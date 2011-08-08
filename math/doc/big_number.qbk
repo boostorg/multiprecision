@@ -1,0 +1,207 @@
+[/ 
+  Copyright 2011 John Maddock.
+  Distributed under the Boost Software License, Version 1.0.
+  (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt).
+]
+
+[library Boost.BigNumbers
+    [quickbook 1.5]
+    [copyright 2011 John Maddock]
+    [purpose Big Number library]
+    [license
+         Distributed under the Boost Software License, Version 1.0.
+         (See accompanying file LICENSE_1_0.txt or copy at
+         [@http://www.boost.org/LICENSE_1_0.txt])
+    ]
+    [authors [authors, various]]
+    [last-revision $Date: 2011-07-08 18:51:46 +0100 (Fri, 08 Jul 2011) $]
+]
+
+[section:intro Introduction]
+
+The Big Number library comes in two distinct parts: an expression template enabled front end `big_number`
+that handles all the operator overloading, expression evaluation optimization, and code reduction, and
+a selection of backends that implement the actual arithmetic operations, and need conform only to the
+reduced interface requirements of the front end.
+
+[endsect]
+
+[section:tut Tutorial]
+
+In order to use this library you need to make two choices: what kind of number do I want, and
+which backend do I want to perform the actual arithmetic?
+
+[section:ints Integer Types]
+
+The following backends provide integer arithmetic:
+
+[table
+[[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
+[[`gmp_int`][boost/math/big_number/gmp.hpp][2][GMP][Very fast and efficient backend.][Dependency on GNU licenced GMP library.]]
+]
+
+[h4 gmp_int]
+
+   namespace boost{ namespace math{
+
+   class gmp_int;
+
+   typedef big_number<gmp_int >         mpz_int;
+
+   }} // namespaces
+
+The `gmp_int` backend is used via the typedef `boost::math::mpz_int`.  It acts as a thin wrapper around the GMP `mpz_t`
+to provide an integer type that is a drop-in replacement for the native C++ integer types, but with unlimited precision.
+
+[h5 Example:]
+
+   #include <boost/math/big_number/gmp.hpp>
+
+   boost::math::mpz_int v = 1;
+
+   // Do some arithmetic:
+   for(unsigned i = 1; i <= 1000; ++i)
+      v *= i;
+
+   std::cout << i << std::endl; // prints 1000!
+
+[endsect]
+
+[section:reals Real Numbers]
+
+The following backends provide real number arithmetic:
+
+[table
+[[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
+[[`gmp_real<N>`][boost/math/big_number/gmp.hpp][2][GMP][Very fast and efficient backend.][Dependency on GNU licenced GMP library.]]
+]
+
+[h4 gmp_real]
+
+   namespace boost{ namespace math{
+
+   template <unsigned Digits10>
+   class gmp_real;
+
+   typedef big_number<gmp_real<50> >    mpf_real_50;
+   typedef big_number<gmp_real<100> >   mpf_real_100;
+   typedef big_number<gmp_real<500> >   mpf_real_500;
+   typedef big_number<gmp_real<1000> >  mpf_real_1000;
+   typedef big_number<gmp_real<0> >     mpf_real;
+
+   }} // namespaces
+
+The `gmp_real` backend is used in conjunction with `big_number`: It acts as a thin wrapper around the GMP `mpf_t`
+to provide an real-number type that is a drop-in replacement for the native C++ floating-point types, but with 
+much greater precision.
+
+Type `gmp_real` can be used at fixed precision by specifying a non-zero `Digits10` template parameter, or
+at variable precision by setting the template argument to zero.  The typedefs mpf_real_50, mpf_real_100,
+mpf_real_500, mpf_real_1000 provide arithmetic types at 50, 100, 500 and 1000 decimal digits precision
+respectively.  The typedef mpf_real provides a variable precision type whose precision can be controlled via the
+`big_number`'s member functions.
+
+[h5 example:]
+
+   #include <boost/math/big_number/gmp.hpp>
+
+   boost::math::gmp_real a = 2;
+   boost::math::gmp_real::default_precision(1000);
+   std::cout << boost::math::gmp_real::default_precision() << std::endl;
+   std::cout << sqrt(a) << std::endl; // print root-2
+
+[endsect]
+
+[endsect]
+
+[section:ref Reference]
+
+[section:bignum big_number]
+
+[h4 Synopsis]
+
+   namespace boost{ namespace math{
+
+   template <class Backend>
+   class big_number
+   {
+      big_number();
+      big_number(see-below);
+      big_number& operator=(see-below);
+      /* Other number-type operators here */
+      // string conversion:
+      std::string str()const;
+      // precision control:
+      static unsigned default_precision();
+      static void default_precision(unsigned digits10);
+      unsigned precision()const;
+      void precision(unsigned digits10);
+      // Comparison:
+      int compare(const big_number<Backend>& o)const;
+      template <class V>
+      typename enable_if<is_arithmetic<V>, int>::type compare(const V& o)const;
+   };
+
+   }} // namespaces
+
+[h4 Description]
+
+   big_number();
+   big_number(see-below);
+   big_number& operator=(see-below);
+
+Type `big_number` is default constructible, and copy both constructible and assignable from:
+
+* Itself.
+* An expression template which is the result of one of the arithmetic operators.
+* Any builtin arithmetic type.
+* A `std::string` or any type which is convertible to `const char*`.
+
+      /* Other number-type operators here */
+
+The following arithmetic operations are support for real-numbered types:
+
+* Binary +, -, *, /, +=, -=, *=, /=, ==, !=, <=, >=, <, >.
+* Unary +, -.
+
+For integer types the following operators are also supported:
+
+Binary %, %=.
+
+(More to follow!!)
+
+Note that the result of the binary +, -, *, / and % operations is an expression template of "unmentionable type".
+
+      std::string str()const;
+
+Returns the number formatted as a string (TODO: enable custom precision).
+
+      static unsigned default_precision();
+      static void default_precision(unsigned digits10);
+      unsigned precision()const;
+      void precision(unsigned digits10);
+
+These functions are only available if the Backend template parameter supports runtime changes to precision.  They get and set
+the default precision and the precision of *this respectively.
+
+      int compare(const big_number<Backend>& o)const;
+      template <class V>
+      typename enable_if<is_arithmetic<V>, int>::type compare(const V& other)const;
+
+Returns:
+
+* A value less that 0 for *this < other
+* A value greater that 0 for *this > other
+* Zero for *this == other
+
+[endsect]
+
+[section:backendconc Backend Requirements]
+
+TODO, big boring job!!
+
+[endsect]
+
+[endsect]
+

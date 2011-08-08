@@ -60,6 +60,25 @@ void test_integer_ops(const boost::mpl::true_&)
    BOOST_TEST(a == -20 % -7);
 }
 
+template <class Real>
+void test_real_ops(const boost::mpl::false_&){}
+
+template <class Real>
+void test_real_ops(const boost::mpl::true_&)
+{
+   std::cout << "Root2 = " << sqrt(Real(2)) << std::endl;
+   BOOST_TEST(abs(Real(2)) == 2);
+   BOOST_TEST(abs(Real(-2)) == 2);
+   BOOST_TEST(fabs(Real(2)) == 2);
+   BOOST_TEST(fabs(Real(-2)) == 2);
+   BOOST_TEST(floor(Real(5) / 2) == 2);
+   BOOST_TEST(ceil(Real(5) / 2) == 3);
+   BOOST_TEST(floor(Real(-5) / 2) == -3);
+   BOOST_TEST(ceil(Real(-5) / 2) == -2);
+   BOOST_TEST(trunc(Real(5) / 2) == 2);
+   BOOST_TEST(trunc(Real(-5) / 2) == -2);
+}
+
 template <class Real, class Num>
 void test_negative_mixed(boost::mpl::true_ const&)
 {
@@ -208,6 +227,10 @@ void test()
    // Integer only functions:
    //
    test_integer_ops<Real>(boost::math::is_extended_integer<Real>());
+   //
+   // Real number only functions:
+   //
+   test_real_ops<Real>(boost::mpl::bool_<false == boost::math::is_extended_integer<Real>::value >());
    //
    // Test basic arithmetic:
    //

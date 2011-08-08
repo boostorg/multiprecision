@@ -1,0 +1,158 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Real Numbers</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.76.1">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.BigNumbers">
+<link rel="up" href="../tut.html" title="Tutorial">
+<link rel="prev" href="ints.html" title="Integer Types">
+<link rel="next" href="../ref.html" title="Reference">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="ints.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../tut.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../ref.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_bignumbers.tut.reals"></a><a class="link" href="reals.html" title="Real Numbers">Real Numbers</a>
+</h3></div></div></div>
+<p>
+        The following backends provide real number arithmetic:
+      </p>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend Type
+                </p>
+              </th>
+<th>
+                <p>
+                  Header
+                </p>
+              </th>
+<th>
+                <p>
+                  Radix
+                </p>
+              </th>
+<th>
+                <p>
+                  Dependencies
+                </p>
+              </th>
+<th>
+                <p>
+                  Pros
+                </p>
+              </th>
+<th>
+                <p>
+                  Cons
+                </p>
+              </th>
+</tr></thead>
+<tbody><tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">gmp_real</span><span class="special">&lt;</span><span class="identifier">N</span><span class="special">&gt;</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  boost/math/big_number/gmp.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  2
+                </p>
+              </td>
+<td>
+                <p>
+                  GMP
+                </p>
+              </td>
+<td>
+                <p>
+                  Very fast and efficient backend.
+                </p>
+              </td>
+<td>
+                <p>
+                  Dependency on GNU licenced GMP library.
+                </p>
+              </td>
+</tr></tbody>
+</table></div>
+<a name="boost_bignumbers.tut.reals.gmp_real"></a><h5>
+<a name="boost_bignumbers.tut.reals.gmp_real-heading"></a>
+        <a class="link" href="reals.html#boost_bignumbers.tut.reals.gmp_real">gmp_real</a>
+      </h5>
+<pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">math</span><span class="special">{</span>
+
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">unsigned</span> <span class="identifier">Digits10</span><span class="special">&gt;</span>
+<span class="keyword">class</span> <span class="identifier">gmp_real</span><span class="special">;</span>
+
+<span class="keyword">typedef</span> <span class="identifier">big_number</span><span class="special">&lt;</span><span class="identifier">gmp_real</span><span class="special">&lt;</span><span class="number">50</span><span class="special">&gt;</span> <span class="special">&gt;</span>    <span class="identifier">mpf_real_50</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">big_number</span><span class="special">&lt;</span><span class="identifier">gmp_real</span><span class="special">&lt;</span><span class="number">100</span><span class="special">&gt;</span> <span class="special">&gt;</span>   <span class="identifier">mpf_real_100</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">big_number</span><span class="special">&lt;</span><span class="identifier">gmp_real</span><span class="special">&lt;</span><span class="number">500</span><span class="special">&gt;</span> <span class="special">&gt;</span>   <span class="identifier">mpf_real_500</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">big_number</span><span class="special">&lt;</span><span class="identifier">gmp_real</span><span class="special">&lt;</span><span class="number">1000</span><span class="special">&gt;</span> <span class="special">&gt;</span>  <span class="identifier">mpf_real_1000</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">big_number</span><span class="special">&lt;</span><span class="identifier">gmp_real</span><span class="special">&lt;</span><span class="number">0</span><span class="special">&gt;</span> <span class="special">&gt;</span>     <span class="identifier">mpf_real</span><span class="special">;</span>
+
+<span class="special">}}</span> <span class="comment">// namespaces</span>
+</pre>
+<p>
+        The <code class="computeroutput"><span class="identifier">gmp_real</span></code> backend is used
+        in conjunction with <code class="computeroutput"><span class="identifier">big_number</span></code>:
+        It acts as a thin wrapper around the GMP <code class="computeroutput"><span class="identifier">mpf_t</span></code>
+        to provide an real-number type that is a drop-in replacement for the native
+        C++ floating-point types, but with much greater precision.
+      </p>
+<p>
+        Type <code class="computeroutput"><span class="identifier">gmp_real</span></code> can be used
+        at fixed precision by specifying a non-zero <code class="computeroutput"><span class="identifier">Digits10</span></code>
+        template parameter, or at variable precision by setting the template argument
+        to zero. The typedefs mpf_real_50, mpf_real_100, mpf_real_500, mpf_real_1000
+        provide arithmetic types at 50, 100, 500 and 1000 decimal digits precision
+        respectively. The typedef mpf_real provides a variable precision type whose
+        precision can be controlled via the <code class="computeroutput"><span class="identifier">big_number</span></code>'s
+        member functions.
+      </p>
+<a name="boost_bignumbers.tut.reals.example_"></a><h6>
+<a name="boost_bignumbers.tut.reals.example_-heading"></a>
+        <a class="link" href="reals.html#boost_bignumbers.tut.reals.example_">example:</a>
+      </h6>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">math</span><span class="special">/</span><span class="identifier">big_number</span><span class="special">/</span><span class="identifier">gmp</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+
+<span class="identifier">boost</span><span class="special">::</span><span class="identifier">math</span><span class="special">::</span><span class="identifier">gmp_real</span> <span class="identifier">a</span> <span class="special">=</span> <span class="number">2</span><span class="special">;</span>
+<span class="identifier">boost</span><span class="special">::</span><span class="identifier">math</span><span class="special">::</span><span class="identifier">gmp_real</span><span class="special">::</span><span class="identifier">default_precision</span><span class="special">(</span><span class="number">1000</span><span class="special">);</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">math</span><span class="special">::</span><span class="identifier">gmp_real</span><span class="special">::</span><span class="identifier">default_precision</span><span class="special">()</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">sqrt</span><span class="special">(</span><span class="identifier">a</span><span class="special">)</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span> <span class="comment">// print root-2</span>
+</pre>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011 John Maddock<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="ints.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../tut.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../ref.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

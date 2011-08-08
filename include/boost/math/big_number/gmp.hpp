@@ -283,6 +283,8 @@ struct gmp_real_imp
       d = v;
       return compare(d);
    }
+   mpf_t& data() { return m_data; }
+   const mpf_t& data()const { return m_data; }
 protected:
    mpf_t m_data;
 };
@@ -365,6 +367,52 @@ private:
       return val;
    }
 };
+
+//
+// Native non-member operations:
+//
+template <unsigned Digits10>
+big_number<gmp_real<Digits10> > sqrt(const big_number<gmp_real<Digits10> >& val)
+{
+   big_number<gmp_real<Digits10> > result;
+   mpf_sqrt(result.backend().data(), val.backend().data());
+   return result;
+}
+template <unsigned Digits10>
+big_number<gmp_real<Digits10> > abs(const big_number<gmp_real<Digits10> >& val)
+{
+   big_number<gmp_real<Digits10> > result;
+   mpf_abs(result.backend().data(), val.backend().data());
+   return result;
+}
+template <unsigned Digits10>
+big_number<gmp_real<Digits10> > fabs(const big_number<gmp_real<Digits10> >& val)
+{
+   big_number<gmp_real<Digits10> > result;
+   mpf_abs(result.backend().data(), val.backend().data());
+   return result;
+}
+template <unsigned Digits10>
+big_number<gmp_real<Digits10> > ceil(const big_number<gmp_real<Digits10> >& val)
+{
+   big_number<gmp_real<Digits10> > result;
+   mpf_ceil(result.backend().data(), val.backend().data());
+   return result;
+}
+template <unsigned Digits10>
+big_number<gmp_real<Digits10> > floor(const big_number<gmp_real<Digits10> >& val)
+{
+   big_number<gmp_real<Digits10> > result;
+   mpf_floor(result.backend().data(), val.backend().data());
+   return result;
+}
+template <unsigned Digits10>
+big_number<gmp_real<Digits10> > trunc(const big_number<gmp_real<Digits10> >& val)
+{
+   big_number<gmp_real<Digits10> > result;
+   mpf_trunc(result.backend().data(), val.backend().data());
+   return result;
+}
 
 struct gmp_int
 {

@@ -398,6 +398,14 @@ public:
    {
       return m_backend.compare(canonical_value(o));
    }
+   Backend& backend()
+   {
+      return m_backend;
+   }
+   const Backend& backend()const
+   {
+      return m_backend;
+   }
 private:
    template <class Exp>
    void do_assign(const Exp& e, const proto::tag::unary_plus&)
@@ -1158,6 +1166,47 @@ std::istream& operator >> (std::istream& is, big_number<Backend>& r)
    is >> s;
    r = s;
    return is;
+}
+
+//
+// Non-member functions accepting an expression-template as argument:
+//
+#undef sqrt
+template <class Exp>
+typename boost::math::detail::expression_type<Exp>::type sqrt(const detail::big_number_exp<Exp>& val)
+{
+   typedef typename detail::expression_type<Exp>::type result_type;
+   return sqrt(result_type(val));
+}
+template <class Exp>
+typename detail::expression_type<Exp>::type abs(const detail::big_number_exp<Exp>& val)
+{
+   typedef typename detail::expression_type<Exp>::type result_type;
+   return abs(result_type(val));
+}
+template <class Exp>
+typename detail::expression_type<Exp>::type fabs(const detail::big_number_exp<Exp>& val)
+{
+   typedef typename detail::expression_type<Exp>::type result_type;
+   return fabs(result_type(val));
+}
+template <class Exp>
+typename detail::expression_type<Exp>::type ceil(const detail::big_number_exp<Exp>& val)
+{
+   typedef typename detail::expression_type<Exp>::type result_type;
+   return ceil(result_type(val));
+}
+template <class Exp>
+typename detail::expression_type<Exp>::type floor(const detail::big_number_exp<Exp>& val)
+{
+   typedef typename detail::expression_type<Exp>::type result_type;
+   return floor(result_type(val));
+}
+template <class Exp>
+typename detail::expression_type<Exp>::type trunc(const detail::big_number_exp<Exp>& val)
+{
+   typedef typename detail::expression_type<Exp>::type result_type;
+   return trunc(result_type(val));
 }
 
 }} // namespaces
