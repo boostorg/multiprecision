@@ -413,6 +413,30 @@ big_number<gmp_real<Digits10> > trunc(const big_number<gmp_real<Digits10> >& val
    mpf_trunc(result.backend().data(), val.backend().data());
    return result;
 }
+template <unsigned Digits10>
+big_number<gmp_real<Digits10> > ldexp(const big_number<gmp_real<Digits10> >& val, long e)
+{
+   big_number<gmp_real<Digits10> > result;
+   if(e > 0)
+      mpf_mul_2exp(result.backend().data(), val.backend().data(), e);
+   else if(e < 0)
+      mpf_div_2exp(result.backend().data(), val.backend().data(), -e);
+   return result;
+}
+template <unsigned Digits10>
+big_number<gmp_real<Digits10> > frexp(const big_number<gmp_real<Digits10> >& val, int* e)
+{
+   long v;
+   mpf_get_d_2exp(&v, val.backend().data());
+   *e = v;
+   return ldexp(val, -v);
+}
+template <unsigned Digits10>
+big_number<gmp_real<Digits10> > frexp(const big_number<gmp_real<Digits10> >& val, long* e)
+{
+   mpf_get_d_2exp(e, val.backend().data());
+   return ldexp(val, -*v);
+}
 
 struct gmp_int
 {

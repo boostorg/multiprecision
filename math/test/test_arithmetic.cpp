@@ -85,6 +85,21 @@ void test_real_ops(const boost::mpl::true_&)
    BOOST_TEST(ceil(Real(-5) / 2) == -2);
    BOOST_TEST(trunc(Real(5) / 2) == 2);
    BOOST_TEST(trunc(Real(-5) / 2) == -2);
+
+   //
+   // ldexp and frexp, these pretty much have to implemented by each backend:
+   //
+   BOOST_TEST(ldexp(Real(2), 5) == 64);
+   BOOST_TEST(ldexp(Real(2), -5) == Real(2) / 32);
+   Real v(512);
+   int exp;
+   Real r = frexp(v, &exp);
+   BOOST_TEST(r == 0.5);
+   BOOST_TEST(exp == 10);
+   v = 1 / v;
+   r = frexp(v, &exp);
+   BOOST_TEST(r == 0.5);
+   BOOST_TEST(exp == -8);
 }
 
 template <class Real, class Num>
