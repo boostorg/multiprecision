@@ -12,6 +12,14 @@
 #  define TEST_MPF
 #  define TEST_BACKEND
 #  define TEST_MPZ
+
+#ifdef _MSC_VER
+#pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
+#endif
+#ifdef __GNUC__
+#pragma warning "CAUTION!!: No backend type specified so testing everything.... this will take some time!!"
+#endif
+
 #endif
 
 template <class Real>
