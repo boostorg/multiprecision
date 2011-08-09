@@ -11,8 +11,12 @@
 #include <boost/mpl/max.hpp>
 #include <boost/mpl/plus.hpp>
 #include <boost/mpl/or.hpp>
+#include <boost/mpl/find_if.hpp>
 #include <boost/assert.hpp>
 #include <boost/type_traits/remove_pointer.hpp>
+#include <boost/type_traits/is_signed.hpp>
+#include <boost/type_traits/is_unsigned.hpp>
+#include <boost/type_traits/is_floating_point.hpp>
 
 namespace boost{ namespace math{
 
