@@ -17,6 +17,7 @@ http://www.netlib.org/f2c/libf2c.zip
 #include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <iomanip>
+#include <cmath>
 #ifdef TEST_BIG_NUMBER
 #include <boost/math/big_number/gmp.hpp>
 typedef boost::math::mpf_real_100 real_type;
@@ -82,8 +83,20 @@ inline double second_(void)
    return ((double)(clock())) / CLOCKS_PER_SEC;
 }
 
+int dgefa_(real_type *, integer *, integer *, integer *, integer *), dgesl_(real_type *, integer *, integer *, integer *, real_type *, integer *);
+int dmxpy_(integer *, real_type *, integer *, integer *, real_type *, real_type *);
+int matgen_(real_type *, integer *, integer *, real_type *, real_type *);
+real_type epslon_(real_type *);
+real_type ran_(integer *);
+int dscal_(integer *, real_type *, real_type *, integer *);
+int daxpy_(integer *, real_type *, real_type *, integer *, real_type *, integer *);
+integer idamax_(integer *, real_type *, integer *);
+real_type ddot_(integer *, real_type *, integer *, real_type *, integer *);
+int daxpy_(integer *, real_type *, real_type *, integer *, real_type *, integer *);
+int dmxpy_(integer *, real_type *, integer *, integer *, real_type *, real_type *);
 
-int main()
+
+extern "C" int MAIN__()
 {
 #ifdef TEST_BIG_NUMBER
    std::cout << "Testing big_number<mpf_real<100> >" << std::endl;
@@ -133,17 +146,9 @@ int main()
    static integer info;
    static double time[6], cray, total;
    static integer ipvt[1000];
-   extern /* Subroutine */ int dgefa_(real_type *, integer *, integer *, 
-      integer *, integer *), dgesl_(real_type *, integer *, integer *, 
-      integer *, real_type *, integer *);
    static real_type resid, norma;
-   extern /* Subroutine */ int dmxpy_(integer *, real_type *, integer *, 
-      integer *, real_type *, real_type *);
    static real_type normx;
-   extern /* Subroutine */ int matgen_(real_type *, integer *, integer *, 
-      real_type *, real_type *);
    static real_type residn;
-   extern real_type epslon_(real_type *);
 
    /* Fortran I/O blocks */
    static cilist io___4 = { 0, 6, 0, fmt_1, 0 };
@@ -270,7 +275,6 @@ int main()
 
    /* Local variables */
    static integer i__, j;
-   extern real_type ran_(integer *);
    static integer init[4];
 
 
@@ -325,10 +329,6 @@ int main()
    static integer j, k, l;
    static real_type t;
    static integer kp1, nm1;
-   extern /* Subroutine */ int dscal_(integer *, real_type *, real_type *, 
-      integer *), daxpy_(integer *, real_type *, real_type *, integer 
-      *, real_type *, integer *);
-   extern integer idamax_(integer *, real_type *, integer *);
 
 
    /*     dgefa factors a double precision matrix by gaussian elimination. */
@@ -465,10 +465,6 @@ L70:
    static integer k, l;
    static real_type t;
    static integer kb, nm1;
-   extern real_type ddot_(integer *, real_type *, integer *, real_type *, 
-      integer *);
-   extern /* Subroutine */ int daxpy_(integer *, real_type *, real_type *, 
-      integer *, real_type *, integer *);
 
 
    /*     dgesl solves the double precision system */
@@ -917,9 +913,9 @@ L30:
 real_type epslon_(real_type *x)
 {
 #ifdef TEST_BIG_NUMBER
-   return ldexp(1.0, 1 - ((100 + 1) * 1000L) / 301L);
+   return std::ldexp(1.0, 1 - ((100 + 1) * 1000L) / 301L);
 #elif defined(TEST_GMPXX)
-   return ldexp(1.0, 1 - ((100 + 1) * 1000L) / 301L);
+   return std::ldexp(1.0, 1 - ((100 + 1) * 1000L) / 301L);
 #else
    return CAST_TO_RT(std::numeric_limits<real_type>::epsilon());
 #endif
@@ -934,8 +930,6 @@ real_type epslon_(real_type *x)
 
    /* Local variables */
    static integer i__, j;
-   extern /* Subroutine */ int dmxpy_(integer *, real_type *, integer *, 
-      integer *, real_type *, real_type *);
 
 
    /*   purpose: */

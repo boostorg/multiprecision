@@ -313,9 +313,9 @@ struct gmp_real : public detail::gmp_real_imp<digits10>
    {
       mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
    }
-   gmp_real(const gmp_real& o) : gmp_real_imp(o) {}
+   gmp_real(const gmp_real& o) : detail::gmp_real_imp<digits10>(o) {}
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   gmp_real(gmp_real&& o) : gmp_real_imp(o) {}
+   gmp_real(gmp_real&& o) : detail::gmp_real_imp<digits10>(o) {}
 #endif
    gmp_real& operator=(const gmp_real& o)
    {
@@ -348,9 +348,9 @@ struct gmp_real<0> : public detail::gmp_real_imp<0>
    {
       mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
    }
-   gmp_real(const gmp_real& o) : gmp_real_imp(o) {}
+   gmp_real(const gmp_real& o) : detail::gmp_real_imp<0>(o) {}
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   gmp_real(gmp_real&& o) : gmp_real_imp(o) {}
+   gmp_real(gmp_real&& o) : detail::gmp_real_imp<0>(o) {}
 #endif
    gmp_real(const gmp_real& o, unsigned digits10) 
    {
@@ -467,7 +467,7 @@ template <unsigned Digits10>
 big_number<gmp_real<Digits10> > frexp(const big_number<gmp_real<Digits10> >& val, long* e)
 {
    mpf_get_d_2exp(e, val.backend().data());
-   return ldexp(val, -*v);
+   return ldexp(val, -*e);
 }
 
 struct gmp_int
