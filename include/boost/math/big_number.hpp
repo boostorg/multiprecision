@@ -190,13 +190,6 @@ public:
       BOOST_ASSERT(proto::value(*this) == this);
       m_backend = canonical_value(v);
    }
-   /*
-   big_number(unsigned digits10, typename enable_if_c<false == Backend::is_fixed>::type* dummy = 0)
-      : base_type(digits10)
-   {
-      proto::value(*this) = this;
-      BOOST_ASSERT(proto::value(*this) == this);
-   }*/
    big_number(const big_number& e, unsigned digits10) : m_backend(e.m_backend, digits10)
    {
       proto::value(*this) = this;
@@ -239,6 +232,19 @@ public:
       BOOST_ASSERT(proto::value(*this) == this);
       do_assign(e, typename proto::tag_of<Exp>::type());
    }
+
+#ifndef BOOST_NO_RVALUE_REFERENCES
+   big_number(big_number&& r) : m_backend(r.m_backend)
+   {
+      proto::value(*this) = this;
+      BOOST_ASSERT(proto::value(*this) == this);
+   }
+   big_number& operator=(big_number&& r)
+   {
+      m_backend.swap(r.m_backend);
+      return *this;
+   }
+#endif
 
    template <class Exp>
    big_number& operator+=(const detail::big_number_exp<Exp>& e)
@@ -367,9 +373,9 @@ public:
    //
    // String conversion functions:
    //
-   std::string str()const
+   std::string str(unsigned digits = 0)const
    {
-      return m_backend.str();
+      return m_backend.str(digits);
    }
    //
    // Default precision:
@@ -1160,7 +1166,7 @@ inline typename boost::enable_if<detail::is_valid_comparison<Exp1, Exp2>, bool>:
 template <class Backend>
 std::ostream& operator << (std::ostream& os, const big_number<Backend>& r)
 {
-   return os << r.str();
+   return os << r.str(static_cast<unsigned>(os.precision()));
 }
 
 template <class Backend>

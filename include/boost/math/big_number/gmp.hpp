@@ -33,11 +33,25 @@ struct gmp_real_imp
    {
       mpf_init_set(m_data, o.m_data);
    }
+#ifndef BOOST_NO_RVALUE_REFERENCES
+   gmp_real_imp(gmp_real_imp&& o)
+   {
+      m_data[0] = o.m_data[0];
+      o.m_data[0]._mp_d = 0;
+   }
+#endif
    gmp_real_imp& operator = (const gmp_real_imp& o)
    {
       mpf_set(m_data, o.m_data);
       return *this;
    }
+#ifndef BOOST_NO_RVALUE_REFERENCES
+   gmp_real_imp& operator = (gmp_real_imp&& o)
+   {
+      mpf_swap(m_data, o.m_data);
+      return *this;
+   }
+#endif
    gmp_real_imp& operator = (boost::uintmax_t i)
    {
       boost::uintmax_t mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
@@ -233,13 +247,13 @@ struct gmp_real_imp
    {
       mpf_swap(m_data, o.m_data);
    }
-   std::string str()const
+   std::string str(unsigned digits)const
    {
       mp_exp_t e;
       void *(*alloc_func_ptr) (size_t);
       void *(*realloc_func_ptr) (void *, size_t, size_t);
       void (*free_func_ptr) (void *, size_t);
-      const char* ps = mpf_get_str (0, &e, 10, 0, m_data);
+      const char* ps = mpf_get_str (0, &e, 10, digits, m_data);
       std::string s("0.");
       if(ps[0] == '-')
       {
@@ -258,7 +272,8 @@ struct gmp_real_imp
    }
    ~gmp_real_imp()
    {
-      mpf_clear(m_data);
+      if(m_data[0]._mp_d)
+         mpf_clear(m_data);
    }
    void negate()
    {
@@ -299,13 +314,21 @@ struct gmp_real : public detail::gmp_real_imp<digits10>
       mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
    }
    gmp_real(const gmp_real& o) : gmp_real_imp(o) {}
-
+#ifndef BOOST_NO_RVALUE_REFERENCES
+   gmp_real(gmp_real&& o) : gmp_real_imp(o) {}
+#endif
    gmp_real& operator=(const gmp_real& o)
    {
       *static_cast<detail::gmp_real_imp<digits10>*>(this) = static_cast<detail::gmp_real_imp<digits10> const&>(o);
       return *this;
    }
-
+#ifndef BOOST_NO_RVALUE_REFERENCES
+   gmp_real& operator=(gmp_real&& o)
+   {
+      *static_cast<detail::gmp_real_imp<digits10>*>(this) = static_cast<detail::gmp_real_imp<digits10>&&>(o);
+      return *this;
+   }
+#endif
    template <class V>
    gmp_real& operator=(const V& v)
    {
@@ -326,6 +349,9 @@ struct gmp_real<0> : public detail::gmp_real_imp<0>
       mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
    }
    gmp_real(const gmp_real& o) : gmp_real_imp(o) {}
+#ifndef BOOST_NO_RVALUE_REFERENCES
+   gmp_real(gmp_real&& o) : gmp_real_imp(o) {}
+#endif
    gmp_real(const gmp_real& o, unsigned digits10) 
    {
       mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
@@ -337,7 +363,13 @@ struct gmp_real<0> : public detail::gmp_real_imp<0>
       *static_cast<detail::gmp_real_imp<0>*>(this) = static_cast<detail::gmp_real_imp<0> const&>(o);
       return *this;
    }
-
+#ifndef BOOST_NO_RVALUE_REFERENCES
+   gmp_real& operator=(gmp_real&& o)
+   {
+      *static_cast<detail::gmp_real_imp<0>*>(this) = static_cast<detail::gmp_real_imp<0> &&>(o);
+      return *this;
+   }
+#endif
    template <class V>
    gmp_real& operator=(const V& v)
    {
@@ -706,7 +738,7 @@ struct gmp_int
    {
       mpz_swap(m_data, o.m_data);
    }
-   std::string str()const
+   std::string str(unsigned)const
    {
       void *(*alloc_func_ptr) (size_t);
       void *(*realloc_func_ptr) (void *, size_t, size_t);

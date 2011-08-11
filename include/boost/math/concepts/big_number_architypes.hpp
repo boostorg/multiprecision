@@ -252,7 +252,7 @@ struct big_number_backend_real_architype
       std::cout << "Swapping (" << m_value << " with " << o.m_value << ")" << std::endl;
       std::swap(m_value, o.m_value);
    }
-   std::string str()const
+   std::string str(unsigned)const
    {
       std::string s(boost::lexical_cast<std::string>(m_value));
       std::cout << "Converting to string (" << s << ")" << std::endl;

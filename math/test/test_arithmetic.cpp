@@ -4,10 +4,8 @@
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_
 
 #include <boost/detail/lightweight_test.hpp>
-#include <boost/math/concepts/big_number_architypes.hpp>
-#include <boost/math/big_number/gmp.hpp>
 
-#if !defined(TEST_MPF50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ)
+#if !defined(TEST_MPF50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_E_FLOAT)
 #  define TEST_MPF50
 #  define TEST_MPF
 #  define TEST_BACKEND
@@ -20,6 +18,17 @@
 #pragma warning "CAUTION!!: No backend type specified so testing everything.... this will take some time!!"
 #endif
 
+#endif
+
+#if defined(TEST_MPF50) || defined(TEST_MPF) || defined(TEST_MPZ)
+#include <boost/math/big_number/gmp.hpp>
+#endif
+#ifdef TEST_BACKEND
+#include <boost/math/concepts/big_number_architypes.hpp>
+#endif
+#ifdef TEST_E_FLOAT
+#include <boost/math/big_number.hpp>
+#include <boost/math/bindings/e_float.hpp>
 #endif
 
 template <class Real>
@@ -83,9 +92,12 @@ void test_real_ops(const boost::mpl::true_&)
    BOOST_TEST(ceil(Real(5) / 2) == 3);
    BOOST_TEST(floor(Real(-5) / 2) == -3);
    BOOST_TEST(ceil(Real(-5) / 2) == -2);
+#ifndef TEST_E_FLOAT
    BOOST_TEST(trunc(Real(5) / 2) == 2);
    BOOST_TEST(trunc(Real(-5) / 2) == -2);
+#endif
 
+#ifndef TEST_E_FLOAT
    //
    // ldexp and frexp, these pretty much have to implemented by each backend:
    //
@@ -100,6 +112,7 @@ void test_real_ops(const boost::mpl::true_&)
    r = frexp(v, &exp);
    BOOST_TEST(r == 0.5);
    BOOST_TEST(exp == -8);
+#endif
 }
 
 template <class Real, class Num>
@@ -347,8 +360,10 @@ void test()
    ac = a * ac;
    BOOST_TEST(ac == 8*8);
    ac = a;
+#ifndef TEST_E_FLOAT
    ac = ac + "8";
    BOOST_TEST(ac == 16);
+#endif
    ac = a;
    ac += +a;
    BOOST_TEST(ac == 16);
@@ -362,8 +377,10 @@ void test()
    ac += b*c;
    BOOST_TEST(ac == 8 + 64 * 500);
    ac = a;
+#ifndef TEST_E_FLOAT
    ac = ac - "8";
    BOOST_TEST(ac == 0);
+#endif
    ac = a;
    ac -= +a;
    BOOST_TEST(ac == 0);
@@ -382,8 +399,12 @@ void test()
    ac = a;
    ac -= ac * b;
    BOOST_TEST(ac == 8 - 8 * 64);
+#ifndef TEST_E_FLOAT
    ac = a * "8";
    BOOST_TEST(ac == 64);
+#else
+   ac = a * 8;
+#endif
    ac *= +a;
    BOOST_TEST(ac == 64 * 8);
    ac = a;
@@ -398,8 +419,10 @@ void test()
    ac = a;
    ac *= b + c;
    BOOST_TEST(ac == 8 * (64 + 500));
+#ifndef TEST_E_FLOAT
    ac = b / "8";
    BOOST_TEST(ac == 8);
+#endif
    ac = b;
    ac /= +a;
    BOOST_TEST(ac == 8);
@@ -412,8 +435,10 @@ void test()
    ac = b;
    ac /= a + Real(0);
    BOOST_TEST(ac == 8);
+#ifndef TEST_E_FLOAT
    ac = a + std::string("8");
    BOOST_TEST(ac == 16);
+#endif
    //
    // Comparisons:
    //
@@ -484,6 +509,9 @@ int main()
 #endif
 #ifdef TEST_MPZ
    test<boost::math::mpz_int>();
+#endif
+#ifdef TEST_E_FLOAT
+   test<boost::math::ef::e_float>();
 #endif
    return boost::report_errors();
 }
