@@ -50,6 +50,16 @@ void test_integer_ops(const boost::mpl::true_&)
    BOOST_TEST(a % -7 == 20 % -7);
    BOOST_TEST(-a % 7u == -20 % 7);
 
+   b = -b;
+   BOOST_TEST(a % b == 20 % -7);
+   a = -a;
+   BOOST_TEST(a % b == -20 % -7);
+   BOOST_TEST(a % -7 == -20 % -7);
+   b = 7;
+   BOOST_TEST(a % b == -20 % 7);
+   BOOST_TEST(a % 7 == -20 % 7);
+   BOOST_TEST(a % 7u == -20 % 7);
+
    a = 20;
    a %= b;
    BOOST_TEST(a == 20 % 7);
@@ -83,6 +93,7 @@ void test_real_ops(const boost::mpl::false_&){}
 template <class Real>
 void test_real_ops(const boost::mpl::true_&)
 {
+#if defined(TEST_MPF) || defined(TEST_MPF_50)
    std::cout << "Root2 = " << sqrt(Real(2)) << std::endl;
    BOOST_TEST(abs(Real(2)) == 2);
    BOOST_TEST(abs(Real(-2)) == 2);
@@ -92,12 +103,8 @@ void test_real_ops(const boost::mpl::true_&)
    BOOST_TEST(ceil(Real(5) / 2) == 3);
    BOOST_TEST(floor(Real(-5) / 2) == -3);
    BOOST_TEST(ceil(Real(-5) / 2) == -2);
-#ifndef TEST_E_FLOAT
    BOOST_TEST(trunc(Real(5) / 2) == 2);
    BOOST_TEST(trunc(Real(-5) / 2) == -2);
-#endif
-
-#ifndef TEST_E_FLOAT
    //
    // ldexp and frexp, these pretty much have to implemented by each backend:
    //
@@ -108,6 +115,7 @@ void test_real_ops(const boost::mpl::true_&)
    Real r = frexp(v, &exp);
    BOOST_TEST(r == 0.5);
    BOOST_TEST(exp == 10);
+   BOOST_TEST(v == 512);
    v = 1 / v;
    r = frexp(v, &exp);
    BOOST_TEST(r == 0.5);
@@ -115,9 +123,24 @@ void test_real_ops(const boost::mpl::true_&)
 #endif
 }
 
+template <class T>
+struct lexical_cast_target_type
+{
+   typedef typename boost::mpl::if_<
+      boost::is_signed<T>,
+      boost::intmax_t,
+      typename boost::mpl::if_<
+         boost::is_unsigned<T>,
+         boost::uintmax_t,
+         T
+      >::type
+   >::type type;
+};
+
 template <class Real, class Num>
 void test_negative_mixed(boost::mpl::true_ const&)
 {
+   typedef typename lexical_cast_target_type<Num>::type target_type;
    std::cout << "Testing mixed arithmetic with type: " << typeid(Real).name()  << " and " << typeid(Num).name() << std::endl;
    Num n1 = -static_cast<Num>(1uLL << (std::numeric_limits<Num>::digits - 1));
    Num n2 = -1;
@@ -133,10 +156,10 @@ void test_negative_mixed(boost::mpl::true_ const&)
    BOOST_TEST(n2 == Real(n2));
    BOOST_TEST(n3 == Real(n3));
    BOOST_TEST(n4 == Real(n4));
-   BOOST_TEST(n1 == boost::lexical_cast<long double>(Real(n1)));
-   BOOST_TEST(n2 == boost::lexical_cast<long double>(Real(n2)));
-   BOOST_TEST(n3 == boost::lexical_cast<long double>(Real(n3)));
-   BOOST_TEST(n4 == boost::lexical_cast<long double>(Real(n4)));
+   BOOST_TEST(n1 == boost::lexical_cast<target_type>(Real(n1).str(0, boost::is_floating_point<Num>::value)));
+   BOOST_TEST(n2 == boost::lexical_cast<target_type>(Real(n2).str(0, boost::is_floating_point<Num>::value)));
+   BOOST_TEST(n3 == boost::lexical_cast<target_type>(Real(n3).str(0, boost::is_floating_point<Num>::value)));
+   BOOST_TEST(n4 == boost::lexical_cast<target_type>(Real(n4).str(0, boost::is_floating_point<Num>::value)));
    // Assignment:
    Real r(0);
    BOOST_TEST(r != n1);
@@ -172,6 +195,21 @@ void test_negative_mixed(boost::mpl::true_ const&)
    BOOST_TEST(Real(r / n5) == n1 / n5);
    r /= n5;
    BOOST_TEST(r == n1 / n5);
+   //
+   // Extra cases for full coverage:
+   //
+   r = Real(n4) + n5;
+   BOOST_TEST(r == n4 + n5);
+   r = n4 + Real(n5);
+   BOOST_TEST(r == n4 + n5);
+   r = Real(n4) - n5;
+   BOOST_TEST(r == n4 - n5);
+   r = n4 - Real(n5);
+   BOOST_TEST(r == n4 - n5);
+   r = n4 * Real(n5);
+   BOOST_TEST(r == n4 * n5);
+   r = (4 * n4) / Real(4);
+   BOOST_TEST(r == n4);
 }
 
 template <class Real, class Num>
@@ -182,6 +220,7 @@ void test_negative_mixed(boost::mpl::false_ const&)
 template <class Real, class Num>
 void test_mixed()
 {
+   typedef typename lexical_cast_target_type<Num>::type target_type;
    std::cout << "Testing mixed arithmetic with type: " << typeid(Real).name()  << " and " << typeid(Num).name() << std::endl;
    Num n1 = static_cast<Num>(1uLL << (std::numeric_limits<Num>::digits - 1));
    Num n2 = 1;
@@ -197,10 +236,10 @@ void test_mixed()
    BOOST_TEST(n2 == Real(n2));
    BOOST_TEST(n3 == Real(n3));
    BOOST_TEST(n4 == Real(n4));
-   BOOST_TEST(n1 == boost::lexical_cast<long double>(Real(n1)));
-   BOOST_TEST(n2 == boost::lexical_cast<long double>(Real(n2)));
-   BOOST_TEST(n3 == boost::lexical_cast<long double>(Real(n3)));
-   BOOST_TEST(n4 == boost::lexical_cast<long double>(Real(n4)));
+   BOOST_TEST(n1 == boost::lexical_cast<target_type>(Real(n1).str(0, boost::is_floating_point<Num>::value)));
+   BOOST_TEST(n2 == boost::lexical_cast<target_type>(Real(n2).str(0, boost::is_floating_point<Num>::value)));
+   BOOST_TEST(n3 == boost::lexical_cast<target_type>(Real(n3).str(0, boost::is_floating_point<Num>::value)));
+   BOOST_TEST(n4 == boost::lexical_cast<target_type>(Real(n4).str(0, boost::is_floating_point<Num>::value)));
    // Assignment:
    Real r(0);
    BOOST_TEST(r != n1);
@@ -236,6 +275,18 @@ void test_mixed()
    BOOST_TEST(Real(r / n5) == n1 / n5);
    r /= n5;
    BOOST_TEST(r == n1 / n5);
+
+   //
+   // special cases for full coverage:
+   //
+   r = n5 + Real(n4);
+   BOOST_TEST(r == n4 + n5);
+   r = n4 - Real(n5);
+   BOOST_TEST(r == n4 - n5);
+   r = n4 * Real(n5);
+   BOOST_TEST(r == n4 * n5);
+   r = (4 * n4) / Real(4);
+   BOOST_TEST(r == n4);
 
    test_negative_mixed<Real, Num>(boost::mpl::bool_<std::numeric_limits<Num>::is_signed>());
 }
@@ -439,6 +490,28 @@ void test()
    ac = a + std::string("8");
    BOOST_TEST(ac == 16);
 #endif
+   //
+   // simple tests with immediate values, these calls can be optimised in many backends:
+   //
+   ac = a + b;
+   BOOST_TEST(ac == 72);
+   ac = a + +b;
+   BOOST_TEST(ac == 72);
+   ac = +a + b;
+   BOOST_TEST(ac == 72);
+   ac = +a + +b;
+   BOOST_TEST(ac == 72);
+   ac = a + -b;
+   BOOST_TEST(ac == 8 - 64);
+   ac = -a + b;
+   BOOST_TEST(ac == -8+64);
+   ac = -a + -b;
+   BOOST_TEST(ac == -72);
+   ac = a + - + -b; // lots of unary operators!!
+   BOOST_TEST(ac == 72);
+   ac = a;
+   ac = b / ac;
+   BOOST_TEST(ac == b / a);
    //
    // Comparisons:
    //

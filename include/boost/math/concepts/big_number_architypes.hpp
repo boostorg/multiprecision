@@ -18,9 +18,9 @@ namespace concepts{
 
 struct big_number_backend_real_architype
 {
-   typedef mpl::list<int, long long>                 signed_types;
-   typedef mpl::list<unsigned, unsigned long long>   unsigned_types;
-   typedef mpl::list<double, long double>            real_types;
+   typedef mpl::list<long long>                 signed_types;
+   typedef mpl::list<unsigned long long>        unsigned_types;
+   typedef mpl::list<long double>               real_types;
 
    big_number_backend_real_architype()
    {
@@ -49,24 +49,6 @@ struct big_number_backend_real_architype
       std::cout << "Int Assignment (" << i << ")" << std::endl;
       return *this;
    }
-   big_number_backend_real_architype& operator = (unsigned i)
-   {
-      m_value = i;
-      std::cout << "UInt Assignment (" << i << ")" << std::endl;
-      return *this;
-   }
-   big_number_backend_real_architype& operator = (int i)
-   {
-      m_value = i;
-      std::cout << "Int Assignment (" << i << ")" << std::endl;
-      return *this;
-   }
-   big_number_backend_real_architype& operator = (double d)
-   {
-      m_value = d;
-      std::cout << "double Assignment (" << d << ")" << std::endl;
-      return *this;
-   }
    big_number_backend_real_architype& operator = (long double d)
    {
       m_value = d;
@@ -79,182 +61,29 @@ struct big_number_backend_real_architype
       std::cout << "const char* Assignment (" << s << ")" << std::endl;
       return *this;
    }
-   big_number_backend_real_architype& operator += (const big_number_backend_real_architype& o)
-   {
-      std::cout << "Addition (" << m_value << " += " << o.m_value << ")" << std::endl;
-      m_value += o.m_value;
-      return *this;
-   }
-   big_number_backend_real_architype& operator -= (const big_number_backend_real_architype& o)
-   {
-      std::cout << "Subtraction (" << m_value << " -= " << o.m_value << ")" << std::endl;
-      m_value -= o.m_value;
-      return *this;
-   }
-   big_number_backend_real_architype& operator *= (const big_number_backend_real_architype& o)
-   {
-      std::cout << "Multiplication (" << m_value << " *= " << o.m_value << ")" << std::endl;
-      m_value *= o.m_value;
-      return *this;
-   }
-   big_number_backend_real_architype& operator /= (const big_number_backend_real_architype& o)
-   {
-      std::cout << "Division (" << m_value << " /= " << o.m_value << ")" << std::endl;
-      m_value /= o.m_value;
-      return *this;
-   }
-   big_number_backend_real_architype& operator += (boost::uintmax_t i)
-   {
-      std::cout << "UIntmax_t Addition (" << m_value << " += " << i << ")" << std::endl;
-      m_value += i;
-      return *this;
-   }
-   big_number_backend_real_architype& operator -= (boost::uintmax_t i)
-   {
-      std::cout << "UIntmax_t Subtraction (" << m_value << " -= " << i << ")" << std::endl;
-      m_value -= i;
-      return *this;
-   }
-   big_number_backend_real_architype& operator *= (boost::uintmax_t i)
-   {
-      std::cout << "UIntmax_t Multiplication (" << m_value << " *= " << i << ")" << std::endl;
-      m_value *= i;
-      return *this;
-   }
-   big_number_backend_real_architype& operator /= (boost::uintmax_t i)
-   {
-      std::cout << "UIntmax_t Division (" << m_value << " /= " << i << ")" << std::endl;
-      m_value /= i;
-      return *this;
-   }
-   big_number_backend_real_architype& operator += (boost::intmax_t i)
-   {
-      std::cout << "Intmax_t Addition (" << m_value << " += " << i << ")" << std::endl;
-      m_value += i;
-      return *this;
-   }
-   big_number_backend_real_architype& operator -= (boost::intmax_t i)
-   {
-      std::cout << "Intmax_t Subtraction (" << m_value << " -= " << i << ")" << std::endl;
-      m_value -= i;
-      return *this;
-   }
-   big_number_backend_real_architype& operator *= (boost::intmax_t i)
-   {
-      std::cout << "Intmax_t Multiplication (" << m_value << " *= " << i << ")" << std::endl;
-      m_value *= i;
-      return *this;
-   }
-   big_number_backend_real_architype& operator /= (boost::intmax_t i)
-   {
-      std::cout << "Intmax_t Division (" << m_value << " /= " << i << ")" << std::endl;
-      m_value /= i;
-      return *this;
-   }
-   big_number_backend_real_architype& operator += (unsigned i)
-   {
-      std::cout << "UInt Addition (" << m_value << " += " << i << ")" << std::endl;
-      m_value += i;
-      return *this;
-   }
-   big_number_backend_real_architype& operator -= (unsigned i)
-   {
-      std::cout << "UInt Subtraction (" << m_value << " -= " << i << ")" << std::endl;
-      m_value -= i;
-      return *this;
-   }
-   big_number_backend_real_architype& operator *= (unsigned i)
-   {
-      std::cout << "UInt Multiplication (" << m_value << " *= " << i << ")" << std::endl;
-      m_value *= i;
-      return *this;
-   }
-   big_number_backend_real_architype& operator /= (unsigned i)
-   {
-      std::cout << "UInt Division (" << m_value << " /= " << i << ")" << std::endl;
-      m_value /= i;
-      return *this;
-   }
-   big_number_backend_real_architype& operator += (int i)
-   {
-      std::cout << "Int Addition (" << m_value << " += " << i << ")" << std::endl;
-      m_value += i;
-      return *this;
-   }
-   big_number_backend_real_architype& operator -= (int i)
-   {
-      std::cout << "Int Subtraction (" << m_value << " -= " << i << ")" << std::endl;
-      m_value -= i;
-      return *this;
-   }
-   big_number_backend_real_architype& operator *= (int i)
-   {
-      std::cout << "Int Multiplication (" << m_value << " *= " << i << ")" << std::endl;
-      m_value *= i;
-      return *this;
-   }
-   big_number_backend_real_architype& operator /= (int i)
-   {
-      std::cout << "Int Division (" << m_value << " /= " << i << ")" << std::endl;
-      m_value /= i;
-      return *this;
-   }
-   big_number_backend_real_architype& operator += (double d)
-   {
-      std::cout << "double Addition (" << m_value << " += " << d << ")" << std::endl;
-      m_value += d;
-      return *this;
-   }
-   big_number_backend_real_architype& operator -= (double d)
-   {
-      std::cout << "double Subtraction (" << m_value << " -= " << d << ")" << std::endl;
-      m_value -= d;
-      return *this;
-   }
-   big_number_backend_real_architype& operator *= (double d)
-   {
-      std::cout << "double Multiplication (" << m_value << " *= " << d << ")" << std::endl;
-      m_value *= d;
-      return *this;
-   }
-   big_number_backend_real_architype& operator /= (double d)
-   {
-      std::cout << "double Division (" << m_value << " /= " << d << ")" << std::endl;
-      m_value /= d;
-      return *this;
-   }
-   big_number_backend_real_architype& operator += (long double d)
-   {
-      std::cout << "long double Addition (" << m_value << " += " << d << ")" << std::endl;
-      m_value += d;
-      return *this;
-   }
-   big_number_backend_real_architype& operator -= (long double d)
-   {
-      std::cout << "long double Subtraction (" << m_value << " -= " << d << ")" << std::endl;
-      m_value -= d;
-      return *this;
-   }
-   big_number_backend_real_architype& operator *= (long double d)
-   {
-      std::cout << "long double Multiplication (" << m_value << " *= " << d << ")" << std::endl;
-      m_value *= d;
-      return *this;
-   }
-   big_number_backend_real_architype& operator /= (long double d)
-   {
-      std::cout << "long double Division (" << m_value << " /= " << d << ")" << std::endl;
-      m_value /= d;
-      return *this;
-   }
    void swap(big_number_backend_real_architype& o)
    {
       std::cout << "Swapping (" << m_value << " with " << o.m_value << ")" << std::endl;
       std::swap(m_value, o.m_value);
    }
-   std::string str(unsigned)const
+   std::string str(unsigned digits, bool scientific)const
    {
-      std::string s(boost::lexical_cast<std::string>(m_value));
+      std::stringstream ss;
+      if(scientific)
+         ss.setf(ss.scientific);
+      if(digits)
+         ss.precision(digits);
+      else
+         ss.precision(std::numeric_limits<long double>::digits10 + 2);
+      boost::intmax_t i = m_value;
+      boost::uintmax_t u = m_value;
+      if(!scientific && m_value == i)
+         ss << i;
+      else if(!scientific && m_value == u)
+         ss << u;
+      else
+         ss << m_value;
+      std::string s = ss.str();
       std::cout << "Converting to string (" << s << ")" << std::endl;
       return s;
    }
@@ -268,16 +97,6 @@ struct big_number_backend_real_architype
       std::cout << "Comparison" << std::endl;
       return m_value > o.m_value ? 1 : (m_value < o.m_value ? -1 : 0);
    }
-   int compare(int i)const
-   {
-      std::cout << "Comparison with int" << std::endl;
-      return m_value > i ? 1 : (m_value < i ? -1 : 0);
-   }
-   int compare(unsigned i)const
-   {
-      std::cout << "Comparison with unsigned" << std::endl;
-      return m_value > i ? 1 : (m_value < i ? -1 : 0);
-   }
    int compare(boost::intmax_t i)const
    {
       std::cout << "Comparison with int" << std::endl;
@@ -288,19 +107,34 @@ struct big_number_backend_real_architype
       std::cout << "Comparison with unsigned" << std::endl;
       return m_value > i ? 1 : (m_value < i ? -1 : 0);
    }
-   int compare(double d)const
-   {
-      std::cout << "Comparison with double" << std::endl;
-      return m_value > d ? 1 : (m_value < d ? -1 : 0);
-   }
    int compare(long double d)const
    {
       std::cout << "Comparison with long double" << std::endl;
       return m_value > d ? 1 : (m_value < d ? -1 : 0);
    }
-private:
    long double m_value;
 };
+
+inline void add(big_number_backend_real_architype& result, const big_number_backend_real_architype& o)
+{
+   std::cout << "Addition (" << result.m_value << " += " << o.m_value << ")" << std::endl;
+   result.m_value += o.m_value;
+}
+inline void subtract(big_number_backend_real_architype& result, const big_number_backend_real_architype& o)
+{
+   std::cout << "Subtraction (" << result.m_value << " -= " << o.m_value << ")" << std::endl;
+   result.m_value -= o.m_value;
+}
+inline void multiply(big_number_backend_real_architype& result, const big_number_backend_real_architype& o)
+{
+   std::cout << "Multiplication (" << result.m_value << " *= " << o.m_value << ")" << std::endl;
+   result.m_value *= o.m_value;
+}
+inline void divide(big_number_backend_real_architype& result, const big_number_backend_real_architype& o)
+{
+   std::cout << "Division (" << result.m_value << " /= " << o.m_value << ")" << std::endl;
+   result.m_value /= o.m_value;
+}
 
 typedef boost::math::big_number<big_number_backend_real_architype> big_number_real_architype;
 

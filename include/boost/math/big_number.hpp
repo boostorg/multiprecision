@@ -17,155 +17,9 @@
 #include <boost/type_traits/is_signed.hpp>
 #include <boost/type_traits/is_unsigned.hpp>
 #include <boost/type_traits/is_floating_point.hpp>
+#include <boost/math/big_number/default_ops.hpp>
 
 namespace boost{ namespace math{
-
-template <class Backend>
-class big_number;
-
-namespace detail{
-
-// Forward-declare an expression wrapper
-template<typename Expr>
-struct big_number_exp;
-//
-// Declare our grammars:
-//
-struct big_number_grammar
-  : proto::or_<
-        proto::terminal< proto::_ >
-      , proto::plus< big_number_grammar, big_number_grammar >
-      , proto::multiplies< big_number_grammar, big_number_grammar >
-      , proto::minus< big_number_grammar, big_number_grammar >
-      , proto::divides< big_number_grammar, big_number_grammar >
-      , proto::unary_plus< big_number_grammar >
-      , proto::negate< big_number_grammar >
-      , proto::modulus<big_number_grammar, big_number_grammar>
-    >
-{};
-
-// Define a calculator domain. Expression within
-// the calculator domain will be wrapped in the
-// calculator<> expression wrapper.
-struct big_number_domain
-  : proto::domain< proto::generator<big_number_exp>, big_number_grammar>
-{};
-
-template<typename Expr>
-struct big_number_exp
-  : proto::extends<Expr, big_number_exp<Expr>, big_number_domain>
-{
-    typedef
-        proto::extends<Expr, big_number_exp<Expr>, big_number_domain> base_type;
-
-    big_number_exp(Expr const &expr = Expr())
-      : base_type(expr)
-    {}
-    template <class Other>
-    big_number_exp(const Other& o)
-       : base_type(o)
-    {}
-};
-
-struct CalcDepth
-  : proto::or_<
-        proto::when< proto::terminal<proto::_>,
-            mpl::int_<0>()
-        >
-      , proto::when< proto::unary_expr<proto::_, CalcDepth>,
-            CalcDepth(proto::_child)
-        >
-      , proto::when< proto::binary_expr<proto::_, CalcDepth, CalcDepth>,
-            mpl::plus<mpl::max<CalcDepth(proto::_left),
-                     CalcDepth(proto::_right)>, mpl::int_<1> >()
-        >
-    >
-{};
-
-template <int b>
-struct has_enough_bits
-{
-   template <class T>
-   struct type : public mpl::bool_<std::numeric_limits<T>::digits >= b>{};
-};
-
-template <class Val, class Backend, class Tag>
-struct canonical_imp
-{
-   typedef Val type;
-};
-template <class Val, class Backend>
-struct canonical_imp<Val, Backend, mpl::int_<0> >
-{
-   typedef typename has_enough_bits<std::numeric_limits<Val>::digits>::template type<mpl::_> pred_type;
-   typedef typename mpl::find_if<
-      typename Backend::signed_types,
-      pred_type
-   >::type iter_type;
-   typedef typename mpl::deref<iter_type>::type type;
-};
-template <class Val, class Backend>
-struct canonical_imp<Val, Backend, mpl::int_<1> >
-{
-   typedef typename has_enough_bits<std::numeric_limits<Val>::digits>::template type<mpl::_> pred_type;
-   typedef typename mpl::find_if<
-      typename Backend::unsigned_types,
-      pred_type
-   >::type iter_type;
-   typedef typename mpl::deref<iter_type>::type type;
-};
-template <class Val, class Backend>
-struct canonical_imp<Val, Backend, mpl::int_<2> >
-{
-   typedef typename has_enough_bits<std::numeric_limits<Val>::digits>::template type<mpl::_> pred_type;
-   typedef typename mpl::find_if<
-      typename Backend::real_types,
-      pred_type
-   >::type iter_type;
-   typedef typename mpl::deref<iter_type>::type type;
-};
-template <class Val, class Backend>
-struct canonical_imp<Val, Backend, mpl::int_<3> >
-{
-   typedef const char* type;
-};
-
-template <class Val, class Backend>
-struct canonical
-{
-   typedef typename mpl::if_<
-      is_signed<Val>,
-      mpl::int_<0>,
-      typename mpl::if_<
-         is_unsigned<Val>,
-         mpl::int_<1>,
-         typename mpl::if_<
-            is_floating_point<Val>,
-            mpl::int_<2>,
-            typename mpl::if_<
-               mpl::or_<
-                  is_convertible<Val, const char*>,
-                  is_same<Val, std::string>
-               >,
-               mpl::int_<3>,
-               mpl::int_<4>
-            >::type
-         >::type
-      >::type
-   >::type tag_type;
-
-   typedef typename canonical_imp<Val, Backend, tag_type>::type type;
-};
-
-} // namespace detail
-
-//
-// Traits class, lets us know whether a backend is an integer type, otherwise assumed to be a real number type:
-//
-template <class Num>
-struct is_extended_integer : public mpl::false_ {};
-template <class Backend>
-struct is_extended_integer<big_number<Backend> > : public is_extended_integer<Backend>{};
 
 template <class Backend>
 class big_number : public detail::big_number_exp<typename proto::terminal<big_number<Backend>*>::type >
@@ -207,7 +61,7 @@ public:
    template <class Exp>
    big_number& operator=(const detail::big_number_exp<Exp>& e)
    {
-      do_assign(e, typename proto::tag_of<Exp>::type());
+      do_assign(e, typename detail::assign_and_eval<Exp>::type());
       return *this;
    }
 
@@ -230,7 +84,7 @@ public:
    {
       proto::value(*this) = this;
       BOOST_ASSERT(proto::value(*this) == this);
-      do_assign(e, typename proto::tag_of<Exp>::type());
+      do_assign(e, typename detail::assign_and_eval<Exp>::type());
    }
 
 #ifndef BOOST_NO_RVALUE_REFERENCES
@@ -267,7 +121,8 @@ public:
    typename enable_if<boost::is_arithmetic<V>, big_number<Backend>& >::type 
       operator+=(const V& v)
    {
-      do_add_value(canonical_value(v), mpl::false_());
+      using big_num_default_ops::add;
+      add(m_backend, canonical_value(v));
       return *this;
    }
 
@@ -291,7 +146,8 @@ public:
    typename enable_if<boost::is_arithmetic<V>, big_number<Backend>& >::type 
       operator-=(const V& v)
    {
-      do_subtract_value(canonical_value(v), mpl::false_());
+      using big_num_default_ops::subtract;
+      subtract(m_backend, canonical_value(v));
       return *this;
    }
 
@@ -316,7 +172,8 @@ public:
    typename enable_if<boost::is_arithmetic<V>, big_number<Backend>& >::type 
       operator*=(const V& v)
    {
-      do_multiplies_value(canonical_value(v), mpl::false_());
+      using big_num_default_ops::multiply;
+      multiply(m_backend, canonical_value(v));
       return *this;
    }
 
@@ -342,7 +199,8 @@ public:
       operator%=(const V& v)
    {
       BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The modulus operation is only valid for integer types");
-      do_modulus_value(canonical_value(v), mpl::false_());
+      using big_num_default_ops::modulus;
+      modulus(m_backend, canonical_value(v));
       return *this;
    }
 
@@ -366,16 +224,17 @@ public:
    typename enable_if<boost::is_arithmetic<V>, big_number<Backend>& >::type 
       operator/=(const V& v)
    {
-      do_divide_value(canonical_value(v), mpl::false_());
+      using big_num_default_ops::divide;
+      divide(m_backend, canonical_value(v));
       return *this;
    }
 
    //
    // String conversion functions:
    //
-   std::string str(unsigned digits = 0)const
+   std::string str(unsigned digits = 0, bool scientific = true)const
    {
-      return m_backend.str(digits);
+      return m_backend.str(digits, scientific);
    }
    //
    // Default precision:
@@ -418,17 +277,102 @@ public:
    }
 private:
    template <class Exp>
+   void do_assign(const Exp& e, const detail::add_immediates&)
+   {
+      using big_num_default_ops::add;
+      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
+      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
+      add(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
+   }
+
+   template <class Exp>
+   void do_assign(const Exp& e, const detail::add_and_negate_immediates&)
+   {
+      using big_num_default_ops::add;
+      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
+      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
+      add(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
+      m_backend.negate();
+   }
+
+   template <class Exp>
+   void do_assign(const Exp& e, const detail::subtract_immediates&)
+   {
+      using big_num_default_ops::subtract;
+      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
+      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
+      subtract(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
+   }
+
+   template <class Exp>
+   void do_assign(const Exp& e, const detail::subtract_and_negate_immediates&)
+   {
+      using big_num_default_ops::subtract;
+      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
+      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
+      subtract(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
+      m_backend.negate();
+   }
+
+   template <class Exp>
+   void do_assign(const Exp& e, const detail::multiply_immediates&)
+   {
+      using big_num_default_ops::multiply;
+      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
+      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
+      multiply(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
+   }
+
+   template <class Exp>
+   void do_assign(const Exp& e, const detail::multiply_and_negate_immediates&)
+   {
+      using big_num_default_ops::multiply;
+      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
+      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
+      multiply(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
+      m_backend.negate();
+   }
+
+   template <class Exp>
+   void do_assign(const Exp& e, const detail::divide_immediates&)
+   {
+      using big_num_default_ops::divide;
+      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
+      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
+      divide(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
+   }
+
+   template <class Exp>
+   void do_assign(const Exp& e, const detail::divide_and_negate_immediates&)
+   {
+      using big_num_default_ops::divide;
+      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
+      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
+      divide(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
+      m_backend.negate();
+   }
+
+   template <class Exp>
+   void do_assign(const Exp& e, const detail::modulus_immediates&)
+   {
+      using big_num_default_ops::modulus;
+      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
+      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
+      modulus(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
+   }
+
+   template <class Exp>
    void do_assign(const Exp& e, const proto::tag::unary_plus&)
    {
       typedef typename proto::result_of::left<Exp>::type left_type;
-      do_assign(proto::left(e), typename proto::tag_of<left_type>::type());
+      do_assign(proto::left(e), typename detail::assign_and_eval<left_type>::type());
    }
 
    template <class Exp>
    void do_assign(const Exp& e, const proto::tag::negate&)
    {
       typedef typename proto::result_of::left<Exp>::type left_type;
-      do_assign(proto::left(e), typename proto::tag_of<left_type>::type());
+      do_assign(proto::left(e), typename detail::assign_and_eval<left_type>::type());
       m_backend.negate();
    }
 
@@ -461,12 +405,12 @@ private:
       }
       else if(left_depth >= right_depth)
       {
-         do_assign(proto::left(e), typename proto::tag_of<left_type>::type());
+         do_assign(proto::left(e), typename detail::assign_and_eval<left_type>::type());
          do_add(proto::right(e), typename proto::tag_of<right_type>::type());
       }
       else
       {
-         do_assign(proto::right(e), typename proto::tag_of<right_type>::type());
+         do_assign(proto::right(e), typename detail::assign_and_eval<right_type>::type());
          do_add(proto::left(e), typename proto::tag_of<left_type>::type());
       }
    }
@@ -500,12 +444,12 @@ private:
       }
       else if(left_depth >= right_depth)
       {
-         do_assign(proto::left(e), typename proto::tag_of<left_type>::type());
+         do_assign(proto::left(e), typename detail::assign_and_eval<left_type>::type());
          do_subtract(proto::right(e), typename proto::tag_of<right_type>::type());
       }
       else
       {
-         do_assign(proto::right(e), typename proto::tag_of<right_type>::type());
+         do_assign(proto::right(e), typename detail::assign_and_eval<right_type>::type());
          do_subtract(proto::left(e), typename proto::tag_of<left_type>::type());
          m_backend.negate();
       }
@@ -539,12 +483,12 @@ private:
       }
       else if(left_depth >= right_depth)
       {
-         do_assign(proto::left(e), typename proto::tag_of<left_type>::type());
+         do_assign(proto::left(e), typename detail::assign_and_eval<left_type>::type());
          do_multiplies(proto::right(e), typename proto::tag_of<right_type>::type());
       }
       else
       {
-         do_assign(proto::right(e), typename proto::tag_of<right_type>::type());
+         do_assign(proto::right(e), typename detail::assign_and_eval<right_type>::type());
          do_multiplies(proto::left(e), typename proto::tag_of<left_type>::type());
       }
    }
@@ -572,7 +516,7 @@ private:
       }
       else
       {
-         do_assign(proto::left(e), typename proto::tag_of<left_type>::type());
+         do_assign(proto::left(e), typename detail::assign_and_eval<left_type>::type());
          do_divide(proto::right(e), typename proto::tag_of<right_type>::type());
       }
    }
@@ -605,7 +549,7 @@ private:
       }
       else
       {
-         do_assign(proto::left(e), typename proto::tag_of<left_type>::type());
+         do_assign(proto::left(e), typename detail::assign_and_eval<left_type>::type());
          do_modulus(proto::right(e), typename proto::tag_of<right_type>::type());
       }
    }
@@ -617,28 +561,55 @@ private:
          m_backend = canonical_value(proto::value(e));
       }
    }
+   template <class Exp>
+   void do_assign(const Exp& e, const proto::tag::function&)
+   {
+      typedef typename proto::arity_of<Exp>::type tag_type;
+      do_assign_function(e, tag_type());
+   }
+   template <class Exp>
+   void do_assign_function(const Exp& e, const mpl::long_<1>&)
+   {
+      proto::value(proto::left(e))(&m_backend);
+   }
+   template <class Exp>
+   void do_assign_function(const Exp& e, const mpl::long_<2>&)
+   {
+      typedef typename proto::result_of::right<Exp>::type right_type;
+      typedef typename proto::tag_of<right_type>::type tag_type;
+      do_assign_function_1(proto::value(proto::left(e)), proto::right(e), tag_type());
+   }
+   template <class F, class Exp>
+   void do_assign_function_1(const F& f, const Exp& val, const proto::tag::terminal&)
+   {
+      f(&m_backend, canonical_value(proto::value(val)));
+   }
+   template <class F, class Exp, class Tag>
+   void do_assign_function_1(const F& f, const Exp& val, const Tag&)
+   {
+      big_number t(val);
+      f(&m_backend, t.backend());
+   }
+   template <class Exp>
+   void do_assign_function(const Exp& e, const mpl::long_<3>&)
+   {
+      typedef typename proto::result_of::right<Exp>::type right_type;
+      typedef typename proto::tag_of<right_type>::type tag_type;
+      typedef typename proto::result_of::child_c<Exp, 2>::type end_type;
+      typedef typename proto::tag_of<end_type>::type end_tag;
+      do_assign_function_2(proto::value(proto::left(e)), proto::right(e), proto::child_c<2>(e), tag_type(), end_tag());
+   }
+   template <class F, class Exp1, class Exp2>
+   void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const proto::tag::terminal&, const proto::tag::terminal&)
+   {
+      f(&m_backend, canonical_value(proto::value(val1)), canonical_value(proto::value(val2)));
+   }
 
    template <class Exp>
    void do_add(const Exp& e, const proto::tag::terminal&)
    {
-      typedef typename proto::result_of::value<Exp>::type t1;
-      typedef typename remove_reference<t1>::type t2;
-      typedef typename remove_cv<t2>::type t3;
-      typedef typename detail::canonical<t3, Backend>::type t4;
-      typedef typename is_convertible<t4, const char*>::type tag;
-      do_add_value(canonical_value(proto::value(e)), tag());
-   }
-
-   template <class V>
-   void do_add_value(const V& v, const mpl::false_&)
-   {
-      m_backend += v;
-   }
-   template <class V>
-   void do_add_value(const V& v, const mpl::true_&)
-   {
-      self_type temp(v);
-      m_backend += temp.m_backend;
+      using big_num_default_ops::add;
+      add(m_backend, canonical_value(proto::value(e)));
    }
 
    template <class Exp>
@@ -683,24 +654,8 @@ private:
    template <class Exp>
    void do_subtract(const Exp& e, const proto::tag::terminal&)
    {
-      typedef typename proto::result_of::value<Exp>::type t1;
-      typedef typename remove_reference<t1>::type t2;
-      typedef typename remove_cv<t2>::type t3;
-      typedef typename detail::canonical<t3, Backend>::type t4;
-      typedef typename is_convertible<t4, const char*>::type tag;
-      do_subtract_value(canonical_value(proto::value(e)), tag());
-   }
-
-   template <class V>
-   void do_subtract_value(const V& v, const mpl::false_&)
-   {
-      m_backend -= v;
-   }
-   template <class V>
-   void do_subtract_value(const V& v, const mpl::true_&)
-   {
-      self_type temp(v);
-      m_backend -= temp.m_backend;
+      using big_num_default_ops::subtract;
+      subtract(m_backend, canonical_value(proto::value(e)));
    }
 
    template <class Exp>
@@ -745,25 +700,8 @@ private:
    template <class Exp>
    void do_multiplies(const Exp& e, const proto::tag::terminal&)
    {
-      typedef typename proto::result_of::value<Exp>::type t1;
-      typedef typename remove_reference<t1>::type t2;
-      typedef typename remove_cv<t2>::type t3;
-      typedef typename detail::canonical<t3, Backend>::type t4;
-      typedef typename is_convertible<t4, const char*>::type tag;
-      do_multiplies_value(canonical_value(proto::value(e)), tag());
-   }
-
-   template <class Val>
-   void do_multiplies_value(const Val& v, const mpl::false_&)
-   {
-      m_backend *= v;
-   }
-
-   template <class Val>
-   void do_multiplies_value(const Val& e, const mpl::true_&)
-   {
-      self_type temp(e);
-      m_backend *= temp.m_backend;
+      using big_num_default_ops::multiply;
+      multiply(m_backend, canonical_value(proto::value(e)));
    }
 
    template <class Exp>
@@ -802,32 +740,16 @@ private:
    template <class Exp, class unknown>
    void do_multiplies(const Exp& e, const unknown&)
    {
+      using big_num_default_ops::multiply;
       self_type temp(e);
-      m_backend *= temp.m_backend;
+      multiply(m_backend, temp.m_backend);
    }
 
    template <class Exp>
    void do_divide(const Exp& e, const proto::tag::terminal&)
    {
-      typedef typename proto::result_of::value<Exp>::type t1;
-      typedef typename remove_reference<t1>::type t2;
-      typedef typename remove_cv<t2>::type t3;
-      typedef typename detail::canonical<t3, Backend>::type t4;
-      typedef typename is_convertible<t4, const char*>::type tag;
-      do_divide_value(canonical_value(proto::value(e)), tag());
-   }
-
-   template <class Val>
-   void do_divide_value(const Val& v, const mpl::false_&)
-   {
-      m_backend /= v;
-   }
-
-   template <class Val>
-   void do_divide_value(const Val& e, const mpl::true_&)
-   {
-      self_type temp(e);
-      m_backend /= temp.m_backend;
+      using big_num_default_ops::divide;
+      divide(m_backend, canonical_value(proto::value(e)));
    }
 
    template <class Exp>
@@ -866,39 +788,24 @@ private:
    template <class Exp, class unknown>
    void do_divide(const Exp& e, const unknown&)
    {
+      using big_num_default_ops::multiply;
       self_type temp(e);
-      m_backend /= temp.m_backend;
+      divide(m_backend, temp.m_backend);
    }
 
    template <class Exp>
    void do_modulus(const Exp& e, const proto::tag::terminal&)
    {
-      typedef typename proto::result_of::value<Exp>::type t1;
-      typedef typename remove_reference<t1>::type t2;
-      typedef typename remove_cv<t2>::type t3;
-      typedef typename detail::canonical<t3, Backend>::type t4;
-      typedef typename is_convertible<t4, const char*>::type tag;
-      do_modulus_value(canonical_value(proto::value(e)), tag());
-   }
-
-   template <class Val>
-   void do_modulus_value(const Val& v, const mpl::false_&)
-   {
-      m_backend %= v;
-   }
-
-   template <class Val>
-   void do_modulus_value(const Val& e, const mpl::true_&)
-   {
-      self_type temp(e);
-      m_backend %= temp.m_backend;
+      using big_num_default_ops::modulus;
+      modulus(m_backend, canonical_value(proto::value(e)));
    }
 
    template <class Exp, class Unknown>
    void do_modulus(const Exp& e, const Unknown&)
    {
+      using big_num_default_ops::modulus;
       self_type temp(e);
-      do_modulus_value(canonical_value(proto::value(temp)), mpl::false_());
+      modulus(m_backend, canonical_value(proto::value(temp)));
    }
 
    // Tests if the expression contains a reference to *this:
@@ -953,6 +860,19 @@ private:
    { 
       return v == this; 
    }
+   template <class Exp>
+   static typename detail::underlying_result<Exp>::type underlying_value(const big_number_exp<Exp>& e, const proto::tag::terminal&)
+   {
+      return proto::value(e);
+   }
+   template <class Exp, class tag>
+   static typename detail::underlying_result<Exp>::type 
+      underlying_value(const big_number_exp<Exp>& e, const tag&)
+   {
+      typedef typename proto::result_of::left<Exp>::type left_type;
+      typedef typename proto::tag_of<left_type>::type tag_type;
+      return underlying_value(proto::left(e), tag_type());
+   }
 
    static const Backend& canonical_value(const self_type& v){  return v.m_backend;  }
    static const Backend& canonical_value(const self_type* v){  return v->m_backend;  }
@@ -966,72 +886,6 @@ private:
 
 namespace detail
 {
-
-template <class Exp1, class Exp2>
-struct combine_expression_type
-{
-   typedef void type;
-};
-
-template <class Backend>
-struct combine_expression_type<boost::math::big_number<Backend>, boost::math::big_number<Backend> >
-{
-   typedef boost::math::big_number<Backend> type;
-};
-
-template <class Backend, class Exp>
-struct combine_expression_type<boost::math::big_number<Backend>, Exp>
-{
-   typedef boost::math::big_number<Backend> type;
-};
-
-template <class Backend, class Exp>
-struct combine_expression_type<Exp, boost::math::big_number<Backend> >
-{
-   typedef boost::math::big_number<Backend> type;
-};
-
-template <class T>
-struct is_big_number : public mpl::false_{};
-template <class T>
-struct is_big_number<boost::math::big_number<T> > : public mpl::true_{};
-template <class T>
-struct is_big_number_exp : public mpl::false_{};
-template <class T>
-struct is_big_number_exp<boost::math::detail::big_number_exp<T> > : public mpl::true_{};
-
-
-template <class Exp, int arity>
-struct expression_type_imp;
-
-template <class Exp>
-struct expression_type_imp<Exp, 0>
-{
-   typedef typename remove_pointer<typename proto::result_of::value<Exp>::type>::type type;
-};
-
-template <class Exp>
-struct expression_type_imp<Exp, 1>
-{
-   typedef typename proto::result_of::left<Exp>::type nested_type;
-   typedef typename expression_type_imp<nested_type, proto::arity_of<nested_type>::value>::type type;
-};
-
-template <class Exp>
-struct expression_type_imp<Exp, 2>
-{
-   typedef typename proto::result_of::left<Exp>::type left_type;
-   typedef typename proto::result_of::right<Exp>::type right_type;
-   typedef typename expression_type_imp<left_type, proto::arity_of<left_type>::value>::type left_result;
-   typedef typename expression_type_imp<right_type, proto::arity_of<right_type>::value>::type right_result;
-   typedef typename combine_expression_type<left_result, right_result>::type type;
-};
-
-template <class Exp>
-struct expression_type
-{
-   typedef typename expression_type_imp<Exp, proto::arity_of<Exp>::value>::type type;
-};
 
 template <class Backend>
 inline int big_number_compare(const big_number<Backend>& a, const big_number<Backend>& b)
@@ -1164,59 +1018,25 @@ inline typename boost::enable_if<detail::is_valid_comparison<Exp1, Exp2>, bool>:
 }
 
 template <class Backend>
-std::ostream& operator << (std::ostream& os, const big_number<Backend>& r)
+inline std::ostream& operator << (std::ostream& os, const big_number<Backend>& r)
 {
-   return os << r.str(static_cast<unsigned>(os.precision()));
+   return os << r.str(static_cast<unsigned>(os.precision(), os.flags() & os.scientific));
+}
+template <class Exp>
+inline std::ostream& operator << (std::ostream& os, const detail::big_number_exp<Exp>& r)
+{
+   typedef typename detail::expression_type<Exp>::type value_type;
+   value_type temp(r);
+   return os << temp;
 }
 
 template <class Backend>
-std::istream& operator >> (std::istream& is, big_number<Backend>& r)
+inline std::istream& operator >> (std::istream& is, big_number<Backend>& r)
 {
    std::string s;
    is >> s;
    r = s;
    return is;
-}
-
-//
-// Non-member functions accepting an expression-template as argument:
-//
-#undef sqrt
-template <class Exp>
-typename boost::math::detail::expression_type<Exp>::type sqrt(const detail::big_number_exp<Exp>& val)
-{
-   typedef typename detail::expression_type<Exp>::type result_type;
-   return sqrt(result_type(val));
-}
-template <class Exp>
-typename detail::expression_type<Exp>::type abs(const detail::big_number_exp<Exp>& val)
-{
-   typedef typename detail::expression_type<Exp>::type result_type;
-   return abs(result_type(val));
-}
-template <class Exp>
-typename detail::expression_type<Exp>::type fabs(const detail::big_number_exp<Exp>& val)
-{
-   typedef typename detail::expression_type<Exp>::type result_type;
-   return fabs(result_type(val));
-}
-template <class Exp>
-typename detail::expression_type<Exp>::type ceil(const detail::big_number_exp<Exp>& val)
-{
-   typedef typename detail::expression_type<Exp>::type result_type;
-   return ceil(result_type(val));
-}
-template <class Exp>
-typename detail::expression_type<Exp>::type floor(const detail::big_number_exp<Exp>& val)
-{
-   typedef typename detail::expression_type<Exp>::type result_type;
-   return floor(result_type(val));
-}
-template <class Exp>
-typename detail::expression_type<Exp>::type trunc(const detail::big_number_exp<Exp>& val)
-{
-   typedef typename detail::expression_type<Exp>::type result_type;
-   return trunc(result_type(val));
 }
 
 }} // namespaces

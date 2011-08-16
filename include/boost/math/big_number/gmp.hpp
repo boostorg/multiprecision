@@ -145,130 +145,45 @@ struct gmp_real_imp
       mpf_set_str(m_data, s, 10);
       return *this;
    }
-   gmp_real_imp& operator += (const gmp_real<digits10>& o)
-   {
-      mpf_add(m_data, m_data, o.m_data);
-      return *this;
-   }
-   template <class V>
-   gmp_real_imp& operator += (V v)
-   {
-      gmp_real<digits10> d;
-      d = v;
-      return *this += d;
-   }
-   gmp_real_imp& operator -= (const gmp_real<digits10>& o)
-   {
-      mpf_sub(m_data, m_data, o.m_data);
-      return *this;
-   }
-   template <class V>
-   gmp_real_imp& operator -= (V v)
-   {
-      gmp_real<digits10> d;
-      d = v;
-      return *this -= d;
-   }
-   gmp_real_imp& operator *= (const gmp_real<digits10>& o)
-   {
-      mpf_mul(m_data, m_data, o.m_data);
-      return *this;
-   }
-   template <class V>
-   gmp_real_imp& operator *= (V v)
-   {
-      gmp_real<digits10> d;
-      d = v;
-      return *this *= d;
-   }
-   gmp_real_imp& operator /= (const gmp_real<digits10>& o)
-   {
-      mpf_div(m_data, m_data, o.m_data);
-      return *this;
-   }
-   template <class V>
-   gmp_real_imp& operator /= (V v)
-   {
-      gmp_real<digits10> d;
-      d = v;
-      return *this /= d;
-   }
-   gmp_real_imp& operator += (unsigned long i)
-   {
-      mpf_add_ui(m_data, m_data, i);
-      return *this;
-   }
-   gmp_real_imp& operator -= (unsigned long i)
-   {
-      mpf_sub_ui(m_data, m_data, i);
-      return *this;
-   }
-   gmp_real_imp& operator *= (unsigned long i)
-   {
-      mpf_mul_ui(m_data, m_data, i);
-      return *this;
-   }
-   gmp_real_imp& operator /= (unsigned long i)
-   {
-      mpf_div_ui(m_data, m_data, i);
-      return *this;
-   }
-   gmp_real_imp& operator += (long i)
-   {
-      if(i > 0)
-         mpf_add_ui(m_data, m_data, i);
-      else
-         mpf_sub_ui(m_data, m_data, std::abs(i));
-      return *this;
-   }
-   gmp_real_imp& operator -= (long i)
-   {
-      if(i > 0)
-         mpf_sub_ui(m_data, m_data, i);
-      else
-         mpf_add_ui(m_data, m_data, std::abs(i));
-      return *this;
-   }
-   gmp_real_imp& operator *= (long i)
-   {
-      mpf_mul_ui(m_data, m_data, std::abs(i));
-      if(i < 0)
-         mpf_neg(m_data, m_data);
-      return *this;
-   }
-   gmp_real_imp& operator /= (long i)
-   {
-      mpf_div_ui(m_data, m_data, std::abs(i));
-      if(i < 0)
-         mpf_neg(m_data, m_data);
-      return *this;
-   }
    void swap(gmp_real_imp& o)
    {
       mpf_swap(m_data, o.m_data);
    }
-   std::string str(unsigned digits)const
+   std::string str(unsigned digits, bool scientific)const
    {
+      std::string result;
       mp_exp_t e;
       void *(*alloc_func_ptr) (size_t);
       void *(*realloc_func_ptr) (void *, size_t, size_t);
       void (*free_func_ptr) (void *, size_t);
       const char* ps = mpf_get_str (0, &e, 10, digits, m_data);
-      std::string s("0.");
-      if(ps[0] == '-')
+      std::ptrdiff_t sl = std::strlen(ps);
+      if(sl == 0)
+         return "0";
+      if(*ps == '-')
+         --sl; // number of digits excluding sign.
+      if(!scientific
+         && (sl <= std::numeric_limits<boost::uintmax_t>::digits10 + 1)
+         && (e >= sl)
+         && (sl <= std::numeric_limits<boost::uintmax_t>::digits10 + 1))
       {
-         s.insert(0, ps, 1);
-         s += ps + 1;
+         result = ps;
+         result.append(e-sl, '0');
       }
       else
       {
-         s += ps;
+         result = ps;
+         if(ps[0] == '-')
+            result.insert(2, 1, '.');
+         else
+            result.insert(1, 1, '.');
+         --e;
+         if(e)
+            result += "e" + lexical_cast<std::string>(e);
       }
-      s += "e";
-      s += boost::lexical_cast<std::string>(e);
       mp_get_memory_functions(&alloc_func_ptr, &realloc_func_ptr, &free_func_ptr);
       (*free_func_ptr)((void*)ps, std::strlen(ps) + 1);
-      return s;
+      return result;
    }
    ~gmp_real_imp()
    {
@@ -400,74 +315,280 @@ private:
    }
 };
 
+template <unsigned digits10>
+inline void add(gmp_real<digits10>& result, const gmp_real<digits10>& o)
+{
+   mpf_add(result.data(), result.data(), o.data());
+}
+template <unsigned digits10>
+inline void subtract(gmp_real<digits10>& result, const gmp_real<digits10>& o)
+{
+   mpf_sub(result.data(), result.data(), o.data());
+}
+template <unsigned digits10>
+inline void multiply(gmp_real<digits10>& result, const gmp_real<digits10>& o)
+{
+   mpf_mul(result.data(), result.data(), o.data());
+}
+template <unsigned digits10>
+inline void divide(gmp_real<digits10>& result, const gmp_real<digits10>& o)
+{
+   mpf_div(result.data(), result.data(), o.data());
+}
+template <unsigned digits10>
+inline void add(gmp_real<digits10>& result, unsigned long i)
+{
+   mpf_add_ui(result.data(), result.data(), i);
+}
+template <unsigned digits10>
+inline void subtract(gmp_real<digits10>& result, unsigned long i)
+{
+   mpf_sub_ui(result.data(), result.data(), i);
+}
+template <unsigned digits10>
+inline void multiply(gmp_real<digits10>& result, unsigned long i)
+{
+   mpf_mul_ui(result.data(), result.data(), i);
+}
+template <unsigned digits10>
+inline void divide(gmp_real<digits10>& result, unsigned long i)
+{
+   mpf_div_ui(result.data(), result.data(), i);
+}
+template <unsigned digits10>
+inline void add(gmp_real<digits10>& result, long i)
+{
+   if(i > 0)
+      mpf_add_ui(result.data(), result.data(), i);
+   else
+      mpf_sub_ui(result.data(), result.data(), std::abs(i));
+}
+template <unsigned digits10>
+inline void subtract(gmp_real<digits10>& result, long i)
+{
+   if(i > 0)
+      mpf_sub_ui(result.data(), result.data(), i);
+   else
+      mpf_add_ui(result.data(), result.data(), std::abs(i));
+}
+template <unsigned digits10>
+inline void multiply(gmp_real<digits10>& result, long i)
+{
+   mpf_mul_ui(result.data(), result.data(), std::abs(i));
+   if(i < 0)
+      mpf_neg(result.data(), result.data());
+}
+template <unsigned digits10>
+inline void divide(gmp_real<digits10>& result, long i)
+{
+   mpf_div_ui(result.data(), result.data(), std::abs(i));
+   if(i < 0)
+      mpf_neg(result.data(), result.data());
+}
+//
+// Specialised 3 arg versions of the basic operators:
+//
+template <unsigned digits10>
+inline void add(gmp_real<digits10>& a, const gmp_real<digits10>& x, const gmp_real<digits10>& y)
+{
+   mpf_add(a.data(), x.data(), y.data());
+}
+template <unsigned digits10>
+inline void add(gmp_real<digits10>& a, const gmp_real<digits10>& x, unsigned long y)
+{
+   mpf_add_ui(a.data(), x.data(), y);
+}
+template <unsigned digits10>
+inline void add(gmp_real<digits10>& a, const gmp_real<digits10>& x, long y)
+{
+   if(y < 0)
+      mpf_sub_ui(a.data(), x.data(), -y);
+   else
+      mpf_add_ui(a.data(), x.data(), y);
+}
+template <unsigned digits10>
+inline void add(gmp_real<digits10>& a, unsigned long x, const gmp_real<digits10>& y)
+{
+   mpf_add_ui(a.data(), y.data(), x);
+}
+template <unsigned digits10>
+inline void add(gmp_real<digits10>& a, long x, const gmp_real<digits10>& y)
+{
+   if(x < 0)
+   {
+      mpf_ui_sub(a.data(), -x, y.data());
+      mpf_neg(a.data(), a.data());
+   }
+   else
+      mpf_add_ui(a.data(), y.data(), x);
+}
+template <unsigned digits10>
+inline void subtract(gmp_real<digits10>& a, const gmp_real<digits10>& x, const gmp_real<digits10>& y)
+{
+   mpf_sub(a.data(), x.data(), y.data());
+}
+template <unsigned digits10>
+inline void subtract(gmp_real<digits10>& a, const gmp_real<digits10>& x, unsigned long y)
+{
+   mpf_sub_ui(a.data(), x.data(), y);
+}
+template <unsigned digits10>
+inline void subtract(gmp_real<digits10>& a, const gmp_real<digits10>& x, long y)
+{
+   if(y < 0)
+      mpf_add_ui(a.data(), x.data(), -y);
+   else
+      mpf_sub_ui(a.data(), x.data(), y);
+}
+template <unsigned digits10>
+inline void subtract(gmp_real<digits10>& a, unsigned long x, const gmp_real<digits10>& y)
+{
+   mpf_ui_sub(a.data(), x, y.data());
+}
+template <unsigned digits10>
+inline void subtract(gmp_real<digits10>& a, long x, const gmp_real<digits10>& y)
+{
+   if(x < 0)
+   {
+      mpf_add_ui(a.data(), y.data(), -x);
+      mpf_neg(a.data(), a.data());
+   }
+   else
+      mpf_ui_sub(a.data(), x, y.data());
+}
+
+template <unsigned digits10>
+inline void multiply(gmp_real<digits10>& a, const gmp_real<digits10>& x, const gmp_real<digits10>& y)
+{
+   mpf_mul(a.data(), x.data(), y.data());
+}
+template <unsigned digits10>
+inline void multiply(gmp_real<digits10>& a, const gmp_real<digits10>& x, unsigned long y)
+{
+   mpf_mul_ui(a.data(), x.data(), y);
+}
+template <unsigned digits10>
+inline void multiply(gmp_real<digits10>& a, const gmp_real<digits10>& x, long y)
+{
+   if(y < 0)
+   {
+      mpf_mul_ui(a.data(), x.data(), -y);
+      a.negate();
+   }
+   else
+      mpf_mul_ui(a.data(), x.data(), y);
+}
+template <unsigned digits10>
+inline void multiply(gmp_real<digits10>& a, unsigned long x, const gmp_real<digits10>& y)
+{
+   mpf_mul_ui(a.data(), y.data(), x);
+}
+template <unsigned digits10>
+inline void multiply(gmp_real<digits10>& a, long x, const gmp_real<digits10>& y)
+{
+   if(x < 0)
+   {
+      mpf_mul_ui(a.data(), y.data(), -x);
+      mpf_neg(a.data(), a.data());
+   }
+   else
+      mpf_mul_ui(a.data(), y.data(), x);
+}
+
+template <unsigned digits10>
+inline void divide(gmp_real<digits10>& a, const gmp_real<digits10>& x, const gmp_real<digits10>& y)
+{
+   mpf_div(a.data(), x.data(), y.data());
+}
+template <unsigned digits10>
+inline void divide(gmp_real<digits10>& a, const gmp_real<digits10>& x, unsigned long y)
+{
+   mpf_div_ui(a.data(), x.data(), y);
+}
+template <unsigned digits10>
+inline void divide(gmp_real<digits10>& a, const gmp_real<digits10>& x, long y)
+{
+   if(y < 0)
+   {
+      mpf_div_ui(a.data(), x.data(), -y);
+      a.negate();
+   }
+   else
+      mpf_div_ui(a.data(), x.data(), y);
+}
+template <unsigned digits10>
+inline void divide(gmp_real<digits10>& a, unsigned long x, const gmp_real<digits10>& y)
+{
+   mpf_ui_div(a.data(), x, y.data());
+}
+template <unsigned digits10>
+inline void divide(gmp_real<digits10>& a, long x, const gmp_real<digits10>& y)
+{
+   if(x < 0)
+   {
+      mpf_ui_div(a.data(), -x, y.data());
+      mpf_neg(a.data(), a.data());
+   }
+   else
+      mpf_ui_div(a.data(), x, y.data());
+}
+
 //
 // Native non-member operations:
 //
 template <unsigned Digits10>
-big_number<gmp_real<Digits10> > sqrt(const big_number<gmp_real<Digits10> >& val)
+inline void sqrt(gmp_real<Digits10>* result, const gmp_real<Digits10>& val)
 {
-   big_number<gmp_real<Digits10> > result;
-   mpf_sqrt(result.backend().data(), val.backend().data());
-   return result;
+   mpf_sqrt(result->data(), val.data());
+}
+
+template <unsigned Digits10>
+inline void abs(gmp_real<Digits10>* result, const gmp_real<Digits10>& val)
+{
+   mpf_abs(result->data(), val.data());
+}
+
+template <unsigned Digits10>
+inline void fabs(gmp_real<Digits10>* result, const gmp_real<Digits10>& val)
+{
+   mpf_abs(result->data(), val.data());
 }
 template <unsigned Digits10>
-big_number<gmp_real<Digits10> > abs(const big_number<gmp_real<Digits10> >& val)
+inline void ceil(gmp_real<Digits10>* result, const gmp_real<Digits10>& val)
 {
-   big_number<gmp_real<Digits10> > result;
-   mpf_abs(result.backend().data(), val.backend().data());
-   return result;
+   mpf_ceil(result->data(), val.data());
 }
 template <unsigned Digits10>
-big_number<gmp_real<Digits10> > fabs(const big_number<gmp_real<Digits10> >& val)
+inline void floor(gmp_real<Digits10>* result, const gmp_real<Digits10>& val)
 {
-   big_number<gmp_real<Digits10> > result;
-   mpf_abs(result.backend().data(), val.backend().data());
-   return result;
+   mpf_floor(result->data(), val.data());
 }
 template <unsigned Digits10>
-big_number<gmp_real<Digits10> > ceil(const big_number<gmp_real<Digits10> >& val)
+inline void trunc(gmp_real<Digits10>* result, const gmp_real<Digits10>& val)
 {
-   big_number<gmp_real<Digits10> > result;
-   mpf_ceil(result.backend().data(), val.backend().data());
-   return result;
+   mpf_trunc(result->data(), val.data());
 }
 template <unsigned Digits10>
-big_number<gmp_real<Digits10> > floor(const big_number<gmp_real<Digits10> >& val)
+inline void ldexp(gmp_real<Digits10>* result, const gmp_real<Digits10>& val, long e)
 {
-   big_number<gmp_real<Digits10> > result;
-   mpf_floor(result.backend().data(), val.backend().data());
-   return result;
-}
-template <unsigned Digits10>
-big_number<gmp_real<Digits10> > trunc(const big_number<gmp_real<Digits10> >& val)
-{
-   big_number<gmp_real<Digits10> > result;
-   mpf_trunc(result.backend().data(), val.backend().data());
-   return result;
-}
-template <unsigned Digits10>
-big_number<gmp_real<Digits10> > ldexp(const big_number<gmp_real<Digits10> >& val, long e)
-{
-   big_number<gmp_real<Digits10> > result;
    if(e > 0)
-      mpf_mul_2exp(result.backend().data(), val.backend().data(), e);
+      mpf_mul_2exp(result->data(), val.data(), e);
    else if(e < 0)
-      mpf_div_2exp(result.backend().data(), val.backend().data(), -e);
-   return result;
+      mpf_div_2exp(result->data(), val.data(), -e);
 }
 template <unsigned Digits10>
-big_number<gmp_real<Digits10> > frexp(const big_number<gmp_real<Digits10> >& val, int* e)
+inline void frexp(gmp_real<Digits10>* result, const gmp_real<Digits10>& val, int* e)
 {
    long v;
-   mpf_get_d_2exp(&v, val.backend().data());
+   mpf_get_d_2exp(&v, val.data());
    *e = v;
-   return ldexp(val, -v);
+   return ldexp(result, val, -v);
 }
 template <unsigned Digits10>
-big_number<gmp_real<Digits10> > frexp(const big_number<gmp_real<Digits10> >& val, long* e)
+inline void frexp(gmp_real<Digits10>* result, const gmp_real<Digits10>& val, long* e)
 {
-   mpf_get_d_2exp(e, val.backend().data());
-   return ldexp(val, -*e);
+   mpf_get_d_2exp(e, val.data());
+   return ldexp(result, val, -*e);
 }
 
 struct gmp_int
@@ -582,163 +703,11 @@ struct gmp_int
       mpz_set_str(m_data, s, 10);
       return *this;
    }
-   gmp_int& operator += (const gmp_int& o)
-   {
-      mpz_add(m_data, m_data, o.m_data);
-      return *this;
-   }
-   template <class V>
-   gmp_int& operator += (V v)
-   {
-      gmp_int d;
-      d = v;
-      return *this += d;
-   }
-   gmp_int& operator -= (const gmp_int& o)
-   {
-      mpz_sub(m_data, m_data, o.m_data);
-      return *this;
-   }
-   template <class V>
-   gmp_int& operator -= (V v)
-   {
-      gmp_int d;
-      d = v;
-      return *this -= d;
-   }
-   gmp_int& operator *= (const gmp_int& o)
-   {
-      mpz_mul(m_data, m_data, o.m_data);
-      return *this;
-   }
-   template <class V>
-   gmp_int& operator *= (V v)
-   {
-      gmp_int d;
-      d = v;
-      return *this *= d;
-   }
-   gmp_int& operator /= (const gmp_int& o)
-   {
-      mpz_div(m_data, m_data, o.m_data);
-      return *this;
-   }
-   template <class V>
-   gmp_int& operator /= (V v)
-   {
-      gmp_int d;
-      d = v;
-      return *this /= d;
-   }
-   gmp_int& operator %= (const gmp_int& o)
-   {
-      bool neg = mpz_sgn(m_data) < 0;
-      bool neg2 = mpz_sgn(o.m_data) < 0;
-      mpz_mod(m_data, m_data, o.m_data);
-      if(neg)
-      {
-         if(!neg2)
-            negate();
-         mpz_add(m_data, m_data, o.m_data);
-         if(!neg2)
-            negate();
-      }
-      return *this;
-   }
-   template <class V>
-   gmp_int& operator %= (V v)
-   {
-      gmp_int d;
-      d = v;
-      return *this %= d;
-   }
-   gmp_int& operator += (unsigned long i)
-   {
-      mpz_add_ui(m_data, m_data, i);
-      return *this;
-   }
-   gmp_int& operator -= (unsigned long i)
-   {
-      mpz_sub_ui(m_data, m_data, i);
-      return *this;
-   }
-   gmp_int& operator *= (unsigned long i)
-   {
-      mpz_mul_ui(m_data, m_data, i);
-      return *this;
-   }
-   gmp_int& operator %= (unsigned long i)
-   {
-      bool neg = mpz_sgn(m_data) < 0;
-      mpz_mod_ui(m_data, m_data, i);
-      if(neg)
-      {
-         negate();
-         mpz_add_ui(m_data, m_data, i);
-         negate();
-      }
-      return *this;
-   }
-   gmp_int& operator /= (unsigned long i)
-   {
-      mpz_div_ui(m_data, m_data, i);
-      return *this;
-   }
-   gmp_int& operator += (long i)
-   {
-      if(i > 0)
-         mpz_add_ui(m_data, m_data, i);
-      else
-         mpz_sub_ui(m_data, m_data, std::abs(i));
-      return *this;
-   }
-   gmp_int& operator -= (long i)
-   {
-      if(i > 0)
-         mpz_sub_ui(m_data, m_data, i);
-      else
-         mpz_add_ui(m_data, m_data, std::abs(i));
-      return *this;
-   }
-   gmp_int& operator *= (long i)
-   {
-      mpz_mul_ui(m_data, m_data, std::abs(i));
-      if(i < 0)
-         mpz_neg(m_data, m_data);
-      return *this;
-   }
-   gmp_int& operator %= (long i)
-   {
-      bool neg = mpz_sgn(m_data) < 0;
-      bool neg2 = i < 0;
-      mpz_mod_ui(m_data, m_data, std::abs(i));
-      if(neg)
-      {
-         if(!neg2)
-         {
-            negate();
-            mpz_add_ui(m_data, m_data, std::abs(i));
-            negate();
-         }
-         else
-         {
-            mpz_sub_ui(m_data, m_data, std::abs(i));
-         }
-      }
-      return *this;
-   }
-   gmp_int& operator /= (long i)
-   {
-      mpz_div_ui(m_data, m_data, std::abs(i));
-      if(i < 0)
-         mpz_neg(m_data, m_data);
-      return *this;
-   }
    void swap(gmp_int& o)
    {
       mpz_swap(m_data, o.m_data);
    }
-   std::string str(unsigned)const
+   std::string str(unsigned /*digits*/, bool /*scientific*/)const
    {
       void *(*alloc_func_ptr) (size_t);
       void *(*realloc_func_ptr) (void *, size_t, size_t);
@@ -776,10 +745,218 @@ struct gmp_int
       d = v;
       return compare(d);
    }
+   mpz_t& data() { return m_data; }
+   const mpz_t& data()const { return m_data; }
 protected:
    mpz_t m_data;
 };
 
+inline void add(gmp_int& t, const gmp_int& o)
+{
+   mpz_add(t.data(), t.data(), o.data());
+}
+inline void subtract(gmp_int& t, const gmp_int& o)
+{
+   mpz_sub(t.data(), t.data(), o.data());
+}
+inline void multiply(gmp_int& t, const gmp_int& o)
+{
+   mpz_mul(t.data(), t.data(), o.data());
+}
+inline void divide(gmp_int& t, const gmp_int& o)
+{
+   mpz_div(t.data(), t.data(), o.data());
+}
+inline void modulus(gmp_int& t, const gmp_int& o)
+{
+   bool neg = mpz_sgn(t.data()) < 0;
+   bool neg2 = mpz_sgn(o.data()) < 0;
+   mpz_mod(t.data(), t.data(), o.data());
+   if(neg)
+   {
+      if(!neg2)
+         t.negate();
+      mpz_add(t.data(), t.data(), o.data());
+      if(!neg2)
+         t.negate();
+   }
+}
+inline void add(gmp_int& t, unsigned long i)
+{
+   mpz_add_ui(t.data(), t.data(), i);
+}
+inline void subtract(gmp_int& t, unsigned long i)
+{
+   mpz_sub_ui(t.data(), t.data(), i);
+}
+inline void multiply(gmp_int& t, unsigned long i)
+{
+   mpz_mul_ui(t.data(), t.data(), i);
+}
+inline void modulus(gmp_int& t, unsigned long i)
+{
+   bool neg = mpz_sgn(t.data()) < 0;
+   mpz_mod_ui(t.data(), t.data(), i);
+   if(neg)
+   {
+      t.negate();
+      mpz_add_ui(t.data(), t.data(), i);
+      t.negate();
+   }
+}
+inline void divide(gmp_int& t, unsigned long i)
+{
+   mpz_div_ui(t.data(), t.data(), i);
+}
+inline void add(gmp_int& t, long i)
+{
+   if(i > 0)
+      mpz_add_ui(t.data(), t.data(), i);
+   else
+      mpz_sub_ui(t.data(), t.data(), -i);
+}
+inline void subtract(gmp_int& t, long i)
+{
+   if(i > 0)
+      mpz_sub_ui(t.data(), t.data(), i);
+   else
+      mpz_add_ui(t.data(), t.data(), -i);
+}
+inline void multiply(gmp_int& t, long i)
+{
+   mpz_mul_ui(t.data(), t.data(), std::abs(i));
+   if(i < 0)
+      mpz_neg(t.data(), t.data());
+}
+inline void modulus(gmp_int& t, long i)
+{
+   bool neg = mpz_sgn(t.data()) < 0;
+   bool neg2 = i < 0;
+   mpz_mod_ui(t.data(), t.data(), std::abs(i));
+   if(neg)
+   {
+      if(!neg2)
+      {
+         t.negate();
+         mpz_add_ui(t.data(), t.data(), std::abs(i));
+         t.negate();
+      }
+      else
+      {
+         mpz_sub_ui(t.data(), t.data(), std::abs(i));
+      }
+   }
+}
+inline void divide(gmp_int& t, long i)
+{
+   mpz_div_ui(t.data(), t.data(), std::abs(i));
+   if(i < 0)
+      mpz_neg(t.data(), t.data());
+}
+
+inline void add(gmp_int& t, const gmp_int& p, const gmp_int& o)
+{
+   mpz_add(t.data(), p.data(), o.data());
+}
+inline void subtract(gmp_int& t, const gmp_int& p, const gmp_int& o)
+{
+   mpz_sub(t.data(), p.data(), o.data());
+}
+inline void multiply(gmp_int& t, const gmp_int& p, const gmp_int& o)
+{
+   mpz_mul(t.data(), p.data(), o.data());
+}
+inline void divide(gmp_int& t, const gmp_int& p, const gmp_int& o)
+{
+   mpz_div(t.data(), p.data(), o.data());
+}
+inline void modulus(gmp_int& t, const gmp_int& p, const gmp_int& o)
+{
+   bool neg = mpz_sgn(p.data()) < 0;
+   bool neg2 = mpz_sgn(o.data()) < 0;
+   mpz_mod(t.data(), p.data(), o.data());
+   if(neg)
+   {
+      if(!neg2)
+         t.negate();
+      mpz_add(t.data(), t.data(), o.data());
+      if(!neg2)
+         t.negate();
+   }
+}
+inline void add(gmp_int& t, const gmp_int& p, unsigned long i)
+{
+   mpz_add_ui(t.data(), p.data(), i);
+}
+inline void subtract(gmp_int& t, const gmp_int& p, unsigned long i)
+{
+   mpz_sub_ui(t.data(), p.data(), i);
+}
+inline void multiply(gmp_int& t, const gmp_int& p, unsigned long i)
+{
+   mpz_mul_ui(t.data(), p.data(), i);
+}
+inline void modulus(gmp_int& t, const gmp_int& p, unsigned long i)
+{
+   bool neg = mpz_sgn(p.data()) < 0;
+   mpz_mod_ui(t.data(), p.data(), i);
+   if(neg)
+   {
+      t.negate();
+      mpz_add_ui(t.data(), t.data(), i);
+      t.negate();
+   }
+}
+inline void divide(gmp_int& t, const gmp_int& p, unsigned long i)
+{
+   mpz_div_ui(t.data(), p.data(), i);
+}
+inline void add(gmp_int& t, const gmp_int& p, long i)
+{
+   if(i > 0)
+      mpz_add_ui(t.data(), p.data(), i);
+   else
+      mpz_sub_ui(t.data(), p.data(), -i);
+}
+inline void subtract(gmp_int& t, const gmp_int& p, long i)
+{
+   if(i > 0)
+      mpz_sub_ui(t.data(), p.data(), i);
+   else
+      mpz_add_ui(t.data(), p.data(), -i);
+}
+inline void multiply(gmp_int& t, const gmp_int& p, long i)
+{
+   mpz_mul_ui(t.data(), p.data(), std::abs(i));
+   if(i < 0)
+      mpz_neg(t.data(), t.data());
+}
+inline void modulus(gmp_int& t, const gmp_int& p, long i)
+{
+   bool neg = mpz_sgn(p.data()) < 0;
+   bool neg2 = i < 0;
+   mpz_mod_ui(t.data(), p.data(), std::abs(i));
+   if(neg)
+   {
+      if(!neg2)
+      {
+         t.negate();
+         mpz_add_ui(t.data(), t.data(), std::abs(i));
+         t.negate();
+      }
+      else
+      {
+         mpz_sub_ui(t.data(), t.data(), std::abs(i));
+      }
+   }
+}
+inline void divide(gmp_int& t, const gmp_int& p, long i)
+{
+   mpz_div_ui(t.data(), p.data(), std::abs(i));
+   if(i < 0)
+      mpz_neg(t.data(), t.data());
+}
+   
 template<>
 struct is_extended_integer<gmp_int> : public mpl::true_ {};
 
