@@ -52,7 +52,7 @@ inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const cha
 {
    T t;
    t = v;
-   mudulus(result, t);
+   modulus(result, t);
 }
 
 template <class T>

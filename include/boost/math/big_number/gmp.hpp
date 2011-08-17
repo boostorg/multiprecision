@@ -957,6 +957,11 @@ inline void divide(gmp_int& t, const gmp_int& p, long i)
       mpz_neg(t.data(), t.data());
 }
    
+inline void abs(gmp_int* result, const gmp_int& val)
+{
+   mpz_abs(result->data(), val.data());
+}
+
 template<>
 struct is_extended_integer<gmp_int> : public mpl::true_ {};
 

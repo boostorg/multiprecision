@@ -85,6 +85,31 @@ void test_integer_ops(const boost::mpl::true_&)
    a = -20;
    a %= -7;
    BOOST_TEST(a == -20 % -7);
+#ifndef BOOST_NO_LONG_LONG
+   a = 20;
+   a %= 7uLL;
+   BOOST_TEST(a == 20 % 7);
+   a = -20;
+   a %= 7uLL;
+   BOOST_TEST(a == -20 % 7);
+   a = 20;
+   a %= -7LL;
+   BOOST_TEST(a == 20 % -7);
+   a = -20;
+   a %= -7LL;
+   BOOST_TEST(a == -20 % -7);
+#endif
+   //
+   // Non-member functions:
+   //
+   a = -20;
+   BOOST_TEST(abs(a) == 20);
+   BOOST_TEST(abs(-a) == 20);
+   BOOST_TEST(abs(+a) == 20);
+   a = 20;
+   BOOST_TEST(abs(a) == 20);
+   BOOST_TEST(abs(-a) == 20);
+   BOOST_TEST(abs(+a) == 20);
 }
 
 template <class Real>
