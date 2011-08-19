@@ -5,11 +5,13 @@
 
 #include <boost/detail/lightweight_test.hpp>
 
-#if !defined(TEST_MPF50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_E_FLOAT)
+#if !defined(TEST_MPF50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_E_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50)
 #  define TEST_MPF50
 #  define TEST_MPF
 #  define TEST_BACKEND
 #  define TEST_MPZ
+#  define TEST_MPFR
+#  define TEST_MPFR_50
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -29,6 +31,9 @@
 #ifdef TEST_E_FLOAT
 #include <boost/math/big_number.hpp>
 #include <boost/math/bindings/e_float.hpp>
+#endif
+#if defined(TEST_MPFR) || defined(TEST_MPFR_50)
+#include <boost/math/big_number/mpfr.hpp>
 #endif
 
 template <class Real>
@@ -599,9 +604,11 @@ int main()
 #endif
 #ifdef TEST_MPF
    boost::math::mpf_real::default_precision(1000);
+   /*
    boost::math::mpf_real r;
    r.precision(50);
    BOOST_TEST(r.precision() >= 50);
+   */
    BOOST_TEST(boost::math::mpf_real::default_precision() == 1000);
    test<boost::math::mpf_real>();
 #endif
@@ -611,5 +618,20 @@ int main()
 #ifdef TEST_E_FLOAT
    test<boost::math::ef::e_float>();
 #endif
+#ifdef TEST_MPFR
+   test<boost::math::mpfr_real>();
+#endif
+#ifdef TEST_MPFR_50
+   test<boost::math::mpfr_real_50>();
+#endif
    return boost::report_errors();
+}
+
+namespace boost
+{
+   void assertion_failed(char const * expr,
+      char const * function, char const * file, long line)
+   {
+      std::cout << "Failed assertion in expression: " << expr << " in function: " << function << " in file: " << file << " at line: " << line <<std::endl;
+   }
 }

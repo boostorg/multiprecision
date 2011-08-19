@@ -31,7 +31,14 @@ struct gmp_real_imp
 
    gmp_real_imp(const gmp_real_imp& o)
    {
-      mpf_init_set(m_data, o.m_data);
+      //
+      // We have to do an init followed by a set here, otherwise *this may be at
+      // a lower precision than o: seems like mpf_init_set copies just enough bits
+      // to get the right value, but if it's then used in further calculations
+      // things go badly wrong!!
+      //
+      mpf_init2(m_data, (((digits10 ? digits10 : gmp_real<0>::default_precision()) + 1) * 1000L) / 301L);
+      mpf_set(m_data, o.m_data);
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
    gmp_real_imp(gmp_real_imp&& o)
@@ -57,8 +64,8 @@ struct gmp_real_imp
       boost::uintmax_t mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
       unsigned shift = 0;
       mpf_t t;
-      mpf_init2(m_data, ((digits10 + 1) * 1000L) / 301L);
-      mpf_init2(t, ((digits10 + 1) * 1000L) / 301L);
+      mpf_init2(t, (((digits10 ? digits10 : gmp_real<0>::default_precision()) + 1) * 1000L) / 301L);
+      mpf_set_ui(m_data, 0);
       while(i)
       {
          mpf_set_ui(t, static_cast<unsigned>(i & mask));

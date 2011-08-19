@@ -19,12 +19,18 @@ http://www.netlib.org/f2c/libf2c.zip
 #include <iomanip>
 #include <cmath>
 
-#ifdef TEST_BIG_NUMBER
+#ifdef TEST_MPF_100
 #include <boost/math/big_number/gmp.hpp>
 typedef boost::math::mpf_real_100 real_type;
+#elif defined(TEST_MPFR_100)
+#include <boost/math/big_number/mpfr.hpp>
+typedef boost::math::mpfr_real_100 real_type;
 #elif defined(TEST_GMPXX)
 #include <gmpxx.h>
 typedef mpf_class real_type;
+#elif defined(TEST_MPFRXX)
+#include <gmpfrxx.h>
+typedef mpfr_class real_type;
 #elif defined(TEST_EF_GMP)
 #define E_FLOAT_TYPE_GMP
 #include <e_float/e_float.h>
@@ -99,11 +105,16 @@ int dmxpy_(integer *, real_type *, integer *, integer *, real_type *, real_type 
 
 extern "C" int MAIN__()
 {
-#ifdef TEST_BIG_NUMBER
+#ifdef TEST_MPF_100
+   std::cout << "Testing big_number<mpf_real<100> >" << std::endl;
+#elif defined(TEST_MPFR_100)
    std::cout << "Testing big_number<mpf_real<100> >" << std::endl;
 #elif defined(TEST_GMPXX)
-   std::cout << "Testing mpfr_class at 100 decimal degits" << std::endl;
+   std::cout << "Testing mpf_class at 100 decimal degits" << std::endl;
    mpf_set_default_prec(((100 + 1) * 1000L) / 301L);
+#elif defined(TEST_MPFRXX)
+   std::cout << "Testing mpfr_class at 100 decimal degits" << std::endl;
+   mpfr_set_default_prec(((100 + 1) * 1000L) / 301L);
 #elif defined(TEST_EF_GMP)
    std::cout << "Testing gmp::e_float" << std::endl;
 #elif defined(TEST_MATH_EF)
@@ -913,9 +924,7 @@ L30:
 
 real_type epslon_(real_type *x)
 {
-#ifdef TEST_BIG_NUMBER
-   return std::ldexp(1.0, 1 - ((100 + 1) * 1000L) / 301L);
-#elif defined(TEST_GMPXX)
+#if defined(TEST_MPF_100) || defined(TEST_MPFR_100) || defined(TEST_GMPXX) || defined(TEST_MPFRXX)
    return std::ldexp(1.0, 1 - ((100 + 1) * 1000L) / 301L);
 #else
    return CAST_TO_RT(std::numeric_limits<real_type>::epsilon());
