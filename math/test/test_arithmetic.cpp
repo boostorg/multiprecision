@@ -12,6 +12,7 @@
 #  define TEST_MPZ
 #  define TEST_MPFR
 #  define TEST_MPFR_50
+#  define TEST_E_FLOAT
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -29,8 +30,7 @@
 #include <boost/math/concepts/big_number_architypes.hpp>
 #endif
 #ifdef TEST_E_FLOAT
-#include <boost/math/big_number.hpp>
-#include <boost/math/bindings/e_float.hpp>
+#include <boost/math/big_number/e_float.hpp>
 #endif
 #if defined(TEST_MPFR) || defined(TEST_MPFR_50)
 #include <boost/math/big_number/mpfr.hpp>
@@ -616,7 +616,7 @@ int main()
    test<boost::math::mpz_int>();
 #endif
 #ifdef TEST_E_FLOAT
-   test<boost::math::ef::e_float>();
+   test<boost::math::e_float>();
 #endif
 #ifdef TEST_MPFR
    test<boost::math::mpfr_real>();
@@ -627,11 +627,3 @@ int main()
    return boost::report_errors();
 }
 
-namespace boost
-{
-   void assertion_failed(char const * expr,
-      char const * function, char const * file, long line)
-   {
-      std::cout << "Failed assertion in expression: " << expr << " in function: " << function << " in file: " << file << " at line: " << line <<std::endl;
-   }
-}

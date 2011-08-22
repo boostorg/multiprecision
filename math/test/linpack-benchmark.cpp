@@ -31,16 +31,15 @@ typedef mpf_class real_type;
 #elif defined(TEST_MPFRXX)
 #include <gmpfrxx.h>
 typedef mpfr_class real_type;
-#elif defined(TEST_EF_GMP)
-#define E_FLOAT_TYPE_GMP
-#include <e_float/e_float.h>
-typedef e_float real_type;
-#define CAST_TO_RT(x) real_type(x)
-#elif defined(TEST_MATH_EF)
-#define E_FLOAT_TYPE_GMP
-#include <boost/math/bindings/e_float.hpp>
-typedef boost::math::ef::e_float real_type;
-//#define CAST_TO_RT(x) real_type(x)
+#elif defined(TEST_E_FLOAT)
+#include <boost/e_float/e_float.hpp>
+#include <boost/e_float/e_float_complex.hpp>
+#include <boost/e_float/e_float_elementary_math.hpp>
+typedef ::efx::e_float real_type;
+using ef::abs;
+#elif defined(TEST_E_FLOAT_BN)
+#include <boost/math/big_number/e_float.hpp>
+typedef boost::math::e_float real_type;
 #else
 typedef double real_type;
 #endif
@@ -68,12 +67,6 @@ extern "C" {
 
 }
 #include <time.h>
-
-
-#if defined(TEST_EF_GMP)
-#include <functions/functions.h>
-using namespace ef;
-#endif
 
 using std::min;
 using std::max;
@@ -115,10 +108,10 @@ extern "C" int MAIN__()
 #elif defined(TEST_MPFRXX)
    std::cout << "Testing mpfr_class at 100 decimal degits" << std::endl;
    mpfr_set_default_prec(((100 + 1) * 1000L) / 301L);
-#elif defined(TEST_EF_GMP)
-   std::cout << "Testing gmp::e_float" << std::endl;
-#elif defined(TEST_MATH_EF)
-   std::cout << "Testing boost::math::ef::e_float" << std::endl;
+#elif defined(TEST_E_FLOAT)
+   std::cout << "Testing boost::ef::e_float" << std::endl;
+#elif defined(TEST_E_FLOAT_BN)
+   std::cout << "Testing boost::math::e_float" << std::endl;
 #else
    std::cout << "Testing double" << std::endl;
 #endif
@@ -926,6 +919,8 @@ real_type epslon_(real_type *x)
 {
 #if defined(TEST_MPF_100) || defined(TEST_MPFR_100) || defined(TEST_GMPXX) || defined(TEST_MPFRXX)
    return std::ldexp(1.0, 1 - ((100 + 1) * 1000L) / 301L);
+#elif defined(TEST_E_FLOAT_BN)
+   return std::pow(10.0, 1-std::numeric_limits<efx::e_float>::digits10);
 #else
    return CAST_TO_RT(std::numeric_limits<real_type>::epsilon());
 #endif

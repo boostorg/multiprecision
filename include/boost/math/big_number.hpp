@@ -58,6 +58,14 @@ public:
       m_backend = canonical_value(v);
    }
 
+   template <class V>
+   big_number(V v, typename enable_if<mpl::and_<is_convertible<V, Backend>, mpl::not_<boost::is_arithmetic<V> > > >::type* dummy1 = 0)
+      : m_backend(v)
+   {
+      proto::value(*this) = this;
+      BOOST_ASSERT(proto::value(*this) == this);
+   }
+
    template <class Exp>
    big_number& operator=(const detail::big_number_exp<Exp>& e)
    {

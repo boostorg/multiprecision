@@ -16,6 +16,11 @@ namespace boost{
 namespace math{
 namespace concepts{
 
+#ifdef BOOST_MSVC
+#pragma warning(push)
+#pragma warning(disable:4244)
+#endif
+
 struct big_number_backend_real_architype
 {
    typedef mpl::list<long long>                 signed_types;
@@ -139,5 +144,38 @@ inline void divide(big_number_backend_real_architype& result, const big_number_b
 typedef boost::math::big_number<big_number_backend_real_architype> big_number_real_architype;
 
 }}} // namespaces
+
+namespace std{
+
+#ifdef BOOST_NO_NOEXCEPT
+#  define noexcept
+#endif
+
+template <>
+class numeric_limits<boost::math::concepts::big_number_real_architype> : public std::numeric_limits<long double>
+{
+   typedef std::numeric_limits<long double> base_type;
+   typedef boost::math::concepts::big_number_real_architype number_type;
+public:
+   BOOST_STATIC_CONSTEXPR number_type (min)() noexcept { return (base_type::min)(); }
+   BOOST_STATIC_CONSTEXPR number_type (max)() noexcept { return (base_type::max)(); }
+   BOOST_STATIC_CONSTEXPR number_type lowest() noexcept { return -(max)(); }
+   BOOST_STATIC_CONSTEXPR number_type epsilon() noexcept { return base_type::epsilon(); }
+   BOOST_STATIC_CONSTEXPR number_type round_error() noexcept { return epsilon() / 2; }
+   BOOST_STATIC_CONSTEXPR number_type infinity() noexcept { return base_type::infinity(); }
+   BOOST_STATIC_CONSTEXPR number_type quiet_NaN() noexcept { return base_type::quiet_NaN(); }
+   BOOST_STATIC_CONSTEXPR number_type signaling_NaN() noexcept { return base_type::signaling_NaN(); }
+   BOOST_STATIC_CONSTEXPR number_type denorm_min() noexcept { return base_type::denorm_min(); }
+};
+
+#ifdef BOOST_NO_NOEXCEPT
+#  undef noexcept
+#endif
+
+}
+
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
 
 #endif

@@ -12,6 +12,8 @@
 #include <boost/lexical_cast.hpp>
 #include <gmp.h>
 #include <cmath>
+#include <limits>
+#include <climits>
 
 namespace boost{ namespace math{
 
@@ -980,5 +982,215 @@ typedef big_number<gmp_real<0> >     mpf_real;
 typedef big_number<gmp_int >         mpz_int;
 
 }}  // namespaces
+
+namespace std{
+
+#ifdef BOOST_NO_NOEXCEPT
+#  define noexcept
+#endif
+
+//
+// numeric_limits [partial] specializations for the types declared in this header:
+//
+template<unsigned Digits10> 
+class numeric_limits<boost::math::big_number<boost::math::gmp_real<Digits10> > >
+{
+   typedef boost::math::big_number<boost::math::gmp_real<Digits10> > number_type;
+public:
+   BOOST_STATIC_CONSTEXPR bool is_specialized = true;
+   BOOST_STATIC_CONSTEXPR number_type (min)() noexcept
+   { 
+      initializer.do_nothing();
+      static std::pair<bool, number_type> value;
+      if(!value.first)
+      {
+         value.first = true;
+         value.second = 1;
+         mpf_div_2exp(value.second.backend().data(), value.second.backend().data(), LONG_MAX);
+      }
+      return value.second;
+   }
+   BOOST_STATIC_CONSTEXPR number_type (max)() noexcept
+   { 
+      initializer.do_nothing();
+      static std::pair<bool, number_type> value;
+      if(!value.first)
+      {
+         value.first = true;
+         value.second = 1;
+         mpf_mul_2exp(value.second.backend().data(), value.second.backend().data(), LONG_MAX - 1);
+      }
+      return value.second;
+   }
+   BOOST_STATIC_CONSTEXPR number_type lowest() noexcept
+   {
+      return -(max)();
+   }
+   BOOST_STATIC_CONSTEXPR int digits = static_cast<int>(((Digits10 + 1) * 1000L) / 301L);
+   BOOST_STATIC_CONSTEXPR int digits10 = Digits10;
+   // Is this really correct???
+   BOOST_STATIC_CONSTEXPR int max_digits10 = Digits10 + 1;
+   BOOST_STATIC_CONSTEXPR bool is_signed = true;
+   BOOST_STATIC_CONSTEXPR bool is_integer = false;
+   BOOST_STATIC_CONSTEXPR bool is_exact = false;
+   BOOST_STATIC_CONSTEXPR int radix = 2;
+   BOOST_STATIC_CONSTEXPR number_type epsilon() noexcept 
+   { 
+      initializer.do_nothing();
+      static std::pair<bool, number_type> value;
+      if(!value.first)
+      {
+         value.first = true;
+         value.second = 1;
+         mpf_div_2exp(value.second.backend().data(), value.second.backend().data(), std::numeric_limits<number_type>::digits - 1);
+      }
+      return value.second;
+   }
+   // What value should this be????
+   BOOST_STATIC_CONSTEXPR number_type round_error() noexcept 
+   { 
+      // returns epsilon/2
+      initializer.do_nothing();
+      static std::pair<bool, number_type> value;
+      if(!value.first)
+      {
+         value.first = true;
+         value.second = 1;
+         mpf_div_2exp(value.second.backend().data(), value.second.backend().data(), digits);
+      }
+      return value.second;
+   }
+   BOOST_STATIC_CONSTEXPR long min_exponent = LONG_MIN;
+   BOOST_STATIC_CONSTEXPR long min_exponent10 = (LONG_MIN / 1000) * 301L;
+   BOOST_STATIC_CONSTEXPR long max_exponent = LONG_MAX;
+   BOOST_STATIC_CONSTEXPR long max_exponent10 = (LONG_MAX / 1000) * 301L;
+   BOOST_STATIC_CONSTEXPR bool has_infinity = false;
+   BOOST_STATIC_CONSTEXPR bool has_quiet_NaN = false;
+   BOOST_STATIC_CONSTEXPR bool has_signaling_NaN = false;
+   BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm = denorm_absent;
+   BOOST_STATIC_CONSTEXPR bool has_denorm_loss = false;
+   BOOST_STATIC_CONSTEXPR number_type infinity() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR number_type quiet_NaN() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR number_type signaling_NaN() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR number_type denorm_min() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR bool is_iec559 = false;
+   BOOST_STATIC_CONSTEXPR bool is_bounded = true;
+   BOOST_STATIC_CONSTEXPR bool is_modulo = false;
+   BOOST_STATIC_CONSTEXPR bool traps = true;
+   BOOST_STATIC_CONSTEXPR bool tinyness_before = false;
+   BOOST_STATIC_CONSTEXPR float_round_style round_style = round_to_nearest;
+
+private:
+   struct data_initializer
+   {
+      data_initializer()
+      {
+         std::numeric_limits<boost::math::big_number<boost::math::gmp_real<digits10> > >::epsilon();
+         std::numeric_limits<boost::math::big_number<boost::math::gmp_real<digits10> > >::round_error();
+         std::numeric_limits<boost::math::big_number<boost::math::gmp_real<digits10> > >::min();
+         std::numeric_limits<boost::math::big_number<boost::math::gmp_real<digits10> > >::max();
+      }
+      void do_nothing()const{}
+   };
+   static const data_initializer initializer;
+};
+
+template<unsigned Digits10> 
+const typename numeric_limits<boost::math::big_number<boost::math::gmp_real<Digits10> > >::data_initializer numeric_limits<boost::math::big_number<boost::math::gmp_real<Digits10> > >::initializer;
+
+template<> 
+class numeric_limits<boost::math::big_number<boost::math::gmp_real<0> > >
+{
+   typedef boost::math::big_number<boost::math::gmp_real<0> > number_type;
+public:
+   BOOST_STATIC_CONSTEXPR bool is_specialized = false;
+   BOOST_STATIC_CONSTEXPR number_type (min)() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR number_type (max)() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR number_type lowest() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR int digits = 0;
+   BOOST_STATIC_CONSTEXPR int digits10 = 0;
+   BOOST_STATIC_CONSTEXPR int max_digits10 = 0;
+   BOOST_STATIC_CONSTEXPR bool is_signed = false;
+   BOOST_STATIC_CONSTEXPR bool is_integer = false;
+   BOOST_STATIC_CONSTEXPR bool is_exact = false;
+   BOOST_STATIC_CONSTEXPR int radix = 0;
+   BOOST_STATIC_CONSTEXPR number_type epsilon() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR number_type round_error() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR int min_exponent = 0;
+   BOOST_STATIC_CONSTEXPR int min_exponent10 = 0;
+   BOOST_STATIC_CONSTEXPR int max_exponent = 0;
+   BOOST_STATIC_CONSTEXPR int max_exponent10 = 0;
+   BOOST_STATIC_CONSTEXPR bool has_infinity = false;
+   BOOST_STATIC_CONSTEXPR bool has_quiet_NaN = false;
+   BOOST_STATIC_CONSTEXPR bool has_signaling_NaN = false;
+   BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm = denorm_absent;
+   BOOST_STATIC_CONSTEXPR bool has_denorm_loss = false;
+   BOOST_STATIC_CONSTEXPR number_type infinity() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR number_type quiet_NaN() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR number_type signaling_NaN() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR number_type denorm_min() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR bool is_iec559 = false;
+   BOOST_STATIC_CONSTEXPR bool is_bounded = false;
+   BOOST_STATIC_CONSTEXPR bool is_modulo = false;
+   BOOST_STATIC_CONSTEXPR bool traps = false;
+   BOOST_STATIC_CONSTEXPR bool tinyness_before = false;
+   BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
+};
+
+template<> 
+class numeric_limits<boost::math::mpz_int >
+{
+   typedef boost::math::mpz_int number_type;
+public:
+   BOOST_STATIC_CONSTEXPR bool is_specialized = true;
+   //
+   // Largest and smallest numbers are bounded only by available memory, set
+   // to zero:
+   //
+   BOOST_STATIC_CONSTEXPR number_type (min)() noexcept
+   { 
+      return number_type();
+   }
+   BOOST_STATIC_CONSTEXPR number_type (max)() noexcept 
+   { 
+      return number_type();
+   }
+   BOOST_STATIC_CONSTEXPR number_type lowest() noexcept { return (min)(); }
+   // Digits are unbounded, use zero for now:
+   BOOST_STATIC_CONSTEXPR int digits = 0;
+   BOOST_STATIC_CONSTEXPR int digits10 = 0;
+   BOOST_STATIC_CONSTEXPR int max_digits10 = 0;
+   BOOST_STATIC_CONSTEXPR bool is_signed = true;
+   BOOST_STATIC_CONSTEXPR bool is_integer = true;
+   BOOST_STATIC_CONSTEXPR bool is_exact = true;
+   BOOST_STATIC_CONSTEXPR int radix = 2;
+   BOOST_STATIC_CONSTEXPR number_type epsilon() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR number_type round_error() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR int min_exponent = 0;
+   BOOST_STATIC_CONSTEXPR int min_exponent10 = 0;
+   BOOST_STATIC_CONSTEXPR int max_exponent = 0;
+   BOOST_STATIC_CONSTEXPR int max_exponent10 = 0;
+   BOOST_STATIC_CONSTEXPR bool has_infinity = false;
+   BOOST_STATIC_CONSTEXPR bool has_quiet_NaN = false;
+   BOOST_STATIC_CONSTEXPR bool has_signaling_NaN = false;
+   BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm = denorm_absent;
+   BOOST_STATIC_CONSTEXPR bool has_denorm_loss = false;
+   BOOST_STATIC_CONSTEXPR number_type infinity() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR number_type quiet_NaN() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR number_type signaling_NaN() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR number_type denorm_min() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR bool is_iec559 = false;
+   BOOST_STATIC_CONSTEXPR bool is_bounded = false;
+   BOOST_STATIC_CONSTEXPR bool is_modulo = false;
+   BOOST_STATIC_CONSTEXPR bool traps = false;
+   BOOST_STATIC_CONSTEXPR bool tinyness_before = false;
+   BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
+};
+
+#ifdef BOOST_NO_NOEXCEPT
+#  undef noexcept
+#endif
+
+} // namespace std
 
 #endif
