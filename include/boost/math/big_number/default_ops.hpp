@@ -146,6 +146,34 @@ inline void modulus(T& t, const U& u, const V& v)
    }
 }
 
+template <class T>
+inline void increment(T& val)
+{
+   typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
+   add(val, static_cast<ui_type>(1u));
+}
+
+template <class T>
+inline void decrement(T& val)
+{
+   typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
+   subtract(val, static_cast<ui_type>(1u));
+}
+
+template <class T, class V>
+inline void left_shift(T& result, const T& arg, const V val)
+{
+   result = arg;
+   left_shift(result, val);
+}
+
+template <class T, class V>
+inline void right_shift(T& result, const T& arg, const V val)
+{
+   result = arg;
+   right_shift(result, val);
+}
+
 //
 // Functions:
 //

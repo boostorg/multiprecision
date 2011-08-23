@@ -36,6 +36,11 @@
 #include <boost/math/big_number/mpfr.hpp>
 #endif
 
+#define BOOST_TEST_THROW(x, EX)\
+   try { x;  BOOST_ERROR("Expected exception not thrown"); } \
+   catch(const EX&){}\
+   catch(...){ BOOST_ERROR("Incorrect exception type thrown"); }
+
 template <class Real>
 void test_integer_ops(const boost::mpl::false_&){}
 
@@ -104,6 +109,41 @@ void test_integer_ops(const boost::mpl::true_&)
    a %= -7LL;
    BOOST_TEST(a == -20 % -7);
 #endif
+   a = 20;
+   BOOST_TEST(++a == 21);
+   BOOST_TEST(--a == 20);
+   BOOST_TEST(a++ == 20);
+   BOOST_TEST(a == 21);
+   BOOST_TEST(a-- == 21);
+   BOOST_TEST(a == 20);
+   a = 2000;
+   a <<= 20;
+   BOOST_TEST(a == 2000L << 20);
+   a >>= 20;
+   BOOST_TEST(a == 2000);
+   a <<= 20u;
+   BOOST_TEST(a == 2000L << 20);
+   a >>= 20u;
+   BOOST_TEST(a == 2000);
+   BOOST_TEST_THROW(a <<= -20, std::out_of_range);
+   BOOST_TEST_THROW(a >>= -20, std::out_of_range);
+#ifndef BOOST_NO_LONG_LONG
+   if(sizeof(long long) > sizeof(std::size_t))
+   {
+      // extreme values should trigger an exception:
+      BOOST_TEST_THROW(a >>= (1uLL << (sizeof(long long) * CHAR_BIT - 2)), std::out_of_range);
+      BOOST_TEST_THROW(a <<= (1uLL << (sizeof(long long) * CHAR_BIT - 2)), std::out_of_range);
+   }
+#endif
+   a = 20;
+   b = a << 20;
+   BOOST_TEST(b == (20 << 20));
+   b = a >> 2;
+   BOOST_TEST(b == (20 >> 2));
+   b = (a + 2) << 10;
+   BOOST_TEST(b == (22 << 10));
+   b = (a + 3) >> 3;
+   BOOST_TEST(b == (23 >> 3));
    //
    // Non-member functions:
    //

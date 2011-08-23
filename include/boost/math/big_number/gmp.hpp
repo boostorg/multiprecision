@@ -862,6 +862,26 @@ inline void divide(gmp_int& t, long i)
    if(i < 0)
       mpz_neg(t.data(), t.data());
 }
+template <class UI>
+inline void left_shift(gmp_int& t, UI i)
+{
+   mpz_mul_2exp(t.data(), t.data(), static_cast<mp_bitcnt_t>(i));
+}
+template <class UI>
+inline void right_shift(gmp_int& t, UI i)
+{
+   mpz_fdiv_q_2exp(t.data(), t.data(), static_cast<mp_bitcnt_t>(i));
+}
+template <class UI>
+inline void left_shift(gmp_int& t, const gmp_int& v, UI i)
+{
+   mpz_mul_2exp(t.data(), v.data(), static_cast<mp_bitcnt_t>(i));
+}
+template <class UI>
+inline void right_shift(gmp_int& t, const gmp_int& v, UI i)
+{
+   mpz_fdiv_q_2exp(t.data(), v.data(), static_cast<mp_bitcnt_t>(i));
+}
 
 inline void add(gmp_int& t, const gmp_int& p, const gmp_int& o)
 {
@@ -1087,8 +1107,8 @@ private:
       {
          std::numeric_limits<boost::math::big_number<boost::math::gmp_real<digits10> > >::epsilon();
          std::numeric_limits<boost::math::big_number<boost::math::gmp_real<digits10> > >::round_error();
-         std::numeric_limits<boost::math::big_number<boost::math::gmp_real<digits10> > >::min();
-         std::numeric_limits<boost::math::big_number<boost::math::gmp_real<digits10> > >::max();
+         (std::numeric_limits<boost::math::big_number<boost::math::gmp_real<digits10> > >::min)();
+         (std::numeric_limits<boost::math::big_number<boost::math::gmp_real<digits10> > >::max)();
       }
       void do_nothing()const{}
    };

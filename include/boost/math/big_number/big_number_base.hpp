@@ -29,6 +29,8 @@ struct big_number_grammar
       , proto::unary_plus< big_number_grammar >
       , proto::negate< big_number_grammar >
       , proto::modulus<big_number_grammar, big_number_grammar>
+      , proto::shift_left<big_number_grammar, big_number_grammar>
+      , proto::shift_right<big_number_grammar, big_number_grammar>
     >
 {};
 

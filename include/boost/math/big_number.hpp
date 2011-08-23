@@ -17,6 +17,9 @@
 #include <boost/type_traits/is_signed.hpp>
 #include <boost/type_traits/is_unsigned.hpp>
 #include <boost/type_traits/is_floating_point.hpp>
+#include <boost/type_traits/is_integral.hpp>
+#include <boost/type_traits/make_unsigned.hpp>
+#include <boost/throw_exception.hpp>
 #include <boost/math/big_number/default_ops.hpp>
 
 namespace boost{ namespace math{
@@ -201,6 +204,65 @@ public:
       }
       return *this;
    }
+   //
+   // These operators are *not* proto-ized.
+   // The issue is that the increment/decrement must happen
+   // even if the result of the operator *is never used*.
+   // Possibly we could modify our expression wrapper to
+   // execute the increment/decrement on destruction, but
+   // correct implemetation will be tricky, so defered for now...
+   //
+   big_number& operator++()
+   {
+      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The increment operation is only valid for integer types");
+      using big_num_default_ops::increment;
+      increment(m_backend);
+      return *this;
+   }
+
+   big_number& operator--()
+   {
+      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The increment operation is only valid for integer types");
+      using big_num_default_ops::decrement;
+      decrement(m_backend);
+      return *this;
+   }
+
+   big_number operator++(int)
+   {
+      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The increment operation is only valid for integer types");
+      using big_num_default_ops::increment;
+      self_type temp(*this);
+      increment(m_backend);
+      return temp;
+   }
+
+   big_number operator--(int)
+   {
+      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The increment operation is only valid for integer types");
+      using big_num_default_ops::decrement;
+      self_type temp(*this);
+      decrement(m_backend);
+      return temp;
+   }
+
+   template <class V>
+   typename enable_if<is_integral<V>, big_number&>::type operator <<= (V val)
+   {
+      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The left-shift operation is only valid for integer types");
+      check_shift_range(val, mpl::bool_<(sizeof(V) > sizeof(std::size_t))>(), is_signed<V>());
+      left_shift(m_backend, canonical_value(val));
+      return *this;
+   }
+
+   template <class V>
+   typename enable_if<is_integral<V>, big_number&>::type operator >>= (V val)
+   {
+      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The right-shift operation is only valid for integer types");
+      check_shift_range(val, mpl::bool_<(sizeof(V) > sizeof(std::size_t))>(), is_signed<V>());
+      right_shift(m_backend, canonical_value(val));
+      return *this;
+   }
 
    template <class V>
    typename enable_if<boost::is_arithmetic<V>, big_number<Backend>& >::type 
@@ -235,6 +297,14 @@ public:
       using big_num_default_ops::divide;
       divide(m_backend, canonical_value(v));
       return *this;
+   }
+
+   //
+   // swap:
+   //
+   void swap(self_type& other)
+   {
+      m_backend.swap(other.backend());
    }
 
    //
@@ -284,6 +354,29 @@ public:
       return m_backend;
    }
 private:
+   template <class V>
+   void check_shift_range(V val, const mpl::true_&, const mpl::true_&)
+   {
+      if(val > std::numeric_limits<std::size_t>::max())
+         BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
+      if(val < 0)
+         BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
+   }
+   template <class V>
+   void check_shift_range(V val, const mpl::false_&, const mpl::true_&)
+   {
+      if(val < 0)
+         BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
+   }
+   template <class V>
+   void check_shift_range(V val, const mpl::true_&, const mpl::false_&)
+   {
+      if(val > std::numeric_limits<std::size_t>::max())
+         BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
+   }
+   template <class V>
+   void check_shift_range(V val, const mpl::false_&, const mpl::false_&){}
+
    template <class Exp>
    void do_assign(const Exp& e, const detail::add_immediates&)
    {
@@ -363,6 +456,7 @@ private:
    template <class Exp>
    void do_assign(const Exp& e, const detail::modulus_immediates&)
    {
+      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The modulus operation is only valid for integer types");
       using big_num_default_ops::modulus;
       typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
       typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
@@ -575,6 +669,64 @@ private:
       typedef typename proto::arity_of<Exp>::type tag_type;
       do_assign_function(e, tag_type());
    }
+   template <class Exp>
+   void do_assign(const Exp& e, const proto::tag::shift_left&)
+   {
+      // We can only shift by an integer value, not an arbitrary expression:
+      typedef typename proto::result_of::left<Exp>::type left_type;
+      typedef typename proto::result_of::right<Exp>::type right_type;
+      typedef typename proto::arity_of<right_type>::type right_arity;
+      BOOST_STATIC_ASSERT_MSG(right_arity::value == 0, "The left shift operator requires an integer value for the shift operand.");
+      typedef typename proto::result_of::value<right_type>::type right_value_type;
+      BOOST_STATIC_ASSERT_MSG(is_integral<right_value_type>::value, "The left shift operator requires an integer value for the shift operand.");
+      typedef typename proto::tag_of<left_type>::type tag_type;
+      do_assign_left_shift(proto::left(e), canonical_value(proto::value(proto::right(e))), tag_type());
+   }
+
+   template <class Exp>
+   void do_assign(const Exp& e, const proto::tag::shift_right&)
+   {
+      // We can only shift by an integer value, not an arbitrary expression:
+      typedef typename proto::result_of::left<Exp>::type left_type;
+      typedef typename proto::result_of::right<Exp>::type right_type;
+      typedef typename proto::arity_of<right_type>::type right_arity;
+      BOOST_STATIC_ASSERT_MSG(right_arity::value == 0, "The left shift operator requires an integer value for the shift operand.");
+      typedef typename proto::result_of::value<right_type>::type right_value_type;
+      BOOST_STATIC_ASSERT_MSG(is_integral<right_value_type>::value, "The left shift operator requires an integer value for the shift operand.");
+      typedef typename proto::tag_of<left_type>::type tag_type;
+      do_assign_right_shift(proto::left(e), canonical_value(proto::value(proto::right(e))), tag_type());
+   }
+
+   template <class Exp, class Val>
+   void do_assign_right_shift(const Exp& e, const Val& val, const proto::tag::terminal&)
+   {
+      using big_num_default_ops::right_shift;
+      right_shift(m_backend, canonical_value(proto::value(e)), val);
+   }
+
+   template <class Exp, class Val>
+   void do_assign_left_shift(const Exp& e, const Val& val, const proto::tag::terminal&)
+   {
+      using big_num_default_ops::left_shift;
+      left_shift(m_backend, canonical_value(proto::value(e)), val);
+   }
+
+   template <class Exp, class Val, class Tag>
+   void do_assign_right_shift(const Exp& e, const Val& val, const Tag&)
+   {
+      using big_num_default_ops::right_shift;
+      self_type temp(e);
+      right_shift(m_backend, temp.backend(), val);
+   }
+
+   template <class Exp, class Val, class Tag>
+   void do_assign_left_shift(const Exp& e, const Val& val, const Tag&)
+   {
+      using big_num_default_ops::left_shift;
+      self_type temp(e);
+      left_shift(m_backend, temp.backend(), val);
+   }
+
    template <class Exp>
    void do_assign_function(const Exp& e, const mpl::long_<1>&)
    {
@@ -804,6 +956,7 @@ private:
    template <class Exp>
    void do_modulus(const Exp& e, const proto::tag::terminal&)
    {
+      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The modulus operation is only valid for integer types");
       using big_num_default_ops::modulus;
       modulus(m_backend, canonical_value(proto::value(e)));
    }
@@ -811,6 +964,7 @@ private:
    template <class Exp, class Unknown>
    void do_modulus(const Exp& e, const Unknown&)
    {
+      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The modulus operation is only valid for integer types");
       using big_num_default_ops::modulus;
       self_type temp(e);
       modulus(m_backend, canonical_value(proto::value(temp)));

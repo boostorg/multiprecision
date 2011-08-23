@@ -741,8 +741,8 @@ private:
       {
          std::numeric_limits<boost::math::big_number<boost::math::mpfr_real_backend<digits10> > >::epsilon();
          std::numeric_limits<boost::math::big_number<boost::math::mpfr_real_backend<digits10> > >::round_error();
-         std::numeric_limits<boost::math::big_number<boost::math::mpfr_real_backend<digits10> > >::min();
-         std::numeric_limits<boost::math::big_number<boost::math::mpfr_real_backend<digits10> > >::max();
+         (std::numeric_limits<boost::math::big_number<boost::math::mpfr_real_backend<digits10> > >::min)();
+         (std::numeric_limits<boost::math::big_number<boost::math::mpfr_real_backend<digits10> > >::max)();
          std::numeric_limits<boost::math::big_number<boost::math::mpfr_real_backend<digits10> > >::infinity();
          std::numeric_limits<boost::math::big_number<boost::math::mpfr_real_backend<digits10> > >::quiet_NaN();
       }
