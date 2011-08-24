@@ -680,6 +680,15 @@ void test()
    {
       BOOST_ERROR("Unexpected zero result");
    }
+   if(a + b){}
+   else
+   {
+      BOOST_ERROR("Unexpected zero result");
+   }
+   if(b - 2)
+   {
+      BOOST_ERROR("Unexpected non-zero result");
+   }
 }
 
 
