@@ -41,6 +41,16 @@
    catch(const EX&){}\
    catch(...){ BOOST_ERROR("Incorrect exception type thrown"); }
 
+#undef BOOST_TEST
+#define BOOST_TEST(x)\
+   try {\
+      if(x){}else{ BOOST_ERROR("Value was zero: "); }\
+   }\
+   catch(const std::exception& e){  \
+      BOOST_ERROR("Unexpected exception: ");\
+      BOOST_LIGHTWEIGHT_TEST_OSTREAM << e.what() << std::endl;\
+   }
+
 template <class Real>
 void test_integer_ops(const boost::mpl::false_&){}
 
@@ -631,6 +641,45 @@ void test()
    BOOST_TEST((72 < b+a) == false);
    BOOST_TEST((72 >= b+a) == true);
    BOOST_TEST((72 > b+a) == false);
+   //
+   // Test sign and zero functions, plus use in boolian context:
+   //
+   a = 20;
+   BOOST_TEST(a.sign() > 0);
+   BOOST_TEST(!a.is_zero());
+   a = -20;
+   BOOST_TEST(a.sign() < 0);
+   BOOST_TEST(!a.is_zero());
+   a = 0;
+   BOOST_TEST(a.sign() == 0);
+   BOOST_TEST(a.is_zero());
+   if(a)
+   {
+      BOOST_ERROR("Unexpected non-zero result");
+   }
+   if(!a){}
+   else
+   {
+      BOOST_ERROR("Unexpected zero result");
+   }
+   b = 2;
+   if(!b)
+   {
+      BOOST_ERROR("Unexpected zero result");
+   }
+   if(b){}
+   else
+   {
+      BOOST_ERROR("Unexpected non-zero result");
+   }
+   if(a && b)
+   {
+      BOOST_ERROR("Unexpected zero result");
+   }
+   if(!(a || b))
+   {
+      BOOST_ERROR("Unexpected zero result");
+   }
 }
 
 

@@ -542,6 +542,17 @@ inline void divide(gmp_real<digits10>& a, long x, const gmp_real<digits10>& y)
       mpf_ui_div(a.data(), x, y.data());
 }
 
+template <unsigned digits10>
+inline bool is_zero(const gmp_real<digits10>& val)
+{
+   return mpf_sgn(val.data()) == 0;
+}
+template <unsigned digits10>
+inline int get_sign(const gmp_real<digits10>& val)
+{
+   return mpf_sgn(val.data());
+}
+
 //
 // Native non-member operations:
 //
@@ -986,6 +997,15 @@ inline void divide(gmp_int& t, const gmp_int& p, long i)
       mpz_neg(t.data(), t.data());
 }
    
+inline bool is_zero(const gmp_int& val)
+{
+   return mpz_sgn(val.data()) == 0;
+}
+inline int get_sign(const gmp_int& val)
+{
+   return mpz_sgn(val.data());
+}
+
 inline void abs(gmp_int* result, const gmp_int& val)
 {
    mpz_abs(result->data(), val.data());

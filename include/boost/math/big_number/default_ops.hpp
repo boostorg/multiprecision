@@ -174,6 +174,19 @@ inline void right_shift(T& result, const T& arg, const V val)
    right_shift(result, val);
 }
 
+template <class T>
+inline bool is_zero(const T& val)
+{
+   typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
+   return val.compare(static_cast<ui_type>(0)) == 0;
+}
+template <class T>
+inline int get_sign(const T& val)
+{
+   typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
+   return val.compare(static_cast<ui_type>(0));
+}
+
 //
 // Functions:
 //

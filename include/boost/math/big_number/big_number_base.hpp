@@ -41,22 +41,6 @@ struct big_number_domain
   : proto::domain< proto::generator<big_number_exp>, big_number_grammar>
 {};
 
-template<typename Expr>
-struct big_number_exp
-  : proto::extends<Expr, big_number_exp<Expr>, big_number_domain>
-{
-    typedef
-        proto::extends<Expr, big_number_exp<Expr>, big_number_domain> base_type;
-
-    big_number_exp(Expr const &expr = Expr())
-      : base_type(expr)
-    {}
-    template <class Other>
-    big_number_exp(const Other& o)
-       : base_type(o)
-    {}
-};
-
 struct CalcDepth
   : proto::or_<
         proto::when< proto::terminal<proto::_>,
@@ -445,6 +429,55 @@ template <class Backend>
 struct backend_type<boost::math::big_number<Backend> >
 {
    typedef Backend type;
+};
+
+template<typename Expr>
+struct big_number_exp
+  : proto::extends<Expr, big_number_exp<Expr>, big_number_domain>
+{
+private:
+    typedef          proto::extends<Expr, big_number_exp<Expr>, big_number_domain>  base_type;
+    typedef          big_number_exp<Expr>                                           self_type;
+    typedef typename expression_type<self_type>::type                               number_type;
+    typedef          void (self_type::*unmentionable_type)();
+    void unmentionable_proc(){}
+    unmentionable_type boolean_context_from_terminal(const number_type* pval)const
+    {
+       return pval->is_zero() ? 0 : &self_type::unmentionable_proc;
+    }
+    unmentionable_type boolean_context_from_terminal(number_type* pval)const
+    {
+       return pval->is_zero() ? 0 : &self_type::unmentionable_proc;
+    }
+    template <class Terminal>
+    unmentionable_type boolean_context_from_terminal(const Terminal& val)const
+    {
+       return val ? 0 : &self_type::unmentionable_proc;
+    }
+    unmentionable_type boolean_context(const proto::tag::terminal&)const
+    {
+       return boolean_context_from_terminal(proto::value(*this));
+    }
+    template <class Tag>
+    unmentionable_type boolean_context(const Tag&)const
+    {
+       // we have to evaluate the expression template:
+       number_type result(*this);
+       return result.is_zero() ? 0 : &self_type::unmentionable_proc;
+    }
+public:
+    big_number_exp(Expr const &expr = Expr())
+      : base_type(expr)
+    {}
+    template <class Other>
+    big_number_exp(const Other& o)
+       : base_type(o)
+    {}
+
+    operator unmentionable_type()const
+    {
+       return boolean_context(typename proto::tag_of<self_type>::type());
+    }
 };
 
 } // namespace detail

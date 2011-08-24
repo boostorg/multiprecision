@@ -27,6 +27,17 @@ inline void abs(arithmetic_backend<efx::e_float>* result, const arithmetic_backe
    result->data() = ef::fabs(arg.data());
 }
 
+inline bool is_zero(const arithmetic_backend<efx::e_float>& val)
+{
+   return val.data().iszero();
+}
+inline int get_sign(const arithmetic_backend<efx::e_float>& val)
+{
+   return val.data().isneg() ? -1 : val.data().iszero() ? 0 : 1;
+}
+
+
+
 
 }} // namespaces
 

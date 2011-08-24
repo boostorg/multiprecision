@@ -306,7 +306,19 @@ public:
    {
       m_backend.swap(other.backend());
    }
-
+   //
+   // Zero and sign:
+   //
+   bool is_zero()
+   {
+      using big_num_default_ops::is_zero;
+      return is_zero(m_backend);
+   }
+   int sign()
+   {
+      using big_num_default_ops::get_sign;
+      return get_sign(m_backend);
+   }
    //
    // String conversion functions:
    //

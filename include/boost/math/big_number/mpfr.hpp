@@ -544,6 +544,17 @@ inline void divide(mpfr_real_backend<digits10>& a, long x, const mpfr_real_backe
       mpfr_ui_div(a.data(), x, y.data(), MPFR_RNDN);
 }
 
+template <unsigned digits10>
+inline bool is_zero(const mpfr_real_backend<digits10>& val)
+{
+   return 0 != mpfr_zero_p(val.data());
+}
+template <unsigned digits10>
+inline int get_sign(const mpfr_real_backend<digits10>& val)
+{
+   return mpfr_sgn(val.data());
+}
+
 //
 // Native non-member operations:
 //
