@@ -187,6 +187,66 @@ inline int get_sign(const T& val)
    return val.compare(static_cast<ui_type>(0));
 }
 
+template <class R, int b>
+struct has_enough_bits
+{
+   template <class T>
+   struct type : public mpl::and_<mpl::not_<is_same<R, T> >, mpl::bool_<std::numeric_limits<T>::digits >= b> >{};
+};
+
+template <class R>
+struct terminal
+{
+   terminal(const R& v) : value(v){}
+   terminal(){}
+   terminal& operator = (R val) {  value = val;  }
+   R value;
+   operator R()const {  return value;  }
+};
+
+template<class R, class B>
+struct calculate_next_larger_type
+{
+   typedef typename mpl::if_<
+      is_signed<R>,
+      typename B::signed_types,
+      typename mpl::if_<
+         is_unsigned<R>,
+         typename B::unsigned_types,
+         typename B::real_types
+      >::type
+   >::type list_type;
+   typedef typename has_enough_bits<R, std::numeric_limits<R>::digits>::template type<mpl::_> pred_type;
+   typedef typename mpl::find_if<
+      list_type,
+      pred_type
+   >::type iter_type;
+   typedef typename mpl::eval_if<
+      is_same<typename mpl::end<list_type>::type, iter_type>,
+      mpl::identity<terminal<R> >,
+      mpl::deref<iter_type>
+      >::type type;
+};
+
+template <class R, class B>
+inline void convert_to(R* result, const B& backend)
+{
+   typedef calculate_next_larger_type<R, B>::type next_type;
+   next_type n;
+   convert_to(&n, backend);
+   *result = static_cast<R>(n);
+}
+
+template <class R, class B>
+inline void convert_to(terminal<R>* result, const B& backend)
+{
+   //
+   // We ran out of types to try for the convertion, try
+   // a lexical_cast and hope for the best:
+   //
+   result->value = boost::lexical_cast<R>(backend.str(0, false));
+}
+
 //
 // Functions:
 //

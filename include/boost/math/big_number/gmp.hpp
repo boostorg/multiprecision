@@ -553,6 +553,22 @@ inline int get_sign(const gmp_real<digits10>& val)
    return mpf_sgn(val.data());
 }
 
+template <unsigned digits10>
+inline void convert_to(unsigned long* result, const gmp_real<digits10>& val)
+{
+   *result = mpf_get_ui(val.data());
+}
+template <unsigned digits10>
+inline void convert_to(long* result, const gmp_real<digits10>& val)
+{
+   *result = mpf_get_si(val.data());
+}
+template <unsigned digits10>
+inline void convert_to(double* result, const gmp_real<digits10>& val)
+{
+   *result = mpf_get_d(val.data());
+}
+
 //
 // Native non-member operations:
 //
@@ -1004,6 +1020,18 @@ inline bool is_zero(const gmp_int& val)
 inline int get_sign(const gmp_int& val)
 {
    return mpz_sgn(val.data());
+}
+inline void convert_to(unsigned long* result, const gmp_int& val)
+{
+   *result = mpz_get_ui(val.data());
+}
+inline void convert_to(long* result, const gmp_int& val)
+{
+   *result = mpz_get_si(val.data());
+}
+inline void convert_to(double* result, const gmp_int& val)
+{
+   *result = mpz_get_d(val.data());
 }
 
 inline void abs(gmp_int* result, const gmp_int& val)

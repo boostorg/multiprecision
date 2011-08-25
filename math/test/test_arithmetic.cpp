@@ -174,7 +174,6 @@ template <class Real>
 void test_real_ops(const boost::mpl::true_&)
 {
 #if defined(TEST_MPF) || defined(TEST_MPF_50)
-   std::cout << "Root2 = " << sqrt(Real(2)) << std::endl;
    BOOST_TEST(abs(Real(2)) == 2);
    BOOST_TEST(abs(Real(-2)) == 2);
    BOOST_TEST(fabs(Real(2)) == 2);
@@ -203,6 +202,16 @@ void test_real_ops(const boost::mpl::true_&)
 #endif
 }
 
+#ifdef TEST_E_FLOAT
+
+template <class T>
+struct lexical_cast_target_type
+{
+   typedef long double type;
+};
+
+#else
+
 template <class T>
 struct lexical_cast_target_type
 {
@@ -216,6 +225,8 @@ struct lexical_cast_target_type
       >::type
    >::type type;
 };
+
+#endif
 
 template <class Real, class Num>
 void test_negative_mixed(boost::mpl::true_ const&)
@@ -312,6 +323,10 @@ void test_mixed()
    BOOST_TEST(Real(n2) == n2);
    BOOST_TEST(Real(n3) == n3);
    BOOST_TEST(Real(n4) == n4);
+   BOOST_TEST(Real(n1).template convert_to<Num>() == n1);
+   BOOST_TEST(Real(n2).template convert_to<Num>() == n2);
+   BOOST_TEST(Real(n3).template convert_to<Num>() == n3);
+   BOOST_TEST(Real(n4).template convert_to<Num>() == n4);
    BOOST_TEST(n1 == Real(n1));
    BOOST_TEST(n2 == Real(n2));
    BOOST_TEST(n3 == Real(n3));
@@ -689,6 +704,20 @@ void test()
    {
       BOOST_ERROR("Unexpected non-zero result");
    }
+   //
+   // Test iostreams:
+   //
+   std::stringstream ss;
+   a = 20;
+   b = 2;
+   ss << a;
+   ss >> c;
+   BOOST_TEST(a == c);
+   ss.clear();
+   ss << a + b;
+   ss >> c;
+   BOOST_TEST(c == 22);
+   BOOST_TEST(c == a + b);
 }
 
 

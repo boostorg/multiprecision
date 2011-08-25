@@ -436,9 +436,9 @@ struct big_number_exp
   : proto::extends<Expr, big_number_exp<Expr>, big_number_domain>
 {
 private:
-    typedef          proto::extends<Expr, big_number_exp<Expr>, big_number_domain>  base_type;
-    typedef          big_number_exp<Expr>                                           self_type;
-    typedef typename expression_type<self_type>::type                               number_type;
+    typedef          proto::extends<Expr, big_number_exp<Expr>, big_number_domain>      base_type;
+    typedef          big_number_exp<Expr>                                               self_type;
+    typedef typename remove_reference<typename expression_type<self_type>::type>::type  number_type;
     typedef          void (self_type::*unmentionable_type)();
     void unmentionable_proc(){}
     unmentionable_type boolean_context_from_terminal(const number_type* pval)const

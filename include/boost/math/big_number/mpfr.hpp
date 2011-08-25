@@ -159,10 +159,7 @@ struct mpfr_real_imp
    {
       std::string result;
       mp_exp_t e;
-      void *(*alloc_func_ptr) (size_t);
-      void *(*realloc_func_ptr) (void *, size_t, size_t);
-      void (*free_func_ptr) (void *, size_t);
-      const char* ps = mpfr_get_str (0, &e, 10, digits, m_data, MPFR_RNDN);
+      char* ps = mpfr_get_str (0, &e, 10, digits, m_data, MPFR_RNDN);
       std::ptrdiff_t sl = std::strlen(ps);
       unsigned chars = sl;
       if(sl == 0)
@@ -192,8 +189,7 @@ struct mpfr_real_imp
          if(e)
             result += "e" + lexical_cast<std::string>(e);
       }
-      mp_get_memory_functions(&alloc_func_ptr, &realloc_func_ptr, &free_func_ptr);
-      (*free_func_ptr)((void*)ps, sl + 1);
+      mpfr_free_str(ps);
       return result;
    }
    ~mpfr_real_imp()
@@ -553,6 +549,39 @@ template <unsigned digits10>
 inline int get_sign(const mpfr_real_backend<digits10>& val)
 {
    return mpfr_sgn(val.data());
+}
+
+template <unsigned digits10>
+inline void convert_to(unsigned long* result, const mpfr_real_backend<digits10>& val)
+{
+   *result = mpfr_get_ui(val.data(), MPFR_RNDN);
+}
+template <unsigned digits10>
+inline void convert_to(long* result, const mpfr_real_backend<digits10>& val)
+{
+   *result = mpfr_get_si(val.data(), MPFR_RNDN);
+}
+#ifdef _MPFR_H_HAVE_INTMAX_T
+template <unsigned digits10>
+inline void convert_to(boost::uintmax_t* result, const mpfr_real_backend<digits10>& val)
+{
+   *result = mpfr_get_uj(val.data(), MPFR_RNDN);
+}
+template <unsigned digits10>
+inline void convert_to(boost::intmax_t* result, const mpfr_real_backend<digits10>& val)
+{
+   *result = mpfr_get_sj(val.data(), MPFR_RNDN);
+}
+#endif
+template <unsigned digits10>
+inline void convert_to(double* result, const mpfr_real_backend<digits10>& val)
+{
+   *result = mpfr_get_d(val.data(), MPFR_RNDN);
+}
+template <unsigned digits10>
+inline void convert_to(long double* result, const mpfr_real_backend<digits10>& val)
+{
+   *result = mpfr_get_ld(val.data(), MPFR_RNDN);
 }
 
 //

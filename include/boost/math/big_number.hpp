@@ -326,6 +326,14 @@ public:
    {
       return m_backend.str(digits, scientific);
    }
+   template <class T>
+   T convert_to()const
+   {
+      using big_num_default_ops::convert_to;
+      T result;
+      convert_to(&result, m_backend);
+      return result;
+   }
    //
    // Default precision:
    //
@@ -1190,22 +1198,47 @@ inline typename boost::enable_if<detail::is_valid_comparison<Exp1, Exp2>, bool>:
 {
    return 0 < detail::big_number_compare(a, b);
 }
-
-template <class Backend>
-inline std::ostream& operator << (std::ostream& os, const big_number<Backend>& r)
+//
+// Because proto overloads these << operators, we need version that accept both
+// const and non-const RHS values, otherwise the proto version will be found
+// with unpleasant results... not only that, but the stream parameter has to be a template
+// otherwise the LHS of the expression would have to be *exactly* of type std::ostream
+// for the overload to be found (ie doesn't work for std::fstream etc unless we do this...)
+//
+template <class Stream, class Backend>
+inline typename enable_if<is_convertible<Stream*, std::ostream*>, std::ostream&>::type operator << (Stream& os, const big_number<Backend>& r)
 {
    return os << r.str(static_cast<unsigned>(os.precision(), os.flags() & os.scientific));
 }
-template <class Exp>
-inline std::ostream& operator << (std::ostream& os, const detail::big_number_exp<Exp>& r)
+
+template <class Stream, class Backend>
+inline typename enable_if<is_convertible<Stream*, std::ostream*>, std::ostream&>::type operator << (Stream& os, big_number<Backend>& r)
 {
-   typedef typename detail::expression_type<Exp>::type value_type;
+   return os << r.str(static_cast<unsigned>(os.precision(), os.flags() & os.scientific));
+}
+
+namespace detail{
+
+template <class Stream, class Exp>
+inline typename enable_if<is_convertible<Stream*, std::ostream*>, std::ostream&>::type operator << (Stream& os, const big_number_exp<Exp>& r)
+{
+   typedef typename expression_type<detail::big_number_exp<Exp> >::type value_type;
    value_type temp(r);
    return os << temp;
 }
 
-template <class Backend>
-inline std::istream& operator >> (std::istream& is, big_number<Backend>& r)
+template <class Stream, class Exp>
+inline typename enable_if<is_convertible<Stream*, std::ostream*>, std::ostream&>::type operator << (Stream& os, big_number_exp<Exp>& r)
+{
+   typedef typename expression_type<detail::big_number_exp<Exp> >::type value_type;
+   value_type temp(r);
+   return os << temp;
+}
+
+}
+
+template <class Stream, class Backend>
+inline typename enable_if<is_convertible<Stream*, std::ostream*>, std::istream&>::type operator >> (Stream& is, big_number<Backend>& r)
 {
    std::string s;
    is >> s;
