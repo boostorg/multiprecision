@@ -204,6 +204,16 @@ public:
       }
       return *this;
    }
+   template <class V>
+   typename enable_if<boost::is_arithmetic<V>, big_number<Backend>& >::type 
+      operator%=(const V& v)
+   {
+      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The modulus operation is only valid for integer types");
+      using big_num_default_ops::modulus;
+      modulus(m_backend, canonical_value(v));
+      return *this;
+   }
+
    //
    // These operators are *not* proto-ized.
    // The issue is that the increment/decrement must happen
@@ -264,16 +274,6 @@ public:
       return *this;
    }
 
-   template <class V>
-   typename enable_if<boost::is_arithmetic<V>, big_number<Backend>& >::type 
-      operator%=(const V& v)
-   {
-      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The modulus operation is only valid for integer types");
-      using big_num_default_ops::modulus;
-      modulus(m_backend, canonical_value(v));
-      return *this;
-   }
-
    template <class Exp>
    big_number& operator/=(const detail::big_number_exp<Exp>& e)
    {
@@ -296,6 +296,82 @@ public:
    {
       using big_num_default_ops::divide;
       divide(m_backend, canonical_value(v));
+      return *this;
+   }
+
+   template <class Exp>
+   big_number& operator&=(const detail::big_number_exp<Exp>& e)
+   {
+      // Create a temporary if the RHS references *this, but not
+      // if we're just doing an   x &= x;
+      if(contains_self(e) && !is_self(e))
+      {
+         self_type temp(e);
+         do_bitwise_and(temp, typename proto::tag_of<self_type>::type());
+      }
+      else
+      {
+         do_bitwise_and(e, typename proto::tag_of<Exp>::type());
+      }
+      return *this;
+   }
+
+   template <class V>
+   typename enable_if<boost::is_arithmetic<V>, big_number<Backend>& >::type 
+      operator&=(const V& v)
+   {
+      using big_num_default_ops::bitwise_and;
+      bitwise_and(m_backend, canonical_value(v));
+      return *this;
+   }
+
+   template <class Exp>
+   big_number& operator|=(const detail::big_number_exp<Exp>& e)
+   {
+      // Create a temporary if the RHS references *this, but not
+      // if we're just doing an   x |= x;
+      if(contains_self(e) && !is_self(e))
+      {
+         self_type temp(e);
+         do_bitwise_or(temp, typename proto::tag_of<self_type>::type());
+      }
+      else
+      {
+         do_bitwise_or(e, typename proto::tag_of<Exp>::type());
+      }
+      return *this;
+   }
+
+   template <class V>
+   typename enable_if<boost::is_arithmetic<V>, big_number<Backend>& >::type 
+      operator|=(const V& v)
+   {
+      using big_num_default_ops::bitwise_or;
+      bitwise_or(m_backend, canonical_value(v));
+      return *this;
+   }
+
+   template <class Exp>
+   big_number& operator^=(const detail::big_number_exp<Exp>& e)
+   {
+      if(contains_self(e))
+      {
+         self_type temp(e);
+         do_bitwise_xor(temp, typename proto::tag_of<self_type>::type());
+      }
+      else
+      {
+         do_bitwise_xor(e, typename proto::tag_of<Exp>::type());
+      }
+      return *this;
+   }
+
+   template <class V>
+   typename enable_if<boost::is_arithmetic<V>, big_number<Backend>& >::type 
+      operator^=(const V& v)
+   {
+      using big_num_default_ops::bitwise_xor;
+      bitwise_xor(m_backend, canonical_value(v));
       return *this;
    }
 
@@ -471,16 +547,6 @@ private:
       typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
       divide(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
       m_backend.negate();
-   }
-
-   template <class Exp>
-   void do_assign(const Exp& e, const detail::modulus_immediates&)
-   {
-      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The modulus operation is only valid for integer types");
-      using big_num_default_ops::modulus;
-      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
-      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
-      modulus(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
    }
 
    template <class Exp>
@@ -676,6 +742,142 @@ private:
       }
    }
    template <class Exp>
+   void do_assign(const Exp& e, const detail::modulus_immediates&)
+   {
+      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The modulus operation is only valid for integer types");
+      using big_num_default_ops::modulus;
+      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
+      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
+      modulus(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
+   }
+
+   template <class Exp>
+   void do_assign(const Exp& e, const proto::tag::bitwise_and&)
+   {
+      //
+      // This operation is only valid for integer backends:
+      //
+      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "Bitwise operations are only valid for integer types");
+
+      typedef typename proto::result_of::left<Exp>::type left_type;
+      typedef typename proto::result_of::right<Exp>::type right_type;
+
+      static int const left_depth = boost::result_of<detail::CalcDepth(left_type)>::type::value;
+      static int const right_depth = boost::result_of<detail::CalcDepth(right_type)>::type::value;
+
+      bool bl = contains_self(proto::left(e));
+      bool br = contains_self(proto::right(e));
+
+      if(bl && is_self(proto::left(e)))
+      {
+         // Ignore the left node, it's *this, just add the right:
+         do_bitwise_and(proto::right(e), typename proto::tag_of<right_type>::type());
+      }
+      else if(br && is_self(proto::right(e)))
+      {
+         do_bitwise_and(proto::left(e), typename proto::tag_of<left_type>::type());
+      }
+      else
+      {
+         do_assign(proto::left(e), typename detail::assign_and_eval<left_type>::type());
+         do_bitwise_and(proto::right(e), typename proto::tag_of<right_type>::type());
+      }
+   }
+   template <class Exp>
+   void do_assign(const Exp& e, const detail::bitwise_and_immediates&)
+   {
+      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "Bitwise operations are only valid for integer types");
+      using big_num_default_ops::bitwise_and;
+      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
+      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
+      bitwise_and(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
+   }
+
+   template <class Exp>
+   void do_assign(const Exp& e, const proto::tag::bitwise_or&)
+   {
+      //
+      // This operation is only valid for integer backends:
+      //
+      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "Bitwise operations are only valid for integer types");
+
+      typedef typename proto::result_of::left<Exp>::type left_type;
+      typedef typename proto::result_of::right<Exp>::type right_type;
+
+      static int const left_depth = boost::result_of<detail::CalcDepth(left_type)>::type::value;
+      static int const right_depth = boost::result_of<detail::CalcDepth(right_type)>::type::value;
+
+      bool bl = contains_self(proto::left(e));
+      bool br = contains_self(proto::right(e));
+
+      if(bl && is_self(proto::left(e)))
+      {
+         // Ignore the left node, it's *this, just add the right:
+         do_bitwise_or(proto::right(e), typename proto::tag_of<right_type>::type());
+      }
+      else if(br && is_self(proto::right(e)))
+      {
+         do_bitwise_or(proto::left(e), typename proto::tag_of<left_type>::type());
+      }
+      else
+      {
+         do_assign(proto::left(e), typename detail::assign_and_eval<left_type>::type());
+         do_bitwise_or(proto::right(e), typename proto::tag_of<right_type>::type());
+      }
+   }
+   template <class Exp>
+   void do_assign(const Exp& e, const detail::bitwise_or_immediates&)
+   {
+      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "Bitwise operations are only valid for integer types");
+      using big_num_default_ops::bitwise_or;
+      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
+      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
+      bitwise_or(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
+   }
+
+   template <class Exp>
+   void do_assign(const Exp& e, const proto::tag::bitwise_xor&)
+   {
+      //
+      // This operation is only valid for integer backends:
+      //
+      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "Bitwise operations are only valid for integer types");
+
+      typedef typename proto::result_of::left<Exp>::type left_type;
+      typedef typename proto::result_of::right<Exp>::type right_type;
+
+      static int const left_depth = boost::result_of<detail::CalcDepth(left_type)>::type::value;
+      static int const right_depth = boost::result_of<detail::CalcDepth(right_type)>::type::value;
+
+      bool bl = contains_self(proto::left(e));
+      bool br = contains_self(proto::right(e));
+
+      if(bl && is_self(proto::left(e)))
+      {
+         // Ignore the left node, it's *this, just add the right:
+         do_bitwise_xor(proto::right(e), typename proto::tag_of<right_type>::type());
+      }
+      else if(br && is_self(proto::right(e)))
+      {
+         do_bitwise_xor(proto::left(e), typename proto::tag_of<left_type>::type());
+      }
+      else
+      {
+         do_assign(proto::left(e), typename detail::assign_and_eval<left_type>::type());
+         do_bitwise_xor(proto::right(e), typename proto::tag_of<right_type>::type());
+      }
+   }
+   template <class Exp>
+   void do_assign(const Exp& e, const detail::bitwise_xor_immediates&)
+   {
+      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "Bitwise operations are only valid for integer types");
+      using big_num_default_ops::bitwise_xor;
+      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
+      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
+      bitwise_xor(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
+   }
+
+   template <class Exp>
    void do_assign(const Exp& e, const proto::tag::terminal&)
    {
       if(!is_self(e))
@@ -715,6 +917,21 @@ private:
       BOOST_STATIC_ASSERT_MSG(is_integral<right_value_type>::value, "The left shift operator requires an integer value for the shift operand.");
       typedef typename proto::tag_of<left_type>::type tag_type;
       do_assign_right_shift(proto::left(e), canonical_value(proto::value(proto::right(e))), tag_type());
+   }
+
+   template <class Exp>
+   void do_assign(const Exp& e, const proto::tag::complement&)
+   {
+      using big_num_default_ops::complement;
+      self_type temp(proto::left(e));
+      complement(m_backend, temp.backend());
+   }
+
+   template <class Exp>
+   void do_assign(const Exp& e, const detail::complement_immediates&)
+   {
+      using big_num_default_ops::complement;
+      complement(m_backend, canonical_value(proto::left(e)));
    }
 
    template <class Exp, class Val>
@@ -990,6 +1207,72 @@ private:
       modulus(m_backend, canonical_value(proto::value(temp)));
    }
 
+   template <class Exp>
+   void do_bitwise_and(const Exp& e, const proto::tag::terminal&)
+   {
+      using big_num_default_ops::bitwise_and;
+      bitwise_and(m_backend, canonical_value(proto::value(e)));
+   }
+   template <class Exp>
+   void do_bitwise_and(const Exp& e, const proto::tag::bitwise_and&)
+   {
+      typedef typename proto::result_of::left<Exp>::type left_type;
+      typedef typename proto::result_of::right<Exp>::type right_type;
+      do_bitwise_and(proto::left(e), typename proto::tag_of<left_type>::type());
+      do_bitwise_and(proto::right(e), typename proto::tag_of<right_type>::type());
+   }
+   template <class Exp, class unknown>
+   void do_bitwise_and(const Exp& e, const unknown&)
+   {
+      using big_num_default_ops::bitwise_and;
+      self_type temp(e);
+      bitwise_and(m_backend, temp.m_backend);
+   }
+
+   template <class Exp>
+   void do_bitwise_or(const Exp& e, const proto::tag::terminal&)
+   {
+      using big_num_default_ops::bitwise_or;
+      bitwise_or(m_backend, canonical_value(proto::value(e)));
+   }
+   template <class Exp>
+   void do_bitwise_or(const Exp& e, const proto::tag::bitwise_or&)
+   {
+      typedef typename proto::result_of::left<Exp>::type left_type;
+      typedef typename proto::result_of::right<Exp>::type right_type;
+      do_bitwise_or(proto::left(e), typename proto::tag_of<left_type>::type());
+      do_bitwise_or(proto::right(e), typename proto::tag_of<right_type>::type());
+   }
+   template <class Exp, class unknown>
+   void do_bitwise_or(const Exp& e, const unknown&)
+   {
+      using big_num_default_ops::bitwise_or;
+      self_type temp(e);
+      bitwise_or(m_backend, temp.m_backend);
+   }
+
+   template <class Exp>
+   void do_bitwise_xor(const Exp& e, const proto::tag::terminal&)
+   {
+      using big_num_default_ops::bitwise_xor;
+      bitwise_xor(m_backend, canonical_value(proto::value(e)));
+   }
+   template <class Exp>
+   void do_bitwise_xor(const Exp& e, const proto::tag::bitwise_xor&)
+   {
+      typedef typename proto::result_of::left<Exp>::type left_type;
+      typedef typename proto::result_of::right<Exp>::type right_type;
+      do_bitwise_xor(proto::left(e), typename proto::tag_of<left_type>::type());
+      do_bitwise_xor(proto::right(e), typename proto::tag_of<right_type>::type());
+   }
+   template <class Exp, class unknown>
+   void do_bitwise_xor(const Exp& e, const unknown&)
+   {
+      using big_num_default_ops::bitwise_xor;
+      self_type temp(e);
+      bitwise_xor(m_backend, temp.m_backend);
+   }
+
    // Tests if the expression contains a reference to *this:
    template <class Exp>
    bool contains_self(const Exp& e)const
@@ -1198,44 +1481,24 @@ inline typename boost::enable_if<detail::is_valid_comparison<Exp1, Exp2>, bool>:
 {
    return 0 < detail::big_number_compare(a, b);
 }
-//
-// Because proto overloads these << operators, we need version that accept both
-// const and non-const RHS values, otherwise the proto version will be found
-// with unpleasant results... not only that, but the stream parameter has to be a template
-// otherwise the LHS of the expression would have to be *exactly* of type std::ostream
-// for the overload to be found (ie doesn't work for std::fstream etc unless we do this...)
-//
-template <class Stream, class Backend>
-inline typename enable_if<is_convertible<Stream*, std::ostream*>, std::ostream&>::type operator << (Stream& os, const big_number<Backend>& r)
-{
-   return os << r.str(static_cast<unsigned>(os.precision(), os.flags() & os.scientific));
-}
 
-template <class Stream, class Backend>
-inline typename enable_if<is_convertible<Stream*, std::ostream*>, std::ostream&>::type operator << (Stream& os, big_number<Backend>& r)
+template <class Backend>
+inline std::ostream& operator << (std::ostream& os, const big_number<Backend>& r)
 {
    return os << r.str(static_cast<unsigned>(os.precision(), os.flags() & os.scientific));
 }
 
 namespace detail{
 
-template <class Stream, class Exp>
-inline typename enable_if<is_convertible<Stream*, std::ostream*>, std::ostream&>::type operator << (Stream& os, const big_number_exp<Exp>& r)
+template <class Exp>
+inline std::ostream& operator << (std::ostream& os, const big_number_exp<Exp>& r)
 {
    typedef typename expression_type<detail::big_number_exp<Exp> >::type value_type;
    value_type temp(r);
    return os << temp;
 }
 
-template <class Stream, class Exp>
-inline typename enable_if<is_convertible<Stream*, std::ostream*>, std::ostream&>::type operator << (Stream& os, big_number_exp<Exp>& r)
-{
-   typedef typename expression_type<detail::big_number_exp<Exp> >::type value_type;
-   value_type temp(r);
-   return os << temp;
-}
-
-}
+} // namespace detail
 
 template <class Stream, class Backend>
 inline typename enable_if<is_convertible<Stream*, std::ostream*>, std::istream&>::type operator >> (Stream& is, big_number<Backend>& r)

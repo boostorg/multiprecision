@@ -910,6 +910,21 @@ inline void right_shift(gmp_int& t, const gmp_int& v, UI i)
    mpz_fdiv_q_2exp(t.data(), v.data(), static_cast<mp_bitcnt_t>(i));
 }
 
+inline void bitwise_and(gmp_int& result, const gmp_int& v)
+{
+   mpz_and(result.data(), result.data(), v.data());
+}
+
+inline void bitwise_or(gmp_int& result, const gmp_int& v)
+{
+   mpz_ior(result.data(), result.data(), v.data());
+}
+
+inline void bitwise_xor(gmp_int& result, const gmp_int& v)
+{
+   mpz_xor(result.data(), result.data(), v.data());
+}
+
 inline void add(gmp_int& t, const gmp_int& p, const gmp_int& o)
 {
    mpz_add(t.data(), p.data(), o.data());
@@ -1013,6 +1028,26 @@ inline void divide(gmp_int& t, const gmp_int& p, long i)
       mpz_neg(t.data(), t.data());
 }
    
+inline void bitwise_and(gmp_int& result, const gmp_int& u, const gmp_int& v)
+{
+   mpz_and(result.data(), u.data(), v.data());
+}
+
+inline void bitwise_or(gmp_int& result, const gmp_int& u, const gmp_int& v)
+{
+   mpz_ior(result.data(), u.data(), v.data());
+}
+
+inline void bitwise_xor(gmp_int& result, const gmp_int& u, const gmp_int& v)
+{
+   mpz_xor(result.data(), u.data(), v.data());
+}
+
+inline void complement(gmp_int& result, const gmp_int& u)
+{
+   mpz_com(result.data(), u.data());
+}
+
 inline bool is_zero(const gmp_int& val)
 {
    return mpz_sgn(val.data()) == 0;

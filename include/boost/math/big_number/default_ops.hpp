@@ -54,6 +54,39 @@ inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const cha
    t = v;
    modulus(result, t);
 }
+template <class T, class V>
+inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const char*>, is_same<V, std::string> > >::type
+   bitwise_and(T& result, V const& v)
+{
+   T t;
+   t = v;
+   bitwise_and(result, t);
+}
+template <class T, class V>
+inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const char*>, is_same<V, std::string> > >::type
+   bitwise_or(T& result, V const& v)
+{
+   T t;
+   t = v;
+   bitwise_or(result, t);
+}
+template <class T, class V>
+inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const char*>, is_same<V, std::string> > >::type
+   bitwise_xor(T& result, V const& v)
+{
+   T t;
+   t = v;
+   bitwise_xor(result, t);
+}
+
+template <class T, class V>
+inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const char*>, is_same<V, std::string> > >::type
+   complement(T& result, V const& v)
+{
+   T t;
+   t = v;
+   complement(result, t);
+}
 
 template <class T>
 inline bool is_same_object(const T& u, const T&v)
@@ -143,6 +176,47 @@ inline void modulus(T& t, const U& u, const V& v)
    {
       t = u;
       modulus(t, v);
+   }
+}
+template <class T, class U, class V>
+inline void bitwise_and(T& t, const U& u, const V& v)
+{
+   if(is_same_object(t, u))
+      bitwise_and(t, v);
+   else if(is_same_object(t, v))
+      bitwise_and(t, u);
+   else
+   {
+      t = u;
+      bitwise_and(t, v);
+   }
+}
+
+template <class T, class U, class V>
+inline void bitwise_or(T& t, const U& u, const V& v)
+{
+   if(is_same_object(t, u))
+      bitwise_or(t, v);
+   else if(is_same_object(t, v))
+      bitwise_or(t, u);
+   else
+   {
+      t = u;
+      bitwise_or(t, v);
+   }
+}
+
+template <class T, class U, class V>
+inline void bitwise_xor(T& t, const U& u, const V& v)
+{
+   if(is_same_object(t, u))
+      bitwise_xor(t, v);
+   else if(is_same_object(t, v))
+      bitwise_xor(t, u);
+   else
+   {
+      t = u;
+      bitwise_xor(t, v);
    }
 }
 

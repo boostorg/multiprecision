@@ -59,6 +59,7 @@ void test_integer_ops(const boost::mpl::true_&)
 {
    Real a(20);
    Real b(7);
+   Real c;
    BOOST_TEST(a % b == 20 % 7);
    BOOST_TEST(a % 7 == 20 % 7);
    BOOST_TEST(a % 7u == 20 % 7);
@@ -154,6 +155,86 @@ void test_integer_ops(const boost::mpl::true_&)
    BOOST_TEST(b == (22 << 10));
    b = (a + 3) >> 3;
    BOOST_TEST(b == (23 >> 3));
+   //
+   // Bit fiddling:
+   //
+   int i = 1020304;
+   int j = 56789123;
+   int k = 4523187;
+   a = i;
+   b = j;
+   c = a;
+   c &= b;
+   BOOST_TEST(c == (i & j));
+   c = a;
+   c &= j;
+   BOOST_TEST(c == (i & j));
+   c = a;
+   c &= a + b;
+   BOOST_TEST(c == (i & (i + j)));
+   BOOST_TEST((a & b) == (i & j));
+   c = k;
+   a = a & (b + k);
+   BOOST_TEST(a == (i & (j + k)));
+   a = i;
+   a = (b + k) & a;
+   BOOST_TEST(a == (i & (j + k)));
+   a = i;
+   c = a & b & k;
+   BOOST_TEST(c == (i&j&k));
+
+   a = i;
+   b = j;
+   c = a;
+   c |= b;
+   BOOST_TEST(c == (i | j));
+   c = a;
+   c |= j;
+   BOOST_TEST(c == (i | j));
+   c = a;
+   c |= a + b;
+   BOOST_TEST(c == (i | (i + j)));
+   BOOST_TEST((a | b) == (i | j));
+   c = k;
+   a = a | (b + k);
+   BOOST_TEST(a == (i | (j + k)));
+   a = i;
+   a = (b + k) | a;
+   BOOST_TEST(a == (i | (j + k)));
+   a = i;
+   c = a | b | k;
+   BOOST_TEST(c == (i|j|k));
+
+   a = i;
+   b = j;
+   c = a;
+   c ^= b;
+   BOOST_TEST(c == (i ^ j));
+   c = a;
+   c ^= j;
+   BOOST_TEST(c == (i ^ j));
+   c = a;
+   c ^= a + b;
+   BOOST_TEST(c == (i ^ (i + j)));
+   BOOST_TEST((a ^ b) == (i ^ j));
+   c = k;
+   a = a ^ (b + k);
+   BOOST_TEST(a == (i ^ (j + k)));
+   a = i;
+   a = (b + k) ^ a;
+   BOOST_TEST(a == (i ^ (j + k)));
+   a = i;
+   c = a ^ b ^ k;
+   BOOST_TEST(c == (i^j^k));
+   a = i;
+   b = j;
+   c = k;
+   BOOST_TEST(~a == ~i);
+   c = a & ~b;
+   BOOST_TEST(c == (i & ~j));
+   c = ~(a | b);
+   BOOST_TEST(c == ~(i | j));
+
    //
    // Non-member functions:
    //
@@ -389,6 +470,7 @@ void test_mixed()
 template <class Real>
 void test()
 {
+#ifndef NO_MIXED_OPS
    test_mixed<Real, unsigned char>();
    test_mixed<Real, signed char>();
    test_mixed<Real, char>();
@@ -405,6 +487,7 @@ void test()
    test_mixed<Real, float>();
    test_mixed<Real, double>();
    test_mixed<Real, long double>();
+#endif
    //
    // Integer only functions:
    //

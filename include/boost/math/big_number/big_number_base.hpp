@@ -19,20 +19,110 @@ struct big_number_exp;
 //
 // Declare our grammars:
 //
-struct big_number_grammar
-  : proto::or_<
-        proto::terminal< proto::_ >
-      , proto::plus< big_number_grammar, big_number_grammar >
-      , proto::multiplies< big_number_grammar, big_number_grammar >
-      , proto::minus< big_number_grammar, big_number_grammar >
-      , proto::divides< big_number_grammar, big_number_grammar >
-      , proto::unary_plus< big_number_grammar >
-      , proto::negate< big_number_grammar >
-      , proto::modulus<big_number_grammar, big_number_grammar>
-      , proto::shift_left<big_number_grammar, big_number_grammar>
-      , proto::shift_right<big_number_grammar, big_number_grammar>
-    >
+struct integer_terminal : public
+proto::and_<
+    proto::terminal< proto::_ >,
+    proto::if_ < boost::is_integral< proto::_value >() >
+  >
 {};
+
+struct big_number_grammar;
+
+template<typename T>
+struct is_big_number_ptr : mpl::false_ {};
+
+template<typename Backend>
+struct is_big_number_ptr<big_number<Backend>*> : mpl::true_ {};
+
+
+struct big_number_grammar_cases
+{
+   // The primary template matches nothing:
+   template<typename Tag>
+   struct case_
+      : proto::not_<proto::_>
+   {};
+};
+
+template<>
+struct big_number_grammar_cases::case_<proto::tag::terminal>
+  : proto::and_<
+      proto::terminal<proto::_ >,
+      proto::or_<
+         proto::if_ < is_big_number_ptr< proto::_value >() >,
+         proto::if_ < is_arithmetic< proto::_value >() >,
+         proto::if_ < is_same< proto::_value, std::string>() >,
+         proto::if_ < is_convertible< proto::_value, const char*>() >
+      >
+  >
+{};
+
+template<>
+struct big_number_grammar_cases::case_<proto::tag::plus>
+  : proto::plus< big_number_grammar, big_number_grammar >
+{};
+
+template<>
+struct big_number_grammar_cases::case_<proto::tag::multiplies>
+  : proto::multiplies< big_number_grammar, big_number_grammar >
+{};
+
+template<>
+struct big_number_grammar_cases::case_<proto::tag::minus>
+  : proto::minus< big_number_grammar, big_number_grammar >
+{};
+
+template<>
+struct big_number_grammar_cases::case_<proto::tag::divides>
+  : proto::divides< big_number_grammar, big_number_grammar >
+{};
+
+template<>
+struct big_number_grammar_cases::case_<proto::tag::unary_plus>
+  : proto::unary_plus< big_number_grammar>
+{};
+
+template<>
+struct big_number_grammar_cases::case_<proto::tag::negate>
+  : proto::negate< big_number_grammar>
+{};
+
+template<>
+struct big_number_grammar_cases::case_<proto::tag::modulus>
+  : proto::modulus< big_number_grammar, big_number_grammar >
+{};
+
+template<>
+struct big_number_grammar_cases::case_<proto::tag::bitwise_and>
+  : proto::bitwise_and< big_number_grammar, big_number_grammar >
+{};
+
+template<>
+struct big_number_grammar_cases::case_<proto::tag::bitwise_or>
+  : proto::bitwise_or< big_number_grammar, big_number_grammar >
+{};
+
+template<>
+struct big_number_grammar_cases::case_<proto::tag::bitwise_xor>
+  : proto::bitwise_xor< big_number_grammar, big_number_grammar >
+{};
+
+template<>
+struct big_number_grammar_cases::case_<proto::tag::shift_left>
+  : proto::shift_left< big_number_grammar, integer_terminal >
+{};
+
+template<>
+struct big_number_grammar_cases::case_<proto::tag::shift_right>
+  : proto::shift_right< big_number_grammar, integer_terminal >
+{};
+
+template<>
+struct big_number_grammar_cases::case_<proto::tag::complement>
+  : proto::complement<big_number_grammar>
+{};
+
+struct big_number_grammar : proto::switch_<big_number_grammar_cases>{};
 
 // Define a calculator domain. Expression within
 // the calculator domain will be wrapped in the
@@ -146,6 +236,10 @@ struct multiply_and_negate_immediates{};
 struct divide_immediates{};
 struct divide_and_negate_immediates{};
 struct modulus_immediates{};
+struct bitwise_and_immediates{};
+struct bitwise_or_immediates{};
+struct bitwise_xor_immediates{};
+struct complement_immediates{};
 
 struct immediate{};
 struct negative_immediate{};
@@ -309,6 +403,67 @@ struct assign_and_eval_imp<Exp, proto::tag::modulus>
       mpl::and_<is_same<left_imm, immediate>, is_same<right_imm, immediate> >,
       modulus_immediates,
       proto::tag::modulus
+   >::type type;
+};
+
+template <class Exp>
+struct assign_and_eval_imp<Exp, proto::tag::bitwise_and>
+{
+   typedef typename proto::result_of::left<Exp>::type left_type;
+   typedef typename proto::result_of::right<Exp>::type right_type;
+   typedef typename proto::tag_of<left_type>::type left_tag;
+   typedef typename proto::tag_of<right_type>::type right_tag;
+   typedef typename immediate_type<left_type, left_tag>::type left_imm;
+   typedef typename immediate_type<right_type, right_tag>::type right_imm;
+   typedef typename mpl::if_<
+      mpl::and_<is_same<left_imm, immediate>, is_same<right_imm, immediate> >,
+      bitwise_and_immediates,
+      proto::tag::bitwise_and
+   >::type type;
+};
+
+template <class Exp>
+struct assign_and_eval_imp<Exp, proto::tag::bitwise_or>
+{
+   typedef typename proto::result_of::left<Exp>::type left_type;
+   typedef typename proto::result_of::right<Exp>::type right_type;
+   typedef typename proto::tag_of<left_type>::type left_tag;
+   typedef typename proto::tag_of<right_type>::type right_tag;
+   typedef typename immediate_type<left_type, left_tag>::type left_imm;
+   typedef typename immediate_type<right_type, right_tag>::type right_imm;
+   typedef typename mpl::if_<
+      mpl::and_<is_same<left_imm, immediate>, is_same<right_imm, immediate> >,
+      bitwise_or_immediates,
+      proto::tag::bitwise_or
+   >::type type;
+};
+
+template <class Exp>
+struct assign_and_eval_imp<Exp, proto::tag::bitwise_xor>
+{
+   typedef typename proto::result_of::left<Exp>::type left_type;
+   typedef typename proto::result_of::right<Exp>::type right_type;
+   typedef typename proto::tag_of<left_type>::type left_tag;
+   typedef typename proto::tag_of<right_type>::type right_tag;
+   typedef typename immediate_type<left_type, left_tag>::type left_imm;
+   typedef typename immediate_type<right_type, right_tag>::type right_imm;
+   typedef typename mpl::if_<
+      mpl::and_<is_same<left_imm, immediate>, is_same<right_imm, immediate> >,
+      bitwise_xor_immediates,
+      proto::tag::bitwise_xor
+   >::type type;
+};
+
+template <class Exp>
+struct assign_and_eval_imp<Exp, proto::tag::complement>
+{
+   typedef typename proto::result_of::left<Exp>::type left_type;
+   typedef typename proto::tag_of<left_type>::type left_tag;
+   typedef typename immediate_type<left_type, left_tag>::type left_imm;
+   typedef typename mpl::if_<
+      is_same<left_imm, immediate>,
+      complement_immediates,
+      proto::tag::complement
    >::type type;
 };
 
