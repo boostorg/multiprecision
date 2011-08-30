@@ -7,6 +7,7 @@
 #define BOOST_MATH_BIG_NUM_DEF_OPS
 
 #include <boost/math/big_number/big_number_base.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 namespace boost{ namespace math{ namespace big_num_default_ops{
 
@@ -343,6 +344,11 @@ void eval_fabs(T* result, const T& arg)
       result->negate();
 }
 
+template <class Backend>
+inline int eval_fpclassify(const Backend& arg)
+{
+   return is_zero(arg) ? FP_ZERO : FP_NORMAL;
+}
 //
 // These have to implemented by the backend, declared here so that our macro generated code compiles OK.
 //
@@ -374,6 +380,67 @@ namespace detail{
 template<typename Expr>
 struct big_number_exp;
 
+}
+
+//
+// Default versions of floating point classification routines:
+//
+template <class Backend>
+inline int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(const big_number<Backend>& arg)
+{
+   using big_num_default_ops::eval_fpclassify;
+   return eval_fpclassify(arg.backend());
+}
+template <class Exp>
+inline int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(const detail::big_number_exp<Exp>& arg)
+{
+   typedef typename expression_type<Exp>::type value_type;
+   return fpclassify(value_type(arg));
+}
+template <class Backend>
+inline bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(const big_number<Backend>& arg)
+{
+   int v = fpclassify(arg);
+   return (v != FP_INFINITE) && (v != FP_NAN);
+}
+template <class Exp>
+inline bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(const detail::big_number_exp<Exp>& arg)
+{
+   typedef typename expression_type<Exp>::type value_type;
+   return isfinite(value_type(arg));
+}
+template <class Backend>
+inline bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION(const big_number<Backend>& arg)
+{
+   return fpclassify(arg) == FP_NAN;
+}
+template <class Exp>
+inline bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION(const detail::big_number_exp<Exp>& arg)
+{
+   typedef typename expression_type<Exp>::type value_type;
+   return isnan(value_type(arg));
+}
+template <class Backend>
+inline bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION(const big_number<Backend>& arg)
+{
+   return fpclassify(arg) == FP_INFINITE;
+}
+template <class Exp>
+inline bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION(const detail::big_number_exp<Exp>& arg)
+{
+   typedef typename expression_type<Exp>::type value_type;
+   return isinf(value_type(arg));
+}
+template <class Backend>
+inline bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(const big_number<Backend>& arg)
+{
+   return fpclassify(arg) == FP_NORMAL;
+}
+template <class Exp>
+inline bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(const detail::big_number_exp<Exp>& arg)
+{
+   typedef typename expression_type<Exp>::type value_type;
+   return isnormal(value_type(arg));
 }
 
 #define UNARY_OP_FUNCTOR(func)\

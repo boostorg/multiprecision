@@ -69,7 +69,10 @@ inline void convert_to(long double* result, const arithmetic_backend<efx::e_floa
 {
    *result = val.data().extract_long_double();
 }
-
+inline int eval_fpclassify(const arithmetic_backend<efx::e_float>& val)
+{
+   return val.data().isinf() ? FP_INFINITE : val.data().isnan() ? FP_NAN : val.data().iszero() ? FP_ZERO : FP_NORMAL;
+}
 
 
 }} // namespaces

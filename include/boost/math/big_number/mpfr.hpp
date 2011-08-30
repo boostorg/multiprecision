@@ -642,6 +642,12 @@ inline void eval_frexp(mpfr_real_backend<Digits10>& result, const mpfr_real_back
    return ldexp(result, val, -*e);
 }
 
+template <unsigned Digits10>
+inline int eval_fpclassify(const mpfr_real_backend<Digits10>& val)
+{
+   return mpfr_inf_p(val.data()) ? FP_INFINITE : mpfr_nan_p(val.data()) ? FP_NAN : mpfr_zero_p(val.data()) ? FP_ZERO : FP_NORMAL;
+}
+
 typedef big_number<mpfr_real_backend<50> >    mpfr_real_50;
 typedef big_number<mpfr_real_backend<100> >   mpfr_real_100;
 typedef big_number<mpfr_real_backend<500> >   mpfr_real_500;

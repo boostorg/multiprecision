@@ -183,6 +183,11 @@ inline void eval_fabs(big_number_backend_real_architype& result, const big_numbe
    result = std::fabs(arg.m_value);
 }
 
+inline int eval_fpclassify(const big_number_backend_real_architype& arg)
+{
+   return boost::math::fpclassify(arg.m_value);
+}
+
 typedef boost::math::big_number<big_number_backend_real_architype> big_number_real_architype;
 
 }}} // namespaces
