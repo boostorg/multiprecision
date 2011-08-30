@@ -979,13 +979,13 @@ private:
    template <class F, class Exp>
    void do_assign_function_1(const F& f, const Exp& val, const proto::tag::terminal&)
    {
-      f(&m_backend, canonical_value(proto::value(val)));
+      f(m_backend, canonical_value(proto::value(val)));
    }
    template <class F, class Exp, class Tag>
    void do_assign_function_1(const F& f, const Exp& val, const Tag&)
    {
       big_number t(val);
-      f(&m_backend, t.backend());
+      f(m_backend, t.backend());
    }
    template <class Exp>
    void do_assign_function(const Exp& e, const mpl::long_<3>&)
@@ -999,7 +999,7 @@ private:
    template <class F, class Exp1, class Exp2>
    void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const proto::tag::terminal&, const proto::tag::terminal&)
    {
-      f(&m_backend, canonical_value(proto::value(val1)), canonical_value(proto::value(val2)));
+      f(m_backend, canonical_value(proto::value(val1)), canonical_value(proto::value(val2)));
    }
 
    template <class Exp>

@@ -8,9 +8,11 @@
 
 #include <iostream>
 #include <iomanip>
+#include <cmath>
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/math/big_number.hpp>
+#include <boost/math/special_functions/trunc.hpp>
 
 namespace boost{
 namespace math{
@@ -139,6 +141,46 @@ inline void divide(big_number_backend_real_architype& result, const big_number_b
 {
    std::cout << "Division (" << result.m_value << " /= " << o.m_value << ")" << std::endl;
    result.m_value /= o.m_value;
+}
+
+inline void eval_frexp(big_number_backend_real_architype& result, const big_number_backend_real_architype& arg, int* exp)
+{
+   result = std::frexp(arg.m_value, exp);
+}
+
+inline void eval_ldexp(big_number_backend_real_architype& result, const big_number_backend_real_architype& arg, int exp)
+{
+   result = std::ldexp(arg.m_value, exp);
+}
+
+inline void eval_floor(big_number_backend_real_architype& result, const big_number_backend_real_architype& arg)
+{
+   result = std::floor(arg.m_value);
+}
+
+inline void eval_ceil(big_number_backend_real_architype& result, const big_number_backend_real_architype& arg)
+{
+   result = std::ceil(arg.m_value);
+}
+
+inline void eval_trunc(big_number_backend_real_architype& result, const big_number_backend_real_architype& arg)
+{
+   result = boost::math::trunc(arg.m_value);
+}
+
+inline void eval_sqrt(big_number_backend_real_architype& result, const big_number_backend_real_architype& arg)
+{
+   result = std::sqrt(arg.m_value);
+}
+
+inline void eval_abs(big_number_backend_real_architype& result, const big_number_backend_real_architype& arg)
+{
+   result = std::abs(arg.m_value);
+}
+
+inline void eval_fabs(big_number_backend_real_architype& result, const big_number_backend_real_architype& arg)
+{
+   result = std::fabs(arg.m_value);
 }
 
 typedef boost::math::big_number<big_number_backend_real_architype> big_number_real_architype;

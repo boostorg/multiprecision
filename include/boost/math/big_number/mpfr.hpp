@@ -588,55 +588,55 @@ inline void convert_to(long double* result, const mpfr_real_backend<digits10>& v
 // Native non-member operations:
 //
 template <unsigned Digits10>
-inline void sqrt(mpfr_real_backend<Digits10>* result, const mpfr_real_backend<Digits10>& val)
+inline void eval_sqrt(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& val)
 {
-   mpfr_sqrt(result->data(), val.data(), MPFR_RNDN);
+   mpfr_sqrt(result.data(), val.data(), MPFR_RNDN);
 }
 
 template <unsigned Digits10>
-inline void abs(mpfr_real_backend<Digits10>* result, const mpfr_real_backend<Digits10>& val)
+inline void eval_abs(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& val)
 {
-   mpfr_abs(result->data(), val.data(), MPFR_RNDN);
+   mpfr_abs(result.data(), val.data(), MPFR_RNDN);
 }
 
 template <unsigned Digits10>
-inline void fabs(mpfr_real_backend<Digits10>* result, const mpfr_real_backend<Digits10>& val)
+inline void eval_fabs(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& val)
 {
-   mpfr_abs(result->data(), val.data(), MPFR_RNDN);
+   mpfr_abs(result.data(), val.data(), MPFR_RNDN);
 }
 template <unsigned Digits10>
-inline void ceil(mpfr_real_backend<Digits10>* result, const mpfr_real_backend<Digits10>& val)
+inline void eval_ceil(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& val)
 {
-   mpfr_ceil(result->data(), val.data());
+   mpfr_ceil(result.data(), val.data());
 }
 template <unsigned Digits10>
-inline void floor(mpfr_real_backend<Digits10>* result, const mpfr_real_backend<Digits10>& val)
+inline void eval_floor(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& val)
 {
-   mpfr_floor(result->data(), val.data());
+   mpfr_floor(result.data(), val.data());
 }
 template <unsigned Digits10>
-inline void trunc(mpfr_real_backend<Digits10>* result, const mpfr_real_backend<Digits10>& val)
+inline void eval_trunc(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& val)
 {
-   mpfr_trunc(result->data(), val.data());
+   mpfr_trunc(result.data(), val.data());
 }
 template <unsigned Digits10>
-inline void ldexp(mpfr_real_backend<Digits10>* result, const mpfr_real_backend<Digits10>& val, long e)
+inline void eval_ldexp(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& val, long e)
 {
    if(e > 0)
-      mpfr_mul_2exp(result->data(), val.data(), e, MPFR_RNDN);
+      mpfr_mul_2exp(result.data(), val.data(), e, MPFR_RNDN);
    else if(e < 0)
-      mpfr_div_2exp(result->data(), val.data(), -e, MPFR_RNDN);
+      mpfr_div_2exp(result.data(), val.data(), -e, MPFR_RNDN);
 }
 template <unsigned Digits10>
-inline void frexp(mpfr_real_backend<Digits10>* result, const mpfr_real_backend<Digits10>& val, int* e)
+inline void eval_frexp(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& val, int* e)
 {
    long v;
    mpfr_get_d_2exp(&v, val.data(), MPFR_RNDN);
    *e = v;
-   return ldexp(result, val, -v);
+   ldexp(result, val, -v);
 }
 template <unsigned Digits10>
-inline void frexp(mpfr_real_backend<Digits10>* result, const mpfr_real_backend<Digits10>& val, long* e)
+inline void eval_frexp(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& val, long* e)
 {
    mpfr_get_d_2exp(e, val.data(), MPFR_RNDN);
    return ldexp(result, val, -*e);

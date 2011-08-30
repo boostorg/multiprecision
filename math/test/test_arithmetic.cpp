@@ -4,6 +4,7 @@
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_
 
 #include <boost/detail/lightweight_test.hpp>
+#include <boost/math/special_functions/pow.hpp>
 
 #if !defined(TEST_MPF50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_E_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50)
 #  define TEST_MPF50
@@ -254,7 +255,7 @@ void test_real_ops(const boost::mpl::false_&){}
 template <class Real>
 void test_real_ops(const boost::mpl::true_&)
 {
-#if defined(TEST_MPF) || defined(TEST_MPF_50)
+#if defined(TEST_MPF) || defined(TEST_MPF_50) || defined(TEST_BACKEND)
    BOOST_TEST(abs(Real(2)) == 2);
    BOOST_TEST(abs(Real(-2)) == 2);
    BOOST_TEST(fabs(Real(2)) == 2);
@@ -280,6 +281,30 @@ void test_real_ops(const boost::mpl::true_&)
    r = frexp(v, &exp);
    BOOST_TEST(r == 0.5);
    BOOST_TEST(exp == -8);
+   //
+   // pow and exp:
+   //
+   v = 3.25;
+   r = pow(v, 0);
+   BOOST_TEST(r == 1);
+   r = pow(v, 1);
+   BOOST_TEST(r == 3.25);
+   r = pow(v, 2);
+   BOOST_TEST(r == boost::math::pow<2>(3.25));
+   r = pow(v, 3);
+   BOOST_TEST(r == boost::math::pow<3>(3.25));
+   r = pow(v, 4);
+   BOOST_TEST(r == boost::math::pow<4>(3.25));
+   r = pow(v, 5);
+   BOOST_TEST(r == boost::math::pow<5>(3.25));
+   r = pow(v, 6);
+   BOOST_TEST(r == boost::math::pow<6>(3.25));
+   r = pow(v, 25);
+   BOOST_TEST(r == boost::math::pow<25>(Real(3.25)));
+   /*
+   r = pow(v, 56);
+   BOOST_TEST(r == boost::math::pow<56>(Real(3.25)));
+   */
 #endif
 }
 

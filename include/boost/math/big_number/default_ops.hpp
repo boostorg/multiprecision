@@ -325,7 +325,7 @@ inline void convert_to(terminal<R>* result, const B& backend)
 // Functions:
 //
 template <class T>
-void abs(T* result, const T& arg)
+void eval_abs(T* result, const T& arg)
 {
    typedef typename T::signed_types type_list;
    typedef typename mpl::front<type_list>::type front;
@@ -334,7 +334,7 @@ void abs(T* result, const T& arg)
       result->negate();
 }
 template <class T>
-void fabs(T* result, const T& arg)
+void eval_fabs(T* result, const T& arg)
 {
    typedef typename T::signed_types type_list;
    typedef typename mpl::front<type_list>::type front;
@@ -347,17 +347,21 @@ void fabs(T* result, const T& arg)
 // These have to implemented by the backend, declared here so that our macro generated code compiles OK.
 //
 template <class T>
-typename enable_if_c<sizeof(T) == 0>::type floor();
+typename enable_if_c<sizeof(T) == 0>::type eval_floor();
 template <class T>
-typename enable_if_c<sizeof(T) == 0>::type ceil();
+typename enable_if_c<sizeof(T) == 0>::type eval_ceil();
 template <class T>
-typename enable_if_c<sizeof(T) == 0>::type trunc();
+typename enable_if_c<sizeof(T) == 0>::type eval_trunc();
 template <class T>
-typename enable_if_c<sizeof(T) == 0>::type sqrt();
+typename enable_if_c<sizeof(T) == 0>::type eval_sqrt();
 template <class T>
-typename enable_if_c<sizeof(T) == 0>::type ldexp();
+typename enable_if_c<sizeof(T) == 0>::type eval_ldexp();
 template <class T>
-typename enable_if_c<sizeof(T) == 0>::type frexp();
+typename enable_if_c<sizeof(T) == 0>::type eval_frexp();
+//
+// These functions are implemented in separate files, but expanded inline here:
+//
+#include <boost/math/big_number/functions/pow.hpp>
 
 }
 
@@ -377,10 +381,10 @@ namespace detail{\
 template <class Backend>\
 struct BOOST_JOIN(func, _funct)\
 {\
-   void operator()(Backend* result, const Backend& arg)const\
+   void operator()(Backend& result, const Backend& arg)const\
    {\
-      using big_num_default_ops::func;\
-      func(result, arg);\
+      using big_num_default_ops::BOOST_JOIN(eval_,func);\
+      BOOST_JOIN(eval_,func)(result, arg);\
    }\
 };\
 \
@@ -419,10 +423,10 @@ template <class Backend>\
 struct BOOST_JOIN(func, _funct)\
 {\
    template <class A2>\
-   void operator()(Backend* result, const Backend& arg, const A2& a)const\
+   void operator()(Backend& result, const Backend& arg, const A2& a)const\
    {\
-      using big_num_default_ops::func;\
-      func(result, arg, a);\
+      using big_num_default_ops:: BOOST_JOIN(eval_,func);\
+      BOOST_JOIN(eval_,func)(result, arg, a);\
    }\
 };\
 \
@@ -467,6 +471,7 @@ UNARY_OP_FUNCTOR(trunc)
 
 BINARY_OP_FUNCTOR(ldexp)
 BINARY_OP_FUNCTOR(frexp)
+BINARY_OP_FUNCTOR(pow)
 
 #undef BINARY_OP_FUNCTOR
 #undef UNARY_OP_FUNCTOR

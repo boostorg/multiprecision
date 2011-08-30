@@ -573,58 +573,58 @@ inline void convert_to(double* result, const gmp_real<digits10>& val)
 // Native non-member operations:
 //
 template <unsigned Digits10>
-inline void sqrt(gmp_real<Digits10>* result, const gmp_real<Digits10>& val)
+inline void eval_sqrt(gmp_real<Digits10>& result, const gmp_real<Digits10>& val)
 {
-   mpf_sqrt(result->data(), val.data());
+   mpf_sqrt(result.data(), val.data());
 }
 
 template <unsigned Digits10>
-inline void abs(gmp_real<Digits10>* result, const gmp_real<Digits10>& val)
+inline void eval_abs(gmp_real<Digits10>& result, const gmp_real<Digits10>& val)
 {
-   mpf_abs(result->data(), val.data());
+   mpf_abs(result.data(), val.data());
 }
 
 template <unsigned Digits10>
-inline void fabs(gmp_real<Digits10>* result, const gmp_real<Digits10>& val)
+inline void eval_fabs(gmp_real<Digits10>& result, const gmp_real<Digits10>& val)
 {
-   mpf_abs(result->data(), val.data());
+   mpf_abs(result.data(), val.data());
 }
 template <unsigned Digits10>
-inline void ceil(gmp_real<Digits10>* result, const gmp_real<Digits10>& val)
+inline void eval_ceil(gmp_real<Digits10>& result, const gmp_real<Digits10>& val)
 {
-   mpf_ceil(result->data(), val.data());
+   mpf_ceil(result.data(), val.data());
 }
 template <unsigned Digits10>
-inline void floor(gmp_real<Digits10>* result, const gmp_real<Digits10>& val)
+inline void eval_floor(gmp_real<Digits10>& result, const gmp_real<Digits10>& val)
 {
-   mpf_floor(result->data(), val.data());
+   mpf_floor(result.data(), val.data());
 }
 template <unsigned Digits10>
-inline void trunc(gmp_real<Digits10>* result, const gmp_real<Digits10>& val)
+inline void eval_trunc(gmp_real<Digits10>& result, const gmp_real<Digits10>& val)
 {
-   mpf_trunc(result->data(), val.data());
+   mpf_trunc(result.data(), val.data());
 }
 template <unsigned Digits10>
-inline void ldexp(gmp_real<Digits10>* result, const gmp_real<Digits10>& val, long e)
+inline void eval_ldexp(gmp_real<Digits10>& result, const gmp_real<Digits10>& val, long e)
 {
    if(e > 0)
-      mpf_mul_2exp(result->data(), val.data(), e);
+      mpf_mul_2exp(result.data(), val.data(), e);
    else if(e < 0)
-      mpf_div_2exp(result->data(), val.data(), -e);
+      mpf_div_2exp(result.data(), val.data(), -e);
 }
 template <unsigned Digits10>
-inline void frexp(gmp_real<Digits10>* result, const gmp_real<Digits10>& val, int* e)
+inline void eval_frexp(gmp_real<Digits10>& result, const gmp_real<Digits10>& val, int* e)
 {
    long v;
    mpf_get_d_2exp(&v, val.data());
    *e = v;
-   return ldexp(result, val, -v);
+   eval_ldexp(result, val, -v);
 }
 template <unsigned Digits10>
-inline void frexp(gmp_real<Digits10>* result, const gmp_real<Digits10>& val, long* e)
+inline void eval_frexp(gmp_real<Digits10>& result, const gmp_real<Digits10>& val, long* e)
 {
    mpf_get_d_2exp(e, val.data());
-   return ldexp(result, val, -*e);
+   eval_ldexp(result, val, -*e);
 }
 
 struct gmp_int
@@ -1069,9 +1069,9 @@ inline void convert_to(double* result, const gmp_int& val)
    *result = mpz_get_d(val.data());
 }
 
-inline void abs(gmp_int* result, const gmp_int& val)
+inline void eval_abs(gmp_int& result, const gmp_int& val)
 {
-   mpz_abs(result->data(), val.data());
+   mpz_abs(result.data(), val.data());
 }
 
 template<>

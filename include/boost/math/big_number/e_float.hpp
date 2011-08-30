@@ -34,9 +34,14 @@ inline std::string arithmetic_backend<efx::e_float>::str(unsigned digits, bool s
    return result;
 }
 
-inline void abs(arithmetic_backend<efx::e_float>* result, const arithmetic_backend<efx::e_float>& arg)
+inline void eval_abs(arithmetic_backend<efx::e_float>& result, const arithmetic_backend<efx::e_float>& arg)
 {
-   result->data() = ef::fabs(arg.data());
+   result.data() = ef::fabs(arg.data());
+}
+
+inline void eval_fabs(arithmetic_backend<efx::e_float>& result, const arithmetic_backend<efx::e_float>& arg)
+{
+   result.data() = ef::fabs(arg.data());
 }
 
 inline bool is_zero(const arithmetic_backend<efx::e_float>& val)
