@@ -453,7 +453,7 @@ private:
    template <class V>
    void check_shift_range(V val, const mpl::true_&, const mpl::true_&)
    {
-      if(val > std::numeric_limits<std::size_t>::max())
+      if(val > (std::numeric_limits<std::size_t>::max)())
          BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
       if(val < 0)
          BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
@@ -467,7 +467,7 @@ private:
    template <class V>
    void check_shift_range(V val, const mpl::true_&, const mpl::false_&)
    {
-      if(val > std::numeric_limits<std::size_t>::max())
+      if(val > (std::numeric_limits<std::size_t>::max)())
          BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
    }
    template <class V>
@@ -686,9 +686,6 @@ private:
       typedef typename proto::result_of::left<Exp>::type left_type;
       typedef typename proto::result_of::right<Exp>::type right_type;
 
-      static int const left_depth = boost::result_of<detail::CalcDepth(left_type)>::type::value;
-      static int const right_depth = boost::result_of<detail::CalcDepth(right_type)>::type::value;
-
       bool bl = contains_self(proto::left(e));
       bool br = contains_self(proto::right(e));
 
@@ -718,9 +715,6 @@ private:
 
       typedef typename proto::result_of::left<Exp>::type left_type;
       typedef typename proto::result_of::right<Exp>::type right_type;
-
-      static int const left_depth = boost::result_of<detail::CalcDepth(left_type)>::type::value;
-      static int const right_depth = boost::result_of<detail::CalcDepth(right_type)>::type::value;
 
       bool bl = contains_self(proto::left(e));
       bool br = contains_self(proto::right(e));
@@ -777,10 +771,15 @@ private:
       {
          do_bitwise_and(proto::left(e), typename proto::tag_of<left_type>::type());
       }
-      else
+      else if(left_depth >= right_depth)
       {
          do_assign(proto::left(e), typename detail::assign_and_eval<left_type>::type());
          do_bitwise_and(proto::right(e), typename proto::tag_of<right_type>::type());
+      }
+      else
+      {
+         do_assign(proto::right(e), typename detail::assign_and_eval<right_type>::type());
+         do_bitwise_and(proto::left(e), typename proto::tag_of<left_type>::type());
       }
    }
    template <class Exp>
@@ -819,10 +818,15 @@ private:
       {
          do_bitwise_or(proto::left(e), typename proto::tag_of<left_type>::type());
       }
-      else
+      else if(left_depth >= right_depth)
       {
          do_assign(proto::left(e), typename detail::assign_and_eval<left_type>::type());
          do_bitwise_or(proto::right(e), typename proto::tag_of<right_type>::type());
+      }
+      else
+      {
+         do_assign(proto::right(e), typename detail::assign_and_eval<right_type>::type());
+         do_bitwise_or(proto::left(e), typename proto::tag_of<left_type>::type());
       }
    }
    template <class Exp>
@@ -861,10 +865,15 @@ private:
       {
          do_bitwise_xor(proto::left(e), typename proto::tag_of<left_type>::type());
       }
-      else
+      else if(left_depth >= right_depth)
       {
          do_assign(proto::left(e), typename detail::assign_and_eval<left_type>::type());
          do_bitwise_xor(proto::right(e), typename proto::tag_of<right_type>::type());
+      }
+      else
+      {
+         do_assign(proto::right(e), typename detail::assign_and_eval<right_type>::type());
+         do_bitwise_xor(proto::left(e), typename proto::tag_of<left_type>::type());
       }
    }
    template <class Exp>
@@ -1000,6 +1009,25 @@ private:
    void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const proto::tag::terminal&, const proto::tag::terminal&)
    {
       f(m_backend, canonical_value(proto::value(val1)), canonical_value(proto::value(val2)));
+   }
+   template <class F, class Exp1, class Exp2, class Tag1>
+   void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const Tag1&, const proto::tag::terminal&)
+   {
+      self_type temp1(val1);
+      f(m_backend, temp1.backend(), canonical_value(proto::value(val2)));
+   }
+   template <class F, class Exp1, class Exp2, class Tag2>
+   void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const proto::tag::terminal&, const Tag2&)
+   {
+      self_type temp2(val2);
+      f(m_backend, canonical_value(proto::value(val1)), temp2.backend());
+   }
+   template <class F, class Exp1, class Exp2, class Tag1, class Tag2>
+   void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const Tag1&, const Tag2&)
+   {
+      self_type temp1(val1);
+      self_type temp2(val2);
+      f(m_backend, temp1.backend(), temp2.backend());
    }
 
    template <class Exp>
@@ -1297,6 +1325,16 @@ private:
       typedef typename proto::result_of::child_c<Exp, 1>::type child1_type;
       return contains_self(proto::child_c<0>(e), mpl::int_<proto::arity_of<child0_type>::value>()) || contains_self(proto::child_c<1>(e), mpl::int_<proto::arity_of<child1_type>::value>());
    }
+   template <class Exp>
+   bool contains_self(const Exp& e, mpl::int_<3> const&)const
+   {
+      typedef typename proto::result_of::child_c<Exp, 0>::type child0_type;
+      typedef typename proto::result_of::child_c<Exp, 1>::type child1_type;
+      typedef typename proto::result_of::child_c<Exp, 2>::type child2_type;
+      return contains_self(proto::child_c<0>(e), mpl::int_<proto::arity_of<child0_type>::value>()) 
+         || contains_self(proto::child_c<1>(e), mpl::int_<proto::arity_of<child1_type>::value>())
+         || contains_self(proto::child_c<2>(e), mpl::int_<proto::arity_of<child2_type>::value>());
+   }
 
    // Test if the expression is a reference to *this:
    template <class Exp>
@@ -1326,13 +1364,13 @@ private:
       return v == this; 
    }
    template <class Exp>
-   static typename detail::underlying_result<Exp>::type underlying_value(const big_number_exp<Exp>& e, const proto::tag::terminal&)
+   static typename detail::underlying_result<Exp>::type underlying_value(const detail::big_number_exp<Exp>& e, const proto::tag::terminal&)
    {
       return proto::value(e);
    }
    template <class Exp, class tag>
    static typename detail::underlying_result<Exp>::type 
-      underlying_value(const big_number_exp<Exp>& e, const tag&)
+      underlying_value(const detail::big_number_exp<Exp>& e, const tag&)
    {
       typedef typename proto::result_of::left<Exp>::type left_type;
       typedef typename proto::tag_of<left_type>::type tag_type;
@@ -1500,8 +1538,8 @@ inline std::ostream& operator << (std::ostream& os, const big_number_exp<Exp>& r
 
 } // namespace detail
 
-template <class Stream, class Backend>
-inline typename enable_if<is_convertible<Stream*, std::ostream*>, std::istream&>::type operator >> (Stream& is, big_number<Backend>& r)
+template <class Backend>
+inline std::istream& operator >> (std::istream& is, big_number<Backend>& r)
 {
    std::string s;
    is >> s;

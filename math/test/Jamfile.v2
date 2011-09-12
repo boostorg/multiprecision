@@ -83,6 +83,14 @@ run test_arithmetic.cpp gmp
          [ check-target-builds ../config//has_gmp : : <build>no ]
         : test_arithmetic_mpz ;
 
+run test_arithmetic.cpp gmp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPQ
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+        : test_arithmetic_mpq ;
+
 run test_arithmetic.cpp mpfr gmp
         : # command line
         : # input files
@@ -137,6 +145,14 @@ run test_numeric_limits.cpp gmp
 	      <define>TEST_MPZ
          [ check-target-builds ../config//has_gmp : : <build>no ]
         : test_numeric_limits_mpz ;
+
+run test_numeric_limits.cpp gmp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPQ
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+        : test_numeric_limits_mpq ;
 
 run test_numeric_limits.cpp mpfr
         : # command line

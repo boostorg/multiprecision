@@ -6,6 +6,8 @@
 #ifndef BOOST_MATH_BIG_NUM_BASE_HPP
 #define BOOST_MATH_BIG_NUM_BASE_HPP
 
+#include <limits>
+
 namespace boost{ namespace math{
 
 template <class Backend>
@@ -120,6 +122,14 @@ struct big_number_grammar_cases::case_<proto::tag::shift_right>
 template<>
 struct big_number_grammar_cases::case_<proto::tag::complement>
   : proto::complement<big_number_grammar>
+{};
+
+template<>
+struct big_number_grammar_cases::case_<proto::tag::function>
+  : proto::or_<
+      proto::function< proto::_, big_number_grammar >,
+      proto::function< proto::_, big_number_grammar, proto::_ >
+  >
 {};
 
 struct big_number_grammar : proto::switch_<big_number_grammar_cases>{};
@@ -625,7 +635,7 @@ public:
       : base_type(expr)
     {}
     template <class Other>
-    big_number_exp(const Other& o)
+    big_number_exp(const Other& o, typename enable_if<is_convertible<Other, base_type> >::type const* = 0)
        : base_type(o)
     {}
 
@@ -645,8 +655,20 @@ struct is_extended_integer : public mpl::false_ {};
 template <class Backend>
 struct is_extended_integer<big_number<Backend> > : public is_extended_integer<Backend>{};
 
-
 }} // namespaces
+
+namespace boost{ namespace math{ namespace tools{
+
+template <class T>
+struct promote_arg;
+
+template <class Exp>
+struct promote_arg<boost::math::detail::big_number_exp<Exp> >
+{
+  typedef typename boost::math::detail::expression_type<Exp>::type type;
+};
+
+}}}
 
 #endif // BOOST_MATH_BIG_NUM_BASE_HPP
 

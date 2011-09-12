@@ -6,7 +6,7 @@
 #include <boost/detail/lightweight_test.hpp>
 #include <boost/math/special_functions/pow.hpp>
 
-#if !defined(TEST_MPF50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_E_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50)
+#if !defined(TEST_MPF50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_E_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ)
 #  define TEST_MPF50
 #  define TEST_MPF
 #  define TEST_BACKEND
@@ -14,6 +14,7 @@
 #  define TEST_MPFR
 #  define TEST_MPFR_50
 #  define TEST_E_FLOAT
+#  define TEST_MPQ
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -24,7 +25,7 @@
 
 #endif
 
-#if defined(TEST_MPF50) || defined(TEST_MPF) || defined(TEST_MPZ)
+#if defined(TEST_MPF50) || defined(TEST_MPF) || defined(TEST_MPZ) || defined(TEST_MPQ)
 #include <boost/math/big_number/gmp.hpp>
 #endif
 #ifdef TEST_BACKEND
@@ -255,7 +256,7 @@ void test_real_ops(const boost::mpl::false_&){}
 template <class Real>
 void test_real_ops(const boost::mpl::true_&)
 {
-#if defined(TEST_MPF) || defined(TEST_MPF_50) || defined(TEST_BACKEND)
+#if defined(TEST_MPF) || defined(TEST_MPF_50) || defined(TEST_BACKEND) || defined(TEST_MPFR)
    BOOST_TEST(abs(Real(2)) == 2);
    BOOST_TEST(abs(Real(-2)) == 2);
    BOOST_TEST(fabs(Real(2)) == 2);
@@ -849,6 +850,9 @@ int main()
 #endif
 #ifdef TEST_MPZ
    test<boost::math::mpz_int>();
+#endif
+#ifdef TEST_MPQ
+   test<boost::math::mpq_rational>();
 #endif
 #ifdef TEST_E_FLOAT
    test<boost::math::e_float>();

@@ -5,7 +5,7 @@
 
 #include <boost/detail/lightweight_test.hpp>
 
-#if !defined(TEST_MPF50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_E_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50)
+#if !defined(TEST_MPF50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_E_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ)
 #  define TEST_MPF50
 #  define TEST_MPF
 #  define TEST_BACKEND
@@ -13,6 +13,7 @@
 #  define TEST_MPFR
 #  define TEST_MPFR_50
 #  define TEST_E_FLOAT
+#  define TEST_MPQ
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -23,7 +24,7 @@
 
 #endif
 
-#if defined(TEST_MPF50) || defined(TEST_MPF) || defined(TEST_MPZ)
+#if defined(TEST_MPF50) || defined(TEST_MPF) || defined(TEST_MPZ) || defined(TEST_MPQ)
 #include <boost/math/big_number/gmp.hpp>
 #endif
 #ifdef TEST_BACKEND
@@ -150,6 +151,9 @@ int main()
 #endif
 #ifdef TEST_MPZ
    test<boost::math::mpz_int>();
+#endif
+#ifdef TEST_MPQ
+   test<boost::math::mpq_rational>();
 #endif
 #ifdef TEST_E_FLOAT
    test<boost::math::e_float>();

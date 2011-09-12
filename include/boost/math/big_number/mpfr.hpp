@@ -21,6 +21,8 @@ struct mpfr_real_backend;
 
 namespace detail{
 
+long get_default_precision() { return 50; }
+
 template <unsigned digits10>
 struct mpfr_real_imp
 {
@@ -32,8 +34,8 @@ struct mpfr_real_imp
 
    mpfr_real_imp(const mpfr_real_imp& o)
    {
-      mpfr_init2(m_data, (((digits10 ? digits10 : mpfr_real_backend<0>::default_precision()) + 1) * 1000L) / 301L);
-      mpfr_set(m_data, o.m_data, MPFR_RNDN);
+      mpfr_init2(m_data, (((digits10 ? digits10 : get_default_precision()) + 1) * 1000L) / 301L);
+      mpfr_set(m_data, o.m_data, GMP_RNDN);
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
    mpfr_real_imp(mpfr_real_imp&& o)
@@ -44,7 +46,7 @@ struct mpfr_real_imp
 #endif
    mpfr_real_imp& operator = (const mpfr_real_imp& o)
    {
-      mpfr_set(m_data, o.m_data, MPFR_RNDN);
+      mpfr_set(m_data, o.m_data, GMP_RNDN);
       return *this;
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
@@ -60,17 +62,17 @@ struct mpfr_real_imp
       unsigned shift = 0;
       mpfr_t t;
       mpfr_init2(t, (std::max)(static_cast<unsigned>(std::numeric_limits<boost::uintmax_t>::digits), static_cast<unsigned>(((digits10 + 1) * 1000L) / 301L)));
-      mpfr_set_ui(m_data, 0, MPFR_RNDN);
+      mpfr_set_ui(m_data, 0, GMP_RNDN);
       while(i)
       {
-         mpfr_set_ui(t, static_cast<unsigned>(i & mask), MPFR_RNDN);
+         mpfr_set_ui(t, static_cast<unsigned>(i & mask), GMP_RNDN);
          long e;
-         const char* ps = mpfr_get_str (0, &e, 10, 0, t, MPFR_RNDN);
+         const char* ps = mpfr_get_str (0, &e, 10, 0, t, GMP_RNDN);
          if(shift)
-            mpfr_mul_2exp(t, t, shift, MPFR_RNDN);
-         ps = mpfr_get_str (0, &e, 10, 0, t, MPFR_RNDN);
-         mpfr_add(m_data, m_data, t, MPFR_RNDN);
-         ps = mpfr_get_str (0, &e, 10, 0, m_data, MPFR_RNDN);
+            mpfr_mul_2exp(t, t, shift, GMP_RNDN);
+         ps = mpfr_get_str (0, &e, 10, 0, t, GMP_RNDN);
+         mpfr_add(m_data, m_data, t, GMP_RNDN);
+         ps = mpfr_get_str (0, &e, 10, 0, m_data, GMP_RNDN);
          shift += std::numeric_limits<unsigned>::digits;
          i >>= std::numeric_limits<unsigned>::digits;
       }
@@ -82,22 +84,22 @@ struct mpfr_real_imp
       bool neg = i < 0;
       *this = static_cast<boost::uintmax_t>(std::abs(i));
       if(neg)
-         mpfr_neg(m_data, m_data, MPFR_RNDN);
+         mpfr_neg(m_data, m_data, GMP_RNDN);
       return *this;
    }
    mpfr_real_imp& operator = (unsigned long i)
    {
-      mpfr_set_ui(m_data, i, MPFR_RNDN);
+      mpfr_set_ui(m_data, i, GMP_RNDN);
       return *this;
    }
    mpfr_real_imp& operator = (long i)
    {
-      mpfr_set_si(m_data, i, MPFR_RNDN);
+      mpfr_set_si(m_data, i, GMP_RNDN);
       return *this;
    }
    mpfr_real_imp& operator = (double d)
    {
-      mpfr_set_d(m_data, d, MPFR_RNDN);
+      mpfr_set_d(m_data, d, GMP_RNDN);
       return *this;
    }
    mpfr_real_imp& operator = (long double a)
@@ -107,12 +109,12 @@ struct mpfr_real_imp
       using std::floor;
 
       if (a == 0) {
-         mpfr_set_si(m_data, 0, MPFR_RNDN);
+         mpfr_set_si(m_data, 0, GMP_RNDN);
          return *this;
       }
 
       if (a == 1) {
-         mpfr_set_si(m_data, 1, MPFR_RNDN);
+         mpfr_set_si(m_data, 1, GMP_RNDN);
          return *this;
       }
 
@@ -121,7 +123,7 @@ struct mpfr_real_imp
 
       int e;
       long double f, term;
-      mpfr_init_set_ui(m_data, 0u, MPFR_RNDN);
+      mpfr_init_set_ui(m_data, 0u, GMP_RNDN);
 
       f = frexp(a, &e);
 
@@ -133,22 +135,22 @@ struct mpfr_real_imp
          f = ldexp(f, shift);
          term = floor(f);
          e -= shift;
-         mpfr_mul_2exp(m_data, m_data, shift, MPFR_RNDN);
+         mpfr_mul_2exp(m_data, m_data, shift, GMP_RNDN);
          if(term > 0)
-            mpfr_add_ui(m_data, m_data, static_cast<unsigned>(term), MPFR_RNDN);
+            mpfr_add_ui(m_data, m_data, static_cast<unsigned>(term), GMP_RNDN);
          else
-            mpfr_sub_ui(m_data, m_data, static_cast<unsigned>(-term), MPFR_RNDN);
+            mpfr_sub_ui(m_data, m_data, static_cast<unsigned>(-term), GMP_RNDN);
          f -= term;
       }
       if(e > 0)
-         mpfr_mul_2exp(m_data, m_data, e, MPFR_RNDN);
+         mpfr_mul_2exp(m_data, m_data, e, GMP_RNDN);
       else if(e < 0)
-         mpfr_div_2exp(m_data, m_data, -e, MPFR_RNDN);
+         mpfr_div_2exp(m_data, m_data, -e, GMP_RNDN);
       return *this;
    }
    mpfr_real_imp& operator = (const char* s)
    {
-      mpfr_set_str(m_data, s, 10, MPFR_RNDN);
+      mpfr_set_str(m_data, s, 10, GMP_RNDN);
       return *this;
    }
    void swap(mpfr_real_imp& o)
@@ -159,7 +161,7 @@ struct mpfr_real_imp
    {
       std::string result;
       mp_exp_t e;
-      char* ps = mpfr_get_str (0, &e, 10, digits, m_data, MPFR_RNDN);
+      char* ps = mpfr_get_str (0, &e, 10, digits, m_data, GMP_RNDN);
       std::ptrdiff_t sl = std::strlen(ps);
       unsigned chars = sl;
       if(sl == 0)
@@ -199,7 +201,7 @@ struct mpfr_real_imp
    }
    void negate()
    {
-      mpfr_neg(m_data, m_data, MPFR_RNDN);
+      mpfr_neg(m_data, m_data, GMP_RNDN);
    }
    int compare(const mpfr_real_backend<digits10>& o)const
    {
@@ -224,6 +226,11 @@ struct mpfr_real_imp
    const mpfr_t& data()const { return m_data; }
 protected:
    mpfr_t m_data;
+   static unsigned& get_default_precision()
+   {
+      static unsigned val = 50;
+      return val;
+   }
 };
 
 } // namespace detail
@@ -314,83 +321,77 @@ struct mpfr_real_backend<0> : public detail::mpfr_real_imp<0>
    {
       mpfr_set_prec(this->m_data, (digits10 + 1) * 1000L / 301);
    }
-private:
-   static unsigned& get_default_precision()
-   {
-      static unsigned val = 50;
-      return val;
-   }
 };
 
 template <unsigned digits10>
 inline void add(mpfr_real_backend<digits10>& result, const mpfr_real_backend<digits10>& o)
 {
-   mpfr_add(result.data(), result.data(), o.data(), MPFR_RNDN);
+   mpfr_add(result.data(), result.data(), o.data(), GMP_RNDN);
 }
 template <unsigned digits10>
 inline void subtract(mpfr_real_backend<digits10>& result, const mpfr_real_backend<digits10>& o)
 {
-   mpfr_sub(result.data(), result.data(), o.data(), MPFR_RNDN);
+   mpfr_sub(result.data(), result.data(), o.data(), GMP_RNDN);
 }
 template <unsigned digits10>
 inline void multiply(mpfr_real_backend<digits10>& result, const mpfr_real_backend<digits10>& o)
 {
-   mpfr_mul(result.data(), result.data(), o.data(), MPFR_RNDN);
+   mpfr_mul(result.data(), result.data(), o.data(), GMP_RNDN);
 }
 template <unsigned digits10>
 inline void divide(mpfr_real_backend<digits10>& result, const mpfr_real_backend<digits10>& o)
 {
-   mpfr_div(result.data(), result.data(), o.data(), MPFR_RNDN);
+   mpfr_div(result.data(), result.data(), o.data(), GMP_RNDN);
 }
 template <unsigned digits10>
 inline void add(mpfr_real_backend<digits10>& result, unsigned long i)
 {
-   mpfr_add_ui(result.data(), result.data(), i, MPFR_RNDN);
+   mpfr_add_ui(result.data(), result.data(), i, GMP_RNDN);
 }
 template <unsigned digits10>
 inline void subtract(mpfr_real_backend<digits10>& result, unsigned long i)
 {
-   mpfr_sub_ui(result.data(), result.data(), i, MPFR_RNDN);
+   mpfr_sub_ui(result.data(), result.data(), i, GMP_RNDN);
 }
 template <unsigned digits10>
 inline void multiply(mpfr_real_backend<digits10>& result, unsigned long i)
 {
-   mpfr_mul_ui(result.data(), result.data(), i, MPFR_RNDN);
+   mpfr_mul_ui(result.data(), result.data(), i, GMP_RNDN);
 }
 template <unsigned digits10>
 inline void divide(mpfr_real_backend<digits10>& result, unsigned long i)
 {
-   mpfr_div_ui(result.data(), result.data(), i, MPFR_RNDN);
+   mpfr_div_ui(result.data(), result.data(), i, GMP_RNDN);
 }
 template <unsigned digits10>
 inline void add(mpfr_real_backend<digits10>& result, long i)
 {
    if(i > 0)
-      mpfr_add_ui(result.data(), result.data(), i, MPFR_RNDN);
+      mpfr_add_ui(result.data(), result.data(), i, GMP_RNDN);
    else
-      mpfr_sub_ui(result.data(), result.data(), std::abs(i), MPFR_RNDN);
+      mpfr_sub_ui(result.data(), result.data(), std::abs(i), GMP_RNDN);
 }
 template <unsigned digits10>
 inline void subtract(mpfr_real_backend<digits10>& result, long i)
 {
    if(i > 0)
-      mpfr_sub_ui(result.data(), result.data(), i, MPFR_RNDN);
+      mpfr_sub_ui(result.data(), result.data(), i, GMP_RNDN);
    else
-      mpfr_add_ui(result.data(), result.data(), std::abs(i), MPFR_RNDN);
+      mpfr_add_ui(result.data(), result.data(), std::abs(i), GMP_RNDN);
 }
 template <unsigned digits10>
 inline void multiply(mpfr_real_backend<digits10>& result, long i)
 {
-   mpfr_mul_ui(result.data(), result.data(), std::abs(i), MPFR_RNDN);
+   mpfr_mul_ui(result.data(), result.data(), std::abs(i), GMP_RNDN);
    if(i < 0)
-      mpfr_neg(result.data(), result.data(), MPFR_RNDN);
+      mpfr_neg(result.data(), result.data(), GMP_RNDN);
 }
 template <unsigned digits10>
 inline void divide(mpfr_real_backend<digits10>& result, long i)
 {
-   mpfr_div_ui(result.data(), result.data(), std::abs(i), MPFR_RNDN);
+   mpfr_div_ui(result.data(), result.data(), std::abs(i), GMP_RNDN);
    if(i < 0)
-      mpfr_neg(result.data(), result.data(), MPFR_RNDN);
+      mpfr_neg(result.data(), result.data(), GMP_RNDN);
 }
 //
 // Specialised 3 arg versions of the basic operators:
@@ -398,146 +399,146 @@ inline void divide(mpfr_real_backend<digits10>& result, long i)
 template <unsigned digits10>
 inline void add(mpfr_real_backend<digits10>& a, const mpfr_real_backend<digits10>& x, const mpfr_real_backend<digits10>& y)
 {
-   mpfr_add(a.data(), x.data(), y.data(), MPFR_RNDN);
+   mpfr_add(a.data(), x.data(), y.data(), GMP_RNDN);
 }
 template <unsigned digits10>
 inline void add(mpfr_real_backend<digits10>& a, const mpfr_real_backend<digits10>& x, unsigned long y)
 {
-   mpfr_add_ui(a.data(), x.data(), y, MPFR_RNDN);
+   mpfr_add_ui(a.data(), x.data(), y, GMP_RNDN);
 }
 template <unsigned digits10>
 inline void add(mpfr_real_backend<digits10>& a, const mpfr_real_backend<digits10>& x, long y)
 {
    if(y < 0)
-      mpfr_sub_ui(a.data(), x.data(), -y, MPFR_RNDN);
+      mpfr_sub_ui(a.data(), x.data(), -y, GMP_RNDN);
    else
-      mpfr_add_ui(a.data(), x.data(), y, MPFR_RNDN);
+      mpfr_add_ui(a.data(), x.data(), y, GMP_RNDN);
 }
 template <unsigned digits10>
 inline void add(mpfr_real_backend<digits10>& a, unsigned long x, const mpfr_real_backend<digits10>& y)
 {
-   mpfr_add_ui(a.data(), y.data(), x, MPFR_RNDN);
+   mpfr_add_ui(a.data(), y.data(), x, GMP_RNDN);
 }
 template <unsigned digits10>
 inline void add(mpfr_real_backend<digits10>& a, long x, const mpfr_real_backend<digits10>& y)
 {
    if(x < 0)
    {
-      mpfr_ui_sub(a.data(), -x, y.data(), MPFR_RNDN);
-      mpfr_neg(a.data(), a.data(), MPFR_RNDN);
+      mpfr_ui_sub(a.data(), -x, y.data(), GMP_RNDN);
+      mpfr_neg(a.data(), a.data(), GMP_RNDN);
    }
    else
-      mpfr_add_ui(a.data(), y.data(), x, MPFR_RNDN);
+      mpfr_add_ui(a.data(), y.data(), x, GMP_RNDN);
 }
 template <unsigned digits10>
 inline void subtract(mpfr_real_backend<digits10>& a, const mpfr_real_backend<digits10>& x, const mpfr_real_backend<digits10>& y)
 {
-   mpfr_sub(a.data(), x.data(), y.data(), MPFR_RNDN);
+   mpfr_sub(a.data(), x.data(), y.data(), GMP_RNDN);
 }
 template <unsigned digits10>
 inline void subtract(mpfr_real_backend<digits10>& a, const mpfr_real_backend<digits10>& x, unsigned long y)
 {
-   mpfr_sub_ui(a.data(), x.data(), y, MPFR_RNDN);
+   mpfr_sub_ui(a.data(), x.data(), y, GMP_RNDN);
 }
 template <unsigned digits10>
 inline void subtract(mpfr_real_backend<digits10>& a, const mpfr_real_backend<digits10>& x, long y)
 {
    if(y < 0)
-      mpfr_add_ui(a.data(), x.data(), -y, MPFR_RNDN);
+      mpfr_add_ui(a.data(), x.data(), -y, GMP_RNDN);
    else
-      mpfr_sub_ui(a.data(), x.data(), y, MPFR_RNDN);
+      mpfr_sub_ui(a.data(), x.data(), y, GMP_RNDN);
 }
 template <unsigned digits10>
 inline void subtract(mpfr_real_backend<digits10>& a, unsigned long x, const mpfr_real_backend<digits10>& y)
 {
-   mpfr_ui_sub(a.data(), x, y.data(), MPFR_RNDN);
+   mpfr_ui_sub(a.data(), x, y.data(), GMP_RNDN);
 }
 template <unsigned digits10>
 inline void subtract(mpfr_real_backend<digits10>& a, long x, const mpfr_real_backend<digits10>& y)
 {
    if(x < 0)
    {
-      mpfr_add_ui(a.data(), y.data(), -x, MPFR_RNDN);
-      mpfr_neg(a.data(), a.data(), MPFR_RNDN);
+      mpfr_add_ui(a.data(), y.data(), -x, GMP_RNDN);
+      mpfr_neg(a.data(), a.data(), GMP_RNDN);
    }
    else
-      mpfr_ui_sub(a.data(), x, y.data(), MPFR_RNDN);
+      mpfr_ui_sub(a.data(), x, y.data(), GMP_RNDN);
 }
 
 template <unsigned digits10>
 inline void multiply(mpfr_real_backend<digits10>& a, const mpfr_real_backend<digits10>& x, const mpfr_real_backend<digits10>& y)
 {
-   mpfr_mul(a.data(), x.data(), y.data(), MPFR_RNDN);
+   mpfr_mul(a.data(), x.data(), y.data(), GMP_RNDN);
 }
 template <unsigned digits10>
 inline void multiply(mpfr_real_backend<digits10>& a, const mpfr_real_backend<digits10>& x, unsigned long y)
 {
-   mpfr_mul_ui(a.data(), x.data(), y, MPFR_RNDN);
+   mpfr_mul_ui(a.data(), x.data(), y, GMP_RNDN);
 }
 template <unsigned digits10>
 inline void multiply(mpfr_real_backend<digits10>& a, const mpfr_real_backend<digits10>& x, long y)
 {
    if(y < 0)
    {
-      mpfr_mul_ui(a.data(), x.data(), -y, MPFR_RNDN);
+      mpfr_mul_ui(a.data(), x.data(), -y, GMP_RNDN);
       a.negate();
    }
    else
-      mpfr_mul_ui(a.data(), x.data(), y, MPFR_RNDN);
+      mpfr_mul_ui(a.data(), x.data(), y, GMP_RNDN);
 }
 template <unsigned digits10>
 inline void multiply(mpfr_real_backend<digits10>& a, unsigned long x, const mpfr_real_backend<digits10>& y)
 {
-   mpfr_mul_ui(a.data(), y.data(), x, MPFR_RNDN);
+   mpfr_mul_ui(a.data(), y.data(), x, GMP_RNDN);
 }
 template <unsigned digits10>
 inline void multiply(mpfr_real_backend<digits10>& a, long x, const mpfr_real_backend<digits10>& y)
 {
    if(x < 0)
    {
-      mpfr_mul_ui(a.data(), y.data(), -x, MPFR_RNDN);
-      mpfr_neg(a.data(), a.data(), MPFR_RNDN);
+      mpfr_mul_ui(a.data(), y.data(), -x, GMP_RNDN);
+      mpfr_neg(a.data(), a.data(), GMP_RNDN);
    }
    else
-      mpfr_mul_ui(a.data(), y.data(), x, MPFR_RNDN);
+      mpfr_mul_ui(a.data(), y.data(), x, GMP_RNDN);
 }
 
 template <unsigned digits10>
 inline void divide(mpfr_real_backend<digits10>& a, const mpfr_real_backend<digits10>& x, const mpfr_real_backend<digits10>& y)
 {
-   mpfr_div(a.data(), x.data(), y.data(), MPFR_RNDN);
+   mpfr_div(a.data(), x.data(), y.data(), GMP_RNDN);
 }
 template <unsigned digits10>
 inline void divide(mpfr_real_backend<digits10>& a, const mpfr_real_backend<digits10>& x, unsigned long y)
 {
-   mpfr_div_ui(a.data(), x.data(), y, MPFR_RNDN);
+   mpfr_div_ui(a.data(), x.data(), y, GMP_RNDN);
 }
 template <unsigned digits10>
 inline void divide(mpfr_real_backend<digits10>& a, const mpfr_real_backend<digits10>& x, long y)
 {
    if(y < 0)
    {
-      mpfr_div_ui(a.data(), x.data(), -y, MPFR_RNDN);
+      mpfr_div_ui(a.data(), x.data(), -y, GMP_RNDN);
       a.negate();
    }
    else
-      mpfr_div_ui(a.data(), x.data(), y, MPFR_RNDN);
+      mpfr_div_ui(a.data(), x.data(), y, GMP_RNDN);
 }
 template <unsigned digits10>
 inline void divide(mpfr_real_backend<digits10>& a, unsigned long x, const mpfr_real_backend<digits10>& y)
 {
-   mpfr_ui_div(a.data(), x, y.data(), MPFR_RNDN);
+   mpfr_ui_div(a.data(), x, y.data(), GMP_RNDN);
 }
 template <unsigned digits10>
 inline void divide(mpfr_real_backend<digits10>& a, long x, const mpfr_real_backend<digits10>& y)
 {
    if(x < 0)
    {
-      mpfr_ui_div(a.data(), -x, y.data(), MPFR_RNDN);
-      mpfr_neg(a.data(), a.data(), MPFR_RNDN);
+      mpfr_ui_div(a.data(), -x, y.data(), GMP_RNDN);
+      mpfr_neg(a.data(), a.data(), GMP_RNDN);
    }
    else
-      mpfr_ui_div(a.data(), x, y.data(), MPFR_RNDN);
+      mpfr_ui_div(a.data(), x, y.data(), GMP_RNDN);
 }
 
 template <unsigned digits10>
@@ -554,34 +555,34 @@ inline int get_sign(const mpfr_real_backend<digits10>& val)
 template <unsigned digits10>
 inline void convert_to(unsigned long* result, const mpfr_real_backend<digits10>& val)
 {
-   *result = mpfr_get_ui(val.data(), MPFR_RNDN);
+   *result = mpfr_get_ui(val.data(), GMP_RNDN);
 }
 template <unsigned digits10>
 inline void convert_to(long* result, const mpfr_real_backend<digits10>& val)
 {
-   *result = mpfr_get_si(val.data(), MPFR_RNDN);
+   *result = mpfr_get_si(val.data(), GMP_RNDN);
 }
 #ifdef _MPFR_H_HAVE_INTMAX_T
 template <unsigned digits10>
 inline void convert_to(boost::uintmax_t* result, const mpfr_real_backend<digits10>& val)
 {
-   *result = mpfr_get_uj(val.data(), MPFR_RNDN);
+   *result = mpfr_get_uj(val.data(), GMP_RNDN);
 }
 template <unsigned digits10>
 inline void convert_to(boost::intmax_t* result, const mpfr_real_backend<digits10>& val)
 {
-   *result = mpfr_get_sj(val.data(), MPFR_RNDN);
+   *result = mpfr_get_sj(val.data(), GMP_RNDN);
 }
 #endif
 template <unsigned digits10>
 inline void convert_to(double* result, const mpfr_real_backend<digits10>& val)
 {
-   *result = mpfr_get_d(val.data(), MPFR_RNDN);
+   *result = mpfr_get_d(val.data(), GMP_RNDN);
 }
 template <unsigned digits10>
 inline void convert_to(long double* result, const mpfr_real_backend<digits10>& val)
 {
-   *result = mpfr_get_ld(val.data(), MPFR_RNDN);
+   *result = mpfr_get_ld(val.data(), GMP_RNDN);
 }
 
 //
@@ -590,19 +591,19 @@ inline void convert_to(long double* result, const mpfr_real_backend<digits10>& v
 template <unsigned Digits10>
 inline void eval_sqrt(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& val)
 {
-   mpfr_sqrt(result.data(), val.data(), MPFR_RNDN);
+   mpfr_sqrt(result.data(), val.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
 inline void eval_abs(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& val)
 {
-   mpfr_abs(result.data(), val.data(), MPFR_RNDN);
+   mpfr_abs(result.data(), val.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
 inline void eval_fabs(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& val)
 {
-   mpfr_abs(result.data(), val.data(), MPFR_RNDN);
+   mpfr_abs(result.data(), val.data(), GMP_RNDN);
 }
 template <unsigned Digits10>
 inline void eval_ceil(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& val)
@@ -623,29 +624,113 @@ template <unsigned Digits10>
 inline void eval_ldexp(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& val, long e)
 {
    if(e > 0)
-      mpfr_mul_2exp(result.data(), val.data(), e, MPFR_RNDN);
+      mpfr_mul_2exp(result.data(), val.data(), e, GMP_RNDN);
    else if(e < 0)
-      mpfr_div_2exp(result.data(), val.data(), -e, MPFR_RNDN);
+      mpfr_div_2exp(result.data(), val.data(), -e, GMP_RNDN);
 }
 template <unsigned Digits10>
 inline void eval_frexp(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& val, int* e)
 {
    long v;
-   mpfr_get_d_2exp(&v, val.data(), MPFR_RNDN);
+   mpfr_get_d_2exp(&v, val.data(), GMP_RNDN);
    *e = v;
-   ldexp(result, val, -v);
+   eval_ldexp(result, val, -v);
 }
 template <unsigned Digits10>
 inline void eval_frexp(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& val, long* e)
 {
-   mpfr_get_d_2exp(e, val.data(), MPFR_RNDN);
-   return ldexp(result, val, -*e);
+   mpfr_get_d_2exp(e, val.data(), GMP_RNDN);
+   return eval_ldexp(result, val, -*e);
 }
 
 template <unsigned Digits10>
 inline int eval_fpclassify(const mpfr_real_backend<Digits10>& val)
 {
    return mpfr_inf_p(val.data()) ? FP_INFINITE : mpfr_nan_p(val.data()) ? FP_NAN : mpfr_zero_p(val.data()) ? FP_ZERO : FP_NORMAL;
+}
+
+template <unsigned Digits10>
+inline void eval_pow(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& b, const mpfr_real_backend<Digits10>& e)
+{
+   mpfr_pow(result.data(), b.data(), e.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10, class Integer>
+inline typename enable_if<mpl::and_<is_signed<Integer>, mpl::bool_<sizeof(Integer) <= sizeof(long)> > >::type eval_pow(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& b, const Integer& e)
+{
+   mpfr_pow_si(result.data(), b.data(), e, GMP_RNDN);
+}
+
+template <unsigned Digits10, class Integer>
+inline typename enable_if<mpl::and_<is_unsigned<Integer>, mpl::bool_<sizeof(Integer) <= sizeof(long)> > >::type eval_pow(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& b, const Integer& e)
+{
+   mpfr_pow_ui(result.data(), b.data(), e, GMP_RNDN);
+}
+
+template <unsigned Digits10>
+inline void eval_exp(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& arg)
+{
+   mpfr_exp(result.data(), arg.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10>
+inline void eval_log(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& arg)
+{
+   mpfr_log(result.data(), arg.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10>
+inline void eval_sin(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& arg)
+{
+   mpfr_sin(result.data(), arg.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10>
+inline void eval_cos(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& arg)
+{
+   mpfr_cos(result.data(), arg.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10>
+inline void eval_tan(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& arg)
+{
+   mpfr_tan(result.data(), arg.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10>
+inline void eval_asin(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& arg)
+{
+   mpfr_asin(result.data(), arg.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10>
+inline void eval_acos(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& arg)
+{
+   mpfr_acos(result.data(), arg.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10>
+inline void eval_atan(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& arg)
+{
+   mpfr_atan(result.data(), arg.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10>
+inline void eval_sinh(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& arg)
+{
+   mpfr_sinh(result.data(), arg.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10>
+inline void eval_cosh(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& arg)
+{
+   mpfr_cosh(result.data(), arg.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10>
+inline void eval_tanh(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& arg)
+{
+   mpfr_tanh(result.data(), arg.data(), GMP_RNDN);
 }
 
 typedef big_number<mpfr_real_backend<50> >    mpfr_real_50;
@@ -679,7 +764,7 @@ public:
       {
          value.first = true;
          value.second = 0.5;
-         mpfr_div_2exp(value.second.backend().data(), value.second.backend().data(), -mpfr_get_emin(), MPFR_RNDN);
+         mpfr_div_2exp(value.second.backend().data(), value.second.backend().data(), -mpfr_get_emin(), GMP_RNDN);
       }
       return value.second;
    }
@@ -691,7 +776,7 @@ public:
       {
          value.first = true;
          value.second = 0.5;
-         mpfr_mul_2exp(value.second.backend().data(), value.second.backend().data(), mpfr_get_emax(), MPFR_RNDN);
+         mpfr_mul_2exp(value.second.backend().data(), value.second.backend().data(), mpfr_get_emax(), GMP_RNDN);
       }
       return value.second;
    }
@@ -715,7 +800,7 @@ public:
       {
          value.first = true;
          value.second = 1;
-         mpfr_div_2exp(value.second.backend().data(), value.second.backend().data(), std::numeric_limits<number_type>::digits - 1, MPFR_RNDN);
+         mpfr_div_2exp(value.second.backend().data(), value.second.backend().data(), std::numeric_limits<number_type>::digits - 1, GMP_RNDN);
       }
       return value.second;
    }
@@ -729,7 +814,7 @@ public:
       {
          value.first = true;
          value.second = 1;
-         mpfr_div_2exp(value.second.backend().data(), value.second.backend().data(), digits, MPFR_RNDN);
+         mpfr_div_2exp(value.second.backend().data(), value.second.backend().data(), digits, GMP_RNDN);
       }
       return value.second;
    }

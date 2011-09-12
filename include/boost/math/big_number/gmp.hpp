@@ -39,7 +39,7 @@ struct gmp_real_imp
       // to get the right value, but if it's then used in further calculations
       // things go badly wrong!!
       //
-      mpf_init2(m_data, (((digits10 ? digits10 : gmp_real<0>::default_precision()) + 1) * 1000L) / 301L);
+      mpf_init2(m_data, (((digits10 ? digits10 : get_default_precision()) + 1) * 1000L) / 301L);
       mpf_set(m_data, o.m_data);
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
@@ -66,7 +66,7 @@ struct gmp_real_imp
       boost::uintmax_t mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
       unsigned shift = 0;
       mpf_t t;
-      mpf_init2(t, (((digits10 ? digits10 : gmp_real<0>::default_precision()) + 1) * 1000L) / 301L);
+      mpf_init2(t, (((digits10 ? digits10 : get_default_precision()) + 1) * 1000L) / 301L);
       mpf_set_ui(m_data, 0);
       while(i)
       {
@@ -226,6 +226,11 @@ struct gmp_real_imp
    const mpf_t& data()const { return m_data; }
 protected:
    mpf_t m_data;
+   static unsigned& get_default_precision()
+   {
+      static unsigned val = 50;
+      return val;
+   }
 };
 
 } // namespace detail
@@ -315,12 +320,6 @@ struct gmp_real<0> : public detail::gmp_real_imp<0>
    void precision(unsigned digits10)
    {
       mpf_set_prec(this->m_data, (digits10 + 1) * 1000L / 301);
-   }
-private:
-   static unsigned& get_default_precision()
-   {
-      static unsigned val = 50;
-      return val;
    }
 };
 
@@ -892,22 +891,22 @@ inline void divide(gmp_int& t, long i)
 template <class UI>
 inline void left_shift(gmp_int& t, UI i)
 {
-   mpz_mul_2exp(t.data(), t.data(), static_cast<mp_bitcnt_t>(i));
+   mpz_mul_2exp(t.data(), t.data(), static_cast<unsigned long>(i));
 }
 template <class UI>
 inline void right_shift(gmp_int& t, UI i)
 {
-   mpz_fdiv_q_2exp(t.data(), t.data(), static_cast<mp_bitcnt_t>(i));
+   mpz_fdiv_q_2exp(t.data(), t.data(), static_cast<unsigned long>(i));
 }
 template <class UI>
 inline void left_shift(gmp_int& t, const gmp_int& v, UI i)
 {
-   mpz_mul_2exp(t.data(), v.data(), static_cast<mp_bitcnt_t>(i));
+   mpz_mul_2exp(t.data(), v.data(), static_cast<unsigned long>(i));
 }
 template <class UI>
 inline void right_shift(gmp_int& t, const gmp_int& v, UI i)
 {
-   mpz_fdiv_q_2exp(t.data(), v.data(), static_cast<mp_bitcnt_t>(i));
+   mpz_fdiv_q_2exp(t.data(), v.data(), static_cast<unsigned long>(i));
 }
 
 inline void bitwise_and(gmp_int& result, const gmp_int& v)
@@ -1074,6 +1073,215 @@ inline void eval_abs(gmp_int& result, const gmp_int& val)
    mpz_abs(result.data(), val.data());
 }
 
+struct gmp_rational;
+void add(gmp_rational& t, const gmp_rational& o);
+
+struct gmp_rational
+{
+   typedef mpl::list<long, long long>                 signed_types;
+   typedef mpl::list<unsigned long, unsigned long long>   unsigned_types;
+   typedef mpl::list<double, long double>            real_types;
+
+   gmp_rational()
+   {
+      mpq_init(this->m_data);
+   }
+   gmp_rational(const gmp_rational& o)
+   {
+      mpq_init(m_data);
+      mpq_set(m_data, o.m_data);
+   }
+   gmp_rational& operator = (const gmp_rational& o)
+   {
+      mpq_set(m_data, o.m_data);
+      return *this;
+   }
+   gmp_rational& operator = (boost::uintmax_t i)
+   {
+      boost::uintmax_t mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
+      unsigned shift = 0;
+      mpq_t t;
+      mpq_init(m_data);
+      mpq_init(t);
+      while(i)
+      {
+         mpq_set_ui(t, static_cast<unsigned>(i & mask), 1);
+         if(shift)
+            mpq_mul_2exp(t, t, shift);
+         mpq_add(m_data, m_data, t);
+         shift += std::numeric_limits<unsigned>::digits;
+         i >>= std::numeric_limits<unsigned>::digits;
+      }
+      mpq_clear(t);
+      return *this;
+   }
+   gmp_rational& operator = (boost::intmax_t i)
+   {
+      bool neg = i < 0;
+      *this = static_cast<boost::uintmax_t>(std::abs(i));
+      if(neg)
+         mpq_neg(m_data, m_data);
+      return *this;
+   }
+   gmp_rational& operator = (unsigned long i)
+   {
+      mpq_set_ui(m_data, i, 1);
+      return *this;
+   }
+   gmp_rational& operator = (long i)
+   {
+      mpq_set_si(m_data, i, 1);
+      return *this;
+   }
+   gmp_rational& operator = (double d)
+   {
+      mpq_set_d(m_data, d);
+      return *this;
+   }
+   gmp_rational& operator = (long double a)
+   {
+      using std::frexp;
+      using std::ldexp;
+      using std::floor;
+      using big_num_default_ops::add;
+      using big_num_default_ops::subtract;
+
+      if (a == 0) {
+         mpq_set_si(m_data, 0, 1);
+         return *this;
+      }
+
+      if (a == 1) {
+         mpq_set_si(m_data, 1, 1);
+         return *this;
+      }
+
+      BOOST_ASSERT(!(boost::math::isinf)(a));
+      BOOST_ASSERT(!(boost::math::isnan)(a));
+
+      int e;
+      long double f, term;
+      mpq_init(m_data);
+      mpq_set_ui(m_data, 0u, 1);
+      gmp_rational t;
+
+      f = frexp(a, &e);
+
+      static const int shift = std::numeric_limits<int>::digits - 1;
+
+      while(f)
+      {
+         // extract int sized bits from f:
+         f = ldexp(f, shift);
+         term = floor(f);
+         e -= shift;
+         mpq_mul_2exp(m_data, m_data, shift);
+         t = static_cast<long>(term);
+         add(*this, t);
+         f -= term;
+      }
+      if(e > 0)
+         mpq_mul_2exp(m_data, m_data, e);
+      else if(e < 0)
+         mpq_div_2exp(m_data, m_data, -e);
+      return *this;
+   }
+   gmp_rational& operator = (const char* s)
+   {
+      mpq_set_str(m_data, s, 10);
+      return *this;
+   }
+   void swap(gmp_rational& o)
+   {
+      mpq_swap(m_data, o.m_data);
+   }
+   std::string str(unsigned /*digits*/, bool /*scientific*/)const
+   {
+      void *(*alloc_func_ptr) (size_t);
+      void *(*realloc_func_ptr) (void *, size_t, size_t);
+      void (*free_func_ptr) (void *, size_t);
+      const char* ps = mpq_get_str (0, 10, m_data);
+      std::string s = ps;
+      mp_get_memory_functions(&alloc_func_ptr, &realloc_func_ptr, &free_func_ptr);
+      (*free_func_ptr)((void*)ps, std::strlen(ps) + 1);
+      return s;
+   }
+   ~gmp_rational()
+   {
+      mpq_clear(m_data);
+   }
+   void negate()
+   {
+      mpq_neg(m_data, m_data);
+   }
+   int compare(const gmp_rational& o)const
+   {
+      return mpq_cmp(m_data, o.m_data);
+   }
+   template <class V>
+   int compare(V v)const
+   {
+      gmp_rational d;
+      d = v;
+      return compare(d);
+   }
+   mpq_t& data() { return m_data; }
+   const mpq_t& data()const { return m_data; }
+protected:
+   mpq_t m_data;
+};
+
+inline void add(gmp_rational& t, const gmp_rational& o)
+{
+   mpq_add(t.data(), t.data(), o.data());
+}
+inline void subtract(gmp_rational& t, const gmp_rational& o)
+{
+   mpq_sub(t.data(), t.data(), o.data());
+}
+inline void multiply(gmp_rational& t, const gmp_rational& o)
+{
+   mpq_mul(t.data(), t.data(), o.data());
+}
+inline void divide(gmp_rational& t, const gmp_rational& o)
+{
+   mpq_div(t.data(), t.data(), o.data());
+}
+inline void add(gmp_rational& t, const gmp_rational& p, const gmp_rational& o)
+{
+   mpq_add(t.data(), p.data(), o.data());
+}
+inline void subtract(gmp_rational& t, const gmp_rational& p, const gmp_rational& o)
+{
+   mpq_sub(t.data(), p.data(), o.data());
+}
+inline void multiply(gmp_rational& t, const gmp_rational& p, const gmp_rational& o)
+{
+   mpq_mul(t.data(), p.data(), o.data());
+}
+inline void divide(gmp_rational& t, const gmp_rational& p, const gmp_rational& o)
+{
+   mpq_div(t.data(), p.data(), o.data());
+}
+   
+inline bool is_zero(const gmp_rational& val)
+{
+   return mpq_sgn(val.data()) == 0;
+}
+inline int get_sign(const gmp_rational& val)
+{
+   return mpq_sgn(val.data());
+}
+inline void convert_to(double* result, const gmp_rational& val)
+{
+   *result = mpq_get_d(val.data());
+}
+
+inline void eval_abs(gmp_rational& result, const gmp_rational& val)
+{
+   mpq_abs(result.data(), val.data());
+}
+
 template<>
 struct is_extended_integer<gmp_int> : public mpl::true_ {};
 
@@ -1083,6 +1291,7 @@ typedef big_number<gmp_real<500> >   mpf_real_500;
 typedef big_number<gmp_real<1000> >  mpf_real_1000;
 typedef big_number<gmp_real<0> >     mpf_real;
 typedef big_number<gmp_int >         mpz_int;
+typedef big_number<gmp_rational >    mpq_rational;
 
 }}  // namespaces
 
