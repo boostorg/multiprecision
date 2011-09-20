@@ -224,7 +224,6 @@ public:
    //
    big_number& operator++()
    {
-      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The increment operation is only valid for integer types");
       using big_num_default_ops::increment;
       increment(m_backend);
       return *this;
@@ -232,7 +231,6 @@ public:
 
    big_number& operator--()
    {
-      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The increment operation is only valid for integer types");
       using big_num_default_ops::decrement;
       decrement(m_backend);
       return *this;
@@ -240,7 +238,6 @@ public:
 
    big_number operator++(int)
    {
-      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The increment operation is only valid for integer types");
       using big_num_default_ops::increment;
       self_type temp(*this);
       increment(m_backend);
@@ -249,7 +246,6 @@ public:
 
    big_number operator--(int)
    {
-      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The increment operation is only valid for integer types");
       using big_num_default_ops::decrement;
       self_type temp(*this);
       decrement(m_backend);
@@ -439,6 +435,8 @@ public:
    template <class V>
    typename enable_if<is_arithmetic<V>, int>::type compare(const V& o)const
    {
+      if(o == 0)
+         return get_sign(m_backend);
       return m_backend.compare(canonical_value(o));
    }
    Backend& backend()
@@ -1380,6 +1378,7 @@ private:
    static const Backend& canonical_value(const self_type& v){  return v.m_backend;  }
    static const Backend& canonical_value(const self_type* v){  return v->m_backend;  }
    static const Backend& canonical_value(self_type* v){  return v->m_backend;  }
+   static const Backend& canonical_value(self_type& v){  return v.m_backend;  }
    template <class V>
    static typename detail::canonical<V, Backend>::type canonical_value(const V& v){  return v;  }
    static typename detail::canonical<std::string, Backend>::type canonical_value(const std::string& v){  return v.c_str();  }

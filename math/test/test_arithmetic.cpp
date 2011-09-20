@@ -345,6 +345,18 @@ void test_negative_mixed(boost::mpl::true_ const&)
    Num n3 = 0;
    Num n4 = -20;
    Num n5 = -8;
+   BOOST_TEST((Real(n2) < 0) == true);
+   BOOST_TEST((Real(n2) <= 0) == true);
+   BOOST_TEST((Real(n2) > 0) == false);
+   BOOST_TEST((Real(n2) >= 0) == false);
+   BOOST_TEST((Real(n2) == 0) == false);
+   BOOST_TEST((Real(n2) != 0) == true);
+   BOOST_TEST((Real(n2) == n2) == true);
+   BOOST_TEST((Real(n2) != n2) == false);
+   BOOST_TEST((Real(n2) >= n2) == true);
+   BOOST_TEST((Real(n2) <= n2) == true);
+   BOOST_TEST((Real(n2) > n2) == false);
+   BOOST_TEST((Real(n2) < n2) == false);
    // Default construct:
    BOOST_TEST(Real(n1) == n1);
    BOOST_TEST(Real(n2) == n2);
@@ -425,6 +437,18 @@ void test_mixed()
    Num n3 = 0;
    Num n4 = 20;
    Num n5 = 8;
+   BOOST_TEST((Real(n2) < 0) == false);
+   BOOST_TEST((Real(n2) <= 0) == false);
+   BOOST_TEST((Real(n2) > 0) == true);
+   BOOST_TEST((Real(n2) >= 0) == true);
+   BOOST_TEST((Real(n2) == 0) == false);
+   BOOST_TEST((Real(n2) != 0) == true);
+   BOOST_TEST((Real(n2) == n2) == true);
+   BOOST_TEST((Real(n2) != n2) == false);
+   BOOST_TEST((Real(n2) >= n2) == true);
+   BOOST_TEST((Real(n2) <= n2) == true);
+   BOOST_TEST((Real(n2) > n2) == false);
+   BOOST_TEST((Real(n2) < n2) == false);
    // Default construct:
    BOOST_TEST(Real(n1) == n1);
    BOOST_TEST(Real(n2) == n2);

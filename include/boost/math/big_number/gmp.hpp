@@ -1225,6 +1225,14 @@ struct gmp_rational
       d = v;
       return compare(d);
    }
+   int compare(unsigned long v)
+   {
+      return mpq_cmp_ui(m_data, v, 1);
+   }
+   int compare(long v)
+   {
+      return mpq_cmp_si(m_data, v, 1);
+   }
    mpq_t& data() { return m_data; }
    const mpq_t& data()const { return m_data; }
 protected:
@@ -1275,6 +1283,20 @@ inline int get_sign(const gmp_rational& val)
 inline void convert_to(double* result, const gmp_rational& val)
 {
    *result = mpq_get_d(val.data());
+}
+
+inline void convert_to(long* result, const gmp_rational& val)
+{
+   double r;
+   convert_to(&r, val);
+   *result = r;
+}
+
+inline void convert_to(unsigned long* result, const gmp_rational& val)
+{
+   double r;
+   convert_to(&r, val);
+   *result = r;
 }
 
 inline void eval_abs(gmp_rational& result, const gmp_rational& val)

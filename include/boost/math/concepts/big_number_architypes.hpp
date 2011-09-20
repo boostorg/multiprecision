@@ -188,6 +188,71 @@ inline int eval_fpclassify(const big_number_backend_real_architype& arg)
    return boost::math::fpclassify(arg.m_value);
 }
 
+inline void eval_pow(big_number_backend_real_architype& result, const big_number_backend_real_architype& b, const big_number_backend_real_architype& e)
+{
+   result = std::pow(b.m_value, e.m_value);
+}
+
+inline void eval_pow(big_number_backend_real_architype& result, const big_number_backend_real_architype& b, int e)
+{
+   result = std::pow(b.m_value, e);
+}
+
+inline void eval_exp(big_number_backend_real_architype& result, const big_number_backend_real_architype& arg)
+{
+   result = std::exp(arg.m_value);
+}
+
+inline void eval_log(big_number_backend_real_architype& result, const big_number_backend_real_architype& arg)
+{
+   result = std::log(arg.m_value);
+}
+
+inline void eval_sin(big_number_backend_real_architype& result, const big_number_backend_real_architype& arg)
+{
+   result = std::sin(arg.m_value);
+}
+
+inline void eval_cos(big_number_backend_real_architype& result, const big_number_backend_real_architype& arg)
+{
+   result = std::cos(arg.m_value);
+}
+
+inline void eval_tan(big_number_backend_real_architype& result, const big_number_backend_real_architype& arg)
+{
+   result = std::tan(arg.m_value);
+}
+
+inline void eval_asin(big_number_backend_real_architype& result, const big_number_backend_real_architype& arg)
+{
+   result = std::asin(arg.m_value);
+}
+
+inline void eval_acos(big_number_backend_real_architype& result, const big_number_backend_real_architype& arg)
+{
+   result = std::acos(arg.m_value);
+}
+
+inline void eval_atan(big_number_backend_real_architype& result, const big_number_backend_real_architype& arg)
+{
+   result = std::atan(arg.m_value);
+}
+
+inline void eval_sinh(big_number_backend_real_architype& result, const big_number_backend_real_architype& arg)
+{
+   result = std::sinh(arg.m_value);
+}
+
+inline void eval_cosh(big_number_backend_real_architype& result, const big_number_backend_real_architype& arg)
+{
+   result = std::cosh(arg.m_value);
+}
+
+inline void eval_tanh(big_number_backend_real_architype& result, const big_number_backend_real_architype& arg)
+{
+   result = std::tanh(arg.m_value);
+}
+
 typedef boost::math::big_number<big_number_backend_real_architype> big_number_real_architype;
 
 }}} // namespaces

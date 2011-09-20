@@ -328,7 +328,7 @@ inline void convert_to(terminal<R>* result, const B& backend)
 // Functions:
 //
 template <class T>
-void eval_abs(T* result, const T& arg)
+void eval_abs(T& result, const T& arg)
 {
    typedef typename T::signed_types type_list;
    typedef typename mpl::front<type_list>::type front;
@@ -337,7 +337,7 @@ void eval_abs(T* result, const T& arg)
       result->negate();
 }
 template <class T>
-void eval_fabs(T* result, const T& arg)
+void eval_fabs(T& result, const T& arg)
 {
    typedef typename T::signed_types type_list;
    typedef typename mpl::front<type_list>::type front;
@@ -351,6 +351,26 @@ inline int eval_fpclassify(const Backend& arg)
 {
    return is_zero(arg) ? FP_ZERO : FP_NORMAL;
 }
+
+template <class T>
+inline void eval_fmod(T& result, const T& a, const T& b)
+{
+   if((&result == &a) || (&result == &b))
+   {
+      T temp;
+      eval_fmod(temp, a, b);
+      result = temp;
+   }
+   T n;
+   divide(result, a, b);
+   if(get_sign(a) < 0)
+      eval_ceil(n, result);
+   else
+      eval_floor(n, result);
+   multiply(n, b);
+   subtract(result, a, n);
+}
+
 //
 // These have to implemented by the backend, declared here so that our macro generated code compiles OK.
 //
@@ -828,6 +848,7 @@ UNARY_OP_FUNCTOR(tanh)
 HETERO_BINARY_OP_FUNCTOR(ldexp, int)
 HETERO_BINARY_OP_FUNCTOR(frexp, int*)
 BINARY_OP_FUNCTOR(pow)
+BINARY_OP_FUNCTOR(fmod)
 
 #undef BINARY_OP_FUNCTOR
 #undef UNARY_OP_FUNCTOR

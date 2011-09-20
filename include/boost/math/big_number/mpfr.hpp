@@ -10,6 +10,7 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/math/bindings/detail/big_lanczos.hpp>
 #include <mpfr.h>
 #include <cmath>
 #include <algorithm>
@@ -738,6 +739,29 @@ typedef big_number<mpfr_real_backend<100> >   mpfr_real_100;
 typedef big_number<mpfr_real_backend<500> >   mpfr_real_500;
 typedef big_number<mpfr_real_backend<1000> >  mpfr_real_1000;
 typedef big_number<mpfr_real_backend<0> >     mpfr_real;
+
+namespace lanczos{
+
+template<unsigned Digits10, class Policy>
+struct lanczos<big_number<mpfr_real_backend<Digits10> >, Policy>
+{
+   typedef typename mpl::if_c<
+      Digits10 <= 36,
+      lanczos22UDT,
+      typename mpl::if_c<
+         Digits10 <= 50,
+         lanczos31UDT,
+         typename mpl::if_c<
+            Digits10 <= 110,
+            lanczos61UDT,
+            undefined_lanczos
+         >::type
+      >::type
+   >::type type;
+};
+
+} // namespace lanczos
+
 
 }}  // namespaces
 
