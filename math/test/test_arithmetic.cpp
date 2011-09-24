@@ -53,11 +53,11 @@
       BOOST_LIGHTWEIGHT_TEST_OSTREAM << e.what() << std::endl;\
    }
 
-template <class Real>
-void test_integer_ops(const boost::mpl::false_&){}
+template <class Real, unsigned N>
+void test_integer_ops(const boost::mpl::int_<N>&){}
 
 template <class Real>
-void test_integer_ops(const boost::mpl::true_&)
+void test_integer_ops(const boost::mpl::int_<boost::math::number_kind_integer>&)
 {
    Real a(20);
    Real b(7);
@@ -236,7 +236,6 @@ void test_integer_ops(const boost::mpl::true_&)
    BOOST_TEST(c == (i & ~j));
    c = ~(a | b);
    BOOST_TEST(c == ~(i | j));
-
    //
    // Non-member functions:
    //
@@ -250,11 +249,11 @@ void test_integer_ops(const boost::mpl::true_&)
    BOOST_TEST(abs(+a) == 20);
 }
 
-template <class Real>
-void test_real_ops(const boost::mpl::false_&){}
+template <class Real, unsigned N>
+void test_real_ops(const boost::mpl::int_<N>&){}
 
 template <class Real>
-void test_real_ops(const boost::mpl::true_&)
+void test_real_ops(const boost::mpl::int_<boost::math::number_kind_floating_point>&)
 {
 #if defined(TEST_MPF) || defined(TEST_MPF_50) || defined(TEST_BACKEND) || defined(TEST_MPFR)
    BOOST_TEST(abs(Real(2)) == 2);
@@ -501,7 +500,6 @@ void test_mixed()
    BOOST_TEST(Real(r / n5) == n1 / n5);
    r /= n5;
    BOOST_TEST(r == n1 / n5);
-
    //
    // special cases for full coverage:
    //
@@ -513,7 +511,6 @@ void test_mixed()
    BOOST_TEST(r == n4 * n5);
    r = (4 * n4) / Real(4);
    BOOST_TEST(r == n4);
-
    test_negative_mixed<Real, Num>(boost::mpl::bool_<std::numeric_limits<Num>::is_signed>());
 }
 
@@ -541,11 +538,11 @@ void test()
    //
    // Integer only functions:
    //
-   test_integer_ops<Real>(boost::math::is_extended_integer<Real>());
+   test_integer_ops<Real>(boost::math::number_category<Real>());
    //
    // Real number only functions:
    //
-   test_real_ops<Real>(boost::mpl::bool_<false == boost::math::is_extended_integer<Real>::value >());
+   test_real_ops<Real>(boost::math::number_category<Real>());
    //
    // Test basic arithmetic:
    //
@@ -565,14 +562,12 @@ void test()
    BOOST_TEST(a / b == 8);
    a /= b;
    BOOST_TEST(a == 8);
-
    Real ac(a);
    BOOST_TEST(ac == a);
    BOOST_TEST(-a == -8);
-
    ac = a * c;
    BOOST_TEST(ac == 8*500L);
-   
+   ac = 8*500L;
    ac = ac + b + c;
    BOOST_TEST(ac == 8*500L+64+500);
    ac = a;
@@ -639,10 +634,6 @@ void test()
    ac = a * ac;
    BOOST_TEST(ac == 8*8);
    ac = a;
-#ifndef TEST_E_FLOAT
-   ac = ac + "8";
-   BOOST_TEST(ac == 16);
-#endif
    ac = a;
    ac += +a;
    BOOST_TEST(ac == 16);
@@ -656,10 +647,6 @@ void test()
    ac += b*c;
    BOOST_TEST(ac == 8 + 64 * 500);
    ac = a;
-#ifndef TEST_E_FLOAT
-   ac = ac - "8";
-   BOOST_TEST(ac == 0);
-#endif
    ac = a;
    ac -= +a;
    BOOST_TEST(ac == 0);
@@ -678,12 +665,7 @@ void test()
    ac = a;
    ac -= ac * b;
    BOOST_TEST(ac == 8 - 8 * 64);
-#ifndef TEST_E_FLOAT
-   ac = a * "8";
-   BOOST_TEST(ac == 64);
-#else
    ac = a * 8;
-#endif
    ac *= +a;
    BOOST_TEST(ac == 64 * 8);
    ac = a;
@@ -698,10 +680,6 @@ void test()
    ac = a;
    ac *= b + c;
    BOOST_TEST(ac == 8 * (64 + 500));
-#ifndef TEST_E_FLOAT
-   ac = b / "8";
-   BOOST_TEST(ac == 8);
-#endif
    ac = b;
    ac /= +a;
    BOOST_TEST(ac == 8);
@@ -714,10 +692,6 @@ void test()
    ac = b;
    ac /= a + Real(0);
    BOOST_TEST(ac == 8);
-#ifndef TEST_E_FLOAT
-   ac = a + std::string("8");
-   BOOST_TEST(ac == 16);
-#endif
    //
    // simple tests with immediate values, these calls can be optimised in many backends:
    //

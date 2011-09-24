@@ -10,6 +10,8 @@
 #include <boost/math/big_number/big_number_base.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/utility/enable_if.hpp>
+#include <boost/mpl/front.hpp>
 
 namespace boost{ namespace math{ namespace big_num_default_ops{
 
@@ -418,16 +420,8 @@ typename enable_if_c<sizeof(T) == 0>::type eval_tanh();
 
 }
 
-
 template <class Backend>
 class big_number;
-
-namespace detail{
-
-template<typename Expr>
-struct big_number_exp;
-
-}
 
 //
 // Default versions of floating point classification routines:
@@ -438,10 +432,10 @@ inline int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(const big_number<Backend>
    using big_num_default_ops::eval_fpclassify;
    return eval_fpclassify(arg.backend());
 }
-template <class Exp>
-inline int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(const detail::big_number_exp<Exp>& arg)
+template <class tag, class A1, class A2, class A3>
+inline int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(const detail::big_number_exp<tag, A1, A2, A3>& arg)
 {
-   typedef typename detail::expression_type<Exp>::type value_type;
+   typedef typename detail::big_number_exp<tag, A1, A2, A3>::result_type value_type;
    return fpclassify(value_type(arg));
 }
 template <class Backend>
@@ -450,10 +444,10 @@ inline bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(const big_number<Backend>&
    int v = fpclassify(arg);
    return (v != FP_INFINITE) && (v != FP_NAN);
 }
-template <class Exp>
-inline bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(const detail::big_number_exp<Exp>& arg)
+template <class tag, class A1, class A2, class A3>
+inline bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(const detail::big_number_exp<tag, A1, A2, A3>& arg)
 {
-   typedef typename detail::expression_type<Exp>::type value_type;
+   typedef typename detail::big_number_exp<tag, A1, A2, A3>::result_type value_type;
    return isfinite(value_type(arg));
 }
 template <class Backend>
@@ -461,10 +455,10 @@ inline bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION(const big_number<Backend>& ar
 {
    return fpclassify(arg) == FP_NAN;
 }
-template <class Exp>
-inline bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION(const detail::big_number_exp<Exp>& arg)
+template <class tag, class A1, class A2, class A3>
+inline bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION(const detail::big_number_exp<tag, A1, A2, A3>& arg)
 {
-   typedef typename detail::expression_type<Exp>::type value_type;
+   typedef typename detail::big_number_exp<tag, A1, A2, A3>::result_type value_type;
    return isnan(value_type(arg));
 }
 template <class Backend>
@@ -472,10 +466,10 @@ inline bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION(const big_number<Backend>& ar
 {
    return fpclassify(arg) == FP_INFINITE;
 }
-template <class Exp>
-inline bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION(const detail::big_number_exp<Exp>& arg)
+template <class tag, class A1, class A2, class A3>
+inline bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION(const detail::big_number_exp<tag, A1, A2, A3>& arg)
 {
-   typedef typename detail::expression_type<Exp>::type value_type;
+   typedef typename detail::big_number_exp<tag, A1, A2, A3>::result_type value_type;
    return isinf(value_type(arg));
 }
 template <class Backend>
@@ -483,17 +477,17 @@ inline bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(const big_number<Backend>&
 {
    return fpclassify(arg) == FP_NORMAL;
 }
-template <class Exp>
-inline bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(const detail::big_number_exp<Exp>& arg)
+template <class tag, class A1, class A2, class A3>
+inline bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(const detail::big_number_exp<tag, A1, A2, A3>& arg)
 {
-   typedef typename detail::expression_type<Exp>::type value_type;
+   typedef typename detail::big_number_exp<tag, A1, A2, A3>::result_type value_type;
    return isnormal(value_type(arg));
 }
 
-template <class Exp, class Policy>
-inline int itrunc(const detail::big_number_exp<Exp>& v, const Policy& pol)
+template <class tag, class A1, class A2, class A3, class Policy>
+inline int itrunc(const detail::big_number_exp<tag, A1, A2, A3>& v, const Policy& pol)
 {
-   typedef typename detail::expression_type<Exp>::type number_type;
+   typedef typename detail::big_number_exp<tag, A1, A2, A3>::result_type number_type;
    number_type r = trunc(v, pol);
    if(fabs(r) > (std::numeric_limits<int>::max)())
       return policies::raise_rounding_error("boost::math::itrunc<%1%>(%1%)", 0, v, 0, pol).template convert_to<int>();
@@ -641,30 +635,38 @@ struct BOOST_JOIN(func, _funct)\
 \
 }\
 \
-template <class Exp> \
-typename proto::result_of::make_expr<\
-    proto::tag::function\
-  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<Exp>::type> \
-  , detail::big_number_exp<Exp> \
->::type const \
-func(const detail::big_number_exp<Exp>& arg)\
+template <class tag, class A1, class A2, class A3> \
+detail::big_number_exp<\
+    detail::function\
+  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::big_number_exp<tag, A1, A2, A3> >::type> \
+  , detail::big_number_exp<tag, A1, A2, A3> \
+> \
+func(const detail::big_number_exp<tag, A1, A2, A3>& arg)\
 {\
-    return proto::make_expr<proto::tag::function>(\
-        detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<Exp>::type>() \
+    return detail::big_number_exp<\
+    detail::function\
+  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::big_number_exp<tag, A1, A2, A3> >::type> \
+  , detail::big_number_exp<tag, A1, A2, A3> \
+> (\
+        detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::big_number_exp<tag, A1, A2, A3> >::type>() \
       , arg   \
     );\
 }\
 template <class Backend> \
-typename proto::result_of::make_expr<\
-    proto::tag::function\
+detail::big_number_exp<\
+    detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
-  , detail::big_number_exp<typename proto::terminal<big_number<Backend>*>::type> \
->::type const \
+  , big_number<Backend>\
+> \
 func(const big_number<Backend>& arg)\
 {\
-    return proto::make_expr<proto::tag::function>(\
+    return detail::big_number_exp<\
+    detail::function\
+  , detail::BOOST_JOIN(func, _funct)<Backend> \
+  , big_number<Backend>\
+  >(\
         detail::BOOST_JOIN(func, _funct)<Backend>() \
-      , static_cast<const detail::big_number_exp<typename proto::terminal<big_number<Backend>*>::type>&>(arg)   \
+      , arg   \
     );\
 }
 
@@ -688,61 +690,81 @@ struct BOOST_JOIN(func, _funct)\
 \
 }\
 template <class Backend> \
-typename proto::result_of::make_expr<\
-    proto::tag::function\
+detail::big_number_exp<\
+    detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
-  , detail::big_number_exp<typename proto::terminal<big_number<Backend>*>::type> \
-  , detail::big_number_exp<typename proto::terminal<big_number<Backend>*>::type> \
->::type const \
+  , big_number<Backend> \
+  , big_number<Backend> \
+> \
 func(const big_number<Backend>& arg, const big_number<Backend>& a)\
 {\
-    return proto::make_expr<proto::tag::function>(\
-        detail::BOOST_JOIN(func, _funct)<Backend>() \
-      , static_cast<const detail::big_number_exp<typename proto::terminal<big_number<Backend>*>::type>&>(arg),\
-      static_cast<const detail::big_number_exp<typename proto::terminal<big_number<Backend>*>::type>&>(a)\
-    );\
-}\
-template <class Backend, class Exp> \
-typename proto::result_of::make_expr<\
-    proto::tag::function\
+    return detail::big_number_exp<\
+    detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
-  , detail::big_number_exp<typename proto::terminal<big_number<Backend>*>::type> \
-  , detail::big_number_exp<Exp> \
->::type const \
-func(const big_number<Backend>& arg, const detail::big_number_exp<Exp>& a)\
-{\
-    return proto::make_expr<proto::tag::function>(\
+  , big_number<Backend> \
+  , big_number<Backend> \
+  >(\
         detail::BOOST_JOIN(func, _funct)<Backend>() \
-      , static_cast<const detail::big_number_exp<typename proto::terminal<big_number<Backend>*>::type>&>(arg),\
+      , arg,\
       a\
     );\
 }\
-template <class Exp, class Backend> \
-typename proto::result_of::make_expr<\
-    proto::tag::function\
+template <class Backend, class tag, class A1, class A2, class A3> \
+detail::big_number_exp<\
+    detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
-  , detail::big_number_exp<Exp> \
-  , detail::big_number_exp<typename proto::terminal<big_number<Backend>*>::type > \
->::type const \
-func(const detail::big_number_exp<Exp>& arg, const big_number<Backend>& a)\
+  , big_number<Backend> \
+  , detail::big_number_exp<tag, A1, A2, A3> \
+> \
+func(const big_number<Backend>& arg, const detail::big_number_exp<tag, A1, A2, A3>& a)\
 {\
-    return proto::make_expr<proto::tag::function>(\
+    return detail::big_number_exp<\
+    detail::function\
+  , detail::BOOST_JOIN(func, _funct)<Backend> \
+  , big_number<Backend> \
+  , detail::big_number_exp<tag, A1, A2, A3> \
+  >(\
         detail::BOOST_JOIN(func, _funct)<Backend>() \
       , arg,\
-      static_cast<const detail::big_number_exp<typename proto::terminal<big_number<Backend>*>::type>&>(a)\
+      a\
     );\
 }\
-template <class Exp1, class Exp2> \
-typename proto::result_of::make_expr<\
-    proto::tag::function\
-  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<Exp1>::type> \
-  , detail::big_number_exp<Exp1> \
-  , detail::big_number_exp<Exp2> \
->::type const \
-func(const detail::big_number_exp<Exp1>& arg, const detail::big_number_exp<Exp2>& a)\
+template <class tag, class A1, class A2, class A3, class Backend> \
+detail::big_number_exp<\
+    detail::function\
+  , detail::BOOST_JOIN(func, _funct)<Backend> \
+  , detail::big_number_exp<tag, A1, A2, A3> \
+  , big_number<Backend>\
+>\
+func(const detail::big_number_exp<tag, A1, A2, A3>& arg, const big_number<Backend>& a)\
 {\
-    return proto::make_expr<proto::tag::function>(\
-        detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<Exp1>::type>() \
+    return detail::big_number_exp<\
+    detail::function\
+  , detail::BOOST_JOIN(func, _funct)<Backend> \
+  , detail::big_number_exp<tag, A1, A2, A3> \
+  , big_number<Backend>\
+  >(\
+        detail::BOOST_JOIN(func, _funct)<Backend>() \
+      , arg,\
+      a\
+    );\
+}\
+template <class tag, class A1, class A2, class A3, class tagb, class A1b, class A2b, class A3b> \
+detail::big_number_exp<\
+    detail::function\
+  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::big_number_exp<tag, A1, A2, A3> >::type> \
+  , detail::big_number_exp<tag, A1, A2, A3> \
+  , detail::big_number_exp<tagb, A1b, A2b, A3b> \
+>\
+func(const detail::big_number_exp<tag, A1, A2, A3>& arg, const detail::big_number_exp<tagb, A1b, A2b, A3b>& a)\
+{\
+    return detail::big_number_exp<\
+    detail::function\
+  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::big_number_exp<tag, A1, A2, A3> >::type> \
+  , detail::big_number_exp<tag, A1, A2, A3> \
+  , detail::big_number_exp<tagb, A1b, A2b, A3b> \
+  >(\
+        detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::big_number_exp<tag, A1, A2, A3> >::type>() \
       , arg,\
       a\
     );\
@@ -750,35 +772,47 @@ func(const detail::big_number_exp<Exp1>& arg, const detail::big_number_exp<Exp2>
 template <class Backend, class Arithmetic> \
 typename enable_if<\
    is_arithmetic<Arithmetic>,\
-   typename proto::result_of::make_expr<\
-    proto::tag::function\
+   detail::big_number_exp<\
+    detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
-  , detail::big_number_exp<typename proto::terminal<big_number<Backend>*>::type> \
-  , typename proto::result_of::as_child<const Arithmetic&>::type\
->::type>::type const \
+  , big_number<Backend>\
+  , Arithmetic\
+  > \
+>::type \
 func(const big_number<Backend>& arg, const Arithmetic& a)\
 {\
-    return proto::make_expr<proto::tag::function>(\
+    return detail::big_number_exp<\
+    detail::function\
+  , detail::BOOST_JOIN(func, _funct)<Backend> \
+  , big_number<Backend>\
+  , Arithmetic\
+  >(\
         detail::BOOST_JOIN(func, _funct)<Backend>() \
-      , static_cast<const detail::big_number_exp<typename proto::terminal<big_number<Backend>*>::type>&>(arg),\
-      proto::as_child(a)\
+      , arg,\
+      a\
     );\
 }\
-template <class Exp, class Arithmetic> \
+template <class tag, class A1, class A2, class A3, class Arithmetic> \
 typename enable_if<\
    is_arithmetic<Arithmetic>,\
-   typename proto::result_of::make_expr<\
-    proto::tag::function\
-  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<Exp>::type> \
-  , detail::big_number_exp<Exp> \
-  , typename proto::result_of::as_child<const Arithmetic&>::type\
->::type>::type const \
-func(const detail::big_number_exp<Exp>& arg, const Arithmetic& a)\
+   detail::big_number_exp<\
+    detail::function\
+  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::big_number_exp<tag, A1, A2, A3> >::type> \
+  , detail::big_number_exp<tag, A1, A2, A3> \
+  , Arithmetic\
+  > \
+>::type \
+func(const detail::big_number_exp<tag, A1, A2, A3>& arg, const Arithmetic& a)\
 {\
-    return proto::make_expr<proto::tag::function>(\
-        detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<Exp>::type>() \
+    return detail::big_number_exp<\
+    detail::function\
+  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::big_number_exp<tag, A1, A2, A3> >::type> \
+  , detail::big_number_exp<tag, A1, A2, A3> \
+  , Arithmetic\
+   >(\
+        detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::big_number_exp<tag, A1, A2, A3> >::type>() \
       , arg,\
-      proto::as_child(a)\
+      a\
     );\
 }\
 
@@ -797,33 +831,43 @@ struct BOOST_JOIN(func, _funct)\
 \
 }\
 \
-template <class Exp> \
-typename proto::result_of::make_expr<\
-    proto::tag::function\
-  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<Exp>::type> \
-  , detail::big_number_exp<Exp> \
-  , typename proto::result_of::as_child<Arg2>::type \
->::type const \
-func(const detail::big_number_exp<Exp>& arg, Arg2 const& a)\
+template <class tag, class A1, class A2, class A3> \
+detail::big_number_exp<\
+    detail::function\
+  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::big_number_exp<tag, A1, A2, A3> >::type> \
+  , detail::big_number_exp<tag, A1, A2, A3> \
+  , Arg2\
+>\
+func(const detail::big_number_exp<tag, A1, A2, A3>& arg, Arg2 const& a)\
 {\
-    return proto::make_expr<proto::tag::function>(\
-        detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<Exp>::type>() \
-      , arg, proto::as_child(a)   \
+    return detail::big_number_exp<\
+    detail::function\
+  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::big_number_exp<tag, A1, A2, A3> >::type> \
+  , detail::big_number_exp<tag, A1, A2, A3> \
+  , Arg2\
+   >(\
+        detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::big_number_exp<tag, A1, A2, A3> >::type>() \
+      , arg, a   \
     );\
 }\
 template <class Backend> \
-typename proto::result_of::make_expr<\
-    proto::tag::function\
+detail::big_number_exp<\
+    detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
-  , detail::big_number_exp<typename proto::terminal<big_number<Backend>*>::type> \
-  , typename proto::result_of::as_child<Arg2 const>::type \
->::type const \
+  , big_number<Backend>\
+  , Arg2\
+>\
 func(const big_number<Backend>& arg, Arg2 const& a)\
 {\
-    return proto::make_expr<proto::tag::function>(\
+    return detail::big_number_exp<\
+    detail::function\
+  , detail::BOOST_JOIN(func, _funct)<Backend> \
+  , big_number<Backend>\
+  , Arg2\
+  >(\
         detail::BOOST_JOIN(func, _funct)<Backend>() \
-      , static_cast<const detail::big_number_exp<typename proto::terminal<big_number<Backend>*>::type>&>(arg),\
-      proto::as_child(a)\
+      , arg,\
+      a\
     );\
 }\
 

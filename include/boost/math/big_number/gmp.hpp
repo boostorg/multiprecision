@@ -1305,7 +1305,9 @@ inline void eval_abs(gmp_rational& result, const gmp_rational& val)
 }
 
 template<>
-struct is_extended_integer<gmp_int> : public mpl::true_ {};
+struct number_category<gmp_int> : public mpl::int_<number_kind_integer>{};
+template<>
+struct number_category<gmp_rational> : public mpl::int_<number_kind_rational>{};
 
 typedef big_number<gmp_real<50> >    mpf_real_50;
 typedef big_number<gmp_real<100> >   mpf_real_100;

@@ -6,7 +6,6 @@
 #ifndef BOOST_MATH_EXTENDED_REAL_HPP
 #define BOOST_MATH_EXTENDED_REAL_HPP
 
-#include <boost/proto/proto.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/mpl/max.hpp>
 #include <boost/mpl/plus.hpp>
@@ -25,54 +24,33 @@
 namespace boost{ namespace math{
 
 template <class Backend>
-class big_number : public detail::big_number_exp<typename proto::terminal<big_number<Backend>*>::type >
+class big_number
 {
-   typedef detail::big_number_exp<typename proto::terminal<big_number<Backend>*>::type > base_type;
    typedef big_number<Backend> self_type;
 public:
-   big_number()
-   {
-      proto::value(*this) = this;
-      BOOST_ASSERT(proto::value(*this) == this);
-   }
-   big_number(const big_number& e) : m_backend(e.m_backend)
-   {
-      proto::value(*this) = this;
-      BOOST_ASSERT(proto::value(*this) == this);
-   }
+   big_number(){}
+   big_number(const big_number& e) : m_backend(e.m_backend){}
    template <class V>
    big_number(V v, typename enable_if<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > >::type* dummy1 = 0)
    {
-      proto::value(*this) = this;
-      BOOST_ASSERT(proto::value(*this) == this);
       m_backend = canonical_value(v);
    }
-   big_number(const big_number& e, unsigned digits10) : m_backend(e.m_backend, digits10)
-   {
-      proto::value(*this) = this;
-      BOOST_ASSERT(proto::value(*this) == this);
-   }
+   big_number(const big_number& e, unsigned digits10) : m_backend(e.m_backend, digits10){}
    template <class V>
    big_number(V v, unsigned digits10, typename enable_if<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > >::type* dummy1 = 0)
-      : base_type(digits10)
    {
-      proto::value(*this) = this;
-      BOOST_ASSERT(proto::value(*this) == this);
+      m_backend.precision(digits10);
       m_backend = canonical_value(v);
    }
 
    template <class V>
    big_number(V v, typename enable_if<mpl::and_<is_convertible<V, Backend>, mpl::not_<boost::is_arithmetic<V> > > >::type* dummy1 = 0)
-      : m_backend(v)
-   {
-      proto::value(*this) = this;
-      BOOST_ASSERT(proto::value(*this) == this);
-   }
+      : m_backend(v){}
 
-   template <class Exp>
-   big_number& operator=(const detail::big_number_exp<Exp>& e)
+   template <class tag, class Arg1, class Arg2, class Arg3>
+   big_number& operator=(const detail::big_number_exp<tag, Arg1, Arg2, Arg3>& e)
    {
-      do_assign(e, typename detail::assign_and_eval<Exp>::type());
+      do_assign(e, tag());
       return *this;
    }
 
@@ -90,20 +68,14 @@ public:
       return *this;
    }
 
-   template <class Exp>
-   big_number(const detail::big_number_exp<Exp>& e)
+   template <class tag, class Arg1, class Arg2, class Arg3>
+   big_number(const detail::big_number_exp<tag, Arg1, Arg2, Arg3>& e)
    {
-      proto::value(*this) = this;
-      BOOST_ASSERT(proto::value(*this) == this);
-      do_assign(e, typename detail::assign_and_eval<Exp>::type());
+      do_assign(e, tag());
    }
 
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   big_number(big_number&& r) : m_backend(r.m_backend)
-   {
-      proto::value(*this) = this;
-      BOOST_ASSERT(proto::value(*this) == this);
-   }
+   big_number(big_number&& r) : m_backend(r.m_backend){}
    big_number& operator=(big_number&& r)
    {
       m_backend.swap(r.m_backend);
@@ -111,19 +83,25 @@ public:
    }
 #endif
 
-   template <class Exp>
-   big_number& operator+=(const detail::big_number_exp<Exp>& e)
+   big_number& operator+=(const self_type& val)
+   {
+      do_add(detail::big_number_exp<detail::terminal, self_type>(val), detail::terminal());
+      return *this;
+   }
+
+   template <class tag, class Arg1, class Arg2, class Arg3>
+   big_number& operator+=(const detail::big_number_exp<tag, Arg1, Arg2, Arg3>& e)
    {
       // Create a copy if e contains this, but not if we're just doing a
       //    x *= x
       if(contains_self(e) && !is_self(e))
       {
          self_type temp(e);
-         do_add(temp, typename proto::tag_of<self_type>::type());
+         do_add(detail::big_number_exp<detail::terminal, self_type>(temp), detail::terminal());
       }
       else
       {
-         do_add(e, typename proto::tag_of<Exp>::type());
+         do_add(e, tag());
       }
       return *this;
    }
@@ -137,6 +115,12 @@ public:
       return *this;
    }
 
+   big_number& operator-=(const self_type& val)
+   {
+      do_subtract(detail::big_number_exp<detail::terminal, self_type>(val), detail::terminal());
+      return *this;
+   }
+
    template <class Exp>
    big_number& operator-=(const detail::big_number_exp<Exp>& e)
    {
@@ -144,11 +128,11 @@ public:
       if(contains_self(e))
       {
          self_type temp(e);
-         do_subtract(temp, typename proto::tag_of<self_type>::type());
+         do_subtract(temp, typename detail_of<self_type>::type());
       }
       else
       {
-         do_subtract(e, typename proto::tag_of<Exp>::type());
+         do_subtract(e, typename Exp::tag_type());
       }
       return *this;
    }
@@ -162,6 +146,13 @@ public:
       return *this;
    }
 
+
+   big_number& operator *= (const self_type& e)
+   {
+      do_multiplies(detail::big_number_exp<detail::terminal, self_type>(e), detail::terminal());
+      return *this;
+   }
+
    template <class Exp>
    big_number& operator*=(const detail::big_number_exp<Exp>& e)
    {
@@ -170,11 +161,11 @@ public:
       if(contains_self(e) && !is_self(e))
       {
          self_type temp(e);
-         do_multiplies(temp, typename proto::tag_of<self_type>::type());
+         do_multiplies(detail::big_number_exp<detail::terminal, self_type>(temp), detail::terminal());
       }
       else
       {
-         do_multiplies(e, typename proto::tag_of<Exp>::type());
+         do_multiplies(e, typename Exp::tag_type());
       }
       return *this;
    }
@@ -188,19 +179,25 @@ public:
       return *this;
    }
 
+   big_number& operator%=(const self_type& e)
+   {
+      BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
+      do_modulus(detail::big_number_exp<detail::terminal, self_type>(e), detail::terminal());
+      return *this;
+   }
    template <class Exp>
    big_number& operator%=(const detail::big_number_exp<Exp>& e)
    {
-      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The modulus operation is only valid for integer types");
+      BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
       // Create a temporary if the RHS references *this:
       if(contains_self(e))
       {
          self_type temp(e);
-         do_modulus(temp, typename proto::tag_of<self_type>::type());
+         do_modulus(temp, typename detail_of<self_type>::type());
       }
       else
       {
-         do_modulus(e, typename proto::tag_of<Exp>::type());
+         do_modulus(e, typename Exp::tag_type());
       }
       return *this;
    }
@@ -208,7 +205,7 @@ public:
    typename enable_if<boost::is_arithmetic<V>, big_number<Backend>& >::type 
       operator%=(const V& v)
    {
-      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The modulus operation is only valid for integer types");
+      BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
       using big_num_default_ops::modulus;
       modulus(m_backend, canonical_value(v));
       return *this;
@@ -255,7 +252,7 @@ public:
    template <class V>
    typename enable_if<is_integral<V>, big_number&>::type operator <<= (V val)
    {
-      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The left-shift operation is only valid for integer types");
+      BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The left-shift operation is only valid for integer types");
       check_shift_range(val, mpl::bool_<(sizeof(V) > sizeof(std::size_t))>(), is_signed<V>());
       left_shift(m_backend, canonical_value(val));
       return *this;
@@ -264,9 +261,15 @@ public:
    template <class V>
    typename enable_if<is_integral<V>, big_number&>::type operator >>= (V val)
    {
-      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The right-shift operation is only valid for integer types");
+      BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The right-shift operation is only valid for integer types");
       check_shift_range(val, mpl::bool_<(sizeof(V) > sizeof(std::size_t))>(), is_signed<V>());
       right_shift(m_backend, canonical_value(val));
+      return *this;
+   }
+
+   big_number& operator /= (const self_type& e)
+   {
+      do_divide(detail::big_number_exp<detail::terminal, self_type>(e), detail::terminal());
       return *this;
    }
 
@@ -277,11 +280,11 @@ public:
       if(contains_self(e))
       {
          self_type temp(e);
-         do_divide(temp, typename proto::tag_of<self_type>::type());
+         do_divide(detail::big_number_exp<detail::terminal, self_type>(temp), typename detail_of<self_type>::type());
       }
       else
       {
-         do_divide(e, typename proto::tag_of<Exp>::type());
+         do_divide(e, typename Exp::tag_type());
       }
       return *this;
    }
@@ -295,6 +298,12 @@ public:
       return *this;
    }
 
+   big_number& operator&=(const self_type& e)
+   {
+      do_bitwise_and(detail::big_number_exp<detail::terminal, self_type>(e), detail::terminal());
+      return *this;
+   }
+
    template <class Exp>
    big_number& operator&=(const detail::big_number_exp<Exp>& e)
    {
@@ -303,11 +312,11 @@ public:
       if(contains_self(e) && !is_self(e))
       {
          self_type temp(e);
-         do_bitwise_and(temp, typename proto::tag_of<self_type>::type());
+         do_bitwise_and(temp, typename detail_of<self_type>::type());
       }
       else
       {
-         do_bitwise_and(e, typename proto::tag_of<Exp>::type());
+         do_bitwise_and(e, typename Exp::tag_type());
       }
       return *this;
    }
@@ -321,6 +330,12 @@ public:
       return *this;
    }
 
+   big_number& operator|=(const self_type& e)
+   {
+      do_bitwise_or(detail::big_number_exp<detail::terminal, self_type>(e), detail::terminal());
+      return *this;
+   }
+
    template <class Exp>
    big_number& operator|=(const detail::big_number_exp<Exp>& e)
    {
@@ -329,11 +344,11 @@ public:
       if(contains_self(e) && !is_self(e))
       {
          self_type temp(e);
-         do_bitwise_or(temp, typename proto::tag_of<self_type>::type());
+         do_bitwise_or(temp, typename detail_of<self_type>::type());
       }
       else
       {
-         do_bitwise_or(e, typename proto::tag_of<Exp>::type());
+         do_bitwise_or(e, typename Exp::tag_type());
       }
       return *this;
    }
@@ -347,17 +362,23 @@ public:
       return *this;
    }
 
+   big_number& operator^=(const self_type& e)
+   {
+      do_bitwise_xor(detail::big_number_exp<detail::terminal, self_type>(e), detail::terminal());
+      return *this;
+   }
+
    template <class Exp>
    big_number& operator^=(const detail::big_number_exp<Exp>& e)
    {
       if(contains_self(e))
       {
          self_type temp(e);
-         do_bitwise_xor(temp, typename proto::tag_of<self_type>::type());
+         do_bitwise_xor(temp, typename detail_of<self_type>::type());
       }
       else
       {
-         do_bitwise_xor(e, typename proto::tag_of<Exp>::type());
+         do_bitwise_xor(e, typename Exp::tag_type());
       }
       return *this;
    }
@@ -370,6 +391,15 @@ public:
       bitwise_xor(m_backend, canonical_value(v));
       return *this;
    }
+   //
+   // Use in boolean context:
+   //
+   typedef bool (self_type::*unmentionable_type)()const;
+
+   operator unmentionable_type()const
+   {
+      return is_zero() ? 0 : &self_type::is_zero;
+   }
 
    //
    // swap:
@@ -381,12 +411,12 @@ public:
    //
    // Zero and sign:
    //
-   bool is_zero()
+   bool is_zero()const
    {
       using big_num_default_ops::is_zero;
       return is_zero(m_backend);
    }
-   int sign()
+   int sign()const
    {
       using big_num_default_ops::get_sign;
       return get_sign(m_backend);
@@ -435,6 +465,7 @@ public:
    template <class V>
    typename enable_if<is_arithmetic<V>, int>::type compare(const V& o)const
    {
+      using big_num_default_ops::get_sign;
       if(o == 0)
          return get_sign(m_backend);
       return m_backend.compare(canonical_value(o));
@@ -475,114 +506,99 @@ private:
    void do_assign(const Exp& e, const detail::add_immediates&)
    {
       using big_num_default_ops::add;
-      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
-      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
-      add(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
+      add(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
-
+/*
    template <class Exp>
    void do_assign(const Exp& e, const detail::add_and_negate_immediates&)
    {
       using big_num_default_ops::add;
-      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
-      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
-      add(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
+      add(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
       m_backend.negate();
    }
-
+*/
    template <class Exp>
    void do_assign(const Exp& e, const detail::subtract_immediates&)
    {
       using big_num_default_ops::subtract;
-      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
-      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
-      subtract(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
+      subtract(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
-
+   /*
    template <class Exp>
    void do_assign(const Exp& e, const detail::subtract_and_negate_immediates&)
    {
       using big_num_default_ops::subtract;
-      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
-      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
-      subtract(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
+      subtract(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
       m_backend.negate();
    }
-
+   */
    template <class Exp>
    void do_assign(const Exp& e, const detail::multiply_immediates&)
    {
       using big_num_default_ops::multiply;
-      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
-      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
-      multiply(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
-   }
-
-   template <class Exp>
-   void do_assign(const Exp& e, const detail::multiply_and_negate_immediates&)
-   {
-      using big_num_default_ops::multiply;
-      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
-      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
-      multiply(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
-      m_backend.negate();
+      multiply(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
 
    template <class Exp>
    void do_assign(const Exp& e, const detail::divide_immediates&)
    {
       using big_num_default_ops::divide;
-      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
-      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
-      divide(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
+      divide(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
+   }
+
+#if 0
+   template <class Exp>
+   void do_assign(const Exp& e, const detail::multiply_and_negate_immediates&)
+   {
+      using big_num_default_ops::multiply;
+      multiply(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
+      m_backend.negate();
    }
 
    template <class Exp>
    void do_assign(const Exp& e, const detail::divide_and_negate_immediates&)
    {
       using big_num_default_ops::divide;
-      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
-      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
-      divide(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
+      divide(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
       m_backend.negate();
    }
 
    template <class Exp>
-   void do_assign(const Exp& e, const proto::tag::unary_plus&)
+   void do_assign(const Exp& e, const detail::unary_plus&)
    {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      do_assign(proto::left(e), typename detail::assign_and_eval<left_type>::type());
+      typedef typename Exp::left_type left_type;
+      do_assign(e.left(), typename left_type::tag_type());
    }
 
+#endif
    template <class Exp>
-   void do_assign(const Exp& e, const proto::tag::negate&)
+   void do_assign(const Exp& e, const detail::negate&)
    {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      do_assign(proto::left(e), typename detail::assign_and_eval<left_type>::type());
+      typedef typename Exp::left_type left_type;
+      do_assign(e.left(), typename left_type::tag_type());
       m_backend.negate();
    }
-
    template <class Exp>
-   void do_assign(const Exp& e, const proto::tag::plus&)
+   void do_assign(const Exp& e, const detail::plus&)
    {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      typedef typename proto::result_of::right<Exp>::type right_type;
+      typedef typename Exp::left_type left_type;
+      typedef typename Exp::right_type right_type;
 
-      static int const left_depth = boost::result_of<detail::CalcDepth(left_type)>::type::value;
-      static int const right_depth = boost::result_of<detail::CalcDepth(right_type)>::type::value;
+      static int const left_depth = left_type::depth;
+      static int const right_depth = right_type::depth;
 
-      bool bl = contains_self(proto::left(e));
-      bool br = contains_self(proto::right(e));
+      bool bl = contains_self(e.left());
+      bool br = contains_self(e.right());
 
-      if(bl && is_self(proto::left(e)))
+      if(bl && is_self(e.left()))
       {
          // Ignore the left node, it's *this, just add the right:
-         do_add(proto::right(e), typename proto::tag_of<right_type>::type());
+         do_add(e.right(), typename right_type::tag_type());
       }
-      else if(br && is_self(proto::right(e)))
+      else if(br && is_self(e.right()))
       {
          // Ignore the right node, it's *this, just add the left:
-         do_add(proto::left(e), typename proto::tag_of<left_type>::type());
+         do_add(e.left(), typename left_type::tag_type());
       }
       else if(bl || br)
       {
@@ -591,36 +607,36 @@ private:
       }
       else if(left_depth >= right_depth)
       {
-         do_assign(proto::left(e), typename detail::assign_and_eval<left_type>::type());
-         do_add(proto::right(e), typename proto::tag_of<right_type>::type());
+         do_assign(e.left(), typename left_type::tag_type());
+         do_add(e.right(), typename right_type::tag_type());
       }
       else
       {
-         do_assign(proto::right(e), typename detail::assign_and_eval<right_type>::type());
-         do_add(proto::left(e), typename proto::tag_of<left_type>::type());
+         do_assign(e.right(), typename right_type::tag_type());
+         do_add(e.left(), typename left_type::tag_type());
       }
    }
    template <class Exp>
-   void do_assign(const Exp& e, const proto::tag::minus&)
+   void do_assign(const Exp& e, const detail::minus&)
    {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      typedef typename proto::result_of::right<Exp>::type right_type;
+      typedef typename Exp::left_type left_type;
+      typedef typename Exp::right_type right_type;
 
-      static int const left_depth = boost::result_of<detail::CalcDepth(left_type)>::type::value;
-      static int const right_depth = boost::result_of<detail::CalcDepth(right_type)>::type::value;
+      static int const left_depth = left_type::depth;
+      static int const right_depth = right_type::depth;
 
-      bool bl = contains_self(proto::left(e));
-      bool br = contains_self(proto::right(e));
+      bool bl = contains_self(e.left());
+      bool br = contains_self(e.right());
 
-      if(bl && is_self(proto::left(e)))
+      if(bl && is_self(e.left()))
       {
          // Ignore the left node, it's *this, just subtract the right:
-         do_subtract(proto::right(e), typename proto::tag_of<right_type>::type());
+         do_subtract(e.right(), typename right_type::tag_type());
       }
-      else if(br && is_self(proto::right(e)))
+      else if(br && is_self(e.right()))
       {
          // Ignore the right node, it's *this, just subtract the left and negate the result:
-         do_subtract(proto::left(e), typename proto::tag_of<left_type>::type());
+         do_subtract(e.left(), typename left_type::tag_type());
          m_backend.negate();
       }
       else if(bl || br)
@@ -630,37 +646,37 @@ private:
       }
       else if(left_depth >= right_depth)
       {
-         do_assign(proto::left(e), typename detail::assign_and_eval<left_type>::type());
-         do_subtract(proto::right(e), typename proto::tag_of<right_type>::type());
+         do_assign(e.left(), typename left_type::tag_type());
+         do_subtract(e.right(), typename right_type::tag_type());
       }
       else
       {
-         do_assign(proto::right(e), typename detail::assign_and_eval<right_type>::type());
-         do_subtract(proto::left(e), typename proto::tag_of<left_type>::type());
+         do_assign(e.right(), typename right_type::tag_type());
+         do_subtract(e.left(), typename left_type::tag_type());
          m_backend.negate();
       }
    }
    template <class Exp>
-   void do_assign(const Exp& e, const proto::tag::multiplies&)
+   void do_assign(const Exp& e, const detail::multiplies&)
    {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      typedef typename proto::result_of::right<Exp>::type right_type;
+      typedef typename Exp::left_type left_type;
+      typedef typename Exp::right_type right_type;
 
-      static int const left_depth = boost::result_of<detail::CalcDepth(left_type)>::type::value;
-      static int const right_depth = boost::result_of<detail::CalcDepth(right_type)>::type::value;
+      static int const left_depth = left_type::depth;
+      static int const right_depth = right_type::depth;
 
-      bool bl = contains_self(proto::left(e));
-      bool br = contains_self(proto::right(e));
+      bool bl = contains_self(e.left());
+      bool br = contains_self(e.right());
 
-      if(bl && is_self(proto::left(e)))
+      if(bl && is_self(e.left()))
       {
          // Ignore the left node, it's *this, just add the right:
-         do_multiplies(proto::right(e), typename proto::tag_of<right_type>::type());
+         do_multiplies(e.right(), typename right_type::tag_type());
       }
-      else if(br && is_self(proto::right(e)))
+      else if(br && is_self(e.right()))
       {
          // Ignore the right node, it's *this, just add the left:
-         do_multiplies(proto::left(e), typename proto::tag_of<left_type>::type());
+         do_multiplies(e.left(), typename left_type::tag_type());
       }
       else if(bl || br)
       {
@@ -669,28 +685,28 @@ private:
       }
       else if(left_depth >= right_depth)
       {
-         do_assign(proto::left(e), typename detail::assign_and_eval<left_type>::type());
-         do_multiplies(proto::right(e), typename proto::tag_of<right_type>::type());
+         do_assign(e.left(), typename left_type::tag_type());
+         do_multiplies(e.right(), typename right_type::tag_type());
       }
       else
       {
-         do_assign(proto::right(e), typename detail::assign_and_eval<right_type>::type());
-         do_multiplies(proto::left(e), typename proto::tag_of<left_type>::type());
+         do_assign(e.right(), typename right_type::tag_type());
+         do_multiplies(e.left(), typename left_type::tag_type());
       }
    }
    template <class Exp>
-   void do_assign(const Exp& e, const proto::tag::divides&)
+   void do_assign(const Exp& e, const detail::divides&)
    {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      typedef typename proto::result_of::right<Exp>::type right_type;
+      typedef typename Exp::left_type left_type;
+      typedef typename Exp::right_type right_type;
 
-      bool bl = contains_self(proto::left(e));
-      bool br = contains_self(proto::right(e));
+      bool bl = contains_self(e.left());
+      bool br = contains_self(e.right());
 
-      if(bl && is_self(proto::left(e)))
+      if(bl && is_self(e.left()))
       {
          // Ignore the left node, it's *this, just add the right:
-         do_divide(proto::right(e), typename proto::tag_of<right_type>::type());
+         do_divide(e.right(), typename right_type::tag_type());
       }
       else if(bl || br)
       {
@@ -699,28 +715,28 @@ private:
       }
       else
       {
-         do_assign(proto::left(e), typename detail::assign_and_eval<left_type>::type());
-         do_divide(proto::right(e), typename proto::tag_of<right_type>::type());
+         do_assign(e.left(), typename left_type::tag_type());
+         do_divide(e.right(), typename right_type::tag_type());
       }
    }
    template <class Exp>
-   void do_assign(const Exp& e, const proto::tag::modulus&)
+   void do_assign(const Exp& e, const detail::modulus&)
    {
       //
       // This operation is only valid for integer backends:
       //
-      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The modulus operation is only valid for integer types");
+      BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
 
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      typedef typename proto::result_of::right<Exp>::type right_type;
+      typedef typename Exp::left_type left_type;
+      typedef typename Exp::right_type right_type;
 
-      bool bl = contains_self(proto::left(e));
-      bool br = contains_self(proto::right(e));
+      bool bl = contains_self(e.left());
+      bool br = contains_self(e.right());
 
-      if(bl && is_self(proto::left(e)))
+      if(bl && is_self(e.left()))
       {
          // Ignore the left node, it's *this, just add the right:
-         do_modulus(proto::right(e), typename proto::tag_of<right_type>::type());
+         do_modulus(e.right(), typename right_type::tag_type());
       }
       else if(bl || br)
       {
@@ -729,208 +745,199 @@ private:
       }
       else
       {
-         do_assign(proto::left(e), typename detail::assign_and_eval<left_type>::type());
-         do_modulus(proto::right(e), typename proto::tag_of<right_type>::type());
+         do_assign(e.left(), typename left_type::tag_type());
+         do_modulus(e.right(), typename right_type::tag_type());
       }
    }
    template <class Exp>
    void do_assign(const Exp& e, const detail::modulus_immediates&)
    {
-      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The modulus operation is only valid for integer types");
+      BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
       using big_num_default_ops::modulus;
-      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
-      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
-      modulus(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
+      modulus(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
 
    template <class Exp>
-   void do_assign(const Exp& e, const proto::tag::bitwise_and&)
+   void do_assign(const Exp& e, const detail::bitwise_and&)
    {
       //
       // This operation is only valid for integer backends:
       //
-      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "Bitwise operations are only valid for integer types");
+      BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "Bitwise operations are only valid for integer types");
 
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      typedef typename proto::result_of::right<Exp>::type right_type;
+      typedef typename Exp::left_type left_type;
+      typedef typename Exp::right_type right_type;
 
-      static int const left_depth = boost::result_of<detail::CalcDepth(left_type)>::type::value;
-      static int const right_depth = boost::result_of<detail::CalcDepth(right_type)>::type::value;
+      static int const left_depth = left_type::depth;
+      static int const right_depth = right_type::depth;
 
-      bool bl = contains_self(proto::left(e));
-      bool br = contains_self(proto::right(e));
+      bool bl = contains_self(e.left());
+      bool br = contains_self(e.right());
 
-      if(bl && is_self(proto::left(e)))
+      if(bl && is_self(e.left()))
       {
          // Ignore the left node, it's *this, just add the right:
-         do_bitwise_and(proto::right(e), typename proto::tag_of<right_type>::type());
+         do_bitwise_and(e.right(), typename right_type::tag_type());
       }
-      else if(br && is_self(proto::right(e)))
+      else if(br && is_self(e.right()))
       {
-         do_bitwise_and(proto::left(e), typename proto::tag_of<left_type>::type());
+         do_bitwise_and(e.left(), typename left_type::tag_type());
       }
       else if(left_depth >= right_depth)
       {
-         do_assign(proto::left(e), typename detail::assign_and_eval<left_type>::type());
-         do_bitwise_and(proto::right(e), typename proto::tag_of<right_type>::type());
+         do_assign(e.left(), typename left_type::tag_type());
+         do_bitwise_and(e.right(), typename right_type::tag_type());
       }
       else
       {
-         do_assign(proto::right(e), typename detail::assign_and_eval<right_type>::type());
-         do_bitwise_and(proto::left(e), typename proto::tag_of<left_type>::type());
+         do_assign(e.right(), typename right_type::tag_type());
+         do_bitwise_and(e.left(), typename left_type::tag_type());
       }
    }
    template <class Exp>
    void do_assign(const Exp& e, const detail::bitwise_and_immediates&)
    {
-      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "Bitwise operations are only valid for integer types");
+      BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "Bitwise operations are only valid for integer types");
       using big_num_default_ops::bitwise_and;
-      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
-      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
-      bitwise_and(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
+      bitwise_and(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
 
    template <class Exp>
-   void do_assign(const Exp& e, const proto::tag::bitwise_or&)
+   void do_assign(const Exp& e, const detail::bitwise_or&)
    {
       //
       // This operation is only valid for integer backends:
       //
-      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "Bitwise operations are only valid for integer types");
+      BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "Bitwise operations are only valid for integer types");
 
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      typedef typename proto::result_of::right<Exp>::type right_type;
+      typedef typename Exp::left_type left_type;
+      typedef typename Exp::right_type right_type;
 
-      static int const left_depth = boost::result_of<detail::CalcDepth(left_type)>::type::value;
-      static int const right_depth = boost::result_of<detail::CalcDepth(right_type)>::type::value;
+      static int const left_depth = left_type::depth;
+      static int const right_depth = right_type::depth;
 
-      bool bl = contains_self(proto::left(e));
-      bool br = contains_self(proto::right(e));
+      bool bl = contains_self(e.left());
+      bool br = contains_self(e.right());
 
-      if(bl && is_self(proto::left(e)))
+      if(bl && is_self(e.left()))
       {
          // Ignore the left node, it's *this, just add the right:
-         do_bitwise_or(proto::right(e), typename proto::tag_of<right_type>::type());
+         do_bitwise_or(e.right(), typename right_type::tag_type());
       }
-      else if(br && is_self(proto::right(e)))
+      else if(br && is_self(e.right()))
       {
-         do_bitwise_or(proto::left(e), typename proto::tag_of<left_type>::type());
+         do_bitwise_or(e.left(), typename left_type::tag_type());
       }
       else if(left_depth >= right_depth)
       {
-         do_assign(proto::left(e), typename detail::assign_and_eval<left_type>::type());
-         do_bitwise_or(proto::right(e), typename proto::tag_of<right_type>::type());
+         do_assign(e.left(), typename left_type::tag_type());
+         do_bitwise_or(e.right(), typename right_type::tag_type());
       }
       else
       {
-         do_assign(proto::right(e), typename detail::assign_and_eval<right_type>::type());
-         do_bitwise_or(proto::left(e), typename proto::tag_of<left_type>::type());
+         do_assign(e.right(), typename right_type::tag_type());
+         do_bitwise_or(e.left(), typename left_type::tag_type());
       }
    }
    template <class Exp>
    void do_assign(const Exp& e, const detail::bitwise_or_immediates&)
    {
-      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "Bitwise operations are only valid for integer types");
+      BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "Bitwise operations are only valid for integer types");
       using big_num_default_ops::bitwise_or;
-      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
-      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
-      bitwise_or(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
+      bitwise_or(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
 
    template <class Exp>
-   void do_assign(const Exp& e, const proto::tag::bitwise_xor&)
+   void do_assign(const Exp& e, const detail::bitwise_xor&)
    {
       //
       // This operation is only valid for integer backends:
       //
-      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "Bitwise operations are only valid for integer types");
+      BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "Bitwise operations are only valid for integer types");
 
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      typedef typename proto::result_of::right<Exp>::type right_type;
+      typedef typename Exp::left_type left_type;
+      typedef typename Exp::right_type right_type;
 
-      static int const left_depth = boost::result_of<detail::CalcDepth(left_type)>::type::value;
-      static int const right_depth = boost::result_of<detail::CalcDepth(right_type)>::type::value;
+      static int const left_depth = left_type::depth;
+      static int const right_depth = right_type::depth;
 
-      bool bl = contains_self(proto::left(e));
-      bool br = contains_self(proto::right(e));
+      bool bl = contains_self(e.left());
+      bool br = contains_self(e.right());
 
-      if(bl && is_self(proto::left(e)))
+      if(bl && is_self(e.left()))
       {
          // Ignore the left node, it's *this, just add the right:
-         do_bitwise_xor(proto::right(e), typename proto::tag_of<right_type>::type());
+         do_bitwise_xor(e.right(), typename right_type::tag_type());
       }
-      else if(br && is_self(proto::right(e)))
+      else if(br && is_self(e.right()))
       {
-         do_bitwise_xor(proto::left(e), typename proto::tag_of<left_type>::type());
+         do_bitwise_xor(e.left(), typename left_type::tag_type());
       }
       else if(left_depth >= right_depth)
       {
-         do_assign(proto::left(e), typename detail::assign_and_eval<left_type>::type());
-         do_bitwise_xor(proto::right(e), typename proto::tag_of<right_type>::type());
+         do_assign(e.left(), typename left_type::tag_type());
+         do_bitwise_xor(e.right(), typename right_type::tag_type());
       }
       else
       {
-         do_assign(proto::right(e), typename detail::assign_and_eval<right_type>::type());
-         do_bitwise_xor(proto::left(e), typename proto::tag_of<left_type>::type());
+         do_assign(e.right(), typename right_type::tag_type());
+         do_bitwise_xor(e.left(), typename left_type::tag_type());
       }
    }
    template <class Exp>
    void do_assign(const Exp& e, const detail::bitwise_xor_immediates&)
    {
-      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "Bitwise operations are only valid for integer types");
+      BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "Bitwise operations are only valid for integer types");
       using big_num_default_ops::bitwise_xor;
-      typedef typename proto::tag_of<typename proto::result_of::left<Exp>::type>::type left_tag;
-      typedef typename proto::tag_of<typename proto::result_of::right<Exp>::type>::type right_tag;
-      bitwise_xor(m_backend, canonical_value(underlying_value(proto::left(e), left_tag())), canonical_value(underlying_value(proto::right(e), right_tag())));
+      bitwise_xor(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
-
    template <class Exp>
-   void do_assign(const Exp& e, const proto::tag::terminal&)
+   void do_assign(const Exp& e, const detail::terminal&)
    {
       if(!is_self(e))
       {
-         m_backend = canonical_value(proto::value(e));
+         m_backend = canonical_value(e.value());
       }
    }
    template <class Exp>
-   void do_assign(const Exp& e, const proto::tag::function&)
+   void do_assign(const Exp& e, const detail::function&)
    {
-      typedef typename proto::arity_of<Exp>::type tag_type;
+      typedef typename Exp::arity tag_type;
       do_assign_function(e, tag_type());
    }
    template <class Exp>
-   void do_assign(const Exp& e, const proto::tag::shift_left&)
+   void do_assign(const Exp& e, const detail::shift_left&)
    {
       // We can only shift by an integer value, not an arbitrary expression:
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      typedef typename proto::result_of::right<Exp>::type right_type;
-      typedef typename proto::arity_of<right_type>::type right_arity;
+      typedef typename Exp::left_type left_type;
+      typedef typename Exp::right_type right_type;
+      typedef typename right_type::arity right_arity;
       BOOST_STATIC_ASSERT_MSG(right_arity::value == 0, "The left shift operator requires an integer value for the shift operand.");
-      typedef typename proto::result_of::value<right_type>::type right_value_type;
+      typedef typename right_type::result_type right_value_type;
       BOOST_STATIC_ASSERT_MSG(is_integral<right_value_type>::value, "The left shift operator requires an integer value for the shift operand.");
-      typedef typename proto::tag_of<left_type>::type tag_type;
-      do_assign_left_shift(proto::left(e), canonical_value(proto::value(proto::right(e))), tag_type());
+      typedef typename left_type::tag_type tag_type;
+      do_assign_left_shift(e.left(), canonical_value(e.right().value()), tag_type());
    }
 
    template <class Exp>
-   void do_assign(const Exp& e, const proto::tag::shift_right&)
+   void do_assign(const Exp& e, const detail::shift_right&)
    {
       // We can only shift by an integer value, not an arbitrary expression:
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      typedef typename proto::result_of::right<Exp>::type right_type;
-      typedef typename proto::arity_of<right_type>::type right_arity;
+      typedef typename Exp::left_type left_type;
+      typedef typename Exp::right_type right_type;
+      typedef typename right_type::arity right_arity;
       BOOST_STATIC_ASSERT_MSG(right_arity::value == 0, "The left shift operator requires an integer value for the shift operand.");
-      typedef typename proto::result_of::value<right_type>::type right_value_type;
+      typedef typename right_type::result_type right_value_type;
       BOOST_STATIC_ASSERT_MSG(is_integral<right_value_type>::value, "The left shift operator requires an integer value for the shift operand.");
-      typedef typename proto::tag_of<left_type>::type tag_type;
-      do_assign_right_shift(proto::left(e), canonical_value(proto::value(proto::right(e))), tag_type());
+      typedef typename left_type::tag_type tag_type;
+      do_assign_right_shift(e.left(), canonical_value(e.right().value()), tag_type());
    }
 
    template <class Exp>
-   void do_assign(const Exp& e, const proto::tag::complement&)
+   void do_assign(const Exp& e, const detail::bitwise_complement&)
    {
       using big_num_default_ops::complement;
-      self_type temp(proto::left(e));
+      self_type temp(e.left());
       complement(m_backend, temp.backend());
    }
 
@@ -938,21 +945,21 @@ private:
    void do_assign(const Exp& e, const detail::complement_immediates&)
    {
       using big_num_default_ops::complement;
-      complement(m_backend, canonical_value(proto::left(e)));
+      complement(m_backend, canonical_value(e.left().value()));
    }
 
    template <class Exp, class Val>
-   void do_assign_right_shift(const Exp& e, const Val& val, const proto::tag::terminal&)
+   void do_assign_right_shift(const Exp& e, const Val& val, const detail::terminal&)
    {
       using big_num_default_ops::right_shift;
-      right_shift(m_backend, canonical_value(proto::value(e)), val);
+      right_shift(m_backend, canonical_value(e.value()), val);
    }
 
    template <class Exp, class Val>
-   void do_assign_left_shift(const Exp& e, const Val& val, const proto::tag::terminal&)
+   void do_assign_left_shift(const Exp& e, const Val& val, const detail::terminal&)
    {
       using big_num_default_ops::left_shift;
-      left_shift(m_backend, canonical_value(proto::value(e)), val);
+      left_shift(m_backend, canonical_value(e.value()), val);
    }
 
    template <class Exp, class Val, class Tag>
@@ -972,21 +979,21 @@ private:
    }
 
    template <class Exp>
-   void do_assign_function(const Exp& e, const mpl::long_<1>&)
+   void do_assign_function(const Exp& e, const mpl::int_<1>&)
    {
-      proto::value(proto::left(e))(&m_backend);
+      e.left().value()(&m_backend);
    }
    template <class Exp>
-   void do_assign_function(const Exp& e, const mpl::long_<2>&)
+   void do_assign_function(const Exp& e, const mpl::int_<2>&)
    {
-      typedef typename proto::result_of::right<Exp>::type right_type;
-      typedef typename proto::tag_of<right_type>::type tag_type;
-      do_assign_function_1(proto::value(proto::left(e)), proto::right(e), tag_type());
+      typedef typename Exp::right_type right_type;
+      typedef typename right_type::tag_type tag_type;
+      do_assign_function_1(e.left().value(), e.right(), tag_type());
    }
    template <class F, class Exp>
-   void do_assign_function_1(const F& f, const Exp& val, const proto::tag::terminal&)
+   void do_assign_function_1(const F& f, const Exp& val, const detail::terminal&)
    {
-      f(m_backend, canonical_value(proto::value(val)));
+      f(m_backend, canonical_value(val.value()));
    }
    template <class F, class Exp, class Tag>
    void do_assign_function_1(const F& f, const Exp& val, const Tag&)
@@ -995,30 +1002,30 @@ private:
       f(m_backend, t.backend());
    }
    template <class Exp>
-   void do_assign_function(const Exp& e, const mpl::long_<3>&)
+   void do_assign_function(const Exp& e, const mpl::int_<3>&)
    {
-      typedef typename proto::result_of::right<Exp>::type right_type;
-      typedef typename proto::tag_of<right_type>::type tag_type;
-      typedef typename proto::result_of::child_c<Exp, 2>::type end_type;
-      typedef typename proto::tag_of<end_type>::type end_tag;
-      do_assign_function_2(proto::value(proto::left(e)), proto::right(e), proto::child_c<2>(e), tag_type(), end_tag());
+      typedef typename Exp::middle_type middle_type;
+      typedef typename middle_type::tag_type tag_type;
+      typedef typename Exp::right_type end_type;
+      typedef typename end_type::tag_type end_tag;
+      do_assign_function_2(e.left().value(), e.middle(), e.right(), tag_type(), end_tag());
    }
    template <class F, class Exp1, class Exp2>
-   void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const proto::tag::terminal&, const proto::tag::terminal&)
+   void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const detail::terminal&, const detail::terminal&)
    {
-      f(m_backend, canonical_value(proto::value(val1)), canonical_value(proto::value(val2)));
+      f(m_backend, canonical_value(val1.value()), canonical_value(val2.value()));
    }
    template <class F, class Exp1, class Exp2, class Tag1>
-   void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const Tag1&, const proto::tag::terminal&)
+   void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const Tag1&, const detail::terminal&)
    {
       self_type temp1(val1);
-      f(m_backend, temp1.backend(), canonical_value(proto::value(val2)));
+      f(m_backend, temp1.backend(), canonical_value(val2.value()));
    }
    template <class F, class Exp1, class Exp2, class Tag2>
-   void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const proto::tag::terminal&, const Tag2&)
+   void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const detail::terminal&, const Tag2&)
    {
       self_type temp2(val2);
-      f(m_backend, canonical_value(proto::value(val1)), temp2.backend());
+      f(m_backend, canonical_value(val1.value()), temp2.backend());
    }
    template <class F, class Exp1, class Exp2, class Tag1, class Tag2>
    void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const Tag1&, const Tag2&)
@@ -1029,137 +1036,160 @@ private:
    }
 
    template <class Exp>
-   void do_add(const Exp& e, const proto::tag::terminal&)
+   void do_add(const Exp& e, const detail::terminal&)
    {
       using big_num_default_ops::add;
-      add(m_backend, canonical_value(proto::value(e)));
+      add(m_backend, canonical_value(e.value()));
    }
 
    template <class Exp>
-   void do_add(const Exp& e, const proto::tag::unary_plus&)
+   void do_add(const Exp& e, const detail::negate&)
    {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      do_add(proto::left(e), typename proto::tag_of<left_type>::type());
+      typedef typename Exp::left_type left_type;
+      do_subtract(e.left(), typename left_type::tag_type());
    }
 
    template <class Exp>
-   void do_add(const Exp& e, const proto::tag::negate&)
+   void do_add(const Exp& e, const detail::plus&)
    {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      do_subtract(proto::left(e), typename proto::tag_of<left_type>::type());
+      typedef typename Exp::left_type left_type;
+      typedef typename Exp::right_type right_type;
+      do_add(e.left(), typename left_type::tag_type());
+      do_add(e.right(), typename right_type::tag_type());
    }
 
    template <class Exp>
-   void do_add(const Exp& e, const proto::tag::plus&)
+   void do_add(const Exp& e, const detail::minus&)
    {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      typedef typename proto::result_of::right<Exp>::type right_type;
-      do_add(proto::left(e), typename proto::tag_of<left_type>::type());
-      do_add(proto::right(e), typename proto::tag_of<right_type>::type());
-   }
-
-   template <class Exp>
-   void do_add(const Exp& e, const proto::tag::minus&)
-   {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      typedef typename proto::result_of::right<Exp>::type right_type;
-      do_add(proto::left(e), typename proto::tag_of<left_type>::type());
-      do_subtract(proto::right(e), typename proto::tag_of<right_type>::type());
+      typedef typename Exp::left_type left_type;
+      typedef typename Exp::right_type right_type;
+      do_add(e.left(), typename left_type::tag_type());
+      do_subtract(e.right(), typename right_type::tag_type());
    }
 
    template <class Exp, class unknown>
    void do_add(const Exp& e, const unknown&)
    {
       self_type temp(e);
-      do_add(temp, proto::tag::terminal());
+      do_add(detail::big_number_exp<detail::terminal, self_type>(temp), detail::terminal());
    }
 
    template <class Exp>
-   void do_subtract(const Exp& e, const proto::tag::terminal&)
+   void do_add(const Exp& e, const detail::add_immediates&)
+   {
+      using big_num_default_ops::add;
+      add(m_backend, canonical_value(e.left().value()));
+      add(m_backend, canonical_value(e.right().value()));
+   }
+   template <class Exp>
+   void do_add(const Exp& e, const detail::subtract_immediates&)
+   {
+      using big_num_default_ops::add;
+      using big_num_default_ops::subtract;
+      add(m_backend, canonical_value(e.left().value()));
+      subtract(m_backend, canonical_value(e.right().value()));
+   }
+   template <class Exp>
+   void do_subtract(const Exp& e, const detail::terminal&)
    {
       using big_num_default_ops::subtract;
-      subtract(m_backend, canonical_value(proto::value(e)));
+      subtract(m_backend, canonical_value(e.value()));
    }
 
    template <class Exp>
-   void do_subtract(const Exp& e, const proto::tag::unary_plus&)
+   void do_subtract(const Exp& e, const detail::negate&)
    {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      do_subtract(proto::left(e), typename proto::tag_of<left_type>::type());
+      typedef typename Exp::left_type left_type;
+      do_add(e.left(), typename left_type::tag_type());
    }
 
    template <class Exp>
-   void do_subtract(const Exp& e, const proto::tag::negate&)
+   void do_subtract(const Exp& e, const detail::plus&)
    {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      do_add(proto::left(e), typename proto::tag_of<left_type>::type());
+      typedef typename Exp::left_type left_type;
+      typedef typename Exp::right_type right_type;
+      do_subtract(e.left(), typename left_type::tag_type());
+      do_subtract(e.right(), typename right_type::tag_type());
    }
 
    template <class Exp>
-   void do_subtract(const Exp& e, const proto::tag::plus&)
+   void do_subtract(const Exp& e, const detail::minus&)
    {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      typedef typename proto::result_of::right<Exp>::type right_type;
-      do_subtract(proto::left(e), typename proto::tag_of<left_type>::type());
-      do_subtract(proto::right(e), typename proto::tag_of<right_type>::type());
+      typedef typename Exp::left_type left_type;
+      typedef typename Exp::right_type right_type;
+      do_subtract(e.left(), typename left_type::tag_type());
+      do_add(e.right(), typename right_type::tag_type());
    }
-
    template <class Exp>
-   void do_subtract(const Exp& e, const proto::tag::minus&)
+   void do_subtract(const Exp& e, const detail::add_immediates&)
    {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      typedef typename proto::result_of::right<Exp>::type right_type;
-      do_subtract(proto::left(e), typename proto::tag_of<left_type>::type());
-      do_add(proto::right(e), typename proto::tag_of<right_type>::type());
+      using big_num_default_ops::subtract;
+      subtract(m_backend, canonical_value(e.left().value()));
+      subtract(m_backend, canonical_value(e.right().value()));
    }
-
+   template <class Exp>
+   void do_subtract(const Exp& e, const detail::subtract_immediates&)
+   {
+      using big_num_default_ops::add;
+      using big_num_default_ops::subtract;
+      subtract(m_backend, canonical_value(e.left().value()));
+      add(m_backend, canonical_value(e.right().value()));
+   }
    template <class Exp, class unknown>
    void do_subtract(const Exp& e, const unknown&)
    {
       self_type temp(e);
-      do_subtract(temp, proto::tag::terminal());
+      do_subtract(detail::big_number_exp<detail::terminal, self_type>(temp), detail::terminal());
    }
 
    template <class Exp>
-   void do_multiplies(const Exp& e, const proto::tag::terminal&)
+   void do_multiplies(const Exp& e, const detail::terminal&)
    {
       using big_num_default_ops::multiply;
-      multiply(m_backend, canonical_value(proto::value(e)));
+      multiply(m_backend, canonical_value(e.value()));
    }
 
    template <class Exp>
-   void do_multiplies(const Exp& e, const proto::tag::unary_plus&)
+   void do_multiplies(const Exp& e, const detail::negate&)
    {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      do_multiplies(proto::left(e), typename proto::tag_of<left_type>::type());
-   }
-
-   template <class Exp>
-   void do_multiplies(const Exp& e, const proto::tag::negate&)
-   {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      do_multiplies(proto::left(e), typename proto::tag_of<left_type>::type());
+      typedef typename Exp::left_type left_type;
+      do_multiplies(e.left(), typename left_type::tag_type());
       m_backend.negate();
    }
 
    template <class Exp>
-   void do_multiplies(const Exp& e, const proto::tag::multiplies&)
+   void do_multiplies(const Exp& e, const detail::multiplies&)
    {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      typedef typename proto::result_of::right<Exp>::type right_type;
-      do_multiplies(proto::left(e), typename proto::tag_of<left_type>::type());
-      do_multiplies(proto::right(e), typename proto::tag_of<right_type>::type());
+      typedef typename Exp::left_type left_type;
+      typedef typename Exp::right_type right_type;
+      do_multiplies(e.left(), typename left_type::tag_type());
+      do_multiplies(e.right(), typename right_type::tag_type());
    }
 
    template <class Exp>
-   void do_multiplies(const Exp& e, const proto::tag::divides&)
+   void do_multiplies(const Exp& e, const detail::divides&)
    {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      typedef typename proto::result_of::right<Exp>::type right_type;
-      do_multiplies(proto::left(e), typename proto::tag_of<left_type>::type());
-      do_divide(proto::right(e), typename proto::tag_of<right_type>::type());
+      typedef typename Exp::left_type left_type;
+      typedef typename Exp::right_type right_type;
+      do_multiplies(e.left(), typename left_type::tag_type());
+      do_divide(e.right(), typename right_type::tag_type());
    }
 
+   template <class Exp>
+   void do_multiplies(const Exp& e, const detail::multiply_immediates&)
+   {
+      using big_num_default_ops::multiply;
+      multiply(m_backend, canonical_value(e.left().value()));
+      multiply(m_backend, canonical_value(e.right().value()));
+   }
+   template <class Exp>
+   void do_multiplies(const Exp& e, const detail::divide_immediates&)
+   {
+      using big_num_default_ops::multiply;
+      using big_num_default_ops::divide;
+      multiply(m_backend, canonical_value(e.left().value()));
+      divide(m_backend, canonical_value(e.right().value()));
+   }
    template <class Exp, class unknown>
    void do_multiplies(const Exp& e, const unknown&)
    {
@@ -1169,43 +1199,52 @@ private:
    }
 
    template <class Exp>
-   void do_divide(const Exp& e, const proto::tag::terminal&)
+   void do_divide(const Exp& e, const detail::terminal&)
    {
       using big_num_default_ops::divide;
-      divide(m_backend, canonical_value(proto::value(e)));
+      divide(m_backend, canonical_value(e.value()));
    }
 
    template <class Exp>
-   void do_divide(const Exp& e, const proto::tag::unary_plus&)
+   void do_divide(const Exp& e, const detail::negate&)
    {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      do_divide(proto::left(e), typename proto::tag_of<left_type>::type());
-   }
-
-   template <class Exp>
-   void do_divide(const Exp& e, const proto::tag::negate&)
-   {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      do_divide(proto::left(e), typename proto::tag_of<left_type>::type());
+      typedef typename Exp::left_type left_type;
+      do_divide(e.left(), typename left_type::tag_type());
       m_backend.negate();
    }
 
    template <class Exp>
-   void do_divide(const Exp& e, const proto::tag::multiplies&)
+   void do_divide(const Exp& e, const detail::multiplies&)
    {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      typedef typename proto::result_of::right<Exp>::type right_type;
-      do_divide(proto::left(e), typename proto::tag_of<left_type>::type());
-      do_divide(proto::right(e), typename proto::tag_of<right_type>::type());
+      typedef typename Exp::left_type left_type;
+      typedef typename Exp::right_type right_type;
+      do_divide(e.left(), typename left_type::tag_type());
+      do_divide(e.right(), typename right_type::tag_type());
    }
 
    template <class Exp>
-   void do_divide(const Exp& e, const proto::tag::divides&)
+   void do_divide(const Exp& e, const detail::divides&)
    {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      typedef typename proto::result_of::right<Exp>::type right_type;
-      do_divide(proto::left(e), typename proto::tag_of<left_type>::type());
-      do_multiplies(proto::right(e), typename proto::tag_of<right_type>::type());
+      typedef typename Exp::left_type left_type;
+      typedef typename Exp::right_type right_type;
+      do_divide(e.left(), typename left_type::tag_type());
+      do_multiplies(e.right(), typename right_type::tag_type());
+   }
+
+   template <class Exp>
+   void do_divides(const Exp& e, const detail::multiply_immediates&)
+   {
+      using big_num_default_ops::divide;
+      divide(m_backend, canonical_value(e.left().value()));
+      divide(m_backend, canonical_value(e.right().value()));
+   }
+   template <class Exp>
+   void do_divides(const Exp& e, const detail::divide_immediates&)
+   {
+      using big_num_default_ops::multiply;
+      using big_num_default_ops::divide;
+      divide(m_backend, canonical_value(e.left().value()));
+      mutiply(m_backend, canonical_value(e.right().value()));
    }
 
    template <class Exp, class unknown>
@@ -1217,35 +1256,35 @@ private:
    }
 
    template <class Exp>
-   void do_modulus(const Exp& e, const proto::tag::terminal&)
+   void do_modulus(const Exp& e, const detail::terminal&)
    {
-      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The modulus operation is only valid for integer types");
+      BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
       using big_num_default_ops::modulus;
-      modulus(m_backend, canonical_value(proto::value(e)));
+      modulus(m_backend, canonical_value(e.value()));
    }
 
    template <class Exp, class Unknown>
    void do_modulus(const Exp& e, const Unknown&)
    {
-      BOOST_STATIC_ASSERT_MSG(is_extended_integer<Backend>::value, "The modulus operation is only valid for integer types");
+      BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
       using big_num_default_ops::modulus;
       self_type temp(e);
-      modulus(m_backend, canonical_value(proto::value(temp)));
+      modulus(m_backend, canonical_value(temp));
    }
 
    template <class Exp>
-   void do_bitwise_and(const Exp& e, const proto::tag::terminal&)
+   void do_bitwise_and(const Exp& e, const detail::terminal&)
    {
       using big_num_default_ops::bitwise_and;
-      bitwise_and(m_backend, canonical_value(proto::value(e)));
+      bitwise_and(m_backend, canonical_value(e.value()));
    }
    template <class Exp>
-   void do_bitwise_and(const Exp& e, const proto::tag::bitwise_and&)
+   void do_bitwise_and(const Exp& e, const detail::bitwise_and&)
    {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      typedef typename proto::result_of::right<Exp>::type right_type;
-      do_bitwise_and(proto::left(e), typename proto::tag_of<left_type>::type());
-      do_bitwise_and(proto::right(e), typename proto::tag_of<right_type>::type());
+      typedef typename Exp::left_type left_type;
+      typedef typename Exp::right_type right_type;
+      do_bitwise_and(e.left(), typename left_type::tag_type());
+      do_bitwise_and(e.right(), typename right_type::tag_type());
    }
    template <class Exp, class unknown>
    void do_bitwise_and(const Exp& e, const unknown&)
@@ -1256,18 +1295,18 @@ private:
    }
 
    template <class Exp>
-   void do_bitwise_or(const Exp& e, const proto::tag::terminal&)
+   void do_bitwise_or(const Exp& e, const detail::terminal&)
    {
       using big_num_default_ops::bitwise_or;
-      bitwise_or(m_backend, canonical_value(proto::value(e)));
+      bitwise_or(m_backend, canonical_value(e.value()));
    }
    template <class Exp>
-   void do_bitwise_or(const Exp& e, const proto::tag::bitwise_or&)
+   void do_bitwise_or(const Exp& e, const detail::bitwise_or&)
    {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      typedef typename proto::result_of::right<Exp>::type right_type;
-      do_bitwise_or(proto::left(e), typename proto::tag_of<left_type>::type());
-      do_bitwise_or(proto::right(e), typename proto::tag_of<right_type>::type());
+      typedef typename Exp::left_type left_type;
+      typedef typename Exp::right_type right_type;
+      do_bitwise_or(e.left(), typename left_type::tag_type());
+      do_bitwise_or(e.right(), typename right_type::tag_type());
    }
    template <class Exp, class unknown>
    void do_bitwise_or(const Exp& e, const unknown&)
@@ -1278,18 +1317,18 @@ private:
    }
 
    template <class Exp>
-   void do_bitwise_xor(const Exp& e, const proto::tag::terminal&)
+   void do_bitwise_xor(const Exp& e, const detail::terminal&)
    {
       using big_num_default_ops::bitwise_xor;
-      bitwise_xor(m_backend, canonical_value(proto::value(e)));
+      bitwise_xor(m_backend, canonical_value(e.value()));
    }
    template <class Exp>
-   void do_bitwise_xor(const Exp& e, const proto::tag::bitwise_xor&)
+   void do_bitwise_xor(const Exp& e, const detail::bitwise_xor&)
    {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      typedef typename proto::result_of::right<Exp>::type right_type;
-      do_bitwise_xor(proto::left(e), typename proto::tag_of<left_type>::type());
-      do_bitwise_xor(proto::right(e), typename proto::tag_of<right_type>::type());
+      typedef typename Exp::left_type left_type;
+      typedef typename Exp::right_type right_type;
+      do_bitwise_xor(e.left(), typename left_type::tag_type());
+      do_bitwise_xor(e.right(), typename right_type::tag_type());
    }
    template <class Exp, class unknown>
    void do_bitwise_xor(const Exp& e, const unknown&)
@@ -1303,47 +1342,48 @@ private:
    template <class Exp>
    bool contains_self(const Exp& e)const
    {
-      return contains_self(e, mpl::int_<proto::arity_of<Exp>::value>());
+      return contains_self(e, typename Exp::arity());
    }
    template <class Exp>
    bool contains_self(const Exp& e, mpl::int_<0> const&)const
    {
-      return is_really_self(proto::value(e));
+      return is_really_self(e.value());
    }
    template <class Exp>
    bool contains_self(const Exp& e, mpl::int_<1> const&)const
    {
-      typedef typename proto::result_of::child_c<Exp, 0>::type child_type;
-      return contains_self(proto::child_c<0>(e), mpl::int_<proto::arity_of<child_type>::value>());
+      typedef typename Exp::left_type child_type;
+      return contains_self(e.left(), typename child_type::arity());
    }
    template <class Exp>
    bool contains_self(const Exp& e, mpl::int_<2> const&)const
    {
-      typedef typename proto::result_of::child_c<Exp, 0>::type child0_type;
-      typedef typename proto::result_of::child_c<Exp, 1>::type child1_type;
-      return contains_self(proto::child_c<0>(e), mpl::int_<proto::arity_of<child0_type>::value>()) || contains_self(proto::child_c<1>(e), mpl::int_<proto::arity_of<child1_type>::value>());
+      typedef typename Exp::left_type child0_type;
+      typedef typename Exp::right_type child1_type;
+      return contains_self(e.left(), typename child0_type::arity()) 
+         || contains_self(e.right(), typename child1_type::arity());
    }
    template <class Exp>
    bool contains_self(const Exp& e, mpl::int_<3> const&)const
    {
-      typedef typename proto::result_of::child_c<Exp, 0>::type child0_type;
-      typedef typename proto::result_of::child_c<Exp, 1>::type child1_type;
-      typedef typename proto::result_of::child_c<Exp, 2>::type child2_type;
-      return contains_self(proto::child_c<0>(e), mpl::int_<proto::arity_of<child0_type>::value>()) 
-         || contains_self(proto::child_c<1>(e), mpl::int_<proto::arity_of<child1_type>::value>())
-         || contains_self(proto::child_c<2>(e), mpl::int_<proto::arity_of<child2_type>::value>());
+      typedef typename Exp::left_type child0_type;
+      typedef typename Exp::middle_type child1_type;
+      typedef typename Exp::right_type child2_type;
+      return contains_self(e.left(), typename child0_type::arity()) 
+         || contains_self(e.middle(), typename child1_type::arity())
+         || contains_self(e.right(), typename child2_type::arity());
    }
 
    // Test if the expression is a reference to *this:
    template <class Exp>
    bool is_self(const Exp& e)const
    {
-      return is_self(e, mpl::int_<proto::arity_of<Exp>::value>());
+      return is_self(e, typename Exp::arity());
    }
    template <class Exp>
    bool is_self(const Exp& e, mpl::int_<0> const&)const
    {
-      return is_really_self(proto::value(e));
+      return is_really_self(e.value());
    }
    template <class Exp, int v>
    bool is_self(const Exp& e, mpl::int_<v> const&)const
@@ -1353,36 +1393,15 @@ private:
 
    template <class Val>
    bool is_really_self(const Val&)const { return false; }
-   bool is_really_self(const self_type* v)const 
-   { 
-      return v == this; 
-   }
-   bool is_really_self(self_type* v)const
-   { 
-      return v == this; 
-   }
-   template <class Exp>
-   static typename detail::underlying_result<Exp>::type underlying_value(const detail::big_number_exp<Exp>& e, const proto::tag::terminal&)
-   {
-      return proto::value(e);
-   }
-   template <class Exp, class tag>
-   static typename detail::underlying_result<Exp>::type 
-      underlying_value(const detail::big_number_exp<Exp>& e, const tag&)
-   {
-      typedef typename proto::result_of::left<Exp>::type left_type;
-      typedef typename proto::tag_of<left_type>::type tag_type;
-      return underlying_value(proto::left(e), tag_type());
-   }
+   bool is_really_self(const self_type& v)const { return &v == this; }
 
    static const Backend& canonical_value(const self_type& v){  return v.m_backend;  }
-   static const Backend& canonical_value(const self_type* v){  return v->m_backend;  }
-   static const Backend& canonical_value(self_type* v){  return v->m_backend;  }
-   static const Backend& canonical_value(self_type& v){  return v.m_backend;  }
+   //static const Backend& canonical_value(const self_type* v){  return v->m_backend;  }
+   //static const Backend& canonical_value(self_type* v){  return v->m_backend;  }
+   //static const Backend& canonical_value(self_type& v){  return v.m_backend;  }
    template <class V>
    static typename detail::canonical<V, Backend>::type canonical_value(const V& v){  return v;  }
    static typename detail::canonical<std::string, Backend>::type canonical_value(const std::string& v){  return v.c_str();  }
-
    Backend m_backend;
 };
 
@@ -1395,14 +1414,14 @@ inline int big_number_compare(const big_number<Backend>& a, const big_number<Bac
    return a.compare(b);
 }
 
-template <class Backend, class Exp>
-inline int big_number_compare(const big_number<Backend>& a, const big_number_exp<Exp>& b)
+template <class Backend, class tag, class A1, class A2, class A3>
+inline int big_number_compare(const big_number<Backend>& a, const big_number_exp<tag, A1, A2, A3>& b)
 {
    return a.compare(big_number<Backend>(b));
 }
 
-template <class Exp, class Backend>
-inline int big_number_compare(const big_number_exp<Exp>& a, const big_number<Backend>& b)
+template <class tag, class A1, class A2, class A3, class Backend>
+inline int big_number_compare(const big_number_exp<tag, A1, A2, A3>& a, const big_number<Backend>& b)
 {
    return -b.compare(big_number<Backend>(a));
 }
@@ -1419,26 +1438,26 @@ inline int big_number_compare(const Val a, const big_number<Backend>& b)
    return -b.compare(a);
 }
 
-template <class Exp1, class Exp2>
-inline int big_number_compare(const big_number_exp<Exp1>& a, const big_number_exp<Exp2>& b)
+template <class tag, class A1, class A2, class A3, class tag2, class A1b, class A2b, class A3b>
+inline int big_number_compare(const big_number_exp<tag, A1, A2, A3>& a, const big_number_exp<tag2, A1b, A2b, A3b>& b)
 {
-   typedef typename expression_type<Exp1>::type real1;
-   typedef typename expression_type<Exp2>::type real2;
+   typedef typename big_number_exp<tag, A1, A2, A3>::result_type real1;
+   typedef typename big_number_exp<tag2, A1b, A2b, A3b>::result_type real2;
    return real1(a).compare(real2(b));
 }
 
-template <class Exp, class Val>
-inline typename enable_if<is_arithmetic<Val>, int>::type big_number_compare(const big_number_exp<Exp>& a, const Val b)
+template <class tag, class A1, class A2, class A3, class Val>
+inline typename enable_if<is_arithmetic<Val>, int>::type big_number_compare(const big_number_exp<tag, A1, A2, A3>& a, const Val b)
 {
-   typedef typename expression_type<Exp>::type real;
+   typedef typename big_number_exp<tag, A1, A2, A3>::result_type real;
    real t(a);
    return t.compare(b);
 }
 
-template <class Val, class Exp>
-inline typename enable_if<is_arithmetic<Val>, int>::type big_number_compare(const Val a, const big_number_exp<Exp>& b)
+template <class Val, class tag, class A1, class A2, class A3>
+inline typename enable_if<is_arithmetic<Val>, int>::type big_number_compare(const Val a, const big_number_exp<tag, A1, A2, A3>& b)
 {
-   typedef typename expression_type<Exp>::type real;
+   typedef typename big_number_exp<tag, A1, A2, A3>::result_type real;
    return -real(b).compare(a);
 }
 
@@ -1527,10 +1546,10 @@ inline std::ostream& operator << (std::ostream& os, const big_number<Backend>& r
 
 namespace detail{
 
-template <class Exp>
-inline std::ostream& operator << (std::ostream& os, const big_number_exp<Exp>& r)
+template <class tag, class A1, class A2, class A3>
+inline std::ostream& operator << (std::ostream& os, const big_number_exp<tag, A1, A2, A3>& r)
 {
-   typedef typename expression_type<detail::big_number_exp<Exp> >::type value_type;
+   typedef typename big_number_exp<tag, A1, A2, A3>::result_type value_type;
    value_type temp(r);
    return os << temp;
 }
