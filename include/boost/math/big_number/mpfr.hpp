@@ -67,13 +67,9 @@ struct mpfr_real_imp
       while(i)
       {
          mpfr_set_ui(t, static_cast<unsigned>(i & mask), GMP_RNDN);
-         long e;
-         const char* ps = mpfr_get_str (0, &e, 10, 0, t, GMP_RNDN);
          if(shift)
             mpfr_mul_2exp(t, t, shift, GMP_RNDN);
-         ps = mpfr_get_str (0, &e, 10, 0, t, GMP_RNDN);
          mpfr_add(m_data, m_data, t, GMP_RNDN);
-         ps = mpfr_get_str (0, &e, 10, 0, m_data, GMP_RNDN);
          shift += std::numeric_limits<unsigned>::digits;
          i >>= std::numeric_limits<unsigned>::digits;
       }

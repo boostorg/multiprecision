@@ -382,10 +382,15 @@ void test_negative_mixed(boost::mpl::true_ const&)
    BOOST_TEST(n2 == Real(n2));
    BOOST_TEST(n3 == Real(n3));
    BOOST_TEST(n4 == Real(n4));
-   BOOST_TEST_CLOSE(n1, boost::lexical_cast<target_type>(Real(n1).str(0, boost::is_floating_point<Num>::value)), 3 * std::numeric_limits<Num>::epsilon());
-   BOOST_TEST_CLOSE(n2, boost::lexical_cast<target_type>(Real(n2).str(0, boost::is_floating_point<Num>::value)), std::numeric_limits<Num>::epsilon());
-   BOOST_TEST_CLOSE(n3, boost::lexical_cast<target_type>(Real(n3).str(0, boost::is_floating_point<Num>::value)), std::numeric_limits<Num>::epsilon());
-   BOOST_TEST_CLOSE(n4, boost::lexical_cast<target_type>(Real(n4).str(0, boost::is_floating_point<Num>::value)), std::numeric_limits<Num>::epsilon());
+#if defined(TEST_MPFR) || defined(TEST_MPFR_50)
+   Num tol = 10 * std::numeric_limits<Num>::epsilon();
+#else
+   Num tol = 0;
+#endif
+   BOOST_TEST_CLOSE(n1, boost::lexical_cast<target_type>(Real(n1).str(0, boost::is_floating_point<Num>::value)), tol);
+   BOOST_TEST_CLOSE(n2, boost::lexical_cast<target_type>(Real(n2).str(0, boost::is_floating_point<Num>::value)), 0);
+   BOOST_TEST_CLOSE(n3, boost::lexical_cast<target_type>(Real(n3).str(0, boost::is_floating_point<Num>::value)), 0);
+   BOOST_TEST_CLOSE(n4, boost::lexical_cast<target_type>(Real(n4).str(0, boost::is_floating_point<Num>::value)), 0);
    // Assignment:
    Real r(0);
    BOOST_TEST(r != n1);
@@ -479,10 +484,15 @@ void test_mixed()
    BOOST_TEST(n3 == Real(n3));
    BOOST_TEST(n4 == Real(n4));
    std::cout << Real(n1).str(0, boost::is_floating_point<Num>::value) << std::endl;
-   BOOST_TEST_CLOSE(n1, boost::lexical_cast<target_type>(Real(n1).str(0, boost::is_floating_point<Num>::value)), 3 * std::numeric_limits<Num>::epsilon());
-   BOOST_TEST_CLOSE(n2, boost::lexical_cast<target_type>(Real(n2).str(0, boost::is_floating_point<Num>::value)), std::numeric_limits<Num>::epsilon());
-   BOOST_TEST_CLOSE(n3, boost::lexical_cast<target_type>(Real(n3).str(0, boost::is_floating_point<Num>::value)), std::numeric_limits<Num>::epsilon());
-   BOOST_TEST_CLOSE(n4, boost::lexical_cast<target_type>(Real(n4).str(0, boost::is_floating_point<Num>::value)), std::numeric_limits<Num>::epsilon());
+#if defined(TEST_MPFR) || defined(TEST_MPFR_50)
+   Num tol = 10 * std::numeric_limits<Num>::epsilon();
+#else
+   Num tol = 0;
+#endif
+   BOOST_TEST_CLOSE(n1, boost::lexical_cast<target_type>(Real(n1).str(0, boost::is_floating_point<Num>::value)), tol);
+   BOOST_TEST_CLOSE(n2, boost::lexical_cast<target_type>(Real(n2).str(0, boost::is_floating_point<Num>::value)), 0);
+   BOOST_TEST_CLOSE(n3, boost::lexical_cast<target_type>(Real(n3).str(0, boost::is_floating_point<Num>::value)), 0);
+   BOOST_TEST_CLOSE(n4, boost::lexical_cast<target_type>(Real(n4).str(0, boost::is_floating_point<Num>::value)), 0);
    // Assignment:
    Real r(0);
    BOOST_TEST(r != n1);
