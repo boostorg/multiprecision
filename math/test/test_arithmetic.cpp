@@ -53,8 +53,25 @@
       BOOST_LIGHTWEIGHT_TEST_OSTREAM << e.what() << std::endl;\
    }
 
-template <class Real, unsigned N>
-void test_integer_ops(const boost::mpl::int_<N>&){}
+bool isfloat(float){ return true; }
+bool isfloat(double){ return true; }
+bool isfloat(long double){ return true; }
+template <class T> bool isfloat(T){ return false; }
+
+#define BOOST_TEST_CLOSE(x, y, tol)\
+   if(x == 0){\
+      BOOST_TEST(y == 0); }\
+   else if(!isfloat(x)){\
+      BOOST_TEST(x == y); }\
+   else if((x != y) && (::fabsl(static_cast<long double>((x-y)/x)) > tol))\
+   {\
+       BOOST_ERROR("Expected tolerance was exceeded: ");\
+       BOOST_LIGHTWEIGHT_TEST_OSTREAM << std::setprecision(34) << "(x-y)/x = " << ::fabsl(static_cast<long double>((x-y)/x)) \
+       << " tolerance = " << tol << std::endl;\
+   }
+
+template <class Real, class T>
+void test_integer_ops(const T&){}
 
 template <class Real>
 void test_integer_ops(const boost::mpl::int_<boost::math::number_kind_integer>&)
@@ -249,8 +266,8 @@ void test_integer_ops(const boost::mpl::int_<boost::math::number_kind_integer>&)
    BOOST_TEST(abs(+a) == 20);
 }
 
-template <class Real, unsigned N>
-void test_real_ops(const boost::mpl::int_<N>&){}
+template <class Real, class T>
+void test_real_ops(const T&){}
 
 template <class Real>
 void test_real_ops(const boost::mpl::int_<boost::math::number_kind_floating_point>&)
@@ -365,10 +382,10 @@ void test_negative_mixed(boost::mpl::true_ const&)
    BOOST_TEST(n2 == Real(n2));
    BOOST_TEST(n3 == Real(n3));
    BOOST_TEST(n4 == Real(n4));
-   BOOST_TEST(n1 == boost::lexical_cast<target_type>(Real(n1).str(0, boost::is_floating_point<Num>::value)));
-   BOOST_TEST(n2 == boost::lexical_cast<target_type>(Real(n2).str(0, boost::is_floating_point<Num>::value)));
-   BOOST_TEST(n3 == boost::lexical_cast<target_type>(Real(n3).str(0, boost::is_floating_point<Num>::value)));
-   BOOST_TEST(n4 == boost::lexical_cast<target_type>(Real(n4).str(0, boost::is_floating_point<Num>::value)));
+   BOOST_TEST_CLOSE(n1, boost::lexical_cast<target_type>(Real(n1).str(0, boost::is_floating_point<Num>::value)), 3 * std::numeric_limits<Num>::epsilon());
+   BOOST_TEST_CLOSE(n2, boost::lexical_cast<target_type>(Real(n2).str(0, boost::is_floating_point<Num>::value)), std::numeric_limits<Num>::epsilon());
+   BOOST_TEST_CLOSE(n3, boost::lexical_cast<target_type>(Real(n3).str(0, boost::is_floating_point<Num>::value)), std::numeric_limits<Num>::epsilon());
+   BOOST_TEST_CLOSE(n4, boost::lexical_cast<target_type>(Real(n4).str(0, boost::is_floating_point<Num>::value)), std::numeric_limits<Num>::epsilon());
    // Assignment:
    Real r(0);
    BOOST_TEST(r != n1);
@@ -461,10 +478,11 @@ void test_mixed()
    BOOST_TEST(n2 == Real(n2));
    BOOST_TEST(n3 == Real(n3));
    BOOST_TEST(n4 == Real(n4));
-   BOOST_TEST(n1 == boost::lexical_cast<target_type>(Real(n1).str(0, boost::is_floating_point<Num>::value)));
-   BOOST_TEST(n2 == boost::lexical_cast<target_type>(Real(n2).str(0, boost::is_floating_point<Num>::value)));
-   BOOST_TEST(n3 == boost::lexical_cast<target_type>(Real(n3).str(0, boost::is_floating_point<Num>::value)));
-   BOOST_TEST(n4 == boost::lexical_cast<target_type>(Real(n4).str(0, boost::is_floating_point<Num>::value)));
+   std::cout << Real(n1).str(0, boost::is_floating_point<Num>::value) << std::endl;
+   BOOST_TEST_CLOSE(n1, boost::lexical_cast<target_type>(Real(n1).str(0, boost::is_floating_point<Num>::value)), 3 * std::numeric_limits<Num>::epsilon());
+   BOOST_TEST_CLOSE(n2, boost::lexical_cast<target_type>(Real(n2).str(0, boost::is_floating_point<Num>::value)), std::numeric_limits<Num>::epsilon());
+   BOOST_TEST_CLOSE(n3, boost::lexical_cast<target_type>(Real(n3).str(0, boost::is_floating_point<Num>::value)), std::numeric_limits<Num>::epsilon());
+   BOOST_TEST_CLOSE(n4, boost::lexical_cast<target_type>(Real(n4).str(0, boost::is_floating_point<Num>::value)), std::numeric_limits<Num>::epsilon());
    // Assignment:
    Real r(0);
    BOOST_TEST(r != n1);
@@ -538,11 +556,11 @@ void test()
    //
    // Integer only functions:
    //
-   test_integer_ops<Real>(boost::math::number_category<Real>());
+   test_integer_ops<Real>(typename boost::math::number_category<Real>::type());
    //
    // Real number only functions:
    //
-   test_real_ops<Real>(boost::math::number_category<Real>());
+   test_real_ops<Real>(typename boost::math::number_category<Real>::type());
    //
    // Test basic arithmetic:
    //

@@ -170,6 +170,7 @@ run test_numeric_limits.cpp mpfr
          [ check-target-builds ../config//has_mpfr : : <build>no ]
         : test_numeric_limits_mpfr_50 ;
 
+
 run test_numeric_limits.cpp $(E_FLOAT_SRC)
         : # command line
         : # input files
@@ -178,5 +179,11 @@ run test_numeric_limits.cpp $(E_FLOAT_SRC)
          [ check-target-builds ../config//has_e_float : : <build>no ]
         : test_numeric_limits_e_float ;
 
-
+run big_number_concept_check.cpp  mpfr
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPFR_50
+         [ check-target-builds ../config//has_mpfr : : <build>no ]
+        : big_number_concept_check_mpfr_50 ;
 

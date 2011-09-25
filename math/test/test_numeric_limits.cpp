@@ -51,10 +51,14 @@ void test()
    PRINT(is_specialized);
    PRINT(min());
    PRINT(max());
+#ifndef BOOST_NO_NUMERIC_LIMITS_LOWEST
    PRINT(lowest());
+#endif
    PRINT(digits);
    PRINT(digits10);
+#ifndef BOOST_NO_NUMERIC_LIMITS_LOWEST
    PRINT(max_digits10);
+#endif
    PRINT(is_signed);
    PRINT(is_integer);
    PRINT(is_exact);

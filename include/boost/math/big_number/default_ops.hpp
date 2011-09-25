@@ -501,10 +501,10 @@ inline int itrunc(const big_number<Backend>& v, const Policy& pol)
       return policies::raise_rounding_error("boost::math::itrunc<%1%>(%1%)", 0, v, 0, pol).template convert_to<int>();
    return r.template convert_to<int>();
 }
-template <class T, class Policy>
-inline long ltrunc(const detail::big_number_exp<T>& v, const Policy& pol)
+template <class tag, class A1, class A2, class A3, class Policy>
+inline long ltrunc(const detail::big_number_exp<tag, A1, A2, A3>& v, const Policy& pol)
 {
-   typedef typename detail::expression_type<T>::type number_type;
+   typedef typename detail::big_number_exp<tag, A1, A2, A3>::result_result number_type;
    number_type r = trunc(v, pol);
    if(fabs(r) > (std::numeric_limits<long>::max)())
       return policies::raise_rounding_error("boost::math::ltrunc<%1%>(%1%)", 0, v, 0L, pol).template convert_to<long>();
@@ -519,10 +519,10 @@ inline long ltrunc(const big_number<T>& v, const Policy& pol)
    return r.template convert_to<long>();
 }
 #ifndef BOOST_NO_LONG_LONG
-template <class T, class Policy>
-inline long long lltrunc(const detail::big_number_exp<T>& v, const Policy& pol)
+template <class tag, class A1, class A2, class A3, class Policy>
+inline long long lltrunc(const detail::big_number_exp<tag, A1, A2, A3>& v, const Policy& pol)
 {
-   typedef typename detail::expression_type<T>::type number_type;
+   typedef typename detail::big_number_exp<tag, A1, A2, A3>::result_result number_type;
    number_type r = trunc(v, pol);
    if(fabs(r) > (std::numeric_limits<long long>::max)())
       return policies::raise_rounding_error("boost::math::lltrunc<%1%>(%1%)", 0, v, 0LL, pol).template convert_to<long long>();
@@ -537,10 +537,10 @@ inline long long lltrunc(const big_number<T>& v, const Policy& pol)
    return r.template convert_to<long long>();
 }
 #endif
-template <class T, class Policy>
-inline int iround(const detail::big_number_exp<T>& v, const Policy& pol)
+template <class tag, class A1, class A2, class A3, class Policy>
+inline int iround(const detail::big_number_exp<tag, A1, A2, A3>& v, const Policy& pol)
 {
-   typedef typename detail::expression_type<T>::type number_type;
+   typedef typename detail::big_number_exp<tag, A1, A2, A3>::result_result number_type;
    number_type r = round(v, pol);
    if(fabs(r) > (std::numeric_limits<int>::max)())
       return policies::raise_rounding_error("boost::math::iround<%1%>(%1%)", 0, v, 0, pol).template convert_to<int>();
@@ -554,10 +554,10 @@ inline int iround(const big_number<T>& v, const Policy& pol)
       return policies::raise_rounding_error("boost::math::iround<%1%>(%1%)", 0, v, 0, pol).template convert_to<int>();
    return r.template convert_to<int>();
 }
-template <class T, class Policy>
-inline long lround(const detail::big_number_exp<T>& v, const Policy& pol)
+template <class tag, class A1, class A2, class A3, class Policy>
+inline long lround(const detail::big_number_exp<tag, A1, A2, A3>& v, const Policy& pol)
 {
-   typedef typename detail::expression_type<T>::type number_type;
+   typedef typename detail::big_number_exp<tag, A1, A2, A3>::result_result number_type;
    number_type r = round(v, pol);
    if(fabs(r) > (std::numeric_limits<long>::max)())
       return policies::raise_rounding_error("boost::math::lround<%1%>(%1%)", 0, v, 0L, pol).template convert_to<long>();
@@ -572,10 +572,10 @@ inline long lround(const big_number<T>& v, const Policy& pol)
    return r.template convert_to<long>();
 }
 #ifndef BOOST_NO_LONG_LONG
-template <class T, class Policy>
-inline long long llround(const detail::big_number_exp<T>& v, const Policy& pol)
+template <class tag, class A1, class A2, class A3, class Policy>
+inline long long llround(const detail::big_number_exp<tag, A1, A2, A3>& v, const Policy& pol)
 {
-   typedef typename detail::expression_type<T>::type number_type;
+   typedef typename detail::big_number_exp<tag, A1, A2, A3>::result_result number_type;
    number_type r = round(v, pol);
    if(fabs(r) > (std::numeric_limits<long long>::max)())
       return policies::raise_rounding_error("boost::math::iround<%1%>(%1%)", 0, v, 0LL, pol).template convert_to<long long>();
@@ -656,14 +656,14 @@ template <class Backend> \
 detail::big_number_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
-  , big_number<Backend>\
+  , big_number<Backend> \
 > \
 func(const big_number<Backend>& arg)\
 {\
     return detail::big_number_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
-  , big_number<Backend>\
+  , big_number<Backend> \
   >(\
         detail::BOOST_JOIN(func, _funct)<Backend>() \
       , arg   \
@@ -734,15 +734,15 @@ detail::big_number_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
   , detail::big_number_exp<tag, A1, A2, A3> \
-  , big_number<Backend>\
->\
+  , big_number<Backend> \
+> \
 func(const detail::big_number_exp<tag, A1, A2, A3>& arg, const big_number<Backend>& a)\
 {\
     return detail::big_number_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
   , detail::big_number_exp<tag, A1, A2, A3> \
-  , big_number<Backend>\
+  , big_number<Backend> \
   >(\
         detail::BOOST_JOIN(func, _funct)<Backend>() \
       , arg,\
@@ -755,7 +755,7 @@ detail::big_number_exp<\
   , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::big_number_exp<tag, A1, A2, A3> >::type> \
   , detail::big_number_exp<tag, A1, A2, A3> \
   , detail::big_number_exp<tagb, A1b, A2b, A3b> \
->\
+> \
 func(const detail::big_number_exp<tag, A1, A2, A3>& arg, const detail::big_number_exp<tagb, A1b, A2b, A3b>& a)\
 {\
     return detail::big_number_exp<\
@@ -775,7 +775,7 @@ typename enable_if<\
    detail::big_number_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
-  , big_number<Backend>\
+  , big_number<Backend> \
   , Arithmetic\
   > \
 >::type \
@@ -784,7 +784,7 @@ func(const big_number<Backend>& arg, const Arithmetic& a)\
     return detail::big_number_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
-  , big_number<Backend>\
+  , big_number<Backend> \
   , Arithmetic\
   >(\
         detail::BOOST_JOIN(func, _funct)<Backend>() \
@@ -837,7 +837,7 @@ detail::big_number_exp<\
   , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::big_number_exp<tag, A1, A2, A3> >::type> \
   , detail::big_number_exp<tag, A1, A2, A3> \
   , Arg2\
->\
+> \
 func(const detail::big_number_exp<tag, A1, A2, A3>& arg, Arg2 const& a)\
 {\
     return detail::big_number_exp<\
@@ -854,15 +854,15 @@ template <class Backend> \
 detail::big_number_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
-  , big_number<Backend>\
+  , big_number<Backend> \
   , Arg2\
->\
+> \
 func(const big_number<Backend>& arg, Arg2 const& a)\
 {\
     return detail::big_number_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
-  , big_number<Backend>\
+  , big_number<Backend> \
   , Arg2\
   >(\
         detail::BOOST_JOIN(func, _funct)<Backend>() \

@@ -179,7 +179,10 @@ struct arg_type<big_number_exp<Tag, Arg1, Arg2, Arg3> >
 };
 
 template <class T>
-void unmentionable_proc(){}
+struct unmentionable
+{
+   static void proc(){}
+};
 
 typedef void (*unmentionable_type)();
 
@@ -226,7 +229,7 @@ struct big_number_exp<tag, Arg1, void, void>
    operator unmentionable_type()const
    {
       result_type r(*this);
-      return r ? unmentionable_proc<void> : 0;
+      return r ? &unmentionable<void>::proc : 0;
    }
 
 private:
@@ -248,7 +251,7 @@ struct big_number_exp<terminal, Arg1, void, void>
 
    operator unmentionable_type()const
    {
-      return arg ? unmentionable_proc<void> : 0;
+      return arg ? &unmentionable<void>::proc : 0;
    }
 
 private:
@@ -276,7 +279,7 @@ struct big_number_exp<tag, Arg1, Arg2, void>
    operator unmentionable_type()const
    {
       result_type r(*this);
-      return r ? unmentionable_proc<void> : 0;
+      return r ? &unmentionable<void>::proc : 0;
    }
 
    static const unsigned left_depth = left_type::depth + 1;
@@ -315,7 +318,7 @@ struct big_number_exp
    operator unmentionable_type()const
    {
       result_type r(*this);
-      return r ? unmentionable_proc<void> : 0;
+      return r ? &unmentionable<void>::proc : 0;
    }
 
    static const unsigned left_depth = left_type::depth + 1;
