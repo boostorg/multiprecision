@@ -1,0 +1,151 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>big_number</title>
+<link rel="stylesheet" href="../../boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.76.1">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.BigNumbers">
+<link rel="up" href="../ref.html" title="Reference">
+<link rel="prev" href="../ref.html" title="Reference">
+<link rel="next" href="backendconc.html" title="Backend Requirements">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../ref.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../ref.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="backendconc.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_bignumbers.ref.bignum"></a><a class="link" href="bignum.html" title="big_number">big_number</a>
+</h3></div></div></div>
+<a name="boost_bignumbers.ref.bignum.synopsis"></a><h5>
+<a name="boost_bignumbers.ref.bignum.synopsis-heading"></a>
+        <a class="link" href="bignum.html#boost_bignumbers.ref.bignum.synopsis">Synopsis</a>
+      </h5>
+<pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">math</span><span class="special">{</span>
+
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
+<span class="keyword">class</span> <span class="identifier">big_number</span>
+<span class="special">{</span>
+   <span class="identifier">big_number</span><span class="special">();</span>
+   <span class="identifier">big_number</span><span class="special">(</span><span class="identifier">see</span><span class="special">-</span><span class="identifier">below</span><span class="special">);</span>
+   <span class="identifier">big_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">=(</span><span class="identifier">see</span><span class="special">-</span><span class="identifier">below</span><span class="special">);</span>
+   <span class="comment">/* Other number-type operators here */</span>
+   <span class="comment">// string conversion:</span>
+   <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">str</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
+   <span class="comment">// precision control:</span>
+   <span class="keyword">static</span> <span class="keyword">unsigned</span> <span class="identifier">default_precision</span><span class="special">();</span>
+   <span class="keyword">static</span> <span class="keyword">void</span> <span class="identifier">default_precision</span><span class="special">(</span><span class="keyword">unsigned</span> <span class="identifier">digits10</span><span class="special">);</span>
+   <span class="keyword">unsigned</span> <span class="identifier">precision</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
+   <span class="keyword">void</span> <span class="identifier">precision</span><span class="special">(</span><span class="keyword">unsigned</span> <span class="identifier">digits10</span><span class="special">);</span>
+   <span class="comment">// Comparison:</span>
+   <span class="keyword">int</span> <span class="identifier">compare</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">big_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">o</span><span class="special">)</span><span class="keyword">const</span><span class="special">;</span>
+   <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">V</span><span class="special">&gt;</span>
+   <span class="keyword">typename</span> <span class="identifier">enable_if</span><span class="special">&lt;</span><span class="identifier">is_arithmetic</span><span class="special">&lt;</span><span class="identifier">V</span><span class="special">&gt;,</span> <span class="keyword">int</span><span class="special">&gt;::</span><span class="identifier">type</span> <span class="identifier">compare</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">V</span><span class="special">&amp;</span> <span class="identifier">o</span><span class="special">)</span><span class="keyword">const</span><span class="special">;</span>
+<span class="special">};</span>
+
+<span class="special">}}</span> <span class="comment">// namespaces</span>
+</pre>
+<a name="boost_bignumbers.ref.bignum.description"></a><h5>
+<a name="boost_bignumbers.ref.bignum.description-heading"></a>
+        <a class="link" href="bignum.html#boost_bignumbers.ref.bignum.description">Description</a>
+      </h5>
+<pre class="programlisting"><span class="identifier">big_number</span><span class="special">();</span>
+<span class="identifier">big_number</span><span class="special">(</span><span class="identifier">see</span><span class="special">-</span><span class="identifier">below</span><span class="special">);</span>
+<span class="identifier">big_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">=(</span><span class="identifier">see</span><span class="special">-</span><span class="identifier">below</span><span class="special">);</span>
+</pre>
+<p>
+        Type <code class="computeroutput"><span class="identifier">big_number</span></code> is default
+        constructible, and copy both constructible and assignable from:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+            Itself.
+          </li>
+<li class="listitem">
+            An expression template which is the result of one of the arithmetic operators.
+          </li>
+<li class="listitem">
+            Any builtin arithmetic type.
+          </li>
+<li class="listitem">
+            A <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span></code> or any type which is convertible
+            to <code class="computeroutput"><span class="keyword">const</span> <span class="keyword">char</span><span class="special">*</span></code>.
+          </li>
+</ul></div>
+<pre class="programlisting"><span class="comment">/* Other number-type operators here */</span>
+</pre>
+<p>
+        The following arithmetic operations are support for real-numbered types:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+            Binary +, -, *, /, +<code class="literal">, -</code>, *<code class="literal">, /</code>,
+            ==, !<code class="literal">, &lt;</code>, &gt;=, &lt;, &gt;.
+          </li>
+<li class="listitem">
+            Unary +, -.
+          </li>
+</ul></div>
+<p>
+        For integer types the following operators are also supported:
+      </p>
+<p>
+        Binary %, %=.
+      </p>
+<p>
+        (More to follow!!)
+      </p>
+<p>
+        Note that the result of the binary +, -, *, / and % operations is an expression
+        template of "unmentionable type".
+      </p>
+<pre class="programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">str</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
+</pre>
+<p>
+        Returns the number formatted as a string (TODO: enable custom precision).
+      </p>
+<pre class="programlisting"><span class="keyword">static</span> <span class="keyword">unsigned</span> <span class="identifier">default_precision</span><span class="special">();</span>
+<span class="keyword">static</span> <span class="keyword">void</span> <span class="identifier">default_precision</span><span class="special">(</span><span class="keyword">unsigned</span> <span class="identifier">digits10</span><span class="special">);</span>
+<span class="keyword">unsigned</span> <span class="identifier">precision</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
+<span class="keyword">void</span> <span class="identifier">precision</span><span class="special">(</span><span class="keyword">unsigned</span> <span class="identifier">digits10</span><span class="special">);</span>
+</pre>
+<p>
+        These functions are only available if the Backend template parameter supports
+        runtime changes to precision. They get and set the default precision and
+        the precision of *this respectively.
+      </p>
+<pre class="programlisting"><span class="keyword">int</span> <span class="identifier">compare</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">big_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">o</span><span class="special">)</span><span class="keyword">const</span><span class="special">;</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">V</span><span class="special">&gt;</span>
+<span class="keyword">typename</span> <span class="identifier">enable_if</span><span class="special">&lt;</span><span class="identifier">is_arithmetic</span><span class="special">&lt;</span><span class="identifier">V</span><span class="special">&gt;,</span> <span class="keyword">int</span><span class="special">&gt;::</span><span class="identifier">type</span> <span class="identifier">compare</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">V</span><span class="special">&amp;</span> <span class="identifier">other</span><span class="special">)</span><span class="keyword">const</span><span class="special">;</span>
+</pre>
+<p>
+        Returns:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+            A value less that 0 for *this &lt; other
+          </li>
+<li class="listitem">
+            A value greater that 0 for *this &gt; other
+          </li>
+<li class="listitem">
+            Zero for *this == other
+          </li>
+</ul></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011 John Maddock<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../ref.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../ref.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="backendconc.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
