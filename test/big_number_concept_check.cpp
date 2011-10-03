@@ -57,22 +57,22 @@
 void foo()
 {
 #ifdef TEST_BACKEND
-   instantiate(boost::math::big_number_real_architype());
+   instantiate(boost::multiprecision::big_number_real_architype());
 #endif
 #ifdef TEST_MPF_50
-   instantiate(boost::math::mpf_real_50());
+   instantiate(boost::multiprecision::mpf_real_50());
 #endif
 #ifdef TEST_MPF
-   instantiate(boost::math::mpf_real());
+   instantiate(boost::multiprecision::mpf_real());
 #endif
 #ifdef TEST_MPFR_50
-   instantiate(boost::math::mpfr_real_50());
+   instantiate(boost::multiprecision::mpfr_real_50());
 #endif
 #ifdef TEST_MPFR
-   instantiate(boost::math::mpfr_real());
+   instantiate(boost::multiprecision::mpfr_real());
 #endif
 #ifdef TEST_E_FLOAT
-   instantiate(boost::math::e_float());
+   instantiate(boost::multiprecision::e_float());
 #endif
 }
 
@@ -82,19 +82,19 @@ int main()
    BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::math::concepts::big_number_real_architype>));
 #endif
 #ifdef TEST_MPF_50
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::math::mpf_real_50>));
+   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mpf_real_50>));
 #endif
 #ifdef TEST_MPF
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::math::mpf_real>));
+   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mpf_real>));
 #endif
 #ifdef TEST_MPFR_50
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::math::mpfr_real_50>));
+   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mpfr_real_50>));
 #endif
 #ifdef TEST_MPFR
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::math::mpfr_real>));
+   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mpfr_real>));
 #endif
 #ifdef TEST_E_FLOAT
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::math::e_float>));
+   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::e_float>));
 #endif
 
 }

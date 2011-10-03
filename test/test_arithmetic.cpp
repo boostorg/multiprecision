@@ -74,7 +74,7 @@ template <class Real, class T>
 void test_integer_ops(const T&){}
 
 template <class Real>
-void test_integer_ops(const boost::mpl::int_<boost::math::number_kind_integer>&)
+void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_integer>&)
 {
    Real a(20);
    Real b(7);
@@ -270,7 +270,7 @@ template <class Real, class T>
 void test_real_ops(const T&){}
 
 template <class Real>
-void test_real_ops(const boost::mpl::int_<boost::math::number_kind_floating_point>&)
+void test_real_ops(const boost::mpl::int_<boost::multiprecision::number_kind_floating_point>&)
 {
 #if defined(TEST_MPF) || defined(TEST_MPF_50) || defined(TEST_BACKEND) || defined(TEST_MPFR)
    BOOST_TEST(abs(Real(2)) == 2);
@@ -566,11 +566,11 @@ void test()
    //
    // Integer only functions:
    //
-   test_integer_ops<Real>(typename boost::math::number_category<Real>::type());
+   test_integer_ops<Real>(typename boost::multiprecision::number_category<Real>::type());
    //
    // Real number only functions:
    //
-   test_real_ops<Real>(typename boost::math::number_category<Real>::type());
+   test_real_ops<Real>(typename boost::multiprecision::number_category<Real>::type());
    //
    // Test basic arithmetic:
    //
@@ -859,35 +859,35 @@ void test()
 int main()
 {
 #ifdef TEST_BACKEND
-   test<boost::math::mp_number<boost::math::concepts::big_number_backend_real_architype> >();
+   test<boost::multiprecision::mp_number<boost::multiprecision::concepts::big_number_backend_real_architype> >();
 #endif
 #ifdef TEST_MPF50
-   test<boost::math::mpf_real_50>();
+   test<boost::multiprecision::mpf_real_50>();
 #endif
 #ifdef TEST_MPF
-   boost::math::mpf_real::default_precision(1000);
+   boost::multiprecision::mpf_real::default_precision(1000);
    /*
-   boost::math::mpf_real r;
+   boost::multiprecision::mpf_real r;
    r.precision(50);
    BOOST_TEST(r.precision() >= 50);
    */
-   BOOST_TEST(boost::math::mpf_real::default_precision() == 1000);
-   test<boost::math::mpf_real>();
+   BOOST_TEST(boost::multiprecision::mpf_real::default_precision() == 1000);
+   test<boost::multiprecision::mpf_real>();
 #endif
 #ifdef TEST_MPZ
-   test<boost::math::mpz_int>();
+   test<boost::multiprecision::mpz_int>();
 #endif
 #ifdef TEST_MPQ
-   test<boost::math::mpq_rational>();
+   test<boost::multiprecision::mpq_rational>();
 #endif
 #ifdef TEST_E_FLOAT
-   test<boost::math::e_float>();
+   test<boost::multiprecision::e_float>();
 #endif
 #ifdef TEST_MPFR
-   test<boost::math::mpfr_real>();
+   test<boost::multiprecision::mpfr_real>();
 #endif
 #ifdef TEST_MPFR_50
-   test<boost::math::mpfr_real_50>();
+   test<boost::multiprecision::mpfr_real_50>();
 #endif
    return boost::report_errors();
 }

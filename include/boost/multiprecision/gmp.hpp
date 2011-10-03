@@ -15,7 +15,7 @@
 #include <limits>
 #include <climits>
 
-namespace boost{ namespace math{
+namespace boost{ namespace multiprecision{
 
 template <unsigned digits10>
 struct gmp_real;
@@ -567,6 +567,68 @@ inline void convert_to(double* result, const gmp_real<digits10>& val)
 {
    *result = mpf_get_d(val.data());
 }
+#ifdef BOOST_HAS_LONG_LONG
+template <unsigned digits10>
+inline void convert_to(long long* result, const gmp_real<digits10>& val)
+{
+   gmp_real<digits10> t(val);
+   if(get_sign(t) < 0)
+      t.negate();
+   
+   long digits = std::numeric_limits<long long>::digits - std::numeric_limits<long>::digits;
+
+   if(digits > 0)
+      mpf_div_2exp(t.data(), t.data(), digits);
+
+   if(!mpf_fits_slong_p(t.data()))
+   {
+      *result = (std::numeric_limits<long long>::max)();
+      return;
+   };
+
+   *result = mpf_get_si(t.data());
+   while(digits > 0)
+   {
+      *result <<= digits;
+      digits -= std::numeric_limits<unsigned long>::digits;
+      mpf_mul_2exp(t.data(), t.data(), digits >= 0 ? std::numeric_limits<unsigned long>::digits : std::numeric_limits<unsigned long>::digits + digits);
+      unsigned long l = mpf_get_ui(t.data());
+      if(digits < 0)
+         l >>= -digits;
+      *result |= l;
+   }
+   if(get_sign(val) < 0)
+      *result = -*result;
+}
+template <unsigned digits10>
+inline void convert_to(unsigned long long* result, const gmp_real<digits10>& val)
+{
+   gmp_real<digits10> t(val);
+   
+   long digits = std::numeric_limits<long long>::digits - std::numeric_limits<long>::digits;
+
+   if(digits > 0)
+      mpf_div_2exp(t.data(), t.data(), digits);
+
+   if(!mpf_fits_ulong_p(t.data()))
+   {
+      *result = (std::numeric_limits<long long>::max)();
+      return;
+   }
+
+   *result = mpf_get_ui(t.data());
+   while(digits > 0)
+   {
+      *result <<= digits;
+      digits -= std::numeric_limits<unsigned long>::digits;
+      mpf_mul_2exp(t.data(), t.data(), digits >= 0 ? std::numeric_limits<unsigned long>::digits : std::numeric_limits<unsigned long>::digits + digits);
+      unsigned long l = mpf_get_ui(t.data());
+      if(digits < 0)
+         l >>= -digits;
+      *result |= l;
+   }
+}
+#endif
 
 //
 // Native non-member operations:
@@ -1289,14 +1351,14 @@ inline void convert_to(long* result, const gmp_rational& val)
 {
    double r;
    convert_to(&r, val);
-   *result = r;
+   *result = static_cast<long>(r);
 }
 
 inline void convert_to(unsigned long* result, const gmp_rational& val)
 {
    double r;
    convert_to(&r, val);
-   *result = r;
+   *result = static_cast<long>(r);
 }
 
 inline void eval_abs(gmp_rational& result, const gmp_rational& val)
@@ -1329,9 +1391,9 @@ namespace std{
 // numeric_limits [partial] specializations for the types declared in this header:
 //
 template<unsigned Digits10> 
-class numeric_limits<boost::math::mp_number<boost::math::gmp_real<Digits10> > >
+class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_real<Digits10> > >
 {
-   typedef boost::math::mp_number<boost::math::gmp_real<Digits10> > number_type;
+   typedef boost::multiprecision::mp_number<boost::multiprecision::gmp_real<Digits10> > number_type;
 public:
    BOOST_STATIC_CONSTEXPR bool is_specialized = true;
    BOOST_STATIC_CONSTEXPR number_type (min)() noexcept
@@ -1421,10 +1483,10 @@ private:
    {
       data_initializer()
       {
-         std::numeric_limits<boost::math::mp_number<boost::math::gmp_real<digits10> > >::epsilon();
-         std::numeric_limits<boost::math::mp_number<boost::math::gmp_real<digits10> > >::round_error();
-         (std::numeric_limits<boost::math::mp_number<boost::math::gmp_real<digits10> > >::min)();
-         (std::numeric_limits<boost::math::mp_number<boost::math::gmp_real<digits10> > >::max)();
+         std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_real<digits10> > >::epsilon();
+         std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_real<digits10> > >::round_error();
+         (std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_real<digits10> > >::min)();
+         (std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_real<digits10> > >::max)();
       }
       void do_nothing()const{}
    };
@@ -1432,12 +1494,12 @@ private:
 };
 
 template<unsigned Digits10> 
-const typename numeric_limits<boost::math::mp_number<boost::math::gmp_real<Digits10> > >::data_initializer numeric_limits<boost::math::mp_number<boost::math::gmp_real<Digits10> > >::initializer;
+const typename numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_real<Digits10> > >::data_initializer numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_real<Digits10> > >::initializer;
 
 template<> 
-class numeric_limits<boost::math::mp_number<boost::math::gmp_real<0> > >
+class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_real<0> > >
 {
-   typedef boost::math::mp_number<boost::math::gmp_real<0> > number_type;
+   typedef boost::multiprecision::mp_number<boost::multiprecision::gmp_real<0> > number_type;
 public:
    BOOST_STATIC_CONSTEXPR bool is_specialized = false;
    BOOST_STATIC_CONSTEXPR number_type (min)() noexcept { return number_type(); }
@@ -1474,9 +1536,9 @@ public:
 };
 
 template<> 
-class numeric_limits<boost::math::mpz_int >
+class numeric_limits<boost::multiprecision::mpz_int >
 {
-   typedef boost::math::mpz_int number_type;
+   typedef boost::multiprecision::mpz_int number_type;
 public:
    BOOST_STATIC_CONSTEXPR bool is_specialized = true;
    //

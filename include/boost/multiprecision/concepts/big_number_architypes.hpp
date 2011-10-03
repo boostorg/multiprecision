@@ -15,7 +15,7 @@
 #include <boost/math/special_functions/trunc.hpp>
 
 namespace boost{
-namespace math{
+namespace multiprecision{
 namespace concepts{
 
 #ifdef BOOST_MSVC
@@ -64,7 +64,7 @@ struct big_number_backend_real_architype
    }
    big_number_backend_real_architype& operator = (const char* s)
    {
-      m_value = boost::lexical_cast<double>(s);
+      m_value = boost::lexical_cast<long double>(s);
       std::cout << "const char* Assignment (" << s << ")" << std::endl;
       return *this;
    }
@@ -141,6 +141,19 @@ inline void divide(big_number_backend_real_architype& result, const big_number_b
 {
    std::cout << "Division (" << result.m_value << " /= " << o.m_value << ")" << std::endl;
    result.m_value /= o.m_value;
+}
+
+inline void convert_to(boost::uintmax_t* result, const big_number_backend_real_architype& val)
+{
+   *result = static_cast<boost::uintmax_t>(val.m_value);
+}
+inline void convert_to(boost::intmax_t* result, const big_number_backend_real_architype& val)
+{
+   *result = static_cast<boost::intmax_t>(val.m_value);
+}
+inline void convert_to(long double* result, big_number_backend_real_architype& val)
+{
+   *result = val.m_value;
 }
 
 inline void eval_frexp(big_number_backend_real_architype& result, const big_number_backend_real_architype& arg, int* exp)
@@ -253,7 +266,7 @@ inline void eval_tanh(big_number_backend_real_architype& result, const big_numbe
    result = std::tanh(arg.m_value);
 }
 
-typedef boost::math::mp_number<big_number_backend_real_architype> big_number_real_architype;
+typedef boost::multiprecision::mp_number<big_number_backend_real_architype> big_number_real_architype;
 
 }}} // namespaces
 
@@ -264,10 +277,10 @@ namespace std{
 #endif
 
 template <>
-class numeric_limits<boost::math::concepts::big_number_real_architype> : public std::numeric_limits<long double>
+class numeric_limits<boost::multiprecision::concepts::big_number_real_architype> : public std::numeric_limits<long double>
 {
    typedef std::numeric_limits<long double> base_type;
-   typedef boost::math::concepts::big_number_real_architype number_type;
+   typedef boost::multiprecision::concepts::big_number_real_architype number_type;
 public:
    BOOST_STATIC_CONSTEXPR number_type (min)() noexcept { return (base_type::min)(); }
    BOOST_STATIC_CONSTEXPR number_type (max)() noexcept { return (base_type::max)(); }

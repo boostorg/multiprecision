@@ -21,10 +21,10 @@ http://www.netlib.org/f2c/libf2c.zip
 
 #ifdef TEST_MPF_100
 #include <boost/multiprecision/gmp.hpp>
-typedef boost::math::mpf_real_100 real_type;
+typedef boost::multiprecision::mpf_real_100 real_type;
 #elif defined(TEST_MPFR_100)
 #include <boost/multiprecision/mpfr.hpp>
-typedef boost::math::mpfr_real_100 real_type;
+typedef boost::multiprecision::mpfr_real_100 real_type;
 #elif defined(TEST_GMPXX)
 #include <gmpxx.h>
 typedef mpf_class real_type;
@@ -39,7 +39,7 @@ typedef ::efx::e_float real_type;
 using ef::abs;
 #elif defined(TEST_E_FLOAT_BN)
 #include <boost/multiprecision/e_float.hpp>
-typedef boost::math::e_float real_type;
+typedef boost::multiprecision::e_float real_type;
 #else
 typedef double real_type;
 #endif
@@ -111,7 +111,7 @@ extern "C" int MAIN__()
 #elif defined(TEST_E_FLOAT)
    std::cout << "Testing boost::ef::e_float" << std::endl;
 #elif defined(TEST_E_FLOAT_BN)
-   std::cout << "Testing boost::math::e_float" << std::endl;
+   std::cout << "Testing boost::multiprecision::e_float" << std::endl;
 #else
    std::cout << "Testing double" << std::endl;
 #endif
@@ -1242,7 +1242,7 @@ mp_number<gmp_real<100> >:
  times for array with leading dimension of1001
       279.96        0.84       280.8      2.3813     0.83988      5014.3
 
-boost::math::ef::e_float:
+boost::multiprecision::ef::e_float:
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
      norm. resid      resid           machep         x(1)          x(n)

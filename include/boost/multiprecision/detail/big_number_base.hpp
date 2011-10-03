@@ -10,7 +10,7 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_convertible.hpp>
 
-namespace boost{ namespace math{
+namespace boost{ namespace multiprecision{
 
 template <class Backend>
 class mp_number;
@@ -139,11 +139,11 @@ struct backend_type<mp_exp<tag, A1, A2, A3> >
 template <class T>
 struct is_big_number : public mpl::false_{};
 template <class T>
-struct is_big_number<boost::math::mp_number<T> > : public mpl::true_{};
+struct is_big_number<boost::multiprecision::mp_number<T> > : public mpl::true_{};
 template <class T>
 struct is_big_number_exp : public mpl::false_{};
 template <class Tag, class Arg1, class Arg2, class Arg3>
-struct is_big_number_exp<boost::math::detail::mp_exp<Tag, Arg1, Arg2, Arg3> > : public mpl::true_{};
+struct is_big_number_exp<boost::multiprecision::detail::mp_exp<Tag, Arg1, Arg2, Arg3> > : public mpl::true_{};
 
 template <class T1, class T2>
 struct combine_expression;
@@ -971,9 +971,9 @@ template <class T>
 struct promote_arg;
 
 template <class tag, class A1, class A2, class A3>
-struct promote_arg<boost::math::detail::mp_exp<tag, A1, A2, A3> >
+struct promote_arg<boost::multiprecision::detail::mp_exp<tag, A1, A2, A3> >
 {
-   typedef typename boost::math::detail::mp_exp<tag, A1, A2, A3>::result_type type;
+   typedef typename boost::multiprecision::detail::mp_exp<tag, A1, A2, A3>::result_type type;
 };
 
 }}}

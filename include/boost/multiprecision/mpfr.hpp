@@ -15,7 +15,7 @@
 #include <cmath>
 #include <algorithm>
 
-namespace boost{ namespace math{
+namespace boost{ namespace multiprecision{
 
 template <unsigned digits10>
 struct mpfr_real_backend;
@@ -736,10 +736,14 @@ typedef mp_number<mpfr_real_backend<500> >   mpfr_real_500;
 typedef mp_number<mpfr_real_backend<1000> >  mpfr_real_1000;
 typedef mp_number<mpfr_real_backend<0> >     mpfr_real;
 
+} // namespace boost
+
+namespace math{
+
 namespace lanczos{
 
 template<unsigned Digits10, class Policy>
-struct lanczos<mp_number<mpfr_real_backend<Digits10> >, Policy>
+struct lanczos<multiprecision::mp_number<multiprecision::mpfr_real_backend<Digits10> >, Policy>
 {
    typedef typename mpl::if_c<
       Digits10 <= 36,
@@ -771,9 +775,9 @@ namespace std{
 // numeric_limits [partial] specializations for the types declared in this header:
 //
 template<unsigned Digits10> 
-class numeric_limits<boost::math::mp_number<boost::math::mpfr_real_backend<Digits10> > >
+class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::mpfr_real_backend<Digits10> > >
 {
-   typedef boost::math::mp_number<boost::math::mpfr_real_backend<Digits10> > number_type;
+   typedef boost::multiprecision::mp_number<boost::multiprecision::mpfr_real_backend<Digits10> > number_type;
 public:
    BOOST_STATIC_CONSTEXPR bool is_specialized = true;
    BOOST_STATIC_CONSTEXPR number_type (min)() noexcept
@@ -890,12 +894,12 @@ private:
    {
       data_initializer()
       {
-         std::numeric_limits<boost::math::mp_number<boost::math::mpfr_real_backend<digits10> > >::epsilon();
-         std::numeric_limits<boost::math::mp_number<boost::math::mpfr_real_backend<digits10> > >::round_error();
-         (std::numeric_limits<boost::math::mp_number<boost::math::mpfr_real_backend<digits10> > >::min)();
-         (std::numeric_limits<boost::math::mp_number<boost::math::mpfr_real_backend<digits10> > >::max)();
-         std::numeric_limits<boost::math::mp_number<boost::math::mpfr_real_backend<digits10> > >::infinity();
-         std::numeric_limits<boost::math::mp_number<boost::math::mpfr_real_backend<digits10> > >::quiet_NaN();
+         std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::mpfr_real_backend<digits10> > >::epsilon();
+         std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::mpfr_real_backend<digits10> > >::round_error();
+         (std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::mpfr_real_backend<digits10> > >::min)();
+         (std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::mpfr_real_backend<digits10> > >::max)();
+         std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::mpfr_real_backend<digits10> > >::infinity();
+         std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::mpfr_real_backend<digits10> > >::quiet_NaN();
       }
       void do_nothing()const{}
    };
@@ -903,12 +907,12 @@ private:
 };
 
 template<unsigned Digits10> 
-const typename numeric_limits<boost::math::mp_number<boost::math::mpfr_real_backend<Digits10> > >::data_initializer numeric_limits<boost::math::mp_number<boost::math::mpfr_real_backend<Digits10> > >::initializer;
+const typename numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::mpfr_real_backend<Digits10> > >::data_initializer numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::mpfr_real_backend<Digits10> > >::initializer;
 
 template<> 
-class numeric_limits<boost::math::mp_number<boost::math::mpfr_real_backend<0> > >
+class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::mpfr_real_backend<0> > >
 {
-   typedef boost::math::mp_number<boost::math::mpfr_real_backend<0> > number_type;
+   typedef boost::multiprecision::mp_number<boost::multiprecision::mpfr_real_backend<0> > number_type;
 public:
    BOOST_STATIC_CONSTEXPR bool is_specialized = false;
    BOOST_STATIC_CONSTEXPR number_type (min)() noexcept { return number_type(0); }

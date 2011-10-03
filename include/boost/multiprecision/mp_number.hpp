@@ -21,7 +21,7 @@
 #include <boost/throw_exception.hpp>
 #include <boost/multiprecision/detail/default_ops.hpp>
 
-namespace boost{ namespace math{
+namespace boost{ namespace multiprecision{
 
 template <class Backend>
 class mp_number
@@ -546,31 +546,6 @@ private:
       divide(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
 
-#if 0
-   template <class Exp>
-   void do_assign(const Exp& e, const detail::multiply_and_negate_immediates&)
-   {
-      using big_num_default_ops::multiply;
-      multiply(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
-      m_backend.negate();
-   }
-
-   template <class Exp>
-   void do_assign(const Exp& e, const detail::divide_and_negate_immediates&)
-   {
-      using big_num_default_ops::divide;
-      divide(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
-      m_backend.negate();
-   }
-
-   template <class Exp>
-   void do_assign(const Exp& e, const detail::unary_plus&)
-   {
-      typedef typename Exp::left_type left_type;
-      do_assign(e.left(), typename left_type::tag_type());
-   }
-
-#endif
    template <class Exp>
    void do_assign(const Exp& e, const detail::negate&)
    {
@@ -1491,7 +1466,7 @@ struct is_valid_comparison_imp
 };
 
 template <class Exp1, class Exp2>
-struct is_valid_comparison : public boost::math::detail::is_valid_comparison_imp<Exp1, Exp2>::type {};
+struct is_valid_comparison : public boost::multiprecision::detail::is_valid_comparison_imp<Exp1, Exp2>::type {};
 
 }
 

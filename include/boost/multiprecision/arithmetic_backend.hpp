@@ -13,7 +13,7 @@
 #include <boost/multiprecision/mp_number.hpp>
 
 namespace boost{
-namespace math{
+namespace multiprecision{
 
 template <class Arithmetic>
 struct arithmetic_backend
@@ -122,10 +122,10 @@ namespace std{
 #endif
 
 template <class Arithmetic>
-class numeric_limits<boost::math::mp_number<boost::math::arithmetic_backend<Arithmetic> > > : public std::numeric_limits<Arithmetic>
+class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::arithmetic_backend<Arithmetic> > > : public std::numeric_limits<Arithmetic>
 {
    typedef std::numeric_limits<Arithmetic> base_type;
-   typedef boost::math::mp_number<boost::math::arithmetic_backend<Arithmetic> > number_type;
+   typedef boost::multiprecision::mp_number<boost::multiprecision::arithmetic_backend<Arithmetic> > number_type;
 public:
    BOOST_STATIC_CONSTEXPR number_type (min)() noexcept { return (base_type::min)(); }
    BOOST_STATIC_CONSTEXPR number_type (max)() noexcept { return (base_type::max)(); }

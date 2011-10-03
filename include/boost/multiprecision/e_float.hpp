@@ -13,7 +13,7 @@
 #include <fstream>
 
 namespace boost{
-namespace math{
+namespace multiprecision{
 
 typedef mp_number<arithmetic_backend<efx::e_float> > e_float;
 

@@ -187,3 +187,11 @@ run big_number_concept_check.cpp  mpfr
          [ check-target-builds ../config//has_mpfr : : <build>no ]
         : big_number_concept_check_mpfr_50 ;
 
+run test_exp.cpp gmp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPF50
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+        : test_exp_mpf50 ;
+
