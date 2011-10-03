@@ -138,7 +138,7 @@ void test()
 int main()
 {
 #ifdef TEST_BACKEND
-   test<boost::multiprecision::mp_number<boost::multiprecision::concepts::big_number_backend_real_architype> >();
+   test<boost::multiprecision::mp_number<boost::multiprecision::concepts::mp_number_backend_real_architype> >();
 #endif
 #ifdef TEST_MPF50
    test<boost::multiprecision::mpf_real_50>();

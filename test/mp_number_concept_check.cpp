@@ -57,7 +57,7 @@
 void foo()
 {
 #ifdef TEST_BACKEND
-   instantiate(boost::multiprecision::big_number_real_architype());
+   instantiate(boost::multiprecision::mp_number_real_architype());
 #endif
 #ifdef TEST_MPF_50
    instantiate(boost::multiprecision::mpf_real_50());
@@ -79,7 +79,7 @@ void foo()
 int main()
 {
 #ifdef TEST_BACKEND
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::math::concepts::big_number_real_architype>));
+   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::math::concepts::mp_number_real_architype>));
 #endif
 #ifdef TEST_MPF_50
    BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mpf_real_50>));

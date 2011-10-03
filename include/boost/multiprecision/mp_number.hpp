@@ -1384,37 +1384,37 @@ namespace detail
 {
 
 template <class Backend>
-inline int big_number_compare(const mp_number<Backend>& a, const mp_number<Backend>& b)
+inline int mp_number_compare(const mp_number<Backend>& a, const mp_number<Backend>& b)
 {
    return a.compare(b);
 }
 
 template <class Backend, class tag, class A1, class A2, class A3>
-inline int big_number_compare(const mp_number<Backend>& a, const mp_exp<tag, A1, A2, A3>& b)
+inline int mp_number_compare(const mp_number<Backend>& a, const mp_exp<tag, A1, A2, A3>& b)
 {
    return a.compare(mp_number<Backend>(b));
 }
 
 template <class tag, class A1, class A2, class A3, class Backend>
-inline int big_number_compare(const mp_exp<tag, A1, A2, A3>& a, const mp_number<Backend>& b)
+inline int mp_number_compare(const mp_exp<tag, A1, A2, A3>& a, const mp_number<Backend>& b)
 {
    return -b.compare(mp_number<Backend>(a));
 }
 
 template <class Backend, class Val>
-inline int big_number_compare(const mp_number<Backend>& a, const Val b)
+inline int mp_number_compare(const mp_number<Backend>& a, const Val b)
 {
    return a.compare(b);
 }
 
 template <class Val, class Backend>
-inline int big_number_compare(const Val a, const mp_number<Backend>& b)
+inline int mp_number_compare(const Val a, const mp_number<Backend>& b)
 {
    return -b.compare(a);
 }
 
 template <class tag, class A1, class A2, class A3, class tag2, class A1b, class A2b, class A3b>
-inline int big_number_compare(const mp_exp<tag, A1, A2, A3>& a, const mp_exp<tag2, A1b, A2b, A3b>& b)
+inline int mp_number_compare(const mp_exp<tag, A1, A2, A3>& a, const mp_exp<tag2, A1b, A2b, A3b>& b)
 {
    typedef typename mp_exp<tag, A1, A2, A3>::result_type real1;
    typedef typename mp_exp<tag2, A1b, A2b, A3b>::result_type real2;
@@ -1422,7 +1422,7 @@ inline int big_number_compare(const mp_exp<tag, A1, A2, A3>& a, const mp_exp<tag
 }
 
 template <class tag, class A1, class A2, class A3, class Val>
-inline typename enable_if<is_arithmetic<Val>, int>::type big_number_compare(const mp_exp<tag, A1, A2, A3>& a, const Val b)
+inline typename enable_if<is_arithmetic<Val>, int>::type mp_number_compare(const mp_exp<tag, A1, A2, A3>& a, const Val b)
 {
    typedef typename mp_exp<tag, A1, A2, A3>::result_type real;
    real t(a);
@@ -1430,7 +1430,7 @@ inline typename enable_if<is_arithmetic<Val>, int>::type big_number_compare(cons
 }
 
 template <class Val, class tag, class A1, class A2, class A3>
-inline typename enable_if<is_arithmetic<Val>, int>::type big_number_compare(const Val a, const mp_exp<tag, A1, A2, A3>& b)
+inline typename enable_if<is_arithmetic<Val>, int>::type mp_number_compare(const Val a, const mp_exp<tag, A1, A2, A3>& b)
 {
    typedef typename mp_exp<tag, A1, A2, A3>::result_type real;
    return -real(b).compare(a);
@@ -1440,12 +1440,12 @@ template <class Exp1, class Exp2>
 struct is_valid_comparison_imp
 {
    typedef typename mpl::or_<
-      is_big_number<Exp1>,
-      is_big_number_exp<Exp1>
+      is_mp_number<Exp1>,
+      is_mp_number_exp<Exp1>
    >::type is1;
    typedef typename mpl::or_<
-      is_big_number<Exp2>,
-      is_big_number_exp<Exp2>
+      is_mp_number<Exp2>,
+      is_mp_number_exp<Exp2>
    >::type is2;
    typedef typename mpl::or_<
       mpl::and_<
@@ -1475,42 +1475,42 @@ template <class Exp1, class Exp2>
 inline typename boost::enable_if<detail::is_valid_comparison<Exp1, Exp2>, bool>::type 
    operator == (const Exp1& a, const Exp2& b)
 {
-   return 0 == detail::big_number_compare(a, b);
+   return 0 == detail::mp_number_compare(a, b);
 }
 
 template <class Exp1, class Exp2>
 inline typename boost::enable_if<detail::is_valid_comparison<Exp1, Exp2>, bool>::type 
    operator != (const Exp1& a, const Exp2& b)
 {
-   return 0 != detail::big_number_compare(a, b);
+   return 0 != detail::mp_number_compare(a, b);
 }
 
 template <class Exp1, class Exp2>
 inline typename boost::enable_if<detail::is_valid_comparison<Exp1, Exp2>, bool>::type 
    operator <= (const Exp1& a, const Exp2& b)
 {
-   return 0 >= detail::big_number_compare(a, b);
+   return 0 >= detail::mp_number_compare(a, b);
 }
 
 template <class Exp1, class Exp2>
 inline typename boost::enable_if<detail::is_valid_comparison<Exp1, Exp2>, bool>::type 
    operator < (const Exp1& a, const Exp2& b)
 {
-   return 0 > detail::big_number_compare(a, b);
+   return 0 > detail::mp_number_compare(a, b);
 }
 
 template <class Exp1, class Exp2>
 inline typename boost::enable_if<detail::is_valid_comparison<Exp1, Exp2>, bool>::type 
    operator >= (const Exp1& a, const Exp2& b)
 {
-   return 0 <= detail::big_number_compare(a, b);
+   return 0 <= detail::mp_number_compare(a, b);
 }
 
 template <class Exp1, class Exp2>
 inline typename boost::enable_if<detail::is_valid_comparison<Exp1, Exp2>, bool>::type 
    operator > (const Exp1& a, const Exp2& b)
 {
-   return 0 < detail::big_number_compare(a, b);
+   return 0 < detail::mp_number_compare(a, b);
 }
 
 template <class Backend>

@@ -137,13 +137,13 @@ struct backend_type<mp_exp<tag, A1, A2, A3> >
 
 
 template <class T>
-struct is_big_number : public mpl::false_{};
+struct is_mp_number : public mpl::false_{};
 template <class T>
-struct is_big_number<boost::multiprecision::mp_number<T> > : public mpl::true_{};
+struct is_mp_number<boost::multiprecision::mp_number<T> > : public mpl::true_{};
 template <class T>
-struct is_big_number_exp : public mpl::false_{};
+struct is_mp_number_exp : public mpl::false_{};
 template <class Tag, class Arg1, class Arg2, class Arg3>
-struct is_big_number_exp<boost::multiprecision::detail::mp_exp<Tag, Arg1, Arg2, Arg3> > : public mpl::true_{};
+struct is_mp_number_exp<boost::multiprecision::detail::mp_exp<Tag, Arg1, Arg2, Arg3> > : public mpl::true_{};
 
 template <class T1, class T2>
 struct combine_expression;
@@ -187,25 +187,25 @@ struct unmentionable
 typedef void (*unmentionable_type)();
 
 template <class T>
-struct big_number_exp_storage
+struct mp_exp_storage
 {
    typedef const T& type;
 };
 
 template <class T>
-struct big_number_exp_storage<T*>
+struct mp_exp_storage<T*>
 {
    typedef T* type;
 };
 
 template <class T>
-struct big_number_exp_storage<const T*>
+struct mp_exp_storage<const T*>
 {
    typedef const T* type;
 };
 
 template <class tag, class A1, class A2, class A3>
-struct big_number_exp_storage<mp_exp<tag, A1, A2, A3> >
+struct mp_exp_storage<mp_exp<tag, A1, A2, A3> >
 {
    typedef mp_exp<tag, A1, A2, A3> type;
 };
@@ -233,7 +233,7 @@ struct mp_exp<tag, Arg1, void, void>
    }
 
 private:
-   typename big_number_exp_storage<Arg1>::type arg;
+   typename mp_exp_storage<Arg1>::type arg;
 };
 
 template<class Arg1>
@@ -255,7 +255,7 @@ struct mp_exp<terminal, Arg1, void, void>
    }
 
 private:
-   typename big_number_exp_storage<Arg1>::type arg;
+   typename mp_exp_storage<Arg1>::type arg;
 };
 
 template <class tag, class Arg1, class Arg2>
@@ -286,8 +286,8 @@ struct mp_exp<tag, Arg1, Arg2, void>
    static const unsigned right_depth = right_type::depth + 1;
    static const unsigned depth = left_depth > right_depth ? left_depth : right_depth;
 private:
-   typename big_number_exp_storage<Arg1>::type arg1;
-   typename big_number_exp_storage<Arg2>::type arg2;
+   typename mp_exp_storage<Arg1>::type arg1;
+   typename mp_exp_storage<Arg2>::type arg2;
 };
 
 template <class tag, class Arg1, class Arg2, class Arg3>
@@ -326,9 +326,9 @@ struct mp_exp
    static const unsigned right_depth = right_type::depth + 1;
    static const unsigned depth = left_depth > right_depth ? (left_depth > middle_depth ? left_depth : middle_depth) : (right_depth > middle_depth ? right_depth : middle_depth);
 private:
-   typename big_number_exp_storage<Arg1>::type arg1;
-   typename big_number_exp_storage<Arg2>::type arg2;
-   typename big_number_exp_storage<Arg3>::type arg3;
+   typename mp_exp_storage<Arg1>::type arg1;
+   typename mp_exp_storage<Arg2>::type arg2;
+   typename mp_exp_storage<Arg3>::type arg3;
 };
 
 } // namespace detail
