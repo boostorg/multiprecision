@@ -179,7 +179,7 @@ run test_numeric_limits.cpp $(E_FLOAT_SRC)
          [ check-target-builds ../config//has_e_float : : <build>no ]
         : test_numeric_limits_e_float ;
 
-run big_number_concept_check.cpp  mpfr
+run mp_number_concept_check.cpp  mpfr
         : # command line
         : # input files
         : # requirements

@@ -28,7 +28,7 @@
 #include <boost/multiprecision/gmp.hpp>
 #endif
 #ifdef TEST_BACKEND
-#include <boost/multiprecision/concepts/big_number_architypes.hpp>
+#include <boost/multiprecision/concepts/mp_number_architypes.hpp>
 #endif
 #ifdef TEST_E_FLOAT
 #include <boost/multiprecision/e_float.hpp>

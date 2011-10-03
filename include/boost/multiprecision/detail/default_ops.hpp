@@ -7,7 +7,7 @@
 #define BOOST_MATH_BIG_NUM_DEF_OPS
 
 #include <boost/math/policies/error_handling.hpp>
-#include <boost/multiprecision/detail/big_number_base.hpp>
+#include <boost/multiprecision/detail/mp_number_base.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/utility/enable_if.hpp>
