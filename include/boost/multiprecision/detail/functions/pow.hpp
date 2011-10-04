@@ -143,7 +143,10 @@ void eval_exp(T& result, const T& x)
       eval_exp(temp, x);
       result = temp;
    }
-   typedef typename mpl::front<T::unsigned_types>::type ui_type;
+   typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+   typedef typename boost::multiprecision::detail::canonical<int, T>::type si_type;
+   typedef typename T::exponent_type exp_type;
+   typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
    // Handle special arguments.
    int type = eval_fpclassify(x);
    bool isneg = get_sign(x) < 0;
@@ -174,7 +177,7 @@ void eval_exp(T& result, const T& x)
       xx.negate();
 
    // Check the range of the argument.
-   static const boost::intmax_t maximum_arg_for_exp = std::numeric_limits<mp_number<T> >::max_exponent == 0 ? std::numeric_limits<long>::max() : std::numeric_limits<mp_number<T> >::max_exponent;
+   static const canonical_exp_type maximum_arg_for_exp = std::numeric_limits<mp_number<T> >::max_exponent == 0 ? std::numeric_limits<long>::max() : std::numeric_limits<mp_number<T> >::max_exponent;
 
    if(xx.compare(maximum_arg_for_exp) >= 0)
    {
@@ -213,13 +216,13 @@ void eval_exp(T& result, const T& x)
    if(b_scale)
    {
       divide(result, xx, get_constant_ln2<T>());
-      boost::intmax_t n;
+      exp_type n;
       convert_to(&n, result);
 
       // The scaling is 2^11 = 2048.
-      static const long long p2 = static_cast<boost::uint32_t>(boost::uint32_t(1u) << 11);
+      static const si_type p2 = static_cast<si_type>(si_type(1) << 11);
 
-      multiply(exp_series, get_constant_ln2<T>(), n);
+      multiply(exp_series, get_constant_ln2<T>(), static_cast<canonical_exp_type>(n));
       subtract(exp_series, xx);
       divide(exp_series, p2);
       exp_series.negate();
@@ -257,14 +260,16 @@ void eval_log(T& result, const T& arg)
       result = temp;
    }
 
-   typedef typename boost::multiprecision::detail::canonical<int, T>::type long_type;
+   typedef typename boost::multiprecision::detail::canonical<int, T>::type si_type;
    typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+   typedef typename T::exponent_type exp_type;
+   typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
 
-   int e;
+   exp_type e;
    T t;
    eval_frexp(t, arg, &e);
    
-   multiply(result, get_constant_ln2<T>(), long_type(e));
+   multiply(result, get_constant_ln2<T>(), canonical_exp_type(e));
    subtract(t, ui_type(1)); /* -0.5 <= t <= 0 */
    t.negate(); /* 0 <= t <= 0.5 */
    T pow = t;

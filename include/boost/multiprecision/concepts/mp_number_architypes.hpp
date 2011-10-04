@@ -28,6 +28,7 @@ struct mp_number_backend_real_architype
    typedef mpl::list<long long>                 signed_types;
    typedef mpl::list<unsigned long long>        unsigned_types;
    typedef mpl::list<long double>               real_types;
+   typedef int                                  exponent_type;
 
    mp_number_backend_real_architype()
    {

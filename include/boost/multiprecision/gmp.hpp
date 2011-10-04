@@ -28,6 +28,7 @@ struct gmp_real_imp
    typedef mpl::list<long, long long>                 signed_types;
    typedef mpl::list<unsigned long, unsigned long long>   unsigned_types;
    typedef mpl::list<double, long double>            real_types;
+   typedef long                                      exponent_type;
 
    gmp_real_imp(){}
 
