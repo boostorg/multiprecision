@@ -241,3 +241,48 @@ void eval_exp(T& result, const T& x)
       result = exp_series;
 }
 
+template <class T>
+void eval_log(T& result, const T& arg)
+{
+   //
+   // We use a variation of http://dlmf.nist.gov/4.45#i
+   // using frexp to reduce the argument to x * 2^n,
+   // then let y = x - 1 and compute:
+   // log(x) = log(2) * n + log1p(1 + y)
+   //
+   if(&arg == &result)
+   {
+      T temp;
+      eval_log(temp, arg);
+      result = temp;
+   }
+
+   typedef typename boost::multiprecision::detail::canonical<int, T>::type long_type;
+   typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+
+   int e;
+   T t;
+   eval_frexp(t, arg, &e);
+   
+   multiply(result, get_constant_ln2<T>(), long_type(e));
+   subtract(t, ui_type(1)); /* -0.5 <= t <= 0 */
+   t.negate(); /* 0 <= t <= 0.5 */
+   T pow = t;
+   T lim;
+   T t2;
+   multiply(lim, result, std::numeric_limits<mp_number<T> >::epsilon().backend());
+   if(get_sign(lim) < 0)
+      lim.negate();
+
+   subtract(result, t);
+
+   ui_type k = 1;
+   do
+   {
+      ++k;
+      multiply(pow, t);
+      divide(t2, pow, k);
+      subtract(result, t2);
+   }while(lim.compare(t2) <= 0);
+}
+

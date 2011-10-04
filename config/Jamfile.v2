@@ -32,7 +32,7 @@ obj has_e_float : has_e_float.cpp : <include>$(e_float_path) ;
 obj has_gmp : has_gmp.cpp :
       <include>$(gmp_path) <include>$(gmp_path)/mpfr <include>$(gmp_path)/gmpfrxx ;
 obj has_mpfr : has_mpfr.cpp :
-      <include>$(mpfr_path) <include>$(gmp_path)/mpfr <include>$(gmp_path)/gmpfrxx ;
+      <include>$(mpfr_path) <include>$(gmp_path)/mpfr <include>$(gmp_path)/gmpfrxx <include>$(gmp_path) ;
 
 explicit has_long_double_support ;
 explicit has_mpfr_class ;
@@ -43,3 +43,4 @@ explicit has_gcc_visibility ;
 explicit has_e_float ;
 explicit has_gmp ;
 explicit has_mpfr ;
+
