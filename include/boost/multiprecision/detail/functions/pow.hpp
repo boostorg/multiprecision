@@ -264,14 +264,24 @@ void eval_log(T& result, const T& arg)
    typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
    typedef typename T::exponent_type exp_type;
    typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
+   typedef typename mpl::front<typename T::real_types>::type fp_type;
 
    exp_type e;
    T t;
    eval_frexp(t, arg, &e);
+   bool alternate = false;
+
+   if(t.compare(fp_type(2) / fp_type(3)) <= 0)
+   {
+      alternate = true;
+      eval_ldexp(t, t, 1);
+      --e;
+   }
    
    multiply(result, get_constant_ln2<T>(), canonical_exp_type(e));
-   subtract(t, ui_type(1)); /* -0.5 <= t <= 0 */
-   t.negate(); /* 0 <= t <= 0.5 */
+   subtract(t, ui_type(1)); /* -0.3 <= t <= 0.3 */
+   if(!alternate)
+      t.negate(); /* 0 <= t <= 0.33333 */
    T pow = t;
    T lim;
    T t2;
@@ -279,7 +289,10 @@ void eval_log(T& result, const T& arg)
    if(get_sign(lim) < 0)
       lim.negate();
 
-   subtract(result, t);
+   if(alternate)
+      add(result, t);
+   else
+      subtract(result, t);
 
    ui_type k = 1;
    do
@@ -287,7 +300,10 @@ void eval_log(T& result, const T& arg)
       ++k;
       multiply(pow, t);
       divide(t2, pow, k);
-      subtract(result, t2);
-   }while(lim.compare(t2) <= 0);
+      if(alternate && ((k & 1) != 0))
+         add(result, t2);
+      else
+         subtract(result, t2);
+   }while(lim.compare(t2) < 0);
 }
 
