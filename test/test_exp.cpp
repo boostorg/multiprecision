@@ -29,6 +29,9 @@
 #if defined(TEST_MPF50)
 #include <boost/multiprecision/gmp.hpp>
 #endif
+#if defined(TEST_MPFR_50)
+#include <boost/multiprecision/mpfr.hpp>
+#endif
 #ifdef TEST_BACKEND
 #include <boost/multiprecision/concepts/mp_number_architypes.hpp>
 #endif
@@ -104,6 +107,11 @@ void test()
       unsigned err = e.template convert_to<unsigned>();
       if(err > max_err)
          max_err = err;
+      val = boost::multiprecision::exp(-boost::multiprecision::sqrt((pi * (100 * k)) * (100 * k)));
+      e = ceil(fabs((val - (1/data[k])) / (1/data[k])) / std::numeric_limits<T>::epsilon());
+      err = e.template convert_to<unsigned>();
+      if(err > max_err)
+         max_err = err;
    }
    std::cout << "Max error was: " << max_err << std::endl;
    BOOST_TEST(max_err < 1200);
@@ -118,6 +126,10 @@ int main()
 #ifdef TEST_MPF50
    test<boost::multiprecision::mpf_real_50>();
    test<boost::multiprecision::mpf_real_100>();
+#endif
+#ifdef TEST_MPFR_50
+   test<boost::multiprecision::mpfr_real_50>();
+   test<boost::multiprecision::mpfr_real_100>();
 #endif
 #ifdef TEST_E_FLOAT
    test<boost::multiprecision::e_float>();

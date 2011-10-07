@@ -202,3 +202,83 @@ run test_log.cpp gmp
 	      <define>TEST_MPF50
          [ check-target-builds ../config//has_gmp : : <build>no ]
         : test_log_mpf50 ;
+
+run test_pow.cpp gmp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPF50
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+        : test_pow_mpf50 ;
+
+run test_sinh.cpp gmp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPF50
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+        : test_sinh_mpf50 ;
+
+run test_cosh.cpp gmp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPF50
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+        : test_cosh_mpf50 ;
+
+run test_tanh.cpp gmp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPF50
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+        : test_tanh_mpf50 ;
+
+run test_exp.cpp mpfr
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPFR_50
+         [ check-target-builds ../config//has_mpfr : : <build>no ]
+        : test_exp_mpfr50 ;
+
+run test_log.cpp mpfr
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPFR_50
+         [ check-target-builds ../config//has_mpfr : : <build>no ]
+        : test_log_mpfr50 ;
+
+run test_pow.cpp mpfr
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPFR_50
+         [ check-target-builds ../config//has_mpfr : : <build>no ]
+        : test_pow_mpfr50 ;
+
+run test_sinh.cpp mpfr
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPFR_50
+         [ check-target-builds ../config//has_mpfr : : <build>no ]
+        : test_sinh_mpfr50 ;
+
+run test_cosh.cpp mpfr
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPFR_50
+         [ check-target-builds ../config//has_mpfr : : <build>no ]
+        : test_cosh_mpfr50 ;
+
+run test_tanh.cpp mpfr
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPFR_50
+         [ check-target-builds ../config//has_mpfr : : <build>no ]
+        : test_tanh_mpfr50 ;

@@ -29,6 +29,9 @@
 #if defined(TEST_MPF50)
 #include <boost/multiprecision/gmp.hpp>
 #endif
+#ifdef TEST_MPFR_50
+#include <boost/multiprecision/mpfr.hpp>
+#endif
 #ifdef TEST_BACKEND
 #include <boost/multiprecision/concepts/mp_number_architypes.hpp>
 #endif
@@ -171,6 +174,10 @@ int main()
 #ifdef TEST_MPF50
    test<boost::multiprecision::mpf_real_50>();
    test<boost::multiprecision::mpf_real_100>();
+#endif
+#ifdef TEST_MPFR_50
+   test<boost::multiprecision::mpfr_real_50>();
+   test<boost::multiprecision::mpfr_real_100>();
 #endif
 #ifdef TEST_E_FLOAT
    test<boost::multiprecision::e_float>();

@@ -12,11 +12,6 @@
 // This file has no include guards or namespaces - it's expanded inline inside default_ops.hpp
 // 
 
-template<typename T> 
-inline void eval_pow(T& result, const T& t, const T& p)
-{
-}
-
 namespace detail{
 
 template<typename T, typename U> 
@@ -103,6 +98,7 @@ void hyp0F0(T& H0F0, const T& x)
 
    typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
 
+   BOOST_ASSERT(&H0F0 != &x);
    long tol = std::numeric_limits<mp_number<T> >::digits;
    T t;
 
@@ -133,6 +129,58 @@ void hyp0F0(T& H0F0, const T& x)
       throw std::runtime_error("H0F0 failed to converge");
 }
 
+template <class T>
+void hyp1F0(T& H1F0, const T& a, const T& x)
+{
+   // Compute the series representation of Hypergeometric1F0 taken from
+   // http://functions.wolfram.com/HypergeometricFunctions/Hypergeometric1F0/06/01/01/
+   // and also see the corresponding section for the power function (i.e. x^a).
+   // There are no checks on input range or parameter boundaries.
+
+   typedef typename boost::multiprecision::detail::canonical<int, T>::type si_type;
+   typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+   typedef typename T::exponent_type exp_type;
+   typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
+   typedef typename mpl::front<typename T::real_types>::type fp_type;
+
+   BOOST_ASSERT(&H1F0 != &x);
+   BOOST_ASSERT(&H1F0 != &a);
+
+   T x_pow_n_div_n_fact(x);
+   T pochham_a         (a);
+   T ap                (a);
+
+   multiply(H1F0, pochham_a, x_pow_n_div_n_fact);
+   add(H1F0, si_type(1));
+
+   si_type n;
+   T term, part;
+
+   // Series expansion of hyperg_1f0(a; ; x).
+   for(n = 2; n < 1000; n++)
+   {
+      multiply(x_pow_n_div_n_fact, x);
+      divide(x_pow_n_div_n_fact, n);
+      increment(ap);
+
+      multiply(pochham_a, ap);
+
+      multiply(term, pochham_a, x_pow_n_div_n_fact);
+
+      if(n > 20)
+      {
+         exp_type e1, e2;
+         eval_frexp(part, H1F0, &e1);
+         eval_frexp(part, term, &e2);
+         if(e1 - e2 >= std::numeric_limits<mp_number<T> >::digits)
+            break;
+      }
+
+      add(H1F0, term);
+   }
+   if(n >= 1000)
+      throw std::runtime_error("H1F0 failed to converge");
+}
 
 template <class T>
 void eval_exp(T& result, const T& x)
@@ -147,6 +195,8 @@ void eval_exp(T& result, const T& x)
    typedef typename boost::multiprecision::detail::canonical<int, T>::type si_type;
    typedef typename T::exponent_type exp_type;
    typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
+   typedef typename boost::multiprecision::detail::canonical<float, T>::type float_type;
+
    // Handle special arguments.
    int type = eval_fpclassify(x);
    bool isneg = get_sign(x) < 0;
@@ -186,6 +236,34 @@ void eval_exp(T& result, const T& x)
          result = ui_type(0);
       else
          result = std::numeric_limits<mp_number<T> >::has_infinity ? std::numeric_limits<mp_number<T> >::infinity().backend() : (std::numeric_limits<mp_number<T> >::max)().backend();
+      return;
+   }
+   if(xx.compare(si_type(1)) <= 0)
+   {
+      //
+      // Use series for exp(x) - 1:
+      //
+      T lim = std::numeric_limits<mp_number<T> >::epsilon().backend();
+      unsigned k = 2;
+      exp_series = xx;
+      result = si_type(1);
+      if(isneg)
+         subtract(result, exp_series);
+      else
+         add(result, exp_series);
+      multiply(exp_series, xx);
+      divide(exp_series, ui_type(k));
+      add(result, exp_series);
+      while(exp_series.compare(lim) > 0)
+      {
+         ++k;
+         multiply(exp_series, xx);
+         divide(exp_series, ui_type(k));
+         if(isneg && (k&1))
+            subtract(result, exp_series);
+         else
+            add(result, exp_series);
+      }
       return;
    }
 
@@ -285,14 +363,15 @@ void eval_log(T& result, const T& arg)
    T pow = t;
    T lim;
    T t2;
-   multiply(lim, result, std::numeric_limits<mp_number<T> >::epsilon().backend());
-   if(get_sign(lim) < 0)
-      lim.negate();
 
    if(alternate)
       add(result, t);
    else
       subtract(result, t);
+
+   multiply(lim, result, std::numeric_limits<mp_number<T> >::epsilon().backend());
+   if(get_sign(lim) < 0)
+      lim.negate();
 
    ui_type k = 1;
    do
@@ -305,5 +384,202 @@ void eval_log(T& result, const T& arg)
       else
          subtract(result, t2);
    }while(lim.compare(t2) < 0);
+}
+
+template<typename T> 
+inline void eval_pow(T& result, const T& x, const T& a)
+{
+   typedef typename boost::multiprecision::detail::canonical<int, T>::type si_type;
+   typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+   typedef typename T::exponent_type exp_type;
+   typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
+   typedef typename mpl::front<typename T::real_types>::type fp_type;
+
+   if((&result == &x) || (&result == &a))
+   {
+      T t;
+      eval_pow(t, x, a);
+      result = t;
+   }
+
+   if(a.compare(si_type(1)) == 0)
+   {
+      result = x;
+      return;
+   }
+
+   int type = eval_fpclassify(x);
+
+   switch(type)
+   {
+   case FP_INFINITE:
+      result = x;
+      return;
+   case FP_ZERO:
+      result = si_type(1);
+      return;
+   case FP_NAN:
+      result = x;
+      return;
+   default: ;
+   }
+
+   if(get_sign(a) == 0)
+   {
+      result = si_type(1);
+      return;
+   }
+
+   boost::intmax_t an;
+   convert_to(&an, a);
+   const bool bo_a_isint = a.compare(an) == 0;
+
+   if((get_sign(x) < 0) && !bo_a_isint)
+   {
+      result = std::numeric_limits<mp_number<T> >::quiet_NaN().backend();
+   }
+
+   T t;
+   T da(a);
+   subtract(da, an);
+
+   if(a.compare(si_type(-1)) < 0)
+   {
+      t = a;
+      t.negate();
+      eval_pow(da, x, t);
+      divide(result, si_type(1), da);
+      return;
+   }
+   
+   subtract(da, a, an);
+
+   if(bo_a_isint)
+   {
+      detail::pow_imp(result, x, an, mpl::true_());
+      return;
+   }
+
+   if((get_sign(x) > 0) && (x.compare(fp_type(0.1)) > 0) && (x.compare(fp_type(0.9)) < 0))
+   {
+      if(a.compare(fp_type(1e-5f)) <= 0)
+      {
+         // Series expansion for small a.
+         eval_log(t, x);
+         multiply(t, a);
+         hyp0F0(result, t);
+         return;
+      }
+      else
+      {
+         // Series expansion for moderately sized x. Note that for large power of a,
+         // the power of the integer part of a is calculated using the pown function.
+         if(an)
+         {
+            da.negate();
+            t = si_type(1);
+            subtract(t, x);
+            hyp1F0(result, da, t);
+            detail::pow_imp(t, x, an, mpl::true_());
+            multiply(result, t);
+         }
+         else
+         {
+            da = a;
+            da.negate();
+            t = si_type(1);
+            subtract(t, x);
+            hyp1F0(result, da, t);
+         }
+      }
+   }
+   else
+   {
+      // Series expansion for pow(x, a). Note that for large power of a, the power
+      // of the integer part of a is calculated using the pown function.
+      if(an)
+      {
+         eval_log(t, x);
+         multiply(t, da);
+         eval_exp(result, t);
+         detail::pow_imp(t, x, an, mpl::true_());
+         multiply(result, t);
+      }
+      else
+      {
+         eval_log(t, x);
+         multiply(t, a);
+         eval_exp(result, t);
+      }
+   }
+}
+
+namespace detail{
+
+   template <class T>
+   void sinhcosh(const T& x, T* p_sinh, T* p_cosh)
+   {
+      typedef typename boost::multiprecision::detail::canonical<int, T>::type si_type;
+      typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+      typedef typename T::exponent_type exp_type;
+      typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
+      typedef typename mpl::front<typename T::real_types>::type fp_type;
+
+      switch(eval_fpclassify(x))
+      {
+      case FP_NAN:
+      case FP_INFINITE:
+         if(p_sinh)
+            *p_sinh = x;
+         if(p_cosh)
+            *p_cosh = x;
+         return;
+      case FP_ZERO:
+         if(p_sinh)
+            *p_sinh = x;
+         if(p_cosh)
+            *p_cosh = ui_type(1);
+         return;
+      default: ;
+      }
+
+
+      T e_px;
+      eval_exp(e_px, x);
+      T e_mx;
+      divide(e_mx, ui_type(1), e_px);
+
+      if(p_sinh) 
+      { 
+         subtract(*p_sinh, e_px, e_mx);
+         divide(*p_sinh, ui_type(2));
+      }
+      if(p_cosh) 
+      { 
+         add(*p_cosh, e_px, e_mx);
+         divide(*p_cosh, ui_type(2)); 
+      }
+   }
+
+} // namespace detail
+
+template <class T>
+inline void eval_sinh(T& result, const T& x)
+{
+   detail::sinhcosh(x, &result, static_cast<T*>(0));
+}
+
+template <class T>
+inline void eval_cosh(T& result, const T& x)
+{
+   detail::sinhcosh(x, static_cast<T*>(0), &result);
+}
+
+template <class T>
+inline void eval_tanh(T& result, const T& x)
+{
+  T c;
+  detail::sinhcosh(x, &result, &c);
+  divide(result, c);
 }
 
