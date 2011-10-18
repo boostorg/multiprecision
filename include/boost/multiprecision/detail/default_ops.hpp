@@ -363,6 +363,7 @@ inline void eval_fmod(T& result, const T& a, const T& b)
       T temp;
       eval_fmod(temp, a, b);
       result = temp;
+      return;
    }
    T n;
    divide(result, a, b);
@@ -443,6 +444,7 @@ typename enable_if_c<sizeof(T) == 0>::type eval_tanh();
 //
 #include <boost/multiprecision/detail/functions/constants.hpp>
 #include <boost/multiprecision/detail/functions/pow.hpp>
+#include <boost/multiprecision/detail/functions/trig.hpp>
 
 }
 

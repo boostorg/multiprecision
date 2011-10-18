@@ -36,6 +36,7 @@ inline void pow_imp(T& result, const T& t, const U& p, const mpl::true_&)
       T denom;
       pow_imp(denom, t, -p, mpl::true_());
       divide(result, temp, denom);
+      return;
    }
 
    switch(p)
@@ -106,6 +107,11 @@ void hyp0F0(T& H0F0, const T& x)
 
    add(H0F0, x_pow_n_div_n_fact, ui_type(1));
 
+   T lim;
+   eval_ldexp(lim, H0F0, 1 - tol);
+   if(get_sign(lim) < 0)
+      lim.negate();
+
    ui_type n;
 
    // Series expansion of hyperg_0f0(; ; x).
@@ -113,17 +119,14 @@ void hyp0F0(T& H0F0, const T& x)
    {
       multiply(x_pow_n_div_n_fact, x);
       divide(x_pow_n_div_n_fact, n);
-
-      if(n > 20)
-      {
-         eval_ldexp(t, H0F0, -tol);
-         if(t.compare(x_pow_n_div_n_fact) >= 0)
-         {
-            break;
-         }
-      }
-
       add(H0F0, x_pow_n_div_n_fact);
+      bool neg = get_sign(x_pow_n_div_n_fact);
+      if(neg)
+         x_pow_n_div_n_fact.negate();
+      if(lim.compare(x_pow_n_div_n_fact) > 0)
+         break;
+      if(neg)
+         x_pow_n_div_n_fact.negate();
    }
    if(n >= 300)
       throw std::runtime_error("H0F0 failed to converge");
@@ -152,6 +155,10 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
 
    multiply(H1F0, pochham_a, x_pow_n_div_n_fact);
    add(H1F0, si_type(1));
+   T lim;
+   eval_ldexp(lim, H1F0, 1 - std::numeric_limits<mp_number<T> >::digits);
+   if(get_sign(lim) < 0)
+      lim.negate();
 
    si_type n;
    T term, part;
@@ -162,21 +169,13 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
       multiply(x_pow_n_div_n_fact, x);
       divide(x_pow_n_div_n_fact, n);
       increment(ap);
-
       multiply(pochham_a, ap);
-
       multiply(term, pochham_a, x_pow_n_div_n_fact);
-
-      if(n > 20)
-      {
-         exp_type e1, e2;
-         eval_frexp(part, H1F0, &e1);
-         eval_frexp(part, term, &e2);
-         if(e1 - e2 >= std::numeric_limits<mp_number<T> >::digits)
-            break;
-      }
-
       add(H1F0, term);
+      if(get_sign(term) < 0)
+         term.negate();
+      if(lim.compare(term) < 0)
+         break;
    }
    if(n >= 1000)
       throw std::runtime_error("H1F0 failed to converge");
@@ -190,6 +189,7 @@ void eval_exp(T& result, const T& x)
       T temp;
       eval_exp(temp, x);
       result = temp;
+      return;
    }
    typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
    typedef typename boost::multiprecision::detail::canonical<int, T>::type si_type;
@@ -336,6 +336,7 @@ void eval_log(T& result, const T& arg)
       T temp;
       eval_log(temp, arg);
       result = temp;
+      return;
    }
 
    typedef typename boost::multiprecision::detail::canonical<int, T>::type si_type;

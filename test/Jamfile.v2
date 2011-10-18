@@ -282,3 +282,52 @@ run test_tanh.cpp mpfr
 	      <define>TEST_MPFR_50
          [ check-target-builds ../config//has_mpfr : : <build>no ]
         : test_tanh_mpfr50 ;
+
+run test_sin.cpp gmp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPF50
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+        : test_sin_mpf50 ;
+
+run test_sin.cpp mpfr
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPFR_50
+         [ check-target-builds ../config//has_mpfr : : <build>no ]
+        : test_sin_mpfr_50 ;
+
+run test_cos.cpp gmp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPF50
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+        : test_cos_mpf50 ;
+
+run test_cos.cpp mpfr
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPFR_50
+         [ check-target-builds ../config//has_mpfr : : <build>no ]
+        : test_cos_mpfr_50 ;
+
+run test_asin.cpp gmp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPF50
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+        : test_asin_mpf50 ;
+
+run test_asin.cpp mpfr
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPFR_50
+         [ check-target-builds ../config//has_mpfr : : <build>no ]
+        : test_asin_mpfr_50 ;
+

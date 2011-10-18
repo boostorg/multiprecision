@@ -65,6 +65,54 @@ void calc_e(T& result, unsigned digits)
    divide(result, denom);
 }
 
+template <class T>
+void calc_pi(T& result, unsigned digits)
+{
+   typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
+   typedef typename mpl::front<typename T::real_types>::type real_type;
+
+   T a;
+   a = ui_type(1);
+   T b;
+   T A(a);
+   T B;
+   B = real_type(0.5f);
+   T D;
+   D = real_type(0.25f);
+
+   T lim;
+   lim = ui_type(1);
+   eval_ldexp(lim, lim, -(int)digits);
+
+   unsigned k = 1;
+
+   do
+   {
+      add(result, A, B);
+      eval_ldexp(result, result, -2);
+      eval_sqrt(b, B);
+      add(a, b);
+      eval_ldexp(a, a, -1);
+      multiply(A, a, a);
+      subtract(B, A, result);
+      eval_ldexp(B, B, 1);
+      subtract(result, A, B);
+      bool neg = get_sign(result) < 0;
+      if(neg)
+         result.negate();
+      if(result.compare(lim) <= 0)
+         break;
+      if(neg)
+         result.negate();
+      eval_ldexp(result, result, k - 1);
+      subtract(D, result);
+      ++k;
+      eval_ldexp(lim, lim, 1);
+   }
+   while(true);
+
+   divide(result, B, D);
+}
 
 template <class T, const T& (*F)(void)>
 struct constant_initializer
@@ -110,6 +158,19 @@ const T& get_constant_e()
       calc_e(result, std::numeric_limits<mp_number<T> >::digits);
 
    constant_initializer<T, &get_constant_e<T> >::do_nothing();
+
+   return result;
+}
+
+template <class T>
+const T& get_constant_pi()
+{
+   static T result;
+   static bool b = false;
+   if(!b)
+      calc_pi(result, std::numeric_limits<mp_number<T> >::digits);
+
+   constant_initializer<T, &get_constant_pi<T> >::do_nothing();
 
    return result;
 }
