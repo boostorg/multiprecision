@@ -120,7 +120,7 @@ void hyp0F0(T& H0F0, const T& x)
       multiply(x_pow_n_div_n_fact, x);
       divide(x_pow_n_div_n_fact, n);
       add(H0F0, x_pow_n_div_n_fact);
-      bool neg = get_sign(x_pow_n_div_n_fact);
+      bool neg = get_sign(x_pow_n_div_n_fact) < 0;
       if(neg)
          x_pow_n_div_n_fact.negate();
       if(lim.compare(x_pow_n_div_n_fact) > 0)
@@ -164,7 +164,7 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
    T term, part;
 
    // Series expansion of hyperg_1f0(a; ; x).
-   for(n = 2; n < 1000; n++)
+   for(n = 2; n < std::numeric_limits<mp_number<T> >::digits + 10; n++)
    {
       multiply(x_pow_n_div_n_fact, x);
       divide(x_pow_n_div_n_fact, n);
@@ -174,10 +174,10 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
       add(H1F0, term);
       if(get_sign(term) < 0)
          term.negate();
-      if(lim.compare(term) < 0)
+      if(lim.compare(term) >= 0)
          break;
    }
-   if(n >= 1000)
+   if(n >= std::numeric_limits<mp_number<T> >::digits + 10)
       throw std::runtime_error("H1F0 failed to converge");
 }
 
@@ -461,7 +461,7 @@ inline void eval_pow(T& result, const T& x, const T& a)
       return;
    }
 
-   if((get_sign(x) > 0) && (x.compare(fp_type(0.1)) > 0) && (x.compare(fp_type(0.9)) < 0))
+   if((get_sign(x) > 0) && (x.compare(fp_type(0.5)) >= 0) && (x.compare(fp_type(0.9)) < 0))
    {
       if(a.compare(fp_type(1e-5f)) <= 0)
       {

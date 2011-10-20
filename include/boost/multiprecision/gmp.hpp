@@ -673,6 +673,8 @@ inline void eval_ldexp(gmp_real<Digits10>& result, const gmp_real<Digits10>& val
       mpf_mul_2exp(result.data(), val.data(), e);
    else if(e < 0)
       mpf_div_2exp(result.data(), val.data(), -e);
+   else
+      result = val;
 }
 template <unsigned Digits10>
 inline void eval_frexp(gmp_real<Digits10>& result, const gmp_real<Digits10>& val, int* e)

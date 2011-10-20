@@ -10,6 +10,7 @@
 
 #include <boost/detail/lightweight_test.hpp>
 #include <boost/array.hpp>
+#include "test.hpp"
 
 #if !defined(TEST_MPF50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_E_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ)
 #  define TEST_MPF50
@@ -155,8 +156,14 @@ void test()
    for(unsigned k = 0; k < data.size(); k++)
    {
       T val = boost::multiprecision::log(tenth + pi * (100 * k) * (100 * k));
-      T e = ceil(fabs((val - data[k]) / data[k]) / std::numeric_limits<T>::epsilon());
+      T e = relative_error(val, data[k]);
       unsigned err = e.template convert_to<unsigned>();
+      if(err > max_err)
+         max_err = err;
+
+      val = boost::multiprecision::log(1 / (tenth + pi * (100 * k) * (100 * k)));
+      e = relative_error(val, T(-data[k]));
+      err = e.template convert_to<unsigned>();
       if(err > max_err)
          max_err = err;
    }

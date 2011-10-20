@@ -468,8 +468,6 @@ void eval_asin(T& result, const T& x)
       t2 = fp_type(1.5f);
       hyp2F1(result, t1, t1, t2, xx);
       multiply(result, x);
-      if(b_neg)
-         result.negate();
       return;
    }
    else if(xx.compare(fp_type(1 - 1e-4f)) > 0)
@@ -521,4 +519,41 @@ void eval_asin(T& result, const T& x)
       result.negate();
 }
 
+template <class T>
+inline void eval_acos(T& result, const T& x)
+{
+   typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
+
+   switch(eval_fpclassify(x))
+   {
+   case FP_NAN:
+   case FP_INFINITE:
+      result = std::numeric_limits<mp_number<T> >::quiet_NaN().backend();
+      return;
+   case FP_ZERO:
+      result = get_constant_pi<T>();
+      eval_ldexp(result, result, -1); // divide by two.
+      return;
+   }
+
+   eval_abs(result, x);
+   int c = result.compare(ui_type(1));
+
+   if(c > 0)
+   {
+      result = std::numeric_limits<mp_number<T> >::quiet_NaN().backend();
+      return;
+   }
+   else if(c == 0)
+   {
+      result = ui_type(0);
+      return;
+   }
+
+   eval_asin(result, x);
+   T t;
+   eval_ldexp(t, get_constant_pi<T>(), -1);
+   subtract(result, t);
+   result.negate();
+}
 
