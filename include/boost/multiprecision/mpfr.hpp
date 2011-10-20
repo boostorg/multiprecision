@@ -625,6 +625,8 @@ inline void eval_ldexp(mpfr_real_backend<Digits10>& result, const mpfr_real_back
       mpfr_mul_2exp(result.data(), val.data(), e, GMP_RNDN);
    else if(e < 0)
       mpfr_div_2exp(result.data(), val.data(), -e, GMP_RNDN);
+   else
+      result = val;
 }
 template <unsigned Digits10>
 inline void eval_frexp(mpfr_real_backend<Digits10>& result, const mpfr_real_backend<Digits10>& val, int* e)
