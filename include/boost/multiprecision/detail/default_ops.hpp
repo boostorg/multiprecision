@@ -398,6 +398,14 @@ inline void eval_round(T& result, const T& a)
    }
 }
 
+template <class T, class Arithmetic>
+void eval_atan2(T& result, const T& a, const Arithmetic& b)
+{
+   T x;
+   x = b;
+   eval_atan2(result, a, x);
+}
+
 //
 // These have to implemented by the backend, declared here so that our macro generated code compiles OK.
 //
@@ -927,6 +935,7 @@ HETERO_BINARY_OP_FUNCTOR(ldexp, int)
 HETERO_BINARY_OP_FUNCTOR(frexp, int*)
 BINARY_OP_FUNCTOR(pow)
 BINARY_OP_FUNCTOR(fmod)
+BINARY_OP_FUNCTOR(atan2)
 
 #undef BINARY_OP_FUNCTOR
 #undef UNARY_OP_FUNCTOR

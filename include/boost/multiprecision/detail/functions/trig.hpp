@@ -557,3 +557,177 @@ inline void eval_acos(T& result, const T& x)
    result.negate();
 }
 
+template <class T>
+void eval_atan(T& result, const T& x)
+{
+   typedef typename boost::multiprecision::detail::canonical<boost::int32_t, T>::type si_type;
+   typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
+   typedef typename T::exponent_type exp_type;
+   typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
+   typedef typename mpl::front<typename T::real_types>::type fp_type;
+
+   switch(eval_fpclassify(x))
+   {
+   case FP_NAN:
+      result = std::numeric_limits<mp_number<T> >::quiet_NaN().backend();
+      return;
+   case FP_ZERO:
+      result = ui_type(0);
+      return;
+   case FP_INFINITE:
+      if(get_sign(x) < 0)
+      {
+         eval_ldexp(result, get_constant_pi<T>(), -1);
+         result.negate();
+      }
+      else
+         eval_ldexp(result, get_constant_pi<T>(), -1);
+      return;
+   default: ;
+   }
+
+   const bool b_neg = get_sign(x) < 0;
+
+   T xx(x);
+   if(b_neg)
+      xx.negate();
+
+   if(xx.compare(fp_type(0.1)) < 0)
+   {
+      T t1, t2, t3;
+      t1 = ui_type(1);
+      t2 = fp_type(0.5f);
+      t3 = fp_type(1.5f);
+      multiply(xx, xx);
+      xx.negate();
+      hyp2F1(result, t1, t2, t3, xx);
+      multiply(result, x);
+      return;
+   }
+
+   if(xx.compare(fp_type(10)) > 0)
+   {
+      T t1, t2, t3;
+      t1 = fp_type(0.5f);
+      t2 = ui_type(1u);
+      t3 = fp_type(1.5f);
+      multiply(xx, xx);
+      divide(xx, si_type(-1), xx);
+      hyp2F1(result, t1, t2, t3, xx);
+      divide(result, x);
+      if(!b_neg)
+         result.negate();
+      eval_ldexp(t1, get_constant_pi<T>(), -1);
+      add(result, t1);
+      if(b_neg)
+         result.negate();
+      return;
+   }
+
+
+   // Get initial estimate using standard math function atan.
+   fp_type d;
+   convert_to(&d, xx);
+   result = fp_type(std::atan(d));
+
+   // Newton-Raphson iteration
+   static const boost::int32_t double_digits10_minus_one = std::numeric_limits<double>::digits10 - 1;
+
+   T s, c, t;
+   for(boost::int32_t digits = double_digits10_minus_one; digits <= std::numeric_limits<mp_number<T> >::digits10; digits *= 2)
+   {
+      eval_sin(s, result);
+      eval_cos(c, result);
+      multiply(t, xx, c);
+      subtract(t, s);
+      multiply(s, t, c);
+      add(result, s);
+   }
+   if(b_neg)
+      result.negate();
+}
+
+template <class T>
+void eval_atan2(T& result, const T& y, const T& x)
+{
+   typedef typename boost::multiprecision::detail::canonical<boost::int32_t, T>::type si_type;
+   typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
+   typedef typename T::exponent_type exp_type;
+   typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
+   typedef typename mpl::front<typename T::real_types>::type fp_type;
+
+   switch(eval_fpclassify(y))
+   {
+   case FP_NAN:
+      result = y;
+      return;
+   case FP_ZERO:
+      {
+         int c = get_sign(x);
+         if(c < 0)
+            result = get_constant_pi<T>();
+         else if(c >= 0)
+            result = ui_type(0); // Note we allow atan2(0,0) to be zero, even though it's mathematically undefined
+         return;
+      }
+   case FP_INFINITE:
+      {
+         if(eval_fpclassify(x) == FP_INFINITE)
+         {
+            result = std::numeric_limits<mp_number<T> >::quiet_NaN().backend();
+         }
+         else
+         {
+            eval_ldexp(result, get_constant_pi<T>(), -1);
+            if(get_sign(y) < 0)
+               result.negate();
+         }
+         return;
+      }
+   }
+
+   switch(eval_fpclassify(x))
+   {
+   case FP_NAN:
+      result = x;
+      return;
+   case FP_ZERO:
+      {
+         eval_ldexp(result, get_constant_pi<T>(), -1);
+         if(get_sign(x) < 0)
+            result.negate();
+         return;
+      }
+   case FP_INFINITE:
+      if(get_sign(x) > 0)
+         result = ui_type(0);
+      else
+         result = get_constant_pi<T>();
+      if(get_sign(y) < 0)
+         result.negate();
+      return;
+   }
+
+   T xx;
+   divide(xx, y, x);
+   if(get_sign(xx) < 0)
+      xx.negate();
+
+   eval_atan(result, xx);
+
+   // Determine quadrant (sign) based on signs of x, y
+   const bool y_neg = get_sign(y) < 0;
+   const bool x_neg = get_sign(x) < 0;
+
+   if(y_neg != x_neg)
+      result.negate();
+
+   if(x_neg)
+   {
+      if(y_neg)
+         subtract(result, get_constant_pi<T>());
+      else
+         add(result, get_constant_pi<T>());
+   }
+}
+

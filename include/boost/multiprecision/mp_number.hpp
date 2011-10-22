@@ -28,6 +28,7 @@ class mp_number
 {
    typedef mp_number<Backend> self_type;
 public:
+   typedef Backend backend_type;
    mp_number(){}
    mp_number(const mp_number& e) : m_backend(e.m_backend){}
    template <class V>
