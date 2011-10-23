@@ -63,7 +63,7 @@ run test_arithmetic.cpp gmp
         : # command line
         : # input files
         : # requirements
-	      <define>TEST_MPF50
+	      <define>TEST_MPF_50
          [ check-target-builds ../config//has_gmp : : <build>no ]
         : test_arithmetic_mpf50 ;
 
@@ -126,7 +126,7 @@ run test_numeric_limits.cpp gmp
         : # command line
         : # input files
         : # requirements
-	      <define>TEST_MPF50
+	      <define>TEST_MPF_50
          [ check-target-builds ../config//has_gmp : : <build>no ]
         : test_numeric_limits_mpf50 ;
 
@@ -187,11 +187,19 @@ run mp_number_concept_check.cpp  mpfr
          [ check-target-builds ../config//has_mpfr : : <build>no ]
         : big_number_concept_check_mpfr_50 ;
 
+run mp_number_concept_check.cpp  gmp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPF_50
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+        : big_number_concept_check_mpf50 ;
+
 run test_exp.cpp gmp
         : # command line
         : # input files
         : # requirements
-	      <define>TEST_MPF50
+	      <define>TEST_MPF_50
          [ check-target-builds ../config//has_gmp : : <build>no ]
         : test_exp_mpf50 ;
 
@@ -199,7 +207,7 @@ run test_log.cpp gmp
         : # command line
         : # input files
         : # requirements
-	      <define>TEST_MPF50
+	      <define>TEST_MPF_50
          [ check-target-builds ../config//has_gmp : : <build>no ]
         : test_log_mpf50 ;
 
@@ -207,7 +215,7 @@ run test_pow.cpp gmp
         : # command line
         : # input files
         : # requirements
-	      <define>TEST_MPF50
+	      <define>TEST_MPF_50
          [ check-target-builds ../config//has_gmp : : <build>no ]
         : test_pow_mpf50 ;
 
@@ -215,7 +223,7 @@ run test_sinh.cpp gmp
         : # command line
         : # input files
         : # requirements
-	      <define>TEST_MPF50
+	      <define>TEST_MPF_50
          [ check-target-builds ../config//has_gmp : : <build>no ]
         : test_sinh_mpf50 ;
 
@@ -223,7 +231,7 @@ run test_cosh.cpp gmp
         : # command line
         : # input files
         : # requirements
-	      <define>TEST_MPF50
+	      <define>TEST_MPF_50
          [ check-target-builds ../config//has_gmp : : <build>no ]
         : test_cosh_mpf50 ;
 
@@ -231,7 +239,7 @@ run test_tanh.cpp gmp
         : # command line
         : # input files
         : # requirements
-	      <define>TEST_MPF50
+	      <define>TEST_MPF_50
          [ check-target-builds ../config//has_gmp : : <build>no ]
         : test_tanh_mpf50 ;
 
@@ -287,7 +295,7 @@ run test_sin.cpp gmp
         : # command line
         : # input files
         : # requirements
-	      <define>TEST_MPF50
+	      <define>TEST_MPF_50
          [ check-target-builds ../config//has_gmp : : <build>no ]
         : test_sin_mpf50 ;
 
@@ -303,7 +311,7 @@ run test_cos.cpp gmp
         : # command line
         : # input files
         : # requirements
-	      <define>TEST_MPF50
+	      <define>TEST_MPF_50
          [ check-target-builds ../config//has_gmp : : <build>no ]
         : test_cos_mpf50 ;
 
@@ -319,7 +327,7 @@ run test_asin.cpp gmp
         : # command line
         : # input files
         : # requirements
-	      <define>TEST_MPF50
+	      <define>TEST_MPF_50
          [ check-target-builds ../config//has_gmp : : <build>no ]
         : test_asin_mpf50 ;
 
@@ -335,7 +343,7 @@ run test_acos.cpp gmp
         : # command line
         : # input files
         : # requirements
-	      <define>TEST_MPF50
+	      <define>TEST_MPF_50
          [ check-target-builds ../config//has_gmp : : <build>no ]
         : test_acos_mpf50 ;
 
@@ -347,3 +355,18 @@ run test_acos.cpp mpfr
          [ check-target-builds ../config//has_mpfr : : <build>no ]
         : test_acos_mpfr_50 ;
 
+run test_atan.cpp gmp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPF_50
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+        : test_atan_mpf50 ;
+
+run test_atan.cpp mpfr
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPFR_50
+         [ check-target-builds ../config//has_mpfr : : <build>no ]
+        : test_atan_mpfr_50 ;

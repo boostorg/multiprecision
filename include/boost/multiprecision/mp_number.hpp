@@ -111,7 +111,7 @@ public:
    typename enable_if<boost::is_arithmetic<V>, mp_number<Backend>& >::type 
       operator+=(const V& v)
    {
-      using big_num_default_ops::add;
+      using default_ops::add;
       add(m_backend, canonical_value(v));
       return *this;
    }
@@ -142,7 +142,7 @@ public:
    typename enable_if<boost::is_arithmetic<V>, mp_number<Backend>& >::type 
       operator-=(const V& v)
    {
-      using big_num_default_ops::subtract;
+      using default_ops::subtract;
       subtract(m_backend, canonical_value(v));
       return *this;
    }
@@ -175,7 +175,7 @@ public:
    typename enable_if<boost::is_arithmetic<V>, mp_number<Backend>& >::type 
       operator*=(const V& v)
    {
-      using big_num_default_ops::multiply;
+      using default_ops::multiply;
       multiply(m_backend, canonical_value(v));
       return *this;
    }
@@ -207,7 +207,7 @@ public:
       operator%=(const V& v)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
-      using big_num_default_ops::modulus;
+      using default_ops::modulus;
       modulus(m_backend, canonical_value(v));
       return *this;
    }
@@ -222,21 +222,21 @@ public:
    //
    mp_number& operator++()
    {
-      using big_num_default_ops::increment;
+      using default_ops::increment;
       increment(m_backend);
       return *this;
    }
 
    mp_number& operator--()
    {
-      using big_num_default_ops::decrement;
+      using default_ops::decrement;
       decrement(m_backend);
       return *this;
    }
 
    mp_number operator++(int)
    {
-      using big_num_default_ops::increment;
+      using default_ops::increment;
       self_type temp(*this);
       increment(m_backend);
       return temp;
@@ -244,7 +244,7 @@ public:
 
    mp_number operator--(int)
    {
-      using big_num_default_ops::decrement;
+      using default_ops::decrement;
       self_type temp(*this);
       decrement(m_backend);
       return temp;
@@ -294,7 +294,7 @@ public:
    typename enable_if<boost::is_arithmetic<V>, mp_number<Backend>& >::type 
       operator/=(const V& v)
    {
-      using big_num_default_ops::divide;
+      using default_ops::divide;
       divide(m_backend, canonical_value(v));
       return *this;
    }
@@ -326,7 +326,7 @@ public:
    typename enable_if<boost::is_arithmetic<V>, mp_number<Backend>& >::type 
       operator&=(const V& v)
    {
-      using big_num_default_ops::bitwise_and;
+      using default_ops::bitwise_and;
       bitwise_and(m_backend, canonical_value(v));
       return *this;
    }
@@ -358,7 +358,7 @@ public:
    typename enable_if<boost::is_arithmetic<V>, mp_number<Backend>& >::type 
       operator|=(const V& v)
    {
-      using big_num_default_ops::bitwise_or;
+      using default_ops::bitwise_or;
       bitwise_or(m_backend, canonical_value(v));
       return *this;
    }
@@ -388,7 +388,7 @@ public:
    typename enable_if<boost::is_arithmetic<V>, mp_number<Backend>& >::type 
       operator^=(const V& v)
    {
-      using big_num_default_ops::bitwise_xor;
+      using default_ops::bitwise_xor;
       bitwise_xor(m_backend, canonical_value(v));
       return *this;
    }
@@ -414,12 +414,12 @@ public:
    //
    bool is_zero()const
    {
-      using big_num_default_ops::is_zero;
+      using default_ops::is_zero;
       return is_zero(m_backend);
    }
    int sign()const
    {
-      using big_num_default_ops::get_sign;
+      using default_ops::get_sign;
       return get_sign(m_backend);
    }
    //
@@ -432,7 +432,7 @@ public:
    template <class T>
    T convert_to()const
    {
-      using big_num_default_ops::convert_to;
+      using default_ops::convert_to;
       T result;
       convert_to(&result, m_backend);
       return result;
@@ -466,7 +466,7 @@ public:
    template <class V>
    typename enable_if<is_arithmetic<V>, int>::type compare(const V& o)const
    {
-      using big_num_default_ops::get_sign;
+      using default_ops::get_sign;
       if(o == 0)
          return get_sign(m_backend);
       return m_backend.compare(canonical_value(o));
@@ -506,14 +506,14 @@ private:
    template <class Exp>
    void do_assign(const Exp& e, const detail::add_immediates&)
    {
-      using big_num_default_ops::add;
+      using default_ops::add;
       add(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
 /*
    template <class Exp>
    void do_assign(const Exp& e, const detail::add_and_negate_immediates&)
    {
-      using big_num_default_ops::add;
+      using default_ops::add;
       add(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
       m_backend.negate();
    }
@@ -521,14 +521,14 @@ private:
    template <class Exp>
    void do_assign(const Exp& e, const detail::subtract_immediates&)
    {
-      using big_num_default_ops::subtract;
+      using default_ops::subtract;
       subtract(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
    /*
    template <class Exp>
    void do_assign(const Exp& e, const detail::subtract_and_negate_immediates&)
    {
-      using big_num_default_ops::subtract;
+      using default_ops::subtract;
       subtract(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
       m_backend.negate();
    }
@@ -536,14 +536,14 @@ private:
    template <class Exp>
    void do_assign(const Exp& e, const detail::multiply_immediates&)
    {
-      using big_num_default_ops::multiply;
+      using default_ops::multiply;
       multiply(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
 
    template <class Exp>
    void do_assign(const Exp& e, const detail::divide_immediates&)
    {
-      using big_num_default_ops::divide;
+      using default_ops::divide;
       divide(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
 
@@ -729,7 +729,7 @@ private:
    void do_assign(const Exp& e, const detail::modulus_immediates&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
-      using big_num_default_ops::modulus;
+      using default_ops::modulus;
       modulus(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
 
@@ -774,7 +774,7 @@ private:
    void do_assign(const Exp& e, const detail::bitwise_and_immediates&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "Bitwise operations are only valid for integer types");
-      using big_num_default_ops::bitwise_and;
+      using default_ops::bitwise_and;
       bitwise_and(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
 
@@ -819,7 +819,7 @@ private:
    void do_assign(const Exp& e, const detail::bitwise_or_immediates&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "Bitwise operations are only valid for integer types");
-      using big_num_default_ops::bitwise_or;
+      using default_ops::bitwise_or;
       bitwise_or(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
 
@@ -864,7 +864,7 @@ private:
    void do_assign(const Exp& e, const detail::bitwise_xor_immediates&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "Bitwise operations are only valid for integer types");
-      using big_num_default_ops::bitwise_xor;
+      using default_ops::bitwise_xor;
       bitwise_xor(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
    template <class Exp>
@@ -912,7 +912,7 @@ private:
    template <class Exp>
    void do_assign(const Exp& e, const detail::bitwise_complement&)
    {
-      using big_num_default_ops::complement;
+      using default_ops::complement;
       self_type temp(e.left());
       complement(m_backend, temp.backend());
    }
@@ -920,28 +920,28 @@ private:
    template <class Exp>
    void do_assign(const Exp& e, const detail::complement_immediates&)
    {
-      using big_num_default_ops::complement;
+      using default_ops::complement;
       complement(m_backend, canonical_value(e.left().value()));
    }
 
    template <class Exp, class Val>
    void do_assign_right_shift(const Exp& e, const Val& val, const detail::terminal&)
    {
-      using big_num_default_ops::right_shift;
+      using default_ops::right_shift;
       right_shift(m_backend, canonical_value(e.value()), val);
    }
 
    template <class Exp, class Val>
    void do_assign_left_shift(const Exp& e, const Val& val, const detail::terminal&)
    {
-      using big_num_default_ops::left_shift;
+      using default_ops::left_shift;
       left_shift(m_backend, canonical_value(e.value()), val);
    }
 
    template <class Exp, class Val, class Tag>
    void do_assign_right_shift(const Exp& e, const Val& val, const Tag&)
    {
-      using big_num_default_ops::right_shift;
+      using default_ops::right_shift;
       self_type temp(e);
       right_shift(m_backend, temp.backend(), val);
    }
@@ -949,7 +949,7 @@ private:
    template <class Exp, class Val, class Tag>
    void do_assign_left_shift(const Exp& e, const Val& val, const Tag&)
    {
-      using big_num_default_ops::left_shift;
+      using default_ops::left_shift;
       self_type temp(e);
       left_shift(m_backend, temp.backend(), val);
    }
@@ -1014,7 +1014,7 @@ private:
    template <class Exp>
    void do_add(const Exp& e, const detail::terminal&)
    {
-      using big_num_default_ops::add;
+      using default_ops::add;
       add(m_backend, canonical_value(e.value()));
    }
 
@@ -1053,22 +1053,22 @@ private:
    template <class Exp>
    void do_add(const Exp& e, const detail::add_immediates&)
    {
-      using big_num_default_ops::add;
+      using default_ops::add;
       add(m_backend, canonical_value(e.left().value()));
       add(m_backend, canonical_value(e.right().value()));
    }
    template <class Exp>
    void do_add(const Exp& e, const detail::subtract_immediates&)
    {
-      using big_num_default_ops::add;
-      using big_num_default_ops::subtract;
+      using default_ops::add;
+      using default_ops::subtract;
       add(m_backend, canonical_value(e.left().value()));
       subtract(m_backend, canonical_value(e.right().value()));
    }
    template <class Exp>
    void do_subtract(const Exp& e, const detail::terminal&)
    {
-      using big_num_default_ops::subtract;
+      using default_ops::subtract;
       subtract(m_backend, canonical_value(e.value()));
    }
 
@@ -1099,15 +1099,15 @@ private:
    template <class Exp>
    void do_subtract(const Exp& e, const detail::add_immediates&)
    {
-      using big_num_default_ops::subtract;
+      using default_ops::subtract;
       subtract(m_backend, canonical_value(e.left().value()));
       subtract(m_backend, canonical_value(e.right().value()));
    }
    template <class Exp>
    void do_subtract(const Exp& e, const detail::subtract_immediates&)
    {
-      using big_num_default_ops::add;
-      using big_num_default_ops::subtract;
+      using default_ops::add;
+      using default_ops::subtract;
       subtract(m_backend, canonical_value(e.left().value()));
       add(m_backend, canonical_value(e.right().value()));
    }
@@ -1121,7 +1121,7 @@ private:
    template <class Exp>
    void do_multiplies(const Exp& e, const detail::terminal&)
    {
-      using big_num_default_ops::multiply;
+      using default_ops::multiply;
       multiply(m_backend, canonical_value(e.value()));
    }
 
@@ -1154,22 +1154,22 @@ private:
    template <class Exp>
    void do_multiplies(const Exp& e, const detail::multiply_immediates&)
    {
-      using big_num_default_ops::multiply;
+      using default_ops::multiply;
       multiply(m_backend, canonical_value(e.left().value()));
       multiply(m_backend, canonical_value(e.right().value()));
    }
    template <class Exp>
    void do_multiplies(const Exp& e, const detail::divide_immediates&)
    {
-      using big_num_default_ops::multiply;
-      using big_num_default_ops::divide;
+      using default_ops::multiply;
+      using default_ops::divide;
       multiply(m_backend, canonical_value(e.left().value()));
       divide(m_backend, canonical_value(e.right().value()));
    }
    template <class Exp, class unknown>
    void do_multiplies(const Exp& e, const unknown&)
    {
-      using big_num_default_ops::multiply;
+      using default_ops::multiply;
       self_type temp(e);
       multiply(m_backend, temp.m_backend);
    }
@@ -1177,7 +1177,7 @@ private:
    template <class Exp>
    void do_divide(const Exp& e, const detail::terminal&)
    {
-      using big_num_default_ops::divide;
+      using default_ops::divide;
       divide(m_backend, canonical_value(e.value()));
    }
 
@@ -1210,15 +1210,15 @@ private:
    template <class Exp>
    void do_divides(const Exp& e, const detail::multiply_immediates&)
    {
-      using big_num_default_ops::divide;
+      using default_ops::divide;
       divide(m_backend, canonical_value(e.left().value()));
       divide(m_backend, canonical_value(e.right().value()));
    }
    template <class Exp>
    void do_divides(const Exp& e, const detail::divide_immediates&)
    {
-      using big_num_default_ops::multiply;
-      using big_num_default_ops::divide;
+      using default_ops::multiply;
+      using default_ops::divide;
       divide(m_backend, canonical_value(e.left().value()));
       mutiply(m_backend, canonical_value(e.right().value()));
    }
@@ -1226,7 +1226,7 @@ private:
    template <class Exp, class unknown>
    void do_divide(const Exp& e, const unknown&)
    {
-      using big_num_default_ops::multiply;
+      using default_ops::multiply;
       self_type temp(e);
       divide(m_backend, temp.m_backend);
    }
@@ -1235,7 +1235,7 @@ private:
    void do_modulus(const Exp& e, const detail::terminal&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
-      using big_num_default_ops::modulus;
+      using default_ops::modulus;
       modulus(m_backend, canonical_value(e.value()));
    }
 
@@ -1243,7 +1243,7 @@ private:
    void do_modulus(const Exp& e, const Unknown&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
-      using big_num_default_ops::modulus;
+      using default_ops::modulus;
       self_type temp(e);
       modulus(m_backend, canonical_value(temp));
    }
@@ -1251,7 +1251,7 @@ private:
    template <class Exp>
    void do_bitwise_and(const Exp& e, const detail::terminal&)
    {
-      using big_num_default_ops::bitwise_and;
+      using default_ops::bitwise_and;
       bitwise_and(m_backend, canonical_value(e.value()));
    }
    template <class Exp>
@@ -1265,7 +1265,7 @@ private:
    template <class Exp, class unknown>
    void do_bitwise_and(const Exp& e, const unknown&)
    {
-      using big_num_default_ops::bitwise_and;
+      using default_ops::bitwise_and;
       self_type temp(e);
       bitwise_and(m_backend, temp.m_backend);
    }
@@ -1273,7 +1273,7 @@ private:
    template <class Exp>
    void do_bitwise_or(const Exp& e, const detail::terminal&)
    {
-      using big_num_default_ops::bitwise_or;
+      using default_ops::bitwise_or;
       bitwise_or(m_backend, canonical_value(e.value()));
    }
    template <class Exp>
@@ -1287,7 +1287,7 @@ private:
    template <class Exp, class unknown>
    void do_bitwise_or(const Exp& e, const unknown&)
    {
-      using big_num_default_ops::bitwise_or;
+      using default_ops::bitwise_or;
       self_type temp(e);
       bitwise_or(m_backend, temp.m_backend);
    }
@@ -1295,7 +1295,7 @@ private:
    template <class Exp>
    void do_bitwise_xor(const Exp& e, const detail::terminal&)
    {
-      using big_num_default_ops::bitwise_xor;
+      using default_ops::bitwise_xor;
       bitwise_xor(m_backend, canonical_value(e.value()));
    }
    template <class Exp>
@@ -1309,7 +1309,7 @@ private:
    template <class Exp, class unknown>
    void do_bitwise_xor(const Exp& e, const unknown&)
    {
-      using big_num_default_ops::bitwise_xor;
+      using default_ops::bitwise_xor;
       self_type temp(e);
       bitwise_xor(m_backend, temp.m_backend);
    }
@@ -1323,7 +1323,7 @@ private:
    template <class Exp>
    bool contains_self(const Exp& e, mpl::int_<0> const&)const
    {
-      return is_really_self(e.value());
+      return is_floatly_self(e.value());
    }
    template <class Exp>
    bool contains_self(const Exp& e, mpl::int_<1> const&)const
@@ -1359,7 +1359,7 @@ private:
    template <class Exp>
    bool is_self(const Exp& e, mpl::int_<0> const&)const
    {
-      return is_really_self(e.value());
+      return is_floatly_self(e.value());
    }
    template <class Exp, int v>
    bool is_self(const Exp& e, mpl::int_<v> const&)const
@@ -1368,8 +1368,8 @@ private:
    }
 
    template <class Val>
-   bool is_really_self(const Val&)const { return false; }
-   bool is_really_self(const self_type& v)const { return &v == this; }
+   bool is_floatly_self(const Val&)const { return false; }
+   bool is_floatly_self(const self_type& v)const { return &v == this; }
 
    static const Backend& canonical_value(const self_type& v){  return v.m_backend;  }
    //static const Backend& canonical_value(const self_type* v){  return v->m_backend;  }

@@ -20,8 +20,8 @@
 #  pragma warning(disable:4503) // decorated name length exceeded, name was truncated
 #endif
 
-#if !defined(TEST_MPF50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_E_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50)
-#  define TEST_MPF50
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_E_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50)
+#  define TEST_MPF_50
 #  define TEST_MPF
 #  define TEST_BACKEND
 #  define TEST_MPZ
@@ -38,7 +38,7 @@
 
 #endif
 
-#if defined(TEST_MPF50) || defined(TEST_MPF) || defined(TEST_MPZ)
+#if defined(TEST_MPF_50) || defined(TEST_MPF) || defined(TEST_MPZ)
 #include <boost/multiprecision/gmp.hpp>
 #endif
 #ifdef TEST_BACKEND
@@ -57,19 +57,19 @@
 void foo()
 {
 #ifdef TEST_BACKEND
-   instantiate(boost::multiprecision::mp_number_real_architype());
+   instantiate(boost::multiprecision::mp_number_float_architype());
 #endif
 #ifdef TEST_MPF_50
-   instantiate(boost::multiprecision::mpf_real_50());
+   instantiate(boost::multiprecision::mpf_float_50());
 #endif
 #ifdef TEST_MPF
-   instantiate(boost::multiprecision::mpf_real());
+   instantiate(boost::multiprecision::mpf_float());
 #endif
 #ifdef TEST_MPFR_50
-   instantiate(boost::multiprecision::mpfr_real_50());
+   instantiate(boost::multiprecision::mpfr_float_50());
 #endif
 #ifdef TEST_MPFR
-   instantiate(boost::multiprecision::mpfr_real());
+   instantiate(boost::multiprecision::mpfr_float());
 #endif
 #ifdef TEST_E_FLOAT
    instantiate(boost::multiprecision::e_float());
@@ -79,19 +79,19 @@ void foo()
 int main()
 {
 #ifdef TEST_BACKEND
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::math::concepts::mp_number_real_architype>));
+   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::math::concepts::mp_number_float_architype>));
 #endif
 #ifdef TEST_MPF_50
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mpf_real_50>));
+   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mpf_float_50>));
 #endif
 #ifdef TEST_MPF
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mpf_real>));
+   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mpf_float>));
 #endif
 #ifdef TEST_MPFR_50
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mpfr_real_50>));
+   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mpfr_float_50>));
 #endif
 #ifdef TEST_MPFR
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mpfr_real>));
+   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mpfr_float>));
 #endif
 #ifdef TEST_E_FLOAT
    BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::e_float>));

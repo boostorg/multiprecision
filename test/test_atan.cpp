@@ -12,8 +12,8 @@
 #include <boost/array.hpp>
 #include "test.hpp"
 
-#if !defined(TEST_MPF50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_E_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ)
-#  define TEST_MPF50
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_E_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ)
+#  define TEST_MPF_50
 //#  define TEST_MPF
 #  define TEST_BACKEND
 #  define TEST_E_FLOAT
@@ -27,7 +27,7 @@
 
 #endif
 
-#if defined(TEST_MPF50)
+#if defined(TEST_MPF_50)
 #include <boost/multiprecision/gmp.hpp>
 #endif
 #if defined(TEST_MPFR_50)
@@ -44,7 +44,7 @@ template <class T>
 T atan2_def(T y, T x)
 {
    T t;
-   t.backend() = boost::multiprecision::big_num_default_ops::get_constant_pi<typename T::backend_type>();
+   t.backend() = boost::multiprecision::default_ops::get_constant_pi<typename T::backend_type>();
    T t2;
    if(x)
       t2 = atan(y / x);
@@ -56,8 +56,10 @@ T atan2_def(T y, T x)
 template <class T>
 struct is_mpfr_type : public boost::mpl::false_ {};
 
+#ifdef TEST_MPFR_50
 template <unsigned Digits10>
-struct is_mpfr_type<boost::multiprecision::mp_number<boost::multiprecision::mpfr_real_backend<Digits10> > > : public boost::mpl::true_{};
+struct is_mpfr_type<boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<Digits10> > > : public boost::mpl::true_{};
+#endif
 
 template <class T>
 void test()
@@ -188,7 +190,7 @@ void test()
       max_err = err;
 
    T pi;
-   pi.backend() = boost::multiprecision::big_num_default_ops::get_constant_pi<typename T::backend_type>();
+   pi.backend() = boost::multiprecision::default_ops::get_constant_pi<typename T::backend_type>();
 
    err = relative_error(T(atan2(T(1), T(0))), T(pi / 2)).template convert_to<unsigned>();
    if(err > max_err)
@@ -227,15 +229,15 @@ void test()
 int main()
 {
 #ifdef TEST_BACKEND
-   test<boost::multiprecision::mp_number<boost::multiprecision::concepts::mp_number_backend_real_architype> >();
+   test<boost::multiprecision::mp_number<boost::multiprecision::concepts::mp_number_backend_float_architype> >();
 #endif
-#ifdef TEST_MPF50
-   test<boost::multiprecision::mpf_real_50>();
-   test<boost::multiprecision::mpf_real_100>();
+#ifdef TEST_MPF_50
+   test<boost::multiprecision::mpf_float_50>();
+   test<boost::multiprecision::mpf_float_100>();
 #endif
 #ifdef TEST_MPFR_50
-   test<boost::multiprecision::mpfr_real_50>();
-   test<boost::multiprecision::mpfr_real_100>();
+   test<boost::multiprecision::mpfr_float_50>();
+   test<boost::multiprecision::mpfr_float_100>();
 #endif
 #ifdef TEST_E_FLOAT
    test<boost::multiprecision::e_float>();

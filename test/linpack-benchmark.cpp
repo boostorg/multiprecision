@@ -21,10 +21,10 @@ http://www.netlib.org/f2c/libf2c.zip
 
 #ifdef TEST_MPF_100
 #include <boost/multiprecision/gmp.hpp>
-typedef boost::multiprecision::mpf_real_100 real_type;
+typedef boost::multiprecision::mpf_float_100 real_type;
 #elif defined(TEST_MPFR_100)
 #include <boost/multiprecision/mpfr.hpp>
-typedef boost::multiprecision::mpfr_real_100 real_type;
+typedef boost::multiprecision::mpfr_float_100 real_type;
 #elif defined(TEST_GMPXX)
 #include <gmpxx.h>
 typedef mpf_class real_type;
@@ -99,9 +99,9 @@ int dmxpy_(integer *, real_type *, integer *, integer *, real_type *, real_type 
 extern "C" int MAIN__()
 {
 #ifdef TEST_MPF_100
-   std::cout << "Testing mp_number<mpf_real<100> >" << std::endl;
+   std::cout << "Testing mp_number<mpf_float<100> >" << std::endl;
 #elif defined(TEST_MPFR_100)
-   std::cout << "Testing mp_number<mpf_real<100> >" << std::endl;
+   std::cout << "Testing mp_number<mpf_float<100> >" << std::endl;
 #elif defined(TEST_GMPXX)
    std::cout << "Testing mpf_class at 100 decimal degits" << std::endl;
    mpf_set_default_prec(((100 + 1) * 1000L) / 301L);
@@ -1229,7 +1229,7 @@ times for array with leading dimension of1001
 266.45     0.798      267.24    2.5021       0.79933   4772.2
 
 
-mp_number<gmp_real<100> >:
+mp_number<gmp_float<100> >:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
      norm. resid      resid           machep         x(1)          x(n)

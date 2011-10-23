@@ -18,21 +18,21 @@
 namespace boost{ namespace multiprecision{
 
 template <unsigned digits10>
-struct gmp_real;
+struct gmp_float;
 
 namespace detail{
 
 template <unsigned digits10>
-struct gmp_real_imp
+struct gmp_float_imp
 {
    typedef mpl::list<long, long long>                 signed_types;
    typedef mpl::list<unsigned long, unsigned long long>   unsigned_types;
    typedef mpl::list<double, long double>            real_types;
    typedef long                                      exponent_type;
 
-   gmp_real_imp(){}
+   gmp_float_imp(){}
 
-   gmp_real_imp(const gmp_real_imp& o)
+   gmp_float_imp(const gmp_float_imp& o)
    {
       //
       // We have to do an init followed by a set here, otherwise *this may be at
@@ -44,25 +44,25 @@ struct gmp_real_imp
       mpf_set(m_data, o.m_data);
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   gmp_real_imp(gmp_real_imp&& o)
+   gmp_float_imp(gmp_float_imp&& o)
    {
       m_data[0] = o.m_data[0];
       o.m_data[0]._mp_d = 0;
    }
 #endif
-   gmp_real_imp& operator = (const gmp_real_imp& o)
+   gmp_float_imp& operator = (const gmp_float_imp& o)
    {
       mpf_set(m_data, o.m_data);
       return *this;
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   gmp_real_imp& operator = (gmp_real_imp&& o)
+   gmp_float_imp& operator = (gmp_float_imp&& o)
    {
       mpf_swap(m_data, o.m_data);
       return *this;
    }
 #endif
-   gmp_real_imp& operator = (boost::uintmax_t i)
+   gmp_float_imp& operator = (boost::uintmax_t i)
    {
       boost::uintmax_t mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
       unsigned shift = 0;
@@ -81,7 +81,7 @@ struct gmp_real_imp
       mpf_clear(t);
       return *this;
    }
-   gmp_real_imp& operator = (boost::intmax_t i)
+   gmp_float_imp& operator = (boost::intmax_t i)
    {
       bool neg = i < 0;
       *this = static_cast<boost::uintmax_t>(std::abs(i));
@@ -89,22 +89,22 @@ struct gmp_real_imp
          mpf_neg(m_data, m_data);
       return *this;
    }
-   gmp_real_imp& operator = (unsigned long i)
+   gmp_float_imp& operator = (unsigned long i)
    {
       mpf_set_ui(m_data, i);
       return *this;
    }
-   gmp_real_imp& operator = (long i)
+   gmp_float_imp& operator = (long i)
    {
       mpf_set_si(m_data, i);
       return *this;
    }
-   gmp_real_imp& operator = (double d)
+   gmp_float_imp& operator = (double d)
    {
       mpf_set_d(m_data, d);
       return *this;
    }
-   gmp_real_imp& operator = (long double a)
+   gmp_float_imp& operator = (long double a)
    {
       using std::frexp;
       using std::ldexp;
@@ -150,12 +150,12 @@ struct gmp_real_imp
          mpf_div_2exp(m_data, m_data, -e);
       return *this;
    }
-   gmp_real_imp& operator = (const char* s)
+   gmp_float_imp& operator = (const char* s)
    {
       mpf_set_str(m_data, s, 10);
       return *this;
    }
-   void swap(gmp_real_imp& o)
+   void swap(gmp_float_imp& o)
    {
       mpf_swap(m_data, o.m_data);
    }
@@ -195,7 +195,7 @@ struct gmp_real_imp
       (*free_func_ptr)((void*)ps, std::strlen(ps) + 1);
       return result;
    }
-   ~gmp_real_imp()
+   ~gmp_float_imp()
    {
       if(m_data[0]._mp_d)
          mpf_clear(m_data);
@@ -204,7 +204,7 @@ struct gmp_real_imp
    {
       mpf_neg(m_data, m_data);
    }
-   int compare(const gmp_real<digits10>& o)const
+   int compare(const gmp_float<digits10>& o)const
    {
       return mpf_cmp(m_data, o.m_data);
    }
@@ -219,7 +219,7 @@ struct gmp_real_imp
    template <class V>
    int compare(V v)const
    {
-      gmp_real<digits10> d;
+      gmp_float<digits10> d;
       d = v;
       return compare(d);
    }
@@ -237,73 +237,73 @@ protected:
 } // namespace detail
 
 template <unsigned digits10>
-struct gmp_real : public detail::gmp_real_imp<digits10>
+struct gmp_float : public detail::gmp_float_imp<digits10>
 {
-   gmp_real()
+   gmp_float()
    {
       mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
    }
-   gmp_real(const gmp_real& o) : detail::gmp_real_imp<digits10>(o) {}
+   gmp_float(const gmp_float& o) : detail::gmp_float_imp<digits10>(o) {}
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   gmp_real(gmp_real&& o) : detail::gmp_real_imp<digits10>(o) {}
+   gmp_float(gmp_float&& o) : detail::gmp_float_imp<digits10>(o) {}
 #endif
-   gmp_real& operator=(const gmp_real& o)
+   gmp_float& operator=(const gmp_float& o)
    {
-      *static_cast<detail::gmp_real_imp<digits10>*>(this) = static_cast<detail::gmp_real_imp<digits10> const&>(o);
+      *static_cast<detail::gmp_float_imp<digits10>*>(this) = static_cast<detail::gmp_float_imp<digits10> const&>(o);
       return *this;
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   gmp_real& operator=(gmp_real&& o)
+   gmp_float& operator=(gmp_float&& o)
    {
-      *static_cast<detail::gmp_real_imp<digits10>*>(this) = static_cast<detail::gmp_real_imp<digits10>&&>(o);
+      *static_cast<detail::gmp_float_imp<digits10>*>(this) = static_cast<detail::gmp_float_imp<digits10>&&>(o);
       return *this;
    }
 #endif
    template <class V>
-   gmp_real& operator=(const V& v)
+   gmp_float& operator=(const V& v)
    {
-      *static_cast<detail::gmp_real_imp<digits10>*>(this) = v;
+      *static_cast<detail::gmp_float_imp<digits10>*>(this) = v;
       return *this;
    }
 };
 
 template <>
-struct gmp_real<0> : public detail::gmp_real_imp<0>
+struct gmp_float<0> : public detail::gmp_float_imp<0>
 {
-   gmp_real()
+   gmp_float()
    {
       mpf_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
    }
-   gmp_real(unsigned digits10)
+   gmp_float(unsigned digits10)
    {
       mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
    }
-   gmp_real(const gmp_real& o) : detail::gmp_real_imp<0>(o) {}
+   gmp_float(const gmp_float& o) : detail::gmp_float_imp<0>(o) {}
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   gmp_real(gmp_real&& o) : detail::gmp_real_imp<0>(o) {}
+   gmp_float(gmp_float&& o) : detail::gmp_float_imp<0>(o) {}
 #endif
-   gmp_real(const gmp_real& o, unsigned digits10) 
+   gmp_float(const gmp_float& o, unsigned digits10) 
    {
       mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
       *this = o;
    }
 
-   gmp_real& operator=(const gmp_real& o)
+   gmp_float& operator=(const gmp_float& o)
    {
-      *static_cast<detail::gmp_real_imp<0>*>(this) = static_cast<detail::gmp_real_imp<0> const&>(o);
+      *static_cast<detail::gmp_float_imp<0>*>(this) = static_cast<detail::gmp_float_imp<0> const&>(o);
       return *this;
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   gmp_real& operator=(gmp_real&& o)
+   gmp_float& operator=(gmp_float&& o)
    {
-      *static_cast<detail::gmp_real_imp<0>*>(this) = static_cast<detail::gmp_real_imp<0> &&>(o);
+      *static_cast<detail::gmp_float_imp<0>*>(this) = static_cast<detail::gmp_float_imp<0> &&>(o);
       return *this;
    }
 #endif
    template <class V>
-   gmp_real& operator=(const V& v)
+   gmp_float& operator=(const V& v)
    {
-      *static_cast<detail::gmp_real_imp<0>*>(this) = v;
+      *static_cast<detail::gmp_float_imp<0>*>(this) = v;
       return *this;
    }
    static unsigned default_precision()
@@ -325,47 +325,47 @@ struct gmp_real<0> : public detail::gmp_real_imp<0>
 };
 
 template <unsigned digits10>
-inline void add(gmp_real<digits10>& result, const gmp_real<digits10>& o)
+inline void add(gmp_float<digits10>& result, const gmp_float<digits10>& o)
 {
    mpf_add(result.data(), result.data(), o.data());
 }
 template <unsigned digits10>
-inline void subtract(gmp_real<digits10>& result, const gmp_real<digits10>& o)
+inline void subtract(gmp_float<digits10>& result, const gmp_float<digits10>& o)
 {
    mpf_sub(result.data(), result.data(), o.data());
 }
 template <unsigned digits10>
-inline void multiply(gmp_real<digits10>& result, const gmp_real<digits10>& o)
+inline void multiply(gmp_float<digits10>& result, const gmp_float<digits10>& o)
 {
    mpf_mul(result.data(), result.data(), o.data());
 }
 template <unsigned digits10>
-inline void divide(gmp_real<digits10>& result, const gmp_real<digits10>& o)
+inline void divide(gmp_float<digits10>& result, const gmp_float<digits10>& o)
 {
    mpf_div(result.data(), result.data(), o.data());
 }
 template <unsigned digits10>
-inline void add(gmp_real<digits10>& result, unsigned long i)
+inline void add(gmp_float<digits10>& result, unsigned long i)
 {
    mpf_add_ui(result.data(), result.data(), i);
 }
 template <unsigned digits10>
-inline void subtract(gmp_real<digits10>& result, unsigned long i)
+inline void subtract(gmp_float<digits10>& result, unsigned long i)
 {
    mpf_sub_ui(result.data(), result.data(), i);
 }
 template <unsigned digits10>
-inline void multiply(gmp_real<digits10>& result, unsigned long i)
+inline void multiply(gmp_float<digits10>& result, unsigned long i)
 {
    mpf_mul_ui(result.data(), result.data(), i);
 }
 template <unsigned digits10>
-inline void divide(gmp_real<digits10>& result, unsigned long i)
+inline void divide(gmp_float<digits10>& result, unsigned long i)
 {
    mpf_div_ui(result.data(), result.data(), i);
 }
 template <unsigned digits10>
-inline void add(gmp_real<digits10>& result, long i)
+inline void add(gmp_float<digits10>& result, long i)
 {
    if(i > 0)
       mpf_add_ui(result.data(), result.data(), i);
@@ -373,7 +373,7 @@ inline void add(gmp_real<digits10>& result, long i)
       mpf_sub_ui(result.data(), result.data(), std::abs(i));
 }
 template <unsigned digits10>
-inline void subtract(gmp_real<digits10>& result, long i)
+inline void subtract(gmp_float<digits10>& result, long i)
 {
    if(i > 0)
       mpf_sub_ui(result.data(), result.data(), i);
@@ -381,14 +381,14 @@ inline void subtract(gmp_real<digits10>& result, long i)
       mpf_add_ui(result.data(), result.data(), std::abs(i));
 }
 template <unsigned digits10>
-inline void multiply(gmp_real<digits10>& result, long i)
+inline void multiply(gmp_float<digits10>& result, long i)
 {
    mpf_mul_ui(result.data(), result.data(), std::abs(i));
    if(i < 0)
       mpf_neg(result.data(), result.data());
 }
 template <unsigned digits10>
-inline void divide(gmp_real<digits10>& result, long i)
+inline void divide(gmp_float<digits10>& result, long i)
 {
    mpf_div_ui(result.data(), result.data(), std::abs(i));
    if(i < 0)
@@ -398,17 +398,17 @@ inline void divide(gmp_real<digits10>& result, long i)
 // Specialised 3 arg versions of the basic operators:
 //
 template <unsigned digits10>
-inline void add(gmp_real<digits10>& a, const gmp_real<digits10>& x, const gmp_real<digits10>& y)
+inline void add(gmp_float<digits10>& a, const gmp_float<digits10>& x, const gmp_float<digits10>& y)
 {
    mpf_add(a.data(), x.data(), y.data());
 }
 template <unsigned digits10>
-inline void add(gmp_real<digits10>& a, const gmp_real<digits10>& x, unsigned long y)
+inline void add(gmp_float<digits10>& a, const gmp_float<digits10>& x, unsigned long y)
 {
    mpf_add_ui(a.data(), x.data(), y);
 }
 template <unsigned digits10>
-inline void add(gmp_real<digits10>& a, const gmp_real<digits10>& x, long y)
+inline void add(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y)
 {
    if(y < 0)
       mpf_sub_ui(a.data(), x.data(), -y);
@@ -416,12 +416,12 @@ inline void add(gmp_real<digits10>& a, const gmp_real<digits10>& x, long y)
       mpf_add_ui(a.data(), x.data(), y);
 }
 template <unsigned digits10>
-inline void add(gmp_real<digits10>& a, unsigned long x, const gmp_real<digits10>& y)
+inline void add(gmp_float<digits10>& a, unsigned long x, const gmp_float<digits10>& y)
 {
    mpf_add_ui(a.data(), y.data(), x);
 }
 template <unsigned digits10>
-inline void add(gmp_real<digits10>& a, long x, const gmp_real<digits10>& y)
+inline void add(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y)
 {
    if(x < 0)
    {
@@ -432,17 +432,17 @@ inline void add(gmp_real<digits10>& a, long x, const gmp_real<digits10>& y)
       mpf_add_ui(a.data(), y.data(), x);
 }
 template <unsigned digits10>
-inline void subtract(gmp_real<digits10>& a, const gmp_real<digits10>& x, const gmp_real<digits10>& y)
+inline void subtract(gmp_float<digits10>& a, const gmp_float<digits10>& x, const gmp_float<digits10>& y)
 {
    mpf_sub(a.data(), x.data(), y.data());
 }
 template <unsigned digits10>
-inline void subtract(gmp_real<digits10>& a, const gmp_real<digits10>& x, unsigned long y)
+inline void subtract(gmp_float<digits10>& a, const gmp_float<digits10>& x, unsigned long y)
 {
    mpf_sub_ui(a.data(), x.data(), y);
 }
 template <unsigned digits10>
-inline void subtract(gmp_real<digits10>& a, const gmp_real<digits10>& x, long y)
+inline void subtract(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y)
 {
    if(y < 0)
       mpf_add_ui(a.data(), x.data(), -y);
@@ -450,12 +450,12 @@ inline void subtract(gmp_real<digits10>& a, const gmp_real<digits10>& x, long y)
       mpf_sub_ui(a.data(), x.data(), y);
 }
 template <unsigned digits10>
-inline void subtract(gmp_real<digits10>& a, unsigned long x, const gmp_real<digits10>& y)
+inline void subtract(gmp_float<digits10>& a, unsigned long x, const gmp_float<digits10>& y)
 {
    mpf_ui_sub(a.data(), x, y.data());
 }
 template <unsigned digits10>
-inline void subtract(gmp_real<digits10>& a, long x, const gmp_real<digits10>& y)
+inline void subtract(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y)
 {
    if(x < 0)
    {
@@ -467,17 +467,17 @@ inline void subtract(gmp_real<digits10>& a, long x, const gmp_real<digits10>& y)
 }
 
 template <unsigned digits10>
-inline void multiply(gmp_real<digits10>& a, const gmp_real<digits10>& x, const gmp_real<digits10>& y)
+inline void multiply(gmp_float<digits10>& a, const gmp_float<digits10>& x, const gmp_float<digits10>& y)
 {
    mpf_mul(a.data(), x.data(), y.data());
 }
 template <unsigned digits10>
-inline void multiply(gmp_real<digits10>& a, const gmp_real<digits10>& x, unsigned long y)
+inline void multiply(gmp_float<digits10>& a, const gmp_float<digits10>& x, unsigned long y)
 {
    mpf_mul_ui(a.data(), x.data(), y);
 }
 template <unsigned digits10>
-inline void multiply(gmp_real<digits10>& a, const gmp_real<digits10>& x, long y)
+inline void multiply(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y)
 {
    if(y < 0)
    {
@@ -488,12 +488,12 @@ inline void multiply(gmp_real<digits10>& a, const gmp_real<digits10>& x, long y)
       mpf_mul_ui(a.data(), x.data(), y);
 }
 template <unsigned digits10>
-inline void multiply(gmp_real<digits10>& a, unsigned long x, const gmp_real<digits10>& y)
+inline void multiply(gmp_float<digits10>& a, unsigned long x, const gmp_float<digits10>& y)
 {
    mpf_mul_ui(a.data(), y.data(), x);
 }
 template <unsigned digits10>
-inline void multiply(gmp_real<digits10>& a, long x, const gmp_real<digits10>& y)
+inline void multiply(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y)
 {
    if(x < 0)
    {
@@ -505,17 +505,17 @@ inline void multiply(gmp_real<digits10>& a, long x, const gmp_real<digits10>& y)
 }
 
 template <unsigned digits10>
-inline void divide(gmp_real<digits10>& a, const gmp_real<digits10>& x, const gmp_real<digits10>& y)
+inline void divide(gmp_float<digits10>& a, const gmp_float<digits10>& x, const gmp_float<digits10>& y)
 {
    mpf_div(a.data(), x.data(), y.data());
 }
 template <unsigned digits10>
-inline void divide(gmp_real<digits10>& a, const gmp_real<digits10>& x, unsigned long y)
+inline void divide(gmp_float<digits10>& a, const gmp_float<digits10>& x, unsigned long y)
 {
    mpf_div_ui(a.data(), x.data(), y);
 }
 template <unsigned digits10>
-inline void divide(gmp_real<digits10>& a, const gmp_real<digits10>& x, long y)
+inline void divide(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y)
 {
    if(y < 0)
    {
@@ -526,12 +526,12 @@ inline void divide(gmp_real<digits10>& a, const gmp_real<digits10>& x, long y)
       mpf_div_ui(a.data(), x.data(), y);
 }
 template <unsigned digits10>
-inline void divide(gmp_real<digits10>& a, unsigned long x, const gmp_real<digits10>& y)
+inline void divide(gmp_float<digits10>& a, unsigned long x, const gmp_float<digits10>& y)
 {
    mpf_ui_div(a.data(), x, y.data());
 }
 template <unsigned digits10>
-inline void divide(gmp_real<digits10>& a, long x, const gmp_real<digits10>& y)
+inline void divide(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y)
 {
    if(x < 0)
    {
@@ -543,36 +543,36 @@ inline void divide(gmp_real<digits10>& a, long x, const gmp_real<digits10>& y)
 }
 
 template <unsigned digits10>
-inline bool is_zero(const gmp_real<digits10>& val)
+inline bool is_zero(const gmp_float<digits10>& val)
 {
    return mpf_sgn(val.data()) == 0;
 }
 template <unsigned digits10>
-inline int get_sign(const gmp_real<digits10>& val)
+inline int get_sign(const gmp_float<digits10>& val)
 {
    return mpf_sgn(val.data());
 }
 
 template <unsigned digits10>
-inline void convert_to(unsigned long* result, const gmp_real<digits10>& val)
+inline void convert_to(unsigned long* result, const gmp_float<digits10>& val)
 {
    *result = mpf_get_ui(val.data());
 }
 template <unsigned digits10>
-inline void convert_to(long* result, const gmp_real<digits10>& val)
+inline void convert_to(long* result, const gmp_float<digits10>& val)
 {
    *result = mpf_get_si(val.data());
 }
 template <unsigned digits10>
-inline void convert_to(double* result, const gmp_real<digits10>& val)
+inline void convert_to(double* result, const gmp_float<digits10>& val)
 {
    *result = mpf_get_d(val.data());
 }
 #ifdef BOOST_HAS_LONG_LONG
 template <unsigned digits10>
-inline void convert_to(long long* result, const gmp_real<digits10>& val)
+inline void convert_to(long long* result, const gmp_float<digits10>& val)
 {
-   gmp_real<digits10> t(val);
+   gmp_float<digits10> t(val);
    if(get_sign(t) < 0)
       t.negate();
    
@@ -602,9 +602,9 @@ inline void convert_to(long long* result, const gmp_real<digits10>& val)
       *result = -*result;
 }
 template <unsigned digits10>
-inline void convert_to(unsigned long long* result, const gmp_real<digits10>& val)
+inline void convert_to(unsigned long long* result, const gmp_float<digits10>& val)
 {
-   gmp_real<digits10> t(val);
+   gmp_float<digits10> t(val);
    
    long digits = std::numeric_limits<long long>::digits - std::numeric_limits<long>::digits;
 
@@ -635,39 +635,39 @@ inline void convert_to(unsigned long long* result, const gmp_real<digits10>& val
 // Native non-member operations:
 //
 template <unsigned Digits10>
-inline void eval_sqrt(gmp_real<Digits10>& result, const gmp_real<Digits10>& val)
+inline void eval_sqrt(gmp_float<Digits10>& result, const gmp_float<Digits10>& val)
 {
    mpf_sqrt(result.data(), val.data());
 }
 
 template <unsigned Digits10>
-inline void eval_abs(gmp_real<Digits10>& result, const gmp_real<Digits10>& val)
+inline void eval_abs(gmp_float<Digits10>& result, const gmp_float<Digits10>& val)
 {
    mpf_abs(result.data(), val.data());
 }
 
 template <unsigned Digits10>
-inline void eval_fabs(gmp_real<Digits10>& result, const gmp_real<Digits10>& val)
+inline void eval_fabs(gmp_float<Digits10>& result, const gmp_float<Digits10>& val)
 {
    mpf_abs(result.data(), val.data());
 }
 template <unsigned Digits10>
-inline void eval_ceil(gmp_real<Digits10>& result, const gmp_real<Digits10>& val)
+inline void eval_ceil(gmp_float<Digits10>& result, const gmp_float<Digits10>& val)
 {
    mpf_ceil(result.data(), val.data());
 }
 template <unsigned Digits10>
-inline void eval_floor(gmp_real<Digits10>& result, const gmp_real<Digits10>& val)
+inline void eval_floor(gmp_float<Digits10>& result, const gmp_float<Digits10>& val)
 {
    mpf_floor(result.data(), val.data());
 }
 template <unsigned Digits10>
-inline void eval_trunc(gmp_real<Digits10>& result, const gmp_real<Digits10>& val)
+inline void eval_trunc(gmp_float<Digits10>& result, const gmp_float<Digits10>& val)
 {
    mpf_trunc(result.data(), val.data());
 }
 template <unsigned Digits10>
-inline void eval_ldexp(gmp_real<Digits10>& result, const gmp_real<Digits10>& val, long e)
+inline void eval_ldexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& val, long e)
 {
    if(e > 0)
       mpf_mul_2exp(result.data(), val.data(), e);
@@ -677,7 +677,7 @@ inline void eval_ldexp(gmp_real<Digits10>& result, const gmp_real<Digits10>& val
       result = val;
 }
 template <unsigned Digits10>
-inline void eval_frexp(gmp_real<Digits10>& result, const gmp_real<Digits10>& val, int* e)
+inline void eval_frexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& val, int* e)
 {
    long v;
    mpf_get_d_2exp(&v, val.data());
@@ -685,7 +685,7 @@ inline void eval_frexp(gmp_real<Digits10>& result, const gmp_real<Digits10>& val
    eval_ldexp(result, val, -v);
 }
 template <unsigned Digits10>
-inline void eval_frexp(gmp_real<Digits10>& result, const gmp_real<Digits10>& val, long* e)
+inline void eval_frexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& val, long* e)
 {
    mpf_get_d_2exp(e, val.data());
    eval_ldexp(result, val, -*e);
@@ -1208,8 +1208,8 @@ struct gmp_rational
       using std::frexp;
       using std::ldexp;
       using std::floor;
-      using big_num_default_ops::add;
-      using big_num_default_ops::subtract;
+      using default_ops::add;
+      using default_ops::subtract;
 
       if (a == 0) {
          mpq_set_si(m_data, 0, 1);
@@ -1374,11 +1374,11 @@ struct number_category<gmp_int> : public mpl::int_<number_kind_integer>{};
 template<>
 struct number_category<gmp_rational> : public mpl::int_<number_kind_rational>{};
 
-typedef mp_number<gmp_real<50> >    mpf_real_50;
-typedef mp_number<gmp_real<100> >   mpf_real_100;
-typedef mp_number<gmp_real<500> >   mpf_real_500;
-typedef mp_number<gmp_real<1000> >  mpf_real_1000;
-typedef mp_number<gmp_real<0> >     mpf_real;
+typedef mp_number<gmp_float<50> >    mpf_float_50;
+typedef mp_number<gmp_float<100> >   mpf_float_100;
+typedef mp_number<gmp_float<500> >   mpf_float_500;
+typedef mp_number<gmp_float<1000> >  mpf_float_1000;
+typedef mp_number<gmp_float<0> >     mpf_float;
 typedef mp_number<gmp_int >         mpz_int;
 typedef mp_number<gmp_rational >    mpq_rational;
 
@@ -1394,9 +1394,9 @@ namespace std{
 // numeric_limits [partial] specializations for the types declared in this header:
 //
 template<unsigned Digits10> 
-class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_real<Digits10> > >
+class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<Digits10> > >
 {
-   typedef boost::multiprecision::mp_number<boost::multiprecision::gmp_real<Digits10> > number_type;
+   typedef boost::multiprecision::mp_number<boost::multiprecision::gmp_float<Digits10> > number_type;
 public:
    BOOST_STATIC_CONSTEXPR bool is_specialized = true;
    BOOST_STATIC_CONSTEXPR number_type (min)() noexcept
@@ -1486,10 +1486,10 @@ private:
    {
       data_initializer()
       {
-         std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_real<digits10> > >::epsilon();
-         std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_real<digits10> > >::round_error();
-         (std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_real<digits10> > >::min)();
-         (std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_real<digits10> > >::max)();
+         std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<digits10> > >::epsilon();
+         std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<digits10> > >::round_error();
+         (std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<digits10> > >::min)();
+         (std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<digits10> > >::max)();
       }
       void do_nothing()const{}
    };
@@ -1497,12 +1497,12 @@ private:
 };
 
 template<unsigned Digits10> 
-const typename numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_real<Digits10> > >::data_initializer numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_real<Digits10> > >::initializer;
+const typename numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<Digits10> > >::data_initializer numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<Digits10> > >::initializer;
 
 template<> 
-class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_real<0> > >
+class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0> > >
 {
-   typedef boost::multiprecision::mp_number<boost::multiprecision::gmp_real<0> > number_type;
+   typedef boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0> > number_type;
 public:
    BOOST_STATIC_CONSTEXPR bool is_specialized = false;
    BOOST_STATIC_CONSTEXPR number_type (min)() noexcept { return number_type(); }

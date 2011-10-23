@@ -14,7 +14,7 @@
 #include <boost/mpl/front.hpp>
 #include <boost/cstdint.hpp>
 
-namespace boost{ namespace multiprecision{ namespace big_num_default_ops{
+namespace boost{ namespace multiprecision{ namespace default_ops{
 
 //
 // Default versions of mixed arithmetic, these just construct a temporary
@@ -467,7 +467,7 @@ namespace math{
 template <class Backend>
 inline int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::mp_number<Backend>& arg)
 {
-   using multiprecision::big_num_default_ops::eval_fpclassify;
+   using multiprecision::default_ops::eval_fpclassify;
    return eval_fpclassify(arg.backend());
 }
 template <class tag, class A1, class A2, class A3>
@@ -535,7 +535,7 @@ inline typename detail::mp_exp<tag, A1, A2, A3>::result_type trunc(const detail:
 template <class Backend, class Policy>
 inline mp_number<Backend> trunc(const mp_number<Backend>& v, const Policy& pol)
 {
-   using big_num_default_ops::eval_trunc;
+   using default_ops::eval_trunc;
    mp_number<Backend> result;
    eval_trunc(result.backend(), v.backend());
    return result;
@@ -603,7 +603,7 @@ inline typename detail::mp_exp<tag, A1, A2, A3>::result_result round(const detai
 template <class T, class Policy>
 inline mp_number<T> round(const mp_number<T>& v, const Policy& pol)
 {
-   using big_num_default_ops::eval_round;
+   using default_ops::eval_round;
    mp_number<T> result;
    eval_round(result.backend(), v.backend());
    return result;
@@ -670,7 +670,7 @@ struct BOOST_JOIN(func, _funct)\
 {\
    void operator()(Backend& result, const Backend& arg)const\
    {\
-      using big_num_default_ops::BOOST_JOIN(eval_,func);\
+      using default_ops::BOOST_JOIN(eval_,func);\
       BOOST_JOIN(eval_,func)(result, arg);\
    }\
 };\
@@ -719,13 +719,13 @@ struct BOOST_JOIN(func, _funct)\
 {\
    void operator()(Backend& result, const Backend& arg, const Backend& a)const\
    {\
-      using big_num_default_ops:: BOOST_JOIN(eval_,func);\
+      using default_ops:: BOOST_JOIN(eval_,func);\
       BOOST_JOIN(eval_,func)(result, arg, a);\
    }\
    template <class Arithmetic> \
    void operator()(Backend& result, const Backend& arg, const Arithmetic& a)const\
    {\
-      using big_num_default_ops:: BOOST_JOIN(eval_,func);\
+      using default_ops:: BOOST_JOIN(eval_,func);\
       BOOST_JOIN(eval_,func)(result, arg, a);\
    }\
 };\
@@ -866,7 +866,7 @@ struct BOOST_JOIN(func, _funct)\
 {\
    void operator()(Backend& result, Backend const& arg, Arg2 a)const\
    {\
-      using big_num_default_ops:: BOOST_JOIN(eval_,func);\
+      using default_ops:: BOOST_JOIN(eval_,func);\
       BOOST_JOIN(eval_,func)(result, arg, a);\
    }\
 };\

@@ -5,8 +5,8 @@
 
 #include <boost/detail/lightweight_test.hpp>
 
-#if !defined(TEST_MPF50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_E_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ)
-#  define TEST_MPF50
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_E_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ)
+#  define TEST_MPF_50
 #  define TEST_MPF
 #  define TEST_BACKEND
 #  define TEST_MPZ
@@ -24,7 +24,7 @@
 
 #endif
 
-#if defined(TEST_MPF50) || defined(TEST_MPF) || defined(TEST_MPZ) || defined(TEST_MPQ)
+#if defined(TEST_MPF_50) || defined(TEST_MPF) || defined(TEST_MPZ) || defined(TEST_MPQ)
 #include <boost/multiprecision/gmp.hpp>
 #endif
 #ifdef TEST_BACKEND
@@ -138,20 +138,20 @@ void test()
 int main()
 {
 #ifdef TEST_BACKEND
-   test<boost::multiprecision::mp_number<boost::multiprecision::concepts::mp_number_backend_real_architype> >();
+   test<boost::multiprecision::mp_number<boost::multiprecision::concepts::mp_number_backend_float_architype> >();
 #endif
-#ifdef TEST_MPF50
-   test<boost::multiprecision::mpf_real_50>();
+#ifdef TEST_MPF_50
+   test<boost::multiprecision::mpf_float_50>();
 #endif
 #ifdef TEST_MPF
-   boost::multiprecision::mpf_real::default_precision(1000);
+   boost::multiprecision::mpf_float::default_precision(1000);
    /*
-   boost::multiprecision::mpf_real r;
+   boost::multiprecision::mpf_float r;
    r.precision(50);
    BOOST_TEST(r.precision() >= 50);
    */
-   BOOST_TEST(boost::multiprecision::mpf_real::default_precision() == 1000);
-   test<boost::multiprecision::mpf_real>();
+   BOOST_TEST(boost::multiprecision::mpf_float::default_precision() == 1000);
+   test<boost::multiprecision::mpf_float>();
 #endif
 #ifdef TEST_MPZ
    test<boost::multiprecision::mpz_int>();
@@ -163,10 +163,10 @@ int main()
    test<boost::multiprecision::e_float>();
 #endif
 #ifdef TEST_MPFR
-   test<boost::multiprecision::mpfr_real>();
+   test<boost::multiprecision::mpfr_float>();
 #endif
 #ifdef TEST_MPFR_50
-   test<boost::multiprecision::mpfr_real_50>();
+   test<boost::multiprecision::mpfr_float_50>();
 #endif
    return boost::report_errors();
 }
