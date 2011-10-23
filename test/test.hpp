@@ -2,6 +2,9 @@
 #ifndef BOOST_MULTIPRECISION_TEST_HPP
 #define BOOST_MULTIPRECISION_TEST_HPP
 
+#include <limits>
+#include <cmath>
+
 template <class T>
 T relative_error(T a, T b)
 {

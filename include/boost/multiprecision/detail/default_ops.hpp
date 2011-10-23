@@ -398,14 +398,6 @@ inline void eval_round(T& result, const T& a)
    }
 }
 
-template <class T, class Arithmetic>
-void eval_atan2(T& result, const T& a, const Arithmetic& b)
-{
-   T x;
-   x = b;
-   eval_atan2(result, a, x);
-}
-
 //
 // These have to implemented by the backend, declared here so that our macro generated code compiles OK.
 //
@@ -971,7 +963,7 @@ inline multiprecision::mp_number<Backend> sinhc_pi(const multiprecision::mp_numb
 template <class Backend, class Policy>
 inline multiprecision::mp_number<Backend> sinhc_pi(const multiprecision::mp_number<Backend>& x, const Policy&)
 {
-   return boost::multiprecision::sinhc_pi(x);
+   return boost::math::sinhc_pi(x);
 }
 
 } // namespace math

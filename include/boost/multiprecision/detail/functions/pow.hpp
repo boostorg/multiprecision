@@ -285,8 +285,6 @@ void eval_exp(T& result, const T& x)
    // implemented as a hypergeometric function, |r| is bounded by
    // ln2 / p2. For small arguments, no scaling is done.
 
-   typedef typename mpl::front<typename T::real_types>::type float_type;
-
    const bool b_scale = (xx.compare(float_type(1e-4)) > 0);
 
    // Compute the exponential series of the (possibly) scaled argument.

@@ -731,3 +731,11 @@ void eval_atan2(T& result, const T& y, const T& x)
    }
 }
 
+template <class T, class Arithmetic>
+typename disable_if<is_same<T, Arithmetic> >::type eval_atan2(T& result, const T& a, const Arithmetic& b)
+{
+   T x;
+   x = b;
+   eval_atan2(result, a, x);
+}
+
