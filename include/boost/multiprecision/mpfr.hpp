@@ -716,6 +716,12 @@ inline void eval_atan(mpfr_float_backend<Digits10>& result, const mpfr_float_bac
 }
 
 template <unsigned Digits10>
+inline void eval_atan2(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg1, const mpfr_float_backend<Digits10>& arg2)
+{
+   mpfr_atan2(result.data(), arg1.data(), arg2.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10>
 inline void eval_sinh(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg)
 {
    mpfr_sinh(result.data(), arg.data(), GMP_RNDN);

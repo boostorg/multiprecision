@@ -222,7 +222,7 @@ void test()
    }
    
    std::cout << "Max error was: " << max_err << std::endl;
-   BOOST_TEST(max_err < 40);
+   BOOST_TEST(max_err < 70);
 }
 
 
