@@ -95,6 +95,7 @@ private:
             mp_float<Digits10>::long_long_max();
             mp_float<Digits10>::long_long_min();
             mp_float<Digits10>::ulong_long_max();
+            mp_float<Digits10>::eps();
             mp_float<Digits10>::pow2(0);
          }
          void do_nothing(){}
@@ -267,6 +268,12 @@ public:
    {
       init.do_nothing();
       static mp_float val((std::numeric_limits<unsigned long long>::max)());
+      return val;
+   }
+   static const mp_float& eps()
+   {
+      init.do_nothing();
+      static mp_float val(1.0, 1 - Digits10);
       return val;
    }
 
@@ -2451,11 +2458,69 @@ inline void convert_to(long double* result, mp_float<Digits10>& val)
    *result = val.extract_long_double();
 }
 
+//
+// Non member function support:
+//
+template <unsigned Digits10>
+int eval_fpclassify(const mp_float<Digits10>& x)
+{
+   if(x.isinf())
+      return FP_INFINITE;
+   if(x.isnan())
+      return FP_NAN;
+   if(x.iszero())
+      return FP_ZERO;
+   return FP_NORMAL;
+}
+
 
 typedef mp_number<mp_float<50> > mp_float_50;
 typedef mp_number<mp_float<100> > mp_float_100;
 
 }}
+
+namespace std
+{
+   template <unsigned Digits10> 
+   class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::mp_float<Digits10> > >
+   {
+   public:
+      static const bool                    is_specialized    = true;
+      static const bool                    is_signed         = true;
+      static const bool                    is_integer        = false;
+      static const bool                    is_exact          = false;
+      static const bool                    is_bounded        = true;
+      static const bool                    is_modulo         = false;
+      static const bool                    is_iec559         = false;
+      static const int                     digits            = boost::multiprecision::mp_float<Digits10>::mp_float_digits;
+      static const int                     digits10          = boost::multiprecision::mp_float<Digits10>::mp_float_digits10;
+      static const int                     max_digits10      = boost::multiprecision::mp_float<Digits10>::mp_float_max_digits10;
+      static const boost::int64_t          min_exponent      = boost::multiprecision::mp_float<Digits10>::mp_float_min_exp;      // Type differs from int.
+      static const boost::int64_t          min_exponent10    = boost::multiprecision::mp_float<Digits10>::mp_float_min_exp10;    // Type differs from int.
+      static const boost::int64_t          max_exponent      = boost::multiprecision::mp_float<Digits10>::mp_float_max_exp;      // Type differs from int.
+      static const boost::int64_t          max_exponent10    = boost::multiprecision::mp_float<Digits10>::mp_float_max_exp10;    // Type differs from int.
+      static const int                     radix             = boost::multiprecision::mp_float<Digits10>::mp_radix;
+      static const std::float_round_style  round_style       = std::round_to_nearest;
+      static const bool                    has_infinity      = true;
+      static const bool                    has_quiet_NaN     = true;
+      static const bool                    has_signaling_NaN = false;
+      static const std::float_denorm_style has_denorm        = std::denorm_absent;
+      static const bool                    has_denorm_loss   = false;
+      static const bool                    traps             = false;
+      static const bool                    tinyness_before   = false;
+
+      static const boost::multiprecision::mp_number<boost::multiprecision::mp_float<Digits10> > (min)        (void) throw() { return (boost::multiprecision::mp_float<Digits10>::min)(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::mp_float<Digits10> > (max)        (void) throw() { return (boost::multiprecision::mp_float<Digits10>::max)(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::mp_float<Digits10> > lowest       (void) throw() { return boost::multiprecision::mp_float<Digits10>::zero(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::mp_float<Digits10> > epsilon      (void) throw() { return boost::multiprecision::mp_float<Digits10>::eps(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::mp_float<Digits10> > round_error  (void) throw() { return 0.5L; }
+      static const boost::multiprecision::mp_number<boost::multiprecision::mp_float<Digits10> > infinity     (void) throw() { return boost::multiprecision::mp_float<Digits10>::inf(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::mp_float<Digits10> > quiet_NaN    (void) throw() { return boost::multiprecision::mp_float<Digits10>::nan(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::mp_float<Digits10> > signaling_NaN(void) throw() { return boost::multiprecision::mp_float<Digits10>::zero(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::mp_float<Digits10> > denorm_min   (void) throw() { return boost::multiprecision::mp_float<Digits10>::zero(); }
+   };
+}
+
 
 #endif
 
