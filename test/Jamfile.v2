@@ -9,12 +9,6 @@ import path ;
 local ntl-path = [ modules.peek : NTL_PATH ] ;
 local gmp_path = [ modules.peek : GMP_PATH ] ;
 local mpfr_path = [ modules.peek : MPFR_PATH ] ;
-local e_float_path = [ modules.peek : BOOST_E_FLOAT_PATH ] ;
-
-if ! $(e_float_path)
-{
-   e_float_path = ../../../../e_float ;
-}
 
 project : requirements 
    <include>$(gmp_path) 
@@ -22,35 +16,14 @@ project : requirements
    <include>$(gmp_path)/gmpfrxx 
    <include>$(mpfr_path)
    <include>../../.. 
-   <include>$(e_float_path) 
    <search>$(gmp_path) 
    <search>$(mpfr_path) 
    <search>$(mpfr_path)/build.vc10/lib/Win32/Debug
    <toolset>msvc:<runtime-link>static
-   <define>E_FLOAT_DIGITS10=100
-   <define>E_FLOAT_TYPE_EFX
    ;
 
 lib gmp ;
 lib mpfr ;
-
-E_FLOAT_SRC =    [ GLOB $(e_float_path)/libs/e_float/src/e_float : *.cpp ]
-   [ GLOB $(e_float_path)/libs/e_float/src/e_float/efx : *.cpp ]
-   [ GLOB $(e_float_path)/libs/e_float/src/functions/constants : *.cpp ]
-   [ GLOB $(e_float_path)/libs/e_float/src/functions/elementary : *.cpp ]
-   [ GLOB $(e_float_path)/libs/e_float/src/functions/gamma : *.cpp ]
-   [ GLOB $(e_float_path)/libs/e_float/src/functions/integer : *.cpp ]
-   [ GLOB $(e_float_path)/libs/e_float/src/functions/tables : *.cpp ]
-   [ GLOB $(e_float_path)/libs/e_float/src/functions/zeta : *.cpp ]
-   [ GLOB $(e_float_path)/libs/e_float/src/generic_functions/constants : *.cpp ]
-   [ GLOB $(e_float_path)/libs/e_float/src/generic_functions/elementary : *.cpp ]
-   [ GLOB $(e_float_path)/libs/e_float/src/utility : *.cpp ]
- ;
-
-lib e_float : $(E_FLOAT_SRC)
-   :
-   [ check-target-builds ../config//has_e_float : : <build>no ]
-   ;
 
 run test_arithmetic.cpp
         : # command line
@@ -58,6 +31,13 @@ run test_arithmetic.cpp
         : # requirements
 	      <define>TEST_BACKEND
         : test_arithmetic_backend_concept ;
+
+run test_arithmetic.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MP_FLOAT
+        : test_arithmetic_mp_float ;
 
 run test_arithmetic.cpp gmp
         : # command line
@@ -106,14 +86,6 @@ run test_arithmetic.cpp mpfr gmp
 	      <define>TEST_MPFR_50
          [ check-target-builds ../config//has_mpfr : : <build>no ]
         : test_arithmetic_mpfr_50 ;
-
-run test_arithmetic.cpp $(E_FLOAT_SRC)
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_E_FLOAT
-         [ check-target-builds ../config//has_e_float : : <build>no ]
-        : test_arithmetic_e_float ;
 
 run test_numeric_limits.cpp
         : # command line
@@ -169,15 +141,6 @@ run test_numeric_limits.cpp mpfr
 	      <define>TEST_MPFR_50
          [ check-target-builds ../config//has_mpfr : : <build>no ]
         : test_numeric_limits_mpfr_50 ;
-
-
-run test_numeric_limits.cpp $(E_FLOAT_SRC)
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_E_FLOAT
-         [ check-target-builds ../config//has_e_float : : <build>no ]
-        : test_numeric_limits_e_float ;
 
 run mp_number_concept_check.cpp  mpfr
         : # command line

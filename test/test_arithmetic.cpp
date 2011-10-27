@@ -6,14 +6,14 @@
 #include <boost/detail/lightweight_test.hpp>
 #include <boost/math/special_functions/pow.hpp>
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_E_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ)
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_MP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ)
 #  define TEST_MPF_50
 #  define TEST_MPF
 #  define TEST_BACKEND
 #  define TEST_MPZ
 #  define TEST_MPFR
 #  define TEST_MPFR_50
-#  define TEST_E_FLOAT
+#  define TEST_MP_FLOAT
 #  define TEST_MPQ
 
 #ifdef _MSC_VER
@@ -31,8 +31,8 @@
 #ifdef TEST_BACKEND
 #include <boost/multiprecision/concepts/mp_number_architypes.hpp>
 #endif
-#ifdef TEST_E_FLOAT
-#include <boost/multiprecision/e_float.hpp>
+#ifdef TEST_MP_FLOAT
+#include <boost/multiprecision/mp_float.hpp>
 #endif
 #if defined(TEST_MPFR) || defined(TEST_MPFR_50)
 #include <boost/multiprecision/mpfr.hpp>
@@ -325,16 +325,6 @@ void test_float_ops(const boost::mpl::int_<boost::multiprecision::number_kind_fl
 #endif
 }
 
-#ifdef TEST_E_FLOAT
-
-template <class T>
-struct lexical_cast_target_type
-{
-   typedef long double type;
-};
-
-#else
-
 template <class T>
 struct lexical_cast_target_type
 {
@@ -348,8 +338,6 @@ struct lexical_cast_target_type
       >::type
    >::type type;
 };
-
-#endif
 
 template <class Real, class Num>
 void test_negative_mixed(boost::mpl::true_ const&)
@@ -483,7 +471,6 @@ void test_mixed()
    BOOST_TEST(n2 == Real(n2));
    BOOST_TEST(n3 == Real(n3));
    BOOST_TEST(n4 == Real(n4));
-   std::cout << Real(n1).str(0, boost::is_floating_point<Num>::value) << std::endl;
 #if defined(TEST_MPFR) || defined(TEST_MPFR_50)
    Num tol = 10 * std::numeric_limits<Num>::epsilon();
 #else
@@ -880,8 +867,8 @@ int main()
 #ifdef TEST_MPQ
    test<boost::multiprecision::mpq_rational>();
 #endif
-#ifdef TEST_E_FLOAT
-   test<boost::multiprecision::e_float>();
+#ifdef TEST_MP_FLOAT
+   test<boost::multiprecision::mp_float_50>();
 #endif
 #ifdef TEST_MPFR
    test<boost::multiprecision::mpfr_float>();
