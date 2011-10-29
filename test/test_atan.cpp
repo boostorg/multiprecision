@@ -12,11 +12,11 @@
 #include <boost/array.hpp>
 #include "test.hpp"
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_E_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ)
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_MP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ)
 #  define TEST_MPF_50
 //#  define TEST_MPF
 #  define TEST_BACKEND
-#  define TEST_E_FLOAT
+#  define TEST_MP_FLOAT
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -36,8 +36,8 @@
 #ifdef TEST_BACKEND
 #include <boost/multiprecision/concepts/mp_number_architypes.hpp>
 #endif
-#ifdef TEST_E_FLOAT
-#include <boost/multiprecision/e_float.hpp>
+#ifdef TEST_MP_FLOAT
+#include <boost/multiprecision/mp_float.hpp>
 #endif
 
 template <class T>
@@ -195,13 +195,11 @@ void test()
    err = relative_error(T(atan2(T(1), T(0))), T(pi / 2)).template convert_to<unsigned>();
    if(err > max_err)
       max_err = err;
-   if(! is_mpfr_type<T>::value)
-   {
-      // MPFR seems to get the sign of this all wrong:
-      err = relative_error(T(atan2(T(-1), T(0))), T(pi / -2)).template convert_to<unsigned>();
-      if(err > max_err)
-         max_err = err;
-   }
+
+   err = relative_error(T(atan2(T(-1), T(0))), T(pi / -2)).template convert_to<unsigned>();
+   if(err > max_err)
+      max_err = err;
+
    T mv = (std::numeric_limits<T>::max)();
    err = relative_error(T(atan2(mv, T(1))), T(pi / 2)).template convert_to<unsigned>();
    if(err > max_err)
@@ -239,8 +237,9 @@ int main()
    test<boost::multiprecision::mpfr_float_50>();
    test<boost::multiprecision::mpfr_float_100>();
 #endif
-#ifdef TEST_E_FLOAT
-   test<boost::multiprecision::e_float>();
+#ifdef TEST_MP_FLOAT
+   test<boost::multiprecision::mp_float_50>();
+   test<boost::multiprecision::mp_float_100>();
 #endif
    return boost::report_errors();
 }

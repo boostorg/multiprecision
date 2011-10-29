@@ -5,7 +5,7 @@
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 //
-// This tests two things: that e_float meets our
+// This tests two things: that mp_float_50 meets our
 // conceptual requirements, and that we can instantiate
 // all our distributions and special functions on this type.
 //
@@ -20,14 +20,14 @@
 #  pragma warning(disable:4503) // decorated name length exceeded, name was truncated
 #endif
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_E_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50)
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_MP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50)
 #  define TEST_MPF_50
 #  define TEST_MPF
 #  define TEST_BACKEND
 #  define TEST_MPZ
 #  define TEST_MPFR
 #  define TEST_MPFR_50
-#  define TEST_E_FLOAT
+#  define TEST_MP_FLOAT
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -44,8 +44,8 @@
 #ifdef TEST_BACKEND
 #include <boost/multiprecision/concepts/mp_number_architypes.hpp>
 #endif
-#ifdef TEST_E_FLOAT
-#include <boost/multiprecision/e_float.hpp>
+#ifdef TEST_MP_FLOAT
+#include <boost/multiprecision/mp_float.hpp>
 #endif
 #if defined(TEST_MPFR) || defined(TEST_MPFR_50)
 #include <boost/multiprecision/mpfr.hpp>
@@ -71,8 +71,8 @@ void foo()
 #ifdef TEST_MPFR
    instantiate(boost::multiprecision::mpfr_float());
 #endif
-#ifdef TEST_E_FLOAT
-   instantiate(boost::multiprecision::e_float());
+#ifdef TEST_MP_FLOAT
+   instantiate(boost::multiprecision::mp_float_50());
 #endif
 }
 
@@ -93,8 +93,8 @@ int main()
 #ifdef TEST_MPFR
    BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mpfr_float>));
 #endif
-#ifdef TEST_E_FLOAT
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::e_float>));
+#ifdef TEST_MP_FLOAT
+   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mp_float_50>));
 #endif
 
 }

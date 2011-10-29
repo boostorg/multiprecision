@@ -45,7 +45,7 @@ public:
    }
 
    template <class V>
-   mp_number(V v, typename enable_if<mpl::and_<is_convertible<V, Backend>, mpl::not_<boost::is_arithmetic<V> > > >::type* dummy1 = 0)
+   mp_number(V v, typename enable_if<mpl::and_<is_convertible<V, Backend>, mpl::not_<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > > > >::type* dummy1 = 0)
       : m_backend(v){}
 
    template <class tag, class Arg1, class Arg2, class Arg3>

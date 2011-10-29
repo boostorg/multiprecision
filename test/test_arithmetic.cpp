@@ -272,7 +272,6 @@ void test_float_ops(const T&){}
 template <class Real>
 void test_float_ops(const boost::mpl::int_<boost::multiprecision::number_kind_floating_point>&)
 {
-#if defined(TEST_MPF) || defined(TEST_MPF_50) || defined(TEST_BACKEND) || defined(TEST_MPFR)
    BOOST_TEST(abs(Real(2)) == 2);
    BOOST_TEST(abs(Real(-2)) == 2);
    BOOST_TEST(fabs(Real(2)) == 2);
@@ -318,11 +317,6 @@ void test_float_ops(const boost::mpl::int_<boost::multiprecision::number_kind_fl
    BOOST_TEST(r == boost::math::pow<6>(3.25));
    r = pow(v, 25);
    BOOST_TEST(r == boost::math::pow<25>(Real(3.25)));
-   /*
-   r = pow(v, 56);
-   BOOST_TEST(r == boost::math::pow<56>(Real(3.25)));
-   */
-#endif
 }
 
 template <class T>

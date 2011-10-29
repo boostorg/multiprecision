@@ -166,6 +166,14 @@ run mp_number_concept_check.cpp  gmp
          [ check-target-builds ../config//has_gmp : : <build>no ]
         : big_number_concept_check_mpf50 ;
 
+run mp_number_concept_check.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MP_FLOAT
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+        : big_number_concept_check_mp_float ;
+
 run test_exp.cpp gmp
         : # command line
         : # input files
@@ -262,6 +270,55 @@ run test_tanh.cpp mpfr
          [ check-target-builds ../config//has_mpfr : : <build>no ]
         : test_tanh_mpfr50 ;
 
+run test_exp.cpp 
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MP_FLOAT
+        : test_exp_mp_float ;
+
+run test_log.cpp 
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MP_FLOAT
+        : test_log_mp_float ;
+
+run test_pow.cpp 
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MP_FLOAT
+        : test_pow_mp_float ;
+
+run test_sinh.cpp 
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MP_FLOAT
+        : test_sinh_mp_float ;
+
+run test_cosh.cpp 
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MP_FLOAT
+        : test_cosh_mp_float ;
+
+run test_tanh.cpp 
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MP_FLOAT
+        : test_tanh_mp_float ;
+
+run test_sin.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MP_FLOAT
+        : test_sin_mp_float ;
+
 run test_sin.cpp gmp
         : # command line
         : # input files
@@ -277,6 +334,13 @@ run test_sin.cpp mpfr
 	      <define>TEST_MPFR_50
          [ check-target-builds ../config//has_mpfr : : <build>no ]
         : test_sin_mpfr_50 ;
+
+run test_cos.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MP_FLOAT
+        : test_cos_mp_float ;
 
 run test_cos.cpp gmp
         : # command line
@@ -294,6 +358,13 @@ run test_cos.cpp mpfr
          [ check-target-builds ../config//has_mpfr : : <build>no ]
         : test_cos_mpfr_50 ;
 
+run test_asin.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MP_FLOAT
+        : test_asin_mp_float ;
+
 run test_asin.cpp gmp
         : # command line
         : # input files
@@ -309,6 +380,13 @@ run test_asin.cpp mpfr
 	      <define>TEST_MPFR_50
          [ check-target-builds ../config//has_mpfr : : <build>no ]
         : test_asin_mpfr_50 ;
+
+run test_acos.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MP_FLOAT
+        : test_acos_mp_float ;
 
 run test_acos.cpp gmp
         : # command line
@@ -333,6 +411,13 @@ run test_atan.cpp gmp
 	      <define>TEST_MPF_50
          [ check-target-builds ../config//has_gmp : : <build>no ]
         : test_atan_mpf50 ;
+
+run test_atan.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MP_FLOAT
+        : test_atan_mp_float ;
 
 run test_atan.cpp mpfr
         : # command line

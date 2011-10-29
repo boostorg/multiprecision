@@ -546,7 +546,10 @@ inline void eval_acos(T& result, const T& x)
    }
    else if(c == 0)
    {
-      result = ui_type(0);
+      if(get_sign(x) < 0)
+         result = get_constant_pi<T>();
+      else
+         result = ui_type(0);
       return;
    }
 
@@ -694,7 +697,7 @@ void eval_atan2(T& result, const T& y, const T& x)
    case FP_ZERO:
       {
          eval_ldexp(result, get_constant_pi<T>(), -1);
-         if(get_sign(x) < 0)
+         if(get_sign(y) < 0)
             result.negate();
          return;
       }

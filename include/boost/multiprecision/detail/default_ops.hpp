@@ -314,7 +314,12 @@ inline void convert_to(R* result, const B& backend)
    typedef typename calculate_next_larger_type<R, B>::type next_type;
    next_type n;
    convert_to(&n, backend);
-   *result = static_cast<R>(n);
+   if(std::numeric_limits<R>::is_specialized && (n > (std::numeric_limits<R>::max)()))
+   {
+      *result = (std::numeric_limits<R>::max)();
+   }
+   else
+      *result = static_cast<R>(n);
 }
 
 template <class R, class B>
@@ -386,14 +391,15 @@ inline void eval_trunc(T& result, const T& a)
 template <class T>
 inline void eval_round(T& result, const T& a)
 {
+   typedef typename boost::multiprecision::detail::canonical<float, T>::type fp_type;
    if(get_sign(a) < 0)
    {
-      subtract(result, a, 0.5f);
+      subtract(result, a, fp_type(0.5f));
       eval_ceil(result, result);
    }
    else
    {
-      add(result, a, 0.5f);
+      add(result, a, fp_type(0.5f));
       eval_floor(result, result);
    }
 }

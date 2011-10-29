@@ -16,6 +16,11 @@
 #include <boost/array.hpp>
 #include <boost/multiprecision/mp_number.hpp>
 
+//
+// Headers required for Boost.Math integration:
+//
+#include <boost/math/policies/policy.hpp>
+
 namespace boost{
 namespace multiprecision{
 
@@ -88,6 +93,7 @@ private:
             mp_float<Digits10>::zero();
             mp_float<Digits10>::one();
             mp_float<Digits10>::two();
+            mp_float<Digits10>::half();
             mp_float<Digits10>::double_min();
             mp_float<Digits10>::double_max();
             mp_float<Digits10>::long_double_max();
@@ -226,6 +232,12 @@ public:
    {
       init.do_nothing();
       static mp_float val(static_cast<unsigned long long>(2u));
+      return val;
+   }
+   static const mp_float& half()
+   {
+      init.do_nothing();
+      static mp_float val(0.5L);
       return val;
    }
    static const mp_float& double_min()
@@ -403,6 +415,57 @@ public:
       }
    }
    static mp_float pow2(long long i);
+   long long order()const
+   {
+      const bool bo_order_is_zero = ((!isfinite()) || (data[0] == static_cast<boost::uint32_t>(0u)));
+      //
+      // Binary search to find the order of the leading term:
+      //
+      boost::uint32_t prefix = 0;
+
+      if(data[0] >= 100000UL)
+      {
+         if(data[0] >= 10000000UL)
+         {
+            if(data[0] >= 100000000UL)
+            {
+               if(data[0] >= 1000000000UL)
+                  prefix = 9;
+               else
+                  prefix = 8;
+            }
+            else
+               prefix = 7;
+         }
+         else
+         {
+            if(data[0] >= 1000000UL)
+               prefix = 6;
+            else
+               prefix = 5;
+         }
+      }
+      else
+      {
+         if(data[0] >= 1000UL)
+         {
+            if(data[0] >= 10000UL)
+               prefix = 4;
+            else
+               prefix = 3;
+         }
+         else
+         {
+            if(data[0] >= 100)
+               prefix = 2;
+            else if(data[0] >= 10)
+               prefix = 1;
+         }
+      }
+
+      return (bo_order_is_zero ? static_cast<boost::int64_t>(0)
+         : static_cast<boost::int64_t>(exp + prefix));
+   }
 
 private:
    static bool data_elem_is_non_zero_predicate(const boost::uint32_t& d) { return (d != static_cast<boost::uint32_t>(0u)); }
@@ -418,13 +481,6 @@ private:
    static boost::uint32_t div_loop_n(boost::uint32_t* const u, boost::uint32_t n, const boost::int32_t p);
 
    bool rd_string(const char* const s);
-   long long order()const
-   {
-      const bool bo_order_is_zero = ((!isfinite()) || (data[0] == static_cast<boost::uint32_t>(0u)));
-
-      return (bo_order_is_zero ? static_cast<boost::int64_t>(0)
-         : static_cast<boost::int64_t>(exp + static_cast<boost::int32_t>(std::log10(static_cast<double>(data[0])) + (std::numeric_limits<double>::epsilon() * 0.9))));
-   }
 };
 
 template <unsigned Digits10>
@@ -2462,7 +2518,7 @@ inline void convert_to(long double* result, mp_float<Digits10>& val)
 // Non member function support:
 //
 template <unsigned Digits10>
-int eval_fpclassify(const mp_float<Digits10>& x)
+inline int eval_fpclassify(const mp_float<Digits10>& x)
 {
    if(x.isinf())
       return FP_INFINITE;
@@ -2473,6 +2529,114 @@ int eval_fpclassify(const mp_float<Digits10>& x)
    return FP_NORMAL;
 }
 
+template <unsigned Digits10>
+inline void eval_abs(mp_float<Digits10>& result, const mp_float<Digits10>& x)
+{
+   result = x;
+   if(x.isneg())
+      result.negate();
+}
+
+template <unsigned Digits10>
+inline void eval_fabs(mp_float<Digits10>& result, const mp_float<Digits10>& x)
+{
+   result = x;
+   if(x.isneg())
+      result.negate();
+}
+
+template <unsigned Digits10>
+inline void eval_sqrt(mp_float<Digits10>& result, const mp_float<Digits10>& x)
+{
+   result = x;
+   result.calculate_sqrt();
+}
+
+template <unsigned Digits10>
+inline void eval_floor(mp_float<Digits10>& result, const mp_float<Digits10>& x)
+{
+   result = x;
+   if(!x.isfinite() || x.isint()) 
+   { 
+      return; 
+   }
+
+   if(x.isneg())
+      result -= mp_float<Digits10>::one();
+   result = result.extract_integer_part();
+}
+
+template <unsigned Digits10>
+inline void eval_ceil(mp_float<Digits10>& result, const mp_float<Digits10>& x)
+{
+   result = x;
+   if(!x.isfinite() || x.isint()) 
+   { 
+      return; 
+   }
+
+   if(!x.isneg())
+      result += mp_float<Digits10>::one();
+   result = result.extract_integer_part();
+}
+
+template <unsigned Digits10>
+inline void eval_trunc(mp_float<Digits10>& result, const mp_float<Digits10>& x)
+{
+   if(!x.isfinite() || x.isint()) 
+   { 
+      result = x;
+      return; 
+   }
+   result = x.extract_integer_part();
+}
+
+template <unsigned Digits10>
+inline void eval_ldexp(mp_float<Digits10>& result, const mp_float<Digits10>& x, long long e)
+{
+   result = x;
+   result *= mp_float<Digits10>::pow2(e);
+}
+
+template <unsigned Digits10>
+inline void eval_frexp(mp_float<Digits10>& result, const mp_float<Digits10>& x, long long* e)
+{
+   result = x;
+   if(result.isneg())
+      result.negate();
+
+   long long t = result.order();
+
+   if(std::abs(t) > (std::numeric_limits<long long>::max)() / 3)
+      throw std::runtime_error("Exponent is too large to be represented as a power of 2.");
+   t *= 3;
+
+   result *= mp_float<Digits10>::pow2(-t);
+
+   while(result.compare(mp_float<Digits10>::one()) >= 0)
+   {
+      result /= mp_float<Digits10>::two();
+      ++t;
+   }
+   while(result.compare(mp_float<Digits10>::half()) < 0)
+   {
+      result *= mp_float<Digits10>::two();
+      --t;
+   }
+   *e = t;
+   if(x.isneg())
+      result.negate();
+}
+
+template <unsigned Digits10>
+inline void eval_frexp(mp_float<Digits10>& result, const mp_float<Digits10>& x, int* e)
+{
+   long long t;
+   eval_frexp(result, x, &t);
+   if(t > (std::numeric_limits<int>::max)())
+      throw std::runtime_error("Exponent is outside the range of an int");
+   *e = static_cast<int>(t);
+}
 
 typedef mp_number<mp_float<50> > mp_float_50;
 typedef mp_number<mp_float<100> > mp_float_100;
@@ -2520,6 +2684,29 @@ namespace std
       static const boost::multiprecision::mp_number<boost::multiprecision::mp_float<Digits10> > denorm_min   (void) throw() { return boost::multiprecision::mp_float<Digits10>::zero(); }
    };
 }
+
+namespace boost{ namespace math{
+
+namespace policies{
+
+template <unsigned Digits10, class Policy>
+struct precision< boost::multiprecision::mp_number<boost::multiprecision::mp_float<Digits10> >, Policy>
+{
+   typedef typename Policy::precision_type precision_type;
+   typedef digits2<((Digits10 + 1) * 1000L) / 301L> digits_2;
+   typedef typename mpl::if_c<
+      ((digits_2::value <= precision_type::value) 
+      || (Policy::precision_type::value <= 0)),
+      // Default case, full precision for RealType:
+      digits_2,
+      // User customised precision:
+      precision_type
+   >::type type;
+};
+
+} // namespace policies
+
+}} // namespaces boost::math
 
 
 #endif
