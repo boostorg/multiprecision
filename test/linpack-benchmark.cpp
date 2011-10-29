@@ -19,27 +19,21 @@ http://www.netlib.org/f2c/libf2c.zip
 #include <iomanip>
 #include <cmath>
 
-#ifdef TEST_MPF_100
-#include <boost/multiprecision/gmp.hpp>
-typedef boost::multiprecision::mpf_float_100 real_type;
-#elif defined(TEST_MPFR_100)
-#include <boost/multiprecision/mpfr.hpp>
-typedef boost::multiprecision::mpfr_float_100 real_type;
-#elif defined(TEST_GMPXX)
+#if defined(TEST_GMPXX)
 #include <gmpxx.h>
 typedef mpf_class real_type;
 #elif defined(TEST_MPFRXX)
 #include <gmpfrxx.h>
 typedef mpfr_class real_type;
-#elif defined(TEST_E_FLOAT)
-#include <boost/e_float/e_float.hpp>
-#include <boost/e_float/e_float_complex.hpp>
-#include <boost/e_float/e_float_elementary_math.hpp>
-typedef ::efx::e_float real_type;
-using ef::abs;
-#elif defined(TEST_E_FLOAT_BN)
-#include <boost/multiprecision/e_float.hpp>
-typedef boost::multiprecision::e_float real_type;
+#elif defined(TEST_MP_FLOAT)
+#include <boost/multiprecision/mp_float.hpp>
+typedef boost::multiprecision::mp_float_50 real_type;
+#elif defined(TEST_MPFR_50)
+#include <boost/multiprecision/mpfr.hpp>
+typedef boost::multiprecision::mpfr_float_50 real_type;
+#elif defined(TEST_MPF_50)
+#include <boost/multiprecision/gmp.hpp>
+typedef boost::multiprecision::mpf_float_50 real_type;
 #else
 typedef double real_type;
 #endif
@@ -98,20 +92,18 @@ int dmxpy_(integer *, real_type *, integer *, integer *, real_type *, real_type 
 
 extern "C" int MAIN__()
 {
-#ifdef TEST_MPF_100
-   std::cout << "Testing mp_number<mpf_float<100> >" << std::endl;
-#elif defined(TEST_MPFR_100)
-   std::cout << "Testing mp_number<mpf_float<100> >" << std::endl;
+#ifdef TEST_MPF_50
+   std::cout << "Testing mp_number<mpf_float<50> >" << std::endl;
+#elif defined(TEST_MPFR_50)
+   std::cout << "Testing mp_number<mpf_float<50> >" << std::endl;
 #elif defined(TEST_GMPXX)
-   std::cout << "Testing mpf_class at 100 decimal degits" << std::endl;
-   mpf_set_default_prec(((100 + 1) * 1000L) / 301L);
+   std::cout << "Testing mpf_class at 50 decimal degits" << std::endl;
+   mpf_set_default_prec(((50 + 1) * 1000L) / 301L);
 #elif defined(TEST_MPFRXX)
-   std::cout << "Testing mpfr_class at 100 decimal degits" << std::endl;
-   mpfr_set_default_prec(((100 + 1) * 1000L) / 301L);
-#elif defined(TEST_E_FLOAT)
-   std::cout << "Testing boost::ef::e_float" << std::endl;
-#elif defined(TEST_E_FLOAT_BN)
-   std::cout << "Testing boost::multiprecision::e_float" << std::endl;
+   std::cout << "Testing mpfr_class at 50 decimal degits" << std::endl;
+   mpfr_set_default_prec(((50 + 1) * 1000L) / 301L);
+#elif defined(TEST_MP_FLOAT)
+   std::cout << "Testing mp_number<mp_float<50> >" << std::endl;
 #else
    std::cout << "Testing double" << std::endl;
 #endif
@@ -919,8 +911,8 @@ real_type epslon_(real_type *x)
 {
 #if defined(TEST_MPF_100) || defined(TEST_MPFR_100) || defined(TEST_GMPXX) || defined(TEST_MPFRXX)
    return std::ldexp(1.0, 1 - ((100 + 1) * 1000L) / 301L);
-#elif defined(TEST_E_FLOAT_BN)
-   return std::pow(10.0, 1-std::numeric_limits<efx::e_float>::digits10);
+#elif defined(TEST_MP_FLOAT_BN)
+   return std::pow(10.0, 1-std::numeric_limits<efx::mp_float_50>::digits10);
 #else
    return CAST_TO_RT(std::numeric_limits<real_type>::epsilon());
 #endif
@@ -1242,7 +1234,7 @@ mp_number<gmp_float<100> >:
  times for array with leading dimension of1001
       279.96        0.84       280.8      2.3813     0.83988      5014.3
 
-boost::multiprecision::ef::e_float:
+boost::multiprecision::ef::mp_float_50:
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
      norm. resid      resid           machep         x(1)          x(n)
