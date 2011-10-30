@@ -129,7 +129,7 @@ public:
       if(contains_self(e))
       {
          self_type temp(e);
-         do_subtract(temp, typename self_type::tag_type());
+         do_subtract(temp, detail::terminal());
       }
       else
       {
@@ -194,7 +194,7 @@ public:
       if(contains_self(e))
       {
          self_type temp(e);
-         do_modulus(temp, typename self_type::tag_type());
+         do_modulus(temp, detail::terminal());
       }
       else
       {
@@ -281,7 +281,7 @@ public:
       if(contains_self(e))
       {
          self_type temp(e);
-         do_divide(detail::mp_exp<detail::terminal, self_type>(temp), typename self_type::tag_type());
+         do_divide(detail::mp_exp<detail::terminal, self_type>(temp), detail::terminal());
       }
       else
       {
@@ -313,7 +313,7 @@ public:
       if(contains_self(e) && !is_self(e))
       {
          self_type temp(e);
-         do_bitwise_and(temp, typename self_type::tag_type());
+         do_bitwise_and(temp, detail::terminal());
       }
       else
       {
@@ -345,7 +345,7 @@ public:
       if(contains_self(e) && !is_self(e))
       {
          self_type temp(e);
-         do_bitwise_or(temp, typename self_type::tag_type());
+         do_bitwise_or(temp, detail::terminal());
       }
       else
       {
@@ -375,7 +375,7 @@ public:
       if(contains_self(e))
       {
          self_type temp(e);
-         do_bitwise_xor(temp, typename self_type::tag_type());
+         do_bitwise_xor(temp, detail::terminal());
       }
       else
       {
