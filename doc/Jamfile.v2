@@ -7,7 +7,7 @@ using quickbook ;
 
 path-constant images_location : html ;
 
-xml big_number : big_number.qbk ;
+xml big_number : multiprecision.qbk ;
 boostbook standalone
     :
         big_number
@@ -65,3 +65,4 @@ boostbook standalone
     ;
 
 install pdf-install : standalone : <location>. <install-type>PDF ;
+
