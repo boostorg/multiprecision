@@ -5,10 +5,10 @@
   http://www.boost.org/LICENSE_1_0.txt).
 ]
 
-[library Boost.BigNumbers
+[library Boost.Multiprecision
     [quickbook 1.5]
     [copyright 2011 John Maddock]
-    [purpose Big Number library]
+    [purpose Multiprecision Number library]
     [license
          Distributed under the Boost Software License, Version 1.0.
          (See accompanying file LICENSE_1_0.txt or copy at
@@ -20,7 +20,7 @@
 
 [section:intro Introduction]
 
-The Big Number library comes in two distinct parts: an expression template enabled front end `big_number`
+The Multiprecision library comes in two distinct parts: an expression template enabled front end `mp_number`
 that handles all the operator overloading, expression evaluation optimization, and code reduction, and
 a selection of backends that implement the actual arithmetic operations, and need conform only to the
 reduced interface requirements of the front end.
@@ -38,33 +38,44 @@ The following backends provide integer arithmetic:
 
 [table
 [[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
-[[`gmp_int`][boost/math/big_number/gmp.hpp][2][GMP][Very fast and efficient backend.][Dependency on GNU licenced GMP library.]]
+[[`gmp_int`][boost/multiprecision/gmp.hpp][2][GMP][Very fast and efficient backend.][Dependency on GNU licenced GMP library.]]
 ]
 
 [h4 gmp_int]
 
-   namespace boost{ namespace math{
+   namespace boost{ namespace multiprecision{
 
    class gmp_int;
 
-   typedef big_number<gmp_int >         mpz_int;
+   typedef mp_number<gmp_int >         mpz_int;
 
    }} // namespaces
 
-The `gmp_int` backend is used via the typedef `boost::math::mpz_int`.  It acts as a thin wrapper around the GMP `mpz_t`
+The `gmp_int` backend is used via the typedef `boost::multiprecision::mpz_int`.  It acts as a thin wrapper around the GMP `mpz_t`
 to provide an integer type that is a drop-in replacement for the native C++ integer types, but with unlimited precision.
+
+As well as the usual conversions from arithmetic and string types, type `mpz_int` is copy constructible and asignable from:
+
+* The GMP native types: `mpf_t`, `mpz_t`, `mpq_t`.
+* Instances of `mp_number<T>` that are wrappers around those types: `mp_number<gmp_float<N> >`, `mp_number<gmp_rational>`.
+
+It's also possible to access the underlying `mpz_t` via the data() member function of `gmp_int`.
 
 [h5 Example:]
 
-   #include <boost/math/big_number/gmp.hpp>
+   #include <boost/multiprecision/gmp.hpp>
 
-   boost::math::mpz_int v = 1;
+   boost::multiprecision::mpz_int v = 1;
 
    // Do some arithmetic:
    for(unsigned i = 1; i <= 1000; ++i)
       v *= i;
 
    std::cout << i << std::endl; // prints 1000!
+
+   // Access the underlying representation:
+   mpz_t z;
+   mpz_int(z, v.backend().data());
 
 [endsect]
 
@@ -74,42 +85,195 @@ The following backends provide real number arithmetic:
 
 [table
 [[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
-[[`gmp_real<N>`][boost/math/big_number/gmp.hpp][2][GMP][Very fast and efficient backend.][Dependency on GNU licenced GMP library.]]
+[[`mpf_float<N>`][boost/multiprecision/gmp.hpp][2][GMP][Very fast and efficient backend.][Dependency on GNU licenced GMP library.]]
+[[`mpfr_float<N>`][boost/multiprecision/mpfr.hpp][2][GMP and MPFR][Very fast and efficient backend, with it's own standard library implementation.][Dependency on GNU licenced GMP and MPFR libraries.]]
+[[`mp_float<N>`][boost/multiprecision/mp_float.hpp][10][None][Header only, all C++ implementation.][Approximately 2x slower than the MPFR or GMP libraries.]]
 ]
 
-[h4 gmp_real]
+[h4 gmp_float]
 
-   namespace boost{ namespace math{
+   namespace boost{ namespace multiprecision{
 
    template <unsigned Digits10>
-   class gmp_real;
+   class gmp_float;
 
-   typedef big_number<gmp_real<50> >    mpf_real_50;
-   typedef big_number<gmp_real<100> >   mpf_real_100;
-   typedef big_number<gmp_real<500> >   mpf_real_500;
-   typedef big_number<gmp_real<1000> >  mpf_real_1000;
-   typedef big_number<gmp_real<0> >     mpf_real;
+   typedef mp_number<gmp_float<50> >    mpf_float_50;
+   typedef mp_number<gmp_float<100> >   mpf_float_100;
+   typedef mp_number<gmp_float<500> >   mpf_float_500;
+   typedef mp_number<gmp_float<1000> >  mpf_float_1000;
+   typedef mp_number<gmp_float<0> >     mpf_float;
 
    }} // namespaces
 
-The `gmp_real` backend is used in conjunction with `big_number`: It acts as a thin wrapper around the GMP `mpf_t`
+The `gmp_float` backend is used in conjunction with `mp_number`: It acts as a thin wrapper around the GMP `mpf_t`
 to provide an real-number type that is a drop-in replacement for the native C++ floating-point types, but with 
 much greater precision.
 
-Type `gmp_real` can be used at fixed precision by specifying a non-zero `Digits10` template parameter, or
-at variable precision by setting the template argument to zero.  The typedefs mpf_real_50, mpf_real_100,
-mpf_real_500, mpf_real_1000 provide arithmetic types at 50, 100, 500 and 1000 decimal digits precision
-respectively.  The typedef mpf_real provides a variable precision type whose precision can be controlled via the
-`big_number`'s member functions.
+Type `gmp_float` can be used at fixed precision by specifying a non-zero `Digits10` template parameter, or
+at variable precision by setting the template argument to zero.  The typedefs mpf_float_50, mpf_float_100,
+mpf_float_500, mpf_float_1000 provide arithmetic types at 50, 100, 500 and 1000 decimal digits precision
+respectively.  The typedef mpf_float provides a variable precision type whose precision can be controlled via the
+`mp_number`'s member functions.
 
-[h5 example:]
+[note This type only provides standard library and numeric_limits support when the precision is fixed at compile time.]
 
-   #include <boost/math/big_number/gmp.hpp>
+As well as the usual conversions from arithmetic and string types, instances of `mp_number<mpf_float<N> >` are
+copy constructible and assignable from:
 
-   boost::math::gmp_real a = 2;
-   boost::math::gmp_real::default_precision(1000);
-   std::cout << boost::math::gmp_real::default_precision() << std::endl;
+* The GMP native types `mpf_t`, `mpz_t`, `mpq_t`.
+* The `mp_number` wrappers around those types: `mp_number<mpf_float<M> >`, `mp_number<gmp_int>`, `mp_number<gmp_rational>`.
+
+It's also possible to access the underlying `mpf_t` via the data() member function of `gmp_float`.
+
+[h5 GMP example:]
+
+   #include <boost/multiprecision/gmp.hpp>
+
+   // Operations at variable precision and limited standard library support:
+   boost::multiprecision::gmp_float a = 2;
+   boost::multiprecision::gmp_float::default_precision(1000);
+   std::cout << boost::multiprecision::gmp_float::default_precision() << std::endl;
    std::cout << sqrt(a) << std::endl; // print root-2
+
+   // Operations at fixed precision and full standard library support:
+   boost::multiprecision::mpf_float_100 b = 2;
+   std::cout << std::numeric_limits<mpf_float_100>::digits << std::endl;
+   std::cout << log(b) << std::endl; // print log(2)
+
+   // Access the underlying representation:
+   mpf_t f;
+   mpf_init(f, a.backend().data());
+
+[h4 mpfr_float]
+
+   namespace boost{ namespace multiprecision{
+
+   template <unsigned Digits10>
+   class mpfr_float;
+
+   typedef mp_number<mpfr_float<50> >    mpfr_float_50;
+   typedef mp_number<mpfr_float<100> >   mpfr_float_100;
+   typedef mp_number<mpfr_float<500> >   mpfr_float_500;
+   typedef mp_number<mpfr_float<1000> >  mpfr_float_1000;
+   typedef mp_number<mpfr_float<0> >     mpfr_float;
+
+   }} // namespaces
+
+The `mpfr_float` backend is used in conjunction with `mp_number`: It acts as a thin wrapper around the MPFR `mpfr_t`
+to provide an real-number type that is a drop-in replacement for the native C++ floating-point types, but with 
+much greater precision.
+
+Type `mpfr_float` can be used at fixed precision by specifying a non-zero `Digits10` template parameter, or
+at variable precision by setting the template argument to zero.  The typedefs mpfr_float_50, mpfr_float_100,
+mpfr_float_500, mpfr_float_1000 provide arithmetic types at 50, 100, 500 and 1000 decimal digits precision
+respectively.  The typedef mpfr_float provides a variable precision type whose precision can be controlled via the
+`mp_number`'s member functions.
+
+[note This type only provides numeric_limits support when the precision is fixed at compile time.]
+
+[h5 MPFR example:]
+
+   #include <boost/multiprecision/gmp.hpp>
+
+   // Operations at variable precision and no numeric_limits support:
+   boost::multiprecision::gmp_float a = 2;
+   boost::multiprecision::gmp_float::default_precision(1000);
+   std::cout << boost::multiprecision::gmp_float::default_precision() << std::endl;
+   std::cout << sqrt(a) << std::endl; // print root-2
+
+   // Operations at fixed precision and full numeric_limits support:
+   boost::multiprecision::mpfr_float_100 b = 2;
+   std::cout << std::numeric_limits<mpfr_float_100>::digits << std::endl;
+   std::cout << log(b) << std::endl; // print log(2)
+
+[h4 mp_float]
+
+   namespace boost{ namespace multiprecision{
+
+   template <unsigned Digits10>
+   class mp_float;
+
+   typedef mp_number<mp_float<50> > mp_float_50;
+   typedef mp_number<mp_float<100> > mp_float_100;
+
+   }} // namespaces
+
+The `mp_float` backend is used in conjunction with `mp_number`: It acts as an entirely C++ (header only and dependency free)
+real-number type that is a drop-in replacement for the native C++ floating-point types, but with 
+much greater precision.
+
+Type `mp_float` can be used at fixed precision by specifying a non-zero `Digits10` template parameter.  
+The typedefs mp_float_50 and mp_float_100 provide arithmetic types at 50 and 100 decimal digits precision
+respectively.
+
+There is full standard library and numeric_limits support available for this type.
+
+[h5 mp_float example:]
+
+   #include <boost/multiprecision/mp_float.hpp>
+
+   // Operations at fixed precision and full numeric_limits support:
+   boost::multiprecision::mp_float_100 b = 2;
+   std::cout << std::numeric_limits<mp_float_100>::digits << std::endl;
+   std::cout << log(b) << std::endl; // print log(2)
+
+[endsect]
+
+[section:rational Rational Number Types]
+
+The following backends provide rational number arithmetic:
+
+[table
+[[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
+[[`gmp_rational`][boost/multiprecision/gmp.hpp][2][GMP][Very fast and efficient backend.][Dependency on GNU licenced GMP library.]]
+]
+
+[h4 gmp_rational]
+
+   namespace boost{ namespace multiprecision{
+
+   class gmp_rational;
+
+   typedef mp_number<gmp_rational >         mpq_rational;
+
+   }} // namespaces
+
+The `gmp_rational` backend is used via the typedef `boost::multiprecision::mpq_rational`.  It acts as a thin wrapper around the GMP `mpq_t`
+to provide a rational number type that is a drop-in replacement for the native C++ number types, but with unlimited precision.
+
+As well as the usual conversions from arithmetic and string types, instances of `mp_number<gmp_rational>` are copy constructible
+and assignable from:
+
+* The GMP native types: `mpz_t`, `mpq_t`.
+* `mp_number<gmp_int>`.
+
+There are also non-member functions:
+
+   mpz_int numerator(const mpq_rational&);
+   mpz_int denominator(const mpq_rational&);
+
+Which return the numerator and denominator of the number.
+
+It's also possible to access the underlying `mpq_t` via the data() member function of `mpq_rational`.
+
+[h5 Example:]
+
+   #include <boost/multiprecision/gmp.hpp>
+
+   boost::multiprecision::mpq_rational v = 1;
+
+   // Do some arithmetic:
+   for(unsigned i = 1; i <= 1000; ++i)
+      v *= i;
+   v /= 10;
+
+   std::cout << i << std::endl; // prints 1000! / 10
+   std::cout << numerator(i) << std::endl;
+   std::cout << denominator(i) << std::endl;
+
+   // Access the underlying data:
+   mpq_t q;
+   mpq_init(q, i.backend().data());
 
 [endsect]
 
@@ -117,18 +281,18 @@ respectively.  The typedef mpf_real provides a variable precision type whose pre
 
 [section:ref Reference]
 
-[section:bignum big_number]
+[section:mp_number mp_number]
 
 [h4 Synopsis]
 
-   namespace boost{ namespace math{
+   namespace boost{ namespace multiprecision{
 
    template <class Backend>
-   class big_number
+   class mp_number
    {
-      big_number();
-      big_number(see-below);
-      big_number& operator=(see-below);
+      mp_number();
+      mp_number(see-below);
+      mp_number& operator=(see-below);
       /* Other number-type operators here */
       // string conversion:
       std::string str()const;
@@ -138,44 +302,93 @@ respectively.  The typedef mpf_real provides a variable precision type whose pre
       unsigned precision()const;
       void precision(unsigned digits10);
       // Comparison:
-      int compare(const big_number<Backend>& o)const;
+      int compare(const mp_number<Backend>& o)const;
       template <class V>
       typename enable_if<is_arithmetic<V>, int>::type compare(const V& o)const;
    };
 
+   // iostream support:
+   template <class Backend>
+   std::ostream& operator << (std::ostream& os, const mp_number<Backend>& r);
+   std::ostream& operator << (std::ostream& os, const ``['unmentionable-expression-template-type]``& r);
+   template <class Backend>
+   std::istream& operator >> (std::istream& is, mp_number<Backend>& r);
+
+   // Non-member function standard library support:
+   ``['unmentionable-expression-template-type]``    abs   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    fabs  (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    sqrt  (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    floor (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    ceil  (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    trunc (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    exp   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    log   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    cos   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    sin   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    tan   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    acos  (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    asin  (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    atan  (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    cosh  (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    sinh  (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    tanh  (const ``['mp_number-or-expression-template-type]``&);
+
+   ``['unmentionable-expression-template-type]``    ldexp (const ``['mp_number-or-expression-template-type]``&, int);
+   ``['unmentionable-expression-template-type]``    frexp (const ``['mp_number-or-expression-template-type]``&, int*);
+   ``['unmentionable-expression-template-type]``    pow   (const ``['mp_number-or-expression-template-type]``&, const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    fmod  (const ``['mp_number-or-expression-template-type]``&, const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    atan2 (const ``['mp_number-or-expression-template-type]``&, const ``['mp_number-or-expression-template-type]``&);
+
    }} // namespaces
+
+   // numeric_limits support:
+   namespace std{
+
+   template <class Backend>
+   struct numeric_limits<boost::multiprecision<Backend> >
+   {
+      /* Usual members here */
+   };
+
+   }
 
 [h4 Description]
 
-   big_number();
-   big_number(see-below);
-   big_number& operator=(see-below);
+   mp_number();
+   mp_number(see-below);
+   mp_number& operator=(see-below);
 
-Type `big_number` is default constructible, and copy both constructible and assignable from:
+Type `mp_number` is default constructible, and both copy constructible and assignable from:
 
 * Itself.
 * An expression template which is the result of one of the arithmetic operators.
 * Any builtin arithmetic type.
 * A `std::string` or any type which is convertible to `const char*`.
+* Any type that the Backend is constructible or assignable from.
 
       /* Other number-type operators here */
 
 The following arithmetic operations are support for real-numbered types:
 
-* Binary +, -, *, /, +=, -=, *=, /=, ==, !=, <=, >=, <, >.
-* Unary +, -.
+* Binary +, -, *, /, +=, -=, *=, /=, ==, !=, <=, >=, <, >, ||, &&, ||=, &&=.
+* Unary +, -, ++, --, !.
 
 For integer types the following operators are also supported:
 
-Binary %, %=.
+Binary %, %=, |, |=, &, &=, ^, ^=, <<, <<=, >>, >>=.
 
-(More to follow!!)
+Note that with the exception of the logical operators and unary + the result of applying an operator to
+mp_number is an "unmentionable" expression template type.
 
-Note that the result of the binary +, -, *, / and % operations is an expression template of "unmentionable type".
+Binary operators, must have at least one argument that is of type `mp_number` or an expression template
+derived from `mp_number`.  One argument may optionally be of arithmetic type.
 
-      std::string str()const;
+Note that type `mp_number` (and all expression templates derived from it) may be used in a Boolian context.
 
-Returns the number formatted as a string (TODO: enable custom precision).
+      std::string str(unsigned precision, bool scientific = true)const;
+
+Returns the number formatted as a string, with at least /precision/ digits, and in scientific format
+if /scientific/ is true.
 
       static unsigned default_precision();
       static void default_precision(unsigned digits10);
@@ -183,9 +396,9 @@ Returns the number formatted as a string (TODO: enable custom precision).
       void precision(unsigned digits10);
 
 These functions are only available if the Backend template parameter supports runtime changes to precision.  They get and set
-the default precision and the precision of *this respectively.
+the default precision and the precision of `*this` respectively.
 
-      int compare(const big_number<Backend>& o)const;
+      int compare(const mp_number<Backend>& o)const;
       template <class V>
       typename enable_if<is_arithmetic<V>, int>::type compare(const V& other)const;
 
@@ -194,6 +407,69 @@ Returns:
 * A value less that 0 for *this < other
 * A value greater that 0 for *this > other
 * Zero for *this == other
+
+[h4 Iostream Support]
+
+   template <class Backend>
+   std::ostream& operator << (std::ostream& os, const mp_number<Backend>& r);
+   template <class Backend>
+   std::ostream& operator << (std::ostream& os, const unmentionable-expression-template& r);
+   template <class Backend>
+   inline std::istream& operator >> (std::istream& is, mp_number<Backend>& r)
+
+These operators provided formatted input-output operations on `mp_number` types, and expression templates derived from them.
+
+[h4 Non-member standard library function support]
+
+   ``['unmentionable-expression-template-type]``    abs   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    fabs  (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    sqrt  (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    floor (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    ceil  (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    trunc (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    exp   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    log   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    cos   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    sin   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    tan   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    acos  (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    asin  (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    atan  (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    cosh  (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    sinh  (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    tanh  (const ``['mp_number-or-expression-template-type]``&);
+
+   ``['unmentionable-expression-template-type]``    ldexp (const ``['mp_number-or-expression-template-type]``&, int);
+   ``['unmentionable-expression-template-type]``    frexp (const ``['mp_number-or-expression-template-type]``&, int*);
+   ``['unmentionable-expression-template-type]``    pow   (const ``['mp_number-or-expression-template-type]``&, const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    fmod  (const ``['mp_number-or-expression-template-type]``&, const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    atan2 (const ``['mp_number-or-expression-template-type]``&, const ``['mp_number-or-expression-template-type]``&);
+
+These functions all behave exactly as their standard library counterparts do: their argument is either an instance of `mp_number` or
+an expression template derived from it; their return value is always an expression template.
+
+These functions are normally implemented by the Backend type.  However, default versions are provided for Backend types that
+don't have native support for these functions.  Please note however, that this default support requires the precision of the type
+to be a compile time constant - this means for example that the GMP MPF Backend will not work with these functions when that type is 
+used at variable precision.
+
+Also note that with the exception of `abs` that these functions can only be used with floating point Backend types.
+
+[h4 std::numeric_limits support]
+
+   namespace std{
+
+   template <class Backend>
+   struct numeric_limits<boost::multiprecision<Backend> >
+   {
+      /* Usual members here */
+   };
+
+   }
+
+Class template `std::numeric_limits` is specialized for all instantiations of `mp_number` whose precision is known at compile time, plus those
+types whose precision is unlimited (though it is much less useful in those cases).  It is not specialized for types
+whose precision can vary at compile time (such as `mpf_float`).
 
 [endsect]
 

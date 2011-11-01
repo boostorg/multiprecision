@@ -236,6 +236,9 @@ protected:
 
 } // namespace detail
 
+struct gmp_int;
+struct gmp_rational;
+
 template <unsigned digits10>
 struct gmp_float : public detail::gmp_float_imp<digits10>
 {
@@ -244,6 +247,37 @@ struct gmp_float : public detail::gmp_float_imp<digits10>
       mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
    }
    gmp_float(const gmp_float& o) : detail::gmp_float_imp<digits10>(o) {}
+   template <unsigned D>
+   gmp_float(const gmp_float<D>& o)
+   {
+      mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
+      mpf_set(this->m_data, o.data());
+   }
+   gmp_float(const gmp_int& o)
+   {
+      mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
+      mpf_set_z(this->data(), o.data());
+   }
+   gmp_float(const gmp_rational& o)
+   {
+      mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
+      mpf_set_q(this->data(), o.data());
+   }
+   gmp_float(mpf_t val)
+   {
+      mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
+      mpf_set(this->m_data, val);
+   }
+   gmp_float(mpz_t val)
+   {
+      mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
+      mpf_set_z(this->m_data, val);
+   }
+   gmp_float(mpq_t val)
+   {
+      mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
+      mpf_set_q(this->m_data, val);
+   }
 #ifndef BOOST_NO_RVALUE_REFERENCES
    gmp_float(gmp_float&& o) : detail::gmp_float_imp<digits10>(o) {}
 #endif
@@ -259,6 +293,37 @@ struct gmp_float : public detail::gmp_float_imp<digits10>
       return *this;
    }
 #endif
+   template <unsigned D>
+   gmp_float& operator=(const gmp_float<D>& o)
+   {
+      mpf_set(this->m_data, o.data());
+      return *this;
+   }
+   gmp_float& operator=(const gmp_int& o)
+   {
+      mpf_set_z(this->data(), o.data());
+      return *this;
+   }
+   gmp_float& operator=(const gmp_rational& o)
+   {
+      mpf_set_q(this->data(), o.data());
+      return *this;
+   }
+   gmp_float& operator=(const mpf_t& val)
+   {
+      mpf_set(this->m_data, val);
+      return *this;
+   }
+   gmp_float& operator=(const mpz_t& val)
+   {
+      mpf_set_z(this->m_data, val);
+      return *this;
+   }
+   gmp_float& operator=(const mpq_t& val)
+   {
+      mpf_set_q(this->m_data, val);
+      return *this;
+   }
    template <class V>
    gmp_float& operator=(const V& v)
    {
@@ -278,14 +343,37 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
    {
       mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
    }
+   gmp_float(mpf_t val)
+   {
+      mpf_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
+      mpf_set(this->m_data, val);
+   }
+   gmp_float(mpz_t val)
+   {
+      mpf_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
+      mpf_set_z(this->m_data, val);
+   }
+   gmp_float(mpq_t val)
+   {
+      mpf_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
+      mpf_set_q(this->m_data, val);
+   }
    gmp_float(const gmp_float& o) : detail::gmp_float_imp<0>(o) {}
+   template <unsigned D>
+   gmp_float(const gmp_float<D>& o)
+   {
+      mpf_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
+      mpf_set(this->m_data, o.data());
+   }
 #ifndef BOOST_NO_RVALUE_REFERENCES
    gmp_float(gmp_float&& o) : detail::gmp_float_imp<0>(o) {}
 #endif
-   gmp_float(const gmp_float& o, unsigned digits10) 
+   gmp_float(const gmp_int& o);
+   gmp_float(const gmp_rational& o);
+   gmp_float(const gmp_float& o, unsigned digits10)
    {
       mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
-      *this = o;
+      mpf_set(this->m_data, o.data());
    }
 
    gmp_float& operator=(const gmp_float& o)
@@ -300,6 +388,29 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
       return *this;
    }
 #endif
+   template <unsigned D>
+   gmp_float& operator=(const gmp_float<D>& o)
+   {
+      mpf_set(this->m_data, o.data());
+      return *this;
+   }
+   gmp_float& operator=(const gmp_int& o);
+   gmp_float& operator=(const gmp_rational& o);
+   gmp_float& operator=(const mpf_t& val)
+   {
+      mpf_set(this->m_data, val);
+      return *this;
+   }
+   gmp_float& operator=(const mpz_t& val)
+   {
+      mpf_set_z(this->m_data, val);
+      return *this;
+   }
+   gmp_float& operator=(const mpq_t& val)
+   {
+      mpf_set_q(this->m_data, val);
+      return *this;
+   }
    template <class V>
    gmp_float& operator=(const V& v)
    {
@@ -702,9 +813,9 @@ inline void eval_frexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& v
 
 struct gmp_int
 {
-   typedef mpl::list<long, long long>                 signed_types;
+   typedef mpl::list<long, long long>                     signed_types;
    typedef mpl::list<unsigned long, unsigned long long>   unsigned_types;
-   typedef mpl::list<double, long double>            real_types;
+   typedef mpl::list<double, long double>                 real_types;
 
    gmp_int()
    {
@@ -714,6 +825,27 @@ struct gmp_int
    {
       mpz_init_set(m_data, o.m_data);
    }
+   gmp_int(mpf_t val)
+   {
+      mpz_init(this->m_data);
+      mpz_set_f(this->m_data, val);
+   }
+   gmp_int(mpz_t val)
+   {
+      mpz_init_set(this->m_data, val);
+   }
+   gmp_int(mpq_t val)
+   {
+      mpz_init(this->m_data);
+      mpz_set_q(this->m_data, val);
+   }
+   template <unsigned Digits10>
+   gmp_int(const gmp_float<Digits10>& o)
+   {
+      mpz_init(this->m_data);
+      mpz_set_f(this->m_data, o.data());
+   }
+   gmp_int(const gmp_rational& o);
    gmp_int& operator = (const gmp_int& o)
    {
       mpz_set(m_data, o.m_data);
@@ -812,6 +944,28 @@ struct gmp_int
       mpz_set_str(m_data, s, 10);
       return *this;
    }
+   gmp_int& operator=(const mpf_t& val)
+   {
+      mpz_set_f(this->m_data, val);
+      return *this;
+   }
+   gmp_int& operator=(const mpz_t& val)
+   {
+      mpz_set(this->m_data, val);
+      return *this;
+   }
+   gmp_int& operator=(const mpq_t& val)
+   {
+      mpz_set_q(this->m_data, val);
+      return *this;
+   }
+   template <unsigned Digits10>
+   gmp_int& operator=(const gmp_float<Digits10>& o)
+   {
+      mpz_set_f(this->m_data, o.data());
+      return *this;
+   }
+   gmp_int& operator=(const gmp_rational& o);
    void swap(gmp_int& o)
    {
       mpz_swap(m_data, o.m_data);
@@ -1176,6 +1330,21 @@ struct gmp_rational
       mpq_init(m_data);
       mpq_set(m_data, o.m_data);
    }
+   gmp_rational(const gmp_int& o)
+   {
+      mpq_init(m_data);
+      mpq_set_z(m_data, o.data());
+   }
+   gmp_rational(mpq_t o)
+   {
+      mpq_init(m_data);
+      mpq_set(m_data, o);
+   }
+   gmp_rational(mpz_t o)
+   {
+      mpq_init(m_data);
+      mpq_set_z(m_data, o);
+   }
    gmp_rational& operator = (const gmp_rational& o)
    {
       mpq_set(m_data, o.m_data);
@@ -1276,6 +1445,21 @@ struct gmp_rational
       mpq_set_str(m_data, s, 10);
       return *this;
    }
+   gmp_rational& operator=(const gmp_int& o)
+   {
+      mpq_set_z(m_data, o.data());
+      return *this;
+   }
+   gmp_rational& operator=(const mpq_t& o)
+   {
+      mpq_set(m_data, o);
+      return *this;
+   }
+   gmp_rational& operator=(const mpz_t& o)
+   {
+      mpq_set_z(m_data, o);
+      return *this;
+   }
    void swap(gmp_rational& o)
    {
       mpq_swap(m_data, o.m_data);
@@ -1323,6 +1507,17 @@ struct gmp_rational
 protected:
    mpq_t m_data;
 };
+
+inline mp_number<gmp_int> numerator(const mp_number<gmp_rational>& val)
+{
+   const __mpz_struct* pz = (mpq_numref(val.backend().data()));
+   return mp_number<gmp_int>((mpz_t&)pz);
+}
+inline mp_number<gmp_int> denominator(const mp_number<gmp_rational>& val)
+{
+   const __mpz_struct* pz = mpq_denref(val.backend().data());
+   return mp_number<gmp_int>((mpz_t&)pz);
+}
 
 inline void add(gmp_rational& t, const gmp_rational& o)
 {
@@ -1388,6 +1583,41 @@ inline void eval_abs(gmp_rational& result, const gmp_rational& val)
 {
    mpq_abs(result.data(), val.data());
 }
+
+//
+// Some member functions that are dependent upon previous code go here:
+//
+inline gmp_float<0>::gmp_float(const gmp_int& o)
+{
+   mpf_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
+   mpf_set_z(this->data(), o.data());
+}
+inline gmp_float<0>::gmp_float(const gmp_rational& o)
+{
+   mpf_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
+   mpf_set_q(this->data(), o.data());
+}
+inline gmp_float<0>& gmp_float<0>::operator=(const gmp_int& o)
+{
+   mpf_set_z(this->data(), o.data());
+   return *this;
+}
+inline gmp_float<0>& gmp_float<0>::operator=(const gmp_rational& o)
+{
+   mpf_set_q(this->data(), o.data());
+   return *this;
+}
+inline gmp_int::gmp_int(const gmp_rational& o)
+{
+   mpz_init(this->m_data);
+   mpz_set_q(this->m_data, o.data());
+}
+inline gmp_int& gmp_int::operator=(const gmp_rational& o)
+{
+   mpz_set_q(this->m_data, o.data());
+   return *this;
+}
+
 
 template<>
 struct number_category<gmp_int> : public mpl::int_<number_kind_integer>{};
@@ -1583,6 +1813,56 @@ public:
    BOOST_STATIC_CONSTEXPR int max_digits10 = 0;
    BOOST_STATIC_CONSTEXPR bool is_signed = true;
    BOOST_STATIC_CONSTEXPR bool is_integer = true;
+   BOOST_STATIC_CONSTEXPR bool is_exact = true;
+   BOOST_STATIC_CONSTEXPR int radix = 2;
+   BOOST_STATIC_CONSTEXPR number_type epsilon() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR number_type round_error() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR int min_exponent = 0;
+   BOOST_STATIC_CONSTEXPR int min_exponent10 = 0;
+   BOOST_STATIC_CONSTEXPR int max_exponent = 0;
+   BOOST_STATIC_CONSTEXPR int max_exponent10 = 0;
+   BOOST_STATIC_CONSTEXPR bool has_infinity = false;
+   BOOST_STATIC_CONSTEXPR bool has_quiet_NaN = false;
+   BOOST_STATIC_CONSTEXPR bool has_signaling_NaN = false;
+   BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm = denorm_absent;
+   BOOST_STATIC_CONSTEXPR bool has_denorm_loss = false;
+   BOOST_STATIC_CONSTEXPR number_type infinity() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR number_type quiet_NaN() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR number_type signaling_NaN() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR number_type denorm_min() noexcept { return number_type(); }
+   BOOST_STATIC_CONSTEXPR bool is_iec559 = false;
+   BOOST_STATIC_CONSTEXPR bool is_bounded = false;
+   BOOST_STATIC_CONSTEXPR bool is_modulo = false;
+   BOOST_STATIC_CONSTEXPR bool traps = false;
+   BOOST_STATIC_CONSTEXPR bool tinyness_before = false;
+   BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
+};
+
+template<> 
+class numeric_limits<boost::multiprecision::mpq_rational >
+{
+   typedef boost::multiprecision::mpq_rational number_type;
+public:
+   BOOST_STATIC_CONSTEXPR bool is_specialized = true;
+   //
+   // Largest and smallest numbers are bounded only by available memory, set
+   // to zero:
+   //
+   BOOST_STATIC_CONSTEXPR number_type (min)() noexcept
+   { 
+      return number_type();
+   }
+   BOOST_STATIC_CONSTEXPR number_type (max)() noexcept 
+   { 
+      return number_type();
+   }
+   BOOST_STATIC_CONSTEXPR number_type lowest() noexcept { return (min)(); }
+   // Digits are unbounded, use zero for now:
+   BOOST_STATIC_CONSTEXPR int digits = 0;
+   BOOST_STATIC_CONSTEXPR int digits10 = 0;
+   BOOST_STATIC_CONSTEXPR int max_digits10 = 0;
+   BOOST_STATIC_CONSTEXPR bool is_signed = true;
+   BOOST_STATIC_CONSTEXPR bool is_integer = false;
    BOOST_STATIC_CONSTEXPR bool is_exact = true;
    BOOST_STATIC_CONSTEXPR int radix = 2;
    BOOST_STATIC_CONSTEXPR number_type epsilon() noexcept { return number_type(); }

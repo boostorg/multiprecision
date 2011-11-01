@@ -13,12 +13,12 @@ boostbook standalone
         big_number
     :
         # Path for links to Boost:
-        #<xsl:param>boost.root=../../../../..
+        #<xsl:param>boost.root=http://www.boost.org/doc/libs/release
         
         # Some general style settings:
         <xsl:param>table.footnote.number.format=1
         <xsl:param>footnote.number.format=1
-        <xsl:param>html.stylesheet=boostbook.css
+        <xsl:param>html.stylesheet=http://www.boost.org/doc/libs/release/doc/src/boostbook.css
 
         # HTML options first:
         # Use graphics not text for navigation:
@@ -65,4 +65,5 @@ boostbook standalone
     ;
 
 install pdf-install : standalone : <location>. <install-type>PDF ;
+
 

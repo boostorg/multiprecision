@@ -43,6 +43,11 @@ public:
       m_backend.precision(digits10);
       m_backend = canonical_value(v);
    }
+   template <class Other>
+   mp_number(const mp_number<Other>& val, typename enable_if<boost::is_convertible<Other, Backend> >::type* dummy1 = 0)
+   {
+      m_backend = val.backend();
+   }
 
    template <class V>
    mp_number(V v, typename enable_if<mpl::and_<is_convertible<V, Backend>, mpl::not_<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > > > >::type* dummy1 = 0)
@@ -66,6 +71,22 @@ public:
       operator=(const V& v)
    {
       m_backend = canonical_value(v);
+      return *this;
+   }
+
+   template <class V>
+   typename enable_if<mpl::and_<is_convertible<V, Backend>, mpl::not_<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > > >, mp_number<Backend>& >::type 
+      operator=(const V& v)
+   {
+      m_backend = v;
+      return *this;
+   }
+
+   template <class Other>
+   typename enable_if<is_convertible<Other, Backend>, mp_number<Backend>& >::type 
+      operator=(const mp_number<Other>& v)
+   {
+      m_backend = v.backend();
       return *this;
    }
 
