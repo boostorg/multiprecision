@@ -1510,13 +1510,15 @@ protected:
 
 inline mp_number<gmp_int> numerator(const mp_number<gmp_rational>& val)
 {
-   const __mpz_struct* pz = (mpq_numref(val.backend().data()));
-   return mp_number<gmp_int>((mpz_t&)pz);
+   mp_number<gmp_int> result;
+   mpz_set(result.backend().data(), (mpq_numref(val.backend().data())));
+   return result;
 }
 inline mp_number<gmp_int> denominator(const mp_number<gmp_rational>& val)
 {
-   const __mpz_struct* pz = mpq_denref(val.backend().data());
-   return mp_number<gmp_int>((mpz_t&)pz);
+   mp_number<gmp_int> result;
+   mpz_set(result.backend().data(), (mpq_denref(val.backend().data())));
+   return result;
 }
 
 inline void add(gmp_rational& t, const gmp_rational& o)

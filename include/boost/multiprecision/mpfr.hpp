@@ -7,6 +7,7 @@
 #define BOOST_MATH_BN_MPFR_HPP
 
 #include <boost/multiprecision/mp_number.hpp>
+#include <boost/multiprecision/gmp.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>
@@ -244,6 +245,48 @@ struct mpfr_float_backend : public detail::mpfr_float_imp<digits10>
 #ifndef BOOST_NO_RVALUE_REFERENCES
    mpfr_float_backend(mpfr_float_backend&& o) : detail::mpfr_float_imp<digits10>(o) {}
 #endif
+   template <unsigned D>
+   mpfr_float_backend(const mpfr_float_backend<D>& val)
+   {
+      mpfr_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
+      mpfr_set(this->m_data, val.data(), GMP_RNDN);
+   }
+   template <unsigned D>
+   mpfr_float_backend(const gmp_float<D>& val)
+   {
+      mpfr_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
+      mpfr_set_f(this->m_data, val.data(), GMP_RNDN);
+   }
+   mpfr_float_backend(const gmp_int& val)
+   {
+      mpfr_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
+      mpfr_set_z(this->m_data, val.data(), GMP_RNDN);
+   }
+   mpfr_float_backend(const gmp_rational& val)
+   {
+      mpfr_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
+      mpfr_set_q(this->m_data, val.data(), GMP_RNDN);
+   }
+   mpfr_float_backend(mpfr_t val)
+   {
+      mpfr_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
+      mpfr_set(this->m_data, val, GMP_RNDN);
+   }
+   mpfr_float_backend(mpf_t val)
+   {
+      mpfr_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
+      mpfr_set_f(this->m_data, val, GMP_RNDN);
+   }
+   mpfr_float_backend(mpz_t val)
+   {
+      mpfr_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
+      mpfr_set_z(this->m_data, val, GMP_RNDN);
+   }
+   mpfr_float_backend(mpq_t val)
+   {
+      mpfr_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
+      mpfr_set_q(this->m_data, val, GMP_RNDN);
+   }
    mpfr_float_backend& operator=(const mpfr_float_backend& o)
    {
       *static_cast<detail::mpfr_float_imp<digits10>*>(this) = static_cast<detail::mpfr_float_imp<digits10> const&>(o);
@@ -262,6 +305,48 @@ struct mpfr_float_backend : public detail::mpfr_float_imp<digits10>
       *static_cast<detail::mpfr_float_imp<digits10>*>(this) = v;
       return *this;
    }
+   mpfr_float_backend& operator=(const mpfr_t& val)
+   {
+      mpfr_set(this->m_data, val, GMP_RNDN);
+      return *this;
+   }
+   mpfr_float_backend& operator=(const mpf_t& val)
+   {
+      mpfr_set_f(this->m_data, val, GMP_RNDN);
+      return *this;
+   }
+   mpfr_float_backend& operator=(const mpz_t& val)
+   {
+      mpfr_set_z(this->m_data, val, GMP_RNDN);
+      return *this;
+   }
+   mpfr_float_backend& operator=(const mpq_t& val)
+   {
+      mpfr_set_q(this->m_data, val, GMP_RNDN);
+      return *this;
+   }
+   template <unsigned D>
+   mpfr_float_backend& operator=(const mpfr_float_backend<D>& val)
+   {
+      mpfr_set(this->m_data, val.data(), GMP_RNDN);
+      return *this;
+   }
+   template <unsigned D>
+   mpfr_float_backend& operator=(const gmp_float<D>& val)
+   {
+      mpfr_set_f(this->m_data, val.data(), GMP_RNDN);
+      return *this;
+   }
+   mpfr_float_backend& operator=(const gmp_int& val)
+   {
+      mpfr_set_z(this->m_data, val.data(), GMP_RNDN);
+      return *this;
+   }
+   mpfr_float_backend& operator=(const gmp_rational& val)
+   {
+      mpfr_set_q(this->m_data, val.data(), GMP_RNDN);
+      return *this;
+   }
 };
 
 template <>
@@ -275,6 +360,26 @@ struct mpfr_float_backend<0> : public detail::mpfr_float_imp<0>
    {
       mpfr_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
    }
+   mpfr_float_backend(mpfr_t val)
+   {
+      mpfr_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
+      mpfr_set(this->m_data, val, GMP_RNDN);
+   }
+   mpfr_float_backend(mpf_t val)
+   {
+      mpfr_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
+      mpfr_set_f(this->m_data, val, GMP_RNDN);
+   }
+   mpfr_float_backend(mpz_t val)
+   {
+      mpfr_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
+      mpfr_set_z(this->m_data, val, GMP_RNDN);
+   }
+   mpfr_float_backend(mpq_t val)
+   {
+      mpfr_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
+      mpfr_set_q(this->m_data, val, GMP_RNDN);
+   }
    mpfr_float_backend(const mpfr_float_backend& o) : detail::mpfr_float_imp<0>(o) {}
 #ifndef BOOST_NO_RVALUE_REFERENCES
    mpfr_float_backend(mpfr_float_backend&& o) : detail::mpfr_float_imp<0>(o) {}
@@ -283,6 +388,28 @@ struct mpfr_float_backend<0> : public detail::mpfr_float_imp<0>
    {
       mpfr_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
       *this = o;
+   }
+   template <unsigned D>
+   mpfr_float_backend(const mpfr_float_backend<D>& val)
+   {
+      mpfr_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
+      mpfr_set(this->m_data, val.data(), GMP_RNDN);
+   }
+   template <unsigned D>
+   mpfr_float_backend(const gmp_float<D>& val)
+   {
+      mpfr_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
+      mpfr_set_f(this->m_data, val.data(), GMP_RNDN);
+   }
+   mpfr_float_backend(const gmp_int& val)
+   {
+      mpfr_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
+      mpfr_set_z(this->m_data, val.data(), GMP_RNDN);
+   }
+   mpfr_float_backend(const gmp_rational& val)
+   {
+      mpfr_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
+      mpfr_set_q(this->m_data, val.data(), GMP_RNDN);
    }
 
    mpfr_float_backend& operator=(const mpfr_float_backend& o)
@@ -301,6 +428,48 @@ struct mpfr_float_backend<0> : public detail::mpfr_float_imp<0>
    mpfr_float_backend& operator=(const V& v)
    {
       *static_cast<detail::mpfr_float_imp<0>*>(this) = v;
+      return *this;
+   }
+   mpfr_float_backend& operator=(const mpfr_t& val)
+   {
+      mpfr_set(this->m_data, val, GMP_RNDN);
+      return *this;
+   }
+   mpfr_float_backend& operator=(const mpf_t& val)
+   {
+      mpfr_set_f(this->m_data, val, GMP_RNDN);
+      return *this;
+   }
+   mpfr_float_backend& operator=(const mpz_t& val)
+   {
+      mpfr_set_z(this->m_data, val, GMP_RNDN);
+      return *this;
+   }
+   mpfr_float_backend& operator=(const mpq_t& val)
+   {
+      mpfr_set_q(this->m_data, val, GMP_RNDN);
+      return *this;
+   }
+   template <unsigned D>
+   mpfr_float_backend& operator=(const mpfr_float_backend<D>& val)
+   {
+      mpfr_set(this->m_data, val.data(), GMP_RNDN);
+      return *this;
+   }
+   template <unsigned D>
+   mpfr_float_backend& operator=(const gmp_float<D>& val)
+   {
+      mpfr_set_f(this->m_data, val.data(), GMP_RNDN);
+      return *this;
+   }
+   mpfr_float_backend& operator=(const gmp_int& val)
+   {
+      mpfr_set_z(this->m_data, val.data(), GMP_RNDN);
+      return *this;
+   }
+   mpfr_float_backend& operator=(const gmp_rational& val)
+   {
+      mpfr_set_q(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
    static unsigned default_precision()
