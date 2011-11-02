@@ -115,7 +115,7 @@ mpf_float_500, mpf_float_1000 provide arithmetic types at 50, 100, 500 and 1000 
 respectively.  The typedef mpf_float provides a variable precision type whose precision can be controlled via the
 `mp_number`'s member functions.
 
-[note This type only provides standard library and numeric_limits support when the precision is fixed at compile time.]
+[note This type only provides standard library and `numeric_limits` support when the precision is fixed at compile time.]
 
 As well as the usual conversions from arithmetic and string types, instances of `mp_number<mpf_float<N> >` are
 copy constructible and assignable from:
@@ -149,27 +149,36 @@ It's also possible to access the underlying `mpf_t` via the data() member functi
    namespace boost{ namespace multiprecision{
 
    template <unsigned Digits10>
-   class mpfr_float;
+   class mpfr_float_backend;
 
-   typedef mp_number<mpfr_float<50> >    mpfr_float_50;
-   typedef mp_number<mpfr_float<100> >   mpfr_float_100;
-   typedef mp_number<mpfr_float<500> >   mpfr_float_500;
-   typedef mp_number<mpfr_float<1000> >  mpfr_float_1000;
-   typedef mp_number<mpfr_float<0> >     mpfr_float;
+   typedef mp_number<mpfr_float_backend<50> >    mpfr_float_50;
+   typedef mp_number<mpfr_float_backend<100> >   mpfr_float_100;
+   typedef mp_number<mpfr_float_backend<500> >   mpfr_float_500;
+   typedef mp_number<mpfr_float_backend<1000> >  mpfr_float_1000;
+   typedef mp_number<mpfr_float_backend<0> >     mpfr_float;
 
    }} // namespaces
 
-The `mpfr_float` backend is used in conjunction with `mp_number`: It acts as a thin wrapper around the MPFR `mpfr_t`
+The `mpfr_float_backend` type is used in conjunction with `mp_number`: It acts as a thin wrapper around the MPFR `mpfr_t`
 to provide an real-number type that is a drop-in replacement for the native C++ floating-point types, but with 
 much greater precision.
 
-Type `mpfr_float` can be used at fixed precision by specifying a non-zero `Digits10` template parameter, or
+Type `mpfr_float_backend` can be used at fixed precision by specifying a non-zero `Digits10` template parameter, or
 at variable precision by setting the template argument to zero.  The typedefs mpfr_float_50, mpfr_float_100,
 mpfr_float_500, mpfr_float_1000 provide arithmetic types at 50, 100, 500 and 1000 decimal digits precision
 respectively.  The typedef mpfr_float provides a variable precision type whose precision can be controlled via the
 `mp_number`'s member functions.
 
-[note This type only provides numeric_limits support when the precision is fixed at compile time.]
+[note This type only provides `numeric_limits` support when the precision is fixed at compile time.]
+
+As well as the usual conversions from arithmetic and string types, instances of `mp_number<mpfr_float_backend<N> >` are
+copy constructible and assignable from:
+
+* The GMP native types `mpf_t`, `mpz_t`, `mpq_t`.
+* The MPFR native type `mpfr_t`.
+* The `mp_number` wrappers around those types: `mp_number<mpfr_float_backend<M> >`, `mp_number<mpf_float<M> >`, `mp_number<gmp_int>`, `mp_number<gmp_rational>`.
+
+It's also possible to access the underlying `mpf_t` via the data() member function of `gmp_float`.
 
 [h5 MPFR example:]
 
@@ -185,6 +194,10 @@ respectively.  The typedef mpfr_float provides a variable precision type whose p
    boost::multiprecision::mpfr_float_100 b = 2;
    std::cout << std::numeric_limits<mpfr_float_100>::digits << std::endl;
    std::cout << log(b) << std::endl; // print log(2)
+
+   // Access the underlying data:
+   mpfr_t r;
+   mpfr_set(r, b.backend().data());
 
 [h4 mp_float]
 
@@ -206,7 +219,7 @@ Type `mp_float` can be used at fixed precision by specifying a non-zero `Digits1
 The typedefs mp_float_50 and mp_float_100 provide arithmetic types at 50 and 100 decimal digits precision
 respectively.
 
-There is full standard library and numeric_limits support available for this type.
+There is full standard library and `numeric_limits` support available for this type.
 
 [h5 mp_float example:]
 
@@ -305,6 +318,9 @@ It's also possible to access the underlying `mpq_t` via the data() member functi
       int compare(const mp_number<Backend>& o)const;
       template <class V>
       typename enable_if<is_arithmetic<V>, int>::type compare(const V& o)const;
+      // Access to the underlying implementation:
+      Backend& backend();
+      const Backend& backend()const;
    };
 
    // iostream support:
@@ -407,6 +423,11 @@ Returns:
 * A value less that 0 for *this < other
 * A value greater that 0 for *this > other
 * Zero for *this == other
+
+      Backend& backend();
+      const Backend& backend()const;
+
+Returns the underlying backend instance used by *this.
 
 [h4 Iostream Support]
 
