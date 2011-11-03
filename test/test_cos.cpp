@@ -166,7 +166,7 @@ void test()
          max_err = err;
    }
    std::cout << "Max error was: " << max_err << std::endl;
-   BOOST_TEST(max_err < 5000000000L);
+   BOOST_TEST(max_err < 5000000000ULL);
 
    static const boost::array<T, 51u> near_one =
    {{

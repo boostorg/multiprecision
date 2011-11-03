@@ -248,21 +248,9 @@ struct gmp_float : public detail::gmp_float_imp<digits10>
    }
    gmp_float(const gmp_float& o) : detail::gmp_float_imp<digits10>(o) {}
    template <unsigned D>
-   gmp_float(const gmp_float<D>& o)
-   {
-      mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
-      mpf_set(this->m_data, o.data());
-   }
-   gmp_float(const gmp_int& o)
-   {
-      mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
-      mpf_set_z(this->data(), o.data());
-   }
-   gmp_float(const gmp_rational& o)
-   {
-      mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
-      mpf_set_q(this->data(), o.data());
-   }
+   gmp_float(const gmp_float<D>& o);
+   gmp_float(const gmp_int& o);
+   gmp_float(const gmp_rational& o);
    gmp_float(mpf_t val)
    {
       mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
@@ -294,21 +282,9 @@ struct gmp_float : public detail::gmp_float_imp<digits10>
    }
 #endif
    template <unsigned D>
-   gmp_float& operator=(const gmp_float<D>& o)
-   {
-      mpf_set(this->m_data, o.data());
-      return *this;
-   }
-   gmp_float& operator=(const gmp_int& o)
-   {
-      mpf_set_z(this->data(), o.data());
-      return *this;
-   }
-   gmp_float& operator=(const gmp_rational& o)
-   {
-      mpf_set_q(this->data(), o.data());
-      return *this;
-   }
+   gmp_float& operator=(const gmp_float<D>& o);
+   gmp_float& operator=(const gmp_int& o);
+   gmp_float& operator=(const gmp_rational& o);
    gmp_float& operator=(const mpf_t& val)
    {
       mpf_set(this->m_data, val);
@@ -1589,6 +1565,44 @@ inline void eval_abs(gmp_rational& result, const gmp_rational& val)
 //
 // Some member functions that are dependent upon previous code go here:
 //
+template <unsigned Digits10>
+template <unsigned D>
+inline gmp_float<Digits10>::gmp_float(const gmp_float<D>& o)
+{
+   mpf_init2(this->m_data, ((Digits10 + 1) * 1000L) / 301L);
+   mpf_set(this->m_data, o.data());
+}
+template <unsigned Digits10>
+inline gmp_float<Digits10>::gmp_float(const gmp_int& o)
+{
+   mpf_init2(this->m_data, ((Digits10 + 1) * 1000L) / 301L);
+   mpf_set_z(this->data(), o.data());
+}
+template <unsigned Digits10>
+inline gmp_float<Digits10>::gmp_float(const gmp_rational& o)
+{
+   mpf_init2(this->m_data, ((Digits10 + 1) * 1000L) / 301L);
+   mpf_set_q(this->data(), o.data());
+}
+template <unsigned Digits10>
+template <unsigned D>
+inline gmp_float<Digits10>& gmp_float<Digits10>::operator=(const gmp_float<D>& o)
+{
+   mpf_set(this->m_data, o.data());
+   return *this;
+}
+template <unsigned Digits10>
+inline gmp_float<Digits10>& gmp_float<Digits10>::operator=(const gmp_int& o)
+{
+   mpf_set_z(this->data(), o.data());
+   return *this;
+}
+template <unsigned Digits10>
+inline gmp_float<Digits10>& gmp_float<Digits10>::operator=(const gmp_rational& o)
+{
+   mpf_set_q(this->data(), o.data());
+   return *this;
+}
 inline gmp_float<0>::gmp_float(const gmp_int& o)
 {
    mpf_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);

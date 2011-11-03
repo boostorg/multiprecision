@@ -439,3 +439,16 @@ run test_mpfr_conversions.cpp gmp mpfr
         : # requirements
          [ check-target-builds ../config//has_mpfr : : <build>no ] ;
 
+run ../example/gmp_snips.cpp gmp
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_gmp : : <build>no ] ;
+
+run ../example/mpfr_snips.cpp mpfr
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_mpfr : : <build>no ] ;
+
+run ../example/mp_float_snips.cpp ;

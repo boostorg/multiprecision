@@ -1173,19 +1173,19 @@ mp_float<Digits10>& mp_float<Digits10>::calculate_sqrt(void)
    // http://www.jjj.de/pibook/pibook.html
    // http://www.amazon.com/exec/obidos/tg/detail/-/3540665722/qid=1035535482/sr=8-7/ref=sr_8_7/104-3357872-6059916?v=glance&n=507846
 
-   static const boost::int32_t double_digits10_minus_one = static_cast<boost::int32_t>(static_cast<boost::int32_t>(Digits10) - static_cast<boost::int32_t>(1));
+   static const boost::uint32_t double_digits10_minus_one = static_cast<boost::int32_t>(static_cast<boost::int32_t>(Digits10) - static_cast<boost::int32_t>(1));
 
-   for(boost::int32_t digits = double_digits10_minus_one; digits <= Digits10; digits *= static_cast<boost::int32_t>(2))
+   for(boost::uint32_t digits = double_digits10_minus_one; digits <= Digits10; digits *= 2u)
    {
       // Adjust precision of the terms.
-      precision(static_cast<boost::int32_t>(digits * static_cast<boost::int32_t>(2)));
-      vi.precision(static_cast<boost::int32_t>(digits * static_cast<boost::int32_t>(2)));
+      precision(digits * 2);
+      vi.precision(digits * 2);
 
       // Next iteration of vi
       mp_float t(*this);
       t *= vi;
       t.negate();
-      t.mul_unsigned_long_long(2);
+      t.mul_unsigned_long_long(2u);
       t += one();
       t *= vi;
       vi += t;

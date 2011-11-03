@@ -166,7 +166,7 @@ T("8.650871796830672527081873591655777773059986288175183143531618768919892399328
          max_err = err;
    }
    std::cout << "Max error was: " << max_err << std::endl;
-   BOOST_TEST(max_err < 5000000000);
+   BOOST_TEST(max_err < 5000000000uLL);
 
    static const boost::array<T, 51u> small_data =
    {{

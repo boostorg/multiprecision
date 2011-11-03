@@ -18,6 +18,10 @@
     [last-revision $Date: 2011-07-08 18:51:46 +0100 (Fri, 08 Jul 2011) $]
 ]
 
+[import ../example/gmp_snips.cpp]
+[import ../example/mpfr_snips.cpp]
+[import ../example/mp_float_snips.cpp]
+
 [section:intro Introduction]
 
 The Multiprecision library comes in two distinct parts: an expression template enabled front end `mp_number`
@@ -63,19 +67,7 @@ It's also possible to access the underlying `mpz_t` via the data() member functi
 
 [h5 Example:]
 
-   #include <boost/multiprecision/gmp.hpp>
-
-   boost::multiprecision::mpz_int v = 1;
-
-   // Do some arithmetic:
-   for(unsigned i = 1; i <= 1000; ++i)
-      v *= i;
-
-   std::cout << i << std::endl; // prints 1000!
-
-   // Access the underlying representation:
-   mpz_t z;
-   mpz_int(z, v.backend().data());
+[mpz_eg]
 
 [endsect]
 
@@ -127,22 +119,7 @@ It's also possible to access the underlying `mpf_t` via the data() member functi
 
 [h5 GMP example:]
 
-   #include <boost/multiprecision/gmp.hpp>
-
-   // Operations at variable precision and limited standard library support:
-   boost::multiprecision::gmp_float a = 2;
-   boost::multiprecision::gmp_float::default_precision(1000);
-   std::cout << boost::multiprecision::gmp_float::default_precision() << std::endl;
-   std::cout << sqrt(a) << std::endl; // print root-2
-
-   // Operations at fixed precision and full standard library support:
-   boost::multiprecision::mpf_float_100 b = 2;
-   std::cout << std::numeric_limits<mpf_float_100>::digits << std::endl;
-   std::cout << log(b) << std::endl; // print log(2)
-
-   // Access the underlying representation:
-   mpf_t f;
-   mpf_init(f, a.backend().data());
+[mpf_eg]
 
 [h4 mpfr_float]
 
@@ -182,22 +159,7 @@ It's also possible to access the underlying `mpf_t` via the data() member functi
 
 [h5 MPFR example:]
 
-   #include <boost/multiprecision/gmp.hpp>
-
-   // Operations at variable precision and no numeric_limits support:
-   boost::multiprecision::gmp_float a = 2;
-   boost::multiprecision::gmp_float::default_precision(1000);
-   std::cout << boost::multiprecision::gmp_float::default_precision() << std::endl;
-   std::cout << sqrt(a) << std::endl; // print root-2
-
-   // Operations at fixed precision and full numeric_limits support:
-   boost::multiprecision::mpfr_float_100 b = 2;
-   std::cout << std::numeric_limits<mpfr_float_100>::digits << std::endl;
-   std::cout << log(b) << std::endl; // print log(2)
-
-   // Access the underlying data:
-   mpfr_t r;
-   mpfr_set(r, b.backend().data());
+[mpfr_eg]
 
 [h4 mp_float]
 
@@ -223,12 +185,7 @@ There is full standard library and `numeric_limits` support available for this t
 
 [h5 mp_float example:]
 
-   #include <boost/multiprecision/mp_float.hpp>
-
-   // Operations at fixed precision and full numeric_limits support:
-   boost::multiprecision::mp_float_100 b = 2;
-   std::cout << std::numeric_limits<mp_float_100>::digits << std::endl;
-   std::cout << log(b) << std::endl; // print log(2)
+[mp_float_eg]
 
 [endsect]
 
@@ -271,22 +228,7 @@ It's also possible to access the underlying `mpq_t` via the data() member functi
 
 [h5 Example:]
 
-   #include <boost/multiprecision/gmp.hpp>
-
-   boost::multiprecision::mpq_rational v = 1;
-
-   // Do some arithmetic:
-   for(unsigned i = 1; i <= 1000; ++i)
-      v *= i;
-   v /= 10;
-
-   std::cout << i << std::endl; // prints 1000! / 10
-   std::cout << numerator(i) << std::endl;
-   std::cout << denominator(i) << std::endl;
-
-   // Access the underlying data:
-   mpq_t q;
-   mpq_init(q, i.backend().data());
+[mpq_eg]
 
 [endsect]
 

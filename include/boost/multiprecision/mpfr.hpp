@@ -398,7 +398,7 @@ struct mpfr_float_backend<0> : public detail::mpfr_float_imp<0>
    template <unsigned D>
    mpfr_float_backend(const gmp_float<D>& val)
    {
-      mpfr_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
+      mpfr_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
       mpfr_set_f(this->m_data, val.data(), GMP_RNDN);
    }
    mpfr_float_backend(const gmp_int& val)
