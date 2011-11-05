@@ -545,15 +545,6 @@ private:
       using default_ops::subtract;
       subtract(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
-   /*
-   template <class Exp>
-   void do_assign(const Exp& e, const detail::subtract_and_negate_immediates&)
-   {
-      using default_ops::subtract;
-      subtract(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
-      m_backend.negate();
-   }
-   */
    template <class Exp>
    void do_assign(const Exp& e, const detail::multiply_immediates&)
    {
