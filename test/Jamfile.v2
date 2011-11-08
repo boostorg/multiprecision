@@ -158,6 +158,38 @@ run mp_number_concept_check.cpp  mpfr
          [ check-target-builds ../config//has_mpfr : : <build>no ]
         : big_number_concept_check_mpfr_50 ;
 
+run mp_number_concept_check.cpp  mpfr
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPFR_6
+         [ check-target-builds ../config//has_mpfr : : <build>no ]
+        : big_number_concept_check_mpfr_6 ;
+
+run mp_number_concept_check.cpp  mpfr
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPFR_15
+         [ check-target-builds ../config//has_mpfr : : <build>no ]
+        : big_number_concept_check_mpfr_15 ;
+
+run mp_number_concept_check.cpp  mpfr
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPFR_17
+         [ check-target-builds ../config//has_mpfr : : <build>no ]
+        : big_number_concept_check_mpfr_17 ;
+
+run mp_number_concept_check.cpp  mpfr
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPFR_30
+         [ check-target-builds ../config//has_mpfr : : <build>no ]
+        : big_number_concept_check_mpfr_30 ;
+
 run mp_number_concept_check.cpp  gmp
         : # command line
         : # input files
@@ -171,8 +203,14 @@ run mp_number_concept_check.cpp
         : # input files
         : # requirements
 	      <define>TEST_MP_FLOAT
-         [ check-target-builds ../config//has_gmp : : <build>no ]
         : big_number_concept_check_mp_float ;
+
+run mp_number_concept_check.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_BACKEND
+        : big_number_concept_check_backend_concept ;
 
 run test_exp.cpp gmp
         : # command line

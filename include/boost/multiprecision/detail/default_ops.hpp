@@ -340,18 +340,18 @@ void eval_abs(T& result, const T& arg)
 {
    typedef typename T::signed_types type_list;
    typedef typename mpl::front<type_list>::type front;
-   *result = arg;
+   result = arg;
    if(arg.compare(front(0)) < 0)
-      result->negate();
+      result.negate();
 }
 template <class T>
 void eval_fabs(T& result, const T& arg)
 {
    typedef typename T::signed_types type_list;
    typedef typename mpl::front<type_list>::type front;
-   *result = arg;
+   result = arg;
    if(arg.compare(front(0)) < 0)
-      result->negate();
+      result.negate();
 }
 
 template <class Backend>

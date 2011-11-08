@@ -177,94 +177,14 @@ inline void eval_ceil(mp_number_backend_float_architype& result, const mp_number
    result = std::ceil(arg.m_value);
 }
 
-inline void eval_trunc(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& arg)
-{
-   result = boost::math::trunc(arg.m_value);
-}
-
 inline void eval_sqrt(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& arg)
 {
    result = std::sqrt(arg.m_value);
 }
 
-inline void eval_abs(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& arg)
-{
-   result = std::abs(arg.m_value);
-}
-
-inline void eval_fabs(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& arg)
-{
-   result = std::fabs(arg.m_value);
-}
-
 inline int eval_fpclassify(const mp_number_backend_float_architype& arg)
 {
-   return boost::math::fpclassify(arg.m_value);
-}
-
-inline void eval_pow(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& b, const mp_number_backend_float_architype& e)
-{
-   result = std::pow(b.m_value, e.m_value);
-}
-
-inline void eval_pow(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& b, int e)
-{
-   result = std::pow(b.m_value, e);
-}
-
-inline void eval_exp(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& arg)
-{
-   result = std::exp(arg.m_value);
-}
-
-inline void eval_log(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& arg)
-{
-   result = std::log(arg.m_value);
-}
-
-inline void eval_sin(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& arg)
-{
-   result = std::sin(arg.m_value);
-}
-
-inline void eval_cos(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& arg)
-{
-   result = std::cos(arg.m_value);
-}
-
-inline void eval_tan(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& arg)
-{
-   result = std::tan(arg.m_value);
-}
-
-inline void eval_asin(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& arg)
-{
-   result = std::asin(arg.m_value);
-}
-
-inline void eval_acos(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& arg)
-{
-   result = std::acos(arg.m_value);
-}
-
-inline void eval_atan(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& arg)
-{
-   result = std::atan(arg.m_value);
-}
-
-inline void eval_sinh(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& arg)
-{
-   result = std::sinh(arg.m_value);
-}
-
-inline void eval_cosh(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& arg)
-{
-   result = std::cosh(arg.m_value);
-}
-
-inline void eval_tanh(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& arg)
-{
-   result = std::tanh(arg.m_value);
+   return (boost::math::fpclassify)(arg.m_value);
 }
 
 typedef boost::multiprecision::mp_number<mp_number_backend_float_architype> mp_number_float_architype;
