@@ -1553,6 +1553,12 @@ inline std::istream& operator >> (std::istream& is, mp_number<Backend>& r)
    return is;
 }
 
+template <class Backend>
+inline void swap(mp_number<Backend>& a, mp_number<Backend>& b)
+{
+   a.swap(b);
+}
+
 }} // namespaces
 
 #endif

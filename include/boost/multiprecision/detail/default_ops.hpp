@@ -382,6 +382,12 @@ inline void eval_fmod(T& result, const T& a, const T& b)
 template <class T>
 inline void eval_trunc(T& result, const T& a)
 {
+   int c = eval_fpclassify(a);
+   if(c == FP_NAN || c == FP_INFINITE)
+   {
+      result = boost::math::policies::raise_rounding_error("boost::multiprecision::trunc<%1%>(%1%)", 0, mp_number<T>(a), 0, boost::math::policies::policy<>()).backend();
+      return;
+   }
    if(get_sign(a) < 0)
       eval_ceil(result, a);
    else
@@ -392,6 +398,12 @@ template <class T>
 inline void eval_round(T& result, const T& a)
 {
    typedef typename boost::multiprecision::detail::canonical<float, T>::type fp_type;
+   int c = eval_fpclassify(a);
+   if(c == FP_NAN || c == FP_INFINITE)
+   {
+      result = boost::math::policies::raise_rounding_error("boost::multiprecision::round<%1%>(%1%)", 0, mp_number<T>(a), 0, boost::math::policies::policy<>()).backend();
+      return;
+   }
    if(get_sign(a) < 0)
    {
       subtract(result, a, fp_type(0.5f));
@@ -419,31 +431,6 @@ template <class T>
 typename enable_if_c<sizeof(T) == 0>::type eval_ldexp();
 template <class T>
 typename enable_if_c<sizeof(T) == 0>::type eval_frexp();
-//
-// TODO: implement default versions of these:
-//
-template <class T>
-typename enable_if_c<sizeof(T) == 0>::type eval_exp();
-template <class T>
-typename enable_if_c<sizeof(T) == 0>::type eval_log();
-template <class T>
-typename enable_if_c<sizeof(T) == 0>::type eval_sin();
-template <class T>
-typename enable_if_c<sizeof(T) == 0>::type eval_cos();
-template <class T>
-typename enable_if_c<sizeof(T) == 0>::type eval_tan();
-template <class T>
-typename enable_if_c<sizeof(T) == 0>::type eval_asin();
-template <class T>
-typename enable_if_c<sizeof(T) == 0>::type eval_acos();
-template <class T>
-typename enable_if_c<sizeof(T) == 0>::type eval_atan();
-template <class T>
-typename enable_if_c<sizeof(T) == 0>::type eval_sinh();
-template <class T>
-typename enable_if_c<sizeof(T) == 0>::type eval_cosh();
-template <class T>
-typename enable_if_c<sizeof(T) == 0>::type eval_tanh();
 //
 // These functions are implemented in separate files, but expanded inline here,
 // DO NOT CHANGE THE ORDER OF THESE INCLUDES:
@@ -527,7 +514,7 @@ template <class tag, class A1, class A2, class A3, class Policy>
 inline typename detail::mp_exp<tag, A1, A2, A3>::result_type trunc(const detail::mp_exp<tag, A1, A2, A3>& v, const Policy& pol)
 {
    typedef typename detail::mp_exp<tag, A1, A2, A3>::result_type number_type;
-   return trunc(v, pol);
+   return trunc(number_type(v), pol);
 }
 
 template <class Backend, class Policy>
@@ -544,58 +531,88 @@ inline int itrunc(const detail::mp_exp<tag, A1, A2, A3>& v, const Policy& pol)
 {
    typedef typename detail::mp_exp<tag, A1, A2, A3>::result_type number_type;
    number_type r = trunc(v, pol);
-   if(fabs(r) > (std::numeric_limits<int>::max)())
-      return boost::math::policies::raise_rounding_error("boost::multiprecision::itrunc<%1%>(%1%)", 0, v, 0, pol).template convert_to<int>();
+   if((r > (std::numeric_limits<int>::max)()) || r < (std::numeric_limits<int>::min)() || !boost::math::isfinite(v))
+      return boost::math::policies::raise_rounding_error("boost::multiprecision::itrunc<%1%>(%1%)", 0, number_type(v), 0, pol).template convert_to<int>();
    return r.template convert_to<int>();
+}
+template <class tag, class A1, class A2, class A3>
+inline int itrunc(const detail::mp_exp<tag, A1, A2, A3>& v)
+{
+   return itrunc(v, boost::math::policies::policy<>());
 }
 template <class Backend, class Policy>
 inline int itrunc(const mp_number<Backend>& v, const Policy& pol)
 {
    mp_number<Backend> r = trunc(v, pol);
-   if(fabs(r) > (std::numeric_limits<int>::max)())
+   if((r > (std::numeric_limits<int>::max)()) || r < (std::numeric_limits<int>::min)() || !boost::math::isfinite(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::itrunc<%1%>(%1%)", 0, v, 0, pol).template convert_to<int>();
    return r.template convert_to<int>();
+}
+template <class Backend>
+inline int itrunc(const mp_number<Backend>& v)
+{
+   return itrunc(v, boost::math::policies::policy<>());
 }
 template <class tag, class A1, class A2, class A3, class Policy>
 inline long ltrunc(const detail::mp_exp<tag, A1, A2, A3>& v, const Policy& pol)
 {
-   typedef typename detail::mp_exp<tag, A1, A2, A3>::result_result number_type;
+   typedef typename detail::mp_exp<tag, A1, A2, A3>::result_type number_type;
    number_type r = trunc(v, pol);
-   if(fabs(r) > (std::numeric_limits<long>::max)())
-      return boost::math::policies::raise_rounding_error("boost::multiprecision::ltrunc<%1%>(%1%)", 0, v, 0L, pol).template convert_to<long>();
+   if((r > (std::numeric_limits<long>::max)()) || r < (std::numeric_limits<long>::min)() || !boost::math::isfinite(v))
+      return boost::math::policies::raise_rounding_error("boost::multiprecision::ltrunc<%1%>(%1%)", 0, number_type(v), 0L, pol).template convert_to<long>();
    return r.template convert_to<long>();
+}
+template <class tag, class A1, class A2, class A3>
+inline long ltrunc(const detail::mp_exp<tag, A1, A2, A3>& v)
+{
+   return ltrunc(v, boost::math::policies::policy<>());
 }
 template <class T, class Policy>
 inline long ltrunc(const mp_number<T>& v, const Policy& pol)
 {
    mp_number<T> r = trunc(v, pol);
-   if(fabs(r) > (std::numeric_limits<long>::max)())
+   if((r > (std::numeric_limits<long>::max)()) || r < (std::numeric_limits<long>::min)() || !boost::math::isfinite(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::ltrunc<%1%>(%1%)", 0, v, 0L, pol).template convert_to<long>();
    return r.template convert_to<long>();
+}
+template <class T>
+inline long ltrunc(const mp_number<T>& v)
+{
+   return ltrunc(v, boost::math::policies::policy<>());
 }
 #ifndef BOOST_NO_LONG_LONG
 template <class tag, class A1, class A2, class A3, class Policy>
 inline long long lltrunc(const detail::mp_exp<tag, A1, A2, A3>& v, const Policy& pol)
 {
-   typedef typename detail::mp_exp<tag, A1, A2, A3>::result_result number_type;
+   typedef typename detail::mp_exp<tag, A1, A2, A3>::result_type number_type;
    number_type r = trunc(v, pol);
-   if(fabs(r) > (std::numeric_limits<long long>::max)())
-      return boost::math::policies::raise_rounding_error("boost::multiprecision::lltrunc<%1%>(%1%)", 0, v, 0LL, pol).template convert_to<long long>();
+   if((r > (std::numeric_limits<long long>::max)()) || r < (std::numeric_limits<long long>::min)() || !boost::math::isfinite(v))
+      return boost::math::policies::raise_rounding_error("boost::multiprecision::lltrunc<%1%>(%1%)", 0, number_type(v), 0LL, pol).template convert_to<long long>();
    return r.template convert_to<long long>();
+}
+template <class tag, class A1, class A2, class A3>
+inline long long lltrunc(const detail::mp_exp<tag, A1, A2, A3>& v)
+{
+   return lltrunc(v, boost::math::policies::policy<>());
 }
 template <class T, class Policy>
 inline long long lltrunc(const mp_number<T>& v, const Policy& pol)
 {
    mp_number<T> r = trunc(v, pol);
-   if(fabs(r) > (std::numeric_limits<long long>::max)())
+   if((r > (std::numeric_limits<long long>::max)()) || r < (std::numeric_limits<long long>::min)() || !boost::math::isfinite(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::lltrunc<%1%>(%1%)", 0, v, 0LL, pol).template convert_to<long long>();
    return r.template convert_to<long long>();
 }
+template <class T>
+inline long long lltrunc(const mp_number<T>& v)
+{
+   return lltrunc(v, boost::math::policies::policy<>());
+}
 #endif
 template <class tag, class A1, class A2, class A3, class Policy>
-inline typename detail::mp_exp<tag, A1, A2, A3>::result_result round(const detail::mp_exp<tag, A1, A2, A3>& v, const Policy& pol)
+inline typename detail::mp_exp<tag, A1, A2, A3>::result_type round(const detail::mp_exp<tag, A1, A2, A3>& v, const Policy& pol)
 {
-   typedef typename detail::mp_exp<tag, A1, A2, A3>::result_result number_type;
+   typedef typename detail::mp_exp<tag, A1, A2, A3>::result_type number_type;
    return round(static_cast<number_type>(v), pol);
 }
 template <class T, class Policy>
@@ -610,54 +627,84 @@ inline mp_number<T> round(const mp_number<T>& v, const Policy& pol)
 template <class tag, class A1, class A2, class A3, class Policy>
 inline int iround(const detail::mp_exp<tag, A1, A2, A3>& v, const Policy& pol)
 {
-   typedef typename detail::mp_exp<tag, A1, A2, A3>::result_result number_type;
+   typedef typename detail::mp_exp<tag, A1, A2, A3>::result_type number_type;
    number_type r = round(v, pol);
-   if(fabs(r) > (std::numeric_limits<int>::max)())
-      return boost::math::policies::raise_rounding_error("boost::multiprecision::iround<%1%>(%1%)", 0, v, 0, pol).template convert_to<int>();
+   if((r > (std::numeric_limits<int>::max)()) || r < (std::numeric_limits<int>::min)() || !boost::math::isfinite(v))
+      return boost::math::policies::raise_rounding_error("boost::multiprecision::iround<%1%>(%1%)", 0, number_type(v), 0, pol).template convert_to<int>();
    return r.template convert_to<int>();
+}
+template <class tag, class A1, class A2, class A3>
+inline int iround(const detail::mp_exp<tag, A1, A2, A3>& v)
+{
+   return iround(v, boost::math::policies::policy<>());
 }
 template <class T, class Policy>
 inline int iround(const mp_number<T>& v, const Policy& pol)
 {
    mp_number<T> r = round(v, pol);
-   if(fabs(r) > (std::numeric_limits<int>::max)())
+   if((r > (std::numeric_limits<int>::max)()) || r < (std::numeric_limits<int>::min)() || !boost::math::isfinite(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::iround<%1%>(%1%)", 0, v, 0, pol).template convert_to<int>();
    return r.template convert_to<int>();
+}
+template <class T>
+inline int iround(const mp_number<T>& v)
+{
+   return iround(v, boost::math::policies::policy<>());
 }
 template <class tag, class A1, class A2, class A3, class Policy>
 inline long lround(const detail::mp_exp<tag, A1, A2, A3>& v, const Policy& pol)
 {
-   typedef typename detail::mp_exp<tag, A1, A2, A3>::result_result number_type;
+   typedef typename detail::mp_exp<tag, A1, A2, A3>::result_type number_type;
    number_type r = round(v, pol);
-   if(fabs(r) > (std::numeric_limits<long>::max)())
-      return boost::math::policies::raise_rounding_error("boost::multiprecision::lround<%1%>(%1%)", 0, v, 0L, pol).template convert_to<long>();
+   if((r > (std::numeric_limits<long>::max)()) || r < (std::numeric_limits<long>::min)() || !boost::math::isfinite(v))
+      return boost::math::policies::raise_rounding_error("boost::multiprecision::lround<%1%>(%1%)", 0, number_type(v), 0L, pol).template convert_to<long>();
    return r.template convert_to<long>();
+}
+template <class tag, class A1, class A2, class A3>
+inline long lround(const detail::mp_exp<tag, A1, A2, A3>& v)
+{
+   return lround(v, boost::math::policies::policy<>());
 }
 template <class T, class Policy>
 inline long lround(const mp_number<T>& v, const Policy& pol)
 {
    mp_number<T> r = round(v, pol);
-   if(fabs(r) > (std::numeric_limits<long>::max)())
+   if((r > (std::numeric_limits<long>::max)()) || r < (std::numeric_limits<long>::min)() || !boost::math::isfinite(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::lround<%1%>(%1%)", 0, v, 0L, pol).template convert_to<long>();
    return r.template convert_to<long>();
+}
+template <class T>
+inline long lround(const mp_number<T>& v)
+{
+   return lround(v, boost::math::policies::policy<>());
 }
 #ifndef BOOST_NO_LONG_LONG
 template <class tag, class A1, class A2, class A3, class Policy>
 inline long long llround(const detail::mp_exp<tag, A1, A2, A3>& v, const Policy& pol)
 {
-   typedef typename detail::mp_exp<tag, A1, A2, A3>::result_result number_type;
+   typedef typename detail::mp_exp<tag, A1, A2, A3>::result_type number_type;
    number_type r = round(v, pol);
-   if(fabs(r) > (std::numeric_limits<long long>::max)())
-      return boost::math::policies::raise_rounding_error("boost::multiprecision::iround<%1%>(%1%)", 0, v, 0LL, pol).template convert_to<long long>();
+   if((r > (std::numeric_limits<long long>::max)()) || r < (std::numeric_limits<long long>::min)() || !boost::math::isfinite(v))
+      return boost::math::policies::raise_rounding_error("boost::multiprecision::iround<%1%>(%1%)", 0, number_type(v), 0LL, pol).template convert_to<long long>();
    return r.template convert_to<long long>();
+}
+template <class tag, class A1, class A2, class A3>
+inline long long llround(const detail::mp_exp<tag, A1, A2, A3>& v)
+{
+   return llround(v, boost::math::policies::policy<>());
 }
 template <class T, class Policy>
 inline long long llround(const mp_number<T>& v, const Policy& pol)
 {
    mp_number<T> r = round(v, pol);
-   if(fabs(r) > (std::numeric_limits<long long>::max)())
+   if((r > (std::numeric_limits<long long>::max)()) || r < (std::numeric_limits<long long>::min)() || !boost::math::isfinite(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::iround<%1%>(%1%)", 0, v, 0LL, pol).template convert_to<long long>();
    return r.template convert_to<long long>();
+}
+template <class T>
+inline long long llround(const mp_number<T>& v)
+{
+   return llround(v, boost::math::policies::policy<>());
 }
 #endif
 
@@ -917,8 +964,10 @@ UNARY_OP_FUNCTOR(sqrt)
 UNARY_OP_FUNCTOR(floor)
 UNARY_OP_FUNCTOR(ceil)
 UNARY_OP_FUNCTOR(trunc)
+UNARY_OP_FUNCTOR(round)
 UNARY_OP_FUNCTOR(exp)
 UNARY_OP_FUNCTOR(log)
+UNARY_OP_FUNCTOR(log10)
 UNARY_OP_FUNCTOR(cos)
 UNARY_OP_FUNCTOR(sin)
 UNARY_OP_FUNCTOR(tan)

@@ -402,9 +402,21 @@ It's also possible to access the underlying `mpq_t` via the data() member functi
       mp_number();
       mp_number(see-below);
       mp_number& operator=(see-below);
+
       /* Other number-type operators here */
+
+      // Use in Boolean context:
+      operator ``['convertible-to-bool-type]``()const;
+      // swap:
+      void swap(mp_number& other);
+      // Sign:
+      bool is_zero()const;
+      int sign()const;
       // string conversion:
       std::string str()const;
+      // Generic conversion mechanism
+      template <class T>
+      T convert_to()const;
       // precision control:
       static unsigned default_precision();
       static void default_precision(unsigned digits10);
@@ -419,6 +431,10 @@ It's also possible to access the underlying `mpq_t` via the data() member functi
       const Backend& backend()const;
    };
 
+   // Swap:
+   template <class Backend>
+   void swap(mp_number<Backend>& a, mp_number<Backend>& b);
+
    // iostream support:
    template <class Backend>
    std::ostream& operator << (std::ostream& os, const mp_number<Backend>& r);
@@ -427,29 +443,48 @@ It's also possible to access the underlying `mpq_t` via the data() member functi
    std::istream& operator >> (std::istream& is, mp_number<Backend>& r);
 
    // Non-member function standard library support:
-   ``['unmentionable-expression-template-type]``    abs   (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    fabs  (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    sqrt  (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    floor (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    ceil  (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    trunc (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    exp   (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    log   (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    cos   (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    sin   (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    tan   (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    acos  (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    asin  (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    atan  (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    cosh  (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    sinh  (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    tanh  (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    abs    (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    fabs   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    sqrt   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    floor  (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    ceil   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    trunc  (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    itrunc (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    ltrunc (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    lltrunc(const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    round  (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    iround (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    lround (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    llround(const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    exp    (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    log    (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    log10    (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    cos    (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    sin    (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    tan    (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    acos   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    asin   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    atan   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    cosh   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    sinh   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    tanh   (const ``['mp_number-or-expression-template-type]``&);
 
    ``['unmentionable-expression-template-type]``    ldexp (const ``['mp_number-or-expression-template-type]``&, int);
    ``['unmentionable-expression-template-type]``    frexp (const ``['mp_number-or-expression-template-type]``&, int*);
    ``['unmentionable-expression-template-type]``    pow   (const ``['mp_number-or-expression-template-type]``&, const ``['mp_number-or-expression-template-type]``&);
    ``['unmentionable-expression-template-type]``    fmod  (const ``['mp_number-or-expression-template-type]``&, const ``['mp_number-or-expression-template-type]``&);
    ``['unmentionable-expression-template-type]``    atan2 (const ``['mp_number-or-expression-template-type]``&, const ``['mp_number-or-expression-template-type]``&);
+
+   }} // namespaces
+
+   namespace boost{ namespace math{
+
+   // Boost.Math interoperability functions:
+   int                                              fpclassify     (const ``['mp_number-or-expression-template-type]``&, int);
+   bool                                             isfinite       (const ``['mp_number-or-expression-template-type]``&, int);
+   bool                                             isnan          (const ``['mp_number-or-expression-template-type]``&, int);
+   bool                                             isinf          (const ``['mp_number-or-expression-template-type]``&, int);
+   bool                                             isnormal       (const ``['mp_number-or-expression-template-type]``&, int);
 
    }} // namespaces
 
@@ -497,10 +532,36 @@ derived from `mp_number`.  One argument may optionally be of arithmetic type.
 
 Note that type `mp_number` (and all expression templates derived from it) may be used in a Boolian context.
 
+      operator ``['convertible-to-bool-type]``()const;
+
+Returns an ['unmentionable-type] that is usable in Boolean contexts (this allows `mp_number` to be used in any
+Boolean context - if statements, conditional statements, or as an argument to a logical operator - without
+type `mp_number` being convertible to type `bool`.
+
+      void swap(mp_number& other);
+
+Swaps `*this` with `other`.
+
+      bool is_zero()const;
+
+Returns `true` is `*this` is zero, otherwise `false`.
+
+      int sign()const;
+
+Returns a value less than zero if `*this` is negative, a value greater than zero if `*this is positive, and zero
+if `*this` is zero.
+
       std::string str(unsigned precision, bool scientific = true)const;
 
 Returns the number formatted as a string, with at least /precision/ digits, and in scientific format
 if /scientific/ is true.
+
+      template <class T>
+      T convert_to()const;
+
+Provides a generic conversion mechanism to convert `*this` to type `T`.  Type `T` may be any arithmetic type.
+Optionally other types may also be supported by specific `Backend` types.
+
 
       static unsigned default_precision();
       static void default_precision(unsigned digits10);
@@ -525,6 +586,13 @@ Returns:
 
 Returns the underlying backend instance used by *this.
 
+[h4 swap]
+
+   template <class Backend>
+   void swap(mp_number<Backend>& a, mp_number<Backend>& b);
+
+Swaps `a` and `b`.
+
 [h4 Iostream Support]
 
    template <class Backend>
@@ -538,23 +606,31 @@ These operators provided formatted input-output operations on `mp_number` types,
 
 [h4 Non-member standard library function support]
 
-   ``['unmentionable-expression-template-type]``    abs   (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    fabs  (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    sqrt  (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    floor (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    ceil  (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    trunc (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    exp   (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    log   (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    cos   (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    sin   (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    tan   (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    acos  (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    asin  (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    atan  (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    cosh  (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    sinh  (const ``['mp_number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    tanh  (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    abs    (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    fabs   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    sqrt   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    floor  (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    ceil   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    trunc  (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    itrunc (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    ltrunc (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    lltrunc(const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    round  (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    iround (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    lround (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    llround(const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    exp    (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    log    (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    log10    (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    cos    (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    sin    (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    tan    (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    acos   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    asin   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    atan   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    cosh   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    sinh   (const ``['mp_number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    tanh   (const ``['mp_number-or-expression-template-type]``&);
 
    ``['unmentionable-expression-template-type]``    ldexp (const ``['mp_number-or-expression-template-type]``&, int);
    ``['unmentionable-expression-template-type]``    frexp (const ``['mp_number-or-expression-template-type]``&, int*);
@@ -571,6 +647,21 @@ to be a compile time constant - this means for example that the GMP MPF Backend 
 used at variable precision.
 
 Also note that with the exception of `abs` that these functions can only be used with floating point Backend types.
+
+[h4 Boost.Math Interoperabilty Support]
+
+   namespace boost{ namespace math{
+
+   int                                              fpclassify     (const ``['mp_number-or-expression-template-type]``&, int);
+   bool                                             isfinite       (const ``['mp_number-or-expression-template-type]``&, int);
+   bool                                             isnan          (const ``['mp_number-or-expression-template-type]``&, int);
+   bool                                             isinf          (const ``['mp_number-or-expression-template-type]``&, int);
+   bool                                             isnormal       (const ``['mp_number-or-expression-template-type]``&, int);
+
+   }} // namespaces
+
+These functions behave exacts as their Boost.Math equivalents.  Other Boost.Math functions and templates may also be
+specialized or overloaded to ensure interoperability.
 
 [h4 std::numeric_limits support]
 
@@ -592,7 +683,149 @@ whose precision can vary at compile time (such as `mpf_float`).
 
 [section:backendconc Backend Requirements]
 
-TODO, big boring job!!
+[template super[x]'''<superscript>'''[x]'''</superscript>''']
+
+The requirements on the `Backend` template argument to `mp_number` are split up into
+compulsary requirements, and optional requirements that are either to improve performance
+or provide optional features.
+
+In the following tables, type B is the `Backend` template arument to `mp_number`, `b` is
+a variable of B, `cb` and `cb2` are constant variables of type B, `a` is a variable of Arithmetic type, 
+`s` is a variable of type `const char*`, `ui` is a variable of type `unsigned`, `bb` is a variable of type `bool`,
+`pa` is a variable of type pointer-to-arithmetc-type, `exp` is a variable of type `B::exp_type`,
+`pexp` is a variable of type `B::exp_type*`.
+
+[table Compulsary Requirements on the Backend type.
+[[Expression][Return Type][Comments]]
+[[`B::signed_types`][`mpl::list<type-list>`][A list of signed integral types that can be assigned to type B.  The types shall be
+                   listed in order of size, smallest first, and shall terminate in the type that is `std::intmax_t`.]]
+[[`B::unsigned_types`][`mpl::list<type-list>`][A list of unsigned integral types that can be assigned to type B.  The types shall be
+                   listed in order of size, smallest first, and shall terminate in the type that is `std::uintmax_t`.]]
+[[`B::real_types`][`mpl::list<type-list>`][A list of floating point types that can be assigned to type B.The types shall be
+                   listed in order of size, smallest first, and shall terminate in type `long double`.]]
+[[`B::exponent_type`][A signed integral type.][The type of the exponent of type B.]]
+[[`B()`][ ][Default constructor.]]
+[[`B(cb)`][ ][Copy Constructor.]]
+[[`b = b`][`B&`][Assignment operator.]]
+[[`b = a`][`B&`][Assignment from an Arithmetic type.  The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`b = s`][`B&`][Assignment from a string.]]
+[[`b.swap(b)`][`void`][Swaps the contents of it's arguments.]]
+[[`cb.str(ui, bb)`][`std::string`][Returns the string representation of `b` with `ui` digits and in scientific format if `bb` is `true`.
+                  If `ui` is zero, then returns as many digits as are required to reconstruct the original value.]]
+[[`b.negate()`][`void`][Negates `b`.]]
+[[`cb.compare(cb2)`][`int`][Compares `cb` and `cb2`, returns a value less than zero if `cb < cb2`, a value greater than zero if `cb > cb2` and zero
+                   if `cb == cb2`.]]
+[[`cb.compare(a)`][`int`][Compares `cb` and `a`, returns a value less than zero if `cb < a`, a value greater than zero if `cb > a` and zero
+                   if `cb == a`.  The type of `a` shall be listed in one of the type lists
+                   `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`add(b, cb)`][`void`][Adds `cb` to `b`.]]
+[[`subtract(b, cb)`][`void`][Subtracts `cb` from `b`.]]
+[[`multiply(b, cb)`][`void`][Multiplies `b` by `cb`.]]
+[[`divide(b, cb)`][`void`][Divides `b` by `cb`.]]
+[[`modulus(b, cb)`][`void`][Computes `b %= cb`, only required when `B` is an integer type.]]
+[[`bitwise_and(b, cb)`][`void`][Computes `b &= cb`, only required when `B` is an integer type.]]
+[[`bitwise_or(b, cb)`][`void`][Computes `b |= cb`, only required when `B` is an integer type.]]
+[[`bitwise_xor(b, cb)`][`void`][Computes `b ^= cb`, only required when `B` is an integer type.]]
+[[`complement(b, cb)`][`void`][Computes the ones-complement of `cb` and stores the result in `b`, only required when `B` is an integer type.]]
+[[`left_shift(b, ui)`][`void`][Computes `b <<= ui`, only required when `B` is an integer type.]]
+[[`right_shift(b, ui)`][`void`][Computes `b >>= ui`, only required when `B` is an integer type.]]
+[[`convert_to(pa, cb)`][`void`][Converts `cb` to the type of `*pa` and store the result in `*pa`.  Type `B` shall support
+                     conversion to at least types `std::intmax_t`, `std::uintmax_t` and `long long`.
+                     Conversion to other arithmetic types can then be synthesised using other operations.
+                     Conversions to other types are entirely optional.]]
+[[`eval_frexp(b, cb, pexp)`][`void`][Stores values in `b` and `*pexp` such that the value of `cb` is b * 2[super *pexp], only required when `B` is a floating point type.]]
+[[`eval_ldexp(b, cb, exp)`][`void`][Stores a value in `b` that is cb * 2[super exp], only required when `B` is a floating point type.]]
+[[`eval_floor(b, cb)`][`void`][Stores the floor of `cb` in `b`, only required when `B` is a floating point type.]]
+[[`eval_ceil(b, cb)`][`void`][Stores the ceiling of `cb` in `b`, only required when `B` is a floating point type.]]
+[[`eval_sqrt(b, cb)`][`void`][Stores the square root of `cb` in `b`, only required when `B` is a floating point type.]]
+]
+
+[table Optional Requirements on the Backend Type
+[[Expression][Returns][Comments]]
+[[`add(b, a)`][`void`][Adds `a` to `b`.  The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`subtract(b, a)`][`void`][Subtracts `a` from `b`.  The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`multiply(b, a)`][`void`][Multiplies `b` by `a`.  The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`divide(b, a)`][`void`][Divides `b` by `a`.  The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`modulus(b, a)`][`void`][Computes `b %= cb`, only required when `B` is an integer type.  The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`bitwise_and(b, a)`][`void`][Computes `b &= cb`, only required when `B` is an integer type.  The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`bitwise_or(b, a)`][`void`][Computes `b |= cb`, only required when `B` is an integer type.  The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`bitwise_xor(b, a)`][`void`][Computes `b ^= cb`, only required when `B` is an integer type.  The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`add(b, cb, cb2)`][`void`][Add `cb` to `cb2` and stores the result in `b`.]]
+[[`subtract(b, cb, cb2)`][`void`][Subtracts `cb2` from `cb` and stores the result in `b`.]]
+[[`multiply(b, cb, cb2)`][`void`][Multiplies `cb` by `cb2` and stores the result in `b`.]]
+[[`divide(b, cb, cb2)`][`void`][Divides `cb` by `cb2` and stores the result in `b`.]]
+[[`add(b, cb, a)`][`void`][Add `cb` to `a` and stores the result in `b`.  The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`subtract(b, cb, a)`][`void`][Subtracts `a` from `cb` and stores the result in `b`.  The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`multiply(b, cb, a)`][`void`][Multiplies `cb` by `a` and stores the result in `b`.  The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`divide(b, cb, a)`][`void`][Divides `cb` by `a` and stores the result in `b`.  The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`modulus(b, cb, cb2)`][`void`][Computes `cb % cb2` and stores the result in `b`, only required when `B` is an integer type.]]
+[[`bitwise_and(b, cb, cb2)`][`void`][Computes `cb & cb2` and stores the result in `b`, only required when `B` is an integer type.]]
+[[`bitwise_or(b, cb, cb2)`][`void`][Computes `cb | cb2` and stores the result in `b`, only required when `B` is an integer type.]]
+[[`bitwise_xor(b, cb, cb2)`][`void`][Computes `cb ^ cb2` and stores the result in `b`, only required when `B` is an integer type.]]
+[[`add(b, a, cb)`][`void`][Add `a` to `cb` and stores the result in `b`.  The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`subtract(b, a, cb)`][`void`][Subtracts `cb` from `a` and stores the result in `b`.  The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`multiply(b, a, cb)`][`void`][Multiplies `a` by `cb` and stores the result in `b`.  The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`divide(b, a, cb)`][`void`][Divides `a` by `cb` and stores the result in `b`.  The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`modulus(b, cb, a)`][`void`][Computes `cb % a` and stores the result in `b`, only required when `B` is an integer type. The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`bitwise_and(b, cb, a)`][`void`][Computes `cb & a` and stores the result in `b`, only required when `B` is an integer type. The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`bitwise_or(b, cb, a)`][`void`][Computes `cb | a` and stores the result in `b`, only required when `B` is an integer type. The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`bitwise_xor(b, cb, a)`][`void`][Computes `cb ^ a` and stores the result in `b`, only required when `B` is an integer type. The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`modulus(b, a, cb)`][`void`][Computes `cb % a` and stores the result in `b`, only required when `B` is an integer type. The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`bitwise_and(b, a, cb)`][`void`][Computes `cb & a` and stores the result in `b`, only required when `B` is an integer type. The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`bitwise_or(b, a, cb)`][`void`][Computes `cb | a` and stores the result in `b`, only required when `B` is an integer type. The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`bitwise_xor(b, a, cb)`][`void`][Computes `a ^ cb` and stores the result in `b`, only required when `B` is an integer type. The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+[[`left_shift(b, cb, ui)`][`void`][Computes `cb << ui` and stores the result in `b`, only required when `B` is an integer type.]]
+[[`right_shift(b, cb, ui)`][`void`][Computes `cb >> ui` and stores the result in `b`, only required when `B` is an integer type.]]
+[[`increment(b)`][void][Increments the value of `b` by one.]]
+[[`decrement(b)`][void][Decrements the value of `b` by one.]]
+[[`is_zero(cb)`][`bool`][Returns `true` if `cb` is zero, otherwise `false`]]
+[[`get_sign(cb)`][`int`][Returns a value < zero if `cb` is negative, a value > zero if `cb` is positive, and zero if `cb` is zero.]]
+[[`eval_abs(b, cb)`][`void`][Set `b` to the absolute value of `cb`.]]
+[[`eval_fabs(b, cb)`][`void`][Set `b` to the absolute value of `cb`.]]
+[[`eval_fpclassify(cb)`][`int`][Returns one of the same values returned by `std::fpclassify`.  Only required when `B` is an floating point type.]]
+[[`eval_trunc(b, cb)`][`void`][Performs the equivalent operation to `std::trunc` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
+[[`eval_round(b, cb, cb2)`][`void`][Performs the equivalent operation to `std::round` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
+[[`eval_exp(b, cb)`][`void`][Performs the equivalent operation to `std::exp` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
+[[`eval_log(b, cb)`][`void`][Performs the equivalent operation to `std::log` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
+[[`eval_log10(b, cb)`][`void`][Performs the equivalent operation to `std::log10` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
+[[`eval_sin(b, cb)`][`void`][Performs the equivalent operation to `std::sin` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
+[[`eval_cos(b, cb)`][`void`][Performs the equivalent operation to `std::cos` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
+[[`eval_tan(b, cb)`][`void`][Performs the equivalent operation to `std::exp` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
+[[`eval_asin(b, cb)`][`void`][Performs the equivalent operation to `std::asin` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
+[[`eval_acos(b, cb)`][`void`][Performs the equivalent operation to `std::acos` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
+[[`eval_atan(b, cb)`][`void`][Performs the equivalent operation to `std::atan` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
+[[`eval_sinh(b, cb)`][`void`][Performs the equivalent operation to `std::sinh` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
+[[`eval_cosh(b, cb)`][`void`][Performs the equivalent operation to `std::cosh` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
+[[`eval_tanh(b, cb)`][`void`][Performs the equivalent operation to `std::tanh` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
+[[`eval_fmod(b, cb, cb2)`][`void`][Performs the equivalent operation to `std::fmod` on arguments `cb` and `cb2`, and store the result in `b`.  Only required when `B` is an floating point type.]]
+[[`eval_pow(b, cb, cb2)`][`void`][Performs the equivalent operation to `std::pow` on arguments `cb` and `cb2`, and store the result in `b`.  Only required when `B` is an floating point type.]]
+[[`eval_atan2(b, cb, cb2)`][`void`][Performs the equivalent operation to `std::atan` on arguments `cb` and `cb2`, and store the result in `b`.  Only required when `B` is an floating point type.]]
+]
 
 [endsect]
 

@@ -785,6 +785,12 @@ inline void eval_floor(mpfr_float_backend<Digits10>& result, const mpfr_float_ba
 template <unsigned Digits10>
 inline void eval_trunc(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& val)
 {
+   int c = eval_fpclassify(val);
+   if(0 == mpfr_number_p(val.data()))
+   {
+      result = boost::math::policies::raise_rounding_error("boost::multiprecision::trunc<%1%>(%1%)", 0, mp_number<mpfr_float_backend<Digits10> >(val), 0, boost::math::policies::policy<>()).backend();
+      return;
+   }
    mpfr_trunc(result.data(), val.data());
 }
 template <unsigned Digits10>
@@ -846,6 +852,12 @@ template <unsigned Digits10>
 inline void eval_log(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg)
 {
    mpfr_log(result.data(), arg.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10>
+inline void eval_log10(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg)
+{
+   mpfr_log10(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
@@ -917,6 +929,16 @@ typedef mp_number<mpfr_float_backend<0> >     mpfr_float;
 } // namespace boost
 
 namespace math{
+
+namespace tools{
+
+template <>
+inline int digits<boost::multiprecision::mpfr_float>()
+{
+   return boost::multiprecision::detail::get_default_precision();
+}
+
+}
 
 namespace lanczos{
 

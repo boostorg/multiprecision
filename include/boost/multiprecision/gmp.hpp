@@ -679,7 +679,10 @@ inline void convert_to(long long* result, const gmp_float<digits10>& val)
 
    if(!mpf_fits_slong_p(t.data()))
    {
-      *result = (std::numeric_limits<long long>::max)();
+      if(get_sign(val) < 0)
+         *result = (std::numeric_limits<long long>::min)();
+      else
+         *result = (std::numeric_limits<long long>::max)();
       return;
    };
 

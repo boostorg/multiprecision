@@ -490,3 +490,35 @@ run ../example/mpfr_snips.cpp mpfr
          [ check-target-builds ../config//has_mpfr : : <build>no ] ;
 
 run ../example/mp_float_snips.cpp ;
+
+run test_round.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_BACKEND
+        : test_round_backend_concept ;
+
+run test_round.cpp gmp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPF_50
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+        : test_round_mpf50 ;
+
+run test_round.cpp mpfr
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPFR_50
+         [ check-target-builds ../config//has_mpfr : : <build>no ]
+        : test_round_mpfr_50 ;
+
+run test_round.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MP_FLOAT
+         [ check-target-builds ../config//has_mpfr : : <build>no ]
+        : test_round_mp_float ;
+

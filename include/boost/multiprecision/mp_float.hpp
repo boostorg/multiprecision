@@ -2583,10 +2583,15 @@ inline void eval_ceil(mp_float<Digits10>& result, const mp_float<Digits10>& x)
 template <unsigned Digits10>
 inline void eval_trunc(mp_float<Digits10>& result, const mp_float<Digits10>& x)
 {
-   if(!x.isfinite() || x.isint()) 
+   if(!x.isfinite()) 
    { 
+      result = boost::math::policies::raise_rounding_error("boost::multiprecision::trunc<%1%>(%1%)", 0, mp_number<mp_float<Digits10> >(x), 0, boost::math::policies::policy<>()).backend();
+      return;
+   }
+   else if(x.isint())
+   {
       result = x;
-      return; 
+      return;
    }
    result = x.extract_integer_part();
 }

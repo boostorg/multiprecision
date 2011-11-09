@@ -385,6 +385,31 @@ void eval_log(T& result, const T& arg)
    }while(lim.compare(t2) < 0);
 }
 
+template <class T>
+const T& get_constant_log10()
+{
+   static T result;
+   static bool b = false;
+   if(!b)
+   {
+      typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+      T ten;
+      ten = ui_type(10u);
+      eval_log(result, ten);
+   }
+
+   constant_initializer<T, &get_constant_log10<T> >::do_nothing();
+
+   return result;
+}
+
+template <class T>
+void eval_log10(T& result, const T& arg)
+{
+   eval_log(result, arg);
+   divide(result, get_constant_log10<T>());
+}
+
 template<typename T> 
 inline void eval_pow(T& result, const T& x, const T& a)
 {

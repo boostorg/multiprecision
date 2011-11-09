@@ -151,6 +151,7 @@ void test()
    T pi = "3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117067982148086513282306647093844609550582231725359408128481117450284102701938521105559644622948954930381964428810975665933446128475648233786783165271201909145648566923460348610454326648213393607260249141273724587006606315588174881520920962829254091715364367892590360011330530548820466521384146951941511609";
    T tenth = 1;
    tenth /= 10;
+   T logten = log(T(10));
 
    unsigned max_err = 0;
    for(unsigned k = 0; k < data.size(); k++)
@@ -163,6 +164,18 @@ void test()
 
       val = boost::multiprecision::log(1 / (tenth + pi * (100 * k) * (100 * k)));
       e = relative_error(val, T(-data[k]));
+      err = e.template convert_to<unsigned>();
+      if(err > max_err)
+         max_err = err;
+
+      val = boost::multiprecision::log10(tenth + pi * (100 * k) * (100 * k));
+      e = relative_error(val, T(data[k] / logten));
+      err = e.template convert_to<unsigned>();
+      if(err > max_err)
+         max_err = err;
+
+      val = boost::multiprecision::log10(1 / (tenth + pi * (100 * k) * (100 * k)));
+      e = relative_error(val, T(-data[k] / logten));
       err = e.template convert_to<unsigned>();
       if(err > max_err)
          max_err = err;
