@@ -6,14 +6,14 @@
 #include <boost/detail/lightweight_test.hpp>
 #include <boost/math/special_functions/pow.hpp>
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_MP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ)
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ)
 #  define TEST_MPF_50
 #  define TEST_MPF
 #  define TEST_BACKEND
 #  define TEST_MPZ
 #  define TEST_MPFR
 #  define TEST_MPFR_50
-#  define TEST_MP_FLOAT
+#  define TEST_CPP_FLOAT
 #  define TEST_MPQ
 
 #ifdef _MSC_VER
@@ -31,8 +31,8 @@
 #ifdef TEST_BACKEND
 #include <boost/multiprecision/concepts/mp_number_architypes.hpp>
 #endif
-#ifdef TEST_MP_FLOAT
-#include <boost/multiprecision/mp_float.hpp>
+#ifdef TEST_CPP_FLOAT
+#include <boost/multiprecision/cpp_float.hpp>
 #endif
 #if defined(TEST_MPFR) || defined(TEST_MPFR_50)
 #include <boost/multiprecision/mpfr.hpp>
@@ -861,8 +861,8 @@ int main()
 #ifdef TEST_MPQ
    test<boost::multiprecision::mpq_rational>();
 #endif
-#ifdef TEST_MP_FLOAT
-   test<boost::multiprecision::mp_float_50>();
+#ifdef TEST_CPP_FLOAT
+   test<boost::multiprecision::cpp_float_50>();
 #endif
 #ifdef TEST_MPFR
    test<boost::multiprecision::mpfr_float>();

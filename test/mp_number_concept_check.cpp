@@ -5,7 +5,7 @@
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 //
-// This tests two things: that mp_float_50 meets our
+// This tests two things: that cpp_float_50 meets our
 // conceptual requirements, and that we can instantiate
 // all our distributions and special functions on this type.
 //
@@ -21,7 +21,7 @@
 #endif
 
 #if !defined(TEST_MPF_50) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) \
-   && !defined(TEST_MP_FLOAT) && !defined(TEST_MPFR_50)\
+   && !defined(TEST_CPP_FLOAT) && !defined(TEST_MPFR_50)\
    && !defined(TEST_MPFR_6) && !defined(TEST_MPFR_15) && !defined(TEST_MPFR_17) && !defined(TEST_MPFR_30)
 #  define TEST_MPF_50
 #  define TEST_BACKEND
@@ -31,7 +31,7 @@
 #  define TEST_MPFR_15
 #  define TEST_MPFR_17
 #  define TEST_MPFR_30
-#  define TEST_MP_FLOAT
+#  define TEST_CPP_FLOAT
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -48,8 +48,8 @@
 #ifdef TEST_BACKEND
 #include <boost/multiprecision/concepts/mp_number_architypes.hpp>
 #endif
-#ifdef TEST_MP_FLOAT
-#include <boost/multiprecision/mp_float.hpp>
+#ifdef TEST_CPP_FLOAT
+#include <boost/multiprecision/cpp_float.hpp>
 #endif
 #if defined(TEST_MPFR_50) || defined(TEST_MPFR_6) || defined(TEST_MPFR_15) || defined(TEST_MPFR_17) || defined(TEST_MPFR_30)
 #include <boost/multiprecision/mpfr.hpp>
@@ -81,8 +81,8 @@ void foo()
 #ifdef TEST_MPFR_30
    instantiate(boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<30> >());
 #endif
-#ifdef TEST_MP_FLOAT
-   instantiate(boost::multiprecision::mp_float_50());
+#ifdef TEST_CPP_FLOAT
+   instantiate(boost::multiprecision::cpp_float_50());
 #endif
 }
 
@@ -112,8 +112,8 @@ int main()
 #ifdef TEST_MPFR_50
    BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mpfr_float_50>));
 #endif
-#ifdef TEST_MP_FLOAT
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mp_float_50>));
+#ifdef TEST_CPP_FLOAT
+   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::cpp_float_50>));
 #endif
 
 }

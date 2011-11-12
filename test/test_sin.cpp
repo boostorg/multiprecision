@@ -12,11 +12,11 @@
 #include <boost/array.hpp>
 #include "test.hpp"
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_MP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ)
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ)
 #  define TEST_MPF_50
 //#  define TEST_MPF
 #  define TEST_BACKEND
-#  define TEST_MP_FLOAT
+#  define TEST_CPP_FLOAT
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -36,8 +36,8 @@
 #ifdef TEST_BACKEND
 #include <boost/multiprecision/concepts/mp_number_architypes.hpp>
 #endif
-#ifdef TEST_MP_FLOAT
-#include <boost/multiprecision/mp_float.hpp>
+#ifdef TEST_CPP_FLOAT
+#include <boost/multiprecision/cpp_float.hpp>
 #endif
 
 template <class T>
@@ -231,7 +231,12 @@ T("8.650871796830672527081873591655777773059986288175183143531618768919892399328
       T e = relative_error(val, small_data[k]);
       unsigned err = e.template convert_to<unsigned>();
       if(err > max_err)
+      {
+         std::cout << val << std::endl;
+         std::cout << small_data[k] << std::endl;
+         std::cout << e << std::endl;
          max_err = err;
+      }
       val = sin(-(euler_gamma + k) / 53);
       e = relative_error(val, T(-small_data[k]));
       err = e.template convert_to<unsigned>();
@@ -285,8 +290,8 @@ int main()
    test<boost::multiprecision::mpfr_float_50>();
    test<boost::multiprecision::mpfr_float_100>();
 #endif
-#ifdef TEST_MP_FLOAT
-   test<boost::multiprecision::mp_float_50>();
+#ifdef TEST_CPP_FLOAT
+   test<boost::multiprecision::cpp_float_50>();
 #endif
    return boost::report_errors();
 }

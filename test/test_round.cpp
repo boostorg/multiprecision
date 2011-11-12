@@ -16,11 +16,11 @@
    catch(...){ BOOST_ERROR("Incorrect exception type thrown"); }
 
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_MP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ)
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ)
 #  define TEST_MPF_50
 #  define TEST_MPFR_50
 #  define TEST_BACKEND
-#  define TEST_MP_FLOAT
+#  define TEST_CPP_FLOAT
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -40,8 +40,8 @@
 #ifdef TEST_BACKEND
 #include <boost/multiprecision/concepts/mp_number_architypes.hpp>
 #endif
-#ifdef TEST_MP_FLOAT
-#include <boost/multiprecision/mp_float.hpp>
+#ifdef TEST_CPP_FLOAT
+#include <boost/multiprecision/cpp_float.hpp>
 #endif
 
 boost::mt19937 rng;
@@ -387,9 +387,9 @@ int main()
    test<boost::multiprecision::mpfr_float_50>();
    test<boost::multiprecision::mpfr_float_100>();
 #endif
-#ifdef TEST_MP_FLOAT
-   test<boost::multiprecision::mp_float_50>();
-   test<boost::multiprecision::mp_float_100>();
+#ifdef TEST_CPP_FLOAT
+   test<boost::multiprecision::cpp_float_50>();
+   test<boost::multiprecision::cpp_float_100>();
 #endif
 #ifdef TEST_BACKEND
    test<boost::multiprecision::mp_number<boost::multiprecision::concepts::mp_number_backend_float_architype> >();
