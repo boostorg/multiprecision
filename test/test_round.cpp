@@ -4,7 +4,6 @@
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/detail/lightweight_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
 #include <boost/math/special_functions/round.hpp>
 #include <boost/math/special_functions/trunc.hpp>
 #include <boost/math/special_functions/modf.hpp>

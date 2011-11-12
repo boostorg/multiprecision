@@ -194,7 +194,7 @@ public:
       init.do_nothing();
       static bool init = false;
       static const std::string str_max =   std::string("9." + std::string(static_cast<std::size_t>(mp_float_max_digits10), static_cast<char>('9')))
-         + std::string("e+" + boost::lexical_cast<std::string>(mp_float_max_exp));
+         + std::string("e+" + boost::lexical_cast<std::string>(mp_float_max_exp10));
       static mp_float val_max;
       if(!init)
       {
@@ -212,7 +212,7 @@ public:
       if(!init)
       {
          init = true;
-         val_min = std::string("1.0e" + boost::lexical_cast<std::string>(mp_float_min_exp)).c_str();
+         val_min = std::string("1.0e" + boost::lexical_cast<std::string>(mp_float_min_exp10)).c_str();
       }
       return val_min;
    }
@@ -285,7 +285,7 @@ public:
    static const mp_float& eps()
    {
       init.do_nothing();
-      static mp_float val(1.0, 1 - Digits10);
+      static mp_float val(1.0, 1 - (int)Digits10);
       return val;
    }
 
@@ -857,6 +857,14 @@ mp_float<Digits10>& mp_float<Digits10>::operator/=(const mp_float<Digits10>& v)
    }
    else
    {
+      if(iszero())
+      {
+         if(v.isnan() || v.iszero())
+         {
+            return *this = v;
+         }
+         return *this;
+      }
       mp_float t(v);
       t.calculate_inv();
       return operator*=(t);
@@ -1098,7 +1106,7 @@ mp_float<Digits10>& mp_float<Digits10>::calculate_inv()
    // is used. During the iterative steps, the precision of the calculation is limited
    // to the minimum required in order to minimize the run-time.
 
-   static const boost::int32_t double_digits10_minus_one = static_cast<boost::int32_t>(static_cast<boost::int32_t>(Digits10) - static_cast<boost::int32_t>(1));
+   static const boost::int32_t double_digits10_minus_one = std::numeric_limits<double>::digits10 - 1;
 
    for(boost::uint32_t digits = double_digits10_minus_one; digits <= Digits10; digits *= static_cast<boost::int32_t>(2))
    {
@@ -1908,7 +1916,7 @@ bool mp_float<Digits10>::rd_string(const char* const s)
    }
 
    // Check for overflow...
-   if(exp > mp_float_max_exp)
+   if(exp > mp_float_max_exp10)
    {
       const bool b_result_is_neg = neg;
 
@@ -1918,9 +1926,9 @@ bool mp_float<Digits10>::rd_string(const char* const s)
    }
 
    // ...and check for underflow.
-   if(exp <= mp_float_min_exp)
+   if(exp <= mp_float_min_exp10)
    {
-      if(exp == mp_float_min_exp)
+      if(exp == mp_float_min_exp10)
       {
          // Check for identity with the minimum value.
          mp_float<Digits10> test = *this;
@@ -2661,7 +2669,7 @@ namespace std
       static const bool                    is_bounded        = true;
       static const bool                    is_modulo         = false;
       static const bool                    is_iec559         = false;
-      static const int                     digits            = boost::multiprecision::mp_float<Digits10>::mp_float_digits;
+      static const int                     digits            = static_cast<int>(((Digits10 + 1) * 1000L) / 301L);
       static const int                     digits10          = boost::multiprecision::mp_float<Digits10>::mp_float_digits10;
       static const int                     max_digits10      = boost::multiprecision::mp_float<Digits10>::mp_float_max_digits10;
       static const boost::int64_t          min_exponent      = boost::multiprecision::mp_float<Digits10>::mp_float_min_exp;      // Type differs from int.

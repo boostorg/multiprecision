@@ -785,7 +785,6 @@ inline void eval_floor(mpfr_float_backend<Digits10>& result, const mpfr_float_ba
 template <unsigned Digits10>
 inline void eval_trunc(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& val)
 {
-   int c = eval_fpclassify(val);
    if(0 == mpfr_number_p(val.data()))
    {
       result = boost::math::policies::raise_rounding_error("boost::multiprecision::trunc<%1%>(%1%)", 0, mp_number<mpfr_float_backend<Digits10> >(val), 0, boost::math::policies::policy<>()).backend();

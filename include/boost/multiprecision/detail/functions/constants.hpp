@@ -40,7 +40,10 @@ void calc_log2(T& num, unsigned digits)
    }
    multiply(denom, ui_type(4));
    multiply(num, ui_type(3));
+   INSTRUMENT_BACKEND(denom);
+   INSTRUMENT_BACKEND(num);
    divide(num, denom);
+   INSTRUMENT_BACKEND(num);
 }
 
 template <class T>
@@ -142,7 +145,10 @@ const T& get_constant_ln2()
    static T result;
    static bool b = false;
    if(!b)
+   {
       calc_log2(result, std::numeric_limits<mp_number<T> >::digits);
+      b = true;
+   }
 
    constant_initializer<T, &get_constant_ln2<T> >::do_nothing();
 
@@ -155,7 +161,10 @@ const T& get_constant_e()
    static T result;
    static bool b = false;
    if(!b)
+   {
       calc_e(result, std::numeric_limits<mp_number<T> >::digits);
+      b = true;
+   }
 
    constant_initializer<T, &get_constant_e<T> >::do_nothing();
 
@@ -168,7 +177,10 @@ const T& get_constant_pi()
    static T result;
    static bool b = false;
    if(!b)
+   {
       calc_pi(result, std::numeric_limits<mp_number<T> >::digits);
+      b = true;
+   }
 
    constant_initializer<T, &get_constant_pi<T> >::do_nothing();
 

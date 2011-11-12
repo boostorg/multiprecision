@@ -227,7 +227,7 @@ void eval_exp(T& result, const T& x)
       xx.negate();
 
    // Check the range of the argument.
-   static const canonical_exp_type maximum_arg_for_exp = std::numeric_limits<mp_number<T> >::max_exponent == 0 ? std::numeric_limits<long>::max() : std::numeric_limits<mp_number<T> >::max_exponent;
+   static const canonical_exp_type maximum_arg_for_exp = std::numeric_limits<mp_number<T> >::max_exponent == 0 ? (std::numeric_limits<long>::max)() : std::numeric_limits<mp_number<T> >::max_exponent;
 
    if(xx.compare(maximum_arg_for_exp) >= 0)
    {
@@ -356,6 +356,7 @@ void eval_log(T& result, const T& arg)
    }
    
    multiply(result, get_constant_ln2<T>(), canonical_exp_type(e));
+   INSTRUMENT_BACKEND(result);
    subtract(t, ui_type(1)); /* -0.3 <= t <= 0.3 */
    if(!alternate)
       t.negate(); /* 0 <= t <= 0.33333 */
@@ -371,6 +372,7 @@ void eval_log(T& result, const T& arg)
    multiply(lim, result, std::numeric_limits<mp_number<T> >::epsilon().backend());
    if(get_sign(lim) < 0)
       lim.negate();
+   INSTRUMENT_BACKEND(lim);
 
    ui_type k = 1;
    do
@@ -378,10 +380,12 @@ void eval_log(T& result, const T& arg)
       ++k;
       multiply(pow, t);
       divide(t2, pow, k);
+      INSTRUMENT_BACKEND(t2);
       if(alternate && ((k & 1) != 0))
          add(result, t2);
       else
          subtract(result, t2);
+      INSTRUMENT_BACKEND(result);
    }while(lim.compare(t2) < 0);
 }
 

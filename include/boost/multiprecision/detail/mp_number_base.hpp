@@ -220,7 +220,7 @@ struct mp_exp<tag, Arg1, void, void>
 
    mp_exp(const Arg1& a) : arg(a) {}
 
-   left_type left()const { return arg; }
+   left_type left()const { return left_type(arg); }
 
    const Arg1& left_ref()const{ return arg; }
 
@@ -243,7 +243,7 @@ struct mp_exp<terminal, Arg1, void, void>
    typedef Arg1 result_type;
    typedef terminal tag_type;
 
-   mp_exp(const Arg1& a) : arg(a) {}
+   explicit mp_exp(const Arg1& a) : arg(a) {}
 
    const Arg1& value()const { return arg; }
 
@@ -271,8 +271,8 @@ struct mp_exp<tag, Arg1, Arg2, void>
 
    mp_exp(const Arg1& a1, const Arg2& a2) : arg1(a1), arg2(a2) {}
 
-   left_type left()const { return arg1; }
-   right_type right()const { return arg2; }
+   left_type left()const { return left_type(arg1); }
+   right_type right()const { return right_type(arg2); }
    const Arg1& left_ref()const{ return arg1; }
    const Arg2& right_ref()const{ return arg2; }
 
@@ -308,9 +308,9 @@ struct mp_exp
 
    mp_exp(const Arg1& a1, const Arg2& a2, const Arg3& a3) : arg1(a1), arg2(a2), arg3(a3) {}
 
-   left_type left()const { return arg1; }
-   middle_type middle()const { return arg2; }
-   right_type right()const { return arg3; }
+   left_type left()const { return left_type(arg1); }
+   middle_type middle()const { return middle_type(arg2); }
+   right_type right()const { return right_type(arg3); }
    const Arg1& left_ref()const{ return arg1; }
    const Arg2& middle_ref()const{ return arg2; }
    const Arg3& right_ref()const{ return arg3; }
@@ -343,13 +343,13 @@ inline const mp_number<B>& operator + (const mp_number<B>& v) { return v; }
 template <class tag, class Arg1, class Arg2, class Arg3>
 inline const detail::mp_exp<tag, Arg1, Arg2, Arg3>& operator + (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& v) { return v; }
 template <class B>
-inline detail::mp_exp<detail::negate, mp_number<B> > operator - (const mp_number<B>& v) { return v; }
+inline detail::mp_exp<detail::negate, mp_number<B> > operator - (const mp_number<B>& v) { return detail::mp_exp<detail::negate, mp_number<B> >(v); }
 template <class tag, class Arg1, class Arg2, class Arg3>
-inline detail::mp_exp<detail::negate, detail::mp_exp<tag, Arg1, Arg2, Arg3> > operator - (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& v) { return v; }
+inline detail::mp_exp<detail::negate, detail::mp_exp<tag, Arg1, Arg2, Arg3> > operator - (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& v) { return detail::mp_exp<detail::negate, detail::mp_exp<tag, Arg1, Arg2, Arg3> >(v); }
 template <class B>
-inline detail::mp_exp<detail::complement_immediates, mp_number<B> > operator ~ (const mp_number<B>& v) { return v; }
+inline detail::mp_exp<detail::complement_immediates, mp_number<B> > operator ~ (const mp_number<B>& v) { return detail::mp_exp<detail::complement_immediates, mp_number<B> >(v); }
 template <class tag, class Arg1, class Arg2, class Arg3>
-inline detail::mp_exp<detail::bitwise_complement, detail::mp_exp<tag, Arg1, Arg2, Arg3> > operator ~ (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& v) { return v; }
+inline detail::mp_exp<detail::bitwise_complement, detail::mp_exp<tag, Arg1, Arg2, Arg3> > operator ~ (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& v) { return detail::mp_exp<detail::bitwise_complement, detail::mp_exp<tag, Arg1, Arg2, Arg3> >(v); }
 //
 // Then addition:
 //

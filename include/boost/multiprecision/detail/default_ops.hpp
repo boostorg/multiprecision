@@ -14,6 +14,16 @@
 #include <boost/mpl/front.hpp>
 #include <boost/cstdint.hpp>
 
+#ifndef INSTRUMENT_BACKEND
+#ifndef BOOST_MP_INSTRUMENT
+#define INSTRUMENT_BACKEND(x)
+#else
+#define INSTRUMENT_BACKEND(x)\
+   std::cout << BOOST_STRINGIZE(x) << " = " << x.str(0, true) << std::endl;
+#endif
+#endif
+
+
 namespace boost{ namespace multiprecision{ namespace default_ops{
 
 //
