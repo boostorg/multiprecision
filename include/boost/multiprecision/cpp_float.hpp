@@ -850,9 +850,13 @@ cpp_float<Digits10>& cpp_float<Digits10>::operator/=(const cpp_float<Digits10>& 
 
    if(u_and_v_are_finite_and_identical)
    {
-      *this = one();
       if(neg != v.neg)
+      {
+         *this = one();
          negate();
+      }
+      else
+         *this = one();
       return *this;
    }
    else
@@ -1108,7 +1112,7 @@ cpp_float<Digits10>& cpp_float<Digits10>::calculate_inv()
 
    static const boost::int32_t double_digits10_minus_one = std::numeric_limits<double>::digits10 - 1;
 
-   for(boost::uint32_t digits = double_digits10_minus_one; digits <= Digits10; digits *= static_cast<boost::int32_t>(2))
+   for(boost::uint32_t digits = double_digits10_minus_one; digits <= cpp_float_max_digits10; digits *= static_cast<boost::int32_t>(2))
    {
       // Adjust precision of the terms.
       precision(static_cast<boost::int32_t>(digits * static_cast<boost::int32_t>(2)));
@@ -1181,9 +1185,9 @@ cpp_float<Digits10>& cpp_float<Digits10>::calculate_sqrt(void)
    // http://www.jjj.de/pibook/pibook.html
    // http://www.amazon.com/exec/obidos/tg/detail/-/3540665722/qid=1035535482/sr=8-7/ref=sr_8_7/104-3357872-6059916?v=glance&n=507846
 
-   static const boost::uint32_t double_digits10_minus_one = static_cast<boost::int32_t>(static_cast<boost::int32_t>(Digits10) - static_cast<boost::int32_t>(1));
+   static const boost::uint32_t double_digits10_minus_one = std::numeric_limits<double>::digits10 - 1;
 
-   for(boost::uint32_t digits = double_digits10_minus_one; digits <= Digits10; digits *= 2u)
+   for(boost::uint32_t digits = double_digits10_minus_one; digits <= cpp_float_max_digits10; digits *= 2u)
    {
       // Adjust precision of the terms.
       precision(digits * 2);

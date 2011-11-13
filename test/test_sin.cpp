@@ -232,9 +232,6 @@ T("8.650871796830672527081873591655777773059986288175183143531618768919892399328
       unsigned err = e.template convert_to<unsigned>();
       if(err > max_err)
       {
-         std::cout << val << std::endl;
-         std::cout << small_data[k] << std::endl;
-         std::cout << e << std::endl;
          max_err = err;
       }
       val = sin(-(euler_gamma + k) / 53);

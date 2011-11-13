@@ -168,8 +168,6 @@ void test()
       if(err > max_err)
       {
          max_err = err;
-         std::cout << val << std::endl;
-         std::cout << T(-data[k]) << std::endl;
       }
 
       val = boost::multiprecision::log10(tenth + pi * (100 * k) * (100 * k));

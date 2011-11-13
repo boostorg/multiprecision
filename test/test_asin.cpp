@@ -69,8 +69,6 @@ void test()
       err = e.template convert_to<unsigned>();
       if(err > max_err)
       {
-         std::cout << val << std::endl;
-         std::cout << -exact_data[k][0] << std::endl;
          max_err = err;
       }
    }

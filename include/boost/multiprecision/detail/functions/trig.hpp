@@ -653,6 +653,19 @@ void eval_atan(T& result, const T& x)
 template <class T>
 void eval_atan2(T& result, const T& y, const T& x)
 {
+   if(&result == &y)
+   {
+      T temp(y);
+      eval_atan2(result, temp, x);
+      return;
+   }
+   else if(&result == &x)
+   {
+      T temp(x);
+      eval_atan2(result, y, temp);
+      return;
+   }
+
    typedef typename boost::multiprecision::detail::canonical<boost::int32_t, T>::type si_type;
    typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
    typedef typename T::exponent_type exp_type;
