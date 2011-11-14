@@ -19,7 +19,7 @@ void hyp0F1(T& result, const T& b, const T& x)
    typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
    typedef typename T::exponent_type exp_type;
    typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
-   typedef typename mpl::front<typename T::real_types>::type fp_type;
+   typedef typename mpl::front<typename T::float_types>::type fp_type;
 
    // Compute the series representation of Hypergeometric0F1 taken from
    // http://functions.wolfram.com/HypergeometricFunctions/Hypergeometric0F1/06/01/01/
@@ -80,7 +80,7 @@ void eval_sin(T& result, const T& x)
    typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
    typedef typename T::exponent_type exp_type;
    typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
-   typedef typename mpl::front<typename T::real_types>::type fp_type;
+   typedef typename mpl::front<typename T::float_types>::type fp_type;
 
    switch(eval_fpclassify(x))
    {
@@ -218,7 +218,7 @@ void eval_cos(T& result, const T& x)
    typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
    typedef typename T::exponent_type exp_type;
    typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
-   typedef typename mpl::front<typename T::real_types>::type fp_type;
+   typedef typename mpl::front<typename T::float_types>::type fp_type;
 
    switch(eval_fpclassify(x))
    {
@@ -359,7 +359,7 @@ void hyp2F1(T& result, const T& a, const T& b, const T& c, const T& x)
    typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
    typedef typename T::exponent_type exp_type;
    typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
-   typedef typename mpl::front<typename T::real_types>::type fp_type;
+   typedef typename mpl::front<typename T::float_types>::type fp_type;
 
    T x_pow_n_div_n_fact(x);
    T pochham_a         (a);
@@ -417,7 +417,7 @@ void eval_asin(T& result, const T& x)
    typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
    typedef typename T::exponent_type exp_type;
    typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
-   typedef typename mpl::front<typename T::real_types>::type fp_type;
+   typedef typename mpl::front<typename T::float_types>::type fp_type;
 
    if(&result == &x)
    {
@@ -567,7 +567,7 @@ void eval_atan(T& result, const T& x)
    typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
    typedef typename T::exponent_type exp_type;
    typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
-   typedef typename mpl::front<typename T::real_types>::type fp_type;
+   typedef typename mpl::front<typename T::float_types>::type fp_type;
 
    switch(eval_fpclassify(x))
    {
@@ -670,7 +670,7 @@ void eval_atan2(T& result, const T& y, const T& x)
    typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
    typedef typename T::exponent_type exp_type;
    typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
-   typedef typename mpl::front<typename T::real_types>::type fp_type;
+   typedef typename mpl::front<typename T::float_types>::type fp_type;
 
    switch(eval_fpclassify(y))
    {

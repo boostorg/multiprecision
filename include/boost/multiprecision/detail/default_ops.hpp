@@ -303,7 +303,7 @@ struct calculate_next_larger_type
       typename mpl::if_<
          is_unsigned<R>,
          typename B::unsigned_types,
-         typename B::real_types
+         typename B::float_types
       >::type
    >::type list_type;
    typedef typename has_enough_bits<R, std::numeric_limits<R>::digits>::template type<mpl::_> pred_type;

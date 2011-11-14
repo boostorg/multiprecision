@@ -144,7 +144,7 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
    typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
    typedef typename T::exponent_type exp_type;
    typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
-   typedef typename mpl::front<typename T::real_types>::type fp_type;
+   typedef typename mpl::front<typename T::float_types>::type fp_type;
 
    BOOST_ASSERT(&H1F0 != &x);
    BOOST_ASSERT(&H1F0 != &a);
@@ -341,7 +341,7 @@ void eval_log(T& result, const T& arg)
    typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
    typedef typename T::exponent_type exp_type;
    typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
-   typedef typename mpl::front<typename T::real_types>::type fp_type;
+   typedef typename mpl::front<typename T::float_types>::type fp_type;
 
    exp_type e;
    T t;
@@ -421,7 +421,7 @@ inline void eval_pow(T& result, const T& x, const T& a)
    typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
    typedef typename T::exponent_type exp_type;
    typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
-   typedef typename mpl::front<typename T::real_types>::type fp_type;
+   typedef typename mpl::front<typename T::float_types>::type fp_type;
 
    if((&result == &x) || (&result == &a))
    {
@@ -551,7 +551,7 @@ namespace detail{
       typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
       typedef typename T::exponent_type exp_type;
       typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
-      typedef typename mpl::front<typename T::real_types>::type fp_type;
+      typedef typename mpl::front<typename T::float_types>::type fp_type;
 
       switch(eval_fpclassify(x))
       {

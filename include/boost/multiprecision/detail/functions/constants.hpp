@@ -50,7 +50,7 @@ template <class T>
 void calc_e(T& result, unsigned digits)
 {
    typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
-   typedef typename mpl::front<typename T::real_types>::type real_type;
+   typedef typename mpl::front<typename T::float_types>::type real_type;
    T lim;
    lim = ui_type(1);
    eval_ldexp(lim, lim, digits);
@@ -72,7 +72,7 @@ template <class T>
 void calc_pi(T& result, unsigned digits)
 {
    typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
-   typedef typename mpl::front<typename T::real_types>::type real_type;
+   typedef typename mpl::front<typename T::float_types>::type real_type;
 
    T a;
    a = ui_type(1);

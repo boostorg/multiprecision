@@ -701,14 +701,14 @@ a variable of B, `cb` and `cb2` are constant variables of type B, `a` is a varia
                    listed in order of size, smallest first, and shall terminate in the type that is `std::intmax_t`.]]
 [[`B::unsigned_types`][`mpl::list<type-list>`][A list of unsigned integral types that can be assigned to type B.  The types shall be
                    listed in order of size, smallest first, and shall terminate in the type that is `std::uintmax_t`.]]
-[[`B::real_types`][`mpl::list<type-list>`][A list of floating point types that can be assigned to type B.The types shall be
+[[`B::float_types`][`mpl::list<type-list>`][A list of floating point types that can be assigned to type B.The types shall be
                    listed in order of size, smallest first, and shall terminate in type `long double`.]]
 [[`B::exponent_type`][A signed integral type.][The type of the exponent of type B.]]
 [[`B()`][ ][Default constructor.]]
 [[`B(cb)`][ ][Copy Constructor.]]
 [[`b = b`][`B&`][Assignment operator.]]
 [[`b = a`][`B&`][Assignment from an Arithmetic type.  The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`b = s`][`B&`][Assignment from a string.]]
 [[`b.swap(b)`][`void`][Swaps the contents of it's arguments.]]
 [[`cb.str(ui, bb)`][`std::string`][Returns the string representation of `b` with `ui` digits and in scientific format if `bb` is `true`.
@@ -718,7 +718,7 @@ a variable of B, `cb` and `cb2` are constant variables of type B, `a` is a varia
                    if `cb == cb2`.]]
 [[`cb.compare(a)`][`int`][Compares `cb` and `a`, returns a value less than zero if `cb < a`, a value greater than zero if `cb > a` and zero
                    if `cb == a`.  The type of `a` shall be listed in one of the type lists
-                   `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+                   `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`add(b, cb)`][`void`][Adds `cb` to `b`.]]
 [[`subtract(b, cb)`][`void`][Subtracts `cb` from `b`.]]
 [[`multiply(b, cb)`][`void`][Multiplies `b` by `cb`.]]
@@ -744,61 +744,61 @@ a variable of B, `cb` and `cb2` are constant variables of type B, `a` is a varia
 [table Optional Requirements on the Backend Type
 [[Expression][Returns][Comments]]
 [[`add(b, a)`][`void`][Adds `a` to `b`.  The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`subtract(b, a)`][`void`][Subtracts `a` from `b`.  The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`multiply(b, a)`][`void`][Multiplies `b` by `a`.  The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`divide(b, a)`][`void`][Divides `b` by `a`.  The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`modulus(b, a)`][`void`][Computes `b %= cb`, only required when `B` is an integer type.  The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`bitwise_and(b, a)`][`void`][Computes `b &= cb`, only required when `B` is an integer type.  The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`bitwise_or(b, a)`][`void`][Computes `b |= cb`, only required when `B` is an integer type.  The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`bitwise_xor(b, a)`][`void`][Computes `b ^= cb`, only required when `B` is an integer type.  The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`add(b, cb, cb2)`][`void`][Add `cb` to `cb2` and stores the result in `b`.]]
 [[`subtract(b, cb, cb2)`][`void`][Subtracts `cb2` from `cb` and stores the result in `b`.]]
 [[`multiply(b, cb, cb2)`][`void`][Multiplies `cb` by `cb2` and stores the result in `b`.]]
 [[`divide(b, cb, cb2)`][`void`][Divides `cb` by `cb2` and stores the result in `b`.]]
 [[`add(b, cb, a)`][`void`][Add `cb` to `a` and stores the result in `b`.  The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`subtract(b, cb, a)`][`void`][Subtracts `a` from `cb` and stores the result in `b`.  The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`multiply(b, cb, a)`][`void`][Multiplies `cb` by `a` and stores the result in `b`.  The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`divide(b, cb, a)`][`void`][Divides `cb` by `a` and stores the result in `b`.  The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`modulus(b, cb, cb2)`][`void`][Computes `cb % cb2` and stores the result in `b`, only required when `B` is an integer type.]]
 [[`bitwise_and(b, cb, cb2)`][`void`][Computes `cb & cb2` and stores the result in `b`, only required when `B` is an integer type.]]
 [[`bitwise_or(b, cb, cb2)`][`void`][Computes `cb | cb2` and stores the result in `b`, only required when `B` is an integer type.]]
 [[`bitwise_xor(b, cb, cb2)`][`void`][Computes `cb ^ cb2` and stores the result in `b`, only required when `B` is an integer type.]]
 [[`add(b, a, cb)`][`void`][Add `a` to `cb` and stores the result in `b`.  The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`subtract(b, a, cb)`][`void`][Subtracts `cb` from `a` and stores the result in `b`.  The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`multiply(b, a, cb)`][`void`][Multiplies `a` by `cb` and stores the result in `b`.  The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`divide(b, a, cb)`][`void`][Divides `a` by `cb` and stores the result in `b`.  The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`modulus(b, cb, a)`][`void`][Computes `cb % a` and stores the result in `b`, only required when `B` is an integer type. The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`bitwise_and(b, cb, a)`][`void`][Computes `cb & a` and stores the result in `b`, only required when `B` is an integer type. The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`bitwise_or(b, cb, a)`][`void`][Computes `cb | a` and stores the result in `b`, only required when `B` is an integer type. The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`bitwise_xor(b, cb, a)`][`void`][Computes `cb ^ a` and stores the result in `b`, only required when `B` is an integer type. The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`modulus(b, a, cb)`][`void`][Computes `cb % a` and stores the result in `b`, only required when `B` is an integer type. The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`bitwise_and(b, a, cb)`][`void`][Computes `cb & a` and stores the result in `b`, only required when `B` is an integer type. The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`bitwise_or(b, a, cb)`][`void`][Computes `cb | a` and stores the result in `b`, only required when `B` is an integer type. The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`bitwise_xor(b, a, cb)`][`void`][Computes `a ^ cb` and stores the result in `b`, only required when `B` is an integer type. The type of `a` shall be listed in one of the type lists
-            `B::signed_types`, `B::unsigned_types` or `B::real_types`.]]
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`left_shift(b, cb, ui)`][`void`][Computes `cb << ui` and stores the result in `b`, only required when `B` is an integer type.]]
 [[`right_shift(b, cb, ui)`][`void`][Computes `cb >> ui` and stores the result in `b`, only required when `B` is an integer type.]]
 [[`increment(b)`][void][Increments the value of `b` by one.]]

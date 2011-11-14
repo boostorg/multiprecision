@@ -58,7 +58,7 @@ struct canonical_imp<Val, Backend, mpl::int_<2> >
 {
    typedef typename has_enough_bits<std::numeric_limits<Val>::digits>::template type<mpl::_> pred_type;
    typedef typename mpl::find_if<
-      typename Backend::real_types,
+      typename Backend::float_types,
       pred_type
    >::type iter_type;
    typedef typename mpl::deref<iter_type>::type type;

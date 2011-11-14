@@ -20,7 +20,7 @@ struct arithmetic_backend
 {
    typedef mpl::list<long long>                 signed_types;
    typedef mpl::list<unsigned long long>        unsigned_types;
-   typedef mpl::list<long double>               real_types;
+   typedef mpl::list<long double>               float_types;
    typedef int                                  exponent_type;
 
    arithmetic_backend(){}

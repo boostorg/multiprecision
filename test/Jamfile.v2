@@ -489,7 +489,7 @@ run ../example/mpfr_snips.cpp mpfr
         : # requirements
          [ check-target-builds ../config//has_mpfr : : <build>no ] ;
 
-run ../example/mp_float_snips.cpp ;
+run ../example/cpp_float_snips.cpp ;
 
 run test_round.cpp
         : # command line

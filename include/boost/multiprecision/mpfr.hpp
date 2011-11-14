@@ -30,7 +30,7 @@ struct mpfr_float_imp
 {
    typedef mpl::list<long, long long>                     signed_types;
    typedef mpl::list<unsigned long, unsigned long long>   unsigned_types;
-   typedef mpl::list<double, long double>                 real_types;
+   typedef mpl::list<double, long double>                 float_types;
    typedef long                                           exponent_type;
 
    mpfr_float_imp(){}
