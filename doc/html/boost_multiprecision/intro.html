@@ -1,0 +1,476 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Introduction</title>
+<link rel="stylesheet" href="http://www.boost.org/doc/libs/release/doc/src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.76.1">
+<link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
+<link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
+<link rel="prev" href="../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
+<link rel="next" href="tut.html" title="Tutorial">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="tut.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="boost_multiprecision.intro"></a><a class="link" href="intro.html" title="Introduction">Introduction</a>
+</h2></div></div></div>
+<p>
+      The Multiprecision library comes in two distinct parts: an expression-template-enabled
+      front end <code class="computeroutput"><span class="identifier">mp_number</span></code> that handles
+      all the operator overloading, expression evaluation optimization, and code
+      reduction, and a selection of backends that implement the actual arithmetic
+      operations, and need conform only to the reduced interface requirements of
+      the front end.
+    </p>
+<p>
+      The library is often used by using one of the predfined typedefs: for example
+      if you wanted an arbitrary precision integer type using GMP as the underlying
+      implementation then you could use:
+    </p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">gmp</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>  <span class="comment">// Defines the wrappers around the GMP library's types</span>
+
+<span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">mpz_int</span> <span class="identifier">myint</span><span class="special">;</span>    <span class="comment">// Arbitrary precision integer type.</span>
+</pre>
+<p>
+      Alternatively one can compose your own multiprecision type, by combining <code class="computeroutput"><span class="identifier">mp_number</span></code> with one of the predefined backend
+      types. For example, suppose you wanted a 300 decimal digit floating point type
+      based on the MPFR library, in this case there's no predefined typedef with
+      that level of precision, so instead we compose our own:
+    </p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">mpfr</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>  <span class="comment">// Defines the Backend type that wraps MPFR</span>
+
+<span class="keyword">namespace</span> <span class="identifier">mp</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">;</span>     <span class="comment">// Reduce the typing a bit later...</span>
+
+<span class="keyword">typedef</span> <span class="identifier">mp</span><span class="special">::</span><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">mp</span><span class="special">::</span><span class="identifier">mpfr_float_backend</span><span class="special">&lt;</span><span class="number">300</span><span class="special">&gt;</span> <span class="special">&gt;</span>  <span class="identifier">my_float</span><span class="special">;</span>
+
+<span class="identifier">my_float</span> <span class="identifier">a</span><span class="special">,</span> <span class="identifier">b</span><span class="special">,</span> <span class="identifier">c</span><span class="special">;</span> <span class="comment">// These variables have 300 decimal digits precision</span>
+</pre>
+<a name="boost_multiprecision.intro.expression_templates"></a><h5>
+<a name="boost_multiprecision.intro.expression_templates-heading"></a>
+      <a class="link" href="intro.html#boost_multiprecision.intro.expression_templates">Expression
+      Templates</a>
+    </h5>
+<p>
+      Class <code class="computeroutput"><span class="identifier">mp_number</span></code> is expression-template-enabled:
+      that means that rather than having a multiplication operator that looks like
+      this:
+    </p>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
+<span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;</span> <span class="keyword">operator</span> <span class="special">*</span> <span class="special">(</span><span class="keyword">const</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">a</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">b</span><span class="special">)</span>
+<span class="special">{</span>
+   <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;</span> <span class="identifier">result</span><span class="special">(</span><span class="identifier">a</span><span class="special">);</span>
+   <span class="identifier">result</span> <span class="special">*=</span> <span class="identifier">b</span><span class="special">;</span>
+   <span class="keyword">return</span> <span class="identifier">result</span><span class="special">;</span>
+<span class="special">}</span>
+</pre>
+<p>
+      Instead the operator looks more like this:
+    </p>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
+<span class="emphasis"><em>unmentionable-type</em></span> <span class="keyword">operator</span> <span class="special">*</span> <span class="special">(</span><span class="keyword">const</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">a</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">b</span><span class="special">);</span>
+</pre>
+<p>
+      Where the "unmentionable" return type is an implementation detail
+      that, rather than containing the result of the multiplication, contains instructions
+      on how to compute the result. In effect it's just a pair of references to the
+      arguments of the function, plus some compile-time information that stores what
+      the operation is.
+    </p>
+<p>
+      The great advantage of this method is the <span class="emphasis"><em>elimination of temporaries</em></span>:
+      for example the "naive" implementation of <code class="computeroutput"><span class="keyword">operator</span><span class="special">*</span></code> above, requires one temporary for computing
+      the result, and at least another one to return it. It's true that sometimes
+      this overhead can be reduced by using move-semantics, but it can't be eliminated
+      completely. For example, lets suppose we're evaluating a polynomial via Horners
+      method, something like this:
+    </p>
+<pre class="programlisting"><span class="identifier">T</span> <span class="identifier">a</span><span class="special">[</span><span class="number">7</span><span class="special">]</span> <span class="special">=</span> <span class="special">{</span> <span class="comment">/* some values */</span> <span class="special">};</span>
+<span class="comment">//....</span>
+<span class="identifier">y</span> <span class="special">=</span> <span class="special">(((((</span><span class="identifier">a</span><span class="special">[</span><span class="number">6</span><span class="special">]</span> <span class="special">*</span> <span class="identifier">x</span> <span class="special">+</span> <span class="identifier">a</span><span class="special">[</span><span class="number">5</span><span class="special">])</span> <span class="special">*</span> <span class="identifier">x</span> <span class="special">+</span> <span class="identifier">a</span><span class="special">[</span><span class="number">4</span><span class="special">])</span> <span class="special">*</span> <span class="identifier">x</span> <span class="special">+</span> <span class="identifier">a</span><span class="special">[</span><span class="number">3</span><span class="special">])</span> <span class="special">*</span> <span class="identifier">x</span> <span class="special">+</span> <span class="identifier">a</span><span class="special">[</span><span class="number">2</span><span class="special">])</span> <span class="special">*</span> <span class="identifier">x</span> <span class="special">+</span> <span class="identifier">a</span><span class="special">[</span><span class="number">1</span><span class="special">])</span> <span class="special">*</span> <span class="identifier">x</span> <span class="special">+</span> <span class="identifier">a</span><span class="special">[</span><span class="number">0</span><span class="special">];</span>
+</pre>
+<p>
+      If type <code class="computeroutput"><span class="identifier">T</span></code> is an <code class="computeroutput"><span class="identifier">mp_number</span></code>, then this expression is evaluated
+      <span class="emphasis"><em>without creating a single temporary value</em></span>, in contrast
+      if we were using the C++ wrapper that ships with GMP - <code class="computeroutput"><span class="identifier">mpf_class</span></code>
+      - then this expression would result in no less than 11 temporaries (this is
+      true even though mpf_class does use expression templates to reduce the number
+      of temporaries somewhat). Had we used an even simpler wrapper around GMP or
+      MPFR like <code class="computeroutput"><span class="identifier">mpclass</span></code> things would
+      have been even worse and no less that 24 temporaries are created for this simple
+      expression (note - we actually measure the number of memory allocations performed
+      rather than the number of temporaries directly).
+    </p>
+<p>
+      This library also extends expression template support to standard library functions
+      like <code class="computeroutput"><span class="identifier">abs</span></code> or <code class="computeroutput"><span class="identifier">sin</span></code>
+      with <code class="computeroutput"><span class="identifier">mp_number</span></code> arguments. This
+      means that an expression such as:
+    </p>
+<pre class="programlisting"><span class="identifier">y</span> <span class="special">=</span> <span class="identifier">abs</span><span class="special">(</span><span class="identifier">x</span><span class="special">);</span>
+</pre>
+<p>
+      can be evaluated without a single temporary being calculated. Even expressions
+      like:
+    </p>
+<pre class="programlisting"><span class="identifier">y</span> <span class="special">=</span> <span class="identifier">sin</span><span class="special">(</span><span class="identifier">x</span><span class="special">);</span>
+</pre>
+<p>
+      get this treatment, so that variable 'y' is used as "working storage"
+      within the implementation of <code class="computeroutput"><span class="identifier">sin</span></code>,
+      thus reducing the number of temporaries used by one. Of course, should you
+      write:
+    </p>
+<pre class="programlisting"><span class="identifier">x</span> <span class="special">=</span> <span class="identifier">sin</span><span class="special">(</span><span class="identifier">x</span><span class="special">);</span>
+</pre>
+<p>
+      Then we clearly can't use <code class="computeroutput"><span class="identifier">x</span></code>
+      as working storage during the calculation, so then a temporary variable is
+      created in this case.
+    </p>
+<p>
+      Given the comments above, you might be forgiven for thinking that expression-templates
+      are some kind of universal-panacea: sadly though, all tricks like this have
+      their downsides. For one thing, expression template libraries like this one,
+      tend to be slower to compile than their simpler cousins, they're also harder
+      to debug (should you actually want to step through our code!), and rely on
+      compiler optimizations being turned on to give really good performance. Also
+      since the return type from expressions involving <code class="computeroutput"><span class="identifier">mp_number</span></code>'s
+      is an "unmentionable implementation detail", you have to be careful
+      to cast the result of an expression to the actual number type when passing
+      an expression to a template function. For example given:
+    </p>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="keyword">void</span> <span class="identifier">my_proc</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">T</span><span class="special">&amp;);</span>
+</pre>
+<p>
+      Then calling:
+    </p>
+<pre class="programlisting"><span class="identifier">my_proc</span><span class="special">(</span><span class="identifier">a</span><span class="special">+</span><span class="identifier">b</span><span class="special">);</span>
+</pre>
+<p>
+      Will very likely result in obscure error messages inside the body of <code class="computeroutput"><span class="identifier">my_proc</span></code> - since we've passed it an expression
+      template type, and not a number type. Instead we probably need:
+    </p>
+<pre class="programlisting"><span class="identifier">my_proc</span><span class="special">(</span><span class="identifier">my_mp_number_type</span><span class="special">(</span><span class="identifier">a</span><span class="special">+</span><span class="identifier">b</span><span class="special">));</span>
+</pre>
+<p>
+      Having said that, these situations don't occur that often - or indeed not at
+      all for non-template functions. In addition all the functions in the Boost.Math
+      library will automatically convert expression-template arguments to the underlying
+      number type without you having to do anything, so:
+    </p>
+<pre class="programlisting"><span class="identifier">mpfr_float_100</span> <span class="identifier">a</span><span class="special">(</span><span class="number">20</span><span class="special">),</span> <span class="identifier">delta</span><span class="special">(</span><span class="number">0.125</span><span class="special">);</span>
+<span class="identifier">boost</span><span class="special">::</span><span class="identifier">math</span><span class="special">::</span><span class="identifier">gamma_p</span><span class="special">(</span><span class="identifier">a</span><span class="special">,</span> <span class="identifier">a</span> <span class="special">+</span> <span class="identifier">delta</span><span class="special">);</span>
+</pre>
+<p>
+      Will work just fine, with the <code class="computeroutput"><span class="identifier">a</span> <span class="special">+</span> <span class="identifier">delta</span></code> expression
+      template argument getting converted to an <code class="computeroutput"><span class="identifier">mpfr_float_100</span></code>
+      internally by the Boost.Math library.
+    </p>
+<p>
+      One other potential pitfall that's only possible in C++11: you should never
+      store an expression template using:
+    </p>
+<pre class="programlisting"><span class="keyword">auto</span> <span class="identifier">my_expression</span> <span class="special">=</span> <span class="identifier">a</span> <span class="special">+</span> <span class="identifier">b</span> <span class="special">-</span> <span class="identifier">c</span><span class="special">;</span>
+</pre>
+<p>
+      Unless you're absolutely sure that the lifetimes of <code class="computeroutput"><span class="identifier">a</span></code>,
+      <code class="computeroutput"><span class="identifier">b</span></code> and <code class="computeroutput"><span class="identifier">c</span></code>
+      will outlive that of <code class="computeroutput"><span class="identifier">my_expression</span></code>.
+    </p>
+<p>
+      And finally.... the performance improvements from an expression template library
+      like this are often not as dramatic as the reduction in number of temporaries
+      would suggest. For example if we compare this library with <code class="computeroutput"><span class="identifier">mpfr_class</span></code>
+      and <code class="computeroutput"><span class="identifier">mpreal</span></code>, with all three
+      using the underlying MPFR library at 50 decimal digits precision then we see
+      the following typical results for polynomial execution:
+    </p>
+<div class="table">
+<a name="boost_multiprecision.intro.evaluation_of_order_6_polynomial_"></a><p class="title"><b>Table&#160;1.1.&#160;Evaluation of Order 6 Polynomial.</b></p>
+<div class="table-contents"><table class="table" summary="Evaluation of Order 6 Polynomial.">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+              <p>
+                Library
+              </p>
+            </th>
+<th>
+              <p>
+                Relative Time
+              </p>
+            </th>
+<th>
+              <p>
+                Relative number of memory allocations
+              </p>
+            </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+              <p>
+                mp_number
+              </p>
+            </td>
+<td>
+              <p>
+                1.0 (0.00793s)
+              </p>
+            </td>
+<td>
+              <p>
+                1.0 (2996 total)
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                mpfr_class
+              </p>
+            </td>
+<td>
+              <p>
+                1.2 (0.00931s)
+              </p>
+            </td>
+<td>
+              <p>
+                4.3 (12976 total)
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                mpreal
+              </p>
+            </td>
+<td>
+              <p>
+                1.9 (0.0148s)
+              </p>
+            </td>
+<td>
+              <p>
+                9.3 (27947 total)
+              </p>
+            </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><p>
+      As you can see the execution time increases a lot more slowly than the number
+      of memory allocations. There are a number of reasons for this:
+    </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          The cost of extended-precision multiplication and division is so great,
+          that the times taken for these tend to swamp everything else.
+        </li>
+<li class="listitem">
+          The cost of an in-place multiplication (using <code class="computeroutput"><span class="keyword">operator</span><span class="special">*=</span></code>) tends to be more than an out-of-place
+          <code class="computeroutput"><span class="keyword">operator</span><span class="special">*</span></code>
+          (typically <code class="computeroutput"><span class="keyword">operator</span> <span class="special">*=</span></code>
+          has to create a temporary workspace to carry out the multiplication, where
+          as <code class="computeroutput"><span class="keyword">operator</span><span class="special">*</span></code>
+          can use the target variable as workspace). Since the expression templates
+          carry out their magic by converting out-of-place operators to in-place
+          ones, we necessarily take this hit. Even so the transformation is more
+          efficient than creating the extra temporary variable, just not by as much
+          as one would hope.
+        </li>
+</ul></div>
+<p>
+      We'll conclude this section by providing some more performance comparisons
+      between these three libraries, again, all are using MPFR to carry out the underlying
+      arithmetic, and all are operating at the same precision (50 decimal places):
+    </p>
+<div class="table">
+<a name="boost_multiprecision.intro.evaluation_of_boost_math_s_bessel_function_test_data"></a><p class="title"><b>Table&#160;1.2.&#160;Evaluation of Boost.Math's Bessel function test data</b></p>
+<div class="table-contents"><table class="table" summary="Evaluation of Boost.Math's Bessel function test data">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+              <p>
+                Library
+              </p>
+            </th>
+<th>
+              <p>
+                Relative Time
+              </p>
+            </th>
+<th>
+              <p>
+                Relative Number of Memory Allocations
+              </p>
+            </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+              <p>
+                mp_number
+              </p>
+            </td>
+<td>
+              <p>
+                1.0 (6.21s)
+              </p>
+            </td>
+<td>
+              <p>
+                1.0 (2685469)
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                mpfr_class
+              </p>
+            </td>
+<td>
+              <p>
+                1.04 (6.45s)
+              </p>
+            </td>
+<td>
+              <p>
+                1.47 (3946007)
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                mpreal
+              </p>
+            </td>
+<td>
+              <p>
+                1.53 (9.52s)
+              </p>
+            </td>
+<td>
+              <p>
+                4.92 (13222940)
+              </p>
+            </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.intro.evaluation_of_boost_math_s_non_central_t_distribution_test_data"></a><p class="title"><b>Table&#160;1.3.&#160;Evaluation of Boost.Math's Non-Central T distribution test data</b></p>
+<div class="table-contents"><table class="table" summary="Evaluation of Boost.Math's Non-Central T distribution test data">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+              <p>
+                Library
+              </p>
+            </th>
+<th>
+              <p>
+                Relative Time
+              </p>
+            </th>
+<th>
+              <p>
+                Relative Number of Memory Allocations
+              </p>
+            </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+              <p>
+                mp_number
+              </p>
+            </td>
+<td>
+              <p>
+                1.0 (269s)
+              </p>
+            </td>
+<td>
+              <p>
+                1.0 (139082551)
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                mpfr_class
+              </p>
+            </td>
+<td>
+              <p>
+                1.04 (278s)
+              </p>
+            </td>
+<td>
+              <p>
+                1.81 (252400791)
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                mpreal
+              </p>
+            </td>
+<td>
+              <p>
+                1.49 (401s)
+              </p>
+            </td>
+<td>
+              <p>
+                3.22 (447009280)
+              </p>
+            </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break">
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011 John Maddock<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="tut.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

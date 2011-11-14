@@ -20,7 +20,7 @@
 
 [import ../example/gmp_snips.cpp]
 [import ../example/mpfr_snips.cpp]
-[import ../example/mp_float_snips.cpp]
+[import ../example/cpp_float_snips.cpp]
 
 [section:intro Introduction]
 
@@ -233,7 +233,7 @@ The following backends provide real number arithmetic:
 [[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
 [[`mpf_float<N>`][boost/multiprecision/gmp.hpp][2][GMP][Very fast and efficient backend.][Dependency on GNU licenced GMP library.]]
 [[`mpfr_float<N>`][boost/multiprecision/mpfr.hpp][2][GMP and MPFR][Very fast and efficient backend, with it's own standard library implementation.][Dependency on GNU licenced GMP and MPFR libraries.]]
-[[`mp_float<N>`][boost/multiprecision/mp_float.hpp][10][None][Header only, all C++ implementation.][Approximately 2x slower than the MPFR or GMP libraries.]]
+[[`cpp_float<N>`][boost/multiprecision/cpp_float.hpp][10][None][Header only, all C++ implementation.][Approximately 2x slower than the MPFR or GMP libraries.]]
 ]
 
 [h4 gmp_float]
@@ -315,31 +315,31 @@ It's also possible to access the underlying `mpf_t` via the data() member functi
 
 [mpfr_eg]
 
-[h4 mp_float]
+[h4 cpp_float]
 
    namespace boost{ namespace multiprecision{
 
    template <unsigned Digits10>
-   class mp_float;
+   class cpp_float;
 
-   typedef mp_number<mp_float<50> > mp_float_50;
-   typedef mp_number<mp_float<100> > mp_float_100;
+   typedef mp_number<cpp_float<50> > cpp_float_50;
+   typedef mp_number<cpp_float<100> > cpp_float_100;
 
    }} // namespaces
 
-The `mp_float` backend is used in conjunction with `mp_number`: It acts as an entirely C++ (header only and dependency free)
+The `cpp_float` backend is used in conjunction with `mp_number`: It acts as an entirely C++ (header only and dependency free)
 real-number type that is a drop-in replacement for the native C++ floating-point types, but with 
 much greater precision.
 
-Type `mp_float` can be used at fixed precision by specifying a non-zero `Digits10` template parameter.  
-The typedefs mp_float_50 and mp_float_100 provide arithmetic types at 50 and 100 decimal digits precision
+Type `cpp_float` can be used at fixed precision by specifying a non-zero `Digits10` template parameter.  
+The typedefs cpp_float_50 and cpp_float_100 provide arithmetic types at 50 and 100 decimal digits precision
 respectively.
 
 There is full standard library and `numeric_limits` support available for this type.
 
-[h5 mp_float example:]
+[h5 cpp_float example:]
 
-[mp_float_eg]
+[cpp_float_eg]
 
 [endsect]
 
@@ -548,7 +548,7 @@ Returns `true` is `*this` is zero, otherwise `false`.
 
       int sign()const;
 
-Returns a value less than zero if `*this` is negative, a value greater than zero if `*this is positive, and zero
+Returns a value less than zero if `*this` is negative, a value greater than zero if `*this` is positive, and zero
 if `*this` is zero.
 
       std::string str(unsigned precision, bool scientific = true)const;

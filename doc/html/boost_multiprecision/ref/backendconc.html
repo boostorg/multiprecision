@@ -1,0 +1,2024 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Backend Requirements</title>
+<link rel="stylesheet" href="http://www.boost.org/doc/libs/release/doc/src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.76.1">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
+<link rel="up" href="../ref.html" title="Reference">
+<link rel="prev" href="mp_number.html" title="mp_number">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="mp_number.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../ref.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_multiprecision.ref.backendconc"></a><a class="link" href="backendconc.html" title="Backend Requirements">Backend Requirements</a>
+</h3></div></div></div>
+<p>
+        The requirements on the <code class="computeroutput"><span class="identifier">Backend</span></code>
+        template argument to <code class="computeroutput"><span class="identifier">mp_number</span></code>
+        are split up into compulsary requirements, and optional requirements that
+        are either to improve performance or provide optional features.
+      </p>
+<p>
+        In the following tables, type B is the <code class="computeroutput"><span class="identifier">Backend</span></code>
+        template arument to <code class="computeroutput"><span class="identifier">mp_number</span></code>,
+        <code class="computeroutput"><span class="identifier">b</span></code> is a variable of B, <code class="computeroutput"><span class="identifier">cb</span></code> and <code class="computeroutput"><span class="identifier">cb2</span></code>
+        are constant variables of type B, <code class="computeroutput"><span class="identifier">a</span></code>
+        is a variable of Arithmetic type, <code class="computeroutput"><span class="identifier">s</span></code>
+        is a variable of type <code class="computeroutput"><span class="keyword">const</span> <span class="keyword">char</span><span class="special">*</span></code>, <code class="computeroutput"><span class="identifier">ui</span></code> is a variable of type <code class="computeroutput"><span class="keyword">unsigned</span></code>, <code class="computeroutput"><span class="identifier">bb</span></code>
+        is a variable of type <code class="computeroutput"><span class="keyword">bool</span></code>,
+        <code class="computeroutput"><span class="identifier">pa</span></code> is a variable of type
+        pointer-to-arithmetc-type, <code class="computeroutput"><span class="identifier">exp</span></code>
+        is a variable of type <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">exp_type</span></code>, <code class="computeroutput"><span class="identifier">pexp</span></code>
+        is a variable of type <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">exp_type</span><span class="special">*</span></code>.
+      </p>
+<div class="table">
+<a name="boost_multiprecision.ref.backendconc.compulsary_requirements_on_the_backend_type_"></a><p class="title"><b>Table&#160;1.4.&#160;Compulsary Requirements on the Backend type.</b></p>
+<div class="table-contents"><table class="table" summary="Compulsary Requirements on the Backend type.">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Expression
+                </p>
+              </th>
+<th>
+                <p>
+                  Return Type
+                </p>
+              </th>
+<th>
+                <p>
+                  Comments
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">mpl</span><span class="special">::</span><span class="identifier">list</span><span class="special">&lt;</span><span class="identifier">type</span><span class="special">-</span><span class="identifier">list</span><span class="special">&gt;</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  A list of signed integral types that can be assigned to type B.
+                  The types shall be listed in order of size, smallest first, and
+                  shall terminate in the type that is <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">intmax_t</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">mpl</span><span class="special">::</span><span class="identifier">list</span><span class="special">&lt;</span><span class="identifier">type</span><span class="special">-</span><span class="identifier">list</span><span class="special">&gt;</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  A list of unsigned integral types that can be assigned to type
+                  B. The types shall be listed in order of size, smallest first,
+                  and shall terminate in the type that is <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">uintmax_t</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">mpl</span><span class="special">::</span><span class="identifier">list</span><span class="special">&lt;</span><span class="identifier">type</span><span class="special">-</span><span class="identifier">list</span><span class="special">&gt;</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  A list of floating point types that can be assigned to type B.The
+                  types shall be listed in order of size, smallest first, and shall
+                  terminate in type <code class="computeroutput"><span class="keyword">long</span> <span class="keyword">double</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">exponent_type</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  A signed integral type.
+                </p>
+              </td>
+<td>
+                <p>
+                  The type of the exponent of type B.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">()</span></code>
+                </p>
+              </td>
+<td>
+              </td>
+<td>
+                <p>
+                  Default constructor.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">(</span><span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+              </td>
+<td>
+                <p>
+                  Copy Constructor.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">b</span> <span class="special">=</span>
+                  <span class="identifier">b</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">&amp;</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Assignment operator.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">b</span> <span class="special">=</span>
+                  <span class="identifier">a</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">&amp;</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Assignment from an Arithmetic type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
+                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">b</span> <span class="special">=</span>
+                  <span class="identifier">s</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">&amp;</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Assignment from a string.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">b</span><span class="special">.</span><span class="identifier">swap</span><span class="special">(</span><span class="identifier">b</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Swaps the contents of it's arguments.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">cb</span><span class="special">.</span><span class="identifier">str</span><span class="special">(</span><span class="identifier">ui</span><span class="special">,</span>
+                  <span class="identifier">bb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Returns the string representation of <code class="computeroutput"><span class="identifier">b</span></code>
+                  with <code class="computeroutput"><span class="identifier">ui</span></code> digits
+                  and in scientific format if <code class="computeroutput"><span class="identifier">bb</span></code>
+                  is <code class="computeroutput"><span class="keyword">true</span></code>. If <code class="computeroutput"><span class="identifier">ui</span></code> is zero, then returns as many
+                  digits as are required to reconstruct the original value.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">b</span><span class="special">.</span><span class="identifier">negate</span><span class="special">()</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Negates <code class="computeroutput"><span class="identifier">b</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">cb</span><span class="special">.</span><span class="identifier">compare</span><span class="special">(</span><span class="identifier">cb2</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">int</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Compares <code class="computeroutput"><span class="identifier">cb</span></code> and
+                  <code class="computeroutput"><span class="identifier">cb2</span></code>, returns a
+                  value less than zero if <code class="computeroutput"><span class="identifier">cb</span>
+                  <span class="special">&lt;</span> <span class="identifier">cb2</span></code>,
+                  a value greater than zero if <code class="computeroutput"><span class="identifier">cb</span>
+                  <span class="special">&gt;</span> <span class="identifier">cb2</span></code>
+                  and zero if <code class="computeroutput"><span class="identifier">cb</span> <span class="special">==</span> <span class="identifier">cb2</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">cb</span><span class="special">.</span><span class="identifier">compare</span><span class="special">(</span><span class="identifier">a</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">int</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Compares <code class="computeroutput"><span class="identifier">cb</span></code> and
+                  <code class="computeroutput"><span class="identifier">a</span></code>, returns a value
+                  less than zero if <code class="computeroutput"><span class="identifier">cb</span>
+                  <span class="special">&lt;</span> <span class="identifier">a</span></code>,
+                  a value greater than zero if <code class="computeroutput"><span class="identifier">cb</span>
+                  <span class="special">&gt;</span> <span class="identifier">a</span></code>
+                  and zero if <code class="computeroutput"><span class="identifier">cb</span> <span class="special">==</span> <span class="identifier">a</span></code>.
+                  The type of <code class="computeroutput"><span class="identifier">a</span></code> shall
+                  be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Adds <code class="computeroutput"><span class="identifier">cb</span></code> to <code class="computeroutput"><span class="identifier">b</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Subtracts <code class="computeroutput"><span class="identifier">cb</span></code> from
+                  <code class="computeroutput"><span class="identifier">b</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">multiply</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Multiplies <code class="computeroutput"><span class="identifier">b</span></code> by
+                  <code class="computeroutput"><span class="identifier">cb</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">divide</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Divides <code class="computeroutput"><span class="identifier">b</span></code> by <code class="computeroutput"><span class="identifier">cb</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">modulus</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes <code class="computeroutput"><span class="identifier">b</span> <span class="special">%=</span>
+                  <span class="identifier">cb</span></code>, only required when
+                  <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">bitwise_and</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes <code class="computeroutput"><span class="identifier">b</span> <span class="special">&amp;=</span>
+                  <span class="identifier">cb</span></code>, only required when
+                  <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">bitwise_or</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes <code class="computeroutput"><span class="identifier">b</span> <span class="special">|=</span>
+                  <span class="identifier">cb</span></code>, only required when
+                  <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">bitwise_xor</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes <code class="computeroutput"><span class="identifier">b</span> <span class="special">^=</span>
+                  <span class="identifier">cb</span></code>, only required when
+                  <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">complement</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes the ones-complement of <code class="computeroutput"><span class="identifier">cb</span></code>
+                  and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>,
+                  only required when <code class="computeroutput"><span class="identifier">B</span></code>
+                  is an integer type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">left_shift</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">ui</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes <code class="computeroutput"><span class="identifier">b</span> <span class="special">&lt;&lt;=</span>
+                  <span class="identifier">ui</span></code>, only required when
+                  <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">right_shift</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">ui</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes <code class="computeroutput"><span class="identifier">b</span> <span class="special">&gt;&gt;=</span>
+                  <span class="identifier">ui</span></code>, only required when
+                  <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">convert_to</span><span class="special">(</span><span class="identifier">pa</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Converts <code class="computeroutput"><span class="identifier">cb</span></code> to
+                  the type of <code class="computeroutput"><span class="special">*</span><span class="identifier">pa</span></code>
+                  and store the result in <code class="computeroutput"><span class="special">*</span><span class="identifier">pa</span></code>. Type <code class="computeroutput"><span class="identifier">B</span></code>
+                  shall support conversion to at least types <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">intmax_t</span></code>,
+                  <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">uintmax_t</span></code> and <code class="computeroutput"><span class="keyword">long</span>
+                  <span class="keyword">long</span></code>. Conversion to other
+                  arithmetic types can then be synthesised using other operations.
+                  Conversions to other types are entirely optional.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_frexp</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">pexp</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Stores values in <code class="computeroutput"><span class="identifier">b</span></code>
+                  and <code class="computeroutput"><span class="special">*</span><span class="identifier">pexp</span></code>
+                  such that the value of <code class="computeroutput"><span class="identifier">cb</span></code>
+                  is b * 2<sup>*pexp</sup>, only required when <code class="computeroutput"><span class="identifier">B</span></code>
+                  is a floating point type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_ldexp</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">exp</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Stores a value in <code class="computeroutput"><span class="identifier">b</span></code>
+                  that is cb * 2<sup>exp</sup>, only required when <code class="computeroutput"><span class="identifier">B</span></code>
+                  is a floating point type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_floor</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Stores the floor of <code class="computeroutput"><span class="identifier">cb</span></code>
+                  in <code class="computeroutput"><span class="identifier">b</span></code>, only required
+                  when <code class="computeroutput"><span class="identifier">B</span></code> is a floating
+                  point type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_ceil</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Stores the ceiling of <code class="computeroutput"><span class="identifier">cb</span></code>
+                  in <code class="computeroutput"><span class="identifier">b</span></code>, only required
+                  when <code class="computeroutput"><span class="identifier">B</span></code> is a floating
+                  point type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_sqrt</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Stores the square root of <code class="computeroutput"><span class="identifier">cb</span></code>
+                  in <code class="computeroutput"><span class="identifier">b</span></code>, only required
+                  when <code class="computeroutput"><span class="identifier">B</span></code> is a floating
+                  point type.
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.ref.backendconc.optional_requirements_on_the_backend_type"></a><p class="title"><b>Table&#160;1.5.&#160;Optional Requirements on the Backend Type</b></p>
+<div class="table-contents"><table class="table" summary="Optional Requirements on the Backend Type">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Expression
+                </p>
+              </th>
+<th>
+                <p>
+                  Returns
+                </p>
+              </th>
+<th>
+                <p>
+                  Comments
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">a</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Adds <code class="computeroutput"><span class="identifier">a</span></code> to <code class="computeroutput"><span class="identifier">b</span></code>. The type of <code class="computeroutput"><span class="identifier">a</span></code> shall be listed in one of the
+                  type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>, <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>
+                  or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">a</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Subtracts <code class="computeroutput"><span class="identifier">a</span></code> from
+                  <code class="computeroutput"><span class="identifier">b</span></code>. The type of
+                  <code class="computeroutput"><span class="identifier">a</span></code> shall be listed
+                  in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">multiply</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">a</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Multiplies <code class="computeroutput"><span class="identifier">b</span></code> by
+                  <code class="computeroutput"><span class="identifier">a</span></code>. The type of
+                  <code class="computeroutput"><span class="identifier">a</span></code> shall be listed
+                  in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">divide</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">a</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Divides <code class="computeroutput"><span class="identifier">b</span></code> by <code class="computeroutput"><span class="identifier">a</span></code>. The type of <code class="computeroutput"><span class="identifier">a</span></code> shall be listed in one of the
+                  type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>, <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>
+                  or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">modulus</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">a</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes <code class="computeroutput"><span class="identifier">b</span> <span class="special">%=</span>
+                  <span class="identifier">cb</span></code>, only required when
+                  <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
+                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">bitwise_and</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">a</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes <code class="computeroutput"><span class="identifier">b</span> <span class="special">&amp;=</span>
+                  <span class="identifier">cb</span></code>, only required when
+                  <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
+                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">bitwise_or</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">a</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes <code class="computeroutput"><span class="identifier">b</span> <span class="special">|=</span>
+                  <span class="identifier">cb</span></code>, only required when
+                  <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
+                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">bitwise_xor</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">a</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes <code class="computeroutput"><span class="identifier">b</span> <span class="special">^=</span>
+                  <span class="identifier">cb</span></code>, only required when
+                  <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
+                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">cb2</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Add <code class="computeroutput"><span class="identifier">cb</span></code> to <code class="computeroutput"><span class="identifier">cb2</span></code> and stores the result in
+                  <code class="computeroutput"><span class="identifier">b</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">cb2</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Subtracts <code class="computeroutput"><span class="identifier">cb2</span></code> from
+                  <code class="computeroutput"><span class="identifier">cb</span></code> and stores the
+                  result in <code class="computeroutput"><span class="identifier">b</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">multiply</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">cb2</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Multiplies <code class="computeroutput"><span class="identifier">cb</span></code> by
+                  <code class="computeroutput"><span class="identifier">cb2</span></code> and stores
+                  the result in <code class="computeroutput"><span class="identifier">b</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">divide</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">cb2</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Divides <code class="computeroutput"><span class="identifier">cb</span></code> by
+                  <code class="computeroutput"><span class="identifier">cb2</span></code> and stores
+                  the result in <code class="computeroutput"><span class="identifier">b</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">a</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Add <code class="computeroutput"><span class="identifier">cb</span></code> to <code class="computeroutput"><span class="identifier">a</span></code> and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>. The type of <code class="computeroutput"><span class="identifier">a</span></code> shall be listed in one of the
+                  type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>, <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code>
+                  or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">a</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Subtracts <code class="computeroutput"><span class="identifier">a</span></code> from
+                  <code class="computeroutput"><span class="identifier">cb</span></code> and stores the
+                  result in <code class="computeroutput"><span class="identifier">b</span></code>. The
+                  type of <code class="computeroutput"><span class="identifier">a</span></code> shall
+                  be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">multiply</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">a</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Multiplies <code class="computeroutput"><span class="identifier">cb</span></code> by
+                  <code class="computeroutput"><span class="identifier">a</span></code> and stores the
+                  result in <code class="computeroutput"><span class="identifier">b</span></code>. The
+                  type of <code class="computeroutput"><span class="identifier">a</span></code> shall
+                  be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">divide</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">a</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Divides <code class="computeroutput"><span class="identifier">cb</span></code> by
+                  <code class="computeroutput"><span class="identifier">a</span></code> and stores the
+                  result in <code class="computeroutput"><span class="identifier">b</span></code>. The
+                  type of <code class="computeroutput"><span class="identifier">a</span></code> shall
+                  be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">modulus</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">cb2</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes <code class="computeroutput"><span class="identifier">cb</span> <span class="special">%</span>
+                  <span class="identifier">cb2</span></code> and stores the result
+                  in <code class="computeroutput"><span class="identifier">b</span></code>, only required
+                  when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">bitwise_and</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">cb2</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes <code class="computeroutput"><span class="identifier">cb</span> <span class="special">&amp;</span>
+                  <span class="identifier">cb2</span></code> and stores the result
+                  in <code class="computeroutput"><span class="identifier">b</span></code>, only required
+                  when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">bitwise_or</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">cb2</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes <code class="computeroutput"><span class="identifier">cb</span> <span class="special">|</span>
+                  <span class="identifier">cb2</span></code> and stores the result
+                  in <code class="computeroutput"><span class="identifier">b</span></code>, only required
+                  when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">bitwise_xor</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">cb2</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes <code class="computeroutput"><span class="identifier">cb</span> <span class="special">^</span>
+                  <span class="identifier">cb2</span></code> and stores the result
+                  in <code class="computeroutput"><span class="identifier">b</span></code>, only required
+                  when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">a</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Add <code class="computeroutput"><span class="identifier">a</span></code> to <code class="computeroutput"><span class="identifier">cb</span></code> and stores the result in
+                  <code class="computeroutput"><span class="identifier">b</span></code>. The type of
+                  <code class="computeroutput"><span class="identifier">a</span></code> shall be listed
+                  in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">a</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Subtracts <code class="computeroutput"><span class="identifier">cb</span></code> from
+                  <code class="computeroutput"><span class="identifier">a</span></code> and stores the
+                  result in <code class="computeroutput"><span class="identifier">b</span></code>. The
+                  type of <code class="computeroutput"><span class="identifier">a</span></code> shall
+                  be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">multiply</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">a</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Multiplies <code class="computeroutput"><span class="identifier">a</span></code> by
+                  <code class="computeroutput"><span class="identifier">cb</span></code> and stores the
+                  result in <code class="computeroutput"><span class="identifier">b</span></code>. The
+                  type of <code class="computeroutput"><span class="identifier">a</span></code> shall
+                  be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">divide</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">a</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Divides <code class="computeroutput"><span class="identifier">a</span></code> by <code class="computeroutput"><span class="identifier">cb</span></code> and stores the result in
+                  <code class="computeroutput"><span class="identifier">b</span></code>. The type of
+                  <code class="computeroutput"><span class="identifier">a</span></code> shall be listed
+                  in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">modulus</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">a</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes <code class="computeroutput"><span class="identifier">cb</span> <span class="special">%</span>
+                  <span class="identifier">a</span></code> and stores the result
+                  in <code class="computeroutput"><span class="identifier">b</span></code>, only required
+                  when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
+                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">bitwise_and</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">a</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes <code class="computeroutput"><span class="identifier">cb</span> <span class="special">&amp;</span>
+                  <span class="identifier">a</span></code> and stores the result
+                  in <code class="computeroutput"><span class="identifier">b</span></code>, only required
+                  when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
+                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">bitwise_or</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">a</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes <code class="computeroutput"><span class="identifier">cb</span> <span class="special">|</span>
+                  <span class="identifier">a</span></code> and stores the result
+                  in <code class="computeroutput"><span class="identifier">b</span></code>, only required
+                  when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
+                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">bitwise_xor</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">a</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes <code class="computeroutput"><span class="identifier">cb</span> <span class="special">^</span>
+                  <span class="identifier">a</span></code> and stores the result
+                  in <code class="computeroutput"><span class="identifier">b</span></code>, only required
+                  when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
+                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">modulus</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">a</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes <code class="computeroutput"><span class="identifier">cb</span> <span class="special">%</span>
+                  <span class="identifier">a</span></code> and stores the result
+                  in <code class="computeroutput"><span class="identifier">b</span></code>, only required
+                  when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
+                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">bitwise_and</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">a</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes <code class="computeroutput"><span class="identifier">cb</span> <span class="special">&amp;</span>
+                  <span class="identifier">a</span></code> and stores the result
+                  in <code class="computeroutput"><span class="identifier">b</span></code>, only required
+                  when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
+                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">bitwise_or</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">a</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes <code class="computeroutput"><span class="identifier">cb</span> <span class="special">|</span>
+                  <span class="identifier">a</span></code> and stores the result
+                  in <code class="computeroutput"><span class="identifier">b</span></code>, only required
+                  when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
+                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">bitwise_xor</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">a</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes <code class="computeroutput"><span class="identifier">a</span> <span class="special">^</span>
+                  <span class="identifier">cb</span></code> and stores the result
+                  in <code class="computeroutput"><span class="identifier">b</span></code>, only required
+                  when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type. The type of <code class="computeroutput"><span class="identifier">a</span></code>
+                  shall be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">real_types</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">left_shift</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">ui</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes <code class="computeroutput"><span class="identifier">cb</span> <span class="special">&lt;&lt;</span>
+                  <span class="identifier">ui</span></code> and stores the result
+                  in <code class="computeroutput"><span class="identifier">b</span></code>, only required
+                  when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">right_shift</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">ui</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Computes <code class="computeroutput"><span class="identifier">cb</span> <span class="special">&gt;&gt;</span>
+                  <span class="identifier">ui</span></code> and stores the result
+                  in <code class="computeroutput"><span class="identifier">b</span></code>, only required
+                  when <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">increment</span><span class="special">(</span><span class="identifier">b</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  void
+                </p>
+              </td>
+<td>
+                <p>
+                  Increments the value of <code class="computeroutput"><span class="identifier">b</span></code>
+                  by one.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">decrement</span><span class="special">(</span><span class="identifier">b</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  void
+                </p>
+              </td>
+<td>
+                <p>
+                  Decrements the value of <code class="computeroutput"><span class="identifier">b</span></code>
+                  by one.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">is_zero</span><span class="special">(</span><span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">bool</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Returns <code class="computeroutput"><span class="keyword">true</span></code> if <code class="computeroutput"><span class="identifier">cb</span></code> is zero, otherwise <code class="computeroutput"><span class="keyword">false</span></code>
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">get_sign</span><span class="special">(</span><span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">int</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Returns a value &lt; zero if <code class="computeroutput"><span class="identifier">cb</span></code>
+                  is negative, a value &gt; zero if <code class="computeroutput"><span class="identifier">cb</span></code>
+                  is positive, and zero if <code class="computeroutput"><span class="identifier">cb</span></code>
+                  is zero.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_abs</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Set <code class="computeroutput"><span class="identifier">b</span></code> to the absolute
+                  value of <code class="computeroutput"><span class="identifier">cb</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_fabs</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Set <code class="computeroutput"><span class="identifier">b</span></code> to the absolute
+                  value of <code class="computeroutput"><span class="identifier">cb</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_fpclassify</span><span class="special">(</span><span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">int</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Returns one of the same values returned by <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">fpclassify</span></code>.
+                  Only required when <code class="computeroutput"><span class="identifier">B</span></code>
+                  is an floating point type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_trunc</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Performs the equivalent operation to <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">trunc</span></code>
+                  on argument <code class="computeroutput"><span class="identifier">cb</span></code>
+                  and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
+                  Only required when <code class="computeroutput"><span class="identifier">B</span></code>
+                  is an floating point type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_round</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">cb2</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Performs the equivalent operation to <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">round</span></code>
+                  on argument <code class="computeroutput"><span class="identifier">cb</span></code>
+                  and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
+                  Only required when <code class="computeroutput"><span class="identifier">B</span></code>
+                  is an floating point type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_exp</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Performs the equivalent operation to <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">exp</span></code>
+                  on argument <code class="computeroutput"><span class="identifier">cb</span></code>
+                  and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
+                  Only required when <code class="computeroutput"><span class="identifier">B</span></code>
+                  is an floating point type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_log</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Performs the equivalent operation to <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">log</span></code>
+                  on argument <code class="computeroutput"><span class="identifier">cb</span></code>
+                  and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
+                  Only required when <code class="computeroutput"><span class="identifier">B</span></code>
+                  is an floating point type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_log10</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Performs the equivalent operation to <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">log10</span></code>
+                  on argument <code class="computeroutput"><span class="identifier">cb</span></code>
+                  and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
+                  Only required when <code class="computeroutput"><span class="identifier">B</span></code>
+                  is an floating point type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_sin</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Performs the equivalent operation to <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">sin</span></code>
+                  on argument <code class="computeroutput"><span class="identifier">cb</span></code>
+                  and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
+                  Only required when <code class="computeroutput"><span class="identifier">B</span></code>
+                  is an floating point type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_cos</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Performs the equivalent operation to <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">cos</span></code>
+                  on argument <code class="computeroutput"><span class="identifier">cb</span></code>
+                  and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
+                  Only required when <code class="computeroutput"><span class="identifier">B</span></code>
+                  is an floating point type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_tan</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Performs the equivalent operation to <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">exp</span></code>
+                  on argument <code class="computeroutput"><span class="identifier">cb</span></code>
+                  and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
+                  Only required when <code class="computeroutput"><span class="identifier">B</span></code>
+                  is an floating point type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_asin</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Performs the equivalent operation to <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">asin</span></code>
+                  on argument <code class="computeroutput"><span class="identifier">cb</span></code>
+                  and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
+                  Only required when <code class="computeroutput"><span class="identifier">B</span></code>
+                  is an floating point type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_acos</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Performs the equivalent operation to <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">acos</span></code>
+                  on argument <code class="computeroutput"><span class="identifier">cb</span></code>
+                  and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
+                  Only required when <code class="computeroutput"><span class="identifier">B</span></code>
+                  is an floating point type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_atan</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Performs the equivalent operation to <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">atan</span></code>
+                  on argument <code class="computeroutput"><span class="identifier">cb</span></code>
+                  and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
+                  Only required when <code class="computeroutput"><span class="identifier">B</span></code>
+                  is an floating point type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_sinh</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Performs the equivalent operation to <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">sinh</span></code>
+                  on argument <code class="computeroutput"><span class="identifier">cb</span></code>
+                  and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
+                  Only required when <code class="computeroutput"><span class="identifier">B</span></code>
+                  is an floating point type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_cosh</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Performs the equivalent operation to <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">cosh</span></code>
+                  on argument <code class="computeroutput"><span class="identifier">cb</span></code>
+                  and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
+                  Only required when <code class="computeroutput"><span class="identifier">B</span></code>
+                  is an floating point type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_tanh</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Performs the equivalent operation to <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tanh</span></code>
+                  on argument <code class="computeroutput"><span class="identifier">cb</span></code>
+                  and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
+                  Only required when <code class="computeroutput"><span class="identifier">B</span></code>
+                  is an floating point type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_fmod</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">cb2</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Performs the equivalent operation to <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">fmod</span></code>
+                  on arguments <code class="computeroutput"><span class="identifier">cb</span></code>
+                  and <code class="computeroutput"><span class="identifier">cb2</span></code>, and store
+                  the result in <code class="computeroutput"><span class="identifier">b</span></code>.
+                  Only required when <code class="computeroutput"><span class="identifier">B</span></code>
+                  is an floating point type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_pow</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">cb2</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Performs the equivalent operation to <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">pow</span></code>
+                  on arguments <code class="computeroutput"><span class="identifier">cb</span></code>
+                  and <code class="computeroutput"><span class="identifier">cb2</span></code>, and store
+                  the result in <code class="computeroutput"><span class="identifier">b</span></code>.
+                  Only required when <code class="computeroutput"><span class="identifier">B</span></code>
+                  is an floating point type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_atan2</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">cb2</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Performs the equivalent operation to <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">atan</span></code>
+                  on arguments <code class="computeroutput"><span class="identifier">cb</span></code>
+                  and <code class="computeroutput"><span class="identifier">cb2</span></code>, and store
+                  the result in <code class="computeroutput"><span class="identifier">b</span></code>.
+                  Only required when <code class="computeroutput"><span class="identifier">B</span></code>
+                  is an floating point type.
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break">
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011 John Maddock<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="mp_number.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../ref.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a>
+</div>
+</body>
+</html>

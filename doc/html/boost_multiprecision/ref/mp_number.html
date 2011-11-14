@@ -1,0 +1,411 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>mp_number</title>
+<link rel="stylesheet" href="http://www.boost.org/doc/libs/release/doc/src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.76.1">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
+<link rel="up" href="../ref.html" title="Reference">
+<link rel="prev" href="../ref.html" title="Reference">
+<link rel="next" href="backendconc.html" title="Backend Requirements">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../ref.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../ref.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="backendconc.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_multiprecision.ref.mp_number"></a><a class="link" href="mp_number.html" title="mp_number">mp_number</a>
+</h3></div></div></div>
+<a name="boost_multiprecision.ref.mp_number.synopsis"></a><h5>
+<a name="boost_multiprecision.ref.mp_number.synopsis-heading"></a>
+        <a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.synopsis">Synopsis</a>
+      </h5>
+<pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">multiprecision</span><span class="special">{</span>
+
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
+<span class="keyword">class</span> <span class="identifier">mp_number</span>
+<span class="special">{</span>
+   <span class="identifier">mp_number</span><span class="special">();</span>
+   <span class="identifier">mp_number</span><span class="special">(</span><span class="identifier">see</span><span class="special">-</span><span class="identifier">below</span><span class="special">);</span>
+   <span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">=(</span><span class="identifier">see</span><span class="special">-</span><span class="identifier">below</span><span class="special">);</span>
+
+   <span class="comment">/* Other number-type operators here */</span>
+
+   <span class="comment">// Use in Boolean context:</span>
+   <span class="keyword">operator</span> <span class="emphasis"><em>convertible-to-bool-type</em></span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
+   <span class="comment">// swap:</span>
+   <span class="keyword">void</span> <span class="identifier">swap</span><span class="special">(</span><span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="identifier">other</span><span class="special">);</span>
+   <span class="comment">// Sign:</span>
+   <span class="keyword">bool</span> <span class="identifier">is_zero</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
+   <span class="keyword">int</span> <span class="identifier">sign</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
+   <span class="comment">// string conversion:</span>
+   <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">str</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
+   <span class="comment">// Generic conversion mechanism</span>
+   <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+   <span class="identifier">T</span> <span class="identifier">convert_to</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
+   <span class="comment">// precision control:</span>
+   <span class="keyword">static</span> <span class="keyword">unsigned</span> <span class="identifier">default_precision</span><span class="special">();</span>
+   <span class="keyword">static</span> <span class="keyword">void</span> <span class="identifier">default_precision</span><span class="special">(</span><span class="keyword">unsigned</span> <span class="identifier">digits10</span><span class="special">);</span>
+   <span class="keyword">unsigned</span> <span class="identifier">precision</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
+   <span class="keyword">void</span> <span class="identifier">precision</span><span class="special">(</span><span class="keyword">unsigned</span> <span class="identifier">digits10</span><span class="special">);</span>
+   <span class="comment">// Comparison:</span>
+   <span class="keyword">int</span> <span class="identifier">compare</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">o</span><span class="special">)</span><span class="keyword">const</span><span class="special">;</span>
+   <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">V</span><span class="special">&gt;</span>
+   <span class="keyword">typename</span> <span class="identifier">enable_if</span><span class="special">&lt;</span><span class="identifier">is_arithmetic</span><span class="special">&lt;</span><span class="identifier">V</span><span class="special">&gt;,</span> <span class="keyword">int</span><span class="special">&gt;::</span><span class="identifier">type</span> <span class="identifier">compare</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">V</span><span class="special">&amp;</span> <span class="identifier">o</span><span class="special">)</span><span class="keyword">const</span><span class="special">;</span>
+   <span class="comment">// Access to the underlying implementation:</span>
+   <span class="identifier">Backend</span><span class="special">&amp;</span> <span class="identifier">backend</span><span class="special">();</span>
+   <span class="keyword">const</span> <span class="identifier">Backend</span><span class="special">&amp;</span> <span class="identifier">backend</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
+<span class="special">};</span>
+
+<span class="comment">// Swap:</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
+<span class="keyword">void</span> <span class="identifier">swap</span><span class="special">(</span><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">a</span><span class="special">,</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">b</span><span class="special">);</span>
+
+<span class="comment">// iostream support:</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="keyword">operator</span> <span class="special">&lt;&lt;</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="identifier">os</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">r</span><span class="special">);</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="keyword">operator</span> <span class="special">&lt;&lt;</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="identifier">os</span><span class="special">,</span> <span class="keyword">const</span> <span class="emphasis"><em>unmentionable-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">r</span><span class="special">);</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">istream</span><span class="special">&amp;</span> <span class="keyword">operator</span> <span class="special">&gt;&gt;</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">istream</span><span class="special">&amp;</span> <span class="identifier">is</span><span class="special">,</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">r</span><span class="special">);</span>
+
+<span class="comment">// Non-member function standard library support:</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">abs</span>    <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">fabs</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">sqrt</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">floor</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">ceil</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">trunc</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">itrunc</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">ltrunc</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">lltrunc</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">round</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">iround</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">lround</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">llround</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">exp</span>    <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">log</span>    <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">log10</span>    <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">cos</span>    <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">sin</span>    <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">tan</span>    <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">acos</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">asin</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">atan</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">cosh</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">sinh</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">tanh</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">ldexp</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">frexp</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">*);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">pow</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">fmod</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">atan2</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+
+<span class="special">}}</span> <span class="comment">// namespaces</span>
+
+<span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">math</span><span class="special">{</span>
+
+<span class="comment">// Boost.Math interoperability functions:</span>
+<span class="keyword">int</span>                                              <span class="identifier">fpclassify</span>     <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">);</span>
+<span class="keyword">bool</span>                                             <span class="identifier">isfinite</span>       <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">);</span>
+<span class="keyword">bool</span>                                             <span class="identifier">isnan</span>          <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">);</span>
+<span class="keyword">bool</span>                                             <span class="identifier">isinf</span>          <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">);</span>
+<span class="keyword">bool</span>                                             <span class="identifier">isnormal</span>       <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">);</span>
+
+<span class="special">}}</span> <span class="comment">// namespaces</span>
+
+<span class="comment">// numeric_limits support:</span>
+<span class="keyword">namespace</span> <span class="identifier">std</span><span class="special">{</span>
+
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
+<span class="keyword">struct</span> <span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;</span> <span class="special">&gt;</span>
+<span class="special">{</span>
+   <span class="comment">/* Usual members here */</span>
+<span class="special">};</span>
+
+<span class="special">}</span>
+</pre>
+<a name="boost_multiprecision.ref.mp_number.description"></a><h5>
+<a name="boost_multiprecision.ref.mp_number.description-heading"></a>
+        <a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.description">Description</a>
+      </h5>
+<pre class="programlisting"><span class="identifier">mp_number</span><span class="special">();</span>
+<span class="identifier">mp_number</span><span class="special">(</span><span class="identifier">see</span><span class="special">-</span><span class="identifier">below</span><span class="special">);</span>
+<span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">=(</span><span class="identifier">see</span><span class="special">-</span><span class="identifier">below</span><span class="special">);</span>
+</pre>
+<p>
+        Type <code class="computeroutput"><span class="identifier">mp_number</span></code> is default
+        constructible, and both copy constructible and assignable from:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+            Itself.
+          </li>
+<li class="listitem">
+            An expression template which is the result of one of the arithmetic operators.
+          </li>
+<li class="listitem">
+            Any builtin arithmetic type.
+          </li>
+<li class="listitem">
+            A <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span></code> or any type which is convertible
+            to <code class="computeroutput"><span class="keyword">const</span> <span class="keyword">char</span><span class="special">*</span></code>.
+          </li>
+<li class="listitem">
+            Any type that the Backend is constructible or assignable from.
+          </li>
+</ul></div>
+<pre class="programlisting"><span class="comment">/* Other number-type operators here */</span>
+</pre>
+<p>
+        The following arithmetic operations are support for real-numbered types:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+            Binary +, -, *, /, +<code class="literal">, -</code>, *<code class="literal">, /</code>,
+            ==, !<code class="literal">, &lt;</code>, &gt;<code class="literal">, &lt;, &gt;, ||, &amp;&amp;,
+            ||</code>, &amp;&amp;=.
+          </li>
+<li class="listitem">
+            Unary +, -, ++, --, !.
+          </li>
+</ul></div>
+<p>
+        For integer types the following operators are also supported:
+      </p>
+<p>
+        Binary %, %<code class="literal">, |, |</code>, &amp;, &amp;<code class="literal">, ^, ^</code>,
+        &lt;&lt;, &lt;&lt;<code class="literal">, &gt;&gt;, &gt;&gt;</code>.
+      </p>
+<p>
+        Note that with the exception of the logical operators and unary + the result
+        of applying an operator to mp_number is an "unmentionable" expression
+        template type.
+      </p>
+<p>
+        Binary operators, must have at least one argument that is of type <code class="computeroutput"><span class="identifier">mp_number</span></code> or an expression template derived
+        from <code class="computeroutput"><span class="identifier">mp_number</span></code>. One argument
+        may optionally be of arithmetic type.
+      </p>
+<p>
+        Note that type <code class="computeroutput"><span class="identifier">mp_number</span></code>
+        (and all expression templates derived from it) may be used in a Boolian context.
+      </p>
+<pre class="programlisting"><span class="keyword">operator</span> <span class="emphasis"><em>convertible-to-bool-type</em></span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
+</pre>
+<p>
+        Returns an <span class="emphasis"><em>unmentionable-type</em></span> that is usable in Boolean
+        contexts (this allows <code class="computeroutput"><span class="identifier">mp_number</span></code>
+        to be used in any Boolean context - if statements, conditional statements,
+        or as an argument to a logical operator - without type <code class="computeroutput"><span class="identifier">mp_number</span></code>
+        being convertible to type <code class="computeroutput"><span class="keyword">bool</span></code>.
+      </p>
+<pre class="programlisting"><span class="keyword">void</span> <span class="identifier">swap</span><span class="special">(</span><span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="identifier">other</span><span class="special">);</span>
+</pre>
+<p>
+        Swaps <code class="computeroutput"><span class="special">*</span><span class="keyword">this</span></code>
+        with <code class="computeroutput"><span class="identifier">other</span></code>.
+      </p>
+<pre class="programlisting"><span class="keyword">bool</span> <span class="identifier">is_zero</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
+</pre>
+<p>
+        Returns <code class="computeroutput"><span class="keyword">true</span></code> is <code class="computeroutput"><span class="special">*</span><span class="keyword">this</span></code> is zero,
+        otherwise <code class="computeroutput"><span class="keyword">false</span></code>.
+      </p>
+<pre class="programlisting"><span class="keyword">int</span> <span class="identifier">sign</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
+</pre>
+<p>
+        Returns a value less than zero if <code class="computeroutput"><span class="special">*</span><span class="keyword">this</span></code> is negative, a value greater than zero
+        if <code class="computeroutput"><span class="special">*</span><span class="keyword">this</span></code>
+        is positive, and zero if <code class="computeroutput"><span class="special">*</span><span class="keyword">this</span></code>
+        is zero.
+      </p>
+<pre class="programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">str</span><span class="special">(</span><span class="keyword">unsigned</span> <span class="identifier">precision</span><span class="special">,</span> <span class="keyword">bool</span> <span class="identifier">scientific</span> <span class="special">=</span> <span class="keyword">true</span><span class="special">)</span><span class="keyword">const</span><span class="special">;</span>
+</pre>
+<p>
+        Returns the number formatted as a string, with at least <span class="emphasis"><em>precision</em></span>
+        digits, and in scientific format if <span class="emphasis"><em>scientific</em></span> is true.
+      </p>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="identifier">T</span> <span class="identifier">convert_to</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
+</pre>
+<p>
+        Provides a generic conversion mechanism to convert <code class="computeroutput"><span class="special">*</span><span class="keyword">this</span></code> to type <code class="computeroutput"><span class="identifier">T</span></code>.
+        Type <code class="computeroutput"><span class="identifier">T</span></code> may be any arithmetic
+        type. Optionally other types may also be supported by specific <code class="computeroutput"><span class="identifier">Backend</span></code> types.
+      </p>
+<pre class="programlisting"><span class="keyword">static</span> <span class="keyword">unsigned</span> <span class="identifier">default_precision</span><span class="special">();</span>
+<span class="keyword">static</span> <span class="keyword">void</span> <span class="identifier">default_precision</span><span class="special">(</span><span class="keyword">unsigned</span> <span class="identifier">digits10</span><span class="special">);</span>
+<span class="keyword">unsigned</span> <span class="identifier">precision</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
+<span class="keyword">void</span> <span class="identifier">precision</span><span class="special">(</span><span class="keyword">unsigned</span> <span class="identifier">digits10</span><span class="special">);</span>
+</pre>
+<p>
+        These functions are only available if the Backend template parameter supports
+        runtime changes to precision. They get and set the default precision and
+        the precision of <code class="computeroutput"><span class="special">*</span><span class="keyword">this</span></code>
+        respectively.
+      </p>
+<pre class="programlisting"><span class="keyword">int</span> <span class="identifier">compare</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">o</span><span class="special">)</span><span class="keyword">const</span><span class="special">;</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">V</span><span class="special">&gt;</span>
+<span class="keyword">typename</span> <span class="identifier">enable_if</span><span class="special">&lt;</span><span class="identifier">is_arithmetic</span><span class="special">&lt;</span><span class="identifier">V</span><span class="special">&gt;,</span> <span class="keyword">int</span><span class="special">&gt;::</span><span class="identifier">type</span> <span class="identifier">compare</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">V</span><span class="special">&amp;</span> <span class="identifier">other</span><span class="special">)</span><span class="keyword">const</span><span class="special">;</span>
+</pre>
+<p>
+        Returns:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+            A value less that 0 for *this &lt; other
+          </li>
+<li class="listitem">
+            A value greater that 0 for *this &gt; other
+          </li>
+<li class="listitem">
+            Zero for *this == other
+          </li>
+</ul></div>
+<pre class="programlisting"><span class="identifier">Backend</span><span class="special">&amp;</span> <span class="identifier">backend</span><span class="special">();</span>
+<span class="keyword">const</span> <span class="identifier">Backend</span><span class="special">&amp;</span> <span class="identifier">backend</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
+</pre>
+<p>
+        Returns the underlying backend instance used by *this.
+      </p>
+<a name="boost_multiprecision.ref.mp_number.swap"></a><h5>
+<a name="boost_multiprecision.ref.mp_number.swap-heading"></a>
+        <a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.swap">swap</a>
+      </h5>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
+<span class="keyword">void</span> <span class="identifier">swap</span><span class="special">(</span><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">a</span><span class="special">,</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">b</span><span class="special">);</span>
+</pre>
+<p>
+        Swaps <code class="computeroutput"><span class="identifier">a</span></code> and <code class="computeroutput"><span class="identifier">b</span></code>.
+      </p>
+<a name="boost_multiprecision.ref.mp_number.iostream_support"></a><h5>
+<a name="boost_multiprecision.ref.mp_number.iostream_support-heading"></a>
+        <a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.iostream_support">Iostream
+        Support</a>
+      </h5>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="keyword">operator</span> <span class="special">&lt;&lt;</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="identifier">os</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">r</span><span class="special">);</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="keyword">operator</span> <span class="special">&lt;&lt;</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="identifier">os</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">unmentionable</span><span class="special">-</span><span class="identifier">expression</span><span class="special">-</span><span class="keyword">template</span><span class="special">&amp;</span> <span class="identifier">r</span><span class="special">);</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
+<span class="keyword">inline</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">istream</span><span class="special">&amp;</span> <span class="keyword">operator</span> <span class="special">&gt;&gt;</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">istream</span><span class="special">&amp;</span> <span class="identifier">is</span><span class="special">,</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">r</span><span class="special">)</span>
+</pre>
+<p>
+        These operators provided formatted input-output operations on <code class="computeroutput"><span class="identifier">mp_number</span></code> types, and expression templates
+        derived from them.
+      </p>
+<a name="boost_multiprecision.ref.mp_number.non_member_standard_library_function_support"></a><h5>
+<a name="boost_multiprecision.ref.mp_number.non_member_standard_library_function_support-heading"></a>
+        <a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.non_member_standard_library_function_support">Non-member
+        standard library function support</a>
+      </h5>
+<pre class="programlisting"><span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">abs</span>    <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">fabs</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">sqrt</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">floor</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">ceil</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">trunc</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">itrunc</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">ltrunc</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">lltrunc</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">round</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">iround</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">lround</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">llround</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">exp</span>    <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">log</span>    <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">log10</span>    <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">cos</span>    <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">sin</span>    <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">tan</span>    <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">acos</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">asin</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">atan</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">cosh</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">sinh</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">tanh</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">ldexp</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">frexp</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">*);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">pow</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">fmod</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">atan2</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+</pre>
+<p>
+        These functions all behave exactly as their standard library counterparts
+        do: their argument is either an instance of <code class="computeroutput"><span class="identifier">mp_number</span></code>
+        or an expression template derived from it; their return value is always an
+        expression template.
+      </p>
+<p>
+        These functions are normally implemented by the Backend type. However, default
+        versions are provided for Backend types that don't have native support for
+        these functions. Please note however, that this default support requires
+        the precision of the type to be a compile time constant - this means for
+        example that the GMP MPF Backend will not work with these functions when
+        that type is used at variable precision.
+      </p>
+<p>
+        Also note that with the exception of <code class="computeroutput"><span class="identifier">abs</span></code>
+        that these functions can only be used with floating point Backend types.
+      </p>
+<a name="boost_multiprecision.ref.mp_number.boost_math_interoperabilty_support"></a><h5>
+<a name="boost_multiprecision.ref.mp_number.boost_math_interoperabilty_support-heading"></a>
+        <a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.boost_math_interoperabilty_support">Boost.Math
+        Interoperabilty Support</a>
+      </h5>
+<pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">math</span><span class="special">{</span>
+
+<span class="keyword">int</span>                                              <span class="identifier">fpclassify</span>     <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">);</span>
+<span class="keyword">bool</span>                                             <span class="identifier">isfinite</span>       <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">);</span>
+<span class="keyword">bool</span>                                             <span class="identifier">isnan</span>          <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">);</span>
+<span class="keyword">bool</span>                                             <span class="identifier">isinf</span>          <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">);</span>
+<span class="keyword">bool</span>                                             <span class="identifier">isnormal</span>       <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">);</span>
+
+<span class="special">}}</span> <span class="comment">// namespaces</span>
+</pre>
+<p>
+        These functions behave exacts as their Boost.Math equivalents. Other Boost.Math
+        functions and templates may also be specialized or overloaded to ensure interoperability.
+      </p>
+<a name="boost_multiprecision.ref.mp_number.std__numeric_limits_support"></a><h5>
+<a name="boost_multiprecision.ref.mp_number.std__numeric_limits_support-heading"></a>
+        <a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.std__numeric_limits_support">std::numeric_limits
+        support</a>
+      </h5>
+<pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">std</span><span class="special">{</span>
+
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
+<span class="keyword">struct</span> <span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;</span> <span class="special">&gt;</span>
+<span class="special">{</span>
+   <span class="comment">/* Usual members here */</span>
+<span class="special">};</span>
+
+<span class="special">}</span>
+</pre>
+<p>
+        Class template <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span></code> is specialized for all instantiations
+        of <code class="computeroutput"><span class="identifier">mp_number</span></code> whose precision
+        is known at compile time, plus those types whose precision is unlimited (though
+        it is much less useful in those cases). It is not specialized for types whose
+        precision can vary at compile time (such as <code class="computeroutput"><span class="identifier">mpf_float</span></code>).
+      </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011 John Maddock<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../ref.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../ref.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="backendconc.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
