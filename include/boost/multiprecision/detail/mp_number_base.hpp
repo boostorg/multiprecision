@@ -218,7 +218,7 @@ struct mp_exp<tag, Arg1, void, void>
    typedef typename left_type::result_type result_type;
    typedef tag tag_type;
 
-   mp_exp(const Arg1& a) : arg(a) {}
+   explicit mp_exp(const Arg1& a) : arg(a) {}
 
    left_type left()const { return left_type(arg); }
 
@@ -504,7 +504,8 @@ template <class Arg1, class Arg2, class Arg3, class B>
 inline detail::mp_exp<detail::negate, detail::mp_exp<detail::plus, mp_number<B>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type > >
    operator - (const detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>& a, const mp_number<B>& b)
 {
-   return detail::mp_exp<detail::plus, mp_number<B>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type >(b, a.left_ref());
+   return detail::mp_exp<detail::negate, detail::mp_exp<detail::plus, mp_number<B>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type > >(
+      detail::mp_exp<detail::plus, mp_number<B>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type >(b, a.left_ref()));
 }
 template <class B>
 inline detail::mp_exp<detail::add_immediates, mp_number<B>, mp_number<B> >
@@ -516,7 +517,8 @@ template <class B>
 inline detail::mp_exp<detail::negate, detail::mp_exp<detail::add_immediates, mp_number<B>, mp_number<B> > >
    operator - (const detail::mp_exp<detail::negate, mp_number<B> >& a, const mp_number<B>& b)
 {
-   return detail::mp_exp<detail::add_immediates, mp_number<B>, mp_number<B> >(b, a.left_ref());
+   return detail::mp_exp<detail::negate, detail::mp_exp<detail::add_immediates, mp_number<B>, mp_number<B> > >(
+      detail::mp_exp<detail::add_immediates, mp_number<B>, mp_number<B> >(b, a.left_ref()));
 }
 template <class B, class V>
 inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::negate, detail::mp_exp<detail::add_immediates, mp_number<B>, V > > >::type
@@ -588,37 +590,43 @@ template <class B, class Arg1, class Arg2, class Arg3>
 inline detail::mp_exp<detail::negate, detail::mp_exp<detail::multiplies, mp_number<B>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type > >
    operator * (const mp_number<B>& a, const detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>& b)
 {
-   return detail::mp_exp<detail::multiplies, mp_number<B>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type > (a, b.left_ref());
+   return detail::mp_exp<detail::negate, detail::mp_exp<detail::multiplies, mp_number<B>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type > >(
+      detail::mp_exp<detail::multiplies, mp_number<B>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type > (a, b.left_ref()));
 }
 template <class Arg1, class Arg2, class Arg3, class B>
 inline detail::mp_exp<detail::negate, detail::mp_exp<detail::multiplies, mp_number<B>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type > >
    operator * (const detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>& a, const mp_number<B>& b)
 {
-   return detail::mp_exp<detail::multiplies, mp_number<B>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type >(b, a.left_ref());
+   return detail::mp_exp<detail::negate, detail::mp_exp<detail::multiplies, mp_number<B>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type > >(
+      detail::mp_exp<detail::multiplies, mp_number<B>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type >(b, a.left_ref()));
 }
 template <class B>
 inline detail::mp_exp<detail::negate, detail::mp_exp<detail::multiply_immediates, mp_number<B>, mp_number<B> > >
    operator * (const mp_number<B>& a, const detail::mp_exp<detail::negate, mp_number<B> >& b)
 {
-   return detail::mp_exp<detail::multiply_immediates, mp_number<B>, mp_number<B> >(a, b.left_ref());
+   return detail::mp_exp<detail::negate, detail::mp_exp<detail::multiply_immediates, mp_number<B>, mp_number<B> > >(
+      detail::mp_exp<detail::multiply_immediates, mp_number<B>, mp_number<B> >(a, b.left_ref()));
 }
 template <class B>
 inline detail::mp_exp<detail::negate, detail::mp_exp<detail::multiply_immediates, mp_number<B>, mp_number<B> > >
    operator * (const detail::mp_exp<detail::negate, mp_number<B> >& a, const mp_number<B>& b)
 {
-   return detail::mp_exp<detail::multiply_immediates, mp_number<B>, mp_number<B> >(b, a.left_ref());
+   return detail::mp_exp<detail::negate, detail::mp_exp<detail::multiply_immediates, mp_number<B>, mp_number<B> > >(
+      detail::mp_exp<detail::multiply_immediates, mp_number<B>, mp_number<B> >(b, a.left_ref()));
 }
 template <class B, class V>
 inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::negate, detail::mp_exp<detail::multiply_immediates, mp_number<B>, V > > >::type
    operator * (const detail::mp_exp<detail::negate, mp_number<B> >& a, const V& b)
 {
-   return detail::mp_exp<detail::multiply_immediates, mp_number<B>, V >(a.left_ref(), b);
+   return detail::mp_exp<detail::negate, detail::mp_exp<detail::multiply_immediates, mp_number<B>, V > > (
+      detail::mp_exp<detail::multiply_immediates, mp_number<B>, V >(a.left_ref(), b));
 }
 template <class V, class B>
 inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::negate, detail::mp_exp<detail::multiply_immediates, mp_number<B>, V > > >::type
    operator * (const V& a, const detail::mp_exp<detail::negate, mp_number<B> >& b)
 {
-   return detail::mp_exp<detail::multiply_immediates, mp_number<B>, V >(b.left_ref(), a);
+   return detail::mp_exp<detail::negate, detail::mp_exp<detail::multiply_immediates, mp_number<B>, V > >(
+      detail::mp_exp<detail::multiply_immediates, mp_number<B>, V >(b.left_ref(), a));
 }
 //
 // Division:
@@ -678,37 +686,43 @@ template <class B, class Arg1, class Arg2, class Arg3>
 inline detail::mp_exp<detail::negate, detail::mp_exp<detail::divides, mp_number<B>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type > >
    operator / (const mp_number<B>& a, const detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>& b)
 {
-   return detail::mp_exp<detail::divides, mp_number<B>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type >(a, b.left_ref());
+   return detail::mp_exp<detail::negate, detail::mp_exp<detail::divides, mp_number<B>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type > >(
+      detail::mp_exp<detail::divides, mp_number<B>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type >(a, b.left_ref()));
 }
 template <class Arg1, class Arg2, class Arg3, class B>
 inline detail::mp_exp<detail::negate, detail::mp_exp<detail::divides, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type, mp_number<B> > >
    operator / (const detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>& a, const mp_number<B>& b)
 {
-   return detail::mp_exp<detail::divides, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type, mp_number<B> >(a.left_ref(), b);
+   return detail::mp_exp<detail::negate, detail::mp_exp<detail::divides, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type, mp_number<B> > >(
+      detail::mp_exp<detail::divides, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type, mp_number<B> >(a.left_ref(), b));
 }
 template <class B>
 inline detail::mp_exp<detail::negate, detail::mp_exp<detail::divide_immediates, mp_number<B>, mp_number<B> > >
    operator / (const mp_number<B>& a, const detail::mp_exp<detail::negate, mp_number<B> >& b)
 {
-   return detail::mp_exp<detail::divide_immediates, mp_number<B>, mp_number<B> >(a, b.left_ref());
+   return detail::mp_exp<detail::negate, detail::mp_exp<detail::divide_immediates, mp_number<B>, mp_number<B> > >(
+      detail::mp_exp<detail::divide_immediates, mp_number<B>, mp_number<B> >(a, b.left_ref()));
 }
 template <class B>
 inline detail::mp_exp<detail::negate, detail::mp_exp<detail::divide_immediates, mp_number<B>, mp_number<B> > >
    operator / (const detail::mp_exp<detail::negate, mp_number<B> >& a, const mp_number<B>& b)
 {
-   return detail::mp_exp<detail::divide_immediates, mp_number<B>, mp_number<B> >(a.left_ref(), b);
+   return detail::mp_exp<detail::negate, detail::mp_exp<detail::divide_immediates, mp_number<B>, mp_number<B> > >(
+      detail::mp_exp<detail::divide_immediates, mp_number<B>, mp_number<B> >(a.left_ref(), b));
 }
 template <class B, class V>
 inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::negate, detail::mp_exp<detail::divide_immediates, mp_number<B>, V > > >::type
    operator / (const detail::mp_exp<detail::negate, mp_number<B> >& a, const V& b)
 {
-   return detail::mp_exp<detail::divide_immediates, mp_number<B>, V>(a.left_ref(), b);
+   return detail::mp_exp<detail::negate, detail::mp_exp<detail::divide_immediates, mp_number<B>, V > >(
+      detail::mp_exp<detail::divide_immediates, mp_number<B>, V>(a.left_ref(), b));
 }
 template <class V, class B>
 inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::negate, detail::mp_exp<detail::divide_immediates, V, mp_number<B> > > >::type
    operator / (const V& a, const detail::mp_exp<detail::negate, mp_number<B> >& b)
 {
-   return detail::mp_exp<detail::divide_immediates, V, mp_number<B> >(a, b.left_ref());
+   return detail::mp_exp<detail::negate, detail::mp_exp<detail::divide_immediates, V, mp_number<B> > >(
+      detail::mp_exp<detail::divide_immediates, V, mp_number<B> >(a, b.left_ref()));
 }
 //
 // Modulus:

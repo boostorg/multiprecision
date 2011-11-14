@@ -1112,7 +1112,7 @@ cpp_float<Digits10>& cpp_float<Digits10>::calculate_inv()
 
    static const boost::int32_t double_digits10_minus_one = std::numeric_limits<double>::digits10 - 1;
 
-   for(boost::uint32_t digits = double_digits10_minus_one; digits <= cpp_float_max_digits10; digits *= static_cast<boost::int32_t>(2))
+   for(boost::int32_t digits = double_digits10_minus_one; digits <= cpp_float_max_digits10; digits *= static_cast<boost::int32_t>(2))
    {
       // Adjust precision of the terms.
       precision(static_cast<boost::int32_t>(digits * static_cast<boost::int32_t>(2)));
@@ -2654,6 +2654,18 @@ inline void eval_frexp(cpp_float<Digits10>& result, const cpp_float<Digits10>& x
       throw std::runtime_error("Exponent is outside the range of an int");
    *e = static_cast<int>(t);
 }
+
+template <unsigned Digits10>
+inline bool is_zero(const cpp_float<Digits10>& val)
+{
+   return val.iszero();
+}
+template <unsigned Digits10>
+inline int get_sign(const cpp_float<Digits10>& val)
+{
+   return val.iszero() ? 0 : val.isneg() ? -1 : 1;
+}
+
 
 typedef mp_number<cpp_float<50> > cpp_float_50;
 typedef mp_number<cpp_float<100> > cpp_float_100;

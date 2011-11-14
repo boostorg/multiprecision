@@ -65,7 +65,7 @@ T get_random()
       shift += std::numeric_limits<int>::digits;
       bits -= std::numeric_limits<int>::digits;
    }
-   return rng() & 1u ? -ldexp(frexp(result, &bits), exponent) : ldexp(frexp(result, &bits), exponent);
+   return rng() & 1u ? T(-ldexp(frexp(result, &bits), exponent)) : T(ldexp(frexp(result, &bits), exponent));
 }
 
 template <class T, class U>
