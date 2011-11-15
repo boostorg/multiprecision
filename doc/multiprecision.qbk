@@ -15,7 +15,7 @@
          [@http://www.boost.org/LICENSE_1_0.txt])
     ]
     [authors [authors, various]]
-    [last-revision $Date: 2011-07-08 18:51:46 +0100 (Fri, 08 Jul 2011) $]
+    [/last-revision $Date: 2011-07-08 18:51:46 +0100 (Fri, 08 Jul 2011) $]
 ]
 
 [import ../example/gmp_snips.cpp]
@@ -24,21 +24,23 @@
 
 [section:intro Introduction]
 
-The Multiprecision library comes in two distinct parts: an expression-template-enabled front end `mp_number`
-that handles all the operator overloading, expression evaluation optimization, and code reduction, and
-a selection of backends that implement the actual arithmetic operations, and need conform only to the
+The Multiprecision library comes in two distinct parts:
+
+* An expression-template-enabled front end `mp_number`
+that handles all the operator overloading, expression evaluation optimization, and code reduction.
+* A selection of backends that implement the actual arithmetic operations, and need conform only to the
 reduced interface requirements of the front end.
 
-The library is often used by using one of the predfined typedefs: for example if you wanted an arbitrary precision
+The library is often used by using one of the predefined typedefs: for example if you wanted an arbitrary precision
 integer type using GMP as the underlying implementation then you could use:
 
    #include <boost/multiprecision/gmp.hpp>  // Defines the wrappers around the GMP library's types
 
    boost::multiprecision::mpz_int myint;    // Arbitrary precision integer type.
 
-Alternatively one can compose your own multiprecision type, by combining `mp_number` with one of the
-predefined backend types.  For example, suppose you wanted a 300 decimal digit floating point type
-based on the MPFR library, in this case there's no predefined typedef with that level of precision,
+Alternatively, you can compose your own multiprecision type, by combining `mp_number` with one of the
+predefined backend types.  For example, suppose you wanted a 300 decimal digit floating-point type
+based on the MPFR library. In this case, there's no predefined typedef with that level of precision,
 so instead we compose our own:
 
    #include <boost/multiprecision/mpfr.hpp>  // Defines the Backend type that wraps MPFR
@@ -81,9 +83,9 @@ lets suppose we're evaluating a polynomial via Horners method, something like th
     //....
     y = (((((a[6] * x + a[5]) * x + a[4]) * x + a[3]) * x + a[2]) * x + a[1]) * x + a[0];
 
-If type `T` is an `mp_number`, then this expression is evaluated ['without creating a single temporary value],  in contrast
+If type `T` is an `mp_number`, then this expression is evaluated ['without creating a single temporary value].  In contrast,
 if we were using the C++ wrapper that ships with GMP - `mpf_class` - then this expression would result in no less than 11
-temporaries (this is true even though mpf_class does use expression templates to reduce the number of temporaries somewhat).  Had
+temporaries (this is true even though `mpf_class` does use expression templates to reduce the number of temporaries somewhat).  Had
 we used an even simpler wrapper around GMP or MPFR like `mpclass` things would have been even worse and no less that 24 temporaries
 are created for this simple expression (note - we actually measure the number of memory allocations performed rather than 
 the number of temporaries directly).
@@ -109,9 +111,9 @@ Given the comments above, you might be forgiven for thinking that expression-tem
 sadly though, all tricks like this have their downsides.  For one thing, expression template libraries
 like this one, tend to be slower to compile than their simpler cousins, they're also harder to debug
 (should you actually want to step through our code!), and rely on compiler optimizations being turned
-on to give really good performance.  Also since the return type from expressions involving `mp_number`'s
+on to give really good performance.  Also, since the return type from expressions involving `mp_number`'s
 is an "unmentionable implementation detail", you have to be careful to cast the result of an expression
-to the actual number type when passing an expression to a template function.  For example given:
+to the actual number type when passing an expression to a template function.  For example, given:
 
    template <class T>
    void my_proc(const T&);
@@ -126,7 +128,7 @@ an expression template type, and not a number type.  Instead we probably need:
    my_proc(my_mp_number_type(a+b));
 
 Having said that, these situations don't occur that often - or indeed not at all for non-template functions.
-In addition all the functions in the Boost.Math library will automatically convert expression-template arguments
+In addition, all the functions in the Boost.Math library will automatically convert expression-template arguments
 to the underlying number type without you having to do anything, so:
 
    mpfr_float_100 a(20), delta(0.125);
@@ -139,9 +141,9 @@ One other potential pitfall that's only possible in C++11: you should never stor
 
    auto my_expression = a + b - c;
 
-Unless you're absolutely sure that the lifetimes of `a`, `b` and `c` will outlive that of `my_expression`.
+unless you're absolutely sure that the lifetimes of `a`, `b` and `c` will outlive that of `my_expression`.
 
-And finally.... the performance improvements from an expression template library like this are often not as
+And finally... the performance improvements from an expression template library like this are often not as
 dramatic as the reduction in number of temporaries would suggest.  For example if we compare this library with 
 `mpfr_class` and `mpreal`, with all three using the underlying MPFR library at 50 decimal digits precision then
 we see the following typical results for polynomial execution:
@@ -153,7 +155,7 @@ we see the following typical results for polynomial execution:
 [[mpreal][1.9 (0.0148s)][9.3 (27947 total)]]
 ]
 
-As you can see the execution time increases a lot more slowly than the number of memory allocations.  There are 
+As you can see, the execution time increases a lot more slowly than the number of memory allocations.  There are 
 a number of reasons for this:
 
 * The cost of extended-precision multiplication and division is so great, that the times taken for these tend to
@@ -167,7 +169,7 @@ one would hope.
 
 We'll conclude this section by providing some more performance comparisons between these three libraries,
 again, all are using MPFR to carry out the underlying arithmetic, and all are operating at the same precision
-(50 decimal places):
+(50 decimal digits):
 
 [table Evaluation of Boost.Math's Bessel function test data
 [[Library][Relative Time][Relative Number of Memory Allocations]]
@@ -212,12 +214,12 @@ The following backends provide integer arithmetic:
 The `gmp_int` backend is used via the typedef `boost::multiprecision::mpz_int`.  It acts as a thin wrapper around the GMP `mpz_t`
 to provide an integer type that is a drop-in replacement for the native C++ integer types, but with unlimited precision.
 
-As well as the usual conversions from arithmetic and string types, type `mpz_int` is copy constructible and asignable from:
+As well as the usual conversions from arithmetic and string types, type `mpz_int` is copy constructible and assignable from:
 
 * The GMP native types: `mpf_t`, `mpz_t`, `mpq_t`.
 * Instances of `mp_number<T>` that are wrappers around those types: `mp_number<gmp_float<N> >`, `mp_number<gmp_rational>`.
 
-It's also possible to access the underlying `mpz_t` via the data() member function of `gmp_int`.
+It's also possible to access the underlying `mpz_t` via the `data()` member function of `gmp_int`.
 
 [h5 Example:]
 
@@ -232,8 +234,8 @@ The following backends provide real number arithmetic:
 [table
 [[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
 [[`mpf_float<N>`][boost/multiprecision/gmp.hpp][2][GMP][Very fast and efficient backend.][Dependency on GNU licenced GMP library.]]
-[[`mpfr_float<N>`][boost/multiprecision/mpfr.hpp][2][GMP and MPFR][Very fast and efficient backend, with it's own standard library implementation.][Dependency on GNU licenced GMP and MPFR libraries.]]
-[[`cpp_float<N>`][boost/multiprecision/cpp_float.hpp][10][None][Header only, all C++ implementation.][Approximately 2x slower than the MPFR or GMP libraries.]]
+[[`mpfr_float<N>`][boost/multiprecision/mpfr.hpp][2][GMP and MPFR][Very fast and efficient backend, with its own standard library implementation.][Dependency on GNU licenced GMP and MPFR libraries.]]
+[[`cpp_float<N>`][boost/multiprecision/cpp_float.hpp][10][None][Header only, all C++ implementation. Boost licence.][Approximately 2x slower than the MPFR or GMP libraries.]]
 ]
 
 [h4 gmp_float]
@@ -251,7 +253,7 @@ The following backends provide real number arithmetic:
 
    }} // namespaces
 
-The `gmp_float` backend is used in conjunction with `mp_number`: It acts as a thin wrapper around the GMP `mpf_t`
+The `gmp_float` backend is used in conjunction with `mp_number` : it acts as a thin wrapper around the GMP `mpf_t`
 to provide an real-number type that is a drop-in replacement for the native C++ floating-point types, but with 
 much greater precision.
 
@@ -269,7 +271,7 @@ copy constructible and assignable from:
 * The GMP native types `mpf_t`, `mpz_t`, `mpq_t`.
 * The `mp_number` wrappers around those types: `mp_number<mpf_float<M> >`, `mp_number<gmp_int>`, `mp_number<gmp_rational>`.
 
-It's also possible to access the underlying `mpf_t` via the data() member function of `gmp_float`.
+It's also possible to access the underlying `mpf_t` via the `data()` member function of `gmp_float`.
 
 [h5 GMP example:]
 
@@ -376,9 +378,9 @@ There are also non-member functions:
    mpz_int numerator(const mpq_rational&);
    mpz_int denominator(const mpq_rational&);
 
-Which return the numerator and denominator of the number.
+which return the numerator and denominator of the number.
 
-It's also possible to access the underlying `mpq_t` via the data() member function of `mpq_rational`.
+It's also possible to access the underlying `mpq_t` via the `data()` member function of `mpq_rational`.
 
 [h5 Example:]
 
@@ -530,7 +532,7 @@ mp_number is an "unmentionable" expression template type.
 Binary operators, must have at least one argument that is of type `mp_number` or an expression template
 derived from `mp_number`.  One argument may optionally be of arithmetic type.
 
-Note that type `mp_number` (and all expression templates derived from it) may be used in a Boolian context.
+Note that type `mp_number` (and all expression templates derived from it) may be used in a Boolean context.
 
       operator ``['convertible-to-bool-type]``()const;
 
@@ -577,14 +579,14 @@ the default precision and the precision of `*this` respectively.
 
 Returns:
 
-* A value less that 0 for *this < other
-* A value greater that 0 for *this > other
-* Zero for *this == other
+* A value less that 0 for `*this < other`
+* A value greater that 0 for `*this > other`
+* Zero for `*this == other`
 
       Backend& backend();
       const Backend& backend()const;
 
-Returns the underlying backend instance used by *this.
+Returns the underlying backend instance used by `*this`.
 
 [h4 swap]
 
@@ -646,21 +648,23 @@ don't have native support for these functions.  Please note however, that this d
 to be a compile time constant - this means for example that the GMP MPF Backend will not work with these functions when that type is 
 used at variable precision.
 
-Also note that with the exception of `abs` that these functions can only be used with floating point Backend types.
+Also note that with the exception of `abs` that these functions can only be used with floating-point Backend types.
 
-[h4 Boost.Math Interoperabilty Support]
+[h4 Boost.Math Interoperability Support]
 
    namespace boost{ namespace math{
 
-   int                                              fpclassify     (const ``['mp_number-or-expression-template-type]``&, int);
-   bool                                             isfinite       (const ``['mp_number-or-expression-template-type]``&, int);
-   bool                                             isnan          (const ``['mp_number-or-expression-template-type]``&, int);
-   bool                                             isinf          (const ``['mp_number-or-expression-template-type]``&, int);
-   bool                                             isnormal       (const ``['mp_number-or-expression-template-type]``&, int);
+   int  fpclassify     (const ``['mp_number-or-expression-template-type]``&, int);
+   bool isfinite       (const ``['mp_number-or-expression-template-type]``&, int);
+   bool isnan          (const ``['mp_number-or-expression-template-type]``&, int);
+   bool isinf          (const ``['mp_number-or-expression-template-type]``&, int);
+   bool isnormal       (const ``['mp_number-or-expression-template-type]``&, int);
 
    }} // namespaces
 
-These functions behave exacts as their Boost.Math equivalents.  Other Boost.Math functions and templates may also be
+These floating-point classification functions behave exactly as their Boost.Math equivalents.
+
+Other Boost.Math functions and templates may also be
 specialized or overloaded to ensure interoperability.
 
 [h4 std::numeric_limits support]
@@ -686,22 +690,22 @@ whose precision can vary at compile time (such as `mpf_float`).
 [template super[x]'''<superscript>'''[x]'''</superscript>''']
 
 The requirements on the `Backend` template argument to `mp_number` are split up into
-compulsary requirements, and optional requirements that are either to improve performance
+compulsory requirements, and optional requirements that are either to improve performance
 or provide optional features.
 
 In the following tables, type B is the `Backend` template arument to `mp_number`, `b` is
 a variable of B, `cb` and `cb2` are constant variables of type B, `a` is a variable of Arithmetic type, 
 `s` is a variable of type `const char*`, `ui` is a variable of type `unsigned`, `bb` is a variable of type `bool`,
-`pa` is a variable of type pointer-to-arithmetc-type, `exp` is a variable of type `B::exp_type`,
+`pa` is a variable of type pointer-to-arithmetic-type, `exp` is a variable of type `B::exp_type`,
 `pexp` is a variable of type `B::exp_type*`.
 
-[table Compulsary Requirements on the Backend type.
+[table Compulsory Requirements on the Backend type.
 [[Expression][Return Type][Comments]]
 [[`B::signed_types`][`mpl::list<type-list>`][A list of signed integral types that can be assigned to type B.  The types shall be
                    listed in order of size, smallest first, and shall terminate in the type that is `std::intmax_t`.]]
 [[`B::unsigned_types`][`mpl::list<type-list>`][A list of unsigned integral types that can be assigned to type B.  The types shall be
                    listed in order of size, smallest first, and shall terminate in the type that is `std::uintmax_t`.]]
-[[`B::float_types`][`mpl::list<type-list>`][A list of floating point types that can be assigned to type B.The types shall be
+[[`B::float_types`][`mpl::list<type-list>`][A list of floating-point types that can be assigned to type B.The types shall be
                    listed in order of size, smallest first, and shall terminate in type `long double`.]]
 [[`B::exponent_type`][A signed integral type.][The type of the exponent of type B.]]
 [[`B()`][ ][Default constructor.]]
@@ -710,7 +714,7 @@ a variable of B, `cb` and `cb2` are constant variables of type B, `a` is a varia
 [[`b = a`][`B&`][Assignment from an Arithmetic type.  The type of `a` shall be listed in one of the type lists
             `B::signed_types`, `B::unsigned_types` or `B::float_types`.]]
 [[`b = s`][`B&`][Assignment from a string.]]
-[[`b.swap(b)`][`void`][Swaps the contents of it's arguments.]]
+[[`b.swap(b)`][`void`][Swaps the contents of its arguments.]]
 [[`cb.str(ui, bb)`][`std::string`][Returns the string representation of `b` with `ui` digits and in scientific format if `bb` is `true`.
                   If `ui` is zero, then returns as many digits as are required to reconstruct the original value.]]
 [[`b.negate()`][`void`][Negates `b`.]]
@@ -734,11 +738,11 @@ a variable of B, `cb` and `cb2` are constant variables of type B, `a` is a varia
                      conversion to at least types `std::intmax_t`, `std::uintmax_t` and `long long`.
                      Conversion to other arithmetic types can then be synthesised using other operations.
                      Conversions to other types are entirely optional.]]
-[[`eval_frexp(b, cb, pexp)`][`void`][Stores values in `b` and `*pexp` such that the value of `cb` is b * 2[super *pexp], only required when `B` is a floating point type.]]
-[[`eval_ldexp(b, cb, exp)`][`void`][Stores a value in `b` that is cb * 2[super exp], only required when `B` is a floating point type.]]
-[[`eval_floor(b, cb)`][`void`][Stores the floor of `cb` in `b`, only required when `B` is a floating point type.]]
-[[`eval_ceil(b, cb)`][`void`][Stores the ceiling of `cb` in `b`, only required when `B` is a floating point type.]]
-[[`eval_sqrt(b, cb)`][`void`][Stores the square root of `cb` in `b`, only required when `B` is a floating point type.]]
+[[`eval_frexp(b, cb, pexp)`][`void`][Stores values in `b` and `*pexp` such that the value of `cb` is b * 2[super *pexp], only required when `B` is a floating-point type.]]
+[[`eval_ldexp(b, cb, exp)`][`void`][Stores a value in `b` that is cb * 2[super exp], only required when `B` is a floating-point type.]]
+[[`eval_floor(b, cb)`][`void`][Stores the floor of `cb` in `b`, only required when `B` is a floating-point type.]]
+[[`eval_ceil(b, cb)`][`void`][Stores the ceiling of `cb` in `b`, only required when `B` is a floating-point type.]]
+[[`eval_sqrt(b, cb)`][`void`][Stores the square root of `cb` in `b`, only required when `B` is a floating-point type.]]
 ]
 
 [table Optional Requirements on the Backend Type
@@ -807,24 +811,24 @@ a variable of B, `cb` and `cb2` are constant variables of type B, `a` is a varia
 [[`get_sign(cb)`][`int`][Returns a value < zero if `cb` is negative, a value > zero if `cb` is positive, and zero if `cb` is zero.]]
 [[`eval_abs(b, cb)`][`void`][Set `b` to the absolute value of `cb`.]]
 [[`eval_fabs(b, cb)`][`void`][Set `b` to the absolute value of `cb`.]]
-[[`eval_fpclassify(cb)`][`int`][Returns one of the same values returned by `std::fpclassify`.  Only required when `B` is an floating point type.]]
-[[`eval_trunc(b, cb)`][`void`][Performs the equivalent operation to `std::trunc` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
-[[`eval_round(b, cb, cb2)`][`void`][Performs the equivalent operation to `std::round` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
-[[`eval_exp(b, cb)`][`void`][Performs the equivalent operation to `std::exp` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
-[[`eval_log(b, cb)`][`void`][Performs the equivalent operation to `std::log` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
-[[`eval_log10(b, cb)`][`void`][Performs the equivalent operation to `std::log10` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
-[[`eval_sin(b, cb)`][`void`][Performs the equivalent operation to `std::sin` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
-[[`eval_cos(b, cb)`][`void`][Performs the equivalent operation to `std::cos` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
-[[`eval_tan(b, cb)`][`void`][Performs the equivalent operation to `std::exp` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
-[[`eval_asin(b, cb)`][`void`][Performs the equivalent operation to `std::asin` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
-[[`eval_acos(b, cb)`][`void`][Performs the equivalent operation to `std::acos` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
-[[`eval_atan(b, cb)`][`void`][Performs the equivalent operation to `std::atan` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
-[[`eval_sinh(b, cb)`][`void`][Performs the equivalent operation to `std::sinh` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
-[[`eval_cosh(b, cb)`][`void`][Performs the equivalent operation to `std::cosh` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
-[[`eval_tanh(b, cb)`][`void`][Performs the equivalent operation to `std::tanh` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating point type.]]
-[[`eval_fmod(b, cb, cb2)`][`void`][Performs the equivalent operation to `std::fmod` on arguments `cb` and `cb2`, and store the result in `b`.  Only required when `B` is an floating point type.]]
-[[`eval_pow(b, cb, cb2)`][`void`][Performs the equivalent operation to `std::pow` on arguments `cb` and `cb2`, and store the result in `b`.  Only required when `B` is an floating point type.]]
-[[`eval_atan2(b, cb, cb2)`][`void`][Performs the equivalent operation to `std::atan` on arguments `cb` and `cb2`, and store the result in `b`.  Only required when `B` is an floating point type.]]
+[[`eval_fpclassify(cb)`][`int`][Returns one of the same values returned by `std::fpclassify`.  Only required when `B` is an floating-point type.]]
+[[`eval_trunc(b, cb)`][`void`][Performs the equivalent operation to `std::trunc` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.]]
+[[`eval_round(b, cb, cb2)`][`void`][Performs the equivalent operation to `std::round` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.]]
+[[`eval_exp(b, cb)`][`void`][Performs the equivalent operation to `std::exp` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.]]
+[[`eval_log(b, cb)`][`void`][Performs the equivalent operation to `std::log` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.]]
+[[`eval_log10(b, cb)`][`void`][Performs the equivalent operation to `std::log10` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.]]
+[[`eval_sin(b, cb)`][`void`][Performs the equivalent operation to `std::sin` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.]]
+[[`eval_cos(b, cb)`][`void`][Performs the equivalent operation to `std::cos` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.]]
+[[`eval_tan(b, cb)`][`void`][Performs the equivalent operation to `std::exp` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.]]
+[[`eval_asin(b, cb)`][`void`][Performs the equivalent operation to `std::asin` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.]]
+[[`eval_acos(b, cb)`][`void`][Performs the equivalent operation to `std::acos` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.]]
+[[`eval_atan(b, cb)`][`void`][Performs the equivalent operation to `std::atan` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.]]
+[[`eval_sinh(b, cb)`][`void`][Performs the equivalent operation to `std::sinh` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.]]
+[[`eval_cosh(b, cb)`][`void`][Performs the equivalent operation to `std::cosh` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.]]
+[[`eval_tanh(b, cb)`][`void`][Performs the equivalent operation to `std::tanh` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.]]
+[[`eval_fmod(b, cb, cb2)`][`void`][Performs the equivalent operation to `std::fmod` on arguments `cb` and `cb2`, and store the result in `b`.  Only required when `B` is an floating-point type.]]
+[[`eval_pow(b, cb, cb2)`][`void`][Performs the equivalent operation to `std::pow` on arguments `cb` and `cb2`, and store the result in `b`.  Only required when `B` is an floating-point type.]]
+[[`eval_atan2(b, cb, cb2)`][`void`][Performs the equivalent operation to `std::atan` on arguments `cb` and `cb2`, and store the result in `b`.  Only required when `B` is an floating-point type.]]
 ]
 
 [endsect]
