@@ -6,7 +6,7 @@
 #include <boost/detail/lightweight_test.hpp>
 #include <boost/math/special_functions/pow.hpp>
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ)
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ) && !defined(TEST_TOMMATH)
 #  define TEST_MPF_50
 #  define TEST_MPF
 #  define TEST_BACKEND
@@ -15,6 +15,7 @@
 #  define TEST_MPFR_50
 #  define TEST_CPP_FLOAT
 #  define TEST_MPQ
+#  define TEST_TOMMATH
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -36,6 +37,9 @@
 #endif
 #if defined(TEST_MPFR) || defined(TEST_MPFR_50)
 #include <boost/multiprecision/mpfr.hpp>
+#endif
+#ifdef TEST_TOMMATH
+#include <boost/multiprecision/tommath.hpp>
 #endif
 
 #define BOOST_TEST_THROW(x, EX)\
@@ -69,6 +73,14 @@ template <class T> bool isfloat(T){ return false; }
        BOOST_LIGHTWEIGHT_TEST_OSTREAM << std::setprecision(34) << "(x-y)/x = " << ::fabsl(static_cast<long double>((x-y)/x)) \
        << " tolerance = " << tol << std::endl;\
    }
+
+template <class T>
+struct is_twos_complement_integer : public boost::mpl::true_ {};
+
+#ifdef TEST_TOMMATH
+template <>
+struct is_twos_complement_integer<boost::multiprecision::mp_int> : public boost::mpl::false_ {};
+#endif
 
 template <class Real, class T>
 void test_integer_ops(const T&){}
@@ -180,6 +192,7 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    int i = 1020304;
    int j = 56789123;
    int k = 4523187;
+   int sign_mask = is_twos_complement_integer<Real>::value ? ~0 : (std::numeric_limits<int>::max)();
    a = i;
    b = j;
    c = a;
@@ -248,11 +261,11 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    a = i;
    b = j;
    c = k;
-   BOOST_TEST(~a == ~i);
+   BOOST_TEST(~a == (~i & sign_mask));
    c = a & ~b;
-   BOOST_TEST(c == (i & ~j));
+   BOOST_TEST(c == (i & (~j & sign_mask)));
    c = ~(a | b);
-   BOOST_TEST(c == ~(i | j));
+   BOOST_TEST(c == (~(i | j) & sign_mask));
    //
    // Non-member functions:
    //
@@ -869,6 +882,9 @@ int main()
 #endif
 #ifdef TEST_MPFR_50
    test<boost::multiprecision::mpfr_float_50>();
+#endif
+#ifdef TEST_TOMMATH
+   test<boost::multiprecision::mp_int>();
 #endif
    return boost::report_errors();
 }

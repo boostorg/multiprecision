@@ -9,21 +9,34 @@ import path ;
 local ntl-path = [ modules.peek : NTL_PATH ] ;
 local gmp_path = [ modules.peek : GMP_PATH ] ;
 local mpfr_path = [ modules.peek : MPFR_PATH ] ;
+local tommath_path = [ modules.peek : TOMMATH_PATH ] ;
 
 project : requirements 
    <include>$(gmp_path) 
    <include>$(gmp_path)/mpfr 
    <include>$(gmp_path)/gmpfrxx 
    <include>$(mpfr_path)
+   <include>$(tommath_path)
    <include>../../.. 
    <search>$(gmp_path) 
    <search>$(mpfr_path) 
    <search>$(mpfr_path)/build.vc10/lib/Win32/Debug
+   <search>$(tommath_path) 
    <toolset>msvc:<runtime-link>static
    ;
 
 lib gmp ;
 lib mpfr ;
+
+if $(tommath_path)
+{
+   TOMMATH = [ GLOB $(tommath_path) : *.c ] ;
+}
+else
+{
+   lib tommath ;
+   TOMMATH = tommath ;
+}
 
 run test_arithmetic.cpp
         : # command line
@@ -87,6 +100,14 @@ run test_arithmetic.cpp mpfr gmp
          [ check-target-builds ../config//has_mpfr : : <build>no ]
         : test_arithmetic_mpfr_50 ;
 
+run test_arithmetic.cpp $(TOMMATH)
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_TOMMATH
+         [ check-target-builds ../config//has_tommath : : <build>no ]
+        : test_arithmetic_tommath ;
+
 run test_numeric_limits.cpp
         : # command line
         : # input files
@@ -149,6 +170,14 @@ run test_numeric_limits.cpp
 	      <define>TEST_CPP_FLOAT
          [ check-target-builds ../config//has_mpfr : : <build>no ]
         : test_numeric_limits_cpp_float ;
+
+run test_numeric_limits.cpp $(TOMMATH)
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_TOMMATH
+         [ check-target-builds ../config//has_tommath : : <build>no ]
+        : test_numeric_limits_tommath ;
 
 run mp_number_concept_check.cpp  mpfr
         : # command line

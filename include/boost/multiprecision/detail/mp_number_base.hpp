@@ -10,6 +10,12 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_convertible.hpp>
 
+#ifdef BOOST_NO_NOEXCEPT
+#define BOOST_MP_NOEXCEPT
+#else
+#define BOOST_MP_NOEXCEPT noexcept
+#endif
+
 namespace boost{ namespace multiprecision{
 
 template <class Backend>

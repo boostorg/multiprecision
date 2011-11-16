@@ -194,7 +194,7 @@ typedef boost::multiprecision::mp_number<mp_number_backend_float_architype> mp_n
 namespace std{
 
 #ifdef BOOST_NO_NOEXCEPT
-#  define noexcept
+#  define BOOST_MP_NOEXCEPT
 #endif
 
 template <>
@@ -203,19 +203,19 @@ class numeric_limits<boost::multiprecision::concepts::mp_number_float_architype>
    typedef std::numeric_limits<long double> base_type;
    typedef boost::multiprecision::concepts::mp_number_float_architype number_type;
 public:
-   BOOST_STATIC_CONSTEXPR number_type (min)() noexcept { return (base_type::min)(); }
-   BOOST_STATIC_CONSTEXPR number_type (max)() noexcept { return (base_type::max)(); }
-   BOOST_STATIC_CONSTEXPR number_type lowest() noexcept { return -(max)(); }
-   BOOST_STATIC_CONSTEXPR number_type epsilon() noexcept { return base_type::epsilon(); }
-   BOOST_STATIC_CONSTEXPR number_type round_error() noexcept { return epsilon() / 2; }
-   BOOST_STATIC_CONSTEXPR number_type infinity() noexcept { return base_type::infinity(); }
-   BOOST_STATIC_CONSTEXPR number_type quiet_NaN() noexcept { return base_type::quiet_NaN(); }
-   BOOST_STATIC_CONSTEXPR number_type signaling_NaN() noexcept { return base_type::signaling_NaN(); }
-   BOOST_STATIC_CONSTEXPR number_type denorm_min() noexcept { return base_type::denorm_min(); }
+   BOOST_STATIC_CONSTEXPR number_type (min)() BOOST_MP_NOEXCEPT { return (base_type::min)(); }
+   BOOST_STATIC_CONSTEXPR number_type (max)() BOOST_MP_NOEXCEPT { return (base_type::max)(); }
+   BOOST_STATIC_CONSTEXPR number_type lowest() BOOST_MP_NOEXCEPT { return -(max)(); }
+   BOOST_STATIC_CONSTEXPR number_type epsilon() BOOST_MP_NOEXCEPT { return base_type::epsilon(); }
+   BOOST_STATIC_CONSTEXPR number_type round_error() BOOST_MP_NOEXCEPT { return epsilon() / 2; }
+   BOOST_STATIC_CONSTEXPR number_type infinity() BOOST_MP_NOEXCEPT { return base_type::infinity(); }
+   BOOST_STATIC_CONSTEXPR number_type quiet_NaN() BOOST_MP_NOEXCEPT { return base_type::quiet_NaN(); }
+   BOOST_STATIC_CONSTEXPR number_type signaling_NaN() BOOST_MP_NOEXCEPT { return base_type::signaling_NaN(); }
+   BOOST_STATIC_CONSTEXPR number_type denorm_min() BOOST_MP_NOEXCEPT { return base_type::denorm_min(); }
 };
 
 #ifdef BOOST_NO_NOEXCEPT
-#  undef noexcept
+#  undef BOOST_MP_NOEXCEPT
 #endif
 
 }

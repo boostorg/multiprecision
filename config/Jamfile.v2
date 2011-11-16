@@ -8,12 +8,15 @@ import path ;
 
 local gmp_path = [ modules.peek : GMP_PATH ] ;
 local mpfr_path = [ modules.peek : MPFR_PATH ] ;
+local tommath_path = [ modules.peek : TOMMATH_PATH ] ;
 
 obj has_gmp : has_gmp.cpp :
       <include>$(gmp_path) <include>$(gmp_path)/mpfr <include>$(gmp_path)/gmpfrxx ;
 obj has_mpfr : has_mpfr.cpp :
       <include>$(mpfr_path) <include>$(gmp_path)/mpfr <include>$(gmp_path)/gmpfrxx <include>$(gmp_path) ;
+obj has_tommath : has_tommath.cpp :
+      <include>$(tommath_path) ;
 
 explicit has_gmp ;
 explicit has_mpfr ;
-
+explicit has_tommath ;

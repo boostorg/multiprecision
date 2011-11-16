@@ -5,7 +5,7 @@
 
 #include <boost/detail/lightweight_test.hpp>
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ)
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ) && !defined(TEST_TOMMATH)
 #  define TEST_MPF_50
 #  define TEST_MPF
 #  define TEST_BACKEND
@@ -14,6 +14,7 @@
 #  define TEST_MPFR_50
 #  define TEST_CPP_FLOAT
 #  define TEST_MPQ
+#  define TEST_TOMMATH
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -35,6 +36,9 @@
 #endif
 #if defined(TEST_MPFR) || defined(TEST_MPFR_50)
 #include <boost/multiprecision/mpfr.hpp>
+#endif
+#ifdef TEST_TOMMATH
+#include <boost/multiprecision/tommath.hpp>
 #endif
 
 #define PRINT(x)\
@@ -168,6 +172,9 @@ int main()
 #endif
 #ifdef TEST_MPFR_50
    test<boost::multiprecision::mpfr_float_50>();
+#endif
+#ifdef TEST_TOMMATH
+   test<boost::multiprecision::mp_int>();
 #endif
    return boost::report_errors();
 }
