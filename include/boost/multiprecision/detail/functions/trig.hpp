@@ -61,7 +61,7 @@ void hyp0F1(T& result, const T& b, const T& x)
    }
 
    if(n >= 300)
-      throw std::runtime_error("H0F1 Failed to Converge");
+      BOOST_THROW_EXCEPTION(std::runtime_error("H0F1 Failed to Converge"));
 }
 
 
@@ -407,7 +407,7 @@ void hyp2F1(T& result, const T& a, const T& b, const T& c, const T& x)
          break;
    }
    if(n > 300)
-      throw std::runtime_error("H2F1 failed to converge.");
+      BOOST_THROW_EXCEPTION(std::runtime_error("H2F1 failed to converge."));
 }
 
 template <class T>

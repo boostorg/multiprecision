@@ -8,7 +8,7 @@
 #include <math.h>
 #include <boost/limits.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <boost/detail/lightweight_test.hpp>
+#include "test.hpp"
 
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ)
 #  define TEST_MPF_50
@@ -41,13 +41,6 @@
 #ifdef _MSC_VER
 #pragma warning(disable: 4127) //  conditional expression is constant
 #endif
-
-#define BOOST_CHECK_EQUAL(x, y)\
-   if(x != y)\
-   {\
-      BOOST_ERROR("Values were not equal.");\
-      BOOST_LIGHTWEIGHT_TEST_OSTREAM << x << " != " << y << std::endl;\
-   }
 
 const char* method_name(const boost::math::detail::native_tag&)
 {

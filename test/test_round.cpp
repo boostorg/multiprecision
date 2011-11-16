@@ -9,12 +9,7 @@
 #include <boost/math/special_functions/modf.hpp>
 #include <boost/math/special_functions/sign.hpp>
 #include <boost/random/mersenne_twister.hpp>
-
-#define BOOST_CHECK_THROW(x, EX)\
-   try { x;  BOOST_ERROR("Expected exception not thrown"); } \
-   catch(const EX&){}\
-   catch(...){ BOOST_ERROR("Incorrect exception type thrown"); }
-
+#include "test.hpp"
 
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ)
 #  define TEST_MPF_50

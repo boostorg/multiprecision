@@ -583,3 +583,4 @@ run test_fpclassify.cpp
         : test_fpclassify_cpp_float ;
 
 
+run test_test.cpp ;

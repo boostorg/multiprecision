@@ -2625,7 +2625,7 @@ inline void eval_frexp(cpp_float<Digits10>& result, const cpp_float<Digits10>& x
    long long t = result.order();
 
    if(std::abs(t) > (std::numeric_limits<long long>::max)() / 3)
-      throw std::runtime_error("Exponent is too large to be represented as a power of 2.");
+      BOOST_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2."));
    t *= 3;
 
    result *= cpp_float<Digits10>::pow2(-t);
@@ -2651,7 +2651,7 @@ inline void eval_frexp(cpp_float<Digits10>& result, const cpp_float<Digits10>& x
    long long t;
    eval_frexp(result, x, &t);
    if(t > (std::numeric_limits<int>::max)())
-      throw std::runtime_error("Exponent is outside the range of an int");
+      BOOST_THROW_EXCEPTION(std::runtime_error("Exponent is outside the range of an int"));
    *e = static_cast<int>(t);
 }
 
@@ -2702,15 +2702,15 @@ namespace std
       static const bool                    traps             = false;
       static const bool                    tinyness_before   = false;
 
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > (min)        (void) throw() { return (boost::multiprecision::cpp_float<Digits10>::min)(); }
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > (max)        (void) throw() { return (boost::multiprecision::cpp_float<Digits10>::max)(); }
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > lowest       (void) throw() { return boost::multiprecision::cpp_float<Digits10>::zero(); }
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > epsilon      (void) throw() { return boost::multiprecision::cpp_float<Digits10>::eps(); }
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > round_error  (void) throw() { return 0.5L; }
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > infinity     (void) throw() { return boost::multiprecision::cpp_float<Digits10>::inf(); }
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > quiet_NaN    (void) throw() { return boost::multiprecision::cpp_float<Digits10>::nan(); }
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > signaling_NaN(void) throw() { return boost::multiprecision::cpp_float<Digits10>::zero(); }
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > denorm_min   (void) throw() { return boost::multiprecision::cpp_float<Digits10>::zero(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > (min)        (void)  { return (boost::multiprecision::cpp_float<Digits10>::min)(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > (max)        (void)  { return (boost::multiprecision::cpp_float<Digits10>::max)(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > lowest       (void)  { return boost::multiprecision::cpp_float<Digits10>::zero(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > epsilon      (void)  { return boost::multiprecision::cpp_float<Digits10>::eps(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > round_error  (void)  { return 0.5L; }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > infinity     (void)  { return boost::multiprecision::cpp_float<Digits10>::inf(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > quiet_NaN    (void)  { return boost::multiprecision::cpp_float<Digits10>::nan(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > signaling_NaN(void)  { return boost::multiprecision::cpp_float<Digits10>::zero(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > denorm_min   (void)  { return boost::multiprecision::cpp_float<Digits10>::zero(); }
    };
 }
 
