@@ -116,7 +116,7 @@ void report_unexpected_exception(const E& e, int severity, const char* file, int
    << std::setprecision(digits_of(x)) << std::scientific\
    << "Value of LHS was: " << x << "\n"\
    << "Value of RHS was: " << y << "\n"\
-   << std::setprecision(3)\
+   << std::setprecision(5) << std::fixed\
    << "Relative error was: " << relative_error(x, y) << "eps\n"\
    << "Tolerance was: " << tol << "eps" << std::endl;\
    BOOST_MP_REPORT_SEVERITY(severity);\

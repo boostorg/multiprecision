@@ -163,6 +163,18 @@ public:
       fpclass  (f.fpclass),
       prec_elem(f.prec_elem) { }
 
+   template <unsigned D>
+   cpp_float(const cpp_float<D>& f) : 
+      exp      (f.exp),
+      neg      (f.neg),
+      fpclass  (static_cast<enum_fpclass>(static_cast<int>(f.fpclass))),
+      prec_elem(mp_elem_number)
+   { 
+      // TODO: this doesn't round!
+      std::copy_n(f.data.begin(), std::min(f.prec_elem, prec_elem), data.begin());
+      precision(std::min(f.prec_elem, prec_elem));
+   }
+
    template <class F>
    cpp_float(const F val, typename enable_if<is_floating_point<F> >::type* = 0): 
       data(),
@@ -297,6 +309,16 @@ public:
       neg = v.neg;
       fpclass = v.fpclass;
       prec_elem = v.prec_elem;
+      return *this;
+   }
+   template <unsigned D>
+   cpp_float& operator=(const cpp_float<D>& f)
+   { 
+      exp = f.exp;
+      neg = f.neg;
+      fpclass = static_cast<enum_fpclass>(static_cast<int>(f.fpclass));
+      std::copy_n(f.data.begin(), std::min(f.prec_elem, prec_elem), data.begin());
+      precision(std::min(f.prec_elem, prec_elem));
       return *this;
    }
    cpp_float& operator= (long long v)
@@ -481,6 +503,10 @@ private:
    static boost::uint32_t div_loop_n(boost::uint32_t* const u, boost::uint32_t n, const boost::int32_t p);
 
    bool rd_string(const char* const s);
+
+   template <unsigned D>
+   friend class cpp_float;
+
 };
 
 template <unsigned Digits10>

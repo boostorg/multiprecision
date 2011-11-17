@@ -1529,7 +1529,9 @@ inline typename boost::enable_if<detail::is_valid_comparison<Exp1, Exp2>, bool>:
 template <class Backend>
 inline std::ostream& operator << (std::ostream& os, const mp_number<Backend>& r)
 {
-   return os << r.str(static_cast<unsigned>(os.precision(), os.flags() & os.scientific));
+   unsigned d = os.precision();
+   bool b = os.flags() & os.scientific;
+   return os << r.str(d, b);
 }
 
 namespace detail{
