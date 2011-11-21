@@ -446,9 +446,9 @@ public:
    //
    // String conversion functions:
    //
-   std::string str(unsigned digits = 0, bool scientific = true)const
+   std::string str(std::streamsize digits = 0, std::ios_base::fmtflags f = std::ios_base::fmtflags(0))const
    {
-      return m_backend.str(digits, scientific);
+      return m_backend.str(digits, f);
    }
    template <class T>
    T convert_to()const
@@ -981,7 +981,7 @@ private:
    template <class F, class Exp>
    void do_assign_function_1(const F& f, const Exp& val, const detail::terminal&)
    {
-      f(m_backend, canonical_value(val.value()));
+      f(m_backend, function_arg_value(val.value()));
    }
    template <class F, class Exp, class Tag>
    void do_assign_function_1(const F& f, const Exp& val, const Tag&)
@@ -1001,19 +1001,19 @@ private:
    template <class F, class Exp1, class Exp2>
    void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const detail::terminal&, const detail::terminal&)
    {
-      f(m_backend, canonical_value(val1.value()), canonical_value(val2.value()));
+      f(m_backend, function_arg_value(val1.value()), function_arg_value(val2.value()));
    }
    template <class F, class Exp1, class Exp2, class Tag1>
    void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const Tag1&, const detail::terminal&)
    {
       self_type temp1(val1);
-      f(m_backend, temp1.backend(), canonical_value(val2.value()));
+      f(m_backend, temp1.backend(), function_arg_value(val2.value()));
    }
    template <class F, class Exp1, class Exp2, class Tag2>
    void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const detail::terminal&, const Tag2&)
    {
       self_type temp2(val2);
-      f(m_backend, canonical_value(val1.value()), temp2.backend());
+      f(m_backend, function_arg_value(val1.value()), temp2.backend());
    }
    template <class F, class Exp1, class Exp2, class Tag1, class Tag2>
    void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const Tag1&, const Tag2&)
@@ -1384,12 +1384,13 @@ private:
    bool is_floatly_self(const self_type& v)const { return &v == this; }
 
    static const Backend& canonical_value(const self_type& v){  return v.m_backend;  }
-   //static const Backend& canonical_value(const self_type* v){  return v->m_backend;  }
-   //static const Backend& canonical_value(self_type* v){  return v->m_backend;  }
-   //static const Backend& canonical_value(self_type& v){  return v.m_backend;  }
    template <class V>
    static typename detail::canonical<V, Backend>::type canonical_value(const V& v){  return v;  }
    static typename detail::canonical<std::string, Backend>::type canonical_value(const std::string& v){  return v.c_str();  }
+
+   static const Backend& function_arg_value(const self_type& v) {  return v.backend();  }
+   template <class V>
+   static const V& function_arg_value(const V& v) {  return v;  }
    Backend m_backend;
 };
 
@@ -1529,9 +1530,18 @@ inline typename boost::enable_if<detail::is_valid_comparison<Exp1, Exp2>, bool>:
 template <class Backend>
 inline std::ostream& operator << (std::ostream& os, const mp_number<Backend>& r)
 {
-   unsigned d = os.precision();
-   bool b = os.flags() & os.scientific;
-   return os << r.str(d, b);
+   std::streamsize d = os.precision();
+   std::string s = r.str(d, os.flags());
+   std::streamsize ss = os.width();
+   if(ss > static_cast<std::streamsize>(s.size()))
+   {
+      char fill = os.fill();
+      if((os.flags() & std::ios_base::left) == std::ios_base::left)
+         s.append(static_cast<std::string::size_type>(ss - s.size()), fill);
+      else
+         s.insert(0, static_cast<std::string::size_type>(ss - s.size()), fill);
+   }
+   return os << s;
 }
 
 namespace detail{

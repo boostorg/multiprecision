@@ -4,6 +4,7 @@
 
 #include <limits>
 #include <cmath>
+#include <typeinfo>
 
 #include <boost/detail/lightweight_test.hpp>
 #include <boost/current_function.hpp>

@@ -74,20 +74,19 @@ struct mp_number_backend_float_architype
       std::cout << "Swapping (" << m_value << " with " << o.m_value << ")" << std::endl;
       std::swap(m_value, o.m_value);
    }
-   std::string str(unsigned digits, bool scientific)const
+   std::string str(std::streamsize digits, std::ios_base::fmtflags f)const
    {
       std::stringstream ss;
-      if(scientific)
-         ss.setf(ss.scientific);
+      ss.flags(f);
       if(digits)
          ss.precision(digits);
       else
          ss.precision(std::numeric_limits<long double>::digits10 + 2);
       boost::intmax_t i = m_value;
       boost::uintmax_t u = m_value;
-      if(!scientific && m_value == i)
+      if(!(f & std::ios_base::scientific) && m_value == i)
          ss << i;
-      else if(!scientific && m_value == u)
+      else if(!(f & std::ios_base::scientific) && m_value == u)
          ss << u;
       else
          ss << m_value;
@@ -193,10 +192,6 @@ typedef boost::multiprecision::mp_number<mp_number_backend_float_architype> mp_n
 
 namespace std{
 
-#ifdef BOOST_NO_NOEXCEPT
-#  define BOOST_MP_NOEXCEPT
-#endif
-
 template <>
 class numeric_limits<boost::multiprecision::concepts::mp_number_float_architype> : public std::numeric_limits<long double>
 {
@@ -213,10 +208,6 @@ public:
    BOOST_STATIC_CONSTEXPR number_type signaling_NaN() BOOST_MP_NOEXCEPT { return base_type::signaling_NaN(); }
    BOOST_STATIC_CONSTEXPR number_type denorm_min() BOOST_MP_NOEXCEPT { return base_type::denorm_min(); }
 };
-
-#ifdef BOOST_NO_NOEXCEPT
-#  undef BOOST_MP_NOEXCEPT
-#endif
 
 }
 

@@ -156,32 +156,51 @@ struct mpfr_float_imp
    {
       mpfr_swap(m_data, o.m_data);
    }
-   std::string str(unsigned digits, bool scientific)const
+   std::string str(std::streamsize digits, std::ios_base::fmtflags f)const
    {
+      bool scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
+      bool fixed      = (f & std::ios_base::fixed) == std::ios_base::fixed;
+      bool showpoint  = (f & std::ios_base::showpoint) == std::ios_base::showpoint;
+
       std::string result;
       mp_exp_t e;
-      char* ps = mpfr_get_str (0, &e, 10, digits, m_data, GMP_RNDN);
+      char* ps = mpfr_get_str (0, &e, 10, static_cast<std::size_t>(digits), m_data, GMP_RNDN);
       std::ptrdiff_t sl = std::strlen(ps);
-      unsigned chars = sl;
+      int chars = sl;
       if(sl == 0)
          return "0";
       while(ps[chars-1] == '0')
          --chars;
+      ps[chars] = 0;
       if(*ps == '-')
          --chars; // number of digits excluding sign.
       if(chars == 0)
-         return "0";
-      if(!scientific
-         && (chars <= std::numeric_limits<boost::uintmax_t>::digits10 + 1)
-         && (e >= (int)chars)
-         && (chars <= std::numeric_limits<boost::uintmax_t>::digits10 + 1))
+         return scientific ? "0.0e0" : showpoint ? "0.0" : "0";
+      result = ps;
+      if(fixed || (!scientific && (e > -4) && (e <= std::numeric_limits<boost::uintmax_t>::digits10 + 2)))
       {
-         result.assign(ps, (*ps == '-' ? chars+1 : chars));
-         result.append(e-chars, '0');
+         if(e >= chars)
+         {
+            result.append(e - chars, '0');
+            if(showpoint)
+               result.append(".0");
+         }
+         else
+         {
+            if(e <= 0)
+            {
+               result.insert(0, -e, '0');
+               result.insert(0, "0.");
+            }
+            else
+            {
+               // Insert the decimal point:
+               result.insert(e, 1, '.');
+            }
+         }
       }
       else
       {
-         result = ps;
          if(ps[0] == '-')
             result.insert(2, 1, '.');
          else
@@ -966,10 +985,6 @@ struct lanczos<multiprecision::mp_number<multiprecision::mpfr_float_backend<Digi
 
 namespace std{
 
-#ifdef BOOST_NO_NOEXCEPT
-#  define BOOST_MP_NOEXCEPT
-#endif
-
 //
 // numeric_limits [partial] specializations for the types declared in this header:
 //
@@ -1146,10 +1161,6 @@ public:
    BOOST_STATIC_CONSTEXPR bool tinyness_before = false;
    BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
 };
-
-#ifdef BOOST_MP_NOEXCEPT
-#undef BOOST_MP_NOEXCEPT
-#endif
 
 } // namespace std
 #endif

@@ -36,7 +36,7 @@ void hyp0F1(T& result, const T& b, const T& x)
 
    T tol;
    tol = ui_type(1);
-   eval_ldexp(tol, tol, 1 - std::numeric_limits<mp_number<T> >::digits);
+   eval_ldexp(tol, tol, 1 - boost::multiprecision::detail::digits2<mp_number<T> >::value);
    multiply(tol, result);
    if(get_sign(tol) < 0)
       tol.negate();
@@ -375,7 +375,7 @@ void hyp2F1(T& result, const T& a, const T& b, const T& c, const T& x)
    add(result, ui_type(1));
 
    T lim;
-   eval_ldexp(lim, result, 1 - std::numeric_limits<mp_number<T> >::digits);
+   eval_ldexp(lim, result, 1 - boost::multiprecision::detail::digits2<mp_number<T> >::value);
 
    if(get_sign(lim) < 0)
       lim.negate();
@@ -507,7 +507,7 @@ void eval_asin(T& result, const T& x)
       subtract(result, s);
 
       T lim;
-      eval_ldexp(lim, result, 1 - std::numeric_limits<mp_number<T> >::digits);
+      eval_ldexp(lim, result, 1 - boost::multiprecision::detail::digits2<mp_number<T> >::value);
       if(get_sign(s) < 0)
          s.negate();
       if(get_sign(lim) < 0)
@@ -751,7 +751,7 @@ template <class T, class Arithmetic>
 typename disable_if<is_same<T, Arithmetic> >::type eval_atan2(T& result, const T& a, const Arithmetic& b)
 {
    T x;
-   x = b;
+   x = static_cast<typename boost::multiprecision::detail::canonical<Arithmetic, T>::type>(b);
    eval_atan2(result, a, x);
 }
 

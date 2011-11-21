@@ -337,6 +337,14 @@ private:
    typename mp_exp_storage<Arg3>::type arg3;
 };
 
+template <class T>
+struct digits2
+{
+   BOOST_STATIC_ASSERT(std::numeric_limits<T>::is_specialized);
+   BOOST_STATIC_ASSERT((std::numeric_limits<T>::radix == 2) || (std::numeric_limits<T>::radix == 10));
+   static const long value = std::numeric_limits<T>::radix == 10 ?  (((std::numeric_limits<T>::digits + 1) * 1000L) / 301L) : std::numeric_limits<T>::digits;
+};
+
 } // namespace detail
 
 //

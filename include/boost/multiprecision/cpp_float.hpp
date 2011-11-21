@@ -171,7 +171,7 @@ public:
       prec_elem(mp_elem_number)
    { 
       // TODO: this doesn't round!
-      std::copy_n(f.data.begin(), std::min(f.prec_elem, prec_elem), data.begin());
+      std::copy(f.data.begin(), f.data.begin() + std::min(f.prec_elem, prec_elem), data.begin());
       precision(std::min(f.prec_elem, prec_elem));
    }
 
@@ -317,7 +317,7 @@ public:
       exp = f.exp;
       neg = f.neg;
       fpclass = static_cast<enum_fpclass>(static_cast<int>(f.fpclass));
-      std::copy_n(f.data.begin(), std::min(f.prec_elem, prec_elem), data.begin());
+      std::copy(f.data.begin(), f.data.begin() + std::min(f.prec_elem, prec_elem), data.begin());
       precision(std::min(f.prec_elem, prec_elem));
       return *this;
    }
@@ -396,7 +396,7 @@ public:
       return *this -= one();
    }
 
-   std::string str(unsigned digits, bool scientific)const;
+   std::string str(std::streamsize digits, std::ios_base::fmtflags f)const;
 
    int compare(const cpp_float& v)const;
    template <class V>
@@ -1460,7 +1460,7 @@ double cpp_float<Digits10>::extract_double(void) const
 
    std::stringstream ss;
 
-   ss << str(std::numeric_limits<double>::digits10 + (2 + 1), true);
+   ss << str(std::numeric_limits<double>::digits10 + (2 + 1), std::ios_base::scientific);
 
    double d;
    ss >> d;
@@ -1506,7 +1506,7 @@ long double cpp_float<Digits10>::extract_long_double(void) const
 
    std::stringstream ss;
 
-   ss << str(std::numeric_limits<long double>::digits10 + (2 + 1), true);
+   ss << str(std::numeric_limits<long double>::digits10 + (2 + 1), std::ios_base::scientific);
 
    long double ld;
    ss >> ld;
@@ -1639,8 +1639,12 @@ cpp_float<Digits10> cpp_float<Digits10>::extract_integer_part(void) const
 }
 
 template <unsigned Digits10>
-std::string cpp_float<Digits10>::str(std::size_t number_of_digits, bool scientific) const
+std::string cpp_float<Digits10>::str(std::streamsize number_of_digits, std::ios_base::fmtflags f) const
 {
+   bool scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
+   bool fixed      = (f & std::ios_base::fixed) == std::ios_base::fixed;
+   bool showpoint  = (f & std::ios_base::showpoint) == std::ios_base::showpoint;
+
    std::string str;
    boost::int64_t my_exp = order();
    if(number_of_digits == 0)
@@ -1665,13 +1669,13 @@ std::string cpp_float<Digits10>::str(std::size_t number_of_digits, bool scientif
    }
 
    // Cut the output to the size of the precision.
-   if(str.length() > number_of_digits)
+   if(str.length() > static_cast<std::string::size_type>(number_of_digits))
    {
       // Get the digit after the last needed digit for rounding
-      const boost::uint32_t round = static_cast<boost::uint32_t>(static_cast<boost::uint32_t>(str.at(number_of_digits)) - static_cast<boost::uint32_t>('0'));
+      const boost::uint32_t round = static_cast<boost::uint32_t>(static_cast<boost::uint32_t>(str[static_cast<std::string::size_type>(number_of_digits)]) - static_cast<boost::uint32_t>('0'));
 
       // Truncate the string
-      str = str.substr(static_cast<std::size_t>(0u), number_of_digits);
+      str.erase(static_cast<std::string::size_type>(number_of_digits));
 
       if(round >= static_cast<boost::uint32_t>(5u))
       {
@@ -1716,18 +1720,30 @@ std::string cpp_float<Digits10>::str(std::size_t number_of_digits, bool scientif
    str.erase(pos, str.end());
    if(str.empty())
       str = '0';
-   if(!scientific && (str.size() < 20) && (my_exp >= 0) && (my_exp < 20))
+   if(fixed || (!scientific && (str.size() < 20) && (my_exp >= -3) && (my_exp < 20)))
    {
       if(1 + my_exp > str.size())
       {
          // Just pad out the end with zeros:
          str.append(static_cast<std::string::size_type>(1 + my_exp - str.size()), '0');
+         if(showpoint)
+            str.append(".0");
       }
       else if(my_exp + 1 != str.size())
       {
-         // Insert the decimal point:
-         str.insert(static_cast<std::string::size_type>(my_exp + 1), 1, '.');
+         if(my_exp < 0)
+         {
+            str.insert(0, static_cast<std::string::size_type>(-1-my_exp), '0');
+            str.insert(0, "0.");
+         }
+         else
+         {
+            // Insert the decimal point:
+            str.insert(static_cast<std::string::size_type>(my_exp + 1), 1, '.');
+         }
       }
+      else if(showpoint)
+         str += ".0";
    }
    else
    {
@@ -2711,7 +2727,7 @@ namespace std
       static const bool                    is_bounded        = true;
       static const bool                    is_modulo         = false;
       static const bool                    is_iec559         = false;
-      static const int                     digits            = static_cast<int>(((Digits10 + 1) * 1000L) / 301L);
+      static const int                     digits            = Digits10;
       static const int                     digits10          = boost::multiprecision::cpp_float<Digits10>::cpp_float_digits10;
       static const int                     max_digits10      = boost::multiprecision::cpp_float<Digits10>::cpp_float_max_digits10;
       static const boost::int64_t          min_exponent      = boost::multiprecision::cpp_float<Digits10>::cpp_float_min_exp;      // Type differs from int.

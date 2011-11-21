@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/multiprecision/mp_number.hpp>
@@ -62,9 +63,12 @@ struct arithmetic_backend
    {
       std::swap(m_value, o.m_value);
    }
-   std::string str(unsigned digits, bool scientific)const
+   std::string str(std::streamsize digits, std::ios_base::fmtflags f)const
    {
-      return boost::lexical_cast<std::string>(m_value);
+      std::stringstream ss;
+      ss.flags(f);
+      ss << std::setprecision(digits) << m_data;
+      return ss.str();
    }
    void negate()
    {
@@ -118,10 +122,6 @@ inline void divide(arithmetic_backend<Arithmetic>& result, const arithmetic_back
 
 namespace std{
 
-#ifdef BOOST_NO_NOEXCEPT
-#  define BOOST_MP_NOEXCEPT
-#endif
-
 template <class Arithmetic>
 class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::arithmetic_backend<Arithmetic> > > : public std::numeric_limits<Arithmetic>
 {
@@ -138,10 +138,6 @@ public:
    BOOST_STATIC_CONSTEXPR number_type signaling_NaN() BOOST_MP_NOEXCEPT { return base_type::signaling_NaN(); }
    BOOST_STATIC_CONSTEXPR number_type denorm_min() BOOST_MP_NOEXCEPT { return base_type::denorm_min(); }
 };
-
-#ifdef BOOST_NO_NOEXCEPT
-#  undef BOOST_MP_NOEXCEPT
-#endif
 
 }
 

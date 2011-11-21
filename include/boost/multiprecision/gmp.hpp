@@ -159,30 +159,48 @@ struct gmp_float_imp
    {
       mpf_swap(m_data, o.m_data);
    }
-   std::string str(unsigned digits, bool scientific)const
+   std::string str(std::streamsize digits, std::ios_base::fmtflags f)const
    {
+      bool scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
+      bool fixed      = (f & std::ios_base::fixed) == std::ios_base::fixed;
+      bool showpoint  = (f & std::ios_base::showpoint) == std::ios_base::showpoint;
+
       std::string result;
       mp_exp_t e;
       void *(*alloc_func_ptr) (size_t);
       void *(*realloc_func_ptr) (void *, size_t, size_t);
       void (*free_func_ptr) (void *, size_t);
-      const char* ps = mpf_get_str (0, &e, 10, digits, m_data);
+      const char* ps = mpf_get_str (0, &e, 10, static_cast<std::size_t>(digits), m_data);
       std::ptrdiff_t sl = std::strlen(ps);
       if(sl == 0)
          return "0";
       if(*ps == '-')
          --sl; // number of digits excluding sign.
-      if(!scientific
-         && (sl <= std::numeric_limits<boost::uintmax_t>::digits10 + 1)
-         && (e >= sl)
-         && (sl <= std::numeric_limits<boost::uintmax_t>::digits10 + 1))
+      result = ps;
+      if(fixed || (!scientific && (e > -4) && (e <= std::numeric_limits<boost::uintmax_t>::digits10 + 2)))
       {
-         result = ps;
-         result.append(e-sl, '0');
+         if(1 + e >= sl)
+         {
+            result.append(e - sl, '0');
+            if(showpoint)
+               result.append(".0");
+         }
+         else
+         {
+            if(e <= 0)
+            {
+               result.insert(0, -e, '0');
+               result.insert(0, "0.");
+            }
+            else
+            {
+               // Insert the decimal point:
+               result.insert(e, 1, '.');
+            }
+         }
       }
       else
       {
-         result = ps;
          if(ps[0] == '-')
             result.insert(2, 1, '.');
          else
@@ -920,7 +938,26 @@ struct gmp_int
    }
    gmp_int& operator = (const char* s)
    {
-      mpz_set_str(m_data, s, 10);
+      std::size_t n = s ? std::strlen(s) : 0;
+      int radix = 10;
+      if(n && (*s == '0'))
+      {
+         if((n > 1) && ((s[1] == 'x') || (s[1] == 'X')))
+         {
+            radix = 16;
+            s +=2;
+            n -= 2;
+         }
+         else
+         {
+            radix = 8;
+            n -= 1;
+         }
+      }
+      if(n)
+         mpz_set_str(m_data, s, radix);
+      else
+         mpz_set_ui(m_data, 0);
       return *this;
    }
    gmp_int& operator=(const mpf_t& val)
@@ -949,15 +986,30 @@ struct gmp_int
    {
       mpz_swap(m_data, o.m_data);
    }
-   std::string str(unsigned /*digits*/, bool /*scientific*/)const
+   std::string str(std::streamsize /*digits*/, std::ios_base::fmtflags f)const
    {
+      int base = 10;
+      if((f & std::ios_base::oct) == std::ios_base::oct)
+         base = 8;
+      else if((f & std::ios_base::hex) == std::ios_base::hex)
+         base = 16;
       void *(*alloc_func_ptr) (size_t);
       void *(*realloc_func_ptr) (void *, size_t, size_t);
       void (*free_func_ptr) (void *, size_t);
-      const char* ps = mpz_get_str (0, 10, m_data);
+      const char* ps = mpz_get_str (0, base, m_data);
       std::string s = ps;
       mp_get_memory_functions(&alloc_func_ptr, &realloc_func_ptr, &free_func_ptr);
       (*free_func_ptr)((void*)ps, std::strlen(ps) + 1);
+
+      if((base != 10) && (f & std::ios_base::showbase))
+      {
+         int pos = s[0] == '-' ? 1 : 0;
+         const char* pp = base == 8 ? "0" : "0x";
+         s.insert(pos, pp);
+      }
+      if((f & std::ios_base::showpos) && (s[0] != '-'))
+         s.insert(0, 1, '+');
+
       return s;
    }
    ~gmp_int()
@@ -1443,8 +1495,9 @@ struct gmp_rational
    {
       mpq_swap(m_data, o.m_data);
    }
-   std::string str(unsigned /*digits*/, bool /*scientific*/)const
+   std::string str(std::streamsize /*digits*/, std::ios_base::fmtflags f)const
    {
+      // TODO make a better job of this including handling of f!!
       void *(*alloc_func_ptr) (size_t);
       void *(*realloc_func_ptr) (void *, size_t, size_t);
       void (*free_func_ptr) (void *, size_t);
@@ -1654,10 +1707,6 @@ typedef mp_number<gmp_rational >    mpq_rational;
 }}  // namespaces
 
 namespace std{
-
-#ifdef BOOST_NO_NOEXCEPT
-#  define BOOST_MP_NOEXCEPT
-#endif
 
 //
 // numeric_limits [partial] specializations for the types declared in this header:
@@ -1905,10 +1954,6 @@ public:
    BOOST_STATIC_CONSTEXPR bool tinyness_before = false;
    BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
 };
-
-#ifdef BOOST_NO_NOEXCEPT
-#  undef BOOST_MP_NOEXCEPT
-#endif
 
 } // namespace std
 

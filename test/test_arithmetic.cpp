@@ -3,6 +3,10 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_
 
+#ifdef _MSC_VER
+#  define _SCL_SECURE_NO_WARNINGS
+#endif
+
 #include <boost/detail/lightweight_test.hpp>
 #include <boost/math/special_functions/pow.hpp>
 
@@ -382,10 +386,11 @@ void test_negative_mixed(boost::mpl::true_ const&)
 #else
    Num tol = 0;
 #endif
-   BOOST_TEST_CLOSE(n1, boost::lexical_cast<target_type>(Real(n1).str(0, boost::is_floating_point<Num>::value)), tol);
-   BOOST_TEST_CLOSE(n2, boost::lexical_cast<target_type>(Real(n2).str(0, boost::is_floating_point<Num>::value)), 0);
-   BOOST_TEST_CLOSE(n3, boost::lexical_cast<target_type>(Real(n3).str(0, boost::is_floating_point<Num>::value)), 0);
-   BOOST_TEST_CLOSE(n4, boost::lexical_cast<target_type>(Real(n4).str(0, boost::is_floating_point<Num>::value)), 0);
+   std::ios_base::fmtflags f = boost::is_floating_point<Num>::value ? std::ios_base::scientific : std::ios_base::fmtflags(0);
+   BOOST_TEST_CLOSE(n1, boost::lexical_cast<target_type>(Real(n1).str(0, f)), tol);
+   BOOST_TEST_CLOSE(n2, boost::lexical_cast<target_type>(Real(n2).str(0, f)), 0);
+   BOOST_TEST_CLOSE(n3, boost::lexical_cast<target_type>(Real(n3).str(0, f)), 0);
+   BOOST_TEST_CLOSE(n4, boost::lexical_cast<target_type>(Real(n4).str(0, f)), 0);
    // Assignment:
    Real r(0);
    BOOST_TEST(r != n1);
@@ -483,10 +488,11 @@ void test_mixed()
 #else
    Num tol = 0;
 #endif
-   BOOST_TEST_CLOSE(n1, boost::lexical_cast<target_type>(Real(n1).str(0, boost::is_floating_point<Num>::value)), tol);
-   BOOST_TEST_CLOSE(n2, boost::lexical_cast<target_type>(Real(n2).str(0, boost::is_floating_point<Num>::value)), 0);
-   BOOST_TEST_CLOSE(n3, boost::lexical_cast<target_type>(Real(n3).str(0, boost::is_floating_point<Num>::value)), 0);
-   BOOST_TEST_CLOSE(n4, boost::lexical_cast<target_type>(Real(n4).str(0, boost::is_floating_point<Num>::value)), 0);
+   std::ios_base::fmtflags f = boost::is_floating_point<Num>::value ? std::ios_base::scientific : std::ios_base::fmtflags(0);
+   BOOST_TEST_CLOSE(n1, boost::lexical_cast<target_type>(Real(n1).str(0, f)), tol);
+   BOOST_TEST_CLOSE(n2, boost::lexical_cast<target_type>(Real(n2).str(0, f)), 0);
+   BOOST_TEST_CLOSE(n3, boost::lexical_cast<target_type>(Real(n3).str(0, f)), 0);
+   BOOST_TEST_CLOSE(n4, boost::lexical_cast<target_type>(Real(n4).str(0, f)), 0);
    // Assignment:
    Real r(0);
    BOOST_TEST(r != n1);

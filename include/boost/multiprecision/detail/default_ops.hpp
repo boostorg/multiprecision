@@ -19,7 +19,7 @@
 #define INSTRUMENT_BACKEND(x)
 #else
 #define INSTRUMENT_BACKEND(x)\
-   std::cout << BOOST_STRINGIZE(x) << " = " << x.str(0, true) << std::endl;
+   std::cout << BOOST_STRINGIZE(x) << " = " << x.str(0, std::ios_base::scientific) << std::endl;
 #endif
 #endif
 
@@ -339,7 +339,7 @@ inline void convert_to(terminal<R>* result, const B& backend)
    // We ran out of types to try for the convertion, try
    // a lexical_cast and hope for the best:
    //
-   result->value = boost::lexical_cast<R>(backend.str(0, false));
+   result->value = boost::lexical_cast<R>(backend.str(0, std::ios_base::fmtflags(0)));
 }
 
 //

@@ -1,4 +1,3 @@
-
 //  Copyright John Maddock 2011.
 //  Use, modification and distribution are subject to the
 //  Boost Software License, Version 1.0. (See accompanying file
@@ -13,6 +12,7 @@
 #define BOOST_MATH_INSTANTIATE_MINIMUM
 
 #ifdef _MSC_VER
+#  define _SCL_SECURE_NO_WARNINGS
 #  pragma warning(disable:4800)
 #  pragma warning(disable:4512)
 #  pragma warning(disable:4127)

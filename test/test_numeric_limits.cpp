@@ -3,6 +3,10 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_
 
+#ifdef _MSC_VER
+#  define _SCL_SECURE_NO_WARNINGS
+#endif
+
 #include <boost/detail/lightweight_test.hpp>
 
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ) && !defined(TEST_TOMMATH)

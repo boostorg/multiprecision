@@ -100,7 +100,7 @@ void hyp0F0(T& H0F0, const T& x)
    typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
 
    BOOST_ASSERT(&H0F0 != &x);
-   long tol = std::numeric_limits<mp_number<T> >::digits;
+   long tol = boost::multiprecision::detail::digits2<mp_number<T> >::value;
    T t;
 
    T x_pow_n_div_n_fact(x);
@@ -156,7 +156,7 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
    multiply(H1F0, pochham_a, x_pow_n_div_n_fact);
    add(H1F0, si_type(1));
    T lim;
-   eval_ldexp(lim, H1F0, 1 - std::numeric_limits<mp_number<T> >::digits);
+   eval_ldexp(lim, H1F0, 1 - boost::multiprecision::detail::digits2<mp_number<T> >::value);
    if(get_sign(lim) < 0)
       lim.negate();
 
@@ -164,7 +164,7 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
    T term, part;
 
    // Series expansion of hyperg_1f0(a; ; x).
-   for(n = 2; n < std::numeric_limits<mp_number<T> >::digits + 10; n++)
+   for(n = 2; n < boost::multiprecision::detail::digits2<mp_number<T> >::value + 10; n++)
    {
       multiply(x_pow_n_div_n_fact, x);
       divide(x_pow_n_div_n_fact, n);
@@ -177,7 +177,7 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
       if(lim.compare(term) >= 0)
          break;
    }
-   if(n >= std::numeric_limits<mp_number<T> >::digits + 10)
+   if(n >= boost::multiprecision::detail::digits2<mp_number<T> >::value + 10)
       BOOST_THROW_EXCEPTION(std::runtime_error("H1F0 failed to converge"));
 }
 
