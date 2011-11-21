@@ -161,6 +161,7 @@ struct mpfr_float_imp
       bool scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
       bool fixed      = (f & std::ios_base::fixed) == std::ios_base::fixed;
       bool showpoint  = (f & std::ios_base::showpoint) == std::ios_base::showpoint;
+      bool showpos    = (f & std::ios_base::showpos) == std::ios_base::showpos;
 
       std::string result;
       mp_exp_t e;
@@ -168,7 +169,12 @@ struct mpfr_float_imp
       std::ptrdiff_t sl = std::strlen(ps);
       int chars = sl;
       if(sl == 0)
+      {
+         result = scientific ? "0.0e0" : showpoint ? "0.0" : "0";
+         if(showpos)
+            result.insert(0, 1, '+');
          return "0";
+      }
       while(ps[chars-1] == '0')
          --chars;
       ps[chars] = 0;
@@ -209,6 +215,8 @@ struct mpfr_float_imp
          if(e)
             result += "e" + lexical_cast<std::string>(e);
       }
+      if(shopos && (str[0] != '-'))
+         str.insert(0, 1, '+');
       mpfr_free_str(ps);
       return result;
    }

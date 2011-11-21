@@ -1644,6 +1644,7 @@ std::string cpp_float<Digits10>::str(std::streamsize number_of_digits, std::ios_
    bool scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
    bool fixed      = (f & std::ios_base::fixed) == std::ios_base::fixed;
    bool showpoint  = (f & std::ios_base::showpoint) == std::ios_base::showpoint;
+   bool shopos     = (f & std::ios_base::showpos) == std::ios_base::showpos;
 
    std::string str;
    boost::int64_t my_exp = order();
@@ -1756,6 +1757,8 @@ std::string cpp_float<Digits10>::str(std::streamsize number_of_digits, std::ios_
    }
    if(isneg())
       str.insert(0, 1, '-');
+   else if(shopos)
+      str.insert(0, 1, '+');
    return str;
 }
 

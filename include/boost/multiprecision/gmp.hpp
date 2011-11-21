@@ -164,6 +164,7 @@ struct gmp_float_imp
       bool scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
       bool fixed      = (f & std::ios_base::fixed) == std::ios_base::fixed;
       bool showpoint  = (f & std::ios_base::showpoint) == std::ios_base::showpoint;
+      bool showpos    = (f & std::ios_base::showpos) == std::ios_base::showpos;
 
       std::string result;
       mp_exp_t e;
@@ -173,7 +174,12 @@ struct gmp_float_imp
       const char* ps = mpf_get_str (0, &e, 10, static_cast<std::size_t>(digits), m_data);
       std::ptrdiff_t sl = std::strlen(ps);
       if(sl == 0)
+      {
+         result = scientific ? "0.0e0" : showpoint ? "0.0" : "0";
+         if(showpos)
+            result.insert(0, 1, '+');
          return "0";
+      }
       if(*ps == '-')
          --sl; // number of digits excluding sign.
       result = ps;
@@ -209,6 +215,8 @@ struct gmp_float_imp
          if(e)
             result += "e" + lexical_cast<std::string>(e);
       }
+      if(shopos && (str[0] != '-'))
+         str.insert(0, 1, '+');
       mp_get_memory_functions(&alloc_func_ptr, &realloc_func_ptr, &free_func_ptr);
       (*free_func_ptr)((void*)ps, std::strlen(ps) + 1);
       return result;
