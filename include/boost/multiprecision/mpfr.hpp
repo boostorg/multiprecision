@@ -168,21 +168,15 @@ struct mpfr_float_imp
       char* ps = mpfr_get_str (0, &e, 10, static_cast<std::size_t>(digits), m_data, GMP_RNDN);
       std::ptrdiff_t sl = std::strlen(ps);
       int chars = sl;
-      if(sl == 0)
-      {
-         result = scientific ? "0.0e0" : showpoint ? "0.0" : "0";
-         if(showpos)
-            result.insert(0, 1, '+');
-         return "0";
-      }
-      while(ps[chars-1] == '0')
+      while(chars && (ps[chars-1] == '0'))
          --chars;
       ps[chars] = 0;
-      if(*ps == '-')
+      if(chars && (*ps == '-'))
          --chars; // number of digits excluding sign.
       if(chars == 0)
-         return scientific ? "0.0e0" : showpoint ? "0.0" : "0";
-      result = ps;
+         result = "0";
+      else
+         result = ps;
       if(fixed || (!scientific && (e > -4) && (e <= std::numeric_limits<boost::uintmax_t>::digits10 + 2)))
       {
          if(e >= chars)
@@ -215,8 +209,20 @@ struct mpfr_float_imp
          if(e)
             result += "e" + lexical_cast<std::string>(e);
       }
-      if(shopos && (str[0] != '-'))
-         str.insert(0, 1, '+');
+      if(showpoint || scientific)
+      {
+         // Pad out end with zeros as required to give required precision.
+         std::streamsize chars = result.size() - 1;
+         BOOST_ASSERT(result.find('.') != std::string::npos); // there must be a decimal point!!
+         BOOST_ASSERT(result.size()); // Better not be a null string by this point!!
+         if(result[0] == '-')
+            --chars;
+         chars = digits - chars;
+         if(chars > 0)
+            result.append(static_cast<std::string::size_type>(chars), '0');
+      }
+      if(showpos && (result[0] != '-'))
+         result.insert(0, 1, '+');
       mpfr_free_str(ps);
       return result;
    }

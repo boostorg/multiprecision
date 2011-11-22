@@ -1755,6 +1755,14 @@ std::string cpp_float<Digits10>::str(std::streamsize number_of_digits, std::ios_
       str.append(1, 'e');
       str.append(boost::lexical_cast<std::string>(my_exp));
    }
+   if(showpoint || scientific)
+   {
+      std::streamsize chars = str.size() - 1;
+      BOOST_ASSERT(str.find('.') != std::string::npos); // there must be a decimal point!!
+      chars = number_of_digits - chars;
+      if(chars > 0)
+         str.append(chars, '0');
+   }
    if(isneg())
       str.insert(0, 1, '-');
    else if(shopos)

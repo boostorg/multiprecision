@@ -173,17 +173,14 @@ struct gmp_float_imp
       void (*free_func_ptr) (void *, size_t);
       const char* ps = mpf_get_str (0, &e, 10, static_cast<std::size_t>(digits), m_data);
       std::ptrdiff_t sl = std::strlen(ps);
+      if(ps && *ps == '-')
+         --sl; // number of digits excluding sign.
+      result = ps;
       if(sl == 0)
       {
          result = scientific ? "0.0e0" : showpoint ? "0.0" : "0";
-         if(showpos)
-            result.insert(0, 1, '+');
-         return "0";
       }
-      if(*ps == '-')
-         --sl; // number of digits excluding sign.
-      result = ps;
-      if(fixed || (!scientific && (e > -4) && (e <= std::numeric_limits<boost::uintmax_t>::digits10 + 2)))
+      else if(fixed || (!scientific && (e > -4) && (e <= std::numeric_limits<boost::uintmax_t>::digits10 + 2)))
       {
          if(1 + e >= sl)
          {
@@ -215,8 +212,20 @@ struct gmp_float_imp
          if(e)
             result += "e" + lexical_cast<std::string>(e);
       }
-      if(shopos && (str[0] != '-'))
-         str.insert(0, 1, '+');
+      if(showpoint || scientific)
+      {
+         // Pad out end with zeros as required to give required precision.
+         std::streamsize chars = result.size() - 1;
+         BOOST_ASSERT(result.find('.') != std::string::npos); // there must be a decimal point!!
+         BOOST_ASSERT(result.size()); // Better not be a null string by this point!!
+         if(result[0] == '-')
+            --chars;
+         chars = digits - chars;
+         if(chars > 0)
+            result.append(static_cast<std::string::size_type>(chars), '0');
+      }
+      if(showpos && (result[0] != '-'))
+         result.insert(0, 1, '+');
       mp_get_memory_functions(&alloc_func_ptr, &realloc_func_ptr, &free_func_ptr);
       (*free_func_ptr)((void*)ps, std::strlen(ps) + 1);
       return result;
