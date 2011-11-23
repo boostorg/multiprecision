@@ -160,70 +160,33 @@ struct mpfr_float_imp
    {
       bool scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
       bool fixed      = (f & std::ios_base::fixed) == std::ios_base::fixed;
-      bool showpoint  = (f & std::ios_base::showpoint) == std::ios_base::showpoint;
-      bool showpos    = (f & std::ios_base::showpos) == std::ios_base::showpos;
+
+      if(scientific)
+         ++digits;
 
       std::string result;
       mp_exp_t e;
-      char* ps = mpfr_get_str (0, &e, 10, static_cast<std::size_t>(digits), m_data, GMP_RNDN);
-      std::ptrdiff_t sl = std::strlen(ps);
-      int chars = sl;
-      while(chars && (ps[chars-1] == '0'))
-         --chars;
-      ps[chars] = 0;
-      if(chars && (*ps == '-'))
-         --chars; // number of digits excluding sign.
-      if(chars == 0)
+      if(mpfr_zero_p(m_data))
+      {
+         e = 0;
          result = "0";
+      }
       else
+      {
+         char* ps = mpfr_get_str (0, &e, 10, static_cast<std::size_t>(digits), m_data, GMP_RNDN);
+        --e;  // To match with what our formatter expects.
+         if(fixed && e != -1)
+         {
+            // Oops we actually need a different number of digits to what we asked for:
+            mpfr_free_str(ps);
+            digits += e + 1;
+            ps = ps = mpfr_get_str (0, &e, 10, static_cast<std::size_t>(digits), m_data, GMP_RNDN);
+            --e;  // To match with what our formatter expects.
+         }
          result = ps;
-      if(fixed || (!scientific && (e > -4) && (e <= std::numeric_limits<boost::uintmax_t>::digits10 + 2)))
-      {
-         if(e >= chars)
-         {
-            result.append(e - chars, '0');
-            if(showpoint)
-               result.append(".0");
-         }
-         else
-         {
-            if(e <= 0)
-            {
-               result.insert(0, -e, '0');
-               result.insert(0, "0.");
-            }
-            else
-            {
-               // Insert the decimal point:
-               result.insert(e, 1, '.');
-            }
-         }
+         mpfr_free_str(ps);
       }
-      else
-      {
-         if(ps[0] == '-')
-            result.insert(2, 1, '.');
-         else
-            result.insert(1, 1, '.');
-         --e;
-         if(e)
-            result += "e" + lexical_cast<std::string>(e);
-      }
-      if(showpoint || scientific)
-      {
-         // Pad out end with zeros as required to give required precision.
-         std::streamsize chars = result.size() - 1;
-         BOOST_ASSERT(result.find('.') != std::string::npos); // there must be a decimal point!!
-         BOOST_ASSERT(result.size()); // Better not be a null string by this point!!
-         if(result[0] == '-')
-            --chars;
-         chars = digits - chars;
-         if(chars > 0)
-            result.append(static_cast<std::string::size_type>(chars), '0');
-      }
-      if(showpos && (result[0] != '-'))
-         result.insert(0, 1, '+');
-      mpfr_free_str(ps);
+      boost::multiprecision::detail::format_float_string(result, e, digits, f);
       return result;
    }
    ~mpfr_float_imp()

@@ -163,71 +163,29 @@ struct gmp_float_imp
    {
       bool scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
       bool fixed      = (f & std::ios_base::fixed) == std::ios_base::fixed;
-      bool showpoint  = (f & std::ios_base::showpoint) == std::ios_base::showpoint;
-      bool showpos    = (f & std::ios_base::showpos) == std::ios_base::showpos;
+
+      if(scientific)
+         ++digits;
 
       std::string result;
       mp_exp_t e;
       void *(*alloc_func_ptr) (size_t);
       void *(*realloc_func_ptr) (void *, size_t, size_t);
       void (*free_func_ptr) (void *, size_t);
-      const char* ps = mpf_get_str (0, &e, 10, static_cast<std::size_t>(digits), m_data);
-      std::ptrdiff_t sl = std::strlen(ps);
-      if(ps && *ps == '-')
-         --sl; // number of digits excluding sign.
-      result = ps;
-      if(sl == 0)
-      {
-         result = scientific ? "0.0e0" : showpoint ? "0.0" : "0";
-      }
-      else if(fixed || (!scientific && (e > -4) && (e <= std::numeric_limits<boost::uintmax_t>::digits10 + 2)))
-      {
-         if(1 + e >= sl)
-         {
-            result.append(e - sl, '0');
-            if(showpoint)
-               result.append(".0");
-         }
-         else
-         {
-            if(e <= 0)
-            {
-               result.insert(0, -e, '0');
-               result.insert(0, "0.");
-            }
-            else
-            {
-               // Insert the decimal point:
-               result.insert(e, 1, '.');
-            }
-         }
-      }
-      else
-      {
-         if(ps[0] == '-')
-            result.insert(2, 1, '.');
-         else
-            result.insert(1, 1, '.');
-         --e;
-         if(e)
-            result += "e" + lexical_cast<std::string>(e);
-      }
-      if(showpoint || scientific)
-      {
-         // Pad out end with zeros as required to give required precision.
-         std::streamsize chars = result.size() - 1;
-         BOOST_ASSERT(result.find('.') != std::string::npos); // there must be a decimal point!!
-         BOOST_ASSERT(result.size()); // Better not be a null string by this point!!
-         if(result[0] == '-')
-            --chars;
-         chars = digits - chars;
-         if(chars > 0)
-            result.append(static_cast<std::string::size_type>(chars), '0');
-      }
-      if(showpos && (result[0] != '-'))
-         result.insert(0, 1, '+');
       mp_get_memory_functions(&alloc_func_ptr, &realloc_func_ptr, &free_func_ptr);
+      const char* ps = mpf_get_str (0, &e, 10, static_cast<std::size_t>(digits), m_data);
+      --e;  // To match with what our formatter expects.
+      if(fixed && e != -1)
+      {
+         // Oops we actually need a different number of digits to what we asked for:
+         (*free_func_ptr)((void*)ps, std::strlen(ps) + 1);
+         digits += e + 1;
+         ps = mpf_get_str (0, &e, 10, static_cast<std::size_t>(digits), m_data);
+         --e;  // To match with what our formatter expects.
+      }
+      result = ps;
       (*free_func_ptr)((void*)ps, std::strlen(ps) + 1);
+      boost::multiprecision::detail::format_float_string(result, e, digits, f);
       return result;
    }
    ~gmp_float_imp()

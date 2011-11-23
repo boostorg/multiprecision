@@ -1641,15 +1641,14 @@ cpp_float<Digits10> cpp_float<Digits10>::extract_integer_part(void) const
 template <unsigned Digits10>
 std::string cpp_float<Digits10>::str(std::streamsize number_of_digits, std::ios_base::fmtflags f) const
 {
-   bool scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
-   bool fixed      = (f & std::ios_base::fixed) == std::ios_base::fixed;
-   bool showpoint  = (f & std::ios_base::showpoint) == std::ios_base::showpoint;
-   bool shopos     = (f & std::ios_base::showpos) == std::ios_base::showpos;
-
    std::string str;
    boost::int64_t my_exp = order();
    if(number_of_digits == 0)
-      number_of_digits = (std::numeric_limits<std::size_t>::max)();
+      number_of_digits = cpp_float_max_digits10;
+   if(f & std::ios_base::fixed)
+      number_of_digits += my_exp + 1;
+   else if(f & std::ios_base::scientific)
+      ++number_of_digits;
    // Determine the number of elements needed to provide the requested digits from cpp_float<Digits10>.
    const std::size_t number_of_elements = (std::min)(static_cast<std::size_t>((number_of_digits / static_cast<std::size_t>(mp_elem_digits10)) + 2u),
       static_cast<std::size_t>(mp_elem_number));
@@ -1711,62 +1710,9 @@ std::string cpp_float<Digits10>::str(std::streamsize number_of_digits, std::ios_
          }
       }
    }
-   //
-   // Suppress trailing zeros:
-   //
-   std::string::iterator pos = str.end();
-   while(pos != str.begin() && *--pos == '0'){}
-   if(pos != str.end())
-      ++pos;
-   str.erase(pos, str.end());
-   if(str.empty())
-      str = '0';
-   if(fixed || (!scientific && (str.size() < 20) && (my_exp >= -3) && (my_exp < 20)))
-   {
-      if(1 + my_exp > str.size())
-      {
-         // Just pad out the end with zeros:
-         str.append(static_cast<std::string::size_type>(1 + my_exp - str.size()), '0');
-         if(showpoint)
-            str.append(".0");
-      }
-      else if(my_exp + 1 != str.size())
-      {
-         if(my_exp < 0)
-         {
-            str.insert(0, static_cast<std::string::size_type>(-1-my_exp), '0');
-            str.insert(0, "0.");
-         }
-         else
-         {
-            // Insert the decimal point:
-            str.insert(static_cast<std::string::size_type>(my_exp + 1), 1, '.');
-         }
-      }
-      else if(showpoint)
-         str += ".0";
-   }
-   else
-   {
-      // Scientific format:
-      str.insert(1, 1, '.');
-      if(str.size() == 2)
-         str.append(1, '0');
-      str.append(1, 'e');
-      str.append(boost::lexical_cast<std::string>(my_exp));
-   }
-   if((showpoint || scientific) && (number_of_digits != (std::numeric_limits<std::size_t>::max)()))
-   {
-      std::streamsize chars = str.size() - 1;
-      BOOST_ASSERT(str.find('.') != std::string::npos); // there must be a decimal point!!
-      chars = number_of_digits - chars;
-      if(chars > 0)
-         str.append(static_cast<std::string::size_type>(chars), '0');
-   }
    if(isneg())
       str.insert(0, 1, '-');
-   else if(shopos)
-      str.insert(0, 1, '+');
+   boost::multiprecision::detail::format_float_string(str, my_exp, number_of_digits, f);
    return str;
 }
 

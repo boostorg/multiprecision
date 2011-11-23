@@ -345,6 +345,87 @@ struct digits2
    static const long value = std::numeric_limits<T>::radix == 10 ?  (((std::numeric_limits<T>::digits + 1) * 1000L) / 301L) : std::numeric_limits<T>::digits;
 };
 
+template <class S>
+void format_float_string(S& str, long long my_exp, std::streamsize digits, std::ios_base::fmtflags f)
+{
+   bool scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
+   bool fixed      = (f & std::ios_base::fixed) == std::ios_base::fixed;
+   bool showpoint  = (f & std::ios_base::showpoint) == std::ios_base::showpoint;
+   bool showpos     = (f & std::ios_base::showpos) == std::ios_base::showpos;
+
+   if(!fixed && !scientific)
+   {
+      //
+      // Suppress trailing zeros:
+      //
+      std::string::iterator pos = str.end();
+      while(pos != str.begin() && *--pos == '0'){}
+      if(pos != str.end())
+         ++pos;
+      str.erase(pos, str.end());
+      if(str.empty())
+         str = '0';
+   }
+   else
+   {
+      //
+      // Pad out the end with zero's if we need to:
+      //
+      std::streamsize chars = str.size();
+      if(chars && str[0] == '-')
+         --chars;
+      chars = digits - chars;
+      if(chars > 0)
+      {
+         str.append(static_cast<std::string::size_type>(chars), '0');
+      }
+   }
+
+   if(fixed || (!scientific && (str.size() < 20) && (my_exp >= -3) && (my_exp < 20)))
+   {
+      if(1 + my_exp > str.size())
+      {
+         // Just pad out the end with zeros:
+         str.append(static_cast<std::string::size_type>(1 + my_exp - str.size()), '0');
+         if(showpoint)
+            str.append(".0");
+      }
+      else if(my_exp + 1 != str.size())
+      {
+         if(my_exp < 0)
+         {
+            str.insert(0, static_cast<std::string::size_type>(-1-my_exp), '0');
+            str.insert(0, "0.");
+         }
+         else
+         {
+            // Insert the decimal point:
+            str.insert(static_cast<std::string::size_type>(my_exp + 1), 1, '.');
+         }
+      }
+      else if(showpoint)
+         str += ".0";
+   }
+   else
+   {
+      // Scientific format:
+      str.insert(1, 1, '.');
+      if(str.size() == 2)
+         str.append(1, '0');
+      str.append(1, 'e');
+      S e = boost::lexical_cast<S>(std::abs(my_exp));
+      if(e.size() < 3)
+         e.insert(0, 3-e.size(), '0');
+      if(my_exp < 0)
+         e.insert(0, 1, '-');
+      else
+         e.insert(0, 1, '+');
+      str.append(e);
+   }
+   if(showpos && (str[0] != '-'))
+      str.insert(0, 1, '+');
+}
+
 } // namespace detail
 
 //
