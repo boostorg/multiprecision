@@ -170,6 +170,8 @@ struct mpfr_float_imp
       {
          e = 0;
          result = "0";
+         if(fixed)
+            ++digits;
       }
       else
       {

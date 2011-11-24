@@ -173,18 +173,29 @@ struct gmp_float_imp
       void *(*realloc_func_ptr) (void *, size_t, size_t);
       void (*free_func_ptr) (void *, size_t);
       mp_get_memory_functions(&alloc_func_ptr, &realloc_func_ptr, &free_func_ptr);
-      const char* ps = mpf_get_str (0, &e, 10, static_cast<std::size_t>(digits), m_data);
-      --e;  // To match with what our formatter expects.
-      if(fixed && e != -1)
+
+      if(mpf_sgn(m_data) == 0)
       {
-         // Oops we actually need a different number of digits to what we asked for:
-         (*free_func_ptr)((void*)ps, std::strlen(ps) + 1);
-         digits += e + 1;
-         ps = mpf_get_str (0, &e, 10, static_cast<std::size_t>(digits), m_data);
-         --e;  // To match with what our formatter expects.
+         e = 0;
+         result = "0";
+         if(fixed)
+            ++digits;
       }
-      result = ps;
-      (*free_func_ptr)((void*)ps, std::strlen(ps) + 1);
+      else
+      {
+         const char* ps = mpf_get_str (0, &e, 10, static_cast<std::size_t>(digits), m_data);
+         --e;  // To match with what our formatter expects.
+         if(fixed && e != -1)
+         {
+            // Oops we actually need a different number of digits to what we asked for:
+            (*free_func_ptr)((void*)ps, std::strlen(ps) + 1);
+            digits += e + 1;
+            ps = mpf_get_str (0, &e, 10, static_cast<std::size_t>(digits), m_data);
+            --e;  // To match with what our formatter expects.
+         }
+         result = ps;
+         (*free_func_ptr)((void*)ps, std::strlen(ps) + 1);
+      }
       boost::multiprecision::detail::format_float_string(result, e, digits, f);
       return result;
    }

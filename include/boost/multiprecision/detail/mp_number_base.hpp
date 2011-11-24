@@ -9,6 +9,7 @@
 #include <limits>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_convertible.hpp>
+#include <boost/lexical_cast.hpp>
 
 #ifdef BOOST_NO_NOEXCEPT
 #define BOOST_MP_NOEXCEPT
@@ -345,6 +346,14 @@ struct digits2
    static const long value = std::numeric_limits<T>::radix == 10 ?  (((std::numeric_limits<T>::digits + 1) * 1000L) / 301L) : std::numeric_limits<T>::digits;
 };
 
+#ifndef BOOST_MP_MIN_EXPONENT_DIGITS
+#ifdef _MSC_VER
+#  define BOOST_MP_MIN_EXPONENT_DIGITS 3
+#else
+#  define BOOST_MP_MIN_EXPONENT_DIGITS 2
+#endif
+#endif
+
 template <class S>
 void format_float_string(S& str, long long my_exp, std::streamsize digits, std::ios_base::fmtflags f)
 {
@@ -353,7 +362,12 @@ void format_float_string(S& str, long long my_exp, std::streamsize digits, std::
    bool showpoint  = (f & std::ios_base::showpoint) == std::ios_base::showpoint;
    bool showpos     = (f & std::ios_base::showpos) == std::ios_base::showpos;
 
-   if(!fixed && !scientific)
+   bool neg = str.size() && (str[0] == '-');
+
+   if(neg)
+      str.erase(0, 1);
+
+   if(!fixed && !scientific && !showpoint)
    {
       //
       // Suppress trailing zeros:
@@ -372,8 +386,6 @@ void format_float_string(S& str, long long my_exp, std::streamsize digits, std::
       // Pad out the end with zero's if we need to:
       //
       std::streamsize chars = str.size();
-      if(chars && str[0] == '-')
-         --chars;
       chars = digits - chars;
       if(chars > 0)
       {
@@ -381,14 +393,14 @@ void format_float_string(S& str, long long my_exp, std::streamsize digits, std::
       }
    }
 
-   if(fixed || (!scientific && (str.size() < 20) && (my_exp >= -3) && (my_exp < 20)))
+   if(fixed || (!scientific && (my_exp >= -4) && (my_exp < digits)))
    {
       if(1 + my_exp > str.size())
       {
          // Just pad out the end with zeros:
          str.append(static_cast<std::string::size_type>(1 + my_exp - str.size()), '0');
          if(showpoint)
-            str.append(".0");
+            str.append(".");
       }
       else if(my_exp + 1 != str.size())
       {
@@ -404,25 +416,26 @@ void format_float_string(S& str, long long my_exp, std::streamsize digits, std::
          }
       }
       else if(showpoint)
-         str += ".0";
+         str += ".";
    }
    else
    {
       // Scientific format:
-      str.insert(1, 1, '.');
-      if(str.size() == 2)
-         str.append(1, '0');
+      if(showpoint || (str.size() > 1))
+         str.insert(1, 1, '.');
       str.append(1, 'e');
       S e = boost::lexical_cast<S>(std::abs(my_exp));
-      if(e.size() < 3)
-         e.insert(0, 3-e.size(), '0');
+      if(e.size() < BOOST_MP_MIN_EXPONENT_DIGITS)
+         e.insert(0, BOOST_MP_MIN_EXPONENT_DIGITS-e.size(), '0');
       if(my_exp < 0)
          e.insert(0, 1, '-');
       else
          e.insert(0, 1, '+');
       str.append(e);
    }
-   if(showpos && (str[0] != '-'))
+   if(neg)
+      str.insert(0, 1, '-');
+   else if(showpos)
       str.insert(0, 1, '+');
 }
 

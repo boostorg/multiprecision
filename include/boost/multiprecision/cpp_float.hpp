@@ -1646,7 +1646,9 @@ std::string cpp_float<Digits10>::str(std::streamsize number_of_digits, std::ios_
    if(number_of_digits == 0)
       number_of_digits = cpp_float_max_digits10;
    if(f & std::ios_base::fixed)
+   {
       number_of_digits += my_exp + 1;
+   }
    else if(f & std::ios_base::scientific)
       ++number_of_digits;
    // Determine the number of elements needed to provide the requested digits from cpp_float<Digits10>.
@@ -1667,46 +1669,63 @@ std::string cpp_float<Digits10>::str(std::streamsize number_of_digits, std::ios_
 
       str += ss.str();
    }
-
-   // Cut the output to the size of the precision.
-   if(str.length() > static_cast<std::string::size_type>(number_of_digits))
+   if(number_of_digits == 0)
    {
-      // Get the digit after the last needed digit for rounding
-      const boost::uint32_t round = static_cast<boost::uint32_t>(static_cast<boost::uint32_t>(str[static_cast<std::string::size_type>(number_of_digits)]) - static_cast<boost::uint32_t>('0'));
-
-      // Truncate the string
-      str.erase(static_cast<std::string::size_type>(number_of_digits));
-
-      if(round >= static_cast<boost::uint32_t>(5u))
+      // We only get here if the output format is "fixed" and we just need to
+      // round the first digit.
+      str.insert(0, 1, '0');
+      ++number_of_digits;
+   }
+   if(number_of_digits < 0)
+   {
+      str = "0";
+      if(isneg())
+         str.insert(0, 1, '-');
+      boost::multiprecision::detail::format_float_string(str, 0, number_of_digits - my_exp - 1, f);
+      return str;
+   }
+   else
+   {
+      // Cut the output to the size of the precision.
+      if(str.length() > static_cast<std::string::size_type>(number_of_digits))
       {
-         std::size_t ix = static_cast<std::size_t>(str.length() - 1u);
+         // Get the digit after the last needed digit for rounding
+         const boost::uint32_t round = static_cast<boost::uint32_t>(static_cast<boost::uint32_t>(str[static_cast<std::string::size_type>(number_of_digits)]) - static_cast<boost::uint32_t>('0'));
 
-         // Every trailing 9 must be rounded up
-         while(ix && (static_cast<boost::int32_t>(str.at(ix)) - static_cast<boost::int32_t>('0') == static_cast<boost::int32_t>(9)))
-         {
-            str.at(ix) = static_cast<char>('0');
-            --ix;
-         }
+         // Truncate the string
+         str.erase(static_cast<std::string::size_type>(number_of_digits));
 
-         if(!ix)
+         if(round >= static_cast<boost::uint32_t>(5u))
          {
-            // There were nothing but trailing nines.
-            if(static_cast<boost::int32_t>(static_cast<boost::int32_t>(str.at(ix)) - static_cast<boost::int32_t>(0x30)) == static_cast<boost::int32_t>(9))
+            std::size_t ix = static_cast<std::size_t>(str.length() - 1u);
+
+            // Every trailing 9 must be rounded up
+            while(ix && (static_cast<boost::int32_t>(str.at(ix)) - static_cast<boost::int32_t>('0') == static_cast<boost::int32_t>(9)))
             {
-               // Increment up to the next order and adjust exponent.
-               str.at(ix) = static_cast<char>('1');
-               ++my_exp;
+               str.at(ix) = static_cast<char>('0');
+               --ix;
+            }
+
+            if(!ix)
+            {
+               // There were nothing but trailing nines.
+               if(static_cast<boost::int32_t>(static_cast<boost::int32_t>(str.at(ix)) - static_cast<boost::int32_t>(0x30)) == static_cast<boost::int32_t>(9))
+               {
+                  // Increment up to the next order and adjust exponent.
+                  str.at(ix) = static_cast<char>('1');
+                  ++my_exp;
+               }
+               else
+               {
+                  // Round up this digit.
+                  ++str.at(ix);
+               }
             }
             else
             {
-               // Round up this digit.
-               ++str.at(ix);
+               // Round up the last digit.
+               ++str[ix];
             }
-         }
-         else
-         {
-            // Round up the last digit.
-            ++str[ix];
          }
       }
    }
