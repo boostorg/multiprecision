@@ -348,15 +348,16 @@ struct digits2
 
 #ifndef BOOST_MP_MIN_EXPONENT_DIGITS
 #ifdef _MSC_VER
-#  define BOOST_MP_MIN_EXPONENT_DIGITS 3
+#  define BOOST_MP_MIN_EXPONENT_DIGITS 2
 #else
 #  define BOOST_MP_MIN_EXPONENT_DIGITS 2
 #endif
 #endif
 
 template <class S>
-void format_float_string(S& str, long long my_exp, std::streamsize digits, std::ios_base::fmtflags f)
+void format_float_string(S& str, long long my_exp, std::streamsize digits, std::ios_base::fmtflags f, bool iszero)
 {
+   typedef typename S::size_type size_type;
    bool scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
    bool fixed      = (f & std::ios_base::fixed) == std::ios_base::fixed;
    bool showpoint  = (f & std::ios_base::showpoint) == std::ios_base::showpoint;
@@ -366,6 +367,39 @@ void format_float_string(S& str, long long my_exp, std::streamsize digits, std::
 
    if(neg)
       str.erase(0, 1);
+
+   if(digits == 0)
+   {
+      digits = (std::max)(str.size(), size_type(16));
+   }
+
+   if(iszero || str.empty() || (str.find_first_not_of('0') == S::npos))
+   {
+      // We will be printing zero, even though the value might not
+      // actually be zero (it just may have been rounded to zero).
+      str = "0";
+      if(scientific || fixed)
+      {
+         str.append(1, '.');
+         str.append(size_type(digits), '0');
+         if(scientific)
+            str.append("e+00");
+      }
+      else
+      {
+         if(showpoint)
+         {
+            str.append(1, '.');
+            if(digits > 1)
+               str.append(size_type(digits - 1), '0');
+         }
+      }
+      if(neg)
+         str.insert(0, 1, '-');
+      else if(showpos)
+         str.insert(0, 1, '+');
+      return;
+   }
 
    if(!fixed && !scientific && !showpoint)
    {
@@ -380,13 +414,15 @@ void format_float_string(S& str, long long my_exp, std::streamsize digits, std::
       if(str.empty())
          str = '0';
    }
-   else
+   else if(!fixed || (my_exp >= 0))
    {
       //
       // Pad out the end with zero's if we need to:
       //
       std::streamsize chars = str.size();
       chars = digits - chars;
+      if(scientific)
+         ++chars;
       if(chars > 0)
       {
          str.append(static_cast<std::string::size_type>(chars), '0');
@@ -399,14 +435,14 @@ void format_float_string(S& str, long long my_exp, std::streamsize digits, std::
       {
          // Just pad out the end with zeros:
          str.append(static_cast<std::string::size_type>(1 + my_exp - str.size()), '0');
-         if(showpoint)
+         if(showpoint || fixed)
             str.append(".");
       }
-      else if(my_exp + 1 != str.size())
+      else if(my_exp + 1 < str.size())
       {
          if(my_exp < 0)
          {
-            str.insert(0, static_cast<std::string::size_type>(-1-my_exp), '0');
+            str.insert(0, static_cast<std::string::size_type>(-1 - my_exp), '0');
             str.insert(0, "0.");
          }
          else
@@ -415,8 +451,17 @@ void format_float_string(S& str, long long my_exp, std::streamsize digits, std::
             str.insert(static_cast<std::string::size_type>(my_exp + 1), 1, '.');
          }
       }
-      else if(showpoint)
+      else if(showpoint || fixed) // we have exactly the digits we require to left of the point
          str += ".";
+
+      if(fixed)
+      {
+         // We may need to add trailing zeros:
+         std::streamsize l = str.find('.') + 1;
+         l = digits - (str.size() - l);
+         if(l > 0)
+            str.append(size_type(l), '0');
+      }
    }
    else
    {

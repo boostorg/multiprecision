@@ -161,7 +161,9 @@ struct mpfr_float_imp
       bool scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
       bool fixed      = (f & std::ios_base::fixed) == std::ios_base::fixed;
 
-      if(scientific)
+      std::streamsize org_digits(digits);
+
+      if(scientific && digits)
          ++digits;
 
       std::string result;
@@ -170,8 +172,6 @@ struct mpfr_float_imp
       {
          e = 0;
          result = "0";
-         if(fixed)
-            ++digits;
       }
       else
       {
@@ -182,13 +182,68 @@ struct mpfr_float_imp
             // Oops we actually need a different number of digits to what we asked for:
             mpfr_free_str(ps);
             digits += e + 1;
-            ps = ps = mpfr_get_str (0, &e, 10, static_cast<std::size_t>(digits), m_data, GMP_RNDN);
-            --e;  // To match with what our formatter expects.
+            if(digits == 0)
+            {
+               // We need to get *all* the digits and then possibly round up,
+               // we end up with either "0" or "1" as the result.
+               ps = mpfr_get_str (0, &e, 10, 0, m_data, GMP_RNDN);
+               --e;
+               unsigned offset = *ps == '-' ? 1 : 0;
+               if(ps[offset] > '5')
+               {
+                  ++e;
+                  ps[offset] = '1';
+                  ps[offset + 1] = 0;
+               }
+               else if(ps[offset] == '5')
+               {
+                  unsigned i = offset + 1;
+                  bool round_up = false;
+                  while(ps[i] != 0)
+                  {
+                     if(ps[i] != '0')
+                     {
+                        round_up = true;
+                        break;
+                     }
+                  }
+                  if(round_up)
+                  {
+                     ++e;
+                     ps[offset] = '1';
+                     ps[offset + 1] = 0;
+                  }
+                  else
+                  {
+                     ps[offset] = '0';
+                     ps[offset + 1] = 0;
+                  }
+               }
+               else
+               {
+                  ps[offset] = '0';
+                  ps[offset + 1] = 0;
+               }
+            }
+            else if(digits > 0)
+            {
+               ps = mpfr_get_str (0, &e, 10, static_cast<std::size_t>(digits), m_data, GMP_RNDN);
+               --e;  // To match with what our formatter expects.
+            }
+            else
+            {
+               ps = mpfr_get_str (0, &e, 10, 1, m_data, GMP_RNDN);
+               --e;
+               unsigned offset = *ps == '-' ? 1 : 0;
+               ps[offset] = '0';
+               ps[offset + 1] = 0;
+            }
          }
-         result = ps;
-         mpfr_free_str(ps);
+         result = ps ? ps : "0";
+         if(ps)
+            mpfr_free_str(ps);
       }
-      boost::multiprecision::detail::format_float_string(result, e, digits, f);
+      boost::multiprecision::detail::format_float_string(result, e, org_digits, f, 0 != mpfr_zero_p(m_data));
       return result;
    }
    ~mpfr_float_imp()

@@ -1642,6 +1642,7 @@ template <unsigned Digits10>
 std::string cpp_float<Digits10>::str(std::streamsize number_of_digits, std::ios_base::fmtflags f) const
 {
    std::string str;
+   std::streamsize org_digits(number_of_digits);
    boost::int64_t my_exp = order();
    if(number_of_digits == 0)
       number_of_digits = cpp_float_max_digits10;
@@ -1669,19 +1670,21 @@ std::string cpp_float<Digits10>::str(std::streamsize number_of_digits, std::ios_
 
       str += ss.str();
    }
+   bool have_leading_zeros = false;
    if(number_of_digits == 0)
    {
       // We only get here if the output format is "fixed" and we just need to
-      // round the first digit.
-      str.insert(0, 1, '0');
-      ++number_of_digits;
+      // round the first non-zero digit.
+      number_of_digits -= my_exp + 1;  // reset to original value
+      str.insert(0, std::string::size_type(number_of_digits), '0');
+      have_leading_zeros = true;
    }
    if(number_of_digits < 0)
    {
       str = "0";
       if(isneg())
          str.insert(0, 1, '-');
-      boost::multiprecision::detail::format_float_string(str, 0, number_of_digits - my_exp - 1, f);
+      boost::multiprecision::detail::format_float_string(str, 0, number_of_digits - my_exp - 1, f, this->iszero());
       return str;
    }
    else
@@ -1692,10 +1695,37 @@ std::string cpp_float<Digits10>::str(std::streamsize number_of_digits, std::ios_
          // Get the digit after the last needed digit for rounding
          const boost::uint32_t round = static_cast<boost::uint32_t>(static_cast<boost::uint32_t>(str[static_cast<std::string::size_type>(number_of_digits)]) - static_cast<boost::uint32_t>('0'));
 
+         bool need_round_up = round >= 5u;
+
+         if(round == 5u)
+         {
+            const boost::uint32_t ix = static_cast<boost::uint32_t>(static_cast<boost::uint32_t>(str[static_cast<std::string::size_type>(number_of_digits - 1)]) - static_cast<boost::uint32_t>('0'));
+            if((ix & 1u) == 0)
+            {
+               // We have an even digit followed by a 5, so we might not actually need to round up
+               // if all the remaining digits are zero:
+               if(str.find_first_not_of('0', static_cast<std::string::size_type>(number_of_digits + 1)) == std::string::npos)
+               {
+                  bool all_zeros = true;
+                  // No none-zero trailing digits in the string, now check whatever parts we didn't convert to the string:
+                  for(std::size_t i = number_of_elements; i < data.size(); i++)
+                  {
+                     if(data[i])
+                     {
+                        all_zeros = false;
+                        break;
+                     }
+                  }
+                  if(all_zeros)
+                     need_round_up = false;  // tie break - round to even.
+               }
+            }
+         }
+
          // Truncate the string
          str.erase(static_cast<std::string::size_type>(number_of_digits));
 
-         if(round >= static_cast<boost::uint32_t>(5u))
+         if(need_round_up)
          {
             std::size_t ix = static_cast<std::size_t>(str.length() - 1u);
 
@@ -1729,9 +1759,21 @@ std::string cpp_float<Digits10>::str(std::streamsize number_of_digits, std::ios_
          }
       }
    }
+   if(have_leading_zeros)
+   {
+      // We need to take the zeros back out again, and correct the exponent
+      // if we rounded up:
+      if(str[std::string::size_type(number_of_digits - 1)] != '0')
+      {
+         ++my_exp;
+         str.erase(0, std::string::size_type(number_of_digits - 1));
+      }
+      else
+         str.erase(0, std::string::size_type(number_of_digits));
+   }
    if(isneg())
       str.insert(0, 1, '-');
-   boost::multiprecision::detail::format_float_string(str, my_exp, number_of_digits, f);
+   boost::multiprecision::detail::format_float_string(str, my_exp, org_digits, f, this->iszero());
    return str;
 }
 
