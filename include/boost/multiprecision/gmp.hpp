@@ -1788,8 +1788,8 @@ public:
    }
    BOOST_STATIC_CONSTEXPR int digits = static_cast<int>(((Digits10 + 1) * 1000L) / 301L);
    BOOST_STATIC_CONSTEXPR int digits10 = Digits10;
-   // Is this really correct???
-   BOOST_STATIC_CONSTEXPR int max_digits10 = Digits10 + 1;
+   // Have to allow for a possible extra limb inside the gmp data structure:
+   BOOST_STATIC_CONSTEXPR int max_digits10 = Digits10 + 2 + ((GMP_LIMB_BITS * 301L) / 1000L);
    BOOST_STATIC_CONSTEXPR bool is_signed = true;
    BOOST_STATIC_CONSTEXPR bool is_integer = false;
    BOOST_STATIC_CONSTEXPR bool is_exact = false;

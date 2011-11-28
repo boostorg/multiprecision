@@ -33,7 +33,9 @@
 #include <boost/multiprecision/cpp_float.hpp>
 #endif
 
-#include <boost/detail/lightweight_test.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int.hpp>
+#include "test.hpp"
 #include <boost/array.hpp>
 #include <iostream>
 #include <iomanip>
@@ -160,6 +162,85 @@ void test()
          }
       }
    }
+
+   if(std::numeric_limits<mp_t>::has_infinity)
+   {
+      T val = std::numeric_limits<T>::infinity();
+      BOOST_CHECK_EQUAL(val.str(), "inf");
+      BOOST_CHECK_EQUAL(val.str(0, std::ios_base::showpos), "+inf");
+      val = -val;
+      BOOST_CHECK_EQUAL(val.str(), "-inf");
+      BOOST_CHECK_EQUAL(val.str(0, std::ios_base::showpos), "-inf");
+
+      val = "inf";
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      val = "+inf";
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      val = "-inf";
+      BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+   }
+   if(std::numeric_limits<mp_t>::has_quiet_NaN)
+   {
+      T val = std::numeric_limits<T>::quiet_NaN();
+      BOOST_CHECK_EQUAL(val.str(), "nan");
+      val = "nan";
+      BOOST_CHECK(boost::math::isnan(val));
+   }
+}
+
+template <class T>
+T generate_random()
+{
+   static boost::random::mt19937 gen;
+   T val = gen();
+   T prev_val = -1;
+   while(val != prev_val)
+   {
+      val *= (gen.max)();
+      prev_val = val;
+      val += gen();
+   }
+   int e;
+   val = frexp(val, &e);
+
+   typedef typename T::backend_type::exponent_type e_type;
+   static boost::random::uniform_int_distribution<e_type> ui(0, std::numeric_limits<T>::max_exponent - 10);
+   return ldexp(val, ui(gen));
+}
+
+template <class T>
+void do_round_trip(const T& val, std::ios_base::fmtflags f)
+{
+   std::stringstream ss;
+   ss << std::setprecision(std::numeric_limits<T>::max_digits10);
+   ss.flags(f);
+   ss << val;
+   T new_val = ss.str();
+   BOOST_CHECK_EQUAL(new_val, val);
+   new_val = val.str(0, f);
+   BOOST_CHECK_EQUAL(new_val, val);
+}
+
+template <class T>
+void do_round_trip(const T& val)
+{
+   do_round_trip(val, std::ios_base::fmtflags(0));
+   do_round_trip(val, std::ios_base::fmtflags(std::ios_base::scientific));
+   if((fabs(val) > 1) && (fabs(val) < 1e100))
+      do_round_trip(val, std::ios_base::fmtflags(std::ios_base::fixed));
+}
+
+template <class T>
+void test_round_trip()
+{
+   for(unsigned i = 0; i < 1000; ++i)
+   {
+      T val = generate_random<T>();
+      do_round_trip(val);
+      do_round_trip(T(-val));
+      do_round_trip(T(1/val));
+      do_round_trip(T(-1/val));
+   }
 }
 
 int main()
@@ -167,14 +248,29 @@ int main()
 #ifdef TEST_MPFR_50
    test<boost::multiprecision::mpfr_float_50>();
    test<boost::multiprecision::mpfr_float_100>();
+
+   test_round_trip<boost::multiprecision::mpfr_float_50>();
+   test_round_trip<boost::multiprecision::mpfr_float_100>();
 #endif
 #ifdef TEST_CPP_FLOAT
    test<boost::multiprecision::cpp_float_50>();
    test<boost::multiprecision::cpp_float_100>();
+
+   /*
+   // cpp_float has extra guard digits that messes this up:
+   test_round_trip<boost::multiprecision::cpp_float_50>();
+   test_round_trip<boost::multiprecision::cpp_float_100>();
+   */
 #endif
 #ifdef TEST_MPF_50
    test<boost::multiprecision::mpf_float_50>();
    test<boost::multiprecision::mpf_float_100>();
+   /*
+   // I can't get this to work with mpf_t - mpf_str appears
+   // not to actually print enough decimal digits:
+   test_round_trip<boost::multiprecision::mpf_float_50>();
+   test_round_trip<boost::multiprecision::mpf_float_100>();
+   */
 #endif
    return boost::report_errors();
 }

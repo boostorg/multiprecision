@@ -168,6 +168,21 @@ struct mpfr_float_imp
 
       std::string result;
       mp_exp_t e;
+      if(mpfr_inf_p(m_data))
+      {
+         if(mpfr_sgn(m_data) < 0)
+            result = "-inf";
+         else if(f & std::ios_base::showpos)
+            result = "+inf";
+         else
+            result = "inf";
+         return result;
+      }
+      if(mpfr_nan_p(m_data))
+      {
+         result = "nan";
+         return result;
+      }
       if(mpfr_zero_p(m_data))
       {
          e = 0;
@@ -1059,7 +1074,7 @@ public:
    BOOST_STATIC_CONSTEXPR int digits = static_cast<int>(((Digits10 + 1) * 1000L) / 301L);
    BOOST_STATIC_CONSTEXPR int digits10 = Digits10;
    // Is this really correct???
-   BOOST_STATIC_CONSTEXPR int max_digits10 = Digits10 + 1;
+   BOOST_STATIC_CONSTEXPR int max_digits10 = Digits10 + 2;
    BOOST_STATIC_CONSTEXPR bool is_signed = true;
    BOOST_STATIC_CONSTEXPR bool is_integer = false;
    BOOST_STATIC_CONSTEXPR bool is_exact = false;

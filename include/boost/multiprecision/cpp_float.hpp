@@ -53,6 +53,11 @@ private:
    static const boost::int32_t mp_elem_number       = static_cast<boost::int32_t>(cpp_float_digits10_num_base + 2);
    static const boost::int32_t mp_elem_mask = static_cast<boost::int32_t>(100000000);
 
+public:
+   static const boost::int32_t cpp_float_total_digits10 = mp_elem_number * mp_elem_digits10;
+
+private:
+
    typedef enum enum_fpclass
    {
       mp_finite,
@@ -1641,6 +1646,20 @@ cpp_float<Digits10> cpp_float<Digits10>::extract_integer_part(void) const
 template <unsigned Digits10>
 std::string cpp_float<Digits10>::str(std::streamsize number_of_digits, std::ios_base::fmtflags f) const
 {
+   if(this->isinf())
+   {
+      if(this->isneg())
+         return "-inf";
+      else if(f & std::ios_base::showpos)
+         return "+inf";
+      else 
+         return "inf";
+   }
+   else if(this->isnan())
+   {
+      return "nan";
+   }
+
    std::string str;
    std::streamsize org_digits(number_of_digits);
    boost::int64_t my_exp = order();
@@ -1799,16 +1818,38 @@ bool cpp_float<Digits10>::rd_string(const char* const s)
    // Get a possible +/- sign and remove it.
    neg = false;
 
-   if((pos = str.find(static_cast<char>('-'))) != std::string::npos)
+   if(str.size())
    {
-      neg = true;
-      str.erase(pos, static_cast<std::size_t>(1u));
+      if(str[0] == '-')
+      {
+         neg = true;
+         str.erase(0, 1);
+      }
+      else if(str[0] == '+')
+      {
+         str.erase(0, 1);
+      }
+   }
+   //
+   // Special cases for infinities and NaN's:
+   //
+   if((str == "inf") || (str == "INF") || (str == "infinity") || (str == "INFINITY"))
+   {
+      if(neg)
+      {
+         *this = this->inf();
+         this->negate();
+      }
+      else
+         *this = this->inf();
+      return true;
+   }
+   if((str.size() >= 3) && ((str.substr(0, 3) == "nan") || (str.substr(0, 3) == "NAN")))
+   {
+      *this = this->nan();
+      return true;
    }
 
-   if((pos = str.find(static_cast<char>('+'))) != std::string::npos)
-   {
-      str.erase(pos, static_cast<std::size_t>(1u));
-   }
 
    // Remove leading zeros for all input types.
    const std::string::iterator fwd_it_leading_zero = std::find_if(str.begin(), str.end(), char_is_nonzero_predicate);
