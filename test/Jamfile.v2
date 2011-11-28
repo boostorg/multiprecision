@@ -607,3 +607,18 @@ run test_float_io.cpp mpfr gmp
          [ check-target-builds ../config//has_mpfr : : <build>no ]
         : test_float_io_mpfr ;
 
+run test_int_io.cpp $(TOMMATH)
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_TOMMATH
+         [ check-target-builds ../config//has_tommath : : <build>no ]
+        : test_int_io_tommath ;
+
+run test_int_io.cpp gmp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPZ
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+        : test_int_io_mpz ;

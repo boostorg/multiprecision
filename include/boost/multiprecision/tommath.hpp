@@ -42,11 +42,11 @@ struct tommath_int
    }
    tommath_int(const tommath_int& o)
    {
-      detail::check_tommath_result(mp_init_copy(&m_data, const_cast<::mp_int*>(&o.m_data)));
+      detail::check_tommath_result(mp_init_copy(&m_data, const_cast< ::mp_int*>(&o.m_data)));
    }
    tommath_int& operator = (const tommath_int& o)
    {
-      detail::check_tommath_result(mp_copy(const_cast<::mp_int*>(&o.m_data), &m_data));
+      detail::check_tommath_result(mp_copy(const_cast< ::mp_int*>(&o.m_data), &m_data));
       return *this;
    }
    tommath_int& operator = (boost::uintmax_t i)
@@ -162,10 +162,11 @@ struct tommath_int
          {
             radix = 8;
             n -= 1;
+            s += 1;
          }
       }
       if(n)
-         detail::check_tommath_result(mp_read_radix(&m_data, s, 10));
+         detail::check_tommath_result(mp_read_radix(&m_data, s, radix));
       else
          detail::check_tommath_result(mp_set_int(&m_data, 0));
       return *this;
@@ -177,10 +178,15 @@ struct tommath_int
          base = 8;
       else if((f & std::ios_base::hex) == std::ios_base::hex)
          base = 16;
+      //
+      // sanity check, bases 8 and 16 are only available for positive numbers:
+      //
+      if((base != 10) && m_data.sign)
+         BOOST_THROW_EXCEPTION(std::runtime_error("Formatted output in bases 8 or 16 is only available for positive numbers"));
       int s;
-      detail::check_tommath_result(mp_radix_size(const_cast<::mp_int*>(&m_data), 10, &s));
+      detail::check_tommath_result(mp_radix_size(const_cast< ::mp_int*>(&m_data), base, &s));
       boost::scoped_array<char> a(new char[s+1]);
-      detail::check_tommath_result(mp_toradix_n(const_cast<::mp_int*>(&m_data), a.get(), base, s+1));
+      detail::check_tommath_result(mp_toradix_n(const_cast< ::mp_int*>(&m_data), a.get(), base, s+1));
       std::string result = a.get();
       if((base != 10) && (f & std::ios_base::showbase))
       {
@@ -202,7 +208,7 @@ struct tommath_int
    }
    int compare(const tommath_int& o)const
    {
-      return mp_cmp(const_cast<::mp_int*>(&m_data), const_cast<::mp_int*>(&o.m_data));
+      return mp_cmp(const_cast< ::mp_int*>(&m_data), const_cast< ::mp_int*>(&o.m_data));
    }
    template <class V>
    int compare(V v)const
@@ -227,30 +233,30 @@ int get_sign(const tommath_int& val);
 
 inline void add(tommath_int& t, const tommath_int& o)
 {
-   detail::check_tommath_result(mp_add(&t.data(), const_cast<::mp_int*>(&o.data()), &t.data()));
+   detail::check_tommath_result(mp_add(&t.data(), const_cast< ::mp_int*>(&o.data()), &t.data()));
 }
 inline void subtract(tommath_int& t, const tommath_int& o)
 {
-   detail::check_tommath_result(mp_sub(&t.data(), const_cast<::mp_int*>(&o.data()), &t.data()));
+   detail::check_tommath_result(mp_sub(&t.data(), const_cast< ::mp_int*>(&o.data()), &t.data()));
 }
 inline void multiply(tommath_int& t, const tommath_int& o)
 {
-   detail::check_tommath_result(mp_mul(&t.data(), const_cast<::mp_int*>(&o.data()), &t.data()));
+   detail::check_tommath_result(mp_mul(&t.data(), const_cast< ::mp_int*>(&o.data()), &t.data()));
 }
 inline void divide(tommath_int& t, const tommath_int& o)
 {
    tommath_int temp;
-   detail::check_tommath_result(mp_div(&t.data(), const_cast<::mp_int*>(&o.data()), &t.data(), &temp.data()));
+   detail::check_tommath_result(mp_div(&t.data(), const_cast< ::mp_int*>(&o.data()), &t.data(), &temp.data()));
 }
 inline void modulus(tommath_int& t, const tommath_int& o)
 {
    bool neg = get_sign(t) < 0;
    bool neg2 = get_sign(o) < 0;
-   detail::check_tommath_result(mp_mod(&t.data(), const_cast<::mp_int*>(&o.data()), &t.data()));
+   detail::check_tommath_result(mp_mod(&t.data(), const_cast< ::mp_int*>(&o.data()), &t.data()));
    if(neg != neg2)
    {
       t.negate();
-      detail::check_tommath_result(mp_add(&t.data(), const_cast<::mp_int*>(&o.data()), &t.data()));
+      detail::check_tommath_result(mp_add(&t.data(), const_cast< ::mp_int*>(&o.data()), &t.data()));
       t.negate();
    }
 }
@@ -268,73 +274,73 @@ inline void right_shift(tommath_int& t, UI i)
 template <class UI>
 inline void left_shift(tommath_int& t, const tommath_int& v, UI i)
 {
-   detail::check_tommath_result(mp_mul_2d(const_cast<::mp_int*>(&v.data()), static_cast<unsigned>(i), &t.data()));
+   detail::check_tommath_result(mp_mul_2d(const_cast< ::mp_int*>(&v.data()), static_cast<unsigned>(i), &t.data()));
 }
 template <class UI>
 inline void right_shift(tommath_int& t, const tommath_int& v, UI i)
 {
    tommath_int d;
-   detail::check_tommath_result(mp_div_2d(const_cast<::mp_int*>(&v.data()), static_cast<unsigned long>(i), &t.data(), &d.data()));
+   detail::check_tommath_result(mp_div_2d(const_cast< ::mp_int*>(&v.data()), static_cast<unsigned long>(i), &t.data(), &d.data()));
 }
 
 inline void bitwise_and(tommath_int& result, const tommath_int& v)
 {
-   detail::check_tommath_result(mp_and(&result.data(), const_cast<::mp_int*>(&v.data()), &result.data()));
+   detail::check_tommath_result(mp_and(&result.data(), const_cast< ::mp_int*>(&v.data()), &result.data()));
 }
 
 inline void bitwise_or(tommath_int& result, const tommath_int& v)
 {
-   detail::check_tommath_result(mp_or(&result.data(), const_cast<::mp_int*>(&v.data()), &result.data()));
+   detail::check_tommath_result(mp_or(&result.data(), const_cast< ::mp_int*>(&v.data()), &result.data()));
 }
 
 inline void bitwise_xor(tommath_int& result, const tommath_int& v)
 {
-   detail::check_tommath_result(mp_xor(&result.data(), const_cast<::mp_int*>(&v.data()), &result.data()));
+   detail::check_tommath_result(mp_xor(&result.data(), const_cast< ::mp_int*>(&v.data()), &result.data()));
 }
 
 inline void add(tommath_int& t, const tommath_int& p, const tommath_int& o)
 {
-   detail::check_tommath_result(mp_add(const_cast<::mp_int*>(&p.data()), const_cast<::mp_int*>(&o.data()), &t.data()));
+   detail::check_tommath_result(mp_add(const_cast< ::mp_int*>(&p.data()), const_cast< ::mp_int*>(&o.data()), &t.data()));
 }
 inline void subtract(tommath_int& t, const tommath_int& p, const tommath_int& o)
 {
-   detail::check_tommath_result(mp_sub(const_cast<::mp_int*>(&p.data()), const_cast<::mp_int*>(&o.data()), &t.data()));
+   detail::check_tommath_result(mp_sub(const_cast< ::mp_int*>(&p.data()), const_cast< ::mp_int*>(&o.data()), &t.data()));
 }
 inline void multiply(tommath_int& t, const tommath_int& p, const tommath_int& o)
 {
-   detail::check_tommath_result(mp_mul(const_cast<::mp_int*>(&p.data()), const_cast<::mp_int*>(&o.data()), &t.data()));
+   detail::check_tommath_result(mp_mul(const_cast< ::mp_int*>(&p.data()), const_cast< ::mp_int*>(&o.data()), &t.data()));
 }
 inline void divide(tommath_int& t, const tommath_int& p, const tommath_int& o)
 {
    tommath_int d;
-   detail::check_tommath_result(mp_div(const_cast<::mp_int*>(&p.data()), const_cast<::mp_int*>(&o.data()), &t.data(), &d.data()));
+   detail::check_tommath_result(mp_div(const_cast< ::mp_int*>(&p.data()), const_cast< ::mp_int*>(&o.data()), &t.data(), &d.data()));
 }
 inline void modulus(tommath_int& t, const tommath_int& p, const tommath_int& o)
 {
    bool neg = get_sign(p) < 0;
    bool neg2 = get_sign(o) < 0;
-   detail::check_tommath_result(mp_mod(const_cast<::mp_int*>(&p.data()), const_cast<::mp_int*>(&o.data()), &t.data()));
+   detail::check_tommath_result(mp_mod(const_cast< ::mp_int*>(&p.data()), const_cast< ::mp_int*>(&o.data()), &t.data()));
    if(neg != neg2)
    {
       t.negate();
-      detail::check_tommath_result(mp_add(&t.data(), const_cast<::mp_int*>(&o.data()), &t.data()));
+      detail::check_tommath_result(mp_add(&t.data(), const_cast< ::mp_int*>(&o.data()), &t.data()));
       t.negate();
    }
 }
 
 inline void bitwise_and(tommath_int& result, const tommath_int& u, const tommath_int& v)
 {
-   detail::check_tommath_result(mp_and(const_cast<::mp_int*>(&u.data()), const_cast<::mp_int*>(&v.data()), &result.data()));
+   detail::check_tommath_result(mp_and(const_cast< ::mp_int*>(&u.data()), const_cast< ::mp_int*>(&v.data()), &result.data()));
 }
 
 inline void bitwise_or(tommath_int& result, const tommath_int& u, const tommath_int& v)
 {
-   detail::check_tommath_result(mp_or(const_cast<::mp_int*>(&u.data()), const_cast<::mp_int*>(&v.data()), &result.data()));
+   detail::check_tommath_result(mp_or(const_cast< ::mp_int*>(&u.data()), const_cast< ::mp_int*>(&v.data()), &result.data()));
 }
 
 inline void bitwise_xor(tommath_int& result, const tommath_int& u, const tommath_int& v)
 {
-   detail::check_tommath_result(mp_xor(const_cast<::mp_int*>(&u.data()), const_cast<::mp_int*>(&v.data()), &result.data()));
+   detail::check_tommath_result(mp_xor(const_cast< ::mp_int*>(&u.data()), const_cast< ::mp_int*>(&v.data()), &result.data()));
 }
 
 inline void complement(tommath_int& result, const tommath_int& u)
@@ -351,7 +357,7 @@ inline void complement(tommath_int& result, const tommath_int& u)
    //
    unsigned shift = result.data().used * DIGIT_BIT;    // How many bits we're actually using
    // How many bits we actually need, reduced by one to account for a mythical sign bit:
-   unsigned padding = result.data().used * std::numeric_limits<mp_digit>::digits - shift - 1; 
+   int padding = result.data().used * std::numeric_limits<mp_digit>::digits - shift - 1; 
    while(padding >= std::numeric_limits<mp_digit>::digits) 
       padding -= std::numeric_limits<mp_digit>::digits;
 
@@ -373,23 +379,23 @@ inline int get_sign(const tommath_int& val)
 template <class A>
 inline void convert_to(A* result, const tommath_int& val)
 {
-   *result = boost::lexical_cast<A>(val.str(0, false));
+   *result = boost::lexical_cast<A>(val.str(0, std::ios_base::fmtflags(0)));
 }
 inline void convert_to(char* result, const tommath_int& val)
 {
-   *result = static_cast<char>(boost::lexical_cast<int>(val.str(0, false)));
+   *result = static_cast<char>(boost::lexical_cast<int>(val.str(0, std::ios_base::fmtflags(0))));
 }
 inline void convert_to(unsigned char* result, const tommath_int& val)
 {
-   *result = static_cast<unsigned char>(boost::lexical_cast<unsigned>(val.str(0, false)));
+   *result = static_cast<unsigned char>(boost::lexical_cast<unsigned>(val.str(0, std::ios_base::fmtflags(0))));
 }
 inline void convert_to(signed char* result, const tommath_int& val)
 {
-   *result = static_cast<signed char>(boost::lexical_cast<int>(val.str(0, false)));
+   *result = static_cast<signed char>(boost::lexical_cast<int>(val.str(0, std::ios_base::fmtflags(0))));
 }
 inline void eval_abs(tommath_int& result, const tommath_int& val)
 {
-   detail::check_tommath_result(mp_abs(const_cast<::mp_int*>(&val.data()), &result.data()));
+   detail::check_tommath_result(mp_abs(const_cast< ::mp_int*>(&val.data()), &result.data()));
 }
 
 

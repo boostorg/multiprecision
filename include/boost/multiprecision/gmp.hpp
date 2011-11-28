@@ -1034,6 +1034,11 @@ struct gmp_int
          base = 8;
       else if((f & std::ios_base::hex) == std::ios_base::hex)
          base = 16;
+      //
+      // sanity check, bases 8 and 16 are only available for positive numbers:
+      //
+      if((base != 10) && (mpz_sgn(m_data) < 0))
+         BOOST_THROW_EXCEPTION(std::runtime_error("Formatted output in bases 8 or 16 is only available for positive numbers"));
       void *(*alloc_func_ptr) (size_t);
       void *(*realloc_func_ptr) (void *, size_t, size_t);
       void (*free_func_ptr) (void *, size_t);
