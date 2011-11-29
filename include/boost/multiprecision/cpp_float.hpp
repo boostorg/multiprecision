@@ -1218,7 +1218,7 @@ cpp_float<Digits10>& cpp_float<Digits10>::calculate_sqrt(void)
 
    static const boost::uint32_t double_digits10_minus_one = std::numeric_limits<double>::digits10 - 1;
 
-   for(boost::uint32_t digits = double_digits10_minus_one; digits <= cpp_float_max_digits10; digits *= 2u)
+   for(boost::int32_t digits = double_digits10_minus_one; digits <= cpp_float_max_digits10; digits *= 2u)
    {
       // Adjust precision of the terms.
       precision(digits * 2);
