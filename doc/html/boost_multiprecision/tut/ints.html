@@ -63,7 +63,8 @@
                 </p>
               </th>
 </tr></thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>
                 <p>
                   <code class="computeroutput"><span class="identifier">gmp_int</span></code>
@@ -94,11 +95,44 @@
                   Dependency on GNU licenced GMP library.
                 </p>
               </td>
-</tr></tbody>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">mp_int</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  boost/multiprecision/tommath.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  2
+                </p>
+              </td>
+<td>
+                <p>
+                  libtommath
+                </p>
+              </td>
+<td>
+                <p>
+                  Public domain backend with no licence restrictions.
+                </p>
+              </td>
+<td>
+                <p>
+                  Slower than GMP.
+                </p>
+              </td>
+</tr>
+</tbody>
 </table></div>
-<a name="boost_multiprecision.tut.ints.gmp_int"></a><h5>
-<a name="boost_multiprecision.tut.ints.gmp_int-heading"></a>
-        <a class="link" href="ints.html#boost_multiprecision.tut.ints.gmp_int">gmp_int</a>
+<h5>
+<a name="boost_multiprecision.tut.ints.h0"></a>
+        <span><a name="boost_multiprecision.tut.ints.gmp_int"></a></span><a class="link" href="ints.html#boost_multiprecision.tut.ints.gmp_int">gmp_int</a>
       </h5>
 <pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">multiprecision</span><span class="special">{</span>
 
@@ -118,7 +152,7 @@
 <p>
         As well as the usual conversions from arithmetic and string types, type
         <code class="computeroutput"><span class="identifier">mpz_int</span></code> is copy constructible
-        and asignable from:
+        and assignable from:
       </p>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc">
 <li class="listitem">
@@ -132,14 +166,26 @@
 </ul></div>
 <p>
         It's also possible to access the underlying <code class="computeroutput"><span class="identifier">mpz_t</span></code>
-        via the data() member function of <code class="computeroutput"><span class="identifier">gmp_int</span></code>.
+        via the <code class="computeroutput"><span class="identifier">data</span><span class="special">()</span></code>
+        member function of <code class="computeroutput"><span class="identifier">gmp_int</span></code>.
       </p>
-<a name="boost_multiprecision.tut.ints.example_"></a><h6>
-<a name="boost_multiprecision.tut.ints.example_-heading"></a>
-        <a class="link" href="ints.html#boost_multiprecision.tut.ints.example_">Example:</a>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+          Formatted IO for this type does not support octal or hexadecimal notation
+          for negative values, as a result performing formatted output on this type
+          when the argument is negative and either of the flags <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">ios_base</span><span class="special">::</span><span class="identifier">oct</span></code>
+          or <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">ios_base</span><span class="special">::</span><span class="identifier">hex</span></code> are set, will result in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code> will be thrown.
+        </p></td></tr>
+</table></div>
+<h6>
+<a name="boost_multiprecision.tut.ints.h1"></a>
+        <span><a name="boost_multiprecision.tut.ints.example_"></a></span><a class="link" href="ints.html#boost_multiprecision.tut.ints.example_">Example:</a>
       </h6>
 <p>
-        
 </p>
 <pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">gmp</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
 
@@ -157,6 +203,91 @@
 <span class="identifier">mpz_t</span> <span class="identifier">z</span><span class="special">;</span>
 <span class="identifier">mpz_init</span><span class="special">(</span><span class="identifier">z</span><span class="special">);</span>
 <span class="identifier">mpz_set</span><span class="special">(</span><span class="identifier">z</span><span class="special">,</span> <span class="identifier">v</span><span class="special">.</span><span class="identifier">backend</span><span class="special">().</span><span class="identifier">data</span><span class="special">());</span>
+</pre>
+<p>
+      </p>
+<h5>
+<a name="boost_multiprecision.tut.ints.h2"></a>
+        <span><a name="boost_multiprecision.tut.ints.mp_int"></a></span><a class="link" href="ints.html#boost_multiprecision.tut.ints.mp_int">mp_int</a>
+      </h5>
+<pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">multiprecision</span><span class="special">{</span>
+
+<span class="keyword">class</span> <span class="identifier">tommath_int</span><span class="special">;</span>
+
+<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">tommath_int</span> <span class="special">&gt;</span>         <span class="identifier">mp_int</span><span class="special">;</span>
+
+<span class="special">}}</span> <span class="comment">// namespaces</span>
+</pre>
+<p>
+        The <code class="computeroutput"><span class="identifier">tommath_int</span></code> backend is
+        used via the typedef <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">mp_int</span></code>.
+        It acts as a thin wrapper around the libtommath <code class="computeroutput"><span class="identifier">mp_int</span></code>
+        to provide an integer type that is a drop-in replacement for the native C++
+        integer types, but with unlimited precision.
+      </p>
+<div class="caution"><table border="0" summary="Caution">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Caution]" src="../../images/caution.png"></td>
+<th align="left">Caution</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+          Although <code class="computeroutput"><span class="identifier">mp_int</span></code> is mostly
+          a drop in replacement for the builtin integer types, it should be noted
+          that it is a rather strange beast as it's a signed type that is not a 2's
+          complement type. As a result the bitwise operations <code class="computeroutput"><span class="special">|</span>
+          <span class="special">&amp;</span> <span class="special">^</span></code>
+          will throw a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code> exception if either of
+          the arguments is negative. Similarly the complement operator<code class="computeroutput"><span class="special">~</span></code> is deliberately not implemented for this
+          type.
+        </p></td></tr>
+</table></div>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+          Formatted IO for this type does not support octal or hexadecimal notation
+          for negative values, as a result performing formatted output on this type
+          when the argument is negative and either of the flags <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">ios_base</span><span class="special">::</span><span class="identifier">oct</span></code>
+          or <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">ios_base</span><span class="special">::</span><span class="identifier">hex</span></code> are set, will result in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code> will be thrown.
+        </p></td></tr>
+</table></div>
+<h6>
+<a name="boost_multiprecision.tut.ints.h3"></a>
+        <span><a name="boost_multiprecision.tut.ints.example0"></a></span><a class="link" href="ints.html#boost_multiprecision.tut.ints.example0">Example:</a>
+      </h6>
+<p>
+</p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">tommath</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+
+<span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">mp_int</span> <span class="identifier">v</span> <span class="special">=</span> <span class="number">1</span><span class="special">;</span>
+
+<span class="comment">// Do some arithmetic:</span>
+<span class="keyword">for</span><span class="special">(</span><span class="keyword">unsigned</span> <span class="identifier">i</span> <span class="special">=</span> <span class="number">1</span><span class="special">;</span> <span class="identifier">i</span> <span class="special">&lt;=</span> <span class="number">1000</span><span class="special">;</span> <span class="special">++</span><span class="identifier">i</span><span class="special">)</span>
+   <span class="identifier">v</span> <span class="special">*=</span> <span class="identifier">i</span><span class="special">;</span>
+
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">v</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span> <span class="comment">// prints 1000!</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">hex</span> <span class="special">&lt;&lt;</span> <span class="identifier">v</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span> <span class="comment">// prints 1000! in hex format</span>
+
+<span class="keyword">try</span><span class="special">{</span>
+   <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">hex</span> <span class="special">&lt;&lt;</span> <span class="special">-</span><span class="identifier">v</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span> <span class="comment">// Ooops! can't print a negative value in hex format!</span>
+<span class="special">}</span>
+<span class="keyword">catch</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span><span class="special">&amp;</span> <span class="identifier">e</span><span class="special">)</span>
+<span class="special">{</span>
+   <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">e</span><span class="special">.</span><span class="identifier">what</span><span class="special">()</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+<span class="special">}</span>
+
+<span class="keyword">try</span><span class="special">{</span>
+   <span class="comment">// v is not a 2's complement type, bitwise operations are only supported</span>
+   <span class="comment">// on positive values:</span>
+   <span class="identifier">v</span> <span class="special">=</span> <span class="special">-</span><span class="identifier">v</span> <span class="special">&amp;</span> <span class="number">2</span><span class="special">;</span>
+<span class="special">}</span>
+<span class="keyword">catch</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span><span class="special">&amp;</span> <span class="identifier">e</span><span class="special">)</span>
+<span class="special">{</span>
+   <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">e</span><span class="special">.</span><span class="identifier">what</span><span class="special">()</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+<span class="special">}</span>
+
 </pre>
 <p>
       </p>

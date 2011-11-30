@@ -21,7 +21,7 @@
 <p>
         The requirements on the <code class="computeroutput"><span class="identifier">Backend</span></code>
         template argument to <code class="computeroutput"><span class="identifier">mp_number</span></code>
-        are split up into compulsary requirements, and optional requirements that
+        are split up into compulsory requirements, and optional requirements that
         are either to improve performance or provide optional features.
       </p>
 <p>
@@ -33,13 +33,13 @@
         is a variable of type <code class="computeroutput"><span class="keyword">const</span> <span class="keyword">char</span><span class="special">*</span></code>, <code class="computeroutput"><span class="identifier">ui</span></code> is a variable of type <code class="computeroutput"><span class="keyword">unsigned</span></code>, <code class="computeroutput"><span class="identifier">bb</span></code>
         is a variable of type <code class="computeroutput"><span class="keyword">bool</span></code>,
         <code class="computeroutput"><span class="identifier">pa</span></code> is a variable of type
-        pointer-to-arithmetc-type, <code class="computeroutput"><span class="identifier">exp</span></code>
+        pointer-to-arithmetic-type, <code class="computeroutput"><span class="identifier">exp</span></code>
         is a variable of type <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">exp_type</span></code>, <code class="computeroutput"><span class="identifier">pexp</span></code>
         is a variable of type <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">exp_type</span><span class="special">*</span></code>.
       </p>
 <div class="table">
-<a name="boost_multiprecision.ref.backendconc.compulsary_requirements_on_the_backend_type_"></a><p class="title"><b>Table&#160;1.4.&#160;Compulsary Requirements on the Backend type.</b></p>
-<div class="table-contents"><table class="table" summary="Compulsary Requirements on the Backend type.">
+<a name="boost_multiprecision.ref.backendconc.compulsory_requirements_on_the_backend_type_"></a><p class="title"><b>Table&#160;1.4.&#160;Compulsory Requirements on the Backend type.</b></p>
+<div class="table-contents"><table class="table" summary="Compulsory Requirements on the Backend type.">
 <colgroup>
 <col>
 <col>
@@ -114,7 +114,7 @@
               </td>
 <td>
                 <p>
-                  A list of floating point types that can be assigned to type B.The
+                  A list of floating-point types that can be assigned to type B.The
                   types shall be listed in order of size, smallest first, and shall
                   terminate in type <code class="computeroutput"><span class="keyword">long</span> <span class="keyword">double</span></code>.
                 </p>
@@ -234,7 +234,7 @@
               </td>
 <td>
                 <p>
-                  Swaps the contents of it's arguments.
+                  Swaps the contents of its arguments.
                 </p>
               </td>
 </tr>
@@ -591,7 +591,7 @@
                   and <code class="computeroutput"><span class="special">*</span><span class="identifier">pexp</span></code>
                   such that the value of <code class="computeroutput"><span class="identifier">cb</span></code>
                   is b * 2<sup>*pexp</sup>, only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is a floating point type.
+                  is a floating-point type.
                 </p>
               </td>
 </tr>
@@ -612,7 +612,7 @@
                 <p>
                   Stores a value in <code class="computeroutput"><span class="identifier">b</span></code>
                   that is cb * 2<sup>exp</sup>, only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is a floating point type.
+                  is a floating-point type.
                 </p>
               </td>
 </tr>
@@ -632,8 +632,8 @@
                 <p>
                   Stores the floor of <code class="computeroutput"><span class="identifier">cb</span></code>
                   in <code class="computeroutput"><span class="identifier">b</span></code>, only required
-                  when <code class="computeroutput"><span class="identifier">B</span></code> is a floating
-                  point type.
+                  when <code class="computeroutput"><span class="identifier">B</span></code> is a floating-point
+                  type.
                 </p>
               </td>
 </tr>
@@ -653,8 +653,8 @@
                 <p>
                   Stores the ceiling of <code class="computeroutput"><span class="identifier">cb</span></code>
                   in <code class="computeroutput"><span class="identifier">b</span></code>, only required
-                  when <code class="computeroutput"><span class="identifier">B</span></code> is a floating
-                  point type.
+                  when <code class="computeroutput"><span class="identifier">B</span></code> is a floating-point
+                  type.
                 </p>
               </td>
 </tr>
@@ -674,8 +674,30 @@
                 <p>
                   Stores the square root of <code class="computeroutput"><span class="identifier">cb</span></code>
                   in <code class="computeroutput"><span class="identifier">b</span></code>, only required
-                  when <code class="computeroutput"><span class="identifier">B</span></code> is a floating
-                  point type.
+                  when <code class="computeroutput"><span class="identifier">B</span></code> is a floating-point
+                  type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">number_category</span><span class="special">&lt;</span><span class="identifier">B</span><span class="special">&gt;::</span><span class="identifier">type</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">mpl</span><span class="special">::</span><span class="identifier">int_</span><span class="special">&lt;</span><span class="identifier">N</span><span class="special">&gt;</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">N</span></code> is one of the
+                  values <code class="computeroutput"><span class="identifier">number_kind_integer</span></code>,
+                  <code class="computeroutput"><span class="identifier">number_kind_floating_point</span></code>,
+                  <code class="computeroutput"><span class="identifier">number_kind_rational</span></code>
+                  or <code class="computeroutput"><span class="identifier">number_kind_fixed_point</span></code>.
+                  Defaults to <code class="computeroutput"><span class="identifier">number_kind_floating_point</span></code>.
                 </p>
               </td>
 </tr>
@@ -1618,7 +1640,7 @@
                 <p>
                   Returns one of the same values returned by <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">fpclassify</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating point type.
+                  is an floating-point type.
                 </p>
               </td>
 </tr>
@@ -1640,7 +1662,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating point type.
+                  is an floating-point type.
                 </p>
               </td>
 </tr>
@@ -1663,7 +1685,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating point type.
+                  is an floating-point type.
                 </p>
               </td>
 </tr>
@@ -1685,7 +1707,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating point type.
+                  is an floating-point type.
                 </p>
               </td>
 </tr>
@@ -1707,7 +1729,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating point type.
+                  is an floating-point type.
                 </p>
               </td>
 </tr>
@@ -1729,7 +1751,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating point type.
+                  is an floating-point type.
                 </p>
               </td>
 </tr>
@@ -1751,7 +1773,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating point type.
+                  is an floating-point type.
                 </p>
               </td>
 </tr>
@@ -1773,7 +1795,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating point type.
+                  is an floating-point type.
                 </p>
               </td>
 </tr>
@@ -1795,7 +1817,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating point type.
+                  is an floating-point type.
                 </p>
               </td>
 </tr>
@@ -1817,7 +1839,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating point type.
+                  is an floating-point type.
                 </p>
               </td>
 </tr>
@@ -1839,7 +1861,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating point type.
+                  is an floating-point type.
                 </p>
               </td>
 </tr>
@@ -1861,7 +1883,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating point type.
+                  is an floating-point type.
                 </p>
               </td>
 </tr>
@@ -1883,7 +1905,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating point type.
+                  is an floating-point type.
                 </p>
               </td>
 </tr>
@@ -1905,7 +1927,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating point type.
+                  is an floating-point type.
                 </p>
               </td>
 </tr>
@@ -1927,7 +1949,7 @@
                   on argument <code class="computeroutput"><span class="identifier">cb</span></code>
                   and stores the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating point type.
+                  is an floating-point type.
                 </p>
               </td>
 </tr>
@@ -1951,7 +1973,7 @@
                   and <code class="computeroutput"><span class="identifier">cb2</span></code>, and store
                   the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating point type.
+                  is an floating-point type.
                 </p>
               </td>
 </tr>
@@ -1975,7 +1997,7 @@
                   and <code class="computeroutput"><span class="identifier">cb2</span></code>, and store
                   the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating point type.
+                  is an floating-point type.
                 </p>
               </td>
 </tr>
@@ -1999,7 +2021,7 @@
                   and <code class="computeroutput"><span class="identifier">cb2</span></code>, and store
                   the result in <code class="computeroutput"><span class="identifier">b</span></code>.
                   Only required when <code class="computeroutput"><span class="identifier">B</span></code>
-                  is an floating point type.
+                  is an floating-point type.
                 </p>
               </td>
 </tr>

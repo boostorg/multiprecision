@@ -20,15 +20,22 @@
 <a name="boost_multiprecision.intro"></a><a class="link" href="intro.html" title="Introduction">Introduction</a>
 </h2></div></div></div>
 <p>
-      The Multiprecision library comes in two distinct parts: an expression-template-enabled
-      front end <code class="computeroutput"><span class="identifier">mp_number</span></code> that handles
-      all the operator overloading, expression evaluation optimization, and code
-      reduction, and a selection of backends that implement the actual arithmetic
-      operations, and need conform only to the reduced interface requirements of
-      the front end.
+      The Multiprecision library comes in two distinct parts:
     </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          An expression-template-enabled front end <code class="computeroutput"><span class="identifier">mp_number</span></code>
+          that handles all the operator overloading, expression evaluation optimization,
+          and code reduction.
+        </li>
+<li class="listitem">
+          A selection of backends that implement the actual arithmetic operations,
+          and need conform only to the reduced interface requirements of the front
+          end.
+        </li>
+</ul></div>
 <p>
-      The library is often used by using one of the predfined typedefs: for example
+      The library is often used by using one of the predefined typedefs: for example
       if you wanted an arbitrary precision integer type using GMP as the underlying
       implementation then you could use:
     </p>
@@ -37,10 +44,11 @@
 <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">mpz_int</span> <span class="identifier">myint</span><span class="special">;</span>    <span class="comment">// Arbitrary precision integer type.</span>
 </pre>
 <p>
-      Alternatively one can compose your own multiprecision type, by combining <code class="computeroutput"><span class="identifier">mp_number</span></code> with one of the predefined backend
-      types. For example, suppose you wanted a 300 decimal digit floating point type
-      based on the MPFR library, in this case there's no predefined typedef with
-      that level of precision, so instead we compose our own:
+      Alternatively, you can compose your own multiprecision type, by combining
+      <code class="computeroutput"><span class="identifier">mp_number</span></code> with one of the predefined
+      backend types. For example, suppose you wanted a 300 decimal digit floating-point
+      type based on the MPFR library. In this case, there's no predefined typedef
+      with that level of precision, so instead we compose our own:
     </p>
 <pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">mpfr</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>  <span class="comment">// Defines the Backend type that wraps MPFR</span>
 
@@ -50,9 +58,9 @@
 
 <span class="identifier">my_float</span> <span class="identifier">a</span><span class="special">,</span> <span class="identifier">b</span><span class="special">,</span> <span class="identifier">c</span><span class="special">;</span> <span class="comment">// These variables have 300 decimal digits precision</span>
 </pre>
-<a name="boost_multiprecision.intro.expression_templates"></a><h5>
-<a name="boost_multiprecision.intro.expression_templates-heading"></a>
-      <a class="link" href="intro.html#boost_multiprecision.intro.expression_templates">Expression
+<h5>
+<a name="boost_multiprecision.intro.h0"></a>
+      <span><a name="boost_multiprecision.intro.expression_templates"></a></span><a class="link" href="intro.html#boost_multiprecision.intro.expression_templates">Expression
       Templates</a>
     </h5>
 <p>
@@ -95,15 +103,15 @@
 </pre>
 <p>
       If type <code class="computeroutput"><span class="identifier">T</span></code> is an <code class="computeroutput"><span class="identifier">mp_number</span></code>, then this expression is evaluated
-      <span class="emphasis"><em>without creating a single temporary value</em></span>, in contrast
+      <span class="emphasis"><em>without creating a single temporary value</em></span>. In contrast,
       if we were using the C++ wrapper that ships with GMP - <code class="computeroutput"><span class="identifier">mpf_class</span></code>
       - then this expression would result in no less than 11 temporaries (this is
-      true even though mpf_class does use expression templates to reduce the number
-      of temporaries somewhat). Had we used an even simpler wrapper around GMP or
-      MPFR like <code class="computeroutput"><span class="identifier">mpclass</span></code> things would
-      have been even worse and no less that 24 temporaries are created for this simple
-      expression (note - we actually measure the number of memory allocations performed
-      rather than the number of temporaries directly).
+      true even though <code class="computeroutput"><span class="identifier">mpf_class</span></code>
+      does use expression templates to reduce the number of temporaries somewhat).
+      Had we used an even simpler wrapper around GMP or MPFR like <code class="computeroutput"><span class="identifier">mpclass</span></code>
+      things would have been even worse and no less that 24 temporaries are created
+      for this simple expression (note - we actually measure the number of memory
+      allocations performed rather than the number of temporaries directly).
     </p>
 <p>
       This library also extends expression template support to standard library functions
@@ -138,11 +146,11 @@
       their downsides. For one thing, expression template libraries like this one,
       tend to be slower to compile than their simpler cousins, they're also harder
       to debug (should you actually want to step through our code!), and rely on
-      compiler optimizations being turned on to give really good performance. Also
+      compiler optimizations being turned on to give really good performance. Also,
       since the return type from expressions involving <code class="computeroutput"><span class="identifier">mp_number</span></code>'s
       is an "unmentionable implementation detail", you have to be careful
       to cast the result of an expression to the actual number type when passing
-      an expression to a template function. For example given:
+      an expression to a template function. For example, given:
     </p>
 <pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
 <span class="keyword">void</span> <span class="identifier">my_proc</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">T</span><span class="special">&amp;);</span>
@@ -160,7 +168,7 @@
 </pre>
 <p>
       Having said that, these situations don't occur that often - or indeed not at
-      all for non-template functions. In addition all the functions in the Boost.Math
+      all for non-template functions. In addition, all the functions in the Boost.Math
       library will automatically convert expression-template arguments to the underlying
       number type without you having to do anything, so:
     </p>
@@ -179,12 +187,12 @@
 <pre class="programlisting"><span class="keyword">auto</span> <span class="identifier">my_expression</span> <span class="special">=</span> <span class="identifier">a</span> <span class="special">+</span> <span class="identifier">b</span> <span class="special">-</span> <span class="identifier">c</span><span class="special">;</span>
 </pre>
 <p>
-      Unless you're absolutely sure that the lifetimes of <code class="computeroutput"><span class="identifier">a</span></code>,
+      unless you're absolutely sure that the lifetimes of <code class="computeroutput"><span class="identifier">a</span></code>,
       <code class="computeroutput"><span class="identifier">b</span></code> and <code class="computeroutput"><span class="identifier">c</span></code>
       will outlive that of <code class="computeroutput"><span class="identifier">my_expression</span></code>.
     </p>
 <p>
-      And finally.... the performance improvements from an expression template library
+      And finally... the performance improvements from an expression template library
       like this are often not as dramatic as the reduction in number of temporaries
       would suggest. For example if we compare this library with <code class="computeroutput"><span class="identifier">mpfr_class</span></code>
       and <code class="computeroutput"><span class="identifier">mpreal</span></code>, with all three
@@ -272,7 +280,7 @@
 </table></div>
 </div>
 <br class="table-break"><p>
-      As you can see the execution time increases a lot more slowly than the number
+      As you can see, the execution time increases a lot more slowly than the number
       of memory allocations. There are a number of reasons for this:
     </p>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc">
@@ -296,7 +304,7 @@
 <p>
       We'll conclude this section by providing some more performance comparisons
       between these three libraries, again, all are using MPFR to carry out the underlying
-      arithmetic, and all are operating at the same precision (50 decimal places):
+      arithmetic, and all are operating at the same precision (50 decimal digits):
     </p>
 <div class="table">
 <a name="boost_multiprecision.intro.evaluation_of_boost_math_s_bessel_function_test_data"></a><p class="title"><b>Table&#160;1.2.&#160;Evaluation of Boost.Math's Bessel function test data</b></p>

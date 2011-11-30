@@ -86,6 +86,24 @@ template <>
 struct is_twos_complement_integer<boost::multiprecision::mp_int> : public boost::mpl::false_ {};
 #endif
 
+template <class Real>
+void test_complement(Real a, Real b, Real c, const boost::mpl::true_&)
+{
+   int i = 1020304;
+   int j = 56789123;
+   int sign_mask = ~0;
+   BOOST_TEST(~a == (~i & sign_mask));
+   c = a & ~b;
+   BOOST_TEST(c == (i & (~j & sign_mask)));
+   c = ~(a | b);
+   BOOST_TEST(c == (~(i | j) & sign_mask));
+}
+
+template <class Real>
+void test_complement(Real, Real, Real, const boost::mpl::false_&)
+{
+}
+
 template <class Real, class T>
 void test_integer_ops(const T&){}
 
@@ -196,7 +214,6 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    int i = 1020304;
    int j = 56789123;
    int k = 4523187;
-   int sign_mask = is_twos_complement_integer<Real>::value ? ~0 : (std::numeric_limits<int>::max)();
    a = i;
    b = j;
    c = a;
@@ -218,6 +235,8 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    a = i;
    c = a & b & k;
    BOOST_TEST(c == (i&j&k));
+
+   test_complement<Real>(a, b, c, typename is_twos_complement_integer<Real>::type());
 
    a = i;
    b = j;
@@ -265,11 +284,6 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    a = i;
    b = j;
    c = k;
-   BOOST_TEST(~a == (~i & sign_mask));
-   c = a & ~b;
-   BOOST_TEST(c == (i & (~j & sign_mask)));
-   c = ~(a | b);
-   BOOST_TEST(c == (~(i | j) & sign_mask));
    //
    // Non-member functions:
    //

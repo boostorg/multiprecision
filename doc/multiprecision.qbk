@@ -21,6 +21,7 @@
 [import ../example/gmp_snips.cpp]
 [import ../example/mpfr_snips.cpp]
 [import ../example/cpp_float_snips.cpp]
+[import ../example/tommath_snips.cpp]
 
 [section:intro Introduction]
 
@@ -199,6 +200,7 @@ The following backends provide integer arithmetic:
 [table
 [[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
 [[`gmp_int`][boost/multiprecision/gmp.hpp][2][GMP][Very fast and efficient backend.][Dependency on GNU licenced GMP library.]]
+[[`mp_int`][boost/multiprecision/tommath.hpp][2][libtommath][Public domain backend with no licence restrictions.][Slower than GMP.]]
 ]
 
 [h4 gmp_int]
@@ -221,9 +223,39 @@ As well as the usual conversions from arithmetic and string types, type `mpz_int
 
 It's also possible to access the underlying `mpz_t` via the `data()` member function of `gmp_int`.
 
+[note Formatted IO for this type does not support octal or hexadecimal notation for negative values, 
+as a result performing formatted output on this type when the argument is negative and either of the flags
+`std::ios_base::oct` or `std::ios_base::hex` are set, will result in a `std::runtime_error` will be thrown.]
+
 [h5 Example:]
 
 [mpz_eg]
+
+[h4 mp_int]
+
+   namespace boost{ namespace multiprecision{
+
+   class tommath_int;
+
+   typedef mp_number<tommath_int >         mp_int;
+
+   }} // namespaces
+
+The `tommath_int` backend is used via the typedef `boost::multiprecision::mp_int`.  It acts as a thin wrapper around the libtommath `mp_int`
+to provide an integer type that is a drop-in replacement for the native C++ integer types, but with unlimited precision.
+
+[caution Although `mp_int` is mostly a drop in replacement for the builtin integer types, it should be noted that it is a
+rather strange beast as it's a signed type that is not a 2's complement type.  As a result the bitwise operations
+`| & ^` will throw a `std::runtime_error` exception if either of the arguments is negative.  Similarly the complement
+operator`~` is deliberately not implemented for this type.]
+
+[note Formatted IO for this type does not support octal or hexadecimal notation for negative values, 
+as a result performing formatted output on this type when the argument is negative and either of the flags
+`std::ios_base::oct` or `std::ios_base::hex` are set, will result in a `std::runtime_error` will be thrown.]
+
+[h5 Example:]
+
+[tommath_eg]
 
 [endsect]
 
@@ -405,7 +437,22 @@ It's also possible to access the underlying `mpq_t` via the `data()` member func
       mp_number(see-below);
       mp_number& operator=(see-below);
 
-      /* Other number-type operators here */
+      // Member operators
+      mp_number& operator+=(const ``['see-below]``&);
+      mp_number& operator-=(const ``['see-below]``&);
+      mp_number& operator*=(const ``['see-below]``&);
+      mp_number& operator/=(const ``['see-below]``&);
+      mp_number& operator++();
+      mp_number& operator--();
+      mp_number  operator++(int);
+      mp_number  operator--(int);
+
+      mp_number& operator%=(const ``['see-below]``&);
+      mp_number& operator&=(const ``['see-below]``&);
+      mp_number& operator|=(const ``['see-below]``&);
+      mp_number& operator^=(const ``['see-below]``&);
+      mp_number& operator<<=(const ``['integer-type]``&);
+      mp_number& operator>>=(const ``['integer-type]``&);
 
       // Use in Boolean context:
       operator ``['convertible-to-bool-type]``()const;
@@ -432,6 +479,26 @@ It's also possible to access the underlying `mpq_t` via the `data()` member func
       Backend& backend();
       const Backend& backend()const;
    };
+
+   // Non member operators:
+   ``['unmentionable-expression-template-type]`` operator+(const ``['see-below]``&, const ``['see-below]``&);
+   ``['unmentionable-expression-template-type]`` operator-(const ``['see-below]``&, const ``['see-below]``&);
+   ``['unmentionable-expression-template-type]`` operator*(const ``['see-below]``&, const ``['see-below]``&);
+   ``['unmentionable-expression-template-type]`` operator/(const ``['see-below]``&, const ``['see-below]``&);
+   // Integer only operations:
+   ``['unmentionable-expression-template-type]`` operator%(const ``['see-below]``&, const ``['see-below]``&);
+   ``['unmentionable-expression-template-type]`` operator&(const ``['see-below]``&, const ``['see-below]``&);
+   ``['unmentionable-expression-template-type]`` operator|(const ``['see-below]``&, const ``['see-below]``&);
+   ``['unmentionable-expression-template-type]`` operator^(const ``['see-below]``&, const ``['see-below]``&);
+   ``['unmentionable-expression-template-type]`` operator<<(const ``['see-below]``&, const ``['integer-type]``&);
+   ``['unmentionable-expression-template-type]`` operator>>(const ``['see-below]``&, const ``['integer-type]``&);
+   // Comparison operators:
+   bool operator==(const ``['see-below]``&, const ``['see-below]``&);
+   bool operator!=(const ``['see-below]``&, const ``['see-below]``&);
+   bool operator< (const ``['see-below]``&, const ``['see-below]``&);
+   bool operator> (const ``['see-below]``&, const ``['see-below]``&);
+   bool operator<=(const ``['see-below]``&, const ``['see-below]``&);
+   bool operator>=(const ``['see-below]``&, const ``['see-below]``&);
 
    // Swap:
    template <class Backend>
@@ -515,30 +582,41 @@ Type `mp_number` is default constructible, and both copy constructible and assig
 * A `std::string` or any type which is convertible to `const char*`.
 * Any type that the Backend is constructible or assignable from.
 
-      /* Other number-type operators here */
+      mp_number& operator+=(const ``['see-below]``&);
+      mp_number& operator-=(const ``['see-below]``&);
+      mp_number& operator*=(const ``['see-below]``&);
+      mp_number& operator/=(const ``['see-below]``&);
+      mp_number& operator++();
+      mp_number& operator--();
+      mp_number  operator++(int);
+      mp_number  operator--(int);
+      // Integer only operations:
+      mp_number& operator%=(const ``['see-below]``&);
+      mp_number& operator&=(const ``['see-below]``&);
+      mp_number& operator|=(const ``['see-below]``&);
+      mp_number& operator^=(const ``['see-below]``&);
+      mp_number& operator<<=(const ``['integer-type]``&);
+      mp_number& operator>>=(const ``['integer-type]``&);
 
-The following arithmetic operations are support for real-numbered types:
+These operators all take their usual arithmetic meanings.
 
-* Binary +, -, *, /, +=, -=, *=, /=, ==, !=, <=, >=, <, >, ||, &&, ||=, &&=.
-* Unary +, -, ++, --, !.
+The arguments to these operators is either:
 
-For integer types the following operators are also supported:
+* Another `mp_number<Backend>`.
+* A builtin arithmetic type.
+* An expression template derived from `mp_number<Backend>`.
 
-Binary %, %=, |, |=, &, &=, ^, ^=, <<, <<=, >>, >>=.
-
-Note that with the exception of the logical operators and unary + the result of applying an operator to
-mp_number is an "unmentionable" expression template type.
-
-Binary operators, must have at least one argument that is of type `mp_number` or an expression template
-derived from `mp_number`.  One argument may optionally be of arithmetic type.
-
-Note that type `mp_number` (and all expression templates derived from it) may be used in a Boolean context.
+For the left and right shift operations, the argument must be a builtin
+integer type with a positive value (negative values result in a `std::runtime_error` being thrown).
 
       operator ``['convertible-to-bool-type]``()const;
 
 Returns an ['unmentionable-type] that is usable in Boolean contexts (this allows `mp_number` to be used in any
 Boolean context - if statements, conditional statements, or as an argument to a logical operator - without
 type `mp_number` being convertible to type `bool`.
+
+This operator also enables the use of `mp_number` with any of the following operators:
+`!`, `||`, `&&` and `?:`.
 
       void swap(mp_number& other);
 
@@ -588,6 +666,44 @@ Returns:
 
 Returns the underlying backend instance used by `*this`.
 
+[h4 Non-member operators]
+
+   // Non member operators:
+   ``['unmentionable-expression-template-type]`` operator+(const ``['see-below]``&, const ``['see-below]``&);
+   ``['unmentionable-expression-template-type]`` operator-(const ``['see-below]``&, const ``['see-below]``&);
+   ``['unmentionable-expression-template-type]`` operator*(const ``['see-below]``&, const ``['see-below]``&);
+   ``['unmentionable-expression-template-type]`` operator/(const ``['see-below]``&, const ``['see-below]``&);
+   // Integer only operations:
+   ``['unmentionable-expression-template-type]`` operator%(const ``['see-below]``&, const ``['see-below]``&);
+   ``['unmentionable-expression-template-type]`` operator&(const ``['see-below]``&, const ``['see-below]``&);
+   ``['unmentionable-expression-template-type]`` operator|(const ``['see-below]``&, const ``['see-below]``&);
+   ``['unmentionable-expression-template-type]`` operator^(const ``['see-below]``&, const ``['see-below]``&);
+   ``['unmentionable-expression-template-type]`` operator<<(const ``['see-below]``&, const ``['integer-type]``&);
+   ``['unmentionable-expression-template-type]`` operator>>(const ``['see-below]``&, const ``['integer-type]``&);
+   // Comparison operators:
+   bool operator==(const ``['see-below]``&, const ``['see-below]``&);
+   bool operator!=(const ``['see-below]``&, const ``['see-below]``&);
+   bool operator< (const ``['see-below]``&, const ``['see-below]``&);
+   bool operator> (const ``['see-below]``&, const ``['see-below]``&);
+   bool operator<=(const ``['see-below]``&, const ``['see-below]``&);
+   bool operator>=(const ``['see-below]``&, const ``['see-below]``&);
+
+These operators all take their usual arithmetic meanings.
+
+The arguments to these functions must contain at least one of the following:
+
+* An `mp_number`.
+* An expression template type derived from `mp_number`.
+
+In addition, one of the two arguments may be a builtin arithmetic type.
+
+With the exception of the comparison operators (which always evaluate their arguments and return a `bool` result),
+these operators return an "unmentionable" expression template type which defers evaluation of the operator
+until the result is actually required.
+
+Finally note that the second argument to the left and right shift operations must be a builtin integer type, 
+and that the argument must be positive (negative arguments result in a `std::runtime_error` being thrown).
+
 [h4 swap]
 
    template <class Backend>
@@ -605,6 +721,9 @@ Swaps `a` and `b`.
    inline std::istream& operator >> (std::istream& is, mp_number<Backend>& r)
 
 These operators provided formatted input-output operations on `mp_number` types, and expression templates derived from them.
+
+It's down to the backend type to actually implement string conversion.  However, the backends provided with
+this library support all of the iostream formatting flags, field width and precision settings.
 
 [h4 Non-member standard library function support]
 
@@ -743,6 +862,8 @@ a variable of B, `cb` and `cb2` are constant variables of type B, `a` is a varia
 [[`eval_floor(b, cb)`][`void`][Stores the floor of `cb` in `b`, only required when `B` is a floating-point type.]]
 [[`eval_ceil(b, cb)`][`void`][Stores the ceiling of `cb` in `b`, only required when `B` is a floating-point type.]]
 [[`eval_sqrt(b, cb)`][`void`][Stores the square root of `cb` in `b`, only required when `B` is a floating-point type.]]
+[[`boost::multiprecision::number_category<B>::type`][`mpl::int_<N>`][`N` is one of the values `number_kind_integer`, `number_kind_floating_point`, `number_kind_rational` or `number_kind_fixed_point`.
+                                                Defaults to `number_kind_floating_point`.]]
 ]
 
 [table Optional Requirements on the Backend Type

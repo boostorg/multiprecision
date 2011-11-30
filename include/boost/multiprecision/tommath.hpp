@@ -229,6 +229,10 @@ protected:
    mp_int m_data;
 };
 
+#define BOOST_MP_TOMMATH_BIT_OP_CHECK(x)\
+   if(SIGN(&x.data()))\
+      BOOST_THROW_EXCEPTION(std::runtime_error("Bitwise operations on libtommath negative valued integers are disabled as they produce unpredictable results"))
+
 int get_sign(const tommath_int& val);
 
 inline void add(tommath_int& t, const tommath_int& o)
@@ -285,16 +289,22 @@ inline void right_shift(tommath_int& t, const tommath_int& v, UI i)
 
 inline void bitwise_and(tommath_int& result, const tommath_int& v)
 {
+   BOOST_MP_TOMMATH_BIT_OP_CHECK(result);
+   BOOST_MP_TOMMATH_BIT_OP_CHECK(v);
    detail::check_tommath_result(mp_and(&result.data(), const_cast< ::mp_int*>(&v.data()), &result.data()));
 }
 
 inline void bitwise_or(tommath_int& result, const tommath_int& v)
 {
+   BOOST_MP_TOMMATH_BIT_OP_CHECK(result);
+   BOOST_MP_TOMMATH_BIT_OP_CHECK(v);
    detail::check_tommath_result(mp_or(&result.data(), const_cast< ::mp_int*>(&v.data()), &result.data()));
 }
 
 inline void bitwise_xor(tommath_int& result, const tommath_int& v)
 {
+   BOOST_MP_TOMMATH_BIT_OP_CHECK(result);
+   BOOST_MP_TOMMATH_BIT_OP_CHECK(v);
    detail::check_tommath_result(mp_xor(&result.data(), const_cast< ::mp_int*>(&v.data()), &result.data()));
 }
 
@@ -330,21 +340,31 @@ inline void modulus(tommath_int& t, const tommath_int& p, const tommath_int& o)
 
 inline void bitwise_and(tommath_int& result, const tommath_int& u, const tommath_int& v)
 {
+   BOOST_MP_TOMMATH_BIT_OP_CHECK(u);
+   BOOST_MP_TOMMATH_BIT_OP_CHECK(v);
    detail::check_tommath_result(mp_and(const_cast< ::mp_int*>(&u.data()), const_cast< ::mp_int*>(&v.data()), &result.data()));
 }
 
 inline void bitwise_or(tommath_int& result, const tommath_int& u, const tommath_int& v)
 {
+   BOOST_MP_TOMMATH_BIT_OP_CHECK(u);
+   BOOST_MP_TOMMATH_BIT_OP_CHECK(v);
    detail::check_tommath_result(mp_or(const_cast< ::mp_int*>(&u.data()), const_cast< ::mp_int*>(&v.data()), &result.data()));
 }
 
 inline void bitwise_xor(tommath_int& result, const tommath_int& u, const tommath_int& v)
 {
+   BOOST_MP_TOMMATH_BIT_OP_CHECK(u);
+   BOOST_MP_TOMMATH_BIT_OP_CHECK(v);
    detail::check_tommath_result(mp_xor(const_cast< ::mp_int*>(&u.data()), const_cast< ::mp_int*>(&v.data()), &result.data()));
 }
-
+/*
 inline void complement(tommath_int& result, const tommath_int& u)
 {
+   //
+   // Although this code works, it doesn't really do what the user might expect....
+   // and it's hard to see how it ever could.  Disabled for now:
+   //
    result = u;
    for(int i = 0; i < result.data().used; ++i)
    {
@@ -367,7 +387,7 @@ inline void complement(tommath_int& result, const tommath_int& u)
    left_shift(mask, shift);
    add(result, mask);
 }
-
+*/
 inline bool is_zero(const tommath_int& val)
 {
    return mp_iszero(&val.data());

@@ -19,9 +19,9 @@
 <div class="titlepage"><div><div><h3 class="title">
 <a name="boost_multiprecision.ref.mp_number"></a><a class="link" href="mp_number.html" title="mp_number">mp_number</a>
 </h3></div></div></div>
-<a name="boost_multiprecision.ref.mp_number.synopsis"></a><h5>
-<a name="boost_multiprecision.ref.mp_number.synopsis-heading"></a>
-        <a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.synopsis">Synopsis</a>
+<h5>
+<a name="boost_multiprecision.ref.mp_number.h0"></a>
+        <span><a name="boost_multiprecision.ref.mp_number.synopsis"></a></span><a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.synopsis">Synopsis</a>
       </h5>
 <pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">multiprecision</span><span class="special">{</span>
 
@@ -32,7 +32,22 @@
    <span class="identifier">mp_number</span><span class="special">(</span><span class="identifier">see</span><span class="special">-</span><span class="identifier">below</span><span class="special">);</span>
    <span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">=(</span><span class="identifier">see</span><span class="special">-</span><span class="identifier">below</span><span class="special">);</span>
 
-   <span class="comment">/* Other number-type operators here */</span>
+   <span class="comment">// Member operators</span>
+   <span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">+=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+   <span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">-=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+   <span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">*=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+   <span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">/=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+   <span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">++();</span>
+   <span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">--();</span>
+   <span class="identifier">mp_number</span>  <span class="keyword">operator</span><span class="special">++(</span><span class="keyword">int</span><span class="special">);</span>
+   <span class="identifier">mp_number</span>  <span class="keyword">operator</span><span class="special">--(</span><span class="keyword">int</span><span class="special">);</span>
+
+   <span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">%=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+   <span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">&amp;=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+   <span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">|=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+   <span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">^=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+   <span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">&lt;&lt;=(</span><span class="keyword">const</span> <span class="emphasis"><em>integer-type</em></span><span class="special">&amp;);</span>
+   <span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">&gt;&gt;=(</span><span class="keyword">const</span> <span class="emphasis"><em>integer-type</em></span><span class="special">&amp;);</span>
 
    <span class="comment">// Use in Boolean context:</span>
    <span class="keyword">operator</span> <span class="emphasis"><em>convertible-to-bool-type</em></span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
@@ -59,6 +74,26 @@
    <span class="identifier">Backend</span><span class="special">&amp;</span> <span class="identifier">backend</span><span class="special">();</span>
    <span class="keyword">const</span> <span class="identifier">Backend</span><span class="special">&amp;</span> <span class="identifier">backend</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
 <span class="special">};</span>
+
+<span class="comment">// Non member operators:</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">+(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">-(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">*(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">/(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="comment">// Integer only operations:</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">%(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">&amp;(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">|(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">^(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">&lt;&lt;(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>integer-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">&gt;&gt;(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>integer-type</em></span><span class="special">&amp;);</span>
+<span class="comment">// Comparison operators:</span>
+<span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">==(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">!=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">&lt;</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">&gt;</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">&lt;=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">&gt;=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
 
 <span class="comment">// Swap:</span>
 <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
@@ -128,9 +163,9 @@
 
 <span class="special">}</span>
 </pre>
-<a name="boost_multiprecision.ref.mp_number.description"></a><h5>
-<a name="boost_multiprecision.ref.mp_number.description-heading"></a>
-        <a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.description">Description</a>
+<h5>
+<a name="boost_multiprecision.ref.mp_number.h1"></a>
+        <span><a name="boost_multiprecision.ref.mp_number.description"></a></span><a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.description">Description</a>
       </h5>
 <pre class="programlisting"><span class="identifier">mp_number</span><span class="special">();</span>
 <span class="identifier">mp_number</span><span class="special">(</span><span class="identifier">see</span><span class="special">-</span><span class="identifier">below</span><span class="special">);</span>
@@ -158,41 +193,43 @@
             Any type that the Backend is constructible or assignable from.
           </li>
 </ul></div>
-<pre class="programlisting"><span class="comment">/* Other number-type operators here */</span>
+<pre class="programlisting"><span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">+=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">-=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">*=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">/=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">++();</span>
+<span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">--();</span>
+<span class="identifier">mp_number</span>  <span class="keyword">operator</span><span class="special">++(</span><span class="keyword">int</span><span class="special">);</span>
+<span class="identifier">mp_number</span>  <span class="keyword">operator</span><span class="special">--(</span><span class="keyword">int</span><span class="special">);</span>
+<span class="comment">// Integer only operations:</span>
+<span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">%=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">&amp;=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">|=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">^=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">&lt;&lt;=(</span><span class="keyword">const</span> <span class="emphasis"><em>integer-type</em></span><span class="special">&amp;);</span>
+<span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">&gt;&gt;=(</span><span class="keyword">const</span> <span class="emphasis"><em>integer-type</em></span><span class="special">&amp;);</span>
 </pre>
 <p>
-        The following arithmetic operations are support for real-numbered types:
+        These operators all take their usual arithmetic meanings.
+      </p>
+<p>
+        The arguments to these operators is either:
       </p>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc">
 <li class="listitem">
-            Binary +, -, *, /, +<code class="literal">, -</code>, *<code class="literal">, /</code>,
-            ==, !<code class="literal">, &lt;</code>, &gt;<code class="literal">, &lt;, &gt;, ||, &amp;&amp;,
-            ||</code>, &amp;&amp;=.
+            Another <code class="computeroutput"><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;</span></code>.
           </li>
 <li class="listitem">
-            Unary +, -, ++, --, !.
+            A builtin arithmetic type.
+          </li>
+<li class="listitem">
+            An expression template derived from <code class="computeroutput"><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;</span></code>.
           </li>
 </ul></div>
 <p>
-        For integer types the following operators are also supported:
-      </p>
-<p>
-        Binary %, %<code class="literal">, |, |</code>, &amp;, &amp;<code class="literal">, ^, ^</code>,
-        &lt;&lt;, &lt;&lt;<code class="literal">, &gt;&gt;, &gt;&gt;</code>.
-      </p>
-<p>
-        Note that with the exception of the logical operators and unary + the result
-        of applying an operator to mp_number is an "unmentionable" expression
-        template type.
-      </p>
-<p>
-        Binary operators, must have at least one argument that is of type <code class="computeroutput"><span class="identifier">mp_number</span></code> or an expression template derived
-        from <code class="computeroutput"><span class="identifier">mp_number</span></code>. One argument
-        may optionally be of arithmetic type.
-      </p>
-<p>
-        Note that type <code class="computeroutput"><span class="identifier">mp_number</span></code>
-        (and all expression templates derived from it) may be used in a Boolian context.
+        For the left and right shift operations, the argument must be a builtin integer
+        type with a positive value (negative values result in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
+        being thrown).
       </p>
 <pre class="programlisting"><span class="keyword">operator</span> <span class="emphasis"><em>convertible-to-bool-type</em></span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
 </pre>
@@ -202,6 +239,12 @@
         to be used in any Boolean context - if statements, conditional statements,
         or as an argument to a logical operator - without type <code class="computeroutput"><span class="identifier">mp_number</span></code>
         being convertible to type <code class="computeroutput"><span class="keyword">bool</span></code>.
+      </p>
+<p>
+        This operator also enables the use of <code class="computeroutput"><span class="identifier">mp_number</span></code>
+        with any of the following operators: <code class="computeroutput"><span class="special">!</span></code>,
+        <code class="computeroutput"><span class="special">||</span></code>, <code class="computeroutput"><span class="special">&amp;&amp;</span></code>
+        and <code class="computeroutput"><span class="special">?:</span></code>.
       </p>
 <pre class="programlisting"><span class="keyword">void</span> <span class="identifier">swap</span><span class="special">(</span><span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="identifier">other</span><span class="special">);</span>
 </pre>
@@ -257,24 +300,80 @@
       </p>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc">
 <li class="listitem">
-            A value less that 0 for *this &lt; other
+            A value less that 0 for <code class="computeroutput"><span class="special">*</span><span class="keyword">this</span> <span class="special">&lt;</span> <span class="identifier">other</span></code>
           </li>
 <li class="listitem">
-            A value greater that 0 for *this &gt; other
+            A value greater that 0 for <code class="computeroutput"><span class="special">*</span><span class="keyword">this</span> <span class="special">&gt;</span> <span class="identifier">other</span></code>
           </li>
 <li class="listitem">
-            Zero for *this == other
+            Zero for <code class="computeroutput"><span class="special">*</span><span class="keyword">this</span>
+            <span class="special">==</span> <span class="identifier">other</span></code>
           </li>
 </ul></div>
 <pre class="programlisting"><span class="identifier">Backend</span><span class="special">&amp;</span> <span class="identifier">backend</span><span class="special">();</span>
 <span class="keyword">const</span> <span class="identifier">Backend</span><span class="special">&amp;</span> <span class="identifier">backend</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
 </pre>
 <p>
-        Returns the underlying backend instance used by *this.
+        Returns the underlying backend instance used by <code class="computeroutput"><span class="special">*</span><span class="keyword">this</span></code>.
       </p>
-<a name="boost_multiprecision.ref.mp_number.swap"></a><h5>
-<a name="boost_multiprecision.ref.mp_number.swap-heading"></a>
-        <a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.swap">swap</a>
+<h5>
+<a name="boost_multiprecision.ref.mp_number.h2"></a>
+        <span><a name="boost_multiprecision.ref.mp_number.non_member_operators"></a></span><a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.non_member_operators">Non-member
+        operators</a>
+      </h5>
+<pre class="programlisting"><span class="comment">// Non member operators:</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">+(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">-(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">*(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">/(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="comment">// Integer only operations:</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">%(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">&amp;(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">|(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">^(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">&lt;&lt;(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>integer-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">&gt;&gt;(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>integer-type</em></span><span class="special">&amp;);</span>
+<span class="comment">// Comparison operators:</span>
+<span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">==(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">!=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">&lt;</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">&gt;</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">&lt;=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">&gt;=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+</pre>
+<p>
+        These operators all take their usual arithmetic meanings.
+      </p>
+<p>
+        The arguments to these functions must contain at least one of the following:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+            An <code class="computeroutput"><span class="identifier">mp_number</span></code>.
+          </li>
+<li class="listitem">
+            An expression template type derived from <code class="computeroutput"><span class="identifier">mp_number</span></code>.
+          </li>
+</ul></div>
+<p>
+        In addition, one of the two arguments may be a builtin arithmetic type.
+      </p>
+<p>
+        With the exception of the comparison operators (which always evaluate their
+        arguments and return a <code class="computeroutput"><span class="keyword">bool</span></code>
+        result), these operators return an "unmentionable" expression template
+        type which defers evaluation of the operator until the result is actually
+        required.
+      </p>
+<p>
+        Finally note that the second argument to the left and right shift operations
+        must be a builtin integer type, and that the argument must be positive (negative
+        arguments result in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
+        being thrown).
+      </p>
+<h5>
+<a name="boost_multiprecision.ref.mp_number.h3"></a>
+        <span><a name="boost_multiprecision.ref.mp_number.swap"></a></span><a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.swap">swap</a>
       </h5>
 <pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
 <span class="keyword">void</span> <span class="identifier">swap</span><span class="special">(</span><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">a</span><span class="special">,</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">b</span><span class="special">);</span>
@@ -282,9 +381,9 @@
 <p>
         Swaps <code class="computeroutput"><span class="identifier">a</span></code> and <code class="computeroutput"><span class="identifier">b</span></code>.
       </p>
-<a name="boost_multiprecision.ref.mp_number.iostream_support"></a><h5>
-<a name="boost_multiprecision.ref.mp_number.iostream_support-heading"></a>
-        <a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.iostream_support">Iostream
+<h5>
+<a name="boost_multiprecision.ref.mp_number.h4"></a>
+        <span><a name="boost_multiprecision.ref.mp_number.iostream_support"></a></span><a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.iostream_support">Iostream
         Support</a>
       </h5>
 <pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
@@ -298,9 +397,14 @@
         These operators provided formatted input-output operations on <code class="computeroutput"><span class="identifier">mp_number</span></code> types, and expression templates
         derived from them.
       </p>
-<a name="boost_multiprecision.ref.mp_number.non_member_standard_library_function_support"></a><h5>
-<a name="boost_multiprecision.ref.mp_number.non_member_standard_library_function_support-heading"></a>
-        <a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.non_member_standard_library_function_support">Non-member
+<p>
+        It's down to the backend type to actually implement string conversion. However,
+        the backends provided with this library support all of the iostream formatting
+        flags, field width and precision settings.
+      </p>
+<h5>
+<a name="boost_multiprecision.ref.mp_number.h5"></a>
+        <span><a name="boost_multiprecision.ref.mp_number.non_member_standard_library_function_support"></a></span><a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.non_member_standard_library_function_support">Non-member
         standard library function support</a>
       </h5>
 <pre class="programlisting"><span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">abs</span>    <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
@@ -351,30 +455,34 @@
       </p>
 <p>
         Also note that with the exception of <code class="computeroutput"><span class="identifier">abs</span></code>
-        that these functions can only be used with floating point Backend types.
+        that these functions can only be used with floating-point Backend types.
       </p>
-<a name="boost_multiprecision.ref.mp_number.boost_math_interoperabilty_support"></a><h5>
-<a name="boost_multiprecision.ref.mp_number.boost_math_interoperabilty_support-heading"></a>
-        <a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.boost_math_interoperabilty_support">Boost.Math
-        Interoperabilty Support</a>
+<h5>
+<a name="boost_multiprecision.ref.mp_number.h6"></a>
+        <span><a name="boost_multiprecision.ref.mp_number.boost_math_interoperability_support"></a></span><a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.boost_math_interoperability_support">Boost.Math
+        Interoperability Support</a>
       </h5>
 <pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">math</span><span class="special">{</span>
 
-<span class="keyword">int</span>                                              <span class="identifier">fpclassify</span>     <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">);</span>
-<span class="keyword">bool</span>                                             <span class="identifier">isfinite</span>       <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">);</span>
-<span class="keyword">bool</span>                                             <span class="identifier">isnan</span>          <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">);</span>
-<span class="keyword">bool</span>                                             <span class="identifier">isinf</span>          <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">);</span>
-<span class="keyword">bool</span>                                             <span class="identifier">isnormal</span>       <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">);</span>
+<span class="keyword">int</span>  <span class="identifier">fpclassify</span>     <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">);</span>
+<span class="keyword">bool</span> <span class="identifier">isfinite</span>       <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">);</span>
+<span class="keyword">bool</span> <span class="identifier">isnan</span>          <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">);</span>
+<span class="keyword">bool</span> <span class="identifier">isinf</span>          <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">);</span>
+<span class="keyword">bool</span> <span class="identifier">isnormal</span>       <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">);</span>
 
 <span class="special">}}</span> <span class="comment">// namespaces</span>
 </pre>
 <p>
-        These functions behave exacts as their Boost.Math equivalents. Other Boost.Math
-        functions and templates may also be specialized or overloaded to ensure interoperability.
+        These floating-point classification functions behave exactly as their Boost.Math
+        equivalents.
       </p>
-<a name="boost_multiprecision.ref.mp_number.std__numeric_limits_support"></a><h5>
-<a name="boost_multiprecision.ref.mp_number.std__numeric_limits_support-heading"></a>
-        <a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.std__numeric_limits_support">std::numeric_limits
+<p>
+        Other Boost.Math functions and templates may also be specialized or overloaded
+        to ensure interoperability.
+      </p>
+<h5>
+<a name="boost_multiprecision.ref.mp_number.h7"></a>
+        <span><a name="boost_multiprecision.ref.mp_number.std__numeric_limits_support"></a></span><a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.std__numeric_limits_support">std::numeric_limits
         support</a>
       </h5>
 <pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">std</span><span class="special">{</span>

@@ -119,7 +119,7 @@
               </td>
 <td>
                 <p>
-                  Very fast and efficient backend, with it's own standard library
+                  Very fast and efficient backend, with its own standard library
                   implementation.
                 </p>
               </td>
@@ -152,7 +152,7 @@
               </td>
 <td>
                 <p>
-                  Header only, all C++ implementation.
+                  Header only, all C++ implementation. Boost licence.
                 </p>
               </td>
 <td>
@@ -163,9 +163,9 @@
 </tr>
 </tbody>
 </table></div>
-<a name="boost_multiprecision.tut.reals.gmp_float"></a><h5>
-<a name="boost_multiprecision.tut.reals.gmp_float-heading"></a>
-        <a class="link" href="reals.html#boost_multiprecision.tut.reals.gmp_float">gmp_float</a>
+<h5>
+<a name="boost_multiprecision.tut.reals.h0"></a>
+        <span><a name="boost_multiprecision.tut.reals.gmp_float"></a></span><a class="link" href="reals.html#boost_multiprecision.tut.reals.gmp_float">gmp_float</a>
       </h5>
 <pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">multiprecision</span><span class="special">{</span>
 
@@ -182,8 +182,8 @@
 </pre>
 <p>
         The <code class="computeroutput"><span class="identifier">gmp_float</span></code> backend is
-        used in conjunction with <code class="computeroutput"><span class="identifier">mp_number</span></code>:
-        It acts as a thin wrapper around the GMP <code class="computeroutput"><span class="identifier">mpf_t</span></code>
+        used in conjunction with <code class="computeroutput"><span class="identifier">mp_number</span></code>
+        : it acts as a thin wrapper around the GMP <code class="computeroutput"><span class="identifier">mpf_t</span></code>
         to provide an real-number type that is a drop-in replacement for the native
         C++ floating-point types, but with much greater precision.
       </p>
@@ -226,14 +226,15 @@
 </ul></div>
 <p>
         It's also possible to access the underlying <code class="computeroutput"><span class="identifier">mpf_t</span></code>
-        via the data() member function of <code class="computeroutput"><span class="identifier">gmp_float</span></code>.
+        via the <code class="computeroutput"><span class="identifier">data</span><span class="special">()</span></code>
+        member function of <code class="computeroutput"><span class="identifier">gmp_float</span></code>.
       </p>
-<a name="boost_multiprecision.tut.reals.gmp_example_"></a><h6>
-<a name="boost_multiprecision.tut.reals.gmp_example_-heading"></a>
-        <a class="link" href="reals.html#boost_multiprecision.tut.reals.gmp_example_">GMP example:</a>
+<h6>
+<a name="boost_multiprecision.tut.reals.h1"></a>
+        <span><a name="boost_multiprecision.tut.reals.gmp_example_"></a></span><a class="link" href="reals.html#boost_multiprecision.tut.reals.gmp_example_">GMP
+        example:</a>
       </h6>
 <p>
-        
 </p>
 <pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">gmp</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
 
@@ -257,9 +258,9 @@
 </pre>
 <p>
       </p>
-<a name="boost_multiprecision.tut.reals.mpfr_float"></a><h5>
-<a name="boost_multiprecision.tut.reals.mpfr_float-heading"></a>
-        <a class="link" href="reals.html#boost_multiprecision.tut.reals.mpfr_float">mpfr_float</a>
+<h5>
+<a name="boost_multiprecision.tut.reals.h2"></a>
+        <span><a name="boost_multiprecision.tut.reals.mpfr_float"></a></span><a class="link" href="reals.html#boost_multiprecision.tut.reals.mpfr_float">mpfr_float</a>
       </h5>
 <pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">multiprecision</span><span class="special">{</span>
 
@@ -324,12 +325,12 @@
         It's also possible to access the underlying <code class="computeroutput"><span class="identifier">mpf_t</span></code>
         via the data() member function of <code class="computeroutput"><span class="identifier">gmp_float</span></code>.
       </p>
-<a name="boost_multiprecision.tut.reals.mpfr_example_"></a><h6>
-<a name="boost_multiprecision.tut.reals.mpfr_example_-heading"></a>
-        <a class="link" href="reals.html#boost_multiprecision.tut.reals.mpfr_example_">MPFR example:</a>
+<h6>
+<a name="boost_multiprecision.tut.reals.h3"></a>
+        <span><a name="boost_multiprecision.tut.reals.mpfr_example_"></a></span><a class="link" href="reals.html#boost_multiprecision.tut.reals.mpfr_example_">MPFR
+        example:</a>
       </h6>
 <p>
-        
 </p>
 <pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">mpfr</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
 
@@ -353,9 +354,9 @@
 </pre>
 <p>
       </p>
-<a name="boost_multiprecision.tut.reals.cpp_float"></a><h5>
-<a name="boost_multiprecision.tut.reals.cpp_float-heading"></a>
-        <a class="link" href="reals.html#boost_multiprecision.tut.reals.cpp_float">cpp_float</a>
+<h5>
+<a name="boost_multiprecision.tut.reals.h4"></a>
+        <span><a name="boost_multiprecision.tut.reals.cpp_float"></a></span><a class="link" href="reals.html#boost_multiprecision.tut.reals.cpp_float">cpp_float</a>
       </h5>
 <pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">multiprecision</span><span class="special">{</span>
 
@@ -384,13 +385,12 @@
         There is full standard library and <code class="computeroutput"><span class="identifier">numeric_limits</span></code>
         support available for this type.
       </p>
-<a name="boost_multiprecision.tut.reals.cpp_float_example_"></a><h6>
-<a name="boost_multiprecision.tut.reals.cpp_float_example_-heading"></a>
-        <a class="link" href="reals.html#boost_multiprecision.tut.reals.cpp_float_example_">cpp_float
+<h6>
+<a name="boost_multiprecision.tut.reals.h5"></a>
+        <span><a name="boost_multiprecision.tut.reals.cpp_float_example_"></a></span><a class="link" href="reals.html#boost_multiprecision.tut.reals.cpp_float_example_">cpp_float
         example:</a>
       </h6>
 <p>
-        
 </p>
 <pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">cpp_float</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
 

@@ -506,20 +506,6 @@ run test_mpfr_conversions.cpp gmp mpfr
         : # requirements
          [ check-target-builds ../config//has_mpfr : : <build>no ] ;
 
-run ../example/gmp_snips.cpp gmp
-        : # command line
-        : # input files
-        : # requirements
-         [ check-target-builds ../config//has_gmp : : <build>no ] ;
-
-run ../example/mpfr_snips.cpp mpfr
-        : # command line
-        : # input files
-        : # requirements
-         [ check-target-builds ../config//has_mpfr : : <build>no ] ;
-
-run ../example/cpp_float_snips.cpp ;
-
 run test_round.cpp
         : # command line
         : # input files
@@ -622,3 +608,25 @@ run test_int_io.cpp gmp
 	      <define>TEST_MPZ
          [ check-target-builds ../config//has_gmp : : <build>no ]
         : test_int_io_mpz ;
+
+run ../example/gmp_snips.cpp gmp
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_gmp : : <build>no ] ;
+
+run ../example/mpfr_snips.cpp mpfr
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_mpfr : : <build>no ] ;
+
+run ../example/cpp_float_snips.cpp ;
+
+run ../example/tommath_snips.cpp $(TOMMATH)
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_tommath : : <build>no ] ;
+
+
