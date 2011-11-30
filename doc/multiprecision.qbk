@@ -956,3 +956,22 @@ a variable of B, `cb` and `cb2` are constant variables of type B, `a` is a varia
 
 [endsect]
 
+[section:map Roadmap]
+
+[section:hist History]
+
+[endsect]
+
+[section:todo TODO]
+
+More a list of what ['could] be done, rather than what ['should] be done (which may be a much smaller list!).
+
+* Adapt Boost.Math special function tests for this library: will make a very good test of arithmetic and std lib support.
+* Add an adapter backend for complex number types.
+* Add an adapter backend for rational types.
+* Test integer types with Boost.Rational.
+* Adapt libtommath code to make an all C++ fixed precision integer type.
+
+[endsect]
+
+[endsect]
