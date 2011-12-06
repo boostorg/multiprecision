@@ -178,7 +178,7 @@ const T& get_constant_pi()
    static bool b = false;
    if(!b)
    {
-      calc_pi(result, boost::multiprecision::detail::digits2<mp_number<T> >::value);
+      calc_pi(result, boost::multiprecision::detail::digits2<mp_number<T> >::value + 10);
       b = true;
    }
 

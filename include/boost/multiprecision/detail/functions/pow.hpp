@@ -545,6 +545,33 @@ inline void eval_pow(T& result, const T& x, const T& a)
 namespace detail{
 
    template <class T>
+   void small_sinh_series(T x, T& result)
+   {
+      typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+      bool neg = get_sign(x) < 0;
+      if(neg)
+         x.negate();
+      T p(x);
+      T mult(x);
+      multiply(mult, x);
+      result = x;
+      ui_type k = 1;
+
+      T lim(x);
+      eval_ldexp(lim, lim, 1 - boost::multiprecision::detail::digits2<mp_number<T> >::value);
+
+      do
+      {
+         multiply(p, mult);
+         divide(p, ++k);
+         divide(p, ++k);
+         add(result, p);
+      }while(p.compare(lim) >= 0);
+      if(neg)
+         result.negate();
+   }
+
+   template <class T>
    void sinhcosh(const T& x, T* p_sinh, T* p_cosh)
    {
       typedef typename boost::multiprecision::detail::canonical<int, T>::type si_type;
@@ -571,21 +598,36 @@ namespace detail{
       default: ;
       }
 
+      T e_px, e_mx;
 
-      T e_px;
-      eval_exp(e_px, x);
-      T e_mx;
-      divide(e_mx, ui_type(1), e_px);
+      bool small_sinh = get_sign(x) < 0 ? e_px.compare(fp_type(-0.5)) > 0 : e_px.compare(fp_type(0.5)) < 0;
 
-      if(p_sinh) 
-      { 
-         subtract(*p_sinh, e_px, e_mx);
-         divide(*p_sinh, ui_type(2));
+      if(p_cosh || !small_sinh)
+      {
+         eval_exp(e_px, x);
+         divide(e_mx, ui_type(1), e_px);
+
+         if(p_sinh) 
+         { 
+            if(small_sinh)
+            {
+               small_sinh_series(x, *p_sinh);
+            }
+            else
+            {
+               subtract(*p_sinh, e_px, e_mx);
+               divide(*p_sinh, ui_type(2));
+            }
+         }
+         if(p_cosh) 
+         { 
+            add(*p_cosh, e_px, e_mx);
+            divide(*p_cosh, ui_type(2)); 
+         }
       }
-      if(p_cosh) 
-      { 
-         add(*p_cosh, e_px, e_mx);
-         divide(*p_cosh, ui_type(2)); 
+      else
+      {
+         small_sinh_series(x, *p_sinh);
       }
    }
 

@@ -7,7 +7,7 @@
 #  define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <boost/detail/lightweight_test.hpp>
+#include "test.hpp"
 
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ) && !defined(TEST_TOMMATH)
 #  define TEST_MPF_50
@@ -47,6 +47,25 @@
 
 #define PRINT(x)\
    std::cout << BOOST_STRINGIZE(x) << " = " << std::numeric_limits<Number>::x << std::endl;
+
+template <class Number>
+void test_fp(const boost::mpl::int_<boost::multiprecision::number_kind_floating_point>&)
+{
+   Number minv, maxv;
+   minv = (std::numeric_limits<Number>::min)();
+   maxv = (std::numeric_limits<Number>::max)();
+   BOOST_CHECK(boost::math::isnormal(minv));
+   BOOST_CHECK(boost::math::isnormal(maxv));
+   BOOST_CHECK(boost::math::isnormal(log(minv)));
+   BOOST_CHECK(boost::math::isnormal(log(maxv)));
+   BOOST_CHECK(boost::math::isnormal(sqrt(minv)));
+   BOOST_CHECK(boost::math::isnormal(sqrt(maxv)));
+}
+
+template <class Number, class T>
+void test_fp(const T&)
+{
+}
 
 template <class Number>
 void test()
@@ -140,6 +159,14 @@ void test()
    BOOST_TEST((boost::math::isnormal)(n));
    BOOST_TEST(!(boost::math::isinf)(n));
    BOOST_TEST(!(boost::math::isnan)(n));
+
+   typedef typename boost::mpl::if_c<
+      std::numeric_limits<Number>::is_specialized,
+      typename boost::multiprecision::number_category<Number>::type,
+      boost::mpl::int_<500> // not a number type
+   >::type fp_test_type;
+
+   test_fp<Number>(fp_test_type());
 }
 
 

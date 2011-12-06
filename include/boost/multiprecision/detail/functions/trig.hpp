@@ -120,6 +120,9 @@ void eval_sin(T& result, const T& x)
       multiply(n_pi, get_constant_pi<T>());
       subtract(xx, n_pi);
 
+      BOOST_MATH_INSTRUMENT_CODE(xx.str(0, std::ios_base::scientific));
+      BOOST_MATH_INSTRUMENT_CODE(n_pi.str(0, std::ios_base::scientific));
+
       // Adjust signs if the multiple of pi is not even.
       if(!b_n_pi_is_even)
       {
@@ -132,6 +135,7 @@ void eval_sin(T& result, const T& x)
    if(xx.compare(t) > 0)
    {
       subtract(xx, get_constant_pi<T>(), xx);
+      BOOST_MATH_INSTRUMENT_CODE(xx.str(0, std::ios_base::scientific));
    }
 
    subtract(t, xx);
@@ -157,6 +161,7 @@ void eval_sin(T& result, const T& x)
       T t2;
       t2 = fp_type(1.5);
       hyp0F1(result, t2, t);
+      BOOST_MATH_INSTRUMENT_CODE(result.str(0, std::ios_base::scientific));
       multiply(result, xx);
    }
    else if(b_near_pi_half)
@@ -166,6 +171,7 @@ void eval_sin(T& result, const T& x)
       T t2;
       t2 = fp_type(0.5);
       hyp0F1(result, t2, t);
+      BOOST_MATH_INSTRUMENT_CODE(result.str(0, std::ios_base::scientific));
    }
    else
    {
@@ -185,6 +191,7 @@ void eval_sin(T& result, const T& x)
       T t2;
       t2 = fp_type(1.5);
       hyp0F1(result, t2, t);
+      BOOST_MATH_INSTRUMENT_CODE(result.str(0, std::ios_base::scientific));
       multiply(result, xx);
 
       // Convert back using multiple angle identity.
@@ -243,7 +250,6 @@ void eval_cos(T& result, const T& x)
    if(get_sign(x) < 0)
    {
       xx.negate();
-      b_negate_cos = !b_negate_cos;
    }
 
    T n_pi, t;
@@ -252,8 +258,11 @@ void eval_cos(T& result, const T& x)
    {
       divide(t, xx, get_constant_pi<T>());
       eval_trunc(n_pi, t);
+      BOOST_MATH_INSTRUMENT_CODE(n_pi.str(0, std::ios_base::scientific));
       multiply(t, n_pi, get_constant_pi<T>());
+      BOOST_MATH_INSTRUMENT_CODE(t.str(0, std::ios_base::scientific));
       subtract(xx, t);
+      BOOST_MATH_INSTRUMENT_CODE(xx.str(0, std::ios_base::scientific));
 
       // Adjust signs if the multiple of pi is not even.
       t = ui_type(2);
@@ -273,6 +282,7 @@ void eval_cos(T& result, const T& x)
    {
       subtract(xx, get_constant_pi<T>(), xx);
       b_negate_cos = !b_negate_cos;
+      BOOST_MATH_INSTRUMENT_CODE(xx.str(0, std::ios_base::scientific));
    }
 
    const bool b_zero    = get_sign(xx) == 0;
@@ -297,6 +307,7 @@ void eval_cos(T& result, const T& x)
       divide(t, si_type(-4));
       n_pi = fp_type(0.5f);
       hyp0F1(result, n_pi, t);
+      BOOST_MATH_INSTRUMENT_CODE(result.str(0, std::ios_base::scientific));
    }
    else if(b_near_pi_half)
    {
@@ -306,6 +317,7 @@ void eval_cos(T& result, const T& x)
       n_pi = fp_type(1.5f);
       hyp0F1(result, n_pi, t);
       multiply(result, t2);
+      BOOST_MATH_INSTRUMENT_CODE(result.str(0, std::ios_base::scientific));
    }
    else
    {
@@ -324,6 +336,7 @@ void eval_cos(T& result, const T& x)
 
       // Now with small arguments, we are ready for a series expansion.
       hyp0F1(result, n_pi, t);
+      BOOST_MATH_INSTRUMENT_CODE(result.str(0, std::ios_base::scientific));
 
       // Convert back using multiple angle identity.
       for(ui_type k = 0; k < n_scale; k++)

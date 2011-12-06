@@ -42,11 +42,14 @@ public:
    static const boost::int32_t cpp_float_digits10         = ((cpp_float_digits10_setting < static_cast<boost::int32_t>(30)) ? static_cast<boost::int32_t>(30) : ((cpp_float_digits10_setting > cpp_float_digits10_limit) ? cpp_float_digits10_limit : cpp_float_digits10_setting));
    static const boost::int32_t cpp_float_digits10_extra   = static_cast<boost::int32_t>(((static_cast<boost::int64_t>(cpp_float_digits10) * 15LL) + 50LL) / 100LL);
    static const boost::int32_t cpp_float_max_digits10     = static_cast<boost::int32_t>(cpp_float_digits10 + ((cpp_float_digits10_extra < static_cast<boost::int32_t>(5)) ? static_cast<boost::int32_t>(5) : ((cpp_float_digits10_extra > static_cast<boost::int32_t>(30)) ? static_cast<boost::int32_t>(30) : cpp_float_digits10_extra)));
-   static const boost::int64_t cpp_float_max_exp   = static_cast<boost::int64_t>(+9223372036854775795LL);
-   static const boost::int64_t cpp_float_min_exp   = static_cast<boost::int64_t>(-9223372036854775795LL);
-   static const boost::int64_t cpp_float_max_exp10 = static_cast<boost::int64_t>(+3063937869882635616LL); // Approx. [cpp_float_max_exp / log10(2)], also an even multiple of 8
-   static const boost::int64_t cpp_float_min_exp10 = static_cast<boost::int64_t>(-3063937869882635616LL);
+   static const boost::int64_t cpp_float_max_exp10 = 2776234983093287512;
+   static const boost::int64_t cpp_float_min_exp10 = -2776234983093287512;
+   static const boost::int64_t cpp_float_max_exp   = (cpp_float_max_exp10 / 301LL) * 1000LL;
+   static const boost::int64_t cpp_float_min_exp   = (cpp_float_min_exp10 / 301LL) * 1000LL;
    static const boost::int32_t mp_elem_digits10   = static_cast<boost::int32_t>(8);
+
+   BOOST_STATIC_ASSERT(0 == cpp_float_max_exp10 % mp_elem_digits10);
+   BOOST_STATIC_ASSERT(cpp_float_max_exp10 == -cpp_float_min_exp10);
 
 private:
    static const boost::int32_t cpp_float_digits10_num_base = static_cast<boost::int32_t>((cpp_float_max_digits10 / mp_elem_digits10) + (((cpp_float_max_digits10 % mp_elem_digits10) != 0) ? 1 : 0));
@@ -740,8 +743,8 @@ cpp_float<Digits10>& cpp_float<Digits10>::operator+=(const cpp_float<Digits10>& 
       return *this = zero();
    }
 
-   bool overflow = exp >= cpp_float_max_exp;
-   if(exp == cpp_float_max_exp)
+   bool overflow = exp >= cpp_float_max_exp10;
+   if(exp == cpp_float_max_exp10)
    {
       // Check to see if we really truely have an overflow or not...
       if(isneg())
@@ -971,8 +974,8 @@ cpp_float<Digits10>& cpp_float<Digits10>::mul_unsigned_long_long(const unsigned 
       data.front() = static_cast<boost::uint32_t>(carry);
    }
 
-   bool overflow = exp >= cpp_float_max_exp;
-   if(exp == cpp_float_max_exp)
+   bool overflow = exp >= cpp_float_max_exp10;
+   if(exp == cpp_float_max_exp10)
    {
       // Check to see if we really truely have an overflow or not...
       if(isneg())
@@ -2723,13 +2726,51 @@ inline void eval_frexp(cpp_float<Digits10>& result, const cpp_float<Digits10>& x
    if(result.isneg())
       result.negate();
 
+   if(result.iszero())
+   {
+      *e = 0;
+      return;
+   }
+
    long long t = result.order();
 
-   if(std::abs(t) > (std::numeric_limits<long long>::max)() / 3)
-      BOOST_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2."));
-   t *= 3;
+   if(std::abs(t) < ((std::numeric_limits<long long>::max)() / 1000))
+   {
+      t *= 1000;
+      t /= 301;
+   }
+   else
+   {
+      t /= 301;
+      t *= 1000;
+   }
 
    result *= cpp_float<Digits10>::pow2(-t);
+
+   if(result.iszero() || result.isinf() || result.isnan())
+   {
+      // pow2 overflowed, slip the calculation up:
+      result = x;
+      if(result.isneg())
+         result.negate();
+      t /= 2;
+      result *= cpp_float<Digits10>::pow2(-t);
+   }
+
+   if(std::abs(result.order()) > 5)
+   {
+      // If our first estimate doesn't get close enough then try recursion until we do:
+      long long e2;
+      cpp_float<Digits10> r2;
+      eval_frexp(r2, result, &e2);
+      // overflow prtection:
+      if((t > 0) && (e2 > 0) && (t > (std::numeric_limits<long long>::max)() - e2))
+         BOOST_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2."));
+      if((t < 0) && (e2 < 0) && (t < (std::numeric_limits<long long>::min)() - e2))
+         BOOST_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2."));
+      t += e2;
+      result = r2;
+   }
 
    while(result.compare(cpp_float<Digits10>::one()) >= 0)
    {

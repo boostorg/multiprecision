@@ -630,3 +630,32 @@ run ../example/tommath_snips.cpp $(TOMMATH)
          [ check-target-builds ../config//has_tommath : : <build>no ] ;
 
 
+for local source in [ glob math/*.cpp ]
+{
+   run $(source) mpfr gmp /boost/test//boost_test_exec_monitor/<link>static /boost/regex//boost_regex/<link>static
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_mpfr : : <build>no ] 
+         <define>TEST_MPFR_50
+         <optimization>speed
+         <define>BOOST_ALL_NO_LIB
+        : $(source:B)_mpfr ;
+   run $(source) gmp /boost/test//boost_test_exec_monitor/<link>static /boost/regex//boost_regex/<link>static
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_gmp : : <build>no ] 
+         <optimization>speed
+         <define>TEST_MPF_50
+         <define>BOOST_ALL_NO_LIB
+        : $(source:B)_mpf ;
+   run $(source) /boost/test//boost_test_exec_monitor/<link>static /boost/regex//boost_regex/<link>static
+        : # command line
+        : # input files
+        : # requirements
+         <define>TEST_CPP_FLOAT
+         <define>BOOST_ALL_NO_LIB
+         <optimization>speed
+        : $(source:B)_cpp_float ;
+}

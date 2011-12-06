@@ -236,6 +236,11 @@ void test()
       unsigned err = e.template convert_to<unsigned>();
       if(err > max_err)
          max_err = err;
+      val = cos(-half_pi + (euler_gamma + k) / 523);
+      e = relative_error(val, near_one[k]);
+      err = e.template convert_to<unsigned>();
+      if(err > max_err)
+         max_err = err;
    }
    std::cout << "Max error was: " << max_err << std::endl;
    BOOST_TEST(max_err < 500);
@@ -244,7 +249,7 @@ void test()
    // Test with some exact binary values as input - this tests our code
    // rather than the test data:
    //
-   static const boost::array<boost::array<T, 2>, 7> exact_data =
+   static const boost::array<boost::array<T, 2>, 8> exact_data =
    {{
       {{ 0.5, "0.877582561890372716116281582603829651991645197109744052997610868315950763274213947405794184084682258355478400593109053993" }},
       {{ 0.25, "0.968912421710644784144595449494189199804134190287442831148128124288942561184523327264655202799685025510352709626116202617" }},
@@ -252,7 +257,8 @@ void test()
       {{std::ldexp(1.0, -20), "0.99999999999954525264911357034690133684385823577463126432241468890539365027135494672267164697779879113636143901797362388" }},
       {{ 2, "-0.416146836547142386997568229500762189766000771075544890755149973781964936124079169074531777860169140367366791365215728559" }},
       {{ 5, "0.283662185463226264466639171513557308334422592252215944930359066586151456767382702286176981668344573238827368717546699737" }},
-      {{ 10, "-0.839071529076452452258863947824064834519930165133168546835953731048792586866270768400933712760422138927451054405350243624" }}
+      {{ 10, "-0.839071529076452452258863947824064834519930165133168546835953731048792586866270768400933712760422138927451054405350243624" }},
+      {{ 8.5, "-0.60201190268482361534842652295699870029606776360435523539636606145572515876770619546025351418378467287262574566665150299" }}
    }};
    max_err = 0;
    for(unsigned k = 0; k < exact_data.size(); k++)
@@ -260,6 +266,11 @@ void test()
       T val = cos(exact_data[k][0]);
       T e = relative_error(val, exact_data[k][1]);
       unsigned err = e.template convert_to<unsigned>();
+      if(err > max_err)
+         max_err = err;
+      val = cos(-exact_data[k][0]);
+      e = relative_error(val, exact_data[k][1]);
+      err = e.template convert_to<unsigned>();
       if(err > max_err)
          max_err = err;
    }

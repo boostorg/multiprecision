@@ -113,6 +113,11 @@ void test()
       unsigned err = e.template convert_to<unsigned>();
       if(err > max_err)
          max_err = err;
+      val = boost::multiprecision::cosh(-x * x);
+      e = relative_error(val, data[k]);
+      err = e.template convert_to<unsigned>();
+      if(err > max_err)
+         max_err = err;
    }
    std::cout << "Max error was: " << max_err << std::endl;
    BOOST_TEST(max_err < 2000);
