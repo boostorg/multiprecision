@@ -83,8 +83,9 @@ struct gmp_float_imp
    }
    gmp_float_imp& operator = (boost::intmax_t i)
    {
+      BOOST_MP_USING_ABS
       bool neg = i < 0;
-      *this = static_cast<boost::uintmax_t>(std::abs(i));
+      *this = static_cast<boost::uintmax_t>(abs(i));
       if(neg)
          mpf_neg(m_data, m_data);
       return *this;
@@ -910,8 +911,9 @@ struct gmp_int
    }
    gmp_int& operator = (boost::intmax_t i)
    {
+      BOOST_MP_USING_ABS
       bool neg = i < 0;
-      *this = static_cast<boost::uintmax_t>(std::abs(i));
+      *this = static_cast<boost::uintmax_t>(abs(i));
       if(neg)
          mpz_neg(m_data, m_data);
       return *this;
@@ -1448,8 +1450,9 @@ struct gmp_rational
    }
    gmp_rational& operator = (boost::intmax_t i)
    {
+      BOOST_MP_USING_ABS
       bool neg = i < 0;
-      *this = static_cast<boost::uintmax_t>(std::abs(i));
+      *this = static_cast<boost::uintmax_t>(abs(i));
       if(neg)
          mpq_neg(m_data, m_data);
       return *this;

@@ -62,6 +62,13 @@ void expected_results()
       ".*",                          // compiler
       ".*",                          // stdlib
       ".*",                          // platform
+      ".*mpfr_float_backend<18>.*",  // test type(s)
+      ".*Y0.*",                      // test data group
+      ".*", 3000, 2000);             // test function
+   add_expected_result(
+      ".*",                          // compiler
+      ".*",                          // stdlib
+      ".*",                          // platform
       ".*",                          // test type(s)
       ".*Y0.*",                      // test data group
       ".*", 800, 400);               // test function
@@ -72,6 +79,13 @@ void expected_results()
       ".*",                          // test type(s)
       ".*Yn.*",                      // test data group
       ".*", 1700, 600);               // test function
+   add_expected_result(
+      ".*",                          // compiler
+      ".*",                          // stdlib
+      ".*",                          // platform
+      ".*mpfr_float_backend<18>.*",  // test type(s)
+      ".*",                          // test data group
+      ".*", 10000, 4000);            // test function
    add_expected_result(
       ".*",                          // compiler
       ".*",                          // stdlib

@@ -2733,8 +2733,8 @@ inline void eval_frexp(cpp_float<Digits10>& result, const cpp_float<Digits10>& x
    }
 
    long long t = result.order();
-
-   if(std::abs(t) < ((std::numeric_limits<long long>::max)() / 1000))
+   BOOST_MP_USING_ABS
+   if(abs(t) < ((std::numeric_limits<long long>::max)() / 1000))
    {
       t *= 1000;
       t /= 301;
@@ -2756,8 +2756,8 @@ inline void eval_frexp(cpp_float<Digits10>& result, const cpp_float<Digits10>& x
       t /= 2;
       result *= cpp_float<Digits10>::pow2(-t);
    }
-
-   if(std::abs(result.order()) > 5)
+   BOOST_MP_USING_ABS
+   if(abs(result.order()) > 5)
    {
       // If our first estimate doesn't get close enough then try recursion until we do:
       long long e2;

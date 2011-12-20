@@ -28,6 +28,14 @@ namespace detail{
 template<class tag, class Arg1 = void, class Arg2 = void, class Arg3 = void>
 struct mp_exp;
 
+template <class T>
+typename boost::enable_if<is_arithmetic<T>, T>::type abs(const T& t)
+{
+   return t < 0 ? -t : t;
+}
+
+#define BOOST_MP_USING_ABS using std::abs; using boost::multiprecision::detail::abs;
+
 template <int b>
 struct has_enough_bits
 {
@@ -465,11 +473,12 @@ void format_float_string(S& str, long long my_exp, std::streamsize digits, std::
    }
    else
    {
+      BOOST_MP_USING_ABS
       // Scientific format:
       if(showpoint || (str.size() > 1))
          str.insert(1, 1, '.');
       str.append(1, 'e');
-      S e = boost::lexical_cast<S>(std::abs(my_exp));
+      S e = boost::lexical_cast<S>(abs(my_exp));
       if(e.size() < BOOST_MP_MIN_EXPONENT_DIGITS)
          e.insert(0, BOOST_MP_MIN_EXPONENT_DIGITS-e.size(), '0');
       if(my_exp < 0)

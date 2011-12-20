@@ -80,8 +80,9 @@ struct mpfr_float_imp
    }
    mpfr_float_imp& operator = (boost::intmax_t i)
    {
+      BOOST_MP_USING_ABS
       bool neg = i < 0;
-      *this = static_cast<boost::uintmax_t>(std::abs(i));
+      *this = static_cast<boost::uintmax_t>(abs(i));
       if(neg)
          mpfr_neg(m_data, m_data, GMP_RNDN);
       return *this;

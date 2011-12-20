@@ -70,8 +70,9 @@ struct tommath_int
    }
    tommath_int& operator = (boost::intmax_t i)
    {
+      BOOST_MP_USING_ABS
       bool neg = i < 0;
-      *this = static_cast<boost::uintmax_t>(std::abs(i));
+      *this = static_cast<boost::uintmax_t>(abs(i));
       if(neg)
          detail::check_tommath_result(mp_neg(&m_data, &m_data));
       return *this;

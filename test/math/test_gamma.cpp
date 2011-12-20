@@ -1,19 +1,13 @@
 ///////////////////////////////////////////////////////////////
-//  Copyright Christopher Kormanyos 2002 - 2011.
 //  Copyright 2011 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_
-//
-// This work is based on an earlier work:
-// "Algorithm 910: A Portable C++ Multiple-Precision System for Special-Function Calculations",
-// in ACM TOMS, {VOL 37, ISSUE 4, (February 2011)} (C) ACM, 2011. http://doi.acm.org/10.1145/1916461.1916469
 
 #ifdef _MSC_VER
 #  define _SCL_SECURE_NO_WARNINGS
 #endif
 
 #define BOOST_MATH_OVERFLOW_ERROR_POLICY ignore_error
-#define BOOST_MATH_SMALL_CONSTANT(x) x
 
 #if !defined(TEST_MPF_50) && !defined(TEST_BACKEND) && !defined(TEST_CPP_FLOAT) && !defined(TEST_MPFR_50)
 #  define TEST_MPF_50
@@ -43,8 +37,9 @@
 #endif
 
 #define SC_(x) T(BOOST_STRINGIZE(x))
+#define TEST_UDT
 
-#include "libs/math/test/test_bessel_k.hpp"
+#include "libs/math/test/test_gamma.hpp"
 
 void expected_results()
 {
@@ -56,31 +51,44 @@ void expected_results()
       ".*",                          // compiler
       ".*",                          // stdlib
       ".*",                          // platform
-      ".*gmp.*",                     // test type(s)
+      ".*gmp_float<18>.*",           // test type(s)
       ".*",                          // test data group
-      ".*", 2000, 1500);                // test function
-
-   add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*mpfr_float_backend<18>.*",  // test type(s)
-      ".*",                          // test data group
-      ".*", 3000, 1000);             // test function
+      "boost::math::tgamma", 4000, 2500);  // test function
    add_expected_result(
       ".*",                          // compiler
       ".*",                          // stdlib
       ".*",                          // platform
       ".*",                          // test type(s)
-      ".*large.*",                   // test data group
-      ".*", 80, 50);                 // test function
+      "factorials",                  // test data group
+      "boost::math::tgamma", 70, 25);  // test function
    add_expected_result(
       ".*",                          // compiler
       ".*",                          // stdlib
       ".*",                          // platform
       ".*",                          // test type(s)
-      ".*",                          // test data group
-      ".*", 50, 15);                 // test function
+      "factorials",                  // test data group
+      "boost::math::lgamma", 80, 40);  // test function
+   add_expected_result(
+      ".*",                          // compiler
+      ".*",                          // stdlib
+      ".*",                          // platform
+      ".*",                          // test type(s)
+      "near.*",                      // test data group
+      "boost::math::tgamma", 80, 60);  // test function
+   add_expected_result(
+      ".*",                          // compiler
+      ".*",                          // stdlib
+      ".*",                          // platform
+      ".*",                          // test type(s)
+      "near.*",                      // test data group
+      "boost::math::lgamma", 10000000, 10000000);  // test function
+   add_expected_result(
+      ".*",                          // compiler
+      ".*",                          // stdlib
+      ".*",                          // platform
+      ".*",                          // test type(s)
+      "tgamma1pm1.*",                // test data group
+      "boost::math::tgamma1pm1", 1000, 150);  // test function
    //
    // Finish off by printing out the compiler/stdlib/platform names,
    // we do this to make it easier to mark up expected error rates.
@@ -101,23 +109,20 @@ int test_main(int, char* [])
    // 35 decimal digits: tests arbitrary precision code
    //
 #ifdef TEST_MPF_50
-   // We have accuracy issues with gmp_float<18> - maybe in std::exp??  Disabled for now.
-   test_bessel(mp_number<gmp_float<18> >(), "mp_number<gmp_float<18> >");
-   test_bessel(mp_number<gmp_float<30> >(), "mp_number<gmp_float<30> >");
-   test_bessel(mp_number<gmp_float<35> >(), "mp_number<gmp_float<35> >");
+   test_gamma(mp_number<gmp_float<18> >(), "mp_number<gmp_float<18> >");
+   test_gamma(mp_number<gmp_float<30> >(), "mp_number<gmp_float<30> >");
+   test_gamma(mp_number<gmp_float<35> >(), "mp_number<gmp_float<35> >");
 #endif
 #ifdef TEST_MPFR_50
-   test_bessel(mp_number<mpfr_float_backend<18> >(), "mp_number<mpfr_float_backend<18> >");
-   test_bessel(mp_number<mpfr_float_backend<30> >(), "mp_number<mpfr_float_backend<30> >");
-   test_bessel(mp_number<mpfr_float_backend<35> >(), "mp_number<mpfr_float_backend<35> >");
+   test_gamma(mp_number<mpfr_float_backend<18> >(), "mp_number<mpfr_float_backend<18> >");
+   test_gamma(mp_number<mpfr_float_backend<30> >(), "mp_number<mpfr_float_backend<30> >");
+   test_gamma(mp_number<mpfr_float_backend<35> >(), "mp_number<mpfr_float_backend<35> >");
 #endif
 #ifdef TEST_CPP_FLOAT
-   test_bessel(mp_number<cpp_float<18> >(), "mp_number<cpp_float<18> >");
-   test_bessel(mp_number<cpp_float<30> >(), "mp_number<cpp_float<30> >");
-   test_bessel(mp_number<cpp_float<35> >(), "mp_number<cpp_float<35> >");
+   test_gamma(mp_number<cpp_float<18> >(), "mp_number<cpp_float<18> >");
+   test_gamma(mp_number<cpp_float<30> >(), "mp_number<cpp_float<30> >");
+   test_gamma(mp_number<cpp_float<35> >(), "mp_number<cpp_float<35> >");
 #endif
    return 0;
 }
-
-
 

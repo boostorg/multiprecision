@@ -57,7 +57,14 @@ void expected_results()
       ".*",                          // platform
       ".*gmp.*",                     // test type(s)
       ".*",                          // test data group
-      ".*", 3000, 200);              // test function
+      ".*", 3000, 1500);             // test function
+   add_expected_result(
+      ".*",                          // compiler
+      ".*",                          // stdlib
+      ".*",                          // platform
+      ".*mpfr_float_backend<18>.*",  // test type(s)
+      ".*",                          // test data group
+      ".*", 500, 100);               // test function
    add_expected_result(
       ".*",                          // compiler
       ".*",                          // stdlib
@@ -102,6 +109,7 @@ int test_main(int, char* [])
 #endif
    return 0;
 }
+
 
 
 

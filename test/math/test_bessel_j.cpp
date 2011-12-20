@@ -65,7 +65,7 @@ void expected_results()
       ".*",                          // platform
       ".*",                  // test type(s)
       ".*J1.*Tricky.*",              // test data group
-      ".*", 5000000, 5000000);       // test function
+      ".*", 10000000, 5000000);       // test function
    add_expected_result(
       ".*",                          // compiler
       ".*",                          // stdlib
