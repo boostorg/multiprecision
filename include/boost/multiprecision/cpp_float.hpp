@@ -404,7 +404,7 @@ public:
       return *this -= one();
    }
 
-   std::string str(std::streamsize digits, std::ios_base::fmtflags f)const;
+   std::string str(boost::intmax_t digits, std::ios_base::fmtflags f)const;
 
    int compare(const cpp_float& v)const;
    template <class V>
@@ -1647,7 +1647,7 @@ cpp_float<Digits10> cpp_float<Digits10>::extract_integer_part(void) const
 }
 
 template <unsigned Digits10>
-std::string cpp_float<Digits10>::str(std::streamsize number_of_digits, std::ios_base::fmtflags f) const
+std::string cpp_float<Digits10>::str(boost::intmax_t number_of_digits, std::ios_base::fmtflags f) const
 {
    if(this->isinf())
    {
@@ -1664,7 +1664,7 @@ std::string cpp_float<Digits10>::str(std::streamsize number_of_digits, std::ios_
    }
 
    std::string str;
-   std::streamsize org_digits(number_of_digits);
+   boost::intmax_t org_digits(number_of_digits);
    boost::int64_t my_exp = order();
    if(number_of_digits == 0)
       number_of_digits = cpp_float_max_digits10;

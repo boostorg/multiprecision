@@ -363,7 +363,7 @@ struct digits2
 #endif
 
 template <class S>
-void format_float_string(S& str, long long my_exp, std::streamsize digits, std::ios_base::fmtflags f, bool iszero)
+void format_float_string(S& str, boost::intmax_t my_exp, boost::intmax_t digits, std::ios_base::fmtflags f, bool iszero)
 {
    typedef typename S::size_type size_type;
    bool scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
@@ -427,7 +427,7 @@ void format_float_string(S& str, long long my_exp, std::streamsize digits, std::
       //
       // Pad out the end with zero's if we need to:
       //
-      std::streamsize chars = str.size();
+      boost::intmax_t chars = str.size();
       chars = digits - chars;
       if(scientific)
          ++chars;
@@ -465,7 +465,7 @@ void format_float_string(S& str, long long my_exp, std::streamsize digits, std::
       if(fixed)
       {
          // We may need to add trailing zeros:
-         std::streamsize l = str.find('.') + 1;
+         boost::intmax_t l = str.find('.') + 1;
          l = digits - (str.size() - l);
          if(l > 0)
             str.append(size_type(l), '0');
