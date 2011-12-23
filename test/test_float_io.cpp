@@ -50,7 +50,7 @@ bool is_mpf(const T&) { return false; }
 
 bool is_bankers_rounding_error(const std::string& s, const char* expect)
 {
-   // This check isn't foolproof: that would require *much* more sofisticated code!!!
+   // This check isn't foolproof: that would require *much* more sophisticated code!!!
    std::string::size_type l = std::strlen(expect);
    if(l != s.size())
       return false;

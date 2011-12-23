@@ -25,6 +25,10 @@ project : requirements
    <toolset>msvc:<runtime-link>static
    ;
 
+local disable-specfun = [ MATCH (--disable-specfun) : [ modules.peek : ARGV ] ] ;
+local disable-concepts = [ MATCH (--disable-concepts) : [ modules.peek : ARGV ] ] ;
+
+
 lib gmp ;
 lib mpfr ;
 
@@ -80,6 +84,14 @@ run test_arithmetic.cpp gmp
         : # command line
         : # input files
         : # requirements
+	      <define>TEST_MPZ_BOOST_RATIONAL
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+        : test_arithmetic_mpz_br ;
+
+run test_arithmetic.cpp gmp
+        : # command line
+        : # input files
+        : # requirements
 	      <define>TEST_MPQ
          [ check-target-builds ../config//has_gmp : : <build>no ]
         : test_arithmetic_mpq ;
@@ -107,6 +119,14 @@ run test_arithmetic.cpp $(TOMMATH)
 	      <define>TEST_TOMMATH
          [ check-target-builds ../config//has_tommath : : <build>no ]
         : test_arithmetic_tommath ;
+
+run test_arithmetic.cpp $(TOMMATH)
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_TOMMATH_BOOST_RATIONAL
+         [ check-target-builds ../config//has_tommath : : <build>no ]
+        : test_arithmetic_tommath_br ;
 
 run test_numeric_limits.cpp
         : # command line
@@ -178,68 +198,6 @@ run test_numeric_limits.cpp $(TOMMATH)
 	      <define>TEST_TOMMATH
          [ check-target-builds ../config//has_tommath : : <build>no ]
         : test_numeric_limits_tommath ;
-
-run mp_number_concept_check.cpp  mpfr
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPFR_50
-         [ check-target-builds ../config//has_mpfr : : <build>no ]
-        : mp_number_concept_check_mpfr_50 ;
-
-run mp_number_concept_check.cpp  mpfr
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPFR_6
-         [ check-target-builds ../config//has_mpfr : : <build>no ]
-        : mp_number_concept_check_mpfr_6 ;
-
-run mp_number_concept_check.cpp  mpfr
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPFR_15
-         [ check-target-builds ../config//has_mpfr : : <build>no ]
-        : mp_number_concept_check_mpfr_15 ;
-
-run mp_number_concept_check.cpp  mpfr
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPFR_17
-         [ check-target-builds ../config//has_mpfr : : <build>no ]
-        : mp_number_concept_check_mpfr_17 ;
-
-run mp_number_concept_check.cpp  mpfr
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPFR_30
-         [ check-target-builds ../config//has_mpfr : : <build>no ]
-        : mp_number_concept_check_mpfr_30 ;
-
-run mp_number_concept_check.cpp  gmp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPF_50
-         [ check-target-builds ../config//has_gmp : : <build>no ]
-        : mp_number_concept_check_mpf50 ;
-
-run mp_number_concept_check.cpp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_CPP_FLOAT
-        : mp_number_concept_check_cpp_float ;
-
-run mp_number_concept_check.cpp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_BACKEND
-        : mp_number_concept_check_backend_concept ;
 
 run test_exp.cpp gmp
         : # command line
@@ -609,6 +567,22 @@ run test_int_io.cpp gmp
          [ check-target-builds ../config//has_gmp : : <build>no ]
         : test_int_io_mpz ;
 
+run test_rational_io.cpp $(TOMMATH)
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_TOMMATH
+         [ check-target-builds ../config//has_tommath : : <build>no ]
+        : test_rational_io_tommath ;
+
+run test_rational_io.cpp gmp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPQ
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+        : test_rational_io_mpz ;
+
 run ../example/gmp_snips.cpp gmp
         : # command line
         : # input files
@@ -630,35 +604,105 @@ run ../example/tommath_snips.cpp $(TOMMATH)
          [ check-target-builds ../config//has_tommath : : <build>no ] ;
 
 
-for local source in [ glob math/*.cpp ]
+if ! $(disable-specfun)
 {
-   run $(source) mpfr gmp /boost/test//boost_test_exec_monitor/<link>static /boost/regex//boost_regex/<link>static
-        : # command line
-        : # input files
-        : # requirements
-         [ check-target-builds ../config//has_mpfr : : <build>no ] 
-         <define>TEST_MPFR_50
-         <optimization>speed
-         <define>BOOST_ALL_NO_LIB
-         <toolset>msvc:<cxxflags>-bigobj
-        : $(source:B)_mpfr ;
-   run $(source) gmp /boost/test//boost_test_exec_monitor/<link>static /boost/regex//boost_regex/<link>static
-        : # command line
-        : # input files
-        : # requirements
-         [ check-target-builds ../config//has_gmp : : <build>no ] 
-         <optimization>speed
-         <define>TEST_MPF_50
-         <define>BOOST_ALL_NO_LIB
-         <toolset>msvc:<cxxflags>-bigobj
-        : $(source:B)_mpf ;
-   run $(source) /boost/test//boost_test_exec_monitor/<link>static /boost/regex//boost_regex/<link>static
-        : # command line
-        : # input files
-        : # requirements
-         <define>TEST_CPP_FLOAT
-         <define>BOOST_ALL_NO_LIB
-         <optimization>speed
-         <toolset>msvc:<cxxflags>-bigobj
-        : $(source:B)_cpp_float ;
+
+   for local source in [ glob math/*.cpp ]
+   {
+      run $(source) mpfr gmp /boost/test//boost_test_exec_monitor/<link>static /boost/regex//boost_regex/<link>static
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_mpfr : : <build>no ] 
+            <define>TEST_MPFR_50
+            <optimization>speed
+            <define>BOOST_ALL_NO_LIB
+            <toolset>msvc:<cxxflags>-bigobj
+           : $(source:B)_mpfr ;
+      run $(source) gmp /boost/test//boost_test_exec_monitor/<link>static /boost/regex//boost_regex/<link>static
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ] 
+            <optimization>speed
+            <define>TEST_MPF_50
+            <define>BOOST_ALL_NO_LIB
+            <toolset>msvc:<cxxflags>-bigobj
+           : $(source:B)_mpf ;
+      run $(source) /boost/test//boost_test_exec_monitor/<link>static /boost/regex//boost_regex/<link>static
+           : # command line
+           : # input files
+           : # requirements
+            <define>TEST_CPP_FLOAT
+            <define>BOOST_ALL_NO_LIB
+            <optimization>speed
+            <toolset>msvc:<cxxflags>-bigobj
+           : $(source:B)_cpp_float ;
+   }
+}
+
+if ! $(disable-concepts)
+{
+   run mp_number_concept_check.cpp  mpfr
+           : # command line
+           : # input files
+           : # requirements
+	         <define>TEST_MPFR_50
+            [ check-target-builds ../config//has_mpfr : : <build>no ]
+           : mp_number_concept_check_mpfr_50 ;
+
+   run mp_number_concept_check.cpp  mpfr
+           : # command line
+           : # input files
+           : # requirements
+	         <define>TEST_MPFR_6
+            [ check-target-builds ../config//has_mpfr : : <build>no ]
+           : mp_number_concept_check_mpfr_6 ;
+
+   run mp_number_concept_check.cpp  mpfr
+           : # command line
+           : # input files
+           : # requirements
+	         <define>TEST_MPFR_15
+            [ check-target-builds ../config//has_mpfr : : <build>no ]
+           : mp_number_concept_check_mpfr_15 ;
+
+   run mp_number_concept_check.cpp  mpfr
+           : # command line
+           : # input files
+           : # requirements
+	         <define>TEST_MPFR_17
+            [ check-target-builds ../config//has_mpfr : : <build>no ]
+           : mp_number_concept_check_mpfr_17 ;
+
+   run mp_number_concept_check.cpp  mpfr
+           : # command line
+           : # input files
+           : # requirements
+	         <define>TEST_MPFR_30
+            [ check-target-builds ../config//has_mpfr : : <build>no ]
+           : mp_number_concept_check_mpfr_30 ;
+
+   run mp_number_concept_check.cpp  gmp
+           : # command line
+           : # input files
+           : # requirements
+	         <define>TEST_MPF_50
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+           : mp_number_concept_check_mpf50 ;
+
+   run mp_number_concept_check.cpp
+           : # command line
+           : # input files
+           : # requirements
+	         <define>TEST_CPP_FLOAT
+           : mp_number_concept_check_cpp_float ;
+
+   run mp_number_concept_check.cpp
+           : # command line
+           : # input files
+           : # requirements
+	         <define>TEST_BACKEND
+           : mp_number_concept_check_backend_concept ;
+
 }

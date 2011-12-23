@@ -10,7 +10,9 @@
 #include <boost/detail/lightweight_test.hpp>
 #include <boost/math/special_functions/pow.hpp>
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ) && !defined(TEST_TOMMATH)
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && \
+   !defined(TEST_CPP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ) \
+   && !defined(TEST_TOMMATH) && !defined(TEST_TOMMATH_BOOST_RATIONAL) && !defined(TEST_MPZ_BOOST_RATIONAL)
 #  define TEST_MPF_50
 #  define TEST_MPF
 #  define TEST_BACKEND
@@ -30,7 +32,7 @@
 
 #endif
 
-#if defined(TEST_MPF_50) || defined(TEST_MPF) || defined(TEST_MPZ) || defined(TEST_MPQ)
+#if defined(TEST_MPF_50) || defined(TEST_MPF) || defined(TEST_MPZ) || defined(TEST_MPQ) || defined(TEST_MPZ_BOOST_RATIONAL)
 #include <boost/multiprecision/gmp.hpp>
 #endif
 #ifdef TEST_BACKEND
@@ -42,8 +44,27 @@
 #if defined(TEST_MPFR) || defined(TEST_MPFR_50)
 #include <boost/multiprecision/mpfr.hpp>
 #endif
-#ifdef TEST_TOMMATH
+#if defined(TEST_TOMMATH) || defined(TEST_TOMMATH_BOOST_RATIONAL)
 #include <boost/multiprecision/tommath.hpp>
+#endif
+#if defined(TEST_TOMMATH_BOOST_RATIONAL) || defined(TEST_MPZ_BOOST_RATIONAL)
+#include <boost/rational.hpp>
+
+#define NO_MIXED_OPS
+
+namespace boost{ namespace multiprecision{
+
+#ifdef TEST_TOMMATH_BOOST_RATIONAL
+template<>
+struct number_category<rational<mp_int> > : public mpl::int_<number_kind_rational> {};
+#endif
+#ifdef TEST_MPZ_BOOST_RATIONAL
+template<>
+struct number_category<rational<mpz_int> > : public mpl::int_<number_kind_rational> {};
+#endif
+
+}}
+
 #endif
 
 #define BOOST_TEST_THROW(x, EX)\
@@ -637,7 +658,9 @@ void test()
    BOOST_TEST(ac == 64 * 2);
    ac = a;
    ac = b - ac * a;
+#ifndef NO_MIXED_OPS
    BOOST_TEST(ac == 0);
+#endif
    ac = a;
    ac = b * (ac + a);
    BOOST_TEST(ac == 64 * (16));
@@ -655,7 +678,9 @@ void test()
    BOOST_TEST(ac == 8 - 64);
    ac = a;
    ac = a - ac;
+#ifndef NO_MIXED_OPS
    BOOST_TEST(ac == 0);
+#endif
    ac = a;
    ac += a + b;
    BOOST_TEST(ac == 80);
@@ -681,7 +706,9 @@ void test()
    BOOST_TEST(ac == 16);
    ac = a;
    ac += -a;
+#ifndef NO_MIXED_OPS
    BOOST_TEST(ac == 0);
+#endif
    ac = a;
    ac += b - a;
    BOOST_TEST(ac == 8 + 64-8);
@@ -691,7 +718,9 @@ void test()
    ac = a;
    ac = a;
    ac -= +a;
+#ifndef NO_MIXED_OPS
    BOOST_TEST(ac == 0);
+#endif
    ac = a;
    ac -= -a;
    BOOST_TEST(ac == 16);
@@ -805,6 +834,7 @@ void test()
    BOOST_TEST((72 < b+a) == false);
    BOOST_TEST((72 >= b+a) == true);
    BOOST_TEST((72 > b+a) == false);
+#ifndef NO_MIXED_OPS
    //
    // Test sign and zero functions, plus use in boolian context:
    //
@@ -817,6 +847,8 @@ void test()
    a = 0;
    BOOST_TEST(a.sign() == 0);
    BOOST_TEST(a.is_zero());
+#endif
+   a = 0;
    if(a)
    {
       BOOST_ERROR("Unexpected non-zero result");
@@ -880,11 +912,6 @@ int main()
 #endif
 #ifdef TEST_MPF
    boost::multiprecision::mpf_float::default_precision(1000);
-   /*
-   boost::multiprecision::mpf_float r;
-   r.precision(50);
-   BOOST_TEST(r.precision() >= 50);
-   */
    BOOST_TEST(boost::multiprecision::mpf_float::default_precision() == 1000);
    test<boost::multiprecision::mpf_float>();
 #endif
@@ -905,6 +932,12 @@ int main()
 #endif
 #ifdef TEST_TOMMATH
    test<boost::multiprecision::mp_int>();
+#endif
+#ifdef TEST_TOMMATH_BOOST_RATIONAL
+   test<boost::rational<boost::multiprecision::mp_int> >();
+#endif
+#ifdef TEST_MPZ_BOOST_RATIONAL
+   test<boost::rational<boost::multiprecision::mpz_int> >();
 #endif
    return boost::report_errors();
 }

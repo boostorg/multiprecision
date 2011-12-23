@@ -1571,6 +1571,46 @@ inline void swap(mp_number<Backend>& a, mp_number<Backend>& b)
    a.swap(b);
 }
 
-}} // namespaces
+}  // namespace multipreciion
+
+template <class T>
+class rational;
+
+template <class Backend>
+inline std::istream& operator >> (std::istream& is, rational<multiprecision::mp_number<Backend> >& r)
+{
+   std::string s1;
+   multiprecision::mp_number<Backend> v1, v2;
+   char c;
+   bool have_hex = false;
+
+   while((EOF != (c = is.peek())) && (c == 'x' || c == 'X' || c == '-' || c == '+' || (c >= '0' && c <= '9') || (have_hex && (c >= 'a' && c <= 'f')) || (have_hex && (c >= 'A' && c <= 'F'))))
+   {
+      if(c == 'x' || c == 'X')
+         have_hex = true;
+      s1.append(1, c);
+      is.get();
+   }
+   v1 = s1;
+   s1.erase();
+   if(c == '/')
+   {
+      is.get();
+      while((EOF != (c = is.peek())) && (c == 'x' || c == 'X' || c == '-' || c == '+' || (c >= '0' && c <= '9') || (have_hex && (c >= 'a' && c <= 'f')) || (have_hex && (c >= 'A' && c <= 'F'))))
+      {
+         if(c == 'x' || c == 'X')
+            have_hex = true;
+         s1.append(1, c);
+         is.get();
+      }
+      v2 = s1;
+   }
+   else
+      v2 = 1;
+   r.assign(v1, v2);
+   return is;
+}
+
+} // namespaces
 
 #endif
