@@ -258,11 +258,15 @@ inline void modulus(tommath_int& t, const tommath_int& o)
    bool neg = get_sign(t) < 0;
    bool neg2 = get_sign(o) < 0;
    detail::check_tommath_result(mp_mod(&t.data(), const_cast< ::mp_int*>(&o.data()), &t.data()));
-   if(neg != neg2)
+   if((neg != neg2) && (get_sign(t) != 0))
    {
       t.negate();
       detail::check_tommath_result(mp_add(&t.data(), const_cast< ::mp_int*>(&o.data()), &t.data()));
       t.negate();
+   }
+   else if(neg && (t.compare(o) == 0))
+   {
+      mp_zero(&t.data());
    }
 }
 template <class UI>
@@ -331,11 +335,15 @@ inline void modulus(tommath_int& t, const tommath_int& p, const tommath_int& o)
    bool neg = get_sign(p) < 0;
    bool neg2 = get_sign(o) < 0;
    detail::check_tommath_result(mp_mod(const_cast< ::mp_int*>(&p.data()), const_cast< ::mp_int*>(&o.data()), &t.data()));
-   if(neg != neg2)
+   if((neg != neg2) && (get_sign(t) != 0))
    {
       t.negate();
       detail::check_tommath_result(mp_add(&t.data(), const_cast< ::mp_int*>(&o.data()), &t.data()));
       t.negate();
+   }
+   else if(neg  && (t.compare(o) == 0))
+   {
+      mp_zero(&t.data());
    }
 }
 

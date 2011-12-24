@@ -34,6 +34,7 @@
 
 #if defined(TEST_MPF_50) || defined(TEST_MPF) || defined(TEST_MPZ) || defined(TEST_MPQ) || defined(TEST_MPZ_BOOST_RATIONAL)
 #include <boost/multiprecision/gmp.hpp>
+#include <boost/multiprecision/rational_adapter.hpp>
 #endif
 #ifdef TEST_BACKEND
 #include <boost/multiprecision/concepts/mp_number_architypes.hpp>
@@ -46,6 +47,7 @@
 #endif
 #if defined(TEST_TOMMATH) || defined(TEST_TOMMATH_BOOST_RATIONAL)
 #include <boost/multiprecision/tommath.hpp>
+#include <boost/multiprecision/rational_adapter.hpp>
 #endif
 #if defined(TEST_TOMMATH_BOOST_RATIONAL) || defined(TEST_MPZ_BOOST_RATIONAL)
 #include <boost/rational.hpp>
@@ -133,7 +135,7 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
 {
    Real a(20);
    Real b(7);
-   Real c;
+   Real c(5);
    BOOST_TEST(a % b == 20 % 7);
    BOOST_TEST(a % 7 == 20 % 7);
    BOOST_TEST(a % 7u == 20 % 7);
@@ -144,6 +146,14 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    BOOST_TEST(-a % -7 == -20 % -7);
    BOOST_TEST(a % -7 == 20 % -7);
    BOOST_TEST(-a % 7u == -20 % 7);
+   BOOST_TEST(-a % a == 0);
+   BOOST_TEST(a % a == 0);
+   BOOST_TEST(-a % c == 0);
+   BOOST_TEST(a % c == 0);
+   BOOST_TEST(-a % 5 == 0);
+   BOOST_TEST(a % 5 == 0);
+   BOOST_TEST(-a % -5 == 0);
+   BOOST_TEST(a % -5 == 0);
 
    b = -b;
    BOOST_TEST(a % b == 20 % -7);
@@ -658,9 +668,7 @@ void test()
    BOOST_TEST(ac == 64 * 2);
    ac = a;
    ac = b - ac * a;
-#ifndef NO_MIXED_OPS
    BOOST_TEST(ac == 0);
-#endif
    ac = a;
    ac = b * (ac + a);
    BOOST_TEST(ac == 64 * (16));
@@ -678,9 +686,7 @@ void test()
    BOOST_TEST(ac == 8 - 64);
    ac = a;
    ac = a - ac;
-#ifndef NO_MIXED_OPS
    BOOST_TEST(ac == 0);
-#endif
    ac = a;
    ac += a + b;
    BOOST_TEST(ac == 80);
@@ -706,9 +712,7 @@ void test()
    BOOST_TEST(ac == 16);
    ac = a;
    ac += -a;
-#ifndef NO_MIXED_OPS
    BOOST_TEST(ac == 0);
-#endif
    ac = a;
    ac += b - a;
    BOOST_TEST(ac == 8 + 64-8);
@@ -718,9 +722,7 @@ void test()
    ac = a;
    ac = a;
    ac -= +a;
-#ifndef NO_MIXED_OPS
    BOOST_TEST(ac == 0);
-#endif
    ac = a;
    ac -= -a;
    BOOST_TEST(ac == 16);
@@ -917,6 +919,7 @@ int main()
 #endif
 #ifdef TEST_MPZ
    test<boost::multiprecision::mpz_int>();
+   test<boost::multiprecision::mp_number<boost::multiprecision::rational_adapter<boost::multiprecision::gmp_int> > >();
 #endif
 #ifdef TEST_MPQ
    test<boost::multiprecision::mpq_rational>();
@@ -932,6 +935,7 @@ int main()
 #endif
 #ifdef TEST_TOMMATH
    test<boost::multiprecision::mp_int>();
+   test<boost::multiprecision::mp_number<boost::multiprecision::rational_adapter<boost::multiprecision::tommath_int> > >();
 #endif
 #ifdef TEST_TOMMATH_BOOST_RATIONAL
    test<boost::rational<boost::multiprecision::mp_int> >();

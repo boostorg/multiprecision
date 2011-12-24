@@ -1611,6 +1611,30 @@ inline std::istream& operator >> (std::istream& is, rational<multiprecision::mp_
    return is;
 }
 
+template <class T, class Arithmetic>
+typename enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator == (const rational<multiprecision::mp_number<T> >& a, const Arithmetic& b)
+{
+   return a == multiprecision::mp_number<T>(b);
+}
+
+template <class T, class Arithmetic>
+typename enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator == (const Arithmetic& b, const rational<multiprecision::mp_number<T> >& a)
+{
+   return a == multiprecision::mp_number<T>(b);
+}
+
+template <class T, class Arithmetic>
+typename enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator != (const rational<multiprecision::mp_number<T> >& a, const Arithmetic& b)
+{
+   return a != multiprecision::mp_number<T>(b);
+}
+
+template <class T, class Arithmetic>
+typename enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator != (const Arithmetic& b, const rational<multiprecision::mp_number<T> >& a)
+{
+   return a != multiprecision::mp_number<T>(b);
+}
+
 } // namespaces
 
 #endif

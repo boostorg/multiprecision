@@ -42,14 +42,14 @@ T generate_random()
 {
    static boost::random::uniform_int_distribution<unsigned> ui(0, 20);
    static boost::random::mt19937 gen;
-   T val = gen();
+   T val = T(gen());
    unsigned lim = ui(gen);
    for(unsigned i = 0; i < lim; ++i)
    {
       val *= (gen.max)();
       val += gen();
    }
-   T denom = gen();
+   T denom = T(gen());
    lim = ui(gen);
    for(unsigned i = 0; i < lim; ++i)
    {
@@ -76,7 +76,7 @@ template <class T>
 void do_round_trip(const T& val, std::ios_base::fmtflags f, const boost::mpl::false_&)
 {
    std::stringstream ss;
-   ss << std::setprecision(std::numeric_limits<T>::max_digits10);
+   ss << std::setprecision(std::numeric_limits<T>::digits10 + 4);
    ss.flags(f);
    ss << val;
    T new_val;

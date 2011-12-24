@@ -1114,7 +1114,7 @@ inline void modulus(gmp_int& t, const gmp_int& o)
    bool neg = mpz_sgn(t.data()) < 0;
    bool neg2 = mpz_sgn(o.data()) < 0;
    mpz_mod(t.data(), t.data(), o.data());
-   if(neg)
+   if(neg && mpz_sgn(t.data()) != 0)
    {
       if(!neg2)
          t.negate();
@@ -1139,7 +1139,7 @@ inline void modulus(gmp_int& t, unsigned long i)
 {
    bool neg = mpz_sgn(t.data()) < 0;
    mpz_mod_ui(t.data(), t.data(), i);
-   if(neg)
+   if(neg && mpz_sgn(t.data()) != 0)
    {
       t.negate();
       mpz_add_ui(t.data(), t.data(), i);
@@ -1175,7 +1175,7 @@ inline void modulus(gmp_int& t, long i)
    bool neg = mpz_sgn(t.data()) < 0;
    bool neg2 = i < 0;
    mpz_mod_ui(t.data(), t.data(), std::abs(i));
-   if(neg)
+   if(neg && mpz_sgn(t.data()) != 0)
    {
       if(!neg2)
       {
@@ -1252,7 +1252,7 @@ inline void modulus(gmp_int& t, const gmp_int& p, const gmp_int& o)
    bool neg = mpz_sgn(p.data()) < 0;
    bool neg2 = mpz_sgn(o.data()) < 0;
    mpz_mod(t.data(), p.data(), o.data());
-   if(neg)
+   if(neg && mpz_sgn(t.data()) != 0)
    {
       if(!neg2)
          t.negate();
@@ -1277,7 +1277,7 @@ inline void modulus(gmp_int& t, const gmp_int& p, unsigned long i)
 {
    bool neg = mpz_sgn(p.data()) < 0;
    mpz_mod_ui(t.data(), p.data(), i);
-   if(neg)
+   if(neg && mpz_sgn(t.data()) != 0)
    {
       t.negate();
       mpz_add_ui(t.data(), t.data(), i);
@@ -1313,7 +1313,7 @@ inline void modulus(gmp_int& t, const gmp_int& p, long i)
    bool neg = mpz_sgn(p.data()) < 0;
    bool neg2 = i < 0;
    mpz_mod_ui(t.data(), p.data(), std::abs(i));
-   if(neg)
+   if(neg && mpz_sgn(t.data()) != 0)
    {
       if(!neg2)
       {
