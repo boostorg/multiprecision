@@ -50,7 +50,35 @@ struct rational_adapter
    }
    rational_adapter& operator = (const char* s)
    {
-      m_value = s;
+      std::string s1;
+      multiprecision::mp_number<IntBackend> v1, v2;
+      char c;
+      bool have_hex = false;
+
+      while((0 != (c = *s)) && (c == 'x' || c == 'X' || c == '-' || c == '+' || (c >= '0' && c <= '9') || (have_hex && (c >= 'a' && c <= 'f')) || (have_hex && (c >= 'A' && c <= 'F'))))
+      {
+         if(c == 'x' || c == 'X')
+            have_hex = true;
+         s1.append(1, c);
+         ++s;
+      }
+      v1 = s1;
+      s1.erase();
+      if(c == '/')
+      {
+         ++s;
+         while((0 != (c = *s)) && (c == 'x' || c == 'X' || c == '-' || c == '+' || (c >= '0' && c <= '9') || (have_hex && (c >= 'a' && c <= 'f')) || (have_hex && (c >= 'A' && c <= 'F'))))
+         {
+            if(c == 'x' || c == 'X')
+               have_hex = true;
+            s1.append(1, c);
+            ++s;
+         }
+         v2 = s1;
+      }
+      else
+         v2 = 1;
+      data().assign(v1, v2);
       return *this;
    }
    void swap(rational_adapter& o)
@@ -65,7 +93,7 @@ struct rational_adapter
       std::string result = data().numerator().str(digits, f);
       if(data().denominator() != 1)
       {
-         result.append(1, ',');
+         result.append(1, '/');
          result.append(data().denominator().str(digits, f));
       }
       return result;
