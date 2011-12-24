@@ -156,6 +156,16 @@ inline int get_sign(const rational_adapter<IntBackend>& val)
    return get_sign(val.data().numerator().backend());
 }
 
+template <class IntBackend>
+inline mp_number<IntBackend> numerator(const mp_number<rational_adapter<IntBackend> >& val)
+{
+   return val.backend().data().numerator();
+}
+template <class IntBackend>
+inline mp_number<IntBackend> denominator(const mp_number<rational_adapter<IntBackend> >& val)
+{
+   return val.backend().data().denominator();
+}
 
 template<class IntBackend>
 struct number_category<rational_adapter<IntBackend> > : public mpl::int_<number_kind_rational>{};

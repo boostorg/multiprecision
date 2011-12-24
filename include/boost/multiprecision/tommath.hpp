@@ -7,6 +7,7 @@
 #define BOOST_MATH_MP_TOMMATH_BACKEND_HPP
 
 #include <boost/multiprecision/mp_number.hpp>
+#include <boost/multiprecision/rational_adapter.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>
@@ -431,7 +432,9 @@ inline void eval_abs(tommath_int& result, const tommath_int& val)
 template<>
 struct number_category<tommath_int> : public mpl::int_<number_kind_integer>{};
 
-typedef mp_number<tommath_int >         mp_int;
+typedef mp_number<tommath_int >                     mp_int;
+typedef rational_adapter<tommath_int>               tommath_rational;
+typedef mp_number<tommath_rational>                 mp_rational;
 
 }}  // namespaces
 

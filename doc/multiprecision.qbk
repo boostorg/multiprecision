@@ -384,6 +384,9 @@ The following backends provide rational number arithmetic:
 [table
 [[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
 [[`gmp_rational`][boost/multiprecision/gmp.hpp][2][GMP][Very fast and efficient backend.][Dependency on GNU licenced GMP library.]]
+[[`tommath_rational`][boost/multiprecision/tommath.hpp][2][libtommath][All C/C++ implementation that's Boost Software Licence compatible.][Slower than GMP.]]
+[[`rational_adapter`][boost/multiprecision/rational_adapter.hpp][N/A][none][All C++ adapter that allows any inetger backend type to be used as a rational type.][Requires an underlying integer backend type.]]
+[[`boost::rational`][boost/rational.hpp][N/A][None][A C++ rational number type that can used with any `mp_number` integer type.][The expression templates used by `mp_number` end up being "hidden" inside `boost::rational`: performance may well suffer as a result.]]
 ]
 
 [h4 gmp_rational]
@@ -417,6 +420,62 @@ It's also possible to access the underlying `mpq_t` via the `data()` member func
 [h5 Example:]
 
 [mpq_eg]
+
+[h4 tommath_rational]
+
+   namespace boost{ namespace multiprecision{
+
+   typedef rational_adpater<tommath_int>        tommath_rational;
+   typedef mp_number<tommath_rational >         mp_rational;
+
+   }} // namespaces
+
+The `tommath_rational` backend is used via the typedef `boost::multiprecision::mp_rational`.  It acts as a thin wrapper around 
+`boost::rational<mp_int>`
+to provide a rational number type that is a drop-in replacement for the native C++ number types, but with unlimited precision.
+
+The advantage of using this type rather than `boost::rational<mp_int>` directly, is that it is expression-template enabled,
+greatly reducing the number of temporaries created in complex expressions.
+
+There are also non-member functions:
+
+   mp_int numerator(const mp_rational&);
+   mp_int denominator(const mp_rational&);
+
+which return the numerator and denominator of the number.
+
+[h5 Example:]
+
+[mp_rat_eg]
+
+[h4 Use With Boost.Rational]
+
+All of the inetger types in this library can be used as template arguments to `boost::rational<IntType>`.
+
+Note that using the library in this way largely negates the effect of the expression templates in `mp_number`.
+
+[h4 rational_adapter]
+
+   namespace boost{ namespace multiprecision{
+
+   template <class IntBackend> 
+   class rational_adpater;
+
+   }}
+
+The class template `rational_adapter` is a backend for `mp_number` which converts any existing integer backend
+into a rational-number backend.
+
+So for example, given an integer backend type `MyIntegerBackend`, the use would be something like:
+
+   typedef mp_number<MyIntegerBackend>                    MyInt;
+   typedef mp_number<rational_adapter<MyIntegerBackend> > MyRational;
+
+   MyRational r = 2;
+   r /= 3;
+   MyInt i = numerator(r);
+   assert(i == 2);
+
 
 [endsect]
 

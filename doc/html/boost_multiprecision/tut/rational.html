@@ -10,8 +10,6 @@
 <link rel="next" href="../ref.html" title="Reference">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
-<table cellpadding="2" width="100%"><tr><td valign="top"></td></tr></table>
-<hr>
 <div class="spirit-nav">
 <a accesskey="p" href="reals.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../tut.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../ref.html"><img src="../../images/next.png" alt="Next"></a>
 </div>
@@ -63,7 +61,8 @@
                 </p>
               </th>
 </tr></thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>
                 <p>
                   <code class="computeroutput"><span class="identifier">gmp_rational</span></code>
@@ -94,7 +93,107 @@
                   Dependency on GNU licenced GMP library.
                 </p>
               </td>
-</tr></tbody>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">tommath_rational</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  boost/multiprecision/tommath.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  2
+                </p>
+              </td>
+<td>
+                <p>
+                  libtommath
+                </p>
+              </td>
+<td>
+                <p>
+                  All C/C++ implementation that's Boost Software Licence compatible.
+                </p>
+              </td>
+<td>
+                <p>
+                  Slower than GMP.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">rational_adapter</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  boost/multiprecision/rational_adapter.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  N/A
+                </p>
+              </td>
+<td>
+                <p>
+                  none
+                </p>
+              </td>
+<td>
+                <p>
+                  All C++ adapter that allows any inetger backend type to be used
+                  as a rational type.
+                </p>
+              </td>
+<td>
+                <p>
+                  Requires an underlying integer backend type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">rational</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  boost/rational.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  N/A
+                </p>
+              </td>
+<td>
+                <p>
+                  None
+                </p>
+              </td>
+<td>
+                <p>
+                  A C++ rational number type that can used with any <code class="computeroutput"><span class="identifier">mp_number</span></code> integer type.
+                </p>
+              </td>
+<td>
+                <p>
+                  The expression templates used by <code class="computeroutput"><span class="identifier">mp_number</span></code>
+                  end up being "hidden" inside <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">rational</span></code>:
+                  performance may well suffer as a result.
+                </p>
+              </td>
+</tr>
+</tbody>
 </table></div>
 <h5>
 <a name="boost_multiprecision.tut.rational.h0"></a>
@@ -171,6 +270,102 @@
 </pre>
 <p>
       </p>
+<h5>
+<a name="boost_multiprecision.tut.rational.h2"></a>
+        <span><a name="boost_multiprecision.tut.rational.tommath_rational"></a></span><a class="link" href="rational.html#boost_multiprecision.tut.rational.tommath_rational">tommath_rational</a>
+      </h5>
+<pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">multiprecision</span><span class="special">{</span>
+
+<span class="keyword">typedef</span> <span class="identifier">rational_adpater</span><span class="special">&lt;</span><span class="identifier">tommath_int</span><span class="special">&gt;</span>        <span class="identifier">tommath_rational</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">tommath_rational</span> <span class="special">&gt;</span>         <span class="identifier">mp_rational</span><span class="special">;</span>
+
+<span class="special">}}</span> <span class="comment">// namespaces</span>
+</pre>
+<p>
+        The <code class="computeroutput"><span class="identifier">tommath_rational</span></code> backend
+        is used via the typedef <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">mp_rational</span></code>.
+        It acts as a thin wrapper around <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">rational</span><span class="special">&lt;</span><span class="identifier">mp_int</span><span class="special">&gt;</span></code> to provide a rational number type that
+        is a drop-in replacement for the native C++ number types, but with unlimited
+        precision.
+      </p>
+<p>
+        The advantage of using this type rather than <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">rational</span><span class="special">&lt;</span><span class="identifier">mp_int</span><span class="special">&gt;</span></code> directly, is that it is expression-template
+        enabled, greatly reducing the number of temporaries created in complex expressions.
+      </p>
+<p>
+        There are also non-member functions:
+      </p>
+<pre class="programlisting"><span class="identifier">mp_int</span> <span class="identifier">numerator</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">mp_rational</span><span class="special">&amp;);</span>
+<span class="identifier">mp_int</span> <span class="identifier">denominator</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">mp_rational</span><span class="special">&amp;);</span>
+</pre>
+<p>
+        which return the numerator and denominator of the number.
+      </p>
+<h6>
+<a name="boost_multiprecision.tut.rational.h3"></a>
+        <span><a name="boost_multiprecision.tut.rational.example0"></a></span><a class="link" href="rational.html#boost_multiprecision.tut.rational.example0">Example:</a>
+      </h6>
+<p>
+</p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">tommath</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+
+<span class="keyword">using</span> <span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">;</span>
+
+<span class="identifier">mp_rational</span> <span class="identifier">v</span> <span class="special">=</span> <span class="number">1</span><span class="special">;</span>
+
+<span class="comment">// Do some arithmetic:</span>
+<span class="keyword">for</span><span class="special">(</span><span class="keyword">unsigned</span> <span class="identifier">i</span> <span class="special">=</span> <span class="number">1</span><span class="special">;</span> <span class="identifier">i</span> <span class="special">&lt;=</span> <span class="number">1000</span><span class="special">;</span> <span class="special">++</span><span class="identifier">i</span><span class="special">)</span>
+   <span class="identifier">v</span> <span class="special">*=</span> <span class="identifier">i</span><span class="special">;</span>
+<span class="identifier">v</span> <span class="special">/=</span> <span class="number">10</span><span class="special">;</span>
+
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">v</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span> <span class="comment">// prints 1000! / 10</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">numerator</span><span class="special">(</span><span class="identifier">v</span><span class="special">)</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">denominator</span><span class="special">(</span><span class="identifier">v</span><span class="special">)</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+
+</pre>
+<p>
+      </p>
+<h5>
+<a name="boost_multiprecision.tut.rational.h4"></a>
+        <span><a name="boost_multiprecision.tut.rational.use_with_boost_rational"></a></span><a class="link" href="rational.html#boost_multiprecision.tut.rational.use_with_boost_rational">Use With
+        Boost.Rational</a>
+      </h5>
+<p>
+        All of the inetger types in this library can be used as template arguments
+        to <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">rational</span><span class="special">&lt;</span><span class="identifier">IntType</span><span class="special">&gt;</span></code>.
+      </p>
+<p>
+        Note that using the library in this way largely negates the effect of the
+        expression templates in <code class="computeroutput"><span class="identifier">mp_number</span></code>.
+      </p>
+<h5>
+<a name="boost_multiprecision.tut.rational.h5"></a>
+        <span><a name="boost_multiprecision.tut.rational.rational_adapter"></a></span><a class="link" href="rational.html#boost_multiprecision.tut.rational.rational_adapter">rational_adapter</a>
+      </h5>
+<pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">multiprecision</span><span class="special">{</span>
+
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">IntBackend</span><span class="special">&gt;</span>
+<span class="keyword">class</span> <span class="identifier">rational_adpater</span><span class="special">;</span>
+
+<span class="special">}}</span>
+</pre>
+<p>
+        The class template <code class="computeroutput"><span class="identifier">rational_adapter</span></code>
+        is a backend for <code class="computeroutput"><span class="identifier">mp_number</span></code>
+        which converts any existing integer backend into a rational-number backend.
+      </p>
+<p>
+        So for example, given an integer backend type <code class="computeroutput"><span class="identifier">MyIntegerBackend</span></code>,
+        the use would be something like:
+      </p>
+<pre class="programlisting"><span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">MyIntegerBackend</span><span class="special">&gt;</span>                    <span class="identifier">MyInt</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">rational_adapter</span><span class="special">&lt;</span><span class="identifier">MyIntegerBackend</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">MyRational</span><span class="special">;</span>
+
+<span class="identifier">MyRational</span> <span class="identifier">r</span> <span class="special">=</span> <span class="number">2</span><span class="special">;</span>
+<span class="identifier">r</span> <span class="special">/=</span> <span class="number">3</span><span class="special">;</span>
+<span class="identifier">MyInt</span> <span class="identifier">i</span> <span class="special">=</span> <span class="identifier">numerator</span><span class="special">(</span><span class="identifier">r</span><span class="special">);</span>
+<span class="identifier">assert</span><span class="special">(</span><span class="identifier">i</span> <span class="special">==</span> <span class="number">2</span><span class="special">);</span>
+</pre>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>

@@ -131,6 +131,18 @@ template <class Real, class T>
 void test_integer_ops(const T&){}
 
 template <class Real>
+void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_rational>&)
+{
+   Real a(2);
+   a /= 3;
+   BOOST_TEST(numerator(a) == 2);
+   BOOST_TEST(denominator(a) == 3);
+   Real b(4);
+   b /= 6;
+   BOOST_TEST(a == b);
+}
+
+template <class Real>
 void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_integer>&)
 {
    Real a(20);

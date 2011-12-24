@@ -127,7 +127,7 @@ int main()
 #endif
 #ifdef TEST_TOMMATH
    test_round_trip<boost::rational<boost::multiprecision::mp_int> >();
-   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::rational_adapter<boost::multiprecision::tommath_int> > >();
+   test_round_trip<boost::multiprecision::mp_rational >();
 #endif
    return boost::report_errors();
 }
