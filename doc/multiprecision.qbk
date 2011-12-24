@@ -1027,8 +1027,6 @@ More a list of what ['could] be done, rather than what ['should] be done (which 
 
 * Add backend support for libdecNumber.
 * Add an adapter backend for complex number types.
-* Add an adapter backend for rational types.
-* Test integer types with Boost.Rational.
 * Adapt libtommath code to make an all C++ fixed precision integer type.
 
 [endsect]
