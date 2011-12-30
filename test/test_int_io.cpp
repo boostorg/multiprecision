@@ -9,9 +9,11 @@
 #  define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#if !defined(TEST_MPZ) && !defined(TEST_TOMMATH)
+#if !defined(TEST_MPZ) && !defined(TEST_TOMMATH) && !defined(TEST_PACKED_INT1) && !defined(TEST_PACKED_INT2)
 #  define TEST_TOMMATH
 #  define TEST_MPZ
+#  define TEST_PACKED_INT1
+#  define TEST_PACKED_INT2
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -27,6 +29,9 @@
 #endif
 #if defined(TEST_TOMMATH)
 #include <boost/multiprecision/tommath.hpp>
+#endif
+#if defined(TEST_PACKED_INT1) || defined(TEST_PACKED_INT2)
+#include <boost/multiprecision/packed_cpp_int.hpp>
 #endif
 
 #include <boost/algorithm/string/case_conv.hpp>
@@ -82,12 +87,16 @@ void test_round_trip()
    {
       T val = generate_random<T>();
       do_round_trip(val);
-      do_round_trip(T(-val));
+      if(std::numeric_limits<T>::is_signed)
+         do_round_trip(T(-val));
    }
 
    BOOST_CHECK_EQUAL(T(1002).str(), "1002");
    BOOST_CHECK_EQUAL(T(1002).str(0, std::ios_base::showpos), "+1002");
-   BOOST_CHECK_EQUAL(T(-1002).str(), "-1002");
+   if(std::numeric_limits<T>::is_signed)
+   {
+      BOOST_CHECK_EQUAL(T(-1002).str(), "-1002");
+   }
    BOOST_CHECK_EQUAL(T(1002).str(0, std::ios_base::oct), "1752");
    BOOST_CHECK_EQUAL(T(1002).str(0, std::ios_base::oct|std::ios_base::showbase), "01752");
    BOOST_CHECK_EQUAL(boost::to_lower_copy(T(1002).str(0, std::ios_base::hex)), "3ea");
@@ -95,8 +104,11 @@ void test_round_trip()
    BOOST_CHECK_EQUAL(T(1002).str(0, std::ios_base::dec), "1002");
    BOOST_CHECK_EQUAL(T(1002).str(0, std::ios_base::dec|std::ios_base::showbase), "1002");
 
-   BOOST_CHECK_THROW(T(-2).str(0, std::ios_base::oct), std::runtime_error);
-   BOOST_CHECK_THROW(T(-2).str(0, std::ios_base::hex), std::runtime_error);
+   if(std::numeric_limits<T>::is_signed && !std::numeric_limits<T>::is_modulo)
+   {
+      BOOST_CHECK_THROW(T(-2).str(0, std::ios_base::oct), std::runtime_error);
+      BOOST_CHECK_THROW(T(-2).str(0, std::ios_base::hex), std::runtime_error);
+   }
 }
 
 int main()
@@ -106,6 +118,20 @@ int main()
 #endif
 #ifdef TEST_TOMMATH
    test_round_trip<boost::multiprecision::mp_int>();
+#endif
+#ifdef TEST_PACKED_INT1
+   test_round_trip<boost::multiprecision::mp_uint64_t>();
+   test_round_trip<boost::multiprecision::mp_uint128_t>();
+   test_round_trip<boost::multiprecision::mp_uint512_t>();
+   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::packed_cpp_int<20, false> > >();
+   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::packed_cpp_int<70, false> > >();
+#endif
+#ifdef TEST_PACKED_INT2
+   test_round_trip<boost::multiprecision::mp_int64_t>();
+   test_round_trip<boost::multiprecision::mp_int128_t>();
+   test_round_trip<boost::multiprecision::mp_int512_t>();
+   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::packed_cpp_int<20, true> > >();
+   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::packed_cpp_int<70, true> > >();
 #endif
    return boost::report_errors();
 }

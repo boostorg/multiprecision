@@ -128,6 +128,20 @@ run test_arithmetic.cpp $(TOMMATH)
          [ check-target-builds ../config//has_tommath : : <build>no ]
         : test_arithmetic_tommath_br ;
 
+run test_arithmetic.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_PACKED_INT1
+        : test_arithmetic_packed_int1 ;
+
+run test_arithmetic.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_PACKED_INT2
+        : test_arithmetic_packed_int2 ;
+
 run test_numeric_limits.cpp
         : # command line
         : # input files
@@ -566,6 +580,20 @@ run test_int_io.cpp gmp
 	      <define>TEST_MPZ
          [ check-target-builds ../config//has_gmp : : <build>no ]
         : test_int_io_mpz ;
+
+run test_int_io.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_PACKED_INT1
+        : test_int_io_packed_int1 ;
+
+run test_int_io.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_PACKED_INT2
+        : test_int_io_packed_int2 ;
 
 run test_rational_io.cpp $(TOMMATH)
         : # command line

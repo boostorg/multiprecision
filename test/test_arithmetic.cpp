@@ -12,7 +12,8 @@
 
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && \
    !defined(TEST_CPP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ) \
-   && !defined(TEST_TOMMATH) && !defined(TEST_TOMMATH_BOOST_RATIONAL) && !defined(TEST_MPZ_BOOST_RATIONAL)
+   && !defined(TEST_TOMMATH) && !defined(TEST_TOMMATH_BOOST_RATIONAL) && !defined(TEST_MPZ_BOOST_RATIONAL)\
+   && !defined(TEST_PACKED_INT1) && !defined(TEST_PACKED_INT2)
 #  define TEST_MPF_50
 #  define TEST_MPF
 #  define TEST_BACKEND
@@ -22,6 +23,8 @@
 #  define TEST_CPP_FLOAT
 #  define TEST_MPQ
 #  define TEST_TOMMATH
+#  define TEST_PACKED_INT1
+#  define TEST_PACKED_INT2
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -48,6 +51,9 @@
 #if defined(TEST_TOMMATH) || defined(TEST_TOMMATH_BOOST_RATIONAL)
 #include <boost/multiprecision/tommath.hpp>
 #include <boost/multiprecision/rational_adapter.hpp>
+#endif
+#if defined(TEST_PACKED_INT1) || defined(TEST_PACKED_INT2)
+#include <boost/multiprecision/packed_cpp_int.hpp>
 #endif
 #if defined(TEST_TOMMATH_BOOST_RATIONAL) || defined(TEST_MPZ_BOOST_RATIONAL)
 #include <boost/rational.hpp>
@@ -151,70 +157,79 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    BOOST_TEST(a % b == 20 % 7);
    BOOST_TEST(a % 7 == 20 % 7);
    BOOST_TEST(a % 7u == 20 % 7);
-   BOOST_TEST(-a % b == -20 % 7);
-   BOOST_TEST(-a % -b == -20 % -7);
-   BOOST_TEST(a % -b == 20 % -7);
-   BOOST_TEST(-a % 7 == -20 % 7);
-   BOOST_TEST(-a % -7 == -20 % -7);
-   BOOST_TEST(a % -7 == 20 % -7);
-   BOOST_TEST(-a % 7u == -20 % 7);
-   BOOST_TEST(-a % a == 0);
    BOOST_TEST(a % a == 0);
-   BOOST_TEST(-a % c == 0);
    BOOST_TEST(a % c == 0);
-   BOOST_TEST(-a % 5 == 0);
    BOOST_TEST(a % 5 == 0);
-   BOOST_TEST(-a % -5 == 0);
-   BOOST_TEST(a % -5 == 0);
+   if(std::numeric_limits<Real>::is_signed)
+   {
+      BOOST_TEST(-a % c == 0);
+      BOOST_TEST(-a % b == -20 % 7);
+      BOOST_TEST(-a % -b == -20 % -7);
+      BOOST_TEST(a % -b == 20 % -7);
+      BOOST_TEST(-a % 7 == -20 % 7);
+      BOOST_TEST(-a % -7 == -20 % -7);
+      BOOST_TEST(a % -7 == 20 % -7);
+      BOOST_TEST(-a % 7u == -20 % 7);
+      BOOST_TEST(-a % a == 0);
+      BOOST_TEST(-a % 5 == 0);
+      BOOST_TEST(-a % -5 == 0);
+      BOOST_TEST(a % -5 == 0);
 
-   b = -b;
-   BOOST_TEST(a % b == 20 % -7);
-   a = -a;
-   BOOST_TEST(a % b == -20 % -7);
-   BOOST_TEST(a % -7 == -20 % -7);
-   b = 7;
-   BOOST_TEST(a % b == -20 % 7);
-   BOOST_TEST(a % 7 == -20 % 7);
-   BOOST_TEST(a % 7u == -20 % 7);
+      b = -b;
+      BOOST_TEST(a % b == 20 % -7);
+      a = -a;
+      BOOST_TEST(a % b == -20 % -7);
+      BOOST_TEST(a % -7 == -20 % -7);
+      b = 7;
+      BOOST_TEST(a % b == -20 % 7);
+      BOOST_TEST(a % 7 == -20 % 7);
+      BOOST_TEST(a % 7u == -20 % 7);
 
-   a = 20;
-   a %= b;
-   BOOST_TEST(a == 20 % 7);
-   a = -20;
-   a %= b;
-   BOOST_TEST(a == -20 % 7);
-   a = 20;
-   a %= -b;
-   BOOST_TEST(a == 20 % -7);
-   a = -20;
-   a %= -b;
-   BOOST_TEST(a == -20 % -7);
+      a = 20;
+      a %= b;
+      BOOST_TEST(a == 20 % 7);
+      a = -20;
+      a %= b;
+      BOOST_TEST(a == -20 % 7);
+      a = 20;
+      a %= -b;
+      BOOST_TEST(a == 20 % -7);
+      a = -20;
+      a %= -b;
+      BOOST_TEST(a == -20 % -7);
+   }
 
    a = 20;
    a %= 7;
    BOOST_TEST(a == 20 % 7);
-   a = -20;
-   a %= 7;
-   BOOST_TEST(a == -20 % 7);
-   a = 20;
-   a %= -7;
-   BOOST_TEST(a == 20 % -7);
-   a = -20;
-   a %= -7;
-   BOOST_TEST(a == -20 % -7);
+   if(std::numeric_limits<Real>::is_signed)
+   {
+      a = -20;
+      a %= 7;
+      BOOST_TEST(a == -20 % 7);
+      a = 20;
+      a %= -7;
+      BOOST_TEST(a == 20 % -7);
+      a = -20;
+      a %= -7;
+      BOOST_TEST(a == -20 % -7);
+   }
 #ifndef BOOST_NO_LONG_LONG
    a = 20;
    a %= 7uLL;
    BOOST_TEST(a == 20 % 7);
-   a = -20;
-   a %= 7uLL;
-   BOOST_TEST(a == -20 % 7);
-   a = 20;
-   a %= -7LL;
-   BOOST_TEST(a == 20 % -7);
-   a = -20;
-   a %= -7LL;
-   BOOST_TEST(a == -20 % -7);
+   if(std::numeric_limits<Real>::is_signed)
+   {
+      a = -20;
+      a %= 7uLL;
+      BOOST_TEST(a == -20 % 7);
+      a = 20;
+      a %= -7LL;
+      BOOST_TEST(a == 20 % -7);
+      a = -20;
+      a %= -7LL;
+      BOOST_TEST(a == -20 % -7);
+   }
 #endif
    a = 20;
    BOOST_TEST(++a == 21);
@@ -330,14 +345,17 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    //
    // Non-member functions:
    //
-   a = -20;
-   BOOST_TEST(abs(a) == 20);
-   BOOST_TEST(abs(-a) == 20);
-   BOOST_TEST(abs(+a) == 20);
-   a = 20;
-   BOOST_TEST(abs(a) == 20);
-   BOOST_TEST(abs(-a) == 20);
-   BOOST_TEST(abs(+a) == 20);
+   if(std::numeric_limits<Real>::is_signed)
+   {
+      a = -20;
+      BOOST_TEST(abs(a) == 20);
+      BOOST_TEST(abs(-a) == 20);
+      BOOST_TEST(abs(+a) == 20);
+      a = 20;
+      BOOST_TEST(abs(a) == 20);
+      BOOST_TEST(abs(-a) == 20);
+      BOOST_TEST(abs(+a) == 20);
+   }
 }
 
 template <class Real, class T>
@@ -410,6 +428,8 @@ struct lexical_cast_target_type
 template <class Real, class Num>
 void test_negative_mixed(boost::mpl::true_ const&)
 {
+   if(std::numeric_limits<Real>::is_specialized && !std::numeric_limits<Real>::is_signed)
+      return;
    typedef typename lexical_cast_target_type<Num>::type target_type;
    std::cout << "Testing mixed arithmetic with type: " << typeid(Real).name()  << " and " << typeid(Num).name() << std::endl;
    Num n1 = -static_cast<Num>(1uLL << (std::numeric_limits<Num>::digits - 1));
@@ -649,7 +669,10 @@ void test()
    BOOST_TEST(a == 8);
    Real ac(a);
    BOOST_TEST(ac == a);
-   BOOST_TEST(-a == -8);
+   if(std::numeric_limits<Real>::is_signed)
+   {
+      BOOST_TEST(-a == -8);
+   }
    ac = a * c;
    BOOST_TEST(ac == 8*500L);
    ac = 8*500L;
@@ -693,9 +716,12 @@ void test()
    ac = a;
    ac = a + ac;
    BOOST_TEST(ac == 16);
-   ac = a;
-   ac = ac - b;
-   BOOST_TEST(ac == 8 - 64);
+   if(std::numeric_limits<Real>::is_signed)
+   {
+      ac = a;
+      ac = ac - b;
+      BOOST_TEST(ac == 8 - 64);
+   }
    ac = a;
    ac = a - ac;
    BOOST_TEST(ac == 0);
@@ -705,16 +731,22 @@ void test()
    ac = a;
    ac += b + a;
    BOOST_TEST(ac == 80);
-   ac = a;
-   ac -= a + b;
-   BOOST_TEST(ac == -64);
-   ac = a;
-   ac -= b - a;
-   BOOST_TEST(ac == 16 - 64);
+   if(std::numeric_limits<Real>::is_signed)
+   {
+      ac = a;
+      ac -= a + b;
+      BOOST_TEST(ac == -64);
+      ac = a;
+      ac -= b - a;
+      BOOST_TEST(ac == 16 - 64);
+   }
    ac = +a;
    BOOST_TEST(ac == 8);
-   ac = -a;
-   BOOST_TEST(ac == -8);
+   if(std::numeric_limits<Real>::is_signed)
+   {
+      ac = -a;
+      BOOST_TEST(ac == -8);
+   }
    ac = 8;
    ac = a * ac;
    BOOST_TEST(ac == 8*8);
@@ -736,8 +768,11 @@ void test()
    ac -= +a;
    BOOST_TEST(ac == 0);
    ac = a;
-   ac -= -a;
-   BOOST_TEST(ac == 16);
+   if(std::numeric_limits<Real>::is_signed)
+   {
+      ac -= -a;
+      BOOST_TEST(ac == 16);
+   }
    ac = a;
    ac -= c - b;
    BOOST_TEST(ac == 8 - (500-64));
@@ -768,9 +803,12 @@ void test()
    ac = b;
    ac /= +a;
    BOOST_TEST(ac == 8);
-   ac = b;
-   ac /= -a;
-   BOOST_TEST(ac == -8);
+   if(std::numeric_limits<Real>::is_signed)
+   {
+      ac = b;
+      ac /= -a;
+      BOOST_TEST(ac == -8);
+   }
    ac = b;
    ac /= b / a;
    BOOST_TEST(ac == 64 / (64/8));
@@ -788,14 +826,17 @@ void test()
    BOOST_TEST(ac == 72);
    ac = +a + +b;
    BOOST_TEST(ac == 72);
-   ac = a + -b;
-   BOOST_TEST(ac == 8 - 64);
-   ac = -a + b;
-   BOOST_TEST(ac == -8+64);
-   ac = -a + -b;
-   BOOST_TEST(ac == -72);
-   ac = a + - + -b; // lots of unary operators!!
-   BOOST_TEST(ac == 72);
+   if(std::numeric_limits<Real>::is_signed)
+   {
+      ac = a + -b;
+      BOOST_TEST(ac == 8 - 64);
+      ac = -a + b;
+      BOOST_TEST(ac == -8+64);
+      ac = -a + -b;
+      BOOST_TEST(ac == -72);
+      ac = a + - + -b; // lots of unary operators!!
+      BOOST_TEST(ac == 72);
+   }
    ac = a;
    ac = b / ac;
    BOOST_TEST(ac == b / a);
@@ -855,9 +896,12 @@ void test()
    a = 20;
    BOOST_TEST(a.sign() > 0);
    BOOST_TEST(!a.is_zero());
-   a = -20;
-   BOOST_TEST(a.sign() < 0);
-   BOOST_TEST(!a.is_zero());
+   if(std::numeric_limits<Real>::is_signed)
+   {
+      a = -20;
+      BOOST_TEST(a.sign() < 0);
+      BOOST_TEST(!a.is_zero());
+   }
    a = 0;
    BOOST_TEST(a.sign() == 0);
    BOOST_TEST(a.is_zero());
@@ -954,6 +998,22 @@ int main()
 #endif
 #ifdef TEST_MPZ_BOOST_RATIONAL
    test<boost::rational<boost::multiprecision::mpz_int> >();
+#endif
+#ifdef TEST_PACKED_INT1
+   test<boost::multiprecision::mp_uint64_t>();
+   test<boost::multiprecision::mp_uint128_t>();
+   test<boost::multiprecision::mp_uint512_t>();
+   test<boost::multiprecision::mp_number<boost::multiprecision::packed_cpp_int<70, false> > >();
+#endif
+#ifdef TEST_PACKED_INT2
+   //
+   // Can't test 64-bit signed ints - they don't have enough bits
+   // to interoperate with uint64_t without loss:
+   //
+   //test<boost::multiprecision::mp_int64_t>();
+   test<boost::multiprecision::mp_int128_t>();
+   test<boost::multiprecision::mp_int512_t>();
+   test<boost::multiprecision::mp_number<boost::multiprecision::packed_cpp_int<70, true> > >();
 #endif
    return boost::report_errors();
 }

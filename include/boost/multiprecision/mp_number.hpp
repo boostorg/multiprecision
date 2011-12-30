@@ -1635,6 +1635,18 @@ typename enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator != (co
    return a != multiprecision::mp_number<T>(b);
 }
 
+template <class T>
+inline multiprecision::mp_number<T> numerator(const rational<multiprecision::mp_number<T> >& a)
+{
+   return a.numerator();
+}
+
+template <class T>
+inline multiprecision::mp_number<T> denominator(const rational<multiprecision::mp_number<T> >& a)
+{
+   return a.denominator();
+}
+
 } // namespaces
 
 #endif
