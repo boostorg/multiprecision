@@ -9,6 +9,8 @@
 #include <boost/math/bindings/mpfr.hpp>
 #include <boost/math/bindings/mpreal.hpp>
 #include <boost/multiprecision/mpfr.hpp>
+#include <boost/multiprecision/gmp.hpp>
+#include <boost/multiprecision/cpp_float.hpp>
 #include <boost/math/special_functions/bessel.hpp>
 #include <boost/math/tools/rational.hpp>
 #include <boost/math/distributions/non_central_t.hpp>
@@ -43,6 +45,7 @@ template <class Real>
 Real test_bessel()
 {
 #  define T double
+#  define SC_(x) x
 #  include "libs/math/test/bessel_i_int_data.ipp"
 #  include "libs/math/test/bessel_i_data.ipp"
 
@@ -184,6 +187,16 @@ int main()
    std::cout << "Time for mpfr_float_50 = " << time << std::endl;
    std::cout << "Total allocations for mpfr_float_50 = " << allocation_count << std::endl;
    allocation_count = 0;
+   test_bessel<boost::multiprecision::mpf_float_50>();
+   time = c.elapsed();
+   std::cout << "Time for mpf_float_50 = " << time << std::endl;
+   std::cout << "Total allocations for mpf_float_50 = " << allocation_count << std::endl;
+   allocation_count = 0;
+   test_bessel<boost::multiprecision::cpp_float_50>();
+   time = c.elapsed();
+   std::cout << "Time for cpp_float_50 = " << time << std::endl;
+   std::cout << "Total allocations for cpp_float_50 = " << allocation_count << std::endl;
+   allocation_count = 0;
    c.reset();
    test_bessel<mpfr_class>();
    time = c.elapsed();
@@ -206,6 +219,18 @@ int main()
    time = c.elapsed();
    std::cout << "Time for mpfr_float_100 = " << time << std::endl;
    std::cout << "Total allocations for mpfr_float_50 = " << allocation_count << std::endl;
+   allocation_count = 0;
+   c.reset();
+   test_bessel<boost::multiprecision::mpf_float_100>();
+   time = c.elapsed();
+   std::cout << "Time for mpf_float_100 = " << time << std::endl;
+   std::cout << "Total allocations for mpf_float_100 = " << allocation_count << std::endl;
+   allocation_count = 0;
+   c.reset();
+   test_bessel<boost::multiprecision::cpp_float_100>();
+   time = c.elapsed();
+   std::cout << "Time for cpp_float_100 = " << time << std::endl;
+   std::cout << "Total allocations for cpp_float_100 = " << allocation_count << std::endl;
    allocation_count = 0;
    c.reset();
    test_bessel<mpfr_class>();
@@ -234,6 +259,18 @@ int main()
    std::cout << "Total allocations for mpfr_float_50 = " << allocation_count << std::endl;
    allocation_count = 0;
    c.reset();
+   test_polynomial<boost::multiprecision::mpf_float_50>();
+   time = c.elapsed();
+   std::cout << "Time for mpf_float_50 = " << time << std::endl;
+   std::cout << "Total allocations for mpf_float_50 = " << allocation_count << std::endl;
+   allocation_count = 0;
+   c.reset();
+   test_polynomial<boost::multiprecision::cpp_float_50>();
+   time = c.elapsed();
+   std::cout << "Time for cpp_float_50 = " << time << std::endl;
+   std::cout << "Total allocations for cpp_float_50 = " << allocation_count << std::endl;
+   allocation_count = 0;
+   c.reset();
    test_polynomial<mpfr_class>();
    time = c.elapsed();
    std::cout << "Time for mpfr_class (50 digits) = " << time << std::endl;
@@ -255,6 +292,18 @@ int main()
    time = c.elapsed();
    std::cout << "Time for mpfr_float_100 = " << time << std::endl;
    std::cout << "Total allocations for mpfr_float_100 = " << allocation_count << std::endl;
+   allocation_count = 0;
+   c.reset();
+   test_polynomial<boost::multiprecision::mpf_float_100>();
+   time = c.elapsed();
+   std::cout << "Time for mpf_float_100 = " << time << std::endl;
+   std::cout << "Total allocations for mpf_float_100 = " << allocation_count << std::endl;
+   allocation_count = 0;
+   c.reset();
+   test_polynomial<boost::multiprecision::cpp_float_100>();
+   time = c.elapsed();
+   std::cout << "Time for cpp_float_100 = " << time << std::endl;
+   std::cout << "Total allocations for cpp_float_100 = " << allocation_count << std::endl;
    allocation_count = 0;
    c.reset();
    test_polynomial<mpfr_class>();
@@ -283,6 +332,18 @@ int main()
    std::cout << "Total allocations for mpfr_float_50 = " << allocation_count << std::endl;
    allocation_count = 0;
    c.reset();
+   test_nct<boost::multiprecision::mpf_float_50>();
+   time = c.elapsed();
+   std::cout << "Time for mpf_float_50 = " << time << std::endl;
+   std::cout << "Total allocations for mpf_float_50 = " << allocation_count << std::endl;
+   allocation_count = 0;
+   c.reset();
+   test_nct<boost::multiprecision::cpp_float_50>();
+   time = c.elapsed();
+   std::cout << "Time for cpp_float_50 = " << time << std::endl;
+   std::cout << "Total allocations for cpp_float_50 = " << allocation_count << std::endl;
+   allocation_count = 0;
+   c.reset();
    test_nct<mpfr_class>();
    time = c.elapsed();
    std::cout << "Time for mpfr_class (50 digits) = " << time << std::endl;
@@ -304,6 +365,18 @@ int main()
    time = c.elapsed();
    std::cout << "Time for mpfr_float_100 = " << time << std::endl;
    std::cout << "Total allocations for mpfr_float_100 = " << allocation_count << std::endl;
+   allocation_count = 0;
+   c.reset();
+   test_nct<boost::multiprecision::mpf_float_100>();
+   time = c.elapsed();
+   std::cout << "Time for mpf_float_100 = " << time << std::endl;
+   std::cout << "Total allocations for mpf_float_100 = " << allocation_count << std::endl;
+   allocation_count = 0;
+   c.reset();
+   test_nct<boost::multiprecision::cpp_float_100>();
+   time = c.elapsed();
+   std::cout << "Time for cpp_float_100 = " << time << std::endl;
+   std::cout << "Total allocations for cpp_float_100 = " << allocation_count << std::endl;
    allocation_count = 0;
    c.reset();
    test_nct<mpfr_class>();

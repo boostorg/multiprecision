@@ -15,6 +15,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/array.hpp>
 #include <boost/multiprecision/mp_number.hpp>
+#include <boost/multiprecision/detail/big_lanczos.hpp>
 
 //
 // Headers required for Boost.Math integration:

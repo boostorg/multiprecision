@@ -11,7 +11,7 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/math/bindings/detail/big_lanczos.hpp>
+#include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <mpfr.h>
 #include <cmath>
 #include <algorithm>
@@ -1007,29 +1007,6 @@ inline int digits<boost::multiprecision::mpfr_float>()
 }
 
 }
-
-namespace lanczos{
-
-template<unsigned Digits10, class Policy>
-struct lanczos<multiprecision::mp_number<multiprecision::mpfr_float_backend<Digits10> >, Policy>
-{
-   typedef typename mpl::if_c<
-      Digits10 <= 36,
-      lanczos22UDT,
-      typename mpl::if_c<
-         Digits10 <= 50,
-         lanczos31UDT,
-         typename mpl::if_c<
-            Digits10 <= 110,
-            lanczos61UDT,
-            undefined_lanczos
-         >::type
-      >::type
-   >::type type;
-};
-
-} // namespace lanczos
-
 
 }}  // namespaces
 
