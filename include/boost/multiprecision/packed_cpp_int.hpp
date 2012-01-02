@@ -3,8 +3,8 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_
 
-#ifndef BOOST_MATH_RATIONAL_ADAPTER_HPP
-#define BOOST_MATH_RATIONAL_ADAPTER_HPP
+#ifndef BOOST_MP_PACKED_INT_HPP
+#define BOOST_MP_PACKED_INT_HPP
 
 #include <iostream>
 #include <iomanip>
@@ -838,6 +838,17 @@ template <unsigned Bits, bool Signed>
 class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::packed_cpp_int<Bits, Signed> > >
 {
    typedef boost::multiprecision::mp_number<boost::multiprecision::packed_cpp_int<Bits, Signed> > number_type;
+
+   struct initializer
+   {
+      initializer()
+      {
+         (std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::packed_cpp_int<Bits, Signed> > >::min)();
+         (std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::packed_cpp_int<Bits, Signed> > >::max)();
+      }
+      void do_nothing()const{}
+   };
+   static const initializer init;
 public:
    BOOST_STATIC_CONSTEXPR bool is_specialized = true;
    //
@@ -845,12 +856,26 @@ public:
    // to zero:
    //
    BOOST_STATIC_CONSTEXPR number_type (min)() BOOST_MP_NOEXCEPT
-   { 
-      return number_type();
+   {
+      static bool init = false;
+      static number_type val;
+      if(!init)
+      {
+         init = true;
+         val = Signed ? number_type(1) << Bits - 1 : 0;
+      }
+      return val;
    }
    BOOST_STATIC_CONSTEXPR number_type (max)() BOOST_MP_NOEXCEPT 
    { 
-      return number_type();
+      static bool init = false;
+      static number_type val;
+      if(!init)
+      {
+         init = true;
+         val = Signed ? number_type(~(number_type(1) << Bits - 1)) : number_type(~number_type(0));
+      }
+      return val;
    }
    BOOST_STATIC_CONSTEXPR number_type lowest() BOOST_MP_NOEXCEPT { return (min)(); }
    BOOST_STATIC_CONSTEXPR int digits = Bits;
@@ -860,8 +885,8 @@ public:
    BOOST_STATIC_CONSTEXPR bool is_integer = true;
    BOOST_STATIC_CONSTEXPR bool is_exact = true;
    BOOST_STATIC_CONSTEXPR int radix = 2;
-   BOOST_STATIC_CONSTEXPR number_type epsilon() BOOST_MP_NOEXCEPT { return number_type(); }
-   BOOST_STATIC_CONSTEXPR number_type round_error() BOOST_MP_NOEXCEPT { return number_type(); }
+   BOOST_STATIC_CONSTEXPR number_type epsilon() BOOST_MP_NOEXCEPT { return 0; }
+   BOOST_STATIC_CONSTEXPR number_type round_error() BOOST_MP_NOEXCEPT { return 0; }
    BOOST_STATIC_CONSTEXPR int min_exponent = 0;
    BOOST_STATIC_CONSTEXPR int min_exponent10 = 0;
    BOOST_STATIC_CONSTEXPR int max_exponent = 0;
@@ -871,10 +896,10 @@ public:
    BOOST_STATIC_CONSTEXPR bool has_signaling_NaN = false;
    BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm = denorm_absent;
    BOOST_STATIC_CONSTEXPR bool has_denorm_loss = false;
-   BOOST_STATIC_CONSTEXPR number_type infinity() BOOST_MP_NOEXCEPT { return number_type(); }
-   BOOST_STATIC_CONSTEXPR number_type quiet_NaN() BOOST_MP_NOEXCEPT { return number_type(); }
-   BOOST_STATIC_CONSTEXPR number_type signaling_NaN() BOOST_MP_NOEXCEPT { return number_type(); }
-   BOOST_STATIC_CONSTEXPR number_type denorm_min() BOOST_MP_NOEXCEPT { return number_type(); }
+   BOOST_STATIC_CONSTEXPR number_type infinity() BOOST_MP_NOEXCEPT { return 0; }
+   BOOST_STATIC_CONSTEXPR number_type quiet_NaN() BOOST_MP_NOEXCEPT { return 0; }
+   BOOST_STATIC_CONSTEXPR number_type signaling_NaN() BOOST_MP_NOEXCEPT { return 0; }
+   BOOST_STATIC_CONSTEXPR number_type denorm_min() BOOST_MP_NOEXCEPT { return 0; }
    BOOST_STATIC_CONSTEXPR bool is_iec559 = false;
    BOOST_STATIC_CONSTEXPR bool is_bounded = true;
    BOOST_STATIC_CONSTEXPR bool is_modulo = true;
@@ -883,6 +908,9 @@ public:
    BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
 };
 
+template <unsigned Bits, bool Signed>
+typename numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::packed_cpp_int<Bits, Signed> > >::initializer
+   typename numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::packed_cpp_int<Bits, Signed> > >::init;
 }
 
 #endif
