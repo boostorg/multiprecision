@@ -595,6 +595,14 @@ run test_int_io.cpp
 	      <define>TEST_PACKED_INT2
         : test_int_io_packed_int2 ;
 
+run packed_int_test.cpp gmp
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+         release  # otherwise runtime is too slow!!
+        : packed_int_test.cpp ;
+
 run test_rational_io.cpp $(TOMMATH)
         : # command line
         : # input files

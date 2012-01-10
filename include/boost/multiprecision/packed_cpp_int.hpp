@@ -504,7 +504,7 @@ boost::uint32_t bitcount(const packed_cpp_int<Bits, Signed>& a)
    }
    return count;
 }
-
+/*
 template <unsigned Bits, bool Signed>
 void divide_unsigned_helper(packed_cpp_int<Bits, Signed>& result, const packed_cpp_int<Bits, Signed>& x, const packed_cpp_int<Bits, Signed>& y, packed_cpp_int<Bits, Signed>& r)
 {
@@ -586,6 +586,170 @@ void divide_unsigned_helper(packed_cpp_int<Bits, Signed>& result, const packed_c
          mask = static_cast<boost::uint32_t>(1u) << (packed_cpp_int<Bits, Signed>::limb_bits - 1);
       }
    }
+   BOOST_ASSERT(r.compare(y) < 0); // remainder must be less than the divisor or our code has failed
+}
+*/
+template <unsigned Bits, bool Signed>
+void divide_unsigned_helper(packed_cpp_int<Bits, Signed>& result, const packed_cpp_int<Bits, Signed>& x, const packed_cpp_int<Bits, Signed>& y, packed_cpp_int<Bits, Signed>& r)
+{
+   if((&result == &x) || (&r == &x))
+   {
+      packed_cpp_int<Bits, Signed> t(x);
+      divide_unsigned_helper(result, t, y, r);
+      return;
+   }
+   if((&result == &y) || (&r == &y))
+   {
+      packed_cpp_int<Bits, Signed> t(y);
+      divide_unsigned_helper(result, x, t, r);
+      return;
+   }
+
+
+   using default_ops::subtract;
+
+
+   if (is_zero(y))
+   {
+      volatile int i = 0;
+      i /= i;
+      return;
+   }
+
+   if (is_zero(x))
+   {
+      r = y;
+      result = x;
+      return;
+   }
+
+   if(&result == &r)
+   {
+      packed_cpp_int<Bits, Signed> rem;
+      divide_unsigned_helper(result, x, y, rem);
+      r = rem;
+      return;
+   }
+
+   r = x;
+   result = static_cast<boost::uint32_t>(0u);
+   if(x.compare(y) < 0)
+   {
+      return; // We already have the answer: zero.
+   }
+
+   //
+   // Find the most significant words of numerator and denominator.
+   // Note that this code can't run past the end of the array because
+   // we know already that neither are all zero:
+   //
+   boost::uint32_t r_order = 0;
+   while(r.data()[r_order] == 0)
+      ++r_order;
+   boost::uint32_t y_order = 0;
+   while(y.data()[y_order] == 0)
+      ++y_order;
+
+   packed_cpp_int<Bits, Signed> t;
+   bool r_neg = false;
+
+   //
+   // See if we can short-circuit long division, and use basic arithmetic instead:
+   //
+   if(r_order == packed_cpp_int<Bits, Signed>::limb_count - 1)
+   {
+      result = r.data()[packed_cpp_int<Bits, Signed>::limb_count - 1] / y.data()[packed_cpp_int<Bits, Signed>::limb_count - 1];
+      r = x.data()[packed_cpp_int<Bits, Signed>::limb_count - 1] % y.data()[packed_cpp_int<Bits, Signed>::limb_count - 1];
+      return;
+   }
+   else if(r_order == packed_cpp_int<Bits, Signed>::limb_count - 2)
+   {
+      unsigned long long a, b;
+      a = (static_cast<unsigned long long>(r.data()[r_order]) << packed_cpp_int<Bits, Signed>::limb_bits) | r.data()[r_order + 1];
+      b = y_order < packed_cpp_int<Bits, Signed>::limb_count - 1 ? 
+         (static_cast<unsigned long long>(y.data()[y_order]) << packed_cpp_int<Bits, Signed>::limb_bits) | y.data()[y_order + 1] 
+         : y.data()[y_order];
+      result = a / b;
+      r = a % b;
+      return;
+   }
+
+   do
+   {
+      //
+      // Update r_order, this can't run past the end as r must be non-zero at this point:
+      //
+      while(r.data()[r_order] == 0)
+         ++r_order;
+      //
+      // Calculate our best guess for how many times y divides into r:
+      //
+      boost::uint32_t guess;
+      if((r.data()[r_order] <= y.data()[y_order]) && (r_order < packed_cpp_int<Bits, Signed>::limb_count - 1))
+      {
+         unsigned long long a, b, v;
+         a = (static_cast<unsigned long long>(r.data()[r_order]) << packed_cpp_int<Bits, Signed>::limb_bits) | r.data()[r_order + 1];
+         b = y.data()[y_order];
+         v = a / b;
+         if(v > packed_cpp_int<Bits, Signed>::max_limb_value)
+            guess = 1;
+         else
+         {
+            guess = static_cast<boost::uint32_t>(v);
+            ++r_order;
+         }
+      }
+      else
+      {
+         guess = r.data()[r_order] / y.data()[y_order];
+      }
+      //
+      // Update result:
+      //
+      boost::uint32_t shift = y_order - r_order;
+      t = boost::uint32_t(0);
+      t.data()[packed_cpp_int<Bits, Signed>::limb_count - 1 - shift] = guess;
+      if(r_neg)
+         subtract(result, t);
+      else
+         add(result, t);
+      //
+      // Calculate guess * y, we use a fused mutiply-shift O(N) for this
+      // rather than a full O(N^2) multiply:
+      //
+      boost::uintmax_t carry = 0;
+      for(unsigned i = packed_cpp_int<Bits, Signed>::limb_count - 1; i > packed_cpp_int<Bits, Signed>::limb_count - shift - 1; --i)
+         t.data()[i] = 0;
+      for(int i = packed_cpp_int<Bits, Signed>::limb_count - 1; i >= static_cast<int>(shift); --i)
+      {
+         boost::uintmax_t v = static_cast<boost::uintmax_t>(y.data()[i]) * static_cast<boost::uintmax_t>(guess) + carry;
+         t.data()[i - shift] = static_cast<packed_cpp_int<Bits, Signed>::limb_type>(v);
+         carry = v >> sizeof(packed_cpp_int<Bits, Signed>::limb_type) * CHAR_BIT;
+      }
+      t.data()[0] &= packed_cpp_int<Bits, Signed>::upper_limb_mask;
+       //
+      // Update r:
+      //
+      subtract(r, t);
+      if(r.data()[0] & packed_cpp_int<Bits, Signed>::sign_bit_mask)
+      {
+         r.negate();
+         r_neg = !r_neg;
+      }
+   }
+   while(r.compare(y) > 0);
+
+   //
+   // We now just have to normalise the result:
+   //
+   if(r_neg)
+   {
+      // We have one too many in the result:
+      decrement(result);
+      r.negate();
+      add(r, y);
+   }
+
    BOOST_ASSERT(r.compare(y) < 0); // remainder must be less than the divisor or our code has failed
 }
 
