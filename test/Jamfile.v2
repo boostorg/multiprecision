@@ -25,7 +25,7 @@ project : requirements
    <toolset>msvc:<runtime-link>static
    ;
 
-local disable-specfun = [ MATCH (--disable-specfun) : [ modules.peek : ARGV ] ] ;
+local enable-specfun = [ MATCH (--enable-specfun) : [ modules.peek : ARGV ] ] ;
 local disable-concepts = [ MATCH (--disable-concepts) : [ modules.peek : ARGV ] ] ;
 
 
@@ -640,7 +640,7 @@ run ../example/tommath_snips.cpp $(TOMMATH)
          [ check-target-builds ../config//has_tommath : : <build>no ] ;
 
 
-if ! $(disable-specfun)
+if $(enable-specfun)
 {
 
    for local source in [ glob math/*.cpp ]
