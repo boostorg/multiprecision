@@ -109,6 +109,26 @@ struct tester
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
+   double test_add_int()
+   {
+      stopwatch<boost::chrono::high_resolution_clock> w;
+      for(unsigned i = 0; i < 1000; ++i)
+      {
+         for(unsigned i = 0; i < b.size(); ++i)
+            a[i] = b[i] + 1;
+      }
+      return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+   }
+   double test_subtract_int()
+   {
+      stopwatch<boost::chrono::high_resolution_clock> w;
+      for(unsigned i = 0; i < 1000; ++i)
+      {
+         for(unsigned i = 0; i < b.size(); ++i)
+            a[i] = b[i] - 1;
+      }
+      return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+   }
    double test_multiply()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
@@ -296,6 +316,8 @@ void test(const char* type, unsigned precision)
    tester<Number, boost::multiprecision::number_category<Number>::value> t;
    std::cout << std::left << std::setw(15) << type << std::setw(10) << precision << std::setw(5) << "+" << t.test_add() << std::endl;
    std::cout << std::left << std::setw(15) << type << std::setw(10) << precision << std::setw(5) << "-" << t.test_subtract() << std::endl;
+   std::cout << std::left << std::setw(15) << type << std::setw(10) << precision << std::setw(5) << "+ (int)" << t.test_add_int() << std::endl;
+   std::cout << std::left << std::setw(15) << type << std::setw(10) << precision << std::setw(5) << "- (int)" << t.test_subtract_int() << std::endl;
    std::cout << std::left << std::setw(15) << type << std::setw(10) << precision << std::setw(5) << "*" << t.test_multiply() << std::endl;
    std::cout << std::left << std::setw(15) << type << std::setw(10) << precision << std::setw(5) << "/" << t.test_divide() << std::endl;
    std::cout << std::left << std::setw(15) << type << std::setw(10) << precision << std::setw(5) << "str" << t.test_str() << std::endl;

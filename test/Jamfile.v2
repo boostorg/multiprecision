@@ -600,8 +600,8 @@ run packed_int_test.cpp gmp
         : # input files
         : # requirements
          [ check-target-builds ../config//has_gmp : : <build>no ]
-         release  # otherwise runtime is too slow!!
-        : packed_int_test.cpp ;
+         release  # otherwise runtime is too slow!! 
+         ;
 
 run test_rational_io.cpp $(TOMMATH)
         : # command line

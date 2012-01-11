@@ -11,35 +11,11 @@
 #  define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#define BOOST_CHRONO_HEADER_ONLY
-
 #include <boost/multiprecision/gmp.hpp>
 #include <boost/multiprecision/packed_cpp_int.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
-#include <boost/chrono.hpp>
 #include "test.hpp"
-
-template <class Clock>
-struct stopwatch
-{
-   typedef typename Clock::duration duration;
-   stopwatch()
-   {
-      m_start = Clock::now();
-   }
-   duration elapsed()
-   {
-      return Clock::now() - m_start;
-   }
-   void reset()
-   {
-      m_start = Clock::now();
-   }
-
-private:
-   typename Clock::time_point m_start;
-};
 
 template <class T>
 T generate_random(unsigned bits_wanted)
@@ -79,7 +55,6 @@ int main()
 {
    using namespace boost::multiprecision;
    typedef mp_number<packed_cpp_int<1024, true> > packed_type;
-   stopwatch<boost::chrono::high_resolution_clock> w;
    unsigned last_error_count = 0;
    for(int i = 0; i < 1000; ++i)
    {
@@ -143,7 +118,6 @@ int main()
          std::cout << "a1%d1  = " << a1%d1 << std::endl;
       }
    }
-   std::cout << w.elapsed() << std::endl;
    return boost::report_errors();
 }
 
