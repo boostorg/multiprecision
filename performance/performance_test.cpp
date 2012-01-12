@@ -12,14 +12,14 @@
 #if !defined(TEST_MPF) && !defined(TEST_MPZ) && \
    !defined(TEST_CPP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPQ) \
    && !defined(TEST_TOMMATH) && !defined(TEST_TOMMATH_BOOST_RATIONAL) && !defined(TEST_MPZ_BOOST_RATIONAL)\
-   && !defined(TEST_PACKED_INT)
+   && !defined(TEST_FIXED_INT)
 #  define TEST_MPF
 #  define TEST_MPZ
 #  define TEST_MPFR
 #  define TEST_CPP_FLOAT
 #  define TEST_MPQ
 #  define TEST_TOMMATH
-#  define TEST_PACKED_INT
+#  define TEST_FIXED_INT
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -44,8 +44,8 @@
 #include <boost/multiprecision/tommath.hpp>
 #include <boost/multiprecision/rational_adapter.hpp>
 #endif
-#if defined(TEST_PACKED_INT)
-#include <boost/multiprecision/packed_cpp_int.hpp>
+#if defined(TEST_FIXED_INT)
+#include <boost/multiprecision/fixed_int.hpp>
 #endif
 
 #include <boost/chrono.hpp>
@@ -347,12 +347,12 @@ int main()
    test<boost::multiprecision::mp_int>("tommath_int", 512);
    test<boost::multiprecision::mp_int>("tommath_int", 1024);
 #endif
-#ifdef TEST_PACKED_INT
+#ifdef TEST_FIXED_INT
    test<boost::multiprecision::mp_int64_t>("mp_int64_t", 64);
    test<boost::multiprecision::mp_int128_t>("mp_int128_t", 128);
    test<boost::multiprecision::mp_int256_t>("mp_int256_t", 256);
    test<boost::multiprecision::mp_int512_t>("mp_int512_t", 512);
-   test<boost::multiprecision::mp_number<boost::multiprecision::packed_cpp_int<1024, true> > >("mp_int1024_t", 1024);
+   test<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<1024, true> > >("mp_int1024_t", 1024);
 #endif
 #ifdef TEST_CPP_FLOAT
    test<boost::multiprecision::cpp_float_50>("cpp_float", 50);

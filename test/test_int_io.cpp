@@ -9,11 +9,11 @@
 #  define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#if !defined(TEST_MPZ) && !defined(TEST_TOMMATH) && !defined(TEST_PACKED_INT1) && !defined(TEST_PACKED_INT2)
+#if !defined(TEST_MPZ) && !defined(TEST_TOMMATH) && !defined(TEST_FIXED_INT1) && !defined(TEST_FIXED_INT2)
 #  define TEST_TOMMATH
 #  define TEST_MPZ
-#  define TEST_PACKED_INT1
-#  define TEST_PACKED_INT2
+#  define TEST_FIXED_INT1
+#  define TEST_FIXED_INT2
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -30,8 +30,8 @@
 #if defined(TEST_TOMMATH)
 #include <boost/multiprecision/tommath.hpp>
 #endif
-#if defined(TEST_PACKED_INT1) || defined(TEST_PACKED_INT2)
-#include <boost/multiprecision/packed_cpp_int.hpp>
+#if defined(TEST_FIXED_INT1) || defined(TEST_FIXED_INT2)
+#include <boost/multiprecision/fixed_int.hpp>
 #endif
 
 #include <boost/algorithm/string/case_conv.hpp>
@@ -123,19 +123,19 @@ int main()
 #ifdef TEST_TOMMATH
    test_round_trip<boost::multiprecision::mp_int>();
 #endif
-#ifdef TEST_PACKED_INT1
+#ifdef TEST_FIXED_INT1
    test_round_trip<boost::multiprecision::mp_uint64_t>();
    test_round_trip<boost::multiprecision::mp_uint128_t>();
    test_round_trip<boost::multiprecision::mp_uint512_t>();
-   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::packed_cpp_int<20, false> > >();
-   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::packed_cpp_int<70, false> > >();
+   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<20, false> > >();
+   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<70, false> > >();
 #endif
-#ifdef TEST_PACKED_INT2
+#ifdef TEST_FIXED_INT2
    test_round_trip<boost::multiprecision::mp_int64_t>();
    test_round_trip<boost::multiprecision::mp_int128_t>();
    test_round_trip<boost::multiprecision::mp_int512_t>();
-   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::packed_cpp_int<20, true> > >();
-   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::packed_cpp_int<70, true> > >();
+   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<20, true> > >();
+   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<70, true> > >();
 #endif
    return boost::report_errors();
 }

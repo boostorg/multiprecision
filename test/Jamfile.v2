@@ -132,15 +132,15 @@ run test_arithmetic.cpp
         : # command line
         : # input files
         : # requirements
-	      <define>TEST_PACKED_INT1
-        : test_arithmetic_packed_int1 ;
+	      <define>TEST_FIXED_INT1
+        : test_arithmetic_fixed_int1 ;
 
 run test_arithmetic.cpp
         : # command line
         : # input files
         : # requirements
-	      <define>TEST_PACKED_INT2
-        : test_arithmetic_packed_int2 ;
+	      <define>TEST_FIXED_INT2
+        : test_arithmetic_fixed_int2 ;
 
 run test_numeric_limits.cpp
         : # command line
@@ -585,17 +585,17 @@ run test_int_io.cpp
         : # command line
         : # input files
         : # requirements
-	      <define>TEST_PACKED_INT1
-        : test_int_io_packed_int1 ;
+	      <define>TEST_FIXED_INT1
+        : test_int_io_fixed_int1 ;
 
 run test_int_io.cpp
         : # command line
         : # input files
         : # requirements
-	      <define>TEST_PACKED_INT2
-        : test_int_io_packed_int2 ;
+	      <define>TEST_FIXED_INT2
+        : test_int_io_fixed_int2 ;
 
-run packed_int_test.cpp gmp
+run fixed_int_test.cpp gmp
         : # command line
         : # input files
         : # requirements

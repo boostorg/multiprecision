@@ -18,7 +18,7 @@ namespace boost{
 namespace multiprecision{
 
 template <unsigned Bits, bool Signed>
-struct packed_cpp_int
+struct fixed_int
 {
    typedef mpl::list<boost::int32_t, boost::intmax_t>      signed_types;
    typedef mpl::list<boost::uint32_t, boost::uintmax_t>    unsigned_types;
@@ -33,37 +33,37 @@ struct packed_cpp_int
    BOOST_STATIC_CONSTANT(limb_type, sign_bit_mask = 1 << ((Bits % limb_bits ? Bits % limb_bits : limb_bits) - 1));
    typedef boost::array<limb_type, limb_count> data_type;
 
-   packed_cpp_int(){}
-   packed_cpp_int(const packed_cpp_int& o)
+   fixed_int(){}
+   fixed_int(const fixed_int& o)
    {
       m_value = o.m_value;
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   packed_cpp_int(packed_cpp_int&& o) : m_value(o.m_value) {}
+   fixed_int(fixed_int&& o) : m_value(o.m_value) {}
 #endif
-   packed_cpp_int& operator = (const packed_cpp_int& o)
+   fixed_int& operator = (const fixed_int& o)
    {
       m_value = o.m_value;
       return *this;
    }
-   packed_cpp_int& operator = (boost::uint32_t i)
+   fixed_int& operator = (boost::uint32_t i)
    {
       m_value[limb_count - 1] = i;
       for(int j = limb_count - 2; j >= 0; --j)
          m_value[j] = 0;
-      m_value[0] &= packed_cpp_int<Bits, Signed>::upper_limb_mask;
+      m_value[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
       return *this;
    }
-   packed_cpp_int& operator = (boost::int32_t i)
+   fixed_int& operator = (boost::int32_t i)
    {
       m_value[limb_count - 1] = i;
       // sign extend:
       for(int j = limb_count - 2; j >= 0; --j)
          m_value[j] = i < 0 ? max_limb_value : 0;
-      m_value[0] &= packed_cpp_int<Bits, Signed>::upper_limb_mask;
+      m_value[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
       return *this;
    }
-   packed_cpp_int& operator = (boost::uintmax_t i)
+   fixed_int& operator = (boost::uintmax_t i)
    {
       BOOST_STATIC_ASSERT(sizeof(i) % sizeof(limb_type) == 0);
       boost::uintmax_t mask = max_limb_value;
@@ -76,10 +76,10 @@ struct packed_cpp_int
       }
       for(int j = static_cast<int>(limb_count) - static_cast<int>(sizeof(boost::intmax_t) / sizeof(limb_type)) - 1; j >= 0; --j)
          m_value[j] = 0;
-      m_value[0] &= packed_cpp_int<Bits, Signed>::upper_limb_mask;
+      m_value[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
       return *this;
    }
-   packed_cpp_int& operator = (boost::intmax_t i)
+   fixed_int& operator = (boost::intmax_t i)
    {
       BOOST_STATIC_ASSERT(sizeof(i) % sizeof(limb_type) == 0);
       boost::uintmax_t mask = max_limb_value;
@@ -92,10 +92,10 @@ struct packed_cpp_int
       }
       for(int j = static_cast<int>(limb_count) - static_cast<int>(sizeof(boost::intmax_t) / sizeof(limb_type)) - 1; j >= 0; --j)
          m_value[j] = i < 0 ? max_limb_value : 0;
-      m_value[0] &= packed_cpp_int<Bits, Signed>::upper_limb_mask;
+      m_value[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
       return *this;
    }
-   packed_cpp_int& operator = (long double a)
+   fixed_int& operator = (long double a)
    {
       BOOST_STATIC_ASSERT(Bits >= (unsigned)std::numeric_limits<long double>::digits);
       using std::frexp;
@@ -138,10 +138,10 @@ struct packed_cpp_int
          left_shift(*this, e);
       else if(e < 0)
          right_shift(*this, -e);
-      data()[0] &= packed_cpp_int<Bits, Signed>::upper_limb_mask;
+      data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
       return *this;
    }
-   packed_cpp_int& operator = (const char* s)
+   fixed_int& operator = (const char* s)
    {
       std::size_t n = s ? std::strlen(s) : 0;
       *this = static_cast<boost::uint32_t>(0u);
@@ -186,7 +186,7 @@ struct packed_cpp_int
                   val = max_limb_value;
                if(val > radix)
                {
-                  m_value[0] &= packed_cpp_int<Bits, Signed>::upper_limb_mask;
+                  m_value[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
                   return *this; // TODO raise an exception here?
                }
                m_value[limb_count - 1] |= val;
@@ -210,12 +210,12 @@ struct packed_cpp_int
             }
          }
       }
-      m_value[0] &= packed_cpp_int<Bits, Signed>::upper_limb_mask;
+      m_value[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
       if(isneg)
          negate();
       return *this;
    }
-   void swap(packed_cpp_int& o)
+   void swap(fixed_int& o)
    {
       std::swap(m_value, o.m_value);
    }
@@ -232,7 +232,7 @@ struct packed_cpp_int
       {
          boost::uint32_t shift = base == 8 ? 3 : 4;
          boost::uint32_t mask = static_cast<boost::uint32_t>((1u << shift) - 1);
-         packed_cpp_int t(*this);
+         fixed_int t(*this);
          for(unsigned i = 0; i < Bits / shift; ++i)
          {
             char c = '0' + (t.data()[limb_count-1] & mask);
@@ -264,8 +264,8 @@ struct packed_cpp_int
       }
       else
       {
-         packed_cpp_int t(*this);
-         packed_cpp_int ten, r;
+         fixed_int t(*this);
+         fixed_int ten, r;
          ten = boost::uint32_t(1000000000);
          bool neg = false;
          if(Signed && (t.data()[0] & sign_bit_mask))
@@ -281,7 +281,7 @@ struct packed_cpp_int
          {
             while(get_sign(t) != 0)
             {
-               packed_cpp_int t2;
+               fixed_int t2;
                divide_unsigned_helper(t2, t, ten, r);
                t = t2;
                boost::uint32_t v = r.data()[limb_count - 1];
@@ -307,15 +307,15 @@ struct packed_cpp_int
    void negate()
    {
       boost::uintmax_t carry = 1;
-      for(int i = packed_cpp_int<Bits, Signed>::limb_count - 1; i >= 0; --i)
+      for(int i = fixed_int<Bits, Signed>::limb_count - 1; i >= 0; --i)
       {
          carry += static_cast<boost::uintmax_t>(~m_value[i]);
          m_value[i] = static_cast<limb_type>(carry);
          carry >>= limb_bits;
       }
-      m_value[0] &= packed_cpp_int<Bits, Signed>::upper_limb_mask;
+      m_value[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
    }
-   int compare(const packed_cpp_int& o)const
+   int compare(const fixed_int& o)const
    {
       int result = 0;
       if(Signed && ((m_value[0] & sign_bit_mask) != (o.data()[0] & sign_bit_mask)))
@@ -336,7 +336,7 @@ struct packed_cpp_int
    typename enable_if<is_arithmetic<Arithmatic>, int>::type compare(Arithmatic i)const
    {
       // braindead version:
-      packed_cpp_int<Bits, Signed> t;
+      fixed_int<Bits, Signed> t;
       t = i;
       return compare(t);
    }
@@ -347,40 +347,40 @@ private:
 };
 
 template <unsigned Bits, bool Signed>
-inline void add(packed_cpp_int<Bits, Signed>& result, const packed_cpp_int<Bits, Signed>& o)
+inline void add(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& o)
 {
    add(result, result, o);
 }
 template <unsigned Bits, bool Signed>
-inline void add(packed_cpp_int<Bits, Signed>& result, const packed_cpp_int<Bits, Signed>& a, const packed_cpp_int<Bits, Signed>& b)
+inline void add(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, const fixed_int<Bits, Signed>& b)
 {
    // Addition using modular arithmatic.
    // Nothing fancy, just let uintmax_t take the strain:
    boost::uintmax_t carry = 0;
-   for(int i = packed_cpp_int<Bits, Signed>::limb_count - 1; i >= 0; --i)
+   for(int i = fixed_int<Bits, Signed>::limb_count - 1; i >= 0; --i)
    {
       carry += static_cast<boost::uintmax_t>(a.data()[i]) + static_cast<boost::uintmax_t>(b.data()[i]);
-      result.data()[i] = static_cast<typename packed_cpp_int<Bits, Signed>::limb_type>(carry);
-      carry >>= packed_cpp_int<Bits, Signed>::limb_bits;
+      result.data()[i] = static_cast<typename fixed_int<Bits, Signed>::limb_type>(carry);
+      carry >>= fixed_int<Bits, Signed>::limb_bits;
    }
-   result.data()[0] &= packed_cpp_int<Bits, Signed>::upper_limb_mask;
+   result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 template <unsigned Bits, bool Signed>
-inline void add(packed_cpp_int<Bits, Signed>& result, const boost::uint32_t& o)
+inline void add(fixed_int<Bits, Signed>& result, const boost::uint32_t& o)
 {
    // Addition using modular arithmatic.
    // Nothing fancy, just let uintmax_t take the strain:
    boost::uintmax_t carry = o;
-   for(int i = packed_cpp_int<Bits, Signed>::limb_count - 1; carry && i >= 0; --i)
+   for(int i = fixed_int<Bits, Signed>::limb_count - 1; carry && i >= 0; --i)
    {
       carry += static_cast<boost::uintmax_t>(result.data()[i]);
-      result.data()[i] = static_cast<typename packed_cpp_int<Bits, Signed>::limb_type>(carry);
-      carry >>= packed_cpp_int<Bits, Signed>::limb_bits;
+      result.data()[i] = static_cast<typename fixed_int<Bits, Signed>::limb_type>(carry);
+      carry >>= fixed_int<Bits, Signed>::limb_bits;
    }
-   result.data()[0] &= packed_cpp_int<Bits, Signed>::upper_limb_mask;
+   result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 template <unsigned Bits, bool Signed>
-inline void add(packed_cpp_int<Bits, Signed>& result, const boost::int32_t& o)
+inline void add(fixed_int<Bits, Signed>& result, const boost::int32_t& o)
 {
    if(o < 0)
       subtract(result, static_cast<boost::uint32_t>(-o));
@@ -388,24 +388,24 @@ inline void add(packed_cpp_int<Bits, Signed>& result, const boost::int32_t& o)
       add(result, static_cast<boost::uint32_t>(o));
 }
 template <unsigned Bits, bool Signed>
-inline void subtract(packed_cpp_int<Bits, Signed>& result, const boost::uint32_t& o)
+inline void subtract(fixed_int<Bits, Signed>& result, const boost::uint32_t& o)
 {
    // Subtract using modular arithmatic.
    // This is the same code as for addition, with the twist that we negate o "on the fly":
-   boost::uintmax_t carry = static_cast<boost::uintmax_t>(result.data()[packed_cpp_int<Bits, Signed>::limb_count - 1]) 
+   boost::uintmax_t carry = static_cast<boost::uintmax_t>(result.data()[fixed_int<Bits, Signed>::limb_count - 1]) 
       + 1uLL + static_cast<boost::uintmax_t>(~o);
-   result.data()[packed_cpp_int<Bits, Signed>::limb_count - 1] = static_cast<typename packed_cpp_int<Bits, Signed>::limb_type>(carry);
-   carry >>= packed_cpp_int<Bits, Signed>::limb_bits;
-   for(int i = packed_cpp_int<Bits, Signed>::limb_count - 2; i >= 0; --i)
+   result.data()[fixed_int<Bits, Signed>::limb_count - 1] = static_cast<typename fixed_int<Bits, Signed>::limb_type>(carry);
+   carry >>= fixed_int<Bits, Signed>::limb_bits;
+   for(int i = fixed_int<Bits, Signed>::limb_count - 2; i >= 0; --i)
    {
       carry += static_cast<boost::uintmax_t>(result.data()[i]) + 0xFFFFFFFF;
-      result.data()[i] = static_cast<typename packed_cpp_int<Bits, Signed>::limb_type>(carry);
-      carry >>= packed_cpp_int<Bits, Signed>::limb_bits;
+      result.data()[i] = static_cast<typename fixed_int<Bits, Signed>::limb_type>(carry);
+      carry >>= fixed_int<Bits, Signed>::limb_bits;
    }
-   result.data()[0] &= packed_cpp_int<Bits, Signed>::upper_limb_mask;
+   result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 template <unsigned Bits, bool Signed>
-inline void subtract(packed_cpp_int<Bits, Signed>& result, const boost::int32_t& o)
+inline void subtract(fixed_int<Bits, Signed>& result, const boost::int32_t& o)
 {
    if(o)
    {
@@ -416,90 +416,90 @@ inline void subtract(packed_cpp_int<Bits, Signed>& result, const boost::int32_t&
    }
 }
 template <unsigned Bits, bool Signed>
-inline void increment(packed_cpp_int<Bits, Signed>& result)
+inline void increment(fixed_int<Bits, Signed>& result)
 {
    static const boost::uint32_t one = 1;
    add(result, one);
 }
 template <unsigned Bits, bool Signed>
-inline void decrement(packed_cpp_int<Bits, Signed>& result)
+inline void decrement(fixed_int<Bits, Signed>& result)
 {
    static const boost::uint32_t one = 1;
    subtract(result, one);
 }
 template <unsigned Bits, bool Signed>
-inline void subtract(packed_cpp_int<Bits, Signed>& result, const packed_cpp_int<Bits, Signed>& o)
+inline void subtract(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& o)
 {
    subtract(result, result, o);
 }
 template <unsigned Bits, bool Signed>
-inline void subtract(packed_cpp_int<Bits, Signed>& result, const packed_cpp_int<Bits, Signed>& a, const packed_cpp_int<Bits, Signed>& b)
+inline void subtract(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, const fixed_int<Bits, Signed>& b)
 {
    // Subtract using modular arithmatic.
    // This is the same code as for addition, with the twist that we negate b "on the fly":
    boost::uintmax_t carry = 1;
-   for(int i = packed_cpp_int<Bits, Signed>::limb_count - 1; i >= 0; --i)
+   for(int i = fixed_int<Bits, Signed>::limb_count - 1; i >= 0; --i)
    {
       carry += static_cast<boost::uintmax_t>(a.data()[i]) + static_cast<boost::uintmax_t>(~b.data()[i]);
-      result.data()[i] = static_cast<typename packed_cpp_int<Bits, Signed>::limb_type>(carry);
-      carry >>= packed_cpp_int<Bits, Signed>::limb_bits;
+      result.data()[i] = static_cast<typename fixed_int<Bits, Signed>::limb_type>(carry);
+      carry >>= fixed_int<Bits, Signed>::limb_bits;
    }
-   result.data()[0] &= packed_cpp_int<Bits, Signed>::upper_limb_mask;
+   result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 template <unsigned Bits, bool Signed>
-inline void multiply(packed_cpp_int<Bits, Signed>& result, const packed_cpp_int<Bits, Signed>& a, const packed_cpp_int<Bits, Signed>& b)
+inline void multiply(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, const fixed_int<Bits, Signed>& b)
 {
    // Very simple long multiplication, only usable for small numbers of limb_type's
    // but that's the typical use case for this type anyway:
    if(&result == &a)
    {
-      packed_cpp_int<Bits, Signed> t(a);
+      fixed_int<Bits, Signed> t(a);
       multiply(result, t, b);
       return;
    }
    if(&result == &b)
    {
-      packed_cpp_int<Bits, Signed> t(b);
+      fixed_int<Bits, Signed> t(b);
       multiply(result, a, t);
       return;
    }
    boost::uintmax_t carry = 0;
-   for(unsigned i = 0; i < packed_cpp_int<Bits, Signed>::limb_count; ++i)
+   for(unsigned i = 0; i < fixed_int<Bits, Signed>::limb_count; ++i)
       result.data()[i] = 0;
-   for(int i = packed_cpp_int<Bits, Signed>::limb_count - 1; i >= 0; --i)
+   for(int i = fixed_int<Bits, Signed>::limb_count - 1; i >= 0; --i)
    {
-      for(int j = packed_cpp_int<Bits, Signed>::limb_count - 1; j >= static_cast<int>(packed_cpp_int<Bits, Signed>::limb_count) - i - 1; --j)
+      for(int j = fixed_int<Bits, Signed>::limb_count - 1; j >= static_cast<int>(fixed_int<Bits, Signed>::limb_count) - i - 1; --j)
       {
          carry += static_cast<boost::uintmax_t>(a.data()[i]) * static_cast<boost::uintmax_t>(b.data()[j]);
-         carry += result.data()[i + j + 1 - packed_cpp_int<Bits, Signed>::limb_count];
-         result.data()[i + j + 1 - packed_cpp_int<Bits, Signed>::limb_count] = static_cast<typename packed_cpp_int<Bits, Signed>::limb_type>(carry);
-         carry >>= packed_cpp_int<Bits, Signed>::limb_bits;
+         carry += result.data()[i + j + 1 - fixed_int<Bits, Signed>::limb_count];
+         result.data()[i + j + 1 - fixed_int<Bits, Signed>::limb_count] = static_cast<typename fixed_int<Bits, Signed>::limb_type>(carry);
+         carry >>= fixed_int<Bits, Signed>::limb_bits;
       }
       carry = 0;
    }
-   result.data()[0] &= packed_cpp_int<Bits, Signed>::upper_limb_mask;
+   result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 template <unsigned Bits, bool Signed>
-inline void multiply(packed_cpp_int<Bits, Signed>& result, const packed_cpp_int<Bits, Signed>& a)
+inline void multiply(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a)
 {
    // There is no in-place multiply:
-   packed_cpp_int<Bits, Signed> b(result);
+   fixed_int<Bits, Signed> b(result);
    multiply(result, b, a);
 }
 template <unsigned Bits, bool Signed>
-inline void multiply(packed_cpp_int<Bits, Signed>& result, const boost::uint32_t& a)
+inline void multiply(fixed_int<Bits, Signed>& result, const boost::uint32_t& a)
 {
    boost::uintmax_t carry = 0;
-   for(int i = packed_cpp_int<Bits, Signed>::limb_count - 1; i >= 0; --i)
+   for(int i = fixed_int<Bits, Signed>::limb_count - 1; i >= 0; --i)
    {
       carry += static_cast<boost::uintmax_t>(result.data()[i]) * static_cast<boost::uintmax_t>(a);
-      result.data()[i] = static_cast<typename packed_cpp_int<Bits, Signed>::limb_type>(carry);
-      carry >>= packed_cpp_int<Bits, Signed>::limb_bits;
+      result.data()[i] = static_cast<typename fixed_int<Bits, Signed>::limb_type>(carry);
+      carry >>= fixed_int<Bits, Signed>::limb_bits;
    }
-   result.data()[0] &= packed_cpp_int<Bits, Signed>::upper_limb_mask;
+   result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 template <unsigned Bits, bool Signed>
-inline void multiply(packed_cpp_int<Bits, Signed>& result, const boost::int32_t& a)
+inline void multiply(fixed_int<Bits, Signed>& result, const boost::int32_t& a)
 {
    if(a > 0)
       multiply(result, static_cast<boost::uint32_t>(a));
@@ -512,15 +512,15 @@ inline void multiply(packed_cpp_int<Bits, Signed>& result, const boost::int32_t&
 
 /*
 template <unsigned Bits, bool Signed>
-boost::uint32_t bitcount(const packed_cpp_int<Bits, Signed>& a)
+boost::uint32_t bitcount(const fixed_int<Bits, Signed>& a)
 {
    // returns the location of the MSB in a:
    boost::uint32_t i = 0;
-   for(; (i < packed_cpp_int<Bits, Signed>::limb_count) && (a.data()[i] == 0); ++i){}
-   boost::uint32_t count = (packed_cpp_int<Bits, Signed>::limb_count - i) * packed_cpp_int<Bits, Signed>::limb_bits;
+   for(; (i < fixed_int<Bits, Signed>::limb_count) && (a.data()[i] == 0); ++i){}
+   boost::uint32_t count = (fixed_int<Bits, Signed>::limb_count - i) * fixed_int<Bits, Signed>::limb_bits;
    if(!count)
       return count; // no bits are set, value is zero
-   boost::uint32_t mask = static_cast<boost::uint32_t>(1u) << (packed_cpp_int<Bits, Signed>::limb_bits - 1);
+   boost::uint32_t mask = static_cast<boost::uint32_t>(1u) << (fixed_int<Bits, Signed>::limb_bits - 1);
    while((a.data()[i] & mask) == 0)
    {
       --count;
@@ -529,17 +529,17 @@ boost::uint32_t bitcount(const packed_cpp_int<Bits, Signed>& a)
    return count;
 }
 template <unsigned Bits, bool Signed>
-void divide_unsigned_helper(packed_cpp_int<Bits, Signed>& result, const packed_cpp_int<Bits, Signed>& x, const packed_cpp_int<Bits, Signed>& y, packed_cpp_int<Bits, Signed>& r)
+void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& x, const fixed_int<Bits, Signed>& y, fixed_int<Bits, Signed>& r)
 {
    if((&result == &x) || (&r == &x))
    {
-      packed_cpp_int<Bits, Signed> t(x);
+      fixed_int<Bits, Signed> t(x);
       divide_unsigned_helper(result, t, y, r);
       return;
    }
    if((&result == &y) || (&r == &y))
    {
-      packed_cpp_int<Bits, Signed> t(y);
+      fixed_int<Bits, Signed> t(y);
       divide_unsigned_helper(result, x, t, r);
       return;
    }
@@ -564,7 +564,7 @@ void divide_unsigned_helper(packed_cpp_int<Bits, Signed>& result, const packed_c
 
    if(&result == &r)
    {
-      packed_cpp_int<Bits, Signed> rem;
+      fixed_int<Bits, Signed> rem;
       divide_unsigned_helper(result, x, y, rem);
       r = rem;
       return;
@@ -588,11 +588,11 @@ void divide_unsigned_helper(packed_cpp_int<Bits, Signed>& result, const packed_c
    }
 
    // Together mask_index and mask give us the bit we may be about to set in the result:
-   boost::uint32_t mask_index = packed_cpp_int<Bits, Signed>::limb_count - 1 - n / packed_cpp_int<Bits, Signed>::limb_bits;
-   boost::uint32_t mask = static_cast<boost::uint32_t>(1u) << n % packed_cpp_int<Bits, Signed>::limb_bits;
-   packed_cpp_int<Bits, Signed> t(y);
+   boost::uint32_t mask_index = fixed_int<Bits, Signed>::limb_count - 1 - n / fixed_int<Bits, Signed>::limb_bits;
+   boost::uint32_t mask = static_cast<boost::uint32_t>(1u) << n % fixed_int<Bits, Signed>::limb_bits;
+   fixed_int<Bits, Signed> t(y);
    left_shift(t, n);
-   while(mask_index < packed_cpp_int<Bits, Signed>::limb_count)
+   while(mask_index < fixed_int<Bits, Signed>::limb_count)
    {
       int comp = r.compare(t);
       if(comp >= 0)
@@ -606,27 +606,45 @@ void divide_unsigned_helper(packed_cpp_int<Bits, Signed>& result, const packed_c
       if(0 == (mask >>= 1))
       {
          ++mask_index;
-         mask = static_cast<boost::uint32_t>(1u) << (packed_cpp_int<Bits, Signed>::limb_bits - 1);
+         mask = static_cast<boost::uint32_t>(1u) << (fixed_int<Bits, Signed>::limb_bits - 1);
       }
    }
    BOOST_ASSERT(r.compare(y) < 0); // remainder must be less than the divisor or our code has failed
 }
 */
 template <unsigned Bits, bool Signed>
-void divide_unsigned_helper(packed_cpp_int<Bits, Signed>& result, const packed_cpp_int<Bits, Signed>& x, const packed_cpp_int<Bits, Signed>& y, packed_cpp_int<Bits, Signed>& r)
+void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& x, const fixed_int<Bits, Signed>& y, fixed_int<Bits, Signed>& r)
 {
    if((&result == &x) || (&r == &x))
    {
-      packed_cpp_int<Bits, Signed> t(x);
+      fixed_int<Bits, Signed> t(x);
       divide_unsigned_helper(result, t, y, r);
       return;
    }
    if((&result == &y) || (&r == &y))
    {
-      packed_cpp_int<Bits, Signed> t(y);
+      fixed_int<Bits, Signed> t(y);
       divide_unsigned_helper(result, x, t, r);
       return;
    }
+
+   /*
+    Very simple, fairly braindead long division.
+    Start by setting the remainder equal to x, and the
+    result equal to 0.  Then in each loop we calculate our
+    "best guess" for how many times y divides into r,
+    add our guess to the result, and subtract guess*y
+    from the remainder r.  One wrinckle is that the remainder
+    may go negative, in which case we subtract the current guess
+    from the result rather than adding.  The value of the guess
+    is determined by dividing the most-significant-limb of the
+    current remainder by the most-significant-limb of y.
+
+    Note that there are more efficient algorithms than this
+    available, in particular see Knuth Vol 2.  However for small
+    numbers of limbs this generally outperforms the alternatives
+    and avoids the normalisation step which would require extra storage.
+    */
 
 
    using default_ops::subtract;
@@ -648,7 +666,7 @@ void divide_unsigned_helper(packed_cpp_int<Bits, Signed>& result, const packed_c
 
    if(&result == &r)
    {
-      packed_cpp_int<Bits, Signed> rem;
+      fixed_int<Bits, Signed> rem;
       divide_unsigned_helper(result, x, y, rem);
       r = rem;
       return;
@@ -673,24 +691,24 @@ void divide_unsigned_helper(packed_cpp_int<Bits, Signed>& result, const packed_c
    while(y.data()[y_order] == 0)
       ++y_order;
 
-   packed_cpp_int<Bits, Signed> t;
+   fixed_int<Bits, Signed> t;
    bool r_neg = false;
 
    //
    // See if we can short-circuit long division, and use basic arithmetic instead:
    //
-   if(r_order == packed_cpp_int<Bits, Signed>::limb_count - 1)
+   if(r_order == fixed_int<Bits, Signed>::limb_count - 1)
    {
-      result = r.data()[packed_cpp_int<Bits, Signed>::limb_count - 1] / y.data()[packed_cpp_int<Bits, Signed>::limb_count - 1];
-      r = x.data()[packed_cpp_int<Bits, Signed>::limb_count - 1] % y.data()[packed_cpp_int<Bits, Signed>::limb_count - 1];
+      result = r.data()[fixed_int<Bits, Signed>::limb_count - 1] / y.data()[fixed_int<Bits, Signed>::limb_count - 1];
+      r = x.data()[fixed_int<Bits, Signed>::limb_count - 1] % y.data()[fixed_int<Bits, Signed>::limb_count - 1];
       return;
    }
-   else if(r_order == packed_cpp_int<Bits, Signed>::limb_count - 2)
+   else if(r_order == fixed_int<Bits, Signed>::limb_count - 2)
    {
       unsigned long long a, b;
-      a = (static_cast<unsigned long long>(r.data()[r_order]) << packed_cpp_int<Bits, Signed>::limb_bits) | r.data()[r_order + 1];
-      b = y_order < packed_cpp_int<Bits, Signed>::limb_count - 1 ? 
-         (static_cast<unsigned long long>(y.data()[y_order]) << packed_cpp_int<Bits, Signed>::limb_bits) | y.data()[y_order + 1] 
+      a = (static_cast<unsigned long long>(r.data()[r_order]) << fixed_int<Bits, Signed>::limb_bits) | r.data()[r_order + 1];
+      b = y_order < fixed_int<Bits, Signed>::limb_count - 1 ? 
+         (static_cast<unsigned long long>(y.data()[y_order]) << fixed_int<Bits, Signed>::limb_bits) | y.data()[y_order + 1] 
          : y.data()[y_order];
       result = a / b;
       r = a % b;
@@ -708,13 +726,13 @@ void divide_unsigned_helper(packed_cpp_int<Bits, Signed>& result, const packed_c
       // Calculate our best guess for how many times y divides into r:
       //
       boost::uint32_t guess;
-      if((r.data()[r_order] <= y.data()[y_order]) && (r_order < packed_cpp_int<Bits, Signed>::limb_count - 1))
+      if((r.data()[r_order] <= y.data()[y_order]) && (r_order < fixed_int<Bits, Signed>::limb_count - 1))
       {
          unsigned long long a, b, v;
-         a = (static_cast<unsigned long long>(r.data()[r_order]) << packed_cpp_int<Bits, Signed>::limb_bits) | r.data()[r_order + 1];
+         a = (static_cast<unsigned long long>(r.data()[r_order]) << fixed_int<Bits, Signed>::limb_bits) | r.data()[r_order + 1];
          b = y.data()[y_order];
          v = a / b;
-         if(v > packed_cpp_int<Bits, Signed>::max_limb_value)
+         if(v > fixed_int<Bits, Signed>::max_limb_value)
             guess = 1;
          else
          {
@@ -724,14 +742,19 @@ void divide_unsigned_helper(packed_cpp_int<Bits, Signed>& result, const packed_c
       }
       else
       {
-         guess = r.data()[r_order] / y.data()[y_order];
+         unsigned long long a, b, v;
+         a = (r_order < fixed_int<Bits, Signed>::limb_count - 1) ? (static_cast<unsigned long long>(r.data()[r_order]) << fixed_int<Bits, Signed>::limb_bits) | r.data()[r_order + 1] : r.data()[r_order];
+         b = (y_order < fixed_int<Bits, Signed>::limb_count - 1) ? (static_cast<unsigned long long>(y.data()[y_order]) << fixed_int<Bits, Signed>::limb_bits) | y.data()[y_order + 1] : (static_cast<unsigned long long>(y.data()[y_order])  << fixed_int<Bits, Signed>::limb_bits);
+         v = a / b;
+         guess = static_cast<typename fixed_int<Bits, Signed>::limb_type>(v);
+         //guess = r.data()[r_order] / y.data()[y_order];
       }
       //
       // Update result:
       //
       boost::uint32_t shift = y_order - r_order;
       t = boost::uint32_t(0);
-      t.data()[packed_cpp_int<Bits, Signed>::limb_count - 1 - shift] = guess;
+      t.data()[fixed_int<Bits, Signed>::limb_count - 1 - shift] = guess;
       if(r_neg)
          subtract(result, t);
       else
@@ -741,20 +764,20 @@ void divide_unsigned_helper(packed_cpp_int<Bits, Signed>& result, const packed_c
       // rather than a full O(N^2) multiply:
       //
       boost::uintmax_t carry = 0;
-      for(unsigned i = packed_cpp_int<Bits, Signed>::limb_count - 1; i > packed_cpp_int<Bits, Signed>::limb_count - shift - 1; --i)
+      for(unsigned i = fixed_int<Bits, Signed>::limb_count - 1; i > fixed_int<Bits, Signed>::limb_count - shift - 1; --i)
          t.data()[i] = 0;
-      for(int i = packed_cpp_int<Bits, Signed>::limb_count - 1; i >= static_cast<int>(shift); --i)
+      for(int i = fixed_int<Bits, Signed>::limb_count - 1; i >= static_cast<int>(shift); --i)
       {
          carry += static_cast<boost::uintmax_t>(y.data()[i]) * static_cast<boost::uintmax_t>(guess);
-         t.data()[i - shift] = static_cast<typename packed_cpp_int<Bits, Signed>::limb_type>(carry);
-         carry >>= packed_cpp_int<Bits, Signed>::limb_bits;
+         t.data()[i - shift] = static_cast<typename fixed_int<Bits, Signed>::limb_type>(carry);
+         carry >>= fixed_int<Bits, Signed>::limb_bits;
       }
-      t.data()[0] &= packed_cpp_int<Bits, Signed>::upper_limb_mask;
+      t.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
        //
       // Update r:
       //
       subtract(r, t);
-      if(r.data()[0] & packed_cpp_int<Bits, Signed>::sign_bit_mask)
+      if(r.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask)
       {
          r.negate();
          r_neg = !r_neg;
@@ -777,29 +800,29 @@ void divide_unsigned_helper(packed_cpp_int<Bits, Signed>& result, const packed_c
 }
 
 template <unsigned Bits, bool Signed>
-inline void divide(packed_cpp_int<Bits, Signed>& result, const packed_cpp_int<Bits, Signed>& a, const packed_cpp_int<Bits, Signed>& b)
+inline void divide(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, const fixed_int<Bits, Signed>& b)
 {
-   packed_cpp_int<Bits, Signed> r;
-   if(Signed && (a.data()[0] & packed_cpp_int<Bits, Signed>::sign_bit_mask))
+   fixed_int<Bits, Signed> r;
+   if(Signed && (a.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask))
    {
-      if(Signed && (b.data()[0] & packed_cpp_int<Bits, Signed>::sign_bit_mask))
+      if(Signed && (b.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask))
       {
-         packed_cpp_int<Bits, Signed> t1(a), t2(b);
+         fixed_int<Bits, Signed> t1(a), t2(b);
          t1.negate();
          t2.negate();
          divide_unsigned_helper(result, t1, t2, r);
       }
       else
       {
-         packed_cpp_int<Bits, Signed> t(a);
+         fixed_int<Bits, Signed> t(a);
          t.negate();
          divide_unsigned_helper(result, t, b, r);
          result.negate();
       }
    }
-   else if(Signed && (b.data()[0] & packed_cpp_int<Bits, Signed>::sign_bit_mask))
+   else if(Signed && (b.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask))
    {
-      packed_cpp_int<Bits, Signed> t(b);
+      fixed_int<Bits, Signed> t(b);
       t.negate();
       divide_unsigned_helper(result, a, t, r);
       result.negate();
@@ -810,21 +833,21 @@ inline void divide(packed_cpp_int<Bits, Signed>& result, const packed_cpp_int<Bi
    }
 }
 template <unsigned Bits, bool Signed>
-inline void divide(packed_cpp_int<Bits, Signed>& result, const packed_cpp_int<Bits, Signed>& b)
+inline void divide(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& b)
 {
    // There is no in place divide:
-   packed_cpp_int<Bits, Signed> a(result);
+   fixed_int<Bits, Signed> a(result);
    divide(result, a, b);
 }
 template <unsigned Bits, bool Signed>
-inline void modulus(packed_cpp_int<Bits, Signed>& result, const packed_cpp_int<Bits, Signed>& a, const packed_cpp_int<Bits, Signed>& b)
+inline void modulus(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, const fixed_int<Bits, Signed>& b)
 {
-   packed_cpp_int<Bits, Signed> r;
-   if(Signed && (a.data()[0] & packed_cpp_int<Bits, Signed>::sign_bit_mask))
+   fixed_int<Bits, Signed> r;
+   if(Signed && (a.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask))
    {
-      if(Signed && (b.data()[0] & packed_cpp_int<Bits, Signed>::sign_bit_mask))
+      if(Signed && (b.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask))
       {
-         packed_cpp_int<Bits, Signed> t1(a), t2(b);
+         fixed_int<Bits, Signed> t1(a), t2(b);
          t1.negate();
          t2.negate();
          divide_unsigned_helper(r, t1, t2, result);
@@ -832,15 +855,15 @@ inline void modulus(packed_cpp_int<Bits, Signed>& result, const packed_cpp_int<B
       }
       else
       {
-         packed_cpp_int<Bits, Signed> t(a);
+         fixed_int<Bits, Signed> t(a);
          t.negate();
          divide_unsigned_helper(r, t, b, result);
          result.negate();
       }
    }
-   else if(Signed && (b.data()[0] & packed_cpp_int<Bits, Signed>::sign_bit_mask))
+   else if(Signed && (b.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask))
    {
-      packed_cpp_int<Bits, Signed> t(b);
+      fixed_int<Bits, Signed> t(b);
       t.negate();
       divide_unsigned_helper(r, a, t, result);
    }
@@ -850,100 +873,100 @@ inline void modulus(packed_cpp_int<Bits, Signed>& result, const packed_cpp_int<B
    }
 }
 template <unsigned Bits, bool Signed>
-inline void modulus(packed_cpp_int<Bits, Signed>& result, const packed_cpp_int<Bits, Signed>& b)
+inline void modulus(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& b)
 {
    // There is no in place divide:
-   packed_cpp_int<Bits, Signed> a(result);
+   fixed_int<Bits, Signed> a(result);
    modulus(result, a, b);
 }
 
 template <unsigned Bits, bool Signed>
-inline void bitwise_and(packed_cpp_int<Bits, Signed>& result, const packed_cpp_int<Bits, Signed>& o)
+inline void bitwise_and(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& o)
 {
-   for(typename packed_cpp_int<Bits, Signed>::data_type::size_type i = 0; i < packed_cpp_int<Bits, Signed>::limb_count; ++i)
+   for(typename fixed_int<Bits, Signed>::data_type::size_type i = 0; i < fixed_int<Bits, Signed>::limb_count; ++i)
       result.data()[i] &= o.data()[i];
 }
 template <unsigned Bits, bool Signed>
-inline void bitwise_or(packed_cpp_int<Bits, Signed>& result, const packed_cpp_int<Bits, Signed>& o)
+inline void bitwise_or(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& o)
 {
-   for(typename packed_cpp_int<Bits, Signed>::data_type::size_type i = 0; i < packed_cpp_int<Bits, Signed>::limb_count; ++i)
+   for(typename fixed_int<Bits, Signed>::data_type::size_type i = 0; i < fixed_int<Bits, Signed>::limb_count; ++i)
       result.data()[i] |= o.data()[i];
 }
 template <unsigned Bits, bool Signed>
-inline void bitwise_xor(packed_cpp_int<Bits, Signed>& result, const packed_cpp_int<Bits, Signed>& o)
+inline void bitwise_xor(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& o)
 {
-   for(typename packed_cpp_int<Bits, Signed>::data_type::size_type i = 0; i < packed_cpp_int<Bits, Signed>::limb_count; ++i)
+   for(typename fixed_int<Bits, Signed>::data_type::size_type i = 0; i < fixed_int<Bits, Signed>::limb_count; ++i)
       result.data()[i] ^= o.data()[i];
-   result.data()[0] &= packed_cpp_int<Bits, Signed>::upper_limb_mask;
+   result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 template <unsigned Bits, bool Signed>
-inline void complement(packed_cpp_int<Bits, Signed>& result, const packed_cpp_int<Bits, Signed>& o)
+inline void complement(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& o)
 {
-   for(typename packed_cpp_int<Bits, Signed>::data_type::size_type i = 0; i < packed_cpp_int<Bits, Signed>::limb_count; ++i)
+   for(typename fixed_int<Bits, Signed>::data_type::size_type i = 0; i < fixed_int<Bits, Signed>::limb_count; ++i)
       result.data()[i] = ~o.data()[i];
-   result.data()[0] &= packed_cpp_int<Bits, Signed>::upper_limb_mask;
+   result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 template <unsigned Bits, bool Signed>
-inline void left_shift(packed_cpp_int<Bits, Signed>& result, boost::uintmax_t s)
+inline void left_shift(fixed_int<Bits, Signed>& result, boost::uintmax_t s)
 {
    if(s >= Bits)
    {
       result = static_cast<boost::uint32_t>(0);
       return;
    }
-   boost::uint32_t offset = static_cast<boost::uint32_t>(s / packed_cpp_int<Bits, Signed>::limb_bits);
-   boost::uint32_t shift  = static_cast<boost::uint32_t>(s % packed_cpp_int<Bits, Signed>::limb_bits);
+   boost::uint32_t offset = static_cast<boost::uint32_t>(s / fixed_int<Bits, Signed>::limb_bits);
+   boost::uint32_t shift  = static_cast<boost::uint32_t>(s % fixed_int<Bits, Signed>::limb_bits);
    unsigned i = 0;
    if(shift)
    {
       // This code only works when shift is non-zero, otherwise we invoke undefined behaviour!
-      for(; i + offset + 1 < packed_cpp_int<Bits, Signed>::limb_count; ++i)
+      for(; i + offset + 1 < fixed_int<Bits, Signed>::limb_count; ++i)
       {
          result.data()[i] = result.data()[i+offset] << shift;
-         result.data()[i] |= result.data()[i+offset+1] >> (packed_cpp_int<Bits, Signed>::limb_bits - shift);
+         result.data()[i] |= result.data()[i+offset+1] >> (fixed_int<Bits, Signed>::limb_bits - shift);
       }
       result.data()[i] = result.data()[i+offset] << shift;
       ++i;
-      for(; i < packed_cpp_int<Bits, Signed>::limb_count; ++i)
+      for(; i < fixed_int<Bits, Signed>::limb_count; ++i)
          result.data()[i] = 0;
    }
    else
    {
-      for(; i + offset < packed_cpp_int<Bits, Signed>::limb_count; ++i)
+      for(; i + offset < fixed_int<Bits, Signed>::limb_count; ++i)
          result.data()[i] = result.data()[i+offset];
-      for(; i < packed_cpp_int<Bits, Signed>::limb_count; ++i)
+      for(; i < fixed_int<Bits, Signed>::limb_count; ++i)
          result.data()[i] = 0;
    }
-   result.data()[0] &= packed_cpp_int<Bits, Signed>::upper_limb_mask;
+   result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 template <unsigned Bits, bool Signed>
-inline void right_shift(packed_cpp_int<Bits, Signed>& result, boost::uintmax_t s)
+inline void right_shift(fixed_int<Bits, Signed>& result, boost::uintmax_t s)
 {
-   boost::uint32_t fill = (Signed && (result.data()[0] & packed_cpp_int<Bits, Signed>::sign_bit_mask)) ? packed_cpp_int<Bits, Signed>::max_limb_value : 0u;
+   boost::uint32_t fill = (Signed && (result.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask)) ? fixed_int<Bits, Signed>::max_limb_value : 0u;
    if(s >= Bits)
    {
-      for(unsigned i = 0; i < packed_cpp_int<Bits, Signed>::limb_count; ++i)
+      for(unsigned i = 0; i < fixed_int<Bits, Signed>::limb_count; ++i)
          result.data()[i] = fill;
       return;
    }
-   boost::uint32_t offset = static_cast<boost::uint32_t>(s / packed_cpp_int<Bits, Signed>::limb_bits);
-   boost::uint32_t shift  = static_cast<boost::uint32_t>(s % packed_cpp_int<Bits, Signed>::limb_bits);
-   int i = packed_cpp_int<Bits, Signed>::limb_count - 1;
+   boost::uint32_t offset = static_cast<boost::uint32_t>(s / fixed_int<Bits, Signed>::limb_bits);
+   boost::uint32_t shift  = static_cast<boost::uint32_t>(s % fixed_int<Bits, Signed>::limb_bits);
+   int i = fixed_int<Bits, Signed>::limb_count - 1;
    if(shift)
    {
       // This code only works for non-zero shift, otherwise we invoke undefined behaviour!
-      if(fill && (Bits % packed_cpp_int<Bits, Signed>::limb_bits))
+      if(fill && (Bits % fixed_int<Bits, Signed>::limb_bits))
       {
          // We need to sign extend the leftmost bits, otherwise we may shift zeros into the result:
-         result.data()[0] |= fill << (Bits % packed_cpp_int<Bits, Signed>::limb_bits);
+         result.data()[0] |= fill << (Bits % fixed_int<Bits, Signed>::limb_bits);
       }
       for(; i - offset > 0; --i)
       {
          result.data()[i] = result.data()[i-offset] >> shift;
-         result.data()[i] |= result.data()[i-offset-1] << (packed_cpp_int<Bits, Signed>::limb_bits - shift);
+         result.data()[i] |= result.data()[i-offset-1] << (fixed_int<Bits, Signed>::limb_bits - shift);
       }
       result.data()[i] = result.data()[i+offset] >> shift;
-      result.data()[i] |= fill << (packed_cpp_int<Bits, Signed>::limb_bits - shift);
+      result.data()[i] |= fill << (fixed_int<Bits, Signed>::limb_bits - shift);
       --i;
       for(; i >= 0; --i)
          result.data()[i] = fill;
@@ -955,37 +978,37 @@ inline void right_shift(packed_cpp_int<Bits, Signed>& result, boost::uintmax_t s
       for(; i >= 0; --i)
          result.data()[i] = fill;
    }
-   result.data()[0] &= packed_cpp_int<Bits, Signed>::upper_limb_mask;
+   result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 
 template <class R, unsigned Bits, bool Signed>
-inline typename enable_if<is_integral<R>, void>::type convert_to(R* result, const packed_cpp_int<Bits, Signed>& backend)
+inline typename enable_if<is_integral<R>, void>::type convert_to(R* result, const fixed_int<Bits, Signed>& backend)
 {
-   unsigned shift = (packed_cpp_int<Bits, Signed>::limb_count - 1) * packed_cpp_int<Bits, Signed>::limb_bits;
+   unsigned shift = (fixed_int<Bits, Signed>::limb_count - 1) * fixed_int<Bits, Signed>::limb_bits;
    *result = 0;
-   for(unsigned i = 0; i < packed_cpp_int<Bits, Signed>::limb_count; ++i)
+   for(unsigned i = 0; i < fixed_int<Bits, Signed>::limb_count; ++i)
    {
       *result += static_cast<R>(backend.data()[i]) << shift;
-      shift -= packed_cpp_int<Bits, Signed>::limb_bits;
+      shift -= fixed_int<Bits, Signed>::limb_bits;
    }
 }
 
 template <class R, unsigned Bits, bool Signed>
-inline typename enable_if<is_floating_point<R>, void>::type convert_to(R* result, const packed_cpp_int<Bits, Signed>& backend)
+inline typename enable_if<is_floating_point<R>, void>::type convert_to(R* result, const fixed_int<Bits, Signed>& backend)
 {
-   unsigned shift = (packed_cpp_int<Bits, Signed>::limb_count - 1) * packed_cpp_int<Bits, Signed>::limb_bits;
+   unsigned shift = (fixed_int<Bits, Signed>::limb_count - 1) * fixed_int<Bits, Signed>::limb_bits;
    *result = 0;
-   for(unsigned i = 0; i < packed_cpp_int<Bits, Signed>::limb_count; ++i)
+   for(unsigned i = 0; i < fixed_int<Bits, Signed>::limb_count; ++i)
    {
       *result += static_cast<R>(std::ldexp(static_cast<double>(backend.data()[i]), shift));
-      shift -= packed_cpp_int<Bits, Signed>::limb_bits;
+      shift -= fixed_int<Bits, Signed>::limb_bits;
    }
 }
 
 template <unsigned Bits, bool Signed>
-inline bool is_zero(const packed_cpp_int<Bits, Signed>& val)
+inline bool is_zero(const fixed_int<Bits, Signed>& val)
 {
-   for(typename packed_cpp_int<Bits, Signed>::data_type::size_type i = 0; i < packed_cpp_int<Bits, Signed>::limb_count; ++i)
+   for(typename fixed_int<Bits, Signed>::data_type::size_type i = 0; i < fixed_int<Bits, Signed>::limb_count; ++i)
    {
       if(val.data()[i])
          return false;
@@ -993,28 +1016,28 @@ inline bool is_zero(const packed_cpp_int<Bits, Signed>& val)
    return true;
 }
 template <unsigned Bits>
-inline int get_sign(const packed_cpp_int<Bits, false>& val)
+inline int get_sign(const fixed_int<Bits, false>& val)
 {
    return is_zero(val) ? 0 : 1;
 }
 template <unsigned Bits>
-inline int get_sign(const packed_cpp_int<Bits, true>& val)
+inline int get_sign(const fixed_int<Bits, true>& val)
 {
-   return is_zero(val) ? 0 : val.data()[0] & packed_cpp_int<Bits, true>::sign_bit_mask ? -1 : 1;
+   return is_zero(val) ? 0 : val.data()[0] & fixed_int<Bits, true>::sign_bit_mask ? -1 : 1;
 }
 
 template <unsigned Bits, bool Signed>
-struct number_category<packed_cpp_int<Bits, Signed> > : public mpl::int_<number_kind_integer>{};
+struct number_category<fixed_int<Bits, Signed> > : public mpl::int_<number_kind_integer>{};
 
-typedef mp_number<packed_cpp_int<64, false> > mp_uint64_t;
-typedef mp_number<packed_cpp_int<128, false> > mp_uint128_t;
-typedef mp_number<packed_cpp_int<256, false> > mp_uint256_t;
-typedef mp_number<packed_cpp_int<512, false> > mp_uint512_t;
+typedef mp_number<fixed_int<64, false> > mp_uint64_t;
+typedef mp_number<fixed_int<128, false> > mp_uint128_t;
+typedef mp_number<fixed_int<256, false> > mp_uint256_t;
+typedef mp_number<fixed_int<512, false> > mp_uint512_t;
 
-typedef mp_number<packed_cpp_int<64, true> > mp_int64_t;
-typedef mp_number<packed_cpp_int<128, true> > mp_int128_t;
-typedef mp_number<packed_cpp_int<256, true> > mp_int256_t;
-typedef mp_number<packed_cpp_int<512, true> > mp_int512_t;
+typedef mp_number<fixed_int<64, true> > mp_int64_t;
+typedef mp_number<fixed_int<128, true> > mp_int128_t;
+typedef mp_number<fixed_int<256, true> > mp_int256_t;
+typedef mp_number<fixed_int<512, true> > mp_int512_t;
 
 }} // namespaces
 
@@ -1022,16 +1045,16 @@ typedef mp_number<packed_cpp_int<512, true> > mp_int512_t;
 namespace std{
 
 template <unsigned Bits, bool Signed>
-class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::packed_cpp_int<Bits, Signed> > >
+class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<Bits, Signed> > >
 {
-   typedef boost::multiprecision::mp_number<boost::multiprecision::packed_cpp_int<Bits, Signed> > number_type;
+   typedef boost::multiprecision::mp_number<boost::multiprecision::fixed_int<Bits, Signed> > number_type;
 
    struct initializer
    {
       initializer()
       {
-         (std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::packed_cpp_int<Bits, Signed> > >::min)();
-         (std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::packed_cpp_int<Bits, Signed> > >::max)();
+         (std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<Bits, Signed> > >::min)();
+         (std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<Bits, Signed> > >::max)();
       }
       void do_nothing()const{}
    };
@@ -1096,8 +1119,8 @@ public:
 };
 
 template <unsigned Bits, bool Signed>
-typename numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::packed_cpp_int<Bits, Signed> > >::initializer const
-   numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::packed_cpp_int<Bits, Signed> > >::init;
+typename numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<Bits, Signed> > >::initializer const
+   numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<Bits, Signed> > >::init;
 }
 
 #endif

@@ -4,7 +4,7 @@
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_
 
 //
-// Compare arithmetic results using packed_cpp_int to GMP results.
+// Compare arithmetic results using fixed_int to GMP results.
 //
 
 #ifdef _MSC_VER
@@ -12,7 +12,7 @@
 #endif
 
 #include <boost/multiprecision/gmp.hpp>
-#include <boost/multiprecision/packed_cpp_int.hpp>
+#include <boost/multiprecision/fixed_int.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
 #include "test.hpp"
@@ -54,7 +54,7 @@ T generate_random(unsigned bits_wanted)
 int main()
 {
    using namespace boost::multiprecision;
-   typedef mp_number<packed_cpp_int<1024, true> > packed_type;
+   typedef mp_number<fixed_int<1024, true> > packed_type;
    unsigned last_error_count = 0;
    for(int i = 0; i < 1000; ++i)
    {
