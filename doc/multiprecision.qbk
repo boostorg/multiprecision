@@ -22,6 +22,7 @@
 [import ../example/mpfr_snips.cpp]
 [import ../example/cpp_float_snips.cpp]
 [import ../example/tommath_snips.cpp]
+[import ../example/fixed_int_snips.cpp]
 
 [section:intro Introduction]
 
@@ -201,6 +202,7 @@ The following backends provide integer arithmetic:
 [[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
 [[`gmp_int`][boost/multiprecision/gmp.hpp][2][GMP][Very fast and efficient backend.][Dependency on GNU licenced GMP library.]]
 [[`mp_int`][boost/multiprecision/tommath.hpp][2][libtommath][Public domain backend with no licence restrictions.][Slower than GMP.]]
+[[`fixed_int`][boost/multiprecision/fixed_int.hpp][2][None][Boost licenced fixed precision modular arithmetic integer.][Slower than GMP.]]
 ]
 
 [h4 gmp_int]
@@ -256,6 +258,33 @@ as a result performing formatted output on this type when the argument is negati
 [h5 Example:]
 
 [tommath_eg]
+
+[h4 fixed_int]
+
+   namespace boost{ namespace multiprecision{
+
+   template <unsigned Digits, bool Signed>
+   class fixed_int;
+
+   typedef mp_number<fixed_int<128, false> > mp_uint128_t;
+   typedef mp_number<fixed_int<256, false> > mp_uint256_t;
+   typedef mp_number<fixed_int<512, false> > mp_uint512_t;
+
+   typedef mp_number<fixed_int<128, true> > mp_int128_t;
+   typedef mp_number<fixed_int<256, true> > mp_int256_t;
+   typedef mp_number<fixed_int<512, true> > mp_int512_t;
+
+   }} // namespaces
+
+The `fixed_int` backend is used via one of the typedefs `boost::multiprecision::mp_uint128_t`, `boost::multiprecision::mp_uint256_t`,
+`boost::multiprecision::mp_uint512_t`, `boost::multiprecision::mp_int128_t`, `boost::multiprecision::mp_int256_t`
+or `boost::multiprecision::mp_int512_t`.  It provides both signed and unsigned integer types with a fixed precision
+and modular arithmetic with a 2's complement representation for negative values.  In other words it's designed to work just 
+like a typical built in integer type, but with larger precision.
+
+[h5 Example:]
+
+[fixed_int_eg]
 
 [endsect]
 

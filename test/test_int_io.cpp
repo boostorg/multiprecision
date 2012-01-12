@@ -124,14 +124,14 @@ int main()
    test_round_trip<boost::multiprecision::mp_int>();
 #endif
 #ifdef TEST_FIXED_INT1
-   test_round_trip<boost::multiprecision::mp_uint64_t>();
+   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<64, false> > >();
    test_round_trip<boost::multiprecision::mp_uint128_t>();
    test_round_trip<boost::multiprecision::mp_uint512_t>();
    test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<20, false> > >();
    test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<70, false> > >();
 #endif
 #ifdef TEST_FIXED_INT2
-   test_round_trip<boost::multiprecision::mp_int64_t>();
+   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<64, true> > >();
    test_round_trip<boost::multiprecision::mp_int128_t>();
    test_round_trip<boost::multiprecision::mp_int512_t>();
    test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<20, true> > >();

@@ -13,7 +13,7 @@
 <div class="spirit-nav">
 <a accesskey="p" href="../tut.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../tut.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="reals.html"><img src="../../images/next.png" alt="Next"></a>
 </div>
-<div class="section">
+<div class="section boost_multiprecision_tut_ints">
 <div class="titlepage"><div><div><h3 class="title">
 <a name="boost_multiprecision.tut.ints"></a><a class="link" href="ints.html" title="Integer Types">Integer Types</a>
 </h3></div></div></div>
@@ -118,6 +118,38 @@
 <td>
                 <p>
                   Public domain backend with no licence restrictions.
+                </p>
+              </td>
+<td>
+                <p>
+                  Slower than GMP.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">fixed_int</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  boost/multiprecision/fixed_int.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  2
+                </p>
+              </td>
+<td>
+                <p>
+                  None
+                </p>
+              </td>
+<td>
+                <p>
+                  Boost licenced fixed precision modular arithmetic integer.
                 </p>
               </td>
 <td>
@@ -285,6 +317,59 @@
 <span class="special">{</span>
    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">e</span><span class="special">.</span><span class="identifier">what</span><span class="special">()</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
 <span class="special">}</span>
+
+</pre>
+<p>
+      </p>
+<h5>
+<a name="boost_multiprecision.tut.ints.h4"></a>
+        <span><a name="boost_multiprecision.tut.ints.fixed_int"></a></span><a class="link" href="ints.html#boost_multiprecision.tut.ints.fixed_int">fixed_int</a>
+      </h5>
+<pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">multiprecision</span><span class="special">{</span>
+
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">unsigned</span> <span class="identifier">Digits</span><span class="special">,</span> <span class="keyword">bool</span> <span class="identifier">Signed</span><span class="special">&gt;</span>
+<span class="keyword">class</span> <span class="identifier">fixed_int</span><span class="special">;</span>
+
+<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">fixed_int</span><span class="special">&lt;</span><span class="number">128</span><span class="special">,</span> <span class="keyword">false</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">mp_uint128_t</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">fixed_int</span><span class="special">&lt;</span><span class="number">256</span><span class="special">,</span> <span class="keyword">false</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">mp_uint256_t</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">fixed_int</span><span class="special">&lt;</span><span class="number">512</span><span class="special">,</span> <span class="keyword">false</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">mp_uint512_t</span><span class="special">;</span>
+
+<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">fixed_int</span><span class="special">&lt;</span><span class="number">128</span><span class="special">,</span> <span class="keyword">true</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">mp_int128_t</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">fixed_int</span><span class="special">&lt;</span><span class="number">256</span><span class="special">,</span> <span class="keyword">true</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">mp_int256_t</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">fixed_int</span><span class="special">&lt;</span><span class="number">512</span><span class="special">,</span> <span class="keyword">true</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">mp_int512_t</span><span class="special">;</span>
+
+<span class="special">}}</span> <span class="comment">// namespaces</span>
+</pre>
+<p>
+        The <code class="computeroutput"><span class="identifier">fixed_int</span></code> backend is
+        used via one of the typedefs <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">mp_uint128_t</span></code>,
+        <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">mp_uint256_t</span></code>, <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">mp_uint512_t</span></code>,
+        <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">mp_int128_t</span></code>, <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">mp_int256_t</span></code>
+        or <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">mp_int512_t</span></code>. It provides both signed and
+        unsigned integer types with a fixed precision and modular arithmetic with
+        a 2's complement representation for negative values. In other words it's
+        designed to work just like a typical built in integer type, but with larger
+        precision.
+      </p>
+<h6>
+<a name="boost_multiprecision.tut.ints.h5"></a>
+        <span><a name="boost_multiprecision.tut.ints.example1"></a></span><a class="link" href="ints.html#boost_multiprecision.tut.ints.example1">Example:</a>
+      </h6>
+<p>
+</p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">fixed_int</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+
+<span class="keyword">using</span> <span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">;</span>
+
+<span class="identifier">mp_int128_t</span> <span class="identifier">v</span> <span class="special">=</span> <span class="number">1</span><span class="special">;</span>
+
+<span class="comment">// Do some arithmetic:</span>
+<span class="keyword">for</span><span class="special">(</span><span class="keyword">unsigned</span> <span class="identifier">i</span> <span class="special">=</span> <span class="number">1</span><span class="special">;</span> <span class="identifier">i</span> <span class="special">&lt;=</span> <span class="number">20</span><span class="special">;</span> <span class="special">++</span><span class="identifier">i</span><span class="special">)</span>
+   <span class="identifier">v</span> <span class="special">*=</span> <span class="identifier">i</span><span class="special">;</span>
+
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">v</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span> <span class="comment">// prints 20!</span>
+<span class="identifier">v</span> <span class="special">=</span> <span class="special">-</span><span class="identifier">v</span><span class="special">;</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">hex</span> <span class="special">&lt;&lt;</span> <span class="identifier">v</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span> <span class="comment">// prints 2's complement representation</span>
 
 </pre>
 <p>

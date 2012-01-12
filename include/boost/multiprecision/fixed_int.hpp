@@ -1034,12 +1034,10 @@ inline int get_sign(const fixed_int<Bits, true>& val)
 template <unsigned Bits, bool Signed>
 struct number_category<fixed_int<Bits, Signed> > : public mpl::int_<number_kind_integer>{};
 
-typedef mp_number<fixed_int<64, false> > mp_uint64_t;
 typedef mp_number<fixed_int<128, false> > mp_uint128_t;
 typedef mp_number<fixed_int<256, false> > mp_uint256_t;
 typedef mp_number<fixed_int<512, false> > mp_uint512_t;
 
-typedef mp_number<fixed_int<64, true> > mp_int64_t;
 typedef mp_number<fixed_int<128, true> > mp_int128_t;
 typedef mp_number<fixed_int<256, true> > mp_int256_t;
 typedef mp_number<fixed_int<512, true> > mp_int512_t;

@@ -1000,7 +1000,7 @@ int main()
    test<boost::rational<boost::multiprecision::mpz_int> >();
 #endif
 #ifdef TEST_FIXED_INT1
-   test<boost::multiprecision::mp_uint64_t>();
+   test<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<64, false> > >();
    test<boost::multiprecision::mp_uint128_t>();
    test<boost::multiprecision::mp_uint512_t>();
    test<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<70, false> > >();

@@ -348,7 +348,7 @@ int main()
    test<boost::multiprecision::mp_int>("tommath_int", 1024);
 #endif
 #ifdef TEST_FIXED_INT
-   test<boost::multiprecision::mp_int64_t>("mp_int64_t", 64);
+   test<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<64, true> > >("mp_int64_t", 64);
    test<boost::multiprecision::mp_int128_t>("mp_int128_t", 128);
    test<boost::multiprecision::mp_int256_t>("mp_int256_t", 256);
    test<boost::multiprecision::mp_int512_t>("mp_int512_t", 512);
