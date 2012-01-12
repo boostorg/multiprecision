@@ -424,13 +424,19 @@ template <unsigned Bits, bool Signed>
 inline void increment(fixed_int<Bits, Signed>& result)
 {
    static const limb_type one = 1;
-   add(result, one);
+   if(result.data().elems[fixed_int<Bits, Signed>::limb_count - 1] < fixed_int<Bits, Signed>::max_limb_value)
+      ++result.data().elems[fixed_int<Bits, Signed>::limb_count - 1];
+   else
+      add(result, one);
 }
 template <unsigned Bits, bool Signed>
 inline void decrement(fixed_int<Bits, Signed>& result)
 {
    static const limb_type one = 1;
-   subtract(result, one);
+   if(result.data().elems[fixed_int<Bits, Signed>::limb_count - 1])
+      --result.data().elems[fixed_int<Bits, Signed>::limb_count - 1];
+   else
+      subtract(result, one);
 }
 template <unsigned Bits, bool Signed>
 inline void subtract(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& o)
@@ -720,6 +726,8 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
       return;
    }
 
+   //fixed_int<Bits, Signed> last_r;
+   //bool last_neg;
    do
    {
       //
@@ -731,6 +739,8 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
       // Calculate our best guess for how many times y divides into r:
       //
       limb_type guess;
+      //last_r = r;
+      //last_neg = r_neg;
       if((r.data()[r_order] <= y.data()[y_order]) && (r_order < fixed_int<Bits, Signed>::limb_count - 1))
       {
          double_limb_type a, b, v;
