@@ -17,14 +17,19 @@
 namespace boost{
 namespace multiprecision{
 
+typedef boost::uint32_t limb_type;
+typedef boost::int32_t signed_limb_type;
+typedef boost::uint64_t double_limb_type;
+typedef boost::int64_t signed_double_limb_type;
+
 template <unsigned Bits, bool Signed>
 struct fixed_int
 {
-   typedef mpl::list<boost::int32_t, boost::intmax_t>      signed_types;
-   typedef mpl::list<boost::uint32_t, boost::uintmax_t>    unsigned_types;
+   typedef mpl::list<signed_limb_type, signed_double_limb_type>      signed_types;
+   typedef mpl::list<limb_type, double_limb_type>    unsigned_types;
    typedef mpl::list<long double>                          float_types;
 
-   typedef boost::uint32_t   limb_type;
+   typedef limb_type   limb_type;
    BOOST_STATIC_CONSTANT(unsigned, limb_bits = sizeof(limb_type) * CHAR_BIT);
    BOOST_STATIC_CONSTANT(unsigned, limb_count = Bits / limb_bits + (Bits % limb_bits ? 1 : 0));
    BOOST_STATIC_CONSTANT(limb_type, max_limb_value = ~static_cast<limb_type>(0u));
@@ -46,7 +51,7 @@ struct fixed_int
       m_value = o.m_value;
       return *this;
    }
-   fixed_int& operator = (boost::uint32_t i)
+   fixed_int& operator = (limb_type i)
    {
       m_value[limb_count - 1] = i;
       for(int j = limb_count - 2; j >= 0; --j)
@@ -54,7 +59,7 @@ struct fixed_int
       m_value[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
       return *this;
    }
-   fixed_int& operator = (boost::int32_t i)
+   fixed_int& operator = (signed_limb_type i)
    {
       m_value[limb_count - 1] = i;
       // sign extend:
@@ -63,34 +68,34 @@ struct fixed_int
       m_value[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
       return *this;
    }
-   fixed_int& operator = (boost::uintmax_t i)
+   fixed_int& operator = (double_limb_type i)
    {
       BOOST_STATIC_ASSERT(sizeof(i) % sizeof(limb_type) == 0);
-      boost::uintmax_t mask = max_limb_value;
+      double_limb_type mask = max_limb_value;
       unsigned shift = 0;
-      for(int j = limb_count - 1; j >= static_cast<int>(limb_count) - static_cast<int>(sizeof(boost::intmax_t) / sizeof(limb_type)); --j)
+      for(int j = limb_count - 1; j >= static_cast<int>(limb_count) - static_cast<int>(sizeof(signed_double_limb_type) / sizeof(limb_type)); --j)
       {
          m_value[j] = static_cast<limb_type>((i & mask) >> shift);
          mask <<= limb_bits;
          shift += limb_bits;
       }
-      for(int j = static_cast<int>(limb_count) - static_cast<int>(sizeof(boost::intmax_t) / sizeof(limb_type)) - 1; j >= 0; --j)
+      for(int j = static_cast<int>(limb_count) - static_cast<int>(sizeof(signed_double_limb_type) / sizeof(limb_type)) - 1; j >= 0; --j)
          m_value[j] = 0;
       m_value[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
       return *this;
    }
-   fixed_int& operator = (boost::intmax_t i)
+   fixed_int& operator = (signed_double_limb_type i)
    {
       BOOST_STATIC_ASSERT(sizeof(i) % sizeof(limb_type) == 0);
-      boost::uintmax_t mask = max_limb_value;
+      double_limb_type mask = max_limb_value;
       unsigned shift = 0;
-      for(int j = limb_count - 1; j >= static_cast<int>(limb_count) - static_cast<int>(sizeof(boost::intmax_t) / sizeof(limb_type)); --j)
+      for(int j = limb_count - 1; j >= static_cast<int>(limb_count) - static_cast<int>(sizeof(signed_double_limb_type) / sizeof(limb_type)); --j)
       {
          m_value[j] = static_cast<limb_type>((i & mask) >> shift);
          mask <<= limb_bits;
          shift += limb_bits;
       }
-      for(int j = static_cast<int>(limb_count) - static_cast<int>(sizeof(boost::intmax_t) / sizeof(limb_type)) - 1; j >= 0; --j)
+      for(int j = static_cast<int>(limb_count) - static_cast<int>(sizeof(signed_double_limb_type) / sizeof(limb_type)) - 1; j >= 0; --j)
          m_value[j] = i < 0 ? max_limb_value : 0;
       m_value[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
       return *this;
@@ -103,11 +108,11 @@ struct fixed_int
       using std::floor;
 
       if (a == 0) {
-         return *this = static_cast<boost::uint32_t>(0u);
+         return *this = static_cast<limb_type>(0u);
       }
 
       if (a == 1) {
-         return *this = static_cast<boost::uint32_t>(1u);
+         return *this = static_cast<limb_type>(1u);
       }
 
       BOOST_ASSERT(!(boost::math::isinf)(a));
@@ -115,11 +120,11 @@ struct fixed_int
 
       int e;
       long double f, term;
-      *this = static_cast<boost::uint32_t>(0u);
+      *this = static_cast<limb_type>(0u);
 
       f = frexp(a, &e);
 
-      static const boost::uint32_t shift = std::numeric_limits<boost::uint32_t>::digits;
+      static const limb_type shift = std::numeric_limits<limb_type>::digits;
 
       while(f)
       {
@@ -129,9 +134,9 @@ struct fixed_int
          e -= shift;
          left_shift(*this, shift);
          if(term > 0)
-            add(*this, static_cast<boost::uint32_t>(term));
+            add(*this, static_cast<limb_type>(term));
          else
-            subtract(*this, static_cast<boost::uint32_t>(-term));
+            subtract(*this, static_cast<limb_type>(-term));
          f -= term;
       }
       if(e > 0)
@@ -144,7 +149,7 @@ struct fixed_int
    fixed_int& operator = (const char* s)
    {
       std::size_t n = s ? std::strlen(s) : 0;
-      *this = static_cast<boost::uint32_t>(0u);
+      *this = static_cast<limb_type>(0u);
       unsigned radix = 10;
       bool isneg = false;
       if(n && (*s == '-'))
@@ -172,7 +177,7 @@ struct fixed_int
          if(radix == 8 || radix == 16)
          {
             unsigned shift = radix == 8 ? 3 : 4;
-            boost::uint32_t val = max_limb_value;
+            limb_type val = max_limb_value;
             while(*s)
             {
                left_shift(*this, shift);
@@ -199,8 +204,8 @@ struct fixed_int
             while(*s)
             {
                // TODO: this implementation is brain dead, Fix Me!
-               multiply(*this, static_cast<boost::uint32_t>(10));
-               boost::uint32_t val;
+               multiply(*this, static_cast<limb_type>(10));
+               limb_type val;
                if(*s >= '0' && *s <= '9')
                   val = *s - '0';
                else
@@ -230,8 +235,8 @@ struct fixed_int
 
       if(base == 8 || base == 16)
       {
-         boost::uint32_t shift = base == 8 ? 3 : 4;
-         boost::uint32_t mask = static_cast<boost::uint32_t>((1u << shift) - 1);
+         limb_type shift = base == 8 ? 3 : 4;
+         limb_type mask = static_cast<limb_type>((1u << shift) - 1);
          fixed_int t(*this);
          for(unsigned i = 0; i < Bits / shift; ++i)
          {
@@ -243,7 +248,7 @@ struct fixed_int
          }
          if(Bits % shift)
          {
-            mask = static_cast<boost::uint32_t>((1u << (Bits % shift)) - 1);
+            mask = static_cast<limb_type>((1u << (Bits % shift)) - 1);
             char c = '0' + (t.data()[limb_count-1] & mask);
             if(c > '9')
                c += 'A' - '9';
@@ -266,7 +271,7 @@ struct fixed_int
       {
          fixed_int t(*this);
          fixed_int ten, r;
-         ten = boost::uint32_t(1000000000);
+         ten = limb_type(1000000000);
          bool neg = false;
          if(Signed && (t.data()[0] & sign_bit_mask))
          {
@@ -284,7 +289,7 @@ struct fixed_int
                fixed_int t2;
                divide_unsigned_helper(t2, t, ten, r);
                t = t2;
-               boost::uint32_t v = r.data()[limb_count - 1];
+               limb_type v = r.data()[limb_count - 1];
                for(unsigned i = 0; i < 9; ++i)
                {
                   char c = '0' + v % 10;
@@ -306,10 +311,10 @@ struct fixed_int
    }
    void negate()
    {
-      boost::uintmax_t carry = 1;
+      double_limb_type carry = 1;
       for(int i = fixed_int<Bits, Signed>::limb_count - 1; i >= 0; --i)
       {
-         carry += static_cast<boost::uintmax_t>(~m_value[i]);
+         carry += static_cast<double_limb_type>(~m_value[i]);
          m_value[i] = static_cast<limb_type>(carry);
          carry >>= limb_bits;
       }
@@ -356,75 +361,75 @@ inline void add(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& 
 {
    // Addition using modular arithmatic.
    // Nothing fancy, just let uintmax_t take the strain:
-   boost::uintmax_t carry = 0;
+   double_limb_type carry = 0;
    for(int i = fixed_int<Bits, Signed>::limb_count - 1; i >= 0; --i)
    {
-      carry += static_cast<boost::uintmax_t>(a.data()[i]) + static_cast<boost::uintmax_t>(b.data()[i]);
+      carry += static_cast<double_limb_type>(a.data()[i]) + static_cast<double_limb_type>(b.data()[i]);
       result.data()[i] = static_cast<typename fixed_int<Bits, Signed>::limb_type>(carry);
       carry >>= fixed_int<Bits, Signed>::limb_bits;
    }
    result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 template <unsigned Bits, bool Signed>
-inline void add(fixed_int<Bits, Signed>& result, const boost::uint32_t& o)
+inline void add(fixed_int<Bits, Signed>& result, const limb_type& o)
 {
    // Addition using modular arithmatic.
    // Nothing fancy, just let uintmax_t take the strain:
-   boost::uintmax_t carry = o;
+   double_limb_type carry = o;
    for(int i = fixed_int<Bits, Signed>::limb_count - 1; carry && i >= 0; --i)
    {
-      carry += static_cast<boost::uintmax_t>(result.data()[i]);
+      carry += static_cast<double_limb_type>(result.data()[i]);
       result.data()[i] = static_cast<typename fixed_int<Bits, Signed>::limb_type>(carry);
       carry >>= fixed_int<Bits, Signed>::limb_bits;
    }
    result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 template <unsigned Bits, bool Signed>
-inline void add(fixed_int<Bits, Signed>& result, const boost::int32_t& o)
+inline void add(fixed_int<Bits, Signed>& result, const signed_limb_type& o)
 {
    if(o < 0)
-      subtract(result, static_cast<boost::uint32_t>(-o));
+      subtract(result, static_cast<limb_type>(-o));
    else if(o > 0)
-      add(result, static_cast<boost::uint32_t>(o));
+      add(result, static_cast<limb_type>(o));
 }
 template <unsigned Bits, bool Signed>
-inline void subtract(fixed_int<Bits, Signed>& result, const boost::uint32_t& o)
+inline void subtract(fixed_int<Bits, Signed>& result, const limb_type& o)
 {
    // Subtract using modular arithmatic.
    // This is the same code as for addition, with the twist that we negate o "on the fly":
-   boost::uintmax_t carry = static_cast<boost::uintmax_t>(result.data()[fixed_int<Bits, Signed>::limb_count - 1]) 
-      + 1uLL + static_cast<boost::uintmax_t>(~o);
+   double_limb_type carry = static_cast<double_limb_type>(result.data()[fixed_int<Bits, Signed>::limb_count - 1]) 
+      + 1uLL + static_cast<double_limb_type>(~o);
    result.data()[fixed_int<Bits, Signed>::limb_count - 1] = static_cast<typename fixed_int<Bits, Signed>::limb_type>(carry);
    carry >>= fixed_int<Bits, Signed>::limb_bits;
    for(int i = fixed_int<Bits, Signed>::limb_count - 2; i >= 0; --i)
    {
-      carry += static_cast<boost::uintmax_t>(result.data()[i]) + 0xFFFFFFFF;
+      carry += static_cast<double_limb_type>(result.data()[i]) + 0xFFFFFFFF;
       result.data()[i] = static_cast<typename fixed_int<Bits, Signed>::limb_type>(carry);
       carry >>= fixed_int<Bits, Signed>::limb_bits;
    }
    result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 template <unsigned Bits, bool Signed>
-inline void subtract(fixed_int<Bits, Signed>& result, const boost::int32_t& o)
+inline void subtract(fixed_int<Bits, Signed>& result, const signed_limb_type& o)
 {
    if(o)
    {
       if(o < 0)
-         add(result, static_cast<boost::uint32_t>(-o));
+         add(result, static_cast<limb_type>(-o));
       else
-         subtract(result, static_cast<boost::uint32_t>(o));
+         subtract(result, static_cast<limb_type>(o));
    }
 }
 template <unsigned Bits, bool Signed>
 inline void increment(fixed_int<Bits, Signed>& result)
 {
-   static const boost::uint32_t one = 1;
+   static const limb_type one = 1;
    add(result, one);
 }
 template <unsigned Bits, bool Signed>
 inline void decrement(fixed_int<Bits, Signed>& result)
 {
-   static const boost::uint32_t one = 1;
+   static const limb_type one = 1;
    subtract(result, one);
 }
 template <unsigned Bits, bool Signed>
@@ -437,10 +442,10 @@ inline void subtract(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Sign
 {
    // Subtract using modular arithmatic.
    // This is the same code as for addition, with the twist that we negate b "on the fly":
-   boost::uintmax_t carry = 1;
+   double_limb_type carry = 1;
    for(int i = fixed_int<Bits, Signed>::limb_count - 1; i >= 0; --i)
    {
-      carry += static_cast<boost::uintmax_t>(a.data()[i]) + static_cast<boost::uintmax_t>(~b.data()[i]);
+      carry += static_cast<double_limb_type>(a.data()[i]) + static_cast<double_limb_type>(~b.data()[i]);
       result.data()[i] = static_cast<typename fixed_int<Bits, Signed>::limb_type>(carry);
       carry >>= fixed_int<Bits, Signed>::limb_bits;
    }
@@ -463,14 +468,14 @@ inline void multiply(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Sign
       multiply(result, a, t);
       return;
    }
-   boost::uintmax_t carry = 0;
+   double_limb_type carry = 0;
    for(unsigned i = 0; i < fixed_int<Bits, Signed>::limb_count; ++i)
       result.data()[i] = 0;
    for(int i = fixed_int<Bits, Signed>::limb_count - 1; i >= 0; --i)
    {
       for(int j = fixed_int<Bits, Signed>::limb_count - 1; j >= static_cast<int>(fixed_int<Bits, Signed>::limb_count) - i - 1; --j)
       {
-         carry += static_cast<boost::uintmax_t>(a.data()[i]) * static_cast<boost::uintmax_t>(b.data()[j]);
+         carry += static_cast<double_limb_type>(a.data()[i]) * static_cast<double_limb_type>(b.data()[j]);
          carry += result.data()[i + j + 1 - fixed_int<Bits, Signed>::limb_count];
          result.data()[i + j + 1 - fixed_int<Bits, Signed>::limb_count] = static_cast<typename fixed_int<Bits, Signed>::limb_type>(carry);
          carry >>= fixed_int<Bits, Signed>::limb_bits;
@@ -487,40 +492,40 @@ inline void multiply(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Sign
    multiply(result, b, a);
 }
 template <unsigned Bits, bool Signed>
-inline void multiply(fixed_int<Bits, Signed>& result, const boost::uint32_t& a)
+inline void multiply(fixed_int<Bits, Signed>& result, const limb_type& a)
 {
-   boost::uintmax_t carry = 0;
+   double_limb_type carry = 0;
    for(int i = fixed_int<Bits, Signed>::limb_count - 1; i >= 0; --i)
    {
-      carry += static_cast<boost::uintmax_t>(result.data()[i]) * static_cast<boost::uintmax_t>(a);
+      carry += static_cast<double_limb_type>(result.data()[i]) * static_cast<double_limb_type>(a);
       result.data()[i] = static_cast<typename fixed_int<Bits, Signed>::limb_type>(carry);
       carry >>= fixed_int<Bits, Signed>::limb_bits;
    }
    result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 template <unsigned Bits, bool Signed>
-inline void multiply(fixed_int<Bits, Signed>& result, const boost::int32_t& a)
+inline void multiply(fixed_int<Bits, Signed>& result, const signed_limb_type& a)
 {
    if(a > 0)
-      multiply(result, static_cast<boost::uint32_t>(a));
+      multiply(result, static_cast<limb_type>(a));
    else
    {
-      multiply(result, static_cast<boost::uint32_t>(-a));
+      multiply(result, static_cast<limb_type>(-a));
       result.negate();
    }
 }
 
 /*
 template <unsigned Bits, bool Signed>
-boost::uint32_t bitcount(const fixed_int<Bits, Signed>& a)
+limb_type bitcount(const fixed_int<Bits, Signed>& a)
 {
    // returns the location of the MSB in a:
-   boost::uint32_t i = 0;
+   limb_type i = 0;
    for(; (i < fixed_int<Bits, Signed>::limb_count) && (a.data()[i] == 0); ++i){}
-   boost::uint32_t count = (fixed_int<Bits, Signed>::limb_count - i) * fixed_int<Bits, Signed>::limb_bits;
+   limb_type count = (fixed_int<Bits, Signed>::limb_count - i) * fixed_int<Bits, Signed>::limb_bits;
    if(!count)
       return count; // no bits are set, value is zero
-   boost::uint32_t mask = static_cast<boost::uint32_t>(1u) << (fixed_int<Bits, Signed>::limb_bits - 1);
+   limb_type mask = static_cast<limb_type>(1u) << (fixed_int<Bits, Signed>::limb_bits - 1);
    while((a.data()[i] & mask) == 0)
    {
       --count;
@@ -571,25 +576,25 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
    }
 
    r = x;
-   result = static_cast<boost::uint32_t>(0u);
+   result = static_cast<limb_type>(0u);
    if(x.compare(y) < 0)
    {
       return; // We already have the answer: zero.
    }
 
-   boost::uint32_t n = bitcount(x) - bitcount(y);
+   limb_type n = bitcount(x) - bitcount(y);
 
    if(n == 0)
    {
       // result is exactly 1:
-      result = static_cast<boost::uint32_t>(1u);
+      result = static_cast<limb_type>(1u);
       subtract(r, y);
       return;
    }
 
    // Together mask_index and mask give us the bit we may be about to set in the result:
-   boost::uint32_t mask_index = fixed_int<Bits, Signed>::limb_count - 1 - n / fixed_int<Bits, Signed>::limb_bits;
-   boost::uint32_t mask = static_cast<boost::uint32_t>(1u) << n % fixed_int<Bits, Signed>::limb_bits;
+   limb_type mask_index = fixed_int<Bits, Signed>::limb_count - 1 - n / fixed_int<Bits, Signed>::limb_bits;
+   limb_type mask = static_cast<limb_type>(1u) << n % fixed_int<Bits, Signed>::limb_bits;
    fixed_int<Bits, Signed> t(y);
    left_shift(t, n);
    while(mask_index < fixed_int<Bits, Signed>::limb_count)
@@ -606,7 +611,7 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
       if(0 == (mask >>= 1))
       {
          ++mask_index;
-         mask = static_cast<boost::uint32_t>(1u) << (fixed_int<Bits, Signed>::limb_bits - 1);
+         mask = static_cast<limb_type>(1u) << (fixed_int<Bits, Signed>::limb_bits - 1);
       }
    }
    BOOST_ASSERT(r.compare(y) < 0); // remainder must be less than the divisor or our code has failed
@@ -673,7 +678,7 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
    }
 
    r = x;
-   result = static_cast<boost::uint32_t>(0u);
+   result = static_cast<limb_type>(0u);
    if(x.compare(y) < 0)
    {
       return; // We already have the answer: zero.
@@ -684,10 +689,10 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
    // Note that this code can't run past the end of the array because
    // we know already that neither are all zero:
    //
-   boost::uint32_t r_order = 0;
+   limb_type r_order = 0;
    while(r.data()[r_order] == 0)
       ++r_order;
-   boost::uint32_t y_order = 0;
+   limb_type y_order = 0;
    while(y.data()[y_order] == 0)
       ++y_order;
 
@@ -705,10 +710,10 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
    }
    else if(r_order == fixed_int<Bits, Signed>::limb_count - 2)
    {
-      unsigned long long a, b;
-      a = (static_cast<unsigned long long>(r.data()[r_order]) << fixed_int<Bits, Signed>::limb_bits) | r.data()[r_order + 1];
+      double_limb_type a, b;
+      a = (static_cast<double_limb_type>(r.data()[r_order]) << fixed_int<Bits, Signed>::limb_bits) | r.data()[r_order + 1];
       b = y_order < fixed_int<Bits, Signed>::limb_count - 1 ? 
-         (static_cast<unsigned long long>(y.data()[y_order]) << fixed_int<Bits, Signed>::limb_bits) | y.data()[y_order + 1] 
+         (static_cast<double_limb_type>(y.data()[y_order]) << fixed_int<Bits, Signed>::limb_bits) | y.data()[y_order + 1] 
          : y.data()[y_order];
       result = a / b;
       r = a % b;
@@ -725,26 +730,26 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
       //
       // Calculate our best guess for how many times y divides into r:
       //
-      boost::uint32_t guess;
+      limb_type guess;
       if((r.data()[r_order] <= y.data()[y_order]) && (r_order < fixed_int<Bits, Signed>::limb_count - 1))
       {
-         unsigned long long a, b, v;
-         a = (static_cast<unsigned long long>(r.data()[r_order]) << fixed_int<Bits, Signed>::limb_bits) | r.data()[r_order + 1];
+         double_limb_type a, b, v;
+         a = (static_cast<double_limb_type>(r.data()[r_order]) << fixed_int<Bits, Signed>::limb_bits) | r.data()[r_order + 1];
          b = y.data()[y_order];
          v = a / b;
          if(v > fixed_int<Bits, Signed>::max_limb_value)
             guess = 1;
          else
          {
-            guess = static_cast<boost::uint32_t>(v);
+            guess = static_cast<limb_type>(v);
             ++r_order;
          }
       }
       else
       {
-         unsigned long long a, b, v;
-         a = (r_order < fixed_int<Bits, Signed>::limb_count - 1) ? (static_cast<unsigned long long>(r.data()[r_order]) << fixed_int<Bits, Signed>::limb_bits) | r.data()[r_order + 1] : r.data()[r_order];
-         b = (y_order < fixed_int<Bits, Signed>::limb_count - 1) ? (static_cast<unsigned long long>(y.data()[y_order]) << fixed_int<Bits, Signed>::limb_bits) | y.data()[y_order + 1] : (static_cast<unsigned long long>(y.data()[y_order])  << fixed_int<Bits, Signed>::limb_bits);
+         double_limb_type a, b, v;
+         a = (r_order < fixed_int<Bits, Signed>::limb_count - 1) ? (static_cast<double_limb_type>(r.data()[r_order]) << fixed_int<Bits, Signed>::limb_bits) | r.data()[r_order + 1] : r.data()[r_order];
+         b = (y_order < fixed_int<Bits, Signed>::limb_count - 1) ? (static_cast<double_limb_type>(y.data()[y_order]) << fixed_int<Bits, Signed>::limb_bits) | y.data()[y_order + 1] : (static_cast<double_limb_type>(y.data()[y_order])  << fixed_int<Bits, Signed>::limb_bits);
          v = a / b;
          guess = static_cast<typename fixed_int<Bits, Signed>::limb_type>(v);
          //guess = r.data()[r_order] / y.data()[y_order];
@@ -752,8 +757,8 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
       //
       // Update result:
       //
-      boost::uint32_t shift = y_order - r_order;
-      t = boost::uint32_t(0);
+      limb_type shift = y_order - r_order;
+      t = limb_type(0);
       t.data()[fixed_int<Bits, Signed>::limb_count - 1 - shift] = guess;
       if(r_neg)
          subtract(result, t);
@@ -763,12 +768,12 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
       // Calculate guess * y, we use a fused mutiply-shift O(N) for this
       // rather than a full O(N^2) multiply:
       //
-      boost::uintmax_t carry = 0;
+      double_limb_type carry = 0;
       for(unsigned i = fixed_int<Bits, Signed>::limb_count - 1; i > fixed_int<Bits, Signed>::limb_count - shift - 1; --i)
          t.data()[i] = 0;
       for(int i = fixed_int<Bits, Signed>::limb_count - 1; i >= static_cast<int>(shift); --i)
       {
-         carry += static_cast<boost::uintmax_t>(y.data()[i]) * static_cast<boost::uintmax_t>(guess);
+         carry += static_cast<double_limb_type>(y.data()[i]) * static_cast<double_limb_type>(guess);
          t.data()[i - shift] = static_cast<typename fixed_int<Bits, Signed>::limb_type>(carry);
          carry >>= fixed_int<Bits, Signed>::limb_bits;
       }
@@ -907,15 +912,15 @@ inline void complement(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Si
    result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 template <unsigned Bits, bool Signed>
-inline void left_shift(fixed_int<Bits, Signed>& result, boost::uintmax_t s)
+inline void left_shift(fixed_int<Bits, Signed>& result, double_limb_type s)
 {
    if(s >= Bits)
    {
-      result = static_cast<boost::uint32_t>(0);
+      result = static_cast<limb_type>(0);
       return;
    }
-   boost::uint32_t offset = static_cast<boost::uint32_t>(s / fixed_int<Bits, Signed>::limb_bits);
-   boost::uint32_t shift  = static_cast<boost::uint32_t>(s % fixed_int<Bits, Signed>::limb_bits);
+   limb_type offset = static_cast<limb_type>(s / fixed_int<Bits, Signed>::limb_bits);
+   limb_type shift  = static_cast<limb_type>(s % fixed_int<Bits, Signed>::limb_bits);
    unsigned i = 0;
    if(shift)
    {
@@ -940,17 +945,17 @@ inline void left_shift(fixed_int<Bits, Signed>& result, boost::uintmax_t s)
    result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 template <unsigned Bits, bool Signed>
-inline void right_shift(fixed_int<Bits, Signed>& result, boost::uintmax_t s)
+inline void right_shift(fixed_int<Bits, Signed>& result, double_limb_type s)
 {
-   boost::uint32_t fill = (Signed && (result.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask)) ? fixed_int<Bits, Signed>::max_limb_value : 0u;
+   limb_type fill = (Signed && (result.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask)) ? fixed_int<Bits, Signed>::max_limb_value : 0u;
    if(s >= Bits)
    {
       for(unsigned i = 0; i < fixed_int<Bits, Signed>::limb_count; ++i)
          result.data()[i] = fill;
       return;
    }
-   boost::uint32_t offset = static_cast<boost::uint32_t>(s / fixed_int<Bits, Signed>::limb_bits);
-   boost::uint32_t shift  = static_cast<boost::uint32_t>(s % fixed_int<Bits, Signed>::limb_bits);
+   limb_type offset = static_cast<limb_type>(s / fixed_int<Bits, Signed>::limb_bits);
+   limb_type shift  = static_cast<limb_type>(s % fixed_int<Bits, Signed>::limb_bits);
    int i = fixed_int<Bits, Signed>::limb_count - 1;
    if(shift)
    {
