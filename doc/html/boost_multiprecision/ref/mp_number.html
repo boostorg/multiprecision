@@ -137,6 +137,16 @@
 <span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">fmod</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
 <span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">atan2</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
 
+<span class="comment">// Traits support:</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="keyword">struct</span> <span class="identifier">component_type</span><span class="special">;</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="keyword">struct</span> <span class="identifier">number_category</span><span class="special">;</span>
+
+<span class="comment">// Rational number support:</span>
+<span class="keyword">typename</span> <span class="identifier">component_type</span><span class="special">&lt;</span><span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&gt;::</span><span class="identifier">type</span> <span class="identifier">numerator</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="keyword">typename</span> <span class="identifier">component_type</span><span class="special">&lt;</span><span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&gt;::</span><span class="identifier">type</span> <span class="identifier">denominator</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+
 <span class="special">}}</span> <span class="comment">// namespaces</span>
 
 <span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">math</span><span class="special">{</span>
@@ -191,6 +201,16 @@
             Any type that the Backend is constructible or assignable from.
           </li>
 </ul></div>
+<p>
+        In addition, if the type has multiple components (for example rational or
+        complex number types), then there is a two argument constructor:
+      </p>
+<pre class="programlisting"><span class="identifier">mp_number</span><span class="special">(</span><span class="identifier">arg1</span><span class="special">,</span> <span class="identifier">arg2</span><span class="special">);</span>
+</pre>
+<p>
+        Where the two args must either be arithmetic types, or types that are convertible
+        to the two components of <code class="computeroutput"><span class="keyword">this</span></code>.
+      </p>
 <pre class="programlisting"><span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">+=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
 <span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">-=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
 <span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">*=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
@@ -457,6 +477,42 @@
       </p>
 <h5>
 <a name="boost_multiprecision.ref.mp_number.h6"></a>
+        <span><a name="boost_multiprecision.ref.mp_number.traits_class_support"></a></span><a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.traits_class_support">Traits
+        Class Support</a>
+      </h5>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="keyword">struct</span> <span class="identifier">component_type</span><span class="special">;</span>
+</pre>
+<p>
+        If this is a type with mutiple components (for example rational or complex
+        types), then this trait has a single member <code class="computeroutput"><span class="identifier">type</span></code>
+        that is the type of those components.
+      </p>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="keyword">struct</span> <span class="identifier">number_category</span><span class="special">;</span>
+</pre>
+<p>
+        A traits class that inherits from <code class="computeroutput"><span class="identifier">mpl</span><span class="special">::</span><span class="identifier">int_</span><span class="special">&lt;</span><span class="identifier">N</span><span class="special">&gt;</span></code>
+        where <code class="computeroutput"><span class="identifier">N</span></code> is one of the enumerated
+        values <code class="computeroutput"><span class="identifier">number_kind_integer</span></code>,
+        <code class="computeroutput"><span class="identifier">number_kind_floating_point</span></code>,
+        <code class="computeroutput"><span class="identifier">number_kind_rational</span></code> or
+        <code class="computeroutput"><span class="identifier">number_kind_fixed_point</span></code>.
+      </p>
+<h5>
+<a name="boost_multiprecision.ref.mp_number.h7"></a>
+        <span><a name="boost_multiprecision.ref.mp_number.rational_number_functions"></a></span><a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.rational_number_functions">Rational
+        Number Functions</a>
+      </h5>
+<pre class="programlisting"><span class="keyword">typename</span> <span class="identifier">component_type</span><span class="special">&lt;</span><span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&gt;::</span><span class="identifier">type</span> <span class="identifier">numerator</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="keyword">typename</span> <span class="identifier">component_type</span><span class="special">&lt;</span><span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&gt;::</span><span class="identifier">type</span> <span class="identifier">denominator</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+</pre>
+<p>
+        These functions return the numerator and denominator of a rational number
+        respectively.
+      </p>
+<h5>
+<a name="boost_multiprecision.ref.mp_number.h8"></a>
         <span><a name="boost_multiprecision.ref.mp_number.boost_math_interoperability_support"></a></span><a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.boost_math_interoperability_support">Boost.Math
         Interoperability Support</a>
       </h5>
@@ -479,7 +535,7 @@
         to ensure interoperability.
       </p>
 <h5>
-<a name="boost_multiprecision.ref.mp_number.h7"></a>
+<a name="boost_multiprecision.ref.mp_number.h9"></a>
         <span><a name="boost_multiprecision.ref.mp_number.std__numeric_limits_support"></a></span><a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.std__numeric_limits_support">std::numeric_limits
         support</a>
       </h5>

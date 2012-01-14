@@ -71,6 +71,9 @@ void t3()
    std::cout << numerator(v) << std::endl;
    std::cout << denominator(v) << std::endl;
 
+   mpq_rational w(2, 3);  // component wise constructor
+   std::cout << w << std::endl; // prints 2/3
+
    // Access the underlying data:
    mpq_t q;
    mpq_init(q);

@@ -1139,6 +1139,13 @@ struct number_category<mp_number<Backend> > : public number_category<Backend>{};
 template <class tag, class A1, class A2, class A3>
 struct number_category<detail::mp_exp<tag, A1, A2, A3> > : public number_category<typename detail::mp_exp<tag, A1, A2, A3>::result_type>{};
 
+template <class T>
+struct component_type;
+template <class T>
+struct component_type<mp_number<T> > : public component_type<T>{};
+template <class tag, class A1, class A2, class A3>
+struct component_type<detail::mp_exp<tag, A1, A2, A3> > : public component_type<typename detail::mp_exp<tag, A1, A2, A3>::result_type>{};
+
 }} // namespaces
 
 namespace boost{ namespace math{ namespace tools{

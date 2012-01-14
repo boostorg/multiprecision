@@ -1,0 +1,276 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Real World Tests</title>
+<link rel="stylesheet" href="http://www.boost.org/doc/libs/release/doc/src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.76.1">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
+<link rel="up" href="../perf.html" title="Performance Comparison">
+<link rel="prev" href="../perf.html" title="Performance Comparison">
+<link rel="next" href="float_performance.html" title="Float Algorithm Perfomance">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="../perf.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../perf.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="float_performance.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section boost_multiprecision_perf_realworld">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_multiprecision.perf.realworld"></a><a class="link" href="realworld.html" title="Real World Tests">Real World Tests</a>
+</h3></div></div></div>
+<p>
+        These tests test the total time taken to execute all of Boost.Math's test
+        cases for these functions. In each case the best performing library gets
+        a relative score of 1, with the total execution time given in brackets. The
+        first three libraries listed are the various floating point types provided
+        by this library, while for comparison, two popular C++ frontends to MPFR
+        (mpfr_class and mpreal) are also shown.
+      </p>
+<p>
+        Test code was compiled with Microsoft Visual Studio 2010 with all optimisations
+        turned on (/Ox), and used MPIR-2.3.0 and MPFR-3.0.0. The tests were run on
+        32-bit Windows Vista machine.
+      </p>
+<div class="table">
+<a name="boost_multiprecision.perf.realworld.bessel_function_performance"></a><p class="title"><b>Table&#160;1.6.&#160;Bessel Function Performance</b></p>
+<div class="table-contents"><table class="table" summary="Bessel Function Performance">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Library
+                </p>
+              </th>
+<th>
+                <p>
+                  50 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  100 Decimal Digits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  mpfr_float
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1.0</strong></span> (6.472s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.193 (10.154s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mpf_float
+                </p>
+              </td>
+<td>
+                <p>
+                  1.801 (11.662s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1.0</strong></span>(8.511s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_float
+                </p>
+              </td>
+<td>
+                <p>
+                  3.13 (20.285s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.46 (21.019s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mpfr_class
+                </p>
+              </td>
+<td>
+                <p>
+                  1.001 (6.480s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.15(9.805s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mpreal
+                </p>
+              </td>
+<td>
+                <p>
+                  1.542 (9.981s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.61 (13.702s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.realworld.non_central_t_distribution_performance"></a><p class="title"><b>Table&#160;1.7.&#160;Non-Central T Distribution Performance</b></p>
+<div class="table-contents"><table class="table" summary="Non-Central T Distribution Performance">
+<colgroup>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Library
+                </p>
+              </th>
+<th>
+                <p>
+                  50 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  100 Decimal Digits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  mpfr_float
+                </p>
+              </td>
+<td>
+                <p>
+                  1.308 (258.09s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.30 (516.74s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mpf_float
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1.0</strong></span> (197.30s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1.0</strong></span>(397.30s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_float
+                </p>
+              </td>
+<td>
+                <p>
+                  1.695 (334.50s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.68 (1064.53s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mpfr_class
+                </p>
+              </td>
+<td>
+                <p>
+                  1.35 (266.39s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.323 (525.74s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mpreal
+                </p>
+              </td>
+<td>
+                <p>
+                  1.75 (346.64s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.635 (649.94s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break">
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011 John Maddock<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../perf.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../perf.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="float_performance.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

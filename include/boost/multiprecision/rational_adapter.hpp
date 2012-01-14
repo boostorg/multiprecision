@@ -42,6 +42,11 @@ struct rational_adapter
       m_value = o.m_value;
       return *this;
    }
+   rational_adapter& operator = (const IntBackend& o)
+   {
+      m_value = o;
+      return *this;
+   }
    template <class Arithmetic>
    typename enable_if<is_arithmetic<Arithmetic>, rational_adapter&>::type operator = (Arithmetic i)
    {
@@ -167,8 +172,20 @@ inline mp_number<IntBackend> denominator(const mp_number<rational_adapter<IntBac
    return val.backend().data().denominator();
 }
 
+template<class IntBackend, class V>
+inline void assign_components(rational_adapter<IntBackend>& result, const V& v1, const V& v2)
+{
+   result.data().assign(v1, v2);
+}
+
 template<class IntBackend>
 struct number_category<rational_adapter<IntBackend> > : public mpl::int_<number_kind_rational>{};
+
+template <class T>
+struct component_type<rational_adapter<T> >
+{
+   typedef mp_number<T> type;
+};
 
 }} // namespaces
 
@@ -176,9 +193,9 @@ struct number_category<rational_adapter<IntBackend> > : public mpl::int_<number_
 namespace std{
 
 template <class IntBackend>
-class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::rational_adapter<IntBackend> > > : public std::numeric_limits<IntBackend>
+class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::rational_adapter<IntBackend> > > : public std::numeric_limits<boost::multiprecision::mp_number<IntBackend> >
 {
-   typedef std::numeric_limits<IntBackend> base_type;
+   typedef std::numeric_limits<boost::multiprecision::mp_number<IntBackend> > base_type;
    typedef boost::multiprecision::mp_number<boost::multiprecision::rational_adapter<IntBackend> > number_type;
 public:
    BOOST_STATIC_CONSTEXPR bool is_integer = false;

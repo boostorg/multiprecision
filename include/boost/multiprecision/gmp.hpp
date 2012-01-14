@@ -1603,6 +1603,12 @@ inline mp_number<gmp_int> denominator(const mp_number<gmp_rational>& val)
    return result;
 }
 
+template <>
+struct component_type<mp_number<gmp_rational> >
+{
+   typedef mp_number<gmp_int> type;
+};
+
 inline void add(gmp_rational& t, const gmp_rational& o)
 {
    mpq_add(t.data(), t.data(), o.data());
@@ -1666,6 +1672,23 @@ inline void convert_to(unsigned long* result, const gmp_rational& val)
 inline void eval_abs(gmp_rational& result, const gmp_rational& val)
 {
    mpq_abs(result.data(), val.data());
+}
+
+inline void assign_components(gmp_rational& result, unsigned long v1, unsigned long v2)
+{
+   mpq_set_ui(result.data(), v1, v2);
+   mpq_canonicalize(result.data());
+}
+inline void assign_components(gmp_rational& result, long v1, long v2)
+{
+   mpq_set_si(result.data(), v1, v2);
+   mpq_canonicalize(result.data());
+}
+inline void assign_components(gmp_rational& result, gmp_int const& v1, gmp_int const& v2)
+{
+   mpz_set(mpq_numref(result.data()), v1.data());
+   mpz_set(mpq_denref(result.data()), v2.data());
+   mpq_canonicalize(result.data());
 }
 
 //
