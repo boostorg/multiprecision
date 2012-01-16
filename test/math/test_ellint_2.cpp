@@ -36,9 +36,10 @@
 #include <boost/multiprecision/cpp_float.hpp>
 #endif
 
-#define SC_(x) T(BOOST_STRINGIZE(x))
+#define SC_(x) BOOST_STRINGIZE(x)
 #define TEST_UDT
 
+#include <boost/math/special_functions/ellint_2.hpp>
 #include "libs/math/test/test_ellint_2.hpp"
 
 void expected_results()

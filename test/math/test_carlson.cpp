@@ -36,9 +36,13 @@
 #include <boost/multiprecision/cpp_float.hpp>
 #endif
 
-#define SC_(x) T(BOOST_STRINGIZE(x))
+#define SC_(x) BOOST_STRINGIZE(x)
 #define TEST_UDT
 
+#include <boost/math/special_functions/ellint_rc.hpp>
+#include <boost/math/special_functions/ellint_rj.hpp>
+#include <boost/math/special_functions/ellint_rd.hpp>
+#include <boost/math/special_functions/ellint_rf.hpp>
 #include "libs/math/test/test_carlson.hpp"
 
 void expected_results()

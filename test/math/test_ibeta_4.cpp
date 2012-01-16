@@ -37,11 +37,12 @@
 #include <boost/multiprecision/cpp_float.hpp>
 #endif
 
-#define SC_(x) T(BOOST_STRINGIZE(x))
+#define SC_(x) BOOST_STRINGIZE(x)
 #define TEST_UDT
 
 #define TEST_DATA 4
 
+#include <boost/math/special_functions/beta.hpp>
 #include "libs/math/test/test_ibeta.hpp"
 
 void expected_results()

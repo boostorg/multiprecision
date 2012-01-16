@@ -654,6 +654,7 @@ if $(enable-specfun)
             <optimization>speed
             <define>BOOST_ALL_NO_LIB
             <toolset>msvc:<cxxflags>-bigobj
+            release
            : $(source:B)_mpfr ;
       run $(source) gmp /boost/test//boost_test_exec_monitor/<link>static /boost/regex//boost_regex/<link>static
            : # command line
@@ -664,6 +665,7 @@ if $(enable-specfun)
             <define>TEST_MPF_50
             <define>BOOST_ALL_NO_LIB
             <toolset>msvc:<cxxflags>-bigobj
+            release
            : $(source:B)_mpf ;
       run $(source) /boost/test//boost_test_exec_monitor/<link>static /boost/regex//boost_regex/<link>static
            : # command line
@@ -673,6 +675,7 @@ if $(enable-specfun)
             <define>BOOST_ALL_NO_LIB
             <optimization>speed
             <toolset>msvc:<cxxflags>-bigobj
+            release
            : $(source:B)_cpp_float ;
    }
 }

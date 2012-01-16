@@ -41,8 +41,9 @@
 #include <boost/multiprecision/cpp_float.hpp>
 #endif
 
-#define SC_(x) T(BOOST_STRINGIZE(x))
+#define SC_(x) BOOST_STRINGIZE(x)
 
+#include <boost/math/special_functions/binomial.hpp>
 #include "libs/math/test/test_binomial_coeff.hpp"
 
 void expected_results()
