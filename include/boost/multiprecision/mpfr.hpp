@@ -59,12 +59,12 @@ struct mpfr_float_imp
       return *this;
    }
 #endif
-   mpfr_float_imp& operator = (boost::uintmax_t i)
+   mpfr_float_imp& operator = (unsigned long long i)
    {
-      boost::uintmax_t mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
+      unsigned long long mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
       unsigned shift = 0;
       mpfr_t t;
-      mpfr_init2(t, (std::max)(static_cast<unsigned>(std::numeric_limits<boost::uintmax_t>::digits), static_cast<unsigned>(((digits10 + 1) * 1000L) / 301L)));
+      mpfr_init2(t, (std::max)(static_cast<unsigned>(std::numeric_limits<unsigned long long>::digits), static_cast<unsigned>(((digits10 + 1) * 1000L) / 301L)));
       mpfr_set_ui(m_data, 0, GMP_RNDN);
       while(i)
       {
@@ -78,11 +78,11 @@ struct mpfr_float_imp
       mpfr_clear(t);
       return *this;
    }
-   mpfr_float_imp& operator = (boost::intmax_t i)
+   mpfr_float_imp& operator = (long long i)
    {
       BOOST_MP_USING_ABS
       bool neg = i < 0;
-      *this = static_cast<boost::uintmax_t>(abs(i));
+      *this = static_cast<unsigned long long>(abs(i));
       if(neg)
          mpfr_neg(m_data, m_data, GMP_RNDN);
       return *this;

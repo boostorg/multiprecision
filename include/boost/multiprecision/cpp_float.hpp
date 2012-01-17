@@ -1815,7 +1815,7 @@ bool cpp_float<Digits10>::rd_string(const char* const s)
       )
    {
       // Remove the exponent part from the string.
-      exp = boost::lexical_cast<boost::int64_t>(static_cast<const char* const>(str.c_str() + (pos + 1u)));
+      exp = boost::lexical_cast<boost::int64_t>(static_cast<const char*>(str.c_str() + (pos + 1u)));
       str = str.substr(static_cast<std::size_t>(0u), pos);
    }
 
@@ -2059,7 +2059,7 @@ bool cpp_float<Digits10>::rd_string(const char* const s)
 }
 
 template <unsigned Digits10>
-cpp_float<Digits10>::cpp_float(const double mantissa, const boost::int64_t exponent) 
+cpp_float<Digits10>::cpp_float(const double mantissa, const long long exponent) 
  : data     (),
    exp      (static_cast<boost::int64_t>(0)),
    neg      (false),
@@ -2245,7 +2245,7 @@ boost::uint32_t cpp_float<Digits10>::div_loop_n(boost::uint32_t* const u, boost:
 }
 
 template <unsigned Digits10>
-cpp_float<Digits10> cpp_float<Digits10>::pow2(const boost::int64_t p)
+cpp_float<Digits10> cpp_float<Digits10>::pow2(const long long p)
 {
    // Create a static const table of p^2 for -128 < p < +128.
    // Note: The size of this table must be odd-numbered and

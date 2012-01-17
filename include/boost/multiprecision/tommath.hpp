@@ -50,9 +50,9 @@ struct tommath_int
       detail::check_tommath_result(mp_copy(const_cast< ::mp_int*>(&o.m_data), &m_data));
       return *this;
    }
-   tommath_int& operator = (boost::uintmax_t i)
+   tommath_int& operator = (unsigned long long i)
    {
-      boost::uintmax_t mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
+      unsigned long long mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
       unsigned shift = 0;
       ::mp_int t;
       detail::check_tommath_result(mp_init(&t));
@@ -69,11 +69,11 @@ struct tommath_int
       mp_clear(&t);
       return *this;
    }
-   tommath_int& operator = (boost::intmax_t i)
+   tommath_int& operator = (long long i)
    {
       BOOST_MP_USING_ABS
       bool neg = i < 0;
-      *this = static_cast<boost::uintmax_t>(abs(i));
+      *this = static_cast<unsigned long long>(abs(i));
       if(neg)
          detail::check_tommath_result(mp_neg(&m_data, &m_data));
       return *this;

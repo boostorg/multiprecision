@@ -26,10 +26,9 @@ template <unsigned Bits, bool Signed>
 struct fixed_int
 {
    typedef mpl::list<signed_limb_type, signed_double_limb_type>      signed_types;
-   typedef mpl::list<limb_type, double_limb_type>    unsigned_types;
-   typedef mpl::list<long double>                          float_types;
+   typedef mpl::list<limb_type, double_limb_type>                    unsigned_types;
+   typedef mpl::list<long double>                                    float_types;
 
-   typedef limb_type   limb_type;
    BOOST_STATIC_CONSTANT(unsigned, limb_bits = sizeof(limb_type) * CHAR_BIT);
    BOOST_STATIC_CONSTANT(unsigned, limb_count = Bits / limb_bits + (Bits % limb_bits ? 1 : 0));
    BOOST_STATIC_CONSTANT(limb_type, max_limb_value = ~static_cast<limb_type>(0u));
@@ -365,7 +364,7 @@ inline void add(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& 
    for(int i = fixed_int<Bits, Signed>::limb_count - 1; i >= 0; --i)
    {
       carry += static_cast<double_limb_type>(a.data()[i]) + static_cast<double_limb_type>(b.data()[i]);
-      result.data()[i] = static_cast<typename fixed_int<Bits, Signed>::limb_type>(carry);
+      result.data()[i] = static_cast<limb_type>(carry);
       carry >>= fixed_int<Bits, Signed>::limb_bits;
    }
    result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
@@ -379,7 +378,7 @@ inline void add(fixed_int<Bits, Signed>& result, const limb_type& o)
    for(int i = fixed_int<Bits, Signed>::limb_count - 1; carry && i >= 0; --i)
    {
       carry += static_cast<double_limb_type>(result.data()[i]);
-      result.data()[i] = static_cast<typename fixed_int<Bits, Signed>::limb_type>(carry);
+      result.data()[i] = static_cast<limb_type>(carry);
       carry >>= fixed_int<Bits, Signed>::limb_bits;
    }
    result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
@@ -399,12 +398,12 @@ inline void subtract(fixed_int<Bits, Signed>& result, const limb_type& o)
    // This is the same code as for addition, with the twist that we negate o "on the fly":
    double_limb_type carry = static_cast<double_limb_type>(result.data()[fixed_int<Bits, Signed>::limb_count - 1]) 
       + 1uLL + static_cast<double_limb_type>(~o);
-   result.data()[fixed_int<Bits, Signed>::limb_count - 1] = static_cast<typename fixed_int<Bits, Signed>::limb_type>(carry);
+   result.data()[fixed_int<Bits, Signed>::limb_count - 1] = static_cast<limb_type>(carry);
    carry >>= fixed_int<Bits, Signed>::limb_bits;
    for(int i = fixed_int<Bits, Signed>::limb_count - 2; i >= 0; --i)
    {
       carry += static_cast<double_limb_type>(result.data()[i]) + 0xFFFFFFFF;
-      result.data()[i] = static_cast<typename fixed_int<Bits, Signed>::limb_type>(carry);
+      result.data()[i] = static_cast<limb_type>(carry);
       carry >>= fixed_int<Bits, Signed>::limb_bits;
    }
    result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
@@ -452,7 +451,7 @@ inline void subtract(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Sign
    for(int i = fixed_int<Bits, Signed>::limb_count - 1; i >= 0; --i)
    {
       carry += static_cast<double_limb_type>(a.data()[i]) + static_cast<double_limb_type>(~b.data()[i]);
-      result.data()[i] = static_cast<typename fixed_int<Bits, Signed>::limb_type>(carry);
+      result.data()[i] = static_cast<limb_type>(carry);
       carry >>= fixed_int<Bits, Signed>::limb_bits;
    }
    result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
@@ -483,7 +482,7 @@ inline void multiply(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Sign
       {
          carry += static_cast<double_limb_type>(a.data()[i]) * static_cast<double_limb_type>(b.data()[j]);
          carry += result.data()[i + j + 1 - fixed_int<Bits, Signed>::limb_count];
-         result.data()[i + j + 1 - fixed_int<Bits, Signed>::limb_count] = static_cast<typename fixed_int<Bits, Signed>::limb_type>(carry);
+         result.data()[i + j + 1 - fixed_int<Bits, Signed>::limb_count] = static_cast<limb_type>(carry);
          carry >>= fixed_int<Bits, Signed>::limb_bits;
       }
       carry = 0;
@@ -504,7 +503,7 @@ inline void multiply(fixed_int<Bits, Signed>& result, const limb_type& a)
    for(int i = fixed_int<Bits, Signed>::limb_count - 1; i >= 0; --i)
    {
       carry += static_cast<double_limb_type>(result.data()[i]) * static_cast<double_limb_type>(a);
-      result.data()[i] = static_cast<typename fixed_int<Bits, Signed>::limb_type>(carry);
+      result.data()[i] = static_cast<limb_type>(carry);
       carry >>= fixed_int<Bits, Signed>::limb_bits;
    }
    result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
@@ -761,7 +760,7 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
          a = (r_order < fixed_int<Bits, Signed>::limb_count - 1) ? (static_cast<double_limb_type>(r.data()[r_order]) << fixed_int<Bits, Signed>::limb_bits) | r.data()[r_order + 1] : r.data()[r_order];
          b = (y_order < fixed_int<Bits, Signed>::limb_count - 1) ? (static_cast<double_limb_type>(y.data()[y_order]) << fixed_int<Bits, Signed>::limb_bits) | y.data()[y_order + 1] : (static_cast<double_limb_type>(y.data()[y_order])  << fixed_int<Bits, Signed>::limb_bits);
          v = a / b;
-         guess = static_cast<typename fixed_int<Bits, Signed>::limb_type>(v);
+         guess = static_cast<limb_type>(v);
          //guess = r.data()[r_order] / y.data()[y_order];
       }
       //
@@ -784,7 +783,7 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
       for(int i = fixed_int<Bits, Signed>::limb_count - 1; i >= static_cast<int>(shift); --i)
       {
          carry += static_cast<double_limb_type>(y.data()[i]) * static_cast<double_limb_type>(guess);
-         t.data()[i - shift] = static_cast<typename fixed_int<Bits, Signed>::limb_type>(carry);
+         t.data()[i - shift] = static_cast<limb_type>(carry);
          carry >>= fixed_int<Bits, Signed>::limb_bits;
       }
       t.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;

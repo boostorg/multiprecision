@@ -45,13 +45,13 @@ struct mp_number_backend_float_architype
       std::cout << "Assignment (" << m_value << ")" << std::endl;
       return *this;
    }
-   mp_number_backend_float_architype& operator = (boost::uintmax_t i)
+   mp_number_backend_float_architype& operator = (unsigned long long i)
    {
       m_value = i;
       std::cout << "UInt Assignment (" << i << ")" << std::endl;
       return *this;
    }
-   mp_number_backend_float_architype& operator = (boost::intmax_t i)
+   mp_number_backend_float_architype& operator = (long long i)
    {
       m_value = i;
       std::cout << "Int Assignment (" << i << ")" << std::endl;
@@ -104,12 +104,12 @@ struct mp_number_backend_float_architype
       std::cout << "Comparison" << std::endl;
       return m_value > o.m_value ? 1 : (m_value < o.m_value ? -1 : 0);
    }
-   int compare(boost::intmax_t i)const
+   int compare(long long i)const
    {
       std::cout << "Comparison with int" << std::endl;
       return m_value > i ? 1 : (m_value < i ? -1 : 0);
    }
-   int compare(boost::uintmax_t i)const
+   int compare(unsigned long long i)const
    {
       std::cout << "Comparison with unsigned" << std::endl;
       return m_value > i ? 1 : (m_value < i ? -1 : 0);
@@ -143,13 +143,13 @@ inline void divide(mp_number_backend_float_architype& result, const mp_number_ba
    result.m_value /= o.m_value;
 }
 
-inline void convert_to(boost::uintmax_t* result, const mp_number_backend_float_architype& val)
+inline void convert_to(unsigned long long* result, const mp_number_backend_float_architype& val)
 {
-   *result = static_cast<boost::uintmax_t>(val.m_value);
+   *result = static_cast<unsigned long long>(val.m_value);
 }
-inline void convert_to(boost::intmax_t* result, const mp_number_backend_float_architype& val)
+inline void convert_to(long long* result, const mp_number_backend_float_architype& val)
 {
-   *result = static_cast<boost::intmax_t>(val.m_value);
+   *result = static_cast<long long>(val.m_value);
 }
 inline void convert_to(long double* result, mp_number_backend_float_architype& val)
 {

@@ -39,12 +39,12 @@ struct arithmetic_backend
       m_value = o.m_value;
       return *this;
    }
-   arithmetic_backend& operator = (boost::uintmax_t i)
+   arithmetic_backend& operator = (unsigned long long i)
    {
       m_value = i;
       return *this;
    }
-   arithmetic_backend& operator = (boost::intmax_t i)
+   arithmetic_backend& operator = (long long i)
    {
       m_value = i;
       return *this;
@@ -78,11 +78,11 @@ struct arithmetic_backend
    {
       return m_value > o.m_value ? 1 : (m_value < o.m_value ? -1 : 0);
    }
-   int compare(boost::intmax_t i)const
+   int compare(long long i)const
    {
       return m_value > i ? 1 : (m_value < i ? -1 : 0);
    }
-   int compare(boost::uintmax_t i)const
+   int compare(unsigned long long i)const
    {
       return m_value > i ? 1 : (m_value < i ? -1 : 0);
    }

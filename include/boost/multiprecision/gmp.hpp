@@ -63,9 +63,9 @@ struct gmp_float_imp
       return *this;
    }
 #endif
-   gmp_float_imp& operator = (boost::uintmax_t i)
+   gmp_float_imp& operator = (unsigned long long i)
    {
-      boost::uintmax_t mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
+      unsigned long long mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
       unsigned shift = 0;
       mpf_t t;
       mpf_init2(t, (((digits10 ? digits10 : get_default_precision()) + 1) * 1000L) / 301L);
@@ -82,11 +82,11 @@ struct gmp_float_imp
       mpf_clear(t);
       return *this;
    }
-   gmp_float_imp& operator = (boost::intmax_t i)
+   gmp_float_imp& operator = (long long i)
    {
       BOOST_MP_USING_ABS
       bool neg = i < 0;
-      *this = static_cast<boost::uintmax_t>(abs(i));
+      *this = static_cast<unsigned long long>(abs(i));
       if(neg)
          mpf_neg(m_data, m_data);
       return *this;
@@ -891,9 +891,9 @@ struct gmp_int
       mpz_set(m_data, o.m_data);
       return *this;
    }
-   gmp_int& operator = (boost::uintmax_t i)
+   gmp_int& operator = (unsigned long long i)
    {
-      boost::uintmax_t mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
+      unsigned long long mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
       unsigned shift = 0;
       mpz_t t;
       mpz_init(m_data);
@@ -910,11 +910,11 @@ struct gmp_int
       mpz_clear(t);
       return *this;
    }
-   gmp_int& operator = (boost::intmax_t i)
+   gmp_int& operator = (long long i)
    {
       BOOST_MP_USING_ABS
       bool neg = i < 0;
-      *this = static_cast<boost::uintmax_t>(abs(i));
+      *this = static_cast<unsigned long long>(abs(i));
       if(neg)
          mpz_neg(m_data, m_data);
       return *this;
@@ -1430,9 +1430,9 @@ struct gmp_rational
       mpq_set(m_data, o.m_data);
       return *this;
    }
-   gmp_rational& operator = (boost::uintmax_t i)
+   gmp_rational& operator = (unsigned long long i)
    {
-      boost::uintmax_t mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
+      unsigned long long mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
       unsigned shift = 0;
       mpq_t t;
       mpq_init(m_data);
@@ -1449,11 +1449,11 @@ struct gmp_rational
       mpq_clear(t);
       return *this;
    }
-   gmp_rational& operator = (boost::intmax_t i)
+   gmp_rational& operator = (long long i)
    {
       BOOST_MP_USING_ABS
       bool neg = i < 0;
-      *this = static_cast<boost::uintmax_t>(abs(i));
+      *this = static_cast<unsigned long long>(abs(i));
       if(neg)
          mpq_neg(m_data, m_data);
       return *this;
