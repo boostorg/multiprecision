@@ -268,7 +268,7 @@ void eval_exp(T& result, const T& x)
    }
 
    // Check for pure-integer arguments which can be either signed or unsigned.
-   boost::intmax_t ll;
+   long long ll;
    eval_trunc(exp_series, x);
    convert_to(&ll, exp_series);
    if(x.compare(ll) == 0)
@@ -458,7 +458,7 @@ inline void eval_pow(T& result, const T& x, const T& a)
       return;
    }
 
-   boost::intmax_t an;
+   long long an;
    convert_to(&an, a);
    const bool bo_a_isint = a.compare(an) == 0;
 

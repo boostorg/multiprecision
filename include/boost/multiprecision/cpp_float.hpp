@@ -32,7 +32,7 @@ public:
    typedef mpl::list<long long>                    signed_types;
    typedef mpl::list<unsigned long long>           unsigned_types;
    typedef mpl::list<long double>                  float_types;
-   typedef boost::int64_t                          exponent_type;
+   typedef long long                               exponent_type;
 
 
    static const boost::int32_t mp_radix        = 10;

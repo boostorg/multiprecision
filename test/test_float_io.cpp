@@ -93,7 +93,7 @@ void test()
    }};
 
    boost::array<boost::array<const char*, 13 * 9>, 40> string_data = {{
-#include "libs/multiprecision/string_data.ipp"
+#include "libs/multiprecision/libs/string_data.ipp"
    }};
 
    double num = 123456789.0;
