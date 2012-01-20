@@ -33,9 +33,9 @@ inline void check_tommath_result(unsigned v)
 
 struct tommath_int
 {
-   typedef mpl::list<long, long long>                     signed_types;
-   typedef mpl::list<unsigned long, unsigned long long>   unsigned_types;
-   typedef mpl::list<long double>                 float_types;
+   typedef mpl::list<boost::int32_t, long long>             signed_types;
+   typedef mpl::list<boost::uint32_t, unsigned long long>   unsigned_types;
+   typedef mpl::list<long double>                           float_types;
 
    tommath_int()
    {
@@ -78,15 +78,20 @@ struct tommath_int
          detail::check_tommath_result(mp_neg(&m_data, &m_data));
       return *this;
    }
-   tommath_int& operator = (unsigned long i)
+   //
+   // Note that although mp_set_int takes an unsigned long as an argument
+   // it only sets the first 32-bits to the result, and ignores the rest.
+   // So use uint32_t as the largest type to pass to this function.
+   //
+   tommath_int& operator = (boost::uint32_t i)
    {
       detail::check_tommath_result((mp_set_int(&m_data, i)));
       return *this;
    }
-   tommath_int& operator = (long i)
+   tommath_int& operator = (boost::int32_t i)
    {
       bool neg = i < 0;
-      *this = static_cast<unsigned long>(std::abs(i));
+      *this = static_cast<boost::uint32_t>(std::abs(i));
       if(neg)
          detail::check_tommath_result(mp_neg(&m_data, &m_data));
       return *this;

@@ -34,7 +34,7 @@ struct fixed_int
    BOOST_STATIC_CONSTANT(limb_type, max_limb_value = ~static_cast<limb_type>(0u));
    BOOST_STATIC_CONSTANT(limb_type, upper_limb_mask = (Bits % limb_bits ? (1 << (Bits % limb_bits)) - 1 : max_limb_value));
    BOOST_STATIC_CONSTANT(limb_type, upper_limb_not_mask = ~upper_limb_mask);
-   BOOST_STATIC_CONSTANT(limb_type, sign_bit_mask = 1 << ((Bits % limb_bits ? Bits % limb_bits : limb_bits) - 1));
+   BOOST_STATIC_CONSTANT(limb_type, sign_bit_mask = 1u << ((Bits % limb_bits ? Bits % limb_bits : limb_bits) - 1));
    typedef boost::array<limb_type, limb_count> data_type;
 
    fixed_int(){}
@@ -53,7 +53,7 @@ struct fixed_int
    fixed_int& operator = (limb_type i)
    {
       m_value[limb_count - 1] = i;
-      for(int j = limb_count - 2; j >= 0; --j)
+      for(int j = static_cast<int>(limb_count) - 2; j >= 0; --j)
          m_value[j] = 0;
       m_value[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
       return *this;
@@ -62,7 +62,7 @@ struct fixed_int
    {
       m_value[limb_count - 1] = i;
       // sign extend:
-      for(int j = limb_count - 2; j >= 0; --j)
+      for(int j = static_cast<int>(limb_count) - 2; j >= 0; --j)
          m_value[j] = i < 0 ? max_limb_value : 0;
       m_value[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
       return *this;
@@ -400,7 +400,7 @@ inline void subtract(fixed_int<Bits, Signed>& result, const limb_type& o)
       + 1uLL + static_cast<double_limb_type>(~o);
    result.data()[fixed_int<Bits, Signed>::limb_count - 1] = static_cast<limb_type>(carry);
    carry >>= fixed_int<Bits, Signed>::limb_bits;
-   for(int i = fixed_int<Bits, Signed>::limb_count - 2; i >= 0; --i)
+   for(int i = static_cast<int>(fixed_int<Bits, Signed>::limb_count) - 2; i >= 0; --i)
    {
       carry += static_cast<double_limb_type>(result.data()[i]) + 0xFFFFFFFF;
       result.data()[i] = static_cast<limb_type>(carry);
@@ -713,7 +713,7 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
       r = x.data()[fixed_int<Bits, Signed>::limb_count - 1] % y.data()[fixed_int<Bits, Signed>::limb_count - 1];
       return;
    }
-   else if(r_order == fixed_int<Bits, Signed>::limb_count - 2)
+   else if(r_order == static_cast<int>(fixed_int<Bits, Signed>::limb_count) - 2)
    {
       double_limb_type a, b;
       a = (static_cast<double_limb_type>(r.data()[r_order]) << fixed_int<Bits, Signed>::limb_bits) | r.data()[r_order + 1];

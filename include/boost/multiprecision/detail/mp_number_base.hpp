@@ -439,14 +439,14 @@ void format_float_string(S& str, boost::intmax_t my_exp, boost::intmax_t digits,
 
    if(fixed || (!scientific && (my_exp >= -4) && (my_exp < digits)))
    {
-      if(1 + my_exp > str.size())
+      if(1 + my_exp > static_cast<boost::intmax_t>(str.size()))
       {
          // Just pad out the end with zeros:
          str.append(static_cast<std::string::size_type>(1 + my_exp - str.size()), '0');
          if(showpoint || fixed)
             str.append(".");
       }
-      else if(my_exp + 1 < str.size())
+      else if(my_exp + 1 < static_cast<boost::intmax_t>(str.size()))
       {
          if(my_exp < 0)
          {

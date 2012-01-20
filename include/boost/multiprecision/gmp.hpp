@@ -1790,6 +1790,11 @@ class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp
    typedef boost::multiprecision::mp_number<boost::multiprecision::gmp_float<Digits10> > number_type;
 public:
    BOOST_STATIC_CONSTEXPR bool is_specialized = true;
+   //
+   // min and max values chosen so as to not cause segfaults when calling
+   // mpf_get_str on 64-bit Linux builds.  Possibly we could use larger
+   // exponent values elsewhere.
+   //
    BOOST_STATIC_CONSTEXPR number_type (min)() BOOST_MP_NOEXCEPT
    { 
       initializer.do_nothing();
@@ -1798,7 +1803,7 @@ public:
       {
          value.first = true;
          value.second = 1;
-         mpf_div_2exp(value.second.backend().data(), value.second.backend().data(), LONG_MAX);
+         mpf_div_2exp(value.second.backend().data(), value.second.backend().data(), (std::numeric_limits<mp_exp_t>::max)() / 64 + 1);
       }
       return value.second;
    }
@@ -1810,7 +1815,7 @@ public:
       {
          value.first = true;
          value.second = 1;
-         mpf_mul_2exp(value.second.backend().data(), value.second.backend().data(), LONG_MAX - 1);
+         mpf_mul_2exp(value.second.backend().data(), value.second.backend().data(), (std::numeric_limits<mp_exp_t>::max)() / 64 + 1);
       }
       return value.second;
    }

@@ -800,12 +800,12 @@ inline void convert_to(long* result, const mpfr_float_backend<digits10>& val)
 }
 #ifdef _MPFR_H_HAVE_INTMAX_T
 template <unsigned digits10>
-inline void convert_to(boost::uintmax_t* result, const mpfr_float_backend<digits10>& val)
+inline void convert_to(unsigned long long* result, const mpfr_float_backend<digits10>& val)
 {
    *result = mpfr_get_uj(val.data(), GMP_RNDN);
 }
 template <unsigned digits10>
-inline void convert_to(boost::intmax_t* result, const mpfr_float_backend<digits10>& val)
+inline void convert_to(long long* result, const mpfr_float_backend<digits10>& val)
 {
    *result = mpfr_get_sj(val.data(), GMP_RNDN);
 }
