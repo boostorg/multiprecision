@@ -21,6 +21,16 @@ typedef boost::uint32_t limb_type;
 typedef boost::int32_t signed_limb_type;
 typedef boost::uint64_t double_limb_type;
 typedef boost::int64_t signed_double_limb_type;
+static const limb_type max_block_10 = 1000000000;
+static const limb_type digits_per_block_10 = 9;
+
+inline limb_type block_multiplier(int count)
+{
+   static const limb_type values[digits_per_block_10] 
+      = { 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000 };
+   BOOST_ASSERT(count < digits_per_block_10);
+   return values[count];
+}
 
 template <unsigned Bits, bool Signed>
 struct fixed_int
@@ -176,41 +186,65 @@ struct fixed_int
          if(radix == 8 || radix == 16)
          {
             unsigned shift = radix == 8 ? 3 : 4;
-            limb_type val = max_limb_value;
+            unsigned block_count = limb_bits / shift;
+            unsigned block_shift = shift * block_count;
+            limb_type val, block;
             while(*s)
             {
-               left_shift(*this, shift);
-               if(*s >= '0' && *s <= '9')
-                  val = *s - '0';
-               else if(*s >= 'a' && *s <= 'f')
-                  val = 10 + *s - 'a';
-               else if(*s >= 'A' && *s <= 'F')
-                  val = 10 + *s - 'A';
-               else
-                  val = max_limb_value;
-               if(val > radix)
+               block = 0;
+               for(unsigned i = 0; (i < block_count); ++i)
                {
-                  m_value[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
-                  return *this; // TODO raise an exception here?
+                  if(*s >= '0' && *s <= '9')
+                     val = *s - '0';
+                  else if(*s >= 'a' && *s <= 'f')
+                     val = 10 + *s - 'a';
+                  else if(*s >= 'A' && *s <= 'F')
+                     val = 10 + *s - 'A';
+                  else
+                     val = max_limb_value;
+                  if(val > radix)
+                  {
+                     m_value[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
+                     BOOST_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
+                  }
+                  block <<= shift;
+                  block |= val;
+                  if(!*++s)
+                  {
+                     // final shift is different:
+                     block_shift = (i + 1) * shift;
+                     break;
+                  }
                }
-               m_value[limb_count - 1] |= val;
-               ++s;
+               left_shift(*this, block_shift);
+               m_value[limb_count - 1] |= block;
             }
          }
          else
          {
-            // Base 10:
+            // Base 10, we extract blocks of size 10^9 at a time, that way
+            // the number of multiplications is kept to a minimum:
+            limb_type block_mult = max_block_10;
             while(*s)
             {
-               // TODO: this implementation is brain dead, Fix Me!
-               multiply(*this, static_cast<limb_type>(10));
-               limb_type val;
-               if(*s >= '0' && *s <= '9')
-                  val = *s - '0';
-               else
-                  return *this; // TODO raise an exception here?
-               add(*this, val);
-               ++s;
+               limb_type block = 0;
+               for(unsigned i = 0; i < digits_per_block_10; ++i)
+               {
+                  limb_type val;
+                  if(*s >= '0' && *s <= '9')
+                     val = *s - '0';
+                  else
+                     BOOST_THROW_EXCEPTION(std::runtime_error("Unexpected character encountered in input."));
+                  block *= 10;
+                  block += val;
+                  if(!*++s)
+                  {
+                     block_mult = block_multiplier(i);
+                     break;
+                  }
+               }
+               multiply(*this, block_mult);
+               add(*this, block);
             }
          }
       }
@@ -237,12 +271,14 @@ struct fixed_int
          limb_type shift = base == 8 ? 3 : 4;
          limb_type mask = static_cast<limb_type>((1u << shift) - 1);
          fixed_int t(*this);
+         result.assign(Bits / shift + (Bits % shift ? 1 : 0), '0');
+         int pos = result.size() - 1;
          for(unsigned i = 0; i < Bits / shift; ++i)
          {
             char c = '0' + (t.data()[limb_count-1] & mask);
             if(c > '9')
                c += 'A' - '9' - 1;
-            result.insert(0, 1, c);
+            result[pos--] = c;
             right_shift(t, shift);
          }
          if(Bits % shift)
@@ -251,7 +287,7 @@ struct fixed_int
             char c = '0' + (t.data()[limb_count-1] & mask);
             if(c > '9')
                c += 'A' - '9';
-            result.insert(0, 1, c);
+            result[pos] = c;
          }
          //
          // Get rid of leading zeros:
@@ -268,9 +304,11 @@ struct fixed_int
       }
       else
       {
+         result.assign(Bits / 3 + 1, '0');
+         int pos = result.size() - 1;
          fixed_int t(*this);
          fixed_int ten, r;
-         ten = limb_type(1000000000);
+         ten = limb_type(max_block_10);
          bool neg = false;
          if(Signed && (t.data()[0] & sign_bit_mask))
          {
@@ -289,11 +327,13 @@ struct fixed_int
                divide_unsigned_helper(t2, t, ten, r);
                t = t2;
                limb_type v = r.data()[limb_count - 1];
-               for(unsigned i = 0; i < 9; ++i)
+               for(unsigned i = 0; i < digits_per_block_10; ++i)
                {
                   char c = '0' + v % 10;
                   v /= 10;
-                  result.insert(0, 1, c);
+                  result[pos] = c;
+                  if(pos-- == 0)
+                     break;
                }
             }
          }
@@ -767,12 +807,27 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
       // Update result:
       //
       limb_type shift = y_order - r_order;
-      t = limb_type(0);
-      t.data()[fixed_int<Bits, Signed>::limb_count - 1 - shift] = guess;
+      //t = limb_type(0);
+      //t.data()[fixed_int<Bits, Signed>::limb_count - 1 - shift] = guess;
       if(r_neg)
-         subtract(result, t);
+      {
+         if(result.data()[fixed_int<Bits, Signed>::limb_count - 1 - shift] > guess)
+            result.data()[fixed_int<Bits, Signed>::limb_count - 1 - shift] -= guess;
+         else
+         {
+            t = limb_type(0);
+            t.data()[fixed_int<Bits, Signed>::limb_count - 1 - shift] = guess;
+            subtract(result, t);
+         }
+      }
+      else if(fixed_int<Bits, Signed>::max_limb_value - result.data()[fixed_int<Bits, Signed>::limb_count - 1 - shift] > guess)
+         result.data()[fixed_int<Bits, Signed>::limb_count - 1 - shift] += guess;
       else
+      {
+         t = limb_type(0);
+         t.data()[fixed_int<Bits, Signed>::limb_count - 1 - shift] = guess;
          add(result, t);
+      }
       //
       // Calculate guess * y, we use a fused mutiply-shift O(N) for this
       // rather than a full O(N^2) multiply:
