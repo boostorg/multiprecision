@@ -307,8 +307,7 @@ struct fixed_int
          result.assign(Bits / 3 + 1, '0');
          int pos = result.size() - 1;
          fixed_int t(*this);
-         fixed_int ten, r;
-         ten = limb_type(max_block_10);
+         fixed_int r;
          bool neg = false;
          if(Signed && (t.data()[0] & sign_bit_mask))
          {
@@ -324,7 +323,7 @@ struct fixed_int
             while(get_sign(t) != 0)
             {
                fixed_int t2;
-               divide_unsigned_helper(t2, t, ten, r);
+               divide_unsigned_helper(t2, t, max_block_10, r);
                t = t2;
                limb_type v = r.data()[limb_count - 1];
                for(unsigned i = 0; i < digits_per_block_10; ++i)
@@ -440,7 +439,7 @@ inline void subtract(fixed_int<Bits, Signed>& result, const limb_type& o)
       + 1uLL + static_cast<double_limb_type>(~o);
    result.data()[fixed_int<Bits, Signed>::limb_count - 1] = static_cast<limb_type>(carry);
    carry >>= fixed_int<Bits, Signed>::limb_bits;
-   for(int i = static_cast<int>(fixed_int<Bits, Signed>::limb_count) - 2; i >= 0; --i)
+   for(int i = static_cast<int>(fixed_int<Bits, Signed>::limb_count) - 2; (carry != 1) && (i >= 0); --i)
    {
       carry += static_cast<double_limb_type>(result.data()[i]) + 0xFFFFFFFF;
       result.data()[i] = static_cast<limb_type>(carry);
@@ -684,7 +683,7 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
     result equal to 0.  Then in each loop we calculate our
     "best guess" for how many times y divides into r,
     add our guess to the result, and subtract guess*y
-    from the remainder r.  One wrinckle is that the remainder
+    from the remainder r.  One wrinkle is that the remainder
     may go negative, in which case we subtract the current guess
     from the result rather than adding.  The value of the guess
     is determined by dividing the most-significant-limb of the
@@ -699,21 +698,6 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
 
    using default_ops::subtract;
 
-
-   if (is_zero(y))
-   {
-      volatile int i = 0;
-      i /= i;
-      return;
-   }
-
-   if (is_zero(x))
-   {
-      r = y;
-      result = x;
-      return;
-   }
-
    if(&result == &r)
    {
       fixed_int<Bits, Signed> rem;
@@ -722,24 +706,49 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
       return;
    }
 
-   r = x;
-   result = static_cast<limb_type>(0u);
-   if(x.compare(y) < 0)
-   {
-      return; // We already have the answer: zero.
-   }
-
    //
    // Find the most significant words of numerator and denominator.
-   // Note that this code can't run past the end of the array because
-   // we know already that neither are all zero:
    //
-   limb_type r_order = 0;
-   while(r.data()[r_order] == 0)
-      ++r_order;
    limb_type y_order = 0;
-   while(y.data()[y_order] == 0)
+   while((y.data()[y_order] == 0) && (y_order < fixed_int<Bits, Signed>::limb_count))
       ++y_order;
+
+   if(y_order >= fixed_int<Bits, Signed>::limb_count - 1)
+   {
+      //
+      // Only a single non-zero limb in the denominator, in this case
+      // we can use a specialized divide-by-single-limb routine which is
+      // much faster.  This also handles division by zero:
+      //
+      divide_unsigned_helper(result, x, y.data()[y_order], r);
+      return;
+   }
+
+   limb_type r_order = 0;
+   while((x.data()[r_order] == 0) && (r_order < fixed_int<Bits, Signed>::limb_count))
+      ++r_order;
+   if(r_order == fixed_int<Bits, Signed>::limb_count)
+   {
+      // x is zero, so is the result:
+      r = y;
+      result = x;
+      return;
+   }
+
+   r = x;
+   result = static_cast<limb_type>(0u);
+   //
+   // Check if the remainder is already less than the divisor, if so
+   // we already have the result.  Note we try and avoid a full compare
+   // if we can:
+   //
+   if(r_order >= y_order)
+   {
+      if((r_order > y_order) || (r.compare(y) < 0))
+      {
+         return;
+      }
+   }
 
    fixed_int<Bits, Signed> t;
    bool r_neg = false;
@@ -765,8 +774,6 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
       return;
    }
 
-   //fixed_int<Bits, Signed> last_r;
-   //bool last_neg;
    do
    {
       //
@@ -778,8 +785,6 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
       // Calculate our best guess for how many times y divides into r:
       //
       limb_type guess;
-      //last_r = r;
-      //last_neg = r_neg;
       if((r.data()[r_order] <= y.data()[y_order]) && (r_order < fixed_int<Bits, Signed>::limb_count - 1))
       {
          double_limb_type a, b, v;
@@ -794,15 +799,19 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
             ++r_order;
          }
       }
+      else if(r_order == fixed_int<Bits, Signed>::limb_count - 1)
+      {
+         guess = r.data()[r_order] / y.data()[y_order];
+      }
       else
       {
          double_limb_type a, b, v;
-         a = (r_order < fixed_int<Bits, Signed>::limb_count - 1) ? (static_cast<double_limb_type>(r.data()[r_order]) << fixed_int<Bits, Signed>::limb_bits) | r.data()[r_order + 1] : r.data()[r_order];
+         a = (static_cast<double_limb_type>(r.data()[r_order]) << fixed_int<Bits, Signed>::limb_bits) | r.data()[r_order + 1];
          b = (y_order < fixed_int<Bits, Signed>::limb_count - 1) ? (static_cast<double_limb_type>(y.data()[y_order]) << fixed_int<Bits, Signed>::limb_bits) | y.data()[y_order + 1] : (static_cast<double_limb_type>(y.data()[y_order])  << fixed_int<Bits, Signed>::limb_bits);
          v = a / b;
          guess = static_cast<limb_type>(v);
-         //guess = r.data()[r_order] / y.data()[y_order];
       }
+      BOOST_ASSERT(guess); // If the guess ever gets to zero we go on forever....
       //
       // Update result:
       //
@@ -842,7 +851,7 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
          carry >>= fixed_int<Bits, Signed>::limb_bits;
       }
       t.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
-       //
+      //
       // Update r:
       //
       subtract(r, t);
@@ -852,7 +861,9 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
          r_neg = !r_neg;
       }
    }
-   while(r.compare(y) > 0);
+   // Termination condition is really just a check that r > y, but with two common
+   // short-circuit cases handled first:
+   while((r_order < y_order) || (r.data()[r_order] > y.data()[y_order]) || (r.compare(y) > 0));
 
    //
    // We now just have to normalise the result:
@@ -864,6 +875,110 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
       r.negate();
       add(r, y);
    }
+
+   BOOST_ASSERT(r.compare(y) < 0); // remainder must be less than the divisor or our code has failed
+}
+
+template <unsigned Bits, bool Signed>
+void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& x, limb_type y, fixed_int<Bits, Signed>& r)
+{
+   if((&result == &x) || (&r == &x))
+   {
+      fixed_int<Bits, Signed> t(x);
+      divide_unsigned_helper(result, t, y, r);
+      return;
+   }
+
+   if(&result == &r)
+   {
+      fixed_int<Bits, Signed> rem;
+      divide_unsigned_helper(result, x, y, rem);
+      r = rem;
+      return;
+   }
+
+   // As above, but simplified for integer divisor:
+
+   using default_ops::subtract;
+
+   if(y == 0)
+   {
+      BOOST_THROW_EXCEPTION(std::runtime_error("Integer Division by zero."));
+   }
+   //
+   // Find the most significant word of numerator.
+   //
+   limb_type r_order = 0;
+   while((x.data()[r_order] == 0) && (r_order < fixed_int<Bits, Signed>::limb_count))
+      ++r_order;
+
+   //
+   // Set remainder and result to their initial values:
+   //
+   r = x;
+   result = static_cast<limb_type>(0u);
+
+   if(r_order == fixed_int<Bits, Signed>::limb_count)
+   {
+      // All the limbs in x are zero, so is the result:
+      return;
+   }
+   //
+   // check for x < y, try to do this without actually having to 
+   // do a full comparison:
+   //
+   if((r_order == fixed_int<Bits, Signed>::limb_count - 1) && (r.data()[r_order] < y))
+   {
+      return;
+   }
+
+   //
+   // See if we can short-circuit long division, and use basic arithmetic instead:
+   //
+   if(r_order == fixed_int<Bits, Signed>::limb_count - 1)
+   {
+      result = r.data()[fixed_int<Bits, Signed>::limb_count - 1] / y;
+      r = x.data()[fixed_int<Bits, Signed>::limb_count - 1] % y;
+      return;
+   }
+   else if(r_order == static_cast<int>(fixed_int<Bits, Signed>::limb_count) - 2)
+   {
+      double_limb_type a;
+      a = (static_cast<double_limb_type>(r.data()[r_order]) << fixed_int<Bits, Signed>::limb_bits) | r.data()[r_order + 1];
+      result = a / y;
+      r = a % y;
+      return;
+   }
+
+   do
+   {
+      //
+      // Update r_order, this can't run past the end as r must be non-zero at this point:
+      //
+      while(r.data()[r_order] == 0)
+         ++r_order;
+      //
+      // Calculate our best guess for how many times y divides into r:
+      //
+      if((r.data()[r_order] < y) && (r_order < fixed_int<Bits, Signed>::limb_count - 1))
+      {
+         double_limb_type a, b;
+         a = (static_cast<double_limb_type>(r.data()[r_order]) << fixed_int<Bits, Signed>::limb_bits) | r.data()[r_order + 1];
+         b = a % y;
+         r.data()[r_order] = 0;
+         ++r_order;
+         r.data()[r_order] = static_cast<limb_type>(b);
+         result.data()[r_order] = static_cast<limb_type>(a / y);
+      }
+      else
+      {
+         result.data()[r_order] = r.data()[r_order] / y;
+         r.data()[r_order] %= y;
+      }
+   }
+   // Termination condition is really just a check that r > y, but with two common
+   // short-circuit cases handled first:
+   while((r_order < fixed_int<Bits, Signed>::limb_count - 1) || (r.data()[r_order] > y));
 
    BOOST_ASSERT(r.compare(y) < 0); // remainder must be less than the divisor or our code has failed
 }
@@ -902,7 +1017,67 @@ inline void divide(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed
    }
 }
 template <unsigned Bits, bool Signed>
+inline void divide(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, limb_type& b)
+{
+   fixed_int<Bits, Signed> r;
+   if(Signed && (a.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask))
+   {
+      fixed_int<Bits, Signed> t(a);
+      t.negate();
+      divide_unsigned_helper(result, t, b, r);
+      result.negate();
+   }
+   else
+   {
+      divide_unsigned_helper(result, a, b, r);
+   }
+}
+template <unsigned Bits, bool Signed>
+inline void divide(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, signed_limb_type& b)
+{
+   fixed_int<Bits, Signed> r;
+   if(Signed && (a.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask))
+   {
+      if(b < 0)
+      {
+         fixed_int<Bits, Signed> t(a);
+         t.negate();
+         divide_unsigned_helper(result, t, static_cast<limb_type>(-b), r);
+      }
+      else
+      {
+         fixed_int<Bits, Signed> t(a);
+         t.negate();
+         divide_unsigned_helper(result, t, b, r);
+         result.negate();
+      }
+   }
+   else if(b < 0)
+   {
+      divide_unsigned_helper(result, a, static_cast<limb_type>(-b), r);
+      result.negate();
+   }
+   else
+   {
+      divide_unsigned_helper(result, a, static_cast<limb_type>(b), r);
+   }
+}
+template <unsigned Bits, bool Signed>
 inline void divide(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& b)
+{
+   // There is no in place divide:
+   fixed_int<Bits, Signed> a(result);
+   divide(result, a, b);
+}
+template <unsigned Bits, bool Signed>
+inline void divide(fixed_int<Bits, Signed>& result, limb_type b)
+{
+   // There is no in place divide:
+   fixed_int<Bits, Signed> a(result);
+   divide(result, a, b);
+}
+template <unsigned Bits, bool Signed>
+inline void divide(fixed_int<Bits, Signed>& result, signed_limb_type b)
 {
    // There is no in place divide:
    fixed_int<Bits, Signed> a(result);
@@ -942,7 +1117,67 @@ inline void modulus(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signe
    }
 }
 template <unsigned Bits, bool Signed>
+inline void modulus(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, limb_type b)
+{
+   fixed_int<Bits, Signed> r;
+   if(Signed && (a.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask))
+   {
+      fixed_int<Bits, Signed> t(a);
+      t.negate();
+      divide_unsigned_helper(r, t, b, result);
+      result.negate();
+   }
+   else
+   {
+      divide_unsigned_helper(r, a, b, result);
+   }
+}
+template <unsigned Bits, bool Signed>
+inline void modulus(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, signed_limb_type b)
+{
+   fixed_int<Bits, Signed> r;
+   if(Signed && (a.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask))
+   {
+      if(b < 0)
+      {
+         fixed_int<Bits, Signed> t1(a);
+         t1.negate();
+         divide_unsigned_helper(r, t1, static_cast<limb_type>(-b), result);
+         result.negate();
+      }
+      else
+      {
+         fixed_int<Bits, Signed> t(a);
+         t.negate();
+         divide_unsigned_helper(r, t, b, result);
+         result.negate();
+      }
+   }
+   else if(b < 0)
+   {
+      divide_unsigned_helper(r, a, static_cast<limb_type>(-b), result);
+   }
+   else
+   {
+      divide_unsigned_helper(r, a, static_cast<limb_type>(b), result);
+   }
+}
+template <unsigned Bits, bool Signed>
 inline void modulus(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& b)
+{
+   // There is no in place divide:
+   fixed_int<Bits, Signed> a(result);
+   modulus(result, a, b);
+}
+template <unsigned Bits, bool Signed>
+inline void modulus(fixed_int<Bits, Signed>& result, limb_type b)
+{
+   // There is no in place divide:
+   fixed_int<Bits, Signed> a(result);
+   modulus(result, a, b);
+}
+template <unsigned Bits, bool Signed>
+inline void modulus(fixed_int<Bits, Signed>& result, signed_limb_type b)
 {
    // There is no in place divide:
    fixed_int<Bits, Signed> a(result);
@@ -956,10 +1191,38 @@ inline void bitwise_and(fixed_int<Bits, Signed>& result, const fixed_int<Bits, S
       result.data()[i] &= o.data()[i];
 }
 template <unsigned Bits, bool Signed>
+inline void bitwise_and(fixed_int<Bits, Signed>& result, limb_type o)
+{
+   result.data()[fixed_int<Bits, Signed>::limb_count - 1] &= o;
+   for(typename fixed_int<Bits, Signed>::data_type::size_type i = 0; i < fixed_int<Bits, Signed>::limb_count - 1; ++i)
+      result.data()[i] = 0;
+}
+template <unsigned Bits, bool Signed>
+inline void bitwise_and(fixed_int<Bits, Signed>& result, signed_limb_type o)
+{
+   result.data()[fixed_int<Bits, Signed>::limb_count - 1] &= o;
+   limb_type mask = o < 0 ? fixed_int<Bits, Signed>::max_limb_value : 0;
+   for(typename fixed_int<Bits, Signed>::data_type::size_type i = 0; i < fixed_int<Bits, Signed>::limb_count - 1; ++i)
+      result.data()[i] &= mask;
+}
+template <unsigned Bits, bool Signed>
 inline void bitwise_or(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& o)
 {
    for(typename fixed_int<Bits, Signed>::data_type::size_type i = 0; i < fixed_int<Bits, Signed>::limb_count; ++i)
       result.data()[i] |= o.data()[i];
+}
+template <unsigned Bits, bool Signed>
+inline void bitwise_or(fixed_int<Bits, Signed>& result, limb_type o)
+{
+   result.data()[fixed_int<Bits, Signed>::limb_count - 1] |= o;
+}
+template <unsigned Bits, bool Signed>
+inline void bitwise_or(fixed_int<Bits, Signed>& result, signed_limb_type o)
+{
+   result.data()[fixed_int<Bits, Signed>::limb_count - 1] |= o;
+   limb_type mask = o < 0 ? fixed_int<Bits, Signed>::max_limb_value : 0;
+   for(typename fixed_int<Bits, Signed>::data_type::size_type i = 0; i < fixed_int<Bits, Signed>::limb_count - 1; ++i)
+      result.data()[i] |= mask;
 }
 template <unsigned Bits, bool Signed>
 inline void bitwise_xor(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& o)
@@ -967,6 +1230,19 @@ inline void bitwise_xor(fixed_int<Bits, Signed>& result, const fixed_int<Bits, S
    for(typename fixed_int<Bits, Signed>::data_type::size_type i = 0; i < fixed_int<Bits, Signed>::limb_count; ++i)
       result.data()[i] ^= o.data()[i];
    result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
+}
+template <unsigned Bits, bool Signed>
+inline void bitwise_xor(fixed_int<Bits, Signed>& result, limb_type o)
+{
+   result.data()[fixed_int<Bits, Signed>::limb_count - 1] ^= o;
+}
+template <unsigned Bits, bool Signed>
+inline void bitwise_xor(fixed_int<Bits, Signed>& result, signed_limb_type o)
+{
+   result.data()[fixed_int<Bits, Signed>::limb_count - 1] ^= o;
+   limb_type mask = o < 0 ? fixed_int<Bits, Signed>::max_limb_value : 0;
+   for(typename fixed_int<Bits, Signed>::data_type::size_type i = 0; i < fixed_int<Bits, Signed>::limb_count - 1; ++i)
+      result.data()[i] ^= mask;
 }
 template <unsigned Bits, bool Signed>
 inline void complement(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& o)

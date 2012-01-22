@@ -1,0 +1,106 @@
+# copyright John Maddock 2012
+# Distributed under the Boost Software License, Version 1.0. 
+# (See accompanying file LICENSE_1_0.txt or copy at 
+# http://www.boost.org/LICENSE_1_0.txt.
+
+import modules ;
+import path ;
+
+local ntl-path = [ modules.peek : NTL_PATH ] ;
+local gmp_path = [ modules.peek : GMP_PATH ] ;
+local mpfr_path = [ modules.peek : MPFR_PATH ] ;
+local tommath_path = [ modules.peek : TOMMATH_PATH ] ;
+
+project : requirements 
+   <include>$(gmp_path) 
+   <include>$(gmp_path)/mpfr 
+   <include>$(gmp_path)/gmpfrxx 
+   <include>$(mpfr_path)
+   <include>$(tommath_path)
+   <include>../../.. 
+   <search>$(gmp_path) 
+   <search>$(mpfr_path) 
+   <search>$(mpfr_path)/build.vc10/lib/Win32/Debug
+   <search>$(tommath_path) 
+   <link>static
+   <define>BOOST_ALL_NO_LIB
+   <debug-symbols>off
+   ;
+
+
+lib gmp ;
+lib mpfr ;
+
+if $(tommath_path)
+{
+   TOMMATH = [ GLOB $(tommath_path) : *.c ] ;
+}
+else
+{
+   lib tommath ;
+   TOMMATH = tommath ;
+}
+
+exe performance_test : performance_test.cpp /boost/system//boost_system
+          : release
+          [ check-target-builds ../config//has_gmp : <define>TEST_MPF <define>TEST_MPZ <source>gmp : ]
+          [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>mpfr : ]
+          [ check-target-builds ../config//has_tommath : <define>TEST_TOMMATH <source>$(TOMMATH) : ]
+          <define>TEST_CPP_FLOAT
+          <define>TEST_FIXED_INT
+          ;
+
+exe sf_performance : sf_performance.cpp
+          : release
+          [ check-target-builds ../config//has_gmp : <define>TEST_MPF <define>TEST_MPZ <source>gmp : ]
+          [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>mpfr : ]
+          <define>TEST_CPP_FLOAT
+          <toolset>msvc:<cxxflags>-bigobj
+          ;
+
+obj obj_linpack_benchmark_mpfr : linpack-benchmark.cpp
+          : release
+          [ check-target-builds ../config//has_mpfr : : <build>no ]
+          <define>TEST_MPFR_50
+          ;
+
+obj obj_linpack_benchmark_mpf : linpack-benchmark.cpp 
+          : release
+          [ check-target-builds ../config//has_gmp : : <build>no ]
+          <define>TEST_MPF_50
+          ;
+
+obj obj_linpack_benchmark_cpp_float : linpack-benchmark.cpp
+          : release
+          <define>TEST_CPP_FLOAT
+          ;
+
+obj obj_linpack_benchmark_double : linpack-benchmark.cpp
+          : release
+          ;
+
+obj obj_f2c : f2c.c : release ;
+
+exe linpack_benchmark_mpfr : obj_linpack_benchmark_mpfr mpfr obj_f2c
+          : release
+          [ check-target-builds ../config//has_mpfr : : <build>no ]
+          <define>TEST_MPFR_50
+          ;
+
+exe linpack_benchmark_mpf : obj_linpack_benchmark_mpf gmp obj_f2c
+          : release
+          [ check-target-builds ../config//has_gmp : : <build>no ]
+          <define>TEST_MPF_50
+          ;
+
+exe linpack_benchmark_cpp_float : obj_linpack_benchmark_cpp_float obj_f2c
+          : release
+          <define>TEST_CPP_FLOAT
+          ;
+
+exe linpack_benchmark_double : obj_linpack_benchmark_double obj_f2c
+          : release
+          ;
+
+install . : performance_test sf_performance linpack_benchmark_double linpack_benchmark_cpp_float linpack_benchmark_mpf linpack_benchmark_mpfr ;
+

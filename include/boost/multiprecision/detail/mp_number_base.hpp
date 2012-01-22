@@ -591,7 +591,7 @@ inline detail::mp_exp<detail::subtract_immediates, mp_number<B>, mp_number<B> >
    return detail::mp_exp<detail::subtract_immediates, mp_number<B>, mp_number<B> >(b, a.left_ref());
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::subtract_immediates, mp_number<B>, V > >::type
+inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::subtract_immediates, V, mp_number<B> > >::type
    operator + (const detail::mp_exp<detail::negate, mp_number<B> >& a, const V& b)
 {
    return detail::mp_exp<detail::subtract_immediates, V, mp_number<B> >(b, a.left_ref());
@@ -686,7 +686,7 @@ template <class B, class V>
 inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::negate, detail::mp_exp<detail::add_immediates, mp_number<B>, V > > >::type
    operator - (const detail::mp_exp<detail::negate, mp_number<B> >& a, const V& b)
 {
-   return detail::mp_exp<detail::add_immediates, V, mp_number<B> >(b, a.left_ref());
+   return detail::mp_exp<detail::negate, detail::mp_exp<detail::add_immediates, mp_number<B>, V > >(detail::mp_exp<detail::add_immediates, mp_number<B>, V >(a.left_ref(), b));
 }
 template <class V, class B>
 inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::add_immediates, V, mp_number<B> > >::type

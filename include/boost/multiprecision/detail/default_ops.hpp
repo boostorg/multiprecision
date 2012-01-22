@@ -131,6 +131,12 @@ inline void add(T& t, const U& u, const V& v)
       add(t, v);
    }
 }
+template<class T, class U>
+inline typename disable_if<is_same<T, U> >::type add(T& t, const U& a, const T& b)
+{
+   return add(t, b, a);
+}
+
 template <class T, class U, class V>
 inline void subtract(T& t, const U& u, const V& v)
 {
@@ -147,6 +153,13 @@ inline void subtract(T& t, const U& u, const V& v)
       subtract(t, v);
    }
 }
+template <class T, class U>
+inline typename disable_if<is_same<T, U> >::type subtract(T& t, const U& a, const T& b)
+{
+   subtract(t, b, a);
+   t.negate();
+}
+
 template <class T, class U, class V>
 inline void multiply(T& t, const U& u, const V& v)
 {
@@ -159,6 +172,11 @@ inline void multiply(T& t, const U& u, const V& v)
       t = u;
       multiply(t, v);
    }
+}
+template <class T, class U>
+inline typename disable_if<is_same<T, U> >::type multiply(T& t, const U& a, const T& b)
+{
+   multiply(t, b, a);
 }
 template <class T, class U, class V>
 inline void divide(T& t, const U& u, const V& v)
@@ -207,6 +225,11 @@ inline void bitwise_and(T& t, const U& u, const V& v)
       bitwise_and(t, v);
    }
 }
+template <class T, class U>
+inline typename disable_if<is_same<T, U> >::type bitwise_and(T& t, const U& a, const T& b)
+{
+   bitwise_and(t, b, a);
+}
 
 template <class T, class U, class V>
 inline void bitwise_or(T& t, const U& u, const V& v)
@@ -221,6 +244,11 @@ inline void bitwise_or(T& t, const U& u, const V& v)
       bitwise_or(t, v);
    }
 }
+template <class T, class U>
+inline typename disable_if<is_same<T, U> >::type bitwise_or(T& t, const U& a, const T& b)
+{
+   bitwise_or(t, b, a);
+}
 
 template <class T, class U, class V>
 inline void bitwise_xor(T& t, const U& u, const V& v)
@@ -234,6 +262,11 @@ inline void bitwise_xor(T& t, const U& u, const V& v)
       t = u;
       bitwise_xor(t, v);
    }
+}
+template <class T, class U>
+inline typename disable_if<is_same<T, U> >::type bitwise_xor(T& t, const U& a, const T& b)
+{
+   bitwise_xor(t, b, a);
 }
 
 template <class T>

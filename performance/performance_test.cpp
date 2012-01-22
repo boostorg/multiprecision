@@ -145,6 +145,16 @@ struct tester
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
+   double test_multiply_int()
+   {
+      stopwatch<boost::chrono::high_resolution_clock> w;
+      for(unsigned i = 0; i < 1000; ++i)
+      {
+         for(unsigned i = 0; i < b.size(); ++i)
+            a[i] = b[i] * 3;
+      }
+      return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+   }
    double test_divide()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
@@ -152,6 +162,16 @@ struct tester
       {
          for(unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] / c[i] + b[i] / small[i];
+      }
+      return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+   }
+   double test_divide_int()
+   {
+      stopwatch<boost::chrono::high_resolution_clock> w;
+      for(unsigned i = 0; i < 1000; ++i)
+      {
+         for(unsigned i = 0; i < b.size(); ++i)
+            a[i] = b[i] / 3;
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
@@ -163,7 +183,7 @@ struct tester
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
    //
-   // The following tests only work for ineteger types:
+   // The following tests only work for integer types:
    //
    double test_mod()
    {
@@ -172,6 +192,16 @@ struct tester
       {
          for(unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] % c[i] + b[i] % small[i];
+      }
+      return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+   }
+   double test_mod_int()
+   {
+      stopwatch<boost::chrono::high_resolution_clock> w;
+      for(unsigned i = 0; i < 1000; ++i)
+      {
+         for(unsigned i = 0; i < b.size(); ++i)
+            a[i] = b[i] % 254;
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
@@ -185,6 +215,16 @@ struct tester
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
+   double test_or_int()
+   {
+      stopwatch<boost::chrono::high_resolution_clock> w;
+      for(unsigned i = 0; i < 1000; ++i)
+      {
+         for(unsigned i = 0; i < b.size(); ++i)
+            a[i] = b[i] | 234;
+      }
+      return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+   }
    double test_and()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
@@ -195,6 +235,16 @@ struct tester
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
+   double test_and_int()
+   {
+      stopwatch<boost::chrono::high_resolution_clock> w;
+      for(unsigned i = 0; i < 1000; ++i)
+      {
+         for(unsigned i = 0; i < b.size(); ++i)
+            a[i] = b[i] & 234;
+      }
+      return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+   }
    double test_xor()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
@@ -202,6 +252,16 @@ struct tester
       {
          for(unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] ^ c[i];
+      }
+      return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+   }
+   double test_xor_int()
+   {
+      stopwatch<boost::chrono::high_resolution_clock> w;
+      for(unsigned i = 0; i < 1000; ++i)
+      {
+         for(unsigned i = 0; i < b.size(); ++i)
+            a[i] = b[i] ^ 234;
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
@@ -380,6 +440,11 @@ void test_int_ops(tester<Number, N>& t, const char* type, unsigned precision, co
    //report_result(cat, type, "~", precision, t.test_complement());
    report_result(cat, type, "<<", precision, t.test_left_shift());
    report_result(cat, type, ">>", precision, t.test_right_shift());
+   // integer ops:
+   report_result(cat, type, "%(int)", precision, t.test_mod_int());
+   report_result(cat, type, "|(int)", precision, t.test_or_int());
+   report_result(cat, type, "&(int)", precision, t.test_and_int());
+   report_result(cat, type, "^(int)", precision, t.test_xor_int());
 }
 template <class Number, int N, class U>
 void test_int_ops(tester<Number, N>& t, const char* type, unsigned precision, const U&)
@@ -403,12 +468,14 @@ void test(const char* type, unsigned precision)
    //
    report_result(cat, type, "+", precision, t.test_add());
    report_result(cat, type, "-", precision, t.test_subtract());
-   report_result(cat, type, "+(int)", precision, t.test_add_int());
-   report_result(cat, type, "-(int)", precision, t.test_subtract_int());
    report_result(cat, type, "*", precision, t.test_multiply());
    report_result(cat, type, "/", precision, t.test_divide());
    report_result(cat, type, "str", precision, t.test_str());
-
+   // integer ops:
+   report_result(cat, type, "+(int)", precision, t.test_add_int());
+   report_result(cat, type, "-(int)", precision, t.test_subtract_int());
+   report_result(cat, type, "*(int)", precision, t.test_multiply_int());
+   report_result(cat, type, "/(int)", precision, t.test_divide_int());
    test_int_ops(t, type, precision, typename boost::multiprecision::number_category<Number>::type());
 }
 
