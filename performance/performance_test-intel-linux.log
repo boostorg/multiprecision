@@ -1,0 +1,507 @@
+gmp_float      50        +    0.0180644
+gmp_float      50        -    0.0194673
+gmp_float      50        *    0.0505578
+gmp_float      50        /    0.278179
+gmp_float      50        str  0.00357972
+gmp_float      50        +(int)0.0115205
+gmp_float      50        -(int)0.0197263
+gmp_float      50        *(int)0.0165976
+gmp_float      50        /(int)0.0758893
+gmp_float      100       +    0.019475
+gmp_float      100       -    0.0218422
+gmp_float      100       *    0.090686
+gmp_float      100       /    0.378055
+gmp_float      100       str  0.00557522
+gmp_float      100       +(int)0.0127856
+gmp_float      100       -(int)0.0205184
+gmp_float      100       *(int)0.0200577
+gmp_float      100       /(int)0.0948556
+gmp_float      500       +    0.0317241
+gmp_float      500       -    0.0335304
+gmp_float      500       *    0.947017
+gmp_float      500       /    1.5881
+gmp_float      500       str  0.0313793
+gmp_float      500       +(int)0.0187639
+gmp_float      500       -(int)0.0265882
+gmp_float      500       *(int)0.0415067
+gmp_float      500       /(int)0.232493
+gmp_int        64        +    0.0167521
+gmp_int        64        -    0.0188881
+gmp_int        64        *    0.011645
+gmp_int        64        /    0.1697
+gmp_int        64        str  0.000336635
+gmp_int        64        +(int)0.00723269
+gmp_int        64        -(int)0.00741945
+gmp_int        64        *(int)0.0120496
+gmp_int        64        /(int)0.0501068
+gmp_int        64        %    0.16582
+gmp_int        64        |    0.0115873
+gmp_int        64        &    0.0125951
+gmp_int        64        ^    0.0129732
+gmp_int        64        <<   0.00969083
+gmp_int        64        >>   0.0130601
+gmp_int        64        %(int)0.034786
+gmp_int        64        |(int)0.0424747
+gmp_int        64        &(int)0.0441868
+gmp_int        64        ^(int)0.0442481
+gmp_int        128       +    0.0192114
+gmp_int        128       -    0.0219479
+gmp_int        128       *    0.0182506
+gmp_int        128       /    0.196561
+gmp_int        128       str  0.00232097
+gmp_int        128       +(int)0.00871277
+gmp_int        128       -(int)0.0130434
+gmp_int        128       *(int)0.0127078
+gmp_int        128       /(int)0.0568248
+gmp_int        128       %    0.164977
+gmp_int        128       |    0.0134681
+gmp_int        128       &    0.01436
+gmp_int        128       ^    0.0140653
+gmp_int        128       <<   0.0131179
+gmp_int        128       >>   0.0107065
+gmp_int        128       %(int)0.0405959
+gmp_int        128       |(int)0.0440289
+gmp_int        128       &(int)0.0453998
+gmp_int        128       ^(int)0.0468496
+gmp_int        256       +    0.0230482
+gmp_int        256       -    0.0289896
+gmp_int        256       *    0.0476911
+gmp_int        256       /    0.240552
+gmp_int        256       str  0.000971703
+gmp_int        256       +(int)0.0145101
+gmp_int        256       -(int)0.0148337
+gmp_int        256       *(int)0.0170638
+gmp_int        256       /(int)0.0686065
+gmp_int        256       %    0.197103
+gmp_int        256       |    0.0159192
+gmp_int        256       &    0.015575
+gmp_int        256       ^    0.0166751
+gmp_int        256       <<   0.0148945
+gmp_int        256       >>   0.0111136
+gmp_int        256       %(int)0.0516333
+gmp_int        256       |(int)0.0474723
+gmp_int        256       &(int)0.0466442
+gmp_int        256       ^(int)0.0465869
+gmp_int        512       +    0.028268
+gmp_int        512       -    0.0352221
+gmp_int        512       *    0.103105
+gmp_int        512       /    0.281226
+gmp_int        512       str  0.00167382
+gmp_int        512       +(int)0.0170154
+gmp_int        512       -(int)0.0179625
+gmp_int        512       *(int)0.021358
+gmp_int        512       /(int)0.0950571
+gmp_int        512       %    0.230214
+gmp_int        512       |    0.0208511
+gmp_int        512       &    0.019777
+gmp_int        512       ^    0.025011
+gmp_int        512       <<   0.0182795
+gmp_int        512       >>   0.0121814
+gmp_int        512       %(int)0.0651899
+gmp_int        512       |(int)0.0493584
+gmp_int        512       &(int)0.0498514
+gmp_int        512       ^(int)0.049668
+gmp_int        1024      +    0.0408966
+gmp_int        1024      -    0.0463151
+gmp_int        1024      *    0.326898
+gmp_int        1024      /    0.36922
+gmp_int        1024      str  0.00297363
+gmp_int        1024      +(int)0.0197647
+gmp_int        1024      -(int)0.0199956
+gmp_int        1024      *(int)0.0300116
+gmp_int        1024      /(int)0.144581
+gmp_int        1024      %    0.302132
+gmp_int        1024      |    0.0284821
+gmp_int        1024      &    0.0266602
+gmp_int        1024      ^    0.0299441
+gmp_int        1024      <<   0.0247868
+gmp_int        1024      >>   0.0162548
+gmp_int        1024      %(int)0.0799406
+gmp_int        1024      |(int)0.0525727
+gmp_int        1024      &(int)0.0539474
+gmp_int        1024      ^(int)0.0539722
+mpq_rational   64        +    0.254473
+mpq_rational   64        -    0.260331
+mpq_rational   64        *    0.426868
+mpq_rational   64        /    1.50105
+mpq_rational   64        str  0.000927423
+mpq_rational   64        +(int)0.309729
+mpq_rational   64        -(int)0.306598
+mpq_rational   64        *(int)0.344178
+mpq_rational   64        /(int)0.32842
+mpq_rational   128       +    0.542374
+mpq_rational   128       -    0.545764
+mpq_rational   128       *    0.968054
+mpq_rational   128       /    2.78757
+mpq_rational   128       str  0.00111655
+mpq_rational   128       +(int)0.154116
+mpq_rational   128       -(int)0.151187
+mpq_rational   128       *(int)0.179899
+mpq_rational   128       /(int)0.184167
+mpq_rational   256       +    2.34795
+mpq_rational   256       -    2.3565
+mpq_rational   256       *    4.39195
+mpq_rational   256       /    8.9203
+mpq_rational   256       str  0.00175742
+mpq_rational   256       +(int)0.177483
+mpq_rational   256       -(int)0.16783
+mpq_rational   256       *(int)0.200539
+mpq_rational   256       /(int)0.206129
+mpq_rational   512       +    5.10523
+mpq_rational   512       -    5.08802
+mpq_rational   512       *    9.6344
+mpq_rational   512       /    16.8502
+mpq_rational   512       str  0.00246714
+mpq_rational   512       +(int)0.212807
+mpq_rational   512       -(int)0.212048
+mpq_rational   512       *(int)0.254142
+mpq_rational   512       /(int)0.262442
+mpq_rational   1024      +    11.2331
+mpq_rational   1024      -    11.2446
+mpq_rational   1024      *    20.9879
+mpq_rational   1024      /    35.6472
+mpq_rational   1024      str  0.00550783
+mpq_rational   1024      +(int)0.27756
+mpq_rational   1024      -(int)0.271845
+mpq_rational   1024      *(int)0.328602
+mpq_rational   1024      /(int)0.350883
+fixed_int      64        +    0.00207163
+fixed_int      64        -    0.00216403
+fixed_int      64        *    0.00392745
+fixed_int      64        /    0.0556903
+fixed_int      64        str  0.000302762
+fixed_int      64        +(int)0.00358307
+fixed_int      64        -(int)0.00354668
+fixed_int      64        *(int)0.00294381
+fixed_int      64        /(int)0.0169012
+fixed_int      64        %    0.054413
+fixed_int      64        |    0.00257616
+fixed_int      64        &    0.00259593
+fixed_int      64        ^    0.00256688
+fixed_int      64        <<   0.00115455
+fixed_int      64        >>   0.00147407
+fixed_int      64        %(int)0.0243407
+fixed_int      64        |(int)0.00208078
+fixed_int      64        &(int)0.00209559
+fixed_int      64        ^(int)0.00202777
+fixed_int      128       +    0.00326026
+fixed_int      128       -    0.00372498
+fixed_int      128       *    0.0104772
+fixed_int      128       /    0.105756
+fixed_int      128       str  0.000500691
+fixed_int      128       +(int)0.00359962
+fixed_int      128       -(int)0.00360689
+fixed_int      128       *(int)0.00422148
+fixed_int      128       /(int)0.0634475
+fixed_int      128       %    0.106105
+fixed_int      128       |    0.00363433
+fixed_int      128       &    0.00361924
+fixed_int      128       ^    0.00361813
+fixed_int      128       <<   0.00632357
+fixed_int      128       >>   0.00238745
+fixed_int      128       %(int)0.0811764
+fixed_int      128       |(int)0.00190869
+fixed_int      128       &(int)0.00245967
+fixed_int      128       ^(int)0.00237775
+fixed_int      256       +    0.00834722
+fixed_int      256       -    0.00653903
+fixed_int      256       *    0.0324122
+fixed_int      256       /    0.198305
+fixed_int      256       str  0.00111683
+fixed_int      256       +(int)0.00405163
+fixed_int      256       -(int)0.00385712
+fixed_int      256       *(int)0.00849409
+fixed_int      256       /(int)0.127666
+fixed_int      256       %    0.19685
+fixed_int      256       |    0.0108232
+fixed_int      256       &    0.0108415
+fixed_int      256       ^    0.0108455
+fixed_int      256       <<   0.00826823
+fixed_int      256       >>   0.00854822
+fixed_int      256       %(int)0.15306
+fixed_int      256       |(int)0.00275195
+fixed_int      256       &(int)0.00419648
+fixed_int      256       ^(int)0.0027653
+fixed_int      512       +    0.0128543
+fixed_int      512       -    0.0120433
+fixed_int      512       *    0.201059
+fixed_int      512       /    0.385977
+fixed_int      512       str  0.00286314
+fixed_int      512       +(int)0.00694047
+fixed_int      512       -(int)0.00681002
+fixed_int      512       *(int)0.015882
+fixed_int      512       /(int)0.244657
+fixed_int      512       %    0.385184
+fixed_int      512       |    0.0131341
+fixed_int      512       &    0.013122
+fixed_int      512       ^    0.013116
+fixed_int      512       <<   0.0150546
+fixed_int      512       >>   0.0134889
+fixed_int      512       %(int)0.303051
+fixed_int      512       |(int)0.00618124
+fixed_int      512       &(int)0.00836021
+fixed_int      512       ^(int)0.00608555
+fixed_int      1024      +    0.0330379
+fixed_int      1024      -    0.0311489
+fixed_int      1024      *    0.701951
+fixed_int      1024      /    0.708393
+fixed_int      1024      str  0.00872206
+fixed_int      1024      +(int)0.0116939
+fixed_int      1024      -(int)0.0116182
+fixed_int      1024      *(int)0.0346698
+fixed_int      1024      /(int)0.692818
+fixed_int      1024      %    0.711308
+fixed_int      1024      |    0.0176472
+fixed_int      1024      &    0.0176585
+fixed_int      1024      ^    0.0177043
+fixed_int      1024      <<   0.0242721
+fixed_int      1024      >>   0.0248274
+fixed_int      1024      %(int)0.584615
+fixed_int      1024      |(int)0.0107899
+fixed_int      1024      &(int)0.0166854
+fixed_int      1024      ^(int)0.0108555
+cpp_float      50        +    0.0142302
+cpp_float      50        -    0.0153931
+cpp_float      50        *    0.137722
+cpp_float      50        /    2.0214
+cpp_float      50        str  0.00924301
+cpp_float      50        +(int)0.0240351
+cpp_float      50        -(int)0.0252498
+cpp_float      50        *(int)0.0387713
+cpp_float      50        /(int)0.199003
+cpp_float      100       +    0.0178132
+cpp_float      100       -    0.0189367
+cpp_float      100       *    0.293407
+cpp_float      100       /    4.24891
+cpp_float      100       str  0.0160219
+cpp_float      100       +(int)0.0334828
+cpp_float      100       -(int)0.0326407
+cpp_float      100       *(int)0.063236
+cpp_float      100       /(int)0.341837
+cpp_float      500       +    0.044608
+cpp_float      500       -    0.0457737
+cpp_float      500       *    2.88591
+cpp_float      500       /    31.8072
+cpp_float      500       str  0.0639606
+cpp_float      500       +(int)0.0947227
+cpp_float      500       -(int)0.0966926
+cpp_float      500       *(int)0.224258
+cpp_float      500       /(int)1.39765
+mpfr_float     50        +    0.0194724
+mpfr_float     50        -    0.0228715
+mpfr_float     50        *    0.0587051
+mpfr_float     50        /    0.319258
+mpfr_float     50        str  0.00735177
+mpfr_float     50        +(int)0.0285879
+mpfr_float     50        -(int)0.0468028
+mpfr_float     50        *(int)0.03626
+mpfr_float     50        /(int)0.0889091
+mpfr_float     100       +    0.0211419
+mpfr_float     100       -    0.0251794
+mpfr_float     100       *    0.0946069
+mpfr_float     100       /    0.464237
+mpfr_float     100       str  0.00743083
+mpfr_float     100       +(int)0.0302544
+mpfr_float     100       -(int)0.0478439
+mpfr_float     100       *(int)0.0407275
+mpfr_float     100       /(int)0.109517
+mpfr_float     500       +    0.0338
+mpfr_float     500       -    0.037242
+mpfr_float     500       *    0.852196
+mpfr_float     500       /    2.80673
+mpfr_float     500       str  0.0339866
+mpfr_float     500       +(int)0.0427411
+mpfr_float     500       -(int)0.060913
+mpfr_float     500       *(int)0.0814603
+mpfr_float     500       /(int)0.254409
+[section:float_performance Float Type Perfomance]
+[table Operator *
+[[Backend][50 Bits][100 Bits][500 Bits]]
+[[cpp_float][2.72405 (0.137722s)][3.23542 (0.293407s)][3.38644 (2.88591s)]]
+[[gmp_float][[*1] (0.0505578s)][[*1] (0.090686s)][1.11127 (0.947017s)]]
+[[mpfr_float][1.16115 (0.0587051s)][1.04324 (0.0946069s)][[*1] (0.852196s)]]
+]
+[table Operator *(int)
+[[Backend][50 Bits][100 Bits][500 Bits]]
+[[cpp_float][2.33595 (0.0387713s)][3.1527 (0.063236s)][5.40294 (0.224258s)]]
+[[gmp_float][[*1] (0.0165976s)][[*1] (0.0200577s)][[*1] (0.0415067s)]]
+[[mpfr_float][2.18465 (0.03626s)][2.03052 (0.0407275s)][1.96258 (0.0814603s)]]
+]
+[table Operator +
+[[Backend][50 Bits][100 Bits][500 Bits]]
+[[cpp_float][[*1] (0.0142302s)][[*1] (0.0178132s)][1.40612 (0.044608s)]]
+[[gmp_float][1.26944 (0.0180644s)][1.09329 (0.019475s)][[*1] (0.0317241s)]]
+[[mpfr_float][1.36838 (0.0194724s)][1.18686 (0.0211419s)][1.06543 (0.0338s)]]
+]
+[table Operator +(int)
+[[Backend][50 Bits][100 Bits][500 Bits]]
+[[cpp_float][2.08629 (0.0240351s)][2.61878 (0.0334828s)][5.04813 (0.0947227s)]]
+[[gmp_float][[*1] (0.0115205s)][[*1] (0.0127856s)][[*1] (0.0187639s)]]
+[[mpfr_float][2.48148 (0.0285879s)][2.36628 (0.0302544s)][2.27784 (0.0427411s)]]
+]
+[table Operator -
+[[Backend][50 Bits][100 Bits][500 Bits]]
+[[cpp_float][[*1] (0.0153931s)][[*1] (0.0189367s)][1.36514 (0.0457737s)]]
+[[gmp_float][1.26468 (0.0194673s)][1.15343 (0.0218422s)][[*1] (0.0335304s)]]
+[[mpfr_float][1.48583 (0.0228715s)][1.32966 (0.0251794s)][1.11069 (0.037242s)]]
+]
+[table Operator -(int)
+[[Backend][50 Bits][100 Bits][500 Bits]]
+[[cpp_float][1.28001 (0.0252498s)][1.5908 (0.0326407s)][3.63667 (0.0966926s)]]
+[[gmp_float][[*1] (0.0197263s)][[*1] (0.0205184s)][[*1] (0.0265882s)]]
+[[mpfr_float][2.37262 (0.0468028s)][2.33176 (0.0478439s)][2.29098 (0.060913s)]]
+]
+[table Operator /
+[[Backend][50 Bits][100 Bits][500 Bits]]
+[[cpp_float][7.26654 (2.0214s)][11.2389 (4.24891s)][20.0284 (31.8072s)]]
+[[gmp_float][[*1] (0.278179s)][[*1] (0.378055s)][[*1] (1.5881s)]]
+[[mpfr_float][1.14767 (0.319258s)][1.22796 (0.464237s)][1.76735 (2.80673s)]]
+]
+[table Operator /(int)
+[[Backend][50 Bits][100 Bits][500 Bits]]
+[[cpp_float][2.62228 (0.199003s)][3.60376 (0.341837s)][6.01157 (1.39765s)]]
+[[gmp_float][[*1] (0.0758893s)][[*1] (0.0948556s)][[*1] (0.232493s)]]
+[[mpfr_float][1.17156 (0.0889091s)][1.15457 (0.109517s)][1.09427 (0.254409s)]]
+]
+[table Operator str
+[[Backend][50 Bits][100 Bits][500 Bits]]
+[[cpp_float][2.58205 (0.00924301s)][2.87378 (0.0160219s)][2.03831 (0.0639606s)]]
+[[gmp_float][[*1] (0.00357972s)][[*1] (0.00557522s)][[*1] (0.0313793s)]]
+[[mpfr_float][2.05373 (0.00735177s)][1.33283 (0.00743083s)][1.08309 (0.0339866s)]]
+]
+[endsect]
+[section:integer_performance Integer Type Perfomance]
+[table Operator %
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.054413s)][[*1] (0.106105s)][[*1] (0.19685s)][1.67316 (0.385184s)][2.3543 (0.711308s)]]
+[[gmp_int][3.04743 (0.16582s)][1.55485 (0.164977s)][1.00128 (0.197103s)][[*1] (0.230214s)][[*1] (0.302132s)]]
+]
+[table Operator %(int)
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.0243407s)][1.99962 (0.0811764s)][2.96437 (0.15306s)][4.64875 (0.303051s)][7.31311 (0.584615s)]]
+[[gmp_int][1.42913 (0.034786s)][[*1] (0.0405959s)][[*1] (0.0516333s)][[*1] (0.0651899s)][[*1] (0.0799406s)]]
+]
+[table Operator &
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.00259593s)][[*1] (0.00361924s)][[*1] (0.0108415s)][[*1] (0.013122s)][[*1] (0.0176585s)]]
+[[gmp_int][4.85187 (0.0125951s)][3.96768 (0.01436s)][1.43661 (0.015575s)][1.50716 (0.019777s)][1.50977 (0.0266602s)]]
+]
+[table Operator &(int)
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.00209559s)][[*1] (0.00245967s)][[*1] (0.00419648s)][[*1] (0.00836021s)][[*1] (0.0166854s)]]
+[[gmp_int][21.0856 (0.0441868s)][18.4577 (0.0453998s)][11.1151 (0.0466442s)][5.96293 (0.0498514s)][3.23322 (0.0539474s)]]
+]
+[table Operator *
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.00392745s)][[*1] (0.0104772s)][[*1] (0.0324122s)][1.95004 (0.201059s)][2.14731 (0.701951s)]]
+[[gmp_int][2.96502 (0.011645s)][1.74194 (0.0182506s)][1.4714 (0.0476911s)][[*1] (0.103105s)][[*1] (0.326898s)]]
+]
+[table Operator *(int)
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.00294381s)][[*1] (0.00422148s)][[*1] (0.00849409s)][[*1] (0.015882s)][1.15522 (0.0346698s)]]
+[[gmp_int][4.09319 (0.0120496s)][3.01026 (0.0127078s)][2.0089 (0.0170638s)][1.34479 (0.021358s)][[*1] (0.0300116s)]]
+]
+[table Operator +
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.00207163s)][[*1] (0.00326026s)][[*1] (0.00834722s)][[*1] (0.0128543s)][[*1] (0.0330379s)]]
+[[gmp_int][8.08642 (0.0167521s)][5.89259 (0.0192114s)][2.76118 (0.0230482s)][2.19911 (0.028268s)][1.23787 (0.0408966s)]]
+]
+[table Operator +(int)
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.00358307s)][[*1] (0.00359962s)][[*1] (0.00405163s)][[*1] (0.00694047s)][[*1] (0.0116939s)]]
+[[gmp_int][2.01857 (0.00723269s)][2.42047 (0.00871277s)][3.5813 (0.0145101s)][2.45162 (0.0170154s)][1.69017 (0.0197647s)]]
+]
+[table Operator -
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.00216403s)][[*1] (0.00372498s)][[*1] (0.00653903s)][[*1] (0.0120433s)][[*1] (0.0311489s)]]
+[[gmp_int][8.72818 (0.0188881s)][5.89208 (0.0219479s)][4.43331 (0.0289896s)][2.92463 (0.0352221s)][1.48689 (0.0463151s)]]
+]
+[table Operator -(int)
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.00354668s)][[*1] (0.00360689s)][[*1] (0.00385712s)][[*1] (0.00681002s)][[*1] (0.0116182s)]]
+[[gmp_int][2.09194 (0.00741945s)][3.61625 (0.0130434s)][3.8458 (0.0148337s)][2.63767 (0.0179625s)][1.72107 (0.0199956s)]]
+]
+[table Operator /
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.0556903s)][[*1] (0.105756s)][[*1] (0.198305s)][1.37248 (0.385977s)][1.91862 (0.708393s)]]
+[[gmp_int][3.04721 (0.1697s)][1.85862 (0.196561s)][1.21304 (0.240552s)][[*1] (0.281226s)][[*1] (0.36922s)]]
+]
+[table Operator /(int)
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.0169012s)][1.11654 (0.0634475s)][1.86084 (0.127666s)][2.57379 (0.244657s)][4.79191 (0.692818s)]]
+[[gmp_int][2.96468 (0.0501068s)][[*1] (0.0568248s)][[*1] (0.0686065s)][[*1] (0.0950571s)][[*1] (0.144581s)]]
+]
+[table Operator <<
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.00115455s)][[*1] (0.00632357s)][[*1] (0.00826823s)][[*1] (0.0150546s)][[*1] (0.0242721s)]]
+[[gmp_int][8.39362 (0.00969083s)][2.07445 (0.0131179s)][1.80141 (0.0148945s)][1.21421 (0.0182795s)][1.02121 (0.0247868s)]]
+]
+[table Operator >>
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.00147407s)][[*1] (0.00238745s)][[*1] (0.00854822s)][1.10734 (0.0134889s)][1.52739 (0.0248274s)]]
+[[gmp_int][8.85991 (0.0130601s)][4.4845 (0.0107065s)][1.30011 (0.0111136s)][[*1] (0.0121814s)][[*1] (0.0162548s)]]
+]
+[table Operator ^
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.00256688s)][[*1] (0.00361813s)][[*1] (0.0108455s)][[*1] (0.013116s)][[*1] (0.0177043s)]]
+[[gmp_int][5.05409 (0.0129732s)][3.88746 (0.0140653s)][1.53751 (0.0166751s)][1.90691 (0.025011s)][1.69135 (0.0299441s)]]
+]
+[table Operator ^(int)
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.00202777s)][[*1] (0.00237775s)][[*1] (0.0027653s)][[*1] (0.00608555s)][[*1] (0.0108555s)]]
+[[gmp_int][21.821 (0.0442481s)][19.7034 (0.0468496s)][16.847 (0.0465869s)][8.16164 (0.049668s)][4.97188 (0.0539722s)]]
+]
+[table Operator str
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.000302762s)][[*1] (0.000500691s)][1.14936 (0.00111683s)][1.71055 (0.00286314s)][2.93313 (0.00872206s)]]
+[[gmp_int][1.11188 (0.000336635s)][4.63553 (0.00232097s)][[*1] (0.000971703s)][[*1] (0.00167382s)][[*1] (0.00297363s)]]
+]
+[table Operator |
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.00257616s)][[*1] (0.00363433s)][[*1] (0.0108232s)][[*1] (0.0131341s)][[*1] (0.0176472s)]]
+[[gmp_int][4.49789 (0.0115873s)][3.7058 (0.0134681s)][1.47085 (0.0159192s)][1.58756 (0.0208511s)][1.61398 (0.0284821s)]]
+]
+[table Operator |(int)
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.00208078s)][[*1] (0.00190869s)][[*1] (0.00275195s)][[*1] (0.00618124s)][[*1] (0.0107899s)]]
+[[gmp_int][20.4129 (0.0424747s)][23.0676 (0.0440289s)][17.2504 (0.0474723s)][7.98521 (0.0493584s)][4.87243 (0.0525727s)]]
+]
+[endsect]
+[section:rational_performance Rational Type Perfomance]
+[table Operator *
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[mpq_rational][[*1] (0.426868s)][[*1] (0.968054s)][[*1] (4.39195s)][[*1] (9.6344s)][[*1] (20.9879s)]]
+]
+[table Operator *(int)
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[mpq_rational][[*1] (0.344178s)][[*1] (0.179899s)][[*1] (0.200539s)][[*1] (0.254142s)][[*1] (0.328602s)]]
+]
+[table Operator +
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[mpq_rational][[*1] (0.254473s)][[*1] (0.542374s)][[*1] (2.34795s)][[*1] (5.10523s)][[*1] (11.2331s)]]
+]
+[table Operator +(int)
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[mpq_rational][[*1] (0.309729s)][[*1] (0.154116s)][[*1] (0.177483s)][[*1] (0.212807s)][[*1] (0.27756s)]]
+]
+[table Operator -
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[mpq_rational][[*1] (0.260331s)][[*1] (0.545764s)][[*1] (2.3565s)][[*1] (5.08802s)][[*1] (11.2446s)]]
+]
+[table Operator -(int)
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[mpq_rational][[*1] (0.306598s)][[*1] (0.151187s)][[*1] (0.16783s)][[*1] (0.212048s)][[*1] (0.271845s)]]
+]
+[table Operator /
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[mpq_rational][[*1] (1.50105s)][[*1] (2.78757s)][[*1] (8.9203s)][[*1] (16.8502s)][[*1] (35.6472s)]]
+]
+[table Operator /(int)
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[mpq_rational][[*1] (0.32842s)][[*1] (0.184167s)][[*1] (0.206129s)][[*1] (0.262442s)][[*1] (0.350883s)]]
+]
+[table Operator str
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[mpq_rational][[*1] (0.000927423s)][[*1] (0.00111655s)][[*1] (0.00175742s)][[*1] (0.00246714s)][[*1] (0.00550783s)]]
+]
+[endsect]

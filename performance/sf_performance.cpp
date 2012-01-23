@@ -14,8 +14,10 @@
 #  define TEST_MPFR_CLASS
 #endif
 
-#ifdef TEST_MPFR
+#ifdef TEST_MPFR_CLASS
 #include <boost/math/bindings/mpfr.hpp>
+#endif
+#ifdef TEST_MPFR
 #include <boost/multiprecision/mpfr.hpp>
 #endif
 #ifdef TEST_MP_REAL

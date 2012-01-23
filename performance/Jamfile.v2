@@ -12,6 +12,9 @@ local mpfr_path = [ modules.peek : MPFR_PATH ] ;
 local tommath_path = [ modules.peek : TOMMATH_PATH ] ;
 
 project : requirements 
+   <target-os>freebsd:<linkflags>"-lrt" 
+   <target-os>linux:<linkflags>"-lrt" 
+   <toolset>pgi:<linkflags>"-lrt" 
    <include>$(gmp_path) 
    <include>$(gmp_path)/mpfr 
    <include>$(gmp_path)/gmpfrxx 
@@ -81,7 +84,7 @@ obj obj_linpack_benchmark_double : linpack-benchmark.cpp
 
 lib f2c ;
 
-exe linpack_benchmark_mpfr : obj_linpack_benchmark_mpfr mpfr f2c
+exe linpack_benchmark_mpfr : obj_linpack_benchmark_mpfr mpfr f2c gmp
           : release
           [ check-target-builds ../config//has_mpfr : : <build>no ]
           <define>TEST_MPFR_50
