@@ -80,7 +80,7 @@
               </td>
 <td>
                 <p>
-                  GMP
+                  <a href="http://gmplib.org" target="_top">GMP</a>
                 </p>
               </td>
 <td>
@@ -90,7 +90,8 @@
               </td>
 <td>
                 <p>
-                  Dependency on GNU licenced GMP library.
+                  Dependency on GNU licenced <a href="http://gmplib.org" target="_top">GMP</a>
+                  library.
                 </p>
               </td>
 </tr>
@@ -122,7 +123,7 @@
               </td>
 <td>
                 <p>
-                  Slower than GMP.
+                  Slower than <a href="http://gmplib.org" target="_top">GMP</a>.
                 </p>
               </td>
 </tr>
@@ -154,7 +155,7 @@
               </td>
 <td>
                 <p>
-                  Slower than GMP.
+                  Slower than <a href="http://gmplib.org" target="_top">GMP</a>.
                 </p>
               </td>
 </tr>
@@ -175,9 +176,9 @@
 <p>
         The <code class="computeroutput"><span class="identifier">gmp_int</span></code> backend is used
         via the typedef <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">mpz_int</span></code>. It acts as a thin wrapper around
-        the GMP <code class="computeroutput"><span class="identifier">mpz_t</span></code> to provide
-        an integer type that is a drop-in replacement for the native C++ integer
-        types, but with unlimited precision.
+        the <a href="http://gmplib.org" target="_top">GMP</a> <code class="computeroutput"><span class="identifier">mpz_t</span></code>
+        to provide an integer type that is a drop-in replacement for the native C++
+        integer types, but with unlimited precision.
       </p>
 <p>
         As well as the usual conversions from arithmetic and string types, type
@@ -186,8 +187,8 @@
       </p>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc">
 <li class="listitem">
-            The GMP native types: <code class="computeroutput"><span class="identifier">mpf_t</span></code>,
-            <code class="computeroutput"><span class="identifier">mpz_t</span></code>, <code class="computeroutput"><span class="identifier">mpq_t</span></code>.
+            The <a href="http://gmplib.org" target="_top">GMP</a> native types: <code class="computeroutput"><span class="identifier">mpf_t</span></code>, <code class="computeroutput"><span class="identifier">mpz_t</span></code>,
+            <code class="computeroutput"><span class="identifier">mpq_t</span></code>.
           </li>
 <li class="listitem">
             Instances of <code class="computeroutput"><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;</span></code> that are wrappers around those types:
@@ -199,18 +200,36 @@
         via the <code class="computeroutput"><span class="identifier">data</span><span class="special">()</span></code>
         member function of <code class="computeroutput"><span class="identifier">gmp_int</span></code>.
       </p>
-<div class="note"><table border="0" summary="Note">
-<tr>
-<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../images/note.png"></td>
-<th align="left">Note</th>
-</tr>
-<tr><td align="left" valign="top"><p>
-          Formatted IO for this type does not support octal or hexadecimal notation
-          for negative values, as a result performing formatted output on this type
-          when the argument is negative and either of the flags <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">ios_base</span><span class="special">::</span><span class="identifier">oct</span></code>
-          or <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">ios_base</span><span class="special">::</span><span class="identifier">hex</span></code> are set, will result in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code> will be thrown.
-        </p></td></tr>
-</table></div>
+<p>
+        Things you should know when using this type:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+            No changes are made to the GMP library's global settings - so you can
+            safely mix this type with existing code that uses <a href="http://gmplib.org" target="_top">GMP</a>.
+          </li>
+<li class="listitem">
+            Default constructed <code class="computeroutput"><span class="identifier">gmp_int</span></code>'s
+            have the value zero (this is GMP's default behavior).
+          </li>
+<li class="listitem">
+            Formatted IO for this type does not support octal or hexadecimal notation
+            for negative values, as a result performing formatted output on this
+            type when the argument is negative and either of the flags <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">ios_base</span><span class="special">::</span><span class="identifier">oct</span></code> or <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">ios_base</span><span class="special">::</span><span class="identifier">hex</span></code>
+            are set, will result in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
+            will be thrown.
+          </li>
+<li class="listitem">
+            Division by zero is handled by the <a href="http://gmplib.org" target="_top">GMP</a>
+            library - it will trigger a division by zero signal.
+          </li>
+<li class="listitem">
+            Although this type is a wrapper around <a href="http://gmplib.org" target="_top">GMP</a>
+            it will work equally well with <a href="http://mpir.org/" target="_top">MPIR</a>.
+            Indeed use of <a href="http://mpir.org/" target="_top">MPIR</a> is recomended
+            on Win32.
+          </li>
+</ul></div>
 <h6>
 <a name="boost_multiprecision.tut.ints.h1"></a>
         <span><a name="boost_multiprecision.tut.ints.example_"></a></span><a class="link" href="ints.html#boost_multiprecision.tut.ints.example_">Example:</a>
@@ -255,34 +274,34 @@
         to provide an integer type that is a drop-in replacement for the native C++
         integer types, but with unlimited precision.
       </p>
-<div class="caution"><table border="0" summary="Caution">
-<tr>
-<td rowspan="2" align="center" valign="top" width="25"><img alt="[Caution]" src="../../images/caution.png"></td>
-<th align="left">Caution</th>
-</tr>
-<tr><td align="left" valign="top"><p>
-          Although <code class="computeroutput"><span class="identifier">mp_int</span></code> is mostly
-          a drop in replacement for the builtin integer types, it should be noted
-          that it is a rather strange beast as it's a signed type that is not a 2's
-          complement type. As a result the bitwise operations <code class="computeroutput"><span class="special">|</span>
-          <span class="special">&amp;</span> <span class="special">^</span></code>
-          will throw a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code> exception if either of
-          the arguments is negative. Similarly the complement operator<code class="computeroutput"><span class="special">~</span></code> is deliberately not implemented for this
-          type.
-        </p></td></tr>
-</table></div>
-<div class="note"><table border="0" summary="Note">
-<tr>
-<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../images/note.png"></td>
-<th align="left">Note</th>
-</tr>
-<tr><td align="left" valign="top"><p>
-          Formatted IO for this type does not support octal or hexadecimal notation
-          for negative values, as a result performing formatted output on this type
-          when the argument is negative and either of the flags <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">ios_base</span><span class="special">::</span><span class="identifier">oct</span></code>
-          or <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">ios_base</span><span class="special">::</span><span class="identifier">hex</span></code> are set, will result in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code> will be thrown.
-        </p></td></tr>
-</table></div>
+<p>
+        Things you should know when using this type:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+            Default constructed objects have the value zero (this is libtommath's
+            default behavior).
+          </li>
+<li class="listitem">
+            Although <code class="computeroutput"><span class="identifier">mp_int</span></code> is mostly
+            a drop in replacement for the builtin integer types, it should be noted
+            that it is a rather strange beast as it's a signed type that is not a
+            2's complement type. As a result the bitwise operations <code class="computeroutput"><span class="special">|</span> <span class="special">&amp;</span> <span class="special">^</span></code> will throw a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
+            exception if either of the arguments is negative. Similarly the complement
+            operator<code class="computeroutput"><span class="special">~</span></code> is deliberately
+            not implemented for this type.
+          </li>
+<li class="listitem">
+            Formatted IO for this type does not support octal or hexadecimal notation
+            for negative values, as a result performing formatted output on this
+            type when the argument is negative and either of the flags <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">ios_base</span><span class="special">::</span><span class="identifier">oct</span></code> or <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">ios_base</span><span class="special">::</span><span class="identifier">hex</span></code>
+            are set, will result in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
+            will be thrown.
+          </li>
+<li class="listitem">
+            Division by zero will result in a hardware signal being raised by libtommath.
+          </li>
+</ul></div>
 <h6>
 <a name="boost_multiprecision.tut.ints.h3"></a>
         <span><a name="boost_multiprecision.tut.ints.example0"></a></span><a class="link" href="ints.html#boost_multiprecision.tut.ints.example0">Example:</a>
@@ -351,6 +370,28 @@
         designed to work just like a typical built in integer type, but with larger
         precision.
       </p>
+<p>
+        Things you should know when using this type:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+            Default constructed <code class="computeroutput"><span class="identifier">fixed_int</span></code>'s
+            have indeterminate value - just like normal built in integers.
+          </li>
+<li class="listitem">
+            Division by zero results in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
+            being thrown.
+          </li>
+<li class="listitem">
+            Construction from a string that contains invalid non-numeric characters
+            results in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code> being thrown.
+          </li>
+<li class="listitem">
+            Since the precision of <code class="computeroutput"><span class="identifier">fixed_int</span></code>
+            is necessarily limited, care should be taken to avoid numeric overflow
+            when using this type unless you actually want modulo-arithmetic behavior.
+          </li>
+</ul></div>
 <h6>
 <a name="boost_multiprecision.tut.ints.h5"></a>
         <span><a name="boost_multiprecision.tut.ints.example1"></a></span><a class="link" href="ints.html#boost_multiprecision.tut.ints.example1">Example:</a>

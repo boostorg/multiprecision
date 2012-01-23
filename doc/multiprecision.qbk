@@ -24,6 +24,13 @@
 [import ../example/tommath_snips.cpp]
 [import ../example/fixed_int_snips.cpp]
 
+[template mpfr[] [@http://www.mpfr.org MPFR]]
+[template gmp[] [@http://gmplib.org GMP]]
+[template mpf_class[] [@http://gmplib.org/manual/C_002b_002b-Interface-Floats.html#C_002b_002b-Interface-Floats mpfr_class]]
+[template mpfr_class[] [@http://math.berkeley.edu/~wilken/code/gmpfrxx/ mpfr_class]]
+[template mpreal[] [@http://www.holoborodko.com/pavel/mpfr/ mpreal]]
+[template mpir[] [@http://mpir.org/ MPIR]]
+
 [section:intro Introduction]
 
 The Multiprecision library comes in two distinct parts:
@@ -33,8 +40,8 @@ that handles all the operator overloading, expression evaluation optimization, a
 * A selection of backends that implement the actual arithmetic operations, and need conform only to the
 reduced interface requirements of the front end.
 
-The library is often used by using one of the predefined typedefs: for example if you wanted an arbitrary precision
-integer type using GMP as the underlying implementation then you could use:
+The library is often used via one of the predefined typedefs: for example if you wanted an arbitrary precision
+integer type using [gmp] as the underlying implementation then you could use:
 
    #include <boost/multiprecision/gmp.hpp>  // Defines the wrappers around the GMP library's types
 
@@ -42,7 +49,7 @@ integer type using GMP as the underlying implementation then you could use:
 
 Alternatively, you can compose your own multiprecision type, by combining `mp_number` with one of the
 predefined backend types.  For example, suppose you wanted a 300 decimal digit floating-point type
-based on the MPFR library. In this case, there's no predefined typedef with that level of precision,
+based on the [mpfr] library. In this case, there's no predefined typedef with that level of precision,
 so instead we compose our own:
 
    #include <boost/multiprecision/mpfr.hpp>  // Defines the Backend type that wraps MPFR
@@ -86,9 +93,9 @@ lets suppose we're evaluating a polynomial via Horners method, something like th
     y = (((((a[6] * x + a[5]) * x + a[4]) * x + a[3]) * x + a[2]) * x + a[1]) * x + a[0];
 
 If type `T` is an `mp_number`, then this expression is evaluated ['without creating a single temporary value].  In contrast,
-if we were using the C++ wrapper that ships with GMP - `mpf_class` - then this expression would result in no less than 11
-temporaries (this is true even though `mpf_class` does use expression templates to reduce the number of temporaries somewhat).  Had
-we used an even simpler wrapper around GMP or MPFR like `mpclass` things would have been even worse and no less that 24 temporaries
+if we were using the C++ wrapper that ships with [gmp] - [mpf_class] - then this expression would result in no less than 11
+temporaries (this is true even though [mpf_class] does use expression templates to reduce the number of temporaries somewhat).  Had
+we used an even simpler wrapper around [gmp] or [mpfr] like `mpclass` things would have been even worse and no less that 24 temporaries
 are created for this simple expression (note - we actually measure the number of memory allocations performed rather than 
 the number of temporaries directly).
 
@@ -147,14 +154,14 @@ unless you're absolutely sure that the lifetimes of `a`, `b` and `c` will outliv
 
 And finally... the performance improvements from an expression template library like this are often not as
 dramatic as the reduction in number of temporaries would suggest.  For example if we compare this library with 
-`mpfr_class` and `mpreal`, with all three using the underlying MPFR library at 50 decimal digits precision then
+[mpfr_class] and [mpreal], with all three using the underlying [mpfr] library at 50 decimal digits precision then
 we see the following typical results for polynomial execution:
 
 [table Evaluation of Order 6 Polynomial.
 [[Library][Relative Time][Relative number of memory allocations]]
 [[mp_number][1.0 (0.00793s)][1.0 (2996 total)]]
-[[mpfr_class][1.2 (0.00931s)][4.3 (12976 total)]]
-[[mpreal][1.9 (0.0148s)][9.3 (27947 total)]]
+[[[mpfr_class]][1.2 (0.00931s)][4.3 (12976 total)]]
+[[[mpreal]][1.9 (0.0148s)][9.3 (27947 total)]]
 ]
 
 As you can see, the execution time increases a lot more slowly than the number of memory allocations.  There are 
@@ -170,21 +177,21 @@ transformation is more efficient than creating the extra temporary variable, jus
 one would hope.
 
 We'll conclude this section by providing some more performance comparisons between these three libraries,
-again, all are using MPFR to carry out the underlying arithmetic, and all are operating at the same precision
+again, all are using [mpfr] to carry out the underlying arithmetic, and all are operating at the same precision
 (50 decimal digits):
 
 [table Evaluation of Boost.Math's Bessel function test data
 [[Library][Relative Time][Relative Number of Memory Allocations]]
 [[mp_number][1.0 (6.21s)][1.0 (2685469)]]
-[[mpfr_class][1.04 (6.45s)][1.47 (3946007)]]
-[[mpreal][1.53 (9.52s)][4.92 (13222940)]]
+[[[mpfr_class]][1.04 (6.45s)][1.47 (3946007)]]
+[[[mpreal]][1.53 (9.52s)][4.92 (13222940)]]
 ]
 
 [table Evaluation of Boost.Math's Non-Central T distribution test data
 [[Library][Relative Time][Relative Number of Memory Allocations]]
 [[mp_number][1.0 (269s)][1.0 (139082551)]]
-[[mpfr_class][1.04 (278s)][1.81 (252400791)]]
-[[mpreal][1.49 (401s)][3.22 (447009280)]]
+[[[mpfr_class]][1.04 (278s)][1.81 (252400791)]]
+[[[mpreal]][1.49 (401s)][3.22 (447009280)]]
 ]
 
 [endsect]
@@ -200,9 +207,9 @@ The following backends provide integer arithmetic:
 
 [table
 [[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
-[[`gmp_int`][boost/multiprecision/gmp.hpp][2][GMP][Very fast and efficient backend.][Dependency on GNU licenced GMP library.]]
-[[`mp_int`][boost/multiprecision/tommath.hpp][2][libtommath][Public domain backend with no licence restrictions.][Slower than GMP.]]
-[[`fixed_int`][boost/multiprecision/fixed_int.hpp][2][None][Boost licenced fixed precision modular arithmetic integer.][Slower than GMP.]]
+[[`gmp_int`][boost/multiprecision/gmp.hpp][2][[gmp]][Very fast and efficient backend.][Dependency on GNU licenced [gmp] library.]]
+[[`mp_int`][boost/multiprecision/tommath.hpp][2][libtommath][Public domain backend with no licence restrictions.][Slower than [gmp].]]
+[[`fixed_int`][boost/multiprecision/fixed_int.hpp][2][None][Boost licenced fixed precision modular arithmetic integer.][Slower than [gmp].]]
 ]
 
 [h4 gmp_int]
@@ -215,19 +222,27 @@ The following backends provide integer arithmetic:
 
    }} // namespaces
 
-The `gmp_int` backend is used via the typedef `boost::multiprecision::mpz_int`.  It acts as a thin wrapper around the GMP `mpz_t`
+The `gmp_int` backend is used via the typedef `boost::multiprecision::mpz_int`.  It acts as a thin wrapper around the [gmp] `mpz_t`
 to provide an integer type that is a drop-in replacement for the native C++ integer types, but with unlimited precision.
 
 As well as the usual conversions from arithmetic and string types, type `mpz_int` is copy constructible and assignable from:
 
-* The GMP native types: `mpf_t`, `mpz_t`, `mpq_t`.
+* The [gmp] native types: `mpf_t`, `mpz_t`, `mpq_t`.
 * Instances of `mp_number<T>` that are wrappers around those types: `mp_number<gmp_float<N> >`, `mp_number<gmp_rational>`.
 
 It's also possible to access the underlying `mpz_t` via the `data()` member function of `gmp_int`.
 
-[note Formatted IO for this type does not support octal or hexadecimal notation for negative values, 
+Things you should know when using this type:
+
+* No changes are made to the GMP library's global settings - so you can safely mix this type with
+existing code that uses [gmp].
+* Default constructed `gmp_int`'s have the value zero (this is GMP's default behavior).
+* Formatted IO for this type does not support octal or hexadecimal notation for negative values, 
 as a result performing formatted output on this type when the argument is negative and either of the flags
-`std::ios_base::oct` or `std::ios_base::hex` are set, will result in a `std::runtime_error` will be thrown.]
+`std::ios_base::oct` or `std::ios_base::hex` are set, will result in a `std::runtime_error` will be thrown.
+* Division by zero is handled by the [gmp] library - it will trigger a division by zero signal.
+* Although this type is a wrapper around [gmp] it will work equally well with [mpir].  Indeed use of [mpir]
+is recomended on Win32.
 
 [h5 Example:]
 
@@ -246,14 +261,17 @@ as a result performing formatted output on this type when the argument is negati
 The `tommath_int` backend is used via the typedef `boost::multiprecision::mp_int`.  It acts as a thin wrapper around the libtommath `mp_int`
 to provide an integer type that is a drop-in replacement for the native C++ integer types, but with unlimited precision.
 
-[caution Although `mp_int` is mostly a drop in replacement for the builtin integer types, it should be noted that it is a
+Things you should know when using this type:
+
+* Default constructed objects have the value zero (this is libtommath's default behavior).
+* Although `mp_int` is mostly a drop in replacement for the builtin integer types, it should be noted that it is a
 rather strange beast as it's a signed type that is not a 2's complement type.  As a result the bitwise operations
 `| & ^` will throw a `std::runtime_error` exception if either of the arguments is negative.  Similarly the complement
-operator`~` is deliberately not implemented for this type.]
-
-[note Formatted IO for this type does not support octal or hexadecimal notation for negative values, 
+operator`~` is deliberately not implemented for this type.
+* Formatted IO for this type does not support octal or hexadecimal notation for negative values, 
 as a result performing formatted output on this type when the argument is negative and either of the flags
-`std::ios_base::oct` or `std::ios_base::hex` are set, will result in a `std::runtime_error` will be thrown.]
+`std::ios_base::oct` or `std::ios_base::hex` are set, will result in a `std::runtime_error` will be thrown.
+* Division by zero will result in a hardware signal being raised by libtommath.
 
 [h5 Example:]
 
@@ -282,6 +300,14 @@ or `boost::multiprecision::mp_int512_t`.  It provides both signed and unsigned i
 and modular arithmetic with a 2's complement representation for negative values.  In other words it's designed to work just 
 like a typical built in integer type, but with larger precision.
 
+Things you should know when using this type:
+
+* Default constructed `fixed_int`'s have indeterminate value - just like normal built in integers.
+* Division by zero results in a `std::runtime_error` being thrown.
+* Construction from a string that contains invalid non-numeric characters results in a `std::runtime_error` being thrown.
+* Since the precision of `fixed_int` is necessarily limited, care should be taken to avoid numeric overflow when using this type
+unless you actually want modulo-arithmetic behavior.
+
 [h5 Example:]
 
 [fixed_int_eg]
@@ -294,9 +320,9 @@ The following backends provide real number arithmetic:
 
 [table
 [[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
-[[`mpf_float<N>`][boost/multiprecision/gmp.hpp][2][GMP][Very fast and efficient backend.][Dependency on GNU licenced GMP library.]]
-[[`mpfr_float<N>`][boost/multiprecision/mpfr.hpp][2][GMP and MPFR][Very fast and efficient backend, with its own standard library implementation.][Dependency on GNU licenced GMP and MPFR libraries.]]
-[[`cpp_float<N>`][boost/multiprecision/cpp_float.hpp][10][None][Header only, all C++ implementation. Boost licence.][Approximately 2x slower than the MPFR or GMP libraries.]]
+[[`mpf_float<N>`][boost/multiprecision/gmp.hpp][2][[gmp]][Very fast and efficient backend.][Dependency on GNU licenced [gmp] library.]]
+[[`mpfr_float<N>`][boost/multiprecision/mpfr.hpp][2][[gmp] and [mpfr]][Very fast and efficient backend, with its own standard library implementation.][Dependency on GNU licenced [gmp] and [mpfr] libraries.]]
+[[`cpp_float<N>`][boost/multiprecision/cpp_float.hpp][10][None][Header only, all C++ implementation. Boost licence.][Approximately 2x slower than the [mpfr] or [gmp] libraries.]]
 ]
 
 [h4 gmp_float]
@@ -314,7 +340,7 @@ The following backends provide real number arithmetic:
 
    }} // namespaces
 
-The `gmp_float` backend is used in conjunction with `mp_number` : it acts as a thin wrapper around the GMP `mpf_t`
+The `gmp_float` backend is used in conjunction with `mp_number` : it acts as a thin wrapper around the [gmp] `mpf_t`
 to provide an real-number type that is a drop-in replacement for the native C++ floating-point types, but with 
 much greater precision.
 
@@ -329,12 +355,27 @@ respectively.  The typedef mpf_float provides a variable precision type whose pr
 As well as the usual conversions from arithmetic and string types, instances of `mp_number<mpf_float<N> >` are
 copy constructible and assignable from:
 
-* The GMP native types `mpf_t`, `mpz_t`, `mpq_t`.
+* The [gmp] native types `mpf_t`, `mpz_t`, `mpq_t`.
 * The `mp_number` wrappers around those types: `mp_number<mpf_float<M> >`, `mp_number<gmp_int>`, `mp_number<gmp_rational>`.
 
 It's also possible to access the underlying `mpf_t` via the `data()` member function of `gmp_float`.
 
-[h5 GMP example:]
+Things you should know when using this type:
+
+* Default constructed `gmp_float`'s have the value zero (this is the [gmp] library's default behavior).
+* No changes are made to the [gmp] library's global settings, so this type can be safely mixed with
+existing [gmp] code.
+* It is not possible to round-trip objects of this type to and from a string and get back
+exactly the same value.  This appears to be a limitation of [gmp].
+* Since the underlying [gmp] types have no notion of infinities or NaN's, care should be taken
+to avoid numeric overflow or division by zero.  That latter will trigger a hardware exception, 
+while generating excessively large exponents may result in instability of the underlying [gmp]
+library (in testing, converting a number with an excessively large or small exponent 
+to a string caused [gmp] to segfault).
+* This type can equally be used with [mpir] as the underlying implementation - indeed that is
+the recommended option on Win32.
+
+[h5 [gmp] example:]
 
 [mpf_eg]
 
@@ -353,7 +394,7 @@ It's also possible to access the underlying `mpf_t` via the `data()` member func
 
    }} // namespaces
 
-The `mpfr_float_backend` type is used in conjunction with `mp_number`: It acts as a thin wrapper around the MPFR `mpfr_t`
+The `mpfr_float_backend` type is used in conjunction with `mp_number`: It acts as a thin wrapper around the [mpfr] `mpfr_t`
 to provide an real-number type that is a drop-in replacement for the native C++ floating-point types, but with 
 much greater precision.
 
@@ -368,13 +409,21 @@ respectively.  The typedef mpfr_float provides a variable precision type whose p
 As well as the usual conversions from arithmetic and string types, instances of `mp_number<mpfr_float_backend<N> >` are
 copy constructible and assignable from:
 
-* The GMP native types `mpf_t`, `mpz_t`, `mpq_t`.
-* The MPFR native type `mpfr_t`.
+* The [gmp] native types `mpf_t`, `mpz_t`, `mpq_t`.
+* The [mpfr] native type `mpfr_t`.
 * The `mp_number` wrappers around those types: `mp_number<mpfr_float_backend<M> >`, `mp_number<mpf_float<M> >`, `mp_number<gmp_int>`, `mp_number<gmp_rational>`.
 
 It's also possible to access the underlying `mpf_t` via the data() member function of `gmp_float`.
 
-[h5 MPFR example:]
+Things you should know when using this type:
+
+* A default constructed `mpfr_float_backend` is set to a NaN (this is the default [mpfr] behavior).
+* All operations use round to nearest.
+* No changes are made to [gmp] or [mpfr] global settings, so this type can coexist with existing
+[mpfr] or [gmp] code.
+* The code can equally use [mpir] in place of [gmp] - indeed that is the prefered option on Win32.
+
+[h5 [mpfr] example:]
 
 [mpfr_eg]
 
@@ -400,6 +449,15 @@ respectively.
 
 There is full standard library and `numeric_limits` support available for this type.
 
+Things you should know when using this type:
+
+* Default constructed `cpp_float`'s have a value of zero.
+* The radix of this type is 10.  As a result it can behave subtly differently from base-2 types.
+* It is not possible to round-trip this type to and from a string and get back to exactly the same value
+(this is a result of the type having some hidden internal guard digits).
+* The type has a number of internal guard digits over and above those specified in the template argument.
+Normally these should not be visible to the user.
+
 [h5 cpp_float example:]
 
 [cpp_float_eg]
@@ -412,8 +470,8 @@ The following backends provide rational number arithmetic:
 
 [table
 [[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
-[[`gmp_rational`][boost/multiprecision/gmp.hpp][2][GMP][Very fast and efficient backend.][Dependency on GNU licenced GMP library.]]
-[[`tommath_rational`][boost/multiprecision/tommath.hpp][2][libtommath][All C/C++ implementation that's Boost Software Licence compatible.][Slower than GMP.]]
+[[`gmp_rational`][boost/multiprecision/gmp.hpp][2][[gmp]][Very fast and efficient backend.][Dependency on GNU licenced [gmp] library.]]
+[[`tommath_rational`][boost/multiprecision/tommath.hpp][2][libtommath][All C/C++ implementation that's Boost Software Licence compatible.][Slower than [gmp].]]
 [[`rational_adapter`][boost/multiprecision/rational_adapter.hpp][N/A][none][All C++ adapter that allows any inetger backend type to be used as a rational type.][Requires an underlying integer backend type.]]
 [[`boost::rational`][boost/rational.hpp][N/A][None][A C++ rational number type that can used with any `mp_number` integer type.][The expression templates used by `mp_number` end up being "hidden" inside `boost::rational`: performance may well suffer as a result.]]
 ]
@@ -428,13 +486,13 @@ The following backends provide rational number arithmetic:
 
    }} // namespaces
 
-The `gmp_rational` backend is used via the typedef `boost::multiprecision::mpq_rational`.  It acts as a thin wrapper around the GMP `mpq_t`
+The `gmp_rational` backend is used via the typedef `boost::multiprecision::mpq_rational`.  It acts as a thin wrapper around the [gmp] `mpq_t`
 to provide a rational number type that is a drop-in replacement for the native C++ number types, but with unlimited precision.
 
 As well as the usual conversions from arithmetic and string types, instances of `mp_number<gmp_rational>` are copy constructible
 and assignable from:
 
-* The GMP native types: `mpz_t`, `mpq_t`.
+* The [gmp] native types: `mpz_t`, `mpq_t`.
 * `mp_number<gmp_int>`.
 
 There are also non-member functions:
@@ -445,6 +503,14 @@ There are also non-member functions:
 which return the numerator and denominator of the number.
 
 It's also possible to access the underlying `mpq_t` via the `data()` member function of `mpq_rational`.
+
+Things you should know when using this type:
+
+* Default constructed `mpq_rational`'s have the value zero (this is the [gmp] default behavior).
+* Division by zero results in a hardware exception inside the [gmp] library.
+* No changes are made to the [gmp] library's global settings, so this type can coexist with existing
+[gmp] code.
+* The code can equally be used with [mpir] as the underlying library - indeed that is the prefered option on Win32.
 
 [h5 Example:]
 
@@ -472,6 +538,14 @@ There are also non-member functions:
    mp_int denominator(const mp_rational&);
 
 which return the numerator and denominator of the number.
+
+Things you should know when using this type:
+
+* Default constructed `mp_rational`'s have the value zero (this the inherited Boost.Rational behavior).
+* Division by zero results in a `boost::bad_rational` exception being thrown (see the rational number library's docs for more information).
+* No changes are made to libtommath's global state, so this type can safely coexist with other libtommath code.
+* Performance of this type has been found to be pretty poor - this need further investigation - but it appears that Boost.Rational
+needs some improvement in this area.
 
 [h5 Example:]
 
@@ -869,7 +943,7 @@ an expression template derived from it; their return value is always an expressi
 
 These functions are normally implemented by the Backend type.  However, default versions are provided for Backend types that
 don't have native support for these functions.  Please note however, that this default support requires the precision of the type
-to be a compile time constant - this means for example that the GMP MPF Backend will not work with these functions when that type is 
+to be a compile time constant - this means for example that the [gmp] MPF Backend will not work with these functions when that type is 
 used at variable precision.
 
 Also note that with the exception of `abs` that these functions can only be used with floating-point Backend types.
@@ -1096,11 +1170,11 @@ of type B2.
 These tests test the total time taken to execute all of Boost.Math's test cases for these functions.
 In each case the best performing library gets a relative score of 1, with the total execution time
 given in brackets.  The first three libraries listed are the various floating point types provided
-by this library, while for comparison, two popular C++ frontends to MPFR (mpfr_class and mpreal)
+by this library, while for comparison, two popular C++ frontends to [mpfr] ([mpfr_class] and [mpreal])
 are also shown.
 
 Test code was compiled with Microsoft Visual Studio 2010 with all optimisations
-turned on (/Ox), and used MPIR-2.3.0 and MPFR-3.0.0.  The tests were run on 32-bit
+turned on (/Ox), and used MPIR-2.3.0 and [mpfr]-3.0.0.  The tests were run on 32-bit
 Windows Vista machine.
 
 [table Bessel Function Performance
@@ -1108,8 +1182,8 @@ Windows Vista machine.
 [[mpfr_float][[*1.0] (6.472s)][1.193 (10.154s)]]
 [[mpf_float][1.801 (11.662s)][[*1.0](8.511s)]]
 [[cpp_float][3.13 (20.285s)][2.46 (21.019s)]]
-[[mpfr_class][1.001 (6.480s)][1.15(9.805s)]]
-[[mpreal][1.542 (9.981s)][1.61 (13.702s)]]
+[[[mpfr_class]][1.001 (6.480s)][1.15(9.805s)]]
+[[[mpreal]][1.542 (9.981s)][1.61 (13.702s)]]
 ]
 
 [table Non-Central T Distribution Performance
@@ -1117,8 +1191,8 @@ Windows Vista machine.
 [[mpfr_float][1.308 (258.09s)][1.30 (516.74s)]]
 [[mpf_float][[*1.0] (197.30s)][[*1.0](397.30s)]]
 [[cpp_float][1.695 (334.50s)][2.68 (1064.53s)]]
-[[mpfr_class][1.35 (266.39s)][1.323 (525.74s)]]
-[[mpreal][1.75 (346.64s)][1.635 (649.94s)]]
+[[[mpfr_class]][1.35 (266.39s)][1.323 (525.74s)]]
+[[[mpreal]][1.75 (346.64s)][1.635 (649.94s)]]
 ]
 
 [endsect]
@@ -1133,50 +1207,63 @@ given a score of 1.  Total actual times are given in brackets, measured in secon
 operations.
 
 Test code was compiled with Microsoft Visual Studio 2010 with all optimisations
-turned on (/Ox), and used MPIR-2.3.0 and MPFR-3.0.0.  The tests were run on 32-bit
+turned on (/Ox), and used MPIR-2.3.0 and [mpfr]-3.0.0.  The tests were run on 32-bit
 Windows Vista machine.
 
-[table Operator *
-[[Backend][50 Decimal Digits][100 Decimal Digits][500 Decimal Digits]]
-[[cpp_float][1.0826 (0.287216s)][1.48086 (0.586363s)][1.57545 (5.05269s)]]
-[[gmp_float][[*1] (0.265302s)][[*1] (0.395962s)][[*1] (3.20714s)]]
-[[mpfr_float][1.24249 (0.329636s)][1.15432 (0.457067s)][1.16182 (3.72612s)]]
-]
 [table Operator +
 [[Backend][50 Decimal Digits][100 Decimal Digits][500 Decimal Digits]]
-[[cpp_float][[*1] (0.0242151s)][[*1] (0.029252s)][[*1] (0.0584099s)]]
-[[gmp_float][4.55194 (0.110226s)][3.67516 (0.107506s)][2.42489 (0.141638s)]]
-[[mpfr_float][2.45362 (0.0594147s)][2.18552 (0.0639309s)][1.32099 (0.0771588s)]]
+[[cpp_float][[*1] (0.02382s)][[*1] (0.0294619s)][[*1] (0.058466s)]]
+[[gmp_float][4.55086 (0.108402s)][3.86443 (0.113853s)][2.6241 (0.15342s)]]
+[[mpfr_float][2.52036 (0.060035s)][2.1833 (0.0643242s)][1.37736 (0.0805287s)]]
 ]
 [table Operator +(int)
 [[Backend][50 Decimal Digits][100 Decimal Digits][500 Decimal Digits]]
-[[cpp_float][1.51995 (0.0484155s)][1.78781 (0.0611055s)][1.8309 (0.104123s)]]
-[[gmp_float][[*1] (0.0318533s)][[*1] (0.0341789s)][[*1] (0.0568699s)]]
-[[mpfr_float][3.39055 (0.108s)][3.30142 (0.112839s)][2.05293 (0.11675s)]]
+[[cpp_float][1.56759 (0.0527023s)][1.74629 (0.0618102s)][1.68077 (0.105927s)]]
+[[gmp_float][[*1] (0.0336201s)][[*1] (0.0353951s)][[*1] (0.0630232s)]]
+[[mpfr_float][3.14875 (0.105861s)][3.15499 (0.111671s)][1.92831 (0.121528s)]]
 ]
 [table Operator -
 [[Backend][50 Decimal Digits][100 Decimal Digits][500 Decimal Digits]]
-[[cpp_float][[*1] (0.0261498s)][[*1] (0.030946s)][[*1] (0.0606388s)]]
-[[gmp_float][4.48753 (0.117348s)][3.75823 (0.116302s)][2.4823 (0.150524s)]]
-[[mpfr_float][2.96057 (0.0774183s)][2.61897 (0.0810465s)][1.56236 (0.0947396s)]]
+[[cpp_float][[*1] (0.0265783s)][[*1] (0.031465s)][[*1] (0.0619405s)]]
+[[gmp_float][4.66954 (0.124108s)][3.72645 (0.117253s)][2.67536 (0.165713s)]]
+[[mpfr_float][2.7909 (0.0741774s)][2.48557 (0.0782083s)][1.50944 (0.0934957s)]]
 ]
 [table Operator -(int)
 [[Backend][50 Decimal Digits][100 Decimal Digits][500 Decimal Digits]]
-[[cpp_float][[*1] (0.0567601s)][[*1] (0.0626685s)][[*1] (0.111692s)]]
-[[gmp_float][2.27932 (0.129374s)][2.04821 (0.128358s)][1.48297 (0.165635s)]]
-[[mpfr_float][2.43199 (0.13804s)][2.32131 (0.145473s)][1.38152 (0.154304s)]]
+[[cpp_float][[*1] (0.0577674s)][[*1] (0.0633795s)][[*1] (0.11146s)]]
+[[gmp_float][2.31811 (0.133911s)][2.07251 (0.131355s)][1.67161 (0.186319s)]]
+[[mpfr_float][2.45081 (0.141577s)][2.29174 (0.145249s)][1.395 (0.155487s)]]
+]
+[table Operator *
+[[Backend][50 Decimal Digits][100 Decimal Digits][500 Decimal Digits]]
+[[cpp_float][1.07276 (0.287898s)][1.47724 (0.584569s)][1.55145 (5.09969s)]]
+[[gmp_float][[*1] (0.268372s)][[*1] (0.395718s)][[*1] (3.28705s)]]
+[[mpfr_float][1.27302 (0.341642s)][1.17649 (0.465557s)][1.14029 (3.7482s)]]
+]
+[table Operator *(int)
+[[Backend][50 Decimal Digits][100 Decimal Digits][500 Decimal Digits]]
+[[cpp_float][2.89945 (0.11959s)][4.56335 (0.197945s)][9.03602 (0.742044s)]]
+[[gmp_float][[*1] (0.0412457s)][[*1] (0.0433772s)][[*1] (0.0821206s)]]
+[[mpfr_float][3.6951 (0.152407s)][3.71977 (0.161353s)][3.30958 (0.271785s)]]
 ]
 [table Operator /
 [[Backend][50 Decimal Digits][100 Decimal Digits][500 Decimal Digits]]
-[[cpp_float][3.2662 (3.98153s)][5.07021 (8.11948s)][6.78872 (53.6099s)]]
-[[gmp_float][[*1] (1.21901s)][[*1] (1.60141s)][[*1] (7.89691s)]]
-[[mpfr_float][1.33238 (1.62419s)][1.39529 (2.23443s)][1.70882 (13.4944s)]]
+[[cpp_float][3.24327 (4.00108s)][5.00532 (8.12985s)][6.79566 (54.2796s)]]
+[[gmp_float][[*1] (1.23366s)][[*1] (1.62424s)][[*1] (7.9874s)]]
+[[mpfr_float][1.32521 (1.63486s)][1.38967 (2.25716s)][1.72413 (13.7713s)]]
+]
+[table Operator /(int)
+[[Backend][50 Decimal Digits][100 Decimal Digits][500 Decimal Digits]]
+[[cpp_float][1.45093 (0.253675s)][1.83306 (0.419569s)][2.3644 (1.64187s)]]
+[[gmp_float][[*1] (0.174836s)][[*1] (0.22889s)][[*1] (0.694411s)]]
+[[mpfr_float][1.16731 (0.204088s)][1.13211 (0.259127s)][1.02031 (0.708513s)]]
 ]
 [table Operator str
 [[Backend][50 Decimal Digits][100 Decimal Digits][500 Decimal Digits]]
-[[cpp_float][1.46076 (0.0192656s)][1.59438 (0.0320398s)][[*1] (0.134302s)]]
-[[gmp_float][[*1] (0.0131888s)][[*1] (0.0200954s)][1.01007 (0.135655s)]]
-[[mpfr_float][2.19174 (0.0289065s)][1.86101 (0.0373977s)][1.15842 (0.155578s)]]
+[[cpp_float][1.4585 (0.0188303s)][1.55515 (0.03172s)][[*1] (0.131962s)]]
+[[gmp_float][[*1] (0.0129107s)][[*1] (0.0203967s)][1.04632 (0.138075s)]]
+[[mpfr_float][2.19015 (0.0282764s)][1.84679 (0.0376683s)][1.20295 (0.158743s)]]
+]
 ]
 [endsect]
 
@@ -1190,86 +1277,126 @@ given a score of 1.  Total actual times are given in brackets, measured in secon
 operations.
 
 Test code was compiled with Microsoft Visual Studio 2010 with all optimisations
-turned on (/Ox), and used MPIR-2.3.0 and MPFR-3.0.0.  The tests were run on 32-bit
+turned on (/Ox), and used MPIR-2.3.0 and [mpfr]-3.0.0.  The tests were run on 32-bit
 Windows Vista machine.
+
+Note that Linux x64 tests showed significantly worse performance for `fixed_int` division
+than on Win32 (or possibly [gmp] behaves much better in that case).  Otherwise the results
+are much the same.
 
 [table Operator +
 [[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
-[[fixed_int][[*1] (0.0031173s)][[*1] (0.00696555s)][[*1] (0.0163707s)][[*1] (0.0314806s)][[*1] (0.0596158s)]]
-[[gmp_int][12.7096 (0.0396194s)][5.89178 (0.0410395s)][2.66402 (0.0436119s)][1.59356 (0.0501664s)][1.11155 (0.0662662s)]]
-[[tommath_int][6.14357 (0.0191513s)][3.16177 (0.0220235s)][1.85441 (0.030358s)][1.45895 (0.0459287s)][1.26576 (0.0754591s)]]
+[[fixed_int][[*1] (0.0031291s)][[*1] (0.00703043s)][[*1] (0.0163669s)][[*1] (0.0326567s)][[*1] (0.0603087s)]]
+[[gmp_int][12.4866 (0.0390717s)][6.01034 (0.0422553s)][2.65628 (0.0434751s)][1.54295 (0.0503875s)][1.16477 (0.0702458s)]]
+[[tommath_int][6.03111 (0.018872s)][3.08173 (0.0216659s)][1.84243 (0.0301548s)][1.30199 (0.0425188s)][1.18909 (0.0717123s)]]
 ]
 [table Operator +(int)
 [[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
-[[fixed_int][[*1] (0.00329336s)][[*1] (0.00370718s)][[*1] (0.00995385s)][[*1] (0.0117467s)][[*1] (0.0233483s)]]
-[[gmp_int][9.56378 (0.031497s)][8.0588 (0.0298754s)][4.15824 (0.0413905s)][5.47974 (0.0643691s)][4.46265 (0.104195s)]]
-[[tommath_int][76.2624 (0.25116s)][71.3973 (0.264682s)][28.0238 (0.278945s)][25.9035 (0.304282s)][13.1635 (0.307346s)]]
+[[fixed_int][[*1] (0.00335294s)][[*1] (0.00376116s)][[*1] (0.00985174s)][[*1] (0.0119345s)][[*1] (0.0170918s)]]
+[[gmp_int][9.47407 (0.031766s)][8.44794 (0.0317741s)][4.23857 (0.0417573s)][5.40856 (0.0645488s)][6.31314 (0.107903s)]]
+[[tommath_int][67.0025 (0.224655s)][60.4203 (0.22725s)][25.1834 (0.2481s)][23.2996 (0.27807s)][17.1743 (0.293538s)]]
 ]
 [table Operator -
 [[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
-[[fixed_int][[*1] (0.00359417s)][[*1] (0.00721041s)][[*1] (0.0168213s)][[*1] (0.0323563s)][[*1] (0.061385s)]]
-[[gmp_int][10.6794 (0.0383836s)][5.65517 (0.0407761s)][2.63634 (0.0443466s)][1.59979 (0.0517632s)][1.13379 (0.0695978s)]]
-[[tommath_int][6.43615 (0.0231326s)][3.6161 (0.0260736s)][2.2585 (0.0379908s)][1.52006 (0.0491835s)][1.24231 (0.0762591s)]]
+[[fixed_int][[*1] (0.00339191s)][[*1] (0.0073172s)][[*1] (0.0166428s)][[*1] (0.0349375s)][[*1] (0.0600083s)]]
+[[gmp_int][12.5182 (0.0424608s)][5.57936 (0.0408253s)][2.78496 (0.0463496s)][1.48373 (0.051838s)][1.29928 (0.0779673s)]]
+[[tommath_int][7.00782 (0.0237699s)][3.69919 (0.0270677s)][2.29645 (0.0382195s)][1.39777 (0.0488346s)][1.28243 (0.0769566s)]]
 ]
 [table Operator -(int)
 [[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
-[[fixed_int][[*1] (0.00353606s)][[*1] (0.00577573s)][[*1] (0.0155184s)][[*1] (0.029385s)][[*1] (0.0586271s)]]
-[[gmp_int][9.04434 (0.0319814s)][5.12393 (0.0295945s)][2.50743 (0.0389112s)][2.01898 (0.0593277s)][1.68381 (0.098717s)]]
-[[tommath_int][60.2486 (0.213043s)][38.3032 (0.221229s)][15.8792 (0.24642s)][8.71166 (0.255992s)][4.85236 (0.28448s)]]
+[[fixed_int][[*1] (0.00250933s)][[*1] (0.00358055s)][[*1] (0.0103282s)][[*1] (0.0119127s)][[*1] (0.0176089s)]]
+[[gmp_int][12.093 (0.0303454s)][8.50898 (0.0304669s)][3.9284 (0.0405733s)][5.03037 (0.0599252s)][5.96617 (0.105058s)]]
+[[tommath_int][80.8477 (0.202873s)][57.8371 (0.207089s)][21.3372 (0.220375s)][23.526 (0.280258s)][14.793 (0.260488s)]]
 ]
 [table Operator *
 [[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
-[[fixed_int][[*1] (0.0175309s)][[*1] (0.0388232s)][[*1] (0.123609s)][[*1] (0.427489s)][[*1] (1.46312s)]]
-[[gmp_int][2.93263 (0.0514117s)][1.70358 (0.0661383s)][1.01811 (0.125848s)][1.20692 (0.515943s)][1.03248 (1.51064s)]]
-[[tommath_int][3.82476 (0.0670515s)][2.87425 (0.111587s)][2.74339 (0.339108s)][2.26768 (0.969408s)][2.1233 (3.10664s)]]
+[[fixed_int][[*1] (0.0223481s)][[*1] (0.0375288s)][[*1] (0.120353s)][[*1] (0.439147s)][[*1] (1.46969s)]]
+[[gmp_int][2.50746 (0.0560369s)][1.76676 (0.0663044s)][1.06052 (0.127636s)][1.22558 (0.53821s)][1.03538 (1.52168s)]]
+[[tommath_int][3.00028 (0.0670506s)][2.97696 (0.111722s)][2.86257 (0.34452s)][2.26661 (0.995374s)][2.12926 (3.12935s)]]
+]
+[table Operator *(int)
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.00444316s)][[*1] (0.0135739s)][[*1] (0.0192615s)][[*1] (0.0328339s)][1.18198 (0.0567364s)]]
+[[gmp_int][4.57776 (0.0203397s)][1.79901 (0.0244196s)][1.32814 (0.025582s)][1.01453 (0.033311s)][[*1] (0.048001s)]]
+[[tommath_int][53.8709 (0.239357s)][18.3773 (0.249452s)][14.2088 (0.273682s)][14.0907 (0.462652s)][9.10761 (0.437175s)]]
 ]
 [table Operator /
 [[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
-[[fixed_int][[*1] (0.0973696s)][[*1] (0.260936s)][[*1] (0.845628s)][2.4597 (2.51371s)][6.21836 (7.93136s)]]
-[[gmp_int][7.66851 (0.74668s)][3.17732 (0.829077s)][1.05006 (0.887961s)][[*1] (1.02196s)][[*1] (1.27547s)]]
-[[tommath_int][18.3945 (1.79107s)][8.11201 (2.11671s)][3.49119 (2.95225s)][4.55727 (4.65733s)][9.06813 (11.5662s)]]
+[[fixed_int][[*1] (0.0991632s)][[*1] (0.172328s)][[*1] (0.309492s)][[*1] (0.573815s)][[*1] (1.06356s)]]
+[[gmp_int][7.81859 (0.775316s)][5.11069 (0.880715s)][2.93514 (0.908404s)][1.80497 (1.03572s)][1.21878 (1.29625s)]]
+[[tommath_int][18.0766 (1.79253s)][12.3939 (2.13582s)][9.80438 (3.03438s)][8.74047 (5.01541s)][10.8288 (11.517s)]]
+]
+[table Operator /(int)
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][1.04098 (0.0443082s)][1.61317 (0.110308s)][2.18324 (0.229148s)][2.36331 (0.442167s)][2.45159 (0.866172s)]]
+[[gmp_int][[*1] (0.042564s)][[*1] (0.06838s)][[*1] (0.104957s)][[*1] (0.187096s)][[*1] (0.35331s)]]
+[[tommath_int][32.4072 (1.37938s)][23.7471 (1.62383s)][22.1907 (2.32908s)][19.9054 (3.72421s)][24.2219 (8.55783s)]]
 ]
 [table Operator %
 [[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
-[[fixed_int][[*1] (0.098458s)][[*1] (0.269155s)][1.10039 (0.849272s)][2.92096 (2.55909s)][7.47157 (7.99106s)]]
-[[gmp_int][6.63934 (0.653697s)][2.6753 (0.72007s)][[*1] (0.771794s)][[*1] (0.87611s)][[*1] (1.06953s)]]
-[[tommath_int][18.5522 (1.82661s)][8.00831 (2.15548s)][3.89737 (3.00797s)][5.38078 (4.71416s)][10.7885 (11.5386s)]]
+[[fixed_int][[*1] (0.0946529s)][[*1] (0.170561s)][[*1] (0.328458s)][[*1] (0.575884s)][[*1] (1.05006s)]]
+[[gmp_int][7.77525 (0.73595s)][4.39387 (0.749422s)][2.35075 (0.772122s)][1.51922 (0.874894s)][1.02263 (1.07382s)]]
+[[tommath_int][27.1503 (2.56986s)][12.8743 (2.19585s)][9.43965 (3.10053s)][8.24936 (4.75068s)][10.9719 (11.5211s)]]
 ]
-[table Operator <<
+[table Operator %(int)
 [[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
-[[fixed_int][[*1] (0.0120907s)][[*1] (0.0129147s)][[*1] (0.0214412s)][[*1] (0.0249208s)][[*1] (0.0341293s)]]
-[[gmp_int][1.93756 (0.0234265s)][1.97785 (0.0255433s)][1.43607 (0.0307911s)][1.815 (0.0452311s)][2.00167 (0.0683156s)]]
-[[tommath_int][3.42859 (0.0414542s)][3.04951 (0.0393836s)][3.04202 (0.0652246s)][3.81169 (0.0949903s)][4.93896 (0.168563s)]]
-]
-[table Operator >>
-[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
-[[fixed_int][[*1] (0.0064833s)][[*1] (0.00772857s)][[*1] (0.0186871s)][[*1] (0.0218303s)][[*1] (0.0326372s)]]
-[[gmp_int][4.212 (0.0273077s)][3.72696 (0.0288041s)][1.55046 (0.0289735s)][1.51403 (0.0330518s)][1.13695 (0.037107s)]]
-[[tommath_int][33.9418 (0.220055s)][29.104 (0.224932s)][13.8407 (0.258642s)][13.1488 (0.287043s)][15.1741 (0.495242s)]]
-]
-[table Operator &
-[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
-[[fixed_int][[*1] (0.0028732s)][[*1] (0.00552933s)][[*1] (0.0125148s)][[*1] (0.020299s)][[*1] (0.034856s)]]
-[[gmp_int][16.3018 (0.0468383s)][9.51109 (0.05259s)][5.20026 (0.0650802s)][4.46545 (0.0906443s)][3.99377 (0.139207s)]]
-[[tommath_int][42.221 (0.121309s)][22.2471 (0.123011s)][11.3587 (0.142151s)][7.3475 (0.149147s)][11.4043 (0.397507s)]]
-]
-[table Operator ^
-[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
-[[fixed_int][[*1] (0.00287983s)][[*1] (0.00543128s)][[*1] (0.0125726s)][[*1] (0.019987s)][[*1] (0.034697s)]]
-[[gmp_int][14.938 (0.0430189s)][9.00973 (0.0489344s)][4.83803 (0.0608267s)][4.33359 (0.0866154s)][3.89518 (0.135151s)]]
-[[tommath_int][41.6898 (0.12006s)][22.4393 (0.121874s)][10.7513 (0.135172s)][7.2632 (0.145169s)][11.5765 (0.401671s)]]
-]
-[table Operator |
-[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
-[[fixed_int][[*1] (0.00314803s)][[*1] (0.00548233s)][[*1] (0.0125434s)][[*1] (0.0198161s)][[*1] (0.034957s)]]
-[[gmp_int][13.0622 (0.0411201s)][8.63936 (0.0473638s)][4.6932 (0.0588688s)][4.25792 (0.0843755s)][3.78236 (0.13222s)]]
-[[tommath_int][38.5896 (0.121481s)][22.3609 (0.12259s)][10.9015 (0.136742s)][7.68521 (0.152291s)][11.6322 (0.406628s)]]
+[[fixed_int][1.25034 (0.0425984s)][1.91617 (0.106226s)][2.02166 (0.195577s)][2.14437 (0.387067s)][2.23514 (0.776075s)]]
+[[gmp_int][[*1] (0.0340695s)][[*1] (0.0554367s)][[*1] (0.0967406s)][[*1] (0.180504s)][[*1] (0.347216s)]]
+[[tommath_int][42.8781 (1.46083s)][29.879 (1.65639s)][23.4323 (2.26685s)][19.932 (3.5978s)][25.0046 (8.682s)]]
 ]
 [table Operator str
 [[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
-[[fixed_int][1.03557 (0.00143356s)][1.39844 (0.00290281s)][3.14081 (0.0099558s)][6.28067 (0.0372769s)][13.2101 (0.188878s)]]
-[[gmp_int][[*1] (0.00138432s)][[*1] (0.00207575s)][[*1] (0.00316982s)][[*1] (0.00593518s)][[*1] (0.014298s)]]
-[[tommath_int][5.31194 (0.00735345s)][7.90724 (0.0164135s)][15.8581 (0.0502673s)][19.7526 (0.117235s)][26.6031 (0.380373s)]]
+[[fixed_int][[*1] (0.000465841s)][[*1] (0.00102073s)][[*1] (0.00207212s)][1.02618 (0.0062017s)][1.32649 (0.0190043s)]]
+[[gmp_int][2.83823 (0.00132216s)][2.17537 (0.00222046s)][1.46978 (0.00304557s)][[*1] (0.00604351s)][[*1] (0.0143268s)]]
+[[tommath_int][15.76 (0.00734164s)][15.9879 (0.0163193s)][21.7337 (0.0450349s)][19.7183 (0.119168s)][26.3445 (0.377431s)]]
+]
+[table Operator <<
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.0119095s)][[*1] (0.0131746s)][[*1] (0.0213483s)][[*1] (0.0247552s)][[*1] (0.0339579s)]]
+[[gmp_int][1.9355 (0.0230509s)][1.94257 (0.0255925s)][1.49684 (0.031955s)][1.79202 (0.0443618s)][2.0846 (0.0707887s)]]
+[[tommath_int][2.64273 (0.0314737s)][2.95612 (0.0389456s)][3.05842 (0.065292s)][3.79496 (0.0939451s)][4.82142 (0.163725s)]]
+]
+[table Operator >>
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.006361s)][[*1] (0.00880189s)][[*1] (0.0180295s)][[*1] (0.0220786s)][[*1] (0.0325312s)]]
+[[gmp_int][4.26889 (0.0271544s)][3.14669 (0.0276968s)][1.74396 (0.0314426s)][1.45928 (0.0322188s)][1.24596 (0.0405327s)]]
+[[tommath_int][39.4379 (0.250865s)][28.6225 (0.251932s)][16.4543 (0.296661s)][14.2167 (0.313884s)][15.5842 (0.506974s)]]
+]
+[table Operator &
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.00298048s)][[*1] (0.00546222s)][[*1] (0.0127546s)][[*1] (0.01985s)][[*1] (0.0349286s)]]
+[[gmp_int][16.0105 (0.0477189s)][9.67027 (0.0528211s)][5.12678 (0.0653902s)][4.62316 (0.0917698s)][4.00837 (0.140007s)]]
+[[tommath_int][43.6665 (0.130147s)][23.8003 (0.130002s)][11.4242 (0.145711s)][7.83416 (0.155508s)][9.50103 (0.331858s)]]
+]
+[table Operator &(int)
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.00222291s)][[*1] (0.0035522s)][[*1] (0.0110247s)][[*1] (0.0154281s)][[*1] (0.0275044s)]]
+[[gmp_int][70.8538 (0.157502s)][42.1478 (0.149717s)][13.9023 (0.153268s)][10.3271 (0.159328s)][6.0529 (0.166481s)]]
+[[tommath_int][154.134 (0.342626s)][93.2035 (0.331077s)][31.9151 (0.351853s)][23.6515 (0.364899s)][22.0042 (0.605213s)]]
+]
+[table Operator ^
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.00307714s)][[*1] (0.00538197s)][[*1] (0.0127717s)][[*1] (0.0198304s)][[*1] (0.0345822s)]]
+[[gmp_int][13.9543 (0.0429392s)][9.92785 (0.0534314s)][4.80398 (0.0613552s)][4.35864 (0.0864335s)][3.887 (0.134421s)]]
+[[tommath_int][41.5958 (0.127996s)][24.2396 (0.130457s)][11.3666 (0.145171s)][8.01016 (0.158845s)][9.84853 (0.340584s)]]
+]
+[table Operator ^(int)
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.00236664s)][[*1] (0.0035339s)][[*1] (0.0100442s)][[*1] (0.0155814s)][[*1] (0.0293253s)]]
+[[gmp_int][61.4272 (0.145376s)][41.6319 (0.147123s)][14.9744 (0.150405s)][9.64857 (0.150338s)][5.46649 (0.160306s)]]
+[[tommath_int][145.509 (0.344367s)][93.9055 (0.331853s)][35.0456 (0.352003s)][22.7371 (0.354275s)][19.1373 (0.561207s)]]
+]
+[table Operator |
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.00295261s)][[*1] (0.00560832s)][[*1] (0.0127056s)][[*1] (0.0200759s)][[*1] (0.034651s)]]
+[[gmp_int][14.1091 (0.0416586s)][8.52475 (0.0478096s)][4.74593 (0.0602998s)][4.19694 (0.0842575s)][3.85525 (0.133588s)]]
+[[tommath_int][44.8889 (0.132539s)][25.2503 (0.141612s)][11.0488 (0.140382s)][7.39273 (0.148416s)][9.75809 (0.338127s)]]
+]
+[table Operator |(int)
+[[Backend][64 Bits][128 Bits][256 Bits][512 Bits][1024 Bits]]
+[[fixed_int][[*1] (0.00244005s)][[*1] (0.0040142s)][[*1] (0.00983777s)][[*1] (0.0155223s)][[*1] (0.0293444s)]]
+[[gmp_int][64.6148 (0.157663s)][34.5827 (0.138822s)][14.2764 (0.140448s)][10.3248 (0.160264s)][5.33565 (0.156572s)]]
+[[tommath_int][137.825 (0.3363s)][81.1074 (0.325581s)][34.8737 (0.343079s)][22.3727 (0.347276s)][18.912 (0.554963s)]]
 ]
 [endsect]
 

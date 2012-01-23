@@ -33,9 +33,9 @@
         </li>
 </ul></div>
 <p>
-      The library is often used by using one of the predefined typedefs: for example
-      if you wanted an arbitrary precision integer type using GMP as the underlying
-      implementation then you could use:
+      The library is often used via one of the predefined typedefs: for example if
+      you wanted an arbitrary precision integer type using <a href="http://gmplib.org" target="_top">GMP</a>
+      as the underlying implementation then you could use:
     </p>
 <pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">gmp</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>  <span class="comment">// Defines the wrappers around the GMP library's types</span>
 
@@ -45,8 +45,9 @@
       Alternatively, you can compose your own multiprecision type, by combining
       <code class="computeroutput"><span class="identifier">mp_number</span></code> with one of the predefined
       backend types. For example, suppose you wanted a 300 decimal digit floating-point
-      type based on the MPFR library. In this case, there's no predefined typedef
-      with that level of precision, so instead we compose our own:
+      type based on the <a href="http://www.mpfr.org" target="_top">MPFR</a> library. In
+      this case, there's no predefined typedef with that level of precision, so instead
+      we compose our own:
     </p>
 <pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">mpfr</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>  <span class="comment">// Defines the Backend type that wraps MPFR</span>
 
@@ -102,11 +103,13 @@
 <p>
       If type <code class="computeroutput"><span class="identifier">T</span></code> is an <code class="computeroutput"><span class="identifier">mp_number</span></code>, then this expression is evaluated
       <span class="emphasis"><em>without creating a single temporary value</em></span>. In contrast,
-      if we were using the C++ wrapper that ships with GMP - <code class="computeroutput"><span class="identifier">mpf_class</span></code>
+      if we were using the C++ wrapper that ships with <a href="http://gmplib.org" target="_top">GMP</a>
+      - <a href="http://gmplib.org/manual/C_002b_002b-Interface-Floats.html#C_002b_002b-Interface-Floats" target="_top">mpfr_class</a>
       - then this expression would result in no less than 11 temporaries (this is
-      true even though <code class="computeroutput"><span class="identifier">mpf_class</span></code>
+      true even though <a href="http://gmplib.org/manual/C_002b_002b-Interface-Floats.html#C_002b_002b-Interface-Floats" target="_top">mpfr_class</a>
       does use expression templates to reduce the number of temporaries somewhat).
-      Had we used an even simpler wrapper around GMP or MPFR like <code class="computeroutput"><span class="identifier">mpclass</span></code>
+      Had we used an even simpler wrapper around <a href="http://gmplib.org" target="_top">GMP</a>
+      or <a href="http://www.mpfr.org" target="_top">MPFR</a> like <code class="computeroutput"><span class="identifier">mpclass</span></code>
       things would have been even worse and no less that 24 temporaries are created
       for this simple expression (note - we actually measure the number of memory
       allocations performed rather than the number of temporaries directly).
@@ -192,10 +195,11 @@
 <p>
       And finally... the performance improvements from an expression template library
       like this are often not as dramatic as the reduction in number of temporaries
-      would suggest. For example if we compare this library with <code class="computeroutput"><span class="identifier">mpfr_class</span></code>
-      and <code class="computeroutput"><span class="identifier">mpreal</span></code>, with all three
-      using the underlying MPFR library at 50 decimal digits precision then we see
-      the following typical results for polynomial execution:
+      would suggest. For example if we compare this library with <a href="http://math.berkeley.edu/~wilken/code/gmpfrxx/" target="_top">mpfr_class</a>
+      and <a href="http://www.holoborodko.com/pavel/mpfr/" target="_top">mpreal</a>, with
+      all three using the underlying <a href="http://www.mpfr.org" target="_top">MPFR</a>
+      library at 50 decimal digits precision then we see the following typical results
+      for polynomial execution:
     </p>
 <div class="table">
 <a name="boost_multiprecision.intro.evaluation_of_order_6_polynomial_"></a><p class="title"><b>Table&#160;1.1.&#160;Evaluation of Order 6 Polynomial.</b></p>
@@ -243,7 +247,7 @@
 <tr>
 <td>
               <p>
-                mpfr_class
+                <a href="http://math.berkeley.edu/~wilken/code/gmpfrxx/" target="_top">mpfr_class</a>
               </p>
             </td>
 <td>
@@ -260,7 +264,7 @@
 <tr>
 <td>
               <p>
-                mpreal
+                <a href="http://www.holoborodko.com/pavel/mpfr/" target="_top">mpreal</a>
               </p>
             </td>
 <td>
@@ -301,8 +305,9 @@
 </ul></div>
 <p>
       We'll conclude this section by providing some more performance comparisons
-      between these three libraries, again, all are using MPFR to carry out the underlying
-      arithmetic, and all are operating at the same precision (50 decimal digits):
+      between these three libraries, again, all are using <a href="http://www.mpfr.org" target="_top">MPFR</a>
+      to carry out the underlying arithmetic, and all are operating at the same precision
+      (50 decimal digits):
     </p>
 <div class="table">
 <a name="boost_multiprecision.intro.evaluation_of_boost_math_s_bessel_function_test_data"></a><p class="title"><b>Table&#160;1.2.&#160;Evaluation of Boost.Math's Bessel function test data</b></p>
@@ -350,7 +355,7 @@
 <tr>
 <td>
               <p>
-                mpfr_class
+                <a href="http://math.berkeley.edu/~wilken/code/gmpfrxx/" target="_top">mpfr_class</a>
               </p>
             </td>
 <td>
@@ -367,7 +372,7 @@
 <tr>
 <td>
               <p>
-                mpreal
+                <a href="http://www.holoborodko.com/pavel/mpfr/" target="_top">mpreal</a>
               </p>
             </td>
 <td>
@@ -430,7 +435,7 @@
 <tr>
 <td>
               <p>
-                mpfr_class
+                <a href="http://math.berkeley.edu/~wilken/code/gmpfrxx/" target="_top">mpfr_class</a>
               </p>
             </td>
 <td>
@@ -447,7 +452,7 @@
 <tr>
 <td>
               <p>
-                mpreal
+                <a href="http://www.holoborodko.com/pavel/mpfr/" target="_top">mpreal</a>
               </p>
             </td>
 <td>

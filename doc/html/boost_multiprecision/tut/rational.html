@@ -80,7 +80,7 @@
               </td>
 <td>
                 <p>
-                  GMP
+                  <a href="http://gmplib.org" target="_top">GMP</a>
                 </p>
               </td>
 <td>
@@ -90,7 +90,8 @@
               </td>
 <td>
                 <p>
-                  Dependency on GNU licenced GMP library.
+                  Dependency on GNU licenced <a href="http://gmplib.org" target="_top">GMP</a>
+                  library.
                 </p>
               </td>
 </tr>
@@ -122,7 +123,7 @@
               </td>
 <td>
                 <p>
-                  Slower than GMP.
+                  Slower than <a href="http://gmplib.org" target="_top">GMP</a>.
                 </p>
               </td>
 </tr>
@@ -210,9 +211,10 @@
 <p>
         The <code class="computeroutput"><span class="identifier">gmp_rational</span></code> backend
         is used via the typedef <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">mpq_rational</span></code>.
-        It acts as a thin wrapper around the GMP <code class="computeroutput"><span class="identifier">mpq_t</span></code>
-        to provide a rational number type that is a drop-in replacement for the native
-        C++ number types, but with unlimited precision.
+        It acts as a thin wrapper around the <a href="http://gmplib.org" target="_top">GMP</a>
+        <code class="computeroutput"><span class="identifier">mpq_t</span></code> to provide a rational
+        number type that is a drop-in replacement for the native C++ number types,
+        but with unlimited precision.
       </p>
 <p>
         As well as the usual conversions from arithmetic and string types, instances
@@ -221,8 +223,7 @@
       </p>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc">
 <li class="listitem">
-            The GMP native types: <code class="computeroutput"><span class="identifier">mpz_t</span></code>,
-            <code class="computeroutput"><span class="identifier">mpq_t</span></code>.
+            The <a href="http://gmplib.org" target="_top">GMP</a> native types: <code class="computeroutput"><span class="identifier">mpz_t</span></code>, <code class="computeroutput"><span class="identifier">mpq_t</span></code>.
           </li>
 <li class="listitem">
             <code class="computeroutput"><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">gmp_int</span><span class="special">&gt;</span></code>.
@@ -242,6 +243,28 @@
         via the <code class="computeroutput"><span class="identifier">data</span><span class="special">()</span></code>
         member function of <code class="computeroutput"><span class="identifier">mpq_rational</span></code>.
       </p>
+<p>
+        Things you should know when using this type:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+            Default constructed <code class="computeroutput"><span class="identifier">mpq_rational</span></code>'s
+            have the value zero (this is the <a href="http://gmplib.org" target="_top">GMP</a>
+            default behavior).
+          </li>
+<li class="listitem">
+            Division by zero results in a hardware exception inside the <a href="http://gmplib.org" target="_top">GMP</a>
+            library.
+          </li>
+<li class="listitem">
+            No changes are made to the <a href="http://gmplib.org" target="_top">GMP</a>
+            library's global settings, so this type can coexist with existing <a href="http://gmplib.org" target="_top">GMP</a> code.
+          </li>
+<li class="listitem">
+            The code can equally be used with <a href="http://mpir.org/" target="_top">MPIR</a>
+            as the underlying library - indeed that is the prefered option on Win32.
+          </li>
+</ul></div>
 <h6>
 <a name="boost_multiprecision.tut.rational.h1"></a>
         <span><a name="boost_multiprecision.tut.rational.example_"></a></span><a class="link" href="rational.html#boost_multiprecision.tut.rational.example_">Example:</a>
@@ -304,6 +327,29 @@
 <p>
         which return the numerator and denominator of the number.
       </p>
+<p>
+        Things you should know when using this type:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+            Default constructed <code class="computeroutput"><span class="identifier">mp_rational</span></code>'s
+            have the value zero (this the inherited Boost.Rational behavior).
+          </li>
+<li class="listitem">
+            Division by zero results in a <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">bad_rational</span></code>
+            exception being thrown (see the rational number library's docs for more
+            information).
+          </li>
+<li class="listitem">
+            No changes are made to libtommath's global state, so this type can safely
+            coexist with other libtommath code.
+          </li>
+<li class="listitem">
+            Performance of this type has been found to be pretty poor - this need
+            further investigation - but it appears that Boost.Rational needs some
+            improvement in this area.
+          </li>
+</ul></div>
 <h6>
 <a name="boost_multiprecision.tut.rational.h3"></a>
         <span><a name="boost_multiprecision.tut.rational.example0"></a></span><a class="link" href="rational.html#boost_multiprecision.tut.rational.example0">Example:</a>

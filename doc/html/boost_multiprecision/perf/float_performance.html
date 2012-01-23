@@ -29,112 +29,11 @@
       </p>
 <p>
         Test code was compiled with Microsoft Visual Studio 2010 with all optimisations
-        turned on (/Ox), and used MPIR-2.3.0 and MPFR-3.0.0. The tests were run on
-        32-bit Windows Vista machine.
+        turned on (/Ox), and used MPIR-2.3.0 and <a href="http://www.mpfr.org" target="_top">MPFR</a>-3.0.0.
+        The tests were run on 32-bit Windows Vista machine.
       </p>
 <div class="table">
-<a name="boost_multiprecision.perf.float_performance.operator__"></a><p class="title"><b>Table&#160;1.8.&#160;Operator *</b></p>
-<div class="table-contents"><table class="table" summary="Operator *">
-<colgroup>
-<col>
-<col>
-<col>
-<col>
-</colgroup>
-<thead><tr>
-<th>
-                <p>
-                  Backend
-                </p>
-              </th>
-<th>
-                <p>
-                  50 Decimal Digits
-                </p>
-              </th>
-<th>
-                <p>
-                  100 Decimal Digits
-                </p>
-              </th>
-<th>
-                <p>
-                  500 Decimal Digits
-                </p>
-              </th>
-</tr></thead>
-<tbody>
-<tr>
-<td>
-                <p>
-                  cpp_float
-                </p>
-              </td>
-<td>
-                <p>
-                  1.0826 (0.287216s)
-                </p>
-              </td>
-<td>
-                <p>
-                  1.48086 (0.586363s)
-                </p>
-              </td>
-<td>
-                <p>
-                  1.57545 (5.05269s)
-                </p>
-              </td>
-</tr>
-<tr>
-<td>
-                <p>
-                  gmp_float
-                </p>
-              </td>
-<td>
-                <p>
-                  <span class="bold"><strong>1</strong></span> (0.265302s)
-                </p>
-              </td>
-<td>
-                <p>
-                  <span class="bold"><strong>1</strong></span> (0.395962s)
-                </p>
-              </td>
-<td>
-                <p>
-                  <span class="bold"><strong>1</strong></span> (3.20714s)
-                </p>
-              </td>
-</tr>
-<tr>
-<td>
-                <p>
-                  mpfr_float
-                </p>
-              </td>
-<td>
-                <p>
-                  1.24249 (0.329636s)
-                </p>
-              </td>
-<td>
-                <p>
-                  1.15432 (0.457067s)
-                </p>
-              </td>
-<td>
-                <p>
-                  1.16182 (3.72612s)
-                </p>
-              </td>
-</tr>
-</tbody>
-</table></div>
-</div>
-<br class="table-break"><div class="table">
-<a name="boost_multiprecision.perf.float_performance.operator0"></a><p class="title"><b>Table&#160;1.9.&#160;Operator +</b></p>
+<a name="boost_multiprecision.perf.float_performance.operator__"></a><p class="title"><b>Table&#160;1.8.&#160;Operator +</b></p>
 <div class="table-contents"><table class="table" summary="Operator +">
 <colgroup>
 <col>
@@ -173,17 +72,17 @@
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0242151s)
+                  <span class="bold"><strong>1</strong></span> (0.02382s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.029252s)
+                  <span class="bold"><strong>1</strong></span> (0.0294619s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0584099s)
+                  <span class="bold"><strong>1</strong></span> (0.058466s)
                 </p>
               </td>
 </tr>
@@ -195,17 +94,17 @@
               </td>
 <td>
                 <p>
-                  4.55194 (0.110226s)
+                  4.55086 (0.108402s)
                 </p>
               </td>
 <td>
                 <p>
-                  3.67516 (0.107506s)
+                  3.86443 (0.113853s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.42489 (0.141638s)
+                  2.6241 (0.15342s)
                 </p>
               </td>
 </tr>
@@ -217,17 +116,17 @@
               </td>
 <td>
                 <p>
-                  2.45362 (0.0594147s)
+                  2.52036 (0.060035s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.18552 (0.0639309s)
+                  2.1833 (0.0643242s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.32099 (0.0771588s)
+                  1.37736 (0.0805287s)
                 </p>
               </td>
 </tr>
@@ -235,7 +134,7 @@
 </table></div>
 </div>
 <br class="table-break"><div class="table">
-<a name="boost_multiprecision.perf.float_performance.operator___int_"></a><p class="title"><b>Table&#160;1.10.&#160;Operator +(int)</b></p>
+<a name="boost_multiprecision.perf.float_performance.operator___int_"></a><p class="title"><b>Table&#160;1.9.&#160;Operator +(int)</b></p>
 <div class="table-contents"><table class="table" summary="Operator +(int)">
 <colgroup>
 <col>
@@ -274,17 +173,17 @@
               </td>
 <td>
                 <p>
-                  1.51995 (0.0484155s)
+                  1.56759 (0.0527023s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.78781 (0.0611055s)
+                  1.74629 (0.0618102s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.8309 (0.104123s)
+                  1.68077 (0.105927s)
                 </p>
               </td>
 </tr>
@@ -296,17 +195,17 @@
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0318533s)
+                  <span class="bold"><strong>1</strong></span> (0.0336201s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0341789s)
+                  <span class="bold"><strong>1</strong></span> (0.0353951s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0568699s)
+                  <span class="bold"><strong>1</strong></span> (0.0630232s)
                 </p>
               </td>
 </tr>
@@ -318,17 +217,17 @@
               </td>
 <td>
                 <p>
-                  3.39055 (0.108s)
+                  3.14875 (0.105861s)
                 </p>
               </td>
 <td>
                 <p>
-                  3.30142 (0.112839s)
+                  3.15499 (0.111671s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.05293 (0.11675s)
+                  1.92831 (0.121528s)
                 </p>
               </td>
 </tr>
@@ -336,7 +235,7 @@
 </table></div>
 </div>
 <br class="table-break"><div class="table">
-<a name="boost_multiprecision.perf.float_performance.operator1"></a><p class="title"><b>Table&#160;1.11.&#160;Operator -</b></p>
+<a name="boost_multiprecision.perf.float_performance.operator0"></a><p class="title"><b>Table&#160;1.10.&#160;Operator -</b></p>
 <div class="table-contents"><table class="table" summary="Operator -">
 <colgroup>
 <col>
@@ -375,17 +274,17 @@
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0261498s)
+                  <span class="bold"><strong>1</strong></span> (0.0265783s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.030946s)
+                  <span class="bold"><strong>1</strong></span> (0.031465s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0606388s)
+                  <span class="bold"><strong>1</strong></span> (0.0619405s)
                 </p>
               </td>
 </tr>
@@ -397,17 +296,17 @@
               </td>
 <td>
                 <p>
-                  4.48753 (0.117348s)
+                  4.66954 (0.124108s)
                 </p>
               </td>
 <td>
                 <p>
-                  3.75823 (0.116302s)
+                  3.72645 (0.117253s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.4823 (0.150524s)
+                  2.67536 (0.165713s)
                 </p>
               </td>
 </tr>
@@ -419,17 +318,17 @@
               </td>
 <td>
                 <p>
-                  2.96057 (0.0774183s)
+                  2.7909 (0.0741774s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.61897 (0.0810465s)
+                  2.48557 (0.0782083s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.56236 (0.0947396s)
+                  1.50944 (0.0934957s)
                 </p>
               </td>
 </tr>
@@ -437,7 +336,7 @@
 </table></div>
 </div>
 <br class="table-break"><div class="table">
-<a name="boost_multiprecision.perf.float_performance.operator_int0"></a><p class="title"><b>Table&#160;1.12.&#160;Operator -(int)</b></p>
+<a name="boost_multiprecision.perf.float_performance.operator_int0"></a><p class="title"><b>Table&#160;1.11.&#160;Operator -(int)</b></p>
 <div class="table-contents"><table class="table" summary="Operator -(int)">
 <colgroup>
 <col>
@@ -476,17 +375,17 @@
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0567601s)
+                  <span class="bold"><strong>1</strong></span> (0.0577674s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0626685s)
+                  <span class="bold"><strong>1</strong></span> (0.0633795s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.111692s)
+                  <span class="bold"><strong>1</strong></span> (0.11146s)
                 </p>
               </td>
 </tr>
@@ -498,17 +397,17 @@
               </td>
 <td>
                 <p>
-                  2.27932 (0.129374s)
+                  2.31811 (0.133911s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.04821 (0.128358s)
+                  2.07251 (0.131355s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.48297 (0.165635s)
+                  1.67161 (0.186319s)
                 </p>
               </td>
 </tr>
@@ -520,17 +419,17 @@
               </td>
 <td>
                 <p>
-                  2.43199 (0.13804s)
+                  2.45081 (0.141577s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.32131 (0.145473s)
+                  2.29174 (0.145249s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.38152 (0.154304s)
+                  1.395 (0.155487s)
                 </p>
               </td>
 </tr>
@@ -538,7 +437,209 @@
 </table></div>
 </div>
 <br class="table-break"><div class="table">
-<a name="boost_multiprecision.perf.float_performance.operator2"></a><p class="title"><b>Table&#160;1.13.&#160;Operator /</b></p>
+<a name="boost_multiprecision.perf.float_performance.operator1"></a><p class="title"><b>Table&#160;1.12.&#160;Operator *</b></p>
+<div class="table-contents"><table class="table" summary="Operator *">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  50 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  100 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  500 Decimal Digits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_float
+                </p>
+              </td>
+<td>
+                <p>
+                  1.07276 (0.287898s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.47724 (0.584569s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.55145 (5.09969s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_float
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.268372s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.395718s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (3.28705s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mpfr_float
+                </p>
+              </td>
+<td>
+                <p>
+                  1.27302 (0.341642s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.17649 (0.465557s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.14029 (3.7482s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.float_performance.operator_int1"></a><p class="title"><b>Table&#160;1.13.&#160;Operator *(int)</b></p>
+<div class="table-contents"><table class="table" summary="Operator *(int)">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  50 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  100 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  500 Decimal Digits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_float
+                </p>
+              </td>
+<td>
+                <p>
+                  2.89945 (0.11959s)
+                </p>
+              </td>
+<td>
+                <p>
+                  4.56335 (0.197945s)
+                </p>
+              </td>
+<td>
+                <p>
+                  9.03602 (0.742044s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_float
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0412457s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0433772s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0821206s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mpfr_float
+                </p>
+              </td>
+<td>
+                <p>
+                  3.6951 (0.152407s)
+                </p>
+              </td>
+<td>
+                <p>
+                  3.71977 (0.161353s)
+                </p>
+              </td>
+<td>
+                <p>
+                  3.30958 (0.271785s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.float_performance.operator2"></a><p class="title"><b>Table&#160;1.14.&#160;Operator /</b></p>
 <div class="table-contents"><table class="table" summary="Operator /">
 <colgroup>
 <col>
@@ -577,17 +678,17 @@
               </td>
 <td>
                 <p>
-                  3.2662 (3.98153s)
+                  3.24327 (4.00108s)
                 </p>
               </td>
 <td>
                 <p>
-                  5.07021 (8.11948s)
+                  5.00532 (8.12985s)
                 </p>
               </td>
 <td>
                 <p>
-                  6.78872 (53.6099s)
+                  6.79566 (54.2796s)
                 </p>
               </td>
 </tr>
@@ -599,17 +700,17 @@
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (1.21901s)
+                  <span class="bold"><strong>1</strong></span> (1.23366s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (1.60141s)
+                  <span class="bold"><strong>1</strong></span> (1.62424s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (7.89691s)
+                  <span class="bold"><strong>1</strong></span> (7.9874s)
                 </p>
               </td>
 </tr>
@@ -621,17 +722,17 @@
               </td>
 <td>
                 <p>
-                  1.33238 (1.62419s)
+                  1.32521 (1.63486s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.39529 (2.23443s)
+                  1.38967 (2.25716s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.70882 (13.4944s)
+                  1.72413 (13.7713s)
                 </p>
               </td>
 </tr>
@@ -639,7 +740,108 @@
 </table></div>
 </div>
 <br class="table-break"><div class="table">
-<a name="boost_multiprecision.perf.float_performance.operator_str"></a><p class="title"><b>Table&#160;1.14.&#160;Operator str</b></p>
+<a name="boost_multiprecision.perf.float_performance.operator_int2"></a><p class="title"><b>Table&#160;1.15.&#160;Operator /(int)</b></p>
+<div class="table-contents"><table class="table" summary="Operator /(int)">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  50 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  100 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  500 Decimal Digits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_float
+                </p>
+              </td>
+<td>
+                <p>
+                  1.45093 (0.253675s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.83306 (0.419569s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.3644 (1.64187s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_float
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.174836s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.22889s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.694411s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mpfr_float
+                </p>
+              </td>
+<td>
+                <p>
+                  1.16731 (0.204088s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.13211 (0.259127s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.02031 (0.708513s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.float_performance.operator_str"></a><p class="title"><b>Table&#160;1.16.&#160;Operator str</b></p>
 <div class="table-contents"><table class="table" summary="Operator str">
 <colgroup>
 <col>
@@ -678,17 +880,17 @@
               </td>
 <td>
                 <p>
-                  1.46076 (0.0192656s)
+                  1.4585 (0.0188303s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.59438 (0.0320398s)
+                  1.55515 (0.03172s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.134302s)
+                  <span class="bold"><strong>1</strong></span> (0.131962s)
                 </p>
               </td>
 </tr>
@@ -700,17 +902,17 @@
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0131888s)
+                  <span class="bold"><strong>1</strong></span> (0.0129107s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0200954s)
+                  <span class="bold"><strong>1</strong></span> (0.0203967s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.01007 (0.135655s)
+                  1.04632 (0.138075s)
                 </p>
               </td>
 </tr>
@@ -722,24 +924,26 @@
               </td>
 <td>
                 <p>
-                  2.19174 (0.0289065s)
+                  2.19015 (0.0282764s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.86101 (0.0373977s)
+                  1.84679 (0.0376683s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.15842 (0.155578s)
+                  1.20295 (0.158743s)
                 </p>
               </td>
 </tr>
 </tbody>
 </table></div>
 </div>
-<br class="table-break">
+<br class="table-break"><p>
+        ]
+      </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
