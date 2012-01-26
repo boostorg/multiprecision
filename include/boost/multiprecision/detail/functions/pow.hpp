@@ -86,6 +86,7 @@ inline void pow_imp(T& result, const T& t, const U& p, const mpl::true_&)
 template<typename T, typename U> 
 inline void eval_pow(T& result, const T& t, const U& p)
 {
+   BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_floating_point, "The pow function is only valid for floating point types.");
    typedef typename is_integral<U>::type tag_type;
    detail::pow_imp(result, t, p, tag_type());
 }
@@ -184,6 +185,7 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
 template <class T>
 void eval_exp(T& result, const T& x)
 {
+   BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_floating_point, "The ldexp function is only valid for floating point types.");
    if(&x == &result)
    {
       T temp;
@@ -323,6 +325,7 @@ void eval_exp(T& result, const T& x)
 template <class T>
 void eval_log(T& result, const T& arg)
 {
+   BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_floating_point, "The log function is only valid for floating point types.");
    //
    // We use a variation of http://dlmf.nist.gov/4.45#i
    // using frexp to reduce the argument to x * 2^n,
@@ -410,6 +413,7 @@ const T& get_constant_log10()
 template <class T>
 void eval_log10(T& result, const T& arg)
 {
+   BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_floating_point, "The fabs function is only valid for floating point types.");
    eval_log(result, arg);
    divide(result, get_constant_log10<T>());
 }
@@ -417,6 +421,7 @@ void eval_log10(T& result, const T& arg)
 template<typename T> 
 inline void eval_pow(T& result, const T& x, const T& a)
 {
+   BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_floating_point, "The pow function is only valid for floating point types.");
    typedef typename boost::multiprecision::detail::canonical<int, T>::type si_type;
    typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
    typedef typename T::exponent_type exp_type;
@@ -636,18 +641,21 @@ namespace detail{
 template <class T>
 inline void eval_sinh(T& result, const T& x)
 {
+   BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_floating_point, "The sinh function is only valid for floating point types.");
    detail::sinhcosh(x, &result, static_cast<T*>(0));
 }
 
 template <class T>
 inline void eval_cosh(T& result, const T& x)
 {
+   BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_floating_point, "The cosh function is only valid for floating point types.");
    detail::sinhcosh(x, static_cast<T*>(0), &result);
 }
 
 template <class T>
 inline void eval_tanh(T& result, const T& x)
 {
+   BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_floating_point, "The tanh function is only valid for floating point types.");
   T c;
   detail::sinhcosh(x, &result, &c);
   divide(result, c);

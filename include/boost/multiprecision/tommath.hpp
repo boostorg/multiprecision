@@ -432,6 +432,14 @@ inline void eval_abs(tommath_int& result, const tommath_int& val)
 {
    detail::check_tommath_result(mp_abs(const_cast< ::mp_int*>(&val.data()), &result.data()));
 }
+inline void eval_gcd(tommath_int& result, const tommath_int& a, const tommath_int& b)
+{
+   detail::check_tommath_result(mp_gcd(const_cast< ::mp_int*>(&a.data()), const_cast< ::mp_int*>(&b.data()), const_cast< ::mp_int*>(&result.data())));
+}
+inline void eval_lcm(tommath_int& result, const tommath_int& a, const tommath_int& b)
+{
+   detail::check_tommath_result(mp_lcm(const_cast< ::mp_int*>(&a.data()), const_cast< ::mp_int*>(&b.data()), const_cast< ::mp_int*>(&result.data())));
+}
 
 
 template<>

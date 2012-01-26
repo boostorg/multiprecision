@@ -9,6 +9,7 @@
 
 #include <boost/detail/lightweight_test.hpp>
 #include <boost/math/special_functions/pow.hpp>
+#include <boost/math/common_factor_rt.hpp>
 
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && \
    !defined(TEST_CPP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ) \
@@ -345,6 +346,14 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    //
    // Non-member functions:
    //
+   a = 400;
+   b = 45;
+   BOOST_TEST(gcd(a, b) == boost::math::gcd(400, 45));
+   BOOST_TEST(lcm(a, b) == boost::math::lcm(400, 45));
+   BOOST_TEST(gcd(a, 45) == boost::math::gcd(400, 45));
+   BOOST_TEST(lcm(a, 45) == boost::math::lcm(400, 45));
+   BOOST_TEST(gcd(400, b) == boost::math::gcd(400, 45));
+   BOOST_TEST(lcm(400, b) == boost::math::lcm(400, 45));
    if(std::numeric_limits<Real>::is_signed)
    {
       a = -20;
@@ -355,6 +364,15 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
       BOOST_TEST(abs(a) == 20);
       BOOST_TEST(abs(-a) == 20);
       BOOST_TEST(abs(+a) == 20);
+
+      a = -400;
+      b = 45;
+      BOOST_TEST(gcd(a, b) == boost::math::gcd(-400, 45));
+      BOOST_TEST(lcm(a, b) == boost::math::lcm(-400, 45));
+      BOOST_TEST(gcd(a, 45) == boost::math::gcd(-400, 45));
+      BOOST_TEST(lcm(a, 45) == boost::math::lcm(-400, 45));
+      BOOST_TEST(gcd(-400, b) == boost::math::gcd(-400, 45));
+      BOOST_TEST(lcm(-400, b) == boost::math::lcm(-400, 45));
    }
 }
 
@@ -458,6 +476,10 @@ void test_negative_mixed(boost::mpl::true_ const&)
    BOOST_TEST(n2 == Real(n2));
    BOOST_TEST(n3 == Real(n3));
    BOOST_TEST(n4 == Real(n4));
+   BOOST_TEST(Real(n1).template convert_to<Num>() == n1);
+   BOOST_TEST(Real(n2).template convert_to<Num>() == n2);
+   BOOST_TEST(Real(n3).template convert_to<Num>() == n3);
+   BOOST_TEST(Real(n4).template convert_to<Num>() == n4);
 #if defined(TEST_MPFR) || defined(TEST_MPFR_50)
    Num tol = 10 * std::numeric_limits<Num>::epsilon();
 #else

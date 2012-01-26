@@ -1254,6 +1254,8 @@ inline void complement(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Si
 template <unsigned Bits, bool Signed>
 inline void left_shift(fixed_int<Bits, Signed>& result, double_limb_type s)
 {
+   if(!s)
+      return;
    if(s >= Bits)
    {
       result = static_cast<limb_type>(0);
@@ -1287,6 +1289,8 @@ inline void left_shift(fixed_int<Bits, Signed>& result, double_limb_type s)
 template <unsigned Bits, bool Signed>
 inline void right_shift(fixed_int<Bits, Signed>& result, double_limb_type s)
 {
+   if(!s)
+      return;
    limb_type fill = (Signed && (result.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask)) ? fixed_int<Bits, Signed>::max_limb_value : 0u;
    if(s >= Bits)
    {
@@ -1327,7 +1331,22 @@ inline void right_shift(fixed_int<Bits, Signed>& result, double_limb_type s)
 }
 
 template <class R, unsigned Bits, bool Signed>
-inline typename enable_if<is_integral<R>, void>::type convert_to(R* result, const fixed_int<Bits, Signed>& backend)
+inline typename enable_if<is_integral<R>, void>::type convert_to(R* result, const fixed_int<Bits, Signed>& backend, const mpl::true_&)
+{
+   if(backend.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask)
+   {
+      fixed_int<Bits, Signed> t(backend);
+      t.negate();
+      convert_to(result, t, mpl::false_());
+      *result = -*result;
+      return;
+   }
+   else
+      convert_to(result, backend, mpl::false_());
+}
+
+template <class R, unsigned Bits, bool Signed>
+inline typename enable_if<is_integral<R>, void>::type convert_to(R* result, const fixed_int<Bits, Signed>& backend, const mpl::false_&)
 {
    unsigned shift = (fixed_int<Bits, Signed>::limb_count - 1) * fixed_int<Bits, Signed>::limb_bits;
    *result = 0;
@@ -1339,8 +1358,23 @@ inline typename enable_if<is_integral<R>, void>::type convert_to(R* result, cons
 }
 
 template <class R, unsigned Bits, bool Signed>
+inline typename enable_if<is_integral<R>, void>::type convert_to(R* result, const fixed_int<Bits, Signed>& backend)
+{
+   typedef mpl::bool_<Signed && std::numeric_limits<R>::is_signed> tag_type;
+   convert_to(result, backend, tag_type());
+}
+
+template <class R, unsigned Bits, bool Signed>
 inline typename enable_if<is_floating_point<R>, void>::type convert_to(R* result, const fixed_int<Bits, Signed>& backend)
 {
+   if(Signed && (backend.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask))
+   {
+      fixed_int<Bits, Signed> t(backend);
+      t.negate();
+      convert_to(result, t);
+      *result = -*result;
+      return;
+   }
    unsigned shift = (fixed_int<Bits, Signed>::limb_count - 1) * fixed_int<Bits, Signed>::limb_bits;
    *result = 0;
    for(unsigned i = 0; i < fixed_int<Bits, Signed>::limb_count; ++i)
@@ -1369,6 +1403,116 @@ template <unsigned Bits>
 inline int get_sign(const fixed_int<Bits, true>& val)
 {
    return is_zero(val) ? 0 : val.data()[0] & fixed_int<Bits, true>::sign_bit_mask ? -1 : 1;
+}
+
+namespace detail{
+//
+// Get the location of the least-significant-bit:
+//
+template <unsigned Bits, bool Signed>
+inline unsigned get_lsb(const fixed_int<Bits, Signed>& a)
+{
+   BOOST_ASSERT(get_sign(a) != 0);
+   
+   unsigned result = 0;
+   //
+   // Find the index of the least significant limb that is non-zero:
+   //
+   int index = fixed_int<Bits, Signed>::limb_count - 1;
+   while(!a.data()[index] && index)
+      --index;
+   //
+   // Find the index of the least significant bit within that limb:
+   //
+   limb_type l = a.data()[index];
+   while(!(l & 1u))
+   {
+      l >>= 1;
+      ++result;
+   }
+
+   return result + (fixed_int<Bits, Signed>::limb_count - 1 - index) * fixed_int<Bits, Signed>::limb_bits;
+}
+
+}
+
+template <unsigned Bits, bool Signed>
+inline void eval_gcd(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, const fixed_int<Bits, Signed>& b)
+{
+   int shift;
+
+   fixed_int<Bits, Signed> u(a), v(b);
+
+   int s = get_sign(u);
+
+   /* GCD(0,x) := x */
+   if(s < 0)
+   {
+      u.negate();
+   }
+   else if(s == 0)
+   {
+      result = v;
+      return;
+   }
+   s = get_sign(v);
+   if(s < 0)
+   {
+      v.negate();
+   }
+   else if(s == 0)
+   {
+      result = u;
+      return;
+   }
+
+   /* Let shift := lg K, where K is the greatest power of 2
+   dividing both u and v. */
+
+   unsigned us = detail::get_lsb(u);
+   unsigned vs = detail::get_lsb(v);
+   shift = (std::min)(us, vs);
+   right_shift(u, us);
+   right_shift(v, vs);
+
+   do 
+   {
+      /* Now u and v are both odd, so diff(u, v) is even.
+      Let u = min(u, v), v = diff(u, v)/2. */
+      if(u.compare(v) > 0)
+         u.swap(v);
+      subtract(v, u);
+      // Termination condition tries not to do a full compare if possible:
+      if(!v.data()[fixed_int<Bits, Signed>::limb_count - 1] && is_zero(v))
+         break;
+      vs = detail::get_lsb(v);
+      right_shift(v, vs);
+      BOOST_ASSERT((v.data()[fixed_int<Bits, Signed>::limb_count - 1] & 1));
+      BOOST_ASSERT((u.data()[fixed_int<Bits, Signed>::limb_count - 1] & 1));
+   } 
+   while(true);
+
+   result = u;
+   left_shift(result, shift);
+}
+
+template <unsigned Bits, bool Signed>
+inline void eval_lcm(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, const fixed_int<Bits, Signed>& b)
+{
+   fixed_int<Bits, Signed> t;
+   eval_gcd(t, a, b);
+
+   if(is_zero(t))
+   {
+      result = 0;
+   }
+   else
+   {
+      divide(result, a, t);
+      multiply(result, b);
+   }
+   if(get_sign(result) < 0)
+      result.negate();
 }
 
 template <unsigned Bits, bool Signed>

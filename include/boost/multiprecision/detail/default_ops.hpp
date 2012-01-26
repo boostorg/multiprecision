@@ -405,6 +405,7 @@ void eval_abs(T& result, const T& arg)
 template <class T>
 void eval_fabs(T& result, const T& arg)
 {
+   BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_floating_point, "The fabs function is only valid for floating point types.");
    typedef typename T::signed_types type_list;
    typedef typename mpl::front<type_list>::type front;
    result = arg;
@@ -415,12 +416,14 @@ void eval_fabs(T& result, const T& arg)
 template <class Backend>
 inline int eval_fpclassify(const Backend& arg)
 {
+   BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_floating_point, "The fpclassify function is only valid for floating point types.");
    return is_zero(arg) ? FP_ZERO : FP_NORMAL;
 }
 
 template <class T>
 inline void eval_fmod(T& result, const T& a, const T& b)
 {
+   BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_floating_point, "The fmod function is only valid for floating point types.");
    if((&result == &a) || (&result == &b))
    {
       T temp;
@@ -440,6 +443,7 @@ inline void eval_fmod(T& result, const T& a, const T& b)
 template <class T>
 inline void eval_trunc(T& result, const T& a)
 {
+   BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_floating_point, "The trunc function is only valid for floating point types.");
    int c = eval_fpclassify(a);
    if(c == FP_NAN || c == FP_INFINITE)
    {
@@ -455,6 +459,7 @@ inline void eval_trunc(T& result, const T& a)
 template <class T>
 inline void eval_round(T& result, const T& a)
 {
+   BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_floating_point, "The round function is only valid for floating point types.");
    typedef typename boost::multiprecision::detail::canonical<float, T>::type fp_type;
    int c = eval_fpclassify(a);
    if(c == FP_NAN || c == FP_INFINITE)
@@ -472,6 +477,33 @@ inline void eval_round(T& result, const T& a)
       add(result, a, fp_type(0.5f));
       eval_floor(result, result);
    }
+}
+
+template <class T, class Arithmetic>
+inline typename enable_if<is_integral<Arithmetic> >::type eval_gcd(T& result, const T& a, const Arithmetic& b)
+{
+   typedef typename boost::multiprecision::detail::canonical<Arithmetic, T>::type si_type;
+   T t;
+   t = static_cast<si_type>(b);
+   eval_gcd(result, a, t);
+}
+template <class T, class Arithmetic>
+inline typename enable_if<is_integral<Arithmetic> >::type eval_gcd(T& result, const Arithmetic& a, const T& b)
+{
+   eval_gcd(result, b, a);
+}
+template <class T, class Arithmetic>
+inline typename enable_if<is_integral<Arithmetic> >::type eval_lcm(T& result, const T& a, const Arithmetic& b)
+{
+   typedef typename boost::multiprecision::detail::canonical<Arithmetic, T>::type si_type;
+   T t;
+   t = static_cast<si_type>(b);
+   eval_lcm(result, a, t);
+}
+template <class T, class Arithmetic>
+inline typename enable_if<is_integral<Arithmetic> >::type eval_lcm(T& result, const Arithmetic& a, const T& b)
+{
+   eval_lcm(result, b, a);
 }
 
 //
@@ -831,6 +863,12 @@ struct BOOST_JOIN(func, _funct)\
       using default_ops:: BOOST_JOIN(eval_,func);\
       BOOST_JOIN(eval_,func)(result, arg, a);\
    }\
+   template <class Arithmetic> \
+   void operator()(Backend& result, const Arithmetic& arg, const Backend& a)const\
+   {\
+      using default_ops:: BOOST_JOIN(eval_,func);\
+      BOOST_JOIN(eval_,func)(result, arg, a);\
+   }\
 };\
 \
 }\
@@ -960,6 +998,52 @@ func(const detail::mp_exp<tag, A1, A2, A3>& arg, const Arithmetic& a)\
       a\
     );\
 }\
+template <class Backend, class Arithmetic> \
+typename enable_if<\
+   is_arithmetic<Arithmetic>,\
+   detail::mp_exp<\
+    detail::function\
+  , detail::BOOST_JOIN(func, _funct)<Backend> \
+  , Arithmetic \
+  , mp_number<Backend>\
+  > \
+>::type \
+func(const Arithmetic& arg, const mp_number<Backend>& a)\
+{\
+    return detail::mp_exp<\
+    detail::function\
+  , detail::BOOST_JOIN(func, _funct)<Backend> \
+  , Arithmetic \
+  , mp_number<Backend>\
+  >(\
+        detail::BOOST_JOIN(func, _funct)<Backend>() \
+      , arg,\
+      a\
+    );\
+}\
+template <class tag, class A1, class A2, class A3, class Arithmetic> \
+typename enable_if<\
+   is_arithmetic<Arithmetic>,\
+   detail::mp_exp<\
+    detail::function\
+  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type> \
+  , Arithmetic \
+  , detail::mp_exp<tag, A1, A2, A3>\
+  > \
+>::type \
+func(const Arithmetic& arg, const detail::mp_exp<tag, A1, A2, A3>& a)\
+{\
+    return detail::mp_exp<\
+    detail::function\
+  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type> \
+  , Arithmetic \
+  , detail::mp_exp<tag, A1, A2, A3>\
+   >(\
+        detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type>() \
+      , arg,\
+      a\
+    );\
+}\
 
 
 #define HETERO_BINARY_OP_FUNCTOR(func, Arg2)\
@@ -1041,6 +1125,13 @@ HETERO_BINARY_OP_FUNCTOR(frexp, int*)
 BINARY_OP_FUNCTOR(pow)
 BINARY_OP_FUNCTOR(fmod)
 BINARY_OP_FUNCTOR(atan2)
+
+//
+// Integer functions:
+//
+BINARY_OP_FUNCTOR(gcd)
+BINARY_OP_FUNCTOR(lcm)
+
 
 #undef BINARY_OP_FUNCTOR
 #undef UNARY_OP_FUNCTOR

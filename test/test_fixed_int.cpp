@@ -119,6 +119,8 @@ int main()
       BOOST_CHECK_EQUAL(mpz_int(si|a).str(), packed_type(si|a1).str());
       BOOST_CHECK_EQUAL(mpz_int(si&a).str(), packed_type(si&a1).str());
       BOOST_CHECK_EQUAL(mpz_int(si^a).str(), packed_type(si^a1).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(a, b)).str(), packed_type(gcd(a1, b1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(c, d)).str(), packed_type(lcm(c1, d1)).str());
 
       if(last_error_count != boost::detail::test_errors())
       {
@@ -135,6 +137,7 @@ int main()
          std::cout << "d1   = " << d1 << std::endl;
          std::cout << "a + b   = " << a+b << std::endl;
          std::cout << "a1 + b1 = " << a1+b1 << std::endl;
+         std::cout << std::dec;
          std::cout << "a - b   = " << a-b << std::endl;
          std::cout << "a1 - b1 = " << a1-b1 << std::endl;
          std::cout << "-a + b   = " << mpz_int(-a)+b << std::endl;

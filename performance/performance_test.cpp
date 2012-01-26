@@ -15,6 +15,7 @@
    && !defined(TEST_FIXED_INT)
 #  define TEST_MPF
 #  define TEST_MPZ
+#  define TEST_MPQ
 #  define TEST_MPFR
 #  define TEST_CPP_FLOAT
 #  define TEST_MPQ
@@ -299,6 +300,16 @@ struct tester
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
+   double test_gcd()
+   {
+      stopwatch<boost::chrono::high_resolution_clock> w;
+      for(unsigned i = 0; i < 1000; ++i)
+      {
+         for(unsigned i = 0; i < b.size(); ++i)
+            a[i] = gcd(b[i], c[i]);
+      }
+      return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+   }
 private:
    T generate_random()
    {
@@ -445,6 +456,7 @@ void test_int_ops(tester<Number, N>& t, const char* type, unsigned precision, co
    report_result(cat, type, "|(int)", precision, t.test_or_int());
    report_result(cat, type, "&(int)", precision, t.test_and_int());
    report_result(cat, type, "^(int)", precision, t.test_xor_int());
+   report_result(cat, type, "gcd", precision, t.test_gcd());
 }
 template <class Number, int N, class U>
 void test_int_ops(tester<Number, N>& t, const char* type, unsigned precision, const U&)
@@ -564,7 +576,8 @@ int main()
    test<boost::multiprecision::mpz_int>("gmp_int", 256);
    test<boost::multiprecision::mpz_int>("gmp_int", 512);
    test<boost::multiprecision::mpz_int>("gmp_int", 1024);
-
+#endif
+#ifdef TEST_MPQ
    test<boost::multiprecision::mpq_rational>("mpq_rational", 64);
    test<boost::multiprecision::mpq_rational>("mpq_rational", 128);
    test<boost::multiprecision::mpq_rational>("mpq_rational", 256);

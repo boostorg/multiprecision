@@ -1392,6 +1392,31 @@ inline void eval_abs(gmp_int& result, const gmp_int& val)
    mpz_abs(result.data(), val.data());
 }
 
+inline void eval_gcd(gmp_int& result, const gmp_int& a, const gmp_int& b)
+{
+   mpz_gcd(result.data(), a.data(), b.data());
+}
+inline void eval_lcm(gmp_int& result, const gmp_int& a, const gmp_int& b)
+{
+   mpz_lcm(result.data(), a.data(), b.data());
+}
+inline void eval_gcd(gmp_int& result, const gmp_int& a, const unsigned long b)
+{
+   mpz_gcd_ui(result.data(), a.data(), b);
+}
+inline void eval_lcm(gmp_int& result, const gmp_int& a, const unsigned long b)
+{
+   mpz_lcm_ui(result.data(), a.data(), b);
+}
+inline void eval_gcd(gmp_int& result, const gmp_int& a, const long b)
+{
+   mpz_gcd_ui(result.data(), a.data(), std::abs(b));
+}
+inline void eval_lcm(gmp_int& result, const gmp_int& a, const long b)
+{
+   mpz_lcm_ui(result.data(), a.data(), std::abs(b));
+}
+
 struct gmp_rational;
 void add(gmp_rational& t, const gmp_rational& o);
 
