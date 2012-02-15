@@ -322,7 +322,7 @@ The following backends provide real number arithmetic:
 [[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
 [[`mpf_float<N>`][boost/multiprecision/gmp.hpp][2][[gmp]][Very fast and efficient backend.][Dependency on GNU licenced [gmp] library.]]
 [[`mpfr_float<N>`][boost/multiprecision/mpfr.hpp][2][[gmp] and [mpfr]][Very fast and efficient backend, with its own standard library implementation.][Dependency on GNU licenced [gmp] and [mpfr] libraries.]]
-[[`cpp_float<N>`][boost/multiprecision/cpp_float.hpp][10][None][Header only, all C++ implementation. Boost licence.][Approximately 2x slower than the [mpfr] or [gmp] libraries.]]
+[[`cpp_dec_float<N>`][boost/multiprecision/cpp_dec_float.hpp][10][None][Header only, all C++ implementation. Boost licence.][Approximately 2x slower than the [mpfr] or [gmp] libraries.]]
 ]
 
 [h4 gmp_float]
@@ -427,23 +427,23 @@ Things you should know when using this type:
 
 [mpfr_eg]
 
-[h4 cpp_float]
+[h4 cpp_dec_float]
 
    namespace boost{ namespace multiprecision{
 
    template <unsigned Digits10>
-   class cpp_float;
+   class cpp_dec_float;
 
-   typedef mp_number<cpp_float<50> > cpp_float_50;
-   typedef mp_number<cpp_float<100> > cpp_float_100;
+   typedef mp_number<cpp_dec_float<50> > cpp_float_50;
+   typedef mp_number<cpp_dec_float<100> > cpp_float_100;
 
    }} // namespaces
 
-The `cpp_float` backend is used in conjunction with `mp_number`: It acts as an entirely C++ (header only and dependency free)
+The `cpp_dec_float` backend is used in conjunction with `mp_number`: It acts as an entirely C++ (header only and dependency free)
 real-number type that is a drop-in replacement for the native C++ floating-point types, but with 
 much greater precision.
 
-Type `cpp_float` can be used at fixed precision by specifying a non-zero `Digits10` template parameter.  
+Type `cpp_dec_float` can be used at fixed precision by specifying a non-zero `Digits10` template parameter.  
 The typedefs cpp_float_50 and cpp_float_100 provide arithmetic types at 50 and 100 decimal digits precision
 respectively.
 
@@ -451,14 +451,14 @@ There is full standard library and `numeric_limits` support available for this t
 
 Things you should know when using this type:
 
-* Default constructed `cpp_float`'s have a value of zero.
+* Default constructed `cpp_dec_float`'s have a value of zero.
 * The radix of this type is 10.  As a result it can behave subtly differently from base-2 types.
 * It is not possible to round-trip this type to and from a string and get back to exactly the same value
 (this is a result of the type having some hidden internal guard digits).
 * The type has a number of internal guard digits over and above those specified in the template argument.
 Normally these should not be visible to the user.
 
-[h5 cpp_float example:]
+[h5 cpp_dec_float example:]
 
 [cpp_float_eg]
 
@@ -1181,7 +1181,7 @@ Windows Vista machine.
 [[Library][50 Decimal Digits][100 Decimal Digits]]
 [[mpfr_float][[*1.0] (6.472s)][1.193 (10.154s)]]
 [[mpf_float][1.801 (11.662s)][[*1.0](8.511s)]]
-[[cpp_float][3.13 (20.285s)][2.46 (21.019s)]]
+[[cpp_dec_float][3.13 (20.285s)][2.46 (21.019s)]]
 [[[mpfr_class]][1.001 (6.480s)][1.15(9.805s)]]
 [[[mpreal]][1.542 (9.981s)][1.61 (13.702s)]]
 ]
@@ -1190,7 +1190,7 @@ Windows Vista machine.
 [[Library][50 Decimal Digits][100 Decimal Digits]]
 [[mpfr_float][1.308 (258.09s)][1.30 (516.74s)]]
 [[mpf_float][[*1.0] (197.30s)][[*1.0](397.30s)]]
-[[cpp_float][1.695 (334.50s)][2.68 (1064.53s)]]
+[[cpp_dec_float][1.695 (334.50s)][2.68 (1064.53s)]]
 [[[mpfr_class]][1.35 (266.39s)][1.323 (525.74s)]]
 [[[mpreal]][1.75 (346.64s)][1.635 (649.94s)]]
 ]
@@ -1212,55 +1212,55 @@ Windows Vista machine.
 
 [table Operator +
 [[Backend][50 Decimal Digits][100 Decimal Digits][500 Decimal Digits]]
-[[cpp_float][[*1] (0.02382s)][[*1] (0.0294619s)][[*1] (0.058466s)]]
+[[cpp_dec_float][[*1] (0.02382s)][[*1] (0.0294619s)][[*1] (0.058466s)]]
 [[gmp_float][4.55086 (0.108402s)][3.86443 (0.113853s)][2.6241 (0.15342s)]]
 [[mpfr_float][2.52036 (0.060035s)][2.1833 (0.0643242s)][1.37736 (0.0805287s)]]
 ]
 [table Operator +(int)
 [[Backend][50 Decimal Digits][100 Decimal Digits][500 Decimal Digits]]
-[[cpp_float][1.56759 (0.0527023s)][1.74629 (0.0618102s)][1.68077 (0.105927s)]]
+[[cpp_dec_float][1.56759 (0.0527023s)][1.74629 (0.0618102s)][1.68077 (0.105927s)]]
 [[gmp_float][[*1] (0.0336201s)][[*1] (0.0353951s)][[*1] (0.0630232s)]]
 [[mpfr_float][3.14875 (0.105861s)][3.15499 (0.111671s)][1.92831 (0.121528s)]]
 ]
 [table Operator -
 [[Backend][50 Decimal Digits][100 Decimal Digits][500 Decimal Digits]]
-[[cpp_float][[*1] (0.0265783s)][[*1] (0.031465s)][[*1] (0.0619405s)]]
+[[cpp_dec_float][[*1] (0.0265783s)][[*1] (0.031465s)][[*1] (0.0619405s)]]
 [[gmp_float][4.66954 (0.124108s)][3.72645 (0.117253s)][2.67536 (0.165713s)]]
 [[mpfr_float][2.7909 (0.0741774s)][2.48557 (0.0782083s)][1.50944 (0.0934957s)]]
 ]
 [table Operator -(int)
 [[Backend][50 Decimal Digits][100 Decimal Digits][500 Decimal Digits]]
-[[cpp_float][[*1] (0.0577674s)][[*1] (0.0633795s)][[*1] (0.11146s)]]
+[[cpp_dec_float][[*1] (0.0577674s)][[*1] (0.0633795s)][[*1] (0.11146s)]]
 [[gmp_float][2.31811 (0.133911s)][2.07251 (0.131355s)][1.67161 (0.186319s)]]
 [[mpfr_float][2.45081 (0.141577s)][2.29174 (0.145249s)][1.395 (0.155487s)]]
 ]
 [table Operator *
 [[Backend][50 Decimal Digits][100 Decimal Digits][500 Decimal Digits]]
-[[cpp_float][1.07276 (0.287898s)][1.47724 (0.584569s)][1.55145 (5.09969s)]]
+[[cpp_dec_float][1.07276 (0.287898s)][1.47724 (0.584569s)][1.55145 (5.09969s)]]
 [[gmp_float][[*1] (0.268372s)][[*1] (0.395718s)][[*1] (3.28705s)]]
 [[mpfr_float][1.27302 (0.341642s)][1.17649 (0.465557s)][1.14029 (3.7482s)]]
 ]
 [table Operator *(int)
 [[Backend][50 Decimal Digits][100 Decimal Digits][500 Decimal Digits]]
-[[cpp_float][2.89945 (0.11959s)][4.56335 (0.197945s)][9.03602 (0.742044s)]]
+[[cpp_dec_float][2.89945 (0.11959s)][4.56335 (0.197945s)][9.03602 (0.742044s)]]
 [[gmp_float][[*1] (0.0412457s)][[*1] (0.0433772s)][[*1] (0.0821206s)]]
 [[mpfr_float][3.6951 (0.152407s)][3.71977 (0.161353s)][3.30958 (0.271785s)]]
 ]
 [table Operator /
 [[Backend][50 Decimal Digits][100 Decimal Digits][500 Decimal Digits]]
-[[cpp_float][3.24327 (4.00108s)][5.00532 (8.12985s)][6.79566 (54.2796s)]]
+[[cpp_dec_float][3.24327 (4.00108s)][5.00532 (8.12985s)][6.79566 (54.2796s)]]
 [[gmp_float][[*1] (1.23366s)][[*1] (1.62424s)][[*1] (7.9874s)]]
 [[mpfr_float][1.32521 (1.63486s)][1.38967 (2.25716s)][1.72413 (13.7713s)]]
 ]
 [table Operator /(int)
 [[Backend][50 Decimal Digits][100 Decimal Digits][500 Decimal Digits]]
-[[cpp_float][1.45093 (0.253675s)][1.83306 (0.419569s)][2.3644 (1.64187s)]]
+[[cpp_dec_float][1.45093 (0.253675s)][1.83306 (0.419569s)][2.3644 (1.64187s)]]
 [[gmp_float][[*1] (0.174836s)][[*1] (0.22889s)][[*1] (0.694411s)]]
 [[mpfr_float][1.16731 (0.204088s)][1.13211 (0.259127s)][1.02031 (0.708513s)]]
 ]
 [table Operator str
 [[Backend][50 Decimal Digits][100 Decimal Digits][500 Decimal Digits]]
-[[cpp_float][1.4585 (0.0188303s)][1.55515 (0.03172s)][[*1] (0.131962s)]]
+[[cpp_dec_float][1.4585 (0.0188303s)][1.55515 (0.03172s)][[*1] (0.131962s)]]
 [[gmp_float][[*1] (0.0129107s)][[*1] (0.0203967s)][1.04632 (0.138075s)]]
 [[mpfr_float][2.19015 (0.0282764s)][1.84679 (0.0376683s)][1.20295 (0.158743s)]]
 ]

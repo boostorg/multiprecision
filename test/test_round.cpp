@@ -15,11 +15,11 @@
 #include <boost/random/mersenne_twister.hpp>
 #include "test.hpp"
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ)
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ)
 #  define TEST_MPF_50
 #  define TEST_MPFR_50
 #  define TEST_BACKEND
-#  define TEST_CPP_FLOAT
+#  define TEST_CPP_DEC_FLOAT
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -39,8 +39,8 @@
 #ifdef TEST_BACKEND
 #include <boost/multiprecision/concepts/mp_number_architypes.hpp>
 #endif
-#ifdef TEST_CPP_FLOAT
-#include <boost/multiprecision/cpp_float.hpp>
+#ifdef TEST_CPP_DEC_FLOAT
+#include <boost/multiprecision/cpp_dec_float.hpp>
 #endif
 
 boost::mt19937 rng;
@@ -386,7 +386,7 @@ int main()
    test<boost::multiprecision::mpfr_float_50>();
    test<boost::multiprecision::mpfr_float_100>();
 #endif
-#ifdef TEST_CPP_FLOAT
+#ifdef TEST_CPP_DEC_FLOAT
    test<boost::multiprecision::cpp_float_50>();
    test<boost::multiprecision::cpp_float_100>();
 #endif

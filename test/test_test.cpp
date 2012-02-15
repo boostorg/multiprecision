@@ -8,7 +8,7 @@
 #endif
 
 #include "test.hpp"
-#include <boost/multiprecision/cpp_float.hpp>
+#include <boost/multiprecision/cpp_dec_float.hpp>
 
 void proc_that_throws()
 {

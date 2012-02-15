@@ -26,7 +26,7 @@ namespace boost{
 namespace multiprecision{
 
 template <unsigned Digits10>
-class cpp_float
+class cpp_dec_float
 {
 public:
    typedef mpl::list<long long>                    signed_types;
@@ -81,7 +81,7 @@ private:
    //
    // Special values constructor:
    //
-   cpp_float(t_fpclass c) : 
+   cpp_dec_float(t_fpclass c) : 
       data(),
       exp      (static_cast<boost::int64_t>(0)),
       neg      (false),
@@ -95,23 +95,23 @@ private:
       {
          initializer()
          {
-            cpp_float<Digits10>::nan();
-            cpp_float<Digits10>::inf();
-            (cpp_float<Digits10>::min)();
-            (cpp_float<Digits10>::max)();
-            cpp_float<Digits10>::zero();
-            cpp_float<Digits10>::one();
-            cpp_float<Digits10>::two();
-            cpp_float<Digits10>::half();
-            cpp_float<Digits10>::double_min();
-            cpp_float<Digits10>::double_max();
-            cpp_float<Digits10>::long_double_max();
-            cpp_float<Digits10>::long_double_min();
-            cpp_float<Digits10>::long_long_max();
-            cpp_float<Digits10>::long_long_min();
-            cpp_float<Digits10>::ulong_long_max();
-            cpp_float<Digits10>::eps();
-            cpp_float<Digits10>::pow2(0);
+            cpp_dec_float<Digits10>::nan();
+            cpp_dec_float<Digits10>::inf();
+            (cpp_dec_float<Digits10>::min)();
+            (cpp_dec_float<Digits10>::max)();
+            cpp_dec_float<Digits10>::zero();
+            cpp_dec_float<Digits10>::one();
+            cpp_dec_float<Digits10>::two();
+            cpp_dec_float<Digits10>::half();
+            cpp_dec_float<Digits10>::double_min();
+            cpp_dec_float<Digits10>::double_max();
+            cpp_dec_float<Digits10>::long_double_max();
+            cpp_dec_float<Digits10>::long_double_min();
+            cpp_dec_float<Digits10>::long_long_max();
+            cpp_dec_float<Digits10>::long_long_min();
+            cpp_dec_float<Digits10>::ulong_long_max();
+            cpp_dec_float<Digits10>::eps();
+            cpp_dec_float<Digits10>::pow2(0);
          }
          void do_nothing(){}
       };
@@ -120,14 +120,14 @@ private:
 
 public:
    // Constructors
-   cpp_float() : 
+   cpp_dec_float() : 
       data(),
       exp      (static_cast<boost::int64_t>(0)),
       neg      (false),
       fpclass  (mp_finite),
       prec_elem(mp_elem_number) { }
 
-   cpp_float(const char* s) : 
+   cpp_dec_float(const char* s) : 
       data(),
       exp      (static_cast<boost::int64_t>(0)),
       neg      (false),
@@ -138,7 +138,7 @@ public:
       }
 
    template<class I>
-   cpp_float(I i, typename enable_if<is_unsigned<I> >::type* = 0) : 
+   cpp_dec_float(I i, typename enable_if<is_unsigned<I> >::type* = 0) : 
       data(),
       exp      (static_cast<boost::int64_t>(0)),
       neg      (false),
@@ -149,7 +149,7 @@ public:
       }
 
    template <class I>
-   cpp_float(I i, typename enable_if<is_signed<I> >::type* = 0) : 
+   cpp_dec_float(I i, typename enable_if<is_signed<I> >::type* = 0) : 
       data(),
       exp      (static_cast<boost::int64_t>(0)),
       neg      (false),
@@ -165,7 +165,7 @@ public:
             from_unsigned_long_long(i);
       }
 
-   cpp_float(const cpp_float& f) : 
+   cpp_dec_float(const cpp_dec_float& f) : 
       data     (f.data),
       exp      (f.exp),
       neg      (f.neg),
@@ -173,7 +173,7 @@ public:
       prec_elem(f.prec_elem) { }
 
    template <unsigned D>
-   cpp_float(const cpp_float<D>& f) : 
+   cpp_dec_float(const cpp_dec_float<D>& f) : 
       exp      (f.exp),
       neg      (f.neg),
       fpclass  (static_cast<enum_fpclass>(static_cast<int>(f.fpclass))),
@@ -185,7 +185,7 @@ public:
    }
 
    template <class F>
-   cpp_float(const F val, typename enable_if<is_floating_point<F> >::type* = 0): 
+   cpp_dec_float(const F val, typename enable_if<is_floating_point<F> >::type* = 0): 
       data(),
       exp      (static_cast<boost::int64_t>(0)),
       neg      (false),
@@ -195,28 +195,28 @@ public:
       *this = val;
    }
 
-   cpp_float(const double val, long long exponent);
+   cpp_dec_float(const double val, long long exponent);
 
    // Specific special values.
-   static const cpp_float& nan()
+   static const cpp_dec_float& nan()
    {
-      static const cpp_float val(mp_NaN);
+      static const cpp_dec_float val(mp_NaN);
       init.do_nothing();
       return val;
    }
-   static const cpp_float& inf()
+   static const cpp_dec_float& inf()
    {
-      static const cpp_float val(mp_inf);
+      static const cpp_dec_float val(mp_inf);
       init.do_nothing();
       return val;
    }
-   static const cpp_float& (max)()
+   static const cpp_dec_float& (max)()
    {
       init.do_nothing();
       static bool init = false;
       static const std::string str_max =   std::string("9." + std::string(static_cast<std::size_t>(cpp_float_max_digits10), static_cast<char>('9')))
          + std::string("e+" + boost::lexical_cast<std::string>(cpp_float_max_exp10));
-      static cpp_float val_max;
+      static cpp_dec_float val_max;
       if(!init)
       {
          init = true;
@@ -225,11 +225,11 @@ public:
       return val_max;
    }
 
-   static const cpp_float& (min)()
+   static const cpp_dec_float& (min)()
    {
       init.do_nothing();
       static bool init = false;
-      static cpp_float val_min;
+      static cpp_dec_float val_min;
       if(!init)
       {
          init = true;
@@ -237,81 +237,81 @@ public:
       }
       return val_min;
    }
-   static const cpp_float& zero()
+   static const cpp_dec_float& zero()
    {
       init.do_nothing();
-      static cpp_float val(static_cast<unsigned long long>(0u));
+      static cpp_dec_float val(static_cast<unsigned long long>(0u));
       return val;
    }
-   static const cpp_float& one()
+   static const cpp_dec_float& one()
    {
       init.do_nothing();
-      static cpp_float val(static_cast<unsigned long long>(1u));
+      static cpp_dec_float val(static_cast<unsigned long long>(1u));
       return val;
    }
-   static const cpp_float& two()
+   static const cpp_dec_float& two()
    {
       init.do_nothing();
-      static cpp_float val(static_cast<unsigned long long>(2u));
+      static cpp_dec_float val(static_cast<unsigned long long>(2u));
       return val;
    }
-   static const cpp_float& half()
+   static const cpp_dec_float& half()
    {
       init.do_nothing();
-      static cpp_float val(0.5L);
+      static cpp_dec_float val(0.5L);
       return val;
    }
-   static const cpp_float& double_min()
+   static const cpp_dec_float& double_min()
    {
       init.do_nothing();
-      static cpp_float val(static_cast<long double>((std::numeric_limits<double>::min)()));
+      static cpp_dec_float val(static_cast<long double>((std::numeric_limits<double>::min)()));
       return val;
    }
-   static const cpp_float& double_max()
+   static const cpp_dec_float& double_max()
    {
       init.do_nothing();
-      static cpp_float val(static_cast<long double>((std::numeric_limits<double>::max)()));
+      static cpp_dec_float val(static_cast<long double>((std::numeric_limits<double>::max)()));
       return val;
    }
-   static const cpp_float& long_double_min()
+   static const cpp_dec_float& long_double_min()
    {
       init.do_nothing();
-      static cpp_float val((std::numeric_limits<long double>::min)());
+      static cpp_dec_float val((std::numeric_limits<long double>::min)());
       return val;
    }
-   static const cpp_float& long_double_max()
+   static const cpp_dec_float& long_double_max()
    {
       init.do_nothing();
-      static cpp_float val((std::numeric_limits<long double>::max)());
+      static cpp_dec_float val((std::numeric_limits<long double>::max)());
       return val;
    }
-   static const cpp_float& long_long_max()
+   static const cpp_dec_float& long_long_max()
    {
       init.do_nothing();
-      static cpp_float val((std::numeric_limits<long long>::max)());
+      static cpp_dec_float val((std::numeric_limits<long long>::max)());
       return val;
    }
-   static const cpp_float& long_long_min()
+   static const cpp_dec_float& long_long_min()
    {
       init.do_nothing();
-      static cpp_float val((std::numeric_limits<long long>::min)());
+      static cpp_dec_float val((std::numeric_limits<long long>::min)());
       return val;
    }
-   static const cpp_float& ulong_long_max()
+   static const cpp_dec_float& ulong_long_max()
    {
       init.do_nothing();
-      static cpp_float val((std::numeric_limits<unsigned long long>::max)());
+      static cpp_dec_float val((std::numeric_limits<unsigned long long>::max)());
       return val;
    }
-   static const cpp_float& eps()
+   static const cpp_dec_float& eps()
    {
       init.do_nothing();
-      static cpp_float val(1.0, 1 - (int)Digits10);
+      static cpp_dec_float val(1.0, 1 - (int)Digits10);
       return val;
    }
 
    // Basic operations.
-   cpp_float& operator= (const cpp_float& v)
+   cpp_dec_float& operator= (const cpp_dec_float& v)
    {
       data = v.data;
       exp = v.exp;
@@ -321,7 +321,7 @@ public:
       return *this;
    }
    template <unsigned D>
-   cpp_float& operator=(const cpp_float<D>& f)
+   cpp_dec_float& operator=(const cpp_dec_float<D>& f)
    { 
       exp = f.exp;
       neg = f.neg;
@@ -330,7 +330,7 @@ public:
       precision(std::min(f.prec_elem, prec_elem));
       return *this;
    }
-   cpp_float& operator= (long long v)
+   cpp_dec_float& operator= (long long v)
    {
       if(v < 0)
       {
@@ -341,41 +341,41 @@ public:
          from_unsigned_long_long(v);
       return *this;
    }
-   cpp_float& operator= (unsigned long long v)
+   cpp_dec_float& operator= (unsigned long long v)
    {
       from_unsigned_long_long(v);
       return *this;
    }
-   cpp_float& operator= (long double v);
-   cpp_float& operator= (const char* v)
+   cpp_dec_float& operator= (long double v);
+   cpp_dec_float& operator= (const char* v)
    {
       rd_string(v);
       return *this;
    }
 
-   cpp_float& operator+=(const cpp_float& v);
-   cpp_float& operator-=(const cpp_float& v);
-   cpp_float& operator*=(const cpp_float& v);
-   cpp_float& operator/=(const cpp_float& v);
+   cpp_dec_float& operator+=(const cpp_dec_float& v);
+   cpp_dec_float& operator-=(const cpp_dec_float& v);
+   cpp_dec_float& operator*=(const cpp_dec_float& v);
+   cpp_dec_float& operator/=(const cpp_dec_float& v);
    
-   cpp_float& add_unsigned_long_long(const unsigned long long n)
+   cpp_dec_float& add_unsigned_long_long(const unsigned long long n)
    {
-      cpp_float t;
+      cpp_dec_float t;
       t.from_unsigned_long_long(n);
       return *this += t;
    }
-   cpp_float& sub_unsigned_long_long(const unsigned long long n)
+   cpp_dec_float& sub_unsigned_long_long(const unsigned long long n)
    {
-      cpp_float t;
+      cpp_dec_float t;
       t.from_unsigned_long_long(n);
       return *this -= t;
    }
-   cpp_float& mul_unsigned_long_long(const unsigned long long n);
-   cpp_float& div_unsigned_long_long(const unsigned long long n);
+   cpp_dec_float& mul_unsigned_long_long(const unsigned long long n);
+   cpp_dec_float& div_unsigned_long_long(const unsigned long long n);
 
    // Elementary primitives.
-   cpp_float& calculate_inv (void);
-   cpp_float& calculate_sqrt(void);
+   cpp_dec_float& calculate_inv (void);
+   cpp_dec_float& calculate_sqrt(void);
    void negate() 
    { 
       if(!iszero())
@@ -396,27 +396,27 @@ public:
    bool isneg  (void) const { return neg; }
 
    // Operators pre-increment and pre-decrement
-   cpp_float& operator++(void)
+   cpp_dec_float& operator++(void)
    {
       return *this += one();
    }
-   cpp_float& operator--(void)
+   cpp_dec_float& operator--(void)
    {
       return *this -= one();
    }
 
    std::string str(boost::intmax_t digits, std::ios_base::fmtflags f)const;
 
-   int compare(const cpp_float& v)const;
+   int compare(const cpp_dec_float& v)const;
    template <class V>
    int compare(const V& v)const
    {
-      cpp_float<Digits10> t;
+      cpp_dec_float<Digits10> t;
       t = v;
       return compare(t);
    }
 
-   void swap(cpp_float& v)
+   void swap(cpp_dec_float& v)
    {
       data.swap(v.data);
       std::swap(exp, v.exp);
@@ -430,7 +430,7 @@ public:
    signed long long   extract_signed_long_long  (void) const;
    unsigned long long extract_unsigned_long_long(void) const;
    void               extract_parts             (double& mantissa, boost::int64_t& exponent) const;
-   cpp_float           extract_integer_part      (void) const;
+   cpp_dec_float           extract_integer_part      (void) const;
    void precision(const boost::int32_t prec_digits)
    {
       if(prec_digits >= cpp_float_digits10)
@@ -445,7 +445,7 @@ public:
          prec_elem = (std::min)(mp_elem_number, (std::max)(elems, static_cast<boost::int32_t>(2)));
       }
    }
-   static cpp_float pow2(long long i);
+   static cpp_dec_float pow2(long long i);
    long long order()const
    {
       const bool bo_order_is_zero = ((!isfinite()) || (data[0] == static_cast<boost::uint32_t>(0u)));
@@ -500,7 +500,7 @@ public:
 
 private:
    static bool data_elem_is_non_zero_predicate(const boost::uint32_t& d) { return (d != static_cast<boost::uint32_t>(0u)); }
-   static bool data_elem_is_non_nine_predicate(const boost::uint32_t& d) { return (d != static_cast<boost::uint32_t>(cpp_float::mp_elem_mask - 1)); }
+   static bool data_elem_is_non_nine_predicate(const boost::uint32_t& d) { return (d != static_cast<boost::uint32_t>(cpp_dec_float::mp_elem_mask - 1)); }
    static bool char_is_nonzero_predicate(const char& c) { return (c != static_cast<char>('0')); }
 
    void from_unsigned_long_long(const unsigned long long u);
@@ -514,47 +514,47 @@ private:
    bool rd_string(const char* const s);
 
    template <unsigned D>
-   friend class cpp_float;
+   friend class cpp_dec_float;
 
 };
 
 template <unsigned Digits10>
-typename cpp_float<Digits10>::initializer cpp_float<Digits10>::init;
+typename cpp_dec_float<Digits10>::initializer cpp_dec_float<Digits10>::init;
 
 template <unsigned Digits10>
-const boost::int32_t cpp_float<Digits10>::mp_radix;
+const boost::int32_t cpp_dec_float<Digits10>::mp_radix;
 template <unsigned Digits10>
-const boost::int32_t cpp_float<Digits10>::cpp_float_digits;
+const boost::int32_t cpp_dec_float<Digits10>::cpp_float_digits;
 template <unsigned Digits10>
-const boost::int32_t cpp_float<Digits10>::cpp_float_digits10_setting;
+const boost::int32_t cpp_dec_float<Digits10>::cpp_float_digits10_setting;
 template <unsigned Digits10>
-const boost::int32_t cpp_float<Digits10>::cpp_float_digits10_limit;
+const boost::int32_t cpp_dec_float<Digits10>::cpp_float_digits10_limit;
 template <unsigned Digits10>
-const boost::int32_t cpp_float<Digits10>::cpp_float_digits10;
+const boost::int32_t cpp_dec_float<Digits10>::cpp_float_digits10;
 template <unsigned Digits10>
-const boost::int32_t cpp_float<Digits10>::cpp_float_digits10_extra;
+const boost::int32_t cpp_dec_float<Digits10>::cpp_float_digits10_extra;
 template <unsigned Digits10>
-const boost::int32_t cpp_float<Digits10>::cpp_float_max_digits10;
+const boost::int32_t cpp_dec_float<Digits10>::cpp_float_max_digits10;
 template <unsigned Digits10>
-const boost::int64_t cpp_float<Digits10>::cpp_float_max_exp;
+const boost::int64_t cpp_dec_float<Digits10>::cpp_float_max_exp;
 template <unsigned Digits10>
-const boost::int64_t cpp_float<Digits10>::cpp_float_min_exp;
+const boost::int64_t cpp_dec_float<Digits10>::cpp_float_min_exp;
 template <unsigned Digits10>
-const boost::int64_t cpp_float<Digits10>::cpp_float_max_exp10;
+const boost::int64_t cpp_dec_float<Digits10>::cpp_float_max_exp10;
 template <unsigned Digits10>
-const boost::int64_t cpp_float<Digits10>::cpp_float_min_exp10;
+const boost::int64_t cpp_dec_float<Digits10>::cpp_float_min_exp10;
 template <unsigned Digits10>
-const boost::int32_t cpp_float<Digits10>::mp_elem_digits10;
+const boost::int32_t cpp_dec_float<Digits10>::mp_elem_digits10;
 template <unsigned Digits10>
-const boost::int32_t cpp_float<Digits10>::cpp_float_digits10_num_base;
+const boost::int32_t cpp_dec_float<Digits10>::cpp_float_digits10_num_base;
 template <unsigned Digits10>
-const boost::int32_t cpp_float<Digits10>::mp_elem_number;
+const boost::int32_t cpp_dec_float<Digits10>::mp_elem_number;
 template <unsigned Digits10>
-const boost::int32_t cpp_float<Digits10>::mp_elem_mask;
+const boost::int32_t cpp_dec_float<Digits10>::mp_elem_mask;
 
 
 template <unsigned Digits10>
-cpp_float<Digits10>& cpp_float<Digits10>::operator+=(const cpp_float<Digits10>& v)
+cpp_dec_float<Digits10>& cpp_dec_float<Digits10>::operator+=(const cpp_dec_float<Digits10>& v)
 {
    if(isnan())
    {
@@ -750,7 +750,7 @@ cpp_float<Digits10>& cpp_float<Digits10>::operator+=(const cpp_float<Digits10>& 
       // Check to see if we really truely have an overflow or not...
       if(isneg())
       {
-         cpp_float t(*this);
+         cpp_dec_float t(*this);
          t.negate();
          overflow = t.compare((max)()) > 0;
       }
@@ -774,7 +774,7 @@ cpp_float<Digits10>& cpp_float<Digits10>::operator+=(const cpp_float<Digits10>& 
 }
 
 template <unsigned Digits10>
-cpp_float<Digits10>& cpp_float<Digits10>::operator-=(const cpp_float<Digits10>& v)
+cpp_dec_float<Digits10>& cpp_dec_float<Digits10>::operator-=(const cpp_dec_float<Digits10>& v)
 {
    // Use *this - v = -(-*this + v).
    negate();
@@ -784,7 +784,7 @@ cpp_float<Digits10>& cpp_float<Digits10>::operator-=(const cpp_float<Digits10>& 
 }
 
 template <unsigned Digits10>
-cpp_float<Digits10>& cpp_float<Digits10>::operator*=(const cpp_float<Digits10>& v)
+cpp_dec_float<Digits10>& cpp_dec_float<Digits10>::operator*=(const cpp_dec_float<Digits10>& v)
 {
    // Evaluate the sign of the result.
    const bool b_result_is_neg = (neg != v.neg);
@@ -876,7 +876,7 @@ cpp_float<Digits10>& cpp_float<Digits10>::operator*=(const cpp_float<Digits10>& 
 }
 
 template <unsigned Digits10>
-cpp_float<Digits10>& cpp_float<Digits10>::operator/=(const cpp_float<Digits10>& v)
+cpp_dec_float<Digits10>& cpp_dec_float<Digits10>::operator/=(const cpp_dec_float<Digits10>& v)
 {
    const bool u_and_v_are_finite_and_identical = (   isfinite()
       && (fpclass == v.fpclass)
@@ -904,14 +904,14 @@ cpp_float<Digits10>& cpp_float<Digits10>::operator/=(const cpp_float<Digits10>& 
          }
          return *this;
       }
-      cpp_float t(v);
+      cpp_dec_float t(v);
       t.calculate_inv();
       return operator*=(t);
    }
 }
 
 template <unsigned Digits10>
-cpp_float<Digits10>& cpp_float<Digits10>::mul_unsigned_long_long(const unsigned long long n)
+cpp_dec_float<Digits10>& cpp_dec_float<Digits10>::mul_unsigned_long_long(const unsigned long long n)
 {
    // Multiply *this with a constant unsigned long long.
 
@@ -947,7 +947,7 @@ cpp_float<Digits10>& cpp_float<Digits10>::mul_unsigned_long_long(const unsigned 
    if(n >= static_cast<unsigned long long>(mp_elem_mask))
    {
       neg = b_neg;
-      cpp_float t;
+      cpp_dec_float t;
       t = n;
       return operator*=(t);
    }
@@ -981,7 +981,7 @@ cpp_float<Digits10>& cpp_float<Digits10>::mul_unsigned_long_long(const unsigned 
       // Check to see if we really truely have an overflow or not...
       if(isneg())
       {
-         cpp_float t(*this);
+         cpp_dec_float t(*this);
          t.negate();
          overflow = t.compare((max)()) > 0;
       }
@@ -1006,7 +1006,7 @@ cpp_float<Digits10>& cpp_float<Digits10>::mul_unsigned_long_long(const unsigned 
 }
 
 template <unsigned Digits10>
-cpp_float<Digits10>& cpp_float<Digits10>::div_unsigned_long_long(const unsigned long long n)
+cpp_dec_float<Digits10>& cpp_dec_float<Digits10>::div_unsigned_long_long(const unsigned long long n)
 {
    // Divide *this by a constant unsigned long long.
 
@@ -1055,7 +1055,7 @@ cpp_float<Digits10>& cpp_float<Digits10>::div_unsigned_long_long(const unsigned 
    if(n >= static_cast<unsigned long long>(mp_elem_mask))
    {
       neg = b_neg;
-      cpp_float t;
+      cpp_dec_float t;
       t = n;
       return operator/=(t);
    }
@@ -1095,7 +1095,7 @@ cpp_float<Digits10>& cpp_float<Digits10>::div_unsigned_long_long(const unsigned 
 }
 
 template <unsigned Digits10>
-cpp_float<Digits10>& cpp_float<Digits10>::calculate_inv()
+cpp_dec_float<Digits10>& cpp_dec_float<Digits10>::calculate_inv()
 {
    // Compute the inverse of *this.
    const bool b_neg = neg;
@@ -1129,7 +1129,7 @@ cpp_float<Digits10>& cpp_float<Digits10>::calculate_inv()
    }
 
    // Save the original *this.
-   cpp_float<Digits10> x(*this);
+   cpp_dec_float<Digits10> x(*this);
 
    // Generate the initial estimate using division.
    // Extract the mantissa and exponent for a "manual"
@@ -1139,7 +1139,7 @@ cpp_float<Digits10>& cpp_float<Digits10>::calculate_inv()
    x.extract_parts(dd, ne);
 
    // Do the inverse estimate using double precision estimates of mantissa and exponent.
-   operator=(cpp_float<Digits10>(1.0 / dd, -ne));
+   operator=(cpp_dec_float<Digits10>(1.0 / dd, -ne));
 
    // Compute the inverse of *this. Quadratically convergent Newton-Raphson iteration
    // is used. During the iterative steps, the precision of the calculation is limited
@@ -1154,7 +1154,7 @@ cpp_float<Digits10>& cpp_float<Digits10>::calculate_inv()
       x.precision(static_cast<boost::int32_t>(digits * static_cast<boost::int32_t>(2)));
 
       // Next iteration.
-      cpp_float t(*this);
+      cpp_dec_float t(*this);
       t *= x;
       t -= two();
       t.negate();
@@ -1169,7 +1169,7 @@ cpp_float<Digits10>& cpp_float<Digits10>::calculate_inv()
 }
 
 template <unsigned Digits10>
-cpp_float<Digits10>& cpp_float<Digits10>::calculate_sqrt(void)
+cpp_dec_float<Digits10>& cpp_dec_float<Digits10>::calculate_sqrt(void)
 {
    // Compute the square root of *this.
 
@@ -1185,7 +1185,7 @@ cpp_float<Digits10>& cpp_float<Digits10>::calculate_sqrt(void)
    }
 
    // Save the original *this.
-   cpp_float<Digits10> x(*this);
+   cpp_dec_float<Digits10> x(*this);
 
    // Generate the initial estimate using division.
    // Extract the mantissa and exponent for a "manual"
@@ -1205,10 +1205,10 @@ cpp_float<Digits10>& cpp_float<Digits10>::calculate_sqrt(void)
    // Estimate the square root using simple manipulations.
    const double sqd = std::sqrt(dd);
 
-   *this = cpp_float<Digits10>(sqd, static_cast<boost::int64_t>(ne / static_cast<boost::int64_t>(2)));
+   *this = cpp_dec_float<Digits10>(sqd, static_cast<boost::int64_t>(ne / static_cast<boost::int64_t>(2)));
 
    // Estimate 1.0 / (2.0 * x0) using simple manipulations.
-   cpp_float<Digits10> vi(0.5 / sqd, static_cast<boost::int64_t>(-ne / static_cast<boost::int64_t>(2)));
+   cpp_dec_float<Digits10> vi(0.5 / sqd, static_cast<boost::int64_t>(-ne / static_cast<boost::int64_t>(2)));
 
    // Compute the square root of x. Coupled Newton iteration
    // as described in "Pi Unleashed" is used. During the
@@ -1229,7 +1229,7 @@ cpp_float<Digits10>& cpp_float<Digits10>::calculate_sqrt(void)
       vi.precision(digits * 2);
 
       // Next iteration of vi
-      cpp_float t(*this);
+      cpp_dec_float t(*this);
       t *= vi;
       t.negate();
       t.mul_unsigned_long_long(2u);
@@ -1252,7 +1252,7 @@ cpp_float<Digits10>& cpp_float<Digits10>::calculate_sqrt(void)
 }
 
 template <unsigned Digits10>
-int cpp_float<Digits10>::cmp_data(const array_type& vd) const
+int cpp_dec_float<Digits10>::cmp_data(const array_type& vd) const
 {
    // Compare the data of *this with those of v.
    //         Return +1 for *this > v
@@ -1274,7 +1274,7 @@ int cpp_float<Digits10>::cmp_data(const array_type& vd) const
 }
 
 template <unsigned Digits10>
-int cpp_float<Digits10>::compare(const cpp_float& v) const
+int cpp_dec_float<Digits10>::compare(const cpp_dec_float& v) const
 {
    // Compare v with *this.
    //         Return +1 for *this > v
@@ -1352,7 +1352,7 @@ int cpp_float<Digits10>::compare(const cpp_float& v) const
 }
 
 template <unsigned Digits10>
-bool cpp_float<Digits10>::isone() const
+bool cpp_dec_float<Digits10>::isone() const
 {
    // Check if the value of *this is identically 1 or very close to 1.
 
@@ -1376,7 +1376,7 @@ bool cpp_float<Digits10>::isone() const
 }
 
 template <unsigned Digits10>
-bool cpp_float<Digits10>::isint() const
+bool cpp_dec_float<Digits10>::isint() const
 {
    if(fpclass != mp_finite) { return false; }
 
@@ -1399,9 +1399,9 @@ bool cpp_float<Digits10>::isint() const
 }
 
 template <unsigned Digits10>
-void cpp_float<Digits10>::extract_parts(double& mantissa, boost::int64_t& exponent) const
+void cpp_dec_float<Digits10>::extract_parts(double& mantissa, boost::int64_t& exponent) const
 {
-   // Extract the approximate parts mantissa and base-10 exponent from the input cpp_float<Digits10> value x.
+   // Extract the approximate parts mantissa and base-10 exponent from the input cpp_dec_float<Digits10> value x.
 
    // Extracts the mantissa and exponent.
    exponent = exp;
@@ -1432,11 +1432,11 @@ void cpp_float<Digits10>::extract_parts(double& mantissa, boost::int64_t& expone
 }
 
 template <unsigned Digits10>
-double cpp_float<Digits10>::extract_double(void) const
+double cpp_dec_float<Digits10>::extract_double(void) const
 {
-   // Returns the double conversion of a cpp_float<Digits10>.
+   // Returns the double conversion of a cpp_dec_float<Digits10>.
 
-   // Check for non-normal cpp_float<Digits10>.
+   // Check for non-normal cpp_dec_float<Digits10>.
    if(!isfinite())
    {
       if(isnan())
@@ -1450,17 +1450,17 @@ double cpp_float<Digits10>::extract_double(void) const
       }
    }
 
-   cpp_float<Digits10> xx(*this);
+   cpp_dec_float<Digits10> xx(*this);
    if(xx.isneg())
       xx.negate();
 
-   // Check for zero cpp_float<Digits10>.
+   // Check for zero cpp_dec_float<Digits10>.
    if(iszero() || (xx.compare(double_min()) < 0))
    {
       return 0.0;
    }
 
-   // Check if cpp_float<Digits10> exceeds the maximum of double.
+   // Check if cpp_dec_float<Digits10> exceeds the maximum of double.
    if(xx.compare(double_max()) > 0)
    {
       return ((!neg) ?  std::numeric_limits<double>::infinity()
@@ -1478,11 +1478,11 @@ double cpp_float<Digits10>::extract_double(void) const
 }
 
 template <unsigned Digits10>
-long double cpp_float<Digits10>::extract_long_double(void) const
+long double cpp_dec_float<Digits10>::extract_long_double(void) const
 {
-   // Returns the long double conversion of a cpp_float<Digits10>.
+   // Returns the long double conversion of a cpp_dec_float<Digits10>.
 
-   // Check for non-normal cpp_float<Digits10>.
+   // Check for non-normal cpp_dec_float<Digits10>.
    if(!isfinite())
    {
       if(isnan())
@@ -1496,17 +1496,17 @@ long double cpp_float<Digits10>::extract_long_double(void) const
       }
    }
 
-   cpp_float<Digits10> xx(*this);
+   cpp_dec_float<Digits10> xx(*this);
    if(xx.isneg())
       xx.negate();
 
-   // Check for zero cpp_float<Digits10>.
+   // Check for zero cpp_dec_float<Digits10>.
    if(iszero() || (xx.compare(long_double_min()) < 0))
    {
       return static_cast<long double>(0.0);
    }
 
-   // Check if cpp_float<Digits10> exceeds the maximum of double.
+   // Check if cpp_dec_float<Digits10> exceeds the maximum of double.
    if(xx.compare(long_double_max()) > 0)
    {
       return ((!neg) ?  std::numeric_limits<long double>::infinity()
@@ -1524,7 +1524,7 @@ long double cpp_float<Digits10>::extract_long_double(void) const
 }
 
 template <unsigned Digits10>
-signed long long cpp_float<Digits10>::extract_signed_long_long(void) const
+signed long long cpp_dec_float<Digits10>::extract_signed_long_long(void) const
 {
    // Extracts a signed long long from *this.
    // If (x > maximum of signed long long) or (x < minimum of signed long long),
@@ -1550,7 +1550,7 @@ signed long long cpp_float<Digits10>::extract_signed_long_long(void) const
    else
    {
       // Extract the data into an unsigned long long value.
-      cpp_float<Digits10> xn(extract_integer_part());
+      cpp_dec_float<Digits10> xn(extract_integer_part());
       if(xn.isneg())
          xn.negate();
 
@@ -1569,7 +1569,7 @@ signed long long cpp_float<Digits10>::extract_signed_long_long(void) const
 }
 
 template <unsigned Digits10>
-unsigned long long cpp_float<Digits10>::extract_unsigned_long_long(void) const
+unsigned long long cpp_dec_float<Digits10>::extract_unsigned_long_long(void) const
 {
    // Extracts an unsigned long long from *this.
    // If x exceeds the maximum of unsigned long long,
@@ -1587,7 +1587,7 @@ unsigned long long cpp_float<Digits10>::extract_unsigned_long_long(void) const
       return static_cast<unsigned long long>(0u);
    }
 
-   const cpp_float<Digits10> xn(extract_integer_part());
+   const cpp_dec_float<Digits10> xn(extract_integer_part());
 
    unsigned long long val;
 
@@ -1613,7 +1613,7 @@ unsigned long long cpp_float<Digits10>::extract_unsigned_long_long(void) const
 }
 
 template <unsigned Digits10>
-cpp_float<Digits10> cpp_float<Digits10>::extract_integer_part(void) const
+cpp_dec_float<Digits10> cpp_dec_float<Digits10>::extract_integer_part(void) const
 {
    // Compute the signed integer part of x.
 
@@ -1636,7 +1636,7 @@ cpp_float<Digits10> cpp_float<Digits10>::extract_integer_part(void) const
    }
 
    // Make a local copy.
-   cpp_float<Digits10> x = *this;
+   cpp_dec_float<Digits10> x = *this;
 
    // Clear out the decimal portion
    const size_t first_clear = (static_cast<size_t>(x.exp) / static_cast<size_t>(mp_elem_digits10)) + 1u;
@@ -1648,7 +1648,7 @@ cpp_float<Digits10> cpp_float<Digits10>::extract_integer_part(void) const
 }
 
 template <unsigned Digits10>
-std::string cpp_float<Digits10>::str(boost::intmax_t number_of_digits, std::ios_base::fmtflags f) const
+std::string cpp_dec_float<Digits10>::str(boost::intmax_t number_of_digits, std::ios_base::fmtflags f) const
 {
    if(this->isinf())
    {
@@ -1675,14 +1675,14 @@ std::string cpp_float<Digits10>::str(boost::intmax_t number_of_digits, std::ios_
    }
    else if(f & std::ios_base::scientific)
       ++number_of_digits;
-   // Determine the number of elements needed to provide the requested digits from cpp_float<Digits10>.
+   // Determine the number of elements needed to provide the requested digits from cpp_dec_float<Digits10>.
    const std::size_t number_of_elements = (std::min)(static_cast<std::size_t>((number_of_digits / static_cast<std::size_t>(mp_elem_digits10)) + 2u),
       static_cast<std::size_t>(mp_elem_number));
 
-   // Extract the remaining digits from cpp_float<Digits10> after the decimal point.
+   // Extract the remaining digits from cpp_dec_float<Digits10> after the decimal point.
    str = boost::lexical_cast<std::string>(data[0]);
 
-   // Extract all of the digits from cpp_float<Digits10>, beginning with the first data element.
+   // Extract all of the digits from cpp_dec_float<Digits10>, beginning with the first data element.
    for(std::size_t i = static_cast<std::size_t>(1u); i < number_of_elements; i++)
    {
       std::stringstream ss;
@@ -1801,7 +1801,7 @@ std::string cpp_float<Digits10>::str(boost::intmax_t number_of_digits, std::ios_
 }
 
 template <unsigned Digits10>
-bool cpp_float<Digits10>::rd_string(const char* const s)
+bool cpp_dec_float<Digits10>::rd_string(const char* const s)
 {
    std::string str(s);
 
@@ -1873,7 +1873,7 @@ bool cpp_float<Digits10>::rd_string(const char* const s)
       }
    }
 
-   // Put the input string into the standard cpp_float<Digits10> input form
+   // Put the input string into the standard cpp_dec_float<Digits10> input form
    // aaa.bbbbE+/-n, where aa has 1...mp_elem_digits10, bbbb has an
    // even multiple of mp_elem_digits10 which are possibly zero padded
    // on the right-end, and n is a signed 32-bit integer which is an
@@ -2001,7 +2001,7 @@ bool cpp_float<Digits10>::rd_string(const char* const s)
          static_cast<std::size_t>(pos_plus_one + max_dec));
    }
 
-   // Now the input string has the standard cpp_float<Digits10> input form.
+   // Now the input string has the standard cpp_dec_float<Digits10> input form.
    // (See the comment above.)
 
    // Set all the data elements to 0.
@@ -2040,7 +2040,7 @@ bool cpp_float<Digits10>::rd_string(const char* const s)
       if(exp == cpp_float_min_exp10)
       {
          // Check for identity with the minimum value.
-         cpp_float<Digits10> test = *this;
+         cpp_dec_float<Digits10> test = *this;
 
          test.exp = static_cast<boost::int64_t>(0);
 
@@ -2059,14 +2059,14 @@ bool cpp_float<Digits10>::rd_string(const char* const s)
 }
 
 template <unsigned Digits10>
-cpp_float<Digits10>::cpp_float(const double mantissa, const long long exponent) 
+cpp_dec_float<Digits10>::cpp_dec_float(const double mantissa, const long long exponent) 
  : data     (),
    exp      (static_cast<boost::int64_t>(0)),
    neg      (false),
    fpclass  (mp_finite),
    prec_elem(mp_elem_number)
 {
-   // Create an cpp_float<Digits10> from mantissa and exponent.
+   // Create an cpp_dec_float<Digits10> from mantissa and exponent.
    // This ctor does not maintain the full precision of double.
 
    const bool mantissa_is_iszero = (::fabs(mantissa) < ((std::numeric_limits<double>::min)() * (1.0 + std::numeric_limits<double>::epsilon())));
@@ -2111,7 +2111,7 @@ cpp_float<Digits10>::cpp_float(const double mantissa, const long long exponent)
 }
 
 template <unsigned Digits10>
-cpp_float<Digits10>& cpp_float<Digits10>::operator = (long double a)
+cpp_dec_float<Digits10>& cpp_dec_float<Digits10>::operator = (long double a)
 {
    // Christopher Kormanyos's original code used a cast to long long here, but that fails
    // when long double has more digits than a long long.
@@ -2161,7 +2161,7 @@ cpp_float<Digits10>& cpp_float<Digits10>::operator = (long double a)
 }
 
 template <unsigned Digits10>
-void cpp_float<Digits10>::from_unsigned_long_long(const unsigned long long u)
+void cpp_dec_float<Digits10>::from_unsigned_long_long(const unsigned long long u)
 {
    std::fill(data.begin(), data.end(), static_cast<boost::uint32_t>(0u));
 
@@ -2193,7 +2193,7 @@ void cpp_float<Digits10>::from_unsigned_long_long(const unsigned long long u)
 }
 
 template <unsigned Digits10>
-void cpp_float<Digits10>::mul_loop_uv(const boost::uint32_t* const u, const boost::uint32_t* const v, boost::uint32_t* const w, const boost::int32_t p)
+void cpp_dec_float<Digits10>::mul_loop_uv(const boost::uint32_t* const u, const boost::uint32_t* const v, boost::uint32_t* const w, const boost::int32_t p)
 {
    boost::uint64_t carry = static_cast<boost::uint64_t>(0u);
 
@@ -2214,7 +2214,7 @@ void cpp_float<Digits10>::mul_loop_uv(const boost::uint32_t* const u, const boos
 }
 
 template <unsigned Digits10>
-boost::uint32_t cpp_float<Digits10>::mul_loop_n(boost::uint32_t* const u, boost::uint32_t n, const boost::int32_t p)
+boost::uint32_t cpp_dec_float<Digits10>::mul_loop_n(boost::uint32_t* const u, boost::uint32_t n, const boost::int32_t p)
 {
    boost::uint64_t carry = static_cast<boost::uint64_t>(0u);
 
@@ -2230,7 +2230,7 @@ boost::uint32_t cpp_float<Digits10>::mul_loop_n(boost::uint32_t* const u, boost:
 }
 
 template <unsigned Digits10>
-boost::uint32_t cpp_float<Digits10>::div_loop_n(boost::uint32_t* const u, boost::uint32_t n, const boost::int32_t p)
+boost::uint32_t cpp_dec_float<Digits10>::div_loop_n(boost::uint32_t* const u, boost::uint32_t n, const boost::int32_t p)
 {
    boost::uint64_t prev = static_cast<boost::uint64_t>(0u);
 
@@ -2245,269 +2245,269 @@ boost::uint32_t cpp_float<Digits10>::div_loop_n(boost::uint32_t* const u, boost:
 }
 
 template <unsigned Digits10>
-cpp_float<Digits10> cpp_float<Digits10>::pow2(const long long p)
+cpp_dec_float<Digits10> cpp_dec_float<Digits10>::pow2(const long long p)
 {
    // Create a static const table of p^2 for -128 < p < +128.
    // Note: The size of this table must be odd-numbered and
    // symmetric about 0.
    init.do_nothing();
-   static const boost::array<cpp_float<Digits10>, 255u> p2_data =
+   static const boost::array<cpp_dec_float<Digits10>, 255u> p2_data =
    {{
-      cpp_float("5.877471754111437539843682686111228389093327783860437607543758531392086297273635864257812500000000000e-39"),
-         cpp_float("1.175494350822287507968736537222245677818665556772087521508751706278417259454727172851562500000000000e-38"),
-         cpp_float("2.350988701644575015937473074444491355637331113544175043017503412556834518909454345703125000000000000e-38"),
-         cpp_float("4.701977403289150031874946148888982711274662227088350086035006825113669037818908691406250000000000000e-38"),
-         cpp_float("9.403954806578300063749892297777965422549324454176700172070013650227338075637817382812500000000000000e-38"),
-         cpp_float("1.880790961315660012749978459555593084509864890835340034414002730045467615127563476562500000000000000e-37"),
-         cpp_float("3.761581922631320025499956919111186169019729781670680068828005460090935230255126953125000000000000000e-37"),
-         cpp_float("7.523163845262640050999913838222372338039459563341360137656010920181870460510253906250000000000000000e-37"),
-         cpp_float("1.504632769052528010199982767644474467607891912668272027531202184036374092102050781250000000000000000e-36"),
-         cpp_float("3.009265538105056020399965535288948935215783825336544055062404368072748184204101562500000000000000000e-36"),
-         cpp_float("6.018531076210112040799931070577897870431567650673088110124808736145496368408203125000000000000000000e-36"),
-         cpp_float("1.203706215242022408159986214115579574086313530134617622024961747229099273681640625000000000000000000e-35"),
-         cpp_float("2.407412430484044816319972428231159148172627060269235244049923494458198547363281250000000000000000000e-35"),
-         cpp_float("4.814824860968089632639944856462318296345254120538470488099846988916397094726562500000000000000000000e-35"),
-         cpp_float("9.629649721936179265279889712924636592690508241076940976199693977832794189453125000000000000000000000e-35"),
-         cpp_float("1.925929944387235853055977942584927318538101648215388195239938795566558837890625000000000000000000000e-34"),
-         cpp_float("3.851859888774471706111955885169854637076203296430776390479877591133117675781250000000000000000000000e-34"),
-         cpp_float("7.703719777548943412223911770339709274152406592861552780959755182266235351562500000000000000000000000e-34"),
-         cpp_float("1.540743955509788682444782354067941854830481318572310556191951036453247070312500000000000000000000000e-33"),
-         cpp_float("3.081487911019577364889564708135883709660962637144621112383902072906494140625000000000000000000000000e-33"),
-         cpp_float("6.162975822039154729779129416271767419321925274289242224767804145812988281250000000000000000000000000e-33"),
-         cpp_float("1.232595164407830945955825883254353483864385054857848444953560829162597656250000000000000000000000000e-32"),
-         cpp_float("2.465190328815661891911651766508706967728770109715696889907121658325195312500000000000000000000000000e-32"),
-         cpp_float("4.930380657631323783823303533017413935457540219431393779814243316650390625000000000000000000000000000e-32"),
-         cpp_float("9.860761315262647567646607066034827870915080438862787559628486633300781250000000000000000000000000000e-32"),
-         cpp_float("1.972152263052529513529321413206965574183016087772557511925697326660156250000000000000000000000000000e-31"),
-         cpp_float("3.944304526105059027058642826413931148366032175545115023851394653320312500000000000000000000000000000e-31"),
-         cpp_float("7.888609052210118054117285652827862296732064351090230047702789306640625000000000000000000000000000000e-31"),
-         cpp_float("1.577721810442023610823457130565572459346412870218046009540557861328125000000000000000000000000000000e-30"),
-         cpp_float("3.155443620884047221646914261131144918692825740436092019081115722656250000000000000000000000000000000e-30"),
-         cpp_float("6.310887241768094443293828522262289837385651480872184038162231445312500000000000000000000000000000000e-30"),
-         cpp_float("1.262177448353618888658765704452457967477130296174436807632446289062500000000000000000000000000000000e-29"),
-         cpp_float("2.524354896707237777317531408904915934954260592348873615264892578125000000000000000000000000000000000e-29"),
-         cpp_float("5.048709793414475554635062817809831869908521184697747230529785156250000000000000000000000000000000000e-29"),
-         cpp_float("1.009741958682895110927012563561966373981704236939549446105957031250000000000000000000000000000000000e-28"),
-         cpp_float("2.019483917365790221854025127123932747963408473879098892211914062500000000000000000000000000000000000e-28"),
-         cpp_float("4.038967834731580443708050254247865495926816947758197784423828125000000000000000000000000000000000000e-28"),
-         cpp_float("8.077935669463160887416100508495730991853633895516395568847656250000000000000000000000000000000000000e-28"),
-         cpp_float("1.615587133892632177483220101699146198370726779103279113769531250000000000000000000000000000000000000e-27"),
-         cpp_float("3.231174267785264354966440203398292396741453558206558227539062500000000000000000000000000000000000000e-27"),
-         cpp_float("6.462348535570528709932880406796584793482907116413116455078125000000000000000000000000000000000000000e-27"),
-         cpp_float("1.292469707114105741986576081359316958696581423282623291015625000000000000000000000000000000000000000e-26"),
-         cpp_float("2.584939414228211483973152162718633917393162846565246582031250000000000000000000000000000000000000000e-26"),
-         cpp_float("5.169878828456422967946304325437267834786325693130493164062500000000000000000000000000000000000000000e-26"),
-         cpp_float("1.033975765691284593589260865087453566957265138626098632812500000000000000000000000000000000000000000e-25"),
-         cpp_float("2.067951531382569187178521730174907133914530277252197265625000000000000000000000000000000000000000000e-25"),
-         cpp_float("4.135903062765138374357043460349814267829060554504394531250000000000000000000000000000000000000000000e-25"),
-         cpp_float("8.271806125530276748714086920699628535658121109008789062500000000000000000000000000000000000000000000e-25"),
-         cpp_float("1.654361225106055349742817384139925707131624221801757812500000000000000000000000000000000000000000000e-24"),
-         cpp_float("3.308722450212110699485634768279851414263248443603515625000000000000000000000000000000000000000000000e-24"),
-         cpp_float("6.617444900424221398971269536559702828526496887207031250000000000000000000000000000000000000000000000e-24"),
-         cpp_float("1.323488980084844279794253907311940565705299377441406250000000000000000000000000000000000000000000000e-23"),
-         cpp_float("2.646977960169688559588507814623881131410598754882812500000000000000000000000000000000000000000000000e-23"),
-         cpp_float("5.293955920339377119177015629247762262821197509765625000000000000000000000000000000000000000000000000e-23"),
-         cpp_float("1.058791184067875423835403125849552452564239501953125000000000000000000000000000000000000000000000000e-22"),
-         cpp_float("2.117582368135750847670806251699104905128479003906250000000000000000000000000000000000000000000000000e-22"),
-         cpp_float("4.235164736271501695341612503398209810256958007812500000000000000000000000000000000000000000000000000e-22"),
-         cpp_float("8.470329472543003390683225006796419620513916015625000000000000000000000000000000000000000000000000000e-22"),
-         cpp_float("1.694065894508600678136645001359283924102783203125000000000000000000000000000000000000000000000000000e-21"),
-         cpp_float("3.388131789017201356273290002718567848205566406250000000000000000000000000000000000000000000000000000e-21"),
-         cpp_float("6.776263578034402712546580005437135696411132812500000000000000000000000000000000000000000000000000000e-21"),
-         cpp_float("1.355252715606880542509316001087427139282226562500000000000000000000000000000000000000000000000000000e-20"),
-         cpp_float("2.710505431213761085018632002174854278564453125000000000000000000000000000000000000000000000000000000e-20"),
-         cpp_float("5.421010862427522170037264004349708557128906250000000000000000000000000000000000000000000000000000000e-20"),
-         cpp_float("1.084202172485504434007452800869941711425781250000000000000000000000000000000000000000000000000000000e-19"),
-         cpp_float("2.168404344971008868014905601739883422851562500000000000000000000000000000000000000000000000000000000e-19"),
-         cpp_float("4.336808689942017736029811203479766845703125000000000000000000000000000000000000000000000000000000000e-19"),
-         cpp_float("8.673617379884035472059622406959533691406250000000000000000000000000000000000000000000000000000000000e-19"),
-         cpp_float("1.734723475976807094411924481391906738281250000000000000000000000000000000000000000000000000000000000e-18"),
-         cpp_float("3.469446951953614188823848962783813476562500000000000000000000000000000000000000000000000000000000000e-18"),
-         cpp_float("6.938893903907228377647697925567626953125000000000000000000000000000000000000000000000000000000000000e-18"),
-         cpp_float("1.387778780781445675529539585113525390625000000000000000000000000000000000000000000000000000000000000e-17"),
-         cpp_float("2.775557561562891351059079170227050781250000000000000000000000000000000000000000000000000000000000000e-17"),
-         cpp_float("5.551115123125782702118158340454101562500000000000000000000000000000000000000000000000000000000000000e-17"),
-         cpp_float("1.110223024625156540423631668090820312500000000000000000000000000000000000000000000000000000000000000e-16"),
-         cpp_float("2.220446049250313080847263336181640625000000000000000000000000000000000000000000000000000000000000000e-16"),
-         cpp_float("4.440892098500626161694526672363281250000000000000000000000000000000000000000000000000000000000000000e-16"),
-         cpp_float("8.881784197001252323389053344726562500000000000000000000000000000000000000000000000000000000000000000e-16"),
-         cpp_float("1.776356839400250464677810668945312500000000000000000000000000000000000000000000000000000000000000000e-15"),
-         cpp_float("3.552713678800500929355621337890625000000000000000000000000000000000000000000000000000000000000000000e-15"),
-         cpp_float("7.105427357601001858711242675781250000000000000000000000000000000000000000000000000000000000000000000e-15"),
-         cpp_float("1.421085471520200371742248535156250000000000000000000000000000000000000000000000000000000000000000000e-14"),
-         cpp_float("2.842170943040400743484497070312500000000000000000000000000000000000000000000000000000000000000000000e-14"),
-         cpp_float("5.684341886080801486968994140625000000000000000000000000000000000000000000000000000000000000000000000e-14"),
-         cpp_float("1.136868377216160297393798828125000000000000000000000000000000000000000000000000000000000000000000000e-13"),
-         cpp_float("2.273736754432320594787597656250000000000000000000000000000000000000000000000000000000000000000000000e-13"),
-         cpp_float("4.547473508864641189575195312500000000000000000000000000000000000000000000000000000000000000000000000e-13"),
-         cpp_float("9.094947017729282379150390625000000000000000000000000000000000000000000000000000000000000000000000000e-13"),
-         cpp_float("1.818989403545856475830078125000000000000000000000000000000000000000000000000000000000000000000000000e-12"),
-         cpp_float("3.637978807091712951660156250000000000000000000000000000000000000000000000000000000000000000000000000e-12"),
-         cpp_float("7.275957614183425903320312500000000000000000000000000000000000000000000000000000000000000000000000000e-12"),
-         cpp_float("1.455191522836685180664062500000000000000000000000000000000000000000000000000000000000000000000000000e-11"),
-         cpp_float("2.910383045673370361328125000000000000000000000000000000000000000000000000000000000000000000000000000e-11"),
-         cpp_float("5.820766091346740722656250000000000000000000000000000000000000000000000000000000000000000000000000000e-11"),
-         cpp_float("1.164153218269348144531250000000000000000000000000000000000000000000000000000000000000000000000000000e-10"),
-         cpp_float("2.328306436538696289062500000000000000000000000000000000000000000000000000000000000000000000000000000e-10"),
-         cpp_float("4.656612873077392578125000000000000000000000000000000000000000000000000000000000000000000000000000000e-10"),
-         cpp_float("9.313225746154785156250000000000000000000000000000000000000000000000000000000000000000000000000000000e-10"),
-         cpp_float("1.862645149230957031250000000000000000000000000000000000000000000000000000000000000000000000000000000e-9"),
-         cpp_float("3.725290298461914062500000000000000000000000000000000000000000000000000000000000000000000000000000000e-9"),
-         cpp_float("7.450580596923828125000000000000000000000000000000000000000000000000000000000000000000000000000000000e-9"),
-         cpp_float("1.490116119384765625000000000000000000000000000000000000000000000000000000000000000000000000000000000e-8"),
-         cpp_float("2.980232238769531250000000000000000000000000000000000000000000000000000000000000000000000000000000000e-8"),
-         cpp_float("5.960464477539062500000000000000000000000000000000000000000000000000000000000000000000000000000000000e-8"),
-         cpp_float("1.192092895507812500000000000000000000000000000000000000000000000000000000000000000000000000000000000e-7"),
-         cpp_float("2.384185791015625000000000000000000000000000000000000000000000000000000000000000000000000000000000000e-7"),
-         cpp_float("4.768371582031250000000000000000000000000000000000000000000000000000000000000000000000000000000000000e-7"),
-         cpp_float("9.536743164062500000000000000000000000000000000000000000000000000000000000000000000000000000000000000e-7"),
-         cpp_float("1.907348632812500000000000000000000000000000000000000000000000000000000000000000000000000000000000000e-6"),
-         cpp_float("3.814697265625000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e-6"),
-         cpp_float("7.629394531250000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e-6"),
-         cpp_float("0.000015258789062500000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_float("0.000030517578125000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_float("0.000061035156250000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_float("0.000122070312500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_float("0.000244140625000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_float("0.000488281250000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_float("0.000976562500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_float("0.001953125000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_float("0.003906250000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_float("0.007812500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_float("0.01562500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_float("0.03125000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_float("0.06250000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-         cpp_float("0.125"),
-         cpp_float("0.25"),
-         cpp_float("0.5"),
+      cpp_dec_float("5.877471754111437539843682686111228389093327783860437607543758531392086297273635864257812500000000000e-39"),
+         cpp_dec_float("1.175494350822287507968736537222245677818665556772087521508751706278417259454727172851562500000000000e-38"),
+         cpp_dec_float("2.350988701644575015937473074444491355637331113544175043017503412556834518909454345703125000000000000e-38"),
+         cpp_dec_float("4.701977403289150031874946148888982711274662227088350086035006825113669037818908691406250000000000000e-38"),
+         cpp_dec_float("9.403954806578300063749892297777965422549324454176700172070013650227338075637817382812500000000000000e-38"),
+         cpp_dec_float("1.880790961315660012749978459555593084509864890835340034414002730045467615127563476562500000000000000e-37"),
+         cpp_dec_float("3.761581922631320025499956919111186169019729781670680068828005460090935230255126953125000000000000000e-37"),
+         cpp_dec_float("7.523163845262640050999913838222372338039459563341360137656010920181870460510253906250000000000000000e-37"),
+         cpp_dec_float("1.504632769052528010199982767644474467607891912668272027531202184036374092102050781250000000000000000e-36"),
+         cpp_dec_float("3.009265538105056020399965535288948935215783825336544055062404368072748184204101562500000000000000000e-36"),
+         cpp_dec_float("6.018531076210112040799931070577897870431567650673088110124808736145496368408203125000000000000000000e-36"),
+         cpp_dec_float("1.203706215242022408159986214115579574086313530134617622024961747229099273681640625000000000000000000e-35"),
+         cpp_dec_float("2.407412430484044816319972428231159148172627060269235244049923494458198547363281250000000000000000000e-35"),
+         cpp_dec_float("4.814824860968089632639944856462318296345254120538470488099846988916397094726562500000000000000000000e-35"),
+         cpp_dec_float("9.629649721936179265279889712924636592690508241076940976199693977832794189453125000000000000000000000e-35"),
+         cpp_dec_float("1.925929944387235853055977942584927318538101648215388195239938795566558837890625000000000000000000000e-34"),
+         cpp_dec_float("3.851859888774471706111955885169854637076203296430776390479877591133117675781250000000000000000000000e-34"),
+         cpp_dec_float("7.703719777548943412223911770339709274152406592861552780959755182266235351562500000000000000000000000e-34"),
+         cpp_dec_float("1.540743955509788682444782354067941854830481318572310556191951036453247070312500000000000000000000000e-33"),
+         cpp_dec_float("3.081487911019577364889564708135883709660962637144621112383902072906494140625000000000000000000000000e-33"),
+         cpp_dec_float("6.162975822039154729779129416271767419321925274289242224767804145812988281250000000000000000000000000e-33"),
+         cpp_dec_float("1.232595164407830945955825883254353483864385054857848444953560829162597656250000000000000000000000000e-32"),
+         cpp_dec_float("2.465190328815661891911651766508706967728770109715696889907121658325195312500000000000000000000000000e-32"),
+         cpp_dec_float("4.930380657631323783823303533017413935457540219431393779814243316650390625000000000000000000000000000e-32"),
+         cpp_dec_float("9.860761315262647567646607066034827870915080438862787559628486633300781250000000000000000000000000000e-32"),
+         cpp_dec_float("1.972152263052529513529321413206965574183016087772557511925697326660156250000000000000000000000000000e-31"),
+         cpp_dec_float("3.944304526105059027058642826413931148366032175545115023851394653320312500000000000000000000000000000e-31"),
+         cpp_dec_float("7.888609052210118054117285652827862296732064351090230047702789306640625000000000000000000000000000000e-31"),
+         cpp_dec_float("1.577721810442023610823457130565572459346412870218046009540557861328125000000000000000000000000000000e-30"),
+         cpp_dec_float("3.155443620884047221646914261131144918692825740436092019081115722656250000000000000000000000000000000e-30"),
+         cpp_dec_float("6.310887241768094443293828522262289837385651480872184038162231445312500000000000000000000000000000000e-30"),
+         cpp_dec_float("1.262177448353618888658765704452457967477130296174436807632446289062500000000000000000000000000000000e-29"),
+         cpp_dec_float("2.524354896707237777317531408904915934954260592348873615264892578125000000000000000000000000000000000e-29"),
+         cpp_dec_float("5.048709793414475554635062817809831869908521184697747230529785156250000000000000000000000000000000000e-29"),
+         cpp_dec_float("1.009741958682895110927012563561966373981704236939549446105957031250000000000000000000000000000000000e-28"),
+         cpp_dec_float("2.019483917365790221854025127123932747963408473879098892211914062500000000000000000000000000000000000e-28"),
+         cpp_dec_float("4.038967834731580443708050254247865495926816947758197784423828125000000000000000000000000000000000000e-28"),
+         cpp_dec_float("8.077935669463160887416100508495730991853633895516395568847656250000000000000000000000000000000000000e-28"),
+         cpp_dec_float("1.615587133892632177483220101699146198370726779103279113769531250000000000000000000000000000000000000e-27"),
+         cpp_dec_float("3.231174267785264354966440203398292396741453558206558227539062500000000000000000000000000000000000000e-27"),
+         cpp_dec_float("6.462348535570528709932880406796584793482907116413116455078125000000000000000000000000000000000000000e-27"),
+         cpp_dec_float("1.292469707114105741986576081359316958696581423282623291015625000000000000000000000000000000000000000e-26"),
+         cpp_dec_float("2.584939414228211483973152162718633917393162846565246582031250000000000000000000000000000000000000000e-26"),
+         cpp_dec_float("5.169878828456422967946304325437267834786325693130493164062500000000000000000000000000000000000000000e-26"),
+         cpp_dec_float("1.033975765691284593589260865087453566957265138626098632812500000000000000000000000000000000000000000e-25"),
+         cpp_dec_float("2.067951531382569187178521730174907133914530277252197265625000000000000000000000000000000000000000000e-25"),
+         cpp_dec_float("4.135903062765138374357043460349814267829060554504394531250000000000000000000000000000000000000000000e-25"),
+         cpp_dec_float("8.271806125530276748714086920699628535658121109008789062500000000000000000000000000000000000000000000e-25"),
+         cpp_dec_float("1.654361225106055349742817384139925707131624221801757812500000000000000000000000000000000000000000000e-24"),
+         cpp_dec_float("3.308722450212110699485634768279851414263248443603515625000000000000000000000000000000000000000000000e-24"),
+         cpp_dec_float("6.617444900424221398971269536559702828526496887207031250000000000000000000000000000000000000000000000e-24"),
+         cpp_dec_float("1.323488980084844279794253907311940565705299377441406250000000000000000000000000000000000000000000000e-23"),
+         cpp_dec_float("2.646977960169688559588507814623881131410598754882812500000000000000000000000000000000000000000000000e-23"),
+         cpp_dec_float("5.293955920339377119177015629247762262821197509765625000000000000000000000000000000000000000000000000e-23"),
+         cpp_dec_float("1.058791184067875423835403125849552452564239501953125000000000000000000000000000000000000000000000000e-22"),
+         cpp_dec_float("2.117582368135750847670806251699104905128479003906250000000000000000000000000000000000000000000000000e-22"),
+         cpp_dec_float("4.235164736271501695341612503398209810256958007812500000000000000000000000000000000000000000000000000e-22"),
+         cpp_dec_float("8.470329472543003390683225006796419620513916015625000000000000000000000000000000000000000000000000000e-22"),
+         cpp_dec_float("1.694065894508600678136645001359283924102783203125000000000000000000000000000000000000000000000000000e-21"),
+         cpp_dec_float("3.388131789017201356273290002718567848205566406250000000000000000000000000000000000000000000000000000e-21"),
+         cpp_dec_float("6.776263578034402712546580005437135696411132812500000000000000000000000000000000000000000000000000000e-21"),
+         cpp_dec_float("1.355252715606880542509316001087427139282226562500000000000000000000000000000000000000000000000000000e-20"),
+         cpp_dec_float("2.710505431213761085018632002174854278564453125000000000000000000000000000000000000000000000000000000e-20"),
+         cpp_dec_float("5.421010862427522170037264004349708557128906250000000000000000000000000000000000000000000000000000000e-20"),
+         cpp_dec_float("1.084202172485504434007452800869941711425781250000000000000000000000000000000000000000000000000000000e-19"),
+         cpp_dec_float("2.168404344971008868014905601739883422851562500000000000000000000000000000000000000000000000000000000e-19"),
+         cpp_dec_float("4.336808689942017736029811203479766845703125000000000000000000000000000000000000000000000000000000000e-19"),
+         cpp_dec_float("8.673617379884035472059622406959533691406250000000000000000000000000000000000000000000000000000000000e-19"),
+         cpp_dec_float("1.734723475976807094411924481391906738281250000000000000000000000000000000000000000000000000000000000e-18"),
+         cpp_dec_float("3.469446951953614188823848962783813476562500000000000000000000000000000000000000000000000000000000000e-18"),
+         cpp_dec_float("6.938893903907228377647697925567626953125000000000000000000000000000000000000000000000000000000000000e-18"),
+         cpp_dec_float("1.387778780781445675529539585113525390625000000000000000000000000000000000000000000000000000000000000e-17"),
+         cpp_dec_float("2.775557561562891351059079170227050781250000000000000000000000000000000000000000000000000000000000000e-17"),
+         cpp_dec_float("5.551115123125782702118158340454101562500000000000000000000000000000000000000000000000000000000000000e-17"),
+         cpp_dec_float("1.110223024625156540423631668090820312500000000000000000000000000000000000000000000000000000000000000e-16"),
+         cpp_dec_float("2.220446049250313080847263336181640625000000000000000000000000000000000000000000000000000000000000000e-16"),
+         cpp_dec_float("4.440892098500626161694526672363281250000000000000000000000000000000000000000000000000000000000000000e-16"),
+         cpp_dec_float("8.881784197001252323389053344726562500000000000000000000000000000000000000000000000000000000000000000e-16"),
+         cpp_dec_float("1.776356839400250464677810668945312500000000000000000000000000000000000000000000000000000000000000000e-15"),
+         cpp_dec_float("3.552713678800500929355621337890625000000000000000000000000000000000000000000000000000000000000000000e-15"),
+         cpp_dec_float("7.105427357601001858711242675781250000000000000000000000000000000000000000000000000000000000000000000e-15"),
+         cpp_dec_float("1.421085471520200371742248535156250000000000000000000000000000000000000000000000000000000000000000000e-14"),
+         cpp_dec_float("2.842170943040400743484497070312500000000000000000000000000000000000000000000000000000000000000000000e-14"),
+         cpp_dec_float("5.684341886080801486968994140625000000000000000000000000000000000000000000000000000000000000000000000e-14"),
+         cpp_dec_float("1.136868377216160297393798828125000000000000000000000000000000000000000000000000000000000000000000000e-13"),
+         cpp_dec_float("2.273736754432320594787597656250000000000000000000000000000000000000000000000000000000000000000000000e-13"),
+         cpp_dec_float("4.547473508864641189575195312500000000000000000000000000000000000000000000000000000000000000000000000e-13"),
+         cpp_dec_float("9.094947017729282379150390625000000000000000000000000000000000000000000000000000000000000000000000000e-13"),
+         cpp_dec_float("1.818989403545856475830078125000000000000000000000000000000000000000000000000000000000000000000000000e-12"),
+         cpp_dec_float("3.637978807091712951660156250000000000000000000000000000000000000000000000000000000000000000000000000e-12"),
+         cpp_dec_float("7.275957614183425903320312500000000000000000000000000000000000000000000000000000000000000000000000000e-12"),
+         cpp_dec_float("1.455191522836685180664062500000000000000000000000000000000000000000000000000000000000000000000000000e-11"),
+         cpp_dec_float("2.910383045673370361328125000000000000000000000000000000000000000000000000000000000000000000000000000e-11"),
+         cpp_dec_float("5.820766091346740722656250000000000000000000000000000000000000000000000000000000000000000000000000000e-11"),
+         cpp_dec_float("1.164153218269348144531250000000000000000000000000000000000000000000000000000000000000000000000000000e-10"),
+         cpp_dec_float("2.328306436538696289062500000000000000000000000000000000000000000000000000000000000000000000000000000e-10"),
+         cpp_dec_float("4.656612873077392578125000000000000000000000000000000000000000000000000000000000000000000000000000000e-10"),
+         cpp_dec_float("9.313225746154785156250000000000000000000000000000000000000000000000000000000000000000000000000000000e-10"),
+         cpp_dec_float("1.862645149230957031250000000000000000000000000000000000000000000000000000000000000000000000000000000e-9"),
+         cpp_dec_float("3.725290298461914062500000000000000000000000000000000000000000000000000000000000000000000000000000000e-9"),
+         cpp_dec_float("7.450580596923828125000000000000000000000000000000000000000000000000000000000000000000000000000000000e-9"),
+         cpp_dec_float("1.490116119384765625000000000000000000000000000000000000000000000000000000000000000000000000000000000e-8"),
+         cpp_dec_float("2.980232238769531250000000000000000000000000000000000000000000000000000000000000000000000000000000000e-8"),
+         cpp_dec_float("5.960464477539062500000000000000000000000000000000000000000000000000000000000000000000000000000000000e-8"),
+         cpp_dec_float("1.192092895507812500000000000000000000000000000000000000000000000000000000000000000000000000000000000e-7"),
+         cpp_dec_float("2.384185791015625000000000000000000000000000000000000000000000000000000000000000000000000000000000000e-7"),
+         cpp_dec_float("4.768371582031250000000000000000000000000000000000000000000000000000000000000000000000000000000000000e-7"),
+         cpp_dec_float("9.536743164062500000000000000000000000000000000000000000000000000000000000000000000000000000000000000e-7"),
+         cpp_dec_float("1.907348632812500000000000000000000000000000000000000000000000000000000000000000000000000000000000000e-6"),
+         cpp_dec_float("3.814697265625000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e-6"),
+         cpp_dec_float("7.629394531250000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e-6"),
+         cpp_dec_float("0.000015258789062500000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
+         cpp_dec_float("0.000030517578125000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
+         cpp_dec_float("0.000061035156250000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
+         cpp_dec_float("0.000122070312500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
+         cpp_dec_float("0.000244140625000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
+         cpp_dec_float("0.000488281250000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
+         cpp_dec_float("0.000976562500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
+         cpp_dec_float("0.001953125000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
+         cpp_dec_float("0.003906250000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
+         cpp_dec_float("0.007812500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
+         cpp_dec_float("0.01562500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
+         cpp_dec_float("0.03125000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
+         cpp_dec_float("0.06250000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
+         cpp_dec_float("0.125"),
+         cpp_dec_float("0.25"),
+         cpp_dec_float("0.5"),
          one(),
          two(),
-         cpp_float(static_cast<unsigned long long>(4)),
-         cpp_float(static_cast<unsigned long long>(8)),
-         cpp_float(static_cast<unsigned long long>(16)),
-         cpp_float(static_cast<unsigned long long>(32)),
-         cpp_float(static_cast<unsigned long long>(64)),
-         cpp_float(static_cast<unsigned long long>(128)),
-         cpp_float(static_cast<unsigned long long>(256)),
-         cpp_float(static_cast<unsigned long long>(512)),
-         cpp_float(static_cast<unsigned long long>(1024)),
-         cpp_float(static_cast<unsigned long long>(2048)),
-         cpp_float(static_cast<unsigned long long>(4096)),
-         cpp_float(static_cast<unsigned long long>(8192)),
-         cpp_float(static_cast<unsigned long long>(16384)),
-         cpp_float(static_cast<unsigned long long>(32768)),
-         cpp_float(static_cast<unsigned long long>(65536)),
-         cpp_float(static_cast<unsigned long long>(131072)),
-         cpp_float(static_cast<unsigned long long>(262144)),
-         cpp_float(static_cast<unsigned long long>(524288)),
-         cpp_float(static_cast<boost::uint64_t>(1uL << 20u)),
-         cpp_float(static_cast<boost::uint64_t>(1uL << 21u)),
-         cpp_float(static_cast<boost::uint64_t>(1uL << 22u)),
-         cpp_float(static_cast<boost::uint64_t>(1uL << 23u)),
-         cpp_float(static_cast<boost::uint64_t>(1uL << 24u)),
-         cpp_float(static_cast<boost::uint64_t>(1uL << 25u)),
-         cpp_float(static_cast<boost::uint64_t>(1uL << 26u)),
-         cpp_float(static_cast<boost::uint64_t>(1uL << 27u)),
-         cpp_float(static_cast<boost::uint64_t>(1uL << 28u)),
-         cpp_float(static_cast<boost::uint64_t>(1uL << 29u)),
-         cpp_float(static_cast<boost::uint64_t>(1uL << 30u)),
-         cpp_float(static_cast<boost::uint64_t>(1uL << 31u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 32u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 33u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 34u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 35u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 36u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 37u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 38u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 39u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 40u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 41u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 42u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 43u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 44u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 45u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 46u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 47u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 48u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 49u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 50u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 51u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 52u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 53u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 54u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 55u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 56u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 57u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 58u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 59u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 60u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 61u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 62u)),
-         cpp_float(static_cast<boost::uint64_t>(1uLL << 63u)),
-         cpp_float("1.844674407370955161600000000000000000000000000000000000000000000000000000000000000000000000000000000e19"),
-         cpp_float("3.689348814741910323200000000000000000000000000000000000000000000000000000000000000000000000000000000e19"),
-         cpp_float("7.378697629483820646400000000000000000000000000000000000000000000000000000000000000000000000000000000e19"),
-         cpp_float("1.475739525896764129280000000000000000000000000000000000000000000000000000000000000000000000000000000e20"),
-         cpp_float("2.951479051793528258560000000000000000000000000000000000000000000000000000000000000000000000000000000e20"),
-         cpp_float("5.902958103587056517120000000000000000000000000000000000000000000000000000000000000000000000000000000e20"),
-         cpp_float("1.180591620717411303424000000000000000000000000000000000000000000000000000000000000000000000000000000e21"),
-         cpp_float("2.361183241434822606848000000000000000000000000000000000000000000000000000000000000000000000000000000e21"),
-         cpp_float("4.722366482869645213696000000000000000000000000000000000000000000000000000000000000000000000000000000e21"),
-         cpp_float("9.444732965739290427392000000000000000000000000000000000000000000000000000000000000000000000000000000e21"),
-         cpp_float("1.888946593147858085478400000000000000000000000000000000000000000000000000000000000000000000000000000e22"),
-         cpp_float("3.777893186295716170956800000000000000000000000000000000000000000000000000000000000000000000000000000e22"),
-         cpp_float("7.555786372591432341913600000000000000000000000000000000000000000000000000000000000000000000000000000e22"),
-         cpp_float("1.511157274518286468382720000000000000000000000000000000000000000000000000000000000000000000000000000e23"),
-         cpp_float("3.022314549036572936765440000000000000000000000000000000000000000000000000000000000000000000000000000e23"),
-         cpp_float("6.044629098073145873530880000000000000000000000000000000000000000000000000000000000000000000000000000e23"),
-         cpp_float("1.208925819614629174706176000000000000000000000000000000000000000000000000000000000000000000000000000e24"),
-         cpp_float("2.417851639229258349412352000000000000000000000000000000000000000000000000000000000000000000000000000e24"),
-         cpp_float("4.835703278458516698824704000000000000000000000000000000000000000000000000000000000000000000000000000e24"),
-         cpp_float("9.671406556917033397649408000000000000000000000000000000000000000000000000000000000000000000000000000e24"),
-         cpp_float("1.934281311383406679529881600000000000000000000000000000000000000000000000000000000000000000000000000e25"),
-         cpp_float("3.868562622766813359059763200000000000000000000000000000000000000000000000000000000000000000000000000e25"),
-         cpp_float("7.737125245533626718119526400000000000000000000000000000000000000000000000000000000000000000000000000e25"),
-         cpp_float("1.547425049106725343623905280000000000000000000000000000000000000000000000000000000000000000000000000e26"),
-         cpp_float("3.094850098213450687247810560000000000000000000000000000000000000000000000000000000000000000000000000e26"),
-         cpp_float("6.189700196426901374495621120000000000000000000000000000000000000000000000000000000000000000000000000e26"),
-         cpp_float("1.237940039285380274899124224000000000000000000000000000000000000000000000000000000000000000000000000e27"),
-         cpp_float("2.475880078570760549798248448000000000000000000000000000000000000000000000000000000000000000000000000e27"),
-         cpp_float("4.951760157141521099596496896000000000000000000000000000000000000000000000000000000000000000000000000e27"),
-         cpp_float("9.903520314283042199192993792000000000000000000000000000000000000000000000000000000000000000000000000e27"),
-         cpp_float("1.980704062856608439838598758400000000000000000000000000000000000000000000000000000000000000000000000e28"),
-         cpp_float("3.961408125713216879677197516800000000000000000000000000000000000000000000000000000000000000000000000e28"),
-         cpp_float("7.922816251426433759354395033600000000000000000000000000000000000000000000000000000000000000000000000e28"),
-         cpp_float("1.584563250285286751870879006720000000000000000000000000000000000000000000000000000000000000000000000e29"),
-         cpp_float("3.169126500570573503741758013440000000000000000000000000000000000000000000000000000000000000000000000e29"),
-         cpp_float("6.338253001141147007483516026880000000000000000000000000000000000000000000000000000000000000000000000e29"),
-         cpp_float("1.267650600228229401496703205376000000000000000000000000000000000000000000000000000000000000000000000e30"),
-         cpp_float("2.535301200456458802993406410752000000000000000000000000000000000000000000000000000000000000000000000e30"),
-         cpp_float("5.070602400912917605986812821504000000000000000000000000000000000000000000000000000000000000000000000e30"),
-         cpp_float("1.014120480182583521197362564300800000000000000000000000000000000000000000000000000000000000000000000e31"),
-         cpp_float("2.028240960365167042394725128601600000000000000000000000000000000000000000000000000000000000000000000e31"),
-         cpp_float("4.056481920730334084789450257203200000000000000000000000000000000000000000000000000000000000000000000e31"),
-         cpp_float("8.112963841460668169578900514406400000000000000000000000000000000000000000000000000000000000000000000e31"),
-         cpp_float("1.622592768292133633915780102881280000000000000000000000000000000000000000000000000000000000000000000e32"),
-         cpp_float("3.245185536584267267831560205762560000000000000000000000000000000000000000000000000000000000000000000e32"),
-         cpp_float("6.490371073168534535663120411525120000000000000000000000000000000000000000000000000000000000000000000e32"),
-         cpp_float("1.298074214633706907132624082305024000000000000000000000000000000000000000000000000000000000000000000e33"),
-         cpp_float("2.596148429267413814265248164610048000000000000000000000000000000000000000000000000000000000000000000e33"),
-         cpp_float("5.192296858534827628530496329220096000000000000000000000000000000000000000000000000000000000000000000e33"),
-         cpp_float("1.038459371706965525706099265844019200000000000000000000000000000000000000000000000000000000000000000e34"),
-         cpp_float("2.076918743413931051412198531688038400000000000000000000000000000000000000000000000000000000000000000e34"),
-         cpp_float("4.153837486827862102824397063376076800000000000000000000000000000000000000000000000000000000000000000e34"),
-         cpp_float("8.307674973655724205648794126752153600000000000000000000000000000000000000000000000000000000000000000e34"),
-         cpp_float("1.661534994731144841129758825350430720000000000000000000000000000000000000000000000000000000000000000e35"),
-         cpp_float("3.323069989462289682259517650700861440000000000000000000000000000000000000000000000000000000000000000e35"),
-         cpp_float("6.646139978924579364519035301401722880000000000000000000000000000000000000000000000000000000000000000e35"),
-         cpp_float("1.329227995784915872903807060280344576000000000000000000000000000000000000000000000000000000000000000e36"),
-         cpp_float("2.658455991569831745807614120560689152000000000000000000000000000000000000000000000000000000000000000e36"),
-         cpp_float("5.316911983139663491615228241121378304000000000000000000000000000000000000000000000000000000000000000e36"),
-         cpp_float("1.063382396627932698323045648224275660800000000000000000000000000000000000000000000000000000000000000e37"),
-         cpp_float("2.126764793255865396646091296448551321600000000000000000000000000000000000000000000000000000000000000e37"),
-         cpp_float("4.253529586511730793292182592897102643200000000000000000000000000000000000000000000000000000000000000e37"),
-         cpp_float("8.507059173023461586584365185794205286400000000000000000000000000000000000000000000000000000000000000e37"),
-         cpp_float("1.701411834604692317316873037158841057280000000000000000000000000000000000000000000000000000000000000e38")
+         cpp_dec_float(static_cast<unsigned long long>(4)),
+         cpp_dec_float(static_cast<unsigned long long>(8)),
+         cpp_dec_float(static_cast<unsigned long long>(16)),
+         cpp_dec_float(static_cast<unsigned long long>(32)),
+         cpp_dec_float(static_cast<unsigned long long>(64)),
+         cpp_dec_float(static_cast<unsigned long long>(128)),
+         cpp_dec_float(static_cast<unsigned long long>(256)),
+         cpp_dec_float(static_cast<unsigned long long>(512)),
+         cpp_dec_float(static_cast<unsigned long long>(1024)),
+         cpp_dec_float(static_cast<unsigned long long>(2048)),
+         cpp_dec_float(static_cast<unsigned long long>(4096)),
+         cpp_dec_float(static_cast<unsigned long long>(8192)),
+         cpp_dec_float(static_cast<unsigned long long>(16384)),
+         cpp_dec_float(static_cast<unsigned long long>(32768)),
+         cpp_dec_float(static_cast<unsigned long long>(65536)),
+         cpp_dec_float(static_cast<unsigned long long>(131072)),
+         cpp_dec_float(static_cast<unsigned long long>(262144)),
+         cpp_dec_float(static_cast<unsigned long long>(524288)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uL << 20u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uL << 21u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uL << 22u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uL << 23u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uL << 24u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uL << 25u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uL << 26u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uL << 27u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uL << 28u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uL << 29u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uL << 30u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uL << 31u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 32u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 33u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 34u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 35u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 36u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 37u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 38u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 39u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 40u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 41u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 42u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 43u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 44u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 45u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 46u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 47u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 48u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 49u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 50u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 51u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 52u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 53u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 54u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 55u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 56u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 57u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 58u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 59u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 60u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 61u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 62u)),
+         cpp_dec_float(static_cast<boost::uint64_t>(1uLL << 63u)),
+         cpp_dec_float("1.844674407370955161600000000000000000000000000000000000000000000000000000000000000000000000000000000e19"),
+         cpp_dec_float("3.689348814741910323200000000000000000000000000000000000000000000000000000000000000000000000000000000e19"),
+         cpp_dec_float("7.378697629483820646400000000000000000000000000000000000000000000000000000000000000000000000000000000e19"),
+         cpp_dec_float("1.475739525896764129280000000000000000000000000000000000000000000000000000000000000000000000000000000e20"),
+         cpp_dec_float("2.951479051793528258560000000000000000000000000000000000000000000000000000000000000000000000000000000e20"),
+         cpp_dec_float("5.902958103587056517120000000000000000000000000000000000000000000000000000000000000000000000000000000e20"),
+         cpp_dec_float("1.180591620717411303424000000000000000000000000000000000000000000000000000000000000000000000000000000e21"),
+         cpp_dec_float("2.361183241434822606848000000000000000000000000000000000000000000000000000000000000000000000000000000e21"),
+         cpp_dec_float("4.722366482869645213696000000000000000000000000000000000000000000000000000000000000000000000000000000e21"),
+         cpp_dec_float("9.444732965739290427392000000000000000000000000000000000000000000000000000000000000000000000000000000e21"),
+         cpp_dec_float("1.888946593147858085478400000000000000000000000000000000000000000000000000000000000000000000000000000e22"),
+         cpp_dec_float("3.777893186295716170956800000000000000000000000000000000000000000000000000000000000000000000000000000e22"),
+         cpp_dec_float("7.555786372591432341913600000000000000000000000000000000000000000000000000000000000000000000000000000e22"),
+         cpp_dec_float("1.511157274518286468382720000000000000000000000000000000000000000000000000000000000000000000000000000e23"),
+         cpp_dec_float("3.022314549036572936765440000000000000000000000000000000000000000000000000000000000000000000000000000e23"),
+         cpp_dec_float("6.044629098073145873530880000000000000000000000000000000000000000000000000000000000000000000000000000e23"),
+         cpp_dec_float("1.208925819614629174706176000000000000000000000000000000000000000000000000000000000000000000000000000e24"),
+         cpp_dec_float("2.417851639229258349412352000000000000000000000000000000000000000000000000000000000000000000000000000e24"),
+         cpp_dec_float("4.835703278458516698824704000000000000000000000000000000000000000000000000000000000000000000000000000e24"),
+         cpp_dec_float("9.671406556917033397649408000000000000000000000000000000000000000000000000000000000000000000000000000e24"),
+         cpp_dec_float("1.934281311383406679529881600000000000000000000000000000000000000000000000000000000000000000000000000e25"),
+         cpp_dec_float("3.868562622766813359059763200000000000000000000000000000000000000000000000000000000000000000000000000e25"),
+         cpp_dec_float("7.737125245533626718119526400000000000000000000000000000000000000000000000000000000000000000000000000e25"),
+         cpp_dec_float("1.547425049106725343623905280000000000000000000000000000000000000000000000000000000000000000000000000e26"),
+         cpp_dec_float("3.094850098213450687247810560000000000000000000000000000000000000000000000000000000000000000000000000e26"),
+         cpp_dec_float("6.189700196426901374495621120000000000000000000000000000000000000000000000000000000000000000000000000e26"),
+         cpp_dec_float("1.237940039285380274899124224000000000000000000000000000000000000000000000000000000000000000000000000e27"),
+         cpp_dec_float("2.475880078570760549798248448000000000000000000000000000000000000000000000000000000000000000000000000e27"),
+         cpp_dec_float("4.951760157141521099596496896000000000000000000000000000000000000000000000000000000000000000000000000e27"),
+         cpp_dec_float("9.903520314283042199192993792000000000000000000000000000000000000000000000000000000000000000000000000e27"),
+         cpp_dec_float("1.980704062856608439838598758400000000000000000000000000000000000000000000000000000000000000000000000e28"),
+         cpp_dec_float("3.961408125713216879677197516800000000000000000000000000000000000000000000000000000000000000000000000e28"),
+         cpp_dec_float("7.922816251426433759354395033600000000000000000000000000000000000000000000000000000000000000000000000e28"),
+         cpp_dec_float("1.584563250285286751870879006720000000000000000000000000000000000000000000000000000000000000000000000e29"),
+         cpp_dec_float("3.169126500570573503741758013440000000000000000000000000000000000000000000000000000000000000000000000e29"),
+         cpp_dec_float("6.338253001141147007483516026880000000000000000000000000000000000000000000000000000000000000000000000e29"),
+         cpp_dec_float("1.267650600228229401496703205376000000000000000000000000000000000000000000000000000000000000000000000e30"),
+         cpp_dec_float("2.535301200456458802993406410752000000000000000000000000000000000000000000000000000000000000000000000e30"),
+         cpp_dec_float("5.070602400912917605986812821504000000000000000000000000000000000000000000000000000000000000000000000e30"),
+         cpp_dec_float("1.014120480182583521197362564300800000000000000000000000000000000000000000000000000000000000000000000e31"),
+         cpp_dec_float("2.028240960365167042394725128601600000000000000000000000000000000000000000000000000000000000000000000e31"),
+         cpp_dec_float("4.056481920730334084789450257203200000000000000000000000000000000000000000000000000000000000000000000e31"),
+         cpp_dec_float("8.112963841460668169578900514406400000000000000000000000000000000000000000000000000000000000000000000e31"),
+         cpp_dec_float("1.622592768292133633915780102881280000000000000000000000000000000000000000000000000000000000000000000e32"),
+         cpp_dec_float("3.245185536584267267831560205762560000000000000000000000000000000000000000000000000000000000000000000e32"),
+         cpp_dec_float("6.490371073168534535663120411525120000000000000000000000000000000000000000000000000000000000000000000e32"),
+         cpp_dec_float("1.298074214633706907132624082305024000000000000000000000000000000000000000000000000000000000000000000e33"),
+         cpp_dec_float("2.596148429267413814265248164610048000000000000000000000000000000000000000000000000000000000000000000e33"),
+         cpp_dec_float("5.192296858534827628530496329220096000000000000000000000000000000000000000000000000000000000000000000e33"),
+         cpp_dec_float("1.038459371706965525706099265844019200000000000000000000000000000000000000000000000000000000000000000e34"),
+         cpp_dec_float("2.076918743413931051412198531688038400000000000000000000000000000000000000000000000000000000000000000e34"),
+         cpp_dec_float("4.153837486827862102824397063376076800000000000000000000000000000000000000000000000000000000000000000e34"),
+         cpp_dec_float("8.307674973655724205648794126752153600000000000000000000000000000000000000000000000000000000000000000e34"),
+         cpp_dec_float("1.661534994731144841129758825350430720000000000000000000000000000000000000000000000000000000000000000e35"),
+         cpp_dec_float("3.323069989462289682259517650700861440000000000000000000000000000000000000000000000000000000000000000e35"),
+         cpp_dec_float("6.646139978924579364519035301401722880000000000000000000000000000000000000000000000000000000000000000e35"),
+         cpp_dec_float("1.329227995784915872903807060280344576000000000000000000000000000000000000000000000000000000000000000e36"),
+         cpp_dec_float("2.658455991569831745807614120560689152000000000000000000000000000000000000000000000000000000000000000e36"),
+         cpp_dec_float("5.316911983139663491615228241121378304000000000000000000000000000000000000000000000000000000000000000e36"),
+         cpp_dec_float("1.063382396627932698323045648224275660800000000000000000000000000000000000000000000000000000000000000e37"),
+         cpp_dec_float("2.126764793255865396646091296448551321600000000000000000000000000000000000000000000000000000000000000e37"),
+         cpp_dec_float("4.253529586511730793292182592897102643200000000000000000000000000000000000000000000000000000000000000e37"),
+         cpp_dec_float("8.507059173023461586584365185794205286400000000000000000000000000000000000000000000000000000000000000e37"),
+         cpp_dec_float("1.701411834604692317316873037158841057280000000000000000000000000000000000000000000000000000000000000e38")
    }};
 
    if((p > static_cast<boost::int64_t>(-128)) && (p < static_cast<boost::int64_t>(+128)))
@@ -2523,11 +2523,11 @@ cpp_float<Digits10> cpp_float<Digits10>::pow2(const long long p)
    else if(p < static_cast<boost::int64_t>(std::numeric_limits<boost::uint64_t>::digits))
    {
       const boost::uint64_t p2 = static_cast<boost::uint64_t>(static_cast<boost::uint64_t>(1uLL) << p);
-      return cpp_float(p2);
+      return cpp_dec_float(p2);
    }
    else
    {
-      cpp_float<Digits10> t;
+      cpp_dec_float<Digits10> t;
       default_ops::detail::pow_imp(t, two(), p, mpl::true_());
       return t;
    }
@@ -2535,49 +2535,49 @@ cpp_float<Digits10> cpp_float<Digits10>::pow2(const long long p)
 
 
 template <unsigned Digits10>
-inline void add(cpp_float<Digits10>& result, const cpp_float<Digits10>& o)
+inline void add(cpp_dec_float<Digits10>& result, const cpp_dec_float<Digits10>& o)
 {
    result += o;
 }
 template <unsigned Digits10>
-inline void subtract(cpp_float<Digits10>& result, const cpp_float<Digits10>& o)
+inline void subtract(cpp_dec_float<Digits10>& result, const cpp_dec_float<Digits10>& o)
 {
    result -= o;
 }
 template <unsigned Digits10>
-inline void multiply(cpp_float<Digits10>& result, const cpp_float<Digits10>& o)
+inline void multiply(cpp_dec_float<Digits10>& result, const cpp_dec_float<Digits10>& o)
 {
    result *= o;
 }
 template <unsigned Digits10>
-inline void divide(cpp_float<Digits10>& result, const cpp_float<Digits10>& o)
+inline void divide(cpp_dec_float<Digits10>& result, const cpp_dec_float<Digits10>& o)
 {
    result /= o;
 }
 
 template <unsigned Digits10>
-inline void add(cpp_float<Digits10>& result, const unsigned long long& o)
+inline void add(cpp_dec_float<Digits10>& result, const unsigned long long& o)
 {
    result.add_unsigned_long_long(o);
 }
 template <unsigned Digits10>
-inline void subtract(cpp_float<Digits10>& result, const unsigned long long& o)
+inline void subtract(cpp_dec_float<Digits10>& result, const unsigned long long& o)
 {
    result.sub_unsigned_long_long(o);
 }
 template <unsigned Digits10>
-inline void multiply(cpp_float<Digits10>& result, const unsigned long long& o)
+inline void multiply(cpp_dec_float<Digits10>& result, const unsigned long long& o)
 {
    result.mul_unsigned_long_long(o);
 }
 template <unsigned Digits10>
-inline void divide(cpp_float<Digits10>& result, const unsigned long long& o)
+inline void divide(cpp_dec_float<Digits10>& result, const unsigned long long& o)
 {
    result.div_unsigned_long_long(o);
 }
 
 template <unsigned Digits10>
-inline void add(cpp_float<Digits10>& result, long long o)
+inline void add(cpp_dec_float<Digits10>& result, long long o)
 {
    if(o < 0)
       result.sub_unsigned_long_long(-o);
@@ -2585,7 +2585,7 @@ inline void add(cpp_float<Digits10>& result, long long o)
       result.add_unsigned_long_long(o);
 }
 template <unsigned Digits10>
-inline void subtract(cpp_float<Digits10>& result, long long o)
+inline void subtract(cpp_dec_float<Digits10>& result, long long o)
 {
    if(o < 0)
       result.add_unsigned_long_long(-o);
@@ -2593,7 +2593,7 @@ inline void subtract(cpp_float<Digits10>& result, long long o)
       result.sub_unsigned_long_long(o);
 }
 template <unsigned Digits10>
-inline void multiply(cpp_float<Digits10>& result, long long o)
+inline void multiply(cpp_dec_float<Digits10>& result, long long o)
 {
    if(o < 0)
    {
@@ -2604,7 +2604,7 @@ inline void multiply(cpp_float<Digits10>& result, long long o)
       result.mul_unsigned_long_long(o);
 }
 template <unsigned Digits10>
-inline void divide(cpp_float<Digits10>& result, long long o)
+inline void divide(cpp_dec_float<Digits10>& result, long long o)
 {
    if(o < 0)
    {
@@ -2616,17 +2616,17 @@ inline void divide(cpp_float<Digits10>& result, long long o)
 }
 
 template <unsigned Digits10>
-inline void convert_to(unsigned long long* result, const cpp_float<Digits10>& val)
+inline void convert_to(unsigned long long* result, const cpp_dec_float<Digits10>& val)
 {
    *result = val.extract_unsigned_long_long();
 }
 template <unsigned Digits10>
-inline void convert_to(long long* result, const cpp_float<Digits10>& val)
+inline void convert_to(long long* result, const cpp_dec_float<Digits10>& val)
 {
    *result = val.extract_signed_long_long();
 }
 template <unsigned Digits10>
-inline void convert_to(long double* result, cpp_float<Digits10>& val)
+inline void convert_to(long double* result, cpp_dec_float<Digits10>& val)
 {
    *result = val.extract_long_double();
 }
@@ -2635,7 +2635,7 @@ inline void convert_to(long double* result, cpp_float<Digits10>& val)
 // Non member function support:
 //
 template <unsigned Digits10>
-inline int eval_fpclassify(const cpp_float<Digits10>& x)
+inline int eval_fpclassify(const cpp_dec_float<Digits10>& x)
 {
    if(x.isinf())
       return FP_INFINITE;
@@ -2647,7 +2647,7 @@ inline int eval_fpclassify(const cpp_float<Digits10>& x)
 }
 
 template <unsigned Digits10>
-inline void eval_abs(cpp_float<Digits10>& result, const cpp_float<Digits10>& x)
+inline void eval_abs(cpp_dec_float<Digits10>& result, const cpp_dec_float<Digits10>& x)
 {
    result = x;
    if(x.isneg())
@@ -2655,7 +2655,7 @@ inline void eval_abs(cpp_float<Digits10>& result, const cpp_float<Digits10>& x)
 }
 
 template <unsigned Digits10>
-inline void eval_fabs(cpp_float<Digits10>& result, const cpp_float<Digits10>& x)
+inline void eval_fabs(cpp_dec_float<Digits10>& result, const cpp_dec_float<Digits10>& x)
 {
    result = x;
    if(x.isneg())
@@ -2663,14 +2663,14 @@ inline void eval_fabs(cpp_float<Digits10>& result, const cpp_float<Digits10>& x)
 }
 
 template <unsigned Digits10>
-inline void eval_sqrt(cpp_float<Digits10>& result, const cpp_float<Digits10>& x)
+inline void eval_sqrt(cpp_dec_float<Digits10>& result, const cpp_dec_float<Digits10>& x)
 {
    result = x;
    result.calculate_sqrt();
 }
 
 template <unsigned Digits10>
-inline void eval_floor(cpp_float<Digits10>& result, const cpp_float<Digits10>& x)
+inline void eval_floor(cpp_dec_float<Digits10>& result, const cpp_dec_float<Digits10>& x)
 {
    result = x;
    if(!x.isfinite() || x.isint()) 
@@ -2679,12 +2679,12 @@ inline void eval_floor(cpp_float<Digits10>& result, const cpp_float<Digits10>& x
    }
 
    if(x.isneg())
-      result -= cpp_float<Digits10>::one();
+      result -= cpp_dec_float<Digits10>::one();
    result = result.extract_integer_part();
 }
 
 template <unsigned Digits10>
-inline void eval_ceil(cpp_float<Digits10>& result, const cpp_float<Digits10>& x)
+inline void eval_ceil(cpp_dec_float<Digits10>& result, const cpp_dec_float<Digits10>& x)
 {
    result = x;
    if(!x.isfinite() || x.isint()) 
@@ -2693,16 +2693,16 @@ inline void eval_ceil(cpp_float<Digits10>& result, const cpp_float<Digits10>& x)
    }
 
    if(!x.isneg())
-      result += cpp_float<Digits10>::one();
+      result += cpp_dec_float<Digits10>::one();
    result = result.extract_integer_part();
 }
 
 template <unsigned Digits10>
-inline void eval_trunc(cpp_float<Digits10>& result, const cpp_float<Digits10>& x)
+inline void eval_trunc(cpp_dec_float<Digits10>& result, const cpp_dec_float<Digits10>& x)
 {
    if(!x.isfinite()) 
    { 
-      result = boost::math::policies::raise_rounding_error("boost::multiprecision::trunc<%1%>(%1%)", 0, mp_number<cpp_float<Digits10> >(x), 0, boost::math::policies::policy<>()).backend();
+      result = boost::math::policies::raise_rounding_error("boost::multiprecision::trunc<%1%>(%1%)", 0, mp_number<cpp_dec_float<Digits10> >(x), 0, boost::math::policies::policy<>()).backend();
       return;
    }
    else if(x.isint())
@@ -2714,14 +2714,14 @@ inline void eval_trunc(cpp_float<Digits10>& result, const cpp_float<Digits10>& x
 }
 
 template <unsigned Digits10>
-inline void eval_ldexp(cpp_float<Digits10>& result, const cpp_float<Digits10>& x, long long e)
+inline void eval_ldexp(cpp_dec_float<Digits10>& result, const cpp_dec_float<Digits10>& x, long long e)
 {
    result = x;
-   result *= cpp_float<Digits10>::pow2(e);
+   result *= cpp_dec_float<Digits10>::pow2(e);
 }
 
 template <unsigned Digits10>
-inline void eval_frexp(cpp_float<Digits10>& result, const cpp_float<Digits10>& x, long long* e)
+inline void eval_frexp(cpp_dec_float<Digits10>& result, const cpp_dec_float<Digits10>& x, long long* e)
 {
    result = x;
    if(result.isneg())
@@ -2746,7 +2746,7 @@ inline void eval_frexp(cpp_float<Digits10>& result, const cpp_float<Digits10>& x
       t *= 1000;
    }
 
-   result *= cpp_float<Digits10>::pow2(-t);
+   result *= cpp_dec_float<Digits10>::pow2(-t);
 
    if(result.iszero() || result.isinf() || result.isnan())
    {
@@ -2755,14 +2755,14 @@ inline void eval_frexp(cpp_float<Digits10>& result, const cpp_float<Digits10>& x
       if(result.isneg())
          result.negate();
       t /= 2;
-      result *= cpp_float<Digits10>::pow2(-t);
+      result *= cpp_dec_float<Digits10>::pow2(-t);
    }
    BOOST_MP_USING_ABS
    if(abs(result.order()) > 5)
    {
       // If our first estimate doesn't get close enough then try recursion until we do:
       long long e2;
-      cpp_float<Digits10> r2;
+      cpp_dec_float<Digits10> r2;
       eval_frexp(r2, result, &e2);
       // overflow prtection:
       if((t > 0) && (e2 > 0) && (t > (std::numeric_limits<long long>::max)() - e2))
@@ -2773,14 +2773,14 @@ inline void eval_frexp(cpp_float<Digits10>& result, const cpp_float<Digits10>& x
       result = r2;
    }
 
-   while(result.compare(cpp_float<Digits10>::one()) >= 0)
+   while(result.compare(cpp_dec_float<Digits10>::one()) >= 0)
    {
-      result /= cpp_float<Digits10>::two();
+      result /= cpp_dec_float<Digits10>::two();
       ++t;
    }
-   while(result.compare(cpp_float<Digits10>::half()) < 0)
+   while(result.compare(cpp_dec_float<Digits10>::half()) < 0)
    {
-      result *= cpp_float<Digits10>::two();
+      result *= cpp_dec_float<Digits10>::two();
       --t;
    }
    *e = t;
@@ -2789,7 +2789,7 @@ inline void eval_frexp(cpp_float<Digits10>& result, const cpp_float<Digits10>& x
 }
 
 template <unsigned Digits10>
-inline void eval_frexp(cpp_float<Digits10>& result, const cpp_float<Digits10>& x, int* e)
+inline void eval_frexp(cpp_dec_float<Digits10>& result, const cpp_dec_float<Digits10>& x, int* e)
 {
    long long t;
    eval_frexp(result, x, &t);
@@ -2799,26 +2799,26 @@ inline void eval_frexp(cpp_float<Digits10>& result, const cpp_float<Digits10>& x
 }
 
 template <unsigned Digits10>
-inline bool is_zero(const cpp_float<Digits10>& val)
+inline bool is_zero(const cpp_dec_float<Digits10>& val)
 {
    return val.iszero();
 }
 template <unsigned Digits10>
-inline int get_sign(const cpp_float<Digits10>& val)
+inline int get_sign(const cpp_dec_float<Digits10>& val)
 {
    return val.iszero() ? 0 : val.isneg() ? -1 : 1;
 }
 
 
-typedef mp_number<cpp_float<50> > cpp_float_50;
-typedef mp_number<cpp_float<100> > cpp_float_100;
+typedef mp_number<cpp_dec_float<50> > cpp_float_50;
+typedef mp_number<cpp_dec_float<100> > cpp_float_100;
 
 }}
 
 namespace std
 {
    template <unsigned Digits10> 
-   class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > >
+   class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10> > >
    {
    public:
       static const bool                    is_specialized    = true;
@@ -2829,13 +2829,13 @@ namespace std
       static const bool                    is_modulo         = false;
       static const bool                    is_iec559         = false;
       static const int                     digits            = Digits10;
-      static const int                     digits10          = boost::multiprecision::cpp_float<Digits10>::cpp_float_digits10;
-      static const int                     max_digits10      = boost::multiprecision::cpp_float<Digits10>::cpp_float_max_digits10;
-      static const boost::int64_t          min_exponent      = boost::multiprecision::cpp_float<Digits10>::cpp_float_min_exp;      // Type differs from int.
-      static const boost::int64_t          min_exponent10    = boost::multiprecision::cpp_float<Digits10>::cpp_float_min_exp10;    // Type differs from int.
-      static const boost::int64_t          max_exponent      = boost::multiprecision::cpp_float<Digits10>::cpp_float_max_exp;      // Type differs from int.
-      static const boost::int64_t          max_exponent10    = boost::multiprecision::cpp_float<Digits10>::cpp_float_max_exp10;    // Type differs from int.
-      static const int                     radix             = boost::multiprecision::cpp_float<Digits10>::mp_radix;
+      static const int                     digits10          = boost::multiprecision::cpp_dec_float<Digits10>::cpp_float_digits10;
+      static const int                     max_digits10      = boost::multiprecision::cpp_dec_float<Digits10>::cpp_float_max_digits10;
+      static const boost::int64_t          min_exponent      = boost::multiprecision::cpp_dec_float<Digits10>::cpp_float_min_exp;      // Type differs from int.
+      static const boost::int64_t          min_exponent10    = boost::multiprecision::cpp_dec_float<Digits10>::cpp_float_min_exp10;    // Type differs from int.
+      static const boost::int64_t          max_exponent      = boost::multiprecision::cpp_dec_float<Digits10>::cpp_float_max_exp;      // Type differs from int.
+      static const boost::int64_t          max_exponent10    = boost::multiprecision::cpp_dec_float<Digits10>::cpp_float_max_exp10;    // Type differs from int.
+      static const int                     radix             = boost::multiprecision::cpp_dec_float<Digits10>::mp_radix;
       static const std::float_round_style  round_style       = std::round_to_nearest;
       static const bool                    has_infinity      = true;
       static const bool                    has_quiet_NaN     = true;
@@ -2845,15 +2845,15 @@ namespace std
       static const bool                    traps             = false;
       static const bool                    tinyness_before   = false;
 
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > (min)        (void)  { return (boost::multiprecision::cpp_float<Digits10>::min)(); }
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > (max)        (void)  { return (boost::multiprecision::cpp_float<Digits10>::max)(); }
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > lowest       (void)  { return boost::multiprecision::cpp_float<Digits10>::zero(); }
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > epsilon      (void)  { return boost::multiprecision::cpp_float<Digits10>::eps(); }
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > round_error  (void)  { return 0.5L; }
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > infinity     (void)  { return boost::multiprecision::cpp_float<Digits10>::inf(); }
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > quiet_NaN    (void)  { return boost::multiprecision::cpp_float<Digits10>::nan(); }
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > signaling_NaN(void)  { return boost::multiprecision::cpp_float<Digits10>::zero(); }
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> > denorm_min   (void)  { return boost::multiprecision::cpp_float<Digits10>::zero(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10> > (min)        (void)  { return (boost::multiprecision::cpp_dec_float<Digits10>::min)(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10> > (max)        (void)  { return (boost::multiprecision::cpp_dec_float<Digits10>::max)(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10> > lowest       (void)  { return boost::multiprecision::cpp_dec_float<Digits10>::zero(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10> > epsilon      (void)  { return boost::multiprecision::cpp_dec_float<Digits10>::eps(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10> > round_error  (void)  { return 0.5L; }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10> > infinity     (void)  { return boost::multiprecision::cpp_dec_float<Digits10>::inf(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10> > quiet_NaN    (void)  { return boost::multiprecision::cpp_dec_float<Digits10>::nan(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10> > signaling_NaN(void)  { return boost::multiprecision::cpp_dec_float<Digits10>::zero(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10> > denorm_min   (void)  { return boost::multiprecision::cpp_dec_float<Digits10>::zero(); }
    };
 }
 
@@ -2862,7 +2862,7 @@ namespace boost{ namespace math{
 namespace policies{
 
 template <unsigned Digits10, class Policy>
-struct precision< boost::multiprecision::mp_number<boost::multiprecision::cpp_float<Digits10> >, Policy>
+struct precision< boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10> >, Policy>
 {
    typedef typename Policy::precision_type precision_type;
    typedef digits2<((Digits10 + 1) * 1000L) / 301L> digits_2;

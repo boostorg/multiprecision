@@ -15,10 +15,10 @@
 #define BOOST_MATH_OVERFLOW_ERROR_POLICY ignore_error
 #define BOOST_MATH_SMALL_CONSTANT(x) x
 
-#if !defined(TEST_MPF_50) && !defined(TEST_BACKEND) && !defined(TEST_CPP_FLOAT) && !defined(TEST_MPFR_50)
+#if !defined(TEST_MPF_50) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR_50)
 #  define TEST_MPF_50
 #  define TEST_MPFR_50
-#  define TEST_CPP_FLOAT
+#  define TEST_CPP_DEC_FLOAT
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -38,8 +38,8 @@
 #ifdef TEST_BACKEND
 #include <boost/multiprecision/concepts/mp_number_architypes.hpp>
 #endif
-#ifdef TEST_CPP_FLOAT
-#include <boost/multiprecision/cpp_float.hpp>
+#ifdef TEST_CPP_DEC_FLOAT
+#include <boost/multiprecision/cpp_dec_float.hpp>
 #endif
 
 #define SC_(x) BOOST_STRINGIZE(x)
@@ -112,10 +112,10 @@ int test_main(int, char* [])
    test_bessel(mp_number<mpfr_float_backend<30> >(), "mp_number<mpfr_float_backend<30> >");
    test_bessel(mp_number<mpfr_float_backend<35> >(), "mp_number<mpfr_float_backend<35> >");
 #endif
-#ifdef TEST_CPP_FLOAT
-   test_bessel(mp_number<cpp_float<18> >(), "mp_number<cpp_float<18> >");
-   test_bessel(mp_number<cpp_float<30> >(), "mp_number<cpp_float<30> >");
-   test_bessel(mp_number<cpp_float<35> >(), "mp_number<cpp_float<35> >");
+#ifdef TEST_CPP_DEC_FLOAT
+   test_bessel(mp_number<cpp_dec_float<18> >(), "mp_number<cpp_dec_float<18> >");
+   test_bessel(mp_number<cpp_dec_float<30> >(), "mp_number<cpp_dec_float<30> >");
+   test_bessel(mp_number<cpp_dec_float<35> >(), "mp_number<cpp_dec_float<35> >");
 #endif
    return 0;
 }

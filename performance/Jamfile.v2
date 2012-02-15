@@ -49,7 +49,7 @@ exe performance_test : performance_test.cpp /boost/system//boost_system
           [ check-target-builds ../config//has_gmp : <define>TEST_MPF <define>TEST_MPZ <source>gmp : ]
           [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>mpfr : ]
           [ check-target-builds ../config//has_tommath : <define>TEST_TOMMATH <source>$(TOMMATH) : ]
-          <define>TEST_CPP_FLOAT
+          <define>TEST_CPP_DEC_FLOAT
           <define>TEST_FIXED_INT
           ;
 
@@ -57,7 +57,7 @@ exe sf_performance : sf_performance.cpp /boost/system//boost_system
           : release
           [ check-target-builds ../config//has_gmp : <define>TEST_MPF <define>TEST_MPZ <source>gmp : ]
           [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>mpfr : ]
-          <define>TEST_CPP_FLOAT
+          <define>TEST_CPP_DEC_FLOAT
           <toolset>msvc:<cxxflags>-bigobj
           ;
 
@@ -75,7 +75,7 @@ obj obj_linpack_benchmark_mpf : linpack-benchmark.cpp
 
 obj obj_linpack_benchmark_cpp_float : linpack-benchmark.cpp
           : release
-          <define>TEST_CPP_FLOAT
+          <define>TEST_CPP_DEC_FLOAT
           ;
 
 obj obj_linpack_benchmark_double : linpack-benchmark.cpp
@@ -98,7 +98,7 @@ exe linpack_benchmark_mpf : obj_linpack_benchmark_mpf gmp  f2c
 
 exe linpack_benchmark_cpp_float : obj_linpack_benchmark_cpp_float  f2c
           : release
-          <define>TEST_CPP_FLOAT
+          <define>TEST_CPP_DEC_FLOAT
           ;
 
 exe linpack_benchmark_double : obj_linpack_benchmark_double  f2c

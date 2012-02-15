@@ -9,14 +9,14 @@
 
 #include "test.hpp"
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ) && !defined(TEST_TOMMATH)
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ) && !defined(TEST_TOMMATH)
 #  define TEST_MPF_50
 #  define TEST_MPF
 #  define TEST_BACKEND
 #  define TEST_MPZ
 #  define TEST_MPFR
 #  define TEST_MPFR_50
-#  define TEST_CPP_FLOAT
+#  define TEST_CPP_DEC_FLOAT
 #  define TEST_MPQ
 #  define TEST_TOMMATH
 
@@ -35,8 +35,8 @@
 #ifdef TEST_BACKEND
 #include <boost/multiprecision/concepts/mp_number_architypes.hpp>
 #endif
-#ifdef TEST_CPP_FLOAT
-#include <boost/multiprecision/cpp_float.hpp>
+#ifdef TEST_CPP_DEC_FLOAT
+#include <boost/multiprecision/cpp_dec_float.hpp>
 #endif
 #if defined(TEST_MPFR) || defined(TEST_MPFR_50)
 #include <boost/multiprecision/mpfr.hpp>
@@ -60,6 +60,54 @@ void test_fp(const boost::mpl::int_<boost::multiprecision::number_kind_floating_
    BOOST_CHECK(boost::math::isnormal(log(maxv)));
    BOOST_CHECK(boost::math::isnormal(sqrt(minv)));
    BOOST_CHECK(boost::math::isnormal(sqrt(maxv)));
+
+   if(std::numeric_limits<Number>::is_specialized)
+   {
+      if(std::numeric_limits<Number>::has_quiet_NaN)
+      {
+         BOOST_TEST((boost::math::isnan)(std::numeric_limits<Number>::quiet_NaN()));
+         BOOST_TEST(FP_NAN == (boost::math::fpclassify)(std::numeric_limits<Number>::quiet_NaN()));
+         BOOST_TEST(!(boost::math::isfinite)(std::numeric_limits<Number>::quiet_NaN()));
+         BOOST_TEST(!(boost::math::isnormal)(std::numeric_limits<Number>::quiet_NaN()));
+         BOOST_TEST(!(boost::math::isinf)(std::numeric_limits<Number>::quiet_NaN()));
+      }
+      if(std::numeric_limits<Number>::has_signaling_NaN)
+      {
+         BOOST_TEST((boost::math::isnan)(std::numeric_limits<Number>::signaling_NaN()));
+         BOOST_TEST(FP_NAN == (boost::math::fpclassify)(std::numeric_limits<Number>::signaling_NaN()));
+         BOOST_TEST(!(boost::math::isfinite)(std::numeric_limits<Number>::signaling_NaN()));
+         BOOST_TEST(!(boost::math::isnormal)(std::numeric_limits<Number>::signaling_NaN()));
+         BOOST_TEST(!(boost::math::isinf)(std::numeric_limits<Number>::signaling_NaN()));
+      }
+      if(std::numeric_limits<Number>::has_infinity)
+      {
+         BOOST_TEST((boost::math::isinf)(std::numeric_limits<Number>::infinity()));
+         BOOST_TEST(FP_INFINITE == (boost::math::fpclassify)(std::numeric_limits<Number>::infinity()));
+         BOOST_TEST(!(boost::math::isfinite)(std::numeric_limits<Number>::infinity()));
+         BOOST_TEST(!(boost::math::isnormal)(std::numeric_limits<Number>::infinity()));
+         BOOST_TEST(!(boost::math::isnan)(std::numeric_limits<Number>::infinity()));
+      }
+      if(std::numeric_limits<Number>::has_denorm)
+      {
+         BOOST_TEST(FP_SUBNORMAL == (boost::math::fpclassify)(std::numeric_limits<Number>::denorm_min()));
+         BOOST_TEST((boost::math::isfinite)(std::numeric_limits<Number>::denorm_min()));
+         BOOST_TEST(!(boost::math::isnormal)(std::numeric_limits<Number>::denorm_min()));
+         BOOST_TEST(!(boost::math::isinf)(std::numeric_limits<Number>::denorm_min()));
+         BOOST_TEST(!(boost::math::isnan)(std::numeric_limits<Number>::denorm_min()));
+      }
+   }
+   Number n = 0;
+   BOOST_TEST((boost::math::fpclassify)(n) == FP_ZERO);
+   BOOST_TEST((boost::math::isfinite)(n));
+   BOOST_TEST(!(boost::math::isnormal)(n));
+   BOOST_TEST(!(boost::math::isinf)(n));
+   BOOST_TEST(!(boost::math::isnan)(n));
+   n = 2;
+   BOOST_TEST((boost::math::fpclassify)(n) == FP_NORMAL);
+   BOOST_TEST((boost::math::isfinite)(n));
+   BOOST_TEST((boost::math::isnormal)(n));
+   BOOST_TEST(!(boost::math::isinf)(n));
+   BOOST_TEST(!(boost::math::isnan)(n));
 }
 
 template <class Number, class T>
@@ -112,54 +160,6 @@ void test()
    PRINT(tinyness_before);
    PRINT(round_style);
 
-   if(std::numeric_limits<Number>::is_specialized)
-   {
-      if(std::numeric_limits<Number>::has_quiet_NaN)
-      {
-         BOOST_TEST((boost::math::isnan)(std::numeric_limits<Number>::quiet_NaN()));
-         BOOST_TEST(FP_NAN == (boost::math::fpclassify)(std::numeric_limits<Number>::quiet_NaN()));
-         BOOST_TEST(!(boost::math::isfinite)(std::numeric_limits<Number>::quiet_NaN()));
-         BOOST_TEST(!(boost::math::isnormal)(std::numeric_limits<Number>::quiet_NaN()));
-         BOOST_TEST(!(boost::math::isinf)(std::numeric_limits<Number>::quiet_NaN()));
-      }
-      if(std::numeric_limits<Number>::has_signaling_NaN)
-      {
-         BOOST_TEST((boost::math::isnan)(std::numeric_limits<Number>::signaling_NaN()));
-         BOOST_TEST(FP_NAN == (boost::math::fpclassify)(std::numeric_limits<Number>::signaling_NaN()));
-         BOOST_TEST(!(boost::math::isfinite)(std::numeric_limits<Number>::signaling_NaN()));
-         BOOST_TEST(!(boost::math::isnormal)(std::numeric_limits<Number>::signaling_NaN()));
-         BOOST_TEST(!(boost::math::isinf)(std::numeric_limits<Number>::signaling_NaN()));
-      }
-      if(std::numeric_limits<Number>::has_infinity)
-      {
-         BOOST_TEST((boost::math::isinf)(std::numeric_limits<Number>::infinity()));
-         BOOST_TEST(FP_INFINITE == (boost::math::fpclassify)(std::numeric_limits<Number>::infinity()));
-         BOOST_TEST(!(boost::math::isfinite)(std::numeric_limits<Number>::infinity()));
-         BOOST_TEST(!(boost::math::isnormal)(std::numeric_limits<Number>::infinity()));
-         BOOST_TEST(!(boost::math::isnan)(std::numeric_limits<Number>::infinity()));
-      }
-      if(std::numeric_limits<Number>::has_denorm)
-      {
-         BOOST_TEST(FP_SUBNORMAL == (boost::math::fpclassify)(std::numeric_limits<Number>::denorm_min()));
-         BOOST_TEST((boost::math::isfinite)(std::numeric_limits<Number>::denorm_min()));
-         BOOST_TEST(!(boost::math::isnormal)(std::numeric_limits<Number>::denorm_min()));
-         BOOST_TEST(!(boost::math::isinf)(std::numeric_limits<Number>::denorm_min()));
-         BOOST_TEST(!(boost::math::isnan)(std::numeric_limits<Number>::denorm_min()));
-      }
-   }
-   Number n = 0;
-   BOOST_TEST((boost::math::fpclassify)(n) == FP_ZERO);
-   BOOST_TEST((boost::math::isfinite)(n));
-   BOOST_TEST(!(boost::math::isnormal)(n));
-   BOOST_TEST(!(boost::math::isinf)(n));
-   BOOST_TEST(!(boost::math::isnan)(n));
-   n = 2;
-   BOOST_TEST((boost::math::fpclassify)(n) == FP_NORMAL);
-   BOOST_TEST((boost::math::isfinite)(n));
-   BOOST_TEST((boost::math::isnormal)(n));
-   BOOST_TEST(!(boost::math::isinf)(n));
-   BOOST_TEST(!(boost::math::isnan)(n));
-
    typedef typename boost::mpl::if_c<
       std::numeric_limits<Number>::is_specialized,
       typename boost::multiprecision::number_category<Number>::type,
@@ -194,7 +194,7 @@ int main()
 #ifdef TEST_MPQ
    test<boost::multiprecision::mpq_rational>();
 #endif
-#ifdef TEST_CPP_FLOAT
+#ifdef TEST_CPP_DEC_FLOAT
    test<boost::multiprecision::cpp_float_50>();
    test<boost::multiprecision::cpp_float_100>();
 #endif

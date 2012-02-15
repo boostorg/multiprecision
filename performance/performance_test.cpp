@@ -10,14 +10,14 @@
 #endif
 
 #if !defined(TEST_MPF) && !defined(TEST_MPZ) && \
-   !defined(TEST_CPP_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPQ) \
+   !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPQ) \
    && !defined(TEST_TOMMATH) && !defined(TEST_TOMMATH_BOOST_RATIONAL) && !defined(TEST_MPZ_BOOST_RATIONAL)\
    && !defined(TEST_FIXED_INT)
 #  define TEST_MPF
 #  define TEST_MPZ
 #  define TEST_MPQ
 #  define TEST_MPFR
-#  define TEST_CPP_FLOAT
+#  define TEST_CPP_DEC_FLOAT
 #  define TEST_MPQ
 #  define TEST_TOMMATH
 #  define TEST_FIXED_INT
@@ -35,8 +35,8 @@
 #include <boost/multiprecision/gmp.hpp>
 #include <boost/multiprecision/rational_adapter.hpp>
 #endif
-#ifdef TEST_CPP_FLOAT
-#include <boost/multiprecision/cpp_float.hpp>
+#ifdef TEST_CPP_DEC_FLOAT
+#include <boost/multiprecision/cpp_dec_float.hpp>
 #endif
 #if defined(TEST_MPFR)
 #include <boost/multiprecision/mpfr.hpp>
@@ -608,10 +608,10 @@ int main()
    test<boost::multiprecision::mp_int512_t>("fixed_int", 512);
    test<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<1024, true> > >("fixed_int", 1024);
 #endif
-#ifdef TEST_CPP_FLOAT
-   test<boost::multiprecision::cpp_float_50>("cpp_float", 50);
-   test<boost::multiprecision::cpp_float_100>("cpp_float", 100);
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_float<500> > >("cpp_float", 500);
+#ifdef TEST_CPP_DEC_FLOAT
+   test<boost::multiprecision::cpp_float_50>("cpp_dec_float", 50);
+   test<boost::multiprecision::cpp_float_100>("cpp_dec_float", 100);
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<500> > >("cpp_dec_float", 500);
 #endif
 #ifdef TEST_MPFR
    test<boost::multiprecision::mpfr_float_50>("mpfr_float", 50);

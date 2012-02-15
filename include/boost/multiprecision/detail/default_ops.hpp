@@ -405,7 +405,7 @@ void eval_abs(T& result, const T& arg)
 template <class T>
 void eval_fabs(T& result, const T& arg)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_floating_point, "The fabs function is only valid for floating point types.");
+   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The fabs function is only valid for floating point types.");
    typedef typename T::signed_types type_list;
    typedef typename mpl::front<type_list>::type front;
    result = arg;
@@ -423,7 +423,7 @@ inline int eval_fpclassify(const Backend& arg)
 template <class T>
 inline void eval_fmod(T& result, const T& a, const T& b)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_floating_point, "The fmod function is only valid for floating point types.");
+   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The fmod function is only valid for floating point types.");
    if((&result == &a) || (&result == &b))
    {
       T temp;
@@ -443,7 +443,7 @@ inline void eval_fmod(T& result, const T& a, const T& b)
 template <class T>
 inline void eval_trunc(T& result, const T& a)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_floating_point, "The trunc function is only valid for floating point types.");
+   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The trunc function is only valid for floating point types.");
    int c = eval_fpclassify(a);
    if(c == FP_NAN || c == FP_INFINITE)
    {
@@ -459,7 +459,7 @@ inline void eval_trunc(T& result, const T& a)
 template <class T>
 inline void eval_round(T& result, const T& a)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_floating_point, "The round function is only valid for floating point types.");
+   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The round function is only valid for floating point types.");
    typedef typename boost::multiprecision::detail::canonical<float, T>::type fp_type;
    int c = eval_fpclassify(a);
    if(c == FP_NAN || c == FP_INFINITE)

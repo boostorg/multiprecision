@@ -10,7 +10,7 @@
 #  define TEST_MPFR
 #  define TEST_MPF
 #  define TEST_MPF
-#  define TEST_CPP_FLOAT
+#  define TEST_CPP_DEC_FLOAT
 #  define TEST_MPFR_CLASS
 #endif
 
@@ -26,8 +26,8 @@
 #ifdef TEST_MPF
 #include <boost/multiprecision/gmp.hpp>
 #endif
-#ifdef TEST_CPP_FLOAT
-#include <boost/multiprecision/cpp_float.hpp>
+#ifdef TEST_CPP_DEC_FLOAT
+#include <boost/multiprecision/cpp_dec_float.hpp>
 #endif
 #include <boost/math/special_functions/bessel.hpp>
 #include <boost/math/tools/rational.hpp>
@@ -231,7 +231,7 @@ int main()
    std::cout << "Total allocations for mpf_float_50 = " << allocation_count << std::endl;
    allocation_count = 0;
 #endif
-#ifdef TEST_CPP_FLOAT
+#ifdef TEST_CPP_DEC_FLOAT
    c.reset();
    test_bessel<boost::multiprecision::cpp_float_50>();
    time = c.elapsed();
@@ -280,7 +280,7 @@ int main()
    std::cout << "Total allocations for mpf_float_100 = " << allocation_count << std::endl;
    allocation_count = 0;
 #endif
-#ifdef TEST_CPP_FLOAT
+#ifdef TEST_CPP_DEC_FLOAT
    c.reset();
    test_bessel<boost::multiprecision::cpp_float_100>();
    time = c.elapsed();
@@ -332,7 +332,7 @@ int main()
    std::cout << "Total allocations for mpf_float_50 = " << allocation_count << std::endl;
    allocation_count = 0;
 #endif
-#ifdef TEST_CPP_FLOAT
+#ifdef TEST_CPP_DEC_FLOAT
    c.reset();
    test_polynomial<boost::multiprecision::cpp_float_50>();
    time = c.elapsed();
@@ -381,7 +381,7 @@ int main()
    std::cout << "Total allocations for mpf_float_100 = " << allocation_count << std::endl;
    allocation_count = 0;
 #endif
-#ifdef TEST_CPP_FLOAT
+#ifdef TEST_CPP_DEC_FLOAT
    c.reset();
    test_polynomial<boost::multiprecision::cpp_float_100>();
    time = c.elapsed();
@@ -432,7 +432,7 @@ int main()
    std::cout << "Total allocations for mpf_float_50 = " << allocation_count << std::endl;
    allocation_count = 0;
 #endif
-#ifdef TEST_CPP_FLOAT
+#ifdef TEST_CPP_DEC_FLOAT
    c.reset();
    test_nct<boost::multiprecision::cpp_float_50>();
    time = c.elapsed();
@@ -481,7 +481,7 @@ int main()
    std::cout << "Total allocations for mpf_float_100 = " << allocation_count << std::endl;
    allocation_count = 0;
 #endif
-#ifdef TEST_CPP_FLOAT
+#ifdef TEST_CPP_DEC_FLOAT
    c.reset();
    test_nct<boost::multiprecision::cpp_float_100>();
    time = c.elapsed();
