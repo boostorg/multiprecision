@@ -233,10 +233,10 @@ int main()
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
    c.reset();
-   test_bessel<boost::multiprecision::cpp_float_50>();
+   test_bessel<boost::multiprecision::cpp_dec_float_50>();
    time = c.elapsed();
-   std::cout << "Time for cpp_float_50 = " << time << std::endl;
-   std::cout << "Total allocations for cpp_float_50 = " << allocation_count << std::endl;
+   std::cout << "Time for cpp_dec_float_50 = " << time << std::endl;
+   std::cout << "Total allocations for cpp_dec_float_50 = " << allocation_count << std::endl;
    allocation_count = 0;
 #endif
 #ifdef TEST_MPFR_CLASS
@@ -282,10 +282,10 @@ int main()
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
    c.reset();
-   test_bessel<boost::multiprecision::cpp_float_100>();
+   test_bessel<boost::multiprecision::cpp_dec_float_100>();
    time = c.elapsed();
-   std::cout << "Time for cpp_float_100 = " << time << std::endl;
-   std::cout << "Total allocations for cpp_float_100 = " << allocation_count << std::endl;
+   std::cout << "Time for cpp_dec_float_100 = " << time << std::endl;
+   std::cout << "Total allocations for cpp_dec_float_100 = " << allocation_count << std::endl;
    allocation_count = 0;
 #endif
 #ifdef TEST_MPFR_CLASS
@@ -334,10 +334,10 @@ int main()
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
    c.reset();
-   test_polynomial<boost::multiprecision::cpp_float_50>();
+   test_polynomial<boost::multiprecision::cpp_dec_float_50>();
    time = c.elapsed();
-   std::cout << "Time for cpp_float_50 = " << time << std::endl;
-   std::cout << "Total allocations for cpp_float_50 = " << allocation_count << std::endl;
+   std::cout << "Time for cpp_dec_float_50 = " << time << std::endl;
+   std::cout << "Total allocations for cpp_dec_float_50 = " << allocation_count << std::endl;
    allocation_count = 0;
 #endif
 #ifdef TEST_MPFR_CLASS
@@ -383,10 +383,10 @@ int main()
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
    c.reset();
-   test_polynomial<boost::multiprecision::cpp_float_100>();
+   test_polynomial<boost::multiprecision::cpp_dec_float_100>();
    time = c.elapsed();
-   std::cout << "Time for cpp_float_100 = " << time << std::endl;
-   std::cout << "Total allocations for cpp_float_100 = " << allocation_count << std::endl;
+   std::cout << "Time for cpp_dec_float_100 = " << time << std::endl;
+   std::cout << "Total allocations for cpp_dec_float_100 = " << allocation_count << std::endl;
    allocation_count = 0;
 #endif
 #ifdef TEST_MPFR_CLASS
@@ -434,10 +434,10 @@ int main()
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
    c.reset();
-   test_nct<boost::multiprecision::cpp_float_50>();
+   test_nct<boost::multiprecision::cpp_dec_float_50>();
    time = c.elapsed();
-   std::cout << "Time for cpp_float_50 = " << time << std::endl;
-   std::cout << "Total allocations for cpp_float_50 = " << allocation_count << std::endl;
+   std::cout << "Time for cpp_dec_float_50 = " << time << std::endl;
+   std::cout << "Total allocations for cpp_dec_float_50 = " << allocation_count << std::endl;
    allocation_count = 0;
 #endif
 #ifdef TEST_MPFR_CLASS
@@ -483,10 +483,10 @@ int main()
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
    c.reset();
-   test_nct<boost::multiprecision::cpp_float_100>();
+   test_nct<boost::multiprecision::cpp_dec_float_100>();
    time = c.elapsed();
-   std::cout << "Time for cpp_float_100 = " << time << std::endl;
-   std::cout << "Total allocations for cpp_float_100 = " << allocation_count << std::endl;
+   std::cout << "Time for cpp_dec_float_100 = " << time << std::endl;
+   std::cout << "Total allocations for cpp_dec_float_100 = " << allocation_count << std::endl;
    allocation_count = 0;
 #endif
 #ifdef TEST_MPFR_CLASS

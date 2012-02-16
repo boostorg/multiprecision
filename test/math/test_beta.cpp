@@ -58,7 +58,7 @@ void expected_results()
       ".*",                          // platform
       ".*gmp.*",                     // test type(s)
       "Beta Function: Medium.*",     // test data group
-      "boost::math::beta", 2200, 1000); // test function
+      "boost::math::beta", 2300, 1000); // test function
    add_expected_result(
       ".*",                          // compiler
       ".*",                          // stdlib

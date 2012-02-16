@@ -8,14 +8,14 @@
 
 void t1()
 {
-   //[cpp_float_eg
+   //[cpp_dec_float_eg
    //=#include <boost/multiprecision/cpp_dec_float.hpp>
 
    using namespace boost::multiprecision;
 
    // Operations at fixed precision and full numeric_limits support:
-   cpp_float_100 b = 2;
-   std::cout << std::numeric_limits<cpp_float_100>::digits << std::endl;
+   cpp_dec_float_100 b = 2;
+   std::cout << std::numeric_limits<cpp_dec_float_100>::digits << std::endl;
    std::cout << log(b) << std::endl; // print log(2)
    //]
 }

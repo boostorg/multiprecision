@@ -20,7 +20,7 @@
 
 [import ../example/gmp_snips.cpp]
 [import ../example/mpfr_snips.cpp]
-[import ../example/cpp_float_snips.cpp]
+[import ../example/cpp_dec_float_snips.cpp]
 [import ../example/tommath_snips.cpp]
 [import ../example/fixed_int_snips.cpp]
 
@@ -434,8 +434,8 @@ Things you should know when using this type:
    template <unsigned Digits10>
    class cpp_dec_float;
 
-   typedef mp_number<cpp_dec_float<50> > cpp_float_50;
-   typedef mp_number<cpp_dec_float<100> > cpp_float_100;
+   typedef mp_number<cpp_dec_float<50> > cpp_dec_float_50;
+   typedef mp_number<cpp_dec_float<100> > cpp_dec_float_100;
 
    }} // namespaces
 
@@ -444,7 +444,7 @@ real-number type that is a drop-in replacement for the native C++ floating-point
 much greater precision.
 
 Type `cpp_dec_float` can be used at fixed precision by specifying a non-zero `Digits10` template parameter.  
-The typedefs cpp_float_50 and cpp_float_100 provide arithmetic types at 50 and 100 decimal digits precision
+The typedefs cpp_dec_float_50 and cpp_dec_float_100 provide arithmetic types at 50 and 100 decimal digits precision
 respectively.
 
 There is full standard library and `numeric_limits` support available for this type.
@@ -460,7 +460,7 @@ Normally these should not be visible to the user.
 
 [h5 cpp_dec_float example:]
 
-[cpp_float_eg]
+[cpp_dec_float_eg]
 
 [endsect]
 

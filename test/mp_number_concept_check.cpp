@@ -4,7 +4,7 @@
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 //
-// This tests two things: that cpp_float_50 meets our
+// This tests two things: that cpp_dec_float_50 meets our
 // conceptual requirements, and that we can instantiate
 // all our distributions and special functions on this type.
 //
@@ -82,7 +82,7 @@ void foo()
    instantiate(boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<30> >());
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
-   instantiate(boost::multiprecision::cpp_float_50());
+   instantiate(boost::multiprecision::cpp_dec_float_50());
 #endif
 }
 
@@ -113,7 +113,7 @@ int main()
    BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mpfr_float_50>));
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::cpp_float_50>));
+   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::cpp_dec_float_50>));
 #endif
 
 }

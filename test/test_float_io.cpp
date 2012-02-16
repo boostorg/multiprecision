@@ -257,13 +257,13 @@ int main()
    test_round_trip<boost::multiprecision::mpfr_float_100>();
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
-   test<boost::multiprecision::cpp_float_50>();
-   test<boost::multiprecision::cpp_float_100>();
+   test<boost::multiprecision::cpp_dec_float_50>();
+   test<boost::multiprecision::cpp_dec_float_100>();
 
    /*
    // cpp_dec_float has extra guard digits that messes this up:
-   test_round_trip<boost::multiprecision::cpp_float_50>();
-   test_round_trip<boost::multiprecision::cpp_float_100>();
+   test_round_trip<boost::multiprecision::cpp_dec_float_50>();
+   test_round_trip<boost::multiprecision::cpp_dec_float_100>();
    */
 #endif
 #ifdef TEST_MPF_50

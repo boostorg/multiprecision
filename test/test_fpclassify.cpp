@@ -310,8 +310,8 @@ int main()
    test<boost::multiprecision::mpfr_float_100>();
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
-   test<boost::multiprecision::cpp_float_50>();
-   test<boost::multiprecision::cpp_float_100>();
+   test<boost::multiprecision::cpp_dec_float_50>();
+   test<boost::multiprecision::cpp_dec_float_100>();
 #endif
 #ifdef TEST_BACKEND
    test<boost::multiprecision::mp_number<boost::multiprecision::concepts::mp_number_backend_float_architype> >();

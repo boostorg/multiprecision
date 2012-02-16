@@ -609,8 +609,8 @@ int main()
    test<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<1024, true> > >("fixed_int", 1024);
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
-   test<boost::multiprecision::cpp_float_50>("cpp_dec_float", 50);
-   test<boost::multiprecision::cpp_float_100>("cpp_dec_float", 100);
+   test<boost::multiprecision::cpp_dec_float_50>("cpp_dec_float", 50);
+   test<boost::multiprecision::cpp_dec_float_100>("cpp_dec_float", 100);
    test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<500> > >("cpp_dec_float", 500);
 #endif
 #ifdef TEST_MPFR

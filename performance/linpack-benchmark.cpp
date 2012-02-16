@@ -27,7 +27,7 @@ typedef mpf_class real_type;
 typedef mpfr_class real_type;
 #elif defined(TEST_CPP_DEC_FLOAT)
 #include <boost/multiprecision/cpp_dec_float.hpp>
-typedef boost::multiprecision::cpp_float_50 real_type;
+typedef boost::multiprecision::cpp_dec_float_50 real_type;
 #elif defined(TEST_MPFR_50)
 #include <boost/multiprecision/mpfr.hpp>
 typedef boost::multiprecision::mpfr_float_50 real_type;
@@ -912,7 +912,7 @@ real_type epslon_(real_type *x)
 #if defined(TEST_MPF_100) || defined(TEST_MPFR_100) || defined(TEST_GMPXX) || defined(TEST_MPFRXX)
    return std::ldexp(1.0, 1 - ((100 + 1) * 1000L) / 301L);
 #elif defined(TEST_CPP_DEC_FLOAT_BN)
-   return std::pow(10.0, 1-std::numeric_limits<efx::cpp_float_50>::digits10);
+   return std::pow(10.0, 1-std::numeric_limits<efx::cpp_dec_float_50>::digits10);
 #else
    return CAST_TO_RT(std::numeric_limits<real_type>::epsilon());
 #endif
@@ -1234,7 +1234,7 @@ mp_number<gmp_float<100> >:
  times for array with leading dimension of1001
       279.96        0.84       280.8      2.3813     0.83988      5014.3
 
-boost::multiprecision::ef::cpp_float_50:
+boost::multiprecision::ef::cpp_dec_float_50:
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
      norm. resid      resid           machep         x(1)          x(n)

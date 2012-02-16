@@ -17,7 +17,7 @@ void proc_that_throws()
 
 int main()
 {
-   boost::multiprecision::cpp_float_50 a1(1), a2(1), b(3), c(-2);
+   boost::multiprecision::cpp_dec_float_50 a1(1), a2(1), b(3), c(-2);
 
    BOOST_WARN(a1);
    BOOST_WARN(a1 == b);
@@ -26,8 +26,8 @@ int main()
    BOOST_CHECK(boost::detail::test_errors() == 1);
    --boost::detail::test_errors();
 
-   boost::multiprecision::cpp_float_50 a_tol = a1 + a1 * 100 * std::numeric_limits<boost::multiprecision::cpp_float_50>::epsilon();
-   boost::multiprecision::cpp_float_50 tol = 100 * std::numeric_limits<boost::multiprecision::cpp_float_50>::epsilon();
+   boost::multiprecision::cpp_dec_float_50 a_tol = a1 + a1 * 100 * std::numeric_limits<boost::multiprecision::cpp_dec_float_50>::epsilon();
+   boost::multiprecision::cpp_dec_float_50 tol = 100 * std::numeric_limits<boost::multiprecision::cpp_dec_float_50>::epsilon();
 
    BOOST_CHECK_CLOSE(a1, a_tol, tol * 102);  // Passes
    BOOST_WARN_CLOSE(a1, a_tol, tol * 98);    // fails

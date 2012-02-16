@@ -1003,7 +1003,7 @@ int main()
    test<boost::multiprecision::mpq_rational>();
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
-   test<boost::multiprecision::cpp_float_50>();
+   test<boost::multiprecision::cpp_dec_float_50>();
 #endif
 #ifdef TEST_MPFR
    test<boost::multiprecision::mpfr_float>();
