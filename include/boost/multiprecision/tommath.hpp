@@ -463,15 +463,15 @@ public:
    // Largest and smallest numbers are bounded only by available memory, set
    // to zero:
    //
-   BOOST_STATIC_CONSTEXPR number_type (min)() BOOST_MP_NOEXCEPT
+   static number_type (min)() BOOST_MP_NOEXCEPT
    { 
       return number_type();
    }
-   BOOST_STATIC_CONSTEXPR number_type (max)() BOOST_MP_NOEXCEPT 
+   static number_type (max)() BOOST_MP_NOEXCEPT 
    { 
       return number_type();
    }
-   BOOST_STATIC_CONSTEXPR number_type lowest() BOOST_MP_NOEXCEPT { return (min)(); }
+   static number_type lowest() BOOST_MP_NOEXCEPT { return (min)(); }
    BOOST_STATIC_CONSTEXPR int digits = INT_MAX;
    BOOST_STATIC_CONSTEXPR int digits10 = (INT_MAX / 1000) * 301L;
    BOOST_STATIC_CONSTEXPR int max_digits10 = digits10 + 2;
@@ -479,8 +479,8 @@ public:
    BOOST_STATIC_CONSTEXPR bool is_integer = true;
    BOOST_STATIC_CONSTEXPR bool is_exact = true;
    BOOST_STATIC_CONSTEXPR int radix = 2;
-   BOOST_STATIC_CONSTEXPR number_type epsilon() BOOST_MP_NOEXCEPT { return number_type(); }
-   BOOST_STATIC_CONSTEXPR number_type round_error() BOOST_MP_NOEXCEPT { return number_type(); }
+   static number_type epsilon() BOOST_MP_NOEXCEPT { return number_type(); }
+   static number_type round_error() BOOST_MP_NOEXCEPT { return number_type(); }
    BOOST_STATIC_CONSTEXPR int min_exponent = 0;
    BOOST_STATIC_CONSTEXPR int min_exponent10 = 0;
    BOOST_STATIC_CONSTEXPR int max_exponent = 0;
@@ -490,10 +490,10 @@ public:
    BOOST_STATIC_CONSTEXPR bool has_signaling_NaN = false;
    BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm = denorm_absent;
    BOOST_STATIC_CONSTEXPR bool has_denorm_loss = false;
-   BOOST_STATIC_CONSTEXPR number_type infinity() BOOST_MP_NOEXCEPT { return number_type(); }
-   BOOST_STATIC_CONSTEXPR number_type quiet_NaN() BOOST_MP_NOEXCEPT { return number_type(); }
-   BOOST_STATIC_CONSTEXPR number_type signaling_NaN() BOOST_MP_NOEXCEPT { return number_type(); }
-   BOOST_STATIC_CONSTEXPR number_type denorm_min() BOOST_MP_NOEXCEPT { return number_type(); }
+   static number_type infinity() BOOST_MP_NOEXCEPT { return number_type(); }
+   static number_type quiet_NaN() BOOST_MP_NOEXCEPT { return number_type(); }
+   static number_type signaling_NaN() BOOST_MP_NOEXCEPT { return number_type(); }
+   static number_type denorm_min() BOOST_MP_NOEXCEPT { return number_type(); }
    BOOST_STATIC_CONSTEXPR bool is_iec559 = false;
    BOOST_STATIC_CONSTEXPR bool is_bounded = false;
    BOOST_STATIC_CONSTEXPR bool is_modulo = false;
