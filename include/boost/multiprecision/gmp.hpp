@@ -896,8 +896,8 @@ struct gmp_int
       unsigned long long mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
       unsigned shift = 0;
       mpz_t t;
-      mpz_init(m_data);
-      mpz_init(t);
+      mpz_set_ui(m_data, 0);
+      mpz_init_set_ui(t, 0);
       while(i)
       {
          mpz_set_ui(t, static_cast<unsigned>(i & mask));
@@ -955,7 +955,7 @@ struct gmp_int
 
       int e;
       long double f, term;
-      mpz_init_set_ui(m_data, 0u);
+      mpz_set_ui(m_data, 0u);
 
       f = frexp(a, &e);
 
