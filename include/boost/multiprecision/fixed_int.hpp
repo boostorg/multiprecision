@@ -24,7 +24,7 @@ typedef boost::int64_t signed_double_limb_type;
 static const limb_type max_block_10 = 1000000000;
 static const limb_type digits_per_block_10 = 9;
 
-inline limb_type block_multiplier(int count)
+inline limb_type block_multiplier(unsigned count)
 {
    static const limb_type values[digits_per_block_10] 
       = { 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000 };
@@ -941,7 +941,7 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
       r = x.data()[fixed_int<Bits, Signed>::limb_count - 1] % y;
       return;
    }
-   else if(r_order == static_cast<int>(fixed_int<Bits, Signed>::limb_count) - 2)
+   else if(r_order == static_cast<limb_type>(fixed_int<Bits, Signed>::limb_count) - 2)
    {
       double_limb_type a;
       a = (static_cast<double_limb_type>(r.data()[r_order]) << fixed_int<Bits, Signed>::limb_bits) | r.data()[r_order + 1];

@@ -130,7 +130,7 @@ public:
       }
    }
 
-   cpp_int_backend() : m_limbs(1), m_internal(true), m_sign(false)
+   cpp_int_backend() : m_limbs(1), m_sign(false), m_internal(true)
    {
       *limbs() = 0;
    }
@@ -149,7 +149,7 @@ public:
       }
       else
       {
-         data.ld = o.data.ld;
+         m_data.ld = o.m_data.ld;
          o.m_limbs = 0;
          o.m_internal = true;
       }
@@ -1703,7 +1703,7 @@ inline typename enable_if<is_integral<R>, void>::type convert_to(R* result, cons
    {
       *result += static_cast<R>(backend.limbs()[i]) << shift;
       shift += cpp_int_backend<InternalLimbs, Allocator>::limb_bits;
-      if(shift > std::numeric_limits<R>::digits)
+      if(shift > static_cast<unsigned>(std::numeric_limits<R>::digits))
          break;
    }
    if(backend.sign())
