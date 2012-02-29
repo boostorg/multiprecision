@@ -117,7 +117,7 @@ struct tommath_int
 
       int e;
       long double f, term;
-      detail::check_tommath_result(mp_init_set_int(&m_data, 0u));
+      detail::check_tommath_result(mp_set_int(&m_data, 0u));
       ::mp_int t;
       detail::check_tommath_result(mp_init(&t));
 
@@ -151,6 +151,7 @@ struct tommath_int
          tommath_int t2;
          detail::check_tommath_result(mp_div_2d(&m_data, -e, &m_data, &t2.data()));
       }
+      mp_clear(&t);
       return *this;
    }
    tommath_int& operator = (const char* s)

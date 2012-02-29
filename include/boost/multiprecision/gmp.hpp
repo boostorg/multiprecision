@@ -1460,7 +1460,7 @@ struct gmp_rational
       unsigned long long mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
       unsigned shift = 0;
       mpq_t t;
-      mpq_init(m_data);
+      mpq_set_ui(m_data, 0, 1);
       mpq_init(t);
       while(i)
       {
@@ -1521,7 +1521,7 @@ struct gmp_rational
 
       int e;
       long double f, term;
-      mpq_init(m_data);
+      mpq_set_ui(m_data, 0, 1);
       mpq_set_ui(m_data, 0u, 1);
       gmp_rational t;
 
