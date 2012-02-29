@@ -142,6 +142,20 @@ run test_arithmetic.cpp
 	      <define>TEST_FIXED_INT2
         : test_arithmetic_fixed_int2 ;
 
+run test_arithmetic.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_CPP_INT
+        : test_arithmetic_fixed_cpp_int ;
+
+run test_arithmetic.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_CPP_INT_BR
+        : test_arithmetic_cpp_int_br ;
+
 run test_numeric_limits.cpp
         : # command line
         : # input files
@@ -202,7 +216,6 @@ run test_numeric_limits.cpp
         : # input files
         : # requirements
 	      <define>TEST_CPP_DEC_FLOAT
-         [ check-target-builds ../config//has_mpfr : : <build>no ]
         : test_numeric_limits_cpp_dec_float ;
 
 run test_numeric_limits.cpp $(TOMMATH)
@@ -212,6 +225,20 @@ run test_numeric_limits.cpp $(TOMMATH)
 	      <define>TEST_TOMMATH
          [ check-target-builds ../config//has_tommath : : <build>no ]
         : test_numeric_limits_tommath ;
+
+run test_numeric_limits.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_CPP_INT
+        : test_numeric_limits_cpp_int ;
+
+run test_numeric_limits.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_FIXED_INT
+        : test_numeric_limits_fixed_int ;
 
 run test_exp.cpp gmp
         : # command line
@@ -596,6 +623,14 @@ run test_int_io.cpp
         : test_int_io_fixed_int2 ;
 
 run test_fixed_int.cpp gmp
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+         release  # otherwise runtime is too slow!! 
+         ;
+
+run test_cpp_int.cpp gmp
         : # command line
         : # input files
         : # requirements

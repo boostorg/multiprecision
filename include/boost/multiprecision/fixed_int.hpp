@@ -1559,7 +1559,7 @@ public:
       if(!init)
       {
          init = true;
-         val = Signed ? number_type(1) << Bits - 1 : 0;
+         val = Signed ? number_type(number_type(1) << (Bits - 1)) : 0;
       }
       return val;
    }

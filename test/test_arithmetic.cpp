@@ -7,6 +7,10 @@
 #  define _SCL_SECURE_NO_WARNINGS
 #endif
 
+#ifdef TEST_VLD
+#include <vld.h>
+#endif
+
 #include <boost/detail/lightweight_test.hpp>
 #include <boost/math/special_functions/pow.hpp>
 #include <boost/math/common_factor_rt.hpp>
@@ -14,7 +18,7 @@
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && \
    !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ) \
    && !defined(TEST_TOMMATH) && !defined(TEST_TOMMATH_BOOST_RATIONAL) && !defined(TEST_MPZ_BOOST_RATIONAL)\
-   && !defined(TEST_FIXED_INT1) && !defined(TEST_FIXED_INT2)
+   && !defined(TEST_FIXED_INT1) && !defined(TEST_FIXED_INT2) && !defined(TEST_CPP_INT) && !defined(TEST_CPP_INT_BR)
 #  define TEST_MPF_50
 #  define TEST_MPF
 #  define TEST_BACKEND
@@ -26,6 +30,8 @@
 #  define TEST_TOMMATH
 #  define TEST_FIXED_INT1
 #  define TEST_FIXED_INT2
+#  define TEST_CPP_INT
+#  define TEST_CPP_INT_BR
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -55,6 +61,9 @@
 #endif
 #if defined(TEST_FIXED_INT1) || defined(TEST_FIXED_INT2)
 #include <boost/multiprecision/fixed_int.hpp>
+#endif
+#if defined(TEST_CPP_INT) || defined(TEST_CPP_INT_BR)
+#include <boost/multiprecision/cpp_int.hpp>
 #endif
 #if defined(TEST_TOMMATH_BOOST_RATIONAL) || defined(TEST_MPZ_BOOST_RATIONAL)
 #include <boost/rational.hpp>
@@ -364,7 +373,6 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
       BOOST_TEST(abs(a) == 20);
       BOOST_TEST(abs(-a) == 20);
       BOOST_TEST(abs(+a) == 20);
-
       a = -400;
       b = 45;
       BOOST_TEST(gcd(a, b) == boost::math::gcd(-400, 45));
@@ -1036,6 +1044,12 @@ int main()
    test<boost::multiprecision::mp_int128_t>();
    test<boost::multiprecision::mp_int512_t>();
    test<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<70, true> > >();
+#endif
+#ifdef TEST_CPP_INT
+   test<boost::multiprecision::cpp_int>();
+#endif
+#ifdef TEST_CPP_INT_BR
+   test<boost::multiprecision::cpp_rational>();
 #endif
    return boost::report_errors();
 }
