@@ -760,22 +760,20 @@ inline void subtract_unsigned(cpp_int_backend<InternalLimbs, Allocator>& result,
    }
    
    unsigned i = 0;
-   BOOST_STATIC_CONSTANT(double_limb_type, borrow_value = static_cast<double_limb_type>(cpp_int_backend<InternalLimbs, Allocator>::max_limb_value) + 1);
    // First where a and b overlap:
    while(i < m)
    {
-      borrow += pb[i];
-      borrow = (borrow_value + static_cast<double_limb_type>(pa[i])) - borrow;
+      borrow = static_cast<double_limb_type>(pa[i]) - static_cast<double_limb_type>(pb[i]) - borrow;
       pr[i] = static_cast<limb_type>(borrow);
-      borrow = borrow & borrow_value ? 0 : 1;
+      borrow = (borrow >> cpp_int_backend<InternalLimbs, Allocator>::limb_bits) & 1u;
       ++i;
    }
    // Now where only a has digits, only as long as we've borrowed:
    while(borrow && (i < x))
    {
-      borrow = (borrow_value + static_cast<double_limb_type>(pa[i])) - borrow;
+      borrow = static_cast<double_limb_type>(pa[i]) - borrow;
       pr[i] = static_cast<limb_type>(borrow);
-      borrow = borrow & borrow_value ? 0 : 1;
+      borrow = (borrow >> cpp_int_backend<InternalLimbs, Allocator>::limb_bits) & 1u;
       ++i;
    }
    // Any remaining digits are the same as those in pa:
