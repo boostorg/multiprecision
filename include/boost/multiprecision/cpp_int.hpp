@@ -1507,7 +1507,7 @@ void bitwise_op(cpp_int_backend<InternalLimbs, Allocator>& result, const cpp_int
    //
    // Strip leading zeros:
    //
-   while(result.limbs()[result.size()-1] == 0)
+   while((result.size() > 1) && (result.limbs()[result.size()-1] == 0))
       result.resize(result.size()-1);
 }
 
