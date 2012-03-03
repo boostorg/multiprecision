@@ -13,42 +13,11 @@
 #include <boost/array.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_floating_point.hpp>
-#include <boost/multiprecision/fixed_int.hpp>
+#include <boost/multiprecision/detail/cpp_int_core.hpp>
 #include <boost/multiprecision/rational_adapter.hpp>
 
 namespace boost{
 namespace multiprecision{
-
-   /*
-typedef boost::uint32_t limb_type;
-typedef boost::int32_t signed_limb_type;
-typedef boost::uint64_t double_limb_type;
-typedef boost::int64_t signed_double_limb_type;
-static const limb_type max_block_10 = 1000000000;
-static const limb_type digits_per_block_10 = 9;
-
-inline limb_type block_multiplier(int count)
-{
-   static const limb_type values[digits_per_block_10] 
-      = { 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000 };
-   BOOST_ASSERT(count < digits_per_block_10);
-   return values[count];
-}
-*/
-template <class T>
-inline void minmax(const T& a, const T& b, T& aa, T& bb)
-{
-   if(a < b)
-   {
-      aa = a;
-      bb = b;
-   }
-   else
-   {
-      aa = b;
-      bb = a;
-   }
-}
 
 template <unsigned InternalLimbs = 0, class Allocator = std::allocator<limb_type> >
 struct cpp_int_backend : private Allocator::template rebind<limb_type>::other

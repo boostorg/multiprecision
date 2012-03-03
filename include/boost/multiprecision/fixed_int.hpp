@@ -10,27 +10,13 @@
 #include <iomanip>
 #include <boost/cstdint.hpp>
 #include <boost/multiprecision/mp_number.hpp>
+#include <boost/multiprecision/detail/cpp_int_core.hpp>
 #include <boost/array.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_floating_point.hpp>
 
 namespace boost{
 namespace multiprecision{
-
-typedef boost::uint32_t limb_type;
-typedef boost::int32_t signed_limb_type;
-typedef boost::uint64_t double_limb_type;
-typedef boost::int64_t signed_double_limb_type;
-static const limb_type max_block_10 = 1000000000;
-static const limb_type digits_per_block_10 = 9;
-
-inline limb_type block_multiplier(unsigned count)
-{
-   static const limb_type values[digits_per_block_10] 
-      = { 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000 };
-   BOOST_ASSERT(count < digits_per_block_10);
-   return values[count];
-}
 
 template <unsigned Bits, bool Signed>
 struct fixed_int
