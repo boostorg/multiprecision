@@ -1060,7 +1060,7 @@ inline void multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, const 
    typename cpp_int_backend<MinBits, Signed, Allocator>::limb_pointer pr = result.limbs();
 
    double_limb_type carry = 0;
-   std::memset(pr, 0, (as + bs) * sizeof(limb_type));
+   std::memset(pr, 0, result.size() * sizeof(limb_type));
    unsigned inner_limit = result.size() - as;
    for(unsigned i = 0; i < as; ++i)
    {
@@ -1242,7 +1242,7 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
    {
       double_limb_type a, b;
       a = (static_cast<double_limb_type>(px[1]) << cpp_int_backend<MinBits, Signed, Allocator>::limb_bits) | px[0];
-      b = y_order > 1 ? 
+      b = y_order ? 
          (static_cast<double_limb_type>(py[1]) << cpp_int_backend<MinBits, Signed, Allocator>::limb_bits) | py[0] 
          : py[0];
       result = a / b;
