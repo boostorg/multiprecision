@@ -587,6 +587,11 @@ int main()
    test<boost::multiprecision::cpp_int>("cpp_int", 256);
    test<boost::multiprecision::cpp_int>("cpp_int", 512);
    test<boost::multiprecision::cpp_int>("cpp_int", 1024);
+
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<128, true, void> > >("cpp_int(fixed)", 128);
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<256, true, void> > >("cpp_int(fixed)", 256);
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<512, true, void> > >("cpp_int(fixed)", 512);
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<1024, true, void> > >("cpp_int(fixed)", 1024);
 #endif
 #ifdef TEST_MPQ
    test<boost::multiprecision::mpq_rational>("mpq_rational", 64);

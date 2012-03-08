@@ -30,7 +30,7 @@ struct fixed_int
    BOOST_STATIC_CONSTANT(limb_type, max_limb_value = ~static_cast<limb_type>(0u));
    BOOST_STATIC_CONSTANT(limb_type, upper_limb_mask = (Bits % limb_bits ? (1 << (Bits % limb_bits)) - 1 : max_limb_value));
    BOOST_STATIC_CONSTANT(limb_type, upper_limb_not_mask = ~upper_limb_mask);
-   BOOST_STATIC_CONSTANT(limb_type, sign_bit_mask = 1u << ((Bits % limb_bits ? Bits % limb_bits : limb_bits) - 1));
+   BOOST_STATIC_CONSTANT(limb_type, sign_bit_mask = limb_type(1u) << ((Bits % limb_bits ? Bits % limb_bits : limb_bits) - 1));
    typedef boost::array<limb_type, limb_count> data_type;
 
    fixed_int(){}
@@ -427,7 +427,7 @@ inline void subtract(fixed_int<Bits, Signed>& result, const limb_type& o)
    carry >>= fixed_int<Bits, Signed>::limb_bits;
    for(int i = static_cast<int>(fixed_int<Bits, Signed>::limb_count) - 2; (carry != 1) && (i >= 0); --i)
    {
-      carry += static_cast<double_limb_type>(result.data()[i]) + 0xFFFFFFFF;
+      carry += static_cast<double_limb_type>(result.data()[i]) + fixed_int<Bits, Signed>::max_limb_value;
       result.data()[i] = static_cast<limb_type>(carry);
       carry >>= fixed_int<Bits, Signed>::limb_bits;
    }
@@ -748,7 +748,7 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
       r = x.data()[fixed_int<Bits, Signed>::limb_count - 1] % y.data()[fixed_int<Bits, Signed>::limb_count - 1];
       return;
    }
-   else if(r_order == static_cast<int>(fixed_int<Bits, Signed>::limb_count) - 2)
+   else if(r_order == static_cast<unsigned>(fixed_int<Bits, Signed>::limb_count) - 2)
    {
       double_limb_type a, b;
       a = (static_cast<double_limb_type>(r.data()[r_order]) << fixed_int<Bits, Signed>::limb_bits) | r.data()[r_order + 1];
@@ -1335,7 +1335,7 @@ template <class R, unsigned Bits, bool Signed>
 inline typename enable_if<is_integral<R>, void>::type convert_to(R* result, const fixed_int<Bits, Signed>& backend, const mpl::false_&)
 {
    unsigned shift = (fixed_int<Bits, Signed>::limb_count - 1) * fixed_int<Bits, Signed>::limb_bits;
-   *result = 0;
+   *result = static_cast<limb_type>(0);
    for(unsigned i = 0; i < fixed_int<Bits, Signed>::limb_count; ++i)
    {
       *result += static_cast<R>(backend.data()[i]) << shift;
@@ -1362,7 +1362,7 @@ inline typename enable_if<is_floating_point<R>, void>::type convert_to(R* result
       return;
    }
    unsigned shift = (fixed_int<Bits, Signed>::limb_count - 1) * fixed_int<Bits, Signed>::limb_bits;
-   *result = 0;
+   *result = static_cast<limb_type>(0);
    for(unsigned i = 0; i < fixed_int<Bits, Signed>::limb_count; ++i)
    {
       *result += static_cast<R>(std::ldexp(static_cast<double>(backend.data()[i]), shift));
@@ -1490,7 +1490,7 @@ inline void eval_lcm(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Sign
 
    if(is_zero(t))
    {
-      result = 0;
+      result = static_cast<limb_type>(0);
    }
    else
    {

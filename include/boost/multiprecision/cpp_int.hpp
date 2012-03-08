@@ -961,7 +961,7 @@ inline void subtract_unsigned(cpp_int_backend<MinBits, Signed, Allocator>& resul
    }
    else if(c == 0)
    {
-      result = 0;
+      result = static_cast<limb_type>(0);
       return;
    }
    
@@ -1092,7 +1092,7 @@ inline void multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, cpp_in
 {
    if(!val)
    {
-      result = 0;
+      result = static_cast<limb_type>(0);
       return;
    }
    double_limb_type carry = 0;
@@ -2108,7 +2108,7 @@ inline void eval_lcm(cpp_int_backend<MinBits, Signed, Allocator>& result, const 
 
    if(is_zero(t))
    {
-      result = 0;
+      result = static_cast<limb_type>(0);
    }
    else
    {
