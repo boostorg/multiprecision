@@ -134,8 +134,17 @@ void test()
    std::cout << "numeric_limits values for type " << typeid(Number).name() << std::endl;
 
    PRINT(is_specialized);
-   PRINT(min());
+   if(std::numeric_limits<Number>::is_integer)
+   {
+      std::cout << std::hex << std::showbase;
+   }
    PRINT(max());
+   if(std::numeric_limits<Number>::is_integer)
+   {
+      std::cout << std::dec;
+   }
+   PRINT(max());
+   PRINT(min());
 #ifndef BOOST_NO_NUMERIC_LIMITS_LOWEST
    PRINT(lowest());
 #endif
@@ -225,6 +234,8 @@ int main()
 #endif
 #ifdef TEST_CPP_INT
    test<boost::multiprecision::cpp_int>();
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<256, true, void> > >();
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<256, false, void> > >();
 #endif
    return boost::report_errors();
 }

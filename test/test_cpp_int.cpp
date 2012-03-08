@@ -51,10 +51,11 @@ T generate_random(unsigned bits_wanted)
    return val;
 }
 
-int main()
+template <class Number>
+void test()
 {
    using namespace boost::multiprecision;
-   typedef cpp_int packed_type;
+   typedef Number test_type;
    unsigned last_error_count = 0;
    for(int i = 0; i < 1000; ++i)
    {
@@ -65,77 +66,77 @@ int main()
 
       int si = d.convert_to<int>();
 
-      packed_type a1 = a.str();
-      packed_type b1 = b.str();
-      packed_type c1 = c.str();
-      packed_type d1 = d.str();
+      test_type a1 = a.str();
+      test_type b1 = b.str();
+      test_type c1 = c.str();
+      test_type d1 = d.str();
 
       BOOST_CHECK_EQUAL(a.str(), a1.str());
       BOOST_CHECK_EQUAL(b.str(), b1.str());
       BOOST_CHECK_EQUAL(c.str(), c1.str());
       BOOST_CHECK_EQUAL(d.str(), d1.str());
-      BOOST_CHECK_EQUAL(mpz_int(a+b).str(), packed_type(a1 + b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(a-b).str(), packed_type(a1 - b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(mpz_int(-a)+b).str(), packed_type(packed_type(-a1) + b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(mpz_int(-a)-b).str(), packed_type(packed_type(-a1) - b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(c * d).str(), packed_type(c1 * d1).str());
-      BOOST_CHECK_EQUAL(mpz_int(c * -d).str(), packed_type(c1 * -d1).str());
-      BOOST_CHECK_EQUAL(mpz_int(-c * d).str(), packed_type(-c1 * d1).str());
-      BOOST_CHECK_EQUAL(mpz_int(b * c).str(), packed_type(b1 * c1).str());
-      BOOST_CHECK_EQUAL(mpz_int(a / b).str(), packed_type(a1 / b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(a / -b).str(), packed_type(a1 / -b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(-a / b).str(), packed_type(-a1 / b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(a / d).str(), packed_type(a1 / d1).str());
-      BOOST_CHECK_EQUAL(mpz_int(a % b).str(), packed_type(a1 % b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(a % -b).str(), packed_type(a1 % -b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(-a % b).str(), packed_type(-a1 % b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(a % d).str(), packed_type(a1 % d1).str());
+      BOOST_CHECK_EQUAL(mpz_int(a+b).str(), test_type(a1 + b1).str());
+      BOOST_CHECK_EQUAL(mpz_int(a-b).str(), test_type(a1 - b1).str());
+      BOOST_CHECK_EQUAL(mpz_int(mpz_int(-a)+b).str(), test_type(test_type(-a1) + b1).str());
+      BOOST_CHECK_EQUAL(mpz_int(mpz_int(-a)-b).str(), test_type(test_type(-a1) - b1).str());
+      BOOST_CHECK_EQUAL(mpz_int(c * d).str(), test_type(c1 * d1).str());
+      BOOST_CHECK_EQUAL(mpz_int(c * -d).str(), test_type(c1 * -d1).str());
+      BOOST_CHECK_EQUAL(mpz_int(-c * d).str(), test_type(-c1 * d1).str());
+      BOOST_CHECK_EQUAL(mpz_int(b * c).str(), test_type(b1 * c1).str());
+      BOOST_CHECK_EQUAL(mpz_int(a / b).str(), test_type(a1 / b1).str());
+      BOOST_CHECK_EQUAL(mpz_int(a / -b).str(), test_type(a1 / -b1).str());
+      BOOST_CHECK_EQUAL(mpz_int(-a / b).str(), test_type(-a1 / b1).str());
+      BOOST_CHECK_EQUAL(mpz_int(a / d).str(), test_type(a1 / d1).str());
+      BOOST_CHECK_EQUAL(mpz_int(a % b).str(), test_type(a1 % b1).str());
+      BOOST_CHECK_EQUAL(mpz_int(a % -b).str(), test_type(a1 % -b1).str());
+      BOOST_CHECK_EQUAL(mpz_int(-a % b).str(), test_type(-a1 % b1).str());
+      BOOST_CHECK_EQUAL(mpz_int(a % d).str(), test_type(a1 % d1).str());
       // bitwise ops:
-      BOOST_CHECK_EQUAL(mpz_int(a|b).str(), packed_type(a1 | b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(-a|b).str(), packed_type(-a1 | b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(a|-b).str(), packed_type(a1 | -b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(-a|-b).str(), packed_type(-a1 | -b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(a&b).str(), packed_type(a1 & b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(-a&b).str(), packed_type(-a1 & b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(a&-b).str(), packed_type(a1 & -b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(-a&-b).str(), packed_type(-a1 & -b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(a^b).str(), packed_type(a1 ^ b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(-a^b).str(), packed_type(-a1 ^ b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(a^-b).str(), packed_type(a1 ^ -b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(-a^-b).str(), packed_type(-a1 ^ -b1).str());
+      BOOST_CHECK_EQUAL(mpz_int(a|b).str(), test_type(a1 | b1).str());
+      BOOST_CHECK_EQUAL(mpz_int(-a|b).str(), test_type(-a1 | b1).str());
+      BOOST_CHECK_EQUAL(mpz_int(a|-b).str(), test_type(a1 | -b1).str());
+      BOOST_CHECK_EQUAL(mpz_int(-a|-b).str(), test_type(-a1 | -b1).str());
+      BOOST_CHECK_EQUAL(mpz_int(a&b).str(), test_type(a1 & b1).str());
+      BOOST_CHECK_EQUAL(mpz_int(-a&b).str(), test_type(-a1 & b1).str());
+      BOOST_CHECK_EQUAL(mpz_int(a&-b).str(), test_type(a1 & -b1).str());
+      BOOST_CHECK_EQUAL(mpz_int(-a&-b).str(), test_type(-a1 & -b1).str());
+      BOOST_CHECK_EQUAL(mpz_int(a^b).str(), test_type(a1 ^ b1).str());
+      BOOST_CHECK_EQUAL(mpz_int(-a^b).str(), test_type(-a1 ^ b1).str());
+      BOOST_CHECK_EQUAL(mpz_int(a^-b).str(), test_type(a1 ^ -b1).str());
+      BOOST_CHECK_EQUAL(mpz_int(-a^-b).str(), test_type(-a1 ^ -b1).str());
       // Now check operations involving integers:
-      BOOST_CHECK_EQUAL(mpz_int(a + si).str(), packed_type(a1 + si).str());
-      BOOST_CHECK_EQUAL(mpz_int(a + -si).str(), packed_type(a1 + -si).str());
-      BOOST_CHECK_EQUAL(mpz_int(-a + si).str(), packed_type(-a1 + si).str());
-      BOOST_CHECK_EQUAL(mpz_int(si + a).str(), packed_type(si + a1).str());
-      BOOST_CHECK_EQUAL(mpz_int(a - si).str(), packed_type(a1 - si).str());
-      BOOST_CHECK_EQUAL(mpz_int(a - -si).str(), packed_type(a1 - -si).str());
-      BOOST_CHECK_EQUAL(mpz_int(-a - si).str(), packed_type(-a1 - si).str());
-      BOOST_CHECK_EQUAL(mpz_int(si - a).str(), packed_type(si - a1).str());
-      BOOST_CHECK_EQUAL(mpz_int(b * si).str(), packed_type(b1 * si).str());
-      BOOST_CHECK_EQUAL(mpz_int(b * -si).str(), packed_type(b1 * -si).str());
-      BOOST_CHECK_EQUAL(mpz_int(-b * si).str(), packed_type(-b1 * si).str());
-      BOOST_CHECK_EQUAL(mpz_int(si * b).str(), packed_type(si * b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(a / si).str(), packed_type(a1 / si).str());
-      BOOST_CHECK_EQUAL(mpz_int(a / -si).str(), packed_type(a1 / -si).str());
-      BOOST_CHECK_EQUAL(mpz_int(-a / si).str(), packed_type(-a1 / si).str());
-      BOOST_CHECK_EQUAL(mpz_int(a % si).str(), packed_type(a1 % si).str());
-      BOOST_CHECK_EQUAL(mpz_int(a % -si).str(), packed_type(a1 % -si).str());
-      BOOST_CHECK_EQUAL(mpz_int(-a % si).str(), packed_type(-a1 % si).str());
-      BOOST_CHECK_EQUAL(mpz_int(a|si).str(), packed_type(a1 | si).str());
-      BOOST_CHECK_EQUAL(mpz_int(a&si).str(), packed_type(a1 & si).str());
-      BOOST_CHECK_EQUAL(mpz_int(a^si).str(), packed_type(a1 ^ si).str());
-      BOOST_CHECK_EQUAL(mpz_int(si|a).str(), packed_type(si|a1).str());
-      BOOST_CHECK_EQUAL(mpz_int(si&a).str(), packed_type(si&a1).str());
-      BOOST_CHECK_EQUAL(mpz_int(si^a).str(), packed_type(si^a1).str());
-      BOOST_CHECK_EQUAL(mpz_int(gcd(a, b)).str(), packed_type(gcd(a1, b1)).str());
-      BOOST_CHECK_EQUAL(mpz_int(lcm(c, d)).str(), packed_type(lcm(c1, d1)).str());
-      BOOST_CHECK_EQUAL(mpz_int(gcd(-a, b)).str(), packed_type(gcd(-a1, b1)).str());
-      BOOST_CHECK_EQUAL(mpz_int(lcm(-c, d)).str(), packed_type(lcm(-c1, d1)).str());
-      BOOST_CHECK_EQUAL(mpz_int(gcd(-a, -b)).str(), packed_type(gcd(-a1, -b1)).str());
-      BOOST_CHECK_EQUAL(mpz_int(lcm(-c, -d)).str(), packed_type(lcm(-c1, -d1)).str());
-      BOOST_CHECK_EQUAL(mpz_int(gcd(a, -b)).str(), packed_type(gcd(a1, -b1)).str());
-      BOOST_CHECK_EQUAL(mpz_int(lcm(c, -d)).str(), packed_type(lcm(c1, -d1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(a + si).str(), test_type(a1 + si).str());
+      BOOST_CHECK_EQUAL(mpz_int(a + -si).str(), test_type(a1 + -si).str());
+      BOOST_CHECK_EQUAL(mpz_int(-a + si).str(), test_type(-a1 + si).str());
+      BOOST_CHECK_EQUAL(mpz_int(si + a).str(), test_type(si + a1).str());
+      BOOST_CHECK_EQUAL(mpz_int(a - si).str(), test_type(a1 - si).str());
+      BOOST_CHECK_EQUAL(mpz_int(a - -si).str(), test_type(a1 - -si).str());
+      BOOST_CHECK_EQUAL(mpz_int(-a - si).str(), test_type(-a1 - si).str());
+      BOOST_CHECK_EQUAL(mpz_int(si - a).str(), test_type(si - a1).str());
+      BOOST_CHECK_EQUAL(mpz_int(b * si).str(), test_type(b1 * si).str());
+      BOOST_CHECK_EQUAL(mpz_int(b * -si).str(), test_type(b1 * -si).str());
+      BOOST_CHECK_EQUAL(mpz_int(-b * si).str(), test_type(-b1 * si).str());
+      BOOST_CHECK_EQUAL(mpz_int(si * b).str(), test_type(si * b1).str());
+      BOOST_CHECK_EQUAL(mpz_int(a / si).str(), test_type(a1 / si).str());
+      BOOST_CHECK_EQUAL(mpz_int(a / -si).str(), test_type(a1 / -si).str());
+      BOOST_CHECK_EQUAL(mpz_int(-a / si).str(), test_type(-a1 / si).str());
+      BOOST_CHECK_EQUAL(mpz_int(a % si).str(), test_type(a1 % si).str());
+      BOOST_CHECK_EQUAL(mpz_int(a % -si).str(), test_type(a1 % -si).str());
+      BOOST_CHECK_EQUAL(mpz_int(-a % si).str(), test_type(-a1 % si).str());
+      BOOST_CHECK_EQUAL(mpz_int(a|si).str(), test_type(a1 | si).str());
+      BOOST_CHECK_EQUAL(mpz_int(a&si).str(), test_type(a1 & si).str());
+      BOOST_CHECK_EQUAL(mpz_int(a^si).str(), test_type(a1 ^ si).str());
+      BOOST_CHECK_EQUAL(mpz_int(si|a).str(), test_type(si|a1).str());
+      BOOST_CHECK_EQUAL(mpz_int(si&a).str(), test_type(si&a1).str());
+      BOOST_CHECK_EQUAL(mpz_int(si^a).str(), test_type(si^a1).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(a, b)).str(), test_type(gcd(a1, b1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(c, d)).str(), test_type(lcm(c1, d1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(-a, b)).str(), test_type(gcd(-a1, b1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(-c, d)).str(), test_type(lcm(-c1, d1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(-a, -b)).str(), test_type(gcd(-a1, -b1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(-c, -d)).str(), test_type(lcm(-c1, -d1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(a, -b)).str(), test_type(gcd(a1, -b1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(c, -d)).str(), test_type(lcm(c1, -d1)).str());
       if(last_error_count != boost::detail::test_errors())
       {
          last_error_count = boost::detail::test_errors();
@@ -155,9 +156,9 @@ int main()
          std::cout << "a - b   = " << a-b << std::endl;
          std::cout << "a1 - b1 = " << a1-b1 << std::endl;
          std::cout << "-a + b   = " << mpz_int(-a)+b << std::endl;
-         std::cout << "-a1 + b1 = " << packed_type(-a1)+b1 << std::endl;
+         std::cout << "-a1 + b1 = " << test_type(-a1)+b1 << std::endl;
          std::cout << "-a - b   = " << mpz_int(-a)-b << std::endl;
-         std::cout << "-a1 - b1 = " << packed_type(-a1)-b1 << std::endl;
+         std::cout << "-a1 - b1 = " << test_type(-a1)-b1 << std::endl;
          std::cout << "c*d    = " << c*d << std::endl;
          std::cout << "c1*d1  = " << c1*d1 << std::endl;
          std::cout << "b*c    = " << b*c << std::endl;
@@ -172,6 +173,13 @@ int main()
          std::cout << "a1%d1  = " << a1%d1 << std::endl;
       }
    }
+}
+
+int main()
+{
+   using namespace boost::multiprecision;
+   test<cpp_int>();
+   test<mp_number<cpp_int_backend<1024, true, void> > >();
    return boost::report_errors();
 }
 

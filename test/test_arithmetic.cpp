@@ -1047,6 +1047,8 @@ int main()
 #endif
 #ifdef TEST_CPP_INT
    test<boost::multiprecision::cpp_int>();
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<256, true, void> > >();
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<256, false, void> > >();
 #endif
 #ifdef TEST_CPP_INT_BR
    test<boost::multiprecision::cpp_rational>();
