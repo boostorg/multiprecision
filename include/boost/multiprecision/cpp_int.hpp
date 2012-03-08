@@ -444,7 +444,7 @@ public:
       typename base_type::limb_pointer p = this->limbs();
       *p = static_cast<limb_type>(i);
       p[1] = static_cast<limb_type>(i >> base_type::limb_bits);
-      resize(p[1] ? 2 : 1);
+      this->resize(p[1] ? 2 : 1);
       this->sign(s);
       return *this;
    }
