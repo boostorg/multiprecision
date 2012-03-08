@@ -46,7 +46,7 @@ public:
          : sizeof(limb_data) / sizeof(limb_type));
    BOOST_STATIC_CONSTANT(bool, variable = true);
 
-   BOOST_STATIC_ASSERT_MESSAGE(Signed, "There is curently no support for unsigned arbitrary precision integers.");
+   BOOST_STATIC_ASSERT_MSG(Signed, "There is curently no support for unsigned arbitrary precision integers.");
 
 private:
    union data_type
@@ -353,17 +353,51 @@ public:
 };
 
 template <unsigned MinBits, bool Signed, class Allocator>
+const unsigned cpp_int_base<MinBits, Signed, Allocator>::limb_bits;
+template <unsigned MinBits, bool Signed, class Allocator>
+const limb_type cpp_int_base<MinBits, Signed, Allocator>::max_limb_value;
+template <unsigned MinBits, bool Signed, class Allocator>
+const limb_type cpp_int_base<MinBits, Signed, Allocator>::sign_bit_mask;
+template <unsigned MinBits, bool Signed, class Allocator>
+const unsigned cpp_int_base<MinBits, Signed, Allocator>::internal_limb_count;
+template <unsigned MinBits, bool Signed, class Allocator>
+const bool cpp_int_base<MinBits, Signed, Allocator>::variable;
+
+template <unsigned MinBits>
+const unsigned cpp_int_base<MinBits, true, void>::limb_bits;
+template <unsigned MinBits>
+const limb_type cpp_int_base<MinBits, true, void>::max_limb_value;
+template <unsigned MinBits>
+const limb_type cpp_int_base<MinBits, true, void>::sign_bit_mask;
+template <unsigned MinBits>
+const unsigned cpp_int_base<MinBits, true, void>::internal_limb_count;
+template <unsigned MinBits>
+const bool cpp_int_base<MinBits, true, void>::variable;
+
+template <unsigned MinBits>
+const unsigned cpp_int_base<MinBits, false, void>::limb_bits;
+template <unsigned MinBits>
+const limb_type cpp_int_base<MinBits, false, void>::max_limb_value;
+template <unsigned MinBits>
+const limb_type cpp_int_base<MinBits, false, void>::sign_bit_mask;
+template <unsigned MinBits>
+const unsigned cpp_int_base<MinBits, false, void>::internal_limb_count;
+template <unsigned MinBits>
+const bool cpp_int_base<MinBits, false, void>::variable;
+
+template <unsigned MinBits, bool Signed, class Allocator>
 struct cpp_int_backend : public cpp_int_base<MinBits, Signed, Allocator>
 {
+   typedef cpp_int_base<MinBits, Signed, Allocator> base_type;
 public:
    typedef mpl::list<signed_limb_type, signed_double_limb_type>      signed_types;
    typedef mpl::list<limb_type, double_limb_type>                    unsigned_types;
    typedef mpl::list<long double>                                    float_types;
 
    cpp_int_backend(){}
-   cpp_int_backend(const cpp_int_backend& o) : cpp_int_base(o) {}
+   cpp_int_backend(const cpp_int_backend& o) : base_type(o) {}
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   cpp_int_backend(cpp_int_backend&& o) : cpp_int_base(o) {}
+   cpp_int_backend(cpp_int_backend&& o) : base_type(o) {}
 #endif
    cpp_int_backend& operator = (const cpp_int_backend& o)
    {
@@ -387,10 +421,10 @@ public:
    cpp_int_backend& operator = (double_limb_type i)
    {
       BOOST_STATIC_ASSERT(sizeof(i) == 2 * sizeof(limb_type));
-      BOOST_STATIC_ASSERT(internal_limb_count >= 2);
-      limb_pointer p = limbs();
+      BOOST_STATIC_ASSERT(base_type::internal_limb_count >= 2);
+      typename base_type::limb_pointer p = this->limbs();
       *p = static_cast<limb_type>(i);
-      p[1] = static_cast<limb_type>(i >> limb_bits);
+      p[1] = static_cast<limb_type>(i >> base_type::limb_bits);
       this->resize(p[1] ? 2 : 1);
       this->sign(false);
       return *this;
@@ -398,7 +432,7 @@ public:
    cpp_int_backend& operator = (signed_double_limb_type i)
    {
       BOOST_STATIC_ASSERT(sizeof(i) == 2 * sizeof(limb_type));
-      BOOST_STATIC_ASSERT(internal_limb_count >= 2);
+      BOOST_STATIC_ASSERT(base_type::internal_limb_count >= 2);
       bool s = false;
       if(i < 0)
       {
@@ -407,9 +441,9 @@ public:
       }
       else
          this->sign(false);
-      limb_pointer p = this->limbs();
+      typename base_type::limb_pointer p = this->limbs();
       *p = static_cast<limb_type>(i);
-      p[1] = static_cast<limb_type>(i >> limb_bits);
+      p[1] = static_cast<limb_type>(i >> base_type::limb_bits);
       resize(p[1] ? 2 : 1);
       this->sign(s);
       return *this;
@@ -494,7 +528,7 @@ public:
          if(radix == 8 || radix == 16)
          {
             unsigned shift = radix == 8 ? 3 : 4;
-            unsigned block_count = limb_bits / shift;
+            unsigned block_count = base_type::limb_bits / shift;
             unsigned block_shift = shift * block_count;
             limb_type val, block;
             while(*s)
@@ -509,7 +543,7 @@ public:
                   else if(*s >= 'A' && *s <= 'F')
                      val = 10 + *s - 'A';
                   else
-                     val = max_limb_value;
+                     val = base_type::max_limb_value;
                   if(val > radix)
                   {
                      BOOST_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
@@ -524,7 +558,7 @@ public:
                   }
                }
                left_shift(*this, block_shift);
-               limbs()[0] |= block;
+               this->limbs()[0] |= block;
             }
          }
          else
@@ -556,7 +590,7 @@ public:
          }
       }
       if(isneg)
-         negate();
+         this->negate();
       return *this;
    }
    void swap(cpp_int_backend& o)
@@ -572,7 +606,7 @@ public:
          base = 16;
       std::string result;
 
-      unsigned Bits = size() * limb_bits;
+      unsigned Bits = this->size() * base_type::limb_bits;
 
       if(base == 8 || base == 16)
       {
@@ -624,7 +658,7 @@ public:
             t.negate();
             neg = true;
          }
-         if(size() == 1)
+         if(this->size() == 1)
          {
             result = boost::lexical_cast<std::string>(t.limbs()[0]);
          }
@@ -661,25 +695,25 @@ public:
    }
    int compare(const cpp_int_backend& o)const
    {
-      if(sign() != o.sign())
-         return sign() ? -1 : 1;
+      if(this->sign() != o.sign())
+         return this->sign() ? -1 : 1;
       int result = 0;
       // Only do the compare if the same sign:
       result = compare_unsigned(o);
 
-      if(sign())
+      if(this->sign())
          result = -result;
       return result;
    }
    int compare_unsigned(const cpp_int_backend& o)const
    {
-      if(size() != o.size())
+      if(this->size() != o.size())
       {
-         return size() > o.size() ? 1 : -1;
+         return this->size() > o.size() ? 1 : -1;
       }
-      const_limb_pointer pa = limbs();
-      const_limb_pointer pb = o.limbs();
-      for(int i = size() - 1; i >= 0; --i)
+      typename base_type::const_limb_pointer pa = this->limbs();
+      typename base_type::const_limb_pointer pb = o.limbs();
+      for(int i = this->size() - 1; i >= 0; --i)
       {
          if(pa[i] != pb[i])
             return pa[i] > pb[i] ? 1 : -1;
@@ -695,15 +729,6 @@ public:
       return compare(t);
    }
 };
-
-template <unsigned MinBits, bool Signed, class Allocator>
-const unsigned cpp_int_backend<MinBits, Signed, Allocator>::limb_bits;
-template <unsigned MinBits, bool Signed, class Allocator>
-const limb_type cpp_int_backend<MinBits, Signed, Allocator>::max_limb_value;
-template <unsigned MinBits, bool Signed, class Allocator>
-const limb_type cpp_int_backend<MinBits, Signed, Allocator>::sign_bit_mask;
-template <unsigned MinBits, bool Signed, class Allocator>
-const unsigned cpp_int_backend<MinBits, Signed, Allocator>::internal_limb_count;
 
 
 template <unsigned MinBits, bool Signed, class Allocator>
