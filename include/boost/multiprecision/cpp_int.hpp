@@ -1061,9 +1061,9 @@ inline void multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, const 
 
    double_limb_type carry = 0;
    std::memset(pr, 0, result.size() * sizeof(limb_type));
-   unsigned inner_limit = result.size() - as;
    for(unsigned i = 0; i < as; ++i)
    {
+      unsigned inner_limit = (std::min)(result.size() - i, b.size());
       for(unsigned j = 0; j < inner_limit; ++j)
       {
          BOOST_ASSERT(i+j < result.size());
@@ -1262,10 +1262,6 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
    do
    {
       //
-      // Update r_order, this can't run past the end as r must be non-zero at this point:
-      //
-      r_order = r.size() - 1;
-      //
       // Calculate our best guess for how many times y divides into r:
       //
       limb_type guess;
@@ -1329,6 +1325,7 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
       //
       double_limb_type carry = 0;
       t.resize(y.size() + shift + 1);
+      bool truncated_t = !cpp_int_backend<MinBits, Signed, Allocator>::variable && (t.size() != y.size() + shift + 1);
       typename cpp_int_backend<MinBits, Signed, Allocator>::limb_pointer pt = t.limbs();
       for(unsigned i = 0; i < shift; ++i)
          pt[i] = 0;
@@ -1338,11 +1335,11 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
          pt[i + shift] = static_cast<limb_type>(carry);
          carry >>= cpp_int_backend<MinBits, Signed, Allocator>::limb_bits;
       }
-      if(carry)
+      if(carry && !truncated_t)
       {
          pt[t.size() - 1] = static_cast<limb_type>(carry);
       }
-      else
+      else if(!truncated_t)
       {
          t.resize(t.size() - 1);
       }
@@ -1365,15 +1362,21 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
          while(pr[result.size() - 1] == 0)
             result.resize(result.size() - 1);
       }
+      //
+      // Update r_order:
+      //
+      r_order = r.size() - 1;
+      if(r_order < y_order)
+         break;
    }
-   // Termination condition is really just a check that r > y, but with two common
-   // short-circuit cases handled first:
-   while((r_order > y_order) || (prem[r_order] > py[y_order]) || (r.compare_unsigned(y) > 0));
+   // Termination condition is really just a check that r > y, but with a common
+   // short-circuit case handled first:
+   while((r_order > y_order) || (r.compare_unsigned(y) >= 0));
 
    //
    // We now just have to normalise the result:
    //
-   if(r_neg)
+   if(r_neg && get_sign(r))
    {
       // We have one too many in the result:
       decrement(result);
@@ -1480,19 +1483,29 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
          --r_order;
          pr[r_order] = static_cast<limb_type>(b);
          pres[r_order] = static_cast<limb_type>(a / y);
+         if(r_order && pr[r_order] == 0)
+         {
+            --r_order;  // No remainder, division was exact.
+            r.resize(r.size() - 1);
+         }
       }
       else
       {
          pres[r_order] = pr[r_order] / y;
          pr[r_order] %= y;
+         if(r_order && pr[r_order] == 0)
+         {
+            --r_order;  // No remainder, division was exact.
+            r.resize(r.size() - 1);
+         }
       }
    }
    // Termination condition is really just a check that r > y, but with two common
    // short-circuit cases handled first:
    while(r_order || (pr[r_order] > y));
 
-   if(pres[result.size() - 1] == 0)
-      result.resize(result.size() - 1);
+   result.normalize();
+   r.normalize();
 
    result.sign(x.sign());
    r.sign(x.sign());

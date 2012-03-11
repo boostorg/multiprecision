@@ -137,6 +137,24 @@ void test()
       BOOST_CHECK_EQUAL(mpz_int(lcm(-c, -d)).str(), test_type(lcm(-c1, -d1)).str());
       BOOST_CHECK_EQUAL(mpz_int(gcd(a, -b)).str(), test_type(gcd(a1, -b1)).str());
       BOOST_CHECK_EQUAL(mpz_int(lcm(c, -d)).str(), test_type(lcm(c1, -d1)).str());
+
+      if(std::numeric_limits<test_type>::is_modulo)
+      {
+         static mpz_int m = mpz_int(1) << std::numeric_limits<test_type>::digits;
+         mpz_int t(a);
+         test_type t1(a1);
+         for(unsigned i = 0; i < 10; ++i)
+         {
+            t *= a;
+            t %= m;
+            t += a;
+            t %= m;
+            t1 *= a1;
+            t1 += a1;
+         }
+         BOOST_CHECK_EQUAL(t.str(), t1.str());
+      }
+
       if(last_error_count != boost::detail::test_errors())
       {
          last_error_count = boost::detail::test_errors();

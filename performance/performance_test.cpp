@@ -12,7 +12,7 @@
 #if !defined(TEST_MPF) && !defined(TEST_MPZ) && \
    !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPQ) \
    && !defined(TEST_TOMMATH) && !defined(TEST_TOMMATH_BOOST_RATIONAL) && !defined(TEST_MPZ_BOOST_RATIONAL)\
-   && !defined(TEST_FIXED_INT) && !defined(TEST_CPP_INT)
+   && !defined(TEST_FIXED_INT) && !defined(TEST_CPP_INT) && !defined(TEST_CPP_INT_RATIONAL)
 #  define TEST_MPF
 #  define TEST_MPZ
 #  define TEST_MPQ
@@ -22,6 +22,7 @@
 #  define TEST_TOMMATH
 #  define TEST_FIXED_INT
 #  define TEST_CPP_INT
+#  define TEST_CPP_INT_RATIONAL
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -575,14 +576,12 @@ int main()
    test<boost::multiprecision::mpf_float_500>("gmp_float", 500);
 #endif
 #ifdef TEST_MPZ
-   test<boost::multiprecision::mpz_int>("gmp_int", 64);
    test<boost::multiprecision::mpz_int>("gmp_int", 128);
    test<boost::multiprecision::mpz_int>("gmp_int", 256);
    test<boost::multiprecision::mpz_int>("gmp_int", 512);
    test<boost::multiprecision::mpz_int>("gmp_int", 1024);
 #endif
 #ifdef TEST_CPP_INT
-   test<boost::multiprecision::cpp_int>("cpp_int", 64);
    test<boost::multiprecision::cpp_int>("cpp_int", 128);
    test<boost::multiprecision::cpp_int>("cpp_int", 256);
    test<boost::multiprecision::cpp_int>("cpp_int", 512);
@@ -593,15 +592,19 @@ int main()
    test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<512, true, void> > >("cpp_int(fixed)", 512);
    test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<1024, true, void> > >("cpp_int(fixed)", 1024);
 #endif
+#ifdef TEST_CPP_INT_RATIONAL
+   test<boost::multiprecision::cpp_rational>("cpp_rational", 128);
+   test<boost::multiprecision::cpp_rational>("cpp_rational", 256);
+   test<boost::multiprecision::cpp_rational>("cpp_rational", 512);
+   test<boost::multiprecision::cpp_rational>("cpp_rational", 1024);
+#endif
 #ifdef TEST_MPQ
-   test<boost::multiprecision::mpq_rational>("mpq_rational", 64);
    test<boost::multiprecision::mpq_rational>("mpq_rational", 128);
    test<boost::multiprecision::mpq_rational>("mpq_rational", 256);
    test<boost::multiprecision::mpq_rational>("mpq_rational", 512);
    test<boost::multiprecision::mpq_rational>("mpq_rational", 1024);
 #endif
 #ifdef TEST_TOMMATH
-   test<boost::multiprecision::mp_int>("tommath_int", 64);
    test<boost::multiprecision::mp_int>("tommath_int", 128);
    test<boost::multiprecision::mp_int>("tommath_int", 256);
    test<boost::multiprecision::mp_int>("tommath_int", 512);
@@ -610,7 +613,6 @@ int main()
    //
    // These are actually too slow to test!!!
    //
-   test<boost::multiprecision::mp_rational>("mp_rational", 64);
    test<boost::multiprecision::mp_rational>("mp_rational", 128);
    test<boost::multiprecision::mp_rational>("mp_rational", 256);
    test<boost::multiprecision::mp_rational>("mp_rational", 512);
@@ -618,7 +620,6 @@ int main()
    */
 #endif
 #ifdef TEST_FIXED_INT
-   test<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<64, true> > >("fixed_int", 64);
    test<boost::multiprecision::mp_int128_t>("fixed_int", 128);
    test<boost::multiprecision::mp_int256_t>("fixed_int", 256);
    test<boost::multiprecision::mp_int512_t>("fixed_int", 512);
