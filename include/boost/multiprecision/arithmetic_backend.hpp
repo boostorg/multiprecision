@@ -15,6 +15,7 @@
 
 namespace boost{
 namespace multiprecision{
+namespace backends{
 
 template <class Arithmetic>
 struct arithmetic_backend
@@ -97,25 +98,29 @@ private:
 };
 
 template <class Arithmetic>
-inline void add(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& o)
+inline void eval_add(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& o)
 {
    result.data() += o.data();
 }
 template <class Arithmetic>
-inline void subtract(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& o)
+inline void eval_subtract(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& o)
 {
    result.data() -= o.data();
 }
 template <class Arithmetic>
-inline void multiply(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& o)
+inline void eval_multiply(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& o)
 {
    result.data() *= o.data();
 }
 template <class Arithmetic>
-inline void divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& o)
+inline void eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& o)
 {
    result.data() /= o.data();
 }
+
+} // namespace backends
+
+using boost::multiprecision::backends::arithmetic_backend;
 
 }} // namespaces
 

@@ -122,36 +122,36 @@ struct mp_number_backend_float_architype
    long double m_value;
 };
 
-inline void add(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& o)
+inline void eval_add(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& o)
 {
    std::cout << "Addition (" << result.m_value << " += " << o.m_value << ")" << std::endl;
    result.m_value += o.m_value;
 }
-inline void subtract(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& o)
+inline void eval_subtract(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& o)
 {
    std::cout << "Subtraction (" << result.m_value << " -= " << o.m_value << ")" << std::endl;
    result.m_value -= o.m_value;
 }
-inline void multiply(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& o)
+inline void eval_multiply(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& o)
 {
    std::cout << "Multiplication (" << result.m_value << " *= " << o.m_value << ")" << std::endl;
    result.m_value *= o.m_value;
 }
-inline void divide(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& o)
+inline void eval_divide(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& o)
 {
    std::cout << "Division (" << result.m_value << " /= " << o.m_value << ")" << std::endl;
    result.m_value /= o.m_value;
 }
 
-inline void convert_to(unsigned long long* result, const mp_number_backend_float_architype& val)
+inline void eval_convert_to(unsigned long long* result, const mp_number_backend_float_architype& val)
 {
    *result = static_cast<unsigned long long>(val.m_value);
 }
-inline void convert_to(long long* result, const mp_number_backend_float_architype& val)
+inline void eval_convert_to(long long* result, const mp_number_backend_float_architype& val)
 {
    *result = static_cast<long long>(val.m_value);
 }
-inline void convert_to(long double* result, mp_number_backend_float_architype& val)
+inline void eval_convert_to(long double* result, mp_number_backend_float_architype& val)
 {
    *result = val.m_value;
 }

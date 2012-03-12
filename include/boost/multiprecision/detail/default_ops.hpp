@@ -32,76 +32,76 @@ namespace boost{ namespace multiprecision{ namespace default_ops{
 //
 template <class T, class V>
 inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const char*>, is_same<V, std::string> > >::type 
-   add(T& result, V const& v)
+   eval_add(T& result, V const& v)
 {
    T t;
    t = v;
-   add(result, t);
+   eval_add(result, t);
 }
 template <class T, class V>
 inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const char*>, is_same<V, std::string> > >::type
-   subtract(T& result, V const& v)
+   eval_subtract(T& result, V const& v)
 {
    T t;
    t = v;
-   subtract(result, t);
+   eval_subtract(result, t);
 }
 template <class T, class V>
 inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const char*>, is_same<V, std::string> > >::type
-   multiply(T& result, V const& v)
+   eval_multiply(T& result, V const& v)
 {
    T t;
    t = v;
-   multiply(result, t);
+   eval_multiply(result, t);
 }
 template <class T, class V>
 inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const char*>, is_same<V, std::string> > >::type
-   divide(T& result, V const& v)
+   eval_divide(T& result, V const& v)
 {
    T t;
    t = v;
-   divide(result, t);
+   eval_divide(result, t);
 }
 template <class T, class V>
 inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const char*>, is_same<V, std::string> > >::type
-   modulus(T& result, V const& v)
+   eval_modulus(T& result, V const& v)
 {
    T t;
    t = v;
-   modulus(result, t);
+   eval_modulus(result, t);
 }
 template <class T, class V>
 inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const char*>, is_same<V, std::string> > >::type
-   bitwise_and(T& result, V const& v)
+   eval_bitwise_and(T& result, V const& v)
 {
    T t;
    t = v;
-   bitwise_and(result, t);
+   eval_bitwise_and(result, t);
 }
 template <class T, class V>
 inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const char*>, is_same<V, std::string> > >::type
-   bitwise_or(T& result, V const& v)
+   eval_bitwise_or(T& result, V const& v)
 {
    T t;
    t = v;
-   bitwise_or(result, t);
+   eval_bitwise_or(result, t);
 }
 template <class T, class V>
 inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const char*>, is_same<V, std::string> > >::type
-   bitwise_xor(T& result, V const& v)
+   eval_bitwise_xor(T& result, V const& v)
 {
    T t;
    t = v;
-   bitwise_xor(result, t);
+   eval_bitwise_xor(result, t);
 }
 
 template <class T, class V>
 inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const char*>, is_same<V, std::string> > >::type
-   complement(T& result, V const& v)
+   eval_complement(T& result, V const& v)
 {
    T t;
    t = v;
-   complement(result, t);
+   eval_complement(result, t);
 }
 
 template <class T>
@@ -115,196 +115,196 @@ inline bool is_same_object(const T& u, const U&v)
 // Default versions of 3-arg arithmetic functions, these just forward to the 2 arg versions:
 //
 template <class T, class U, class V>
-inline void add(T& t, const U& u, const V& v)
+inline void eval_add(T& t, const U& u, const V& v)
 {
    if(is_same_object(t, v))
    {
-      add(t, u);
+      eval_add(t, u);
    }
    else if(is_same_object(t, u))
    {
-      add(t, v);
+      eval_add(t, v);
    }
    else
    {
       t = u;
-      add(t, v);
+      eval_add(t, v);
    }
 }
 template<class T, class U>
-inline typename disable_if<is_same<T, U> >::type add(T& t, const U& a, const T& b)
+inline typename disable_if<is_same<T, U> >::type eval_add(T& t, const U& a, const T& b)
 {
-   return add(t, b, a);
+   return eval_add(t, b, a);
 }
 
 template <class T, class U, class V>
-inline void subtract(T& t, const U& u, const V& v)
+inline void eval_subtract(T& t, const U& u, const V& v)
 {
    if(is_same_object(t, u))
-      subtract(t, v);
+      eval_subtract(t, v);
    else if(is_same_object(t, v))
    {
-      subtract(t, u);
+      eval_subtract(t, u);
       t.negate();
    }
    else
    {
       t = u;
-      subtract(t, v);
+      eval_subtract(t, v);
    }
 }
 template <class T, class U>
-inline typename disable_if<is_same<T, U> >::type subtract(T& t, const U& a, const T& b)
+inline typename disable_if<is_same<T, U> >::type eval_subtract(T& t, const U& a, const T& b)
 {
-   subtract(t, b, a);
+   eval_subtract(t, b, a);
    t.negate();
 }
 
 template <class T, class U, class V>
-inline void multiply(T& t, const U& u, const V& v)
+inline void eval_multiply(T& t, const U& u, const V& v)
 {
    if(is_same_object(t, u))
-      multiply(t, v);
+      eval_multiply(t, v);
    else if(is_same_object(t, v))
-      multiply(t, u);
+      eval_multiply(t, u);
    else
    {
       t = u;
-      multiply(t, v);
+      eval_multiply(t, v);
    }
 }
 template <class T, class U>
-inline typename disable_if<is_same<T, U> >::type multiply(T& t, const U& a, const T& b)
+inline typename disable_if<is_same<T, U> >::type eval_multiply(T& t, const U& a, const T& b)
 {
-   multiply(t, b, a);
+   eval_multiply(t, b, a);
 }
 template <class T, class U, class V>
-inline void divide(T& t, const U& u, const V& v)
+inline void eval_divide(T& t, const U& u, const V& v)
 {
    if(is_same_object(t, u))
-      divide(t, v);
+      eval_divide(t, v);
    else if(is_same_object(t, v))
    {
       T temp = t;
-      divide(temp, u, v);
+      eval_divide(temp, u, v);
       temp.swap(t);
    }
    else
    {
       t = u;
-      divide(t, v);
+      eval_divide(t, v);
    }
 }
 template <class T, class U, class V>
-inline void modulus(T& t, const U& u, const V& v)
+inline void eval_modulus(T& t, const U& u, const V& v)
 {
    if(is_same_object(t, u))
-      modulus(t, v);
+      eval_modulus(t, v);
    else if(is_same_object(t, v))
    {
       T temp;
-      modulus(temp, u, v);
+      eval_modulus(temp, u, v);
       temp.swap(t);
    }
    else
    {
       t = u;
-      modulus(t, v);
+      eval_modulus(t, v);
    }
 }
 template <class T, class U, class V>
-inline void bitwise_and(T& t, const U& u, const V& v)
+inline void eval_bitwise_and(T& t, const U& u, const V& v)
 {
    if(is_same_object(t, u))
-      bitwise_and(t, v);
+      eval_bitwise_and(t, v);
    else if(is_same_object(t, v))
-      bitwise_and(t, u);
+      eval_bitwise_and(t, u);
    else
    {
       t = u;
-      bitwise_and(t, v);
+      eval_bitwise_and(t, v);
    }
 }
 template <class T, class U>
-inline typename disable_if<is_same<T, U> >::type bitwise_and(T& t, const U& a, const T& b)
+inline typename disable_if<is_same<T, U> >::type eval_bitwise_and(T& t, const U& a, const T& b)
 {
-   bitwise_and(t, b, a);
+   eval_bitwise_and(t, b, a);
 }
 
 template <class T, class U, class V>
-inline void bitwise_or(T& t, const U& u, const V& v)
+inline void eval_bitwise_or(T& t, const U& u, const V& v)
 {
    if(is_same_object(t, u))
-      bitwise_or(t, v);
+      eval_bitwise_or(t, v);
    else if(is_same_object(t, v))
-      bitwise_or(t, u);
+      eval_bitwise_or(t, u);
    else
    {
       t = u;
-      bitwise_or(t, v);
+      eval_bitwise_or(t, v);
    }
 }
 template <class T, class U>
-inline typename disable_if<is_same<T, U> >::type bitwise_or(T& t, const U& a, const T& b)
+inline typename disable_if<is_same<T, U> >::type eval_bitwise_or(T& t, const U& a, const T& b)
 {
-   bitwise_or(t, b, a);
+   eval_bitwise_or(t, b, a);
 }
 
 template <class T, class U, class V>
-inline void bitwise_xor(T& t, const U& u, const V& v)
+inline void eval_bitwise_xor(T& t, const U& u, const V& v)
 {
    if(is_same_object(t, u))
-      bitwise_xor(t, v);
+      eval_bitwise_xor(t, v);
    else if(is_same_object(t, v))
-      bitwise_xor(t, u);
+      eval_bitwise_xor(t, u);
    else
    {
       t = u;
-      bitwise_xor(t, v);
+      eval_bitwise_xor(t, v);
    }
 }
 template <class T, class U>
-inline typename disable_if<is_same<T, U> >::type bitwise_xor(T& t, const U& a, const T& b)
+inline typename disable_if<is_same<T, U> >::type eval_bitwise_xor(T& t, const U& a, const T& b)
 {
-   bitwise_xor(t, b, a);
+   eval_bitwise_xor(t, b, a);
 }
 
 template <class T>
-inline void increment(T& val)
+inline void eval_increment(T& val)
 {
    typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
-   add(val, static_cast<ui_type>(1u));
+   eval_add(val, static_cast<ui_type>(1u));
 }
 
 template <class T>
-inline void decrement(T& val)
+inline void eval_decrement(T& val)
 {
    typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
-   subtract(val, static_cast<ui_type>(1u));
+   eval_subtract(val, static_cast<ui_type>(1u));
 }
 
 template <class T, class V>
-inline void left_shift(T& result, const T& arg, const V val)
+inline void eval_left_shift(T& result, const T& arg, const V val)
 {
    result = arg;
-   left_shift(result, val);
+   eval_left_shift(result, val);
 }
 
 template <class T, class V>
-inline void right_shift(T& result, const T& arg, const V val)
+inline void eval_right_shift(T& result, const T& arg, const V val)
 {
    result = arg;
-   right_shift(result, val);
+   eval_right_shift(result, val);
 }
 
 template <class T>
-inline bool is_zero(const T& val)
+inline bool eval_is_zero(const T& val)
 {
    typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
    return val.compare(static_cast<ui_type>(0)) == 0;
 }
 template <class T>
-inline int get_sign(const T& val)
+inline int eval_get_sign(const T& val)
 {
    typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
    return val.compare(static_cast<ui_type>(0));
@@ -316,7 +316,7 @@ inline void assign_components_imp(T& result, const V& v1, const V& v2, const mpl
    result = v1;
    T t;
    t = v2;
-   divide(result, t);
+   eval_divide(result, t);
 }
 
 template <class T, class V>
@@ -367,11 +367,11 @@ struct calculate_next_larger_type
 };
 
 template <class R, class B>
-inline void convert_to(R* result, const B& backend)
+inline void eval_convert_to(R* result, const B& backend)
 {
    typedef typename calculate_next_larger_type<R, B>::type next_type;
    next_type n;
-   convert_to(&n, backend);
+   eval_convert_to(&n, backend);
    if(std::numeric_limits<R>::is_specialized && (n > (std::numeric_limits<R>::max)()))
    {
       *result = (std::numeric_limits<R>::max)();
@@ -381,7 +381,7 @@ inline void convert_to(R* result, const B& backend)
 }
 
 template <class R, class B>
-inline void convert_to(terminal<R>* result, const B& backend)
+inline void eval_convert_to(terminal<R>* result, const B& backend)
 {
    //
    // We ran out of types to try for the convertion, try
@@ -417,7 +417,7 @@ template <class Backend>
 inline int eval_fpclassify(const Backend& arg)
 {
    BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_floating_point, "The fpclassify function is only valid for floating point types.");
-   return is_zero(arg) ? FP_ZERO : FP_NORMAL;
+   return eval_is_zero(arg) ? FP_ZERO : FP_NORMAL;
 }
 
 template <class T>
@@ -432,13 +432,13 @@ inline void eval_fmod(T& result, const T& a, const T& b)
       return;
    }
    T n;
-   divide(result, a, b);
-   if(get_sign(a) < 0)
+   eval_divide(result, a, b);
+   if(eval_get_sign(a) < 0)
       eval_ceil(n, result);
    else
       eval_floor(n, result);
-   multiply(n, b);
-   subtract(result, a, n);
+   eval_multiply(n, b);
+   eval_subtract(result, a, n);
 }
 template <class T>
 inline void eval_trunc(T& result, const T& a)
@@ -450,7 +450,7 @@ inline void eval_trunc(T& result, const T& a)
       result = boost::math::policies::raise_rounding_error("boost::multiprecision::trunc<%1%>(%1%)", 0, mp_number<T>(a), 0, boost::math::policies::policy<>()).backend();
       return;
    }
-   if(get_sign(a) < 0)
+   if(eval_get_sign(a) < 0)
       eval_ceil(result, a);
    else
       eval_floor(result, a);
@@ -467,14 +467,14 @@ inline void eval_round(T& result, const T& a)
       result = boost::math::policies::raise_rounding_error("boost::multiprecision::round<%1%>(%1%)", 0, mp_number<T>(a), 0, boost::math::policies::policy<>()).backend();
       return;
    }
-   if(get_sign(a) < 0)
+   if(eval_get_sign(a) < 0)
    {
-      subtract(result, a, fp_type(0.5f));
+      eval_subtract(result, a, fp_type(0.5f));
       eval_ceil(result, result);
    }
    else
    {
-      add(result, a, fp_type(0.5f));
+      eval_add(result, a, fp_type(0.5f));
       eval_floor(result, result);
    }
 }

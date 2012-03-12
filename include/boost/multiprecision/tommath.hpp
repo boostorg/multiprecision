@@ -17,7 +17,7 @@
 #include <limits>
 #include <climits>
 
-namespace boost{ namespace multiprecision{
+namespace boost{ namespace multiprecision{ namespace backends{
 
 namespace detail{
 
@@ -241,31 +241,31 @@ protected:
    if(SIGN(&x.data()))\
       BOOST_THROW_EXCEPTION(std::runtime_error("Bitwise operations on libtommath negative valued integers are disabled as they produce unpredictable results"))
 
-int get_sign(const tommath_int& val);
+int eval_get_sign(const tommath_int& val);
 
-inline void add(tommath_int& t, const tommath_int& o)
+inline void eval_add(tommath_int& t, const tommath_int& o)
 {
    detail::check_tommath_result(mp_add(&t.data(), const_cast< ::mp_int*>(&o.data()), &t.data()));
 }
-inline void subtract(tommath_int& t, const tommath_int& o)
+inline void eval_subtract(tommath_int& t, const tommath_int& o)
 {
    detail::check_tommath_result(mp_sub(&t.data(), const_cast< ::mp_int*>(&o.data()), &t.data()));
 }
-inline void multiply(tommath_int& t, const tommath_int& o)
+inline void eval_multiply(tommath_int& t, const tommath_int& o)
 {
    detail::check_tommath_result(mp_mul(&t.data(), const_cast< ::mp_int*>(&o.data()), &t.data()));
 }
-inline void divide(tommath_int& t, const tommath_int& o)
+inline void eval_divide(tommath_int& t, const tommath_int& o)
 {
    tommath_int temp;
    detail::check_tommath_result(mp_div(&t.data(), const_cast< ::mp_int*>(&o.data()), &t.data(), &temp.data()));
 }
-inline void modulus(tommath_int& t, const tommath_int& o)
+inline void eval_modulus(tommath_int& t, const tommath_int& o)
 {
-   bool neg = get_sign(t) < 0;
-   bool neg2 = get_sign(o) < 0;
+   bool neg = eval_get_sign(t) < 0;
+   bool neg2 = eval_get_sign(o) < 0;
    detail::check_tommath_result(mp_mod(&t.data(), const_cast< ::mp_int*>(&o.data()), &t.data()));
-   if((neg != neg2) && (get_sign(t) != 0))
+   if((neg != neg2) && (eval_get_sign(t) != 0))
    {
       t.negate();
       detail::check_tommath_result(mp_add(&t.data(), const_cast< ::mp_int*>(&o.data()), &t.data()));
@@ -277,72 +277,72 @@ inline void modulus(tommath_int& t, const tommath_int& o)
    }
 }
 template <class UI>
-inline void left_shift(tommath_int& t, UI i)
+inline void eval_left_shift(tommath_int& t, UI i)
 {
    detail::check_tommath_result(mp_mul_2d(&t.data(), static_cast<unsigned>(i), &t.data()));
 }
 template <class UI>
-inline void right_shift(tommath_int& t, UI i)
+inline void eval_right_shift(tommath_int& t, UI i)
 {
    tommath_int d;
    detail::check_tommath_result(mp_div_2d(&t.data(), static_cast<unsigned>(i), &t.data(), &d.data()));
 }
 template <class UI>
-inline void left_shift(tommath_int& t, const tommath_int& v, UI i)
+inline void eval_left_shift(tommath_int& t, const tommath_int& v, UI i)
 {
    detail::check_tommath_result(mp_mul_2d(const_cast< ::mp_int*>(&v.data()), static_cast<unsigned>(i), &t.data()));
 }
 template <class UI>
-inline void right_shift(tommath_int& t, const tommath_int& v, UI i)
+inline void eval_right_shift(tommath_int& t, const tommath_int& v, UI i)
 {
    tommath_int d;
    detail::check_tommath_result(mp_div_2d(const_cast< ::mp_int*>(&v.data()), static_cast<unsigned long>(i), &t.data(), &d.data()));
 }
 
-inline void bitwise_and(tommath_int& result, const tommath_int& v)
+inline void eval_bitwise_and(tommath_int& result, const tommath_int& v)
 {
    BOOST_MP_TOMMATH_BIT_OP_CHECK(result);
    BOOST_MP_TOMMATH_BIT_OP_CHECK(v);
    detail::check_tommath_result(mp_and(&result.data(), const_cast< ::mp_int*>(&v.data()), &result.data()));
 }
 
-inline void bitwise_or(tommath_int& result, const tommath_int& v)
+inline void eval_bitwise_or(tommath_int& result, const tommath_int& v)
 {
    BOOST_MP_TOMMATH_BIT_OP_CHECK(result);
    BOOST_MP_TOMMATH_BIT_OP_CHECK(v);
    detail::check_tommath_result(mp_or(&result.data(), const_cast< ::mp_int*>(&v.data()), &result.data()));
 }
 
-inline void bitwise_xor(tommath_int& result, const tommath_int& v)
+inline void eval_bitwise_xor(tommath_int& result, const tommath_int& v)
 {
    BOOST_MP_TOMMATH_BIT_OP_CHECK(result);
    BOOST_MP_TOMMATH_BIT_OP_CHECK(v);
    detail::check_tommath_result(mp_xor(&result.data(), const_cast< ::mp_int*>(&v.data()), &result.data()));
 }
 
-inline void add(tommath_int& t, const tommath_int& p, const tommath_int& o)
+inline void eval_add(tommath_int& t, const tommath_int& p, const tommath_int& o)
 {
    detail::check_tommath_result(mp_add(const_cast< ::mp_int*>(&p.data()), const_cast< ::mp_int*>(&o.data()), &t.data()));
 }
-inline void subtract(tommath_int& t, const tommath_int& p, const tommath_int& o)
+inline void eval_subtract(tommath_int& t, const tommath_int& p, const tommath_int& o)
 {
    detail::check_tommath_result(mp_sub(const_cast< ::mp_int*>(&p.data()), const_cast< ::mp_int*>(&o.data()), &t.data()));
 }
-inline void multiply(tommath_int& t, const tommath_int& p, const tommath_int& o)
+inline void eval_multiply(tommath_int& t, const tommath_int& p, const tommath_int& o)
 {
    detail::check_tommath_result(mp_mul(const_cast< ::mp_int*>(&p.data()), const_cast< ::mp_int*>(&o.data()), &t.data()));
 }
-inline void divide(tommath_int& t, const tommath_int& p, const tommath_int& o)
+inline void eval_divide(tommath_int& t, const tommath_int& p, const tommath_int& o)
 {
    tommath_int d;
    detail::check_tommath_result(mp_div(const_cast< ::mp_int*>(&p.data()), const_cast< ::mp_int*>(&o.data()), &t.data(), &d.data()));
 }
-inline void modulus(tommath_int& t, const tommath_int& p, const tommath_int& o)
+inline void eval_modulus(tommath_int& t, const tommath_int& p, const tommath_int& o)
 {
-   bool neg = get_sign(p) < 0;
-   bool neg2 = get_sign(o) < 0;
+   bool neg = eval_get_sign(p) < 0;
+   bool neg2 = eval_get_sign(o) < 0;
    detail::check_tommath_result(mp_mod(const_cast< ::mp_int*>(&p.data()), const_cast< ::mp_int*>(&o.data()), &t.data()));
-   if((neg != neg2) && (get_sign(t) != 0))
+   if((neg != neg2) && (eval_get_sign(t) != 0))
    {
       t.negate();
       detail::check_tommath_result(mp_add(&t.data(), const_cast< ::mp_int*>(&o.data()), &t.data()));
@@ -354,28 +354,28 @@ inline void modulus(tommath_int& t, const tommath_int& p, const tommath_int& o)
    }
 }
 
-inline void bitwise_and(tommath_int& result, const tommath_int& u, const tommath_int& v)
+inline void eval_bitwise_and(tommath_int& result, const tommath_int& u, const tommath_int& v)
 {
    BOOST_MP_TOMMATH_BIT_OP_CHECK(u);
    BOOST_MP_TOMMATH_BIT_OP_CHECK(v);
    detail::check_tommath_result(mp_and(const_cast< ::mp_int*>(&u.data()), const_cast< ::mp_int*>(&v.data()), &result.data()));
 }
 
-inline void bitwise_or(tommath_int& result, const tommath_int& u, const tommath_int& v)
+inline void eval_bitwise_or(tommath_int& result, const tommath_int& u, const tommath_int& v)
 {
    BOOST_MP_TOMMATH_BIT_OP_CHECK(u);
    BOOST_MP_TOMMATH_BIT_OP_CHECK(v);
    detail::check_tommath_result(mp_or(const_cast< ::mp_int*>(&u.data()), const_cast< ::mp_int*>(&v.data()), &result.data()));
 }
 
-inline void bitwise_xor(tommath_int& result, const tommath_int& u, const tommath_int& v)
+inline void eval_bitwise_xor(tommath_int& result, const tommath_int& u, const tommath_int& v)
 {
    BOOST_MP_TOMMATH_BIT_OP_CHECK(u);
    BOOST_MP_TOMMATH_BIT_OP_CHECK(v);
    detail::check_tommath_result(mp_xor(const_cast< ::mp_int*>(&u.data()), const_cast< ::mp_int*>(&v.data()), &result.data()));
 }
 /*
-inline void complement(tommath_int& result, const tommath_int& u)
+inline void eval_complement(tommath_int& result, const tommath_int& u)
 {
    //
    // Although this code works, it doesn't really do what the user might expect....
@@ -400,32 +400,32 @@ inline void complement(tommath_int& result, const tommath_int& u)
    // Create a mask providing the extra bits we need and add to result:
    tommath_int mask;
    mask = static_cast<long long>((1u << padding) - 1);
-   left_shift(mask, shift);
+   eval_left_shift(mask, shift);
    add(result, mask);
 }
 */
-inline bool is_zero(const tommath_int& val)
+inline bool eval_is_zero(const tommath_int& val)
 {
    return mp_iszero(&val.data());
 }
-inline int get_sign(const tommath_int& val)
+inline int eval_get_sign(const tommath_int& val)
 {
    return mp_iszero(&val.data()) ? 0 : SIGN(&val.data()) ? -1 : 1;
 }
 template <class A>
-inline void convert_to(A* result, const tommath_int& val)
+inline void eval_convert_to(A* result, const tommath_int& val)
 {
    *result = boost::lexical_cast<A>(val.str(0, std::ios_base::fmtflags(0)));
 }
-inline void convert_to(char* result, const tommath_int& val)
+inline void eval_convert_to(char* result, const tommath_int& val)
 {
    *result = static_cast<char>(boost::lexical_cast<int>(val.str(0, std::ios_base::fmtflags(0))));
 }
-inline void convert_to(unsigned char* result, const tommath_int& val)
+inline void eval_convert_to(unsigned char* result, const tommath_int& val)
 {
    *result = static_cast<unsigned char>(boost::lexical_cast<unsigned>(val.str(0, std::ios_base::fmtflags(0))));
 }
-inline void convert_to(signed char* result, const tommath_int& val)
+inline void eval_convert_to(signed char* result, const tommath_int& val)
 {
    *result = static_cast<signed char>(boost::lexical_cast<int>(val.str(0, std::ios_base::fmtflags(0))));
 }
@@ -442,6 +442,9 @@ inline void eval_lcm(tommath_int& result, const tommath_int& a, const tommath_in
    detail::check_tommath_result(mp_lcm(const_cast< ::mp_int*>(&a.data()), const_cast< ::mp_int*>(&b.data()), const_cast< ::mp_int*>(&result.data())));
 }
 
+} // namespace backends
+
+using boost::multiprecision::backends::tommath_int;
 
 template<>
 struct number_category<tommath_int> : public mpl::int_<number_kind_integer>{};

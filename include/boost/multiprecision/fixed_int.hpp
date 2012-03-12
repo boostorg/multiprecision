@@ -127,17 +127,17 @@ struct fixed_int
          f = ldexp(f, shift);
          term = floor(f);
          e -= shift;
-         left_shift(*this, shift);
+         eval_left_shift(*this, shift);
          if(term > 0)
-            add(*this, static_cast<limb_type>(term));
+            eval_add(*this, static_cast<limb_type>(term));
          else
-            subtract(*this, static_cast<limb_type>(-term));
+            eval_subtract(*this, static_cast<limb_type>(-term));
          f -= term;
       }
       if(e > 0)
-         left_shift(*this, e);
+         eval_left_shift(*this, e);
       else if(e < 0)
-         right_shift(*this, -e);
+         eval_right_shift(*this, -e);
       data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
       return *this;
    }
@@ -202,7 +202,7 @@ struct fixed_int
                      break;
                   }
                }
-               left_shift(*this, block_shift);
+               eval_left_shift(*this, block_shift);
                m_value[limb_count - 1] |= block;
             }
          }
@@ -229,8 +229,8 @@ struct fixed_int
                      break;
                   }
                }
-               multiply(*this, block_mult);
-               add(*this, block);
+               eval_multiply(*this, block_mult);
+               eval_add(*this, block);
             }
          }
       }
@@ -265,7 +265,7 @@ struct fixed_int
             if(c > '9')
                c += 'A' - '9' - 1;
             result[pos--] = c;
-            right_shift(t, shift);
+            eval_right_shift(t, shift);
          }
          if(Bits % shift)
          {
@@ -306,7 +306,7 @@ struct fixed_int
          }
          else
          {
-            while(get_sign(t) != 0)
+            while(eval_get_sign(t) != 0)
             {
                fixed_int t2;
                divide_unsigned_helper(t2, t, max_block_10, r);
@@ -376,12 +376,12 @@ private:
 };
 
 template <unsigned Bits, bool Signed>
-inline void add(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& o)
+inline void eval_add(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& o)
 {
-   add(result, result, o);
+   eval_add(result, result, o);
 }
 template <unsigned Bits, bool Signed>
-inline void add(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, const fixed_int<Bits, Signed>& b)
+inline void eval_add(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, const fixed_int<Bits, Signed>& b)
 {
    // Addition using modular arithmatic.
    // Nothing fancy, just let uintmax_t take the strain:
@@ -395,7 +395,7 @@ inline void add(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& 
    result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 template <unsigned Bits, bool Signed>
-inline void add(fixed_int<Bits, Signed>& result, const limb_type& o)
+inline void eval_add(fixed_int<Bits, Signed>& result, const limb_type& o)
 {
    // Addition using modular arithmatic.
    // Nothing fancy, just let uintmax_t take the strain:
@@ -409,15 +409,15 @@ inline void add(fixed_int<Bits, Signed>& result, const limb_type& o)
    result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 template <unsigned Bits, bool Signed>
-inline void add(fixed_int<Bits, Signed>& result, const signed_limb_type& o)
+inline void eval_add(fixed_int<Bits, Signed>& result, const signed_limb_type& o)
 {
    if(o < 0)
-      subtract(result, static_cast<limb_type>(-o));
+      eval_subtract(result, static_cast<limb_type>(-o));
    else if(o > 0)
-      add(result, static_cast<limb_type>(o));
+      eval_add(result, static_cast<limb_type>(o));
 }
 template <unsigned Bits, bool Signed>
-inline void subtract(fixed_int<Bits, Signed>& result, const limb_type& o)
+inline void eval_subtract(fixed_int<Bits, Signed>& result, const limb_type& o)
 {
    // Subtract using modular arithmatic.
    // This is the same code as for addition, with the twist that we negate o "on the fly":
@@ -434,41 +434,41 @@ inline void subtract(fixed_int<Bits, Signed>& result, const limb_type& o)
    result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 template <unsigned Bits, bool Signed>
-inline void subtract(fixed_int<Bits, Signed>& result, const signed_limb_type& o)
+inline void eval_subtract(fixed_int<Bits, Signed>& result, const signed_limb_type& o)
 {
    if(o)
    {
       if(o < 0)
-         add(result, static_cast<limb_type>(-o));
+         eval_add(result, static_cast<limb_type>(-o));
       else
-         subtract(result, static_cast<limb_type>(o));
+         eval_subtract(result, static_cast<limb_type>(o));
    }
 }
 template <unsigned Bits, bool Signed>
-inline void increment(fixed_int<Bits, Signed>& result)
+inline void eval_increment(fixed_int<Bits, Signed>& result)
 {
    static const limb_type one = 1;
    if(result.data().elems[fixed_int<Bits, Signed>::limb_count - 1] < fixed_int<Bits, Signed>::max_limb_value)
       ++result.data().elems[fixed_int<Bits, Signed>::limb_count - 1];
    else
-      add(result, one);
+      eval_add(result, one);
 }
 template <unsigned Bits, bool Signed>
-inline void decrement(fixed_int<Bits, Signed>& result)
+inline void eval_decrement(fixed_int<Bits, Signed>& result)
 {
    static const limb_type one = 1;
    if(result.data().elems[fixed_int<Bits, Signed>::limb_count - 1])
       --result.data().elems[fixed_int<Bits, Signed>::limb_count - 1];
    else
-      subtract(result, one);
+      eval_subtract(result, one);
 }
 template <unsigned Bits, bool Signed>
-inline void subtract(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& o)
+inline void eval_subtract(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& o)
 {
-   subtract(result, result, o);
+   eval_subtract(result, result, o);
 }
 template <unsigned Bits, bool Signed>
-inline void subtract(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, const fixed_int<Bits, Signed>& b)
+inline void eval_subtract(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, const fixed_int<Bits, Signed>& b)
 {
    // Subtract using modular arithmatic.
    // This is the same code as for addition, with the twist that we negate b "on the fly":
@@ -482,20 +482,20 @@ inline void subtract(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Sign
    result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 template <unsigned Bits, bool Signed>
-inline void multiply(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, const fixed_int<Bits, Signed>& b)
+inline void eval_multiply(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, const fixed_int<Bits, Signed>& b)
 {
    // Very simple long multiplication, only usable for small numbers of limb_type's
    // but that's the typical use case for this type anyway:
    if(&result == &a)
    {
       fixed_int<Bits, Signed> t(a);
-      multiply(result, t, b);
+      eval_multiply(result, t, b);
       return;
    }
    if(&result == &b)
    {
       fixed_int<Bits, Signed> t(b);
-      multiply(result, a, t);
+      eval_multiply(result, a, t);
       return;
    }
    double_limb_type carry = 0;
@@ -515,14 +515,14 @@ inline void multiply(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Sign
    result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 template <unsigned Bits, bool Signed>
-inline void multiply(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a)
+inline void eval_multiply(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a)
 {
    // There is no in-place multiply:
    fixed_int<Bits, Signed> b(result);
-   multiply(result, b, a);
+   eval_multiply(result, b, a);
 }
 template <unsigned Bits, bool Signed>
-inline void multiply(fixed_int<Bits, Signed>& result, const limb_type& a)
+inline void eval_multiply(fixed_int<Bits, Signed>& result, const limb_type& a)
 {
    double_limb_type carry = 0;
    for(int i = fixed_int<Bits, Signed>::limb_count - 1; i >= 0; --i)
@@ -534,13 +534,13 @@ inline void multiply(fixed_int<Bits, Signed>& result, const limb_type& a)
    result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 template <unsigned Bits, bool Signed>
-inline void multiply(fixed_int<Bits, Signed>& result, const signed_limb_type& a)
+inline void eval_multiply(fixed_int<Bits, Signed>& result, const signed_limb_type& a)
 {
    if(a > 0)
-      multiply(result, static_cast<limb_type>(a));
+      eval_multiply(result, static_cast<limb_type>(a));
    else
    {
-      multiply(result, static_cast<limb_type>(-a));
+      eval_multiply(result, static_cast<limb_type>(-a));
       result.negate();
    }
 }
@@ -580,17 +580,17 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
    }
 
 
-   using default_ops::subtract;
+   using default_ops::eval_subtract;
 
 
-   if (is_zero(y))
+   if (eval_is_zero(y))
    {
       volatile int i = 0;
       i /= i;
       return;
    }
 
-   if (is_zero(x))
+   if (eval_is_zero(x))
    {
       r = y;
       result = x;
@@ -618,7 +618,7 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
    {
       // result is exactly 1:
       result = static_cast<limb_type>(1u);
-      subtract(r, y);
+      eval_subtract(r, y);
       return;
    }
 
@@ -626,18 +626,18 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
    limb_type mask_index = fixed_int<Bits, Signed>::limb_count - 1 - n / fixed_int<Bits, Signed>::limb_bits;
    limb_type mask = static_cast<limb_type>(1u) << n % fixed_int<Bits, Signed>::limb_bits;
    fixed_int<Bits, Signed> t(y);
-   left_shift(t, n);
+   eval_left_shift(t, n);
    while(mask_index < fixed_int<Bits, Signed>::limb_count)
    {
       int comp = r.compare(t);
       if(comp >= 0)
       {
          result.data()[mask_index] |= mask;
-         subtract(r, t);
+         eval_subtract(r, t);
          if(comp == 0)
             break; // no remainder left - we have an exact result!
       }
-      right_shift(t, 1u);
+      eval_right_shift(t, 1u);
       if(0 == (mask >>= 1))
       {
          ++mask_index;
@@ -682,7 +682,7 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
     */
 
 
-   using default_ops::subtract;
+   using default_ops::eval_subtract;
 
    if(&result == &r)
    {
@@ -812,7 +812,7 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
          {
             t = limb_type(0);
             t.data()[fixed_int<Bits, Signed>::limb_count - 1 - shift] = guess;
-            subtract(result, t);
+            eval_subtract(result, t);
          }
       }
       else if(fixed_int<Bits, Signed>::max_limb_value - result.data()[fixed_int<Bits, Signed>::limb_count - 1 - shift] > guess)
@@ -821,7 +821,7 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
       {
          t = limb_type(0);
          t.data()[fixed_int<Bits, Signed>::limb_count - 1 - shift] = guess;
-         add(result, t);
+         eval_add(result, t);
       }
       //
       // Calculate guess * y, we use a fused mutiply-shift O(N) for this
@@ -840,7 +840,7 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
       //
       // Update r:
       //
-      subtract(r, t);
+      eval_subtract(r, t);
       if(r.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask)
       {
          r.negate();
@@ -857,9 +857,9 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
    if(r_neg)
    {
       // We have one too many in the result:
-      decrement(result);
+      eval_decrement(result);
       r.negate();
-      add(r, y);
+      eval_add(r, y);
    }
 
    BOOST_ASSERT(r.compare(y) < 0); // remainder must be less than the divisor or our code has failed
@@ -885,7 +885,7 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
 
    // As above, but simplified for integer divisor:
 
-   using default_ops::subtract;
+   using default_ops::eval_subtract;
 
    if(y == 0)
    {
@@ -970,7 +970,7 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
 }
 
 template <unsigned Bits, bool Signed>
-inline void divide(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, const fixed_int<Bits, Signed>& b)
+inline void eval_divide(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, const fixed_int<Bits, Signed>& b)
 {
    fixed_int<Bits, Signed> r;
    if(Signed && (a.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask))
@@ -1003,7 +1003,7 @@ inline void divide(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed
    }
 }
 template <unsigned Bits, bool Signed>
-inline void divide(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, limb_type& b)
+inline void eval_divide(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, limb_type& b)
 {
    fixed_int<Bits, Signed> r;
    if(Signed && (a.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask))
@@ -1019,7 +1019,7 @@ inline void divide(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed
    }
 }
 template <unsigned Bits, bool Signed>
-inline void divide(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, signed_limb_type& b)
+inline void eval_divide(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, signed_limb_type& b)
 {
    fixed_int<Bits, Signed> r;
    if(Signed && (a.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask))
@@ -1049,28 +1049,28 @@ inline void divide(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed
    }
 }
 template <unsigned Bits, bool Signed>
-inline void divide(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& b)
+inline void eval_divide(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& b)
 {
    // There is no in place divide:
    fixed_int<Bits, Signed> a(result);
-   divide(result, a, b);
+   eval_divide(result, a, b);
 }
 template <unsigned Bits, bool Signed>
-inline void divide(fixed_int<Bits, Signed>& result, limb_type b)
+inline void eval_divide(fixed_int<Bits, Signed>& result, limb_type b)
 {
    // There is no in place divide:
    fixed_int<Bits, Signed> a(result);
-   divide(result, a, b);
+   eval_divide(result, a, b);
 }
 template <unsigned Bits, bool Signed>
-inline void divide(fixed_int<Bits, Signed>& result, signed_limb_type b)
+inline void eval_divide(fixed_int<Bits, Signed>& result, signed_limb_type b)
 {
    // There is no in place divide:
    fixed_int<Bits, Signed> a(result);
-   divide(result, a, b);
+   eval_divide(result, a, b);
 }
 template <unsigned Bits, bool Signed>
-inline void modulus(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, const fixed_int<Bits, Signed>& b)
+inline void eval_modulus(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, const fixed_int<Bits, Signed>& b)
 {
    fixed_int<Bits, Signed> r;
    if(Signed && (a.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask))
@@ -1103,7 +1103,7 @@ inline void modulus(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signe
    }
 }
 template <unsigned Bits, bool Signed>
-inline void modulus(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, limb_type b)
+inline void eval_modulus(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, limb_type b)
 {
    fixed_int<Bits, Signed> r;
    if(Signed && (a.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask))
@@ -1119,7 +1119,7 @@ inline void modulus(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signe
    }
 }
 template <unsigned Bits, bool Signed>
-inline void modulus(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, signed_limb_type b)
+inline void eval_modulus(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& a, signed_limb_type b)
 {
    fixed_int<Bits, Signed> r;
    if(Signed && (a.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask))
@@ -1149,42 +1149,42 @@ inline void modulus(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signe
    }
 }
 template <unsigned Bits, bool Signed>
-inline void modulus(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& b)
+inline void eval_modulus(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& b)
 {
    // There is no in place divide:
    fixed_int<Bits, Signed> a(result);
-   modulus(result, a, b);
+   eval_modulus(result, a, b);
 }
 template <unsigned Bits, bool Signed>
-inline void modulus(fixed_int<Bits, Signed>& result, limb_type b)
+inline void eval_modulus(fixed_int<Bits, Signed>& result, limb_type b)
 {
    // There is no in place divide:
    fixed_int<Bits, Signed> a(result);
-   modulus(result, a, b);
+   eval_modulus(result, a, b);
 }
 template <unsigned Bits, bool Signed>
-inline void modulus(fixed_int<Bits, Signed>& result, signed_limb_type b)
+inline void eval_modulus(fixed_int<Bits, Signed>& result, signed_limb_type b)
 {
    // There is no in place divide:
    fixed_int<Bits, Signed> a(result);
-   modulus(result, a, b);
+   eval_modulus(result, a, b);
 }
 
 template <unsigned Bits, bool Signed>
-inline void bitwise_and(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& o)
+inline void eval_bitwise_and(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& o)
 {
    for(typename fixed_int<Bits, Signed>::data_type::size_type i = 0; i < fixed_int<Bits, Signed>::limb_count; ++i)
       result.data()[i] &= o.data()[i];
 }
 template <unsigned Bits, bool Signed>
-inline void bitwise_and(fixed_int<Bits, Signed>& result, limb_type o)
+inline void eval_bitwise_and(fixed_int<Bits, Signed>& result, limb_type o)
 {
    result.data()[fixed_int<Bits, Signed>::limb_count - 1] &= o;
    for(typename fixed_int<Bits, Signed>::data_type::size_type i = 0; i < fixed_int<Bits, Signed>::limb_count - 1; ++i)
       result.data()[i] = 0;
 }
 template <unsigned Bits, bool Signed>
-inline void bitwise_and(fixed_int<Bits, Signed>& result, signed_limb_type o)
+inline void eval_bitwise_and(fixed_int<Bits, Signed>& result, signed_limb_type o)
 {
    result.data()[fixed_int<Bits, Signed>::limb_count - 1] &= o;
    limb_type mask = o < 0 ? fixed_int<Bits, Signed>::max_limb_value : 0;
@@ -1192,18 +1192,18 @@ inline void bitwise_and(fixed_int<Bits, Signed>& result, signed_limb_type o)
       result.data()[i] &= mask;
 }
 template <unsigned Bits, bool Signed>
-inline void bitwise_or(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& o)
+inline void eval_bitwise_or(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& o)
 {
    for(typename fixed_int<Bits, Signed>::data_type::size_type i = 0; i < fixed_int<Bits, Signed>::limb_count; ++i)
       result.data()[i] |= o.data()[i];
 }
 template <unsigned Bits, bool Signed>
-inline void bitwise_or(fixed_int<Bits, Signed>& result, limb_type o)
+inline void eval_bitwise_or(fixed_int<Bits, Signed>& result, limb_type o)
 {
    result.data()[fixed_int<Bits, Signed>::limb_count - 1] |= o;
 }
 template <unsigned Bits, bool Signed>
-inline void bitwise_or(fixed_int<Bits, Signed>& result, signed_limb_type o)
+inline void eval_bitwise_or(fixed_int<Bits, Signed>& result, signed_limb_type o)
 {
    result.data()[fixed_int<Bits, Signed>::limb_count - 1] |= o;
    limb_type mask = o < 0 ? fixed_int<Bits, Signed>::max_limb_value : 0;
@@ -1211,19 +1211,19 @@ inline void bitwise_or(fixed_int<Bits, Signed>& result, signed_limb_type o)
       result.data()[i] |= mask;
 }
 template <unsigned Bits, bool Signed>
-inline void bitwise_xor(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& o)
+inline void eval_bitwise_xor(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& o)
 {
    for(typename fixed_int<Bits, Signed>::data_type::size_type i = 0; i < fixed_int<Bits, Signed>::limb_count; ++i)
       result.data()[i] ^= o.data()[i];
    result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 template <unsigned Bits, bool Signed>
-inline void bitwise_xor(fixed_int<Bits, Signed>& result, limb_type o)
+inline void eval_bitwise_xor(fixed_int<Bits, Signed>& result, limb_type o)
 {
    result.data()[fixed_int<Bits, Signed>::limb_count - 1] ^= o;
 }
 template <unsigned Bits, bool Signed>
-inline void bitwise_xor(fixed_int<Bits, Signed>& result, signed_limb_type o)
+inline void eval_bitwise_xor(fixed_int<Bits, Signed>& result, signed_limb_type o)
 {
    result.data()[fixed_int<Bits, Signed>::limb_count - 1] ^= o;
    limb_type mask = o < 0 ? fixed_int<Bits, Signed>::max_limb_value : 0;
@@ -1231,14 +1231,14 @@ inline void bitwise_xor(fixed_int<Bits, Signed>& result, signed_limb_type o)
       result.data()[i] ^= mask;
 }
 template <unsigned Bits, bool Signed>
-inline void complement(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& o)
+inline void eval_complement(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Signed>& o)
 {
    for(typename fixed_int<Bits, Signed>::data_type::size_type i = 0; i < fixed_int<Bits, Signed>::limb_count; ++i)
       result.data()[i] = ~o.data()[i];
    result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 template <unsigned Bits, bool Signed>
-inline void left_shift(fixed_int<Bits, Signed>& result, double_limb_type s)
+inline void eval_left_shift(fixed_int<Bits, Signed>& result, double_limb_type s)
 {
    if(!s)
       return;
@@ -1273,7 +1273,7 @@ inline void left_shift(fixed_int<Bits, Signed>& result, double_limb_type s)
    result.data()[0] &= fixed_int<Bits, Signed>::upper_limb_mask;
 }
 template <unsigned Bits, bool Signed>
-inline void right_shift(fixed_int<Bits, Signed>& result, double_limb_type s)
+inline void eval_right_shift(fixed_int<Bits, Signed>& result, double_limb_type s)
 {
    if(!s)
       return;
@@ -1317,22 +1317,22 @@ inline void right_shift(fixed_int<Bits, Signed>& result, double_limb_type s)
 }
 
 template <class R, unsigned Bits, bool Signed>
-inline typename enable_if<is_integral<R>, void>::type convert_to(R* result, const fixed_int<Bits, Signed>& backend, const mpl::true_&)
+inline typename enable_if<is_integral<R>, void>::type eval_convert_to(R* result, const fixed_int<Bits, Signed>& backend, const mpl::true_&)
 {
    if(backend.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask)
    {
       fixed_int<Bits, Signed> t(backend);
       t.negate();
-      convert_to(result, t, mpl::false_());
+      eval_convert_to(result, t, mpl::false_());
       *result = -*result;
       return;
    }
    else
-      convert_to(result, backend, mpl::false_());
+      eval_convert_to(result, backend, mpl::false_());
 }
 
 template <class R, unsigned Bits, bool Signed>
-inline typename enable_if<is_integral<R>, void>::type convert_to(R* result, const fixed_int<Bits, Signed>& backend, const mpl::false_&)
+inline typename enable_if<is_integral<R>, void>::type eval_convert_to(R* result, const fixed_int<Bits, Signed>& backend, const mpl::false_&)
 {
    unsigned shift = (fixed_int<Bits, Signed>::limb_count - 1) * fixed_int<Bits, Signed>::limb_bits;
    *result = static_cast<limb_type>(0);
@@ -1344,20 +1344,20 @@ inline typename enable_if<is_integral<R>, void>::type convert_to(R* result, cons
 }
 
 template <class R, unsigned Bits, bool Signed>
-inline typename enable_if<is_integral<R>, void>::type convert_to(R* result, const fixed_int<Bits, Signed>& backend)
+inline typename enable_if<is_integral<R>, void>::type eval_convert_to(R* result, const fixed_int<Bits, Signed>& backend)
 {
    typedef mpl::bool_<Signed && std::numeric_limits<R>::is_signed> tag_type;
-   convert_to(result, backend, tag_type());
+   eval_convert_to(result, backend, tag_type());
 }
 
 template <class R, unsigned Bits, bool Signed>
-inline typename enable_if<is_floating_point<R>, void>::type convert_to(R* result, const fixed_int<Bits, Signed>& backend)
+inline typename enable_if<is_floating_point<R>, void>::type eval_convert_to(R* result, const fixed_int<Bits, Signed>& backend)
 {
    if(Signed && (backend.data()[0] & fixed_int<Bits, Signed>::sign_bit_mask))
    {
       fixed_int<Bits, Signed> t(backend);
       t.negate();
-      convert_to(result, t);
+      eval_convert_to(result, t);
       *result = -*result;
       return;
    }
@@ -1371,7 +1371,7 @@ inline typename enable_if<is_floating_point<R>, void>::type convert_to(R* result
 }
 
 template <unsigned Bits, bool Signed>
-inline bool is_zero(const fixed_int<Bits, Signed>& val)
+inline bool eval_is_zero(const fixed_int<Bits, Signed>& val)
 {
    for(typename fixed_int<Bits, Signed>::data_type::size_type i = 0; i < fixed_int<Bits, Signed>::limb_count; ++i)
    {
@@ -1381,14 +1381,14 @@ inline bool is_zero(const fixed_int<Bits, Signed>& val)
    return true;
 }
 template <unsigned Bits>
-inline int get_sign(const fixed_int<Bits, false>& val)
+inline int eval_get_sign(const fixed_int<Bits, false>& val)
 {
-   return is_zero(val) ? 0 : 1;
+   return eval_is_zero(val) ? 0 : 1;
 }
 template <unsigned Bits>
-inline int get_sign(const fixed_int<Bits, true>& val)
+inline int eval_get_sign(const fixed_int<Bits, true>& val)
 {
-   return is_zero(val) ? 0 : val.data()[0] & fixed_int<Bits, true>::sign_bit_mask ? -1 : 1;
+   return eval_is_zero(val) ? 0 : val.data()[0] & fixed_int<Bits, true>::sign_bit_mask ? -1 : 1;
 }
 
 namespace detail{
@@ -1398,7 +1398,7 @@ namespace detail{
 template <unsigned Bits, bool Signed>
 inline unsigned get_lsb(const fixed_int<Bits, Signed>& a)
 {
-   BOOST_ASSERT(get_sign(a) != 0);
+   BOOST_ASSERT(eval_get_sign(a) != 0);
    
    unsigned result = 0;
    //
@@ -1429,7 +1429,7 @@ inline void eval_gcd(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Sign
 
    fixed_int<Bits, Signed> u(a), v(b);
 
-   int s = get_sign(u);
+   int s = eval_get_sign(u);
 
    /* GCD(0,x) := x */
    if(s < 0)
@@ -1441,7 +1441,7 @@ inline void eval_gcd(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Sign
       result = v;
       return;
    }
-   s = get_sign(v);
+   s = eval_get_sign(v);
    if(s < 0)
    {
       v.negate();
@@ -1458,8 +1458,8 @@ inline void eval_gcd(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Sign
    unsigned us = detail::get_lsb(u);
    unsigned vs = detail::get_lsb(v);
    shift = (std::min)(us, vs);
-   right_shift(u, us);
-   right_shift(v, vs);
+   eval_right_shift(u, us);
+   eval_right_shift(v, vs);
 
    do 
    {
@@ -1467,19 +1467,19 @@ inline void eval_gcd(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Sign
       Let u = min(u, v), v = diff(u, v)/2. */
       if(u.compare(v) > 0)
          u.swap(v);
-      subtract(v, u);
+      eval_subtract(v, u);
       // Termination condition tries not to do a full compare if possible:
-      if(!v.data()[fixed_int<Bits, Signed>::limb_count - 1] && is_zero(v))
+      if(!v.data()[fixed_int<Bits, Signed>::limb_count - 1] && eval_is_zero(v))
          break;
       vs = detail::get_lsb(v);
-      right_shift(v, vs);
+      eval_right_shift(v, vs);
       BOOST_ASSERT((v.data()[fixed_int<Bits, Signed>::limb_count - 1] & 1));
       BOOST_ASSERT((u.data()[fixed_int<Bits, Signed>::limb_count - 1] & 1));
    } 
    while(true);
 
    result = u;
-   left_shift(result, shift);
+   eval_left_shift(result, shift);
 }
 
 template <unsigned Bits, bool Signed>
@@ -1488,16 +1488,16 @@ inline void eval_lcm(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Sign
    fixed_int<Bits, Signed> t;
    eval_gcd(t, a, b);
 
-   if(is_zero(t))
+   if(eval_is_zero(t))
    {
       result = static_cast<limb_type>(0);
    }
    else
    {
-      divide(result, a, t);
-      multiply(result, b);
+      eval_divide(result, a, t);
+      eval_multiply(result, b);
    }
-   if(get_sign(result) < 0)
+   if(eval_get_sign(result) < 0)
       result.negate();
 }
 

@@ -18,6 +18,7 @@
 
 namespace boost{
 namespace multiprecision{
+namespace backends{
 
 template <unsigned MinBits = 0, bool Signed = true, class Allocator = std::allocator<limb_type> >
 struct cpp_int_backend;
@@ -338,7 +339,7 @@ public:
       for(i = 0; i < internal_limb_count; ++i)
          m_data[i] = ~m_data[i];
       normalize();
-      increment(static_cast<cpp_int_backend<MinBits, false, void>& >(*this));
+      eval_increment(static_cast<cpp_int_backend<MinBits, false, void>& >(*this));
    }
    bool isneg()const
    {
@@ -451,8 +452,8 @@ public:
 
    cpp_int_backend& operator = (long double a)
    {
-      using default_ops::add;
-      using default_ops::subtract;
+      using default_ops::eval_add;
+      using default_ops::eval_subtract;
       using std::frexp;
       using std::ldexp;
       using std::floor;
@@ -482,23 +483,23 @@ public:
          f = ldexp(f, shift);
          term = floor(f);
          e -= shift;
-         left_shift(*this, shift);
+         eval_left_shift(*this, shift);
          if(term > 0)
-            add(*this, static_cast<limb_type>(term));
+            eval_add(*this, static_cast<limb_type>(term));
          else
-            subtract(*this, static_cast<limb_type>(-term));
+            eval_subtract(*this, static_cast<limb_type>(-term));
          f -= term;
       }
       if(e > 0)
-         left_shift(*this, e);
+         eval_left_shift(*this, e);
       else if(e < 0)
-         right_shift(*this, -e);
+         eval_right_shift(*this, -e);
       return *this;
    }
    cpp_int_backend& operator = (const char* s)
    {
-      using default_ops::multiply;
-      using default_ops::add;
+      using default_ops::eval_multiply;
+      using default_ops::eval_add;
       std::size_t n = s ? std::strlen(s) : 0;
       *this = static_cast<limb_type>(0u);
       unsigned radix = 10;
@@ -557,7 +558,7 @@ public:
                      break;
                   }
                }
-               left_shift(*this, block_shift);
+               eval_left_shift(*this, block_shift);
                this->limbs()[0] |= block;
             }
          }
@@ -584,8 +585,8 @@ public:
                      break;
                   }
                }
-               multiply(*this, block_mult);
-               add(*this, block);
+               eval_multiply(*this, block_mult);
+               eval_add(*this, block);
             }
          }
       }
@@ -623,7 +624,7 @@ public:
             if(c > '9')
                c += 'A' - '9' - 1;
             result[pos--] = c;
-            right_shift(t, shift);
+            eval_right_shift(t, shift);
          }
          if(Bits % shift)
          {
@@ -666,7 +667,7 @@ public:
          {
             cpp_int_backend block10;
             block10 = max_block_10;
-            while(get_sign(t) != 0)
+            while(eval_get_sign(t) != 0)
             {
                cpp_int_backend t2;
                divide_unsigned_helper(t2, t, block10, r);
@@ -732,9 +733,9 @@ public:
 
 
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void add(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& o)
+inline void eval_add(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& o)
 {
-   add(result, result, o);
+   eval_add(result, result, o);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
 inline void add_unsigned(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, const cpp_int_backend<MinBits, Signed, Allocator>& b)
@@ -795,7 +796,7 @@ inline void add_unsigned(cpp_int_backend<MinBits, Signed, Allocator>& result, co
    result.sign(a.sign());
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void add(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, const cpp_int_backend<MinBits, Signed, Allocator>& b)
+inline void eval_add(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, const cpp_int_backend<MinBits, Signed, Allocator>& b)
 {
    if(a.sign() != b.sign())
    {
@@ -829,7 +830,7 @@ inline void add_unsigned(cpp_int_backend<MinBits, Signed, Allocator>& result, co
    result.normalize();
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void add(cpp_int_backend<MinBits, Signed, Allocator>& result, const limb_type& o)
+inline void eval_add(cpp_int_backend<MinBits, Signed, Allocator>& result, const limb_type& o)
 {
    if(result.sign())
    {
@@ -839,12 +840,12 @@ inline void add(cpp_int_backend<MinBits, Signed, Allocator>& result, const limb_
       add_unsigned(result, o);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void add(cpp_int_backend<MinBits, Signed, Allocator>& result, const signed_limb_type& o)
+inline void eval_add(cpp_int_backend<MinBits, Signed, Allocator>& result, const signed_limb_type& o)
 {
    if(o < 0)
-      subtract(result, static_cast<limb_type>(-o));
+      eval_subtract(result, static_cast<limb_type>(-o));
    else if(o > 0)
-      add(result, static_cast<limb_type>(o));
+      eval_add(result, static_cast<limb_type>(o));
 }
 
 template <unsigned MinBits, bool Signed, class Allocator>
@@ -877,7 +878,7 @@ inline void subtract_unsigned(cpp_int_backend<MinBits, Signed, Allocator>& resul
    }
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void subtract(cpp_int_backend<MinBits, Signed, Allocator>& result, const limb_type& o)
+inline void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator>& result, const limb_type& o)
 {
    if(result.sign())
       add_unsigned(result, o);
@@ -885,18 +886,18 @@ inline void subtract(cpp_int_backend<MinBits, Signed, Allocator>& result, const 
       subtract_unsigned(result, o);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void subtract(cpp_int_backend<MinBits, Signed, Allocator>& result, const signed_limb_type& o)
+inline void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator>& result, const signed_limb_type& o)
 {
    if(o)
    {
       if(o < 0)
-         add(result, static_cast<limb_type>(-o));
+         eval_add(result, static_cast<limb_type>(-o));
       else
-         subtract(result, static_cast<limb_type>(o));
+         eval_subtract(result, static_cast<limb_type>(o));
    }
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void increment(cpp_int_backend<MinBits, Signed, Allocator>& result)
+inline void eval_increment(cpp_int_backend<MinBits, Signed, Allocator>& result)
 {
    static const limb_type one = 1;
    if(!result.sign() && (result.limbs()[0] < cpp_int_backend<MinBits, Signed, Allocator>::max_limb_value))
@@ -904,10 +905,10 @@ inline void increment(cpp_int_backend<MinBits, Signed, Allocator>& result)
    else if(result.sign() && result.limbs()[0])
       --result.limbs()[0];
    else
-      add(result, one);
+      eval_add(result, one);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void decrement(cpp_int_backend<MinBits, Signed, Allocator>& result)
+inline void eval_decrement(cpp_int_backend<MinBits, Signed, Allocator>& result)
 {
    static const limb_type one = 1;
    if(!result.sign() && result.limbs()[0])
@@ -915,12 +916,12 @@ inline void decrement(cpp_int_backend<MinBits, Signed, Allocator>& result)
    else if(result.sign() && (result.limbs()[0] < cpp_int_backend<MinBits, Signed, Allocator>::max_limb_value))
       ++result.limbs()[0];
    else
-      subtract(result, one);
+      eval_subtract(result, one);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void subtract(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& o)
+inline void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& o)
 {
-   subtract(result, result, o);
+   eval_subtract(result, result, o);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
 inline void subtract_unsigned(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, const cpp_int_backend<MinBits, Signed, Allocator>& b)
@@ -996,7 +997,7 @@ inline void subtract_unsigned(cpp_int_backend<MinBits, Signed, Allocator>& resul
       result.negate();
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void subtract(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, const cpp_int_backend<MinBits, Signed, Allocator>& b)
+inline void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, const cpp_int_backend<MinBits, Signed, Allocator>& b)
 {
    if(a.sign() != b.sign())
    {
@@ -1006,7 +1007,7 @@ inline void subtract(cpp_int_backend<MinBits, Signed, Allocator>& result, const 
    subtract_unsigned(result, a, b);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, const cpp_int_backend<MinBits, Signed, Allocator>& b)
+inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, const cpp_int_backend<MinBits, Signed, Allocator>& b)
 {
    // Very simple long multiplication, only usable for small numbers of limb_type's
    // but that's the typical use case for this type anyway:
@@ -1028,7 +1029,7 @@ inline void multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, const 
       {
          limb_type l = *pa;
          result = b;
-         multiply(result, l);
+         eval_multiply(result, l);
       }
       result.sign(s);
       return;
@@ -1038,7 +1039,7 @@ inline void multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, const 
       limb_type l = *pb;
       bool s = b.sign() != a.sign();
       result = a;
-      multiply(result, l);
+      eval_multiply(result, l);
       result.sign(s);
       return;
    }
@@ -1046,13 +1047,13 @@ inline void multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, const 
    if(&result == &a)
    {
       cpp_int_backend<MinBits, Signed, Allocator> t(a);
-      multiply(result, t, b);
+      eval_multiply(result, t, b);
       return;
    }
    if(&result == &b)
    {
       cpp_int_backend<MinBits, Signed, Allocator> t(b);
-      multiply(result, a, t);
+      eval_multiply(result, a, t);
       return;
    }
 
@@ -1063,7 +1064,7 @@ inline void multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, const 
    std::memset(pr, 0, result.size() * sizeof(limb_type));
    for(unsigned i = 0; i < as; ++i)
    {
-      unsigned inner_limit = (std::min)(result.size() - i, b.size());
+      unsigned inner_limit = cpp_int_backend<MinBits, Signed, Allocator>::variable ? bs : (std::min)(result.size() - i, bs);
       for(unsigned j = 0; j < inner_limit; ++j)
       {
          BOOST_ASSERT(i+j < result.size());
@@ -1083,12 +1084,12 @@ inline void multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, const 
    result.sign(a.sign() != b.sign());
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a)
+inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a)
 {
-    multiply(result, result, a);
+    eval_multiply(result, result, a);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, cpp_int_backend<MinBits, Signed, Allocator>& a, const limb_type& val)
+inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, cpp_int_backend<MinBits, Signed, Allocator>& a, const limb_type& val)
 {
    if(!val)
    {
@@ -1117,25 +1118,25 @@ inline void multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, cpp_in
       result.normalize();
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, const limb_type& val)
+inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, const limb_type& val)
 {
-   multiply(result, result, val);
+   eval_multiply(result, result, val);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, cpp_int_backend<MinBits, Signed, Allocator>& a, const signed_limb_type& val)
+inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, cpp_int_backend<MinBits, Signed, Allocator>& a, const signed_limb_type& val)
 {
    if(val > 0)
-      multiply(result, a, static_cast<limb_type>(val));
+      eval_multiply(result, a, static_cast<limb_type>(val));
    else
    {
-      multiply(result, a, static_cast<limb_type>(-val));
+      eval_multiply(result, a, static_cast<limb_type>(-val));
       result.negate();
    }
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, const signed_limb_type& val)
+inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, const signed_limb_type& val)
 {
-   multiply(result, result, val);
+   eval_multiply(result, result, val);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
 void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& x, const cpp_int_backend<MinBits, Signed, Allocator>& y, cpp_int_backend<MinBits, Signed, Allocator>& r)
@@ -1172,7 +1173,7 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
     */
 
 
-   using default_ops::subtract;
+   using default_ops::eval_subtract;
 
    if(&result == &r)
    {
@@ -1306,7 +1307,7 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
             t.limbs()[shift] = guess;
             for(unsigned i = 0; i < shift; ++i)
                t.limbs()[i] = 0;
-            subtract(result, t);
+            eval_subtract(result, t);
          }
       }
       else if(cpp_int_backend<MinBits, Signed, Allocator>::max_limb_value - pr[shift] > guess)
@@ -1317,7 +1318,7 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
          t.limbs()[shift] = guess;
          for(unsigned i = 0; i < shift; ++i)
             t.limbs()[i] = 0;
-         add(result, t);
+         eval_add(result, t);
       }
       //
       // Calculate guess * y, we use a fused mutiply-shift O(N) for this
@@ -1346,7 +1347,7 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
       //
       // Update r:
       //
-      subtract(r, t);
+      eval_subtract(r, t);
       if(r.isneg())
       {
          r.negate();
@@ -1376,15 +1377,15 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
    //
    // We now just have to normalise the result:
    //
-   if(r_neg && get_sign(r))
+   if(r_neg && eval_get_sign(r))
    {
       // We have one too many in the result:
-      decrement(result);
+      eval_decrement(result);
       r.negate();
       if(y.sign())
-         subtract(r, y);
+         eval_subtract(r, y);
       else
-         add(r, y);
+         eval_add(r, y);
    }
 
    BOOST_ASSERT(r.compare_unsigned(y) < 0); // remainder must be less than the divisor or our code has failed
@@ -1410,7 +1411,7 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
 
    // As above, but simplified for integer divisor:
 
-   using default_ops::subtract;
+   using default_ops::eval_subtract;
 
    if(y == 0)
    {
@@ -1514,20 +1515,20 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
 }
 
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void divide(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, const cpp_int_backend<MinBits, Signed, Allocator>& b)
+inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, const cpp_int_backend<MinBits, Signed, Allocator>& b)
 {
    cpp_int_backend<MinBits, Signed, Allocator> r;
    divide_unsigned_helper(result, a, b, r);
    result.sign(a.sign() != b.sign());
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void divide(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, limb_type& b)
+inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, limb_type& b)
 {
    cpp_int_backend<MinBits, Signed, Allocator> r;
    divide_unsigned_helper(result, a, b, r);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void divide(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, signed_limb_type& b)
+inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, signed_limb_type& b)
 {
    cpp_int_backend<MinBits, Signed, Allocator> r;
    divide_unsigned_helper(result, a, std::abs(b), r);
@@ -1535,65 +1536,65 @@ inline void divide(cpp_int_backend<MinBits, Signed, Allocator>& result, const cp
       result.negate();
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void divide(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& b)
+inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& b)
 {
    // There is no in place divide:
    cpp_int_backend<MinBits, Signed, Allocator> a(result);
-   divide(result, a, b);
+   eval_divide(result, a, b);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void divide(cpp_int_backend<MinBits, Signed, Allocator>& result, limb_type b)
+inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator>& result, limb_type b)
 {
    // There is no in place divide:
    cpp_int_backend<MinBits, Signed, Allocator> a(result);
-   divide(result, a, b);
+   eval_divide(result, a, b);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void divide(cpp_int_backend<MinBits, Signed, Allocator>& result, signed_limb_type b)
+inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator>& result, signed_limb_type b)
 {
    // There is no in place divide:
    cpp_int_backend<MinBits, Signed, Allocator> a(result);
-   divide(result, a, b);
+   eval_divide(result, a, b);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, const cpp_int_backend<MinBits, Signed, Allocator>& b)
+inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, const cpp_int_backend<MinBits, Signed, Allocator>& b)
 {
    cpp_int_backend<MinBits, Signed, Allocator> r;
    divide_unsigned_helper(r, a, b, result);
    result.sign(a.sign());
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, limb_type b)
+inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, limb_type b)
 {
    cpp_int_backend<MinBits, Signed, Allocator> r;
    divide_unsigned_helper(r, a, b, result);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, signed_limb_type b)
+inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, signed_limb_type b)
 {
    cpp_int_backend<MinBits, Signed, Allocator> r;
    divide_unsigned_helper(r, a, static_cast<limb_type>(std::abs(b)), result);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& b)
+inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& b)
 {
    // There is no in place divide:
    cpp_int_backend<MinBits, Signed, Allocator> a(result);
-   modulus(result, a, b);
+   eval_modulus(result, a, b);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, limb_type b)
+inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, limb_type b)
 {
    // There is no in place divide:
    cpp_int_backend<MinBits, Signed, Allocator> a(result);
-   modulus(result, a, b);
+   eval_modulus(result, a, b);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, signed_limb_type b)
+inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, signed_limb_type b)
 {
    // There is no in place divide:
    cpp_int_backend<MinBits, Signed, Allocator> a(result);
-   modulus(result, a, b);
+   eval_modulus(result, a, b);
 }
 template <unsigned MinBits, bool Signed, class Allocator, class Op>
 void bitwise_op(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& o, Op op)
@@ -1726,20 +1727,20 @@ struct bit_or{ limb_type operator()(limb_type a, limb_type b)const{ return a | b
 struct bit_xor{ limb_type operator()(limb_type a, limb_type b)const{ return a ^ b; } };
 
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void bitwise_and(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& o)
+inline void eval_bitwise_and(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& o)
 {
    bitwise_op(result, o, bit_and());
 }
 #if 0
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void bitwise_and(cpp_int_backend<MinBits, Signed, Allocator>& result, limb_type o)
+inline void eval_bitwise_and(cpp_int_backend<MinBits, Signed, Allocator>& result, limb_type o)
 {
    result.data()[cpp_int_backend<MinBits, Signed, Allocator>::limb_count - 1] &= o;
    for(typename cpp_int_backend<MinBits, Signed, Allocator>::data_type::size_type i = 0; i < cpp_int_backend<MinBits, Signed, Allocator>::limb_count - 1; ++i)
       result.data()[i] = 0;
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void bitwise_and(cpp_int_backend<MinBits, Signed, Allocator>& result, signed_limb_type o)
+inline void eval_bitwise_and(cpp_int_backend<MinBits, Signed, Allocator>& result, signed_limb_type o)
 {
    result.data()[cpp_int_backend<MinBits, Signed, Allocator>::limb_count - 1] &= o;
    limb_type mask = o < 0 ? cpp_int_backend<MinBits, Signed, Allocator>::max_limb_value : 0;
@@ -1747,35 +1748,35 @@ inline void bitwise_and(cpp_int_backend<MinBits, Signed, Allocator>& result, sig
       result.data()[i] &= mask;
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void bitwise_or(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& o)
+inline void eval_bitwise_or(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& o)
 {
    for(typename cpp_int_backend<MinBits, Signed, Allocator>::data_type::size_type i = 0; i < cpp_int_backend<MinBits, Signed, Allocator>::limb_count; ++i)
       result.data()[i] |= o.data()[i];
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void bitwise_or(cpp_int_backend<MinBits, Signed, Allocator>& result, limb_type o)
+inline void eval_bitwise_or(cpp_int_backend<MinBits, Signed, Allocator>& result, limb_type o)
 {
    result.data()[cpp_int_backend<MinBits, Signed, Allocator>::limb_count - 1] |= o;
 }
 #endif
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void bitwise_or(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& o)
+inline void eval_bitwise_or(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& o)
 {
    bitwise_op(result, o, bit_or());
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void bitwise_xor(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& o)
+inline void eval_bitwise_xor(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& o)
 {
    bitwise_op(result, o, bit_xor());
 }
 #if 0
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void bitwise_xor(cpp_int_backend<MinBits, Signed, Allocator>& result, limb_type o)
+inline void eval_bitwise_xor(cpp_int_backend<MinBits, Signed, Allocator>& result, limb_type o)
 {
    result.data()[cpp_int_backend<MinBits, Signed, Allocator>::limb_count - 1] ^= o;
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void bitwise_xor(cpp_int_backend<MinBits, Signed, Allocator>& result, signed_limb_type o)
+inline void eval_bitwise_xor(cpp_int_backend<MinBits, Signed, Allocator>& result, signed_limb_type o)
 {
    result.data()[cpp_int_backend<MinBits, Signed, Allocator>::limb_count - 1] ^= o;
    limb_type mask = o < 0 ? cpp_int_backend<MinBits, Signed, Allocator>::max_limb_value : 0;
@@ -1784,15 +1785,15 @@ inline void bitwise_xor(cpp_int_backend<MinBits, Signed, Allocator>& result, sig
 }
 #endif
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void complement(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& o)
+inline void eval_complement(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& o)
 {
    // Increment and negate:
    result = o;
-   increment(result);
+   eval_increment(result);
    result.negate();
 }
 template <unsigned MinBits, bool Signed>
-inline void left_shift(cpp_int_backend<MinBits, Signed, void>& result, double_limb_type s)
+inline void eval_left_shift(cpp_int_backend<MinBits, Signed, void>& result, double_limb_type s)
 {
    if(!s)
       return;
@@ -1868,7 +1869,7 @@ inline void left_shift(cpp_int_backend<MinBits, Signed, void>& result, double_li
    }
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void left_shift(cpp_int_backend<MinBits, Signed, Allocator>& result, double_limb_type s)
+inline void eval_left_shift(cpp_int_backend<MinBits, Signed, Allocator>& result, double_limb_type s)
 {
    if(!s)
       return;
@@ -1925,7 +1926,7 @@ inline void left_shift(cpp_int_backend<MinBits, Signed, Allocator>& result, doub
    }
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void right_shift(cpp_int_backend<MinBits, Signed, Allocator>& result, double_limb_type s)
+inline void eval_right_shift(cpp_int_backend<MinBits, Signed, Allocator>& result, double_limb_type s)
 {
    if(!s)
       return;
@@ -1979,7 +1980,7 @@ inline Integer negate_integer(Integer i, const mpl::false_&)
 }
 
 template <class R, unsigned MinBits, bool Signed, class Allocator>
-inline typename enable_if<is_integral<R>, void>::type convert_to(R* result, const cpp_int_backend<MinBits, Signed, Allocator>& backend)
+inline typename enable_if<is_integral<R>, void>::type eval_convert_to(R* result, const cpp_int_backend<MinBits, Signed, Allocator>& backend)
 {
    *result = static_cast<R>(backend.limbs()[0]);
    unsigned shift = cpp_int_backend<MinBits, Signed, Allocator>::limb_bits;
@@ -1997,7 +1998,7 @@ inline typename enable_if<is_integral<R>, void>::type convert_to(R* result, cons
 }
 
 template <class R, unsigned MinBits, bool Signed, class Allocator>
-inline typename enable_if<is_floating_point<R>, void>::type convert_to(R* result, const cpp_int_backend<MinBits, Signed, Allocator>& backend)
+inline typename enable_if<is_floating_point<R>, void>::type eval_convert_to(R* result, const cpp_int_backend<MinBits, Signed, Allocator>& backend)
 {
    typename cpp_int_backend<MinBits, Signed, Allocator>::const_limb_pointer p = backend.limbs();
    unsigned shift = cpp_int_backend<MinBits, Signed, Allocator>::limb_bits;
@@ -2012,24 +2013,23 @@ inline typename enable_if<is_floating_point<R>, void>::type convert_to(R* result
 }
 
 template <unsigned MinBits, bool Signed, class Allocator>
-inline bool is_zero(const cpp_int_backend<MinBits, Signed, Allocator>& val)
+inline bool eval_is_zero(const cpp_int_backend<MinBits, Signed, Allocator>& val)
 {
    return (val.size() == 1) && (val.limbs()[0] == 0);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline int get_sign(const cpp_int_backend<MinBits, Signed, Allocator>& val)
+inline int eval_get_sign(const cpp_int_backend<MinBits, Signed, Allocator>& val)
 {
-   return is_zero(val) ? 0 : val.sign() ? -1 : 1;
+   return eval_is_zero(val) ? 0 : val.sign() ? -1 : 1;
 }
 
-namespace detail{
 //
 // Get the location of the least-significant-bit:
 //
 template <unsigned MinBits, bool Signed, class Allocator>
 inline unsigned get_lsb(const cpp_int_backend<MinBits, Signed, Allocator>& a)
 {
-   BOOST_ASSERT(get_sign(a) != 0);
+   BOOST_ASSERT(eval_get_sign(a) != 0);
    
    unsigned result = 0;
    //
@@ -2051,8 +2051,6 @@ inline unsigned get_lsb(const cpp_int_backend<MinBits, Signed, Allocator>& a)
    return result + index * cpp_int_backend<MinBits, Signed, Allocator>::limb_bits;
 }
 
-}
-
 template <unsigned MinBits, bool Signed, class Allocator>
 inline void eval_gcd(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, const cpp_int_backend<MinBits, Signed, Allocator>& b)
 {
@@ -2060,7 +2058,7 @@ inline void eval_gcd(cpp_int_backend<MinBits, Signed, Allocator>& result, const 
 
    cpp_int_backend<MinBits, Signed, Allocator> u(a), v(b);
 
-   int s = get_sign(u);
+   int s = eval_get_sign(u);
 
    /* GCD(0,x) := x */
    if(s < 0)
@@ -2072,7 +2070,7 @@ inline void eval_gcd(cpp_int_backend<MinBits, Signed, Allocator>& result, const 
       result = v;
       return;
    }
-   s = get_sign(v);
+   s = eval_get_sign(v);
    if(s < 0)
    {
       v.negate();
@@ -2086,11 +2084,11 @@ inline void eval_gcd(cpp_int_backend<MinBits, Signed, Allocator>& result, const 
    /* Let shift := lg K, where K is the greatest power of 2
    dividing both u and v. */
 
-   unsigned us = detail::get_lsb(u);
-   unsigned vs = detail::get_lsb(v);
+   unsigned us = get_lsb(u);
+   unsigned vs = get_lsb(v);
    shift = (std::min)(us, vs);
-   right_shift(u, us);
-   right_shift(v, vs);
+   eval_right_shift(u, us);
+   eval_right_shift(v, vs);
 
    do 
    {
@@ -2098,19 +2096,19 @@ inline void eval_gcd(cpp_int_backend<MinBits, Signed, Allocator>& result, const 
       Let u = min(u, v), v = diff(u, v)/2. */
       if(u.compare(v) > 0)
          u.swap(v);
-      subtract(v, u);
+      eval_subtract(v, u);
       // Termination condition tries not to do a full compare if possible:
-      if(!v.limbs()[0] && is_zero(v))
+      if(!v.limbs()[0] && eval_is_zero(v))
          break;
-      vs = detail::get_lsb(v);
-      right_shift(v, vs);
+      vs = get_lsb(v);
+      eval_right_shift(v, vs);
       BOOST_ASSERT((v.limbs()[0] & 1));
       BOOST_ASSERT((u.limbs()[0] & 1));
    } 
    while(true);
 
    result = u;
-   left_shift(result, shift);
+   eval_left_shift(result, shift);
 }
 
 template <unsigned MinBits, bool Signed, class Allocator>
@@ -2119,18 +2117,22 @@ inline void eval_lcm(cpp_int_backend<MinBits, Signed, Allocator>& result, const 
    cpp_int_backend<MinBits, Signed, Allocator> t;
    eval_gcd(t, a, b);
 
-   if(is_zero(t))
+   if(eval_is_zero(t))
    {
       result = static_cast<limb_type>(0);
    }
    else
    {
-      divide(result, a, t);
-      multiply(result, b);
+      eval_divide(result, a, t);
+      eval_multiply(result, b);
    }
-   if(get_sign(result) < 0)
+   if(eval_get_sign(result) < 0)
       result.negate();
 }
+
+} // namespace backends;
+
+using boost::multiprecision::backends::cpp_int_backend;
 
 template <unsigned MinBits, bool Signed, class Allocator>
 struct number_category<cpp_int_backend<MinBits, Signed, Allocator> > : public mpl::int_<number_kind_integer>{};

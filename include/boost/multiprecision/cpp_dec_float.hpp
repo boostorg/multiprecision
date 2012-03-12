@@ -24,6 +24,7 @@
 
 namespace boost{
 namespace multiprecision{
+namespace backends{
 
 template <unsigned Digits10>
 class cpp_dec_float
@@ -2535,49 +2536,49 @@ cpp_dec_float<Digits10> cpp_dec_float<Digits10>::pow2(const long long p)
 
 
 template <unsigned Digits10>
-inline void add(cpp_dec_float<Digits10>& result, const cpp_dec_float<Digits10>& o)
+inline void eval_add(cpp_dec_float<Digits10>& result, const cpp_dec_float<Digits10>& o)
 {
    result += o;
 }
 template <unsigned Digits10>
-inline void subtract(cpp_dec_float<Digits10>& result, const cpp_dec_float<Digits10>& o)
+inline void eval_subtract(cpp_dec_float<Digits10>& result, const cpp_dec_float<Digits10>& o)
 {
    result -= o;
 }
 template <unsigned Digits10>
-inline void multiply(cpp_dec_float<Digits10>& result, const cpp_dec_float<Digits10>& o)
+inline void eval_multiply(cpp_dec_float<Digits10>& result, const cpp_dec_float<Digits10>& o)
 {
    result *= o;
 }
 template <unsigned Digits10>
-inline void divide(cpp_dec_float<Digits10>& result, const cpp_dec_float<Digits10>& o)
+inline void eval_divide(cpp_dec_float<Digits10>& result, const cpp_dec_float<Digits10>& o)
 {
    result /= o;
 }
 
 template <unsigned Digits10>
-inline void add(cpp_dec_float<Digits10>& result, const unsigned long long& o)
+inline void eval_add(cpp_dec_float<Digits10>& result, const unsigned long long& o)
 {
    result.add_unsigned_long_long(o);
 }
 template <unsigned Digits10>
-inline void subtract(cpp_dec_float<Digits10>& result, const unsigned long long& o)
+inline void eval_subtract(cpp_dec_float<Digits10>& result, const unsigned long long& o)
 {
    result.sub_unsigned_long_long(o);
 }
 template <unsigned Digits10>
-inline void multiply(cpp_dec_float<Digits10>& result, const unsigned long long& o)
+inline void eval_multiply(cpp_dec_float<Digits10>& result, const unsigned long long& o)
 {
    result.mul_unsigned_long_long(o);
 }
 template <unsigned Digits10>
-inline void divide(cpp_dec_float<Digits10>& result, const unsigned long long& o)
+inline void eval_divide(cpp_dec_float<Digits10>& result, const unsigned long long& o)
 {
    result.div_unsigned_long_long(o);
 }
 
 template <unsigned Digits10>
-inline void add(cpp_dec_float<Digits10>& result, long long o)
+inline void eval_add(cpp_dec_float<Digits10>& result, long long o)
 {
    if(o < 0)
       result.sub_unsigned_long_long(-o);
@@ -2585,7 +2586,7 @@ inline void add(cpp_dec_float<Digits10>& result, long long o)
       result.add_unsigned_long_long(o);
 }
 template <unsigned Digits10>
-inline void subtract(cpp_dec_float<Digits10>& result, long long o)
+inline void eval_subtract(cpp_dec_float<Digits10>& result, long long o)
 {
    if(o < 0)
       result.add_unsigned_long_long(-o);
@@ -2593,7 +2594,7 @@ inline void subtract(cpp_dec_float<Digits10>& result, long long o)
       result.sub_unsigned_long_long(o);
 }
 template <unsigned Digits10>
-inline void multiply(cpp_dec_float<Digits10>& result, long long o)
+inline void eval_multiply(cpp_dec_float<Digits10>& result, long long o)
 {
    if(o < 0)
    {
@@ -2604,7 +2605,7 @@ inline void multiply(cpp_dec_float<Digits10>& result, long long o)
       result.mul_unsigned_long_long(o);
 }
 template <unsigned Digits10>
-inline void divide(cpp_dec_float<Digits10>& result, long long o)
+inline void eval_divide(cpp_dec_float<Digits10>& result, long long o)
 {
    if(o < 0)
    {
@@ -2616,17 +2617,17 @@ inline void divide(cpp_dec_float<Digits10>& result, long long o)
 }
 
 template <unsigned Digits10>
-inline void convert_to(unsigned long long* result, const cpp_dec_float<Digits10>& val)
+inline void eval_convert_to(unsigned long long* result, const cpp_dec_float<Digits10>& val)
 {
    *result = val.extract_unsigned_long_long();
 }
 template <unsigned Digits10>
-inline void convert_to(long long* result, const cpp_dec_float<Digits10>& val)
+inline void eval_convert_to(long long* result, const cpp_dec_float<Digits10>& val)
 {
    *result = val.extract_signed_long_long();
 }
 template <unsigned Digits10>
-inline void convert_to(long double* result, cpp_dec_float<Digits10>& val)
+inline void eval_convert_to(long double* result, cpp_dec_float<Digits10>& val)
 {
    *result = val.extract_long_double();
 }
@@ -2799,15 +2800,19 @@ inline void eval_frexp(cpp_dec_float<Digits10>& result, const cpp_dec_float<Digi
 }
 
 template <unsigned Digits10>
-inline bool is_zero(const cpp_dec_float<Digits10>& val)
+inline bool eval_is_zero(const cpp_dec_float<Digits10>& val)
 {
    return val.iszero();
 }
 template <unsigned Digits10>
-inline int get_sign(const cpp_dec_float<Digits10>& val)
+inline int eval_get_sign(const cpp_dec_float<Digits10>& val)
 {
    return val.iszero() ? 0 : val.isneg() ? -1 : 1;
 }
+
+} // namespace backends
+
+using boost::multiprecision::backends::cpp_dec_float;
 
 
 typedef mp_number<cpp_dec_float<50> > cpp_dec_float_50;

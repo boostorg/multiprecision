@@ -35,7 +35,7 @@ inline void pow_imp(T& result, const T& t, const U& p, const mpl::true_&)
       temp = static_cast<int_type>(1);
       T denom;
       pow_imp(denom, t, -p, mpl::true_());
-      divide(result, temp, denom);
+      eval_divide(result, temp, denom);
       return;
    }
 
@@ -48,15 +48,15 @@ inline void pow_imp(T& result, const T& t, const U& p, const mpl::true_&)
       result = t;
       break;
    case 2:
-      multiply(result, t, t);
+      eval_multiply(result, t, t);
       break;
    case 3:
-      multiply(result, t, t);
-      multiply(result, t);
+      eval_multiply(result, t, t);
+      eval_multiply(result, t);
       break;
    case 4:
-      multiply(result, t, t);
-      multiply(result, result);
+      eval_multiply(result, t, t);
+      eval_multiply(result, result);
       break;
    default:
       {
@@ -65,7 +65,7 @@ inline void pow_imp(T& result, const T& t, const U& p, const mpl::true_&)
 
          for(n = static_cast<U>(1); n <= static_cast<U>(p / static_cast<U>(2)); n *= static_cast<U>(2))
          {
-            multiply(result, result);
+            eval_multiply(result, result);
          }
 
          const U p_minus_n = static_cast<U>(p - n);
@@ -75,7 +75,7 @@ inline void pow_imp(T& result, const T& t, const U& p, const mpl::true_&)
          {
             T temp;
             pow_imp(temp, t, p_minus_n, mpl::true_());
-            multiply(result, temp);
+            eval_multiply(result, temp);
          }
       }
    }
@@ -106,11 +106,11 @@ void hyp0F0(T& H0F0, const T& x)
 
    T x_pow_n_div_n_fact(x);
 
-   add(H0F0, x_pow_n_div_n_fact, ui_type(1));
+   eval_add(H0F0, x_pow_n_div_n_fact, ui_type(1));
 
    T lim;
    eval_ldexp(lim, H0F0, 1 - tol);
-   if(get_sign(lim) < 0)
+   if(eval_get_sign(lim) < 0)
       lim.negate();
 
    ui_type n;
@@ -118,10 +118,10 @@ void hyp0F0(T& H0F0, const T& x)
    // Series expansion of hyperg_0f0(; ; x).
    for(n = 2; n < 300; ++n)
    {
-      multiply(x_pow_n_div_n_fact, x);
-      divide(x_pow_n_div_n_fact, n);
-      add(H0F0, x_pow_n_div_n_fact);
-      bool neg = get_sign(x_pow_n_div_n_fact) < 0;
+      eval_multiply(x_pow_n_div_n_fact, x);
+      eval_divide(x_pow_n_div_n_fact, n);
+      eval_add(H0F0, x_pow_n_div_n_fact);
+      bool neg = eval_get_sign(x_pow_n_div_n_fact) < 0;
       if(neg)
          x_pow_n_div_n_fact.negate();
       if(lim.compare(x_pow_n_div_n_fact) > 0)
@@ -154,11 +154,11 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
    T pochham_a         (a);
    T ap                (a);
 
-   multiply(H1F0, pochham_a, x_pow_n_div_n_fact);
-   add(H1F0, si_type(1));
+   eval_multiply(H1F0, pochham_a, x_pow_n_div_n_fact);
+   eval_add(H1F0, si_type(1));
    T lim;
    eval_ldexp(lim, H1F0, 1 - boost::multiprecision::detail::digits2<mp_number<T> >::value);
-   if(get_sign(lim) < 0)
+   if(eval_get_sign(lim) < 0)
       lim.negate();
 
    si_type n;
@@ -167,13 +167,13 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
    // Series expansion of hyperg_1f0(a; ; x).
    for(n = 2; n < boost::multiprecision::detail::digits2<mp_number<T> >::value + 10; n++)
    {
-      multiply(x_pow_n_div_n_fact, x);
-      divide(x_pow_n_div_n_fact, n);
-      increment(ap);
-      multiply(pochham_a, ap);
-      multiply(term, pochham_a, x_pow_n_div_n_fact);
-      add(H1F0, term);
-      if(get_sign(term) < 0)
+      eval_multiply(x_pow_n_div_n_fact, x);
+      eval_divide(x_pow_n_div_n_fact, n);
+      eval_increment(ap);
+      eval_multiply(pochham_a, ap);
+      eval_multiply(term, pochham_a, x_pow_n_div_n_fact);
+      eval_add(H1F0, term);
+      if(eval_get_sign(term) < 0)
          term.negate();
       if(lim.compare(term) >= 0)
          break;
@@ -201,7 +201,7 @@ void eval_exp(T& result, const T& x)
 
    // Handle special arguments.
    int type = eval_fpclassify(x);
-   bool isneg = get_sign(x) < 0;
+   bool isneg = eval_get_sign(x) < 0;
    if(type == FP_NAN)
    {
       result = std::numeric_limits<mp_number<T> >::quiet_NaN().backend();
@@ -250,21 +250,21 @@ void eval_exp(T& result, const T& x)
       exp_series = xx;
       result = si_type(1);
       if(isneg)
-         subtract(result, exp_series);
+         eval_subtract(result, exp_series);
       else
-         add(result, exp_series);
-      multiply(exp_series, xx);
-      divide(exp_series, ui_type(k));
-      add(result, exp_series);
+         eval_add(result, exp_series);
+      eval_multiply(exp_series, xx);
+      eval_divide(exp_series, ui_type(k));
+      eval_add(result, exp_series);
       while(exp_series.compare(lim) > 0)
       {
          ++k;
-         multiply(exp_series, xx);
-         divide(exp_series, ui_type(k));
+         eval_multiply(exp_series, xx);
+         eval_divide(exp_series, ui_type(k));
          if(isneg && (k&1))
-            subtract(result, exp_series);
+            eval_subtract(result, exp_series);
          else
-            add(result, exp_series);
+            eval_add(result, exp_series);
       }
       return;
    }
@@ -272,7 +272,7 @@ void eval_exp(T& result, const T& x)
    // Check for pure-integer arguments which can be either signed or unsigned.
    long long ll;
    eval_trunc(exp_series, x);
-   convert_to(&ll, exp_series);
+   eval_convert_to(&ll, exp_series);
    if(x.compare(ll) == 0)
    {
       detail::pow_imp(result, get_constant_e<T>(), ll, mpl::true_());
@@ -293,23 +293,23 @@ void eval_exp(T& result, const T& x)
 
    if(b_scale)
    {
-      divide(result, xx, get_constant_ln2<T>());
+      eval_divide(result, xx, get_constant_ln2<T>());
       exp_type n;
-      convert_to(&n, result);
+      eval_convert_to(&n, result);
 
       // The scaling is 2^11 = 2048.
       static const si_type p2 = static_cast<si_type>(si_type(1) << 11);
 
-      multiply(exp_series, get_constant_ln2<T>(), static_cast<canonical_exp_type>(n));
-      subtract(exp_series, xx);
-      divide(exp_series, p2);
+      eval_multiply(exp_series, get_constant_ln2<T>(), static_cast<canonical_exp_type>(n));
+      eval_subtract(exp_series, xx);
+      eval_divide(exp_series, p2);
       exp_series.negate();
       hyp0F0(result, exp_series);
 
       detail::pow_imp(exp_series, result, p2, mpl::true_());
       result = ui_type(1);
       eval_ldexp(result, result, n);
-      multiply(exp_series, result);
+      eval_multiply(exp_series, result);
    }
    else
    {
@@ -317,7 +317,7 @@ void eval_exp(T& result, const T& x)
    }
 
    if(isneg)
-      divide(result, ui_type(1), exp_series);
+      eval_divide(result, ui_type(1), exp_series);
    else
       result = exp_series;
 }
@@ -358,9 +358,9 @@ void eval_log(T& result, const T& arg)
       --e;
    }
    
-   multiply(result, get_constant_ln2<T>(), canonical_exp_type(e));
+   eval_multiply(result, get_constant_ln2<T>(), canonical_exp_type(e));
    INSTRUMENT_BACKEND(result);
-   subtract(t, ui_type(1)); /* -0.3 <= t <= 0.3 */
+   eval_subtract(t, ui_type(1)); /* -0.3 <= t <= 0.3 */
    if(!alternate)
       t.negate(); /* 0 <= t <= 0.33333 */
    T pow = t;
@@ -368,12 +368,12 @@ void eval_log(T& result, const T& arg)
    T t2;
 
    if(alternate)
-      add(result, t);
+      eval_add(result, t);
    else
-      subtract(result, t);
+      eval_subtract(result, t);
 
-   multiply(lim, result, std::numeric_limits<mp_number<T> >::epsilon().backend());
-   if(get_sign(lim) < 0)
+   eval_multiply(lim, result, std::numeric_limits<mp_number<T> >::epsilon().backend());
+   if(eval_get_sign(lim) < 0)
       lim.negate();
    INSTRUMENT_BACKEND(lim);
 
@@ -381,13 +381,13 @@ void eval_log(T& result, const T& arg)
    do
    {
       ++k;
-      multiply(pow, t);
-      divide(t2, pow, k);
+      eval_multiply(pow, t);
+      eval_divide(t2, pow, k);
       INSTRUMENT_BACKEND(t2);
       if(alternate && ((k & 1) != 0))
-         add(result, t2);
+         eval_add(result, t2);
       else
-         subtract(result, t2);
+         eval_subtract(result, t2);
       INSTRUMENT_BACKEND(result);
    }while(lim.compare(t2) < 0);
 }
@@ -415,7 +415,7 @@ void eval_log10(T& result, const T& arg)
 {
    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The fabs function is only valid for floating point types.");
    eval_log(result, arg);
-   divide(result, get_constant_log10<T>());
+   eval_divide(result, get_constant_log10<T>());
 }
 
 template<typename T> 
@@ -457,35 +457,35 @@ inline void eval_pow(T& result, const T& x, const T& a)
    default: ;
    }
 
-   if(get_sign(a) == 0)
+   if(eval_get_sign(a) == 0)
    {
       result = si_type(1);
       return;
    }
 
    long long an;
-   convert_to(&an, a);
+   eval_convert_to(&an, a);
    const bool bo_a_isint = a.compare(an) == 0;
 
-   if((get_sign(x) < 0) && !bo_a_isint)
+   if((eval_get_sign(x) < 0) && !bo_a_isint)
    {
       result = std::numeric_limits<mp_number<T> >::quiet_NaN().backend();
    }
 
    T t;
    T da(a);
-   subtract(da, an);
+   eval_subtract(da, an);
 
    if(a.compare(si_type(-1)) < 0)
    {
       t = a;
       t.negate();
       eval_pow(da, x, t);
-      divide(result, si_type(1), da);
+      eval_divide(result, si_type(1), da);
       return;
    }
    
-   subtract(da, a, an);
+   eval_subtract(da, a, an);
 
    if(bo_a_isint)
    {
@@ -493,13 +493,13 @@ inline void eval_pow(T& result, const T& x, const T& a)
       return;
    }
 
-   if((get_sign(x) > 0) && (x.compare(fp_type(0.5)) >= 0) && (x.compare(fp_type(0.9)) < 0))
+   if((eval_get_sign(x) > 0) && (x.compare(fp_type(0.5)) >= 0) && (x.compare(fp_type(0.9)) < 0))
    {
       if(a.compare(fp_type(1e-5f)) <= 0)
       {
          // Series expansion for small a.
          eval_log(t, x);
-         multiply(t, a);
+         eval_multiply(t, a);
          hyp0F0(result, t);
          return;
       }
@@ -511,17 +511,17 @@ inline void eval_pow(T& result, const T& x, const T& a)
          {
             da.negate();
             t = si_type(1);
-            subtract(t, x);
+            eval_subtract(t, x);
             hyp1F0(result, da, t);
             detail::pow_imp(t, x, an, mpl::true_());
-            multiply(result, t);
+            eval_multiply(result, t);
          }
          else
          {
             da = a;
             da.negate();
             t = si_type(1);
-            subtract(t, x);
+            eval_subtract(t, x);
             hyp1F0(result, da, t);
          }
       }
@@ -533,15 +533,15 @@ inline void eval_pow(T& result, const T& x, const T& a)
       if(an)
       {
          eval_log(t, x);
-         multiply(t, da);
+         eval_multiply(t, da);
          eval_exp(result, t);
          detail::pow_imp(t, x, an, mpl::true_());
-         multiply(result, t);
+         eval_multiply(result, t);
       }
       else
       {
          eval_log(t, x);
-         multiply(t, a);
+         eval_multiply(t, a);
          eval_exp(result, t);
       }
    }
@@ -553,12 +553,12 @@ namespace detail{
    void small_sinh_series(T x, T& result)
    {
       typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
-      bool neg = get_sign(x) < 0;
+      bool neg = eval_get_sign(x) < 0;
       if(neg)
          x.negate();
       T p(x);
       T mult(x);
-      multiply(mult, x);
+      eval_multiply(mult, x);
       result = x;
       ui_type k = 1;
 
@@ -567,10 +567,10 @@ namespace detail{
 
       do
       {
-         multiply(p, mult);
-         divide(p, ++k);
-         divide(p, ++k);
-         add(result, p);
+         eval_multiply(p, mult);
+         eval_divide(p, ++k);
+         eval_divide(p, ++k);
+         eval_add(result, p);
       }while(p.compare(lim) >= 0);
       if(neg)
          result.negate();
@@ -605,12 +605,12 @@ namespace detail{
 
       T e_px, e_mx;
 
-      bool small_sinh = get_sign(x) < 0 ? e_px.compare(fp_type(-0.5)) > 0 : e_px.compare(fp_type(0.5)) < 0;
+      bool small_sinh = eval_get_sign(x) < 0 ? e_px.compare(fp_type(-0.5)) > 0 : e_px.compare(fp_type(0.5)) < 0;
 
       if(p_cosh || !small_sinh)
       {
          eval_exp(e_px, x);
-         divide(e_mx, ui_type(1), e_px);
+         eval_divide(e_mx, ui_type(1), e_px);
 
          if(p_sinh) 
          { 
@@ -620,14 +620,14 @@ namespace detail{
             }
             else
             {
-               subtract(*p_sinh, e_px, e_mx);
-               divide(*p_sinh, ui_type(2));
+               eval_subtract(*p_sinh, e_px, e_mx);
+               eval_divide(*p_sinh, ui_type(2));
             }
          }
          if(p_cosh) 
          { 
-            add(*p_cosh, e_px, e_mx);
-            divide(*p_cosh, ui_type(2)); 
+            eval_add(*p_cosh, e_px, e_mx);
+            eval_divide(*p_cosh, ui_type(2)); 
          }
       }
       else
@@ -658,6 +658,6 @@ inline void eval_tanh(T& result, const T& x)
    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The tanh function is only valid for floating point types.");
   T c;
   detail::sinhcosh(x, &result, &c);
-  divide(result, c);
+  eval_divide(result, c);
 }
 

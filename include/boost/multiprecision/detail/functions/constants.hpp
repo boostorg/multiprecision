@@ -28,21 +28,21 @@ void calc_log2(T& num, unsigned digits)
    for(ui_type n = 6; n < limit; ++n)
    {
       temp = static_cast<ui_type>(2);
-      multiply(temp, ui_type(2 * n));
-      multiply(temp, ui_type(2 * n + 1));
-      multiply(num, temp);
-      multiply(denom, temp);
+      eval_multiply(temp, ui_type(2 * n));
+      eval_multiply(temp, ui_type(2 * n + 1));
+      eval_multiply(num, temp);
+      eval_multiply(denom, temp);
       sign = -sign;
-      multiply(next_term, n);
-      multiply(temp, next_term, next_term);
-      multiply(temp, sign);
-      add(num, temp);
+      eval_multiply(next_term, n);
+      eval_multiply(temp, next_term, next_term);
+      eval_multiply(temp, sign);
+      eval_add(num, temp);
    }
-   multiply(denom, ui_type(4));
-   multiply(num, ui_type(3));
+   eval_multiply(denom, ui_type(4));
+   eval_multiply(num, ui_type(3));
    INSTRUMENT_BACKEND(denom);
    INSTRUMENT_BACKEND(num);
-   divide(num, denom);
+   eval_divide(num, denom);
    INSTRUMENT_BACKEND(num);
 }
 
@@ -60,12 +60,12 @@ void calc_e(T& result, unsigned digits)
    denom = ui_type(1);
    ui_type i = 2;
    do{
-      multiply(denom, i);
-      multiply(result, i);
-      add(result, ui_type(1));
+      eval_multiply(denom, i);
+      eval_multiply(result, i);
+      eval_add(result, ui_type(1));
       ++i;
    }while(denom.compare(lim) <= 0);
-   divide(result, denom);
+   eval_divide(result, denom);
 }
 
 template <class T>
@@ -91,16 +91,16 @@ void calc_pi(T& result, unsigned digits)
 
    do
    {
-      add(result, A, B);
+      eval_add(result, A, B);
       eval_ldexp(result, result, -2);
       eval_sqrt(b, B);
-      add(a, b);
+      eval_add(a, b);
       eval_ldexp(a, a, -1);
-      multiply(A, a, a);
-      subtract(B, A, result);
+      eval_multiply(A, a, a);
+      eval_subtract(B, A, result);
       eval_ldexp(B, B, 1);
-      subtract(result, A, B);
-      bool neg = get_sign(result) < 0;
+      eval_subtract(result, A, B);
+      bool neg = eval_get_sign(result) < 0;
       if(neg)
          result.negate();
       if(result.compare(lim) <= 0)
@@ -108,13 +108,13 @@ void calc_pi(T& result, unsigned digits)
       if(neg)
          result.negate();
       eval_ldexp(result, result, k - 1);
-      subtract(D, result);
+      eval_subtract(D, result);
       ++k;
       eval_ldexp(lim, lim, 1);
    }
    while(true);
 
-   divide(result, B, D);
+   eval_divide(result, B, D);
 }
 
 template <class T, const T& (*F)(void)>

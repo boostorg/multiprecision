@@ -16,6 +16,7 @@
 
 namespace boost{
 namespace multiprecision{
+namespace backends{
 
 template <class IntBackend>
 struct rational_adapter
@@ -123,42 +124,42 @@ private:
 };
 
 template <class IntBackend>
-inline void add(rational_adapter<IntBackend>& result, const rational_adapter<IntBackend>& o)
+inline void eval_add(rational_adapter<IntBackend>& result, const rational_adapter<IntBackend>& o)
 {
    result.data() += o.data();
 }
 template <class IntBackend>
-inline void subtract(rational_adapter<IntBackend>& result, const rational_adapter<IntBackend>& o)
+inline void eval_subtract(rational_adapter<IntBackend>& result, const rational_adapter<IntBackend>& o)
 {
    result.data() -= o.data();
 }
 template <class IntBackend>
-inline void multiply(rational_adapter<IntBackend>& result, const rational_adapter<IntBackend>& o)
+inline void eval_multiply(rational_adapter<IntBackend>& result, const rational_adapter<IntBackend>& o)
 {
    result.data() *= o.data();
 }
 template <class IntBackend>
-inline void divide(rational_adapter<IntBackend>& result, const rational_adapter<IntBackend>& o)
+inline void eval_divide(rational_adapter<IntBackend>& result, const rational_adapter<IntBackend>& o)
 {
    result.data() /= o.data();
 }
 
 template <class R, class IntBackend>
-inline void convert_to(R* result, const rational_adapter<IntBackend>& backend)
+inline void eval_convert_to(R* result, const rational_adapter<IntBackend>& backend)
 {
    *result = backend.data().numerator().template convert_to<R>();
    *result /= backend.data().denominator().template convert_to<R>();
 }
 
 template <class IntBackend>
-inline bool is_zero(const rational_adapter<IntBackend>& val)
+inline bool eval_is_zero(const rational_adapter<IntBackend>& val)
 {
-   return is_zero(val.data().numerator().backend());
+   return eval_is_zero(val.data().numerator().backend());
 }
 template <class IntBackend>
-inline int get_sign(const rational_adapter<IntBackend>& val)
+inline int eval_get_sign(const rational_adapter<IntBackend>& val)
 {
-   return get_sign(val.data().numerator().backend());
+   return eval_get_sign(val.data().numerator().backend());
 }
 
 template <class IntBackend>
@@ -180,6 +181,10 @@ inline void assign_components(rational_adapter<IntBackend>& result, const V& v1,
 
 template<class IntBackend>
 struct number_category<rational_adapter<IntBackend> > : public mpl::int_<number_kind_rational>{};
+
+} // namespace backends
+
+using boost::multiprecision::backends::rational_adapter;
 
 template <class T>
 struct component_type<rational_adapter<T> >

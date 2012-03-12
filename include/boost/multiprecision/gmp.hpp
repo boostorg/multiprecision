@@ -16,7 +16,9 @@
 #include <limits>
 #include <climits>
 
-namespace boost{ namespace multiprecision{
+namespace boost{ 
+namespace multiprecision{
+namespace backends{
 
 template <unsigned digits10>
 struct gmp_float;
@@ -473,47 +475,47 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
 };
 
 template <unsigned digits10>
-inline void add(gmp_float<digits10>& result, const gmp_float<digits10>& o)
+inline void eval_add(gmp_float<digits10>& result, const gmp_float<digits10>& o)
 {
    mpf_add(result.data(), result.data(), o.data());
 }
 template <unsigned digits10>
-inline void subtract(gmp_float<digits10>& result, const gmp_float<digits10>& o)
+inline void eval_subtract(gmp_float<digits10>& result, const gmp_float<digits10>& o)
 {
    mpf_sub(result.data(), result.data(), o.data());
 }
 template <unsigned digits10>
-inline void multiply(gmp_float<digits10>& result, const gmp_float<digits10>& o)
+inline void eval_multiply(gmp_float<digits10>& result, const gmp_float<digits10>& o)
 {
    mpf_mul(result.data(), result.data(), o.data());
 }
 template <unsigned digits10>
-inline void divide(gmp_float<digits10>& result, const gmp_float<digits10>& o)
+inline void eval_divide(gmp_float<digits10>& result, const gmp_float<digits10>& o)
 {
    mpf_div(result.data(), result.data(), o.data());
 }
 template <unsigned digits10>
-inline void add(gmp_float<digits10>& result, unsigned long i)
+inline void eval_add(gmp_float<digits10>& result, unsigned long i)
 {
    mpf_add_ui(result.data(), result.data(), i);
 }
 template <unsigned digits10>
-inline void subtract(gmp_float<digits10>& result, unsigned long i)
+inline void eval_subtract(gmp_float<digits10>& result, unsigned long i)
 {
    mpf_sub_ui(result.data(), result.data(), i);
 }
 template <unsigned digits10>
-inline void multiply(gmp_float<digits10>& result, unsigned long i)
+inline void eval_multiply(gmp_float<digits10>& result, unsigned long i)
 {
    mpf_mul_ui(result.data(), result.data(), i);
 }
 template <unsigned digits10>
-inline void divide(gmp_float<digits10>& result, unsigned long i)
+inline void eval_divide(gmp_float<digits10>& result, unsigned long i)
 {
    mpf_div_ui(result.data(), result.data(), i);
 }
 template <unsigned digits10>
-inline void add(gmp_float<digits10>& result, long i)
+inline void eval_add(gmp_float<digits10>& result, long i)
 {
    if(i > 0)
       mpf_add_ui(result.data(), result.data(), i);
@@ -521,7 +523,7 @@ inline void add(gmp_float<digits10>& result, long i)
       mpf_sub_ui(result.data(), result.data(), std::abs(i));
 }
 template <unsigned digits10>
-inline void subtract(gmp_float<digits10>& result, long i)
+inline void eval_subtract(gmp_float<digits10>& result, long i)
 {
    if(i > 0)
       mpf_sub_ui(result.data(), result.data(), i);
@@ -529,14 +531,14 @@ inline void subtract(gmp_float<digits10>& result, long i)
       mpf_add_ui(result.data(), result.data(), std::abs(i));
 }
 template <unsigned digits10>
-inline void multiply(gmp_float<digits10>& result, long i)
+inline void eval_multiply(gmp_float<digits10>& result, long i)
 {
    mpf_mul_ui(result.data(), result.data(), std::abs(i));
    if(i < 0)
       mpf_neg(result.data(), result.data());
 }
 template <unsigned digits10>
-inline void divide(gmp_float<digits10>& result, long i)
+inline void eval_divide(gmp_float<digits10>& result, long i)
 {
    mpf_div_ui(result.data(), result.data(), std::abs(i));
    if(i < 0)
@@ -546,17 +548,17 @@ inline void divide(gmp_float<digits10>& result, long i)
 // Specialised 3 arg versions of the basic operators:
 //
 template <unsigned digits10>
-inline void add(gmp_float<digits10>& a, const gmp_float<digits10>& x, const gmp_float<digits10>& y)
+inline void eval_add(gmp_float<digits10>& a, const gmp_float<digits10>& x, const gmp_float<digits10>& y)
 {
    mpf_add(a.data(), x.data(), y.data());
 }
 template <unsigned digits10>
-inline void add(gmp_float<digits10>& a, const gmp_float<digits10>& x, unsigned long y)
+inline void eval_add(gmp_float<digits10>& a, const gmp_float<digits10>& x, unsigned long y)
 {
    mpf_add_ui(a.data(), x.data(), y);
 }
 template <unsigned digits10>
-inline void add(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y)
+inline void eval_add(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y)
 {
    if(y < 0)
       mpf_sub_ui(a.data(), x.data(), -y);
@@ -564,12 +566,12 @@ inline void add(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y)
       mpf_add_ui(a.data(), x.data(), y);
 }
 template <unsigned digits10>
-inline void add(gmp_float<digits10>& a, unsigned long x, const gmp_float<digits10>& y)
+inline void eval_add(gmp_float<digits10>& a, unsigned long x, const gmp_float<digits10>& y)
 {
    mpf_add_ui(a.data(), y.data(), x);
 }
 template <unsigned digits10>
-inline void add(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y)
+inline void eval_add(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y)
 {
    if(x < 0)
    {
@@ -580,17 +582,17 @@ inline void add(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y)
       mpf_add_ui(a.data(), y.data(), x);
 }
 template <unsigned digits10>
-inline void subtract(gmp_float<digits10>& a, const gmp_float<digits10>& x, const gmp_float<digits10>& y)
+inline void eval_subtract(gmp_float<digits10>& a, const gmp_float<digits10>& x, const gmp_float<digits10>& y)
 {
    mpf_sub(a.data(), x.data(), y.data());
 }
 template <unsigned digits10>
-inline void subtract(gmp_float<digits10>& a, const gmp_float<digits10>& x, unsigned long y)
+inline void eval_subtract(gmp_float<digits10>& a, const gmp_float<digits10>& x, unsigned long y)
 {
    mpf_sub_ui(a.data(), x.data(), y);
 }
 template <unsigned digits10>
-inline void subtract(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y)
+inline void eval_subtract(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y)
 {
    if(y < 0)
       mpf_add_ui(a.data(), x.data(), -y);
@@ -598,12 +600,12 @@ inline void subtract(gmp_float<digits10>& a, const gmp_float<digits10>& x, long 
       mpf_sub_ui(a.data(), x.data(), y);
 }
 template <unsigned digits10>
-inline void subtract(gmp_float<digits10>& a, unsigned long x, const gmp_float<digits10>& y)
+inline void eval_subtract(gmp_float<digits10>& a, unsigned long x, const gmp_float<digits10>& y)
 {
    mpf_ui_sub(a.data(), x, y.data());
 }
 template <unsigned digits10>
-inline void subtract(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y)
+inline void eval_subtract(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y)
 {
    if(x < 0)
    {
@@ -615,17 +617,17 @@ inline void subtract(gmp_float<digits10>& a, long x, const gmp_float<digits10>& 
 }
 
 template <unsigned digits10>
-inline void multiply(gmp_float<digits10>& a, const gmp_float<digits10>& x, const gmp_float<digits10>& y)
+inline void eval_multiply(gmp_float<digits10>& a, const gmp_float<digits10>& x, const gmp_float<digits10>& y)
 {
    mpf_mul(a.data(), x.data(), y.data());
 }
 template <unsigned digits10>
-inline void multiply(gmp_float<digits10>& a, const gmp_float<digits10>& x, unsigned long y)
+inline void eval_multiply(gmp_float<digits10>& a, const gmp_float<digits10>& x, unsigned long y)
 {
    mpf_mul_ui(a.data(), x.data(), y);
 }
 template <unsigned digits10>
-inline void multiply(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y)
+inline void eval_multiply(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y)
 {
    if(y < 0)
    {
@@ -636,12 +638,12 @@ inline void multiply(gmp_float<digits10>& a, const gmp_float<digits10>& x, long 
       mpf_mul_ui(a.data(), x.data(), y);
 }
 template <unsigned digits10>
-inline void multiply(gmp_float<digits10>& a, unsigned long x, const gmp_float<digits10>& y)
+inline void eval_multiply(gmp_float<digits10>& a, unsigned long x, const gmp_float<digits10>& y)
 {
    mpf_mul_ui(a.data(), y.data(), x);
 }
 template <unsigned digits10>
-inline void multiply(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y)
+inline void eval_multiply(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y)
 {
    if(x < 0)
    {
@@ -653,17 +655,17 @@ inline void multiply(gmp_float<digits10>& a, long x, const gmp_float<digits10>& 
 }
 
 template <unsigned digits10>
-inline void divide(gmp_float<digits10>& a, const gmp_float<digits10>& x, const gmp_float<digits10>& y)
+inline void eval_divide(gmp_float<digits10>& a, const gmp_float<digits10>& x, const gmp_float<digits10>& y)
 {
    mpf_div(a.data(), x.data(), y.data());
 }
 template <unsigned digits10>
-inline void divide(gmp_float<digits10>& a, const gmp_float<digits10>& x, unsigned long y)
+inline void eval_divide(gmp_float<digits10>& a, const gmp_float<digits10>& x, unsigned long y)
 {
    mpf_div_ui(a.data(), x.data(), y);
 }
 template <unsigned digits10>
-inline void divide(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y)
+inline void eval_divide(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y)
 {
    if(y < 0)
    {
@@ -674,12 +676,12 @@ inline void divide(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y)
       mpf_div_ui(a.data(), x.data(), y);
 }
 template <unsigned digits10>
-inline void divide(gmp_float<digits10>& a, unsigned long x, const gmp_float<digits10>& y)
+inline void eval_divide(gmp_float<digits10>& a, unsigned long x, const gmp_float<digits10>& y)
 {
    mpf_ui_div(a.data(), x, y.data());
 }
 template <unsigned digits10>
-inline void divide(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y)
+inline void eval_divide(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y)
 {
    if(x < 0)
    {
@@ -691,18 +693,18 @@ inline void divide(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y)
 }
 
 template <unsigned digits10>
-inline bool is_zero(const gmp_float<digits10>& val)
+inline bool eval_is_zero(const gmp_float<digits10>& val)
 {
    return mpf_sgn(val.data()) == 0;
 }
 template <unsigned digits10>
-inline int get_sign(const gmp_float<digits10>& val)
+inline int eval_get_sign(const gmp_float<digits10>& val)
 {
    return mpf_sgn(val.data());
 }
 
 template <unsigned digits10>
-inline void convert_to(unsigned long* result, const gmp_float<digits10>& val)
+inline void eval_convert_to(unsigned long* result, const gmp_float<digits10>& val)
 {
    if(0 == mpf_fits_ulong_p(val.data()))
       *result = (std::numeric_limits<unsigned long>::max)();
@@ -710,7 +712,7 @@ inline void convert_to(unsigned long* result, const gmp_float<digits10>& val)
       *result = mpf_get_ui(val.data());
 }
 template <unsigned digits10>
-inline void convert_to(long* result, const gmp_float<digits10>& val)
+inline void eval_convert_to(long* result, const gmp_float<digits10>& val)
 {
    if(0 == mpf_fits_slong_p(val.data()))
    {
@@ -721,16 +723,16 @@ inline void convert_to(long* result, const gmp_float<digits10>& val)
       *result = mpf_get_si(val.data());
 }
 template <unsigned digits10>
-inline void convert_to(double* result, const gmp_float<digits10>& val)
+inline void eval_convert_to(double* result, const gmp_float<digits10>& val)
 {
    *result = mpf_get_d(val.data());
 }
 #ifdef BOOST_HAS_LONG_LONG
 template <unsigned digits10>
-inline void convert_to(long long* result, const gmp_float<digits10>& val)
+inline void eval_convert_to(long long* result, const gmp_float<digits10>& val)
 {
    gmp_float<digits10> t(val);
-   if(get_sign(t) < 0)
+   if(eval_get_sign(t) < 0)
       t.negate();
    
    long digits = std::numeric_limits<long long>::digits - std::numeric_limits<long>::digits;
@@ -740,7 +742,7 @@ inline void convert_to(long long* result, const gmp_float<digits10>& val)
 
    if(!mpf_fits_slong_p(t.data()))
    {
-      if(get_sign(val) < 0)
+      if(eval_get_sign(val) < 0)
          *result = (std::numeric_limits<long long>::min)();
       else
          *result = (std::numeric_limits<long long>::max)();
@@ -758,11 +760,11 @@ inline void convert_to(long long* result, const gmp_float<digits10>& val)
          l >>= -digits;
       *result |= l;
    }
-   if(get_sign(val) < 0)
+   if(eval_get_sign(val) < 0)
       *result = -*result;
 }
 template <unsigned digits10>
-inline void convert_to(unsigned long long* result, const gmp_float<digits10>& val)
+inline void eval_convert_to(unsigned long long* result, const gmp_float<digits10>& val)
 {
    gmp_float<digits10> t(val);
    
@@ -1094,23 +1096,23 @@ protected:
    mpz_t m_data;
 };
 
-inline void add(gmp_int& t, const gmp_int& o)
+inline void eval_add(gmp_int& t, const gmp_int& o)
 {
    mpz_add(t.data(), t.data(), o.data());
 }
-inline void subtract(gmp_int& t, const gmp_int& o)
+inline void eval_subtract(gmp_int& t, const gmp_int& o)
 {
    mpz_sub(t.data(), t.data(), o.data());
 }
-inline void multiply(gmp_int& t, const gmp_int& o)
+inline void eval_multiply(gmp_int& t, const gmp_int& o)
 {
    mpz_mul(t.data(), t.data(), o.data());
 }
-inline void divide(gmp_int& t, const gmp_int& o)
+inline void eval_divide(gmp_int& t, const gmp_int& o)
 {
    mpz_div(t.data(), t.data(), o.data());
 }
-inline void modulus(gmp_int& t, const gmp_int& o)
+inline void eval_modulus(gmp_int& t, const gmp_int& o)
 {
    bool neg = mpz_sgn(t.data()) < 0;
    bool neg2 = mpz_sgn(o.data()) < 0;
@@ -1124,19 +1126,19 @@ inline void modulus(gmp_int& t, const gmp_int& o)
          t.negate();
    }
 }
-inline void add(gmp_int& t, unsigned long i)
+inline void eval_add(gmp_int& t, unsigned long i)
 {
    mpz_add_ui(t.data(), t.data(), i);
 }
-inline void subtract(gmp_int& t, unsigned long i)
+inline void eval_subtract(gmp_int& t, unsigned long i)
 {
    mpz_sub_ui(t.data(), t.data(), i);
 }
-inline void multiply(gmp_int& t, unsigned long i)
+inline void eval_multiply(gmp_int& t, unsigned long i)
 {
    mpz_mul_ui(t.data(), t.data(), i);
 }
-inline void modulus(gmp_int& t, unsigned long i)
+inline void eval_modulus(gmp_int& t, unsigned long i)
 {
    bool neg = mpz_sgn(t.data()) < 0;
    mpz_mod_ui(t.data(), t.data(), i);
@@ -1147,31 +1149,31 @@ inline void modulus(gmp_int& t, unsigned long i)
       t.negate();
    }
 }
-inline void divide(gmp_int& t, unsigned long i)
+inline void eval_divide(gmp_int& t, unsigned long i)
 {
    mpz_div_ui(t.data(), t.data(), i);
 }
-inline void add(gmp_int& t, long i)
+inline void eval_add(gmp_int& t, long i)
 {
    if(i > 0)
       mpz_add_ui(t.data(), t.data(), i);
    else
       mpz_sub_ui(t.data(), t.data(), -i);
 }
-inline void subtract(gmp_int& t, long i)
+inline void eval_subtract(gmp_int& t, long i)
 {
    if(i > 0)
       mpz_sub_ui(t.data(), t.data(), i);
    else
       mpz_add_ui(t.data(), t.data(), -i);
 }
-inline void multiply(gmp_int& t, long i)
+inline void eval_multiply(gmp_int& t, long i)
 {
    mpz_mul_ui(t.data(), t.data(), std::abs(i));
    if(i < 0)
       mpz_neg(t.data(), t.data());
 }
-inline void modulus(gmp_int& t, long i)
+inline void eval_modulus(gmp_int& t, long i)
 {
    bool neg = mpz_sgn(t.data()) < 0;
    bool neg2 = i < 0;
@@ -1190,65 +1192,65 @@ inline void modulus(gmp_int& t, long i)
       }
    }
 }
-inline void divide(gmp_int& t, long i)
+inline void eval_divide(gmp_int& t, long i)
 {
    mpz_div_ui(t.data(), t.data(), std::abs(i));
    if(i < 0)
       mpz_neg(t.data(), t.data());
 }
 template <class UI>
-inline void left_shift(gmp_int& t, UI i)
+inline void eval_left_shift(gmp_int& t, UI i)
 {
    mpz_mul_2exp(t.data(), t.data(), static_cast<unsigned long>(i));
 }
 template <class UI>
-inline void right_shift(gmp_int& t, UI i)
+inline void eval_right_shift(gmp_int& t, UI i)
 {
    mpz_fdiv_q_2exp(t.data(), t.data(), static_cast<unsigned long>(i));
 }
 template <class UI>
-inline void left_shift(gmp_int& t, const gmp_int& v, UI i)
+inline void eval_left_shift(gmp_int& t, const gmp_int& v, UI i)
 {
    mpz_mul_2exp(t.data(), v.data(), static_cast<unsigned long>(i));
 }
 template <class UI>
-inline void right_shift(gmp_int& t, const gmp_int& v, UI i)
+inline void eval_right_shift(gmp_int& t, const gmp_int& v, UI i)
 {
    mpz_fdiv_q_2exp(t.data(), v.data(), static_cast<unsigned long>(i));
 }
 
-inline void bitwise_and(gmp_int& result, const gmp_int& v)
+inline void eval_bitwise_and(gmp_int& result, const gmp_int& v)
 {
    mpz_and(result.data(), result.data(), v.data());
 }
 
-inline void bitwise_or(gmp_int& result, const gmp_int& v)
+inline void eval_bitwise_or(gmp_int& result, const gmp_int& v)
 {
    mpz_ior(result.data(), result.data(), v.data());
 }
 
-inline void bitwise_xor(gmp_int& result, const gmp_int& v)
+inline void eval_bitwise_xor(gmp_int& result, const gmp_int& v)
 {
    mpz_xor(result.data(), result.data(), v.data());
 }
 
-inline void add(gmp_int& t, const gmp_int& p, const gmp_int& o)
+inline void eval_add(gmp_int& t, const gmp_int& p, const gmp_int& o)
 {
    mpz_add(t.data(), p.data(), o.data());
 }
-inline void subtract(gmp_int& t, const gmp_int& p, const gmp_int& o)
+inline void eval_subtract(gmp_int& t, const gmp_int& p, const gmp_int& o)
 {
    mpz_sub(t.data(), p.data(), o.data());
 }
-inline void multiply(gmp_int& t, const gmp_int& p, const gmp_int& o)
+inline void eval_multiply(gmp_int& t, const gmp_int& p, const gmp_int& o)
 {
    mpz_mul(t.data(), p.data(), o.data());
 }
-inline void divide(gmp_int& t, const gmp_int& p, const gmp_int& o)
+inline void eval_divide(gmp_int& t, const gmp_int& p, const gmp_int& o)
 {
    mpz_div(t.data(), p.data(), o.data());
 }
-inline void modulus(gmp_int& t, const gmp_int& p, const gmp_int& o)
+inline void eval_modulus(gmp_int& t, const gmp_int& p, const gmp_int& o)
 {
    bool neg = mpz_sgn(p.data()) < 0;
    bool neg2 = mpz_sgn(o.data()) < 0;
@@ -1262,19 +1264,19 @@ inline void modulus(gmp_int& t, const gmp_int& p, const gmp_int& o)
          t.negate();
    }
 }
-inline void add(gmp_int& t, const gmp_int& p, unsigned long i)
+inline void eval_add(gmp_int& t, const gmp_int& p, unsigned long i)
 {
    mpz_add_ui(t.data(), p.data(), i);
 }
-inline void subtract(gmp_int& t, const gmp_int& p, unsigned long i)
+inline void eval_subtract(gmp_int& t, const gmp_int& p, unsigned long i)
 {
    mpz_sub_ui(t.data(), p.data(), i);
 }
-inline void multiply(gmp_int& t, const gmp_int& p, unsigned long i)
+inline void eval_multiply(gmp_int& t, const gmp_int& p, unsigned long i)
 {
    mpz_mul_ui(t.data(), p.data(), i);
 }
-inline void modulus(gmp_int& t, const gmp_int& p, unsigned long i)
+inline void eval_modulus(gmp_int& t, const gmp_int& p, unsigned long i)
 {
    bool neg = mpz_sgn(p.data()) < 0;
    mpz_mod_ui(t.data(), p.data(), i);
@@ -1285,31 +1287,31 @@ inline void modulus(gmp_int& t, const gmp_int& p, unsigned long i)
       t.negate();
    }
 }
-inline void divide(gmp_int& t, const gmp_int& p, unsigned long i)
+inline void eval_divide(gmp_int& t, const gmp_int& p, unsigned long i)
 {
    mpz_div_ui(t.data(), p.data(), i);
 }
-inline void add(gmp_int& t, const gmp_int& p, long i)
+inline void eval_add(gmp_int& t, const gmp_int& p, long i)
 {
    if(i > 0)
       mpz_add_ui(t.data(), p.data(), i);
    else
       mpz_sub_ui(t.data(), p.data(), -i);
 }
-inline void subtract(gmp_int& t, const gmp_int& p, long i)
+inline void eval_subtract(gmp_int& t, const gmp_int& p, long i)
 {
    if(i > 0)
       mpz_sub_ui(t.data(), p.data(), i);
    else
       mpz_add_ui(t.data(), p.data(), -i);
 }
-inline void multiply(gmp_int& t, const gmp_int& p, long i)
+inline void eval_multiply(gmp_int& t, const gmp_int& p, long i)
 {
    mpz_mul_ui(t.data(), p.data(), std::abs(i));
    if(i < 0)
       mpz_neg(t.data(), t.data());
 }
-inline void modulus(gmp_int& t, const gmp_int& p, long i)
+inline void eval_modulus(gmp_int& t, const gmp_int& p, long i)
 {
    bool neg = mpz_sgn(p.data()) < 0;
    bool neg2 = i < 0;
@@ -1328,42 +1330,42 @@ inline void modulus(gmp_int& t, const gmp_int& p, long i)
       }
    }
 }
-inline void divide(gmp_int& t, const gmp_int& p, long i)
+inline void eval_divide(gmp_int& t, const gmp_int& p, long i)
 {
    mpz_div_ui(t.data(), p.data(), std::abs(i));
    if(i < 0)
       mpz_neg(t.data(), t.data());
 }
    
-inline void bitwise_and(gmp_int& result, const gmp_int& u, const gmp_int& v)
+inline void eval_bitwise_and(gmp_int& result, const gmp_int& u, const gmp_int& v)
 {
    mpz_and(result.data(), u.data(), v.data());
 }
 
-inline void bitwise_or(gmp_int& result, const gmp_int& u, const gmp_int& v)
+inline void eval_bitwise_or(gmp_int& result, const gmp_int& u, const gmp_int& v)
 {
    mpz_ior(result.data(), u.data(), v.data());
 }
 
-inline void bitwise_xor(gmp_int& result, const gmp_int& u, const gmp_int& v)
+inline void eval_bitwise_xor(gmp_int& result, const gmp_int& u, const gmp_int& v)
 {
    mpz_xor(result.data(), u.data(), v.data());
 }
 
-inline void complement(gmp_int& result, const gmp_int& u)
+inline void eval_complement(gmp_int& result, const gmp_int& u)
 {
    mpz_com(result.data(), u.data());
 }
 
-inline bool is_zero(const gmp_int& val)
+inline bool eval_is_zero(const gmp_int& val)
 {
    return mpz_sgn(val.data()) == 0;
 }
-inline int get_sign(const gmp_int& val)
+inline int eval_get_sign(const gmp_int& val)
 {
    return mpz_sgn(val.data());
 }
-inline void convert_to(unsigned long* result, const gmp_int& val)
+inline void eval_convert_to(unsigned long* result, const gmp_int& val)
 {
    if(0 == mpz_fits_ulong_p(val.data()))
    {
@@ -1372,7 +1374,7 @@ inline void convert_to(unsigned long* result, const gmp_int& val)
    else
       *result = mpz_get_ui(val.data());
 }
-inline void convert_to(long* result, const gmp_int& val)
+inline void eval_convert_to(long* result, const gmp_int& val)
 {
    if(0 == mpz_fits_slong_p(val.data()))
    {
@@ -1382,7 +1384,7 @@ inline void convert_to(long* result, const gmp_int& val)
    else
       *result = mpz_get_si(val.data());
 }
-inline void convert_to(double* result, const gmp_int& val)
+inline void eval_convert_to(double* result, const gmp_int& val)
 {
    *result = mpz_get_d(val.data());
 }
@@ -1418,7 +1420,7 @@ inline void eval_lcm(gmp_int& result, const gmp_int& a, const long b)
 }
 
 struct gmp_rational;
-void add(gmp_rational& t, const gmp_rational& o);
+void eval_add(gmp_rational& t, const gmp_rational& o);
 
 struct gmp_rational
 {
@@ -1503,8 +1505,8 @@ struct gmp_rational
       using std::frexp;
       using std::ldexp;
       using std::floor;
-      using default_ops::add;
-      using default_ops::subtract;
+      using default_ops::eval_add;
+      using default_ops::eval_subtract;
 
       if (a == 0) {
          mpq_set_si(m_data, 0, 1);
@@ -1537,7 +1539,7 @@ struct gmp_rational
          e -= shift;
          mpq_mul_2exp(m_data, m_data, shift);
          t = static_cast<long>(term);
-         add(*this, t);
+         eval_add(*this, t);
          f -= term;
       }
       if(e > 0)
@@ -1628,69 +1630,63 @@ inline mp_number<gmp_int> denominator(const mp_number<gmp_rational>& val)
    return result;
 }
 
-template <>
-struct component_type<mp_number<gmp_rational> >
-{
-   typedef mp_number<gmp_int> type;
-};
-
-inline void add(gmp_rational& t, const gmp_rational& o)
+inline void eval_add(gmp_rational& t, const gmp_rational& o)
 {
    mpq_add(t.data(), t.data(), o.data());
 }
-inline void subtract(gmp_rational& t, const gmp_rational& o)
+inline void eval_subtract(gmp_rational& t, const gmp_rational& o)
 {
    mpq_sub(t.data(), t.data(), o.data());
 }
-inline void multiply(gmp_rational& t, const gmp_rational& o)
+inline void eval_multiply(gmp_rational& t, const gmp_rational& o)
 {
    mpq_mul(t.data(), t.data(), o.data());
 }
-inline void divide(gmp_rational& t, const gmp_rational& o)
+inline void eval_divide(gmp_rational& t, const gmp_rational& o)
 {
    mpq_div(t.data(), t.data(), o.data());
 }
-inline void add(gmp_rational& t, const gmp_rational& p, const gmp_rational& o)
+inline void eval_add(gmp_rational& t, const gmp_rational& p, const gmp_rational& o)
 {
    mpq_add(t.data(), p.data(), o.data());
 }
-inline void subtract(gmp_rational& t, const gmp_rational& p, const gmp_rational& o)
+inline void eval_subtract(gmp_rational& t, const gmp_rational& p, const gmp_rational& o)
 {
    mpq_sub(t.data(), p.data(), o.data());
 }
-inline void multiply(gmp_rational& t, const gmp_rational& p, const gmp_rational& o)
+inline void eval_multiply(gmp_rational& t, const gmp_rational& p, const gmp_rational& o)
 {
    mpq_mul(t.data(), p.data(), o.data());
 }
-inline void divide(gmp_rational& t, const gmp_rational& p, const gmp_rational& o)
+inline void eval_divide(gmp_rational& t, const gmp_rational& p, const gmp_rational& o)
 {
    mpq_div(t.data(), p.data(), o.data());
 }
    
-inline bool is_zero(const gmp_rational& val)
+inline bool eval_is_zero(const gmp_rational& val)
 {
    return mpq_sgn(val.data()) == 0;
 }
-inline int get_sign(const gmp_rational& val)
+inline int eval_get_sign(const gmp_rational& val)
 {
    return mpq_sgn(val.data());
 }
-inline void convert_to(double* result, const gmp_rational& val)
+inline void eval_convert_to(double* result, const gmp_rational& val)
 {
    *result = mpq_get_d(val.data());
 }
 
-inline void convert_to(long* result, const gmp_rational& val)
+inline void eval_convert_to(long* result, const gmp_rational& val)
 {
    double r;
-   convert_to(&r, val);
+   eval_convert_to(&r, val);
    *result = static_cast<long>(r);
 }
 
-inline void convert_to(unsigned long* result, const gmp_rational& val)
+inline void eval_convert_to(unsigned long* result, const gmp_rational& val)
 {
    double r;
-   convert_to(&r, val);
+   eval_convert_to(&r, val);
    *result = static_cast<long>(r);
 }
 
@@ -1788,6 +1784,17 @@ inline gmp_int& gmp_int::operator=(const gmp_rational& o)
    return *this;
 }
 
+} //namespace backends
+
+using boost::multiprecision::backends::gmp_int;
+using boost::multiprecision::backends::gmp_rational;
+using boost::multiprecision::backends::gmp_float;
+
+template <>
+struct component_type<mp_number<gmp_rational> >
+{
+   typedef mp_number<gmp_int> type;
+};
 
 template<>
 struct number_category<gmp_int> : public mpl::int_<number_kind_integer>{};

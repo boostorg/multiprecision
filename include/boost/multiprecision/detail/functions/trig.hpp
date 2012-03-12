@@ -29,31 +29,31 @@ void hyp0F1(T& result, const T& b, const T& x)
    T pochham_b         (b);
    T bp                (b);
 
-   divide(result, x_pow_n_div_n_fact, pochham_b);
-   add(result, ui_type(1));
+   eval_divide(result, x_pow_n_div_n_fact, pochham_b);
+   eval_add(result, ui_type(1));
 
    si_type n;
 
    T tol;
    tol = ui_type(1);
    eval_ldexp(tol, tol, 1 - boost::multiprecision::detail::digits2<mp_number<T> >::value);
-   multiply(tol, result);
-   if(get_sign(tol) < 0)
+   eval_multiply(tol, result);
+   if(eval_get_sign(tol) < 0)
       tol.negate();
    T term;
 
    // Series expansion of hyperg_0f1(; b; x).
    for(n = 2; n < 300; ++n)
    {
-      multiply(x_pow_n_div_n_fact, x);
-      divide(x_pow_n_div_n_fact, n);
-      increment(bp);
-      multiply(pochham_b, bp);
+      eval_multiply(x_pow_n_div_n_fact, x);
+      eval_divide(x_pow_n_div_n_fact, n);
+      eval_increment(bp);
+      eval_multiply(pochham_b, bp);
 
-      divide(term, x_pow_n_div_n_fact, pochham_b);
-      add(result, term);
+      eval_divide(term, x_pow_n_div_n_fact, pochham_b);
+      eval_add(result, term);
 
-      bool neg_term = get_sign(term) < 0;
+      bool neg_term = eval_get_sign(term) < 0;
       if(neg_term)
          term.negate();
       if(term.compare(tol) <= 0)
@@ -103,7 +103,7 @@ void eval_sin(T& result, const T& x)
    // The argument xx will be reduced to 0 <= xx <= pi/2.
    bool b_negate_sin = false;
 
-   if(get_sign(x) < 0)
+   if(eval_get_sign(x) < 0)
    {
       xx.negate();
       b_negate_sin = !b_negate_sin;
@@ -113,13 +113,13 @@ void eval_sin(T& result, const T& x)
    // Remove even multiples of pi.
    if(xx.compare(get_constant_pi<T>()) > 0)
    {
-      divide(n_pi, xx, get_constant_pi<T>());
+      eval_divide(n_pi, xx, get_constant_pi<T>());
       eval_trunc(n_pi, n_pi);
       t = ui_type(2);
       eval_fmod(t, n_pi, t);
-      const bool b_n_pi_is_even = get_sign(t) == 0;
-      multiply(n_pi, get_constant_pi<T>());
-      subtract(xx, n_pi);
+      const bool b_n_pi_is_even = eval_get_sign(t) == 0;
+      eval_multiply(n_pi, get_constant_pi<T>());
+      eval_subtract(xx, n_pi);
 
       BOOST_MATH_INSTRUMENT_CODE(xx.str(0, std::ios_base::scientific));
       BOOST_MATH_INSTRUMENT_CODE(n_pi.str(0, std::ios_base::scientific));
@@ -135,13 +135,13 @@ void eval_sin(T& result, const T& x)
    eval_ldexp(t, get_constant_pi<T>(), -1);
    if(xx.compare(t) > 0)
    {
-      subtract(xx, get_constant_pi<T>(), xx);
+      eval_subtract(xx, get_constant_pi<T>(), xx);
       BOOST_MATH_INSTRUMENT_CODE(xx.str(0, std::ios_base::scientific));
    }
 
-   subtract(t, xx);
-   const bool b_zero    = get_sign(xx) == 0;
-   const bool b_pi_half = get_sign(t) == 0;
+   eval_subtract(t, xx);
+   const bool b_zero    = eval_get_sign(xx) == 0;
+   const bool b_pi_half = eval_get_sign(t) == 0;
 
    // Check if the reduced argument is very close to 0 or pi/2.
    const bool    b_near_zero    = xx.compare(fp_type(1e-1)) < 0;
@@ -157,18 +157,18 @@ void eval_sin(T& result, const T& x)
    }
    else if(b_near_zero)
    {
-      multiply(t, xx, xx);
-      divide(t, si_type(-4));
+      eval_multiply(t, xx, xx);
+      eval_divide(t, si_type(-4));
       T t2;
       t2 = fp_type(1.5);
       hyp0F1(result, t2, t);
       BOOST_MATH_INSTRUMENT_CODE(result.str(0, std::ios_base::scientific));
-      multiply(result, xx);
+      eval_multiply(result, xx);
    }
    else if(b_near_pi_half)
    {
-      multiply(t, t);
-      divide(t, si_type(-4));
+      eval_multiply(t, t);
+      eval_divide(t, si_type(-4));
       T t2;
       t2 = fp_type(0.5);
       hyp0F1(result, t2, t);
@@ -184,26 +184,26 @@ void eval_sin(T& result, const T& x)
       static const si_type n_scale = 9;
       static const si_type n_three_pow_scale = static_cast<si_type>(19683L);
 
-      divide(xx, n_three_pow_scale);
+      eval_divide(xx, n_three_pow_scale);
 
       // Now with small arguments, we are ready for a series expansion.
-      multiply(t, xx, xx);
-      divide(t, si_type(-4));
+      eval_multiply(t, xx, xx);
+      eval_divide(t, si_type(-4));
       T t2;
       t2 = fp_type(1.5);
       hyp0F1(result, t2, t);
       BOOST_MATH_INSTRUMENT_CODE(result.str(0, std::ios_base::scientific));
-      multiply(result, xx);
+      eval_multiply(result, xx);
 
       // Convert back using multiple angle identity.
       for(boost::int32_t k = static_cast<boost::int32_t>(0); k < n_scale; k++)
       {
          // Rescale the cosine value using the multiple angle identity.
-         multiply(t2, result, ui_type(3));
-         multiply(t, result, result);
-         multiply(t, result);
-         multiply(t, ui_type(4));
-         subtract(result, t2, t);
+         eval_multiply(t2, result, ui_type(3));
+         eval_multiply(t, result, result);
+         eval_multiply(t, result);
+         eval_multiply(t, ui_type(4));
+         eval_subtract(result, t2, t);
       }
    }
 
@@ -249,7 +249,7 @@ void eval_cos(T& result, const T& x)
    // The argument xx will be reduced to 0 <= xx <= pi/2.
    bool b_negate_cos = false;
 
-   if(get_sign(x) < 0)
+   if(eval_get_sign(x) < 0)
    {
       xx.negate();
    }
@@ -258,18 +258,18 @@ void eval_cos(T& result, const T& x)
    // Remove even multiples of pi.
    if(xx.compare(get_constant_pi<T>()) > 0)
    {
-      divide(t, xx, get_constant_pi<T>());
+      eval_divide(t, xx, get_constant_pi<T>());
       eval_trunc(n_pi, t);
       BOOST_MATH_INSTRUMENT_CODE(n_pi.str(0, std::ios_base::scientific));
-      multiply(t, n_pi, get_constant_pi<T>());
+      eval_multiply(t, n_pi, get_constant_pi<T>());
       BOOST_MATH_INSTRUMENT_CODE(t.str(0, std::ios_base::scientific));
-      subtract(xx, t);
+      eval_subtract(xx, t);
       BOOST_MATH_INSTRUMENT_CODE(xx.str(0, std::ios_base::scientific));
 
       // Adjust signs if the multiple of pi is not even.
       t = ui_type(2);
       eval_fmod(t, n_pi, t);
-      const bool b_n_pi_is_even = get_sign(t) == 0;
+      const bool b_n_pi_is_even = eval_get_sign(t) == 0;
 
       if(!b_n_pi_is_even)
       {
@@ -282,17 +282,17 @@ void eval_cos(T& result, const T& x)
    int com = xx.compare(t);
    if(com > 0)
    {
-      subtract(xx, get_constant_pi<T>(), xx);
+      eval_subtract(xx, get_constant_pi<T>(), xx);
       b_negate_cos = !b_negate_cos;
       BOOST_MATH_INSTRUMENT_CODE(xx.str(0, std::ios_base::scientific));
    }
 
-   const bool b_zero    = get_sign(xx) == 0;
+   const bool b_zero    = eval_get_sign(xx) == 0;
    const bool b_pi_half = com == 0;
 
    // Check if the reduced argument is very close to 0 or pi/2.
    const bool    b_near_zero    = xx.compare(fp_type(1e-4)) < 0;
-   subtract(t, xx);
+   eval_subtract(t, xx);
    const bool    b_near_pi_half = t.compare(fp_type(1e-4)) < 0;
 
    if(b_zero)
@@ -305,8 +305,8 @@ void eval_cos(T& result, const T& x)
    }
    else if(b_near_zero)
    {
-      multiply(t, xx, xx);
-      divide(t, si_type(-4));
+      eval_multiply(t, xx, xx);
+      eval_divide(t, si_type(-4));
       n_pi = fp_type(0.5f);
       hyp0F1(result, n_pi, t);
       BOOST_MATH_INSTRUMENT_CODE(result.str(0, std::ios_base::scientific));
@@ -314,11 +314,11 @@ void eval_cos(T& result, const T& x)
    else if(b_near_pi_half)
    {
       T t2(t);
-      multiply(t, t);
-      divide(t, si_type(-4));
+      eval_multiply(t, t);
+      eval_divide(t, si_type(-4));
       n_pi = fp_type(1.5f);
       hyp0F1(result, n_pi, t);
-      multiply(result, t2);
+      eval_multiply(result, t2);
       BOOST_MATH_INSTRUMENT_CODE(result.str(0, std::ios_base::scientific));
    }
    else
@@ -330,10 +330,10 @@ void eval_cos(T& result, const T& x)
 
       static const ui_type n_scale           = 9;
       static const ui_type n_three_pow_scale = 19683;
-      divide(xx, n_three_pow_scale);
+      eval_divide(xx, n_three_pow_scale);
 
-      multiply(t, xx, xx);
-      divide(t, si_type(-4));
+      eval_multiply(t, xx, xx);
+      eval_divide(t, si_type(-4));
       n_pi = fp_type(0.5f);
 
       // Now with small arguments, we are ready for a series expansion.
@@ -343,11 +343,11 @@ void eval_cos(T& result, const T& x)
       // Convert back using multiple angle identity.
       for(ui_type k = 0; k < n_scale; k++)
       {
-         multiply(t, result, result);
-         multiply(t, result);
-         multiply(t, ui_type(4));
-         multiply(result, si_type(-3));
-         add(result, t);
+         eval_multiply(t, result, result);
+         eval_multiply(t, result);
+         eval_multiply(t, ui_type(4));
+         eval_multiply(result, si_type(-3));
+         eval_add(result, t);
       }
    }
    if(b_negate_cos)
@@ -361,7 +361,7 @@ void eval_tan(T& result, const T& x)
    T t;
    eval_sin(result, x);
    eval_cos(t, x);
-   divide(result, t);
+   eval_divide(result, t);
 }
 
 template <class T>
@@ -385,15 +385,15 @@ void hyp2F1(T& result, const T& a, const T& b, const T& c, const T& x)
    T bp                (b);
    T cp                (c);
 
-   multiply(result, pochham_a, pochham_b);
-   divide(result, pochham_c);
-   multiply(result, x_pow_n_div_n_fact);
-   add(result, ui_type(1));
+   eval_multiply(result, pochham_a, pochham_b);
+   eval_divide(result, pochham_c);
+   eval_multiply(result, x_pow_n_div_n_fact);
+   eval_add(result, ui_type(1));
 
    T lim;
    eval_ldexp(lim, result, 1 - boost::multiprecision::detail::digits2<mp_number<T> >::value);
 
-   if(get_sign(lim) < 0)
+   if(eval_get_sign(lim) < 0)
       lim.negate();
 
    ui_type n;
@@ -402,22 +402,22 @@ void hyp2F1(T& result, const T& a, const T& b, const T& c, const T& x)
    // Series expansion of hyperg_2f1(a, b; c; x).
    for(n = 2; n < 300; ++n)
    {
-      multiply(x_pow_n_div_n_fact, x);
-      divide(x_pow_n_div_n_fact, n);
+      eval_multiply(x_pow_n_div_n_fact, x);
+      eval_divide(x_pow_n_div_n_fact, n);
 
-      increment(ap);
-      multiply(pochham_a, ap);
-      increment(bp);
-      multiply(pochham_b, bp);
-      increment(cp);
-      multiply(pochham_c, cp);
+      eval_increment(ap);
+      eval_multiply(pochham_a, ap);
+      eval_increment(bp);
+      eval_multiply(pochham_b, bp);
+      eval_increment(cp);
+      eval_multiply(pochham_c, cp);
 
-      multiply(term, pochham_a, pochham_b);
-      divide(term, pochham_c);
-      multiply(term, x_pow_n_div_n_fact);
-      add(result, term);
+      eval_multiply(term, pochham_a, pochham_b);
+      eval_divide(term, pochham_c);
+      eval_multiply(term, x_pow_n_div_n_fact);
+      eval_add(result, term);
 
-      if(get_sign(term) < 0)
+      if(eval_get_sign(term) < 0)
          term.negate();
       if(lim.compare(term) >= 0)
          break;
@@ -455,7 +455,7 @@ void eval_asin(T& result, const T& x)
    default: ;
    }
 
-   const bool b_neg = get_sign(x) < 0;
+   const bool b_neg = eval_get_sign(x) < 0;
 
    T xx(x);
    if(b_neg)
@@ -479,29 +479,29 @@ void eval_asin(T& result, const T& x)
    if(xx.compare(fp_type(1e-4)) < 0)
    {
       // http://functions.wolfram.com/ElementaryFunctions/ArcSin/26/01/01/
-      multiply(xx, xx);
+      eval_multiply(xx, xx);
       T t1, t2;
       t1 = fp_type(0.5f);
       t2 = fp_type(1.5f);
       hyp2F1(result, t1, t1, t2, xx);
-      multiply(result, x);
+      eval_multiply(result, x);
       return;
    }
    else if(xx.compare(fp_type(1 - 1e-4f)) > 0)
    {
       T dx1;
       T t1, t2;
-      subtract(dx1, ui_type(1), xx);
+      eval_subtract(dx1, ui_type(1), xx);
       t1 = fp_type(0.5f);
       t2 = fp_type(1.5f);
       eval_ldexp(dx1, dx1, -1);
       hyp2F1(result, t1, t1, t2, dx1);
       eval_ldexp(dx1, dx1, 2);
       eval_sqrt(t1, dx1);
-      multiply(result, t1);
+      eval_multiply(result, t1);
       eval_ldexp(t1, get_constant_pi<T>(), -1);
       result.negate();
-      add(result, t1);
+      eval_add(result, t1);
       if(b_neg)
          result.negate();
       return;
@@ -509,7 +509,7 @@ void eval_asin(T& result, const T& x)
 
    // Get initial estimate using standard math function asin.
    double dd;
-   convert_to(&dd, xx);
+   eval_convert_to(&dd, xx);
 
    result = fp_type(std::asin(dd));
 
@@ -519,15 +519,15 @@ void eval_asin(T& result, const T& x)
       T s, c;
       eval_sin(s, result);
       eval_cos(c, result);
-      subtract(s, xx);
-      divide(s, c);
-      subtract(result, s);
+      eval_subtract(s, xx);
+      eval_divide(s, c);
+      eval_subtract(result, s);
 
       T lim;
       eval_ldexp(lim, result, 1 - boost::multiprecision::detail::digits2<mp_number<T> >::value);
-      if(get_sign(s) < 0)
+      if(eval_get_sign(s) < 0)
          s.negate();
-      if(get_sign(lim) < 0)
+      if(eval_get_sign(lim) < 0)
          lim.negate();
       if(lim.compare(s) >= 0)
          break;
@@ -564,7 +564,7 @@ inline void eval_acos(T& result, const T& x)
    }
    else if(c == 0)
    {
-      if(get_sign(x) < 0)
+      if(eval_get_sign(x) < 0)
          result = get_constant_pi<T>();
       else
          result = ui_type(0);
@@ -574,7 +574,7 @@ inline void eval_acos(T& result, const T& x)
    eval_asin(result, x);
    T t;
    eval_ldexp(t, get_constant_pi<T>(), -1);
-   subtract(result, t);
+   eval_subtract(result, t);
    result.negate();
 }
 
@@ -597,7 +597,7 @@ void eval_atan(T& result, const T& x)
       result = ui_type(0);
       return;
    case FP_INFINITE:
-      if(get_sign(x) < 0)
+      if(eval_get_sign(x) < 0)
       {
          eval_ldexp(result, get_constant_pi<T>(), -1);
          result.negate();
@@ -608,7 +608,7 @@ void eval_atan(T& result, const T& x)
    default: ;
    }
 
-   const bool b_neg = get_sign(x) < 0;
+   const bool b_neg = eval_get_sign(x) < 0;
 
    T xx(x);
    if(b_neg)
@@ -620,10 +620,10 @@ void eval_atan(T& result, const T& x)
       t1 = ui_type(1);
       t2 = fp_type(0.5f);
       t3 = fp_type(1.5f);
-      multiply(xx, xx);
+      eval_multiply(xx, xx);
       xx.negate();
       hyp2F1(result, t1, t2, t3, xx);
-      multiply(result, x);
+      eval_multiply(result, x);
       return;
    }
 
@@ -633,14 +633,14 @@ void eval_atan(T& result, const T& x)
       t1 = fp_type(0.5f);
       t2 = ui_type(1u);
       t3 = fp_type(1.5f);
-      multiply(xx, xx);
-      divide(xx, si_type(-1), xx);
+      eval_multiply(xx, xx);
+      eval_divide(xx, si_type(-1), xx);
       hyp2F1(result, t1, t2, t3, xx);
-      divide(result, x);
+      eval_divide(result, x);
       if(!b_neg)
          result.negate();
       eval_ldexp(t1, get_constant_pi<T>(), -1);
-      add(result, t1);
+      eval_add(result, t1);
       if(b_neg)
          result.negate();
       return;
@@ -649,7 +649,7 @@ void eval_atan(T& result, const T& x)
 
    // Get initial estimate using standard math function atan.
    fp_type d;
-   convert_to(&d, xx);
+   eval_convert_to(&d, xx);
    result = fp_type(std::atan(d));
 
    // Newton-Raphson iteration
@@ -660,10 +660,10 @@ void eval_atan(T& result, const T& x)
    {
       eval_sin(s, result);
       eval_cos(c, result);
-      multiply(t, xx, c);
-      subtract(t, s);
-      multiply(s, t, c);
-      add(result, s);
+      eval_multiply(t, xx, c);
+      eval_subtract(t, s);
+      eval_multiply(s, t, c);
+      eval_add(result, s);
    }
    if(b_neg)
       result.negate();
@@ -699,7 +699,7 @@ void eval_atan2(T& result, const T& y, const T& x)
       return;
    case FP_ZERO:
       {
-         int c = get_sign(x);
+         int c = eval_get_sign(x);
          if(c < 0)
             result = get_constant_pi<T>();
          else if(c >= 0)
@@ -715,7 +715,7 @@ void eval_atan2(T& result, const T& y, const T& x)
          else
          {
             eval_ldexp(result, get_constant_pi<T>(), -1);
-            if(get_sign(y) < 0)
+            if(eval_get_sign(y) < 0)
                result.negate();
          }
          return;
@@ -730,30 +730,30 @@ void eval_atan2(T& result, const T& y, const T& x)
    case FP_ZERO:
       {
          eval_ldexp(result, get_constant_pi<T>(), -1);
-         if(get_sign(y) < 0)
+         if(eval_get_sign(y) < 0)
             result.negate();
          return;
       }
    case FP_INFINITE:
-      if(get_sign(x) > 0)
+      if(eval_get_sign(x) > 0)
          result = ui_type(0);
       else
          result = get_constant_pi<T>();
-      if(get_sign(y) < 0)
+      if(eval_get_sign(y) < 0)
          result.negate();
       return;
    }
 
    T xx;
-   divide(xx, y, x);
-   if(get_sign(xx) < 0)
+   eval_divide(xx, y, x);
+   if(eval_get_sign(xx) < 0)
       xx.negate();
 
    eval_atan(result, xx);
 
    // Determine quadrant (sign) based on signs of x, y
-   const bool y_neg = get_sign(y) < 0;
-   const bool x_neg = get_sign(x) < 0;
+   const bool y_neg = eval_get_sign(y) < 0;
+   const bool x_neg = eval_get_sign(x) < 0;
 
    if(y_neg != x_neg)
       result.negate();
@@ -761,9 +761,9 @@ void eval_atan2(T& result, const T& y, const T& x)
    if(x_neg)
    {
       if(y_neg)
-         subtract(result, get_constant_pi<T>());
+         eval_subtract(result, get_constant_pi<T>());
       else
-         add(result, get_constant_pi<T>());
+         eval_add(result, get_constant_pi<T>());
    }
 }
 
