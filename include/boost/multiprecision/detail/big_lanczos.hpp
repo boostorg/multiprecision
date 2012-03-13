@@ -16,10 +16,10 @@ namespace lanczos{
 template <class T, class Policy>
 struct lanczos;
 
-template<class Backend, class Policy>
-struct lanczos<multiprecision::mp_number<Backend>, Policy>
+template<class Backend, bool ExpressionTemplates, class Policy>
+struct lanczos<multiprecision::mp_number<Backend, ExpressionTemplates>, Policy>
 {
-   typedef typename boost::math::policies::precision<multiprecision::mp_number<Backend>, Policy>::type precision_type;
+   typedef typename boost::math::policies::precision<multiprecision::mp_number<Backend, ExpressionTemplates>, Policy>::type precision_type;
    typedef typename mpl::if_c<
       precision_type::value <= 73,
       lanczos13UDT,

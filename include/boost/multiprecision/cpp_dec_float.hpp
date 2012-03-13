@@ -2822,8 +2822,8 @@ typedef mp_number<cpp_dec_float<100> > cpp_dec_float_100;
 
 namespace std
 {
-   template <unsigned Digits10> 
-   class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10> > >
+   template <unsigned Digits10, bool ExpressionTemplates> 
+   class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> >
    {
    public:
       static const bool                    is_specialized    = true;
@@ -2850,15 +2850,15 @@ namespace std
       static const bool                    traps             = false;
       static const bool                    tinyness_before   = false;
 
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10> > (min)        (void)  { return (boost::multiprecision::cpp_dec_float<Digits10>::min)(); }
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10> > (max)        (void)  { return (boost::multiprecision::cpp_dec_float<Digits10>::max)(); }
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10> > lowest       (void)  { return boost::multiprecision::cpp_dec_float<Digits10>::zero(); }
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10> > epsilon      (void)  { return boost::multiprecision::cpp_dec_float<Digits10>::eps(); }
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10> > round_error  (void)  { return 0.5L; }
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10> > infinity     (void)  { return boost::multiprecision::cpp_dec_float<Digits10>::inf(); }
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10> > quiet_NaN    (void)  { return boost::multiprecision::cpp_dec_float<Digits10>::nan(); }
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10> > signaling_NaN(void)  { return boost::multiprecision::cpp_dec_float<Digits10>::zero(); }
-      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10> > denorm_min   (void)  { return boost::multiprecision::cpp_dec_float<Digits10>::zero(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> (min)        (void)  { return (boost::multiprecision::cpp_dec_float<Digits10>::min)(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> (max)        (void)  { return (boost::multiprecision::cpp_dec_float<Digits10>::max)(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> lowest       (void)  { return boost::multiprecision::cpp_dec_float<Digits10>::zero(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> epsilon      (void)  { return boost::multiprecision::cpp_dec_float<Digits10>::eps(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> round_error  (void)  { return 0.5L; }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> infinity     (void)  { return boost::multiprecision::cpp_dec_float<Digits10>::inf(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> quiet_NaN    (void)  { return boost::multiprecision::cpp_dec_float<Digits10>::nan(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> signaling_NaN(void)  { return boost::multiprecision::cpp_dec_float<Digits10>::zero(); }
+      static const boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> denorm_min   (void)  { return boost::multiprecision::cpp_dec_float<Digits10>::zero(); }
    };
 }
 
@@ -2866,8 +2866,8 @@ namespace boost{ namespace math{
 
 namespace policies{
 
-template <unsigned Digits10, class Policy>
-struct precision< boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10> >, Policy>
+template <unsigned Digits10, class Policy, bool ExpressionTemplates>
+struct precision< boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates>, Policy>
 {
    typedef typename Policy::precision_type precision_type;
    typedef digits2<((Digits10 + 1) * 1000L) / 301L> digits_2;

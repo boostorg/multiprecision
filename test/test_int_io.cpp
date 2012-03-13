@@ -9,11 +9,12 @@
 #  define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#if !defined(TEST_MPZ) && !defined(TEST_TOMMATH) && !defined(TEST_FIXED_INT1) && !defined(TEST_FIXED_INT2)
+#if !defined(TEST_MPZ) && !defined(TEST_TOMMATH) && !defined(TEST_FIXED_INT1) && !defined(TEST_FIXED_INT2) && !defined(TEST_CPP_INT)
 #  define TEST_TOMMATH
 #  define TEST_MPZ
 #  define TEST_FIXED_INT1
 #  define TEST_FIXED_INT2
+#  define TEST_CPP_INT
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -32,6 +33,9 @@
 #endif
 #if defined(TEST_FIXED_INT1) || defined(TEST_FIXED_INT2)
 #include <boost/multiprecision/fixed_int.hpp>
+#endif
+#ifdef TEST_CPP_INT
+#include <boost/multiprecision/cpp_int.hpp>
 #endif
 
 #include <boost/algorithm/string/case_conv.hpp>
@@ -136,6 +140,11 @@ int main()
    test_round_trip<boost::multiprecision::mp_int512_t>();
    test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<20, true> > >();
    test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<70, true> > >();
+#endif
+#ifdef TEST_CPP_INT
+   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<> > >();
+   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<1024, true, void> > >();
+   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<512, false, void> > >();
 #endif
    return boost::report_errors();
 }

@@ -1517,10 +1517,10 @@ typedef mp_number<fixed_int<512, true> > mp_int512_t;
 
 namespace std{
 
-template <unsigned Bits, bool Signed>
-class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<Bits, Signed> > >
+template <unsigned Bits, bool Signed, bool ExpressionTemplates>
+class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<Bits, Signed>, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::mp_number<boost::multiprecision::fixed_int<Bits, Signed> > number_type;
+   typedef boost::multiprecision::mp_number<boost::multiprecision::fixed_int<Bits, Signed>, ExpressionTemplates> number_type;
 
    struct initializer
    {
@@ -1591,9 +1591,9 @@ public:
    BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
 };
 
-template <unsigned Bits, bool Signed>
-typename numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<Bits, Signed> > >::initializer const
-   numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<Bits, Signed> > >::init;
+template <unsigned Bits, bool Signed, bool ExpressionTemplates>
+typename numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<Bits, Signed>, ExpressionTemplates> >::initializer const
+   numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<Bits, Signed>, ExpressionTemplates> >::init;
 }
 
 #endif

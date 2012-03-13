@@ -1011,6 +1011,11 @@ inline int digits<boost::multiprecision::mpfr_float>()
 {
    return boost::multiprecision::backends::detail::get_default_precision();
 }
+template <>
+inline int digits<boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<0>, false> >()
+{
+   return boost::multiprecision::backends::detail::get_default_precision();
+}
 
 }
 
@@ -1021,10 +1026,10 @@ namespace std{
 //
 // numeric_limits [partial] specializations for the types declared in this header:
 //
-template<unsigned Digits10> 
-class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<Digits10> > >
+template<unsigned Digits10, bool ExpressionTemplates> 
+class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<Digits10>, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<Digits10> > number_type;
+   typedef boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<Digits10>, ExpressionTemplates> number_type;
 public:
    BOOST_STATIC_CONSTEXPR bool is_specialized = true;
    BOOST_STATIC_CONSTEXPR number_type (min)() BOOST_MP_NOEXCEPT
@@ -1153,13 +1158,13 @@ private:
    static const data_initializer initializer;
 };
 
-template<unsigned Digits10> 
-const typename numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<Digits10> > >::data_initializer numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<Digits10> > >::initializer;
+template<unsigned Digits10, bool ExpressionTemplates> 
+const typename numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<Digits10>, ExpressionTemplates> >::data_initializer numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<Digits10>, ExpressionTemplates> >::initializer;
 
-template<> 
-class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<0> > >
+template<bool ExpressionTemplates> 
+class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<0>, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<0> > number_type;
+   typedef boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<0>, ExpressionTemplates> number_type;
 public:
    BOOST_STATIC_CONSTEXPR bool is_specialized = false;
    static number_type (min)() BOOST_MP_NOEXCEPT { return number_type(0); }

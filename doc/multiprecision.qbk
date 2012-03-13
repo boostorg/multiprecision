@@ -60,6 +60,17 @@ so instead we compose our own:
 
    my_float a, b, c; // These variables have 300 decimal digits precision
 
+We can repeat the above example, but with the expression templates disabled (for faster compile times, but slower runtimes)
+by passing a second template argument to `mp_number`:
+
+   #include <boost/multiprecision/mpfr.hpp>  // Defines the Backend type that wraps MPFR
+
+   namespace mp = boost::multiprecision;     // Reduce the typing a bit later...
+
+   typedef mp::mp_number<mp::mpfr_float_backend<300>, false>  my_float;
+
+   my_float a, b, c; // These variables have 300 decimal digits precision
+
 [h4 Expression Templates]
 
 Class `mp_number` is expression-template-enabled: that means that rather than having a multiplication
@@ -176,6 +187,9 @@ magic by converting out-of-place operators to in-place ones, we necessarily take
 transformation is more efficient than creating the extra temporary variable, just not by as much as
 one would hope.
 
+Finally, note that `mp_number` takes a second template argument, which, when set to `false` disables all
+the expression template machinary.  The result is much faster to compile, but slower at runtime.
+
 We'll conclude this section by providing some more performance comparisons between these three libraries,
 again, all are using [mpfr] to carry out the underlying arithmetic, and all are operating at the same precision
 (50 decimal digits):
@@ -209,7 +223,8 @@ The following backends provide integer arithmetic:
 [[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
 [[`gmp_int`][boost/multiprecision/gmp.hpp][2][[gmp]][Very fast and efficient backend.][Dependency on GNU licenced [gmp] library.]]
 [[`mp_int`][boost/multiprecision/tommath.hpp][2][libtommath][Public domain backend with no licence restrictions.][Slower than [gmp].]]
-[[`fixed_int`][boost/multiprecision/fixed_int.hpp][2][None][Boost licenced fixed precision modular arithmetic integer.][Slower than [gmp].]]
+[[`cpp_int`][boost/multiprecision/cpp_int.hpp][2][None]
+            [Very versatile, Boost licenced, all C++ integer type which support both arbitrary precision and fixed precision integer types.][Slower than [gmp].]]
 ]
 
 [h4 gmp_int]
@@ -277,46 +292,76 @@ as a result performing formatted output on this type when the argument is negati
 
 [tommath_eg]
 
-[h4 fixed_int]
+[h4 cpp_int]
 
    namespace boost{ namespace multiprecision{
 
-   template <unsigned Digits, bool Signed>
-   class fixed_int;
+   typedef unspecified-type limb_type;
 
-   typedef mp_number<fixed_int<128, false> > mp_uint128_t;
-   typedef mp_number<fixed_int<256, false> > mp_uint256_t;
-   typedef mp_number<fixed_int<512, false> > mp_uint512_t;
+   template <unsigned MinDigits = 0, bool Signed = true, class Allocator = std::allocator<limb_type> >
+   class cpp_int_backend;
 
-   typedef mp_number<fixed_int<128, true> > mp_int128_t;
-   typedef mp_number<fixed_int<256, true> > mp_int256_t;
-   typedef mp_number<fixed_int<512, true> > mp_int512_t;
+   typedef mp_number<cpp_int_backend<> >           cpp_int;    // arbitrary precision integer
+   typedef rational_adapter<cpp_int_backend<> >    cpp_rational_backend;
+   typedef mp_number<cpp_rational_backend>         cpp_rational; // arbitrary precision rational number
+
+   // Fixed precision unsigned types:
+   typedef mp_number<cpp_int<128, false, void> >   mp_uint128_t;
+   typedef mp_number<fixed_int<256, false, void> > mp_uint256_t;
+   typedef mp_number<fixed_int<512, false, void> > mp_uint512_t;
+
+   // Fixed precision signed types:
+   typedef mp_number<fixed_int<128, true, void> >  mp_int128_t;
+   typedef mp_number<fixed_int<256, true, void> >  mp_int256_t;
+   typedef mp_number<fixed_int<512, true, void> >  mp_int512_t;
 
    }} // namespaces
 
-The `fixed_int` backend is used via one of the typedefs `boost::multiprecision::mp_uint128_t`, `boost::multiprecision::mp_uint256_t`,
+The `cpp_int_backend` type is used via one of the typedefs `boost::multiprecision::cpp_int`, 
+`boost::multiprecision::mp_uint128_t`, `boost::multiprecision::mp_uint256_t`,
 `boost::multiprecision::mp_uint512_t`, `boost::multiprecision::mp_int128_t`, `boost::multiprecision::mp_int256_t`
-or `boost::multiprecision::mp_int512_t`.  It provides both signed and unsigned integer types with a fixed precision
-and modular arithmetic with a 2's complement representation for negative values.  In other words it's designed to work just 
-like a typical built in integer type, but with larger precision.
+or `boost::multiprecision::mp_int512_t`.  
+
+This backend is the "Swiss Army Knife" of integer types as it can represent both fixed and arbitrary precision
+integer types, and both signed and unsigned types.  There are three template arguments:
+
+[variablelist
+[[MinBits][Determines the number of Bits to store directly within the object before resorting to dynamic memory
+           allocation.  When zero, this field is determined automatically based on how many bits can be stored
+           in union with the dynamic storage header: setting a larger value may improve performance as larger integer
+           values will be stored internally before memory allocation is required.  
+           When the Allocator parameter is type `void`, then this field
+           determines the total number of bits in the resulting fixed precision type.]]
+[[Signed][Determines whether the resulting type is signed or not.  Note that for arbitrary precision types
+          (where the Allocator parameter is non-void), then this parameter must be `true`.  For fixed precision
+          types then this type may be either `true` (type is signed), or `false` (type is unsigned).]]
+[[Allocator][The allocator to use for dymamic memory allocation, or type `void` if this is to be a fixed precision type.]]
+]
 
 Things you should know when using this type:
 
-* Default constructed `fixed_int`'s have indeterminate value - just like normal built in integers.
+* Default constructed `cpp_int_backend`'s have the value zero.
 * Division by zero results in a `std::runtime_error` being thrown.
 * Construction from a string that contains invalid non-numeric characters results in a `std::runtime_error` being thrown.
-* Since the precision of `fixed_int` is necessarily limited, care should be taken to avoid numeric overflow when using this type
+* Since the precision of `cpp_int_backend` is necessarily limited when the allocator parameter is void, 
+care should be taken to avoid numeric overflow when using this type
 unless you actually want modulo-arithmetic behavior.
+* The type uses a sign-magnitude representation internally, so type `mp_int128_t` has 128-bits of precision plus an extra sign bit.
+In this respect the behaviour of these types differs from built-in 2's complement types.  In might be tempting to use a
+127-bit type instead, and indeed this does work, but behaviour is still slightly different from a 2's complement built-in type
+as the min and max values are identical (apart from the sign), where as they differ by one for a true 2's complement type.
+That said it should be noted that there's no requirement for built-in types to be 2's complement either - it's simply that this
+is the most common format by far.
 
 [h5 Example:]
 
-[fixed_int_eg]
+[cpp_int_eg]
 
 [endsect]
 
-[section:reals Real Numbers]
+[section:reals Floating Point Numbers]
 
-The following backends provide real number arithmetic:
+The following backends provide floating point arithmetic:
 
 [table
 [[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
@@ -471,7 +516,8 @@ The following backends provide rational number arithmetic:
 [table
 [[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
 [[`gmp_rational`][boost/multiprecision/gmp.hpp][2][[gmp]][Very fast and efficient backend.][Dependency on GNU licenced [gmp] library.]]
-[[`tommath_rational`][boost/multiprecision/tommath.hpp][2][libtommath][All C/C++ implementation that's Boost Software Licence compatible.][Slower than [gmp].]]
+[[`cpp_rational`][boost/multiprecision/cpp_int.hpp][2][None][An all C++ Boost-licenced implementation.][[Slower than [gmp].]]
+[[`tommath_rational`][boost/multiprecision/tommath.hpp][2][libtommath][All C/C++ implementation that's Boost Software Licence compatible.]
 [[`rational_adapter`][boost/multiprecision/rational_adapter.hpp][N/A][none][All C++ adapter that allows any inetger backend type to be used as a rational type.][Requires an underlying integer backend type.]]
 [[`boost::rational`][boost/rational.hpp][N/A][None][A C++ rational number type that can used with any `mp_number` integer type.][The expression templates used by `mp_number` end up being "hidden" inside `boost::rational`: performance may well suffer as a result.]]
 ]
@@ -515,6 +561,38 @@ Things you should know when using this type:
 [h5 Example:]
 
 [mpq_eg]
+
+[h4 cpp_rational]
+
+   namespace boost{ namespace multiprecision{
+
+   typedef rational_adapter<cpp_int_backend<> >    cpp_rational_backend;
+
+   typedef mp_number<cpp_rational_backend>         cpp_rational;
+
+   }} // namespaces
+
+The `cpp_rational_backend` type is used via the typedef `boost::multiprecision::cpp_rational`.  It provides
+a rational number type that is a drop-in replacement for the native C++ number types, but with unlimited precision.
+
+As well as the usual conversions from arithmetic and string types, instances of `cpp_rational` are copy constructible
+and assignable from type `cpp_int`.
+
+There are also non-member functions:
+
+   cpp_int numerator(const cpp_rational&);
+   cpp_int denominator(const cpp_rational&);
+
+which return the numerator and denominator of the number.
+
+Things you should know when using this type:
+
+* Default constructed `cpp_rational`'s have the value zero.
+* Division by zero results in a `std::rumtime_error` being thrown.
+
+[h5 Example:]
+
+[cpp_rational_eg]
 
 [h4 tommath_rational]
 
@@ -592,7 +670,7 @@ So for example, given an integer backend type `MyIntegerBackend`, the use would 
 
    namespace boost{ namespace multiprecision{
 
-   template <class Backend>
+   template <class Backend, bool ExpressionTemplates = true>
    class mp_number
    {
       mp_number();
@@ -621,13 +699,13 @@ So for example, given an integer backend type `MyIntegerBackend`, the use would 
       // swap:
       void swap(mp_number& other);
       // Sign:
-      bool eval_is_zero()const;
+      bool is_zero()const;
       int sign()const;
       // string conversion:
       std::string str()const;
       // Generic conversion mechanism
       template <class T>
-      T eval_convert_to()const;
+      T convert_to()const;
       // precision control:
       static unsigned default_precision();
       static void default_precision(unsigned digits10);
@@ -663,15 +741,15 @@ So for example, given an integer backend type `MyIntegerBackend`, the use would 
    bool operator>=(const ``['see-below]``&, const ``['see-below]``&);
 
    // Swap:
-   template <class Backend>
-   void swap(mp_number<Backend>& a, mp_number<Backend>& b);
+   template <class Backend, bool ExpressionTemplates>
+   void swap(mp_number<Backend, ExpressionTemplates>& a, mp_number<Backend, ExpressionTemplates>& b);
 
    // iostream support:
-   template <class Backend>
-   std::ostream& operator << (std::ostream& os, const mp_number<Backend>& r);
+   template <class Backend, bool ExpressionTemplates>
+   std::ostream& operator << (std::ostream& os, const mp_number<Backend, ExpressionTemplates>& r);
    std::ostream& operator << (std::ostream& os, const ``['unmentionable-expression-template-type]``& r);
-   template <class Backend>
-   std::istream& operator >> (std::istream& is, mp_number<Backend>& r);
+   template <class Backend, bool ExpressionTemplates>
+   std::istream& operator >> (std::istream& is, mp_number<Backend, ExpressionTemplates>& r);
 
    // Non-member function standard library support:
    ``['unmentionable-expression-template-type]``    abs    (const ``['mp_number-or-expression-template-type]``&);
@@ -732,8 +810,8 @@ So for example, given an integer backend type `MyIntegerBackend`, the use would 
    // numeric_limits support:
    namespace std{
 
-   template <class Backend>
-   struct numeric_limits<boost::multiprecision<Backend> >
+   template <class Backend, bool ExpressionTemplates>
+   struct numeric_limits<boost::multiprecision<Backend, ExpressionTemplates> >
    {
       /* Usual members here */
    };
@@ -741,6 +819,16 @@ So for example, given an integer backend type `MyIntegerBackend`, the use would 
    }
 
 [h4 Description]
+
+   template <class Backend, bool ExpressionTemplates = true>
+   class mp_number;
+
+Class `mp_number` has two template arguments:
+
+[variablelist
+[[Backend][The actual arithmetic backend that does all the work.]]
+[[ExpressionTemplates][A boolean value: when true, then expression templates are enabled, otherwise they are disabled.]]
+]
 
    mp_number();
    mp_number(see-below);
@@ -781,7 +869,7 @@ These operators all take their usual arithmetic meanings.
 
 The arguments to these operators is either:
 
-* Another `mp_number<Backend>`.
+* Another `mp_number<Backend, ExpressionTemplates>`.
 * A builtin arithmetic type.
 * An expression template derived from `mp_number<Backend>`.
 
@@ -801,7 +889,7 @@ This operator also enables the use of `mp_number` with any of the following oper
 
 Swaps `*this` with `other`.
 
-      bool eval_is_zero()const;
+      bool is_zero()const;
 
 Returns `true` is `*this` is zero, otherwise `false`.
 
@@ -816,7 +904,7 @@ Returns the number formatted as a string, with at least /precision/ digits, and 
 if /scientific/ is true.
 
       template <class T>
-      T eval_convert_to()const;
+      T convert_to()const;
 
 Provides a generic conversion mechanism to convert `*this` to type `T`.  Type `T` may be any arithmetic type.
 Optionally other types may also be supported by specific `Backend` types.
@@ -830,7 +918,7 @@ Optionally other types may also be supported by specific `Backend` types.
 These functions are only available if the Backend template parameter supports runtime changes to precision.  They get and set
 the default precision and the precision of `*this` respectively.
 
-      int compare(const mp_number<Backend>& o)const;
+      int compare(const mp_number<Backend, ExpressionTemplates>& o)const;
       template <class V>
       typename enable_if<is_arithmetic<V>, int>::type compare(const V& other)const;
 
@@ -876,28 +964,30 @@ The arguments to these functions must contain at least one of the following:
 
 In addition, one of the two arguments may be a builtin arithmetic type.
 
-With the exception of the comparison operators (which always evaluate their arguments and return a `bool` result),
-these operators return an "unmentionable" expression template type which defers evaluation of the operator
-until the result is actually required.
+The return type of these operators is either:
+
+* An ['unmentionable-type] expression template type when `ExpressionTemplates` is `true`.
+* Type `mp_number<Backend, false>` when `ExpressionTemplates` is `false`.
+* Type `bool` if the operator is a comparison operator.
 
 Finally note that the second argument to the left and right shift operations must be a builtin integer type, 
 and that the argument must be positive (negative arguments result in a `std::runtime_error` being thrown).
 
 [h4 swap]
 
-   template <class Backend>
-   void swap(mp_number<Backend>& a, mp_number<Backend>& b);
+   template <class Backend, ExpressionTemplates>
+   void swap(mp_number<Backend, ExpressionTemplates>& a, mp_number<Backend, ExpressionTemplates>& b);
 
 Swaps `a` and `b`.
 
 [h4 Iostream Support]
 
-   template <class Backend>
-   std::ostream& operator << (std::ostream& os, const mp_number<Backend>& r);
-   template <class Backend>
+   template <class Backend, bool ExpressionTemplates>
+   std::ostream& operator << (std::ostream& os, const mp_number<Backend, ExpressionTemplates>& r);
+   template <class Unspecified...>
    std::ostream& operator << (std::ostream& os, const unmentionable-expression-template& r);
-   template <class Backend>
-   inline std::istream& operator >> (std::istream& is, mp_number<Backend>& r)
+   template <class Backend, bool ExpressionTemplates>
+   inline std::istream& operator >> (std::istream& is, mp_number<Backend, ExpressionTemplates>& r)
 
 These operators provided formatted input-output operations on `mp_number` types, and expression templates derived from them.
 
@@ -939,7 +1029,8 @@ this library support all of the iostream formatting flags, field width and preci
    ``['unmentionable-expression-template-type]``    atan2 (const ``['mp_number-or-expression-template-type]``&, const ``['mp_number-or-expression-template-type]``&);
 
 These functions all behave exactly as their standard library counterparts do: their argument is either an instance of `mp_number` or
-an expression template derived from it; their return value is always an expression template.
+an expression template derived from it; If the argument is of type `mp_number,Backend, false>` then that is also the return type,
+otherwise the return type is an expression template.
 
 These functions are normally implemented by the Backend type.  However, default versions are provided for Backend types that
 don't have native support for these functions.  Please note however, that this default support requires the precision of the type
@@ -990,8 +1081,8 @@ specialized or overloaded to ensure interoperability.
 
    namespace std{
 
-   template <class Backend>
-   struct numeric_limits<boost::multiprecision<Backend> >
+   template <class Backend, ExpressionTemplates>
+   struct numeric_limits<boost::multiprecision<Backend, ExpressionTemplates> >
    {
       /* Usual members here */
    };
@@ -1158,6 +1249,10 @@ of type B2.
 [[`eval_pow(b, cb, cb2)`][`void`][Performs the equivalent operation to `std::pow` on arguments `cb` and `cb2`, and store the result in `b`.  Only required when `B` is an floating-point type.]]
 [[`eval_atan2(b, cb, cb2)`][`void`][Performs the equivalent operation to `std::atan` on arguments `cb` and `cb2`, and store the result in `b`.  Only required when `B` is an floating-point type.]]
 ]
+
+[note
+The non-member functions are all named with an "eval_" prefix to avoid conflicts with template classes of the same name - 
+in point of fact this naming convension shouldn't be necessary, but rather works around some compiler bugs.]
 
 [endsect]
 

@@ -2146,10 +2146,10 @@ typedef mp_number<cpp_rational_backend>        cpp_rational;
 
 namespace std{
 
-template <unsigned MinBits, bool Signed, class Allocator>
-class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator> > >
+template <unsigned MinBits, bool Signed, class Allocator, bool ExpressionTemplates>
+class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator>, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator> > number_type;
+   typedef boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator>, ExpressionTemplates> number_type;
 
 public:
    BOOST_STATIC_CONSTEXPR bool is_specialized = true;
@@ -2196,10 +2196,10 @@ public:
    BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
 };
 
-template <unsigned MinBits>
-class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void> > >
+template <unsigned MinBits, bool ExpressionTemplates>
+class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void> > number_type;
+   typedef boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates> number_type;
 
    struct inititializer
    {
@@ -2273,13 +2273,13 @@ public:
    BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
 };
 
-template <unsigned MinBits>
-const typename numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void> > >::inititializer numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void> > >::init;
+template <unsigned MinBits, bool ExpressionTemplates>
+const typename numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates> >::inititializer numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates> >::init;
 
-template <unsigned MinBits>
-class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void> > >
+template <unsigned MinBits, bool ExpressionTemplates>
+class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void> > number_type;
+   typedef boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> number_type;
 
    struct inititializer
    {
@@ -2352,8 +2352,8 @@ public:
    BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
 };
 
-template <unsigned MinBits>
-const typename numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void> > >::inititializer numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void> > >::init;
+template <unsigned MinBits, bool ExpressionTemplates>
+const typename numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::inititializer numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::init;
 
 }
 

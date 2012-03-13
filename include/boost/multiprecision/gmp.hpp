@@ -1816,10 +1816,10 @@ namespace std{
 //
 // numeric_limits [partial] specializations for the types declared in this header:
 //
-template<unsigned Digits10> 
-class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<Digits10> > >
+template<unsigned Digits10, bool ExpressionTemplates> 
+class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<Digits10>, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::mp_number<boost::multiprecision::gmp_float<Digits10> > number_type;
+   typedef boost::multiprecision::mp_number<boost::multiprecision::gmp_float<Digits10>, ExpressionTemplates> number_type;
 public:
    BOOST_STATIC_CONSTEXPR bool is_specialized = true;
    //
@@ -1924,13 +1924,13 @@ private:
    static const data_initializer initializer;
 };
 
-template<unsigned Digits10> 
-const typename numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<Digits10> > >::data_initializer numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<Digits10> > >::initializer;
+template<unsigned Digits10, bool ExpressionTemplates> 
+const typename numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<Digits10>, ExpressionTemplates> >::data_initializer numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<Digits10>, ExpressionTemplates> >::initializer;
 
-template<> 
-class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0> > >
+template<bool ExpressionTemplates> 
+class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0> > number_type;
+   typedef boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> number_type;
 public:
    BOOST_STATIC_CONSTEXPR bool is_specialized = false;
    static number_type (min)() BOOST_MP_NOEXCEPT { return number_type(); }
@@ -1966,10 +1966,10 @@ public:
    BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
 };
 
-template<> 
-class numeric_limits<boost::multiprecision::mpz_int >
+template<bool ExpressionTemplates> 
+class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::mpz_int number_type;
+   typedef boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> number_type;
 public:
    BOOST_STATIC_CONSTEXPR bool is_specialized = true;
    //
@@ -2015,10 +2015,10 @@ public:
    BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
 };
 
-template<> 
-class numeric_limits<boost::multiprecision::mpq_rational >
+template<bool ExpressionTemplates> 
+class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::mpq_rational number_type;
+   typedef boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> number_type;
 public:
    BOOST_STATIC_CONSTEXPR bool is_specialized = true;
    //

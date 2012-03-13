@@ -457,10 +457,10 @@ typedef mp_number<tommath_rational>                 mp_rational;
 
 namespace std{
 
-template<> 
-class numeric_limits<boost::multiprecision::mp_int >
+template<bool ExpressionTemplates> 
+class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::tommath_int, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::mp_int number_type;
+   typedef boost::multiprecision::mp_number<boost::multiprecision::tommath_int, ExpressionTemplates> number_type;
 public:
    BOOST_STATIC_CONSTEXPR bool is_specialized = true;
    //

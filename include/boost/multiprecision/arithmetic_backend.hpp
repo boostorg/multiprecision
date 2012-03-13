@@ -127,11 +127,11 @@ using boost::multiprecision::backends::arithmetic_backend;
 
 namespace std{
 
-template <class Arithmetic>
-class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::arithmetic_backend<Arithmetic> > > : public std::numeric_limits<Arithmetic>
+template <class Arithmetic, bool ExpressionTemplates>
+class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::arithmetic_backend<Arithmetic>, ExpressionTemplates > > : public std::numeric_limits<Arithmetic>
 {
    typedef std::numeric_limits<Arithmetic> base_type;
-   typedef boost::multiprecision::mp_number<boost::multiprecision::arithmetic_backend<Arithmetic> > number_type;
+   typedef boost::multiprecision::mp_number<boost::multiprecision::arithmetic_backend<Arithmetic>, ExpressionTemplates> number_type;
 public:
    BOOST_STATIC_CONSTEXPR number_type (min)() BOOST_MP_NOEXCEPT { return (base_type::min)(); }
    BOOST_STATIC_CONSTEXPR number_type (max)() BOOST_MP_NOEXCEPT { return (base_type::max)(); }

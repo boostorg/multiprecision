@@ -192,11 +192,11 @@ typedef boost::multiprecision::mp_number<mp_number_backend_float_architype> mp_n
 
 namespace std{
 
-template <>
-class numeric_limits<boost::multiprecision::concepts::mp_number_float_architype> : public std::numeric_limits<long double>
+template <bool ExpressionTemplates>
+class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::concepts::mp_number_backend_float_architype, ExpressionTemplates> > : public std::numeric_limits<long double>
 {
    typedef std::numeric_limits<long double> base_type;
-   typedef boost::multiprecision::concepts::mp_number_float_architype number_type;
+   typedef boost::multiprecision::mp_number<boost::multiprecision::concepts::mp_number_backend_float_architype, ExpressionTemplates> number_type;
 public:
    static number_type (min)() BOOST_MP_NOEXCEPT { return (base_type::min)(); }
    static number_type (max)() BOOST_MP_NOEXCEPT { return (base_type::max)(); }

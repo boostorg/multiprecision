@@ -179,10 +179,10 @@ inline void assign_components(rational_adapter<IntBackend>& result, const V& v1,
    result.data().assign(v1, v2);
 }
 
-template<class IntBackend>
-struct number_category<rational_adapter<IntBackend> > : public mpl::int_<number_kind_rational>{};
-
 } // namespace backends
+
+template<class IntBackend>
+struct number_category<backends::rational_adapter<IntBackend> > : public mpl::int_<number_kind_rational>{};
 
 using boost::multiprecision::backends::rational_adapter;
 

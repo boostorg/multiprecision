@@ -23,10 +23,10 @@
 
 namespace boost{ namespace multiprecision{
 
-template <class Backend>
+template <class Backend, bool ExpressionTemplates>
 class mp_number
 {
-   typedef mp_number<Backend> self_type;
+   typedef mp_number<Backend, ExpressionTemplates> self_type;
 public:
    typedef Backend backend_type;
    mp_number(){}
@@ -49,8 +49,11 @@ public:
       m_backend = canonical_value(v);
    }
    */
-   template <class Other>
-   mp_number(const mp_number<Other>& val, typename enable_if<boost::is_convertible<Other, Backend> >::type* dummy1 = 0)
+   template<bool ET>
+   mp_number(const mp_number<Backend, ET>& val) : m_backend(val.m_backend) {}
+
+   template <class Other, bool ET>
+   mp_number(const mp_number<Other, ET>& val, typename enable_if<boost::is_convertible<Other, Backend> >::type* dummy1 = 0)
    {
       m_backend = val.backend();
    }
@@ -60,8 +63,8 @@ public:
       using default_ops::assign_components;
       assign_components(m_backend, canonical_value(v1), canonical_value(v2));
    }
-   template <class Other>
-   mp_number(const mp_number<Other>& v1, const mp_number<Other>& v2, typename enable_if<boost::is_convertible<Other, Backend> >::type* dummy1 = 0)
+   template <class Other, bool ET>
+   mp_number(const mp_number<Other, ET>& v1, const mp_number<Other, ET>& v2, typename enable_if<boost::is_convertible<Other, Backend> >::type* dummy1 = 0)
    {
       using default_ops::assign_components;
       assign_components(m_backend, v1.backend(), v2.backend());
@@ -85,7 +88,7 @@ public:
    }
 
    template <class V>
-   typename enable_if<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> >, mp_number<Backend>& >::type 
+   typename enable_if<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> >, mp_number<Backend, ExpressionTemplates>& >::type 
       operator=(const V& v)
    {
       m_backend = canonical_value(v);
@@ -93,15 +96,22 @@ public:
    }
 
    template <class V>
-   typename enable_if<mpl::and_<is_convertible<V, Backend>, mpl::not_<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > > >, mp_number<Backend>& >::type 
+   typename enable_if<mpl::and_<is_convertible<V, Backend>, mpl::not_<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > > >, mp_number<Backend, ExpressionTemplates>& >::type 
       operator=(const V& v)
    {
       m_backend = v;
       return *this;
    }
 
+   template <bool ET>
+   mp_number& operator=(const mp_number<Backend, ET>& v)
+   {
+      m_backend = v.backend();
+      return *this;
+   }
+
    template <class Other>
-   typename enable_if<is_convertible<Other, Backend>, mp_number<Backend>& >::type 
+   typename enable_if<is_convertible<Other, Backend>, mp_number<Backend, ExpressionTemplates>& >::type 
       operator=(const mp_number<Other>& v)
    {
       m_backend = v.backend();
@@ -147,7 +157,7 @@ public:
    }
 
    template <class V>
-   typename enable_if<boost::is_arithmetic<V>, mp_number<Backend>& >::type 
+   typename enable_if<boost::is_arithmetic<V>, mp_number<Backend, ExpressionTemplates>& >::type 
       operator+=(const V& v)
    {
       using default_ops::eval_add;
@@ -178,7 +188,7 @@ public:
    }
 
    template <class V>
-   typename enable_if<boost::is_arithmetic<V>, mp_number<Backend>& >::type 
+   typename enable_if<boost::is_arithmetic<V>, mp_number<Backend, ExpressionTemplates>& >::type 
       operator-=(const V& v)
    {
       using default_ops::eval_subtract;
@@ -211,7 +221,7 @@ public:
    }
 
    template <class V>
-   typename enable_if<boost::is_arithmetic<V>, mp_number<Backend>& >::type 
+   typename enable_if<boost::is_arithmetic<V>, mp_number<Backend, ExpressionTemplates>& >::type 
       operator*=(const V& v)
    {
       using default_ops::eval_multiply;
@@ -242,7 +252,7 @@ public:
       return *this;
    }
    template <class V>
-   typename enable_if<boost::is_arithmetic<V>, mp_number<Backend>& >::type 
+   typename enable_if<boost::is_arithmetic<V>, mp_number<Backend, ExpressionTemplates>& >::type 
       operator%=(const V& v)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
@@ -330,7 +340,7 @@ public:
    }
 
    template <class V>
-   typename enable_if<boost::is_arithmetic<V>, mp_number<Backend>& >::type 
+   typename enable_if<boost::is_arithmetic<V>, mp_number<Backend, ExpressionTemplates>& >::type 
       operator/=(const V& v)
    {
       using default_ops::eval_divide;
@@ -364,7 +374,7 @@ public:
    }
 
    template <class V>
-   typename enable_if<boost::is_arithmetic<V>, mp_number<Backend>& >::type 
+   typename enable_if<boost::is_arithmetic<V>, mp_number<Backend, ExpressionTemplates>& >::type 
       operator&=(const V& v)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise & operation is only valid for integer types");
@@ -399,7 +409,7 @@ public:
    }
 
    template <class V>
-   typename enable_if<boost::is_arithmetic<V>, mp_number<Backend>& >::type 
+   typename enable_if<boost::is_arithmetic<V>, mp_number<Backend, ExpressionTemplates>& >::type 
       operator|=(const V& v)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise | operation is only valid for integer types");
@@ -432,7 +442,7 @@ public:
    }
 
    template <class V>
-   typename enable_if<boost::is_arithmetic<V>, mp_number<Backend>& >::type 
+   typename enable_if<boost::is_arithmetic<V>, mp_number<Backend, ExpressionTemplates>& >::type 
       operator^=(const V& v)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise ^ operation is only valid for integer types");
@@ -507,7 +517,7 @@ public:
    //
    // Comparison:
    //
-   int compare(const mp_number<Backend>& o)const
+   int compare(const mp_number<Backend, ExpressionTemplates>& o)const
    {
       return m_backend.compare(o.m_backend);
    }
@@ -1377,7 +1387,7 @@ private:
    template <class Exp>
    bool contains_self(const Exp& e, mpl::int_<0> const&)const
    {
-      return is_floatly_self(e.value());
+      return is_realy_self(e.value());
    }
    template <class Exp>
    bool contains_self(const Exp& e, mpl::int_<1> const&)const
@@ -1413,7 +1423,7 @@ private:
    template <class Exp>
    bool is_self(const Exp& e, mpl::int_<0> const&)const
    {
-      return is_floatly_self(e.value());
+      return is_realy_self(e.value());
    }
    template <class Exp, int v>
    bool is_self(const Exp& e, mpl::int_<v> const&)const
@@ -1422,8 +1432,8 @@ private:
    }
 
    template <class Val>
-   bool is_floatly_self(const Val&)const { return false; }
-   bool is_floatly_self(const self_type& v)const { return &v == this; }
+   bool is_realy_self(const Val&)const { return false; }
+   bool is_realy_self(const self_type& v)const { return &v == this; }
 
    static const Backend& canonical_value(const self_type& v){  return v.m_backend;  }
    template <class V>
@@ -1439,32 +1449,32 @@ private:
 namespace detail
 {
 
-template <class Backend>
-inline int mp_number_compare(const mp_number<Backend>& a, const mp_number<Backend>& b)
+template <class Backend, bool ExpressionTemplates>
+inline int mp_number_compare(const mp_number<Backend, ExpressionTemplates>& a, const mp_number<Backend, ExpressionTemplates>& b)
 {
    return a.compare(b);
 }
 
-template <class Backend, class tag, class A1, class A2, class A3>
-inline int mp_number_compare(const mp_number<Backend>& a, const mp_exp<tag, A1, A2, A3>& b)
+template <class Backend, bool ExpressionTemplates, class tag, class A1, class A2, class A3>
+inline int mp_number_compare(const mp_number<Backend, ExpressionTemplates>& a, const mp_exp<tag, A1, A2, A3>& b)
 {
-   return a.compare(mp_number<Backend>(b));
+   return a.compare(mp_number<Backend, ExpressionTemplates>(b));
 }
 
-template <class tag, class A1, class A2, class A3, class Backend>
-inline int mp_number_compare(const mp_exp<tag, A1, A2, A3>& a, const mp_number<Backend>& b)
+template <class tag, class A1, class A2, class A3, class Backend, bool ExpressionTemplates>
+inline int mp_number_compare(const mp_exp<tag, A1, A2, A3>& a, const mp_number<Backend, ExpressionTemplates>& b)
 {
-   return -b.compare(mp_number<Backend>(a));
+   return -b.compare(mp_number<Backend, ExpressionTemplates>(a));
 }
 
-template <class Backend, class Val>
-inline int mp_number_compare(const mp_number<Backend>& a, const Val b)
+template <class Backend, bool ExpressionTemplates, class Val>
+inline int mp_number_compare(const mp_number<Backend, ExpressionTemplates>& a, const Val b)
 {
    return a.compare(b);
 }
 
-template <class Val, class Backend>
-inline int mp_number_compare(const Val a, const mp_number<Backend>& b)
+template <class Val, class Backend, bool ExpressionTemplates>
+inline int mp_number_compare(const Val a, const mp_number<Backend, ExpressionTemplates>& b)
 {
    return -b.compare(a);
 }
@@ -1569,8 +1579,8 @@ inline typename boost::enable_if<detail::is_valid_comparison<Exp1, Exp2>, bool>:
    return 0 < detail::mp_number_compare(a, b);
 }
 
-template <class Backend>
-inline std::ostream& operator << (std::ostream& os, const mp_number<Backend>& r)
+template <class Backend, bool ExpressionTemplates>
+inline std::ostream& operator << (std::ostream& os, const mp_number<Backend, ExpressionTemplates>& r)
 {
    std::streamsize d = os.precision();
    std::string s = r.str(d, os.flags());
@@ -1598,8 +1608,8 @@ inline std::ostream& operator << (std::ostream& os, const mp_exp<tag, A1, A2, A3
 
 } // namespace detail
 
-template <class Backend>
-inline std::istream& operator >> (std::istream& is, mp_number<Backend>& r)
+template <class Backend, bool ExpressionTemplates>
+inline std::istream& operator >> (std::istream& is, mp_number<Backend, ExpressionTemplates>& r)
 {
    std::string s;
    is >> s;
@@ -1607,8 +1617,8 @@ inline std::istream& operator >> (std::istream& is, mp_number<Backend>& r)
    return is;
 }
 
-template <class Backend>
-inline void swap(mp_number<Backend>& a, mp_number<Backend>& b)
+template <class Backend, bool ExpressionTemplates>
+inline void swap(mp_number<Backend, ExpressionTemplates>& a, mp_number<Backend, ExpressionTemplates>& b)
 {
    a.swap(b);
 }
@@ -1618,11 +1628,11 @@ inline void swap(mp_number<Backend>& a, mp_number<Backend>& b)
 template <class T>
 class rational;
 
-template <class Backend>
-inline std::istream& operator >> (std::istream& is, rational<multiprecision::mp_number<Backend> >& r)
+template <class Backend, bool ExpressionTemplates>
+inline std::istream& operator >> (std::istream& is, rational<multiprecision::mp_number<Backend, ExpressionTemplates> >& r)
 {
    std::string s1;
-   multiprecision::mp_number<Backend> v1, v2;
+   multiprecision::mp_number<Backend, ExpressionTemplates> v1, v2;
    char c;
    bool have_hex = false;
 
@@ -1653,38 +1663,38 @@ inline std::istream& operator >> (std::istream& is, rational<multiprecision::mp_
    return is;
 }
 
-template <class T, class Arithmetic>
-typename enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator == (const rational<multiprecision::mp_number<T> >& a, const Arithmetic& b)
+template <class T, bool ExpressionTemplates, class Arithmetic>
+typename enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator == (const rational<multiprecision::mp_number<T, ExpressionTemplates> >& a, const Arithmetic& b)
 {
-   return a == multiprecision::mp_number<T>(b);
+   return a == multiprecision::mp_number<T, ExpressionTemplates>(b);
 }
 
-template <class T, class Arithmetic>
-typename enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator == (const Arithmetic& b, const rational<multiprecision::mp_number<T> >& a)
+template <class T, bool ExpressionTemplates, class Arithmetic>
+typename enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator == (const Arithmetic& b, const rational<multiprecision::mp_number<T, ExpressionTemplates> >& a)
 {
-   return a == multiprecision::mp_number<T>(b);
+   return a == multiprecision::mp_number<T, ExpressionTemplates>(b);
 }
 
-template <class T, class Arithmetic>
-typename enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator != (const rational<multiprecision::mp_number<T> >& a, const Arithmetic& b)
+template <class T, bool ExpressionTemplates, class Arithmetic>
+typename enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator != (const rational<multiprecision::mp_number<T, ExpressionTemplates> >& a, const Arithmetic& b)
 {
-   return a != multiprecision::mp_number<T>(b);
+   return a != multiprecision::mp_number<T, ExpressionTemplates>(b);
 }
 
-template <class T, class Arithmetic>
-typename enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator != (const Arithmetic& b, const rational<multiprecision::mp_number<T> >& a)
+template <class T, bool ExpressionTemplates, class Arithmetic>
+typename enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator != (const Arithmetic& b, const rational<multiprecision::mp_number<T, ExpressionTemplates> >& a)
 {
-   return a != multiprecision::mp_number<T>(b);
+   return a != multiprecision::mp_number<T, ExpressionTemplates>(b);
 }
 
-template <class T>
-inline multiprecision::mp_number<T> numerator(const rational<multiprecision::mp_number<T> >& a)
+template <class T, bool ExpressionTemplates>
+inline multiprecision::mp_number<T, ExpressionTemplates> numerator(const rational<multiprecision::mp_number<T, ExpressionTemplates> >& a)
 {
    return a.numerator();
 }
 
-template <class T>
-inline multiprecision::mp_number<T> denominator(const rational<multiprecision::mp_number<T> >& a)
+template <class T, bool ExpressionTemplates>
+inline multiprecision::mp_number<T, ExpressionTemplates> denominator(const rational<multiprecision::mp_number<T, ExpressionTemplates> >& a)
 {
    return a.denominator();
 }

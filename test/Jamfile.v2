@@ -132,22 +132,8 @@ run test_arithmetic.cpp
         : # command line
         : # input files
         : # requirements
-	      <define>TEST_FIXED_INT1
-        : test_arithmetic_fixed_int1 ;
-
-run test_arithmetic.cpp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_FIXED_INT2
-        : test_arithmetic_fixed_int2 ;
-
-run test_arithmetic.cpp
-        : # command line
-        : # input files
-        : # requirements
 	      <define>TEST_CPP_INT
-        : test_arithmetic_fixed_cpp_int ;
+        : test_arithmetic_cpp_int ;
 
 run test_arithmetic.cpp
         : # command line
@@ -232,13 +218,6 @@ run test_numeric_limits.cpp
         : # requirements
 	      <define>TEST_CPP_INT
         : test_numeric_limits_cpp_int ;
-
-run test_numeric_limits.cpp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_FIXED_INT
-        : test_numeric_limits_fixed_int ;
 
 run test_exp.cpp gmp
         : # command line
@@ -612,23 +591,8 @@ run test_int_io.cpp
         : # command line
         : # input files
         : # requirements
-	      <define>TEST_FIXED_INT1
-        : test_int_io_fixed_int1 ;
-
-run test_int_io.cpp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_FIXED_INT2
-        : test_int_io_fixed_int2 ;
-
-run test_fixed_int.cpp gmp
-        : # command line
-        : # input files
-        : # requirements
-         [ check-target-builds ../config//has_gmp : : <build>no ]
-         release  # otherwise runtime is too slow!! 
-         ;
+	      <define>TEST_CPP_INT
+        : test_int_io_cpp_int ;
 
 run test_cpp_int.cpp gmp
         : # command line
@@ -771,6 +735,13 @@ if ! $(disable-concepts)
            : # requirements
 	         <define>TEST_CPP_DEC_FLOAT
            : mp_number_concept_check_cpp_dec_float ;
+
+   run mp_number_concept_check.cpp
+           : # command line
+           : # input files
+           : # requirements
+	         <define>TEST_CPP_DEC_FLOAT_NO_ET
+           : mp_number_concept_check_cpp_dec_float_no_et ;
 
    run mp_number_concept_check.cpp
            : # command line
