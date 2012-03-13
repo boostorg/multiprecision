@@ -631,6 +631,7 @@ run ../example/mpfr_snips.cpp mpfr
          [ check-target-builds ../config//has_mpfr : : <build>no ] ;
 
 run ../example/cpp_dec_float_snips.cpp ;
+run ../example/cpp_int_snips.cpp ;
 
 run ../example/tommath_snips.cpp $(TOMMATH)
         : # command line

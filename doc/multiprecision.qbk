@@ -22,7 +22,7 @@
 [import ../example/mpfr_snips.cpp]
 [import ../example/cpp_dec_float_snips.cpp]
 [import ../example/tommath_snips.cpp]
-[import ../example/fixed_int_snips.cpp]
+[import ../example/cpp_int_snips.cpp]
 
 [template mpfr[] [@http://www.mpfr.org MPFR]]
 [template gmp[] [@http://gmplib.org GMP]]
