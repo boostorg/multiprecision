@@ -306,14 +306,14 @@ as a result performing formatted output on this type when the argument is negati
    typedef mp_number<cpp_rational_backend>         cpp_rational; // arbitrary precision rational number
 
    // Fixed precision unsigned types:
-   typedef mp_number<cpp_int<128, false, void> >   mp_uint128_t;
-   typedef mp_number<fixed_int<256, false, void> > mp_uint256_t;
-   typedef mp_number<fixed_int<512, false, void> > mp_uint512_t;
+   typedef mp_number<cpp_int_backend<128, false, void> >   mp_uint128_t;
+   typedef mp_number<cpp_int_backend<256, false, void> >   mp_uint256_t;
+   typedef mp_number<cpp_int_backend<512, false, void> >   mp_uint512_t;
 
    // Fixed precision signed types:
-   typedef mp_number<fixed_int<128, true, void> >  mp_int128_t;
-   typedef mp_number<fixed_int<256, true, void> >  mp_int256_t;
-   typedef mp_number<fixed_int<512, true, void> >  mp_int512_t;
+   typedef mp_number<cpp_int_backend<128, true, void> >    mp_int128_t;
+   typedef mp_number<cpp_int_backend<256, true, void> >    mp_int256_t;
+   typedef mp_number<cpp_int_backend<512, true, void> >    mp_int512_t;
 
    }} // namespaces
 
@@ -352,6 +352,8 @@ In this respect the behaviour of these types differs from built-in 2's complemen
 as the min and max values are identical (apart from the sign), where as they differ by one for a true 2's complement type.
 That said it should be noted that there's no requirement for built-in types to be 2's complement either - it's simply that this
 is the most common format by far.
+* Attempting to print negative values as either an Octal or Hexadecimal string results in a `std::runtime_error` being thrown,
+this is a direct consequence of the sign-magnitude representation.
 
 [h5 Example:]
 
@@ -516,8 +518,8 @@ The following backends provide rational number arithmetic:
 [table
 [[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
 [[`gmp_rational`][boost/multiprecision/gmp.hpp][2][[gmp]][Very fast and efficient backend.][Dependency on GNU licenced [gmp] library.]]
-[[`cpp_rational`][boost/multiprecision/cpp_int.hpp][2][None][An all C++ Boost-licenced implementation.][[Slower than [gmp].]]
-[[`tommath_rational`][boost/multiprecision/tommath.hpp][2][libtommath][All C/C++ implementation that's Boost Software Licence compatible.]
+[[`cpp_rational`][boost/multiprecision/cpp_int.hpp][2][None][An all C++ Boost-licenced implementation.][Slower than [gmp].]]
+[[`tommath_rational`][boost/multiprecision/tommath.hpp][2][libtommath][All C/C++ implementation that's Boost Software Licence compatible.][Slower than [gmp].]]
 [[`rational_adapter`][boost/multiprecision/rational_adapter.hpp][N/A][none][All C++ adapter that allows any inetger backend type to be used as a rational type.][Requires an underlying integer backend type.]]
 [[`boost::rational`][boost/rational.hpp][N/A][None][A C++ rational number type that can used with any `mp_number` integer type.][The expression templates used by `mp_number` end up being "hidden" inside `boost::rational`: performance may well suffer as a result.]]
 ]
@@ -540,6 +542,8 @@ and assignable from:
 
 * The [gmp] native types: `mpz_t`, `mpq_t`.
 * `mp_number<gmp_int>`.
+
+There is also a two-argument constructor that accepts a numerator and denominator (both of type `mp_number<gmp_int>`).
 
 There are also non-member functions:
 
@@ -577,6 +581,8 @@ a rational number type that is a drop-in replacement for the native C++ number t
 
 As well as the usual conversions from arithmetic and string types, instances of `cpp_rational` are copy constructible
 and assignable from type `cpp_int`.
+
+There is also a two argument constructor that accepts a numerator and denominator: both of type `cpp_int`.
 
 There are also non-member functions:
 
@@ -1029,7 +1035,7 @@ this library support all of the iostream formatting flags, field width and preci
    ``['unmentionable-expression-template-type]``    atan2 (const ``['mp_number-or-expression-template-type]``&, const ``['mp_number-or-expression-template-type]``&);
 
 These functions all behave exactly as their standard library counterparts do: their argument is either an instance of `mp_number` or
-an expression template derived from it; If the argument is of type `mp_number,Backend, false>` then that is also the return type,
+an expression template derived from it; If the argument is of type `mp_number<Backend, false>` then that is also the return type,
 otherwise the return type is an expression template.
 
 These functions are normally implemented by the Backend type.  However, default versions are provided for Backend types that

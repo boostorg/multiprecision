@@ -6,7 +6,7 @@
 <meta name="generator" content="DocBook XSL Stylesheets V1.76.1">
 <link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
 <link rel="up" href="../tut.html" title="Tutorial">
-<link rel="prev" href="reals.html" title="Real Numbers">
+<link rel="prev" href="reals.html" title="Floating Point Numbers">
 <link rel="next" href="../ref.html" title="Reference">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -92,6 +92,38 @@
                 <p>
                   Dependency on GNU licenced <a href="http://gmplib.org" target="_top">GMP</a>
                   library.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">cpp_rational</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  boost/multiprecision/cpp_int.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  2
+                </p>
+              </td>
+<td>
+                <p>
+                  None
+                </p>
+              </td>
+<td>
+                <p>
+                  An all C++ Boost-licenced implementation.
+                </p>
+              </td>
+<td>
+                <p>
+                  Slower than <a href="http://gmplib.org" target="_top">GMP</a>.
                 </p>
               </td>
 </tr>
@@ -230,6 +262,10 @@
           </li>
 </ul></div>
 <p>
+        There is also a two-argument constructor that accepts a numerator and denominator
+        (both of type <code class="computeroutput"><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">gmp_int</span><span class="special">&gt;</span></code>).
+      </p>
+<p>
         There are also non-member functions:
       </p>
 <pre class="programlisting"><span class="identifier">mpz_int</span> <span class="identifier">numerator</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">mpq_rational</span><span class="special">&amp;);</span>
@@ -298,6 +334,81 @@
       </p>
 <h5>
 <a name="boost_multiprecision.tut.rational.h2"></a>
+        <span><a name="boost_multiprecision.tut.rational.cpp_rational"></a></span><a class="link" href="rational.html#boost_multiprecision.tut.rational.cpp_rational">cpp_rational</a>
+      </h5>
+<pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">multiprecision</span><span class="special">{</span>
+
+<span class="keyword">typedef</span> <span class="identifier">rational_adapter</span><span class="special">&lt;</span><span class="identifier">cpp_int_backend</span><span class="special">&lt;&gt;</span> <span class="special">&gt;</span>    <span class="identifier">cpp_rational_backend</span><span class="special">;</span>
+
+<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">cpp_rational_backend</span><span class="special">&gt;</span>         <span class="identifier">cpp_rational</span><span class="special">;</span>
+
+<span class="special">}}</span> <span class="comment">// namespaces</span>
+</pre>
+<p>
+        The <code class="computeroutput"><span class="identifier">cpp_rational_backend</span></code>
+        type is used via the typedef <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">cpp_rational</span></code>.
+        It provides a rational number type that is a drop-in replacement for the
+        native C++ number types, but with unlimited precision.
+      </p>
+<p>
+        As well as the usual conversions from arithmetic and string types, instances
+        of <code class="computeroutput"><span class="identifier">cpp_rational</span></code> are copy
+        constructible and assignable from type <code class="computeroutput"><span class="identifier">cpp_int</span></code>.
+      </p>
+<p>
+        There is also a two argument constructor that accepts a numerator and denominator:
+        both of type <code class="computeroutput"><span class="identifier">cpp_int</span></code>.
+      </p>
+<p>
+        There are also non-member functions:
+      </p>
+<pre class="programlisting"><span class="identifier">cpp_int</span> <span class="identifier">numerator</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">cpp_rational</span><span class="special">&amp;);</span>
+<span class="identifier">cpp_int</span> <span class="identifier">denominator</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">cpp_rational</span><span class="special">&amp;);</span>
+</pre>
+<p>
+        which return the numerator and denominator of the number.
+      </p>
+<p>
+        Things you should know when using this type:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+            Default constructed <code class="computeroutput"><span class="identifier">cpp_rational</span></code>'s
+            have the value zero.
+          </li>
+<li class="listitem">
+            Division by zero results in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">rumtime_error</span></code>
+            being thrown.
+          </li>
+</ul></div>
+<h6>
+<a name="boost_multiprecision.tut.rational.h3"></a>
+        <span><a name="boost_multiprecision.tut.rational.example0"></a></span><a class="link" href="rational.html#boost_multiprecision.tut.rational.example0">Example:</a>
+      </h6>
+<p>
+</p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">cpp_int</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+
+<span class="keyword">using</span> <span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">;</span>
+
+<span class="identifier">cpp_rational</span> <span class="identifier">v</span> <span class="special">=</span> <span class="number">1</span><span class="special">;</span>
+
+<span class="comment">// Do some arithmetic:</span>
+<span class="keyword">for</span><span class="special">(</span><span class="keyword">unsigned</span> <span class="identifier">i</span> <span class="special">=</span> <span class="number">1</span><span class="special">;</span> <span class="identifier">i</span> <span class="special">&lt;=</span> <span class="number">1000</span><span class="special">;</span> <span class="special">++</span><span class="identifier">i</span><span class="special">)</span>
+   <span class="identifier">v</span> <span class="special">*=</span> <span class="identifier">i</span><span class="special">;</span>
+<span class="identifier">v</span> <span class="special">/=</span> <span class="number">10</span><span class="special">;</span>
+
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">v</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span> <span class="comment">// prints 1000! / 10</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">numerator</span><span class="special">(</span><span class="identifier">v</span><span class="special">)</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">denominator</span><span class="special">(</span><span class="identifier">v</span><span class="special">)</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+
+<span class="identifier">cpp_rational</span> <span class="identifier">w</span><span class="special">(</span><span class="number">2</span><span class="special">,</span> <span class="number">3</span><span class="special">);</span>  <span class="comment">// component wise constructor</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">w</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span> <span class="comment">// prints 2/3</span>
+</pre>
+<p>
+      </p>
+<h5>
+<a name="boost_multiprecision.tut.rational.h4"></a>
         <span><a name="boost_multiprecision.tut.rational.tommath_rational"></a></span><a class="link" href="rational.html#boost_multiprecision.tut.rational.tommath_rational">tommath_rational</a>
       </h5>
 <pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">multiprecision</span><span class="special">{</span>
@@ -351,8 +462,8 @@
           </li>
 </ul></div>
 <h6>
-<a name="boost_multiprecision.tut.rational.h3"></a>
-        <span><a name="boost_multiprecision.tut.rational.example0"></a></span><a class="link" href="rational.html#boost_multiprecision.tut.rational.example0">Example:</a>
+<a name="boost_multiprecision.tut.rational.h5"></a>
+        <span><a name="boost_multiprecision.tut.rational.example1"></a></span><a class="link" href="rational.html#boost_multiprecision.tut.rational.example1">Example:</a>
       </h6>
 <p>
 </p>
@@ -373,12 +484,11 @@
 
 <span class="identifier">mp_rational</span> <span class="identifier">w</span><span class="special">(</span><span class="number">2</span><span class="special">,</span> <span class="number">3</span><span class="special">);</span> <span class="comment">// Component wise constructor</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">w</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span> <span class="comment">// prints 2/3</span>
-
 </pre>
 <p>
       </p>
 <h5>
-<a name="boost_multiprecision.tut.rational.h4"></a>
+<a name="boost_multiprecision.tut.rational.h6"></a>
         <span><a name="boost_multiprecision.tut.rational.use_with_boost_rational"></a></span><a class="link" href="rational.html#boost_multiprecision.tut.rational.use_with_boost_rational">Use With
         Boost.Rational</a>
       </h5>
@@ -391,7 +501,7 @@
         expression templates in <code class="computeroutput"><span class="identifier">mp_number</span></code>.
       </p>
 <h5>
-<a name="boost_multiprecision.tut.rational.h5"></a>
+<a name="boost_multiprecision.tut.rational.h7"></a>
         <span><a name="boost_multiprecision.tut.rational.rational_adapter"></a></span><a class="link" href="rational.html#boost_multiprecision.tut.rational.rational_adapter">rational_adapter</a>
       </h5>
 <pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">multiprecision</span><span class="special">{</span>

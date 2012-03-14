@@ -11,7 +11,7 @@
 
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && \
    !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ) && \
-   !defined(TEST_TOMMATH) && !defined(TEST_CPP_INT) && !defined(TEST_FIXED_INT)
+   !defined(TEST_TOMMATH) && !defined(TEST_CPP_INT)
 #  define TEST_MPF_50
 #  define TEST_MPF
 #  define TEST_BACKEND
@@ -21,7 +21,6 @@
 #  define TEST_CPP_DEC_FLOAT
 #  define TEST_MPQ
 #  define TEST_TOMMATH
-#  define TEST_FIXED_INT
 #  define TEST_CPP_INT
 
 #ifdef _MSC_VER
@@ -47,9 +46,6 @@
 #endif
 #ifdef TEST_TOMMATH
 #include <boost/multiprecision/tommath.hpp>
-#endif
-#ifdef TEST_FIXED_INT
-#include <boost/multiprecision/fixed_int.hpp>
 #endif
 #ifdef TEST_CPP_INT
 #include <boost/multiprecision/cpp_int.hpp>
@@ -226,16 +222,10 @@ int main()
 #ifdef TEST_TOMMATH
    test<boost::multiprecision::mp_int>();
 #endif
-#ifdef TEST_FIXED_INT
-   test<boost::multiprecision::mp_int128_t>();
-   test<boost::multiprecision::mp_int512_t>();
-   test<boost::multiprecision::mp_uint128_t>();
-   test<boost::multiprecision::mp_uint512_t>();
-#endif
 #ifdef TEST_CPP_INT
    test<boost::multiprecision::cpp_int>();
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<256, true, void> > >();
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<256, false, void> > >();
+   test<boost::multiprecision::mp_int256_t>();
+   test<boost::multiprecision::mp_uint512_t>();
 #endif
    return boost::report_errors();
 }

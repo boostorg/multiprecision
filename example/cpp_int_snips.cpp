@@ -33,7 +33,7 @@ void t1()
 
 void t3()
 {
-   //[cpp_rat_eg
+   //[cpp_rational_eg
    //=#include <boost/multiprecision/cpp_int.hpp>
 
    using namespace boost::multiprecision;

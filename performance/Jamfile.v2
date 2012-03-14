@@ -50,7 +50,7 @@ exe performance_test : performance_test.cpp /boost/system//boost_system
           [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>mpfr : ]
           [ check-target-builds ../config//has_tommath : <define>TEST_TOMMATH <source>$(TOMMATH) : ]
           <define>TEST_CPP_DEC_FLOAT
-          <define>TEST_FIXED_INT
+          <define>TEST_CPP_INT
           ;
 
 exe sf_performance : sf_performance.cpp /boost/system//boost_system

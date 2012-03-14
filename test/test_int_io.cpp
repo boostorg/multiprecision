@@ -9,11 +9,9 @@
 #  define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#if !defined(TEST_MPZ) && !defined(TEST_TOMMATH) && !defined(TEST_FIXED_INT1) && !defined(TEST_FIXED_INT2) && !defined(TEST_CPP_INT)
+#if !defined(TEST_MPZ) && !defined(TEST_TOMMATH) && !defined(TEST_CPP_INT)
 #  define TEST_TOMMATH
 #  define TEST_MPZ
-#  define TEST_FIXED_INT1
-#  define TEST_FIXED_INT2
 #  define TEST_CPP_INT
 
 #ifdef _MSC_VER
@@ -30,9 +28,6 @@
 #endif
 #if defined(TEST_TOMMATH)
 #include <boost/multiprecision/tommath.hpp>
-#endif
-#if defined(TEST_FIXED_INT1) || defined(TEST_FIXED_INT2)
-#include <boost/multiprecision/fixed_int.hpp>
 #endif
 #ifdef TEST_CPP_INT
 #include <boost/multiprecision/cpp_int.hpp>
@@ -126,20 +121,6 @@ int main()
 #endif
 #ifdef TEST_TOMMATH
    test_round_trip<boost::multiprecision::mp_int>();
-#endif
-#ifdef TEST_FIXED_INT1
-   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<64, false> > >();
-   test_round_trip<boost::multiprecision::mp_uint128_t>();
-   test_round_trip<boost::multiprecision::mp_uint512_t>();
-   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<20, false> > >();
-   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<70, false> > >();
-#endif
-#ifdef TEST_FIXED_INT2
-   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<64, true> > >();
-   test_round_trip<boost::multiprecision::mp_int128_t>();
-   test_round_trip<boost::multiprecision::mp_int512_t>();
-   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<20, true> > >();
-   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<70, true> > >();
 #endif
 #ifdef TEST_CPP_INT
    test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<> > >();

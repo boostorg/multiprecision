@@ -18,7 +18,7 @@
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && \
    !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ) \
    && !defined(TEST_TOMMATH) && !defined(TEST_TOMMATH_BOOST_RATIONAL) && !defined(TEST_MPZ_BOOST_RATIONAL)\
-   && !defined(TEST_FIXED_INT1) && !defined(TEST_FIXED_INT2) && !defined(TEST_CPP_INT) && !defined(TEST_CPP_INT_BR)
+   && !defined(TEST_CPP_INT) && !defined(TEST_CPP_INT_BR)
 #  define TEST_MPF_50
 #  define TEST_MPF
 #  define TEST_BACKEND
@@ -28,8 +28,6 @@
 #  define TEST_CPP_DEC_FLOAT
 #  define TEST_MPQ
 #  define TEST_TOMMATH
-#  define TEST_FIXED_INT1
-#  define TEST_FIXED_INT2
 #  define TEST_CPP_INT
 #  define TEST_CPP_INT_BR
 
@@ -58,9 +56,6 @@
 #if defined(TEST_TOMMATH) || defined(TEST_TOMMATH_BOOST_RATIONAL)
 #include <boost/multiprecision/tommath.hpp>
 #include <boost/multiprecision/rational_adapter.hpp>
-#endif
-#if defined(TEST_FIXED_INT1) || defined(TEST_FIXED_INT2)
-#include <boost/multiprecision/fixed_int.hpp>
 #endif
 #if defined(TEST_CPP_INT) || defined(TEST_CPP_INT_BR)
 #include <boost/multiprecision/cpp_int.hpp>
@@ -1030,26 +1025,10 @@ int main()
 #ifdef TEST_MPZ_BOOST_RATIONAL
    test<boost::rational<boost::multiprecision::mpz_int> >();
 #endif
-#ifdef TEST_FIXED_INT1
-   test<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<64, false> > >();
-   test<boost::multiprecision::mp_uint128_t>();
-   test<boost::multiprecision::mp_uint512_t>();
-   test<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<70, false> > >();
-#endif
-#ifdef TEST_FIXED_INT2
-   //
-   // Can't test 64-bit signed ints - they don't have enough bits
-   // to interoperate with uint64_t without loss:
-   //
-   //test<boost::multiprecision::mp_int64_t>();
-   test<boost::multiprecision::mp_int128_t>();
-   test<boost::multiprecision::mp_int512_t>();
-   test<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<70, true> > >();
-#endif
 #ifdef TEST_CPP_INT
    test<boost::multiprecision::cpp_int>();
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<256, true, void> > >();
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<256, false, void> > >();
+   test<boost::multiprecision::mp_int256_t >();
+   test<boost::multiprecision::mp_uint512_t >();
    test<boost::multiprecision::cpp_rational>();
    test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<>, false> >();
 #endif

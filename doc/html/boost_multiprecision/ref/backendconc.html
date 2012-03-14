@@ -330,7 +330,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">cb</span><span class="special">)</span></code>
                 </p>
               </td>
@@ -348,7 +348,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">cb</span><span class="special">)</span></code>
                 </p>
               </td>
@@ -367,7 +367,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">multiply</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_multiply</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">cb</span><span class="special">)</span></code>
                 </p>
               </td>
@@ -386,7 +386,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">divide</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_divide</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">cb</span><span class="special">)</span></code>
                 </p>
               </td>
@@ -404,7 +404,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">modulus</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_modulus</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">cb</span><span class="special">)</span></code>
                 </p>
               </td>
@@ -425,8 +425,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">bitwise_and</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
-                  <span class="identifier">cb</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_bitwise_and</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -446,8 +445,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">bitwise_or</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
-                  <span class="identifier">cb</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_bitwise_or</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -467,8 +465,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">bitwise_xor</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
-                  <span class="identifier">cb</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_bitwise_xor</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -488,8 +485,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">complement</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
-                  <span class="identifier">cb</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_complement</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -509,8 +505,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">left_shift</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
-                  <span class="identifier">ui</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_left_shift</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">ui</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -530,8 +525,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">right_shift</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
-                  <span class="identifier">ui</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_right_shift</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">ui</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -551,8 +545,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">convert_to</span><span class="special">(</span><span class="identifier">pa</span><span class="special">,</span>
-                  <span class="identifier">cb</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_convert_to</span><span class="special">(</span><span class="identifier">pa</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -807,7 +800,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">a</span><span class="special">)</span></code>
                 </p>
               </td>
@@ -827,7 +820,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">a</span><span class="special">)</span></code>
                 </p>
               </td>
@@ -849,7 +842,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">multiply</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_multiply</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">a</span><span class="special">)</span></code>
                 </p>
               </td>
@@ -871,7 +864,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">divide</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_divide</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">a</span><span class="special">)</span></code>
                 </p>
               </td>
@@ -891,7 +884,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">modulus</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_modulus</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">a</span><span class="special">)</span></code>
                 </p>
               </td>
@@ -914,8 +907,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">bitwise_and</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
-                  <span class="identifier">a</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_bitwise_and</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -937,8 +929,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">bitwise_or</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
-                  <span class="identifier">a</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_bitwise_or</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -960,8 +951,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">bitwise_xor</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
-                  <span class="identifier">a</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_bitwise_xor</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -983,7 +973,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">cb</span><span class="special">,</span>
                   <span class="identifier">cb2</span><span class="special">)</span></code>
                 </p>
@@ -1003,7 +993,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">cb</span><span class="special">,</span>
                   <span class="identifier">cb2</span><span class="special">)</span></code>
                 </p>
@@ -1024,7 +1014,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">multiply</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_multiply</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">cb</span><span class="special">,</span>
                   <span class="identifier">cb2</span><span class="special">)</span></code>
                 </p>
@@ -1045,7 +1035,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">divide</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_divide</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">cb</span><span class="special">,</span>
                   <span class="identifier">cb2</span><span class="special">)</span></code>
                 </p>
@@ -1066,7 +1056,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">cb</span><span class="special">,</span>
                   <span class="identifier">a</span><span class="special">)</span></code>
                 </p>
@@ -1087,7 +1077,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">cb</span><span class="special">,</span>
                   <span class="identifier">a</span><span class="special">)</span></code>
                 </p>
@@ -1111,7 +1101,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">multiply</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_multiply</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">cb</span><span class="special">,</span>
                   <span class="identifier">a</span><span class="special">)</span></code>
                 </p>
@@ -1135,7 +1125,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">divide</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_divide</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">cb</span><span class="special">,</span>
                   <span class="identifier">a</span><span class="special">)</span></code>
                 </p>
@@ -1159,7 +1149,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">modulus</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_modulus</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">cb</span><span class="special">,</span>
                   <span class="identifier">cb2</span><span class="special">)</span></code>
                 </p>
@@ -1182,9 +1172,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">bitwise_and</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
-                  <span class="identifier">cb</span><span class="special">,</span>
-                  <span class="identifier">cb2</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_bitwise_and</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">cb2</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -1205,9 +1193,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">bitwise_or</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
-                  <span class="identifier">cb</span><span class="special">,</span>
-                  <span class="identifier">cb2</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_bitwise_or</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">cb2</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -1228,9 +1214,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">bitwise_xor</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
-                  <span class="identifier">cb</span><span class="special">,</span>
-                  <span class="identifier">cb2</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_bitwise_xor</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">cb2</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -1251,7 +1235,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">a</span><span class="special">,</span>
                   <span class="identifier">cb</span><span class="special">)</span></code>
                 </p>
@@ -1274,7 +1258,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">a</span><span class="special">,</span>
                   <span class="identifier">cb</span><span class="special">)</span></code>
                 </p>
@@ -1298,7 +1282,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">multiply</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_multiply</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">a</span><span class="special">,</span>
                   <span class="identifier">cb</span><span class="special">)</span></code>
                 </p>
@@ -1322,7 +1306,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">divide</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_divide</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">a</span><span class="special">,</span>
                   <span class="identifier">cb</span><span class="special">)</span></code>
                 </p>
@@ -1345,7 +1329,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">modulus</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_modulus</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">cb</span><span class="special">,</span>
                   <span class="identifier">a</span><span class="special">)</span></code>
                 </p>
@@ -1370,9 +1354,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">bitwise_and</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
-                  <span class="identifier">cb</span><span class="special">,</span>
-                  <span class="identifier">a</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_bitwise_and</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -1395,9 +1377,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">bitwise_or</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
-                  <span class="identifier">cb</span><span class="special">,</span>
-                  <span class="identifier">a</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_bitwise_or</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -1420,9 +1400,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">bitwise_xor</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
-                  <span class="identifier">cb</span><span class="special">,</span>
-                  <span class="identifier">a</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_bitwise_xor</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -1445,7 +1423,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">modulus</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <code class="computeroutput"><span class="identifier">eval_modulus</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">a</span><span class="special">,</span>
                   <span class="identifier">cb</span><span class="special">)</span></code>
                 </p>
@@ -1470,9 +1448,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">bitwise_and</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
-                  <span class="identifier">a</span><span class="special">,</span>
-                  <span class="identifier">cb</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_bitwise_and</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">a</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -1495,9 +1471,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">bitwise_or</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
-                  <span class="identifier">a</span><span class="special">,</span>
-                  <span class="identifier">cb</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_bitwise_or</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">a</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -1520,9 +1494,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">bitwise_xor</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
-                  <span class="identifier">a</span><span class="special">,</span>
-                  <span class="identifier">cb</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_bitwise_xor</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">a</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -1545,9 +1517,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">left_shift</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
-                  <span class="identifier">cb</span><span class="special">,</span>
-                  <span class="identifier">ui</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_left_shift</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">ui</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -1568,9 +1538,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">right_shift</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
-                  <span class="identifier">cb</span><span class="special">,</span>
-                  <span class="identifier">ui</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_right_shift</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">ui</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -1591,7 +1559,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">increment</span><span class="special">(</span><span class="identifier">b</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_increment</span><span class="special">(</span><span class="identifier">b</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -1609,7 +1577,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">decrement</span><span class="special">(</span><span class="identifier">b</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_decrement</span><span class="special">(</span><span class="identifier">b</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -1627,7 +1595,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">is_zero</span><span class="special">(</span><span class="identifier">cb</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_is_zero</span><span class="special">(</span><span class="identifier">cb</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -1644,7 +1612,7 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">get_sign</span><span class="special">(</span><span class="identifier">cb</span><span class="special">)</span></code>
+                  <code class="computeroutput"><span class="identifier">eval_get_sign</span><span class="special">(</span><span class="identifier">cb</span><span class="special">)</span></code>
                 </p>
               </td>
 <td>
@@ -2102,7 +2070,18 @@
 </tbody>
 </table></div>
 </div>
-<br class="table-break">
+<br class="table-break"><div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+          The non-member functions are all named with an "eval_" prefix
+          to avoid conflicts with template classes of the same name - in point of
+          fact this naming convension shouldn't be necessary, but rather works around
+          some compiler bugs.
+        </p></td></tr>
+</table></div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>

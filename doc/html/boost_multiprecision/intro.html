@@ -57,6 +57,19 @@
 
 <span class="identifier">my_float</span> <span class="identifier">a</span><span class="special">,</span> <span class="identifier">b</span><span class="special">,</span> <span class="identifier">c</span><span class="special">;</span> <span class="comment">// These variables have 300 decimal digits precision</span>
 </pre>
+<p>
+      We can repeat the above example, but with the expression templates disabled
+      (for faster compile times, but slower runtimes) by passing a second template
+      argument to <code class="computeroutput"><span class="identifier">mp_number</span></code>:
+    </p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">mpfr</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>  <span class="comment">// Defines the Backend type that wraps MPFR</span>
+
+<span class="keyword">namespace</span> <span class="identifier">mp</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">;</span>     <span class="comment">// Reduce the typing a bit later...</span>
+
+<span class="keyword">typedef</span> <span class="identifier">mp</span><span class="special">::</span><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">mp</span><span class="special">::</span><span class="identifier">mpfr_float_backend</span><span class="special">&lt;</span><span class="number">300</span><span class="special">&gt;,</span> <span class="keyword">false</span><span class="special">&gt;</span>  <span class="identifier">my_float</span><span class="special">;</span>
+
+<span class="identifier">my_float</span> <span class="identifier">a</span><span class="special">,</span> <span class="identifier">b</span><span class="special">,</span> <span class="identifier">c</span><span class="special">;</span> <span class="comment">// These variables have 300 decimal digits precision</span>
+</pre>
 <h5>
 <a name="boost_multiprecision.intro.h0"></a>
       <span><a name="boost_multiprecision.intro.expression_templates"></a></span><a class="link" href="intro.html#boost_multiprecision.intro.expression_templates">Expression
@@ -303,6 +316,12 @@
           as one would hope.
         </li>
 </ul></div>
+<p>
+      Finally, note that <code class="computeroutput"><span class="identifier">mp_number</span></code>
+      takes a second template argument, which, when set to <code class="computeroutput"><span class="keyword">false</span></code>
+      disables all the expression template machinary. The result is much faster to
+      compile, but slower at runtime.
+    </p>
 <p>
       We'll conclude this section by providing some more performance comparisons
       between these three libraries, again, all are using <a href="http://www.mpfr.org" target="_top">MPFR</a>

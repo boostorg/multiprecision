@@ -2141,6 +2141,17 @@ typedef mp_number<cpp_int_backend<> >          cpp_int;
 typedef rational_adapter<cpp_int_backend<> >   cpp_rational_backend;
 typedef mp_number<cpp_rational_backend>        cpp_rational;
 
+// Fixed precision unsigned types:
+typedef mp_number<cpp_int_backend<128, false, void> >   mp_uint128_t;
+typedef mp_number<cpp_int_backend<256, false, void> >   mp_uint256_t;
+typedef mp_number<cpp_int_backend<512, false, void> >   mp_uint512_t;
+
+// Fixed precision signed types:
+typedef mp_number<cpp_int_backend<128, true, void> >    mp_int128_t;
+typedef mp_number<cpp_int_backend<256, true, void> >    mp_int256_t;
+typedef mp_number<cpp_int_backend<512, true, void> >    mp_int512_t;
+
+
 }} // namespaces
 
 

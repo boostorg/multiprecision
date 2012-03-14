@@ -23,7 +23,7 @@
       </h5>
 <pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">multiprecision</span><span class="special">{</span>
 
-<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="keyword">bool</span> <span class="identifier">ExpressionTemplates</span> <span class="special">=</span> <span class="keyword">true</span><span class="special">&gt;</span>
 <span class="keyword">class</span> <span class="identifier">mp_number</span>
 <span class="special">{</span>
    <span class="identifier">mp_number</span><span class="special">();</span>
@@ -94,15 +94,15 @@
 <span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">&gt;=(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
 
 <span class="comment">// Swap:</span>
-<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
-<span class="keyword">void</span> <span class="identifier">swap</span><span class="special">(</span><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">a</span><span class="special">,</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">b</span><span class="special">);</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="keyword">bool</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span>
+<span class="keyword">void</span> <span class="identifier">swap</span><span class="special">(</span><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">a</span><span class="special">,</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">b</span><span class="special">);</span>
 
 <span class="comment">// iostream support:</span>
-<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
-<span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="keyword">operator</span> <span class="special">&lt;&lt;</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="identifier">os</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">r</span><span class="special">);</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="keyword">bool</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="keyword">operator</span> <span class="special">&lt;&lt;</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="identifier">os</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">r</span><span class="special">);</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="keyword">operator</span> <span class="special">&lt;&lt;</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="identifier">os</span><span class="special">,</span> <span class="keyword">const</span> <span class="emphasis"><em>unmentionable-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">r</span><span class="special">);</span>
-<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
-<span class="identifier">std</span><span class="special">::</span><span class="identifier">istream</span><span class="special">&amp;</span> <span class="keyword">operator</span> <span class="special">&gt;&gt;</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">istream</span><span class="special">&amp;</span> <span class="identifier">is</span><span class="special">,</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">r</span><span class="special">);</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="keyword">bool</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">istream</span><span class="special">&amp;</span> <span class="keyword">operator</span> <span class="special">&gt;&gt;</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">istream</span><span class="special">&amp;</span> <span class="identifier">is</span><span class="special">,</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">r</span><span class="special">);</span>
 
 <span class="comment">// Non-member function standard library support:</span>
 <span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">abs</span>    <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
@@ -163,8 +163,8 @@
 <span class="comment">// numeric_limits support:</span>
 <span class="keyword">namespace</span> <span class="identifier">std</span><span class="special">{</span>
 
-<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
-<span class="keyword">struct</span> <span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;</span> <span class="special">&gt;</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="keyword">bool</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span>
+<span class="keyword">struct</span> <span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span> <span class="special">&gt;</span>
 <span class="special">{</span>
    <span class="comment">/* Usual members here */</span>
 <span class="special">};</span>
@@ -175,6 +175,27 @@
 <a name="boost_multiprecision.ref.mp_number.h1"></a>
         <span><a name="boost_multiprecision.ref.mp_number.description"></a></span><a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.description">Description</a>
       </h5>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="keyword">bool</span> <span class="identifier">ExpressionTemplates</span> <span class="special">=</span> <span class="keyword">true</span><span class="special">&gt;</span>
+<span class="keyword">class</span> <span class="identifier">mp_number</span><span class="special">;</span>
+</pre>
+<p>
+        Class <code class="computeroutput"><span class="identifier">mp_number</span></code> has two template
+        arguments:
+      </p>
+<div class="variablelist">
+<p class="title"><b></b></p>
+<dl>
+<dt><span class="term">Backend</span></dt>
+<dd><p>
+              The actual arithmetic backend that does all the work.
+            </p></dd>
+<dt><span class="term">ExpressionTemplates</span></dt>
+<dd><p>
+              A boolean value: when true, then expression templates are enabled,
+              otherwise they are disabled.
+            </p></dd>
+</dl>
+</div>
 <pre class="programlisting"><span class="identifier">mp_number</span><span class="special">();</span>
 <span class="identifier">mp_number</span><span class="special">(</span><span class="identifier">see</span><span class="special">-</span><span class="identifier">below</span><span class="special">);</span>
 <span class="identifier">mp_number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">=(</span><span class="identifier">see</span><span class="special">-</span><span class="identifier">below</span><span class="special">);</span>
@@ -235,7 +256,8 @@
       </p>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc">
 <li class="listitem">
-            Another <code class="computeroutput"><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;</span></code>.
+            Another <code class="computeroutput"><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span>
+            <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span></code>.
           </li>
 <li class="listitem">
             A builtin arithmetic type.
@@ -309,7 +331,7 @@
         the precision of <code class="computeroutput"><span class="special">*</span><span class="keyword">this</span></code>
         respectively.
       </p>
-<pre class="programlisting"><span class="keyword">int</span> <span class="identifier">compare</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">o</span><span class="special">)</span><span class="keyword">const</span><span class="special">;</span>
+<pre class="programlisting"><span class="keyword">int</span> <span class="identifier">compare</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">o</span><span class="special">)</span><span class="keyword">const</span><span class="special">;</span>
 <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">V</span><span class="special">&gt;</span>
 <span class="keyword">typename</span> <span class="identifier">enable_if</span><span class="special">&lt;</span><span class="identifier">is_arithmetic</span><span class="special">&lt;</span><span class="identifier">V</span><span class="special">&gt;,</span> <span class="keyword">int</span><span class="special">&gt;::</span><span class="identifier">type</span> <span class="identifier">compare</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">V</span><span class="special">&amp;</span> <span class="identifier">other</span><span class="special">)</span><span class="keyword">const</span><span class="special">;</span>
 </pre>
@@ -377,12 +399,25 @@
         In addition, one of the two arguments may be a builtin arithmetic type.
       </p>
 <p>
-        With the exception of the comparison operators (which always evaluate their
-        arguments and return a <code class="computeroutput"><span class="keyword">bool</span></code>
-        result), these operators return an "unmentionable" expression template
-        type which defers evaluation of the operator until the result is actually
-        required.
+        The return type of these operators is either:
       </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+            An <span class="emphasis"><em>unmentionable-type</em></span> expression template type when
+            <code class="computeroutput"><span class="identifier">ExpressionTemplates</span></code> is
+            <code class="computeroutput"><span class="keyword">true</span></code>.
+          </li>
+<li class="listitem">
+            Type <code class="computeroutput"><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span>
+            <span class="keyword">false</span><span class="special">&gt;</span></code>
+            when <code class="computeroutput"><span class="identifier">ExpressionTemplates</span></code>
+            is <code class="computeroutput"><span class="keyword">false</span></code>.
+          </li>
+<li class="listitem">
+            Type <code class="computeroutput"><span class="keyword">bool</span></code> if the operator
+            is a comparison operator.
+          </li>
+</ul></div>
 <p>
         Finally note that the second argument to the left and right shift operations
         must be a builtin integer type, and that the argument must be positive (negative
@@ -393,8 +428,8 @@
 <a name="boost_multiprecision.ref.mp_number.h3"></a>
         <span><a name="boost_multiprecision.ref.mp_number.swap"></a></span><a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.swap">swap</a>
       </h5>
-<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
-<span class="keyword">void</span> <span class="identifier">swap</span><span class="special">(</span><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">a</span><span class="special">,</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">b</span><span class="special">);</span>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span>
+<span class="keyword">void</span> <span class="identifier">swap</span><span class="special">(</span><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">a</span><span class="special">,</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">b</span><span class="special">);</span>
 </pre>
 <p>
         Swaps <code class="computeroutput"><span class="identifier">a</span></code> and <code class="computeroutput"><span class="identifier">b</span></code>.
@@ -404,12 +439,12 @@
         <span><a name="boost_multiprecision.ref.mp_number.iostream_support"></a></span><a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.iostream_support">Iostream
         Support</a>
       </h5>
-<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
-<span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="keyword">operator</span> <span class="special">&lt;&lt;</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="identifier">os</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">r</span><span class="special">);</span>
-<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="keyword">bool</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="keyword">operator</span> <span class="special">&lt;&lt;</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="identifier">os</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">r</span><span class="special">);</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Unspecified</span><span class="special">...&gt;</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="keyword">operator</span> <span class="special">&lt;&lt;</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="identifier">os</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">unmentionable</span><span class="special">-</span><span class="identifier">expression</span><span class="special">-</span><span class="keyword">template</span><span class="special">&amp;</span> <span class="identifier">r</span><span class="special">);</span>
-<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
-<span class="keyword">inline</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">istream</span><span class="special">&amp;</span> <span class="keyword">operator</span> <span class="special">&gt;&gt;</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">istream</span><span class="special">&amp;</span> <span class="identifier">is</span><span class="special">,</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">r</span><span class="special">)</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="keyword">bool</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span>
+<span class="keyword">inline</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">istream</span><span class="special">&amp;</span> <span class="keyword">operator</span> <span class="special">&gt;&gt;</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">istream</span><span class="special">&amp;</span> <span class="identifier">is</span><span class="special">,</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">r</span><span class="special">)</span>
 </pre>
 <p>
         These operators provided formatted input-output operations on <code class="computeroutput"><span class="identifier">mp_number</span></code> types, and expression templates
@@ -460,8 +495,9 @@
 <p>
         These functions all behave exactly as their standard library counterparts
         do: their argument is either an instance of <code class="computeroutput"><span class="identifier">mp_number</span></code>
-        or an expression template derived from it; their return value is always an
-        expression template.
+        or an expression template derived from it; If the argument is of type <code class="computeroutput"><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="keyword">false</span><span class="special">&gt;</span></code>
+        then that is also the return type, otherwise the return type is an expression
+        template.
       </p>
 <p>
         These functions are normally implemented by the Backend type. However, default
@@ -541,8 +577,8 @@
       </h5>
 <pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">std</span><span class="special">{</span>
 
-<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
-<span class="keyword">struct</span> <span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;</span> <span class="special">&gt;</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span>
+<span class="keyword">struct</span> <span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span> <span class="special">&gt;</span>
 <span class="special">{</span>
    <span class="comment">/* Usual members here */</span>
 <span class="special">};</span>
