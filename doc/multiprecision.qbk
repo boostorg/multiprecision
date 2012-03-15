@@ -23,6 +23,7 @@
 [import ../example/cpp_dec_float_snips.cpp]
 [import ../example/tommath_snips.cpp]
 [import ../example/cpp_int_snips.cpp]
+[import ../example/random_snips.cpp]
 
 [template mpfr[] [@http://www.mpfr.org MPFR]]
 [template gmp[] [@http://gmplib.org GMP]]
@@ -663,6 +664,37 @@ So for example, given an integer backend type `MyIntegerBackend`, the use would 
    MyInt i = numerator(r);
    assert(i == 2);
 
+
+[endsect]
+
+[section:random Generating Random Numbers]
+
+Random numbers are generated in conjunction with Boost.Random.  However, since Boost.Random is unaware
+of arbitrary precision numbers, it's necessary to include the header:
+
+   #include <boost/multiprecision/random.hpp>
+
+In order to act as a bridge between the two libraries.
+
+Integers with /N/ random bits are generated using `independent_bits_engine`:
+
+[random_eg1]
+
+Alternatively we can generate integers in a given range using `uniform_int_distribution`, this will
+invoke the underlying engine multiple times to build up the required number of bits in the result:
+
+[random_eg2]
+
+Floating point values in \[0,1) are generated using `uniform_01`, the trick here is to ensure
+that the underlying generator produces as many random bits as there are digits in the floating
+point type.  As above `independent_bits_engine` can be used for this purpose, note that we also have to
+convert decimal digits (in the floating point type) to bits (in the random number generator):
+
+[random_eg3]
+
+Finally, we can modify the above example to produce numbers distributed according to some distribution:
+
+[random_eg4]
 
 [endsect]
 
