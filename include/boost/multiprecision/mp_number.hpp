@@ -77,7 +77,8 @@ public:
    template <class tag, class Arg1, class Arg2, class Arg3>
    mp_number& operator=(const detail::mp_exp<tag, Arg1, Arg2, Arg3>& e)
    {
-      do_assign(e, tag());
+      typedef typename is_same<mp_number, typename detail::mp_exp<tag, Arg1, Arg2, Arg3>::result_type>::type tag_type;
+      do_assign(e, tag_type());
       return *this;
    }
 
@@ -121,7 +122,7 @@ public:
    template <class tag, class Arg1, class Arg2, class Arg3>
    mp_number(const detail::mp_exp<tag, Arg1, Arg2, Arg3>& e)
    {
-      do_assign(e, tag());
+      *this = e;
    }
 
 #ifndef BOOST_NO_RVALUE_REFERENCES
@@ -538,6 +539,22 @@ public:
       return m_backend;
    }
 private:
+   template <class tag, class Arg1, class Arg2, class Arg3>
+   void do_assign(const detail::mp_exp<tag, Arg1, Arg2, Arg3>& e, const mpl::true_&)
+   {
+      do_assign(e, tag());
+   }
+   template <class tag, class Arg1, class Arg2, class Arg3>
+   void do_assign(const detail::mp_exp<tag, Arg1, Arg2, Arg3>& e, const mpl::false_&)
+   {
+      // The result of the expression isn't the same type as this -
+      // create a temporary result and assign it to *this:
+      typedef typename detail::mp_exp<tag, Arg1, Arg2, Arg3>::result_type temp_type;
+      temp_type t(e);
+      *this = t;
+   }
+
+
    template <class V>
    void check_shift_range(V val, const mpl::true_&, const mpl::true_&)
    {
