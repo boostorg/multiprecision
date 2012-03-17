@@ -1110,21 +1110,11 @@ inline void eval_multiply(gmp_int& t, const gmp_int& o)
 }
 inline void eval_divide(gmp_int& t, const gmp_int& o)
 {
-   mpz_div(t.data(), t.data(), o.data());
+   mpz_tdiv_q(t.data(), t.data(), o.data());
 }
 inline void eval_modulus(gmp_int& t, const gmp_int& o)
 {
-   bool neg = mpz_sgn(t.data()) < 0;
-   bool neg2 = mpz_sgn(o.data()) < 0;
-   mpz_mod(t.data(), t.data(), o.data());
-   if(neg && mpz_sgn(t.data()) != 0)
-   {
-      if(!neg2)
-         t.negate();
-      mpz_add(t.data(), t.data(), o.data());
-      if(!neg2)
-         t.negate();
-   }
+   mpz_tdiv_r(t.data(), t.data(), o.data());
 }
 inline void eval_add(gmp_int& t, unsigned long i)
 {
@@ -1140,18 +1130,11 @@ inline void eval_multiply(gmp_int& t, unsigned long i)
 }
 inline void eval_modulus(gmp_int& t, unsigned long i)
 {
-   bool neg = mpz_sgn(t.data()) < 0;
-   mpz_mod_ui(t.data(), t.data(), i);
-   if(neg && mpz_sgn(t.data()) != 0)
-   {
-      t.negate();
-      mpz_add_ui(t.data(), t.data(), i);
-      t.negate();
-   }
+   mpz_tdiv_r_ui(t.data(), t.data(), i);
 }
 inline void eval_divide(gmp_int& t, unsigned long i)
 {
-   mpz_div_ui(t.data(), t.data(), i);
+   mpz_tdiv_q_ui(t.data(), t.data(), i);
 }
 inline void eval_add(gmp_int& t, long i)
 {
@@ -1175,26 +1158,11 @@ inline void eval_multiply(gmp_int& t, long i)
 }
 inline void eval_modulus(gmp_int& t, long i)
 {
-   bool neg = mpz_sgn(t.data()) < 0;
-   bool neg2 = i < 0;
-   mpz_mod_ui(t.data(), t.data(), std::abs(i));
-   if(neg && mpz_sgn(t.data()) != 0)
-   {
-      if(!neg2)
-      {
-         t.negate();
-         mpz_add_ui(t.data(), t.data(), std::abs(i));
-         t.negate();
-      }
-      else
-      {
-         mpz_sub_ui(t.data(), t.data(), std::abs(i));
-      }
-   }
+   mpz_tdiv_r_ui(t.data(), t.data(), std::abs(i));
 }
 inline void eval_divide(gmp_int& t, long i)
 {
-   mpz_div_ui(t.data(), t.data(), std::abs(i));
+   mpz_tdiv_q_ui(t.data(), t.data(), std::abs(i));
    if(i < 0)
       mpz_neg(t.data(), t.data());
 }
@@ -1248,21 +1216,11 @@ inline void eval_multiply(gmp_int& t, const gmp_int& p, const gmp_int& o)
 }
 inline void eval_divide(gmp_int& t, const gmp_int& p, const gmp_int& o)
 {
-   mpz_div(t.data(), p.data(), o.data());
+   mpz_tdiv_q(t.data(), p.data(), o.data());
 }
 inline void eval_modulus(gmp_int& t, const gmp_int& p, const gmp_int& o)
 {
-   bool neg = mpz_sgn(p.data()) < 0;
-   bool neg2 = mpz_sgn(o.data()) < 0;
-   mpz_mod(t.data(), p.data(), o.data());
-   if(neg && mpz_sgn(t.data()) != 0)
-   {
-      if(!neg2)
-         t.negate();
-      mpz_add(t.data(), t.data(), o.data());
-      if(!neg2)
-         t.negate();
-   }
+   mpz_tdiv_r(t.data(), p.data(), o.data());
 }
 inline void eval_add(gmp_int& t, const gmp_int& p, unsigned long i)
 {
@@ -1278,18 +1236,11 @@ inline void eval_multiply(gmp_int& t, const gmp_int& p, unsigned long i)
 }
 inline void eval_modulus(gmp_int& t, const gmp_int& p, unsigned long i)
 {
-   bool neg = mpz_sgn(p.data()) < 0;
-   mpz_mod_ui(t.data(), p.data(), i);
-   if(neg && mpz_sgn(t.data()) != 0)
-   {
-      t.negate();
-      mpz_add_ui(t.data(), t.data(), i);
-      t.negate();
-   }
+   mpz_tdiv_r_ui(t.data(), p.data(), i);
 }
 inline void eval_divide(gmp_int& t, const gmp_int& p, unsigned long i)
 {
-   mpz_div_ui(t.data(), p.data(), i);
+   mpz_tdiv_q_ui(t.data(), p.data(), i);
 }
 inline void eval_add(gmp_int& t, const gmp_int& p, long i)
 {
@@ -1313,26 +1264,11 @@ inline void eval_multiply(gmp_int& t, const gmp_int& p, long i)
 }
 inline void eval_modulus(gmp_int& t, const gmp_int& p, long i)
 {
-   bool neg = mpz_sgn(p.data()) < 0;
-   bool neg2 = i < 0;
-   mpz_mod_ui(t.data(), p.data(), std::abs(i));
-   if(neg && mpz_sgn(t.data()) != 0)
-   {
-      if(!neg2)
-      {
-         t.negate();
-         mpz_add_ui(t.data(), t.data(), std::abs(i));
-         t.negate();
-      }
-      else
-      {
-         mpz_sub_ui(t.data(), t.data(), std::abs(i));
-      }
-   }
+   mpz_tdiv_r_ui(t.data(), p.data(), std::abs(i));
 }
 inline void eval_divide(gmp_int& t, const gmp_int& p, long i)
 {
-   mpz_div_ui(t.data(), p.data(), std::abs(i));
+   mpz_tdiv_q_ui(t.data(), p.data(), std::abs(i));
    if(i < 0)
       mpz_neg(t.data(), t.data());
 }

@@ -1104,7 +1104,7 @@ inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, c
    typename cpp_int_backend<MinBits, Signed, Allocator>::limb_pointer pa = a.limbs();
    while(p != pe)
    {
-      carry += static_cast<double_limb_type>(*pa * static_cast<double_limb_type>(val));
+      carry += static_cast<double_limb_type>(*pa) * static_cast<double_limb_type>(val);
       *p = static_cast<limb_type>(carry);
       carry >>= cpp_int_backend<MinBits, Signed, Allocator>::limb_bits;
       ++p, ++pa;
