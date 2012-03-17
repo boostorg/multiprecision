@@ -5,7 +5,7 @@
 
 //[safe_prime
 
-#include <boost/multiprecision/gmp.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/miller_rabin.hpp>
 #include <iostream>
 #include <iomanip>
@@ -15,7 +15,7 @@ int main()
    using namespace boost::random;
    using namespace boost::multiprecision;
 
-   typedef mpz_int int_type;
+   typedef cpp_int int_type;
    mt11213b base_gen(clock());
    independent_bits_engine<mt11213b, 256, int_type> gen(base_gen);
    //

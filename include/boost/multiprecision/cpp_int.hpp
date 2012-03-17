@@ -745,7 +745,9 @@ inline void add_unsigned(cpp_int_backend<MinBits, Signed, Allocator>& result, co
    // Nothing fancy, just let uintmax_t take the strain:
    double_limb_type carry = 0;
    unsigned m, x;
-   minmax(a.size(), b.size(), m, x);
+   unsigned as = a.size();
+   unsigned bs = b.size();
+   minmax(as, bs, m, x);
    if(x == 1)
    {
       bool s = a.sign();
@@ -759,7 +761,7 @@ inline void add_unsigned(cpp_int_backend<MinBits, Signed, Allocator>& result, co
    typename cpp_int_backend<MinBits, Signed, Allocator>::limb_pointer pr = result.limbs();
    typename cpp_int_backend<MinBits, Signed, Allocator>::limb_pointer pr_end = pr + m;
 
-   if(a.size() < b.size())
+   if(as < bs)
       swap(pa, pb);
    
    // First where a and b overlap:
