@@ -602,6 +602,14 @@ run test_cpp_int.cpp gmp
          release  # otherwise runtime is too slow!! 
          ;
 
+run test_miller_rabin.cpp gmp
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+         release  # otherwise runtime is too slow!! 
+         ;
+
 run test_rational_io.cpp $(TOMMATH)
         : # command line
         : # input files
