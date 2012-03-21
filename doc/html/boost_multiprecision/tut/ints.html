@@ -113,7 +113,7 @@
               </td>
 <td>
                 <p>
-                  libtommath
+                  <a href="http://libtom.org/?page=features&amp;newsitems=5&amp;whatfile=ltm" target="_top">libtommath</a>
                 </p>
               </td>
 <td>
@@ -271,16 +271,17 @@
 <p>
         The <code class="computeroutput"><span class="identifier">tommath_int</span></code> backend is
         used via the typedef <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">mp_int</span></code>.
-        It acts as a thin wrapper around the libtommath <code class="computeroutput"><span class="identifier">mp_int</span></code>
-        to provide an integer type that is a drop-in replacement for the native C++
-        integer types, but with unlimited precision.
+        It acts as a thin wrapper around the <a href="http://libtom.org/?page=features&amp;newsitems=5&amp;whatfile=ltm" target="_top">libtommath</a>
+        <code class="computeroutput"><span class="identifier">mp_int</span></code> to provide an integer
+        type that is a drop-in replacement for the native C++ integer types, but
+        with unlimited precision.
       </p>
 <p>
         Things you should know when using this type:
       </p>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc">
 <li class="listitem">
-            Default constructed objects have the value zero (this is libtommath's
+            Default constructed objects have the value zero (this is <a href="http://libtom.org/?page=features&amp;newsitems=5&amp;whatfile=ltm" target="_top">libtommath</a>'s
             default behavior).
           </li>
 <li class="listitem">
@@ -300,7 +301,7 @@
             will be thrown.
           </li>
 <li class="listitem">
-            Division by zero will result in a hardware signal being raised by libtommath.
+            Division by zero will result in a hardware signal being raised by <a href="http://libtom.org/?page=features&amp;newsitems=5&amp;whatfile=ltm" target="_top">libtommath</a>.
           </li>
 </ul></div>
 <h6>
@@ -359,11 +360,13 @@
 <span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">cpp_int_backend</span><span class="special">&lt;</span><span class="number">128</span><span class="special">,</span> <span class="keyword">false</span><span class="special">,</span> <span class="keyword">void</span><span class="special">&gt;</span> <span class="special">&gt;</span>   <span class="identifier">mp_uint128_t</span><span class="special">;</span>
 <span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">cpp_int_backend</span><span class="special">&lt;</span><span class="number">256</span><span class="special">,</span> <span class="keyword">false</span><span class="special">,</span> <span class="keyword">void</span><span class="special">&gt;</span> <span class="special">&gt;</span>   <span class="identifier">mp_uint256_t</span><span class="special">;</span>
 <span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">cpp_int_backend</span><span class="special">&lt;</span><span class="number">512</span><span class="special">,</span> <span class="keyword">false</span><span class="special">,</span> <span class="keyword">void</span><span class="special">&gt;</span> <span class="special">&gt;</span>   <span class="identifier">mp_uint512_t</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">cpp_int_backend</span><span class="special">&lt;</span><span class="number">1024</span><span class="special">,</span> <span class="keyword">false</span><span class="special">,</span> <span class="keyword">void</span><span class="special">&gt;</span> <span class="special">&gt;</span>  <span class="identifier">mp_uint1024_t</span><span class="special">;</span>
 
 <span class="comment">// Fixed precision signed types:</span>
 <span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">cpp_int_backend</span><span class="special">&lt;</span><span class="number">128</span><span class="special">,</span> <span class="keyword">true</span><span class="special">,</span> <span class="keyword">void</span><span class="special">&gt;</span> <span class="special">&gt;</span>    <span class="identifier">mp_int128_t</span><span class="special">;</span>
 <span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">cpp_int_backend</span><span class="special">&lt;</span><span class="number">256</span><span class="special">,</span> <span class="keyword">true</span><span class="special">,</span> <span class="keyword">void</span><span class="special">&gt;</span> <span class="special">&gt;</span>    <span class="identifier">mp_int256_t</span><span class="special">;</span>
 <span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">cpp_int_backend</span><span class="special">&lt;</span><span class="number">512</span><span class="special">,</span> <span class="keyword">true</span><span class="special">,</span> <span class="keyword">void</span><span class="special">&gt;</span> <span class="special">&gt;</span>    <span class="identifier">mp_int512_t</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">cpp_int_backend</span><span class="special">&lt;</span><span class="number">1024</span><span class="special">,</span> <span class="keyword">true</span><span class="special">,</span> <span class="keyword">void</span><span class="special">&gt;</span> <span class="special">&gt;</span>   <span class="identifier">mp_int1024_t</span><span class="special">;</span>
 
 <span class="special">}}</span> <span class="comment">// namespaces</span>
 </pre>

@@ -15,6 +15,7 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
+#include <boost/timer.hpp>
 #include "test.hpp"
 
 template <class T>
@@ -57,7 +58,9 @@ void test()
    using namespace boost::multiprecision;
    typedef Number test_type;
    unsigned last_error_count = 0;
-   for(int i = 0; i < 1000; ++i)
+   boost::timer tim;
+
+   for(int i = 0; i < 10000; ++i)
    {
       mpz_int a = generate_random<mpz_int>(1000);
       mpz_int b = generate_random<mpz_int>(512);
@@ -280,6 +283,18 @@ void test()
          std::cout << "a%d    = " << a%d << std::endl;
          std::cout << "a1%d1  = " << a1%d1 << std::endl;
       }
+
+      //
+      // Check to see if test is taking too long.
+      // Tests run on the compiler farm time out after 300 seconds, 
+      // so don't get too close to that:
+      //
+      if(tim.elapsed() > 100)
+      {
+         std::cout << "Timeout reached, aborting tests now....\n";
+         break;
+      }
+
    }
 }
 

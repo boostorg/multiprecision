@@ -7,6 +7,7 @@
 #define BOOST_MATH_ER_GMP_BACKEND_HPP
 
 #include <boost/multiprecision/mp_number.hpp>
+#include <boost/multiprecision/integer_ops.hpp>
 #include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/cstdint.hpp>
@@ -1353,6 +1354,32 @@ inline void eval_gcd(gmp_int& result, const gmp_int& a, const long b)
 inline void eval_lcm(gmp_int& result, const gmp_int& a, const long b)
 {
    mpz_lcm_ui(result.data(), a.data(), std::abs(b));
+}
+
+inline void eval_qr(const gmp_int& x, const gmp_int& y, 
+   gmp_int& q, gmp_int& r)
+{
+   mpz_tdiv_qr(q.data(), r.data(), x.data(), y.data());
+}
+
+template <class Integer>
+inline typename enable_if<is_unsigned<Integer>, Integer>::type eval_integer_modulus(const gmp_int& x, Integer val)
+{
+   if((sizeof(Integer) <= sizeof(long)) || (val <= (std::numeric_limits<unsigned long>::max)()))
+   {
+      gmp_int r;
+      return mpz_tdiv_r_ui(r.data(), x.data(), val);
+   }
+   else
+   {
+      return default_ops::eval_integer_modulus(x, val);
+   }
+}
+template <class Integer>
+inline typename enable_if<is_signed<Integer>, Integer>::type eval_integer_modulus(const gmp_int& x, Integer val)
+{
+   typedef typename make_unsigned<Integer>::type unsigned_type;
+   return eval_integer_modulus(x, static_cast<unsigned_type>(std::abs(val)));
 }
 
 struct gmp_rational;

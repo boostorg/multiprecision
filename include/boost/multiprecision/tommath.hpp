@@ -8,6 +8,7 @@
 
 #include <boost/multiprecision/mp_number.hpp>
 #include <boost/multiprecision/rational_adapter.hpp>
+#include <boost/multiprecision/integer_ops.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>
@@ -440,6 +441,34 @@ inline void eval_gcd(tommath_int& result, const tommath_int& a, const tommath_in
 inline void eval_lcm(tommath_int& result, const tommath_int& a, const tommath_int& b)
 {
    detail::check_tommath_result(mp_lcm(const_cast< ::mp_int*>(&a.data()), const_cast< ::mp_int*>(&b.data()), const_cast< ::mp_int*>(&result.data())));
+}
+
+inline void eval_qr(const tommath_int& x, const tommath_int& y, 
+   tommath_int& q, tommath_int& r)
+{
+   detail::check_tommath_result(mp_div(const_cast< ::mp_int*>(&x.data()), const_cast< ::mp_int*>(&y.data()), &q.data(), &r.data()));
+}
+
+template <class Integer>
+inline typename enable_if<is_unsigned<Integer>, Integer>::type eval_integer_modulus(const tommath_int& x, Integer val)
+{
+   static const mp_digit m = (static_cast<mp_digit>(1) << DIGIT_BIT) - 1;
+   if(val <= m)
+   {
+      mp_digit d;
+      detail::check_tommath_result(mp_mod_d(const_cast< ::mp_int*>(&x.data()), static_cast<mp_digit>(val), &d));
+      return d;
+   }
+   else
+   {
+      return default_ops::eval_integer_modulus(x, val);
+   }
+}
+template <class Integer>
+inline typename enable_if<is_signed<Integer>, Integer>::type eval_integer_modulus(const tommath_int& x, Integer val)
+{
+   typedef typename make_unsigned<Integer>::type unsigned_type;
+   return eval_integer_modulus(x, static_cast<unsigned_type>(std::abs(val)));
 }
 
 } // namespace backends

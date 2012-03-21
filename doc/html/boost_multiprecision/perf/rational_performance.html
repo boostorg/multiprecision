@@ -1,22 +1,22 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-<title>Float Algorithm Perfomance</title>
+<title>Rational Type Perfomance</title>
 <link rel="stylesheet" href="http://www.boost.org/doc/libs/release/doc/src/boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.76.1">
 <link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
 <link rel="up" href="../perf.html" title="Performance Comparison">
-<link rel="prev" href="int_real_world.html" title="Integer Real World Tests">
-<link rel="next" href="integer_performance.html" title="Integer Algorithm Perfomance">
+<link rel="prev" href="integer_performance.html" title="Integer Algorithm Perfomance">
+<link rel="next" href="../map.html" title="Roadmap">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <div class="spirit-nav">
-<a accesskey="p" href="int_real_world.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../perf.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="integer_performance.html"><img src="../../images/next.png" alt="Next"></a>
+<a accesskey="p" href="integer_performance.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../perf.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../map.html"><img src="../../images/next.png" alt="Next"></a>
 </div>
-<div class="section boost_multiprecision_perf_float_performance">
+<div class="section boost_multiprecision_perf_rational_performance">
 <div class="titlepage"><div><div><h3 class="title">
-<a name="boost_multiprecision.perf.float_performance"></a><a class="link" href="float_performance.html" title="Float Algorithm Perfomance">Float Algorithm
-      Perfomance</a>
+<a name="boost_multiprecision.perf.rational_performance"></a><a class="link" href="rational_performance.html" title="Rational Type Perfomance">Rational
+      Type Perfomance</a>
 </h3></div></div></div>
 <p>
         Note that these tests are carefully designed to test performance of the underlying
@@ -33,13 +33,14 @@
         The tests were run on 32-bit Windows Vista machine.
       </p>
 <div class="table">
-<a name="boost_multiprecision.perf.float_performance.operator__"></a><p class="title"><b>Table&#160;1.8.&#160;Operator +</b></p>
+<a name="boost_multiprecision.perf.rational_performance.operator__"></a><p class="title"><b>Table&#160;1.37.&#160;Operator +</b></p>
 <div class="table-contents"><table class="table" summary="Operator +">
 <colgroup>
 <col>
 <col>
 <col>
 <col>
+<col>
 </colgroup>
 <thead><tr>
 <th>
@@ -49,17 +50,22 @@
               </th>
 <th>
                 <p>
-                  50 Decimal Digits
+                  128 Bits
                 </p>
               </th>
 <th>
                 <p>
-                  100 Decimal Digits
+                  256 Bits
                 </p>
               </th>
 <th>
                 <p>
-                  500 Decimal Digits
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
                 </p>
               </th>
 </tr></thead>
@@ -67,66 +73,54 @@
 <tr>
 <td>
                 <p>
-                  cpp_dec_float
+                  cpp_rational
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.02382s)
+                  5.91758 (18.1263s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0294619s)
+                  6.60754 (44.1182s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.058466s)
-                </p>
-              </td>
-</tr>
-<tr>
-<td>
-                <p>
-                  gmp_float
+                  6.65334 (103.169s)
                 </p>
               </td>
 <td>
                 <p>
-                  4.55086 (0.108402s)
-                </p>
-              </td>
-<td>
-                <p>
-                  3.86443 (0.113853s)
-                </p>
-              </td>
-<td>
-                <p>
-                  2.6241 (0.15342s)
+                  6.44717 (244.055s)
                 </p>
               </td>
 </tr>
 <tr>
 <td>
                 <p>
-                  mpfr_float
+                  mpq_rational
                 </p>
               </td>
 <td>
                 <p>
-                  2.52036 (0.060035s)
+                  <span class="bold"><strong>1</strong></span> (3.06312s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.1833 (0.0643242s)
+                  <span class="bold"><strong>1</strong></span> (6.67695s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.37736 (0.0805287s)
+                  <span class="bold"><strong>1</strong></span> (15.5064s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (37.8546s)
                 </p>
               </td>
 </tr>
@@ -134,13 +128,14 @@
 </table></div>
 </div>
 <br class="table-break"><div class="table">
-<a name="boost_multiprecision.perf.float_performance.operator___int_"></a><p class="title"><b>Table&#160;1.9.&#160;Operator +(int)</b></p>
+<a name="boost_multiprecision.perf.rational_performance.operator___int_"></a><p class="title"><b>Table&#160;1.38.&#160;Operator +(int)</b></p>
 <div class="table-contents"><table class="table" summary="Operator +(int)">
 <colgroup>
 <col>
 <col>
 <col>
 <col>
+<col>
 </colgroup>
 <thead><tr>
 <th>
@@ -150,17 +145,22 @@
               </th>
 <th>
                 <p>
-                  50 Decimal Digits
+                  128 Bits
                 </p>
               </th>
 <th>
                 <p>
-                  100 Decimal Digits
+                  256 Bits
                 </p>
               </th>
 <th>
                 <p>
-                  500 Decimal Digits
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
                 </p>
               </th>
 </tr></thead>
@@ -168,66 +168,54 @@
 <tr>
 <td>
                 <p>
-                  cpp_dec_float
+                  cpp_rational
                 </p>
               </td>
 <td>
                 <p>
-                  1.56759 (0.0527023s)
+                  3.98512 (2.67249s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.74629 (0.0618102s)
+                  4.24335 (3.04309s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.68077 (0.105927s)
-                </p>
-              </td>
-</tr>
-<tr>
-<td>
-                <p>
-                  gmp_float
+                  4.65009 (3.83046s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0336201s)
-                </p>
-              </td>
-<td>
-                <p>
-                  <span class="bold"><strong>1</strong></span> (0.0353951s)
-                </p>
-              </td>
-<td>
-                <p>
-                  <span class="bold"><strong>1</strong></span> (0.0630232s)
+                  5.45832 (5.08346s)
                 </p>
               </td>
 </tr>
 <tr>
 <td>
                 <p>
-                  mpfr_float
+                  mpq_rational
                 </p>
               </td>
 <td>
                 <p>
-                  3.14875 (0.105861s)
+                  <span class="bold"><strong>1</strong></span> (0.670618s)
                 </p>
               </td>
 <td>
                 <p>
-                  3.15499 (0.111671s)
+                  <span class="bold"><strong>1</strong></span> (0.717144s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.92831 (0.121528s)
+                  <span class="bold"><strong>1</strong></span> (0.823739s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.931322s)
                 </p>
               </td>
 </tr>
@@ -235,13 +223,14 @@
 </table></div>
 </div>
 <br class="table-break"><div class="table">
-<a name="boost_multiprecision.perf.float_performance.operator0"></a><p class="title"><b>Table&#160;1.10.&#160;Operator -</b></p>
+<a name="boost_multiprecision.perf.rational_performance.operator0"></a><p class="title"><b>Table&#160;1.39.&#160;Operator -</b></p>
 <div class="table-contents"><table class="table" summary="Operator -">
 <colgroup>
 <col>
 <col>
 <col>
 <col>
+<col>
 </colgroup>
 <thead><tr>
 <th>
@@ -251,17 +240,22 @@
               </th>
 <th>
                 <p>
-                  50 Decimal Digits
+                  128 Bits
                 </p>
               </th>
 <th>
                 <p>
-                  100 Decimal Digits
+                  256 Bits
                 </p>
               </th>
 <th>
                 <p>
-                  500 Decimal Digits
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
                 </p>
               </th>
 </tr></thead>
@@ -269,66 +263,54 @@
 <tr>
 <td>
                 <p>
-                  cpp_dec_float
+                  cpp_rational
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0265783s)
+                  5.91504 (18.2374s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.031465s)
+                  6.55676 (43.8659s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0619405s)
-                </p>
-              </td>
-</tr>
-<tr>
-<td>
-                <p>
-                  gmp_float
+                  6.66239 (103.481s)
                 </p>
               </td>
 <td>
                 <p>
-                  4.66954 (0.124108s)
-                </p>
-              </td>
-<td>
-                <p>
-                  3.72645 (0.117253s)
-                </p>
-              </td>
-<td>
-                <p>
-                  2.67536 (0.165713s)
+                  6.47224 (244.887s)
                 </p>
               </td>
 </tr>
 <tr>
 <td>
                 <p>
-                  mpfr_float
+                  mpq_rational
                 </p>
               </td>
 <td>
                 <p>
-                  2.7909 (0.0741774s)
+                  <span class="bold"><strong>1</strong></span> (3.08322s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.48557 (0.0782083s)
+                  <span class="bold"><strong>1</strong></span> (6.69018s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.50944 (0.0934957s)
+                  <span class="bold"><strong>1</strong></span> (15.5321s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (37.8365s)
                 </p>
               </td>
 </tr>
@@ -336,13 +318,14 @@
 </table></div>
 </div>
 <br class="table-break"><div class="table">
-<a name="boost_multiprecision.perf.float_performance.operator_int0"></a><p class="title"><b>Table&#160;1.11.&#160;Operator -(int)</b></p>
+<a name="boost_multiprecision.perf.rational_performance.operator_int0"></a><p class="title"><b>Table&#160;1.40.&#160;Operator -(int)</b></p>
 <div class="table-contents"><table class="table" summary="Operator -(int)">
 <colgroup>
 <col>
 <col>
 <col>
 <col>
+<col>
 </colgroup>
 <thead><tr>
 <th>
@@ -352,17 +335,22 @@
               </th>
 <th>
                 <p>
-                  50 Decimal Digits
+                  128 Bits
                 </p>
               </th>
 <th>
                 <p>
-                  100 Decimal Digits
+                  256 Bits
                 </p>
               </th>
 <th>
                 <p>
-                  500 Decimal Digits
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
                 </p>
               </th>
 </tr></thead>
@@ -370,66 +358,54 @@
 <tr>
 <td>
                 <p>
-                  cpp_dec_float
+                  cpp_rational
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0577674s)
+                  3.96173 (2.66785s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0633795s)
+                  4.36532 (3.09023s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.11146s)
-                </p>
-              </td>
-</tr>
-<tr>
-<td>
-                <p>
-                  gmp_float
+                  4.59363 (3.74494s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.31811 (0.133911s)
-                </p>
-              </td>
-<td>
-                <p>
-                  2.07251 (0.131355s)
-                </p>
-              </td>
-<td>
-                <p>
-                  1.67161 (0.186319s)
+                  5.43075 (5.09156s)
                 </p>
               </td>
 </tr>
 <tr>
 <td>
                 <p>
-                  mpfr_float
+                  mpq_rational
                 </p>
               </td>
 <td>
                 <p>
-                  2.45081 (0.141577s)
+                  <span class="bold"><strong>1</strong></span> (0.673405s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.29174 (0.145249s)
+                  <span class="bold"><strong>1</strong></span> (0.707904s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.395 (0.155487s)
+                  <span class="bold"><strong>1</strong></span> (0.815246s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.937541s)
                 </p>
               </td>
 </tr>
@@ -437,13 +413,14 @@
 </table></div>
 </div>
 <br class="table-break"><div class="table">
-<a name="boost_multiprecision.perf.float_performance.operator1"></a><p class="title"><b>Table&#160;1.12.&#160;Operator *</b></p>
+<a name="boost_multiprecision.perf.rational_performance.operator1"></a><p class="title"><b>Table&#160;1.41.&#160;Operator *</b></p>
 <div class="table-contents"><table class="table" summary="Operator *">
 <colgroup>
 <col>
 <col>
 <col>
 <col>
+<col>
 </colgroup>
 <thead><tr>
 <th>
@@ -453,17 +430,22 @@
               </th>
 <th>
                 <p>
-                  50 Decimal Digits
+                  128 Bits
                 </p>
               </th>
 <th>
                 <p>
-                  100 Decimal Digits
+                  256 Bits
                 </p>
               </th>
 <th>
                 <p>
-                  500 Decimal Digits
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
                 </p>
               </th>
 </tr></thead>
@@ -471,66 +453,54 @@
 <tr>
 <td>
                 <p>
-                  cpp_dec_float
+                  cpp_rational
                 </p>
               </td>
 <td>
                 <p>
-                  1.07276 (0.287898s)
+                  5.59286 (32.3559s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.47724 (0.584569s)
+                  6.54125 (82.4247s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.55145 (5.09969s)
-                </p>
-              </td>
-</tr>
-<tr>
-<td>
-                <p>
-                  gmp_float
+                  6.8815 (197.198s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.268372s)
-                </p>
-              </td>
-<td>
-                <p>
-                  <span class="bold"><strong>1</strong></span> (0.395718s)
-                </p>
-              </td>
-<td>
-                <p>
-                  <span class="bold"><strong>1</strong></span> (3.28705s)
+                  6.84066 (473.057s)
                 </p>
               </td>
 </tr>
 <tr>
 <td>
                 <p>
-                  mpfr_float
+                  mpq_rational
                 </p>
               </td>
 <td>
                 <p>
-                  1.27302 (0.341642s)
+                  <span class="bold"><strong>1</strong></span> (5.78521s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.17649 (0.465557s)
+                  <span class="bold"><strong>1</strong></span> (12.6008s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.14029 (3.7482s)
+                  <span class="bold"><strong>1</strong></span> (28.6562s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (69.1537s)
                 </p>
               </td>
 </tr>
@@ -538,13 +508,14 @@
 </table></div>
 </div>
 <br class="table-break"><div class="table">
-<a name="boost_multiprecision.perf.float_performance.operator_int1"></a><p class="title"><b>Table&#160;1.13.&#160;Operator *(int)</b></p>
+<a name="boost_multiprecision.perf.rational_performance.operator_int1"></a><p class="title"><b>Table&#160;1.42.&#160;Operator *(int)</b></p>
 <div class="table-contents"><table class="table" summary="Operator *(int)">
 <colgroup>
 <col>
 <col>
 <col>
 <col>
+<col>
 </colgroup>
 <thead><tr>
 <th>
@@ -554,17 +525,22 @@
               </th>
 <th>
                 <p>
-                  50 Decimal Digits
+                  128 Bits
                 </p>
               </th>
 <th>
                 <p>
-                  100 Decimal Digits
+                  256 Bits
                 </p>
               </th>
 <th>
                 <p>
-                  500 Decimal Digits
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
                 </p>
               </th>
 </tr></thead>
@@ -572,66 +548,54 @@
 <tr>
 <td>
                 <p>
-                  cpp_dec_float
+                  cpp_rational
                 </p>
               </td>
 <td>
                 <p>
-                  2.89945 (0.11959s)
+                  2.70193 (3.1466s)
                 </p>
               </td>
 <td>
                 <p>
-                  4.56335 (0.197945s)
+                  3.10134 (3.79056s)
                 </p>
               </td>
 <td>
                 <p>
-                  9.03602 (0.742044s)
-                </p>
-              </td>
-</tr>
-<tr>
-<td>
-                <p>
-                  gmp_float
+                  3.659 (4.93935s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0412457s)
-                </p>
-              </td>
-<td>
-                <p>
-                  <span class="bold"><strong>1</strong></span> (0.0433772s)
-                </p>
-              </td>
-<td>
-                <p>
-                  <span class="bold"><strong>1</strong></span> (0.0821206s)
+                  4.61372 (6.89845s)
                 </p>
               </td>
 </tr>
 <tr>
 <td>
                 <p>
-                  mpfr_float
+                  mpq_rational
                 </p>
               </td>
 <td>
                 <p>
-                  3.6951 (0.152407s)
+                  <span class="bold"><strong>1</strong></span> (1.16457s)
                 </p>
               </td>
 <td>
                 <p>
-                  3.71977 (0.161353s)
+                  <span class="bold"><strong>1</strong></span> (1.22223s)
                 </p>
               </td>
 <td>
                 <p>
-                  3.30958 (0.271785s)
+                  <span class="bold"><strong>1</strong></span> (1.34992s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (1.4952s)
                 </p>
               </td>
 </tr>
@@ -639,13 +603,14 @@
 </table></div>
 </div>
 <br class="table-break"><div class="table">
-<a name="boost_multiprecision.perf.float_performance.operator2"></a><p class="title"><b>Table&#160;1.14.&#160;Operator /</b></p>
+<a name="boost_multiprecision.perf.rational_performance.operator2"></a><p class="title"><b>Table&#160;1.43.&#160;Operator /</b></p>
 <div class="table-contents"><table class="table" summary="Operator /">
 <colgroup>
 <col>
 <col>
 <col>
 <col>
+<col>
 </colgroup>
 <thead><tr>
 <th>
@@ -655,17 +620,22 @@
               </th>
 <th>
                 <p>
-                  50 Decimal Digits
+                  128 Bits
                 </p>
               </th>
 <th>
                 <p>
-                  100 Decimal Digits
+                  256 Bits
                 </p>
               </th>
 <th>
                 <p>
-                  500 Decimal Digits
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
                 </p>
               </th>
 </tr></thead>
@@ -673,66 +643,54 @@
 <tr>
 <td>
                 <p>
-                  cpp_dec_float
+                  cpp_rational
                 </p>
               </td>
 <td>
                 <p>
-                  3.24327 (4.00108s)
+                  4.36846 (63.9498s)
                 </p>
               </td>
 <td>
                 <p>
-                  5.00532 (8.12985s)
+                  5.52565 (145.045s)
                 </p>
               </td>
 <td>
                 <p>
-                  6.79566 (54.2796s)
-                </p>
-              </td>
-</tr>
-<tr>
-<td>
-                <p>
-                  gmp_float
+                  6.18331 (328.069s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (1.23366s)
-                </p>
-              </td>
-<td>
-                <p>
-                  <span class="bold"><strong>1</strong></span> (1.62424s)
-                </p>
-              </td>
-<td>
-                <p>
-                  <span class="bold"><strong>1</strong></span> (7.9874s)
+                  6.49822 (784.806s)
                 </p>
               </td>
 </tr>
 <tr>
 <td>
                 <p>
-                  mpfr_float
+                  mpq_rational
                 </p>
               </td>
 <td>
                 <p>
-                  1.32521 (1.63486s)
+                  <span class="bold"><strong>1</strong></span> (14.639s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.38967 (2.25716s)
+                  <span class="bold"><strong>1</strong></span> (26.2494s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.72413 (13.7713s)
+                  <span class="bold"><strong>1</strong></span> (53.0571s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (120.772s)
                 </p>
               </td>
 </tr>
@@ -740,13 +698,14 @@
 </table></div>
 </div>
 <br class="table-break"><div class="table">
-<a name="boost_multiprecision.perf.float_performance.operator_int2"></a><p class="title"><b>Table&#160;1.15.&#160;Operator /(int)</b></p>
+<a name="boost_multiprecision.perf.rational_performance.operator_int2"></a><p class="title"><b>Table&#160;1.44.&#160;Operator /(int)</b></p>
 <div class="table-contents"><table class="table" summary="Operator /(int)">
 <colgroup>
 <col>
 <col>
 <col>
 <col>
+<col>
 </colgroup>
 <thead><tr>
 <th>
@@ -756,17 +715,22 @@
               </th>
 <th>
                 <p>
-                  50 Decimal Digits
+                  128 Bits
                 </p>
               </th>
 <th>
                 <p>
-                  100 Decimal Digits
+                  256 Bits
                 </p>
               </th>
 <th>
                 <p>
-                  500 Decimal Digits
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
                 </p>
               </th>
 </tr></thead>
@@ -774,66 +738,54 @@
 <tr>
 <td>
                 <p>
-                  cpp_dec_float
+                  cpp_rational
                 </p>
               </td>
 <td>
                 <p>
-                  1.45093 (0.253675s)
+                  2.26643 (3.13785s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.83306 (0.419569s)
+                  2.57125 (3.76931s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.3644 (1.64187s)
-                </p>
-              </td>
-</tr>
-<tr>
-<td>
-                <p>
-                  gmp_float
+                  3.20872 (5.06758s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.174836s)
-                </p>
-              </td>
-<td>
-                <p>
-                  <span class="bold"><strong>1</strong></span> (0.22889s)
-                </p>
-              </td>
-<td>
-                <p>
-                  <span class="bold"><strong>1</strong></span> (0.694411s)
+                  4.02177 (7.17803s)
                 </p>
               </td>
 </tr>
 <tr>
 <td>
                 <p>
-                  mpfr_float
+                  mpq_rational
                 </p>
               </td>
 <td>
                 <p>
-                  1.16731 (0.204088s)
+                  <span class="bold"><strong>1</strong></span> (1.38449s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.13211 (0.259127s)
+                  <span class="bold"><strong>1</strong></span> (1.46594s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.02031 (0.708513s)
+                  <span class="bold"><strong>1</strong></span> (1.57931s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (1.78479s)
                 </p>
               </td>
 </tr>
@@ -841,9 +793,10 @@
 </table></div>
 </div>
 <br class="table-break"><div class="table">
-<a name="boost_multiprecision.perf.float_performance.operator_str"></a><p class="title"><b>Table&#160;1.16.&#160;Operator str</b></p>
+<a name="boost_multiprecision.perf.rational_performance.operator_str"></a><p class="title"><b>Table&#160;1.45.&#160;Operator str</b></p>
 <div class="table-contents"><table class="table" summary="Operator str">
 <colgroup>
+<col>
 <col>
 <col>
 <col>
@@ -857,17 +810,22 @@
               </th>
 <th>
                 <p>
-                  50 Decimal Digits
+                  128 Bits
                 </p>
               </th>
 <th>
                 <p>
-                  100 Decimal Digits
+                  256 Bits
                 </p>
               </th>
 <th>
                 <p>
-                  500 Decimal Digits
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
                 </p>
               </th>
 </tr></thead>
@@ -875,75 +833,61 @@
 <tr>
 <td>
                 <p>
-                  cpp_dec_float
+                  cpp_rational
                 </p>
               </td>
 <td>
                 <p>
-                  1.4585 (0.0188303s)
+                  5.40493 (0.0199393s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.55515 (0.03172s)
+                  8.55089 (0.0511907s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.131962s)
-                </p>
-              </td>
-</tr>
-<tr>
-<td>
-                <p>
-                  gmp_float
+                  9.91026 (0.118839s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0129107s)
-                </p>
-              </td>
-<td>
-                <p>
-                  <span class="bold"><strong>1</strong></span> (0.0203967s)
-                </p>
-              </td>
-<td>
-                <p>
-                  1.04632 (0.138075s)
+                  9.93546 (0.285367s)
                 </p>
               </td>
 </tr>
 <tr>
 <td>
                 <p>
-                  mpfr_float
+                  mpq_rational
                 </p>
               </td>
 <td>
                 <p>
-                  2.19015 (0.0282764s)
+                  <span class="bold"><strong>1</strong></span> (0.00368909s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.84679 (0.0376683s)
+                  <span class="bold"><strong>1</strong></span> (0.00598659s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.20295 (0.158743s)
+                  <span class="bold"><strong>1</strong></span> (0.0119915s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.028722s)
                 </p>
               </td>
 </tr>
 </tbody>
 </table></div>
 </div>
-<br class="table-break"><p>
-        ]
-      </p>
+<br class="table-break">
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
@@ -955,7 +899,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="int_real_world.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../perf.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="integer_performance.html"><img src="../../images/next.png" alt="Next"></a>
+<a accesskey="p" href="integer_performance.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../perf.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../map.html"><img src="../../images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

@@ -7,11 +7,11 @@
 <link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
 <link rel="up" href="../perf.html" title="Performance Comparison">
 <link rel="prev" href="float_performance.html" title="Float Algorithm Perfomance">
-<link rel="next" href="../map.html" title="Roadmap">
+<link rel="next" href="rational_performance.html" title="Rational Type Perfomance">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <div class="spirit-nav">
-<a accesskey="p" href="float_performance.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../perf.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../map.html"><img src="../../images/next.png" alt="Next"></a>
+<a accesskey="p" href="float_performance.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../perf.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="rational_performance.html"><img src="../../images/next.png" alt="Next"></a>
 </div>
 <div class="section boost_multiprecision_perf_integer_performance">
 <div class="titlepage"><div><div><h3 class="title">
@@ -33,9 +33,8 @@
         The tests were run on 32-bit Windows Vista machine.
       </p>
 <p>
-        Note that Linux x64 tests showed significantly worse performance for <code class="computeroutput"><span class="identifier">fixed_int</span></code> division than on Win32 (or possibly
-        <a href="http://gmplib.org" target="_top">GMP</a> behaves much better in that case).
-        Otherwise the results are much the same.
+        Linux x86_64 results are broadly similar, except that libtommath performs
+        much better there.
       </p>
 <div class="table">
 <a name="boost_multiprecision.perf.integer_performance.operator__"></a><p class="title"><b>Table&#160;1.17.&#160;Operator +</b></p>
@@ -46,17 +45,11 @@
 <col>
 <col>
 <col>
-<col>
 </colgroup>
 <thead><tr>
 <th>
                 <p>
                   Backend
-                </p>
-              </th>
-<th>
-                <p>
-                  64 Bits
                 </p>
               </th>
 <th>
@@ -84,32 +77,54 @@
 <tr>
 <td>
                 <p>
-                  fixed_int
+                  cpp_int
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0031291s)
+                  1.24574 (0.0270133s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.00703043s)
+                  1.09665 (0.0352319s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0163669s)
+                  1.25708 (0.0524047s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0326567s)
+                  1.31488 (0.08777s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0603087s)
+                  1.05787 (0.0229394s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0321268s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.16171 (0.0484289s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.24017 (0.0827832s)
                 </p>
               </td>
 </tr>
@@ -121,27 +136,22 @@
               </td>
 <td>
                 <p>
-                  12.4866 (0.0390717s)
+                  2.08016 (0.0451073s)
                 </p>
               </td>
 <td>
                 <p>
-                  6.01034 (0.0422553s)
+                  1.33792 (0.042983s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.65628 (0.0434751s)
+                  1.19676 (0.0498904s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.54295 (0.0503875s)
-                </p>
-              </td>
-<td>
-                <p>
-                  1.16477 (0.0702458s)
+                  <span class="bold"><strong>1</strong></span> (0.0667514s)
                 </p>
               </td>
 </tr>
@@ -153,27 +163,22 @@
               </td>
 <td>
                 <p>
-                  6.03111 (0.018872s)
+                  <span class="bold"><strong>1</strong></span> (0.0216845s)
                 </p>
               </td>
 <td>
                 <p>
-                  3.08173 (0.0216659s)
+                  1.07779 (0.0346258s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.84243 (0.0301548s)
+                  <span class="bold"><strong>1</strong></span> (0.0416877s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.30199 (0.0425188s)
-                </p>
-              </td>
-<td>
-                <p>
-                  1.18909 (0.0717123s)
+                  1.06344 (0.0709863s)
                 </p>
               </td>
 </tr>
@@ -189,17 +194,11 @@
 <col>
 <col>
 <col>
-<col>
 </colgroup>
 <thead><tr>
 <th>
                 <p>
                   Backend
-                </p>
-              </th>
-<th>
-                <p>
-                  64 Bits
                 </p>
               </th>
 <th>
@@ -227,32 +226,54 @@
 <tr>
 <td>
                 <p>
-                  fixed_int
+                  cpp_int
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.00335294s)
+                  1.46244 (0.0202077s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.00376116s)
+                  1.20665 (0.0238576s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.00985174s)
+                  1.17647 (0.0258293s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0119345s)
+                  1.12424 (0.0317931s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0170918s)
+                  <span class="bold"><strong>1</strong></span> (0.0138178s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0197719s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0219548s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0282796s)
                 </p>
               </td>
 </tr>
@@ -264,27 +285,22 @@
               </td>
 <td>
                 <p>
-                  9.47407 (0.031766s)
+                  2.15321 (0.0297527s)
                 </p>
               </td>
 <td>
                 <p>
-                  8.44794 (0.0317741s)
+                  2.09834 (0.041488s)
                 </p>
               </td>
 <td>
                 <p>
-                  4.23857 (0.0417573s)
+                  2.89935 (0.0636546s)
                 </p>
               </td>
 <td>
                 <p>
-                  5.40856 (0.0645488s)
-                </p>
-              </td>
-<td>
-                <p>
-                  6.31314 (0.107903s)
+                  3.70262 (0.104709s)
                 </p>
               </td>
 </tr>
@@ -296,27 +312,22 @@
               </td>
 <td>
                 <p>
-                  67.0025 (0.224655s)
+                  17.1419 (0.236864s)
                 </p>
               </td>
 <td>
                 <p>
-                  60.4203 (0.22725s)
+                  12.9762 (0.256563s)
                 </p>
               </td>
 <td>
                 <p>
-                  25.1834 (0.2481s)
+                  12.3275 (0.270648s)
                 </p>
               </td>
 <td>
                 <p>
-                  23.2996 (0.27807s)
-                </p>
-              </td>
-<td>
-                <p>
-                  17.1743 (0.293538s)
+                  10.7373 (0.303648s)
                 </p>
               </td>
 </tr>
@@ -332,17 +343,11 @@
 <col>
 <col>
 <col>
-<col>
 </colgroup>
 <thead><tr>
 <th>
                 <p>
                   Backend
-                </p>
-              </th>
-<th>
-                <p>
-                  64 Bits
                 </p>
               </th>
 <th>
@@ -370,32 +375,54 @@
 <tr>
 <td>
                 <p>
-                  fixed_int
+                  cpp_int
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.00339191s)
+                  1.15385 (0.029665s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0073172s)
+                  1.08217 (0.0369886s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0166428s)
+                  1.05882 (0.051534s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0349375s)
+                  1.12132 (0.0822725s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0600083s)
+                  <span class="bold"><strong>1</strong></span> (0.0257095s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0341801s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0486711s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.08659 (0.0797242s)
                 </p>
               </td>
 </tr>
@@ -407,27 +434,22 @@
               </td>
 <td>
                 <p>
-                  12.5182 (0.0424608s)
+                  1.56685 (0.040283s)
                 </p>
               </td>
 <td>
                 <p>
-                  5.57936 (0.0408253s)
+                  1.32917 (0.0454312s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.78496 (0.0463496s)
+                  1.06917 (0.0520378s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.48373 (0.051838s)
-                </p>
-              </td>
-<td>
-                <p>
-                  1.29928 (0.0779673s)
+                  <span class="bold"><strong>1</strong></span> (0.0733708s)
                 </p>
               </td>
 </tr>
@@ -439,27 +461,22 @@
               </td>
 <td>
                 <p>
-                  7.00782 (0.0237699s)
+                  1.059 (0.0272264s)
                 </p>
               </td>
 <td>
                 <p>
-                  3.69919 (0.0270677s)
+                  1.16974 (0.0399818s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.29645 (0.0382195s)
+                  1.01303 (0.0493054s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.39777 (0.0488346s)
-                </p>
-              </td>
-<td>
-                <p>
-                  1.28243 (0.0769566s)
+                  1.03375 (0.0758472s)
                 </p>
               </td>
 </tr>
@@ -475,17 +492,11 @@
 <col>
 <col>
 <col>
-<col>
 </colgroup>
 <thead><tr>
 <th>
                 <p>
                   Backend
-                </p>
-              </th>
-<th>
-                <p>
-                  64 Bits
                 </p>
               </th>
 <th>
@@ -513,32 +524,54 @@
 <tr>
 <td>
                 <p>
-                  fixed_int
+                  cpp_int
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.00250933s)
+                  1.51665 (0.0157196s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.00358055s)
+                  1.31513 (0.0200533s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0103282s)
+                  1.29599 (0.0235066s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0119127s)
+                  1.21534 (0.0266136s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0176089s)
+                  <span class="bold"><strong>1</strong></span> (0.0103647s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0152482s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.018138s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.021898s)
                 </p>
               </td>
 </tr>
@@ -550,27 +583,22 @@
               </td>
 <td>
                 <p>
-                  12.093 (0.0303454s)
+                  2.7938 (0.0289568s)
                 </p>
               </td>
 <td>
                 <p>
-                  8.50898 (0.0304669s)
+                  2.55493 (0.038958s)
                 </p>
               </td>
 <td>
                 <p>
-                  3.9284 (0.0405733s)
+                  3.12248 (0.0566356s)
                 </p>
               </td>
 <td>
                 <p>
-                  5.03037 (0.0599252s)
-                </p>
-              </td>
-<td>
-                <p>
-                  5.96617 (0.105058s)
+                  4.48855 (0.0982904s)
                 </p>
               </td>
 </tr>
@@ -582,27 +610,22 @@
               </td>
 <td>
                 <p>
-                  80.8477 (0.202873s)
+                  20.8695 (0.216305s)
                 </p>
               </td>
 <td>
                 <p>
-                  57.8371 (0.207089s)
+                  15.0705 (0.229797s)
                 </p>
               </td>
 <td>
                 <p>
-                  21.3372 (0.220375s)
+                  13.4093 (0.243217s)
                 </p>
               </td>
 <td>
                 <p>
-                  23.526 (0.280258s)
-                </p>
-              </td>
-<td>
-                <p>
-                  14.793 (0.260488s)
+                  12.2599 (0.268468s)
                 </p>
               </td>
 </tr>
@@ -618,17 +641,11 @@
 <col>
 <col>
 <col>
-<col>
 </colgroup>
 <thead><tr>
 <th>
                 <p>
                   Backend
-                </p>
-              </th>
-<th>
-                <p>
-                  64 Bits
                 </p>
               </th>
 <th>
@@ -656,32 +673,54 @@
 <tr>
 <td>
                 <p>
-                  fixed_int
+                  cpp_int
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0223481s)
+                  1.29504 (0.0731032s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0375288s)
+                  1.55431 (0.196132s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.120353s)
+                  1.4363 (0.656569s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.439147s)
+                  1.63701 (2.47859s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (1.46969s)
+                  <span class="bold"><strong>1</strong></span> (0.0564485s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.16604 (0.147138s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.457124s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (1.5141s)
                 </p>
               </td>
 </tr>
@@ -693,27 +732,22 @@
               </td>
 <td>
                 <p>
-                  2.50746 (0.0560369s)
+                  1.19574 (0.0674975s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.76676 (0.0663044s)
+                  <span class="bold"><strong>1</strong></span> (0.126186s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.06052 (0.127636s)
+                  1.16627 (0.53313s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.22558 (0.53821s)
-                </p>
-              </td>
-<td>
-                <p>
-                  1.03538 (1.52168s)
+                  1.02906 (1.5581s)
                 </p>
               </td>
 </tr>
@@ -725,27 +759,22 @@
               </td>
 <td>
                 <p>
-                  3.00028 (0.0670506s)
+                  1.97229 (0.111333s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.97696 (0.111722s)
+                  2.67087 (0.337027s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.86257 (0.34452s)
+                  2.13031 (0.973817s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.26661 (0.995374s)
-                </p>
-              </td>
-<td>
-                <p>
-                  2.12926 (3.12935s)
+                  2.05869 (3.11706s)
                 </p>
               </td>
 </tr>
@@ -761,17 +790,11 @@
 <col>
 <col>
 <col>
-<col>
 </colgroup>
 <thead><tr>
 <th>
                 <p>
                   Backend
-                </p>
-              </th>
-<th>
-                <p>
-                  64 Bits
                 </p>
               </th>
 <th>
@@ -799,32 +822,54 @@
 <tr>
 <td>
                 <p>
-                  fixed_int
+                  cpp_int
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.00444316s)
+                  1.34609 (0.030315s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0135739s)
+                  1.57086 (0.0407838s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0192615s)
+                  1.60154 (0.0542267s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0328339s)
+                  1.67808 (0.0804984s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
                 </p>
               </td>
 <td>
                 <p>
-                  1.18198 (0.0567364s)
+                  1.29783 (0.0292279s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.58263 (0.0410894s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.61543 (0.054697s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.66841 (0.0800346s)
                 </p>
               </td>
 </tr>
@@ -836,27 +881,22 @@
               </td>
 <td>
                 <p>
-                  4.57776 (0.0203397s)
+                  <span class="bold"><strong>1</strong></span> (0.0225207s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.79901 (0.0244196s)
+                  <span class="bold"><strong>1</strong></span> (0.0259628s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.32814 (0.025582s)
+                  <span class="bold"><strong>1</strong></span> (0.033859s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.01453 (0.033311s)
-                </p>
-              </td>
-<td>
-                <p>
-                  <span class="bold"><strong>1</strong></span> (0.048001s)
+                  <span class="bold"><strong>1</strong></span> (0.0479706s)
                 </p>
               </td>
 </tr>
@@ -868,27 +908,22 @@
               </td>
 <td>
                 <p>
-                  53.8709 (0.239357s)
+                  12.4278 (0.279882s)
                 </p>
               </td>
 <td>
                 <p>
-                  18.3773 (0.249452s)
+                  11.9045 (0.309074s)
                 </p>
               </td>
 <td>
                 <p>
-                  14.2088 (0.273682s)
+                  10.5973 (0.358813s)
                 </p>
               </td>
 <td>
                 <p>
-                  14.0907 (0.462652s)
-                </p>
-              </td>
-<td>
-                <p>
-                  9.10761 (0.437175s)
+                  9.47384 (0.454466s)
                 </p>
               </td>
 </tr>
@@ -904,17 +939,11 @@
 <col>
 <col>
 <col>
-<col>
 </colgroup>
 <thead><tr>
 <th>
                 <p>
                   Backend
-                </p>
-              </th>
-<th>
-                <p>
-                  64 Bits
                 </p>
               </th>
 <th>
@@ -942,32 +971,54 @@
 <tr>
 <td>
                 <p>
-                  fixed_int
+                  cpp_int
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0991632s)
+                  2.86387 (0.593314s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.172328s)
+                  2.18375 (0.69965s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.309492s)
+                  1.72571 (0.918294s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.573815s)
+                  1.39251 (1.33801s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (1.06356s)
+                  <span class="bold"><strong>1</strong></span> (0.207172s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.320389s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.532127s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.960856s)
                 </p>
               </td>
 </tr>
@@ -979,27 +1030,22 @@
               </td>
 <td>
                 <p>
-                  7.81859 (0.775316s)
+                  3.89115 (0.806137s)
                 </p>
               </td>
 <td>
                 <p>
-                  5.11069 (0.880715s)
+                  2.87573 (0.921352s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.93514 (0.908404s)
+                  1.96635 (1.04635s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.80497 (1.03572s)
-                </p>
-              </td>
-<td>
-                <p>
-                  1.21878 (1.29625s)
+                  1.29618 (1.24544s)
                 </p>
               </td>
 </tr>
@@ -1011,27 +1057,22 @@
               </td>
 <td>
                 <p>
-                  18.0766 (1.79253s)
+                  11.9483 (2.47535s)
                 </p>
               </td>
 <td>
                 <p>
-                  12.3939 (2.13582s)
+                  9.35941 (2.99865s)
                 </p>
               </td>
 <td>
                 <p>
-                  9.80438 (3.03438s)
+                  8.79014 (4.67747s)
                 </p>
               </td>
 <td>
                 <p>
-                  8.74047 (5.01541s)
-                </p>
-              </td>
-<td>
-                <p>
-                  10.8288 (11.517s)
+                  11.8316 (11.3684s)
                 </p>
               </td>
 </tr>
@@ -1047,17 +1088,11 @@
 <col>
 <col>
 <col>
-<col>
 </colgroup>
 <thead><tr>
 <th>
                 <p>
                   Backend
-                </p>
-              </th>
-<th>
-                <p>
-                  64 Bits
                 </p>
               </th>
 <th>
@@ -1085,32 +1120,54 @@
 <tr>
 <td>
                 <p>
-                  fixed_int
+                  cpp_int
                 </p>
               </td>
 <td>
                 <p>
-                  1.04098 (0.0443082s)
+                  5.77003 (0.313196s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.61317 (0.110308s)
+                  4.38067 (0.431864s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.18324 (0.229148s)
+                  3.55054 (0.634559s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.36331 (0.442167s)
+                  2.97898 (1.03205s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
                 </p>
               </td>
 <td>
                 <p>
-                  2.45159 (0.866172s)
+                  2.48952 (0.135131s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.59188 (0.255519s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.56716 (0.458808s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.52368 (0.874313s)
                 </p>
               </td>
 </tr>
@@ -1122,27 +1179,22 @@
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.042564s)
+                  <span class="bold"><strong>1</strong></span> (0.0542797s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.06838s)
+                  <span class="bold"><strong>1</strong></span> (0.0985842s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.104957s)
+                  <span class="bold"><strong>1</strong></span> (0.178722s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.187096s)
-                </p>
-              </td>
-<td>
-                <p>
-                  <span class="bold"><strong>1</strong></span> (0.35331s)
+                  <span class="bold"><strong>1</strong></span> (0.346443s)
                 </p>
               </td>
 </tr>
@@ -1154,27 +1206,22 @@
               </td>
 <td>
                 <p>
-                  32.4072 (1.37938s)
+                  31.6477 (1.71783s)
                 </p>
               </td>
 <td>
                 <p>
-                  23.7471 (1.62383s)
+                  22.8727 (2.25489s)
                 </p>
               </td>
 <td>
                 <p>
-                  22.1907 (2.32908s)
+                  19.9248 (3.56101s)
                 </p>
               </td>
 <td>
                 <p>
-                  19.9054 (3.72421s)
-                </p>
-              </td>
-<td>
-                <p>
-                  24.2219 (8.55783s)
+                  24.3266 (8.42779s)
                 </p>
               </td>
 </tr>
@@ -1190,17 +1237,11 @@
 <col>
 <col>
 <col>
-<col>
 </colgroup>
 <thead><tr>
 <th>
                 <p>
                   Backend
-                </p>
-              </th>
-<th>
-                <p>
-                  64 Bits
                 </p>
               </th>
 <th>
@@ -1228,32 +1269,54 @@
 <tr>
 <td>
                 <p>
-                  fixed_int
+                  cpp_int
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0946529s)
+                  1.9813 (0.357541s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.170561s)
+                  1.55667 (0.460146s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.328458s)
+                  1.35341 (0.681144s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.575884s)
+                  1.19906 (1.10138s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (1.05006s)
+                  <span class="bold"><strong>1</strong></span> (0.180457s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.295597s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.503278s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.918538s)
                 </p>
               </td>
 </tr>
@@ -1265,27 +1328,22 @@
               </td>
 <td>
                 <p>
-                  7.77525 (0.73595s)
+                  3.50213 (0.631985s)
                 </p>
               </td>
 <td>
                 <p>
-                  4.39387 (0.749422s)
+                  2.33312 (0.689662s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.35075 (0.772122s)
+                  1.57264 (0.791475s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.51922 (0.874894s)
-                </p>
-              </td>
-<td>
-                <p>
-                  1.02263 (1.07382s)
+                  1.07795 (0.99014s)
                 </p>
               </td>
 </tr>
@@ -1297,27 +1355,22 @@
               </td>
 <td>
                 <p>
-                  27.1503 (2.56986s)
+                  12.2393 (2.20868s)
                 </p>
               </td>
 <td>
                 <p>
-                  12.8743 (2.19585s)
+                  10.1123 (2.98915s)
                 </p>
               </td>
 <td>
                 <p>
-                  9.43965 (3.10053s)
+                  9.46676 (4.76442s)
                 </p>
               </td>
 <td>
                 <p>
-                  8.24936 (4.75068s)
-                </p>
-              </td>
-<td>
-                <p>
-                  10.9719 (11.5211s)
+                  12.1795 (11.1873s)
                 </p>
               </td>
 </tr>
@@ -1333,17 +1386,11 @@
 <col>
 <col>
 <col>
-<col>
 </colgroup>
 <thead><tr>
 <th>
                 <p>
                   Backend
-                </p>
-              </th>
-<th>
-                <p>
-                  64 Bits
                 </p>
               </th>
 <th>
@@ -1371,32 +1418,54 @@
 <tr>
 <td>
                 <p>
-                  fixed_int
+                  cpp_int
                 </p>
               </td>
 <td>
                 <p>
-                  1.25034 (0.0425984s)
+                  1.88485 (0.105552s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.91617 (0.106226s)
+                  2.00194 (0.203711s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.02166 (0.195577s)
+                  2.08202 (0.380096s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.14437 (0.387067s)
+                  2.12794 (0.752068s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
                 </p>
               </td>
 <td>
                 <p>
-                  2.23514 (0.776075s)
+                  1.7474 (0.0978544s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.88457 (0.191768s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.0306 (0.37071s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.0851 (0.736929s)
                 </p>
               </td>
 </tr>
@@ -1408,27 +1477,22 @@
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0340695s)
+                  <span class="bold"><strong>1</strong></span> (0.0560001s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0554367s)
+                  <span class="bold"><strong>1</strong></span> (0.101757s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0967406s)
+                  <span class="bold"><strong>1</strong></span> (0.182561s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.180504s)
-                </p>
-              </td>
-<td>
-                <p>
-                  <span class="bold"><strong>1</strong></span> (0.347216s)
+                  <span class="bold"><strong>1</strong></span> (0.353426s)
                 </p>
               </td>
 </tr>
@@ -1440,27 +1504,22 @@
               </td>
 <td>
                 <p>
-                  42.8781 (1.46083s)
+                  30.4466 (1.70501s)
                 </p>
               </td>
 <td>
                 <p>
-                  29.879 (1.65639s)
+                  22.2997 (2.26915s)
                 </p>
               </td>
 <td>
                 <p>
-                  23.4323 (2.26685s)
+                  19.6199 (3.58184s)
                 </p>
               </td>
 <td>
                 <p>
-                  19.932 (3.5978s)
-                </p>
-              </td>
-<td>
-                <p>
-                  25.0046 (8.682s)
+                  24.0694 (8.50676s)
                 </p>
               </td>
 </tr>
@@ -1468,150 +1527,7 @@
 </table></div>
 </div>
 <br class="table-break"><div class="table">
-<a name="boost_multiprecision.perf.integer_performance.operator_str"></a><p class="title"><b>Table&#160;1.27.&#160;Operator str</b></p>
-<div class="table-contents"><table class="table" summary="Operator str">
-<colgroup>
-<col>
-<col>
-<col>
-<col>
-<col>
-<col>
-</colgroup>
-<thead><tr>
-<th>
-                <p>
-                  Backend
-                </p>
-              </th>
-<th>
-                <p>
-                  64 Bits
-                </p>
-              </th>
-<th>
-                <p>
-                  128 Bits
-                </p>
-              </th>
-<th>
-                <p>
-                  256 Bits
-                </p>
-              </th>
-<th>
-                <p>
-                  512 Bits
-                </p>
-              </th>
-<th>
-                <p>
-                  1024 Bits
-                </p>
-              </th>
-</tr></thead>
-<tbody>
-<tr>
-<td>
-                <p>
-                  fixed_int
-                </p>
-              </td>
-<td>
-                <p>
-                  <span class="bold"><strong>1</strong></span> (0.000465841s)
-                </p>
-              </td>
-<td>
-                <p>
-                  <span class="bold"><strong>1</strong></span> (0.00102073s)
-                </p>
-              </td>
-<td>
-                <p>
-                  <span class="bold"><strong>1</strong></span> (0.00207212s)
-                </p>
-              </td>
-<td>
-                <p>
-                  1.02618 (0.0062017s)
-                </p>
-              </td>
-<td>
-                <p>
-                  1.32649 (0.0190043s)
-                </p>
-              </td>
-</tr>
-<tr>
-<td>
-                <p>
-                  gmp_int
-                </p>
-              </td>
-<td>
-                <p>
-                  2.83823 (0.00132216s)
-                </p>
-              </td>
-<td>
-                <p>
-                  2.17537 (0.00222046s)
-                </p>
-              </td>
-<td>
-                <p>
-                  1.46978 (0.00304557s)
-                </p>
-              </td>
-<td>
-                <p>
-                  <span class="bold"><strong>1</strong></span> (0.00604351s)
-                </p>
-              </td>
-<td>
-                <p>
-                  <span class="bold"><strong>1</strong></span> (0.0143268s)
-                </p>
-              </td>
-</tr>
-<tr>
-<td>
-                <p>
-                  tommath_int
-                </p>
-              </td>
-<td>
-                <p>
-                  15.76 (0.00734164s)
-                </p>
-              </td>
-<td>
-                <p>
-                  15.9879 (0.0163193s)
-                </p>
-              </td>
-<td>
-                <p>
-                  21.7337 (0.0450349s)
-                </p>
-              </td>
-<td>
-                <p>
-                  19.7183 (0.119168s)
-                </p>
-              </td>
-<td>
-                <p>
-                  26.3445 (0.377431s)
-                </p>
-              </td>
-</tr>
-</tbody>
-</table></div>
-</div>
-<br class="table-break"><div class="table">
-<a name="boost_multiprecision.perf.integer_performance.operator___"></a><p class="title"><b>Table&#160;1.28.&#160;Operator &lt;&lt;</b></p>
+<a name="boost_multiprecision.perf.integer_performance.operator___"></a><p class="title"><b>Table&#160;1.27.&#160;Operator &lt;&lt;</b></p>
 <div class="table-contents"><table class="table" summary="Operator &lt;&lt;">
 <colgroup>
 <col>
@@ -1619,17 +1535,11 @@
 <col>
 <col>
 <col>
-<col>
 </colgroup>
 <thead><tr>
 <th>
                 <p>
                   Backend
-                </p>
-              </th>
-<th>
-                <p>
-                  64 Bits
                 </p>
               </th>
 <th>
@@ -1657,32 +1567,54 @@
 <tr>
 <td>
                 <p>
-                  fixed_int
+                  cpp_int
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0119095s)
+                  1.20362 (0.0224696s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0131746s)
+                  1.08555 (0.0294403s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0213483s)
+                  <span class="bold"><strong>1</strong></span> (0.0360516s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0247552s)
+                  1.07177 (0.0523935s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0339579s)
+                  <span class="bold"><strong>1</strong></span> (0.0186683s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0271201s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.02126 (0.036818s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0488848s)
                 </p>
               </td>
 </tr>
@@ -1694,27 +1626,22 @@
               </td>
 <td>
                 <p>
-                  1.9355 (0.0230509s)
+                  1.36706 (0.0255207s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.94257 (0.0255925s)
+                  1.12042 (0.0303858s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.49684 (0.031955s)
+                  1.24359 (0.0448335s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.79202 (0.0443618s)
-                </p>
-              </td>
-<td>
-                <p>
-                  2.0846 (0.0707887s)
+                  1.40143 (0.0685085s)
                 </p>
               </td>
 </tr>
@@ -1726,27 +1653,22 @@
               </td>
 <td>
                 <p>
-                  2.64273 (0.0314737s)
+                  2.09357 (0.0390833s)
                 </p>
               </td>
 <td>
                 <p>
-                  2.95612 (0.0389456s)
+                  2.4569 (0.0666312s)
                 </p>
               </td>
 <td>
                 <p>
-                  3.05842 (0.065292s)
+                  2.63592 (0.0950291s)
                 </p>
               </td>
 <td>
                 <p>
-                  3.79496 (0.0939451s)
-                </p>
-              </td>
-<td>
-                <p>
-                  4.82142 (0.163725s)
+                  3.43638 (0.167987s)
                 </p>
               </td>
 </tr>
@@ -1754,7 +1676,7 @@
 </table></div>
 </div>
 <br class="table-break"><div class="table">
-<a name="boost_multiprecision.perf.integer_performance.operator4"></a><p class="title"><b>Table&#160;1.29.&#160;Operator &gt;&gt;</b></p>
+<a name="boost_multiprecision.perf.integer_performance.operator4"></a><p class="title"><b>Table&#160;1.28.&#160;Operator &gt;&gt;</b></p>
 <div class="table-contents"><table class="table" summary="Operator &gt;&gt;">
 <colgroup>
 <col>
@@ -1762,17 +1684,11 @@
 <col>
 <col>
 <col>
-<col>
 </colgroup>
 <thead><tr>
 <th>
                 <p>
                   Backend
-                </p>
-              </th>
-<th>
-                <p>
-                  64 Bits
                 </p>
               </th>
 <th>
@@ -1800,32 +1716,54 @@
 <tr>
 <td>
                 <p>
-                  fixed_int
+                  cpp_int
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.006361s)
+                  1.33649 (0.0210319s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.00880189s)
+                  1.12919 (0.0266135s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0180295s)
+                  1.10413 (0.0307184s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0220786s)
+                  1.09267 (0.0399373s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0325312s)
+                  <span class="bold"><strong>1</strong></span> (0.0157367s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0235686s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0278214s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.05198 (0.0384501s)
                 </p>
               </td>
 </tr>
@@ -1837,27 +1775,22 @@
               </td>
 <td>
                 <p>
-                  4.26889 (0.0271544s)
+                  1.72135 (0.0270884s)
                 </p>
               </td>
 <td>
                 <p>
-                  3.14669 (0.0276968s)
+                  1.2078 (0.0284661s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.74396 (0.0314426s)
+                  1.16066 (0.0322912s)
                 </p>
               </td>
 <td>
                 <p>
-                  1.45928 (0.0322188s)
-                </p>
-              </td>
-<td>
-                <p>
-                  1.24596 (0.0405327s)
+                  <span class="bold"><strong>1</strong></span> (0.0365503s)
                 </p>
               </td>
 </tr>
@@ -1869,27 +1802,22 @@
               </td>
 <td>
                 <p>
-                  39.4379 (0.250865s)
+                  15.4381 (0.242945s)
                 </p>
               </td>
 <td>
                 <p>
-                  28.6225 (0.251932s)
+                  11.8797 (0.279987s)
                 </p>
               </td>
 <td>
                 <p>
-                  16.4543 (0.296661s)
+                  10.9043 (0.303374s)
                 </p>
               </td>
 <td>
                 <p>
-                  14.2167 (0.313884s)
-                </p>
-              </td>
-<td>
-                <p>
-                  15.5842 (0.506974s)
+                  14.0762 (0.514491s)
                 </p>
               </td>
 </tr>
@@ -1897,7 +1825,7 @@
 </table></div>
 </div>
 <br class="table-break"><div class="table">
-<a name="boost_multiprecision.perf.integer_performance.operator5"></a><p class="title"><b>Table&#160;1.30.&#160;Operator &amp;</b></p>
+<a name="boost_multiprecision.perf.integer_performance.operator5"></a><p class="title"><b>Table&#160;1.29.&#160;Operator &amp;</b></p>
 <div class="table-contents"><table class="table" summary="Operator &amp;">
 <colgroup>
 <col>
@@ -1905,17 +1833,11 @@
 <col>
 <col>
 <col>
-<col>
 </colgroup>
 <thead><tr>
 <th>
                 <p>
                   Backend
-                </p>
-              </th>
-<th>
-                <p>
-                  64 Bits
                 </p>
               </th>
 <th>
@@ -1943,32 +1865,54 @@
 <tr>
 <td>
                 <p>
-                  fixed_int
+                  cpp_int
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.00298048s)
+                  1.65829 (0.0314059s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.00546222s)
+                  1.42198 (0.0390384s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0127546s)
+                  1.48578 (0.0498903s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.01985s)
+                  1.51243 (0.0770342s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0349286s)
+                  <span class="bold"><strong>1</strong></span> (0.0189387s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0274536s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0335786s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0509341s)
                 </p>
               </td>
 </tr>
@@ -1980,27 +1924,22 @@
               </td>
 <td>
                 <p>
-                  16.0105 (0.0477189s)
+                  2.80248 (0.0530755s)
                 </p>
               </td>
 <td>
                 <p>
-                  9.67027 (0.0528211s)
+                  2.39752 (0.0658206s)
                 </p>
               </td>
 <td>
                 <p>
-                  5.12678 (0.0653902s)
+                  2.66009 (0.089322s)
                 </p>
               </td>
 <td>
                 <p>
-                  4.62316 (0.0917698s)
-                </p>
-              </td>
-<td>
-                <p>
-                  4.00837 (0.140007s)
+                  2.73942 (0.13953s)
                 </p>
               </td>
 </tr>
@@ -2012,27 +1951,22 @@
               </td>
 <td>
                 <p>
-                  43.6665 (0.130147s)
+                  6.95432 (0.131706s)
                 </p>
               </td>
 <td>
                 <p>
-                  23.8003 (0.130002s)
+                  5.4059 (0.148412s)
                 </p>
               </td>
 <td>
                 <p>
-                  11.4242 (0.145711s)
+                  4.56887 (0.153417s)
                 </p>
               </td>
 <td>
                 <p>
-                  7.83416 (0.155508s)
-                </p>
-              </td>
-<td>
-                <p>
-                  9.50103 (0.331858s)
+                  6.5696 (0.334616s)
                 </p>
               </td>
 </tr>
@@ -2040,7 +1974,7 @@
 </table></div>
 </div>
 <br class="table-break"><div class="table">
-<a name="boost_multiprecision.perf.integer_performance.operator_int4"></a><p class="title"><b>Table&#160;1.31.&#160;Operator &amp;(int)</b></p>
+<a name="boost_multiprecision.perf.integer_performance.operator_int4"></a><p class="title"><b>Table&#160;1.30.&#160;Operator &amp;(int)</b></p>
 <div class="table-contents"><table class="table" summary="Operator &amp;(int)">
 <colgroup>
 <col>
@@ -2048,17 +1982,11 @@
 <col>
 <col>
 <col>
-<col>
 </colgroup>
 <thead><tr>
 <th>
                 <p>
                   Backend
-                </p>
-              </th>
-<th>
-                <p>
-                  64 Bits
                 </p>
               </th>
 <th>
@@ -2086,32 +2014,54 @@
 <tr>
 <td>
                 <p>
-                  fixed_int
+                  cpp_int
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.00222291s)
+                  1.63285 (0.0472296s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0035522s)
+                  1.43344 (0.0588492s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0110247s)
+                  1.33141 (0.0724386s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0154281s)
+                  1.21353 (0.104144s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0275044s)
+                  <span class="bold"><strong>1</strong></span> (0.0289247s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0410546s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0544075s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0858187s)
                 </p>
               </td>
 </tr>
@@ -2123,27 +2073,22 @@
               </td>
 <td>
                 <p>
-                  70.8538 (0.157502s)
+                  5.24478 (0.151704s)
                 </p>
               </td>
 <td>
                 <p>
-                  42.1478 (0.149717s)
+                  3.81907 (0.15679s)
                 </p>
               </td>
 <td>
                 <p>
-                  13.9023 (0.153268s)
+                  2.77979 (0.151242s)
                 </p>
               </td>
 <td>
                 <p>
-                  10.3271 (0.159328s)
-                </p>
-              </td>
-<td>
-                <p>
-                  6.0529 (0.166481s)
+                  1.84209 (0.158086s)
                 </p>
               </td>
 </tr>
@@ -2155,27 +2100,22 @@
               </td>
 <td>
                 <p>
-                  154.134 (0.342626s)
+                  11.7257 (0.339163s)
                 </p>
               </td>
 <td>
                 <p>
-                  93.2035 (0.331077s)
+                  8.6379 (0.354625s)
                 </p>
               </td>
 <td>
                 <p>
-                  31.9151 (0.351853s)
+                  6.90411 (0.375636s)
                 </p>
               </td>
 <td>
                 <p>
-                  23.6515 (0.364899s)
-                </p>
-              </td>
-<td>
-                <p>
-                  22.0042 (0.605213s)
+                  7.63253 (0.655013s)
                 </p>
               </td>
 </tr>
@@ -2183,7 +2123,7 @@
 </table></div>
 </div>
 <br class="table-break"><div class="table">
-<a name="boost_multiprecision.perf.integer_performance.operator6"></a><p class="title"><b>Table&#160;1.32.&#160;Operator ^</b></p>
+<a name="boost_multiprecision.perf.integer_performance.operator6"></a><p class="title"><b>Table&#160;1.31.&#160;Operator ^</b></p>
 <div class="table-contents"><table class="table" summary="Operator ^">
 <colgroup>
 <col>
@@ -2191,17 +2131,11 @@
 <col>
 <col>
 <col>
-<col>
 </colgroup>
 <thead><tr>
 <th>
                 <p>
                   Backend
-                </p>
-              </th>
-<th>
-                <p>
-                  64 Bits
                 </p>
               </th>
 <th>
@@ -2229,32 +2163,54 @@
 <tr>
 <td>
                 <p>
-                  fixed_int
+                  cpp_int
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.00307714s)
+                  1.39325 (0.0297525s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.00538197s)
+                  1.28821 (0.0385005s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0127717s)
+                  1.18843 (0.0492426s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0198304s)
+                  1.07724 (0.0758668s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0345822s)
+                  <span class="bold"><strong>1</strong></span> (0.0213547s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0298868s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.041435s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.070427s)
                 </p>
               </td>
 </tr>
@@ -2266,27 +2222,22 @@
               </td>
 <td>
                 <p>
-                  13.9543 (0.0429392s)
+                  2.28582 (0.048813s)
                 </p>
               </td>
 <td>
                 <p>
-                  9.92785 (0.0534314s)
+                  2.03478 (0.0608129s)
                 </p>
               </td>
 <td>
                 <p>
-                  4.80398 (0.0613552s)
+                  2.05655 (0.0852131s)
                 </p>
               </td>
 <td>
                 <p>
-                  4.35864 (0.0864335s)
-                </p>
-              </td>
-<td>
-                <p>
-                  3.887 (0.134421s)
+                  1.92381 (0.135488s)
                 </p>
               </td>
 </tr>
@@ -2298,27 +2249,22 @@
               </td>
 <td>
                 <p>
-                  41.5958 (0.127996s)
+                  6.17078 (0.131775s)
                 </p>
               </td>
 <td>
                 <p>
-                  24.2396 (0.130457s)
+                  4.8567 (0.145151s)
                 </p>
               </td>
 <td>
                 <p>
-                  11.3666 (0.145171s)
+                  3.64659 (0.151097s)
                 </p>
               </td>
 <td>
                 <p>
-                  8.01016 (0.158845s)
-                </p>
-              </td>
-<td>
-                <p>
-                  9.84853 (0.340584s)
+                  4.78192 (0.336776s)
                 </p>
               </td>
 </tr>
@@ -2326,7 +2272,7 @@
 </table></div>
 </div>
 <br class="table-break"><div class="table">
-<a name="boost_multiprecision.perf.integer_performance.operator_int5"></a><p class="title"><b>Table&#160;1.33.&#160;Operator ^(int)</b></p>
+<a name="boost_multiprecision.perf.integer_performance.operator_int5"></a><p class="title"><b>Table&#160;1.32.&#160;Operator ^(int)</b></p>
 <div class="table-contents"><table class="table" summary="Operator ^(int)">
 <colgroup>
 <col>
@@ -2334,17 +2280,11 @@
 <col>
 <col>
 <col>
-<col>
 </colgroup>
 <thead><tr>
 <th>
                 <p>
                   Backend
-                </p>
-              </th>
-<th>
-                <p>
-                  64 Bits
                 </p>
               </th>
 <th>
@@ -2372,32 +2312,54 @@
 <tr>
 <td>
                 <p>
-                  fixed_int
+                  cpp_int
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.00236664s)
+                  1.89396 (0.0383127s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0035339s)
+                  1.64269 (0.043417s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0100442s)
+                  1.5386 (0.0477162s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0155814s)
+                  1.32247 (0.0568053s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0293253s)
+                  <span class="bold"><strong>1</strong></span> (0.0202288s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0264305s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0310128s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0429539s)
                 </p>
               </td>
 </tr>
@@ -2409,27 +2371,22 @@
               </td>
 <td>
                 <p>
-                  61.4272 (0.145376s)
+                  7.01953 (0.141997s)
                 </p>
               </td>
 <td>
                 <p>
-                  41.6319 (0.147123s)
+                  5.47513 (0.14471s)
                 </p>
               </td>
 <td>
                 <p>
-                  14.9744 (0.150405s)
+                  4.6627 (0.144603s)
                 </p>
               </td>
 <td>
                 <p>
-                  9.64857 (0.150338s)
-                </p>
-              </td>
-<td>
-                <p>
-                  5.46649 (0.160306s)
+                  3.59601 (0.154463s)
                 </p>
               </td>
 </tr>
@@ -2441,27 +2398,22 @@
               </td>
 <td>
                 <p>
-                  145.509 (0.344367s)
+                  16.2706 (0.329134s)
                 </p>
               </td>
 <td>
                 <p>
-                  93.9055 (0.331853s)
+                  12.9494 (0.342258s)
                 </p>
               </td>
 <td>
                 <p>
-                  35.0456 (0.352003s)
+                  11.3305 (0.35139s)
                 </p>
               </td>
 <td>
                 <p>
-                  22.7371 (0.354275s)
-                </p>
-              </td>
-<td>
-                <p>
-                  19.1373 (0.561207s)
+                  14.1712 (0.608709s)
                 </p>
               </td>
 </tr>
@@ -2469,7 +2421,7 @@
 </table></div>
 </div>
 <br class="table-break"><div class="table">
-<a name="boost_multiprecision.perf.integer_performance.operator7"></a><p class="title"><b>Table&#160;1.34.&#160;Operator |</b></p>
+<a name="boost_multiprecision.perf.integer_performance.operator7"></a><p class="title"><b>Table&#160;1.33.&#160;Operator |</b></p>
 <div class="table-contents"><table class="table" summary="Operator |">
 <colgroup>
 <col>
@@ -2477,17 +2429,11 @@
 <col>
 <col>
 <col>
-<col>
 </colgroup>
 <thead><tr>
 <th>
                 <p>
                   Backend
-                </p>
-              </th>
-<th>
-                <p>
-                  64 Bits
                 </p>
               </th>
 <th>
@@ -2515,32 +2461,54 @@
 <tr>
 <td>
                 <p>
-                  fixed_int
+                  cpp_int
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.00295261s)
+                  1.34742 (0.0296944s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.00560832s)
+                  1.25923 (0.0384846s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0127056s)
+                  1.20517 (0.0493908s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0200759s)
+                  1.10536 (0.0761343s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.034651s)
+                  <span class="bold"><strong>1</strong></span> (0.0220379s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.030562s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0409823s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0688775s)
                 </p>
               </td>
 </tr>
@@ -2552,27 +2520,22 @@
               </td>
 <td>
                 <p>
-                  14.1091 (0.0416586s)
+                  2.14429 (0.0472558s)
                 </p>
               </td>
 <td>
                 <p>
-                  8.52475 (0.0478096s)
+                  1.95901 (0.0598712s)
                 </p>
               </td>
 <td>
                 <p>
-                  4.74593 (0.0602998s)
+                  2.07584 (0.0850728s)
                 </p>
               </td>
 <td>
                 <p>
-                  4.19694 (0.0842575s)
-                </p>
-              </td>
-<td>
-                <p>
-                  3.85525 (0.133588s)
+                  1.94265 (0.133805s)
                 </p>
               </td>
 </tr>
@@ -2584,27 +2547,22 @@
               </td>
 <td>
                 <p>
-                  44.8889 (0.132539s)
+                  5.98286 (0.13185s)
                 </p>
               </td>
 <td>
                 <p>
-                  25.2503 (0.141612s)
+                  4.65705 (0.142329s)
                 </p>
               </td>
 <td>
                 <p>
-                  11.0488 (0.140382s)
+                  3.85812 (0.158115s)
                 </p>
               </td>
 <td>
                 <p>
-                  7.39273 (0.148416s)
-                </p>
-              </td>
-<td>
-                <p>
-                  9.75809 (0.338127s)
+                  4.81524 (0.331662s)
                 </p>
               </td>
 </tr>
@@ -2612,10 +2570,9 @@
 </table></div>
 </div>
 <br class="table-break"><div class="table">
-<a name="boost_multiprecision.perf.integer_performance.operator_int6"></a><p class="title"><b>Table&#160;1.35.&#160;Operator |(int)</b></p>
+<a name="boost_multiprecision.perf.integer_performance.operator_int6"></a><p class="title"><b>Table&#160;1.34.&#160;Operator |(int)</b></p>
 <div class="table-contents"><table class="table" summary="Operator |(int)">
 <colgroup>
-<col>
 <col>
 <col>
 <col>
@@ -2626,11 +2583,6 @@
 <th>
                 <p>
                   Backend
-                </p>
-              </th>
-<th>
-                <p>
-                  64 Bits
                 </p>
               </th>
 <th>
@@ -2658,32 +2610,54 @@
 <tr>
 <td>
                 <p>
-                  fixed_int
+                  cpp_int
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.00244005s)
+                  1.40808 (0.0389721s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0040142s)
+                  1.65035 (0.0437872s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.00983777s)
+                  1.51667 (0.0466144s)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0155223s)
+                  1.37806 (0.0582842s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1</strong></span> (0.0293444s)
+                  <span class="bold"><strong>1</strong></span> (0.0276775s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.026532s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0307348s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0422945s)
                 </p>
               </td>
 </tr>
@@ -2695,27 +2669,22 @@
               </td>
 <td>
                 <p>
-                  64.6148 (0.157663s)
+                  5.31451 (0.147092s)
                 </p>
               </td>
 <td>
                 <p>
-                  34.5827 (0.138822s)
+                  5.37333 (0.142565s)
                 </p>
               </td>
 <td>
                 <p>
-                  14.2764 (0.140448s)
+                  4.86508 (0.149527s)
                 </p>
               </td>
 <td>
                 <p>
-                  10.3248 (0.160264s)
-                </p>
-              </td>
-<td>
-                <p>
-                  5.33565 (0.156572s)
+                  3.74364 (0.158335s)
                 </p>
               </td>
 </tr>
@@ -2727,27 +2696,320 @@
               </td>
 <td>
                 <p>
-                  137.825 (0.3363s)
+                  11.9312 (0.330226s)
                 </p>
               </td>
 <td>
                 <p>
-                  81.1074 (0.325581s)
+                  12.943 (0.343403s)
                 </p>
               </td>
 <td>
                 <p>
-                  34.8737 (0.343079s)
+                  11.4457 (0.35178s)
                 </p>
               </td>
 <td>
                 <p>
-                  22.3727 (0.347276s)
+                  14.4462 (0.610997s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator_gcd"></a><p class="title"><b>Table&#160;1.35.&#160;Operator gcd</b></p>
+<div class="table-contents"><table class="table" summary="Operator gcd">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
                 </p>
               </td>
 <td>
                 <p>
-                  18.912 (0.554963s)
+                  1.82514 (4.45586s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.75955 (10.1748s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.87025 (25.23s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.11453 (68.8556s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.57965 (3.85654s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.67404 (9.68027s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.8405 (24.8287s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.27588 (74.1096s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (2.44138s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (5.78259s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (13.4902s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (32.5631s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  5.01357 (12.24s)
+                </p>
+              </td>
+<td>
+                <p>
+                  4.38161 (25.337s)
+                </p>
+              </td>
+<td>
+                <p>
+                  4.08681 (55.1319s)
+                </p>
+              </td>
+<td>
+                <p>
+                  4.01045 (130.593s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator_str"></a><p class="title"><b>Table&#160;1.36.&#160;Operator str</b></p>
+<div class="table-contents"><table class="table" summary="Operator str">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.46421 (0.00195137s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.21669 (0.00319216s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.25041 (0.00765237s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.53339 (0.0218096s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.00133271s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.00262366s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.0109 (0.00618661s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.24429 (0.0176978s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.7777 (0.00236916s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.27408 (0.00334274s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.00611991s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0142232s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  11.9797 (0.0159654s)
+                </p>
+              </td>
+<td>
+                <p>
+                  18.3349 (0.0481046s)
+                </p>
+              </td>
+<td>
+                <p>
+                  18.3681 (0.112411s)
+                </p>
+              </td>
+<td>
+                <p>
+                  25.0355 (0.356085s)
                 </p>
               </td>
 </tr>
@@ -2766,7 +3028,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="float_performance.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../perf.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../map.html"><img src="../../images/next.png" alt="Next"></a>
+<a accesskey="p" href="float_performance.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../perf.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="rational_performance.html"><img src="../../images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

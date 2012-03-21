@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <boost/cstdint.hpp>
 #include <boost/multiprecision/mp_number.hpp>
+#include <boost/multiprecision/integer_ops.hpp>
 #include <boost/array.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_floating_point.hpp>
@@ -670,7 +671,7 @@ public:
             while(eval_get_sign(t) != 0)
             {
                cpp_int_backend t2;
-               divide_unsigned_helper(t2, t, block10, r);
+               divide_unsigned_helper(&t2, t, block10, r);
                t = t2;
                limb_type v = r.limbs()[0];
                for(unsigned i = 0; i < digits_per_block_10; ++i)
@@ -1141,15 +1142,15 @@ inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, c
    eval_multiply(result, result, val);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& x, const cpp_int_backend<MinBits, Signed, Allocator>& y, cpp_int_backend<MinBits, Signed, Allocator>& r)
+void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>* result, const cpp_int_backend<MinBits, Signed, Allocator>& x, const cpp_int_backend<MinBits, Signed, Allocator>& y, cpp_int_backend<MinBits, Signed, Allocator>& r)
 {
-   if((&result == &x) || (&r == &x))
+   if((result == &x) || (&r == &x))
    {
       cpp_int_backend<MinBits, Signed, Allocator> t(x);
       divide_unsigned_helper(result, t, y, r);
       return;
    }
-   if((&result == &y) || (&r == &y))
+   if((result == &y) || (&r == &y))
    {
       cpp_int_backend<MinBits, Signed, Allocator> t(y);
       divide_unsigned_helper(result, x, t, r);
@@ -1177,7 +1178,7 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
 
    using default_ops::eval_subtract;
 
-   if(&result == &r)
+   if(result == &r)
    {
       cpp_int_backend<MinBits, Signed, Allocator> rem;
       divide_unsigned_helper(result, x, y, rem);
@@ -1209,13 +1210,15 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
    {
       // x is zero, so is the result:
       r = y;
-      result = x;
+      if(result)
+         *result = x;
       return;
    }
 
    r = x;
    r.sign(false);
-   result = static_cast<limb_type>(0u);
+   if(result)
+      *result = static_cast<limb_type>(0u);
    //
    // Check if the remainder is already less than the divisor, if so
    // we already have the result.  Note we try and avoid a full compare
@@ -1237,7 +1240,8 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
    //
    if(r_order == 0)
    {
-      result = px[0] / py[0];
+      if(result)
+         *result = px[0] / py[0];
       r = px[0] % py[0];
       return;
    }
@@ -1248,18 +1252,24 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
       b = y_order ? 
          (static_cast<double_limb_type>(py[1]) << cpp_int_backend<MinBits, Signed, Allocator>::limb_bits) | py[0] 
          : py[0];
-      result = a / b;
+      if(result)
+         *result = a / b;
       r = a % b;
       return;
    }
    //
    // prepare result:
    //
-   result.resize(1 + r_order - y_order);
+   if(result)
+      result->resize(1 + r_order - y_order);
    typename cpp_int_backend<MinBits, Signed, Allocator>::const_limb_pointer prem = r.limbs();
-   typename cpp_int_backend<MinBits, Signed, Allocator>::limb_pointer pr = result.limbs();
-   for(unsigned i = 1; i < 1 + r_order - y_order; ++i)
-      pr[i] = 0;
+   typename cpp_int_backend<MinBits, Signed, Allocator>::limb_pointer pr;
+   if(result)
+   {
+      pr = result->limbs();
+      for(unsigned i = 1; i < 1 + r_order - y_order; ++i)
+         pr[i] = 0;
+   }
    bool first_pass = true;
 
    do
@@ -1299,28 +1309,31 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
       // Update result:
       //
       limb_type shift = r_order - y_order;
-      if(r_neg)
+      if(result)
       {
-         if(pr[shift] > guess)
-            pr[shift] -= guess;
+         if(r_neg)
+         {
+            if(pr[shift] > guess)
+               pr[shift] -= guess;
+            else
+            {
+               t.resize(shift + 1);
+               t.limbs()[shift] = guess;
+               for(unsigned i = 0; i < shift; ++i)
+                  t.limbs()[i] = 0;
+               eval_subtract(*result, t);
+            }
+         }
+         else if(cpp_int_backend<MinBits, Signed, Allocator>::max_limb_value - pr[shift] > guess)
+            pr[shift] += guess;
          else
          {
             t.resize(shift + 1);
             t.limbs()[shift] = guess;
             for(unsigned i = 0; i < shift; ++i)
                t.limbs()[i] = 0;
-            eval_subtract(result, t);
+            eval_add(*result, t);
          }
-      }
-      else if(cpp_int_backend<MinBits, Signed, Allocator>::max_limb_value - pr[shift] > guess)
-         pr[shift] += guess;
-      else
-      {
-         t.resize(shift + 1);
-         t.limbs()[shift] = guess;
-         for(unsigned i = 0; i < shift; ++i)
-            t.limbs()[i] = 0;
-         eval_add(result, t);
       }
       //
       // Calculate guess * y, we use a fused mutiply-shift O(N) for this
@@ -1359,11 +1372,11 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
       // First time through we need to strip any leading zero, otherwise
       // the termination condition goes belly-up:
       //
-      if(first_pass)
+      if(result && first_pass)
       {
          first_pass = false;
-         while(pr[result.size() - 1] == 0)
-            result.resize(result.size() - 1);
+         while(pr[result->size() - 1] == 0)
+            result->resize(result->size() - 1);
       }
       //
       // Update r_order:
@@ -1382,7 +1395,8 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
    if(r_neg && eval_get_sign(r))
    {
       // We have one too many in the result:
-      eval_decrement(result);
+      if(result)
+         eval_decrement(*result);
       r.negate();
       if(y.sign())
          eval_subtract(r, y);
@@ -1394,16 +1408,16 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
 }
 
 template <unsigned MinBits, bool Signed, class Allocator>
-void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& x, limb_type y, cpp_int_backend<MinBits, Signed, Allocator>& r)
+void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>* result, const cpp_int_backend<MinBits, Signed, Allocator>& x, limb_type y, cpp_int_backend<MinBits, Signed, Allocator>& r)
 {
-   if((&result == &x) || (&r == &x))
+   if((result == &x) || (&r == &x))
    {
       cpp_int_backend<MinBits, Signed, Allocator> t(x);
       divide_unsigned_helper(result, t, y, r);
       return;
    }
 
-   if(&result == &r)
+   if(result == &r)
    {
       cpp_int_backend<MinBits, Signed, Allocator> rem;
       divide_unsigned_helper(result, x, y, rem);
@@ -1442,7 +1456,8 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
    //
    if((r_order == 0) && (*pr < y))
    {
-      result = static_cast<limb_type>(0u);
+      if(result)
+         *result = static_cast<limb_type>(0u);
       return;
    }
 
@@ -1451,8 +1466,11 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
    //
    if(r_order == 0)
    {
-      result = *pr / y;
-      result.sign(x.sign());
+      if(result)
+      {
+         *result = *pr / y;
+         result->sign(x.sign());
+      }
       r.sign(x.sign());
       *pr %= y;
       return;
@@ -1461,16 +1479,23 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
    {
       double_limb_type a;
       a = (static_cast<double_limb_type>(pr[r_order]) << cpp_int_backend<MinBits, Signed, Allocator>::limb_bits) | pr[0];
-      result = a / y;
-      result.sign(x.sign());
+      if(result)
+      {
+         *result = a / y;
+         result->sign(x.sign());
+      }
       r = a % y;
       r.sign(x.sign());
       return;
    }
 
-   result.resize(r_order + 1);
-   typename cpp_int_backend<MinBits, Signed, Allocator>::limb_pointer pres = result.limbs();
-   pres[r_order] = 0;  // just in case we don't set the most significant limb below.
+   typename cpp_int_backend<MinBits, Signed, Allocator>::limb_pointer pres;
+   if(result)
+   {
+      result->resize(r_order + 1);
+      pres = result->limbs();
+      pres[r_order] = 0;  // just in case we don't set the most significant limb below.
+   }
 
    do
    {
@@ -1485,7 +1510,8 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
          r.resize(r.size() - 1);
          --r_order;
          pr[r_order] = static_cast<limb_type>(b);
-         pres[r_order] = static_cast<limb_type>(a / y);
+         if(result)
+            pres[r_order] = static_cast<limb_type>(a / y);
          if(r_order && pr[r_order] == 0)
          {
             --r_order;  // No remainder, division was exact.
@@ -1494,7 +1520,8 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
       }
       else
       {
-         pres[r_order] = pr[r_order] / y;
+         if(result)
+            pres[r_order] = pr[r_order] / y;
          pr[r_order] %= y;
          if(r_order && pr[r_order] == 0)
          {
@@ -1507,10 +1534,12 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>& result,
    // short-circuit cases handled first:
    while(r_order || (pr[r_order] > y));
 
-   result.normalize();
+   if(result)
+   {
+      result->normalize();
+      result->sign(x.sign());
+   }
    r.normalize();
-
-   result.sign(x.sign());
    r.sign(x.sign());
 
    BOOST_ASSERT(r.compare(y) < 0); // remainder must be less than the divisor or our code has failed
@@ -1520,20 +1549,20 @@ template <unsigned MinBits, bool Signed, class Allocator>
 inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, const cpp_int_backend<MinBits, Signed, Allocator>& b)
 {
    cpp_int_backend<MinBits, Signed, Allocator> r;
-   divide_unsigned_helper(result, a, b, r);
+   divide_unsigned_helper(&result, a, b, r);
    result.sign(a.sign() != b.sign());
 }
 template <unsigned MinBits, bool Signed, class Allocator>
 inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, limb_type& b)
 {
    cpp_int_backend<MinBits, Signed, Allocator> r;
-   divide_unsigned_helper(result, a, b, r);
+   divide_unsigned_helper(&result, a, b, r);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
 inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, signed_limb_type& b)
 {
    cpp_int_backend<MinBits, Signed, Allocator> r;
-   divide_unsigned_helper(result, a, std::abs(b), r);
+   divide_unsigned_helper(&result, a, std::abs(b), r);
    if(b < 0)
       result.negate();
 }
@@ -1561,21 +1590,18 @@ inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator>& result, sig
 template <unsigned MinBits, bool Signed, class Allocator>
 inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, const cpp_int_backend<MinBits, Signed, Allocator>& b)
 {
-   cpp_int_backend<MinBits, Signed, Allocator> r;
-   divide_unsigned_helper(r, a, b, result);
+   divide_unsigned_helper(static_cast<cpp_int_backend<MinBits, Signed, Allocator>* >(0), a, b, result);
    result.sign(a.sign());
 }
 template <unsigned MinBits, bool Signed, class Allocator>
 inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, limb_type b)
 {
-   cpp_int_backend<MinBits, Signed, Allocator> r;
-   divide_unsigned_helper(r, a, b, result);
+   divide_unsigned_helper(static_cast<cpp_int_backend<MinBits, Signed, Allocator>* >(0), a, b, result);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
 inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, signed_limb_type b)
 {
-   cpp_int_backend<MinBits, Signed, Allocator> r;
-   divide_unsigned_helper(r, a, static_cast<limb_type>(std::abs(b)), result);
+   divide_unsigned_helper(static_cast<cpp_int_backend<MinBits, Signed, Allocator>* >(0), a, static_cast<limb_type>(std::abs(b)), result);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
 inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& b)
@@ -2024,6 +2050,12 @@ inline int eval_get_sign(const cpp_int_backend<MinBits, Signed, Allocator>& val)
 {
    return eval_is_zero(val) ? 0 : val.sign() ? -1 : 1;
 }
+template <unsigned MinBits, bool Signed, class Allocator>
+inline void eval_abs(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& val)
+{
+   result = val;
+   result.sign(false);
+}
 
 //
 // Get the location of the least-significant-bit:
@@ -2132,6 +2164,36 @@ inline void eval_lcm(cpp_int_backend<MinBits, Signed, Allocator>& result, const 
       result.negate();
 }
 
+template <unsigned MinBits, bool Signed, class Allocator>
+inline void eval_qr(const cpp_int_backend<MinBits, Signed, Allocator>& x, const cpp_int_backend<MinBits, Signed, Allocator>& y, 
+   cpp_int_backend<MinBits, Signed, Allocator>& q, cpp_int_backend<MinBits, Signed, Allocator>& r)
+{
+   divide_unsigned_helper(&q, x, y, r);
+   q.sign(x.sign() != y.sign());
+   r.sign(x.sign());
+}
+
+template <unsigned MinBits, bool Signed, class Allocator, class Integer>
+inline typename enable_if<is_unsigned<Integer>, Integer>::type eval_integer_modulus(const cpp_int_backend<MinBits, Signed, Allocator>& x, Integer val)
+{
+   if((sizeof(Integer) <= sizeof(limb_type)) || (val <= (std::numeric_limits<limb_type>::max)()))
+   {
+      cpp_int_backend<MinBits, Signed, Allocator> d;
+      divide_unsigned_helper(static_cast<cpp_int_backend<MinBits, Signed, Allocator>*>(0), x, val, d);
+      return d.limbs()[0];
+   }
+   else
+   {
+      return default_ops::eval_integer_modulus(x, val);
+   }
+}
+template <unsigned MinBits, bool Signed, class Allocator, class Integer>
+inline typename enable_if<is_signed<Integer>, Integer>::type eval_integer_modulus(const cpp_int_backend<MinBits, Signed, Allocator>& x, Integer val)
+{
+   typedef typename make_unsigned<Integer>::type unsigned_type;
+   return eval_integer_modulus(x, static_cast<unsigned_type>(std::abs(val)));
+}
+
 } // namespace backends;
 
 using boost::multiprecision::backends::cpp_int_backend;
@@ -2147,11 +2209,13 @@ typedef mp_number<cpp_rational_backend>        cpp_rational;
 typedef mp_number<cpp_int_backend<128, false, void> >   mp_uint128_t;
 typedef mp_number<cpp_int_backend<256, false, void> >   mp_uint256_t;
 typedef mp_number<cpp_int_backend<512, false, void> >   mp_uint512_t;
+typedef mp_number<cpp_int_backend<1024, false, void> >  mp_uint1024_t;
 
 // Fixed precision signed types:
 typedef mp_number<cpp_int_backend<128, true, void> >    mp_int128_t;
 typedef mp_number<cpp_int_backend<256, true, void> >    mp_int256_t;
 typedef mp_number<cpp_int_backend<512, true, void> >    mp_int512_t;
+typedef mp_number<cpp_int_backend<1024, true, void> >   mp_int1024_t;
 
 
 }} // namespaces

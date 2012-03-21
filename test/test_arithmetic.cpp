@@ -358,6 +358,11 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    BOOST_TEST(lcm(a, 45) == boost::math::lcm(400, 45));
    BOOST_TEST(gcd(400, b) == boost::math::gcd(400, 45));
    BOOST_TEST(lcm(400, b) == boost::math::lcm(400, 45));
+   Real r;
+   divide_qr(a, b, c, r);
+   BOOST_TEST(c == a / b);
+   BOOST_TEST(r = a % b);
+   BOOST_TEST(integer_modulus(a, 57) == a % 57);
    if(std::numeric_limits<Real>::is_signed)
    {
       a = -20;
@@ -376,6 +381,20 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
       BOOST_TEST(lcm(a, 45) == boost::math::lcm(-400, 45));
       BOOST_TEST(gcd(-400, b) == boost::math::gcd(-400, 45));
       BOOST_TEST(lcm(-400, b) == boost::math::lcm(-400, 45));
+      divide_qr(a, b, c, r);
+      BOOST_TEST(c == a / b);
+      BOOST_TEST(r = a % b);
+      BOOST_TEST(integer_modulus(a, 57) == abs(a % 57));
+      b = -57;
+      divide_qr(a, b, c, r);
+      BOOST_TEST(c == a / b);
+      BOOST_TEST(r = a % b);
+      BOOST_TEST(integer_modulus(a, -57) == abs(a % -57));
+      a = 458;
+      divide_qr(a, b, c, r);
+      BOOST_TEST(c == a / b);
+      BOOST_TEST(r = a % b);
+      BOOST_TEST(integer_modulus(a, -57) == abs(a % -57));
    }
 }
 
