@@ -184,6 +184,7 @@ public:
    BOOST_STATIC_CONSTANT(limb_type, sign_bit_mask = 1u << (limb_bits - 1));
    BOOST_STATIC_CONSTANT(unsigned, internal_limb_count = MinBits / limb_bits + (MinBits % limb_bits ? 1 : 0));
    BOOST_STATIC_CONSTANT(bool, variable = false);
+   BOOST_STATIC_CONSTANT(limb_type, upper_limb_mask = MinBits % limb_bits ? (limb_type(1) << (MinBits % limb_bits)) -1 : (~limb_type(0)));
    BOOST_STATIC_ASSERT_MSG(internal_limb_count >= 2, "A fixed precision integer type must have at least 2 limbs");
 
 private:
@@ -216,7 +217,9 @@ public:
    void normalize()
    {
       limb_pointer p = limbs();
+      p[internal_limb_count-1] &= upper_limb_mask;
       while((m_limbs-1) && !p[m_limbs - 1])--m_limbs;
+      if((m_limbs == 1) && (!*p)) m_sign = false; // zero is always unsigned
    }
 
    cpp_int_base() : m_limbs(1), m_sign(false)
@@ -280,6 +283,7 @@ public:
    BOOST_STATIC_CONSTANT(limb_type, sign_bit_mask = 1u << (limb_bits - 1));
    BOOST_STATIC_CONSTANT(unsigned, internal_limb_count = MinBits / limb_bits + (MinBits % limb_bits ? 1 : 0));
    BOOST_STATIC_CONSTANT(bool, variable = false);
+   BOOST_STATIC_CONSTANT(limb_type, upper_limb_mask = MinBits % limb_bits ? (limb_type(1) << (MinBits % limb_bits)) -1 : (~limb_type(0)));
    BOOST_STATIC_ASSERT_MSG(internal_limb_count >= 2, "A fixed precision integer type must have at least 2 limbs");
 
 private:
@@ -302,6 +306,7 @@ public:
    void normalize()
    {
       limb_pointer p = limbs();
+      p[internal_limb_count-1] &= upper_limb_mask;
       while((m_limbs-1) && !p[m_limbs - 1])--m_limbs;
    }
 

@@ -55,7 +55,7 @@
    std::cout << BOOST_STRINGIZE(x) << " = " << std::numeric_limits<Number>::x << std::endl;
 
 template <class Number>
-void test_fp(const boost::mpl::int_<boost::multiprecision::number_kind_floating_point>&)
+void test_specific(const boost::mpl::int_<boost::multiprecision::number_kind_floating_point>&)
 {
    Number minv, maxv;
    minv = (std::numeric_limits<Number>::min)();
@@ -116,8 +116,21 @@ void test_fp(const boost::mpl::int_<boost::multiprecision::number_kind_floating_
    BOOST_TEST(!(boost::math::isnan)(n));
 }
 
+template <class Number>
+void test_specific(const boost::mpl::int_<boost::multiprecision::number_kind_integer>&)
+{
+   if(std::numeric_limits<Number>::is_modulo)
+   {
+      if(!std::numeric_limits<Number>::is_signed)
+      {
+         BOOST_TEST(1 + (std::numeric_limits<Number>::max)() == 0);
+         BOOST_TEST(--Number(0) == (std::numeric_limits<Number>::max)());
+      }
+   }
+}
+
 template <class Number, class T>
-void test_fp(const T&)
+void test_specific(const T&)
 {
 }
 
@@ -181,7 +194,7 @@ void test()
       boost::mpl::int_<500> // not a number type
    >::type fp_test_type;
 
-   test_fp<Number>(fp_test_type());
+   test_specific<Number>(fp_test_type());
 }
 
 
@@ -226,6 +239,8 @@ int main()
    test<boost::multiprecision::cpp_int>();
    test<boost::multiprecision::mp_int256_t>();
    test<boost::multiprecision::mp_uint512_t>();
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<200, false, void> > >();
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<70, true, void> > >();
 #endif
    return boost::report_errors();
 }

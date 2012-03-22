@@ -1059,6 +1059,7 @@ int main()
    test<boost::multiprecision::mp_uint512_t >();
    test<boost::multiprecision::cpp_rational>();
    test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<>, false> >();
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<500, true, void> > >();
 #endif
 #ifdef TEST_CPP_INT_BR
    test<boost::multiprecision::cpp_rational>();
