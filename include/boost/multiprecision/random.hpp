@@ -9,6 +9,20 @@
 #define BOOST_MP_RANDOM_HPP
 
 #include <boost/multiprecision/mp_number.hpp>
+
+namespace boost{ namespace random{ namespace detail{
+//
+// This is a horrible hack: this declaration has to appear before the definition of
+// uniform_int_distribution, otherwise it won't be used...
+// Need to find a better solution, like make Boost.Random safe to use with
+// UDT's and depricate/remove this header altogether.
+//
+template<class Engine, class Backend, bool ExpressionTemplates>
+boost::multiprecision::mp_number<Backend, ExpressionTemplates> 
+   generate_uniform_int(Engine& eng, const boost::multiprecision::mp_number<Backend, ExpressionTemplates>& min_value, const boost::multiprecision::mp_number<Backend, ExpressionTemplates>& max_value);
+
+}}}
+
 #include <boost/random.hpp>
 #include <boost/mpl/eval_if.hpp>
 
