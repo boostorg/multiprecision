@@ -174,7 +174,6 @@ typename enable_if_c<number_category<Backend>::value == number_kind_integer, boo
    for(unsigned i = 0; i < trials; ++i)
    {
       x = dist(gen);
-      y;
       expmod(x, q, n, y);
       unsigned j = 0;
       while(true)
