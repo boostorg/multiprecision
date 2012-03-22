@@ -225,76 +225,11 @@ The following backends provide integer arithmetic:
 
 [table
 [[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
-[[`gmp_int`][boost/multiprecision/gmp.hpp][2][[gmp]][Very fast and efficient backend.][Dependency on GNU licenced [gmp] library.]]
-[[`mp_int`][boost/multiprecision/tommath.hpp][2][[tommath]][Public domain backend with no licence restrictions.][Slower than [gmp].]]
 [[`cpp_int`][boost/multiprecision/cpp_int.hpp][2][None]
-            [Very versatile, Boost licenced, all C++ integer type which support both arbitrary precision and fixed precision integer types.][Slower than [gmp].]]
+            [Very versatile, Boost licenced, all C++ integer type which support both arbitrary precision and fixed precision integer types.][Slower than [gmp], though typically not as slow as [tommath]]]
+[[`gmp_int`][boost/multiprecision/gmp.hpp][2][[gmp]][Very fast and efficient backend.][Dependency on GNU licenced [gmp] library.]]
+[[`tom_int`][boost/multiprecision/tommath.hpp][2][[tommath]][Public domain backend with no licence restrictions.][Slower than [gmp].]]
 ]
-
-[h4 gmp_int]
-
-   namespace boost{ namespace multiprecision{
-
-   class gmp_int;
-
-   typedef mp_number<gmp_int >         mpz_int;
-
-   }} // namespaces
-
-The `gmp_int` backend is used via the typedef `boost::multiprecision::mpz_int`.  It acts as a thin wrapper around the [gmp] `mpz_t`
-to provide an integer type that is a drop-in replacement for the native C++ integer types, but with unlimited precision.
-
-As well as the usual conversions from arithmetic and string types, type `mpz_int` is copy constructible and assignable from:
-
-* The [gmp] native types: `mpf_t`, `mpz_t`, `mpq_t`.
-* Instances of `mp_number<T>` that are wrappers around those types: `mp_number<gmp_float<N> >`, `mp_number<gmp_rational>`.
-
-It's also possible to access the underlying `mpz_t` via the `data()` member function of `gmp_int`.
-
-Things you should know when using this type:
-
-* No changes are made to the GMP library's global settings - so you can safely mix this type with
-existing code that uses [gmp].
-* Default constructed `gmp_int`'s have the value zero (this is GMP's default behavior).
-* Formatted IO for this type does not support octal or hexadecimal notation for negative values, 
-as a result performing formatted output on this type when the argument is negative and either of the flags
-`std::ios_base::oct` or `std::ios_base::hex` are set, will result in a `std::runtime_error` will be thrown.
-* Division by zero is handled by the [gmp] library - it will trigger a division by zero signal.
-* Although this type is a wrapper around [gmp] it will work equally well with [mpir].  Indeed use of [mpir]
-is recomended on Win32.
-
-[h5 Example:]
-
-[mpz_eg]
-
-[h4 mp_int]
-
-   namespace boost{ namespace multiprecision{
-
-   class tommath_int;
-
-   typedef mp_number<tommath_int >         mp_int;
-
-   }} // namespaces
-
-The `tommath_int` backend is used via the typedef `boost::multiprecision::mp_int`.  It acts as a thin wrapper around the [tommath] `mp_int`
-to provide an integer type that is a drop-in replacement for the native C++ integer types, but with unlimited precision.
-
-Things you should know when using this type:
-
-* Default constructed objects have the value zero (this is [tommath]'s default behavior).
-* Although `mp_int` is mostly a drop in replacement for the builtin integer types, it should be noted that it is a
-rather strange beast as it's a signed type that is not a 2's complement type.  As a result the bitwise operations
-`| & ^` will throw a `std::runtime_error` exception if either of the arguments is negative.  Similarly the complement
-operator`~` is deliberately not implemented for this type.
-* Formatted IO for this type does not support octal or hexadecimal notation for negative values, 
-as a result performing formatted output on this type when the argument is negative and either of the flags
-`std::ios_base::oct` or `std::ios_base::hex` are set, will result in a `std::runtime_error` will be thrown.
-* Division by zero will result in a hardware signal being raised by [tommath].
-
-[h5 Example:]
-
-[tommath_eg]
 
 [h4 cpp_int]
 
@@ -310,16 +245,16 @@ as a result performing formatted output on this type when the argument is negati
    typedef mp_number<cpp_rational_backend>         cpp_rational; // arbitrary precision rational number
 
    // Fixed precision unsigned types:
-   typedef mp_number<cpp_int_backend<128, false, void> >   mp_uint128_t;
-   typedef mp_number<cpp_int_backend<256, false, void> >   mp_uint256_t;
-   typedef mp_number<cpp_int_backend<512, false, void> >   mp_uint512_t;
-   typedef mp_number<cpp_int_backend<1024, false, void> >  mp_uint1024_t;
+   typedef mp_number<cpp_int_backend<128, false, void>, false>   mp_uint128_t;
+   typedef mp_number<cpp_int_backend<256, false, void>, false>   mp_uint256_t;
+   typedef mp_number<cpp_int_backend<512, false, void>, false>   mp_uint512_t;
+   typedef mp_number<cpp_int_backend<1024, false, void>, false>  mp_uint1024_t;
 
    // Fixed precision signed types:
-   typedef mp_number<cpp_int_backend<128, true, void> >    mp_int128_t;
-   typedef mp_number<cpp_int_backend<256, true, void> >    mp_int256_t;
-   typedef mp_number<cpp_int_backend<512, true, void> >    mp_int512_t;
-   typedef mp_number<cpp_int_backend<1024, true, void> >   mp_int1024_t;
+   typedef mp_number<cpp_int_backend<128, true, void>, false>    mp_int128_t;
+   typedef mp_number<cpp_int_backend<256, true, void>, false>    mp_int256_t;
+   typedef mp_number<cpp_int_backend<512, true, void>, false>    mp_int512_t;
+   typedef mp_number<cpp_int_backend<1024, true, void>, false>   mp_int1024_t;
 
    }} // namespaces
 
@@ -360,10 +295,78 @@ That said it should be noted that there's no requirement for built-in types to b
 is the most common format by far.
 * Attempting to print negative values as either an Octal or Hexadecimal string results in a `std::runtime_error` being thrown,
 this is a direct consequence of the sign-magnitude representation.
+* The fixed precision types `mp_[u]intXXX_t` have expression template support turned off - it seems to make little 
+difference to the performance of these types either way - so we may as well have the faster compile times by turning
+the feature off.
 
 [h5 Example:]
 
 [cpp_int_eg]
+
+[h4 gmp_int]
+
+   namespace boost{ namespace multiprecision{
+
+   class gmp_int;
+
+   typedef mp_number<gmp_int >         mpz_int;
+
+   }} // namespaces
+
+The `gmp_int` backend is used via the typedef `boost::multiprecision::mpz_int`.  It acts as a thin wrapper around the [gmp] `mpz_t`
+to provide an integer type that is a drop-in replacement for the native C++ integer types, but with unlimited precision.
+
+As well as the usual conversions from arithmetic and string types, type `mpz_int` is copy constructible and assignable from:
+
+* The [gmp] native types: `mpf_t`, `mpz_t`, `mpq_t`.
+* Instances of `mp_number<T>` that are wrappers around those types: `mp_number<gmp_float<N> >`, `mp_number<gmp_rational>`.
+
+It's also possible to access the underlying `mpz_t` via the `data()` member function of `gmp_int`.
+
+Things you should know when using this type:
+
+* No changes are made to the GMP library's global settings - so you can safely mix this type with
+existing code that uses [gmp].
+* Default constructed `gmp_int`'s have the value zero (this is GMP's default behavior).
+* Formatted IO for this type does not support octal or hexadecimal notation for negative values, 
+as a result performing formatted output on this type when the argument is negative and either of the flags
+`std::ios_base::oct` or `std::ios_base::hex` are set, will result in a `std::runtime_error` will be thrown.
+* Division by zero is handled by the [gmp] library - it will trigger a division by zero signal.
+* Although this type is a wrapper around [gmp] it will work equally well with [mpir].  Indeed use of [mpir]
+is recomended on Win32.
+
+[h5 Example:]
+
+[mpz_eg]
+
+[h4 tom_int]
+
+   namespace boost{ namespace multiprecision{
+
+   class tommath_int;
+
+   typedef mp_number<tommath_int >         tom_int;
+
+   }} // namespaces
+
+The `tommath_int` backend is used via the typedef `boost::multiprecision::tom_int`.  It acts as a thin wrapper around the [tommath] `tom_int`
+to provide an integer type that is a drop-in replacement for the native C++ integer types, but with unlimited precision.
+
+Things you should know when using this type:
+
+* Default constructed objects have the value zero (this is [tommath]'s default behavior).
+* Although `tom_int` is mostly a drop in replacement for the builtin integer types, it should be noted that it is a
+rather strange beast as it's a signed type that is not a 2's complement type.  As a result the bitwise operations
+`| & ^` will throw a `std::runtime_error` exception if either of the arguments is negative.  Similarly the complement
+operator`~` is deliberately not implemented for this type.
+* Formatted IO for this type does not support octal or hexadecimal notation for negative values, 
+as a result performing formatted output on this type when the argument is negative and either of the flags
+`std::ios_base::oct` or `std::ios_base::hex` are set, will result in a `std::runtime_error` will be thrown.
+* Division by zero will result in a hardware signal being raised by [tommath].
+
+[h5 Example:]
+
+[tommath_eg]
 
 [endsect]
 
@@ -611,27 +614,27 @@ Things you should know when using this type:
    namespace boost{ namespace multiprecision{
 
    typedef rational_adpater<tommath_int>        tommath_rational;
-   typedef mp_number<tommath_rational >         mp_rational;
+   typedef mp_number<tommath_rational >         tom_rational;
 
    }} // namespaces
 
-The `tommath_rational` backend is used via the typedef `boost::multiprecision::mp_rational`.  It acts as a thin wrapper around 
-`boost::rational<mp_int>`
+The `tommath_rational` backend is used via the typedef `boost::multiprecision::tom_rational`.  It acts as a thin wrapper around 
+`boost::rational<tom_int>`
 to provide a rational number type that is a drop-in replacement for the native C++ number types, but with unlimited precision.
 
-The advantage of using this type rather than `boost::rational<mp_int>` directly, is that it is expression-template enabled,
+The advantage of using this type rather than `boost::rational<tom_int>` directly, is that it is expression-template enabled,
 greatly reducing the number of temporaries created in complex expressions.
 
 There are also non-member functions:
 
-   mp_int numerator(const mp_rational&);
-   mp_int denominator(const mp_rational&);
+   tom_int numerator(const tom_rational&);
+   tom_int denominator(const tom_rational&);
 
 which return the numerator and denominator of the number.
 
 Things you should know when using this type:
 
-* Default constructed `mp_rational`'s have the value zero (this the inherited Boost.Rational behavior).
+* Default constructed `tom_rational`'s have the value zero (this the inherited Boost.Rational behavior).
 * Division by zero results in a `boost::bad_rational` exception being thrown (see the rational number library's docs for more information).
 * No changes are made to [tommath]'s global state, so this type can safely coexist with other [tommath] code.
 * Performance of this type has been found to be pretty poor - this need further investigation - but it appears that Boost.Rational
@@ -859,6 +862,16 @@ The following example searches for a prime `p` for which `(p-1)/2` is also proba
    struct component_type;
    template <class T>
    struct number_category;
+
+   // Integer specific functions:
+   template <class Backend, bool ExpressionTemplates>
+   bool divide_qr(const ``['mp_number-or-expression-template-type]``& x, const ``['mp_number-or-expression-template-type]``& y,
+                  mp_number<Backend, ExpressionTemplates>& q, mp_number<Backend, ExpressionTemplates>& r);
+   template <class Integer>
+   Integer integer_modulus(const ``['mp_number-or-expression-template-type]``& x, Integer val);
+   template <class Engine>
+   bool miller_rabin_test(const ``['mp_number-or-expression-template-type]``& n, unsigned trials, Engine& gen);
+   bool miller_rabin_test(const ``['mp_number-or-expression-template-type]``& n, unsigned trials);
 
    // Rational number support:
    typename component_type<``['mp_number-or-expression-template-type]``>::type numerator  (const ``['mp_number-or-expression-template-type]``&);
@@ -1123,6 +1136,29 @@ If this is a type with mutiple components (for example rational or complex types
 A traits class that inherits from `mpl::int_<N>` where `N` is one of the enumerated values `number_kind_integer`, `number_kind_floating_point`,
 `number_kind_rational` or `number_kind_fixed_point`.
 
+
+[h4 Integer functions]
+
+   template <class Backend, bool ExpressionTemplates>
+   bool divide_qr(const ``['mp_number-or-expression-template-type]``& x, const ``['mp_number-or-expression-template-type]``& y,
+                  mp_number<Backend, ExpressionTemplates>& q, mp_number<Backend, ExpressionTemplates>& r);
+
+Divides x by y and returns both the quotient and remainder.  After the call `q = x / y` and `r = x % y`.
+
+   template <class Integer>
+   Integer integer_modulus(const ``['mp_number-or-expression-template-type]``& x, Integer val);
+
+Returns the absolute value of `x % val`.
+
+   template <class Engine>
+   bool miller_rabin_test(const ``['mp_number-or-expression-template-type]``& n, unsigned trials, Engine& gen);
+   bool miller_rabin_test(const ``['mp_number-or-expression-template-type]``& n, unsigned trials);
+
+Tests to see if the number /n/ is probably prime - the test excludes the vast majority of composite numbers
+by excluding small prime factors and performing a single Fermat test.  Then performs /trials/ Miller-Rabin
+tests.  Returns `false` if /n/ is definitely composite, or `true` if /n/ is probably prime with the
+probability of it being composite less than 0.25^trials.
+
 [h4 Rational Number Functions]
 
    typename component_type<``['mp_number-or-expression-template-type]``>::type numerator  (const ``['mp_number-or-expression-template-type]``&);
@@ -1373,18 +1409,18 @@ Windows Vista machine.
 
 [table
 [[Integer Type][Relative (and Absolute) Times]]
-[[cpp_int][1.45089(0.481248s)]]
-[[cpp_int (no Expression templates)][1.61489(0.535646s)]]
-[[cpp_int (64-bit cache)][1.39273(0.461956s)]]
-[[cpp_int (256-bit cache)][1.37743(0.456884s)]]
-[[cpp_int (512-bit cache)][1.0919(0.362175s)]]
-[[cpp_int (1024-bit cache)][1.10864(0.367726s)]]
-[[mp_int][3.92956(1.3034s)]]
-[[mp_int (no Expression templates)][4.02496(1.33505s)]]
-[[mp_int1024_t][1.01094(0.335322s)]]
-[[mp_int1024_t (no Expression templates)][1(0.331692s)]]
-[[mpz_int][1.08472(0.359793s)]]
-[[mpz_int (no Expression templates)][1.20865(0.400901s)]]
+[[mpz_int][1.08279(0.370326s)]]
+[[mpz_int (no Expression templates)][1.1702(0.400222s)]]]
+[[cpp_int][1.3612(0.465547s)]]
+[[cpp_int (no Expression templates)][1.33286(0.455854s)]]
+[[cpp_int (64-bit cache)][1.33134(0.455333s)]]
+[[cpp_int (256-bit cache)][1.29367(0.442451s)]]
+[[cpp_int (512-bit cache)][1.08821(0.37218s)]]
+[[cpp_int (1024-bit cache)][1.07902(0.369037s)]]
+[[mp_int1024_t][1.02616(0.35096s)]]
+[[mp_int1024_t (no Expression templates)][1(0.342011s)]]
+[[tom_int][3.74233(1.27992s)]]
+[[tom_int (no Expression templates)][3.97646(1.35999s)]]
 ]
 
 It's interesting to note that expression templates have little effect here - perhaps because the actual expressions involved

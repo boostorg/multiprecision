@@ -69,7 +69,7 @@ namespace boost{ namespace multiprecision{
 
 #ifdef TEST_TOMMATH_BOOST_RATIONAL
 template<>
-struct number_category<rational<mp_int> > : public mpl::int_<number_kind_rational> {};
+struct number_category<rational<tom_int> > : public mpl::int_<number_kind_rational> {};
 #endif
 #ifdef TEST_MPZ_BOOST_RATIONAL
 template<>
@@ -117,7 +117,7 @@ struct is_twos_complement_integer : public boost::mpl::true_ {};
 
 #ifdef TEST_TOMMATH
 template <>
-struct is_twos_complement_integer<boost::multiprecision::mp_int> : public boost::mpl::false_ {};
+struct is_twos_complement_integer<boost::multiprecision::tom_int> : public boost::mpl::false_ {};
 #endif
 
 template <class Real>
@@ -360,6 +360,15 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    BOOST_TEST(lcm(400, b) == boost::math::lcm(400, 45));
    Real r;
    divide_qr(a, b, c, r);
+   BOOST_TEST(c == a / b);
+   BOOST_TEST(r = a % b);
+   divide_qr(a + 0, b, c, r);
+   BOOST_TEST(c == a / b);
+   BOOST_TEST(r = a % b);
+   divide_qr(a, b+0, c, r);
+   BOOST_TEST(c == a / b);
+   BOOST_TEST(r = a % b);
+   divide_qr(a+0, b+0, c, r);
    BOOST_TEST(c == a / b);
    BOOST_TEST(r = a % b);
    BOOST_TEST(integer_modulus(a, 57) == a % 57);
@@ -1035,11 +1044,11 @@ int main()
    test<boost::multiprecision::mpfr_float_50>();
 #endif
 #ifdef TEST_TOMMATH
-   test<boost::multiprecision::mp_int>();
+   test<boost::multiprecision::tom_int>();
    test<boost::multiprecision::mp_number<boost::multiprecision::rational_adapter<boost::multiprecision::tommath_int> > >();
 #endif
 #ifdef TEST_TOMMATH_BOOST_RATIONAL
-   test<boost::rational<boost::multiprecision::mp_int> >();
+   test<boost::rational<boost::multiprecision::tom_int> >();
 #endif
 #ifdef TEST_MPZ_BOOST_RATIONAL
    test<boost::rational<boost::multiprecision::mpz_int> >();

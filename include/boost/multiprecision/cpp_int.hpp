@@ -2206,16 +2206,16 @@ typedef rational_adapter<cpp_int_backend<> >   cpp_rational_backend;
 typedef mp_number<cpp_rational_backend>        cpp_rational;
 
 // Fixed precision unsigned types:
-typedef mp_number<cpp_int_backend<128, false, void> >   mp_uint128_t;
-typedef mp_number<cpp_int_backend<256, false, void> >   mp_uint256_t;
-typedef mp_number<cpp_int_backend<512, false, void> >   mp_uint512_t;
-typedef mp_number<cpp_int_backend<1024, false, void> >  mp_uint1024_t;
+typedef mp_number<cpp_int_backend<128, false, void>, false>   mp_uint128_t;
+typedef mp_number<cpp_int_backend<256, false, void>, false>   mp_uint256_t;
+typedef mp_number<cpp_int_backend<512, false, void>, false>   mp_uint512_t;
+typedef mp_number<cpp_int_backend<1024, false, void>, false>  mp_uint1024_t;
 
 // Fixed precision signed types:
-typedef mp_number<cpp_int_backend<128, true, void> >    mp_int128_t;
-typedef mp_number<cpp_int_backend<256, true, void> >    mp_int256_t;
-typedef mp_number<cpp_int_backend<512, true, void> >    mp_int512_t;
-typedef mp_number<cpp_int_backend<1024, true, void> >   mp_int1024_t;
+typedef mp_number<cpp_int_backend<128, true, void>, false>    mp_int128_t;
+typedef mp_number<cpp_int_backend<256, true, void>, false>    mp_int256_t;
+typedef mp_number<cpp_int_backend<512, true, void>, false>    mp_int512_t;
+typedef mp_number<cpp_int_backend<1024, true, void>, false>   mp_int1024_t;
 
 
 }} // namespaces

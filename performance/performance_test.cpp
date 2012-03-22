@@ -601,18 +601,18 @@ int main()
    test<boost::multiprecision::mpq_rational>("mpq_rational", 1024);
 #endif
 #ifdef TEST_TOMMATH
-   test<boost::multiprecision::mp_int>("tommath_int", 128);
-   test<boost::multiprecision::mp_int>("tommath_int", 256);
-   test<boost::multiprecision::mp_int>("tommath_int", 512);
-   test<boost::multiprecision::mp_int>("tommath_int", 1024);
+   test<boost::multiprecision::tom_int>("tommath_int", 128);
+   test<boost::multiprecision::tom_int>("tommath_int", 256);
+   test<boost::multiprecision::tom_int>("tommath_int", 512);
+   test<boost::multiprecision::tom_int>("tommath_int", 1024);
    /*
    //
    // These are actually too slow to test!!!
    //
-   test<boost::multiprecision::mp_rational>("mp_rational", 128);
-   test<boost::multiprecision::mp_rational>("mp_rational", 256);
-   test<boost::multiprecision::mp_rational>("mp_rational", 512);
-   test<boost::multiprecision::mp_rational>("mp_rational", 1024);
+   test<boost::multiprecision::tom_rational>("tom_rational", 128);
+   test<boost::multiprecision::tom_rational>("tom_rational", 256);
+   test<boost::multiprecision::tom_rational>("tom_rational", 512);
+   test<boost::multiprecision::tom_rational>("tom_rational", 1024);
    */
 #endif
 #ifdef TEST_CPP_DEC_FLOAT

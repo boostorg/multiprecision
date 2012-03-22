@@ -11,7 +11,7 @@ void t1()
    //[tommath_eg
    //=#include <boost/multiprecision/tommath.hpp>
 
-   boost::multiprecision::mp_int v = 1;
+   boost::multiprecision::tom_int v = 1;
 
    // Do some arithmetic:
    for(unsigned i = 1; i <= 1000; ++i)
@@ -48,7 +48,7 @@ void t3()
 
    using namespace boost::multiprecision;
 
-   mp_rational v = 1;
+   tom_rational v = 1;
 
    // Do some arithmetic:
    for(unsigned i = 1; i <= 1000; ++i)
@@ -59,7 +59,7 @@ void t3()
    std::cout << numerator(v) << std::endl;
    std::cout << denominator(v) << std::endl;
 
-   mp_rational w(2, 3); // Component wise constructor
+   tom_rational w(2, 3); // Component wise constructor
    std::cout << w << std::endl; // prints 2/3
 
    //]

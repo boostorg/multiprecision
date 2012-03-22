@@ -228,14 +228,14 @@ struct tommath_int
       d = v;
       return t.compare(d);
    }
-   mp_int& data() { return m_data; }
-   const mp_int& data()const { return m_data; }
+   ::mp_int& data() { return m_data; }
+   const ::mp_int& data()const { return m_data; }
    void swap(tommath_int& o)
    {
       mp_exch(&m_data, &o.data());
    }
 protected:
-   mp_int m_data;
+   ::mp_int m_data;
 };
 
 #define BOOST_MP_TOMMATH_BIT_OP_CHECK(x)\
@@ -478,9 +478,9 @@ using boost::multiprecision::backends::tommath_int;
 template<>
 struct number_category<tommath_int> : public mpl::int_<number_kind_integer>{};
 
-typedef mp_number<tommath_int >                     mp_int;
+typedef mp_number<tommath_int >                     tom_int;
 typedef rational_adapter<tommath_int>               tommath_rational;
-typedef mp_number<tommath_rational>                 mp_rational;
+typedef mp_number<tommath_rational>                 tom_rational;
 
 }}  // namespaces
 

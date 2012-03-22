@@ -143,6 +143,16 @@
 <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
 <span class="keyword">struct</span> <span class="identifier">number_category</span><span class="special">;</span>
 
+<span class="comment">// Integer specific functions:</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="keyword">bool</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span>
+<span class="keyword">bool</span> <span class="identifier">divide_qr</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">x</span><span class="special">,</span> <span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">y</span><span class="special">,</span>
+               <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">q</span><span class="special">,</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">r</span><span class="special">);</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Integer</span><span class="special">&gt;</span>
+<span class="identifier">Integer</span> <span class="identifier">integer_modulus</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">x</span><span class="special">,</span> <span class="identifier">Integer</span> <span class="identifier">val</span><span class="special">);</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Engine</span><span class="special">&gt;</span>
+<span class="keyword">bool</span> <span class="identifier">miller_rabin_test</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">n</span><span class="special">,</span> <span class="keyword">unsigned</span> <span class="identifier">trials</span><span class="special">,</span> <span class="identifier">Engine</span><span class="special">&amp;</span> <span class="identifier">gen</span><span class="special">);</span>
+<span class="keyword">bool</span> <span class="identifier">miller_rabin_test</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">n</span><span class="special">,</span> <span class="keyword">unsigned</span> <span class="identifier">trials</span><span class="special">);</span>
+
 <span class="comment">// Rational number support:</span>
 <span class="keyword">typename</span> <span class="identifier">component_type</span><span class="special">&lt;</span><span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&gt;::</span><span class="identifier">type</span> <span class="identifier">numerator</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
 <span class="keyword">typename</span> <span class="identifier">component_type</span><span class="special">&lt;</span><span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&gt;::</span><span class="identifier">type</span> <span class="identifier">denominator</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;);</span>
@@ -537,6 +547,40 @@
       </p>
 <h5>
 <a name="boost_multiprecision.ref.mp_number.h7"></a>
+        <span><a name="boost_multiprecision.ref.mp_number.integer_functions"></a></span><a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.integer_functions">Integer functions</a>
+      </h5>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="keyword">bool</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span>
+<span class="keyword">bool</span> <span class="identifier">divide_qr</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">x</span><span class="special">,</span> <span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">y</span><span class="special">,</span>
+               <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">q</span><span class="special">,</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">r</span><span class="special">);</span>
+</pre>
+<p>
+        Divides x by y and returns both the quotient and remainder. After the call
+        <code class="computeroutput"><span class="identifier">q</span> <span class="special">=</span>
+        <span class="identifier">x</span> <span class="special">/</span> <span class="identifier">y</span></code> and <code class="computeroutput"><span class="identifier">r</span>
+        <span class="special">=</span> <span class="identifier">x</span> <span class="special">%</span> <span class="identifier">y</span></code>.
+      </p>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Integer</span><span class="special">&gt;</span>
+<span class="identifier">Integer</span> <span class="identifier">integer_modulus</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">x</span><span class="special">,</span> <span class="identifier">Integer</span> <span class="identifier">val</span><span class="special">);</span>
+</pre>
+<p>
+        Returns the absolute value of <code class="computeroutput"><span class="identifier">x</span>
+        <span class="special">%</span> <span class="identifier">val</span></code>.
+      </p>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Engine</span><span class="special">&gt;</span>
+<span class="keyword">bool</span> <span class="identifier">miller_rabin_test</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">n</span><span class="special">,</span> <span class="keyword">unsigned</span> <span class="identifier">trials</span><span class="special">,</span> <span class="identifier">Engine</span><span class="special">&amp;</span> <span class="identifier">gen</span><span class="special">);</span>
+<span class="keyword">bool</span> <span class="identifier">miller_rabin_test</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>mp_number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">n</span><span class="special">,</span> <span class="keyword">unsigned</span> <span class="identifier">trials</span><span class="special">);</span>
+</pre>
+<p>
+        Tests to see if the number <span class="emphasis"><em>n</em></span> is probably prime - the
+        test excludes the vast majority of composite numbers by excluding small prime
+        factors and performing a single Fermat test. Then performs <span class="emphasis"><em>trials</em></span>
+        Miller-Rabin tests. Returns <code class="computeroutput"><span class="keyword">false</span></code>
+        if <span class="emphasis"><em>n</em></span> is definitely composite, or <code class="computeroutput"><span class="keyword">true</span></code>
+        if <span class="emphasis"><em>n</em></span> is probably prime with the probability of it being
+        composite less than 0.25^trials.
+      </p>
+<h5>
+<a name="boost_multiprecision.ref.mp_number.h8"></a>
         <span><a name="boost_multiprecision.ref.mp_number.rational_number_functions"></a></span><a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.rational_number_functions">Rational
         Number Functions</a>
       </h5>
@@ -548,7 +592,7 @@
         respectively.
       </p>
 <h5>
-<a name="boost_multiprecision.ref.mp_number.h8"></a>
+<a name="boost_multiprecision.ref.mp_number.h9"></a>
         <span><a name="boost_multiprecision.ref.mp_number.boost_math_interoperability_support"></a></span><a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.boost_math_interoperability_support">Boost.Math
         Interoperability Support</a>
       </h5>
@@ -571,7 +615,7 @@
         to ensure interoperability.
       </p>
 <h5>
-<a name="boost_multiprecision.ref.mp_number.h9"></a>
+<a name="boost_multiprecision.ref.mp_number.h10"></a>
         <span><a name="boost_multiprecision.ref.mp_number.std__numeric_limits_support"></a></span><a class="link" href="mp_number.html#boost_multiprecision.ref.mp_number.std__numeric_limits_support">std::numeric_limits
         support</a>
       </h5>

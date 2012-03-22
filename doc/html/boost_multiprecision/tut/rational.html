@@ -414,26 +414,26 @@
 <pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">multiprecision</span><span class="special">{</span>
 
 <span class="keyword">typedef</span> <span class="identifier">rational_adpater</span><span class="special">&lt;</span><span class="identifier">tommath_int</span><span class="special">&gt;</span>        <span class="identifier">tommath_rational</span><span class="special">;</span>
-<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">tommath_rational</span> <span class="special">&gt;</span>         <span class="identifier">mp_rational</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">tommath_rational</span> <span class="special">&gt;</span>         <span class="identifier">tom_rational</span><span class="special">;</span>
 
 <span class="special">}}</span> <span class="comment">// namespaces</span>
 </pre>
 <p>
         The <code class="computeroutput"><span class="identifier">tommath_rational</span></code> backend
-        is used via the typedef <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">mp_rational</span></code>.
-        It acts as a thin wrapper around <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">rational</span><span class="special">&lt;</span><span class="identifier">mp_int</span><span class="special">&gt;</span></code> to provide a rational number type that
+        is used via the typedef <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">tom_rational</span></code>.
+        It acts as a thin wrapper around <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">rational</span><span class="special">&lt;</span><span class="identifier">tom_int</span><span class="special">&gt;</span></code> to provide a rational number type that
         is a drop-in replacement for the native C++ number types, but with unlimited
         precision.
       </p>
 <p>
-        The advantage of using this type rather than <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">rational</span><span class="special">&lt;</span><span class="identifier">mp_int</span><span class="special">&gt;</span></code> directly, is that it is expression-template
+        The advantage of using this type rather than <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">rational</span><span class="special">&lt;</span><span class="identifier">tom_int</span><span class="special">&gt;</span></code> directly, is that it is expression-template
         enabled, greatly reducing the number of temporaries created in complex expressions.
       </p>
 <p>
         There are also non-member functions:
       </p>
-<pre class="programlisting"><span class="identifier">mp_int</span> <span class="identifier">numerator</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">mp_rational</span><span class="special">&amp;);</span>
-<span class="identifier">mp_int</span> <span class="identifier">denominator</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">mp_rational</span><span class="special">&amp;);</span>
+<pre class="programlisting"><span class="identifier">tom_int</span> <span class="identifier">numerator</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">tom_rational</span><span class="special">&amp;);</span>
+<span class="identifier">tom_int</span> <span class="identifier">denominator</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">tom_rational</span><span class="special">&amp;);</span>
 </pre>
 <p>
         which return the numerator and denominator of the number.
@@ -443,7 +443,7 @@
       </p>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc">
 <li class="listitem">
-            Default constructed <code class="computeroutput"><span class="identifier">mp_rational</span></code>'s
+            Default constructed <code class="computeroutput"><span class="identifier">tom_rational</span></code>'s
             have the value zero (this the inherited Boost.Rational behavior).
           </li>
 <li class="listitem">
@@ -472,7 +472,7 @@
 
 <span class="keyword">using</span> <span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">;</span>
 
-<span class="identifier">mp_rational</span> <span class="identifier">v</span> <span class="special">=</span> <span class="number">1</span><span class="special">;</span>
+<span class="identifier">tom_rational</span> <span class="identifier">v</span> <span class="special">=</span> <span class="number">1</span><span class="special">;</span>
 
 <span class="comment">// Do some arithmetic:</span>
 <span class="keyword">for</span><span class="special">(</span><span class="keyword">unsigned</span> <span class="identifier">i</span> <span class="special">=</span> <span class="number">1</span><span class="special">;</span> <span class="identifier">i</span> <span class="special">&lt;=</span> <span class="number">1000</span><span class="special">;</span> <span class="special">++</span><span class="identifier">i</span><span class="special">)</span>
@@ -483,7 +483,7 @@
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">numerator</span><span class="special">(</span><span class="identifier">v</span><span class="special">)</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">denominator</span><span class="special">(</span><span class="identifier">v</span><span class="special">)</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
 
-<span class="identifier">mp_rational</span> <span class="identifier">w</span><span class="special">(</span><span class="number">2</span><span class="special">,</span> <span class="number">3</span><span class="special">);</span> <span class="comment">// Component wise constructor</span>
+<span class="identifier">tom_rational</span> <span class="identifier">w</span><span class="special">(</span><span class="number">2</span><span class="special">,</span> <span class="number">3</span><span class="special">);</span> <span class="comment">// Component wise constructor</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">w</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span> <span class="comment">// prints 2/3</span>
 </pre>
 <p>

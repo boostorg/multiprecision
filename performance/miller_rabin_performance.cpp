@@ -151,8 +151,8 @@ int main()
    std::cout << "Time for mpz_int (native Miller Rabin Test) = " << test_miller_rabin_gmp() << std::endl;
 #endif
 #ifdef TEST_TOMMATH
-   test_miller_rabin<mp_number<boost::multiprecision::tommath_int, false> >("mp_int (no Expression templates)");
-   test_miller_rabin<boost::multiprecision::mp_int>("mp_int");
+   test_miller_rabin<mp_number<boost::multiprecision::tommath_int, false> >("tom_int (no Expression templates)");
+   test_miller_rabin<boost::multiprecision::tom_int>("tom_int");
 #endif
    mp_get_memory_functions(&alloc_func_ptr, &realloc_func_ptr, &free_func_ptr);
    mp_set_memory_functions(&alloc_func, &realloc_func, &free_func);

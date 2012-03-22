@@ -220,7 +220,7 @@ int main()
    test<boost::multiprecision::mpfr_float_50>();
 #endif
 #ifdef TEST_TOMMATH
-   test<boost::multiprecision::mp_int>();
+   test<boost::multiprecision::tom_int>();
 #endif
 #ifdef TEST_CPP_INT
    test<boost::multiprecision::cpp_int>();

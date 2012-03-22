@@ -85,35 +85,81 @@ bool check_small_factors(const mp_number<Backend, ExpressionTemplates>& n)
          return false;
    }
 
-   static const boost::uint32_t small_factors5[] = {
-      101u, 103u, 107u, 109u };
-   static const boost::uint32_t pp5 = 121330189u;
+   static const boost::uint32_t small_factors5[6][4] = {
+      { 101u, 103u, 107u, 109u },
+      { 113u, 127u, 131u, 137u },
+      { 139u, 149u, 151u, 157u },
+      { 163u, 167u, 173u, 179u },
+      { 181u, 191u, 193u, 197u },
+      { 199u, 211u, 223u, 227u }
+   };
+   static const boost::uint32_t pp5[6] = 
+   { 
+      121330189u, 
+      113u * 127u * 131u * 137u, 
+      139u * 149u * 151u * 157u,
+      163u * 167u * 173u * 179u,
+      181u * 191u * 193u * 197u,
+      199u * 211u * 223u * 227u
+   };
 
-   m1 = integer_modulus(n, pp5);
-
-   for(unsigned i = 0; i < sizeof(small_factors5) / sizeof(small_factors5[0]); ++i)
+   for(unsigned k = 0; k < sizeof(pp5) / sizeof(*pp5); ++k)
    {
-      BOOST_ASSERT(pp5 % small_factors5[i] == 0);
-      if(m1 % small_factors5[i] == 0)
-         return false;
+      m1 = integer_modulus(n, pp5[k]);
+
+      for(unsigned i = 0; i < 4; ++i)
+      {
+         BOOST_ASSERT(pp5[k] % small_factors5[k][i] == 0);
+         if(m1 % small_factors5[k][i] == 0)
+            return false;
+      }
    }
    return true;
 }
 
+inline bool is_small_prime(unsigned n)
+{
+   static const unsigned char p[] = 
+   {
+      3u, 5u, 7u, 11u, 13u, 17u, 19u, 23u, 29u, 31u, 
+      37u, 41u, 43u, 47u, 53u, 59u, 61u, 67u, 71u, 73u, 
+      79u, 83u, 89u, 97u, 101u, 103u, 107u, 109u, 113u, 
+      127u, 131u, 137u, 139u, 149u, 151u, 157u, 163u, 
+      167u, 173u, 179u, 181u, 191u, 193u, 197u, 199u, 
+      211u, 223u, 227u
+   };
+   for(unsigned i = 0; i < sizeof(p) / sizeof(*p); ++i)
+   {
+      if(n == p[i])
+         return true;
+   }
+   return false;
+}
+
 template <class Backend, bool ExpressionTemplates, class Engine>
-bool miller_rabin_test(const mp_number<Backend, ExpressionTemplates>& n, unsigned trials, Engine& gen)
+typename enable_if_c<number_category<Backend>::value == number_kind_integer, bool>::type 
+   miller_rabin_test(const mp_number<Backend, ExpressionTemplates>& n, unsigned trials, Engine& gen)
 {
    typedef mp_number<Backend, ExpressionTemplates> number_type;
 
-   if(n < 2)
-      return false;
+   if(n <= 227)
+      return is_small_prime(n.template convert_to<unsigned>());
    if((n & 1) == 0)
       return false;
 
    if(!check_small_factors(n))
       return false;
 
-   number_type q = (n - 1) >> 1;
+   number_type nm1 = n - 1;
+   //
+   // Begin with a single Fermat test - it excludes a lot of candidates:
+   //
+   number_type q(228), x, y; // We know n is greater than this, as we've excluded small factors
+   expmod(q, nm1, n, x);
+   if(x != 1u)
+      return false;
+
+   q = (n - 1) >> 1;
    unsigned k = 1;
    while((q & 1) == 0)
    {
@@ -122,14 +168,13 @@ bool miller_rabin_test(const mp_number<Backend, ExpressionTemplates>& n, unsigne
    }
    // Declare our random number generator:
    boost::random::uniform_int_distribution<number_type> dist(0, n);
-   number_type nm1 = n - 1;
    //
    // Execute the trials:
    //
    for(unsigned i = 0; i < trials; ++i)
    {
-      number_type x = dist(gen);
-      number_type y;
+      x = dist(gen);
+      y;
       expmod(x, q, n, y);
       unsigned j = 0;
       while(true)

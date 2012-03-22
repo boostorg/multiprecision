@@ -5,6 +5,7 @@
 
 #include <boost/multiprecision/gmp.hpp>
 #include <boost/multiprecision/miller_rabin.hpp>
+#include <boost/math/special_functions/prime.hpp>
 #include <iostream>
 #include <iomanip>
 #include "test.hpp"
@@ -20,6 +21,7 @@ int main()
    //
    using namespace boost::random;
    using namespace boost::multiprecision;
+
    independent_bits_engine<mt11213b, 256, mpz_int> gen;
    //
    // We must use a different generator for the tests and number generation, otherwise
@@ -28,6 +30,16 @@ int main()
    //
    mt19937 gen2;
 
+   //
+   // Begin by testing the primes in our table as all these should return true:
+   //
+   for(unsigned i = 1; i < boost::math::max_prime; ++i)
+   {
+      BOOST_TEST(miller_rabin_test(mpz_int(boost::math::prime(i)), 25, gen));
+   }
+   //
+   // Now test some random values and compare GMP's native routine with ours.
+   //
    for(unsigned i = 0; i < 10000; ++i)
    {
       mpz_int n = gen();

@@ -130,8 +130,8 @@ int main()
    test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::rational_adapter<boost::multiprecision::gmp_int> > >();
 #endif
 #ifdef TEST_TOMMATH
-   test_round_trip<boost::rational<boost::multiprecision::mp_int> >();
-   test_round_trip<boost::multiprecision::mp_rational >();
+   test_round_trip<boost::rational<boost::multiprecision::tom_int> >();
+   test_round_trip<boost::multiprecision::tom_rational >();
 #endif
    return boost::report_errors();
 }

@@ -120,7 +120,7 @@ int main()
    test_round_trip<boost::multiprecision::mpz_int>();
 #endif
 #ifdef TEST_TOMMATH
-   test_round_trip<boost::multiprecision::mp_int>();
+   test_round_trip<boost::multiprecision::tom_int>();
 #endif
 #ifdef TEST_CPP_INT
    test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<> > >();
