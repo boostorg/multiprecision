@@ -506,6 +506,71 @@ inline typename enable_if<is_integral<Arithmetic> >::type eval_lcm(T& result, co
    eval_lcm(result, b, a);
 }
 
+template <class T>
+inline unsigned eval_lsb(const T& val)
+{
+   typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+   unsigned result = 0;
+   T mask, t;
+   mask = ui_type(1);
+   do
+   {
+      eval_bitwise_and(t, mask, val);
+      ++result;
+      eval_left_shift(mask, 1);
+   }
+   while(eval_is_zero(t));
+   
+   return --result;
+}
+
+template <class T>
+inline bool eval_bit_test(const T& val, unsigned index)
+{
+   typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+   unsigned result = 0;
+   T mask, t;
+   mask = ui_type(1);
+   eval_left_shift(mask, index);
+   eval_bitwise_and(t, mask, val);
+   return !eval_is_zero(t);
+}
+
+template <class T>
+inline void eval_bit_set(T& val, unsigned index)
+{
+   typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+   unsigned result = 0;
+   T mask;
+   mask = ui_type(1);
+   eval_left_shift(mask, index);
+   eval_bitwise_or(val, mask);
+}
+
+template <class T>
+inline void eval_bit_flip(T& val, unsigned index)
+{
+   typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+   unsigned result = 0;
+   T mask;
+   mask = ui_type(1);
+   eval_left_shift(mask, index);
+   eval_bitwise_xor(val, mask);
+}
+
+template <class T>
+inline void eval_bit_unset(T& val, unsigned index)
+{
+   typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+   unsigned result = 0;
+   T mask, t;
+   mask = ui_type(1);
+   eval_left_shift(mask, index);
+   eval_bitwise_and(t, mask, val);
+   if(!eval_is_zero(t))
+      eval_bitwise_xor(val, mask);
+}
+
 //
 // These have to implemented by the backend, declared here so that our macro generated code compiles OK.
 //

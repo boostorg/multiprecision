@@ -1844,7 +1844,7 @@ inline void eval_left_shift(cpp_int_backend<MinBits, Signed, void>& result, doub
    if((ors == 1) && (!*result.limbs()))
       return; // shifting zero yields zero.
    unsigned rs = ors;
-   if(shift && (result.limbs()[rs - 1] >> (cpp_int_backend<MinBits, Signed, void>::limb_bits - shift)))
+   if(shift && (result.limbs()[ors - 1] >> (cpp_int_backend<MinBits, Signed, void>::limb_bits - shift)))
       ++rs; // Most significant limb will overflow when shifted
    rs += offset;
    result.resize(rs);
@@ -1860,7 +1860,7 @@ inline void eval_left_shift(cpp_int_backend<MinBits, Signed, void>& result, doub
       i = 0;
       if(!truncated)
       {
-         if(rs > ors)
+         if(rs > ors + offset)
          {
             pr[rs - 1 - i] = pr[ors - 1 - i] >> (cpp_int_backend<MinBits, Signed, void>::limb_bits - shift);
             --rs;
@@ -1925,7 +1925,7 @@ inline void eval_left_shift(cpp_int_backend<MinBits, Signed, Allocator>& result,
    {
       // This code only works when shift is non-zero, otherwise we invoke undefined behaviour!
       i = 0;
-      if(rs > ors)
+      if(rs > ors + offset)
       {
          pr[rs - 1 - i] = pr[ors - 1 - i] >> (cpp_int_backend<MinBits, Signed, Allocator>::limb_bits - shift);
          --rs;
@@ -2066,7 +2066,7 @@ inline void eval_abs(cpp_int_backend<MinBits, Signed, Allocator>& result, const 
 // Get the location of the least-significant-bit:
 //
 template <unsigned MinBits, bool Signed, class Allocator>
-inline unsigned get_lsb(const cpp_int_backend<MinBits, Signed, Allocator>& a)
+inline unsigned eval_lsb(const cpp_int_backend<MinBits, Signed, Allocator>& a)
 {
    BOOST_ASSERT(eval_get_sign(a) != 0);
    
@@ -2123,8 +2123,8 @@ inline void eval_gcd(cpp_int_backend<MinBits, Signed, Allocator>& result, const 
    /* Let shift := lg K, where K is the greatest power of 2
    dividing both u and v. */
 
-   unsigned us = get_lsb(u);
-   unsigned vs = get_lsb(v);
+   unsigned us = eval_lsb(u);
+   unsigned vs = eval_lsb(v);
    shift = (std::min)(us, vs);
    eval_right_shift(u, us);
    eval_right_shift(v, vs);
@@ -2139,7 +2139,7 @@ inline void eval_gcd(cpp_int_backend<MinBits, Signed, Allocator>& result, const 
       // Termination condition tries not to do a full compare if possible:
       if(!v.limbs()[0] && eval_is_zero(v))
          break;
-      vs = get_lsb(v);
+      vs = eval_lsb(v);
       eval_right_shift(v, vs);
       BOOST_ASSERT((v.limbs()[0] & 1));
       BOOST_ASSERT((u.limbs()[0] & 1));
@@ -2148,6 +2148,66 @@ inline void eval_gcd(cpp_int_backend<MinBits, Signed, Allocator>& result, const 
 
    result = u;
    eval_left_shift(result, shift);
+}
+
+template <unsigned MinBits, bool Signed, class Allocator>
+inline bool eval_bit_test(const cpp_int_backend<MinBits, Signed, Allocator>& val, unsigned index)
+{
+   unsigned offset = index / cpp_int_backend<MinBits, Signed, Allocator>::limb_bits;
+   unsigned shift = index % cpp_int_backend<MinBits, Signed, Allocator>::limb_bits;
+   limb_type mask = shift ? limb_type(1u) << shift : limb_type(1u);
+   if(offset >= val.size())
+      return false;
+   return val.limbs()[offset] & mask ? true : false;
+}
+
+template <unsigned MinBits, bool Signed, class Allocator>
+inline void eval_bit_set(cpp_int_backend<MinBits, Signed, Allocator>& val, unsigned index)
+{
+   unsigned offset = index / cpp_int_backend<MinBits, Signed, Allocator>::limb_bits;
+   unsigned shift = index % cpp_int_backend<MinBits, Signed, Allocator>::limb_bits;
+   limb_type mask = shift ? limb_type(1u) << shift : limb_type(1u);
+   if(offset >= val.size())
+   {
+      unsigned os = val.size();
+      val.resize(offset + 1);
+      if(offset >= val.size())
+         return;  // fixed precision overflow
+      for(unsigned i = os; i <= offset; ++i)
+         val.limbs()[i] = 0;
+   }
+   val.limbs()[offset] |= mask;
+}
+
+template <unsigned MinBits, bool Signed, class Allocator>
+inline void eval_bit_unset(cpp_int_backend<MinBits, Signed, Allocator>& val, unsigned index)
+{
+   unsigned offset = index / cpp_int_backend<MinBits, Signed, Allocator>::limb_bits;
+   unsigned shift = index % cpp_int_backend<MinBits, Signed, Allocator>::limb_bits;
+   limb_type mask = shift ? limb_type(1u) << shift : limb_type(1u);
+   if(offset >= val.size())
+      return;
+   val.limbs()[offset] &= ~mask;
+   val.normalize();
+}
+
+template <unsigned MinBits, bool Signed, class Allocator>
+inline void eval_bit_flip(cpp_int_backend<MinBits, Signed, Allocator>& val, unsigned index)
+{
+   unsigned offset = index / cpp_int_backend<MinBits, Signed, Allocator>::limb_bits;
+   unsigned shift = index % cpp_int_backend<MinBits, Signed, Allocator>::limb_bits;
+   limb_type mask = shift ? limb_type(1u) << shift : limb_type(1u);
+   if(offset >= val.size())
+   {
+      unsigned os = val.size();
+      val.resize(offset + 1);
+      if(offset >= val.size())
+         return;  // fixed precision overflow
+      for(unsigned i = os; i <= offset; ++i)
+         val.limbs()[i] = 0;
+   }
+   val.limbs()[offset] ^= mask;
+   val.normalize();
 }
 
 template <unsigned MinBits, bool Signed, class Allocator>

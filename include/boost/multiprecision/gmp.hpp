@@ -1356,6 +1356,31 @@ inline void eval_lcm(gmp_int& result, const gmp_int& a, const long b)
    mpz_lcm_ui(result.data(), a.data(), std::abs(b));
 }
 
+inline unsigned eval_lsb(const gmp_int& val)
+{
+   return mpz_scan1(val.data(), 0);
+}
+
+inline bool eval_bit_test(const gmp_int& val, unsigned index)
+{
+   return mpz_tstbit(val.data(), index) ? true : false;
+}
+
+inline void eval_bit_set(gmp_int& val, unsigned index)
+{
+   mpz_setbit(val.data(), index);
+}
+
+inline void eval_bit_unset(gmp_int& val, unsigned index)
+{
+   mpz_clrbit(val.data(), index);
+}
+
+inline void eval_bit_flip(gmp_int& val, unsigned index)
+{
+   mpz_combit(val.data(), index);
+}
+
 inline void eval_qr(const gmp_int& x, const gmp_int& y, 
    gmp_int& q, gmp_int& r)
 {

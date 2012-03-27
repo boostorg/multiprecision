@@ -405,6 +405,20 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
       BOOST_TEST(r = a % b);
       BOOST_TEST(integer_modulus(a, -57) == abs(a % -57));
    }
+   for(unsigned i = 0; i < 20; ++i)
+   {
+      if(std::numeric_limits<Real>::is_specialized && (!std::numeric_limits<Real>::is_bounded || (i * 17 < std::numeric_limits<Real>::digits)))
+      {
+         BOOST_TEST(lsb(Real(1) << (i * 17)) == i * 17);
+         BOOST_TEST(bit_test(Real(1) << (i * 17), i * 17));
+         BOOST_TEST(!bit_test(Real(1) << (i * 17), i * 17 + 1));
+         BOOST_TEST(!bit_test(Real(1) << (i * 17), i * 17 - 1));
+         BOOST_TEST(bit_test(bit_set(Real(0), i * 17), i * 17));
+         BOOST_TEST(bit_flip(Real(0), i*17) == Real(1) << i * 17);
+         BOOST_TEST(bit_flip(Real(Real(1) << i * 17), i * 17) == 0);
+         BOOST_TEST(bit_unset(Real(Real(1) << i * 17), i * 17) == 0);
+      }
+   }
 }
 
 template <class Real, class T>

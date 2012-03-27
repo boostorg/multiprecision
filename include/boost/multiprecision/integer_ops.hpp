@@ -89,6 +89,69 @@ inline typename enable_if<mpl::and_<is_integral<Integer>, mpl::bool_<number_cate
    return integer_modulus(result_type(x), val);
 }
 
+template <class Backend, bool ExpressionTemplates>
+inline typename enable_if_c<number_category<Backend>::value == number_kind_integer, unsigned>::type 
+   lsb(const mp_number<Backend, ExpressionTemplates>& x)
+{
+   using default_ops::eval_lsb;
+   return eval_lsb(x.backend());
+}
+
+template <class tag, class A1, class A2, class A3>
+inline typename enable_if_c<number_category<typename multiprecision::detail::mp_exp<tag, A1, A2, A3>::result_type>::value == number_kind_integer, unsigned>::type 
+   lsb(const multiprecision::detail::mp_exp<tag, A1, A2, A3>& x)
+{
+   typedef typename multiprecision::detail::mp_exp<tag, A1, A2, A3>::result_type number_type;
+   number_type n(x);
+   using default_ops::eval_lsb;
+   return eval_lsb(n.backend());
+}
+
+template <class Backend, bool ExpressionTemplates>
+inline typename enable_if_c<number_category<Backend>::value == number_kind_integer, bool>::type 
+   bit_test(const mp_number<Backend, ExpressionTemplates>& x, unsigned index)
+{
+   using default_ops::eval_bit_test;
+   return eval_bit_test(x.backend(), index);
+}
+
+template <class tag, class A1, class A2, class A3>
+inline typename enable_if_c<number_category<typename multiprecision::detail::mp_exp<tag, A1, A2, A3>::result_type>::value == number_kind_integer, bool>::type 
+   bit_test(const multiprecision::detail::mp_exp<tag, A1, A2, A3>& x, unsigned index)
+{
+   typedef typename multiprecision::detail::mp_exp<tag, A1, A2, A3>::result_type number_type;
+   number_type n(x);
+   using default_ops::eval_bit_test;
+   return eval_bit_test(n.backend(), index);
+}
+
+template <class Backend, bool ExpressionTemplates>
+inline typename enable_if_c<number_category<Backend>::value == number_kind_integer, mp_number<Backend, ExpressionTemplates>&>::type 
+   bit_set(mp_number<Backend, ExpressionTemplates>& x, unsigned index)
+{
+   using default_ops::eval_bit_set;
+   eval_bit_set(x.backend(), index);
+   return x;
+}
+
+template <class Backend, bool ExpressionTemplates>
+inline typename enable_if_c<number_category<Backend>::value == number_kind_integer, mp_number<Backend, ExpressionTemplates>&>::type 
+   bit_unset(mp_number<Backend, ExpressionTemplates>& x, unsigned index)
+{
+   using default_ops::eval_bit_unset;
+   eval_bit_unset(x.backend(), index);
+   return x;
+}
+
+template <class Backend, bool ExpressionTemplates>
+inline typename enable_if_c<number_category<Backend>::value == number_kind_integer, mp_number<Backend, ExpressionTemplates>&>::type 
+   bit_flip(mp_number<Backend, ExpressionTemplates>& x, unsigned index)
+{
+   using default_ops::eval_bit_flip;
+   eval_bit_flip(x.backend(), index);
+   return x;
+}
+
 }} //namespaces
 
 #endif

@@ -7,14 +7,14 @@
 
 [library Boost.Multiprecision
     [quickbook 1.5]
-    [copyright 2011 John Maddock]
+    [copyright 2002-2012 John Maddock and Christopher Kormanyos]
     [purpose Multiprecision Number library]
     [license
          Distributed under the Boost Software License, Version 1.0.
          (See accompanying file LICENSE_1_0.txt or copy at
          [@http://www.boost.org/LICENSE_1_0.txt])
     ]
-    [authors [authors, various]]
+    [authors [Maddock, John], [Kormanyos, Christopher]]
     [/last-revision $Date: 2011-07-08 18:51:46 +0100 (Fri, 08 Jul 2011) $]
 ]
 
@@ -869,6 +869,15 @@ The following example searches for a prime `p` for which `(p-1)/2` is also proba
                   mp_number<Backend, ExpressionTemplates>& q, mp_number<Backend, ExpressionTemplates>& r);
    template <class Integer>
    Integer integer_modulus(const ``['mp_number-or-expression-template-type]``& x, Integer val);
+   unsigned lsb(const ``['mp_number-or-expression-template-type]``& x);
+   template <class Backend, class ExpressionTemplates>
+   bool bit_test(const mp_number<Backend, ExpressionTemplates>& val, unsigned index);
+   template <class Backend, class ExpressionTemplates>
+   mp_number<Backend, ExpressionTemplates>& bit_set(mp_number<Backend, ExpressionTemplates>& val, unsigned index);
+   template <class Backend, class ExpressionTemplates>
+   mp_number<Backend, ExpressionTemplates>& bit_unset(mp_number<Backend, ExpressionTemplates>& val, unsigned index);
+   template <class Backend, class ExpressionTemplates>
+   mp_number<Backend, ExpressionTemplates>& bit_flip(mp_number<Backend, ExpressionTemplates>& val, unsigned index);
    template <class Engine>
    bool miller_rabin_test(const ``['mp_number-or-expression-template-type]``& n, unsigned trials, Engine& gen);
    bool miller_rabin_test(const ``['mp_number-or-expression-template-type]``& n, unsigned trials);
@@ -1150,6 +1159,30 @@ Divides x by y and returns both the quotient and remainder.  After the call `q =
 
 Returns the absolute value of `x % val`.
 
+   unsigned lsb(const ``['mp_number-or-expression-template-type]``& x);
+
+Returns the index of the least significant bit that is set to 1.
+
+   template <class Backend, class ExpressionTemplates>
+   bool bit_test(const mp_number<Backend, ExpressionTemplates>& val, unsigned index);
+
+Returns `true` if the bit at /index/ in /val/ is set.
+
+   template <class Backend, class ExpressionTemplates>
+   mp_number<Backend, ExpressionTemplates>& bit_set(mp_number<Backend, ExpressionTemplates>& val, unsigned index);
+
+Sets the bit at /index/ in /val/, and returns /val/.
+
+   template <class Backend, class ExpressionTemplates>
+   mp_number<Backend, ExpressionTemplates>& bit_unset(mp_number<Backend, ExpressionTemplates>& val, unsigned index);
+
+Unsets the bit at /index/ in /val/, and returns /val/.
+
+   template <class Backend, class ExpressionTemplates>
+   mp_number<Backend, ExpressionTemplates>& bit_flip(mp_number<Backend, ExpressionTemplates>& val, unsigned index);
+
+Flips the bit at /index/ in /val/, and returns /val/.
+
    template <class Engine>
    bool miller_rabin_test(const ``['mp_number-or-expression-template-type]``& n, unsigned trials, Engine& gen);
    bool miller_rabin_test(const ``['mp_number-or-expression-template-type]``& n, unsigned trials);
@@ -1209,8 +1242,8 @@ The requirements on the `Backend` template argument to `mp_number` are split up 
 compulsory requirements, and optional requirements that are either to improve performance
 or provide optional features.
 
-In the following tables, type B is the `Backend` template arument to `mp_number`, `b` is
-a variable of B, `cb` and `cb2` are constant variables of type B, `a` is a variable of Arithmetic type, 
+In the following tables, type B is the `Backend` template arument to `mp_number`, `b` and `b2` are
+a variables of type B, `cb` and `cb2` are constant variables of type B, `a` is a variable of Arithmetic type, 
 `s` is a variable of type `const char*`, `ui` is a variable of type `unsigned`, `bb` is a variable of type `bool`,
 `pa` is a variable of type pointer-to-arithmetic-type, `exp` is a variable of type `B::exp_type`,
 `pexp` is a variable of type `B::exp_type*`, B2 is another type that meets these requirements, b2 is a variable
@@ -1354,6 +1387,15 @@ of type B2.
 [[`eval_fmod(b, cb, cb2)`][`void`][Performs the equivalent operation to `std::fmod` on arguments `cb` and `cb2`, and store the result in `b`.  Only required when `B` is an floating-point type.]]
 [[`eval_pow(b, cb, cb2)`][`void`][Performs the equivalent operation to `std::pow` on arguments `cb` and `cb2`, and store the result in `b`.  Only required when `B` is an floating-point type.]]
 [[`eval_atan2(b, cb, cb2)`][`void`][Performs the equivalent operation to `std::atan` on arguments `cb` and `cb2`, and store the result in `b`.  Only required when `B` is an floating-point type.]]
+[[`eval_qr(cb, cb2, b, b2)`][`void`][Sets `b` to the result of `cb / cb2` and `b2` to the result of `cb % cb2`.  Only required when `B` is an integer type.]]
+[[`eval_integer_modulus(cb, ui)`][`unsigned`][Returns the result of `cb % ui`.    Only required when `B` is an integer type.]]
+[[`eval_lsb(cb)`][`unsigned`][Returns the index of the least significant bit that is set.`    Only required when `B` is an integer type.]]
+[[`eval_bit_test(cb, ui)`][`bool`][Returns true if `cb` has bit `ui` set.    Only required when `B` is an integer type.]]
+[[`eval_bit_set(b, ui)`][`void`][Sets the bit at index `ui` in `b`.  Only required when `B` is an integer type.]]
+[[`eval_bit_unset(b, ui)`][`void`][Unsets the bit at index `ui` in `b`.  Only required when `B` is an integer type.]]
+[[`eval_bit_flip(b, ui)`][`void`][Flips the bit at index `ui` in `b`.  Only required when `B` is an integer type.]]
+[[`eval_gcd(b, cb, cb2)`][`void`][Sets `b` to the greatest common divisor of `cb` and `cb2`.    Only required when `B` is an integer type.]]
+[[`eval_lcm(b, cb, cb2)`][`void`][Sets `b` to the least common multiple of `cb` and `cb2`.    Only required when `B` is an integer type.]]
 ]
 
 [note
@@ -1731,6 +1773,10 @@ More a list of what ['could] be done, rather than what ['should] be done (which 
 
 * Add backend support for libdecNumber.
 * Add an adapter backend for complex number types.
+* Add a backend for MPFR interval arithmetic.
+* Add better multiplication routines (Karatsuba, FFT etc) to cpp_int_backend.
+* Add assembly level routines to cpp_int_backend.
+* Add an all C++ binary floating point type.
 
 [endsect]
 

@@ -449,6 +449,11 @@ inline void eval_qr(const tommath_int& x, const tommath_int& y,
    detail::check_tommath_result(mp_div(const_cast< ::mp_int*>(&x.data()), const_cast< ::mp_int*>(&y.data()), &q.data(), &r.data()));
 }
 
+inline unsigned eval_lsb(const tommath_int& val)
+{
+   return mp_cnt_lsb(const_cast<::mp_int*>(&val.data()));
+}
+
 template <class Integer>
 inline typename enable_if<is_unsigned<Integer>, Integer>::type eval_integer_modulus(const tommath_int& x, Integer val)
 {

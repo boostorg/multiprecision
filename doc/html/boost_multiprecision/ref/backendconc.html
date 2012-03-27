@@ -26,13 +26,16 @@
 <p>
         In the following tables, type B is the <code class="computeroutput"><span class="identifier">Backend</span></code>
         template arument to <code class="computeroutput"><span class="identifier">mp_number</span></code>,
-        <code class="computeroutput"><span class="identifier">b</span></code> is a variable of B, <code class="computeroutput"><span class="identifier">cb</span></code> and <code class="computeroutput"><span class="identifier">cb2</span></code>
-        are constant variables of type B, <code class="computeroutput"><span class="identifier">a</span></code>
-        is a variable of Arithmetic type, <code class="computeroutput"><span class="identifier">s</span></code>
-        is a variable of type <code class="computeroutput"><span class="keyword">const</span> <span class="keyword">char</span><span class="special">*</span></code>, <code class="computeroutput"><span class="identifier">ui</span></code> is a variable of type <code class="computeroutput"><span class="keyword">unsigned</span></code>, <code class="computeroutput"><span class="identifier">bb</span></code>
-        is a variable of type <code class="computeroutput"><span class="keyword">bool</span></code>,
-        <code class="computeroutput"><span class="identifier">pa</span></code> is a variable of type
-        pointer-to-arithmetic-type, <code class="computeroutput"><span class="identifier">exp</span></code>
+        <code class="computeroutput"><span class="identifier">b</span></code> and <code class="computeroutput"><span class="identifier">b2</span></code>
+        are a variables of type B, <code class="computeroutput"><span class="identifier">cb</span></code>
+        and <code class="computeroutput"><span class="identifier">cb2</span></code> are constant variables
+        of type B, <code class="computeroutput"><span class="identifier">a</span></code> is a variable
+        of Arithmetic type, <code class="computeroutput"><span class="identifier">s</span></code> is
+        a variable of type <code class="computeroutput"><span class="keyword">const</span> <span class="keyword">char</span><span class="special">*</span></code>, <code class="computeroutput"><span class="identifier">ui</span></code>
+        is a variable of type <code class="computeroutput"><span class="keyword">unsigned</span></code>,
+        <code class="computeroutput"><span class="identifier">bb</span></code> is a variable of type
+        <code class="computeroutput"><span class="keyword">bool</span></code>, <code class="computeroutput"><span class="identifier">pa</span></code>
+        is a variable of type pointer-to-arithmetic-type, <code class="computeroutput"><span class="identifier">exp</span></code>
         is a variable of type <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">exp_type</span></code>, <code class="computeroutput"><span class="identifier">pexp</span></code>
         is a variable of type <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">exp_type</span><span class="special">*</span></code>,
         B2 is another type that meets these requirements, b2 is a variable of type
@@ -2067,6 +2070,113 @@
                 </p>
               </td>
 </tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_qr</span><span class="special">(</span><span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">cb2</span><span class="special">,</span>
+                  <span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">b2</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Sets <code class="computeroutput"><span class="identifier">b</span></code> to the result
+                  of <code class="computeroutput"><span class="identifier">cb</span> <span class="special">/</span>
+                  <span class="identifier">cb2</span></code> and <code class="computeroutput"><span class="identifier">b2</span></code> to the result of <code class="computeroutput"><span class="identifier">cb</span> <span class="special">%</span>
+                  <span class="identifier">cb2</span></code>. Only required when
+                  <code class="computeroutput"><span class="identifier">B</span></code> is an integer
+                  type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_integer_modulus</span><span class="special">(</span><span class="identifier">cb</span><span class="special">,</span> <span class="identifier">ui</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">unsigned</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Returns the result of <code class="computeroutput"><span class="identifier">cb</span>
+                  <span class="special">%</span> <span class="identifier">ui</span></code>.
+                  Only required when <code class="computeroutput"><span class="identifier">B</span></code>
+                  is an integer type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_lsb</span><span class="special">(</span><span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">unsigned</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Returns the index of the least significant bit that is set.<code class="computeroutput">
+                  <span class="identifier">Only</span> <span class="identifier">required</span>
+                  <span class="identifier">when</span> </code>B<code class="computeroutput"> <span class="identifier">is</span> <span class="identifier">an</span>
+                  <span class="identifier">integer</span> <span class="identifier">type</span><span class="special">.]]</span> <span class="special">[[</span></code>eval_bit_test(cb,
+                  ui)<code class="computeroutput"><span class="special">][</span></code>bool<code class="computeroutput"><span class="special">][</span><span class="identifier">Returns</span>
+                  <span class="keyword">true</span> <span class="keyword">if</span>
+                  </code>cb<code class="computeroutput"> <span class="identifier">has</span> <span class="identifier">bit</span> </code>ui<code class="computeroutput"> <span class="identifier">set</span><span class="special">.</span> <span class="identifier">Only</span>
+                  <span class="identifier">required</span> <span class="identifier">when</span>
+                  </code>B<code class="computeroutput"> <span class="identifier">is</span> <span class="identifier">an</span>
+                  <span class="identifier">integer</span> <span class="identifier">type</span><span class="special">.]]</span> <span class="special">[[</span></code>eval_bit_set(b,
+                  ui)<code class="computeroutput"><span class="special">][</span></code>void<code class="computeroutput"><span class="special">][</span><span class="identifier">Sets</span>
+                  <span class="identifier">the</span> <span class="identifier">bit</span>
+                  <span class="identifier">at</span> <span class="identifier">index</span>
+                  </code>ui<code class="computeroutput"> <span class="identifier">in</span> </code>b<code class="computeroutput"><span class="special">.</span> <span class="identifier">Only</span>
+                  <span class="identifier">required</span> <span class="identifier">when</span>
+                  </code>B<code class="computeroutput"> <span class="identifier">is</span> <span class="identifier">an</span>
+                  <span class="identifier">integer</span> <span class="identifier">type</span><span class="special">.]]</span> <span class="special">[[</span></code>eval_bit_unset(b,
+                  ui)<code class="computeroutput"><span class="special">][</span></code>void<code class="computeroutput"><span class="special">][</span><span class="identifier">Unsets</span>
+                  <span class="identifier">the</span> <span class="identifier">bit</span>
+                  <span class="identifier">at</span> <span class="identifier">index</span>
+                  </code>ui<code class="computeroutput"> <span class="identifier">in</span> </code>b<code class="computeroutput"><span class="special">.</span> <span class="identifier">Only</span>
+                  <span class="identifier">required</span> <span class="identifier">when</span>
+                  </code>B<code class="computeroutput"> <span class="identifier">is</span> <span class="identifier">an</span>
+                  <span class="identifier">integer</span> <span class="identifier">type</span><span class="special">.]]</span> <span class="special">[[</span></code>eval_bit_flip(b,
+                  ui)<code class="computeroutput"><span class="special">][</span></code>void<code class="computeroutput"><span class="special">][</span><span class="identifier">Flips</span>
+                  <span class="identifier">the</span> <span class="identifier">bit</span>
+                  <span class="identifier">at</span> <span class="identifier">index</span>
+                  </code>ui<code class="computeroutput"> <span class="identifier">in</span> </code>b<code class="computeroutput"><span class="special">.</span> <span class="identifier">Only</span>
+                  <span class="identifier">required</span> <span class="identifier">when</span>
+                  </code>B<code class="computeroutput"> <span class="identifier">is</span> <span class="identifier">an</span>
+                  <span class="identifier">integer</span> <span class="identifier">type</span><span class="special">.]]</span> <span class="special">[[</span></code>eval_gcd(b,
+                  cb, cb2)<code class="computeroutput"><span class="special">][</span></code>void<code class="computeroutput"><span class="special">][</span><span class="identifier">Sets</span>
+                  </code>b<code class="computeroutput"> <span class="identifier">to</span> <span class="identifier">the</span>
+                  <span class="identifier">greatest</span> <span class="identifier">common</span>
+                  <span class="identifier">divisor</span> <span class="identifier">of</span>
+                  </code>cb<code class="computeroutput"> <span class="keyword">and</span> </code>cb2<code class="computeroutput"><span class="special">.</span> <span class="identifier">Only</span>
+                  <span class="identifier">required</span> <span class="identifier">when</span>
+                  </code>B<code class="computeroutput"> <span class="identifier">is</span> <span class="identifier">an</span>
+                  <span class="identifier">integer</span> <span class="identifier">type</span><span class="special">.]]</span> <span class="special">[[</span></code>eval_lcm(b,
+                  cb, cb2)<code class="computeroutput"><span class="special">][</span></code>void<code class="computeroutput"><span class="special">][</span><span class="identifier">Sets</span>
+                  </code>b<code class="computeroutput"> <span class="identifier">to</span> <span class="identifier">the</span>
+                  <span class="identifier">least</span> <span class="identifier">common</span>
+                  <span class="identifier">multiple</span> <span class="identifier">of</span>
+                  </code>cb<code class="computeroutput"> <span class="keyword">and</span> </code>cb2<code class="computeroutput"><span class="special">.</span> <span class="identifier">Only</span>
+                  <span class="identifier">required</span> <span class="identifier">when</span>
+                  </code>B` is an integer type.
+                </p>
+              </td>
+</tr>
 </tbody>
 </table></div>
 </div>
@@ -2085,7 +2195,7 @@
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2011 John Maddock<p>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2012 John Maddock and Christopher Kormanyos<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

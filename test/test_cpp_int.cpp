@@ -133,6 +133,15 @@ void test()
       BOOST_CHECK_EQUAL((mpz_int(a)^=-b).str(), (test_type(a1) ^= -b1).str());
       BOOST_CHECK_EQUAL(mpz_int(-a^-b).str(), test_type(-a1 ^ -b1).str());
       BOOST_CHECK_EQUAL((mpz_int(-a)^=-b).str(), (test_type(-a1) ^= -b1).str());
+      // Shift ops:
+      for(unsigned i = 0; i < 128; ++i)
+      {
+         if(!std::numeric_limits<test_type>::is_bounded)
+         {
+            BOOST_CHECK_EQUAL(mpz_int(a << i).str(), test_type(a1 << i).str());
+         }
+         BOOST_CHECK_EQUAL(mpz_int(a >> i).str(), test_type(a1 >> i).str());
+      }
       // Now check operations involving signed integers:
       BOOST_CHECK_EQUAL(mpz_int(a + si).str(), test_type(a1 + si).str());
       BOOST_CHECK_EQUAL(mpz_int(a + -si).str(), test_type(a1 + -si).str());
