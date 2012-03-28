@@ -18,7 +18,7 @@
 <a name="boost_multiprecision.tut.reals"></a><a class="link" href="reals.html" title="Floating Point Numbers">Floating Point Numbers</a>
 </h3></div></div></div>
 <p>
-        The following backends provide floating point arithmetic:
+        The following back-ends provide floating point arithmetic:
       </p>
 <div class="informaltable"><table class="table">
 <colgroup>
@@ -85,7 +85,7 @@
               </td>
 <td>
                 <p>
-                  Very fast and efficient backend.
+                  Very fast and efficient back-end.
                 </p>
               </td>
 <td>
@@ -118,7 +118,7 @@
               </td>
 <td>
                 <p>
-                  Very fast and efficient backend, with its own standard library
+                  Very fast and efficient back-end, with its own standard library
                   implementation.
                 </p>
               </td>
@@ -182,7 +182,7 @@
 <span class="special">}}</span> <span class="comment">// namespaces</span>
 </pre>
 <p>
-        The <code class="computeroutput"><span class="identifier">gmp_float</span></code> backend is
+        The <code class="computeroutput"><span class="identifier">gmp_float</span></code> back-end is
         used in conjunction with <code class="computeroutput"><span class="identifier">mp_number</span></code>
         : it acts as a thin wrapper around the <a href="http://gmplib.org" target="_top">GMP</a>
         <code class="computeroutput"><span class="identifier">mpf_t</span></code> to provide an real-number
@@ -196,7 +196,7 @@
         to zero. The typedefs mpf_float_50, mpf_float_100, mpf_float_500, mpf_float_1000
         provide arithmetic types at 50, 100, 500 and 1000 decimal digits precision
         respectively. The typedef mpf_float provides a variable precision type whose
-        precision can be controlled via the <code class="computeroutput"><span class="identifier">mp_number</span></code>'s
+        precision can be controlled via the <code class="computeroutput"><span class="identifier">mp_number</span></code>s
         member functions.
       </p>
 <div class="note"><table border="0" summary="Note">
@@ -236,7 +236,7 @@
       </p>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc">
 <li class="listitem">
-            Default constructed <code class="computeroutput"><span class="identifier">gmp_float</span></code>'s
+            Default constructed <code class="computeroutput"><span class="identifier">gmp_float</span></code>s
             have the value zero (this is the <a href="http://gmplib.org" target="_top">GMP</a>
             library's default behavior).
           </li>
@@ -327,7 +327,7 @@
         to zero. The typedefs mpfr_float_50, mpfr_float_100, mpfr_float_500, mpfr_float_1000
         provide arithmetic types at 50, 100, 500 and 1000 decimal digits precision
         respectively. The typedef mpfr_float provides a variable precision type whose
-        precision can be controlled via the <code class="computeroutput"><span class="identifier">mp_number</span></code>'s
+        precision can be controlled via the <code class="computeroutput"><span class="identifier">mp_number</span></code>s
         member functions.
       </p>
 <div class="note"><table border="0" summary="Note">
@@ -431,7 +431,7 @@
 <span class="special">}}</span> <span class="comment">// namespaces</span>
 </pre>
 <p>
-        The <code class="computeroutput"><span class="identifier">cpp_dec_float</span></code> backend
+        The <code class="computeroutput"><span class="identifier">cpp_dec_float</span></code> back-end
         is used in conjunction with <code class="computeroutput"><span class="identifier">mp_number</span></code>:
         It acts as an entirely C++ (header only and dependency free) real-number
         type that is a drop-in replacement for the native C++ floating-point types,
@@ -440,7 +440,8 @@
 <p>
         Type <code class="computeroutput"><span class="identifier">cpp_dec_float</span></code> can be
         used at fixed precision by specifying a non-zero <code class="computeroutput"><span class="identifier">Digits10</span></code>
-        template parameter. The typedefs cpp_dec_float_50 and cpp_dec_float_100 provide
+        template parameter. The typedefs <code class="computeroutput"><span class="identifier">cpp_dec_float_50</span></code>
+        and <code class="computeroutput"><span class="identifier">cpp_dec_float_100</span></code> provide
         arithmetic types at 50 and 100 decimal digits precision respectively.
       </p>
 <p>
@@ -452,7 +453,7 @@
       </p>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc">
 <li class="listitem">
-            Default constructed <code class="computeroutput"><span class="identifier">cpp_dec_float</span></code>'s
+            Default constructed <code class="computeroutput"><span class="identifier">cpp_dec_float</span></code>s
             have a value of zero.
           </li>
 <li class="listitem">

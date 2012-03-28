@@ -18,20 +18,35 @@
 <a name="boost_multiprecision.intro"></a><a class="link" href="intro.html" title="Introduction">Introduction</a>
 </h2></div></div></div>
 <p>
+      The Multiprecision Library provides <span class="emphasis"><em>User-defined</em></span> integer,
+      rational and floating-point C++ types which try to emulate as closely as practicable
+      the C++ built-in types, but provide for more range and precision. Depending
+      upon the number type, precision may be arbitrarily large (limited only by available
+      memory), fixed at compile time values, for example 50 decimal digits, or a
+      variable controlled at run-time by member functions. The types are expression-template-enabled
+      for better performance than naive user-defined types.
+    </p>
+<p>
       The Multiprecision library comes in two distinct parts:
     </p>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc">
 <li class="listitem">
-          An expression-template-enabled front end <code class="computeroutput"><span class="identifier">mp_number</span></code>
+          An expression-template-enabled front-end <code class="computeroutput"><span class="identifier">mp_number</span></code>
           that handles all the operator overloading, expression evaluation optimization,
           and code reduction.
         </li>
 <li class="listitem">
-          A selection of backends that implement the actual arithmetic operations,
-          and need conform only to the reduced interface requirements of the front
-          end.
+          A selection of back-ends that implement the actual arithmetic operations,
+          and need conform only to the reduced interface requirements of the front-end.
         </li>
 </ul></div>
+<p>
+      Separation of front-end and back-end allows use of highly refined, but restricted
+      license libraries where possible, but provides Boost license alternatives for
+      users who must have a portable unconstrained license. Which is to say some
+      back-ends rely on 3rd party libraries, but a header-only Boost license version
+      is always available (if somewhat slower).
+    </p>
 <p>
       The library is often used via one of the predefined typedefs: for example if
       you wanted an arbitrary precision integer type using <a href="http://gmplib.org" target="_top">GMP</a>
@@ -44,7 +59,7 @@
 <p>
       Alternatively, you can compose your own multiprecision type, by combining
       <code class="computeroutput"><span class="identifier">mp_number</span></code> with one of the predefined
-      backend types. For example, suppose you wanted a 300 decimal digit floating-point
+      back-end types. For example, suppose you wanted a 300 decimal digit floating-point
       type based on the <a href="http://www.mpfr.org" target="_top">MPFR</a> library. In
       this case, there's no predefined typedef with that level of precision, so instead
       we compose our own:
@@ -161,7 +176,7 @@
       tend to be slower to compile than their simpler cousins, they're also harder
       to debug (should you actually want to step through our code!), and rely on
       compiler optimizations being turned on to give really good performance. Also,
-      since the return type from expressions involving <code class="computeroutput"><span class="identifier">mp_number</span></code>'s
+      since the return type from expressions involving <code class="computeroutput"><span class="identifier">mp_number</span></code>s
       is an "unmentionable implementation detail", you have to be careful
       to cast the result of an expression to the actual number type when passing
       an expression to a template function. For example, given:

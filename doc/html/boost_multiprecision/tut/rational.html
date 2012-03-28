@@ -18,7 +18,7 @@
 <a name="boost_multiprecision.tut.rational"></a><a class="link" href="rational.html" title="Rational Number Types">Rational Number Types</a>
 </h3></div></div></div>
 <p>
-        The following backends provide rational number arithmetic:
+        The following back-ends provide rational number arithmetic:
       </p>
 <div class="informaltable"><table class="table">
 <colgroup>
@@ -85,7 +85,7 @@
               </td>
 <td>
                 <p>
-                  Very fast and efficient backend.
+                  Very fast and efficient back-end.
                 </p>
               </td>
 <td>
@@ -182,13 +182,13 @@
               </td>
 <td>
                 <p>
-                  All C++ adapter that allows any inetger backend type to be used
+                  All C++ adapter that allows any inetger back-end type to be used
                   as a rational type.
                 </p>
               </td>
 <td>
                 <p>
-                  Requires an underlying integer backend type.
+                  Requires an underlying integer back-end type.
                 </p>
               </td>
 </tr>
@@ -241,7 +241,7 @@
 <span class="special">}}</span> <span class="comment">// namespaces</span>
 </pre>
 <p>
-        The <code class="computeroutput"><span class="identifier">gmp_rational</span></code> backend
+        The <code class="computeroutput"><span class="identifier">gmp_rational</span></code> back-end
         is used via the typedef <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">mpq_rational</span></code>.
         It acts as a thin wrapper around the <a href="http://gmplib.org" target="_top">GMP</a>
         <code class="computeroutput"><span class="identifier">mpq_t</span></code> to provide a rational
@@ -284,7 +284,7 @@
       </p>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc">
 <li class="listitem">
-            Default constructed <code class="computeroutput"><span class="identifier">mpq_rational</span></code>'s
+            Default constructed <code class="computeroutput"><span class="identifier">mpq_rational</span></code>s
             have the value zero (this is the <a href="http://gmplib.org" target="_top">GMP</a>
             default behavior).
           </li>
@@ -373,7 +373,7 @@
       </p>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc">
 <li class="listitem">
-            Default constructed <code class="computeroutput"><span class="identifier">cpp_rational</span></code>'s
+            Default constructed <code class="computeroutput"><span class="identifier">cpp_rational</span></code>s
             have the value zero.
           </li>
 <li class="listitem">
@@ -419,7 +419,7 @@
 <span class="special">}}</span> <span class="comment">// namespaces</span>
 </pre>
 <p>
-        The <code class="computeroutput"><span class="identifier">tommath_rational</span></code> backend
+        The <code class="computeroutput"><span class="identifier">tommath_rational</span></code> back-end
         is used via the typedef <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">tom_rational</span></code>.
         It acts as a thin wrapper around <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">rational</span><span class="special">&lt;</span><span class="identifier">tom_int</span><span class="special">&gt;</span></code> to provide a rational number type that
         is a drop-in replacement for the native C++ number types, but with unlimited
@@ -443,7 +443,7 @@
       </p>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc">
 <li class="listitem">
-            Default constructed <code class="computeroutput"><span class="identifier">tom_rational</span></code>'s
+            Default constructed <code class="computeroutput"><span class="identifier">tom_rational</span></code>s
             have the value zero (this the inherited Boost.Rational behavior).
           </li>
 <li class="listitem">
@@ -494,7 +494,7 @@
         Boost.Rational</a>
       </h5>
 <p>
-        All of the inetger types in this library can be used as template arguments
+        All of the integer types in this library can be used as template arguments
         to <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">rational</span><span class="special">&lt;</span><span class="identifier">IntType</span><span class="special">&gt;</span></code>.
       </p>
 <p>
@@ -514,11 +514,11 @@
 </pre>
 <p>
         The class template <code class="computeroutput"><span class="identifier">rational_adapter</span></code>
-        is a backend for <code class="computeroutput"><span class="identifier">mp_number</span></code>
-        which converts any existing integer backend into a rational-number backend.
+        is a back-end for <code class="computeroutput"><span class="identifier">mp_number</span></code>
+        which converts any existing integer back-end into a rational-number back-end.
       </p>
 <p>
-        So for example, given an integer backend type <code class="computeroutput"><span class="identifier">MyIntegerBackend</span></code>,
+        So for example, given an integer back-end type <code class="computeroutput"><span class="identifier">MyIntegerBackend</span></code>,
         the use would be something like:
       </p>
 <pre class="programlisting"><span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">MyIntegerBackend</span><span class="special">&gt;</span>                    <span class="identifier">MyInt</span><span class="special">;</span>

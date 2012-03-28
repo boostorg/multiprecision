@@ -70,16 +70,128 @@
                 </p>
               </td>
 </tr>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.3612(0.465547s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int (no Expression templates)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.33286(0.455854s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int (64-bit cache)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.33134(0.455333s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int (256-bit cache)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.29367(0.442451s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int (512-bit cache)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.08821(0.37218s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int (1024-bit cache)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.07902(0.369037s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mp_int1024_t
+                </p>
+              </td>
+<td>
+                <p>
+                  1.02616(0.35096s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mp_int1024_t (no Expression templates)
+                </p>
+              </td>
+<td>
+                <p>
+                  1(0.342011s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tom_int
+                </p>
+              </td>
+<td>
+                <p>
+                  3.74233(1.27992s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tom_int (no Expression templates)
+                </p>
+              </td>
+<td>
+                <p>
+                  3.97646(1.35999s)
+                </p>
+              </td>
+</tr>
 </tbody>
 </table></div>
-<p>
-        [[cpp_int][1.3612(0.465547s)]] [[cpp_int (no Expression templates)][1.33286(0.455854s)]]
-        [[cpp_int (64-bit cache)][1.33134(0.455333s)]] [[cpp_int (256-bit cache)][1.29367(0.442451s)]]
-        [[cpp_int (512-bit cache)][1.08821(0.37218s)]] [[cpp_int (1024-bit cache)][1.07902(0.369037s)]]
-        [[mp_int1024_t][1.02616(0.35096s)]] [[mp_int1024_t (no Expression templates)][1(0.342011s)]]
-        [[tom_int][3.74233(1.27992s)]] [[tom_int (no Expression templates)][3.97646(1.35999s)]]
-        ]
-      </p>
 <p>
         It's interesting to note that expression templates have little effect here
         - perhaps because the actual expressions involved are relatively trivial

@@ -37,12 +37,24 @@
 
 [section:intro Introduction]
 
+The Multiprecision Library provides ['User-defined] integer, rational and floating-point C++ types which
+try to emulate as closely as practicable the C++ built-in types, but provide for more range and
+precision.  Depending upon the number type, precision may be arbitrarily large (limited only by available memory),
+fixed at compile time values, for example 50 decimal
+digits, or a variable controlled at run-time by member functions.  The types are
+expression-template-enabled for better performance than naive user-defined types.
+
 The Multiprecision library comes in two distinct parts:
 
-* An expression-template-enabled front end `mp_number`
+* An expression-template-enabled front-end `mp_number`
 that handles all the operator overloading, expression evaluation optimization, and code reduction.
-* A selection of backends that implement the actual arithmetic operations, and need conform only to the
-reduced interface requirements of the front end.
+* A selection of back-ends that implement the actual arithmetic operations, and need conform only to the
+reduced interface requirements of the front-end.
+
+Separation of front-end and back-end allows use of highly refined, but restricted license libraries
+where possible, but provides Boost license alternatives for users who must have a portable
+unconstrained license.  Which is to say some back-ends rely on 3rd party libraries, but a header-only Boost license version is always
+available (if somewhat slower).
 
 The library is often used via one of the predefined typedefs: for example if you wanted an arbitrary precision
 integer type using [gmp] as the underlying implementation then you could use:
@@ -52,7 +64,7 @@ integer type using [gmp] as the underlying implementation then you could use:
    boost::multiprecision::mpz_int myint;    // Arbitrary precision integer type.
 
 Alternatively, you can compose your own multiprecision type, by combining `mp_number` with one of the
-predefined backend types.  For example, suppose you wanted a 300 decimal digit floating-point type
+predefined back-end types.  For example, suppose you wanted a 300 decimal digit floating-point type
 based on the [mpfr] library. In this case, there's no predefined typedef with that level of precision,
 so instead we compose our own:
 
@@ -135,7 +147,7 @@ Given the comments above, you might be forgiven for thinking that expression-tem
 sadly though, all tricks like this have their downsides.  For one thing, expression template libraries
 like this one, tend to be slower to compile than their simpler cousins, they're also harder to debug
 (should you actually want to step through our code!), and rely on compiler optimizations being turned
-on to give really good performance.  Also, since the return type from expressions involving `mp_number`'s
+on to give really good performance.  Also, since the return type from expressions involving `mp_number`s
 is an "unmentionable implementation detail", you have to be careful to cast the result of an expression
 to the actual number type when passing an expression to a template function.  For example, given:
 
@@ -217,18 +229,18 @@ again, all are using [mpfr] to carry out the underlying arithmetic, and all are 
 [section:tut Tutorial]
 
 In order to use this library you need to make two choices: what kind of number do I want, and
-which backend do I want to perform the actual arithmetic?
+which back-end do I want to perform the actual arithmetic?
 
 [section:ints Integer Types]
 
-The following backends provide integer arithmetic:
+The following back-ends provide integer arithmetic:
 
 [table
 [[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
 [[`cpp_int`][boost/multiprecision/cpp_int.hpp][2][None]
             [Very versatile, Boost licenced, all C++ integer type which support both arbitrary precision and fixed precision integer types.][Slower than [gmp], though typically not as slow as [tommath]]]
-[[`gmp_int`][boost/multiprecision/gmp.hpp][2][[gmp]][Very fast and efficient backend.][Dependency on GNU licenced [gmp] library.]]
-[[`tom_int`][boost/multiprecision/tommath.hpp][2][[tommath]][Public domain backend with no licence restrictions.][Slower than [gmp].]]
+[[`gmp_int`][boost/multiprecision/gmp.hpp][2][[gmp]][Very fast and efficient back-end.][Dependency on GNU licenced [gmp] library.]]
+[[`tom_int`][boost/multiprecision/tommath.hpp][2][[tommath]][Public domain back-end with no licence restrictions.][Slower than [gmp].]]
 ]
 
 [h4 cpp_int]
@@ -263,7 +275,7 @@ The `cpp_int_backend` type is used via one of the typedefs `boost::multiprecisio
 `boost::multiprecision::mp_uint512_t`, `boost::multiprecision::mp_int128_t`, `boost::multiprecision::mp_int256_t`
 or `boost::multiprecision::mp_int512_t`.  
 
-This backend is the "Swiss Army Knife" of integer types as it can represent both fixed and arbitrary precision
+This back-end is the "Swiss Army Knife" of integer types as it can represent both fixed and arbitrary precision
 integer types, and both signed and unsigned types.  There are three template arguments:
 
 [variablelist
@@ -281,7 +293,7 @@ integer types, and both signed and unsigned types.  There are three template arg
 
 Things you should know when using this type:
 
-* Default constructed `cpp_int_backend`'s have the value zero.
+* Default constructed `cpp_int_backend`s have the value zero.
 * Division by zero results in a `std::runtime_error` being thrown.
 * Construction from a string that contains invalid non-numeric characters results in a `std::runtime_error` being thrown.
 * Since the precision of `cpp_int_backend` is necessarily limited when the allocator parameter is void, 
@@ -313,7 +325,7 @@ the feature off.
 
    }} // namespaces
 
-The `gmp_int` backend is used via the typedef `boost::multiprecision::mpz_int`.  It acts as a thin wrapper around the [gmp] `mpz_t`
+The `gmp_int` back-end is used via the typedef `boost::multiprecision::mpz_int`.  It acts as a thin wrapper around the [gmp] `mpz_t`
 to provide an integer type that is a drop-in replacement for the native C++ integer types, but with unlimited precision.
 
 As well as the usual conversions from arithmetic and string types, type `mpz_int` is copy constructible and assignable from:
@@ -327,7 +339,7 @@ Things you should know when using this type:
 
 * No changes are made to the GMP library's global settings - so you can safely mix this type with
 existing code that uses [gmp].
-* Default constructed `gmp_int`'s have the value zero (this is GMP's default behavior).
+* Default constructed `gmp_int`s have the value zero (this is GMP's default behavior).
 * Formatted IO for this type does not support octal or hexadecimal notation for negative values, 
 as a result performing formatted output on this type when the argument is negative and either of the flags
 `std::ios_base::oct` or `std::ios_base::hex` are set, will result in a `std::runtime_error` will be thrown.
@@ -349,7 +361,7 @@ is recomended on Win32.
 
    }} // namespaces
 
-The `tommath_int` backend is used via the typedef `boost::multiprecision::tom_int`.  It acts as a thin wrapper around the [tommath] `tom_int`
+The `tommath_int` back-end is used via the typedef `boost::multiprecision::tom_int`.  It acts as a thin wrapper around the [tommath] `tom_int`
 to provide an integer type that is a drop-in replacement for the native C++ integer types, but with unlimited precision.
 
 Things you should know when using this type:
@@ -372,12 +384,12 @@ as a result performing formatted output on this type when the argument is negati
 
 [section:reals Floating Point Numbers]
 
-The following backends provide floating point arithmetic:
+The following back-ends provide floating point arithmetic:
 
 [table
 [[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
-[[`mpf_float<N>`][boost/multiprecision/gmp.hpp][2][[gmp]][Very fast and efficient backend.][Dependency on GNU licenced [gmp] library.]]
-[[`mpfr_float<N>`][boost/multiprecision/mpfr.hpp][2][[gmp] and [mpfr]][Very fast and efficient backend, with its own standard library implementation.][Dependency on GNU licenced [gmp] and [mpfr] libraries.]]
+[[`mpf_float<N>`][boost/multiprecision/gmp.hpp][2][[gmp]][Very fast and efficient back-end.][Dependency on GNU licenced [gmp] library.]]
+[[`mpfr_float<N>`][boost/multiprecision/mpfr.hpp][2][[gmp] and [mpfr]][Very fast and efficient back-end, with its own standard library implementation.][Dependency on GNU licenced [gmp] and [mpfr] libraries.]]
 [[`cpp_dec_float<N>`][boost/multiprecision/cpp_dec_float.hpp][10][None][Header only, all C++ implementation. Boost licence.][Approximately 2x slower than the [mpfr] or [gmp] libraries.]]
 ]
 
@@ -396,7 +408,7 @@ The following backends provide floating point arithmetic:
 
    }} // namespaces
 
-The `gmp_float` backend is used in conjunction with `mp_number` : it acts as a thin wrapper around the [gmp] `mpf_t`
+The `gmp_float` back-end is used in conjunction with `mp_number` : it acts as a thin wrapper around the [gmp] `mpf_t`
 to provide an real-number type that is a drop-in replacement for the native C++ floating-point types, but with 
 much greater precision.
 
@@ -404,7 +416,7 @@ Type `gmp_float` can be used at fixed precision by specifying a non-zero `Digits
 at variable precision by setting the template argument to zero.  The typedefs mpf_float_50, mpf_float_100,
 mpf_float_500, mpf_float_1000 provide arithmetic types at 50, 100, 500 and 1000 decimal digits precision
 respectively.  The typedef mpf_float provides a variable precision type whose precision can be controlled via the
-`mp_number`'s member functions.
+`mp_number`s member functions.
 
 [note This type only provides standard library and `numeric_limits` support when the precision is fixed at compile time.]
 
@@ -418,7 +430,7 @@ It's also possible to access the underlying `mpf_t` via the `data()` member func
 
 Things you should know when using this type:
 
-* Default constructed `gmp_float`'s have the value zero (this is the [gmp] library's default behavior).
+* Default constructed `gmp_float`s have the value zero (this is the [gmp] library's default behavior).
 * No changes are made to the [gmp] library's global settings, so this type can be safely mixed with
 existing [gmp] code.
 * It is not possible to round-trip objects of this type to and from a string and get back
@@ -458,7 +470,7 @@ Type `mpfr_float_backend` can be used at fixed precision by specifying a non-zer
 at variable precision by setting the template argument to zero.  The typedefs mpfr_float_50, mpfr_float_100,
 mpfr_float_500, mpfr_float_1000 provide arithmetic types at 50, 100, 500 and 1000 decimal digits precision
 respectively.  The typedef mpfr_float provides a variable precision type whose precision can be controlled via the
-`mp_number`'s member functions.
+`mp_number`s member functions.
 
 [note This type only provides `numeric_limits` support when the precision is fixed at compile time.]
 
@@ -495,19 +507,19 @@ Things you should know when using this type:
 
    }} // namespaces
 
-The `cpp_dec_float` backend is used in conjunction with `mp_number`: It acts as an entirely C++ (header only and dependency free)
+The `cpp_dec_float` back-end is used in conjunction with `mp_number`: It acts as an entirely C++ (header only and dependency free)
 real-number type that is a drop-in replacement for the native C++ floating-point types, but with 
 much greater precision.
 
 Type `cpp_dec_float` can be used at fixed precision by specifying a non-zero `Digits10` template parameter.  
-The typedefs cpp_dec_float_50 and cpp_dec_float_100 provide arithmetic types at 50 and 100 decimal digits precision
+The typedefs `cpp_dec_float_50` and `cpp_dec_float_100` provide arithmetic types at 50 and 100 decimal digits precision
 respectively.
 
 There is full standard library and `numeric_limits` support available for this type.
 
 Things you should know when using this type:
 
-* Default constructed `cpp_dec_float`'s have a value of zero.
+* Default constructed `cpp_dec_float`s have a value of zero.
 * The radix of this type is 10.  As a result it can behave subtly differently from base-2 types.
 * It is not possible to round-trip this type to and from a string and get back to exactly the same value
 (this is a result of the type having some hidden internal guard digits).
@@ -522,14 +534,14 @@ Normally these should not be visible to the user.
 
 [section:rational Rational Number Types]
 
-The following backends provide rational number arithmetic:
+The following back-ends provide rational number arithmetic:
 
 [table
 [[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
-[[`gmp_rational`][boost/multiprecision/gmp.hpp][2][[gmp]][Very fast and efficient backend.][Dependency on GNU licenced [gmp] library.]]
+[[`gmp_rational`][boost/multiprecision/gmp.hpp][2][[gmp]][Very fast and efficient back-end.][Dependency on GNU licenced [gmp] library.]]
 [[`cpp_rational`][boost/multiprecision/cpp_int.hpp][2][None][An all C++ Boost-licenced implementation.][Slower than [gmp].]]
 [[`tommath_rational`][boost/multiprecision/tommath.hpp][2][[tommath]][All C/C++ implementation that's Boost Software Licence compatible.][Slower than [gmp].]]
-[[`rational_adapter`][boost/multiprecision/rational_adapter.hpp][N/A][none][All C++ adapter that allows any inetger backend type to be used as a rational type.][Requires an underlying integer backend type.]]
+[[`rational_adapter`][boost/multiprecision/rational_adapter.hpp][N/A][none][All C++ adapter that allows any inetger back-end type to be used as a rational type.][Requires an underlying integer back-end type.]]
 [[`boost::rational`][boost/rational.hpp][N/A][None][A C++ rational number type that can used with any `mp_number` integer type.][The expression templates used by `mp_number` end up being "hidden" inside `boost::rational`: performance may well suffer as a result.]]
 ]
 
@@ -543,7 +555,7 @@ The following backends provide rational number arithmetic:
 
    }} // namespaces
 
-The `gmp_rational` backend is used via the typedef `boost::multiprecision::mpq_rational`.  It acts as a thin wrapper around the [gmp] `mpq_t`
+The `gmp_rational` back-end is used via the typedef `boost::multiprecision::mpq_rational`.  It acts as a thin wrapper around the [gmp] `mpq_t`
 to provide a rational number type that is a drop-in replacement for the native C++ number types, but with unlimited precision.
 
 As well as the usual conversions from arithmetic and string types, instances of `mp_number<gmp_rational>` are copy constructible
@@ -565,7 +577,7 @@ It's also possible to access the underlying `mpq_t` via the `data()` member func
 
 Things you should know when using this type:
 
-* Default constructed `mpq_rational`'s have the value zero (this is the [gmp] default behavior).
+* Default constructed `mpq_rational`s have the value zero (this is the [gmp] default behavior).
 * Division by zero results in a hardware exception inside the [gmp] library.
 * No changes are made to the [gmp] library's global settings, so this type can coexist with existing
 [gmp] code.
@@ -602,7 +614,7 @@ which return the numerator and denominator of the number.
 
 Things you should know when using this type:
 
-* Default constructed `cpp_rational`'s have the value zero.
+* Default constructed `cpp_rational`s have the value zero.
 * Division by zero results in a `std::rumtime_error` being thrown.
 
 [h5 Example:]
@@ -618,7 +630,7 @@ Things you should know when using this type:
 
    }} // namespaces
 
-The `tommath_rational` backend is used via the typedef `boost::multiprecision::tom_rational`.  It acts as a thin wrapper around 
+The `tommath_rational` back-end is used via the typedef `boost::multiprecision::tom_rational`.  It acts as a thin wrapper around 
 `boost::rational<tom_int>`
 to provide a rational number type that is a drop-in replacement for the native C++ number types, but with unlimited precision.
 
@@ -634,7 +646,7 @@ which return the numerator and denominator of the number.
 
 Things you should know when using this type:
 
-* Default constructed `tom_rational`'s have the value zero (this the inherited Boost.Rational behavior).
+* Default constructed `tom_rational`s have the value zero (this the inherited Boost.Rational behavior).
 * Division by zero results in a `boost::bad_rational` exception being thrown (see the rational number library's docs for more information).
 * No changes are made to [tommath]'s global state, so this type can safely coexist with other [tommath] code.
 * Performance of this type has been found to be pretty poor - this need further investigation - but it appears that Boost.Rational
@@ -646,7 +658,7 @@ needs some improvement in this area.
 
 [h4 Use With Boost.Rational]
 
-All of the inetger types in this library can be used as template arguments to `boost::rational<IntType>`.
+All of the integer types in this library can be used as template arguments to `boost::rational<IntType>`.
 
 Note that using the library in this way largely negates the effect of the expression templates in `mp_number`.
 
@@ -659,10 +671,10 @@ Note that using the library in this way largely negates the effect of the expres
 
    }}
 
-The class template `rational_adapter` is a backend for `mp_number` which converts any existing integer backend
-into a rational-number backend.
+The class template `rational_adapter` is a back-end for `mp_number` which converts any existing integer back-end
+into a rational-number back-end.
 
-So for example, given an integer backend type `MyIntegerBackend`, the use would be something like:
+So for example, given an integer back-end type `MyIntegerBackend`, the use would be something like:
 
    typedef mp_number<MyIntegerBackend>                    MyInt;
    typedef mp_number<rational_adapter<MyIntegerBackend> > MyRational;
@@ -719,13 +731,13 @@ The library implements a fairly basic (meaning unoptimized, and possibly slow) M
    bool miller_rabin_test(const mp_number<Backend, ExpressionTemplates>& n, unsigned trials);
 
 These functions perform a Miller-Rabin test for primality, if the result is `false` then /n/ is definitely composite,
-while if the result is `true` then /n/ is prime with probability 0.25^trials.  The algorithm used is straight out of
+while if the result is `true` then /n/ is prime with probability ['0.25^trials].  The algorithm used is straight out of
 Knuth Vol 2, which recomends 25 trials for a pretty strong likelyhood that /n/ is prime.
 
 The third optional argument is for a Uniform Random Number Generator from Boost.Random.  When not provided the `mt19937`
 generator is used.   Note that when producing random primes then you should probably use a different random number generator 
-to produce possible primes, than used internally for testing whether the value is prime.  It also helps of course to seed the
-generators with some source of randomness.
+to produce candidate prime numbers for testing, than is used internally by `miller_rabin_test` for determining 
+whether the value is prime.  It also helps of course to seed the generators with some source of randomness.
 
 The following example searches for a prime `p` for which `(p-1)/2` is also probably prime:
 
@@ -918,7 +930,7 @@ The following example searches for a prime `p` for which `(p-1)/2` is also proba
 Class `mp_number` has two template arguments:
 
 [variablelist
-[[Backend][The actual arithmetic backend that does all the work.]]
+[[Backend][The actual arithmetic back-end that does all the work.]]
 [[ExpressionTemplates][A boolean value: when true, then expression templates are enabled, otherwise they are disabled.]]
 ]
 
@@ -1023,7 +1035,7 @@ Returns:
       Backend& backend();
       const Backend& backend()const;
 
-Returns the underlying backend instance used by `*this`.
+Returns the underlying back-end instance used by `*this`.
 
 [h4 Non-member operators]
 
@@ -1083,7 +1095,7 @@ Swaps `a` and `b`.
 
 These operators provided formatted input-output operations on `mp_number` types, and expression templates derived from them.
 
-It's down to the backend type to actually implement string conversion.  However, the backends provided with
+It's down to the back-end type to actually implement string conversion.  However, the back-ends provided with
 this library support all of the iostream formatting flags, field width and precision settings.
 
 [h4 Non-member standard library function support]
@@ -1299,8 +1311,8 @@ of type B2.
 
 [table Optional Requirements on the Backend Type
 [[Expression][Returns][Comments]]
-[[`B(b2)`][`B`][Copy constructor from a different backend type.]]
-[[`b = b2`][`b&`][Assignment operator from a different backend type.]]
+[[`B(b2)`][`B`][Copy constructor from a different back-end type.]]
+[[`b = b2`][`b&`][Assignment operator from a different back-end type.]]
 [[`assign_components(b, a, a)`][`void`][Assigns to `b` the two components in the following arguments.  
                            Only applies to rational and complex number types.]]
 [[`assign_components(b, b2, b2)`][`void`][Assigns to `b` the two components in the following arguments.  
@@ -1389,13 +1401,13 @@ of type B2.
 [[`eval_atan2(b, cb, cb2)`][`void`][Performs the equivalent operation to `std::atan` on arguments `cb` and `cb2`, and store the result in `b`.  Only required when `B` is an floating-point type.]]
 [[`eval_qr(cb, cb2, b, b2)`][`void`][Sets `b` to the result of `cb / cb2` and `b2` to the result of `cb % cb2`.  Only required when `B` is an integer type.]]
 [[`eval_integer_modulus(cb, ui)`][`unsigned`][Returns the result of `cb % ui`.    Only required when `B` is an integer type.]]
-[[`eval_lsb(cb)`][`unsigned`][Returns the index of the least significant bit that is set.`    Only required when `B` is an integer type.]]
-[[`eval_bit_test(cb, ui)`][`bool`][Returns true if `cb` has bit `ui` set.    Only required when `B` is an integer type.]]
+[[`eval_lsb(cb)`][`unsigned`][Returns the index of the least significant bit that is set.  Only required when `B` is an integer type.]]
+[[`eval_bit_test(cb, ui)`][`bool`][Returns true if `cb` has bit `ui` set.  Only required when `B` is an integer type.]]
 [[`eval_bit_set(b, ui)`][`void`][Sets the bit at index `ui` in `b`.  Only required when `B` is an integer type.]]
 [[`eval_bit_unset(b, ui)`][`void`][Unsets the bit at index `ui` in `b`.  Only required when `B` is an integer type.]]
 [[`eval_bit_flip(b, ui)`][`void`][Flips the bit at index `ui` in `b`.  Only required when `B` is an integer type.]]
-[[`eval_gcd(b, cb, cb2)`][`void`][Sets `b` to the greatest common divisor of `cb` and `cb2`.    Only required when `B` is an integer type.]]
-[[`eval_lcm(b, cb, cb2)`][`void`][Sets `b` to the least common multiple of `cb` and `cb2`.    Only required when `B` is an integer type.]]
+[[`eval_gcd(b, cb, cb2)`][`void`][Sets `b` to the greatest common divisor of `cb` and `cb2`.  Only required when `B` is an integer type.]]
+[[`eval_lcm(b, cb, cb2)`][`void`][Sets `b` to the least common multiple of `cb` and `cb2`.  Only required when `B` is an integer type.]]
 ]
 
 [note
@@ -1413,7 +1425,7 @@ in point of fact this naming convension shouldn't be necessary, but rather works
 These tests test the total time taken to execute all of Boost.Math's test cases for these functions.
 In each case the best performing library gets a relative score of 1, with the total execution time
 given in brackets.  The first three libraries listed are the various floating point types provided
-by this library, while for comparison, two popular C++ frontends to [mpfr] ([mpfr_class] and [mpreal])
+by this library, while for comparison, two popular C++ front-ends to [mpfr] ([mpfr_class] and [mpreal])
 are also shown.
 
 Test code was compiled with Microsoft Visual Studio 2010 with all optimisations
@@ -1452,7 +1464,7 @@ Windows Vista machine.
 [table
 [[Integer Type][Relative (and Absolute) Times]]
 [[mpz_int][1.08279(0.370326s)]]
-[[mpz_int (no Expression templates)][1.1702(0.400222s)]]]
+[[mpz_int (no Expression templates)][1.1702(0.400222s)]]
 [[cpp_int][1.3612(0.465547s)]]
 [[cpp_int (no Expression templates)][1.33286(0.455854s)]]
 [[cpp_int (64-bit cache)][1.33134(0.455333s)]]
@@ -1476,7 +1488,7 @@ altogether - cutting about a third off the total runtime.
 
 Note that these tests are carefully designed to test performance of the underlying algorithms
 and not memory allocation or variable copying.  As usual, performance results should be taken
-with a healthy dose of scepticsm, and real-world peformance may vary widely depending upon the
+with a healthy dose of scepticism, and real-world peformance may vary widely depending upon the
 specifics of the program.  In each table relative times are given first, with the best performer
 given a score of 1.  Total actual times are given in brackets, measured in seconds for 500000
 operations.
@@ -1546,7 +1558,7 @@ Windows Vista machine.
 
 Note that these tests are carefully designed to test performance of the underlying algorithms
 and not memory allocation or variable copying.  As usual, performance results should be taken
-with a healthy dose of scepticsm, and real-world peformance may vary widely depending upon the
+with a healthy dose of scepticism, and real-world peformance may vary widely depending upon the
 specifics of the program.  In each table relative times are given first, with the best performer
 given a score of 1.  Total actual times are given in brackets, measured in seconds for 500000
 operations.
@@ -1703,7 +1715,7 @@ Linux x86_64 results are broadly similar, except that libtommath performs much b
 
 Note that these tests are carefully designed to test performance of the underlying algorithms
 and not memory allocation or variable copying.  As usual, performance results should be taken
-with a healthy dose of scepticsm, and real-world peformance may vary widely depending upon the
+with a healthy dose of scepticism, and real-world peformance may vary widely depending upon the
 specifics of the program.  In each table relative times are given first, with the best performer
 given a score of 1.  Total actual times are given in brackets, measured in seconds for 500000
 operations.
@@ -1771,9 +1783,9 @@ Windows Vista machine.
 
 More a list of what ['could] be done, rather than what ['should] be done (which may be a much smaller list!).
 
-* Add backend support for libdecNumber.
-* Add an adapter backend for complex number types.
-* Add a backend for MPFR interval arithmetic.
+* Add back-end support for libdecNumber.
+* Add an adapter back-end for complex number types.
+* Add a back-end for MPFR interval arithmetic.
 * Add better multiplication routines (Karatsuba, FFT etc) to cpp_int_backend.
 * Add assembly level routines to cpp_int_backend.
 * Add an all C++ binary floating point type.

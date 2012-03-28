@@ -18,7 +18,7 @@
 <a name="boost_multiprecision.tut.ints"></a><a class="link" href="ints.html" title="Integer Types">Integer Types</a>
 </h3></div></div></div>
 <p>
-        The following backends provide integer arithmetic:
+        The following back-ends provide integer arithmetic:
       </p>
 <div class="informaltable"><table class="table">
 <colgroup>
@@ -119,7 +119,7 @@
               </td>
 <td>
                 <p>
-                  Very fast and efficient backend.
+                  Very fast and efficient back-end.
                 </p>
               </td>
 <td>
@@ -152,7 +152,7 @@
               </td>
 <td>
                 <p>
-                  Public domain backend with no licence restrictions.
+                  Public domain back-end with no licence restrictions.
                 </p>
               </td>
 <td>
@@ -200,9 +200,9 @@
         <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">mp_int256_t</span></code> or <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">mp_int512_t</span></code>.
       </p>
 <p>
-        This backend is the "Swiss Army Knife" of integer types as it can
-        represent both fixed and arbitrary precision integer types, and both signed
-        and unsigned types. There are three template arguments:
+        This back-end is the "Swiss Army Knife" of integer types as it
+        can represent both fixed and arbitrary precision integer types, and both
+        signed and unsigned types. There are three template arguments:
       </p>
 <div class="variablelist">
 <p class="title"><b></b></p>
@@ -237,7 +237,7 @@
       </p>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc">
 <li class="listitem">
-            Default constructed <code class="computeroutput"><span class="identifier">cpp_int_backend</span></code>'s
+            Default constructed <code class="computeroutput"><span class="identifier">cpp_int_backend</span></code>s
             have the value zero.
           </li>
 <li class="listitem">
@@ -317,7 +317,7 @@
 <span class="special">}}</span> <span class="comment">// namespaces</span>
 </pre>
 <p>
-        The <code class="computeroutput"><span class="identifier">gmp_int</span></code> backend is used
+        The <code class="computeroutput"><span class="identifier">gmp_int</span></code> back-end is used
         via the typedef <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">mpz_int</span></code>. It acts as a thin wrapper around
         the <a href="http://gmplib.org" target="_top">GMP</a> <code class="computeroutput"><span class="identifier">mpz_t</span></code>
         to provide an integer type that is a drop-in replacement for the native C++
@@ -352,7 +352,7 @@
             safely mix this type with existing code that uses <a href="http://gmplib.org" target="_top">GMP</a>.
           </li>
 <li class="listitem">
-            Default constructed <code class="computeroutput"><span class="identifier">gmp_int</span></code>'s
+            Default constructed <code class="computeroutput"><span class="identifier">gmp_int</span></code>s
             have the value zero (this is GMP's default behavior).
           </li>
 <li class="listitem">
@@ -411,8 +411,8 @@
 <span class="special">}}</span> <span class="comment">// namespaces</span>
 </pre>
 <p>
-        The <code class="computeroutput"><span class="identifier">tommath_int</span></code> backend is
-        used via the typedef <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">tom_int</span></code>.
+        The <code class="computeroutput"><span class="identifier">tommath_int</span></code> back-end
+        is used via the typedef <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">tom_int</span></code>.
         It acts as a thin wrapper around the <a href="http://libtom.org/?page=features&amp;newsitems=5&amp;whatfile=ltm" target="_top">libtommath</a>
         <code class="computeroutput"><span class="identifier">tom_int</span></code> to provide an integer
         type that is a drop-in replacement for the native C++ integer types, but
