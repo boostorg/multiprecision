@@ -56,7 +56,7 @@ where possible, but provides Boost license alternatives for users who must have 
 unconstrained license.  Which is to say some back-ends rely on 3rd party libraries, but a header-only Boost license version is always
 available (if somewhat slower).
 
-The library is often used via one of the predefined typedefs: for example if you wanted an arbitrary precision
+The library is often used via one of the predefined typedefs: for example if you wanted an [@http://en.wikipedia.org/wiki/Arbitrary-precision_arithmetic arbitrary precision]
 integer type using [gmp] as the underlying implementation then you could use:
 
    #include <boost/multiprecision/gmp.hpp>  // Defines the wrappers around the GMP library's types
@@ -238,7 +238,7 @@ The following back-ends provide integer arithmetic:
 [table
 [[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
 [[`cpp_int`][boost/multiprecision/cpp_int.hpp][2][None]
-            [Very versatile, Boost licenced, all C++ integer type which support both arbitrary precision and fixed precision integer types.][Slower than [gmp], though typically not as slow as [tommath]]]
+            [Very versatile, Boost licenced, all C++ integer type which support both [@http://en.wikipedia.org/wiki/Arbitrary-precision_arithmetic arbitrary precision] and fixed precision integer types.][Slower than [gmp], though typically not as slow as [tommath]]]
 [[`gmp_int`][boost/multiprecision/gmp.hpp][2][[gmp]][Very fast and efficient back-end.][Dependency on GNU licenced [gmp] library.]]
 [[`tom_int`][boost/multiprecision/tommath.hpp][2][[tommath]][Public domain back-end with no licence restrictions.][Slower than [gmp].]]
 ]
@@ -275,7 +275,8 @@ The `cpp_int_backend` type is used via one of the typedefs `boost::multiprecisio
 `boost::multiprecision::mp_uint512_t`, `boost::multiprecision::mp_int128_t`, `boost::multiprecision::mp_int256_t`
 or `boost::multiprecision::mp_int512_t`.  
 
-This back-end is the "Swiss Army Knife" of integer types as it can represent both fixed and arbitrary precision
+This back-end is the "Swiss Army Knife" of integer types as it can represent both fixed and 
+[@http://en.wikipedia.org/wiki/Arbitrary-precision_arithmetic arbitrary precision]
 integer types, and both signed and unsigned types.  There are three template arguments:
 
 [variablelist
@@ -285,7 +286,8 @@ integer types, and both signed and unsigned types.  There are three template arg
            values will be stored internally before memory allocation is required.  
            When the Allocator parameter is type `void`, then this field
            determines the total number of bits in the resulting fixed precision type.]]
-[[Signed][Determines whether the resulting type is signed or not.  Note that for arbitrary precision types
+[[Signed][Determines whether the resulting type is signed or not.  Note that for 
+[@http://en.wikipedia.org/wiki/Arbitrary-precision_arithmetic arbitrary precision] types
           (where the Allocator parameter is non-void), then this parameter must be `true`.  For fixed precision
           types then this type may be either `true` (type is signed), or `false` (type is unsigned).]]
 [[Allocator][The allocator to use for dymamic memory allocation, or type `void` if this is to be a fixed precision type.]]
@@ -690,7 +692,7 @@ So for example, given an integer back-end type `MyIntegerBackend`, the use would
 [section:random Generating Random Numbers]
 
 Random numbers are generated in conjunction with Boost.Random.  However, since Boost.Random is unaware
-of arbitrary precision numbers, it's necessary to include the header:
+of [@http://en.wikipedia.org/wiki/Arbitrary-precision_arithmetic arbitrary precision] numbers, it's necessary to include the header:
 
    #include <boost/multiprecision/random.hpp>
 
