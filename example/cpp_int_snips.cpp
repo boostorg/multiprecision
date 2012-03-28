@@ -21,7 +21,7 @@ void t1()
 
    std::cout << v << std::endl; // prints 20!
 
-   // Try again at arbitrary precision:
+   // Repeat at arbitrary precision:
    cpp_int u = 1;
    for(unsigned i = 1; i <= 100; ++i)
       u *= i;
