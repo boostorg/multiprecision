@@ -23,6 +23,12 @@
 
 namespace boost{ namespace multiprecision{
 
+#ifdef BOOST_MSVC
+// warning C4127: conditional expression is constant
+#pragma warning(push)
+#pragma warning(disable:4127)
+#endif
+
 template <class Backend, bool ExpressionTemplates>
 class mp_number
 {
@@ -32,7 +38,7 @@ public:
    mp_number(){}
    mp_number(const mp_number& e) : m_backend(e.m_backend){}
    template <class V>
-   mp_number(V v, typename enable_if<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > >::type* dummy1 = 0)
+   mp_number(V v, typename enable_if<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > >::type* = 0)
    {
       m_backend = canonical_value(v);
    }
@@ -71,7 +77,7 @@ public:
    }
 
    template <class V>
-   mp_number(V v, typename enable_if<mpl::and_<is_convertible<V, Backend>, mpl::not_<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > > > >::type* dummy1 = 0)
+   mp_number(V v, typename enable_if<mpl::and_<is_convertible<V, Backend>, mpl::not_<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > > > >::type* = 0)
       : m_backend(v){}
 
    template <class tag, class Arg1, class Arg2, class Arg3>
@@ -576,7 +582,7 @@ private:
          BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
    }
    template <class V>
-   void check_shift_range(V val, const mpl::false_&, const mpl::false_&){}
+   void check_shift_range(V, const mpl::false_&, const mpl::false_&){}
 
    template <class Exp>
    void do_assign(const Exp& e, const detail::add_immediates&)
@@ -1443,7 +1449,7 @@ private:
       return is_realy_self(e.value());
    }
    template <class Exp, int v>
-   bool is_self(const Exp& e, mpl::int_<v> const&)const
+   bool is_self(const Exp&, mpl::int_<v> const&)const
    {
       return false;
    }
@@ -1454,7 +1460,7 @@ private:
 
    static const Backend& canonical_value(const self_type& v){  return v.m_backend;  }
    template <class V>
-   static typename detail::canonical<V, Backend>::type canonical_value(const V& v){  return v;  }
+   static typename detail::canonical<V, Backend>::type canonical_value(const V& v){  return static_cast<typename detail::canonical<V, Backend>::type>(v);  }
    static typename detail::canonical<std::string, Backend>::type canonical_value(const std::string& v){  return v.c_str();  }
 
    static const Backend& function_arg_value(const self_type& v) {  return v.backend();  }
@@ -1715,6 +1721,10 @@ inline multiprecision::mp_number<T, ExpressionTemplates> denominator(const ratio
 {
    return a.denominator();
 }
+
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
 
 } // namespaces
 

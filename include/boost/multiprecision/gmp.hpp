@@ -21,6 +21,12 @@ namespace boost{
 namespace multiprecision{
 namespace backends{
 
+#ifdef BOOST_MSVC
+// warning C4127: conditional expression is constant
+#pragma warning(push)
+#pragma warning(disable:4127)
+#endif
+
 template <unsigned digits10>
 struct gmp_float;
 
@@ -1560,7 +1566,7 @@ struct gmp_rational
    {
       mpq_swap(m_data, o.m_data);
    }
-   std::string str(std::streamsize /*digits*/, std::ios_base::fmtflags f)const
+   std::string str(std::streamsize /*digits*/, std::ios_base::fmtflags /*f*/)const
    {
       // TODO make a better job of this including handling of f!!
       void *(*alloc_func_ptr) (size_t);
@@ -2052,6 +2058,10 @@ public:
    BOOST_STATIC_CONSTEXPR bool tinyness_before = false;
    BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
 };
+
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
 
 } // namespace std
 

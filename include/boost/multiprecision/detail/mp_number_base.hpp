@@ -249,6 +249,7 @@ struct mp_exp<tag, Arg1, void, void>
 
 private:
    typename mp_exp_storage<Arg1>::type arg;
+   mp_exp& operator=(const mp_exp&);
 };
 
 template<class Arg1>
@@ -271,6 +272,7 @@ struct mp_exp<terminal, Arg1, void, void>
 
 private:
    typename mp_exp_storage<Arg1>::type arg;
+   mp_exp& operator=(const mp_exp&);
 };
 
 template <class tag, class Arg1, class Arg2>
@@ -303,6 +305,7 @@ struct mp_exp<tag, Arg1, Arg2, void>
 private:
    typename mp_exp_storage<Arg1>::type arg1;
    typename mp_exp_storage<Arg2>::type arg2;
+   mp_exp& operator=(const mp_exp&);
 };
 
 template <class tag, class Arg1, class Arg2, class Arg3>
@@ -344,6 +347,7 @@ private:
    typename mp_exp_storage<Arg1>::type arg1;
    typename mp_exp_storage<Arg2>::type arg2;
    typename mp_exp_storage<Arg3>::type arg3;
+   mp_exp& operator=(const mp_exp&);
 };
 
 template <class T>

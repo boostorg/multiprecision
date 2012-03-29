@@ -21,6 +21,12 @@ namespace boost{
 namespace multiprecision{
 namespace backends{
 
+#ifdef BOOST_MSVC
+// warning C4127: conditional expression is constant
+#pragma warning(push)
+#pragma warning(disable:4127)
+#endif
+
 template <unsigned MinBits = 0, bool Signed = true, class Allocator = std::allocator<limb_type> >
 struct cpp_int_backend;
 
@@ -212,7 +218,7 @@ public:
    }
    void resize(unsigned new_size)
    {
-      m_limbs = (std::min)(new_size, internal_limb_count);
+      m_limbs = static_cast<boost::uint16_t>((std::min)(new_size, internal_limb_count));
    }
    void normalize()
    {
@@ -604,7 +610,7 @@ public:
    {
       this->do_swap(o);
    }
-   std::string str(std::streamsize digits, std::ios_base::fmtflags f)const
+   std::string str(std::streamsize /*digits*/, std::ios_base::fmtflags f)const
    {
       int base = 10;
       if((f & std::ios_base::oct) == std::ios_base::oct)
@@ -626,7 +632,7 @@ public:
          int pos = result.size() - 1;
          for(unsigned i = 0; i < Bits / shift; ++i)
          {
-            char c = '0' + (t.limbs()[0] & mask);
+            char c = '0' + static_cast<char>(t.limbs()[0] & mask);
             if(c > '9')
                c += 'A' - '9' - 1;
             result[pos--] = c;
@@ -635,7 +641,7 @@ public:
          if(Bits % shift)
          {
             mask = static_cast<limb_type>((1u << (Bits % shift)) - 1);
-            char c = '0' + (t.limbs()[0] & mask);
+            char c = '0' + static_cast<char>(t.limbs()[0] & mask);
             if(c > '9')
                c += 'A' - '9';
             result[pos] = c;
@@ -1268,7 +1274,8 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>* result,
    if(result)
       result->resize(1 + r_order - y_order);
    typename cpp_int_backend<MinBits, Signed, Allocator>::const_limb_pointer prem = r.limbs();
-   typename cpp_int_backend<MinBits, Signed, Allocator>::limb_pointer pr;
+   // This is initialised just to keep the compiler from emitting useless warnings later on:
+   typename cpp_int_backend<MinBits, Signed, Allocator>::limb_pointer pr = typename cpp_int_backend<MinBits, Signed, Allocator>::limb_pointer();
    if(result)
    {
       pr = result->limbs();
@@ -1494,7 +1501,8 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>* result,
       return;
    }
 
-   typename cpp_int_backend<MinBits, Signed, Allocator>::limb_pointer pres;
+   // This is initialised just to keep the compiler from emitting useless warnings later on:
+   typename cpp_int_backend<MinBits, Signed, Allocator>::limb_pointer pres = typename cpp_int_backend<MinBits, Signed, Allocator>::limb_pointer();
    if(result)
    {
       result->resize(r_order + 1);
@@ -2282,6 +2290,9 @@ typedef mp_number<cpp_int_backend<256, true, void>, false>    mp_int256_t;
 typedef mp_number<cpp_int_backend<512, true, void>, false>    mp_int512_t;
 typedef mp_number<cpp_int_backend<1024, true, void>, false>   mp_int1024_t;
 
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
 
 }} // namespaces
 

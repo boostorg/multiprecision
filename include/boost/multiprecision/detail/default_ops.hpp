@@ -26,6 +26,11 @@
 
 namespace boost{ namespace multiprecision{ namespace default_ops{
 
+#ifdef BOOST_MSVC
+// warning C4127: conditional expression is constant
+#pragma warning(push)
+#pragma warning(disable:4127)
+#endif
 //
 // Default versions of mixed arithmetic, these just construct a temporary
 // from the arithmetic value and then do the arithmetic on that:
@@ -108,7 +113,7 @@ template <class T>
 inline bool is_same_object(const T& u, const T&v)
 {  return &u == &v;  }
 template <class T, class U>
-inline bool is_same_object(const T& u, const U&v)
+inline bool is_same_object(const T&, const U&)
 {  return false;  }
 
 //
@@ -528,7 +533,6 @@ template <class T>
 inline bool eval_bit_test(const T& val, unsigned index)
 {
    typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
-   unsigned result = 0;
    T mask, t;
    mask = ui_type(1);
    eval_left_shift(mask, index);
@@ -540,7 +544,6 @@ template <class T>
 inline void eval_bit_set(T& val, unsigned index)
 {
    typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
-   unsigned result = 0;
    T mask;
    mask = ui_type(1);
    eval_left_shift(mask, index);
@@ -551,7 +554,6 @@ template <class T>
 inline void eval_bit_flip(T& val, unsigned index)
 {
    typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
-   unsigned result = 0;
    T mask;
    mask = ui_type(1);
    eval_left_shift(mask, index);
@@ -562,7 +564,6 @@ template <class T>
 inline void eval_bit_unset(T& val, unsigned index)
 {
    typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
-   unsigned result = 0;
    T mask, t;
    mask = ui_type(1);
    eval_left_shift(mask, index);
@@ -1285,6 +1286,9 @@ inline multiprecision::mp_number<Backend, ExpressionTemplates> sinhc_pi(const mu
    return boost::math::sinhc_pi(x);
 }
 
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
 } // namespace math
 } // namespace boost
 

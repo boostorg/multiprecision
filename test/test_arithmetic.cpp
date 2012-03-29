@@ -80,6 +80,11 @@ struct number_category<rational<mpz_int> > : public mpl::int_<number_kind_ration
 
 #endif
 
+#ifdef BOOST_MSVC
+// warning C4127: conditional expression is constant
+#pragma warning(disable:4127)
+#endif
+
 #define BOOST_TEST_THROW(x, EX)\
    try { x;  BOOST_ERROR("Expected exception not thrown"); } \
    catch(const EX&){}\
@@ -413,10 +418,14 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
          BOOST_TEST(bit_test(Real(1) << (i * 17), i * 17));
          BOOST_TEST(!bit_test(Real(1) << (i * 17), i * 17 + 1));
          BOOST_TEST(!bit_test(Real(1) << (i * 17), i * 17 - 1));
-         BOOST_TEST(bit_test(bit_set(Real(0), i * 17), i * 17));
-         BOOST_TEST(bit_flip(Real(0), i*17) == Real(1) << i * 17);
-         BOOST_TEST(bit_flip(Real(Real(1) << i * 17), i * 17) == 0);
-         BOOST_TEST(bit_unset(Real(Real(1) << i * 17), i * 17) == 0);
+         Real zero(0);
+         BOOST_TEST(bit_test(bit_set(zero, i * 17), i * 17));
+         zero = 0;
+         BOOST_TEST(bit_flip(zero, i*17) == Real(1) << i * 17);
+         zero = Real(1) << i * 17;
+         BOOST_TEST(bit_flip(zero, i * 17) == 0);
+         zero = Real(1) << i * 17;
+         BOOST_TEST(bit_unset(zero, i * 17) == 0);
       }
    }
 }
