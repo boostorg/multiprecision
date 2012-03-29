@@ -671,7 +671,7 @@ inline typename detail::mp_exp<tag, A1, A2, A3>::result_type trunc(const detail:
 }
 
 template <class Backend, bool ExpressionTemplates, class Policy>
-inline mp_number<Backend, ExpressionTemplates> trunc(const mp_number<Backend, ExpressionTemplates>& v, const Policy& pol)
+inline mp_number<Backend, ExpressionTemplates> trunc(const mp_number<Backend, ExpressionTemplates>& v, const Policy&)
 {
    using default_ops::eval_trunc;
    mp_number<Backend, ExpressionTemplates> result;
@@ -769,7 +769,7 @@ inline typename detail::mp_exp<tag, A1, A2, A3>::result_type round(const detail:
    return round(static_cast<number_type>(v), pol);
 }
 template <class T, bool ExpressionTemplates, class Policy>
-inline mp_number<T, ExpressionTemplates> round(const mp_number<T, ExpressionTemplates>& v, const Policy& pol)
+inline mp_number<T, ExpressionTemplates> round(const mp_number<T, ExpressionTemplates>& v, const Policy&)
 {
    using default_ops::eval_round;
    mp_number<T, ExpressionTemplates> result;
