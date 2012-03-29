@@ -19,7 +19,7 @@
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/make_unsigned.hpp>
 #include <boost/throw_exception.hpp>
-#include <boost/multiprecision/detail/default_ops.hpp>
+#include <boost/multiprecision/detail/generic_interconvert.hpp>
 
 namespace boost{ namespace multiprecision{
 
@@ -62,6 +62,14 @@ public:
    mp_number(const mp_number<Other, ET>& val, typename enable_if<boost::is_convertible<Other, Backend> >::type* dummy1 = 0)
    {
       m_backend = val.backend();
+   }
+   template <class Other, bool ET>
+   mp_number(const mp_number<Other, ET>& val, typename disable_if<boost::is_convertible<Other, Backend> >::type* dummy1 = 0)
+   {
+      //
+      // Attempt a generic interconvertion:
+      //
+      detail::generic_interconvert(backend(), val.backend(), number_category<Backend>(), number_category<Other>());
    }
    template <class V>
    mp_number(V v1, V v2, typename enable_if<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > >::type* dummy1 = 0)
@@ -122,6 +130,17 @@ public:
       operator=(const mp_number<Other>& v)
    {
       m_backend = v.backend();
+      return *this;
+   }
+
+   template <class Other>
+   typename disable_if<is_convertible<Other, Backend>, mp_number<Backend, ExpressionTemplates>& >::type 
+      operator=(const mp_number<Other>& v)
+   {
+      //
+      // Attempt a generic interconvertion:
+      //
+      detail::generic_interconvert(backend(), v.backend(), number_category<Backend>(), number_category<Other>());
       return *this;
    }
 

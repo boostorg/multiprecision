@@ -2025,12 +2025,10 @@ inline typename enable_if<is_integral<R>, void>::type eval_convert_to(R* result,
 {
    *result = static_cast<R>(backend.limbs()[0]);
    unsigned shift = cpp_int_backend<MinBits, Signed, Allocator>::limb_bits;
-   for(unsigned i = 1; i < backend.size(); ++i)
+   for(unsigned i = 1; (i < backend.size()) && (shift < static_cast<unsigned>(std::numeric_limits<R>::digits)); ++i)
    {
       *result += static_cast<R>(backend.limbs()[i]) << shift;
       shift += cpp_int_backend<MinBits, Signed, Allocator>::limb_bits;
-      if(shift > static_cast<unsigned>(std::numeric_limits<R>::digits))
-         break;
    }
    if(backend.sign())
    {

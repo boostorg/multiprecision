@@ -1804,6 +1804,8 @@ std::string cpp_dec_float<Digits10>::str(boost::intmax_t number_of_digits, std::
 template <unsigned Digits10>
 bool cpp_dec_float<Digits10>::rd_string(const char* const s)
 {
+   try{
+
    std::string str(s);
 
    // Get a possible exponent and remove it.
@@ -1849,7 +1851,7 @@ bool cpp_dec_float<Digits10>::rd_string(const char* const s)
          *this = this->inf();
       return true;
    }
-   if((str.size() >= 3) && ((str.substr(0, 3) == "nan") || (str.substr(0, 3) == "NAN")))
+   if((str.size() >= 3) && ((str.substr(0, 3) == "nan") || (str.substr(0, 3) == "NAN") || (str.substr(0, 3) == "NaN")))
    {
       *this = this->nan();
       return true;
@@ -2054,6 +2056,16 @@ bool cpp_dec_float<Digits10>::rd_string(const char* const s)
       {
          *this = zero();
       }
+   }
+
+   }
+   catch(const bad_lexical_cast&)
+   {
+      // Rethrow with better error message:
+      std::string msg = "Unable to parse the string \"";
+      msg += s;
+      msg += "\" as a floating point value.";
+      throw std::runtime_error(msg);
    }
 
    return true;

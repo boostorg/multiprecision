@@ -626,6 +626,17 @@ run test_rational_io.cpp gmp
          [ check-target-builds ../config//has_gmp : : <build>no ]
         : test_rational_io_mpz ;
 
+run test_generic_conv.cpp
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_gmp : <define>TEST_GMP <source>gmp :  ] 
+         [ check-target-builds ../config//has_tommath : <define>TEST_TOMMATH <source>$(TOMMATH) :  ] 
+         [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>mpfr :  ] 
+         release
+         ;
+      
+
 run ../example/gmp_snips.cpp gmp
         : # command line
         : # input files
