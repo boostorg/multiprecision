@@ -1,0 +1,217 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Integer Real World Tests</title>
+<link rel="stylesheet" href="http://www.boost.org/doc/libs/release/doc/src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.76.1">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
+<link rel="up" href="../perf.html" title="Performance Comparison">
+<link rel="prev" href="realworld.html" title="Floating Point Real World Tests">
+<link rel="next" href="float_performance.html" title="Float Algorithm Perfomance">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="realworld.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../perf.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="float_performance.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section boost_multiprecision_perf_int_real_world">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_multiprecision.perf.int_real_world"></a><a class="link" href="int_real_world.html" title="Integer Real World Tests">Integer Real
+      World Tests</a>
+</h3></div></div></div>
+<p>
+        These <a href="../../../../performance/miller_rabin_performance.cpp" target="_top">tests</a>
+        measure the time taken to generate 1000 128-bit random numbers and test for
+        primality using the Miller Rabin test.
+      </p>
+<p>
+        Test code was compiled with Microsoft Visual Studio 2010 with all optimisations
+        turned on (/Ox), and used MPIR-2.3.0 and <a href="http://libtom.org/?page=features&amp;newsitems=5&amp;whatfile=ltm" target="_top">libtommath</a>-0.42.0.
+        The tests were run on 32-bit Windows Vista machine.
+      </p>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Integer Type
+                </p>
+              </th>
+<th>
+                <p>
+                  Relative (and Absolute) Times
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  mpz_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.08279(0.370326s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mpz_int (no Expression templates)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.1702(0.400222s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.3612(0.465547s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int (no Expression templates)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.33286(0.455854s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int (64-bit cache)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.33134(0.455333s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int (256-bit cache)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.29367(0.442451s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int (512-bit cache)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.08821(0.37218s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int (1024-bit cache)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.07902(0.369037s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mp_int1024_t
+                </p>
+              </td>
+<td>
+                <p>
+                  1.02616(0.35096s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mp_int1024_t (no Expression templates)
+                </p>
+              </td>
+<td>
+                <p>
+                  1(0.342011s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tom_int
+                </p>
+              </td>
+<td>
+                <p>
+                  3.74233(1.27992s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tom_int (no Expression templates)
+                </p>
+              </td>
+<td>
+                <p>
+                  3.97646(1.35999s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+<p>
+        It's interesting to note that expression templates have little effect here
+        - perhaps because the actual expressions involved are relatively trivial
+        in this case - so the time taken for multiplication and division tends to
+        dominate. Also note how increasing the internal cache size used by <code class="computeroutput"><span class="identifier">cpp_int</span></code> is quite effective in this case
+        in cutting out memory allocations altogether - cutting about a third off
+        the total runtime.
+      </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2012 John Maddock and Christopher Kormanyos<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="realworld.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../perf.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="float_performance.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
