@@ -556,6 +556,14 @@ Normally these should not be visible to the user.
 
 [endsect]
 
+[section:jel Worked Example: defining a mathematical function.]
+
+[import ../example/floating_point_examples.cpp]
+
+[JEL]
+
+[endsect]
+
 [endsect]
 
 [section:rational Rational Number Types]
