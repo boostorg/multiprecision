@@ -53,7 +53,7 @@ exe performance_test : performance_test.cpp /boost/system//boost_system
           <define>TEST_CPP_INT
           ;
 
-exe sf_performance : sf_performance.cpp /boost/system//boost_system
+exe sf_performance : sf_performance.cpp /boost/system//boost_system /boost/system//boost_chrono /boost/system//boost_thread
           : release
           [ check-target-builds ../config//has_gmp : <define>TEST_MPF <define>TEST_MPZ <source>gmp : ]
           [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>mpfr : ]
