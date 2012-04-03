@@ -2072,6 +2072,21 @@ More a list of what ['could] be done, rather than what ['should] be done (which 
 * Add assembly level routines to cpp_int_backend.
 * Add an all C++ binary floating point type.
 
+[h4 Pre-Review Comments]
+
+* Make the exponent type for cpp_dec_float a templare parameter, maybe include support for big-integer exponents.
+Open question - what should be the default - int32_t or int64_t?
+* Document the size requirements of fixed precision ints.
+* Document std lib function accuracy.
+* Make fixed precision orthogonal to Allocator type in cpp_int.  Possible solution - add an additional MaxBits 
+template argument that defaults to 0 (meaning keep going till no more space/memory).
+* Add support for fused multiply add (and subtract).  GMP mpz_t could use this.
+* Be a bit clearer on the effects of sign-magnitude representation of cpp_int - min == -max etc.
+* Document cpp_dec_float precision, rounding, and exponent size.
+* Can we be clearer in the docs that mixed arithmetic doesn't work?
+* Document round functions behaviour better (they behave as in C99).
+* Should there be a choice of rounding mode (probably MPFR specific)?
+
 [endsect]
 
 [section:ack Acknowledgements]
