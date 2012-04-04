@@ -553,6 +553,7 @@ run test_float_io.cpp
         : # input files
         : # requirements
 	      <define>TEST_CPP_DEC_FLOAT
+         release # Otherwise runtime is slow
         : test_float_io_cpp_dec_float ;
 
 run test_float_io.cpp gmp
@@ -560,6 +561,7 @@ run test_float_io.cpp gmp
         : # input files
         : # requirements
 	      <define>TEST_MPF_50
+         release # Otherwise runtime is slow
          [ check-target-builds ../config//has_gmp : : <build>no ]
         : test_float_io_mpf ;
 
@@ -568,6 +570,7 @@ run test_float_io.cpp mpfr gmp
         : # input files
         : # requirements
 	      <define>TEST_MPFR_50
+         release # Otherwise runtime is slow
          [ check-target-builds ../config//has_mpfr : : <build>no ]
         : test_float_io_mpfr ;
 
@@ -576,6 +579,7 @@ run test_int_io.cpp $(TOMMATH)
         : # input files
         : # requirements
 	      <define>TEST_TOMMATH
+         release # Otherwise runtime is slow
          [ check-target-builds ../config//has_tommath : : <build>no ]
         : test_int_io_tommath ;
 
@@ -584,6 +588,7 @@ run test_int_io.cpp gmp
         : # input files
         : # requirements
 	      <define>TEST_MPZ
+         release # Otherwise runtime is slow
          [ check-target-builds ../config//has_gmp : : <build>no ]
         : test_int_io_mpz ;
 
@@ -592,6 +597,7 @@ run test_int_io.cpp
         : # input files
         : # requirements
 	      <define>TEST_CPP_INT
+         release # Otherwise runtime is slow
         : test_int_io_cpp_int ;
 
 run test_cpp_int.cpp gmp
@@ -616,6 +622,7 @@ run test_rational_io.cpp $(TOMMATH)
         : # requirements
 	      <define>TEST_TOMMATH
          [ check-target-builds ../config//has_tommath : : <build>no ]
+         release # Otherwise runtime is slow
         : test_rational_io_tommath ;
 
 run test_rational_io.cpp gmp
@@ -624,6 +631,7 @@ run test_rational_io.cpp gmp
         : # requirements
 	      <define>TEST_MPQ
          [ check-target-builds ../config//has_gmp : : <build>no ]
+         release # Otherwise runtime is slow
         : test_rational_io_mpz ;
 
 run test_generic_conv.cpp
@@ -633,7 +641,7 @@ run test_generic_conv.cpp
          [ check-target-builds ../config//has_gmp : <define>TEST_GMP <source>gmp :  ] 
          [ check-target-builds ../config//has_tommath : <define>TEST_TOMMATH <source>$(TOMMATH) :  ] 
          [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>mpfr :  ] 
-         release
+         release # Otherwise runtime is slow
          ;
       
 
@@ -657,7 +665,7 @@ run ../example/tommath_snips.cpp $(TOMMATH)
         : # input files
         : # requirements
          [ check-target-builds ../config//has_tommath : : <build>no ] ;
-
+run ../example/floating_point_examples.cpp ;
 
 if $(enable-specfun)
 {
