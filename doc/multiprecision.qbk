@@ -2094,6 +2094,7 @@ template argument that defaults to 0 (meaning keep going till no more space/memo
 * Can we be clearer in the docs that mixed arithmetic doesn't work?
 * Document round functions behaviour better (they behave as in C99).
 * Should there be a choice of rounding mode (probably MPFR specific)?
+* Document limits on size of cpp_dec_float.
 
 [endsect]
 
