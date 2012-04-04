@@ -40,7 +40,7 @@ public:
    static const boost::int32_t cpp_dec_float_digits = Digits10;
 
    static const boost::int32_t cpp_dec_float_digits10_setting = Digits10;
-   static const boost::int32_t cpp_dec_float_digits10_limit   = boost::integer_traits<boost::int32_t>::const_max;
+   static const boost::int32_t cpp_dec_float_digits10_limit   = boost::integer_traits<boost::int32_t>::const_max - 100;
    static const boost::int32_t cpp_dec_float_digits10         = ((cpp_dec_float_digits10_setting < static_cast<boost::int32_t>(30)) ? static_cast<boost::int32_t>(30) : ((cpp_dec_float_digits10_setting > cpp_dec_float_digits10_limit) ? cpp_dec_float_digits10_limit : cpp_dec_float_digits10_setting));
    static const boost::int32_t cpp_dec_float_digits10_extra   = static_cast<boost::int32_t>(((static_cast<boost::int64_t>(cpp_dec_float_digits10) * 15LL) + 50LL) / 100LL);
    static const boost::int32_t cpp_dec_float_max_digits10     = static_cast<boost::int32_t>(cpp_dec_float_digits10 + ((cpp_dec_float_digits10_extra < static_cast<boost::int32_t>(5)) ? static_cast<boost::int32_t>(5) : ((cpp_dec_float_digits10_extra > static_cast<boost::int32_t>(30)) ? static_cast<boost::int32_t>(30) : cpp_dec_float_digits10_extra)));
