@@ -451,7 +451,7 @@ inline void eval_qr(const tommath_int& x, const tommath_int& y,
 
 inline unsigned eval_lsb(const tommath_int& val)
 {
-   return mp_cnt_lsb(const_cast<::mp_int*>(&val.data()));
+   return mp_cnt_lsb(const_cast< ::mp_int*>(&val.data()));
 }
 
 template <class Integer>
