@@ -35,7 +35,7 @@ void calc_log2(T& num, unsigned digits)
    //
    // Check if we can just construct from string:
    //
-   if(digits * 1000L / 301 < 1100)
+   if(digits  < 3640)
    {
       num = string_val;
       return;
@@ -92,7 +92,7 @@ void calc_e(T& result, unsigned digits)
    //
    // Check if we can just construct from string:
    //
-   if(digits * 1000L / 301 < 1100)
+   if(digits  < 3640)
    {
       result = string_val;
       return;
@@ -138,7 +138,7 @@ void calc_pi(T& result, unsigned digits)
    //
    // Check if we can just construct from string:
    //
-   if(digits * 1000L / 301 < 1100)
+   if(digits  < 3640)
    {
       result = string_val;
       return;
