@@ -2208,6 +2208,14 @@ void cpp_dec_float<Digits10>::from_unsigned_long_long(const unsigned long long u
 template <unsigned Digits10>
 void cpp_dec_float<Digits10>::mul_loop_uv(const boost::uint32_t* const u, const boost::uint32_t* const v, boost::uint32_t* const w, const boost::int32_t p)
 {
+   //
+   // There is a limit on how many limbs this algorithm can handle without dropping digits 
+   // due to overflow in the carry, it is: 
+   //
+   // FLOOR( (2^64 - 1) / (10^8 * 10^8) )  ==  1844
+   //
+   BOOST_STATIC_ASSERT_MSG(mp_elem_number < 1800, "Too many limbs in the data type for the multiplication algorithm - unsupported precision in cpp_dec_float.");
+
    boost::uint64_t carry = static_cast<boost::uint64_t>(0u);
 
    for(boost::int32_t j = static_cast<boost::int32_t>(p - 1u); j >= static_cast<boost::int32_t>(0); j--)
