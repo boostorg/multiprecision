@@ -57,9 +57,23 @@ void expected_results()
       ".*",                          // compiler
       ".*",                          // stdlib
       ".*",                          // platform
+      ".*mpfr_float_backend<18>.*",          // test type(s)
+      ".*J0.*Tricky.*",              // test data group
+      ".*", 10000000000L, 5000000000L); // test function
+   add_expected_result(
+      ".*",                          // compiler
+      ".*",                          // stdlib
+      ".*",                          // platform
       ".*",                  // test type(s)
       ".*J0.*Tricky.*",              // test data group
       ".*", 400000000, 400000000);   // test function
+   add_expected_result(
+      ".*",                          // compiler
+      ".*",                          // stdlib
+      ".*",                          // platform
+      ".*mpfr_float_backend<18>.*",          // test type(s)
+      ".*J1.*Tricky.*",              // test data group
+      ".*", 1000000000L, 500000000L);  // test function
    add_expected_result(
       ".*",                          // compiler
       ".*",                          // stdlib
@@ -78,9 +92,16 @@ void expected_results()
       ".*",                          // compiler
       ".*",                          // stdlib
       ".*",                          // platform
+      ".*mpfr_float_backend<18>.*",  // test type(s)
+      ".*(JN|j).*|.*Tricky.*",       // test data group
+      ".*", 70000, 7000);               // test function
+   add_expected_result(
+      ".*",                          // compiler
+      ".*",                          // stdlib
+      ".*",                          // platform
       ".*",                  // test type(s)
       ".*(JN|j).*|.*Tricky.*",       // test data group
-      ".*", 4000, 700);               // test function
+      ".*", 7000, 3000);               // test function
    add_expected_result(
       ".*",                          // compiler
       ".*",                          // stdlib

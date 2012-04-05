@@ -54,7 +54,7 @@ void expected_results()
       ".*",                          // platform
       ".*",                          // test type(s)
       ".*",                          // test data group
-      ".*", 60, 30);                 // test function
+      ".*", 300, 200);               // test function
    //
    // Finish off by printing out the compiler/stdlib/platform names,
    // we do this to make it easier to mark up expected error rates.

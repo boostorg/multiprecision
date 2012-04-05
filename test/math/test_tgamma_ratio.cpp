@@ -59,9 +59,16 @@ void expected_results()
       ".*",                          // compiler
       ".*",                          // stdlib
       ".*",                          // platform
+      ".*mpfr_float_backend<18>.*",  // test type(s)
+      ".*",                          // test data group
+      ".*", 20000, 7000);             // test function
+   add_expected_result(
+      ".*",                          // compiler
+      ".*",                          // stdlib
+      ".*",                          // platform
       ".*",                          // test type(s)
       ".*",                          // test data group
-      ".*", 1000, 200);             // test function
+      ".*", 2000, 500);              // test function
    //
    // Finish off by printing out the compiler/stdlib/platform names,
    // we do this to make it easier to mark up expected error rates.

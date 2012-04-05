@@ -54,7 +54,7 @@ void expected_results()
       ".*",                          // platform
       ".*",                          // test type(s)
       ".*Random values less than 1", // test data group
-      ".*", 5000, 2000);             // test function
+      ".*", 6000, 3000);             // test function
    add_expected_result(
       ".*",                          // compiler
       ".*",                          // stdlib

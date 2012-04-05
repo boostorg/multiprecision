@@ -75,7 +75,7 @@ void expected_results()
       ".*",                          // platform
       ".*",                          // test type(s)
       "near.*",                      // test data group
-      "boost::math::tgamma", 80, 60);  // test function
+      "boost::math::tgamma", 200, 100);  // test function
    add_expected_result(
       ".*",                          // compiler
       ".*",                          // stdlib

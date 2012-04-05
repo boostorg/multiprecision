@@ -62,6 +62,13 @@ void expected_results()
       "[^|]*",                          // compiler
       "[^|]*",                          // stdlib
       "[^|]*",                          // platform
+      ".*mpfr_float_backend<18>.*",     // test type(s)
+      "(?i).*small.*",                  // test data group
+      ".*", 400, 200);                  // test function
+   add_expected_result(
+      "[^|]*",                          // compiler
+      "[^|]*",                          // stdlib
+      "[^|]*",                          // platform
       ".*",                             // test type(s)
       "(?i).*small.*",                  // test data group
       ".*", 90, 25);  // test function
