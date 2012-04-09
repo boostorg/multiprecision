@@ -61,44 +61,45 @@ private:
   const value_type x;
 };
 
-using boost::math::constants::pi;
-typedef boost::multiprecision::cpp_dec_float_50 mp_type;
 
 int main(int, char**)
 {
-  const float j2_f =
-    integral(0.0F,
-             pi<float>(),
-             0.01F,
-             cyl_bessel_j_integral_rep<float>(2U, 1.23F)) / pi<float>();
+   using boost::math::constants::pi;
+   typedef boost::multiprecision::cpp_dec_float_50 mp_type;
 
-  const double j2_d =
-    integral(0.0,
-             pi<double>(),
-             0.0001,
-             cyl_bessel_j_integral_rep<double>(2U, 1.23)) / pi<double>();
+   const float j2_f =
+      integral(0.0F,
+      pi<float>(),
+      0.01F,
+      cyl_bessel_j_integral_rep<float>(2U, 1.23F)) / pi<float>();
 
-  const mp_type j2_mp =
-    integral(mp_type(0),
-             pi<mp_type>(),
-             mp_type(1.0E-20),
-             cyl_bessel_j_integral_rep<mp_type>(2U, mp_type(123) / 100)) / pi<mp_type>();
+   const double j2_d =
+      integral(0.0,
+      pi<double>(),
+      0.0001,
+      cyl_bessel_j_integral_rep<double>(2U, 1.23)) / pi<double>();
 
-  // 0.166369
-  std::cout
-    << std::setprecision(std::numeric_limits<float>::digits10)
-    << j2_f
-    << std::endl;
+   const mp_type j2_mp =
+      integral(mp_type(0),
+      pi<mp_type>(),
+      mp_type(1.0E-20),
+      cyl_bessel_j_integral_rep<mp_type>(2U, mp_type(123) / 100)) / pi<mp_type>();
 
-  // 0.166369383786814
-  std::cout
-    << std::setprecision(std::numeric_limits<double>::digits10)
-    << j2_d
-    << std::endl;
+   // 0.166369
+   std::cout
+      << std::setprecision(std::numeric_limits<float>::digits10)
+      << j2_f
+      << std::endl;
 
-  // 0.16636938378681407351267852431513159437103348245333
-  std::cout
-    << std::setprecision(std::numeric_limits<mp_type>::digits10)
-    << j2_mp
-    << std::endl;
+   // 0.166369383786814
+   std::cout
+      << std::setprecision(std::numeric_limits<double>::digits10)
+      << j2_d
+      << std::endl;
+
+   // 0.16636938378681407351267852431513159437103348245333
+   std::cout
+      << std::setprecision(std::numeric_limits<mp_type>::digits10)
+      << j2_mp
+      << std::endl;
 }

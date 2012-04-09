@@ -18,6 +18,7 @@
     [/last-revision $Date: 2011-07-08 18:51:46 +0100 (Fri, 08 Jul 2011) $]
 ]
 
+[include html4_symbols.qbk]
 [import ../example/gmp_snips.cpp]
 [import ../example/mpfr_snips.cpp]
 [import ../example/cpp_dec_float_snips.cpp]
@@ -33,6 +34,18 @@
 [template mpreal[] [@http://www.holoborodko.com/pavel/mpfr/ mpreal]]
 [template mpir[] [@http://mpir.org/ MPIR]]
 [template tommath[] [@http://libtom.org/?page=features&newsitems=5&whatfile=ltm libtommath]]
+
+[template super[x]'''<superscript>'''[x]'''</superscript>''']
+[template sub[x]'''<subscript>'''[x]'''</subscript>''']
+
+[template equation[name]  '''<inlinemediaobject>
+<imageobject role="html">
+<imagedata fileref="../'''[name]'''.png"></imagedata>
+</imageobject>
+<imageobject role="print">
+<imagedata fileref="../'''[name]'''.svg"></imagedata>
+</imageobject>
+</inlinemediaobject>''']
 
 
 [section:intro Introduction]
@@ -556,11 +569,38 @@ Normally these should not be visible to the user.
 
 [endsect]
 
-[section:jel Worked Example: defining a mathematical function.]
+[section:fp_eg Examples]
 
 [import ../example/floating_point_examples.cpp]
 
+[section:aos Area of Circle]
+
+[AOS1]
+[AOS2]
+[AOS3]
+
+[endsect]
+
+[section:jel Defining a Lambda Function.]
+
 [JEL]
+
+[endsect]
+
+[section:nd Calculating a Derivative]
+
+[ND1]
+[ND2]
+[ND3]
+
+[endsect]
+
+[section:GI Calculating an Integral]
+
+[GI1]
+[GI2]
+
+[endsect]
 
 [endsect]
 
@@ -1527,8 +1567,6 @@ More information on this type can be found in the [link boost_multiprecision.tut
 [endsect]
 
 [section:backendconc Backend Requirements]
-
-[template super[x]'''<superscript>'''[x]'''</superscript>''']
 
 The requirements on the `Backend` template argument to `mp_number` are split up into
 compulsory requirements, and optional requirements that are either to improve performance
