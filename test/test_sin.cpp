@@ -291,6 +291,16 @@ int main()
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
    test<boost::multiprecision::cpp_dec_float_50>();
+   test<boost::multiprecision::cpp_dec_float_100>();
+   // Some "peculiar" digit counts which stress our code:
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<65> > >();
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<64> > >();
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<63> > >();
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<62> > >();
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<61> > >();
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<60> > >();
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<59> > >();
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<58> > >();
 #endif
    return boost::report_errors();
 }

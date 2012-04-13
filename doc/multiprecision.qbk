@@ -407,6 +407,20 @@ as a result performing formatted output on this type when the argument is negati
 
 [endsect]
 
+[section:egs Examples]
+
+[import ../example/integer_examples.cpp]
+
+[section:factorials Factorials]
+[FAC1]
+[endsect]
+
+[section:bitops Bit Operations]
+[BITOPS]
+[endsect]
+
+[endsect]
+
 [endsect]
 
 [section:floats Floating Point Numbers]
@@ -595,10 +609,16 @@ Normally these should not be visible to the user.
 
 [endsect]
 
-[section:GI Calculating an Integral]
+[section:gi Calculating an Integral]
 
 [GI1]
 [GI2]
+
+[endsect]
+
+[section:poly_eg Polynomial Evaluation]
+
+[POLY]
 
 [endsect]
 
@@ -874,7 +894,7 @@ Finally, we can modify the above example to produce numbers distributed accordin
 
 [section:primetest Primality Testing]
 
-The library implements a fairly basic (meaning unoptimized, and possibly slow) Miller-Rabin test for primality:
+The library implements a Miller-Rabin test for primality:
 
    #include <boost/multiprecision/miller_rabin.hpp>
 
@@ -885,7 +905,9 @@ The library implements a fairly basic (meaning unoptimized, and possibly slow) M
    bool miller_rabin_test(const mp_number<Backend, ExpressionTemplates>& n, unsigned trials);
 
 These functions perform a Miller-Rabin test for primality, if the result is `false` then /n/ is definitely composite,
-while if the result is `true` then /n/ is prime with probability ['0.25^trials].  The algorithm used is straight out of
+while if the result is `true` then /n/ is prime with probability ['0.25^trials].  The algorithm used performs some
+trial divisions to exclude small prime factors, does one Fermat test to exclude many more composites, and then
+uses the Miller-Rabin algorithm straight out of
 Knuth Vol 2, which recomends 25 trials for a pretty strong likelyhood that /n/ is prime.
 
 The third optional argument is for a Uniform Random Number Generator from Boost.Random.  When not provided the `mt19937`

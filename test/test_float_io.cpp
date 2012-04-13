@@ -191,6 +191,7 @@ void test()
 template <class T>
 T generate_random()
 {
+   typedef typename T::backend_type::exponent_type e_type;
    static boost::random::mt19937 gen;
    T val = gen();
    T prev_val = -1;
@@ -200,10 +201,9 @@ T generate_random()
       prev_val = val;
       val += gen();
    }
-   int e;
+   e_type e;
    val = frexp(val, &e);
 
-   typedef typename T::backend_type::exponent_type e_type;
    static boost::random::uniform_int_distribution<e_type> ui(0, std::numeric_limits<T>::max_exponent - 10);
    return ldexp(val, ui(gen));
 }
@@ -260,11 +260,11 @@ int main()
    test<boost::multiprecision::cpp_dec_float_50>();
    test<boost::multiprecision::cpp_dec_float_100>();
 
-   /*
+   
    // cpp_dec_float has extra guard digits that messes this up:
    test_round_trip<boost::multiprecision::cpp_dec_float_50>();
    test_round_trip<boost::multiprecision::cpp_dec_float_100>();
-   */
+   
 #endif
 #ifdef TEST_MPF_50
    test<boost::multiprecision::mpf_float_50>();
