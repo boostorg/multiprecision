@@ -1,0 +1,961 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Float Algorithm Perfomance</title>
+<link rel="stylesheet" href="http://www.boost.org/doc/libs/release/doc/src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.76.1">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
+<link rel="up" href="../perf.html" title="Performance Comparison">
+<link rel="prev" href="int_real_world.html" title="Integer Real World Tests">
+<link rel="next" href="integer_performance.html" title="Integer Algorithm Perfomance">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="int_real_world.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../perf.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="integer_performance.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section boost_multiprecision_perf_float_performance">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_multiprecision.perf.float_performance"></a><a class="link" href="float_performance.html" title="Float Algorithm Perfomance">Float Algorithm
+      Perfomance</a>
+</h3></div></div></div>
+<p>
+        Note that these tests are carefully designed to test performance of the underlying
+        algorithms and not memory allocation or variable copying. As usual, performance
+        results should be taken with a healthy dose of scepticism, and real-world
+        performance may vary widely depending upon the specifics of the program.
+        In each table relative times are given first, with the best performer given
+        a score of 1. Total actual times are given in brackets, measured in seconds
+        for 500000 operations.
+      </p>
+<p>
+        Test code was compiled with Microsoft Visual Studio 2010 with all optimisations
+        turned on (/Ox), and used MPIR-2.3.0 and <a href="http://www.mpfr.org" target="_top">MPFR</a>-3.0.0.
+        The tests were run on 32-bit Windows Vista machine.
+      </p>
+<div class="table">
+<a name="boost_multiprecision.perf.float_performance.operator__"></a><p class="title"><b>Table&#160;1.8.&#160;Operator +</b></p>
+<div class="table-contents"><table class="table" summary="Operator +">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  50 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  100 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  500 Decimal Digits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_dec_float
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.02382s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0294619s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.058466s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_float
+                </p>
+              </td>
+<td>
+                <p>
+                  4.55086 (0.108402s)
+                </p>
+              </td>
+<td>
+                <p>
+                  3.86443 (0.113853s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.6241 (0.15342s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mpfr_float
+                </p>
+              </td>
+<td>
+                <p>
+                  2.52036 (0.060035s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.1833 (0.0643242s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.37736 (0.0805287s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.float_performance.operator___int_"></a><p class="title"><b>Table&#160;1.9.&#160;Operator +(int)</b></p>
+<div class="table-contents"><table class="table" summary="Operator +(int)">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  50 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  100 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  500 Decimal Digits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_dec_float
+                </p>
+              </td>
+<td>
+                <p>
+                  1.56759 (0.0527023s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.74629 (0.0618102s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.68077 (0.105927s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_float
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0336201s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0353951s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0630232s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mpfr_float
+                </p>
+              </td>
+<td>
+                <p>
+                  3.14875 (0.105861s)
+                </p>
+              </td>
+<td>
+                <p>
+                  3.15499 (0.111671s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.92831 (0.121528s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.float_performance.operator0"></a><p class="title"><b>Table&#160;1.10.&#160;Operator -</b></p>
+<div class="table-contents"><table class="table" summary="Operator -">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  50 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  100 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  500 Decimal Digits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_dec_float
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0265783s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.031465s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0619405s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_float
+                </p>
+              </td>
+<td>
+                <p>
+                  4.66954 (0.124108s)
+                </p>
+              </td>
+<td>
+                <p>
+                  3.72645 (0.117253s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.67536 (0.165713s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mpfr_float
+                </p>
+              </td>
+<td>
+                <p>
+                  2.7909 (0.0741774s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.48557 (0.0782083s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.50944 (0.0934957s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.float_performance.operator_int0"></a><p class="title"><b>Table&#160;1.11.&#160;Operator -(int)</b></p>
+<div class="table-contents"><table class="table" summary="Operator -(int)">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  50 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  100 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  500 Decimal Digits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_dec_float
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0577674s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0633795s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.11146s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_float
+                </p>
+              </td>
+<td>
+                <p>
+                  2.31811 (0.133911s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.07251 (0.131355s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.67161 (0.186319s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mpfr_float
+                </p>
+              </td>
+<td>
+                <p>
+                  2.45081 (0.141577s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.29174 (0.145249s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.395 (0.155487s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.float_performance.operator1"></a><p class="title"><b>Table&#160;1.12.&#160;Operator *</b></p>
+<div class="table-contents"><table class="table" summary="Operator *">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  50 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  100 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  500 Decimal Digits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_dec_float
+                </p>
+              </td>
+<td>
+                <p>
+                  1.07276 (0.287898s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.47724 (0.584569s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.55145 (5.09969s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_float
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.268372s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.395718s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (3.28705s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mpfr_float
+                </p>
+              </td>
+<td>
+                <p>
+                  1.27302 (0.341642s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.17649 (0.465557s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.14029 (3.7482s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.float_performance.operator_int1"></a><p class="title"><b>Table&#160;1.13.&#160;Operator *(int)</b></p>
+<div class="table-contents"><table class="table" summary="Operator *(int)">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  50 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  100 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  500 Decimal Digits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_dec_float
+                </p>
+              </td>
+<td>
+                <p>
+                  2.89945 (0.11959s)
+                </p>
+              </td>
+<td>
+                <p>
+                  4.56335 (0.197945s)
+                </p>
+              </td>
+<td>
+                <p>
+                  9.03602 (0.742044s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_float
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0412457s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0433772s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0821206s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mpfr_float
+                </p>
+              </td>
+<td>
+                <p>
+                  3.6951 (0.152407s)
+                </p>
+              </td>
+<td>
+                <p>
+                  3.71977 (0.161353s)
+                </p>
+              </td>
+<td>
+                <p>
+                  3.30958 (0.271785s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.float_performance.operator2"></a><p class="title"><b>Table&#160;1.14.&#160;Operator /</b></p>
+<div class="table-contents"><table class="table" summary="Operator /">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  50 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  100 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  500 Decimal Digits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_dec_float
+                </p>
+              </td>
+<td>
+                <p>
+                  3.24327 (4.00108s)
+                </p>
+              </td>
+<td>
+                <p>
+                  5.00532 (8.12985s)
+                </p>
+              </td>
+<td>
+                <p>
+                  6.79566 (54.2796s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_float
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (1.23366s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (1.62424s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (7.9874s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mpfr_float
+                </p>
+              </td>
+<td>
+                <p>
+                  1.32521 (1.63486s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.38967 (2.25716s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.72413 (13.7713s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.float_performance.operator_int2"></a><p class="title"><b>Table&#160;1.15.&#160;Operator /(int)</b></p>
+<div class="table-contents"><table class="table" summary="Operator /(int)">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  50 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  100 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  500 Decimal Digits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_dec_float
+                </p>
+              </td>
+<td>
+                <p>
+                  1.45093 (0.253675s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.83306 (0.419569s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.3644 (1.64187s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_float
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.174836s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.22889s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.694411s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mpfr_float
+                </p>
+              </td>
+<td>
+                <p>
+                  1.16731 (0.204088s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.13211 (0.259127s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.02031 (0.708513s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.float_performance.operator_str"></a><p class="title"><b>Table&#160;1.16.&#160;Operator str</b></p>
+<div class="table-contents"><table class="table" summary="Operator str">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  50 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  100 Decimal Digits
+                </p>
+              </th>
+<th>
+                <p>
+                  500 Decimal Digits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_dec_float
+                </p>
+              </td>
+<td>
+                <p>
+                  1.4585 (0.0188303s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.55515 (0.03172s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.131962s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_float
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0129107s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0203967s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.04632 (0.138075s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mpfr_float
+                </p>
+              </td>
+<td>
+                <p>
+                  2.19015 (0.0282764s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.84679 (0.0376683s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.20295 (0.158743s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><p>
+        ]
+      </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2012 John Maddock and Christopher Kormanyos<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="int_real_world.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../perf.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="integer_performance.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
