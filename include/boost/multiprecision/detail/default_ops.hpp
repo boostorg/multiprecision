@@ -1153,20 +1153,7 @@ func(const Arithmetic& a, const mp_number<Backend, false>& arg)\
 }\
 
 
-#define HETERO_BINARY_OP_FUNCTOR(func, Arg2)\
-namespace detail{\
-template <class Backend> \
-struct BOOST_JOIN(func, _funct)\
-{\
-   void operator()(Backend& result, Backend const& arg, Arg2 a)const\
-   {\
-      using default_ops:: BOOST_JOIN(eval_,func);\
-      BOOST_JOIN(eval_,func)(result, arg, a);\
-   }\
-};\
-\
-}\
-\
+#define HETERO_BINARY_OP_FUNCTOR_B(func, Arg2)\
 template <class tag, class A1, class A2, class A3> \
 inline detail::mp_exp<\
     detail::function\
@@ -1216,6 +1203,24 @@ func(const mp_number<Backend, false>& arg, Arg2 const& a)\
    return result;\
 }\
 
+#define HETERO_BINARY_OP_FUNCTOR(func, Arg2)\
+namespace detail{\
+template <class Backend> \
+struct BOOST_JOIN(func, _funct)\
+{\
+   template <class Arg>\
+   void operator()(Backend& result, Backend const& arg, Arg a)const\
+   {\
+      using default_ops:: BOOST_JOIN(eval_,func);\
+      BOOST_JOIN(eval_,func)(result, arg, a);\
+   }\
+};\
+\
+}\
+\
+HETERO_BINARY_OP_FUNCTOR_B(func, Arg2)
+
+
 UNARY_OP_FUNCTOR(abs)
 UNARY_OP_FUNCTOR(fabs)
 UNARY_OP_FUNCTOR(sqrt)
@@ -1238,6 +1243,10 @@ UNARY_OP_FUNCTOR(tanh)
 
 HETERO_BINARY_OP_FUNCTOR(ldexp, int)
 HETERO_BINARY_OP_FUNCTOR(frexp, int*)
+HETERO_BINARY_OP_FUNCTOR_B(ldexp, long)
+HETERO_BINARY_OP_FUNCTOR_B(frexp, long*)
+HETERO_BINARY_OP_FUNCTOR_B(ldexp, long long)
+HETERO_BINARY_OP_FUNCTOR_B(frexp, long long*)
 BINARY_OP_FUNCTOR(pow)
 BINARY_OP_FUNCTOR(fmod)
 BINARY_OP_FUNCTOR(atan2)

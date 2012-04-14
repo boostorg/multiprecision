@@ -665,7 +665,7 @@ run ../example/tommath_snips.cpp $(TOMMATH)
         : # input files
         : # requirements
          [ check-target-builds ../config//has_tommath : : <build>no ] ;
-run ../example/floating_point_examples.cpp ;
+run ../example/floating_point_examples.cpp : : : <toolset>gcc:<cxxflags>-std=c++0x ;
 
 if $(enable-specfun)
 {

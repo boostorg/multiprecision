@@ -441,7 +441,7 @@ mp_type mysin(const mp_type& x)
 /*`
 Calling the function like so:
 
-   std::cout << std::setprecision(std::numeric_limits<::mp_type>::digits10) << std::scientific;
+   std::cout << std::setprecision(std::numeric_limits< ::mp_type>::digits10) << std::scientific;
    std::cout << mysin(mp_type(1)) << std::endl;
 
 Yields the expected output:
@@ -657,9 +657,9 @@ int main(int, char**)
 
    //]
 
-   std::cout << std::setprecision(std::numeric_limits<::mp_type>::digits10) << std::scientific;
-   std::cout << mysin(boost::math::constants::pi<::mp_type>() / 4) << std::endl;
-   std::cout << boost::multiprecision::sin(boost::math::constants::pi<::mp_type>() / 4) << std::endl;
+   std::cout << std::setprecision(std::numeric_limits< ::mp_type>::digits10) << std::scientific;
+   std::cout << mysin(boost::math::constants::pi< ::mp_type>() / 4) << std::endl;
+   std::cout << boost::multiprecision::sin(boost::math::constants::pi< ::mp_type>() / 4) << std::endl;
 
    return 0;
 }

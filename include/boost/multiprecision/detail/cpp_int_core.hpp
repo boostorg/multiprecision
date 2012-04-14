@@ -8,7 +8,7 @@
 
 namespace boost{ namespace multiprecision{
 
-#if defined(__GNUC__) && !defined(BOOST_INTEL) && defined(__x86_64__)
+#if defined(__GNUC__) && !defined(BOOST_INTEL) && defined(__WORDSIZE) && (__WORDSIZE == 64)
 
 typedef boost::uint64_t limb_type;
 typedef boost::int64_t signed_limb_type;
