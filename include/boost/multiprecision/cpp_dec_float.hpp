@@ -36,27 +36,32 @@ public:
    typedef long long                               exponent_type;
 
 
-   static const boost::int32_t mp_radix        = 10;
-   static const boost::int32_t cpp_dec_float_digits = Digits10;
+   static const boost::int32_t mp_radix = 10;
 
    static const boost::int32_t cpp_dec_float_digits10_setting = Digits10;
    static const boost::int32_t cpp_dec_float_digits10_limit   = boost::integer_traits<boost::int32_t>::const_max - 100;
-   static const boost::int32_t cpp_dec_float_digits10         = ((cpp_dec_float_digits10_setting < static_cast<boost::int32_t>(30)) ? static_cast<boost::int32_t>(30) : ((cpp_dec_float_digits10_setting > cpp_dec_float_digits10_limit) ? cpp_dec_float_digits10_limit : cpp_dec_float_digits10_setting));
-   static const boost::int32_t cpp_dec_float_digits10_extra   = static_cast<boost::int32_t>(((static_cast<boost::int64_t>(cpp_dec_float_digits10) * 15LL) + 50LL) / 100LL);
-   static const boost::int32_t cpp_dec_float_max_digits10     = static_cast<boost::int32_t>(cpp_dec_float_digits10 + ((cpp_dec_float_digits10_extra < static_cast<boost::int32_t>(5)) ? static_cast<boost::int32_t>(5) : ((cpp_dec_float_digits10_extra > static_cast<boost::int32_t>(30)) ? static_cast<boost::int32_t>(30) : cpp_dec_float_digits10_extra)));
-   static const boost::int64_t cpp_dec_float_max_exp10 = 2776234983093287512;
+   static const boost::int32_t cpp_dec_float_digits10         = ((Digits10 < 30) ? 30 : ((Digits10 > cpp_dec_float_digits10_limit) ? cpp_dec_float_digits10_limit : Digits10));
+   static const boost::int64_t cpp_dec_float_max_exp10 =  2776234983093287512;
    static const boost::int64_t cpp_dec_float_min_exp10 = -2776234983093287512;
    static const boost::int64_t cpp_dec_float_max_exp   = (cpp_dec_float_max_exp10 / 301LL) * 1000LL;
    static const boost::int64_t cpp_dec_float_min_exp   = (cpp_dec_float_min_exp10 / 301LL) * 1000LL;
-   static const boost::int32_t mp_elem_digits10   = static_cast<boost::int32_t>(8);
+
+   static const boost::int32_t mp_elem_digits10 = static_cast<boost::int32_t>(8);
 
    BOOST_STATIC_ASSERT(0 == cpp_dec_float_max_exp10 % mp_elem_digits10);
    BOOST_STATIC_ASSERT(cpp_dec_float_max_exp10 == -cpp_dec_float_min_exp10);
 
 private:
-   static const boost::int32_t cpp_dec_float_digits10_num_base = static_cast<boost::int32_t>((cpp_dec_float_max_digits10 / mp_elem_digits10) + (((cpp_dec_float_max_digits10 % mp_elem_digits10) != 0) ? 1 : 0));
-   static const boost::int32_t mp_elem_number       = static_cast<boost::int32_t>(cpp_dec_float_digits10_num_base + 2);
-   static const boost::int32_t mp_elem_mask = static_cast<boost::int32_t>(100000000);
+   static const boost::int32_t cpp_dec_float_digits10_num_base = static_cast<boost::int32_t>((cpp_dec_float_digits10 / mp_elem_digits10) + (((cpp_dec_float_digits10 % mp_elem_digits10) != 0) ? 1 : 0));
+
+   // There are three guard limbs.
+   // 1) The first limb has 'play' from 1...8 decimal digits.
+   // 2) The last limb also has 'play' from 1...8 decimal digits.
+   // 3) One limb can get lost when justifying after multiply,
+   //    as only half of the triangle is multiplied and a carry
+   //    from below is missing.
+   static const boost::int32_t mp_elem_number = static_cast<boost::int32_t>(cpp_dec_float_digits10_num_base + 3);
+   static const boost::int32_t mp_elem_mask   = static_cast<boost::int32_t>(100000000);
 
 public:
    static const boost::int32_t cpp_dec_float_total_digits10 = mp_elem_number * mp_elem_digits10;
@@ -181,8 +186,8 @@ public:
       prec_elem(mp_elem_number)
    { 
       // TODO: this doesn't round!
-      std::copy(f.data.begin(), f.data.begin() + std::min(f.prec_elem, prec_elem), data.begin());
-      precision(std::min(f.prec_elem, prec_elem));
+      std::copy(f.data.begin(), f.data.begin() + (std::min)(f.prec_elem, prec_elem), data.begin());
+      precision((std::min)(f.prec_elem, prec_elem));
    }
 
    template <class F>
@@ -215,7 +220,7 @@ public:
    {
       init.do_nothing();
       static bool init = false;
-      static const std::string str_max =   std::string("9." + std::string(static_cast<std::size_t>(cpp_dec_float_max_digits10), static_cast<char>('9')))
+      static const std::string str_max =   std::string("9." + std::string(static_cast<std::size_t>(cpp_dec_float_total_digits10), static_cast<char>('9')))
          + std::string("e+" + boost::lexical_cast<std::string>(cpp_dec_float_max_exp10));
       static cpp_dec_float val_max;
       if(!init)
@@ -327,8 +332,8 @@ public:
       exp = f.exp;
       neg = f.neg;
       fpclass = static_cast<enum_fpclass>(static_cast<int>(f.fpclass));
-      std::copy(f.data.begin(), f.data.begin() + std::min(f.prec_elem, prec_elem), data.begin());
-      precision(std::min(f.prec_elem, prec_elem));
+      std::copy(f.data.begin(), f.data.begin() + (std::min)(f.prec_elem, prec_elem), data.begin());
+      precision((std::min)(f.prec_elem, prec_elem));
       return *this;
    }
    cpp_dec_float& operator= (long long v)
@@ -431,10 +436,10 @@ public:
    signed long long   extract_signed_long_long  (void) const;
    unsigned long long extract_unsigned_long_long(void) const;
    void               extract_parts             (double& mantissa, boost::int64_t& exponent) const;
-   cpp_dec_float           extract_integer_part      (void) const;
+   cpp_dec_float      extract_integer_part      (void) const;
    void precision(const boost::int32_t prec_digits)
    {
-      if(prec_digits >= cpp_dec_float_digits10)
+      if(prec_digits >= cpp_dec_float_total_digits10)
       {
          prec_elem = mp_elem_number;
       }
@@ -525,17 +530,11 @@ typename cpp_dec_float<Digits10>::initializer cpp_dec_float<Digits10>::init;
 template <unsigned Digits10>
 const boost::int32_t cpp_dec_float<Digits10>::mp_radix;
 template <unsigned Digits10>
-const boost::int32_t cpp_dec_float<Digits10>::cpp_dec_float_digits;
-template <unsigned Digits10>
 const boost::int32_t cpp_dec_float<Digits10>::cpp_dec_float_digits10_setting;
 template <unsigned Digits10>
 const boost::int32_t cpp_dec_float<Digits10>::cpp_dec_float_digits10_limit;
 template <unsigned Digits10>
 const boost::int32_t cpp_dec_float<Digits10>::cpp_dec_float_digits10;
-template <unsigned Digits10>
-const boost::int32_t cpp_dec_float<Digits10>::cpp_dec_float_digits10_extra;
-template <unsigned Digits10>
-const boost::int32_t cpp_dec_float<Digits10>::cpp_dec_float_max_digits10;
 template <unsigned Digits10>
 const boost::int64_t cpp_dec_float<Digits10>::cpp_dec_float_max_exp;
 template <unsigned Digits10>
@@ -855,7 +854,8 @@ cpp_dec_float<Digits10>& cpp_dec_float<Digits10>::operator*=(const cpp_dec_float
 
    boost::array<boost::uint32_t, static_cast<std::size_t>(mp_elem_number + static_cast<boost::int32_t>(1))> w = {{ 0u }};
 
-   mul_loop_uv(data.data(), v.data.data(), w.data(), (std::min)(prec_elem, v.prec_elem));
+   const boost::int32_t prec_mul = (std::min)(prec_elem, v.prec_elem);
+   mul_loop_uv(data.data(), v.data.data(), w.data(), prec_mul);
 
    // Copy the multiplication data into the result.
    // Shift the result and adjust the exponent if necessary.
@@ -863,11 +863,11 @@ cpp_dec_float<Digits10>& cpp_dec_float<Digits10>::operator*=(const cpp_dec_float
    {
       exp += static_cast<boost::int64_t>(mp_elem_digits10);
 
-      std::copy(w.begin(), w.end() - 1u, data.begin());
+      std::copy(w.begin(), w.begin() + prec_mul, data.begin());
    }
    else
    {
-      std::copy(w.begin() + 1u, w.end(), data.begin());
+      std::copy(w.begin() + 1u, w.begin() + (prec_mul + 1), data.begin());
    }
 
    // Set the sign of the result.
@@ -1146,13 +1146,13 @@ cpp_dec_float<Digits10>& cpp_dec_float<Digits10>::calculate_inv()
    // is used. During the iterative steps, the precision of the calculation is limited
    // to the minimum required in order to minimize the run-time.
 
-   static const boost::int32_t double_digits10_minus_one = std::numeric_limits<double>::digits10 - 1;
+   static const boost::int32_t double_digits10_minus_a_few = std::numeric_limits<double>::digits10 - 3;
 
-   for(boost::int32_t digits = double_digits10_minus_one; digits <= cpp_dec_float_max_digits10; digits *= static_cast<boost::int32_t>(2))
+   for(boost::int32_t digits = double_digits10_minus_a_few; digits <= cpp_dec_float_total_digits10; digits *= static_cast<boost::int32_t>(2))
    {
       // Adjust precision of the terms.
-      precision(static_cast<boost::int32_t>(digits * static_cast<boost::int32_t>(2)));
-      x.precision(static_cast<boost::int32_t>(digits * static_cast<boost::int32_t>(2)));
+      precision(static_cast<boost::int32_t>((digits + 10) * static_cast<boost::int32_t>(2)));
+      x.precision(static_cast<boost::int32_t>((digits + 10) * static_cast<boost::int32_t>(2)));
 
       // Next iteration.
       cpp_dec_float t(*this);
@@ -1221,13 +1221,13 @@ cpp_dec_float<Digits10>& cpp_dec_float<Digits10>::calculate_sqrt(void)
    // http://www.jjj.de/pibook/pibook.html
    // http://www.amazon.com/exec/obidos/tg/detail/-/3540665722/qid=1035535482/sr=8-7/ref=sr_8_7/104-3357872-6059916?v=glance&n=507846
 
-   static const boost::uint32_t double_digits10_minus_one = std::numeric_limits<double>::digits10 - 1;
+   static const boost::uint32_t double_digits10_minus_a_few = std::numeric_limits<double>::digits10 - 3;
 
-   for(boost::int32_t digits = double_digits10_minus_one; digits <= cpp_dec_float_max_digits10; digits *= 2u)
+   for(boost::int32_t digits = double_digits10_minus_a_few; digits <= cpp_dec_float_total_digits10; digits *= 2u)
    {
       // Adjust precision of the terms.
-      precision(digits * 2);
-      vi.precision(digits * 2);
+      precision((digits + 10) * 2);
+      vi.precision((digits + 10) * 2);
 
       // Next iteration of vi
       cpp_dec_float t(*this);
@@ -1669,7 +1669,7 @@ std::string cpp_dec_float<Digits10>::str(boost::intmax_t number_of_digits, std::
    boost::intmax_t org_digits(number_of_digits);
    boost::int64_t my_exp = order();
    if(number_of_digits == 0)
-      number_of_digits = cpp_dec_float_max_digits10;
+      number_of_digits = cpp_dec_float_total_digits10;
    if(f & std::ios_base::fixed)
    {
       number_of_digits += my_exp + 1;
@@ -2785,7 +2785,7 @@ inline void eval_frexp(cpp_dec_float<Digits10>& result, const cpp_dec_float<Digi
       long long e2;
       cpp_dec_float<Digits10> r2;
       eval_frexp(r2, result, &e2);
-      // overflow prtection:
+      // overflow protection:
       if((t > 0) && (e2 > 0) && (t > (std::numeric_limits<long long>::max)() - e2))
          BOOST_THROW_EXCEPTION(std::runtime_error("Exponent is too large to be represented as a power of 2."));
       if((t < 0) && (e2 < 0) && (t < (std::numeric_limits<long long>::min)() - e2))
@@ -2855,7 +2855,7 @@ namespace std
       static const bool                    is_iec559         = false;
       static const int                     digits            = Digits10;
       static const int                     digits10          = boost::multiprecision::cpp_dec_float<Digits10>::cpp_dec_float_digits10;
-      static const int                     max_digits10      = boost::multiprecision::cpp_dec_float<Digits10>::cpp_dec_float_max_digits10;
+      static const int                     max_digits10      = boost::multiprecision::cpp_dec_float<Digits10>::cpp_dec_float_digits10 + 1;
       static const boost::int64_t          min_exponent      = boost::multiprecision::cpp_dec_float<Digits10>::cpp_dec_float_min_exp;      // Type differs from int.
       static const boost::int64_t          min_exponent10    = boost::multiprecision::cpp_dec_float<Digits10>::cpp_dec_float_min_exp10;    // Type differs from int.
       static const boost::int64_t          max_exponent      = boost::multiprecision::cpp_dec_float<Digits10>::cpp_dec_float_max_exp;      // Type differs from int.

@@ -653,10 +653,10 @@ void eval_atan(T& result, const T& x)
    result = fp_type(std::atan(d));
 
    // Newton-Raphson iteration
-   static const boost::int32_t double_digits10_minus_one = std::numeric_limits<double>::digits10 - 1;
+   static const boost::int32_t double_digits10_minus_a_few = std::numeric_limits<double>::digits10 - 3;
 
    T s, c, t;
-   for(boost::int32_t digits = double_digits10_minus_one; digits <= std::numeric_limits<mp_number<T> >::digits10; digits *= 2)
+   for(boost::int32_t digits = double_digits10_minus_a_few; digits <= std::numeric_limits<mp_number<T> >::digits10; digits *= 2)
    {
       eval_sin(s, result);
       eval_cos(c, result);
