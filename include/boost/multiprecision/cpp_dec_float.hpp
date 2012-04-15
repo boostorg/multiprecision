@@ -2855,7 +2855,7 @@ namespace std
       static const bool                    is_iec559         = false;
       static const int                     digits            = Digits10;
       static const int                     digits10          = boost::multiprecision::cpp_dec_float<Digits10>::cpp_dec_float_digits10;
-      static const int                     max_digits10      = boost::multiprecision::cpp_dec_float<Digits10>::cpp_dec_float_digits10 + 1;
+      static const int                     max_digits10      = boost::multiprecision::cpp_dec_float<Digits10>::cpp_dec_float_total_digits10;
       static const boost::int64_t          min_exponent      = boost::multiprecision::cpp_dec_float<Digits10>::cpp_dec_float_min_exp;      // Type differs from int.
       static const boost::int64_t          min_exponent10    = boost::multiprecision::cpp_dec_float<Digits10>::cpp_dec_float_min_exp10;    // Type differs from int.
       static const boost::int64_t          max_exponent      = boost::multiprecision::cpp_dec_float<Digits10>::cpp_dec_float_max_exp;      // Type differs from int.
