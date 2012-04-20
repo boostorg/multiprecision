@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright Christopher Kormanyos 2002 - 2011.
-//  Copyright 2011 John Maddock. Distributed under the Boost
+//  Copyright Christopher Kormanyos 2002 - 2012.
+//  Copyright 2012 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -2860,7 +2860,7 @@ namespace std
       static const bool                    is_bounded        = true;
       static const bool                    is_modulo         = false;
       static const bool                    is_iec559         = false;
-      static const int                     digits            = Digits10;
+      static const int                     digits            = boost::multiprecision::cpp_dec_float<Digits10>::cpp_dec_float_digits10;
       static const int                     digits10          = boost::multiprecision::cpp_dec_float<Digits10>::cpp_dec_float_digits10;
       static const int                     max_digits10      = boost::multiprecision::cpp_dec_float<Digits10>::cpp_dec_float_total_digits10;
       static const boost::int64_t          min_exponent      = boost::multiprecision::cpp_dec_float<Digits10>::cpp_dec_float_min_exp;      // Type differs from int.
@@ -2896,8 +2896,12 @@ namespace policies{
 template <unsigned Digits10, class Policy, bool ExpressionTemplates>
 struct precision< boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates>, Policy>
 {
+   // Define a local copy of cpp_dec_float_digits10 because it might differ
+   // from the template parameter Digits10 for small or large digit counts.
+   static const boost::int32_t cpp_dec_float_digits10 = boost::multiprecision::cpp_dec_float<Digits10>::cpp_dec_float_digits10;
+
    typedef typename Policy::precision_type precision_type;
-   typedef digits2<((Digits10 + 1) * 1000L) / 301L> digits_2;
+   typedef digits2<((cpp_dec_float_digits10 + 1LL) * 1000LL) / 301LL> digits_2;
    typedef typename mpl::if_c<
       ((digits_2::value <= precision_type::value) 
       || (Policy::precision_type::value <= 0)),
