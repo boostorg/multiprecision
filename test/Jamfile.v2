@@ -322,6 +322,13 @@ run test_exp.cpp
 	      <define>TEST_CPP_DEC_FLOAT
         : test_exp_cpp_dec_float ;
 
+run test_sqrt.cpp 
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_CPP_DEC_FLOAT
+        : test_sqrt_cpp_dec_float ;
+
 run test_log.cpp 
         : # command line
         : # input files

@@ -189,6 +189,9 @@ int main()
    test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<60> > >();
    test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<59> > >();
    test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<58> > >();
+   // Check low multiprecision digit counts.
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<9> > >();
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<18> > >();
 #endif
    return boost::report_errors();
 }

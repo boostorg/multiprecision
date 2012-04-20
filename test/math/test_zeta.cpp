@@ -77,6 +77,7 @@ int test_main(int, char* [])
    expected_results();
    //
    // Test at:
+   //  9 decimal digits: tests the least wide arbitrary precision code
    // 18 decimal digits: tests 80-bit long double approximations
    // 30 decimal digits: tests 128-bit long double approximations
    // 35 decimal digits: tests arbitrary precision code
@@ -92,6 +93,7 @@ int test_main(int, char* [])
    test_zeta(mp_number<mpfr_float_backend<35> >(), "mp_number<mpfr_float_backend<35> >");
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
+   test_zeta(mp_number<cpp_dec_float<9> >(),  "mp_number<cpp_dec_float<9> >");
    test_zeta(mp_number<cpp_dec_float<18> >(), "mp_number<cpp_dec_float<18> >");
    test_zeta(mp_number<cpp_dec_float<30> >(), "mp_number<cpp_dec_float<30> >");
    test_zeta(mp_number<cpp_dec_float<35> >(), "mp_number<cpp_dec_float<35> >");
