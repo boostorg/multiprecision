@@ -766,7 +766,7 @@ void eval_atan2(T& result, const T& y, const T& x)
          eval_add(result, get_constant_pi<T>());
    }
 }
-
+/*
 template <class T, class Arithmetic>
 typename disable_if<is_same<T, Arithmetic> >::type eval_atan2(T& result, const T& a, const Arithmetic& b)
 {
@@ -775,4 +775,4 @@ typename disable_if<is_same<T, Arithmetic> >::type eval_atan2(T& result, const T
    x = static_cast<typename boost::multiprecision::detail::canonical<Arithmetic, T>::type>(b);
    eval_atan2(result, a, x);
 }
-
+*/

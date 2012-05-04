@@ -484,6 +484,68 @@ inline void eval_round(T& result, const T& a)
    }
 }
 
+template<class T, class A> 
+inline typename enable_if<is_floating_point<A>, void>::type eval_pow(T& result, const T& x, const A& a)
+{
+   // Note this one is resticted to float arguments since pow.hpp already has a version for
+   // integer powers....
+   typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
+   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+   cast_type c;
+   c = a;
+   eval_pow(result, x, c);
+}
+
+template<class T, class A> 
+inline typename enable_if<is_arithmetic<A>, void>::type eval_pow(T& result, const A& x, const T& a)
+{
+   typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
+   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+   cast_type c;
+   c = x;
+   eval_pow(result, c, a);
+}
+
+template<class T, class A> 
+inline typename enable_if<is_arithmetic<A>, void>::type eval_fmod(T& result, const T& x, const A& a)
+{
+   typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
+   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+   cast_type c;
+   c = a;
+   eval_fmod(result, x, c);
+}
+
+template<class T, class A> 
+inline typename enable_if<is_arithmetic<A>, void>::type eval_fmod(T& result, const A& x, const T& a)
+{
+   typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
+   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+   cast_type c;
+   c = x;
+   eval_fmod(result, c, a);
+}
+
+template<class T, class A> 
+inline typename enable_if<is_arithmetic<A>, void>::type eval_atan2(T& result, const T& x, const A& a)
+{
+   typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
+   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+   cast_type c;
+   c = a;
+   eval_atan2(result, x, c);
+}
+
+template<class T, class A> 
+inline typename enable_if<is_arithmetic<A>, void>::type eval_atan2(T& result, const A& x, const T& a)
+{
+   typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
+   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+   cast_type c;
+   c = x;
+   eval_atan2(result, c, a);
+}
+
 template <class T, class Arithmetic>
 inline typename enable_if<is_integral<Arithmetic> >::type eval_gcd(T& result, const T& a, const Arithmetic& b)
 {
@@ -861,7 +923,7 @@ inline long long llround(const mp_number<T, ExpressionTemplates>& v)
 }
 #endif
 
-#define UNARY_OP_FUNCTOR(func)\
+#define UNARY_OP_FUNCTOR(func, category)\
 namespace detail{\
 template <class Backend> \
 struct BOOST_JOIN(func, _funct)\
@@ -876,11 +938,12 @@ struct BOOST_JOIN(func, _funct)\
 }\
 \
 template <class tag, class A1, class A2, class A3> \
-inline detail::mp_exp<\
+inline typename enable_if_c<number_category<detail::mp_exp<tag, A1, A2, A3> >::value == category,\
+   detail::mp_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type> \
-  , detail::mp_exp<tag, A1, A2, A3> \
-> \
+  , detail::mp_exp<tag, A1, A2, A3> >\
+>::type \
 func(const detail::mp_exp<tag, A1, A2, A3>& arg)\
 {\
     return detail::mp_exp<\
@@ -893,11 +956,12 @@ func(const detail::mp_exp<tag, A1, A2, A3>& arg)\
     );\
 }\
 template <class Backend> \
-inline detail::mp_exp<\
+inline typename enable_if_c<number_category<Backend>::value == category,\
+   detail::mp_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
-  , mp_number<Backend> \
-> \
+  , mp_number<Backend> >\
+>::type \
 func(const mp_number<Backend>& arg)\
 {\
     return detail::mp_exp<\
@@ -910,7 +974,9 @@ func(const mp_number<Backend>& arg)\
     );\
 }\
 template <class Backend> \
-inline mp_number<Backend, false> \
+inline typename boost::enable_if_c<\
+   boost::multiprecision::number_category<Backend>::value == category,\
+   mp_number<Backend, false> >::type \
 func(const mp_number<Backend, false>& arg)\
 {\
    mp_number<Backend, false> result;\
@@ -919,7 +985,7 @@ func(const mp_number<Backend, false>& arg)\
    return result;\
 }
 
-#define BINARY_OP_FUNCTOR(func)\
+#define BINARY_OP_FUNCTOR(func, category)\
 namespace detail{\
 template <class Backend> \
 struct BOOST_JOIN(func, _funct)\
@@ -945,12 +1011,13 @@ struct BOOST_JOIN(func, _funct)\
 \
 }\
 template <class Backend> \
-inline detail::mp_exp<\
+inline typename enable_if_c<number_category<Backend>::value == category,\
+   detail::mp_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
   , mp_number<Backend> \
-  , mp_number<Backend> \
-> \
+  , mp_number<Backend> > \
+>::type \
 func(const mp_number<Backend>& arg, const mp_number<Backend>& a)\
 {\
     return detail::mp_exp<\
@@ -965,12 +1032,14 @@ func(const mp_number<Backend>& arg, const mp_number<Backend>& a)\
     );\
 }\
 template <class Backend, class tag, class A1, class A2, class A3> \
-inline detail::mp_exp<\
+inline typename enable_if_c<\
+   (number_category<Backend>::value == category) && (number_category<detail::mp_exp<tag, A1, A2, A3> >::value == category),\
+   detail::mp_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
   , mp_number<Backend> \
-  , detail::mp_exp<tag, A1, A2, A3> \
-> \
+  , detail::mp_exp<tag, A1, A2, A3> > \
+>::type \
 func(const mp_number<Backend>& arg, const detail::mp_exp<tag, A1, A2, A3>& a)\
 {\
     return detail::mp_exp<\
@@ -985,12 +1054,14 @@ func(const mp_number<Backend>& arg, const detail::mp_exp<tag, A1, A2, A3>& a)\
     );\
 }\
 template <class tag, class A1, class A2, class A3, class Backend> \
-inline detail::mp_exp<\
+inline typename enable_if_c<\
+   (number_category<Backend>::value == category) && (number_category<detail::mp_exp<tag, A1, A2, A3> >::value == category),\
+   detail::mp_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
   , detail::mp_exp<tag, A1, A2, A3> \
-  , mp_number<Backend> \
-> \
+  , mp_number<Backend> > \
+>::type \
 func(const detail::mp_exp<tag, A1, A2, A3>& arg, const mp_number<Backend>& a)\
 {\
     return detail::mp_exp<\
@@ -1005,12 +1076,14 @@ func(const detail::mp_exp<tag, A1, A2, A3>& arg, const mp_number<Backend>& a)\
     );\
 }\
 template <class tag, class A1, class A2, class A3, class tagb, class A1b, class A2b, class A3b> \
-inline detail::mp_exp<\
+inline typename enable_if_c<\
+      (number_category<detail::mp_exp<tag, A1, A2, A3> >::value == category) && (number_category<detail::mp_exp<tagb, A1b, A2b, A3b> >::value == category),\
+   detail::mp_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type> \
   , detail::mp_exp<tag, A1, A2, A3> \
-  , detail::mp_exp<tagb, A1b, A2b, A3b> \
-> \
+  , detail::mp_exp<tagb, A1b, A2b, A3b> > \
+>::type \
 func(const detail::mp_exp<tag, A1, A2, A3>& arg, const detail::mp_exp<tagb, A1b, A2b, A3b>& a)\
 {\
     return detail::mp_exp<\
@@ -1025,8 +1098,8 @@ func(const detail::mp_exp<tag, A1, A2, A3>& arg, const detail::mp_exp<tagb, A1b,
     );\
 }\
 template <class Backend, class Arithmetic> \
-inline typename enable_if<\
-   is_arithmetic<Arithmetic>,\
+inline typename enable_if_c<\
+   is_arithmetic<Arithmetic>::value && (number_category<Backend>::value == category),\
    detail::mp_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
@@ -1048,8 +1121,8 @@ func(const mp_number<Backend>& arg, const Arithmetic& a)\
     );\
 }\
 template <class tag, class A1, class A2, class A3, class Arithmetic> \
-inline typename enable_if<\
-   is_arithmetic<Arithmetic>,\
+inline typename enable_if_c<\
+   is_arithmetic<Arithmetic>::value && (number_category<detail::mp_exp<tag, A1, A2, A3> >::value == category),\
    detail::mp_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type> \
@@ -1071,8 +1144,8 @@ func(const detail::mp_exp<tag, A1, A2, A3>& arg, const Arithmetic& a)\
     );\
 }\
 template <class Backend, class Arithmetic> \
-inline typename enable_if<\
-   is_arithmetic<Arithmetic>,\
+inline typename enable_if_c<\
+   is_arithmetic<Arithmetic>::value && (number_category<Backend>::value == category),\
    detail::mp_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
@@ -1094,8 +1167,8 @@ func(const Arithmetic& arg, const mp_number<Backend>& a)\
     );\
 }\
 template <class tag, class A1, class A2, class A3, class Arithmetic> \
-inline typename enable_if<\
-   is_arithmetic<Arithmetic>,\
+inline typename enable_if_c<\
+   is_arithmetic<Arithmetic>::value && (number_category<detail::mp_exp<tag, A1, A2, A3> >::value == category),\
    detail::mp_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type> \
@@ -1117,7 +1190,8 @@ func(const Arithmetic& arg, const detail::mp_exp<tag, A1, A2, A3>& a)\
     );\
 }\
 template <class Backend> \
-inline mp_number<Backend, false> \
+inline typename enable_if_c<(number_category<Backend>::value == category),\
+   mp_number<Backend, false> >::type \
 func(const mp_number<Backend, false>& arg, const mp_number<Backend, false>& a)\
 {\
    mp_number<Backend, false> result;\
@@ -1126,8 +1200,8 @@ func(const mp_number<Backend, false>& arg, const mp_number<Backend, false>& a)\
    return result;\
 }\
 template <class Backend, class Arithmetic> \
-inline typename enable_if<\
-   is_arithmetic<Arithmetic>,\
+inline typename enable_if_c<\
+   is_arithmetic<Arithmetic>::value && (number_category<Backend>::value == category),\
    mp_number<Backend, false> \
 >::type \
 func(const mp_number<Backend, false>& arg, const Arithmetic& a)\
@@ -1139,8 +1213,8 @@ func(const mp_number<Backend, false>& arg, const Arithmetic& a)\
    return result;\
 }\
 template <class Backend, class Arithmetic> \
-inline typename enable_if<\
-   is_arithmetic<Arithmetic>,\
+inline typename enable_if_c<\
+   is_arithmetic<Arithmetic>::value && (number_category<Backend>::value == category),\
    mp_number<Backend, false> \
 >::type \
 func(const Arithmetic& a, const mp_number<Backend, false>& arg)\
@@ -1153,14 +1227,16 @@ func(const Arithmetic& a, const mp_number<Backend, false>& arg)\
 }\
 
 
-#define HETERO_BINARY_OP_FUNCTOR_B(func, Arg2)\
+#define HETERO_BINARY_OP_FUNCTOR_B(func, Arg2, category)\
 template <class tag, class A1, class A2, class A3> \
-inline detail::mp_exp<\
+inline typename enable_if_c<\
+   (number_category<detail::mp_exp<tag, A1, A2, A3> >::value == category),\
+   detail::mp_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type> \
   , detail::mp_exp<tag, A1, A2, A3> \
-  , Arg2\
-> \
+  , Arg2> \
+>::type \
 func(const detail::mp_exp<tag, A1, A2, A3>& arg, Arg2 const& a)\
 {\
     return detail::mp_exp<\
@@ -1174,12 +1250,14 @@ func(const detail::mp_exp<tag, A1, A2, A3>& arg, Arg2 const& a)\
     );\
 }\
 template <class Backend> \
-inline detail::mp_exp<\
+inline typename enable_if_c<\
+   (number_category<Backend>::value == category),\
+  detail::mp_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
   , mp_number<Backend> \
-  , Arg2\
-> \
+  , Arg2> \
+>::type \
 func(const mp_number<Backend>& arg, Arg2 const& a)\
 {\
     return detail::mp_exp<\
@@ -1194,7 +1272,9 @@ func(const mp_number<Backend>& arg, Arg2 const& a)\
     );\
 }\
 template <class Backend> \
-inline mp_number<Backend, false> \
+inline typename enable_if_c<\
+  (number_category<Backend>::value == category),\
+  mp_number<Backend, false> >::type \
 func(const mp_number<Backend, false>& arg, Arg2 const& a)\
 {\
    mp_number<Backend, false> result;\
@@ -1203,7 +1283,7 @@ func(const mp_number<Backend, false>& arg, Arg2 const& a)\
    return result;\
 }\
 
-#define HETERO_BINARY_OP_FUNCTOR(func, Arg2)\
+#define HETERO_BINARY_OP_FUNCTOR(func, Arg2, category)\
 namespace detail{\
 template <class Backend> \
 struct BOOST_JOIN(func, _funct)\
@@ -1218,44 +1298,97 @@ struct BOOST_JOIN(func, _funct)\
 \
 }\
 \
-HETERO_BINARY_OP_FUNCTOR_B(func, Arg2)
+HETERO_BINARY_OP_FUNCTOR_B(func, Arg2, category)
 
+namespace detail{
+template <class Backend>
+struct abs_funct
+{
+   void operator()(Backend& result, const Backend& arg)const
+   {
+      using default_ops::eval_abs;
+      eval_abs(result, arg);
+   }
+};
 
-UNARY_OP_FUNCTOR(abs)
-UNARY_OP_FUNCTOR(fabs)
-UNARY_OP_FUNCTOR(sqrt)
-UNARY_OP_FUNCTOR(floor)
-UNARY_OP_FUNCTOR(ceil)
-UNARY_OP_FUNCTOR(trunc)
-UNARY_OP_FUNCTOR(round)
-UNARY_OP_FUNCTOR(exp)
-UNARY_OP_FUNCTOR(log)
-UNARY_OP_FUNCTOR(log10)
-UNARY_OP_FUNCTOR(cos)
-UNARY_OP_FUNCTOR(sin)
-UNARY_OP_FUNCTOR(tan)
-UNARY_OP_FUNCTOR(asin)
-UNARY_OP_FUNCTOR(acos)
-UNARY_OP_FUNCTOR(atan)
-UNARY_OP_FUNCTOR(cosh)
-UNARY_OP_FUNCTOR(sinh)
-UNARY_OP_FUNCTOR(tanh)
+}
 
-HETERO_BINARY_OP_FUNCTOR(ldexp, int)
-HETERO_BINARY_OP_FUNCTOR(frexp, int*)
-HETERO_BINARY_OP_FUNCTOR_B(ldexp, long)
-HETERO_BINARY_OP_FUNCTOR_B(frexp, long*)
-HETERO_BINARY_OP_FUNCTOR_B(ldexp, long long)
-HETERO_BINARY_OP_FUNCTOR_B(frexp, long long*)
-BINARY_OP_FUNCTOR(pow)
-BINARY_OP_FUNCTOR(fmod)
-BINARY_OP_FUNCTOR(atan2)
+template <class tag, class A1, class A2, class A3>
+inline detail::mp_exp<
+    detail::function
+  , detail::abs_funct<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type>
+  , detail::mp_exp<tag, A1, A2, A3> >
+abs(const detail::mp_exp<tag, A1, A2, A3>& arg)
+{
+    return detail::mp_exp<
+    detail::function
+  , detail::abs_funct<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type>
+  , detail::mp_exp<tag, A1, A2, A3>
+> (
+        detail::abs_funct<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type>()
+      , arg
+    );
+}
+template <class Backend>
+inline detail::mp_exp<
+    detail::function
+  , detail::abs_funct<Backend>
+  , mp_number<Backend> >
+abs(const mp_number<Backend>& arg)
+{
+    return detail::mp_exp<
+    detail::function
+  , detail::abs_funct<Backend>
+  , mp_number<Backend>
+  >(
+        detail::abs_funct<Backend>()
+      , arg
+    );
+}
+template <class Backend>
+inline mp_number<Backend, false>
+abs(const mp_number<Backend, false>& arg)
+{
+   mp_number<Backend, false> result;
+   using default_ops::eval_abs;
+   eval_abs(result.backend(), arg.backend());
+   return result;
+}
+
+UNARY_OP_FUNCTOR(fabs, number_kind_floating_point)
+UNARY_OP_FUNCTOR(sqrt, number_kind_floating_point)
+UNARY_OP_FUNCTOR(floor, number_kind_floating_point)
+UNARY_OP_FUNCTOR(ceil, number_kind_floating_point)
+UNARY_OP_FUNCTOR(trunc, number_kind_floating_point)
+UNARY_OP_FUNCTOR(round, number_kind_floating_point)
+UNARY_OP_FUNCTOR(exp, number_kind_floating_point)
+UNARY_OP_FUNCTOR(log, number_kind_floating_point)
+UNARY_OP_FUNCTOR(log10, number_kind_floating_point)
+UNARY_OP_FUNCTOR(cos, number_kind_floating_point)
+UNARY_OP_FUNCTOR(sin, number_kind_floating_point)
+UNARY_OP_FUNCTOR(tan, number_kind_floating_point)
+UNARY_OP_FUNCTOR(asin, number_kind_floating_point)
+UNARY_OP_FUNCTOR(acos, number_kind_floating_point)
+UNARY_OP_FUNCTOR(atan, number_kind_floating_point)
+UNARY_OP_FUNCTOR(cosh, number_kind_floating_point)
+UNARY_OP_FUNCTOR(sinh, number_kind_floating_point)
+UNARY_OP_FUNCTOR(tanh, number_kind_floating_point)
+
+HETERO_BINARY_OP_FUNCTOR(ldexp, int, number_kind_floating_point)
+HETERO_BINARY_OP_FUNCTOR(frexp, int*, number_kind_floating_point)
+HETERO_BINARY_OP_FUNCTOR_B(ldexp, long, number_kind_floating_point)
+HETERO_BINARY_OP_FUNCTOR_B(frexp, long*, number_kind_floating_point)
+HETERO_BINARY_OP_FUNCTOR_B(ldexp, long long, number_kind_floating_point)
+HETERO_BINARY_OP_FUNCTOR_B(frexp, long long*, number_kind_floating_point)
+BINARY_OP_FUNCTOR(pow, number_kind_floating_point)
+BINARY_OP_FUNCTOR(fmod, number_kind_floating_point)
+BINARY_OP_FUNCTOR(atan2, number_kind_floating_point)
 
 //
 // Integer functions:
 //
-BINARY_OP_FUNCTOR(gcd)
-BINARY_OP_FUNCTOR(lcm)
+BINARY_OP_FUNCTOR(gcd, number_kind_integer)
+BINARY_OP_FUNCTOR(lcm, number_kind_integer)
 
 
 #undef BINARY_OP_FUNCTOR

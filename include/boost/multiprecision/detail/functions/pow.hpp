@@ -84,11 +84,9 @@ inline void pow_imp(T& result, const T& t, const U& p, const mpl::true_&)
 } // namespace detail
 
 template<typename T, typename U> 
-inline void eval_pow(T& result, const T& t, const U& p)
+inline typename enable_if<is_integral<U> >::type eval_pow(T& result, const T& t, const U& p)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The pow function is only valid for floating point types.");
-   typedef typename is_integral<U>::type tag_type;
-   detail::pow_imp(result, t, p, tag_type());
+   detail::pow_imp(result, t, p, mpl::true_());
 }
 
 template <class T>
