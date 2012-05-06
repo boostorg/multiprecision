@@ -185,9 +185,9 @@ public:
    cpp_dec_float(const cpp_dec_float<D>& f) : 
       exp      (f.exp),
       neg      (f.neg),
-      fpclass  (static_cast<enum_fpclass>(static_cast<int>(f.fpclass))),
+      fpclass  (static_cast<fpclass_type>(static_cast<int>(f.fpclass))),
       prec_elem(cpp_dec_float_elem_number)
-   { 
+   {
       // TODO: this doesn't round!
       std::copy(f.data.begin(), f.data.begin() + (std::min)(f.prec_elem, prec_elem), data.begin());
       precision((std::min)(f.prec_elem, prec_elem));
@@ -334,7 +334,7 @@ public:
    { 
       exp = f.exp;
       neg = f.neg;
-      fpclass = static_cast<enum_fpclass>(static_cast<int>(f.fpclass));
+      fpclass = static_cast<fpclass_type>(static_cast<int>(f.fpclass));
       std::copy(f.data.begin(), f.data.begin() + (std::min)(f.prec_elem, prec_elem), data.begin());
       precision((std::min)(f.prec_elem, prec_elem));
       return *this;
