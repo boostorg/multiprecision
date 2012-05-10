@@ -1052,8 +1052,10 @@ The following example searches for a prime `p` for which `(p-1)/2` is also proba
    struct number_category;
 
    // Integer specific functions:
+   ``['unmentionable-expression-template-type]``    pow(const ``['mp_number-or-expression-template-type]``&, unsigned);
+   ``['unmentionable-expression-template-type]``    powm(const ``['mp_number-or-expression-template-type]``& b, const ``['mp_number-or-expression-template-type]``& p, const ``['mp_number-or-expression-template-type]``& m);
    template <class Backend, bool ExpressionTemplates>
-   bool divide_qr(const ``['mp_number-or-expression-template-type]``& x, const ``['mp_number-or-expression-template-type]``& y,
+   void divide_qr(const ``['mp_number-or-expression-template-type]``& x, const ``['mp_number-or-expression-template-type]``& y,
                   mp_number<Backend, ExpressionTemplates>& q, mp_number<Backend, ExpressionTemplates>& r);
    template <class Integer>
    Integer integer_modulus(const ``['mp_number-or-expression-template-type]``& x, Integer val);
@@ -1335,6 +1337,15 @@ A traits class that inherits from `mpl::int_<N>` where `N` is one of the enumera
 
 
 [h4 Integer functions]
+
+   ``['unmentionable-expression-template-type]``    pow(const ``['mp_number-or-expression-template-type]``& b, unsigned p);
+
+Returns ['b[super p]] as an expression template.  Note that this function should be used with extreme care as the result can grow so 
+large as to take "effectively forever" to compute, or else simply run the host machine out of memory.
+
+   ``['unmentionable-expression-template-type]``    powm(const ``['mp_number-or-expression-template-type]``& b, const ``['mp_number-or-expression-template-type]``& p, const ``['mp_number-or-expression-template-type]``& m);
+
+Returns ['b[super p] mod m] as an expression template.
 
    template <class Backend, bool ExpressionTemplates>
    bool divide_qr(const ``['mp_number-or-expression-template-type]``& x, const ``['mp_number-or-expression-template-type]``& y,

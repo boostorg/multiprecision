@@ -22,11 +22,27 @@ namespace boost{ namespace multiprecision{
 template <class Backend, bool ExpressionTemplates = true>
 class mp_number;
 
+template <class T>
+struct is_mp_number : public mpl::false_ {};
+
+template <class Backend, bool ExpressionTemplates>
+struct is_mp_number<mp_number<Backend, ExpressionTemplates> > : public mpl::true_ {};
+
 namespace detail{
 
 // Forward-declare an expression wrapper
-template<class tag, class Arg1 = void, class Arg2 = void, class Arg3 = void>
+template<class tag, class Arg1 = void, class Arg2 = void, class Arg3 = void, class Arg4 = void>
 struct mp_exp;
+
+} // namespace detail
+
+template <class T>
+struct is_mp_number_expression : public mpl::false_ {};
+
+template<class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+struct is_mp_number_expression<detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> > : public mpl::true_ {};
+
+namespace detail{
 
 template <class T>
 typename boost::enable_if<is_arithmetic<T>, T>::type abs(const T& t)
@@ -144,10 +160,10 @@ struct backend_type<mp_number<T, ExpressionTemplates> >
    typedef T type;
 };
 
-template <class tag, class A1, class A2, class A3>
-struct backend_type<mp_exp<tag, A1, A2, A3> >
+template <class tag, class A1, class A2, class A3, class A4>
+struct backend_type<mp_exp<tag, A1, A2, A3, A4> >
 {
-   typedef typename backend_type<typename mp_exp<tag, A1, A2, A3>::result_type>::type type;
+   typedef typename backend_type<typename mp_exp<tag, A1, A2, A3, A4>::result_type>::type type;
 };
 
 
@@ -157,8 +173,8 @@ template <class T, bool ExpressionTemplates>
 struct is_mp_number<boost::multiprecision::mp_number<T, ExpressionTemplates> > : public mpl::true_{};
 template <class T>
 struct is_mp_number_exp : public mpl::false_{};
-template <class Tag, class Arg1, class Arg2, class Arg3>
-struct is_mp_number_exp<boost::multiprecision::detail::mp_exp<Tag, Arg1, Arg2, Arg3> > : public mpl::true_{};
+template <class Tag, class Arg1, class Arg2, class Arg3, class Arg4>
+struct is_mp_number_exp<boost::multiprecision::detail::mp_exp<Tag, Arg1, Arg2, Arg3, Arg4> > : public mpl::true_{};
 
 template <class T1, class T2>
 struct combine_expression;
@@ -187,10 +203,10 @@ struct arg_type
    typedef mp_exp<terminal, T> type;
 };
 
-template <class Tag, class Arg1, class Arg2, class Arg3>
-struct arg_type<mp_exp<Tag, Arg1, Arg2, Arg3> >
+template <class Tag, class Arg1, class Arg2, class Arg3, class Arg4>
+struct arg_type<mp_exp<Tag, Arg1, Arg2, Arg3, Arg4> >
 {
-   typedef mp_exp<Tag, Arg1, Arg2, Arg3> type;
+   typedef mp_exp<Tag, Arg1, Arg2, Arg3, Arg4> type;
 };
 
 template <class T>
@@ -219,14 +235,14 @@ struct mp_exp_storage<const T*>
    typedef const T* type;
 };
 
-template <class tag, class A1, class A2, class A3>
-struct mp_exp_storage<mp_exp<tag, A1, A2, A3> >
+template <class tag, class A1, class A2, class A3, class A4>
+struct mp_exp_storage<mp_exp<tag, A1, A2, A3, A4> >
 {
-   typedef mp_exp<tag, A1, A2, A3> type;
+   typedef mp_exp<tag, A1, A2, A3, A4> type;
 };
 
 template<class tag, class Arg1>
-struct mp_exp<tag, Arg1, void, void>
+struct mp_exp<tag, Arg1, void, void, void>
 {
    typedef mpl::int_<1> arity;
    typedef typename arg_type<Arg1>::type left_type;
@@ -253,7 +269,7 @@ private:
 };
 
 template<class Arg1>
-struct mp_exp<terminal, Arg1, void, void>
+struct mp_exp<terminal, Arg1, void, void, void>
 {
    typedef mpl::int_<0> arity;
    typedef Arg1 result_type;
@@ -276,7 +292,7 @@ private:
 };
 
 template <class tag, class Arg1, class Arg2>
-struct mp_exp<tag, Arg1, Arg2, void>
+struct mp_exp<tag, Arg1, Arg2, void, void>
 {
    typedef mpl::int_<2> arity;
    typedef typename arg_type<Arg1>::type left_type;
@@ -309,7 +325,7 @@ private:
 };
 
 template <class tag, class Arg1, class Arg2, class Arg3>
-struct mp_exp
+struct mp_exp<tag, Arg1, Arg2, Arg3, void>
 {
    typedef mpl::int_<3> arity;
    typedef typename arg_type<Arg1>::type left_type;
@@ -347,6 +363,61 @@ private:
    typename mp_exp_storage<Arg1>::type arg1;
    typename mp_exp_storage<Arg2>::type arg2;
    typename mp_exp_storage<Arg3>::type arg3;
+   mp_exp& operator=(const mp_exp&);
+};
+
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+struct mp_exp
+{
+   typedef mpl::int_<4> arity;
+   typedef typename arg_type<Arg1>::type left_type;
+   typedef typename arg_type<Arg2>::type left_middle_type;
+   typedef typename arg_type<Arg3>::type right_middle_type;
+   typedef typename arg_type<Arg4>::type right_type;
+   typedef typename left_type::result_type left_result_type;
+   typedef typename left_middle_type::result_type left_middle_result_type;
+   typedef typename right_middle_type::result_type right_middle_result_type;
+   typedef typename right_type::result_type right_result_type;
+   typedef typename combine_expression<
+      typename combine_expression<
+         typename combine_expression<left_result_type, left_middle_result_type>::type,
+         right_middle_result_type
+      >::type,
+      right_result_type
+   >::type result_type;
+   typedef tag tag_type;
+
+   mp_exp(const Arg1& a1, const Arg2& a2, const Arg3& a3, const Arg4& a4) : arg1(a1), arg2(a2), arg3(a3), arg4(a4) {}
+
+   left_type left()const { return left_type(arg1); }
+   left_middle_type left_middle()const { return left_middle_type(arg2); }
+   right_middle_type right_middle()const { return right_middle_type(arg3); }
+   right_type right()const { return right_type(arg4); }
+   const Arg1& left_ref()const{ return arg1; }
+   const Arg2& left_middle_ref()const{ return arg2; }
+   const Arg3& right_middle_ref()const{ return arg3; }
+   const Arg4& right_ref()const{ return arg4; }
+
+   operator unmentionable_type()const
+   {
+      result_type r(*this);
+      return r ? &unmentionable<void>::proc : 0;
+   }
+
+   static const unsigned left_depth = left_type::depth + 1;
+   static const unsigned left_middle_depth = left_middle_type::depth + 1;
+   static const unsigned right_middle_depth = right_middle_type::depth + 1;
+   static const unsigned right_depth = right_type::depth + 1;
+
+   static const unsigned left_max_depth = left_depth > left_middle_depth ? left_depth : left_middle_depth;
+   static const unsigned right_max_depth = right_depth > right_middle_depth ? right_depth : right_middle_depth;
+
+   static const unsigned depth = left_max_depth > right_max_depth ? left_max_depth : right_max_depth;
+private:
+   typename mp_exp_storage<Arg1>::type arg1;
+   typename mp_exp_storage<Arg2>::type arg2;
+   typename mp_exp_storage<Arg3>::type arg3;
+   typename mp_exp_storage<Arg4>::type arg4;
    mp_exp& operator=(const mp_exp&);
 };
 
@@ -506,16 +577,16 @@ void format_float_string(S& str, boost::intmax_t my_exp, boost::intmax_t digits,
 //
 template <class B, bool ExpressionTemplates>
 inline const mp_number<B, ExpressionTemplates>& operator + (const mp_number<B, ExpressionTemplates>& v) { return v; }
-template <class tag, class Arg1, class Arg2, class Arg3>
-inline const detail::mp_exp<tag, Arg1, Arg2, Arg3>& operator + (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& v) { return v; }
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& operator + (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& v) { return v; }
 template <class B>
 inline detail::mp_exp<detail::negate, mp_number<B, true> > operator - (const mp_number<B, true>& v) { return detail::mp_exp<detail::negate, mp_number<B, true> >(v); }
-template <class tag, class Arg1, class Arg2, class Arg3>
-inline detail::mp_exp<detail::negate, detail::mp_exp<tag, Arg1, Arg2, Arg3> > operator - (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& v) { return detail::mp_exp<detail::negate, detail::mp_exp<tag, Arg1, Arg2, Arg3> >(v); }
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline detail::mp_exp<detail::negate, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> > operator - (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& v) { return detail::mp_exp<detail::negate, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >(v); }
 template <class B>
 inline detail::mp_exp<detail::complement_immediates, mp_number<B, true> > operator ~ (const mp_number<B, true>& v) { return detail::mp_exp<detail::complement_immediates, mp_number<B, true> >(v); }
-template <class tag, class Arg1, class Arg2, class Arg3>
-inline detail::mp_exp<detail::bitwise_complement, detail::mp_exp<tag, Arg1, Arg2, Arg3> > operator ~ (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& v) { return detail::mp_exp<detail::bitwise_complement, detail::mp_exp<tag, Arg1, Arg2, Arg3> >(v); }
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline detail::mp_exp<detail::bitwise_complement, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> > operator ~ (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& v) { return detail::mp_exp<detail::bitwise_complement, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >(v); }
 //
 // Then addition:
 //
@@ -537,50 +608,50 @@ inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::add_immediate
 {
    return detail::mp_exp<detail::add_immediates, V, mp_number<B, true> >(a, b);
 }
-template <class B, class tag, class Arg1, class Arg2, class Arg3>
-inline detail::mp_exp<detail::plus, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3> >
-   operator + (const mp_number<B, true>& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3>& b)
+template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline detail::mp_exp<detail::plus, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >
+   operator + (const mp_number<B, true>& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::mp_exp<detail::plus, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3> >(a, b);
+   return detail::mp_exp<detail::plus, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class B>
-inline detail::mp_exp<detail::plus, detail::mp_exp<tag, Arg1, Arg2, Arg3>, mp_number<B, true> >
-   operator + (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const mp_number<B, true>& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
+inline detail::mp_exp<detail::plus, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, mp_number<B, true> >
+   operator + (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const mp_number<B, true>& b)
 {
-   return detail::mp_exp<detail::plus, detail::mp_exp<tag, Arg1, Arg2, Arg3>, mp_number<B, true> >(a, b);
+   return detail::mp_exp<detail::plus, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, mp_number<B, true> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class tag2, class Arg1b, class Arg2b, class Arg3b>
-inline detail::mp_exp<detail::plus, detail::mp_exp<tag, Arg1, Arg2, Arg3>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b> >
-   operator + (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b>& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class tag2, class Arg1b, class Arg2b, class Arg3b, class Arg4b>
+inline detail::mp_exp<detail::plus, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b, Arg4b> >
+   operator + (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b, Arg4b>& b)
 {
-   return detail::mp_exp<detail::plus, detail::mp_exp<tag, Arg1, Arg2, Arg3>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b> >(a, b);
+   return detail::mp_exp<detail::plus, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b, Arg4b> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class V>
-inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::plus, detail::mp_exp<tag, Arg1, Arg2, Arg3>, V > >::type
-   operator + (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const V& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class V>
+inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::plus, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, V > >::type
+   operator + (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const V& b)
 {
-   return detail::mp_exp<detail::plus, detail::mp_exp<tag, Arg1, Arg2, Arg3>, V >(a, b);
+   return detail::mp_exp<detail::plus, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, V >(a, b);
 }
-template <class V, class tag, class Arg1, class Arg2, class Arg3>
-inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::plus, V, detail::mp_exp<tag, Arg1, Arg2, Arg3> > >::type
-   operator + (const V& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3>& b)
+template <class V, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::plus, V, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> > >::type
+   operator + (const V& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::mp_exp<detail::plus, V, detail::mp_exp<tag, Arg1, Arg2, Arg3> >(a, b);
+   return detail::mp_exp<detail::plus, V, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 //
 // Repeat operator for negated arguments: propagate the negation to the top level to avoid temporaries:
 //
-template <class B, class Arg1, class Arg2, class Arg3>
-inline detail::mp_exp<detail::minus, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type >
-   operator + (const mp_number<B, true>& a, const detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>& b)
+template <class B, class Arg1, class Arg2, class Arg3, class Arg4>
+inline detail::mp_exp<detail::minus, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >
+   operator + (const mp_number<B, true>& a, const detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::mp_exp<detail::minus, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type >(a, b.left_ref());
+   return detail::mp_exp<detail::minus, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >(a, b.left_ref());
 }
-template <class Arg1, class Arg2, class Arg3, class B>
-inline detail::mp_exp<detail::minus, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type >
-   operator + (const detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>& a, const mp_number<B, true>& b)
+template <class Arg1, class Arg2, class Arg3, class Arg4, class B>
+inline detail::mp_exp<detail::minus, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >
+   operator + (const detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>& a, const mp_number<B, true>& b)
 {
-   return detail::mp_exp<detail::minus, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type >(b, a.left_ref());
+   return detail::mp_exp<detail::minus, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >(b, a.left_ref());
 }
 template <class B>
 inline detail::mp_exp<detail::subtract_immediates, mp_number<B, true>, mp_number<B, true> >
@@ -627,51 +698,51 @@ inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::subtract_imme
 {
    return detail::mp_exp<detail::subtract_immediates, V, mp_number<B, true> >(a, b);
 }
-template <class B, class tag, class Arg1, class Arg2, class Arg3>
-inline detail::mp_exp<detail::minus, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3> >
-   operator - (const mp_number<B, true>& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3>& b)
+template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline detail::mp_exp<detail::minus, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >
+   operator - (const mp_number<B, true>& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::mp_exp<detail::minus, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3> >(a, b);
+   return detail::mp_exp<detail::minus, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class B>
-inline detail::mp_exp<detail::minus, detail::mp_exp<tag, Arg1, Arg2, Arg3>, mp_number<B, true> >
-   operator - (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const mp_number<B, true>& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
+inline detail::mp_exp<detail::minus, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, mp_number<B, true> >
+   operator - (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const mp_number<B, true>& b)
 {
-   return detail::mp_exp<detail::minus, detail::mp_exp<tag, Arg1, Arg2, Arg3>, mp_number<B, true> >(a, b);
+   return detail::mp_exp<detail::minus, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, mp_number<B, true> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class tag2, class Arg1b, class Arg2b, class Arg3b>
-inline detail::mp_exp<detail::minus, detail::mp_exp<tag, Arg1, Arg2, Arg3>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b> >
-   operator - (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b>& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class tag2, class Arg1b, class Arg2b, class Arg3b, class Arg4b>
+inline detail::mp_exp<detail::minus, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b, Arg4b> >
+   operator - (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b, Arg4b>& b)
 {
-   return detail::mp_exp<detail::minus, detail::mp_exp<tag, Arg1, Arg2, Arg3>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b> >(a, b);
+   return detail::mp_exp<detail::minus, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b, Arg4b> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class V>
-inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::minus, detail::mp_exp<tag, Arg1, Arg2, Arg3>, V > >::type
-   operator - (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const V& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class V>
+inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::minus, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, V > >::type
+   operator - (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const V& b)
 {
-   return detail::mp_exp<detail::minus, detail::mp_exp<tag, Arg1, Arg2, Arg3>, V >(a, b);
+   return detail::mp_exp<detail::minus, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, V >(a, b);
 }
-template <class V, class tag, class Arg1, class Arg2, class Arg3>
-inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::minus, V, detail::mp_exp<tag, Arg1, Arg2, Arg3> > >::type
-   operator - (const V& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3>& b)
+template <class V, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::minus, V, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> > >::type
+   operator - (const V& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::mp_exp<detail::minus, V, detail::mp_exp<tag, Arg1, Arg2, Arg3> >(a, b);
+   return detail::mp_exp<detail::minus, V, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 //
 // Repeat operator for negated arguments: propagate the negation to the top level to avoid temporaries:
 //
-template <class B, class Arg1, class Arg2, class Arg3>
-inline detail::mp_exp<detail::plus, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type >
-   operator - (const mp_number<B, true>& a, const detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>& b)
+template <class B, class Arg1, class Arg2, class Arg3, class Arg4>
+inline detail::mp_exp<detail::plus, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >
+   operator - (const mp_number<B, true>& a, const detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::mp_exp<detail::plus, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type >(a, b.left_ref());
+   return detail::mp_exp<detail::plus, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >(a, b.left_ref());
 }
-template <class Arg1, class Arg2, class Arg3, class B>
-inline detail::mp_exp<detail::negate, detail::mp_exp<detail::plus, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type > >
-   operator - (const detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>& a, const mp_number<B, true>& b)
+template <class Arg1, class Arg2, class Arg3, class Arg4, class B>
+inline detail::mp_exp<detail::negate, detail::mp_exp<detail::plus, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > >
+   operator - (const detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>& a, const mp_number<B, true>& b)
 {
-   return detail::mp_exp<detail::negate, detail::mp_exp<detail::plus, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type > >(
-      detail::mp_exp<detail::plus, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type >(b, a.left_ref()));
+   return detail::mp_exp<detail::negate, detail::mp_exp<detail::plus, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > >(
+      detail::mp_exp<detail::plus, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >(b, a.left_ref()));
 }
 template <class B>
 inline detail::mp_exp<detail::add_immediates, mp_number<B, true>, mp_number<B, true> >
@@ -719,52 +790,52 @@ inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::multiply_imme
 {
    return detail::mp_exp<detail::multiply_immediates, V, mp_number<B, true> >(a, b);
 }
-template <class B, class tag, class Arg1, class Arg2, class Arg3>
-inline detail::mp_exp<detail::multiplies, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3> >
-   operator * (const mp_number<B, true>& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3>& b)
+template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline detail::mp_exp<detail::multiplies, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >
+   operator * (const mp_number<B, true>& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::mp_exp<detail::multiplies, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3> >(a, b);
+   return detail::mp_exp<detail::multiplies, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class B>
-inline detail::mp_exp<detail::multiplies, detail::mp_exp<tag, Arg1, Arg2, Arg3>, mp_number<B, true> >
-   operator * (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const mp_number<B, true>& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
+inline detail::mp_exp<detail::multiplies, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, mp_number<B, true> >
+   operator * (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const mp_number<B, true>& b)
 {
-   return detail::mp_exp<detail::multiplies, detail::mp_exp<tag, Arg1, Arg2, Arg3>, mp_number<B, true> >(a, b);
+   return detail::mp_exp<detail::multiplies, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, mp_number<B, true> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class tag2, class Arg1b, class Arg2b, class Arg3b>
-inline detail::mp_exp<detail::multiplies, detail::mp_exp<tag, Arg1, Arg2, Arg3>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b> >
-   operator * (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b>& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class tag2, class Arg1b, class Arg2b, class Arg3b, class Arg4b>
+inline detail::mp_exp<detail::multiplies, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b, Arg4b> >
+   operator * (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b, Arg4b>& b)
 {
-   return detail::mp_exp<detail::multiplies, detail::mp_exp<tag, Arg1, Arg2, Arg3>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b> >(a, b);
+   return detail::mp_exp<detail::multiplies, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b, Arg4b> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class V>
-inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::multiplies, detail::mp_exp<tag, Arg1, Arg2, Arg3>, V > >::type
-   operator * (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const V& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class V>
+inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::multiplies, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, V > >::type
+   operator * (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const V& b)
 {
-   return detail::mp_exp<detail::multiplies, detail::mp_exp<tag, Arg1, Arg2, Arg3>, V >(a, b);
+   return detail::mp_exp<detail::multiplies, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, V >(a, b);
 }
-template <class V, class tag, class Arg1, class Arg2, class Arg3>
-inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::multiplies, V, detail::mp_exp<tag, Arg1, Arg2, Arg3> > >::type
-   operator * (const V& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3>& b)
+template <class V, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::multiplies, V, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> > >::type
+   operator * (const V& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::mp_exp<detail::multiplies, V, detail::mp_exp<tag, Arg1, Arg2, Arg3> >(a, b);
+   return detail::mp_exp<detail::multiplies, V, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 //
 // Repeat operator for negated arguments: propagate the negation to the top level to avoid temporaries:
 //
-template <class B, class Arg1, class Arg2, class Arg3>
-inline detail::mp_exp<detail::negate, detail::mp_exp<detail::multiplies, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type > >
-   operator * (const mp_number<B, true>& a, const detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>& b)
+template <class B, class Arg1, class Arg2, class Arg3, class Arg4>
+inline detail::mp_exp<detail::negate, detail::mp_exp<detail::multiplies, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > >
+   operator * (const mp_number<B, true>& a, const detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::mp_exp<detail::negate, detail::mp_exp<detail::multiplies, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type > >(
-      detail::mp_exp<detail::multiplies, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type > (a, b.left_ref()));
+   return detail::mp_exp<detail::negate, detail::mp_exp<detail::multiplies, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > >(
+      detail::mp_exp<detail::multiplies, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > (a, b.left_ref()));
 }
-template <class Arg1, class Arg2, class Arg3, class B>
-inline detail::mp_exp<detail::negate, detail::mp_exp<detail::multiplies, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type > >
-   operator * (const detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>& a, const mp_number<B, true>& b)
+template <class Arg1, class Arg2, class Arg3, class Arg4, class B>
+inline detail::mp_exp<detail::negate, detail::mp_exp<detail::multiplies, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > >
+   operator * (const detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>& a, const mp_number<B, true>& b)
 {
-   return detail::mp_exp<detail::negate, detail::mp_exp<detail::multiplies, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type > >(
-      detail::mp_exp<detail::multiplies, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type >(b, a.left_ref()));
+   return detail::mp_exp<detail::negate, detail::mp_exp<detail::multiplies, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > >(
+      detail::mp_exp<detail::multiplies, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >(b, a.left_ref()));
 }
 template <class B>
 inline detail::mp_exp<detail::negate, detail::mp_exp<detail::multiply_immediates, mp_number<B, true>, mp_number<B, true> > >
@@ -815,52 +886,52 @@ inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::divide_immedi
 {
    return detail::mp_exp<detail::divide_immediates, V, mp_number<B, true> >(a, b);
 }
-template <class B, class tag, class Arg1, class Arg2, class Arg3>
-inline detail::mp_exp<detail::divides, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3> >
-   operator / (const mp_number<B, true>& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3>& b)
+template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline detail::mp_exp<detail::divides, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >
+   operator / (const mp_number<B, true>& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::mp_exp<detail::divides, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3> >(a, b);
+   return detail::mp_exp<detail::divides, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class B>
-inline detail::mp_exp<detail::divides, detail::mp_exp<tag, Arg1, Arg2, Arg3>, mp_number<B, true> >
-   operator / (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const mp_number<B, true>& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
+inline detail::mp_exp<detail::divides, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, mp_number<B, true> >
+   operator / (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const mp_number<B, true>& b)
 {
-   return detail::mp_exp<detail::divides, detail::mp_exp<tag, Arg1, Arg2, Arg3>, mp_number<B, true> >(a, b);
+   return detail::mp_exp<detail::divides, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, mp_number<B, true> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class tag2, class Arg1b, class Arg2b, class Arg3b>
-inline detail::mp_exp<detail::divides, detail::mp_exp<tag, Arg1, Arg2, Arg3>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b> >
-   operator / (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b>& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class tag2, class Arg1b, class Arg2b, class Arg3b, class Arg4b>
+inline detail::mp_exp<detail::divides, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b, Arg4b> >
+   operator / (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b, Arg4b>& b)
 {
-   return detail::mp_exp<detail::divides, detail::mp_exp<tag, Arg1, Arg2, Arg3>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b> >(a, b);
+   return detail::mp_exp<detail::divides, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b, Arg4b> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class V>
-inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::divides, detail::mp_exp<tag, Arg1, Arg2, Arg3>, V > >::type
-   operator / (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const V& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class V>
+inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::divides, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, V > >::type
+   operator / (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const V& b)
 {
-   return detail::mp_exp<detail::divides, detail::mp_exp<tag, Arg1, Arg2, Arg3>, V >(a, b);
+   return detail::mp_exp<detail::divides, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, V >(a, b);
 }
-template <class V, class tag, class Arg1, class Arg2, class Arg3>
-inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::divides, V, detail::mp_exp<tag, Arg1, Arg2, Arg3> > >::type
-   operator / (const V& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3>& b)
+template <class V, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::divides, V, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> > >::type
+   operator / (const V& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::mp_exp<detail::divides, V, detail::mp_exp<tag, Arg1, Arg2, Arg3> >(a, b);
+   return detail::mp_exp<detail::divides, V, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 //
 // Repeat operator for negated arguments: propagate the negation to the top level to avoid temporaries:
 //
-template <class B, class Arg1, class Arg2, class Arg3>
-inline detail::mp_exp<detail::negate, detail::mp_exp<detail::divides, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type > >
-   operator / (const mp_number<B, true>& a, const detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>& b)
+template <class B, class Arg1, class Arg2, class Arg3, class Arg4>
+inline detail::mp_exp<detail::negate, detail::mp_exp<detail::divides, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > >
+   operator / (const mp_number<B, true>& a, const detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::mp_exp<detail::negate, detail::mp_exp<detail::divides, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type > >(
-      detail::mp_exp<detail::divides, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type >(a, b.left_ref()));
+   return detail::mp_exp<detail::negate, detail::mp_exp<detail::divides, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > >(
+      detail::mp_exp<detail::divides, mp_number<B, true>, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >(a, b.left_ref()));
 }
-template <class Arg1, class Arg2, class Arg3, class B>
-inline detail::mp_exp<detail::negate, detail::mp_exp<detail::divides, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type, mp_number<B, true> > >
-   operator / (const detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>& a, const mp_number<B, true>& b)
+template <class Arg1, class Arg2, class Arg3, class Arg4, class B>
+inline detail::mp_exp<detail::negate, detail::mp_exp<detail::divides, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type, mp_number<B, true> > >
+   operator / (const detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>& a, const mp_number<B, true>& b)
 {
-   return detail::mp_exp<detail::negate, detail::mp_exp<detail::divides, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type, mp_number<B, true> > >(
-      detail::mp_exp<detail::divides, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3>::left_type, mp_number<B, true> >(a.left_ref(), b));
+   return detail::mp_exp<detail::negate, detail::mp_exp<detail::divides, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type, mp_number<B, true> > >(
+      detail::mp_exp<detail::divides, typename detail::mp_exp<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type, mp_number<B, true> >(a.left_ref(), b));
 }
 template <class B>
 inline detail::mp_exp<detail::negate, detail::mp_exp<detail::divide_immediates, mp_number<B, true>, mp_number<B, true> > >
@@ -911,35 +982,35 @@ inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::modulus_immed
 {
    return detail::mp_exp<detail::modulus_immediates, V, mp_number<B, true> >(a, b);
 }
-template <class B, class tag, class Arg1, class Arg2, class Arg3>
-inline detail::mp_exp<detail::modulus, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3> >
-   operator % (const mp_number<B, true>& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3>& b)
+template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline detail::mp_exp<detail::modulus, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >
+   operator % (const mp_number<B, true>& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::mp_exp<detail::modulus, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3> >(a, b);
+   return detail::mp_exp<detail::modulus, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class B>
-inline detail::mp_exp<detail::modulus, detail::mp_exp<tag, Arg1, Arg2, Arg3>, mp_number<B, true> >
-   operator % (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const mp_number<B, true>& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
+inline detail::mp_exp<detail::modulus, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, mp_number<B, true> >
+   operator % (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const mp_number<B, true>& b)
 {
-   return detail::mp_exp<detail::modulus, detail::mp_exp<tag, Arg1, Arg2, Arg3>, mp_number<B, true> >(a, b);
+   return detail::mp_exp<detail::modulus, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, mp_number<B, true> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class tag2, class Arg1b, class Arg2b, class Arg3b>
-inline detail::mp_exp<detail::modulus, detail::mp_exp<tag, Arg1, Arg2, Arg3>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b> >
-   operator % (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b>& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class tag2, class Arg1b, class Arg2b, class Arg3b, class Arg4b>
+inline detail::mp_exp<detail::modulus, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b, Arg4b> >
+   operator % (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b, Arg4b>& b)
 {
-   return detail::mp_exp<detail::modulus, detail::mp_exp<tag, Arg1, Arg2, Arg3>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b> >(a, b);
+   return detail::mp_exp<detail::modulus, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b, Arg4b> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class V>
-inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::modulus, detail::mp_exp<tag, Arg1, Arg2, Arg3>, V > >::type
-   operator % (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const V& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class V>
+inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::modulus, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, V > >::type
+   operator % (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const V& b)
 {
-   return detail::mp_exp<detail::modulus, detail::mp_exp<tag, Arg1, Arg2, Arg3>, V >(a, b);
+   return detail::mp_exp<detail::modulus, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, V >(a, b);
 }
-template <class V, class tag, class Arg1, class Arg2, class Arg3>
-inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::modulus, V, detail::mp_exp<tag, Arg1, Arg2, Arg3> > >::type
-   operator % (const V& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3>& b)
+template <class V, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::modulus, V, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> > >::type
+   operator % (const V& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::mp_exp<detail::modulus, V, detail::mp_exp<tag, Arg1, Arg2, Arg3> >(a, b);
+   return detail::mp_exp<detail::modulus, V, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 //
 // Left shift:
@@ -950,11 +1021,11 @@ inline typename enable_if<is_integral<I>, detail::mp_exp<detail::shift_left, mp_
 {
    return detail::mp_exp<detail::shift_left, mp_number<B, true>, I>(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class I>
-inline typename enable_if<is_integral<I>, detail::mp_exp<detail::shift_left, detail::mp_exp<tag, Arg1, Arg2, Arg3>, I> >::type
-   operator << (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const I& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class I>
+inline typename enable_if<is_integral<I>, detail::mp_exp<detail::shift_left, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, I> >::type
+   operator << (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const I& b)
 {
-   return detail::mp_exp<detail::shift_left, detail::mp_exp<tag, Arg1, Arg2, Arg3>, I>(a, b);
+   return detail::mp_exp<detail::shift_left, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, I>(a, b);
 }
 //
 // Right shift:
@@ -965,11 +1036,11 @@ inline typename enable_if<is_integral<I>, detail::mp_exp<detail::shift_right, mp
 {
    return detail::mp_exp<detail::shift_right, mp_number<B, true>, I>(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class I>
-inline typename enable_if<is_integral<I>, detail::mp_exp<detail::shift_right, detail::mp_exp<tag, Arg1, Arg2, Arg3>, I> >::type
-   operator >> (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const I& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class I>
+inline typename enable_if<is_integral<I>, detail::mp_exp<detail::shift_right, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, I> >::type
+   operator >> (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const I& b)
 {
-   return detail::mp_exp<detail::shift_right, detail::mp_exp<tag, Arg1, Arg2, Arg3>, I>(a, b);
+   return detail::mp_exp<detail::shift_right, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, I>(a, b);
 }
 //
 // Bitwise AND:
@@ -992,35 +1063,35 @@ inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::bitwise_and_i
 {
    return detail::mp_exp<detail::bitwise_and_immediates, V, mp_number<B, true> >(a, b);
 }
-template <class B, class tag, class Arg1, class Arg2, class Arg3>
-inline detail::mp_exp<detail::bitwise_and, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3> >
-   operator & (const mp_number<B, true>& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3>& b)
+template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline detail::mp_exp<detail::bitwise_and, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >
+   operator & (const mp_number<B, true>& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::mp_exp<detail::bitwise_and, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3> >(a, b);
+   return detail::mp_exp<detail::bitwise_and, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class B>
-inline detail::mp_exp<detail::bitwise_and, detail::mp_exp<tag, Arg1, Arg2, Arg3>, mp_number<B, true> >
-   operator & (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const mp_number<B, true>& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
+inline detail::mp_exp<detail::bitwise_and, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, mp_number<B, true> >
+   operator & (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const mp_number<B, true>& b)
 {
-   return detail::mp_exp<detail::bitwise_and, detail::mp_exp<tag, Arg1, Arg2, Arg3>, mp_number<B, true> >(a, b);
+   return detail::mp_exp<detail::bitwise_and, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, mp_number<B, true> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class tag2, class Arg1b, class Arg2b, class Arg3b>
-inline detail::mp_exp<detail::bitwise_and, detail::mp_exp<tag, Arg1, Arg2, Arg3>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b> >
-   operator & (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b>& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class tag2, class Arg1b, class Arg2b, class Arg3b, class Arg4b>
+inline detail::mp_exp<detail::bitwise_and, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b, Arg4b> >
+   operator & (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b, Arg4b>& b)
 {
-   return detail::mp_exp<detail::bitwise_and, detail::mp_exp<tag, Arg1, Arg2, Arg3>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b> >(a, b);
+   return detail::mp_exp<detail::bitwise_and, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b, Arg4b> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class V>
-inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::bitwise_and, detail::mp_exp<tag, Arg1, Arg2, Arg3>, V > >::type
-   operator & (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const V& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class V>
+inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::bitwise_and, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, V > >::type
+   operator & (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const V& b)
 {
-   return detail::mp_exp<detail::bitwise_and, detail::mp_exp<tag, Arg1, Arg2, Arg3>, V >(a, b);
+   return detail::mp_exp<detail::bitwise_and, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, V >(a, b);
 }
-template <class V, class tag, class Arg1, class Arg2, class Arg3>
-inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::bitwise_and, V, detail::mp_exp<tag, Arg1, Arg2, Arg3> > >::type
-   operator & (const V& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3>& b)
+template <class V, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::bitwise_and, V, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> > >::type
+   operator & (const V& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::mp_exp<detail::bitwise_and, V, detail::mp_exp<tag, Arg1, Arg2, Arg3> >(a, b);
+   return detail::mp_exp<detail::bitwise_and, V, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 //
 // Bitwise OR:
@@ -1043,35 +1114,35 @@ inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::bitwise_or_im
 {
    return detail::mp_exp<detail::bitwise_or_immediates, V, mp_number<B, true> >(a, b);
 }
-template <class B, class tag, class Arg1, class Arg2, class Arg3>
-inline detail::mp_exp<detail::bitwise_or, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3> >
-   operator| (const mp_number<B, true>& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3>& b)
+template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline detail::mp_exp<detail::bitwise_or, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >
+   operator| (const mp_number<B, true>& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::mp_exp<detail::bitwise_or, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3> >(a, b);
+   return detail::mp_exp<detail::bitwise_or, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class B>
-inline detail::mp_exp<detail::bitwise_or, detail::mp_exp<tag, Arg1, Arg2, Arg3>, mp_number<B, true> >
-   operator| (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const mp_number<B, true>& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
+inline detail::mp_exp<detail::bitwise_or, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, mp_number<B, true> >
+   operator| (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const mp_number<B, true>& b)
 {
-   return detail::mp_exp<detail::bitwise_or, detail::mp_exp<tag, Arg1, Arg2, Arg3>, mp_number<B, true> >(a, b);
+   return detail::mp_exp<detail::bitwise_or, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, mp_number<B, true> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class tag2, class Arg1b, class Arg2b, class Arg3b>
-inline detail::mp_exp<detail::bitwise_or, detail::mp_exp<tag, Arg1, Arg2, Arg3>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b> >
-   operator| (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b>& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class tag2, class Arg1b, class Arg2b, class Arg3b, class Arg4b>
+inline detail::mp_exp<detail::bitwise_or, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b, Arg4b> >
+   operator| (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b, Arg4b>& b)
 {
-   return detail::mp_exp<detail::bitwise_or, detail::mp_exp<tag, Arg1, Arg2, Arg3>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b> >(a, b);
+   return detail::mp_exp<detail::bitwise_or, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b, Arg4b> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class V>
-inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::bitwise_or, detail::mp_exp<tag, Arg1, Arg2, Arg3>, V > >::type
-   operator| (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const V& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class V>
+inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::bitwise_or, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, V > >::type
+   operator| (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const V& b)
 {
-   return detail::mp_exp<detail::bitwise_or, detail::mp_exp<tag, Arg1, Arg2, Arg3>, V >(a, b);
+   return detail::mp_exp<detail::bitwise_or, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, V >(a, b);
 }
-template <class V, class tag, class Arg1, class Arg2, class Arg3>
-inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::bitwise_or, V, detail::mp_exp<tag, Arg1, Arg2, Arg3> > >::type
-   operator| (const V& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3>& b)
+template <class V, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::bitwise_or, V, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> > >::type
+   operator| (const V& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::mp_exp<detail::bitwise_or, V, detail::mp_exp<tag, Arg1, Arg2, Arg3> >(a, b);
+   return detail::mp_exp<detail::bitwise_or, V, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 //
 // Bitwise XOR:
@@ -1094,35 +1165,35 @@ inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::bitwise_xor_i
 {
    return detail::mp_exp<detail::bitwise_xor_immediates, V, mp_number<B, true> >(a, b);
 }
-template <class B, class tag, class Arg1, class Arg2, class Arg3>
-inline detail::mp_exp<detail::bitwise_xor, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3> >
-   operator^ (const mp_number<B, true>& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3>& b)
+template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline detail::mp_exp<detail::bitwise_xor, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >
+   operator^ (const mp_number<B, true>& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::mp_exp<detail::bitwise_xor, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3> >(a, b);
+   return detail::mp_exp<detail::bitwise_xor, mp_number<B, true>, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class B>
-inline detail::mp_exp<detail::bitwise_xor, detail::mp_exp<tag, Arg1, Arg2, Arg3>, mp_number<B, true> >
-   operator^ (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const mp_number<B, true>& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
+inline detail::mp_exp<detail::bitwise_xor, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, mp_number<B, true> >
+   operator^ (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const mp_number<B, true>& b)
 {
-   return detail::mp_exp<detail::bitwise_xor, detail::mp_exp<tag, Arg1, Arg2, Arg3>, mp_number<B, true> >(a, b);
+   return detail::mp_exp<detail::bitwise_xor, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, mp_number<B, true> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class tag2, class Arg1b, class Arg2b, class Arg3b>
-inline detail::mp_exp<detail::bitwise_xor, detail::mp_exp<tag, Arg1, Arg2, Arg3>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b> >
-   operator^ (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b>& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class tag2, class Arg1b, class Arg2b, class Arg3b, class Arg4b>
+inline detail::mp_exp<detail::bitwise_xor, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b, Arg4b> >
+   operator^ (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b, Arg4b>& b)
 {
-   return detail::mp_exp<detail::bitwise_xor, detail::mp_exp<tag, Arg1, Arg2, Arg3>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b> >(a, b);
+   return detail::mp_exp<detail::bitwise_xor, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, detail::mp_exp<tag2, Arg1b, Arg2b, Arg3b, Arg4b> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class V>
-inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::bitwise_xor, detail::mp_exp<tag, Arg1, Arg2, Arg3>, V > >::type
-   operator^ (const detail::mp_exp<tag, Arg1, Arg2, Arg3>& a, const V& b)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class V>
+inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::bitwise_xor, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, V > >::type
+   operator^ (const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& a, const V& b)
 {
-   return detail::mp_exp<detail::bitwise_xor, detail::mp_exp<tag, Arg1, Arg2, Arg3>, V >(a, b);
+   return detail::mp_exp<detail::bitwise_xor, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>, V >(a, b);
 }
-template <class V, class tag, class Arg1, class Arg2, class Arg3>
-inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::bitwise_xor, V, detail::mp_exp<tag, Arg1, Arg2, Arg3> > >::type
-   operator^ (const V& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3>& b)
+template <class V, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline typename enable_if<is_arithmetic<V>, detail::mp_exp<detail::bitwise_xor, V, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> > >::type
+   operator^ (const V& a, const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::mp_exp<detail::bitwise_xor, V, detail::mp_exp<tag, Arg1, Arg2, Arg3> >(a, b);
+   return detail::mp_exp<detail::bitwise_xor, V, detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 
 //
@@ -1140,15 +1211,15 @@ template <class Num>
 struct number_category : public mpl::int_<number_kind_floating_point> {};
 template <class Backend, bool ExpressionTemplates>
 struct number_category<mp_number<Backend, ExpressionTemplates> > : public number_category<Backend>{};
-template <class tag, class A1, class A2, class A3>
-struct number_category<detail::mp_exp<tag, A1, A2, A3> > : public number_category<typename detail::mp_exp<tag, A1, A2, A3>::result_type>{};
+template <class tag, class A1, class A2, class A3, class A4>
+struct number_category<detail::mp_exp<tag, A1, A2, A3, A4> > : public number_category<typename detail::mp_exp<tag, A1, A2, A3, A4>::result_type>{};
 
 template <class T>
 struct component_type;
 template <class T, bool ExpressionTemplates>
 struct component_type<mp_number<T, ExpressionTemplates> > : public component_type<T>{};
-template <class tag, class A1, class A2, class A3>
-struct component_type<detail::mp_exp<tag, A1, A2, A3> > : public component_type<typename detail::mp_exp<tag, A1, A2, A3>::result_type>{};
+template <class tag, class A1, class A2, class A3, class A4>
+struct component_type<detail::mp_exp<tag, A1, A2, A3, A4> > : public component_type<typename detail::mp_exp<tag, A1, A2, A3, A4>::result_type>{};
 
 }} // namespaces
 
@@ -1157,10 +1228,10 @@ namespace boost{ namespace math{ namespace tools{
 template <class T>
 struct promote_arg;
 
-template <class tag, class A1, class A2, class A3>
-struct promote_arg<boost::multiprecision::detail::mp_exp<tag, A1, A2, A3> >
+template <class tag, class A1, class A2, class A3, class A4>
+struct promote_arg<boost::multiprecision::detail::mp_exp<tag, A1, A2, A3, A4> >
 {
-   typedef typename boost::multiprecision::detail::mp_exp<tag, A1, A2, A3>::result_type type;
+   typedef typename boost::multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>::result_type type;
 };
 
 }}}

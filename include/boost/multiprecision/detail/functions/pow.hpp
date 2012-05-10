@@ -15,30 +15,11 @@
 namespace detail{
 
 template<typename T, typename U> 
-inline T pow_imp(T& result, const T& t, const U& p, const mpl::false_&)
-{
-   T temp(p);
-   eval_pow(result, t, p);
-}
-
-template<typename T, typename U> 
-inline void pow_imp(T& result, const T& t, const U& p, const mpl::true_&)
+inline void pow_imp(T& result, const T& t, const U& p, const mpl::false_&)
 {
    // Compute the pure power of typename T t^p. Binary splitting of the power is
    // used. The resulting computational complexity has the order of log2[abs(p)].
-
-   typedef typename mpl::front<typename T::signed_types>::type int_type;
-
-   if(p < 0)
-   {
-      T temp;
-      temp = static_cast<int_type>(1);
-      T denom;
-      pow_imp(denom, t, -p, mpl::true_());
-      eval_divide(result, temp, denom);
-      return;
-   }
-
+   typedef typename boost::multiprecision::detail::canonical<U, T>::type  int_type;
    switch(p)
    {
    case 0:
@@ -74,11 +55,29 @@ inline void pow_imp(T& result, const T& t, const U& p, const mpl::true_&)
          if(p_minus_n)
          {
             T temp;
-            pow_imp(temp, t, p_minus_n, mpl::true_());
+            pow_imp(temp, t, p_minus_n, mpl::false_());
             eval_multiply(result, temp);
          }
       }
    }
+}
+
+template<typename T, typename U> 
+inline void pow_imp(T& result, const T& t, const U& p, const mpl::true_&)
+{
+   // Signed integer power, just take care of the sign then call the unsigned version:
+   typedef typename boost::multiprecision::detail::canonical<U, T>::type  int_type;
+
+   if(p < 0)
+   {
+      T temp;
+      temp = static_cast<int_type>(1);
+      T denom;
+      pow_imp(denom, t, -p, mpl::false_());
+      eval_divide(result, temp, denom);
+      return;
+   }
+   pow_imp(result, t, p, mpl::false_());
 }
 
 } // namespace detail
@@ -86,7 +85,7 @@ inline void pow_imp(T& result, const T& t, const U& p, const mpl::true_&)
 template<typename T, typename U> 
 inline typename enable_if<is_integral<U> >::type eval_pow(T& result, const T& t, const U& p)
 {
-   detail::pow_imp(result, t, p, mpl::true_());
+   detail::pow_imp(result, t, p, boost::is_signed<U>());
 }
 
 template <class T>
@@ -543,6 +542,28 @@ inline void eval_pow(T& result, const T& x, const T& a)
          eval_exp(result, t);
       }
    }
+}
+
+template<class T, class A> 
+inline typename enable_if<is_floating_point<A>, void>::type eval_pow(T& result, const T& x, const A& a)
+{
+   // Note this one is resticted to float arguments since pow.hpp already has a version for
+   // integer powers....
+   typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
+   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+   cast_type c;
+   c = a;
+   eval_pow(result, x, c);
+}
+
+template<class T, class A> 
+inline typename enable_if<is_arithmetic<A>, void>::type eval_pow(T& result, const A& x, const T& a)
+{
+   typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
+   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+   cast_type c;
+   c = x;
+   eval_pow(result, c, a);
 }
 
 namespace detail{

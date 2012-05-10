@@ -334,7 +334,7 @@ public:
    { 
       exp = f.exp;
       neg = f.neg;
-      fpclass = static_cast<fpclass_type>(static_cast<int>(f.fpclass));
+      fpclass = static_cast<enum_fpclass_type>(static_cast<int>(f.fpclass));
       std::copy(f.data.begin(), f.data.begin() + (std::min)(f.prec_elem, prec_elem), data.begin());
       precision((std::min)(f.prec_elem, prec_elem));
       return *this;

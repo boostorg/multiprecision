@@ -49,25 +49,25 @@ inline typename enable_if_c<number_category<Backend>::value == number_kind_integ
    eval_qr(x.backend(), y.backend(), q.backend(), r.backend());
 }
 
-template <class Backend, bool ExpressionTemplates, class tag, class A1, class A2, class A3>
+template <class Backend, bool ExpressionTemplates, class tag, class A1, class A2, class A3, class A4>
 inline typename enable_if_c<number_category<Backend>::value == number_kind_integer>::type 
-   divide_qr(const mp_number<Backend, ExpressionTemplates>& x, const multiprecision::detail::mp_exp<tag, A1, A2, A3>& y,
+   divide_qr(const mp_number<Backend, ExpressionTemplates>& x, const multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>& y,
    mp_number<Backend, ExpressionTemplates>& q, mp_number<Backend, ExpressionTemplates>& r)
 {
    divide_qr(x, mp_number<Backend, ExpressionTemplates>(y), q, r);
 }
 
-template <class tag, class A1, class A2, class A3, class Backend, bool ExpressionTemplates>
+template <class tag, class A1, class A2, class A3, class A4, class Backend, bool ExpressionTemplates>
 inline typename enable_if_c<number_category<Backend>::value == number_kind_integer>::type 
-   divide_qr(const multiprecision::detail::mp_exp<tag, A1, A2, A3>& x, const mp_number<Backend, ExpressionTemplates>& y,
+   divide_qr(const multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>& x, const mp_number<Backend, ExpressionTemplates>& y,
    mp_number<Backend, ExpressionTemplates>& q, mp_number<Backend, ExpressionTemplates>& r)
 {
    divide_qr(mp_number<Backend, ExpressionTemplates>(x), y, q, r);
 }
 
-template <class tag, class A1, class A2, class A3, class tagb, class A1b, class A2b, class A3b, class Backend, bool ExpressionTemplates>
+template <class tag, class A1, class A2, class A3, class A4, class tagb, class A1b, class A2b, class A3b, class A4b, class Backend, bool ExpressionTemplates>
 inline typename enable_if_c<number_category<Backend>::value == number_kind_integer>::type 
-   divide_qr(const multiprecision::detail::mp_exp<tag, A1, A2, A3>& x, const multiprecision::detail::mp_exp<tagb, A1b, A2b, A3b>& y,
+   divide_qr(const multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>& x, const multiprecision::detail::mp_exp<tagb, A1b, A2b, A3b, A4b>& y,
    mp_number<Backend, ExpressionTemplates>& q, mp_number<Backend, ExpressionTemplates>& r)
 {
    divide_qr(mp_number<Backend, ExpressionTemplates>(x), mp_number<Backend, ExpressionTemplates>(y), q, r);
@@ -81,11 +81,11 @@ inline typename enable_if<mpl::and_<is_integral<Integer>, mpl::bool_<number_cate
    return eval_integer_modulus(x.backend(), val);
 }
 
-template <class tag, class A1, class A2, class A3, class Integer>
-inline typename enable_if<mpl::and_<is_integral<Integer>, mpl::bool_<number_category<typename multiprecision::detail::mp_exp<tag, A1, A2, A3>::result_type>::value == number_kind_integer> >, Integer>::type 
-   integer_modulus(const multiprecision::detail::mp_exp<tag, A1, A2, A3>& x, Integer val)
+template <class tag, class A1, class A2, class A3, class A4, class Integer>
+inline typename enable_if<mpl::and_<is_integral<Integer>, mpl::bool_<number_category<typename multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer> >, Integer>::type 
+   integer_modulus(const multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>& x, Integer val)
 {
-   typedef typename multiprecision::detail::mp_exp<tag, A1, A2, A3>::result_type result_type;
+   typedef typename multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>::result_type result_type;
    return integer_modulus(result_type(x), val);
 }
 
@@ -97,11 +97,11 @@ inline typename enable_if_c<number_category<Backend>::value == number_kind_integ
    return eval_lsb(x.backend());
 }
 
-template <class tag, class A1, class A2, class A3>
-inline typename enable_if_c<number_category<typename multiprecision::detail::mp_exp<tag, A1, A2, A3>::result_type>::value == number_kind_integer, unsigned>::type 
-   lsb(const multiprecision::detail::mp_exp<tag, A1, A2, A3>& x)
+template <class tag, class A1, class A2, class A3, class A4>
+inline typename enable_if_c<number_category<typename multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer, unsigned>::type 
+   lsb(const multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>& x)
 {
-   typedef typename multiprecision::detail::mp_exp<tag, A1, A2, A3>::result_type number_type;
+   typedef typename multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>::result_type number_type;
    number_type n(x);
    using default_ops::eval_lsb;
    return eval_lsb(n.backend());
@@ -115,11 +115,11 @@ inline typename enable_if_c<number_category<Backend>::value == number_kind_integ
    return eval_bit_test(x.backend(), index);
 }
 
-template <class tag, class A1, class A2, class A3>
-inline typename enable_if_c<number_category<typename multiprecision::detail::mp_exp<tag, A1, A2, A3>::result_type>::value == number_kind_integer, bool>::type 
-   bit_test(const multiprecision::detail::mp_exp<tag, A1, A2, A3>& x, unsigned index)
+template <class tag, class A1, class A2, class A3, class A4>
+inline typename enable_if_c<number_category<typename multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>::result_type>::value == number_kind_integer, bool>::type 
+   bit_test(const multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>& x, unsigned index)
 {
-   typedef typename multiprecision::detail::mp_exp<tag, A1, A2, A3>::result_type number_type;
+   typedef typename multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>::result_type number_type;
    number_type n(x);
    using default_ops::eval_bit_test;
    return eval_bit_test(n.backend(), index);
@@ -150,6 +150,150 @@ inline typename enable_if_c<number_category<Backend>::value == number_kind_integ
    using default_ops::eval_bit_flip;
    eval_bit_flip(x.backend(), index);
    return x;
+}
+
+namespace detail{
+
+//
+// Calculate (a^p)%c:
+//
+template <class Backend>
+void eval_powm(Backend& result, const Backend& a, const Backend& p, const Backend& c)
+{
+   typedef typename canonical<unsigned char, Backend>::type ui_type;
+   Backend x, y(a), b(p);
+   x = ui_type(1u);
+   while(eval_get_sign(b) > 0)
+   {
+      if(eval_bit_test(b, 0))
+      {
+         eval_multiply(result, x, y);
+         eval_modulus(x, result, c);
+      }
+      eval_multiply(result, y, y);
+      eval_modulus(y, result, c);
+      eval_right_shift(b, ui_type(1));
+   }
+   eval_modulus(result, x, c);
+}
+
+template <class Backend, class Integer>
+void eval_powm(Backend& result, const Backend& a, const Backend& p, Integer c)
+{
+   typedef typename canonical<unsigned char, Backend>::type ui_type;
+   typedef typename canonical<Integer, Backend>::type i_type;
+
+   if(eval_get_sign(p) < 0)
+   {
+      BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
+   }
+
+   Backend x, y(a), b(p);
+   x = ui_type(1u);
+   while(eval_get_sign(b) > 0)
+   {
+      if(eval_bit_test(b, 0))
+      {
+         eval_multiply(result, x, y);
+         eval_modulus(x, result, static_cast<i_type>(c));
+      }
+      eval_multiply(result, y, y);
+      eval_modulus(y, result, static_cast<i_type>(c));
+      eval_right_shift(b, ui_type(1));
+   }
+   eval_modulus(result, x, static_cast<i_type>(c));
+}
+
+template <class Backend, class Integer>
+void eval_powm(Backend& result, const Backend& a, Integer b, const Backend& c)
+{
+   typedef typename canonical<unsigned char, Backend>::type ui_type;
+   typedef typename canonical<Integer, Backend>::type i_type;
+
+   if(b < 0)
+   {
+      BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
+   }
+
+   Backend x, y(a);
+   x = ui_type(1u);
+   while(b > 0)
+   {
+      if(b & 1)
+      {
+         eval_multiply(result, x, y);
+         eval_modulus(x, result, c);
+      }
+      eval_multiply(result, y, y);
+      eval_modulus(y, result, c);
+      b >>= 1;
+   }
+   eval_modulus(result, x, c);
+}
+
+template <class Backend, class Integer1, class Integer2>
+void eval_powm(Backend& result, const Backend& a, Integer1 b, Integer2 c)
+{
+   typedef typename canonical<unsigned char, Backend>::type ui_type;
+   typedef typename canonical<Integer1, Backend>::type i1_type;
+   typedef typename canonical<Integer2, Backend>::type i2_type;
+
+   if(b < 0)
+   {
+      BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
+   }
+
+   Backend x, y(a);
+   x = ui_type(1u);
+   while(b > 0)
+   {
+      if(b & 1)
+      {
+         eval_multiply(result, x, y);
+         eval_modulus(x, result, static_cast<i2_type>(c));
+      }
+      eval_multiply(result, y, y);
+      eval_modulus(y, result, static_cast<i2_type>(c));
+      b >>= 1;
+   }
+   eval_modulus(result, x, static_cast<i2_type>(c));
+}
+
+struct powm_func
+{
+   template <class T, class U, class V>
+   void operator()(T& result, const T& b, const U& p, const V& m)const
+   {
+      eval_powm(result, b, p, m);
+   }
+};
+
+}
+
+template <class T, class U, class V>
+inline typename enable_if<
+   mpl::and_<
+      mpl::bool_<number_category<T>::value == number_kind_integer>, 
+      mpl::or_<
+         is_mp_number<T>,
+         is_mp_number_expression<T>
+      >,
+      mpl::or_<
+         is_mp_number<U>,
+         is_mp_number_expression<U>,
+         is_integral<U>
+      >,
+      mpl::or_<
+         is_mp_number<V>,
+         is_mp_number_expression<V>,
+         is_integral<V>
+      >
+   >,
+   detail::mp_exp<detail::function, detail::powm_func, T, U, V> >::type 
+   powm(const T& b, const U& p, const V& mod)
+{
+   return detail::mp_exp<detail::function, detail::powm_func, T, U, V>(
+      detail::powm_func(), b, p, mod);
 }
 
 }} //namespaces

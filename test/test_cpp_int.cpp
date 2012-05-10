@@ -257,6 +257,33 @@ void test()
          BOOST_CHECK_EQUAL(t.str(), t1.str());
       }
 
+      //
+      // Now integer functions:
+      //
+      mpz_int z1, z2;
+      test_type t1, t2;
+      divide_qr(a, b, z1, z2);
+      divide_qr(a1, b1, t1, t2);
+      BOOST_CHECK_EQUAL(z1.str(), t1.str());
+      BOOST_CHECK_EQUAL(z2.str(), t2.str());
+      BOOST_CHECK_EQUAL(integer_modulus(a, si), integer_modulus(a1, si));
+      BOOST_CHECK_EQUAL(lsb(a), lsb(a1));
+
+      for(unsigned i = 0; i < 1000; i += 13)
+      {
+         BOOST_CHECK_EQUAL(bit_test(a, i), bit_test(a1, i));
+      }
+      if(!std::numeric_limits<test_type>::is_modulo)
+      {
+         // We have to take care that our powers don't grow too large, otherwise this takes "forever",
+         // also don't test for modulo types, as these may give a diffferent result from arbitrary
+         // precision types:
+         BOOST_CHECK_EQUAL(mpz_int(pow(d, ui % 19)).str(), test_type(pow(d1, ui % 19)).str());
+         BOOST_CHECK_EQUAL(mpz_int(powm(a, b, c)).str(), test_type(powm(a, b, c)).str());
+         BOOST_CHECK_EQUAL(mpz_int(powm(a, b, ui)).str(), test_type(powm(a, b, ui)).str());
+         BOOST_CHECK_EQUAL(mpz_int(powm(a, ui, c)).str(), test_type(powm(a, ui, c)).str());
+      }
+
       if(last_error_count != boost::detail::test_errors())
       {
          last_error_count = boost::detail::test_errors();

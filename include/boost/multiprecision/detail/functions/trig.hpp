@@ -766,13 +766,23 @@ void eval_atan2(T& result, const T& y, const T& x)
          eval_add(result, get_constant_pi<T>());
    }
 }
-/*
-template <class T, class Arithmetic>
-typename disable_if<is_same<T, Arithmetic> >::type eval_atan2(T& result, const T& a, const Arithmetic& b)
+template<class T, class A> 
+inline typename enable_if<is_arithmetic<A>, void>::type eval_atan2(T& result, const T& x, const A& a)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The atan2 function is only valid for floating point types.");
-   T x;
-   x = static_cast<typename boost::multiprecision::detail::canonical<Arithmetic, T>::type>(b);
-   eval_atan2(result, a, x);
+   typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
+   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+   cast_type c;
+   c = a;
+   eval_atan2(result, x, c);
 }
-*/
+
+template<class T, class A> 
+inline typename enable_if<is_arithmetic<A>, void>::type eval_atan2(T& result, const A& x, const T& a)
+{
+   typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
+   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+   cast_type c;
+   c = x;
+   eval_atan2(result, c, a);
+}
+

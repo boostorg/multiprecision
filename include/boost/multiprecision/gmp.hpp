@@ -1412,6 +1412,29 @@ inline typename enable_if<is_signed<Integer>, Integer>::type eval_integer_modulu
    typedef typename make_unsigned<Integer>::type unsigned_type;
    return eval_integer_modulus(x, static_cast<unsigned_type>(std::abs(val)));
 }
+inline void eval_powm(gmp_int& result, const gmp_int& base, const gmp_int& p, const gmp_int& m)
+{
+   if(eval_get_sign(p) < 0)
+   {
+      BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
+   }
+   mpz_powm(result.data(), base.data(), p.data(), m.data());
+}
+
+template <class Integer>
+inline typename enable_if<
+   mpl::and_<
+      is_unsigned<Integer>,
+      mpl::bool_<sizeof(Integer) <= sizeof(unsigned long)>
+   >
+>::type eval_powm(gmp_int& result, const gmp_int& base, Integer p, const gmp_int& m)
+{
+   if(p < 0)
+   {
+      BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
+   }
+   mpz_powm_ui(result.data(), base.data(), p, m.data());
+}
 
 struct gmp_rational;
 void eval_add(gmp_rational& t, const gmp_rational& o);

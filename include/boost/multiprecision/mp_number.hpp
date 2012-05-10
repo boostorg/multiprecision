@@ -88,10 +88,10 @@ public:
    mp_number(V v, typename enable_if<mpl::and_<is_convertible<V, Backend>, mpl::not_<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > > > >::type* = 0)
       : m_backend(v){}
 
-   template <class tag, class Arg1, class Arg2, class Arg3>
-   mp_number& operator=(const detail::mp_exp<tag, Arg1, Arg2, Arg3>& e)
+   template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+   mp_number& operator=(const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
-      typedef typename is_same<mp_number, typename detail::mp_exp<tag, Arg1, Arg2, Arg3>::result_type>::type tag_type;
+      typedef typename is_same<mp_number, typename detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::type tag_type;
       do_assign(e, tag_type());
       return *this;
    }
@@ -144,8 +144,8 @@ public:
       return *this;
    }
 
-   template <class tag, class Arg1, class Arg2, class Arg3>
-   mp_number(const detail::mp_exp<tag, Arg1, Arg2, Arg3>& e)
+   template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+   mp_number(const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       *this = e;
    }
@@ -165,8 +165,8 @@ public:
       return *this;
    }
 
-   template <class tag, class Arg1, class Arg2, class Arg3>
-   mp_number& operator+=(const detail::mp_exp<tag, Arg1, Arg2, Arg3>& e)
+   template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+   mp_number& operator+=(const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       // Create a copy if e contains this, but not if we're just doing a
       //    x *= x
@@ -564,17 +564,17 @@ public:
       return m_backend;
    }
 private:
-   template <class tag, class Arg1, class Arg2, class Arg3>
-   void do_assign(const detail::mp_exp<tag, Arg1, Arg2, Arg3>& e, const mpl::true_&)
+   template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+   void do_assign(const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& e, const mpl::true_&)
    {
       do_assign(e, tag());
    }
-   template <class tag, class Arg1, class Arg2, class Arg3>
-   void do_assign(const detail::mp_exp<tag, Arg1, Arg2, Arg3>& e, const mpl::false_&)
+   template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+   void do_assign(const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& e, const mpl::false_&)
    {
       // The result of the expression isn't the same type as this -
       // create a temporary result and assign it to *this:
-      typedef typename detail::mp_exp<tag, Arg1, Arg2, Arg3>::result_type temp_type;
+      typedef typename detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>::result_type temp_type;
       temp_type t(e);
       *this = t;
    }
@@ -1061,12 +1061,12 @@ private:
    {
       typedef typename Exp::right_type right_type;
       typedef typename right_type::tag_type tag_type;
-      do_assign_function_1(e.left().value(), e.right(), tag_type());
+      do_assign_function_1(e.left().value(), e.right_ref(), tag_type());
    }
    template <class F, class Exp>
    void do_assign_function_1(const F& f, const Exp& val, const detail::terminal&)
    {
-      f(m_backend, function_arg_value(val.value()));
+      f(m_backend, function_arg_value(val));
    }
    template <class F, class Exp, class Tag>
    void do_assign_function_1(const F& f, const Exp& val, const Tag&)
@@ -1081,24 +1081,24 @@ private:
       typedef typename middle_type::tag_type tag_type;
       typedef typename Exp::right_type end_type;
       typedef typename end_type::tag_type end_tag;
-      do_assign_function_2(e.left().value(), e.middle(), e.right(), tag_type(), end_tag());
+      do_assign_function_2(e.left().value(), e.middle_ref(), e.right_ref(), tag_type(), end_tag());
    }
    template <class F, class Exp1, class Exp2>
    void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const detail::terminal&, const detail::terminal&)
    {
-      f(m_backend, function_arg_value(val1.value()), function_arg_value(val2.value()));
+      f(m_backend, function_arg_value(val1), function_arg_value(val2));
    }
    template <class F, class Exp1, class Exp2, class Tag1>
    void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const Tag1&, const detail::terminal&)
    {
       self_type temp1(val1);
-      f(m_backend, temp1.backend(), function_arg_value(val2.value()));
+      f(m_backend, temp1.backend(), function_arg_value(val2));
    }
    template <class F, class Exp1, class Exp2, class Tag2>
    void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const detail::terminal&, const Tag2&)
    {
       self_type temp2(val2);
-      f(m_backend, function_arg_value(val1.value()), temp2.backend());
+      f(m_backend, function_arg_value(val1), temp2.backend());
    }
    template <class F, class Exp1, class Exp2, class Tag1, class Tag2>
    void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const Tag1&, const Tag2&)
@@ -1106,6 +1106,51 @@ private:
       self_type temp1(val1);
       self_type temp2(val2);
       f(m_backend, temp1.backend(), temp2.backend());
+   }
+
+   template <class Exp>
+   void do_assign_function(const Exp& e, const mpl::int_<4>&)
+   {
+      typedef typename Exp::left_middle_type left_type;
+      typedef typename left_type::tag_type left_tag_type;
+      typedef typename Exp::right_middle_type middle_type;
+      typedef typename middle_type::tag_type middle_tag_type;
+      typedef typename Exp::right_type right_type;
+      typedef typename right_type::tag_type right_tag_type;
+      do_assign_function_3a(e.left().value(), e.left_middle_ref(), e.right_middle_ref(), e.right_ref(), left_tag_type(), middle_tag_type(), right_tag_type());
+   }
+   template <class F, class Exp1, class Exp2, class Exp3, class Tag2, class Tag3>
+   void do_assign_function_3a(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const detail::terminal&, const Tag2& t2, const Tag3& t3)
+   {
+      do_assign_function_3b(f, val1, val2, val3, t2, t3);
+   }
+   template <class F, class Exp1, class Exp2, class Exp3, class Tag1, class Tag2, class Tag3>
+   void do_assign_function_3a(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const Tag1&, const Tag2& t2, const Tag3& t3)
+   {
+      mp_number t(val1);
+      do_assign_function_3b(f, t, val2, val3, t2, t3);
+   }
+   template <class F, class Exp1, class Exp2, class Exp3, class Tag3>
+   void do_assign_function_3b(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const detail::terminal&, const Tag3& t3)
+   {
+      do_assign_function_3c(f, val1, val2, val3, t3);
+   }
+   template <class F, class Exp1, class Exp2, class Exp3, class Tag2, class Tag3>
+   void do_assign_function_3b(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const Tag2& t2, const Tag3& t3)
+   {
+      mp_number t(val2);
+      do_assign_function_3c(f, val1, t, val3, t3);
+   }
+   template <class F, class Exp1, class Exp2, class Exp3>
+   void do_assign_function_3c(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const detail::terminal&)
+   {
+      f(m_backend, function_arg_value(val1), function_arg_value(val2), function_arg_value(val3));
+   }
+   template <class F, class Exp1, class Exp2, class Exp3, class Tag3>
+   void do_assign_function_3c(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const Tag3& t3)
+   {
+      mp_number t(val3);
+      do_assign_function_3c(f, val1, val2, t, detail::terminal());
    }
 
    template <class Exp>
@@ -1485,6 +1530,10 @@ private:
    static const Backend& function_arg_value(const self_type& v) {  return v.backend();  }
    template <class V>
    static const V& function_arg_value(const V& v) {  return v;  }
+   template <class A1, class A2, class A3, class A4>
+   static const A1& function_arg_value(const detail::mp_exp<detail::terminal, A1, A2, A3, A4>& exp) { return exp.value(); }
+   template <class A2, class A3, class A4>
+   static const Backend& function_arg_value(const detail::mp_exp<detail::terminal, mp_number<Backend>, A2, A3, A4>& exp) { return exp.value().backend(); }
    Backend m_backend;
 };
 
@@ -1497,14 +1546,14 @@ inline int mp_number_compare(const mp_number<Backend, ExpressionTemplates>& a, c
    return a.compare(b);
 }
 
-template <class Backend, bool ExpressionTemplates, class tag, class A1, class A2, class A3>
-inline int mp_number_compare(const mp_number<Backend, ExpressionTemplates>& a, const mp_exp<tag, A1, A2, A3>& b)
+template <class Backend, bool ExpressionTemplates, class tag, class A1, class A2, class A3, class A4>
+inline int mp_number_compare(const mp_number<Backend, ExpressionTemplates>& a, const mp_exp<tag, A1, A2, A3, A4>& b)
 {
    return a.compare(mp_number<Backend, ExpressionTemplates>(b));
 }
 
-template <class tag, class A1, class A2, class A3, class Backend, bool ExpressionTemplates>
-inline int mp_number_compare(const mp_exp<tag, A1, A2, A3>& a, const mp_number<Backend, ExpressionTemplates>& b)
+template <class tag, class A1, class A2, class A3, class A4, class Backend, bool ExpressionTemplates>
+inline int mp_number_compare(const mp_exp<tag, A1, A2, A3, A4>& a, const mp_number<Backend, ExpressionTemplates>& b)
 {
    return -b.compare(mp_number<Backend, ExpressionTemplates>(a));
 }
@@ -1521,26 +1570,26 @@ inline int mp_number_compare(const Val a, const mp_number<Backend, ExpressionTem
    return -b.compare(a);
 }
 
-template <class tag, class A1, class A2, class A3, class tag2, class A1b, class A2b, class A3b>
-inline int mp_number_compare(const mp_exp<tag, A1, A2, A3>& a, const mp_exp<tag2, A1b, A2b, A3b>& b)
+template <class tag, class A1, class A2, class A3, class A4, class tag2, class A1b, class A2b, class A3b>
+inline int mp_number_compare(const mp_exp<tag, A1, A2, A3, A4>& a, const mp_exp<tag2, A1b, A2b, A3b>& b)
 {
-   typedef typename mp_exp<tag, A1, A2, A3>::result_type real1;
+   typedef typename mp_exp<tag, A1, A2, A3, A4>::result_type real1;
    typedef typename mp_exp<tag2, A1b, A2b, A3b>::result_type real2;
    return real1(a).compare(real2(b));
 }
 
-template <class tag, class A1, class A2, class A3, class Val>
-inline typename enable_if<is_arithmetic<Val>, int>::type mp_number_compare(const mp_exp<tag, A1, A2, A3>& a, const Val b)
+template <class tag, class A1, class A2, class A3, class A4, class Val>
+inline typename enable_if<is_arithmetic<Val>, int>::type mp_number_compare(const mp_exp<tag, A1, A2, A3, A4>& a, const Val b)
 {
-   typedef typename mp_exp<tag, A1, A2, A3>::result_type real;
+   typedef typename mp_exp<tag, A1, A2, A3, A4>::result_type real;
    real t(a);
    return t.compare(b);
 }
 
-template <class Val, class tag, class A1, class A2, class A3>
-inline typename enable_if<is_arithmetic<Val>, int>::type mp_number_compare(const Val a, const mp_exp<tag, A1, A2, A3>& b)
+template <class Val, class tag, class A1, class A2, class A3, class A4>
+inline typename enable_if<is_arithmetic<Val>, int>::type mp_number_compare(const Val a, const mp_exp<tag, A1, A2, A3, A4>& b)
 {
-   typedef typename mp_exp<tag, A1, A2, A3>::result_type real;
+   typedef typename mp_exp<tag, A1, A2, A3, A4>::result_type real;
    return -real(b).compare(a);
 }
 
@@ -1640,10 +1689,10 @@ inline std::ostream& operator << (std::ostream& os, const mp_number<Backend, Exp
 
 namespace detail{
 
-template <class tag, class A1, class A2, class A3>
-inline std::ostream& operator << (std::ostream& os, const mp_exp<tag, A1, A2, A3>& r)
+template <class tag, class A1, class A2, class A3, class A4>
+inline std::ostream& operator << (std::ostream& os, const mp_exp<tag, A1, A2, A3, A4>& r)
 {
-   typedef typename mp_exp<tag, A1, A2, A3>::result_type value_type;
+   typedef typename mp_exp<tag, A1, A2, A3, A4>::result_type value_type;
    value_type temp(r);
    return os << temp;
 }

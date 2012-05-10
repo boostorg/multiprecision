@@ -900,17 +900,30 @@ inline void eval_pow(mpfr_float_backend<Digits10>& result, const mpfr_float_back
    mpfr_pow(result.data(), b.data(), e.data(), GMP_RNDN);
 }
 
+#ifdef BOOST_MSVC
+//
+// The enable_if usage below doesn't work with msvc - but only when
+// certain other enable_if usages are defined first.  It's a capricious
+// and rather annoying compiler bug in other words....
+//
+# define BOOST_MP_ENABLE_IF_WORKAROUND (Digits10 || !Digits10) && 
+#else
+#define BOOST_MP_ENABLE_IF_WORKAROUND
+#endif
+
 template <unsigned Digits10, class Integer>
-inline typename enable_if<mpl::and_<is_signed<Integer>, mpl::bool_<sizeof(Integer) <= sizeof(long)> > >::type eval_pow(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& b, const Integer& e)
+inline typename enable_if<mpl::and_<is_signed<Integer>, mpl::bool_<BOOST_MP_ENABLE_IF_WORKAROUND (sizeof(Integer) <= sizeof(long))> > >::type eval_pow(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& b, const Integer& e)
 {
    mpfr_pow_si(result.data(), b.data(), e, GMP_RNDN);
 }
 
 template <unsigned Digits10, class Integer>
-inline typename enable_if<mpl::and_<is_unsigned<Integer>, mpl::bool_<sizeof(Integer) <= sizeof(long)> > >::type eval_pow(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& b, const Integer& e)
+inline typename enable_if<mpl::and_<is_unsigned<Integer>, mpl::bool_<BOOST_MP_ENABLE_IF_WORKAROUND (sizeof(Integer) <= sizeof(long))> > >::type eval_pow(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& b, const Integer& e)
 {
    mpfr_pow_ui(result.data(), b.data(), e, GMP_RNDN);
 }
+
+#undef BOOST_MP_ENABLE_IF_WORKAROUND
 
 template <unsigned Digits10>
 inline void eval_exp(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg)

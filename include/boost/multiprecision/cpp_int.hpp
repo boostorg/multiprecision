@@ -1082,10 +1082,13 @@ inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, c
       for(unsigned j = 0; j < inner_limit; ++j)
       {
          BOOST_ASSERT(i+j < result.size());
+         BOOST_ASSERT((std::numeric_limits<double_limb_type>::max)() - carry > static_cast<double_limb_type>(cpp_int_backend<MinBits, Signed, Allocator>::max_limb_value) * static_cast<double_limb_type>(cpp_int_backend<MinBits, Signed, Allocator>::max_limb_value));
          carry += static_cast<double_limb_type>(pa[i]) * static_cast<double_limb_type>(pb[j]);
+         BOOST_ASSERT((std::numeric_limits<double_limb_type>::max)() - carry >= pr[i+j]);
          carry += pr[i + j];
          pr[i + j] = static_cast<limb_type>(carry);
          carry >>= cpp_int_backend<MinBits, Signed, Allocator>::limb_bits;
+         BOOST_ASSERT(carry <= (cpp_int_backend<MinBits, Signed, Allocator>::max_limb_value));
       }
       if(cpp_int_backend<MinBits, Signed, Allocator>::variable || (i + bs < result.size()))
          pr[i + bs] = static_cast<limb_type>(carry);
@@ -1529,6 +1532,8 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>* result,
          {
             --r_order;  // No remainder, division was exact.
             r.resize(r.size() - 1);
+            if(result)
+               pres[r_order] = static_cast<limb_type>(0u);
          }
       }
       else
@@ -1540,6 +1545,8 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>* result,
          {
             --r_order;  // No remainder, division was exact.
             r.resize(r.size() - 1);
+            if(result)
+               pres[r_order] = static_cast<limb_type>(0u);
          }
       }
    }

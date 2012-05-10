@@ -445,6 +445,26 @@ inline void eval_fmod(T& result, const T& a, const T& b)
    eval_multiply(n, b);
    eval_subtract(result, a, n);
 }
+template<class T, class A> 
+inline typename enable_if<is_arithmetic<A>, void>::type eval_fmod(T& result, const T& x, const A& a)
+{
+   typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
+   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+   cast_type c;
+   c = a;
+   eval_fmod(result, x, c);
+}
+
+template<class T, class A> 
+inline typename enable_if<is_arithmetic<A>, void>::type eval_fmod(T& result, const A& x, const T& a)
+{
+   typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
+   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+   cast_type c;
+   c = x;
+   eval_fmod(result, c, a);
+}
+
 template <class T>
 inline void eval_trunc(T& result, const T& a)
 {
@@ -482,68 +502,6 @@ inline void eval_round(T& result, const T& a)
       eval_add(result, a, fp_type(0.5f));
       eval_floor(result, result);
    }
-}
-
-template<class T, class A> 
-inline typename enable_if<is_floating_point<A>, void>::type eval_pow(T& result, const T& x, const A& a)
-{
-   // Note this one is resticted to float arguments since pow.hpp already has a version for
-   // integer powers....
-   typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
-   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
-   cast_type c;
-   c = a;
-   eval_pow(result, x, c);
-}
-
-template<class T, class A> 
-inline typename enable_if<is_arithmetic<A>, void>::type eval_pow(T& result, const A& x, const T& a)
-{
-   typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
-   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
-   cast_type c;
-   c = x;
-   eval_pow(result, c, a);
-}
-
-template<class T, class A> 
-inline typename enable_if<is_arithmetic<A>, void>::type eval_fmod(T& result, const T& x, const A& a)
-{
-   typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
-   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
-   cast_type c;
-   c = a;
-   eval_fmod(result, x, c);
-}
-
-template<class T, class A> 
-inline typename enable_if<is_arithmetic<A>, void>::type eval_fmod(T& result, const A& x, const T& a)
-{
-   typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
-   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
-   cast_type c;
-   c = x;
-   eval_fmod(result, c, a);
-}
-
-template<class T, class A> 
-inline typename enable_if<is_arithmetic<A>, void>::type eval_atan2(T& result, const T& x, const A& a)
-{
-   typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
-   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
-   cast_type c;
-   c = a;
-   eval_atan2(result, x, c);
-}
-
-template<class T, class A> 
-inline typename enable_if<is_arithmetic<A>, void>::type eval_atan2(T& result, const A& x, const T& a)
-{
-   typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
-   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
-   cast_type c;
-   c = x;
-   eval_atan2(result, c, a);
 }
 
 template <class T, class Arithmetic>
@@ -670,10 +628,10 @@ inline int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::mp_
    using multiprecision::default_ops::eval_fpclassify;
    return eval_fpclassify(arg.backend());
 }
-template <class tag, class A1, class A2, class A3>
-inline int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::mp_exp<tag, A1, A2, A3>& arg)
+template <class tag, class A1, class A2, class A3, class A4>
+inline int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>& arg)
 {
-   typedef typename multiprecision::detail::mp_exp<tag, A1, A2, A3>::result_type value_type;
+   typedef typename multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>::result_type value_type;
    return fpclassify(value_type(arg));
 }
 template <class Backend, bool ExpressionTemplates>
@@ -682,10 +640,10 @@ inline bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::mp_n
    int v = fpclassify(arg);
    return (v != FP_INFINITE) && (v != FP_NAN);
 }
-template <class tag, class A1, class A2, class A3>
-inline bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::mp_exp<tag, A1, A2, A3>& arg)
+template <class tag, class A1, class A2, class A3, class A4>
+inline bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>& arg)
 {
-   typedef typename multiprecision::detail::mp_exp<tag, A1, A2, A3>::result_type value_type;
+   typedef typename multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>::result_type value_type;
    return isfinite(value_type(arg));
 }
 template <class Backend, bool ExpressionTemplates>
@@ -693,10 +651,10 @@ inline bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::mp_numb
 {
    return fpclassify(arg) == FP_NAN;
 }
-template <class tag, class A1, class A2, class A3>
-inline bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::mp_exp<tag, A1, A2, A3>& arg)
+template <class tag, class A1, class A2, class A3, class A4>
+inline bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>& arg)
 {
-   typedef typename multiprecision::detail::mp_exp<tag, A1, A2, A3>::result_type value_type;
+   typedef typename multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>::result_type value_type;
    return isnan(value_type(arg));
 }
 template <class Backend, bool ExpressionTemplates>
@@ -704,10 +662,10 @@ inline bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::mp_numb
 {
    return fpclassify(arg) == FP_INFINITE;
 }
-template <class tag, class A1, class A2, class A3>
-inline bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::mp_exp<tag, A1, A2, A3>& arg)
+template <class tag, class A1, class A2, class A3, class A4>
+inline bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>& arg)
 {
-   typedef typename multiprecision::detail::mp_exp<tag, A1, A2, A3>::result_type value_type;
+   typedef typename multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>::result_type value_type;
    return isinf(value_type(arg));
 }
 template <class Backend, bool ExpressionTemplates>
@@ -715,20 +673,20 @@ inline bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::mp_n
 {
    return fpclassify(arg) == FP_NORMAL;
 }
-template <class tag, class A1, class A2, class A3>
-inline bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::mp_exp<tag, A1, A2, A3>& arg)
+template <class tag, class A1, class A2, class A3, class A4>
+inline bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>& arg)
 {
-   typedef typename multiprecision::detail::mp_exp<tag, A1, A2, A3>::result_type value_type;
+   typedef typename multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>::result_type value_type;
    return isnormal(value_type(arg));
 }
 
 } // namespace math
 namespace multiprecision{
 
-template <class tag, class A1, class A2, class A3, class Policy>
-inline typename detail::mp_exp<tag, A1, A2, A3>::result_type trunc(const detail::mp_exp<tag, A1, A2, A3>& v, const Policy& pol)
+template <class tag, class A1, class A2, class A3, class A4, class Policy>
+inline typename detail::mp_exp<tag, A1, A2, A3, A4>::result_type trunc(const detail::mp_exp<tag, A1, A2, A3, A4>& v, const Policy& pol)
 {
-   typedef typename detail::mp_exp<tag, A1, A2, A3>::result_type number_type;
+   typedef typename detail::mp_exp<tag, A1, A2, A3, A4>::result_type number_type;
    return trunc(number_type(v), pol);
 }
 
@@ -741,17 +699,17 @@ inline mp_number<Backend, ExpressionTemplates> trunc(const mp_number<Backend, Ex
    return result;
 }
 
-template <class tag, class A1, class A2, class A3, class Policy>
-inline int itrunc(const detail::mp_exp<tag, A1, A2, A3>& v, const Policy& pol)
+template <class tag, class A1, class A2, class A3, class A4, class Policy>
+inline int itrunc(const detail::mp_exp<tag, A1, A2, A3, A4>& v, const Policy& pol)
 {
-   typedef typename detail::mp_exp<tag, A1, A2, A3>::result_type number_type;
+   typedef typename detail::mp_exp<tag, A1, A2, A3, A4>::result_type number_type;
    number_type r = trunc(v, pol);
    if((r > (std::numeric_limits<int>::max)()) || r < (std::numeric_limits<int>::min)() || !boost::math::isfinite(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::itrunc<%1%>(%1%)", 0, number_type(v), 0, pol).template convert_to<int>();
    return r.template convert_to<int>();
 }
-template <class tag, class A1, class A2, class A3>
-inline int itrunc(const detail::mp_exp<tag, A1, A2, A3>& v)
+template <class tag, class A1, class A2, class A3, class A4>
+inline int itrunc(const detail::mp_exp<tag, A1, A2, A3, A4>& v)
 {
    return itrunc(v, boost::math::policies::policy<>());
 }
@@ -768,17 +726,17 @@ inline int itrunc(const mp_number<Backend, ExpressionTemplates>& v)
 {
    return itrunc(v, boost::math::policies::policy<>());
 }
-template <class tag, class A1, class A2, class A3, class Policy>
-inline long ltrunc(const detail::mp_exp<tag, A1, A2, A3>& v, const Policy& pol)
+template <class tag, class A1, class A2, class A3, class A4, class Policy>
+inline long ltrunc(const detail::mp_exp<tag, A1, A2, A3, A4>& v, const Policy& pol)
 {
-   typedef typename detail::mp_exp<tag, A1, A2, A3>::result_type number_type;
+   typedef typename detail::mp_exp<tag, A1, A2, A3, A4>::result_type number_type;
    number_type r = trunc(v, pol);
    if((r > (std::numeric_limits<long>::max)()) || r < (std::numeric_limits<long>::min)() || !boost::math::isfinite(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::ltrunc<%1%>(%1%)", 0, number_type(v), 0L, pol).template convert_to<long>();
    return r.template convert_to<long>();
 }
-template <class tag, class A1, class A2, class A3>
-inline long ltrunc(const detail::mp_exp<tag, A1, A2, A3>& v)
+template <class tag, class A1, class A2, class A3, class A4>
+inline long ltrunc(const detail::mp_exp<tag, A1, A2, A3, A4>& v)
 {
    return ltrunc(v, boost::math::policies::policy<>());
 }
@@ -796,17 +754,17 @@ inline long ltrunc(const mp_number<T, ExpressionTemplates>& v)
    return ltrunc(v, boost::math::policies::policy<>());
 }
 #ifndef BOOST_NO_LONG_LONG
-template <class tag, class A1, class A2, class A3, class Policy>
-inline long long lltrunc(const detail::mp_exp<tag, A1, A2, A3>& v, const Policy& pol)
+template <class tag, class A1, class A2, class A3, class A4, class Policy>
+inline long long lltrunc(const detail::mp_exp<tag, A1, A2, A3, A4>& v, const Policy& pol)
 {
-   typedef typename detail::mp_exp<tag, A1, A2, A3>::result_type number_type;
+   typedef typename detail::mp_exp<tag, A1, A2, A3, A4>::result_type number_type;
    number_type r = trunc(v, pol);
    if((r > (std::numeric_limits<long long>::max)()) || r < (std::numeric_limits<long long>::min)() || !boost::math::isfinite(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::lltrunc<%1%>(%1%)", 0, number_type(v), 0LL, pol).template convert_to<long long>();
    return r.template convert_to<long long>();
 }
-template <class tag, class A1, class A2, class A3>
-inline long long lltrunc(const detail::mp_exp<tag, A1, A2, A3>& v)
+template <class tag, class A1, class A2, class A3, class A4>
+inline long long lltrunc(const detail::mp_exp<tag, A1, A2, A3, A4>& v)
 {
    return lltrunc(v, boost::math::policies::policy<>());
 }
@@ -824,10 +782,10 @@ inline long long lltrunc(const mp_number<T, ExpressionTemplates>& v)
    return lltrunc(v, boost::math::policies::policy<>());
 }
 #endif
-template <class tag, class A1, class A2, class A3, class Policy>
-inline typename detail::mp_exp<tag, A1, A2, A3>::result_type round(const detail::mp_exp<tag, A1, A2, A3>& v, const Policy& pol)
+template <class tag, class A1, class A2, class A3, class A4, class Policy>
+inline typename detail::mp_exp<tag, A1, A2, A3, A4>::result_type round(const detail::mp_exp<tag, A1, A2, A3, A4>& v, const Policy& pol)
 {
-   typedef typename detail::mp_exp<tag, A1, A2, A3>::result_type number_type;
+   typedef typename detail::mp_exp<tag, A1, A2, A3, A4>::result_type number_type;
    return round(static_cast<number_type>(v), pol);
 }
 template <class T, bool ExpressionTemplates, class Policy>
@@ -839,17 +797,17 @@ inline mp_number<T, ExpressionTemplates> round(const mp_number<T, ExpressionTemp
    return result;
 }
 
-template <class tag, class A1, class A2, class A3, class Policy>
-inline int iround(const detail::mp_exp<tag, A1, A2, A3>& v, const Policy& pol)
+template <class tag, class A1, class A2, class A3, class A4, class Policy>
+inline int iround(const detail::mp_exp<tag, A1, A2, A3, A4>& v, const Policy& pol)
 {
-   typedef typename detail::mp_exp<tag, A1, A2, A3>::result_type number_type;
+   typedef typename detail::mp_exp<tag, A1, A2, A3, A4>::result_type number_type;
    number_type r = round(v, pol);
    if((r > (std::numeric_limits<int>::max)()) || r < (std::numeric_limits<int>::min)() || !boost::math::isfinite(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::iround<%1%>(%1%)", 0, number_type(v), 0, pol).template convert_to<int>();
    return r.template convert_to<int>();
 }
-template <class tag, class A1, class A2, class A3>
-inline int iround(const detail::mp_exp<tag, A1, A2, A3>& v)
+template <class tag, class A1, class A2, class A3, class A4>
+inline int iround(const detail::mp_exp<tag, A1, A2, A3, A4>& v)
 {
    return iround(v, boost::math::policies::policy<>());
 }
@@ -866,17 +824,17 @@ inline int iround(const mp_number<T, ExpressionTemplates>& v)
 {
    return iround(v, boost::math::policies::policy<>());
 }
-template <class tag, class A1, class A2, class A3, class Policy>
-inline long lround(const detail::mp_exp<tag, A1, A2, A3>& v, const Policy& pol)
+template <class tag, class A1, class A2, class A3, class A4, class Policy>
+inline long lround(const detail::mp_exp<tag, A1, A2, A3, A4>& v, const Policy& pol)
 {
-   typedef typename detail::mp_exp<tag, A1, A2, A3>::result_type number_type;
+   typedef typename detail::mp_exp<tag, A1, A2, A3, A4>::result_type number_type;
    number_type r = round(v, pol);
    if((r > (std::numeric_limits<long>::max)()) || r < (std::numeric_limits<long>::min)() || !boost::math::isfinite(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::lround<%1%>(%1%)", 0, number_type(v), 0L, pol).template convert_to<long>();
    return r.template convert_to<long>();
 }
-template <class tag, class A1, class A2, class A3>
-inline long lround(const detail::mp_exp<tag, A1, A2, A3>& v)
+template <class tag, class A1, class A2, class A3, class A4>
+inline long lround(const detail::mp_exp<tag, A1, A2, A3, A4>& v)
 {
    return lround(v, boost::math::policies::policy<>());
 }
@@ -894,17 +852,17 @@ inline long lround(const mp_number<T, ExpressionTemplates>& v)
    return lround(v, boost::math::policies::policy<>());
 }
 #ifndef BOOST_NO_LONG_LONG
-template <class tag, class A1, class A2, class A3, class Policy>
-inline long long llround(const detail::mp_exp<tag, A1, A2, A3>& v, const Policy& pol)
+template <class tag, class A1, class A2, class A3, class A4, class Policy>
+inline long long llround(const detail::mp_exp<tag, A1, A2, A3, A4>& v, const Policy& pol)
 {
-   typedef typename detail::mp_exp<tag, A1, A2, A3>::result_type number_type;
+   typedef typename detail::mp_exp<tag, A1, A2, A3, A4>::result_type number_type;
    number_type r = round(v, pol);
    if((r > (std::numeric_limits<long long>::max)()) || r < (std::numeric_limits<long long>::min)() || !boost::math::isfinite(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::iround<%1%>(%1%)", 0, number_type(v), 0LL, pol).template convert_to<long long>();
    return r.template convert_to<long long>();
 }
-template <class tag, class A1, class A2, class A3>
-inline long long llround(const detail::mp_exp<tag, A1, A2, A3>& v)
+template <class tag, class A1, class A2, class A3, class A4>
+inline long long llround(const detail::mp_exp<tag, A1, A2, A3, A4>& v)
 {
    return llround(v, boost::math::policies::policy<>());
 }
@@ -937,21 +895,21 @@ struct BOOST_JOIN(func, _funct)\
 \
 }\
 \
-template <class tag, class A1, class A2, class A3> \
-inline typename enable_if_c<number_category<detail::mp_exp<tag, A1, A2, A3> >::value == category,\
+template <class tag, class A1, class A2, class A3, class A4> \
+inline typename enable_if_c<number_category<detail::mp_exp<tag, A1, A2, A3, A4> >::value == category,\
    detail::mp_exp<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type> \
-  , detail::mp_exp<tag, A1, A2, A3> >\
+  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3, A4> >::type> \
+  , detail::mp_exp<tag, A1, A2, A3, A4> > \
 >::type \
-func(const detail::mp_exp<tag, A1, A2, A3>& arg)\
+func(const detail::mp_exp<tag, A1, A2, A3, A4>& arg)\
 {\
     return detail::mp_exp<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type> \
-  , detail::mp_exp<tag, A1, A2, A3> \
+  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3, A4> >::type> \
+  , detail::mp_exp<tag, A1, A2, A3, A4> \
 > (\
-        detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type>() \
+        detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3, A4> >::type>() \
       , arg   \
     );\
 }\
@@ -960,7 +918,7 @@ inline typename enable_if_c<number_category<Backend>::value == category,\
    detail::mp_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
-  , mp_number<Backend> >\
+  , mp_number<Backend> > \
 >::type \
 func(const mp_number<Backend>& arg)\
 {\
@@ -1031,43 +989,43 @@ func(const mp_number<Backend>& arg, const mp_number<Backend>& a)\
       a\
     );\
 }\
-template <class Backend, class tag, class A1, class A2, class A3> \
+template <class Backend, class tag, class A1, class A2, class A3, class A4> \
 inline typename enable_if_c<\
-   (number_category<Backend>::value == category) && (number_category<detail::mp_exp<tag, A1, A2, A3> >::value == category),\
+   (number_category<Backend>::value == category) && (number_category<detail::mp_exp<tag, A1, A2, A3, A4> >::value == category),\
    detail::mp_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
   , mp_number<Backend> \
-  , detail::mp_exp<tag, A1, A2, A3> > \
+  , detail::mp_exp<tag, A1, A2, A3, A4> > \
 >::type \
-func(const mp_number<Backend>& arg, const detail::mp_exp<tag, A1, A2, A3>& a)\
+func(const mp_number<Backend>& arg, const detail::mp_exp<tag, A1, A2, A3, A4>& a)\
 {\
     return detail::mp_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
   , mp_number<Backend> \
-  , detail::mp_exp<tag, A1, A2, A3> \
+  , detail::mp_exp<tag, A1, A2, A3, A4> \
   >(\
         detail::BOOST_JOIN(func, _funct)<Backend>() \
       , arg,\
       a\
     );\
 }\
-template <class tag, class A1, class A2, class A3, class Backend> \
+template <class tag, class A1, class A2, class A3, class A4, class Backend> \
 inline typename enable_if_c<\
-   (number_category<Backend>::value == category) && (number_category<detail::mp_exp<tag, A1, A2, A3> >::value == category),\
+   (number_category<Backend>::value == category) && (number_category<detail::mp_exp<tag, A1, A2, A3, A4> >::value == category),\
    detail::mp_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
-  , detail::mp_exp<tag, A1, A2, A3> \
+  , detail::mp_exp<tag, A1, A2, A3, A4> \
   , mp_number<Backend> > \
 >::type \
-func(const detail::mp_exp<tag, A1, A2, A3>& arg, const mp_number<Backend>& a)\
+func(const detail::mp_exp<tag, A1, A2, A3, A4>& arg, const mp_number<Backend>& a)\
 {\
     return detail::mp_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
-  , detail::mp_exp<tag, A1, A2, A3> \
+  , detail::mp_exp<tag, A1, A2, A3, A4> \
   , mp_number<Backend> \
   >(\
         detail::BOOST_JOIN(func, _funct)<Backend>() \
@@ -1075,24 +1033,24 @@ func(const detail::mp_exp<tag, A1, A2, A3>& arg, const mp_number<Backend>& a)\
       a\
     );\
 }\
-template <class tag, class A1, class A2, class A3, class tagb, class A1b, class A2b, class A3b> \
+template <class tag, class A1, class A2, class A3, class A4, class tagb, class A1b, class A2b, class A3b, class A4b> \
 inline typename enable_if_c<\
-      (number_category<detail::mp_exp<tag, A1, A2, A3> >::value == category) && (number_category<detail::mp_exp<tagb, A1b, A2b, A3b> >::value == category),\
+      (number_category<detail::mp_exp<tag, A1, A2, A3, A4> >::value == category) && (number_category<detail::mp_exp<tagb, A1b, A2b, A3b, A4b> >::value == category),\
    detail::mp_exp<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type> \
-  , detail::mp_exp<tag, A1, A2, A3> \
-  , detail::mp_exp<tagb, A1b, A2b, A3b> > \
+  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3, A4> >::type> \
+  , detail::mp_exp<tag, A1, A2, A3, A4> \
+  , detail::mp_exp<tagb, A1b, A2b, A3b, A4b> > \
 >::type \
-func(const detail::mp_exp<tag, A1, A2, A3>& arg, const detail::mp_exp<tagb, A1b, A2b, A3b>& a)\
+func(const detail::mp_exp<tag, A1, A2, A3, A4>& arg, const detail::mp_exp<tagb, A1b, A2b, A3b, A4b>& a)\
 {\
     return detail::mp_exp<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type> \
-  , detail::mp_exp<tag, A1, A2, A3> \
-  , detail::mp_exp<tagb, A1b, A2b, A3b> \
+  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3, A4> >::type> \
+  , detail::mp_exp<tag, A1, A2, A3, A4> \
+  , detail::mp_exp<tagb, A1b, A2b, A3b, A4b> \
   >(\
-        detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type>() \
+        detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3, A4> >::type>() \
       , arg,\
       a\
     );\
@@ -1120,25 +1078,25 @@ func(const mp_number<Backend>& arg, const Arithmetic& a)\
       a\
     );\
 }\
-template <class tag, class A1, class A2, class A3, class Arithmetic> \
+template <class tag, class A1, class A2, class A3, class A4, class Arithmetic> \
 inline typename enable_if_c<\
-   is_arithmetic<Arithmetic>::value && (number_category<detail::mp_exp<tag, A1, A2, A3> >::value == category),\
+   is_arithmetic<Arithmetic>::value && (number_category<detail::mp_exp<tag, A1, A2, A3, A4> >::value == category),\
    detail::mp_exp<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type> \
-  , detail::mp_exp<tag, A1, A2, A3> \
+  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3, A4> >::type> \
+  , detail::mp_exp<tag, A1, A2, A3, A4> \
   , Arithmetic\
   > \
 >::type \
-func(const detail::mp_exp<tag, A1, A2, A3>& arg, const Arithmetic& a)\
+func(const detail::mp_exp<tag, A1, A2, A3, A4>& arg, const Arithmetic& a)\
 {\
     return detail::mp_exp<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type> \
-  , detail::mp_exp<tag, A1, A2, A3> \
+  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3, A4> >::type> \
+  , detail::mp_exp<tag, A1, A2, A3, A4> \
   , Arithmetic\
    >(\
-        detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type>() \
+        detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3, A4> >::type>() \
       , arg,\
       a\
     );\
@@ -1166,25 +1124,25 @@ func(const Arithmetic& arg, const mp_number<Backend>& a)\
       a\
     );\
 }\
-template <class tag, class A1, class A2, class A3, class Arithmetic> \
+template <class tag, class A1, class A2, class A3, class A4, class Arithmetic> \
 inline typename enable_if_c<\
-   is_arithmetic<Arithmetic>::value && (number_category<detail::mp_exp<tag, A1, A2, A3> >::value == category),\
+   is_arithmetic<Arithmetic>::value && (number_category<detail::mp_exp<tag, A1, A2, A3, A4> >::value == category),\
    detail::mp_exp<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type> \
+  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3, A4> >::type> \
   , Arithmetic \
-  , detail::mp_exp<tag, A1, A2, A3> \
+  , detail::mp_exp<tag, A1, A2, A3, A4> \
   > \
 >::type \
-func(const Arithmetic& arg, const detail::mp_exp<tag, A1, A2, A3>& a)\
+func(const Arithmetic& arg, const detail::mp_exp<tag, A1, A2, A3, A4>& a)\
 {\
     return detail::mp_exp<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type> \
+  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3, A4> >::type> \
   , Arithmetic \
-  , detail::mp_exp<tag, A1, A2, A3> \
+  , detail::mp_exp<tag, A1, A2, A3, A4> \
    >(\
-        detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type>() \
+        detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3, A4> >::type>() \
       , arg,\
       a\
     );\
@@ -1228,24 +1186,24 @@ func(const Arithmetic& a, const mp_number<Backend, false>& arg)\
 
 
 #define HETERO_BINARY_OP_FUNCTOR_B(func, Arg2, category)\
-template <class tag, class A1, class A2, class A3> \
+template <class tag, class A1, class A2, class A3, class A4> \
 inline typename enable_if_c<\
-   (number_category<detail::mp_exp<tag, A1, A2, A3> >::value == category),\
+   (number_category<detail::mp_exp<tag, A1, A2, A3, A4> >::value == category),\
    detail::mp_exp<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type> \
-  , detail::mp_exp<tag, A1, A2, A3> \
+  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3, A4> >::type> \
+  , detail::mp_exp<tag, A1, A2, A3, A4> \
   , Arg2> \
 >::type \
-func(const detail::mp_exp<tag, A1, A2, A3>& arg, Arg2 const& a)\
+func(const detail::mp_exp<tag, A1, A2, A3, A4>& arg, Arg2 const& a)\
 {\
     return detail::mp_exp<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type> \
-  , detail::mp_exp<tag, A1, A2, A3> \
+  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3, A4> >::type> \
+  , detail::mp_exp<tag, A1, A2, A3, A4> \
   , Arg2\
    >(\
-        detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type>() \
+        detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3, A4> >::type>() \
       , arg, a   \
     );\
 }\
@@ -1313,19 +1271,19 @@ struct abs_funct
 
 }
 
-template <class tag, class A1, class A2, class A3>
+template <class tag, class A1, class A2, class A3, class A4>
 inline detail::mp_exp<
     detail::function
-  , detail::abs_funct<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type>
-  , detail::mp_exp<tag, A1, A2, A3> >
-abs(const detail::mp_exp<tag, A1, A2, A3>& arg)
+  , detail::abs_funct<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3, A4> >::type>
+  , detail::mp_exp<tag, A1, A2, A3, A4> >
+abs(const detail::mp_exp<tag, A1, A2, A3, A4>& arg)
 {
     return detail::mp_exp<
     detail::function
-  , detail::abs_funct<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type>
-  , detail::mp_exp<tag, A1, A2, A3>
+  , detail::abs_funct<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3, A4> >::type>
+  , detail::mp_exp<tag, A1, A2, A3, A4>
 > (
-        detail::abs_funct<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3> >::type>()
+        detail::abs_funct<typename detail::backend_type<detail::mp_exp<tag, A1, A2, A3, A4> >::type>()
       , arg
     );
 }
@@ -1389,7 +1347,7 @@ BINARY_OP_FUNCTOR(atan2, number_kind_floating_point)
 //
 BINARY_OP_FUNCTOR(gcd, number_kind_integer)
 BINARY_OP_FUNCTOR(lcm, number_kind_integer)
-
+HETERO_BINARY_OP_FUNCTOR_B(pow, unsigned, number_kind_integer)
 
 #undef BINARY_OP_FUNCTOR
 #undef UNARY_OP_FUNCTOR

@@ -197,17 +197,17 @@ bool miller_rabin_test(const mp_number<Backend, ExpressionTemplates>& x, unsigne
    return miller_rabin_test(x, trials, gen);
 }
 
-template <class tag, class Arg1, class Arg2, class Arg3, class Engine>
-bool miller_rabin_test(const detail::mp_exp<tag, Arg1, Arg2, Arg3> & n, unsigned trials, Engine& gen)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class Engine>
+bool miller_rabin_test(const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> & n, unsigned trials, Engine& gen)
 {
-   typedef typename detail::mp_exp<tag, Arg1, Arg2, Arg3>::result_type number_type;
+   typedef typename detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>::result_type number_type;
    return miller_rabin_test(number_type(n), trials, gen);
 }
 
-template <class tag, class Arg1, class Arg2, class Arg3>
-bool miller_rabin_test(const detail::mp_exp<tag, Arg1, Arg2, Arg3> & n, unsigned trials)
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+bool miller_rabin_test(const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> & n, unsigned trials)
 {
-   typedef typename detail::mp_exp<tag, Arg1, Arg2, Arg3>::result_type number_type;
+   typedef typename detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>::result_type number_type;
    return miller_rabin_test(number_type(n), trials);
 }
 
