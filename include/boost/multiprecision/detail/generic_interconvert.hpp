@@ -107,6 +107,10 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
 template <class To, class From>
 void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_floating_point>& /*to_type*/, const mpl::int_<number_kind_floating_point>& /*from_type*/)
 {
+#ifdef BOOST_MSVC
+#pragma warning(push)
+#pragma warning(disable:4127)
+#endif
    //
    // The code here only works when the radix of "From" is 2, we could try shifting by other
    // radixes but it would complicate things.... use a string convertion when the radix is other
@@ -178,6 +182,9 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
       return;
    }
    eval_ldexp(to, to, static_cast<to_exponent>(e));
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
 }
 
 template <class To, class From>

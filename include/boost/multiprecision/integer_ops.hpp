@@ -160,7 +160,14 @@ namespace detail{
 template <class Backend>
 void eval_powm(Backend& result, const Backend& a, const Backend& p, const Backend& c)
 {
+   using default_ops::eval_bit_test;
+   using default_ops::eval_get_sign;
+   using default_ops::eval_multiply;
+   using default_ops::eval_modulus;
+   using default_ops::eval_right_shift;
+
    typedef typename canonical<unsigned char, Backend>::type ui_type;
+   
    Backend x, y(a), b(p);
    x = ui_type(1u);
    while(eval_get_sign(b) > 0)
@@ -182,6 +189,12 @@ void eval_powm(Backend& result, const Backend& a, const Backend& p, Integer c)
 {
    typedef typename canonical<unsigned char, Backend>::type ui_type;
    typedef typename canonical<Integer, Backend>::type i_type;
+
+   using default_ops::eval_bit_test;
+   using default_ops::eval_get_sign;
+   using default_ops::eval_multiply;
+   using default_ops::eval_modulus;
+   using default_ops::eval_right_shift;
 
    if(eval_get_sign(p) < 0)
    {
@@ -210,6 +223,12 @@ void eval_powm(Backend& result, const Backend& a, Integer b, const Backend& c)
    typedef typename canonical<unsigned char, Backend>::type ui_type;
    typedef typename canonical<Integer, Backend>::type i_type;
 
+   using default_ops::eval_bit_test;
+   using default_ops::eval_get_sign;
+   using default_ops::eval_multiply;
+   using default_ops::eval_modulus;
+   using default_ops::eval_right_shift;
+
    if(b < 0)
    {
       BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
@@ -237,6 +256,12 @@ void eval_powm(Backend& result, const Backend& a, Integer1 b, Integer2 c)
    typedef typename canonical<unsigned char, Backend>::type ui_type;
    typedef typename canonical<Integer1, Backend>::type i1_type;
    typedef typename canonical<Integer2, Backend>::type i2_type;
+
+   using default_ops::eval_bit_test;
+   using default_ops::eval_get_sign;
+   using default_ops::eval_multiply;
+   using default_ops::eval_modulus;
+   using default_ops::eval_right_shift;
 
    if(b < 0)
    {

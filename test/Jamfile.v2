@@ -23,6 +23,9 @@ project : requirements
    <search>$(mpfr_path)/build.vc10/lib/Win32/Debug
    <search>$(tommath_path) 
    <toolset>msvc:<runtime-link>static
+   <toolset>msvc:<warnings>all
+   <toolset>gcc:<cxxflags>-Wall
+   <toolset>gcc:<cxxflags>-Wextra
    ;
 
 local enable-specfun = [ MATCH (--enable-specfun) : [ modules.peek : ARGV ] ] ;

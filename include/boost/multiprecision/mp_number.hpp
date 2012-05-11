@@ -59,12 +59,12 @@ public:
    mp_number(const mp_number<Backend, ET>& val) : m_backend(val.m_backend) {}
 
    template <class Other, bool ET>
-   mp_number(const mp_number<Other, ET>& val, typename enable_if<boost::is_convertible<Other, Backend> >::type* dummy1 = 0)
+   mp_number(const mp_number<Other, ET>& val, typename enable_if<boost::is_convertible<Other, Backend> >::type* = 0)
    {
       m_backend = val.backend();
    }
    template <class Other, bool ET>
-   mp_number(const mp_number<Other, ET>& val, typename disable_if<boost::is_convertible<Other, Backend> >::type* dummy1 = 0)
+   mp_number(const mp_number<Other, ET>& val, typename disable_if<boost::is_convertible<Other, Backend> >::type* = 0)
    {
       //
       // Attempt a generic interconvertion:
@@ -72,13 +72,13 @@ public:
       detail::generic_interconvert(backend(), val.backend(), number_category<Backend>(), number_category<Other>());
    }
    template <class V>
-   mp_number(V v1, V v2, typename enable_if<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > >::type* dummy1 = 0)
+   mp_number(V v1, V v2, typename enable_if<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > >::type* = 0)
    {
       using default_ops::assign_components;
       assign_components(m_backend, canonical_value(v1), canonical_value(v2));
    }
    template <class Other, bool ET>
-   mp_number(const mp_number<Other, ET>& v1, const mp_number<Other, ET>& v2, typename enable_if<boost::is_convertible<Other, Backend> >::type* dummy1 = 0)
+   mp_number(const mp_number<Other, ET>& v1, const mp_number<Other, ET>& v2, typename enable_if<boost::is_convertible<Other, Backend> >::type* = 0)
    {
       using default_ops::assign_components;
       assign_components(m_backend, v1.backend(), v2.backend());
@@ -1136,7 +1136,7 @@ private:
       do_assign_function_3c(f, val1, val2, val3, t3);
    }
    template <class F, class Exp1, class Exp2, class Exp3, class Tag2, class Tag3>
-   void do_assign_function_3b(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const Tag2& t2, const Tag3& t3)
+   void do_assign_function_3b(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const Tag2& /*t2*/, const Tag3& t3)
    {
       mp_number t(val2);
       do_assign_function_3c(f, val1, t, val3, t3);
@@ -1147,7 +1147,7 @@ private:
       f(m_backend, function_arg_value(val1), function_arg_value(val2), function_arg_value(val3));
    }
    template <class F, class Exp1, class Exp2, class Exp3, class Tag3>
-   void do_assign_function_3c(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const Tag3& t3)
+   void do_assign_function_3c(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const Tag3& /*t3*/)
    {
       mp_number t(val3);
       do_assign_function_3c(f, val1, val2, t, detail::terminal());
@@ -1727,7 +1727,7 @@ inline std::istream& operator >> (std::istream& is, rational<multiprecision::mp_
    char c;
    bool have_hex = false;
 
-   while((EOF != (c = is.peek())) && (c == 'x' || c == 'X' || c == '-' || c == '+' || (c >= '0' && c <= '9') || (have_hex && (c >= 'a' && c <= 'f')) || (have_hex && (c >= 'A' && c <= 'F'))))
+   while((EOF != (c = static_cast<char>(is.peek()))) && (c == 'x' || c == 'X' || c == '-' || c == '+' || (c >= '0' && c <= '9') || (have_hex && (c >= 'a' && c <= 'f')) || (have_hex && (c >= 'A' && c <= 'F'))))
    {
       if(c == 'x' || c == 'X')
          have_hex = true;
@@ -1739,7 +1739,7 @@ inline std::istream& operator >> (std::istream& is, rational<multiprecision::mp_
    if(c == '/')
    {
       is.get();
-      while((EOF != (c = is.peek())) && (c == 'x' || c == 'X' || c == '-' || c == '+' || (c >= '0' && c <= '9') || (have_hex && (c >= 'a' && c <= 'f')) || (have_hex && (c >= 'A' && c <= 'F'))))
+      while((EOF != (c = static_cast<char>(is.peek()))) && (c == 'x' || c == 'X' || c == '-' || c == '+' || (c >= '0' && c <= '9') || (have_hex && (c >= 'a' && c <= 'f')) || (have_hex && (c >= 'A' && c <= 'F'))))
       {
          if(c == 'x' || c == 'X')
             have_hex = true;

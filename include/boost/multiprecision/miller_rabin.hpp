@@ -10,25 +10,6 @@
 
 namespace boost{
 namespace multiprecision{
-//
-// Calculate (a^b)%c:
-//
-template <class Backend, bool ExpressionTemplates>
-void expmod(const mp_number<Backend, ExpressionTemplates>& a, mp_number<Backend, ExpressionTemplates> b, const mp_number<Backend, ExpressionTemplates>& c, mp_number<Backend, ExpressionTemplates>& result)
-{
-   typedef mp_number<Backend, ExpressionTemplates> number_type;
-   number_type x(1), y(a);
-   while(b > 0)
-   {
-      if(b & 1)
-      {
-         x = (x * y) % c;
-      }
-      y = (y * y) % c;
-      b /= 2;
-   }
-   result = x % c;
-}
 
 template <class Backend, bool ExpressionTemplates>
 bool check_small_factors(const mp_number<Backend, ExpressionTemplates>& n)
@@ -140,6 +121,10 @@ template <class Backend, bool ExpressionTemplates, class Engine>
 typename enable_if_c<number_category<Backend>::value == number_kind_integer, bool>::type 
    miller_rabin_test(const mp_number<Backend, ExpressionTemplates>& n, unsigned trials, Engine& gen)
 {
+#ifdef BOOST_MSVC
+#pragma warning(push)
+#pragma warning(disable:4127)
+#endif
    typedef mp_number<Backend, ExpressionTemplates> number_type;
 
    if(n <= 227)
@@ -155,7 +140,7 @@ typename enable_if_c<number_category<Backend>::value == number_kind_integer, boo
    // Begin with a single Fermat test - it excludes a lot of candidates:
    //
    number_type q(228), x, y; // We know n is greater than this, as we've excluded small factors
-   expmod(q, nm1, n, x);
+   x = powm(q, nm1, n);
    if(x != 1u)
       return false;
 
@@ -174,7 +159,7 @@ typename enable_if_c<number_category<Backend>::value == number_kind_integer, boo
    for(unsigned i = 0; i < trials; ++i)
    {
       x = dist(gen);
-      expmod(x, q, n, y);
+      y = powm(x, q, n);
       unsigned j = 0;
       while(true)
       {
@@ -188,6 +173,9 @@ typename enable_if_c<number_category<Backend>::value == number_kind_integer, boo
       }
    }
    return true;  // Yeheh! probably prime.
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
 }
 
 template <class Backend, bool ExpressionTemplates>

@@ -412,7 +412,7 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    }
    for(unsigned i = 0; i < 20; ++i)
    {
-      if(std::numeric_limits<Real>::is_specialized && (!std::numeric_limits<Real>::is_bounded || (i * 17 < std::numeric_limits<Real>::digits)))
+      if(std::numeric_limits<Real>::is_specialized && (!std::numeric_limits<Real>::is_bounded || ((int)i * 17 < std::numeric_limits<Real>::digits)))
       {
          BOOST_TEST(lsb(Real(1) << (i * 17)) == i * 17);
          BOOST_TEST(bit_test(Real(1) << (i * 17), i * 17));
@@ -428,6 +428,29 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
          BOOST_TEST(bit_unset(zero, i * 17) == 0);
       }
    }
+   //
+   // pow, powm:
+   //
+   BOOST_TEST(pow(Real(3), 4) == 81);
+   BOOST_TEST(pow(Real(3) + Real(0), 4) == 81);
+   BOOST_TEST(powm(Real(3), Real(4), Real(13)) == 81 % 13);
+   BOOST_TEST(powm(Real(3), Real(4), 13) == 81 % 13);
+   BOOST_TEST(powm(Real(3), Real(4), Real(13) + 0) == 81 % 13);
+   BOOST_TEST(powm(Real(3), Real(4) + 0, Real(13)) == 81 % 13);
+   BOOST_TEST(powm(Real(3), Real(4) + 0, 13) == 81 % 13);
+   BOOST_TEST(powm(Real(3), Real(4) + 0, Real(13) + 0) == 81 % 13);
+   BOOST_TEST(powm(Real(3), 4 + 0, Real(13)) == 81 % 13);
+   BOOST_TEST(powm(Real(3), 4 + 0, 13) == 81 % 13);
+   BOOST_TEST(powm(Real(3), 4 + 0, Real(13) + 0) == 81 % 13);
+   BOOST_TEST(powm(Real(3) + 0, Real(4), Real(13)) == 81 % 13);
+   BOOST_TEST(powm(Real(3) + 0, Real(4), 13) == 81 % 13);
+   BOOST_TEST(powm(Real(3) + 0, Real(4), Real(13) + 0) == 81 % 13);
+   BOOST_TEST(powm(Real(3) + 0, Real(4) + 0, Real(13)) == 81 % 13);
+   BOOST_TEST(powm(Real(3) + 0, Real(4) + 0, 13) == 81 % 13);
+   BOOST_TEST(powm(Real(3) + 0, Real(4) + 0, Real(13) + 0) == 81 % 13);
+   BOOST_TEST(powm(Real(3) + 0, 4 + 0, Real(13)) == 81 % 13);
+   BOOST_TEST(powm(Real(3) + 0, 4 + 0, 13) == 81 % 13);
+   BOOST_TEST(powm(Real(3) + 0, 4 + 0, Real(13) + 0) == 81 % 13);
 }
 
 template <class Real, class T>

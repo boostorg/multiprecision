@@ -284,7 +284,7 @@ void test()
          BOOST_CHECK_EQUAL(mpz_int(powm(a, ui, c)).str(), test_type(powm(a, ui, c)).str());
       }
 
-      if(last_error_count != boost::detail::test_errors())
+      if(last_error_count != (unsigned)boost::detail::test_errors())
       {
          last_error_count = boost::detail::test_errors();
          std::cout << std::hex << std::showbase;

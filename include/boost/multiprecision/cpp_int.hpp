@@ -119,14 +119,14 @@ public:
    {
       *limbs() = 0;
    }
-   cpp_int_base(const cpp_int_base& o) : m_limbs(0), m_internal(true)
+   cpp_int_base(const cpp_int_base& o) : allocator_type(o), m_limbs(0), m_internal(true)
    {
       resize(o.size());
       std::memcpy(limbs(), o.limbs(), size() * sizeof(limb_type));
       m_sign = o.m_sign;
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   cpp_int_base(cpp_int_base&& o) : m_limbs(o.m_limbs), m_sign(o.m_sign), m_internal(o.m_internal) 
+   cpp_int_base(cpp_int_base&& o) : allocator_type(o), m_limbs(o.m_limbs), m_sign(o.m_sign), m_internal(o.m_internal) 
    {
       if(m_internal)
       {
@@ -149,6 +149,7 @@ public:
    {
       if(this != &o)
       {
+         static_cast<allocator_type&>(*this) = static_cast<const allocator_type&>(o);
          m_limbs = 0;
          resize(o.size());
          std::memcpy(limbs(), o.limbs(), size() * sizeof(limb_type));
