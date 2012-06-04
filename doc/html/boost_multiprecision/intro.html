@@ -132,16 +132,19 @@
 <p>
       If type <code class="computeroutput"><span class="identifier">T</span></code> is an <code class="computeroutput"><span class="identifier">mp_number</span></code>, then this expression is evaluated
       <span class="emphasis"><em>without creating a single temporary value</em></span>. In contrast,
-      if we were using the C++ wrapper that ships with <a href="http://gmplib.org" target="_top">GMP</a>
-      - <a href="http://gmplib.org/manual/C_002b_002b-Interface-Floats.html#C_002b_002b-Interface-Floats" target="_top">mpfr_class</a>
-      - then this expression would result in no less than 11 temporaries (this is
-      true even though <a href="http://gmplib.org/manual/C_002b_002b-Interface-Floats.html#C_002b_002b-Interface-Floats" target="_top">mpfr_class</a>
-      does use expression templates to reduce the number of temporaries somewhat).
-      Had we used an even simpler wrapper around <a href="http://gmplib.org" target="_top">GMP</a>
-      or <a href="http://www.mpfr.org" target="_top">MPFR</a> like <code class="computeroutput"><span class="identifier">mpclass</span></code>
-      things would have been even worse and no less that 24 temporaries are created
-      for this simple expression (note - we actually measure the number of memory
-      allocations performed rather than the number of temporaries directly).
+      if we were using the <a href="http://math.berkeley.edu/~wilken/code/gmpfrxx/" target="_top">mpfr_class</a>
+      C++ wrapper for <a href="http://www.mpfr.org" target="_top">MPFR</a> - then this expression
+      would result in no less than 11 temporaries (this is true even though <a href="http://math.berkeley.edu/~wilken/code/gmpfrxx/" target="_top">mpfr_class</a> does
+      use expression templates to reduce the number of temporaries somewhat). Had
+      we used an even simpler wrapper around <a href="http://www.mpfr.org" target="_top">MPFR</a>
+      like <a href="http://www.holoborodko.com/pavel/mpfr/" target="_top">mpreal</a> things
+      would have been even worse and no less that 24 temporaries are created for
+      this simple expression (note - we actually measure the number of memory allocations
+      performed rather than the number of temporaries directly, note also that the
+      <a href="http://gmplib.org/manual/C_002b_002b-Interface-Floats.html#C_002b_002b-Interface-Floats" target="_top">mpf_class</a>
+      wrapper that will be supplied with GMP-5.1 reduces the number of temporaries
+      to pretty much zero). Finally if we use this library with expression templates
+      disabled, we still only generate 11 temporaries <sup>[<a name="boost_multiprecision.intro.f0" href="#ftn.boost_multiprecision.intro.f0" class="footnote">1</a>]</sup> <sup>[<a name="boost_multiprecision.intro.f1" href="#ftn.boost_multiprecision.intro.f1" class="footnote">2</a>]</sup>.
     </p>
 <p>
       This library also extends expression template support to standard library functions
@@ -504,7 +507,19 @@
 </tbody>
 </table></div>
 </div>
-<br class="table-break">
+<br class="table-break"><div class="footnotes">
+<br><hr width="100" align="left">
+<div class="footnote"><p><sup>[<a id="ftn.boost_multiprecision.intro.f0" href="#boost_multiprecision.intro.f0" class="para">1</a>] </sup>
+        The actual number generated will depend on the compiler, how well it optimises
+        the code, and whether it supports rvalue references. The number of 11 temporaries
+        was generated with Visual C++ 10
+      </p></div>
+<div class="footnote"><p><sup>[<a id="ftn.boost_multiprecision.intro.f1" href="#boost_multiprecision.intro.f1" class="para">2</a>] </sup>
+        Marc Glisse suggested pre-review that this could be reduced still further
+        by careful use of rvalue-references and move semantics in the operator overloads.
+        This will be investigated further at a later date.
+      </p></div>
+</div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>

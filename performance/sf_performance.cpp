@@ -228,6 +228,7 @@ int main()
    std::cout << "Allocation Counts for Horner Evaluation:\n";
 #ifdef TEST_MPFR
    basic_allocation_test("mpfr_float_50", mpfr_float_50(2));
+   basic_allocation_test("mpfr_float_50 - no expression templates", mp_number<mpfr_float_backend<50>, false>(2));
 #endif
 #ifdef TEST_MPFR_CLASS
    basic_allocation_test("mpfr_class", mpfr_class(2));
@@ -239,6 +240,7 @@ int main()
    std::cout << "Allocation Counts for boost::math::tools::evaluate_polynomial:\n";
 #ifdef TEST_MPFR
    poly_allocation_test("mpfr_float_50", mpfr_float_50(2));
+   poly_allocation_test("mpfr_float_50 - no expression templates", mp_number<mpfr_float_backend<50>, false>(2));
 #endif
 #ifdef TEST_MPFR_CLASS
    poly_allocation_test("mpfr_class", mpfr_class(2));
@@ -270,7 +272,7 @@ int main()
 #ifdef TEST_MPFR_CLASS
    time_proc("mpfr_class", test_bessel<mpfr_class>, mpfr_buildopt_tls_p() ? 3 : 1);
 #endif
-#ifdef TEST_MP_REAL
+#ifdef TEST_MPREAL
    time_proc("mpfr::mpreal", test_bessel<mpfr::mpreal>, mpfr_buildopt_tls_p() ? 3 : 1);
 #endif
    //
@@ -288,6 +290,7 @@ int main()
 #endif
 #ifdef TEST_MPF
    time_proc("mpf_float_100", test_bessel<mpf_float_100>);
+   time_proc("mpf_float_100 (no expression templates", test_bessel<mp_number<gmp_float<100>, false> >);
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
    time_proc("cpp_dec_float_100", test_bessel<cpp_dec_float_100>);
@@ -314,6 +317,7 @@ int main()
 #endif
 #ifdef TEST_MPF
    time_proc("mpf_float_50", test_polynomial<mpf_float_50>);
+   time_proc("mpf_float_50 (no expression templates", test_polynomial<mp_number<gmp_float<50>, false> >);
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
    time_proc("cpp_dec_float_50", test_polynomial<cpp_dec_float_50>);
@@ -339,6 +343,7 @@ int main()
 #endif
 #ifdef TEST_MPF
    time_proc("mpf_float_100", test_polynomial<mpf_float_100>);
+   time_proc("mpf_float_100 (no expression templates", test_polynomial<mp_number<gmp_float<100>, false> >);
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
    time_proc("cpp_dec_float_100", test_polynomial<cpp_dec_float_100>);
@@ -364,6 +369,7 @@ int main()
 #endif
 #ifdef TEST_MPF
    time_proc("mpf_float_50", test_nct<mpf_float_50>);
+   time_proc("mpf_float_50 (no expression templates", test_nct<mp_number<gmp_float<50>, false> >);
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
    time_proc("cpp_dec_float_50", test_nct<cpp_dec_float_50>);
@@ -371,7 +377,7 @@ int main()
 #ifdef TEST_MPFR_CLASS
    time_proc("mpfr_class", test_nct<mpfr_class>);
 #endif
-#ifdef TEST_MP_REAL
+#ifdef TEST_MPREAL
    time_proc("mpfr::mpreal", test_nct<mpfr::mpreal>);
 #endif
    //
@@ -389,6 +395,7 @@ int main()
 #endif
 #ifdef TEST_MPF
    time_proc("mpf_float_100", test_nct<mpf_float_100>);
+   time_proc("mpf_float_100 (no expression templates", test_nct<mp_number<gmp_float<100>, false> >);
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
    time_proc("cpp_dec_float_100", test_nct<cpp_dec_float_100>);

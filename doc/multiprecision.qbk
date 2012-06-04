@@ -29,7 +29,7 @@
 
 [template mpfr[] [@http://www.mpfr.org MPFR]]
 [template gmp[] [@http://gmplib.org GMP]]
-[template mpf_class[] [@http://gmplib.org/manual/C_002b_002b-Interface-Floats.html#C_002b_002b-Interface-Floats mpfr_class]]
+[template mpf_class[] [@http://gmplib.org/manual/C_002b_002b-Interface-Floats.html#C_002b_002b-Interface-Floats mpf_class]]
 [template mpfr_class[] [@http://math.berkeley.edu/~wilken/code/gmpfrxx/ mpfr_class]]
 [template mpreal[] [@http://www.holoborodko.com/pavel/mpfr/ mpreal]]
 [template mpir[] [@http://mpir.org/ MPIR]]
@@ -133,11 +133,17 @@ lets suppose we're evaluating a polynomial via Horners method, something like th
     y = (((((a[6] * x + a[5]) * x + a[4]) * x + a[3]) * x + a[2]) * x + a[1]) * x + a[0];
 
 If type `T` is an `mp_number`, then this expression is evaluated ['without creating a single temporary value].  In contrast,
-if we were using the C++ wrapper that ships with [gmp] - [mpf_class] - then this expression would result in no less than 11
-temporaries (this is true even though [mpf_class] does use expression templates to reduce the number of temporaries somewhat).  Had
-we used an even simpler wrapper around [gmp] or [mpfr] like `mpclass` things would have been even worse and no less that 24 temporaries
+if we were using the [mpfr_class] C++ wrapper for [mpfr] - then this expression would result in no less than 11
+temporaries (this is true even though [mpfr_class] does use expression templates to reduce the number of temporaries somewhat).  Had
+we used an even simpler wrapper around [mpfr] like [mpreal] things would have been even worse and no less that 24 temporaries
 are created for this simple expression (note - we actually measure the number of memory allocations performed rather than 
-the number of temporaries directly).
+the number of temporaries directly, note also that the [mpf_class] wrapper that will be supplied with GMP-5.1 reduces the number of 
+temporaries to pretty much zero).  Finally if we use this library with expression templates disabled, we still only generate 11
+temporaries
+[footnote The actual number generated will depend on the compiler, how well it optimises the code, and whether it supports
+rvalue references.  The number of 11 temporaries was generated with Visual C++ 10]
+[footnote Marc Glisse suggested pre-review that this could be reduced still further by careful use of rvalue-references
+and move semantics in the operator overloads.  This will be investigated further at a later date.].
 
 This library also extends expression template support to standard library functions like `abs` or `sin` with `mp_number`
 arguments.  This means that an expression such as:
@@ -982,6 +988,8 @@ The following example searches for a prime `p` for which `(p-1)/2` is also proba
    };
 
    // Non member operators:
+   ``['unmentionable-expression-template-type]`` operator+(const ``['see-below]``&);
+   ``['unmentionable-expression-template-type]`` operator-(const ``['see-below]``&);
    ``['unmentionable-expression-template-type]`` operator+(const ``['see-below]``&, const ``['see-below]``&);
    ``['unmentionable-expression-template-type]`` operator-(const ``['see-below]``&, const ``['see-below]``&);
    ``['unmentionable-expression-template-type]`` operator*(const ``['see-below]``&, const ``['see-below]``&);
@@ -1218,6 +1226,8 @@ Returns the underlying back-end instance used by `*this`.
 [h4 Non-member operators]
 
    // Non member operators:
+   ``['unmentionable-expression-template-type]`` operator+(const ``['see-below]``&);
+   ``['unmentionable-expression-template-type]`` operator-(const ``['see-below]``&);
    ``['unmentionable-expression-template-type]`` operator+(const ``['see-below]``&, const ``['see-below]``&);
    ``['unmentionable-expression-template-type]`` operator-(const ``['see-below]``&, const ``['see-below]``&);
    ``['unmentionable-expression-template-type]`` operator*(const ``['see-below]``&, const ``['see-below]``&);
