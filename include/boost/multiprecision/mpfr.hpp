@@ -25,7 +25,7 @@ struct mpfr_float_backend;
 
 namespace detail{
 
-long get_default_precision() { return 50; }
+inline long get_default_precision() { return 50; }
 
 template <unsigned digits10>
 struct mpfr_float_imp

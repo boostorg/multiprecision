@@ -86,6 +86,26 @@
 
 <span class="identifier">my_float</span> <span class="identifier">a</span><span class="special">,</span> <span class="identifier">b</span><span class="special">,</span> <span class="identifier">c</span><span class="special">;</span> <span class="comment">// These variables have 300 decimal digits precision</span>
 </pre>
+<p>
+      Note that mixing arithmetic operations using types of different precision is
+      strictly forbidden:
+    </p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">cpp_int</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+
+<span class="keyword">namespace</span> <span class="identifier">mp</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">;</span>     <span class="comment">// Reduce the typing a bit later...</span>
+
+<span class="identifier">mp</span><span class="special">::</span><span class="identifier">mp_int128_t</span> <span class="identifier">a</span><span class="special">(</span><span class="number">3</span><span class="special">),</span> <span class="identifier">b</span><span class="special">(</span><span class="number">2</span><span class="special">);</span>
+<span class="identifier">mp</span><span class="special">::</span><span class="identifier">mp_int512_t</span> <span class="identifier">c</span><span class="special">(</span><span class="number">50</span><span class="special">),</span> <span class="identifier">d</span><span class="special">;</span>
+
+<span class="identifier">d</span> <span class="special">=</span> <span class="identifier">c</span> <span class="special">*</span> <span class="identifier">a</span><span class="special">;</span>   <span class="comment">// Compiler error</span>
+</pre>
+<p>
+      However, conversions are allowed:
+    </p>
+<pre class="programlisting"><span class="identifier">d</span> <span class="special">=</span> <span class="identifier">a</span><span class="special">;</span> <span class="comment">// OK, widening conversion.</span>
+<span class="identifier">d</span> <span class="special">=</span> <span class="identifier">a</span> <span class="special">*</span> <span class="identifier">b</span><span class="special">;</span>  <span class="comment">// OK, can convert from an expression template too.</span>
+<span class="identifier">d</span> <span class="special">=</span> <span class="identifier">mp</span><span class="special">::</span><span class="identifier">mp_int512_t</span><span class="special">(</span><span class="identifier">a</span><span class="special">)</span> <span class="special">*</span> <span class="identifier">c</span><span class="special">;</span> <span class="comment">// OK, all the types in the expression are the same now.</span>
+</pre>
 <h5>
 <a name="boost_multiprecision.intro.h0"></a>
       <span><a name="boost_multiprecision.intro.expression_templates"></a></span><a class="link" href="intro.html#boost_multiprecision.intro.expression_templates">Expression

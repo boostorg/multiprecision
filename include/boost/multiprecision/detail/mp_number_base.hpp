@@ -1234,6 +1234,20 @@ struct promote_arg<boost::multiprecision::detail::mp_exp<tag, A1, A2, A3, A4> >
    typedef typename boost::multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>::result_type type;
 };
 
+template <class R, class B, bool ET>
+inline R real_cast(const boost::multiprecision::mp_number<B, ET>& val)
+{
+   return val.template convert_to<R>();
+}
+
+template <class R, class tag, class A1, class A2, class A3, class A4>
+inline R real_cast(const boost::multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>& val)
+{
+   typedef typename boost::multiprecision::detail::mp_exp<tag, A1, A2, A3, A4>::result_type val_type;
+   return val_type(val).template convert_to<R>();
+}
+
+
 }}}
 
 #endif // BOOST_MATH_BIG_NUM_BASE_HPP

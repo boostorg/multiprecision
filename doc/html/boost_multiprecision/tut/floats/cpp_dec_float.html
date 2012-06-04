@@ -70,6 +70,21 @@
               specified in the template argument. Normally these should not be visible
               to the user.
             </li>
+<li class="listitem">
+              The type supports both infinities and NaN's. An infinity is generated
+              whenever the result would overflow, and a NaN is generated for any
+              mathematically undefined operation.
+            </li>
+<li class="listitem">
+              There is a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span></code> specialisation for
+              this type.
+            </li>
+<li class="listitem">
+              Any <code class="computeroutput"><span class="identifier">mp_number</span></code> instantiated
+              on this type, is convertible to any other <code class="computeroutput"><span class="identifier">mp_number</span></code>
+              instantiated on this type - for example you can convert from <code class="computeroutput"><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float</span><span class="special">&lt;</span><span class="number">50</span><span class="special">&gt;</span> <span class="special">&gt;</span></code> to <code class="computeroutput"><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float</span><span class="special">&lt;</span><span class="identifier">SomeOtherValue</span><span class="special">&gt;</span> <span class="special">&gt;</span></code>.
+              Narrowing conversions are truncating.
+            </li>
 </ul></div>
 <h6>
 <a name="boost_multiprecision.tut.floats.cpp_dec_float.h0"></a>

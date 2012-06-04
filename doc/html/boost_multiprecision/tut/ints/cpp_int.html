@@ -134,6 +134,20 @@
               difference to the performance of these types either way - so we may
               as well have the faster compile times by turning the feature off.
             </li>
+<li class="listitem">
+              Unsigned types support subtraction, and unary negation - the result
+              is "as if" a 2's complement operation had been performed
+              - in other words they behave pretty much as a built in integer type
+              would in this situation. So for example if we were using <code class="computeroutput"><span class="identifier">mp_uint128_t</span></code> then both <code class="computeroutput"><span class="identifier">mp_uint128_t</span><span class="special">(</span><span class="number">1</span><span class="special">)-</span><span class="number">4</span></code>
+              and <code class="computeroutput"><span class="special">-</span><span class="identifier">mp_uint128</span><span class="special">(</span><span class="number">3</span><span class="special">)</span></code>
+              would result in the value <code class="computeroutput"><span class="number">0</span><span class="identifier">xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD</span></code>
+              of type <code class="computeroutput"><span class="identifier">mp_uint128_t</span></code>.
+            </li>
+<li class="listitem">
+              This backend supports rvalue-references and is move-aware, making instantiations
+              of <code class="computeroutput"><span class="identifier">mp_number</span></code> on this
+              backend move aware.
+            </li>
 </ul></div>
 <h6>
 <a name="boost_multiprecision.tut.ints.cpp_int.h0"></a>

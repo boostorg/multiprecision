@@ -74,6 +74,8 @@
 <span class="special">};</span>
 
 <span class="comment">// Non member operators:</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">+(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">-(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
 <span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">+(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
 <span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">-(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
 <span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">*(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
@@ -242,6 +244,13 @@
 <li class="listitem">
             Any type that the Backend is constructible or assignable from.
           </li>
+<li class="listitem">
+            An rvalue reference to another <code class="computeroutput"><span class="identifier">mp_number</span></code>.
+            Move-semantics are used for construction if the backend also supports
+            rvalue reference construction. In the case of assignment, move semantics
+            are always supported when the argument is an rvalue reference irrespective
+            of the backend.
+          </li>
 </ul></div>
 <p>
         In addition, if the type has multiple components (for example rational or
@@ -291,6 +300,10 @@
         For the left and right shift operations, the argument must be a builtin integer
         type with a positive value (negative values result in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
         being thrown).
+      </p>
+<p>
+        Note that all the types involved in the expression must evaluate to the same
+        type - which is to say we cannot mix an <code class="computeroutput"><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">B1</span><span class="special">&gt;</span></code> with an <code class="computeroutput"><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">B2</span><span class="special">&gt;</span></code> where B1 and B2 are different types.
       </p>
 <pre class="programlisting"><span class="keyword">operator</span> <span class="emphasis"><em>convertible-to-bool-type</em></span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
 </pre>
@@ -383,6 +396,8 @@
         operators</a>
       </h5>
 <pre class="programlisting"><span class="comment">// Non member operators:</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">+(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">-(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
 <span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">+(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
 <span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">-(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
 <span class="emphasis"><em>unmentionable-expression-template-type</em></span> <span class="keyword">operator</span><span class="special">*(</span><span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>see-below</em></span><span class="special">&amp;);</span>
@@ -439,6 +454,10 @@
             is a comparison operator.
           </li>
 </ul></div>
+<p>
+        Note that all the types involved in the expression must evaluate to the same
+        type - which is to say we cannot mix an <code class="computeroutput"><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">B1</span><span class="special">&gt;</span></code> with an <code class="computeroutput"><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">B2</span><span class="special">&gt;</span></code> where B1 and B2 are different types.
+      </p>
 <p>
         Finally note that the second argument to the left and right shift operations
         must be a builtin integer type, and that the argument must be positive (negative
@@ -530,7 +549,10 @@
       </p>
 <p>
         Also note that with the exception of <code class="computeroutput"><span class="identifier">abs</span></code>
-        that these functions can only be used with floating-point Backend types.
+        that these functions can only be used with floating-point Backend types (if
+        any other types such as fixed precision or complex types are added to the
+        library later, then these functions may be extended to support those number
+        types).
       </p>
 <h5>
 <a name="boost_multiprecision.ref.mp_number.h6"></a>

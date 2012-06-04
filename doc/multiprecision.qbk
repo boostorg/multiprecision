@@ -100,6 +100,23 @@ by passing a second template argument to `mp_number`:
 
    my_float a, b, c; // These variables have 300 decimal digits precision
 
+Note that mixing arithmetic operations using types of different precision is strictly forbidden:
+
+   #include <boost/multiprecision/cpp_int.hpp>
+
+   namespace mp = boost::multiprecision;     // Reduce the typing a bit later...
+
+   mp::mp_int128_t a(3), b(2);
+   mp::mp_int512_t c(50), d;
+
+   d = c * a;   // Compiler error
+
+However, conversions are allowed:
+
+   d = a; // OK, widening conversion.
+   d = a * b;  // OK, can convert from an expression template too.
+   d = mp::mp_int512_t(a) * c; // OK, all the types in the expression are the same now.
+
 [h4 Expression Templates]
 
 Class `mp_number` is expression-template-enabled: that means that rather than having a multiplication
@@ -333,6 +350,12 @@ this is a direct consequence of the sign-magnitude representation.
 * The fixed precision types `mp_[u]intXXX_t` have expression template support turned off - it seems to make little 
 difference to the performance of these types either way - so we may as well have the faster compile times by turning
 the feature off.
+* Unsigned types support subtraction, and unary negation - the result is "as if" a 2's complement operation had been performed
+ - in other words they behave pretty much as a built in integer type would in this situation.  So for example if we were using
+ `mp_uint128_t` then both `mp_uint128_t(1)-4` and `-mp_uint128(3)` would result in the value `0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD`
+ of type `mp_uint128_t`.
+* This backend supports rvalue-references and is move-aware, making instantiations of `mp_number` on this backend move aware.
+ 
 
 [h5 Example:]
 
@@ -373,6 +396,7 @@ as a result performing formatted output on this type when the argument is negati
 * Division by zero is handled by the [gmp] library - it will trigger a division by zero signal.
 * Although this type is a wrapper around [gmp] it will work equally well with [mpir].  Indeed use of [mpir]
 is recommended on Win32.
+* This backend supports rvalue-references and is move-aware, making instantiations of `mp_number` on this backend move aware.
 
 [h5 Example:]
 
@@ -543,6 +567,7 @@ Things you should know when using this type:
 * No changes are made to [gmp] or [mpfr] global settings, so this type can coexist with existing
 [mpfr] or [gmp] code.
 * The code can equally use [mpir] in place of [gmp] - indeed that is the preferred option on Win32.
+* This backend supports rvalue-references and is move-aware, making instantiations of `mp_number` on this backend move aware.
 
 [h5 [mpfr] example:]
 
@@ -582,6 +607,12 @@ Things you should know when using this type:
 (this is a result of the type having some hidden internal guard digits).
 * The type has a number of internal guard digits over and above those specified in the template argument.
 Normally these should not be visible to the user.
+* The type supports both infinities and NaN's.  An infinity is generated whenever the result would overflow,
+and a NaN is generated for any mathematically undefined operation.
+* There is a `std::numeric_limits` specialisation for this type.
+* Any `mp_number` instantiated on this type, is convertible to any other `mp_number` instantiated on this type - 
+for example you can convert from `mp_number<cpp_dec_float<50> >` to `mp_number<cpp_dec_float<SomeOtherValue> >`.
+Narrowing conversions are truncating.
 
 [h5 cpp_dec_float example:]
 
@@ -865,6 +896,15 @@ In particular:
    mpf_init_set_ui(m, 0); // set to a value;
    mpf_float i(m);        // copies the value of the native type.
 
+More information on what additional types a backend supports conversions from are given in the tutorial for each backend.
+
+* An `mp_number` can be converted to any built in type, via the `convert_to` member function:
+
+   mpz_int z(2);
+   int i = z.template convert_to<int>(); // sets i to 2
+
+Additional conversions may be supported by particular backends.
+
 [endsect]
 
 [section:random Generating Random Numbers]
@@ -1131,6 +1171,9 @@ Type `mp_number` is default constructible, and both copy constructible and assig
 * Any builtin arithmetic type.
 * A `std::string` or any type which is convertible to `const char*`.
 * Any type that the Backend is constructible or assignable from.
+* An rvalue reference to another `mp_number`.  Move-semantics are used for construction if the backend also
+supports rvalue reference construction.  In the case of assignment, move semantics are always supported
+when the argument is an rvalue reference irrespective of the backend.
 
 In addition, if the type has multiple components (for example rational or complex number types), then there is a
 two argument constructor:
@@ -1165,6 +1208,9 @@ The arguments to these operators is either:
 
 For the left and right shift operations, the argument must be a builtin
 integer type with a positive value (negative values result in a `std::runtime_error` being thrown).
+
+Note that all the types involved in the expression must evaluate to the same type - which is to say 
+we cannot mix an `mp_number<B1>` with an `mp_number<B2>` where B1 and B2 are different types.
 
       operator ``['convertible-to-bool-type]``()const;
 
@@ -1262,6 +1308,9 @@ The return type of these operators is either:
 * Type `mp_number<Backend, false>` when `ExpressionTemplates` is `false`.
 * Type `bool` if the operator is a comparison operator.
 
+Note that all the types involved in the expression must evaluate to the same type - which is to say 
+we cannot mix an `mp_number<B1>` with an `mp_number<B2>` where B1 and B2 are different types.
+
 Finally note that the second argument to the left and right shift operations must be a builtin integer type, 
 and that the argument must be positive (negative arguments result in a `std::runtime_error` being thrown).
 
@@ -1329,7 +1378,8 @@ don't have native support for these functions.  Please note however, that this d
 to be a compile time constant - this means for example that the [gmp] MPF Backend will not work with these functions when that type is 
 used at variable precision.
 
-Also note that with the exception of `abs` that these functions can only be used with floating-point Backend types.
+Also note that with the exception of `abs` that these functions can only be used with floating-point Backend types (if any other types
+such as fixed precision or complex types are added to the library later, then these functions may be extended to support those number types).
 
 [h4 Traits Class Support]
 
@@ -1487,6 +1537,8 @@ The template arguments are:
       no dymanic memory will ever be allocated.]]
 ]
 
+The type of `number_category<cpp_int<Args...> >::type` is `mpl::int_<number_kind_integer>`.
+
 More information on this type can be found in the [link boost_multiprecision.tut.ints.cpp_int tutorial].
 
 [endsect]
@@ -1505,6 +1557,8 @@ Class template `gmp_int` fulfills all of the requirements for a [link boost_mult
 It's members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
 to change.
 
+The type of `number_category<cpp_int<Args...> >::type` is `mpl::int_<number_kind_integer>`.
+
 More information on this type can be found in the [link boost_multiprecision.tut.ints.gmp_int tutorial].
 
 [endsect]
@@ -1522,6 +1576,8 @@ More information on this type can be found in the [link boost_multiprecision.tut
 Class template `tommath_int` fulfills all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
 It's members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
 to change.
+
+The type of `number_category<cpp_int<Args...> >::type` is `mpl::int_<number_kind_integer>`.
 
 More information on this type can be found in the [link boost_multiprecision.tut.ints.tom_int tutorial].
 
@@ -1552,6 +1608,8 @@ and `mp_number::precision`.  Note that this type does not in any way change the 
 it does not change the default precision of the mpf_t data type), therefore you can safely mix this type with existing
 code that uses GMP, and also mix `gmp_float`s of differing precision.
 
+The type of `number_category<cpp_int<Args...> >::type` is `mpl::int_<number_kind_floating_point>`.
+
 More information on this type can be found in the [link boost_multiprecision.tut.floats.gmp_float tutorial].
 
 [endsect]
@@ -1581,6 +1639,8 @@ and `mp_number::precision`.  Note that this type does not in any way change the 
 it does not change the default precision of the mpfr_t data type), therefore you can safely mix this type with existing
 code that uses GMP or MPFR, and also mix `mpfr_float_backend`s of differing precision.
 
+The type of `number_category<cpp_int<Args...> >::type` is `mpl::int_<number_kind_floating_point>`.
+
 More information on this type can be found in the [link boost_multiprecision.tut.floats.mpfr_float tutorial].
 
 [endsect]
@@ -1604,6 +1664,8 @@ to change.
 The class takes a single template parameter - `Digits10` - which is the number of decimal digits precision the type
 should support.  Note that this type does not ever perform any dynamic memory allocation, as a result the `Digits10`
 template argument should not be set too high or the classes size will grow unreasonably large.
+
+The type of `number_category<cpp_int<Args...> >::type` is `mpl::int_<number_kind_floating_point>`.
 
 More information on this type can be found in the [link boost_multiprecision.tut.floats.cpp_dec_float tutorial].
 
@@ -1771,9 +1833,46 @@ of type B2.
 [[`eval_lcm(b, cb, cb2)`][`void`][Sets `b` to the least common multiple of `cb` and `cb2`.  Only required when `B` is an integer type.]]
 ]
 
+The tables above place no ['throws] requirements on any of the operations.  It is up to each type modelling this concept to
+decide when or whether throwing an exception is desirable.  However, thrown exceptions should always either be the type, or
+inherit from the type `std::runtime_error`.  For example, a floating point type might choose to throw `std::overflow_error`
+whenever the result of an operation would be infinite, and `std::underflow_error` whenever it would round to zero.
+
 [note
 The non-member functions are all named with an "eval_" prefix to avoid conflicts with template classes of the same name - 
 in point of fact this naming convention shouldn't be necessary, but rather works around some compiler bugs.]
+
+[endsect]
+
+[section:headers Header File Structure]
+
+[table Top level headers
+[[Header][Contains]]
+[[cpp_int.hpp][The `cpp_int` backend type.]]
+[[gmp.hpp][Defines all [gmp] related backends.]]
+[[integer_ops.hpp][Integer specific non-member functions.]]
+[[miller_rabin.hpp][Miller Rabin primality testing code.]]
+[[mp_number.hpp][Defines the `mp_number` backend, is included by all the backend headers.]]
+[[mpfr.hpp][Defines the mpfr_float_backend backend.]]
+[[random.hpp][Defines code to interoperate with Boost.Random.]]
+[[rational_adapter.hpp][Defines the `rational_adapter` backend.]]
+[[cpp_dec_float.hpp][Defines the `cpp_dec_float` backend.]]
+[[tommath.hpp][Defines the `tommath_int` backend.]]
+[[concepts/mp_number_architypes.hpp][Defines a backend concept architypes for testing use.]]
+]
+
+[table Implementation Headers]
+[[Header][Contains]]
+[[detail/big_lanczos.hpp][Lanczos support for Boost.Math integration.]]
+[[detail/cpp_int_core.hpp][Platform and peformance tuning for the `cpp_int` backend.]]
+[[detail/default_ops.hpp][Default versions of the optional backend non-member functions.]]
+[[detail/generic_interconvert.hpp][Generic interconversion routines.]]
+[[detail/mp_number_base.hpp][All the expression template code, metaprogramming, and operator overloads for `mp_number`.]]
+[[detail/no_et_ops.hpp][The non-expression template operators.]]
+[[defail/functions/constants.hpp][Defines constants used by the floating point functions.]]
+[[detail/functions/pow.hpp][Defines default versions of the power and exponential related floating point functions.]]
+[[detail/functions/trig.hpp][Defines default versions of the trigonometric related floating point functions.]]
+]
 
 [endsect]
 

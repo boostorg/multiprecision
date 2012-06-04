@@ -1,0 +1,331 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Header File Structure</title>
+<link rel="stylesheet" href="http://www.boost.org/doc/libs/release/doc/src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.76.1">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
+<link rel="up" href="../ref.html" title="Reference">
+<link rel="prev" href="backendconc.html" title="Backend Requirements">
+<link rel="next" href="../perf.html" title="Performance Comparison">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="backendconc.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../ref.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../perf.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section boost_multiprecision_ref_headers">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_multiprecision.ref.headers"></a><a class="link" href="headers.html" title="Header File Structure">Header File Structure</a>
+</h3></div></div></div>
+<div class="table">
+<a name="boost_multiprecision.ref.headers.top_level_headers"></a><p class="title"><b>Table&#160;1.6.&#160;Top level headers</b></p>
+<div class="table-contents"><table class="table" summary="Top level headers">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Header
+                </p>
+              </th>
+<th>
+                <p>
+                  Contains
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  The <code class="computeroutput"><span class="identifier">cpp_int</span></code> backend
+                  type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  Defines all <a href="http://gmplib.org" target="_top">GMP</a> related
+                  backends.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  integer_ops.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  Integer specific non-member functions.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  miller_rabin.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  Miller Rabin primality testing code.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mp_number.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  Defines the <code class="computeroutput"><span class="identifier">mp_number</span></code>
+                  backend, is included by all the backend headers.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  mpfr.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  Defines the mpfr_float_backend backend.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  random.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  Defines code to interoperate with Boost.Random.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  rational_adapter.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  Defines the <code class="computeroutput"><span class="identifier">rational_adapter</span></code>
+                  backend.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_dec_float.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  Defines the <code class="computeroutput"><span class="identifier">cpp_dec_float</span></code>
+                  backend.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  Defines the <code class="computeroutput"><span class="identifier">tommath_int</span></code>
+                  backend.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  concepts/mp_number_architypes.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  Defines a backend concept architypes for testing use.
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.ref.headers.implementation_headers_"></a><p class="title"><b>Table&#160;1.7.&#160;Implementation Headers]</b></p>
+<div class="table-contents"><table class="table" summary="Implementation Headers]">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Header
+                </p>
+              </th>
+<th>
+                <p>
+                  Contains
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  detail/big_lanczos.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  Lanczos support for Boost.Math integration.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  detail/cpp_int_core.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  Platform and peformance tuning for the <code class="computeroutput"><span class="identifier">cpp_int</span></code>
+                  backend.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  detail/default_ops.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  Default versions of the optional backend non-member functions.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  detail/generic_interconvert.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  Generic interconversion routines.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  detail/mp_number_base.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  All the expression template code, metaprogramming, and operator
+                  overloads for <code class="computeroutput"><span class="identifier">mp_number</span></code>.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  detail/no_et_ops.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  The non-expression template operators.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  defail/functions/constants.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  Defines constants used by the floating point functions.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  detail/functions/pow.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  Defines default versions of the power and exponential related floating
+                  point functions.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  detail/functions/trig.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  Defines default versions of the trigonometric related floating
+                  point functions.
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break">
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2012 John Maddock and Christopher Kormanyos<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="backendconc.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../ref.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="../perf.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

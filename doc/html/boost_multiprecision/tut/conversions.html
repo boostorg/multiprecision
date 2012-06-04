@@ -89,6 +89,21 @@
 <span class="identifier">mpf_init_set_ui</span><span class="special">(</span><span class="identifier">m</span><span class="special">,</span> <span class="number">0</span><span class="special">);</span> <span class="comment">// set to a value;</span>
 <span class="identifier">mpf_float</span> <span class="identifier">i</span><span class="special">(</span><span class="identifier">m</span><span class="special">);</span>        <span class="comment">// copies the value of the native type.</span>
 </pre>
+<p>
+        More information on what additional types a backend supports conversions
+        from are given in the tutorial for each backend.
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+            An <code class="computeroutput"><span class="identifier">mp_number</span></code> can be converted
+            to any built in type, via the <code class="computeroutput"><span class="identifier">convert_to</span></code>
+            member function:
+          </li></ul></div>
+<pre class="programlisting"><span class="identifier">mpz_int</span> <span class="identifier">z</span><span class="special">(</span><span class="number">2</span><span class="special">);</span>
+<span class="keyword">int</span> <span class="identifier">i</span> <span class="special">=</span> <span class="identifier">z</span><span class="special">.</span><span class="keyword">template</span> <span class="identifier">convert_to</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;();</span> <span class="comment">// sets i to 2</span>
+</pre>
+<p>
+        Additional conversions may be supported by particular backends.
+      </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
