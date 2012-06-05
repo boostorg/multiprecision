@@ -2262,6 +2262,10 @@ More a list of what ['could] be done, rather than what ['should] be done (which 
 
 [h4 Pre-Review Comments]
 
+* Can the non-expression template operators be further optimised with rvalue reference support?
+* Can any functions - in particular value initialization - be made `constexp`?
+* Can we differentiate between explicit and implicit conversions in the mp_number constructor (may need some new type traits)?
+* Can ring types (exact floating point types) be supported?  The answer should be yes, but someone needs to write it.
 * Make the exponent type for cpp_dec_float a templare parameter, maybe include support for big-integer exponents.
 Open question - what should be the default - int32_t or int64_t?
 * Document the size requirements of fixed precision ints.

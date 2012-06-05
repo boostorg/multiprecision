@@ -48,6 +48,21 @@
       </h5>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc">
 <li class="listitem">
+            Can the non-expression template operators be further optimised with rvalue
+            reference support?
+          </li>
+<li class="listitem">
+            Can any functions - in particular value initialization - be made <code class="computeroutput"><span class="identifier">constexp</span></code>?
+          </li>
+<li class="listitem">
+            Can we differentiate between explicit and implicit conversions in the
+            mp_number constructor (may need some new type traits)?
+          </li>
+<li class="listitem">
+            Can ring types (exact floating point types) be supported? The answer
+            should be yes, but someone needs to write it.
+          </li>
+<li class="listitem">
             Make the exponent type for cpp_dec_float a templare parameter, maybe
             include support for big-integer exponents. Open question - what should
             be the default - int32_t or int64_t?
