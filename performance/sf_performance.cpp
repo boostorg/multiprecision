@@ -14,6 +14,9 @@
 #  define TEST_MPREAL
 #endif
 
+#ifdef TEST_FLOAT
+#include "float_backend.hpp"
+#endif
 #ifdef TEST_MPFR_CLASS
 #include <boost/math/bindings/mpfr.hpp>
 #endif
@@ -247,6 +250,16 @@ int main()
 #endif
 #ifdef TEST_MPREAL
    poly_allocation_test("mpfr::mpreal", mpfr::mpreal(2));
+#endif
+
+   //
+   // Comparison for builtin floats:
+   //
+#ifdef TEST_FLOAT
+   time_proc("double", test_bessel<double>);
+   time_proc("real_concept", test_bessel<boost::math::concepts::real_concept>);
+   time_proc("float_backend<double>", test_bessel<mp_number<float_backend<double> > >);
+   time_proc("float_backend<double> - no expression templates", test_bessel<mp_number<float_backend<double>, false> >);
 #endif
 
    //

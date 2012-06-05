@@ -1806,7 +1806,7 @@ of type B2.
 [[`eval_fabs(b, cb)`][`void`][Set `b` to the absolute value of `cb`.]]
 [[`eval_fpclassify(cb)`][`int`][Returns one of the same values returned by `std::fpclassify`.  Only required when `B` is an floating-point type.]]
 [[`eval_trunc(b, cb)`][`void`][Performs the equivalent operation to `std::trunc` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.]]
-[[`eval_round(b, cb, cb2)`][`void`][Performs the equivalent operation to `std::round` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.]]
+[[`eval_round(b, cb)`][`void`][Performs the equivalent operation to `std::round` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.]]
 [[`eval_exp(b, cb)`][`void`][Performs the equivalent operation to `std::exp` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.]]
 [[`eval_log(b, cb)`][`void`][Performs the equivalent operation to `std::log` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.]]
 [[`eval_log10(b, cb)`][`void`][Performs the equivalent operation to `std::log10` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.]]
