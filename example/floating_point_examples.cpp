@@ -537,7 +537,7 @@ int main(int, char**)
       );
    //
    // In the cpp_dec_float_50 case, the sin function is multiply overloaded
-   // to handle expression templates etc.  As a result it's hard to take it's
+   // to handle expression templates etc.  As a result it's hard to take its
    // address without knowing about its implementation details.  We'll use a 
    // C++11 lambda expression to capture the call.
    // We also need a typecast on the first argument so we don't accidently pass

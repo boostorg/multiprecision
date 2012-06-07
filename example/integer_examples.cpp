@@ -157,7 +157,7 @@ cpp_int b2(unsigned n)
 }
 
 /*`
-Note how the `bit_set` function sets the specified bit in it's argument and then returns a reference to the result -
+Note how the `bit_set` function sets the specified bit in its argument and then returns a reference to the result -
 which we can then simply decrement.  The result from a call to `b2` is the same as that to `b1`.
 
 We can equally test bits, so for example the n'th bit of the result returned from `b2` shouldn't be set

@@ -672,7 +672,7 @@ The following back-ends provide rational number arithmetic:
 [[`gmp_rational`][boost/multiprecision/gmp.hpp][2][[gmp]][Very fast and efficient back-end.][Dependency on GNU licensed [gmp] library.]]
 [[`cpp_rational`][boost/multiprecision/cpp_int.hpp][2][None][An all C++ Boost-licensed implementation.][Slower than [gmp].]]
 [[`tommath_rational`][boost/multiprecision/tommath.hpp][2][[tommath]][All C/C++ implementation that's Boost Software Licence compatible.][Slower than [gmp].]]
-[[`rational_adapter`][boost/multiprecision/rational_adapter.hpp][N/A][none][All C++ adapter that allows any inetger back-end type to be used as a rational type.][Requires an underlying integer back-end type.]]
+[[`rational_adapter`][boost/multiprecision/rational_adapter.hpp][N/A][none][All C++ adapter that allows any integer back-end type to be used as a rational type.][Requires an underlying integer back-end type.]]
 [[`boost::rational`][boost/rational.hpp][N/A][None][A C++ rational number type that can used with any `mp_number` integer type.][The expression templates used by `mp_number` end up being "hidden" inside `boost::rational`: performance may well suffer as a result.]]
 ]
 
@@ -877,7 +877,7 @@ In particular:
    // Now print in hex format with prefix:
    std::cout << std::hex << std::showbase << i << std::endl;
 
-* Some intercomnversions between number types are completely generic, and are always available:
+* Some interconversions between number types are completely generic, and are always available:
 
    cpp_int cppi(2);
    // We can always convert between numbers of the same category - 
@@ -1519,7 +1519,7 @@ whose precision can vary at compile time (such as `mpf_float`).
    }} // namespaces
 
 Class template `cpp_int_backend` fulfills all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
-It's members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
+Its members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
 to change.
 
 The template arguments are:
@@ -1554,7 +1554,7 @@ More information on this type can be found in the [link boost_multiprecision.tut
    }} // namespaces
 
 Class template `gmp_int` fulfills all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
-It's members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
+Its members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
 to change.
 
 The type of `number_category<cpp_int<Args...> >::type` is `mpl::int_<number_kind_integer>`.
@@ -1574,7 +1574,7 @@ More information on this type can be found in the [link boost_multiprecision.tut
    }} // namespaces
 
 Class template `tommath_int` fulfills all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
-It's members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
+Its members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
 to change.
 
 The type of `number_category<cpp_int<Args...> >::type` is `mpl::int_<number_kind_integer>`.
@@ -1599,7 +1599,7 @@ More information on this type can be found in the [link boost_multiprecision.tut
    }} // namespaces
 
 Class template `gmp_float` fulfills all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
-It's members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
+Its members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
 to change.
 
 The class takes a single template parameter - `Digits10` - which is the number of decimal digits precision the type
@@ -1630,7 +1630,7 @@ More information on this type can be found in the [link boost_multiprecision.tut
    }} // namespaces
 
 Class template `mpfr_float_backend` fulfills all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
-It's members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
+Its members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
 to change.
 
 The class takes a single template parameter - `Digits10` - which is the number of decimal digits precision the type
@@ -1658,12 +1658,12 @@ More information on this type can be found in the [link boost_multiprecision.tut
    }} // namespaces
 
 Class template `cpp_dec_float` fulfills all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
-It's members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
+Its members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
 to change.
 
 The class takes a single template parameter - `Digits10` - which is the number of decimal digits precision the type
 should support.  Note that this type does not ever perform any dynamic memory allocation, as a result the `Digits10`
-template argument should not be set too high or the classes size will grow unreasonably large.
+template argument should not be set too high or the class's size will grow unreasonably large.
 
 The type of `number_category<cpp_int<Args...> >::type` is `mpl::int_<number_kind_floating_point>`.
 
