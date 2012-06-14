@@ -20,6 +20,8 @@
 #include <boost/type_traits/make_unsigned.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/multiprecision/detail/generic_interconvert.hpp>
+#include <istream>  // stream operators
+#include <cstdio>   // EOF
 
 namespace boost{ namespace multiprecision{
 

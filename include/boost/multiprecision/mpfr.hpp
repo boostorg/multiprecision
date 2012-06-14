@@ -1045,7 +1045,7 @@ class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::mpf
    typedef boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<Digits10>, ExpressionTemplates> number_type;
 public:
    BOOST_STATIC_CONSTEXPR bool is_specialized = true;
-   BOOST_STATIC_CONSTEXPR number_type (min)() BOOST_MP_NOEXCEPT
+   BOOST_STATIC_CONSTEXPR number_type (min)() BOOST_NOEXCEPT
    { 
       initializer.do_nothing();
       static std::pair<bool, number_type> value;
@@ -1057,7 +1057,7 @@ public:
       }
       return value.second;
    }
-   BOOST_STATIC_CONSTEXPR number_type (max)() BOOST_MP_NOEXCEPT
+   BOOST_STATIC_CONSTEXPR number_type (max)() BOOST_NOEXCEPT
    { 
       initializer.do_nothing();
       static std::pair<bool, number_type> value;
@@ -1069,7 +1069,7 @@ public:
       }
       return value.second;
    }
-   BOOST_STATIC_CONSTEXPR number_type lowest() BOOST_MP_NOEXCEPT
+   BOOST_STATIC_CONSTEXPR number_type lowest() BOOST_NOEXCEPT
    {
       return -(max)();
    }
@@ -1081,7 +1081,7 @@ public:
    BOOST_STATIC_CONSTEXPR bool is_integer = false;
    BOOST_STATIC_CONSTEXPR bool is_exact = false;
    BOOST_STATIC_CONSTEXPR int radix = 2;
-   BOOST_STATIC_CONSTEXPR number_type epsilon() BOOST_MP_NOEXCEPT 
+   BOOST_STATIC_CONSTEXPR number_type epsilon() BOOST_NOEXCEPT 
    { 
       initializer.do_nothing();
       static std::pair<bool, number_type> value;
@@ -1094,7 +1094,7 @@ public:
       return value.second;
    }
    // What value should this be????
-   BOOST_STATIC_CONSTEXPR number_type round_error() BOOST_MP_NOEXCEPT 
+   BOOST_STATIC_CONSTEXPR number_type round_error() BOOST_NOEXCEPT 
    { 
       // returns epsilon/2
       initializer.do_nothing();
@@ -1116,7 +1116,7 @@ public:
    BOOST_STATIC_CONSTEXPR bool has_signaling_NaN = false;
    BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm = denorm_absent;
    BOOST_STATIC_CONSTEXPR bool has_denorm_loss = false;
-   BOOST_STATIC_CONSTEXPR number_type infinity() BOOST_MP_NOEXCEPT 
+   BOOST_STATIC_CONSTEXPR number_type infinity() BOOST_NOEXCEPT 
    { 
       // returns epsilon/2
       initializer.do_nothing();
@@ -1129,7 +1129,7 @@ public:
       }
       return value.second;
    }
-   BOOST_STATIC_CONSTEXPR number_type quiet_NaN() BOOST_MP_NOEXCEPT 
+   BOOST_STATIC_CONSTEXPR number_type quiet_NaN() BOOST_NOEXCEPT 
    { 
       // returns epsilon/2
       initializer.do_nothing();
@@ -1142,11 +1142,11 @@ public:
       }
       return value.second;
    }
-   BOOST_STATIC_CONSTEXPR number_type signaling_NaN() BOOST_MP_NOEXCEPT 
+   BOOST_STATIC_CONSTEXPR number_type signaling_NaN() BOOST_NOEXCEPT 
    { 
       return number_type(0); 
    }
-   BOOST_STATIC_CONSTEXPR number_type denorm_min() BOOST_MP_NOEXCEPT { return number_type(0); }
+   BOOST_STATIC_CONSTEXPR number_type denorm_min() BOOST_NOEXCEPT { return number_type(0); }
    BOOST_STATIC_CONSTEXPR bool is_iec559 = false;
    BOOST_STATIC_CONSTEXPR bool is_bounded = true;
    BOOST_STATIC_CONSTEXPR bool is_modulo = false;
@@ -1180,9 +1180,9 @@ class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::mpf
    typedef boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<0>, ExpressionTemplates> number_type;
 public:
    BOOST_STATIC_CONSTEXPR bool is_specialized = false;
-   static number_type (min)() BOOST_MP_NOEXCEPT { return number_type(0); }
-   static number_type (max)() BOOST_MP_NOEXCEPT { return number_type(0); }
-   static number_type lowest() BOOST_MP_NOEXCEPT { return number_type(0); }
+   static number_type (min)() BOOST_NOEXCEPT { return number_type(0); }
+   static number_type (max)() BOOST_NOEXCEPT { return number_type(0); }
+   static number_type lowest() BOOST_NOEXCEPT { return number_type(0); }
    BOOST_STATIC_CONSTEXPR int digits = 0;
    BOOST_STATIC_CONSTEXPR int digits10 = 0;
    BOOST_STATIC_CONSTEXPR int max_digits10 = 0;
@@ -1190,8 +1190,8 @@ public:
    BOOST_STATIC_CONSTEXPR bool is_integer = false;
    BOOST_STATIC_CONSTEXPR bool is_exact = false;
    BOOST_STATIC_CONSTEXPR int radix = 0;
-   static number_type epsilon() BOOST_MP_NOEXCEPT { return number_type(0); }
-   static number_type round_error() BOOST_MP_NOEXCEPT { return number_type(0); }
+   static number_type epsilon() BOOST_NOEXCEPT { return number_type(0); }
+   static number_type round_error() BOOST_NOEXCEPT { return number_type(0); }
    BOOST_STATIC_CONSTEXPR int min_exponent = 0;
    BOOST_STATIC_CONSTEXPR int min_exponent10 = 0;
    BOOST_STATIC_CONSTEXPR int max_exponent = 0;
@@ -1201,10 +1201,10 @@ public:
    BOOST_STATIC_CONSTEXPR bool has_signaling_NaN = false;
    BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm = denorm_absent;
    BOOST_STATIC_CONSTEXPR bool has_denorm_loss = false;
-   static number_type infinity() BOOST_MP_NOEXCEPT { return number_type(0); }
-   static number_type quiet_NaN() BOOST_MP_NOEXCEPT { return number_type(0); }
-   static number_type signaling_NaN() BOOST_MP_NOEXCEPT { return number_type(0); }
-   static number_type denorm_min() BOOST_MP_NOEXCEPT { return number_type(0); }
+   static number_type infinity() BOOST_NOEXCEPT { return number_type(0); }
+   static number_type quiet_NaN() BOOST_NOEXCEPT { return number_type(0); }
+   static number_type signaling_NaN() BOOST_NOEXCEPT { return number_type(0); }
+   static number_type denorm_min() BOOST_NOEXCEPT { return number_type(0); }
    BOOST_STATIC_CONSTEXPR bool is_iec559 = false;
    BOOST_STATIC_CONSTEXPR bool is_bounded = false;
    BOOST_STATIC_CONSTEXPR bool is_modulo = false;

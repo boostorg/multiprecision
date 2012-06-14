@@ -11,12 +11,6 @@
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/lexical_cast.hpp>
 
-#ifdef BOOST_NO_NOEXCEPT
-#define BOOST_MP_NOEXCEPT
-#else
-#define BOOST_MP_NOEXCEPT noexcept
-#endif
-
 namespace boost{ namespace multiprecision{
 
 template <class Backend, bool ExpressionTemplates = true>
