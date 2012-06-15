@@ -1429,6 +1429,16 @@ inline typename enable_if<
    >
 >::type eval_powm(gmp_int& result, const gmp_int& base, Integer p, const gmp_int& m)
 {
+   mpz_powm_ui(result.data(), base.data(), p, m.data());
+}
+template <class Integer>
+inline typename enable_if<
+   mpl::and_<
+      is_signed<Integer>,
+      mpl::bool_<sizeof(Integer) <= sizeof(unsigned long)>
+   >
+>::type eval_powm(gmp_int& result, const gmp_int& base, Integer p, const gmp_int& m)
+{
    if(p < 0)
    {
       BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));

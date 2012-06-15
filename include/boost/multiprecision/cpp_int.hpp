@@ -964,12 +964,16 @@ inline void subtract_unsigned(cpp_int_backend<MinBits, Signed, Allocator>& resul
       result.sign(s);
       return;
    }
+   // This isn't used till later, but comparison has to occur before we resize the result,
+   // as that may also resize a or b if this is an inplace operation:
+   int c = a.compare_unsigned(b);
+   // Set up the result vector:
    result.resize(x);
+   // Now that a, b, and result are stable, get pointers to their limbs:
    typename cpp_int_backend<MinBits, Signed, Allocator>::const_limb_pointer pa = a.limbs();
    typename cpp_int_backend<MinBits, Signed, Allocator>::const_limb_pointer pb = b.limbs();
    typename cpp_int_backend<MinBits, Signed, Allocator>::limb_pointer pr = result.limbs();
    bool swapped = false;
-   int c = a.compare_unsigned(b);
    if(c < 0)
    {
       swap(pa, pb);
@@ -2355,6 +2359,55 @@ public:
    BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
 };
 
+#ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
+
+template <unsigned MinBits, bool Signed, class Allocator, bool ExpressionTemplates>
+const int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator>, ExpressionTemplates> >::digits;
+template <unsigned MinBits, bool Signed, class Allocator, bool ExpressionTemplates>
+const int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator>, ExpressionTemplates> >::digits10;
+template <unsigned MinBits, bool Signed, class Allocator, bool ExpressionTemplates>
+const int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator>, ExpressionTemplates> >::max_digits10;
+template <unsigned MinBits, bool Signed, class Allocator, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator>, ExpressionTemplates> >::is_signed;
+template <unsigned MinBits, bool Signed, class Allocator, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator>, ExpressionTemplates> >::is_integer;
+template <unsigned MinBits, bool Signed, class Allocator, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator>, ExpressionTemplates> >::is_exact;
+template <unsigned MinBits, bool Signed, class Allocator, bool ExpressionTemplates>
+const int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator>, ExpressionTemplates> >::radix;
+template <unsigned MinBits, bool Signed, class Allocator, bool ExpressionTemplates>
+const int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator>, ExpressionTemplates> >::min_exponent;
+template <unsigned MinBits, bool Signed, class Allocator, bool ExpressionTemplates>
+const int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator>, ExpressionTemplates> >::min_exponent10;
+template <unsigned MinBits, bool Signed, class Allocator, bool ExpressionTemplates>
+const int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator>, ExpressionTemplates> >::max_exponent;
+template <unsigned MinBits, bool Signed, class Allocator, bool ExpressionTemplates>
+const int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator>, ExpressionTemplates> >::max_exponent10;
+template <unsigned MinBits, bool Signed, class Allocator, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator>, ExpressionTemplates> >::has_infinity;
+template <unsigned MinBits, bool Signed, class Allocator, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator>, ExpressionTemplates> >::has_quiet_NaN;
+template <unsigned MinBits, bool Signed, class Allocator, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator>, ExpressionTemplates> >::has_signaling_NaN;
+template <unsigned MinBits, bool Signed, class Allocator, bool ExpressionTemplates>
+const float_denorm_style numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator>, ExpressionTemplates> >::has_denorm;
+template <unsigned MinBits, bool Signed, class Allocator, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator>, ExpressionTemplates> >::has_denorm_loss;
+template <unsigned MinBits, bool Signed, class Allocator, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator>, ExpressionTemplates> >::is_iec559;
+template <unsigned MinBits, bool Signed, class Allocator, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator>, ExpressionTemplates> >::is_bounded;
+template <unsigned MinBits, bool Signed, class Allocator, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator>, ExpressionTemplates> >::is_modulo;
+template <unsigned MinBits, bool Signed, class Allocator, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator>, ExpressionTemplates> >::traps;
+template <unsigned MinBits, bool Signed, class Allocator, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator>, ExpressionTemplates> >::tinyness_before;
+template <unsigned MinBits, bool Signed, class Allocator, bool ExpressionTemplates>
+const float_round_style numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator>, ExpressionTemplates> >::round_style;
+
+#endif
+
 template <unsigned MinBits, bool ExpressionTemplates>
 class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates> >
 {
@@ -2435,6 +2488,55 @@ public:
 template <unsigned MinBits, bool ExpressionTemplates>
 const typename numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates> >::inititializer numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates> >::init;
 
+#ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
+
+template <unsigned MinBits, bool ExpressionTemplates>
+const int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates>  >::digits;
+template <unsigned MinBits, bool ExpressionTemplates>
+const int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates>  >::digits10;
+template <unsigned MinBits, bool ExpressionTemplates>
+const int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates>  >::max_digits10;
+template <unsigned MinBits, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates>  >::is_signed;
+template <unsigned MinBits, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates>  >::is_integer;
+template <unsigned MinBits, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates>  >::is_exact;
+template <unsigned MinBits, bool ExpressionTemplates>
+const int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates>  >::radix;
+template <unsigned MinBits, bool ExpressionTemplates>
+const int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates>  >::min_exponent;
+template <unsigned MinBits, bool ExpressionTemplates>
+const int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates>  >::min_exponent10;
+template <unsigned MinBits, bool ExpressionTemplates>
+const int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates>  >::max_exponent;
+template <unsigned MinBits, bool ExpressionTemplates>
+const int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates>  >::max_exponent10;
+template <unsigned MinBits, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates>  >::has_infinity;
+template <unsigned MinBits, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates>  >::has_quiet_NaN;
+template <unsigned MinBits, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates>  >::has_signaling_NaN;
+template <unsigned MinBits, bool ExpressionTemplates>
+const float_denorm_style numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates>  >::has_denorm;
+template <unsigned MinBits, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates>  >::has_denorm_loss;
+template <unsigned MinBits, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates>  >::is_iec559;
+template <unsigned MinBits, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates>  >::is_bounded;
+template <unsigned MinBits, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates>  >::is_modulo;
+template <unsigned MinBits, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates>  >::traps;
+template <unsigned MinBits, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates>  >::tinyness_before;
+template <unsigned MinBits, bool ExpressionTemplates>
+const float_round_style numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, true, void>, ExpressionTemplates>  >::round_style;
+
+#endif
+
 template <unsigned MinBits, bool ExpressionTemplates>
 class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >
 {
@@ -2513,6 +2615,55 @@ public:
 
 template <unsigned MinBits, bool ExpressionTemplates>
 const typename numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::inititializer numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::init;
+
+#ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
+
+template <unsigned MinBits, bool ExpressionTemplates>
+const int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::digits;
+template <unsigned MinBits, bool ExpressionTemplates>
+const int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::digits10;
+template <unsigned MinBits, bool ExpressionTemplates>
+const int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::max_digits10;
+template <unsigned MinBits, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::is_signed;
+template <unsigned MinBits, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::is_integer;
+template <unsigned MinBits, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::is_exact;
+template <unsigned MinBits, bool ExpressionTemplates>
+const int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::radix;
+template <unsigned MinBits, bool ExpressionTemplates>
+const int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::min_exponent;
+template <unsigned MinBits, bool ExpressionTemplates>
+const int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::min_exponent10;
+template <unsigned MinBits, bool ExpressionTemplates>
+const int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::max_exponent;
+template <unsigned MinBits, bool ExpressionTemplates>
+const int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::max_exponent10;
+template <unsigned MinBits, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::has_infinity;
+template <unsigned MinBits, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::has_quiet_NaN;
+template <unsigned MinBits, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::has_signaling_NaN;
+template <unsigned MinBits, bool ExpressionTemplates>
+const float_denorm_style numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::has_denorm;
+template <unsigned MinBits, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::has_denorm_loss;
+template <unsigned MinBits, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::is_iec559;
+template <unsigned MinBits, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::is_bounded;
+template <unsigned MinBits, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::is_modulo;
+template <unsigned MinBits, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::traps;
+template <unsigned MinBits, bool ExpressionTemplates>
+const bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::tinyness_before;
+template <unsigned MinBits, bool ExpressionTemplates>
+const float_round_style numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<MinBits, false, void>, ExpressionTemplates> >::round_style;
+
+#endif
 
 }
 
