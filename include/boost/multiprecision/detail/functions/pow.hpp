@@ -17,47 +17,31 @@ namespace detail{
 template<typename T, typename U> 
 inline void pow_imp(T& result, const T& t, const U& p, const mpl::false_&)
 {
-   // Compute the pure power of typename T t^p. Binary splitting of the power is
-   // used. The resulting computational complexity has the order of log2[abs(p)].
-   typedef typename boost::multiprecision::detail::canonical<U, T>::type  int_type;
-   switch(p)
+   // Compute the pure power of typename T t^p.
+   // Use the S-and-X binary method, as described in
+   // D. E. Knuth, "The Art of Computer Programming", Vol. 2,
+   // Section 4.6.3 . The resulting computational complexity
+   // is order log2[abs(p)].
+
+   // This will store the result.
+   result = ((U(p % U(2)) != U(0)) ? t : T(1));
+
+   U p2(p);
+
+   // The variable x stores the binary powers of t.
+   T x(t);
+
+   while(U(p2 /= 2) != U(0))
    {
-   case 0:
-      result = static_cast<int_type>(1);
-      break;
-   case 1:
-      result = t;
-      break;
-   case 2:
-      eval_multiply(result, t, t);
-      break;
-   case 3:
-      eval_multiply(result, t, t);
-      eval_multiply(result, t);
-      break;
-   case 4:
-      eval_multiply(result, t, t);
-      eval_multiply(result, result);
-      break;
-   default:
+      // Square x for each binary power.
+      eval_multiply(x, x);
+
+      const bool has_binary_power = (U(p2 % U(2)) != U(0));
+
+      if(has_binary_power)
       {
-         result = t;
-         U n;
-
-         for(n = static_cast<U>(1); n <= static_cast<U>(p / static_cast<U>(2)); n *= static_cast<U>(2))
-         {
-            eval_multiply(result, result);
-         }
-
-         const U p_minus_n = static_cast<U>(p - n);
-
-         // Call the function recursively for computing the remaining power of n.
-         if(p_minus_n)
-         {
-            T temp;
-            pow_imp(temp, t, p_minus_n, mpl::false_());
-            eval_multiply(result, temp);
-         }
+         // Multiply the result with each binary power contained in the exponent.
+         eval_multiply(result, x);
       }
    }
 }
