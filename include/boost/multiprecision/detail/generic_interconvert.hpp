@@ -159,7 +159,7 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
 
    eval_frexp(f, from, &e);
 
-   static const int shift = std::numeric_limits<long long>::digits - 1;
+   static const int shift = std::numeric_limits<boost::intmax_t>::digits - 1;
 
    while(!eval_is_zero(f))
    {
@@ -168,7 +168,7 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
       eval_floor(term, f);
       e -= shift;
       eval_ldexp(to, to, shift);
-      long long ll;
+      boost::intmax_t ll;
       eval_convert_to(&ll, term);
       eval_add(to, ll);
       eval_subtract(f, term);

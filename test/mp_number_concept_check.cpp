@@ -47,7 +47,7 @@
 #include <boost/multiprecision/gmp.hpp>
 #endif
 #ifdef TEST_BACKEND
-#include <boost/multiprecision/concepts/mp_number_architypes.hpp>
+#include <boost/multiprecision/concepts/mp_number_archetypes.hpp>
 #endif
 #if defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_DEC_FLOAT_NO_ET)
 #include <boost/multiprecision/cpp_dec_float.hpp>

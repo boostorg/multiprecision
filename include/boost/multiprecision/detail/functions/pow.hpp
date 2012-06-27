@@ -23,8 +23,15 @@ inline void pow_imp(T& result, const T& t, const U& p, const mpl::false_&)
    // Section 4.6.3 . The resulting computational complexity
    // is order log2[abs(p)].
 
+   typedef typename boost::multiprecision::detail::canonical<U, T>::type int_type;
+
    // This will store the result.
-   result = ((U(p % U(2)) != U(0)) ? t : T(1));
+   if(U(p % U(2)) != U(0))
+   {
+      result = t;
+   }
+   else
+      result = int_type(1);
 
    U p2(p);
 
@@ -51,17 +58,18 @@ inline void pow_imp(T& result, const T& t, const U& p, const mpl::true_&)
 {
    // Signed integer power, just take care of the sign then call the unsigned version:
    typedef typename boost::multiprecision::detail::canonical<U, T>::type  int_type;
+   typedef typename make_unsigned<U>::type                                ui_type;
 
    if(p < 0)
    {
       T temp;
       temp = static_cast<int_type>(1);
       T denom;
-      pow_imp(denom, t, -p, mpl::false_());
+      pow_imp(denom, t, static_cast<ui_type>(-p), mpl::false_());
       eval_divide(result, temp, denom);
       return;
    }
-   pow_imp(result, t, p, mpl::false_());
+   pow_imp(result, t, static_cast<ui_type>(p), mpl::false_());
 }
 
 } // namespace detail
@@ -166,7 +174,7 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
 template <class T>
 void eval_exp(T& result, const T& x)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The ldexp function is only valid for floating point types.");
+   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The exp function is only valid for floating point types.");
    if(&x == &result)
    {
       T temp;
@@ -251,7 +259,7 @@ void eval_exp(T& result, const T& x)
    }
 
    // Check for pure-integer arguments which can be either signed or unsigned.
-   long long ll;
+   boost::intmax_t ll;
    eval_trunc(exp_series, x);
    eval_convert_to(&ll, exp_series);
    if(x.compare(ll) == 0)
@@ -268,34 +276,25 @@ void eval_exp(T& result, const T& x)
    // implemented as a hypergeometric function, |r| is bounded by
    // ln2 / p2. For small arguments, no scaling is done.
 
-   const bool b_scale = (xx.compare(float_type(1e-4)) > 0);
-
    // Compute the exponential series of the (possibly) scaled argument.
 
-   if(b_scale)
-   {
-      eval_divide(result, xx, get_constant_ln2<T>());
-      exp_type n;
-      eval_convert_to(&n, result);
+   eval_divide(result, xx, get_constant_ln2<T>());
+   exp_type n;
+   eval_convert_to(&n, result);
 
-      // The scaling is 2^11 = 2048.
-      static const si_type p2 = static_cast<si_type>(si_type(1) << 11);
+   // The scaling is 2^11 = 2048.
+   static const si_type p2 = static_cast<si_type>(si_type(1) << 11);
 
-      eval_multiply(exp_series, get_constant_ln2<T>(), static_cast<canonical_exp_type>(n));
-      eval_subtract(exp_series, xx);
-      eval_divide(exp_series, p2);
-      exp_series.negate();
-      hyp0F0(result, exp_series);
+   eval_multiply(exp_series, get_constant_ln2<T>(), static_cast<canonical_exp_type>(n));
+   eval_subtract(exp_series, xx);
+   eval_divide(exp_series, p2);
+   exp_series.negate();
+   hyp0F0(result, exp_series);
 
-      detail::pow_imp(exp_series, result, p2, mpl::true_());
-      result = ui_type(1);
-      eval_ldexp(result, result, n);
-      eval_multiply(exp_series, result);
-   }
-   else
-   {
-      hyp0F0(exp_series, xx);
-   }
+   detail::pow_imp(exp_series, result, p2, mpl::true_());
+   result = ui_type(1);
+   eval_ldexp(result, result, n);
+   eval_multiply(exp_series, result);
 
    if(isneg)
       eval_divide(result, ui_type(1), exp_series);
@@ -313,14 +312,6 @@ void eval_log(T& result, const T& arg)
    // then let y = x - 1 and compute:
    // log(x) = log(2) * n + log1p(1 + y)
    //
-   if(&arg == &result)
-   {
-      T temp;
-      eval_log(temp, arg);
-      result = temp;
-      return;
-   }
-
    typedef typename boost::multiprecision::detail::canonical<int, T>::type si_type;
    typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
    typedef typename T::exponent_type exp_type;
@@ -394,7 +385,7 @@ const T& get_constant_log10()
 template <class T>
 void eval_log10(T& result, const T& arg)
 {
-   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The fabs function is only valid for floating point types.");
+   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The log10 function is only valid for floating point types.");
    eval_log(result, arg);
    eval_divide(result, get_constant_log10<T>());
 }
@@ -444,21 +435,9 @@ inline void eval_pow(T& result, const T& x, const T& a)
       return;
    }
 
-   long long an;
-   eval_convert_to(&an, a);
-   const bool bo_a_isint = a.compare(an) == 0;
-
-   if((eval_get_sign(x) < 0) && !bo_a_isint)
-   {
-      result = std::numeric_limits<mp_number<T> >::quiet_NaN().backend();
-   }
-
-   T t;
-   T da(a);
-   eval_subtract(da, an);
-
    if(a.compare(si_type(-1)) < 0)
    {
+      T t, da;
       t = a;
       t.negate();
       eval_pow(da, x, t);
@@ -466,15 +445,34 @@ inline void eval_pow(T& result, const T& x, const T& a)
       return;
    }
    
-   eval_subtract(da, a, an);
-
-   if(bo_a_isint)
+   bool bo_a_isint = false;
+   boost::intmax_t an;
+   T fa;
+   try
    {
-      detail::pow_imp(result, x, an, mpl::true_());
-      return;
+      eval_convert_to(&an, a);
+      if(a.compare(an) == 0)
+      {
+         detail::pow_imp(result, x, an, mpl::true_());
+         return;
+      }
+   }
+   catch(const std::exception&)
+   {
+      // conversion failed, just fall through, value is not an integer.
+      an = (std::numeric_limits<boost::intmax_t>::max)();
    }
 
-   if((eval_get_sign(x) > 0) && (x.compare(fp_type(0.5)) >= 0) && (x.compare(fp_type(0.9)) < 0))
+   if((eval_get_sign(x) < 0) && !bo_a_isint)
+   {
+      result = std::numeric_limits<mp_number<T> >::quiet_NaN().backend();
+   }
+
+   T t, da;
+
+   eval_subtract(da, a, an);
+
+   if((x.compare(fp_type(0.5)) >= 0) && (x.compare(fp_type(0.9)) < 0))
    {
       if(a.compare(fp_type(1e-5f)) <= 0)
       {
@@ -595,7 +593,11 @@ namespace detail{
          if(p_sinh)
             *p_sinh = x;
          if(p_cosh)
+         {
             *p_cosh = x;
+            if(eval_get_sign(x) < 0)
+               p_cosh->negate();
+         }
          return;
       case FP_ZERO:
          if(p_sinh)
@@ -606,12 +608,11 @@ namespace detail{
       default: ;
       }
 
-      T e_px, e_mx;
-
-      bool small_sinh = eval_get_sign(x) < 0 ? e_px.compare(fp_type(-0.5)) > 0 : e_px.compare(fp_type(0.5)) < 0;
+      bool small_sinh = eval_get_sign(x) < 0 ? x.compare(fp_type(-0.5)) > 0 : x.compare(fp_type(0.5)) < 0;
 
       if(p_cosh || !small_sinh)
       {
+         T e_px, e_mx;
          eval_exp(e_px, x);
          eval_divide(e_mx, ui_type(1), e_px);
 
@@ -624,13 +625,13 @@ namespace detail{
             else
             {
                eval_subtract(*p_sinh, e_px, e_mx);
-               eval_divide(*p_sinh, ui_type(2));
+               eval_ldexp(*p_sinh, *p_sinh, -1);
             }
          }
          if(p_cosh) 
          { 
             eval_add(*p_cosh, e_px, e_mx);
-            eval_divide(*p_cosh, ui_type(2)); 
+            eval_ldexp(*p_cosh, *p_cosh, -1); 
          }
       }
       else

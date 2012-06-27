@@ -9,12 +9,7 @@
 template <class T>
 void calc_log2(T& num, unsigned digits)
 {
-   typedef typename has_enough_bits<unsigned, std::numeric_limits<unsigned>::digits>::template type<mpl::_> pred_type;
-   typedef typename mpl::find_if<
-      typename T::unsigned_types,
-      pred_type
-   >::type iter_type;
-   typedef typename mpl::deref<iter_type>::type ui_type;
+   typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
    typedef typename mpl::front<typename T::signed_types>::type si_type;
 
    //
@@ -35,15 +30,27 @@ void calc_log2(T& num, unsigned digits)
    //
    // Check if we can just construct from string:
    //
-   if(digits  < 3640)
+   if(digits  < 3640)  // 3640 binary digits ~ 1100 decimal digits
    {
       num = string_val;
       return;
    }
-   num = static_cast<ui_type>(1180509120u);
+   //
+   // We calculate log2 from using the formula:
+   //
+   // ln(2) = 3/4 SUM[n>=0] ((-1)^n * N!^2 / (2^n(2n+1)!))
+   //
+   // Numerator and denominator are calculated separately and then 
+   // divided at the end, we also precalculate the terms up to n = 5
+   // since these fit in a 32-bit integer anyway.
+   //
+   // See Gourdon, X., and Sebah, P. The logarithmic constant: log 2, Jan. 2004.
+   // Also http://www.mpfr.org/algorithms.pdf.
+   //
+   num = static_cast<ui_type>(1180509120uL);
    T denom, next_term, temp;
-   denom = static_cast<ui_type>(1277337600u);
-   next_term = static_cast<ui_type>(120u);
+   denom = static_cast<ui_type>(1277337600uL);
+   next_term = static_cast<ui_type>(120uL);
    si_type sign = -1;
 
    ui_type limit = digits / 3 + 1;
@@ -58,7 +65,8 @@ void calc_log2(T& num, unsigned digits)
       sign = -sign;
       eval_multiply(next_term, n);
       eval_multiply(temp, next_term, next_term);
-      eval_multiply(temp, sign);
+      if(sign < 0)
+         temp.negate();
       eval_add(num, temp);
    }
    eval_multiply(denom, ui_type(4));
@@ -92,7 +100,7 @@ void calc_e(T& result, unsigned digits)
    //
    // Check if we can just construct from string:
    //
-   if(digits  < 3640)
+   if(digits  < 3640) // 3640 binary digits ~ 1100 decimal digits
    {
       result = string_val;
       return;
@@ -102,6 +110,9 @@ void calc_e(T& result, unsigned digits)
    lim = ui_type(1);
    eval_ldexp(lim, lim, digits);
 
+   //
+   // Standard evaluation from the definition of e: http://functions.wolfram.com/Constants/E/02/
+   //
    result = ui_type(2);
    T denom;
    denom = ui_type(1);
@@ -138,7 +149,7 @@ void calc_pi(T& result, unsigned digits)
    //
    // Check if we can just construct from string:
    //
-   if(digits  < 3640)
+   if(digits  < 3640) // 3640 binary digits ~ 1100 decimal digits
    {
       result = string_val;
       return;
@@ -156,6 +167,25 @@ void calc_pi(T& result, unsigned digits)
    T lim;
    lim = ui_type(1);
    eval_ldexp(lim, lim, -(int)digits);
+
+   //
+   // This algorithm is from:
+   // Schonhage, A., Grotefeld, A. F. W., and Vetter, E. Fast Algorithms: A Multitape Turing
+   // Machine Implementation. BI Wissenschaftverlag, 1994.
+   // Also described in MPFR's algorithm guide: http://www.mpfr.org/algorithms.pdf.
+   //
+   // Let:
+   // a[0] = A[0] = 1
+   // B[0] = 1/2
+   // D[0] = 1/4
+   // Then:
+   // S[k+1] = (A[k]+B[k]) / 4
+   // b[k] = sqrt(B[k])
+   // a[k+1] = a[k]^2
+   // B[k+1] = 2(A[k+1]-S[k+1])
+   // D[k+1] = D[k] - 2^k(A[k+1]-B[k+1])
+   // Stop when |A[k]-B[k]| <= 2^(k-p)
+   // and PI = B[k]/D[k]
 
    unsigned k = 1;
 
@@ -248,7 +278,7 @@ const T& get_constant_pi()
    static bool b = false;
    if(!b)
    {
-      calc_pi(result, boost::multiprecision::detail::digits2<mp_number<T> >::value + 10);
+      calc_pi(result, boost::multiprecision::detail::digits2<mp_number<T> >::value);
       b = true;
    }
 

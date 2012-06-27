@@ -1681,7 +1681,8 @@ In the following tables, type B is the `Backend` template arument to `mp_number`
 a variables of type B, `cb` and `cb2` are constant variables of type B, `a` is a variable of Arithmetic type, 
 `s` is a variable of type `const char*`, `ui` is a variable of type `unsigned`, `bb` is a variable of type `bool`,
 `pa` is a variable of type pointer-to-arithmetic-type, `exp` is a variable of type `B::exp_type`,
-`pexp` is a variable of type `B::exp_type*`, B2 is another type that meets these requirements, b2 is a variable
+`pexp` is a variable of type `B::exp_type*`, `i` is a variable of type `int`, `pi` pointer to a variable of type `int`, 
+B2 is another type that meets these requirements, b2 is a variable
 of type B2.
 
 [table Compulsory Requirements on the Backend type.
@@ -1725,6 +1726,8 @@ of type B2.
                      Conversions to other types are entirely optional.]]
 [[`eval_frexp(b, cb, pexp)`][`void`][Stores values in `b` and `*pexp` such that the value of `cb` is b * 2[super *pexp], only required when `B` is a floating-point type.]]
 [[`eval_ldexp(b, cb, exp)`][`void`][Stores a value in `b` that is cb * 2[super exp], only required when `B` is a floating-point type.]]
+[[`eval_frexp(b, cb, pi)`][`void`][Stores values in `b` and `*pi` such that the value of `cb` is b * 2[super *pi], only required when `B` is a floating-point type.]]
+[[`eval_ldexp(b, cb, i)`][`void`][Stores a value in `b` that is cb * 2[super i], only required when `B` is a floating-point type.]]
 [[`eval_floor(b, cb)`][`void`][Stores the floor of `cb` in `b`, only required when `B` is a floating-point type.]]
 [[`eval_ceil(b, cb)`][`void`][Stores the ceiling of `cb` in `b`, only required when `B` is a floating-point type.]]
 [[`eval_sqrt(b, cb)`][`void`][Stores the square root of `cb` in `b`, only required when `B` is a floating-point type.]]
@@ -1858,7 +1861,7 @@ in point of fact this naming convention shouldn't be necessary, but rather works
 [[rational_adapter.hpp][Defines the `rational_adapter` backend.]]
 [[cpp_dec_float.hpp][Defines the `cpp_dec_float` backend.]]
 [[tommath.hpp][Defines the `tommath_int` backend.]]
-[[concepts/mp_number_architypes.hpp][Defines a backend concept architypes for testing use.]]
+[[concepts/mp_number_archetypes.hpp][Defines a backend concept architypes for testing use.]]
 ]
 
 [table Implementation Headers]

@@ -7,12 +7,14 @@
 #define BOOST_MATH_CONCEPTS_ER_HPP
 
 #include <iostream>
+#include <sstream>
 #include <iomanip>
 #include <cmath>
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/multiprecision/mp_number.hpp>
-#include <boost/math/special_functions/trunc.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <boost/mpl/list.hpp>
 
 namespace boost{
 namespace multiprecision{

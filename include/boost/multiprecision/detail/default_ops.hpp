@@ -13,6 +13,7 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/front.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/type_traits/make_unsigned.hpp>
 
 #ifndef INSTRUMENT_BACKEND
 #ifndef BOOST_MP_INSTRUMENT
