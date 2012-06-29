@@ -585,7 +585,7 @@ run test_float_io.cpp
         : # input files
         : # requirements
 	      <define>TEST_CPP_DEC_FLOAT
-         release # Otherwise runtime is slow
+         #release # Otherwise runtime is slow
         : test_float_io_cpp_dec_float ;
 
 run test_float_io.cpp gmp

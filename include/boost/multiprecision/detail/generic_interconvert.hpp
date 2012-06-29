@@ -168,7 +168,7 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
       eval_floor(term, f);
       e -= shift;
       eval_ldexp(to, to, shift);
-      boost::intmax_t ll;
+      typename boost::multiprecision::detail::canonical<boost::intmax_t, To>::type ll;
       eval_convert_to(&ll, term);
       eval_add(to, ll);
       eval_subtract(f, term);

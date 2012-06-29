@@ -61,7 +61,7 @@ void expected_results()
       ".*",                          // platform
       ".*",                          // test type(s)
       "factorials",                  // test data group
-      "boost::math::tgamma", 70, 25);  // test function
+      "boost::math::tgamma", 140, 70);  // test function
    add_expected_result(
       ".*",                          // compiler
       ".*",                          // stdlib

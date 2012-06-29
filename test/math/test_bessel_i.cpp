@@ -63,7 +63,7 @@ void expected_results()
       ".*",                          // test type(s)
       ".*",                          // test data group
       ".*",                          // test function
-      300,                           // Max Peek error
+      500,                           // Max Peek error
       200);                          // Max mean error
 
    //

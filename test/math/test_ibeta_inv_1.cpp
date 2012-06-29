@@ -57,7 +57,7 @@ void expected_results()
       ".*",                          // platform
       ".*mpfr_float_backend<18>.*",  // test type(s)
       ".*",                          // test data group
-      ".*", 20000000, 2000000);      // test function
+      ".*", 50000000, 7000000);      // test function
    add_expected_result(
       ".*",                          // compiler
       ".*",                          // stdlib

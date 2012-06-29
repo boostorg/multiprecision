@@ -72,7 +72,7 @@ void expected_results()
       ".*",                          // platform
       ".*mpfr_float_backend<18>.*",  // test type(s)
       "Beta Function: Small.*",      // test data group
-      "boost::math::beta", 200, 200); // test function
+      "boost::math::beta", 1000, 750); // test function
    add_expected_result(
       ".*",                          // compiler
       ".*",                          // stdlib
@@ -86,14 +86,14 @@ void expected_results()
       ".*",                          // platform
       ".*",                          // test type(s)
       "Beta Function: Medium.*",     // test data group
-      "boost::math::beta", 260, 200); // test function
+      "boost::math::beta", 1000, 750); // test function
    add_expected_result(
       ".*",                          // compiler
       ".*",                          // stdlib
       ".*",                          // platform
       ".*",                          // test type(s)
       "Beta Function: Divergent.*",  // test data group
-      "boost::math::beta", 200, 200);   // test function
+      "boost::math::beta", 1000, 700);   // test function
    //
    // Finish off by printing out the compiler/stdlib/platform names,
    // we do this to make it easier to mark up expected error rates.
