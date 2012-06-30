@@ -1993,6 +1993,55 @@ public:
    BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
 };
 
+#ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
+
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >::digits;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >::digits10;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >::max_digits10;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >::is_signed;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >::is_integer;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >::is_exact;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >::radix;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >::min_exponent;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >::min_exponent10;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >::max_exponent;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >::max_exponent10;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >::has_infinity;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >::has_quiet_NaN;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >::has_signaling_NaN;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST float_denorm_style numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >::has_denorm;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >::has_denorm_loss;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >::is_iec559;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >::is_bounded;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >::is_modulo;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >::traps;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >::tinyness_before;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST float_round_style numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >::round_style;
+
+#endif
+
 template<bool ExpressionTemplates> 
 class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> >
 {
@@ -2041,6 +2090,55 @@ public:
    BOOST_STATIC_CONSTEXPR bool tinyness_before = false;
    BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
 };
+
+#ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
+
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> >::digits;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> >::digits10;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> >::max_digits10;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> >::is_signed;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> >::is_integer;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> >::is_exact;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> >::radix;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> >::min_exponent;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> >::min_exponent10;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> >::max_exponent;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> >::max_exponent10;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> >::has_infinity;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> >::has_quiet_NaN;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> >::has_signaling_NaN;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST float_denorm_style numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> >::has_denorm;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> >::has_denorm_loss;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> >::is_iec559;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> >::is_bounded;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> >::is_modulo;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> >::traps;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> >::tinyness_before;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST float_round_style numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_int, ExpressionTemplates> >::round_style;
+
+#endif
 
 template<bool ExpressionTemplates> 
 class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> >
@@ -2091,6 +2189,55 @@ public:
    BOOST_STATIC_CONSTEXPR bool tinyness_before = false;
    BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
 };
+
+#ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
+
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> >::digits;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> >::digits10;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> >::max_digits10;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> >::is_signed;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> >::is_integer;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> >::is_exact;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> >::radix;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> >::min_exponent;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> >::min_exponent10;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> >::max_exponent;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> >::max_exponent10;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> >::has_infinity;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> >::has_quiet_NaN;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> >::has_signaling_NaN;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST float_denorm_style numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> >::has_denorm;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> >::has_denorm_loss;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> >::is_iec559;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> >::is_bounded;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> >::is_modulo;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> >::traps;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> >::tinyness_before;
+template <bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST float_round_style numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_rational, ExpressionTemplates> >::round_style;
+
+#endif
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

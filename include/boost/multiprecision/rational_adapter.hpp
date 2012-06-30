@@ -197,8 +197,8 @@ struct component_type<rational_adapter<T> >
 
 namespace std{
 
-template <class IntBackend>
-class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::rational_adapter<IntBackend> > > : public std::numeric_limits<boost::multiprecision::mp_number<IntBackend> >
+template <class IntBackend, bool ExpressionTemplates>
+class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::rational_adapter<IntBackend>, ExpressionTemplates> > : public std::numeric_limits<boost::multiprecision::mp_number<IntBackend, ExpressionTemplates> >
 {
    typedef std::numeric_limits<boost::multiprecision::mp_number<IntBackend> > base_type;
    typedef boost::multiprecision::mp_number<boost::multiprecision::rational_adapter<IntBackend> > number_type;
@@ -215,6 +215,16 @@ public:
    BOOST_STATIC_CONSTEXPR number_type signaling_NaN() BOOST_NOEXCEPT { return base_type::signaling_NaN(); }
    BOOST_STATIC_CONSTEXPR number_type denorm_min() BOOST_NOEXCEPT { return base_type::denorm_min(); }
 };
+
+#ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
+
+template <class IntBackend, bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::rational_adapter<IntBackend>, ExpressionTemplates> >::is_integer;
+template <class IntBackend, bool ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::rational_adapter<IntBackend>, ExpressionTemplates> >::is_exact;
+
+#endif
+
 
 }
 
