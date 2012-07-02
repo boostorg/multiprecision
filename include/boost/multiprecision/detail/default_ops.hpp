@@ -111,10 +111,10 @@ inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const cha
 }
 
 template <class T>
-inline bool is_same_object(const T& u, const T&v)
+inline bool is_same_object(const T& u, const T&v) BOOST_NOEXCEPT
 {  return &u == &v;  }
 template <class T, class U>
-inline bool is_same_object(const T&, const U&)
+BOOST_CONSTEXPR inline bool is_same_object(const T&, const U&) BOOST_NOEXCEPT
 {  return false;  }
 
 //
@@ -688,7 +688,7 @@ template <class tag, class A1, class A2, class A3, class A4, class Policy>
 inline typename detail::mp_exp<tag, A1, A2, A3, A4>::result_type trunc(const detail::mp_exp<tag, A1, A2, A3, A4>& v, const Policy& pol)
 {
    typedef typename detail::mp_exp<tag, A1, A2, A3, A4>::result_type number_type;
-   return trunc(number_type(v), pol);
+   return BOOST_MP_MOVE(trunc(number_type(v), pol));
 }
 
 template <class Backend, bool ExpressionTemplates, class Policy>
@@ -697,7 +697,7 @@ inline mp_number<Backend, ExpressionTemplates> trunc(const mp_number<Backend, Ex
    using default_ops::eval_trunc;
    mp_number<Backend, ExpressionTemplates> result;
    eval_trunc(result.backend(), v.backend());
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 
 template <class tag, class A1, class A2, class A3, class A4, class Policy>
@@ -787,7 +787,7 @@ template <class tag, class A1, class A2, class A3, class A4, class Policy>
 inline typename detail::mp_exp<tag, A1, A2, A3, A4>::result_type round(const detail::mp_exp<tag, A1, A2, A3, A4>& v, const Policy& pol)
 {
    typedef typename detail::mp_exp<tag, A1, A2, A3, A4>::result_type number_type;
-   return round(static_cast<number_type>(v), pol);
+   return BOOST_MP_MOVE(round(static_cast<number_type>(v), pol));
 }
 template <class T, bool ExpressionTemplates, class Policy>
 inline mp_number<T, ExpressionTemplates> round(const mp_number<T, ExpressionTemplates>& v, const Policy&)
@@ -795,7 +795,7 @@ inline mp_number<T, ExpressionTemplates> round(const mp_number<T, ExpressionTemp
    using default_ops::eval_round;
    mp_number<T, ExpressionTemplates> result;
    eval_round(result.backend(), v.backend());
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 
 template <class tag, class A1, class A2, class A3, class A4, class Policy>
@@ -919,9 +919,9 @@ inline typename enable_if_c<number_category<Backend>::value == category,\
    detail::mp_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
-  , mp_number<Backend> > \
+  , mp_number<Backend, true> > \
 >::type \
-func(const mp_number<Backend>& arg)\
+func(const mp_number<Backend, true>& arg)\
 {\
     return detail::mp_exp<\
     detail::function\
@@ -941,7 +941,7 @@ func(const mp_number<Backend, false>& arg)\
    mp_number<Backend, false> result;\
    using default_ops::BOOST_JOIN(eval_,func);\
    BOOST_JOIN(eval_,func)(result.backend(), arg.backend());\
-   return result;\
+   return BOOST_MP_MOVE(result);\
 }
 
 #define BINARY_OP_FUNCTOR(func, category)\
@@ -974,10 +974,10 @@ inline typename enable_if_c<number_category<Backend>::value == category,\
    detail::mp_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
-  , mp_number<Backend> \
-  , mp_number<Backend> > \
+  , mp_number<Backend, true> \
+  , mp_number<Backend, true> > \
 >::type \
-func(const mp_number<Backend>& arg, const mp_number<Backend>& a)\
+func(const mp_number<Backend, true>& arg, const mp_number<Backend, true>& a)\
 {\
     return detail::mp_exp<\
     detail::function\
@@ -996,10 +996,10 @@ inline typename enable_if_c<\
    detail::mp_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
-  , mp_number<Backend> \
+  , mp_number<Backend, true> \
   , detail::mp_exp<tag, A1, A2, A3, A4> > \
 >::type \
-func(const mp_number<Backend>& arg, const detail::mp_exp<tag, A1, A2, A3, A4>& a)\
+func(const mp_number<Backend, true>& arg, const detail::mp_exp<tag, A1, A2, A3, A4>& a)\
 {\
     return detail::mp_exp<\
     detail::function\
@@ -1019,9 +1019,9 @@ inline typename enable_if_c<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
   , detail::mp_exp<tag, A1, A2, A3, A4> \
-  , mp_number<Backend> > \
+  , mp_number<Backend, true> > \
 >::type \
-func(const detail::mp_exp<tag, A1, A2, A3, A4>& arg, const mp_number<Backend>& a)\
+func(const detail::mp_exp<tag, A1, A2, A3, A4>& arg, const mp_number<Backend, true>& a)\
 {\
     return detail::mp_exp<\
     detail::function\
@@ -1062,11 +1062,11 @@ inline typename enable_if_c<\
    detail::mp_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
-  , mp_number<Backend> \
+  , mp_number<Backend, true> \
   , Arithmetic\
   > \
 >::type \
-func(const mp_number<Backend>& arg, const Arithmetic& a)\
+func(const mp_number<Backend, true>& arg, const Arithmetic& a)\
 {\
     return detail::mp_exp<\
     detail::function\
@@ -1109,10 +1109,10 @@ inline typename enable_if_c<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
   , Arithmetic \
-  , mp_number<Backend> \
+  , mp_number<Backend, true> \
   > \
 >::type \
-func(const Arithmetic& arg, const mp_number<Backend>& a)\
+func(const Arithmetic& arg, const mp_number<Backend, true>& a)\
 {\
     return detail::mp_exp<\
     detail::function\
@@ -1156,7 +1156,7 @@ func(const mp_number<Backend, false>& arg, const mp_number<Backend, false>& a)\
    mp_number<Backend, false> result;\
    using default_ops:: BOOST_JOIN(eval_,func);\
    BOOST_JOIN(eval_,func)(result.backend(), arg.backend(), a.backend());\
-   return result;\
+   return BOOST_MP_MOVE(result);\
 }\
 template <class Backend, class Arithmetic> \
 inline typename enable_if_c<\
@@ -1169,7 +1169,7 @@ func(const mp_number<Backend, false>& arg, const Arithmetic& a)\
    mp_number<Backend, false> result;\
    using default_ops:: BOOST_JOIN(eval_,func);\
    BOOST_JOIN(eval_,func)(result.backend(), arg.backend(), static_cast<canonical_type>(a));\
-   return result;\
+   return BOOST_MP_MOVE(result);\
 }\
 template <class Backend, class Arithmetic> \
 inline typename enable_if_c<\
@@ -1182,7 +1182,7 @@ func(const Arithmetic& a, const mp_number<Backend, false>& arg)\
    mp_number<Backend, false> result;\
    using default_ops:: BOOST_JOIN(eval_,func);\
    BOOST_JOIN(eval_,func)(result.backend(), static_cast<canonical_type>(a), arg.backend());\
-   return result;\
+   return BOOST_MP_MOVE(result);\
 }\
 
 
@@ -1214,10 +1214,10 @@ inline typename enable_if_c<\
   detail::mp_exp<\
     detail::function\
   , detail::BOOST_JOIN(func, _funct)<Backend> \
-  , mp_number<Backend> \
+  , mp_number<Backend, true> \
   , Arg2> \
 >::type \
-func(const mp_number<Backend>& arg, Arg2 const& a)\
+func(const mp_number<Backend, true>& arg, Arg2 const& a)\
 {\
     return detail::mp_exp<\
     detail::function\
@@ -1239,7 +1239,7 @@ func(const mp_number<Backend, false>& arg, Arg2 const& a)\
    mp_number<Backend, false> result;\
    using default_ops:: BOOST_JOIN(eval_,func);\
    BOOST_JOIN(eval_,func)(result.backend(), arg.backend(), a);\
-   return result;\
+   return BOOST_MP_MOVE(result);\
 }\
 
 #define HETERO_BINARY_OP_FUNCTOR(func, Arg2, category)\
@@ -1292,13 +1292,13 @@ template <class Backend>
 inline detail::mp_exp<
     detail::function
   , detail::abs_funct<Backend>
-  , mp_number<Backend> >
-abs(const mp_number<Backend>& arg)
+  , mp_number<Backend, true> >
+abs(const mp_number<Backend, true>& arg)
 {
     return detail::mp_exp<
     detail::function
   , detail::abs_funct<Backend>
-  , mp_number<Backend>
+  , mp_number<Backend, true>
   >(
         detail::abs_funct<Backend>()
       , arg
@@ -1311,7 +1311,7 @@ abs(const mp_number<Backend, false>& arg)
    mp_number<Backend, false> result;
    using default_ops::eval_abs;
    eval_abs(result.backend(), arg.backend());
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 
 UNARY_OP_FUNCTOR(fabs, number_kind_floating_point)
@@ -1366,25 +1366,25 @@ namespace detail{
 template <class Backend, bool ExpressionTemplates>
 inline multiprecision::mp_number<Backend, ExpressionTemplates> sinc_pi(const multiprecision::mp_number<Backend, ExpressionTemplates>& x)
 {
-   return detail::sinc_pi_imp(x);
+   return BOOST_MP_MOVE(detail::sinc_pi_imp(x));
 }
 
 template <class Backend, bool ExpressionTemplates, class Policy>
 inline multiprecision::mp_number<Backend, ExpressionTemplates> sinc_pi(const multiprecision::mp_number<Backend, ExpressionTemplates>& x, const Policy&)
 {
-   return detail::sinc_pi_imp(x);
+   return BOOST_MP_MOVE(detail::sinc_pi_imp(x));
 }
 
 template <class Backend, bool ExpressionTemplates>
 inline multiprecision::mp_number<Backend, ExpressionTemplates> sinhc_pi(const multiprecision::mp_number<Backend, ExpressionTemplates>& x)
 {
-   return detail::sinhc_pi_imp(x);
+   return BOOST_MP_MOVE(detail::sinhc_pi_imp(x));
 }
 
 template <class Backend, bool ExpressionTemplates, class Policy>
 inline multiprecision::mp_number<Backend, ExpressionTemplates> sinhc_pi(const multiprecision::mp_number<Backend, ExpressionTemplates>& x, const Policy&)
 {
-   return boost::math::sinhc_pi(x);
+   return BOOST_MP_MOVE(boost::math::sinhc_pi(x));
 }
 
 #ifdef BOOST_MSVC

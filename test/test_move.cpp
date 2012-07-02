@@ -1,0 +1,241 @@
+// Copyright John Maddock 2012.
+
+// Use, modification and distribution are subject to the
+// Boost Software License, Version 1.0.
+// (See accompanying file LICENSE_1_0.txt
+// or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#ifdef _MSC_VER
+#  define _SCL_SECURE_NO_WARNINGS
+#endif
+
+#include <boost/config.hpp>
+
+#ifndef BOOST_NO_RVALUE_REFERENCES
+
+#if !defined(TEST_GMP) && !defined(TEST_MPFR) && !defined(TEST_TOMMATH) && !defined(TEST_CPP_INT)
+#  define TEST_GMP
+#  define TEST_MPFR
+#  define TEST_TOMMATH
+#  define TEST_CPP_INT
+
+#ifdef _MSC_VER
+#pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
+#endif
+#ifdef __GNUC__
+#pragma warning "CAUTION!!: No backend type specified so testing everything.... this will take some time!!"
+#endif
+
+#endif
+
+#if defined(TEST_GMP)
+#include <boost/multiprecision/gmp.hpp>
+#endif
+#if defined(TEST_MPFR)
+#include <boost/multiprecision/mpfr.hpp>
+#endif
+#ifdef TEST_TOMMATH
+#include <boost/multiprecision/tommath.hpp>
+#endif
+#ifdef TEST_CPP_INT
+#include <boost/multiprecision/cpp_int.hpp>
+#endif
+
+#include "test.hpp"
+
+unsigned allocation_count = 0;
+
+void *(*alloc_func_ptr) (size_t);
+void *(*realloc_func_ptr) (void *, size_t, size_t);
+void (*free_func_ptr) (void *, size_t);
+
+void *alloc_func(size_t n)
+{
+   ++allocation_count;
+   return (*alloc_func_ptr)(n);
+}
+
+void free_func(void * p, size_t n)
+{
+   (*free_func_ptr)(p, n);
+}
+
+void * realloc_func(void * p, size_t old, size_t n)
+{
+   ++allocation_count;
+   return (*realloc_func_ptr)(p, old, n);
+}
+
+template <class T>
+void do_something(const T&)
+{
+}
+
+
+int main()
+{
+#if defined(TEST_MPFR) || defined(TEST_GMP)
+   mp_get_memory_functions(&alloc_func_ptr, &realloc_func_ptr, &free_func_ptr);
+   mp_set_memory_functions(&alloc_func, &realloc_func, &free_func);
+#endif
+
+   using namespace boost::multiprecision;
+
+#ifdef TEST_MPFR
+   {
+      mpfr_float_50 a = 2;
+      BOOST_TEST(allocation_count); // sanity check that we are tracking allocations
+      allocation_count = 0;
+      mpfr_float_50 b = std::move(a);
+      BOOST_TEST(allocation_count == 0);
+      //
+      // Move assign - we rely on knowledge of the internals to make this test work!!
+      //
+      mpfr_float_50 c(3);
+      do_something(b);
+      do_something(c);
+      const void* p = b.backend().data()[0]._mpfr_d;
+      BOOST_TEST(c.backend().data()[0]._mpfr_d != p);
+      c = std::move(b);
+      BOOST_TEST(c.backend().data()[0]._mpfr_d == p);
+      BOOST_TEST(b.backend().data()[0]._mpfr_d != p);
+      //
+      // Again with variable precision, this we can test more easily:
+      //
+      mpfr_float d, e;
+      d.precision(100);
+      e.precision(1000);
+      d = 2;
+      e = 3;
+      allocation_count = 0;
+      BOOST_TEST(d == 2);
+      d = std::move(e);
+      BOOST_TEST(allocation_count == 0);
+      BOOST_TEST(d == 3);
+   }
+#endif
+#ifdef TEST_GMP
+   {
+      mpf_float_50 a = 2;
+      BOOST_TEST(allocation_count); // sanity check that we are tracking allocations
+      allocation_count = 0;
+      mpf_float_50 b = std::move(a);
+      BOOST_TEST(allocation_count == 0);
+      //
+      // Move assign: this requires knowledge of the internals to test!!
+      //
+      mpf_float_50 c(3);
+      do_something(b);
+      do_something(c);
+      const void* p = b.backend().data()[0]._mp_d;
+      BOOST_TEST(c.backend().data()[0]._mp_d != p);
+      c = std::move(b);
+      BOOST_TEST(c.backend().data()[0]._mp_d == p);
+      BOOST_TEST(b.backend().data()[0]._mp_d != p);
+      //
+      // Again with variable precision, this we can test more easily:
+      //
+      mpf_float d, e;
+      d.precision(100);
+      e.precision(1000);
+      d = 2;
+      e = 3;
+      allocation_count = 0;
+      BOOST_TEST(d == 2);
+      d = std::move(e);
+      BOOST_TEST(allocation_count == 0);
+      BOOST_TEST(d == 3);
+   }
+   {
+      mpz_int a = 2;
+      BOOST_TEST(allocation_count); // sanity check that we are tracking allocations
+      allocation_count = 0;
+      mpz_int b = std::move(a);
+      BOOST_TEST(allocation_count == 0);
+
+      //
+      // Move assign:
+      //
+      mpz_int d, e;
+      d = 2;
+      d <<= 1000;
+      e = 3;
+      allocation_count = 0;
+      e = std::move(d);
+      BOOST_TEST(allocation_count == 0);
+   }
+   {
+      mpq_rational a = 2;
+      BOOST_TEST(allocation_count); // sanity check that we are tracking allocations
+      allocation_count = 0;
+      mpq_rational b = std::move(a);
+      BOOST_TEST(allocation_count == 0);
+
+      //
+      // Move assign:
+      //
+      mpq_rational d, e;
+      d = mpz_int(2) << 1000;
+      e = 3;
+      allocation_count = 0;
+      e = std::move(d);
+      BOOST_TEST(allocation_count == 0);
+   }
+#endif
+#ifdef TEST_TOMMATH
+   {
+      tom_int a = 2;
+      void const* p = a.backend().data().dp;
+      tom_int b = std::move(a);
+      BOOST_TEST(b.backend().data().dp == p);
+      BOOST_TEST(a.backend().data().dp == 0);
+
+      //
+      // Move assign:
+      //
+      tom_int d, e;
+      d = 2;
+      d <<= 1000;
+      e = 3;
+      p = d.backend().data().dp;
+      BOOST_TEST(p != e.backend().data().dp);
+      e = std::move(d);
+      BOOST_TEST(e.backend().data().dp == p);
+   }
+#endif
+#ifdef TEST_CPP_INT
+   {
+      cpp_int a = 2;
+      a <<= 1000;  // Force dynamic allocation.
+      void const* p = a.backend().limbs();
+      cpp_int b = std::move(a);
+      BOOST_TEST(b.backend().limbs() == p);
+
+      //
+      // Move assign:
+      //
+      cpp_int d, e;
+      d = 2;
+      d <<= 1000;
+      e = 3;
+      e <<= 1000;
+      p = d.backend().limbs();
+      BOOST_TEST(p != e.backend().limbs());
+      e = std::move(d);
+      BOOST_TEST(e.backend().limbs() == p);
+   }
+#endif
+   return boost::report_errors();
+}
+
+#else
+//
+// No rvalue refs, nothing to test:
+//
+int main()
+{
+   return 0;
+}
+
+#endif
+

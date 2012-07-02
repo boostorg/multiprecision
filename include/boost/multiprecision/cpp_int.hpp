@@ -411,7 +411,7 @@ public:
    cpp_int_backend(){}
    cpp_int_backend(const cpp_int_backend& o) : base_type(o) {}
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   cpp_int_backend(cpp_int_backend&& o) : base_type(o) {}
+   cpp_int_backend(cpp_int_backend&& o) : base_type(static_cast<base_type&&>(o)) {}
 #endif
    cpp_int_backend& operator = (const cpp_int_backend& o)
    {

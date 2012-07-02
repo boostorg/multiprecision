@@ -37,7 +37,9 @@ template<class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 struct is_mp_number_expression<detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> > : public mpl::true_ {};
 
 namespace detail{
-
+//
+// Workaround for missing abs(long long) on some compilers:
+//
 template <class T>
 typename boost::enable_if<is_arithmetic<T>, T>::type abs(const T& t)
 {
@@ -45,6 +47,15 @@ typename boost::enable_if<is_arithmetic<T>, T>::type abs(const T& t)
 }
 
 #define BOOST_MP_USING_ABS using std::abs; using boost::multiprecision::detail::abs;
+
+//
+// Move support:
+//
+#ifndef BOOST_NO_RVALUE_REFERENCES
+#  define BOOST_MP_MOVE(x) std::move(x)
+#else
+#  define BOOST_MP_MOVE(x) x
+#endif
 
 template <int b>
 struct has_enough_bits

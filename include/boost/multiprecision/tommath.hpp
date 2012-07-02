@@ -46,6 +46,13 @@ struct tommath_int
    {
       detail::check_tommath_result(mp_init_copy(&m_data, const_cast< ::mp_int*>(&o.m_data)));
    }
+#ifndef BOOST_NO_RVALUE_REFERENCES
+   tommath_int(tommath_int&& o)
+   {
+      m_data = o.m_data;
+      o.m_data.dp = 0;
+   }
+#endif
    tommath_int& operator = (const tommath_int& o)
    {
       detail::check_tommath_result(mp_copy(const_cast< ::mp_int*>(&o.m_data), &m_data));
@@ -209,7 +216,8 @@ struct tommath_int
    }
    ~tommath_int()
    {
-      mp_clear(&m_data);
+      if(m_data.dp)
+         mp_clear(&m_data);
    }
    void negate()
    {

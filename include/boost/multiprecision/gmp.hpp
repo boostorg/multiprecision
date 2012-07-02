@@ -337,7 +337,7 @@ struct gmp_float : public detail::gmp_float_imp<digits10>
       mpf_set_q(this->m_data, val);
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   gmp_float(gmp_float&& o) : detail::gmp_float_imp<digits10>(o) {}
+   gmp_float(gmp_float&& o) : detail::gmp_float_imp<digits10>(static_cast<detail::gmp_float_imp<digits10>&&>(o)) {}
 #endif
    gmp_float& operator=(const gmp_float& o)
    {
@@ -412,7 +412,7 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
       mpf_set(this->m_data, o.data());
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   gmp_float(gmp_float&& o) : detail::gmp_float_imp<0>(o) {}
+   gmp_float(gmp_float&& o) : detail::gmp_float_imp<0>(static_cast<detail::gmp_float_imp<0>&&>(o)) {}
 #endif
    gmp_float(const gmp_int& o);
    gmp_float(const gmp_rational& o);
@@ -874,6 +874,13 @@ struct gmp_int
    {
       mpz_init_set(m_data, o.m_data);
    }
+#ifndef BOOST_NO_RVALUE_REFERENCES
+   gmp_int(gmp_int&& o)
+   {
+      m_data[0] = o.m_data[0];
+      o.m_data[0]._mp_d = 0;
+   }
+#endif
    gmp_int(mpf_t val)
    {
       mpz_init(this->m_data);
@@ -1072,7 +1079,8 @@ struct gmp_int
    }
    ~gmp_int()
    {
-      mpz_clear(m_data);
+      if(m_data[0]._mp_d)
+         mpz_clear(m_data);
    }
    void negate()
    {
@@ -1469,6 +1477,15 @@ struct gmp_rational
       mpq_init(m_data);
       mpq_set_z(m_data, o.data());
    }
+#ifndef BOOST_NO_RVALUE_REFERENCES
+   gmp_rational(gmp_rational&& o)
+   {
+      m_data[0]._mp_num = o.data()[0]._mp_num;
+      m_data[0]._mp_den = o.data()[0]._mp_den;
+      o.data()[0]._mp_num._mp_d = 0;
+      o.data()[0]._mp_den._mp_d = 0;
+   }
+#endif
    gmp_rational(mpq_t o)
    {
       mpq_init(m_data);
@@ -1613,7 +1630,8 @@ struct gmp_rational
    }
    ~gmp_rational()
    {
-      mpq_clear(m_data);
+      if(m_data[0]._mp_num._mp_d || m_data[0]._mp_den._mp_d)
+         mpq_clear(m_data);
    }
    void negate()
    {

@@ -578,6 +578,37 @@ run test_constants.cpp
         : test_constants_cpp_dec_float ;
 
 
+run test_move.cpp mpfr
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPFR
+         [ check-target-builds ../config//has_mpfr : : <build>no ]
+        : test_move_mpfr ;
+
+run test_move.cpp gmp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_GMP
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+        : test_move_gmp ;
+
+run test_move.cpp $(TOMMATH)
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_TOMMATH
+         [ check-target-builds ../config//has_tommath : : <build>no ]
+        : test_move_tommath ;
+
+run test_move.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_CPP_INT
+        : test_move_cpp_int ;
+
 run test_test.cpp ;
 
 run test_float_io.cpp

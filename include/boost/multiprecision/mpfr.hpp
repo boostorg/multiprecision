@@ -152,7 +152,10 @@ struct mpfr_float_imp
    }
    mpfr_float_imp& operator = (const char* s)
    {
-      mpfr_set_str(m_data, s, 10, GMP_RNDN);
+      if(mpfr_set_str(m_data, s, 10, GMP_RNDN) != 0)
+      {
+         BOOST_THROW_EXCEPTION(std::runtime_error("Unable to parse string as a valid floating point number."));
+      }
       return *this;
    }
    void swap(mpfr_float_imp& o)
@@ -314,7 +317,7 @@ struct mpfr_float_backend : public detail::mpfr_float_imp<digits10>
    }
    mpfr_float_backend(const mpfr_float_backend& o) : detail::mpfr_float_imp<digits10>(o) {}
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   mpfr_float_backend(mpfr_float_backend&& o) : detail::mpfr_float_imp<digits10>(o) {}
+   mpfr_float_backend(mpfr_float_backend&& o) : detail::mpfr_float_imp<digits10>(static_cast<detail::mpfr_float_imp<digits10>&&>(o)) {}
 #endif
    template <unsigned D>
    mpfr_float_backend(const mpfr_float_backend<D>& val)
@@ -453,7 +456,7 @@ struct mpfr_float_backend<0> : public detail::mpfr_float_imp<0>
    }
    mpfr_float_backend(const mpfr_float_backend& o) : detail::mpfr_float_imp<0>(o) {}
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   mpfr_float_backend(mpfr_float_backend&& o) : detail::mpfr_float_imp<0>(o) {}
+   mpfr_float_backend(mpfr_float_backend&& o) : detail::mpfr_float_imp<0>(static_cast<detail::mpfr_float_imp<0>&&>(o)) {}
 #endif
    mpfr_float_backend(const mpfr_float_backend& o, unsigned digits10) 
    {

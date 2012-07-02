@@ -19,14 +19,14 @@ inline mp_number<B, false> operator - (const mp_number<B, false>& v)
 {
    mp_number<B, false> result(v);
    result.backend().negate();
-   return result; 
+   return BOOST_MP_MOVE(result); 
 }
 template <class B>
 inline mp_number<B, false> operator ~ (const mp_number<B, false>& v) 
 {
    mp_number<B, false> result;
    eval_complement(result.backend(), v.backend());
-   return result; 
+   return BOOST_MP_MOVE(result); 
 }
 //
 // Addition:
@@ -37,7 +37,7 @@ inline mp_number<B, false> operator + (const mp_number<B, false>& a, const mp_nu
    mp_number<B, false> result;
    using default_ops::eval_add;
    eval_add(result.backend(), a.backend(), b.backend());
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 template <class B, class V>
 inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
@@ -47,7 +47,7 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    mp_number<B, false> result;
    using default_ops::eval_add;
    eval_add(result.backend(), a.backend(), static_cast<canonical_type>(b));
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 template <class V, class B>
 inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
@@ -57,7 +57,7 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    mp_number<B, false> result;
    using default_ops::eval_add;
    eval_add(result.backend(), b.backend(), static_cast<canonical_type>(a));
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 //
 // Subtraction:
@@ -68,7 +68,7 @@ inline mp_number<B, false> operator - (const mp_number<B, false>& a, const mp_nu
    mp_number<B, false> result;
    using default_ops::eval_subtract;
    eval_subtract(result.backend(), a.backend(), b.backend());
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 template <class B, class V>
 inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
@@ -78,7 +78,7 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    mp_number<B, false> result;
    using default_ops::eval_subtract;
    eval_subtract(result.backend(), a.backend(), static_cast<canonical_type>(b));
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 template <class V, class B>
 inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
@@ -88,7 +88,7 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    mp_number<B, false> result;
    using default_ops::eval_subtract;
    eval_subtract(result.backend(), static_cast<canonical_type>(a), b.backend());
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 //
 // Multiply:
@@ -99,7 +99,7 @@ inline mp_number<B, false> operator * (const mp_number<B, false>& a, const mp_nu
    mp_number<B, false> result;
    using default_ops::eval_multiply;
    eval_multiply(result.backend(), a.backend(), b.backend());
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 template <class B, class V>
 inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
@@ -109,7 +109,7 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    mp_number<B, false> result;
    using default_ops::eval_multiply;
    eval_multiply(result.backend(), a.backend(), static_cast<canonical_type>(b));
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 template <class V, class B>
 inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
@@ -119,7 +119,7 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    mp_number<B, false> result;
    using default_ops::eval_multiply;
    eval_multiply(result.backend(), b.backend(), static_cast<canonical_type>(a));
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 //
 // divide:
@@ -130,7 +130,7 @@ inline mp_number<B, false> operator / (const mp_number<B, false>& a, const mp_nu
    mp_number<B, false> result;
    using default_ops::eval_divide;
    eval_divide(result.backend(), a.backend(), b.backend());
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 template <class B, class V>
 inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
@@ -140,7 +140,7 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    mp_number<B, false> result;
    using default_ops::eval_divide;
    eval_divide(result.backend(), a.backend(), static_cast<canonical_type>(b));
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 template <class V, class B>
 inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
@@ -150,7 +150,7 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    mp_number<B, false> result;
    using default_ops::eval_divide;
    eval_divide(result.backend(), static_cast<canonical_type>(a), b.backend());
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 //
 // modulus:
@@ -161,7 +161,7 @@ inline mp_number<B, false> operator % (const mp_number<B, false>& a, const mp_nu
    mp_number<B, false> result;
    using default_ops::eval_modulus;
    eval_modulus(result.backend(), a.backend(), b.backend());
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 template <class B, class V>
 inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
@@ -171,7 +171,7 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    mp_number<B, false> result;
    using default_ops::eval_modulus;
    eval_modulus(result.backend(), a.backend(), static_cast<canonical_type>(b));
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 template <class V, class B>
 inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
@@ -181,7 +181,7 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    mp_number<B, false> result;
    using default_ops::eval_modulus;
    eval_modulus(result.backend(), static_cast<canonical_type>(a), b.backend());
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 //
 // Bitwise or:
@@ -192,7 +192,7 @@ inline mp_number<B, false> operator | (const mp_number<B, false>& a, const mp_nu
    mp_number<B, false> result;
    using default_ops::eval_bitwise_or;
    eval_bitwise_or(result.backend(), a.backend(), b.backend());
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 template <class B, class V>
 inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
@@ -202,7 +202,7 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    mp_number<B, false> result;
    using default_ops::eval_bitwise_or;
    eval_bitwise_or(result.backend(), a.backend(), static_cast<canonical_type>(b));
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 template <class V, class B>
 inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
@@ -212,7 +212,7 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    mp_number<B, false> result;
    using default_ops::eval_bitwise_or;
    eval_bitwise_or(result.backend(), b.backend(), static_cast<canonical_type>(a));
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 //
 // Bitwise xor:
@@ -223,7 +223,7 @@ inline mp_number<B, false> operator ^ (const mp_number<B, false>& a, const mp_nu
    mp_number<B, false> result;
    using default_ops::eval_bitwise_xor;
    eval_bitwise_xor(result.backend(), a.backend(), b.backend());
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 template <class B, class V>
 inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
@@ -233,7 +233,7 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    mp_number<B, false> result;
    using default_ops::eval_bitwise_xor;
    eval_bitwise_xor(result.backend(), a.backend(), static_cast<canonical_type>(b));
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 template <class V, class B>
 inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
@@ -243,7 +243,7 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    mp_number<B, false> result;
    using default_ops::eval_bitwise_xor;
    eval_bitwise_xor(result.backend(), b.backend(), static_cast<canonical_type>(a));
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 //
 // Bitwise and:
@@ -254,7 +254,7 @@ inline mp_number<B, false> operator & (const mp_number<B, false>& a, const mp_nu
    mp_number<B, false> result;
    using default_ops::eval_bitwise_and;
    eval_bitwise_and(result.backend(), a.backend(), b.backend());
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 template <class B, class V>
 inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
@@ -264,7 +264,7 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    mp_number<B, false> result;
    using default_ops::eval_bitwise_and;
    eval_bitwise_and(result.backend(), a.backend(), static_cast<canonical_type>(b));
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 template <class V, class B>
 inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
@@ -274,7 +274,7 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    mp_number<B, false> result;
    using default_ops::eval_bitwise_and;
    eval_bitwise_and(result.backend(), b.backend(), static_cast<canonical_type>(a));
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 //
 // shifts:
@@ -286,7 +286,7 @@ inline typename enable_if<is_integral<I>, mp_number<B, false> >::type
    mp_number<B, false> result(a);
    using default_ops::eval_left_shift;
    eval_left_shift(result.backend(), b);
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 template <class B, class I>
 inline typename enable_if<is_integral<I>, mp_number<B, false> >::type
@@ -295,21 +295,29 @@ inline typename enable_if<is_integral<I>, mp_number<B, false> >::type
    mp_number<B, false> result(a);
    using default_ops::eval_right_shift;
    eval_right_shift(result.backend(), b);
-   return result;
+   return BOOST_MP_MOVE(result);
 }
 
 #ifndef BOOST_NO_RVALUE_REFERENCES
 //
-// If we have rvalue references go all over again with rvalue ref overloads and move semantics:
+// If we have rvalue references go all over again with rvalue ref overloads and move semantics.
+// Note that while it would be tempting to implement these so they return an rvalue reference
+// (and indeed this would be optimally efficient), this is unsafe due to users propensity to
+// write:
+//
+// const T& t = a * b;
+//
+// which would lead to a dangling reference if we didn't return by value.  Of course move
+// semantics help a great deal in return by value, so performance is still pretty good...
 //
 template <class B>
-inline mp_number<B, false>&& operator - (mp_number<B, false>&& v) 
+inline mp_number<B, false> operator - (mp_number<B, false>&& v) 
 {
    v.backend().negate();
    return static_cast<mp_number<B, false>&&>(v); 
 }
 template <class B>
-inline mp_number<B, false>&& operator ~ (mp_number<B, false>&& v) 
+inline mp_number<B, false> operator ~ (mp_number<B, false>&& v) 
 {
    eval_complement(v.backend(), v.backend());
    return static_cast<mp_number<B, false>&&>(v); 
@@ -318,28 +326,28 @@ inline mp_number<B, false>&& operator ~ (mp_number<B, false>&& v)
 // Addition:
 //
 template <class B>
-inline mp_number<B, false>&& operator + (mp_number<B, false>&& a, const mp_number<B, false>& b)
+inline mp_number<B, false> operator + (mp_number<B, false>&& a, const mp_number<B, false>& b)
 {
    using default_ops::eval_add;
    eval_add(a.backend(), b.backend());
    return static_cast<mp_number<B, false>&&>(a);
 }
 template <class B>
-inline mp_number<B, false>&& operator + (const mp_number<B, false>& a, mp_number<B, false>&& b)
+inline mp_number<B, false> operator + (const mp_number<B, false>& a, mp_number<B, false>&& b)
 {
    using default_ops::eval_add;
    eval_add(b.backend(), a.backend());
    return static_cast<mp_number<B, false>&&>(b);
 }
 template <class B>
-inline mp_number<B, false>&& operator + (mp_number<B, false>&& a, mp_number<B, false>&& b)
+inline mp_number<B, false> operator + (mp_number<B, false>&& a, mp_number<B, false>&& b)
 {
    using default_ops::eval_add;
    eval_add(a.backend(), b.backend());
    return static_cast<mp_number<B, false>&&>(a);
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
+inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    operator + (mp_number<B, false>&& a, const V& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -348,7 +356,7 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
    return static_cast<mp_number<B, false>&&>(a);
 }
 template <class V, class B>
-inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
+inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    operator + (const V& a, mp_number<B, false>&& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -360,14 +368,14 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
 // Subtraction:
 //
 template <class B>
-inline mp_number<B, false>&& operator - (mp_number<B, false>&& a, const mp_number<B, false>& b)
+inline mp_number<B, false> operator - (mp_number<B, false>&& a, const mp_number<B, false>& b)
 {
    using default_ops::eval_subtract;
    eval_subtract(a.backend(), b.backend());
    return static_cast<mp_number<B, false>&&>(a);
 }
 template <class B>
-inline mp_number<B, false>&& operator - (const mp_number<B, false>& a, mp_number<B, false>&& b)
+inline mp_number<B, false> operator - (const mp_number<B, false>& a, mp_number<B, false>&& b)
 {
    using default_ops::eval_subtract;
    eval_subtract(b.backend(), a.backend());
@@ -375,14 +383,14 @@ inline mp_number<B, false>&& operator - (const mp_number<B, false>& a, mp_number
    return static_cast<mp_number<B, false>&&>(b);
 }
 template <class B>
-inline mp_number<B, false>&& operator - (mp_number<B, false>&& a, mp_number<B, false>&& b)
+inline mp_number<B, false> operator - (mp_number<B, false>&& a, mp_number<B, false>&& b)
 {
    using default_ops::eval_subtract;
    eval_subtract(a.backend(), b.backend());
    return static_cast<mp_number<B, false>&&>(a);
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
+inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    operator - (mp_number<B, false>&& a, const V& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -391,7 +399,7 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
    return static_cast<mp_number<B, false>&&>(a);
 }
 template <class V, class B>
-inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
+inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    operator - (const V& a, mp_number<B, false>&& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -404,28 +412,28 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
 // Multiply:
 //
 template <class B>
-inline mp_number<B, false>&& operator * (mp_number<B, false>&& a, const mp_number<B, false>& b)
+inline mp_number<B, false> operator * (mp_number<B, false>&& a, const mp_number<B, false>& b)
 {
    using default_ops::eval_multiply;
    eval_multiply(a.backend(), b.backend());
    return static_cast<mp_number<B, false>&&>(a);
 }
 template <class B>
-inline mp_number<B, false>&& operator * (const mp_number<B, false>& a, mp_number<B, false>&& b)
+inline mp_number<B, false> operator * (const mp_number<B, false>& a, mp_number<B, false>&& b)
 {
    using default_ops::eval_multiply;
    eval_multiply(b.backend(), a.backend());
    return static_cast<mp_number<B, false>&&>(b);
 }
 template <class B>
-inline mp_number<B, false>&& operator * (mp_number<B, false>&& a, mp_number<B, false>&& b)
+inline mp_number<B, false> operator * (mp_number<B, false>&& a, mp_number<B, false>&& b)
 {
    using default_ops::eval_multiply;
    eval_multiply(a.backend(), b.backend());
    return static_cast<mp_number<B, false>&&>(a);
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
+inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    operator * (mp_number<B, false>&& a, const V& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -434,7 +442,7 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
    return static_cast<mp_number<B, false>&&>(a);
 }
 template <class V, class B>
-inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
+inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    operator * (const V& a, mp_number<B, false>&& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -446,14 +454,14 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
 // divide:
 //
 template <class B>
-inline mp_number<B, false>&& operator / (mp_number<B, false>&& a, const mp_number<B, false>& b)
+inline mp_number<B, false> operator / (mp_number<B, false>&& a, const mp_number<B, false>& b)
 {
    using default_ops::eval_divide;
    eval_divide(a.backend(), b.backend());
    return static_cast<mp_number<B, false>&&>(a);
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
+inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    operator / (mp_number<B, false>&& a, const V& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -465,14 +473,14 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
 // modulus:
 //
 template <class B>
-inline mp_number<B, false>&& operator % (mp_number<B, false>&& a, const mp_number<B, false>& b)
+inline mp_number<B, false> operator % (mp_number<B, false>&& a, const mp_number<B, false>& b)
 {
    using default_ops::eval_modulus;
    eval_modulus(a.backend(), b.backend());
    return static_cast<mp_number<B, false>&&>(a);
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
+inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    operator % (mp_number<B, false>&& a, const V& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -484,28 +492,28 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
 // Bitwise or:
 //
 template <class B>
-inline mp_number<B, false>&& operator | (mp_number<B, false>&& a, const mp_number<B, false>& b)
+inline mp_number<B, false> operator | (mp_number<B, false>&& a, const mp_number<B, false>& b)
 {
    using default_ops::eval_bitwise_or;
    eval_bitwise_or(a.backend(), b.backend());
    return static_cast<mp_number<B, false>&&>(a);
 }
 template <class B>
-inline mp_number<B, false>&& operator | (const mp_number<B, false>& a, mp_number<B, false>&& b)
+inline mp_number<B, false> operator | (const mp_number<B, false>& a, mp_number<B, false>&& b)
 {
    using default_ops::eval_bitwise_or;
    eval_bitwise_or(b.backend(), a.backend());
    return static_cast<mp_number<B, false>&&>(b);
 }
 template <class B>
-inline mp_number<B, false>&& operator | (mp_number<B, false>&& a, mp_number<B, false>&& b)
+inline mp_number<B, false> operator | (mp_number<B, false>&& a, mp_number<B, false>&& b)
 {
    using default_ops::eval_bitwise_or;
    eval_bitwise_or(a.backend(), b.backend());
    return static_cast<mp_number<B, false>&&>(a);
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
+inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    operator | (mp_number<B, false>&& a, const V& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -514,7 +522,7 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
    return static_cast<mp_number<B, false>&&>(a);
 }
 template <class V, class B>
-inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
+inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    operator | (const V& a, mp_number<B, false>&& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -526,28 +534,28 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
 // Bitwise xor:
 //
 template <class B>
-inline mp_number<B, false>&& operator ^ (mp_number<B, false>&& a, const mp_number<B, false>& b)
+inline mp_number<B, false> operator ^ (mp_number<B, false>&& a, const mp_number<B, false>& b)
 {
    using default_ops::eval_bitwise_xor;
    eval_bitwise_xor(a.backend(), b.backend());
    return static_cast<mp_number<B, false>&&>(a);
 }
 template <class B>
-inline mp_number<B, false>&& operator ^ (const mp_number<B, false>& a, mp_number<B, false>&& b)
+inline mp_number<B, false> operator ^ (const mp_number<B, false>& a, mp_number<B, false>&& b)
 {
    using default_ops::eval_bitwise_xor;
    eval_bitwise_xor(b.backend(), a.backend());
    return static_cast<mp_number<B, false>&&>(b);
 }
 template <class B>
-inline mp_number<B, false>&& operator ^ (mp_number<B, false>&& a, mp_number<B, false>&& b)
+inline mp_number<B, false> operator ^ (mp_number<B, false>&& a, mp_number<B, false>&& b)
 {
    using default_ops::eval_bitwise_xor;
    eval_bitwise_xor(a.backend(), b.backend());
    return static_cast<mp_number<B, false>&&>(a);
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
+inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    operator ^ (mp_number<B, false>&& a, const V& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -556,7 +564,7 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
    return static_cast<mp_number<B, false>&&>(a);
 }
 template <class V, class B>
-inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
+inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    operator ^ (const V& a, mp_number<B, false>&& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -568,28 +576,28 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
 // Bitwise and:
 //
 template <class B>
-inline mp_number<B, false>&& operator & (mp_number<B, false>&& a, const mp_number<B, false>& b)
+inline mp_number<B, false> operator & (mp_number<B, false>&& a, const mp_number<B, false>& b)
 {
    using default_ops::eval_bitwise_and;
    eval_bitwise_and(a.backend(), b.backend());
    return static_cast<mp_number<B, false>&&>(a);
 }
 template <class B>
-inline mp_number<B, false>&& operator & (const mp_number<B, false>& a, mp_number<B, false>&& b)
+inline mp_number<B, false> operator & (const mp_number<B, false>& a, mp_number<B, false>&& b)
 {
    using default_ops::eval_bitwise_and;
    eval_bitwise_and(b.backend(), a.backend());
    return static_cast<mp_number<B, false>&&>(b);
 }
 template <class B>
-inline mp_number<B, false>&& operator & (mp_number<B, false>&& a, mp_number<B, false>&& b)
+inline mp_number<B, false> operator & (mp_number<B, false>&& a, mp_number<B, false>&& b)
 {
    using default_ops::eval_bitwise_and;
    eval_bitwise_and(a.backend(), b.backend());
    return static_cast<mp_number<B, false>&&>(a);
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
+inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    operator & (mp_number<B, false>&& a, const V& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -598,7 +606,7 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
    return static_cast<mp_number<B, false>&&>(a);
 }
 template <class V, class B>
-inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
+inline typename enable_if<is_arithmetic<V>, mp_number<B, false> >::type
    operator & (const V& a, mp_number<B, false>&& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -610,7 +618,7 @@ inline typename enable_if<is_arithmetic<V>, mp_number<B, false>&& >::type
 // shifts:
 //
 template <class B, class I>
-inline typename enable_if<is_integral<I>, mp_number<B, false>&& >::type
+inline typename enable_if<is_integral<I>, mp_number<B, false> >::type
    operator << (mp_number<B, false>&& a, const I& b)
 {
    using default_ops::eval_left_shift;
@@ -618,7 +626,7 @@ inline typename enable_if<is_integral<I>, mp_number<B, false>&& >::type
    return static_cast<mp_number<B, false>&&>(a);
 }
 template <class B, class I>
-inline typename enable_if<is_integral<I>, mp_number<B, false>&& >::type
+inline typename enable_if<is_integral<I>, mp_number<B, false> >::type
    operator >> (mp_number<B, false>&& a, const I& b)
 {
    using default_ops::eval_right_shift;

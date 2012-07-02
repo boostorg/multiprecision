@@ -153,7 +153,7 @@ public:
    }
 
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   mp_number(mp_number&& r) : m_backend(r.m_backend){}
+   mp_number(mp_number&& r) : m_backend(static_cast<Backend&&>(r.m_backend)){}
    mp_number& operator=(mp_number&& r)
    {
       m_backend.swap(r.m_backend);
@@ -171,7 +171,7 @@ public:
    mp_number& operator+=(const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       // Create a copy if e contains this, but not if we're just doing a
-      //    x *= x
+      //    x += x
       if(contains_self(e) && !is_self(e))
       {
          self_type temp(e);
@@ -202,7 +202,7 @@ public:
    template <class Exp>
    mp_number& operator-=(const detail::mp_exp<Exp>& e)
    {
-      // Create a copy if e contains this, but not if we're just doing a
+      // Create a copy if e contains this:
       if(contains_self(e))
       {
          self_type temp(e);
@@ -235,7 +235,7 @@ public:
    mp_number& operator*=(const detail::mp_exp<Exp>& e)
    {
       // Create a temporary if the RHS references *this, but not
-      // if we're just doing an   x += x;
+      // if we're just doing an   x *= x;
       if(contains_self(e) && !is_self(e))
       {
          self_type temp(e);
@@ -1094,20 +1094,20 @@ private:
    void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const Tag1&, const detail::terminal&)
    {
       self_type temp1(val1);
-      f(m_backend, temp1.backend(), function_arg_value(val2));
+      f(m_backend, BOOST_MP_MOVE(temp1.backend()), function_arg_value(val2));
    }
    template <class F, class Exp1, class Exp2, class Tag2>
    void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const detail::terminal&, const Tag2&)
    {
       self_type temp2(val2);
-      f(m_backend, function_arg_value(val1), temp2.backend());
+      f(m_backend, function_arg_value(val1), BOOST_MP_MOVE(temp2.backend()));
    }
    template <class F, class Exp1, class Exp2, class Tag1, class Tag2>
    void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const Tag1&, const Tag2&)
    {
       self_type temp1(val1);
       self_type temp2(val2);
-      f(m_backend, temp1.backend(), temp2.backend());
+      f(m_backend, BOOST_MP_MOVE(temp1.backend()), BOOST_MP_MOVE(temp2.backend()));
    }
 
    template <class Exp>
@@ -1130,7 +1130,7 @@ private:
    void do_assign_function_3a(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const Tag1&, const Tag2& t2, const Tag3& t3)
    {
       mp_number t(val1);
-      do_assign_function_3b(f, t, val2, val3, t2, t3);
+      do_assign_function_3b(f, BOOST_MP_MOVE(t), val2, val3, t2, t3);
    }
    template <class F, class Exp1, class Exp2, class Exp3, class Tag3>
    void do_assign_function_3b(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const detail::terminal&, const Tag3& t3)
@@ -1141,7 +1141,7 @@ private:
    void do_assign_function_3b(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const Tag2& /*t2*/, const Tag3& t3)
    {
       mp_number t(val2);
-      do_assign_function_3c(f, val1, t, val3, t3);
+      do_assign_function_3c(f, val1, BOOST_MP_MOVE(t), val3, t3);
    }
    template <class F, class Exp1, class Exp2, class Exp3>
    void do_assign_function_3c(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const detail::terminal&)
@@ -1152,7 +1152,7 @@ private:
    void do_assign_function_3c(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const Tag3& /*t3*/)
    {
       mp_number t(val3);
-      do_assign_function_3c(f, val1, val2, t, detail::terminal());
+      do_assign_function_3c(f, val1, val2, BOOST_MP_MOVE(t), detail::terminal());
    }
 
    template <class Exp>
@@ -1469,23 +1469,23 @@ private:
 
    // Tests if the expression contains a reference to *this:
    template <class Exp>
-   bool contains_self(const Exp& e)const
+   bool contains_self(const Exp& e)const BOOST_NOEXCEPT
    {
       return contains_self(e, typename Exp::arity());
    }
    template <class Exp>
-   bool contains_self(const Exp& e, mpl::int_<0> const&)const
+   bool contains_self(const Exp& e, mpl::int_<0> const&)const BOOST_NOEXCEPT
    {
       return is_realy_self(e.value());
    }
    template <class Exp>
-   bool contains_self(const Exp& e, mpl::int_<1> const&)const
+   bool contains_self(const Exp& e, mpl::int_<1> const&)const BOOST_NOEXCEPT
    {
       typedef typename Exp::left_type child_type;
       return contains_self(e.left(), typename child_type::arity());
    }
    template <class Exp>
-   bool contains_self(const Exp& e, mpl::int_<2> const&)const
+   bool contains_self(const Exp& e, mpl::int_<2> const&)const BOOST_NOEXCEPT
    {
       typedef typename Exp::left_type child0_type;
       typedef typename Exp::right_type child1_type;
@@ -1493,7 +1493,7 @@ private:
          || contains_self(e.right(), typename child1_type::arity());
    }
    template <class Exp>
-   bool contains_self(const Exp& e, mpl::int_<3> const&)const
+   bool contains_self(const Exp& e, mpl::int_<3> const&)const BOOST_NOEXCEPT
    {
       typedef typename Exp::left_type child0_type;
       typedef typename Exp::middle_type child1_type;
@@ -1505,37 +1505,37 @@ private:
 
    // Test if the expression is a reference to *this:
    template <class Exp>
-   bool is_self(const Exp& e)const
+   bool is_self(const Exp& e)const BOOST_NOEXCEPT
    {
       return is_self(e, typename Exp::arity());
    }
    template <class Exp>
-   bool is_self(const Exp& e, mpl::int_<0> const&)const
+   bool is_self(const Exp& e, mpl::int_<0> const&)const BOOST_NOEXCEPT
    {
       return is_realy_self(e.value());
    }
    template <class Exp, int v>
-   bool is_self(const Exp&, mpl::int_<v> const&)const
+   BOOST_CONSTEXPR bool is_self(const Exp&, mpl::int_<v> const&)const BOOST_NOEXCEPT
    {
       return false;
    }
 
    template <class Val>
-   bool is_realy_self(const Val&)const { return false; }
-   bool is_realy_self(const self_type& v)const { return &v == this; }
+   BOOST_CONSTEXPR bool is_realy_self(const Val&)const BOOST_NOEXCEPT{ return false; } 
+   BOOST_CONSTEXPR bool is_realy_self(const self_type& v)const BOOST_NOEXCEPT{ return &v == this; } 
 
-   static const Backend& canonical_value(const self_type& v){  return v.m_backend;  }
+   static const Backend& canonical_value(const self_type& v) BOOST_NOEXCEPT {  return v.m_backend;  }
    template <class V>
-   static typename detail::canonical<V, Backend>::type canonical_value(const V& v){  return static_cast<typename detail::canonical<V, Backend>::type>(v);  }
-   static typename detail::canonical<std::string, Backend>::type canonical_value(const std::string& v){  return v.c_str();  }
+   static typename detail::canonical<V, Backend>::type canonical_value(const V& v) BOOST_NOEXCEPT {  return static_cast<typename detail::canonical<V, Backend>::type>(v);  }
+   static typename detail::canonical<std::string, Backend>::type canonical_value(const std::string& v) BOOST_NOEXCEPT {  return v.c_str();  }
 
-   static const Backend& function_arg_value(const self_type& v) {  return v.backend();  }
+   static const Backend& function_arg_value(const self_type& v) BOOST_NOEXCEPT {  return v.backend();  }
    template <class V>
-   static const V& function_arg_value(const V& v) {  return v;  }
+   static const V& function_arg_value(const V& v) BOOST_NOEXCEPT {  return v;  }
    template <class A1, class A2, class A3, class A4>
-   static const A1& function_arg_value(const detail::mp_exp<detail::terminal, A1, A2, A3, A4>& exp) { return exp.value(); }
+   static const A1& function_arg_value(const detail::mp_exp<detail::terminal, A1, A2, A3, A4>& exp) BOOST_NOEXCEPT { return exp.value(); }
    template <class A2, class A3, class A4>
-   static const Backend& function_arg_value(const detail::mp_exp<detail::terminal, mp_number<Backend>, A2, A3, A4>& exp) { return exp.value().backend(); }
+   static const Backend& function_arg_value(const detail::mp_exp<detail::terminal, mp_number<Backend>, A2, A3, A4>& exp) BOOST_NOEXCEPT { return exp.value().backend(); }
    Backend m_backend;
 };
 
