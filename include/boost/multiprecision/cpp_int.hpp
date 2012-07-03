@@ -1072,6 +1072,10 @@ inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, c
    result.resize(as + bs);
    typename cpp_int_backend<MinBits, Signed, Allocator>::limb_pointer pr = result.limbs();
 
+   static const double_limb_type limb_max = ~static_cast<limb_type>(0u);
+   static const double_limb_type double_limb_max = ~static_cast<double_limb_type>(0u);
+   BOOST_STATIC_ASSERT(double_limb_max - 2 * limb_max >= limb_max * limb_max);
+
    double_limb_type carry = 0;
    std::memset(pr, 0, result.size() * sizeof(limb_type));
    for(unsigned i = 0; i < as; ++i)
@@ -1080,9 +1084,9 @@ inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, c
       for(unsigned j = 0; j < inner_limit; ++j)
       {
          BOOST_ASSERT(i+j < result.size());
-         BOOST_ASSERT((std::numeric_limits<double_limb_type>::max)() - carry > static_cast<double_limb_type>(cpp_int_backend<MinBits, Signed, Allocator>::max_limb_value) * static_cast<double_limb_type>(cpp_int_backend<MinBits, Signed, Allocator>::max_limb_value));
+         BOOST_ASSERT(!std::numeric_limits<double_limb_type>::is_specialized || ((std::numeric_limits<double_limb_type>::max)() - carry > static_cast<double_limb_type>(cpp_int_backend<MinBits, Signed, Allocator>::max_limb_value) * static_cast<double_limb_type>(cpp_int_backend<MinBits, Signed, Allocator>::max_limb_value)));
          carry += static_cast<double_limb_type>(pa[i]) * static_cast<double_limb_type>(pb[j]);
-         BOOST_ASSERT((std::numeric_limits<double_limb_type>::max)() - carry >= pr[i+j]);
+         BOOST_ASSERT(!std::numeric_limits<double_limb_type>::is_specialized || ((std::numeric_limits<double_limb_type>::max)() - carry >= pr[i+j]));
          carry += pr[i + j];
          pr[i + j] = static_cast<limb_type>(carry);
          carry >>= cpp_int_backend<MinBits, Signed, Allocator>::limb_bits;

@@ -83,7 +83,7 @@ Yields the output:
 
 [pre 9.822663964796047e-001]
 
-Now lets implement the function again, but this time using the multiprecision type
+Now let's implement the function again, but this time using the multiprecision type
 `cpp_dec_float_50` as the argument type:
 
 */   

@@ -44,7 +44,7 @@ public:
    {
       m_backend = canonical_value(v);
    }
-   mp_number(const mp_number& e, unsigned digits10) BOOST_NOEXCEPT_IF(noexcept(Backend(static_cast<const Backend&>(std::declval<Backend>()), 0u))) 
+   mp_number(const mp_number& e, unsigned digits10)
       : m_backend(e.m_backend, digits10){}
    /*
    //
