@@ -53,7 +53,16 @@ exe performance_test : performance_test.cpp /boost/system//boost_system
           <define>TEST_CPP_INT
           ;
 
-exe sf_performance : sf_performance.cpp /boost/system//boost_system /boost/system//boost_chrono /boost/system//boost_thread
+exe miller_rabin_performance : miller_rabin_performance.cpp /boost/system//boost_system /boost/chrono//boost_chrono 
+          : release
+          [ check-target-builds ../config//has_gmp : <define>TEST_MPF <define>TEST_MPZ <source>gmp : ]
+          [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>mpfr : ]
+          #[ check-target-builds ../config//has_tommath : <define>TEST_TOMMATH <source>$(TOMMATH) : ]
+          <define>TEST_CPP_DEC_FLOAT
+          <define>TEST_CPP_INT
+          ;
+
+exe sf_performance : sf_performance.cpp /boost/system//boost_system /boost/chrono//boost_chrono /boost/thread//boost_thread
           : release
           [ check-target-builds ../config//has_gmp : <define>TEST_MPF <define>TEST_MPZ <source>gmp : ]
           [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>mpfr : ]
@@ -105,5 +114,8 @@ exe linpack_benchmark_double : obj_linpack_benchmark_double  f2c
           : release
           ;
 
-install . : performance_test sf_performance linpack_benchmark_double linpack_benchmark_cpp_float linpack_benchmark_mpf linpack_benchmark_mpfr ;
+install miller_rabin_install : miller_rabin_performance : <location>. ;
+install performance_test_install : performance_test  : <location>. ;
+install sf_performance_install : sf_performance   : <location>. ;
+install . : linpack_benchmark_double linpack_benchmark_cpp_float linpack_benchmark_mpf linpack_benchmark_mpfr ;
 

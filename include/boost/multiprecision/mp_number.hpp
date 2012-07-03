@@ -37,14 +37,15 @@ class mp_number
    typedef mp_number<Backend, ExpressionTemplates> self_type;
 public:
    typedef Backend backend_type;
-   mp_number(){}
-   mp_number(const mp_number& e) : m_backend(e.m_backend){}
+   BOOST_CONSTEXPR mp_number() BOOST_NOEXCEPT_IF(noexcept(Backend())) {}
+   mp_number(const mp_number& e) BOOST_NOEXCEPT_IF(noexcept(Backend(static_cast<const Backend&>(std::declval<Backend>())))) : m_backend(e.m_backend){}
    template <class V>
    mp_number(V v, typename enable_if<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > >::type* = 0)
    {
       m_backend = canonical_value(v);
    }
-   mp_number(const mp_number& e, unsigned digits10) : m_backend(e.m_backend, digits10){}
+   mp_number(const mp_number& e, unsigned digits10) BOOST_NOEXCEPT_IF(noexcept(Backend(static_cast<const Backend&>(std::declval<Backend>()), 0u))) 
+      : m_backend(e.m_backend, digits10){}
    /*
    //
    // This conflicts with component based initialization (for rational and complex types)
@@ -58,10 +59,10 @@ public:
    }
    */
    template<bool ET>
-   mp_number(const mp_number<Backend, ET>& val) : m_backend(val.m_backend) {}
+   mp_number(const mp_number<Backend, ET>& val) BOOST_NOEXCEPT_IF(noexcept(Backend(static_cast<const Backend&>(std::declval<Backend>())))) : m_backend(val.m_backend) {}
 
    template <class Other, bool ET>
-   mp_number(const mp_number<Other, ET>& val, typename enable_if<boost::is_convertible<Other, Backend> >::type* = 0)
+   mp_number(const mp_number<Other, ET>& val, typename enable_if<boost::is_convertible<Other, Backend> >::type* = 0) BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend>() = std::declval<Other>()))
    {
       m_backend = val.backend();
    }
@@ -88,6 +89,7 @@ public:
 
    template <class V>
    mp_number(V v, typename enable_if<mpl::and_<is_convertible<V, Backend>, mpl::not_<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > > > >::type* = 0)
+      BOOST_NOEXCEPT_IF(noexcept(Backend(static_cast<const V&>(std::declval<V>()))))
       : m_backend(v){}
 
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
@@ -98,7 +100,7 @@ public:
       return *this;
    }
 
-   mp_number& operator=(const mp_number& e)
+   mp_number& operator=(const mp_number& e) BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend>() = static_cast<const Backend&>(std::declval<Backend>())))
    {
       m_backend = e.m_backend;
       return *this;
@@ -106,7 +108,7 @@ public:
 
    template <class V>
    typename enable_if<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> >, mp_number<Backend, ExpressionTemplates>& >::type 
-      operator=(const V& v)
+      operator=(const V& v) BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend>() = std::declval<typename boost::multiprecision::detail::canonical<V, Backend>::type>()))
    {
       m_backend = canonical_value(v);
       return *this;
@@ -114,14 +116,14 @@ public:
 
    template <class V>
    typename enable_if<mpl::and_<is_convertible<V, Backend>, mpl::not_<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > > >, mp_number<Backend, ExpressionTemplates>& >::type 
-      operator=(const V& v)
+      operator=(const V& v) BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend>() = static_cast<const V&>(std::declval<V>())))
    {
       m_backend = v;
       return *this;
    }
 
    template <bool ET>
-   mp_number& operator=(const mp_number<Backend, ET>& v)
+   mp_number& operator=(const mp_number<Backend, ET>& v) BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend>() = static_cast<const Backend&>(std::declval<Backend>())))
    {
       m_backend = v.backend();
       return *this;
@@ -129,7 +131,7 @@ public:
 
    template <class Other>
    typename enable_if<is_convertible<Other, Backend>, mp_number<Backend, ExpressionTemplates>& >::type 
-      operator=(const mp_number<Other>& v)
+      operator=(const mp_number<Other>& v) BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend>() = static_cast<const Other&>(std::declval<Other>())))
    {
       m_backend = v.backend();
       return *this;
@@ -153,8 +155,8 @@ public:
    }
 
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   mp_number(mp_number&& r) : m_backend(static_cast<Backend&&>(r.m_backend)){}
-   mp_number& operator=(mp_number&& r)
+   mp_number(mp_number&& r) BOOST_NOEXCEPT : m_backend(static_cast<Backend&&>(r.m_backend)){}
+   mp_number& operator=(mp_number&& r) BOOST_NOEXCEPT 
    {
       m_backend.swap(r.m_backend);
       return *this;
@@ -316,7 +318,7 @@ public:
       using default_ops::eval_increment;
       self_type temp(*this);
       eval_increment(m_backend);
-      return temp;
+      return BOOST_MP_MOVE(temp);
    }
 
    mp_number operator--(int)
@@ -324,7 +326,7 @@ public:
       using default_ops::eval_decrement;
       self_type temp(*this);
       eval_decrement(m_backend);
-      return temp;
+      return BOOST_MP_MOVE(temp);
    }
 
    template <class V>
@@ -491,7 +493,7 @@ public:
    //
    // swap:
    //
-   void swap(self_type& other)
+   void swap(self_type& other) BOOST_NOEXCEPT
    {
       m_backend.swap(other.backend());
    }
@@ -526,7 +528,7 @@ public:
    //
    // Default precision:
    //
-   static unsigned default_precision()
+   static unsigned default_precision() BOOST_NOEXCEPT
    {
       return Backend::default_precision();
    }
@@ -534,7 +536,7 @@ public:
    {
       Backend::default_precision(digits10);
    }
-   unsigned precision()const
+   unsigned precision()const BOOST_NOEXCEPT
    {
       return m_backend.precision();
    }
@@ -546,6 +548,7 @@ public:
    // Comparison:
    //
    int compare(const mp_number<Backend, ExpressionTemplates>& o)const
+      BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend>().compare(std::declval<Backend>())))
    {
       return m_backend.compare(o.m_backend);
    }
@@ -557,11 +560,11 @@ public:
          return eval_get_sign(m_backend);
       return m_backend.compare(canonical_value(o));
    }
-   Backend& backend()
+   Backend& backend() BOOST_NOEXCEPT
    {
       return m_backend;
    }
-   const Backend& backend()const
+   const Backend& backend()const BOOST_NOEXCEPT
    {
       return m_backend;
    }
@@ -603,7 +606,7 @@ private:
          BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
    }
    template <class V>
-   void check_shift_range(V, const mpl::false_&, const mpl::false_&){}
+   void check_shift_range(V, const mpl::false_&, const mpl::false_&) BOOST_NOEXCEPT{}
 
    template <class Exp>
    void do_assign(const Exp& e, const detail::add_immediates&)
@@ -611,15 +614,6 @@ private:
       using default_ops::eval_add;
       eval_add(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
-/*
-   template <class Exp>
-   void do_assign(const Exp& e, const detail::add_and_negate_immediates&)
-   {
-      using default_ops::eval_add;
-      eval_add(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
-      m_backend.negate();
-   }
-*/
    template <class Exp>
    void do_assign(const Exp& e, const detail::subtract_immediates&)
    {
@@ -1469,23 +1463,23 @@ private:
 
    // Tests if the expression contains a reference to *this:
    template <class Exp>
-   bool contains_self(const Exp& e)const BOOST_NOEXCEPT
+   BOOST_CONSTEXPR bool contains_self(const Exp& e)const BOOST_NOEXCEPT
    {
       return contains_self(e, typename Exp::arity());
    }
    template <class Exp>
-   bool contains_self(const Exp& e, mpl::int_<0> const&)const BOOST_NOEXCEPT
+   BOOST_CONSTEXPR bool contains_self(const Exp& e, mpl::int_<0> const&)const BOOST_NOEXCEPT
    {
       return is_realy_self(e.value());
    }
    template <class Exp>
-   bool contains_self(const Exp& e, mpl::int_<1> const&)const BOOST_NOEXCEPT
+   BOOST_CONSTEXPR bool contains_self(const Exp& e, mpl::int_<1> const&)const BOOST_NOEXCEPT
    {
       typedef typename Exp::left_type child_type;
       return contains_self(e.left(), typename child_type::arity());
    }
    template <class Exp>
-   bool contains_self(const Exp& e, mpl::int_<2> const&)const BOOST_NOEXCEPT
+   BOOST_CONSTEXPR bool contains_self(const Exp& e, mpl::int_<2> const&)const BOOST_NOEXCEPT
    {
       typedef typename Exp::left_type child0_type;
       typedef typename Exp::right_type child1_type;
@@ -1493,7 +1487,7 @@ private:
          || contains_self(e.right(), typename child1_type::arity());
    }
    template <class Exp>
-   bool contains_self(const Exp& e, mpl::int_<3> const&)const BOOST_NOEXCEPT
+   BOOST_CONSTEXPR bool contains_self(const Exp& e, mpl::int_<3> const&)const BOOST_NOEXCEPT
    {
       typedef typename Exp::left_type child0_type;
       typedef typename Exp::middle_type child1_type;
@@ -1505,12 +1499,12 @@ private:
 
    // Test if the expression is a reference to *this:
    template <class Exp>
-   bool is_self(const Exp& e)const BOOST_NOEXCEPT
+   BOOST_CONSTEXPR bool is_self(const Exp& e)const BOOST_NOEXCEPT
    {
       return is_self(e, typename Exp::arity());
    }
    template <class Exp>
-   bool is_self(const Exp& e, mpl::int_<0> const&)const BOOST_NOEXCEPT
+   BOOST_CONSTEXPR bool is_self(const Exp& e, mpl::int_<0> const&)const BOOST_NOEXCEPT
    {
       return is_realy_self(e.value());
    }
@@ -1524,18 +1518,18 @@ private:
    BOOST_CONSTEXPR bool is_realy_self(const Val&)const BOOST_NOEXCEPT{ return false; } 
    BOOST_CONSTEXPR bool is_realy_self(const self_type& v)const BOOST_NOEXCEPT{ return &v == this; } 
 
-   static const Backend& canonical_value(const self_type& v) BOOST_NOEXCEPT {  return v.m_backend;  }
+   static BOOST_CONSTEXPR const Backend& canonical_value(const self_type& v) BOOST_NOEXCEPT {  return v.m_backend;  }
    template <class V>
-   static typename detail::canonical<V, Backend>::type canonical_value(const V& v) BOOST_NOEXCEPT {  return static_cast<typename detail::canonical<V, Backend>::type>(v);  }
+   static BOOST_CONSTEXPR typename detail::canonical<V, Backend>::type canonical_value(const V& v) BOOST_NOEXCEPT {  return static_cast<typename detail::canonical<V, Backend>::type>(v);  }
    static typename detail::canonical<std::string, Backend>::type canonical_value(const std::string& v) BOOST_NOEXCEPT {  return v.c_str();  }
 
-   static const Backend& function_arg_value(const self_type& v) BOOST_NOEXCEPT {  return v.backend();  }
+   static BOOST_CONSTEXPR const Backend& function_arg_value(const self_type& v) BOOST_NOEXCEPT {  return v.backend();  }
    template <class V>
-   static const V& function_arg_value(const V& v) BOOST_NOEXCEPT {  return v;  }
+   static BOOST_CONSTEXPR const V& function_arg_value(const V& v) BOOST_NOEXCEPT {  return v;  }
    template <class A1, class A2, class A3, class A4>
    static const A1& function_arg_value(const detail::mp_exp<detail::terminal, A1, A2, A3, A4>& exp) BOOST_NOEXCEPT { return exp.value(); }
    template <class A2, class A3, class A4>
-   static const Backend& function_arg_value(const detail::mp_exp<detail::terminal, mp_number<Backend>, A2, A3, A4>& exp) BOOST_NOEXCEPT { return exp.value().backend(); }
+   static BOOST_CONSTEXPR const Backend& function_arg_value(const detail::mp_exp<detail::terminal, mp_number<Backend>, A2, A3, A4>& exp) BOOST_NOEXCEPT { return exp.value().backend(); }
    Backend m_backend;
 };
 

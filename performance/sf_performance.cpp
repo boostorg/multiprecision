@@ -273,7 +273,11 @@ int main()
    mpfr::mpreal::set_default_prec(50 * 1000L / 301L);
 #endif
 #ifdef TEST_MPFR
+#if MPFR_VERSION<MPFR_VERSION_NUM(3,0,0)
+   time_proc("mpfr_float_50", test_bessel<boost::multiprecision::mpfr_float_50>, 1);
+#else
    time_proc("mpfr_float_50", test_bessel<boost::multiprecision::mpfr_float_50>, mpfr_buildopt_tls_p() ? 3 : 1);
+#endif
 #endif
 #ifdef TEST_MPF
    time_proc("mpf_float_50", test_bessel<mpf_float_50>, 3);
