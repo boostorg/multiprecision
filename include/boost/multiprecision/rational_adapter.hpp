@@ -60,6 +60,7 @@ struct rational_adapter
       multiprecision::mp_number<IntBackend> v1, v2;
       char c;
       bool have_hex = false;
+      const char* p = s; // saved for later
 
       while((0 != (c = *s)) && (c == 'x' || c == 'X' || c == '-' || c == '+' || (c >= '0' && c <= '9') || (have_hex && (c >= 'a' && c <= 'f')) || (have_hex && (c >= 'A' && c <= 'F'))))
       {
@@ -84,6 +85,10 @@ struct rational_adapter
       }
       else
          v2 = 1;
+      if(*s)
+      {
+         BOOST_THROW_EXCEPTION(std::runtime_error(std::string("Could parse the string \"") + p + std::string("\" as a valid rational number.")));
+      }
       data().assign(v1, v2);
       return *this;
    }
@@ -141,6 +146,11 @@ inline void eval_multiply(rational_adapter<IntBackend>& result, const rational_a
 template <class IntBackend>
 inline void eval_divide(rational_adapter<IntBackend>& result, const rational_adapter<IntBackend>& o)
 {
+   using default_ops::eval_is_zero;
+   if(eval_is_zero(o))
+   {
+      BOOST_THROW_EXCEPTION(std::runtime_error("Divide by zero."));
+   }
    result.data() /= o.data();
 }
 

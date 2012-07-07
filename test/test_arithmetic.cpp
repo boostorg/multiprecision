@@ -11,9 +11,9 @@
 #include <vld.h>
 #endif
 
-#include <boost/detail/lightweight_test.hpp>
 #include <boost/math/special_functions/pow.hpp>
 #include <boost/math/common_factor_rt.hpp>
+#include "test.hpp"
 
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && \
    !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ) \
@@ -64,6 +64,12 @@
 #include <boost/rational.hpp>
 
 #define NO_MIXED_OPS
+
+template <class T>
+bool is_boost_rational(const boost::rational<T>&)
+{
+   return true;
+}
 
 namespace boost{ namespace multiprecision{
 
@@ -146,6 +152,12 @@ void test_complement(Real, Real, Real, const boost::mpl::false_&)
 template <class Real, class T>
 void test_integer_ops(const T&){}
 
+template <class T>
+bool is_boost_rational(const T&)
+{
+   return false;
+}
+
 template <class Real>
 void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_rational>&)
 {
@@ -156,6 +168,25 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    Real b(4);
    b /= 6;
    BOOST_TEST(a == b);
+
+   //
+   // Boost.Rational has a slightly different error handling stategy,
+   // we only test our own:
+   //
+   if(!is_boost_rational(a))
+   {
+      BOOST_CHECK_THROW(Real(a / 0), std::runtime_error);
+      BOOST_CHECK_THROW(Real("3.14"), std::runtime_error);
+      b = "2/3";
+      BOOST_CHECK_EQUAL(a, b);
+   }
+   //
+   // Check IO code:
+   //
+   std::stringstream ss;
+   ss << a;
+   ss >> b;
+   BOOST_CHECK_EQUAL(a, b);
 }
 
 template <class Real>
@@ -451,6 +482,12 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    BOOST_TEST(powm(Real(3) + 0, 4 + 0, Real(13)) == 81 % 13);
    BOOST_TEST(powm(Real(3) + 0, 4 + 0, 13) == 81 % 13);
    BOOST_TEST(powm(Real(3) + 0, 4 + 0, Real(13) + 0) == 81 % 13);
+   //
+   // Things that are expected errors:
+   //
+   BOOST_CHECK_THROW(Real("3.14"), std::runtime_error);
+   BOOST_CHECK_THROW(Real("3L"), std::runtime_error);
+   BOOST_CHECK_THROW(Real(Real(20) / 0u), std::runtime_error);
 }
 
 template <class Real, class T>
@@ -517,6 +554,21 @@ void test_float_ops(const boost::mpl::int_<boost::multiprecision::number_kind_fl
    BOOST_TEST(r == boost::math::pow<6>(3.25));
    r = pow(v, 25);
    BOOST_TEST(r == boost::math::pow<25>(Real(3.25)));
+   //
+   // Things that are expected errors:
+   //
+   BOOST_CHECK_THROW(Real("3.14L"), std::runtime_error);
+   if(std::numeric_limits<Real>::is_specialized)
+   {
+      if(std::numeric_limits<Real>::has_infinity)
+      {
+         BOOST_CHECK(boost::math::isinf(Real(20) / 0u));
+      }
+      else
+      {
+         BOOST_CHECK_THROW(Real(Real(20) / 0u), std::runtime_error);
+      }
+   }
 }
 
 template <class T>

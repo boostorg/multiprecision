@@ -41,7 +41,7 @@ namespace detail{
 // Workaround for missing abs(long long) on some compilers:
 //
 template <class T>
-typename boost::enable_if<is_arithmetic<T>, T>::type abs(const T& t)
+typename boost::enable_if<is_arithmetic<T>, T>::type abs(const T& t) BOOST_NOEXCEPT
 {
    return t < 0 ? -t : t;
 }
@@ -258,7 +258,7 @@ struct mp_exp<tag, Arg1, void, void, void>
 
    left_type left()const { return left_type(arg); }
 
-   const Arg1& left_ref()const{ return arg; }
+   const Arg1& left_ref()const BOOST_NOEXCEPT { return arg; }
 
    static const unsigned depth = left_type::depth + 1;
 
@@ -282,7 +282,7 @@ struct mp_exp<terminal, Arg1, void, void, void>
 
    explicit mp_exp(const Arg1& a) : arg(a) {}
 
-   const Arg1& value()const { return arg; }
+   const Arg1& value()const BOOST_NOEXCEPT { return arg; }
 
    static const unsigned depth = 0;
 
@@ -311,8 +311,8 @@ struct mp_exp<tag, Arg1, Arg2, void, void>
 
    left_type left()const { return left_type(arg1); }
    right_type right()const { return right_type(arg2); }
-   const Arg1& left_ref()const{ return arg1; }
-   const Arg2& right_ref()const{ return arg2; }
+   const Arg1& left_ref()const BOOST_NOEXCEPT { return arg1; }
+   const Arg2& right_ref()const BOOST_NOEXCEPT { return arg2; }
 
    operator unmentionable_type()const
    {
@@ -350,9 +350,9 @@ struct mp_exp<tag, Arg1, Arg2, Arg3, void>
    left_type left()const { return left_type(arg1); }
    middle_type middle()const { return middle_type(arg2); }
    right_type right()const { return right_type(arg3); }
-   const Arg1& left_ref()const{ return arg1; }
-   const Arg2& middle_ref()const{ return arg2; }
-   const Arg3& right_ref()const{ return arg3; }
+   const Arg1& left_ref()const BOOST_NOEXCEPT { return arg1; }
+   const Arg2& middle_ref()const BOOST_NOEXCEPT { return arg2; }
+   const Arg3& right_ref()const BOOST_NOEXCEPT { return arg3; }
 
    operator unmentionable_type()const
    {
@@ -398,10 +398,10 @@ struct mp_exp
    left_middle_type left_middle()const { return left_middle_type(arg2); }
    right_middle_type right_middle()const { return right_middle_type(arg3); }
    right_type right()const { return right_type(arg4); }
-   const Arg1& left_ref()const{ return arg1; }
-   const Arg2& left_middle_ref()const{ return arg2; }
-   const Arg3& right_middle_ref()const{ return arg3; }
-   const Arg4& right_ref()const{ return arg4; }
+   const Arg1& left_ref()const BOOST_NOEXCEPT { return arg1; }
+   const Arg2& left_middle_ref()const BOOST_NOEXCEPT { return arg2; }
+   const Arg3& right_middle_ref()const BOOST_NOEXCEPT { return arg3; }
+   const Arg4& right_ref()const BOOST_NOEXCEPT { return arg4; }
 
    operator unmentionable_type()const
    {

@@ -35,7 +35,7 @@ struct mpfr_float_imp
    typedef mpl::list<double, long double>                 float_types;
    typedef long                                           exponent_type;
 
-   mpfr_float_imp(){}
+   mpfr_float_imp() BOOST_NOEXCEPT {}
 
    mpfr_float_imp(const mpfr_float_imp& o)
    {
@@ -43,24 +43,36 @@ struct mpfr_float_imp
       mpfr_set(m_data, o.m_data, GMP_RNDN);
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   mpfr_float_imp(mpfr_float_imp&& o)
+   mpfr_float_imp(mpfr_float_imp&& o) BOOST_NOEXCEPT
    {
       m_data[0] = o.m_data[0];
       o.m_data[0]._mpfr_d = 0;
    }
 #endif
-   mpfr_float_imp& operator = (const mpfr_float_imp& o)
+   mpfr_float_imp& operator = (const mpfr_float_imp& o) BOOST_NOEXCEPT
    {
       mpfr_set(m_data, o.m_data, GMP_RNDN);
       return *this;
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   mpfr_float_imp& operator = (mpfr_float_imp&& o)
+   mpfr_float_imp& operator = (mpfr_float_imp&& o) BOOST_NOEXCEPT
    {
       mpfr_swap(m_data, o.m_data);
       return *this;
    }
 #endif
+#ifdef _MPFR_H_HAVE_INTMAX_T
+   mpfr_float_imp& operator = (unsigned long long i) BOOST_NOEXCEPT
+   {
+      mpfr_set_uj(m_data, i, GMP_RNDN);
+      return *this;
+   }
+   mpfr_float_imp& operator = (long long i) BOOST_NOEXCEPT
+   {
+      mpfr_set_sj(m_data, i, GMP_RNDN);
+      return *this;
+   }
+#else
    mpfr_float_imp& operator = (unsigned long long i)
    {
       unsigned long long mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
@@ -89,76 +101,36 @@ struct mpfr_float_imp
          mpfr_neg(m_data, m_data, GMP_RNDN);
       return *this;
    }
-   mpfr_float_imp& operator = (unsigned long i)
+#endif
+   mpfr_float_imp& operator = (unsigned long i) BOOST_NOEXCEPT
    {
       mpfr_set_ui(m_data, i, GMP_RNDN);
       return *this;
    }
-   mpfr_float_imp& operator = (long i)
+   mpfr_float_imp& operator = (long i) BOOST_NOEXCEPT
    {
       mpfr_set_si(m_data, i, GMP_RNDN);
       return *this;
    }
-   mpfr_float_imp& operator = (double d)
+   mpfr_float_imp& operator = (double d) BOOST_NOEXCEPT
    {
       mpfr_set_d(m_data, d, GMP_RNDN);
       return *this;
    }
-   mpfr_float_imp& operator = (long double a)
+   mpfr_float_imp& operator = (long double a) BOOST_NOEXCEPT
    {
-      using std::frexp;
-      using std::ldexp;
-      using std::floor;
-
-      if (a == 0) {
-         mpfr_set_si(m_data, 0, GMP_RNDN);
-         return *this;
-      }
-
-      if (a == 1) {
-         mpfr_set_si(m_data, 1, GMP_RNDN);
-         return *this;
-      }
-
-      BOOST_ASSERT(!(boost::math::isinf)(a));
-      BOOST_ASSERT(!(boost::math::isnan)(a));
-
-      int e;
-      long double f, term;
-      mpfr_init_set_ui(m_data, 0u, GMP_RNDN);
-
-      f = frexp(a, &e);
-
-      static const int shift = std::numeric_limits<int>::digits - 1;
-
-      while(f)
-      {
-         // extract int sized bits from f:
-         f = ldexp(f, shift);
-         term = floor(f);
-         e -= shift;
-         mpfr_mul_2exp(m_data, m_data, shift, GMP_RNDN);
-         if(term > 0)
-            mpfr_add_ui(m_data, m_data, static_cast<unsigned>(term), GMP_RNDN);
-         else
-            mpfr_sub_ui(m_data, m_data, static_cast<unsigned>(-term), GMP_RNDN);
-         f -= term;
-      }
-      if(e > 0)
-         mpfr_mul_2exp(m_data, m_data, e, GMP_RNDN);
-      else if(e < 0)
-         mpfr_div_2exp(m_data, m_data, -e, GMP_RNDN);
+      mpfr_set_ld(m_data, a, GMP_RNDN);
       return *this;
    }
    mpfr_float_imp& operator = (const char* s)
    {
       if(mpfr_set_str(m_data, s, 10, GMP_RNDN) != 0)
       {
-         BOOST_THROW_EXCEPTION(std::runtime_error("Unable to parse string as a valid floating point number."));
+         BOOST_THROW_EXCEPTION(std::runtime_error(std::string("Unable to parse string \"") + s + std::string("\"as a valid floating point number.")));
       }
       return *this;
    }
-   void swap(mpfr_float_imp& o)
+   void swap(mpfr_float_imp& o) BOOST_NOEXCEPT
    {
       mpfr_swap(m_data, o.m_data);
    }
@@ -267,39 +239,39 @@ struct mpfr_float_imp
       boost::multiprecision::detail::format_float_string(result, e, org_digits, f, 0 != mpfr_zero_p(m_data));
       return result;
    }
-   ~mpfr_float_imp()
+   ~mpfr_float_imp() BOOST_NOEXCEPT
    {
       if(m_data[0]._mpfr_d)
          mpfr_clear(m_data);
    }
-   void negate()
+   void negate() BOOST_NOEXCEPT
    {
       mpfr_neg(m_data, m_data, GMP_RNDN);
    }
-   int compare(const mpfr_float_backend<digits10>& o)const
+   int compare(const mpfr_float_backend<digits10>& o)const BOOST_NOEXCEPT
    {
       return mpfr_cmp(m_data, o.m_data);
    }
-   int compare(long i)const
+   int compare(long i)const BOOST_NOEXCEPT
    {
       return mpfr_cmp_si(m_data, i);
    }
-   int compare(unsigned long i)const
+   int compare(unsigned long i)const BOOST_NOEXCEPT
    {
       return mpfr_cmp_ui(m_data, i);
    }
    template <class V>
-   int compare(V v)const
+   int compare(V v)const BOOST_NOEXCEPT
    {
       mpfr_float_backend<digits10> d;
       d = v;
       return compare(d);
    }
-   mpfr_t& data() { return m_data; }
-   const mpfr_t& data()const { return m_data; }
+   mpfr_t& data() BOOST_NOEXCEPT { return m_data; }
+   const mpfr_t& data()const BOOST_NOEXCEPT { return m_data; }
 protected:
    mpfr_t m_data;
-   static unsigned& get_default_precision()
+   static unsigned& get_default_precision() BOOST_NOEXCEPT
    {
       static unsigned val = 50;
       return val;
@@ -367,7 +339,7 @@ struct mpfr_float_backend : public detail::mpfr_float_imp<digits10>
       return *this;
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   mpfr_float_backend& operator=(mpfr_float_backend&& o)
+   mpfr_float_backend& operator=(mpfr_float_backend&& o) BOOST_NOEXCEPT
    {
       *static_cast<detail::mpfr_float_imp<digits10>*>(this) = static_cast<detail::mpfr_float_imp<digits10>&&>(o);
       return *this;
@@ -379,44 +351,44 @@ struct mpfr_float_backend : public detail::mpfr_float_imp<digits10>
       *static_cast<detail::mpfr_float_imp<digits10>*>(this) = v;
       return *this;
    }
-   mpfr_float_backend& operator=(const mpfr_t& val)
+   mpfr_float_backend& operator=(const mpfr_t& val)BOOST_NOEXCEPT
    {
       mpfr_set(this->m_data, val, GMP_RNDN);
       return *this;
    }
-   mpfr_float_backend& operator=(const mpf_t& val)
+   mpfr_float_backend& operator=(const mpf_t& val)BOOST_NOEXCEPT
    {
       mpfr_set_f(this->m_data, val, GMP_RNDN);
       return *this;
    }
-   mpfr_float_backend& operator=(const mpz_t& val)
+   mpfr_float_backend& operator=(const mpz_t& val)BOOST_NOEXCEPT
    {
       mpfr_set_z(this->m_data, val, GMP_RNDN);
       return *this;
    }
-   mpfr_float_backend& operator=(const mpq_t& val)
+   mpfr_float_backend& operator=(const mpq_t& val)BOOST_NOEXCEPT
    {
       mpfr_set_q(this->m_data, val, GMP_RNDN);
       return *this;
    }
    template <unsigned D>
-   mpfr_float_backend& operator=(const mpfr_float_backend<D>& val)
+   mpfr_float_backend& operator=(const mpfr_float_backend<D>& val) BOOST_NOEXCEPT
    {
       mpfr_set(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
    template <unsigned D>
-   mpfr_float_backend& operator=(const gmp_float<D>& val)
+   mpfr_float_backend& operator=(const gmp_float<D>& val) BOOST_NOEXCEPT
    {
       mpfr_set_f(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
-   mpfr_float_backend& operator=(const gmp_int& val)
+   mpfr_float_backend& operator=(const gmp_int& val) BOOST_NOEXCEPT
    {
       mpfr_set_z(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
-   mpfr_float_backend& operator=(const gmp_rational& val)
+   mpfr_float_backend& operator=(const gmp_rational& val) BOOST_NOEXCEPT
    {
       mpfr_set_q(this->m_data, val.data(), GMP_RNDN);
       return *this;
@@ -456,7 +428,7 @@ struct mpfr_float_backend<0> : public detail::mpfr_float_imp<0>
    }
    mpfr_float_backend(const mpfr_float_backend& o) : detail::mpfr_float_imp<0>(o) {}
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   mpfr_float_backend(mpfr_float_backend&& o) : detail::mpfr_float_imp<0>(static_cast<detail::mpfr_float_imp<0>&&>(o)) {}
+   mpfr_float_backend(mpfr_float_backend&& o) BOOST_NOEXCEPT : detail::mpfr_float_imp<0>(static_cast<detail::mpfr_float_imp<0>&&>(o)) {}
 #endif
    mpfr_float_backend(const mpfr_float_backend& o, unsigned digits10) 
    {
@@ -492,7 +464,7 @@ struct mpfr_float_backend<0> : public detail::mpfr_float_imp<0>
       return *this;
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   mpfr_float_backend& operator=(mpfr_float_backend&& o)
+   mpfr_float_backend& operator=(mpfr_float_backend&& o) BOOST_NOEXCEPT
    {
       *static_cast<detail::mpfr_float_imp<0>*>(this) = static_cast<detail::mpfr_float_imp<0> &&>(o);
       return *this;
@@ -504,78 +476,78 @@ struct mpfr_float_backend<0> : public detail::mpfr_float_imp<0>
       *static_cast<detail::mpfr_float_imp<0>*>(this) = v;
       return *this;
    }
-   mpfr_float_backend& operator=(const mpfr_t& val)
+   mpfr_float_backend& operator=(const mpfr_t& val) BOOST_NOEXCEPT
    {
       mpfr_set(this->m_data, val, GMP_RNDN);
       return *this;
    }
-   mpfr_float_backend& operator=(const mpf_t& val)
+   mpfr_float_backend& operator=(const mpf_t& val) BOOST_NOEXCEPT
    {
       mpfr_set_f(this->m_data, val, GMP_RNDN);
       return *this;
    }
-   mpfr_float_backend& operator=(const mpz_t& val)
+   mpfr_float_backend& operator=(const mpz_t& val) BOOST_NOEXCEPT
    {
       mpfr_set_z(this->m_data, val, GMP_RNDN);
       return *this;
    }
-   mpfr_float_backend& operator=(const mpq_t& val)
+   mpfr_float_backend& operator=(const mpq_t& val) BOOST_NOEXCEPT
    {
       mpfr_set_q(this->m_data, val, GMP_RNDN);
       return *this;
    }
    template <unsigned D>
-   mpfr_float_backend& operator=(const mpfr_float_backend<D>& val)
+   mpfr_float_backend& operator=(const mpfr_float_backend<D>& val) BOOST_NOEXCEPT
    {
       mpfr_set(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
    template <unsigned D>
-   mpfr_float_backend& operator=(const gmp_float<D>& val)
+   mpfr_float_backend& operator=(const gmp_float<D>& val) BOOST_NOEXCEPT
    {
       mpfr_set_f(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
-   mpfr_float_backend& operator=(const gmp_int& val)
+   mpfr_float_backend& operator=(const gmp_int& val) BOOST_NOEXCEPT
    {
       mpfr_set_z(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
-   mpfr_float_backend& operator=(const gmp_rational& val)
+   mpfr_float_backend& operator=(const gmp_rational& val) BOOST_NOEXCEPT
    {
       mpfr_set_q(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
-   static unsigned default_precision()
+   static unsigned default_precision() BOOST_NOEXCEPT
    {
       return get_default_precision();
    }
-   static void default_precision(unsigned v)
+   static void default_precision(unsigned v) BOOST_NOEXCEPT
    {
       get_default_precision() = v;
    }
-   unsigned precision()const
+   unsigned precision()const BOOST_NOEXCEPT
    {
       return mpfr_get_prec(this->m_data) * 301L / 1000 - 1;
    }
-   void precision(unsigned digits10)
+   void precision(unsigned digits10) BOOST_NOEXCEPT
    {
       mpfr_set_prec(this->m_data, (digits10 + 1) * 1000L / 301);
    }
 };
 
 template <unsigned digits10>
-inline void eval_add(mpfr_float_backend<digits10>& result, const mpfr_float_backend<digits10>& o)
+inline void eval_add(mpfr_float_backend<digits10>& result, const mpfr_float_backend<digits10>& o) BOOST_NOEXCEPT
 {
    mpfr_add(result.data(), result.data(), o.data(), GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_subtract(mpfr_float_backend<digits10>& result, const mpfr_float_backend<digits10>& o)
+inline void eval_subtract(mpfr_float_backend<digits10>& result, const mpfr_float_backend<digits10>& o) BOOST_NOEXCEPT
 {
    mpfr_sub(result.data(), result.data(), o.data(), GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_multiply(mpfr_float_backend<digits10>& result, const mpfr_float_backend<digits10>& o)
+inline void eval_multiply(mpfr_float_backend<digits10>& result, const mpfr_float_backend<digits10>& o) BOOST_NOEXCEPT
 {
    mpfr_mul(result.data(), result.data(), o.data(), GMP_RNDN);
 }
@@ -585,17 +557,17 @@ inline void eval_divide(mpfr_float_backend<digits10>& result, const mpfr_float_b
    mpfr_div(result.data(), result.data(), o.data(), GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_add(mpfr_float_backend<digits10>& result, unsigned long i)
+inline void eval_add(mpfr_float_backend<digits10>& result, unsigned long i) BOOST_NOEXCEPT
 {
    mpfr_add_ui(result.data(), result.data(), i, GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_subtract(mpfr_float_backend<digits10>& result, unsigned long i)
+inline void eval_subtract(mpfr_float_backend<digits10>& result, unsigned long i) BOOST_NOEXCEPT
 {
    mpfr_sub_ui(result.data(), result.data(), i, GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_multiply(mpfr_float_backend<digits10>& result, unsigned long i)
+inline void eval_multiply(mpfr_float_backend<digits10>& result, unsigned long i) BOOST_NOEXCEPT
 {
    mpfr_mul_ui(result.data(), result.data(), i, GMP_RNDN);
 }
@@ -605,7 +577,7 @@ inline void eval_divide(mpfr_float_backend<digits10>& result, unsigned long i)
    mpfr_div_ui(result.data(), result.data(), i, GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_add(mpfr_float_backend<digits10>& result, long i)
+inline void eval_add(mpfr_float_backend<digits10>& result, long i) BOOST_NOEXCEPT
 {
    if(i > 0)
       mpfr_add_ui(result.data(), result.data(), i, GMP_RNDN);
@@ -613,7 +585,7 @@ inline void eval_add(mpfr_float_backend<digits10>& result, long i)
       mpfr_sub_ui(result.data(), result.data(), std::abs(i), GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_subtract(mpfr_float_backend<digits10>& result, long i)
+inline void eval_subtract(mpfr_float_backend<digits10>& result, long i) BOOST_NOEXCEPT
 {
    if(i > 0)
       mpfr_sub_ui(result.data(), result.data(), i, GMP_RNDN);
@@ -621,7 +593,7 @@ inline void eval_subtract(mpfr_float_backend<digits10>& result, long i)
       mpfr_add_ui(result.data(), result.data(), std::abs(i), GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_multiply(mpfr_float_backend<digits10>& result, long i)
+inline void eval_multiply(mpfr_float_backend<digits10>& result, long i) BOOST_NOEXCEPT
 {
    mpfr_mul_ui(result.data(), result.data(), std::abs(i), GMP_RNDN);
    if(i < 0)
@@ -638,17 +610,17 @@ inline void eval_divide(mpfr_float_backend<digits10>& result, long i)
 // Specialised 3 arg versions of the basic operators:
 //
 template <unsigned digits10>
-inline void eval_add(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, const mpfr_float_backend<digits10>& y)
+inline void eval_add(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, const mpfr_float_backend<digits10>& y) BOOST_NOEXCEPT
 {
    mpfr_add(a.data(), x.data(), y.data(), GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_add(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, unsigned long y)
+inline void eval_add(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, unsigned long y) BOOST_NOEXCEPT
 {
    mpfr_add_ui(a.data(), x.data(), y, GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_add(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, long y)
+inline void eval_add(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, long y) BOOST_NOEXCEPT
 {
    if(y < 0)
       mpfr_sub_ui(a.data(), x.data(), -y, GMP_RNDN);
@@ -656,12 +628,12 @@ inline void eval_add(mpfr_float_backend<digits10>& a, const mpfr_float_backend<d
       mpfr_add_ui(a.data(), x.data(), y, GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_add(mpfr_float_backend<digits10>& a, unsigned long x, const mpfr_float_backend<digits10>& y)
+inline void eval_add(mpfr_float_backend<digits10>& a, unsigned long x, const mpfr_float_backend<digits10>& y) BOOST_NOEXCEPT
 {
    mpfr_add_ui(a.data(), y.data(), x, GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_add(mpfr_float_backend<digits10>& a, long x, const mpfr_float_backend<digits10>& y)
+inline void eval_add(mpfr_float_backend<digits10>& a, long x, const mpfr_float_backend<digits10>& y) BOOST_NOEXCEPT
 {
    if(x < 0)
    {
@@ -672,17 +644,17 @@ inline void eval_add(mpfr_float_backend<digits10>& a, long x, const mpfr_float_b
       mpfr_add_ui(a.data(), y.data(), x, GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_subtract(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, const mpfr_float_backend<digits10>& y)
+inline void eval_subtract(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, const mpfr_float_backend<digits10>& y) BOOST_NOEXCEPT
 {
    mpfr_sub(a.data(), x.data(), y.data(), GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_subtract(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, unsigned long y)
+inline void eval_subtract(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, unsigned long y) BOOST_NOEXCEPT
 {
    mpfr_sub_ui(a.data(), x.data(), y, GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_subtract(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, long y)
+inline void eval_subtract(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, long y) BOOST_NOEXCEPT
 {
    if(y < 0)
       mpfr_add_ui(a.data(), x.data(), -y, GMP_RNDN);
@@ -690,12 +662,12 @@ inline void eval_subtract(mpfr_float_backend<digits10>& a, const mpfr_float_back
       mpfr_sub_ui(a.data(), x.data(), y, GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_subtract(mpfr_float_backend<digits10>& a, unsigned long x, const mpfr_float_backend<digits10>& y)
+inline void eval_subtract(mpfr_float_backend<digits10>& a, unsigned long x, const mpfr_float_backend<digits10>& y) BOOST_NOEXCEPT
 {
    mpfr_ui_sub(a.data(), x, y.data(), GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_subtract(mpfr_float_backend<digits10>& a, long x, const mpfr_float_backend<digits10>& y)
+inline void eval_subtract(mpfr_float_backend<digits10>& a, long x, const mpfr_float_backend<digits10>& y) BOOST_NOEXCEPT
 {
    if(x < 0)
    {
@@ -707,17 +679,17 @@ inline void eval_subtract(mpfr_float_backend<digits10>& a, long x, const mpfr_fl
 }
 
 template <unsigned digits10>
-inline void eval_multiply(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, const mpfr_float_backend<digits10>& y)
+inline void eval_multiply(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, const mpfr_float_backend<digits10>& y) BOOST_NOEXCEPT
 {
    mpfr_mul(a.data(), x.data(), y.data(), GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_multiply(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, unsigned long y)
+inline void eval_multiply(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, unsigned long y) BOOST_NOEXCEPT
 {
    mpfr_mul_ui(a.data(), x.data(), y, GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_multiply(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, long y)
+inline void eval_multiply(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, long y) BOOST_NOEXCEPT
 {
    if(y < 0)
    {
@@ -728,12 +700,12 @@ inline void eval_multiply(mpfr_float_backend<digits10>& a, const mpfr_float_back
       mpfr_mul_ui(a.data(), x.data(), y, GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_multiply(mpfr_float_backend<digits10>& a, unsigned long x, const mpfr_float_backend<digits10>& y)
+inline void eval_multiply(mpfr_float_backend<digits10>& a, unsigned long x, const mpfr_float_backend<digits10>& y) BOOST_NOEXCEPT
 {
    mpfr_mul_ui(a.data(), y.data(), x, GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_multiply(mpfr_float_backend<digits10>& a, long x, const mpfr_float_backend<digits10>& y)
+inline void eval_multiply(mpfr_float_backend<digits10>& a, long x, const mpfr_float_backend<digits10>& y) BOOST_NOEXCEPT
 {
    if(x < 0)
    {
@@ -783,12 +755,12 @@ inline void eval_divide(mpfr_float_backend<digits10>& a, long x, const mpfr_floa
 }
 
 template <unsigned digits10>
-inline bool eval_is_zero(const mpfr_float_backend<digits10>& val)
+inline bool eval_is_zero(const mpfr_float_backend<digits10>& val) BOOST_NOEXCEPT
 {
    return 0 != mpfr_zero_p(val.data());
 }
 template <unsigned digits10>
-inline int eval_get_sign(const mpfr_float_backend<digits10>& val)
+inline int eval_get_sign(const mpfr_float_backend<digits10>& val) BOOST_NOEXCEPT
 {
    return mpfr_sgn(val.data());
 }
@@ -796,32 +768,48 @@ inline int eval_get_sign(const mpfr_float_backend<digits10>& val)
 template <unsigned digits10>
 inline void eval_convert_to(unsigned long* result, const mpfr_float_backend<digits10>& val)
 {
+   if(mpfr_nan_p(val.data()))
+   {
+      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert NaN to integer."));
+   }
    *result = mpfr_get_ui(val.data(), GMP_RNDN);
 }
 template <unsigned digits10>
 inline void eval_convert_to(long* result, const mpfr_float_backend<digits10>& val)
 {
+   if(mpfr_nan_p(val.data()))
+   {
+      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert NaN to integer."));
+   }
    *result = mpfr_get_si(val.data(), GMP_RNDN);
 }
 #ifdef _MPFR_H_HAVE_INTMAX_T
 template <unsigned digits10>
 inline void eval_convert_to(unsigned long long* result, const mpfr_float_backend<digits10>& val)
 {
+   if(mpfr_nan_p(val.data()))
+   {
+      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert NaN to integer."));
+   }
    *result = mpfr_get_uj(val.data(), GMP_RNDN);
 }
 template <unsigned digits10>
 inline void eval_convert_to(long long* result, const mpfr_float_backend<digits10>& val)
 {
+   if(mpfr_nan_p(val.data()))
+   {
+      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert NaN to integer."));
+   }
    *result = mpfr_get_sj(val.data(), GMP_RNDN);
 }
 #endif
 template <unsigned digits10>
-inline void eval_convert_to(double* result, const mpfr_float_backend<digits10>& val)
+inline void eval_convert_to(double* result, const mpfr_float_backend<digits10>& val) BOOST_NOEXCEPT
 {
    *result = mpfr_get_d(val.data(), GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_convert_to(long double* result, const mpfr_float_backend<digits10>& val)
+inline void eval_convert_to(long double* result, const mpfr_float_backend<digits10>& val) BOOST_NOEXCEPT
 {
    *result = mpfr_get_ld(val.data(), GMP_RNDN);
 }
@@ -830,29 +818,29 @@ inline void eval_convert_to(long double* result, const mpfr_float_backend<digits
 // Native non-member operations:
 //
 template <unsigned Digits10>
-inline void eval_sqrt(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& val)
+inline void eval_sqrt(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& val) BOOST_NOEXCEPT
 {
    mpfr_sqrt(result.data(), val.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_abs(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& val)
+inline void eval_abs(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& val) BOOST_NOEXCEPT
 {
    mpfr_abs(result.data(), val.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_fabs(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& val)
+inline void eval_fabs(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& val) BOOST_NOEXCEPT
 {
    mpfr_abs(result.data(), val.data(), GMP_RNDN);
 }
 template <unsigned Digits10>
-inline void eval_ceil(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& val)
+inline void eval_ceil(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& val) BOOST_NOEXCEPT
 {
    mpfr_ceil(result.data(), val.data());
 }
 template <unsigned Digits10>
-inline void eval_floor(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& val)
+inline void eval_floor(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& val) BOOST_NOEXCEPT
 {
    mpfr_floor(result.data(), val.data());
 }
@@ -867,7 +855,7 @@ inline void eval_trunc(mpfr_float_backend<Digits10>& result, const mpfr_float_ba
    mpfr_trunc(result.data(), val.data());
 }
 template <unsigned Digits10>
-inline void eval_ldexp(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& val, long e)
+inline void eval_ldexp(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& val, long e) BOOST_NOEXCEPT
 {
    if(e > 0)
       mpfr_mul_2exp(result.data(), val.data(), e, GMP_RNDN);
@@ -877,7 +865,7 @@ inline void eval_ldexp(mpfr_float_backend<Digits10>& result, const mpfr_float_ba
       result = val;
 }
 template <unsigned Digits10>
-inline void eval_frexp(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& val, int* e)
+inline void eval_frexp(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& val, int* e) BOOST_NOEXCEPT
 {
    long v;
    mpfr_get_d_2exp(&v, val.data(), GMP_RNDN);
@@ -885,20 +873,20 @@ inline void eval_frexp(mpfr_float_backend<Digits10>& result, const mpfr_float_ba
    eval_ldexp(result, val, -v);
 }
 template <unsigned Digits10>
-inline void eval_frexp(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& val, long* e)
+inline void eval_frexp(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& val, long* e) BOOST_NOEXCEPT
 {
    mpfr_get_d_2exp(e, val.data(), GMP_RNDN);
    return eval_ldexp(result, val, -*e);
 }
 
 template <unsigned Digits10>
-inline int eval_fpclassify(const mpfr_float_backend<Digits10>& val)
+inline int eval_fpclassify(const mpfr_float_backend<Digits10>& val) BOOST_NOEXCEPT
 {
    return mpfr_inf_p(val.data()) ? FP_INFINITE : mpfr_nan_p(val.data()) ? FP_NAN : mpfr_zero_p(val.data()) ? FP_ZERO : FP_NORMAL;
 }
 
 template <unsigned Digits10>
-inline void eval_pow(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& b, const mpfr_float_backend<Digits10>& e)
+inline void eval_pow(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& b, const mpfr_float_backend<Digits10>& e) BOOST_NOEXCEPT
 {
    mpfr_pow(result.data(), b.data(), e.data(), GMP_RNDN);
 }
@@ -915,13 +903,13 @@ inline void eval_pow(mpfr_float_backend<Digits10>& result, const mpfr_float_back
 #endif
 
 template <unsigned Digits10, class Integer>
-inline typename enable_if<mpl::and_<is_signed<Integer>, mpl::bool_<BOOST_MP_ENABLE_IF_WORKAROUND (sizeof(Integer) <= sizeof(long))> > >::type eval_pow(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& b, const Integer& e)
+inline typename enable_if<mpl::and_<is_signed<Integer>, mpl::bool_<BOOST_MP_ENABLE_IF_WORKAROUND (sizeof(Integer) <= sizeof(long))> > >::type eval_pow(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& b, const Integer& e) BOOST_NOEXCEPT
 {
    mpfr_pow_si(result.data(), b.data(), e, GMP_RNDN);
 }
 
 template <unsigned Digits10, class Integer>
-inline typename enable_if<mpl::and_<is_unsigned<Integer>, mpl::bool_<BOOST_MP_ENABLE_IF_WORKAROUND (sizeof(Integer) <= sizeof(long))> > >::type eval_pow(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& b, const Integer& e)
+inline typename enable_if<mpl::and_<is_unsigned<Integer>, mpl::bool_<BOOST_MP_ENABLE_IF_WORKAROUND (sizeof(Integer) <= sizeof(long))> > >::type eval_pow(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& b, const Integer& e) BOOST_NOEXCEPT
 {
    mpfr_pow_ui(result.data(), b.data(), e, GMP_RNDN);
 }
@@ -929,79 +917,79 @@ inline typename enable_if<mpl::and_<is_unsigned<Integer>, mpl::bool_<BOOST_MP_EN
 #undef BOOST_MP_ENABLE_IF_WORKAROUND
 
 template <unsigned Digits10>
-inline void eval_exp(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg)
+inline void eval_exp(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg) BOOST_NOEXCEPT
 {
    mpfr_exp(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_log(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg)
+inline void eval_log(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg) BOOST_NOEXCEPT
 {
    mpfr_log(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_log10(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg)
+inline void eval_log10(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg) BOOST_NOEXCEPT
 {
    mpfr_log10(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_sin(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg)
+inline void eval_sin(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg) BOOST_NOEXCEPT
 {
    mpfr_sin(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_cos(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg)
+inline void eval_cos(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg) BOOST_NOEXCEPT
 {
    mpfr_cos(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_tan(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg)
+inline void eval_tan(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg) BOOST_NOEXCEPT
 {
    mpfr_tan(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_asin(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg)
+inline void eval_asin(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg) BOOST_NOEXCEPT
 {
    mpfr_asin(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_acos(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg)
+inline void eval_acos(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg) BOOST_NOEXCEPT
 {
    mpfr_acos(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_atan(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg)
+inline void eval_atan(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg) BOOST_NOEXCEPT
 {
    mpfr_atan(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_atan2(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg1, const mpfr_float_backend<Digits10>& arg2)
+inline void eval_atan2(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg1, const mpfr_float_backend<Digits10>& arg2) BOOST_NOEXCEPT
 {
    mpfr_atan2(result.data(), arg1.data(), arg2.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_sinh(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg)
+inline void eval_sinh(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg) BOOST_NOEXCEPT
 {
    mpfr_sinh(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_cosh(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg)
+inline void eval_cosh(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg) BOOST_NOEXCEPT
 {
    mpfr_cosh(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_tanh(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg)
+inline void eval_tanh(mpfr_float_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg) BOOST_NOEXCEPT
 {
    mpfr_tanh(result.data(), arg.data(), GMP_RNDN);
 }
@@ -1023,12 +1011,12 @@ namespace math{
 namespace tools{
 
 template <>
-inline int digits<boost::multiprecision::mpfr_float>()
+inline int digits<boost::multiprecision::mpfr_float>() BOOST_NOEXCEPT
 {
    return boost::multiprecision::backends::detail::get_default_precision();
 }
 template <>
-inline int digits<boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<0>, false> >()
+inline int digits<boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<0>, false> >() BOOST_NOEXCEPT
 {
    return boost::multiprecision::backends::detail::get_default_precision();
 }

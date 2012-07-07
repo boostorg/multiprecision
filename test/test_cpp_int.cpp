@@ -60,6 +60,8 @@ void test()
    unsigned last_error_count = 0;
    boost::timer tim;
 
+   BOOST_CHECK_EQUAL(Number(), 0);
+
    for(int i = 0; i < 10000; ++i)
    {
       mpz_int a = generate_random<mpz_int>(1000);

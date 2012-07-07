@@ -30,6 +30,11 @@ namespace backends{
 template <unsigned digits10>
 struct gmp_float;
 
+//
+// Within this file, the only functions we mark as noexcept are those that manipulate
+// (but don't create) an mpf_t.  All other types may allocate at pretty much any time
+// via a user-supplied allocator, and therefore throw.
+//
 namespace detail{
 
 template <unsigned digits10>
@@ -40,7 +45,7 @@ struct gmp_float_imp
    typedef mpl::list<double, long double>            float_types;
    typedef long                                      exponent_type;
 
-   gmp_float_imp(){}
+   gmp_float_imp() BOOST_NOEXCEPT {}
 
    gmp_float_imp(const gmp_float_imp& o)
    {
@@ -54,7 +59,7 @@ struct gmp_float_imp
       mpf_set(m_data, o.m_data);
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   gmp_float_imp(gmp_float_imp&& o)
+   gmp_float_imp(gmp_float_imp&& o) BOOST_NOEXCEPT
    {
       m_data[0] = o.m_data[0];
       o.m_data[0]._mp_d = 0;
@@ -66,7 +71,7 @@ struct gmp_float_imp
       return *this;
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   gmp_float_imp& operator = (gmp_float_imp&& o)
+   gmp_float_imp& operator = (gmp_float_imp&& o) BOOST_NOEXCEPT
    {
       mpf_swap(m_data, o.m_data);
       return *this;
@@ -100,17 +105,17 @@ struct gmp_float_imp
          mpf_neg(m_data, m_data);
       return *this;
    }
-   gmp_float_imp& operator = (unsigned long i)
+   gmp_float_imp& operator = (unsigned long i) BOOST_NOEXCEPT
    {
       mpf_set_ui(m_data, i);
       return *this;
    }
-   gmp_float_imp& operator = (long i)
+   gmp_float_imp& operator = (long i) BOOST_NOEXCEPT
    {
       mpf_set_si(m_data, i);
       return *this;
    }
-   gmp_float_imp& operator = (double d)
+   gmp_float_imp& operator = (double d) BOOST_NOEXCEPT
    {
       mpf_set_d(m_data, d);
       return *this;
@@ -163,10 +168,11 @@ struct gmp_float_imp
    }
    gmp_float_imp& operator = (const char* s)
    {
-      mpf_set_str(m_data, s, 10);
+      if(0 != mpf_set_str(m_data, s, 10))
+         BOOST_THROW_EXCEPTION(std::runtime_error(std::string("The string \"") + s + std::string("\"could not be interpreted as a valid floating point number.")));
       return *this;
    }
-   void swap(gmp_float_imp& o)
+   void swap(gmp_float_imp& o) BOOST_NOEXCEPT
    {
       mpf_swap(m_data, o.m_data);
    }
@@ -265,24 +271,24 @@ struct gmp_float_imp
       boost::multiprecision::detail::format_float_string(result, e, org_digits, f, mpf_sgn(m_data) == 0);
       return result;
    }
-   ~gmp_float_imp()
+   ~gmp_float_imp() BOOST_NOEXCEPT
    {
       if(m_data[0]._mp_d)
          mpf_clear(m_data);
    }
-   void negate()
+   void negate() BOOST_NOEXCEPT
    {
       mpf_neg(m_data, m_data);
    }
-   int compare(const gmp_float<digits10>& o)const
+   int compare(const gmp_float<digits10>& o)const BOOST_NOEXCEPT
    {
       return mpf_cmp(m_data, o.m_data);
    }
-   int compare(long i)const
+   int compare(long i)const BOOST_NOEXCEPT
    {
       return mpf_cmp_si(m_data, i);
    }
-   int compare(unsigned long i)const
+   int compare(unsigned long i)const BOOST_NOEXCEPT
    {
       return mpf_cmp_ui(m_data, i);
    }
@@ -293,11 +299,11 @@ struct gmp_float_imp
       d = v;
       return compare(d);
    }
-   mpf_t& data() { return m_data; }
-   const mpf_t& data()const { return m_data; }
+   mpf_t& data() BOOST_NOEXCEPT { return m_data; }
+   const mpf_t& data()const BOOST_NOEXCEPT { return m_data; }
 protected:
    mpf_t m_data;
-   static unsigned& get_default_precision()
+   static unsigned& get_default_precision() BOOST_NOEXCEPT
    {
       static unsigned val = 50;
       return val;
@@ -337,7 +343,7 @@ struct gmp_float : public detail::gmp_float_imp<digits10>
       mpf_set_q(this->m_data, val);
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   gmp_float(gmp_float&& o) : detail::gmp_float_imp<digits10>(static_cast<detail::gmp_float_imp<digits10>&&>(o)) {}
+   gmp_float(gmp_float&& o) BOOST_NOEXCEPT : detail::gmp_float_imp<digits10>(static_cast<detail::gmp_float_imp<digits10>&&>(o)) {}
 #endif
    gmp_float& operator=(const gmp_float& o)
    {
@@ -345,7 +351,7 @@ struct gmp_float : public detail::gmp_float_imp<digits10>
       return *this;
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   gmp_float& operator=(gmp_float&& o)
+   gmp_float& operator=(gmp_float&& o) BOOST_NOEXCEPT
    {
       *static_cast<detail::gmp_float_imp<digits10>*>(this) = static_cast<detail::gmp_float_imp<digits10>&&>(o);
       return *this;
@@ -355,17 +361,17 @@ struct gmp_float : public detail::gmp_float_imp<digits10>
    gmp_float& operator=(const gmp_float<D>& o);
    gmp_float& operator=(const gmp_int& o);
    gmp_float& operator=(const gmp_rational& o);
-   gmp_float& operator=(const mpf_t& val)
+   gmp_float& operator=(const mpf_t& val) BOOST_NOEXCEPT
    {
       mpf_set(this->m_data, val);
       return *this;
    }
-   gmp_float& operator=(const mpz_t& val)
+   gmp_float& operator=(const mpz_t& val) BOOST_NOEXCEPT
    {
       mpf_set_z(this->m_data, val);
       return *this;
    }
-   gmp_float& operator=(const mpq_t& val)
+   gmp_float& operator=(const mpq_t& val) BOOST_NOEXCEPT
    {
       mpf_set_q(this->m_data, val);
       return *this;
@@ -412,7 +418,7 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
       mpf_set(this->m_data, o.data());
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   gmp_float(gmp_float&& o) : detail::gmp_float_imp<0>(static_cast<detail::gmp_float_imp<0>&&>(o)) {}
+   gmp_float(gmp_float&& o) BOOST_NOEXCEPT : detail::gmp_float_imp<0>(static_cast<detail::gmp_float_imp<0>&&>(o)) {}
 #endif
    gmp_float(const gmp_int& o);
    gmp_float(const gmp_rational& o);
@@ -428,7 +434,7 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
       return *this;
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   gmp_float& operator=(gmp_float&& o)
+   gmp_float& operator=(gmp_float&& o) BOOST_NOEXCEPT
    {
       *static_cast<detail::gmp_float_imp<0>*>(this) = static_cast<detail::gmp_float_imp<0> &&>(o);
       return *this;
@@ -463,66 +469,75 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
       *static_cast<detail::gmp_float_imp<0>*>(this) = v;
       return *this;
    }
-   static unsigned default_precision()
+   static unsigned default_precision() BOOST_NOEXCEPT
    {
       return get_default_precision();
    }
-   static void default_precision(unsigned v)
+   static void default_precision(unsigned v) BOOST_NOEXCEPT
    {
       get_default_precision() = v;
    }
-   unsigned precision()const
+   unsigned precision()const BOOST_NOEXCEPT
    {
       return mpf_get_prec(this->m_data) * 301L / 1000 - 1;
    }
-   void precision(unsigned digits10)
+   void precision(unsigned digits10) BOOST_NOEXCEPT
    {
       mpf_set_prec(this->m_data, (digits10 + 1) * 1000L / 301);
    }
 };
 
 template <unsigned digits10>
-inline void eval_add(gmp_float<digits10>& result, const gmp_float<digits10>& o)
+inline void eval_add(gmp_float<digits10>& result, const gmp_float<digits10>& o) BOOST_NOEXCEPT
 {
    mpf_add(result.data(), result.data(), o.data());
 }
 template <unsigned digits10>
-inline void eval_subtract(gmp_float<digits10>& result, const gmp_float<digits10>& o)
+inline void eval_subtract(gmp_float<digits10>& result, const gmp_float<digits10>& o) BOOST_NOEXCEPT
 {
    mpf_sub(result.data(), result.data(), o.data());
 }
 template <unsigned digits10>
-inline void eval_multiply(gmp_float<digits10>& result, const gmp_float<digits10>& o)
+inline void eval_multiply(gmp_float<digits10>& result, const gmp_float<digits10>& o) BOOST_NOEXCEPT
 {
    mpf_mul(result.data(), result.data(), o.data());
 }
 template <unsigned digits10>
+inline bool eval_is_zero(const gmp_float<digits10>& val) BOOST_NOEXCEPT
+{
+   return mpf_sgn(val.data()) == 0;
+}
+template <unsigned digits10>
 inline void eval_divide(gmp_float<digits10>& result, const gmp_float<digits10>& o)
 {
+   if(eval_is_zero(o))
+      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
    mpf_div(result.data(), result.data(), o.data());
 }
 template <unsigned digits10>
-inline void eval_add(gmp_float<digits10>& result, unsigned long i)
+inline void eval_add(gmp_float<digits10>& result, unsigned long i) BOOST_NOEXCEPT
 {
    mpf_add_ui(result.data(), result.data(), i);
 }
 template <unsigned digits10>
-inline void eval_subtract(gmp_float<digits10>& result, unsigned long i)
+inline void eval_subtract(gmp_float<digits10>& result, unsigned long i) BOOST_NOEXCEPT
 {
    mpf_sub_ui(result.data(), result.data(), i);
 }
 template <unsigned digits10>
-inline void eval_multiply(gmp_float<digits10>& result, unsigned long i)
+inline void eval_multiply(gmp_float<digits10>& result, unsigned long i) BOOST_NOEXCEPT
 {
    mpf_mul_ui(result.data(), result.data(), i);
 }
 template <unsigned digits10>
 inline void eval_divide(gmp_float<digits10>& result, unsigned long i)
 {
+   if(i == 0)
+      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
    mpf_div_ui(result.data(), result.data(), i);
 }
 template <unsigned digits10>
-inline void eval_add(gmp_float<digits10>& result, long i)
+inline void eval_add(gmp_float<digits10>& result, long i) BOOST_NOEXCEPT
 {
    if(i > 0)
       mpf_add_ui(result.data(), result.data(), i);
@@ -530,7 +545,7 @@ inline void eval_add(gmp_float<digits10>& result, long i)
       mpf_sub_ui(result.data(), result.data(), std::abs(i));
 }
 template <unsigned digits10>
-inline void eval_subtract(gmp_float<digits10>& result, long i)
+inline void eval_subtract(gmp_float<digits10>& result, long i) BOOST_NOEXCEPT
 {
    if(i > 0)
       mpf_sub_ui(result.data(), result.data(), i);
@@ -538,7 +553,7 @@ inline void eval_subtract(gmp_float<digits10>& result, long i)
       mpf_add_ui(result.data(), result.data(), std::abs(i));
 }
 template <unsigned digits10>
-inline void eval_multiply(gmp_float<digits10>& result, long i)
+inline void eval_multiply(gmp_float<digits10>& result, long i) BOOST_NOEXCEPT
 {
    mpf_mul_ui(result.data(), result.data(), std::abs(i));
    if(i < 0)
@@ -547,6 +562,8 @@ inline void eval_multiply(gmp_float<digits10>& result, long i)
 template <unsigned digits10>
 inline void eval_divide(gmp_float<digits10>& result, long i)
 {
+   if(i == 0)
+      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
    mpf_div_ui(result.data(), result.data(), std::abs(i));
    if(i < 0)
       mpf_neg(result.data(), result.data());
@@ -555,17 +572,17 @@ inline void eval_divide(gmp_float<digits10>& result, long i)
 // Specialised 3 arg versions of the basic operators:
 //
 template <unsigned digits10>
-inline void eval_add(gmp_float<digits10>& a, const gmp_float<digits10>& x, const gmp_float<digits10>& y)
+inline void eval_add(gmp_float<digits10>& a, const gmp_float<digits10>& x, const gmp_float<digits10>& y) BOOST_NOEXCEPT
 {
    mpf_add(a.data(), x.data(), y.data());
 }
 template <unsigned digits10>
-inline void eval_add(gmp_float<digits10>& a, const gmp_float<digits10>& x, unsigned long y)
+inline void eval_add(gmp_float<digits10>& a, const gmp_float<digits10>& x, unsigned long y) BOOST_NOEXCEPT
 {
    mpf_add_ui(a.data(), x.data(), y);
 }
 template <unsigned digits10>
-inline void eval_add(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y)
+inline void eval_add(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y) BOOST_NOEXCEPT
 {
    if(y < 0)
       mpf_sub_ui(a.data(), x.data(), -y);
@@ -573,12 +590,12 @@ inline void eval_add(gmp_float<digits10>& a, const gmp_float<digits10>& x, long 
       mpf_add_ui(a.data(), x.data(), y);
 }
 template <unsigned digits10>
-inline void eval_add(gmp_float<digits10>& a, unsigned long x, const gmp_float<digits10>& y)
+inline void eval_add(gmp_float<digits10>& a, unsigned long x, const gmp_float<digits10>& y) BOOST_NOEXCEPT
 {
    mpf_add_ui(a.data(), y.data(), x);
 }
 template <unsigned digits10>
-inline void eval_add(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y)
+inline void eval_add(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y) BOOST_NOEXCEPT
 {
    if(x < 0)
    {
@@ -589,17 +606,17 @@ inline void eval_add(gmp_float<digits10>& a, long x, const gmp_float<digits10>& 
       mpf_add_ui(a.data(), y.data(), x);
 }
 template <unsigned digits10>
-inline void eval_subtract(gmp_float<digits10>& a, const gmp_float<digits10>& x, const gmp_float<digits10>& y)
+inline void eval_subtract(gmp_float<digits10>& a, const gmp_float<digits10>& x, const gmp_float<digits10>& y) BOOST_NOEXCEPT
 {
    mpf_sub(a.data(), x.data(), y.data());
 }
 template <unsigned digits10>
-inline void eval_subtract(gmp_float<digits10>& a, const gmp_float<digits10>& x, unsigned long y)
+inline void eval_subtract(gmp_float<digits10>& a, const gmp_float<digits10>& x, unsigned long y) BOOST_NOEXCEPT
 {
    mpf_sub_ui(a.data(), x.data(), y);
 }
 template <unsigned digits10>
-inline void eval_subtract(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y)
+inline void eval_subtract(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y) BOOST_NOEXCEPT
 {
    if(y < 0)
       mpf_add_ui(a.data(), x.data(), -y);
@@ -607,12 +624,12 @@ inline void eval_subtract(gmp_float<digits10>& a, const gmp_float<digits10>& x, 
       mpf_sub_ui(a.data(), x.data(), y);
 }
 template <unsigned digits10>
-inline void eval_subtract(gmp_float<digits10>& a, unsigned long x, const gmp_float<digits10>& y)
+inline void eval_subtract(gmp_float<digits10>& a, unsigned long x, const gmp_float<digits10>& y) BOOST_NOEXCEPT
 {
    mpf_ui_sub(a.data(), x, y.data());
 }
 template <unsigned digits10>
-inline void eval_subtract(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y)
+inline void eval_subtract(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y) BOOST_NOEXCEPT
 {
    if(x < 0)
    {
@@ -624,17 +641,17 @@ inline void eval_subtract(gmp_float<digits10>& a, long x, const gmp_float<digits
 }
 
 template <unsigned digits10>
-inline void eval_multiply(gmp_float<digits10>& a, const gmp_float<digits10>& x, const gmp_float<digits10>& y)
+inline void eval_multiply(gmp_float<digits10>& a, const gmp_float<digits10>& x, const gmp_float<digits10>& y) BOOST_NOEXCEPT
 {
    mpf_mul(a.data(), x.data(), y.data());
 }
 template <unsigned digits10>
-inline void eval_multiply(gmp_float<digits10>& a, const gmp_float<digits10>& x, unsigned long y)
+inline void eval_multiply(gmp_float<digits10>& a, const gmp_float<digits10>& x, unsigned long y) BOOST_NOEXCEPT
 {
    mpf_mul_ui(a.data(), x.data(), y);
 }
 template <unsigned digits10>
-inline void eval_multiply(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y)
+inline void eval_multiply(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y) BOOST_NOEXCEPT
 {
    if(y < 0)
    {
@@ -645,12 +662,12 @@ inline void eval_multiply(gmp_float<digits10>& a, const gmp_float<digits10>& x, 
       mpf_mul_ui(a.data(), x.data(), y);
 }
 template <unsigned digits10>
-inline void eval_multiply(gmp_float<digits10>& a, unsigned long x, const gmp_float<digits10>& y)
+inline void eval_multiply(gmp_float<digits10>& a, unsigned long x, const gmp_float<digits10>& y) BOOST_NOEXCEPT
 {
    mpf_mul_ui(a.data(), y.data(), x);
 }
 template <unsigned digits10>
-inline void eval_multiply(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y)
+inline void eval_multiply(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y) BOOST_NOEXCEPT
 {
    if(x < 0)
    {
@@ -664,16 +681,22 @@ inline void eval_multiply(gmp_float<digits10>& a, long x, const gmp_float<digits
 template <unsigned digits10>
 inline void eval_divide(gmp_float<digits10>& a, const gmp_float<digits10>& x, const gmp_float<digits10>& y)
 {
+   if(eval_is_zero(y))
+      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
    mpf_div(a.data(), x.data(), y.data());
 }
 template <unsigned digits10>
 inline void eval_divide(gmp_float<digits10>& a, const gmp_float<digits10>& x, unsigned long y)
 {
+   if(y == 0)
+      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
    mpf_div_ui(a.data(), x.data(), y);
 }
 template <unsigned digits10>
 inline void eval_divide(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y)
 {
+   if(y == 0)
+      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
    if(y < 0)
    {
       mpf_div_ui(a.data(), x.data(), -y);
@@ -685,11 +708,15 @@ inline void eval_divide(gmp_float<digits10>& a, const gmp_float<digits10>& x, lo
 template <unsigned digits10>
 inline void eval_divide(gmp_float<digits10>& a, unsigned long x, const gmp_float<digits10>& y)
 {
+   if(eval_is_zero(y))
+      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
    mpf_ui_div(a.data(), x, y.data());
 }
 template <unsigned digits10>
 inline void eval_divide(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y)
 {
+   if(eval_is_zero(y))
+      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
    if(x < 0)
    {
       mpf_ui_div(a.data(), -x, y.data());
@@ -700,18 +727,13 @@ inline void eval_divide(gmp_float<digits10>& a, long x, const gmp_float<digits10
 }
 
 template <unsigned digits10>
-inline bool eval_is_zero(const gmp_float<digits10>& val)
-{
-   return mpf_sgn(val.data()) == 0;
-}
-template <unsigned digits10>
-inline int eval_get_sign(const gmp_float<digits10>& val)
+inline int eval_get_sign(const gmp_float<digits10>& val) BOOST_NOEXCEPT
 {
    return mpf_sgn(val.data());
 }
 
 template <unsigned digits10>
-inline void eval_convert_to(unsigned long* result, const gmp_float<digits10>& val)
+inline void eval_convert_to(unsigned long* result, const gmp_float<digits10>& val) BOOST_NOEXCEPT
 {
    if(0 == mpf_fits_ulong_p(val.data()))
       *result = (std::numeric_limits<unsigned long>::max)();
@@ -719,7 +741,7 @@ inline void eval_convert_to(unsigned long* result, const gmp_float<digits10>& va
       *result = mpf_get_ui(val.data());
 }
 template <unsigned digits10>
-inline void eval_convert_to(long* result, const gmp_float<digits10>& val)
+inline void eval_convert_to(long* result, const gmp_float<digits10>& val) BOOST_NOEXCEPT
 {
    if(0 == mpf_fits_slong_p(val.data()))
    {
@@ -730,7 +752,7 @@ inline void eval_convert_to(long* result, const gmp_float<digits10>& val)
       *result = mpf_get_si(val.data());
 }
 template <unsigned digits10>
-inline void eval_convert_to(double* result, const gmp_float<digits10>& val)
+inline void eval_convert_to(double* result, const gmp_float<digits10>& val) BOOST_NOEXCEPT
 {
    *result = mpf_get_d(val.data());
 }
@@ -804,39 +826,39 @@ inline void eval_convert_to(unsigned long long* result, const gmp_float<digits10
 // Native non-member operations:
 //
 template <unsigned Digits10>
-inline void eval_sqrt(gmp_float<Digits10>& result, const gmp_float<Digits10>& val)
+inline void eval_sqrt(gmp_float<Digits10>& result, const gmp_float<Digits10>& val) BOOST_NOEXCEPT
 {
    mpf_sqrt(result.data(), val.data());
 }
 
 template <unsigned Digits10>
-inline void eval_abs(gmp_float<Digits10>& result, const gmp_float<Digits10>& val)
+inline void eval_abs(gmp_float<Digits10>& result, const gmp_float<Digits10>& val) BOOST_NOEXCEPT
 {
    mpf_abs(result.data(), val.data());
 }
 
 template <unsigned Digits10>
-inline void eval_fabs(gmp_float<Digits10>& result, const gmp_float<Digits10>& val)
+inline void eval_fabs(gmp_float<Digits10>& result, const gmp_float<Digits10>& val) BOOST_NOEXCEPT
 {
    mpf_abs(result.data(), val.data());
 }
 template <unsigned Digits10>
-inline void eval_ceil(gmp_float<Digits10>& result, const gmp_float<Digits10>& val)
+inline void eval_ceil(gmp_float<Digits10>& result, const gmp_float<Digits10>& val) BOOST_NOEXCEPT
 {
    mpf_ceil(result.data(), val.data());
 }
 template <unsigned Digits10>
-inline void eval_floor(gmp_float<Digits10>& result, const gmp_float<Digits10>& val)
+inline void eval_floor(gmp_float<Digits10>& result, const gmp_float<Digits10>& val) BOOST_NOEXCEPT
 {
    mpf_floor(result.data(), val.data());
 }
 template <unsigned Digits10>
-inline void eval_trunc(gmp_float<Digits10>& result, const gmp_float<Digits10>& val)
+inline void eval_trunc(gmp_float<Digits10>& result, const gmp_float<Digits10>& val) BOOST_NOEXCEPT
 {
    mpf_trunc(result.data(), val.data());
 }
 template <unsigned Digits10>
-inline void eval_ldexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& val, long e)
+inline void eval_ldexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& val, long e) BOOST_NOEXCEPT
 {
    if(e > 0)
       mpf_mul_2exp(result.data(), val.data(), e);
@@ -846,7 +868,7 @@ inline void eval_ldexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& v
       result = val;
 }
 template <unsigned Digits10>
-inline void eval_frexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& val, int* e)
+inline void eval_frexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& val, int* e) BOOST_NOEXCEPT
 {
    long v;
    mpf_get_d_2exp(&v, val.data());
@@ -854,7 +876,7 @@ inline void eval_frexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& v
    eval_ldexp(result, val, -v);
 }
 template <unsigned Digits10>
-inline void eval_frexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& val, long* e)
+inline void eval_frexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& val, long* e) BOOST_NOEXCEPT
 {
    mpf_get_d_2exp(e, val.data());
    eval_ldexp(result, val, -*e);
@@ -875,7 +897,7 @@ struct gmp_int
       mpz_init_set(m_data, o.m_data);
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   gmp_int(gmp_int&& o)
+   gmp_int(gmp_int&& o) BOOST_NOEXCEPT
    {
       m_data[0] = o.m_data[0];
       o.m_data[0]._mp_d = 0;
@@ -1015,7 +1037,10 @@ struct gmp_int
          }
       }
       if(n)
-         mpz_set_str(m_data, s, radix);
+      {
+         if(0 != mpz_set_str(m_data, s, radix))
+            BOOST_THROW_EXCEPTION(std::runtime_error(std::string("The string \"") + s + std::string("\"could not be interpreted as a valid integer.")));
+      }
       else
          mpz_set_ui(m_data, 0);
       return *this;
@@ -1111,6 +1136,10 @@ protected:
    mpz_t m_data;
 };
 
+inline bool eval_is_zero(const gmp_int& val)
+{
+   return mpz_sgn(val.data()) == 0;
+}
 inline void eval_add(gmp_int& t, const gmp_int& o)
 {
    mpz_add(t.data(), t.data(), o.data());
@@ -1125,6 +1154,8 @@ inline void eval_multiply(gmp_int& t, const gmp_int& o)
 }
 inline void eval_divide(gmp_int& t, const gmp_int& o)
 {
+   if(eval_is_zero(o))
+      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
    mpz_tdiv_q(t.data(), t.data(), o.data());
 }
 inline void eval_modulus(gmp_int& t, const gmp_int& o)
@@ -1149,6 +1180,8 @@ inline void eval_modulus(gmp_int& t, unsigned long i)
 }
 inline void eval_divide(gmp_int& t, unsigned long i)
 {
+   if(i == 0)
+      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
    mpz_tdiv_q_ui(t.data(), t.data(), i);
 }
 inline void eval_add(gmp_int& t, long i)
@@ -1177,6 +1210,8 @@ inline void eval_modulus(gmp_int& t, long i)
 }
 inline void eval_divide(gmp_int& t, long i)
 {
+   if(i == 0)
+      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
    mpz_tdiv_q_ui(t.data(), t.data(), std::abs(i));
    if(i < 0)
       mpz_neg(t.data(), t.data());
@@ -1231,6 +1266,8 @@ inline void eval_multiply(gmp_int& t, const gmp_int& p, const gmp_int& o)
 }
 inline void eval_divide(gmp_int& t, const gmp_int& p, const gmp_int& o)
 {
+   if(eval_is_zero(o))
+      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
    mpz_tdiv_q(t.data(), p.data(), o.data());
 }
 inline void eval_modulus(gmp_int& t, const gmp_int& p, const gmp_int& o)
@@ -1255,6 +1292,8 @@ inline void eval_modulus(gmp_int& t, const gmp_int& p, unsigned long i)
 }
 inline void eval_divide(gmp_int& t, const gmp_int& p, unsigned long i)
 {
+   if(i == 0)
+      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
    mpz_tdiv_q_ui(t.data(), p.data(), i);
 }
 inline void eval_add(gmp_int& t, const gmp_int& p, long i)
@@ -1283,6 +1322,8 @@ inline void eval_modulus(gmp_int& t, const gmp_int& p, long i)
 }
 inline void eval_divide(gmp_int& t, const gmp_int& p, long i)
 {
+   if(i == 0)
+      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
    mpz_tdiv_q_ui(t.data(), p.data(), std::abs(i));
    if(i < 0)
       mpz_neg(t.data(), t.data());
@@ -1308,10 +1349,6 @@ inline void eval_complement(gmp_int& result, const gmp_int& u)
    mpz_com(result.data(), u.data());
 }
 
-inline bool eval_is_zero(const gmp_int& val)
-{
-   return mpz_sgn(val.data()) == 0;
-}
 inline int eval_get_sign(const gmp_int& val)
 {
    return mpz_sgn(val.data());
@@ -1478,7 +1515,7 @@ struct gmp_rational
       mpq_set_z(m_data, o.data());
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   gmp_rational(gmp_rational&& o)
+   gmp_rational(gmp_rational&& o) BOOST_NOEXCEPT
    {
       m_data[0]._mp_num = o.data()[0]._mp_num;
       m_data[0]._mp_den = o.data()[0]._mp_den;
@@ -1594,7 +1631,8 @@ struct gmp_rational
    }
    gmp_rational& operator = (const char* s)
    {
-      mpq_set_str(m_data, s, 10);
+      if(0 != mpq_set_str(m_data, s, 10))
+         BOOST_THROW_EXCEPTION(std::runtime_error(std::string("The string \"") + s + std::string("\"could not be interpreted as a valid rational number.")));
       return *this;
    }
    gmp_rational& operator=(const gmp_int& o)
@@ -1662,6 +1700,10 @@ protected:
    mpq_t m_data;
 };
 
+inline bool eval_is_zero(const gmp_rational& val)
+{
+   return mpq_sgn(val.data()) == 0;
+}
 inline mp_number<gmp_int> numerator(const mp_number<gmp_rational>& val)
 {
    mp_number<gmp_int> result;
@@ -1689,6 +1731,8 @@ inline void eval_multiply(gmp_rational& t, const gmp_rational& o)
 }
 inline void eval_divide(gmp_rational& t, const gmp_rational& o)
 {
+   if(eval_is_zero(o))
+      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
    mpq_div(t.data(), t.data(), o.data());
 }
 inline void eval_add(gmp_rational& t, const gmp_rational& p, const gmp_rational& o)
@@ -1705,13 +1749,11 @@ inline void eval_multiply(gmp_rational& t, const gmp_rational& p, const gmp_rati
 }
 inline void eval_divide(gmp_rational& t, const gmp_rational& p, const gmp_rational& o)
 {
+   if(eval_is_zero(o))
+      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
    mpq_div(t.data(), p.data(), o.data());
 }
    
-inline bool eval_is_zero(const gmp_rational& val)
-{
-   return mpq_sgn(val.data()) == 0;
-}
 inline int eval_get_sign(const gmp_rational& val)
 {
    return mpq_sgn(val.data());

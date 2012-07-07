@@ -47,7 +47,7 @@ struct tommath_int
       detail::check_tommath_result(mp_init_copy(&m_data, const_cast< ::mp_int*>(&o.m_data)));
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   tommath_int(tommath_int&& o)
+   tommath_int(tommath_int&& o) BOOST_NOEXCEPT
    {
       m_data = o.m_data;
       o.m_data.dp = 0;
@@ -164,8 +164,21 @@ struct tommath_int
    }
    tommath_int& operator = (const char* s)
    {
+      //
+      // We don't use libtommath's own routine because it doesn't error check the input :-(
+      //
+      using default_ops::eval_multiply;
+      using default_ops::eval_add;
       std::size_t n = s ? std::strlen(s) : 0;
-      int radix = 10;
+      *this = static_cast<boost::uint32_t>(0u);
+      unsigned radix = 10;
+      bool isneg = false;
+      if(n && (*s == '-'))
+      {
+         --n;
+         ++s;
+         isneg = true;
+      }
       if(n && (*s == '0'))
       {
          if((n > 1) && ((s[1] == 'x') || (s[1] == 'X')))
@@ -178,13 +191,80 @@ struct tommath_int
          {
             radix = 8;
             n -= 1;
-            s += 1;
          }
       }
       if(n)
-         detail::check_tommath_result(mp_read_radix(&m_data, s, radix));
-      else
-         detail::check_tommath_result(mp_set_int(&m_data, 0));
+      {
+         if(radix == 8 || radix == 16)
+         {
+            unsigned shift = radix == 8 ? 3 : 4;
+            unsigned block_count = DIGIT_BIT / shift;
+            unsigned block_shift = shift * block_count;
+            boost::uint32_t val, block;
+            while(*s)
+            {
+               block = 0;
+               for(unsigned i = 0; (i < block_count); ++i)
+               {
+                  if(*s >= '0' && *s <= '9')
+                     val = *s - '0';
+                  else if(*s >= 'a' && *s <= 'f')
+                     val = 10 + *s - 'a';
+                  else if(*s >= 'A' && *s <= 'F')
+                     val = 10 + *s - 'A';
+                  else
+                     val = 400;
+                  if(val > radix)
+                  {
+                     BOOST_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
+                  }
+                  block <<= shift;
+                  block |= val;
+                  if(!*++s)
+                  {
+                     // final shift is different:
+                     block_shift = (i + 1) * shift;
+                     break;
+                  }
+               }
+               detail::check_tommath_result(mp_mul_2d(&data(), block_shift, &data()));
+               if(data().used)
+                  data().dp[0] |= block;
+               else
+                  *this = block;
+            }
+         }
+         else
+         {
+            // Base 10, we extract blocks of size 10^9 at a time, that way
+            // the number of multiplications is kept to a minimum:
+            boost::uint32_t block_mult = 1000000000;
+            while(*s)
+            {
+               boost::uint32_t block = 0;
+               for(unsigned i = 0; i < 9; ++i)
+               {
+                  boost::uint32_t val;
+                  if(*s >= '0' && *s <= '9')
+                     val = *s - '0';
+                  else
+                     BOOST_THROW_EXCEPTION(std::runtime_error("Unexpected character encountered in input."));
+                  block *= 10;
+                  block += val;
+                  if(!*++s)
+                  {
+                     static const boost::uint32_t block_multiplier[9]  = { 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000 };
+                     block_mult = block_multiplier[i];
+                     break;
+                  }
+               }
+               eval_multiply(*this, block_mult);
+               eval_add(*this, block);
+            }
+         }
+      }
+      if(isneg)
+         this->negate();
       return *this;
    }
    std::string str(std::streamsize /*digits*/, std::ios_base::fmtflags f)const
@@ -238,7 +318,7 @@ struct tommath_int
    }
    ::mp_int& data() { return m_data; }
    const ::mp_int& data()const { return m_data; }
-   void swap(tommath_int& o)
+   void swap(tommath_int& o)BOOST_NOEXCEPT
    {
       mp_exch(&m_data, &o.data());
    }

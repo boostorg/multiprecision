@@ -67,7 +67,14 @@ struct mp_number_backend_float_architype
    }
    mp_number_backend_float_architype& operator = (const char* s)
    {
-      m_value = boost::lexical_cast<long double>(s);
+      try
+      {
+         m_value = boost::lexical_cast<long double>(s);
+      }
+      catch(const std::exception&)
+      {
+         BOOST_THROW_EXCEPTION(std::runtime_error(std::string("Unable to parse input string: \"") + s + std::string("\" as a valid floating point number.")));
+      }
       std::cout << "const char* Assignment (" << s << ")" << std::endl;
       return *this;
    }

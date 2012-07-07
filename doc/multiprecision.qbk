@@ -393,7 +393,9 @@ existing code that uses [gmp].
 * Formatted IO for this type does not support octal or hexadecimal notation for negative values, 
 as a result performing formatted output on this type when the argument is negative and either of the flags
 `std::ios_base::oct` or `std::ios_base::hex` are set, will result in a `std::runtime_error` will be thrown.
-* Division by zero is handled by the [gmp] library - it will trigger a division by zero signal.
+* Conversion from a string results in a `std::runtime_error` being thrown if the string can not be interpreted 
+as a valid integer.
+* Division by zero results in a `std::runtime_error` being thrown.
 * Although this type is a wrapper around [gmp] it will work equally well with [mpir].  Indeed use of [mpir]
 is recommended on Win32.
 * This backend supports rvalue-references and is move-aware, making instantiations of `mp_number` on this backend move aware.
@@ -429,7 +431,9 @@ operator`~` is deliberately not implemented for this type.
 * Formatted IO for this type does not support octal or hexadecimal notation for negative values, 
 as a result performing formatted output on this type when the argument is negative and either of the flags
 `std::ios_base::oct` or `std::ios_base::hex` are set, will result in a `std::runtime_error` will be thrown.
-* Division by zero will result in a hardware signal being raised by [tommath].
+* Conversion from a string results in a `std::runtime_error` being thrown if the string can not be interpreted 
+as a valid integer.
+* Division by zero results in a `std::runtime_error` being thrown.
 
 [h5 Example:]
 
@@ -506,6 +510,7 @@ Things you should know when using this type:
 * Default constructed `gmp_float`s have the value zero (this is the [gmp] library's default behavior).
 * No changes are made to the [gmp] library's global settings, so this type can be safely mixed with
 existing [gmp] code.
+* This backend supports rvalue-references and is move-aware, making instantiations of `mp_number` on this backend move aware.
 * It is not possible to round-trip objects of this type to and from a string and get back
 exactly the same value.  This appears to be a limitation of [gmp].
 * Since the underlying [gmp] types have no notion of infinities or NaN's, care should be taken
@@ -515,6 +520,9 @@ library (in testing, converting a number with an excessively large or small expo
 to a string caused [gmp] to segfault).
 * This type can equally be used with [mpir] as the underlying implementation - indeed that is
 the recommended option on Win32.
+* Conversion from a string results in a `std::runtime_error` being thrown if the string can not be interpreted 
+as a valid floating point number.
+* Division by zero results in a `std::runtime_error` being thrown.
 
 [h5 [gmp] example:]
 
@@ -568,6 +576,9 @@ Things you should know when using this type:
 [mpfr] or [gmp] code.
 * The code can equally use [mpir] in place of [gmp] - indeed that is the preferred option on Win32.
 * This backend supports rvalue-references and is move-aware, making instantiations of `mp_number` on this backend move aware.
+* Conversion from a string results in a `std::runtime_error` being thrown if the string can not be interpreted 
+as a valid floating point number.
+* Division by zero results in an infinity.
 
 [h5 [mpfr] example:]
 
@@ -613,6 +624,8 @@ and a NaN is generated for any mathematically undefined operation.
 * Any `mp_number` instantiated on this type, is convertible to any other `mp_number` instantiated on this type - 
 for example you can convert from `mp_number<cpp_dec_float<50> >` to `mp_number<cpp_dec_float<SomeOtherValue> >`.
 Narrowing conversions are truncating.
+* Conversion from a string results in a `std::runtime_error` being thrown if the string can not be interpreted
+as a valid floating point number.
 
 [h5 cpp_dec_float example:]
 
@@ -711,7 +724,9 @@ It's also possible to access the underlying `mpq_t` via the `data()` member func
 Things you should know when using this type:
 
 * Default constructed `mpq_rational`s have the value zero (this is the [gmp] default behavior).
-* Division by zero results in a hardware exception inside the [gmp] library.
+* Division by zero results in a `std::runtime_error` being thrown.
+* Conversion from a string results in a `std::runtime_error` being thrown if the string can not be
+interpreted as a valid rational number.
 * No changes are made to the [gmp] library's global settings, so this type can coexist with existing
 [gmp] code.
 * The code can equally be used with [mpir] as the underlying library - indeed that is the preferred option on Win32.
@@ -753,6 +768,8 @@ Things you should know when using this type:
 
 * Default constructed `cpp_rational`s have the value zero.
 * Division by zero results in a `std::rumtime_error` being thrown.
+* Conversion from a string results in a `std::runtime_error` being thrown if the string can not be
+interpreted as a valid rational number.
 
 [h5 Example:]
 
@@ -788,7 +805,9 @@ which return the numerator and denominator of the number.
 Things you should know when using this type:
 
 * Default constructed `tom_rational`s have the value zero (this the inherited Boost.Rational behavior).
-* Division by zero results in a `boost::bad_rational` exception being thrown (see the rational number library's docs for more information).
+* Division by zero results in a `std::runtime_error` being thrown.
+* Conversion from a string results in a `std::runtime_error` being thrown if the string can not be
+interpreted as a valid rational number.
 * No changes are made to [tommath]'s global state, so this type can safely coexist with other [tommath] code.
 * Performance of this type has been found to be pretty poor - this need further investigation - but it appears that Boost.Rational
 needs some improvement in this area.

@@ -24,7 +24,7 @@ namespace backends{
 #ifdef BOOST_MSVC
 // warning C4127: conditional expression is constant
 #pragma warning(push)
-#pragma warning(disable:4127)
+#pragma warning(disable:4127 4351)
 #endif
 
 template <unsigned MinBits = 0, bool Signed = true, class Allocator = std::allocator<limb_type> >
@@ -114,7 +114,6 @@ public:
       limb_pointer p = limbs();
       while((m_limbs-1) && !p[m_limbs - 1])--m_limbs;
    }
-
    BOOST_CONSTEXPR cpp_int_base() BOOST_NOEXCEPT : m_data(), m_limbs(1), m_sign(false), m_internal(true) 
    {
    }
@@ -1158,7 +1157,7 @@ inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator>& result, c
    eval_multiply(result, result, val);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>* result, const cpp_int_backend<MinBits, Signed, Allocator>& x, const cpp_int_backend<MinBits, Signed, Allocator>& y, cpp_int_backend<MinBits, Signed, Allocator>& r) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>* result, const cpp_int_backend<MinBits, Signed, Allocator>& x, const cpp_int_backend<MinBits, Signed, Allocator>& y, cpp_int_backend<MinBits, Signed, Allocator>& r)
 {
    if((result == &x) || (&r == &x))
    {
@@ -1425,7 +1424,7 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>* result,
 }
 
 template <unsigned MinBits, bool Signed, class Allocator>
-void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>* result, const cpp_int_backend<MinBits, Signed, Allocator>& x, limb_type y, cpp_int_backend<MinBits, Signed, Allocator>& r) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>* result, const cpp_int_backend<MinBits, Signed, Allocator>& x, limb_type y, cpp_int_backend<MinBits, Signed, Allocator>& r)
 {
    if((result == &x) || (&r == &x))
    {
@@ -1568,20 +1567,20 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>* result,
 }
 
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, const cpp_int_backend<MinBits, Signed, Allocator>& b) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, const cpp_int_backend<MinBits, Signed, Allocator>& b)
 {
    cpp_int_backend<MinBits, Signed, Allocator> r;
    divide_unsigned_helper(&result, a, b, r);
    result.sign(a.sign() != b.sign());
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, limb_type& b) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, limb_type& b)
 {
    cpp_int_backend<MinBits, Signed, Allocator> r;
    divide_unsigned_helper(&result, a, b, r);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, signed_limb_type& b) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, signed_limb_type& b)
 {
    cpp_int_backend<MinBits, Signed, Allocator> r;
    divide_unsigned_helper(&result, a, std::abs(b), r);
@@ -1589,58 +1588,58 @@ inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator>& result, con
       result.negate();
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& b) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& b)
 {
    // There is no in place divide:
    cpp_int_backend<MinBits, Signed, Allocator> a(result);
    eval_divide(result, a, b);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator>& result, limb_type b) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator>& result, limb_type b)
 {
    // There is no in place divide:
    cpp_int_backend<MinBits, Signed, Allocator> a(result);
    eval_divide(result, a, b);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator>& result, signed_limb_type b) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator>& result, signed_limb_type b)
 {
    // There is no in place divide:
    cpp_int_backend<MinBits, Signed, Allocator> a(result);
    eval_divide(result, a, b);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, const cpp_int_backend<MinBits, Signed, Allocator>& b) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, const cpp_int_backend<MinBits, Signed, Allocator>& b)
 {
    divide_unsigned_helper(static_cast<cpp_int_backend<MinBits, Signed, Allocator>* >(0), a, b, result);
    result.sign(a.sign());
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, limb_type b) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, limb_type b)
 {
    divide_unsigned_helper(static_cast<cpp_int_backend<MinBits, Signed, Allocator>* >(0), a, b, result);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, signed_limb_type b) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& a, signed_limb_type b)
 {
    divide_unsigned_helper(static_cast<cpp_int_backend<MinBits, Signed, Allocator>* >(0), a, static_cast<limb_type>(std::abs(b)), result);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& b) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& b)
 {
    // There is no in place divide:
    cpp_int_backend<MinBits, Signed, Allocator> a(result);
    eval_modulus(result, a, b);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, limb_type b) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, limb_type b)
 {
    // There is no in place divide:
    cpp_int_backend<MinBits, Signed, Allocator> a(result);
    eval_modulus(result, a, b);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, signed_limb_type b) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator>& result, signed_limb_type b)
 {
    // There is no in place divide:
    cpp_int_backend<MinBits, Signed, Allocator> a(result);
@@ -1777,17 +1776,17 @@ struct bit_or { limb_type operator()(limb_type a, limb_type b)const BOOST_NOEXCE
 struct bit_xor{ limb_type operator()(limb_type a, limb_type b)const BOOST_NOEXCEPT { return a ^ b; } };
 
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_bitwise_and(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& o)BOOST_NOEXCEPT
+inline void eval_bitwise_and(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& o)BOOST_NOEXCEPT_IF(is_void<Allocator>::value)
 {
    bitwise_op(result, o, bit_and());
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_bitwise_or(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& o) BOOST_NOEXCEPT
+inline void eval_bitwise_or(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& o) BOOST_NOEXCEPT_IF(is_void<Allocator>::value)
 {
    bitwise_op(result, o, bit_or());
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_bitwise_xor(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& o) BOOST_NOEXCEPT
+inline void eval_bitwise_xor(cpp_int_backend<MinBits, Signed, Allocator>& result, const cpp_int_backend<MinBits, Signed, Allocator>& o) BOOST_NOEXCEPT_IF(is_void<Allocator>::value)
 {
    bitwise_op(result, o, bit_xor());
 }
