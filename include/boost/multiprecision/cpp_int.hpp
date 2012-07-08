@@ -1511,7 +1511,8 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator>* result,
    {
       result->resize(r_order + 1);
       pres = result->limbs();
-      pres[r_order] = 0;  // just in case we don't set the most significant limb below.
+      if(result->size() > r_order)
+         pres[r_order] = 0;  // just in case we don't set the most significant limb below.
    }
 
    do

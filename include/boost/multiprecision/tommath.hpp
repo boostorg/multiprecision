@@ -200,7 +200,7 @@ struct tommath_int
             unsigned shift = radix == 8 ? 3 : 4;
             unsigned block_count = DIGIT_BIT / shift;
             unsigned block_shift = shift * block_count;
-            boost::uint32_t val, block;
+            unsigned long long val, block;
             while(*s)
             {
                block = 0;

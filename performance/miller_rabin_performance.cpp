@@ -138,7 +138,7 @@ int main()
 #ifdef TEST_CPP_INT
    test_miller_rabin<mp_number<cpp_int_backend<>, false> >("cpp_int (no Expression templates)");
    test_miller_rabin<cpp_int>("cpp_int");
-   test_miller_rabin<mp_number<cpp_int_backend<64> > >("cpp_int (64-bit cache)");
+   test_miller_rabin<mp_number<cpp_int_backend<128> > >("cpp_int (128-bit cache)");
    test_miller_rabin<mp_number<cpp_int_backend<256> > >("cpp_int (256-bit cache)");
    test_miller_rabin<mp_number<cpp_int_backend<512> > >("cpp_int (512-bit cache)");
    test_miller_rabin<mp_number<cpp_int_backend<1024> > >("cpp_int (1024-bit cache)");
