@@ -76,6 +76,9 @@ inline limb_type block_multiplier(unsigned count)
    return values[count];
 }
 
+// Can't do formatted IO on an __int128
+#define BOOST_MP_NO_DOUBLE_LIMB_TYPE_IO
+
 #else
 
 typedef detail::largest_unsigned_type<32>::type limb_type;

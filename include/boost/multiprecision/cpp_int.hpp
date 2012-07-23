@@ -425,15 +425,20 @@ public:
    }
 };
 
-template <unsigned N>
-struct trivial_limb_type
+template <unsigned N, bool s>
+struct trivial_limb_type_imp
 {
-   typedef typename mpl::if_c<
-      N <= sizeof(long long) * CHAR_BIT,
-      typename boost::uint_t<N>::least,
-      double_limb_type
-   >::type type;
+   typedef double_limb_type type;
 };
+
+template <unsigned N>
+struct trivial_limb_type_imp<N, true>
+{
+   typedef typename boost::uint_t<N>::least type;
+};
+
+template <unsigned N>
+struct trivial_limb_type : public trivial_limb_type_imp<N, N <= sizeof(long long) * CHAR_BIT> {};
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -446,10 +451,10 @@ struct cpp_int_base<MinBits, true, void, true>
    typedef typename trivial_limb_type<MinBits>::type  local_limb_type;
    typedef local_limb_type*                           limb_pointer;
    typedef const local_limb_type*                     const_limb_pointer;
-private:
+protected:
    BOOST_STATIC_CONSTANT(unsigned, limb_bits = sizeof(local_limb_type) * CHAR_BIT);
    BOOST_STATIC_CONSTANT(local_limb_type, limb_mask = MinBits < limb_bits ? (local_limb_type(1) << MinBits) -1 : (~local_limb_type(0)));
-
+private:
    local_limb_type    m_data;
    bool               m_sign;
 
@@ -1058,7 +1063,8 @@ public:
    {
       this->do_swap(o);
    }
-   std::string str(std::streamsize /*digits*/, std::ios_base::fmtflags f)const
+private:
+   std::string str(std::ios_base::fmtflags f, const mpl::false_&)const
    {
       std::stringstream ss;
       ss.flags(f);
@@ -1068,6 +1074,92 @@ public:
          result += '-';
       result += ss.str();
       return result;
+   }
+   std::string str(std::ios_base::fmtflags f, const mpl::true_&)const
+   {
+      // Even though we have only one limb, we can't do IO on it :-(
+      int base = 10;
+      if((f & std::ios_base::oct) == std::ios_base::oct)
+         base = 8;
+      else if((f & std::ios_base::hex) == std::ios_base::hex)
+         base = 16;
+      std::string result;
+
+      unsigned Bits = base_type::limb_bits;
+
+      if(base == 8 || base == 16)
+      {
+         if(this->sign())
+            BOOST_THROW_EXCEPTION(std::runtime_error("Base 8 or 16 printing of negative numbers is not supported."));
+         limb_type shift = base == 8 ? 3 : 4;
+         limb_type mask = static_cast<limb_type>((1u << shift) - 1);
+         typename base_type::local_limb_type v = *this->limbs();
+         result.assign(Bits / shift + (Bits % shift ? 1 : 0), '0');
+         int pos = result.size() - 1;
+         for(unsigned i = 0; i < Bits / shift; ++i)
+         {
+            char c = '0' + static_cast<char>(v & mask);
+            if(c > '9')
+               c += 'A' - '9' - 1;
+            result[pos--] = c;
+            v >>= shift;
+         }
+         if(Bits % shift)
+         {
+            mask = static_cast<limb_type>((1u << (Bits % shift)) - 1);
+            char c = '0' + static_cast<char>(v & mask);
+            if(c > '9')
+               c += 'A' - '9';
+            result[pos] = c;
+         }
+         //
+         // Get rid of leading zeros:
+         //
+         std::string::size_type n = result.find_first_not_of('0');
+         if(!result.empty() && (n == std::string::npos))
+            n = result.size() - 1;
+         result.erase(0, n);
+         if(f & std::ios_base::showbase)
+         {
+            const char* pp = base == 8 ? "0" : "0x";
+            result.insert(0, pp);
+         }
+      }
+      else
+      {
+         result.assign(Bits / 3 + 1, '0');
+         int pos = result.size() - 1;
+         typename base_type::local_limb_type v(*this->limbs());
+         bool neg = false;
+         if(this->sign())
+         {
+            neg = true;
+         }
+         while(v)
+         {
+            result[pos] = (v % 10) + '0';
+            --pos;
+            v /= 10;
+         }
+         unsigned n = result.find_first_not_of('0');
+         result.erase(0, n);
+         if(result.empty())
+            result = "0";
+         if(neg)
+            result.insert(0, 1, '-');
+         else if(f & std::ios_base::showpos)
+            result.insert(0, 1, '+');
+      }
+      return result;
+   }
+public:
+   std::string str(std::streamsize /*digits*/, std::ios_base::fmtflags f)const
+   {
+#ifdef BOOST_MP_NO_DOUBLE_LIMB_TYPE_IO
+      return str(f, mpl::bool_<is_same<typename base_type::local_limb_type, double_limb_type>::value>());
+#else
+      return str(f, mpl::bool_<false>());
+#endif
    }
    int compare(const cpp_int_backend& o)const BOOST_NOEXCEPT
    {

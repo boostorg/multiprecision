@@ -159,7 +159,7 @@ inline void eval_bitwise_or(cpp_int_backend<MinBits, true, void, true>& result, 
    }
    a |= b;
    bool isneg = false;
-   static const typename cpp_int_backend<MinBits, true, void, true>::local_limb_type mask = static_cast<typename cpp_int_backend<MinBits, true, void, true>::local_limb_type>(1) << (std::numeric_limits<typename cpp_int_backend<MinBits, true, void, true>::local_limb_type>::digits - 1);
+   static const typename cpp_int_backend<MinBits, true, void, true>::local_limb_type mask = static_cast<typename cpp_int_backend<MinBits, true, void, true>::local_limb_type>(1) << (sizeof(typename cpp_int_backend<MinBits, true, void, true>::local_limb_type) * CHAR_BIT - 1);
    if(a & mask)
    {
       a = ~a;
