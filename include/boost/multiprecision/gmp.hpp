@@ -391,10 +391,6 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
    {
       mpf_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
    }
-   gmp_float(unsigned digits10)
-   {
-      mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
-   }
    gmp_float(mpf_t val)
    {
       mpf_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);

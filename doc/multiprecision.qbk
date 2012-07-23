@@ -119,6 +119,8 @@ However, conversions are allowed:
 
 [h4 Expression Templates]
 
+TODO: compare to rvalue refs.
+
 Class `mp_number` is expression-template-enabled: that means that rather than having a multiplication
 operator that looks like this:
 
@@ -245,6 +247,8 @@ the expression template machinery.  The result is much faster to compile, but sl
 We'll conclude this section by providing some more performance comparisons between these three libraries,
 again, all are using [mpfr] to carry out the underlying arithmetic, and all are operating at the same precision
 (50 decimal digits):
+
+TODO: Update, compare to rvalue refs but no ET's as well.
 
 [table Evaluation of Boost.Math's Bessel function test data
 [[Library][Relative Time][Relative Number of Memory Allocations]]
@@ -1695,6 +1699,8 @@ More information on this type can be found in the [link boost_multiprecision.tut
 The requirements on the `Backend` template argument to `mp_number` are split up into
 compulsory requirements, and optional requirements that are either to improve performance
 or provide optional features.
+
+TODO: Add optional construction support, add throws specification, clarify what compulsory means.
 
 In the following tables, type B is the `Backend` template arument to `mp_number`, `b` and `b2` are
 a variables of type B, `cb` and `cb2` are constant variables of type B, `a` is a variable of Arithmetic type, 

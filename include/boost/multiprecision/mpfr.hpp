@@ -402,10 +402,6 @@ struct mpfr_float_backend<0> : public detail::mpfr_float_imp<0>
    {
       mpfr_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
    }
-   mpfr_float_backend(unsigned digits10)
-   {
-      mpfr_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
-   }
    mpfr_float_backend(mpfr_t val)
    {
       mpfr_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);

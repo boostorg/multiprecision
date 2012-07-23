@@ -38,13 +38,20 @@ class mp_number
 public:
    typedef Backend backend_type;
    BOOST_CONSTEXPR mp_number() BOOST_NOEXCEPT_IF(noexcept(Backend())) {}
-   mp_number(const mp_number& e) BOOST_NOEXCEPT_IF(noexcept(Backend(static_cast<const Backend&>(std::declval<Backend>())))) : m_backend(e.m_backend){}
+   BOOST_CONSTEXPR mp_number(const mp_number& e) BOOST_NOEXCEPT_IF(noexcept(Backend(static_cast<const Backend&>(std::declval<Backend>())))) : m_backend(e.m_backend){}
    template <class V>
-   mp_number(V v, typename enable_if<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > >::type* = 0)
+   mp_number(V v, typename enable_if_c<
+         (boost::is_arithmetic<V>::value || is_same<std::string, V>::value || is_convertible<V, const char*>::value) 
+         && !is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value >::type* = 0)
    {
       m_backend = canonical_value(v);
    }
-   mp_number(const mp_number& e, unsigned digits10)
+   template <class V>
+   BOOST_CONSTEXPR mp_number(V v, typename enable_if_c<
+         (boost::is_arithmetic<V>::value || is_same<std::string, V>::value || is_convertible<V, const char*>::value) 
+         && is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value >::type* = 0) 
+      : m_backend(canonical_value(v)) {}
+   BOOST_CONSTEXPR mp_number(const mp_number& e, unsigned digits10)
       : m_backend(e.m_backend, digits10){}
    /*
    //
@@ -59,7 +66,7 @@ public:
    }
    */
    template<bool ET>
-   mp_number(const mp_number<Backend, ET>& val) BOOST_NOEXCEPT_IF(noexcept(Backend(static_cast<const Backend&>(std::declval<Backend>())))) : m_backend(val.m_backend) {}
+   BOOST_CONSTEXPR mp_number(const mp_number<Backend, ET>& val) BOOST_NOEXCEPT_IF(noexcept(Backend(static_cast<const Backend&>(std::declval<Backend>())))) : m_backend(val.m_backend) {}
 
    template <class Other, bool ET>
    mp_number(const mp_number<Other, ET>& val, typename enable_if<boost::is_convertible<Other, Backend> >::type* = 0) BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend>() = std::declval<Other>()))
@@ -88,7 +95,7 @@ public:
    }
 
    template <class V>
-   mp_number(V v, typename enable_if<mpl::and_<is_convertible<V, Backend>, mpl::not_<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > > > >::type* = 0)
+   BOOST_CONSTEXPR mp_number(V v, typename enable_if<mpl::and_<is_convertible<V, Backend>, mpl::not_<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > > > >::type* = 0)
       BOOST_NOEXCEPT_IF(noexcept(Backend(static_cast<const V&>(std::declval<V>()))))
       : m_backend(v){}
 
@@ -155,7 +162,7 @@ public:
    }
 
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   mp_number(mp_number&& r) BOOST_NOEXCEPT : m_backend(static_cast<Backend&&>(r.m_backend)){}
+   BOOST_CONSTEXPR mp_number(mp_number&& r) BOOST_NOEXCEPT : m_backend(static_cast<Backend&&>(r.m_backend)){}
    mp_number& operator=(mp_number&& r) BOOST_NOEXCEPT 
    {
       m_backend.swap(r.m_backend);

@@ -1171,6 +1171,10 @@ int main()
    test<boost::multiprecision::cpp_rational>();
    test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<>, false> >();
    test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<500, true, void> > >();
+
+   // Again with "trivial" backends:
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<64, true, void>, false > >();
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<64, false, void>, false > >();
 #endif
 #ifdef TEST_CPP_INT_BR
    test<boost::multiprecision::cpp_rational>();

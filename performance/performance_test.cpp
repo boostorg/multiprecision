@@ -84,6 +84,13 @@ private:
 
 unsigned bits_wanted; // for integer types
 
+namespace boost{ namespace multiprecision{
+
+template<>
+class number_category<boost::int64_t> : public mpl::int_<number_kind_integer>{};
+
+}}
+
 template <class T, int Type>
 struct tester
 {
@@ -177,12 +184,23 @@ struct tester
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
-   double test_str()
+   double test_str(const boost::mpl::false_&)
+   {
+      stopwatch<boost::chrono::high_resolution_clock> w;
+      for(unsigned i = 0; i < b.size(); ++i)
+         a[i] = boost::lexical_cast<T>(boost::lexical_cast<std::string>(b[i]));
+      return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+   }
+   double test_str(const boost::mpl::true_&)
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
       for(unsigned i = 0; i < b.size(); ++i)
          a[i] = b[i].str();
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+   }
+   double test_str()
+   {
+      return test_str(boost::is_class<T>());
    }
    //
    // The following tests only work for integer types:
@@ -303,6 +321,7 @@ struct tester
    }
    double test_gcd()
    {
+      using boost::math::gcd;
       stopwatch<boost::chrono::high_resolution_clock> w;
       for(unsigned i = 0; i < 1000; ++i)
       {
@@ -310,6 +329,54 @@ struct tester
             a[i] = gcd(b[i], c[i]);
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+   }
+   double test_construct()
+   {
+      std::allocator<T> a;
+      T* pt = a.allocate(1000);
+      stopwatch<boost::chrono::high_resolution_clock> w;
+      for(unsigned i = 0; i < 1000; ++i)
+      {
+         for(unsigned i = 0; i < 1000; ++i)
+            new(pt+i) T();
+         for(unsigned i = 0; i < 1000; ++i)
+            a.destroy(pt+i);
+      }
+      double result = boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+      a.deallocate(pt, 1000);
+      return result;
+   }
+   double test_construct_unsigned()
+   {
+      std::allocator<T> a;
+      T* pt = a.allocate(1000);
+      stopwatch<boost::chrono::high_resolution_clock> w;
+      for(unsigned i = 0; i < 1000; ++i)
+      {
+         for(unsigned i = 0; i < 1000; ++i)
+            new(pt+i) T(i);
+         for(unsigned i = 0; i < 1000; ++i)
+            a.destroy(pt+i);
+      }
+      double result = boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+      a.deallocate(pt, 1000);
+      return result;
+   }
+   double test_construct_unsigned_ll()
+   {
+      std::allocator<T> a;
+      T* pt = a.allocate(1000);
+      stopwatch<boost::chrono::high_resolution_clock> w;
+      for(unsigned i = 0; i < 1000; ++i)
+      {
+         for(unsigned long long j = 0; j < 1000; ++j)
+            new(pt+j) T(j);
+         for(unsigned j = 0; j < 1000; ++j)
+            a.destroy(pt+j);
+      }
+      double result = boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+      a.deallocate(pt, 1000);
+      return result;
    }
 private:
    T generate_random()
@@ -489,6 +556,10 @@ void test(const char* type, unsigned precision)
    report_result(cat, type, "-(int)", precision, t.test_subtract_int());
    report_result(cat, type, "*(int)", precision, t.test_multiply_int());
    report_result(cat, type, "/(int)", precision, t.test_divide_int());
+   // construction and destruction:
+   report_result(cat, type, "construct", precision, t.test_construct());
+   report_result(cat, type, "construct(unsigned)", precision, t.test_construct_unsigned());
+   report_result(cat, type, "construct(unsigned long long)", precision, t.test_construct_unsigned_ll());
    test_int_ops(t, type, precision, typename boost::multiprecision::number_category<Number>::type());
 }
 
@@ -566,6 +637,9 @@ void quickbook_results()
 
 int main()
 {
+#ifdef TEST_INT64
+   test<boost::int64_t>("boost::int64_t", 64);
+#endif
 #ifdef TEST_MPF
    test<boost::multiprecision::mpf_float_50>("gmp_float", 50);
    test<boost::multiprecision::mpf_float_100>("gmp_float", 100);
@@ -578,15 +652,16 @@ int main()
    test<boost::multiprecision::mpz_int>("gmp_int", 1024);
 #endif
 #ifdef TEST_CPP_INT
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<64, true, void>, false > >("cpp_int(fixed)", 64);
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<128, true, void>, false > >("cpp_int(fixed)", 128);
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<256, true, void>, false > >("cpp_int(fixed)", 256);
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<512, true, void>, false > >("cpp_int(fixed)", 512);
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<1024, true, void>, false > >("cpp_int(fixed)", 1024);
+
    test<boost::multiprecision::cpp_int>("cpp_int", 128);
    test<boost::multiprecision::cpp_int>("cpp_int", 256);
    test<boost::multiprecision::cpp_int>("cpp_int", 512);
    test<boost::multiprecision::cpp_int>("cpp_int", 1024);
-
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<128, true, void> > >("cpp_int(fixed)", 128);
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<256, true, void> > >("cpp_int(fixed)", 256);
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<512, true, void> > >("cpp_int(fixed)", 512);
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<1024, true, void> > >("cpp_int(fixed)", 1024);
 #endif
 #ifdef TEST_CPP_INT_RATIONAL
    test<boost::multiprecision::cpp_rational>("cpp_rational", 128);
