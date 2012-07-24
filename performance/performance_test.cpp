@@ -88,6 +88,8 @@ namespace boost{ namespace multiprecision{
 
 template<>
 class number_category<boost::int64_t> : public mpl::int_<number_kind_integer>{};
+template<>
+class number_category<boost::uint64_t> : public mpl::int_<number_kind_integer>{};
 
 }}
 
@@ -638,7 +640,7 @@ void quickbook_results()
 int main()
 {
 #ifdef TEST_INT64
-   test<boost::int64_t>("boost::int64_t", 64);
+   test<boost::uint64_t>("boost::uint64_t", 64);
 #endif
 #ifdef TEST_MPF
    test<boost::multiprecision::mpf_float_50>("gmp_float", 50);
@@ -652,6 +654,7 @@ int main()
    test<boost::multiprecision::mpz_int>("gmp_int", 1024);
 #endif
 #ifdef TEST_CPP_INT
+   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<64, false, void>, false > >("cpp_int(unsigned, fixed)", 64);
    test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<64, true, void>, false > >("cpp_int(fixed)", 64);
    test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<128, true, void>, false > >("cpp_int(fixed)", 128);
    test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<256, true, void>, false > >("cpp_int(fixed)", 256);

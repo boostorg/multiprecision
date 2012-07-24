@@ -610,6 +610,7 @@ run test_move.cpp
         : test_move_cpp_int ;
 
 run test_test.cpp ;
+compile test_constexpr.cpp ;
 
 run test_float_io.cpp
         : # command line
@@ -772,73 +773,59 @@ if $(enable-specfun)
 
 if ! $(disable-concepts)
 {
-   run mp_number_concept_check.cpp  mpfr
-           : # command line
-           : # input files
-           : # requirements
-	         <define>TEST_MPFR_50
-            [ check-target-builds ../config//has_mpfr : : <build>no ]
-           : mp_number_concept_check_mpfr_50 ;
 
-   run mp_number_concept_check.cpp  mpfr
-           : # command line
-           : # input files
-           : # requirements
-	         <define>TEST_MPFR_6
-            [ check-target-builds ../config//has_mpfr : : <build>no ]
-           : mp_number_concept_check_mpfr_6 ;
+   for local source in [ glob concepts/*.cpp ]
+   {
 
-   run mp_number_concept_check.cpp  mpfr
-           : # command line
-           : # input files
-           : # requirements
-	         <define>TEST_MPFR_15
-            [ check-target-builds ../config//has_mpfr : : <build>no ]
-           : mp_number_concept_check_mpfr_15 ;
+      compile $(source)  mpfr
+              : # requirements
+	            <define>TEST_MPFR_50
+               [ check-target-builds ../config//has_mpfr : : <build>no ]
+              : $(source:B)_mpfr_50 ;
 
-   run mp_number_concept_check.cpp  mpfr
-           : # command line
-           : # input files
-           : # requirements
-	         <define>TEST_MPFR_17
-            [ check-target-builds ../config//has_mpfr : : <build>no ]
-           : mp_number_concept_check_mpfr_17 ;
+      compile $(source)  mpfr
+              : # requirements
+	            <define>TEST_MPFR_6
+               [ check-target-builds ../config//has_mpfr : : <build>no ]
+              : $(source:B)_mpfr_6 ;
 
-   run mp_number_concept_check.cpp  mpfr
-           : # command line
-           : # input files
-           : # requirements
-	         <define>TEST_MPFR_30
-            [ check-target-builds ../config//has_mpfr : : <build>no ]
-           : mp_number_concept_check_mpfr_30 ;
+      compile $(source)  mpfr
+              : # requirements
+	            <define>TEST_MPFR_15
+               [ check-target-builds ../config//has_mpfr : : <build>no ]
+              : $(source:B)_mpfr_15 ;
 
-   run mp_number_concept_check.cpp  gmp
-           : # command line
-           : # input files
-           : # requirements
-	         <define>TEST_MPF_50
-            [ check-target-builds ../config//has_gmp : : <build>no ]
-           : mp_number_concept_check_mpf50 ;
+      compile $(source)  mpfr
+              : # requirements
+	            <define>TEST_MPFR_17
+               [ check-target-builds ../config//has_mpfr : : <build>no ]
+              : $(source:B)_mpfr_17 ;
 
-   run mp_number_concept_check.cpp
-           : # command line
-           : # input files
-           : # requirements
-	         <define>TEST_CPP_DEC_FLOAT
-           : mp_number_concept_check_cpp_dec_float ;
+      compile $(source)  mpfr
+              : # requirements
+	            <define>TEST_MPFR_30
+               [ check-target-builds ../config//has_mpfr : : <build>no ]
+              : $(source:B)_mpfr_30 ;
 
-   run mp_number_concept_check.cpp
-           : # command line
-           : # input files
-           : # requirements
-	         <define>TEST_CPP_DEC_FLOAT_NO_ET
-           : mp_number_concept_check_cpp_dec_float_no_et ;
+      compile $(source)  gmp
+              : # requirements
+	            <define>TEST_MPF_50
+               [ check-target-builds ../config//has_gmp : : <build>no ]
+              : $(source:B)_mpf50 ;
 
-   run mp_number_concept_check.cpp
-           : # command line
-           : # input files
-           : # requirements
-	         <define>TEST_BACKEND
-           : mp_number_concept_check_backend_concept ;
+      compile $(source)
+              : # requirements
+	            <define>TEST_CPP_DEC_FLOAT
+              : $(source:B)_cpp_dec_float ;
 
+      compile $(source)
+              : # requirements
+	            <define>TEST_CPP_DEC_FLOAT_NO_ET
+              : $(source:B)_cpp_dec_float_no_et ;
+
+      compile $(source)
+              : # requirements
+	            <define>TEST_BACKEND
+              : $(source:B)_backend_concept ;
+   }
 }

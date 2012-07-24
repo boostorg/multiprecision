@@ -236,11 +236,15 @@ public:
    BOOST_STATIC_ASSERT_MSG(internal_limb_count >= 2, "A fixed precision integer type must have at least 2 limbs");
 
 private:
-   union{
+   union data_type{
       limb_type          m_data[internal_limb_count];
       limb_type          m_first_limb;
       double_limb_type   m_double_first_limb;
-   };
+
+      BOOST_CONSTEXPR data_type(){}
+      BOOST_CONSTEXPR data_type(limb_type i) : m_first_limb(i) {}
+      BOOST_CONSTEXPR data_type(double_limb_type i) : m_double_first_limb(i) {}
+   } m_wrapper;
    boost::uint16_t    m_limbs;
    bool               m_sign;
 
@@ -249,21 +253,21 @@ public:
    // Direct construction:
    //
    BOOST_CONSTEXPR cpp_int_base(limb_type i)BOOST_NOEXCEPT 
-      : m_first_limb(i), m_limbs(1), m_sign(false) {}
+      : m_wrapper(i), m_limbs(1), m_sign(false) {}
    BOOST_CONSTEXPR cpp_int_base(signed_limb_type i)BOOST_NOEXCEPT 
-      : m_first_limb(std::abs(i)), m_limbs(1), m_sign(i < 0) {}
+      : m_wrapper(limb_type(i < 0 ? -i : i)), m_limbs(1), m_sign(i < 0) {}
 #if defined(BOOST_LITTLE_ENDIAN)
    BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT 
-      : m_double_first_limb(i), m_limbs(i > max_limb_value ? 2 : 1), m_sign(false) {}
+      : m_wrapper(i), m_limbs(i > max_limb_value ? 2 : 1), m_sign(false) {}
    BOOST_CONSTEXPR cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT 
-      : m_double_first_limb(i < 0 ? -i : i), m_limbs(i < 0 ? (-i > max_limb_value ? 2 : 1) : (i > max_limb_value ? 2 : 1)), m_sign(i < 0) {}
+      : m_wrapper(double_limb_type(i < 0 ? -i : i)), m_limbs(i < 0 ? (-i > max_limb_value ? 2 : 1) : (i > max_limb_value ? 2 : 1)), m_sign(i < 0) {}
 #endif
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
    unsigned size()const BOOST_NOEXCEPT { return m_limbs; }
-   limb_pointer limbs() BOOST_NOEXCEPT { return m_data; }
-   const_limb_pointer limbs()const BOOST_NOEXCEPT { return m_data; }
+   limb_pointer limbs() BOOST_NOEXCEPT { return m_wrapper.m_data; }
+   const_limb_pointer limbs()const BOOST_NOEXCEPT { return m_wrapper.m_data; }
    bool sign()const BOOST_NOEXCEPT { return m_sign; }
    void sign(bool b) BOOST_NOEXCEPT
    { 
@@ -287,7 +291,7 @@ public:
       if((m_limbs == 1) && (!*p)) m_sign = false; // zero is always unsigned
    }
 
-   BOOST_CONSTEXPR cpp_int_base() : m_first_limb(0), m_limbs(1), m_sign(false) {}
+   BOOST_CONSTEXPR cpp_int_base() : m_wrapper(limb_type(0u)), m_limbs(1), m_sign(false) {}
    cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT : m_limbs(o.m_limbs), m_sign(o.m_sign)
    {
       std::copy(o.limbs(), o.limbs() + o.size(), limbs());
@@ -298,7 +302,7 @@ public:
       if(this != &o)
       {
          resize(o.size());
-         std::memcpy(limbs(), o.limbs(), size() * sizeof(limb_type));
+         std::copy(o.limbs(), o.limbs() + o.size(), limbs());
          m_sign = o.m_sign;
       }
    }
@@ -319,7 +323,7 @@ public:
    void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
       for(unsigned i = 0; i < (std::max)(size(), o.size()); ++i)
-         std::swap(m_data[i], o.m_data[i]);
+         std::swap(m_wrapper.m_data[i], o.m_wrapper.m_data[i]);
       std::swap(m_sign, o.m_sign);
       std::swap(m_limbs, o.m_limbs);
    }
@@ -346,11 +350,15 @@ public:
    BOOST_STATIC_ASSERT_MSG(internal_limb_count >= 2, "A fixed precision integer type must have at least 2 limbs");
 
 private:
-   union{
+   union data_type{
       limb_type          m_data[internal_limb_count];
       limb_type          m_first_limb;
       double_limb_type   m_double_first_limb;
-   };
+
+      BOOST_CONSTEXPR data_type() {}
+      BOOST_CONSTEXPR data_type(limb_type i) : m_first_limb(i) {}
+      BOOST_CONSTEXPR data_type(double_limb_type i) : m_double_first_limb(i) {}
+   } m_wrapper;
    limb_type          m_limbs;
 
 public:
@@ -358,21 +366,21 @@ public:
    // Direct construction:
    //
    BOOST_CONSTEXPR cpp_int_base(limb_type i)BOOST_NOEXCEPT 
-      : m_first_limb(i), m_limbs(1) {}
+      : m_wrapper(i), m_limbs(1) {}
    cpp_int_base(signed_limb_type i)BOOST_NOEXCEPT 
-      : m_first_limb(i < 0 ? -i : i), m_limbs(1) { if(i < 0) negate(); }
+      : m_wrapper(limb_type(i < 0 ? -i : i)), m_limbs(1) { if(i < 0) negate(); }
 #ifdef BOOST_LITTLE_ENDIAN
    BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT 
-      : m_double_first_limb(i), m_limbs(i > max_limb_value ? 2 : 1) {}
+      : m_wrapper(i), m_limbs(i > max_limb_value ? 2 : 1) {}
    cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT 
-      : m_double_first_limb(i < 0 ? -i : i), m_limbs(i < 0 ? (-i > max_limb_value ? 2 : 1) : (i > max_limb_value ? 2 : 1)) { if(i < 0) negate(); }
+      : m_wrapper(double_limb_type(i < 0 ? -i : i)), m_limbs(i < 0 ? (-i > max_limb_value ? 2 : 1) : (i > max_limb_value ? 2 : 1)) { if(i < 0) negate(); }
 #endif
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
    unsigned size()const BOOST_NOEXCEPT { return m_limbs; }
-   limb_pointer limbs() BOOST_NOEXCEPT { return m_data; }
-   const_limb_pointer limbs()const BOOST_NOEXCEPT { return m_data; }
+   limb_pointer limbs() BOOST_NOEXCEPT { return m_wrapper.m_data; }
+   const_limb_pointer limbs()const BOOST_NOEXCEPT { return m_wrapper.m_data; }
    BOOST_CONSTEXPR bool sign()const BOOST_NOEXCEPT { return false; }
    void sign(bool b) BOOST_NOEXCEPT {  if(b) negate(); }
    void resize(unsigned new_size) BOOST_NOEXCEPT
@@ -386,7 +394,7 @@ public:
       while((m_limbs-1) && !p[m_limbs - 1])--m_limbs;
    }
 
-   BOOST_CONSTEXPR cpp_int_base() BOOST_NOEXCEPT : m_first_limb(0), m_limbs(1) {}
+   BOOST_CONSTEXPR cpp_int_base() BOOST_NOEXCEPT : m_wrapper(limb_type(0u)), m_limbs(1) {}
    cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT : m_limbs(o.m_limbs)
    {
       std::copy(o.limbs(), o.limbs() + o.size(), limbs());
@@ -397,7 +405,7 @@ public:
       if(this != &o)
       {
          resize(o.size());
-         std::memcpy(limbs(), o.limbs(), size() * sizeof(limb_type));
+         std::copy(o.limbs(), o.limbs() + o.size(), limbs());
       }
    }
    void negate() BOOST_NOEXCEPT
@@ -406,10 +414,10 @@ public:
       // would result in a "negative" number:
       unsigned i;
       for(i = m_limbs; i < internal_limb_count; ++i)
-         m_data[i] = 0;
+         m_wrapper.m_data[i] = 0;
       m_limbs = internal_limb_count;
       for(i = 0; i < internal_limb_count; ++i)
-         m_data[i] = ~m_data[i];
+         m_wrapper.m_data[i] = ~m_wrapper.m_data[i];
       normalize();
       eval_increment(static_cast<cpp_int_backend<MinBits, false, void>& >(*this));
    }
@@ -420,7 +428,7 @@ public:
    void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
       for(unsigned i = 0; i < (std::max)(size(), o.size()); ++i)
-         std::swap(m_data[i], o.m_data[i]);
+         std::swap(m_wrapper.m_data[i], o.m_wrapper.m_data[i]);
       std::swap(m_limbs, o.m_limbs);
    }
 };
@@ -442,7 +450,7 @@ struct trivial_limb_type : public trivial_limb_type_imp<N, N <= sizeof(long long
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
-#pragma warning(disable:4244) // loss of data in initialization
+#pragma warning(disable:4244 4293) // loss of data in initialization, shift count too large
 #endif
 
 template <unsigned MinBits>
