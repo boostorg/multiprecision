@@ -34,10 +34,11 @@ namespace boost{ namespace multiprecision{ namespace default_ops{
 #endif
 //
 // Default versions of mixed arithmetic, these just construct a temporary
-// from the arithmetic value and then do the arithmetic on that:
+// from the arithmetic value and then do the arithmetic on that, two versions
+// of each depending on whether the backend can be directly constructed from type V:
 //
 template <class T, class V>
-inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const char*>, is_same<V, std::string> > >::type 
+inline typename enable_if_c<is_arithmetic<V>::value && !is_convertible<V, T>::value >::type 
    eval_add(T& result, V const& v)
 {
    T t;
@@ -45,7 +46,14 @@ inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const cha
    eval_add(result, t);
 }
 template <class T, class V>
-inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const char*>, is_same<V, std::string> > >::type
+inline typename enable_if_c<is_arithmetic<V>::value && is_convertible<V, T>::value >::type 
+   eval_add(T& result, V const& v)
+{
+   T t(v);
+   eval_add(result, t);
+}
+template <class T, class V>
+inline typename enable_if_c<is_arithmetic<V>::value && !is_convertible<V, T>::value>::type
    eval_subtract(T& result, V const& v)
 {
    T t;
@@ -53,7 +61,14 @@ inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const cha
    eval_subtract(result, t);
 }
 template <class T, class V>
-inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const char*>, is_same<V, std::string> > >::type
+inline typename enable_if_c<is_arithmetic<V>::value && is_convertible<V, T>::value>::type
+   eval_subtract(T& result, V const& v)
+{
+   T t(v);
+   eval_subtract(result, t);
+}
+template <class T, class V>
+inline typename enable_if_c<is_arithmetic<V>::value && !is_convertible<V, T>::value>::type
    eval_multiply(T& result, V const& v)
 {
    T t;
@@ -61,7 +76,14 @@ inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const cha
    eval_multiply(result, t);
 }
 template <class T, class V>
-inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const char*>, is_same<V, std::string> > >::type
+inline typename enable_if_c<is_arithmetic<V>::value && is_convertible<V, T>::value>::type
+   eval_multiply(T& result, V const& v)
+{
+   T t(v);
+   eval_multiply(result, t);
+}
+template <class T, class V>
+inline typename enable_if_c<is_arithmetic<V>::value && !is_convertible<V, T>::value>::type
    eval_divide(T& result, V const& v)
 {
    T t;
@@ -69,7 +91,14 @@ inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const cha
    eval_divide(result, t);
 }
 template <class T, class V>
-inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const char*>, is_same<V, std::string> > >::type
+inline typename enable_if_c<is_arithmetic<V>::value && is_convertible<V, T>::value>::type
+   eval_divide(T& result, V const& v)
+{
+   T t(v);
+   eval_divide(result, t);
+}
+template <class T, class V>
+inline typename enable_if_c<is_arithmetic<V>::value && !is_convertible<V, T>::value>::type
    eval_modulus(T& result, V const& v)
 {
    T t;
@@ -77,7 +106,14 @@ inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const cha
    eval_modulus(result, t);
 }
 template <class T, class V>
-inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const char*>, is_same<V, std::string> > >::type
+inline typename enable_if_c<is_arithmetic<V>::value && is_convertible<V, T>::value>::type
+   eval_modulus(T& result, V const& v)
+{
+   T t(v);
+   eval_modulus(result, t);
+}
+template <class T, class V>
+inline typename enable_if_c<is_arithmetic<V>::value && !is_convertible<V, T>::value>::type
    eval_bitwise_and(T& result, V const& v)
 {
    T t;
@@ -85,7 +121,14 @@ inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const cha
    eval_bitwise_and(result, t);
 }
 template <class T, class V>
-inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const char*>, is_same<V, std::string> > >::type
+inline typename enable_if_c<is_arithmetic<V>::value && is_convertible<V, T>::value>::type
+   eval_bitwise_and(T& result, V const& v)
+{
+   T t(v);
+   eval_bitwise_and(result, t);
+}
+template <class T, class V>
+inline typename enable_if_c<is_arithmetic<V>::value && !is_convertible<V, T>::value>::type
    eval_bitwise_or(T& result, V const& v)
 {
    T t;
@@ -93,20 +136,41 @@ inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const cha
    eval_bitwise_or(result, t);
 }
 template <class T, class V>
-inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const char*>, is_same<V, std::string> > >::type
+inline typename enable_if_c<is_arithmetic<V>::value && is_convertible<V, T>::value>::type
+   eval_bitwise_or(T& result, V const& v)
+{
+   T t(v);
+   eval_bitwise_or(result, t);
+}
+template <class T, class V>
+inline typename enable_if_c<is_arithmetic<V>::value && !is_convertible<V, T>::value>::type
    eval_bitwise_xor(T& result, V const& v)
 {
    T t;
    t = v;
    eval_bitwise_xor(result, t);
 }
+template <class T, class V>
+inline typename enable_if_c<is_arithmetic<V>::value && is_convertible<V, T>::value>::type
+   eval_bitwise_xor(T& result, V const& v)
+{
+   T t(v);
+   eval_bitwise_xor(result, t);
+}
 
 template <class T, class V>
-inline typename enable_if<mpl::or_<is_arithmetic<V>, is_convertible<V, const char*>, is_same<V, std::string> > >::type
+inline typename enable_if_c<is_arithmetic<V>::value && !is_convertible<V, T>::value>::type
    eval_complement(T& result, V const& v)
 {
    T t;
    t = v;
+   eval_complement(result, t);
+}
+template <class T, class V>
+inline typename enable_if_c<is_arithmetic<V>::value && is_convertible<V, T>::value>::type
+   eval_complement(T& result, V const& v)
+{
+   T t(v);
    eval_complement(result, t);
 }
 
@@ -118,16 +182,16 @@ BOOST_CONSTEXPR inline bool is_same_object(const T&, const U&) BOOST_NOEXCEPT
 {  return false;  }
 
 //
-// Default versions of 3-arg arithmetic functions, these just forward to the 2 arg versions:
+// Default versions of 3-arg arithmetic functions, these mostly just forward to the 2 arg versions:
 //
-template <class T, class U, class V>
-inline void eval_add(T& t, const U& u, const V& v)
+template <class T>
+inline void eval_add(T& t, const T& u, const T& v)
 {
-   if(is_same_object(t, v))
+   if(&t == &v)
    {
       eval_add(t, u);
    }
-   else if(is_same_object(t, u))
+   else if(&t == &u)
    {
       eval_add(t, v);
    }
@@ -137,22 +201,37 @@ inline void eval_add(T& t, const U& u, const V& v)
       eval_add(t, v);
    }
 }
-template<class T, class U>
-inline typename disable_if<is_same<T, U> >::type eval_add(T& t, const U& a, const T& b)
+template <class T, class U>
+inline typename enable_if_c<is_arithmetic<U>::value && !is_convertible<U, T>::value>::type eval_add(T& t, const T& u, const U& v)
 {
-   return eval_add(t, b, a);
+   T vv;
+   vv = v;
+   eval_add(t, u, vv);
+}
+template <class T, class U>
+inline typename enable_if_c<is_arithmetic<U>::value && is_convertible<U, T>::value>::type eval_add(T& t, const T& u, const U& v)
+{
+   T vv(v);
+   eval_add(t, u, vv);
+}
+template <class T, class U>
+inline typename enable_if_c<is_arithmetic<U>::value>::type eval_add(T& t, const U& u, const T& v)
+{
+   eval_add(t, v, u);
 }
 
-template <class T, class U, class V>
-inline void eval_subtract(T& t, const U& u, const V& v)
+template <class T>
+inline void eval_subtract(T& t, const T& u, const T& v)
 {
-   if(is_same_object(t, u))
-      eval_subtract(t, v);
-   else if(is_same_object(t, v))
+   if(&t == &v)
    {
       eval_subtract(t, u);
       t.negate();
    }
+   else if(&t == &u)
+   {
+      eval_subtract(t, v);
+   }
    else
    {
       t = u;
@@ -160,19 +239,36 @@ inline void eval_subtract(T& t, const U& u, const V& v)
    }
 }
 template <class T, class U>
-inline typename disable_if<is_same<T, U> >::type eval_subtract(T& t, const U& a, const T& b)
+inline typename enable_if_c<is_arithmetic<U>::value && !is_convertible<U, T>::value>::type eval_subtract(T& t, const T& u, const U& v)
 {
-   eval_subtract(t, b, a);
+   T vv;
+   vv = v;
+   eval_subtract(t, u, vv);
+}
+template <class T, class U>
+inline typename enable_if_c<is_arithmetic<U>::value && is_convertible<U, T>::value>::type eval_subtract(T& t, const T& u, const U& v)
+{
+   T vv(v);
+   eval_subtract(t, u, vv);
+}
+template <class T, class U>
+inline typename enable_if_c<is_arithmetic<U>::value>::type eval_subtract(T& t, const U& u, const T& v)
+{
+   eval_subtract(t, v, u);
    t.negate();
 }
 
-template <class T, class U, class V>
-inline void eval_multiply(T& t, const U& u, const V& v)
+template <class T>
+inline void eval_multiply(T& t, const T& u, const T& v)
 {
-   if(is_same_object(t, u))
-      eval_multiply(t, v);
-   else if(is_same_object(t, v))
+   if(&t == &v)
+   {
       eval_multiply(t, u);
+   }
+   else if(&t == &u)
+   {
+      eval_multiply(t, v);
+   }
    else
    {
       t = u;
@@ -180,18 +276,32 @@ inline void eval_multiply(T& t, const U& u, const V& v)
    }
 }
 template <class T, class U>
-inline typename disable_if<is_same<T, U> >::type eval_multiply(T& t, const U& a, const T& b)
+inline typename enable_if_c<is_arithmetic<U>::value && !is_convertible<U, T>::value>::type eval_multiply(T& t, const T& u, const U& v)
 {
-   eval_multiply(t, b, a);
+   T vv;
+   vv = v;
+   eval_multiply(t, u, vv);
 }
-template <class T, class U, class V>
-inline void eval_divide(T& t, const U& u, const V& v)
+template <class T, class U>
+inline typename enable_if_c<is_arithmetic<U>::value && is_convertible<U, T>::value>::type eval_multiply(T& t, const T& u, const U& v)
 {
-   if(is_same_object(t, u))
+   T vv(v);
+   eval_multiply(t, u, vv);
+}
+template <class T, class U>
+inline typename enable_if_c<is_arithmetic<U>::value>::type eval_multiply(T& t, const U& u, const T& v)
+{
+   eval_multiply(t, v, u);
+}
+
+template <class T>
+inline void eval_divide(T& t, const T& u, const T& v)
+{
+   if(&t == &u)
       eval_divide(t, v);
-   else if(is_same_object(t, v))
+   else if(&t == &v)
    {
-      T temp = t;
+      T temp;
       eval_divide(temp, u, v);
       temp.swap(t);
    }
@@ -201,12 +311,40 @@ inline void eval_divide(T& t, const U& u, const V& v)
       eval_divide(t, v);
    }
 }
-template <class T, class U, class V>
-inline void eval_modulus(T& t, const U& u, const V& v)
+template <class T, class U>
+inline typename enable_if_c<is_arithmetic<U>::value && !is_convertible<U, T>::value>::type eval_divide(T& t, const T& u, const U& v)
 {
-   if(is_same_object(t, u))
+   T vv;
+   vv = v;
+   eval_divide(t, u, vv);
+}
+template <class T, class U>
+inline typename enable_if_c<is_arithmetic<U>::value && is_convertible<U, T>::value>::type eval_divide(T& t, const T& u, const U& v)
+{
+   T vv(v);
+   eval_divide(t, u, vv);
+}
+template <class T, class U>
+inline typename enable_if_c<is_arithmetic<U>::value && !is_convertible<U, T>::value>::type eval_divide(T& t, const U& u, const T& v)
+{
+   T uu;
+   uu = u;
+   eval_divide(t, uu, v);
+}
+template <class T, class U>
+inline typename enable_if_c<is_arithmetic<U>::value && is_convertible<U, T>::value>::type eval_divide(T& t, const U& u, const T& v)
+{
+   T uu(u);
+   eval_divide(t, uu, v);
+}
+
+
+template <class T>
+inline void eval_modulus(T& t, const T& u, const T& v)
+{
+   if(&t == &u)
       eval_modulus(t, v);
-   else if(is_same_object(t, v))
+   else if(&t == &v)
    {
       T temp;
       eval_modulus(temp, u, v);
@@ -218,13 +356,44 @@ inline void eval_modulus(T& t, const U& u, const V& v)
       eval_modulus(t, v);
    }
 }
-template <class T, class U, class V>
-inline void eval_bitwise_and(T& t, const U& u, const V& v)
+template <class T, class U>
+inline typename enable_if_c<is_arithmetic<U>::value && !is_convertible<U, T>::value>::type eval_modulus(T& t, const T& u, const U& v)
 {
-   if(is_same_object(t, u))
-      eval_bitwise_and(t, v);
-   else if(is_same_object(t, v))
+   T vv;
+   vv = v;
+   eval_modulus(t, u, vv);
+}
+template <class T, class U>
+inline typename enable_if_c<is_arithmetic<U>::value && is_convertible<U, T>::value>::type eval_modulus(T& t, const T& u, const U& v)
+{
+   T vv(v);
+   eval_modulus(t, u, vv);
+}
+template <class T, class U>
+inline typename enable_if_c<is_arithmetic<U>::value && !is_convertible<U, T>::value>::type eval_modulus(T& t, const U& u, const T& v)
+{
+   T uu;
+   uu = u;
+   eval_modulus(t, uu, v);
+}
+template <class T, class U>
+inline typename enable_if_c<is_arithmetic<U>::value && is_convertible<U, T>::value>::type eval_modulus(T& t, const U& u, const T& v)
+{
+   T uu(u);
+   eval_modulus(t, uu, v);
+}
+
+template <class T>
+inline void eval_bitwise_and(T& t, const T& u, const T& v)
+{
+   if(&t == &v)
+   {
       eval_bitwise_and(t, u);
+   }
+   else if(&t == &u)
+   {
+      eval_bitwise_and(t, v);
+   }
    else
    {
       t = u;
@@ -232,18 +401,35 @@ inline void eval_bitwise_and(T& t, const U& u, const V& v)
    }
 }
 template <class T, class U>
-inline typename disable_if<is_same<T, U> >::type eval_bitwise_and(T& t, const U& a, const T& b)
+inline typename enable_if_c<is_arithmetic<U>::value && !is_convertible<U, T>::value>::type eval_bitwise_and(T& t, const T& u, const U& v)
 {
-   eval_bitwise_and(t, b, a);
+   T vv;
+   vv = v;
+   eval_bitwise_and(t, u, vv);
+}
+template <class T, class U>
+inline typename enable_if_c<is_arithmetic<U>::value && is_convertible<U, T>::value>::type eval_bitwise_and(T& t, const T& u, const U& v)
+{
+   T vv(v);
+   eval_bitwise_and(t, u, vv);
+}
+template <class T, class U>
+inline typename enable_if_c<is_arithmetic<U>::value>::type eval_bitwise_and(T& t, const U& u, const T& v)
+{
+   eval_bitwise_and(t, v, u);
 }
 
-template <class T, class U, class V>
-inline void eval_bitwise_or(T& t, const U& u, const V& v)
+template <class T>
+inline void eval_bitwise_or(T& t, const T& u, const T& v)
 {
-   if(is_same_object(t, u))
-      eval_bitwise_or(t, v);
-   else if(is_same_object(t, v))
+   if(&t == &v)
+   {
       eval_bitwise_or(t, u);
+   }
+   else if(&t == &u)
+   {
+      eval_bitwise_or(t, v);
+   }
    else
    {
       t = u;
@@ -251,18 +437,35 @@ inline void eval_bitwise_or(T& t, const U& u, const V& v)
    }
 }
 template <class T, class U>
-inline typename disable_if<is_same<T, U> >::type eval_bitwise_or(T& t, const U& a, const T& b)
+inline typename enable_if_c<is_arithmetic<U>::value && !is_convertible<U, T>::value>::type eval_bitwise_or(T& t, const T& u, const U& v)
 {
-   eval_bitwise_or(t, b, a);
+   T vv;
+   vv = v;
+   eval_bitwise_or(t, u, vv);
+}
+template <class T, class U>
+inline typename enable_if_c<is_arithmetic<U>::value && is_convertible<U, T>::value>::type eval_bitwise_or(T& t, const T& u, const U& v)
+{
+   T vv(v);
+   eval_bitwise_or(t, u, vv);
+}
+template <class T, class U>
+inline typename enable_if_c<is_arithmetic<U>::value>::type eval_bitwise_or(T& t, const U& u, const T& v)
+{
+   eval_bitwise_or(t, v, u);
 }
 
-template <class T, class U, class V>
-inline void eval_bitwise_xor(T& t, const U& u, const V& v)
+template <class T>
+inline void eval_bitwise_xor(T& t, const T& u, const T& v)
 {
-   if(is_same_object(t, u))
-      eval_bitwise_xor(t, v);
-   else if(is_same_object(t, v))
+   if(&t == &v)
+   {
       eval_bitwise_xor(t, u);
+   }
+   else if(&t == &u)
+   {
+      eval_bitwise_xor(t, v);
+   }
    else
    {
       t = u;
@@ -270,9 +473,22 @@ inline void eval_bitwise_xor(T& t, const U& u, const V& v)
    }
 }
 template <class T, class U>
-inline typename disable_if<is_same<T, U> >::type eval_bitwise_xor(T& t, const U& a, const T& b)
+inline typename enable_if_c<is_arithmetic<U>::value && !is_convertible<U, T>::value>::type eval_bitwise_xor(T& t, const T& u, const U& v)
 {
-   eval_bitwise_xor(t, b, a);
+   T vv;
+   vv = v;
+   eval_bitwise_xor(t, u, vv);
+}
+template <class T, class U>
+inline typename enable_if_c<is_arithmetic<U>::value && is_convertible<U, T>::value>::type eval_bitwise_xor(T& t, const T& u, const U& v)
+{
+   T vv(v);
+   eval_bitwise_xor(t, u, vv);
+}
+template <class T, class U>
+inline typename enable_if_c<is_arithmetic<U>::value>::type eval_bitwise_xor(T& t, const U& u, const T& v)
+{
+   eval_bitwise_xor(t, v, u);
 }
 
 template <class T>
@@ -281,7 +497,6 @@ inline void eval_increment(T& val)
    typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
    eval_add(val, static_cast<ui_type>(1u));
 }
-
 template <class T>
 inline void eval_decrement(T& val)
 {

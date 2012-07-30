@@ -380,6 +380,129 @@ struct tester
       a.deallocate(pt, 1000);
       return result;
    }
+
+   //
+   // Hetero operations:
+   //
+   template <class T>
+   static T get_hetero_test_value(boost::mpl::false_ const&)
+   {
+      return T(2) / 3;
+   }
+   template <class T>
+   static T get_hetero_test_value(boost::mpl::true_ const&)
+   {
+      return (std::numeric_limits<T>::max)() >> 4;
+   }
+   template <class T>
+   static T get_hetero_test_value()
+   {
+      return get_hetero_test_value<T>(boost::is_integral<T>());
+   }
+   template <class T>
+   double test_multiply_hetero()
+   {
+      static const T val = get_hetero_test_value<T>();
+      stopwatch<boost::chrono::high_resolution_clock> w;
+      for(unsigned i = 0; i < 1000; ++i)
+      {
+         for(unsigned i = 0; i < b.size(); ++i)
+            a[i] = b[i] * val;
+      }
+      return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+   }
+   template <class T>
+   double test_inplace_multiply_hetero()
+   {
+      static const T val = get_hetero_test_value<T>();
+      for(unsigned i = 0; i < b.size(); ++i)
+         a[i] = b[i];
+      stopwatch<boost::chrono::high_resolution_clock> w;
+      for(unsigned i = 0; i < 1000; ++i)
+      {
+         for(unsigned i = 0; i < b.size(); ++i)
+            a[i] *= val;
+      }
+      return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+   }
+   template <class T>
+   double test_add_hetero()
+   {
+      static const T val = get_hetero_test_value<T>();
+      stopwatch<boost::chrono::high_resolution_clock> w;
+      for(unsigned i = 0; i < 1000; ++i)
+      {
+         for(unsigned i = 0; i < b.size(); ++i)
+            a[i] = b[i] + val;
+      }
+      return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+   }
+   template <class T>
+   double test_inplace_add_hetero()
+   {
+      static const T val = get_hetero_test_value<T>();
+      for(unsigned i = 0; i < b.size(); ++i)
+         a[i] = b[i];
+      stopwatch<boost::chrono::high_resolution_clock> w;
+      for(unsigned i = 0; i < 1000; ++i)
+      {
+         for(unsigned i = 0; i < b.size(); ++i)
+            a[i] += val;
+      }
+      return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+   }
+   template <class T>
+   double test_subtract_hetero()
+   {
+      static const T val = get_hetero_test_value<T>();
+      stopwatch<boost::chrono::high_resolution_clock> w;
+      for(unsigned i = 0; i < 1000; ++i)
+      {
+         for(unsigned i = 0; i < b.size(); ++i)
+            a[i] = b[i] - val;
+      }
+      return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+   }
+   template <class T>
+   double test_inplace_subtract_hetero()
+   {
+      static const T val = get_hetero_test_value<T>();
+      for(unsigned i = 0; i < b.size(); ++i)
+         a[i] = b[i];
+      stopwatch<boost::chrono::high_resolution_clock> w;
+      for(unsigned i = 0; i < 1000; ++i)
+      {
+         for(unsigned i = 0; i < b.size(); ++i)
+            a[i] -= val;
+      }
+      return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+   }
+   template <class T>
+   double test_divide_hetero()
+   {
+      static const T val = get_hetero_test_value<T>();
+      stopwatch<boost::chrono::high_resolution_clock> w;
+      for(unsigned i = 0; i < 1000; ++i)
+      {
+         for(unsigned i = 0; i < b.size(); ++i)
+            a[i] = b[i] / val;
+      }
+      return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+   }
+   template <class T>
+   double test_inplace_divide_hetero()
+   {
+      static const T val = get_hetero_test_value<T>();
+      for(unsigned i = 0; i < b.size(); ++i)
+         a[i] = b[i];
+      stopwatch<boost::chrono::high_resolution_clock> w;
+      for(unsigned i = 0; i < 1000; ++i)
+      {
+         for(unsigned i = 0; i < b.size(); ++i)
+            a[i] /= val;
+      }
+      return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+   }
 private:
    T generate_random()
    {
@@ -563,6 +686,15 @@ void test(const char* type, unsigned precision)
    report_result(cat, type, "construct(unsigned)", precision, t.test_construct_unsigned());
    report_result(cat, type, "construct(unsigned long long)", precision, t.test_construct_unsigned_ll());
    test_int_ops(t, type, precision, typename boost::multiprecision::number_category<Number>::type());
+   // Hetero ops:
+   report_result(cat, type, "+", precision, t.template test_add_hetero<unsigned long long>());
+   report_result(cat, type, "-", precision, t.template test_subtract_hetero<unsigned long long>());
+   report_result(cat, type, "*", precision, t.template test_multiply_hetero<unsigned long long>());
+   report_result(cat, type, "/", precision, t.template test_divide_hetero<unsigned long long>());
+   report_result(cat, type, "+", precision, t.template test_inplace_add_hetero<unsigned long long>());
+   report_result(cat, type, "-", precision, t.template test_inplace_subtract_hetero<unsigned long long>());
+   report_result(cat, type, "*", precision, t.template test_inplace_multiply_hetero<unsigned long long>());
+   report_result(cat, type, "/", precision, t.template test_inplace_divide_hetero<unsigned long long>());
 }
 
 void quickbook_results()

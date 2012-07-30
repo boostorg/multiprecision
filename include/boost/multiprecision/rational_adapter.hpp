@@ -37,6 +37,11 @@ struct rational_adapter
 #ifndef BOOST_NO_RVALUE_REFERENCES
    rational_adapter(rational_adapter&& o) : m_value(o.m_value) {}
    rational_adapter(IntBackend&& o) : m_value(o) {}
+   rational_adapter& operator = (rational_adapter&& o)
+   {
+      m_value = static_cast<rational_type&&>(o.m_value);
+      return *this;
+   }
 #endif
    rational_adapter& operator = (const rational_adapter& o)
    {

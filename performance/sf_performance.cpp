@@ -6,16 +6,17 @@
 #define BOOST_MATH_MAX_ROOT_ITERATION_POLICY 500
 
 #if !defined(TEST_MPFR) && !defined(TEST_MPREAL) && !defined(TEST_MPF) && !defined(TEST_MPREAL) \
-   && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR_CLASS)
+   && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR_CLASS) && !defined(TEST_FLOAT)
 #  define TEST_MPFR
 #  define TEST_MPF
 #  define TEST_CPP_DEC_FLOAT
 #  define TEST_MPFR_CLASS
 #  define TEST_MPREAL
+#  define TEST_FLOAT
 #endif
 
 #ifdef TEST_FLOAT
-#include "float_backend.hpp"
+#include "arithmetic_backend.hpp"
 #endif
 #ifdef TEST_MPFR_CLASS
 #include <boost/math/bindings/mpfr.hpp>
@@ -258,8 +259,8 @@ int main()
 #ifdef TEST_FLOAT
    time_proc("double", test_bessel<double>);
    time_proc("real_concept", test_bessel<boost::math::concepts::real_concept>);
-   time_proc("float_backend<double>", test_bessel<mp_number<float_backend<double> > >);
-   time_proc("float_backend<double> - no expression templates", test_bessel<mp_number<float_backend<double>, false> >);
+   time_proc("arithmetic_backend<double>", test_bessel<mp_number<arithmetic_backend<double> > >);
+   time_proc("arithmetic_backend<double> - no expression templates", test_bessel<mp_number<arithmetic_backend<double>, false> >);
 #endif
 
    //

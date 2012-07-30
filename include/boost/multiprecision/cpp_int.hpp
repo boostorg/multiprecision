@@ -135,7 +135,7 @@ public:
       {
          cap = (std::max)(cap * 4, new_size);
          limb_pointer pl = allocator().allocate(cap);
-         std::memcpy(pl, limbs(), size() * sizeof(limb_type));
+         std::copy(limbs(), limbs() + size(), pl);
          if(!m_internal)
             allocator().deallocate(limbs(), capacity());
          else
@@ -162,7 +162,7 @@ public:
       m_sign = o.m_sign;
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   cpp_int_base(cpp_int_base&& o) BOOST_NOEXCEPT : allocator_type(o), m_limbs(o.m_limbs), m_sign(o.m_sign), m_internal(o.m_internal) 
+   cpp_int_base(cpp_int_base&& o) BOOST_NOEXCEPT : allocator_type(static_cast<Allocator&&>(o)), m_limbs(o.m_limbs), m_sign(o.m_sign), m_internal(o.m_internal) 
    {
       if(m_internal)
       {
@@ -174,6 +174,26 @@ public:
          o.m_limbs = 0;
          o.m_internal = true;
       }
+   }
+   cpp_int_base& operator = (cpp_int_base&& o) BOOST_NOEXCEPT
+   {
+      if(!m_internal)
+         allocator().deallocate(m_data.ld.data, m_data.ld.capacity);
+      *static_cast<Allocator*>(this) = static_cast<Allocator&&>(o);
+      m_limbs = o.m_limbs;
+      m_sign = o.m_sign;
+      m_internal = o.m_internal;
+      if(m_internal)
+      {
+         std::copy(o.limbs(), o.limbs() + o.size(), limbs());
+      }
+      else
+      {
+         m_data.ld = o.m_data.ld;
+         o.m_limbs = 0;
+         o.m_internal = true;
+      }
+      return *this;
    }
 #endif
    ~cpp_int_base() BOOST_NOEXCEPT
@@ -188,7 +208,7 @@ public:
          static_cast<allocator_type&>(*this) = static_cast<const allocator_type&>(o);
          m_limbs = 0;
          resize(o.size());
-         std::memcpy(limbs(), o.limbs(), size() * sizeof(limb_type));
+         std::copy(o.limbs(), o.limbs() + o.size(), limbs());
          m_sign = o.m_sign;
       }
    }
@@ -682,6 +702,13 @@ public:
       this->assign(o);
       return *this;
    }
+#ifndef BOOST_NO_RVALUE_REFERENCES
+   cpp_int_backend& operator = (cpp_int_backend&& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+   {
+      *static_cast<base_type*>(this) = static_cast<base_type&&>(o);
+      return *this;
+   }
+#endif
    cpp_int_backend& operator = (limb_type i) BOOST_NOEXCEPT
    {
       this->resize(1);
@@ -1239,7 +1266,7 @@ inline void add_unsigned(cpp_int_backend<MinBits, Signed, Allocator, false>& res
       if(!carry)
       {
          if(pa != pr)
-            std::memcpy(pr, pa, (pr_end - pr) * sizeof(limb_type));
+            std::copy(pa, pa + (pr_end - pr), pr);
          break;
       }
       carry += static_cast<double_limb_type>(*pa);
@@ -1269,17 +1296,26 @@ inline void eval_add(cpp_int_backend<MinBits, Signed, Allocator, false>& result,
 }
 
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void add_unsigned(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+inline void add_unsigned(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    // Addition using modular arithmatic.
    // Nothing fancy, just let uintmax_t take the strain:
+   if(&result != &a)
+      result.resize(a.size());
    double_limb_type carry = o;
    typename cpp_int_backend<MinBits, Signed, Allocator, false>::limb_pointer pr = result.limbs();
-   for(unsigned i = 0; carry && (i < result.size()); ++i)
+   typename cpp_int_backend<MinBits, Signed, Allocator, false>::const_limb_pointer pa = a.limbs();
+   unsigned i = 0;
+   for(; carry && (i < result.size()); ++i)
    {
-      carry += static_cast<double_limb_type>(pr[i]);
+      carry += static_cast<double_limb_type>(pa[i]);
       pr[i] = static_cast<limb_type>(carry);
       carry >>= cpp_int_backend<MinBits, Signed, Allocator, false>::limb_bits;
+   }
+   if(&a != &result)
+   {
+      for(; i < result.size(); ++i)
+         pr[i] = pa[i];
    }
    if(carry)
    {
@@ -1299,7 +1335,18 @@ inline void eval_add(cpp_int_backend<MinBits, Signed, Allocator, false>& result,
       subtract_unsigned(result, o);
    }
    else
-      add_unsigned(result, o);
+      add_unsigned(result, result, o);
+}
+template <unsigned MinBits, bool Signed, class Allocator>
+inline void eval_add(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+{
+   if(a.sign())
+   {
+      result = a;
+      subtract_unsigned(result, o);
+   }
+   else
+      add_unsigned(result, a, o);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
 inline void eval_add(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const signed_limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
@@ -1308,6 +1355,16 @@ inline void eval_add(cpp_int_backend<MinBits, Signed, Allocator, false>& result,
       eval_subtract(result, static_cast<limb_type>(-o));
    else if(o > 0)
       eval_add(result, static_cast<limb_type>(o));
+}
+template <unsigned MinBits, bool Signed, class Allocator>
+inline void eval_add(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const signed_limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+{
+   if(o < 0)
+      eval_subtract(result, a, static_cast<limb_type>(-o));
+   else if(o > 0)
+      eval_add(result, a, static_cast<limb_type>(o));
+   else if(&result != &a)
+      result = a;
 }
 
 template <unsigned MinBits, bool Signed, class Allocator>
@@ -1343,9 +1400,20 @@ template <unsigned MinBits, bool Signed, class Allocator>
 inline void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    if(result.sign())
-      add_unsigned(result, o);
+      add_unsigned(result, result, o);
    else
       subtract_unsigned(result, o);
+}
+template <unsigned MinBits, bool Signed, class Allocator>
+inline void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+{
+   if(a.sign())
+      add_unsigned(result, a, o);
+   else
+   {
+      result = a;
+      subtract_unsigned(result, o);
+   }
 }
 template <unsigned MinBits, bool Signed, class Allocator>
 inline void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const signed_limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
@@ -1357,6 +1425,19 @@ inline void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& re
       else
          eval_subtract(result, static_cast<limb_type>(o));
    }
+}
+template <unsigned MinBits, bool Signed, class Allocator>
+inline void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const signed_limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+{
+   if(o)
+   {
+      if(o < 0)
+         eval_add(result, a, static_cast<limb_type>(-o));
+      else
+         eval_subtract(result, a, static_cast<limb_type>(o));
+   }
+   else if(&result != &a)
+      result = a;
 }
 template <unsigned MinBits, bool Signed, class Allocator>
 inline void eval_increment(cpp_int_backend<MinBits, Signed, Allocator, false>& result) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
@@ -1451,7 +1532,7 @@ inline void subtract_unsigned(cpp_int_backend<MinBits, Signed, Allocator, false>
    }
    // Any remaining digits are the same as those in pa:
    if((x != i) && (pa != pr))
-      std::memcpy(pr + i, pa + i, (x - i) * sizeof(limb_type));
+      std::copy(pa + i, pa + x, pr + i);
    BOOST_ASSERT(0 == borrow);
 
    //
@@ -1494,18 +1575,16 @@ inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& re
       else
       {
          limb_type l = *pa;
-         result = b;
-         eval_multiply(result, l);
+         eval_multiply(result, b, l);
       }
       result.sign(s);
       return;
    }
    if(bs == 1)
    {
-      limb_type l = *pb;
       bool s = b.sign() != a.sign();
-      result = a;
-      eval_multiply(result, l);
+      limb_type l = *pb;
+      eval_multiply(result, a, l);
       result.sign(s);
       return;
    }
@@ -1562,17 +1641,19 @@ inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& re
     eval_multiply(result, result, a);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, cpp_int_backend<MinBits, Signed, Allocator, false>& a, const limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    if(!val)
    {
       result = static_cast<limb_type>(0);
       return;
    }
+   if(&a != &result)
+      result.resize(a.size());
    double_limb_type carry = 0;
    typename cpp_int_backend<MinBits, Signed, Allocator, false>::limb_pointer p = result.limbs();
    typename cpp_int_backend<MinBits, Signed, Allocator, false>::limb_pointer pe = result.limbs() + result.size();
-   typename cpp_int_backend<MinBits, Signed, Allocator, false>::limb_pointer pa = a.limbs();
+   typename cpp_int_backend<MinBits, Signed, Allocator, false>::const_limb_pointer pa = a.limbs();
    while(p != pe)
    {
       carry += static_cast<double_limb_type>(*pa) * static_cast<double_limb_type>(val);
@@ -1587,6 +1668,7 @@ inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& re
       if(cpp_int_backend<MinBits, Signed, Allocator, false>::variable || (result.size() > i))
          result.limbs()[i] = static_cast<limb_type>(carry);
    }
+   result.sign(a.sign());
    if(!cpp_int_backend<MinBits, Signed, Allocator, false>::variable)
       result.normalize();
 }
@@ -1596,7 +1678,25 @@ inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& re
    eval_multiply(result, result, val);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, cpp_int_backend<MinBits, Signed, Allocator, false>& a, const signed_limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const double_limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+{
+   if(val <= (std::numeric_limits<limb_type>::max)())
+   {
+      eval_multiply(result, a, static_cast<limb_type>(val));
+   }
+   else
+   {
+      cpp_int_backend<MinBits, Signed, Allocator, false> t(val);
+      eval_multiply(result, a, t);
+   }
+}
+template <unsigned MinBits, bool Signed, class Allocator>
+inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const double_limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+{
+   eval_multiply(result, result, val);
+}
+template <unsigned MinBits, bool Signed, class Allocator>
+inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const signed_limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    if(val > 0)
       eval_multiply(result, a, static_cast<limb_type>(val));
@@ -1611,6 +1711,32 @@ inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& re
 {
    eval_multiply(result, result, val);
 }
+template <unsigned MinBits, bool Signed, class Allocator>
+inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const signed_double_limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+{
+   if(val > 0)
+   {
+      if(val <= (std::numeric_limits<limb_type>::max)())
+      {
+         eval_multiply(result, a, static_cast<limb_type>(val));
+         return;
+      }
+   }
+   else if(val >= -static_cast<signed_double_limb_type>((std::numeric_limits<limb_type>::max)()))
+   {
+      eval_multiply(result, a, static_cast<limb_type>(-val));
+      result.negate();
+      return;
+   }
+   cpp_int_backend<MinBits, Signed, Allocator, false> t(val);
+   eval_multiply(result, a, t);
+}
+template <unsigned MinBits, bool Signed, class Allocator>
+inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const signed_double_limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+{
+   eval_multiply(result, result, val);
+}
+
 template <unsigned MinBits, bool Signed, class Allocator>
 void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator, false>* result, const cpp_int_backend<MinBits, Signed, Allocator, false>& x, const cpp_int_backend<MinBits, Signed, Allocator, false>& y, cpp_int_backend<MinBits, Signed, Allocator, false>& r)
 {

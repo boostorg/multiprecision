@@ -165,7 +165,7 @@ public:
    BOOST_CONSTEXPR mp_number(mp_number&& r) BOOST_NOEXCEPT : m_backend(static_cast<Backend&&>(r.m_backend)){}
    mp_number& operator=(mp_number&& r) BOOST_NOEXCEPT 
    {
-      m_backend.swap(r.m_backend);
+      m_backend = static_cast<Backend&&>(r.m_backend);
       return *this;
    }
 #endif

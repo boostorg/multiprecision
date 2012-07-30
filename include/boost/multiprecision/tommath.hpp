@@ -52,6 +52,12 @@ struct tommath_int
       m_data = o.m_data;
       o.m_data.dp = 0;
    }
+   tommath_int& operator = (tommath_int&& o)
+   {
+      m_data = o.m_data;
+      o.m_data.dp = 0;
+      return *this;
+   }
 #endif
    tommath_int& operator = (const tommath_int& o)
    {

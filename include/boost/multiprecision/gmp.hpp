@@ -925,6 +925,14 @@ struct gmp_int
       mpz_set(m_data, o.m_data);
       return *this;
    }
+#ifndef BOOST_NO_RVALUE_REFERENCES
+   gmp_int& operator = (gmp_int&& o) BOOST_NOEXCEPT
+   {
+      m_data[0] = o.m_data[0];
+      o.m_data[0]._mp_d = 0;
+      return *this;
+   }
+#endif
    gmp_int& operator = (unsigned long long i)
    {
       unsigned long long mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
@@ -1534,6 +1542,16 @@ struct gmp_rational
       mpq_set(m_data, o.m_data);
       return *this;
    }
+#ifndef BOOST_NO_RVALUE_REFERENCES
+   gmp_rational& operator = (gmp_rational&& o) BOOST_NOEXCEPT
+   {
+      m_data[0]._mp_num = o.data()[0]._mp_num;
+      m_data[0]._mp_den = o.data()[0]._mp_den;
+      o.data()[0]._mp_num._mp_d = 0;
+      o.data()[0]._mp_den._mp_d = 0;
+      return *this;
+   }
+#endif
    gmp_rational& operator = (unsigned long long i)
    {
       unsigned long long mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
