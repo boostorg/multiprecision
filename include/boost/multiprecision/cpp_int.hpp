@@ -1326,6 +1326,7 @@ inline void add_unsigned(cpp_int_backend<MinBits, Signed, Allocator, false>& res
          result.limbs()[x] = static_cast<limb_type>(carry);
    }
    result.normalize();
+   result.sign(a.sign());
 }
 template <unsigned MinBits, bool Signed, class Allocator>
 inline void eval_add(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
@@ -1400,7 +1401,9 @@ template <unsigned MinBits, bool Signed, class Allocator>
 inline void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    if(result.sign())
+   {
       add_unsigned(result, result, o);
+   }
    else
       subtract_unsigned(result, o);
 }
@@ -1408,7 +1411,9 @@ template <unsigned MinBits, bool Signed, class Allocator>
 inline void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    if(a.sign())
+   {
       add_unsigned(result, a, o);
+   }
    else
    {
       result = a;
@@ -2068,8 +2073,8 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator, false>* 
          *result = *pr / y;
          result->sign(x.sign());
       }
-      r.sign(x.sign());
       *pr %= y;
+      r.sign(x.sign());
       return;
    }
    else if(r_order == 1)
