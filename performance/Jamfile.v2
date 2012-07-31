@@ -69,6 +69,8 @@ exe sf_performance : sf_performance.cpp /boost/system//boost_system /boost/chron
           <define>TEST_CPP_DEC_FLOAT
           <toolset>msvc:<cxxflags>-bigobj
           ;
+          
+exe delaunay_test : delaunay_test.cpp /boost/system//boost_system /boost/chrono//boost_chrono ;
 
 obj obj_linpack_benchmark_mpfr : linpack-benchmark.cpp
           : release
@@ -118,4 +120,6 @@ install miller_rabin_install : miller_rabin_performance : <location>. ;
 install performance_test_install : performance_test  : <location>. ;
 install sf_performance_install : sf_performance   : <location>. ;
 install . : linpack_benchmark_double linpack_benchmark_cpp_float linpack_benchmark_mpf linpack_benchmark_mpfr ;
+install delaunay_install : delaunay_test : <location>. ;
+
 

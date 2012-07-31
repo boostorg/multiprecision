@@ -18,6 +18,11 @@ namespace boost{
 namespace multiprecision{
 namespace backends{
 
+#ifdef BOOST_MSVC
+#  pragma warning(push)
+#  pragma warning(disable:4389 4244 4018 4244 4127)
+#endif
+
 template <class Arithmetic>
 struct arithmetic_backend
 {
@@ -46,7 +51,14 @@ struct arithmetic_backend
    }
    arithmetic_backend& operator = (const char* s)
    {
-      m_value = boost::lexical_cast<double>(s);
+      try
+      {
+         m_value = boost::lexical_cast<Arithmetic>(s);
+      }
+      catch(const bad_lexical_cast&)
+      {
+         throw std::runtime_error(std::string("Unable to interpret the string provided: \"") + s + std::string("\" as a compatible number type."));
+      }
       return *this;
    }
    void swap(arithmetic_backend& o)
@@ -57,12 +69,20 @@ struct arithmetic_backend
    {
       std::stringstream ss;
       ss.flags(f);
-      ss << std::setprecision(digits) << m_value;
+      ss << std::setprecision(digits ? digits : std::numeric_limits<Arithmetic>::digits10 + 4) << m_value;
       return ss.str();
+   }
+   void do_negate(const mpl::true_&)
+   {
+      m_value = 1 + ~m_value;
+   }
+   void do_negate(const mpl::false_&)
+   {
+      m_value = -m_value;
    }
    void negate()
    {
-      m_value = -m_value;
+      do_negate(is_unsigned<Arithmetic>());
    }
    int compare(const arithmetic_backend& o)const
    {
@@ -86,6 +106,37 @@ inline void eval_convert_to(R* result, const arithmetic_backend<Arithmetic>& bac
 }
 
 template <class Arithmetic>
+inline bool eval_eq(const arithmetic_backend<Arithmetic>& a, const arithmetic_backend<Arithmetic>& b)
+{
+   return a.data() == b.data();
+}
+template <class Arithmetic, class A2>
+inline bool eval_eq(const arithmetic_backend<Arithmetic>& a, const A2& b)
+{
+   return a.data() == b;
+}
+template <class Arithmetic>
+inline bool eval_lt(const arithmetic_backend<Arithmetic>& a, const arithmetic_backend<Arithmetic>& b)
+{
+   return a.data() < b.data();
+}
+template <class Arithmetic, class A2>
+inline bool eval_lt(const arithmetic_backend<Arithmetic>& a, const A2& b)
+{
+   return a.data() < b;
+}
+template <class Arithmetic>
+inline bool eval_gt(const arithmetic_backend<Arithmetic>& a, const arithmetic_backend<Arithmetic>& b)
+{
+   return a.data() > b.data();
+}
+template <class Arithmetic, class A2>
+inline bool eval_gt(const arithmetic_backend<Arithmetic>& a, const A2& b)
+{
+   return a.data() > b;
+}
+
+template <class Arithmetic>
 inline void eval_add(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& o)
 {
    result.data() += o.data();
@@ -103,6 +154,8 @@ inline void eval_multiply(arithmetic_backend<Arithmetic>& result, const arithmet
 template <class Arithmetic>
 inline void eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& o)
 {
+   if(!std::numeric_limits<Arithmetic>::has_infinity && !o.data())
+      BOOST_THROW_EXCEPTION(std::runtime_error("Divide by zero"));
    result.data() /= o.data();
 }
 
@@ -124,6 +177,8 @@ inline typename enable_if<is_arithmetic<A2> >::type eval_multiply(arithmetic_bac
 template <class Arithmetic, class A2>
 inline typename enable_if<is_arithmetic<A2> >::type eval_divide(arithmetic_backend<Arithmetic>& result, const A2& o)
 {
+   if(!std::numeric_limits<Arithmetic>::has_infinity && !o)
+      BOOST_THROW_EXCEPTION(std::runtime_error("Divide by zero"));
    result.data() /= o;
 }
 
@@ -145,6 +200,8 @@ inline void eval_multiply(arithmetic_backend<Arithmetic>& result, const arithmet
 template <class Arithmetic>
 inline void eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const arithmetic_backend<Arithmetic>& b)
 {
+   if(!std::numeric_limits<Arithmetic>::has_infinity && !b.data())
+      BOOST_THROW_EXCEPTION(std::runtime_error("Divide by zero"));
    result.data() = a.data() / b.data();
 }
 
@@ -166,6 +223,8 @@ inline typename enable_if<is_arithmetic<A2>>::type eval_multiply(arithmetic_back
 template <class Arithmetic, class A2>
 inline typename enable_if<is_arithmetic<A2>>::type eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
 {
+   if(!std::numeric_limits<Arithmetic>::has_infinity && !b)
+      BOOST_THROW_EXCEPTION(std::runtime_error("Divide by zero"));
    result.data() = a.data() / b;
 }
 
@@ -181,10 +240,15 @@ inline int eval_get_sign(const arithmetic_backend<Arithmetic>& val)
    return val.data() == 0 ? 0 : val.data() < 0 ? -1 : 1;
 }
 
+template <class T>
+inline typename enable_if<is_unsigned<T>, T>::type abs(T v) { return v; }
+
 template <class Arithmetic>
 inline void eval_abs(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& o)
 {
-   result.data() = std::abs(o.data());
+   using std::abs;
+   using boost::multiprecision::backends::abs;
+   result.data() = abs(o.data());
 }
 
 template <class Arithmetic>
@@ -232,6 +296,20 @@ inline void eval_round(arithmetic_backend<Arithmetic>& result, const arithmetic_
 {
    BOOST_MATH_STD_USING
    result.data() = round(o.data());
+}
+
+template <class Arithmetic>
+inline void eval_frexp(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, int* v)
+{
+   BOOST_MATH_STD_USING
+   result.data() = frexp(a.data(), v);
+}
+
+template <class Arithmetic>
+inline void eval_ldexp(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, int v)
+{
+   BOOST_MATH_STD_USING
+   result.data() = ldexp(a.data(), v);
 }
 
 template <class Arithmetic>
@@ -339,9 +417,70 @@ inline void eval_atan2(arithmetic_backend<Arithmetic>& result, const arithmetic_
    result.data() = atan2(a.data(), b.data());
 }
 
+template <class Arithmetic, class I>
+inline void eval_left_shift(arithmetic_backend<Arithmetic>& result, I val)
+{
+   result.data() <<= val;
+}
+
+template <class Arithmetic, class I>
+inline void eval_right_shift(arithmetic_backend<Arithmetic>& result, I val)
+{
+   result.data() >>= val;
+}
+
+template <class Arithmetic>
+inline void eval_modulus(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a)
+{
+   result.data() %= a.data();
+}
+
+template <class Arithmetic>
+inline void eval_bitwise_and(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a)
+{
+   result.data() &= a.data();
+}
+
+template <class Arithmetic>
+inline void eval_bitwise_or(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a)
+{
+   result.data() |= a.data();
+}
+
+template <class Arithmetic>
+inline void eval_bitwise_xor(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a)
+{
+   result.data() ^= a.data();
+}
+
+template <class Arithmetic>
+inline void eval_complement(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a)
+{
+   result.data() = ~a.data();
+}
+
+template <class Arithmetic>
+inline void eval_gcd(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const arithmetic_backend<Arithmetic>& b)
+{
+   result.data() = boost::math::gcd(a.data(), b.data());
+}
+
+template <class Arithmetic>
+inline void eval_lcm(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const arithmetic_backend<Arithmetic>& b)
+{
+   result.data() = boost::math::lcm(a.data(), b.data());
+}
+
+#ifdef BOOST_MSVC
+#  pragma warning(pop)
+#endif
+
 } // namespace backends
 
 using boost::multiprecision::backends::arithmetic_backend;
+
+template <class Arithmetic>
+struct number_category<arithmetic_backend<Arithmetic> > : public mpl::int_<is_integral<Arithmetic>::value ? number_kind_integer : number_kind_floating_point>{};
 
 }} // namespaces
 
@@ -393,5 +532,7 @@ public:
 };
 
 }
+
+#include <boost/multiprecision/integer_ops.hpp>
 
 #endif

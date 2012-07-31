@@ -18,7 +18,7 @@
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && \
    !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ) \
    && !defined(TEST_TOMMATH) && !defined(TEST_TOMMATH_BOOST_RATIONAL) && !defined(TEST_MPZ_BOOST_RATIONAL)\
-   && !defined(TEST_CPP_INT) && !defined(TEST_CPP_INT_BR)
+   && !defined(TEST_CPP_INT) && !defined(TEST_CPP_INT_BR) && !defined(TEST_ARITHMETIC_BACKEND)
 #  define TEST_MPF_50
 #  define TEST_MPF
 #  define TEST_BACKEND
@@ -30,6 +30,7 @@
 #  define TEST_TOMMATH
 #  define TEST_CPP_INT
 #  define TEST_CPP_INT_BR
+#  define TEST_ARITHMETIC_BACKEND
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -40,6 +41,9 @@
 
 #endif
 
+#if defined(TEST_ARITHMETIC_BACKEND)
+# include "../performance/arithmetic_backend.hpp"
+#endif
 #if defined(TEST_MPF_50) || defined(TEST_MPF) || defined(TEST_MPZ) || defined(TEST_MPQ) || defined(TEST_MPZ_BOOST_RATIONAL)
 #include <boost/multiprecision/gmp.hpp>
 #include <boost/multiprecision/rational_adapter.hpp>
@@ -628,7 +632,10 @@ void test_negative_mixed(boost::mpl::true_ const&)
    Num tol = 0;
 #endif
    std::ios_base::fmtflags f = boost::is_floating_point<Num>::value ? std::ios_base::scientific : std::ios_base::fmtflags(0);
-   BOOST_TEST_CLOSE(n1, boost::lexical_cast<target_type>(Real(n1).str(0, f)), tol);
+   if(std::numeric_limits<target_type>::digits <= std::numeric_limits<Real>::digits)
+   {
+      BOOST_TEST_CLOSE(n1, boost::lexical_cast<target_type>(Real(n1).str(0, f)), tol);
+   }
    BOOST_TEST_CLOSE(n2, boost::lexical_cast<target_type>(Real(n2).str(0, f)), 0);
    BOOST_TEST_CLOSE(n3, boost::lexical_cast<target_type>(Real(n3).str(0, f)), 0);
    BOOST_TEST_CLOSE(n4, boost::lexical_cast<target_type>(Real(n4).str(0, f)), 0);
@@ -693,6 +700,10 @@ template <class Real, class Num>
 void test_mixed()
 {
    typedef typename lexical_cast_target_type<Num>::type target_type;
+   
+   if(std::numeric_limits<Real>::digits < std::numeric_limits<Num>::digits)
+      return;
+
    std::cout << "Testing mixed arithmetic with type: " << typeid(Real).name()  << " and " << typeid(Num).name() << std::endl;
    Num n1 = static_cast<Num>(1uLL << (std::numeric_limits<Num>::digits - 1));
    Num n2 = 1;
@@ -730,7 +741,10 @@ void test_mixed()
    Num tol = 0;
 #endif
    std::ios_base::fmtflags f = boost::is_floating_point<Num>::value ? std::ios_base::scientific : std::ios_base::fmtflags(0);
-   BOOST_TEST_CLOSE(n1, boost::lexical_cast<target_type>(Real(n1).str(0, f)), tol);
+   if(std::numeric_limits<target_type>::digits <= std::numeric_limits<Real>::digits)
+   {
+      BOOST_TEST_CLOSE(n1, boost::lexical_cast<target_type>(Real(n1).str(0, f)), tol);
+   }
    BOOST_TEST_CLOSE(n2, boost::lexical_cast<target_type>(Real(n2).str(0, f)), 0);
    BOOST_TEST_CLOSE(n3, boost::lexical_cast<target_type>(Real(n3).str(0, f)), 0);
    BOOST_TEST_CLOSE(n4, boost::lexical_cast<target_type>(Real(n4).str(0, f)), 0);
@@ -1126,6 +1140,11 @@ void test()
 
 int main()
 {
+#ifdef TEST_ARITHMETIC_BACKEND
+   test<boost::multiprecision::mp_number<boost::multiprecision::arithmetic_backend<double> > >();
+   test<boost::multiprecision::mp_number<boost::multiprecision::arithmetic_backend<int> > >();
+   test<boost::multiprecision::mp_number<boost::multiprecision::arithmetic_backend<unsigned int> > >();
+#endif
 #ifdef TEST_BACKEND
    test<boost::multiprecision::mp_number<boost::multiprecision::concepts::mp_number_backend_float_architype> >();
 #endif

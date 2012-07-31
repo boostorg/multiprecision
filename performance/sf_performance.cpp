@@ -257,10 +257,15 @@ int main()
    // Comparison for builtin floats:
    //
 #ifdef TEST_FLOAT
-   time_proc("double", test_bessel<double>);
-   time_proc("real_concept", test_bessel<boost::math::concepts::real_concept>);
-   time_proc("arithmetic_backend<double>", test_bessel<mp_number<arithmetic_backend<double> > >);
-   time_proc("arithmetic_backend<double> - no expression templates", test_bessel<mp_number<arithmetic_backend<double>, false> >);
+   time_proc("Bessel Functions - double", test_bessel<double>);
+   time_proc("Bessel Functions - real_concept", test_bessel<boost::math::concepts::real_concept>);
+   time_proc("Bessel Functions - arithmetic_backend<double>", test_bessel<mp_number<arithmetic_backend<double> > >);
+   time_proc("Bessel Functions - arithmetic_backend<double> - no expression templates", test_bessel<mp_number<arithmetic_backend<double>, false> >);
+
+   time_proc("Non-central T - double", test_nct<double>);
+   time_proc("Non-central T - real_concept", test_nct<boost::math::concepts::real_concept>);
+   time_proc("Non-central T - arithmetic_backend<double>", test_nct<mp_number<arithmetic_backend<double> > >);
+   time_proc("Non-central T - arithmetic_backend<double> - no expression templates", test_nct<mp_number<arithmetic_backend<double>, false> >);
 #endif
 
    //

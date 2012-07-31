@@ -20,6 +20,7 @@
 #include <boost/type_traits/make_unsigned.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/multiprecision/detail/generic_interconvert.hpp>
+#include <boost/multiprecision/detail/mp_number_compare.hpp>
 #include <istream>  // stream operators
 #include <cstdio>   // EOF
 
@@ -1630,14 +1631,13 @@ struct is_valid_comparison : public boost::multiprecision::detail::is_valid_comp
 
 }
 
-
+/*
 template <class Exp1, class Exp2>
 inline typename boost::enable_if<detail::is_valid_comparison<Exp1, Exp2>, bool>::type 
    operator == (const Exp1& a, const Exp2& b)
 {
    return 0 == detail::mp_number_compare(a, b);
 }
-
 template <class Exp1, class Exp2>
 inline typename boost::enable_if<detail::is_valid_comparison<Exp1, Exp2>, bool>::type 
    operator != (const Exp1& a, const Exp2& b)
@@ -1672,7 +1672,7 @@ inline typename boost::enable_if<detail::is_valid_comparison<Exp1, Exp2>, bool>:
 {
    return 0 < detail::mp_number_compare(a, b);
 }
-
+*/
 template <class Backend, bool ExpressionTemplates>
 inline std::ostream& operator << (std::ostream& os, const mp_number<Backend, ExpressionTemplates>& r)
 {
