@@ -13,6 +13,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/math/concepts/real_concept.hpp>
 #include <boost/multiprecision/mp_number.hpp>
+#include <boost/math/common_factor_rt.hpp>
 
 namespace boost{
 namespace multiprecision{
@@ -223,17 +224,17 @@ inline typename disable_if_c<std::numeric_limits<Arithmetic>::has_infinity>::typ
 }
 
 template <class Arithmetic, class A2>
-inline typename enable_if<is_arithmetic<A2>>::type eval_add(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
+inline typename enable_if<is_arithmetic<A2> >::type eval_add(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
 {
    result.data() = a.data() + b;
 }
 template <class Arithmetic, class A2>
-inline typename enable_if<is_arithmetic<A2>>::type eval_subtract(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
+inline typename enable_if<is_arithmetic<A2> >::type eval_subtract(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
 {
    result.data() = a.data() - b;
 }
 template <class Arithmetic, class A2>
-inline typename enable_if<is_arithmetic<A2>>::type eval_multiply(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
+inline typename enable_if<is_arithmetic<A2> >::type eval_multiply(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
 {
    result.data() = a.data() * b;
 }

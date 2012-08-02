@@ -578,7 +578,7 @@ run test_constants.cpp
         : test_constants_cpp_dec_float ;
 
 
-run test_move.cpp mpfr
+run test_move.cpp mpfr gmp
         : # command line
         : # input files
         : # requirements

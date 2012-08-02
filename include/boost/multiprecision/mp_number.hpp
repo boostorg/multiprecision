@@ -1471,23 +1471,23 @@ private:
 
    // Tests if the expression contains a reference to *this:
    template <class Exp>
-   BOOST_CONSTEXPR bool contains_self(const Exp& e)const BOOST_NOEXCEPT
+   bool contains_self(const Exp& e)const BOOST_NOEXCEPT
    {
       return contains_self(e, typename Exp::arity());
    }
    template <class Exp>
-   BOOST_CONSTEXPR bool contains_self(const Exp& e, mpl::int_<0> const&)const BOOST_NOEXCEPT
+   bool contains_self(const Exp& e, mpl::int_<0> const&)const BOOST_NOEXCEPT
    {
       return is_realy_self(e.value());
    }
    template <class Exp>
-   BOOST_CONSTEXPR bool contains_self(const Exp& e, mpl::int_<1> const&)const BOOST_NOEXCEPT
+   bool contains_self(const Exp& e, mpl::int_<1> const&)const BOOST_NOEXCEPT
    {
       typedef typename Exp::left_type child_type;
       return contains_self(e.left(), typename child_type::arity());
    }
    template <class Exp>
-   BOOST_CONSTEXPR bool contains_self(const Exp& e, mpl::int_<2> const&)const BOOST_NOEXCEPT
+   bool contains_self(const Exp& e, mpl::int_<2> const&)const BOOST_NOEXCEPT
    {
       typedef typename Exp::left_type child0_type;
       typedef typename Exp::right_type child1_type;
@@ -1495,7 +1495,7 @@ private:
          || contains_self(e.right(), typename child1_type::arity());
    }
    template <class Exp>
-   BOOST_CONSTEXPR bool contains_self(const Exp& e, mpl::int_<3> const&)const BOOST_NOEXCEPT
+   bool contains_self(const Exp& e, mpl::int_<3> const&)const BOOST_NOEXCEPT
    {
       typedef typename Exp::left_type child0_type;
       typedef typename Exp::middle_type child1_type;

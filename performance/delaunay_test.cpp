@@ -129,12 +129,12 @@ inline int128_t mult_64x64_to_128(int64_t a, int64_t b)
 }
 
 template <class R, class T>
-__forceinline void mul_2n(R& r, const T& a, const T& b)
+inline void mul_2n(R& r, const T& a, const T& b)
 {
    r = R(a) * b;
 }
 
-__forceinline void mul_2n(int128_t& r, const boost::int64_t& a, const boost::int64_t& b)
+inline void mul_2n(int128_t& r, const boost::int64_t& a, const boost::int64_t& b)
 {
    r = mult_64x64_to_128(a, b);
 }
@@ -155,9 +155,6 @@ inline bool delaunay_test(int32_t ax, int32_t ay, int32_t bx, int32_t by,
 
    typedef typename Traits::i64_t i64;
    typedef typename Traits::i128_t i128;
-
-   i64 ax64 = ax, ay64 = ay, bx64 = bx, by64 = by,
-      cx64 = cx, cy64 = cy, dx64 = dx, dy64 = dy;
 
    i64 cos_abc, t;
    mul_2n(cos_abc, (ax-bx), (cx-bx));
