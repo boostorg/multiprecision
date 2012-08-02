@@ -532,6 +532,22 @@ struct mpfr_float_backend<0> : public detail::mpfr_float_imp<0>
    }
 };
 
+template <unsigned digits10, class T>
+inline typename disable_if<is_same<mpfr_float_backend<digits10>, T>, bool>::type eval_eq(const mpfr_float_backend<digits10>& a, const T& b) BOOST_NOEXCEPT
+{
+   return a.compare(b) == 0;
+}
+template <unsigned digits10, class T>
+inline typename disable_if<is_same<mpfr_float_backend<digits10>, T>, bool>::type eval_lt(const mpfr_float_backend<digits10>& a, const T& b) BOOST_NOEXCEPT
+{
+   return a.compare(b) < 0;
+}
+template <unsigned digits10, class T>
+inline typename disable_if<is_same<mpfr_float_backend<digits10>, T>, bool>::type eval_gt(const mpfr_float_backend<digits10>& a, const T& b) BOOST_NOEXCEPT
+{
+   return a.compare(b) > 0;
+}
+
 template <unsigned digits10>
 inline void eval_add(mpfr_float_backend<digits10>& result, const mpfr_float_backend<digits10>& o) BOOST_NOEXCEPT
 {

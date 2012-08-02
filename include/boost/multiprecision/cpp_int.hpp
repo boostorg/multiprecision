@@ -1218,6 +1218,122 @@ public:
    }
 };
 
+template <unsigned MinBits, bool Signed, class Allocator>
+inline bool eval_eq(const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const cpp_int_backend<MinBits, Signed, Allocator, false>& b) BOOST_NOEXCEPT
+{
+   return (a.sign() == b.sign())
+      && (a.size() == b.size())
+      && std::equal(a.limbs(), a.limbs() + a.size(), b.limbs());
+}
+template <unsigned MinBits, class Allocator>
+inline bool eval_eq(const cpp_int_backend<MinBits, true, Allocator, false>& a, limb_type b) BOOST_NOEXCEPT
+{
+   return (a.sign() == false)
+      && (a.size() == 1)
+      && (*a.limbs() == b);
+}
+template <unsigned MinBits, class Allocator>
+inline bool eval_eq(const cpp_int_backend<MinBits, true, Allocator, false>& a, signed_limb_type b) BOOST_NOEXCEPT
+{
+   return (a.sign() == (b < 0))
+      && (a.size() == 1)
+      && (*a.limbs() == static_cast<limb_type>(std::abs(b)));
+}
+template <unsigned MinBits, class Allocator>
+inline bool eval_eq(const cpp_int_backend<MinBits, false, Allocator, false>& a, limb_type b) BOOST_NOEXCEPT
+{
+   return (a.size() == 1)
+      && (*a.limbs() == b);
+}
+template <unsigned MinBits, class Allocator>
+inline bool eval_eq(const cpp_int_backend<MinBits, false, Allocator, false>& a, signed_limb_type b) BOOST_NOEXCEPT
+{
+   return (b < 0) ? eval_eq(a, cpp_int_backend<MinBits, false, Allocator, false>(b)) : eval_eq(a, static_cast<limb_type>(b)); // Use bit pattern of b for comparison
+}
+
+template <unsigned MinBits, class Allocator>
+inline bool eval_lt(const cpp_int_backend<MinBits, true, Allocator, false>& a, limb_type b) BOOST_NOEXCEPT
+{
+   if(a.sign())
+      return true;
+   if(a.size() > 1)
+      return false;
+   return *a.limbs() < b;
+}
+template <unsigned MinBits, class Allocator>
+inline bool eval_lt(const cpp_int_backend<MinBits, true, Allocator, false>& a, signed_limb_type b) BOOST_NOEXCEPT
+{
+   if((b == 0) || (a.sign() != (b < 0)))
+      return a.sign();
+   if(a.sign())
+   {
+      if(a.size() > 1)
+         return true;
+      return *a.limbs() > static_cast<limb_type>(std::abs(b));
+   }
+   else
+   {
+      if(a.size() > 1)
+         return false;
+      return *a.limbs() < static_cast<limb_type>(b);
+   }
+}
+
+template <unsigned MinBits, class Allocator>
+inline bool eval_lt(const cpp_int_backend<MinBits, false, Allocator, false>& a, limb_type b) BOOST_NOEXCEPT
+{
+   if(a.size() > 1)
+      return false;
+   return *a.limbs() < b;
+}
+template <unsigned MinBits, class Allocator>
+inline bool eval_lt(const cpp_int_backend<MinBits, false, Allocator, false>& a, signed_limb_type b) BOOST_NOEXCEPT
+{
+   return (b < 0) ? a.compare(b) < 0 : eval_lt(a, static_cast<limb_type>(b)); // Use bit pattern of b for comparison
+}
+
+template <unsigned MinBits, class Allocator>
+inline bool eval_gt(const cpp_int_backend<MinBits, true, Allocator, false>& a, limb_type b) BOOST_NOEXCEPT
+{
+   if(a.sign())
+      return false;
+   if(a.size() > 1)
+      return true;
+   return *a.limbs() > b;
+}
+template <unsigned MinBits, class Allocator>
+inline bool eval_gt(const cpp_int_backend<MinBits, true, Allocator, false>& a, signed_limb_type b) BOOST_NOEXCEPT
+{
+   if(b == 0)
+      return !a.sign() && ((a.size() > 1) || *a.limbs());
+   if(a.sign() != (b < 0))
+      return !a.sign();
+   if(a.sign())
+   {
+      if(a.size() > 1)
+         return false;
+      return *a.limbs() < static_cast<limb_type>(std::abs(b));
+   }
+   else
+   {
+      if(a.size() > 1)
+         return true;
+      return *a.limbs() > static_cast<limb_type>(b);
+   }
+}
+
+template <unsigned MinBits, class Allocator>
+inline bool eval_gt(const cpp_int_backend<MinBits, false, Allocator, false>& a, limb_type b) BOOST_NOEXCEPT
+{
+   if(a.size() > 1)
+      return true;
+   return *a.limbs() > b;
+}
+template <unsigned MinBits, class Allocator>
+inline bool eval_gt(const cpp_int_backend<MinBits, false, Allocator, false>& a, signed_limb_type b) BOOST_NOEXCEPT
+{
+   return (b < 0) ? a.compare(b) > 0 : eval_gt(a, static_cast<limb_type>(b)); // Use bit pattern of b for comparison.
+}
 
 template <unsigned MinBits, bool Signed, class Allocator>
 inline void eval_add(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)

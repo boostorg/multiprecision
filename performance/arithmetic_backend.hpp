@@ -152,9 +152,14 @@ inline void eval_multiply(arithmetic_backend<Arithmetic>& result, const arithmet
    result.data() *= o.data();
 }
 template <class Arithmetic>
-inline void eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& o)
+inline typename enable_if_c<std::numeric_limits<Arithmetic>::has_infinity>::type eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& o)
 {
-   if(!std::numeric_limits<Arithmetic>::has_infinity && !o.data())
+   result.data() /= o.data();
+}
+template <class Arithmetic>
+inline typename disable_if_c<std::numeric_limits<Arithmetic>::has_infinity>::type eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& o)
+{
+   if(!o.data())
       BOOST_THROW_EXCEPTION(std::runtime_error("Divide by zero"));
    result.data() /= o.data();
 }
@@ -175,10 +180,17 @@ inline typename enable_if<is_arithmetic<A2> >::type eval_multiply(arithmetic_bac
    result.data() *= o;
 }
 template <class Arithmetic, class A2>
-inline typename enable_if<is_arithmetic<A2> >::type eval_divide(arithmetic_backend<Arithmetic>& result, const A2& o)
+inline typename enable_if_c<(is_arithmetic<A2>::value && !std::numeric_limits<Arithmetic>::has_infinity)>::type 
+   eval_divide(arithmetic_backend<Arithmetic>& result, const A2& o)
 {
-   if(!std::numeric_limits<Arithmetic>::has_infinity && !o)
+   if(!o)
       BOOST_THROW_EXCEPTION(std::runtime_error("Divide by zero"));
+   result.data() /= o;
+}
+template <class Arithmetic, class A2>
+inline typename enable_if_c<(is_arithmetic<A2>::value && std::numeric_limits<Arithmetic>::has_infinity)>::type 
+   eval_divide(arithmetic_backend<Arithmetic>& result, const A2& o)
+{
    result.data() /= o;
 }
 
@@ -198,9 +210,14 @@ inline void eval_multiply(arithmetic_backend<Arithmetic>& result, const arithmet
    result.data() = a.data() * b.data();
 }
 template <class Arithmetic>
-inline void eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const arithmetic_backend<Arithmetic>& b)
+inline typename enable_if_c<std::numeric_limits<Arithmetic>::has_infinity>::type eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const arithmetic_backend<Arithmetic>& b)
 {
-   if(!std::numeric_limits<Arithmetic>::has_infinity && !b.data())
+   result.data() = a.data() / b.data();
+}
+template <class Arithmetic>
+inline typename disable_if_c<std::numeric_limits<Arithmetic>::has_infinity>::type eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const arithmetic_backend<Arithmetic>& b)
+{
+   if(!b.data())
       BOOST_THROW_EXCEPTION(std::runtime_error("Divide by zero"));
    result.data() = a.data() / b.data();
 }
@@ -221,10 +238,17 @@ inline typename enable_if<is_arithmetic<A2>>::type eval_multiply(arithmetic_back
    result.data() = a.data() * b;
 }
 template <class Arithmetic, class A2>
-inline typename enable_if<is_arithmetic<A2>>::type eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
+inline typename enable_if_c<(is_arithmetic<A2>::value && !std::numeric_limits<Arithmetic>::has_infinity)>::type 
+   eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
 {
-   if(!std::numeric_limits<Arithmetic>::has_infinity && !b)
+   if(!b)
       BOOST_THROW_EXCEPTION(std::runtime_error("Divide by zero"));
+   result.data() = a.data() / b;
+}
+template <class Arithmetic, class A2>
+inline typename enable_if_c<(is_arithmetic<A2>::value && std::numeric_limits<Arithmetic>::has_infinity)>::type 
+   eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
+{
    result.data() = a.data() / b;
 }
 

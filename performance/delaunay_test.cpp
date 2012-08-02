@@ -8,6 +8,8 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include "arithmetic_backend.hpp"
 #include <boost/chrono.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
 
 #include <fstream>
 #include <iomanip>
@@ -196,30 +198,6 @@ struct dt_dat {
 typedef std::vector<dt_dat> data_t;
 data_t data;
 
-static void load_data()
-{
-   std::ifstream is("delaunay_data.txt");
-
-   while (is.good()) 
-   {
-      dt_dat d;
-      is >> d.ax >> d.ay >> d.bx >> d.by >> d.cx >> d.cy >> d.dx >> d.dy;
-      if (is.good()) 
-      {
-         data.push_back(d);
-         d.ax >>= 10;
-         d.ay >>= 10;
-         d.bx >>= 10;
-         d.by >>= 10;
-         d.cx >>= 10;
-         d.cy >>= 10;
-         d.dx >>= 10;
-         d.dy >>= 10;
-         data.push_back(d);
-      }
-   }
-}
-
 template <class Traits>
 void do_calc(const char* name)
 {
@@ -254,6 +232,32 @@ struct test_traits
    typedef I64 i64_t;
    typedef I128 i128_t;
 };
+
+
+dt_dat generate_quadrilateral()
+{
+   static boost::random::mt19937 gen;
+   static boost::random::uniform_int_distribution<> dist(INT_MIN/2, INT_MAX/2);
+
+   dt_dat result;
+
+   result.ax = dist(gen);
+   result.ay = dist(gen);
+   result.bx = boost::random::uniform_int_distribution<>(result.ax, INT_MAX/2)(gen);  // bx is to the right of ax.
+   result.by = dist(gen);
+   result.cx = dist(gen);
+   result.cy = boost::random::uniform_int_distribution<>(result.cx > result.bx ? result.by : result.ay, INT_MAX/2)(gen);  // cy is below at least one of ay and by.
+   result.dx = boost::random::uniform_int_distribution<>(result.cx, INT_MAX/2)(gen);  // dx is to the right of cx.
+   result.dy = boost::random::uniform_int_distribution<>(result.cx > result.bx ? result.by : result.ay, INT_MAX/2)(gen);  // cy is below at least one of ay and by.
+   
+   return result;
+}
+
+static void load_data()
+{
+   for(unsigned i = 0; i < 100000; ++i)
+      data.push_back(generate_quadrilateral());
+}
 
 
 int main()

@@ -135,6 +135,72 @@ template <>
 struct is_twos_complement_integer<boost::multiprecision::tom_int> : public boost::mpl::false_ {};
 #endif
 
+#define BOOST_TEST_EQUAL(a, b) BOOST_TEST((a) == (b))
+
+template <class Real, class Val>
+void test_comparisons(Val a, Val b)
+{
+   Real r1(a);
+   Real r2(b);
+   Real z(1);
+
+   BOOST_TEST_EQUAL(r1 == r2, a == b);
+   BOOST_TEST_EQUAL(r1 != r2, a != b);
+   BOOST_TEST_EQUAL(r1 <= r2, a <= b);
+   BOOST_TEST_EQUAL(r1 < r2, a < b);
+   BOOST_TEST_EQUAL(r1 >= r2, a >= b);
+   BOOST_TEST_EQUAL(r1 > r2, a > b);
+
+   BOOST_TEST_EQUAL(r1 == b, a == b);
+   BOOST_TEST_EQUAL(r1 != b, a != b);
+   BOOST_TEST_EQUAL(r1 <= b, a <= b);
+   BOOST_TEST_EQUAL(r1 < b, a < b);
+   BOOST_TEST_EQUAL(r1 >= b, a >= b);
+   BOOST_TEST_EQUAL(r1 > b, a > b);
+
+   BOOST_TEST_EQUAL(a == r2, a == b);
+   BOOST_TEST_EQUAL(a != r2, a != b);
+   BOOST_TEST_EQUAL(a <= r2, a <= b);
+   BOOST_TEST_EQUAL(a < r2, a < b);
+   BOOST_TEST_EQUAL(a >= r2, a >= b);
+   BOOST_TEST_EQUAL(a > r2, a > b);
+
+   BOOST_TEST_EQUAL(r1*z == r2, a == b);
+   BOOST_TEST_EQUAL(r1*z != r2, a != b);
+   BOOST_TEST_EQUAL(r1*z <= r2, a <= b);
+   BOOST_TEST_EQUAL(r1*z < r2, a < b);
+   BOOST_TEST_EQUAL(r1*z >= r2, a >= b);
+   BOOST_TEST_EQUAL(r1*z > r2, a > b);
+
+   BOOST_TEST_EQUAL(r1 == r2*z, a == b);
+   BOOST_TEST_EQUAL(r1 != r2*z, a != b);
+   BOOST_TEST_EQUAL(r1 <= r2*z, a <= b);
+   BOOST_TEST_EQUAL(r1 < r2*z, a < b);
+   BOOST_TEST_EQUAL(r1 >= r2*z, a >= b);
+   BOOST_TEST_EQUAL(r1 > r2*z, a > b);
+
+   BOOST_TEST_EQUAL(r1*z == r2*z, a == b);
+   BOOST_TEST_EQUAL(r1*z != r2*z, a != b);
+   BOOST_TEST_EQUAL(r1*z <= r2*z, a <= b);
+   BOOST_TEST_EQUAL(r1*z < r2*z, a < b);
+   BOOST_TEST_EQUAL(r1*z >= r2*z, a >= b);
+   BOOST_TEST_EQUAL(r1*z > r2*z, a > b);
+
+   BOOST_TEST_EQUAL(r1*z == b, a == b);
+   BOOST_TEST_EQUAL(r1*z != b, a != b);
+   BOOST_TEST_EQUAL(r1*z <= b, a <= b);
+   BOOST_TEST_EQUAL(r1*z < b, a < b);
+   BOOST_TEST_EQUAL(r1*z >= b, a >= b);
+   BOOST_TEST_EQUAL(r1*z > b, a > b);
+
+   BOOST_TEST_EQUAL(a == r2*z, a == b);
+   BOOST_TEST_EQUAL(a != r2*z, a != b);
+   BOOST_TEST_EQUAL(a <= r2*z, a <= b);
+   BOOST_TEST_EQUAL(a < r2*z, a < b);
+   BOOST_TEST_EQUAL(a >= r2*z, a >= b);
+   BOOST_TEST_EQUAL(a > r2*z, a > b);
+}
+
 template <class Real>
 void test_complement(Real a, Real b, Real c, const boost::mpl::true_&)
 {
@@ -601,18 +667,14 @@ void test_negative_mixed(boost::mpl::true_ const&)
    Num n3 = 0;
    Num n4 = -20;
    Num n5 = -8;
-   BOOST_TEST((Real(n2) < 0) == true);
-   BOOST_TEST((Real(n2) <= 0) == true);
-   BOOST_TEST((Real(n2) > 0) == false);
-   BOOST_TEST((Real(n2) >= 0) == false);
-   BOOST_TEST((Real(n2) == 0) == false);
-   BOOST_TEST((Real(n2) != 0) == true);
-   BOOST_TEST((Real(n2) == n2) == true);
-   BOOST_TEST((Real(n2) != n2) == false);
-   BOOST_TEST((Real(n2) >= n2) == true);
-   BOOST_TEST((Real(n2) <= n2) == true);
-   BOOST_TEST((Real(n2) > n2) == false);
-   BOOST_TEST((Real(n2) < n2) == false);
+
+   test_comparisons<Real>(n1, n2);
+   test_comparisons<Real>(n1, n3);
+   test_comparisons<Real>(n3, n1);
+   test_comparisons<Real>(n2, n1);
+   test_comparisons<Real>(n1, n1);
+   test_comparisons<Real>(n3, n3);
+
    // Default construct:
    BOOST_TEST(Real(n1) == n1);
    BOOST_TEST(Real(n2) == n2);
@@ -710,18 +772,14 @@ void test_mixed()
    Num n3 = 0;
    Num n4 = 20;
    Num n5 = 8;
-   BOOST_TEST((Real(n2) < 0) == false);
-   BOOST_TEST((Real(n2) <= 0) == false);
-   BOOST_TEST((Real(n2) > 0) == true);
-   BOOST_TEST((Real(n2) >= 0) == true);
-   BOOST_TEST((Real(n2) == 0) == false);
-   BOOST_TEST((Real(n2) != 0) == true);
-   BOOST_TEST((Real(n2) == n2) == true);
-   BOOST_TEST((Real(n2) != n2) == false);
-   BOOST_TEST((Real(n2) >= n2) == true);
-   BOOST_TEST((Real(n2) <= n2) == true);
-   BOOST_TEST((Real(n2) > n2) == false);
-   BOOST_TEST((Real(n2) < n2) == false);
+   
+   test_comparisons<Real>(n1, n2);
+   test_comparisons<Real>(n1, n3);
+   test_comparisons<Real>(n1, n1);
+   test_comparisons<Real>(n3, n1);
+   test_comparisons<Real>(n2, n1);
+   test_comparisons<Real>(n3, n3);
+
    // Default construct:
    BOOST_TEST(Real(n1) == n1);
    BOOST_TEST(Real(n2) == n2);

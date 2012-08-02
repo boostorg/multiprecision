@@ -483,6 +483,22 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
    }
 };
 
+template <unsigned digits10, class T>
+inline typename disable_if<is_same<gmp_float<digits10>, T>, bool>::type eval_eq(const gmp_float<digits10>& a, const T& b) BOOST_NOEXCEPT
+{
+   return a.compare(b) == 0;
+}
+template <unsigned digits10, class T>
+inline typename disable_if<is_same<gmp_float<digits10>, T>, bool>::type eval_lt(const gmp_float<digits10>& a, const T& b) BOOST_NOEXCEPT
+{
+   return a.compare(b) < 0;
+}
+template <unsigned digits10, class T>
+inline typename disable_if<is_same<gmp_float<digits10>, T>, bool>::type eval_gt(const gmp_float<digits10>& a, const T& b) BOOST_NOEXCEPT
+{
+   return a.compare(b) > 0;
+}
+
 template <unsigned digits10>
 inline void eval_add(gmp_float<digits10>& result, const gmp_float<digits10>& o) BOOST_NOEXCEPT
 {
@@ -928,6 +944,8 @@ struct gmp_int
 #ifndef BOOST_NO_RVALUE_REFERENCES
    gmp_int& operator = (gmp_int&& o) BOOST_NOEXCEPT
    {
+      if(m_data[0]._mp_d)
+         mpz_clear(m_data);
       m_data[0] = o.m_data[0];
       o.m_data[0]._mp_d = 0;
       return *this;
@@ -1139,6 +1157,22 @@ struct gmp_int
 protected:
    mpz_t m_data;
 };
+
+template <class T>
+inline typename disable_if<is_same<gmp_int, T>, bool>::type eval_eq(const gmp_int& a, const T& b)
+{
+   return a.compare(b) == 0;
+}
+template <class T>
+inline typename disable_if<is_same<gmp_int, T>, bool>::type eval_lt(const gmp_int& a, const T& b)
+{
+   return a.compare(b) < 0;
+}
+template <class T>
+inline typename disable_if<is_same<gmp_int, T>, bool>::type eval_gt(const gmp_int& a, const T& b)
+{
+   return a.compare(b) > 0;
+}
 
 inline bool eval_is_zero(const gmp_int& val)
 {
@@ -1700,11 +1734,11 @@ struct gmp_rational
       d = v;
       return compare(d);
    }
-   int compare(unsigned long v)
+   int compare(unsigned long v)const
    {
       return mpq_cmp_ui(m_data, v, 1);
    }
-   int compare(long v)
+   int compare(long v)const
    {
       return mpq_cmp_si(m_data, v, 1);
    }
@@ -1729,6 +1763,22 @@ inline mp_number<gmp_int> denominator(const mp_number<gmp_rational>& val)
    mp_number<gmp_int> result;
    mpz_set(result.backend().data(), (mpq_denref(val.backend().data())));
    return result;
+}
+
+template <class T>
+inline bool eval_eq(gmp_rational& a, const T& b)
+{
+   return a.compare(b) == 0;
+}
+template <class T>
+inline bool eval_lt(gmp_rational& a, const T& b)
+{
+   return a.compare(b) < 0;
+}
+template <class T>
+inline bool eval_gt(gmp_rational& a, const T& b)
+{
+   return a.compare(b) > 0;
 }
 
 inline void eval_add(gmp_rational& t, const gmp_rational& o)
