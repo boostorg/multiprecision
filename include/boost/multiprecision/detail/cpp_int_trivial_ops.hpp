@@ -11,106 +11,106 @@
 namespace boost{ namespace multiprecision{ namespace backends{
 
 template <unsigned MinBits>
-inline bool eval_eq(const cpp_int_backend<MinBits, true, void, true>& a, const cpp_int_backend<MinBits, true, void, true>& b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE bool eval_eq(const cpp_int_backend<MinBits, true, void, true>& a, const cpp_int_backend<MinBits, true, void, true>& b) BOOST_NOEXCEPT
 {
    return (a.sign() == b.sign()) && (*a.limbs() == *b.limbs());
 }
 template <unsigned MinBits>
-inline bool eval_eq(const cpp_int_backend<MinBits, false, void, true>& a, const cpp_int_backend<MinBits, false, void, true>& b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE bool eval_eq(const cpp_int_backend<MinBits, false, void, true>& a, const cpp_int_backend<MinBits, false, void, true>& b) BOOST_NOEXCEPT
 {
    return *a.limbs() == *b.limbs();
 }
 template <unsigned MinBits, class U>
-inline typename enable_if<is_unsigned<U>, bool>::type eval_eq(const cpp_int_backend<MinBits, true, void, true>& a, U b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE typename enable_if<is_unsigned<U>, bool>::type eval_eq(const cpp_int_backend<MinBits, true, void, true>& a, U b) BOOST_NOEXCEPT
 {
    return !a.sign() && (*a.limbs() == b);
 }
 template <unsigned MinBits, class S>
-inline typename enable_if<is_signed<S>, bool>::type eval_eq(const cpp_int_backend<MinBits, true, void, true>& a, S b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE typename enable_if<is_signed<S>, bool>::type eval_eq(const cpp_int_backend<MinBits, true, void, true>& a, S b) BOOST_NOEXCEPT
 {
    return (a.sign() == (b < 0)) && (*a.limbs() == std::abs(b));
 }
 template <unsigned MinBits, class U>
-inline typename enable_if<is_unsigned<U>, bool>::type eval_eq(const cpp_int_backend<MinBits, false, void, true>& a, U b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE typename enable_if<is_unsigned<U>, bool>::type eval_eq(const cpp_int_backend<MinBits, false, void, true>& a, U b) BOOST_NOEXCEPT
 {
    return *a.limbs() == b;
 }
 template <unsigned MinBits, class S>
-inline typename enable_if<is_signed<S>, bool>::type eval_eq(const cpp_int_backend<MinBits, false, void, true>& a, S b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE typename enable_if<is_signed<S>, bool>::type eval_eq(const cpp_int_backend<MinBits, false, void, true>& a, S b) BOOST_NOEXCEPT
 {
    return *a.limbs() == b;
 }
 
 template <unsigned MinBits>
-inline bool eval_lt(const cpp_int_backend<MinBits, true, void, true>& a, const cpp_int_backend<MinBits, true, void, true>& b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE bool eval_lt(const cpp_int_backend<MinBits, true, void, true>& a, const cpp_int_backend<MinBits, true, void, true>& b) BOOST_NOEXCEPT
 {
    if(a.sign() != b.sign())
       return a.sign();
    return a.sign() ? *a.limbs() > *b.limbs() : *a.limbs() < *b.limbs();
 }
 template <unsigned MinBits>
-inline bool eval_lt(const cpp_int_backend<MinBits, false, void, true>& a, const cpp_int_backend<MinBits, false, void, true>& b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE bool eval_lt(const cpp_int_backend<MinBits, false, void, true>& a, const cpp_int_backend<MinBits, false, void, true>& b) BOOST_NOEXCEPT
 {
    return *a.limbs() < *b.limbs();
 }
 template <unsigned MinBits, class U>
-inline typename enable_if<is_unsigned<U>, bool>::type eval_lt(const cpp_int_backend<MinBits, true, void, true>& a, U b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE typename enable_if<is_unsigned<U>, bool>::type eval_lt(const cpp_int_backend<MinBits, true, void, true>& a, U b) BOOST_NOEXCEPT
 {
    if(a.sign())
       return true;
    return *a.limbs() < b;
 }
 template <unsigned MinBits, class S>
-inline typename enable_if<is_signed<S>, bool>::type eval_lt(const cpp_int_backend<MinBits, true, void, true>& a, S b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE typename enable_if<is_signed<S>, bool>::type eval_lt(const cpp_int_backend<MinBits, true, void, true>& a, S b) BOOST_NOEXCEPT
 {
    if(a.sign() != (b < 0))
       return a.sign();
    return a.sign() ? (*a.limbs() > std::abs(b)) : (*a.limbs() < std::abs(b));
 }
 template <unsigned MinBits, class U>
-inline typename enable_if<is_unsigned<U>, bool>::type eval_lt(const cpp_int_backend<MinBits, false, void, true>& a, U b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE typename enable_if<is_unsigned<U>, bool>::type eval_lt(const cpp_int_backend<MinBits, false, void, true>& a, U b) BOOST_NOEXCEPT
 {
    return *a.limbs() < b;
 }
 template <unsigned MinBits, class S>
-inline typename enable_if<is_signed<S>, bool>::type eval_lt(const cpp_int_backend<MinBits, false, void, true>& a, S b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE typename enable_if<is_signed<S>, bool>::type eval_lt(const cpp_int_backend<MinBits, false, void, true>& a, S b) BOOST_NOEXCEPT
 {
    return *a.limbs() < b;
 }
 
 template <unsigned MinBits>
-inline bool eval_gt(const cpp_int_backend<MinBits, true, void, true>& a, const cpp_int_backend<MinBits, true, void, true>& b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE bool eval_gt(const cpp_int_backend<MinBits, true, void, true>& a, const cpp_int_backend<MinBits, true, void, true>& b) BOOST_NOEXCEPT
 {
    if(a.sign() != b.sign())
       return !a.sign();
    return a.sign() ? *a.limbs() < *b.limbs() : *a.limbs() > *b.limbs();
 }
 template <unsigned MinBits>
-inline bool eval_gt(const cpp_int_backend<MinBits, false, void, true>& a, const cpp_int_backend<MinBits, false, void, true>& b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE bool eval_gt(const cpp_int_backend<MinBits, false, void, true>& a, const cpp_int_backend<MinBits, false, void, true>& b) BOOST_NOEXCEPT
 {
    return *a.limbs() > *b.limbs();
 }
 template <unsigned MinBits, class U>
-inline typename enable_if<is_unsigned<U>, bool>::type eval_gt(const cpp_int_backend<MinBits, true, void, true>& a, U b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE typename enable_if<is_unsigned<U>, bool>::type eval_gt(const cpp_int_backend<MinBits, true, void, true>& a, U b) BOOST_NOEXCEPT
 {
    if(a.sign())
       return false;
    return *a.limbs() > b;
 }
 template <unsigned MinBits, class S>
-inline typename enable_if<is_signed<S>, bool>::type eval_gt(const cpp_int_backend<MinBits, true, void, true>& a, S b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE typename enable_if<is_signed<S>, bool>::type eval_gt(const cpp_int_backend<MinBits, true, void, true>& a, S b) BOOST_NOEXCEPT
 {
    if(a.sign() != (b < 0))
       return !a.sign();
    return a.sign() ? (*a.limbs() < std::abs(b)) : (*a.limbs() > std::abs(b));
 }
 template <unsigned MinBits, class U>
-inline typename enable_if<is_unsigned<U>, bool>::type eval_gt(const cpp_int_backend<MinBits, false, void, true>& a, U b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE typename enable_if<is_unsigned<U>, bool>::type eval_gt(const cpp_int_backend<MinBits, false, void, true>& a, U b) BOOST_NOEXCEPT
 {
    return *a.limbs() > b;
 }
 template <unsigned MinBits, class S>
-inline typename enable_if<is_signed<S>, bool>::type eval_gt(const cpp_int_backend<MinBits, false, void, true>& a, S b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE typename enable_if<is_signed<S>, bool>::type eval_gt(const cpp_int_backend<MinBits, false, void, true>& a, S b) BOOST_NOEXCEPT
 {
    return *a.limbs() > b;
 }
@@ -133,7 +133,7 @@ inline void eval_add(cpp_int_backend<MinBits, true, void, true>& result, const c
 }
 
 template <unsigned MinBits>
-inline void eval_add(cpp_int_backend<MinBits, false, void, true>& result, const cpp_int_backend<MinBits, false, void, true>& o) BOOST_NOEXCEPT
+BOOST_FORCEINLINE void eval_add(cpp_int_backend<MinBits, false, void, true>& result, const cpp_int_backend<MinBits, false, void, true>& o) BOOST_NOEXCEPT
 {
    *result.limbs() += *o.limbs();
 }
@@ -155,26 +155,26 @@ inline void eval_subtract(cpp_int_backend<MinBits, true, void, true>& result, co
 }
 
 template <unsigned MinBits>
-inline void eval_subtract(cpp_int_backend<MinBits, false, void, true>& result, const cpp_int_backend<MinBits, false, void, true>& o) BOOST_NOEXCEPT
+BOOST_FORCEINLINE void eval_subtract(cpp_int_backend<MinBits, false, void, true>& result, const cpp_int_backend<MinBits, false, void, true>& o) BOOST_NOEXCEPT
 {
    *result.limbs() -= *o.limbs();
 }
 
 template <unsigned MinBits>
-inline void eval_multiply(cpp_int_backend<MinBits, true, void, true>& result, const cpp_int_backend<MinBits, true, void, true>& o) BOOST_NOEXCEPT
+BOOST_FORCEINLINE void eval_multiply(cpp_int_backend<MinBits, true, void, true>& result, const cpp_int_backend<MinBits, true, void, true>& o) BOOST_NOEXCEPT
 {
    *result.limbs() *= *o.limbs();
    result.sign(result.sign() != o.sign());
 }
 
 template <unsigned MinBits>
-inline void eval_multiply(cpp_int_backend<MinBits, false, void, true>& result, const cpp_int_backend<MinBits, false, void, true>& o) BOOST_NOEXCEPT
+BOOST_FORCEINLINE void eval_multiply(cpp_int_backend<MinBits, false, void, true>& result, const cpp_int_backend<MinBits, false, void, true>& o) BOOST_NOEXCEPT
 {
    *result.limbs() *= *o.limbs();
 }
 
 template <unsigned MinBits>
-inline void eval_divide(cpp_int_backend<MinBits, true, void, true>& result, const cpp_int_backend<MinBits, true, void, true>& o)
+BOOST_FORCEINLINE void eval_divide(cpp_int_backend<MinBits, true, void, true>& result, const cpp_int_backend<MinBits, true, void, true>& o)
 {
    if(!*o.limbs())
       BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
@@ -183,7 +183,7 @@ inline void eval_divide(cpp_int_backend<MinBits, true, void, true>& result, cons
 }
 
 template <unsigned MinBits>
-inline void eval_divide(cpp_int_backend<MinBits, false, void, true>& result, const cpp_int_backend<MinBits, false, void, true>& o)
+BOOST_FORCEINLINE void eval_divide(cpp_int_backend<MinBits, false, void, true>& result, const cpp_int_backend<MinBits, false, void, true>& o)
 {
    if(!*o.limbs())
       BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
@@ -191,7 +191,7 @@ inline void eval_divide(cpp_int_backend<MinBits, false, void, true>& result, con
 }
 
 template <unsigned MinBits, bool Signed>
-inline void eval_modulus(cpp_int_backend<MinBits, Signed, void, true>& result, const cpp_int_backend<MinBits, Signed, void, true>& o)
+BOOST_FORCEINLINE void eval_modulus(cpp_int_backend<MinBits, Signed, void, true>& result, const cpp_int_backend<MinBits, Signed, void, true>& o)
 {
    if(!*o.limbs())
       BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
@@ -200,13 +200,13 @@ inline void eval_modulus(cpp_int_backend<MinBits, Signed, void, true>& result, c
 }
 
 template <unsigned MinBits, bool Signed, class T>
-inline void eval_left_shift(cpp_int_backend<MinBits, Signed, void, true>& result, T s) BOOST_NOEXCEPT
+BOOST_FORCEINLINE void eval_left_shift(cpp_int_backend<MinBits, Signed, void, true>& result, T s) BOOST_NOEXCEPT
 {
    *result.limbs() <<= s;
 }
 
 template <unsigned MinBits, bool Signed, class T>
-inline void eval_right_shift(cpp_int_backend<MinBits, Signed, void, true>& result, T s) BOOST_NOEXCEPT
+BOOST_FORCEINLINE void eval_right_shift(cpp_int_backend<MinBits, Signed, void, true>& result, T s) BOOST_NOEXCEPT
 {
    *result.limbs() >>= s;
 }
@@ -241,7 +241,7 @@ inline void eval_bitwise_and(cpp_int_backend<MinBits, true, void, true>& result,
 }
 
 template <unsigned MinBits>
-inline void eval_bitwise_and(cpp_int_backend<MinBits, false, void, true>& result, const cpp_int_backend<MinBits, false, void, true>& o) BOOST_NOEXCEPT
+BOOST_FORCEINLINE void eval_bitwise_and(cpp_int_backend<MinBits, false, void, true>& result, const cpp_int_backend<MinBits, false, void, true>& o) BOOST_NOEXCEPT
 {
    *result.limbs() &= *o.limbs();
 }
@@ -276,7 +276,7 @@ inline void eval_bitwise_or(cpp_int_backend<MinBits, true, void, true>& result, 
 }
 
 template <unsigned MinBits>
-inline void eval_bitwise_or(cpp_int_backend<MinBits, false, void, true>& result, const cpp_int_backend<MinBits, false, void, true>& o) BOOST_NOEXCEPT
+BOOST_FORCEINLINE void eval_bitwise_or(cpp_int_backend<MinBits, false, void, true>& result, const cpp_int_backend<MinBits, false, void, true>& o) BOOST_NOEXCEPT
 {
    *result.limbs() |= *o.limbs();
 }
@@ -311,7 +311,7 @@ inline void eval_bitwise_xor(cpp_int_backend<MinBits, true, void, true>& result,
 }
 
 template <unsigned MinBits>
-inline void eval_bitwise_xor(cpp_int_backend<MinBits, false, void, true>& result, const cpp_int_backend<MinBits, false, void, true>& o) BOOST_NOEXCEPT
+BOOST_FORCEINLINE void eval_bitwise_xor(cpp_int_backend<MinBits, false, void, true>& result, const cpp_int_backend<MinBits, false, void, true>& o) BOOST_NOEXCEPT
 {
    *result.limbs() ^= *o.limbs();
 }
@@ -340,19 +340,19 @@ inline void eval_complement(cpp_int_backend<MinBits, true, void, true>& result, 
 }
 
 template <unsigned MinBits>
-inline void eval_complement(cpp_int_backend<MinBits, false, void, true>& result, const cpp_int_backend<MinBits, false, void, true>& o) BOOST_NOEXCEPT
+BOOST_FORCEINLINE void eval_complement(cpp_int_backend<MinBits, false, void, true>& result, const cpp_int_backend<MinBits, false, void, true>& o) BOOST_NOEXCEPT
 {
    *result.limbs() = ~*o.limbs();
 }
 
 template <unsigned MinBits, bool Signed>
-inline void eval_gcd(cpp_int_backend<MinBits, Signed, void, true>& result, const cpp_int_backend<MinBits, Signed, void, true>& a, const cpp_int_backend<MinBits, Signed, void, true>& b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE void eval_gcd(cpp_int_backend<MinBits, Signed, void, true>& result, const cpp_int_backend<MinBits, Signed, void, true>& a, const cpp_int_backend<MinBits, Signed, void, true>& b) BOOST_NOEXCEPT
 {
    *result.limbs() = boost::math::gcd(*a.limbs(), *b.limbs());
 }
 
 template <unsigned MinBits, bool Signed>
-inline void eval_lcm(cpp_int_backend<MinBits, Signed, void, true>& result, const cpp_int_backend<MinBits, Signed, void, true>& a, const cpp_int_backend<MinBits, Signed, void, true>& b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE void eval_lcm(cpp_int_backend<MinBits, Signed, void, true>& result, const cpp_int_backend<MinBits, Signed, void, true>& a, const cpp_int_backend<MinBits, Signed, void, true>& b) BOOST_NOEXCEPT
 {
    *result.limbs() = boost::math::lcm(*a.limbs(), *b.limbs());
 }

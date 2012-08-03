@@ -129,12 +129,13 @@ inline int128_t mult_64x64_to_128(int64_t a, int64_t b)
 }
 
 template <class R, class T>
-__forceinline void mul_2n(R& r, const T& a, const T& b)
+BOOST_FORCEINLINE void mul_2n(R& r, const T& a, const T& b)
 {
-   r = R(a) * b;
+   r = a;
+   r *= b;
 }
 
-__forceinline void mul_2n(int128_t& r, const boost::int64_t& a, const boost::int64_t& b)
+BOOST_FORCEINLINE void mul_2n(int128_t& r, const boost::int64_t& a, const boost::int64_t& b)
 {
    r = mult_64x64_to_128(a, b);
 }

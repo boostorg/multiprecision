@@ -98,26 +98,26 @@ public:
    //
    // Direct construction:
    //
-   BOOST_CONSTEXPR cpp_int_base(limb_type i)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(limb_type i)BOOST_NOEXCEPT 
       : m_data(i), m_limbs(1), m_sign(false), m_internal(true) { }
-   BOOST_CONSTEXPR cpp_int_base(signed_limb_type i)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_limb_type i)BOOST_NOEXCEPT 
       : m_data(i), m_limbs(1), m_sign(i < 0), m_internal(true) { }
 #if defined(BOOST_LITTLE_ENDIAN)
-   BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT 
       : m_data(i), m_limbs(i > max_limb_value ? 2 : 1), m_sign(false), m_internal(true) { }
-   BOOST_CONSTEXPR cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT 
       : m_data(i), m_limbs(i < 0 ? (-i > max_limb_value ? 2 : 1) : (i > max_limb_value ? 2 : 1)), m_sign(i < 0), m_internal(true) { }
 #endif
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
-   allocator_type& allocator() BOOST_NOEXCEPT { return *this; }
-   const allocator_type& allocator()const BOOST_NOEXCEPT { return *this; }
-   unsigned size()const  BOOST_NOEXCEPT { return m_limbs; }
-   limb_pointer limbs()  BOOST_NOEXCEPT { return m_internal ? m_data.la : m_data.ld.data; }
-   const_limb_pointer limbs()const  BOOST_NOEXCEPT { return m_internal ? m_data.la : m_data.ld.data; }
-   unsigned capacity()const  BOOST_NOEXCEPT { return m_internal ? internal_limb_count : m_data.ld.capacity; }
-   bool sign()const  BOOST_NOEXCEPT { return m_sign; }
+   BOOST_FORCEINLINE allocator_type& allocator() BOOST_NOEXCEPT { return *this; }
+   BOOST_FORCEINLINE const allocator_type& allocator()const BOOST_NOEXCEPT { return *this; }
+   BOOST_FORCEINLINE unsigned size()const  BOOST_NOEXCEPT { return m_limbs; }
+   BOOST_FORCEINLINE limb_pointer limbs()  BOOST_NOEXCEPT { return m_internal ? m_data.la : m_data.ld.data; }
+   BOOST_FORCEINLINE const_limb_pointer limbs()const  BOOST_NOEXCEPT { return m_internal ? m_data.la : m_data.ld.data; }
+   BOOST_FORCEINLINE unsigned capacity()const  BOOST_NOEXCEPT { return m_internal ? internal_limb_count : m_data.ld.capacity; }
+   BOOST_FORCEINLINE bool sign()const  BOOST_NOEXCEPT { return m_sign; }
    void sign(bool b)  BOOST_NOEXCEPT 
    { 
       m_sign = b; 
@@ -149,13 +149,13 @@ public:
          m_limbs = new_size;
       }
    }
-   void normalize() BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void normalize() BOOST_NOEXCEPT
    {
       limb_pointer p = limbs();
       while((m_limbs-1) && !p[m_limbs - 1])--m_limbs;
    }
-   BOOST_CONSTEXPR cpp_int_base() BOOST_NOEXCEPT : m_data(), m_limbs(1), m_sign(false), m_internal(true) {}
-   cpp_int_base(const cpp_int_base& o) : allocator_type(o), m_limbs(0), m_internal(true)
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() BOOST_NOEXCEPT : m_data(), m_limbs(1), m_sign(false), m_internal(true) {}
+   BOOST_FORCEINLINE cpp_int_base(const cpp_int_base& o) : allocator_type(o), m_limbs(0), m_internal(true)
    {
       resize(o.size());
       std::copy(o.limbs(), o.limbs() + o.size(), limbs());
@@ -196,7 +196,7 @@ public:
       return *this;
    }
 #endif
-   ~cpp_int_base() BOOST_NOEXCEPT
+   BOOST_FORCEINLINE ~cpp_int_base() BOOST_NOEXCEPT
    {
       if(!m_internal)
          allocator().deallocate(limbs(), capacity());
@@ -212,7 +212,7 @@ public:
          m_sign = o.m_sign;
       }
    }
-   void negate() BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void negate() BOOST_NOEXCEPT
    {
       m_sign = !m_sign;
       // Check for zero value:
@@ -222,11 +222,11 @@ public:
             m_sign = false;
       }
    }
-   bool isneg()const BOOST_NOEXCEPT
+   BOOST_FORCEINLINE bool isneg()const BOOST_NOEXCEPT
    {
       return m_sign; 
    }
-   void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
       std::swap(m_data, o.m_data);
       std::swap(m_sign, o.m_sign);
@@ -272,24 +272,24 @@ public:
    //
    // Direct construction:
    //
-   BOOST_CONSTEXPR cpp_int_base(limb_type i)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(limb_type i)BOOST_NOEXCEPT 
       : m_wrapper(i), m_limbs(1), m_sign(false) {}
-   BOOST_CONSTEXPR cpp_int_base(signed_limb_type i)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_limb_type i)BOOST_NOEXCEPT 
       : m_wrapper(limb_type(i < 0 ? -i : i)), m_limbs(1), m_sign(i < 0) {}
 #if defined(BOOST_LITTLE_ENDIAN)
-   BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT 
       : m_wrapper(i), m_limbs(i > max_limb_value ? 2 : 1), m_sign(false) {}
-   BOOST_CONSTEXPR cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT 
       : m_wrapper(double_limb_type(i < 0 ? -i : i)), m_limbs(i < 0 ? (-i > max_limb_value ? 2 : 1) : (i > max_limb_value ? 2 : 1)), m_sign(i < 0) {}
 #endif
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
-   unsigned size()const BOOST_NOEXCEPT { return m_limbs; }
-   limb_pointer limbs() BOOST_NOEXCEPT { return m_wrapper.m_data; }
-   const_limb_pointer limbs()const BOOST_NOEXCEPT { return m_wrapper.m_data; }
-   bool sign()const BOOST_NOEXCEPT { return m_sign; }
-   void sign(bool b) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE unsigned size()const BOOST_NOEXCEPT { return m_limbs; }
+   BOOST_FORCEINLINE limb_pointer limbs() BOOST_NOEXCEPT { return m_wrapper.m_data; }
+   BOOST_FORCEINLINE const_limb_pointer limbs()const BOOST_NOEXCEPT { return m_wrapper.m_data; }
+   BOOST_FORCEINLINE bool sign()const BOOST_NOEXCEPT { return m_sign; }
+   BOOST_FORCEINLINE void sign(bool b) BOOST_NOEXCEPT
    { 
       m_sign = b; 
       // Check for zero value:
@@ -299,11 +299,11 @@ public:
             m_sign = false;
       }
    }
-   void resize(unsigned new_size) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void resize(unsigned new_size) BOOST_NOEXCEPT
    {
       m_limbs = static_cast<boost::uint16_t>((std::min)(new_size, internal_limb_count));
    }
-   void normalize() BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void normalize() BOOST_NOEXCEPT
    {
       limb_pointer p = limbs();
       p[internal_limb_count-1] &= upper_limb_mask;
@@ -311,8 +311,8 @@ public:
       if((m_limbs == 1) && (!*p)) m_sign = false; // zero is always unsigned
    }
 
-   BOOST_CONSTEXPR cpp_int_base() : m_wrapper(limb_type(0u)), m_limbs(1), m_sign(false) {}
-   cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT : m_limbs(o.m_limbs), m_sign(o.m_sign)
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() : m_wrapper(limb_type(0u)), m_limbs(1), m_sign(false) {}
+   BOOST_FORCEINLINE cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT : m_limbs(o.m_limbs), m_sign(o.m_sign)
    {
       std::copy(o.limbs(), o.limbs() + o.size(), limbs());
    }
@@ -326,7 +326,7 @@ public:
          m_sign = o.m_sign;
       }
    }
-   void negate() BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void negate() BOOST_NOEXCEPT
    {
       m_sign = !m_sign;
       // Check for zero value:
@@ -336,11 +336,11 @@ public:
             m_sign = false;
       }
    }
-   bool isneg()const BOOST_NOEXCEPT
+   BOOST_FORCEINLINE bool isneg()const BOOST_NOEXCEPT
    {
       return m_sign; 
    }
-   void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
       for(unsigned i = 0; i < (std::max)(size(), o.size()); ++i)
          std::swap(m_wrapper.m_data[i], o.m_wrapper.m_data[i]);
@@ -385,42 +385,42 @@ public:
    //
    // Direct construction:
    //
-   BOOST_CONSTEXPR cpp_int_base(limb_type i)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(limb_type i)BOOST_NOEXCEPT 
       : m_wrapper(i), m_limbs(1) {}
-   cpp_int_base(signed_limb_type i)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE cpp_int_base(signed_limb_type i)BOOST_NOEXCEPT 
       : m_wrapper(limb_type(i < 0 ? -i : i)), m_limbs(1) { if(i < 0) negate(); }
 #ifdef BOOST_LITTLE_ENDIAN
-   BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT 
       : m_wrapper(i), m_limbs(i > max_limb_value ? 2 : 1) {}
-   cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT 
       : m_wrapper(double_limb_type(i < 0 ? -i : i)), m_limbs(i < 0 ? (-i > max_limb_value ? 2 : 1) : (i > max_limb_value ? 2 : 1)) { if(i < 0) negate(); }
 #endif
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
-   unsigned size()const BOOST_NOEXCEPT { return m_limbs; }
-   limb_pointer limbs() BOOST_NOEXCEPT { return m_wrapper.m_data; }
-   const_limb_pointer limbs()const BOOST_NOEXCEPT { return m_wrapper.m_data; }
-   BOOST_CONSTEXPR bool sign()const BOOST_NOEXCEPT { return false; }
-   void sign(bool b) BOOST_NOEXCEPT {  if(b) negate(); }
-   void resize(unsigned new_size) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE unsigned size()const BOOST_NOEXCEPT { return m_limbs; }
+   BOOST_FORCEINLINE limb_pointer limbs() BOOST_NOEXCEPT { return m_wrapper.m_data; }
+   BOOST_FORCEINLINE const_limb_pointer limbs()const BOOST_NOEXCEPT { return m_wrapper.m_data; }
+   BOOST_FORCEINLINE BOOST_CONSTEXPR bool sign()const BOOST_NOEXCEPT { return false; }
+   BOOST_FORCEINLINE void sign(bool b) BOOST_NOEXCEPT {  if(b) negate(); }
+   BOOST_FORCEINLINE void resize(unsigned new_size) BOOST_NOEXCEPT
    {
       m_limbs = (std::min)(new_size, internal_limb_count);
    }
-   void normalize() BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void normalize() BOOST_NOEXCEPT
    {
       limb_pointer p = limbs();
       p[internal_limb_count-1] &= upper_limb_mask;
       while((m_limbs-1) && !p[m_limbs - 1])--m_limbs;
    }
 
-   BOOST_CONSTEXPR cpp_int_base() BOOST_NOEXCEPT : m_wrapper(limb_type(0u)), m_limbs(1) {}
-   cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT : m_limbs(o.m_limbs)
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() BOOST_NOEXCEPT : m_wrapper(limb_type(0u)), m_limbs(1) {}
+   BOOST_FORCEINLINE cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT : m_limbs(o.m_limbs)
    {
       std::copy(o.limbs(), o.limbs() + o.size(), limbs());
    }
    //~cpp_int_base() BOOST_NOEXCEPT {}
-   void assign(const cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void assign(const cpp_int_base& o) BOOST_NOEXCEPT
    {
       if(this != &o)
       {
@@ -441,11 +441,11 @@ public:
       normalize();
       eval_increment(static_cast<cpp_int_backend<MinBits, false, void>& >(*this));
    }
-   BOOST_CONSTEXPR bool isneg()const BOOST_NOEXCEPT
+   BOOST_FORCEINLINE BOOST_CONSTEXPR bool isneg()const BOOST_NOEXCEPT
    {
       return false; 
    }
-   void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
       for(unsigned i = 0; i < (std::max)(size(), o.size()); ++i)
          std::swap(m_wrapper.m_data[i], o.m_wrapper.m_data[i]);
@@ -496,22 +496,22 @@ public:
    // Direct construction:
    //
    template <class SI>
-   BOOST_CONSTEXPR cpp_int_base(SI i, typename enable_if<is_signed<SI> >::type const* = 0) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(SI i, typename enable_if<is_signed<SI> >::type const* = 0) BOOST_NOEXCEPT
       : m_data(i < 0 ? -i : i), m_sign(i < 0) {}
    template <class UI>
-   BOOST_CONSTEXPR cpp_int_base(UI i, typename enable_if<is_unsigned<UI> >::type const* = 0) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(UI i, typename enable_if<is_unsigned<UI> >::type const* = 0) BOOST_NOEXCEPT
       : m_data(i), m_sign(false) {}
    template <class F>
-   cpp_int_base(F i, typename enable_if<is_floating_point<F> >::type const* = 0) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE cpp_int_base(F i, typename enable_if<is_floating_point<F> >::type const* = 0) BOOST_NOEXCEPT
       : m_data(std::fabs(i)), m_sign(i < 0) {}
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
-   BOOST_CONSTEXPR unsigned size()const BOOST_NOEXCEPT { return 1; }
-   limb_pointer limbs() BOOST_NOEXCEPT { return &m_data; }
-   const_limb_pointer limbs()const BOOST_NOEXCEPT { return &m_data; }
-   bool sign()const BOOST_NOEXCEPT { return m_sign; }
-   void sign(bool b) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE BOOST_CONSTEXPR unsigned size()const BOOST_NOEXCEPT { return 1; }
+   BOOST_FORCEINLINE limb_pointer limbs() BOOST_NOEXCEPT { return &m_data; }
+   BOOST_FORCEINLINE const_limb_pointer limbs()const BOOST_NOEXCEPT { return &m_data; }
+   BOOST_FORCEINLINE bool sign()const BOOST_NOEXCEPT { return m_sign; }
+   BOOST_FORCEINLINE void sign(bool b) BOOST_NOEXCEPT
    { 
       m_sign = b; 
       // Check for zero value:
@@ -520,23 +520,23 @@ public:
          m_sign = false;
       }
    }
-   void resize(unsigned new_size) BOOST_NOEXCEPT {}
-   void normalize() BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void resize(unsigned new_size) BOOST_NOEXCEPT {}
+   BOOST_FORCEINLINE void normalize() BOOST_NOEXCEPT
    {
       if(!m_data) 
          m_sign = false; // zero is always unsigned
       m_data &= limb_mask;
    }
 
-   BOOST_CONSTEXPR cpp_int_base() : m_data(0), m_sign(false) {}
-   BOOST_CONSTEXPR cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT : m_data(o.m_data), m_sign(o.m_sign) {}
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() : m_data(0), m_sign(false) {}
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT : m_data(o.m_data), m_sign(o.m_sign) {}
    //~cpp_int_base() BOOST_NOEXCEPT {}
-   void assign(const cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void assign(const cpp_int_base& o) BOOST_NOEXCEPT
    {
       m_data = o.m_data;
       m_sign = o.m_sign;
    }
-   void negate() BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void negate() BOOST_NOEXCEPT
    {
       m_sign = !m_sign;
       // Check for zero value:
@@ -545,11 +545,11 @@ public:
          m_sign = false;
       }
    }
-   bool isneg()const BOOST_NOEXCEPT
+   BOOST_FORCEINLINE bool isneg()const BOOST_NOEXCEPT
    {
       return m_sign; 
    }
-   void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
       std::swap(m_sign, o.m_sign);
       std::swap(m_data, o.m_data);
@@ -578,13 +578,13 @@ public:
    // Direct construction:
    //
    template <class SI>
-   BOOST_CONSTEXPR cpp_int_base(SI i, typename enable_if<is_signed<SI> >::type const* = 0) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(SI i, typename enable_if<is_signed<SI> >::type const* = 0) BOOST_NOEXCEPT
       : m_data(i < 0 ? 1 + ~static_cast<local_limb_type>(-i) : static_cast<local_limb_type>(i)) {}
    template <class UI>
-   BOOST_CONSTEXPR cpp_int_base(UI i, typename enable_if<is_unsigned<UI> >::type const* = 0) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(UI i, typename enable_if<is_unsigned<UI> >::type const* = 0) BOOST_NOEXCEPT
       : m_data(i) {}
    template <class F>
-   cpp_int_base(F i, typename enable_if<is_floating_point<F> >::type const* = 0) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE cpp_int_base(F i, typename enable_if<is_floating_point<F> >::type const* = 0) BOOST_NOEXCEPT
       : m_data(std::fabs(i)) 
    {
       if(i < 0)
@@ -593,38 +593,38 @@ public:
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
-   BOOST_CONSTEXPR unsigned size()const BOOST_NOEXCEPT { return 1; }
-   limb_pointer limbs() BOOST_NOEXCEPT { return &m_data; }
-   const_limb_pointer limbs()const BOOST_NOEXCEPT { return &m_data; }
-   BOOST_CONSTEXPR bool sign()const BOOST_NOEXCEPT { return false; }
-   void sign(bool b) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE BOOST_CONSTEXPR unsigned size()const BOOST_NOEXCEPT { return 1; }
+   BOOST_FORCEINLINE limb_pointer limbs() BOOST_NOEXCEPT { return &m_data; }
+   BOOST_FORCEINLINE const_limb_pointer limbs()const BOOST_NOEXCEPT { return &m_data; }
+   BOOST_FORCEINLINE BOOST_CONSTEXPR bool sign()const BOOST_NOEXCEPT { return false; }
+   BOOST_FORCEINLINE void sign(bool b) BOOST_NOEXCEPT
    {
       if(b)
          negate();
    }
-   void resize(unsigned new_size) BOOST_NOEXCEPT {}
-   void normalize() BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE void resize(unsigned new_size) BOOST_NOEXCEPT {}
+   BOOST_FORCEINLINE void normalize() BOOST_NOEXCEPT 
    {
       m_data &= limb_mask;
    }
 
-   BOOST_CONSTEXPR cpp_int_base() : m_data(0) {}
-   BOOST_CONSTEXPR cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT : m_data(o.m_data) {}
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() : m_data(0) {}
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT : m_data(o.m_data) {}
    //~cpp_int_base() BOOST_NOEXCEPT {}
-   void assign(const cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void assign(const cpp_int_base& o) BOOST_NOEXCEPT
    {
       m_data = o.m_data;
    }
-   void negate() BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void negate() BOOST_NOEXCEPT
    {
       m_data = ~m_data;
       ++m_data;
    }
-   BOOST_CONSTEXPR bool isneg()const BOOST_NOEXCEPT
+   BOOST_FORCEINLINE BOOST_CONSTEXPR bool isneg()const BOOST_NOEXCEPT
    {
       return false; 
    }
-   void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
       std::swap(m_data, o.m_data);
    }
@@ -678,45 +678,45 @@ public:
    typedef mpl::list<limb_type, double_limb_type>                    unsigned_types;
    typedef mpl::list<long double>                                    float_types;
 
-   BOOST_CONSTEXPR cpp_int_backend() BOOST_NOEXCEPT{}
-   BOOST_CONSTEXPR cpp_int_backend(const cpp_int_backend& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value) : base_type(o) {}
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend() BOOST_NOEXCEPT{}
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(const cpp_int_backend& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value) : base_type(o) {}
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   BOOST_CONSTEXPR cpp_int_backend(cpp_int_backend&& o) BOOST_NOEXCEPT : base_type(static_cast<base_type&&>(o)) {}
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(cpp_int_backend&& o) BOOST_NOEXCEPT : base_type(static_cast<base_type&&>(o)) {}
 #endif
    template <class LT>
-   BOOST_CONSTEXPR cpp_int_backend(LT i, typename enable_if<is_same<LT, limb_type> >::type const* = 0)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(LT i, typename enable_if<is_same<LT, limb_type> >::type const* = 0)BOOST_NOEXCEPT 
       : base_type(i) {}
    template <class SLT>
-   BOOST_CONSTEXPR cpp_int_backend(SLT i, typename enable_if<is_same<SLT, signed_limb_type> >::type const* = 0)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(SLT i, typename enable_if<is_same<SLT, signed_limb_type> >::type const* = 0)BOOST_NOEXCEPT 
       : base_type(i) {}
 #if defined(BOOST_LITTLE_ENDIAN)
    template <class LT>
-   BOOST_CONSTEXPR cpp_int_backend(LT i, typename enable_if<is_same<LT, double_limb_type> >::type const* = 0)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(LT i, typename enable_if<is_same<LT, double_limb_type> >::type const* = 0)BOOST_NOEXCEPT 
       : base_type(i) {}
    template <class SLT>
-   BOOST_CONSTEXPR cpp_int_backend(SLT i, typename enable_if<is_same<SLT, signed_double_limb_type> >::type const* = 0)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(SLT i, typename enable_if<is_same<SLT, signed_double_limb_type> >::type const* = 0)BOOST_NOEXCEPT 
       : base_type(i) {}
 #endif
-   cpp_int_backend& operator = (const cpp_int_backend& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+   BOOST_FORCEINLINE cpp_int_backend& operator = (const cpp_int_backend& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
    {
       this->assign(o);
       return *this;
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   cpp_int_backend& operator = (cpp_int_backend&& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+   BOOST_FORCEINLINE cpp_int_backend& operator = (cpp_int_backend&& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
    {
       *static_cast<base_type*>(this) = static_cast<base_type&&>(o);
       return *this;
    }
 #endif
-   cpp_int_backend& operator = (limb_type i) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE cpp_int_backend& operator = (limb_type i) BOOST_NOEXCEPT
    {
       this->resize(1);
       *this->limbs() = i;
       this->sign(false);
       return *this;
    }
-   cpp_int_backend& operator = (signed_limb_type i) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE cpp_int_backend& operator = (signed_limb_type i) BOOST_NOEXCEPT
    {
       this->resize(1);
       *this->limbs() = static_cast<limb_type>(std::abs(i));
@@ -898,7 +898,7 @@ public:
          this->negate();
       return *this;
    }
-   void swap(cpp_int_backend& o) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void swap(cpp_int_backend& o) BOOST_NOEXCEPT
    {
       this->do_swap(o);
    }
@@ -1026,7 +1026,7 @@ public:
       return 0;
    }
    template <class Arithmatic>
-   typename enable_if<is_arithmetic<Arithmatic>, int>::type compare(Arithmatic i)const BOOST_NOEXCEPT
+   BOOST_FORCEINLINE typename enable_if<is_arithmetic<Arithmatic>, int>::type compare(Arithmatic i)const BOOST_NOEXCEPT
    {
       // braindead version:
       cpp_int_backend t;
@@ -1051,33 +1051,33 @@ public:
 
    BOOST_STATIC_CONSTANT(unsigned, limb_bits = sizeof(typename base_type::local_limb_type) * CHAR_BIT);
 
-   BOOST_CONSTEXPR cpp_int_backend() BOOST_NOEXCEPT{}
-   BOOST_CONSTEXPR cpp_int_backend(const cpp_int_backend& o) BOOST_NOEXCEPT : base_type(o) {}
-   cpp_int_backend& operator = (const cpp_int_backend& o) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend() BOOST_NOEXCEPT{}
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(const cpp_int_backend& o) BOOST_NOEXCEPT : base_type(o) {}
+   BOOST_FORCEINLINE cpp_int_backend& operator = (const cpp_int_backend& o) BOOST_NOEXCEPT
    {
       this->assign(o);
       return *this;
    }
 
    template <class A>
-   BOOST_CONSTEXPR cpp_int_backend(A i, typename enable_if<is_arithmetic<A> >::type const* = 0) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(A i, typename enable_if<is_arithmetic<A> >::type const* = 0) BOOST_NOEXCEPT
       : base_type(i) {}
 
    template <class SI>
-   typename enable_if<is_signed<SI>, cpp_int_backend&>::type operator = (SI i) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE typename enable_if<is_signed<SI>, cpp_int_backend&>::type operator = (SI i) BOOST_NOEXCEPT
    {
       *this->limbs() = static_cast<typename base_type::local_limb_type>(std::abs(i));
       this->sign(i < 0);
       return *this;
    }
    template <class UI>
-   typename enable_if<is_unsigned<UI>, cpp_int_backend&>::type operator = (UI i) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE typename enable_if<is_unsigned<UI>, cpp_int_backend&>::type operator = (UI i) BOOST_NOEXCEPT
    {
       *this->limbs() = static_cast<typename base_type::local_limb_type>(i);
       return *this;
    }
    template <class F>
-   typename enable_if<is_floating_point<F>, cpp_int_backend&>::type operator = (F i) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE typename enable_if<is_floating_point<F>, cpp_int_backend&>::type operator = (F i) BOOST_NOEXCEPT
    {
       *this->limbs() = static_cast<typename base_type::local_limb_type>(std::abs(i));
       this->sign(i < 0);
@@ -1094,7 +1094,7 @@ public:
       }
       return *this;
    }
-   void swap(cpp_int_backend& o) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void swap(cpp_int_backend& o) BOOST_NOEXCEPT
    {
       this->do_swap(o);
    }
@@ -1209,7 +1209,7 @@ public:
       return result;
    }
    template <class Arithmatic>
-   typename enable_if<is_arithmetic<Arithmatic>, int>::type compare(Arithmatic i)const BOOST_NOEXCEPT
+   BOOST_FORCEINLINE typename enable_if<is_arithmetic<Arithmatic>, int>::type compare(Arithmatic i)const BOOST_NOEXCEPT
    {
       // braindead version:
       cpp_int_backend t;
@@ -1219,40 +1219,40 @@ public:
 };
 
 template <unsigned MinBits, bool Signed, class Allocator>
-inline bool eval_eq(const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const cpp_int_backend<MinBits, Signed, Allocator, false>& b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE bool eval_eq(const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const cpp_int_backend<MinBits, Signed, Allocator, false>& b) BOOST_NOEXCEPT
 {
    return (a.sign() == b.sign())
       && (a.size() == b.size())
       && std::equal(a.limbs(), a.limbs() + a.size(), b.limbs());
 }
 template <unsigned MinBits, class Allocator>
-inline bool eval_eq(const cpp_int_backend<MinBits, true, Allocator, false>& a, limb_type b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE bool eval_eq(const cpp_int_backend<MinBits, true, Allocator, false>& a, limb_type b) BOOST_NOEXCEPT
 {
    return (a.sign() == false)
       && (a.size() == 1)
       && (*a.limbs() == b);
 }
 template <unsigned MinBits, class Allocator>
-inline bool eval_eq(const cpp_int_backend<MinBits, true, Allocator, false>& a, signed_limb_type b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE bool eval_eq(const cpp_int_backend<MinBits, true, Allocator, false>& a, signed_limb_type b) BOOST_NOEXCEPT
 {
    return (a.sign() == (b < 0))
       && (a.size() == 1)
       && (*a.limbs() == static_cast<limb_type>(std::abs(b)));
 }
 template <unsigned MinBits, class Allocator>
-inline bool eval_eq(const cpp_int_backend<MinBits, false, Allocator, false>& a, limb_type b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE bool eval_eq(const cpp_int_backend<MinBits, false, Allocator, false>& a, limb_type b) BOOST_NOEXCEPT
 {
    return (a.size() == 1)
       && (*a.limbs() == b);
 }
 template <unsigned MinBits, class Allocator>
-inline bool eval_eq(const cpp_int_backend<MinBits, false, Allocator, false>& a, signed_limb_type b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE bool eval_eq(const cpp_int_backend<MinBits, false, Allocator, false>& a, signed_limb_type b) BOOST_NOEXCEPT
 {
    return (b < 0) ? eval_eq(a, cpp_int_backend<MinBits, false, Allocator, false>(b)) : eval_eq(a, static_cast<limb_type>(b)); // Use bit pattern of b for comparison
 }
 
 template <unsigned MinBits, class Allocator>
-inline bool eval_lt(const cpp_int_backend<MinBits, true, Allocator, false>& a, limb_type b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE bool eval_lt(const cpp_int_backend<MinBits, true, Allocator, false>& a, limb_type b) BOOST_NOEXCEPT
 {
    if(a.sign())
       return true;
@@ -1280,20 +1280,20 @@ inline bool eval_lt(const cpp_int_backend<MinBits, true, Allocator, false>& a, s
 }
 
 template <unsigned MinBits, class Allocator>
-inline bool eval_lt(const cpp_int_backend<MinBits, false, Allocator, false>& a, limb_type b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE bool eval_lt(const cpp_int_backend<MinBits, false, Allocator, false>& a, limb_type b) BOOST_NOEXCEPT
 {
    if(a.size() > 1)
       return false;
    return *a.limbs() < b;
 }
 template <unsigned MinBits, class Allocator>
-inline bool eval_lt(const cpp_int_backend<MinBits, false, Allocator, false>& a, signed_limb_type b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE bool eval_lt(const cpp_int_backend<MinBits, false, Allocator, false>& a, signed_limb_type b) BOOST_NOEXCEPT
 {
    return (b < 0) ? a.compare(b) < 0 : eval_lt(a, static_cast<limb_type>(b)); // Use bit pattern of b for comparison
 }
 
 template <unsigned MinBits, class Allocator>
-inline bool eval_gt(const cpp_int_backend<MinBits, true, Allocator, false>& a, limb_type b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE bool eval_gt(const cpp_int_backend<MinBits, true, Allocator, false>& a, limb_type b) BOOST_NOEXCEPT
 {
    if(a.sign())
       return false;
@@ -1323,20 +1323,20 @@ inline bool eval_gt(const cpp_int_backend<MinBits, true, Allocator, false>& a, s
 }
 
 template <unsigned MinBits, class Allocator>
-inline bool eval_gt(const cpp_int_backend<MinBits, false, Allocator, false>& a, limb_type b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE bool eval_gt(const cpp_int_backend<MinBits, false, Allocator, false>& a, limb_type b) BOOST_NOEXCEPT
 {
    if(a.size() > 1)
       return true;
    return *a.limbs() > b;
 }
 template <unsigned MinBits, class Allocator>
-inline bool eval_gt(const cpp_int_backend<MinBits, false, Allocator, false>& a, signed_limb_type b) BOOST_NOEXCEPT
+BOOST_FORCEINLINE bool eval_gt(const cpp_int_backend<MinBits, false, Allocator, false>& a, signed_limb_type b) BOOST_NOEXCEPT
 {
    return (b < 0) ? a.compare(b) > 0 : eval_gt(a, static_cast<limb_type>(b)); // Use bit pattern of b for comparison.
 }
 
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_add(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_add(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    eval_add(result, result, o);
 }
@@ -1445,7 +1445,7 @@ inline void add_unsigned(cpp_int_backend<MinBits, Signed, Allocator, false>& res
    result.sign(a.sign());
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_add(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_add(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    if(result.sign())
    {
@@ -1455,7 +1455,7 @@ inline void eval_add(cpp_int_backend<MinBits, Signed, Allocator, false>& result,
       add_unsigned(result, result, o);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_add(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_add(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    if(a.sign())
    {
@@ -1466,7 +1466,7 @@ inline void eval_add(cpp_int_backend<MinBits, Signed, Allocator, false>& result,
       add_unsigned(result, a, o);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_add(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const signed_limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_add(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const signed_limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    if(o < 0)
       eval_subtract(result, static_cast<limb_type>(-o));
@@ -1474,7 +1474,7 @@ inline void eval_add(cpp_int_backend<MinBits, Signed, Allocator, false>& result,
       eval_add(result, static_cast<limb_type>(o));
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_add(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const signed_limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_add(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const signed_limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    if(o < 0)
       eval_subtract(result, a, static_cast<limb_type>(-o));
@@ -1514,7 +1514,7 @@ inline void subtract_unsigned(cpp_int_backend<MinBits, Signed, Allocator, false>
    }
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    if(result.sign())
    {
@@ -1524,7 +1524,7 @@ inline void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& re
       subtract_unsigned(result, o);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    if(a.sign())
    {
@@ -1537,7 +1537,7 @@ inline void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& re
    }
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const signed_limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const signed_limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    if(o)
    {
@@ -1548,7 +1548,7 @@ inline void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& re
    }
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const signed_limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const signed_limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    if(o)
    {
@@ -1561,7 +1561,7 @@ inline void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& re
       result = a;
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_increment(cpp_int_backend<MinBits, Signed, Allocator, false>& result) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_increment(cpp_int_backend<MinBits, Signed, Allocator, false>& result) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    static const limb_type one = 1;
    if(!result.sign() && (result.limbs()[0] < cpp_int_backend<MinBits, Signed, Allocator, false>::max_limb_value))
@@ -1572,7 +1572,7 @@ inline void eval_increment(cpp_int_backend<MinBits, Signed, Allocator, false>& r
       eval_add(result, one);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_decrement(cpp_int_backend<MinBits, Signed, Allocator, false>& result) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_decrement(cpp_int_backend<MinBits, Signed, Allocator, false>& result) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    static const limb_type one = 1;
    if(!result.sign() && result.limbs()[0])
@@ -1583,7 +1583,7 @@ inline void eval_decrement(cpp_int_backend<MinBits, Signed, Allocator, false>& r
       eval_subtract(result, one);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    eval_subtract(result, result, o);
 }
@@ -1665,7 +1665,7 @@ inline void subtract_unsigned(cpp_int_backend<MinBits, Signed, Allocator, false>
       result.negate();
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const cpp_int_backend<MinBits, Signed, Allocator, false>& b) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const cpp_int_backend<MinBits, Signed, Allocator, false>& b) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    if(a.sign() != b.sign())
    {
@@ -1757,7 +1757,7 @@ inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& re
    result.sign(a.sign() != b.sign());
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
     eval_multiply(result, result, a);
 }
@@ -1794,12 +1794,12 @@ inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& re
       result.normalize();
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    eval_multiply(result, result, val);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const double_limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const double_limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    if(val <= (std::numeric_limits<limb_type>::max)())
    {
@@ -1812,12 +1812,12 @@ inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& re
    }
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const double_limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const double_limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    eval_multiply(result, result, val);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const signed_limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const signed_limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    if(val > 0)
       eval_multiply(result, a, static_cast<limb_type>(val));
@@ -1828,7 +1828,7 @@ inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& re
    }
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const signed_limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const signed_limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    eval_multiply(result, result, val);
 }
@@ -1853,7 +1853,7 @@ inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& re
    eval_multiply(result, a, t);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const signed_double_limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const signed_double_limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    eval_multiply(result, result, val);
 }
@@ -2270,20 +2270,20 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator, false>* 
 }
 
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const cpp_int_backend<MinBits, Signed, Allocator, false>& b)
+BOOST_FORCEINLINE void eval_divide(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const cpp_int_backend<MinBits, Signed, Allocator, false>& b)
 {
    cpp_int_backend<MinBits, Signed, Allocator, false> r;
    divide_unsigned_helper(&result, a, b, r);
    result.sign(a.sign() != b.sign());
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, limb_type& b)
+BOOST_FORCEINLINE void eval_divide(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, limb_type& b)
 {
    cpp_int_backend<MinBits, Signed, Allocator, false> r;
    divide_unsigned_helper(&result, a, b, r);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, signed_limb_type& b)
+BOOST_FORCEINLINE void eval_divide(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, signed_limb_type& b)
 {
    cpp_int_backend<MinBits, Signed, Allocator, false> r;
    divide_unsigned_helper(&result, a, std::abs(b), r);
@@ -2291,58 +2291,58 @@ inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator, false>& resu
       result.negate();
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& b)
+BOOST_FORCEINLINE void eval_divide(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& b)
 {
    // There is no in place divide:
    cpp_int_backend<MinBits, Signed, Allocator, false> a(result);
    eval_divide(result, a, b);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator, false>& result, limb_type b)
+BOOST_FORCEINLINE void eval_divide(cpp_int_backend<MinBits, Signed, Allocator, false>& result, limb_type b)
 {
    // There is no in place divide:
    cpp_int_backend<MinBits, Signed, Allocator, false> a(result);
    eval_divide(result, a, b);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_divide(cpp_int_backend<MinBits, Signed, Allocator, false>& result, signed_limb_type b)
+BOOST_FORCEINLINE void eval_divide(cpp_int_backend<MinBits, Signed, Allocator, false>& result, signed_limb_type b)
 {
    // There is no in place divide:
    cpp_int_backend<MinBits, Signed, Allocator, false> a(result);
    eval_divide(result, a, b);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const cpp_int_backend<MinBits, Signed, Allocator, false>& b)
+BOOST_FORCEINLINE void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const cpp_int_backend<MinBits, Signed, Allocator, false>& b)
 {
    divide_unsigned_helper(static_cast<cpp_int_backend<MinBits, Signed, Allocator, false>* >(0), a, b, result);
    result.sign(a.sign());
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, limb_type b)
+BOOST_FORCEINLINE void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, limb_type b)
 {
    divide_unsigned_helper(static_cast<cpp_int_backend<MinBits, Signed, Allocator, false>* >(0), a, b, result);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, signed_limb_type b)
+BOOST_FORCEINLINE void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, signed_limb_type b)
 {
    divide_unsigned_helper(static_cast<cpp_int_backend<MinBits, Signed, Allocator, false>* >(0), a, static_cast<limb_type>(std::abs(b)), result);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& b)
+BOOST_FORCEINLINE void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& b)
 {
    // There is no in place divide:
    cpp_int_backend<MinBits, Signed, Allocator, false> a(result);
    eval_modulus(result, a, b);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator, false>& result, limb_type b)
+BOOST_FORCEINLINE void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator, false>& result, limb_type b)
 {
    // There is no in place divide:
    cpp_int_backend<MinBits, Signed, Allocator, false> a(result);
    eval_modulus(result, a, b);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator, false>& result, signed_limb_type b)
+BOOST_FORCEINLINE void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator, false>& result, signed_limb_type b)
 {
    // There is no in place divide:
    cpp_int_backend<MinBits, Signed, Allocator, false> a(result);
@@ -2479,22 +2479,22 @@ struct bit_or { limb_type operator()(limb_type a, limb_type b)const BOOST_NOEXCE
 struct bit_xor{ limb_type operator()(limb_type a, limb_type b)const BOOST_NOEXCEPT { return a ^ b; } };
 
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_bitwise_and(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& o)BOOST_NOEXCEPT_IF(is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_bitwise_and(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& o)BOOST_NOEXCEPT_IF(is_void<Allocator>::value)
 {
    bitwise_op(result, o, bit_and());
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_bitwise_or(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& o) BOOST_NOEXCEPT_IF(is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_bitwise_or(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& o) BOOST_NOEXCEPT_IF(is_void<Allocator>::value)
 {
    bitwise_op(result, o, bit_or());
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_bitwise_xor(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& o) BOOST_NOEXCEPT_IF(is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_bitwise_xor(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& o) BOOST_NOEXCEPT_IF(is_void<Allocator>::value)
 {
    bitwise_op(result, o, bit_xor());
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_complement(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_complement(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    // Increment and negate:
    result = o;
@@ -2720,17 +2720,17 @@ inline typename enable_if<is_floating_point<R>, void>::type eval_convert_to(R* r
 }
 
 template <unsigned MinBits, bool Signed, class Allocator>
-inline bool eval_is_zero(const cpp_int_backend<MinBits, Signed, Allocator, false>& val) BOOST_NOEXCEPT
+BOOST_FORCEINLINE bool eval_is_zero(const cpp_int_backend<MinBits, Signed, Allocator, false>& val) BOOST_NOEXCEPT
 {
    return (val.size() == 1) && (val.limbs()[0] == 0);
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline int eval_get_sign(const cpp_int_backend<MinBits, Signed, Allocator, false>& val) BOOST_NOEXCEPT
+BOOST_FORCEINLINE int eval_get_sign(const cpp_int_backend<MinBits, Signed, Allocator, false>& val) BOOST_NOEXCEPT
 {
    return eval_is_zero(val) ? 0 : val.sign() ? -1 : 1;
 }
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_abs(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_abs(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    result = val;
    result.sign(false);
@@ -2927,7 +2927,7 @@ inline typename enable_if<is_unsigned<Integer>, Integer>::type eval_integer_modu
    }
 }
 template <unsigned MinBits, bool Signed, class Allocator, class Integer>
-inline typename enable_if<is_signed<Integer>, Integer>::type eval_integer_modulus(const cpp_int_backend<MinBits, Signed, Allocator, false>& x, Integer val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE typename enable_if<is_signed<Integer>, Integer>::type eval_integer_modulus(const cpp_int_backend<MinBits, Signed, Allocator, false>& x, Integer val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
 {
    typedef typename make_unsigned<Integer>::type unsigned_type;
    return eval_integer_modulus(x, static_cast<unsigned_type>(std::abs(val)));
