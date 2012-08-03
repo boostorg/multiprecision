@@ -4,6 +4,7 @@
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_
 
 #define BOOST_MATH_MAX_ROOT_ITERATION_POLICY 500
+#define BOOST_MATH_PROMOTE_DOUBLE_POLICY false
 
 #if !defined(TEST_MPFR) && !defined(TEST_MPREAL) && !defined(TEST_MPF) && !defined(TEST_MPREAL) \
    && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR_CLASS) && !defined(TEST_FLOAT)

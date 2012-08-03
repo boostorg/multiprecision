@@ -129,12 +129,12 @@ inline int128_t mult_64x64_to_128(int64_t a, int64_t b)
 }
 
 template <class R, class T>
-inline void mul_2n(R& r, const T& a, const T& b)
+__forceinline void mul_2n(R& r, const T& a, const T& b)
 {
    r = R(a) * b;
 }
 
-inline void mul_2n(int128_t& r, const boost::int64_t& a, const boost::int64_t& b)
+__forceinline void mul_2n(int128_t& r, const boost::int64_t& a, const boost::int64_t& b)
 {
    r = mult_64x64_to_128(a, b);
 }
@@ -152,14 +152,17 @@ inline bool delaunay_test(int32_t ax, int32_t ay, int32_t bx, int32_t by,
    // to the following code.
    // Numerical robustness is important.  This code addresses it by performing 
    // exact calculations with large integer types.
+   //
+   // NOTE: This routine is limited to inputs with up to 30 BIT PRECISION, which
+   // is to say all inputs must be in the range [INT_MIN/2, INT_MAX/2].
 
    typedef typename Traits::i64_t i64;
    typedef typename Traits::i128_t i128;
 
    i64 cos_abc, t;
-   mul_2n(cos_abc, (ax-bx), (cx-bx));
+   mul_2n(cos_abc, (ax-bx), (cx-bx));  // subtraction yields 31-bit values, multiplied to give 62-bit values
    mul_2n(t, (ay-by), (cy-by));
-   cos_abc += t;
+   cos_abc += t;   // addition yields 63 bit value, leaving one left for the sign
 
    i64 cos_cda;
    mul_2n(cos_cda, (cx-dx), (ax-dx));
@@ -180,9 +183,9 @@ inline bool delaunay_test(int32_t ax, int32_t ay, int32_t bx, int32_t by,
    sin_cda -= t;
 
    i128 sin_sum, t128;
-   mul_2n(sin_sum, sin_abc, cos_cda);
+   mul_2n(sin_sum, sin_abc, cos_cda);  // 63-bit inputs multiplied to 126-bit output
    mul_2n(t128, cos_abc, sin_cda);
-   sin_sum += t128;
+   sin_sum += t128;  // Addition yields 127 bit result, leaving one bit for the sign
 
    return sin_sum < 0;
 }
@@ -266,7 +269,7 @@ int main()
    std::cout << "calculating...\n";
 
    do_calc<test_traits<boost::int64_t, boost::int64_t> >("int64_t, int64_t");
-   do_calc<test_traits<mp_number<arithmetic_backend<boost::int64_t> >, mp_number<arithmetic_backend<boost::int64_t> > > >("arithmetic_backend<int64_t>");
+   do_calc<test_traits<mp_number<arithmetic_backend<boost::int64_t>, false>, mp_number<arithmetic_backend<boost::int64_t>, false> > >("arithmetic_backend<int64_t>");
    do_calc<test_traits<boost::int64_t, int128_t> >("int64_t, int128_t");
    do_calc<test_traits<boost::int64_t, mp_int128_t> >("int64_t, mp_int128_t");
    do_calc<test_traits<boost::int64_t, mp_number<cpp_int_backend<128, true, void>, true> > >("int64_t, mp_int128_t (ET)");
