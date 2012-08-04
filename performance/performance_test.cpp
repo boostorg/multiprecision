@@ -384,25 +384,25 @@ struct tester
    //
    // Hetero operations:
    //
-   template <class T>
-   static T get_hetero_test_value(boost::mpl::false_ const&)
+   template <class U>
+   static U get_hetero_test_value(boost::mpl::false_ const&)
    {
-      return T(2) / 3;
+      return U(2) / 3;
    }
-   template <class T>
-   static T get_hetero_test_value(boost::mpl::true_ const&)
+   template <class U>
+   static U get_hetero_test_value(boost::mpl::true_ const&)
    {
-      return (std::numeric_limits<T>::max)() >> 4;
+      return (std::numeric_limits<U>::max)() >> 4;
    }
-   template <class T>
-   static T get_hetero_test_value()
+   template <class U>
+   static U get_hetero_test_value()
    {
-      return get_hetero_test_value<T>(boost::is_integral<T>());
+      return get_hetero_test_value<U>(boost::is_integral<U>());
    }
-   template <class T>
+   template <class U>
    double test_multiply_hetero()
    {
-      static const T val = get_hetero_test_value<T>();
+      static const U val = get_hetero_test_value<U>();
       stopwatch<boost::chrono::high_resolution_clock> w;
       for(unsigned i = 0; i < 1000; ++i)
       {
@@ -411,10 +411,10 @@ struct tester
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
-   template <class T>
+   template <class U>
    double test_inplace_multiply_hetero()
    {
-      static const T val = get_hetero_test_value<T>();
+      static const U val = get_hetero_test_value<U>();
       for(unsigned i = 0; i < b.size(); ++i)
          a[i] = b[i];
       stopwatch<boost::chrono::high_resolution_clock> w;
@@ -425,10 +425,10 @@ struct tester
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
-   template <class T>
+   template <class U>
    double test_add_hetero()
    {
-      static const T val = get_hetero_test_value<T>();
+      static const U val = get_hetero_test_value<U>();
       stopwatch<boost::chrono::high_resolution_clock> w;
       for(unsigned i = 0; i < 1000; ++i)
       {
@@ -437,10 +437,10 @@ struct tester
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
-   template <class T>
+   template <class U>
    double test_inplace_add_hetero()
    {
-      static const T val = get_hetero_test_value<T>();
+      static const U val = get_hetero_test_value<U>();
       for(unsigned i = 0; i < b.size(); ++i)
          a[i] = b[i];
       stopwatch<boost::chrono::high_resolution_clock> w;
@@ -451,10 +451,10 @@ struct tester
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
-   template <class T>
+   template <class U>
    double test_subtract_hetero()
    {
-      static const T val = get_hetero_test_value<T>();
+      static const U val = get_hetero_test_value<U>();
       stopwatch<boost::chrono::high_resolution_clock> w;
       for(unsigned i = 0; i < 1000; ++i)
       {
@@ -463,10 +463,10 @@ struct tester
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
-   template <class T>
+   template <class U>
    double test_inplace_subtract_hetero()
    {
-      static const T val = get_hetero_test_value<T>();
+      static const U val = get_hetero_test_value<U>();
       for(unsigned i = 0; i < b.size(); ++i)
          a[i] = b[i];
       stopwatch<boost::chrono::high_resolution_clock> w;
@@ -477,10 +477,10 @@ struct tester
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
-   template <class T>
+   template <class U>
    double test_divide_hetero()
    {
-      static const T val = get_hetero_test_value<T>();
+      static const U val = get_hetero_test_value<U>();
       stopwatch<boost::chrono::high_resolution_clock> w;
       for(unsigned i = 0; i < 1000; ++i)
       {
@@ -489,10 +489,10 @@ struct tester
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
-   template <class T>
+   template <class U>
    double test_inplace_divide_hetero()
    {
-      static const T val = get_hetero_test_value<T>();
+      static const U val = get_hetero_test_value<U>();
       for(unsigned i = 0; i < b.size(); ++i)
          a[i] = b[i];
       stopwatch<boost::chrono::high_resolution_clock> w;
