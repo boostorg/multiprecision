@@ -20,17 +20,15 @@ inline bool eval_eq(const B& a, const B& b)
    return a.compare(b) == 0;
 }
 template <class B, class A>
-inline typename enable_if_c<(is_arithmetic<A>::value && is_convertible<A, B>::value), bool>::type eval_eq(const B& a, const A& b)
+inline bool eval_eq(const B& a, const A& b)
 {
-   B t(b);
-   return eval_eq(a, t);
-}
-template <class B, class A>
-inline typename enable_if_c<(is_arithmetic<A>::value && !is_convertible<A, B>::value), bool>::type eval_eq(const B& a, const A& b)
-{
-   B t;
-   t = b;
-   return eval_eq(a, t);
+   typedef typename mpl::if_<
+      is_convertible<A, mp_number<B, false> >, 
+      mp_number<B, false>, 
+      mp_number<B, true> 
+   >::type mp_type;
+   mp_type t(b);
+   return eval_eq(a, t.backend());
 }
 
 template <class B>
@@ -39,17 +37,15 @@ inline bool eval_lt(const B& a, const B& b)
    return a.compare(b) < 0;
 }
 template <class B, class A>
-inline typename enable_if_c<(is_arithmetic<A>::value && is_convertible<A, B>::value), bool>::type eval_lt(const B& a, const A& b)
+inline bool eval_lt(const B& a, const A& b)
 {
-   B t(b);
-   return eval_lt(a, t);
-}
-template <class B, class A>
-inline typename enable_if_c<(is_arithmetic<A>::value && !is_convertible<A, B>::value), bool>::type eval_lt(const B& a, const A& b)
-{
-   B t;
-   t = b;
-   return eval_lt(a, t);
+   typedef typename mpl::if_<
+      is_convertible<A, mp_number<B, false> >, 
+      mp_number<B, false>, 
+      mp_number<B, true> 
+   >::type mp_type;
+   mp_type t(b);
+   return eval_lt(a, t.backend());
 }
 
 template <class B>
@@ -58,17 +54,15 @@ inline bool eval_gt(const B& a, const B& b)
    return a.compare(b) > 0;
 }
 template <class B, class A>
-inline typename enable_if_c<(is_arithmetic<A>::value && is_convertible<A, B>::value), bool>::type eval_gt(const B& a, const A& b)
+inline bool eval_gt(const B& a, const A& b)
 {
-   B t(b);
-   return eval_gt(a, t);
-}
-template <class B, class A>
-inline typename enable_if_c<(is_arithmetic<A>::value && !is_convertible<A, B>::value), bool>::type eval_gt(const B& a, const A& b)
-{
-   B t;
-   t = b;
-   return eval_gt(a, t);
+   typedef typename mpl::if_<
+      is_convertible<A, mp_number<B, false> >, 
+      mp_number<B, false>, 
+      mp_number<B, true> 
+   >::type mp_type;
+   mp_type t(b);
+   return eval_gt(a, t.backend());
 }
 
 }

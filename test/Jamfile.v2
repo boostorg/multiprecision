@@ -749,7 +749,7 @@ run ublas_interop/test2.cpp ublas_interop/test21.cpp ublas_interop/test22.cpp ub
 run ublas_interop/test4.cpp ublas_interop/test42.cpp ublas_interop/test43.cpp ;
 run ublas_interop/test5.cpp ublas_interop/test52.cpp ublas_interop/test53.cpp ;
 run ublas_interop/test6.cpp ublas_interop/test62.cpp ublas_interop/test63.cpp ;
-run ublas_interop/test7.cpp ublas_interop/test71.cpp ublas_interop/test72.cpp ublas_interop/test73.cpp ;
+#run ublas_interop/test7.cpp ublas_interop/test71.cpp ublas_interop/test72.cpp ublas_interop/test73.cpp ;
 
 
 if $(enable-specfun)

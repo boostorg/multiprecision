@@ -147,21 +147,175 @@ struct test_my_matrix {
 void test_matrix () {
     std::cout << "test_matrix" << std::endl;
 
+#ifdef USE_MATRIX
+#ifdef USE_BOUNDED_ARRAY
+#ifdef USE_FLOAT
     std::cout << "mp_test_type, bounded_array" << std::endl;
     test_my_matrix<ublas::matrix<mp_test_type, ublas::row_major, ublas::bounded_array<mp_test_type, 3 * 3> >, 3> () ();
+#endif
+
+#ifdef USE_DOUBLE
+    std::cout << "double, bounded_array" << std::endl;
+    test_my_matrix<ublas::matrix<double, ublas::row_major, ublas::bounded_array<double, 3 * 3> >, 3> () ();
+#endif
+
+#ifdef USE_STD_COMPLEX
+#ifdef USE_FLOAT
+    std::cout << "std::complex<mp_test_type>, bounded_array" << std::endl;
+    test_my_matrix<ublas::matrix<std::complex<mp_test_type>, ublas::row_major, ublas::bounded_array<std::complex<mp_test_type>, 3 * 3> >, 3> () ();
+#endif
+
+#ifdef USE_DOUBLE
+    std::cout << "std::complex<double>, bounded_array" << std::endl;
+    test_my_matrix<ublas::matrix<std::complex<double>, ublas::row_major, ublas::bounded_array<std::complex<double>, 3 * 3> >, 3> () ();
+#endif
+#endif
+#endif
+
+#ifdef USE_UNBOUNDED_ARRAY
+#ifdef USE_FLOAT
     std::cout << "mp_test_type, unbounded_array" << std::endl;
     test_my_matrix<ublas::matrix<mp_test_type, ublas::row_major, ublas::unbounded_array<mp_test_type> >, 3> () ();
+#endif
+
+#ifdef USE_DOUBLE
+    std::cout << "double, unbounded_array" << std::endl;
+    test_my_matrix<ublas::matrix<double, ublas::row_major, ublas::unbounded_array<double> >, 3> () ();
+#endif
+
+#ifdef USE_STD_COMPLEX
+#ifdef USE_FLOAT
+    std::cout << "std::complex<mp_test_type>, unbounded_array" << std::endl;
+    test_my_matrix<ublas::matrix<std::complex<mp_test_type>, ublas::row_major, ublas::unbounded_array<std::complex<mp_test_type> > >, 3> () ();
+#endif
+
+#ifdef USE_DOUBLE
+    std::cout << "std::complex<double>, unbounded_array" << std::endl;
+    test_my_matrix<ublas::matrix<std::complex<double>, ublas::row_major, ublas::unbounded_array<std::complex<double> > >, 3> () ();
+#endif
+#endif
+#endif
+
+#ifdef USE_STD_VECTOR
+#ifdef USE_FLOAT
     std::cout << "mp_test_type, std::vector" << std::endl;
     test_my_matrix<ublas::matrix<mp_test_type, ublas::row_major, std::vector<mp_test_type> >, 3> () ();
+#endif
+
+#ifdef USE_DOUBLE
+    std::cout << "double, std::vector" << std::endl;
+    test_my_matrix<ublas::matrix<double, ublas::row_major, std::vector<double> >, 3> () ();
+#endif
+
+#ifdef USE_STD_COMPLEX
+#ifdef USE_FLOAT
+    std::cout << "std::complex<mp_test_type>, std::vector" << std::endl;
+    test_my_matrix<ublas::matrix<std::complex<mp_test_type>, ublas::row_major, std::vector<std::complex<mp_test_type> > >, 3> () ();
+#endif
+
+#ifdef USE_DOUBLE
+    std::cout << "std::complex<double>, std::vector" << std::endl;
+    test_my_matrix<ublas::matrix<std::complex<double>, ublas::row_major, std::vector<std::complex<double> > >, 3> () ();
+#endif
+#endif
+#endif
+#endif
+
+#ifdef USE_BOUNDED_MATRIX
+#ifdef USE_FLOAT
     std::cout << "mp_test_type, bounded" << std::endl;
     test_my_matrix<ublas::bounded_matrix<mp_test_type, 3, 3>, 3> () ();
+#endif
+
+#ifdef USE_DOUBLE
+    std::cout << "double, bounded" << std::endl;
+    test_my_matrix<ublas::bounded_matrix<double, 3, 3>, 3> () ();
+#endif
+
+#ifdef USE_STD_COMPLEX
+#ifdef USE_FLOAT
+    std::cout << "std::complex<mp_test_type>, bounded" << std::endl;
+    test_my_matrix<ublas::bounded_matrix<std::complex<mp_test_type>, 3, 3>, 3> () ();
+#endif
+
+#ifdef USE_DOUBLE
+    std::cout << "std::complex<double>, bounded" << std::endl;
+    test_my_matrix<ublas::bounded_matrix<std::complex<double>, 3, 3>, 3> () ();
+#endif
+#endif
+#endif
+
+#ifdef USE_VECTOR_OF_VECTOR
+#ifdef USE_BOUNDED_ARRAY
+#ifdef USE_FLOAT
     std::cout << "mp_test_type, bounded_array" << std::endl;
     test_my_matrix<ublas::vector_of_vector<mp_test_type, ublas::row_major, ublas::bounded_array<ublas::bounded_array<mp_test_type, 3>, 3 + 1> >, 3> () ();
-    /*
-    // This fails with an internal std lib assersion, even when mp_test_type is double,
-    // looks like a bug in the uBlas test code...
+#endif
+
+#ifdef USE_DOUBLE
+    std::cout << "double, bounded_array" << std::endl;
+    test_my_matrix<ublas::vector_of_vector<double, ublas::row_major, ublas::bounded_array<ublas::bounded_array<double, 3>, 3 + 1> >, 3> () ();
+#endif
+
+#ifdef USE_STD_COMPLEX
+#ifdef USE_FLOAT
+    std::cout << "std::complex<mp_test_type>, bounded_array" << std::endl;
+    test_my_matrix<ublas::vector_of_vector<std::complex<mp_test_type>, ublas::row_major, ublas::bounded_array<ublas::bounded_array<std::complex<mp_test_type>, 3>, 3 + 1> >, 3> () ();
+#endif
+
+#ifdef USE_DOUBLE
+    std::cout << "std::complex<double>, bounded_array" << std::endl;
+    test_my_matrix<ublas::vector_of_vector<std::complex<double>, ublas::row_major, ublas::bounded_array<ublas::bounded_array<std::complex<double>, 3>, 3 + 1> >, 3> () ();
+#endif
+#endif
+#endif
+
+#ifdef USE_UNBOUNDED_ARRAY
+#ifdef USE_FLOAT
     std::cout << "mp_test_type, unbounded_array" << std::endl;
     test_my_matrix<ublas::vector_of_vector<mp_test_type, ublas::row_major, ublas::unbounded_array<ublas::unbounded_array<mp_test_type> > >, 3> () ();
+#endif
+
+#ifdef USE_DOUBLE
+    std::cout << "double, unbounded_array" << std::endl;
+    test_my_matrix<ublas::vector_of_vector<double, ublas::row_major, ublas::unbounded_array<ublas::unbounded_array<double> > >, 3> () ();
+#endif
+
+#ifdef USE_STD_COMPLEX
+#ifdef USE_FLOAT
+    std::cout << "std::complex<mp_test_type>, unbounded_array" << std::endl;
+    test_my_matrix<ublas::vector_of_vector<std::complex<mp_test_type>, ublas::row_major, ublas::unbounded_array<ublas::unbounded_array<std::complex<mp_test_type> > > >, 3> () ();
+#endif
+
+#ifdef USE_DOUBLE
+    std::cout << "std::complex<double>, unbounded_array" << std::endl;
+    test_my_matrix<ublas::vector_of_vector<std::complex<double>, ublas::row_major, ublas::unbounded_array<ublas::unbounded_array<std::complex<double> > > >, 3> () ();
+#endif
+#endif
+#endif
+
+#ifdef USE_STD_VECTOR
+#ifdef USE_FLOAT
     std::cout << "mp_test_type, std::vector" << std::endl;
-    test_my_matrix<ublas::vector_of_vector<mp_test_type, ublas::row_major, std::vector<std::vector<mp_test_type > > >, 3> () ();*/
+    test_my_matrix<ublas::vector_of_vector<mp_test_type, ublas::row_major, std::vector<std::vector<mp_test_type > > >, 3> () ();
+#endif
+
+#ifdef USE_DOUBLE
+    std::cout << "double, std::vector" << std::endl;
+    test_my_matrix<ublas::vector_of_vector<double, ublas::row_major, std::vector<std::vector<double> > >, 3> () ();
+#endif
+
+#ifdef USE_STD_COMPLEX
+#ifdef USE_FLOAT
+    std::cout << "std::complex<mp_test_type>, std::vector" << std::endl;
+    test_my_matrix<ublas::vector_of_vector<std::complex<mp_test_type>, ublas::row_major, std::vector<std::vector<std::complex<mp_test_type> > > >, 3> () ();
+#endif
+
+#ifdef USE_DOUBLE
+    std::cout << "std::complex<double>, std::vector" << std::endl;
+    test_my_matrix<ublas::vector_of_vector<std::complex<double>, ublas::row_major, std::vector<std::vector<std::complex<double> > > >, 3> () ();
+#endif
+#endif
+#endif
+#endif
 }

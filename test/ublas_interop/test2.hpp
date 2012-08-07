@@ -12,7 +12,6 @@
 
 #ifndef TEST2_H
 #define TEST2_H
-
 #ifdef _MSC_VER
 #  pragma warning(disable:4800 4996)
 #endif
@@ -25,11 +24,18 @@ typedef boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<50
 #define USE_RANGE
 #define USE_SLICE
 #define USE_FLOAT
-#define USE_RANGE 
-#define USE_SLICE
 #define USE_UNBOUNDED_ARRAY 
 #define USE_STD_VECTOR 
 #define USE_BOUNDED_VECTOR USE_MATRIX
+#define USE_UNBOUNDED_ARRAY
+#define USE_MAP_ARRAY 
+#define USE_STD_MAP
+#define USE_MAPPED_VECTOR 
+#define USE_COMPRESSED_VECTOR 
+#define USE_COORDINATE_VECTOR
+#define USE_MAPPED_MATRIX 
+#define USE_COMPRESSED_MATRIX 
+#define USE_COORDINATE_MATRIX
 
 #include <iostream>
 
