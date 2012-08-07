@@ -1541,138 +1541,6 @@ private:
    Backend m_backend;
 };
 
-/*
-namespace detail
-{
-
-template <class Backend, bool ExpressionTemplates>
-BOOST_FORCEINLINE int mp_number_compare(const mp_number<Backend, ExpressionTemplates>& a, const mp_number<Backend, ExpressionTemplates>& b)
-{
-   return a.compare(b);
-}
-
-template <class Backend, bool ExpressionTemplates, class tag, class A1, class A2, class A3, class A4>
-BOOST_FORCEINLINE int mp_number_compare(const mp_number<Backend, ExpressionTemplates>& a, const mp_exp<tag, A1, A2, A3, A4>& b)
-{
-   return a.compare(mp_number<Backend, ExpressionTemplates>(b));
-}
-
-template <class tag, class A1, class A2, class A3, class A4, class Backend, bool ExpressionTemplates>
-inline int mp_number_compare(const mp_exp<tag, A1, A2, A3, A4>& a, const mp_number<Backend, ExpressionTemplates>& b)
-{
-   return -b.compare(mp_number<Backend, ExpressionTemplates>(a));
-}
-
-template <class Backend, bool ExpressionTemplates, class Val>
-inline int mp_number_compare(const mp_number<Backend, ExpressionTemplates>& a, const Val b)
-{
-   return a.compare(b);
-}
-
-template <class Val, class Backend, bool ExpressionTemplates>
-inline int mp_number_compare(const Val a, const mp_number<Backend, ExpressionTemplates>& b)
-{
-   return -b.compare(a);
-}
-
-template <class tag, class A1, class A2, class A3, class A4, class tag2, class A1b, class A2b, class A3b>
-inline int mp_number_compare(const mp_exp<tag, A1, A2, A3, A4>& a, const mp_exp<tag2, A1b, A2b, A3b>& b)
-{
-   typedef typename mp_exp<tag, A1, A2, A3, A4>::result_type real1;
-   typedef typename mp_exp<tag2, A1b, A2b, A3b>::result_type real2;
-   return real1(a).compare(real2(b));
-}
-
-template <class tag, class A1, class A2, class A3, class A4, class Val>
-inline typename enable_if<is_arithmetic<Val>, int>::type mp_number_compare(const mp_exp<tag, A1, A2, A3, A4>& a, const Val b)
-{
-   typedef typename mp_exp<tag, A1, A2, A3, A4>::result_type real;
-   real t(a);
-   return t.compare(b);
-}
-
-template <class Val, class tag, class A1, class A2, class A3, class A4>
-inline typename enable_if<is_arithmetic<Val>, int>::type mp_number_compare(const Val a, const mp_exp<tag, A1, A2, A3, A4>& b)
-{
-   typedef typename mp_exp<tag, A1, A2, A3, A4>::result_type real;
-   return -real(b).compare(a);
-}
-
-template <class Exp1, class Exp2>
-struct is_valid_comparison_imp
-{
-   typedef typename mpl::or_<
-      is_mp_number<Exp1>,
-      is_mp_number_exp<Exp1>
-   >::type is1;
-   typedef typename mpl::or_<
-      is_mp_number<Exp2>,
-      is_mp_number_exp<Exp2>
-   >::type is2;
-   typedef typename mpl::or_<
-      mpl::and_<
-         is1,
-         mpl::or_<
-            is2,
-            is_arithmetic<Exp2>
-         >
-      >,
-      mpl::and_<
-         is2,
-         mpl::or_<
-            is1,
-            is_arithmetic<Exp1>
-         >
-      >
-   >::type type;
-};
-
-template <class Exp1, class Exp2>
-struct is_valid_comparison : public boost::multiprecision::detail::is_valid_comparison_imp<Exp1, Exp2>::type {};
-
-}
-
-template <class Exp1, class Exp2>
-inline typename boost::enable_if<detail::is_valid_comparison<Exp1, Exp2>, bool>::type 
-   operator == (const Exp1& a, const Exp2& b)
-{
-   return 0 == detail::mp_number_compare(a, b);
-}
-template <class Exp1, class Exp2>
-inline typename boost::enable_if<detail::is_valid_comparison<Exp1, Exp2>, bool>::type 
-   operator != (const Exp1& a, const Exp2& b)
-{
-   return 0 != detail::mp_number_compare(a, b);
-}
-
-template <class Exp1, class Exp2>
-inline typename boost::enable_if<detail::is_valid_comparison<Exp1, Exp2>, bool>::type 
-   operator <= (const Exp1& a, const Exp2& b)
-{
-   return 0 >= detail::mp_number_compare(a, b);
-}
-
-template <class Exp1, class Exp2>
-inline typename boost::enable_if<detail::is_valid_comparison<Exp1, Exp2>, bool>::type 
-   operator < (const Exp1& a, const Exp2& b)
-{
-   return 0 > detail::mp_number_compare(a, b);
-}
-
-template <class Exp1, class Exp2>
-inline typename boost::enable_if<detail::is_valid_comparison<Exp1, Exp2>, bool>::type 
-   operator >= (const Exp1& a, const Exp2& b)
-{
-   return 0 <= detail::mp_number_compare(a, b);
-}
-
-template <class Exp1, class Exp2>
-inline typename boost::enable_if<detail::is_valid_comparison<Exp1, Exp2>, bool>::type 
-   operator > (const Exp1& a, const Exp2& b)
-{
-   return 0 < detail::mp_number_compare(a, b);
-}
-*/
 template <class Backend, bool ExpressionTemplates>
 inline std::ostream& operator << (std::ostream& os, const mp_number<Backend, ExpressionTemplates>& r)
 {
@@ -1792,6 +1660,22 @@ inline multiprecision::mp_number<T, ExpressionTemplates> denominator(const ratio
 {
    return a.denominator();
 }
+
+namespace numeric { namespace ublas {
+//
+// uBlas interoperability:
+//
+template<class V>
+class sparse_vector_element;
+
+template <class V, class Backend, bool ExpressionTemplates>
+inline bool operator == (const sparse_vector_element<V>& a, const ::boost::multiprecision::mp_number<Backend, ExpressionTemplates>& b)
+{
+typedef typename sparse_vector_element<V>::const_reference ref_type;
+   return static_cast<ref_type>(a) == b;
+}
+
+}} // namespaces
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

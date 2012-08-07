@@ -225,7 +225,7 @@ void time_proc(const char* name, Real (*proc)(), unsigned threads = 1)
 int main()
 {
    using namespace boost::multiprecision;
-#if defined(TEST_MPFR) || defined(TEST_MPFR_CLASS) || defined(TEST_MPREAL)
+#if defined(TEST_MPFR) || defined(TEST_MPFR_CLASS) || defined(TEST_MPREAL) || defined(TEST_MPF)
    mp_get_memory_functions(&alloc_func_ptr, &realloc_func_ptr, &free_func_ptr);
    mp_set_memory_functions(&alloc_func, &realloc_func, &free_func);
 #endif
