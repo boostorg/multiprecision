@@ -54,18 +54,22 @@ struct tommath_int
    }
    tommath_int& operator = (tommath_int&& o)
    {
-      m_data = o.m_data;
-      o.m_data.dp = 0;
+      mp_exch(&m_data, &o.data());
       return *this;
    }
 #endif
    tommath_int& operator = (const tommath_int& o)
    {
-      detail::check_tommath_result(mp_copy(const_cast< ::mp_int*>(&o.m_data), &m_data));
+      if(m_data.dp == 0)
+         detail::check_tommath_result(mp_init(&m_data));
+      if(o.m_data.dp)
+         detail::check_tommath_result(mp_copy(const_cast< ::mp_int*>(&o.m_data), &m_data));
       return *this;
    }
    tommath_int& operator = (unsigned long long i)
    {
+      if(m_data.dp == 0)
+         detail::check_tommath_result(mp_init(&m_data));
       unsigned long long mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
       unsigned shift = 0;
       ::mp_int t;
@@ -86,6 +90,8 @@ struct tommath_int
    tommath_int& operator = (long long i)
    {
       BOOST_MP_USING_ABS
+      if(m_data.dp == 0)
+         detail::check_tommath_result(mp_init(&m_data));
       bool neg = i < 0;
       *this = static_cast<unsigned long long>(abs(i));
       if(neg)
@@ -99,11 +105,15 @@ struct tommath_int
    //
    tommath_int& operator = (boost::uint32_t i)
    {
+      if(m_data.dp == 0)
+         detail::check_tommath_result(mp_init(&m_data));
       detail::check_tommath_result((mp_set_int(&m_data, i)));
       return *this;
    }
    tommath_int& operator = (boost::int32_t i)
    {
+      if(m_data.dp == 0)
+         detail::check_tommath_result(mp_init(&m_data));
       bool neg = i < 0;
       *this = static_cast<boost::uint32_t>(std::abs(i));
       if(neg)
@@ -115,6 +125,9 @@ struct tommath_int
       using std::frexp;
       using std::ldexp;
       using std::floor;
+
+      if(m_data.dp == 0)
+         detail::check_tommath_result(mp_init(&m_data));
 
       if (a == 0) {
          detail::check_tommath_result(mp_set_int(&m_data, 0));
@@ -175,6 +188,8 @@ struct tommath_int
       //
       using default_ops::eval_multiply;
       using default_ops::eval_add;
+      if(m_data.dp == 0)
+         detail::check_tommath_result(mp_init(&m_data));
       std::size_t n = s ? std::strlen(s) : 0;
       *this = static_cast<boost::uint32_t>(0u);
       unsigned radix = 10;
@@ -275,6 +290,7 @@ struct tommath_int
    }
    std::string str(std::streamsize /*digits*/, std::ios_base::fmtflags f)const
    {
+      BOOST_ASSERT(m_data.dp);
       int base = 10;
       if((f & std::ios_base::oct) == std::ios_base::oct)
          base = 8;
@@ -307,10 +323,12 @@ struct tommath_int
    }
    void negate()
    {
+      BOOST_ASSERT(m_data.dp);
       mp_neg(&m_data, &m_data);
    }
    int compare(const tommath_int& o)const
    {
+      BOOST_ASSERT(m_data.dp && o.m_data.dp);
       return mp_cmp(const_cast< ::mp_int*>(&m_data), const_cast< ::mp_int*>(&o.m_data));
    }
    template <class V>
@@ -322,8 +340,16 @@ struct tommath_int
       d = v;
       return t.compare(d);
    }
-   ::mp_int& data() { return m_data; }
-   const ::mp_int& data()const { return m_data; }
+   ::mp_int& data() 
+   { 
+      BOOST_ASSERT(m_data.dp);
+      return m_data; 
+   }
+   const ::mp_int& data()const 
+   { 
+      BOOST_ASSERT(m_data.dp);
+      return m_data; 
+   }
    void swap(tommath_int& o)BOOST_NOEXCEPT
    {
       mp_exch(&m_data, &o.data());

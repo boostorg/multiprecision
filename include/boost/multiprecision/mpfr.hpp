@@ -40,7 +40,8 @@ struct mpfr_float_imp
    mpfr_float_imp(const mpfr_float_imp& o)
    {
       mpfr_init2(m_data, (((digits10 ? digits10 : get_default_precision()) + 1) * 1000L) / 301L);
-      mpfr_set(m_data, o.m_data, GMP_RNDN);
+      if(o.m_data[0]._mpfr_d)
+         mpfr_set(m_data, o.m_data, GMP_RNDN);
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
    mpfr_float_imp(mpfr_float_imp&& o) BOOST_NOEXCEPT
@@ -51,7 +52,10 @@ struct mpfr_float_imp
 #endif
    mpfr_float_imp& operator = (const mpfr_float_imp& o) BOOST_NOEXCEPT
    {
-      mpfr_set(m_data, o.m_data, GMP_RNDN);
+      if(m_data[0]._mpfr_d == 0)
+         mpfr_init2(m_data, (((digits10 ? digits10 : get_default_precision()) + 1) * 1000L) / 301L);
+      if(o.m_data[0]._mpfr_d)
+         mpfr_set(m_data, o.m_data, GMP_RNDN);
       return *this;
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
@@ -64,17 +68,23 @@ struct mpfr_float_imp
 #ifdef _MPFR_H_HAVE_INTMAX_T
    mpfr_float_imp& operator = (unsigned long long i) BOOST_NOEXCEPT
    {
+      if(m_data[0]._mpfr_d == 0)
+         mpfr_init2(m_data, (((digits10 ? digits10 : get_default_precision()) + 1) * 1000L) / 301L);
       mpfr_set_uj(m_data, i, GMP_RNDN);
       return *this;
    }
    mpfr_float_imp& operator = (long long i) BOOST_NOEXCEPT
    {
+      if(m_data[0]._mpfr_d == 0)
+         mpfr_init2(m_data, (((digits10 ? digits10 : get_default_precision()) + 1) * 1000L) / 301L);
       mpfr_set_sj(m_data, i, GMP_RNDN);
       return *this;
    }
 #else
    mpfr_float_imp& operator = (unsigned long long i)
    {
+      if(m_data[0]._mpfr_d == 0)
+         mpfr_init2(m_data, (((digits10 ? digits10 : get_default_precision()) + 1) * 1000L) / 301L);
       unsigned long long mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
       unsigned shift = 0;
       mpfr_t t;
@@ -95,6 +105,8 @@ struct mpfr_float_imp
    mpfr_float_imp& operator = (long long i)
    {
       BOOST_MP_USING_ABS
+      if(m_data[0]._mpfr_d == 0)
+         mpfr_init2(m_data, (((digits10 ? digits10 : get_default_precision()) + 1) * 1000L) / 301L);
       bool neg = i < 0;
       *this = static_cast<unsigned long long>(abs(i));
       if(neg)
@@ -104,26 +116,36 @@ struct mpfr_float_imp
 #endif
    mpfr_float_imp& operator = (unsigned long i) BOOST_NOEXCEPT
    {
+      if(m_data[0]._mpfr_d == 0)
+         mpfr_init2(m_data, (((digits10 ? digits10 : get_default_precision()) + 1) * 1000L) / 301L);
       mpfr_set_ui(m_data, i, GMP_RNDN);
       return *this;
    }
    mpfr_float_imp& operator = (long i) BOOST_NOEXCEPT
    {
+      if(m_data[0]._mpfr_d == 0)
+         mpfr_init2(m_data, (((digits10 ? digits10 : get_default_precision()) + 1) * 1000L) / 301L);
       mpfr_set_si(m_data, i, GMP_RNDN);
       return *this;
    }
    mpfr_float_imp& operator = (double d) BOOST_NOEXCEPT
    {
+      if(m_data[0]._mpfr_d == 0)
+         mpfr_init2(m_data, (((digits10 ? digits10 : get_default_precision()) + 1) * 1000L) / 301L);
       mpfr_set_d(m_data, d, GMP_RNDN);
       return *this;
    }
    mpfr_float_imp& operator = (long double a) BOOST_NOEXCEPT
    {
+      if(m_data[0]._mpfr_d == 0)
+         mpfr_init2(m_data, (((digits10 ? digits10 : get_default_precision()) + 1) * 1000L) / 301L);
       mpfr_set_ld(m_data, a, GMP_RNDN);
       return *this;
    }
    mpfr_float_imp& operator = (const char* s)
    {
+      if(m_data[0]._mpfr_d == 0)
+         mpfr_init2(m_data, (((digits10 ? digits10 : get_default_precision()) + 1) * 1000L) / 301L);
       if(mpfr_set_str(m_data, s, 10, GMP_RNDN) != 0)
       {
          BOOST_THROW_EXCEPTION(std::runtime_error(std::string("Unable to parse string \"") + s + std::string("\"as a valid floating point number.")));
@@ -136,6 +158,8 @@ struct mpfr_float_imp
    }
    std::string str(std::streamsize digits, std::ios_base::fmtflags f)const
    {
+      BOOST_ASSERT(m_data[0]._mpfr_d);
+
       bool scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
       bool fixed      = (f & std::ios_base::fixed) == std::ios_base::fixed;
 
@@ -246,18 +270,22 @@ struct mpfr_float_imp
    }
    void negate() BOOST_NOEXCEPT
    {
+      BOOST_ASSERT(m_data[0]._mpfr_d);
       mpfr_neg(m_data, m_data, GMP_RNDN);
    }
    int compare(const mpfr_float_backend<digits10>& o)const BOOST_NOEXCEPT
    {
+      BOOST_ASSERT(m_data[0]._mpfr_d && o.m_data[0]._mpfr_d);
       return mpfr_cmp(m_data, o.m_data);
    }
    int compare(long i)const BOOST_NOEXCEPT
    {
+      BOOST_ASSERT(m_data[0]._mpfr_d);
       return mpfr_cmp_si(m_data, i);
    }
    int compare(unsigned long i)const BOOST_NOEXCEPT
    {
+      BOOST_ASSERT(m_data[0]._mpfr_d);
       return mpfr_cmp_ui(m_data, i);
    }
    template <class V>
@@ -267,8 +295,16 @@ struct mpfr_float_imp
       d = v;
       return compare(d);
    }
-   mpfr_t& data() BOOST_NOEXCEPT { return m_data; }
-   const mpfr_t& data()const BOOST_NOEXCEPT { return m_data; }
+   mpfr_t& data() BOOST_NOEXCEPT 
+   { 
+      BOOST_ASSERT(m_data[0]._mpfr_d);
+      return m_data; 
+   }
+   const mpfr_t& data()const BOOST_NOEXCEPT 
+   { 
+      BOOST_ASSERT(m_data[0]._mpfr_d);
+      return m_data; 
+   }
 protected:
    mpfr_t m_data;
    static unsigned& get_default_precision() BOOST_NOEXCEPT

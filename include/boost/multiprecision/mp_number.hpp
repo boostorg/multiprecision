@@ -28,8 +28,9 @@ namespace boost{ namespace multiprecision{
 
 #ifdef BOOST_MSVC
 // warning C4127: conditional expression is constant
+// warning C4714: function marked as __forceinline not inlined
 #pragma warning(push)
-#pragma warning(disable:4127)
+#pragma warning(disable:4127 4714)
 #endif
 
 template <class Backend, bool ExpressionTemplates>

@@ -56,7 +56,8 @@ struct gmp_float_imp
       // things go badly wrong!!
       //
       mpf_init2(m_data, (((digits10 ? digits10 : get_default_precision()) + 1) * 1000L) / 301L);
-      mpf_set(m_data, o.m_data);
+      if(o.m_data[0]._mp_d)
+         mpf_set(m_data, o.m_data);
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
    gmp_float_imp(gmp_float_imp&& o) BOOST_NOEXCEPT
@@ -67,7 +68,10 @@ struct gmp_float_imp
 #endif
    gmp_float_imp& operator = (const gmp_float_imp& o)
    {
-      mpf_set(m_data, o.m_data);
+      if(m_data[0]._mp_d == 0)
+         mpf_init2(m_data, (((digits10 ? digits10 : get_default_precision()) + 1) * 1000L) / 301L);
+      if(o.m_data[0]._mp_d)
+         mpf_set(m_data, o.m_data);
       return *this;
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
@@ -79,6 +83,8 @@ struct gmp_float_imp
 #endif
    gmp_float_imp& operator = (unsigned long long i)
    {
+      if(m_data[0]._mp_d == 0)
+         mpf_init2(m_data, (((digits10 ? digits10 : get_default_precision()) + 1) * 1000L) / 301L);
       unsigned long long mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
       unsigned shift = 0;
       mpf_t t;
@@ -99,6 +105,8 @@ struct gmp_float_imp
    gmp_float_imp& operator = (long long i)
    {
       BOOST_MP_USING_ABS
+      if(m_data[0]._mp_d == 0)
+         mpf_init2(m_data, (((digits10 ? digits10 : get_default_precision()) + 1) * 1000L) / 301L);
       bool neg = i < 0;
       *this = static_cast<unsigned long long>(abs(i));
       if(neg)
@@ -107,16 +115,22 @@ struct gmp_float_imp
    }
    gmp_float_imp& operator = (unsigned long i) BOOST_NOEXCEPT
    {
+      if(m_data[0]._mp_d == 0)
+         mpf_init2(m_data, (((digits10 ? digits10 : get_default_precision()) + 1) * 1000L) / 301L);
       mpf_set_ui(m_data, i);
       return *this;
    }
    gmp_float_imp& operator = (long i) BOOST_NOEXCEPT
    {
+      if(m_data[0]._mp_d == 0)
+         mpf_init2(m_data, (((digits10 ? digits10 : get_default_precision()) + 1) * 1000L) / 301L);
       mpf_set_si(m_data, i);
       return *this;
    }
    gmp_float_imp& operator = (double d) BOOST_NOEXCEPT
    {
+      if(m_data[0]._mp_d == 0)
+         mpf_init2(m_data, (((digits10 ? digits10 : get_default_precision()) + 1) * 1000L) / 301L);
       mpf_set_d(m_data, d);
       return *this;
    }
@@ -125,6 +139,9 @@ struct gmp_float_imp
       using std::frexp;
       using std::ldexp;
       using std::floor;
+
+      if(m_data[0]._mp_d == 0)
+         mpf_init2(m_data, (((digits10 ? digits10 : get_default_precision()) + 1) * 1000L) / 301L);
 
       if (a == 0) {
          mpf_set_si(m_data, 0);
@@ -168,6 +185,8 @@ struct gmp_float_imp
    }
    gmp_float_imp& operator = (const char* s)
    {
+      if(m_data[0]._mp_d == 0)
+         mpf_init2(m_data, (((digits10 ? digits10 : get_default_precision()) + 1) * 1000L) / 301L);
       if(0 != mpf_set_str(m_data, s, 10))
          BOOST_THROW_EXCEPTION(std::runtime_error(std::string("The string \"") + s + std::string("\"could not be interpreted as a valid floating point number.")));
       return *this;
@@ -178,6 +197,8 @@ struct gmp_float_imp
    }
    std::string str(std::streamsize digits, std::ios_base::fmtflags f)const
    {
+      BOOST_ASSERT(m_data[0]._mp_d);
+
       bool scientific = (f & std::ios_base::scientific) == std::ios_base::scientific;
       bool fixed      = (f & std::ios_base::fixed) == std::ios_base::fixed;
       std::streamsize org_digits(digits);
@@ -278,18 +299,22 @@ struct gmp_float_imp
    }
    void negate() BOOST_NOEXCEPT
    {
+      BOOST_ASSERT(m_data[0]._mp_d);
       mpf_neg(m_data, m_data);
    }
    int compare(const gmp_float<digits10>& o)const BOOST_NOEXCEPT
    {
+      BOOST_ASSERT(m_data[0]._mp_d && o.m_data[0]._mp_d);
       return mpf_cmp(m_data, o.m_data);
    }
    int compare(long i)const BOOST_NOEXCEPT
    {
+      BOOST_ASSERT(m_data[0]._mp_d);
       return mpf_cmp_si(m_data, i);
    }
    int compare(unsigned long i)const BOOST_NOEXCEPT
    {
+      BOOST_ASSERT(m_data[0]._mp_d);
       return mpf_cmp_ui(m_data, i);
    }
    template <class V>
@@ -299,8 +324,16 @@ struct gmp_float_imp
       d = v;
       return compare(d);
    }
-   mpf_t& data() BOOST_NOEXCEPT { return m_data; }
-   const mpf_t& data()const BOOST_NOEXCEPT { return m_data; }
+   mpf_t& data() BOOST_NOEXCEPT 
+   { 
+      BOOST_ASSERT(m_data[0]._mp_d);
+      return m_data; 
+   }
+   const mpf_t& data()const BOOST_NOEXCEPT 
+   { 
+      BOOST_ASSERT(m_data[0]._mp_d);
+      return m_data; 
+   }
 protected:
    mpf_t m_data;
    static unsigned& get_default_precision() BOOST_NOEXCEPT
@@ -363,16 +396,22 @@ struct gmp_float : public detail::gmp_float_imp<digits10>
    gmp_float& operator=(const gmp_rational& o);
    gmp_float& operator=(const mpf_t& val) BOOST_NOEXCEPT
    {
+      if(this->m_data[0]._mp_d == 0)
+         mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
       mpf_set(this->m_data, val);
       return *this;
    }
    gmp_float& operator=(const mpz_t& val) BOOST_NOEXCEPT
    {
+      if(this->m_data[0]._mp_d == 0)
+         mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
       mpf_set_z(this->m_data, val);
       return *this;
    }
    gmp_float& operator=(const mpq_t& val) BOOST_NOEXCEPT
    {
+      if(this->m_data[0]._mp_d == 0)
+         mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
       mpf_set_q(this->m_data, val);
       return *this;
    }
@@ -439,6 +478,8 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
    template <unsigned D>
    gmp_float& operator=(const gmp_float<D>& o)
    {
+      if(this->m_data[0]._mp_d == 0)
+         mpf_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
       mpf_set(this->m_data, o.data());
       return *this;
    }
@@ -446,16 +487,22 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
    gmp_float& operator=(const gmp_rational& o);
    gmp_float& operator=(const mpf_t& val)
    {
+      if(this->m_data[0]._mp_d == 0)
+         mpf_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
       mpf_set(this->m_data, val);
       return *this;
    }
    gmp_float& operator=(const mpz_t& val)
    {
+      if(this->m_data[0]._mp_d == 0)
+         mpf_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
       mpf_set_z(this->m_data, val);
       return *this;
    }
    gmp_float& operator=(const mpq_t& val)
    {
+      if(this->m_data[0]._mp_d == 0)
+         mpf_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
       mpf_set_q(this->m_data, val);
       return *this;
    }
@@ -906,7 +953,10 @@ struct gmp_int
    }
    gmp_int(const gmp_int& o)
    {
-      mpz_init_set(m_data, o.m_data);
+      if(o.m_data[0]._mp_d)
+         mpz_init_set(m_data, o.m_data);
+      else
+         mpz_init(this->m_data);
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
    gmp_int(gmp_int&& o) BOOST_NOEXCEPT
@@ -938,21 +988,21 @@ struct gmp_int
    gmp_int(const gmp_rational& o);
    gmp_int& operator = (const gmp_int& o)
    {
-      mpz_set(m_data, o.m_data);
+      if(o.m_data[0]._mp_d)
+         mpz_set(m_data, o.m_data);
       return *this;
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
    gmp_int& operator = (gmp_int&& o) BOOST_NOEXCEPT
    {
-      if(m_data[0]._mp_d)
-         mpz_clear(m_data);
-      m_data[0] = o.m_data[0];
-      o.m_data[0]._mp_d = 0;
+      mpz_swap(m_data, o.m_data);
       return *this;
    }
 #endif
    gmp_int& operator = (unsigned long long i)
    {
+      if(m_data[0]._mp_d == 0)
+         mpz_init(this->m_data);
       unsigned long long mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
       unsigned shift = 0;
       mpz_t t;
@@ -973,6 +1023,8 @@ struct gmp_int
    gmp_int& operator = (long long i)
    {
       BOOST_MP_USING_ABS
+      if(m_data[0]._mp_d == 0)
+         mpz_init(this->m_data);
       bool neg = i < 0;
       *this = static_cast<unsigned long long>(abs(i));
       if(neg)
@@ -981,16 +1033,22 @@ struct gmp_int
    }
    gmp_int& operator = (unsigned long i)
    {
+      if(m_data[0]._mp_d == 0)
+         mpz_init(this->m_data);
       mpz_set_ui(m_data, i);
       return *this;
    }
    gmp_int& operator = (long i)
    {
+      if(m_data[0]._mp_d == 0)
+         mpz_init(this->m_data);
       mpz_set_si(m_data, i);
       return *this;
    }
    gmp_int& operator = (double d)
    {
+      if(m_data[0]._mp_d == 0)
+         mpz_init(this->m_data);
       mpz_set_d(m_data, d);
       return *this;
    }
@@ -999,6 +1057,9 @@ struct gmp_int
       using std::frexp;
       using std::ldexp;
       using std::floor;
+
+      if(m_data[0]._mp_d == 0)
+         mpz_init(this->m_data);
 
       if (a == 0) {
          mpz_set_si(m_data, 0);
@@ -1042,6 +1103,8 @@ struct gmp_int
    }
    gmp_int& operator = (const char* s)
    {
+      if(m_data[0]._mp_d == 0)
+         mpz_init(this->m_data);
       std::size_t n = s ? std::strlen(s) : 0;
       int radix = 10;
       if(n && (*s == '0'))
@@ -1069,22 +1132,30 @@ struct gmp_int
    }
    gmp_int& operator=(const mpf_t& val)
    {
+      if(m_data[0]._mp_d == 0)
+         mpz_init(this->m_data);
       mpz_set_f(this->m_data, val);
       return *this;
    }
    gmp_int& operator=(const mpz_t& val)
    {
+      if(m_data[0]._mp_d == 0)
+         mpz_init(this->m_data);
       mpz_set(this->m_data, val);
       return *this;
    }
    gmp_int& operator=(const mpq_t& val)
    {
+      if(m_data[0]._mp_d == 0)
+         mpz_init(this->m_data);
       mpz_set_q(this->m_data, val);
       return *this;
    }
    template <unsigned Digits10>
    gmp_int& operator=(const gmp_float<Digits10>& o)
    {
+      if(m_data[0]._mp_d == 0)
+         mpz_init(this->m_data);
       mpz_set_f(this->m_data, o.data());
       return *this;
    }
@@ -1095,6 +1166,8 @@ struct gmp_int
    }
    std::string str(std::streamsize /*digits*/, std::ios_base::fmtflags f)const
    {
+      BOOST_ASSERT(m_data[0]._mp_d);
+
       int base = 10;
       if((f & std::ios_base::oct) == std::ios_base::oct)
          base = 8;
@@ -1131,18 +1204,22 @@ struct gmp_int
    }
    void negate()
    {
+      BOOST_ASSERT(m_data[0]._mp_d);
       mpz_neg(m_data, m_data);
    }
    int compare(const gmp_int& o)const
    {
+      BOOST_ASSERT(m_data[0]._mp_d && o.m_data[0]._mp_d);
       return mpz_cmp(m_data, o.m_data);
    }
    int compare(long i)const
    {
+      BOOST_ASSERT(m_data[0]._mp_d);
       return mpz_cmp_si(m_data, i);
    }
    int compare(unsigned long i)const
    {
+      BOOST_ASSERT(m_data[0]._mp_d);
       return mpz_cmp_ui(m_data, i);
    }
    template <class V>
@@ -1152,8 +1229,16 @@ struct gmp_int
       d = v;
       return compare(d);
    }
-   mpz_t& data() { return m_data; }
-   const mpz_t& data()const { return m_data; }
+   mpz_t& data() 
+   { 
+      BOOST_ASSERT(m_data[0]._mp_d);
+      return m_data; 
+   }
+   const mpz_t& data()const 
+   { 
+      BOOST_ASSERT(m_data[0]._mp_d);
+      return m_data; 
+   }
 protected:
    mpz_t m_data;
 };
@@ -1545,7 +1630,8 @@ struct gmp_rational
    gmp_rational(const gmp_rational& o)
    {
       mpq_init(m_data);
-      mpq_set(m_data, o.m_data);
+      if(o.m_data[0]._mp_num._mp_d)
+         mpq_set(m_data, o.m_data);
    }
    gmp_rational(const gmp_int& o)
    {
@@ -1557,8 +1643,8 @@ struct gmp_rational
    {
       m_data[0]._mp_num = o.data()[0]._mp_num;
       m_data[0]._mp_den = o.data()[0]._mp_den;
-      o.data()[0]._mp_num._mp_d = 0;
-      o.data()[0]._mp_den._mp_d = 0;
+      o.m_data[0]._mp_num._mp_d = 0;
+      o.m_data[0]._mp_den._mp_d = 0;
    }
 #endif
    gmp_rational(mpq_t o)
@@ -1573,21 +1659,21 @@ struct gmp_rational
    }
    gmp_rational& operator = (const gmp_rational& o)
    {
-      mpq_set(m_data, o.m_data);
+      if(o.m_data[0]._mp_num._mp_d)
+         mpq_set(m_data, o.m_data);
       return *this;
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
    gmp_rational& operator = (gmp_rational&& o) BOOST_NOEXCEPT
    {
-      m_data[0]._mp_num = o.data()[0]._mp_num;
-      m_data[0]._mp_den = o.data()[0]._mp_den;
-      o.data()[0]._mp_num._mp_d = 0;
-      o.data()[0]._mp_den._mp_d = 0;
+      mpq_swap(m_data, o.m_data);
       return *this;
    }
 #endif
    gmp_rational& operator = (unsigned long long i)
    {
+      if(m_data[0]._mp_den._mp_d == 0)
+         mpq_init(m_data);
       unsigned long long mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
       unsigned shift = 0;
       mpq_t t;
@@ -1608,6 +1694,8 @@ struct gmp_rational
    gmp_rational& operator = (long long i)
    {
       BOOST_MP_USING_ABS
+      if(m_data[0]._mp_den._mp_d == 0)
+         mpq_init(m_data);
       bool neg = i < 0;
       *this = static_cast<unsigned long long>(abs(i));
       if(neg)
@@ -1616,16 +1704,22 @@ struct gmp_rational
    }
    gmp_rational& operator = (unsigned long i)
    {
+      if(m_data[0]._mp_den._mp_d == 0)
+         mpq_init(m_data);
       mpq_set_ui(m_data, i, 1);
       return *this;
    }
    gmp_rational& operator = (long i)
    {
+      if(m_data[0]._mp_den._mp_d == 0)
+         mpq_init(m_data);
       mpq_set_si(m_data, i, 1);
       return *this;
    }
    gmp_rational& operator = (double d)
    {
+      if(m_data[0]._mp_den._mp_d == 0)
+         mpq_init(m_data);
       mpq_set_d(m_data, d);
       return *this;
    }
@@ -1636,6 +1730,9 @@ struct gmp_rational
       using std::floor;
       using default_ops::eval_add;
       using default_ops::eval_subtract;
+
+      if(m_data[0]._mp_den._mp_d == 0)
+         mpq_init(m_data);
 
       if (a == 0) {
          mpq_set_si(m_data, 0, 1);
@@ -1679,22 +1776,30 @@ struct gmp_rational
    }
    gmp_rational& operator = (const char* s)
    {
+      if(m_data[0]._mp_den._mp_d == 0)
+         mpq_init(m_data);
       if(0 != mpq_set_str(m_data, s, 10))
          BOOST_THROW_EXCEPTION(std::runtime_error(std::string("The string \"") + s + std::string("\"could not be interpreted as a valid rational number.")));
       return *this;
    }
    gmp_rational& operator=(const gmp_int& o)
    {
+      if(m_data[0]._mp_den._mp_d == 0)
+         mpq_init(m_data);
       mpq_set_z(m_data, o.data());
       return *this;
    }
    gmp_rational& operator=(const mpq_t& o)
    {
+      if(m_data[0]._mp_den._mp_d == 0)
+         mpq_init(m_data);
       mpq_set(m_data, o);
       return *this;
    }
    gmp_rational& operator=(const mpz_t& o)
    {
+      if(m_data[0]._mp_den._mp_d == 0)
+         mpq_init(m_data);
       mpq_set_z(m_data, o);
       return *this;
    }
@@ -1704,6 +1809,7 @@ struct gmp_rational
    }
    std::string str(std::streamsize /*digits*/, std::ios_base::fmtflags /*f*/)const
    {
+      BOOST_ASSERT(m_data[0]._mp_num._mp_d);
       // TODO make a better job of this including handling of f!!
       void *(*alloc_func_ptr) (size_t);
       void *(*realloc_func_ptr) (void *, size_t, size_t);
@@ -1721,10 +1827,12 @@ struct gmp_rational
    }
    void negate()
    {
+      BOOST_ASSERT(m_data[0]._mp_num._mp_d);
       mpq_neg(m_data, m_data);
    }
    int compare(const gmp_rational& o)const
    {
+      BOOST_ASSERT(m_data[0]._mp_num._mp_d && o.m_data[0]._mp_num._mp_d);
       return mpq_cmp(m_data, o.m_data);
    }
    template <class V>
@@ -1736,14 +1844,24 @@ struct gmp_rational
    }
    int compare(unsigned long v)const
    {
+      BOOST_ASSERT(m_data[0]._mp_num._mp_d);
       return mpq_cmp_ui(m_data, v, 1);
    }
    int compare(long v)const
    {
+      BOOST_ASSERT(m_data[0]._mp_num._mp_d);
       return mpq_cmp_si(m_data, v, 1);
    }
-   mpq_t& data() { return m_data; }
-   const mpq_t& data()const { return m_data; }
+   mpq_t& data() 
+   { 
+      BOOST_ASSERT(m_data[0]._mp_num._mp_d);
+      return m_data; 
+   }
+   const mpq_t& data()const 
+   { 
+      BOOST_ASSERT(m_data[0]._mp_num._mp_d);
+      return m_data; 
+   }
 protected:
    mpq_t m_data;
 };
@@ -1870,37 +1988,43 @@ template <unsigned Digits10>
 template <unsigned D>
 inline gmp_float<Digits10>::gmp_float(const gmp_float<D>& o)
 {
-   mpf_init2(this->m_data, ((Digits10 + 1) * 1000L) / 301L);
+   mpf_init2(this->m_data, (((Digits10 ? Digits10 : this->get_default_precision()) + 1) * 1000L) / 301L);
    mpf_set(this->m_data, o.data());
 }
 template <unsigned Digits10>
 inline gmp_float<Digits10>::gmp_float(const gmp_int& o)
 {
-   mpf_init2(this->m_data, ((Digits10 + 1) * 1000L) / 301L);
+   mpf_init2(this->m_data, (((Digits10 ? Digits10 : this->get_default_precision()) + 1) * 1000L) / 301L);
    mpf_set_z(this->data(), o.data());
 }
 template <unsigned Digits10>
 inline gmp_float<Digits10>::gmp_float(const gmp_rational& o)
 {
-   mpf_init2(this->m_data, ((Digits10 + 1) * 1000L) / 301L);
+   mpf_init2(this->m_data, (((Digits10 ? Digits10 : this->get_default_precision()) + 1) * 1000L) / 301L);
    mpf_set_q(this->data(), o.data());
 }
 template <unsigned Digits10>
 template <unsigned D>
 inline gmp_float<Digits10>& gmp_float<Digits10>::operator=(const gmp_float<D>& o)
 {
+   if(this->m_data[0]._mp_d == 0)
+      mpf_init2(this->m_data, (((Digits10 ? Digits10 : this->get_default_precision()) + 1) * 1000L) / 301L);
    mpf_set(this->m_data, o.data());
    return *this;
 }
 template <unsigned Digits10>
 inline gmp_float<Digits10>& gmp_float<Digits10>::operator=(const gmp_int& o)
 {
+   if(this->m_data[0]._mp_d == 0)
+      mpf_init2(this->m_data, (((Digits10 ? Digits10 : this->get_default_precision()) + 1) * 1000L) / 301L);
    mpf_set_z(this->data(), o.data());
    return *this;
 }
 template <unsigned Digits10>
 inline gmp_float<Digits10>& gmp_float<Digits10>::operator=(const gmp_rational& o)
 {
+   if(this->m_data[0]._mp_d == 0)
+      mpf_init2(this->m_data, (((Digits10 ? Digits10 : this->get_default_precision()) + 1) * 1000L) / 301L);
    mpf_set_q(this->data(), o.data());
    return *this;
 }
@@ -1916,11 +2040,15 @@ inline gmp_float<0>::gmp_float(const gmp_rational& o)
 }
 inline gmp_float<0>& gmp_float<0>::operator=(const gmp_int& o)
 {
+   if(this->m_data[0]._mp_d == 0)
+      mpf_init2(this->m_data, ((this->get_default_precision() + 1) * 1000L) / 301L);
    mpf_set_z(this->data(), o.data());
    return *this;
 }
 inline gmp_float<0>& gmp_float<0>::operator=(const gmp_rational& o)
 {
+   if(this->m_data[0]._mp_d == 0)
+      mpf_init2(this->m_data, ((this->get_default_precision() + 1) * 1000L) / 301L);
    mpf_set_q(this->data(), o.data());
    return *this;
 }
@@ -1931,6 +2059,8 @@ inline gmp_int::gmp_int(const gmp_rational& o)
 }
 inline gmp_int& gmp_int::operator=(const gmp_rational& o)
 {
+   if(this->m_data[0]._mp_d == 0)
+      mpz_init(this->m_data);
    mpz_set_q(this->m_data, o.data());
    return *this;
 }

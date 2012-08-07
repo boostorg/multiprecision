@@ -71,6 +71,19 @@ void do_something(const T&)
 {
 }
 
+template <class T>
+void test_std_lib()
+{
+   std::vector<T> v;
+   for(unsigned i = 0; i < 100; ++i)
+      v.insert(v.begin(), i);
+
+   T a(2), b(3);
+   std::swap(a, b);
+   BOOST_TEST(a == 3);
+   BOOST_TEST(b == 2);
+}
+
 
 int main()
 {
@@ -83,6 +96,7 @@ int main()
 
 #ifdef TEST_MPFR
    {
+      test_std_lib<mpfr_float_50>();
       mpfr_float_50 a = 2;
       BOOST_TEST(allocation_count); // sanity check that we are tracking allocations
       allocation_count = 0;
@@ -112,10 +126,16 @@ int main()
       d = std::move(e);
       BOOST_TEST(allocation_count == 0);
       BOOST_TEST(d == 3);
+      e = 2;
+      BOOST_TEST(e == 2);
+      d = std::move(e);
+      e = d;
+      BOOST_TEST(e == d);
    }
 #endif
 #ifdef TEST_GMP
    {
+      test_std_lib<mpf_float_50>();
       mpf_float_50 a = 2;
       BOOST_TEST(allocation_count); // sanity check that we are tracking allocations
       allocation_count = 0;
@@ -145,8 +165,14 @@ int main()
       d = std::move(e);
       BOOST_TEST(allocation_count == 0);
       BOOST_TEST(d == 3);
+      e = 2;
+      BOOST_TEST(e == 2);
+      d = std::move(e);
+      e = d;
+      BOOST_TEST(e == d);
    }
    {
+      test_std_lib<mpz_int>();
       mpz_int a = 2;
       BOOST_TEST(allocation_count); // sanity check that we are tracking allocations
       allocation_count = 0;
@@ -163,8 +189,14 @@ int main()
       allocation_count = 0;
       e = std::move(d);
       BOOST_TEST(allocation_count == 0);
+      e = 2;
+      BOOST_TEST(e == 2);
+      d = std::move(e);
+      e = d;
+      BOOST_TEST(e == d);
    }
    {
+      test_std_lib<mpq_rational>();
       mpq_rational a = 2;
       BOOST_TEST(allocation_count); // sanity check that we are tracking allocations
       allocation_count = 0;
@@ -180,15 +212,22 @@ int main()
       allocation_count = 0;
       e = std::move(d);
       BOOST_TEST(allocation_count == 0);
+      d = 2;
+      BOOST_TEST(d == 2);
+      d = std::move(e);
+      e = d;
+      BOOST_TEST(e == d);
    }
 #endif
 #ifdef TEST_TOMMATH
    {
+      test_std_lib<tom_int>();
       tom_int a = 2;
       void const* p = a.backend().data().dp;
       tom_int b = std::move(a);
       BOOST_TEST(b.backend().data().dp == p);
-      BOOST_TEST(a.backend().data().dp == 0);
+      // We can't test this, as it will assert inside data():
+      //BOOST_TEST(a.backend().data().dp == 0);
 
       //
       // Move assign:
@@ -201,10 +240,16 @@ int main()
       BOOST_TEST(p != e.backend().data().dp);
       e = std::move(d);
       BOOST_TEST(e.backend().data().dp == p);
+      d = 2;
+      BOOST_TEST(d == 2);
+      d = std::move(e);
+      e = d;
+      BOOST_TEST(e == d);
    }
 #endif
 #ifdef TEST_CPP_INT
    {
+      test_std_lib<cpp_int>();
       cpp_int a = 2;
       a <<= 1000;  // Force dynamic allocation.
       void const* p = a.backend().limbs();
@@ -223,6 +268,11 @@ int main()
       BOOST_TEST(p != e.backend().limbs());
       e = std::move(d);
       BOOST_TEST(e.backend().limbs() == p);
+      d = 2;
+      BOOST_TEST(d == 2);
+      d = std::move(e);
+      e = d;
+      BOOST_TEST(e == d);
    }
 #endif
    return boost::report_errors();
