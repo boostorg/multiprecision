@@ -279,7 +279,7 @@ void test()
 int main()
 {
 #ifdef TEST_BACKEND
-   test<boost::multiprecision::mp_number<boost::multiprecision::concepts::mp_number_backend_float_architype> >();
+   test<boost::multiprecision::number<boost::multiprecision::concepts::mp_number_backend_float_architype> >();
 #endif
 #ifdef TEST_MPF_50
    test<boost::multiprecision::mpf_float_50>();
@@ -293,17 +293,17 @@ int main()
    test<boost::multiprecision::cpp_dec_float_50>();
    test<boost::multiprecision::cpp_dec_float_100>();
    // Some "peculiar" digit counts which stress our code:
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<65> > >();
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<64> > >();
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<63> > >();
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<62> > >();
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<61> > >();
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<60> > >();
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<59> > >();
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<58> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<65> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<64> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<63> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<62> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<61> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<60> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<59> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<58> > >();
    // Check low multiprecision digit counts.
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<9> > >();
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<18> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<9> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<18> > >();
 #endif
    return boost::report_errors();
 }

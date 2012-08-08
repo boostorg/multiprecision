@@ -12,7 +12,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/math/concepts/real_concept.hpp>
-#include <boost/multiprecision/mp_number.hpp>
+#include <boost/multiprecision/number.hpp>
 #include <boost/math/common_factor_rt.hpp>
 
 namespace boost{
@@ -523,10 +523,10 @@ inline double real_cast<double, concepts::real_concept>(concepts::real_concept r
 namespace std{
 
 template <class Arithmetic, bool ExpressionTemplates>
-class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::arithmetic_backend<Arithmetic>, ExpressionTemplates > > : public std::numeric_limits<Arithmetic>
+class numeric_limits<boost::multiprecision::number<boost::multiprecision::arithmetic_backend<Arithmetic>, ExpressionTemplates > > : public std::numeric_limits<Arithmetic>
 {
    typedef std::numeric_limits<Arithmetic> base_type;
-   typedef boost::multiprecision::mp_number<boost::multiprecision::arithmetic_backend<Arithmetic>, ExpressionTemplates> number_type;
+   typedef boost::multiprecision::number<boost::multiprecision::arithmetic_backend<Arithmetic>, ExpressionTemplates> number_type;
 public:
    BOOST_STATIC_CONSTEXPR number_type (min)() BOOST_NOEXCEPT { return (base_type::min)(); }
    BOOST_STATIC_CONSTEXPR number_type (max)() BOOST_NOEXCEPT { return (base_type::max)(); }

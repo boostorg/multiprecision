@@ -10,6 +10,14 @@
 
 namespace boost{ namespace multiprecision{ namespace backends{
 
+#ifdef BOOST_MSVC
+#pragma warning(push)
+   // C4389: signed/unsigned mismatch
+   // C4127: conditional expression is constant
+   // C4018: signed/unsigned mismatch
+#pragma warning(disable:4127 4018 4389)
+#endif
+
 template <unsigned MinBits>
 BOOST_FORCEINLINE bool eval_eq(const cpp_int_backend<MinBits, true, void, true>& a, const cpp_int_backend<MinBits, true, void, true>& b) BOOST_NOEXCEPT
 {
@@ -357,10 +365,6 @@ BOOST_FORCEINLINE void eval_lcm(cpp_int_backend<MinBits, Signed, void, true>& re
    *result.limbs() = boost::math::lcm(*a.limbs(), *b.limbs());
 }
 
-#ifdef BOOST_MSVC
-#pragma warning(push)
-#pragma warning(disable:4127 4018)
-#endif
 template <class R, unsigned MinBits>
 inline void eval_convert_to(R* result, const cpp_int_backend<MinBits, true, void, true>& val)
 {

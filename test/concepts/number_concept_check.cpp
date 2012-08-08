@@ -171,22 +171,22 @@ void foo()
    test_extra(boost::multiprecision::mpfr_float_50());
 #endif
 #ifdef TEST_MPFR_6
-   test_extra(boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<6> >());
+   test_extra(boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<6> >());
 #endif
 #ifdef TEST_MPFR_15
-   test_extra(boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<15> >());
+   test_extra(boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<15> >());
 #endif
 #ifdef TEST_MPFR_17
-   test_extra(boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<17> >());
+   test_extra(boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<17> >());
 #endif
 #ifdef TEST_MPFR_30
-   test_extra(boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<30> >());
+   test_extra(boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<30> >());
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
    test_extra(boost::multiprecision::cpp_dec_float_50());
 #endif
 #ifdef TEST_CPP_DEC_FLOAT_NO_ET
-   test_extra(boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<100>, false>());
+   test_extra(boost::multiprecision::number<boost::multiprecision::cpp_dec_float<100>, false>());
 #endif
 }
 
@@ -202,16 +202,16 @@ int main()
    BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mpfr_float_50>));
 #endif
 #ifdef TEST_MPFR_6
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<6> > >));
+   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<6> > >));
 #endif
 #ifdef TEST_MPFR_15
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<15> > >));
+   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<15> > >));
 #endif
 #ifdef TEST_MPFR_17
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<17> > >));
+   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<17> > >));
 #endif
 #ifdef TEST_MPFR_30
-   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<30> > >));
+   BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<30> > >));
 #endif
 #ifdef TEST_MPFR_50
    BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::mpfr_float_50>));

@@ -270,14 +270,14 @@ int main()
    std::cout << "calculating...\n";
 
    do_calc<test_traits<boost::int64_t, boost::int64_t> >("int64_t, int64_t");
-   do_calc<test_traits<mp_number<arithmetic_backend<boost::int64_t>, false>, mp_number<arithmetic_backend<boost::int64_t>, false> > >("arithmetic_backend<int64_t>");
+   do_calc<test_traits<number<arithmetic_backend<boost::int64_t>, false>, number<arithmetic_backend<boost::int64_t>, false> > >("arithmetic_backend<int64_t>");
    do_calc<test_traits<boost::int64_t, int128_t> >("int64_t, int128_t");
-   do_calc<test_traits<boost::int64_t, mp_int128_t> >("int64_t, mp_int128_t");
-   do_calc<test_traits<boost::int64_t, mp_number<cpp_int_backend<128, true, void>, true> > >("int64_t, mp_int128_t (ET)");
+   do_calc<test_traits<boost::int64_t, int128_t> >("int64_t, int128_t");
+   do_calc<test_traits<boost::int64_t, number<cpp_int_backend<128, true, void>, true> > >("int64_t, int128_t (ET)");
    do_calc<test_traits<boost::int64_t, cpp_int> >("int64_t, cpp_int");
-   do_calc<test_traits<boost::int64_t, mp_number<cpp_int_backend<>, false> > >("int64_t, cpp_int (no ET's)");
-   do_calc<test_traits<boost::int64_t, mp_number<cpp_int_backend<128> > > >("int64_t, cpp_int(128-bit cache)");
-   do_calc<test_traits<boost::int64_t, mp_number<cpp_int_backend<128>, false> > >("int64_t, cpp_int (128-bit Cache no ET's)");
+   do_calc<test_traits<boost::int64_t, number<cpp_int_backend<>, false> > >("int64_t, cpp_int (no ET's)");
+   do_calc<test_traits<boost::int64_t, number<cpp_int_backend<128> > > >("int64_t, cpp_int(128-bit cache)");
+   do_calc<test_traits<boost::int64_t, number<cpp_int_backend<128>, false> > >("int64_t, cpp_int (128-bit Cache no ET's)");
 
    return 0;
 }

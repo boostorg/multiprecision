@@ -343,7 +343,7 @@ private:
 
 /*`
 In this example we'll look at polynomial evaluation, this is not only an important
-use case, but it's one that `mp_number` performs particularly well at because the
+use case, but it's one that `number` performs particularly well at because the
 expression templates ['completely eliminate all temporaries] from a 
 [@http://en.wikipedia.org/wiki/Horner%27s_method Horner polynomial
 evaluation scheme].
@@ -353,7 +353,7 @@ The following code evaluates `sin(x)` as a polynomial, accurate to at least 64 d
 */
 
 using boost::multiprecision::cpp_dec_float;
-typedef boost::multiprecision::mp_number<cpp_dec_float<64> > mp_type;
+typedef boost::multiprecision::number<cpp_dec_float<64> > mp_type;
 
 mp_type mysin(const mp_type& x)
 {

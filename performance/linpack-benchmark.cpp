@@ -93,9 +93,9 @@ int dmxpy_(integer *, real_type *, integer *, integer *, real_type *, real_type 
 extern "C" int MAIN__()
 {
 #ifdef TEST_MPF_50
-   std::cout << "Testing mp_number<mpf_float<50> >" << std::endl;
+   std::cout << "Testing number<mpf_float<50> >" << std::endl;
 #elif defined(TEST_MPFR_50)
-   std::cout << "Testing mp_number<mpf_float<50> >" << std::endl;
+   std::cout << "Testing number<mpf_float<50> >" << std::endl;
 #elif defined(TEST_GMPXX)
    std::cout << "Testing mpf_class at 50 decimal degits" << std::endl;
    mpf_set_default_prec(((50 + 1) * 1000L) / 301L);
@@ -103,7 +103,7 @@ extern "C" int MAIN__()
    std::cout << "Testing mpfr_class at 50 decimal degits" << std::endl;
    mpfr_set_default_prec(((50 + 1) * 1000L) / 301L);
 #elif defined(TEST_CPP_DEC_FLOAT)
-   std::cout << "Testing mp_number<cpp_dec_float<50> >" << std::endl;
+   std::cout << "Testing number<cpp_dec_float<50> >" << std::endl;
 #else
    std::cout << "Testing double" << std::endl;
 #endif
@@ -1221,7 +1221,7 @@ times for array with leading dimension of1001
 266.45     0.798      267.24    2.5021       0.79933   4772.2
 
 
-mp_number<gmp_float<100> >:
+number<gmp_float<100> >:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
      norm. resid      resid           machep         x(1)          x(n)

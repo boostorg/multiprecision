@@ -340,7 +340,7 @@ int main()
 {
    using namespace boost::multiprecision;
    test<cpp_int>();
-   test<mp_number<cpp_int_backend<2048, true, void> > >();
+   test<number<cpp_int_backend<2048, true, void> > >();
    return boost::report_errors();
 }
 

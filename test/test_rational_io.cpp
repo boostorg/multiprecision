@@ -92,7 +92,7 @@ void do_round_trip(const T& val, std::ios_base::fmtflags f, const boost::mpl::fa
 template <class T>
 struct is_mp_number : public boost::mpl::false_{};
 template <class T>
-struct is_mp_number<boost::multiprecision::mp_number<T> > : public boost::mpl::true_{};
+struct is_mp_number<boost::multiprecision::number<T> > : public boost::mpl::true_{};
 
 template <class T>
 void do_round_trip(const T& val, std::ios_base::fmtflags f)
@@ -127,7 +127,7 @@ int main()
 #ifdef TEST_MPQ
    test_round_trip<boost::multiprecision::mpq_rational>();
    test_round_trip<boost::rational<boost::multiprecision::mpz_int> >();
-   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::rational_adapter<boost::multiprecision::gmp_int> > >();
+   test_round_trip<boost::multiprecision::number<boost::multiprecision::rational_adapter<boost::multiprecision::gmp_int> > >();
 #endif
 #ifdef TEST_TOMMATH
    test_round_trip<boost::rational<boost::multiprecision::tom_int> >();

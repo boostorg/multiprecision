@@ -786,12 +786,12 @@ int main()
    test<boost::multiprecision::mpz_int>("gmp_int", 1024);
 #endif
 #ifdef TEST_CPP_INT
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<64, false, void>, false > >("cpp_int(unsigned, fixed)", 64);
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<64, true, void>, false > >("cpp_int(fixed)", 64);
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<128, true, void>, false > >("cpp_int(fixed)", 128);
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<256, true, void>, false > >("cpp_int(fixed)", 256);
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<512, true, void>, false > >("cpp_int(fixed)", 512);
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<1024, true, void>, false > >("cpp_int(fixed)", 1024);
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, false, void>, false > >("cpp_int(unsigned, fixed)", 64);
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, true, void>, false > >("cpp_int(fixed)", 64);
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<128, true, void>, false > >("cpp_int(fixed)", 128);
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<256, true, void>, false > >("cpp_int(fixed)", 256);
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<512, true, void>, false > >("cpp_int(fixed)", 512);
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<1024, true, void>, false > >("cpp_int(fixed)", 1024);
 
    test<boost::multiprecision::cpp_int>("cpp_int", 128);
    test<boost::multiprecision::cpp_int>("cpp_int", 256);
@@ -828,7 +828,7 @@ int main()
 #ifdef TEST_CPP_DEC_FLOAT
    test<boost::multiprecision::cpp_dec_float_50>("cpp_dec_float", 50);
    test<boost::multiprecision::cpp_dec_float_100>("cpp_dec_float", 100);
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<500> > >("cpp_dec_float", 500);
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<500> > >("cpp_dec_float", 500);
 #endif
 #ifdef TEST_MPFR
    test<boost::multiprecision::mpfr_float_50>("mpfr_float", 50);

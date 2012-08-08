@@ -85,19 +85,19 @@ int test_main(int, char* [])
    // 35 decimal digits: tests arbitrary precision code
    //
 #ifdef TEST_MPF_50
-   //test_beta(mp_number<gmp_float<18> >(), "mp_number<gmp_float<18> >");
-   test_beta(mp_number<gmp_float<30> >(), "mp_number<gmp_float<30> >");
-   test_beta(mp_number<gmp_float<35> >(), "mp_number<gmp_float<35> >");
+   //test_beta(number<gmp_float<18> >(), "number<gmp_float<18> >");
+   test_beta(number<gmp_float<30> >(), "number<gmp_float<30> >");
+   test_beta(number<gmp_float<35> >(), "number<gmp_float<35> >");
 #endif
 #ifdef TEST_MPFR_50
-   test_beta(mp_number<mpfr_float_backend<18> >(), "mp_number<mpfr_float_backend<18> >");
-   test_beta(mp_number<mpfr_float_backend<30> >(), "mp_number<mpfr_float_backend<30> >");
-   test_beta(mp_number<mpfr_float_backend<35> >(), "mp_number<mpfr_float_backend<35> >");
+   test_beta(number<mpfr_float_backend<18> >(), "number<mpfr_float_backend<18> >");
+   test_beta(number<mpfr_float_backend<30> >(), "number<mpfr_float_backend<30> >");
+   test_beta(number<mpfr_float_backend<35> >(), "number<mpfr_float_backend<35> >");
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
-   test_beta(mp_number<cpp_dec_float<18> >(), "mp_number<cpp_dec_float<18> >");
-   test_beta(mp_number<cpp_dec_float<30> >(), "mp_number<cpp_dec_float<30> >");
-   test_beta(mp_number<cpp_dec_float<35> >(), "mp_number<cpp_dec_float<35> >");
+   test_beta(number<cpp_dec_float<18> >(), "number<cpp_dec_float<18> >");
+   test_beta(number<cpp_dec_float<30> >(), "number<cpp_dec_float<30> >");
+   test_beta(number<cpp_dec_float<35> >(), "number<cpp_dec_float<35> >");
 #endif
    return 0;
 }

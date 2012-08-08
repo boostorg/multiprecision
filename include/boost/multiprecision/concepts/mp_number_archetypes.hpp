@@ -12,7 +12,7 @@
 #include <cmath>
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/multiprecision/mp_number.hpp>
+#include <boost/multiprecision/number.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/mpl/list.hpp>
 
@@ -195,17 +195,17 @@ inline int eval_fpclassify(const mp_number_backend_float_architype& arg)
    return (boost::math::fpclassify)(arg.m_value);
 }
 
-typedef boost::multiprecision::mp_number<mp_number_backend_float_architype> mp_number_float_architype;
+typedef boost::multiprecision::number<mp_number_backend_float_architype> mp_number_float_architype;
 
 }}} // namespaces
 
 namespace std{
 
 template <bool ExpressionTemplates>
-class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::concepts::mp_number_backend_float_architype, ExpressionTemplates> > : public std::numeric_limits<long double>
+class numeric_limits<boost::multiprecision::number<boost::multiprecision::concepts::mp_number_backend_float_architype, ExpressionTemplates> > : public std::numeric_limits<long double>
 {
    typedef std::numeric_limits<long double> base_type;
-   typedef boost::multiprecision::mp_number<boost::multiprecision::concepts::mp_number_backend_float_architype, ExpressionTemplates> number_type;
+   typedef boost::multiprecision::number<boost::multiprecision::concepts::mp_number_backend_float_architype, ExpressionTemplates> number_type;
 public:
    static number_type (min)() BOOST_NOEXCEPT { return (base_type::min)(); }
    static number_type (max)() BOOST_NOEXCEPT { return (base_type::max)(); }

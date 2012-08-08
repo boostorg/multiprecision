@@ -54,7 +54,7 @@ T generate_random(unsigned bits_wanted)
 int main()
 {
    using namespace boost::multiprecision;
-   typedef mp_number<fixed_int<1024, true> > packed_type;
+   typedef number<fixed_int<1024, true> > packed_type;
    unsigned last_error_count = 0;
    for(int i = 0; i < 1000; ++i)
    {

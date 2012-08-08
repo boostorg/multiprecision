@@ -1211,12 +1211,12 @@ void test()
 int main()
 {
 #ifdef TEST_ARITHMETIC_BACKEND
-   test<boost::multiprecision::mp_number<boost::multiprecision::arithmetic_backend<double> > >();
-   test<boost::multiprecision::mp_number<boost::multiprecision::arithmetic_backend<int> > >();
-   test<boost::multiprecision::mp_number<boost::multiprecision::arithmetic_backend<unsigned int> > >();
+   test<boost::multiprecision::number<boost::multiprecision::arithmetic_backend<double> > >();
+   test<boost::multiprecision::number<boost::multiprecision::arithmetic_backend<int> > >();
+   test<boost::multiprecision::number<boost::multiprecision::arithmetic_backend<unsigned int> > >();
 #endif
 #ifdef TEST_BACKEND
-   test<boost::multiprecision::mp_number<boost::multiprecision::concepts::mp_number_backend_float_architype> >();
+   test<boost::multiprecision::number<boost::multiprecision::concepts::mp_number_backend_float_architype> >();
 #endif
 #ifdef TEST_MPF_50
    test<boost::multiprecision::mpf_float_50>();
@@ -1228,14 +1228,14 @@ int main()
 #endif
 #ifdef TEST_MPZ
    test<boost::multiprecision::mpz_int>();
-   test<boost::multiprecision::mp_number<boost::multiprecision::rational_adapter<boost::multiprecision::gmp_int> > >();
+   test<boost::multiprecision::number<boost::multiprecision::rational_adapter<boost::multiprecision::gmp_int> > >();
 #endif
 #ifdef TEST_MPQ
    test<boost::multiprecision::mpq_rational>();
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
    test<boost::multiprecision::cpp_dec_float_50>();
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<100>, false> >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<100>, false> >();
 #endif
 #ifdef TEST_MPFR
    test<boost::multiprecision::mpfr_float>();
@@ -1245,7 +1245,7 @@ int main()
 #endif
 #ifdef TEST_TOMMATH
    test<boost::multiprecision::tom_int>();
-   test<boost::multiprecision::mp_number<boost::multiprecision::rational_adapter<boost::multiprecision::tommath_int> > >();
+   test<boost::multiprecision::number<boost::multiprecision::rational_adapter<boost::multiprecision::tommath_int> > >();
 #endif
 #ifdef TEST_TOMMATH_BOOST_RATIONAL
    test<boost::rational<boost::multiprecision::tom_int> >();
@@ -1255,15 +1255,15 @@ int main()
 #endif
 #ifdef TEST_CPP_INT
    test<boost::multiprecision::cpp_int>();
-   test<boost::multiprecision::mp_int256_t >();
-   test<boost::multiprecision::mp_uint512_t >();
+   test<boost::multiprecision::int256_t >();
+   test<boost::multiprecision::uint512_t >();
    test<boost::multiprecision::cpp_rational>();
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<>, false> >();
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<500, true, void> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<>, false> >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<500, true, void> > >();
 
    // Again with "trivial" backends:
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<64, true, void>, false > >();
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<64, false, void>, false > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, true, void>, false > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, false, void>, false > >();
 #endif
 #ifdef TEST_CPP_INT_BR
    test<boost::multiprecision::cpp_rational>();

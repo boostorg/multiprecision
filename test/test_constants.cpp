@@ -160,7 +160,7 @@ inline bool is_mpfr(const T&)
 }
 #if defined(TEST_MPFR_50)
 template <unsigned N>
-inline bool is_mpfr(const boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<N> >&)
+inline bool is_mpfr(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<N> >&)
 {
    return true;
 }
@@ -185,13 +185,13 @@ void test()
 int main()
 {
 #ifdef TEST_MPFR_50
-   test<boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<2000> > >();
+   test<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<2000> > >();
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<2000> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<2000> > >();
 #endif
 #ifdef TEST_MPF_50
-   test<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<2000> > >();
+   test<boost::multiprecision::number<boost::multiprecision::gmp_float<2000> > >();
 #endif
    return boost::report_errors();
 }

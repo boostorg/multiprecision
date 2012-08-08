@@ -36,7 +36,7 @@ void hyp0F1(T& result, const T& b, const T& x)
 
    T tol;
    tol = ui_type(1);
-   eval_ldexp(tol, tol, 1 - boost::multiprecision::detail::digits2<mp_number<T> >::value);
+   eval_ldexp(tol, tol, 1 - boost::multiprecision::detail::digits2<number<T> >::value);
    eval_multiply(tol, result);
    if(eval_get_sign(tol) < 0)
       tol.negate();
@@ -87,7 +87,7 @@ void eval_sin(T& result, const T& x)
    {
    case FP_INFINITE:
    case FP_NAN:
-      result = std::numeric_limits<mp_number<T> >::quiet_NaN().backend();
+      result = std::numeric_limits<number<T> >::quiet_NaN().backend();
       return;
    case FP_ZERO:
       result = ui_type(0);
@@ -233,7 +233,7 @@ void eval_cos(T& result, const T& x)
    {
    case FP_INFINITE:
    case FP_NAN:
-      result = std::numeric_limits<mp_number<T> >::quiet_NaN().backend();
+      result = std::numeric_limits<number<T> >::quiet_NaN().backend();
       return;
    case FP_ZERO:
       result = ui_type(1);
@@ -391,7 +391,7 @@ void hyp2F1(T& result, const T& a, const T& b, const T& c, const T& x)
    eval_add(result, ui_type(1));
 
    T lim;
-   eval_ldexp(lim, result, 1 - boost::multiprecision::detail::digits2<mp_number<T> >::value);
+   eval_ldexp(lim, result, 1 - boost::multiprecision::detail::digits2<number<T> >::value);
 
    if(eval_get_sign(lim) < 0)
       lim.negate();
@@ -447,7 +447,7 @@ void eval_asin(T& result, const T& x)
    {
    case FP_NAN:
    case FP_INFINITE:
-      result = std::numeric_limits<mp_number<T> >::quiet_NaN().backend();
+      result = std::numeric_limits<number<T> >::quiet_NaN().backend();
       return;
    case FP_ZERO:
       result = ui_type(0);
@@ -464,7 +464,7 @@ void eval_asin(T& result, const T& x)
    int c = xx.compare(ui_type(1));
    if(c > 0)
    {
-      result = std::numeric_limits<mp_number<T> >::quiet_NaN().backend();
+      result = std::numeric_limits<number<T> >::quiet_NaN().backend();
       return;
    }
    else if(c == 0)
@@ -524,7 +524,7 @@ void eval_asin(T& result, const T& x)
       eval_subtract(result, s);
 
       T lim;
-      eval_ldexp(lim, result, 1 - boost::multiprecision::detail::digits2<mp_number<T> >::value);
+      eval_ldexp(lim, result, 1 - boost::multiprecision::detail::digits2<number<T> >::value);
       if(eval_get_sign(s) < 0)
          s.negate();
       if(eval_get_sign(lim) < 0)
@@ -546,7 +546,7 @@ inline void eval_acos(T& result, const T& x)
    {
    case FP_NAN:
    case FP_INFINITE:
-      result = std::numeric_limits<mp_number<T> >::quiet_NaN().backend();
+      result = std::numeric_limits<number<T> >::quiet_NaN().backend();
       return;
    case FP_ZERO:
       result = get_constant_pi<T>();
@@ -559,7 +559,7 @@ inline void eval_acos(T& result, const T& x)
 
    if(c > 0)
    {
-      result = std::numeric_limits<mp_number<T> >::quiet_NaN().backend();
+      result = std::numeric_limits<number<T> >::quiet_NaN().backend();
       return;
    }
    else if(c == 0)
@@ -591,7 +591,7 @@ void eval_atan(T& result, const T& x)
    switch(eval_fpclassify(x))
    {
    case FP_NAN:
-      result = std::numeric_limits<mp_number<T> >::quiet_NaN().backend();
+      result = std::numeric_limits<number<T> >::quiet_NaN().backend();
       return;
    case FP_ZERO:
       result = ui_type(0);
@@ -656,7 +656,7 @@ void eval_atan(T& result, const T& x)
    static const boost::int32_t double_digits10_minus_a_few = std::numeric_limits<double>::digits10 - 3;
 
    T s, c, t;
-   for(boost::int32_t digits = double_digits10_minus_a_few; digits <= std::numeric_limits<mp_number<T> >::digits10; digits *= 2)
+   for(boost::int32_t digits = double_digits10_minus_a_few; digits <= std::numeric_limits<number<T> >::digits10; digits *= 2)
    {
       eval_sin(s, result);
       eval_cos(c, result);
@@ -710,7 +710,7 @@ void eval_atan2(T& result, const T& y, const T& x)
       {
          if(eval_fpclassify(x) == FP_INFINITE)
          {
-            result = std::numeric_limits<mp_number<T> >::quiet_NaN().backend();
+            result = std::numeric_limits<number<T> >::quiet_NaN().backend();
          }
          else
          {

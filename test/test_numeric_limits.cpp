@@ -201,7 +201,7 @@ void test()
 int main()
 {
 #ifdef TEST_BACKEND
-   test<boost::multiprecision::mp_number<boost::multiprecision::concepts::mp_number_backend_float_architype> >();
+   test<boost::multiprecision::number<boost::multiprecision::concepts::mp_number_backend_float_architype> >();
 #endif
 #ifdef TEST_MPF_50
    test<boost::multiprecision::mpf_float_50>();
@@ -237,10 +237,10 @@ int main()
 #endif
 #ifdef TEST_CPP_INT
    test<boost::multiprecision::cpp_int>();
-   test<boost::multiprecision::mp_int256_t>();
-   test<boost::multiprecision::mp_uint512_t>();
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<200, false, void> > >();
-   test<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<70, true, void> > >();
+   test<boost::multiprecision::int256_t>();
+   test<boost::multiprecision::uint512_t>();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<200, false, void> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<70, true, void> > >();
 #endif
    return boost::report_errors();
 }

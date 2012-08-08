@@ -58,7 +58,7 @@ int main()
       //
       // Now integer to float:
       //
-      typedef mp_number<cpp_dec_float<500> > dec_float_500;
+      typedef number<cpp_dec_float<500> > dec_float_500;
       dec_float_500 df(c);
       dec_float_500 df2(c.str());
       BOOST_CHECK_EQUAL(df, df2);
@@ -66,7 +66,7 @@ int main()
       df2 = -df2;
       BOOST_CHECK_EQUAL(df, df2);
 #ifdef TEST_GMP
-      typedef mp_number<gmp_float<500> > mpf_type;
+      typedef number<gmp_float<500> > mpf_type;
       mpf_type mpf(c);
       mpf_type mpf2(c.str());
       BOOST_CHECK_EQUAL(mpf, mpf2);
@@ -75,7 +75,7 @@ int main()
       BOOST_CHECK_EQUAL(mpf, mpf2);
 #endif
 #ifdef TEST_MPFR
-      typedef mp_number<mpfr_float_backend<500> > mpfr_type;
+      typedef number<mpfr_float_backend<500> > mpfr_type;
       mpfr_type mpfr(c);
       mpfr_type mpfr2(c.str());
       BOOST_CHECK_EQUAL(mpfr, mpfr2);

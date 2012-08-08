@@ -11,7 +11,7 @@
 #include <sstream>
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/multiprecision/mp_number.hpp>
+#include <boost/multiprecision/number.hpp>
 
 namespace boost{
 namespace multiprecision{
@@ -128,10 +128,10 @@ using boost::multiprecision::backends::arithmetic_backend;
 namespace std{
 
 template <class Arithmetic, bool ExpressionTemplates>
-class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::arithmetic_backend<Arithmetic>, ExpressionTemplates > > : public std::numeric_limits<Arithmetic>
+class numeric_limits<boost::multiprecision::number<boost::multiprecision::arithmetic_backend<Arithmetic>, ExpressionTemplates > > : public std::numeric_limits<Arithmetic>
 {
    typedef std::numeric_limits<Arithmetic> base_type;
-   typedef boost::multiprecision::mp_number<boost::multiprecision::arithmetic_backend<Arithmetic>, ExpressionTemplates> number_type;
+   typedef boost::multiprecision::number<boost::multiprecision::arithmetic_backend<Arithmetic>, ExpressionTemplates> number_type;
 public:
    BOOST_STATIC_CONSTEXPR number_type (min)() BOOST_NOEXCEPT { return (base_type::min)(); }
    BOOST_STATIC_CONSTEXPR number_type (max)() BOOST_NOEXCEPT { return (base_type::max)(); }

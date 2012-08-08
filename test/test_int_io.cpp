@@ -123,9 +123,9 @@ int main()
    test_round_trip<boost::multiprecision::tom_int>();
 #endif
 #ifdef TEST_CPP_INT
-   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<> > >();
-   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<1024, true, void> > >();
-   test_round_trip<boost::multiprecision::mp_number<boost::multiprecision::cpp_int_backend<512, false, void> > >();
+   test_round_trip<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<> > >();
+   test_round_trip<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<1024, true, void> > >();
+   test_round_trip<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<512, false, void> > >();
 #endif
    return boost::report_errors();
 }

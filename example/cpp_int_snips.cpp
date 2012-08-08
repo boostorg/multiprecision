@@ -13,7 +13,7 @@ void t1()
 
    using namespace boost::multiprecision;
 
-   mp_int128_t v = 1;
+   int128_t v = 1;
 
    // Do some fixed precision arithmetic:
    for(unsigned i = 1; i <= 20; ++i)

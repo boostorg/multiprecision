@@ -12,7 +12,7 @@ namespace boost{
 namespace multiprecision{
 
 template <class Backend, bool ExpressionTemplates>
-bool check_small_factors(const mp_number<Backend, ExpressionTemplates>& n)
+bool check_small_factors(const number<Backend, ExpressionTemplates>& n)
 {
    static const boost::uint32_t small_factors1[] = {
       3u, 5u, 7u, 11u, 13u, 17u, 19u, 23u };
@@ -119,13 +119,13 @@ inline bool is_small_prime(unsigned n)
 
 template <class Backend, bool ExpressionTemplates, class Engine>
 typename enable_if_c<number_category<Backend>::value == number_kind_integer, bool>::type 
-   miller_rabin_test(const mp_number<Backend, ExpressionTemplates>& n, unsigned trials, Engine& gen)
+   miller_rabin_test(const number<Backend, ExpressionTemplates>& n, unsigned trials, Engine& gen)
 {
 #ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable:4127)
 #endif
-   typedef mp_number<Backend, ExpressionTemplates> number_type;
+   typedef number<Backend, ExpressionTemplates> number_type;
 
    if(n <= 227)
       return is_small_prime(n.template convert_to<unsigned>());
@@ -179,23 +179,23 @@ typename enable_if_c<number_category<Backend>::value == number_kind_integer, boo
 }
 
 template <class Backend, bool ExpressionTemplates>
-bool miller_rabin_test(const mp_number<Backend, ExpressionTemplates>& x, unsigned trials)
+bool miller_rabin_test(const number<Backend, ExpressionTemplates>& x, unsigned trials)
 {
    static mt19937 gen;
    return miller_rabin_test(x, trials, gen);
 }
 
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class Engine>
-bool miller_rabin_test(const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> & n, unsigned trials, Engine& gen)
+bool miller_rabin_test(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4> & n, unsigned trials, Engine& gen)
 {
-   typedef typename detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>::result_type number_type;
+   typedef typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type number_type;
    return miller_rabin_test(number_type(n), trials, gen);
 }
 
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-bool miller_rabin_test(const detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4> & n, unsigned trials)
+bool miller_rabin_test(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4> & n, unsigned trials)
 {
-   typedef typename detail::mp_exp<tag, Arg1, Arg2, Arg3, Arg4>::result_type number_type;
+   typedef typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type number_type;
    return miller_rabin_test(number_type(n), trials);
 }
 

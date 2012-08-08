@@ -94,19 +94,19 @@ int test_main(int, char* [])
    //
 #ifdef TEST_MPF_50
    // We have accuracy issues with gmp_float<18> - our argument reduction in std::sin isn't accurate enough:
-   test_binomial(mp_number<gmp_float<18> >(), "mp_number<gmp_float<18> >");
-   test_binomial(mp_number<gmp_float<30> >(), "mp_number<gmp_float<30> >");
-   test_binomial(mp_number<gmp_float<35> >(), "mp_number<gmp_float<35> >");
+   test_binomial(number<gmp_float<18> >(), "number<gmp_float<18> >");
+   test_binomial(number<gmp_float<30> >(), "number<gmp_float<30> >");
+   test_binomial(number<gmp_float<35> >(), "number<gmp_float<35> >");
 #endif
 #ifdef TEST_MPFR_50
-   test_binomial(mp_number<mpfr_float_backend<18> >(), "mp_number<mpfr_float_backend<18> >");
-   test_binomial(mp_number<mpfr_float_backend<30> >(), "mp_number<mpfr_float_backend<30> >");
-   test_binomial(mp_number<mpfr_float_backend<35> >(), "mp_number<mpfr_float_backend<35> >");
+   test_binomial(number<mpfr_float_backend<18> >(), "number<mpfr_float_backend<18> >");
+   test_binomial(number<mpfr_float_backend<30> >(), "number<mpfr_float_backend<30> >");
+   test_binomial(number<mpfr_float_backend<35> >(), "number<mpfr_float_backend<35> >");
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
-   test_binomial(mp_number<cpp_dec_float<18> >(), "mp_number<cpp_dec_float<18> >");
-   test_binomial(mp_number<cpp_dec_float<30> >(), "mp_number<cpp_dec_float<30> >");
-   test_binomial(mp_number<cpp_dec_float<35> >(), "mp_number<cpp_dec_float<35> >");
+   test_binomial(number<cpp_dec_float<18> >(), "number<cpp_dec_float<18> >");
+   test_binomial(number<cpp_dec_float<30> >(), "number<cpp_dec_float<30> >");
+   test_binomial(number<cpp_dec_float<35> >(), "number<cpp_dec_float<35> >");
 #endif
    return 0;
 }

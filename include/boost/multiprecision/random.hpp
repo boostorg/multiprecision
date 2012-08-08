@@ -8,7 +8,7 @@
 #ifndef BOOST_MP_RANDOM_HPP
 #define BOOST_MP_RANDOM_HPP
 
-#include <boost/multiprecision/mp_number.hpp>
+#include <boost/multiprecision/number.hpp>
 
 namespace boost{ namespace random{ namespace detail{
 //
@@ -18,8 +18,8 @@ namespace boost{ namespace random{ namespace detail{
 // UDT's and depricate/remove this header altogether.
 //
 template<class Engine, class Backend, bool ExpressionTemplates>
-boost::multiprecision::mp_number<Backend, ExpressionTemplates> 
-   generate_uniform_int(Engine& eng, const boost::multiprecision::mp_number<Backend, ExpressionTemplates>& min_value, const boost::multiprecision::mp_number<Backend, ExpressionTemplates>& max_value);
+boost::multiprecision::number<Backend, ExpressionTemplates> 
+   generate_uniform_int(Engine& eng, const boost::multiprecision::number<Backend, ExpressionTemplates>& min_value, const boost::multiprecision::number<Backend, ExpressionTemplates>& max_value);
 
 }}}
 
@@ -31,20 +31,20 @@ namespace random{
 namespace detail{
 
 template<class Backend, bool ExpressionTemplates>
-struct subtract<boost::multiprecision::mp_number<Backend, ExpressionTemplates>, true> 
+struct subtract<boost::multiprecision::number<Backend, ExpressionTemplates>, true> 
 { 
-  typedef boost::multiprecision::mp_number<Backend, ExpressionTemplates> result_type;
+  typedef boost::multiprecision::number<Backend, ExpressionTemplates> result_type;
   result_type operator()(result_type const& x, result_type const& y) { return x - y; }
 };
 
 }
 
 template<class Engine, std::size_t w, class Backend, bool ExpressionTemplates>
-class independent_bits_engine<Engine, w, boost::multiprecision::mp_number<Backend, ExpressionTemplates> >
+class independent_bits_engine<Engine, w, boost::multiprecision::number<Backend, ExpressionTemplates> >
 {
 public:
     typedef Engine base_type;
-    typedef boost::multiprecision::mp_number<Backend, ExpressionTemplates> result_type;
+    typedef boost::multiprecision::number<Backend, ExpressionTemplates> result_type;
 
     static result_type min BOOST_PREVENT_MACRO_SUBSTITUTION ()
     { return 0; }
@@ -199,11 +199,11 @@ private:
 };
 
 template<class Backend, bool ExpressionTemplates>
-class uniform_smallint<boost::multiprecision::mp_number<Backend, ExpressionTemplates> >
+class uniform_smallint<boost::multiprecision::number<Backend, ExpressionTemplates> >
 {
 public:
-    typedef boost::multiprecision::mp_number<Backend, ExpressionTemplates> input_type;
-    typedef boost::multiprecision::mp_number<Backend, ExpressionTemplates> result_type;
+    typedef boost::multiprecision::number<Backend, ExpressionTemplates> input_type;
+    typedef boost::multiprecision::number<Backend, ExpressionTemplates> result_type;
 
     class param_type
     {
@@ -382,22 +382,22 @@ private:
 namespace detail{
 
 template<class Backend, bool ExpressionTemplates>
-struct select_uniform_01<boost::multiprecision::mp_number<Backend, ExpressionTemplates> >
+struct select_uniform_01<boost::multiprecision::number<Backend, ExpressionTemplates> >
 {
   template<class RealType>
   struct apply
   {
-    typedef new_uniform_01<boost::multiprecision::mp_number<Backend, ExpressionTemplates> > type;
+    typedef new_uniform_01<boost::multiprecision::number<Backend, ExpressionTemplates> > type;
   };
 };
 
 template<class Engine, class Backend, bool ExpressionTemplates>
-boost::multiprecision::mp_number<Backend, ExpressionTemplates> 
+boost::multiprecision::number<Backend, ExpressionTemplates> 
    generate_uniform_int(
-    Engine& eng, const boost::multiprecision::mp_number<Backend, ExpressionTemplates>& min_value, const boost::multiprecision::mp_number<Backend, ExpressionTemplates>& max_value,
+    Engine& eng, const boost::multiprecision::number<Backend, ExpressionTemplates>& min_value, const boost::multiprecision::number<Backend, ExpressionTemplates>& max_value,
     boost::mpl::true_ /** is_integral<Engine::result_type> */)
 {
-    typedef boost::multiprecision::mp_number<Backend, ExpressionTemplates> result_type;
+    typedef boost::multiprecision::number<Backend, ExpressionTemplates> result_type;
     // Since we're using big-numbers, use the result type for all internal calculations:
     typedef result_type range_type;
     typedef result_type base_result;
@@ -558,8 +558,8 @@ boost::multiprecision::mp_number<Backend, ExpressionTemplates>
 }
 
 template<class Engine, class Backend, bool ExpressionTemplates>
-inline boost::multiprecision::mp_number<Backend, ExpressionTemplates> 
-   generate_uniform_int(Engine& eng, const boost::multiprecision::mp_number<Backend, ExpressionTemplates>& min_value, const boost::multiprecision::mp_number<Backend, ExpressionTemplates>& max_value)
+inline boost::multiprecision::number<Backend, ExpressionTemplates> 
+   generate_uniform_int(Engine& eng, const boost::multiprecision::number<Backend, ExpressionTemplates>& min_value, const boost::multiprecision::number<Backend, ExpressionTemplates>& max_value)
 {
     typedef typename Engine::result_type base_result;
     typedef typename mpl::or_<boost::is_integral<base_result>, mpl::bool_<boost::multiprecision::number_category<Backend>::value == boost::multiprecision::number_kind_integer> >::type tag_type;

@@ -314,7 +314,7 @@ int main()
    test<boost::multiprecision::cpp_dec_float_100>();
 #endif
 #ifdef TEST_BACKEND
-   test<boost::multiprecision::mp_number<boost::multiprecision::concepts::mp_number_backend_float_architype> >();
+   test<boost::multiprecision::number<boost::multiprecision::concepts::mp_number_backend_float_architype> >();
 #endif
    return boost::report_errors();
 }

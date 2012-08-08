@@ -42,7 +42,7 @@
 
 #if defined(TEST_MPF_50)
 template <unsigned N>
-bool is_mpf(const boost::multiprecision::mp_number<boost::multiprecision::gmp_float<N> >&)
+bool is_mpf(const boost::multiprecision::number<boost::multiprecision::gmp_float<N> >&)
 {  return true;  }
 #endif
 template <class T>
@@ -215,23 +215,23 @@ struct max_digits10_proxy
 };
 #ifdef TEST_CPP_DEC_FLOAT
 template <unsigned D, bool ET>
-struct max_digits10_proxy<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<D>, ET> >
+struct max_digits10_proxy<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<D>, ET> >
 {
-   static const unsigned value = std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<D>, ET> >::max_digits10;
+   static const unsigned value = std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<D>, ET> >::max_digits10;
 };
 #endif
 #ifdef TEST_MPF_50
 template <unsigned D, bool ET>
-struct max_digits10_proxy<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<D>, ET> >
+struct max_digits10_proxy<boost::multiprecision::number<boost::multiprecision::gmp_float<D>, ET> >
 {
-   static const unsigned value = std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::gmp_float<D>, ET> >::max_digits10;
+   static const unsigned value = std::numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_float<D>, ET> >::max_digits10;
 };
 #endif
 #ifdef TEST_MPFR_50
 template <unsigned D, bool ET>
-struct max_digits10_proxy<boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<D>, ET> >
+struct max_digits10_proxy<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<D>, ET> >
 {
-   static const unsigned value = std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::mpfr_float_backend<D>, ET> >::max_digits10;
+   static const unsigned value = std::numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<D>, ET> >::max_digits10;
 };
 #endif
 

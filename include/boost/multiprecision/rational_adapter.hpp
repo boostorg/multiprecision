@@ -11,7 +11,7 @@
 #include <sstream>
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/multiprecision/mp_number.hpp>
+#include <boost/multiprecision/number.hpp>
 #include <boost/rational.hpp>
 
 namespace boost{
@@ -21,7 +21,7 @@ namespace backends{
 template <class IntBackend>
 struct rational_adapter
 {
-   typedef mp_number<IntBackend>                integer_type;
+   typedef number<IntBackend>                integer_type;
    typedef boost::rational<integer_type>        rational_type;
 
    typedef typename IntBackend::signed_types    signed_types;
@@ -62,7 +62,7 @@ struct rational_adapter
    rational_adapter& operator = (const char* s)
    {
       std::string s1;
-      multiprecision::mp_number<IntBackend> v1, v2;
+      multiprecision::number<IntBackend> v1, v2;
       char c;
       bool have_hex = false;
       const char* p = s; // saved for later
@@ -178,12 +178,12 @@ inline int eval_get_sign(const rational_adapter<IntBackend>& val)
 }
 
 template <class IntBackend>
-inline mp_number<IntBackend> numerator(const mp_number<rational_adapter<IntBackend> >& val)
+inline number<IntBackend> numerator(const number<rational_adapter<IntBackend> >& val)
 {
    return val.backend().data().numerator();
 }
 template <class IntBackend>
-inline mp_number<IntBackend> denominator(const mp_number<rational_adapter<IntBackend> >& val)
+inline number<IntBackend> denominator(const number<rational_adapter<IntBackend> >& val)
 {
    return val.backend().data().denominator();
 }
@@ -204,7 +204,7 @@ using boost::multiprecision::backends::rational_adapter;
 template <class T>
 struct component_type<rational_adapter<T> >
 {
-   typedef mp_number<T> type;
+   typedef number<T> type;
 };
 
 }} // namespaces
@@ -213,10 +213,10 @@ struct component_type<rational_adapter<T> >
 namespace std{
 
 template <class IntBackend, bool ExpressionTemplates>
-class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::rational_adapter<IntBackend>, ExpressionTemplates> > : public std::numeric_limits<boost::multiprecision::mp_number<IntBackend, ExpressionTemplates> >
+class numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adapter<IntBackend>, ExpressionTemplates> > : public std::numeric_limits<boost::multiprecision::number<IntBackend, ExpressionTemplates> >
 {
-   typedef std::numeric_limits<boost::multiprecision::mp_number<IntBackend> > base_type;
-   typedef boost::multiprecision::mp_number<boost::multiprecision::rational_adapter<IntBackend> > number_type;
+   typedef std::numeric_limits<boost::multiprecision::number<IntBackend> > base_type;
+   typedef boost::multiprecision::number<boost::multiprecision::rational_adapter<IntBackend> > number_type;
 public:
    BOOST_STATIC_CONSTEXPR bool is_integer = false;
    BOOST_STATIC_CONSTEXPR bool is_exact = true;
@@ -234,9 +234,9 @@ public:
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
 
 template <class IntBackend, bool ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::rational_adapter<IntBackend>, ExpressionTemplates> >::is_integer;
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adapter<IntBackend>, ExpressionTemplates> >::is_integer;
 template <class IntBackend, bool ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::rational_adapter<IntBackend>, ExpressionTemplates> >::is_exact;
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adapter<IntBackend>, ExpressionTemplates> >::is_exact;
 
 #endif
 

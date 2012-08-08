@@ -116,7 +116,7 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
    // radixes but it would complicate things.... use a string convertion when the radix is other
    // than 2:
    //
-   if(std::numeric_limits<mp_number<From> >::radix != 2)
+   if(std::numeric_limits<number<From> >::radix != 2)
    {
       to = from.str(0, std::ios_base::fmtflags()).c_str();
       return;
@@ -190,10 +190,10 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
 template <class To, class From>
 void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_rational>& /*to_type*/, const mpl::int_<number_kind_rational>& /*from_type*/)
 {
-   typedef typename component_type<mp_number<From> >::type   from_component_type;
-   typedef typename component_type<mp_number<To> >::type     to_component_type;
+   typedef typename component_type<number<From> >::type   from_component_type;
+   typedef typename component_type<number<To> >::type     to_component_type;
 
-   mp_number<From> t(from);
+   number<From> t(from);
    to_component_type n(numerator(t)), d(denominator(t));
    using default_ops::assign_components;
    assign_components(to, n.backend(), d.backend());
@@ -202,9 +202,9 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
 template <class To, class From>
 void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_rational>& /*to_type*/, const mpl::int_<number_kind_integer>& /*from_type*/)
 {
-   typedef typename component_type<mp_number<To> >::type     to_component_type;
+   typedef typename component_type<number<To> >::type     to_component_type;
 
-   mp_number<From> t(from);
+   number<From> t(from);
    to_component_type n(t), d(1);
    using default_ops::assign_components;
    assign_components(to, n.backend(), d.backend());
@@ -213,12 +213,12 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
 template <class To, class From>
 void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_floating_point>& /*to_type*/, const mpl::int_<number_kind_rational>& /*from_type*/)
 {
-   typedef typename component_type<mp_number<From> >::type   from_component_type;
+   typedef typename component_type<number<From> >::type   from_component_type;
    using default_ops::eval_divide;
 
-   mp_number<From> t(from);
+   number<From> t(from);
    from_component_type n(numerator(t)), d(denominator(t));
-   mp_number<To> fn(n), fd(d);
+   number<To> fn(n), fd(d);
    eval_divide(to, fn.backend(), fd.backend());
 }
 

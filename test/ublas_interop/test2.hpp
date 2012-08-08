@@ -18,7 +18,7 @@
 
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
-typedef boost::multiprecision::mp_number<boost::multiprecision::cpp_dec_float<50>, false> mp_test_type;
+typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<50>, false> mp_test_type;
 //typedef double mp_test_type;
 
 #define USE_RANGE

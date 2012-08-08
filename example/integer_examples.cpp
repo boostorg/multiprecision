@@ -32,7 +32,7 @@ void print_factorials()
    // large the largest is, we'll be able to "pretty format" the results.
    //
    // Calculate the largest number that will fit inside 128 bits, we could
-   // also have used numeric_limits<mp_int128_t>::max() for this value:
+   // also have used numeric_limits<int128_t>::max() for this value:
    cpp_int limit = (cpp_int(1) << 128) - 1;
    // 
    // Our table of values:

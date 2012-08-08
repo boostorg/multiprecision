@@ -9,7 +9,7 @@
 #include <iostream>
 #include <iomanip>
 #include <boost/cstdint.hpp>
-#include <boost/multiprecision/mp_number.hpp>
+#include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/cpp_int_core.hpp>
 #include <boost/array.hpp>
 #include <boost/type_traits/is_integral.hpp>
@@ -1504,13 +1504,13 @@ inline void eval_lcm(fixed_int<Bits, Signed>& result, const fixed_int<Bits, Sign
 template <unsigned Bits, bool Signed>
 struct number_category<fixed_int<Bits, Signed> > : public mpl::int_<number_kind_integer>{};
 
-typedef mp_number<fixed_int<128, false> > mp_uint128_t;
-typedef mp_number<fixed_int<256, false> > mp_uint256_t;
-typedef mp_number<fixed_int<512, false> > mp_uint512_t;
+typedef number<fixed_int<128, false> > uint128_t;
+typedef number<fixed_int<256, false> > uint256_t;
+typedef number<fixed_int<512, false> > uint512_t;
 
-typedef mp_number<fixed_int<128, true> > mp_int128_t;
-typedef mp_number<fixed_int<256, true> > mp_int256_t;
-typedef mp_number<fixed_int<512, true> > mp_int512_t;
+typedef number<fixed_int<128, true> > int128_t;
+typedef number<fixed_int<256, true> > int256_t;
+typedef number<fixed_int<512, true> > int512_t;
 
 }} // namespaces
 
@@ -1518,16 +1518,16 @@ typedef mp_number<fixed_int<512, true> > mp_int512_t;
 namespace std{
 
 template <unsigned Bits, bool Signed, bool ExpressionTemplates>
-class numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<Bits, Signed>, ExpressionTemplates> >
+class numeric_limits<boost::multiprecision::number<boost::multiprecision::fixed_int<Bits, Signed>, ExpressionTemplates> >
 {
-   typedef boost::multiprecision::mp_number<boost::multiprecision::fixed_int<Bits, Signed>, ExpressionTemplates> number_type;
+   typedef boost::multiprecision::number<boost::multiprecision::fixed_int<Bits, Signed>, ExpressionTemplates> number_type;
 
    struct initializer
    {
       initializer()
       {
-         (std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<Bits, Signed> > >::min)();
-         (std::numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<Bits, Signed> > >::max)();
+         (std::numeric_limits<boost::multiprecision::number<boost::multiprecision::fixed_int<Bits, Signed> > >::min)();
+         (std::numeric_limits<boost::multiprecision::number<boost::multiprecision::fixed_int<Bits, Signed> > >::max)();
       }
       void do_nothing()const{}
    };
@@ -1592,8 +1592,8 @@ public:
 };
 
 template <unsigned Bits, bool Signed, bool ExpressionTemplates>
-typename numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<Bits, Signed>, ExpressionTemplates> >::initializer const
-   numeric_limits<boost::multiprecision::mp_number<boost::multiprecision::fixed_int<Bits, Signed>, ExpressionTemplates> >::init;
+typename numeric_limits<boost::multiprecision::number<boost::multiprecision::fixed_int<Bits, Signed>, ExpressionTemplates> >::initializer const
+   numeric_limits<boost::multiprecision::number<boost::multiprecision::fixed_int<Bits, Signed>, ExpressionTemplates> >::init;
 }
 
 #endif
