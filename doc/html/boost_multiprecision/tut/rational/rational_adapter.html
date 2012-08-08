@@ -26,15 +26,15 @@
 </pre>
 <p>
           The class template <code class="computeroutput"><span class="identifier">rational_adapter</span></code>
-          is a back-end for <code class="computeroutput"><span class="identifier">mp_number</span></code>
+          is a back-end for <code class="computeroutput"><span class="identifier">number</span></code>
           which converts any existing integer back-end into a rational-number back-end.
         </p>
 <p>
           So for example, given an integer back-end type <code class="computeroutput"><span class="identifier">MyIntegerBackend</span></code>,
           the use would be something like:
         </p>
-<pre class="programlisting"><span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">MyIntegerBackend</span><span class="special">&gt;</span>                    <span class="identifier">MyInt</span><span class="special">;</span>
-<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">rational_adapter</span><span class="special">&lt;</span><span class="identifier">MyIntegerBackend</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">MyRational</span><span class="special">;</span>
+<pre class="programlisting"><span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">MyIntegerBackend</span><span class="special">&gt;</span>                    <span class="identifier">MyInt</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">rational_adapter</span><span class="special">&lt;</span><span class="identifier">MyIntegerBackend</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">MyRational</span><span class="special">;</span>
 
 <span class="identifier">MyRational</span> <span class="identifier">r</span> <span class="special">=</span> <span class="number">2</span><span class="special">;</span>
 <span class="identifier">r</span> <span class="special">/=</span> <span class="number">3</span><span class="special">;</span>

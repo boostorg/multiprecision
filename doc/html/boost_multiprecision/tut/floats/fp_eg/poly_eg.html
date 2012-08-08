@@ -20,7 +20,7 @@
 </h5></div></div></div>
 <p>
             In this example we'll look at polynomial evaluation, this is not only
-            an important use case, but it's one that <code class="computeroutput"><span class="identifier">mp_number</span></code>
+            an important use case, but it's one that <code class="computeroutput"><span class="identifier">number</span></code>
             performs particularly well at because the expression templates <span class="emphasis"><em>completely
             eliminate all temporaries</em></span> from a <a href="http://en.wikipedia.org/wiki/Horner%27s_method" target="_top">Horner
             polynomial evaluation scheme</a>.
@@ -32,7 +32,7 @@
 <p>
 </p>
 <pre class="programlisting"><span class="keyword">using</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">cpp_dec_float</span><span class="special">;</span>
-<span class="keyword">typedef</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float</span><span class="special">&lt;</span><span class="number">64</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">mp_type</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float</span><span class="special">&lt;</span><span class="number">64</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">mp_type</span><span class="special">;</span>
 
 <span class="identifier">mp_type</span> <span class="identifier">mysin</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">mp_type</span><span class="special">&amp;</span> <span class="identifier">x</span><span class="special">)</span>
 <span class="special">{</span>

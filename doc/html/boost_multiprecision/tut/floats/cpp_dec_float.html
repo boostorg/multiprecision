@@ -25,14 +25,14 @@
 <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">unsigned</span> <span class="identifier">Digits10</span><span class="special">&gt;</span>
 <span class="keyword">class</span> <span class="identifier">cpp_dec_float</span><span class="special">;</span>
 
-<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float</span><span class="special">&lt;</span><span class="number">50</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">cpp_dec_float_50</span><span class="special">;</span>
-<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float</span><span class="special">&lt;</span><span class="number">100</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">cpp_dec_float_100</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float</span><span class="special">&lt;</span><span class="number">50</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">cpp_dec_float_50</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float</span><span class="special">&lt;</span><span class="number">100</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">cpp_dec_float_100</span><span class="special">;</span>
 
 <span class="special">}}</span> <span class="comment">// namespaces</span>
 </pre>
 <p>
           The <code class="computeroutput"><span class="identifier">cpp_dec_float</span></code> back-end
-          is used in conjunction with <code class="computeroutput"><span class="identifier">mp_number</span></code>:
+          is used in conjunction with <code class="computeroutput"><span class="identifier">number</span></code>:
           It acts as an entirely C++ (header only and dependency free) real-number
           type that is a drop-in replacement for the native C++ floating-point types,
           but with much greater precision.
@@ -80,10 +80,15 @@
               this type.
             </li>
 <li class="listitem">
-              Any <code class="computeroutput"><span class="identifier">mp_number</span></code> instantiated
-              on this type, is convertible to any other <code class="computeroutput"><span class="identifier">mp_number</span></code>
-              instantiated on this type - for example you can convert from <code class="computeroutput"><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float</span><span class="special">&lt;</span><span class="number">50</span><span class="special">&gt;</span> <span class="special">&gt;</span></code> to <code class="computeroutput"><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float</span><span class="special">&lt;</span><span class="identifier">SomeOtherValue</span><span class="special">&gt;</span> <span class="special">&gt;</span></code>.
+              Any <code class="computeroutput"><span class="identifier">number</span></code> instantiated
+              on this type, is convertible to any other <code class="computeroutput"><span class="identifier">number</span></code>
+              instantiated on this type - for example you can convert from <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float</span><span class="special">&lt;</span><span class="number">50</span><span class="special">&gt;</span> <span class="special">&gt;</span></code> to <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float</span><span class="special">&lt;</span><span class="identifier">SomeOtherValue</span><span class="special">&gt;</span> <span class="special">&gt;</span></code>.
               Narrowing conversions are truncating.
+            </li>
+<li class="listitem">
+              Conversion from a string results in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
+              being thrown if the string can not be interpreted as a valid floating
+              point number.
             </li>
 </ul></div>
 <h6>

@@ -31,7 +31,7 @@
     </p>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc">
 <li class="listitem">
-          An expression-template-enabled front-end <code class="computeroutput"><span class="identifier">mp_number</span></code>
+          An expression-template-enabled front-end <code class="computeroutput"><span class="identifier">number</span></code>
           that handles all the operator overloading, expression evaluation optimization,
           and code reduction.
         </li>
@@ -59,7 +59,7 @@
 </pre>
 <p>
       Alternatively, you can compose your own multiprecision type, by combining
-      <code class="computeroutput"><span class="identifier">mp_number</span></code> with one of the predefined
+      <code class="computeroutput"><span class="identifier">number</span></code> with one of the predefined
       back-end types. For example, suppose you wanted a 300 decimal digit floating-point
       type based on the <a href="http://www.mpfr.org" target="_top">MPFR</a> library. In
       this case, there's no predefined typedef with that level of precision, so instead
@@ -69,20 +69,20 @@
 
 <span class="keyword">namespace</span> <span class="identifier">mp</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">;</span>     <span class="comment">// Reduce the typing a bit later...</span>
 
-<span class="keyword">typedef</span> <span class="identifier">mp</span><span class="special">::</span><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">mp</span><span class="special">::</span><span class="identifier">mpfr_float_backend</span><span class="special">&lt;</span><span class="number">300</span><span class="special">&gt;</span> <span class="special">&gt;</span>  <span class="identifier">my_float</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">mp</span><span class="special">::</span><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">mp</span><span class="special">::</span><span class="identifier">mpfr_float_backend</span><span class="special">&lt;</span><span class="number">300</span><span class="special">&gt;</span> <span class="special">&gt;</span>  <span class="identifier">my_float</span><span class="special">;</span>
 
 <span class="identifier">my_float</span> <span class="identifier">a</span><span class="special">,</span> <span class="identifier">b</span><span class="special">,</span> <span class="identifier">c</span><span class="special">;</span> <span class="comment">// These variables have 300 decimal digits precision</span>
 </pre>
 <p>
       We can repeat the above example, but with the expression templates disabled
       (for faster compile times, but slower runtimes) by passing a second template
-      argument to <code class="computeroutput"><span class="identifier">mp_number</span></code>:
+      argument to <code class="computeroutput"><span class="identifier">number</span></code>:
     </p>
 <pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">mpfr</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>  <span class="comment">// Defines the Backend type that wraps MPFR</span>
 
 <span class="keyword">namespace</span> <span class="identifier">mp</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">;</span>     <span class="comment">// Reduce the typing a bit later...</span>
 
-<span class="keyword">typedef</span> <span class="identifier">mp</span><span class="special">::</span><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">mp</span><span class="special">::</span><span class="identifier">mpfr_float_backend</span><span class="special">&lt;</span><span class="number">300</span><span class="special">&gt;,</span> <span class="keyword">false</span><span class="special">&gt;</span>  <span class="identifier">my_float</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">mp</span><span class="special">::</span><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">mp</span><span class="special">::</span><span class="identifier">mpfr_float_backend</span><span class="special">&lt;</span><span class="number">300</span><span class="special">&gt;,</span> <span class="keyword">false</span><span class="special">&gt;</span>  <span class="identifier">my_float</span><span class="special">;</span>
 
 <span class="identifier">my_float</span> <span class="identifier">a</span><span class="special">,</span> <span class="identifier">b</span><span class="special">,</span> <span class="identifier">c</span><span class="special">;</span> <span class="comment">// These variables have 300 decimal digits precision</span>
 </pre>
@@ -94,8 +94,8 @@
 
 <span class="keyword">namespace</span> <span class="identifier">mp</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">;</span>     <span class="comment">// Reduce the typing a bit later...</span>
 
-<span class="identifier">mp</span><span class="special">::</span><span class="identifier">mp_int128_t</span> <span class="identifier">a</span><span class="special">(</span><span class="number">3</span><span class="special">),</span> <span class="identifier">b</span><span class="special">(</span><span class="number">2</span><span class="special">);</span>
-<span class="identifier">mp</span><span class="special">::</span><span class="identifier">mp_int512_t</span> <span class="identifier">c</span><span class="special">(</span><span class="number">50</span><span class="special">),</span> <span class="identifier">d</span><span class="special">;</span>
+<span class="identifier">mp</span><span class="special">::</span><span class="identifier">int128_t</span> <span class="identifier">a</span><span class="special">(</span><span class="number">3</span><span class="special">),</span> <span class="identifier">b</span><span class="special">(</span><span class="number">2</span><span class="special">);</span>
+<span class="identifier">mp</span><span class="special">::</span><span class="identifier">int512_t</span> <span class="identifier">c</span><span class="special">(</span><span class="number">50</span><span class="special">),</span> <span class="identifier">d</span><span class="special">;</span>
 
 <span class="identifier">d</span> <span class="special">=</span> <span class="identifier">c</span> <span class="special">*</span> <span class="identifier">a</span><span class="special">;</span>   <span class="comment">// Compiler error</span>
 </pre>
@@ -104,22 +104,55 @@
     </p>
 <pre class="programlisting"><span class="identifier">d</span> <span class="special">=</span> <span class="identifier">a</span><span class="special">;</span> <span class="comment">// OK, widening conversion.</span>
 <span class="identifier">d</span> <span class="special">=</span> <span class="identifier">a</span> <span class="special">*</span> <span class="identifier">b</span><span class="special">;</span>  <span class="comment">// OK, can convert from an expression template too.</span>
-<span class="identifier">d</span> <span class="special">=</span> <span class="identifier">mp</span><span class="special">::</span><span class="identifier">mp_int512_t</span><span class="special">(</span><span class="identifier">a</span><span class="special">)</span> <span class="special">*</span> <span class="identifier">c</span><span class="special">;</span> <span class="comment">// OK, all the types in the expression are the same now.</span>
+<span class="identifier">d</span> <span class="special">=</span> <span class="identifier">mp</span><span class="special">::</span><span class="identifier">int512_t</span><span class="special">(</span><span class="identifier">a</span><span class="special">)</span> <span class="special">*</span> <span class="identifier">c</span><span class="special">;</span> <span class="comment">// OK, all the types in the expression are the same now.</span>
 </pre>
 <h5>
 <a name="boost_multiprecision.intro.h0"></a>
+      <span><a name="boost_multiprecision.intro.move_semantics"></a></span><a class="link" href="intro.html#boost_multiprecision.intro.move_semantics">Move
+      Semantics</a>
+    </h5>
+<p>
+      On compilers that support rvalue-references, class <code class="computeroutput"><span class="identifier">number</span></code>
+      is move-enabled if the underlying backend is.
+    </p>
+<p>
+      In addition the non-expression template operator overloads (see below) are
+      move aware and have overloads that look something like:
+    </p>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">B</span><span class="special">&gt;</span>
+<span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">B</span><span class="special">,</span> <span class="keyword">false</span><span class="special">&gt;</span> <span class="keyword">operator</span> <span class="special">+</span> <span class="special">(</span><span class="identifier">number</span><span class="special">&amp;&amp;</span> <span class="identifier">a</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">number</span><span class="special">&amp;</span> <span class="identifier">b</span><span class="special">)</span>
+<span class="special">{</span>
+    <span class="keyword">return</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">move</span><span class="special">(</span><span class="identifier">a</span> <span class="special">+=</span> <span class="identifier">b</span><span class="special">);</span>
+<span class="special">}</span>
+</pre>
+<p>
+      These operator overloads ensure that many expressions can be evaluated without
+      actually generating any temporaries. However, there are still many simple expressions
+      such as:
+    </p>
+<pre class="programlisting"><span class="identifier">a</span> <span class="special">=</span> <span class="identifier">b</span> <span class="special">*</span> <span class="identifier">c</span><span class="special">;</span>
+</pre>
+<p>
+      Which don't noticably benefit from move support. Therefore, optimal performance
+      comes from having both move-support, and expression templates enabled.
+    </p>
+<h5>
+<a name="boost_multiprecision.intro.h1"></a>
       <span><a name="boost_multiprecision.intro.expression_templates"></a></span><a class="link" href="intro.html#boost_multiprecision.intro.expression_templates">Expression
       Templates</a>
     </h5>
 <p>
-      Class <code class="computeroutput"><span class="identifier">mp_number</span></code> is expression-template-enabled:
+      TODO: compare to rvalue refs.
+    </p>
+<p>
+      Class <code class="computeroutput"><span class="identifier">number</span></code> is expression-template-enabled:
       that means that rather than having a multiplication operator that looks like
       this:
     </p>
 <pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
-<span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;</span> <span class="keyword">operator</span> <span class="special">*</span> <span class="special">(</span><span class="keyword">const</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">a</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">b</span><span class="special">)</span>
+<span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;</span> <span class="keyword">operator</span> <span class="special">*</span> <span class="special">(</span><span class="keyword">const</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">a</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">b</span><span class="special">)</span>
 <span class="special">{</span>
-   <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;</span> <span class="identifier">result</span><span class="special">(</span><span class="identifier">a</span><span class="special">);</span>
+   <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;</span> <span class="identifier">result</span><span class="special">(</span><span class="identifier">a</span><span class="special">);</span>
    <span class="identifier">result</span> <span class="special">*=</span> <span class="identifier">b</span><span class="special">;</span>
    <span class="keyword">return</span> <span class="identifier">result</span><span class="special">;</span>
 <span class="special">}</span>
@@ -128,7 +161,7 @@
       Instead the operator looks more like this:
     </p>
 <pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span>
-<span class="emphasis"><em>unmentionable-type</em></span> <span class="keyword">operator</span> <span class="special">*</span> <span class="special">(</span><span class="keyword">const</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">a</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">b</span><span class="special">);</span>
+<span class="emphasis"><em>unmentionable-type</em></span> <span class="keyword">operator</span> <span class="special">*</span> <span class="special">(</span><span class="keyword">const</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">a</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;&amp;</span> <span class="identifier">b</span><span class="special">);</span>
 </pre>
 <p>
       Where the "unmentionable" return type is an implementation detail
@@ -150,7 +183,7 @@
 <span class="identifier">y</span> <span class="special">=</span> <span class="special">(((((</span><span class="identifier">a</span><span class="special">[</span><span class="number">6</span><span class="special">]</span> <span class="special">*</span> <span class="identifier">x</span> <span class="special">+</span> <span class="identifier">a</span><span class="special">[</span><span class="number">5</span><span class="special">])</span> <span class="special">*</span> <span class="identifier">x</span> <span class="special">+</span> <span class="identifier">a</span><span class="special">[</span><span class="number">4</span><span class="special">])</span> <span class="special">*</span> <span class="identifier">x</span> <span class="special">+</span> <span class="identifier">a</span><span class="special">[</span><span class="number">3</span><span class="special">])</span> <span class="special">*</span> <span class="identifier">x</span> <span class="special">+</span> <span class="identifier">a</span><span class="special">[</span><span class="number">2</span><span class="special">])</span> <span class="special">*</span> <span class="identifier">x</span> <span class="special">+</span> <span class="identifier">a</span><span class="special">[</span><span class="number">1</span><span class="special">])</span> <span class="special">*</span> <span class="identifier">x</span> <span class="special">+</span> <span class="identifier">a</span><span class="special">[</span><span class="number">0</span><span class="special">];</span>
 </pre>
 <p>
-      If type <code class="computeroutput"><span class="identifier">T</span></code> is an <code class="computeroutput"><span class="identifier">mp_number</span></code>, then this expression is evaluated
+      If type <code class="computeroutput"><span class="identifier">T</span></code> is a <code class="computeroutput"><span class="identifier">number</span></code>, then this expression is evaluated
       <span class="emphasis"><em>without creating a single temporary value</em></span>. In contrast,
       if we were using the <a href="http://math.berkeley.edu/~wilken/code/gmpfrxx/" target="_top">mpfr_class</a>
       C++ wrapper for <a href="http://www.mpfr.org" target="_top">MPFR</a> - then this expression
@@ -169,7 +202,7 @@
 <p>
       This library also extends expression template support to standard library functions
       like <code class="computeroutput"><span class="identifier">abs</span></code> or <code class="computeroutput"><span class="identifier">sin</span></code>
-      with <code class="computeroutput"><span class="identifier">mp_number</span></code> arguments. This
+      with <code class="computeroutput"><span class="identifier">number</span></code> arguments. This
       means that an expression such as:
     </p>
 <pre class="programlisting"><span class="identifier">y</span> <span class="special">=</span> <span class="identifier">abs</span><span class="special">(</span><span class="identifier">x</span><span class="special">);</span>
@@ -200,7 +233,7 @@
       tend to be slower to compile than their simpler cousins, they're also harder
       to debug (should you actually want to step through our code!), and rely on
       compiler optimizations being turned on to give really good performance. Also,
-      since the return type from expressions involving <code class="computeroutput"><span class="identifier">mp_number</span></code>s
+      since the return type from expressions involving <code class="computeroutput"><span class="identifier">number</span></code>s
       is an "unmentionable implementation detail", you have to be careful
       to cast the result of an expression to the actual number type when passing
       an expression to a template function. For example, given:
@@ -282,7 +315,7 @@
 <tr>
 <td>
               <p>
-                mp_number
+                number
               </p>
             </td>
 <td>
@@ -356,8 +389,8 @@
         </li>
 </ul></div>
 <p>
-      Finally, note that <code class="computeroutput"><span class="identifier">mp_number</span></code>
-      takes a second template argument, which, when set to <code class="computeroutput"><span class="keyword">false</span></code>
+      Finally, note that <code class="computeroutput"><span class="identifier">number</span></code> takes
+      a second template argument, which, when set to <code class="computeroutput"><span class="keyword">false</span></code>
       disables all the expression template machinery. The result is much faster to
       compile, but slower at runtime.
     </p>
@@ -366,6 +399,9 @@
       between these three libraries, again, all are using <a href="http://www.mpfr.org" target="_top">MPFR</a>
       to carry out the underlying arithmetic, and all are operating at the same precision
       (50 decimal digits):
+    </p>
+<p>
+      TODO: Update, compare to rvalue refs but no ET's as well.
     </p>
 <div class="table">
 <a name="boost_multiprecision.intro.evaluation_of_boost_math_s_bessel_function_test_data"></a><p class="title"><b>Table&#160;1.2.&#160;Evaluation of Boost.Math's Bessel function test data</b></p>
@@ -396,7 +432,7 @@
 <tr>
 <td>
               <p>
-                mp_number
+                number
               </p>
             </td>
 <td>
@@ -476,7 +512,7 @@
 <tr>
 <td>
               <p>
-                mp_number
+                number
               </p>
             </td>
 <td>

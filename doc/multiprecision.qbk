@@ -117,6 +117,27 @@ However, conversions are allowed:
    d = a * b;  // OK, can convert from an expression template too.
    d = mp::int512_t(a) * c; // OK, all the types in the expression are the same now.
 
+[h4 Move Semantics]
+
+On compilers that support rvalue-references, class `number` is move-enabled if the underlying backend is.
+
+In addition the non-expression template operator overloads (see below) are move aware and have overloads 
+that look something like:
+
+   template <class B>
+   number<B, false> operator + (number&& a, const number& b)
+   {
+       return std::move(a += b);
+   }
+
+These operator overloads ensure that many expressions can be evaluated without actually generating any temporaries.
+However, there are still many simple expressions such as:
+
+   a = b * c;
+
+Which don't noticably benefit from move support.  Therefore, optimal performance comes from having both
+move-support, and expression templates enabled.
+
 [h4 Expression Templates]
 
 TODO: compare to rvalue refs.
@@ -151,7 +172,7 @@ lets suppose we're evaluating a polynomial via Horners method, something like th
     //....
     y = (((((a[6] * x + a[5]) * x + a[4]) * x + a[3]) * x + a[2]) * x + a[1]) * x + a[0];
 
-If type `T` is an `number`, then this expression is evaluated ['without creating a single temporary value].  In contrast,
+If type `T` is a `number`, then this expression is evaluated ['without creating a single temporary value].  In contrast,
 if we were using the [mpfr_class] C++ wrapper for [mpfr] - then this expression would result in no less than 11
 temporaries (this is true even though [mpfr_class] does use expression templates to reduce the number of temporaries somewhat).  Had
 we used an even simpler wrapper around [mpfr] like [mpreal] things would have been even worse and no less that 24 temporaries
@@ -866,6 +887,20 @@ In particular:
    cpp_dec_float_50 df(0.5); // OK construction from double
    cpp_int          i(450);  // OK constructs from signed int
 
+* A `number` can be converted to any built in type, via the `convert_to` member function:
+
+   mpz_int z(2);
+   int i = z.template convert_to<int>(); // sets i to 2
+
+Additional conversions may be supported by particular backends.
+
+* A `number` can be converted to any built in type, via an explicit conversion operator: 
+this functionality is only available on compilers supporting C++11's explicit conversion syntax.
+
+   mpz_int z(2);
+   int i = z;  // Error, implicit conversion not allowed.
+   int j = static_cast<int>(z);  // OK explicit conversion.
+
 * Any number type can be constructed (or assigned) from a `const char*` or a `std::string`:
 
    // pi to 50 places from a string:
@@ -920,13 +955,6 @@ In particular:
    mpf_float i(m);        // copies the value of the native type.
 
 More information on what additional types a backend supports conversions from are given in the tutorial for each backend.
-
-* An `number` can be converted to any built in type, via the `convert_to` member function:
-
-   mpz_int z(2);
-   int i = z.template convert_to<int>(); // sets i to 2
-
-Additional conversions may be supported by particular backends.
 
 [endsect]
 
@@ -1036,6 +1064,8 @@ The following example searches for a prime `p` for which `(p-1)/2` is also proba
       // Generic conversion mechanism
       template <class T>
       T convert_to()const;
+      template <class T>
+      explicit operator T ()const;
       // precision control:
       static unsigned default_precision();
       static void default_precision(unsigned digits10);
@@ -1233,7 +1263,7 @@ For the left and right shift operations, the argument must be a builtin
 integer type with a positive value (negative values result in a `std::runtime_error` being thrown).
 
 Note that all the types involved in the expression must evaluate to the same type - which is to say 
-we cannot mix an `number<B1>` with an `number<B2>` where B1 and B2 are different types.
+we cannot mix a `number<B1>` with a `number<B2>` where B1 and B2 are different types.
 
       operator ``['convertible-to-bool-type]``()const;
 
@@ -1264,6 +1294,9 @@ if /scientific/ is true.
 
       template <class T>
       T convert_to()const;
+
+      template <class T>
+      explicit operator T ()const;
 
 Provides a generic conversion mechanism to convert `*this` to type `T`.  Type `T` may be any arithmetic type.
 Optionally other types may also be supported by specific `Backend` types.
@@ -1320,7 +1353,7 @@ These operators all take their usual arithmetic meanings.
 
 The arguments to these functions must contain at least one of the following:
 
-* An `number`.
+* A `number`.
 * An expression template type derived from `number`.
 
 In addition, one of the two arguments may be a builtin arithmetic type.
@@ -1332,7 +1365,7 @@ The return type of these operators is either:
 * Type `bool` if the operator is a comparison operator.
 
 Note that all the types involved in the expression must evaluate to the same type - which is to say 
-we cannot mix an `number<B1>` with an `number<B2>` where B1 and B2 are different types.
+we cannot mix a `number<B1>` with a `number<B2>` where B1 and B2 are different types.
 
 Finally note that the second argument to the left and right shift operations must be a builtin integer type, 
 and that the argument must be positive (negative arguments result in a `std::runtime_error` being thrown).

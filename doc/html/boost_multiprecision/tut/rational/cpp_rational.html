@@ -24,7 +24,7 @@
 
 <span class="keyword">typedef</span> <span class="identifier">rational_adapter</span><span class="special">&lt;</span><span class="identifier">cpp_int_backend</span><span class="special">&lt;&gt;</span> <span class="special">&gt;</span>    <span class="identifier">cpp_rational_backend</span><span class="special">;</span>
 
-<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">cpp_rational_backend</span><span class="special">&gt;</span>         <span class="identifier">cpp_rational</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_rational_backend</span><span class="special">&gt;</span>         <span class="identifier">cpp_rational</span><span class="special">;</span>
 
 <span class="special">}}</span> <span class="comment">// namespaces</span>
 </pre>
@@ -63,6 +63,11 @@
 <li class="listitem">
               Division by zero results in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">rumtime_error</span></code>
               being thrown.
+            </li>
+<li class="listitem">
+              Conversion from a string results in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
+              being thrown if the string can not be interpreted as a valid rational
+              number.
             </li>
 </ul></div>
 <h6>

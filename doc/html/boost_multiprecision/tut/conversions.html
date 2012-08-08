@@ -19,7 +19,7 @@
       Interconverting Between Number Types</a>
 </h3></div></div></div>
 <p>
-        All of the number types that are based on <code class="computeroutput"><span class="identifier">mp_number</span></code>
+        All of the number types that are based on <code class="computeroutput"><span class="identifier">number</span></code>
         have certain conversion rules in common. In particular:
       </p>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
@@ -28,6 +28,27 @@
           </li></ul></div>
 <pre class="programlisting"><span class="identifier">cpp_dec_float_50</span> <span class="identifier">df</span><span class="special">(</span><span class="number">0.5</span><span class="special">);</span> <span class="comment">// OK construction from double</span>
 <span class="identifier">cpp_int</span>          <span class="identifier">i</span><span class="special">(</span><span class="number">450</span><span class="special">);</span>  <span class="comment">// OK constructs from signed int</span>
+</pre>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+            A <code class="computeroutput"><span class="identifier">number</span></code> can be converted
+            to any built in type, via the <code class="computeroutput"><span class="identifier">convert_to</span></code>
+            member function:
+          </li></ul></div>
+<pre class="programlisting"><span class="identifier">mpz_int</span> <span class="identifier">z</span><span class="special">(</span><span class="number">2</span><span class="special">);</span>
+<span class="keyword">int</span> <span class="identifier">i</span> <span class="special">=</span> <span class="identifier">z</span><span class="special">.</span><span class="keyword">template</span> <span class="identifier">convert_to</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;();</span> <span class="comment">// sets i to 2</span>
+</pre>
+<p>
+        Additional conversions may be supported by particular backends.
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+            A <code class="computeroutput"><span class="identifier">number</span></code> can be converted
+            to any built in type, via an explicit conversion operator: this functionality
+            is only available on compilers supporting C++11's explicit conversion
+            syntax.
+          </li></ul></div>
+<pre class="programlisting"><span class="identifier">mpz_int</span> <span class="identifier">z</span><span class="special">(</span><span class="number">2</span><span class="special">);</span>
+<span class="keyword">int</span> <span class="identifier">i</span> <span class="special">=</span> <span class="identifier">z</span><span class="special">;</span>  <span class="comment">// Error, implicit conversion not allowed.</span>
+<span class="keyword">int</span> <span class="identifier">j</span> <span class="special">=</span> <span class="keyword">static_cast</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;(</span><span class="identifier">z</span><span class="special">);</span>  <span class="comment">// OK explicit conversion.</span>
 </pre>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
             Any number type can be constructed (or assigned) from a <code class="computeroutput"><span class="keyword">const</span> <span class="keyword">char</span><span class="special">*</span></code> or a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span></code>:
@@ -92,17 +113,6 @@
 <p>
         More information on what additional types a backend supports conversions
         from are given in the tutorial for each backend.
-      </p>
-<div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
-            An <code class="computeroutput"><span class="identifier">mp_number</span></code> can be converted
-            to any built in type, via the <code class="computeroutput"><span class="identifier">convert_to</span></code>
-            member function:
-          </li></ul></div>
-<pre class="programlisting"><span class="identifier">mpz_int</span> <span class="identifier">z</span><span class="special">(</span><span class="number">2</span><span class="special">);</span>
-<span class="keyword">int</span> <span class="identifier">i</span> <span class="special">=</span> <span class="identifier">z</span><span class="special">.</span><span class="keyword">template</span> <span class="identifier">convert_to</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;();</span> <span class="comment">// sets i to 2</span>
-</pre>
-<p>
-        Additional conversions may be supported by particular backends.
       </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>

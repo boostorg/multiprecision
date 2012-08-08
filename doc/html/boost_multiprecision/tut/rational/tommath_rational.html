@@ -23,7 +23,7 @@
 <pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">multiprecision</span><span class="special">{</span>
 
 <span class="keyword">typedef</span> <span class="identifier">rational_adpater</span><span class="special">&lt;</span><span class="identifier">tommath_int</span><span class="special">&gt;</span>        <span class="identifier">tommath_rational</span><span class="special">;</span>
-<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">tommath_rational</span> <span class="special">&gt;</span>         <span class="identifier">tom_rational</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">tommath_rational</span> <span class="special">&gt;</span>         <span class="identifier">tom_rational</span><span class="special">;</span>
 
 <span class="special">}}</span> <span class="comment">// namespaces</span>
 </pre>
@@ -57,9 +57,13 @@
               have the value zero (this the inherited Boost.Rational behavior).
             </li>
 <li class="listitem">
-              Division by zero results in a <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">bad_rational</span></code>
-              exception being thrown (see the rational number library's docs for
-              more information).
+              Division by zero results in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
+              being thrown.
+            </li>
+<li class="listitem">
+              Conversion from a string results in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
+              being thrown if the string can not be interpreted as a valid rational
+              number.
             </li>
 <li class="listitem">
               No changes are made to <a href="http://libtom.org/?page=features&amp;newsitems=5&amp;whatfile=ltm" target="_top">libtommath</a>'s

@@ -24,7 +24,7 @@
 
 <span class="keyword">class</span> <span class="identifier">gmp_int</span><span class="special">;</span>
 
-<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">gmp_int</span> <span class="special">&gt;</span>         <span class="identifier">mpz_int</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">gmp_int</span> <span class="special">&gt;</span>         <span class="identifier">mpz_int</span><span class="special">;</span>
 
 <span class="special">}}</span> <span class="comment">// namespaces</span>
 </pre>
@@ -47,8 +47,8 @@
               <code class="computeroutput"><span class="identifier">mpq_t</span></code>.
             </li>
 <li class="listitem">
-              Instances of <code class="computeroutput"><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;</span></code> that are wrappers around those
-              types: <code class="computeroutput"><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">gmp_float</span><span class="special">&lt;</span><span class="identifier">N</span><span class="special">&gt;</span> <span class="special">&gt;</span></code>, <code class="computeroutput"><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">gmp_rational</span><span class="special">&gt;</span></code>.
+              Instances of <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;</span></code> that are wrappers around those
+              types: <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">gmp_float</span><span class="special">&lt;</span><span class="identifier">N</span><span class="special">&gt;</span> <span class="special">&gt;</span></code>, <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">gmp_rational</span><span class="special">&gt;</span></code>.
             </li>
 </ul></div>
 <p>
@@ -76,8 +76,12 @@
               will be thrown.
             </li>
 <li class="listitem">
-              Division by zero is handled by the <a href="http://gmplib.org" target="_top">GMP</a>
-              library - it will trigger a division by zero signal.
+              Conversion from a string results in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
+              being thrown if the string can not be interpreted as a valid integer.
+            </li>
+<li class="listitem">
+              Division by zero results in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
+              being thrown.
             </li>
 <li class="listitem">
               Although this type is a wrapper around <a href="http://gmplib.org" target="_top">GMP</a>
@@ -87,8 +91,8 @@
             </li>
 <li class="listitem">
               This backend supports rvalue-references and is move-aware, making instantiations
-              of <code class="computeroutput"><span class="identifier">mp_number</span></code> on this
-              backend move aware.
+              of <code class="computeroutput"><span class="identifier">number</span></code> on this backend
+              move aware.
             </li>
 </ul></div>
 <h6>

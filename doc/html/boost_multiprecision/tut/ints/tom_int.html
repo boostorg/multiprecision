@@ -24,7 +24,7 @@
 
 <span class="keyword">class</span> <span class="identifier">tommath_int</span><span class="special">;</span>
 
-<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">tommath_int</span> <span class="special">&gt;</span>         <span class="identifier">tom_int</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">tommath_int</span> <span class="special">&gt;</span>         <span class="identifier">tom_int</span><span class="special">;</span>
 
 <span class="special">}}</span> <span class="comment">// namespaces</span>
 </pre>
@@ -61,8 +61,12 @@
               will be thrown.
             </li>
 <li class="listitem">
-              Division by zero will result in a hardware signal being raised by
-              <a href="http://libtom.org/?page=features&amp;newsitems=5&amp;whatfile=ltm" target="_top">libtommath</a>.
+              Conversion from a string results in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
+              being thrown if the string can not be interpreted as a valid integer.
+            </li>
+<li class="listitem">
+              Division by zero results in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
+              being thrown.
             </li>
 </ul></div>
 <h6>

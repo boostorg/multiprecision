@@ -25,17 +25,17 @@
 <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">unsigned</span> <span class="identifier">Digits10</span><span class="special">&gt;</span>
 <span class="keyword">class</span> <span class="identifier">gmp_float</span><span class="special">;</span>
 
-<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">gmp_float</span><span class="special">&lt;</span><span class="number">50</span><span class="special">&gt;</span> <span class="special">&gt;</span>    <span class="identifier">mpf_float_50</span><span class="special">;</span>
-<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">gmp_float</span><span class="special">&lt;</span><span class="number">100</span><span class="special">&gt;</span> <span class="special">&gt;</span>   <span class="identifier">mpf_float_100</span><span class="special">;</span>
-<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">gmp_float</span><span class="special">&lt;</span><span class="number">500</span><span class="special">&gt;</span> <span class="special">&gt;</span>   <span class="identifier">mpf_float_500</span><span class="special">;</span>
-<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">gmp_float</span><span class="special">&lt;</span><span class="number">1000</span><span class="special">&gt;</span> <span class="special">&gt;</span>  <span class="identifier">mpf_float_1000</span><span class="special">;</span>
-<span class="keyword">typedef</span> <span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">gmp_float</span><span class="special">&lt;</span><span class="number">0</span><span class="special">&gt;</span> <span class="special">&gt;</span>     <span class="identifier">mpf_float</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">gmp_float</span><span class="special">&lt;</span><span class="number">50</span><span class="special">&gt;</span> <span class="special">&gt;</span>    <span class="identifier">mpf_float_50</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">gmp_float</span><span class="special">&lt;</span><span class="number">100</span><span class="special">&gt;</span> <span class="special">&gt;</span>   <span class="identifier">mpf_float_100</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">gmp_float</span><span class="special">&lt;</span><span class="number">500</span><span class="special">&gt;</span> <span class="special">&gt;</span>   <span class="identifier">mpf_float_500</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">gmp_float</span><span class="special">&lt;</span><span class="number">1000</span><span class="special">&gt;</span> <span class="special">&gt;</span>  <span class="identifier">mpf_float_1000</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">gmp_float</span><span class="special">&lt;</span><span class="number">0</span><span class="special">&gt;</span> <span class="special">&gt;</span>     <span class="identifier">mpf_float</span><span class="special">;</span>
 
 <span class="special">}}</span> <span class="comment">// namespaces</span>
 </pre>
 <p>
           The <code class="computeroutput"><span class="identifier">gmp_float</span></code> back-end
-          is used in conjunction with <code class="computeroutput"><span class="identifier">mp_number</span></code>
+          is used in conjunction with <code class="computeroutput"><span class="identifier">number</span></code>
           : it acts as a thin wrapper around the <a href="http://gmplib.org" target="_top">GMP</a>
           <code class="computeroutput"><span class="identifier">mpf_t</span></code> to provide an real-number
           type that is a drop-in replacement for the native C++ floating-point types,
@@ -48,7 +48,7 @@
           to zero. The typedefs mpf_float_50, mpf_float_100, mpf_float_500, mpf_float_1000
           provide arithmetic types at 50, 100, 500 and 1000 decimal digits precision
           respectively. The typedef mpf_float provides a variable precision type
-          whose precision can be controlled via the <code class="computeroutput"><span class="identifier">mp_number</span></code>s
+          whose precision can be controlled via the <code class="computeroutput"><span class="identifier">number</span></code>s
           member functions.
         </p>
 <div class="note"><table border="0" summary="Note">
@@ -63,7 +63,7 @@
 </table></div>
 <p>
           As well as the usual conversions from arithmetic and string types, instances
-          of <code class="computeroutput"><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">mpf_float</span><span class="special">&lt;</span><span class="identifier">N</span><span class="special">&gt;</span> <span class="special">&gt;</span></code> are copy constructible and assignable
+          of <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">mpf_float</span><span class="special">&lt;</span><span class="identifier">N</span><span class="special">&gt;</span> <span class="special">&gt;</span></code> are copy constructible and assignable
           from:
         </p>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc">
@@ -72,10 +72,10 @@
               <code class="computeroutput"><span class="identifier">mpq_t</span></code>.
             </li>
 <li class="listitem">
-              The <code class="computeroutput"><span class="identifier">mp_number</span></code> wrappers
-              around those types: <code class="computeroutput"><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">mpf_float</span><span class="special">&lt;</span><span class="identifier">M</span><span class="special">&gt;</span> <span class="special">&gt;</span></code>,
-              <code class="computeroutput"><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">gmp_int</span><span class="special">&gt;</span></code>,
-              <code class="computeroutput"><span class="identifier">mp_number</span><span class="special">&lt;</span><span class="identifier">gmp_rational</span><span class="special">&gt;</span></code>.
+              The <code class="computeroutput"><span class="identifier">number</span></code> wrappers
+              around those types: <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">mpf_float</span><span class="special">&lt;</span><span class="identifier">M</span><span class="special">&gt;</span> <span class="special">&gt;</span></code>,
+              <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">gmp_int</span><span class="special">&gt;</span></code>,
+              <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">gmp_rational</span><span class="special">&gt;</span></code>.
             </li>
 </ul></div>
 <p>
@@ -98,6 +98,11 @@
               <a href="http://gmplib.org" target="_top">GMP</a> code.
             </li>
 <li class="listitem">
+              This backend supports rvalue-references and is move-aware, making instantiations
+              of <code class="computeroutput"><span class="identifier">number</span></code> on this backend
+              move aware.
+            </li>
+<li class="listitem">
               It is not possible to round-trip objects of this type to and from a
               string and get back exactly the same value. This appears to be a limitation
               of <a href="http://gmplib.org" target="_top">GMP</a>.
@@ -116,6 +121,15 @@
               This type can equally be used with <a href="http://mpir.org/" target="_top">MPIR</a>
               as the underlying implementation - indeed that is the recommended option
               on Win32.
+            </li>
+<li class="listitem">
+              Conversion from a string results in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
+              being thrown if the string can not be interpreted as a valid floating
+              point number.
+            </li>
+<li class="listitem">
+              Division by zero results in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
+              being thrown.
             </li>
 </ul></div>
 <h6>

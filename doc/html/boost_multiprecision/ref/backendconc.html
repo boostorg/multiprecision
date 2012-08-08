@@ -19,13 +19,17 @@
 </h3></div></div></div>
 <p>
         The requirements on the <code class="computeroutput"><span class="identifier">Backend</span></code>
-        template argument to <code class="computeroutput"><span class="identifier">mp_number</span></code>
+        template argument to <code class="computeroutput"><span class="identifier">number</span></code>
         are split up into compulsory requirements, and optional requirements that
         are either to improve performance or provide optional features.
       </p>
 <p>
+        TODO: Add optional construction support, add throws specification, clarify
+        what compulsory means.
+      </p>
+<p>
         In the following tables, type B is the <code class="computeroutput"><span class="identifier">Backend</span></code>
-        template arument to <code class="computeroutput"><span class="identifier">mp_number</span></code>,
+        template arument to <code class="computeroutput"><span class="identifier">number</span></code>,
         <code class="computeroutput"><span class="identifier">b</span></code> and <code class="computeroutput"><span class="identifier">b2</span></code>
         are a variables of type B, <code class="computeroutput"><span class="identifier">cb</span></code>
         and <code class="computeroutput"><span class="identifier">cb2</span></code> are constant variables
@@ -38,6 +42,9 @@
         is a variable of type pointer-to-arithmetic-type, <code class="computeroutput"><span class="identifier">exp</span></code>
         is a variable of type <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">exp_type</span></code>, <code class="computeroutput"><span class="identifier">pexp</span></code>
         is a variable of type <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">exp_type</span><span class="special">*</span></code>,
+        <code class="computeroutput"><span class="identifier">i</span></code> is a variable of type
+        <code class="computeroutput"><span class="keyword">int</span></code>, <code class="computeroutput"><span class="identifier">pi</span></code>
+        pointer to a variable of type <code class="computeroutput"><span class="keyword">int</span></code>,
         B2 is another type that meets these requirements, b2 is a variable of type
         B2.
       </p>
@@ -609,6 +616,50 @@
                 <p>
                   Stores a value in <code class="computeroutput"><span class="identifier">b</span></code>
                   that is cb * 2<sup>exp</sup>, only required when <code class="computeroutput"><span class="identifier">B</span></code>
+                  is a floating-point type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_frexp</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">pi</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Stores values in <code class="computeroutput"><span class="identifier">b</span></code>
+                  and <code class="computeroutput"><span class="special">*</span><span class="identifier">pi</span></code>
+                  such that the value of <code class="computeroutput"><span class="identifier">cb</span></code>
+                  is b * 2<sup>*pi</sup>, only required when <code class="computeroutput"><span class="identifier">B</span></code>
+                  is a floating-point type.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_ldexp</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
+                  <span class="identifier">cb</span><span class="special">,</span>
+                  <span class="identifier">i</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Stores a value in <code class="computeroutput"><span class="identifier">b</span></code>
+                  that is cb * 2<sup>i</sup>, only required when <code class="computeroutput"><span class="identifier">B</span></code>
                   is a floating-point type.
                 </p>
               </td>
