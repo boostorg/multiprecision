@@ -8,7 +8,7 @@
 
 #include <boost/multiprecision/mp_number.hpp>
 #include <boost/multiprecision/rational_adapter.hpp>
-#include <boost/multiprecision/integer_ops.hpp>
+#include <boost/multiprecision/detail/integer_ops.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>

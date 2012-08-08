@@ -611,6 +611,11 @@ inline void eval_convert_to(terminal<R>* result, const B& backend)
    result->value = boost::lexical_cast<R>(backend.str(0, std::ios_base::fmtflags(0)));
 }
 
+template <class B>
+inline void eval_convert_to(std::string* result, const B& backend)
+{
+   *result = backend.str(0, std::ios_base::fmtflags(0));
+}
 //
 // Functions:
 //

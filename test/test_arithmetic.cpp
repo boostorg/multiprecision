@@ -688,6 +688,12 @@ void test_negative_mixed(boost::mpl::true_ const&)
    BOOST_TEST(Real(n2).template convert_to<Num>() == n2);
    BOOST_TEST(Real(n3).template convert_to<Num>() == n3);
    BOOST_TEST(Real(n4).template convert_to<Num>() == n4);
+#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+   BOOST_TEST(static_cast<Num>(Real(n1)) == n1);
+   BOOST_TEST(static_cast<Num>(Real(n2)) == n2);
+   BOOST_TEST(static_cast<Num>(Real(n3)) == n3);
+   BOOST_TEST(static_cast<Num>(Real(n4)) == n4);
+#endif
 #if defined(TEST_MPFR) || defined(TEST_MPFR_50)
    Num tol = 10 * std::numeric_limits<Num>::epsilon();
 #else
@@ -789,6 +795,12 @@ void test_mixed()
    BOOST_TEST(Real(n2).template convert_to<Num>() == n2);
    BOOST_TEST(Real(n3).template convert_to<Num>() == n3);
    BOOST_TEST(Real(n4).template convert_to<Num>() == n4);
+#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+   BOOST_TEST(static_cast<Num>(Real(n1)) == n1);
+   BOOST_TEST(static_cast<Num>(Real(n2)) == n2);
+   BOOST_TEST(static_cast<Num>(Real(n3)) == n3);
+   BOOST_TEST(static_cast<Num>(Real(n4)) == n4);
+#endif
    BOOST_TEST(n1 == Real(n1));
    BOOST_TEST(n2 == Real(n2));
    BOOST_TEST(n3 == Real(n3));

@@ -534,6 +534,13 @@ public:
       eval_convert_to(&result, m_backend);
       return result;
    }
+#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+template <class T>
+explicit operator T()const
+{
+   return this->template convert_to<T>();
+}
+#endif
    //
    // Default precision:
    //

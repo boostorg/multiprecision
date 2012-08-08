@@ -558,6 +558,6 @@ public:
 
 }
 
-#include <boost/multiprecision/integer_ops.hpp>
+#include <boost/multiprecision/detail/integer_ops.hpp>
 
 #endif

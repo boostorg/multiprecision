@@ -10,7 +10,7 @@
 #include <iomanip>
 #include <boost/cstdint.hpp>
 #include <boost/multiprecision/mp_number.hpp>
-#include <boost/multiprecision/integer_ops.hpp>
+#include <boost/multiprecision/detail/integer_ops.hpp>
 #include <boost/array.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_floating_point.hpp>
