@@ -185,7 +185,7 @@ template <unsigned MinBits>
 BOOST_FORCEINLINE void eval_divide(cpp_int_backend<MinBits, true, void, true>& result, const cpp_int_backend<MinBits, true, void, true>& o)
 {
    if(!*o.limbs())
-      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    *result.limbs() /= *o.limbs();
    result.sign(result.sign() != o.sign());
 }
@@ -194,7 +194,7 @@ template <unsigned MinBits>
 BOOST_FORCEINLINE void eval_divide(cpp_int_backend<MinBits, false, void, true>& result, const cpp_int_backend<MinBits, false, void, true>& o)
 {
    if(!*o.limbs())
-      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    *result.limbs() /= *o.limbs();
 }
 
@@ -202,7 +202,7 @@ template <unsigned MinBits, bool Signed>
 BOOST_FORCEINLINE void eval_modulus(cpp_int_backend<MinBits, Signed, void, true>& result, const cpp_int_backend<MinBits, Signed, void, true>& o)
 {
    if(!*o.limbs())
-      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    *result.limbs() %= *o.limbs();
    result.sign(result.sign());
 }

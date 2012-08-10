@@ -154,7 +154,7 @@ inline void eval_divide(rational_adapter<IntBackend>& result, const rational_ada
    using default_ops::eval_is_zero;
    if(eval_is_zero(o))
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("Divide by zero."));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Divide by zero."));
    }
    result.data() /= o.data();
 }

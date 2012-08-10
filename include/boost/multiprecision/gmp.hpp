@@ -570,7 +570,7 @@ template <unsigned digits10>
 inline void eval_divide(gmp_float<digits10>& result, const gmp_float<digits10>& o)
 {
    if(eval_is_zero(o))
-      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpf_div(result.data(), result.data(), o.data());
 }
 template <unsigned digits10>
@@ -592,7 +592,7 @@ template <unsigned digits10>
 inline void eval_divide(gmp_float<digits10>& result, unsigned long i)
 {
    if(i == 0)
-      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpf_div_ui(result.data(), result.data(), i);
 }
 template <unsigned digits10>
@@ -622,7 +622,7 @@ template <unsigned digits10>
 inline void eval_divide(gmp_float<digits10>& result, long i)
 {
    if(i == 0)
-      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpf_div_ui(result.data(), result.data(), std::abs(i));
    if(i < 0)
       mpf_neg(result.data(), result.data());
@@ -741,21 +741,21 @@ template <unsigned digits10>
 inline void eval_divide(gmp_float<digits10>& a, const gmp_float<digits10>& x, const gmp_float<digits10>& y)
 {
    if(eval_is_zero(y))
-      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpf_div(a.data(), x.data(), y.data());
 }
 template <unsigned digits10>
 inline void eval_divide(gmp_float<digits10>& a, const gmp_float<digits10>& x, unsigned long y)
 {
    if(y == 0)
-      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpf_div_ui(a.data(), x.data(), y);
 }
 template <unsigned digits10>
 inline void eval_divide(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y)
 {
    if(y == 0)
-      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    if(y < 0)
    {
       mpf_div_ui(a.data(), x.data(), -y);
@@ -768,14 +768,14 @@ template <unsigned digits10>
 inline void eval_divide(gmp_float<digits10>& a, unsigned long x, const gmp_float<digits10>& y)
 {
    if(eval_is_zero(y))
-      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpf_ui_div(a.data(), x, y.data());
 }
 template <unsigned digits10>
 inline void eval_divide(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y)
 {
    if(eval_is_zero(y))
-      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    if(x < 0)
    {
       mpf_ui_div(a.data(), -x, y.data());
@@ -1278,7 +1278,7 @@ inline void eval_multiply(gmp_int& t, const gmp_int& o)
 inline void eval_divide(gmp_int& t, const gmp_int& o)
 {
    if(eval_is_zero(o))
-      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpz_tdiv_q(t.data(), t.data(), o.data());
 }
 inline void eval_modulus(gmp_int& t, const gmp_int& o)
@@ -1304,7 +1304,7 @@ inline void eval_modulus(gmp_int& t, unsigned long i)
 inline void eval_divide(gmp_int& t, unsigned long i)
 {
    if(i == 0)
-      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpz_tdiv_q_ui(t.data(), t.data(), i);
 }
 inline void eval_add(gmp_int& t, long i)
@@ -1334,7 +1334,7 @@ inline void eval_modulus(gmp_int& t, long i)
 inline void eval_divide(gmp_int& t, long i)
 {
    if(i == 0)
-      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpz_tdiv_q_ui(t.data(), t.data(), std::abs(i));
    if(i < 0)
       mpz_neg(t.data(), t.data());
@@ -1390,7 +1390,7 @@ inline void eval_multiply(gmp_int& t, const gmp_int& p, const gmp_int& o)
 inline void eval_divide(gmp_int& t, const gmp_int& p, const gmp_int& o)
 {
    if(eval_is_zero(o))
-      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpz_tdiv_q(t.data(), p.data(), o.data());
 }
 inline void eval_modulus(gmp_int& t, const gmp_int& p, const gmp_int& o)
@@ -1416,7 +1416,7 @@ inline void eval_modulus(gmp_int& t, const gmp_int& p, unsigned long i)
 inline void eval_divide(gmp_int& t, const gmp_int& p, unsigned long i)
 {
    if(i == 0)
-      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpz_tdiv_q_ui(t.data(), p.data(), i);
 }
 inline void eval_add(gmp_int& t, const gmp_int& p, long i)
@@ -1446,7 +1446,7 @@ inline void eval_modulus(gmp_int& t, const gmp_int& p, long i)
 inline void eval_divide(gmp_int& t, const gmp_int& p, long i)
 {
    if(i == 0)
-      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpz_tdiv_q_ui(t.data(), p.data(), std::abs(i));
    if(i < 0)
       mpz_neg(t.data(), t.data());
@@ -1914,7 +1914,7 @@ inline void eval_multiply(gmp_rational& t, const gmp_rational& o)
 inline void eval_divide(gmp_rational& t, const gmp_rational& o)
 {
    if(eval_is_zero(o))
-      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpq_div(t.data(), t.data(), o.data());
 }
 inline void eval_add(gmp_rational& t, const gmp_rational& p, const gmp_rational& o)
@@ -1932,7 +1932,7 @@ inline void eval_multiply(gmp_rational& t, const gmp_rational& p, const gmp_rati
 inline void eval_divide(gmp_rational& t, const gmp_rational& p, const gmp_rational& o)
 {
    if(eval_is_zero(o))
-      BOOST_THROW_EXCEPTION(std::runtime_error("Division by zero."));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpq_div(t.data(), p.data(), o.data());
 }
    

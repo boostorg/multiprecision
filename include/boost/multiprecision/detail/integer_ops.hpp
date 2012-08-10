@@ -38,6 +38,88 @@ inline Integer eval_integer_modulus(const Backend& x, Integer val)
    return maybe_abs(result);
 }
 
+template <class B>
+inline void eval_gcd(B& result, const B& a, const B& b)
+{
+   using default_ops::eval_lsb;
+   using default_ops::eval_is_zero;
+   using default_ops::eval_get_sign;
+
+   int shift;
+
+   B u(a), v(b);
+
+   int s = eval_get_sign(u);
+
+   /* GCD(0,x) := x */
+   if(s < 0)
+   {
+      u.negate();
+   }
+   else if(s == 0)
+   {
+      result = v;
+      return;
+   }
+   s = eval_get_sign(v);
+   if(s < 0)
+   {
+      v.negate();
+   }
+   else if(s == 0)
+   {
+      result = u;
+      return;
+   }
+
+   /* Let shift := lg K, where K is the greatest power of 2
+   dividing both u and v. */
+
+   unsigned us = eval_lsb(u);
+   unsigned vs = eval_lsb(v);
+   shift = (std::min)(us, vs);
+   eval_right_shift(u, us);
+   eval_right_shift(v, vs);
+
+   do 
+   {
+      /* Now u and v are both odd, so diff(u, v) is even.
+      Let u = min(u, v), v = diff(u, v)/2. */
+      if(u.compare(v) > 0)
+         u.swap(v);
+      eval_subtract(v, u);
+      // Termination condition tries not to do a full compare if possible:
+      if(eval_is_zero(v))
+         break;
+      vs = eval_lsb(v);
+      eval_right_shift(v, vs);
+   } 
+   while(true);
+
+   result = u;
+   eval_left_shift(result, shift);
+}
+
+template <class B>
+inline void eval_lcm(B& result, const B& a, const B& b)
+{
+   typedef typename typename mpl::front<typename B::unsigned_types>::type ui_type;
+   B t;
+   eval_gcd(t, a, b);
+
+   if(eval_is_zero(t))
+   {
+      result = static_cast<ui_type>(0);
+   }
+   else
+   {
+      eval_divide(result, a, t);
+      eval_multiply(result, b);
+   }
+   if(eval_get_sign(result) < 0)
+      result.negate();
+}
+
 }
 
 template <class Backend, bool ExpressionTemplates>

@@ -2149,7 +2149,7 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator, false>* 
 
    if(y == 0)
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("Integer Division by zero."));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Integer Division by zero."));
    }
    //
    // Find the most significant word of numerator.
@@ -2765,66 +2765,6 @@ inline unsigned eval_lsb(const cpp_int_backend<MinBits, Signed, Allocator, false
 }
 
 template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_gcd(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const cpp_int_backend<MinBits, Signed, Allocator, false>& b) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
-{
-   int shift;
-
-   cpp_int_backend<MinBits, Signed, Allocator, false> u(a), v(b);
-
-   int s = eval_get_sign(u);
-
-   /* GCD(0,x) := x */
-   if(s < 0)
-   {
-      u.negate();
-   }
-   else if(s == 0)
-   {
-      result = v;
-      return;
-   }
-   s = eval_get_sign(v);
-   if(s < 0)
-   {
-      v.negate();
-   }
-   else if(s == 0)
-   {
-      result = u;
-      return;
-   }
-
-   /* Let shift := lg K, where K is the greatest power of 2
-   dividing both u and v. */
-
-   unsigned us = eval_lsb(u);
-   unsigned vs = eval_lsb(v);
-   shift = (std::min)(us, vs);
-   eval_right_shift(u, us);
-   eval_right_shift(v, vs);
-
-   do 
-   {
-      /* Now u and v are both odd, so diff(u, v) is even.
-      Let u = min(u, v), v = diff(u, v)/2. */
-      if(u.compare(v) > 0)
-         u.swap(v);
-      eval_subtract(v, u);
-      // Termination condition tries not to do a full compare if possible:
-      if(!v.limbs()[0] && eval_is_zero(v))
-         break;
-      vs = eval_lsb(v);
-      eval_right_shift(v, vs);
-      BOOST_ASSERT((v.limbs()[0] & 1));
-      BOOST_ASSERT((u.limbs()[0] & 1));
-   } 
-   while(true);
-
-   result = u;
-   eval_left_shift(result, shift);
-}
-
-template <unsigned MinBits, bool Signed, class Allocator>
 inline bool eval_bit_test(const cpp_int_backend<MinBits, Signed, Allocator, false>& val, unsigned index) BOOST_NOEXCEPT
 {
    unsigned offset = index / cpp_int_backend<MinBits, Signed, Allocator, false>::limb_bits;
@@ -2882,25 +2822,6 @@ inline void eval_bit_flip(cpp_int_backend<MinBits, Signed, Allocator, false>& va
    }
    val.limbs()[offset] ^= mask;
    val.normalize();
-}
-
-template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_lcm(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const cpp_int_backend<MinBits, Signed, Allocator, false>& b) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
-{
-   cpp_int_backend<MinBits, Signed, Allocator, false> t;
-   eval_gcd(t, a, b);
-
-   if(eval_is_zero(t))
-   {
-      result = static_cast<limb_type>(0);
-   }
-   else
-   {
-      eval_divide(result, a, t);
-      eval_multiply(result, b);
-   }
-   if(eval_get_sign(result) < 0)
-      result.negate();
 }
 
 template <unsigned MinBits, bool Signed, class Allocator>

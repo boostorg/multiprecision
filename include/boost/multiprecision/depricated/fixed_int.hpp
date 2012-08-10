@@ -889,7 +889,7 @@ void divide_unsigned_helper(fixed_int<Bits, Signed>& result, const fixed_int<Bit
 
    if(y == 0)
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("Integer Division by zero."));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Integer Division by zero."));
    }
    //
    // Find the most significant word of numerator.

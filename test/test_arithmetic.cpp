@@ -245,7 +245,7 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    //
    if(!is_boost_rational(a))
    {
-      BOOST_CHECK_THROW(Real(a / 0), std::runtime_error);
+      BOOST_CHECK_THROW(Real(a / 0), std::overflow_error);
       BOOST_CHECK_THROW(Real("3.14"), std::runtime_error);
       b = "2/3";
       BOOST_CHECK_EQUAL(a, b);
@@ -557,7 +557,7 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    //
    BOOST_CHECK_THROW(Real("3.14"), std::runtime_error);
    BOOST_CHECK_THROW(Real("3L"), std::runtime_error);
-   BOOST_CHECK_THROW(Real(Real(20) / 0u), std::runtime_error);
+   BOOST_CHECK_THROW(Real(Real(20) / 0u), std::overflow_error);
 }
 
 template <class Real, class T>
@@ -636,7 +636,7 @@ void test_float_ops(const boost::mpl::int_<boost::multiprecision::number_kind_fl
       }
       else
       {
-         BOOST_CHECK_THROW(Real(Real(20) / 0u), std::runtime_error);
+         BOOST_CHECK_THROW(Real(Real(20) / 0u), std::overflow_error);
       }
    }
 }

@@ -136,6 +136,15 @@
       Which don't noticably benefit from move support. Therefore, optimal performance
       comes from having both move-support, and expression templates enabled.
     </p>
+<p>
+      Note that while "moved-from" objects are left in a sane state, they
+      have an unspecified value, and the only permitted operations on them are destruction
+      or the assignment of a new value. Any other operation should be considered
+      a programming error and many backends will trigger an assertion if any other
+      operation is attempted. This behavior allows for optimal performance on move-construction
+      (i.e. no allocation required, we just take ownership of the existing object's
+      internal state), while maintaining usability in the standard library containers.
+    </p>
 <h5>
 <a name="boost_multiprecision.intro.h1"></a>
       <span><a name="boost_multiprecision.intro.expression_templates"></a></span><a class="link" href="intro.html#boost_multiprecision.intro.expression_templates">Expression

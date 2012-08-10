@@ -378,11 +378,17 @@ inline void eval_multiply(tommath_int& t, const tommath_int& o)
 }
 inline void eval_divide(tommath_int& t, const tommath_int& o)
 {
+   using default_ops::eval_is_zero;
    tommath_int temp;
+   if(eval_is_zero(o))
+      BOOST_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
    detail::check_tommath_result(mp_div(&t.data(), const_cast< ::mp_int*>(&o.data()), &t.data(), &temp.data()));
 }
 inline void eval_modulus(tommath_int& t, const tommath_int& o)
 {
+   using default_ops::eval_is_zero;
+   if(eval_is_zero(o))
+      BOOST_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
    bool neg = eval_get_sign(t) < 0;
    bool neg2 = eval_get_sign(o) < 0;
    detail::check_tommath_result(mp_mod(&t.data(), const_cast< ::mp_int*>(&o.data()), &t.data()));
@@ -455,11 +461,17 @@ inline void eval_multiply(tommath_int& t, const tommath_int& p, const tommath_in
 }
 inline void eval_divide(tommath_int& t, const tommath_int& p, const tommath_int& o)
 {
+   using default_ops::eval_is_zero;
    tommath_int d;
+   if(eval_is_zero(o))
+      BOOST_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
    detail::check_tommath_result(mp_div(const_cast< ::mp_int*>(&p.data()), const_cast< ::mp_int*>(&o.data()), &t.data(), &d.data()));
 }
 inline void eval_modulus(tommath_int& t, const tommath_int& p, const tommath_int& o)
 {
+   using default_ops::eval_is_zero;
+   if(eval_is_zero(o))
+      BOOST_THROW_EXCEPTION(std::overflow_error("Integer division by zero"));
    bool neg = eval_get_sign(p) < 0;
    bool neg2 = eval_get_sign(o) < 0;
    detail::check_tommath_result(mp_mod(const_cast< ::mp_int*>(&p.data()), const_cast< ::mp_int*>(&o.data()), &t.data()));
