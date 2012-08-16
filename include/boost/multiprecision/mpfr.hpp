@@ -23,6 +23,13 @@ namespace backends{
 template <unsigned digits10>
 struct mpfr_float_backend;
 
+} // namespace backends
+
+template <unsigned digits10>
+struct number_category<backends::mpfr_float_backend<digits10> > : public mpl::int_<number_kind_floating_point>{};
+
+namespace backends{
+
 namespace detail{
 
 inline long get_default_precision() { return 50; }
@@ -387,22 +394,22 @@ struct mpfr_float_backend : public detail::mpfr_float_imp<digits10>
       *static_cast<detail::mpfr_float_imp<digits10>*>(this) = v;
       return *this;
    }
-   mpfr_float_backend& operator=(const mpfr_t& val)BOOST_NOEXCEPT
+   mpfr_float_backend& operator=(const mpfr_t val)BOOST_NOEXCEPT
    {
       mpfr_set(this->m_data, val, GMP_RNDN);
       return *this;
    }
-   mpfr_float_backend& operator=(const mpf_t& val)BOOST_NOEXCEPT
+   mpfr_float_backend& operator=(const mpf_t val)BOOST_NOEXCEPT
    {
       mpfr_set_f(this->m_data, val, GMP_RNDN);
       return *this;
    }
-   mpfr_float_backend& operator=(const mpz_t& val)BOOST_NOEXCEPT
+   mpfr_float_backend& operator=(const mpz_t val)BOOST_NOEXCEPT
    {
       mpfr_set_z(this->m_data, val, GMP_RNDN);
       return *this;
    }
-   mpfr_float_backend& operator=(const mpq_t& val)BOOST_NOEXCEPT
+   mpfr_float_backend& operator=(const mpq_t val)BOOST_NOEXCEPT
    {
       mpfr_set_q(this->m_data, val, GMP_RNDN);
       return *this;
@@ -508,22 +515,22 @@ struct mpfr_float_backend<0> : public detail::mpfr_float_imp<0>
       *static_cast<detail::mpfr_float_imp<0>*>(this) = v;
       return *this;
    }
-   mpfr_float_backend& operator=(const mpfr_t& val) BOOST_NOEXCEPT
+   mpfr_float_backend& operator=(const mpfr_t val) BOOST_NOEXCEPT
    {
       mpfr_set(this->m_data, val, GMP_RNDN);
       return *this;
    }
-   mpfr_float_backend& operator=(const mpf_t& val) BOOST_NOEXCEPT
+   mpfr_float_backend& operator=(const mpf_t val) BOOST_NOEXCEPT
    {
       mpfr_set_f(this->m_data, val, GMP_RNDN);
       return *this;
    }
-   mpfr_float_backend& operator=(const mpz_t& val) BOOST_NOEXCEPT
+   mpfr_float_backend& operator=(const mpz_t val) BOOST_NOEXCEPT
    {
       mpfr_set_z(this->m_data, val, GMP_RNDN);
       return *this;
    }
-   mpfr_float_backend& operator=(const mpq_t& val) BOOST_NOEXCEPT
+   mpfr_float_backend& operator=(const mpq_t val) BOOST_NOEXCEPT
    {
       mpfr_set_q(this->m_data, val, GMP_RNDN);
       return *this;

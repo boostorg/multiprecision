@@ -40,7 +40,7 @@ inline number<B, false> operator + (const number<B, false>& a, const number<B, f
    return BOOST_MP_MOVE(result);
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator + (const number<B, false>& a, const V& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -50,7 +50,7 @@ inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
    return BOOST_MP_MOVE(result);
 }
 template <class V, class B>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator + (const V& a, const number<B, false>& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -71,7 +71,7 @@ inline number<B, false> operator - (const number<B, false>& a, const number<B, f
    return BOOST_MP_MOVE(result);
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator - (const number<B, false>& a, const V& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -81,7 +81,7 @@ inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
    return BOOST_MP_MOVE(result);
 }
 template <class V, class B>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator - (const V& a, const number<B, false>& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -102,7 +102,7 @@ inline number<B, false> operator * (const number<B, false>& a, const number<B, f
    return BOOST_MP_MOVE(result);
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator * (const number<B, false>& a, const V& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -112,7 +112,7 @@ inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
    return BOOST_MP_MOVE(result);
 }
 template <class V, class B>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator * (const V& a, const number<B, false>& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -133,7 +133,7 @@ inline number<B, false> operator / (const number<B, false>& a, const number<B, f
    return BOOST_MP_MOVE(result);
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator / (const number<B, false>& a, const V& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -143,7 +143,7 @@ inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
    return BOOST_MP_MOVE(result);
 }
 template <class V, class B>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator / (const V& a, const number<B, false>& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -164,7 +164,7 @@ inline number<B, false> operator % (const number<B, false>& a, const number<B, f
    return BOOST_MP_MOVE(result);
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator % (const number<B, false>& a, const V& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -174,7 +174,7 @@ inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
    return BOOST_MP_MOVE(result);
 }
 template <class V, class B>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator % (const V& a, const number<B, false>& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -195,7 +195,7 @@ inline number<B, false> operator | (const number<B, false>& a, const number<B, f
    return BOOST_MP_MOVE(result);
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator | (const number<B, false>& a, const V& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -205,7 +205,7 @@ inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
    return BOOST_MP_MOVE(result);
 }
 template <class V, class B>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator | (const V& a, const number<B, false>& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -226,7 +226,7 @@ inline number<B, false> operator ^ (const number<B, false>& a, const number<B, f
    return BOOST_MP_MOVE(result);
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator ^ (const number<B, false>& a, const V& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -236,7 +236,7 @@ inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
    return BOOST_MP_MOVE(result);
 }
 template <class V, class B>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator ^ (const V& a, const number<B, false>& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -257,7 +257,7 @@ inline number<B, false> operator & (const number<B, false>& a, const number<B, f
    return BOOST_MP_MOVE(result);
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator & (const number<B, false>& a, const V& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -267,7 +267,7 @@ inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
    return BOOST_MP_MOVE(result);
 }
 template <class V, class B>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator & (const V& a, const number<B, false>& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -347,7 +347,7 @@ inline number<B, false> operator + (number<B, false>&& a, number<B, false>&& b)
    return static_cast<number<B, false>&&>(a);
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator + (number<B, false>&& a, const V& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -356,7 +356,7 @@ inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
    return static_cast<number<B, false>&&>(a);
 }
 template <class V, class B>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator + (const V& a, number<B, false>&& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -390,7 +390,7 @@ inline number<B, false> operator - (number<B, false>&& a, number<B, false>&& b)
    return static_cast<number<B, false>&&>(a);
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator - (number<B, false>&& a, const V& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -399,7 +399,7 @@ inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
    return static_cast<number<B, false>&&>(a);
 }
 template <class V, class B>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator - (const V& a, number<B, false>&& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -433,7 +433,7 @@ inline number<B, false> operator * (number<B, false>&& a, number<B, false>&& b)
    return static_cast<number<B, false>&&>(a);
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator * (number<B, false>&& a, const V& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -442,7 +442,7 @@ inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
    return static_cast<number<B, false>&&>(a);
 }
 template <class V, class B>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator * (const V& a, number<B, false>&& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -461,7 +461,7 @@ inline number<B, false> operator / (number<B, false>&& a, const number<B, false>
    return static_cast<number<B, false>&&>(a);
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator / (number<B, false>&& a, const V& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -480,7 +480,7 @@ inline number<B, false> operator % (number<B, false>&& a, const number<B, false>
    return static_cast<number<B, false>&&>(a);
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator % (number<B, false>&& a, const V& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -513,7 +513,7 @@ inline number<B, false> operator | (number<B, false>&& a, number<B, false>&& b)
    return static_cast<number<B, false>&&>(a);
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator | (number<B, false>&& a, const V& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -522,7 +522,7 @@ inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
    return static_cast<number<B, false>&&>(a);
 }
 template <class V, class B>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator | (const V& a, number<B, false>&& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -555,7 +555,7 @@ inline number<B, false> operator ^ (number<B, false>&& a, number<B, false>&& b)
    return static_cast<number<B, false>&&>(a);
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator ^ (number<B, false>&& a, const V& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -564,7 +564,7 @@ inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
    return static_cast<number<B, false>&&>(a);
 }
 template <class V, class B>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator ^ (const V& a, number<B, false>&& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -597,7 +597,7 @@ inline number<B, false> operator & (number<B, false>&& a, number<B, false>&& b)
    return static_cast<number<B, false>&&>(a);
 }
 template <class B, class V>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator & (number<B, false>&& a, const V& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;
@@ -606,7 +606,7 @@ inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
    return static_cast<number<B, false>&&>(a);
 }
 template <class V, class B>
-inline typename enable_if<is_arithmetic<V>, number<B, false> >::type
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator & (const V& a, number<B, false>&& b)
 {
    typedef typename detail::canonical<V, B>::type canonical_type;

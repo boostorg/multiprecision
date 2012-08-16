@@ -46,7 +46,7 @@
 #include <boost/math/special_functions/sqrt1pm1.hpp>
 #include <boost/math/special_functions/powm1.hpp>
 
-#define SC_(x) BOOST_STRINGIZE(x)
+#include "table_type.hpp"
 
 #include "libs/math/test/powm1_sqrtp1m1_test.hpp"
 

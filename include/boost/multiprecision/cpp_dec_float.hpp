@@ -27,6 +27,16 @@ namespace multiprecision{
 namespace backends{
 
 template <unsigned Digits10>
+class cpp_dec_float;
+
+} // namespace
+
+template <unsigned Digits10>
+struct number_category<backends::cpp_dec_float<Digits10> > : public mpl::int_<number_kind_floating_point>{};
+
+namespace backends{
+
+template <unsigned Digits10>
 class cpp_dec_float
 {
 private:

@@ -91,18 +91,18 @@ int main()
       dec_float_500 tol("1e-500");
 #ifdef TEST_GMP
       mpf = df;
-      mpf2 = df.str();
+      mpf2 = static_cast<mpf_type>(df.str());
       BOOST_CHECK_EQUAL(mpf, mpf2);
       df = mpf;
-      df2 = mpf.str();
+      df2 = static_cast<dec_float_500>(mpf.str());
       BOOST_CHECK(fabs((df - df2) / df) < tol);
 #endif
 #ifdef TEST_MPFR
       mpfr = df;
-      mpfr2 = df.str();
+      mpfr2 = static_cast<mpfr_type>(df.str());
       BOOST_CHECK_EQUAL(mpfr, mpfr2);
       df = mpfr;
-      df2 = mpfr.str();
+      df2 = static_cast<dec_float_500>(mpfr.str());
       BOOST_CHECK(fabs((df - df2) / df) < tol);
 #endif
       //
@@ -124,12 +124,12 @@ int main()
       //
 #ifdef TEST_GMP
       mpq = c;
-      mpq_rational mpq2 = c.str();
+      mpq_rational mpq2 = static_cast<mpq_rational>(c.str());
       BOOST_CHECK_EQUAL(mpq, mpq2);
 #endif
 #ifdef TEST_TOMMATH
       tr = c;
-      tom_rational tr2 = c.str();
+      tom_rational tr2 = static_cast<tom_rational>(c.str());
       BOOST_CHECK_EQUAL(tr, tr2);
 #endif
       //

@@ -9,9 +9,10 @@
 #  define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#if !defined(TEST_MPQ) && !defined(TEST_TOMMATH)
+#if !defined(TEST_MPQ) && !defined(TEST_TOMMATH) && !defined(TEST_CPP_INT)
 #  define TEST_MPQ
 #  define TEST_TOMMATH
+#  define TEST_CPP_INT
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -27,6 +28,9 @@
 #endif
 #if defined(TEST_TOMMATH)
 #include <boost/multiprecision/tommath.hpp>
+#endif
+#ifdef TEST_CPP_INT
+#include <boost/multiprecision/cpp_int.hpp>
 #endif
 
 #include <boost/algorithm/string/case_conv.hpp>
@@ -71,9 +75,9 @@ void do_round_trip(const T& val, std::ios_base::fmtflags f, const boost::mpl::tr
 #endif
    ss.flags(f);
    ss << val;
-   T new_val = ss.str();
+   T new_val = static_cast<T>(ss.str());
    BOOST_CHECK_EQUAL(new_val, val);
-   new_val = val.str(0, f);
+   new_val = static_cast<T>(val.str(0, f));
    BOOST_CHECK_EQUAL(new_val, val);
 }
 
@@ -132,6 +136,10 @@ int main()
 #ifdef TEST_TOMMATH
    test_round_trip<boost::rational<boost::multiprecision::tom_int> >();
    test_round_trip<boost::multiprecision::tom_rational >();
+#endif
+#ifdef TEST_CPP_INT
+   test_round_trip<boost::rational<boost::multiprecision::cpp_int> >();
+   test_round_trip<boost::multiprecision::cpp_rational >();
 #endif
    return boost::report_errors();
 }

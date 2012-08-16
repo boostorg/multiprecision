@@ -1943,7 +1943,7 @@ void divide_unsigned_helper(cpp_int_backend<MinBits, Signed, Allocator, false>* 
    //
    if(r_order <= y_order)
    {
-      if((r_order < y_order) || (r.compare(y) < 0))
+      if((r_order < y_order) || (r.compare_unsigned(y) < 0))
       {
          return;
       }

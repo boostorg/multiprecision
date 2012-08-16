@@ -172,18 +172,18 @@ void test()
       BOOST_CHECK_EQUAL(val.str(), "-inf");
       BOOST_CHECK_EQUAL(val.str(0, std::ios_base::showpos), "-inf");
 
-      val = "inf";
+      val = static_cast<T>("inf");
       BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
-      val = "+inf";
+      val = static_cast<T>("+inf");
       BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
-      val = "-inf";
+      val = static_cast<T>("-inf");
       BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
    }
    if(std::numeric_limits<mp_t>::has_quiet_NaN)
    {
       T val = std::numeric_limits<T>::quiet_NaN();
       BOOST_CHECK_EQUAL(val.str(), "nan");
-      val = "nan";
+      val = static_cast<T>("nan");
       BOOST_CHECK(boost::math::isnan(val));
    }
 }
@@ -246,9 +246,9 @@ void do_round_trip(const T& val, std::ios_base::fmtflags f)
 #endif
    ss.flags(f);
    ss << val;
-   T new_val = ss.str();
+   T new_val = static_cast<T>(ss.str());
    BOOST_CHECK_EQUAL(new_val, val);
-   new_val = val.str(0, f);
+   new_val = static_cast<T>(val.str(0, f));
    BOOST_CHECK_EQUAL(new_val, val);
 }
 

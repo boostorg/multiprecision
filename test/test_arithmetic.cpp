@@ -64,16 +64,17 @@
 #if defined(TEST_CPP_INT) || defined(TEST_CPP_INT_BR)
 #include <boost/multiprecision/cpp_int.hpp>
 #endif
+
+template <class T>
+struct is_boost_rational : public boost::mpl::false_{};
+
 #if defined(TEST_TOMMATH_BOOST_RATIONAL) || defined(TEST_MPZ_BOOST_RATIONAL)
 #include <boost/rational.hpp>
 
 #define NO_MIXED_OPS
 
 template <class T>
-bool is_boost_rational(const boost::rational<T>&)
-{
-   return true;
-}
+struct is_boost_rational<boost::rational<T> > : public boost::mpl::true_{};
 
 namespace boost{ namespace multiprecision{
 
@@ -138,7 +139,11 @@ struct is_twos_complement_integer<boost::multiprecision::tom_int> : public boost
 #define BOOST_TEST_EQUAL(a, b) BOOST_TEST((a) == (b))
 
 template <class Real, class Val>
-void test_comparisons(Val a, Val b)
+void test_comparisons(Val, Val, const boost::mpl::false_)
+{}
+
+template <class Real, class Val>
+void test_comparisons(Val a, Val b, const boost::mpl::true_)
 {
    Real r1(a);
    Real r2(b);
@@ -222,14 +227,8 @@ void test_complement(Real, Real, Real, const boost::mpl::false_&)
 template <class Real, class T>
 void test_integer_ops(const T&){}
 
-template <class T>
-bool is_boost_rational(const T&)
-{
-   return false;
-}
-
 template <class Real>
-void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_rational>&)
+void test_rational(const boost::mpl::true_&)
 {
    Real a(2);
    a /= 3;
@@ -240,16 +239,29 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    BOOST_TEST(a == b);
 
    //
-   // Boost.Rational has a slightly different error handling stategy,
-   // we only test our own:
+   // Check IO code:
    //
-   if(!is_boost_rational(a))
-   {
-      BOOST_CHECK_THROW(Real(a / 0), std::overflow_error);
-      BOOST_CHECK_THROW(Real("3.14"), std::runtime_error);
-      b = "2/3";
-      BOOST_CHECK_EQUAL(a, b);
-   }
+   std::stringstream ss;
+   ss << a;
+   ss >> b;
+   BOOST_CHECK_EQUAL(a, b);
+}
+
+template <class Real>
+void test_rational(const boost::mpl::false_&)
+{
+   Real a(2);
+   a /= 3;
+   BOOST_TEST(numerator(a) == 2);
+   BOOST_TEST(denominator(a) == 3);
+   Real b(4);
+   b /= 6;
+   BOOST_TEST(a == b);
+
+   BOOST_CHECK_THROW(Real(a / 0), std::overflow_error);
+   BOOST_CHECK_THROW(Real("3.14"), std::runtime_error);
+   b = Real("2/3");
+   BOOST_CHECK_EQUAL(a, b);
    //
    // Check IO code:
    //
@@ -257,6 +269,12 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    ss << a;
    ss >> b;
    BOOST_CHECK_EQUAL(a, b);
+}
+
+template <class Real>
+void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_rational>&)
+{
+   test_rational<Real>(is_boost_rational<Real>());
 }
 
 template <class Real>
@@ -661,6 +679,16 @@ void test_negative_mixed(boost::mpl::true_ const&)
    if(std::numeric_limits<Real>::is_specialized && !std::numeric_limits<Real>::is_signed)
       return;
    typedef typename lexical_cast_target_type<Num>::type target_type;
+   typedef typename boost::mpl::if_<
+         boost::is_convertible<Num, Real>, 
+         typename boost::mpl::if_c<boost::is_integral<Num>::value && (sizeof(Num) < sizeof(int)), int, Num>::type, 
+         Real
+      >::type cast_type;
+   typedef typename boost::mpl::if_<
+         boost::is_convertible<Num, Real>, 
+         Num, 
+         Real
+      >::type simple_cast_type;
    std::cout << "Testing mixed arithmetic with type: " << typeid(Real).name()  << " and " << typeid(Num).name() << std::endl;
    Num n1 = -static_cast<Num>(1uLL << (std::numeric_limits<Num>::digits - 1));
    Num n2 = -1;
@@ -668,22 +696,22 @@ void test_negative_mixed(boost::mpl::true_ const&)
    Num n4 = -20;
    Num n5 = -8;
 
-   test_comparisons<Real>(n1, n2);
-   test_comparisons<Real>(n1, n3);
-   test_comparisons<Real>(n3, n1);
-   test_comparisons<Real>(n2, n1);
-   test_comparisons<Real>(n1, n1);
-   test_comparisons<Real>(n3, n3);
+   test_comparisons<Real>(n1, n2, boost::is_convertible<Num, Real>());
+   test_comparisons<Real>(n1, n3, boost::is_convertible<Num, Real>());
+   test_comparisons<Real>(n3, n1, boost::is_convertible<Num, Real>());
+   test_comparisons<Real>(n2, n1, boost::is_convertible<Num, Real>());
+   test_comparisons<Real>(n1, n1, boost::is_convertible<Num, Real>());
+   test_comparisons<Real>(n3, n3, boost::is_convertible<Num, Real>());
 
    // Default construct:
-   BOOST_TEST(Real(n1) == n1);
-   BOOST_TEST(Real(n2) == n2);
-   BOOST_TEST(Real(n3) == n3);
-   BOOST_TEST(Real(n4) == n4);
-   BOOST_TEST(n1 == Real(n1));
-   BOOST_TEST(n2 == Real(n2));
-   BOOST_TEST(n3 == Real(n3));
-   BOOST_TEST(n4 == Real(n4));
+   BOOST_TEST(Real(n1) == static_cast<cast_type>(n1));
+   BOOST_TEST(Real(n2) == static_cast<cast_type>(n2));
+   BOOST_TEST(Real(n3) == static_cast<cast_type>(n3));
+   BOOST_TEST(Real(n4) == static_cast<cast_type>(n4));
+   BOOST_TEST(static_cast<cast_type>(n1) == Real(n1));
+   BOOST_TEST(static_cast<cast_type>(n2) == Real(n2));
+   BOOST_TEST(static_cast<cast_type>(n3) == Real(n3));
+   BOOST_TEST(static_cast<cast_type>(n4) == Real(n4));
    BOOST_TEST(Real(n1).template convert_to<Num>() == n1);
    BOOST_TEST(Real(n2).template convert_to<Num>() == n2);
    BOOST_TEST(Real(n3).template convert_to<Num>() == n3);
@@ -709,54 +737,54 @@ void test_negative_mixed(boost::mpl::true_ const&)
    BOOST_TEST_CLOSE(n4, boost::lexical_cast<target_type>(Real(n4).str(0, f)), 0);
    // Assignment:
    Real r(0);
-   BOOST_TEST(r != n1);
-   r = n1;
-   BOOST_TEST(r == n1);
-   r = n2;
-   BOOST_TEST(r == n2);
-   r = n3;
-   BOOST_TEST(r == n3);
-   r = n4;
-   BOOST_TEST(r == n4);
+   BOOST_TEST(r != static_cast<cast_type>(n1));
+   r = static_cast<simple_cast_type>(n1);
+   BOOST_TEST(r == static_cast<cast_type>(n1));
+   r = static_cast<simple_cast_type>(n2);
+   BOOST_TEST(r == static_cast<cast_type>(n2));
+   r = static_cast<simple_cast_type>(n3);
+   BOOST_TEST(r == static_cast<cast_type>(n3));
+   r = static_cast<simple_cast_type>(n4);
+   BOOST_TEST(r == static_cast<cast_type>(n4));
    // Addition:
-   r = n2;
-   BOOST_TEST(r + n4 == n2 + n4);
-   BOOST_TEST(Real(r + n4) == n2 + n4);
-   r += n4;
-   BOOST_TEST(r == n2 + n4);
+   r = static_cast<simple_cast_type>(n2);
+   BOOST_TEST(r + static_cast<simple_cast_type>(n4) == static_cast<cast_type>(n2 + n4));
+   BOOST_TEST(Real(r + static_cast<simple_cast_type>(n4)) == static_cast<cast_type>(n2 + n4));
+   r += static_cast<simple_cast_type>(n4);
+   BOOST_TEST(r == static_cast<cast_type>(n2 + n4));
    // subtraction:
-   r = n4;
-   BOOST_TEST(r - n5 == n4 - n5);
-   BOOST_TEST(Real(r - n5) == n4 - n5);
-   r -= n5;
-   BOOST_TEST(r == n4 - n5);
+   r = static_cast<simple_cast_type>(n4);
+   BOOST_TEST(r - static_cast<simple_cast_type>(n5) == static_cast<cast_type>(n4 - n5));
+   BOOST_TEST(Real(r - static_cast<simple_cast_type>(n5)) == static_cast<cast_type>(n4 - n5));
+   r -= static_cast<simple_cast_type>(n5);
+   BOOST_TEST(r == static_cast<cast_type>(n4 - n5));
    // Multiplication:
-   r = n2;
-   BOOST_TEST(r * n4 == n2 * n4);
-   BOOST_TEST(Real(r * n4) == n2 * n4);
-   r *= n4;
-   BOOST_TEST(r == n2 * n4);
+   r = static_cast<simple_cast_type>(n2);
+   BOOST_TEST(r * static_cast<simple_cast_type>(n4) == static_cast<cast_type>(n2 * n4));
+   BOOST_TEST(Real(r * static_cast<simple_cast_type>(n4)) == static_cast<cast_type>(n2 * n4));
+   r *= static_cast<simple_cast_type>(n4);
+   BOOST_TEST(r == static_cast<cast_type>(n2 * n4));
    // Division:
-   r = n1;
-   BOOST_TEST(r / n5 == n1 / n5);
-   BOOST_TEST(Real(r / n5) == n1 / n5);
-   r /= n5;
-   BOOST_TEST(r == n1 / n5);
+   r = static_cast<simple_cast_type>(n1);
+   BOOST_TEST(r / static_cast<simple_cast_type>(n5) == static_cast<cast_type>(n1 / n5));
+   BOOST_TEST(Real(r / static_cast<simple_cast_type>(n5)) == static_cast<cast_type>(n1 / n5));
+   r /= static_cast<simple_cast_type>(n5);
+   BOOST_TEST(r == static_cast<cast_type>(n1 / n5));
    //
    // Extra cases for full coverage:
    //
-   r = Real(n4) + n5;
-   BOOST_TEST(r == n4 + n5);
-   r = n4 + Real(n5);
-   BOOST_TEST(r == n4 + n5);
-   r = Real(n4) - n5;
-   BOOST_TEST(r == n4 - n5);
-   r = n4 - Real(n5);
-   BOOST_TEST(r == n4 - n5);
-   r = n4 * Real(n5);
-   BOOST_TEST(r == n4 * n5);
-   r = (4 * n4) / Real(4);
-   BOOST_TEST(r == n4);
+   r = Real(n4) + static_cast<simple_cast_type>(n5);
+   BOOST_TEST(r == static_cast<cast_type>(n4 + n5));
+   r = static_cast<simple_cast_type>(n4) + Real(n5);
+   BOOST_TEST(r == static_cast<cast_type>(n4 + n5));
+   r = Real(n4) - static_cast<simple_cast_type>(n5);
+   BOOST_TEST(r == static_cast<cast_type>(n4 - n5));
+   r = static_cast<simple_cast_type>(n4) - Real(n5);
+   BOOST_TEST(r == static_cast<cast_type>(n4 - n5));
+   r = static_cast<simple_cast_type>(n4) * Real(n5);
+   BOOST_TEST(r == static_cast<cast_type>(n4 * n5));
+   r = static_cast<cast_type>(4 * n4) / Real(4);
+   BOOST_TEST(r == static_cast<cast_type>(n4));
 }
 
 template <class Real, class Num>
@@ -768,6 +796,16 @@ template <class Real, class Num>
 void test_mixed()
 {
    typedef typename lexical_cast_target_type<Num>::type target_type;
+   typedef typename boost::mpl::if_<
+         boost::is_convertible<Num, Real>, 
+         typename boost::mpl::if_c<boost::is_integral<Num>::value && (sizeof(Num) < sizeof(int)), int, Num>::type, 
+         Real
+      >::type cast_type;
+   typedef typename boost::mpl::if_<
+         boost::is_convertible<Num, Real>, 
+         Num, 
+         Real
+      >::type simple_cast_type;
    
    if(std::numeric_limits<Real>::digits < std::numeric_limits<Num>::digits)
       return;
@@ -779,18 +817,18 @@ void test_mixed()
    Num n4 = 20;
    Num n5 = 8;
    
-   test_comparisons<Real>(n1, n2);
-   test_comparisons<Real>(n1, n3);
-   test_comparisons<Real>(n1, n1);
-   test_comparisons<Real>(n3, n1);
-   test_comparisons<Real>(n2, n1);
-   test_comparisons<Real>(n3, n3);
+   test_comparisons<Real>(n1, n2, boost::is_convertible<Num, Real>());
+   test_comparisons<Real>(n1, n3, boost::is_convertible<Num, Real>());
+   test_comparisons<Real>(n1, n1, boost::is_convertible<Num, Real>());
+   test_comparisons<Real>(n3, n1, boost::is_convertible<Num, Real>());
+   test_comparisons<Real>(n2, n1, boost::is_convertible<Num, Real>());
+   test_comparisons<Real>(n3, n3, boost::is_convertible<Num, Real>());
 
    // Default construct:
-   BOOST_TEST(Real(n1) == n1);
-   BOOST_TEST(Real(n2) == n2);
-   BOOST_TEST(Real(n3) == n3);
-   BOOST_TEST(Real(n4) == n4);
+   BOOST_TEST(Real(n1) == static_cast<cast_type>(n1));
+   BOOST_TEST(Real(n2) == static_cast<cast_type>(n2));
+   BOOST_TEST(Real(n3) == static_cast<cast_type>(n3));
+   BOOST_TEST(Real(n4) == static_cast<cast_type>(n4));
    BOOST_TEST(Real(n1).template convert_to<Num>() == n1);
    BOOST_TEST(Real(n2).template convert_to<Num>() == n2);
    BOOST_TEST(Real(n3).template convert_to<Num>() == n3);
@@ -801,10 +839,10 @@ void test_mixed()
    BOOST_TEST(static_cast<Num>(Real(n3)) == n3);
    BOOST_TEST(static_cast<Num>(Real(n4)) == n4);
 #endif
-   BOOST_TEST(n1 == Real(n1));
-   BOOST_TEST(n2 == Real(n2));
-   BOOST_TEST(n3 == Real(n3));
-   BOOST_TEST(n4 == Real(n4));
+   BOOST_TEST(static_cast<cast_type>(n1) == Real(n1));
+   BOOST_TEST(static_cast<cast_type>(n2) == Real(n2));
+   BOOST_TEST(static_cast<cast_type>(n3) == Real(n3));
+   BOOST_TEST(static_cast<cast_type>(n4) == Real(n4));
 #if defined(TEST_MPFR) || defined(TEST_MPFR_50)
    Num tol = 10 * std::numeric_limits<Num>::epsilon();
 #else
@@ -820,50 +858,50 @@ void test_mixed()
    BOOST_TEST_CLOSE(n4, boost::lexical_cast<target_type>(Real(n4).str(0, f)), 0);
    // Assignment:
    Real r(0);
-   BOOST_TEST(r != n1);
-   r = n1;
-   BOOST_TEST(r == n1);
-   r = n2;
-   BOOST_TEST(r == n2);
-   r = n3;
-   BOOST_TEST(r == n3);
-   r = n4;
-   BOOST_TEST(r == n4);
+   BOOST_TEST(r != static_cast<cast_type>(n1));
+   r = static_cast<simple_cast_type>(n1);
+   BOOST_TEST(r == static_cast<cast_type>(n1));
+   r = static_cast<simple_cast_type>(n2);
+   BOOST_TEST(r == static_cast<cast_type>(n2));
+   r = static_cast<simple_cast_type>(n3);
+   BOOST_TEST(r == static_cast<cast_type>(n3));
+   r = static_cast<simple_cast_type>(n4);
+   BOOST_TEST(r == static_cast<cast_type>(n4));
    // Addition:
-   r = n2;
-   BOOST_TEST(r + n4 == n2 + n4);
-   BOOST_TEST(Real(r + n4) == n2 + n4);
-   r += n4;
-   BOOST_TEST(r == n2 + n4);
+   r = static_cast<simple_cast_type>(n2);
+   BOOST_TEST(r + static_cast<simple_cast_type>(n4) == static_cast<cast_type>(n2 + n4));
+   BOOST_TEST(Real(r + static_cast<simple_cast_type>(n4)) == static_cast<cast_type>(n2 + n4));
+   r += static_cast<simple_cast_type>(n4);
+   BOOST_TEST(r == static_cast<cast_type>(n2 + n4));
    // subtraction:
-   r = n4;
-   BOOST_TEST(r - n5 == n4 - n5);
-   BOOST_TEST(Real(r - n5) == n4 - n5);
-   r -= n5;
-   BOOST_TEST(r == n4 - n5);
+   r = static_cast<simple_cast_type>(n4);
+   BOOST_TEST(r - static_cast<simple_cast_type>(n5) == static_cast<cast_type>(n4 - n5));
+   BOOST_TEST(Real(r - static_cast<simple_cast_type>(n5)) == static_cast<cast_type>(n4 - n5));
+   r -= static_cast<simple_cast_type>(n5);
+   BOOST_TEST(r == static_cast<cast_type>(n4 - n5));
    // Multiplication:
-   r = n2;
-   BOOST_TEST(r * n4 == n2 * n4);
-   BOOST_TEST(Real(r * n4) == n2 * n4);
-   r *= n4;
-   BOOST_TEST(r == n2 * n4);
+   r = static_cast<simple_cast_type>(n2);
+   BOOST_TEST(r * static_cast<simple_cast_type>(n4) == static_cast<cast_type>(n2 * n4));
+   BOOST_TEST(Real(r * static_cast<simple_cast_type>(n4)) == static_cast<cast_type>(n2 * n4));
+   r *= static_cast<simple_cast_type>(n4);
+   BOOST_TEST(r == static_cast<cast_type>(n2 * n4));
    // Division:
-   r = n1;
-   BOOST_TEST(r / n5 == n1 / n5);
-   BOOST_TEST(Real(r / n5) == n1 / n5);
-   r /= n5;
-   BOOST_TEST(r == n1 / n5);
+   r = static_cast<simple_cast_type>(n1);
+   BOOST_TEST(r / static_cast<simple_cast_type>(n5) == static_cast<cast_type>(n1 / n5));
+   BOOST_TEST(Real(r / static_cast<simple_cast_type>(n5)) == static_cast<cast_type>(n1 / n5));
+   r /= static_cast<simple_cast_type>(n5);
+   BOOST_TEST(r == static_cast<cast_type>(n1 / n5));
    //
    // special cases for full coverage:
    //
-   r = n5 + Real(n4);
-   BOOST_TEST(r == n4 + n5);
-   r = n4 - Real(n5);
-   BOOST_TEST(r == n4 - n5);
-   r = n4 * Real(n5);
-   BOOST_TEST(r == n4 * n5);
-   r = (4 * n4) / Real(4);
-   BOOST_TEST(r == n4);
+   r = static_cast<simple_cast_type>(n5) + Real(n4);
+   BOOST_TEST(r == static_cast<cast_type>(n4 + n5));
+   r = static_cast<simple_cast_type>(n4) - Real(n5);
+   BOOST_TEST(r == static_cast<cast_type>(n4 - n5));
+   r = static_cast<simple_cast_type>(n4) * Real(n5);
+   BOOST_TEST(r == static_cast<cast_type>(n4 * n5));
+   r = static_cast<cast_type>(4 * n4) / Real(4);
+   BOOST_TEST(r == static_cast<cast_type>(n4));
    test_negative_mixed<Real, Num>(boost::mpl::bool_<std::numeric_limits<Num>::is_signed>());
 }
 

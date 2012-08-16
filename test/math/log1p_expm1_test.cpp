@@ -46,7 +46,7 @@
 #include <boost/math/special_functions/log1p.hpp>
 #include <boost/math/special_functions/expm1.hpp>
 
-#define SC_(x) BOOST_STRINGIZE(x)
+#include "table_type.hpp"
 
 #include "libs/math/test/log1p_expm1_test.hpp"
 

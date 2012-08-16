@@ -172,13 +172,13 @@ void test()
    typedef typename T::backend_type backend_type;
    T num, expect;
    num.backend() = boost::multiprecision::default_ops::get_constant_pi<backend_type>();
-   expect = pi;
+   expect = static_cast<T>(pi);
    BOOST_CHECK_CLOSE_FRACTION(num, expect, std::numeric_limits<T>::epsilon() * (is_mpfr(num) ? 1200 : 2));
    num.backend() = boost::multiprecision::default_ops::get_constant_ln2<backend_type>();
-   expect = ln2;
+   expect = static_cast<T>(ln2);
    BOOST_CHECK_CLOSE_FRACTION(num, expect, std::numeric_limits<T>::epsilon() * (is_mpfr(num) ? 30 : 1));
    num.backend() = boost::multiprecision::default_ops::get_constant_e<backend_type>();
-   expect = e;
+   expect = static_cast<T>(e);
    BOOST_CHECK_CLOSE_FRACTION(num, expect, std::numeric_limits<T>::epsilon() * (is_mpfr(num) ? 2 : 1));
 }
 

@@ -698,6 +698,14 @@ run test_rational_io.cpp gmp
          release # Otherwise runtime is slow
         : test_rational_io_mpz ;
 
+run test_rational_io.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_CPP_INT
+         release # Otherwise runtime is slow
+        : test_rational_io_cpp_int ;
+
 run test_generic_conv.cpp
         : # command line
         : # input files
@@ -792,6 +800,10 @@ if $(enable-specfun)
    }
 }
 
+for local source in [ glob compile_fail/*.cpp ]
+{
+   compile-fail $(source) ;
+}
 
 if ! $(disable-concepts)
 {

@@ -29,7 +29,19 @@ namespace backends{
 
 template <unsigned digits10>
 struct gmp_float;
+struct gmp_int;
+struct gmp_rational;
 
+} // namespace backends
+
+template<>
+struct number_category<backends::gmp_int> : public mpl::int_<number_kind_integer>{};
+template<>
+struct number_category<backends::gmp_rational> : public mpl::int_<number_kind_rational>{};
+template <unsigned digits10>
+struct number_category<backends::gmp_float<digits10> > : public mpl::int_<number_kind_floating_point>{};
+
+namespace backends{
 //
 // Within this file, the only functions we mark as noexcept are those that manipulate
 // (but don't create) an mpf_t.  All other types may allocate at pretty much any time
@@ -394,21 +406,21 @@ struct gmp_float : public detail::gmp_float_imp<digits10>
    gmp_float& operator=(const gmp_float<D>& o);
    gmp_float& operator=(const gmp_int& o);
    gmp_float& operator=(const gmp_rational& o);
-   gmp_float& operator=(const mpf_t& val) BOOST_NOEXCEPT
+   gmp_float& operator=(const mpf_t val) BOOST_NOEXCEPT
    {
       if(this->m_data[0]._mp_d == 0)
          mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
       mpf_set(this->m_data, val);
       return *this;
    }
-   gmp_float& operator=(const mpz_t& val) BOOST_NOEXCEPT
+   gmp_float& operator=(const mpz_t val) BOOST_NOEXCEPT
    {
       if(this->m_data[0]._mp_d == 0)
          mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
       mpf_set_z(this->m_data, val);
       return *this;
    }
-   gmp_float& operator=(const mpq_t& val) BOOST_NOEXCEPT
+   gmp_float& operator=(const mpq_t val) BOOST_NOEXCEPT
    {
       if(this->m_data[0]._mp_d == 0)
          mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
@@ -485,21 +497,21 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
    }
    gmp_float& operator=(const gmp_int& o);
    gmp_float& operator=(const gmp_rational& o);
-   gmp_float& operator=(const mpf_t& val)
+   gmp_float& operator=(const mpf_t val)
    {
       if(this->m_data[0]._mp_d == 0)
          mpf_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
       mpf_set(this->m_data, val);
       return *this;
    }
-   gmp_float& operator=(const mpz_t& val)
+   gmp_float& operator=(const mpz_t val)
    {
       if(this->m_data[0]._mp_d == 0)
          mpf_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
       mpf_set_z(this->m_data, val);
       return *this;
    }
-   gmp_float& operator=(const mpq_t& val)
+   gmp_float& operator=(const mpq_t val)
    {
       if(this->m_data[0]._mp_d == 0)
          mpf_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
@@ -1130,21 +1142,21 @@ struct gmp_int
          mpz_set_ui(m_data, 0);
       return *this;
    }
-   gmp_int& operator=(const mpf_t& val)
+   gmp_int& operator=(const mpf_t val)
    {
       if(m_data[0]._mp_d == 0)
          mpz_init(this->m_data);
       mpz_set_f(this->m_data, val);
       return *this;
    }
-   gmp_int& operator=(const mpz_t& val)
+   gmp_int& operator=(const mpz_t val)
    {
       if(m_data[0]._mp_d == 0)
          mpz_init(this->m_data);
       mpz_set(this->m_data, val);
       return *this;
    }
-   gmp_int& operator=(const mpq_t& val)
+   gmp_int& operator=(const mpq_t val)
    {
       if(m_data[0]._mp_d == 0)
          mpz_init(this->m_data);
@@ -1789,14 +1801,14 @@ struct gmp_rational
       mpq_set_z(m_data, o.data());
       return *this;
    }
-   gmp_rational& operator=(const mpq_t& o)
+   gmp_rational& operator=(const mpq_t o)
    {
       if(m_data[0]._mp_den._mp_d == 0)
          mpq_init(m_data);
       mpq_set(m_data, o);
       return *this;
    }
-   gmp_rational& operator=(const mpz_t& o)
+   gmp_rational& operator=(const mpz_t o)
    {
       if(m_data[0]._mp_den._mp_d == 0)
          mpq_init(m_data);
@@ -2076,11 +2088,6 @@ struct component_type<number<gmp_rational> >
 {
    typedef number<gmp_int> type;
 };
-
-template<>
-struct number_category<gmp_int> : public mpl::int_<number_kind_integer>{};
-template<>
-struct number_category<gmp_rational> : public mpl::int_<number_kind_rational>{};
 
 typedef number<gmp_float<50> >    mpf_float_50;
 typedef number<gmp_float<100> >   mpf_float_100;

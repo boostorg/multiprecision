@@ -101,13 +101,13 @@ int main()
    rat = 2;
    BOOST_TEST(mpz_int(rat) == 2);
    iz = 3;
-   iz = f0;
+   iz = static_cast<mpz_int>(f0);
    BOOST_TEST(iz == 2);
    iz = 3;
-   iz = f50;
+   iz = static_cast<mpz_int>(f50);
    BOOST_TEST(iz == 2);
    iz = 3;
-   iz = rat;
+   iz = static_cast<mpz_int>(rat);
    BOOST_TEST(iz == 2);
 
    BOOST_TEST(mpq_rational(mpz) == 2);

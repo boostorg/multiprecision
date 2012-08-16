@@ -197,7 +197,12 @@ inline int eval_fpclassify(const mp_number_backend_float_architype& arg)
 
 typedef boost::multiprecision::number<mp_number_backend_float_architype> mp_number_float_architype;
 
-}}} // namespaces
+} // namespace
+
+template<>
+struct number_category<concepts::mp_number_backend_float_architype> : public mpl::int_<number_kind_floating_point>{};
+
+}} // namespaces
 
 namespace std{
 

@@ -72,10 +72,10 @@ void test()
       int si = d.convert_to<int>();
       unsigned ui = si;
 
-      test_type a1 = a.str();
-      test_type b1 = b.str();
-      test_type c1 = c.str();
-      test_type d1 = d.str();
+      test_type a1 = static_cast<test_type>(a.str());
+      test_type b1 = static_cast<test_type>(b.str());
+      test_type c1 = static_cast<test_type>(c.str());
+      test_type d1 = static_cast<test_type>(d.str());
 
       BOOST_CHECK_EQUAL(a.str(), a1.str());
       BOOST_CHECK_EQUAL(b.str(), b1.str());

@@ -53,10 +53,30 @@ struct rational_adapter
       m_value = o;
       return *this;
    }
-   template <class Arithmetic>
-   typename enable_if<is_arithmetic<Arithmetic>, rational_adapter&>::type operator = (Arithmetic i)
+   template <class Int>
+   typename enable_if<is_integral<Int>, rational_adapter&>::type operator = (Int i)
    {
       m_value = i;
+      return *this;
+   }
+   template <class Float>
+   typename enable_if<is_floating_point<Float>, rational_adapter&>::type operator = (Float i)
+   {
+      int e;
+      Float f = std::frexp(i, &e);
+      f = std::ldexp(f, std::numeric_limits<Float>::digits);
+      e -= std::numeric_limits<Float>::digits;
+      integer_type num(f);
+      integer_type denom(1u);
+      if(e > 0)
+      {
+         num <<= e;
+      }
+      else if(e < 0)
+      {
+         denom <<= -e;
+      }
+      m_value.assign(num, denom);
       return *this;
    }
    rational_adapter& operator = (const char* s)
@@ -74,7 +94,7 @@ struct rational_adapter
          s1.append(1, c);
          ++s;
       }
-      v1 = s1;
+      v1.assign(s1);
       s1.erase();
       if(c == '/')
       {
@@ -86,7 +106,7 @@ struct rational_adapter
             s1.append(1, c);
             ++s;
          }
-         v2 = s1;
+         v2.assign(s1);
       }
       else
          v2 = 1;

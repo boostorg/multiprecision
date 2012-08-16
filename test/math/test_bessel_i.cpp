@@ -41,7 +41,7 @@
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #endif
 
-#define SC_(x) BOOST_STRINGIZE(x)
+#define SC_(x) static_cast<typename table_type<T>::type>(BOOST_STRINGIZE(x))
 
 #include <boost/math/special_functions/bessel.hpp>
 #include "libs/math/test/test_bessel_i.hpp"
