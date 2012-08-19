@@ -369,20 +369,22 @@ struct gmp_float : public detail::gmp_float_imp<digits10>
    }
    gmp_float(const gmp_float& o) : detail::gmp_float_imp<digits10>(o) {}
    template <unsigned D>
-   gmp_float(const gmp_float<D>& o);
+   gmp_float(const gmp_float<D>& o, typename enable_if_c<D <= digits10>::type* = 0);
+   template <unsigned D>
+   explicit gmp_float(const gmp_float<D>& o, typename disable_if_c<D <= digits10>::type* = 0);
    gmp_float(const gmp_int& o);
    gmp_float(const gmp_rational& o);
-   gmp_float(mpf_t val)
+   gmp_float(const mpf_t val)
    {
       mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
       mpf_set(this->m_data, val);
    }
-   gmp_float(mpz_t val)
+   gmp_float(const mpz_t val)
    {
       mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
       mpf_set_z(this->m_data, val);
    }
-   gmp_float(mpq_t val)
+   gmp_float(const mpq_t val)
    {
       mpf_init2(this->m_data, ((digits10 + 1) * 1000L) / 301L);
       mpf_set_q(this->m_data, val);
@@ -442,17 +444,17 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
    {
       mpf_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
    }
-   gmp_float(mpf_t val)
+   gmp_float(const mpf_t val)
    {
       mpf_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
       mpf_set(this->m_data, val);
    }
-   gmp_float(mpz_t val)
+   gmp_float(const mpz_t val)
    {
       mpf_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
       mpf_set_z(this->m_data, val);
    }
-   gmp_float(mpq_t val)
+   gmp_float(const mpq_t val)
    {
       mpf_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
       mpf_set_q(this->m_data, val);
@@ -461,7 +463,7 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
    template <unsigned D>
    gmp_float(const gmp_float<D>& o)
    {
-      mpf_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
+      mpf_init2(this->m_data, mpf_get_prec(o.data()));
       mpf_set(this->m_data, o.data());
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
@@ -491,7 +493,13 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
    gmp_float& operator=(const gmp_float<D>& o)
    {
       if(this->m_data[0]._mp_d == 0)
-         mpf_init2(this->m_data, ((get_default_precision() + 1) * 1000L) / 301L);
+      {
+         mpf_init2(this->m_data, mpf_get_prec(o.data()));
+      }
+      else
+      {
+         mpf_set_prec(this->m_data, mpf_get_prec(o.data()));
+      }
       mpf_set(this->m_data, o.data());
       return *this;
    }
@@ -534,11 +542,11 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
    }
    unsigned precision()const BOOST_NOEXCEPT
    {
-      return mpf_get_prec(this->m_data) * 301L / 1000 - 1;
+      return (mpf_get_prec(this->m_data) * 301L) / 1000 - 1;
    }
    void precision(unsigned digits10) BOOST_NOEXCEPT
    {
-      mpf_set_prec(this->m_data, (digits10 + 1) * 1000L / 301);
+      mpf_set_prec(this->m_data, ((digits10 + 1) * 1000L) / 301);
    }
 };
 
@@ -977,27 +985,27 @@ struct gmp_int
       o.m_data[0]._mp_d = 0;
    }
 #endif
-   gmp_int(mpf_t val)
+   explicit gmp_int(const mpf_t val)
    {
       mpz_init(this->m_data);
       mpz_set_f(this->m_data, val);
    }
-   gmp_int(mpz_t val)
+   gmp_int(const mpz_t val)
    {
       mpz_init_set(this->m_data, val);
    }
-   gmp_int(mpq_t val)
+   explicit gmp_int(const mpq_t val)
    {
       mpz_init(this->m_data);
       mpz_set_q(this->m_data, val);
    }
    template <unsigned Digits10>
-   gmp_int(const gmp_float<Digits10>& o)
+   explicit gmp_int(const gmp_float<Digits10>& o)
    {
       mpz_init(this->m_data);
       mpz_set_f(this->m_data, o.data());
    }
-   gmp_int(const gmp_rational& o);
+   explicit gmp_int(const gmp_rational& o);
    gmp_int& operator = (const gmp_int& o)
    {
       if(o.m_data[0]._mp_d)
@@ -1659,12 +1667,12 @@ struct gmp_rational
       o.m_data[0]._mp_den._mp_d = 0;
    }
 #endif
-   gmp_rational(mpq_t o)
+   gmp_rational(const mpq_t o)
    {
       mpq_init(m_data);
       mpq_set(m_data, o);
    }
-   gmp_rational(mpz_t o)
+   gmp_rational(const mpz_t o)
    {
       mpq_init(m_data);
       mpq_set_z(m_data, o);
@@ -1998,7 +2006,14 @@ inline void assign_components(gmp_rational& result, gmp_int const& v1, gmp_int c
 //
 template <unsigned Digits10>
 template <unsigned D>
-inline gmp_float<Digits10>::gmp_float(const gmp_float<D>& o)
+inline gmp_float<Digits10>::gmp_float(const gmp_float<D>& o, typename enable_if_c<D <= Digits10>::type*)
+{
+   mpf_init2(this->m_data, (((Digits10 ? Digits10 : this->get_default_precision()) + 1) * 1000L) / 301L);
+   mpf_set(this->m_data, o.data());
+}
+template <unsigned Digits10>
+template <unsigned D>
+inline gmp_float<Digits10>::gmp_float(const gmp_float<D>& o, typename disable_if_c<D <= Digits10>::type*)
 {
    mpf_init2(this->m_data, (((Digits10 ? Digits10 : this->get_default_precision()) + 1) * 1000L) / 301L);
    mpf_set(this->m_data, o.data());
@@ -2088,6 +2103,33 @@ struct component_type<number<gmp_rational> >
 {
    typedef number<gmp_int> type;
 };
+
+#ifdef BOOST_NO_SFINAE_EXPR
+
+namespace detail{
+
+template<>
+struct is_explicitly_convertible<typename canonical<mpf_t, gmp_int>::type, gmp_int> : public mpl::true_ {};
+template<>
+struct is_explicitly_convertible<typename canonical<mpq_t, gmp_int>::type, gmp_int> : public mpl::true_ {};
+template<unsigned Digits10>
+struct is_explicitly_convertible<gmp_float<Digits10>, gmp_int> : public mpl::true_ {};
+template<>
+struct is_explicitly_convertible<gmp_rational, gmp_int> : public mpl::true_ {};
+template<unsigned D1, unsigned D2>
+struct is_explicitly_convertible<gmp_float<D1>, gmp_float<D2> > : public mpl::true_ {};
+
+}
+
+#endif
+
+template<>
+struct number_category<typename detail::canonical<mpz_t, gmp_int>::type> : public mpl::int_<number_kind_integer>{};
+template<>
+struct number_category<typename detail::canonical<mpq_t, gmp_rational>::type> : public mpl::int_<number_kind_rational>{};
+template<>
+struct number_category<typename detail::canonical<mpf_t, gmp_float<0> >::type> : public mpl::int_<number_kind_floating_point>{};
+
 
 typedef number<gmp_float<50> >    mpf_float_50;
 typedef number<gmp_float<100> >   mpf_float_100;

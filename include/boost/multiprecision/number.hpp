@@ -43,7 +43,7 @@ public:
    BOOST_FORCEINLINE BOOST_CONSTEXPR number() BOOST_NOEXCEPT_IF(noexcept(Backend())) {}
    BOOST_FORCEINLINE BOOST_CONSTEXPR number(const number& e) BOOST_NOEXCEPT_IF(noexcept(Backend(static_cast<const Backend&>(std::declval<Backend>())))) : m_backend(e.m_backend){}
    template <class V>
-   BOOST_FORCEINLINE number(V v, typename enable_if_c<
+   BOOST_FORCEINLINE number(const V& v, typename enable_if_c<
             (boost::is_arithmetic<V>::value || is_same<std::string, V>::value || is_convertible<V, const char*>::value) 
             && !is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value 
             && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value
@@ -52,28 +52,29 @@ public:
       m_backend = canonical_value(v);
    }
    template <class V>
-   BOOST_FORCEINLINE BOOST_CONSTEXPR number(V v, typename enable_if_c<
-            (boost::is_arithmetic<V>::value || is_same<std::string, V>::value || is_convertible<V, const char*>::value) 
-            && is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR number(const V& v, typename enable_if_c<
+            /*(boost::is_arithmetic<V>::value || is_same<std::string, V>::value || is_convertible<V, const char*>::value) 
+            &&*/ is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value 
             && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value
          >::type* = 0) 
       : m_backend(canonical_value(v)) {}
    BOOST_FORCEINLINE BOOST_CONSTEXPR number(const number& e, unsigned digits10)
       : m_backend(e.m_backend, digits10){}
    template <class V>
-   explicit BOOST_FORCEINLINE number(V v, typename enable_if_c<
+   explicit BOOST_FORCEINLINE number(const V& v, typename enable_if_c<
             (boost::is_arithmetic<V>::value || is_same<std::string, V>::value || is_convertible<V, const char*>::value) 
-            && !is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value 
+            && !detail::is_explicitly_convertible<typename detail::canonical<V, Backend>::type, Backend>::value 
             && detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value
          >::type* = 0)
    {
       m_backend = canonical_value(v);
    }
    template <class V>
-   explicit BOOST_FORCEINLINE BOOST_CONSTEXPR number(V v, typename enable_if_c<
-            (boost::is_arithmetic<V>::value || is_same<std::string, V>::value || is_convertible<V, const char*>::value) 
-            && is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value 
-            && detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value
+   explicit BOOST_FORCEINLINE BOOST_CONSTEXPR number(const V& v, typename enable_if_c<
+            /*(boost::is_arithmetic<V>::value || is_same<std::string, V>::value || is_convertible<V, const char*>::value) 
+            &&*/ detail::is_explicitly_convertible<typename detail::canonical<V, Backend>::type, Backend>::value 
+            && (detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value
+                || !is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value)
          >::type* = 0) 
       : m_backend(canonical_value(v)) {}
    /*
@@ -92,12 +93,16 @@ public:
    BOOST_FORCEINLINE BOOST_CONSTEXPR number(const number<Backend, ET>& val) BOOST_NOEXCEPT_IF(noexcept(Backend(static_cast<const Backend&>(std::declval<Backend>())))) : m_backend(val.m_backend) {}
 
    template <class Other, bool ET>
-   BOOST_FORCEINLINE number(const number<Other, ET>& val, typename enable_if_c<(boost::is_convertible<Other, Backend>::value && !detail::is_restricted_conversion<Other, Backend>::value)>::type* = 0) BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend>() = std::declval<Other>()))
-   {
-      m_backend = val.backend();
-   }
+   BOOST_FORCEINLINE number(const number<Other, ET>& val, 
+         typename enable_if_c<(boost::is_convertible<Other, Backend>::value && !detail::is_restricted_conversion<Other, Backend>::value)>::type* = 0) 
+      BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend>() = std::declval<Other>()))
+      : m_backend(val.backend()) {}
+
    template <class Other, bool ET>
-   number(const number<Other, ET>& val, typename enable_if_c<(!boost::is_convertible<Other, Backend>::value && !detail::is_restricted_conversion<Other, Backend>::value)>::type* = 0)
+   number(const number<Other, ET>& val, typename enable_if_c<
+         (!detail::is_explicitly_convertible<Other, Backend>::value 
+            && !detail::is_restricted_conversion<Other, Backend>::value)
+         >::type* = 0)
    {
       //
       // Attempt a generic interconvertion:
@@ -105,12 +110,17 @@ public:
       detail::generic_interconvert(backend(), val.backend(), number_category<Backend>(), number_category<Other>());
    }
    template <class Other, bool ET>
-   explicit BOOST_FORCEINLINE number(const number<Other, ET>& val, typename enable_if_c<(boost::is_convertible<Other, Backend>::value && detail::is_restricted_conversion<Other, Backend>::value)>::type* = 0) BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend>() = std::declval<Other>()))
-   {
-      m_backend = val.backend();
-   }
+   explicit BOOST_FORCEINLINE number(const number<Other, ET>& val, typename enable_if_c<
+         (detail::is_explicitly_convertible<Other, Backend>::value 
+            && (detail::is_restricted_conversion<Other, Backend>::value || !boost::is_convertible<Other, Backend>::value))
+         >::type* = 0) BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend>() = std::declval<Other>()))
+      : m_backend(val.backend()) {}
+
    template <class Other, bool ET>
-   explicit number(const number<Other, ET>& val, typename enable_if_c<(!boost::is_convertible<Other, Backend>::value && detail::is_restricted_conversion<Other, Backend>::value)>::type* = 0)
+   explicit number(const number<Other, ET>& val, typename enable_if_c<
+         (!detail::is_explicitly_convertible<Other, Backend>::value 
+            && detail::is_restricted_conversion<Other, Backend>::value)
+         >::type* = 0)
    {
       //
       // Attempt a generic interconvertion:
@@ -130,11 +140,12 @@ public:
       assign_components(m_backend, v1.backend(), v2.backend());
    }
 
+   /*
    template <class V>
    BOOST_FORCEINLINE BOOST_CONSTEXPR number(V v, typename enable_if<mpl::and_<is_convertible<V, Backend>, mpl::not_<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > > > >::type* = 0)
       BOOST_NOEXCEPT_IF(noexcept(Backend(static_cast<const V&>(std::declval<V>()))))
       : m_backend(v){}
-
+   */
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
    typename enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
@@ -201,7 +212,7 @@ public:
    */
 
    template <class Other>
-   typename disable_if<is_convertible<Other, Backend>, number<Backend, ExpressionTemplates>& >::type 
+   typename disable_if<detail::is_explicitly_convertible<Other, Backend>, number<Backend, ExpressionTemplates>& >::type 
       operator=(const number<Other>& v)
    {
       //

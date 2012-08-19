@@ -86,16 +86,17 @@ int main()
    BOOST_TEST(mpz_int(mpz) == 2);
    BOOST_TEST(mpz_int(mpq) == 2);
    iz = 3;
-   iz = mpf;
+   iz = mpz_int(mpf);  // explicit conversion only
    BOOST_TEST(iz == 2);
    iz = 3;
    iz = mpz;
    BOOST_TEST(iz == 2);
    iz = 4;
-   iz = mpq;
+   iz = mpz_int(mpq);  // explicit conversion only
    BOOST_TEST(iz == 2);
    f0 = 2;
    f50 = 2;
+
    BOOST_TEST(mpz_int(f0) == 2);
    BOOST_TEST(mpz_int(f50) == 2);
    rat = 2;
@@ -127,6 +128,24 @@ int main()
    BOOST_TEST(iz == 2);
    iz = denominator(rat);
    BOOST_TEST(iz == 1);
+
+   //
+   // Conversions involving precision only,
+   // note that mpf_t precisions are only approximate:
+   //
+   mpf_float::default_precision(30);
+   f50 = 2;
+   mpf_float_100   f100(3);
+   mpf_float       f0a(4);
+   mpf_float       f0b(f100);
+   BOOST_TEST(f0a.precision() >= 30);
+   BOOST_TEST(f0b.precision() >= 100);
+   f0a = f100;
+   BOOST_TEST(f0a == 3);
+   BOOST_TEST(f0a.precision() >= 100);
+
+   f100 = f50;
+   BOOST_TEST(f100 == 2);
 
    return boost::report_errors();
 }

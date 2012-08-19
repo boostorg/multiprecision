@@ -802,7 +802,10 @@ if $(enable-specfun)
 
 for local source in [ glob compile_fail/*.cpp ]
 {
-   compile-fail $(source) ;
+   compile-fail $(source) 
+   :
+   [ check-target-builds ../config//has_gmp : <define>TEST_GMP : ]  
+   ;
 }
 
 if ! $(disable-concepts)
