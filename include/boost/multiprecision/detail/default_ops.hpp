@@ -725,10 +725,16 @@ inline void eval_round(T& result, const T& a)
    }
 }
 
+template <class B>
+void eval_lcm(B& result, const B& a, const B& b);
+template <class B>
+void eval_gcd(B& result, const B& a, const B& b);
+
 template <class T, class Arithmetic>
 inline typename enable_if<is_integral<Arithmetic> >::type eval_gcd(T& result, const T& a, const Arithmetic& b)
 {
    typedef typename boost::multiprecision::detail::canonical<Arithmetic, T>::type si_type;
+   using default_ops::eval_gcd;
    T t;
    t = static_cast<si_type>(b);
    eval_gcd(result, a, t);
@@ -742,6 +748,7 @@ template <class T, class Arithmetic>
 inline typename enable_if<is_integral<Arithmetic> >::type eval_lcm(T& result, const T& a, const Arithmetic& b)
 {
    typedef typename boost::multiprecision::detail::canonical<Arithmetic, T>::type si_type;
+   using default_ops::eval_lcm;
    T t;
    t = static_cast<si_type>(b);
    eval_lcm(result, a, t);
@@ -812,11 +819,6 @@ inline void eval_bit_unset(T& val, unsigned index)
    if(!eval_is_zero(t))
       eval_bitwise_xor(val, mask);
 }
-
-template <class B>
-void eval_lcm(B& result, const B& a, const B& b);
-template <class B>
-void eval_gcd(B& result, const B& a, const B& b);
 
 //
 // These have to implemented by the backend, declared here so that our macro generated code compiles OK.

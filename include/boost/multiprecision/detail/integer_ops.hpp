@@ -309,7 +309,7 @@ void eval_powm(Backend& result, const Backend& a, const Backend& p, Integer c)
 }
 
 template <class Backend, class Integer>
-void eval_powm(Backend& result, const Backend& a, Integer b, const Backend& c)
+typename enable_if<is_unsigned<Integer> >::type eval_powm(Backend& result, const Backend& a, Integer b, const Backend& c)
 {
    typedef typename canonical<unsigned char, Backend>::type ui_type;
    typedef typename canonical<Integer, Backend>::type i_type;
@@ -319,11 +319,6 @@ void eval_powm(Backend& result, const Backend& a, Integer b, const Backend& c)
    using default_ops::eval_multiply;
    using default_ops::eval_modulus;
    using default_ops::eval_right_shift;
-
-   if(b < 0)
-   {
-      BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
-   }
 
    Backend x, y(a);
    x = ui_type(1u);
@@ -341,8 +336,18 @@ void eval_powm(Backend& result, const Backend& a, Integer b, const Backend& c)
    eval_modulus(result, x, c);
 }
 
+template <class Backend, class Integer>
+typename enable_if<is_signed<Integer> >::type eval_powm(Backend& result, const Backend& a, Integer b, const Backend& c)
+{
+   if(b < 0)
+   {
+      BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
+   }
+   eval_powm(result, a, static_cast<typename make_unsigned<Integer>::type>(b), c);
+}
+
 template <class Backend, class Integer1, class Integer2>
-void eval_powm(Backend& result, const Backend& a, Integer1 b, Integer2 c)
+typename enable_if<is_unsigned<Integer1> >::type eval_powm(Backend& result, const Backend& a, Integer1 b, Integer2 c)
 {
    typedef typename canonical<unsigned char, Backend>::type ui_type;
    typedef typename canonical<Integer1, Backend>::type i1_type;
@@ -353,11 +358,6 @@ void eval_powm(Backend& result, const Backend& a, Integer1 b, Integer2 c)
    using default_ops::eval_multiply;
    using default_ops::eval_modulus;
    using default_ops::eval_right_shift;
-
-   if(b < 0)
-   {
-      BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
-   }
 
    Backend x, y(a);
    x = ui_type(1u);
@@ -373,6 +373,16 @@ void eval_powm(Backend& result, const Backend& a, Integer1 b, Integer2 c)
       b >>= 1;
    }
    eval_modulus(result, x, static_cast<i2_type>(c));
+}
+
+template <class Backend, class Integer1, class Integer2>
+typename enable_if<is_signed<Integer1> >::type eval_powm(Backend& result, const Backend& a, Integer1 b, Integer2 c)
+{
+   if(b < 0)
+   {
+      BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
+   }
+   eval_powm(result, a, static_cast<typename make_unsigned<Integer1>::type>(b), c);
 }
 
 struct powm_func

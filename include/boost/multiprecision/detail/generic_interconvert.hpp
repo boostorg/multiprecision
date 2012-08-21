@@ -66,6 +66,7 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
    using default_ops::eval_right_shift;
    using default_ops::eval_left_shift;
    using default_ops::eval_bitwise_or;
+   using default_ops::eval_is_zero;
    // smallest unsigned type handled natively by "From" is likely to be it's limb_type:
    typedef typename canonical<unsigned char, From>::type   limb_type;
    // get the corresponding type that we can assign to "To":
