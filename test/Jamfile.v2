@@ -738,6 +738,7 @@ run ../example/tommath_snips.cpp $(TOMMATH)
         : # requirements
          [ check-target-builds ../config//has_tommath : : <build>no ] ;
 run ../example/floating_point_examples.cpp : : : <toolset>gcc:<cxxflags>-std=c++0x ;
+run test_cpp_int_conv.cpp ;
 
 compile include_test/mpfr_include_test.cpp
               : # requirements
@@ -804,7 +805,8 @@ for local source in [ glob compile_fail/*.cpp ]
 {
    compile-fail $(source) 
    :
-   [ check-target-builds ../config//has_gmp : <define>TEST_GMP : ]  
+      [ check-target-builds ../config//has_gmp : <define>TEST_GMP : ]  
+      [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR : ]  
    ;
 }
 

@@ -281,9 +281,9 @@ void test()
          // also don't test for modulo types, as these may give a diffferent result from arbitrary
          // precision types:
          BOOST_CHECK_EQUAL(mpz_int(pow(d, ui % 19)).str(), test_type(pow(d1, ui % 19)).str());
-         BOOST_CHECK_EQUAL(mpz_int(powm(a, b, c)).str(), test_type(powm(a, b, c)).str());
-         BOOST_CHECK_EQUAL(mpz_int(powm(a, b, ui)).str(), test_type(powm(a, b, ui)).str());
-         BOOST_CHECK_EQUAL(mpz_int(powm(a, ui, c)).str(), test_type(powm(a, ui, c)).str());
+         BOOST_CHECK_EQUAL(mpz_int(powm(a, b, c)).str(), test_type(powm(a1, b1, c1)).str());
+         BOOST_CHECK_EQUAL(mpz_int(powm(a, b, ui)).str(), test_type(powm(a1, b1, ui)).str());
+         BOOST_CHECK_EQUAL(mpz_int(powm(a, ui, c)).str(), test_type(powm(a1, ui, c1)).str());
       }
 
       if(last_error_count != (unsigned)boost::detail::test_errors())

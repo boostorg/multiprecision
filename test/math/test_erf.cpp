@@ -75,7 +75,7 @@ void expected_results()
       ".*",                          // platform
       ".*",                          // test type(s)
       "Inverse Erf.*",               // test data group
-      "boost::math::erfc?_inv", 35, 20);  // test function
+      "boost::math::erfc?_inv", 60, 20);  // test function
    //
    // Finish off by printing out the compiler/stdlib/platform names,
    // we do this to make it easier to mark up expected error rates.

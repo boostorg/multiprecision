@@ -683,6 +683,10 @@ public:
 #ifndef BOOST_NO_RVALUE_REFERENCES
    BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(cpp_int_backend&& o) BOOST_NOEXCEPT : base_type(static_cast<base_type&&>(o)) {}
 #endif
+   //
+   // These are templates, so that only args that are *exactly* the types specified are allowed, and conversions
+   // are not considered.  Without this, conversions may be ambiguous.
+   //
    template <class LT>
    BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(LT i, typename enable_if<is_same<LT, limb_type> >::type const* = 0)BOOST_NOEXCEPT 
       : base_type(i) {}
@@ -697,6 +701,67 @@ public:
    BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(SLT i, typename enable_if<is_same<SLT, signed_double_limb_type> >::type const* = 0)BOOST_NOEXCEPT 
       : base_type(i) {}
 #endif
+   
+   template <unsigned MinBits2, bool Signed2, class Allocator2>
+   cpp_int_backend(const cpp_int_backend<MinBits2, Signed2, Allocator2, true>& other) 
+      : base_type()
+   {
+       *this = static_cast<
+            typename detail::canonical<
+               typename cpp_int_backend<MinBits2, Signed2, Allocator2, true>::local_limb_type, 
+               cpp_int_backend<MinBits, Signed, Allocator, false> 
+            >::type
+         >(*other.limbs());
+      this->sign(other.sign());
+   }
+   template <unsigned MinBits2, bool Signed2, class Allocator2>
+   cpp_int_backend& operator=(const cpp_int_backend<MinBits2, Signed2, Allocator2, true>& other) 
+   {
+       *this = static_cast<
+            typename detail::canonical<
+               typename cpp_int_backend<MinBits2, Signed2, Allocator2, true>::local_limb_type, 
+               cpp_int_backend<MinBits, Signed, Allocator, false> 
+            >::type
+         >(*other.limbs());
+      this->sign(other.sign());
+      return *this;
+   }
+
+   template <unsigned MinBits2, bool Signed2, class Allocator2>
+   cpp_int_backend(const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& other, 
+      typename enable_if_c<
+         (Signed || !Signed2) 
+         && (!is_void<Allocator>::value || (is_void<Allocator2>::value && (MinBits >= MinBits2)))
+      >::type* = 0) 
+      : base_type()
+   {
+      this->resize(other.size());
+      std::copy(other.limbs(), other.limbs() + (std::min)(other.size(), this->size()), this->limbs());
+      this->sign(other.sign());
+   }
+
+   template <unsigned MinBits2, bool Signed2, class Allocator2>
+   explicit cpp_int_backend(const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& other, 
+      typename disable_if_c<
+         (Signed || !Signed2) 
+         && (!is_void<Allocator>::value || (is_void<Allocator2>::value && (MinBits >= MinBits2)))
+      >::type* = 0) 
+      : base_type()
+   {
+      this->resize(other.size());
+      std::copy(other.limbs(), other.limbs() + (std::min)(other.size(), this->size()), this->limbs());
+      this->sign(other.sign());
+   }
+
+   template <unsigned MinBits2, bool Signed2, class Allocator2>
+   cpp_int_backend& operator=(const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& other)
+   {
+      this->resize(other.size());
+      std::copy(other.limbs(), other.limbs() + (std::min)(other.size(), this->size()), this->limbs());
+      this->sign(other.sign());
+      return *this;
+   }
+
    BOOST_FORCEINLINE cpp_int_backend& operator = (const cpp_int_backend& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
    {
       this->assign(o);
@@ -2879,6 +2944,17 @@ typedef number<cpp_int_backend<1024, true, void>, false>   int1024_t;
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)
+#endif
+
+#ifdef BOOST_NO_SFINAE_EXPR
+
+namespace detail{
+
+template<unsigned MinBits, bool Signed, class Allocator, bool trivial, unsigned MinBits2, bool Signed2, class Allocator2, bool trivial2>
+struct is_explicitly_convertible<cpp_int_backend<MinBits, Signed, Allocator, trivial>, cpp_int_backend<MinBits2, Signed2, Allocator2, trivial2> > : public mpl::true_ {};
+
+}
+
 #endif
 
 }} // namespaces

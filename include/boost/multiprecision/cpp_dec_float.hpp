@@ -192,15 +192,25 @@ public:
       prec_elem(f.prec_elem) { }
 
    template <unsigned D>
-   cpp_dec_float(const cpp_dec_float<D>& f) BOOST_NOEXCEPT : 
+   cpp_dec_float(const cpp_dec_float<D>& f, typename enable_if_c<D <= Digits10>::type* = 0) BOOST_NOEXCEPT : 
+      data(),
+      exp      (f.exp),
+      neg      (f.neg),
+      fpclass  (static_cast<fpclass_type>(static_cast<int>(f.fpclass))),
+      prec_elem(cpp_dec_float_elem_number)
+   {
+      std::copy(f.data.begin(), f.data.begin() + f.prec_elem, data.begin());
+   }
+   template <unsigned D>
+   explicit cpp_dec_float(const cpp_dec_float<D>& f, typename disable_if_c<D <= Digits10>::type* = 0) BOOST_NOEXCEPT : 
+      data(),
       exp      (f.exp),
       neg      (f.neg),
       fpclass  (static_cast<fpclass_type>(static_cast<int>(f.fpclass))),
       prec_elem(cpp_dec_float_elem_number)
    {
       // TODO: this doesn't round!
-      std::copy(f.data.begin(), f.data.begin() + (std::min)(f.prec_elem, prec_elem), data.begin());
-      precision((std::min)(f.prec_elem, prec_elem));
+      std::copy(f.data.begin(), f.data.begin() + prec_elem, data.begin());
    }
 
    template <class F>
@@ -2854,6 +2864,18 @@ using boost::multiprecision::backends::cpp_dec_float;
 
 typedef number<cpp_dec_float<50> > cpp_dec_float_50;
 typedef number<cpp_dec_float<100> > cpp_dec_float_100;
+
+#ifdef BOOST_NO_SFINAE_EXPR
+
+namespace detail{
+
+template<unsigned D1, unsigned D2>
+struct is_explicitly_convertible<cpp_dec_float<D1>, cpp_dec_float<D2> > : public mpl::true_ {};
+
+}
+
+#endif
+
 
 }}
 

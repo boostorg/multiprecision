@@ -243,7 +243,7 @@ void test()
          max_err = err;
    }
    std::cout << "Max error was: " << max_err << std::endl;
-   BOOST_TEST(max_err < 500);
+   BOOST_TEST(max_err < 750);
 
    //
    // Test with some exact binary values as input - this tests our code

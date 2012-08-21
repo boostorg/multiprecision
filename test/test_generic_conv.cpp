@@ -43,16 +43,16 @@ int main()
       mpz_int z(c);
       cpp_int t(z);
       BOOST_CHECK_EQUAL(t, c);
-      z = -c;
-      t = -z;
+      z.assign(-c);
+      t.assign(-z);
       BOOST_CHECK_EQUAL(t, c);
 #endif
 #ifdef TEST_TOMMATH
       tom_int tom(c);
       cpp_int t2(tom);
       BOOST_CHECK_EQUAL(t2, c);
-      tom = -c;
-      t2 = -tom;
+      tom.assign(-c);
+      t2.assign(-tom);
       BOOST_CHECK_EQUAL(t2, c);
 #endif
       //
@@ -62,7 +62,7 @@ int main()
       dec_float_500 df(c);
       dec_float_500 df2(c.str());
       BOOST_CHECK_EQUAL(df, df2);
-      df = -c;
+      df.assign(-c);
       df2 = -df2;
       BOOST_CHECK_EQUAL(df, df2);
 #ifdef TEST_GMP
@@ -70,7 +70,7 @@ int main()
       mpf_type mpf(c);
       mpf_type mpf2(c.str());
       BOOST_CHECK_EQUAL(mpf, mpf2);
-      mpf = -c;
+      mpf.assign(-c);
       mpf2 = -mpf2;
       BOOST_CHECK_EQUAL(mpf, mpf2);
 #endif
@@ -79,29 +79,29 @@ int main()
       mpfr_type mpfr(c);
       mpfr_type mpfr2(c.str());
       BOOST_CHECK_EQUAL(mpfr, mpfr2);
-      mpfr = -c;
+      mpfr.assign(-c);
       mpfr2 = -mpfr2;
       BOOST_CHECK_EQUAL(mpfr, mpfr2);
 #endif
       //
       // Now float to float:
       //
-      df = c;
+      df.assign(c);
       df /= dec_float_500(gen());
       dec_float_500 tol("1e-500");
 #ifdef TEST_GMP
-      mpf = df;
+      mpf.assign(df);
       mpf2 = static_cast<mpf_type>(df.str());
       BOOST_CHECK_EQUAL(mpf, mpf2);
-      df = mpf;
+      df.assign(mpf);
       df2 = static_cast<dec_float_500>(mpf.str());
       BOOST_CHECK(fabs((df - df2) / df) < tol);
 #endif
 #ifdef TEST_MPFR
-      mpfr = df;
+      mpfr.assign(df);
       mpfr2 = static_cast<mpfr_type>(df.str());
       BOOST_CHECK_EQUAL(mpfr, mpfr2);
-      df = mpfr;
+      df.assign(mpfr);
       df2 = static_cast<dec_float_500>(mpfr.str());
       BOOST_CHECK(fabs((df - df2) / df) < tol);
 #endif
@@ -123,20 +123,20 @@ int main()
       // Integer to rational conversions:
       //
 #ifdef TEST_GMP
-      mpq = c;
+      mpq.assign(c);
       mpq_rational mpq2 = static_cast<mpq_rational>(c.str());
       BOOST_CHECK_EQUAL(mpq, mpq2);
 #endif
 #ifdef TEST_TOMMATH
-      tr = c;
+      tr.assign(c);
       tom_rational tr2 = static_cast<tom_rational>(c.str());
       BOOST_CHECK_EQUAL(tr, tr2);
 #endif
       //
       // Rational to float:
       //
-      df = cppr;
-      df2 = numerator(cppr);
+      df.assign(cppr);
+      df2.assign(numerator(cppr));
       df2 /= dec_float_500(denominator(cppr));
       BOOST_CHECK(fabs(df - df2) / df2 < tol);
    }

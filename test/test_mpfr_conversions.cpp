@@ -100,6 +100,24 @@ int main()
    BOOST_TEST(mpfr_float(gf) == 2);
    BOOST_TEST(mpfr_float_50(gf) == 2);
 
+   //
+   // Conversions involving precision only:
+   //
+   mpfr_float::default_precision(30);
+   f50 = 2;
+   mpfr_float_100   f100(3);
+   mpfr_float       f0a(4);
+   mpfr_float       f0b(f100);
+   BOOST_TEST(f0a.precision() == 30);
+   BOOST_TEST(f0b.precision() == 100);
+   f0a = f100;
+   BOOST_TEST(f0a == 3);
+   BOOST_TEST(f0a.precision() == 100);
+
+   f100 = f50;
+   BOOST_TEST(f100 == 2);
+
+   f50 = static_cast<mpfr_float_50>(f100);
 
    return boost::report_errors();
 }

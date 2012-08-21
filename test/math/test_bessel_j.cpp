@@ -87,7 +87,7 @@ void expected_results()
       ".*",                          // platform
       ".*",                  // test type(s)
       ".*JN.*Integer.*",              // test data group
-      ".*", 40000, 10000);       // test function
+      ".*", 50000, 15000);       // test function
    add_expected_result(
       ".*",                          // compiler
       ".*",                          // stdlib

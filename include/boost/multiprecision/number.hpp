@@ -99,9 +99,8 @@ public:
       : m_backend(val.backend()) {}
 
    template <class Other, bool ET>
-   number(const number<Other, ET>& val, typename enable_if_c<
-         (!detail::is_explicitly_convertible<Other, Backend>::value 
-            && !detail::is_restricted_conversion<Other, Backend>::value)
+   explicit number(const number<Other, ET>& val, typename enable_if_c<
+         (!detail::is_explicitly_convertible<Other, Backend>::value)
          >::type* = 0)
    {
       //
@@ -116,17 +115,6 @@ public:
          >::type* = 0) BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend>() = std::declval<Other>()))
       : m_backend(val.backend()) {}
 
-   template <class Other, bool ET>
-   explicit number(const number<Other, ET>& val, typename enable_if_c<
-         (!detail::is_explicitly_convertible<Other, Backend>::value 
-            && detail::is_restricted_conversion<Other, Backend>::value)
-         >::type* = 0)
-   {
-      //
-      // Attempt a generic interconvertion:
-      //
-      detail::generic_interconvert(backend(), val.backend(), number_category<Backend>(), number_category<Other>());
-   }
    template <class V>
    BOOST_FORCEINLINE number(V v1, V v2, typename enable_if<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > >::type* = 0)
    {
@@ -210,7 +198,7 @@ public:
       return *this;
    }
    */
-
+/*
    template <class Other>
    typename disable_if<detail::is_explicitly_convertible<Other, Backend>, number<Backend, ExpressionTemplates>& >::type 
       operator=(const number<Other>& v)
@@ -220,7 +208,7 @@ public:
       //
       detail::generic_interconvert(backend(), v.backend(), number_category<Backend>(), number_category<Other>());
       return *this;
-   }
+   }*/
    template <class Other>
    typename disable_if<is_convertible<Other, Backend>, number<Backend, ExpressionTemplates>& >::type 
       assign(const number<Other>& v)
@@ -672,7 +660,7 @@ private:
       // create a temporary result and assign it to *this:
       typedef typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type temp_type;
       temp_type t(e);
-      *this = t;
+      this->assign(t);
    }
 
 
