@@ -1148,6 +1148,67 @@ public:
       this->sign(i < 0);
       return *this;
    }
+
+   template <unsigned MinBits2, bool Signed2, class Allocator2>
+   cpp_int_backend(const cpp_int_backend<MinBits2, Signed2, Allocator2, true>& other, 
+      typename enable_if_c<
+         (sizeof(cpp_int_backend<MinBits2, Signed2, Allocator2, true>::local_limb_type) <= sizeof(typename cpp_int_backend::local_limb_type))
+         && (Signed || !Signed2)
+      >::type* = 0) 
+      : base_type()
+   {
+       *this = static_cast<
+            typename boost::multiprecision::detail::canonical<
+               typename cpp_int_backend<MinBits2, Signed2, Allocator2, true>::local_limb_type, 
+               cpp_int_backend<MinBits, Signed, void, true> 
+            >::type
+         >(*other.limbs());
+      this->sign(other.sign());
+   }
+   template <unsigned MinBits2, bool Signed2, class Allocator2>
+   explicit cpp_int_backend(const cpp_int_backend<MinBits2, Signed2, Allocator2, true>& other, 
+      typename disable_if_c<
+         (sizeof(cpp_int_backend<MinBits2, Signed2, Allocator2, true>::local_limb_type) <= sizeof(typename cpp_int_backend::local_limb_type))
+         && (Signed || !Signed2)
+      >::type* = 0) 
+      : base_type()
+   {
+       *this = static_cast<
+            typename boost::multiprecision::detail::canonical<
+               typename cpp_int_backend<MinBits2, Signed2, Allocator2, true>::local_limb_type, 
+               cpp_int_backend<MinBits, Signed, void, true> 
+            >::type
+         >(*other.limbs());
+      this->sign(other.sign());
+   }
+   template <unsigned MinBits2, bool Signed2, class Allocator2>
+   cpp_int_backend& operator = (const cpp_int_backend<MinBits2, Signed2, Allocator2, true>& other) 
+   {
+       *this = static_cast<
+            typename boost::multiprecision::detail::canonical<
+               typename cpp_int_backend<MinBits2, Signed2, Allocator2, true>::local_limb_type, 
+               cpp_int_backend<MinBits, Signed, void, true> 
+            >::type
+         >(*other.limbs());
+      this->sign(other.sign());
+      return *this;
+   }
+   template <unsigned MinBits2, bool Signed2, class Allocator2>
+   explicit cpp_int_backend(const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& other) 
+      : base_type()
+   {
+      // We can only ever copy two limbs from other:
+      if(other.size() == 1)
+      {
+         *this->limbs() = *other.limbs();
+      }
+      else
+      {
+         *this->limbs() = static_cast<double_limb_type>(*other.limbs()) | (static_cast<double_limb_type>(other.limbs()[1]) << (sizeof(limb_type) * CHAR_BIT));
+      }
+      this->sign(other.sign());
+   }
+
    cpp_int_backend& operator = (const char* s)
    {
       try{

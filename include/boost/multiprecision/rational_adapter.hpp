@@ -34,6 +34,22 @@ struct rational_adapter
       m_value = o.m_value;
    }
    rational_adapter(const IntBackend& o) : m_value(o) {}
+
+   template <class U>
+   rational_adapter(const U& u, typename enable_if_c<is_convertible<U, IntBackend>::value>::type* = 0) 
+      : m_value(IntBackend(u)){}
+   template <class U>
+   explicit rational_adapter(const U& u, 
+      typename enable_if_c<
+         detail::is_explicitly_convertible<U, IntBackend>::value && !is_convertible<U, IntBackend>::value
+      >::type* = 0) 
+      : m_value(IntBackend(u)){}
+   template <class U>
+   typename enable_if_c<(detail::is_explicitly_convertible<U, IntBackend>::value && !is_arithmetic<U>::value), rational_adapter&>::type operator = (const U& u) 
+   {
+      m_value = IntBackend(u);
+   }
+
 #ifndef BOOST_NO_RVALUE_REFERENCES
    rational_adapter(rational_adapter&& o) : m_value(o.m_value) {}
    rational_adapter(IntBackend&& o) : m_value(o) {}
@@ -226,6 +242,17 @@ struct component_type<rational_adapter<T> >
 {
    typedef number<T> type;
 };
+
+#ifdef BOOST_NO_SFINAE_EXPR
+
+namespace detail{
+
+template<class U, class IntBackend>
+struct is_explicitly_convertible<U, rational_adapter<IntBackend> > : public is_explicitly_convertible<U, IntBackend> {};
+
+}
+
+#endif
 
 }} // namespaces
 

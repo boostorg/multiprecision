@@ -48,6 +48,9 @@ int main()
    int128_t   i6(i4);
    BOOST_TEST(i6 == -5677334);
 
+   number<cpp_int_backend<32, true, void>, false> i7(i3);
+   BOOST_TEST(i7 == -1234567);
+
    return boost::report_errors();
 }
 
