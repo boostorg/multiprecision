@@ -112,7 +112,7 @@ inline void eval_gcd(B& result, const B& a, const B& b)
 template <class B>
 inline void eval_lcm(B& result, const B& a, const B& b)
 {
-   typedef typename typename mpl::front<typename B::unsigned_types>::type ui_type;
+   typedef typename mpl::front<typename B::unsigned_types>::type ui_type;
    B t;
    eval_gcd(t, a, b);
 

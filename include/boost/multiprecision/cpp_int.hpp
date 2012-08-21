@@ -707,7 +707,7 @@ public:
       : base_type()
    {
        *this = static_cast<
-            typename detail::canonical<
+            typename boost::multiprecision::detail::canonical<
                typename cpp_int_backend<MinBits2, Signed2, Allocator2, true>::local_limb_type, 
                cpp_int_backend<MinBits, Signed, Allocator, false> 
             >::type
@@ -718,7 +718,7 @@ public:
    cpp_int_backend& operator=(const cpp_int_backend<MinBits2, Signed2, Allocator2, true>& other) 
    {
        *this = static_cast<
-            typename detail::canonical<
+            typename boost::multiprecision::detail::canonical<
                typename cpp_int_backend<MinBits2, Signed2, Allocator2, true>::local_limb_type, 
                cpp_int_backend<MinBits, Signed, Allocator, false> 
             >::type

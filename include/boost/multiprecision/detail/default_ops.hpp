@@ -813,6 +813,11 @@ inline void eval_bit_unset(T& val, unsigned index)
       eval_bitwise_xor(val, mask);
 }
 
+template <class B>
+void eval_lcm(B& result, const B& a, const B& b);
+template <class B>
+void eval_gcd(B& result, const B& a, const B& b);
+
 //
 // These have to implemented by the backend, declared here so that our macro generated code compiles OK.
 //
