@@ -41,11 +41,11 @@ struct rational_adapter
    template <class U>
    explicit rational_adapter(const U& u, 
       typename enable_if_c<
-         detail::is_explicitly_convertible<U, IntBackend>::value && !is_convertible<U, IntBackend>::value
+         boost::multiprecision::detail::is_explicitly_convertible<U, IntBackend>::value && !is_convertible<U, IntBackend>::value
       >::type* = 0) 
       : m_value(IntBackend(u)){}
    template <class U>
-   typename enable_if_c<(detail::is_explicitly_convertible<U, IntBackend>::value && !is_arithmetic<U>::value), rational_adapter&>::type operator = (const U& u) 
+   typename enable_if_c<(boost::multiprecision::detail::is_explicitly_convertible<U, IntBackend>::value && !is_arithmetic<U>::value), rational_adapter&>::type operator = (const U& u) 
    {
       m_value = IntBackend(u);
    }

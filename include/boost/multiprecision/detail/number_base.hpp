@@ -76,7 +76,7 @@ struct has_enough_bits
 template <class Val, class Backend, class Tag>
 struct canonical_imp
 {
-   typedef typename decay<Val>::type type;
+   typedef typename remove_cv<typename decay<const Val>::type>::type type;
 };
 template <class Val, class Backend>
 struct canonical_imp<Val, Backend, mpl::int_<0> >

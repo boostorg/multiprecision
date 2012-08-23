@@ -1601,7 +1601,11 @@ private:
    template <class B2, bool ET>
    static BOOST_FORCEINLINE BOOST_CONSTEXPR const B2& canonical_value(const number<B2, ET>& v) BOOST_NOEXCEPT {  return v.backend();  }
    template <class V>
-   static BOOST_FORCEINLINE BOOST_CONSTEXPR typename detail::canonical<V, Backend>::type canonical_value(const V& v) BOOST_NOEXCEPT {  return static_cast<typename detail::canonical<V, Backend>::type>(v);  }
+   static BOOST_FORCEINLINE BOOST_CONSTEXPR typename disable_if<is_same<typename detail::canonical<V, Backend>::type, V>, typename detail::canonical<V, Backend>::type>::type 
+      canonical_value(const V& v) BOOST_NOEXCEPT {  return static_cast<typename detail::canonical<V, Backend>::type>(v);  }
+   template <class V>
+   static BOOST_FORCEINLINE BOOST_CONSTEXPR typename enable_if<is_same<typename detail::canonical<V, Backend>::type, V>, const V&>::type 
+      canonical_value(const V& v) BOOST_NOEXCEPT {  return v;  }
    static BOOST_FORCEINLINE typename detail::canonical<std::string, Backend>::type canonical_value(const std::string& v) BOOST_NOEXCEPT {  return v.c_str();  }
 
    static BOOST_FORCEINLINE BOOST_CONSTEXPR const Backend& function_arg_value(const self_type& v) BOOST_NOEXCEPT {  return v.backend();  }
