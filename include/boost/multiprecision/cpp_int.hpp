@@ -2811,7 +2811,7 @@ inline Integer negate_integer(Integer i, const mpl::true_&) BOOST_NOEXCEPT
 template <class Integer>
 inline Integer negate_integer(Integer i, const mpl::false_&) BOOST_NOEXCEPT
 {
-   return ~--i;
+   return ~(i-1);
 }
 
 template <class R, unsigned MinBits, bool Signed, class Allocator>

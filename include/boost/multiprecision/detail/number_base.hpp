@@ -78,6 +78,16 @@ struct canonical_imp
 {
    typedef typename remove_cv<typename decay<const Val>::type>::type type;
 };
+template <class B, class Backend, class Tag>
+struct canonical_imp<number<B, true>, Backend, Tag>
+{
+   typedef B type;
+};
+template <class B, class Backend, class Tag>
+struct canonical_imp<number<B, false>, Backend, Tag>
+{
+   typedef B type;
+};
 template <class Val, class Backend>
 struct canonical_imp<Val, Backend, mpl::int_<0> >
 {

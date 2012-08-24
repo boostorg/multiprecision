@@ -112,7 +112,7 @@ public:
    explicit BOOST_FORCEINLINE number(const number<Other, ET>& val, typename enable_if_c<
          (detail::is_explicitly_convertible<Other, Backend>::value 
             && (detail::is_restricted_conversion<Other, Backend>::value || !boost::is_convertible<Other, Backend>::value))
-         >::type* = 0) BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend>() = std::declval<Other>()))
+         >::type* = 0) BOOST_NOEXCEPT_IF(noexcept(Backend(std::declval<Other>())))
       : m_backend(val.backend()) {}
 
    template <class V>
@@ -148,13 +148,13 @@ public:
       do_assign(e, tag_type());
       return *this;
    }
-/*
+
    BOOST_FORCEINLINE number& operator=(const number& e) BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend>() = static_cast<const Backend&>(std::declval<Backend>())))
    {
       m_backend = e.m_backend;
       return *this;
    }
-   */
+
    template <class V>
    BOOST_FORCEINLINE typename enable_if<is_convertible<V, self_type>, number<Backend, ExpressionTemplates>& >::type 
       operator=(const V& v) BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend>() = std::declval<typename boost::multiprecision::detail::canonical<V, Backend>::type>()))
@@ -602,6 +602,11 @@ template <class T>
 explicit operator T()const
 {
    return this->template convert_to<T>();
+}
+explicit operator bool()const
+{
+   using default_ops::eval_is_zero;
+   return !eval_is_zero(backend());
 }
 #endif
    //
