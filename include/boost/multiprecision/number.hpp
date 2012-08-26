@@ -598,16 +598,35 @@ public:
       return result;
    }
 #ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-template <class T>
-explicit operator T()const
-{
-   return this->template convert_to<T>();
-}
-explicit operator bool()const
-{
-   using default_ops::eval_is_zero;
-   return !eval_is_zero(backend());
-}
+#if defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ < 7)
+   //
+   // Horrible workaround for gcc-4.6.x which always prefers the non-template
+   // operator bool() rather than the template operator when converting to
+   // an arithmetic type:
+   //
+   template <class T, typename enable_if<is_same<T, bool>, int>::type = 0>
+   explicit operator T ()const
+   {
+      using default_ops::eval_is_zero;
+      return !eval_is_zero(backend());
+   }
+   template <class T, typename disable_if<is_same<T, bool>, int>::type = 0>
+   explicit operator T ()const
+   {
+      return this->template convert_to<T>();
+   }
+#else
+   template <class T>
+   explicit operator T()const
+   {
+      return this->template convert_to<T>();
+   }
+   explicit operator bool()const
+   {
+      using default_ops::eval_is_zero;
+      return !eval_is_zero(backend());
+   }
+#endif
 #endif
    //
    // Default precision:
