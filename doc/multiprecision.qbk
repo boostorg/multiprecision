@@ -134,7 +134,7 @@ However, there are still many simple expressions such as:
 
    a = b * c;
 
-Which don't noticably benefit from move support.  Therefore, optimal performance comes from having both
+Which don't noticeably benefit from move support.  Therefore, optimal performance comes from having both
 move-support, and expression templates enabled.
 
 Note that while "moved-from" objects are left in a sane state, they have an unspecified value, and the only permitted 
@@ -144,8 +144,6 @@ allows for optimal performance on move-construction (i.e. no allocation required
 object's internal state), while maintaining usability in the standard library containers.
 
 [h4 Expression Templates]
-
-TODO: compare to rvalue refs.
 
 Class `number` is expression-template-enabled: that means that rather than having a multiplication
 operator that looks like this:
@@ -171,7 +169,7 @@ is.
 The great advantage of this method is the ['elimination of temporaries]: for example the "naive" implementation
 of `operator*` above, requires one temporary for computing the result, and at least another one to return it.  It's true 
 that sometimes this overhead can be reduced by using move-semantics, but it can't be eliminated completely.  For example, 
-lets suppose we're evaluating a polynomial via Horners method, something like this:
+lets suppose we're evaluating a polynomial via Horner's method, something like this:
 
     T a[7] = { /* some values */ };
     //....
@@ -887,10 +885,20 @@ So for example, given an integer back-end type `MyIntegerBackend`, the use would
 All of the number types that are based on `number` have certain conversion rules in common.
 In particular:
 
-* Any number type can be constructed (or assigned) from any builtin arithmetic type:
+* Any number type can be constructed (or assigned) from any builtin arithmetic type, as long
+  as the conversion isn't lossy (for example float to int conversion):
 
    cpp_dec_float_50 df(0.5); // OK construction from double
    cpp_int          i(450);  // OK constructs from signed int
+   cpp_int          j = 3.14; // Error, lossy conversion.
+
+* A number can be explicitly constructed from an arithmetic type, even when the conversion is lossy:
+
+   cpp_int          i(3.14);  // OK explicit conversion
+   i = static_cast<cpp_int>(3.14)  // OK explicit conversion
+   i.assign(3.14);                 // OK, explicit assign and avoid a temporary from the cast above
+   i = 3.14;                       // Error, no implicit assignment operator for lossy conversion.
+   cpp_int          j = 3.14;      // Error, no implicit constructor for lossy conversion.
 
 * A `number` can be converted to any built in type, via the `convert_to` member function:
 
@@ -906,16 +914,21 @@ this functionality is only available on compilers supporting C++11's explicit co
    int i = z;  // Error, implicit conversion not allowed.
    int j = static_cast<int>(z);  // OK explicit conversion.
 
-* Any number type can be constructed (or assigned) from a `const char*` or a `std::string`:
+* Any number type can be ['explicitly] constructed (or assigned) from a `const char*` or a `std::string`:
 
    // pi to 50 places from a string:
-   cpp_dec_float_50 df = "3.14159265358979323846264338327950288419716939937510";
+   cpp_dec_float_50 df("3.14159265358979323846264338327950288419716939937510");
    // Integer type will automatically detect "0x" and "0" prefixes and parse the string accordingly:
-   cpp_int          i  = "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000";
+   cpp_int          i("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000");
    // Invalid input always results in a std::runtime_error being thrown:
-   i = std::string("3.14");
+   i = static_cast<cpp_int>("3.14");
+   // implicit conversions from strings are not allowed:
+   i = "23"; // Error, no assignment operator for implicit conversion from string
+   // assign member function, avoids having to create a temporary via a static_cast:
+   i.assign("23");  // OK
 
-* Any number type will interoperate with the builtin type in arithmetic expressions:
+* Any number type will interoperate with the builtin types in arithmetic expressions as long as the conversions
+are not lossy:
 
    // pi to 50 places from a string:
    cpp_dec_float_50 df = "3.14159265358979323846264338327950288419716939937510";
@@ -923,10 +936,9 @@ this functionality is only available on compilers supporting C++11's explicit co
    // than constructing a temporary:
    df *= 2;
 
-   // There is a need to be careful with integer types though:
+   // You can't mix integer types with floats though:
    cpp_int i = 2;
-   // Ooops, this really just multiplies by 3:
-   i *= 3.14;
+   i *= 3.14;  // Error, no *= operator will be found.
 
 * Any number type can be streamed to and from the C++ iostreams:
    
@@ -940,17 +952,33 @@ this functionality is only available on compilers supporting C++11's explicit co
    // Now print in hex format with prefix:
    std::cout << std::hex << std::showbase << i << std::endl;
 
-* Some interconversions between number types are completely generic, and are always available:
+* Interconversions between number types of the same family are allowed and are implicit conversions if no
+loss of precision is involved, and explicit if it is:
+
+   int128       i128 = 0;
+   int266       i256 = i128;  // OK implicit widening conversion
+   i128              = i256;  // Error, no assignment operator found, narrowing conversion is explict
+   i128              = static_cast<int128>(i256); // OK, explicit narrowing conversion
+
+   mpz_int      z    = 0;
+   mpf_float    f    = z;    // OK, GMP handles this conversion natively, and it's not lossy and therefore implicit
+   
+   mpf_float_50 f50  = 2;
+   f                 = f50;  // OK, conversion from fixed to variable precision, f will have 50 digits precision.
+   f50               = f;    // Error, conversion from variable to fixed precision is potentially lossy, explicit cast required.
+
+* Some interconversions between number types are completely generic, and are always available, albeit the conversions are always ['explicit]:
 
    cpp_int cppi(2);
    // We can always convert between numbers of the same category - 
-   // int to int, rational to rational, or float to float, so this is OK:
-   mpz_int z = cppi;
+   // int to int, rational to rational, or float to float, so this is OK
+   // as long as we use an explicit conversion:
+   mpz_int z(cppi);
    // We can always promote from int to rational, int to float, or rational to float:
-   cpp_rational     cppr = cppi;  // OK, int to rational
-   cpp_dec_float_50 df =   cppi;  // OK, int to float
-   df                  =   cppr;  // OK, rational to float
-   // However narrowing conversions always fail:
+   cpp_rational     cppr(cppi);  // OK, int to rational
+   cpp_dec_float_50 df(cppi);    // OK, int to float
+   df                  = static_cast<cpp_dec_float_50>(cppr);  // OK, explicit rational to float conversion
+   // However narrowing and/or implicit conversions always fail:
    cppi                =   df;    // Compiler error, conversion not allowed
 
 * Other interconversions may be allowed as special cases, whenever the backend allows it:
@@ -960,6 +988,8 @@ this functionality is only available on compilers supporting C++11's explicit co
    mpf_float i(m);        // copies the value of the native type.
 
 More information on what additional types a backend supports conversions from are given in the tutorial for each backend.
+The converting constructor will be implict if the backend's converting constructor is also implicit, and explicit if the
+backends converting constructor is also explicit.
 
 [endsect]
 
@@ -1010,7 +1040,7 @@ These functions perform a Miller-Rabin test for primality, if the result is `fal
 while if the result is `true` then /n/ is prime with probability ['0.25^trials].  The algorithm used performs some
 trial divisions to exclude small prime factors, does one Fermat test to exclude many more composites, and then
 uses the Miller-Rabin algorithm straight out of
-Knuth Vol 2, which recomends 25 trials for a pretty strong likelyhood that /n/ is prime.
+Knuth Vol 2, which recommends 25 trials for a pretty strong likelihood that /n/ is prime.
 
 The third optional argument is for a Uniform Random Number Generator from Boost.Random.  When not provided the `mt19937`
 generator is used.   Note that when producing random primes then you should probably use a different random number generator 
@@ -1039,6 +1069,7 @@ The following example searches for a prime `p` for which `(p-1)/2` is also proba
       number();
       number(see-below);
       number& operator=(see-below);
+      number& assign(see-below);
 
       // Member operators
       number& operator+=(const ``['see-below]``&);
@@ -1079,7 +1110,8 @@ The following example searches for a prime `p` for which `(p-1)/2` is also proba
       // Comparison:
       int compare(const number<Backend>& o)const;
       template <class V>
-      typename enable_if<is_arithmetic<V>, int>::type compare(const V& o)const;
+      typename enable_if<is_convertible<V, number<Backend, ExpressionTemplates> >, int>::type 
+         compare(const V& o)const;
       // Access to the underlying implementation:
       Backend& backend();
       const Backend& backend()const;
@@ -1221,17 +1253,38 @@ Class `number` has two template arguments:
    number();
    number(see-below);
    number& operator=(see-below);
+   number& assign(see-below);
 
 Type `number` is default constructible, and both copy constructible and assignable from:
 
 * Itself.
 * An expression template which is the result of one of the arithmetic operators.
-* Any builtin arithmetic type.
-* A `std::string` or any type which is convertible to `const char*`.
-* Any type that the Backend is constructible or assignable from.
+* Any builtin arithmetic type, as long as the result would not be lossy (for example float to integer conversion).
+* Any type that the Backend is implicitly constructible or assignable from.
 * An rvalue reference to another `number`.  Move-semantics are used for construction if the backend also
 supports rvalue reference construction.  In the case of assignment, move semantics are always supported
 when the argument is an rvalue reference irrespective of the backend.
+* Any type in the same family, as long as no loss of precision is involved.  For example from `int128` to `int256`,
+or `cpp_dec_float_50` to `cpp_dec_float_100`.
+
+Type `number` is explicitly constructible from:
+
+* Any type mentioned above.
+* A `std::string` or any type which is convertible to `const char*`.
+* Any arithmetic type (including those that would result in lossy conversions).
+* Any type in the same family, including those that result in loss of precision.
+* Any type that the Backend is explicitly constructible from.
+* Any pair of types for which a generic interconversion exists: that is from integer to integer, integer
+to rational, integer to float, rational to rational, rational to float, or float to float.
+
+The assign member function is available for any type for which an explicit converting constructor exists.
+It is intended to be used where a temporary generated from an explicit assignment would be expensive, for example:
+
+   mpfr_float_50    f50;
+   mpfr_float_100   f100;
+
+   f50 = static_cast<mpfr_float_50>(f100);  // explicit cast create a temporary
+   f50.assign(f100);                        // explicit call to assign create no temporary
 
 In addition, if the type has multiple components (for example rational or complex number types), then there is a
 two argument constructor:
@@ -1261,8 +1314,8 @@ These operators all take their usual arithmetic meanings.
 The arguments to these operators is either:
 
 * Another `number<Backend, ExpressionTemplates>`.
-* A builtin arithmetic type.
 * An expression template derived from `number<Backend>`.
+* Any type implicitly convertible to `number<Backend, ExpressionTemplates>`.
 
 For the left and right shift operations, the argument must be a builtin
 integer type with a positive value (negative values result in a `std::runtime_error` being thrown).
@@ -1317,7 +1370,8 @@ the default precision and the precision of `*this` respectively.
 
       int compare(const number<Backend, ExpressionTemplates>& o)const;
       template <class V>
-      typename enable_if<is_arithmetic<V>, int>::type compare(const V& other)const;
+      typename enable_if<is_convertible<V, number<Backend, ExpressionTemplates> >, int>::type 
+         compare(const V& other)const;
 
 Returns:
 
@@ -1447,14 +1501,16 @@ such as fixed precision or complex types are added to the library later, then th
    template <class T>
    struct component_type;
 
-If this is a type with mutiple components (for example rational or complex types), then this trait has a single member
+If this is a type with multiple components (for example rational or complex types), then this trait has a single member
 `type` that is the type of those components.
 
    template <class T>
    struct number_category;
 
 A traits class that inherits from `mpl::int_<N>` where `N` is one of the enumerated values `number_kind_integer`, `number_kind_floating_point`,
-`number_kind_rational` or `number_kind_fixed_point`.
+`number_kind_rational`, `number_kind_fixed_point`, or `number_kind_unknown`.  This traits class is specialized for any type that has
+`std::numeric_limits` support as well as for classes in this library: which means it can be used for generic code that must work
+with built in arithmetic types as well as multiprecision ones.
 
 
 [h4 Integer functions]
@@ -1595,7 +1651,7 @@ The template arguments are:
 [[Signed][When `true` the type is signed, otherwise unsigned.  Note that unsigned types are currently only 
       supported when the Allocator parameter is `void`.]]
 [[Allocator][The allocator used for dynamic memory allocation.  This parameter can be `void`, in which case
-      no dymanic memory will ever be allocated.]]
+      no dynamic memory will ever be allocated.]]
 ]
 
 The type of `number_category<cpp_int<Args...> >::type` is `mpl::int_<number_kind_integer>`.
@@ -1732,18 +1788,61 @@ More information on this type can be found in the [link boost_multiprecision.tut
 
 [endsect]
 
+[section:internals Internal Support Code]
+
+There are some traits classes which authors of new backends should be aware of:
+
+   namespace boost{ namespace multiprecision{ namespace detail{
+
+   template<typename From, typename To>
+   struct is_explicitly_convertible;
+
+   }}}
+
+Inherits from `boost::integral_constant<bool,true>` if type `From` has an explicit conversion from `To`.
+
+For compilers that support C++11 SFINAE-expressions this trait should "just work".  Otherwise it inherits
+from `boost::is_convertible<From, To>::type`, and will need to be specialised for Backends that have
+constructors marked as `explicit`.
+
+   template <class From, class To>
+   struct is_lossy_conversion
+   {
+      static const bool value = see below;
+   };
+
+Member `value` is true if the conversion from `From` to `To` would result in a loss of precision, and `false` otherwise.
+
+The default version of this trait simply checks whether the ['kind] of conversion (for example from a floating point to an integer type)
+is inherently lossy.  Note that if either of the types `From` or `To` are of an unknown number category (because `number_category` is not
+specialised for that type) then this trait will be `true`.
+
+   template<typename From, typename To>
+   struct is_restricted_conversion
+   {
+      static const bool value = see below;
+   };
+
+Member `value` is `true` if `From` is only explicitly convertible to `To` and not implicitly convertible, or
+if `is_lossy_conversion<From, To>::value` is `true`.  Otherwise `false`.
+
+Note that while this trait is the ultimate arbiter of which constructors are marked as `explicit` in class `number`,
+authors of backend types should generally specialise one of the traits above, rather than this one directly.
+
+[endsect]
+
 [section:backendconc Backend Requirements]
 
 The requirements on the `Backend` template argument to `number` are split up into
-sections: compulsary and optional.
+sections: compulsory and optional.
 
-Compulsary requirements have no default implementation in the library, therefore if the feature
+Compulsory requirements have no default implementation in the library, therefore if the feature
 they implement is to be supported at all, then they must be implemented by the backend.
 
 Optional requirements have default implementations that are called if the backend doesn't provide
 it's own.  Typically the backend will implement these to improve performance.
 
-In the following tables, type B is the `Backend` template arument to `number`, `b` and `b2` are
+In the following tables, type B is the `Backend` template argument to `number`, `b` and `b2` are
 a variables of type B, `cb`, `cb2` and `cb3` are constant variables of type `const B`,
 `rb` is a variable of type `B&&`, `a` and `a2` are variables of Arithmetic type, 
 `s` is a variable of type `const char*`, `ui` is a variable of type `unsigned`, `bb` is a variable of type `bool`,
@@ -1816,7 +1915,8 @@ of type B2.
 [[`B(a)`][`B`][Direct construction from an arithmetic type.  The type of `a` shall be listed in one of the type lists
             `B::signed_types`, `B::unsigned_types` or `B::float_types`.
             When not provided, this operation is simulated using default-construction followed by assignment.][[space]]]
-[[`B(b2)`][`B`][Copy constructor from a different back-end type.  When not provided, a generic interconversion routine is used.][[space]]]
+[[`B(b2)`][`B`][Copy constructor from a different back-end type.  When not provided, a generic interconversion routine is used.
+          This constructor may be `explicit` if the corresponding frontend constructor should also be `explicit`.][[space]]]
 [[`b = b2`][`b&`][Assignment operator from a different back-end type.  When not provided, a generic interconversion routine is used.][[space]]]
 [[`assign_components(b, a, a)`][`void`][Assigns to `b` the two components in the following arguments.  
                            Only applies to rational and complex number types.
@@ -2475,6 +2575,15 @@ Windows Vista machine.
 
 [section:hist History]
 
+[h4 Post review changes]
+
+* Non-expression template operators further optimised with rvalue reference support.
+* Many functions made made `constexp`?
+* Differentiate between explicit and implicit conversions in the number constructor.
+* Removed "mp_" prefix from types.
+
+[h4 Pre-review history]
+
 *2011-2012, John Maddock adds an expression template enabled front end to Christopher's code,
 and adds support for other backends.
 * 2011, Christopher Kormanyos publishes the decimal floating point code under the Boost
@@ -2500,9 +2609,6 @@ More a list of what ['could] be done, rather than what ['should] be done (which 
 
 [h4 Pre-Review Comments]
 
-* Can the non-expression template operators be further optimised with rvalue reference support?
-* Can any functions - in particular value initialization - be made `constexp`?
-* Can we differentiate between explicit and implicit conversions in the number constructor (may need some new type traits)?
 * Can ring types (exact floating point types) be supported?  The answer should be yes, but someone needs to write it.
 * Make the exponent type for cpp_dec_float a templare parameter, maybe include support for big-integer exponents.
 Open question - what should be the default - int32_t or int64_t?

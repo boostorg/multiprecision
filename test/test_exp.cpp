@@ -167,7 +167,7 @@ void test()
 int main()
 {
 #ifdef TEST_BACKEND
-   test<boost::multiprecision::number<boost::multiprecision::concepts::mp_number_backend_float_architype> >();
+   test<boost::multiprecision::number<boost::multiprecision::concepts::number_backend_float_architype> >();
 #endif
 #ifdef TEST_MPF_50
    test<boost::multiprecision::mpf_float_50>();

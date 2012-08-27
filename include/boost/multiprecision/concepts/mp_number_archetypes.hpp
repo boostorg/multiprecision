@@ -25,47 +25,47 @@ namespace concepts{
 #pragma warning(disable:4244)
 #endif
 
-struct mp_number_backend_float_architype
+struct number_backend_float_architype
 {
    typedef mpl::list<long long>                 signed_types;
    typedef mpl::list<unsigned long long>        unsigned_types;
    typedef mpl::list<long double>               float_types;
    typedef int                                  exponent_type;
 
-   mp_number_backend_float_architype()
+   number_backend_float_architype()
    {
       std::cout << "Default construct" << std::endl;
    }
-   mp_number_backend_float_architype(const mp_number_backend_float_architype& o)
+   number_backend_float_architype(const number_backend_float_architype& o)
    {
       std::cout << "Copy construct" << std::endl;
       m_value = o.m_value;
    }
-   mp_number_backend_float_architype& operator = (const mp_number_backend_float_architype& o)
+   number_backend_float_architype& operator = (const number_backend_float_architype& o)
    {
       m_value = o.m_value;
       std::cout << "Assignment (" << m_value << ")" << std::endl;
       return *this;
    }
-   mp_number_backend_float_architype& operator = (unsigned long long i)
+   number_backend_float_architype& operator = (unsigned long long i)
    {
       m_value = i;
       std::cout << "UInt Assignment (" << i << ")" << std::endl;
       return *this;
    }
-   mp_number_backend_float_architype& operator = (long long i)
+   number_backend_float_architype& operator = (long long i)
    {
       m_value = i;
       std::cout << "Int Assignment (" << i << ")" << std::endl;
       return *this;
    }
-   mp_number_backend_float_architype& operator = (long double d)
+   number_backend_float_architype& operator = (long double d)
    {
       m_value = d;
       std::cout << "long double Assignment (" << d << ")" << std::endl;
       return *this;
    }
-   mp_number_backend_float_architype& operator = (const char* s)
+   number_backend_float_architype& operator = (const char* s)
    {
       try
       {
@@ -78,7 +78,7 @@ struct mp_number_backend_float_architype
       std::cout << "const char* Assignment (" << s << ")" << std::endl;
       return *this;
    }
-   void swap(mp_number_backend_float_architype& o)
+   void swap(number_backend_float_architype& o)
    {
       std::cout << "Swapping (" << m_value << " with " << o.m_value << ")" << std::endl;
       std::swap(m_value, o.m_value);
@@ -108,7 +108,7 @@ struct mp_number_backend_float_architype
       std::cout << "Negating (" << m_value << ")" << std::endl;
       m_value = -m_value;
    }
-   int compare(const mp_number_backend_float_architype& o)const
+   int compare(const number_backend_float_architype& o)const
    {
       std::cout << "Comparison" << std::endl;
       return m_value > o.m_value ? 1 : (m_value < o.m_value ? -1 : 0);
@@ -131,86 +131,86 @@ struct mp_number_backend_float_architype
    long double m_value;
 };
 
-inline void eval_add(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& o)
+inline void eval_add(number_backend_float_architype& result, const number_backend_float_architype& o)
 {
    std::cout << "Addition (" << result.m_value << " += " << o.m_value << ")" << std::endl;
    result.m_value += o.m_value;
 }
-inline void eval_subtract(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& o)
+inline void eval_subtract(number_backend_float_architype& result, const number_backend_float_architype& o)
 {
    std::cout << "Subtraction (" << result.m_value << " -= " << o.m_value << ")" << std::endl;
    result.m_value -= o.m_value;
 }
-inline void eval_multiply(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& o)
+inline void eval_multiply(number_backend_float_architype& result, const number_backend_float_architype& o)
 {
    std::cout << "Multiplication (" << result.m_value << " *= " << o.m_value << ")" << std::endl;
    result.m_value *= o.m_value;
 }
-inline void eval_divide(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& o)
+inline void eval_divide(number_backend_float_architype& result, const number_backend_float_architype& o)
 {
    std::cout << "Division (" << result.m_value << " /= " << o.m_value << ")" << std::endl;
    result.m_value /= o.m_value;
 }
 
-inline void eval_convert_to(unsigned long long* result, const mp_number_backend_float_architype& val)
+inline void eval_convert_to(unsigned long long* result, const number_backend_float_architype& val)
 {
    *result = static_cast<unsigned long long>(val.m_value);
 }
-inline void eval_convert_to(long long* result, const mp_number_backend_float_architype& val)
+inline void eval_convert_to(long long* result, const number_backend_float_architype& val)
 {
    *result = static_cast<long long>(val.m_value);
 }
-inline void eval_convert_to(long double* result, mp_number_backend_float_architype& val)
+inline void eval_convert_to(long double* result, number_backend_float_architype& val)
 {
    *result = val.m_value;
 }
 
-inline void eval_frexp(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& arg, int* exp)
+inline void eval_frexp(number_backend_float_architype& result, const number_backend_float_architype& arg, int* exp)
 {
    result = std::frexp(arg.m_value, exp);
 }
 
-inline void eval_ldexp(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& arg, int exp)
+inline void eval_ldexp(number_backend_float_architype& result, const number_backend_float_architype& arg, int exp)
 {
    result = std::ldexp(arg.m_value, exp);
 }
 
-inline void eval_floor(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& arg)
+inline void eval_floor(number_backend_float_architype& result, const number_backend_float_architype& arg)
 {
    result = std::floor(arg.m_value);
 }
 
-inline void eval_ceil(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& arg)
+inline void eval_ceil(number_backend_float_architype& result, const number_backend_float_architype& arg)
 {
    result = std::ceil(arg.m_value);
 }
 
-inline void eval_sqrt(mp_number_backend_float_architype& result, const mp_number_backend_float_architype& arg)
+inline void eval_sqrt(number_backend_float_architype& result, const number_backend_float_architype& arg)
 {
    result = std::sqrt(arg.m_value);
 }
 
-inline int eval_fpclassify(const mp_number_backend_float_architype& arg)
+inline int eval_fpclassify(const number_backend_float_architype& arg)
 {
    return (boost::math::fpclassify)(arg.m_value);
 }
 
-typedef boost::multiprecision::number<mp_number_backend_float_architype> mp_number_float_architype;
+typedef boost::multiprecision::number<number_backend_float_architype> mp_number_float_architype;
 
 } // namespace
 
 template<>
-struct number_category<concepts::mp_number_backend_float_architype> : public mpl::int_<number_kind_floating_point>{};
+struct number_category<concepts::number_backend_float_architype> : public mpl::int_<number_kind_floating_point>{};
 
 }} // namespaces
 
 namespace std{
 
 template <bool ExpressionTemplates>
-class numeric_limits<boost::multiprecision::number<boost::multiprecision::concepts::mp_number_backend_float_architype, ExpressionTemplates> > : public std::numeric_limits<long double>
+class numeric_limits<boost::multiprecision::number<boost::multiprecision::concepts::number_backend_float_architype, ExpressionTemplates> > : public std::numeric_limits<long double>
 {
    typedef std::numeric_limits<long double> base_type;
-   typedef boost::multiprecision::number<boost::multiprecision::concepts::mp_number_backend_float_architype, ExpressionTemplates> number_type;
+   typedef boost::multiprecision::number<boost::multiprecision::concepts::number_backend_float_architype, ExpressionTemplates> number_type;
 public:
    static number_type (min)() BOOST_NOEXCEPT { return (base_type::min)(); }
    static number_type (max)() BOOST_NOEXCEPT { return (base_type::max)(); }

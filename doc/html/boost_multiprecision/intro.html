@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
 <title>Introduction</title>
 <link rel="stylesheet" href="http://www.boost.org/doc/libs/release/doc/src/boostbook.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.76.1">
+<meta name="generator" content="DocBook XSL Stylesheets V1.77.1">
 <link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
 <link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
 <link rel="prev" href="../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
@@ -29,7 +29,7 @@
 <p>
       The Multiprecision library comes in two distinct parts:
     </p>
-<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
 <li class="listitem">
           An expression-template-enabled front-end <code class="computeroutput"><span class="identifier">number</span></code>
           that handles all the operator overloading, expression evaluation optimization,
@@ -108,7 +108,7 @@
 </pre>
 <h5>
 <a name="boost_multiprecision.intro.h0"></a>
-      <span><a name="boost_multiprecision.intro.move_semantics"></a></span><a class="link" href="intro.html#boost_multiprecision.intro.move_semantics">Move
+      <span class="phrase"><a name="boost_multiprecision.intro.move_semantics"></a></span><a class="link" href="intro.html#boost_multiprecision.intro.move_semantics">Move
       Semantics</a>
     </h5>
 <p>
@@ -133,7 +133,7 @@
 <pre class="programlisting"><span class="identifier">a</span> <span class="special">=</span> <span class="identifier">b</span> <span class="special">*</span> <span class="identifier">c</span><span class="special">;</span>
 </pre>
 <p>
-      Which don't noticably benefit from move support. Therefore, optimal performance
+      Which don't noticeably benefit from move support. Therefore, optimal performance
       comes from having both move-support, and expression templates enabled.
     </p>
 <p>
@@ -147,12 +147,9 @@
     </p>
 <h5>
 <a name="boost_multiprecision.intro.h1"></a>
-      <span><a name="boost_multiprecision.intro.expression_templates"></a></span><a class="link" href="intro.html#boost_multiprecision.intro.expression_templates">Expression
+      <span class="phrase"><a name="boost_multiprecision.intro.expression_templates"></a></span><a class="link" href="intro.html#boost_multiprecision.intro.expression_templates">Expression
       Templates</a>
     </h5>
-<p>
-      TODO: compare to rvalue refs.
-    </p>
 <p>
       Class <code class="computeroutput"><span class="identifier">number</span></code> is expression-template-enabled:
       that means that rather than having a multiplication operator that looks like
@@ -184,7 +181,7 @@
       for example the "naive" implementation of <code class="computeroutput"><span class="keyword">operator</span><span class="special">*</span></code> above, requires one temporary for computing
       the result, and at least another one to return it. It's true that sometimes
       this overhead can be reduced by using move-semantics, but it can't be eliminated
-      completely. For example, lets suppose we're evaluating a polynomial via Horners
+      completely. For example, lets suppose we're evaluating a polynomial via Horner's
       method, something like this:
     </p>
 <pre class="programlisting"><span class="identifier">T</span> <span class="identifier">a</span><span class="special">[</span><span class="number">7</span><span class="special">]</span> <span class="special">=</span> <span class="special">{</span> <span class="comment">/* some values */</span> <span class="special">};</span>
@@ -206,7 +203,7 @@
       <a href="http://gmplib.org/manual/C_002b_002b-Interface-Floats.html#C_002b_002b-Interface-Floats" target="_top">mpf_class</a>
       wrapper that will be supplied with GMP-5.1 reduces the number of temporaries
       to pretty much zero). Finally if we use this library with expression templates
-      disabled, we still only generate 11 temporaries <sup>[<a name="boost_multiprecision.intro.f0" href="#ftn.boost_multiprecision.intro.f0" class="footnote">1</a>]</sup> <sup>[<a name="boost_multiprecision.intro.f1" href="#ftn.boost_multiprecision.intro.f1" class="footnote">2</a>]</sup>.
+      disabled, we still only generate 11 temporaries <a href="#ftn.boost_multiprecision.intro.f0" class="footnote"><sup class="footnote"><a name="boost_multiprecision.intro.f0"></a>[1]</sup></a> <a href="#ftn.boost_multiprecision.intro.f1" class="footnote"><sup class="footnote"><a name="boost_multiprecision.intro.f1"></a>[2]</sup></a>.
     </p>
 <p>
       This library also extends expression template support to standard library functions
@@ -379,7 +376,7 @@
       As you can see, the execution time increases a lot more slowly than the number
       of memory allocations. There are a number of reasons for this:
     </p>
-<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
 <li class="listitem">
           The cost of extended-precision multiplication and division is so great,
           that the times taken for these tend to swamp everything else.
@@ -573,13 +570,13 @@
 </table></div>
 </div>
 <br class="table-break"><div class="footnotes">
-<br><hr width="100" align="left">
-<div class="footnote"><p><sup>[<a id="ftn.boost_multiprecision.intro.f0" href="#boost_multiprecision.intro.f0" class="para">1</a>] </sup>
+<br><hr style="width:100; align:left;">
+<div id="ftn.boost_multiprecision.intro.f0" class="footnote"><p><a href="#boost_multiprecision.intro.f0" class="para"><sup class="para">[1] </sup></a>
         The actual number generated will depend on the compiler, how well it optimises
         the code, and whether it supports rvalue references. The number of 11 temporaries
         was generated with Visual C++ 10
       </p></div>
-<div class="footnote"><p><sup>[<a id="ftn.boost_multiprecision.intro.f1" href="#boost_multiprecision.intro.f1" class="para">2</a>] </sup>
+<div id="ftn.boost_multiprecision.intro.f1" class="footnote"><p><a href="#boost_multiprecision.intro.f1" class="para"><sup class="para">[2] </sup></a>
         Marc Glisse suggested pre-review that this could be reduced still further
         by careful use of rvalue-references and move semantics in the operator overloads.
         This will be investigated further at a later date.
