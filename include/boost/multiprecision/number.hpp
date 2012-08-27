@@ -53,8 +53,7 @@ public:
    }
    template <class V>
    BOOST_FORCEINLINE BOOST_CONSTEXPR number(const V& v, typename enable_if_c<
-            /*(boost::is_arithmetic<V>::value || is_same<std::string, V>::value || is_convertible<V, const char*>::value) 
-            &&*/ is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value 
+            is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value 
             && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value
          >::type* = 0) 
       : m_backend(canonical_value(v)) {}
@@ -71,8 +70,7 @@ public:
    }
    template <class V>
    explicit BOOST_FORCEINLINE BOOST_CONSTEXPR number(const V& v, typename enable_if_c<
-            /*(boost::is_arithmetic<V>::value || is_same<std::string, V>::value || is_convertible<V, const char*>::value) 
-            &&*/ detail::is_explicitly_convertible<typename detail::canonical<V, Backend>::type, Backend>::value 
+            detail::is_explicitly_convertible<typename detail::canonical<V, Backend>::type, Backend>::value 
             && (detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value
                 || !is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value)
          >::type* = 0) 
@@ -128,12 +126,6 @@ public:
       assign_components(m_backend, v1.backend(), v2.backend());
    }
 
-   /*
-   template <class V>
-   BOOST_FORCEINLINE BOOST_CONSTEXPR number(V v, typename enable_if<mpl::and_<is_convertible<V, Backend>, mpl::not_<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > > > >::type* = 0)
-      BOOST_NOEXCEPT_IF(noexcept(Backend(static_cast<const V&>(std::declval<V>()))))
-      : m_backend(v){}
-   */
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
    typename enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
@@ -168,47 +160,6 @@ public:
       m_backend = canonical_value(v);
       return *this;
    }
-   /*
-   template <class V>
-   BOOST_FORCEINLINE typename enable_if<mpl::and_<is_convertible<V, Backend>, mpl::not_<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > > >, number<Backend, ExpressionTemplates>& >::type 
-      operator=(const V& v) BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend>() = static_cast<const V&>(std::declval<V>())))
-   {
-      m_backend = v;
-      return *this;
-   }
-   template <bool ET>
-   BOOST_FORCEINLINE number& operator=(const number<Backend, ET>& v) BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend>() = static_cast<const Backend&>(std::declval<Backend>())))
-   {
-      m_backend = v.backend();
-      return *this;
-   }
-
-   template <class Other>
-   BOOST_FORCEINLINE typename enable_if<is_convertible<Other, Backend>, number<Backend, ExpressionTemplates>& >::type 
-      operator=(const number<Other>& v) BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend>() = static_cast<const Other&>(std::declval<Other>())))
-   {
-      m_backend = v.backend();
-      return *this;
-   }
-   template <class Other>
-   BOOST_FORCEINLINE typename enable_if<is_convertible<Other, Backend>, number<Backend, ExpressionTemplates>& >::type 
-      assign(const number<Other>& v) BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend>() = static_cast<const Other&>(std::declval<Other>())))
-   {
-      m_backend = v.backend();
-      return *this;
-   }
-   */
-/*
-   template <class Other>
-   typename disable_if<detail::is_explicitly_convertible<Other, Backend>, number<Backend, ExpressionTemplates>& >::type 
-      operator=(const number<Other>& v)
-   {
-      //
-      // Attempt a generic interconvertion:
-      //
-      detail::generic_interconvert(backend(), v.backend(), number_category<Backend>(), number_category<Other>());
-      return *this;
-   }*/
    template <class Other>
    typename disable_if<is_convertible<Other, Backend>, number<Backend, ExpressionTemplates>& >::type 
       assign(const number<Other>& v)
