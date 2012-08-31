@@ -94,14 +94,14 @@ void do_round_trip(const T& val, std::ios_base::fmtflags f, const boost::mpl::fa
 }
 
 template <class T>
-struct is_mp_number : public boost::mpl::false_{};
+struct is_number : public boost::mpl::false_{};
 template <class T>
-struct is_mp_number<boost::multiprecision::number<T> > : public boost::mpl::true_{};
+struct is_number<boost::multiprecision::number<T> > : public boost::mpl::true_{};
 
 template <class T>
 void do_round_trip(const T& val, std::ios_base::fmtflags f)
 {
-   do_round_trip(val, f, is_mp_number<T>());
+   do_round_trip(val, f, is_number<T>());
 }
 
 template <class T>

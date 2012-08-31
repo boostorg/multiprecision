@@ -223,7 +223,7 @@ Then calling:
 Will very likely result in obscure error messages inside the body of `my_proc` - since we've passed it
 an expression template type, and not a number type.  Instead we probably need:
 
-   my_proc(my_mp_number_type(a+b));
+   my_proc(my_number_type(a+b));
 
 Having said that, these situations don't occur that often - or indeed not at all for non-template functions.
 In addition, all the functions in the Boost.Math library will automatically convert expression-template arguments
@@ -1188,6 +1188,10 @@ The following example searches for a prime `p` for which `(p-1)/2` is also proba
    struct component_type;
    template <class T>
    struct number_category;
+   template <class T>
+   struct is_number;
+   template <class T>
+   struct is_number_expression;
 
    // Integer specific functions:
    ``['unmentionable-expression-template-type]``    pow(const ``['number-or-expression-template-type]``&, unsigned);
@@ -1511,6 +1515,17 @@ A traits class that inherits from `mpl::int_<N>` where `N` is one of the enumera
 `number_kind_rational`, `number_kind_fixed_point`, or `number_kind_unknown`.  This traits class is specialized for any type that has
 `std::numeric_limits` support as well as for classes in this library: which means it can be used for generic code that must work
 with built in arithmetic types as well as multiprecision ones.
+
+   template <class T>
+   struct is_number;
+
+A traits class that inherits from `mpl::true_` if T is an instance of `number<>`, otherwise from `mpl::false_`.
+
+   template <class T>
+   struct is_number_expression;
+
+A traits class that inherits from `mpl::true_` if T is an expression template type derived from `number<>`, otherwise from `mpl::false_`.
+
 
 
 [h4 Integer functions]
@@ -2196,7 +2211,7 @@ in point of fact this naming convention shouldn't be necessary, but rather works
 [[rational_adapter.hpp][Defines the `rational_adapter` backend.]]
 [[cpp_dec_float.hpp][Defines the `cpp_dec_float` backend.]]
 [[tommath.hpp][Defines the `tommath_int` backend.]]
-[[concepts/mp_number_archetypes.hpp][Defines a backend concept architypes for testing use.]]
+[[concepts/number_archetypes.hpp][Defines a backend concept architypes for testing use.]]
 ]
 
 [table Implementation Headers]

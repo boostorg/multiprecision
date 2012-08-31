@@ -126,6 +126,8 @@ int main()
    test_round_trip<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<> > >();
    test_round_trip<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<1024, true, void> > >();
    test_round_trip<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<512, false, void> > >();
+   test_round_trip<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<32, true, void> > >();
+   test_round_trip<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<32, false, void> > >();
 #endif
    return boost::report_errors();
 }

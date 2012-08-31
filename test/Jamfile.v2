@@ -135,8 +135,22 @@ run test_arithmetic.cpp
         : # command line
         : # input files
         : # requirements
-	      <define>TEST_CPP_INT
-        : test_arithmetic_cpp_int ;
+	      <define>TEST_CPP_INT_1
+        : test_arithmetic_cpp_int_1 ;
+
+run test_arithmetic.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_CPP_INT_2
+        : test_arithmetic_cpp_int_2 ;
+
+run test_arithmetic.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_CPP_INT_3
+        : test_arithmetic_cpp_int_3 ;
 
 run test_arithmetic.cpp
         : # command line
@@ -805,8 +819,8 @@ for local source in [ glob compile_fail/*.cpp ]
 {
    compile-fail $(source) 
    :
-      [ check-target-builds ../config//has_gmp : <define>TEST_GMP : ]  
-      [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR : ]  
+      [ check-target-builds ../config//has_gmp : <define>TEST_GMP <debug-symbols>off : ]  
+      [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <debug-symbols>off : ]  
    ;
 }
 
@@ -820,51 +834,60 @@ if ! $(disable-concepts)
               : # requirements
 	            <define>TEST_MPFR_50
                [ check-target-builds ../config//has_mpfr : : <build>no ]
+               <debug-symbols>off
               : $(source:B)_mpfr_50 ;
 
       compile $(source)  mpfr
               : # requirements
 	            <define>TEST_MPFR_6
                [ check-target-builds ../config//has_mpfr : : <build>no ]
+               <debug-symbols>off
               : $(source:B)_mpfr_6 ;
 
       compile $(source)  mpfr
               : # requirements
 	            <define>TEST_MPFR_15
                [ check-target-builds ../config//has_mpfr : : <build>no ]
+               <debug-symbols>off
               : $(source:B)_mpfr_15 ;
 
       compile $(source)  mpfr
               : # requirements
 	            <define>TEST_MPFR_17
                [ check-target-builds ../config//has_mpfr : : <build>no ]
+               <debug-symbols>off
               : $(source:B)_mpfr_17 ;
 
       compile $(source)  mpfr
               : # requirements
 	            <define>TEST_MPFR_30
                [ check-target-builds ../config//has_mpfr : : <build>no ]
+               <debug-symbols>off
               : $(source:B)_mpfr_30 ;
 
       compile $(source)  gmp
               : # requirements
 	            <define>TEST_MPF_50
                [ check-target-builds ../config//has_gmp : : <build>no ]
+               <debug-symbols>off
               : $(source:B)_mpf50 ;
 
       compile $(source)
               : # requirements
 	            <define>TEST_CPP_DEC_FLOAT
+               <debug-symbols>off
               : $(source:B)_cpp_dec_float ;
 
       compile $(source)
               : # requirements
 	            <define>TEST_CPP_DEC_FLOAT_NO_ET
+               <debug-symbols>off
               : $(source:B)_cpp_dec_float_no_et ;
 
       compile $(source)
               : # requirements
 	            <define>TEST_BACKEND
+               <debug-symbols>off
               : $(source:B)_backend_concept ;
    }
 }

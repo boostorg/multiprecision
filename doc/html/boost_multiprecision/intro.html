@@ -256,7 +256,7 @@
       Will very likely result in obscure error messages inside the body of <code class="computeroutput"><span class="identifier">my_proc</span></code> - since we've passed it an expression
       template type, and not a number type. Instead we probably need:
     </p>
-<pre class="programlisting"><span class="identifier">my_proc</span><span class="special">(</span><span class="identifier">my_mp_number_type</span><span class="special">(</span><span class="identifier">a</span><span class="special">+</span><span class="identifier">b</span><span class="special">));</span>
+<pre class="programlisting"><span class="identifier">my_proc</span><span class="special">(</span><span class="identifier">my_number_type</span><span class="special">(</span><span class="identifier">a</span><span class="special">+</span><span class="identifier">b</span><span class="special">));</span>
 </pre>
 <p>
       Having said that, these situations don't occur that often - or indeed not at

@@ -74,7 +74,7 @@ inline bool operator == (const number<Backend, ExpressionTemplates>& a, const nu
    return eval_eq(a.backend(), b.backend());
 }
 template <class Backend, bool ExpressionTemplates, class Arithmetic>
-inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, ExpressionTemplates> >::value && !is_mp_number_expression<Arithmetic>::value && !is_mp_number<Arithmetic>::value), bool>::type 
+inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, ExpressionTemplates> >::value && !is_number_expression<Arithmetic>::value && !is_number<Arithmetic>::value), bool>::type 
    operator == (const number<Backend, ExpressionTemplates>& a, const Arithmetic& b)
 {
    typedef typename detail::canonical<Arithmetic, Backend>::type ct;
@@ -90,7 +90,7 @@ inline typename enable_if<is_same<number<Backend, ExpressionTemplates>, typename
    return eval_eq(a.backend(), t.backend());
 }
 template <class Arithmetic, class Backend, bool ExpressionTemplates>
-inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, ExpressionTemplates> >::value && !is_mp_number_expression<Arithmetic>::value && !is_mp_number<Arithmetic>::value), bool>::type 
+inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, ExpressionTemplates> >::value && !is_number_expression<Arithmetic>::value && !is_number<Arithmetic>::value), bool>::type 
    operator == (const Arithmetic& a, const number<Backend, ExpressionTemplates>& b)
 {
    typedef typename detail::canonical<Arithmetic, Backend>::type ct;
@@ -98,7 +98,7 @@ inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, Expressi
    return eval_eq(b.backend(), ct(a));
 }
 template <class Arithmetic, class Tag, class A1, class A2, class A3, class A4>
-inline typename enable_if_c<(is_convertible<Arithmetic, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value && !is_mp_number_expression<Arithmetic>::value && !is_mp_number<Arithmetic>::value), bool>::type 
+inline typename enable_if_c<(is_convertible<Arithmetic, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value && !is_number_expression<Arithmetic>::value && !is_number<Arithmetic>::value), bool>::type 
    operator == (const Arithmetic& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
 {
    typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
@@ -116,7 +116,7 @@ inline typename enable_if<is_same<number<Backend, ExpressionTemplates>, typename
    return eval_eq(t.backend(), b.backend());
 }
 template <class Tag, class A1, class A2, class A3, class A4, class Arithmetic>
-inline typename enable_if_c<(is_convertible<Arithmetic, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value && !is_mp_number_expression<Arithmetic>::value && !is_mp_number<Arithmetic>::value), bool>::type 
+inline typename enable_if_c<(is_convertible<Arithmetic, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value && !is_number_expression<Arithmetic>::value && !is_number<Arithmetic>::value), bool>::type 
    operator == (const detail::expression<Tag, A1, A2, A3, A4>& a, const Arithmetic& b)
 {
    typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
@@ -142,7 +142,7 @@ inline bool operator != (const number<Backend, ExpressionTemplates>& a, const nu
    return !eval_eq(a.backend(), b.backend());
 }
 template <class Backend, bool ExpressionTemplates, class Arithmetic>
-inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, ExpressionTemplates> >::value && !is_mp_number_expression<Arithmetic>::value && !is_mp_number<Arithmetic>::value), bool>::type 
+inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, ExpressionTemplates> >::value && !is_number_expression<Arithmetic>::value && !is_number<Arithmetic>::value), bool>::type 
    operator != (const number<Backend, ExpressionTemplates>& a, const Arithmetic& b)
 {
    typedef typename detail::canonical<Arithmetic, Backend>::type ct;
@@ -158,7 +158,7 @@ inline typename enable_if<is_same<number<Backend, ExpressionTemplates>, typename
    return !eval_eq(a.backend(), t.backend());
 }
 template <class Arithmetic, class Backend, bool ExpressionTemplates>
-inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, ExpressionTemplates> >::value && !is_mp_number_expression<Arithmetic>::value && !is_mp_number<Arithmetic>::value), bool>::type 
+inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, ExpressionTemplates> >::value && !is_number_expression<Arithmetic>::value && !is_number<Arithmetic>::value), bool>::type 
    operator != (const Arithmetic& a, const number<Backend, ExpressionTemplates>& b)
 {
    typedef typename detail::canonical<Arithmetic, Backend>::type ct;
@@ -166,7 +166,7 @@ inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, Expressi
    return !eval_eq(b.backend(), ct(a));
 }
 template <class Arithmetic, class Tag, class A1, class A2, class A3, class A4>
-inline typename enable_if_c<(is_convertible<Arithmetic, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value && !is_mp_number_expression<Arithmetic>::value && !is_mp_number<Arithmetic>::value), bool>::type 
+inline typename enable_if_c<(is_convertible<Arithmetic, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value && !is_number_expression<Arithmetic>::value && !is_number<Arithmetic>::value), bool>::type 
    operator != (const Arithmetic& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
 {
    typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
@@ -184,7 +184,7 @@ inline typename enable_if<is_same<number<Backend, ExpressionTemplates>, typename
    return !eval_eq(t.backend(), b.backend());
 }
 template <class Tag, class A1, class A2, class A3, class A4, class Arithmetic>
-inline typename enable_if_c<(is_convertible<Arithmetic, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value && !is_mp_number_expression<Arithmetic>::value && !is_mp_number<Arithmetic>::value), bool>::type 
+inline typename enable_if_c<(is_convertible<Arithmetic, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value && !is_number_expression<Arithmetic>::value && !is_number<Arithmetic>::value), bool>::type 
    operator != (const detail::expression<Tag, A1, A2, A3, A4>& a, const Arithmetic& b)
 {
    typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
@@ -210,7 +210,7 @@ inline bool operator < (const number<Backend, ExpressionTemplates>& a, const num
    return eval_lt(a.backend(), b.backend());
 }
 template <class Backend, bool ExpressionTemplates, class Arithmetic>
-inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, ExpressionTemplates> >::value && !is_mp_number_expression<Arithmetic>::value && !is_mp_number<Arithmetic>::value), bool>::type 
+inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, ExpressionTemplates> >::value && !is_number_expression<Arithmetic>::value && !is_number<Arithmetic>::value), bool>::type 
    operator < (const number<Backend, ExpressionTemplates>& a, const Arithmetic& b)
 {
    typedef typename detail::canonical<Arithmetic, Backend>::type ct;
@@ -226,7 +226,7 @@ inline typename enable_if<is_same<number<Backend, ExpressionTemplates>, typename
    return eval_lt(a.backend(), t.backend());
 }
 template <class Arithmetic, class Backend, bool ExpressionTemplates>
-inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, ExpressionTemplates> >::value && !is_mp_number_expression<Arithmetic>::value && !is_mp_number<Arithmetic>::value), bool>::type 
+inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, ExpressionTemplates> >::value && !is_number_expression<Arithmetic>::value && !is_number<Arithmetic>::value), bool>::type 
    operator < (const Arithmetic& a, const number<Backend, ExpressionTemplates>& b)
 {
    typedef typename detail::canonical<Arithmetic, Backend>::type ct;
@@ -234,7 +234,7 @@ inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, Expressi
    return eval_gt(b.backend(), ct(a));
 }
 template <class Arithmetic, class Tag, class A1, class A2, class A3, class A4>
-inline typename enable_if_c<(is_convertible<Arithmetic, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value && !is_mp_number_expression<Arithmetic>::value && !is_mp_number<Arithmetic>::value), bool>::type 
+inline typename enable_if_c<(is_convertible<Arithmetic, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value && !is_number_expression<Arithmetic>::value && !is_number<Arithmetic>::value), bool>::type 
    operator < (const Arithmetic& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
 {
    typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
@@ -252,7 +252,7 @@ inline typename enable_if<is_same<number<Backend, ExpressionTemplates>, typename
    return eval_lt(t.backend(), b.backend());
 }
 template <class Tag, class A1, class A2, class A3, class A4, class Arithmetic>
-inline typename enable_if_c<(is_convertible<Arithmetic, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value && !is_mp_number_expression<Arithmetic>::value && !is_mp_number<Arithmetic>::value), bool>::type 
+inline typename enable_if_c<(is_convertible<Arithmetic, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value && !is_number_expression<Arithmetic>::value && !is_number<Arithmetic>::value), bool>::type 
    operator < (const detail::expression<Tag, A1, A2, A3, A4>& a, const Arithmetic& b)
 {
    typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
@@ -278,7 +278,7 @@ inline bool operator > (const number<Backend, ExpressionTemplates>& a, const num
    return eval_gt(a.backend(), b.backend());
 }
 template <class Backend, bool ExpressionTemplates, class Arithmetic>
-inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, ExpressionTemplates> >::value && !is_mp_number_expression<Arithmetic>::value && !is_mp_number<Arithmetic>::value), bool>::type 
+inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, ExpressionTemplates> >::value && !is_number_expression<Arithmetic>::value && !is_number<Arithmetic>::value), bool>::type 
    operator > (const number<Backend, ExpressionTemplates>& a, const Arithmetic& b)
 {
    typedef typename detail::canonical<Arithmetic, Backend>::type ct;
@@ -294,7 +294,7 @@ inline typename enable_if<is_same<number<Backend, ExpressionTemplates>, typename
    return eval_gt(a.backend(), t.backend());
 }
 template <class Arithmetic, class Backend, bool ExpressionTemplates>
-inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, ExpressionTemplates> >::value && !is_mp_number_expression<Arithmetic>::value && !is_mp_number<Arithmetic>::value), bool>::type 
+inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, ExpressionTemplates> >::value && !is_number_expression<Arithmetic>::value && !is_number<Arithmetic>::value), bool>::type 
    operator > (const Arithmetic& a, const number<Backend, ExpressionTemplates>& b)
 {
    typedef typename detail::canonical<Arithmetic, Backend>::type ct;
@@ -302,7 +302,7 @@ inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, Expressi
    return eval_lt(b.backend(), ct(a));
 }
 template <class Arithmetic, class Tag, class A1, class A2, class A3, class A4>
-inline typename enable_if_c<(is_convertible<Arithmetic, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value && !is_mp_number_expression<Arithmetic>::value && !is_mp_number<Arithmetic>::value), bool>::type 
+inline typename enable_if_c<(is_convertible<Arithmetic, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value && !is_number_expression<Arithmetic>::value && !is_number<Arithmetic>::value), bool>::type 
    operator > (const Arithmetic& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
 {
    typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
@@ -320,7 +320,7 @@ inline typename enable_if<is_same<number<Backend, ExpressionTemplates>, typename
    return eval_gt(t.backend(), b.backend());
 }
 template <class Tag, class A1, class A2, class A3, class A4, class Arithmetic>
-inline typename enable_if_c<(is_convertible<Arithmetic, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value && !is_mp_number_expression<Arithmetic>::value && !is_mp_number<Arithmetic>::value), bool>::type 
+inline typename enable_if_c<(is_convertible<Arithmetic, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value && !is_number_expression<Arithmetic>::value && !is_number<Arithmetic>::value), bool>::type 
    operator > (const detail::expression<Tag, A1, A2, A3, A4>& a, const Arithmetic& b)
 {
    typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
@@ -346,7 +346,7 @@ inline bool operator <= (const number<Backend, ExpressionTemplates>& a, const nu
    return !eval_gt(a.backend(), b.backend());
 }
 template <class Backend, bool ExpressionTemplates, class Arithmetic>
-inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, ExpressionTemplates> >::value && !is_mp_number_expression<Arithmetic>::value && !is_mp_number<Arithmetic>::value), bool>::type 
+inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, ExpressionTemplates> >::value && !is_number_expression<Arithmetic>::value && !is_number<Arithmetic>::value), bool>::type 
    operator <= (const number<Backend, ExpressionTemplates>& a, const Arithmetic& b)
 {
    typedef typename detail::canonical<Arithmetic, Backend>::type ct;
@@ -362,7 +362,7 @@ inline typename enable_if<is_same<number<Backend, ExpressionTemplates>, typename
    return !eval_gt(a.backend(), t.backend());
 }
 template <class Arithmetic, class Backend, bool ExpressionTemplates>
-inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, ExpressionTemplates> >::value && !is_mp_number_expression<Arithmetic>::value && !is_mp_number<Arithmetic>::value), bool>::type 
+inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, ExpressionTemplates> >::value && !is_number_expression<Arithmetic>::value && !is_number<Arithmetic>::value), bool>::type 
    operator <= (const Arithmetic& a, const number<Backend, ExpressionTemplates>& b)
 {
    typedef typename detail::canonical<Arithmetic, Backend>::type ct;
@@ -370,7 +370,7 @@ inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, Expressi
    return !eval_lt(b.backend(), ct(a));
 }
 template <class Arithmetic, class Tag, class A1, class A2, class A3, class A4>
-inline typename enable_if_c<(is_convertible<Arithmetic, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value && !is_mp_number_expression<Arithmetic>::value && !is_mp_number<Arithmetic>::value), bool>::type 
+inline typename enable_if_c<(is_convertible<Arithmetic, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value && !is_number_expression<Arithmetic>::value && !is_number<Arithmetic>::value), bool>::type 
    operator <= (const Arithmetic& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
 {
    typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
@@ -388,7 +388,7 @@ inline typename enable_if<is_same<number<Backend, ExpressionTemplates>, typename
    return !eval_gt(t.backend(), b.backend());
 }
 template <class Tag, class A1, class A2, class A3, class A4, class Arithmetic>
-inline typename enable_if_c<(is_convertible<Arithmetic, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value && !is_mp_number_expression<Arithmetic>::value && !is_mp_number<Arithmetic>::value), bool>::type 
+inline typename enable_if_c<(is_convertible<Arithmetic, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value && !is_number_expression<Arithmetic>::value && !is_number<Arithmetic>::value), bool>::type 
    operator <= (const detail::expression<Tag, A1, A2, A3, A4>& a, const Arithmetic& b)
 {
    typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
@@ -414,7 +414,7 @@ inline bool operator >= (const number<Backend, ExpressionTemplates>& a, const nu
    return !eval_lt(a.backend(), b.backend());
 }
 template <class Backend, bool ExpressionTemplates, class Arithmetic>
-inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, ExpressionTemplates> >::value && !is_mp_number_expression<Arithmetic>::value && !is_mp_number<Arithmetic>::value), bool>::type 
+inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, ExpressionTemplates> >::value && !is_number_expression<Arithmetic>::value && !is_number<Arithmetic>::value), bool>::type 
    operator >= (const number<Backend, ExpressionTemplates>& a, const Arithmetic& b)
 {
    typedef typename detail::canonical<Arithmetic, Backend>::type ct;
@@ -430,7 +430,7 @@ inline typename enable_if<is_same<number<Backend, ExpressionTemplates>, typename
    return !eval_lt(a.backend(), t.backend());
 }
 template <class Arithmetic, class Backend, bool ExpressionTemplates>
-inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, ExpressionTemplates> >::value && !is_mp_number_expression<Arithmetic>::value && !is_mp_number<Arithmetic>::value), bool>::type 
+inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, ExpressionTemplates> >::value && !is_number_expression<Arithmetic>::value && !is_number<Arithmetic>::value), bool>::type 
    operator >= (const Arithmetic& a, const number<Backend, ExpressionTemplates>& b)
 {
    typedef typename detail::canonical<Arithmetic, Backend>::type ct;
@@ -438,7 +438,7 @@ inline typename enable_if_c<(is_convertible<Arithmetic, number<Backend, Expressi
    return !eval_gt(b.backend(), ct(a));
 }
 template <class Arithmetic, class Tag, class A1, class A2, class A3, class A4>
-inline typename enable_if_c<(is_convertible<Arithmetic, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value && !is_mp_number_expression<Arithmetic>::value && !is_mp_number<Arithmetic>::value), bool>::type 
+inline typename enable_if_c<(is_convertible<Arithmetic, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value && !is_number_expression<Arithmetic>::value && !is_number<Arithmetic>::value), bool>::type 
    operator >= (const Arithmetic& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
 {
    typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;
@@ -456,7 +456,7 @@ inline typename enable_if<is_same<number<Backend, ExpressionTemplates>, typename
    return !eval_lt(t.backend(), b.backend());
 }
 template <class Tag, class A1, class A2, class A3, class A4, class Arithmetic>
-inline typename enable_if_c<(is_convertible<Arithmetic, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value && !is_mp_number_expression<Arithmetic>::value && !is_mp_number<Arithmetic>::value), bool>::type 
+inline typename enable_if_c<(is_convertible<Arithmetic, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>::value && !is_number_expression<Arithmetic>::value && !is_number<Arithmetic>::value), bool>::type 
    operator >= (const detail::expression<Tag, A1, A2, A3, A4>& a, const Arithmetic& b)
 {
    typedef typename detail::expression<Tag, A1, A2, A3, A4>::result_type result_type;

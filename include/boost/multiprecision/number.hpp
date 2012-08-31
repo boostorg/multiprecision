@@ -356,7 +356,7 @@ public:
    BOOST_FORCEINLINE typename enable_if<is_integral<V>, number&>::type operator <<= (V val)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The left-shift operation is only valid for integer types");
-      check_shift_range(val, mpl::bool_<(sizeof(V) > sizeof(std::size_t))>(), is_signed<V>());
+      detail::check_shift_range(val, mpl::bool_<(sizeof(V) > sizeof(std::size_t))>(), is_signed<V>());
       eval_left_shift(m_backend, canonical_value(val));
       return *this;
    }
@@ -365,7 +365,7 @@ public:
    BOOST_FORCEINLINE typename enable_if<is_integral<V>, number&>::type operator >>= (V val)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The right-shift operation is only valid for integer types");
-      check_shift_range(val, mpl::bool_<(sizeof(V) > sizeof(std::size_t))>(), is_signed<V>());
+      detail::check_shift_range(val, mpl::bool_<(sizeof(V) > sizeof(std::size_t))>(), is_signed<V>());
       eval_right_shift(m_backend, canonical_value(val));
       return *this;
    }
@@ -638,29 +638,6 @@ private:
       this->assign(t);
    }
 
-
-   template <class V>
-   void check_shift_range(V val, const mpl::true_&, const mpl::true_&)
-   {
-      if(val > (std::numeric_limits<std::size_t>::max)())
-         BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
-      if(val < 0)
-         BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
-   }
-   template <class V>
-   void check_shift_range(V val, const mpl::false_&, const mpl::true_&)
-   {
-      if(val < 0)
-         BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
-   }
-   template <class V>
-   void check_shift_range(V val, const mpl::true_&, const mpl::false_&)
-   {
-      if(val > (std::numeric_limits<std::size_t>::max)())
-         BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
-   }
-   template <class V>
-   void check_shift_range(V, const mpl::false_&, const mpl::false_&) BOOST_NOEXCEPT{}
 
    template <class Exp>
    void do_assign(const Exp& e, const detail::add_immediates&)
@@ -1072,6 +1049,7 @@ private:
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The right shift operation is only valid for integer types");
       using default_ops::eval_right_shift;
+      detail::check_shift_range(val, mpl::bool_<(sizeof(Val) > sizeof(std::size_t))>(), is_signed<Val>());
       eval_right_shift(m_backend, canonical_value(e.value()), val);
    }
 
@@ -1080,6 +1058,7 @@ private:
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The left shift operation is only valid for integer types");
       using default_ops::eval_left_shift;
+      detail::check_shift_range(val, mpl::bool_<(sizeof(Val) > sizeof(std::size_t))>(), is_signed<Val>());
       eval_left_shift(m_backend, canonical_value(e.value()), val);
    }
 
@@ -1089,6 +1068,7 @@ private:
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The right shift operation is only valid for integer types");
       using default_ops::eval_right_shift;
       self_type temp(e);
+      detail::check_shift_range(val, mpl::bool_<(sizeof(Val) > sizeof(std::size_t))>(), is_signed<Val>());
       eval_right_shift(m_backend, temp.backend(), val);
    }
 
@@ -1098,6 +1078,7 @@ private:
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The left shift operation is only valid for integer types");
       using default_ops::eval_left_shift;
       self_type temp(e);
+      detail::check_shift_range(val, mpl::bool_<(sizeof(Val) > sizeof(std::size_t))>(), is_signed<Val>());
       eval_left_shift(m_backend, temp.backend(), val);
    }
 

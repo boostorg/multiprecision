@@ -148,6 +148,10 @@
 <span class="keyword">struct</span> <span class="identifier">component_type</span><span class="special">;</span>
 <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
 <span class="keyword">struct</span> <span class="identifier">number_category</span><span class="special">;</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="keyword">struct</span> <span class="identifier">is_number</span><span class="special">;</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="keyword">struct</span> <span class="identifier">is_number_expression</span><span class="special">;</span>
 
 <span class="comment">// Integer specific functions:</span>
 <span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">pow</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">unsigned</span><span class="special">);</span>
@@ -629,6 +633,20 @@
         support as well as for classes in this library: which means it can be used
         for generic code that must work with built in arithmetic types as well as
         multiprecision ones.
+      </p>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="keyword">struct</span> <span class="identifier">is_number</span><span class="special">;</span>
+</pre>
+<p>
+        A traits class that inherits from <code class="computeroutput"><span class="identifier">mpl</span><span class="special">::</span><span class="identifier">true_</span></code>
+        if T is an instance of <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;&gt;</span></code>, otherwise from <code class="computeroutput"><span class="identifier">mpl</span><span class="special">::</span><span class="identifier">false_</span></code>.
+      </p>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="keyword">struct</span> <span class="identifier">is_number_expression</span><span class="special">;</span>
+</pre>
+<p>
+        A traits class that inherits from <code class="computeroutput"><span class="identifier">mpl</span><span class="special">::</span><span class="identifier">true_</span></code>
+        if T is an expression template type derived from <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;&gt;</span></code>, otherwise from <code class="computeroutput"><span class="identifier">mpl</span><span class="special">::</span><span class="identifier">false_</span></code>.
       </p>
 <h5>
 <a name="boost_multiprecision.ref.number.h7"></a>

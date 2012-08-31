@@ -1534,19 +1534,23 @@ inline void eval_lcm(gmp_int& result, const gmp_int& a, const gmp_int& b)
 {
    mpz_lcm(result.data(), a.data(), b.data());
 }
-inline void eval_gcd(gmp_int& result, const gmp_int& a, const unsigned long b)
+template <class I>
+inline typename enable_if_c<(is_unsigned<I>::value && (sizeof(I) <= sizeof(unsigned long)))>::type eval_gcd(gmp_int& result, const gmp_int& a, const I b)
 {
    mpz_gcd_ui(result.data(), a.data(), b);
 }
-inline void eval_lcm(gmp_int& result, const gmp_int& a, const unsigned long b)
+template <class I>
+inline typename enable_if_c<(is_unsigned<I>::value && (sizeof(I) <= sizeof(unsigned long)))>::type eval_lcm(gmp_int& result, const gmp_int& a, const I b)
 {
    mpz_lcm_ui(result.data(), a.data(), b);
 }
-inline void eval_gcd(gmp_int& result, const gmp_int& a, const long b)
+template <class I>
+inline typename enable_if_c<(is_signed<I>::value && (sizeof(I) <= sizeof(long)))>::type eval_gcd(gmp_int& result, const gmp_int& a, const I b)
 {
    mpz_gcd_ui(result.data(), a.data(), std::abs(b));
 }
-inline void eval_lcm(gmp_int& result, const gmp_int& a, const long b)
+template <class I>
+inline typename enable_if_c<is_signed<I>::value && ((sizeof(I) <= sizeof(long)))>::type eval_lcm(gmp_int& result, const gmp_int& a, const I b)
 {
    mpz_lcm_ui(result.data(), a.data(), std::abs(b));
 }
@@ -2464,9 +2468,9 @@ public:
    }
    static number_type lowest() BOOST_NOEXCEPT { return (min)(); }
    // Digits are unbounded, use zero for now:
-   BOOST_STATIC_CONSTEXPR int digits = 0;
-   BOOST_STATIC_CONSTEXPR int digits10 = 0;
-   BOOST_STATIC_CONSTEXPR int max_digits10 = 0;
+   BOOST_STATIC_CONSTEXPR int digits = INT_MAX;
+   BOOST_STATIC_CONSTEXPR int digits10 = (INT_MAX / 1000) * 301L;
+   BOOST_STATIC_CONSTEXPR int max_digits10 = digits10 + 2;
    BOOST_STATIC_CONSTEXPR bool is_signed = true;
    BOOST_STATIC_CONSTEXPR bool is_integer = false;
    BOOST_STATIC_CONSTEXPR bool is_exact = true;

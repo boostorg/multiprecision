@@ -51,6 +51,25 @@ int main()
    number<cpp_int_backend<32, true, void>, false> i7(i3);
    BOOST_TEST(i7 == -1234567);
 
+   int256_t   i8(i6);
+   BOOST_TEST(i8 == -5677334);
+
+   i7.assign(4.0);
+   BOOST_TEST(i7 == 4);
+
+   number<cpp_int_backend<30, true, void>, false> i9(-5677334);
+   i7 = i9;
+   BOOST_TEST(i7 == -5677334);
+   i7 = number<cpp_int_backend<32, true, void>, false>(i9);
+   BOOST_TEST(i7 == -5677334);
+
+   i9 = static_cast<number<cpp_int_backend<30, true, void>, false> >(i7);
+   BOOST_TEST(i9 == -5677334);
+
+   ++i9;
+   i7 = i9;
+   BOOST_TEST(i7 == 1 - 5677334);
+
    return boost::report_errors();
 }
 

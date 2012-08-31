@@ -401,17 +401,17 @@ inline typename enable_if<
    mpl::and_<
       mpl::bool_<number_category<T>::value == number_kind_integer>, 
       mpl::or_<
-         is_mp_number<T>,
-         is_mp_number_expression<T>
+         is_number<T>,
+         is_number_expression<T>
       >,
       mpl::or_<
-         is_mp_number<U>,
-         is_mp_number_expression<U>,
+         is_number<U>,
+         is_number_expression<U>,
          is_integral<U>
       >,
       mpl::or_<
-         is_mp_number<V>,
-         is_mp_number_expression<V>,
+         is_number<V>,
+         is_number_expression<V>,
          is_integral<V>
       >
    >,

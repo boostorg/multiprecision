@@ -285,6 +285,7 @@ inline typename enable_if<is_integral<I>, number<B, false> >::type
 {
    number<B, false> result(a);
    using default_ops::eval_left_shift;
+   detail::check_shift_range(b, mpl::bool_<(sizeof(I) > sizeof(std::size_t))>(), is_signed<I>());
    eval_left_shift(result.backend(), b);
    return BOOST_MP_MOVE(result);
 }
@@ -294,6 +295,7 @@ inline typename enable_if<is_integral<I>, number<B, false> >::type
 {
    number<B, false> result(a);
    using default_ops::eval_right_shift;
+   detail::check_shift_range(b, mpl::bool_<(sizeof(I) > sizeof(std::size_t))>(), is_signed<I>());
    eval_right_shift(result.backend(), b);
    return BOOST_MP_MOVE(result);
 }

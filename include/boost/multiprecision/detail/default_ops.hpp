@@ -174,13 +174,6 @@ inline typename enable_if_c<is_arithmetic<V>::value && is_convertible<V, T>::val
    eval_complement(result, t);
 }
 
-template <class T>
-inline bool is_same_object(const T& u, const T&v) BOOST_NOEXCEPT
-{  return &u == &v;  }
-template <class T, class U>
-BOOST_CONSTEXPR inline bool is_same_object(const T&, const U&) BOOST_NOEXCEPT
-{  return false;  }
-
 //
 // Default versions of 3-arg arithmetic functions, these mostly just forward to the 2 arg versions:
 //

@@ -18,10 +18,10 @@ template <class Backend, bool ExpressionTemplates = true>
 class number;
 
 template <class T>
-struct is_mp_number : public mpl::false_ {};
+struct is_number : public mpl::false_ {};
 
 template <class Backend, bool ExpressionTemplates>
-struct is_mp_number<number<Backend, ExpressionTemplates> > : public mpl::true_ {};
+struct is_number<number<Backend, ExpressionTemplates> > : public mpl::true_ {};
 
 namespace detail{
 
@@ -32,17 +32,17 @@ struct expression;
 } // namespace detail
 
 template <class T>
-struct is_mp_number_expression : public mpl::false_ {};
+struct is_number_expression : public mpl::false_ {};
 
 template<class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-struct is_mp_number_expression<detail::expression<tag, Arg1, Arg2, Arg3, Arg4> > : public mpl::true_ {};
+struct is_number_expression<detail::expression<tag, Arg1, Arg2, Arg3, Arg4> > : public mpl::true_ {};
 
 template <class T, class Num>
 struct is_compatible_arithmetic_type 
    : public mpl::bool_<
          is_convertible<T, Num>::value 
-         && !is_mp_number<T>::value 
-         && !is_mp_number_expression<T>::value> 
+         && !is_number<T>::value 
+         && !is_number_expression<T>::value> 
 {};
 
 namespace detail{
@@ -192,9 +192,9 @@ struct backend_type<expression<tag, A1, A2, A3, A4> >
 
 
 template <class T>
-struct is_mp_number : public mpl::false_{};
+struct is_number : public mpl::false_{};
 template <class T, bool ExpressionTemplates>
-struct is_mp_number<boost::multiprecision::number<T, ExpressionTemplates> > : public mpl::true_{};
+struct is_number<boost::multiprecision::number<T, ExpressionTemplates> > : public mpl::true_{};
 template <class T>
 struct is_mp_number_exp : public mpl::false_{};
 template <class Tag, class Arg1, class Arg2, class Arg3, class Arg4>
@@ -594,6 +594,29 @@ void format_float_string(S& str, boost::intmax_t my_exp, boost::intmax_t digits,
       str.insert(0, 1, '+');
 }
 
+template <class V>
+void check_shift_range(V val, const mpl::true_&, const mpl::true_&)
+{
+   if(val > (std::numeric_limits<std::size_t>::max)())
+      BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
+   if(val < 0)
+      BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
+}
+template <class V>
+void check_shift_range(V val, const mpl::false_&, const mpl::true_&)
+{
+   if(val < 0)
+      BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a negative value."));
+}
+template <class V>
+void check_shift_range(V val, const mpl::true_&, const mpl::false_&)
+{
+   if(val > (std::numeric_limits<std::size_t>::max)())
+      BOOST_THROW_EXCEPTION(std::out_of_range("Can not shift by a value greater than std::numeric_limits<std::size_t>::max()."));
+}
+template <class V>
+void check_shift_range(V, const mpl::false_&, const mpl::false_&) BOOST_NOEXCEPT{}
+
 } // namespace detail
 
 //
@@ -701,7 +724,7 @@ template <class V, class B>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, true> >, detail::expression<detail::subtract_immediates, V, number<B, true> > >::type
    operator + (const V& a, const detail::expression<detail::negate, number<B, true> >& b)
 {
-   return detail::expression<detail::subtract_immediates, number<B, true>, number<B, true> >(a, b.left_ref());
+   return detail::expression<detail::subtract_immediates, V, number<B, true> >(a, b.left_ref());
 }
 template <class B>
 inline detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, true>, number<B, true> > >

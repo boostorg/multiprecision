@@ -1152,7 +1152,7 @@ public:
    template <unsigned MinBits2, bool Signed2, class Allocator2>
    cpp_int_backend(const cpp_int_backend<MinBits2, Signed2, Allocator2, true>& other, 
       typename enable_if_c<
-         (sizeof(cpp_int_backend<MinBits2, Signed2, Allocator2, true>::local_limb_type) <= sizeof(typename cpp_int_backend::local_limb_type))
+         (MinBits2 <= MinBits)
          && (Signed || !Signed2)
       >::type* = 0) 
       : base_type()
@@ -1168,7 +1168,7 @@ public:
    template <unsigned MinBits2, bool Signed2, class Allocator2>
    explicit cpp_int_backend(const cpp_int_backend<MinBits2, Signed2, Allocator2, true>& other, 
       typename disable_if_c<
-         (sizeof(cpp_int_backend<MinBits2, Signed2, Allocator2, true>::local_limb_type) <= sizeof(typename cpp_int_backend::local_limb_type))
+         (MinBits2 <= MinBits)
          && (Signed || !Signed2)
       >::type* = 0) 
       : base_type()
@@ -1209,17 +1209,6 @@ public:
       this->sign(other.sign());
    }
 
-   cpp_int_backend& operator = (const char* s)
-   {
-      try{
-         *this->limbs() = boost::lexical_cast<limb_type>(s);
-      }
-      catch(const std::exception&)
-      {
-         BOOST_THROW_EXCEPTION(std::runtime_error(std::string("Could not interpret the string \"") + s + std::string("\" as a valid integer value.")));
-      }
-      return *this;
-   }
    BOOST_FORCEINLINE void swap(cpp_int_backend& o) BOOST_NOEXCEPT
    {
       this->do_swap(o);
@@ -1228,11 +1217,13 @@ private:
    std::string str(std::ios_base::fmtflags f, const mpl::false_&)const
    {
       std::stringstream ss;
-      ss.flags(f);
+      ss.flags(f & ~std::ios_base::showpos);
       ss << *this->limbs();
       std::string result;
       if(this->sign())
          result += '-';
+      else if(f & std::ios_base::showpos)
+         result += '+';
       result += ss.str();
       return result;
    }
@@ -1314,6 +1305,58 @@ private:
       return result;
    }
 public:
+   cpp_int_backend& operator = (const char* s)
+   {
+      std::size_t n = s ? std::strlen(s) : 0;
+      *this->limbs() = 0;
+      unsigned radix = 10;
+      bool isneg = false;
+      if(n && (*s == '-'))
+      {
+         --n;
+         ++s;
+         isneg = true;
+      }
+      if(n && (*s == '0'))
+      {
+         if((n > 1) && ((s[1] == 'x') || (s[1] == 'X')))
+         {
+            radix = 16;
+            s +=2;
+            n -= 2;
+         }
+         else
+         {
+            radix = 8;
+            n -= 1;
+         }
+      }
+      if(n)
+      {
+         unsigned val;
+         while(*s)
+         {
+            if(*s >= '0' && *s <= '9')
+               val = *s - '0';
+            else if(*s >= 'a' && *s <= 'f')
+               val = 10 + *s - 'a';
+            else if(*s >= 'A' && *s <= 'F')
+               val = 10 + *s - 'A';
+            else
+               val = radix + 1;
+            if(val > radix)
+            {
+               BOOST_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
+            }
+            *this->limbs() *= radix;
+            *this->limbs() += val;
+            ++s;
+         }
+      }
+      if(isneg)
+         this->negate();
+      return *this;
+   }
    std::string str(std::streamsize /*digits*/, std::ios_base::fmtflags f)const
    {
 #ifdef BOOST_MP_NO_DOUBLE_LIMB_TYPE_IO
@@ -3045,9 +3088,9 @@ public:
       return number_type(0);
    }
    static number_type lowest() BOOST_NOEXCEPT { return (min)(); }
-   BOOST_STATIC_CONSTEXPR int digits = 0;
-   BOOST_STATIC_CONSTEXPR int digits10 = 0;
-   BOOST_STATIC_CONSTEXPR int max_digits10 = 0;
+   BOOST_STATIC_CONSTEXPR int digits = INT_MAX;
+   BOOST_STATIC_CONSTEXPR int digits10 = (INT_MAX / 1000) * 301L;
+   BOOST_STATIC_CONSTEXPR int max_digits10 = digits10 + 2;
    BOOST_STATIC_CONSTEXPR bool is_signed = true;
    BOOST_STATIC_CONSTEXPR bool is_integer = true;
    BOOST_STATIC_CONSTEXPR bool is_exact = true;
