@@ -87,24 +87,39 @@
 <span class="identifier">my_float</span> <span class="identifier">a</span><span class="special">,</span> <span class="identifier">b</span><span class="special">,</span> <span class="identifier">c</span><span class="special">;</span> <span class="comment">// These variables have 300 decimal digits precision</span>
 </pre>
 <p>
-      Note that mixing arithmetic operations using types of different precision is
-      strictly forbidden:
+      We can also mix arithmetic operations between different types, provided there
+      is an unambiguous implicit conversion from one type to the other:
     </p>
 <pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">cpp_int</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
 
 <span class="keyword">namespace</span> <span class="identifier">mp</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">;</span>     <span class="comment">// Reduce the typing a bit later...</span>
 
-<span class="identifier">mp</span><span class="special">::</span><span class="identifier">int128_t</span> <span class="identifier">a</span><span class="special">(</span><span class="number">3</span><span class="special">),</span> <span class="identifier">b</span><span class="special">(</span><span class="number">2</span><span class="special">);</span>
+<span class="identifier">mp</span><span class="special">::</span><span class="identifier">int128_t</span> <span class="identifier">a</span><span class="special">(</span><span class="number">3</span><span class="special">),</span> <span class="identifier">b</span><span class="special">(</span><span class="number">4</span><span class="special">);</span>
 <span class="identifier">mp</span><span class="special">::</span><span class="identifier">int512_t</span> <span class="identifier">c</span><span class="special">(</span><span class="number">50</span><span class="special">),</span> <span class="identifier">d</span><span class="special">;</span>
 
-<span class="identifier">d</span> <span class="special">=</span> <span class="identifier">c</span> <span class="special">*</span> <span class="identifier">a</span><span class="special">;</span>   <span class="comment">// Compiler error</span>
+<span class="identifier">d</span> <span class="special">=</span> <span class="identifier">c</span> <span class="special">*</span> <span class="identifier">a</span><span class="special">;</span>   <span class="comment">// OK, result of mixed arithmetic is an int512_t</span>
 </pre>
 <p>
-      However, conversions are allowed:
+      Conversions are also allowed:
     </p>
 <pre class="programlisting"><span class="identifier">d</span> <span class="special">=</span> <span class="identifier">a</span><span class="special">;</span> <span class="comment">// OK, widening conversion.</span>
 <span class="identifier">d</span> <span class="special">=</span> <span class="identifier">a</span> <span class="special">*</span> <span class="identifier">b</span><span class="special">;</span>  <span class="comment">// OK, can convert from an expression template too.</span>
-<span class="identifier">d</span> <span class="special">=</span> <span class="identifier">mp</span><span class="special">::</span><span class="identifier">int512_t</span><span class="special">(</span><span class="identifier">a</span><span class="special">)</span> <span class="special">*</span> <span class="identifier">c</span><span class="special">;</span> <span class="comment">// OK, all the types in the expression are the same now.</span>
+</pre>
+<p>
+      However conversions that are inherently lossy are either declared explicit
+      or else forbidden altogether:
+    </p>
+<pre class="programlisting"><span class="identifier">d</span> <span class="special">=</span> <span class="number">3.14</span><span class="special">;</span>  <span class="comment">// Error implicit conversion from float not allowed.</span>
+<span class="identifier">d</span> <span class="special">=</span> <span class="keyword">static_cast</span><span class="special">&lt;</span><span class="identifier">mp</span><span class="special">::</span><span class="identifier">int512_t</span><span class="special">&gt;(</span><span class="number">3.14</span><span class="special">);</span>  <span class="comment">// OK explicit construction is allowed</span>
+</pre>
+<p>
+      Mixed arithmetic will fail if the conversion is either ambiguous or explicit:
+    </p>
+<pre class="programlisting"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_int_backend</span><span class="special">&lt;&gt;,</span> <span class="keyword">false</span><span class="special">&gt;</span> <span class="identifier">a</span><span class="special">(</span><span class="number">2</span><span class="special">);</span>
+<span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_int_backend</span><span class="special">&lt;&gt;,</span> <span class="keyword">true</span><span class="special">&gt;</span>  <span class="identifier">b</span><span class="special">(</span><span class="number">3</span><span class="special">);</span>
+
+<span class="identifier">b</span> <span class="special">=</span> <span class="identifier">a</span> <span class="special">*</span> <span class="identifier">b</span><span class="special">;</span> <span class="comment">// Error, implicit conversion could go either way.</span>
+<span class="identifier">b</span> <span class="special">=</span> <span class="identifier">a</span> <span class="special">*</span> <span class="number">3.14</span><span class="special">;</span> <span class="comment">// Error, no operator overload if the conversion would be explicit.</span>
 </pre>
 <h5>
 <a name="boost_multiprecision.intro.h0"></a>

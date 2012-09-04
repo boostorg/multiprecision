@@ -342,17 +342,14 @@
             An expression template derived from <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;</span></code>.
           </li>
 <li class="listitem">
-            Any type implicitly convertible to <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span></code>.
+            Any type implicitly convertible to <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span></code>, including some other instance of
+            class <code class="computeroutput"><span class="identifier">number</span></code>.
           </li>
 </ul></div>
 <p>
         For the left and right shift operations, the argument must be a builtin integer
         type with a positive value (negative values result in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
         being thrown).
-      </p>
-<p>
-        Note that all the types involved in the expression must evaluate to the same
-        type - which is to say we cannot mix a <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">B1</span><span class="special">&gt;</span></code> with a <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">B2</span><span class="special">&gt;</span></code> where B1 and B2 are different types.
       </p>
 <pre class="programlisting"><span class="keyword">operator</span> <span class="emphasis"><em>convertible-to-bool-type</em></span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
 </pre>
@@ -483,10 +480,11 @@
 <li class="listitem">
             An expression template type derived from <code class="computeroutput"><span class="identifier">number</span></code>.
           </li>
+<li class="listitem">
+            Any type for which <code class="computeroutput"><span class="identifier">number</span></code>
+            has an implicit constructor - for example a builtin arithmetic type.
+          </li>
 </ul></div>
-<p>
-        In addition, one of the two arguments may be a builtin arithmetic type.
-      </p>
 <p>
         The return type of these operators is either:
       </p>
@@ -507,10 +505,6 @@
             is a comparison operator.
           </li>
 </ul></div>
-<p>
-        Note that all the types involved in the expression must evaluate to the same
-        type - which is to say we cannot mix a <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">B1</span><span class="special">&gt;</span></code> with a <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">B2</span><span class="special">&gt;</span></code> where B1 and B2 are different types.
-      </p>
 <p>
         Finally note that the second argument to the left and right shift operations
         must be a builtin integer type, and that the argument must be positive (negative

@@ -99,22 +99,35 @@ by passing a second template argument to `number`:
 
    my_float a, b, c; // These variables have 300 decimal digits precision
 
-Note that mixing arithmetic operations using types of different precision is strictly forbidden:
+We can also mix arithmetic operations between different types, provided there is an unambiguous implicit conversion from one
+type to the other:
 
    #include <boost/multiprecision/cpp_int.hpp>
 
    namespace mp = boost::multiprecision;     // Reduce the typing a bit later...
 
-   mp::int128_t a(3), b(2);
+   mp::int128_t a(3), b(4);
    mp::int512_t c(50), d;
 
-   d = c * a;   // Compiler error
+   d = c * a;   // OK, result of mixed arithmetic is an int512_t
 
-However, conversions are allowed:
+Conversions are also allowed:
 
    d = a; // OK, widening conversion.
    d = a * b;  // OK, can convert from an expression template too.
-   d = mp::int512_t(a) * c; // OK, all the types in the expression are the same now.
+
+However conversions that are inherently lossy are either declared explicit or else forbidden altogether:
+
+   d = 3.14;  // Error implicit conversion from float not allowed.
+   d = static_cast<mp::int512_t>(3.14);  // OK explicit construction is allowed
+
+Mixed arithmetic will fail if the conversion is either ambiguous or explicit:
+
+   number<cpp_int_backend<>, false> a(2);
+   number<cpp_int_backend<>, true>  b(3);
+
+   b = a * b; // Error, implicit conversion could go either way.
+   b = a * 3.14; // Error, no operator overload if the conversion would be explicit.
 
 [h4 Move Semantics]
 
@@ -1319,13 +1332,10 @@ The arguments to these operators is either:
 
 * Another `number<Backend, ExpressionTemplates>`.
 * An expression template derived from `number<Backend>`.
-* Any type implicitly convertible to `number<Backend, ExpressionTemplates>`.
+* Any type implicitly convertible to `number<Backend, ExpressionTemplates>`, including some other instance of class `number`.
 
 For the left and right shift operations, the argument must be a builtin
 integer type with a positive value (negative values result in a `std::runtime_error` being thrown).
-
-Note that all the types involved in the expression must evaluate to the same type - which is to say 
-we cannot mix a `number<B1>` with a `number<B2>` where B1 and B2 are different types.
 
       operator ``['convertible-to-bool-type]``()const;
 
@@ -1418,17 +1428,13 @@ The arguments to these functions must contain at least one of the following:
 
 * A `number`.
 * An expression template type derived from `number`.
-
-In addition, one of the two arguments may be a builtin arithmetic type.
+* Any type for which `number` has an implicit constructor - for example a builtin arithmetic type.
 
 The return type of these operators is either:
 
 * An ['unmentionable-type] expression template type when `ExpressionTemplates` is `true`.
 * Type `number<Backend, false>` when `ExpressionTemplates` is `false`.
 * Type `bool` if the operator is a comparison operator.
-
-Note that all the types involved in the expression must evaluate to the same type - which is to say 
-we cannot mix a `number<B1>` with a `number<B2>` where B1 and B2 are different types.
 
 Finally note that the second argument to the left and right shift operations must be a builtin integer type, 
 and that the argument must be positive (negative arguments result in a `std::runtime_error` being thrown).

@@ -567,18 +567,18 @@ inline typename enable_if_c<is_arithmetic<T>::value, bool>::type eval_gt(const g
    return a.compare(b) > 0;
 }
 
-template <unsigned digits10>
-inline void eval_add(gmp_float<digits10>& result, const gmp_float<digits10>& o) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_add(gmp_float<D1>& result, const gmp_float<D2>& o) BOOST_NOEXCEPT
 {
    mpf_add(result.data(), result.data(), o.data());
 }
-template <unsigned digits10>
-inline void eval_subtract(gmp_float<digits10>& result, const gmp_float<digits10>& o) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_subtract(gmp_float<D1>& result, const gmp_float<D2>& o) BOOST_NOEXCEPT
 {
    mpf_sub(result.data(), result.data(), o.data());
 }
-template <unsigned digits10>
-inline void eval_multiply(gmp_float<digits10>& result, const gmp_float<digits10>& o) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_multiply(gmp_float<D1>& result, const gmp_float<D2>& o) BOOST_NOEXCEPT
 {
    mpf_mul(result.data(), result.data(), o.data());
 }
@@ -587,8 +587,8 @@ inline bool eval_is_zero(const gmp_float<digits10>& val) BOOST_NOEXCEPT
 {
    return mpf_sgn(val.data()) == 0;
 }
-template <unsigned digits10>
-inline void eval_divide(gmp_float<digits10>& result, const gmp_float<digits10>& o)
+template <unsigned D1, unsigned D2>
+inline void eval_divide(gmp_float<D1>& result, const gmp_float<D2>& o)
 {
    if(eval_is_zero(o))
       BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
@@ -651,31 +651,31 @@ inline void eval_divide(gmp_float<digits10>& result, long i)
 //
 // Specialised 3 arg versions of the basic operators:
 //
-template <unsigned digits10>
-inline void eval_add(gmp_float<digits10>& a, const gmp_float<digits10>& x, const gmp_float<digits10>& y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2, unsigned D3>
+inline void eval_add(gmp_float<D1>& a, const gmp_float<D2>& x, const gmp_float<D3>& y) BOOST_NOEXCEPT
 {
    mpf_add(a.data(), x.data(), y.data());
 }
-template <unsigned digits10>
-inline void eval_add(gmp_float<digits10>& a, const gmp_float<digits10>& x, unsigned long y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_add(gmp_float<D1>& a, const gmp_float<D2>& x, unsigned long y) BOOST_NOEXCEPT
 {
    mpf_add_ui(a.data(), x.data(), y);
 }
-template <unsigned digits10>
-inline void eval_add(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_add(gmp_float<D1>& a, const gmp_float<D2>& x, long y) BOOST_NOEXCEPT
 {
    if(y < 0)
       mpf_sub_ui(a.data(), x.data(), -y);
    else
       mpf_add_ui(a.data(), x.data(), y);
 }
-template <unsigned digits10>
-inline void eval_add(gmp_float<digits10>& a, unsigned long x, const gmp_float<digits10>& y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_add(gmp_float<D1>& a, unsigned long x, const gmp_float<D2>& y) BOOST_NOEXCEPT
 {
    mpf_add_ui(a.data(), y.data(), x);
 }
-template <unsigned digits10>
-inline void eval_add(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_add(gmp_float<D1>& a, long x, const gmp_float<D2>& y) BOOST_NOEXCEPT
 {
    if(x < 0)
    {
@@ -685,31 +685,31 @@ inline void eval_add(gmp_float<digits10>& a, long x, const gmp_float<digits10>& 
    else
       mpf_add_ui(a.data(), y.data(), x);
 }
-template <unsigned digits10>
-inline void eval_subtract(gmp_float<digits10>& a, const gmp_float<digits10>& x, const gmp_float<digits10>& y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2, unsigned D3>
+inline void eval_subtract(gmp_float<D1>& a, const gmp_float<D2>& x, const gmp_float<D3>& y) BOOST_NOEXCEPT
 {
    mpf_sub(a.data(), x.data(), y.data());
 }
-template <unsigned digits10>
-inline void eval_subtract(gmp_float<digits10>& a, const gmp_float<digits10>& x, unsigned long y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_subtract(gmp_float<D1>& a, const gmp_float<D2>& x, unsigned long y) BOOST_NOEXCEPT
 {
    mpf_sub_ui(a.data(), x.data(), y);
 }
-template <unsigned digits10>
-inline void eval_subtract(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_subtract(gmp_float<D1>& a, const gmp_float<D2>& x, long y) BOOST_NOEXCEPT
 {
    if(y < 0)
       mpf_add_ui(a.data(), x.data(), -y);
    else
       mpf_sub_ui(a.data(), x.data(), y);
 }
-template <unsigned digits10>
-inline void eval_subtract(gmp_float<digits10>& a, unsigned long x, const gmp_float<digits10>& y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_subtract(gmp_float<D1>& a, unsigned long x, const gmp_float<D2>& y) BOOST_NOEXCEPT
 {
    mpf_ui_sub(a.data(), x, y.data());
 }
-template <unsigned digits10>
-inline void eval_subtract(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_subtract(gmp_float<D1>& a, long x, const gmp_float<D2>& y) BOOST_NOEXCEPT
 {
    if(x < 0)
    {
@@ -720,18 +720,18 @@ inline void eval_subtract(gmp_float<digits10>& a, long x, const gmp_float<digits
       mpf_ui_sub(a.data(), x, y.data());
 }
 
-template <unsigned digits10>
-inline void eval_multiply(gmp_float<digits10>& a, const gmp_float<digits10>& x, const gmp_float<digits10>& y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2, unsigned D3>
+inline void eval_multiply(gmp_float<D1>& a, const gmp_float<D2>& x, const gmp_float<D3>& y) BOOST_NOEXCEPT
 {
    mpf_mul(a.data(), x.data(), y.data());
 }
-template <unsigned digits10>
-inline void eval_multiply(gmp_float<digits10>& a, const gmp_float<digits10>& x, unsigned long y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_multiply(gmp_float<D1>& a, const gmp_float<D2>& x, unsigned long y) BOOST_NOEXCEPT
 {
    mpf_mul_ui(a.data(), x.data(), y);
 }
-template <unsigned digits10>
-inline void eval_multiply(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_multiply(gmp_float<D1>& a, const gmp_float<D2>& x, long y) BOOST_NOEXCEPT
 {
    if(y < 0)
    {
@@ -741,13 +741,13 @@ inline void eval_multiply(gmp_float<digits10>& a, const gmp_float<digits10>& x, 
    else
       mpf_mul_ui(a.data(), x.data(), y);
 }
-template <unsigned digits10>
-inline void eval_multiply(gmp_float<digits10>& a, unsigned long x, const gmp_float<digits10>& y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_multiply(gmp_float<D1>& a, unsigned long x, const gmp_float<D2>& y) BOOST_NOEXCEPT
 {
    mpf_mul_ui(a.data(), y.data(), x);
 }
-template <unsigned digits10>
-inline void eval_multiply(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_multiply(gmp_float<D1>& a, long x, const gmp_float<D2>& y) BOOST_NOEXCEPT
 {
    if(x < 0)
    {
@@ -758,22 +758,22 @@ inline void eval_multiply(gmp_float<digits10>& a, long x, const gmp_float<digits
       mpf_mul_ui(a.data(), y.data(), x);
 }
 
-template <unsigned digits10>
-inline void eval_divide(gmp_float<digits10>& a, const gmp_float<digits10>& x, const gmp_float<digits10>& y)
+template <unsigned D1, unsigned D2, unsigned D3>
+inline void eval_divide(gmp_float<D1>& a, const gmp_float<D2>& x, const gmp_float<D3>& y)
 {
    if(eval_is_zero(y))
       BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpf_div(a.data(), x.data(), y.data());
 }
-template <unsigned digits10>
-inline void eval_divide(gmp_float<digits10>& a, const gmp_float<digits10>& x, unsigned long y)
+template <unsigned D1, unsigned D2>
+inline void eval_divide(gmp_float<D1>& a, const gmp_float<D2>& x, unsigned long y)
 {
    if(y == 0)
       BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpf_div_ui(a.data(), x.data(), y);
 }
-template <unsigned digits10>
-inline void eval_divide(gmp_float<digits10>& a, const gmp_float<digits10>& x, long y)
+template <unsigned D1, unsigned D2>
+inline void eval_divide(gmp_float<D1>& a, const gmp_float<D2>& x, long y)
 {
    if(y == 0)
       BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
@@ -785,15 +785,15 @@ inline void eval_divide(gmp_float<digits10>& a, const gmp_float<digits10>& x, lo
    else
       mpf_div_ui(a.data(), x.data(), y);
 }
-template <unsigned digits10>
-inline void eval_divide(gmp_float<digits10>& a, unsigned long x, const gmp_float<digits10>& y)
+template <unsigned D1, unsigned D2>
+inline void eval_divide(gmp_float<D1>& a, unsigned long x, const gmp_float<D2>& y)
 {
    if(eval_is_zero(y))
       BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpf_ui_div(a.data(), x, y.data());
 }
-template <unsigned digits10>
-inline void eval_divide(gmp_float<digits10>& a, long x, const gmp_float<digits10>& y)
+template <unsigned D1, unsigned D2>
+inline void eval_divide(gmp_float<D1>& a, long x, const gmp_float<D2>& y)
 {
    if(eval_is_zero(y))
       BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));

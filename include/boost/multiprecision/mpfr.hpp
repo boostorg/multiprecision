@@ -609,23 +609,23 @@ inline typename enable_if<is_arithmetic<T>, bool>::type eval_gt(const mpfr_float
    return a.compare(b) > 0;
 }
 
-template <unsigned digits10>
-inline void eval_add(mpfr_float_backend<digits10>& result, const mpfr_float_backend<digits10>& o) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_add(mpfr_float_backend<D1>& result, const mpfr_float_backend<D2>& o) BOOST_NOEXCEPT
 {
    mpfr_add(result.data(), result.data(), o.data(), GMP_RNDN);
 }
-template <unsigned digits10>
-inline void eval_subtract(mpfr_float_backend<digits10>& result, const mpfr_float_backend<digits10>& o) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_subtract(mpfr_float_backend<D1>& result, const mpfr_float_backend<D2>& o) BOOST_NOEXCEPT
 {
    mpfr_sub(result.data(), result.data(), o.data(), GMP_RNDN);
 }
-template <unsigned digits10>
-inline void eval_multiply(mpfr_float_backend<digits10>& result, const mpfr_float_backend<digits10>& o) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_multiply(mpfr_float_backend<D1>& result, const mpfr_float_backend<D2>& o) BOOST_NOEXCEPT
 {
    mpfr_mul(result.data(), result.data(), o.data(), GMP_RNDN);
 }
-template <unsigned digits10>
-inline void eval_divide(mpfr_float_backend<digits10>& result, const mpfr_float_backend<digits10>& o)
+template <unsigned D1, unsigned D2>
+inline void eval_divide(mpfr_float_backend<D1>& result, const mpfr_float_backend<D2>& o)
 {
    mpfr_div(result.data(), result.data(), o.data(), GMP_RNDN);
 }
@@ -682,31 +682,31 @@ inline void eval_divide(mpfr_float_backend<digits10>& result, long i)
 //
 // Specialised 3 arg versions of the basic operators:
 //
-template <unsigned digits10>
-inline void eval_add(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, const mpfr_float_backend<digits10>& y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2, unsigned D3>
+inline void eval_add(mpfr_float_backend<D1>& a, const mpfr_float_backend<D2>& x, const mpfr_float_backend<D3>& y) BOOST_NOEXCEPT
 {
    mpfr_add(a.data(), x.data(), y.data(), GMP_RNDN);
 }
-template <unsigned digits10>
-inline void eval_add(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, unsigned long y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_add(mpfr_float_backend<D1>& a, const mpfr_float_backend<D2>& x, unsigned long y) BOOST_NOEXCEPT
 {
    mpfr_add_ui(a.data(), x.data(), y, GMP_RNDN);
 }
-template <unsigned digits10>
-inline void eval_add(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, long y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_add(mpfr_float_backend<D1>& a, const mpfr_float_backend<D2>& x, long y) BOOST_NOEXCEPT
 {
    if(y < 0)
       mpfr_sub_ui(a.data(), x.data(), -y, GMP_RNDN);
    else
       mpfr_add_ui(a.data(), x.data(), y, GMP_RNDN);
 }
-template <unsigned digits10>
-inline void eval_add(mpfr_float_backend<digits10>& a, unsigned long x, const mpfr_float_backend<digits10>& y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_add(mpfr_float_backend<D1>& a, unsigned long x, const mpfr_float_backend<D2>& y) BOOST_NOEXCEPT
 {
    mpfr_add_ui(a.data(), y.data(), x, GMP_RNDN);
 }
-template <unsigned digits10>
-inline void eval_add(mpfr_float_backend<digits10>& a, long x, const mpfr_float_backend<digits10>& y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_add(mpfr_float_backend<D1>& a, long x, const mpfr_float_backend<D2>& y) BOOST_NOEXCEPT
 {
    if(x < 0)
    {
@@ -716,31 +716,31 @@ inline void eval_add(mpfr_float_backend<digits10>& a, long x, const mpfr_float_b
    else
       mpfr_add_ui(a.data(), y.data(), x, GMP_RNDN);
 }
-template <unsigned digits10>
-inline void eval_subtract(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, const mpfr_float_backend<digits10>& y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2, unsigned D3>
+inline void eval_subtract(mpfr_float_backend<D1>& a, const mpfr_float_backend<D2>& x, const mpfr_float_backend<D3>& y) BOOST_NOEXCEPT
 {
    mpfr_sub(a.data(), x.data(), y.data(), GMP_RNDN);
 }
-template <unsigned digits10>
-inline void eval_subtract(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, unsigned long y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_subtract(mpfr_float_backend<D1>& a, const mpfr_float_backend<D2>& x, unsigned long y) BOOST_NOEXCEPT
 {
    mpfr_sub_ui(a.data(), x.data(), y, GMP_RNDN);
 }
-template <unsigned digits10>
-inline void eval_subtract(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, long y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_subtract(mpfr_float_backend<D1>& a, const mpfr_float_backend<D2>& x, long y) BOOST_NOEXCEPT
 {
    if(y < 0)
       mpfr_add_ui(a.data(), x.data(), -y, GMP_RNDN);
    else
       mpfr_sub_ui(a.data(), x.data(), y, GMP_RNDN);
 }
-template <unsigned digits10>
-inline void eval_subtract(mpfr_float_backend<digits10>& a, unsigned long x, const mpfr_float_backend<digits10>& y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_subtract(mpfr_float_backend<D1>& a, unsigned long x, const mpfr_float_backend<D2>& y) BOOST_NOEXCEPT
 {
    mpfr_ui_sub(a.data(), x, y.data(), GMP_RNDN);
 }
-template <unsigned digits10>
-inline void eval_subtract(mpfr_float_backend<digits10>& a, long x, const mpfr_float_backend<digits10>& y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_subtract(mpfr_float_backend<D1>& a, long x, const mpfr_float_backend<D2>& y) BOOST_NOEXCEPT
 {
    if(x < 0)
    {
@@ -751,18 +751,18 @@ inline void eval_subtract(mpfr_float_backend<digits10>& a, long x, const mpfr_fl
       mpfr_ui_sub(a.data(), x, y.data(), GMP_RNDN);
 }
 
-template <unsigned digits10>
-inline void eval_multiply(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, const mpfr_float_backend<digits10>& y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2, unsigned D3>
+inline void eval_multiply(mpfr_float_backend<D1>& a, const mpfr_float_backend<D2>& x, const mpfr_float_backend<D3>& y) BOOST_NOEXCEPT
 {
    mpfr_mul(a.data(), x.data(), y.data(), GMP_RNDN);
 }
-template <unsigned digits10>
-inline void eval_multiply(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, unsigned long y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_multiply(mpfr_float_backend<D1>& a, const mpfr_float_backend<D2>& x, unsigned long y) BOOST_NOEXCEPT
 {
    mpfr_mul_ui(a.data(), x.data(), y, GMP_RNDN);
 }
-template <unsigned digits10>
-inline void eval_multiply(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, long y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_multiply(mpfr_float_backend<D1>& a, const mpfr_float_backend<D2>& x, long y) BOOST_NOEXCEPT
 {
    if(y < 0)
    {
@@ -772,13 +772,13 @@ inline void eval_multiply(mpfr_float_backend<digits10>& a, const mpfr_float_back
    else
       mpfr_mul_ui(a.data(), x.data(), y, GMP_RNDN);
 }
-template <unsigned digits10>
-inline void eval_multiply(mpfr_float_backend<digits10>& a, unsigned long x, const mpfr_float_backend<digits10>& y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_multiply(mpfr_float_backend<D1>& a, unsigned long x, const mpfr_float_backend<D2>& y) BOOST_NOEXCEPT
 {
    mpfr_mul_ui(a.data(), y.data(), x, GMP_RNDN);
 }
-template <unsigned digits10>
-inline void eval_multiply(mpfr_float_backend<digits10>& a, long x, const mpfr_float_backend<digits10>& y) BOOST_NOEXCEPT
+template <unsigned D1, unsigned D2>
+inline void eval_multiply(mpfr_float_backend<D1>& a, long x, const mpfr_float_backend<D2>& y) BOOST_NOEXCEPT
 {
    if(x < 0)
    {
@@ -789,18 +789,18 @@ inline void eval_multiply(mpfr_float_backend<digits10>& a, long x, const mpfr_fl
       mpfr_mul_ui(a.data(), y.data(), x, GMP_RNDN);
 }
 
-template <unsigned digits10>
-inline void eval_divide(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, const mpfr_float_backend<digits10>& y)
+template <unsigned D1, unsigned D2, unsigned D3>
+inline void eval_divide(mpfr_float_backend<D1>& a, const mpfr_float_backend<D2>& x, const mpfr_float_backend<D3>& y)
 {
    mpfr_div(a.data(), x.data(), y.data(), GMP_RNDN);
 }
-template <unsigned digits10>
-inline void eval_divide(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, unsigned long y)
+template <unsigned D1, unsigned D2>
+inline void eval_divide(mpfr_float_backend<D1>& a, const mpfr_float_backend<D2>& x, unsigned long y)
 {
    mpfr_div_ui(a.data(), x.data(), y, GMP_RNDN);
 }
-template <unsigned digits10>
-inline void eval_divide(mpfr_float_backend<digits10>& a, const mpfr_float_backend<digits10>& x, long y)
+template <unsigned D1, unsigned D2>
+inline void eval_divide(mpfr_float_backend<D1>& a, const mpfr_float_backend<D2>& x, long y)
 {
    if(y < 0)
    {
@@ -810,13 +810,13 @@ inline void eval_divide(mpfr_float_backend<digits10>& a, const mpfr_float_backen
    else
       mpfr_div_ui(a.data(), x.data(), y, GMP_RNDN);
 }
-template <unsigned digits10>
-inline void eval_divide(mpfr_float_backend<digits10>& a, unsigned long x, const mpfr_float_backend<digits10>& y)
+template <unsigned D1, unsigned D2>
+inline void eval_divide(mpfr_float_backend<D1>& a, unsigned long x, const mpfr_float_backend<D2>& y)
 {
    mpfr_ui_div(a.data(), x, y.data(), GMP_RNDN);
 }
-template <unsigned digits10>
-inline void eval_divide(mpfr_float_backend<digits10>& a, long x, const mpfr_float_backend<digits10>& y)
+template <unsigned D1, unsigned D2>
+inline void eval_divide(mpfr_float_backend<D1>& a, long x, const mpfr_float_backend<D2>& y)
 {
    if(x < 0)
    {
