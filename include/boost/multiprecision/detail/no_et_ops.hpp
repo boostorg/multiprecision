@@ -43,20 +43,18 @@ template <class B, class V>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator + (const number<B, false>& a, const V& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    number<B, false> result;
    using default_ops::eval_add;
-   eval_add(result.backend(), a.backend(), static_cast<canonical_type>(b));
+   eval_add(result.backend(), a.backend(), number<B, false>::canonical_value(b));
    return BOOST_MP_MOVE(result);
 }
 template <class V, class B>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator + (const V& a, const number<B, false>& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    number<B, false> result;
    using default_ops::eval_add;
-   eval_add(result.backend(), b.backend(), static_cast<canonical_type>(a));
+   eval_add(result.backend(), b.backend(), number<B, false>::canonical_value(a));
    return BOOST_MP_MOVE(result);
 }
 //
@@ -74,20 +72,18 @@ template <class B, class V>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator - (const number<B, false>& a, const V& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    number<B, false> result;
    using default_ops::eval_subtract;
-   eval_subtract(result.backend(), a.backend(), static_cast<canonical_type>(b));
+   eval_subtract(result.backend(), a.backend(), number<B, false>::canonical_value(b));
    return BOOST_MP_MOVE(result);
 }
 template <class V, class B>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator - (const V& a, const number<B, false>& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    number<B, false> result;
    using default_ops::eval_subtract;
-   eval_subtract(result.backend(), static_cast<canonical_type>(a), b.backend());
+   eval_subtract(result.backend(), number<B, false>::canonical_value(a), b.backend());
    return BOOST_MP_MOVE(result);
 }
 //
@@ -105,20 +101,18 @@ template <class B, class V>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator * (const number<B, false>& a, const V& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    number<B, false> result;
    using default_ops::eval_multiply;
-   eval_multiply(result.backend(), a.backend(), static_cast<canonical_type>(b));
+   eval_multiply(result.backend(), a.backend(), number<B, false>::canonical_value(b));
    return BOOST_MP_MOVE(result);
 }
 template <class V, class B>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator * (const V& a, const number<B, false>& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    number<B, false> result;
    using default_ops::eval_multiply;
-   eval_multiply(result.backend(), b.backend(), static_cast<canonical_type>(a));
+   eval_multiply(result.backend(), b.backend(), number<B, false>::canonical_value(a));
    return BOOST_MP_MOVE(result);
 }
 //
@@ -136,20 +130,18 @@ template <class B, class V>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator / (const number<B, false>& a, const V& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    number<B, false> result;
    using default_ops::eval_divide;
-   eval_divide(result.backend(), a.backend(), static_cast<canonical_type>(b));
+   eval_divide(result.backend(), a.backend(), number<B, false>::canonical_value(b));
    return BOOST_MP_MOVE(result);
 }
 template <class V, class B>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator / (const V& a, const number<B, false>& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    number<B, false> result;
    using default_ops::eval_divide;
-   eval_divide(result.backend(), static_cast<canonical_type>(a), b.backend());
+   eval_divide(result.backend(), number<B, false>::canonical_value(a), b.backend());
    return BOOST_MP_MOVE(result);
 }
 //
@@ -167,20 +159,18 @@ template <class B, class V>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator % (const number<B, false>& a, const V& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    number<B, false> result;
    using default_ops::eval_modulus;
-   eval_modulus(result.backend(), a.backend(), static_cast<canonical_type>(b));
+   eval_modulus(result.backend(), a.backend(), number<B, false>::canonical_value(b));
    return BOOST_MP_MOVE(result);
 }
 template <class V, class B>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator % (const V& a, const number<B, false>& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    number<B, false> result;
    using default_ops::eval_modulus;
-   eval_modulus(result.backend(), static_cast<canonical_type>(a), b.backend());
+   eval_modulus(result.backend(), number<B, false>::canonical_value(a), b.backend());
    return BOOST_MP_MOVE(result);
 }
 //
@@ -198,20 +188,18 @@ template <class B, class V>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator | (const number<B, false>& a, const V& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    number<B, false> result;
    using default_ops::eval_bitwise_or;
-   eval_bitwise_or(result.backend(), a.backend(), static_cast<canonical_type>(b));
+   eval_bitwise_or(result.backend(), a.backend(), number<B, false>::canonical_value(b));
    return BOOST_MP_MOVE(result);
 }
 template <class V, class B>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator | (const V& a, const number<B, false>& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    number<B, false> result;
    using default_ops::eval_bitwise_or;
-   eval_bitwise_or(result.backend(), b.backend(), static_cast<canonical_type>(a));
+   eval_bitwise_or(result.backend(), b.backend(), number<B, false>::canonical_value(a));
    return BOOST_MP_MOVE(result);
 }
 //
@@ -229,20 +217,18 @@ template <class B, class V>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator ^ (const number<B, false>& a, const V& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    number<B, false> result;
    using default_ops::eval_bitwise_xor;
-   eval_bitwise_xor(result.backend(), a.backend(), static_cast<canonical_type>(b));
+   eval_bitwise_xor(result.backend(), a.backend(), number<B, false>::canonical_value(b));
    return BOOST_MP_MOVE(result);
 }
 template <class V, class B>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator ^ (const V& a, const number<B, false>& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    number<B, false> result;
    using default_ops::eval_bitwise_xor;
-   eval_bitwise_xor(result.backend(), b.backend(), static_cast<canonical_type>(a));
+   eval_bitwise_xor(result.backend(), b.backend(), number<B, false>::canonical_value(a));
    return BOOST_MP_MOVE(result);
 }
 //
@@ -260,20 +246,18 @@ template <class B, class V>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator & (const number<B, false>& a, const V& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    number<B, false> result;
    using default_ops::eval_bitwise_and;
-   eval_bitwise_and(result.backend(), a.backend(), static_cast<canonical_type>(b));
+   eval_bitwise_and(result.backend(), a.backend(), number<B, false>::canonical_value(b));
    return BOOST_MP_MOVE(result);
 }
 template <class V, class B>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator & (const V& a, const number<B, false>& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    number<B, false> result;
    using default_ops::eval_bitwise_and;
-   eval_bitwise_and(result.backend(), b.backend(), static_cast<canonical_type>(a));
+   eval_bitwise_and(result.backend(), b.backend(), number<B, false>::canonical_value(a));
    return BOOST_MP_MOVE(result);
 }
 //
@@ -352,18 +336,16 @@ template <class B, class V>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator + (number<B, false>&& a, const V& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    using default_ops::eval_add;
-   eval_add(a.backend(), static_cast<canonical_type>(b));
+   eval_add(a.backend(), number<B, false>::canonical_value(b));
    return static_cast<number<B, false>&&>(a);
 }
 template <class V, class B>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator + (const V& a, number<B, false>&& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    using default_ops::eval_add;
-   eval_add(b.backend(), static_cast<canonical_type>(a));
+   eval_add(b.backend(), number<B, false>::canonical_value(a));
    return static_cast<number<B, false>&&>(b);
 }
 //
@@ -395,18 +377,16 @@ template <class B, class V>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator - (number<B, false>&& a, const V& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    using default_ops::eval_subtract;
-   eval_subtract(a.backend(), static_cast<canonical_type>(b));
+   eval_subtract(a.backend(), number<B, false>::canonical_value(b));
    return static_cast<number<B, false>&&>(a);
 }
 template <class V, class B>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator - (const V& a, number<B, false>&& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    using default_ops::eval_subtract;
-   eval_subtract(b.backend(), static_cast<canonical_type>(a));
+   eval_subtract(b.backend(), number<B, false>::canonical_value(a));
    b.backend().negate();
    return static_cast<number<B, false>&&>(b);
 }
@@ -438,18 +418,16 @@ template <class B, class V>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator * (number<B, false>&& a, const V& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    using default_ops::eval_multiply;
-   eval_multiply(a.backend(), static_cast<canonical_type>(b));
+   eval_multiply(a.backend(), number<B, false>::canonical_value(b));
    return static_cast<number<B, false>&&>(a);
 }
 template <class V, class B>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator * (const V& a, number<B, false>&& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    using default_ops::eval_multiply;
-   eval_multiply(b.backend(), static_cast<canonical_type>(a));
+   eval_multiply(b.backend(), number<B, false>::canonical_value(a));
    return static_cast<number<B, false>&&>(b);
 }
 //
@@ -466,9 +444,8 @@ template <class B, class V>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator / (number<B, false>&& a, const V& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    using default_ops::eval_divide;
-   eval_divide(a.backend(), static_cast<canonical_type>(b));
+   eval_divide(a.backend(), number<B, false>::canonical_value(b));
    return static_cast<number<B, false>&&>(a);
 }
 //
@@ -485,9 +462,8 @@ template <class B, class V>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator % (number<B, false>&& a, const V& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    using default_ops::eval_modulus;
-   eval_modulus(a.backend(), static_cast<canonical_type>(b));
+   eval_modulus(a.backend(), number<B, false>::canonical_value(b));
    return static_cast<number<B, false>&&>(a);
 }
 //
@@ -518,18 +494,16 @@ template <class B, class V>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator | (number<B, false>&& a, const V& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    using default_ops::eval_bitwise_or;
-   eval_bitwise_or(a.backend(), static_cast<canonical_type>(b));
+   eval_bitwise_or(a.backend(), number<B, false>::canonical_value(b));
    return static_cast<number<B, false>&&>(a);
 }
 template <class V, class B>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator | (const V& a, number<B, false>&& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    using default_ops::eval_bitwise_or;
-   eval_bitwise_or(b.backend(), static_cast<canonical_type>(a));
+   eval_bitwise_or(b.backend(), number<B, false>::canonical_value(a));
    return static_cast<number<B, false>&&>(b);
 }
 //
@@ -560,18 +534,16 @@ template <class B, class V>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator ^ (number<B, false>&& a, const V& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    using default_ops::eval_bitwise_xor;
-   eval_bitwise_xor(a.backend(), static_cast<canonical_type>(b));
+   eval_bitwise_xor(a.backend(), number<B, false>::canonical_value(b));
    return static_cast<number<B, false>&&>(a);
 }
 template <class V, class B>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator ^ (const V& a, number<B, false>&& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    using default_ops::eval_bitwise_xor;
-   eval_bitwise_xor(b.backend(), static_cast<canonical_type>(a));
+   eval_bitwise_xor(b.backend(), number<B, false>::canonical_value(a));
    return static_cast<number<B, false>&&>(b);
 }
 //
@@ -602,18 +574,16 @@ template <class B, class V>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator & (number<B, false>&& a, const V& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    using default_ops::eval_bitwise_and;
-   eval_bitwise_and(a.backend(), static_cast<canonical_type>(b));
+   eval_bitwise_and(a.backend(), number<B, false>::canonical_value(b));
    return static_cast<number<B, false>&&>(a);
 }
 template <class V, class B>
 inline typename enable_if<is_compatible_arithmetic_type<V, number<B, false> >, number<B, false> >::type
    operator & (const V& a, number<B, false>&& b)
 {
-   typedef typename detail::canonical<V, B>::type canonical_type;
    using default_ops::eval_bitwise_and;
-   eval_bitwise_and(b.backend(), static_cast<canonical_type>(a));
+   eval_bitwise_and(b.backend(), number<B, false>::canonical_value(a));
    return static_cast<number<B, false>&&>(b);
 }
 //

@@ -331,7 +331,7 @@ struct gmp_float_imp
       return mpf_cmp_ui(m_data, i);
    }
    template <class V>
-   int compare(V v)const
+   typename enable_if<is_arithmetic<V>, int>::type compare(V v)const
    {
       gmp_float<digits10> d;
       d = v;
@@ -552,17 +552,17 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
 };
 
 template <unsigned digits10, class T>
-inline typename disable_if<is_same<gmp_float<digits10>, T>, bool>::type eval_eq(const gmp_float<digits10>& a, const T& b) BOOST_NOEXCEPT
+inline typename enable_if_c<is_arithmetic<T>::value, bool>::type eval_eq(const gmp_float<digits10>& a, const T& b) BOOST_NOEXCEPT
 {
    return a.compare(b) == 0;
 }
 template <unsigned digits10, class T>
-inline typename disable_if<is_same<gmp_float<digits10>, T>, bool>::type eval_lt(const gmp_float<digits10>& a, const T& b) BOOST_NOEXCEPT
+inline typename enable_if_c<is_arithmetic<T>::value, bool>::type eval_lt(const gmp_float<digits10>& a, const T& b) BOOST_NOEXCEPT
 {
    return a.compare(b) < 0;
 }
 template <unsigned digits10, class T>
-inline typename disable_if<is_same<gmp_float<digits10>, T>, bool>::type eval_gt(const gmp_float<digits10>& a, const T& b) BOOST_NOEXCEPT
+inline typename enable_if_c<is_arithmetic<T>::value, bool>::type eval_gt(const gmp_float<digits10>& a, const T& b) BOOST_NOEXCEPT
 {
    return a.compare(b) > 0;
 }
@@ -1265,17 +1265,17 @@ protected:
 };
 
 template <class T>
-inline typename disable_if<is_same<gmp_int, T>, bool>::type eval_eq(const gmp_int& a, const T& b)
+inline typename enable_if<is_arithmetic<T>, bool>::type eval_eq(const gmp_int& a, const T& b)
 {
    return a.compare(b) == 0;
 }
 template <class T>
-inline typename disable_if<is_same<gmp_int, T>, bool>::type eval_lt(const gmp_int& a, const T& b)
+inline typename enable_if<is_arithmetic<T>, bool>::type eval_lt(const gmp_int& a, const T& b)
 {
    return a.compare(b) < 0;
 }
 template <class T>
-inline typename disable_if<is_same<gmp_int, T>, bool>::type eval_gt(const gmp_int& a, const T& b)
+inline typename enable_if<is_arithmetic<T>, bool>::type eval_gt(const gmp_int& a, const T& b)
 {
    return a.compare(b) > 0;
 }

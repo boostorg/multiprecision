@@ -119,15 +119,31 @@ bool isfloat(double){ return true; }
 bool isfloat(long double){ return true; }
 template <class T> bool isfloat(T){ return false; }
 
+namespace detail{
+
+template <class T>
+typename boost::disable_if<boost::is_unsigned<T>, T>::type abs(T v)
+{
+   return v < 0 ? -v : v;
+}
+template <class T>
+typename boost::enable_if<boost::is_unsigned<T>, T>::type abs(T v)
+{
+   return v;
+}
+
+}
+
 #define BOOST_TEST_CLOSE(x, y, tol)\
+   using std::abs;  using detail::abs;\
    if(x == 0){\
       BOOST_TEST(y == 0); }\
    else if(!isfloat(x)){\
       BOOST_TEST(x == y); }\
-   else if((x != y) && (::fabsl(static_cast<long double>((x-y)/x)) > tol))\
+   else if((x != y) && (abs((x-y)/x) > tol))\
    {\
        BOOST_ERROR("Expected tolerance was exceeded: ");\
-       BOOST_LIGHTWEIGHT_TEST_OSTREAM << std::setprecision(34) << "(x-y)/x = " << ::fabsl(static_cast<long double>((x-y)/x)) \
+       BOOST_LIGHTWEIGHT_TEST_OSTREAM << std::setprecision(34) << "(x-y)/x = " << abs((x-y)/x) \
        << " tolerance = " << tol << std::endl;\
    }
 
@@ -141,6 +157,58 @@ struct is_twos_complement_integer<boost::multiprecision::tom_int> : public boost
 
 #define BOOST_TEST_EQUAL(a, b) BOOST_TEST((a) == (b))
 
+
+template <class T>
+struct related_type
+{
+   typedef T type;
+};
+
+#ifdef TEST_MPQ
+template <>
+struct related_type<boost::multiprecision::mpq_rational>
+{
+   typedef boost::multiprecision::mpz_int type;
+};
+#endif
+#if defined(TEST_MPF_50) || defined(TEST_MPF)
+template <unsigned D>
+struct related_type<boost::multiprecision::number< boost::multiprecision::gmp_float<D> > >
+{
+   typedef boost::multiprecision::number< boost::multiprecision::gmp_float<D/2> > type;
+};
+template <>
+struct related_type<boost::multiprecision::mpf_float >
+{
+   typedef boost::multiprecision::mpz_int type;
+};
+#endif
+#ifdef TEST_CPP_DEC_FLOAT
+template <unsigned D>
+struct related_type<boost::multiprecision::number< boost::multiprecision::cpp_dec_float<D> > >
+{
+   typedef boost::multiprecision::number< boost::multiprecision::cpp_dec_float<D/2> > type;
+};
+#endif
+#if defined(TEST_MPFR_50) || defined(TEST_MPFR)
+template <unsigned D>
+struct related_type<boost::multiprecision::number< boost::multiprecision::mpfr_float_backend<D> > >
+{
+   typedef boost::multiprecision::number< boost::multiprecision::mpfr_float_backend<D/2> > type;
+};
+#endif
+#if defined(TEST_CPP_INT_1) || defined(TEST_CPP_INT_2) || defined(TEST_CPP_INT_3) || defined(TEST_CPP_INT_BR)
+template <>
+struct related_type<boost::multiprecision::cpp_int>
+{
+   typedef boost::multiprecision::int256_t type;
+};
+template <unsigned D, bool S, bool ET>
+struct related_type<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<D, S, void>, ET> >
+{
+   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<D/2, S, void>, ET> type;
+};
+#endif
 template <class Real, class Val>
 void test_comparisons(Val, Val, const boost::mpl::false_)
 {}
@@ -836,7 +904,8 @@ void test_negative_mixed(boost::mpl::true_ const&)
          Real
       >::type simple_cast_type;
    std::cout << "Testing mixed arithmetic with type: " << typeid(Real).name()  << " and " << typeid(Num).name() << std::endl;
-   Num n1 = -static_cast<Num>(1uLL << (std::numeric_limits<Num>::digits - 1));
+   static const int left_shift = std::numeric_limits<Num>::digits - 1;
+   Num n1 = -static_cast<Num>(1uLL << ((left_shift < 63) && (left_shift > 0) ? left_shift : 10));
    Num n2 = -1;
    Num n3 = 0;
    Num n4 = -20;
@@ -1047,11 +1116,12 @@ void test_mixed(const boost::mpl::true_&)
          Real
       >::type simple_cast_type;
    
-   if(std::numeric_limits<Real>::digits < std::numeric_limits<Num>::digits)
+   if(std::numeric_limits<Real>::is_specialized && std::numeric_limits<Real>::is_bounded && std::numeric_limits<Real>::digits < std::numeric_limits<Num>::digits)
       return;
 
    std::cout << "Testing mixed arithmetic with type: " << typeid(Real).name()  << " and " << typeid(Num).name() << std::endl;
-   Num n1 = static_cast<Num>(1uLL << (std::numeric_limits<Num>::digits - 1));
+   static const int left_shift = std::numeric_limits<Num>::digits - 1;
+   Num n1 = static_cast<Num>(1uLL << ((left_shift < 63) && (left_shift > 0) ? left_shift : 10));
    Num n2 = 1;
    Num n3 = 0;
    Num n4 = 20;
@@ -1198,6 +1268,12 @@ void test()
    test_mixed<Real, float>(tag);
    test_mixed<Real, double>(tag);
    test_mixed<Real, long double>(tag);
+
+   typedef typename related_type<Real>::type related_type;
+   boost::mpl::bool_<boost::multiprecision::is_number<Real>::value && !boost::is_same<related_type, Real>::value>  tag2;
+
+   test_mixed<Real, related_type>(tag2);
+
 #endif
    //
    // Integer only functions:

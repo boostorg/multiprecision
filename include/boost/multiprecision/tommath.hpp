@@ -32,6 +32,11 @@ inline void check_tommath_result(unsigned v)
 
 }
 
+struct tommath_int;
+
+void eval_multiply(tommath_int& t, const tommath_int& o);
+void eval_add(tommath_int& t, const tommath_int& o);
+
 struct tommath_int
 {
    typedef mpl::list<boost::int32_t, long long>             signed_types;
@@ -186,8 +191,6 @@ struct tommath_int
       //
       // We don't use libtommath's own routine because it doesn't error check the input :-(
       //
-      using default_ops::eval_multiply;
-      using default_ops::eval_add;
       if(m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
       std::size_t n = s ? std::strlen(s) : 0;
@@ -279,8 +282,11 @@ struct tommath_int
                      break;
                   }
                }
-               eval_multiply(*this, block_mult);
-               eval_add(*this, block);
+               tommath_int t;
+               t = block_mult;
+               eval_multiply(*this, t);
+               t = block;
+               eval_add(*this, t);
             }
          }
       }

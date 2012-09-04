@@ -3202,13 +3202,8 @@ public:
       static number_type val;
       if(!init)
       {
-         boost::multiprecision::limb_type l = ~static_cast<boost::multiprecision::limb_type>(0);
-         unsigned c = MinBits / backend_type::limb_bits + (MinBits % backend_type::limb_bits ? 1 : 0);
-         for(unsigned i = 0; i < c; ++i)
-         {
-            val <<= backend_type::limb_bits;
-            val |= l;
-         }
+         boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> t(0);
+         val = ~t;
          init = true;
       }
       return val;

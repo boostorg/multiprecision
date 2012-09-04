@@ -161,7 +161,7 @@ public:
       return *this;
    }
    template <class Other>
-   typename disable_if<is_convertible<Other, Backend>, number<Backend, ExpressionTemplates>& >::type 
+   typename disable_if<boost::multiprecision::detail::is_explicitly_convertible<Other, Backend>, number<Backend, ExpressionTemplates>& >::type 
       assign(const number<Other>& v)
    {
       //
@@ -540,12 +540,28 @@ public:
    {
       return m_backend.str(digits, f);
    }
+private:
+   template <class T>
+   void convert_to_imp(T* result)const
+   {
+      using default_ops::eval_convert_to;
+      eval_convert_to(result, m_backend);
+   }
+   template <class B2, bool ET>
+   void convert_to_imp(number<B2, ET>* result)const
+   {
+      result->assign(*this);
+   }
+   void convert_to_imp(std::string* result)const
+   {
+      *result = this->str();
+   }
+public:
    template <class T>
    T convert_to()const
    {
-      using default_ops::eval_convert_to;
       T result;
-      eval_convert_to(&result, m_backend);
+      convert_to_imp(&result);
       return result;
    }
 #ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
@@ -1553,6 +1569,20 @@ private:
    BOOST_FORCEINLINE BOOST_CONSTEXPR bool is_realy_self(const Val&)const BOOST_NOEXCEPT{ return false; } 
    BOOST_FORCEINLINE BOOST_CONSTEXPR bool is_realy_self(const self_type& v)const BOOST_NOEXCEPT{ return &v == this; } 
 
+   static BOOST_FORCEINLINE BOOST_CONSTEXPR const Backend& function_arg_value(const self_type& v) BOOST_NOEXCEPT {  return v.backend();  }
+   template <class V>
+   static BOOST_FORCEINLINE BOOST_CONSTEXPR const V& function_arg_value(const V& v) BOOST_NOEXCEPT {  return v;  }
+   template <class A1, class A2, class A3, class A4>
+   static BOOST_FORCEINLINE const A1& function_arg_value(const detail::expression<detail::terminal, A1, A2, A3, A4>& exp) BOOST_NOEXCEPT { return exp.value(); }
+   template <class A2, class A3, class A4>
+   static BOOST_FORCEINLINE BOOST_CONSTEXPR const Backend& function_arg_value(const detail::expression<detail::terminal, number<Backend>, A2, A3, A4>& exp) BOOST_NOEXCEPT { return exp.value().backend(); }
+   Backend m_backend;
+
+public:
+   //
+   // These shouldn't really need to be public, or even member functions, but it makes implementing
+   // the non-member operators way easier if they are:
+   //
    static BOOST_FORCEINLINE BOOST_CONSTEXPR const Backend& canonical_value(const self_type& v) BOOST_NOEXCEPT {  return v.m_backend;  }
    template <class B2, bool ET>
    static BOOST_FORCEINLINE BOOST_CONSTEXPR const B2& canonical_value(const number<B2, ET>& v) BOOST_NOEXCEPT {  return v.backend();  }
@@ -1564,14 +1594,6 @@ private:
       canonical_value(const V& v) BOOST_NOEXCEPT {  return v;  }
    static BOOST_FORCEINLINE typename detail::canonical<std::string, Backend>::type canonical_value(const std::string& v) BOOST_NOEXCEPT {  return v.c_str();  }
 
-   static BOOST_FORCEINLINE BOOST_CONSTEXPR const Backend& function_arg_value(const self_type& v) BOOST_NOEXCEPT {  return v.backend();  }
-   template <class V>
-   static BOOST_FORCEINLINE BOOST_CONSTEXPR const V& function_arg_value(const V& v) BOOST_NOEXCEPT {  return v;  }
-   template <class A1, class A2, class A3, class A4>
-   static BOOST_FORCEINLINE const A1& function_arg_value(const detail::expression<detail::terminal, A1, A2, A3, A4>& exp) BOOST_NOEXCEPT { return exp.value(); }
-   template <class A2, class A3, class A4>
-   static BOOST_FORCEINLINE BOOST_CONSTEXPR const Backend& function_arg_value(const detail::expression<detail::terminal, number<Backend>, A2, A3, A4>& exp) BOOST_NOEXCEPT { return exp.value().backend(); }
-   Backend m_backend;
 };
 
 template <class Backend, bool ExpressionTemplates>
