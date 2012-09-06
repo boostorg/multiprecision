@@ -82,7 +82,7 @@
 
 <span class="keyword">namespace</span> <span class="identifier">mp</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">;</span>     <span class="comment">// Reduce the typing a bit later...</span>
 
-<span class="keyword">typedef</span> <span class="identifier">mp</span><span class="special">::</span><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">mp</span><span class="special">::</span><span class="identifier">mpfr_float_backend</span><span class="special">&lt;</span><span class="number">300</span><span class="special">&gt;,</span> <span class="keyword">false</span><span class="special">&gt;</span>  <span class="identifier">my_float</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">mp</span><span class="special">::</span><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">mp</span><span class="special">::</span><span class="identifier">mpfr_float_backend</span><span class="special">&lt;</span><span class="number">300</span><span class="special">&gt;,</span> <span class="identifier">et_off</span><span class="special">&gt;</span>  <span class="identifier">my_float</span><span class="special">;</span>
 
 <span class="identifier">my_float</span> <span class="identifier">a</span><span class="special">,</span> <span class="identifier">b</span><span class="special">,</span> <span class="identifier">c</span><span class="special">;</span> <span class="comment">// These variables have 300 decimal digits precision</span>
 </pre>
@@ -115,8 +115,8 @@
 <p>
       Mixed arithmetic will fail if the conversion is either ambiguous or explicit:
     </p>
-<pre class="programlisting"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_int_backend</span><span class="special">&lt;&gt;,</span> <span class="keyword">false</span><span class="special">&gt;</span> <span class="identifier">a</span><span class="special">(</span><span class="number">2</span><span class="special">);</span>
-<span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_int_backend</span><span class="special">&lt;&gt;,</span> <span class="keyword">true</span><span class="special">&gt;</span>  <span class="identifier">b</span><span class="special">(</span><span class="number">3</span><span class="special">);</span>
+<pre class="programlisting"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_int_backend</span><span class="special">&lt;&gt;,</span> <span class="identifier">et_off</span><span class="special">&gt;</span> <span class="identifier">a</span><span class="special">(</span><span class="number">2</span><span class="special">);</span>
+<span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_int_backend</span><span class="special">&lt;&gt;,</span> <span class="identifier">et_on</span><span class="special">&gt;</span>  <span class="identifier">b</span><span class="special">(</span><span class="number">3</span><span class="special">);</span>
 
 <span class="identifier">b</span> <span class="special">=</span> <span class="identifier">a</span> <span class="special">*</span> <span class="identifier">b</span><span class="special">;</span> <span class="comment">// Error, implicit conversion could go either way.</span>
 <span class="identifier">b</span> <span class="special">=</span> <span class="identifier">a</span> <span class="special">*</span> <span class="number">3.14</span><span class="special">;</span> <span class="comment">// Error, no operator overload if the conversion would be explicit.</span>
@@ -135,7 +135,7 @@
       move aware and have overloads that look something like:
     </p>
 <pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">B</span><span class="special">&gt;</span>
-<span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">B</span><span class="special">,</span> <span class="keyword">false</span><span class="special">&gt;</span> <span class="keyword">operator</span> <span class="special">+</span> <span class="special">(</span><span class="identifier">number</span><span class="special">&amp;&amp;</span> <span class="identifier">a</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">number</span><span class="special">&amp;</span> <span class="identifier">b</span><span class="special">)</span>
+<span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">B</span><span class="special">,</span> <span class="identifier">et_off</span><span class="special">&gt;</span> <span class="keyword">operator</span> <span class="special">+</span> <span class="special">(</span><span class="identifier">number</span><span class="special">&amp;&amp;</span> <span class="identifier">a</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">number</span><span class="special">&amp;</span> <span class="identifier">b</span><span class="special">)</span>
 <span class="special">{</span>
     <span class="keyword">return</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">move</span><span class="special">(</span><span class="identifier">a</span> <span class="special">+=</span> <span class="identifier">b</span><span class="special">);</span>
 <span class="special">}</span>
