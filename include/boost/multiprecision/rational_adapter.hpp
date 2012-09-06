@@ -259,7 +259,7 @@ struct is_explicitly_convertible<U, rational_adapter<IntBackend> > : public is_e
 
 namespace std{
 
-template <class IntBackend, bool ExpressionTemplates>
+template <class IntBackend, boost::multiprecision::expression_template_option ExpressionTemplates>
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adapter<IntBackend>, ExpressionTemplates> > : public std::numeric_limits<boost::multiprecision::number<IntBackend, ExpressionTemplates> >
 {
    typedef std::numeric_limits<boost::multiprecision::number<IntBackend> > base_type;
@@ -280,9 +280,9 @@ public:
 
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
 
-template <class IntBackend, bool ExpressionTemplates>
+template <class IntBackend, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adapter<IntBackend>, ExpressionTemplates> >::is_integer;
-template <class IntBackend, bool ExpressionTemplates>
+template <class IntBackend, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adapter<IntBackend>, ExpressionTemplates> >::is_exact;
 
 #endif

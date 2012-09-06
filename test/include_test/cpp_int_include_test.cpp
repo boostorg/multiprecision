@@ -8,9 +8,9 @@
 using namespace boost::multiprecision;
 
 number<cpp_int_backend<> > a;
-number<cpp_int_backend<>, false> b;
-number<cpp_int_backend<64, true, void>, false> c;
-number<cpp_int_backend<128, false, void>, false> d;
-number<cpp_int_backend<500, true, void>, false> e;
+number<cpp_int_backend<>, et_off> b;
+number<cpp_int_backend<64, true, void>, et_off> c;
+number<cpp_int_backend<128, false, void>, et_off> d;
+number<cpp_int_backend<500, true, void>, et_off> e;
 
 

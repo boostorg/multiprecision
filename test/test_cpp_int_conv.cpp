@@ -48,7 +48,7 @@ int main()
    int128_t   i6(i4);
    BOOST_TEST(i6 == -5677334);
 
-   number<cpp_int_backend<32, true, void>, false> i7(i3);
+   number<cpp_int_backend<32, true, void>, et_off> i7(i3);
    BOOST_TEST(i7 == -1234567);
 
    int256_t   i8(i6);
@@ -57,13 +57,13 @@ int main()
    i7.assign(4.0);
    BOOST_TEST(i7 == 4);
 
-   number<cpp_int_backend<30, true, void>, false> i9(-5677334);
+   number<cpp_int_backend<30, true, void>, et_off> i9(-5677334);
    i7 = i9;
    BOOST_TEST(i7 == -5677334);
-   i7 = number<cpp_int_backend<32, true, void>, false>(i9);
+   i7 = number<cpp_int_backend<32, true, void>, et_off>(i9);
    BOOST_TEST(i7 == -5677334);
 
-   i9 = static_cast<number<cpp_int_backend<30, true, void>, false> >(i7);
+   i9 = static_cast<number<cpp_int_backend<30, true, void>, et_off> >(i7);
    BOOST_TEST(i9 == -5677334);
 
    ++i9;

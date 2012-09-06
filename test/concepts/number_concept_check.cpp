@@ -186,7 +186,7 @@ void foo()
    test_extra(boost::multiprecision::cpp_dec_float_50());
 #endif
 #ifdef TEST_CPP_DEC_FLOAT_NO_ET
-   test_extra(boost::multiprecision::number<boost::multiprecision::cpp_dec_float<100>, false>());
+   test_extra(boost::multiprecision::number<boost::multiprecision::cpp_dec_float<100>, boost::multiprecision::et_off>());
 #endif
 }
 

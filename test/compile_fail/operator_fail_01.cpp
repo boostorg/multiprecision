@@ -9,8 +9,8 @@ using namespace boost::multiprecision;
 
 int main()
 {
-   number<cpp_dec_float<50>, true>  a(2);
-   number<cpp_dec_float<50>, false> b(2);
+   number<cpp_dec_float<50>, et_on>  a(2);
+   number<cpp_dec_float<50>, et_off> b(2);
 
    a = a + b;
 }

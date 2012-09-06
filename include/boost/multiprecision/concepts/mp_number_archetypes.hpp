@@ -206,7 +206,7 @@ struct number_category<concepts::number_backend_float_architype> : public mpl::i
 
 namespace std{
 
-template <bool ExpressionTemplates>
+template <boost::multiprecision::expression_template_option ExpressionTemplates>
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::concepts::number_backend_float_architype, ExpressionTemplates> > : public std::numeric_limits<long double>
 {
    typedef std::numeric_limits<long double> base_type;

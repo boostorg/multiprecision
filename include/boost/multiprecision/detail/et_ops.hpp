@@ -13,46 +13,46 @@ namespace boost{ namespace multiprecision{
 //
 // Unary operators first:
 //
-template <class B, bool ExpressionTemplates>
+template <class B, expression_template_option ExpressionTemplates>
 inline const number<B, ExpressionTemplates>& operator + (const number<B, ExpressionTemplates>& v) { return v; }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 inline const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& operator + (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& v) { return v; }
 template <class B>
-inline detail::expression<detail::negate, number<B, true> > operator - (const number<B, true>& v) { return detail::expression<detail::negate, number<B, true> >(v); }
+inline detail::expression<detail::negate, number<B, et_on> > operator - (const number<B, et_on>& v) { return detail::expression<detail::negate, number<B, et_on> >(v); }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 inline detail::expression<detail::negate, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> > operator - (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& v) { return detail::expression<detail::negate, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(v); }
 template <class B>
-inline detail::expression<detail::complement_immediates, number<B, true> > operator ~ (const number<B, true>& v) { return detail::expression<detail::complement_immediates, number<B, true> >(v); }
+inline detail::expression<detail::complement_immediates, number<B, et_on> > operator ~ (const number<B, et_on>& v) { return detail::expression<detail::complement_immediates, number<B, et_on> >(v); }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 inline detail::expression<detail::bitwise_complement, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> > operator ~ (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& v) { return detail::expression<detail::bitwise_complement, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(v); }
 //
 // Then addition:
 //
 template <class B>
-inline detail::expression<detail::add_immediates, number<B, true>, number<B, true> >
-   operator + (const number<B, true>& a, const number<B, true>& b)
+inline detail::expression<detail::add_immediates, number<B, et_on>, number<B, et_on> >
+   operator + (const number<B, et_on>& a, const number<B, et_on>& b)
 {
-   return detail::expression<detail::add_immediates, number<B, true>, number<B, true> >(a, b);
+   return detail::expression<detail::add_immediates, number<B, et_on>, number<B, et_on> >(a, b);
 }
 template <class B, class V>
-inline typename enable_if<is_compatible_arithmetic_type<V, number<B, true> >, detail::expression<detail::add_immediates, number<B, true>, V > >::type
-   operator + (const number<B, true>& a, const V& b)
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >, detail::expression<detail::add_immediates, number<B, et_on>, V > >::type
+   operator + (const number<B, et_on>& a, const V& b)
 {
-   return detail::expression<detail::add_immediates, number<B, true>, V >(a, b);
+   return detail::expression<detail::add_immediates, number<B, et_on>, V >(a, b);
 }
 template <class V, class B>
-inline typename enable_if<is_compatible_arithmetic_type<V, number<B, true> >, detail::expression<detail::add_immediates, V, number<B, true> > >::type
-   operator + (const V& a, const number<B, true>& b)
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >, detail::expression<detail::add_immediates, V, number<B, et_on> > >::type
+   operator + (const V& a, const number<B, et_on>& b)
 {
-   return detail::expression<detail::add_immediates, V, number<B, true> >(a, b);
+   return detail::expression<detail::add_immediates, V, number<B, et_on> >(a, b);
 }
-template <class B, bool ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+template <class B, expression_template_option ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 inline detail::expression<detail::plus, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >
    operator + (const number<B, ET>& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
    return detail::expression<detail::plus, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B, bool ET>
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
 inline detail::expression<detail::plus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >
    operator + (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const number<B, ET>& b)
 {
@@ -79,82 +79,82 @@ inline typename enable_if<is_compatible_arithmetic_type<V, typename detail::expr
 //
 // Repeat operator for negated arguments: propagate the negation to the top level to avoid temporaries:
 //
-template <class B, bool ET, class Arg1, class Arg2, class Arg3, class Arg4>
+template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
 inline detail::expression<detail::minus, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >
    operator + (const number<B, ET>& a, const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& b)
 {
    return detail::expression<detail::minus, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >(a, b.left_ref());
 }
-template <class Arg1, class Arg2, class Arg3, class Arg4, class B, bool ET>
+template <class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
 inline detail::expression<detail::minus, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >
    operator + (const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& a, const number<B, ET>& b)
 {
    return detail::expression<detail::minus, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >(b, a.left_ref());
 }
 template <class B>
-inline detail::expression<detail::subtract_immediates, number<B, true>, number<B, true> >
-   operator + (const number<B, true>& a, const detail::expression<detail::negate, number<B, true> >& b)
+inline detail::expression<detail::subtract_immediates, number<B, et_on>, number<B, et_on> >
+   operator + (const number<B, et_on>& a, const detail::expression<detail::negate, number<B, et_on> >& b)
 {
-   return detail::expression<detail::subtract_immediates, number<B, true>, number<B, true> >(a, b.left_ref());
+   return detail::expression<detail::subtract_immediates, number<B, et_on>, number<B, et_on> >(a, b.left_ref());
 }
 template <class B>
-inline detail::expression<detail::subtract_immediates, number<B, true>, number<B, true> >
-   operator + (const detail::expression<detail::negate, number<B, true> >& a, const number<B, true>& b)
+inline detail::expression<detail::subtract_immediates, number<B, et_on>, number<B, et_on> >
+   operator + (const detail::expression<detail::negate, number<B, et_on> >& a, const number<B, et_on>& b)
 {
-   return detail::expression<detail::subtract_immediates, number<B, true>, number<B, true> >(b, a.left_ref());
+   return detail::expression<detail::subtract_immediates, number<B, et_on>, number<B, et_on> >(b, a.left_ref());
 }
 template <class B, class V>
-inline typename enable_if<is_compatible_arithmetic_type<V, number<B, true> >, detail::expression<detail::subtract_immediates, V, number<B, true> > >::type
-   operator + (const detail::expression<detail::negate, number<B, true> >& a, const V& b)
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >, detail::expression<detail::subtract_immediates, V, number<B, et_on> > >::type
+   operator + (const detail::expression<detail::negate, number<B, et_on> >& a, const V& b)
 {
-   return detail::expression<detail::subtract_immediates, V, number<B, true> >(b, a.left_ref());
+   return detail::expression<detail::subtract_immediates, V, number<B, et_on> >(b, a.left_ref());
 }
-template <class B, class B2, bool ET>
-inline typename enable_if<is_compatible_arithmetic_type<number<B2, ET>, number<B, true> >, detail::expression<detail::subtract_immediates, number<B2, ET>, number<B, true> > >::type
-   operator + (const detail::expression<detail::negate, number<B, true> >& a, const number<B2, ET>& b)
+template <class B, class B2, expression_template_option ET>
+inline typename enable_if<is_compatible_arithmetic_type<number<B2, ET>, number<B, et_on> >, detail::expression<detail::subtract_immediates, number<B2, ET>, number<B, et_on> > >::type
+   operator + (const detail::expression<detail::negate, number<B, et_on> >& a, const number<B2, ET>& b)
 {
-   return detail::expression<detail::subtract_immediates, number<B2, ET>, number<B, true> >(b, a.left_ref());
+   return detail::expression<detail::subtract_immediates, number<B2, ET>, number<B, et_on> >(b, a.left_ref());
 }
-template <class B2, bool ET, class B>
-inline typename enable_if<is_compatible_arithmetic_type<number<B2, ET>, number<B, true> >, detail::expression<detail::subtract_immediates, number<B2, ET>, number<B, true> > >::type
-   operator + (const number<B2, ET>& a, const detail::expression<detail::negate, number<B, true> >& b)
+template <class B2, expression_template_option ET, class B>
+inline typename enable_if<is_compatible_arithmetic_type<number<B2, ET>, number<B, et_on> >, detail::expression<detail::subtract_immediates, number<B2, ET>, number<B, et_on> > >::type
+   operator + (const number<B2, ET>& a, const detail::expression<detail::negate, number<B, et_on> >& b)
 {
-   return detail::expression<detail::subtract_immediates, number<B2, ET>, number<B, true> >(a, b.left_ref());
+   return detail::expression<detail::subtract_immediates, number<B2, ET>, number<B, et_on> >(a, b.left_ref());
 }
 template <class B>
-inline detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, true>, number<B, true> > >
-   operator + (const detail::expression<detail::negate, number<B, true> >& a, const detail::expression<detail::negate, number<B, true> >& b)
+inline detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, et_on>, number<B, et_on> > >
+   operator + (const detail::expression<detail::negate, number<B, et_on> >& a, const detail::expression<detail::negate, number<B, et_on> >& b)
 {
-   return detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, true>, number<B, true> > >(detail::expression<detail::add_immediates, number<B, true>, number<B, true> >(a.left_ref(), b.left_ref()));
+   return detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, et_on>, number<B, et_on> > >(detail::expression<detail::add_immediates, number<B, et_on>, number<B, et_on> >(a.left_ref(), b.left_ref()));
 }
 //
 // Subtraction:
 //
 template <class B>
-inline detail::expression<detail::subtract_immediates, number<B, true>, number<B, true> >
-   operator - (const number<B, true>& a, const number<B, true>& b)
+inline detail::expression<detail::subtract_immediates, number<B, et_on>, number<B, et_on> >
+   operator - (const number<B, et_on>& a, const number<B, et_on>& b)
 {
-   return detail::expression<detail::subtract_immediates, number<B, true>, number<B, true> >(a, b);
+   return detail::expression<detail::subtract_immediates, number<B, et_on>, number<B, et_on> >(a, b);
 }
 template <class B, class V>
-inline typename enable_if<is_compatible_arithmetic_type<V, number<B, true> >, detail::expression<detail::subtract_immediates, number<B, true>, V > >::type
-   operator - (const number<B, true>& a, const V& b)
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >, detail::expression<detail::subtract_immediates, number<B, et_on>, V > >::type
+   operator - (const number<B, et_on>& a, const V& b)
 {
-   return detail::expression<detail::subtract_immediates, number<B, true>, V >(a, b);
+   return detail::expression<detail::subtract_immediates, number<B, et_on>, V >(a, b);
 }
 template <class V, class B>
-inline typename enable_if<is_compatible_arithmetic_type<V, number<B, true> >, detail::expression<detail::subtract_immediates, V, number<B, true> > >::type
-   operator - (const V& a, const number<B, true>& b)
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >, detail::expression<detail::subtract_immediates, V, number<B, et_on> > >::type
+   operator - (const V& a, const number<B, et_on>& b)
 {
-   return detail::expression<detail::subtract_immediates, V, number<B, true> >(a, b);
+   return detail::expression<detail::subtract_immediates, V, number<B, et_on> >(a, b);
 }
-template <class B, bool ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+template <class B, expression_template_option ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 inline detail::expression<detail::minus, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >
    operator - (const number<B, ET>& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
    return detail::expression<detail::minus, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B, bool ET>
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
 inline detail::expression<detail::minus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >
    operator - (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const number<B, ET>& b)
 {
@@ -181,13 +181,13 @@ inline typename enable_if<is_compatible_arithmetic_type<V, typename detail::expr
 //
 // Repeat operator for negated arguments: propagate the negation to the top level to avoid temporaries:
 //
-template <class B, bool ET, class Arg1, class Arg2, class Arg3, class Arg4>
+template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
 inline detail::expression<detail::plus, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >
    operator - (const number<B, ET>& a, const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& b)
 {
    return detail::expression<detail::plus, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >(a, b.left_ref());
 }
-template <class Arg1, class Arg2, class Arg3, class Arg4, class B, bool ET>
+template <class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
 inline detail::expression<detail::negate, detail::expression<detail::plus, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > >
    operator - (const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& a, const number<B, ET>& b)
 {
@@ -195,70 +195,70 @@ inline detail::expression<detail::negate, detail::expression<detail::plus, numbe
       detail::expression<detail::plus, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >(b, a.left_ref()));
 }
 template <class B>
-inline detail::expression<detail::add_immediates, number<B, true>, number<B, true> >
-   operator - (const number<B, true>& a, const detail::expression<detail::negate, number<B, true> >& b)
+inline detail::expression<detail::add_immediates, number<B, et_on>, number<B, et_on> >
+   operator - (const number<B, et_on>& a, const detail::expression<detail::negate, number<B, et_on> >& b)
 {
-   return detail::expression<detail::add_immediates, number<B, true>, number<B, true> >(a, b.left_ref());
+   return detail::expression<detail::add_immediates, number<B, et_on>, number<B, et_on> >(a, b.left_ref());
 }
 template <class B>
-inline detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, true>, number<B, true> > >
-   operator - (const detail::expression<detail::negate, number<B, true> >& a, const number<B, true>& b)
+inline detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, et_on>, number<B, et_on> > >
+   operator - (const detail::expression<detail::negate, number<B, et_on> >& a, const number<B, et_on>& b)
 {
-   return detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, true>, number<B, true> > >(
-      detail::expression<detail::add_immediates, number<B, true>, number<B, true> >(b, a.left_ref()));
+   return detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, et_on>, number<B, et_on> > >(
+      detail::expression<detail::add_immediates, number<B, et_on>, number<B, et_on> >(b, a.left_ref()));
 }
 template <class B, class V>
-inline typename enable_if<is_compatible_arithmetic_type<V, number<B, true> >, detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, true>, V > > >::type
-   operator - (const detail::expression<detail::negate, number<B, true> >& a, const V& b)
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >, detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, et_on>, V > > >::type
+   operator - (const detail::expression<detail::negate, number<B, et_on> >& a, const V& b)
 {
-   return detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, true>, V > >(detail::expression<detail::add_immediates, number<B, true>, V >(a.left_ref(), b));
+   return detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, et_on>, V > >(detail::expression<detail::add_immediates, number<B, et_on>, V >(a.left_ref(), b));
 }
-template <class B, class B2, bool ET>
-inline typename enable_if<is_compatible_arithmetic_type<number<B2, ET>, number<B, true> >, detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, true>, number<B2, ET> > > >::type
-   operator - (const detail::expression<detail::negate, number<B, true> >& a, const number<B2, ET>& b)
+template <class B, class B2, expression_template_option ET>
+inline typename enable_if<is_compatible_arithmetic_type<number<B2, ET>, number<B, et_on> >, detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, et_on>, number<B2, ET> > > >::type
+   operator - (const detail::expression<detail::negate, number<B, et_on> >& a, const number<B2, ET>& b)
 {
-   return detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, true>, number<B2, ET> > >(detail::expression<detail::add_immediates, number<B, true>, number<B2, ET> >(a.left_ref(), b));
+   return detail::expression<detail::negate, detail::expression<detail::add_immediates, number<B, et_on>, number<B2, ET> > >(detail::expression<detail::add_immediates, number<B, et_on>, number<B2, ET> >(a.left_ref(), b));
 }
 template <class V, class B>
-inline typename enable_if<is_compatible_arithmetic_type<V, number<B, true> >, detail::expression<detail::add_immediates, V, number<B, true> > >::type
-   operator - (const V& a, const detail::expression<detail::negate, number<B, true> >& b)
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >, detail::expression<detail::add_immediates, V, number<B, et_on> > >::type
+   operator - (const V& a, const detail::expression<detail::negate, number<B, et_on> >& b)
 {
-   return detail::expression<detail::add_immediates, V, number<B, true> >(a, b.left_ref());
+   return detail::expression<detail::add_immediates, V, number<B, et_on> >(a, b.left_ref());
 }
-template <class B2, bool ET, class B>
-inline typename enable_if<is_compatible_arithmetic_type<number<B2, ET>, number<B, true> >, detail::expression<detail::add_immediates, number<B2, ET>, number<B, true> > >::type
-   operator - (const number<B2, ET>& a, const detail::expression<detail::negate, number<B, true> >& b)
+template <class B2, expression_template_option ET, class B>
+inline typename enable_if<is_compatible_arithmetic_type<number<B2, ET>, number<B, et_on> >, detail::expression<detail::add_immediates, number<B2, ET>, number<B, et_on> > >::type
+   operator - (const number<B2, ET>& a, const detail::expression<detail::negate, number<B, et_on> >& b)
 {
-   return detail::expression<detail::add_immediates, number<B2, ET>, number<B, true> >(a, b.left_ref());
+   return detail::expression<detail::add_immediates, number<B2, ET>, number<B, et_on> >(a, b.left_ref());
 }
 //
 // Multiplication:
 //
 template <class B>
-inline detail::expression<detail::multiply_immediates, number<B, true>, number<B, true> >
-   operator * (const number<B, true>& a, const number<B, true>& b)
+inline detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> >
+   operator * (const number<B, et_on>& a, const number<B, et_on>& b)
 {
-   return detail::expression<detail::multiply_immediates, number<B, true>, number<B, true> >(a, b);
+   return detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> >(a, b);
 }
 template <class B, class V>
-inline typename enable_if<is_compatible_arithmetic_type<V, number<B, true> >, detail::expression<detail::multiply_immediates, number<B, true>, V > >::type
-   operator * (const number<B, true>& a, const V& b)
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >, detail::expression<detail::multiply_immediates, number<B, et_on>, V > >::type
+   operator * (const number<B, et_on>& a, const V& b)
 {
-   return detail::expression<detail::multiply_immediates, number<B, true>, V >(a, b);
+   return detail::expression<detail::multiply_immediates, number<B, et_on>, V >(a, b);
 }
 template <class V, class B>
-inline typename enable_if<is_compatible_arithmetic_type<V, number<B, true> >, detail::expression<detail::multiply_immediates, V, number<B, true> > >::type
-   operator * (const V& a, const number<B, true>& b)
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >, detail::expression<detail::multiply_immediates, V, number<B, et_on> > >::type
+   operator * (const V& a, const number<B, et_on>& b)
 {
-   return detail::expression<detail::multiply_immediates, V, number<B, true> >(a, b);
+   return detail::expression<detail::multiply_immediates, V, number<B, et_on> >(a, b);
 }
-template <class B, bool ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+template <class B, expression_template_option ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 inline detail::expression<detail::multiplies, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >
    operator * (const number<B, ET>& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
    return detail::expression<detail::multiplies, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B, bool ET>
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
 inline detail::expression<detail::multiplies, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >
    operator * (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const number<B, ET>& b)
 {
@@ -285,14 +285,14 @@ inline typename enable_if<is_compatible_arithmetic_type<V, typename detail::expr
 //
 // Repeat operator for negated arguments: propagate the negation to the top level to avoid temporaries:
 //
-template <class B, bool ET, class Arg1, class Arg2, class Arg3, class Arg4>
+template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
 inline detail::expression<detail::negate, detail::expression<detail::multiplies, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > >
    operator * (const number<B, ET>& a, const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& b)
 {
    return detail::expression<detail::negate, detail::expression<detail::multiplies, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > >(
       detail::expression<detail::multiplies, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > (a, b.left_ref()));
 }
-template <class Arg1, class Arg2, class Arg3, class Arg4, class B, bool ET>
+template <class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
 inline detail::expression<detail::negate, detail::expression<detail::multiplies, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > >
    operator * (const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& a, const number<B, ET>& b)
 {
@@ -300,75 +300,75 @@ inline detail::expression<detail::negate, detail::expression<detail::multiplies,
       detail::expression<detail::multiplies, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >(b, a.left_ref()));
 }
 template <class B>
-inline detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, true>, number<B, true> > >
-   operator * (const number<B, true>& a, const detail::expression<detail::negate, number<B, true> >& b)
+inline detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> > >
+   operator * (const number<B, et_on>& a, const detail::expression<detail::negate, number<B, et_on> >& b)
 {
-   return detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, true>, number<B, true> > >(
-      detail::expression<detail::multiply_immediates, number<B, true>, number<B, true> >(a, b.left_ref()));
+   return detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> > >(
+      detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> >(a, b.left_ref()));
 }
 template <class B>
-inline detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, true>, number<B, true> > >
-   operator * (const detail::expression<detail::negate, number<B, true> >& a, const number<B, true>& b)
+inline detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> > >
+   operator * (const detail::expression<detail::negate, number<B, et_on> >& a, const number<B, et_on>& b)
 {
-   return detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, true>, number<B, true> > >(
-      detail::expression<detail::multiply_immediates, number<B, true>, number<B, true> >(b, a.left_ref()));
+   return detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> > >(
+      detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> >(b, a.left_ref()));
 }
 template <class B, class V>
-inline typename enable_if<is_compatible_arithmetic_type<V, number<B, true> >, detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, true>, V > > >::type
-   operator * (const detail::expression<detail::negate, number<B, true> >& a, const V& b)
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >, detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, V > > >::type
+   operator * (const detail::expression<detail::negate, number<B, et_on> >& a, const V& b)
 {
-   return detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, true>, V > > (
-      detail::expression<detail::multiply_immediates, number<B, true>, V >(a.left_ref(), b));
+   return detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, V > > (
+      detail::expression<detail::multiply_immediates, number<B, et_on>, V >(a.left_ref(), b));
 }
-template <class B, class B2, bool ET>
-inline typename enable_if<is_compatible_arithmetic_type<number<B2, ET>, number<B, true> >, detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, true>, number<B2, ET> > > >::type
-   operator * (const detail::expression<detail::negate, number<B, true> >& a, const number<B2, ET>& b)
+template <class B, class B2, expression_template_option ET>
+inline typename enable_if<is_compatible_arithmetic_type<number<B2, ET>, number<B, et_on> >, detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B2, ET> > > >::type
+   operator * (const detail::expression<detail::negate, number<B, et_on> >& a, const number<B2, ET>& b)
 {
-   return detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, true>, number<B2, ET> > > (
-      detail::expression<detail::multiply_immediates, number<B, true>, number<B2, ET> >(a.left_ref(), b));
+   return detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B2, ET> > > (
+      detail::expression<detail::multiply_immediates, number<B, et_on>, number<B2, ET> >(a.left_ref(), b));
 }
 template <class V, class B>
-inline typename enable_if<is_compatible_arithmetic_type<V, number<B, true> >, detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, true>, V > > >::type
-   operator * (const V& a, const detail::expression<detail::negate, number<B, true> >& b)
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >, detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, V > > >::type
+   operator * (const V& a, const detail::expression<detail::negate, number<B, et_on> >& b)
 {
-   return detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, true>, V > >(
-      detail::expression<detail::multiply_immediates, number<B, true>, V >(b.left_ref(), a));
+   return detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, V > >(
+      detail::expression<detail::multiply_immediates, number<B, et_on>, V >(b.left_ref(), a));
 }
-template <class B2, bool ET, class B>
-inline typename enable_if<is_compatible_arithmetic_type<number<B2, ET>, number<B, true> >, detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, true>, number<B2, ET> > > >::type
-   operator * (const number<B2, ET>& a, const detail::expression<detail::negate, number<B, true> >& b)
+template <class B2, expression_template_option ET, class B>
+inline typename enable_if<is_compatible_arithmetic_type<number<B2, ET>, number<B, et_on> >, detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B2, ET> > > >::type
+   operator * (const number<B2, ET>& a, const detail::expression<detail::negate, number<B, et_on> >& b)
 {
-   return detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, true>, number<B2, ET> > >(
-      detail::expression<detail::multiply_immediates, number<B, true>, number<B2, ET> >(b.left_ref(), a));
+   return detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B2, ET> > >(
+      detail::expression<detail::multiply_immediates, number<B, et_on>, number<B2, ET> >(b.left_ref(), a));
 }
 //
 // Division:
 //
 template <class B>
-inline detail::expression<detail::divide_immediates, number<B, true>, number<B, true> >
-   operator / (const number<B, true>& a, const number<B, true>& b)
+inline detail::expression<detail::divide_immediates, number<B, et_on>, number<B, et_on> >
+   operator / (const number<B, et_on>& a, const number<B, et_on>& b)
 {
-   return detail::expression<detail::divide_immediates, number<B, true>, number<B, true> >(a, b);
+   return detail::expression<detail::divide_immediates, number<B, et_on>, number<B, et_on> >(a, b);
 }
 template <class B, class V>
-inline typename enable_if<is_compatible_arithmetic_type<V, number<B, true> >, detail::expression<detail::divide_immediates, number<B, true>, V > >::type
-   operator / (const number<B, true>& a, const V& b)
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >, detail::expression<detail::divide_immediates, number<B, et_on>, V > >::type
+   operator / (const number<B, et_on>& a, const V& b)
 {
-   return detail::expression<detail::divide_immediates, number<B, true>, V >(a, b);
+   return detail::expression<detail::divide_immediates, number<B, et_on>, V >(a, b);
 }
 template <class V, class B>
-inline typename enable_if<is_compatible_arithmetic_type<V, number<B, true> >, detail::expression<detail::divide_immediates, V, number<B, true> > >::type
-   operator / (const V& a, const number<B, true>& b)
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >, detail::expression<detail::divide_immediates, V, number<B, et_on> > >::type
+   operator / (const V& a, const number<B, et_on>& b)
 {
-   return detail::expression<detail::divide_immediates, V, number<B, true> >(a, b);
+   return detail::expression<detail::divide_immediates, V, number<B, et_on> >(a, b);
 }
-template <class B, bool ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+template <class B, expression_template_option ET, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 inline detail::expression<detail::divides, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >
    operator / (const number<B, ET>& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
    return detail::expression<detail::divides, number<B, ET>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
-template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B, bool ET>
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
 inline detail::expression<detail::divides, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, ET> >
    operator / (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const number<B, ET>& b)
 {
@@ -395,14 +395,14 @@ inline typename enable_if<is_compatible_arithmetic_type<V, typename detail::expr
 //
 // Repeat operator for negated arguments: propagate the negation to the top level to avoid temporaries:
 //
-template <class B, bool ET, class Arg1, class Arg2, class Arg3, class Arg4>
+template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
 inline detail::expression<detail::negate, detail::expression<detail::divides, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > >
    operator / (const number<B, ET>& a, const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& b)
 {
    return detail::expression<detail::negate, detail::expression<detail::divides, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > >(
       detail::expression<detail::divides, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >(a, b.left_ref()));
 }
-template <class Arg1, class Arg2, class Arg3, class Arg4, class B, bool ET>
+template <class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
 inline detail::expression<detail::negate, detail::expression<detail::divides, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type, number<B, ET> > >
    operator / (const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& a, const number<B, ET>& b)
 {
@@ -410,79 +410,79 @@ inline detail::expression<detail::negate, detail::expression<detail::divides, ty
       detail::expression<detail::divides, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type, number<B, ET> >(a.left_ref(), b));
 }
 template <class B>
-inline detail::expression<detail::negate, detail::expression<detail::divide_immediates, number<B, true>, number<B, true> > >
-   operator / (const number<B, true>& a, const detail::expression<detail::negate, number<B, true> >& b)
+inline detail::expression<detail::negate, detail::expression<detail::divide_immediates, number<B, et_on>, number<B, et_on> > >
+   operator / (const number<B, et_on>& a, const detail::expression<detail::negate, number<B, et_on> >& b)
 {
-   return detail::expression<detail::negate, detail::expression<detail::divide_immediates, number<B, true>, number<B, true> > >(
-      detail::expression<detail::divide_immediates, number<B, true>, number<B, true> >(a, b.left_ref()));
+   return detail::expression<detail::negate, detail::expression<detail::divide_immediates, number<B, et_on>, number<B, et_on> > >(
+      detail::expression<detail::divide_immediates, number<B, et_on>, number<B, et_on> >(a, b.left_ref()));
 }
 template <class B>
-inline detail::expression<detail::negate, detail::expression<detail::divide_immediates, number<B, true>, number<B, true> > >
-   operator / (const detail::expression<detail::negate, number<B, true> >& a, const number<B, true>& b)
+inline detail::expression<detail::negate, detail::expression<detail::divide_immediates, number<B, et_on>, number<B, et_on> > >
+   operator / (const detail::expression<detail::negate, number<B, et_on> >& a, const number<B, et_on>& b)
 {
-   return detail::expression<detail::negate, detail::expression<detail::divide_immediates, number<B, true>, number<B, true> > >(
-      detail::expression<detail::divide_immediates, number<B, true>, number<B, true> >(a.left_ref(), b));
+   return detail::expression<detail::negate, detail::expression<detail::divide_immediates, number<B, et_on>, number<B, et_on> > >(
+      detail::expression<detail::divide_immediates, number<B, et_on>, number<B, et_on> >(a.left_ref(), b));
 }
 template <class B, class V>
-inline typename enable_if<is_compatible_arithmetic_type<V, number<B, true> >, detail::expression<detail::negate, detail::expression<detail::divide_immediates, number<B, true>, V > > >::type
-   operator / (const detail::expression<detail::negate, number<B, true> >& a, const V& b)
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >, detail::expression<detail::negate, detail::expression<detail::divide_immediates, number<B, et_on>, V > > >::type
+   operator / (const detail::expression<detail::negate, number<B, et_on> >& a, const V& b)
 {
-   return detail::expression<detail::negate, detail::expression<detail::divide_immediates, number<B, true>, V > >(
-      detail::expression<detail::divide_immediates, number<B, true>, V>(a.left_ref(), b));
+   return detail::expression<detail::negate, detail::expression<detail::divide_immediates, number<B, et_on>, V > >(
+      detail::expression<detail::divide_immediates, number<B, et_on>, V>(a.left_ref(), b));
 }
-template <class B, class B2, bool ET>
-inline typename enable_if<is_compatible_arithmetic_type<number<B2, ET>, number<B, true> >, detail::expression<detail::negate, detail::expression<detail::divide_immediates, number<B, true>, number<B2, ET> > > >::type
-   operator / (const detail::expression<detail::negate, number<B, true> >& a, const number<B2, ET>& b)
+template <class B, class B2, expression_template_option ET>
+inline typename enable_if<is_compatible_arithmetic_type<number<B2, ET>, number<B, et_on> >, detail::expression<detail::negate, detail::expression<detail::divide_immediates, number<B, et_on>, number<B2, ET> > > >::type
+   operator / (const detail::expression<detail::negate, number<B, et_on> >& a, const number<B2, ET>& b)
 {
-   return detail::expression<detail::negate, detail::expression<detail::divide_immediates, number<B, true>, number<B2, ET> > >(
-      detail::expression<detail::divide_immediates, number<B, true>, number<B2, ET> >(a.left_ref(), b));
+   return detail::expression<detail::negate, detail::expression<detail::divide_immediates, number<B, et_on>, number<B2, ET> > >(
+      detail::expression<detail::divide_immediates, number<B, et_on>, number<B2, ET> >(a.left_ref(), b));
 }
 template <class V, class B>
-inline typename enable_if<is_compatible_arithmetic_type<V, number<B, true> >, detail::expression<detail::negate, detail::expression<detail::divide_immediates, V, number<B, true> > > >::type
-   operator / (const V& a, const detail::expression<detail::negate, number<B, true> >& b)
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >, detail::expression<detail::negate, detail::expression<detail::divide_immediates, V, number<B, et_on> > > >::type
+   operator / (const V& a, const detail::expression<detail::negate, number<B, et_on> >& b)
 {
-   return detail::expression<detail::negate, detail::expression<detail::divide_immediates, V, number<B, true> > >(
-      detail::expression<detail::divide_immediates, V, number<B, true> >(a, b.left_ref()));
+   return detail::expression<detail::negate, detail::expression<detail::divide_immediates, V, number<B, et_on> > >(
+      detail::expression<detail::divide_immediates, V, number<B, et_on> >(a, b.left_ref()));
 }
-template <class B2, bool ET, class B>
-inline typename enable_if<is_compatible_arithmetic_type<number<B2, ET>, number<B, true> >, detail::expression<detail::negate, detail::expression<detail::divide_immediates, number<B2, ET>, number<B, true> > > >::type
-   operator / (const number<B2, ET>& a, const detail::expression<detail::negate, number<B, true> >& b)
+template <class B2, expression_template_option ET, class B>
+inline typename enable_if<is_compatible_arithmetic_type<number<B2, ET>, number<B, et_on> >, detail::expression<detail::negate, detail::expression<detail::divide_immediates, number<B2, ET>, number<B, et_on> > > >::type
+   operator / (const number<B2, ET>& a, const detail::expression<detail::negate, number<B, et_on> >& b)
 {
-   return detail::expression<detail::negate, detail::expression<detail::divide_immediates, number<B2, ET>, number<B, true> > >(
-      detail::expression<detail::divide_immediates, number<B2, ET>, number<B, true> >(a, b.left_ref()));
+   return detail::expression<detail::negate, detail::expression<detail::divide_immediates, number<B2, ET>, number<B, et_on> > >(
+      detail::expression<detail::divide_immediates, number<B2, ET>, number<B, et_on> >(a, b.left_ref()));
 }
 //
 // Modulus:
 //
 template <class B>
-inline detail::expression<detail::modulus_immediates, number<B, true>, number<B, true> >
-   operator % (const number<B, true>& a, const number<B, true>& b)
+inline detail::expression<detail::modulus_immediates, number<B, et_on>, number<B, et_on> >
+   operator % (const number<B, et_on>& a, const number<B, et_on>& b)
 {
-   return detail::expression<detail::modulus_immediates, number<B, true>, number<B, true> >(a, b);
+   return detail::expression<detail::modulus_immediates, number<B, et_on>, number<B, et_on> >(a, b);
 }
 template <class B, class V>
-inline typename enable_if<is_compatible_arithmetic_type<V, number<B, true> >, detail::expression<detail::modulus_immediates, number<B, true>, V > >::type
-   operator % (const number<B, true>& a, const V& b)
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >, detail::expression<detail::modulus_immediates, number<B, et_on>, V > >::type
+   operator % (const number<B, et_on>& a, const V& b)
 {
-   return detail::expression<detail::modulus_immediates, number<B, true>, V >(a, b);
+   return detail::expression<detail::modulus_immediates, number<B, et_on>, V >(a, b);
 }
 template <class V, class B>
-inline typename enable_if<is_compatible_arithmetic_type<V, number<B, true> >, detail::expression<detail::modulus_immediates, V, number<B, true> > >::type
-   operator % (const V& a, const number<B, true>& b)
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >, detail::expression<detail::modulus_immediates, V, number<B, et_on> > >::type
+   operator % (const V& a, const number<B, et_on>& b)
 {
-   return detail::expression<detail::modulus_immediates, V, number<B, true> >(a, b);
+   return detail::expression<detail::modulus_immediates, V, number<B, et_on> >(a, b);
 }
 template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-inline detail::expression<detail::modulus, number<B, true>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >
-   operator % (const number<B, true>& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
+inline detail::expression<detail::modulus, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >
+   operator % (const number<B, et_on>& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::expression<detail::modulus, number<B, true>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
+   return detail::expression<detail::modulus, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
-inline detail::expression<detail::modulus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, true> >
-   operator % (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const number<B, true>& b)
+inline detail::expression<detail::modulus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >
+   operator % (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const number<B, et_on>& b)
 {
-   return detail::expression<detail::modulus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, true> >(a, b);
+   return detail::expression<detail::modulus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class tag2, class Arg1b, class Arg2b, class Arg3b, class Arg4b>
 inline detail::expression<detail::modulus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, detail::expression<tag2, Arg1b, Arg2b, Arg3b, Arg4b> >
@@ -506,10 +506,10 @@ inline typename enable_if<is_compatible_arithmetic_type<V, typename detail::expr
 // Left shift:
 //
 template <class B, class I>
-inline typename enable_if<is_integral<I>, detail::expression<detail::shift_left, number<B, true>, I > >::type
-   operator << (const number<B, true>& a, const I& b)
+inline typename enable_if<is_integral<I>, detail::expression<detail::shift_left, number<B, et_on>, I > >::type
+   operator << (const number<B, et_on>& a, const I& b)
 {
-   return detail::expression<detail::shift_left, number<B, true>, I>(a, b);
+   return detail::expression<detail::shift_left, number<B, et_on>, I>(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class I>
 inline typename enable_if<is_integral<I>, detail::expression<detail::shift_left, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, I> >::type
@@ -521,10 +521,10 @@ inline typename enable_if<is_integral<I>, detail::expression<detail::shift_left,
 // Right shift:
 //
 template <class B, class I>
-inline typename enable_if<is_integral<I>, detail::expression<detail::shift_right, number<B, true>, I > >::type
-   operator >> (const number<B, true>& a, const I& b)
+inline typename enable_if<is_integral<I>, detail::expression<detail::shift_right, number<B, et_on>, I > >::type
+   operator >> (const number<B, et_on>& a, const I& b)
 {
-   return detail::expression<detail::shift_right, number<B, true>, I>(a, b);
+   return detail::expression<detail::shift_right, number<B, et_on>, I>(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class I>
 inline typename enable_if<is_integral<I>, detail::expression<detail::shift_right, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, I> >::type
@@ -536,34 +536,34 @@ inline typename enable_if<is_integral<I>, detail::expression<detail::shift_right
 // Bitwise AND:
 //
 template <class B>
-inline detail::expression<detail::bitwise_and_immediates, number<B, true>, number<B, true> >
-   operator & (const number<B, true>& a, const number<B, true>& b)
+inline detail::expression<detail::bitwise_and_immediates, number<B, et_on>, number<B, et_on> >
+   operator & (const number<B, et_on>& a, const number<B, et_on>& b)
 {
-   return detail::expression<detail::bitwise_and_immediates, number<B, true>, number<B, true> >(a, b);
+   return detail::expression<detail::bitwise_and_immediates, number<B, et_on>, number<B, et_on> >(a, b);
 }
 template <class B, class V>
-inline typename enable_if<is_compatible_arithmetic_type<V, number<B, true> >, detail::expression<detail::bitwise_and_immediates, number<B, true>, V > >::type
-   operator & (const number<B, true>& a, const V& b)
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >, detail::expression<detail::bitwise_and_immediates, number<B, et_on>, V > >::type
+   operator & (const number<B, et_on>& a, const V& b)
 {
-   return detail::expression<detail::bitwise_and_immediates, number<B, true>, V >(a, b);
+   return detail::expression<detail::bitwise_and_immediates, number<B, et_on>, V >(a, b);
 }
 template <class V, class B>
-inline typename enable_if<is_compatible_arithmetic_type<V, number<B, true> >, detail::expression<detail::bitwise_and_immediates, V, number<B, true> > >::type
-   operator & (const V& a, const number<B, true>& b)
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >, detail::expression<detail::bitwise_and_immediates, V, number<B, et_on> > >::type
+   operator & (const V& a, const number<B, et_on>& b)
 {
-   return detail::expression<detail::bitwise_and_immediates, V, number<B, true> >(a, b);
+   return detail::expression<detail::bitwise_and_immediates, V, number<B, et_on> >(a, b);
 }
 template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-inline detail::expression<detail::bitwise_and, number<B, true>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >
-   operator & (const number<B, true>& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
+inline detail::expression<detail::bitwise_and, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >
+   operator & (const number<B, et_on>& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::expression<detail::bitwise_and, number<B, true>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
+   return detail::expression<detail::bitwise_and, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
-inline detail::expression<detail::bitwise_and, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, true> >
-   operator & (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const number<B, true>& b)
+inline detail::expression<detail::bitwise_and, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >
+   operator & (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const number<B, et_on>& b)
 {
-   return detail::expression<detail::bitwise_and, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, true> >(a, b);
+   return detail::expression<detail::bitwise_and, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class tag2, class Arg1b, class Arg2b, class Arg3b, class Arg4b>
 inline detail::expression<detail::bitwise_and, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, detail::expression<tag2, Arg1b, Arg2b, Arg3b, Arg4b> >
@@ -587,34 +587,34 @@ inline typename enable_if<is_compatible_arithmetic_type<V, typename detail::expr
 // Bitwise OR:
 //
 template <class B>
-inline detail::expression<detail::bitwise_or_immediates, number<B, true>, number<B, true> >
-   operator| (const number<B, true>& a, const number<B, true>& b)
+inline detail::expression<detail::bitwise_or_immediates, number<B, et_on>, number<B, et_on> >
+   operator| (const number<B, et_on>& a, const number<B, et_on>& b)
 {
-   return detail::expression<detail::bitwise_or_immediates, number<B, true>, number<B, true> >(a, b);
+   return detail::expression<detail::bitwise_or_immediates, number<B, et_on>, number<B, et_on> >(a, b);
 }
 template <class B, class V>
-inline typename enable_if<is_compatible_arithmetic_type<V, number<B, true> >, detail::expression<detail::bitwise_or_immediates, number<B, true>, V > >::type
-   operator| (const number<B, true>& a, const V& b)
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >, detail::expression<detail::bitwise_or_immediates, number<B, et_on>, V > >::type
+   operator| (const number<B, et_on>& a, const V& b)
 {
-   return detail::expression<detail::bitwise_or_immediates, number<B, true>, V >(a, b);
+   return detail::expression<detail::bitwise_or_immediates, number<B, et_on>, V >(a, b);
 }
 template <class V, class B>
-inline typename enable_if<is_compatible_arithmetic_type<V, number<B, true> >, detail::expression<detail::bitwise_or_immediates, V, number<B, true> > >::type
-   operator| (const V& a, const number<B, true>& b)
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >, detail::expression<detail::bitwise_or_immediates, V, number<B, et_on> > >::type
+   operator| (const V& a, const number<B, et_on>& b)
 {
-   return detail::expression<detail::bitwise_or_immediates, V, number<B, true> >(a, b);
+   return detail::expression<detail::bitwise_or_immediates, V, number<B, et_on> >(a, b);
 }
 template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-inline detail::expression<detail::bitwise_or, number<B, true>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >
-   operator| (const number<B, true>& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
+inline detail::expression<detail::bitwise_or, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >
+   operator| (const number<B, et_on>& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::expression<detail::bitwise_or, number<B, true>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
+   return detail::expression<detail::bitwise_or, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
-inline detail::expression<detail::bitwise_or, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, true> >
-   operator| (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const number<B, true>& b)
+inline detail::expression<detail::bitwise_or, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >
+   operator| (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const number<B, et_on>& b)
 {
-   return detail::expression<detail::bitwise_or, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, true> >(a, b);
+   return detail::expression<detail::bitwise_or, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class tag2, class Arg1b, class Arg2b, class Arg3b, class Arg4b>
 inline detail::expression<detail::bitwise_or, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, detail::expression<tag2, Arg1b, Arg2b, Arg3b, Arg4b> >
@@ -638,34 +638,34 @@ inline typename enable_if<is_compatible_arithmetic_type<V, typename detail::expr
 // Bitwise XOR:
 //
 template <class B>
-inline detail::expression<detail::bitwise_xor_immediates, number<B, true>, number<B, true> >
-   operator^ (const number<B, true>& a, const number<B, true>& b)
+inline detail::expression<detail::bitwise_xor_immediates, number<B, et_on>, number<B, et_on> >
+   operator^ (const number<B, et_on>& a, const number<B, et_on>& b)
 {
-   return detail::expression<detail::bitwise_xor_immediates, number<B, true>, number<B, true> >(a, b);
+   return detail::expression<detail::bitwise_xor_immediates, number<B, et_on>, number<B, et_on> >(a, b);
 }
 template <class B, class V>
-inline typename enable_if<is_compatible_arithmetic_type<V, number<B, true> >, detail::expression<detail::bitwise_xor_immediates, number<B, true>, V > >::type
-   operator^ (const number<B, true>& a, const V& b)
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >, detail::expression<detail::bitwise_xor_immediates, number<B, et_on>, V > >::type
+   operator^ (const number<B, et_on>& a, const V& b)
 {
-   return detail::expression<detail::bitwise_xor_immediates, number<B, true>, V >(a, b);
+   return detail::expression<detail::bitwise_xor_immediates, number<B, et_on>, V >(a, b);
 }
 template <class V, class B>
-inline typename enable_if<is_compatible_arithmetic_type<V, number<B, true> >, detail::expression<detail::bitwise_xor_immediates, V, number<B, true> > >::type
-   operator^ (const V& a, const number<B, true>& b)
+inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_on> >, detail::expression<detail::bitwise_xor_immediates, V, number<B, et_on> > >::type
+   operator^ (const V& a, const number<B, et_on>& b)
 {
-   return detail::expression<detail::bitwise_xor_immediates, V, number<B, true> >(a, b);
+   return detail::expression<detail::bitwise_xor_immediates, V, number<B, et_on> >(a, b);
 }
 template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-inline detail::expression<detail::bitwise_xor, number<B, true>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >
-   operator^ (const number<B, true>& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
+inline detail::expression<detail::bitwise_xor, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >
+   operator^ (const number<B, et_on>& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::expression<detail::bitwise_xor, number<B, true>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
+   return detail::expression<detail::bitwise_xor, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
-inline detail::expression<detail::bitwise_xor, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, true> >
-   operator^ (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const number<B, true>& b)
+inline detail::expression<detail::bitwise_xor, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >
+   operator^ (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const number<B, et_on>& b)
 {
-   return detail::expression<detail::bitwise_xor, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, true> >(a, b);
+   return detail::expression<detail::bitwise_xor, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> >(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class tag2, class Arg1b, class Arg2b, class Arg3b, class Arg4b>
 inline detail::expression<detail::bitwise_xor, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, detail::expression<tag2, Arg1b, Arg2b, Arg3b, Arg4b> >

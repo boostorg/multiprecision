@@ -203,7 +203,7 @@ struct related_type<boost::multiprecision::cpp_int>
 {
    typedef boost::multiprecision::int256_t type;
 };
-template <unsigned D, bool S, bool ET>
+template <unsigned D, bool S, boost::multiprecision::expression_template_option ET>
 struct related_type<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<D, S, void>, ET> >
 {
    typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<D/2, S, void>, ET> type;
@@ -1654,7 +1654,7 @@ int main()
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
    test<boost::multiprecision::cpp_dec_float_50>();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<100>, false> >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<100>, boost::multiprecision::et_off> >();
 #endif
 #ifdef TEST_MPFR
    test<boost::multiprecision::mpfr_float>();
@@ -1679,13 +1679,13 @@ int main()
 #endif
 #ifdef TEST_CPP_INT_2
    test<boost::multiprecision::cpp_rational>();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<>, false> >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<>, boost::multiprecision::et_off> >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<500, true, void> > >();
 #endif
 #ifdef TEST_CPP_INT_3
    // Again with "trivial" backends:
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, true, void>, false > >();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, false, void>, false > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, true, void>, boost::multiprecision::et_off > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, false, void>, boost::multiprecision::et_off > >();
 #endif
 #ifdef TEST_CPP_INT_BR
    test<boost::rational<boost::multiprecision::cpp_int> >();

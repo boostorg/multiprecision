@@ -522,7 +522,7 @@ inline double real_cast<double, concepts::real_concept>(concepts::real_concept r
 
 namespace std{
 
-template <class Arithmetic, bool ExpressionTemplates>
+template <class Arithmetic, boost::multiprecision::expression_template_option ExpressionTemplates>
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::arithmetic_backend<Arithmetic>, ExpressionTemplates > > : public std::numeric_limits<Arithmetic>
 {
    typedef std::numeric_limits<Arithmetic> base_type;

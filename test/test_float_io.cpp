@@ -214,21 +214,21 @@ struct max_digits10_proxy
    static const unsigned value = std::numeric_limits<T>::digits10 + 5;
 };
 #ifdef TEST_CPP_DEC_FLOAT
-template <unsigned D, bool ET>
+template <unsigned D, boost::multiprecision::expression_template_option ET>
 struct max_digits10_proxy<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<D>, ET> >
 {
    static const unsigned value = std::numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<D>, ET> >::max_digits10;
 };
 #endif
 #ifdef TEST_MPF_50
-template <unsigned D, bool ET>
+template <unsigned D, boost::multiprecision::expression_template_option ET>
 struct max_digits10_proxy<boost::multiprecision::number<boost::multiprecision::gmp_float<D>, ET> >
 {
    static const unsigned value = std::numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_float<D>, ET> >::max_digits10;
 };
 #endif
 #ifdef TEST_MPFR_50
-template <unsigned D, bool ET>
+template <unsigned D, boost::multiprecision::expression_template_option ET>
 struct max_digits10_proxy<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<D>, ET> >
 {
    static const unsigned value = std::numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<D>, ET> >::max_digits10;

@@ -136,7 +136,7 @@ int main()
 {
    using namespace boost::multiprecision;
 #ifdef TEST_CPP_INT
-   test_miller_rabin<number<cpp_int_backend<>, false> >("cpp_int (no Expression templates)");
+   test_miller_rabin<number<cpp_int_backend<>, et_off> >("cpp_int (no Expression templates)");
    test_miller_rabin<cpp_int>("cpp_int");
    test_miller_rabin<number<cpp_int_backend<128> > >("cpp_int (128-bit cache)");
    test_miller_rabin<number<cpp_int_backend<256> > >("cpp_int (256-bit cache)");
@@ -145,12 +145,12 @@ int main()
    test_miller_rabin<int1024_t>("int1024_t");
 #endif
 #ifdef TEST_MPZ
-   test_miller_rabin<number<gmp_int, false> >("mpz_int (no Expression templates)");
+   test_miller_rabin<number<gmp_int, et_off> >("mpz_int (no Expression templates)");
    test_miller_rabin<mpz_int>("mpz_int");
    std::cout << "Time for mpz_int (native Miller Rabin Test) = " << test_miller_rabin_gmp() << std::endl;
 #endif
 #ifdef TEST_TOMMATH
-   test_miller_rabin<number<boost::multiprecision::tommath_int, false> >("tom_int (no Expression templates)");
+   test_miller_rabin<number<boost::multiprecision::tommath_int, et_off> >("tom_int (no Expression templates)");
    test_miller_rabin<boost::multiprecision::tom_int>("tom_int");
 #endif
    mp_get_memory_functions(&alloc_func_ptr, &realloc_func_ptr, &free_func_ptr);

@@ -31,9 +31,9 @@ void test3()
 
 using namespace boost::multiprecision;
 
-template void test1<number<backends::cpp_int_backend<64, false, void, true>, false> >();
-template void test1<number<backends::cpp_int_backend<64, true, void, true>, false> >();
-template void test3<number<backends::cpp_int_backend<2048, false, void>, false> >();
-template void test2<number<backends::cpp_int_backend<2048, true, void>, false> >();
+template void test1<number<backends::cpp_int_backend<64, false, void, true>, et_off> >();
+template void test1<number<backends::cpp_int_backend<64, true, void, true>, et_off> >();
+template void test3<number<backends::cpp_int_backend<2048, false, void>, et_off> >();
+template void test2<number<backends::cpp_int_backend<2048, true, void>, et_off> >();
 
 #endif

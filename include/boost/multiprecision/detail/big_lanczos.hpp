@@ -16,7 +16,7 @@ namespace lanczos{
 template <class T, class Policy>
 struct lanczos;
 
-template<class Backend, bool ExpressionTemplates, class Policy>
+template<class Backend, boost::multiprecision::expression_template_option ExpressionTemplates, class Policy>
 struct lanczos<multiprecision::number<Backend, ExpressionTemplates>, Policy>
 {
    typedef typename boost::math::policies::precision<multiprecision::number<Backend, ExpressionTemplates>, Policy>::type precision_type;

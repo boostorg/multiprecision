@@ -131,7 +131,7 @@ inline void eval_lcm(B& result, const B& a, const B& b)
 
 }
 
-template <class Backend, bool ExpressionTemplates>
+template <class Backend, expression_template_option ExpressionTemplates>
 inline typename enable_if_c<number_category<Backend>::value == number_kind_integer>::type 
    divide_qr(const number<Backend, ExpressionTemplates>& x, const number<Backend, ExpressionTemplates>& y,
    number<Backend, ExpressionTemplates>& q, number<Backend, ExpressionTemplates>& r)
@@ -140,7 +140,7 @@ inline typename enable_if_c<number_category<Backend>::value == number_kind_integ
    eval_qr(x.backend(), y.backend(), q.backend(), r.backend());
 }
 
-template <class Backend, bool ExpressionTemplates, class tag, class A1, class A2, class A3, class A4>
+template <class Backend, expression_template_option ExpressionTemplates, class tag, class A1, class A2, class A3, class A4>
 inline typename enable_if_c<number_category<Backend>::value == number_kind_integer>::type 
    divide_qr(const number<Backend, ExpressionTemplates>& x, const multiprecision::detail::expression<tag, A1, A2, A3, A4>& y,
    number<Backend, ExpressionTemplates>& q, number<Backend, ExpressionTemplates>& r)
@@ -148,7 +148,7 @@ inline typename enable_if_c<number_category<Backend>::value == number_kind_integ
    divide_qr(x, number<Backend, ExpressionTemplates>(y), q, r);
 }
 
-template <class tag, class A1, class A2, class A3, class A4, class Backend, bool ExpressionTemplates>
+template <class tag, class A1, class A2, class A3, class A4, class Backend, expression_template_option ExpressionTemplates>
 inline typename enable_if_c<number_category<Backend>::value == number_kind_integer>::type 
    divide_qr(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x, const number<Backend, ExpressionTemplates>& y,
    number<Backend, ExpressionTemplates>& q, number<Backend, ExpressionTemplates>& r)
@@ -156,7 +156,7 @@ inline typename enable_if_c<number_category<Backend>::value == number_kind_integ
    divide_qr(number<Backend, ExpressionTemplates>(x), y, q, r);
 }
 
-template <class tag, class A1, class A2, class A3, class A4, class tagb, class A1b, class A2b, class A3b, class A4b, class Backend, bool ExpressionTemplates>
+template <class tag, class A1, class A2, class A3, class A4, class tagb, class A1b, class A2b, class A3b, class A4b, class Backend, expression_template_option ExpressionTemplates>
 inline typename enable_if_c<number_category<Backend>::value == number_kind_integer>::type 
    divide_qr(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& x, const multiprecision::detail::expression<tagb, A1b, A2b, A3b, A4b>& y,
    number<Backend, ExpressionTemplates>& q, number<Backend, ExpressionTemplates>& r)
@@ -164,7 +164,7 @@ inline typename enable_if_c<number_category<Backend>::value == number_kind_integ
    divide_qr(number<Backend, ExpressionTemplates>(x), number<Backend, ExpressionTemplates>(y), q, r);
 }
 
-template <class Backend, bool ExpressionTemplates, class Integer>
+template <class Backend, expression_template_option ExpressionTemplates, class Integer>
 inline typename enable_if<mpl::and_<is_integral<Integer>, mpl::bool_<number_category<Backend>::value == number_kind_integer> >, Integer>::type 
    integer_modulus(const number<Backend, ExpressionTemplates>& x, Integer val)
 {
@@ -180,7 +180,7 @@ inline typename enable_if<mpl::and_<is_integral<Integer>, mpl::bool_<number_cate
    return integer_modulus(result_type(x), val);
 }
 
-template <class Backend, bool ExpressionTemplates>
+template <class Backend, expression_template_option ExpressionTemplates>
 inline typename enable_if_c<number_category<Backend>::value == number_kind_integer, unsigned>::type 
    lsb(const number<Backend, ExpressionTemplates>& x)
 {
@@ -198,7 +198,7 @@ inline typename enable_if_c<number_category<typename multiprecision::detail::exp
    return eval_lsb(n.backend());
 }
 
-template <class Backend, bool ExpressionTemplates>
+template <class Backend, expression_template_option ExpressionTemplates>
 inline typename enable_if_c<number_category<Backend>::value == number_kind_integer, bool>::type 
    bit_test(const number<Backend, ExpressionTemplates>& x, unsigned index)
 {
@@ -216,7 +216,7 @@ inline typename enable_if_c<number_category<typename multiprecision::detail::exp
    return eval_bit_test(n.backend(), index);
 }
 
-template <class Backend, bool ExpressionTemplates>
+template <class Backend, expression_template_option ExpressionTemplates>
 inline typename enable_if_c<number_category<Backend>::value == number_kind_integer, number<Backend, ExpressionTemplates>&>::type 
    bit_set(number<Backend, ExpressionTemplates>& x, unsigned index)
 {
@@ -225,7 +225,7 @@ inline typename enable_if_c<number_category<Backend>::value == number_kind_integ
    return x;
 }
 
-template <class Backend, bool ExpressionTemplates>
+template <class Backend, expression_template_option ExpressionTemplates>
 inline typename enable_if_c<number_category<Backend>::value == number_kind_integer, number<Backend, ExpressionTemplates>&>::type 
    bit_unset(number<Backend, ExpressionTemplates>& x, unsigned index)
 {
@@ -234,7 +234,7 @@ inline typename enable_if_c<number_category<Backend>::value == number_kind_integ
    return x;
 }
 
-template <class Backend, bool ExpressionTemplates>
+template <class Backend, expression_template_option ExpressionTemplates>
 inline typename enable_if_c<number_category<Backend>::value == number_kind_integer, number<Backend, ExpressionTemplates>&>::type 
    bit_flip(number<Backend, ExpressionTemplates>& x, unsigned index)
 {

@@ -95,7 +95,7 @@ by passing a second template argument to `number`:
 
    namespace mp = boost::multiprecision;     // Reduce the typing a bit later...
 
-   typedef mp::number<mp::mpfr_float_backend<300>, false>  my_float;
+   typedef mp::number<mp::mpfr_float_backend<300>, et_off>  my_float;
 
    my_float a, b, c; // These variables have 300 decimal digits precision
 
@@ -123,8 +123,8 @@ However conversions that are inherently lossy are either declared explicit or el
 
 Mixed arithmetic will fail if the conversion is either ambiguous or explicit:
 
-   number<cpp_int_backend<>, false> a(2);
-   number<cpp_int_backend<>, true>  b(3);
+   number<cpp_int_backend<>, et_off> a(2);
+   number<cpp_int_backend<>, et_on>  b(3);
 
    b = a * b; // Error, implicit conversion could go either way.
    b = a * 3.14; // Error, no operator overload if the conversion would be explicit.
@@ -137,7 +137,7 @@ In addition the non-expression template operator overloads (see below) are move 
 that look something like:
 
    template <class B>
-   number<B, false> operator + (number&& a, const number& b)
+   number<B, et_off> operator + (number&& a, const number& b)
    {
        return std::move(a += b);
    }
@@ -336,16 +336,16 @@ The following back-ends provide integer arithmetic:
    typedef number<cpp_rational_backend>         cpp_rational; // arbitrary precision rational number
 
    // Fixed precision unsigned types:
-   typedef number<cpp_int_backend<128, false, void>, false>   uint128_t;
-   typedef number<cpp_int_backend<256, false, void>, false>   uint256_t;
-   typedef number<cpp_int_backend<512, false, void>, false>   uint512_t;
-   typedef number<cpp_int_backend<1024, false, void>, false>  uint1024_t;
+   typedef number<cpp_int_backend<128, false, void>, et_off>   uint128_t;
+   typedef number<cpp_int_backend<256, false, void>, et_off>   uint256_t;
+   typedef number<cpp_int_backend<512, false, void>, et_off>   uint512_t;
+   typedef number<cpp_int_backend<1024, false, void>, et_off>  uint1024_t;
 
    // Fixed precision signed types:
-   typedef number<cpp_int_backend<128, true, void>, false>    int128_t;
-   typedef number<cpp_int_backend<256, true, void>, false>    int256_t;
-   typedef number<cpp_int_backend<512, true, void>, false>    int512_t;
-   typedef number<cpp_int_backend<1024, true, void>, false>   int1024_t;
+   typedef number<cpp_int_backend<128, true, void>, et_off>    int128_t;
+   typedef number<cpp_int_backend<256, true, void>, et_off>    int256_t;
+   typedef number<cpp_int_backend<512, true, void>, et_off>    int512_t;
+   typedef number<cpp_int_backend<1024, true, void>, et_off>   int1024_t;
 
    }} // namespaces
 
@@ -1043,10 +1043,10 @@ The library implements a Miller-Rabin test for primality:
 
    #include <boost/multiprecision/miller_rabin.hpp>
 
-   template <class Backend, bool ExpressionTemplates, class Engine>
+   template <class Backend, expression_template_option ExpressionTemplates, class Engine>
    bool miller_rabin_test(const number<Backend, ExpressionTemplates>& n, unsigned trials, Engine& gen);
 
-   template <class Backend, bool ExpressionTemplates, class Engine>
+   template <class Backend, expression_template_option ExpressionTemplates, class Engine>
    bool miller_rabin_test(const number<Backend, ExpressionTemplates>& n, unsigned trials);
 
 These functions perform a Miller-Rabin test for primality, if the result is `false` then /n/ is definitely composite,
@@ -1076,7 +1076,7 @@ The following example searches for a prime `p` for which `(p-1)/2` is also proba
 
    namespace boost{ namespace multiprecision{
 
-   template <class Backend, bool ExpressionTemplates = true>
+   template <class Backend, expression_template_option ExpressionTemplates = true>
    class number
    {
       number();
@@ -1153,14 +1153,14 @@ The following example searches for a prime `p` for which `(p-1)/2` is also proba
    bool operator>=(const ``['see-below]``&, const ``['see-below]``&);
 
    // Swap:
-   template <class Backend, bool ExpressionTemplates>
+   template <class Backend, expression_template_option ExpressionTemplates>
    void swap(number<Backend, ExpressionTemplates>& a, number<Backend, ExpressionTemplates>& b);
 
    // iostream support:
-   template <class Backend, bool ExpressionTemplates>
+   template <class Backend, expression_template_option ExpressionTemplates>
    std::ostream& operator << (std::ostream& os, const number<Backend, ExpressionTemplates>& r);
    std::ostream& operator << (std::ostream& os, const ``['unmentionable-expression-template-type]``& r);
-   template <class Backend, bool ExpressionTemplates>
+   template <class Backend, expression_template_option ExpressionTemplates>
    std::istream& operator >> (std::istream& is, number<Backend, ExpressionTemplates>& r);
 
    // Non-member function standard library support:
@@ -1209,7 +1209,7 @@ The following example searches for a prime `p` for which `(p-1)/2` is also proba
    // Integer specific functions:
    ``['unmentionable-expression-template-type]``    pow(const ``['number-or-expression-template-type]``&, unsigned);
    ``['unmentionable-expression-template-type]``    powm(const ``['number-or-expression-template-type]``& b, const ``['number-or-expression-template-type]``& p, const ``['number-or-expression-template-type]``& m);
-   template <class Backend, bool ExpressionTemplates>
+   template <class Backend, expression_template_option ExpressionTemplates>
    void divide_qr(const ``['number-or-expression-template-type]``& x, const ``['number-or-expression-template-type]``& y,
                   number<Backend, ExpressionTemplates>& q, number<Backend, ExpressionTemplates>& r);
    template <class Integer>
@@ -1247,7 +1247,7 @@ The following example searches for a prime `p` for which `(p-1)/2` is also proba
    // numeric_limits support:
    namespace std{
 
-   template <class Backend, bool ExpressionTemplates>
+   template <class Backend, expression_template_option ExpressionTemplates>
    struct numeric_limits<boost::multiprecision<Backend, ExpressionTemplates> >
    {
       /* Usual members here */
@@ -1257,7 +1257,7 @@ The following example searches for a prime `p` for which `(p-1)/2` is also proba
 
 [h4 Description]
 
-   template <class Backend, bool ExpressionTemplates = true>
+   template <class Backend, expression_template_option ExpressionTemplates = true>
    class number;
 
 Class `number` has two template arguments:
@@ -1433,7 +1433,7 @@ The arguments to these functions must contain at least one of the following:
 The return type of these operators is either:
 
 * An ['unmentionable-type] expression template type when `ExpressionTemplates` is `true`.
-* Type `number<Backend, false>` when `ExpressionTemplates` is `false`.
+* Type `number<Backend, et_off>` when `ExpressionTemplates` is `false`.
 * Type `bool` if the operator is a comparison operator.
 
 Finally note that the second argument to the left and right shift operations must be a builtin integer type, 
@@ -1448,11 +1448,11 @@ Swaps `a` and `b`.
 
 [h4 Iostream Support]
 
-   template <class Backend, bool ExpressionTemplates>
+   template <class Backend, expression_template_option ExpressionTemplates>
    std::ostream& operator << (std::ostream& os, const number<Backend, ExpressionTemplates>& r);
    template <class Unspecified...>
    std::ostream& operator << (std::ostream& os, const unmentionable-expression-template& r);
-   template <class Backend, bool ExpressionTemplates>
+   template <class Backend, expression_template_option ExpressionTemplates>
    inline std::istream& operator >> (std::istream& is, number<Backend, ExpressionTemplates>& r)
 
 These operators provided formatted input-output operations on `number` types, and expression templates derived from them.
@@ -1495,7 +1495,7 @@ this library support all of the iostream formatting flags, field width and preci
    ``['unmentionable-expression-template-type]``    atan2 (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
 
 These functions all behave exactly as their standard library counterparts do: their argument is either an instance of `number` or
-an expression template derived from it; If the argument is of type `number<Backend, false>` then that is also the return type,
+an expression template derived from it; If the argument is of type `number<Backend, et_off>` then that is also the return type,
 otherwise the return type is an expression template.
 
 These functions are normally implemented by the Backend type.  However, default versions are provided for Backend types that
@@ -1545,7 +1545,7 @@ large as to take "effectively forever" to compute, or else simply run the host m
 
 Returns ['b[super p] mod m] as an expression template.
 
-   template <class Backend, bool ExpressionTemplates>
+   template <class Backend, expression_template_option ExpressionTemplates>
    bool divide_qr(const ``['number-or-expression-template-type]``& x, const ``['number-or-expression-template-type]``& y,
                   number<Backend, ExpressionTemplates>& q, number<Backend, ExpressionTemplates>& r);
 
@@ -1643,16 +1643,16 @@ whose precision can vary at compile time (such as `mpf_float`).
    typedef number<cpp_rational_backend>         cpp_rational; // arbitrary precision rational number
 
    // Fixed precision unsigned types:
-   typedef number<cpp_int_backend<128, false, void>, false>   uint128_t;
-   typedef number<cpp_int_backend<256, false, void>, false>   uint256_t;
-   typedef number<cpp_int_backend<512, false, void>, false>   uint512_t;
-   typedef number<cpp_int_backend<1024, false, void>, false>  uint1024_t;
+   typedef number<cpp_int_backend<128, false, void>, et_off>   uint128_t;
+   typedef number<cpp_int_backend<256, false, void>, et_off>   uint256_t;
+   typedef number<cpp_int_backend<512, false, void>, et_off>   uint512_t;
+   typedef number<cpp_int_backend<1024, false, void>, et_off>  uint1024_t;
 
    // Fixed precision signed types:
-   typedef number<cpp_int_backend<128, true, void>, false>    int128_t;
-   typedef number<cpp_int_backend<256, true, void>, false>    int256_t;
-   typedef number<cpp_int_backend<512, true, void>, false>    int512_t;
-   typedef number<cpp_int_backend<1024, true, void>, false>   int1024_t;
+   typedef number<cpp_int_backend<128, true, void>, et_off>    int128_t;
+   typedef number<cpp_int_backend<256, true, void>, et_off>    int256_t;
+   typedef number<cpp_int_backend<512, true, void>, et_off>    int512_t;
+   typedef number<cpp_int_backend<1024, true, void>, et_off>   int1024_t;
 
    }} // namespaces
 

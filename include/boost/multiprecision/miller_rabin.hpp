@@ -11,7 +11,7 @@
 namespace boost{
 namespace multiprecision{
 
-template <class Backend, bool ExpressionTemplates>
+template <class Backend, expression_template_option ExpressionTemplates>
 bool check_small_factors(const number<Backend, ExpressionTemplates>& n)
 {
    static const boost::uint32_t small_factors1[] = {
@@ -117,7 +117,7 @@ inline bool is_small_prime(unsigned n)
    return false;
 }
 
-template <class Backend, bool ExpressionTemplates, class Engine>
+template <class Backend, expression_template_option ExpressionTemplates, class Engine>
 typename enable_if_c<number_category<Backend>::value == number_kind_integer, bool>::type 
    miller_rabin_test(const number<Backend, ExpressionTemplates>& n, unsigned trials, Engine& gen)
 {
@@ -178,7 +178,7 @@ typename enable_if_c<number_category<Backend>::value == number_kind_integer, boo
 #endif
 }
 
-template <class Backend, bool ExpressionTemplates>
+template <class Backend, expression_template_option ExpressionTemplates>
 bool miller_rabin_test(const number<Backend, ExpressionTemplates>& x, unsigned trials)
 {
    static mt19937 gen;

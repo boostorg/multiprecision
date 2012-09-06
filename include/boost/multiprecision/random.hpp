@@ -17,7 +17,7 @@ namespace boost{ namespace random{ namespace detail{
 // Need to find a better solution, like make Boost.Random safe to use with
 // UDT's and depricate/remove this header altogether.
 //
-template<class Engine, class Backend, bool ExpressionTemplates>
+template<class Engine, class Backend, boost::multiprecision::expression_template_option ExpressionTemplates>
 boost::multiprecision::number<Backend, ExpressionTemplates> 
    generate_uniform_int(Engine& eng, const boost::multiprecision::number<Backend, ExpressionTemplates>& min_value, const boost::multiprecision::number<Backend, ExpressionTemplates>& max_value);
 
@@ -30,7 +30,7 @@ namespace boost{
 namespace random{
 namespace detail{
 
-template<class Backend, bool ExpressionTemplates>
+template<class Backend, boost::multiprecision::expression_template_option ExpressionTemplates>
 struct subtract<boost::multiprecision::number<Backend, ExpressionTemplates>, true> 
 { 
   typedef boost::multiprecision::number<Backend, ExpressionTemplates> result_type;
@@ -39,7 +39,7 @@ struct subtract<boost::multiprecision::number<Backend, ExpressionTemplates>, tru
 
 }
 
-template<class Engine, std::size_t w, class Backend, bool ExpressionTemplates>
+template<class Engine, std::size_t w, class Backend, boost::multiprecision::expression_template_option ExpressionTemplates>
 class independent_bits_engine<Engine, w, boost::multiprecision::number<Backend, ExpressionTemplates> >
 {
 public:
@@ -198,7 +198,7 @@ private:
     Engine _base;
 };
 
-template<class Backend, bool ExpressionTemplates>
+template<class Backend, boost::multiprecision::expression_template_option ExpressionTemplates>
 class uniform_smallint<boost::multiprecision::number<Backend, ExpressionTemplates> >
 {
 public:
@@ -381,7 +381,7 @@ private:
 
 namespace detail{
 
-template<class Backend, bool ExpressionTemplates>
+template<class Backend, boost::multiprecision::expression_template_option ExpressionTemplates>
 struct select_uniform_01<boost::multiprecision::number<Backend, ExpressionTemplates> >
 {
   template<class RealType>
@@ -391,7 +391,7 @@ struct select_uniform_01<boost::multiprecision::number<Backend, ExpressionTempla
   };
 };
 
-template<class Engine, class Backend, bool ExpressionTemplates>
+template<class Engine, class Backend, boost::multiprecision::expression_template_option ExpressionTemplates>
 boost::multiprecision::number<Backend, ExpressionTemplates> 
    generate_uniform_int(
     Engine& eng, const boost::multiprecision::number<Backend, ExpressionTemplates>& min_value, const boost::multiprecision::number<Backend, ExpressionTemplates>& max_value,
@@ -557,7 +557,7 @@ boost::multiprecision::number<Backend, ExpressionTemplates>
     }
 }
 
-template<class Engine, class Backend, bool ExpressionTemplates>
+template<class Engine, class Backend, boost::multiprecision::expression_template_option ExpressionTemplates>
 inline boost::multiprecision::number<Backend, ExpressionTemplates> 
    generate_uniform_int(Engine& eng, const boost::multiprecision::number<Backend, ExpressionTemplates>& min_value, const boost::multiprecision::number<Backend, ExpressionTemplates>& max_value)
 {

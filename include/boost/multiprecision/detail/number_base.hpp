@@ -14,13 +14,19 @@
 
 namespace boost{ namespace multiprecision{
 
-template <class Backend, bool ExpressionTemplates = true>
+enum expression_template_option
+{
+   et_off  = 0,
+   et_on   = 1
+};
+
+template <class Backend, expression_template_option ExpressionTemplates = et_on>
 class number;
 
 template <class T>
 struct is_number : public mpl::false_ {};
 
-template <class Backend, bool ExpressionTemplates>
+template <class Backend, expression_template_option ExpressionTemplates>
 struct is_number<number<Backend, ExpressionTemplates> > : public mpl::true_ {};
 
 namespace detail{
@@ -79,12 +85,12 @@ struct canonical_imp
    typedef typename remove_cv<typename decay<const Val>::type>::type type;
 };
 template <class B, class Backend, class Tag>
-struct canonical_imp<number<B, true>, Backend, Tag>
+struct canonical_imp<number<B, et_on>, Backend, Tag>
 {
    typedef B type;
 };
 template <class B, class Backend, class Tag>
-struct canonical_imp<number<B, false>, Backend, Tag>
+struct canonical_imp<number<B, et_off>, Backend, Tag>
 {
    typedef B type;
 };
@@ -178,7 +184,7 @@ struct function{};
 template <class T>
 struct backend_type;
 
-template <class T, bool ExpressionTemplates>
+template <class T, expression_template_option ExpressionTemplates>
 struct backend_type<number<T, ExpressionTemplates> >
 {
    typedef T type;
@@ -193,7 +199,7 @@ struct backend_type<expression<tag, A1, A2, A3, A4> >
 
 template <class T>
 struct is_number : public mpl::false_{};
-template <class T, bool ExpressionTemplates>
+template <class T, expression_template_option ExpressionTemplates>
 struct is_number<boost::multiprecision::number<T, ExpressionTemplates> > : public mpl::true_{};
 template <class T>
 struct is_mp_number_exp : public mpl::false_{};
@@ -203,25 +209,25 @@ struct is_mp_number_exp<boost::multiprecision::detail::expression<Tag, Arg1, Arg
 template <class T1, class T2>
 struct combine_expression;
 
-template <class T1, bool ExpressionTemplates, class T2>
+template <class T1, expression_template_option ExpressionTemplates, class T2>
 struct combine_expression<number<T1, ExpressionTemplates>, T2>
 {
    typedef number<T1, ExpressionTemplates> type;
 };
 
-template <class T1, class T2, bool ExpressionTemplates>
+template <class T1, class T2, expression_template_option ExpressionTemplates>
 struct combine_expression<T1, number<T2, ExpressionTemplates> >
 {
    typedef number<T2, ExpressionTemplates> type;
 };
 
-template <class T, bool ExpressionTemplates>
+template <class T, expression_template_option ExpressionTemplates>
 struct combine_expression<number<T, ExpressionTemplates>, number<T, ExpressionTemplates> >
 {
    typedef number<T, ExpressionTemplates> type;
 };
 
-template <class T1, bool ExpressionTemplates1, class T2, bool ExpressionTemplates2>
+template <class T1, expression_template_option ExpressionTemplates1, class T2, expression_template_option ExpressionTemplates2>
 struct combine_expression<number<T1, ExpressionTemplates1>, number<T2, ExpressionTemplates2> >
 {
    typedef typename mpl::if_c<
@@ -643,14 +649,14 @@ enum number_category_type
 
 template <class Num>
 struct number_category : public mpl::int_<std::numeric_limits<Num>::is_integer ? number_kind_integer : (std::numeric_limits<Num>::max_exponent ? number_kind_floating_point : number_kind_unknown)> {};
-template <class Backend, bool ExpressionTemplates>
+template <class Backend, expression_template_option ExpressionTemplates>
 struct number_category<number<Backend, ExpressionTemplates> > : public number_category<Backend>{};
 template <class tag, class A1, class A2, class A3, class A4>
 struct number_category<detail::expression<tag, A1, A2, A3, A4> > : public number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>{};
 
 template <class T>
 struct component_type;
-template <class T, bool ExpressionTemplates>
+template <class T, expression_template_option ExpressionTemplates>
 struct component_type<number<T, ExpressionTemplates> > : public component_type<T>{};
 template <class tag, class A1, class A2, class A3, class A4>
 struct component_type<detail::expression<tag, A1, A2, A3, A4> > : public component_type<typename detail::expression<tag, A1, A2, A3, A4>::result_type>{};
@@ -668,7 +674,7 @@ struct promote_arg<boost::multiprecision::detail::expression<tag, A1, A2, A3, A4
    typedef typename boost::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type type;
 };
 
-template <class R, class B, bool ET>
+template <class R, class B, boost::multiprecision::expression_template_option ET>
 inline R real_cast(const boost::multiprecision::number<B, ET>& val)
 {
    return val.template convert_to<R>();

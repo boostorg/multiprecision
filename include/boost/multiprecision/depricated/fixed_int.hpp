@@ -1517,7 +1517,7 @@ typedef number<fixed_int<512, true> > int512_t;
 
 namespace std{
 
-template <unsigned Bits, bool Signed, bool ExpressionTemplates>
+template <unsigned Bits, bool Signed, boost::multiprecision::expression_template_option ExpressionTemplates>
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::fixed_int<Bits, Signed>, ExpressionTemplates> >
 {
    typedef boost::multiprecision::number<boost::multiprecision::fixed_int<Bits, Signed>, ExpressionTemplates> number_type;
@@ -1591,7 +1591,7 @@ public:
    BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
 };
 
-template <unsigned Bits, bool Signed, bool ExpressionTemplates>
+template <unsigned Bits, bool Signed, boost::multiprecision::expression_template_option ExpressionTemplates>
 typename numeric_limits<boost::multiprecision::number<boost::multiprecision::fixed_int<Bits, Signed>, ExpressionTemplates> >::initializer const
    numeric_limits<boost::multiprecision::number<boost::multiprecision::fixed_int<Bits, Signed>, ExpressionTemplates> >::init;
 }

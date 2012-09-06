@@ -34,7 +34,7 @@ namespace boost{ namespace multiprecision{
 #pragma warning(disable:4127 4714)
 #endif
 
-template <class Backend, bool ExpressionTemplates>
+template <class Backend, expression_template_option ExpressionTemplates>
 class number
 {
    typedef number<Backend, ExpressionTemplates> self_type;
@@ -87,16 +87,16 @@ public:
       m_backend = canonical_value(v);
    }
    */
-   template<bool ET>
+   template<expression_template_option ET>
    BOOST_FORCEINLINE BOOST_CONSTEXPR number(const number<Backend, ET>& val) BOOST_NOEXCEPT_IF(noexcept(Backend(static_cast<const Backend&>(std::declval<Backend>())))) : m_backend(val.m_backend) {}
 
-   template <class Other, bool ET>
+   template <class Other, expression_template_option ET>
    BOOST_FORCEINLINE number(const number<Other, ET>& val, 
          typename enable_if_c<(boost::is_convertible<Other, Backend>::value && !detail::is_restricted_conversion<Other, Backend>::value)>::type* = 0) 
       BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend>() = std::declval<Other>()))
       : m_backend(val.backend()) {}
 
-   template <class Other, bool ET>
+   template <class Other, expression_template_option ET>
    explicit number(const number<Other, ET>& val, typename enable_if_c<
          (!detail::is_explicitly_convertible<Other, Backend>::value)
          >::type* = 0)
@@ -106,7 +106,7 @@ public:
       //
       detail::generic_interconvert(backend(), val.backend(), number_category<Backend>(), number_category<Other>());
    }
-   template <class Other, bool ET>
+   template <class Other, expression_template_option ET>
    explicit BOOST_FORCEINLINE number(const number<Other, ET>& val, typename enable_if_c<
          (detail::is_explicitly_convertible<Other, Backend>::value 
             && (detail::is_restricted_conversion<Other, Backend>::value || !boost::is_convertible<Other, Backend>::value))
@@ -119,7 +119,7 @@ public:
       using default_ops::assign_components;
       assign_components(m_backend, canonical_value(v1), canonical_value(v2));
    }
-   template <class Other, bool ET>
+   template <class Other, expression_template_option ET>
    BOOST_FORCEINLINE number(const number<Other, ET>& v1, const number<Other, ET>& v2, typename enable_if<boost::is_convertible<Other, Backend> >::type* = 0)
    {
       using default_ops::assign_components;
@@ -547,7 +547,7 @@ private:
       using default_ops::eval_convert_to;
       eval_convert_to(result, m_backend);
    }
-   template <class B2, bool ET>
+   template <class B2, expression_template_option ET>
    void convert_to_imp(number<B2, ET>* result)const
    {
       result->assign(*this);
@@ -1584,7 +1584,7 @@ public:
    // the non-member operators way easier if they are:
    //
    static BOOST_FORCEINLINE BOOST_CONSTEXPR const Backend& canonical_value(const self_type& v) BOOST_NOEXCEPT {  return v.m_backend;  }
-   template <class B2, bool ET>
+   template <class B2, expression_template_option ET>
    static BOOST_FORCEINLINE BOOST_CONSTEXPR const B2& canonical_value(const number<B2, ET>& v) BOOST_NOEXCEPT {  return v.backend();  }
    template <class V>
    static BOOST_FORCEINLINE BOOST_CONSTEXPR typename disable_if<is_same<typename detail::canonical<V, Backend>::type, V>, typename detail::canonical<V, Backend>::type>::type 
@@ -1596,7 +1596,7 @@ public:
 
 };
 
-template <class Backend, bool ExpressionTemplates>
+template <class Backend, expression_template_option ExpressionTemplates>
 inline std::ostream& operator << (std::ostream& os, const number<Backend, ExpressionTemplates>& r)
 {
    std::streamsize d = os.precision();
@@ -1625,7 +1625,7 @@ inline std::ostream& operator << (std::ostream& os, const expression<tag, A1, A2
 
 } // namespace detail
 
-template <class Backend, bool ExpressionTemplates>
+template <class Backend, expression_template_option ExpressionTemplates>
 inline std::istream& operator >> (std::istream& is, number<Backend, ExpressionTemplates>& r)
 {
    std::string s;
@@ -1634,7 +1634,7 @@ inline std::istream& operator >> (std::istream& is, number<Backend, ExpressionTe
    return is;
 }
 
-template <class Backend, bool ExpressionTemplates>
+template <class Backend, expression_template_option ExpressionTemplates>
 BOOST_FORCEINLINE void swap(number<Backend, ExpressionTemplates>& a, number<Backend, ExpressionTemplates>& b)
 {
    a.swap(b);
@@ -1645,7 +1645,7 @@ BOOST_FORCEINLINE void swap(number<Backend, ExpressionTemplates>& a, number<Back
 template <class T>
 class rational;
 
-template <class Backend, bool ExpressionTemplates>
+template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
 inline std::istream& operator >> (std::istream& is, rational<multiprecision::number<Backend, ExpressionTemplates> >& r)
 {
    std::string s1;
@@ -1680,37 +1680,37 @@ inline std::istream& operator >> (std::istream& is, rational<multiprecision::num
    return is;
 }
 
-template <class T, bool ExpressionTemplates, class Arithmetic>
+template <class T, multiprecision::expression_template_option ExpressionTemplates, class Arithmetic>
 typename enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator == (const rational<multiprecision::number<T, ExpressionTemplates> >& a, const Arithmetic& b)
 {
    return a == multiprecision::number<T, ExpressionTemplates>(b);
 }
 
-template <class T, bool ExpressionTemplates, class Arithmetic>
+template <class T, multiprecision::expression_template_option ExpressionTemplates, class Arithmetic>
 typename enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator == (const Arithmetic& b, const rational<multiprecision::number<T, ExpressionTemplates> >& a)
 {
    return a == multiprecision::number<T, ExpressionTemplates>(b);
 }
 
-template <class T, bool ExpressionTemplates, class Arithmetic>
+template <class T, multiprecision::expression_template_option ExpressionTemplates, class Arithmetic>
 typename enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator != (const rational<multiprecision::number<T, ExpressionTemplates> >& a, const Arithmetic& b)
 {
    return a != multiprecision::number<T, ExpressionTemplates>(b);
 }
 
-template <class T, bool ExpressionTemplates, class Arithmetic>
+template <class T, multiprecision::expression_template_option ExpressionTemplates, class Arithmetic>
 typename enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator != (const Arithmetic& b, const rational<multiprecision::number<T, ExpressionTemplates> >& a)
 {
    return a != multiprecision::number<T, ExpressionTemplates>(b);
 }
 
-template <class T, bool ExpressionTemplates>
+template <class T, multiprecision::expression_template_option ExpressionTemplates>
 inline multiprecision::number<T, ExpressionTemplates> numerator(const rational<multiprecision::number<T, ExpressionTemplates> >& a)
 {
    return a.numerator();
 }
 
-template <class T, bool ExpressionTemplates>
+template <class T, multiprecision::expression_template_option ExpressionTemplates>
 inline multiprecision::number<T, ExpressionTemplates> denominator(const rational<multiprecision::number<T, ExpressionTemplates> >& a)
 {
    return a.denominator();
@@ -1723,7 +1723,7 @@ namespace numeric { namespace ublas {
 template<class V>
 class sparse_vector_element;
 
-template <class V, class Backend, bool ExpressionTemplates>
+template <class V, class Backend, multiprecision::expression_template_option ExpressionTemplates>
 inline bool operator == (const sparse_vector_element<V>& a, const ::boost::multiprecision::number<Backend, ExpressionTemplates>& b)
 {
 typedef typename sparse_vector_element<V>::const_reference ref_type;

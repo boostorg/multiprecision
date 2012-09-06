@@ -2881,7 +2881,7 @@ struct is_explicitly_convertible<cpp_dec_float<D1>, cpp_dec_float<D2> > : public
 
 namespace std
 {
-   template <unsigned Digits10, bool ExpressionTemplates> 
+   template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates> 
    class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> >
    {
    public:
@@ -2922,49 +2922,49 @@ namespace std
 
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
 
-template <unsigned Digits10, bool ExpressionTemplates>
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> >::digits;
-template <unsigned Digits10, bool ExpressionTemplates>
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> >::digits10;
-template <unsigned Digits10, bool ExpressionTemplates>
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> >::max_digits10;
-template <unsigned Digits10, bool ExpressionTemplates>
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> >::is_signed;
-template <unsigned Digits10, bool ExpressionTemplates>
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> >::is_integer;
-template <unsigned Digits10, bool ExpressionTemplates>
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> >::is_exact;
-template <unsigned Digits10, bool ExpressionTemplates>
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> >::radix;
-template <unsigned Digits10, bool ExpressionTemplates>
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST boost::int64_t numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> >::min_exponent;
-template <unsigned Digits10, bool ExpressionTemplates>
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST boost::int64_t numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> >::min_exponent10;
-template <unsigned Digits10, bool ExpressionTemplates>
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST boost::int64_t numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> >::max_exponent;
-template <unsigned Digits10, bool ExpressionTemplates>
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST boost::int64_t numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> >::max_exponent10;
-template <unsigned Digits10, bool ExpressionTemplates>
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> >::has_infinity;
-template <unsigned Digits10, bool ExpressionTemplates>
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> >::has_quiet_NaN;
-template <unsigned Digits10, bool ExpressionTemplates>
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> >::has_signaling_NaN;
-template <unsigned Digits10, bool ExpressionTemplates>
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST float_denorm_style numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> >::has_denorm;
-template <unsigned Digits10, bool ExpressionTemplates>
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> >::has_denorm_loss;
-template <unsigned Digits10, bool ExpressionTemplates>
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> >::is_iec559;
-template <unsigned Digits10, bool ExpressionTemplates>
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> >::is_bounded;
-template <unsigned Digits10, bool ExpressionTemplates>
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> >::is_modulo;
-template <unsigned Digits10, bool ExpressionTemplates>
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> >::traps;
-template <unsigned Digits10, bool ExpressionTemplates>
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> >::tinyness_before;
-template <unsigned Digits10, bool ExpressionTemplates>
+template <unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST float_round_style numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates> >::round_style;
 
 #endif
@@ -2974,7 +2974,7 @@ namespace boost{ namespace math{
 
 namespace policies{
 
-template <unsigned Digits10, class Policy, bool ExpressionTemplates>
+template <unsigned Digits10, class Policy, boost::multiprecision::expression_template_option ExpressionTemplates>
 struct precision< boost::multiprecision::number<boost::multiprecision::cpp_dec_float<Digits10>, ExpressionTemplates>, Policy>
 {
    // Define a local copy of cpp_dec_float_digits10 because it might differ

@@ -233,7 +233,7 @@ int main()
    std::cout << "Allocation Counts for Horner Evaluation:\n";
 #ifdef TEST_MPFR
    basic_allocation_test("mpfr_float_50", mpfr_float_50(2));
-   basic_allocation_test("mpfr_float_50 - no expression templates", number<mpfr_float_backend<50>, false>(2));
+   basic_allocation_test("mpfr_float_50 - no expression templates", number<mpfr_float_backend<50>, et_off>(2));
 #endif
 #ifdef TEST_MPFR_CLASS
    basic_allocation_test("mpfr_class", mpfr_class(2));
@@ -245,7 +245,7 @@ int main()
    std::cout << "Allocation Counts for boost::math::tools::evaluate_polynomial:\n";
 #ifdef TEST_MPFR
    poly_allocation_test("mpfr_float_50", mpfr_float_50(2));
-   poly_allocation_test("mpfr_float_50 - no expression templates", number<mpfr_float_backend<50>, false>(2));
+   poly_allocation_test("mpfr_float_50 - no expression templates", number<mpfr_float_backend<50>, et_off>(2));
 #endif
 #ifdef TEST_MPFR_CLASS
    poly_allocation_test("mpfr_class", mpfr_class(2));
@@ -261,12 +261,12 @@ int main()
    time_proc("Bessel Functions - double", test_bessel<double>);
    time_proc("Bessel Functions - real_concept", test_bessel<boost::math::concepts::real_concept>);
    time_proc("Bessel Functions - arithmetic_backend<double>", test_bessel<number<arithmetic_backend<double> > >);
-   time_proc("Bessel Functions - arithmetic_backend<double> - no expression templates", test_bessel<number<arithmetic_backend<double>, false> >);
+   time_proc("Bessel Functions - arithmetic_backend<double> - no expression templates", test_bessel<number<arithmetic_backend<double>, et_off> >);
 
    time_proc("Non-central T - double", test_nct<double>);
    time_proc("Non-central T - real_concept", test_nct<boost::math::concepts::real_concept>);
    time_proc("Non-central T - arithmetic_backend<double>", test_nct<number<arithmetic_backend<double> > >);
-   time_proc("Non-central T - arithmetic_backend<double> - no expression templates", test_nct<number<arithmetic_backend<double>, false> >);
+   time_proc("Non-central T - arithmetic_backend<double> - no expression templates", test_nct<number<arithmetic_backend<double>, et_off> >);
 #endif
 
    //
@@ -288,7 +288,7 @@ int main()
 #endif
 #ifdef TEST_MPF
    time_proc("mpf_float_50", test_bessel<mpf_float_50>, 3);
-   time_proc("mpf_float_50 (no expression templates", test_bessel<number<gmp_float<50>, false> >, 3);
+   time_proc("mpf_float_50 (no expression templates", test_bessel<number<gmp_float<50>, et_off> >, 3);
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
    time_proc("cpp_dec_float_50", test_bessel<cpp_dec_float_50>, 3);
@@ -314,7 +314,7 @@ int main()
 #endif
 #ifdef TEST_MPF
    time_proc("mpf_float_100", test_bessel<mpf_float_100>);
-   time_proc("mpf_float_100 (no expression templates", test_bessel<number<gmp_float<100>, false> >);
+   time_proc("mpf_float_100 (no expression templates", test_bessel<number<gmp_float<100>, et_off> >);
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
    time_proc("cpp_dec_float_100", test_bessel<cpp_dec_float_100>);
@@ -341,7 +341,7 @@ int main()
 #endif
 #ifdef TEST_MPF
    time_proc("mpf_float_50", test_polynomial<mpf_float_50>);
-   time_proc("mpf_float_50 (no expression templates", test_polynomial<number<gmp_float<50>, false> >);
+   time_proc("mpf_float_50 (no expression templates", test_polynomial<number<gmp_float<50>, et_off> >);
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
    time_proc("cpp_dec_float_50", test_polynomial<cpp_dec_float_50>);
@@ -367,7 +367,7 @@ int main()
 #endif
 #ifdef TEST_MPF
    time_proc("mpf_float_100", test_polynomial<mpf_float_100>);
-   time_proc("mpf_float_100 (no expression templates", test_polynomial<number<gmp_float<100>, false> >);
+   time_proc("mpf_float_100 (no expression templates", test_polynomial<number<gmp_float<100>, et_off> >);
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
    time_proc("cpp_dec_float_100", test_polynomial<cpp_dec_float_100>);
@@ -393,7 +393,7 @@ int main()
 #endif
 #ifdef TEST_MPF
    time_proc("mpf_float_50", test_nct<mpf_float_50>);
-   time_proc("mpf_float_50 (no expression templates", test_nct<number<gmp_float<50>, false> >);
+   time_proc("mpf_float_50 (no expression templates", test_nct<number<gmp_float<50>, et_off> >);
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
    time_proc("cpp_dec_float_50", test_nct<cpp_dec_float_50>);
@@ -419,7 +419,7 @@ int main()
 #endif
 #ifdef TEST_MPF
    time_proc("mpf_float_100", test_nct<mpf_float_100>);
-   time_proc("mpf_float_100 (no expression templates", test_nct<number<gmp_float<100>, false> >);
+   time_proc("mpf_float_100 (no expression templates", test_nct<number<gmp_float<100>, et_off> >);
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
    time_proc("cpp_dec_float_100", test_nct<cpp_dec_float_100>);
