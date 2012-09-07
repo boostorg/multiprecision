@@ -27,7 +27,7 @@ inline std::ostream& operator << (std::ostream& os, string_table_entry const & w
    return os << static_cast<const char*>(what);
 }
 
-template <class Backend, expression_template_option ExpressionTemplates>
+template <class Backend, boost::multiprecision::expression_template_option ExpressionTemplates>
 struct table_type<boost::multiprecision::number<Backend, ExpressionTemplates> >
 {
    typedef string_table_entry type;

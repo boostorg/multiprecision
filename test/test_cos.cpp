@@ -47,6 +47,7 @@
 template <class T>
 void test()
 {
+   std::cout << "Testing type " << typeid(T).name() << std::endl;
    static const boost::array<const char*, 101u> data =
    {{
          "-2.37609908807915949996042688873953402912174184373388399043229539427530802169622688886435380890546981798452174137747437590e-1",
@@ -303,10 +304,10 @@ int main()
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<64> > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<63> > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<62> > >();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<61> > >();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<60> > >();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<59> > >();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<58> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<61, long long> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<60, long long> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<59, long long, std::allocator<void> > > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<58, long long, std::allocator<void> > > >();
 #endif
    return boost::report_errors();
 }

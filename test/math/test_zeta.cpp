@@ -96,7 +96,7 @@ int test_main(int, char* [])
    test_zeta(number<cpp_dec_float<9> >(),  "number<cpp_dec_float<9> >");
    test_zeta(number<cpp_dec_float<18> >(), "number<cpp_dec_float<18> >");
    test_zeta(number<cpp_dec_float<30> >(), "number<cpp_dec_float<30> >");
-   test_zeta(number<cpp_dec_float<35> >(), "number<cpp_dec_float<35> >");
+   test_zeta(number<cpp_dec_float<35, long long, std::allocator<void> > >(), "number<cpp_dec_float<35, long long, std::allocator<void> > >");
 #endif
    return 0;
 }

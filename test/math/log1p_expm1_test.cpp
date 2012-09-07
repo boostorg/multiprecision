@@ -140,7 +140,7 @@ int test_main(int, char* [])
 #ifdef TEST_CPP_DEC_FLOAT
    test(number<cpp_dec_float<18> >(), "number<cpp_dec_float<18> >");
    test(number<cpp_dec_float<30> >(), "number<cpp_dec_float<30> >");
-   test(number<cpp_dec_float<35> >(), "number<cpp_dec_float<35> >");
+   test(number<cpp_dec_float<35, long long, std::allocator<void> > >(), "number<cpp_dec_float<35, long long, std::allocator<void> > >");
 #endif
    return 0;
 }

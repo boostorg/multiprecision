@@ -580,7 +580,7 @@
 <span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">atan2</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
 </pre>
 <p>
-        These functions all behave exactly as their standard library counterparts
+        These functions all behave exactly as their standard library C++11 counterparts
         do: their argument is either an instance of <code class="computeroutput"><span class="identifier">number</span></code>
         or an expression template derived from it; If the argument is of type <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">et_off</span><span class="special">&gt;</span></code>
         then that is also the return type, otherwise the return type is an expression
@@ -601,6 +601,317 @@
         library later, then these functions may be extended to support those number
         types).
       </p>
+<p>
+        The precision of these functions is generally deterimined by the backend
+        implementation. For example the precision of these functions when used with
+        <a class="link" href="../tut/floats/mpfr_float.html" title="mpfr_float">mpfr_float</a>
+        is determined entirely by <a href="http://www.mpfr.org" target="_top">MPFR</a>.
+        When these functions use our own implementations, the accuracy of the transcendal
+        functions is generally a few epsilon. Note however, that the trigonmetrical
+        functions incur the usual accuracy loss when reducing arguments by large
+        multiples of &#960;. Also note that both __mpf_float and <a class="link" href="../tut/floats/cpp_dec_float.html" title="cpp_dec_float">cpp_dec_float</a>
+        have a number of guard digits beyond their stated precision, so the error
+        rates listed for these are in some sense artificially low.
+      </p>
+<p>
+        The following table shows the error rates we observe for these functions
+        with various backend types, functions not listed here are exact (tested on
+        Win32 with VC++10, MPFR-3.0.0, MPIR-2.1.1):
+      </p>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Function
+                </p>
+              </th>
+<th>
+                <p>
+                  mpfr_float_50
+                </p>
+              </th>
+<th>
+                <p>
+                  mpf_float_50
+                </p>
+              </th>
+<th>
+                <p>
+                  cpp_dec_float_50
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  sqrt
+                </p>
+              </td>
+<td>
+                <p>
+                  1eps
+                </p>
+              </td>
+<td>
+                <p>
+                  0eps
+                </p>
+              </td>
+<td>
+                <p>
+                  0eps
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  exp
+                </p>
+              </td>
+<td>
+                <p>
+                  1eps
+                </p>
+              </td>
+<td>
+                <p>
+                  0eps
+                </p>
+              </td>
+<td>
+                <p>
+                  0eps
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  log
+                </p>
+              </td>
+<td>
+                <p>
+                  1eps
+                </p>
+              </td>
+<td>
+                <p>
+                  0eps
+                </p>
+              </td>
+<td>
+                <p>
+                  0eps
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  log10
+                </p>
+              </td>
+<td>
+                <p>
+                  1eps
+                </p>
+              </td>
+<td>
+                <p>
+                  0eps
+                </p>
+              </td>
+<td>
+                <p>
+                  0eps
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cos
+                </p>
+              </td>
+<td>
+                <p>
+                  700eps
+                </p>
+              </td>
+<td>
+                <p>
+                  0eps
+                </p>
+              </td>
+<td>
+                <p>
+                  0eps
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  sin
+                </p>
+              </td>
+<td>
+                <p>
+                  1eps
+                </p>
+              </td>
+<td>
+                <p>
+                  0eps
+                </p>
+              </td>
+<td>
+                <p>
+                  0eps
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tan
+                </p>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  acos
+                </p>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  asin
+                </p>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  atan
+                </p>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cosh
+                </p>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  sinh
+                </p>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tanh
+                </p>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  pow
+                </p>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  fmod
+                </p>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  atan2
+                </p>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+<td>
+              </td>
+</tr>
+</tbody>
+</table></div>
 <h5>
 <a name="boost_multiprecision.ref.number.h6"></a>
         <span class="phrase"><a name="boost_multiprecision.ref.number.traits_class_support"></a></span><a class="link" href="number.html#boost_multiprecision.ref.number.traits_class_support">Traits Class

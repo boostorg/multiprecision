@@ -47,6 +47,7 @@
 template <class T>
 void test()
 {
+   std::cout << "Testing type " << typeid(T).name() << std::endl;
    static const boost::array<const char*, 51u> data =
    {{
       "1.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
@@ -185,10 +186,10 @@ int main()
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<64> > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<63> > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<62> > >();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<61> > >();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<60> > >();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<59> > >();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<58> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<61, long long> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<60, long long> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<59, long long, std::allocator<void> > > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<58, long long, std::allocator<void> > > >();
    // Check low multiprecision digit counts.
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<9> > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<18> > >();

@@ -101,7 +101,7 @@ int test_main(int, char* [])
    test_bessel(number<cpp_dec_float<8> >(),  "number<cpp_dec_float<8> >");
    test_bessel(number<cpp_dec_float<18> >(), "number<cpp_dec_float<18> >");
    test_bessel(number<cpp_dec_float<30> >(), "number<cpp_dec_float<30> >");
-   test_bessel(number<cpp_dec_float<35> >(), "number<cpp_dec_float<35> >");
+   test_bessel(number<cpp_dec_float<35, long long, std::allocator<void> > >(), "number<cpp_dec_float<35, long long, std::allocator<void> > >");
 #endif
    return 0;
 }

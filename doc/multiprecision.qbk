@@ -47,6 +47,16 @@
 </imageobject>
 </inlinemediaobject>''']
 
+[def __cpp_int [link boost_multiprecision.tut.ints.cpp_int cpp_int]]
+[def __gmp_int [link boost_multiprecision.tut.ints.gmp_int gmp_int]]
+[def __tom_int [link boost_multiprecision.tut.ints.tom_int tom_int]]
+[def __gmp_float [link boost_multiprecision.tut.floats.gmp_float gmp_float]]
+[def __mpfr_float_backend [link boost_multiprecision.tut.floats.mpfr_float mpfr_float]]
+[def __cpp_dec_float [link boost_multiprecision.tut.floats.cpp_dec_float cpp_dec_float]]
+[def __gmp_rational [link boost_multiprecision.tut.rational.gmp_rational gmp_rational]]
+[def __cpp_rational [link boost_multiprecision.tut.rational.cpp_rational cpp_rational]]
+[def __tommath_rational [link boost_multiprecision.tut.rational.tommath_rational tommath_rational]]
+
 [section:intro Introduction]
 
 The Multiprecision Library provides ['User-defined] integer, rational and floating-point C++ types which
@@ -504,10 +514,72 @@ The following back-ends provide floating point arithmetic:
 
 [table
 [[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
+[[`cpp_dec_float<N>`][boost/multiprecision/cpp_dec_float.hpp][10][None][Header only, all C++ implementation. Boost licence.][Approximately 2x slower than the [mpfr] or [gmp] libraries.]]
 [[`mpf_float<N>`][boost/multiprecision/gmp.hpp][2][[gmp]][Very fast and efficient back-end.][Dependency on GNU licensed [gmp] library.]]
 [[`mpfr_float<N>`][boost/multiprecision/mpfr.hpp][2][[gmp] and [mpfr]][Very fast and efficient back-end, with its own standard library implementation.][Dependency on GNU licensed [gmp] and [mpfr] libraries.]]
-[[`cpp_dec_float<N>`][boost/multiprecision/cpp_dec_float.hpp][10][None][Header only, all C++ implementation. Boost licence.][Approximately 2x slower than the [mpfr] or [gmp] libraries.]]
 ]
+
+[section:cpp_dec_float cpp_dec_float]
+
+`#include <boost/multiprecision/cpp_dec_float.hpp>`
+
+   namespace boost{ namespace multiprecision{
+
+   template <unsigned Digits10, class ExponentType = boost::int32_t, class Allocator = void>
+   class cpp_dec_float;
+
+   typedef number<cpp_dec_float<50> > cpp_dec_float_50;
+   typedef number<cpp_dec_float<100> > cpp_dec_float_100;
+
+   }} // namespaces
+
+The `cpp_dec_float` back-end is used in conjunction with `number`: It acts as an entirely C++ (header only and dependency free)
+real-number type that is a drop-in replacement for the native C++ floating-point types, but with 
+much greater precision.
+
+Type `cpp_dec_float` can be used at fixed precision by specifying a non-zero `Digits10` template parameter.  
+The typedefs `cpp_dec_float_50` and `cpp_dec_float_100` provide arithmetic types at 50 and 100 decimal digits precision
+respectively.  Optionally, you can specify an integer type to use for the exponent, this defaults to a 32-bit integer type
+which is more than large enough for the vast majority of use cases, but larger types such as `long long` can also be specified
+if you need a truely huge exponent range.
+
+Normally `cpp_dec_float` allocates no memory: all of the space required for it's digits are allocated
+directly within the class.  As a result care should be taken not to use the class with too high a digit count
+as stack space requirements can grow out of control.  If that represents a problem then providing an allocator
+as the final template parameter causes `cpp_dec_float` to dynamically allocate the memory it needs: this
+significantly reduces the size of `cpp_dec_float` and increases the viable upper limit on the number of digits
+at the expense of performance.  However, please bare in mind that arithmetic operations rapidly become ['very] expensive
+as the digit count grows: the current implementation really isn't optimized or designed for large digit counts.
+
+There is full standard library and `numeric_limits` support available for this type.
+
+Things you should know when using this type:
+
+* Default constructed `cpp_dec_float`s have a value of zero.
+* The radix of this type is 10.  As a result it can behave subtly differently from base-2 types.
+* It is not possible to round-trip this type to and from a string and get back to exactly the same value
+(this is a result of the type having some hidden internal guard digits).
+* The type has a number of internal guard digits over and above those specified in the template argument.
+Normally these should not be visible to the user.
+* The type supports both infinities and NaN's.  An infinity is generated whenever the result would overflow,
+and a NaN is generated for any mathematically undefined operation.
+* There is a `std::numeric_limits` specialisation for this type.
+* Any `number` instantiated on this type, is convertible to any other `number` instantiated on this type - 
+for example you can convert from `number<cpp_dec_float<50> >` to `number<cpp_dec_float<SomeOtherValue> >`.
+Narrowing conversions are truncating and `explicit`.
+* Conversion from a string results in a `std::runtime_error` being thrown if the string can not be interpreted
+as a valid floating point number.
+* The actual precision of a `cpp_dec_float` is always slightly higher than the number of digits specified in
+the template parameter, actually how much higher is an implementation detail but is always at least 8 decimal 
+digits.
+* Operations involving `cpp_dec_float` are always truncating.  However, note that since their are guard digits 
+in effect, in practice this has no real impact on accuracy for most use cases.
+
+[h5 cpp_dec_float example:]
+
+[cpp_dec_float_eg]
+
+[endsect]
 
 [section:gmp_float gmp_float]
 
@@ -627,53 +699,6 @@ as a valid floating point number.
 
 [endsect]
 
-[section:cpp_dec_float cpp_dec_float]
-
-`#include <boost/multiprecision/cpp_dec_float.hpp>`
-
-   namespace boost{ namespace multiprecision{
-
-   template <unsigned Digits10>
-   class cpp_dec_float;
-
-   typedef number<cpp_dec_float<50> > cpp_dec_float_50;
-   typedef number<cpp_dec_float<100> > cpp_dec_float_100;
-
-   }} // namespaces
-
-The `cpp_dec_float` back-end is used in conjunction with `number`: It acts as an entirely C++ (header only and dependency free)
-real-number type that is a drop-in replacement for the native C++ floating-point types, but with 
-much greater precision.
-
-Type `cpp_dec_float` can be used at fixed precision by specifying a non-zero `Digits10` template parameter.  
-The typedefs `cpp_dec_float_50` and `cpp_dec_float_100` provide arithmetic types at 50 and 100 decimal digits precision
-respectively.
-
-There is full standard library and `numeric_limits` support available for this type.
-
-Things you should know when using this type:
-
-* Default constructed `cpp_dec_float`s have a value of zero.
-* The radix of this type is 10.  As a result it can behave subtly differently from base-2 types.
-* It is not possible to round-trip this type to and from a string and get back to exactly the same value
-(this is a result of the type having some hidden internal guard digits).
-* The type has a number of internal guard digits over and above those specified in the template argument.
-Normally these should not be visible to the user.
-* The type supports both infinities and NaN's.  An infinity is generated whenever the result would overflow,
-and a NaN is generated for any mathematically undefined operation.
-* There is a `std::numeric_limits` specialisation for this type.
-* Any `number` instantiated on this type, is convertible to any other `number` instantiated on this type - 
-for example you can convert from `number<cpp_dec_float<50> >` to `number<cpp_dec_float<SomeOtherValue> >`.
-Narrowing conversions are truncating.
-* Conversion from a string results in a `std::runtime_error` being thrown if the string can not be interpreted
-as a valid floating point number.
-
-[h5 cpp_dec_float example:]
-
-[cpp_dec_float_eg]
-
-[endsect]
-
 [section:fp_eg Examples]
 
 [import ../example/floating_point_examples.cpp]
@@ -723,12 +748,52 @@ The following back-ends provide rational number arithmetic:
 
 [table
 [[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
-[[`gmp_rational`][boost/multiprecision/gmp.hpp][2][[gmp]][Very fast and efficient back-end.][Dependency on GNU licensed [gmp] library.]]
 [[`cpp_rational`][boost/multiprecision/cpp_int.hpp][2][None][An all C++ Boost-licensed implementation.][Slower than [gmp].]]
+[[`gmp_rational`][boost/multiprecision/gmp.hpp][2][[gmp]][Very fast and efficient back-end.][Dependency on GNU licensed [gmp] library.]]
 [[`tommath_rational`][boost/multiprecision/tommath.hpp][2][[tommath]][All C/C++ implementation that's Boost Software Licence compatible.][Slower than [gmp].]]
 [[`rational_adapter`][boost/multiprecision/rational_adapter.hpp][N/A][none][All C++ adapter that allows any integer back-end type to be used as a rational type.][Requires an underlying integer back-end type.]]
 [[`boost::rational`][boost/rational.hpp][N/A][None][A C++ rational number type that can used with any `number` integer type.][The expression templates used by `number` end up being "hidden" inside `boost::rational`: performance may well suffer as a result.]]
 ]
+
+[section:cpp_rational cpp_rational]
+
+`#include <boost/multiprecision/cpp_int.hpp>`
+
+   namespace boost{ namespace multiprecision{
+
+   typedef rational_adapter<cpp_int_backend<> >    cpp_rational_backend;
+
+   typedef number<cpp_rational_backend>         cpp_rational;
+
+   }} // namespaces
+
+The `cpp_rational_backend` type is used via the typedef `boost::multiprecision::cpp_rational`.  It provides
+a rational number type that is a drop-in replacement for the native C++ number types, but with unlimited precision.
+
+As well as the usual conversions from arithmetic and string types, instances of `cpp_rational` are copy constructible
+and assignable from type `cpp_int`.
+
+There is also a two argument constructor that accepts a numerator and denominator: both of type `cpp_int`.
+
+There are also non-member functions:
+
+   cpp_int numerator(const cpp_rational&);
+   cpp_int denominator(const cpp_rational&);
+
+which return the numerator and denominator of the number.
+
+Things you should know when using this type:
+
+* Default constructed `cpp_rational`s have the value zero.
+* Division by zero results in a `std::rumtime_error` being thrown.
+* Conversion from a string results in a `std::runtime_error` being thrown if the string can not be
+interpreted as a valid rational number.
+
+[h5 Example:]
+
+[cpp_rational_eg]
+
+[endsect]
 
 [section:gmp_rational gmp_rational]
 
@@ -775,46 +840,6 @@ interpreted as a valid rational number.
 [h5 Example:]
 
 [mpq_eg]
-
-[endsect]
-
-[section:cpp_rational cpp_rational]
-
-`#include <boost/multiprecision/cpp_int.hpp>`
-
-   namespace boost{ namespace multiprecision{
-
-   typedef rational_adapter<cpp_int_backend<> >    cpp_rational_backend;
-
-   typedef number<cpp_rational_backend>         cpp_rational;
-
-   }} // namespaces
-
-The `cpp_rational_backend` type is used via the typedef `boost::multiprecision::cpp_rational`.  It provides
-a rational number type that is a drop-in replacement for the native C++ number types, but with unlimited precision.
-
-As well as the usual conversions from arithmetic and string types, instances of `cpp_rational` are copy constructible
-and assignable from type `cpp_int`.
-
-There is also a two argument constructor that accepts a numerator and denominator: both of type `cpp_int`.
-
-There are also non-member functions:
-
-   cpp_int numerator(const cpp_rational&);
-   cpp_int denominator(const cpp_rational&);
-
-which return the numerator and denominator of the number.
-
-Things you should know when using this type:
-
-* Default constructed `cpp_rational`s have the value zero.
-* Division by zero results in a `std::rumtime_error` being thrown.
-* Conversion from a string results in a `std::runtime_error` being thrown if the string can not be
-interpreted as a valid rational number.
-
-[h5 Example:]
-
-[cpp_rational_eg]
 
 [endsect]
 
@@ -1494,7 +1519,7 @@ this library support all of the iostream formatting flags, field width and preci
    ``['unmentionable-expression-template-type]``    fmod  (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
    ``['unmentionable-expression-template-type]``    atan2 (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
 
-These functions all behave exactly as their standard library counterparts do: their argument is either an instance of `number` or
+These functions all behave exactly as their standard library C++11 counterparts do: their argument is either an instance of `number` or
 an expression template derived from it; If the argument is of type `number<Backend, et_off>` then that is also the return type,
 otherwise the return type is an expression template.
 
@@ -1506,6 +1531,35 @@ used at variable precision.
 Also note that with the exception of `abs` that these functions can only be used with floating-point Backend types (if any other types
 such as fixed precision or complex types are added to the library later, then these functions may be extended to support those number types).
 
+The precision of these functions is generally deterimined by the backend implementation.  For example the precision
+of these functions when used with __mpfr_float_backend is determined entirely by [mpfr].  When these functions use our own
+implementations, the accuracy of the transcendal functions is generally a few epsilon.  Note however, that the trigonmetrical
+functions incur the usual accuracy loss when reducing arguments by large multiples of [pi].  Also note that both __mpf_float
+and __cpp_dec_float have a number of guard digits beyond their stated precision, so the error rates listed for these
+are in some sense artificially low.
+
+The following table shows the error rates we observe for these functions with various backend types, functions not listed
+here are exact (tested on Win32 with VC++10, MPFR-3.0.0, MPIR-2.1.1):
+
+[table
+[[Function][mpfr_float_50][mpf_float_50][cpp_dec_float_50]]
+[[sqrt][1eps][0eps][0eps]]
+[[exp][1eps][0eps][0eps]]
+[[log][1eps][0eps][0eps]]
+[[log10][1eps][0eps][0eps]]
+[[cos][700eps][0eps][0eps]]
+[[sin][1eps][0eps][0eps]]
+[[tan][][][]]
+[[acos][][][]]
+[[asin][][][]]
+[[atan][][][]]
+[[cosh][][][]]
+[[sinh][][][]]
+[[tanh][][][]]
+[[pow][][][]]
+[[fmod][][][]]
+[[atan2][][][]]
+]
 [h4 Traits Class Support]
 
    template <class T>
@@ -2602,6 +2656,8 @@ Windows Vista machine.
 * Many functions made made `constexp`?
 * Differentiate between explicit and implicit conversions in the number constructor.
 * Removed "mp_" prefix from types.
+* Allowed mixed precision arithmetic.
+* Changed ExpressionTemplates parameter to class `number` to use enumerated values rather than true/false.
 
 [h4 Pre-review history]
 
@@ -2632,18 +2688,18 @@ More a list of what ['could] be done, rather than what ['should] be done (which 
 
 * Can ring types (exact floating point types) be supported?  The answer should be yes, but someone needs to write it.
 * Make the exponent type for cpp_dec_float a templare parameter, maybe include support for big-integer exponents.
-Open question - what should be the default - int32_t or int64_t?
+Open question - what should be the default - int32_t or int64_t?  (done 2012/09/06)
 * Document the size requirements of fixed precision ints.
 * Document std lib function accuracy.
 * Make fixed precision orthogonal to Allocator type in cpp_int.  Possible solution - add an additional MaxBits 
 template argument that defaults to 0 (meaning keep going till no more space/memory).
 * Add support for fused multiply add (and subtract).  GMP mpz_t could use this.
 * Be a bit clearer on the effects of sign-magnitude representation of cpp_int - min == -max etc.
-* Document cpp_dec_float precision, rounding, and exponent size.
-* Can we be clearer in the docs that mixed arithmetic doesn't work?
-* Document round functions behaviour better (they behave as in C99).
+* Document cpp_dec_float precision, rounding, and exponent size (done 2012/09/06).
+* Can we be clearer in the docs that mixed arithmetic doesn't work (no longer applicable as of 2012/09/06)?
+* Document round functions behaviour better (they behave as in C++11) (added note 2012/09/06).
 * Should there be a choice of rounding mode (probably MPFR specific)?
-* Document limits on size of cpp_dec_float.
+* Document limits on size of cpp_dec_float (done 2012/09/06).
 
 [endsect]
 

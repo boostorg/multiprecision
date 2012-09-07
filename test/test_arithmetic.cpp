@@ -1654,7 +1654,8 @@ int main()
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
    test<boost::multiprecision::cpp_dec_float_50>();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<100>, boost::multiprecision::et_off> >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<100, long long>, boost::multiprecision::et_off> >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<100, long long, std::allocator<void> >, boost::multiprecision::et_on> >();
 #endif
 #ifdef TEST_MPFR
    test<boost::multiprecision::mpfr_float>();
