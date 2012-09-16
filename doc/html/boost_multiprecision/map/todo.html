@@ -18,6 +18,106 @@
 <a name="boost_multiprecision.map.todo"></a><a class="link" href="todo.html" title="TODO">TODO</a>
 </h3></div></div></div>
 <p>
+        Things requested in review:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+            A 2's complement fixed precision int that uses exactly N bits and no
+            more.
+          </li>
+<li class="listitem">
+            A backend for an overflow aware integers.
+          </li>
+<li class="listitem">
+            Each back-end should document the requirements it satisfies (not currently
+            scheduled for inclusion: it's deliberately an implementation detail,
+            and "optional" requirements are optimisations which can't be
+            detected by the user).
+          </li>
+<li class="listitem">
+            IIUC convert_to is used to emulate in c++98 compilers C++11 explicit
+            conversions. Could the explicit conversion operator be added on compilers
+            supporting it? (Done 2012/09/15).
+          </li>
+<li class="listitem">
+            The front-end should make the differences between implicit and explicit
+            construction (Done 2012/09/15).
+          </li>
+<li class="listitem">
+            The use of bool in template parameters could be improved by the use of
+            an enum class which will be more explicit. E.g <code class="computeroutput"><span class="keyword">enum</span>
+            <span class="keyword">class</span> <span class="identifier">expression_template</span>
+            <span class="special">{</span><span class="identifier">disabled</span><span class="special">,</span> <span class="identifier">enabled</span><span class="special">};</span> <span class="keyword">enum</span> <span class="keyword">class</span> <span class="identifier">sign</span>
+            <span class="special">{</span><span class="keyword">unsigned</span><span class="special">,</span> <span class="keyword">signed</span><span class="special">};</span></code> (Partly done 2012/09/15).
+          </li>
+<li class="listitem">
+            The ExpresionTemplate parameter could be defaulted to a traits class
+            for more sensible defaults.
+          </li>
+<li class="listitem">
+            The library interface should use the noexcept (BOOST_NOEXCEPT, ...) facilities
+            (Done 2012/09/15).
+          </li>
+<li class="listitem">
+            It is unfortunate that the generic mp_number front end can not make use
+            contexpr as not all the backends can ensure this (done - we can go quite
+            a way).
+          </li>
+<li class="listitem">
+            literals: The library doesn't provide some kind of literals. I think
+            that the mp_number class should provide a way to create literals if the
+            backend is able to. (Done 2012/09/15).
+          </li>
+<li class="listitem">
+            The performances of mp_number&lt;a_trivial_adaptor&lt;float&gt;, false&gt;respect
+            to float and mp_number&lt;a_trivial_adaptor&lt;int&gt;, false&gt; and
+            int should be given to show the cost of using the generic interface (Mostly
+            done, just need to update docs to the latest results).
+          </li>
+<li class="listitem">
+            The documentation should contain Throws specification on the mp_number
+            and backend requirements operations. (Done 2012/09/15).
+          </li>
+<li class="listitem">
+            The tutorial should add more examples concerning implicit or explicit
+            conversions. (Done 2012/09/15).
+          </li>
+<li class="listitem">
+            The documentation must explain how move semantics helps in this domain
+            and what the backend needs to do to profit from this optimization. (Done
+            2012/09/15).
+          </li>
+<li class="listitem">
+            The rounding applied when converting must be documented.
+          </li>
+<li class="listitem">
+            cpp_dec_float should round to nearest.
+          </li>
+<li class="listitem">
+            In a = exp1 op exp2 where a occurs inside one of exp1 or exp2 then we
+            can optimise and eliminate one more temporary.
+          </li>
+<li class="listitem">
+            We can reuse temporaries in multiple subtrees (temporary caching).
+          </li>
+<li class="listitem">
+            Emphasise in the docs that ET's may reorder operations.
+          </li>
+<li class="listitem">
+            Document why we don't use proto (compile times).
+          </li>
+<li class="listitem">
+            Document what happens to small fixed precision cpp_int's.
+          </li>
+<li class="listitem">
+            Should we provide min/max overloads for expression templates?
+          </li>
+<li class="listitem">
+            Document why we don't abstract out addition/multiplication algorithms
+            etc.
+          </li>
+</ul></div>
+<p>
         More a list of what <span class="emphasis"><em>could</em></span> be done, rather than what
         <span class="emphasis"><em>should</em></span> be done (which may be a much smaller list!).
       </p>
@@ -57,10 +157,10 @@
             be the default - int32_t or int64_t? (done 2012/09/06)
           </li>
 <li class="listitem">
-            Document the size requirements of fixed precision ints.
+            Document the size requirements of fixed precision ints (done 2012/09/15).
           </li>
 <li class="listitem">
-            Document std lib function accuracy.
+            Document std lib function accuracy (done 2012/09/15).
           </li>
 <li class="listitem">
             Make fixed precision orthogonal to Allocator type in cpp_int. Possible
@@ -73,7 +173,7 @@
           </li>
 <li class="listitem">
             Be a bit clearer on the effects of sign-magnitude representation of cpp_int
-            - min == -max etc.
+            - min == -max etc - done.
           </li>
 <li class="listitem">
             Document cpp_dec_float precision, rounding, and exponent size (done 2012/09/06).

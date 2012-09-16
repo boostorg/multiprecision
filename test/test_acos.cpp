@@ -47,6 +47,7 @@
 template <class T>
 void test()
 {
+   std::cout << "Testing type: " << typeid(T).name() << std::endl;
    //
    // Test with some exact binary values as input - this tests our code
    // rather than the test data:

@@ -406,6 +406,14 @@ the feature off.
  `uint128_t` then both `uint128_t(1)-4` and `-uint128(3)` would result in the value `0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD`
  of type `uint128_t`.
 * This backend supports rvalue-references and is move-aware, making instantiations of `number` on this backend move aware.
+* When used at fixed precision, the size of this type is always one machine word larger than you would expect for an N-bit integer: 
+the extra word stores both the sign, and how many machine words in the integer are actually in use.  
+The latter is an optimisation for larger fixed precision integers, so that a 1024-bit integer has almost the same performance
+characterists as a 128-bit integer, rather than being 4 times slower for addition and 16 times slower for multiplication
+ (assuming the values involved would always fit in 128 bits).
+Typically this means you can use
+an integer type wide enough for the "worst case senario" with only minor performance degradation even if most of the time
+the arithmetic could in fact be done with a narrower type.
  
 
 [h5 Example:]
@@ -1549,16 +1557,15 @@ here are exact (tested on Win32 with VC++10, MPFR-3.0.0, MPIR-2.1.1):
 [[log10][1eps][0eps][0eps]]
 [[cos][700eps][0eps][0eps]]
 [[sin][1eps][0eps][0eps]]
-[[tan][][][]]
-[[acos][][][]]
-[[asin][][][]]
-[[atan][][][]]
-[[cosh][][][]]
-[[sinh][][][]]
-[[tanh][][][]]
-[[pow][][][]]
-[[fmod][][][]]
-[[atan2][][][]]
+[[tan][0eps][0eps][0eps]]
+[[acos][0eps][0eps][0eps]]
+[[asin][0eps][0eps][0eps]]
+[[atan][1eps][0eps][0eps]]
+[[cosh][1045eps[footnote It's likely that the inherent error in the input values to our test cases are to blame here.]][0eps][0eps]]
+[[sinh][2eps][0eps][0eps]]
+[[tanh][1eps][0eps][0eps]]
+[[pow][0eps][4eps][3eps]]
+[[atan2][1eps][0eps][0eps]]
 ]
 [h4 Traits Class Support]
 
@@ -2675,6 +2682,52 @@ code.
 
 [section:todo TODO]
 
+Things requested in review:
+
+* A 2's complement fixed precision int that uses exactly N bits and no more.
+* A backend for an overflow aware integers.
+* Each back-end should document the requirements it satisfies (not currently scheduled for inclusion: it's
+deliberately an implementation detail, and "optional" requirements are optimisations which can't be detected
+by the user).
+* IIUC convert_to is used to emulate in c++98 compilers C++11 explicit 
+conversions. Could the explicit conversion operator be added on 
+compilers supporting it?  (Done 2012/09/15).
+* The front-end should make the differences between implicit and explicit 
+construction (Done 2012/09/15).
+* The use of bool in template parameters could be improved by the use of 
+an enum class which will be more explicit. E.g `enum class expression_template {disabled, enabled};
+enum class sign {unsigned, signed};`  (Partly done 2012/09/15).
+* The ExpresionTemplate parameter could be defaulted to a traits class for more sensible defaults.
+* The library interface should use the noexcept (BOOST_NOEXCEPT, ...) 
+facilities (Done 2012/09/15).
+* It is unfortunate that the generic mp_number front end can not make use 
+contexpr as not all the backends can ensure this (done - we can go quite a way).
+* literals: The library doesn't provide some kind of literals. I think that the 
+mp_number class should provide a way to create literals if the backend 
+is able to.  (Done 2012/09/15).
+* The performances of mp_number<a_trivial_adaptor<float>, false>respect to 
+float and mp_number<a_trivial_adaptor<int>, false> and int should be 
+given to show the cost of using the generic interface (Mostly done, just need to update docs to the latest results).
+* The documentation should contain Throws specification on the mp_number 
+and backend requirements operations. (Done 2012/09/15).
+* The tutorial should add more examples concerning implicit or explicit 
+conversions. (Done 2012/09/15).
+* The documentation must explain how move semantics helps in this domain 
+and what the backend needs to do to profit from this optimization. (Done 2012/09/15).
+* The rounding applied when converting must be documented.
+* cpp_dec_float should round to nearest.
+* In a = exp1 op exp2 where a occurs inside one of exp1 or exp2 then we can optimise and eliminate one more temporary.
+* We can reuse temporaries in multiple subtrees (temporary caching).
+* Emphasise in the docs that ET's may reorder operations.
+* Document why we don't use proto (compile times).
+* Document what happens to small fixed precision cpp_int's.
+* Should we provide min/max overloads for expression templates?
+* Document why we don't abstract out addition/multiplication algorithms etc.
+
+
+
+
+
 More a list of what ['could] be done, rather than what ['should] be done (which may be a much smaller list!).
 
 * Add back-end support for libdecNumber.
@@ -2689,12 +2742,12 @@ More a list of what ['could] be done, rather than what ['should] be done (which 
 * Can ring types (exact floating point types) be supported?  The answer should be yes, but someone needs to write it.
 * Make the exponent type for cpp_dec_float a templare parameter, maybe include support for big-integer exponents.
 Open question - what should be the default - int32_t or int64_t?  (done 2012/09/06)
-* Document the size requirements of fixed precision ints.
-* Document std lib function accuracy.
+* Document the size requirements of fixed precision ints (done 2012/09/15).
+* Document std lib function accuracy (done 2012/09/15).
 * Make fixed precision orthogonal to Allocator type in cpp_int.  Possible solution - add an additional MaxBits 
 template argument that defaults to 0 (meaning keep going till no more space/memory).
 * Add support for fused multiply add (and subtract).  GMP mpz_t could use this.
-* Be a bit clearer on the effects of sign-magnitude representation of cpp_int - min == -max etc.
+* Be a bit clearer on the effects of sign-magnitude representation of cpp_int - min == -max etc - done.
 * Document cpp_dec_float precision, rounding, and exponent size (done 2012/09/06).
 * Can we be clearer in the docs that mixed arithmetic doesn't work (no longer applicable as of 2012/09/06)?
 * Document round functions behaviour better (they behave as in C++11) (added note 2012/09/06).

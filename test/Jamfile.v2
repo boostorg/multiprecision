@@ -496,6 +496,29 @@ run test_atan.cpp mpfr
          [ check-target-builds ../config//has_mpfr : : <build>no ]
         : test_atan_mpfr_50 ;
 
+run test_tan.cpp gmp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPF_50
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+        : test_tan_mpf50 ;
+
+run test_tan.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_CPP_DEC_FLOAT
+        : test_tan_cpp_dec_float ;
+
+run test_tan.cpp mpfr
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPFR_50
+         [ check-target-builds ../config//has_mpfr : : <build>no ]
+        : test_tan_mpfr_50 ;
+
 run test_gmp_conversions.cpp gmp
         : # command line
         : # input files
