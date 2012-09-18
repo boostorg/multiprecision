@@ -177,6 +177,9 @@ inline typename enable_if_c<is_convertible<V, number<T> >::value && is_convertib
 //
 // Default versions of 3-arg arithmetic functions, these mostly just forward to the 2 arg versions:
 //
+template <class T, class U, class V>
+void eval_add(T& t, const U& u, const V& v);
+
 template <class T>
 inline void eval_add_default(T& t, const T& u, const T& v)
 {
@@ -223,6 +226,9 @@ inline void eval_add(T& t, const U& u, const V& v)
 {
    eval_add_default(t, u, v);
 }
+
+template <class T, class U, class V>
+void eval_subtract(T& t, const U& u, const V& v);
 
 template <class T>
 inline void eval_subtract_default(T& t, const T& u, const T& v)
@@ -273,6 +279,9 @@ inline void eval_subtract(T& t, const U& u, const V& v)
    eval_subtract_default(t, u, v);
 }
 
+template <class T, class U, class V>
+void eval_multiply(T& t, const U& u, const V& v);
+
 template <class T>
 inline void eval_multiply_default(T& t, const T& u, const T& v)
 {
@@ -319,6 +328,9 @@ inline void eval_multiply(T& t, const U& u, const V& v)
 {
    eval_multiply_default(t, u, v);
 }
+
+template <class T, class U, class V>
+void eval_divide(T& t, const U& u, const V& v);
 
 template <class T>
 inline void eval_divide_default(T& t, const T& u, const T& v)
@@ -375,6 +387,9 @@ inline void eval_divide(T& t, const U& u, const V& v)
    eval_divide_default(t, u, v);
 }
 
+template <class T, class U, class V>
+void eval_modulus(T& t, const U& u, const V& v);
+
 template <class T>
 inline void eval_modulus_default(T& t, const T& u, const T& v)
 {
@@ -430,6 +445,9 @@ inline void eval_modulus(T& t, const U& u, const V& v)
    eval_modulus_default(t, u, v);
 }
 
+template <class T, class U, class V>
+void eval_bitwise_and(T& t, const U& u, const V& v);
+
 template <class T>
 inline void eval_bitwise_and_default(T& t, const T& u, const T& v)
 {
@@ -477,6 +495,9 @@ inline void eval_bitwise_and(T& t, const U& u, const V& v)
    eval_bitwise_and_default(t, u, v);
 }
 
+template <class T, class U, class V>
+void eval_bitwise_or(T& t, const U& u, const V& v);
+
 template <class T>
 inline void eval_bitwise_or_default(T& t, const T& u, const T& v)
 {
@@ -523,6 +544,9 @@ inline void eval_bitwise_or(T& t, const U& u, const V& v)
 {
    eval_bitwise_or_default(t, u, v);
 }
+
+template <class T, class U, class V>
+void eval_bitwise_xor(T& t, const U& u, const V& v);
 
 template <class T>
 inline void eval_bitwise_xor_default(T& t, const T& u, const T& v)

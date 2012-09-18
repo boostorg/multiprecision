@@ -1702,7 +1702,7 @@ BOOST_FORCEINLINE void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator,
       subtract_unsigned(result, o);
 }
 template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-BOOST_FORCEINLINE void eval_subtract(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& a, const limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_subtract(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& a, const limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator1>::value)
 {
    if(a.sign())
    {
@@ -2682,22 +2682,22 @@ struct bit_xor{ limb_type operator()(limb_type a, limb_type b)const BOOST_NOEXCE
 template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
 BOOST_FORCEINLINE void eval_bitwise_and(
    cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, 
-   const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& o)BOOST_NOEXCEPT_IF(is_void<Allocator>::value)
+   const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& o)BOOST_NOEXCEPT_IF(is_void<Allocator1>::value)
 {
    bitwise_op(result, o, bit_and());
 }
 template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-BOOST_FORCEINLINE void eval_bitwise_or(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& o) BOOST_NOEXCEPT_IF(is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_bitwise_or(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& o) BOOST_NOEXCEPT_IF(is_void<Allocator1>::value)
 {
    bitwise_op(result, o, bit_or());
 }
 template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-BOOST_FORCEINLINE void eval_bitwise_xor(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& o) BOOST_NOEXCEPT_IF(is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_bitwise_xor(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& o) BOOST_NOEXCEPT_IF(is_void<Allocator1>::value)
 {
    bitwise_op(result, o, bit_xor());
 }
 template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-BOOST_FORCEINLINE void eval_complement(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+BOOST_FORCEINLINE void eval_complement(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator1>::value)
 {
    // Increment and negate:
    result = o;

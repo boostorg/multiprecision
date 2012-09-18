@@ -14,19 +14,40 @@
 #include <boost/detail/lightweight_test.hpp>
 #include <boost/current_function.hpp>
 #include <boost/static_assert.hpp>
+#include <boost/utility/enable_if.hpp>
+#include <boost/type_traits/is_unsigned.hpp>
+
+namespace detail{
+
+template <class T>
+inline typename boost::disable_if<boost::is_unsigned<T>, T>::type abs(const T& a)
+{
+   return a < 0 ? -a : a;
+}
+
+template <class T>
+inline typename boost::enable_if<boost::is_unsigned<T>, T>::type abs(const T& a)
+{
+   return a;
+}
+
+}
 
 template <class T>
 T relative_error(T a, T b)
 {
+   using std::abs;
+   using detail::abs;
+
    T min_val = (std::numeric_limits<T>::min)();
    T max_val = (std::numeric_limits<T>::max)();
 
    if((a != 0) && (b != 0))
    {
       // TODO: use isfinite:
-      if(fabs(b) >= max_val)
+      if(abs(b) >= max_val)
       {
-         if(fabs(a) >= max_val)
+         if(abs(a) >= max_val)
             return 0;  // one infinity is as good as another!
       }
       // If the result is denormalised, treat all denorms as equivalent:
@@ -38,17 +59,17 @@ T relative_error(T a, T b)
          b = min_val;
       else if((b > -min_val) && (b < 0))
          b = -min_val;
-      return (std::max)(fabs((a-b)/a), fabs((a-b)/b)) / std::numeric_limits<T>::epsilon();
+      return (std::max)(abs(T((a-b)/a)), abs(T((a-b)/b))) / std::numeric_limits<T>::epsilon();
    }
 
    // Handle special case where one or both are zero:
    if(min_val == 0)
-      return fabs(a-b);
-   if(fabs(a) < min_val)
+      return abs(T(a-b));
+   if(abs(a) < min_val)
       a = min_val;
-   if(fabs(b) < min_val)
+   if(abs(b) < min_val)
       b = min_val;
-   return (std::max)(fabs((a-b)/a), fabs((a-b)/b)) / std::numeric_limits<T>::epsilon();
+   return (std::max)(abs(T((a-b)/a)), abs(T((a-b)/b))) / std::numeric_limits<T>::epsilon();
 }
 
 enum

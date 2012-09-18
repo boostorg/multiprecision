@@ -2682,50 +2682,6 @@ code.
 
 [section:todo TODO]
 
-Things requested in review:
-
-* A 2's complement fixed precision int that uses exactly N bits and no more.
-* A backend for an overflow aware integers.
-* Each back-end should document the requirements it satisfies (not currently scheduled for inclusion: it's
-deliberately an implementation detail, and "optional" requirements are optimisations which can't be detected
-by the user).
-* IIUC convert_to is used to emulate in c++98 compilers C++11 explicit 
-conversions. Could the explicit conversion operator be added on 
-compilers supporting it?  (Done 2012/09/15).
-* The front-end should make the differences between implicit and explicit 
-construction (Done 2012/09/15).
-* The use of bool in template parameters could be improved by the use of 
-an enum class which will be more explicit. E.g `enum class expression_template {disabled, enabled};
-enum class sign {unsigned, signed};`  (Partly done 2012/09/15).
-* The ExpresionTemplate parameter could be defaulted to a traits class for more sensible defaults.
-* The library interface should use the noexcept (BOOST_NOEXCEPT, ...) 
-facilities (Done 2012/09/15).
-* It is unfortunate that the generic mp_number front end can not make use 
-contexpr as not all the backends can ensure this (done - we can go quite a way).
-* literals: The library doesn't provide some kind of literals. I think that the 
-mp_number class should provide a way to create literals if the backend 
-is able to.  (Done 2012/09/15).
-* The performances of mp_number<a_trivial_adaptor<float>, false>respect to 
-float and mp_number<a_trivial_adaptor<int>, false> and int should be 
-given to show the cost of using the generic interface (Mostly done, just need to update docs to the latest results).
-* The documentation should contain Throws specification on the mp_number 
-and backend requirements operations. (Done 2012/09/15).
-* The tutorial should add more examples concerning implicit or explicit 
-conversions. (Done 2012/09/15).
-* The documentation must explain how move semantics helps in this domain 
-and what the backend needs to do to profit from this optimization. (Done 2012/09/15).
-* The rounding applied when converting must be documented.
-* cpp_dec_float should round to nearest.
-* In a = exp1 op exp2 where a occurs inside one of exp1 or exp2 then we can optimise and eliminate one more temporary.
-* We can reuse temporaries in multiple subtrees (temporary caching).
-* Emphasise in the docs that ET's may reorder operations.
-* Document why we don't use proto (compile times).
-* Document what happens to small fixed precision cpp_int's.
-* Should we provide min/max overloads for expression templates?
-* Document why we don't abstract out addition/multiplication algorithms etc.
-
-
-
 
 
 More a list of what ['could] be done, rather than what ['should] be done (which may be a much smaller list!).
@@ -2736,22 +2692,69 @@ More a list of what ['could] be done, rather than what ['should] be done (which 
 * Add better multiplication routines (Karatsuba, FFT etc) to cpp_int_backend.
 * Add assembly level routines to cpp_int_backend.
 * Add an all C++ binary floating point type.
+* Can ring types (exact floating point types) be supported?  The answer should be yes, but someone needs to write it, 
+the hard part is IO and binary-decimal convertion.
+* Should there be a choice of rounding mode (probably MPFR specific)?
+
+Things requested in review:
+
+* A 2's complement fixed precision int that uses exactly N bits and no more.
+* A backend for an overflow aware integers.
+* Each back-end should document the requirements it satisfies (not currently scheduled for inclusion: it's
+deliberately an implementation detail, and "optional" requirements are optimisations which can't be detected
+by the user).
+* The use of bool in template parameters could be improved by the use of 
+an enum class which will be more explicit. E.g `enum class expression_template {disabled, enabled};
+enum class sign {unsigned, signed};`  (Partly done 2012/09/15).
+* The ExpresionTemplate parameter could be defaulted to a traits class for more sensible defaults.
+* The performances of mp_number<a_trivial_adaptor<float>, false>respect to 
+float and mp_number<a_trivial_adaptor<int>, false> and int should be 
+given to show the cost of using the generic interface (Mostly done, just need to update docs to the latest results).
+* The rounding applied when converting must be documented.
+* cpp_dec_float should round to nearest.
+* In a = exp1 op exp2 where a occurs inside one of exp1 or exp2 then we can optimise and eliminate one more temporary.
+* We can reuse temporaries in multiple subtrees (temporary caching).
+* Emphasise in the docs that ET's may reorder operations.
+* Document why we don't use proto (compile times).
+* Document what happens to small fixed precision cpp_int's.
+* Should we provide min/max overloads for expression templates?
+* Document why we don't abstract out addition/multiplication algorithms etc.
+* IIUC convert_to is used to emulate in c++98 compilers C++11 explicit 
+conversions. Could the explicit conversion operator be added on 
+compilers supporting it?  (Done 2012/09/15).
+* The front-end should make the differences between implicit and explicit 
+construction (Done 2012/09/15).
+* The tutorial should add more examples concerning implicit or explicit 
+conversions. (Done 2012/09/15).
+* The documentation must explain how move semantics helps in this domain 
+and what the backend needs to do to profit from this optimization. (Done 2012/09/15).
+* The documentation should contain Throws specification on the mp_number 
+and backend requirements operations. (Done 2012/09/15).
+* The library interface should use the noexcept (BOOST_NOEXCEPT, ...) 
+facilities (Done 2012/09/15).
+* It is unfortunate that the generic mp_number front end can not make use 
+contexpr as not all the backends can ensure this (done - we can go quite a way).
+* literals: The library doesn't provide some kind of literals. I think that the 
+mp_number class should provide a way to create literals if the backend 
+is able to.  (Done 2012/09/15).
+
+
 
 [h4 Pre-Review Comments]
 
-* Can ring types (exact floating point types) be supported?  The answer should be yes, but someone needs to write it.
+* Make fixed precision orthogonal to Allocator type in cpp_int.  Possible solution - add an additional MaxBits 
+template argument that defaults to 0 (meaning keep going till no more space/memory).
+* Add support for fused multiply add (and subtract).  GMP mpz_t could use this.
+* Can ring types (exact floating point types) be supported?  The answer should be yes, but someone needs to write it (Moved to TODO list).
+* Should there be a choice of rounding mode (probably MPFR specific)?  Moved to TODO list.
 * Make the exponent type for cpp_dec_float a templare parameter, maybe include support for big-integer exponents.
 Open question - what should be the default - int32_t or int64_t?  (done 2012/09/06)
 * Document the size requirements of fixed precision ints (done 2012/09/15).
 * Document std lib function accuracy (done 2012/09/15).
-* Make fixed precision orthogonal to Allocator type in cpp_int.  Possible solution - add an additional MaxBits 
-template argument that defaults to 0 (meaning keep going till no more space/memory).
-* Add support for fused multiply add (and subtract).  GMP mpz_t could use this.
 * Be a bit clearer on the effects of sign-magnitude representation of cpp_int - min == -max etc - done.
 * Document cpp_dec_float precision, rounding, and exponent size (done 2012/09/06).
 * Can we be clearer in the docs that mixed arithmetic doesn't work (no longer applicable as of 2012/09/06)?
 * Document round functions behaviour better (they behave as in C++11) (added note 2012/09/06).
-* Should there be a choice of rounding mode (probably MPFR specific)?
 * Document limits on size of cpp_dec_float (done 2012/09/06).
 
 [endsect]

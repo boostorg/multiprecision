@@ -121,29 +121,25 @@ template <class T> bool isfloat(T){ return false; }
 
 namespace detail{
 
-template <class T>
-typename boost::disable_if<boost::is_unsigned<T>, T>::type abs(T v)
+template<class tag, class Arg1, class Arg2, class Arg3, class Arg4> 
+typename boost::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type
+   abs(boost::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4> const& v)
 {
-   return v < 0 ? -v : v;
-}
-template <class T>
-typename boost::enable_if<boost::is_unsigned<T>, T>::type abs(T v)
-{
-   return v;
+   typedef typename boost::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type result_type;
+   return v < 0 ? result_type(-v) : result_type(v);
 }
 
 }
 
 #define BOOST_TEST_CLOSE(x, y, tol)\
-   using std::abs;  using detail::abs;\
    if(x == 0){\
       BOOST_TEST(y == 0); }\
    else if(!isfloat(x)){\
       BOOST_TEST(x == y); }\
-   else if((x != y) && (abs((x-y)/x) > tol))\
+   else if((x != y) && (detail::abs((x-y)/x) > tol))\
    {\
        BOOST_ERROR("Expected tolerance was exceeded: ");\
-       BOOST_LIGHTWEIGHT_TEST_OSTREAM << std::setprecision(34) << "(x-y)/x = " << abs((x-y)/x) \
+       BOOST_LIGHTWEIGHT_TEST_OSTREAM << std::setprecision(34) << "(x-y)/x = " << detail::abs((x-y)/x) \
        << " tolerance = " << tol << std::endl;\
    }
 

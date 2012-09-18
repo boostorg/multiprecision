@@ -16,6 +16,7 @@
 #include <boost/array.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/big_lanczos.hpp>
+#include <vector>
 
 //
 // Headers required for Boost.Math integration:
@@ -38,11 +39,17 @@ namespace backends{
 
 namespace detail{
 
+template <class T, class Allocator>
+struct rebind
+{
+   typedef typename Allocator::template rebind<T>::other type;
+};
+
 template <class T, unsigned S, class Allocator>
-struct dynamic_array : public std::vector<T, Allocator>
+struct dynamic_array : public std::vector<T, typename rebind<T, Allocator>::type>
 {
    dynamic_array()
-      : std::vector<T, Allocator>(static_cast<std::vector<T, Allocator>::size_type>(S), static_cast<T>(0)) {}
+      : std::vector<T, typename rebind<T, Allocator>::type>(static_cast<typename std::vector<T, typename rebind<T, Allocator>::type>::size_type>(S), static_cast<T>(0)) {}
 };
 
 }
@@ -1668,7 +1675,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator> cpp_dec_float<Digits10, Exponen
       // Thus the integer part is zero.
       return zero();
    }
-   else if(exp >= Digits10 - 1)
+   else if(exp >= static_cast<ExponentType>(Digits10 - 1))
    {
       // The number is too large to resolve the integer part.
       // Thus it is already a pure integer part.
