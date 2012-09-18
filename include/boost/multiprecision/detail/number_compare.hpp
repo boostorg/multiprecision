@@ -79,10 +79,7 @@ struct is_valid_mixed_compare : public mpl::false_ {};
 
 template <class B, expression_template_option ET, class Val>
 struct is_valid_mixed_compare<number<B, ET>, Val> : public is_convertible<Val, number<B, ET>> {};
-/*
-template <class Val, class B, expression_template_option ET>
-struct is_valid_mixed_compare<Val, number<B, ET> > : public is_convertible<Val, number<B, ET>> {};
-*/
+
 template <class B, expression_template_option ET>
 struct is_valid_mixed_compare<number<B, ET>, number<B, ET> > : public mpl::false_ {};
 
@@ -109,16 +106,6 @@ inline typename enable_if_c<detail::is_valid_mixed_compare<number<Backend, Expre
    using default_ops::eval_eq;
    return eval_eq(a.backend(), number<Backend, ExpressionTemplates>::canonical_value(b));
 }
-/*
-template <class Backend, expression_template_option ExpressionTemplates, class Tag, class A1, class A2, class A3, class A4>
-inline typename enable_if<is_same<number<Backend, ExpressionTemplates>, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>, bool>::type 
-   operator == (const number<Backend, ExpressionTemplates>& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
-{
-   using default_ops::eval_eq;
-   typename detail::expression<Tag, A1, A2, A3, A4>::result_type t(b);
-   return eval_eq(a.backend(), t.backend());
-}
-*/
 template <class Arithmetic, class Backend, expression_template_option ExpressionTemplates>
 inline typename enable_if_c<detail::is_valid_mixed_compare<number<Backend, ExpressionTemplates>, Arithmetic>::value, bool>::type 
    operator == (const Arithmetic& a, const number<Backend, ExpressionTemplates>& b)
@@ -135,15 +122,6 @@ inline typename enable_if_c<detail::is_valid_mixed_compare<typename detail::expr
    result_type t(b);
    return eval_eq(t.backend(), result_type::canonical_value(a));
 }
-/*
-template <class Tag, class A1, class A2, class A3, class A4, class Backend, expression_template_option ExpressionTemplates>
-inline typename enable_if<is_same<number<Backend, ExpressionTemplates>, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>, bool>::type 
-   operator == (const detail::expression<Tag, A1, A2, A3, A4>& a, const number<Backend, ExpressionTemplates>& b)
-{
-   using default_ops::eval_eq;
-   typename detail::expression<Tag, A1, A2, A3, A4>::result_type t(a);
-   return eval_eq(t.backend(), b.backend());
-}*/
 template <class Tag, class A1, class A2, class A3, class A4, class Arithmetic>
 inline typename enable_if_c<detail::is_valid_mixed_compare<typename detail::expression<Tag, A1, A2, A3, A4>::result_type, Arithmetic>::value, bool>::type 
    operator == (const detail::expression<Tag, A1, A2, A3, A4>& a, const Arithmetic& b)
@@ -176,16 +154,6 @@ inline typename enable_if_c<detail::is_valid_mixed_compare<number<Backend, Expre
    using default_ops::eval_eq;
    return !eval_eq(a.backend(), number<Backend>::canonical_value(b));
 }
-/*
-template <class Backend, expression_template_option ExpressionTemplates, class Tag, class A1, class A2, class A3, class A4>
-inline typename enable_if<is_same<number<Backend, ExpressionTemplates>, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>, bool>::type 
-   operator != (const number<Backend, ExpressionTemplates>& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
-{
-   using default_ops::eval_eq;
-   typename detail::expression<Tag, A1, A2, A3, A4>::result_type t(b);
-   return !eval_eq(a.backend(), t.backend());
-}
-*/
 template <class Arithmetic, class Backend, expression_template_option ExpressionTemplates>
 inline typename enable_if_c<detail::is_valid_mixed_compare<number<Backend, ExpressionTemplates>, Arithmetic>::value, bool>::type 
    operator != (const Arithmetic& a, const number<Backend, ExpressionTemplates>& b)
@@ -202,15 +170,6 @@ inline typename enable_if_c<detail::is_valid_mixed_compare<typename detail::expr
    result_type t(b);
    return !eval_eq(t.backend(), result_type::canonical_value(a));
 }
-/*
-template <class Tag, class A1, class A2, class A3, class A4, class Backend, expression_template_option ExpressionTemplates>
-inline typename enable_if<is_same<number<Backend, ExpressionTemplates>, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>, bool>::type 
-   operator != (const detail::expression<Tag, A1, A2, A3, A4>& a, const number<Backend, ExpressionTemplates>& b)
-{
-   using default_ops::eval_eq;
-   typename detail::expression<Tag, A1, A2, A3, A4>::result_type t(a);
-   return !eval_eq(t.backend(), b.backend());
-}*/
 template <class Tag, class A1, class A2, class A3, class A4, class Arithmetic>
 inline typename enable_if_c<detail::is_valid_mixed_compare<typename detail::expression<Tag, A1, A2, A3, A4>::result_type, Arithmetic>::value, bool>::type 
    operator != (const detail::expression<Tag, A1, A2, A3, A4>& a, const Arithmetic& b)
@@ -243,16 +202,6 @@ inline typename enable_if_c<detail::is_valid_mixed_compare<number<Backend, Expre
    using default_ops::eval_lt;
    return eval_lt(a.backend(), number<Backend, ExpressionTemplates>::canonical_value(b));
 }
-/*
-template <class Backend, expression_template_option ExpressionTemplates, class Tag, class A1, class A2, class A3, class A4>
-inline typename enable_if<is_same<number<Backend, ExpressionTemplates>, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>, bool>::type 
-   operator < (const number<Backend, ExpressionTemplates>& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
-{
-   using default_ops::eval_lt;
-   typename detail::expression<Tag, A1, A2, A3, A4>::result_type t(b);
-   return eval_lt(a.backend(), t.backend());
-}
-*/
 template <class Arithmetic, class Backend, expression_template_option ExpressionTemplates>
 inline typename enable_if_c<detail::is_valid_mixed_compare<number<Backend, ExpressionTemplates>, Arithmetic>::value, bool>::type 
    operator < (const Arithmetic& a, const number<Backend, ExpressionTemplates>& b)
@@ -269,16 +218,6 @@ inline typename enable_if_c<detail::is_valid_mixed_compare<typename detail::expr
    result_type t(b);
    return eval_gt(t.backend(), result_type::canonical_value(a));
 }
-/*
-template <class Tag, class A1, class A2, class A3, class A4, class Backend, expression_template_option ExpressionTemplates>
-inline typename enable_if<is_same<number<Backend, ExpressionTemplates>, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>, bool>::type 
-   operator < (const detail::expression<Tag, A1, A2, A3, A4>& a, const number<Backend, ExpressionTemplates>& b)
-{
-   using default_ops::eval_lt;
-   typename detail::expression<Tag, A1, A2, A3, A4>::result_type t(a);
-   return eval_lt(t.backend(), b.backend());
-}
-*/
 template <class Tag, class A1, class A2, class A3, class A4, class Arithmetic>
 inline typename enable_if_c<detail::is_valid_mixed_compare<typename detail::expression<Tag, A1, A2, A3, A4>::result_type, Arithmetic>::value, bool>::type 
    operator < (const detail::expression<Tag, A1, A2, A3, A4>& a, const Arithmetic& b)
@@ -311,16 +250,6 @@ inline typename enable_if_c<detail::is_valid_mixed_compare<number<Backend, Expre
    using default_ops::eval_gt;
    return eval_gt(a.backend(), number<Backend, ExpressionTemplates>::canonical_value(b));
 }
-/*
-template <class Backend, expression_template_option ExpressionTemplates, class Tag, class A1, class A2, class A3, class A4>
-inline typename enable_if<is_same<number<Backend, ExpressionTemplates>, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>, bool>::type 
-   operator > (const number<Backend, ExpressionTemplates>& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
-{
-   using default_ops::eval_gt;
-   typename detail::expression<Tag, A1, A2, A3, A4>::result_type t(b);
-   return eval_gt(a.backend(), t.backend());
-}
-*/
 template <class Arithmetic, class Backend, expression_template_option ExpressionTemplates>
 inline typename enable_if_c<detail::is_valid_mixed_compare<number<Backend, ExpressionTemplates>, Arithmetic>::value, bool>::type 
    operator > (const Arithmetic& a, const number<Backend, ExpressionTemplates>& b)
@@ -337,16 +266,6 @@ inline typename enable_if_c<detail::is_valid_mixed_compare<typename detail::expr
    result_type t(b);
    return eval_lt(t.backend(), result_type::canonical_value(a));
 }
-/*
-template <class Tag, class A1, class A2, class A3, class A4, class Backend, expression_template_option ExpressionTemplates>
-inline typename enable_if<is_same<number<Backend, ExpressionTemplates>, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>, bool>::type 
-   operator > (const detail::expression<Tag, A1, A2, A3, A4>& a, const number<Backend, ExpressionTemplates>& b)
-{
-   using default_ops::eval_gt;
-   typename detail::expression<Tag, A1, A2, A3, A4>::result_type t(a);
-   return eval_gt(t.backend(), b.backend());
-}
-*/
 template <class Tag, class A1, class A2, class A3, class A4, class Arithmetic>
 inline typename enable_if_c<detail::is_valid_mixed_compare<typename detail::expression<Tag, A1, A2, A3, A4>::result_type, Arithmetic>::value, bool>::type 
    operator > (const detail::expression<Tag, A1, A2, A3, A4>& a, const Arithmetic& b)
@@ -379,16 +298,6 @@ inline typename enable_if_c<detail::is_valid_mixed_compare<number<Backend, Expre
    using default_ops::eval_gt;
    return !eval_gt(a.backend(), number<Backend, ExpressionTemplates>::canonical_value(b));
 }
-/*
-template <class Backend, expression_template_option ExpressionTemplates, class Tag, class A1, class A2, class A3, class A4>
-inline typename enable_if<is_same<number<Backend, ExpressionTemplates>, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>, bool>::type 
-   operator <= (const number<Backend, ExpressionTemplates>& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
-{
-   using default_ops::eval_gt;
-   typename detail::expression<Tag, A1, A2, A3, A4>::result_type t(b);
-   return !eval_gt(a.backend(), t.backend());
-}
-*/
 template <class Arithmetic, class Backend, expression_template_option ExpressionTemplates>
 inline typename enable_if_c<detail::is_valid_mixed_compare<number<Backend, ExpressionTemplates>, Arithmetic>::value, bool>::type 
    operator <= (const Arithmetic& a, const number<Backend, ExpressionTemplates>& b)
@@ -405,16 +314,6 @@ inline typename enable_if_c<detail::is_valid_mixed_compare<typename detail::expr
    result_type t(b);
    return !eval_lt(t.backend(), result_type::canonical_value(a));
 }
-/*
-template <class Tag, class A1, class A2, class A3, class A4, class Backend, expression_template_option ExpressionTemplates>
-inline typename enable_if<is_same<number<Backend, ExpressionTemplates>, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>, bool>::type 
-   operator <= (const detail::expression<Tag, A1, A2, A3, A4>& a, const number<Backend, ExpressionTemplates>& b)
-{
-   using default_ops::eval_gt;
-   typename detail::expression<Tag, A1, A2, A3, A4>::result_type t(a);
-   return !eval_gt(t.backend(), b.backend());
-}
-*/
 template <class Tag, class A1, class A2, class A3, class A4, class Arithmetic>
 inline typename enable_if_c<detail::is_valid_mixed_compare<typename detail::expression<Tag, A1, A2, A3, A4>::result_type, Arithmetic>::value, bool>::type 
    operator <= (const detail::expression<Tag, A1, A2, A3, A4>& a, const Arithmetic& b)
@@ -447,16 +346,6 @@ inline typename enable_if_c<detail::is_valid_mixed_compare<number<Backend, Expre
    using default_ops::eval_lt;
    return !eval_lt(a.backend(), number<Backend, ExpressionTemplates>::canonical_value(b));
 }
-/*
-template <class Backend, expression_template_option ExpressionTemplates, class Tag, class A1, class A2, class A3, class A4>
-inline typename enable_if<is_same<number<Backend, ExpressionTemplates>, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>, bool>::type 
-   operator >= (const number<Backend, ExpressionTemplates>& a, const detail::expression<Tag, A1, A2, A3, A4>& b)
-{
-   using default_ops::eval_lt;
-   typename detail::expression<Tag, A1, A2, A3, A4>::result_type t(b);
-   return !eval_lt(a.backend(), t.backend());
-}
-*/
 template <class Arithmetic, class Backend, expression_template_option ExpressionTemplates>
 inline typename enable_if_c<detail::is_valid_mixed_compare<number<Backend, ExpressionTemplates>, Arithmetic>::value, bool>::type 
    operator >= (const Arithmetic& a, const number<Backend, ExpressionTemplates>& b)
@@ -473,16 +362,6 @@ inline typename enable_if_c<detail::is_valid_mixed_compare<typename detail::expr
    result_type t(b);
    return !eval_gt(t.backend(), result_type::canonical_value(a));
 }
-/*
-template <class Tag, class A1, class A2, class A3, class A4, class Backend, expression_template_option ExpressionTemplates>
-inline typename enable_if<is_same<number<Backend, ExpressionTemplates>, typename detail::expression<Tag, A1, A2, A3, A4>::result_type>, bool>::type 
-   operator >= (const detail::expression<Tag, A1, A2, A3, A4>& a, const number<Backend, ExpressionTemplates>& b)
-{
-   using default_ops::eval_lt;
-   typename detail::expression<Tag, A1, A2, A3, A4>::result_type t(a);
-   return !eval_lt(t.backend(), b.backend());
-}
-*/
 template <class Tag, class A1, class A2, class A3, class A4, class Arithmetic>
 inline typename enable_if_c<detail::is_valid_mixed_compare<typename detail::expression<Tag, A1, A2, A3, A4>::result_type, Arithmetic>::value, bool>::type 
    operator >= (const detail::expression<Tag, A1, A2, A3, A4>& a, const Arithmetic& b)
