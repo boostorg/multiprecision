@@ -1156,15 +1156,10 @@ public:
       typename enable_if_c<
          (MinBits2 <= MinBits)
          && (Signed || !Signed2)
-      >::type* = 0) 
+      >::type* = 0) BOOST_NOEXCEPT
       : base_type()
    {
-       *this = static_cast<
-            typename boost::multiprecision::detail::canonical<
-               typename cpp_int_backend<MinBits2, Signed2, Allocator2, true>::local_limb_type, 
-               cpp_int_backend<MinBits, Signed, void, true> 
-            >::type
-         >(*other.limbs());
+      *this->limbs() = static_cast<typename cpp_int_backend<MinBits, Signed, void, true>::local_limb_type>(*other.limbs());
       this->sign(other.sign());
    }
    template <unsigned MinBits2, bool Signed2, class Allocator2>
@@ -1172,31 +1167,21 @@ public:
       typename disable_if_c<
          (MinBits2 <= MinBits)
          && (Signed || !Signed2)
-      >::type* = 0) 
+      >::type* = 0) BOOST_NOEXCEPT
       : base_type()
    {
-       *this = static_cast<
-            typename boost::multiprecision::detail::canonical<
-               typename cpp_int_backend<MinBits2, Signed2, Allocator2, true>::local_limb_type, 
-               cpp_int_backend<MinBits, Signed, void, true> 
-            >::type
-         >(*other.limbs());
+      *this->limbs() = static_cast<typename cpp_int_backend<MinBits, Signed, void, true>::local_limb_type>(*other.limbs());
       this->sign(other.sign());
    }
    template <unsigned MinBits2, bool Signed2, class Allocator2>
-   cpp_int_backend& operator = (const cpp_int_backend<MinBits2, Signed2, Allocator2, true>& other) 
+   cpp_int_backend& operator = (const cpp_int_backend<MinBits2, Signed2, Allocator2, true>& other)BOOST_NOEXCEPT
    {
-       *this = static_cast<
-            typename boost::multiprecision::detail::canonical<
-               typename cpp_int_backend<MinBits2, Signed2, Allocator2, true>::local_limb_type, 
-               cpp_int_backend<MinBits, Signed, void, true> 
-            >::type
-         >(*other.limbs());
+      *this->limbs() = static_cast<typename cpp_int_backend<MinBits, Signed, void, true>::local_limb_type>(*other.limbs());
       this->sign(other.sign());
       return *this;
    }
    template <unsigned MinBits2, bool Signed2, class Allocator2>
-   explicit cpp_int_backend(const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& other) 
+   explicit cpp_int_backend(const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& other)BOOST_NOEXCEPT
       : base_type()
    {
       // We can only ever copy two limbs from other:
@@ -1209,6 +1194,21 @@ public:
          *this->limbs() = static_cast<double_limb_type>(*other.limbs()) | (static_cast<double_limb_type>(other.limbs()[1]) << (sizeof(limb_type) * CHAR_BIT));
       }
       this->sign(other.sign());
+   }
+   template <unsigned MinBits2, bool Signed2, class Allocator2>
+   cpp_int_backend& operator=(const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& other)BOOST_NOEXCEPT 
+   {
+      // We can only ever copy two limbs from other:
+      if(other.size() == 1)
+      {
+         *this->limbs() = *other.limbs();
+      }
+      else
+      {
+         *this->limbs() = static_cast<double_limb_type>(*other.limbs()) | (static_cast<double_limb_type>(other.limbs()[1]) << (sizeof(limb_type) * CHAR_BIT));
+      }
+      this->sign(other.sign());
+      return *this;
    }
 
    BOOST_FORCEINLINE void swap(cpp_int_backend& o) BOOST_NOEXCEPT

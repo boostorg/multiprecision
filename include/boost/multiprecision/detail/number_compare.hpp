@@ -78,7 +78,7 @@ template <class Num, class Val>
 struct is_valid_mixed_compare : public mpl::false_ {};
 
 template <class B, expression_template_option ET, class Val>
-struct is_valid_mixed_compare<number<B, ET>, Val> : public is_convertible<Val, number<B, ET>> {};
+struct is_valid_mixed_compare<number<B, ET>, Val> : public is_convertible<Val, number<B, ET> > {};
 
 template <class B, expression_template_option ET>
 struct is_valid_mixed_compare<number<B, ET>, number<B, ET> > : public mpl::false_ {};

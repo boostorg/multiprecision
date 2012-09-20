@@ -218,7 +218,7 @@ template <class T1, class T2>
 struct combine_expression
 {
 #ifdef BOOST_NO_DECLTYPE
-   typedef typename mpl::if_c<sizeof(T1) > sizeof(T2) ? T1, T2>::type type;
+   typedef typename mpl::if_c<(sizeof(T1() + T2()) == sizeof(T1)), T1, T2>::type type;
 #else
    typedef decltype(T1() + T2()) type;
 #endif

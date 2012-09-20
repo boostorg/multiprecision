@@ -1383,7 +1383,7 @@ void test_members(Real)
 }
 
 template <class Real>
-void test_members(boost::rational<Real> v)
+void test_members(boost::rational<Real>)
 {
 }
 
