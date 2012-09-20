@@ -41,8 +41,8 @@
 #include <iomanip>
 
 #if defined(TEST_MPF_50)
-template <unsigned N>
-bool is_mpf(const boost::multiprecision::number<boost::multiprecision::gmp_float<N> >&)
+template <unsigned N, boost::multiprecision::expression_template_option ET>
+bool is_mpf(const boost::multiprecision::number<boost::multiprecision::gmp_float<N>, ET>&)
 {  return true;  }
 #endif
 template <class T>

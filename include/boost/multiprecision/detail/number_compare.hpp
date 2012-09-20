@@ -152,14 +152,14 @@ inline typename enable_if_c<detail::is_valid_mixed_compare<number<Backend, Expre
    operator != (const number<Backend, ExpressionTemplates>& a, const Arithmetic& b)
 {
    using default_ops::eval_eq;
-   return !eval_eq(a.backend(), number<Backend>::canonical_value(b));
+   return !eval_eq(a.backend(), number<Backend, et_on>::canonical_value(b));
 }
 template <class Arithmetic, class Backend, expression_template_option ExpressionTemplates>
 inline typename enable_if_c<detail::is_valid_mixed_compare<number<Backend, ExpressionTemplates>, Arithmetic>::value, bool>::type 
    operator != (const Arithmetic& a, const number<Backend, ExpressionTemplates>& b)
 {
    using default_ops::eval_eq;
-   return !eval_eq(b.backend(), number<Backend>::canonical_value(a));
+   return !eval_eq(b.backend(), number<Backend, et_on>::canonical_value(a));
 }
 template <class Arithmetic, class Tag, class A1, class A2, class A3, class A4>
 inline typename enable_if_c<detail::is_valid_mixed_compare<typename detail::expression<Tag, A1, A2, A3, A4>::result_type, Arithmetic>::value, bool>::type 

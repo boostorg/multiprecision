@@ -90,7 +90,7 @@ void hyp0F0(T& H0F0, const T& x)
    typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
 
    BOOST_ASSERT(&H0F0 != &x);
-   long tol = boost::multiprecision::detail::digits2<number<T> >::value;
+   long tol = boost::multiprecision::detail::digits2<number<T, et_on> >::value;
    T t;
 
    T x_pow_n_div_n_fact(x);
@@ -146,7 +146,7 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
    eval_multiply(H1F0, pochham_a, x_pow_n_div_n_fact);
    eval_add(H1F0, si_type(1));
    T lim;
-   eval_ldexp(lim, H1F0, 1 - boost::multiprecision::detail::digits2<number<T> >::value);
+   eval_ldexp(lim, H1F0, 1 - boost::multiprecision::detail::digits2<number<T, et_on> >::value);
    if(eval_get_sign(lim) < 0)
       lim.negate();
 
@@ -154,7 +154,7 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
    T term, part;
 
    // Series expansion of hyperg_1f0(a; ; x).
-   for(n = 2; n < boost::multiprecision::detail::digits2<number<T> >::value + 10; n++)
+   for(n = 2; n < boost::multiprecision::detail::digits2<number<T, et_on> >::value + 10; n++)
    {
       eval_multiply(x_pow_n_div_n_fact, x);
       eval_divide(x_pow_n_div_n_fact, n);
@@ -167,7 +167,7 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
       if(lim.compare(term) >= 0)
          break;
    }
-   if(n >= boost::multiprecision::detail::digits2<number<T> >::value + 10)
+   if(n >= boost::multiprecision::detail::digits2<number<T, et_on> >::value + 10)
       BOOST_THROW_EXCEPTION(std::runtime_error("H1F0 failed to converge"));
 }
 
@@ -193,7 +193,7 @@ void eval_exp(T& result, const T& x)
    bool isneg = eval_get_sign(x) < 0;
    if(type == FP_NAN)
    {
-      result = std::numeric_limits<number<T> >::quiet_NaN().backend();
+      result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
       return;
    }
    else if(type == FP_INFINITE)
@@ -218,7 +218,7 @@ void eval_exp(T& result, const T& x)
       xx.negate();
 
    // Check the range of the argument.
-   static const canonical_exp_type maximum_arg_for_exp = std::numeric_limits<number<T> >::max_exponent == 0 ? (std::numeric_limits<long>::max)() : std::numeric_limits<number<T> >::max_exponent;
+   static const canonical_exp_type maximum_arg_for_exp = std::numeric_limits<number<T, et_on> >::max_exponent == 0 ? (std::numeric_limits<long>::max)() : std::numeric_limits<number<T, et_on> >::max_exponent;
 
    if(xx.compare(maximum_arg_for_exp) >= 0)
    {
@@ -226,7 +226,7 @@ void eval_exp(T& result, const T& x)
       if(isneg)
          result = ui_type(0);
       else
-         result = std::numeric_limits<number<T> >::has_infinity ? std::numeric_limits<number<T> >::infinity().backend() : (std::numeric_limits<number<T> >::max)().backend();
+         result = std::numeric_limits<number<T, et_on> >::has_infinity ? std::numeric_limits<number<T, et_on> >::infinity().backend() : (std::numeric_limits<number<T, et_on> >::max)().backend();
       return;
    }
    if(xx.compare(si_type(1)) <= 0)
@@ -234,7 +234,7 @@ void eval_exp(T& result, const T& x)
       //
       // Use series for exp(x) - 1:
       //
-      T lim = std::numeric_limits<number<T> >::epsilon().backend();
+      T lim = std::numeric_limits<number<T, et_on> >::epsilon().backend();
       unsigned k = 2;
       exp_series = xx;
       result = si_type(1);
@@ -344,7 +344,7 @@ void eval_log(T& result, const T& arg)
    else
       eval_subtract(result, t);
 
-   eval_multiply(lim, result, std::numeric_limits<number<T> >::epsilon().backend());
+   eval_multiply(lim, result, std::numeric_limits<number<T, et_on> >::epsilon().backend());
    if(eval_get_sign(lim) < 0)
       lim.negate();
    INSTRUMENT_BACKEND(lim);
@@ -465,7 +465,7 @@ inline void eval_pow(T& result, const T& x, const T& a)
 
    if((eval_get_sign(x) < 0) && !bo_a_isint)
    {
-      result = std::numeric_limits<number<T> >::quiet_NaN().backend();
+      result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
    }
 
    T t, da;
@@ -564,7 +564,7 @@ namespace detail{
       ui_type k = 1;
 
       T lim(x);
-      eval_ldexp(lim, lim, 1 - boost::multiprecision::detail::digits2<number<T> >::value);
+      eval_ldexp(lim, lim, 1 - boost::multiprecision::detail::digits2<number<T, et_on> >::value);
 
       do
       {

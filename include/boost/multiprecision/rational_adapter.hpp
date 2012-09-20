@@ -213,17 +213,6 @@ inline int eval_get_sign(const rational_adapter<IntBackend>& val)
    return eval_get_sign(val.data().numerator().backend());
 }
 
-template <class IntBackend>
-inline number<IntBackend> numerator(const number<rational_adapter<IntBackend> >& val)
-{
-   return val.backend().data().numerator();
-}
-template <class IntBackend>
-inline number<IntBackend> denominator(const number<rational_adapter<IntBackend> >& val)
-{
-   return val.backend().data().denominator();
-}
-
 template<class IntBackend, class V>
 inline void assign_components(rational_adapter<IntBackend>& result, const V& v1, const V& v2)
 {
@@ -232,6 +221,9 @@ inline void assign_components(rational_adapter<IntBackend>& result, const V& v1,
 
 } // namespace backends
 
+template<class IntBackend>
+struct expression_template_default<backends::rational_adapter<IntBackend> > : public expression_template_default<IntBackend> {};
+   
 template<class IntBackend>
 struct number_category<backends::rational_adapter<IntBackend> > : public mpl::int_<number_kind_rational>{};
 
@@ -242,6 +234,17 @@ struct component_type<rational_adapter<T> >
 {
    typedef number<T> type;
 };
+
+template <class IntBackend, expression_template_option ET>
+inline number<IntBackend, ET> numerator(const number<rational_adapter<IntBackend>, ET>& val)
+{
+   return val.backend().data().numerator();
+}
+template <class IntBackend, expression_template_option ET>
+inline number<IntBackend, ET> denominator(const number<rational_adapter<IntBackend>, ET>& val)
+{
+   return val.backend().data().denominator();
+}
 
 #ifdef BOOST_NO_SFINAE_EXPR
 

@@ -44,6 +44,17 @@
             Changed ExpressionTemplates parameter to class <code class="computeroutput"><span class="identifier">number</span></code>
             to use enumerated values rather than true/false.
           </li>
+<li class="listitem">
+            Changed ExpressionTemplate parameter default value to use a traits class
+            so that the default value depends on the backend used.
+          </li>
+<li class="listitem">
+            Added support for fused-multiply-add/subtract with GMP support.
+          </li>
+<li class="listitem">
+            Tweaked expression template unpacking to use fewer temporaries when the
+            LHS also appears in the RHS.
+          </li>
 </ul></div>
 <h5>
 <a name="boost_multiprecision.map.hist.h1"></a>

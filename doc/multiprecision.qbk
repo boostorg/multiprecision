@@ -340,22 +340,28 @@ The following back-ends provide integer arithmetic:
 
    template <unsigned MinDigits = 0, bool Signed = true, class Allocator = std::allocator<limb_type> >
    class cpp_int_backend;
+   //
+   // Expression templates default to et_off if there is no allocator:
+   //
+   template <unsigned MinDigits, bool Signed>
+   struct expression_template_default<cpp_int_backend<MinDigits, Signed, void> >
+   { static const expression_template_option value = et_off; };
 
-   typedef number<cpp_int_backend<> >           cpp_int;    // arbitrary precision integer
+   typedef number<cpp_int_backend<> >              cpp_int;    // arbitrary precision integer
    typedef rational_adapter<cpp_int_backend<> >    cpp_rational_backend;
-   typedef number<cpp_rational_backend>         cpp_rational; // arbitrary precision rational number
+   typedef number<cpp_rational_backend>            cpp_rational; // arbitrary precision rational number
 
    // Fixed precision unsigned types:
-   typedef number<cpp_int_backend<128, false, void>, et_off>   uint128_t;
-   typedef number<cpp_int_backend<256, false, void>, et_off>   uint256_t;
-   typedef number<cpp_int_backend<512, false, void>, et_off>   uint512_t;
-   typedef number<cpp_int_backend<1024, false, void>, et_off>  uint1024_t;
+   typedef number<cpp_int_backend<128, false, void> >   uint128_t;
+   typedef number<cpp_int_backend<256, false, void> >   uint256_t;
+   typedef number<cpp_int_backend<512, false, void> >   uint512_t;
+   typedef number<cpp_int_backend<1024, false, void> >  uint1024_t;
 
    // Fixed precision signed types:
-   typedef number<cpp_int_backend<128, true, void>, et_off>    int128_t;
-   typedef number<cpp_int_backend<256, true, void>, et_off>    int256_t;
-   typedef number<cpp_int_backend<512, true, void>, et_off>    int512_t;
-   typedef number<cpp_int_backend<1024, true, void>, et_off>   int1024_t;
+   typedef number<cpp_int_backend<128, true, void> >    int128_t;
+   typedef number<cpp_int_backend<256, true, void> >    int256_t;
+   typedef number<cpp_int_backend<512, true, void> >    int512_t;
+   typedef number<cpp_int_backend<1024, true, void> >   int1024_t;
 
    }} // namespaces
 
@@ -1109,7 +1115,12 @@ The following example searches for a prime `p` for which `(p-1)/2` is also proba
 
    namespace boost{ namespace multiprecision{
 
-   template <class Backend, expression_template_option ExpressionTemplates = true>
+   enum expression_template_option { et_on = 1, et_off = 0 };
+
+   template <class Backend> struct expression_template_default 
+   { static const expression_template_option value = et_on; };
+
+   template <class Backend, expression_template_option ExpressionTemplates = expression_template_default<Backend>::value>
    class number
    {
       number();
@@ -1290,14 +1301,26 @@ The following example searches for a prime `p` for which `(p-1)/2` is also proba
 
 [h4 Description]
 
-   template <class Backend, expression_template_option ExpressionTemplates = true>
+   enum expression_template_option { et_on = 1, et_off = 0 };
+
+This enumerated type is used to specify whether expression templates are turned on (et_on) or turned off (et_off).
+
+   template <class Backend> struct expression_template_default 
+   { static const expression_template_option value = et_on; };
+
+This traits class specifies the default expression template option to be used with a particular Backend type.
+It defaults to `et_on`.
+
+   template <class Backend, expression_template_option ExpressionTemplates = expression_template_default<Backend>::value>
    class number;
 
 Class `number` has two template arguments:
 
 [variablelist
 [[Backend][The actual arithmetic back-end that does all the work.]]
-[[ExpressionTemplates][A Boolean value: when true, then expression templates are enabled, otherwise they are disabled.]]
+[[ExpressionTemplates][A Boolean value: when `et_on`, then expression templates are enabled, otherwise when set to `et_off` they are disabled.
+   The default for this parameter is computed via the traits class `expression_template_default` whose member `value` defaults to `et_on` unless
+   the the traits class is specialized for a particular backend.]]
 ]
 
    number();
@@ -1698,22 +1721,28 @@ whose precision can vary at compile time (such as `mpf_float`).
 
    template <unsigned MinBits = 0, bool Signed = true, class Allocator = std::allocator<limb_type> >
    struct cpp_int_backend;
+   //
+   // Expression templates default to et_off if there is no allocator:
+   //
+   template <unsigned MinDigits, bool Signed>
+   struct expression_template_default<cpp_int_backend<MinDigits, Signed, void> >
+   { static const expression_template_option value = et_off; };
 
    typedef number<cpp_int_backend<> >           cpp_int;    // arbitrary precision integer
    typedef rational_adapter<cpp_int_backend<> >    cpp_rational_backend;
    typedef number<cpp_rational_backend>         cpp_rational; // arbitrary precision rational number
 
    // Fixed precision unsigned types:
-   typedef number<cpp_int_backend<128, false, void>, et_off>   uint128_t;
-   typedef number<cpp_int_backend<256, false, void>, et_off>   uint256_t;
-   typedef number<cpp_int_backend<512, false, void>, et_off>   uint512_t;
-   typedef number<cpp_int_backend<1024, false, void>, et_off>  uint1024_t;
+   typedef number<cpp_int_backend<128, false, void> >   uint128_t;
+   typedef number<cpp_int_backend<256, false, void> >   uint256_t;
+   typedef number<cpp_int_backend<512, false, void> >   uint512_t;
+   typedef number<cpp_int_backend<1024, false, void> >  uint1024_t;
 
    // Fixed precision signed types:
-   typedef number<cpp_int_backend<128, true, void>, et_off>    int128_t;
-   typedef number<cpp_int_backend<256, true, void>, et_off>    int256_t;
-   typedef number<cpp_int_backend<512, true, void>, et_off>    int512_t;
-   typedef number<cpp_int_backend<1024, true, void>, et_off>   int1024_t;
+   typedef number<cpp_int_backend<128, true, void> >    int128_t;
+   typedef number<cpp_int_backend<256, true, void> >    int256_t;
+   typedef number<cpp_int_backend<512, true, void> >    int512_t;
+   typedef number<cpp_int_backend<1024, true, void> >   int1024_t;
 
    }} // namespaces
 
@@ -2080,6 +2109,42 @@ of type B2.
 [[`eval_multiply(b, a, cb)`][`void`][Multiplies `a` by `cb` and stores the result in `b`.  The type of `a` shall be listed in one of the type lists
             `B::signed_types`, `B::unsigned_types` or `B::float_types`.
             When not provided, does the equivalent of `eval_multiply(b, cb, a)`.][[space]]]
+[[`eval_multiply_add(b, cb, cb2)`][`void`][Multiplies `cb` by `cb2` and adds the result to `b`.
+            When not provided does the equivalent of creating a temporary `B t` and `eval_multiply(t, cb, cb2)` followed by
+            `eval_add(b, t)`.][[space]]]
+[[`eval_multiply_add(b, cb, a)`][`void`][Multiplies `a` by `cb` and adds the result to `b`.
+            The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.
+            When not provided does the equivalent of creating a temporary `B t` and `eval_multiply(t, cb, a)` followed by
+            `eval_add(b, t)`.][[space]]]
+[[`eval_multiply_add(b, a, cb)`][`void`][Multiplies `a` by `cb` and adds the result to `b`.
+            The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.
+            When not provided does the equivalent of  `eval_multiply_add(b, cb, a)`.][[space]]]
+[[`eval_multiply_subtract(b, cb, cb2)`][`void`][Multiplies `cb` by `cb2` and subtracts the result from `b`.
+            When not provided does the equivalent of creating a temporary `B t` and `eval_multiply(t, cb, cb2)` followed by
+            `eval_subtract(b, t)`.][[space]]]
+[[`eval_multiply_subtract(b, cb, a)`][`void`][Multiplies `a` by `cb` and subtracts the result from `b`.
+            The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.
+            When not provided does the equivalent of creating a temporary `B t` and `eval_multiply(t, cb, a)` followed by
+            `eval_subtract(b, t)`.][[space]]]
+[[`eval_multiply_subtract(b, a, cb)`][`void`][Multiplies `a` by `cb` and subtracts the result from `b`.
+            The type of `a` shall be listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.
+            When not provided does the equivalent of  `eval_multiply_subtract(b, cb, a)`.][[space]]]
+[[`eval_multiply_add(b, cb, cb2, cb3)`][`void`][Multiplies `cb` by `cb2` and adds the result to `cb3` storing the result in `b`.
+            When not provided does the equivalent of `eval_multiply(b, cb, cb2)` followed by
+            `eval_add(b, cb3)`.
+            For brevity, only a version showing all arguments of type `B` is shown here, but you can replace up to any 2 of
+            `cb`, `cb2` and `cb3` with any type type listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.][[space]]]
+[[`eval_multiply_subtract(b, cb, cb2, cb3)`][`void`][Multiplies `cb` by `cb2` and subtracts from the result `cb3` storing the result in `b`.
+            When not provided does the equivalent of `eval_multiply(b, cb, cb2)` followed by
+            `eval_subtract(b, cb3)`.
+            For brevity, only a version showing all arguments of type `B` is shown here, but you can replace up to any 2 of
+            `cb`, `cb2` and `cb3` with any type type listed in one of the type lists
+            `B::signed_types`, `B::unsigned_types` or `B::float_types`.][[space]]]
 [[`eval_divide(b, a)`][`void`][Divides `b` by `a`.  The type of `a` shall be listed in one of the type lists
             `B::signed_types`, `B::unsigned_types` or `B::float_types`.
             When not provided, the default version calls `eval_divide(b, B(a))`]
@@ -2665,6 +2730,9 @@ Windows Vista machine.
 * Removed "mp_" prefix from types.
 * Allowed mixed precision arithmetic.
 * Changed ExpressionTemplates parameter to class `number` to use enumerated values rather than true/false.
+* Changed ExpressionTemplate parameter default value to use a traits class so that the default value depends on the backend used.
+* Added support for fused-multiply-add/subtract with GMP support.
+* Tweaked expression template unpacking to use fewer temporaries when the LHS also appears in the RHS.
 
 [h4 Pre-review history]
 
@@ -2706,13 +2774,11 @@ by the user).
 * The use of bool in template parameters could be improved by the use of 
 an enum class which will be more explicit. E.g `enum class expression_template {disabled, enabled};
 enum class sign {unsigned, signed};`  (Partly done 2012/09/15).
-* The ExpresionTemplate parameter could be defaulted to a traits class for more sensible defaults.
 * The performances of mp_number<a_trivial_adaptor<float>, false>respect to 
 float and mp_number<a_trivial_adaptor<int>, false> and int should be 
 given to show the cost of using the generic interface (Mostly done, just need to update docs to the latest results).
 * The rounding applied when converting must be documented.
 * cpp_dec_float should round to nearest.
-* In a = exp1 op exp2 where a occurs inside one of exp1 or exp2 then we can optimise and eliminate one more temporary.
 * We can reuse temporaries in multiple subtrees (temporary caching).
 * Emphasise in the docs that ET's may reorder operations.
 * Document why we don't use proto (compile times).
@@ -2737,6 +2803,8 @@ contexpr as not all the backends can ensure this (done - we can go quite a way).
 * literals: The library doesn't provide some kind of literals. I think that the 
 mp_number class should provide a way to create literals if the backend 
 is able to.  (Done 2012/09/15).
+* The ExpresionTemplate parameter could be defaulted to a traits class for more sensible defaults (done 2012/09/20).
+* In a = exp1 op exp2 where a occurs inside one of exp1 or exp2 then we can optimise and eliminate one more temporary (done 2012/09/20).
 
 
 
@@ -2744,7 +2812,6 @@ is able to.  (Done 2012/09/15).
 
 * Make fixed precision orthogonal to Allocator type in cpp_int.  Possible solution - add an additional MaxBits 
 template argument that defaults to 0 (meaning keep going till no more space/memory).
-* Add support for fused multiply add (and subtract).  GMP mpz_t could use this.
 * Can ring types (exact floating point types) be supported?  The answer should be yes, but someone needs to write it (Moved to TODO list).
 * Should there be a choice of rounding mode (probably MPFR specific)?  Moved to TODO list.
 * Make the exponent type for cpp_dec_float a templare parameter, maybe include support for big-integer exponents.
@@ -2756,6 +2823,7 @@ Open question - what should be the default - int32_t or int64_t?  (done 2012/09/
 * Can we be clearer in the docs that mixed arithmetic doesn't work (no longer applicable as of 2012/09/06)?
 * Document round functions behaviour better (they behave as in C++11) (added note 2012/09/06).
 * Document limits on size of cpp_dec_float (done 2012/09/06).
+* Add support for fused multiply add (and subtract).  GMP mpz_t could use this (done 2012/09/20).
 
 [endsect]
 

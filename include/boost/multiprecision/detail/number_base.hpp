@@ -20,7 +20,13 @@ enum expression_template_option
    et_on   = 1
 };
 
-template <class Backend, expression_template_option ExpressionTemplates = et_on>
+template <class Backend>
+struct expression_template_default
+{
+   static const expression_template_option value = et_on;
+};
+
+template <class Backend, expression_template_option ExpressionTemplates = expression_template_default<Backend>::value>
 class number;
 
 template <class T>
@@ -180,6 +186,8 @@ struct bitwise_or_immediates{};
 struct bitwise_xor_immediates{};
 struct complement_immediates{};
 struct function{};
+struct multiply_add{};
+struct multiply_subtract{};
 
 template <class T>
 struct backend_type;
@@ -207,7 +215,14 @@ template <class Tag, class Arg1, class Arg2, class Arg3, class Arg4>
 struct is_mp_number_exp<boost::multiprecision::detail::expression<Tag, Arg1, Arg2, Arg3, Arg4> > : public mpl::true_{};
 
 template <class T1, class T2>
-struct combine_expression;
+struct combine_expression
+{
+#ifdef BOOST_NO_DECLTYPE
+   typedef typename mpl::if_c<sizeof(T1) > sizeof(T2) ? T1, T2>::type type;
+#else
+   typedef decltype(T1() + T2()) type;
+#endif
+};
 
 template <class T1, expression_template_option ExpressionTemplates, class T2>
 struct combine_expression<number<T1, ExpressionTemplates>, T2>

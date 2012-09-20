@@ -3059,6 +3059,12 @@ BOOST_FORCEINLINE typename enable_if<is_signed<Integer>, Integer>::type eval_int
 
 } // namespace backends;
 
+template <unsigned MinBits, bool Signed, bool trivial>
+struct expression_template_default<backends::cpp_int_backend<MinBits, Signed, void, trivial> >
+{
+   static const expression_template_option value = et_off;
+};
+
 using boost::multiprecision::backends::cpp_int_backend;
 
 template <unsigned MinBits, bool Signed, class Allocator, bool trivial>
@@ -3069,16 +3075,16 @@ typedef rational_adapter<cpp_int_backend<> >   cpp_rational_backend;
 typedef number<cpp_rational_backend>        cpp_rational;
 
 // Fixed precision unsigned types:
-typedef number<cpp_int_backend<128, false, void>, et_off>   uint128_t;
-typedef number<cpp_int_backend<256, false, void>, et_off>   uint256_t;
-typedef number<cpp_int_backend<512, false, void>, et_off>   uint512_t;
-typedef number<cpp_int_backend<1024, false, void>, et_off>  uint1024_t;
+typedef number<cpp_int_backend<128, false, void> >   uint128_t;
+typedef number<cpp_int_backend<256, false, void> >   uint256_t;
+typedef number<cpp_int_backend<512, false, void> >   uint512_t;
+typedef number<cpp_int_backend<1024, false, void> >  uint1024_t;
 
 // Fixed precision signed types:
-typedef number<cpp_int_backend<128, true, void>, et_off>    int128_t;
-typedef number<cpp_int_backend<256, true, void>, et_off>    int256_t;
-typedef number<cpp_int_backend<512, true, void>, et_off>    int512_t;
-typedef number<cpp_int_backend<1024, true, void>, et_off>   int1024_t;
+typedef number<cpp_int_backend<128, true, void> >    int128_t;
+typedef number<cpp_int_backend<256, true, void> >    int256_t;
+typedef number<cpp_int_backend<512, true, void> >    int512_t;
+typedef number<cpp_int_backend<1024, true, void> >   int1024_t;
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

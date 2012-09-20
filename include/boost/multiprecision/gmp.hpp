@@ -1288,6 +1288,14 @@ inline void eval_add(gmp_int& t, const gmp_int& o)
 {
    mpz_add(t.data(), t.data(), o.data());
 }
+inline void eval_multiply_add(gmp_int& t, const gmp_int& a, const gmp_int& b)
+{
+   mpz_addmul(t.data(), a.data(), b.data());
+}
+inline void eval_multiply_subtract(gmp_int& t, const gmp_int& a, const gmp_int& b)
+{
+   mpz_submul(t.data(), a.data(), b.data());
+}
 inline void eval_subtract(gmp_int& t, const gmp_int& o)
 {
    mpz_sub(t.data(), t.data(), o.data());
@@ -1309,6 +1317,14 @@ inline void eval_modulus(gmp_int& t, const gmp_int& o)
 inline void eval_add(gmp_int& t, unsigned long i)
 {
    mpz_add_ui(t.data(), t.data(), i);
+}
+inline void eval_multiply_add(gmp_int& t, const gmp_int& a, unsigned long i)
+{
+   mpz_addmul_ui(t.data(), a.data(), i);
+}
+inline void eval_multiply_subtract(gmp_int& t, const gmp_int& a, unsigned long i)
+{
+   mpz_submul_ui(t.data(), a.data(), i);
 }
 inline void eval_subtract(gmp_int& t, unsigned long i)
 {
@@ -1334,6 +1350,20 @@ inline void eval_add(gmp_int& t, long i)
       mpz_add_ui(t.data(), t.data(), i);
    else
       mpz_sub_ui(t.data(), t.data(), -i);
+}
+inline void eval_multiply_add(gmp_int& t, const gmp_int& a, long i)
+{
+   if(i > 0)
+      mpz_addmul_ui(t.data(), a.data(), i);
+   else
+      mpz_submul_ui(t.data(), a.data(), -i);
+}
+inline void eval_multiply_subtract(gmp_int& t, const gmp_int& a, long i)
+{
+   if(i > 0)
+      mpz_submul_ui(t.data(), a.data(), i);
+   else
+      mpz_addmul_ui(t.data(), a.data(), -i);
 }
 inline void eval_subtract(gmp_int& t, long i)
 {
@@ -1895,19 +1925,6 @@ inline bool eval_is_zero(const gmp_rational& val)
 {
    return mpq_sgn(val.data()) == 0;
 }
-inline number<gmp_int> numerator(const number<gmp_rational>& val)
-{
-   number<gmp_int> result;
-   mpz_set(result.backend().data(), (mpq_numref(val.backend().data())));
-   return result;
-}
-inline number<gmp_int> denominator(const number<gmp_rational>& val)
-{
-   number<gmp_int> result;
-   mpz_set(result.backend().data(), (mpq_denref(val.backend().data())));
-   return result;
-}
-
 template <class T>
 inline bool eval_eq(gmp_rational& a, const T& b)
 {
@@ -2108,6 +2125,21 @@ struct component_type<number<gmp_rational> >
 {
    typedef number<gmp_int> type;
 };
+
+template <expression_template_option ET>
+inline number<gmp_int, ET> numerator(const number<gmp_rational, ET>& val)
+{
+   number<gmp_int, ET> result;
+   mpz_set(result.backend().data(), (mpq_numref(val.backend().data())));
+   return result;
+}
+template <expression_template_option ET>
+inline number<gmp_int, ET> denominator(const number<gmp_rational, ET>& val)
+{
+   number<gmp_int, ET> result;
+   mpz_set(result.backend().data(), (mpq_denref(val.backend().data())));
+   return result;
+}
 
 #ifdef BOOST_NO_SFINAE_EXPR
 

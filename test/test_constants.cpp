@@ -159,8 +159,8 @@ inline bool is_mpfr(const T&)
    return false;
 }
 #if defined(TEST_MPFR_50)
-template <unsigned N>
-inline bool is_mpfr(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<N> >&)
+template <unsigned N, boost::multiprecision::expression_template_option ET>
+inline bool is_mpfr(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<N>, ET>&)
 {
    return true;
 }

@@ -1085,6 +1085,79 @@ void test_negative_mixed(boost::mpl::true_ const&)
    BOOST_TEST(c == 30);
    c = static_cast<cast_type>(n4) * a;
    BOOST_TEST(c == 50 * 20);
+
+   n1 = -2;
+   n2 = -3;
+   n3 = -4;
+   a = static_cast<cast_type>(n1);
+   b = static_cast<cast_type>(n2);
+   c = static_cast<cast_type>(n3);
+   d = a + b * c;
+   BOOST_TEST(d == -2 + -3 * -4);
+   d = static_cast<cast_type>(n1) + b * c;
+   BOOST_TEST(d == -2 + -3 * -4);
+   d = a + static_cast<cast_type>(n2) * c;
+   BOOST_TEST(d == -2 + -3 * -4);
+   d = a + b * static_cast<cast_type>(n3);
+   BOOST_TEST(d == -2 + -3 * -4);
+   d = static_cast<cast_type>(n1) + static_cast<cast_type>(n2) * c;
+   BOOST_TEST(d == -2 + -3 * -4);
+   d = static_cast<cast_type>(n1) + b * static_cast<cast_type>(n3);
+   BOOST_TEST(d == -2 + -3 * -4);
+   a += static_cast<cast_type>(n2) * c;
+   BOOST_TEST(a == -2 + -3 * -4);
+   a = static_cast<cast_type>(n1);
+   a += b * static_cast<cast_type>(n3);
+   BOOST_TEST(a == -2 + -3 * -4);
+   a = static_cast<cast_type>(n1);
+
+   d = b * c + a;
+   BOOST_TEST(d == -2 + -3 * -4);
+   d = b * c + static_cast<cast_type>(n1);
+   BOOST_TEST(d == -2 + -3 * -4);
+   d = static_cast<cast_type>(n2) * c + a;
+   BOOST_TEST(d == -2 + -3 * -4);
+   d = b * static_cast<cast_type>(n3) + a;
+   BOOST_TEST(d == -2 + -3 * -4);
+   d = static_cast<cast_type>(n2) * c + static_cast<cast_type>(n1);
+   BOOST_TEST(d == -2 + -3 * -4);
+   d = b * static_cast<cast_type>(n3) + static_cast<cast_type>(n1);
+   BOOST_TEST(d == -2 + -3 * -4);
+
+   a = -20;
+   d = a - b * c;
+   BOOST_TEST(d == -20 - -3 * -4);
+   n1 = -20;
+   d = static_cast<cast_type>(n1) - b * c;
+   BOOST_TEST(d == -20 - -3 * -4);
+   d = a - static_cast<cast_type>(n2) * c;
+   BOOST_TEST(d == -20 - -3 * -4);
+   d = a - b * static_cast<cast_type>(n3);
+   BOOST_TEST(d == -20 - -3 * -4);
+   d = static_cast<cast_type>(n1) - static_cast<cast_type>(n2) * c;
+   BOOST_TEST(d == -20 - -3 * -4);
+   d = static_cast<cast_type>(n1) - b * static_cast<cast_type>(n3);
+   BOOST_TEST(d == -20 - -3 * -4);
+   a -= static_cast<cast_type>(n2) * c;
+   BOOST_TEST(a == -20 - -3 * -4);
+   a = static_cast<cast_type>(n1);
+   a -= b * static_cast<cast_type>(n3);
+   BOOST_TEST(a == -20 - -3 * -4);
+
+   a = -2;
+   d = b * c - a;
+   BOOST_TEST(d == -3 * -4 - -2);
+   n1 = -2;
+   d = b * c - static_cast<cast_type>(n1);
+   BOOST_TEST(d == -3 * -4 - -2);
+   d = static_cast<cast_type>(n2) * c - a;
+   BOOST_TEST(d == -3 * -4 - -2);
+   d = b * static_cast<cast_type>(n3) - a;
+   BOOST_TEST(d == -3 * -4 - -2);
+   d = static_cast<cast_type>(n2) * c - static_cast<cast_type>(n1);
+   BOOST_TEST(d == -3 * -4 - -2);
+   d = b * static_cast<cast_type>(n3) - static_cast<cast_type>(n1);
+   BOOST_TEST(d == -3 * -4 - -2);
 }
 
 template <class Real, class Num>
@@ -1209,6 +1282,77 @@ void test_mixed(const boost::mpl::true_&)
    r = static_cast<cast_type>(4 * n4) / Real(4);
    BOOST_TEST(r == static_cast<cast_type>(n4));
    test_negative_mixed<Real, Num>(boost::mpl::bool_<std::numeric_limits<Num>::is_signed>());
+
+   n1 = 2;
+   n2 = 3;
+   n3 = 4;
+   Real a(n1), b(n2), c(n3), d;
+   d = a + b * c;
+   BOOST_TEST(d == 2 + 3 * 4);
+   d = static_cast<cast_type>(n1) + b * c;
+   BOOST_TEST(d == 2 + 3 * 4);
+   d = a + static_cast<cast_type>(n2) * c;
+   BOOST_TEST(d == 2 + 3 * 4);
+   d = a + b * static_cast<cast_type>(n3);
+   BOOST_TEST(d == 2 + 3 * 4);
+   d = static_cast<cast_type>(n1) + static_cast<cast_type>(n2) * c;
+   BOOST_TEST(d == 2 + 3 * 4);
+   d = static_cast<cast_type>(n1) + b * static_cast<cast_type>(n3);
+   BOOST_TEST(d == 2 + 3 * 4);
+   a += static_cast<cast_type>(n2) * c;
+   BOOST_TEST(a == 2 + 3 * 4);
+   a = static_cast<cast_type>(n1);
+   a += b * static_cast<cast_type>(n3);
+   BOOST_TEST(a == 2 + 3 * 4);
+   a = static_cast<cast_type>(n1);
+
+   d = b * c + a;
+   BOOST_TEST(d == 2 + 3 * 4);
+   d = b * c + static_cast<cast_type>(n1);
+   BOOST_TEST(d == 2 + 3 * 4);
+   d = static_cast<cast_type>(n2) * c + a;
+   BOOST_TEST(d == 2 + 3 * 4);
+   d = b * static_cast<cast_type>(n3) + a;
+   BOOST_TEST(d == 2 + 3 * 4);
+   d = static_cast<cast_type>(n2) * c + static_cast<cast_type>(n1);
+   BOOST_TEST(d == 2 + 3 * 4);
+   d = b * static_cast<cast_type>(n3) + static_cast<cast_type>(n1);
+   BOOST_TEST(d == 2 + 3 * 4);
+
+   a = 20;
+   d = a - b * c;
+   BOOST_TEST(d == 20 - 3 * 4);
+   n1 = 20;
+   d = static_cast<cast_type>(n1) - b * c;
+   BOOST_TEST(d == 20 - 3 * 4);
+   d = a - static_cast<cast_type>(n2) * c;
+   BOOST_TEST(d == 20 - 3 * 4);
+   d = a - b * static_cast<cast_type>(n3);
+   BOOST_TEST(d == 20 - 3 * 4);
+   d = static_cast<cast_type>(n1) - static_cast<cast_type>(n2) * c;
+   BOOST_TEST(d == 20 - 3 * 4);
+   d = static_cast<cast_type>(n1) - b * static_cast<cast_type>(n3);
+   BOOST_TEST(d == 20 - 3 * 4);
+   a -= static_cast<cast_type>(n2) * c;
+   BOOST_TEST(a == 20 - 3 * 4);
+   a = static_cast<cast_type>(n1);
+   a -= b * static_cast<cast_type>(n3);
+   BOOST_TEST(a == 20 - 3 * 4);
+
+   a = 2;
+   d = b * c - a;
+   BOOST_TEST(d == 3 * 4 - 2);
+   n1 = 2;
+   d = b * c - static_cast<cast_type>(n1);
+   BOOST_TEST(d == 3 * 4 - 2);
+   d = static_cast<cast_type>(n2) * c - a;
+   BOOST_TEST(d == 3 * 4 - 2);
+   d = b * static_cast<cast_type>(n3) - a;
+   BOOST_TEST(d == 3 * 4 - a);
+   d = static_cast<cast_type>(n2) * c - static_cast<cast_type>(n1);
+   BOOST_TEST(d == 3 * 4 - 2);
+   d = b * static_cast<cast_type>(n3) - static_cast<cast_type>(n1);
+   BOOST_TEST(d == 3 * 4 - 2);
 }
 
 template <class Real>
@@ -1612,6 +1756,19 @@ void test()
    BOOST_TEST(c == 20 * 30 + 22);
    c = 22 + (a * b);
    BOOST_TEST(c == 20 * 30 + 22);
+   c = 10;
+   ac = a + b * c;
+   BOOST_TEST(ac == 20 + 30 * 10);
+   ac = b * c + a;
+   BOOST_TEST(ac == 20 + 30 * 10);
+   a = a + b * c;
+   BOOST_TEST(a == 20 + 30 * 10);
+   a = 20;
+   b = a + b * c;
+   BOOST_TEST(b == 20 + 30 * 10);
+   b = 30;
+   c = a + b * c;
+   BOOST_TEST(c == 20 + 30 * 10);
 
    //
    // Test conditionals:
@@ -1681,8 +1838,8 @@ int main()
 #endif
 #ifdef TEST_CPP_INT_3
    // Again with "trivial" backends:
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, true, void>, boost::multiprecision::et_off > >();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, false, void>, boost::multiprecision::et_off > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, true, void> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, false, void> > >();
 #endif
 #ifdef TEST_CPP_INT_BR
    test<boost::rational<boost::multiprecision::cpp_int> >();

@@ -23,7 +23,12 @@
       </h5>
 <pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">multiprecision</span><span class="special">{</span>
 
-<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">expression_template_option</span> <span class="identifier">ExpressionTemplates</span> <span class="special">=</span> <span class="keyword">true</span><span class="special">&gt;</span>
+<span class="keyword">enum</span> <span class="identifier">expression_template_option</span> <span class="special">{</span> <span class="identifier">et_on</span> <span class="special">=</span> <span class="number">1</span><span class="special">,</span> <span class="identifier">et_off</span> <span class="special">=</span> <span class="number">0</span> <span class="special">};</span>
+
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span> <span class="keyword">struct</span> <span class="identifier">expression_template_default</span>
+<span class="special">{</span> <span class="keyword">static</span> <span class="keyword">const</span> <span class="identifier">expression_template_option</span> <span class="identifier">value</span> <span class="special">=</span> <span class="identifier">et_on</span><span class="special">;</span> <span class="special">};</span>
+
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">expression_template_option</span> <span class="identifier">ExpressionTemplates</span> <span class="special">=</span> <span class="identifier">expression_template_default</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;::</span><span class="identifier">value</span><span class="special">&gt;</span>
 <span class="keyword">class</span> <span class="identifier">number</span>
 <span class="special">{</span>
    <span class="identifier">number</span><span class="special">();</span>
@@ -206,7 +211,20 @@
 <a name="boost_multiprecision.ref.number.h1"></a>
         <span class="phrase"><a name="boost_multiprecision.ref.number.description"></a></span><a class="link" href="number.html#boost_multiprecision.ref.number.description">Description</a>
       </h5>
-<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">expression_template_option</span> <span class="identifier">ExpressionTemplates</span> <span class="special">=</span> <span class="keyword">true</span><span class="special">&gt;</span>
+<pre class="programlisting"><span class="keyword">enum</span> <span class="identifier">expression_template_option</span> <span class="special">{</span> <span class="identifier">et_on</span> <span class="special">=</span> <span class="number">1</span><span class="special">,</span> <span class="identifier">et_off</span> <span class="special">=</span> <span class="number">0</span> <span class="special">};</span>
+</pre>
+<p>
+        This enumerated type is used to specify whether expression templates are
+        turned on (et_on) or turned off (et_off).
+      </p>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">&gt;</span> <span class="keyword">struct</span> <span class="identifier">expression_template_default</span>
+<span class="special">{</span> <span class="keyword">static</span> <span class="keyword">const</span> <span class="identifier">expression_template_option</span> <span class="identifier">value</span> <span class="special">=</span> <span class="identifier">et_on</span><span class="special">;</span> <span class="special">};</span>
+</pre>
+<p>
+        This traits class specifies the default expression template option to be
+        used with a particular Backend type. It defaults to <code class="computeroutput"><span class="identifier">et_on</span></code>.
+      </p>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">expression_template_option</span> <span class="identifier">ExpressionTemplates</span> <span class="special">=</span> <span class="identifier">expression_template_default</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;::</span><span class="identifier">value</span><span class="special">&gt;</span>
 <span class="keyword">class</span> <span class="identifier">number</span><span class="special">;</span>
 </pre>
 <p>
@@ -222,8 +240,12 @@
             </p></dd>
 <dt><span class="term">ExpressionTemplates</span></dt>
 <dd><p>
-              A Boolean value: when true, then expression templates are enabled,
-              otherwise they are disabled.
+              A Boolean value: when <code class="computeroutput"><span class="identifier">et_on</span></code>,
+              then expression templates are enabled, otherwise when set to <code class="computeroutput"><span class="identifier">et_off</span></code> they are disabled. The default
+              for this parameter is computed via the traits class <code class="computeroutput"><span class="identifier">expression_template_default</span></code>
+              whose member <code class="computeroutput"><span class="identifier">value</span></code>
+              defaults to <code class="computeroutput"><span class="identifier">et_on</span></code> unless
+              the the traits class is specialized for a particular backend.
             </p></dd>
 </dl>
 </div>

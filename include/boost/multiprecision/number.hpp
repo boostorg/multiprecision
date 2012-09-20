@@ -160,9 +160,9 @@ public:
       m_backend = canonical_value(v);
       return *this;
    }
-   template <class Other>
+   template <class Other, expression_template_option ET>
    typename disable_if<boost::multiprecision::detail::is_explicitly_convertible<Other, Backend>, number<Backend, ExpressionTemplates>& >::type 
-      assign(const number<Other>& v)
+      assign(const number<Other, ET>& v)
    {
       //
       // Attempt a generic interconvertion:
@@ -209,6 +209,17 @@ public:
       return *this;
    }
 
+   template <class Arg1, class Arg2, class Arg3, class Arg4>
+   number& operator+=(const detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>& e)
+   {
+      //
+      // Fused multiply-add:
+      //
+      using default_ops::eval_multiply_add;
+      eval_multiply_add(m_backend, canonical_value(e.left_ref()), canonical_value(e.right_ref()));
+      return *this;
+   }
+
    template <class V>
    typename enable_if<boost::is_convertible<V, self_type>, number<Backend, ExpressionTemplates>& >::type 
       operator+=(const V& v)
@@ -246,6 +257,17 @@ public:
    {
       using default_ops::eval_subtract;
       eval_subtract(m_backend, canonical_value(v));
+      return *this;
+   }
+
+   template <class Arg1, class Arg2, class Arg3, class Arg4>
+   number& operator-=(const detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>& e)
+   {
+      //
+      // Fused multiply-subtract:
+      //
+      using default_ops::eval_multiply_subtract;
+      eval_multiply_subtract(m_backend, canonical_value(e.left_ref()), canonical_value(e.right_ref()));
       return *this;
    }
 
@@ -673,6 +695,18 @@ private:
       using default_ops::eval_multiply;
       eval_multiply(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
+   template <class Exp>
+   void do_assign(const Exp& e, const detail::multiply_add&)
+   {
+      using default_ops::eval_multiply_add;
+      eval_multiply_add(m_backend, canonical_value(e.left().value()), canonical_value(e.middle().value()), canonical_value(e.right().value()));
+   }
+   template <class Exp>
+   void do_assign(const Exp& e, const detail::multiply_subtract&)
+   {
+      using default_ops::eval_multiply_subtract;
+      eval_multiply_subtract(m_backend, canonical_value(e.left().value()), canonical_value(e.middle().value()), canonical_value(e.right().value()));
+   }
 
    template <class Exp>
    void do_assign(const Exp& e, const detail::divide_immediates&)
@@ -710,13 +744,13 @@ private:
          // Ignore the right node, it's *this, just add the left:
          do_add(e.left(), typename left_type::tag_type());
       }
-      else if(bl || br)
+      else if(bl && br)
       {
          self_type temp(e);
          temp.m_backend.swap(this->m_backend);
       }
-      else if(left_depth >= right_depth)
-      {
+      else if(bl || (left_depth >= right_depth))
+      { // br is always false, but if bl is true we must take the this branch:
          do_assign(e.left(), typename left_type::tag_type());
          do_add(e.right(), typename right_type::tag_type());
       }
@@ -749,13 +783,13 @@ private:
          do_subtract(e.left(), typename left_type::tag_type());
          m_backend.negate();
       }
-      else if(bl || br)
+      else if(bl && br)
       {
          self_type temp(e);
          temp.m_backend.swap(this->m_backend);
       }
-      else if(left_depth >= right_depth)
-      {
+      else if(bl || (left_depth >= right_depth))
+      { // br is always false, but if bl is true we must take the this branch:
          do_assign(e.left(), typename left_type::tag_type());
          do_subtract(e.right(), typename right_type::tag_type());
       }
@@ -788,13 +822,13 @@ private:
          // Ignore the right node, it's *this, just add the left:
          do_multiplies(e.left(), typename left_type::tag_type());
       }
-      else if(bl || br)
+      else if(bl && br)
       {
          self_type temp(e);
          temp.m_backend.swap(this->m_backend);
       }
-      else if(left_depth >= right_depth)
-      {
+      else if(bl || (left_depth >= right_depth))
+      { // br is always false, but if bl is true we must take the this branch:
          do_assign(e.left(), typename left_type::tag_type());
          do_multiplies(e.right(), typename right_type::tag_type());
       }
@@ -818,7 +852,7 @@ private:
          // Ignore the left node, it's *this, just add the right:
          do_divide(e.right(), typename right_type::tag_type());
       }
-      else if(bl || br)
+      else if(br)
       {
          self_type temp(e);
          temp.m_backend.swap(this->m_backend);
@@ -848,7 +882,7 @@ private:
          // Ignore the left node, it's *this, just add the right:
          do_modulus(e.right(), typename right_type::tag_type());
       }
-      else if(bl || br)
+      else if(br)
       {
          self_type temp(e);
          temp.m_backend.swap(this->m_backend);

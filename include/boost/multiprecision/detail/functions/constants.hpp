@@ -246,7 +246,7 @@ const T& get_constant_ln2()
    static bool b = false;
    if(!b)
    {
-      calc_log2(result, boost::multiprecision::detail::digits2<number<T> >::value);
+      calc_log2(result, boost::multiprecision::detail::digits2<number<T, et_on> >::value);
       b = true;
    }
 
@@ -262,7 +262,7 @@ const T& get_constant_e()
    static bool b = false;
    if(!b)
    {
-      calc_e(result, boost::multiprecision::detail::digits2<number<T> >::value);
+      calc_e(result, boost::multiprecision::detail::digits2<number<T, et_on> >::value);
       b = true;
    }
 
@@ -278,7 +278,7 @@ const T& get_constant_pi()
    static bool b = false;
    if(!b)
    {
-      calc_pi(result, boost::multiprecision::detail::digits2<number<T> >::value);
+      calc_pi(result, boost::multiprecision::detail::digits2<number<T, et_on> >::value);
       b = true;
    }
 

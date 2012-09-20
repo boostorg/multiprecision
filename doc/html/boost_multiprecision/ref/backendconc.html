@@ -1812,6 +1812,235 @@
 <tr>
 <td>
                 <p>
+                  <code class="computeroutput"><span class="identifier">eval_multiply_add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">cb2</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Multiplies <code class="computeroutput"><span class="identifier">cb</span></code> by
+                  <code class="computeroutput"><span class="identifier">cb2</span></code> and adds the
+                  result to <code class="computeroutput"><span class="identifier">b</span></code>. When
+                  not provided does the equivalent of creating a temporary <code class="computeroutput"><span class="identifier">B</span> <span class="identifier">t</span></code>
+                  and <code class="computeroutput"><span class="identifier">eval_multiply</span><span class="special">(</span><span class="identifier">t</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">cb2</span><span class="special">)</span></code> followed by <code class="computeroutput"><span class="identifier">eval_add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">t</span><span class="special">)</span></code>.
+                </p>
+              </td>
+<td>
+                <p>
+                  &#160;
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_multiply_add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Multiplies <code class="computeroutput"><span class="identifier">a</span></code> by
+                  <code class="computeroutput"><span class="identifier">cb</span></code> and adds the
+                  result to <code class="computeroutput"><span class="identifier">b</span></code>. The
+                  type of <code class="computeroutput"><span class="identifier">a</span></code> shall
+                  be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided
+                  does the equivalent of creating a temporary <code class="computeroutput"><span class="identifier">B</span>
+                  <span class="identifier">t</span></code> and <code class="computeroutput"><span class="identifier">eval_multiply</span><span class="special">(</span><span class="identifier">t</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code> followed by <code class="computeroutput"><span class="identifier">eval_add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">t</span><span class="special">)</span></code>.
+                </p>
+              </td>
+<td>
+                <p>
+                  &#160;
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_multiply_add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">a</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Multiplies <code class="computeroutput"><span class="identifier">a</span></code> by
+                  <code class="computeroutput"><span class="identifier">cb</span></code> and adds the
+                  result to <code class="computeroutput"><span class="identifier">b</span></code>. The
+                  type of <code class="computeroutput"><span class="identifier">a</span></code> shall
+                  be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided
+                  does the equivalent of <code class="computeroutput"><span class="identifier">eval_multiply_add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code>.
+                </p>
+              </td>
+<td>
+                <p>
+                  &#160;
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_multiply_subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">cb2</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Multiplies <code class="computeroutput"><span class="identifier">cb</span></code> by
+                  <code class="computeroutput"><span class="identifier">cb2</span></code> and subtracts
+                  the result from <code class="computeroutput"><span class="identifier">b</span></code>.
+                  When not provided does the equivalent of creating a temporary
+                  <code class="computeroutput"><span class="identifier">B</span> <span class="identifier">t</span></code>
+                  and <code class="computeroutput"><span class="identifier">eval_multiply</span><span class="special">(</span><span class="identifier">t</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">cb2</span><span class="special">)</span></code> followed by <code class="computeroutput"><span class="identifier">eval_subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">t</span><span class="special">)</span></code>.
+                </p>
+              </td>
+<td>
+                <p>
+                  &#160;
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_multiply_subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Multiplies <code class="computeroutput"><span class="identifier">a</span></code> by
+                  <code class="computeroutput"><span class="identifier">cb</span></code> and subtracts
+                  the result from <code class="computeroutput"><span class="identifier">b</span></code>.
+                  The type of <code class="computeroutput"><span class="identifier">a</span></code> shall
+                  be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided
+                  does the equivalent of creating a temporary <code class="computeroutput"><span class="identifier">B</span>
+                  <span class="identifier">t</span></code> and <code class="computeroutput"><span class="identifier">eval_multiply</span><span class="special">(</span><span class="identifier">t</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code> followed by <code class="computeroutput"><span class="identifier">eval_subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">t</span><span class="special">)</span></code>.
+                </p>
+              </td>
+<td>
+                <p>
+                  &#160;
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_multiply_subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">a</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Multiplies <code class="computeroutput"><span class="identifier">a</span></code> by
+                  <code class="computeroutput"><span class="identifier">cb</span></code> and subtracts
+                  the result from <code class="computeroutput"><span class="identifier">b</span></code>.
+                  The type of <code class="computeroutput"><span class="identifier">a</span></code> shall
+                  be listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>. When not provided
+                  does the equivalent of <code class="computeroutput"><span class="identifier">eval_multiply_subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">a</span><span class="special">)</span></code>.
+                </p>
+              </td>
+<td>
+                <p>
+                  &#160;
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_multiply_add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">cb2</span><span class="special">,</span> <span class="identifier">cb3</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Multiplies <code class="computeroutput"><span class="identifier">cb</span></code> by
+                  <code class="computeroutput"><span class="identifier">cb2</span></code> and adds the
+                  result to <code class="computeroutput"><span class="identifier">cb3</span></code> storing
+                  the result in <code class="computeroutput"><span class="identifier">b</span></code>.
+                  When not provided does the equivalent of <code class="computeroutput"><span class="identifier">eval_multiply</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">cb2</span><span class="special">)</span></code> followed by <code class="computeroutput"><span class="identifier">eval_add</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb3</span><span class="special">)</span></code>. For brevity, only a version showing
+                  all arguments of type <code class="computeroutput"><span class="identifier">B</span></code>
+                  is shown here, but you can replace up to any 2 of <code class="computeroutput"><span class="identifier">cb</span></code>, <code class="computeroutput"><span class="identifier">cb2</span></code>
+                  and <code class="computeroutput"><span class="identifier">cb3</span></code> with any
+                  type type listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>.
+                </p>
+              </td>
+<td>
+                <p>
+                  &#160;
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">eval_multiply_subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">cb2</span><span class="special">,</span> <span class="identifier">cb3</span><span class="special">)</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="keyword">void</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  Multiplies <code class="computeroutput"><span class="identifier">cb</span></code> by
+                  <code class="computeroutput"><span class="identifier">cb2</span></code> and subtracts
+                  from the result <code class="computeroutput"><span class="identifier">cb3</span></code>
+                  storing the result in <code class="computeroutput"><span class="identifier">b</span></code>.
+                  When not provided does the equivalent of <code class="computeroutput"><span class="identifier">eval_multiply</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb</span><span class="special">,</span> <span class="identifier">cb2</span><span class="special">)</span></code> followed by <code class="computeroutput"><span class="identifier">eval_subtract</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">cb3</span><span class="special">)</span></code>. For brevity, only a version showing
+                  all arguments of type <code class="computeroutput"><span class="identifier">B</span></code>
+                  is shown here, but you can replace up to any 2 of <code class="computeroutput"><span class="identifier">cb</span></code>, <code class="computeroutput"><span class="identifier">cb2</span></code>
+                  and <code class="computeroutput"><span class="identifier">cb3</span></code> with any
+                  type type listed in one of the type lists <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">signed_types</span></code>,
+                  <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">unsigned_types</span></code> or <code class="computeroutput"><span class="identifier">B</span><span class="special">::</span><span class="identifier">float_types</span></code>.
+                </p>
+              </td>
+<td>
+                <p>
+                  &#160;
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
                   <code class="computeroutput"><span class="identifier">eval_divide</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span>
                   <span class="identifier">a</span><span class="special">)</span></code>
                 </p>
