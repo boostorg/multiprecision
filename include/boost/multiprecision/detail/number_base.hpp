@@ -59,15 +59,20 @@ struct is_compatible_arithmetic_type
 
 namespace detail{
 //
-// Workaround for missing abs(long long) on some compilers:
+// Workaround for missing abs(long long) and abs(__int128) on some compilers:
 //
 template <class T>
-typename boost::enable_if<is_arithmetic<T>, T>::type abs(const T& t) BOOST_NOEXCEPT
+typename enable_if_c<(is_signed<T>::value || is_floating_point<T>::value), T>::type abs(T t) BOOST_NOEXCEPT
 {
    return t < 0 ? -t : t;
 }
+template <class T>
+typename enable_if_c<(is_unsigned<T>::value), T>::type abs(T t) BOOST_NOEXCEPT
+{
+   return t;
+}
 
-#define BOOST_MP_USING_ABS using std::abs; using boost::multiprecision::detail::abs;
+#define BOOST_MP_USING_ABS using boost::multiprecision::detail::abs;
 
 //
 // Move support:
@@ -204,15 +209,6 @@ struct backend_type<expression<tag, A1, A2, A3, A4> >
    typedef typename backend_type<typename expression<tag, A1, A2, A3, A4>::result_type>::type type;
 };
 
-
-template <class T>
-struct is_number : public mpl::false_{};
-template <class T, expression_template_option ExpressionTemplates>
-struct is_number<boost::multiprecision::number<T, ExpressionTemplates> > : public mpl::true_{};
-template <class T>
-struct is_mp_number_exp : public mpl::false_{};
-template <class Tag, class Arg1, class Arg2, class Arg3, class Arg4>
-struct is_mp_number_exp<boost::multiprecision::detail::expression<Tag, Arg1, Arg2, Arg3, Arg4> > : public mpl::true_{};
 
 template <class T1, class T2>
 struct combine_expression
@@ -675,6 +671,13 @@ template <class T, expression_template_option ExpressionTemplates>
 struct component_type<number<T, ExpressionTemplates> > : public component_type<T>{};
 template <class tag, class A1, class A2, class A3, class A4>
 struct component_type<detail::expression<tag, A1, A2, A3, A4> > : public component_type<typename detail::expression<tag, A1, A2, A3, A4>::result_type>{};
+
+template <class T>
+struct is_unsigned_number : public mpl::false_{};
+template <class Backend, expression_template_option ExpressionTemplates>
+struct is_unsigned_number<number<Backend, ExpressionTemplates> > : public is_unsigned_number<Backend> {};
+template <class T>
+struct is_signed_number : public mpl::bool_<!is_unsigned_number<T>::value> {};
 
 }} // namespaces
 

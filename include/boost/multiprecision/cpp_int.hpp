@@ -14,40 +14,148 @@
 #include <boost/array.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_floating_point.hpp>
-#include <boost/multiprecision/detail/cpp_int_core.hpp>
+#include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
 #include <boost/multiprecision/rational_adapter.hpp>
 #include <boost/detail/endian.hpp>
+#include <boost/integer/static_min_max.hpp>
+#include <boost/type_traits/common_type.hpp>
+#include <boost/multiprecision/cpp_int/checked.hpp>
 
 namespace boost{
 namespace multiprecision{
+
 namespace backends{
 
 #ifdef BOOST_MSVC
 // warning C4127: conditional expression is constant
 #pragma warning(push)
-#pragma warning(disable:4127 4351)
+#pragma warning(disable:4127 4351 4293)
 #endif
 
-template <unsigned MinBits = 0, bool Signed = true, class Allocator = std::allocator<limb_type>, bool trivial = is_void<Allocator>::value && (MinBits <= sizeof(double_limb_type) * CHAR_BIT) >
+template <unsigned MinBits = 0, unsigned MaxBits = 0, cpp_integer_type SignType = signed_magnitude, cpp_int_check_type Checked = unchecked, class Allocator = std::allocator<limb_type> >
 struct cpp_int_backend;
 
-template <unsigned MinBits = 0, bool Signed = true, class Allocator = std::allocator<limb_type>, bool trivial = false>
+template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator, bool trivial = false>
 struct cpp_int_base;
+//
+// Traits class determines the maximum and minimum precision values:
+//
+template <class T> struct max_precision;
 
-template <class T>
-struct is_trivial_cpp_int;
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial>
-struct is_trivial_cpp_int<cpp_int_backend<MinBits, Signed, Allocator, trivial> >
+template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
+struct max_precision<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >
 {
-   typedef mpl::bool_<trivial> type;
+   static const unsigned value = is_void<Allocator>::value ?
+      static_unsigned_max<MinBits, MaxBits>::value
+      : (((MaxBits >= MinBits) && MaxBits) ? MaxBits : UINT_MAX);
 };
 
-template <unsigned MinBits, bool Signed, class Allocator>
-struct cpp_int_base<MinBits, Signed, Allocator> : private Allocator::template rebind<limb_type>::other
+template <class T> struct min_precision;
+
+template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
+struct min_precision<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >
+{
+   static const unsigned value = (is_void<Allocator>::value ? static_unsigned_max<MinBits, MaxBits>::value : MinBits);
+};
+//
+// Traits class determines whether the number of bits precision requested could fit in a native type,
+// we call this a "trivial" cpp_int:
+//
+template <class T>
+struct is_trivial_cpp_int
+{
+   static const bool value = false;
+};
+
+template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
+struct is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >
+{
+   typedef cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> self;
+   static const bool value = is_void<Allocator>::value && (max_precision<self>::value <= (sizeof(double_limb_type) * CHAR_BIT) - (SignType == signed_packed ? 1 : 0));
+};
+
+template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
+struct is_trivial_cpp_int<cpp_int_base<MinBits, MaxBits, SignType, Checked, Allocator, true> >
+{
+   static const bool value = true;
+};
+
+} // namespace backends
+//
+// Traits class to determine whether a cpp_int_backend is signed or not:
+//
+template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
+struct is_unsigned_number<backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >
+   : public mpl::bool_<(SignType == unsigned_magnitude) || (SignType == unsigned_packed)>{};
+
+namespace backends{
+//
+// Traits class determines whether T should be implicitly convertible to U, or
+// whether the constructor should be made explicit.  The latter happens if we
+// are losing the sign, or have fewer digits precision in the target type:
+//
+template <class T, class U>
+struct is_implicit_cpp_int_conversion;
+
+template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
+struct is_implicit_cpp_int_conversion<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >
+{
+   typedef cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> t1;
+   typedef cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> t2;
+   static const bool value =
+      (is_signed_number<t2>::value || !is_signed_number<t1>::value)
+      && (max_precision<t1>::value <= max_precision<t2>::value);
+};
+
+//
+// Traits class to determine whether operations on a cpp_int may throw:
+//
+template <class T>
+struct is_non_throwing_cpp_int : public mpl::false_{};
+template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType>
+struct is_non_throwing_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, unchecked, void> > : public mpl::true_ {};
+
+//
+// Traits class, determines whether the cpp_int is fixed precision or not:
+//
+template <class T>
+struct is_fixed_precision;
+template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
+struct is_fixed_precision<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >
+   : public mpl::bool_<max_precision<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value != UINT_MAX> {};
+
+namespace detail{
+
+inline void verify_new_size(unsigned new_size, unsigned min_size, const mpl::int_<checked>&)
+{
+   if(new_size < min_size)
+      BOOST_THROW_EXCEPTION(std::overflow_error("Unable to allocate sufficient storage for the value of the result: value overflows the maximum allowable magnitude."));
+}
+inline void verify_new_size(unsigned /*new_size*/, unsigned /*min_size*/, const mpl::int_<unchecked>&){}
+
+template <class U>
+inline void verify_limb_mask(bool b, U limb, U mask, const mpl::int_<checked>&)
+{
+   // When we mask out "limb" with "mask", do we loose bits?  If so it's an overflow error:
+   if(b && (limb & ~mask))
+      BOOST_THROW_EXCEPTION(std::overflow_error("Overflow in cpp_int arithmetic: there is insufficient precision in the target type to hold all of the bits of the result."));
+}
+template <class U>
+inline void verify_limb_mask(bool /*b*/, U /*limb*/, U /*mask*/, const mpl::int_<unchecked>&){}
+
+}
+
+//
+// Now define the various data layouts that are possible as partial specializations of the base class,
+// starting with the default arbitrary precision signed integer type:
+//
+template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class Allocator>
+struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false> : private Allocator::template rebind<limb_type>::other
 {
    typedef typename Allocator::template rebind<limb_type>::other allocator_type;
    typedef typename allocator_type::pointer                      limb_pointer;
    typedef typename allocator_type::const_pointer                const_limb_pointer;
+   typedef mpl::int_<Checked>                                    checked_type;
 
    //
    // Interface invariants:
@@ -65,13 +173,11 @@ public:
    BOOST_STATIC_CONSTANT(unsigned, limb_bits = sizeof(limb_type) * CHAR_BIT);
    BOOST_STATIC_CONSTANT(limb_type, max_limb_value = ~static_cast<limb_type>(0u));
    BOOST_STATIC_CONSTANT(limb_type, sign_bit_mask = 1u << (limb_bits - 1));
-   BOOST_STATIC_CONSTANT(unsigned, internal_limb_count = 
-      MinBits 
-         ? MinBits / limb_bits + (MinBits % limb_bits ? 1 : 0) 
+   BOOST_STATIC_CONSTANT(unsigned, internal_limb_count =
+      MinBits
+         ? MinBits / limb_bits + (MinBits % limb_bits ? 1 : 0)
          : sizeof(limb_data) / sizeof(limb_type));
    BOOST_STATIC_CONSTANT(bool, variable = true);
-
-   BOOST_STATIC_ASSERT_MSG(Signed, "There is curently no support for unsigned arbitrary precision integers.");
 
 private:
    union data_type
@@ -98,14 +204,14 @@ public:
    //
    // Direct construction:
    //
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(limb_type i)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(limb_type i)BOOST_NOEXCEPT
       : m_data(i), m_limbs(1), m_sign(false), m_internal(true) { }
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_limb_type i)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_limb_type i)BOOST_NOEXCEPT
       : m_data(i), m_limbs(1), m_sign(i < 0), m_internal(true) { }
 #if defined(BOOST_LITTLE_ENDIAN)
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT
       : m_data(i), m_limbs(i > max_limb_value ? 2 : 1), m_sign(false), m_internal(true) { }
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT
       : m_data(i), m_limbs(i < 0 ? (-i > max_limb_value ? 2 : 1) : (i > max_limb_value ? 2 : 1)), m_sign(i < 0), m_internal(true) { }
 #endif
    //
@@ -118,9 +224,9 @@ public:
    BOOST_FORCEINLINE const_limb_pointer limbs()const  BOOST_NOEXCEPT { return m_internal ? m_data.la : m_data.ld.data; }
    BOOST_FORCEINLINE unsigned capacity()const  BOOST_NOEXCEPT { return m_internal ? internal_limb_count : m_data.ld.capacity; }
    BOOST_FORCEINLINE bool sign()const  BOOST_NOEXCEPT { return m_sign; }
-   void sign(bool b)  BOOST_NOEXCEPT 
-   { 
-      m_sign = b; 
+   void sign(bool b)  BOOST_NOEXCEPT
+   {
+      m_sign = b;
       // Check for zero value:
       if(m_sign && (m_limbs == 1))
       {
@@ -128,12 +234,19 @@ public:
             m_sign = false;
       }
    }
-   void resize(unsigned new_size)
+   void resize(unsigned new_size, unsigned min_size)
    {
+      static const unsigned max_limbs = MaxBits / (CHAR_BIT * sizeof(limb_type)) + (MaxBits % (CHAR_BIT * sizeof(limb_type)) ? 1 : 0);
+      // We never resize beyond MaxSize:
+      if(new_size > max_limbs)
+         new_size = max_limbs;
+      detail::verify_new_size(new_size, min_size, checked_type());
+      // See if we have enough capacity already:
       unsigned cap = capacity();
       if(new_size > cap)
       {
-         cap = (std::max)(cap * 4, new_size);
+         // Allocate a new buffer and copy everything over:
+         cap = (std::min)((std::max)(cap * 4, new_size), max_limbs);
          limb_pointer pl = allocator().allocate(cap);
          std::copy(limbs(), limbs() + size(), pl);
          if(!m_internal)
@@ -157,12 +270,13 @@ public:
    BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() BOOST_NOEXCEPT : m_data(), m_limbs(1), m_sign(false), m_internal(true) {}
    BOOST_FORCEINLINE cpp_int_base(const cpp_int_base& o) : allocator_type(o), m_limbs(0), m_internal(true)
    {
-      resize(o.size());
+      resize(o.size(), o.size());
       std::copy(o.limbs(), o.limbs() + o.size(), limbs());
       m_sign = o.m_sign;
    }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-   cpp_int_base(cpp_int_base&& o) BOOST_NOEXCEPT : allocator_type(static_cast<Allocator&&>(o)), m_limbs(o.m_limbs), m_sign(o.m_sign), m_internal(o.m_internal) 
+   cpp_int_base(cpp_int_base&& o) BOOST_NOEXCEPT
+      : allocator_type(static_cast<Allocator&&>(o)), m_limbs(o.m_limbs), m_sign(o.m_sign), m_internal(o.m_internal)
    {
       if(m_internal)
       {
@@ -207,7 +321,7 @@ public:
       {
          static_cast<allocator_type&>(*this) = static_cast<const allocator_type&>(o);
          m_limbs = 0;
-         resize(o.size());
+         resize(o.size(), o.size());
          std::copy(o.limbs(), o.limbs() + o.size(), limbs());
          m_sign = o.m_sign;
       }
@@ -224,7 +338,7 @@ public:
    }
    BOOST_FORCEINLINE bool isneg()const BOOST_NOEXCEPT
    {
-      return m_sign; 
+      return m_sign;
    }
    BOOST_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
@@ -235,11 +349,39 @@ public:
    }
 };
 
-template <unsigned MinBits>
-struct cpp_int_base<MinBits, true, void, false>
+#ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
+
+template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class Allocator>
+const unsigned cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false>::limb_bits;
+template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class Allocator>
+const limb_type cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false>::max_limb_value;
+template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class Allocator>
+const limb_type cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false>::sign_bit_mask;
+template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class Allocator>
+const unsigned cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false>::internal_limb_count;
+template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class Allocator>
+const bool cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false>::variable;
+
+#endif
+
+template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class Allocator>
+struct cpp_int_base<MinBits, MaxBits, unsigned_magnitude, Checked, Allocator, false> : private Allocator::template rebind<limb_type>::other
+{
+   //
+   // There is currently no support for unsigned arbitrary precision arithmetic, largely
+   // because it's not clear what subtraction should do:
+   //
+   BOOST_STATIC_ASSERT_MSG(((sizeof(Allocator) == 0) && !is_void<Allocator>::value), "There is curently no support for unsigned arbitrary precision integers.");
+};
+//
+// Fixed precision (i.e. no allocator), signed-magnitude type with limb-usage count:
+//
+template <unsigned MinBits, cpp_int_check_type Checked>
+struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
 {
    typedef limb_type*                      limb_pointer;
    typedef const limb_type*                const_limb_pointer;
+   typedef mpl::int_<Checked>              checked_type;
 
    //
    // Interface invariants:
@@ -272,14 +414,14 @@ public:
    //
    // Direct construction:
    //
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(limb_type i)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(limb_type i)BOOST_NOEXCEPT
       : m_wrapper(i), m_limbs(1), m_sign(false) {}
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_limb_type i)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_limb_type i)BOOST_NOEXCEPT
       : m_wrapper(limb_type(i < 0 ? -i : i)), m_limbs(1), m_sign(i < 0) {}
 #if defined(BOOST_LITTLE_ENDIAN)
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT
       : m_wrapper(i), m_limbs(i > max_limb_value ? 2 : 1), m_sign(false) {}
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT
       : m_wrapper(double_limb_type(i < 0 ? -i : i)), m_limbs(i < 0 ? (-i > max_limb_value ? 2 : 1) : (i > max_limb_value ? 2 : 1)), m_sign(i < 0) {}
 #endif
    //
@@ -290,8 +432,8 @@ public:
    BOOST_FORCEINLINE const_limb_pointer limbs()const BOOST_NOEXCEPT { return m_wrapper.m_data; }
    BOOST_FORCEINLINE bool sign()const BOOST_NOEXCEPT { return m_sign; }
    BOOST_FORCEINLINE void sign(bool b) BOOST_NOEXCEPT
-   { 
-      m_sign = b; 
+   {
+      m_sign = b;
       // Check for zero value:
       if(m_sign && (m_limbs == 1))
       {
@@ -299,13 +441,15 @@ public:
             m_sign = false;
       }
    }
-   BOOST_FORCEINLINE void resize(unsigned new_size) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void resize(unsigned new_size, unsigned min_size) BOOST_NOEXCEPT_IF((Checked == unchecked))
    {
       m_limbs = static_cast<boost::uint16_t>((std::min)(new_size, internal_limb_count));
+      detail::verify_new_size(m_limbs, min_size, checked_type());
    }
-   BOOST_FORCEINLINE void normalize() BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void normalize() BOOST_NOEXCEPT_IF((Checked == unchecked))
    {
       limb_pointer p = limbs();
+      detail::verify_limb_mask(m_limbs == internal_limb_count, p[internal_limb_count-1], upper_limb_mask, checked_type());
       p[internal_limb_count-1] &= upper_limb_mask;
       while((m_limbs-1) && !p[m_limbs - 1])--m_limbs;
       if((m_limbs == 1) && (!*p)) m_sign = false; // zero is always unsigned
@@ -321,7 +465,7 @@ public:
    {
       if(this != &o)
       {
-         resize(o.size());
+         resize(o.size(), o.size());
          std::copy(o.limbs(), o.limbs() + o.size(), limbs());
          m_sign = o.m_sign;
       }
@@ -338,7 +482,7 @@ public:
    }
    BOOST_FORCEINLINE bool isneg()const BOOST_NOEXCEPT
    {
-      return m_sign; 
+      return m_sign;
    }
    BOOST_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
@@ -348,12 +492,29 @@ public:
       std::swap(m_limbs, o.m_limbs);
    }
 };
+#ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
 
-template <unsigned MinBits>
-struct cpp_int_base<MinBits, false, void, false>
+template <unsigned MinBits, cpp_int_check_type Checked>
+const unsigned cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>::limb_bits;
+template <unsigned MinBits, cpp_int_check_type Checked>
+const limb_type cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>::max_limb_value;
+template <unsigned MinBits, cpp_int_check_type Checked>
+const limb_type cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>::sign_bit_mask;
+template <unsigned MinBits, cpp_int_check_type Checked>
+const unsigned cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>::internal_limb_count;
+template <unsigned MinBits, cpp_int_check_type Checked>
+const bool cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>::variable;
+
+#endif
+//
+// Fixed precision (i.e. no allocator), unsigned type with limb-usage count:
+//
+template <unsigned MinBits, cpp_int_check_type Checked>
+struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
 {
    typedef limb_type*                      limb_pointer;
    typedef const limb_type*                const_limb_pointer;
+   typedef mpl::int_<Checked>              checked_type;
 
    //
    // Interface invariants:
@@ -385,14 +546,14 @@ public:
    //
    // Direct construction:
    //
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(limb_type i)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(limb_type i)BOOST_NOEXCEPT
       : m_wrapper(i), m_limbs(1) {}
-   BOOST_FORCEINLINE cpp_int_base(signed_limb_type i)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE cpp_int_base(signed_limb_type i)BOOST_NOEXCEPT
       : m_wrapper(limb_type(i < 0 ? -i : i)), m_limbs(1) { if(i < 0) negate(); }
 #ifdef BOOST_LITTLE_ENDIAN
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT
       : m_wrapper(i), m_limbs(i > max_limb_value ? 2 : 1) {}
-   BOOST_FORCEINLINE cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT
       : m_wrapper(double_limb_type(i < 0 ? -i : i)), m_limbs(i < 0 ? (-i > max_limb_value ? 2 : 1) : (i > max_limb_value ? 2 : 1)) { if(i < 0) negate(); }
 #endif
    //
@@ -403,13 +564,15 @@ public:
    BOOST_FORCEINLINE const_limb_pointer limbs()const BOOST_NOEXCEPT { return m_wrapper.m_data; }
    BOOST_FORCEINLINE BOOST_CONSTEXPR bool sign()const BOOST_NOEXCEPT { return false; }
    BOOST_FORCEINLINE void sign(bool b) BOOST_NOEXCEPT {  if(b) negate(); }
-   BOOST_FORCEINLINE void resize(unsigned new_size) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void resize(unsigned new_size, unsigned min_size) BOOST_NOEXCEPT_IF((Checked == unchecked))
    {
       m_limbs = (std::min)(new_size, internal_limb_count);
+      detail::verify_new_size(m_limbs, min_size, checked_type());
    }
-   BOOST_FORCEINLINE void normalize() BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void normalize() BOOST_NOEXCEPT_IF((Checked == unchecked))
    {
       limb_pointer p = limbs();
+      detail::verify_limb_mask(m_limbs == internal_limb_count, p[internal_limb_count-1], upper_limb_mask, checked_type());
       p[internal_limb_count-1] &= upper_limb_mask;
       while((m_limbs-1) && !p[m_limbs - 1])--m_limbs;
    }
@@ -424,26 +587,36 @@ public:
    {
       if(this != &o)
       {
-         resize(o.size());
+         resize(o.size(), o.size());
          std::copy(o.limbs(), o.limbs() + o.size(), limbs());
       }
    }
-   void negate() BOOST_NOEXCEPT
+private:
+   void check_negate(const mpl::int_<checked>&)
+   {
+      BOOST_THROW_EXCEPTION(std::range_error("Attempt to negate an unsigned number."));
+   }
+   void check_negate(const mpl::int_<unchecked>&){}
+public:
+   void negate() BOOST_NOEXCEPT_IF((Checked == unchecked))
    {
       // Not so much a negate as a complement - this gets called when subtraction
       // would result in a "negative" number:
       unsigned i;
+      if((m_limbs == 1) && (m_wrapper.m_data[0] == 0))
+         return; // negating zero is always zero, and always OK.
+      check_negate(checked_type());
       for(i = m_limbs; i < internal_limb_count; ++i)
          m_wrapper.m_data[i] = 0;
       m_limbs = internal_limb_count;
       for(i = 0; i < internal_limb_count; ++i)
          m_wrapper.m_data[i] = ~m_wrapper.m_data[i];
       normalize();
-      eval_increment(static_cast<cpp_int_backend<MinBits, false, void>& >(*this));
+      eval_increment(static_cast<cpp_int_backend<MinBits, MinBits, unsigned_magnitude, Checked, void>& >(*this));
    }
    BOOST_FORCEINLINE BOOST_CONSTEXPR bool isneg()const BOOST_NOEXCEPT
    {
-      return false; 
+      return false;
    }
    BOOST_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
@@ -452,7 +625,24 @@ public:
       std::swap(m_limbs, o.m_limbs);
    }
 };
+#ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
 
+template <unsigned MinBits, cpp_int_check_type Checked>
+const unsigned cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>::limb_bits;
+template <unsigned MinBits, cpp_int_check_type Checked>
+const limb_type cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>::max_limb_value;
+template <unsigned MinBits, cpp_int_check_type Checked>
+const limb_type cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>::sign_bit_mask;
+template <unsigned MinBits, cpp_int_check_type Checked>
+const unsigned cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>::internal_limb_count;
+template <unsigned MinBits, cpp_int_check_type Checked>
+const bool cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>::variable;
+
+#endif
+//
+// Traits classes to figure out a native type with N bits, these vary from boost::uint_t<N> only
+// because some platforms have native integer types longer than long long, "really long long" anyone??
+//
 template <unsigned N, bool s>
 struct trivial_limb_type_imp
 {
@@ -467,18 +657,16 @@ struct trivial_limb_type_imp<N, true>
 
 template <unsigned N>
 struct trivial_limb_type : public trivial_limb_type_imp<N, N <= sizeof(long long) * CHAR_BIT> {};
-
-#ifdef BOOST_MSVC
-#pragma warning(push)
-#pragma warning(disable:4244 4293) // loss of data in initialization, shift count too large
-#endif
-
-template <unsigned MinBits>
-struct cpp_int_base<MinBits, true, void, true>
+//
+// Backend for fixed precision signed-magnitude type which will fit entirely inside a "double_limb_type":
+//
+template <unsigned MinBits, cpp_int_check_type Checked>
+struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
 {
    typedef typename trivial_limb_type<MinBits>::type  local_limb_type;
    typedef local_limb_type*                           limb_pointer;
    typedef const local_limb_type*                     const_limb_pointer;
+   typedef mpl::int_<Checked>                         checked_type;
 protected:
    BOOST_STATIC_CONSTANT(unsigned, limb_bits = sizeof(local_limb_type) * CHAR_BIT);
    BOOST_STATIC_CONSTANT(local_limb_type, limb_mask = MinBits < limb_bits ? (local_limb_type(1) << MinBits) -1 : (~local_limb_type(0)));
@@ -490,20 +678,42 @@ private:
    // Interface invariants:
    //
    BOOST_STATIC_ASSERT_MSG(MinBits <= sizeof(double_limb_type) * CHAR_BIT, "Template parameter MinBits is inconsistent with the parameter trivial - did you mistakingly try to override the trivial parameter?");
+protected:
+   template <class T>
+   typename disable_if_c<is_integral<T>::value && (sizeof(T) <= sizeof(local_limb_type)), T>::type check_in_range(T val, const mpl::int_<checked>&)
+   {
+      BOOST_MP_USING_ABS
+      typedef typename common_type<T, local_limb_type>::type common_type;
+
+      if(static_cast<common_type>(abs(val)) > static_cast<common_type>(limb_mask))
+         BOOST_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
+      return val;
+   }
+   template <class T, int C>
+   BOOST_CONSTEXPR T check_in_range(T val, const mpl::int_<C>&)
+   {
+      return val;
+   }
+
+   template <class T>
+   BOOST_CONSTEXPR T check_in_range(T val)
+   {
+      return check_in_range(val, checked_type());
+   }
 
 public:
    //
    // Direct construction:
    //
    template <class SI>
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(SI i, typename enable_if<is_signed<SI> >::type const* = 0) BOOST_NOEXCEPT
-      : m_data(i < 0 ? -i : i), m_sign(i < 0) {}
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(SI i, typename enable_if<is_signed<SI> >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+      : m_data(check_in_range(i) < 0 ? static_cast<local_limb_type>(-i) : static_cast<local_limb_type>(i)), m_sign(i < 0) {}
    template <class UI>
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(UI i, typename enable_if<is_unsigned<UI> >::type const* = 0) BOOST_NOEXCEPT
-      : m_data(i), m_sign(false) {}
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(UI i, typename enable_if<is_unsigned<UI> >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+      : m_data(static_cast<local_limb_type>(check_in_range(i))), m_sign(false) {}
    template <class F>
-   BOOST_FORCEINLINE cpp_int_base(F i, typename enable_if<is_floating_point<F> >::type const* = 0) BOOST_NOEXCEPT
-      : m_data(std::fabs(i)), m_sign(i < 0) {}
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(F i, typename enable_if<is_floating_point<F> >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+      : m_data(static_cast<local_limb_type>(std::fabs(check_in_range(i)))), m_sign(i < 0) {}
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
@@ -512,19 +722,23 @@ public:
    BOOST_FORCEINLINE const_limb_pointer limbs()const BOOST_NOEXCEPT { return &m_data; }
    BOOST_FORCEINLINE bool sign()const BOOST_NOEXCEPT { return m_sign; }
    BOOST_FORCEINLINE void sign(bool b) BOOST_NOEXCEPT
-   { 
-      m_sign = b; 
+   {
+      m_sign = b;
       // Check for zero value:
       if(m_sign && !m_data)
       {
          m_sign = false;
       }
    }
-   BOOST_FORCEINLINE void resize(unsigned new_size) BOOST_NOEXCEPT {}
-   BOOST_FORCEINLINE void normalize() BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void resize(unsigned new_size, unsigned min_size)
    {
-      if(!m_data) 
+      detail::verify_new_size(2, min_size, checked_type());
+   }
+   BOOST_FORCEINLINE void normalize() BOOST_NOEXCEPT_IF((Checked == unchecked))
+   {
+      if(!m_data)
          m_sign = false; // zero is always unsigned
+      detail::verify_limb_mask(true, m_data, limb_mask, checked_type());
       m_data &= limb_mask;
    }
 
@@ -547,7 +761,7 @@ public:
    }
    BOOST_FORCEINLINE bool isneg()const BOOST_NOEXCEPT
    {
-      return m_sign; 
+      return m_sign;
    }
    BOOST_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
@@ -555,38 +769,74 @@ public:
       std::swap(m_data, o.m_data);
    }
 };
-
-template <unsigned MinBits>
-struct cpp_int_base<MinBits, false, void, true>
+//
+// Backend for unsigned fixed precision (i.e. no allocator) type which will fit entirely inside a "double_limb_type":
+//
+template <unsigned MinBits, cpp_int_check_type Checked>
+struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
 {
    typedef typename trivial_limb_type<MinBits>::type  local_limb_type;
    typedef local_limb_type*                           limb_pointer;
    typedef const local_limb_type*                     const_limb_pointer;
 private:
    BOOST_STATIC_CONSTANT(unsigned, limb_bits = sizeof(local_limb_type) * CHAR_BIT);
-   BOOST_STATIC_CONSTANT(local_limb_type, limb_mask = MinBits < limb_bits ? (local_limb_type(1) << MinBits) -1 : (~local_limb_type(0)));
+   BOOST_STATIC_CONSTANT(local_limb_type, limb_mask = (~local_limb_type(0)) >> (limb_bits - MinBits));
 
    local_limb_type    m_data;
+
+   typedef mpl::int_<Checked>                          checked_type;
 
    //
    // Interface invariants:
    //
    BOOST_STATIC_ASSERT_MSG(MinBits <= sizeof(double_limb_type) * CHAR_BIT, "Template parameter MinBits is inconsistent with the parameter trivial - did you mistakingly try to override the trivial parameter?");
+protected:
+   template <class T>
+   typename disable_if_c<is_integral<T>::value && (sizeof(T) <= sizeof(local_limb_type)), T>::type check_in_range(T val, const mpl::int_<checked>&, const mpl::true_&)
+   {
+      typedef typename common_type<T, local_limb_type>::type common_type;
+
+      if(static_cast<common_type>(val) > limb_mask)
+         BOOST_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
+   }
+   template <class T>
+   typename disable_if_c<is_integral<T>::value && (sizeof(T) <= sizeof(local_limb_type)), T>::type check_in_range(T val, const mpl::int_<checked>&, const mpl::false_&)
+   {
+      typedef typename common_type<T, local_limb_type>::type common_type;
+
+      if(static_cast<common_type>(val) > limb_mask)
+         BOOST_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
+      if(val < 0)
+         BOOST_THROW_EXCEPTION(std::range_error("The argument to an unsigned cpp_int constructor was negative."));
+      return val;
+   }
+   template <class T, int C, class U>
+   BOOST_FORCEINLINE BOOST_CONSTEXPR T check_in_range(T val, const mpl::int_<C>&, const U&)
+   {
+      return val;
+   }
+
+   template <class T>
+   BOOST_FORCEINLINE BOOST_CONSTEXPR T check_in_range(T val)
+   {
+      return check_in_range(val, checked_type(), is_unsigned<T>());
+   }
 
 public:
    //
    // Direct construction:
    //
    template <class SI>
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(SI i, typename enable_if<is_signed<SI> >::type const* = 0) BOOST_NOEXCEPT
-      : m_data(i < 0 ? 1 + ~static_cast<local_limb_type>(-i) : static_cast<local_limb_type>(i)) {}
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(SI i, typename enable_if<is_signed<SI> >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+      : m_data(check_in_range(i) < 0 ? 1 + ~static_cast<local_limb_type>(-i) : static_cast<local_limb_type>(i)) {}
    template <class UI>
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(UI i, typename enable_if<is_unsigned<UI> >::type const* = 0) BOOST_NOEXCEPT
-      : m_data(i) {}
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(UI i, typename enable_if<is_unsigned<UI> >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+      : m_data(static_cast<local_limb_type>(check_in_range(i))) {}
    template <class F>
-   BOOST_FORCEINLINE cpp_int_base(F i, typename enable_if<is_floating_point<F> >::type const* = 0) BOOST_NOEXCEPT
-      : m_data(std::fabs(i)) 
+   BOOST_FORCEINLINE cpp_int_base(F i, typename enable_if<is_floating_point<F> >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+      : m_data(static_cast<local_limb_type>(std::fabs(i)))
    {
+      check_in_range(i);
       if(i < 0)
          negate();
    }
@@ -602,9 +852,13 @@ public:
       if(b)
          negate();
    }
-   BOOST_FORCEINLINE void resize(unsigned new_size) BOOST_NOEXCEPT {}
-   BOOST_FORCEINLINE void normalize() BOOST_NOEXCEPT 
+   BOOST_FORCEINLINE void resize(unsigned new_size, unsigned min_size)
    {
+      detail::verify_new_size(2, min_size, checked_type());
+   }
+   BOOST_FORCEINLINE void normalize() BOOST_NOEXCEPT_IF((Checked == unchecked))
+   {
+      detail::verify_limb_mask(true, m_data, limb_mask, checked_type());
       m_data &= limb_mask;
    }
 
@@ -622,61 +876,70 @@ public:
    }
    BOOST_FORCEINLINE BOOST_CONSTEXPR bool isneg()const BOOST_NOEXCEPT
    {
-      return false; 
+      return false;
    }
    BOOST_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
       std::swap(m_data, o.m_data);
    }
 };
-
-#ifdef BOOST_MSVC
-#pragma warning(pop)
+//
+// Traits class, lets us know whether type T can be directly converted to the base type,
+// used to enable/disable constructors etc:
+//
+template <class Arg, class Base>
+struct is_allowed_cpp_int_base_conversion : public mpl::if_c<
+      is_same<Arg, limb_type>::value || is_same<Arg, signed_limb_type>::value
+#ifdef BOOST_LITTLE_ENDIAN
+      || is_same<Arg, double_limb_type>::value || is_same<Arg, signed_double_limb_type>::value
 #endif
-
-template <unsigned MinBits, bool Signed, class Allocator>
-const unsigned cpp_int_base<MinBits, Signed, Allocator, false>::limb_bits;
-template <unsigned MinBits, bool Signed, class Allocator>
-const limb_type cpp_int_base<MinBits, Signed, Allocator, false>::max_limb_value;
-template <unsigned MinBits, bool Signed, class Allocator>
-const limb_type cpp_int_base<MinBits, Signed, Allocator, false>::sign_bit_mask;
-template <unsigned MinBits, bool Signed, class Allocator>
-const unsigned cpp_int_base<MinBits, Signed, Allocator, false>::internal_limb_count;
-template <unsigned MinBits, bool Signed, class Allocator>
-const bool cpp_int_base<MinBits, Signed, Allocator, false>::variable;
-
-template <unsigned MinBits>
-const unsigned cpp_int_base<MinBits, true, void, false>::limb_bits;
-template <unsigned MinBits>
-const limb_type cpp_int_base<MinBits, true, void, false>::max_limb_value;
-template <unsigned MinBits>
-const limb_type cpp_int_base<MinBits, true, void, false>::sign_bit_mask;
-template <unsigned MinBits>
-const unsigned cpp_int_base<MinBits, true, void, false>::internal_limb_count;
-template <unsigned MinBits>
-const bool cpp_int_base<MinBits, true, void, false>::variable;
-
-template <unsigned MinBits>
-const unsigned cpp_int_base<MinBits, false, void, false>::limb_bits;
-template <unsigned MinBits>
-const limb_type cpp_int_base<MinBits, false, void, false>::max_limb_value;
-template <unsigned MinBits>
-const limb_type cpp_int_base<MinBits, false, void, false>::sign_bit_mask;
-template <unsigned MinBits>
-const unsigned cpp_int_base<MinBits, false, void, false>::internal_limb_count;
-template <unsigned MinBits>
-const bool cpp_int_base<MinBits, false, void, false>::variable;
-
-template <unsigned MinBits, bool Signed, class Allocator>
-struct cpp_int_backend<MinBits, Signed, Allocator, false> : public cpp_int_base<MinBits, Signed, Allocator, false>
+      || (is_trivial_cpp_int<Base>::value && is_arithmetic<Arg>::value),
+      mpl::true_,
+      mpl::false_
+   >::type
+{};
+//
+// Now the actual backend, normalising parameters passed to the base class:
+//
+template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
+struct cpp_int_backend
+   : public cpp_int_base<
+               min_precision<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value,
+               max_precision<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value,
+               SignType,
+               Checked,
+               Allocator,
+               is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value>
 {
-   typedef cpp_int_backend<MinBits, Signed, Allocator>               self_type;
-   typedef cpp_int_base<MinBits, Signed, Allocator>                  base_type;
-   typedef typename is_trivial_cpp_int<self_type>::type              trivial_tag;
+   typedef cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>    self_type;
+   typedef cpp_int_base<
+               min_precision<self_type>::value,
+               max_precision<self_type>::value,
+               SignType,
+               Checked,
+               Allocator,
+               is_trivial_cpp_int<self_type>::value>                 base_type;
+   typedef mpl::bool_<is_trivial_cpp_int<self_type>::value>          trivial_tag;
 public:
-   typedef mpl::list<signed_limb_type, signed_double_limb_type>      signed_types;
-   typedef mpl::list<limb_type, double_limb_type>                    unsigned_types;
-   typedef mpl::list<long double>                                    float_types;
+   typedef typename mpl::if_<
+      trivial_tag,
+      mpl::list<
+      signed char, short, int, long,
+      long long, signed_double_limb_type>,
+      mpl::list<signed_limb_type, signed_double_limb_type>
+   >::type                                                           signed_types;
+   typedef typename mpl::if_<
+      trivial_tag,
+      mpl::list<unsigned char, unsigned short, unsigned,
+      unsigned long long, double_limb_type>,
+      mpl::list<limb_type, double_limb_type>
+   >::type                                                           unsigned_types;
+   typedef typename mpl::if_<
+      trivial_tag,
+      mpl::list<float, double, long double>,
+      mpl::list<long double>
+   >::type                                                           float_types;
+   typedef mpl::int_<Checked>                                        checked_type;
 
    BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend() BOOST_NOEXCEPT{}
    BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(const cpp_int_backend& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value) : base_type(o) {}
@@ -684,84 +947,207 @@ public:
    BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(cpp_int_backend&& o) BOOST_NOEXCEPT : base_type(static_cast<base_type&&>(o)) {}
 #endif
    //
-   // These are templates, so that only args that are *exactly* the types specified are allowed, and conversions
-   // are not considered.  Without this, conversions may be ambiguous.
+   // Direct construction from arithmetic type:
    //
-   template <class LT>
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(LT i, typename enable_if<is_same<LT, limb_type> >::type const* = 0)BOOST_NOEXCEPT 
+   template <class Arg>
+   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(Arg i, typename enable_if_c<is_allowed_cpp_int_base_conversion<Arg, base_type>::value >::type const* = 0)BOOST_NOEXCEPT_IF((Checked == unchecked))
       : base_type(i) {}
-   template <class SLT>
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(SLT i, typename enable_if<is_same<SLT, signed_limb_type> >::type const* = 0)BOOST_NOEXCEPT 
-      : base_type(i) {}
-#if defined(BOOST_LITTLE_ENDIAN)
-   template <class LT>
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(LT i, typename enable_if<is_same<LT, double_limb_type> >::type const* = 0)BOOST_NOEXCEPT 
-      : base_type(i) {}
-   template <class SLT>
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(SLT i, typename enable_if<is_same<SLT, signed_double_limb_type> >::type const* = 0)BOOST_NOEXCEPT 
-      : base_type(i) {}
-#endif
-   
-   template <unsigned MinBits2, bool Signed2, class Allocator2>
-   cpp_int_backend(const cpp_int_backend<MinBits2, Signed2, Allocator2, true>& other) 
+
+private:
+   template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
+   void do_assign(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other, mpl::true_ const&, mpl::true_ const &)
+   {
+      // Assigning trivial type to trivial type:
+      this->check_in_range(*other.limbs());
+      *this->limbs() = static_cast<typename self_type::local_limb_type>(*other.limbs());
+      this->sign(other.sign());
+      this->normalize();
+   }
+   template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
+   void do_assign(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other, mpl::true_ const&, mpl::false_ const &)
+   {
+      // non-trivial to trivial narrowing conversion:
+      double_limb_type v = *other.limbs();
+      if(other.size() > 1)
+      {
+         v |= static_cast<double_limb_type>(other.limbs()[1]) << bits_per_limb;
+         if((Checked == checked) && (other.size() > 2))
+         {
+            BOOST_THROW_EXCEPTION(std::range_error("Assignment of a cpp_int that is out of range for the target type."));
+         }
+      }
+      *this = v;
+      this->sign(other.sign());
+      this->normalize();
+   }
+   template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
+   void do_assign(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other, mpl::false_ const&, mpl::true_ const &)
+   {
+      // trivial to non-trivial, treat the trivial argument as if it were an unsigned arithmetic type, then set the sign afterwards:
+       *this = static_cast<
+            typename boost::multiprecision::detail::canonical<
+               typename cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>::local_limb_type,
+               cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>
+            >::type
+         >(*other.limbs());
+       this->sign(other.sign());
+   }
+   template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
+   void do_assign(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other, mpl::false_ const&, mpl::false_ const &)
+   {
+      // regular non-trivial to non-trivial assign:
+      this->resize(other.size(), other.size());
+      std::copy(other.limbs(), other.limbs() + (std::min)(other.size(), this->size()), this->limbs());
+      this->sign(other.sign());
+      this->normalize();
+   }
+public:
+   template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
+   cpp_int_backend(
+      const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other,
+      typename enable_if_c<is_implicit_cpp_int_conversion<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>, self_type>::value>::type* = 0)
+      : base_type()
+   {
+      do_assign(
+         other,
+         mpl::bool_<is_trivial_cpp_int<self_type>::value>(),
+         mpl::bool_<is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>());
+   }
+   template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
+   explicit cpp_int_backend(
+      const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other,
+      typename disable_if_c<is_implicit_cpp_int_conversion<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>, self_type>::value>::type* = 0)
+      : base_type()
+   {
+      do_assign(
+         other,
+         mpl::bool_<is_trivial_cpp_int<self_type>::value>(),
+         mpl::bool_<is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>());
+   }
+   template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
+   cpp_int_backend& operator=(
+      const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other)
+   {
+      do_assign(
+         other,
+         mpl::bool_<is_trivial_cpp_int<self_type>::value>(),
+         mpl::bool_<is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>());
+      return *this;
+   }
+#if 0
+   template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, class Allocator2>
+   cpp_int_backend(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2>& other, typename enable_if_c<is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2> >::value >::type* = 0)
       : base_type()
    {
        *this = static_cast<
             typename boost::multiprecision::detail::canonical<
-               typename cpp_int_backend<MinBits2, Signed2, Allocator2, true>::local_limb_type, 
-               cpp_int_backend<MinBits, Signed, Allocator, false> 
+               typename cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2>::local_limb_type,
+               cpp_int_backend<MinBits, MaxBits, SignType, Allocator>
             >::type
          >(*other.limbs());
       this->sign(other.sign());
    }
-   template <unsigned MinBits2, bool Signed2, class Allocator2>
-   cpp_int_backend& operator=(const cpp_int_backend<MinBits2, Signed2, Allocator2, true>& other) 
+   template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, class Allocator2>
+   typename enable_if_c<is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2> >::value, cpp_int_backend&>::type
+    operator=(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2>& other)
    {
        *this = static_cast<
             typename boost::multiprecision::detail::canonical<
-               typename cpp_int_backend<MinBits2, Signed2, Allocator2, true>::local_limb_type, 
-               cpp_int_backend<MinBits, Signed, Allocator, false> 
+               typename cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2>::local_limb_type,
+               cpp_int_backend<MinBits, MaxBits, SignType, Allocator>
             >::type
          >(*other.limbs());
       this->sign(other.sign());
       return *this;
    }
 
-   template <unsigned MinBits2, bool Signed2, class Allocator2>
-   cpp_int_backend(const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& other, 
+   template <unsigned MinBits2, unsigned MaxBits2, bool SignType2, class Allocator2>
+   cpp_int_backend(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2>& other,
       typename enable_if_c<
-         (Signed || !Signed2) 
+         ((is_signed_number<cpp_int_backend<MinBits, MaxBits, SignType, Allocator> >::value || !is_signed_number<cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2> >::value)
          && (!is_void<Allocator>::value || (is_void<Allocator2>::value && (MinBits >= MinBits2)))
-      >::type* = 0) 
+         && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2> >::value
+         && !is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Allocator> >::value)
+      >::type* = 0)
       : base_type()
    {
-      this->resize(other.size());
+      this->resize(other.size(), other_size());
       std::copy(other.limbs(), other.limbs() + (std::min)(other.size(), this->size()), this->limbs());
       this->sign(other.sign());
    }
 
-   template <unsigned MinBits2, bool Signed2, class Allocator2>
-   explicit cpp_int_backend(const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& other, 
-      typename disable_if_c<
-         (Signed || !Signed2) 
-         && (!is_void<Allocator>::value || (is_void<Allocator2>::value && (MinBits >= MinBits2)))
-      >::type* = 0) 
+   template <unsigned MinBits2, unsigned MaxBits2, bool SignType2, class Allocator2>
+   explicit cpp_int_backend(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2>& other,
+      typename enable_if_c<
+         (!((is_signed_number<cpp_int_backend<MinBits, MaxBits, SignType, Allocator> >::value || !is_signed_number<cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2> >::value)
+         && (!is_void<Allocator>::value || (is_void<Allocator2>::value && (MinBits >= MinBits2))))
+         && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2> >::value
+         && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Allocator> >::value)
+      >::type* = 0)
       : base_type()
    {
-      this->resize(other.size());
+      double_limb_type v = *other.limbs();
+      if(other.size() > 1)
+         v |= static_cast<double_limb_type>(other.limbs()[1]) << bits_per_limb;
+      *this = v;
+      this->sign(other.sign());
+   }
+
+   template <unsigned MinBits2, unsigned MaxBits2, bool SignType2, class Allocator2>
+   explicit cpp_int_backend(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2>& other,
+      typename enable_if_c<
+         (!((is_signed_number<cpp_int_backend<MinBits, MaxBits, SignType, Allocator> >::value || !is_signed_number<cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2> >::value))
+         && (!is_void<Allocator>::value || (is_void<Allocator2>::value && (MinBits >= MinBits2)))
+         && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2> >::value
+         && !is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Allocator> >::value)
+      >::type* = 0)
+      : base_type()
+   {
+      this->resize(other.size(), other.size());
       std::copy(other.limbs(), other.limbs() + (std::min)(other.size(), this->size()), this->limbs());
       this->sign(other.sign());
    }
 
-   template <unsigned MinBits2, bool Signed2, class Allocator2>
-   cpp_int_backend& operator=(const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& other)
+   template <unsigned MinBits2, unsigned MaxBits2, bool SignType2, class Allocator2>
+   explicit cpp_int_backend(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2>& other,
+      typename enable_if_c<
+         (!((is_signed_number<cpp_int_backend<MinBits, MaxBits, SignType, Allocator> >::value || !is_signed_number<cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2> >::value))
+         && (!is_void<Allocator>::value || (is_void<Allocator2>::value && (MinBits >= MinBits2)))
+         && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2> >::value
+         && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Allocator> >::value)
+      >::type* = 0)
+      : base_type()
    {
-      this->resize(other.size());
+      double_limb_type v = *other.limbs();
+      if(other.size() > 1)
+         v |= static_cast<double_limb_type>(other.limbs()[1]) << bits_per_limb;
+      *this = v;
+      this->sign(other.sign());
+   }
+
+   template <unsigned MinBits2, unsigned MaxBits2, bool SignType2, class Allocator2>
+   typename enable_if_c<(!is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2> >::value
+         && !is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Allocator> >::value), cpp_int_backend&>::type
+      operator=(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2>& other)
+   {
+      this->resize(other.size(), other.size());
       std::copy(other.limbs(), other.limbs() + (std::min)(other.size(), this->size()), this->limbs());
       this->sign(other.sign());
       return *this;
    }
 
+   template <unsigned MinBits2, unsigned MaxBits2, bool SignType2, class Allocator2>
+   typename enable_if_c<(!is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2> >::value
+         && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Allocator> >::value), cpp_int_backend&>::type
+      operator=(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2>& other)
+   {
+      double_limb_type v = *other.limbs();
+      if(other.size() > 1)
+         v |= static_cast<double_limb_type>(other.limbs()[1]) << bits_per_limb;
+      *this = v;
+      this->sign(other.sign());
+   }
+#endif
    BOOST_FORCEINLINE cpp_int_backend& operator = (const cpp_int_backend& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
    {
       this->assign(o);
@@ -774,32 +1160,45 @@ public:
       return *this;
    }
 #endif
-   BOOST_FORCEINLINE cpp_int_backend& operator = (limb_type i) BOOST_NOEXCEPT
+private:
+   template <class A>
+   typename enable_if<is_unsigned<A> >::type do_assign_arithmetic(A val, const mpl::true_&)
    {
-      this->resize(1);
+      this->check_in_range(val);
+      *this->limbs() = static_cast<typename self_type::local_limb_type>(val);
+      this->normalize();
+   }
+   template <class A>
+   typename disable_if<is_unsigned<A> >::type do_assign_arithmetic(A val, const mpl::true_&)
+   {
+      this->check_in_range(val);
+      *this->limbs() = (val < 0) ? static_cast<typename self_type::local_limb_type>(-val) : static_cast<typename self_type::local_limb_type>(val);
+      this->sign(val < 0);
+      this->normalize();
+   }
+   BOOST_FORCEINLINE void do_assign_arithmetic(limb_type i, const mpl::false_&) BOOST_NOEXCEPT
+   {
+      this->resize(1, 1);
       *this->limbs() = i;
       this->sign(false);
-      return *this;
    }
-   BOOST_FORCEINLINE cpp_int_backend& operator = (signed_limb_type i) BOOST_NOEXCEPT
+   BOOST_FORCEINLINE void do_assign_arithmetic(signed_limb_type i, const mpl::false_&) BOOST_NOEXCEPT
    {
-      this->resize(1);
+      this->resize(1, 1);
       *this->limbs() = static_cast<limb_type>(std::abs(i));
       this->sign(i < 0);
-      return *this;
    }
-   cpp_int_backend& operator = (double_limb_type i) BOOST_NOEXCEPT_IF(MinBits <= sizeof(double_limb_type) * CHAR_BIT)
+   void do_assign_arithmetic(double_limb_type i, const mpl::false_&)
    {
       BOOST_STATIC_ASSERT(sizeof(i) == 2 * sizeof(limb_type));
       BOOST_STATIC_ASSERT(base_type::internal_limb_count >= 2);
       typename base_type::limb_pointer p = this->limbs();
       *p = static_cast<limb_type>(i);
       p[1] = static_cast<limb_type>(i >> base_type::limb_bits);
-      this->resize(p[1] ? 2 : 1);
+      this->resize(p[1] ? 2 : 1, p[1] ? 2 : 1);
       this->sign(false);
-      return *this;
    }
-   cpp_int_backend& operator = (signed_double_limb_type i) BOOST_NOEXCEPT_IF(MinBits <= sizeof(signed_double_limb_type) * CHAR_BIT)
+   void do_assign_arithmetic(signed_double_limb_type i, const mpl::false_&)
    {
       BOOST_STATIC_ASSERT(sizeof(i) == 2 * sizeof(limb_type));
       BOOST_STATIC_ASSERT(base_type::internal_limb_count >= 2);
@@ -814,12 +1213,11 @@ public:
       typename base_type::limb_pointer p = this->limbs();
       *p = static_cast<limb_type>(i);
       p[1] = static_cast<limb_type>(i >> base_type::limb_bits);
-      this->resize(p[1] ? 2 : 1);
+      this->resize(p[1] ? 2 : 1, p[1] ? 2 : 1);
       this->sign(s);
-      return *this;
    }
 
-   cpp_int_backend& operator = (long double a) BOOST_NOEXCEPT_IF(MinBits <= sizeof(long double) * CHAR_BIT)
+   void do_assign_arithmetic(long double a, const mpl::false_&)
    {
       using default_ops::eval_add;
       using default_ops::eval_subtract;
@@ -828,11 +1226,11 @@ public:
       using std::floor;
 
       if (a == 0) {
-         return *this = static_cast<limb_type>(0u);
+         *this = static_cast<limb_type>(0u);
       }
 
       if (a == 1) {
-         return *this = static_cast<limb_type>(1u);
+         *this = static_cast<limb_type>(1u);
       }
 
       BOOST_ASSERT(!(boost::math::isinf)(a));
@@ -863,9 +1261,67 @@ public:
          eval_left_shift(*this, e);
       else if(e < 0)
          eval_right_shift(*this, -e);
+   }
+public:
+   template <class Arithmetic>
+   BOOST_FORCEINLINE cpp_int_backend& operator = (Arithmetic val)
+   {
+      do_assign_arithmetic(val, trivial_tag());
       return *this;
    }
-   cpp_int_backend& operator = (const char* s)
+private:
+   void do_assign_string(const char* s, const mpl::true_&)
+   {
+      std::size_t n = s ? std::strlen(s) : 0;
+      *this->limbs() = 0;
+      unsigned radix = 10;
+      bool isneg = false;
+      if(n && (*s == '-'))
+      {
+         --n;
+         ++s;
+         isneg = true;
+      }
+      if(n && (*s == '0'))
+      {
+         if((n > 1) && ((s[1] == 'x') || (s[1] == 'X')))
+         {
+            radix = 16;
+            s +=2;
+            n -= 2;
+         }
+         else
+         {
+            radix = 8;
+            n -= 1;
+         }
+      }
+      if(n)
+      {
+         unsigned val;
+         while(*s)
+         {
+            if(*s >= '0' && *s <= '9')
+               val = *s - '0';
+            else if(*s >= 'a' && *s <= 'f')
+               val = 10 + *s - 'a';
+            else if(*s >= 'A' && *s <= 'F')
+               val = 10 + *s - 'A';
+            else
+               val = radix + 1;
+            if(val > radix)
+            {
+               BOOST_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
+            }
+            *this->limbs() = detail::checked_multiply(*this->limbs(), static_cast<typename base_type::local_limb_type>(radix), checked_type());
+            *this->limbs() = detail::checked_add(*this->limbs(), static_cast<typename base_type::local_limb_type>(val), checked_type());
+            ++s;
+         }
+      }
+      if(isneg)
+         this->negate();
+   }
+   void do_assign_string(const char* s, const mpl::false_&)
    {
       using default_ops::eval_multiply;
       using default_ops::eval_add;
@@ -961,14 +1417,121 @@ public:
       }
       if(isneg)
          this->negate();
+   }
+public:
+   cpp_int_backend& operator = (const char* s)
+   {
+      do_assign_string(s, trivial_tag());
       return *this;
    }
    BOOST_FORCEINLINE void swap(cpp_int_backend& o) BOOST_NOEXCEPT
    {
       this->do_swap(o);
    }
-   std::string str(std::streamsize /*digits*/, std::ios_base::fmtflags f)const
+private:
+   std::string do_get_trivial_string(std::ios_base::fmtflags f, const mpl::false_&)const
    {
+      if(this->sign() && (((f & std::ios_base::hex) == std::ios_base::hex) || ((f & std::ios_base::oct) == std::ios_base::oct)))
+         BOOST_THROW_EXCEPTION(std::runtime_error("Base 8 or 16 printing of negative numbers is not supported."));
+      std::stringstream ss;
+      ss.flags(f & ~std::ios_base::showpos);
+      ss << *this->limbs();
+      std::string result;
+      if(this->sign())
+         result += '-';
+      else if(f & std::ios_base::showpos)
+         result += '+';
+      result += ss.str();
+      return result;
+   }
+   std::string do_get_trivial_string(std::ios_base::fmtflags f, const mpl::true_&)const
+   {
+      // Even though we have only one limb, we can't do IO on it :-(
+      int base = 10;
+      if((f & std::ios_base::oct) == std::ios_base::oct)
+         base = 8;
+      else if((f & std::ios_base::hex) == std::ios_base::hex)
+         base = 16;
+      std::string result;
+
+      unsigned Bits = base_type::limb_bits;
+
+      if(base == 8 || base == 16)
+      {
+         if(this->sign())
+            BOOST_THROW_EXCEPTION(std::runtime_error("Base 8 or 16 printing of negative numbers is not supported."));
+         limb_type shift = base == 8 ? 3 : 4;
+         limb_type mask = static_cast<limb_type>((1u << shift) - 1);
+         typename base_type::local_limb_type v = *this->limbs();
+         result.assign(Bits / shift + (Bits % shift ? 1 : 0), '0');
+         int pos = result.size() - 1;
+         for(unsigned i = 0; i < Bits / shift; ++i)
+         {
+            char c = '0' + static_cast<char>(v & mask);
+            if(c > '9')
+               c += 'A' - '9' - 1;
+            result[pos--] = c;
+            v >>= shift;
+         }
+         if(Bits % shift)
+         {
+            mask = static_cast<limb_type>((1u << (Bits % shift)) - 1);
+            char c = '0' + static_cast<char>(v & mask);
+            if(c > '9')
+               c += 'A' - '9';
+            result[pos] = c;
+         }
+         //
+         // Get rid of leading zeros:
+         //
+         std::string::size_type n = result.find_first_not_of('0');
+         if(!result.empty() && (n == std::string::npos))
+            n = result.size() - 1;
+         result.erase(0, n);
+         if(f & std::ios_base::showbase)
+         {
+            const char* pp = base == 8 ? "0" : "0x";
+            result.insert(0, pp);
+         }
+      }
+      else
+      {
+         result.assign(Bits / 3 + 1, '0');
+         int pos = result.size() - 1;
+         typename base_type::local_limb_type v(*this->limbs());
+         bool neg = false;
+         if(this->sign())
+         {
+            neg = true;
+         }
+         while(v)
+         {
+            result[pos] = (v % 10) + '0';
+            --pos;
+            v /= 10;
+         }
+         unsigned n = result.find_first_not_of('0');
+         result.erase(0, n);
+         if(result.empty())
+            result = "0";
+         if(neg)
+            result.insert(0, 1, '-');
+         else if(f & std::ios_base::showpos)
+            result.insert(0, 1, '+');
+      }
+      return result;
+   }
+   std::string do_get_string(std::ios_base::fmtflags f, const mpl::true_&)const
+   {
+#ifdef BOOST_MP_NO_DOUBLE_LIMB_TYPE_IO
+      return do_get_trivial_string(f, mpl::bool_<is_same<typename base_type::local_limb_type, double_limb_type>::value>());
+#else
+      return do_get_trivial_string(f, mpl::bool_<false>());
+#endif
+   }
+   std::string do_get_string(std::ios_base::fmtflags f, const mpl::false_&)const
+   {
+      using default_ops::eval_get_sign;
       int base = 10;
       if((f & std::ios_base::oct) == std::ios_base::oct)
          base = 8;
@@ -1063,21 +1626,69 @@ public:
       }
       return result;
    }
-   template <unsigned MinBits2, bool Signed2, class Allocator2>
-   int compare(const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& o)const BOOST_NOEXCEPT
+public:
+   std::string str(std::streamsize /*digits*/, std::ios_base::fmtflags f)const
+   {
+      return do_get_string(f, trivial_tag());
+   }
+   template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
+   typename enable_if_c<
+      !is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value,
+      int
+   >::type compare(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o)const BOOST_NOEXCEPT
    {
       if(this->sign() != o.sign())
          return this->sign() ? -1 : 1;
-      int result = 0;
+
       // Only do the compare if the same sign:
-      result = compare_unsigned(o);
+      int result = compare_unsigned(o);
 
       if(this->sign())
          result = -result;
       return result;
    }
-   template <unsigned MinBits2, bool Signed2, class Allocator2>
-   int compare_unsigned(const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& o)const BOOST_NOEXCEPT
+   template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
+   typename enable_if_c<
+      is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value,
+      int
+   >::type compare(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o)const
+   {
+      cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> t(*this);
+      return t.compare(o);
+   }
+   template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
+   typename enable_if_c<
+      !is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value && is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value,
+      int
+   >::type compare(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o)const
+   {
+      cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> t(o);
+      return compare(t);
+   }
+   template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
+   typename enable_if_c<
+      is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value && is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value,
+      int
+   >::type compare(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o)const BOOST_NOEXCEPT
+   {
+      if(this->sign())
+      {
+         if(o.sign())
+         {
+            return *this->limbs() < *o.limbs() ? 1 : (*this->limbs() > *o.limbs() ? -1 : 0);
+         }
+         else
+            return -1;
+      }
+      else
+      {
+         if(o.sign())
+            return 1;
+         return *this->limbs() < *o.limbs() ? -1 : (*this->limbs() > *o.limbs() ? 1 : 0);
+      }
+   }
+   template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
+   int compare_unsigned(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o)const BOOST_NOEXCEPT
    {
       if(this->size() != o.size())
       {
@@ -1093,7 +1704,7 @@ public:
       return 0;
    }
    template <class Arithmetic>
-   BOOST_FORCEINLINE typename enable_if<is_arithmetic<Arithmetic>, int>::type compare(Arithmetic i)const BOOST_NOEXCEPT
+   BOOST_FORCEINLINE typename enable_if<is_arithmetic<Arithmetic>, int>::type compare(Arithmetic i)const
    {
       // braindead version:
       cpp_int_backend t;
@@ -1102,2363 +1713,72 @@ public:
    }
 };
 
-template <unsigned MinBits, bool Signed>
-struct cpp_int_backend<MinBits, Signed, void, true> : public cpp_int_base<MinBits, Signed, void, true>
-{
-public:
-   typedef cpp_int_backend<MinBits, Signed, void, true>              self_type;
-   typedef cpp_int_base<MinBits, Signed, void, true>                 base_type;
-   typedef typename is_trivial_cpp_int<self_type>::type              trivial_tag;
-   typedef mpl::list<
-      signed char, short, int, long, 
-      long long, signed_double_limb_type>                            signed_types;
-   typedef mpl::list<unsigned char, unsigned short, unsigned,
-      unsigned long long, double_limb_type>                          unsigned_types;
-   typedef mpl::list<float, double, long double>                     float_types;
+} // namespace backends
 
-   BOOST_STATIC_CONSTANT(unsigned, limb_bits = sizeof(typename base_type::local_limb_type) * CHAR_BIT);
-
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend() BOOST_NOEXCEPT{}
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(const cpp_int_backend& o) BOOST_NOEXCEPT : base_type(o) {}
-   BOOST_FORCEINLINE cpp_int_backend& operator = (const cpp_int_backend& o) BOOST_NOEXCEPT
-   {
-      this->assign(o);
-      return *this;
-   }
-
-   template <class A>
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(A i, typename enable_if<is_arithmetic<A> >::type const* = 0) BOOST_NOEXCEPT
-      : base_type(i) {}
-
-   template <class SI>
-   BOOST_FORCEINLINE typename enable_if<is_signed<SI>, cpp_int_backend&>::type operator = (SI i) BOOST_NOEXCEPT
-   {
-      *this->limbs() = static_cast<typename base_type::local_limb_type>(std::abs(i));
-      this->sign(i < 0);
-      return *this;
-   }
-   template <class UI>
-   BOOST_FORCEINLINE typename enable_if<is_unsigned<UI>, cpp_int_backend&>::type operator = (UI i) BOOST_NOEXCEPT
-   {
-      *this->limbs() = static_cast<typename base_type::local_limb_type>(i);
-      return *this;
-   }
-   template <class F>
-   BOOST_FORCEINLINE typename enable_if<is_floating_point<F>, cpp_int_backend&>::type operator = (F i) BOOST_NOEXCEPT
-   {
-      *this->limbs() = static_cast<typename base_type::local_limb_type>(std::abs(i));
-      this->sign(i < 0);
-      return *this;
-   }
-
-   template <unsigned MinBits2, bool Signed2, class Allocator2>
-   cpp_int_backend(const cpp_int_backend<MinBits2, Signed2, Allocator2, true>& other, 
-      typename enable_if_c<
-         (MinBits2 <= MinBits)
-         && (Signed || !Signed2)
-      >::type* = 0) BOOST_NOEXCEPT
-      : base_type()
-   {
-      *this->limbs() = static_cast<typename cpp_int_backend<MinBits, Signed, void, true>::local_limb_type>(*other.limbs());
-      this->sign(other.sign());
-   }
-   template <unsigned MinBits2, bool Signed2, class Allocator2>
-   explicit cpp_int_backend(const cpp_int_backend<MinBits2, Signed2, Allocator2, true>& other, 
-      typename disable_if_c<
-         (MinBits2 <= MinBits)
-         && (Signed || !Signed2)
-      >::type* = 0) BOOST_NOEXCEPT
-      : base_type()
-   {
-      *this->limbs() = static_cast<typename cpp_int_backend<MinBits, Signed, void, true>::local_limb_type>(*other.limbs());
-      this->sign(other.sign());
-   }
-   template <unsigned MinBits2, bool Signed2, class Allocator2>
-   cpp_int_backend& operator = (const cpp_int_backend<MinBits2, Signed2, Allocator2, true>& other)BOOST_NOEXCEPT
-   {
-      *this->limbs() = static_cast<typename cpp_int_backend<MinBits, Signed, void, true>::local_limb_type>(*other.limbs());
-      this->sign(other.sign());
-      return *this;
-   }
-   template <unsigned MinBits2, bool Signed2, class Allocator2>
-   explicit cpp_int_backend(const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& other)BOOST_NOEXCEPT
-      : base_type()
-   {
-      // We can only ever copy two limbs from other:
-      if(other.size() == 1)
-      {
-         *this->limbs() = *other.limbs();
-      }
-      else
-      {
-         *this->limbs() = static_cast<double_limb_type>(*other.limbs()) | (static_cast<double_limb_type>(other.limbs()[1]) << (sizeof(limb_type) * CHAR_BIT));
-      }
-      this->sign(other.sign());
-   }
-   template <unsigned MinBits2, bool Signed2, class Allocator2>
-   cpp_int_backend& operator=(const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& other)BOOST_NOEXCEPT 
-   {
-      // We can only ever copy two limbs from other:
-      if(other.size() == 1)
-      {
-         *this->limbs() = *other.limbs();
-      }
-      else
-      {
-         *this->limbs() = static_cast<double_limb_type>(*other.limbs()) | (static_cast<double_limb_type>(other.limbs()[1]) << (sizeof(limb_type) * CHAR_BIT));
-      }
-      this->sign(other.sign());
-      return *this;
-   }
-
-   BOOST_FORCEINLINE void swap(cpp_int_backend& o) BOOST_NOEXCEPT
-   {
-      this->do_swap(o);
-   }
-private:
-   std::string str(std::ios_base::fmtflags f, const mpl::false_&)const
-   {
-      std::stringstream ss;
-      ss.flags(f & ~std::ios_base::showpos);
-      ss << *this->limbs();
-      std::string result;
-      if(this->sign())
-         result += '-';
-      else if(f & std::ios_base::showpos)
-         result += '+';
-      result += ss.str();
-      return result;
-   }
-   std::string str(std::ios_base::fmtflags f, const mpl::true_&)const
-   {
-      // Even though we have only one limb, we can't do IO on it :-(
-      int base = 10;
-      if((f & std::ios_base::oct) == std::ios_base::oct)
-         base = 8;
-      else if((f & std::ios_base::hex) == std::ios_base::hex)
-         base = 16;
-      std::string result;
-
-      unsigned Bits = base_type::limb_bits;
-
-      if(base == 8 || base == 16)
-      {
-         if(this->sign())
-            BOOST_THROW_EXCEPTION(std::runtime_error("Base 8 or 16 printing of negative numbers is not supported."));
-         limb_type shift = base == 8 ? 3 : 4;
-         limb_type mask = static_cast<limb_type>((1u << shift) - 1);
-         typename base_type::local_limb_type v = *this->limbs();
-         result.assign(Bits / shift + (Bits % shift ? 1 : 0), '0');
-         int pos = result.size() - 1;
-         for(unsigned i = 0; i < Bits / shift; ++i)
-         {
-            char c = '0' + static_cast<char>(v & mask);
-            if(c > '9')
-               c += 'A' - '9' - 1;
-            result[pos--] = c;
-            v >>= shift;
-         }
-         if(Bits % shift)
-         {
-            mask = static_cast<limb_type>((1u << (Bits % shift)) - 1);
-            char c = '0' + static_cast<char>(v & mask);
-            if(c > '9')
-               c += 'A' - '9';
-            result[pos] = c;
-         }
-         //
-         // Get rid of leading zeros:
-         //
-         std::string::size_type n = result.find_first_not_of('0');
-         if(!result.empty() && (n == std::string::npos))
-            n = result.size() - 1;
-         result.erase(0, n);
-         if(f & std::ios_base::showbase)
-         {
-            const char* pp = base == 8 ? "0" : "0x";
-            result.insert(0, pp);
-         }
-      }
-      else
-      {
-         result.assign(Bits / 3 + 1, '0');
-         int pos = result.size() - 1;
-         typename base_type::local_limb_type v(*this->limbs());
-         bool neg = false;
-         if(this->sign())
-         {
-            neg = true;
-         }
-         while(v)
-         {
-            result[pos] = (v % 10) + '0';
-            --pos;
-            v /= 10;
-         }
-         unsigned n = result.find_first_not_of('0');
-         result.erase(0, n);
-         if(result.empty())
-            result = "0";
-         if(neg)
-            result.insert(0, 1, '-');
-         else if(f & std::ios_base::showpos)
-            result.insert(0, 1, '+');
-      }
-      return result;
-   }
-public:
-   cpp_int_backend& operator = (const char* s)
-   {
-      std::size_t n = s ? std::strlen(s) : 0;
-      *this->limbs() = 0;
-      unsigned radix = 10;
-      bool isneg = false;
-      if(n && (*s == '-'))
-      {
-         --n;
-         ++s;
-         isneg = true;
-      }
-      if(n && (*s == '0'))
-      {
-         if((n > 1) && ((s[1] == 'x') || (s[1] == 'X')))
-         {
-            radix = 16;
-            s +=2;
-            n -= 2;
-         }
-         else
-         {
-            radix = 8;
-            n -= 1;
-         }
-      }
-      if(n)
-      {
-         unsigned val;
-         while(*s)
-         {
-            if(*s >= '0' && *s <= '9')
-               val = *s - '0';
-            else if(*s >= 'a' && *s <= 'f')
-               val = 10 + *s - 'a';
-            else if(*s >= 'A' && *s <= 'F')
-               val = 10 + *s - 'A';
-            else
-               val = radix + 1;
-            if(val > radix)
-            {
-               BOOST_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
-            }
-            *this->limbs() *= radix;
-            *this->limbs() += val;
-            ++s;
-         }
-      }
-      if(isneg)
-         this->negate();
-      return *this;
-   }
-   std::string str(std::streamsize /*digits*/, std::ios_base::fmtflags f)const
-   {
-#ifdef BOOST_MP_NO_DOUBLE_LIMB_TYPE_IO
-      return str(f, mpl::bool_<is_same<typename base_type::local_limb_type, double_limb_type>::value>());
-#else
-      return str(f, mpl::bool_<false>());
-#endif
-   }
-   int compare(const cpp_int_backend& o)const BOOST_NOEXCEPT
-   {
-      if(this->sign() != o.sign())
-         return this->sign() ? -1 : 1;
-      int result = 0;
-      // Only do the compare if the same sign:
-      result = *this->limbs() == *o.limbs() ? 0 : *this->limbs() < *o.limbs() ? -1 : 1;
-
-      if(this->sign())
-         result = -result;
-      return result;
-   }
-   template <class Arithmetic>
-   BOOST_FORCEINLINE typename enable_if<is_arithmetic<Arithmetic>, int>::type compare(Arithmetic i)const BOOST_NOEXCEPT
-   {
-      // braindead version:
-      cpp_int_backend t;
-      t = i;
-      return compare(t);
-   }
-};
-
-template <unsigned MinBits, bool Signed, class Allocator>
-BOOST_FORCEINLINE bool eval_eq(const cpp_int_backend<MinBits, Signed, Allocator, false>& a, const cpp_int_backend<MinBits, Signed, Allocator, false>& b) BOOST_NOEXCEPT
-{
-   return (a.sign() == b.sign())
-      && (a.size() == b.size())
-      && std::equal(a.limbs(), a.limbs() + a.size(), b.limbs());
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-BOOST_FORCEINLINE bool eval_eq(const cpp_int_backend<MinBits1, Signed1, Allocator1, false>& a, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& b) BOOST_NOEXCEPT
-{
-   return (a.sign() == b.sign())
-      && (a.size() == b.size())
-      && std::equal(a.limbs(), a.limbs() + a.size(), b.limbs());
-}
-template <unsigned MinBits, class Allocator>
-BOOST_FORCEINLINE bool eval_eq(const cpp_int_backend<MinBits, true, Allocator, false>& a, limb_type b) BOOST_NOEXCEPT
-{
-   return (a.sign() == false)
-      && (a.size() == 1)
-      && (*a.limbs() == b);
-}
-template <unsigned MinBits, class Allocator>
-BOOST_FORCEINLINE bool eval_eq(const cpp_int_backend<MinBits, true, Allocator, false>& a, signed_limb_type b) BOOST_NOEXCEPT
-{
-   return (a.sign() == (b < 0))
-      && (a.size() == 1)
-      && (*a.limbs() == static_cast<limb_type>(std::abs(b)));
-}
-template <unsigned MinBits, class Allocator>
-BOOST_FORCEINLINE bool eval_eq(const cpp_int_backend<MinBits, false, Allocator, false>& a, limb_type b) BOOST_NOEXCEPT
-{
-   return (a.size() == 1)
-      && (*a.limbs() == b);
-}
-template <unsigned MinBits, class Allocator>
-BOOST_FORCEINLINE bool eval_eq(const cpp_int_backend<MinBits, false, Allocator, false>& a, signed_limb_type b) BOOST_NOEXCEPT
-{
-   return (b < 0) ? eval_eq(a, cpp_int_backend<MinBits, false, Allocator, false>(b)) : eval_eq(a, static_cast<limb_type>(b)); // Use bit pattern of b for comparison
-}
-
-template <unsigned MinBits, class Allocator>
-BOOST_FORCEINLINE bool eval_lt(const cpp_int_backend<MinBits, true, Allocator, false>& a, limb_type b) BOOST_NOEXCEPT
-{
-   if(a.sign())
-      return true;
-   if(a.size() > 1)
-      return false;
-   return *a.limbs() < b;
-}
-template <unsigned MinBits, class Allocator>
-inline bool eval_lt(const cpp_int_backend<MinBits, true, Allocator, false>& a, signed_limb_type b) BOOST_NOEXCEPT
-{
-   if((b == 0) || (a.sign() != (b < 0)))
-      return a.sign();
-   if(a.sign())
-   {
-      if(a.size() > 1)
-         return true;
-      return *a.limbs() > static_cast<limb_type>(std::abs(b));
-   }
-   else
-   {
-      if(a.size() > 1)
-         return false;
-      return *a.limbs() < static_cast<limb_type>(b);
-   }
-}
-
-template <unsigned MinBits, class Allocator>
-BOOST_FORCEINLINE bool eval_lt(const cpp_int_backend<MinBits, false, Allocator, false>& a, limb_type b) BOOST_NOEXCEPT
-{
-   if(a.size() > 1)
-      return false;
-   return *a.limbs() < b;
-}
-template <unsigned MinBits, class Allocator>
-BOOST_FORCEINLINE bool eval_lt(const cpp_int_backend<MinBits, false, Allocator, false>& a, signed_limb_type b) BOOST_NOEXCEPT
-{
-   return (b < 0) ? a.compare(b) < 0 : eval_lt(a, static_cast<limb_type>(b)); // Use bit pattern of b for comparison
-}
-
-template <unsigned MinBits, class Allocator>
-BOOST_FORCEINLINE bool eval_gt(const cpp_int_backend<MinBits, true, Allocator, false>& a, limb_type b) BOOST_NOEXCEPT
-{
-   if(a.sign())
-      return false;
-   if(a.size() > 1)
-      return true;
-   return *a.limbs() > b;
-}
-template <unsigned MinBits, class Allocator>
-inline bool eval_gt(const cpp_int_backend<MinBits, true, Allocator, false>& a, signed_limb_type b) BOOST_NOEXCEPT
-{
-   if(b == 0)
-      return !a.sign() && ((a.size() > 1) || *a.limbs());
-   if(a.sign() != (b < 0))
-      return !a.sign();
-   if(a.sign())
-   {
-      if(a.size() > 1)
-         return false;
-      return *a.limbs() < static_cast<limb_type>(std::abs(b));
-   }
-   else
-   {
-      if(a.size() > 1)
-         return true;
-      return *a.limbs() > static_cast<limb_type>(b);
-   }
-}
-
-template <unsigned MinBits, class Allocator>
-BOOST_FORCEINLINE bool eval_gt(const cpp_int_backend<MinBits, false, Allocator, false>& a, limb_type b) BOOST_NOEXCEPT
-{
-   if(a.size() > 1)
-      return true;
-   return *a.limbs() > b;
-}
-template <unsigned MinBits, class Allocator>
-BOOST_FORCEINLINE bool eval_gt(const cpp_int_backend<MinBits, false, Allocator, false>& a, signed_limb_type b) BOOST_NOEXCEPT
-{
-   return (b < 0) ? a.compare(b) > 0 : eval_gt(a, static_cast<limb_type>(b)); // Use bit pattern of b for comparison.
-}
-
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-BOOST_FORCEINLINE void eval_add(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator1>::value)
-{
-   eval_add(result, result, o);
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2, unsigned MinBits3, bool Signed3, class Allocator3>
-inline void add_unsigned(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& a, const cpp_int_backend<MinBits3, Signed3, Allocator3, false>& b) BOOST_NOEXCEPT_IF(boost::is_void<Allocator1>::value)
-{
-   using std::swap;
-
-   // Nothing fancy, just let uintmax_t take the strain:
-   double_limb_type carry = 0;
-   unsigned m, x;
-   unsigned as = a.size();
-   unsigned bs = b.size();
-   minmax(as, bs, m, x);
-   if(x == 1)
-   {
-      bool s = a.sign();
-      result = static_cast<double_limb_type>(*a.limbs()) + static_cast<double_limb_type>(*b.limbs());
-      result.sign(s);
-      return;
-   }
-   result.resize(x);
-   typename cpp_int_backend<MinBits2, Signed2, Allocator2, false>::const_limb_pointer pa = a.limbs();
-   typename cpp_int_backend<MinBits3, Signed3, Allocator3, false>::const_limb_pointer pb = b.limbs();
-   typename cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_pointer pr = result.limbs();
-   typename cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_pointer pr_end = pr + m;
-
-   if(as < bs)
-      swap(pa, pb);
-   
-   // First where a and b overlap:
-   while(pr != pr_end)
-   {
-      carry += static_cast<double_limb_type>(*pa) + static_cast<double_limb_type>(*pb);
-      *pr = static_cast<limb_type>(carry);
-      carry >>= cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits;
-      ++pr, ++pa, ++pb;
-   }
-   pr_end += x - m;
-   // Now where only a has digits:
-   while(pr != pr_end)
-   {
-      if(!carry)
-      {
-         if(pa != pr)
-            std::copy(pa, pa + (pr_end - pr), pr);
-         break;
-      }
-      carry += static_cast<double_limb_type>(*pa);
-      *pr = static_cast<limb_type>(carry);
-      carry >>= cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits;
-      ++pr, ++pa;
-   }
-   if(carry)
-   {
-      result.resize(x + 1);
-      // We overflowed, need to add one more limb:
-      if(cpp_int_backend<MinBits1, Signed1, Allocator1, false>::variable || (result.size() > x))
-         result.limbs()[x] = static_cast<limb_type>(carry);
-   }
-   result.normalize();
-   result.sign(a.sign());
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2, unsigned MinBits3, bool Signed3, class Allocator3>
-inline void eval_add(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& a, const cpp_int_backend<MinBits3, Signed3, Allocator3, false>& b) BOOST_NOEXCEPT_IF(boost::is_void<Allocator1>::value)
-{
-   if(a.sign() != b.sign())
-   {
-      subtract_unsigned(result, a, b);
-      return;
-   }
-   add_unsigned(result, a, b);
-}
-
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-inline void add_unsigned(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& a, const limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator1>::value)
-{
-   // Addition using modular arithmatic.
-   // Nothing fancy, just let uintmax_t take the strain:
-   if(&result != &a)
-      result.resize(a.size());
-   double_limb_type carry = o;
-   typename cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_pointer pr = result.limbs();
-   typename cpp_int_backend<MinBits2, Signed2, Allocator2, false>::const_limb_pointer pa = a.limbs();
-   unsigned i = 0;
-   for(; carry && (i < result.size()); ++i)
-   {
-      carry += static_cast<double_limb_type>(pa[i]);
-      pr[i] = static_cast<limb_type>(carry);
-      carry >>= cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits;
-   }
-   if(&a != &result)
-   {
-      for(; i < result.size(); ++i)
-         pr[i] = pa[i];
-   }
-   if(carry)
-   {
-      unsigned x = result.size();
-      result.resize(x + 1);
-      // We overflowed, need to add one more limb:
-      if(cpp_int_backend<MinBits1, Signed1, Allocator1, false>::variable || (result.size() > x))
-         result.limbs()[x] = static_cast<limb_type>(carry);
-   }
-   result.normalize();
-   result.sign(a.sign());
-}
-template <unsigned MinBits, bool Signed, class Allocator>
-BOOST_FORCEINLINE void eval_add(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
-{
-   if(result.sign())
-   {
-      subtract_unsigned(result, o);
-   }
-   else
-      add_unsigned(result, result, o);
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-BOOST_FORCEINLINE void eval_add(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& a, const limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator1>::value)
-{
-   if(a.sign())
-   {
-      result = a;
-      subtract_unsigned(result, o);
-   }
-   else
-      add_unsigned(result, a, o);
-}
-template <unsigned MinBits, bool Signed, class Allocator>
-BOOST_FORCEINLINE void eval_add(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const signed_limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
-{
-   if(o < 0)
-      eval_subtract(result, static_cast<limb_type>(-o));
-   else if(o > 0)
-      eval_add(result, static_cast<limb_type>(o));
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-BOOST_FORCEINLINE void eval_add(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& a, const signed_limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator1>::value)
-{
-   if(o < 0)
-      eval_subtract(result, a, static_cast<limb_type>(-o));
-   else if(o > 0)
-      eval_add(result, a, static_cast<limb_type>(o));
-   else if(&result != &a)
-      result = a;
-}
-
-template <unsigned MinBits, bool Signed, class Allocator>
-inline void subtract_unsigned(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
-{
-   // Subtract one limb.
-   // Nothing fancy, just let uintmax_t take the strain:
-   BOOST_STATIC_CONSTANT(double_limb_type, borrow = static_cast<double_limb_type>(cpp_int_backend<MinBits, Signed, Allocator, false>::max_limb_value) + 1);
-   typename cpp_int_backend<MinBits, Signed, Allocator, false>::limb_pointer p = result.limbs();
-   if(*p > o)
-   {
-      *p -= o;
-   }
-   else if(result.size() == 1)
-   {
-      *p = o - *p;
-      result.negate();
-   }
-   else
-   {
-      *p = static_cast<limb_type>((borrow + *p) - o);
-      ++p;
-      while(!*p)
-      {
-         *p = cpp_int_backend<MinBits, Signed, Allocator, false>::max_limb_value;
-         ++p;
-      }
-      --*p;
-      result.normalize();
-   }
-}
-template <unsigned MinBits, bool Signed, class Allocator>
-BOOST_FORCEINLINE void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
-{
-   if(result.sign())
-   {
-      add_unsigned(result, result, o);
-   }
-   else
-      subtract_unsigned(result, o);
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-BOOST_FORCEINLINE void eval_subtract(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& a, const limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator1>::value)
-{
-   if(a.sign())
-   {
-      add_unsigned(result, a, o);
-   }
-   else
-   {
-      result = a;
-      subtract_unsigned(result, o);
-   }
-}
-template <unsigned MinBits, bool Signed, class Allocator>
-BOOST_FORCEINLINE void eval_subtract(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const signed_limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
-{
-   if(o)
-   {
-      if(o < 0)
-         eval_add(result, static_cast<limb_type>(-o));
-      else
-         eval_subtract(result, static_cast<limb_type>(o));
-   }
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-BOOST_FORCEINLINE void eval_subtract(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& a, const signed_limb_type& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator1>::value)
-{
-   if(o)
-   {
-      if(o < 0)
-         eval_add(result, a, static_cast<limb_type>(-o));
-      else
-         eval_subtract(result, a, static_cast<limb_type>(o));
-   }
-   else if(&result != &a)
-      result = a;
-}
-template <unsigned MinBits, bool Signed, class Allocator>
-BOOST_FORCEINLINE void eval_increment(cpp_int_backend<MinBits, Signed, Allocator, false>& result) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
-{
-   static const limb_type one = 1;
-   if(!result.sign() && (result.limbs()[0] < cpp_int_backend<MinBits, Signed, Allocator, false>::max_limb_value))
-      ++result.limbs()[0];
-   else if(result.sign() && result.limbs()[0])
-      --result.limbs()[0];
-   else
-      eval_add(result, one);
-}
-template <unsigned MinBits, bool Signed, class Allocator>
-BOOST_FORCEINLINE void eval_decrement(cpp_int_backend<MinBits, Signed, Allocator, false>& result) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
-{
-   static const limb_type one = 1;
-   if(!result.sign() && result.limbs()[0])
-      --result.limbs()[0];
-   else if(result.sign() && (result.limbs()[0] < cpp_int_backend<MinBits, Signed, Allocator, false>::max_limb_value))
-      ++result.limbs()[0];
-   else
-      eval_subtract(result, one);
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-BOOST_FORCEINLINE void eval_subtract(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator1>::value)
-{
-   eval_subtract(result, result, o);
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2, unsigned MinBits3, bool Signed3, class Allocator3>
-inline void subtract_unsigned(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& a, const cpp_int_backend<MinBits3, Signed3, Allocator3, false>& b) BOOST_NOEXCEPT_IF(boost::is_void<Allocator1>::value)
-{
-   using std::swap;
-
-   // Nothing fancy, just let uintmax_t take the strain:
-   double_limb_type borrow = 0;
-   unsigned m, x;
-   minmax(a.size(), b.size(), m, x);
-   //
-   // special cases for small limb counts:
-   //
-   if(x == 1)
-   {
-      bool s = a.sign();
-      limb_type al = *a.limbs();
-      limb_type bl = *b.limbs();
-      if(bl > al)
-      {
-         std::swap(al, bl);
-         s = !s;
-      }
-      result = al - bl;
-      result.sign(s);
-      return;
-   }
-   // This isn't used till later, but comparison has to occur before we resize the result,
-   // as that may also resize a or b if this is an inplace operation:
-   int c = a.compare_unsigned(b);
-   // Set up the result vector:
-   result.resize(x);
-   // Now that a, b, and result are stable, get pointers to their limbs:
-   typename cpp_int_backend<MinBits2, Signed2, Allocator2, false>::const_limb_pointer pa = a.limbs();
-   typename cpp_int_backend<MinBits3, Signed3, Allocator3, false>::const_limb_pointer pb = b.limbs();
-   typename cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_pointer pr = result.limbs();
-   bool swapped = false;
-   if(c < 0)
-   {
-      swap(pa, pb);
-      swapped = true;
-   }
-   else if(c == 0)
-   {
-      result = static_cast<limb_type>(0);
-      return;
-   }
-   
-   unsigned i = 0;
-   // First where a and b overlap:
-   while(i < m)
-   {
-      borrow = static_cast<double_limb_type>(pa[i]) - static_cast<double_limb_type>(pb[i]) - borrow;
-      pr[i] = static_cast<limb_type>(borrow);
-      borrow = (borrow >> cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits) & 1u;
-      ++i;
-   }
-   // Now where only a has digits, only as long as we've borrowed:
-   while(borrow && (i < x))
-   {
-      borrow = static_cast<double_limb_type>(pa[i]) - borrow;
-      pr[i] = static_cast<limb_type>(borrow);
-      borrow = (borrow >> cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits) & 1u;
-      ++i;
-   }
-   // Any remaining digits are the same as those in pa:
-   if((x != i) && (pa != pr))
-      std::copy(pa + i, pa + x, pr + i);
-   BOOST_ASSERT(0 == borrow);
-
-   //
-   // We may have lost digits, if so update limb usage count:
-   //
-   result.normalize();
-   result.sign(a.sign());
-   if(swapped)
-      result.negate();
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2, unsigned MinBits3, bool Signed3, class Allocator3>
-BOOST_FORCEINLINE void eval_subtract(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& a, const cpp_int_backend<MinBits3, Signed3, Allocator3, false>& b) BOOST_NOEXCEPT_IF(boost::is_void<Allocator1>::value)
-{
-   if(a.sign() != b.sign())
-   {
-      add_unsigned(result, a, b);
-      return;
-   }
-   subtract_unsigned(result, a, b);
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2, unsigned MinBits3, bool Signed3, class Allocator3>
-inline void eval_multiply(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& a, const cpp_int_backend<MinBits3, Signed3, Allocator3, false>& b) BOOST_NOEXCEPT_IF(boost::is_void<Allocator1>::value)
-{
-   // Very simple long multiplication, only usable for small numbers of limb_type's
-   // but that's the typical use case for this type anyway:
-   //
-   // Special cases first:
-   //
-   unsigned as = a.size();
-   unsigned bs = b.size();
-   typename cpp_int_backend<MinBits2, Signed2, Allocator2, false>::const_limb_pointer pa = a.limbs();
-   typename cpp_int_backend<MinBits3, Signed3, Allocator3, false>::const_limb_pointer pb = b.limbs();
-   if(as == 1)
-   {
-      bool s = b.sign() != a.sign();
-      if(bs == 1)
-      {
-         result = static_cast<double_limb_type>(*pa) * static_cast<double_limb_type>(*pb);
-      }
-      else
-      {
-         limb_type l = *pa;
-         eval_multiply(result, b, l);
-      }
-      result.sign(s);
-      return;
-   }
-   if(bs == 1)
-   {
-      bool s = b.sign() != a.sign();
-      limb_type l = *pb;
-      eval_multiply(result, a, l);
-      result.sign(s);
-      return;
-   }
-
-   if((void*)&result == (void*)&a)
-   {
-      cpp_int_backend<MinBits1, Signed1, Allocator1, false> t(a);
-      eval_multiply(result, t, b);
-      return;
-   }
-   if((void*)&result == (void*)&b)
-   {
-      cpp_int_backend<MinBits1, Signed1, Allocator1, false> t(b);
-      eval_multiply(result, a, t);
-      return;
-   }
-
-   result.resize(as + bs);
-   typename cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_pointer pr = result.limbs();
-
-   static const double_limb_type limb_max = ~static_cast<limb_type>(0u);
-   static const double_limb_type double_limb_max = ~static_cast<double_limb_type>(0u);
-   BOOST_STATIC_ASSERT(double_limb_max - 2 * limb_max >= limb_max * limb_max);
-
-   double_limb_type carry = 0;
-   std::memset(pr, 0, result.size() * sizeof(limb_type));
-   for(unsigned i = 0; i < as; ++i)
-   {
-      unsigned inner_limit = cpp_int_backend<MinBits1, Signed1, Allocator1, false>::variable ? bs : (std::min)(result.size() - i, bs);
-      for(unsigned j = 0; j < inner_limit; ++j)
-      {
-         BOOST_ASSERT(i+j < result.size());
-         BOOST_ASSERT(!std::numeric_limits<double_limb_type>::is_specialized 
-            || ((std::numeric_limits<double_limb_type>::max)() - carry 
-                  > 
-                static_cast<double_limb_type>(cpp_int_backend<MinBits1, Signed1, Allocator1, false>::max_limb_value) * static_cast<double_limb_type>(cpp_int_backend<MinBits1, Signed1, Allocator1, false>::max_limb_value)));
-         carry += static_cast<double_limb_type>(pa[i]) * static_cast<double_limb_type>(pb[j]);
-         BOOST_ASSERT(!std::numeric_limits<double_limb_type>::is_specialized || ((std::numeric_limits<double_limb_type>::max)() - carry >= pr[i+j]));
-         carry += pr[i + j];
-         pr[i + j] = static_cast<limb_type>(carry);
-         carry >>= cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits;
-         BOOST_ASSERT(carry <= (cpp_int_backend<MinBits1, Signed1, Allocator1, false>::max_limb_value));
-      }
-      if(cpp_int_backend<MinBits1, Signed1, Allocator1, false>::variable || (i + bs < result.size()))
-         pr[i + bs] = static_cast<limb_type>(carry);
-      carry = 0;
-   }
-   result.normalize();
-   //
-   // Set the sign of the result:
-   //
-   result.sign(a.sign() != b.sign());
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-BOOST_FORCEINLINE void eval_multiply(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& a) BOOST_NOEXCEPT_IF(boost::is_void<Allocator1>::value)
-{
-    eval_multiply(result, result, a);
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-inline void eval_multiply(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& a, const limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator1>::value)
-{
-   if(!val)
-   {
-      result = static_cast<limb_type>(0);
-      return;
-   }
-   if((void*)&a != (void*)&result)
-      result.resize(a.size());
-   double_limb_type carry = 0;
-   typename cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_pointer p = result.limbs();
-   typename cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_pointer pe = result.limbs() + result.size();
-   typename cpp_int_backend<MinBits2, Signed2, Allocator2, false>::const_limb_pointer pa = a.limbs();
-   while(p != pe)
-   {
-      carry += static_cast<double_limb_type>(*pa) * static_cast<double_limb_type>(val);
-      *p = static_cast<limb_type>(carry);
-      carry >>= cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits;
-      ++p, ++pa;
-   }
-   if(carry)
-   {
-      unsigned i = result.size();
-      result.resize(i + 1);
-      if(cpp_int_backend<MinBits1, Signed1, Allocator1, false>::variable || (result.size() > i))
-         result.limbs()[i] = static_cast<limb_type>(carry);
-   }
-   result.sign(a.sign());
-   if(!cpp_int_backend<MinBits1, Signed1, Allocator1, false>::variable)
-      result.normalize();
-}
-template <unsigned MinBits, bool Signed, class Allocator>
-BOOST_FORCEINLINE void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
-{
-   eval_multiply(result, result, val);
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-BOOST_FORCEINLINE void eval_multiply(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& a, const double_limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator1>::value)
-{
-   if(val <= (std::numeric_limits<limb_type>::max)())
-   {
-      eval_multiply(result, a, static_cast<limb_type>(val));
-   }
-   else
-   {
-      cpp_int_backend<MinBits1, Signed1, Allocator1, false> t(val);
-      eval_multiply(result, a, t);
-   }
-}
-template <unsigned MinBits, bool Signed, class Allocator>
-BOOST_FORCEINLINE void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const double_limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
-{
-   eval_multiply(result, result, val);
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-BOOST_FORCEINLINE void eval_multiply(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& a, const signed_limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator1>::value)
-{
-   if(val > 0)
-      eval_multiply(result, a, static_cast<limb_type>(val));
-   else
-   {
-      eval_multiply(result, a, static_cast<limb_type>(-val));
-      result.negate();
-   }
-}
-template <unsigned MinBits, bool Signed, class Allocator>
-BOOST_FORCEINLINE void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const signed_limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
-{
-   eval_multiply(result, result, val);
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-inline void eval_multiply(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& a, const signed_double_limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator1>::value)
-{
-   if(val > 0)
-   {
-      if(val <= (std::numeric_limits<limb_type>::max)())
-      {
-         eval_multiply(result, a, static_cast<limb_type>(val));
-         return;
-      }
-   }
-   else if(val >= -static_cast<signed_double_limb_type>((std::numeric_limits<limb_type>::max)()))
-   {
-      eval_multiply(result, a, static_cast<limb_type>(-val));
-      result.negate();
-      return;
-   }
-   cpp_int_backend<MinBits1, Signed1, Allocator1, false> t(val);
-   eval_multiply(result, a, t);
-}
-template <unsigned MinBits, bool Signed, class Allocator>
-BOOST_FORCEINLINE void eval_multiply(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const signed_double_limb_type& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
-{
-   eval_multiply(result, result, val);
-}
-
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2, unsigned MinBits3, bool Signed3, class Allocator3>
-void divide_unsigned_helper(cpp_int_backend<MinBits1, Signed1, Allocator1, false>* result, 
-   const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& x, 
-   const cpp_int_backend<MinBits3, Signed3, Allocator3, false>& y, 
-   cpp_int_backend<MinBits1, Signed1, Allocator1, false>& r)
-{
-   if(((void*)result == (void*)&x) || ((void*)&r == (void*)&x))
-   {
-      cpp_int_backend<MinBits2, Signed2, Allocator2, false> t(x);
-      divide_unsigned_helper(result, t, y, r);
-      return;
-   }
-   if(((void*)result == (void*)&y) || ((void*)&r == (void*)&y))
-   {
-      cpp_int_backend<MinBits3, Signed3, Allocator3, false> t(y);
-      divide_unsigned_helper(result, x, t, r);
-      return;
-   }
-
-   /*
-    Very simple, fairly braindead long division.
-    Start by setting the remainder equal to x, and the
-    result equal to 0.  Then in each loop we calculate our
-    "best guess" for how many times y divides into r,
-    add our guess to the result, and subtract guess*y
-    from the remainder r.  One wrinkle is that the remainder
-    may go negative, in which case we subtract the current guess
-    from the result rather than adding.  The value of the guess
-    is determined by dividing the most-significant-limb of the
-    current remainder by the most-significant-limb of y.
-
-    Note that there are more efficient algorithms than this
-    available, in particular see Knuth Vol 2.  However for small
-    numbers of limbs this generally outperforms the alternatives
-    and avoids the normalisation step which would require extra storage.
-    */
-
-
-   using default_ops::eval_subtract;
-
-   if(result == &r)
-   {
-      cpp_int_backend<MinBits1, Signed1, Allocator1, false> rem;
-      divide_unsigned_helper(result, x, y, rem);
-      r = rem;
-      return;
-   }
-
-   //
-   // Find the most significant words of numerator and denominator.
-   //
-   limb_type y_order = y.size() - 1;
-
-   if(y_order == 0)
-   {
-      //
-      // Only a single non-zero limb in the denominator, in this case
-      // we can use a specialized divide-by-single-limb routine which is
-      // much faster.  This also handles division by zero:
-      //
-      divide_unsigned_helper(result, x, y.limbs()[y_order], r);
-      return;
-   }
-
-   typename cpp_int_backend<MinBits2, Signed2, Allocator2, false>::const_limb_pointer px = x.limbs();
-   typename cpp_int_backend<MinBits3, Signed3, Allocator3, false>::const_limb_pointer py = y.limbs();
-
-   limb_type r_order = x.size() - 1;
-   if((r_order == 0) && (*px == 0))
-   {
-      // x is zero, so is the result:
-      r = y;
-      if(result)
-         *result = x;
-      return;
-   }
-
-   r = x;
-   r.sign(false);
-   if(result)
-      *result = static_cast<limb_type>(0u);
-   //
-   // Check if the remainder is already less than the divisor, if so
-   // we already have the result.  Note we try and avoid a full compare
-   // if we can:
-   //
-   if(r_order <= y_order)
-   {
-      if((r_order < y_order) || (r.compare_unsigned(y) < 0))
-      {
-         return;
-      }
-   }
-
-   cpp_int_backend<MinBits1, Signed1, Allocator1, false> t;
-   bool r_neg = false;
-
-   //
-   // See if we can short-circuit long division, and use basic arithmetic instead:
-   //
-   if(r_order == 0)
-   {
-      if(result)
-         *result = px[0] / py[0];
-      r = px[0] % py[0];
-      return;
-   }
-   else if(r_order == 1)
-   {
-      double_limb_type a, b;
-      a = (static_cast<double_limb_type>(px[1]) << cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits) | px[0];
-      b = y_order ? 
-         (static_cast<double_limb_type>(py[1]) << cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits) | py[0] 
-         : py[0];
-      if(result)
-         *result = a / b;
-      r = a % b;
-      return;
-   }
-   //
-   // prepare result:
-   //
-   if(result)
-      result->resize(1 + r_order - y_order);
-   typename cpp_int_backend<MinBits1, Signed1, Allocator1, false>::const_limb_pointer prem = r.limbs();
-   // This is initialised just to keep the compiler from emitting useless warnings later on:
-   typename cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_pointer pr 
-      = typename cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_pointer();
-   if(result)
-   {
-      pr = result->limbs();
-      for(unsigned i = 1; i < 1 + r_order - y_order; ++i)
-         pr[i] = 0;
-   }
-   bool first_pass = true;
-
-   do
-   {
-      //
-      // Calculate our best guess for how many times y divides into r:
-      //
-      limb_type guess;
-      if((prem[r_order] <= py[y_order]) && (r_order > 0))
-      {
-         double_limb_type a, b, v;
-         a = (static_cast<double_limb_type>(prem[r_order]) << cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits) | prem[r_order - 1];
-         b = py[y_order];
-         v = a / b;
-         if(v > cpp_int_backend<MinBits1, Signed1, Allocator1, false>::max_limb_value)
-            guess = 1;
-         else
-         {
-            guess = static_cast<limb_type>(v);
-            --r_order;
-         }
-      }
-      else if(r_order == 0)
-      {
-         guess = prem[0] / py[y_order];
-      }
-      else
-      {
-         double_limb_type a, b, v;
-         a = (static_cast<double_limb_type>(prem[r_order]) << cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits) | prem[r_order - 1];
-         b = (y_order > 0) ? (static_cast<double_limb_type>(py[y_order]) << cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits) | py[y_order - 1] : (static_cast<double_limb_type>(py[y_order])  << cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits);
-         v = a / b;
-         guess = static_cast<limb_type>(v);
-      }
-      BOOST_ASSERT(guess); // If the guess ever gets to zero we go on forever....
-      //
-      // Update result:
-      //
-      limb_type shift = r_order - y_order;
-      if(result)
-      {
-         if(r_neg)
-         {
-            if(pr[shift] > guess)
-               pr[shift] -= guess;
-            else
-            {
-               t.resize(shift + 1);
-               t.limbs()[shift] = guess;
-               for(unsigned i = 0; i < shift; ++i)
-                  t.limbs()[i] = 0;
-               eval_subtract(*result, t);
-            }
-         }
-         else if(cpp_int_backend<MinBits1, Signed1, Allocator1, false>::max_limb_value - pr[shift] > guess)
-            pr[shift] += guess;
-         else
-         {
-            t.resize(shift + 1);
-            t.limbs()[shift] = guess;
-            for(unsigned i = 0; i < shift; ++i)
-               t.limbs()[i] = 0;
-            eval_add(*result, t);
-         }
-      }
-      //
-      // Calculate guess * y, we use a fused mutiply-shift O(N) for this
-      // rather than a full O(N^2) multiply:
-      //
-      double_limb_type carry = 0;
-      t.resize(y.size() + shift + 1);
-      bool truncated_t = !cpp_int_backend<MinBits1, Signed1, Allocator1, false>::variable && (t.size() != y.size() + shift + 1);
-      typename cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_pointer pt = t.limbs();
-      for(unsigned i = 0; i < shift; ++i)
-         pt[i] = 0;
-      for(unsigned i = 0; i < y.size(); ++i)
-      {
-         carry += static_cast<double_limb_type>(py[i]) * static_cast<double_limb_type>(guess);
-         pt[i + shift] = static_cast<limb_type>(carry);
-         carry >>= cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits;
-      }
-      if(carry && !truncated_t)
-      {
-         pt[t.size() - 1] = static_cast<limb_type>(carry);
-      }
-      else if(!truncated_t)
-      {
-         t.resize(t.size() - 1);
-      }
-      //
-      // Update r:
-      //
-      eval_subtract(r, t);
-      if(r.isneg())
-      {
-         r.negate();
-         r_neg = !r_neg;
-      }
-      //
-      // First time through we need to strip any leading zero, otherwise
-      // the termination condition goes belly-up:
-      //
-      if(result && first_pass)
-      {
-         first_pass = false;
-         while(pr[result->size() - 1] == 0)
-            result->resize(result->size() - 1);
-      }
-      //
-      // Update r_order:
-      //
-      r_order = r.size() - 1;
-      if(r_order < y_order)
-         break;
-   }
-   // Termination condition is really just a check that r > y, but with a common
-   // short-circuit case handled first:
-   while((r_order > y_order) || (r.compare_unsigned(y) >= 0));
-
-   //
-   // We now just have to normalise the result:
-   //
-   if(r_neg && eval_get_sign(r))
-   {
-      // We have one too many in the result:
-      if(result)
-         eval_decrement(*result);
-      r.negate();
-      if(y.sign())
-         eval_subtract(r, y);
-      else
-         eval_add(r, y);
-   }
-
-   BOOST_ASSERT(r.compare_unsigned(y) < 0); // remainder must be less than the divisor or our code has failed
-}
-
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-void divide_unsigned_helper(
-   cpp_int_backend<MinBits1, Signed1, Allocator1, false>* result, 
-   const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& x, 
-   limb_type y, 
-   cpp_int_backend<MinBits1, Signed1, Allocator1, false>& r)
-{
-   if(((void*)result == (void*)&x) || ((void*)&r == (void*)&x))
-   {
-      cpp_int_backend<MinBits2, Signed2, Allocator2, false> t(x);
-      divide_unsigned_helper(result, t, y, r);
-      return;
-   }
-
-   if(result == &r)
-   {
-      cpp_int_backend<MinBits1, Signed1, Allocator1, false> rem;
-      divide_unsigned_helper(result, x, y, rem);
-      r = rem;
-      return;
-   }
-
-   // As above, but simplified for integer divisor:
-
-   using default_ops::eval_subtract;
-
-   if(y == 0)
-   {
-      BOOST_THROW_EXCEPTION(std::overflow_error("Integer Division by zero."));
-   }
-   //
-   // Find the most significant word of numerator.
-   //
-   limb_type r_order = x.size() - 1;
-
-   //
-   // Set remainder and result to their initial values:
-   //
-   r = x;
-   r.sign(false);
-   typename cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_pointer pr = r.limbs();
-
-   if((r_order == 0) && (*pr == 0))
-   {
-      // All the limbs in x are zero, so is the result:
-      return;
-   }
-   //
-   // check for x < y, try to do this without actually having to 
-   // do a full comparison:
-   //
-   if((r_order == 0) && (*pr < y))
-   {
-      if(result)
-         *result = static_cast<limb_type>(0u);
-      return;
-   }
-
-   //
-   // See if we can short-circuit long division, and use basic arithmetic instead:
-   //
-   if(r_order == 0)
-   {
-      if(result)
-      {
-         *result = *pr / y;
-         result->sign(x.sign());
-      }
-      *pr %= y;
-      r.sign(x.sign());
-      return;
-   }
-   else if(r_order == 1)
-   {
-      double_limb_type a;
-      a = (static_cast<double_limb_type>(pr[r_order]) << cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits) | pr[0];
-      if(result)
-      {
-         *result = a / y;
-         result->sign(x.sign());
-      }
-      r = a % y;
-      r.sign(x.sign());
-      return;
-   }
-
-   // This is initialised just to keep the compiler from emitting useless warnings later on:
-   typename cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_pointer pres = typename cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_pointer();
-   if(result)
-   {
-      result->resize(r_order + 1);
-      pres = result->limbs();
-      if(result->size() > r_order)
-         pres[r_order] = 0;  // just in case we don't set the most significant limb below.
-   }
-
-   do
-   {
-      //
-      // Calculate our best guess for how many times y divides into r:
-      //
-      if((pr[r_order] < y) && r_order)
-      {
-         double_limb_type a, b;
-         a = (static_cast<double_limb_type>(pr[r_order]) << cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits) | pr[r_order - 1];
-         b = a % y;
-         r.resize(r.size() - 1);
-         --r_order;
-         pr[r_order] = static_cast<limb_type>(b);
-         if(result)
-            pres[r_order] = static_cast<limb_type>(a / y);
-         if(r_order && pr[r_order] == 0)
-         {
-            --r_order;  // No remainder, division was exact.
-            r.resize(r.size() - 1);
-            if(result)
-               pres[r_order] = static_cast<limb_type>(0u);
-         }
-      }
-      else
-      {
-         if(result)
-            pres[r_order] = pr[r_order] / y;
-         pr[r_order] %= y;
-         if(r_order && pr[r_order] == 0)
-         {
-            --r_order;  // No remainder, division was exact.
-            r.resize(r.size() - 1);
-            if(result)
-               pres[r_order] = static_cast<limb_type>(0u);
-         }
-      }
-   }
-   // Termination condition is really just a check that r > y, but with two common
-   // short-circuit cases handled first:
-   while(r_order || (pr[r_order] > y));
-
-   if(result)
-   {
-      result->normalize();
-      result->sign(x.sign());
-   }
-   r.normalize();
-   r.sign(x.sign());
-
-   BOOST_ASSERT(r.compare(y) < 0); // remainder must be less than the divisor or our code has failed
-}
-
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2, unsigned MinBits3, bool Signed3, class Allocator3>
-BOOST_FORCEINLINE void eval_divide(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, 
-   const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& a, const cpp_int_backend<MinBits3, Signed3, Allocator3, false>& b)
-{
-   cpp_int_backend<MinBits1, Signed1, Allocator1, false> r;
-   divide_unsigned_helper(&result, a, b, r);
-   result.sign(a.sign() != b.sign());
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-BOOST_FORCEINLINE void eval_divide(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, 
-   const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& a, limb_type& b)
-{
-   cpp_int_backend<MinBits1, Signed1, Allocator1, false> r;
-   divide_unsigned_helper(&result, a, b, r);
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-BOOST_FORCEINLINE void eval_divide(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, 
-   const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& a, signed_limb_type& b)
-{
-   cpp_int_backend<MinBits1, Signed1, Allocator1, false> r;
-   divide_unsigned_helper(&result, a, std::abs(b), r);
-   if(b < 0)
-      result.negate();
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-BOOST_FORCEINLINE void eval_divide(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, 
-   const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& b)
-{
-   // There is no in place divide:
-   cpp_int_backend<MinBits1, Signed1, Allocator1, false> a(result);
-   eval_divide(result, a, b);
-}
-template <unsigned MinBits, bool Signed, class Allocator>
-BOOST_FORCEINLINE void eval_divide(cpp_int_backend<MinBits, Signed, Allocator, false>& result, limb_type b)
-{
-   // There is no in place divide:
-   cpp_int_backend<MinBits, Signed, Allocator, false> a(result);
-   eval_divide(result, a, b);
-}
-template <unsigned MinBits, bool Signed, class Allocator>
-BOOST_FORCEINLINE void eval_divide(cpp_int_backend<MinBits, Signed, Allocator, false>& result, signed_limb_type b)
-{
-   // There is no in place divide:
-   cpp_int_backend<MinBits, Signed, Allocator, false> a(result);
-   eval_divide(result, a, b);
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2, unsigned MinBits3, bool Signed3, class Allocator3>
-BOOST_FORCEINLINE void eval_modulus(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, 
-   const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& a, 
-   const cpp_int_backend<MinBits3, Signed3, Allocator3, false>& b)
-{
-   divide_unsigned_helper(static_cast<cpp_int_backend<MinBits1, Signed1, Allocator1, false>* >(0), a, b, result);
-   result.sign(a.sign());
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-BOOST_FORCEINLINE void eval_modulus(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, 
-   const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& a, limb_type b)
-{
-   divide_unsigned_helper(static_cast<cpp_int_backend<MinBits1, Signed1, Allocator1, false>* >(0), a, b, result);
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-BOOST_FORCEINLINE void eval_modulus(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, 
-   const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& a, signed_limb_type b)
-{
-   divide_unsigned_helper(static_cast<cpp_int_backend<MinBits1, Signed1, Allocator1, false>* >(0), a, static_cast<limb_type>(std::abs(b)), result);
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-BOOST_FORCEINLINE void eval_modulus(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, 
-   const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& b)
-{
-   // There is no in place divide:
-   cpp_int_backend<MinBits1, Signed1, Allocator1, false> a(result);
-   eval_modulus(result, a, b);
-}
-template <unsigned MinBits, bool Signed, class Allocator>
-BOOST_FORCEINLINE void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator, false>& result, limb_type b)
-{
-   // There is no in place divide:
-   cpp_int_backend<MinBits, Signed, Allocator, false> a(result);
-   eval_modulus(result, a, b);
-}
-template <unsigned MinBits, bool Signed, class Allocator>
-BOOST_FORCEINLINE void eval_modulus(cpp_int_backend<MinBits, Signed, Allocator, false>& result, signed_limb_type b)
-{
-   // There is no in place divide:
-   cpp_int_backend<MinBits, Signed, Allocator, false> a(result);
-   eval_modulus(result, a, b);
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2, class Op>
-void bitwise_op(
-   cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, 
-   const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& o, 
-   Op op) BOOST_NOEXCEPT
-{
-   //
-   // There are 4 cases:
-   // * Both positive.
-   // * result negative, o positive.
-   // * o negative, result positive.
-   // * Both negative.
-   //
-   // When one arg is negative we convert to 2's complement form "on the fly",
-   // and then convert back to signed-magnitude form at the end.
-   //
-   // First figure out how big the result needs to be and set up some data:
-   //
-   unsigned rs = result.size();
-   unsigned os = o.size();
-   unsigned m, x;
-   minmax(rs, os, m, x);
-   result.resize(x);
-   typename cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_pointer pr = result.limbs();
-   typename cpp_int_backend<MinBits2, Signed2, Allocator2, false>::const_limb_pointer po = o.limbs();
-   for(unsigned i = rs; i < x; ++i)
-      pr[i] = 0;
-
-   limb_type next_limb = 0;
-
-   if(!result.sign())
-   {
-      if(!o.sign())
-      {
-         for(unsigned i = 0; i < os; ++i)
-            pr[i] = op(pr[i], po[i]);
-         for(unsigned i = os; i < x; ++i)
-            pr[i] = op(pr[i], limb_type(0));
-      }
-      else
-      {
-         // "o" is negative:
-         double_limb_type carry = 1;
-         for(unsigned i = 0; i < os; ++i)
-         {
-            carry += static_cast<double_limb_type>(~po[i]);
-            pr[i] = op(pr[i], static_cast<limb_type>(carry));
-            carry >>= cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits;
-         }
-         for(unsigned i = os; i < x; ++i)
-         {
-            carry += static_cast<double_limb_type>(~limb_type(0));
-            pr[i] = op(pr[i], static_cast<limb_type>(carry));
-            carry >>= cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits;
-         }
-         // Set the overflow into the "extra" limb:
-         carry += static_cast<double_limb_type>(~limb_type(0));
-         next_limb = op(limb_type(0), static_cast<limb_type>(carry));
-      }
-   }
-   else
-   {
-      if(!o.sign())
-      {
-         // "result" is negative:
-         double_limb_type carry = 1;
-         for(unsigned i = 0; i < os; ++i)
-         {
-            carry += static_cast<double_limb_type>(~pr[i]);
-            pr[i] = op(static_cast<limb_type>(carry), po[i]);
-            carry >>= cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits;
-         }
-         for(unsigned i = os; i < x; ++i)
-         {
-            carry += static_cast<double_limb_type>(~pr[i]);
-            pr[i] = op(static_cast<limb_type>(carry), limb_type(0));
-            carry >>= cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits;
-         }
-         // Set the overflow into the "extra" limb:
-         carry += static_cast<double_limb_type>(~limb_type(0));
-         next_limb = op(static_cast<limb_type>(carry), limb_type(0));
-      }
-      else
-      {
-         // both are negative:
-         double_limb_type r_carry = 1;
-         double_limb_type o_carry = 1;
-         for(unsigned i = 0; i < os; ++i)
-         {
-            r_carry += static_cast<double_limb_type>(~pr[i]);
-            o_carry += static_cast<double_limb_type>(~po[i]);
-            pr[i] = op(static_cast<limb_type>(r_carry), static_cast<limb_type>(o_carry));
-            r_carry >>= cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits;
-            o_carry >>= cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits;
-         }
-         for(unsigned i = os; i < x; ++i)
-         {
-            r_carry += static_cast<double_limb_type>(~pr[i]);
-            o_carry += static_cast<double_limb_type>(~limb_type(0));
-            pr[i] = op(static_cast<limb_type>(r_carry), static_cast<limb_type>(o_carry));
-            r_carry >>= cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits;
-            o_carry >>= cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits;
-         }
-         // Set the overflow into the "extra" limb:
-         r_carry += static_cast<double_limb_type>(~limb_type(0));
-         o_carry += static_cast<double_limb_type>(~limb_type(0));
-         next_limb = op(static_cast<limb_type>(r_carry), static_cast<limb_type>(o_carry));
-      }
-   }
-   //
-   // See if the result is negative or not:
-   //
-   if(static_cast<signed_limb_type>(next_limb) < 0)
-   {
-      result.sign(true);
-      double_limb_type carry = 1;
-      for(unsigned i = 0; i < x; ++i)
-      {
-         carry += static_cast<double_limb_type>(~pr[i]);
-         pr[i] = static_cast<limb_type>(carry);
-         carry >>= cpp_int_backend<MinBits1, Signed1, Allocator1, false>::limb_bits;
-      }
-   }
-   else
-      result.sign(false);
-
-   result.normalize();
-}
-
-struct bit_and{ limb_type operator()(limb_type a, limb_type b)const BOOST_NOEXCEPT { return a & b; } };
-struct bit_or { limb_type operator()(limb_type a, limb_type b)const BOOST_NOEXCEPT { return a | b; } };
-struct bit_xor{ limb_type operator()(limb_type a, limb_type b)const BOOST_NOEXCEPT { return a ^ b; } };
-
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-BOOST_FORCEINLINE void eval_bitwise_and(
-   cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, 
-   const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& o)BOOST_NOEXCEPT_IF(is_void<Allocator1>::value)
-{
-   bitwise_op(result, o, bit_and());
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-BOOST_FORCEINLINE void eval_bitwise_or(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& o) BOOST_NOEXCEPT_IF(is_void<Allocator1>::value)
-{
-   bitwise_op(result, o, bit_or());
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-BOOST_FORCEINLINE void eval_bitwise_xor(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& o) BOOST_NOEXCEPT_IF(is_void<Allocator1>::value)
-{
-   bitwise_op(result, o, bit_xor());
-}
-template <unsigned MinBits1, bool Signed1, class Allocator1, unsigned MinBits2, bool Signed2, class Allocator2>
-BOOST_FORCEINLINE void eval_complement(cpp_int_backend<MinBits1, Signed1, Allocator1, false>& result, const cpp_int_backend<MinBits2, Signed2, Allocator2, false>& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator1>::value)
-{
-   // Increment and negate:
-   result = o;
-   eval_increment(result);
-   result.negate();
-}
-template <unsigned MinBits, bool Signed>
-inline void eval_left_shift(cpp_int_backend<MinBits, Signed, void, false>& result, double_limb_type s) BOOST_NOEXCEPT
-{
-   if(!s)
-      return;
-
-   limb_type offset = static_cast<limb_type>(s / cpp_int_backend<MinBits, Signed, void>::limb_bits);
-   limb_type shift  = static_cast<limb_type>(s % cpp_int_backend<MinBits, Signed, void>::limb_bits);
-
-   if(offset > cpp_int_backend<MinBits, Signed, void>::internal_limb_count)
-   {
-      result = static_cast<limb_type>(0);
-      return;
-   }
-
-   unsigned ors = result.size();
-   if((ors == 1) && (!*result.limbs()))
-      return; // shifting zero yields zero.
-   unsigned rs = ors;
-   if(shift && (result.limbs()[ors - 1] >> (cpp_int_backend<MinBits, Signed, void>::limb_bits - shift)))
-      ++rs; // Most significant limb will overflow when shifted
-   rs += offset;
-   result.resize(rs);
-   bool truncated = result.size() != rs;
-   if(truncated)
-      rs = result.size();
-   typename cpp_int_backend<MinBits, Signed, void>::limb_pointer pr = result.limbs();
-
-   unsigned i = 0;
-   if(shift)
-   {
-      // This code only works when shift is non-zero, otherwise we invoke undefined behaviour!
-      i = 0;
-      if(!truncated)
-      {
-         if(rs > ors + offset)
-         {
-            pr[rs - 1 - i] = pr[ors - 1 - i] >> (cpp_int_backend<MinBits, Signed, void>::limb_bits - shift);
-            --rs;
-         }
-         else
-         {
-            pr[rs - 1 - i] = pr[ors - 1 - i] << shift;
-            if(ors > 1)
-               pr[rs - 1 - i] |= pr[ors - 2 - i] >> (cpp_int_backend<MinBits, Signed, void>::limb_bits - shift);
-            ++i;
-         }
-      }
-      for(; ors > 1 + i; ++i)
-      {
-         pr[rs - 1 - i] = pr[ors - 1 - i] << shift;
-         pr[rs - 1 - i] |= pr[ors - 2 - i] >> (cpp_int_backend<MinBits, Signed, void>::limb_bits - shift);
-      }
-      if(ors >= 1 + i)
-      {
-         pr[rs - 1 - i] = pr[ors - 1 - i] << shift;
-         ++i;
-      }
-      for(; i < rs; ++i)
-         pr[rs - 1 - i] = 0;
-   }
-   else
-   {
-      for(; i < ors; ++i)
-         pr[rs - 1 - i] = pr[ors - 1 - i];
-      for(; i < rs; ++i)
-         pr[rs - 1 - i] = 0;
-   }
-   //
-   // We may have shifted off the end and have leading zeros:
-   //
-   if(truncated)
-   {
-      result.normalize();
-   }
-}
-template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_left_shift(cpp_int_backend<MinBits, Signed, Allocator, false>& result, double_limb_type s) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
-{
-   if(!s)
-      return;
-
-   limb_type offset = static_cast<limb_type>(s / cpp_int_backend<MinBits, Signed, Allocator, false>::limb_bits);
-   limb_type shift  = static_cast<limb_type>(s % cpp_int_backend<MinBits, Signed, Allocator, false>::limb_bits);
-
-   unsigned ors = result.size();
-   if((ors == 1) && (!*result.limbs()))
-      return; // shifting zero yields zero.
-   unsigned rs = ors;
-   if(shift && (result.limbs()[rs - 1] >> (cpp_int_backend<MinBits, Signed, Allocator, false>::limb_bits - shift)))
-      ++rs; // Most significant limb will overflow when shifted
-   rs += offset;
-   result.resize(rs);
-   typename cpp_int_backend<MinBits, Signed, Allocator, false>::limb_pointer pr = result.limbs();
-
-   unsigned i = 0;
-   if(shift)
-   {
-      // This code only works when shift is non-zero, otherwise we invoke undefined behaviour!
-      i = 0;
-      if(rs > ors + offset)
-      {
-         pr[rs - 1 - i] = pr[ors - 1 - i] >> (cpp_int_backend<MinBits, Signed, Allocator, false>::limb_bits - shift);
-         --rs;
-      }
-      else
-      {
-         pr[rs - 1 - i] = pr[ors - 1 - i] << shift;
-         if(ors > 1)
-            pr[rs - 1 - i] |= pr[ors - 2 - i] >> (cpp_int_backend<MinBits, Signed, Allocator, false>::limb_bits - shift);
-         ++i;
-      }
-      for(; ors > 1 + i; ++i)
-      {
-         pr[rs - 1 - i] = pr[ors - 1 - i] << shift;
-         pr[rs - 1 - i] |= pr[ors - 2 - i] >> (cpp_int_backend<MinBits, Signed, Allocator, false>::limb_bits - shift);
-      }
-      if(ors >= 1 + i)
-      {
-         pr[rs - 1 - i] = pr[ors - 1 - i] << shift;
-         ++i;
-      }
-      for(; i < rs; ++i)
-         pr[rs - 1 - i] = 0;
-   }
-   else
-   {
-      for(; i < ors; ++i)
-         pr[rs - 1 - i] = pr[ors - 1 - i];
-      for(; i < rs; ++i)
-         pr[rs - 1 - i] = 0;
-   }
-}
-template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_right_shift(cpp_int_backend<MinBits, Signed, Allocator, false>& result, double_limb_type s) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
-{
-   if(!s)
-      return;
-
-   limb_type offset = static_cast<limb_type>(s / cpp_int_backend<MinBits, Signed, Allocator, false>::limb_bits);
-   limb_type shift  = static_cast<limb_type>(s % cpp_int_backend<MinBits, Signed, Allocator, false>::limb_bits);
-   unsigned ors = result.size();
-   unsigned rs = ors;
-   if(offset >= rs)
-   {
-      result = limb_type(0);
-      return;
-   }
-   rs -= offset;
-   typename cpp_int_backend<MinBits, Signed, Allocator, false>::limb_pointer pr = result.limbs();
-   if((pr[ors - 1] >> shift) == 0)
-      --rs;
-   if(rs == 0)
-   {
-      result = limb_type(0);
-      return;
-   }
-   unsigned i = 0;
-   if(shift)
-   {
-      // This code only works for non-zero shift, otherwise we invoke undefined behaviour!
-      for(; i + offset + 1 < ors; ++i)
-      {
-         pr[i] = pr[i + offset] >> shift;
-         pr[i] |= pr[i + offset + 1] << (cpp_int_backend<MinBits, Signed, Allocator, false>::limb_bits - shift);
-      }
-      pr[i] = pr[i + offset] >> shift;
-   }
-   else
-   {
-      for(; i < rs; ++i)
-         pr[i] = pr[i + offset];
-   }
-   result.resize(rs);
-}
-
-template <class Integer>
-inline Integer negate_integer(Integer i, const mpl::true_&) BOOST_NOEXCEPT
-{
-   return -i;
-}
-template <class Integer>
-inline Integer negate_integer(Integer i, const mpl::false_&) BOOST_NOEXCEPT
-{
-   return ~(i-1);
-}
-
-template <class R, unsigned MinBits, bool Signed, class Allocator>
-inline typename enable_if<is_integral<R>, void>::type eval_convert_to(R* result, const cpp_int_backend<MinBits, Signed, Allocator, false>& backend) BOOST_NOEXCEPT
-{
-   *result = static_cast<R>(backend.limbs()[0]);
-   unsigned shift = cpp_int_backend<MinBits, Signed, Allocator, false>::limb_bits;
-   for(unsigned i = 1; (i < backend.size()) && (shift < static_cast<unsigned>(std::numeric_limits<R>::digits)); ++i)
-   {
-      *result += static_cast<R>(backend.limbs()[i]) << shift;
-      shift += cpp_int_backend<MinBits, Signed, Allocator, false>::limb_bits;
-   }
-   if(backend.sign())
-   {
-      *result = negate_integer(*result, mpl::bool_<std::numeric_limits<R>::is_signed>());
-   }
-}
-
-template <class R, unsigned MinBits, bool Signed, class Allocator>
-inline typename enable_if<is_floating_point<R>, void>::type eval_convert_to(R* result, const cpp_int_backend<MinBits, Signed, Allocator, false>& backend) BOOST_NOEXCEPT
-{
-   typename cpp_int_backend<MinBits, Signed, Allocator, false>::const_limb_pointer p = backend.limbs();
-   unsigned shift = cpp_int_backend<MinBits, Signed, Allocator, false>::limb_bits;
-   *result = static_cast<R>(*p);
-   for(unsigned i = 1; i < backend.size(); ++i)
-   {
-      *result += static_cast<R>(std::ldexp(static_cast<long double>(p[i]), shift));
-      shift += cpp_int_backend<MinBits, Signed, Allocator, false>::limb_bits;
-   }
-   if(backend.sign())
-      *result = -*result;
-}
-
-template <unsigned MinBits, bool Signed, class Allocator>
-BOOST_FORCEINLINE bool eval_is_zero(const cpp_int_backend<MinBits, Signed, Allocator, false>& val) BOOST_NOEXCEPT
-{
-   return (val.size() == 1) && (val.limbs()[0] == 0);
-}
-template <unsigned MinBits, bool Signed, class Allocator>
-BOOST_FORCEINLINE int eval_get_sign(const cpp_int_backend<MinBits, Signed, Allocator, false>& val) BOOST_NOEXCEPT
-{
-   return eval_is_zero(val) ? 0 : val.sign() ? -1 : 1;
-}
-template <unsigned MinBits, bool Signed, class Allocator>
-BOOST_FORCEINLINE void eval_abs(cpp_int_backend<MinBits, Signed, Allocator, false>& result, const cpp_int_backend<MinBits, Signed, Allocator, false>& val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
-{
-   result = val;
-   result.sign(false);
-}
-
-//
-// Get the location of the least-significant-bit:
-//
-template <unsigned MinBits, bool Signed, class Allocator>
-inline unsigned eval_lsb(const cpp_int_backend<MinBits, Signed, Allocator, false>& a) BOOST_NOEXCEPT
-{
-   BOOST_ASSERT(eval_get_sign(a) != 0);
-   
-   unsigned result = 0;
-   //
-   // Find the index of the least significant limb that is non-zero:
-   //
-   unsigned index = 0;
-   while(!a.limbs()[index] && (index < a.size()))
-      ++index;
-   //
-   // Find the index of the least significant bit within that limb:
-   //
-   limb_type l = a.limbs()[index];
-   while(!(l & 1u))
-   {
-      l >>= 1;
-      ++result;
-   }
-
-   return result + index * cpp_int_backend<MinBits, Signed, Allocator, false>::limb_bits;
-}
-
-template <unsigned MinBits, bool Signed, class Allocator>
-inline bool eval_bit_test(const cpp_int_backend<MinBits, Signed, Allocator, false>& val, unsigned index) BOOST_NOEXCEPT
-{
-   unsigned offset = index / cpp_int_backend<MinBits, Signed, Allocator, false>::limb_bits;
-   unsigned shift = index % cpp_int_backend<MinBits, Signed, Allocator, false>::limb_bits;
-   limb_type mask = shift ? limb_type(1u) << shift : limb_type(1u);
-   if(offset >= val.size())
-      return false;
-   return val.limbs()[offset] & mask ? true : false;
-}
-
-template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_bit_set(cpp_int_backend<MinBits, Signed, Allocator, false>& val, unsigned index) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
-{
-   unsigned offset = index / cpp_int_backend<MinBits, Signed, Allocator, false>::limb_bits;
-   unsigned shift = index % cpp_int_backend<MinBits, Signed, Allocator, false>::limb_bits;
-   limb_type mask = shift ? limb_type(1u) << shift : limb_type(1u);
-   if(offset >= val.size())
-   {
-      unsigned os = val.size();
-      val.resize(offset + 1);
-      if(offset >= val.size())
-         return;  // fixed precision overflow
-      for(unsigned i = os; i <= offset; ++i)
-         val.limbs()[i] = 0;
-   }
-   val.limbs()[offset] |= mask;
-}
-
-template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_bit_unset(cpp_int_backend<MinBits, Signed, Allocator, false>& val, unsigned index) BOOST_NOEXCEPT
-{
-   unsigned offset = index / cpp_int_backend<MinBits, Signed, Allocator, false>::limb_bits;
-   unsigned shift = index % cpp_int_backend<MinBits, Signed, Allocator, false>::limb_bits;
-   limb_type mask = shift ? limb_type(1u) << shift : limb_type(1u);
-   if(offset >= val.size())
-      return;
-   val.limbs()[offset] &= ~mask;
-   val.normalize();
-}
-
-template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_bit_flip(cpp_int_backend<MinBits, Signed, Allocator, false>& val, unsigned index) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
-{
-   unsigned offset = index / cpp_int_backend<MinBits, Signed, Allocator, false>::limb_bits;
-   unsigned shift = index % cpp_int_backend<MinBits, Signed, Allocator, false>::limb_bits;
-   limb_type mask = shift ? limb_type(1u) << shift : limb_type(1u);
-   if(offset >= val.size())
-   {
-      unsigned os = val.size();
-      val.resize(offset + 1);
-      if(offset >= val.size())
-         return;  // fixed precision overflow
-      for(unsigned i = os; i <= offset; ++i)
-         val.limbs()[i] = 0;
-   }
-   val.limbs()[offset] ^= mask;
-   val.normalize();
-}
-
-template <unsigned MinBits, bool Signed, class Allocator>
-inline void eval_qr(const cpp_int_backend<MinBits, Signed, Allocator, false>& x, const cpp_int_backend<MinBits, Signed, Allocator, false>& y, 
-   cpp_int_backend<MinBits, Signed, Allocator, false>& q, cpp_int_backend<MinBits, Signed, Allocator, false>& r) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
-{
-   divide_unsigned_helper(&q, x, y, r);
-   q.sign(x.sign() != y.sign());
-   r.sign(x.sign());
-}
-
-template <unsigned MinBits, bool Signed, class Allocator, class Integer>
-inline typename enable_if<is_unsigned<Integer>, Integer>::type eval_integer_modulus(const cpp_int_backend<MinBits, Signed, Allocator, false>& x, Integer val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
-{
-   if((sizeof(Integer) <= sizeof(limb_type)) || (val <= (std::numeric_limits<limb_type>::max)()))
-   {
-      cpp_int_backend<MinBits, Signed, Allocator, false> d;
-      divide_unsigned_helper(static_cast<cpp_int_backend<MinBits, Signed, Allocator, false>*>(0), x, val, d);
-      return d.limbs()[0];
-   }
-   else
-   {
-      return default_ops::eval_integer_modulus(x, val);
-   }
-}
-template <unsigned MinBits, bool Signed, class Allocator, class Integer>
-BOOST_FORCEINLINE typename enable_if<is_signed<Integer>, Integer>::type eval_integer_modulus(const cpp_int_backend<MinBits, Signed, Allocator, false>& x, Integer val) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
-{
-   typedef typename make_unsigned<Integer>::type unsigned_type;
-   return eval_integer_modulus(x, static_cast<unsigned_type>(std::abs(val)));
-}
-
-} // namespace backends;
-
-template <unsigned MinBits, bool Signed, bool trivial>
-struct expression_template_default<backends::cpp_int_backend<MinBits, Signed, void, trivial> >
+template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked>
+struct expression_template_default<backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, void> >
 {
    static const expression_template_option value = et_off;
 };
 
 using boost::multiprecision::backends::cpp_int_backend;
 
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial>
-struct number_category<cpp_int_backend<MinBits, Signed, Allocator, trivial> > : public mpl::int_<number_kind_integer>{};
+template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
+struct number_category<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> > : public mpl::int_<number_kind_integer>{};
 
-typedef number<cpp_int_backend<> >          cpp_int;
-typedef rational_adapter<cpp_int_backend<> >   cpp_rational_backend;
-typedef number<cpp_rational_backend>        cpp_rational;
+typedef number<cpp_int_backend<> >                   cpp_int;
+typedef rational_adapter<cpp_int_backend<> >         cpp_rational_backend;
+typedef number<cpp_rational_backend>                 cpp_rational;
 
 // Fixed precision unsigned types:
-typedef number<cpp_int_backend<128, false, void> >   uint128_t;
-typedef number<cpp_int_backend<256, false, void> >   uint256_t;
-typedef number<cpp_int_backend<512, false, void> >   uint512_t;
-typedef number<cpp_int_backend<1024, false, void> >  uint1024_t;
+typedef number<cpp_int_backend<128, 128, unsigned_magnitude, unchecked, void> >   uint128_t;
+typedef number<cpp_int_backend<256, 256, unsigned_magnitude, unchecked, void> >   uint256_t;
+typedef number<cpp_int_backend<512, 512, unsigned_magnitude, unchecked, void> >   uint512_t;
+typedef number<cpp_int_backend<1024, 1024, unsigned_magnitude, unchecked, void> > uint1024_t;
 
 // Fixed precision signed types:
-typedef number<cpp_int_backend<128, true, void> >    int128_t;
-typedef number<cpp_int_backend<256, true, void> >    int256_t;
-typedef number<cpp_int_backend<512, true, void> >    int512_t;
-typedef number<cpp_int_backend<1024, true, void> >   int1024_t;
+typedef number<cpp_int_backend<128, 128, signed_magnitude, unchecked, void> >    int128_t;
+typedef number<cpp_int_backend<256, 256, signed_magnitude, unchecked, void> >    int256_t;
+typedef number<cpp_int_backend<512, 512, signed_magnitude, unchecked, void> >    int512_t;
+typedef number<cpp_int_backend<1024, 1024, signed_magnitude, unchecked, void> >  int1024_t;
 
-#ifdef BOOST_MSVC
-#pragma warning(pop)
-#endif
+// Over again, but with checking enabled this time:
+typedef number<cpp_int_backend<0, 0, signed_magnitude, checked> >  checked_cpp_int;
+typedef rational_adapter<cpp_int_backend<0, 0, signed_magnitude, checked> >  checked_cpp_rational_backend;
+typedef number<cpp_rational_backend>                 checked_cpp_rational;
+// Fixed precision unsigned types:
+typedef number<cpp_int_backend<128, 128, unsigned_magnitude, checked, void> >   checked_uint128_t;
+typedef number<cpp_int_backend<256, 256, unsigned_magnitude, checked, void> >   checked_uint256_t;
+typedef number<cpp_int_backend<512, 512, unsigned_magnitude, checked, void> >   checked_uint512_t;
+typedef number<cpp_int_backend<1024, 1024, unsigned_magnitude, checked, void> > checked_uint1024_t;
+
+// Fixed precision signed types:
+typedef number<cpp_int_backend<128, 128, signed_magnitude, checked, void> >    checked_int128_t;
+typedef number<cpp_int_backend<256, 256, signed_magnitude, checked, void> >    checked_int256_t;
+typedef number<cpp_int_backend<512, 512, signed_magnitude, checked, void> >    checked_int512_t;
+typedef number<cpp_int_backend<1024, 1024, signed_magnitude, checked, void> >  checked_int1024_t;
 
 #ifdef BOOST_NO_SFINAE_EXPR
 
 namespace detail{
 
-template<unsigned MinBits, bool Signed, class Allocator, bool trivial, unsigned MinBits2, bool Signed2, class Allocator2, bool trivial2>
-struct is_explicitly_convertible<cpp_int_backend<MinBits, Signed, Allocator, trivial>, cpp_int_backend<MinBits2, Signed2, Allocator2, trivial2> > : public mpl::true_ {};
+template<unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
+struct is_explicitly_convertible<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> > : public mpl::true_ {};
 
 }
-
 #endif
 
 }} // namespaces
 
-#include <boost/multiprecision/detail/cpp_int_trivial_ops.hpp>
-
-
-namespace std{
-
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial, boost::multiprecision::expression_template_option ExpressionTemplates>
-class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator, trivial>, ExpressionTemplates> >
-{
-   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator, trivial>, ExpressionTemplates> number_type;
-
-public:
-   BOOST_STATIC_CONSTEXPR bool is_specialized = true;
-   //
-   // Largest and smallest numbers are bounded only by available memory, set
-   // to zero:
-   //
-   static number_type (min)() BOOST_NOEXCEPT
-   {
-      return number_type(0);
-   }
-   static number_type (max)() BOOST_NOEXCEPT 
-   { 
-      return number_type(0);
-   }
-   static number_type lowest() BOOST_NOEXCEPT { return (min)(); }
-   BOOST_STATIC_CONSTEXPR int digits = INT_MAX;
-   BOOST_STATIC_CONSTEXPR int digits10 = (INT_MAX / 1000) * 301L;
-   BOOST_STATIC_CONSTEXPR int max_digits10 = digits10 + 2;
-   BOOST_STATIC_CONSTEXPR bool is_signed = true;
-   BOOST_STATIC_CONSTEXPR bool is_integer = true;
-   BOOST_STATIC_CONSTEXPR bool is_exact = true;
-   BOOST_STATIC_CONSTEXPR int radix = 2;
-   static number_type epsilon() BOOST_NOEXCEPT { return 0; }
-   static number_type round_error() BOOST_NOEXCEPT { return 0; }
-   BOOST_STATIC_CONSTEXPR int min_exponent = 0;
-   BOOST_STATIC_CONSTEXPR int min_exponent10 = 0;
-   BOOST_STATIC_CONSTEXPR int max_exponent = 0;
-   BOOST_STATIC_CONSTEXPR int max_exponent10 = 0;
-   BOOST_STATIC_CONSTEXPR bool has_infinity = false;
-   BOOST_STATIC_CONSTEXPR bool has_quiet_NaN = false;
-   BOOST_STATIC_CONSTEXPR bool has_signaling_NaN = false;
-   BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm = denorm_absent;
-   BOOST_STATIC_CONSTEXPR bool has_denorm_loss = false;
-   static number_type infinity() BOOST_NOEXCEPT { return 0; }
-   static number_type quiet_NaN() BOOST_NOEXCEPT { return 0; }
-   static number_type signaling_NaN() BOOST_NOEXCEPT { return 0; }
-   static number_type denorm_min() BOOST_NOEXCEPT { return 0; }
-   BOOST_STATIC_CONSTEXPR bool is_iec559 = false;
-   BOOST_STATIC_CONSTEXPR bool is_bounded = false;
-   BOOST_STATIC_CONSTEXPR bool is_modulo = false;
-   BOOST_STATIC_CONSTEXPR bool traps = false;
-   BOOST_STATIC_CONSTEXPR bool tinyness_before = false;
-   BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
-};
-
-#ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
-
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator, trivial>, ExpressionTemplates> >::digits;
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator, trivial>, ExpressionTemplates> >::digits10;
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator, trivial>, ExpressionTemplates> >::max_digits10;
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator, trivial>, ExpressionTemplates> >::is_signed;
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator, trivial>, ExpressionTemplates> >::is_integer;
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator, trivial>, ExpressionTemplates> >::is_exact;
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator, trivial>, ExpressionTemplates> >::radix;
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator, trivial>, ExpressionTemplates> >::min_exponent;
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator, trivial>, ExpressionTemplates> >::min_exponent10;
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator, trivial>, ExpressionTemplates> >::max_exponent;
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator, trivial>, ExpressionTemplates> >::max_exponent10;
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator, trivial>, ExpressionTemplates> >::has_infinity;
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator, trivial>, ExpressionTemplates> >::has_quiet_NaN;
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator, trivial>, ExpressionTemplates> >::has_signaling_NaN;
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST float_denorm_style numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator, trivial>, ExpressionTemplates> >::has_denorm;
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator, trivial>, ExpressionTemplates> >::has_denorm_loss;
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator, trivial>, ExpressionTemplates> >::is_iec559;
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator, trivial>, ExpressionTemplates> >::is_bounded;
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator, trivial>, ExpressionTemplates> >::is_modulo;
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator, trivial>, ExpressionTemplates> >::traps;
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator, trivial>, ExpressionTemplates> >::tinyness_before;
-template <unsigned MinBits, bool Signed, class Allocator, bool trivial, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST float_round_style numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, Signed, Allocator, trivial>, ExpressionTemplates> >::round_style;
-
-#endif
-
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates> >
-{
-   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates> number_type;
-
-   struct inititializer
-   {
-      inititializer()
-      {
-         (std::numeric_limits<number_type>::max)();
-         (std::numeric_limits<number_type>::min)();
-      }
-      void do_nothing()const{}
-   };
-
-   static const inititializer init;
-
-public:
-   BOOST_STATIC_CONSTEXPR bool is_specialized = true;
-   //
-   // Largest and smallest numbers are bounded only by available memory, set
-   // to zero:
-   //
-   static number_type (min)() BOOST_NOEXCEPT
-   {
-      return -(max)();
-   }
-   static number_type (max)() BOOST_NOEXCEPT 
-   {
-      typedef typename number_type::backend_type backend_type;
-      init.do_nothing();
-      static bool init = false;
-      static number_type val;
-      if(!init)
-      {
-         boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> t(0);
-         val = ~t;
-         init = true;
-      }
-      return val;
-   }
-   static number_type lowest() BOOST_NOEXCEPT { return (min)(); }
-   BOOST_STATIC_CONSTEXPR int digits = MinBits;
-   BOOST_STATIC_CONSTEXPR int digits10 = static_cast<int>(MinBits * 301L / 1000L);
-   BOOST_STATIC_CONSTEXPR int max_digits10 = digits10 + 2;
-   BOOST_STATIC_CONSTEXPR bool is_signed = true;
-   BOOST_STATIC_CONSTEXPR bool is_integer = true;
-   BOOST_STATIC_CONSTEXPR bool is_exact = true;
-   BOOST_STATIC_CONSTEXPR int radix = 2;
-   static number_type epsilon() BOOST_NOEXCEPT { return 0; }
-   static number_type round_error() BOOST_NOEXCEPT { return 0; }
-   BOOST_STATIC_CONSTEXPR int min_exponent = 0;
-   BOOST_STATIC_CONSTEXPR int min_exponent10 = 0;
-   BOOST_STATIC_CONSTEXPR int max_exponent = 0;
-   BOOST_STATIC_CONSTEXPR int max_exponent10 = 0;
-   BOOST_STATIC_CONSTEXPR bool has_infinity = false;
-   BOOST_STATIC_CONSTEXPR bool has_quiet_NaN = false;
-   BOOST_STATIC_CONSTEXPR bool has_signaling_NaN = false;
-   BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm = denorm_absent;
-   BOOST_STATIC_CONSTEXPR bool has_denorm_loss = false;
-   static number_type infinity() BOOST_NOEXCEPT { return 0; }
-   static number_type quiet_NaN() BOOST_NOEXCEPT { return 0; }
-   static number_type signaling_NaN() BOOST_NOEXCEPT { return 0; }
-   static number_type denorm_min() BOOST_NOEXCEPT { return 0; }
-   BOOST_STATIC_CONSTEXPR bool is_iec559 = false;
-   BOOST_STATIC_CONSTEXPR bool is_bounded = true;
-   BOOST_STATIC_CONSTEXPR bool is_modulo = true;
-   BOOST_STATIC_CONSTEXPR bool traps = false;
-   BOOST_STATIC_CONSTEXPR bool tinyness_before = false;
-   BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
-};
-
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-const typename numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates> >::inititializer numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates> >::init;
-
-#ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
-
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates>  >::digits;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates>  >::digits10;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates>  >::max_digits10;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates>  >::is_signed;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates>  >::is_integer;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates>  >::is_exact;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates>  >::radix;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates>  >::min_exponent;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates>  >::min_exponent10;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates>  >::max_exponent;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates>  >::max_exponent10;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates>  >::has_infinity;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates>  >::has_quiet_NaN;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates>  >::has_signaling_NaN;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST float_denorm_style numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates>  >::has_denorm;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates>  >::has_denorm_loss;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates>  >::is_iec559;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates>  >::is_bounded;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates>  >::is_modulo;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates>  >::traps;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates>  >::tinyness_before;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST float_round_style numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, true, void, trivial>, ExpressionTemplates>  >::round_style;
-
-#endif
-
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >
-{
-   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> number_type;
-
-   struct inititializer
-   {
-      inititializer()
-      {
-         (std::numeric_limits<number_type>::max)();
-      }
-      void do_nothing()const{}
-   };
-
-   static const inititializer init;
-
-public:
-   BOOST_STATIC_CONSTEXPR bool is_specialized = true;
-   //
-   // Largest and smallest numbers are bounded only by available memory, set
-   // to zero:
-   //
-   static number_type (min)() BOOST_NOEXCEPT
-   {
-      return number_type(0);
-   }
-   static number_type (max)() BOOST_NOEXCEPT 
-   {
-      typedef typename number_type::backend_type backend_type;
-      init.do_nothing();
-      static bool init = false;
-      static number_type val(0);
-      if(!init)
-      {
-         boost::multiprecision::limb_type l = ~static_cast<boost::multiprecision::limb_type>(0);
-         unsigned c = MinBits / backend_type::limb_bits + (MinBits % backend_type::limb_bits ? 1 : 0);
-         for(unsigned i = 0; i < c; ++i)
-         {
-            val <<= backend_type::limb_bits;
-            val |= l;
-         }
-         init = true;
-      }
-      return val;
-   }
-   static number_type lowest() BOOST_NOEXCEPT { return (min)(); }
-   BOOST_STATIC_CONSTEXPR int digits = MinBits;
-   BOOST_STATIC_CONSTEXPR int digits10 = static_cast<int>(MinBits * 301L / 1000L);
-   BOOST_STATIC_CONSTEXPR int max_digits10 = digits10 + 2;
-   BOOST_STATIC_CONSTEXPR bool is_signed = false;
-   BOOST_STATIC_CONSTEXPR bool is_integer = true;
-   BOOST_STATIC_CONSTEXPR bool is_exact = true;
-   BOOST_STATIC_CONSTEXPR int radix = 2;
-   static number_type epsilon() BOOST_NOEXCEPT { return 0; }
-   static number_type round_error() BOOST_NOEXCEPT { return 0; }
-   BOOST_STATIC_CONSTEXPR int min_exponent = 0;
-   BOOST_STATIC_CONSTEXPR int min_exponent10 = 0;
-   BOOST_STATIC_CONSTEXPR int max_exponent = 0;
-   BOOST_STATIC_CONSTEXPR int max_exponent10 = 0;
-   BOOST_STATIC_CONSTEXPR bool has_infinity = false;
-   BOOST_STATIC_CONSTEXPR bool has_quiet_NaN = false;
-   BOOST_STATIC_CONSTEXPR bool has_signaling_NaN = false;
-   BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm = denorm_absent;
-   BOOST_STATIC_CONSTEXPR bool has_denorm_loss = false;
-   static number_type infinity() BOOST_NOEXCEPT { return 0; }
-   static number_type quiet_NaN() BOOST_NOEXCEPT { return 0; }
-   static number_type signaling_NaN() BOOST_NOEXCEPT { return 0; }
-   static number_type denorm_min() BOOST_NOEXCEPT { return 0; }
-   BOOST_STATIC_CONSTEXPR bool is_iec559 = false;
-   BOOST_STATIC_CONSTEXPR bool is_bounded = true;
-   BOOST_STATIC_CONSTEXPR bool is_modulo = true;
-   BOOST_STATIC_CONSTEXPR bool traps = false;
-   BOOST_STATIC_CONSTEXPR bool tinyness_before = false;
-   BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
-};
-
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-const typename numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >::inititializer numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >::init;
-
-#ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
-
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >::digits;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >::digits10;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >::max_digits10;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >::is_signed;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >::is_integer;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >::is_exact;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >::radix;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >::min_exponent;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >::min_exponent10;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >::max_exponent;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >::max_exponent10;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >::has_infinity;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >::has_quiet_NaN;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >::has_signaling_NaN;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST float_denorm_style numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >::has_denorm;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >::has_denorm_loss;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >::is_iec559;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >::is_bounded;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >::is_modulo;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >::traps;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >::tinyness_before;
-template <unsigned MinBits, boost::multiprecision::expression_template_option ExpressionTemplates, bool trivial>
-BOOST_CONSTEXPR_OR_CONST float_round_style numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, false, void, trivial>, ExpressionTemplates> >::round_style;
-
-#endif
-
-}
+//
+// Last of all we include the implementations of all the eval_* non member functions:
+//
+#include <boost/multiprecision/cpp_int/comparison.hpp>
+#include <boost/multiprecision/cpp_int/add.hpp>
+#include <boost/multiprecision/cpp_int/multiply.hpp>
+#include <boost/multiprecision/cpp_int/divide.hpp>
+#include <boost/multiprecision/cpp_int/bitwise.hpp>
+#include <boost/multiprecision/cpp_int/misc.hpp>
+#include <boost/multiprecision/cpp_int/limits.hpp>
 
 #endif

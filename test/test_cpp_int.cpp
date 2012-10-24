@@ -57,6 +57,8 @@ void test()
 {
    using namespace boost::multiprecision;
    typedef Number test_type;
+   typedef typename test_type::backend_type::checked_type checked;
+
    unsigned last_error_count = 0;
    boost::timer tim;
 
@@ -242,7 +244,7 @@ void test()
       BOOST_CHECK_EQUAL(mpz_int(gcd(a, -b)).str(), test_type(gcd(a1, -b1)).str());
       BOOST_CHECK_EQUAL(mpz_int(lcm(c, -d)).str(), test_type(lcm(c1, -d1)).str());
 
-      if(std::numeric_limits<test_type>::is_modulo)
+      if(std::numeric_limits<test_type>::is_modulo && checked::value)
       {
          static mpz_int m = mpz_int(1) << std::numeric_limits<test_type>::digits;
          mpz_int t(a);
@@ -327,7 +329,7 @@ void test()
       // Tests run on the compiler farm time out after 300 seconds, 
       // so don't get too close to that:
       //
-      if(tim.elapsed() > 100)
+      if(tim.elapsed() > 200)
       {
          std::cout << "Timeout reached, aborting tests now....\n";
          break;
@@ -336,11 +338,25 @@ void test()
    }
 }
 
+#if !defined(TEST1) && !defined(TEST2) && !defined(TEST3)
+#define TEST1
+#define TEST2
+#define TEST3
+#endif
+
 int main()
 {
    using namespace boost::multiprecision;
+#ifdef TEST1
    test<cpp_int>();
-   test<number<cpp_int_backend<2048, true, void> > >();
+#endif
+#ifdef TEST2
+   test<number<cpp_int_backend<2048, 2048, signed_magnitude, checked, void> > >();
+#endif
+#ifdef TEST3
+   // Unchecked test verifies modulo arithmetic:
+   test<number<cpp_int_backend<2048, 2048, signed_magnitude, unchecked, void> > >();
+#endif
    return boost::report_errors();
 }
 

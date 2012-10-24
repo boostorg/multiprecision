@@ -41,11 +41,26 @@
 #include <iomanip>
 
 template <class T>
+struct unchecked_type{ typedef T type; };
+
+#ifdef TEST_CPP_INT
+template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+struct unchecked_type<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates> >
+{
+   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, boost::multiprecision::unchecked, Allocator>, ExpressionTemplates> type;
+};
+#endif
+
+template <class T>
 T generate_random()
 {
-   static boost::random::uniform_int_distribution<unsigned> ui(0, 20);
+   typedef typename unchecked_type<T>::type unchecked_T;
+
+   static const unsigned limbs = std::numeric_limits<T>::is_specialized && std::numeric_limits<T>::is_bounded ? std::numeric_limits<T>::digits / std::numeric_limits<unsigned>::digits + 3 : 20;
+
+   static boost::random::uniform_int_distribution<unsigned> ui(0, limbs);
    static boost::random::mt19937 gen;
-   T val = gen();
+   unchecked_T val = gen();
    unsigned lim = ui(gen);
    for(unsigned i = 0; i < lim; ++i)
    {
@@ -123,11 +138,11 @@ int main()
    test_round_trip<boost::multiprecision::tom_int>();
 #endif
 #ifdef TEST_CPP_INT
-   test_round_trip<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<> > >();
-   test_round_trip<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<1024, true, void> > >();
-   test_round_trip<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<512, false, void> > >();
-   test_round_trip<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<32, true, void> > >();
-   test_round_trip<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<32, false, void> > >();
+   test_round_trip<boost::multiprecision::cpp_int>();
+   test_round_trip<boost::multiprecision::checked_int1024_t>();
+   test_round_trip<boost::multiprecision::checked_uint512_t >();
+   test_round_trip<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<32, 32, boost::multiprecision::signed_magnitude, boost::multiprecision::checked, void> > >();
+   test_round_trip<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<32, 32, boost::multiprecision::unsigned_magnitude, boost::multiprecision::checked, void> > >();
 #endif
    return boost::report_errors();
 }

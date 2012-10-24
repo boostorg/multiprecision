@@ -19,6 +19,7 @@
    !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ) \
    && !defined(TEST_TOMMATH) && !defined(TEST_TOMMATH_BOOST_RATIONAL) && !defined(TEST_MPZ_BOOST_RATIONAL)\
    && !defined(TEST_CPP_INT_1) && !defined(TEST_CPP_INT_2) && !defined(TEST_CPP_INT_3) \
+   && !defined(TEST_CPP_INT_1A) && !defined(TEST_CPP_INT_2A) && !defined(TEST_CPP_INT_3A) \
    && !defined(TEST_CPP_INT_BR) && !defined(TEST_ARITHMETIC_BACKEND)
 #  define TEST_MPF_50
 #  define TEST_MPF
@@ -32,6 +33,9 @@
 #  define TEST_CPP_INT_1
 #  define TEST_CPP_INT_2
 #  define TEST_CPP_INT_3
+#  define TEST_CPP_INT_1A
+#  define TEST_CPP_INT_2A
+#  define TEST_CPP_INT_3A
 #  define TEST_CPP_INT_BR
 #  define TEST_ARITHMETIC_BACKEND
 
@@ -64,7 +68,7 @@
 #include <boost/multiprecision/tommath.hpp>
 #include <boost/multiprecision/rational_adapter.hpp>
 #endif
-#if defined(TEST_CPP_INT_1) || defined(TEST_CPP_INT_2) || defined(TEST_CPP_INT_3) || defined(TEST_CPP_INT_BR)
+#if defined(TEST_CPP_INT_1) || defined(TEST_CPP_INT_2) || defined(TEST_CPP_INT_3) || defined(TEST_CPP_INT_BR) || defined(TEST_CPP_INT_1A) || defined(TEST_CPP_INT_2A) || defined(TEST_CPP_INT_3A)
 #include <boost/multiprecision/cpp_int.hpp>
 #endif
 
@@ -150,6 +154,10 @@ struct is_twos_complement_integer : public boost::mpl::true_ {};
 template <>
 struct is_twos_complement_integer<boost::multiprecision::tom_int> : public boost::mpl::false_ {};
 #endif
+#if defined(TEST_CPP_INT_1) || defined(TEST_CPP_INT_2) || defined(TEST_CPP_INT_3) || defined(TEST_CPP_INT_BR) || defined(TEST_CPP_INT_1A) || defined(TEST_CPP_INT_2A) || defined(TEST_CPP_INT_3A)
+template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+struct is_twos_complement_integer<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, boost::multiprecision::checked, Allocator>, ExpressionTemplates> > : public boost::mpl::false_ {};
+#endif
 
 #define BOOST_TEST_EQUAL(a, b) BOOST_TEST((a) == (b))
 
@@ -193,16 +201,16 @@ struct related_type<boost::multiprecision::number< boost::multiprecision::mpfr_f
    typedef boost::multiprecision::number< boost::multiprecision::mpfr_float_backend<D/2> > type;
 };
 #endif
-#if defined(TEST_CPP_INT_1) || defined(TEST_CPP_INT_2) || defined(TEST_CPP_INT_3) || defined(TEST_CPP_INT_BR)
+#if defined(TEST_CPP_INT_1) || defined(TEST_CPP_INT_2) || defined(TEST_CPP_INT_3) || defined(TEST_CPP_INT_BR) || defined(TEST_CPP_INT_1A) || defined(TEST_CPP_INT_2A) || defined(TEST_CPP_INT_3A)
 template <>
 struct related_type<boost::multiprecision::cpp_int>
 {
    typedef boost::multiprecision::int256_t type;
 };
-template <unsigned D, bool S, boost::multiprecision::expression_template_option ET>
-struct related_type<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<D, S, void>, ET> >
+template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ET>
+struct related_type<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ET> >
 {
-   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<D/2, S, void>, ET> type;
+   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits/2, MaxBits/2, SignType, Checked, Allocator>, ET> type;
 };
 #endif
 template <class Real, class Val>
@@ -315,11 +323,18 @@ void test_complement(Real a, Real b, Real c, const boost::mpl::true_&)
    int i = 1020304;
    int j = 56789123;
    int sign_mask = ~0;
-   BOOST_TEST(~a == (~i & sign_mask));
-   c = a & ~b;
-   BOOST_TEST(c == (i & (~j & sign_mask)));
-   c = ~(a | b);
-   BOOST_TEST(c == (~(i | j) & sign_mask));
+   if(std::numeric_limits<Real>::is_signed)
+   {
+      BOOST_TEST(~a == (~i & sign_mask));
+      c = a & ~b;
+      BOOST_TEST(c == (i & (~j & sign_mask)));
+      c = ~(a | b);
+      BOOST_TEST(c == (~(i | j) & sign_mask));
+   }
+   else
+   {
+      BOOST_TEST((~a & a) == 0);
+   }
 }
 
 template <class Real>
@@ -710,7 +725,10 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
          BOOST_TEST(lsb(Real(1) << (i * 17)) == i * 17);
          BOOST_TEST(bit_test(Real(1) << (i * 17), i * 17));
          BOOST_TEST(!bit_test(Real(1) << (i * 17), i * 17 + 1));
-         BOOST_TEST(!bit_test(Real(1) << (i * 17), i * 17 - 1));
+         if(i)
+         {
+            BOOST_TEST(!bit_test(Real(1) << (i * 17), i * 17 - 1));
+         }
          Real zero(0);
          BOOST_TEST(bit_test(bit_set(zero, i * 17), i * 17));
          zero = 0;
@@ -1530,9 +1548,6 @@ void test()
    ac += +a;
    BOOST_TEST(ac == 16);
    ac = a;
-   ac += -a;
-   BOOST_TEST(ac == 0);
-   ac = a;
    ac += b - a;
    BOOST_TEST(ac == 8 + 64-8);
    ac = a;
@@ -1547,25 +1562,31 @@ void test()
    {
       ac -= -a;
       BOOST_TEST(ac == 16);
+      ac = a;
+      ac += -a;
+      BOOST_TEST(ac == 0);
    }
-   ac = a;
-   ac -= c - b;
-   BOOST_TEST(ac == 8 - (500-64));
-   ac = a;
-   ac -= b*c;
-   BOOST_TEST(ac == 8 - 500*64);
+   if(std::numeric_limits<Real>::is_signed || is_twos_complement_integer<Real>::value)
+   {
+      ac = a;
+      ac -= c - b;
+      BOOST_TEST(ac == 8 - (500-64));
+      ac = a;
+      ac -= b*c;
+      BOOST_TEST(ac == 8 - 500*64);
+   }
    ac = a;
    ac += ac * b;
    BOOST_TEST(ac == 8 + 8 * 64);
-   ac = a;
-   ac -= ac * b;
-   BOOST_TEST(ac == 8 - 8 * 64);
+   if(std::numeric_limits<Real>::is_signed || is_twos_complement_integer<Real>::value)
+   {
+      ac = a;
+      ac -= ac * b;
+      BOOST_TEST(ac == 8 - 8 * 64);
+   }
    ac = a * 8;
    ac *= +a;
    BOOST_TEST(ac == 64 * 8);
-   ac = a;
-   ac *= -a;
-   BOOST_TEST(ac == -64);
    ac = a;
    ac *= b * c;
    BOOST_TEST(ac == 8 * 64 * 500);
@@ -1583,6 +1604,9 @@ void test()
       ac = b;
       ac /= -a;
       BOOST_TEST(ac == -8);
+      ac = a;
+      ac *= -a;
+      BOOST_TEST(ac == -64);
    }
    ac = b;
    ac /= b / a;
@@ -1775,7 +1799,10 @@ void test()
    //
    a = 20;
    test_conditional(a, +a);
-   test_conditional(Real(-a), -a);
+   if(std::numeric_limits<Real>::is_signed || is_twos_complement_integer<Real>::value)
+   {
+      test_conditional(Real(-a), -a);
+   }
    test_conditional(a, (a + 0));
 }
 
@@ -1828,18 +1855,35 @@ int main()
 #endif
 #ifdef TEST_CPP_INT_1
    test<boost::multiprecision::cpp_int>();
-   test<boost::multiprecision::int256_t >();
-   test<boost::multiprecision::uint512_t >();
+   test<boost::multiprecision::int512_t >();
+   test<boost::multiprecision::uint1024_t >();
+#endif
+#ifdef TEST_CPP_INT_1A
+   test<boost::multiprecision::checked_cpp_int>();
+   test<boost::multiprecision::checked_int512_t >();
+   test<boost::multiprecision::checked_uint1024_t >();
 #endif
 #ifdef TEST_CPP_INT_2
    test<boost::multiprecision::cpp_rational>();
    test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<>, boost::multiprecision::et_off> >();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<500, true, void> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<500, 500, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> > >();
+#endif
+#ifdef TEST_CPP_INT_2A
+   test<boost::multiprecision::checked_cpp_rational>();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<0, 0, boost::multiprecision::signed_magnitude, boost::multiprecision::checked>, boost::multiprecision::et_off> >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<500, 500, boost::multiprecision::signed_magnitude, boost::multiprecision::checked, void> > >();
 #endif
 #ifdef TEST_CPP_INT_3
    // Again with "trivial" backends:
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, true, void> > >();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, false, void> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, 64, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, 64, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<31, 31, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> > >();
+#endif
+#ifdef TEST_CPP_INT_3A
+   // Again with "trivial" checked backends:
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, 64, boost::multiprecision::signed_magnitude, boost::multiprecision::checked, void> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, 64, boost::multiprecision::unsigned_magnitude, boost::multiprecision::checked, void> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<31, 31, boost::multiprecision::signed_magnitude, boost::multiprecision::checked, void> > >();
 #endif
 #ifdef TEST_CPP_INT_BR
    test<boost::rational<boost::multiprecision::cpp_int> >();

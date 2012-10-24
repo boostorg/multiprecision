@@ -267,7 +267,7 @@ void eval_subtract(T& t, const U& u, const V& v);
 template <class T>
 inline void eval_subtract_default(T& t, const T& u, const T& v)
 {
-   if(&t == &v)
+   if((&t == &v) && is_signed_number<T>::value)
    {
       eval_subtract(t, u);
       t.negate();
@@ -296,16 +296,22 @@ inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_co
    eval_subtract(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type eval_subtract_default(T& t, const U& u, const T& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_signed_number<T>::value>::type eval_subtract_default(T& t, const U& u, const T& v)
 {
    eval_subtract(t, v, u);
    t.negate();
+}
+template <class T, class U>
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_unsigned_number<T>::value>::type eval_subtract_default(T& t, const U& u, const T& v)
+{
+   T temp(u);
+   eval_subtract(t, temp, v);
 }
 template <class T, class U, class V>
 inline void eval_subtract_default(T& t, const U& u, const V& v)
 {
    t = u;
-   eval_subtract(t, u);
+   eval_subtract(t, v);
 }
 template <class T, class U, class V>
 inline void eval_subtract(T& t, const U& u, const V& v)

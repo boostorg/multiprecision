@@ -156,6 +156,27 @@ run test_arithmetic.cpp
         : # command line
         : # input files
         : # requirements
+	      <define>TEST_CPP_INT_1A
+        : test_arithmetic_cpp_int_1a ;
+
+run test_arithmetic.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_CPP_INT_2A
+        : test_arithmetic_cpp_int_2a ;
+
+run test_arithmetic.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_CPP_INT_3A
+        : test_arithmetic_cpp_int_3a ;
+
+run test_arithmetic.cpp
+        : # command line
+        : # input files
+        : # requirements
 	      <define>TEST_CPP_INT_BR
         : test_arithmetic_cpp_int_br ;
 
@@ -707,6 +728,28 @@ run test_cpp_int.cpp gmp
         : # requirements
          [ check-target-builds ../config//has_gmp : : <build>no ]
          release  # otherwise runtime is too slow!! 
+         <define>TEST1
+         : test_cpp_int_1
+         ;
+
+run test_cpp_int.cpp gmp
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+         release  # otherwise runtime is too slow!! 
+         <define>TEST2
+         : test_cpp_int_2
+         ;
+
+run test_cpp_int.cpp gmp
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+         release  # otherwise runtime is too slow!! 
+         <define>TEST3
+         : test_cpp_int_3
          ;
 
 run test_miller_rabin.cpp gmp

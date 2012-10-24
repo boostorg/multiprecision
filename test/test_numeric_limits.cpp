@@ -239,8 +239,8 @@ int main()
    test<boost::multiprecision::cpp_int>();
    test<boost::multiprecision::int256_t>();
    test<boost::multiprecision::uint512_t>();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<200, false, void> > >();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<70, true, void> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<200, 200, boost::multiprecision::unsigned_magnitude, boost::multiprecision::checked, void> > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<70, 70, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> > >();
 #endif
    return boost::report_errors();
 }

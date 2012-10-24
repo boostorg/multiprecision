@@ -7,6 +7,11 @@
 #define BOOST_MP_CPP_INT_CORE_HPP
 
 #include <boost/integer.hpp>
+#include <boost/integer_traits.hpp>
+#include <boost/mpl/if.hpp>
+#include <boost/mpl/int.hpp>
+#include <boost/static_assert.hpp>
+#include <boost/assert.hpp>
 
 namespace boost{ namespace multiprecision{
 
@@ -56,7 +61,7 @@ struct largest_unsigned_type
    >::type type;
 };
 
-}
+} // namepsace detail
 
 #if defined(__GNUC__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6))) \
    && !defined(BOOST_INTEL) && defined(__WORDSIZE) && (__WORDSIZE == 64)
@@ -78,6 +83,22 @@ inline limb_type block_multiplier(unsigned count)
 
 // Can't do formatted IO on an __int128
 #define BOOST_MP_NO_DOUBLE_LIMB_TYPE_IO
+
+// Need to specialise integer_traits for __int128 as it's not a normal native type:
+} // namespace multiprecision
+
+template<>
+class integer_traits<double_limb_type>
+  : public std::numeric_limits<double_limb_type>,
+    public detail::integer_traits_base<double_limb_type, 0, ~static_cast<double_limb_type>(0)>
+{ };
+template<>
+class integer_traits<signed_double_limb_type>
+  : public std::numeric_limits<signed_double_limb_type>,
+    public detail::integer_traits_base<signed_double_limb_type, static_cast<signed_double_limb_type>(static_cast<double_limb_type>(1) << 127), static_cast<signed_double_limb_type>((~static_cast<double_limb_type>(0)) >> 1)>
+{ };
+
+namespace multiprecision{
 
 #else
 
@@ -114,6 +135,20 @@ inline void minmax(const T& a, const T& b, T& aa, T& bb)
       bb = a;
    }
 }
+
+enum cpp_integer_type
+{
+   signed_magnitude,
+   unsigned_magnitude,
+   signed_packed,
+   unsigned_packed
+};
+
+enum cpp_int_check_type
+{
+   checked,
+   unchecked
+};
 
 }}
 

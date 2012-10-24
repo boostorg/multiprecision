@@ -359,7 +359,7 @@ inline number<B, et_off> operator - (number<B, et_off>&& a, const number<B, et_o
    return static_cast<number<B, et_off>&&>(a);
 }
 template <class B>
-inline number<B, et_off> operator - (const number<B, et_off>& a, number<B, et_off>&& b)
+inline typename enable_if<is_signed_number<B>, number<B, et_off> >::type operator - (const number<B, et_off>& a, number<B, et_off>&& b)
 {
    using default_ops::eval_subtract;
    eval_subtract(b.backend(), a.backend());
@@ -382,7 +382,7 @@ inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, 
    return static_cast<number<B, et_off>&&>(a);
 }
 template <class V, class B>
-inline typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
+inline typename enable_if_c<(is_compatible_arithmetic_type<V, number<B, et_off> >::value && is_signed_number<B>::value), number<B, et_off> >::type
    operator - (const V& a, number<B, et_off>&& b)
 {
    using default_ops::eval_subtract;

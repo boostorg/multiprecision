@@ -20,14 +20,10 @@ inline void eval_qr(const Backend& x, const Backend& y, Backend& q, Backend& r)
    eval_modulus(r, x, y);
 }
 
-template <class Integer>
-inline typename enable_if<is_signed<Integer>, Integer>::type maybe_abs(Integer i) { return std::abs(i); }
-template <class Integer>
-inline typename enable_if<is_unsigned<Integer>, Integer>::type maybe_abs(Integer i) { return i; }
-
 template <class Backend, class Integer>
 inline Integer eval_integer_modulus(const Backend& x, Integer val)
 {
+   BOOST_MP_USING_ABS
    using default_ops::eval_modulus;
    using default_ops::eval_convert_to;
    typedef typename boost::multiprecision::detail::canonical<Integer, Backend>::type int_type;
@@ -35,7 +31,7 @@ inline Integer eval_integer_modulus(const Backend& x, Integer val)
    eval_modulus(t, x, static_cast<int_type>(val));
    Integer result;
    eval_convert_to(&result, t);
-   return maybe_abs(result);
+   return abs(result);
 }
 
 #ifdef BOOST_MSVC
