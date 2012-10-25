@@ -63,13 +63,12 @@ struct largest_unsigned_type
 
 } // namepsace detail
 
-#if defined(__GNUC__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6))) \
-   && !defined(BOOST_INTEL) && defined(__WORDSIZE) && (__WORDSIZE == 64)
+#if defined(BOOST_HAS_INT128)
 
 typedef detail::largest_unsigned_type<64>::type limb_type;
 typedef detail::largest_signed_type<64>::type signed_limb_type;
-typedef unsigned __int128 double_limb_type;
-typedef __int128 signed_double_limb_type;
+typedef boost::uint128_type double_limb_type;
+typedef boost::int128_type signed_double_limb_type;
 static const limb_type max_block_10 = 1000000000000000000uLL;
 static const limb_type digits_per_block_10 = 18;
 
@@ -88,14 +87,14 @@ inline limb_type block_multiplier(unsigned count)
 } // namespace multiprecision
 
 template<>
-class integer_traits<double_limb_type>
-  : public std::numeric_limits<double_limb_type>,
-    public detail::integer_traits_base<double_limb_type, 0, ~static_cast<double_limb_type>(0)>
+class integer_traits<multiprecision::double_limb_type>
+  : public std::numeric_limits<multiprecision::double_limb_type>,
+    public detail::integer_traits_base<multiprecision::double_limb_type, 0, ~static_cast<multiprecision::double_limb_type>(0)>
 { };
 template<>
-class integer_traits<signed_double_limb_type>
-  : public std::numeric_limits<signed_double_limb_type>,
-    public detail::integer_traits_base<signed_double_limb_type, static_cast<signed_double_limb_type>(static_cast<double_limb_type>(1) << 127), static_cast<signed_double_limb_type>((~static_cast<double_limb_type>(0)) >> 1)>
+class integer_traits<multiprecision::signed_double_limb_type>
+  : public std::numeric_limits<multiprecision::signed_double_limb_type>,
+    public detail::integer_traits_base<multiprecision::signed_double_limb_type, static_cast<multiprecision::signed_double_limb_type>((static_cast<multiprecision::double_limb_type>(1) << 127)), static_cast<multiprecision::signed_double_limb_type>(((~static_cast<multiprecision::double_limb_type>(0)) >> 1))>
 { };
 
 namespace multiprecision{
