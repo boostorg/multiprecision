@@ -16,17 +16,20 @@
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_unsigned.hpp>
+#include <boost/multiprecision/number.hpp>
 
 namespace detail{
 
 template <class T>
-inline typename boost::disable_if<boost::is_unsigned<T>, T>::type abs(const T& a)
+inline typename boost::disable_if_c<boost::is_unsigned<T>::value || boost::multiprecision::is_unsigned_number<T>::value, T>::type 
+   abs(const T& a)
 {
    return a < 0 ? -a : a;
 }
 
 template <class T>
-inline typename boost::enable_if<boost::is_unsigned<T>, T>::type abs(const T& a)
+inline typename boost::enable_if_c<boost::is_unsigned<T>::value || boost::multiprecision::is_unsigned_number<T>::value, T>::type 
+   abs(const T& a)
 {
    return a;
 }

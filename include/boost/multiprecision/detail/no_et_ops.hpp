@@ -17,6 +17,7 @@ namespace multiprecision{
 template <class B>
 inline number<B, et_off> operator - (const number<B, et_off>& v) 
 {
+   BOOST_STATIC_ASSERT_MSG(is_signed_number<B>::value, "Negating an unsigned type results in ill-defined behavior.");
    number<B, et_off> result(v);
    result.backend().negate();
    return BOOST_MP_MOVE(result); 
@@ -299,6 +300,7 @@ inline typename enable_if<is_integral<I>, number<B, et_off> >::type
 template <class B>
 inline number<B, et_off> operator - (number<B, et_off>&& v) 
 {
+   BOOST_STATIC_ASSERT_MSG(is_signed_number<B>::value, "Negating an unsigned type results in ill-defined behavior.");
    v.backend().negate();
    return static_cast<number<B, et_off>&&>(v); 
 }

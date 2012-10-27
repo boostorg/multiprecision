@@ -18,7 +18,7 @@ inline boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinB
 {
    // Bounded and signed.
    typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates> result_type;
-   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, boost::multiprecision::unsigned_magnitude, Checked, Allocator>, ExpressionTemplates> ui_type;
+   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, Allocator>, ExpressionTemplates> ui_type;
    static const result_type val = -result_type(~ui_type(0));
    return val;
 }
@@ -57,7 +57,7 @@ inline boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinB
 {
    // Bounded and signed.
    typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates> result_type;
-   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, boost::multiprecision::unsigned_magnitude, Checked, Allocator>, ExpressionTemplates> ui_type;
+   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, Allocator>, ExpressionTemplates> ui_type;
    static const result_type val = ~ui_type(0);
    return val;
 }
@@ -68,7 +68,8 @@ inline boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinB
 {
    // Bound and unsigned:
    typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates> result_type;
-   static const result_type val = ~result_type(0);
+   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, Allocator>, ExpressionTemplates> ui_type;
+   static const result_type val = ~ui_type(0);
    return val;
 }
 

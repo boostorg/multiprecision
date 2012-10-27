@@ -23,7 +23,7 @@ inline void raise_add_overflow()
 }
 inline void raise_subtract_overflow()
 {
-   raise_overflow("subtraction");
+   BOOST_THROW_EXCEPTION(std::range_error("Subtraction resulted in a negative value, but the type is unsigned"));
 }
 inline void raise_mul_overflow()
 {

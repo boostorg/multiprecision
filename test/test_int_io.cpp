@@ -99,22 +99,42 @@ void do_round_trip(const T& val)
 }
 
 template <class T>
+void negative_round_trip(T val, const boost::mpl::true_&)
+{
+   do_round_trip(T(-val));
+}
+template <class T>
+void negative_round_trip(T, const boost::mpl::false_&)
+{
+}
+
+template <class T>
+void negative_spots(const boost::mpl::true_&)
+{
+   BOOST_CHECK_EQUAL(T(-1002).str(), "-1002");
+   if(!std::numeric_limits<T>::is_modulo)
+   {
+      BOOST_CHECK_THROW(T(-2).str(0, std::ios_base::oct), std::runtime_error);
+      BOOST_CHECK_THROW(T(-2).str(0, std::ios_base::hex), std::runtime_error);
+   }
+}
+template <class T>
+void negative_spots(const boost::mpl::false_&)
+{
+}
+
+template <class T>
 void test_round_trip()
 {
    for(unsigned i = 0; i < 1000; ++i)
    {
       T val = generate_random<T>();
       do_round_trip(val);
-      if(std::numeric_limits<T>::is_signed)
-         do_round_trip(T(-val));
+      negative_round_trip(val, boost::mpl::bool_<std::numeric_limits<T>::is_signed>());
    }
 
    BOOST_CHECK_EQUAL(T(1002).str(), "1002");
    BOOST_CHECK_EQUAL(T(1002).str(0, std::ios_base::showpos), "+1002");
-   if(std::numeric_limits<T>::is_signed)
-   {
-      BOOST_CHECK_EQUAL(T(-1002).str(), "-1002");
-   }
    BOOST_CHECK_EQUAL(T(1002).str(0, std::ios_base::oct), "1752");
    BOOST_CHECK_EQUAL(T(1002).str(0, std::ios_base::oct|std::ios_base::showbase), "01752");
    BOOST_CHECK_EQUAL(boost::to_lower_copy(T(1002).str(0, std::ios_base::hex)), "3ea");
@@ -122,11 +142,7 @@ void test_round_trip()
    BOOST_CHECK_EQUAL(T(1002).str(0, std::ios_base::dec), "1002");
    BOOST_CHECK_EQUAL(T(1002).str(0, std::ios_base::dec|std::ios_base::showbase), "1002");
 
-   if(std::numeric_limits<T>::is_signed && !std::numeric_limits<T>::is_modulo)
-   {
-      BOOST_CHECK_THROW(T(-2).str(0, std::ios_base::oct), std::runtime_error);
-      BOOST_CHECK_THROW(T(-2).str(0, std::ios_base::hex), std::runtime_error);
-   }
+   negative_spots<T>(boost::mpl::bool_<std::numeric_limits<T>::is_signed>());
 }
 
 int main()

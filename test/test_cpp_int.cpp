@@ -52,6 +52,11 @@ T generate_random(unsigned bits_wanted)
    return val;
 }
 
+template <class T>
+struct is_checked_cpp_int : public boost::mpl::false_ {};
+template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, class Allocator, boost::multiprecision::expression_template_option ET>
+struct is_checked_cpp_int<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, boost::multiprecision::checked, Allocator>, ET> > : public boost::mpl::true_ {};
+
 template <class Number>
 void test()
 {
@@ -115,28 +120,37 @@ void test()
       // bitwise ops:
       BOOST_CHECK_EQUAL(mpz_int(a|b).str(), test_type(a1 | b1).str());
       BOOST_CHECK_EQUAL((mpz_int(a)|=b).str(), (test_type(a1) |= b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(-a|b).str(), test_type(-a1 | b1).str());
-      BOOST_CHECK_EQUAL((mpz_int(-a)|=b).str(), (test_type(-a1) |= b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(a|-b).str(), test_type(a1 | -b1).str());
-      BOOST_CHECK_EQUAL((mpz_int(a)|=-b).str(), (test_type(a1) |= -b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(-a|-b).str(), test_type(-a1 | -b1).str());
-      BOOST_CHECK_EQUAL((mpz_int(-a)|=-b).str(), (test_type(-a1) |= -b1).str());
+      if(!is_checked_cpp_int<test_type>::value)
+      {
+         BOOST_CHECK_EQUAL(mpz_int(-a|b).str(), test_type(-a1 | b1).str());
+         BOOST_CHECK_EQUAL((mpz_int(-a)|=b).str(), (test_type(-a1) |= b1).str());
+         BOOST_CHECK_EQUAL(mpz_int(a|-b).str(), test_type(a1 | -b1).str());
+         BOOST_CHECK_EQUAL((mpz_int(a)|=-b).str(), (test_type(a1) |= -b1).str());
+         BOOST_CHECK_EQUAL(mpz_int(-a|-b).str(), test_type(-a1 | -b1).str());
+         BOOST_CHECK_EQUAL((mpz_int(-a)|=-b).str(), (test_type(-a1) |= -b1).str());
+      }
       BOOST_CHECK_EQUAL(mpz_int(a&b).str(), test_type(a1 & b1).str());
       BOOST_CHECK_EQUAL((mpz_int(a)&=b).str(), (test_type(a1) &= b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(-a&b).str(), test_type(-a1 & b1).str());
-      BOOST_CHECK_EQUAL((mpz_int(-a)&=b).str(), (test_type(-a1) &= b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(a&-b).str(), test_type(a1 & -b1).str());
-      BOOST_CHECK_EQUAL((mpz_int(a)&=-b).str(), (test_type(a1) &= -b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(-a&-b).str(), test_type(-a1 & -b1).str());
-      BOOST_CHECK_EQUAL((mpz_int(-a)&=-b).str(), (test_type(-a1) &= -b1).str());
+      if(!is_checked_cpp_int<test_type>::value)
+      {
+         BOOST_CHECK_EQUAL(mpz_int(-a&b).str(), test_type(-a1 & b1).str());
+         BOOST_CHECK_EQUAL((mpz_int(-a)&=b).str(), (test_type(-a1) &= b1).str());
+         BOOST_CHECK_EQUAL(mpz_int(a&-b).str(), test_type(a1 & -b1).str());
+         BOOST_CHECK_EQUAL((mpz_int(a)&=-b).str(), (test_type(a1) &= -b1).str());
+         BOOST_CHECK_EQUAL(mpz_int(-a&-b).str(), test_type(-a1 & -b1).str());
+         BOOST_CHECK_EQUAL((mpz_int(-a)&=-b).str(), (test_type(-a1) &= -b1).str());
+      }
       BOOST_CHECK_EQUAL(mpz_int(a^b).str(), test_type(a1 ^ b1).str());
       BOOST_CHECK_EQUAL((mpz_int(a)^=b).str(), (test_type(a1) ^= b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(-a^b).str(), test_type(-a1 ^ b1).str());
-      BOOST_CHECK_EQUAL((mpz_int(-a)^=b).str(), (test_type(-a1) ^= b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(a^-b).str(), test_type(a1 ^ -b1).str());
-      BOOST_CHECK_EQUAL((mpz_int(a)^=-b).str(), (test_type(a1) ^= -b1).str());
-      BOOST_CHECK_EQUAL(mpz_int(-a^-b).str(), test_type(-a1 ^ -b1).str());
-      BOOST_CHECK_EQUAL((mpz_int(-a)^=-b).str(), (test_type(-a1) ^= -b1).str());
+      if(!is_checked_cpp_int<test_type>::value)
+      {
+         BOOST_CHECK_EQUAL(mpz_int(-a^b).str(), test_type(-a1 ^ b1).str());
+         BOOST_CHECK_EQUAL((mpz_int(-a)^=b).str(), (test_type(-a1) ^= b1).str());
+         BOOST_CHECK_EQUAL(mpz_int(a^-b).str(), test_type(a1 ^ -b1).str());
+         BOOST_CHECK_EQUAL((mpz_int(a)^=-b).str(), (test_type(a1) ^= -b1).str());
+         BOOST_CHECK_EQUAL(mpz_int(-a^-b).str(), test_type(-a1 ^ -b1).str());
+         BOOST_CHECK_EQUAL((mpz_int(-a)^=-b).str(), (test_type(-a1) ^= -b1).str());
+      }
       // Shift ops:
       for(unsigned i = 0; i < 128; ++i)
       {
@@ -185,15 +199,18 @@ void test()
       BOOST_CHECK_EQUAL((mpz_int(a)%=-si).str(), (test_type(a1) %= -si).str());
       BOOST_CHECK_EQUAL((mpz_int(-a)%=si).str(), (test_type(-a1) %= si).str());
       BOOST_CHECK_EQUAL((mpz_int(-a)%=-si).str(), (test_type(-a1) %= -si).str());
-      BOOST_CHECK_EQUAL(mpz_int(a|si).str(), test_type(a1 | si).str());
-      BOOST_CHECK_EQUAL((mpz_int(a)|=si).str(), (test_type(a1) |= si).str());
-      BOOST_CHECK_EQUAL(mpz_int(a&si).str(), test_type(a1 & si).str());
-      BOOST_CHECK_EQUAL((mpz_int(a)&=si).str(), (test_type(a1) &= si).str());
-      BOOST_CHECK_EQUAL(mpz_int(a^si).str(), test_type(a1 ^ si).str());
-      BOOST_CHECK_EQUAL((mpz_int(a)^=si).str(), (test_type(a1) ^= si).str());
-      BOOST_CHECK_EQUAL(mpz_int(si|a).str(), test_type(si|a1).str());
-      BOOST_CHECK_EQUAL(mpz_int(si&a).str(), test_type(si&a1).str());
-      BOOST_CHECK_EQUAL(mpz_int(si^a).str(), test_type(si^a1).str());
+      if((si > 0) || !is_checked_cpp_int<test_type>::value)
+      {
+         BOOST_CHECK_EQUAL(mpz_int(a|si).str(), test_type(a1 | si).str());
+         BOOST_CHECK_EQUAL((mpz_int(a)|=si).str(), (test_type(a1) |= si).str());
+         BOOST_CHECK_EQUAL(mpz_int(a&si).str(), test_type(a1 & si).str());
+         BOOST_CHECK_EQUAL((mpz_int(a)&=si).str(), (test_type(a1) &= si).str());
+         BOOST_CHECK_EQUAL(mpz_int(a^si).str(), test_type(a1 ^ si).str());
+         BOOST_CHECK_EQUAL((mpz_int(a)^=si).str(), (test_type(a1) ^= si).str());
+         BOOST_CHECK_EQUAL(mpz_int(si|a).str(), test_type(si|a1).str());
+         BOOST_CHECK_EQUAL(mpz_int(si&a).str(), test_type(si&a1).str());
+         BOOST_CHECK_EQUAL(mpz_int(si^a).str(), test_type(si^a1).str());
+      }
       BOOST_CHECK_EQUAL(mpz_int(gcd(a, b)).str(), test_type(gcd(a1, b1)).str());
       BOOST_CHECK_EQUAL(mpz_int(lcm(c, d)).str(), test_type(lcm(c1, d1)).str());
       BOOST_CHECK_EQUAL(mpz_int(gcd(-a, b)).str(), test_type(gcd(-a1, b1)).str());

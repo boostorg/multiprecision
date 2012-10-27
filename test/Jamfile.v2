@@ -752,6 +752,8 @@ run test_cpp_int.cpp gmp
          : test_cpp_int_3
          ;
 
+run test_checked_cpp_int.cpp ;
+
 run test_miller_rabin.cpp gmp
         : # command line
         : # input files

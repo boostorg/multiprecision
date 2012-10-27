@@ -18,9 +18,17 @@ inline const number<B, ExpressionTemplates>& operator + (const number<B, Express
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 inline const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& operator + (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& v) { return v; }
 template <class B>
-inline detail::expression<detail::negate, number<B, et_on> > operator - (const number<B, et_on>& v) { return detail::expression<detail::negate, number<B, et_on> >(v); }
+inline detail::expression<detail::negate, number<B, et_on> > operator - (const number<B, et_on>& v) 
+{
+   BOOST_STATIC_ASSERT_MSG(is_signed_number<B>::value, "Negating an unsigned type results in ill-defined behavior.");
+   return detail::expression<detail::negate, number<B, et_on> >(v); 
+}
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-inline detail::expression<detail::negate, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> > operator - (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& v) { return detail::expression<detail::negate, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(v); }
+inline detail::expression<detail::negate, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> > operator - (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& v) 
+{ 
+   BOOST_STATIC_ASSERT_MSG((is_signed_number<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value), "Negating an unsigned type results in ill-defined behavior.");
+   return detail::expression<detail::negate, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(v); 
+}
 template <class B>
 inline detail::expression<detail::complement_immediates, number<B, et_on> > operator ~ (const number<B, et_on>& v) { return detail::expression<detail::complement_immediates, number<B, et_on> >(v); }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>

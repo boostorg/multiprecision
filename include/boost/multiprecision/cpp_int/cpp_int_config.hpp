@@ -137,16 +137,16 @@ inline void minmax(const T& a, const T& b, T& aa, T& bb)
 
 enum cpp_integer_type
 {
-   signed_magnitude,
-   unsigned_magnitude,
-   signed_packed,
-   unsigned_packed
+   signed_magnitude = 1,
+   unsigned_magnitude = 0,
+   signed_packed = 3,
+   unsigned_packed = 2
 };
 
 enum cpp_int_check_type
 {
-   checked,
-   unchecked
+   checked = 1,
+   unchecked = 0
 };
 
 }}

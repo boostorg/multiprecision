@@ -32,7 +32,7 @@ namespace backends{
 #pragma warning(disable:4127 4351 4293)
 #endif
 
-template <unsigned MinBits = 0, unsigned MaxBits = 0, cpp_integer_type SignType = signed_magnitude, cpp_int_check_type Checked = unchecked, class Allocator = std::allocator<limb_type> >
+template <unsigned MinBits = 0, unsigned MaxBits = 0, cpp_integer_type SignType = signed_magnitude, cpp_int_check_type Checked = unchecked, class Allocator = mpl::if_c<MinBits && (MinBits == MaxBits), void, std::allocator<limb_type> >::type >
 struct cpp_int_backend;
 
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator, bool trivial = false>
@@ -680,7 +680,8 @@ private:
    BOOST_STATIC_ASSERT_MSG(MinBits <= sizeof(double_limb_type) * CHAR_BIT, "Template parameter MinBits is inconsistent with the parameter trivial - did you mistakingly try to override the trivial parameter?");
 protected:
    template <class T>
-   typename disable_if_c<is_integral<T>::value && (sizeof(T) <= sizeof(local_limb_type)), void>::type check_in_range(T val, const mpl::int_<checked>&)
+   typename disable_if_c<std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= MinBits)>::type
+      check_in_range(T val, const mpl::int_<checked>&)
    {
       BOOST_MP_USING_ABS
       typedef typename common_type<T, local_limb_type>::type common_type;
@@ -797,7 +798,8 @@ private:
    BOOST_STATIC_ASSERT_MSG(MinBits <= sizeof(double_limb_type) * CHAR_BIT, "Template parameter MinBits is inconsistent with the parameter trivial - did you mistakingly try to override the trivial parameter?");
 protected:
    template <class T>
-   typename disable_if_c<is_integral<T>::value && (sizeof(T) <= sizeof(local_limb_type))>::type check_in_range(T val, const mpl::int_<checked>&, const mpl::true_&)
+   typename disable_if_c<std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= MinBits)>::type
+      check_in_range(T val, const mpl::int_<checked>&, const mpl::false_&)
    {
       typedef typename common_type<T, local_limb_type>::type common_type;
 
@@ -805,7 +807,7 @@ protected:
          BOOST_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
    }
    template <class T>
-   typename disable_if_c<is_integral<T>::value && (sizeof(T) <= sizeof(local_limb_type))>::type check_in_range(T val, const mpl::int_<checked>&, const mpl::false_&)
+   void check_in_range(T val, const mpl::int_<checked>&, const mpl::true_&)
    {
       typedef typename common_type<T, local_limb_type>::type common_type;
 
@@ -814,13 +816,13 @@ protected:
       if(val < 0)
          BOOST_THROW_EXCEPTION(std::range_error("The argument to an unsigned cpp_int constructor was negative."));
    }
-   template <class T, int C, class U>
-   BOOST_FORCEINLINE void check_in_range(T val, const mpl::int_<C>&, const U&){}
+   template <class T, int C, bool B>
+   BOOST_FORCEINLINE void check_in_range(T val, const mpl::int_<C>&, const mpl::bool_<B>&){}
 
    template <class T>
    BOOST_FORCEINLINE void check_in_range(T val)
    {
-      check_in_range(val, checked_type(), is_unsigned<T>());
+      check_in_range(val, checked_type(), is_signed<T>());
    }
 
 public:
@@ -878,6 +880,10 @@ public:
    }
    BOOST_FORCEINLINE void negate() BOOST_NOEXCEPT
    {
+      if(Checked == checked)
+      {
+         BOOST_THROW_EXCEPTION(std::range_error("Attempt to negate an unsigned type."));
+      }
       m_data = ~m_data;
       ++m_data;
    }
@@ -1316,7 +1322,7 @@ private:
                val = 10 + *s - 'A';
             else
                val = radix + 1;
-            if(val > radix)
+            if(val >= radix)
             {
                BOOST_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
             }
@@ -1377,7 +1383,7 @@ private:
                      val = 10 + *s - 'A';
                   else
                      val = base_type::max_limb_value;
-                  if(val > radix)
+                  if(val >= radix)
                   {
                      BOOST_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
                   }
