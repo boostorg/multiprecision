@@ -27,15 +27,15 @@
             type, as long as the conversion isn't lossy (for example float to int
             conversion):
           </li></ul></div>
-<pre class="programlisting"><span class="identifier">cpp_dec_float_50</span> <span class="identifier">df</span><span class="special">(</span><span class="number">0.5</span><span class="special">);</span> <span class="comment">// OK construction from double</span>
-<span class="identifier">cpp_int</span>          <span class="identifier">i</span><span class="special">(</span><span class="number">450</span><span class="special">);</span>  <span class="comment">// OK constructs from signed int</span>
-<span class="identifier">cpp_int</span>          <span class="identifier">j</span> <span class="special">=</span> <span class="number">3.14</span><span class="special">;</span> <span class="comment">// Error, lossy conversion.</span>
+<pre class="programlisting"><span class="identifier">cpp_dec_float_50</span> <span class="identifier">df</span><span class="special">(</span><span class="number">0.5</span><span class="special">);</span>   <span class="comment">// OK construction from double</span>
+<span class="identifier">cpp_int</span>          <span class="identifier">i</span><span class="special">(</span><span class="number">450</span><span class="special">);</span>    <span class="comment">// OK constructs from signed int</span>
+<span class="identifier">cpp_int</span>          <span class="identifier">j</span> <span class="special">=</span> <span class="number">3.14</span><span class="special">;</span>  <span class="comment">// Error, lossy conversion.</span>
 </pre>
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
             A number can be explicitly constructed from an arithmetic type, even
             when the conversion is lossy:
           </li></ul></div>
-<pre class="programlisting"><span class="identifier">cpp_int</span>          <span class="identifier">i</span><span class="special">(</span><span class="number">3.14</span><span class="special">);</span>  <span class="comment">// OK explicit conversion</span>
+<pre class="programlisting"><span class="identifier">cpp_int</span>          <span class="identifier">i</span><span class="special">(</span><span class="number">3.14</span><span class="special">);</span>       <span class="comment">// OK explicit conversion</span>
 <span class="identifier">i</span> <span class="special">=</span> <span class="keyword">static_cast</span><span class="special">&lt;</span><span class="identifier">cpp_int</span><span class="special">&gt;(</span><span class="number">3.14</span><span class="special">)</span>  <span class="comment">// OK explicit conversion</span>
 <span class="identifier">i</span><span class="special">.</span><span class="identifier">assign</span><span class="special">(</span><span class="number">3.14</span><span class="special">);</span>                 <span class="comment">// OK, explicit assign and avoid a temporary from the cast above</span>
 <span class="identifier">i</span> <span class="special">=</span> <span class="number">3.14</span><span class="special">;</span>                       <span class="comment">// Error, no implicit assignment operator for lossy conversion.</span>
@@ -59,8 +59,8 @@
             syntax.
           </li></ul></div>
 <pre class="programlisting"><span class="identifier">mpz_int</span> <span class="identifier">z</span><span class="special">(</span><span class="number">2</span><span class="special">);</span>
-<span class="keyword">int</span> <span class="identifier">i</span> <span class="special">=</span> <span class="identifier">z</span><span class="special">;</span>  <span class="comment">// Error, implicit conversion not allowed.</span>
-<span class="keyword">int</span> <span class="identifier">j</span> <span class="special">=</span> <span class="keyword">static_cast</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;(</span><span class="identifier">z</span><span class="special">);</span>  <span class="comment">// OK explicit conversion.</span>
+<span class="keyword">int</span> <span class="identifier">i</span> <span class="special">=</span> <span class="identifier">z</span><span class="special">;</span>                     <span class="comment">// Error, implicit conversion not allowed.</span>
+<span class="keyword">int</span> <span class="identifier">j</span> <span class="special">=</span> <span class="keyword">static_cast</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;(</span><span class="identifier">z</span><span class="special">);</span>   <span class="comment">// OK explicit conversion.</span>
 </pre>
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
             Any number type can be <span class="emphasis"><em>explicitly</em></span> constructed (or
@@ -109,10 +109,10 @@
             and are implicit conversions if no loss of precision is involved, and
             explicit if it is:
           </li></ul></div>
-<pre class="programlisting"><span class="identifier">int128</span>       <span class="identifier">i128</span> <span class="special">=</span> <span class="number">0</span><span class="special">;</span>
-<span class="identifier">int266</span>       <span class="identifier">i256</span> <span class="special">=</span> <span class="identifier">i128</span><span class="special">;</span>  <span class="comment">// OK implicit widening conversion</span>
-<span class="identifier">i128</span>              <span class="special">=</span> <span class="identifier">i256</span><span class="special">;</span>  <span class="comment">// Error, no assignment operator found, narrowing conversion is explict</span>
-<span class="identifier">i128</span>              <span class="special">=</span> <span class="keyword">static_cast</span><span class="special">&lt;</span><span class="identifier">int128</span><span class="special">&gt;(</span><span class="identifier">i256</span><span class="special">);</span> <span class="comment">// OK, explicit narrowing conversion</span>
+<pre class="programlisting"><span class="identifier">int128_t</span>     <span class="identifier">i128</span> <span class="special">=</span> <span class="number">0</span><span class="special">;</span>
+<span class="identifier">int266_t</span>     <span class="identifier">i256</span> <span class="special">=</span> <span class="identifier">i128</span><span class="special">;</span>  <span class="comment">// OK implicit widening conversion</span>
+<span class="identifier">i128_t</span>            <span class="special">=</span> <span class="identifier">i256</span><span class="special">;</span>  <span class="comment">// Error, no assignment operator found, narrowing conversion is explict</span>
+<span class="identifier">i128_t</span>            <span class="special">=</span> <span class="keyword">static_cast</span><span class="special">&lt;</span><span class="identifier">int128_t</span><span class="special">&gt;(</span><span class="identifier">i256</span><span class="special">);</span> <span class="comment">// OK, explicit narrowing conversion</span>
 
 <span class="identifier">mpz_int</span>      <span class="identifier">z</span>    <span class="special">=</span> <span class="number">0</span><span class="special">;</span>
 <span class="identifier">mpf_float</span>    <span class="identifier">f</span>    <span class="special">=</span> <span class="identifier">z</span><span class="special">;</span>    <span class="comment">// OK, GMP handles this conversion natively, and it's not lossy and therefore implicit</span>

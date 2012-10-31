@@ -282,8 +282,10 @@ int main()
 #ifdef TEST_MPFR
 #if MPFR_VERSION<MPFR_VERSION_NUM(3,0,0)
    time_proc("mpfr_float_50", test_bessel<boost::multiprecision::mpfr_float_50>, 1);
+   time_proc("mpfr_float_50 (no expression templates", test_bessel<number<mpfr_float_backend<50>, et_off> >, 1);
 #else
    time_proc("mpfr_float_50", test_bessel<boost::multiprecision::mpfr_float_50>, mpfr_buildopt_tls_p() ? 3 : 1);
+   time_proc("mpfr_float_50 (no expression templates", test_bessel<number<mpfr_float_backend<50>, et_off> >, mpfr_buildopt_tls_p() ? 3 : 1);
 #endif
 #endif
 #ifdef TEST_MPF
@@ -311,6 +313,7 @@ int main()
 #endif
 #ifdef TEST_MPFR
    time_proc("mpfr_float_100", test_bessel<mpfr_float_100>);
+   time_proc("mpfr_float_100 (no expression templates", test_bessel<number<mpfr_float_backend<100>, et_off> >);
 #endif
 #ifdef TEST_MPF
    time_proc("mpf_float_100", test_bessel<mpf_float_100>);
@@ -338,6 +341,7 @@ int main()
 #endif
 #ifdef TEST_MPFR
    time_proc("mpfr_float_50", test_polynomial<mpfr_float_50>);
+   time_proc("mpfr_float_50 (no expression templates", test_polynomial<number<mpfr_float_backend<50>, et_off> >);
 #endif
 #ifdef TEST_MPF
    time_proc("mpf_float_50", test_polynomial<mpf_float_50>);
@@ -364,6 +368,7 @@ int main()
 #endif
 #ifdef TEST_MPFR
    time_proc("mpfr_float_100", test_polynomial<mpfr_float_100>);
+   time_proc("mpfr_float_100 (no expression templates", test_polynomial<number<mpfr_float_backend<100>, et_off> >);
 #endif
 #ifdef TEST_MPF
    time_proc("mpf_float_100", test_polynomial<mpf_float_100>);
@@ -390,6 +395,7 @@ int main()
 #endif
 #ifdef TEST_MPFR
    time_proc("mpfr_float_50", test_nct<mpfr_float_50>);
+   time_proc("mpfr_float_50 (no expression templates", test_nct<number<mpfr_float_backend<50>, et_off> >);
 #endif
 #ifdef TEST_MPF
    time_proc("mpf_float_50", test_nct<mpf_float_50>);
@@ -416,6 +422,7 @@ int main()
 #endif
 #ifdef TEST_MPFR
    time_proc("mpfr_float_100", test_nct<mpfr_float_100>);
+   time_proc("mpfr_float_100 (no expression templates", test_nct<number<mpfr_float_backend<100>, et_off> >);
 #endif
 #ifdef TEST_MPF
    time_proc("mpf_float_100", test_nct<mpf_float_100>);

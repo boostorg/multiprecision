@@ -155,10 +155,11 @@
       Note that while "moved-from" objects are left in a sane state, they
       have an unspecified value, and the only permitted operations on them are destruction
       or the assignment of a new value. Any other operation should be considered
-      a programming error and many backends will trigger an assertion if any other
-      operation is attempted. This behavior allows for optimal performance on move-construction
-      (i.e. no allocation required, we just take ownership of the existing object's
-      internal state), while maintaining usability in the standard library containers.
+      a programming error and all of our backends will trigger an assertion if any
+      other operation is attempted. This behavior allows for optimal performance
+      on move-construction (i.e. no allocation required, we just take ownership of
+      the existing object's internal state), while maintaining usability in the standard
+      library containers.
     </p>
 <h5>
 <a name="boost_multiprecision.intro.h1"></a>
@@ -217,9 +218,36 @@
       performed rather than the number of temporaries directly, note also that the
       <a href="http://gmplib.org/manual/C_002b_002b-Interface-Floats.html#C_002b_002b-Interface-Floats" target="_top">mpf_class</a>
       wrapper that will be supplied with GMP-5.1 reduces the number of temporaries
-      to pretty much zero). Finally if we use this library with expression templates
-      disabled, we still only generate 11 temporaries <a href="#ftn.boost_multiprecision.intro.f0" class="footnote"><sup class="footnote"><a name="boost_multiprecision.intro.f0"></a>[1]</sup></a> <a href="#ftn.boost_multiprecision.intro.f1" class="footnote"><sup class="footnote"><a name="boost_multiprecision.intro.f1"></a>[2]</sup></a>.
+      to pretty much zero). Note that if we compile with expression templates disabled
+      and rvalue-reference support on, then actually still have no wasted memory
+      allocations as even though temporaries are created, their contents are moved
+      rather than copied. <a href="#ftn.boost_multiprecision.intro.f0" class="footnote"><sup class="footnote"><a name="boost_multiprecision.intro.f0"></a>[1]</sup></a>
     </p>
+<div class="important"><table border="0" summary="Important">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Important]" src="../images/important.png"></td>
+<th align="left">Important</th>
+</tr>
+<tr><td align="left" valign="top">
+<p>
+        Expression templates can radically reorder the operations in an expression,
+        for example:
+      </p>
+<p>
+        a = (b * c) * a;
+      </p>
+<p>
+        Will get transformed into:
+      </p>
+<p>
+        a *= c; a *= b;
+      </p>
+<p>
+        If this is likely to be an issue for a particular application, then they
+        should be disabled.
+      </p>
+</td></tr>
+</table></div>
 <p>
       This library also extends expression template support to standard library functions
       like <code class="computeroutput"><span class="identifier">abs</span></code> or <code class="computeroutput"><span class="identifier">sin</span></code>
@@ -411,7 +439,7 @@
 </ul></div>
 <p>
       Finally, note that <code class="computeroutput"><span class="identifier">number</span></code> takes
-      a second template argument, which, when set to <code class="computeroutput"><span class="keyword">false</span></code>
+      a second template argument, which, when set to <code class="computeroutput"><span class="identifier">et_off</span></code>
       disables all the expression template machinery. The result is much faster to
       compile, but slower at runtime.
     </p>
@@ -420,9 +448,6 @@
       between these three libraries, again, all are using <a href="http://www.mpfr.org" target="_top">MPFR</a>
       to carry out the underlying arithmetic, and all are operating at the same precision
       (50 decimal digits):
-    </p>
-<p>
-      TODO: Update, compare to rvalue refs but no ET's as well.
     </p>
 <div class="table">
 <a name="boost_multiprecision.intro.evaluation_of_boost_math_s_bessel_function_test_data"></a><p class="title"><b>Table&#160;1.2.&#160;Evaluation of Boost.Math's Bessel function test data</b></p>
@@ -453,17 +478,35 @@
 <tr>
 <td>
               <p>
-                number
+                mpfr_float_50
               </p>
             </td>
 <td>
               <p>
-                1.0 (6.21s)
+                1.0 (5.66s)
               </p>
             </td>
 <td>
               <p>
-                1.0 (2685469)
+                1.0 (1611963)
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                number&lt;mpfr_float_backend&lt;50&gt;, et_off&gt;<br> (but with
+                rvalue reference support)
+              </p>
+            </td>
+<td>
+              <p>
+                1.10 (6.25s)
+              </p>
+            </td>
+<td>
+              <p>
+                2.64 (4260868)
               </p>
             </td>
 </tr>
@@ -475,12 +518,12 @@
             </td>
 <td>
               <p>
-                1.04 (6.45s)
+                1.09 (6.16s)
               </p>
             </td>
 <td>
               <p>
-                1.47 (3946007)
+                2.45 (3948316)
               </p>
             </td>
 </tr>
@@ -492,12 +535,12 @@
             </td>
 <td>
               <p>
-                1.53 (9.52s)
+                1.65 (9.34s)
               </p>
             </td>
 <td>
               <p>
-                4.92 (13222940)
+                8.21 (13226029)
               </p>
             </td>
 </tr>
@@ -538,12 +581,30 @@
             </td>
 <td>
               <p>
-                1.0 (269s)
+                1.0 (257s)
               </p>
             </td>
 <td>
               <p>
-                1.0 (139082551)
+                1.0 (127710873)
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                number&lt;mpfr_float_backend&lt;50&gt;, et_off&gt;<br> (but with
+                rvalue reference support)
+              </p>
+            </td>
+<td>
+              <p>
+                1.0 (257s)
+              </p>
+            </td>
+<td>
+              <p>
+                1.2 (156797871)
               </p>
             </td>
 </tr>
@@ -555,12 +616,12 @@
             </td>
 <td>
               <p>
-                1.04 (278s)
+                1.1 (280s)
               </p>
             </td>
 <td>
               <p>
-                1.81 (252400791)
+                2.1 (268336640)
               </p>
             </td>
 </tr>
@@ -572,29 +633,28 @@
             </td>
 <td>
               <p>
-                1.49 (401s)
+                1.4 (363s)
               </p>
             </td>
 <td>
               <p>
-                3.22 (447009280)
+                3.6 (466960653)
               </p>
             </td>
 </tr>
 </tbody>
 </table></div>
 </div>
-<br class="table-break"><div class="footnotes">
+<br class="table-break"><p>
+      The above results were generated on Win32 compiling with Visual C++ 2010, all
+      optimizations on (/Ox), with MPFR 3.0 and MPIR 2.3.0.
+    </p>
+<div class="footnotes">
 <br><hr style="width:100; align:left;">
 <div id="ftn.boost_multiprecision.intro.f0" class="footnote"><p><a href="#boost_multiprecision.intro.f0" class="para"><sup class="para">[1] </sup></a>
         The actual number generated will depend on the compiler, how well it optimises
         the code, and whether it supports rvalue references. The number of 11 temporaries
         was generated with Visual C++ 10
-      </p></div>
-<div id="ftn.boost_multiprecision.intro.f1" class="footnote"><p><a href="#boost_multiprecision.intro.f1" class="para"><sup class="para">[2] </sup></a>
-        Marc Glisse suggested pre-review that this could be reduced still further
-        by careful use of rvalue-references and move semantics in the operator overloads.
-        This will be investigated further at a later date.
       </p></div>
 </div>
 </div>

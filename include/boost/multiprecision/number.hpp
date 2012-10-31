@@ -749,7 +749,7 @@ private:
          self_type temp(e);
          temp.m_backend.swap(this->m_backend);
       }
-      else if(bl || (left_depth >= right_depth))
+      else if(!br && (bl || (left_depth >= right_depth)))
       { // br is always false, but if bl is true we must take the this branch:
          do_assign(e.left(), typename left_type::tag_type());
          do_add(e.right(), typename right_type::tag_type());
@@ -788,7 +788,7 @@ private:
          self_type temp(e);
          temp.m_backend.swap(this->m_backend);
       }
-      else if(bl || (left_depth >= right_depth))
+      else if(!br && (bl || (left_depth >= right_depth)))
       { // br is always false, but if bl is true we must take the this branch:
          do_assign(e.left(), typename left_type::tag_type());
          do_subtract(e.right(), typename right_type::tag_type());
@@ -827,7 +827,7 @@ private:
          self_type temp(e);
          temp.m_backend.swap(this->m_backend);
       }
-      else if(bl || (left_depth >= right_depth))
+      else if(!br && (bl || (left_depth >= right_depth)))
       { // br is always false, but if bl is true we must take the this branch:
          do_assign(e.left(), typename left_type::tag_type());
          do_multiplies(e.right(), typename right_type::tag_type());
@@ -927,7 +927,7 @@ private:
       {
          do_bitwise_and(e.left(), typename left_type::tag_type());
       }
-      else if(left_depth >= right_depth)
+      else if(!br && (bl || (left_depth >= right_depth)))
       {
          do_assign(e.left(), typename left_type::tag_type());
          do_bitwise_and(e.right(), typename right_type::tag_type());
@@ -972,7 +972,7 @@ private:
       {
          do_bitwise_or(e.left(), typename left_type::tag_type());
       }
-      else if(left_depth >= right_depth)
+      else if(!br && (bl || (left_depth >= right_depth)))
       {
          do_assign(e.left(), typename left_type::tag_type());
          do_bitwise_or(e.right(), typename right_type::tag_type());
@@ -1017,7 +1017,7 @@ private:
       {
          do_bitwise_xor(e.left(), typename left_type::tag_type());
       }
-      else if(left_depth >= right_depth)
+      else if(!br && (bl || (left_depth >= right_depth)))
       {
          do_assign(e.left(), typename left_type::tag_type());
          do_bitwise_xor(e.right(), typename right_type::tag_type());

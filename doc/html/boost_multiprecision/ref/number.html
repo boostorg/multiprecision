@@ -281,8 +281,8 @@
           </li>
 <li class="listitem">
             Any type in the same family, as long as no loss of precision is involved.
-            For example from <code class="computeroutput"><span class="identifier">int128</span></code>
-            to <code class="computeroutput"><span class="identifier">int256</span></code>, or <code class="computeroutput"><span class="identifier">cpp_dec_float_50</span></code> to <code class="computeroutput"><span class="identifier">cpp_dec_float_100</span></code>.
+            For example from <code class="computeroutput"><span class="identifier">int128_t</span></code>
+            to <code class="computeroutput"><span class="identifier">int256_t</span></code>, or <code class="computeroutput"><span class="identifier">cpp_dec_float_50</span></code> to <code class="computeroutput"><span class="identifier">cpp_dec_float_100</span></code>.
           </li>
 </ul></div>
 <p>
@@ -631,7 +631,8 @@
         When these functions use our own implementations, the accuracy of the transcendal
         functions is generally a few epsilon. Note however, that the trigonmetrical
         functions incur the usual accuracy loss when reducing arguments by large
-        multiples of &#960;. Also note that both __mpf_float and <a class="link" href="../tut/floats/cpp_dec_float.html" title="cpp_dec_float">cpp_dec_float</a>
+        multiples of &#960;. Also note that both <a class="link" href="../tut/floats/gmp_float.html" title="gmp_float">gmp_float</a>
+        and <a class="link" href="../tut/floats/cpp_dec_float.html" title="cpp_dec_float">cpp_dec_float</a>
         have a number of guard digits beyond their stated precision, so the error
         rates listed for these are in some sense artificially low.
       </p>

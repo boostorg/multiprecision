@@ -110,9 +110,9 @@
 <li class="listitem">
               Since the underlying <a href="http://gmplib.org" target="_top">GMP</a> types
               have no notion of infinities or NaN's, care should be taken to avoid
-              numeric overflow or division by zero. That latter will trigger a hardware
-              exception, while generating excessively large exponents may result
-              in instability of the underlying <a href="http://gmplib.org" target="_top">GMP</a>
+              numeric overflow or division by zero. That latter will result in a
+              std::overflow_error being thrown, while generating excessively large
+              exponents may result in instability of the underlying <a href="http://gmplib.org" target="_top">GMP</a>
               library (in testing, converting a number with an excessively large
               or small exponent to a string caused <a href="http://gmplib.org" target="_top">GMP</a>
               to segfault).
@@ -128,7 +128,7 @@
               point number.
             </li>
 <li class="listitem">
-              Division by zero results in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
+              Division by zero results in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">overflow_error</span></code>
               being thrown.
             </li>
 </ul></div>

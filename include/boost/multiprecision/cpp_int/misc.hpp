@@ -31,7 +31,7 @@ void check_in_range(const CppInt& /*val*/, const mpl::int_<unchecked>&) BOOST_NO
 void check_is_negative(const mpl::true_&) BOOST_NOEXCEPT {}
 void check_is_negative(const mpl::false_&)
 {
-   BOOST_THROW_EXCEPTION(std::domain_error("Attempt to assign a negative value to an unsigned type."));
+   BOOST_THROW_EXCEPTION(std::range_error("Attempt to assign a negative value to an unsigned type."));
 }
 
 template <class Integer>

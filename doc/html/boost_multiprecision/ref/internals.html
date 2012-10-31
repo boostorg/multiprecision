@@ -77,6 +77,17 @@
         types should generally specialise one of the traits above, rather than this
         one directly.
       </p>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="identifier">is_signed_number</span><span class="special">;</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="identifier">is_unsigned_number</span><span class="special">;</span>
+</pre>
+<p>
+        These two traits inherit from either <code class="computeroutput"><span class="identifier">mpl</span><span class="special">::</span><span class="identifier">true_</span></code>
+        or <code class="computeroutput"><span class="identifier">mpl</span><span class="special">::</span><span class="identifier">false_</span></code>, by default types are assumed to
+        be signed unless <code class="computeroutput"><span class="identifier">is_unsigned_number</span></code>
+        is specialized for that type.
+      </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>

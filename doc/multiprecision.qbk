@@ -51,6 +51,7 @@
 [def __gmp_int [link boost_multiprecision.tut.ints.gmp_int gmp_int]]
 [def __tom_int [link boost_multiprecision.tut.ints.tom_int tom_int]]
 [def __gmp_float [link boost_multiprecision.tut.floats.gmp_float gmp_float]]
+[def __mpf_float [link boost_multiprecision.tut.floats.gmp_float gmp_float]]
 [def __mpfr_float_backend [link boost_multiprecision.tut.floats.mpfr_float mpfr_float]]
 [def __cpp_dec_float [link boost_multiprecision.tut.floats.cpp_dec_float cpp_dec_float]]
 [def __gmp_rational [link boost_multiprecision.tut.rational.gmp_rational gmp_rational]]
@@ -162,7 +163,7 @@ move-support, and expression templates enabled.
 
 Note that while "moved-from" objects are left in a sane state, they have an unspecified value, and the only permitted 
 operations on them are destruction or the assignment of a new value.  Any other operation should be considered
-a programming error and many backends will trigger an assertion if any other operation is attempted.  This behavior
+a programming error and all of our backends will trigger an assertion if any other operation is attempted.  This behavior
 allows for optimal performance on move-construction (i.e. no allocation required, we just take ownership of the existing
 object's internal state), while maintaining usability in the standard library containers.
 
@@ -204,12 +205,24 @@ temporaries (this is true even though [mpfr_class] does use expression templates
 we used an even simpler wrapper around [mpfr] like [mpreal] things would have been even worse and no less that 24 temporaries
 are created for this simple expression (note - we actually measure the number of memory allocations performed rather than 
 the number of temporaries directly, note also that the [mpf_class] wrapper that will be supplied with GMP-5.1 reduces the number of 
-temporaries to pretty much zero).  Finally if we use this library with expression templates disabled, we still only generate 11
-temporaries
+temporaries to pretty much zero).  Note that if we compile with expression templates disabled and rvalue-reference support
+on, then actually still have no wasted memory allocations as even though temporaries are created, their contents are moved
+rather than copied.
 [footnote The actual number generated will depend on the compiler, how well it optimises the code, and whether it supports
 rvalue references.  The number of 11 temporaries was generated with Visual C++ 10]
-[footnote Marc Glisse suggested pre-review that this could be reduced still further by careful use of rvalue-references
-and move semantics in the operator overloads.  This will be investigated further at a later date.].
+
+[important
+Expression templates can radically reorder the operations in an expression, for example:
+
+   a = (b * c) * a;
+
+Will get transformed into:
+
+   a *= c;
+   a *= b;
+
+If this is likely to be an issue for a particular application, then they should be disabled.
+]
 
 This library also extends expression template support to standard library functions like `abs` or `sin` with `number`
 arguments.  This means that an expression such as:
@@ -288,28 +301,33 @@ magic by converting out-of-place operators to in-place ones, we necessarily take
 transformation is more efficient than creating the extra temporary variable, just not by as much as
 one would hope.
 
-Finally, note that `number` takes a second template argument, which, when set to `false` disables all
+Finally, note that `number` takes a second template argument, which, when set to `et_off` disables all
 the expression template machinery.  The result is much faster to compile, but slower at runtime.
 
 We'll conclude this section by providing some more performance comparisons between these three libraries,
 again, all are using [mpfr] to carry out the underlying arithmetic, and all are operating at the same precision
 (50 decimal digits):
 
-TODO: Update, compare to rvalue refs but no ET's as well.
-
 [table Evaluation of Boost.Math's Bessel function test data
 [[Library][Relative Time][Relative Number of Memory Allocations]]
-[[number][1.0 (6.21s)][1.0 (2685469)]]
-[[[mpfr_class]][1.04 (6.45s)][1.47 (3946007)]]
-[[[mpreal]][1.53 (9.52s)][4.92 (13222940)]]
+[[mpfr_float_50]                            [1.0 (5.66s)] [1.0 (1611963)]]
+[[number<mpfr_float_backend<50>, et_off>[br](but with rvalue reference support)]   
+                                            [1.10 (6.25s)][2.64 (4260868)]]
+[[[mpfr_class]]                             [1.09 (6.16s)][2.45 (3948316)]]
+[[[mpreal]]                                 [1.65 (9.34s)][8.21 (13226029)]]
 ]
 
 [table Evaluation of Boost.Math's Non-Central T distribution test data
 [[Library][Relative Time][Relative Number of Memory Allocations]]
-[[number][1.0 (269s)][1.0 (139082551)]]
-[[[mpfr_class]][1.04 (278s)][1.81 (252400791)]]
-[[[mpreal]][1.49 (401s)][3.22 (447009280)]]
+[[number]                                   [1.0 (257s)][1.0 (127710873)]]
+[[number<mpfr_float_backend<50>, et_off>[br](but with rvalue reference support)]   
+                                            [1.0 (257s)][1.2 (156797871)]]
+[[[mpfr_class]]                             [1.1 (280s)][2.1 (268336640)]]
+[[[mpreal]]                                 [1.4 (363s)][3.6 (466960653)]]
 ]
+
+The above results were generated on Win32 compiling with Visual C++ 2010, all optimizations on (/Ox),
+with MPFR 3.0 and MPIR 2.3.0.
 
 [endsect]
 
@@ -338,13 +356,20 @@ The following back-ends provide integer arithmetic:
 
    typedef unspecified-type limb_type;
 
-   template <unsigned MinDigits = 0, bool Signed = true, class Allocator = std::allocator<limb_type> >
+   enum cpp_integer_type    { signed_magnitude, unsigned_magnitude };
+   enum cpp_int_check_type  { checked, unchecked };
+
+   template <unsigned MinDigits = 0, 
+             unsigned MaxDits = 0, 
+             cpp_integer_type SignType = signed_magnitude, 
+             cpp_int_check_type Checked = unchecked, 
+             class Allocator = std::allocator<limb_type> >
    class cpp_int_backend;
    //
    // Expression templates default to et_off if there is no allocator:
    //
-   template <unsigned MinDigits, bool Signed>
-   struct expression_template_default<cpp_int_backend<MinDigits, Signed, void> >
+   template <unsigned MinDigits, unsigned MaxDigits, cpp_integer_type SignType, cpp_int_check_type Checked>
+   struct expression_template_default<cpp_int_backend<MinDigits, MaxDigits, SignType, Checked, void> >
    { static const expression_template_option value = et_off; };
 
    typedef number<cpp_int_backend<> >              cpp_int;    // arbitrary precision integer
@@ -352,46 +377,80 @@ The following back-ends provide integer arithmetic:
    typedef number<cpp_rational_backend>            cpp_rational; // arbitrary precision rational number
 
    // Fixed precision unsigned types:
-   typedef number<cpp_int_backend<128, false, void> >   uint128_t;
-   typedef number<cpp_int_backend<256, false, void> >   uint256_t;
-   typedef number<cpp_int_backend<512, false, void> >   uint512_t;
-   typedef number<cpp_int_backend<1024, false, void> >  uint1024_t;
+   typedef number<cpp_int_backend<128, 128, unsigned_magnitude, unchecked, void> >   uint128_t;
+   typedef number<cpp_int_backend<256, 256, unsigned_magnitude, unchecked, void> >   uint256_t;
+   typedef number<cpp_int_backend<512, 512, unsigned_magnitude, unchecked, void> >   uint512_t;
+   typedef number<cpp_int_backend<1024, 1024, unsigned_magnitude, unchecked, void> > uint1024_t;
 
    // Fixed precision signed types:
-   typedef number<cpp_int_backend<128, true, void> >    int128_t;
-   typedef number<cpp_int_backend<256, true, void> >    int256_t;
-   typedef number<cpp_int_backend<512, true, void> >    int512_t;
-   typedef number<cpp_int_backend<1024, true, void> >   int1024_t;
+   typedef number<cpp_int_backend<128, 128, signed_magnitude, unchecked, void> >     int128_t;
+   typedef number<cpp_int_backend<256, 256, signed_magnitude, unchecked, void> >     int256_t;
+   typedef number<cpp_int_backend<512, 512, signed_magnitude, unchecked, void> >     int512_t;
+   typedef number<cpp_int_backend<1024, 1024, signed_magnitude, unchecked, void> >   int1024_t;
+
+   // Over again, but with checking enabled this time:
+   typedef number<cpp_int_backend<0, 0, signed_magnitude, checked> >                 checked_cpp_int;
+   typedef rational_adapter<cpp_int_backend<0, 0, signed_magnitude, checked> >       checked_cpp_rational_backend;
+   typedef number<cpp_rational_backend>                                              checked_cpp_rational;
+
+   // Checked fixed precision unsigned types:
+   typedef number<cpp_int_backend<128, 128, unsigned_magnitude, checked, void> >     checked_uint128_t;
+   typedef number<cpp_int_backend<256, 256, unsigned_magnitude, checked, void> >     checked_uint256_t;
+   typedef number<cpp_int_backend<512, 512, unsigned_magnitude, checked, void> >     checked_uint512_t;
+   typedef number<cpp_int_backend<1024, 1024, unsigned_magnitude, checked, void> >   checked_uint1024_t;
+
+   // Fixed precision signed types:
+   typedef number<cpp_int_backend<128, 128, signed_magnitude, checked, void> >       checked_int128_t;
+   typedef number<cpp_int_backend<256, 256, signed_magnitude, checked, void> >       checked_int256_t;
+   typedef number<cpp_int_backend<512, 512, signed_magnitude, checked, void> >       checked_int512_t;
+   typedef number<cpp_int_backend<1024, 1024, signed_magnitude, checked, void> >     checked_int1024_t;
 
    }} // namespaces
 
-The `cpp_int_backend` type is used via one of the typedefs `boost::multiprecision::cpp_int`, 
-`boost::multiprecision::uint128_t`, `boost::multiprecision::uint256_t`,
-`boost::multiprecision::uint512_t`, `boost::multiprecision::int128_t`, `boost::multiprecision::int256_t`
-or `boost::multiprecision::int512_t`.  
+The `cpp_int_backend` type is normally used via one of the convenience typedefs given above.  
 
 This back-end is the "Swiss Army Knife" of integer types as it can represent both fixed and 
 [@http://en.wikipedia.org/wiki/Arbitrary-precision_arithmetic arbitrary precision]
-integer types, and both signed and unsigned types.  There are three template arguments:
+integer types, and both signed and unsigned types.  There are five template arguments:
 
 [variablelist
 [[MinBits][Determines the number of Bits to store directly within the object before resorting to dynamic memory
            allocation.  When zero, this field is determined automatically based on how many bits can be stored
            in union with the dynamic storage header: setting a larger value may improve performance as larger integer
-           values will be stored internally before memory allocation is required.  
-           When the Allocator parameter is type `void`, then this field
-           determines the total number of bits in the resulting fixed precision type.]]
-[[Signed][Determines whether the resulting type is signed or not.  Note that for 
+           values will be stored internally before memory allocation is required.]]
+[[MaxBits][Determines the maximum number of bits to be stored in the type: resulting in a fixed precision type.
+           When this value is the same as MinBits, then the Allocator parameter is ignored, as no dynamic
+           memory allocation will ever be performed: in this situation the Allocator parameter should be set to
+           type `void`.  Note that this parameter should not be used simply to prevent large memory
+           allocations, not only is that role better performed by the allocator, but fixed precision
+           integers have a tendency to allocate all of MaxBits of storage more often than one would expect.]]
+[[SignType][Determines whether the resulting type is signed or not.  Note that for 
 [@http://en.wikipedia.org/wiki/Arbitrary-precision_arithmetic arbitrary precision] types
-          (where the Allocator parameter is non-void), then this parameter must be `true`.  For fixed precision
-          types then this type may be either `true` (type is signed), or `false` (type is unsigned).]]
-[[Allocator][The allocator to use for dynamic memory allocation, or type `void` if this is to be a fixed precision type.]]
+          this parameter must be `signed_magnitude`.  For fixed precision
+          types then this type may be either `signed_magnitude` or `unsigned_magnitude`.]]
+[[Checked][This parameter has two values: `checked` or `unchecked`.  See below.]]
+[[Allocator][The allocator to use for dynamic memory allocation, or type `void` if MaxBits == MinBits.]]
+]
+
+When the template parameter Checked is set to `checked` then the result is a ['checked-integer], checked 
+and unchecked integers have the following properties:
+
+[table
+[[Condition][Checked-Integer][Unchecked-Integer]]
+[[Numeric overflow in fixed precision arithmetic][Throws a `std::overflow_error`.][Performs arithmetic modulo 2[super MaxBits]]]
+[[Constructing an integer from a value that can not be represented in the target type][Throws a `std::range_error`.]
+[Converts the value modulo 2[super MaxBits], signed to unsigned conversions extract the last MaxBits bits of the
+2's complement representation of the input value.]]
+[[Unsigned subtraction yielding a negative value.][Throws a `std::range_error`.][Yields the value that would
+result from treating the unsigned type as a 2's complement signed type.]]
+[[Attempting a bitwise operation on a negative value.][Throws a `std::range_error`][Yields the value, but not the bit pattern,
+that would result from performing the operation on a 2's complement integer type.]]
 ]
 
 Things you should know when using this type:
 
 * Default constructed `cpp_int_backend`s have the value zero.
-* Division by zero results in a `std::runtime_error` being thrown.
+* Division by zero results in a `std::overflow_error` being thrown.
 * Construction from a string that contains invalid non-numeric characters results in a `std::runtime_error` being thrown.
 * Since the precision of `cpp_int_backend` is necessarily limited when the allocator parameter is void, 
 care should be taken to avoid numeric overflow when using this type
@@ -404,13 +463,16 @@ That said it should be noted that there's no requirement for built-in types to b
 is the most common format by far.
 * Attempting to print negative values as either an Octal or Hexadecimal string results in a `std::runtime_error` being thrown,
 this is a direct consequence of the sign-magnitude representation.
-* The fixed precision types `mp_[u]intXXX_t` have expression template support turned off - it seems to make little 
+* The fixed precision types `[checked_][u]intXXX_t` have expression template support turned off - it seems to make little 
 difference to the performance of these types either way - so we may as well have the faster compile times by turning
 the feature off.
-* Unsigned types support subtraction, and unary negation - the result is "as if" a 2's complement operation had been performed
- - in other words they behave pretty much as a built in integer type would in this situation.  So for example if we were using
- `uint128_t` then both `uint128_t(1)-4` and `-uint128(3)` would result in the value `0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD`
- of type `uint128_t`.
+* Unsigned types support subtraction - the result is "as if" a 2's complement operation had been performed as long as they are not 
+ ['checked-integers] (see above).
+ In other words they behave pretty much as a built in integer type would in this situation.  So for example if we were using
+ `uint128_t` then `uint128_t(1)-4` would result in the value `0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD`
+ of type `uint128_t`.  However, had this operation been performed on `checked_uint128_t` then a `std::range_error` would have
+ been thrown.
+* Unary negation of unsigned types results in a compiler error (static assertion).
 * This backend supports rvalue-references and is move-aware, making instantiations of `number` on this backend move aware.
 * When used at fixed precision, the size of this type is always one machine word larger than you would expect for an N-bit integer: 
 the extra word stores both the sign, and how many machine words in the integer are actually in use.  
@@ -420,6 +482,11 @@ characterists as a 128-bit integer, rather than being 4 times slower for additio
 Typically this means you can use
 an integer type wide enough for the "worst case senario" with only minor performance degradation even if most of the time
 the arithmetic could in fact be done with a narrower type.
+* When used at fixed precision and MaxBits is smaller than the number of bits in the largest native integer type, then
+internally `cpp_int_backend` switches to a "trivial" implementation where it is just a thin wrapper around a single
+integer.  Note that it will still be slightly slower than a bare native integer, as it emulates a 
+signed-magnitude representation rather than simply using the platforms native sign representation: this ensures
+there is no step change in behavior as a cpp_int grows in size.
  
 
 [h5 Example:]
@@ -460,7 +527,7 @@ as a result performing formatted output on this type when the argument is negati
 `std::ios_base::oct` or `std::ios_base::hex` are set, will result in a `std::runtime_error` will be thrown.
 * Conversion from a string results in a `std::runtime_error` being thrown if the string can not be interpreted 
 as a valid integer.
-* Division by zero results in a `std::runtime_error` being thrown.
+* Division by zero results in a `std::overflow_error` being thrown.
 * Although this type is a wrapper around [gmp] it will work equally well with [mpir].  Indeed use of [mpir]
 is recommended on Win32.
 * This backend supports rvalue-references and is move-aware, making instantiations of `number` on this backend move aware.
@@ -498,7 +565,7 @@ as a result performing formatted output on this type when the argument is negati
 `std::ios_base::oct` or `std::ios_base::hex` are set, will result in a `std::runtime_error` will be thrown.
 * Conversion from a string results in a `std::runtime_error` being thrown if the string can not be interpreted 
 as a valid integer.
-* Division by zero results in a `std::runtime_error` being thrown.
+* Division by zero results in a `std::overflow_error` being thrown.
 
 [h5 Example:]
 
@@ -548,7 +615,7 @@ The following back-ends provide floating point arithmetic:
    }} // namespaces
 
 The `cpp_dec_float` back-end is used in conjunction with `number`: It acts as an entirely C++ (header only and dependency free)
-real-number type that is a drop-in replacement for the native C++ floating-point types, but with 
+floating-point number type that is a drop-in replacement for the native C++ floating-point types, but with 
 much greater precision.
 
 Type `cpp_dec_float` can be used at fixed precision by specifying a non-zero `Digits10` template parameter.  
@@ -641,7 +708,7 @@ existing [gmp] code.
 * It is not possible to round-trip objects of this type to and from a string and get back
 exactly the same value.  This appears to be a limitation of [gmp].
 * Since the underlying [gmp] types have no notion of infinities or NaN's, care should be taken
-to avoid numeric overflow or division by zero.  That latter will trigger a hardware exception, 
+to avoid numeric overflow or division by zero.  That latter will result in a std::overflow_error being thrown, 
 while generating excessively large exponents may result in instability of the underlying [gmp]
 library (in testing, converting a number with an excessively large or small exponent 
 to a string caused [gmp] to segfault).
@@ -649,7 +716,7 @@ to a string caused [gmp] to segfault).
 the recommended option on Win32.
 * Conversion from a string results in a `std::runtime_error` being thrown if the string can not be interpreted 
 as a valid floating point number.
-* Division by zero results in a `std::runtime_error` being thrown.
+* Division by zero results in a `std::overflow_error` being thrown.
 
 [h5 [gmp] example:]
 
@@ -799,7 +866,7 @@ which return the numerator and denominator of the number.
 Things you should know when using this type:
 
 * Default constructed `cpp_rational`s have the value zero.
-* Division by zero results in a `std::rumtime_error` being thrown.
+* Division by zero results in a `std::overflow_error` being thrown.
 * Conversion from a string results in a `std::runtime_error` being thrown if the string can not be
 interpreted as a valid rational number.
 
@@ -844,7 +911,7 @@ It's also possible to access the underlying `mpq_t` via the `data()` member func
 Things you should know when using this type:
 
 * Default constructed `mpq_rational`s have the value zero (this is the [gmp] default behavior).
-* Division by zero results in a `std::runtime_error` being thrown.
+* Division by zero results in a `std::overflow_error` being thrown.
 * Conversion from a string results in a `std::runtime_error` being thrown if the string can not be
 interpreted as a valid rational number.
 * No changes are made to the [gmp] library's global settings, so this type can coexist with existing
@@ -885,7 +952,7 @@ which return the numerator and denominator of the number.
 Things you should know when using this type:
 
 * Default constructed `tom_rational`s have the value zero (this the inherited Boost.Rational behavior).
-* Division by zero results in a `std::runtime_error` being thrown.
+* Division by zero results in a `std::overflow_error` being thrown.
 * Conversion from a string results in a `std::runtime_error` being thrown if the string can not be
 interpreted as a valid rational number.
 * No changes are made to [tommath]'s global state, so this type can safely coexist with other [tommath] code.
@@ -940,13 +1007,13 @@ In particular:
 * Any number type can be constructed (or assigned) from any builtin arithmetic type, as long
   as the conversion isn't lossy (for example float to int conversion):
 
-   cpp_dec_float_50 df(0.5); // OK construction from double
-   cpp_int          i(450);  // OK constructs from signed int
-   cpp_int          j = 3.14; // Error, lossy conversion.
+   cpp_dec_float_50 df(0.5);   // OK construction from double
+   cpp_int          i(450);    // OK constructs from signed int
+   cpp_int          j = 3.14;  // Error, lossy conversion.
 
 * A number can be explicitly constructed from an arithmetic type, even when the conversion is lossy:
 
-   cpp_int          i(3.14);  // OK explicit conversion
+   cpp_int          i(3.14);       // OK explicit conversion
    i = static_cast<cpp_int>(3.14)  // OK explicit conversion
    i.assign(3.14);                 // OK, explicit assign and avoid a temporary from the cast above
    i = 3.14;                       // Error, no implicit assignment operator for lossy conversion.
@@ -963,8 +1030,8 @@ Additional conversions may be supported by particular backends.
 this functionality is only available on compilers supporting C++11's explicit conversion syntax.
 
    mpz_int z(2);
-   int i = z;  // Error, implicit conversion not allowed.
-   int j = static_cast<int>(z);  // OK explicit conversion.
+   int i = z;                     // Error, implicit conversion not allowed.
+   int j = static_cast<int>(z);   // OK explicit conversion.
 
 * Any number type can be ['explicitly] constructed (or assigned) from a `const char*` or a `std::string`:
 
@@ -1007,10 +1074,10 @@ are not lossy:
 * Interconversions between number types of the same family are allowed and are implicit conversions if no
 loss of precision is involved, and explicit if it is:
 
-   int128       i128 = 0;
-   int266       i256 = i128;  // OK implicit widening conversion
-   i128              = i256;  // Error, no assignment operator found, narrowing conversion is explict
-   i128              = static_cast<int128>(i256); // OK, explicit narrowing conversion
+   int128_t     i128 = 0;
+   int266_t     i256 = i128;  // OK implicit widening conversion
+   i128_t            = i256;  // Error, no assignment operator found, narrowing conversion is explict
+   i128_t            = static_cast<int128_t>(i256); // OK, explicit narrowing conversion
 
    mpz_int      z    = 0;
    mpf_float    f    = z;    // OK, GMP handles this conversion natively, and it's not lossy and therefore implicit
@@ -1337,7 +1404,7 @@ Type `number` is default constructible, and both copy constructible and assignab
 * An rvalue reference to another `number`.  Move-semantics are used for construction if the backend also
 supports rvalue reference construction.  In the case of assignment, move semantics are always supported
 when the argument is an rvalue reference irrespective of the backend.
-* Any type in the same family, as long as no loss of precision is involved.  For example from `int128` to `int256`,
+* Any type in the same family, as long as no loss of precision is involved.  For example from `int128_t` to `int256_t`,
 or `cpp_dec_float_50` to `cpp_dec_float_100`.
 
 Type `number` is explicitly constructible from:
@@ -1719,30 +1786,56 @@ whose precision can vary at compile time (such as `mpf_float`).
 
    namespace boost{ namespace multiprecision{
 
-   template <unsigned MinBits = 0, bool Signed = true, class Allocator = std::allocator<limb_type> >
-   struct cpp_int_backend;
+   typedef unspecified-type limb_type;
+
+   enum cpp_integer_type    { signed_magnitude, unsigned_magnitude };
+   enum cpp_int_check_type  { checked, unchecked };
+
+   template <unsigned MinDigits = 0, 
+             unsigned MaxDits = 0, 
+             cpp_integer_type SignType = signed_magnitude, 
+             cpp_int_check_type Checked = unchecked, 
+             class Allocator = std::allocator<limb_type> >
+   class cpp_int_backend;
    //
    // Expression templates default to et_off if there is no allocator:
    //
-   template <unsigned MinDigits, bool Signed>
-   struct expression_template_default<cpp_int_backend<MinDigits, Signed, void> >
+   template <unsigned MinDigits, unsigned MaxDigits, cpp_integer_type SignType, cpp_int_check_type Checked>
+   struct expression_template_default<cpp_int_backend<MinDigits, MaxDigits, SignType, Checked, void> >
    { static const expression_template_option value = et_off; };
 
-   typedef number<cpp_int_backend<> >           cpp_int;    // arbitrary precision integer
+   typedef number<cpp_int_backend<> >              cpp_int;    // arbitrary precision integer
    typedef rational_adapter<cpp_int_backend<> >    cpp_rational_backend;
-   typedef number<cpp_rational_backend>         cpp_rational; // arbitrary precision rational number
+   typedef number<cpp_rational_backend>            cpp_rational; // arbitrary precision rational number
 
    // Fixed precision unsigned types:
-   typedef number<cpp_int_backend<128, false, void> >   uint128_t;
-   typedef number<cpp_int_backend<256, false, void> >   uint256_t;
-   typedef number<cpp_int_backend<512, false, void> >   uint512_t;
-   typedef number<cpp_int_backend<1024, false, void> >  uint1024_t;
+   typedef number<cpp_int_backend<128, 128, unsigned_magnitude, unchecked, void> >   uint128_t;
+   typedef number<cpp_int_backend<256, 256, unsigned_magnitude, unchecked, void> >   uint256_t;
+   typedef number<cpp_int_backend<512, 512, unsigned_magnitude, unchecked, void> >   uint512_t;
+   typedef number<cpp_int_backend<1024, 1024, unsigned_magnitude, unchecked, void> > uint1024_t;
 
    // Fixed precision signed types:
-   typedef number<cpp_int_backend<128, true, void> >    int128_t;
-   typedef number<cpp_int_backend<256, true, void> >    int256_t;
-   typedef number<cpp_int_backend<512, true, void> >    int512_t;
-   typedef number<cpp_int_backend<1024, true, void> >   int1024_t;
+   typedef number<cpp_int_backend<128, 128, signed_magnitude, unchecked, void> >     int128_t;
+   typedef number<cpp_int_backend<256, 256, signed_magnitude, unchecked, void> >     int256_t;
+   typedef number<cpp_int_backend<512, 512, signed_magnitude, unchecked, void> >     int512_t;
+   typedef number<cpp_int_backend<1024, 1024, signed_magnitude, unchecked, void> >   int1024_t;
+
+   // Over again, but with checking enabled this time:
+   typedef number<cpp_int_backend<0, 0, signed_magnitude, checked> >                 checked_cpp_int;
+   typedef rational_adapter<cpp_int_backend<0, 0, signed_magnitude, checked> >       checked_cpp_rational_backend;
+   typedef number<cpp_rational_backend>                                              checked_cpp_rational;
+
+   // Checked fixed precision unsigned types:
+   typedef number<cpp_int_backend<128, 128, unsigned_magnitude, checked, void> >     checked_uint128_t;
+   typedef number<cpp_int_backend<256, 256, unsigned_magnitude, checked, void> >     checked_uint256_t;
+   typedef number<cpp_int_backend<512, 512, unsigned_magnitude, checked, void> >     checked_uint512_t;
+   typedef number<cpp_int_backend<1024, 1024, unsigned_magnitude, checked, void> >   checked_uint1024_t;
+
+   // Fixed precision signed types:
+   typedef number<cpp_int_backend<128, 128, signed_magnitude, checked, void> >       checked_int128_t;
+   typedef number<cpp_int_backend<256, 256, signed_magnitude, checked, void> >       checked_int256_t;
+   typedef number<cpp_int_backend<512, 512, signed_magnitude, checked, void> >       checked_int512_t;
+   typedef number<cpp_int_backend<1024, 1024, signed_magnitude, checked, void> >     checked_int1024_t;
 
    }} // namespaces
 
@@ -1753,16 +1846,22 @@ to change.
 The template arguments are:
 
 [variablelist
-[[Argument][Meaning]]
-[[MinBits]
-   [The number of Bits to reserve inside the class's internal cache.  When constructing a value,
-    the object will use this internal cache if possible before resorting to dynamic memory allocation.
-    When this value is zero, then the size of the internal cache is `2*sizeof(void*)*CHAR_BIT`.
-    When the Allocator argument is `void`, then this parameter determines the precision of the type.]]
-[[Signed][When `true` the type is signed, otherwise unsigned.  Note that unsigned types are currently only 
-      supported when the Allocator parameter is `void`.]]
-[[Allocator][The allocator used for dynamic memory allocation.  This parameter can be `void`, in which case
-      no dynamic memory will ever be allocated.]]
+[[MinBits][Determines the number of Bits to store directly within the object before resorting to dynamic memory
+           allocation.  When zero, this field is determined automatically based on how many bits can be stored
+           in union with the dynamic storage header: setting a larger value may improve performance as larger integer
+           values will be stored internally before memory allocation is required.]]
+[[MaxBits][Determines the maximum number of bits to be stored in the type: resulting in a fixed precision type.
+           When this value is the same as MinBits, then the Allocator parameter is ignored, as no dynamic
+           memory allocation will ever be performed: in this situation the Allocator parameter should be set to
+           type `void`.  Note that this parameter should not be used simply to prevent large memory
+           allocations, not only is that role better performed by the allocator, but fixed precision
+           integers have a tendency to allocate all of MaxBits of storage more often than one would expect.]]
+[[SignType][Determines whether the resulting type is signed or not.  Note that for 
+[@http://en.wikipedia.org/wiki/Arbitrary-precision_arithmetic arbitrary precision] types
+          this parameter must be `signed_magnitude`.  For fixed precision
+          types then this type may be either `signed_magnitude` or `unsigned_magnitude`.]]
+[[Checked][This parameter has two values: `checked` or `unchecked`.  See the [link boost_multiprecision.tut.ints.cpp_int tutorial] for more information.]]
+[[Allocator][The allocator to use for dynamic memory allocation, or type `void` if MaxBits == MinBits.]]
 ]
 
 The type of `number_category<cpp_int<Args...> >::type` is `mpl::int_<number_kind_integer>`.
@@ -1939,6 +2038,14 @@ if `is_lossy_conversion<From, To>::value` is `true`.  Otherwise `false`.
 
 Note that while this trait is the ultimate arbiter of which constructors are marked as `explicit` in class `number`,
 authors of backend types should generally specialise one of the traits above, rather than this one directly.
+
+   template <class T>
+   is_signed_number;
+   template <class T>
+   is_unsigned_number;
+
+These two traits inherit from either `mpl::true_` or `mpl::false_`, by default types are assumed to be signed unless
+`is_unsigned_number` is specialized for that type.
 
 [endsect]
 
@@ -2335,7 +2442,6 @@ in point of fact this naming convention shouldn't be necessary, but rather works
 [[Header][Contains]]
 [[cpp_int.hpp][The `cpp_int` backend type.]]
 [[gmp.hpp][Defines all [gmp] related backends.]]
-[[integer_ops.hpp][Integer specific non-member functions.]]
 [[miller_rabin.hpp][Miller Rabin primality testing code.]]
 [[number.hpp][Defines the `number` backend, is included by all the backend headers.]]
 [[mpfr.hpp][Defines the mpfr_float_backend backend.]]
@@ -2348,8 +2454,16 @@ in point of fact this naming convention shouldn't be necessary, but rather works
 
 [table Implementation Headers]
 [[Header][Contains]]
+[[cpp_int/add.hpp][Add and subtract operators for `cpp_int_backend`.]]
+[[cpp_int/bitwise.hpp][Bitwise operators for `cpp_int_backend`.]]
+[[cpp_int/checked.hpp][Helper functions for checked arithmetic for `cpp_int_backend`.]]
+[[cpp_int/comparison.hpp][Comparison operators for `cpp_int_backend`.]]
+[[cpp_int/cpp_int_config.hpp][Basic setup and configuration for `cpp_int_backend`.]]
+[[cpp_int/divide.hpp][Division and modulus operators for `cpp_int_backend`.]]
+[[cpp_int/limits.hpp][`numeric_limits` support for `cpp_int_backend`.]]
+[[cpp_int/misc.hpp][Miscellaneous operators for `cpp_int_backend`.]]
+[[cpp_int/multiply.hpp][Multiply operators for `cpp_int_backend`.]]
 [[detail/big_lanczos.hpp][Lanczos support for Boost.Math integration.]]
-[[detail/cpp_int_core.hpp][Platform and peformance tuning for the `cpp_int` backend.]]
 [[detail/default_ops.hpp][Default versions of the optional backend non-member functions.]]
 [[detail/generic_interconvert.hpp][Generic interconversion routines.]]
 [[detail/number_base.hpp][All the expression template code, metaprogramming, and operator overloads for `number`.]]
@@ -2725,7 +2839,7 @@ Windows Vista machine.
 [h4 Post review changes]
 
 * Non-expression template operators further optimised with rvalue reference support.
-* Many functions made made `constexp`?
+* Many functions made `constexp`.
 * Differentiate between explicit and implicit conversions in the number constructor.
 * Removed "mp_" prefix from types.
 * Allowed mixed precision arithmetic.
@@ -2733,6 +2847,7 @@ Windows Vista machine.
 * Changed ExpressionTemplate parameter default value to use a traits class so that the default value depends on the backend used.
 * Added support for fused-multiply-add/subtract with GMP support.
 * Tweaked expression template unpacking to use fewer temporaries when the LHS also appears in the RHS.
+* Refactored `cpp_int_backend` based on review comments with new template parameter structure.
 
 [h4 Pre-review history]
 
@@ -2763,28 +2878,30 @@ More a list of what ['could] be done, rather than what ['should] be done (which 
 * Can ring types (exact floating point types) be supported?  The answer should be yes, but someone needs to write it, 
 the hard part is IO and binary-decimal convertion.
 * Should there be a choice of rounding mode (probably MPFR specific)?
+* We can reuse temporaries in multiple subtrees (temporary caching).
 
 Things requested in review:
 
 * A 2's complement fixed precision int that uses exactly N bits and no more.
-* A backend for an overflow aware integers.
-* Each back-end should document the requirements it satisfies (not currently scheduled for inclusion: it's
-deliberately an implementation detail, and "optional" requirements are optimisations which can't be detected
-by the user).
-* The use of bool in template parameters could be improved by the use of 
-an enum class which will be more explicit. E.g `enum class expression_template {disabled, enabled};
-enum class sign {unsigned, signed};`  (Partly done 2012/09/15).
 * The performances of mp_number<a_trivial_adaptor<float>, false>respect to 
 float and mp_number<a_trivial_adaptor<int>, false> and int should be 
 given to show the cost of using the generic interface (Mostly done, just need to update docs to the latest results).
 * The rounding applied when converting must be documented.
 * cpp_dec_float should round to nearest.
-* We can reuse temporaries in multiple subtrees (temporary caching).
-* Emphasise in the docs that ET's may reorder operations.
 * Document why we don't use proto (compile times).
-* Document what happens to small fixed precision cpp_int's.
 * Should we provide min/max overloads for expression templates?
 * Document why we don't abstract out addition/multiplication algorithms etc.
+* We can reuse temporaries in multiple subtrees (temporary caching)  Moved to TODO list.
+* Emphasise in the docs that ET's may reorder operations (done 2012/10/31).
+* Document what happens to small fixed precision cpp_int's (done 2012/10/31).
+* The use of bool in template parameters could be improved by the use of 
+an enum class which will be more explicit. E.g `enum class expression_template {disabled, enabled};
+enum class sign {unsigned, signed};`  (Partly done 2012/09/15, done 2012/10/31).
+* Each back-end should document the requirements it satisfies (not currently scheduled for inclusion: it's
+deliberately an implementation detail, and "optional" requirements are optimisations which can't be detected
+by the user).  Not done: this is an implementation detail, the exact list of requirements satisfied is purely
+an optimimization, not something the user can detect.
+* A backend for an overflow aware integers (done 2012/10/31).
 * IIUC convert_to is used to emulate in c++98 compilers C++11 explicit 
 conversions. Could the explicit conversion operator be added on 
 compilers supporting it?  (Done 2012/09/15).
@@ -2811,7 +2928,7 @@ is able to.  (Done 2012/09/15).
 [h4 Pre-Review Comments]
 
 * Make fixed precision orthogonal to Allocator type in cpp_int.  Possible solution - add an additional MaxBits 
-template argument that defaults to 0 (meaning keep going till no more space/memory).
+template argument that defaults to 0 (meaning keep going till no more space/memory).  Done.
 * Can ring types (exact floating point types) be supported?  The answer should be yes, but someone needs to write it (Moved to TODO list).
 * Should there be a choice of rounding mode (probably MPFR specific)?  Moved to TODO list.
 * Make the exponent type for cpp_dec_float a templare parameter, maybe include support for big-integer exponents.

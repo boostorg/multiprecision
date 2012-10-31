@@ -86,6 +86,8 @@ int test_main(int, char* [])
    test_zeta(number<gmp_float<18> >(), "number<gmp_float<18> >");
    test_zeta(number<gmp_float<30> >(), "number<gmp_float<30> >");
    test_zeta(number<gmp_float<35> >(), "number<gmp_float<35> >");
+   // there should be at least one test with expression templates off:
+   test_zeta(number<gmp_float<35>, et_off>(), "number<gmp_float<35>, et_off>");
 #endif
 #ifdef TEST_MPFR_50
    test_zeta(number<mpfr_float_backend<18> >(), "number<mpfr_float_backend<18> >");

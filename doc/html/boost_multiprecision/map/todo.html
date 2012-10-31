@@ -58,22 +58,6 @@
             more.
           </li>
 <li class="listitem">
-            A backend for an overflow aware integers.
-          </li>
-<li class="listitem">
-            Each back-end should document the requirements it satisfies (not currently
-            scheduled for inclusion: it's deliberately an implementation detail,
-            and "optional" requirements are optimisations which can't be
-            detected by the user).
-          </li>
-<li class="listitem">
-            The use of bool in template parameters could be improved by the use of
-            an enum class which will be more explicit. E.g <code class="computeroutput"><span class="keyword">enum</span>
-            <span class="keyword">class</span> <span class="identifier">expression_template</span>
-            <span class="special">{</span><span class="identifier">disabled</span><span class="special">,</span> <span class="identifier">enabled</span><span class="special">};</span> <span class="keyword">enum</span> <span class="keyword">class</span> <span class="identifier">sign</span>
-            <span class="special">{</span><span class="keyword">unsigned</span><span class="special">,</span> <span class="keyword">signed</span><span class="special">};</span></code> (Partly done 2012/09/15).
-          </li>
-<li class="listitem">
             The performances of mp_number&lt;a_trivial_adaptor&lt;float&gt;, false&gt;respect
             to float and mp_number&lt;a_trivial_adaptor&lt;int&gt;, false&gt; and
             int should be given to show the cost of using the generic interface (Mostly
@@ -95,14 +79,32 @@
             Document why we don't use proto (compile times).
           </li>
 <li class="listitem">
-            Document what happens to small fixed precision cpp_int's.
-          </li>
-<li class="listitem">
             Should we provide min/max overloads for expression templates?
           </li>
 <li class="listitem">
             Document why we don't abstract out addition/multiplication algorithms
             etc.
+          </li>
+<li class="listitem">
+            Document what happens to small fixed precision cpp_int's (done 2012/10/31).
+          </li>
+<li class="listitem">
+            The use of bool in template parameters could be improved by the use of
+            an enum class which will be more explicit. E.g <code class="computeroutput"><span class="keyword">enum</span>
+            <span class="keyword">class</span> <span class="identifier">expression_template</span>
+            <span class="special">{</span><span class="identifier">disabled</span><span class="special">,</span> <span class="identifier">enabled</span><span class="special">};</span> <span class="keyword">enum</span> <span class="keyword">class</span> <span class="identifier">sign</span>
+            <span class="special">{</span><span class="keyword">unsigned</span><span class="special">,</span> <span class="keyword">signed</span><span class="special">};</span></code> (Partly done 2012/09/15, done 2012/10/31).
+          </li>
+<li class="listitem">
+            Each back-end should document the requirements it satisfies (not currently
+            scheduled for inclusion: it's deliberately an implementation detail,
+            and "optional" requirements are optimisations which can't be
+            detected by the user). Not done: this is an implementation detail, the
+            exact list of requirements satisfied is purely an optimimization, not
+            something the user can detect.
+          </li>
+<li class="listitem">
+            A backend for an overflow aware integers (done 2012/10/31).
           </li>
 <li class="listitem">
             IIUC convert_to is used to emulate in c++98 compilers C++11 explicit
@@ -158,7 +160,7 @@
 <li class="listitem">
             Make fixed precision orthogonal to Allocator type in cpp_int. Possible
             solution - add an additional MaxBits template argument that defaults
-            to 0 (meaning keep going till no more space/memory).
+            to 0 (meaning keep going till no more space/memory). Done.
           </li>
 <li class="listitem">
             Can ring types (exact floating point types) be supported? The answer

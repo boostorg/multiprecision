@@ -78,6 +78,8 @@ int test_main(int, char* [])
    test_legendre_p(number<gmp_float<18> >(), "number<gmp_float<18> >");
    test_legendre_p(number<gmp_float<30> >(), "number<gmp_float<30> >");
    test_legendre_p(number<gmp_float<35> >(), "number<gmp_float<35> >");
+   // there should be at least one test with expression templates off:
+   test_legendre_p(number<gmp_float<35>, et_off>(), "number<gmp_float<35>, et_off>");
 #endif
 #ifdef TEST_MPFR_50
    test_legendre_p(number<mpfr_float_backend<18> >(), "number<mpfr_float_backend<18> >");
