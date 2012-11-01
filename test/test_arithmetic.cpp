@@ -1839,6 +1839,7 @@ int main()
 #endif
 #ifdef TEST_MPFR_50
    test<boost::multiprecision::mpfr_float_50>();
+   test<boost::multiprecision::static_mpfr_float_50>();
 #endif
 #ifdef TEST_TOMMATH
    test<boost::multiprecision::tom_int>();

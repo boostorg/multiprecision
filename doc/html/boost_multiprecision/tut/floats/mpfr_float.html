@@ -22,7 +22,13 @@
         </p>
 <pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">multiprecision</span><span class="special">{</span>
 
-<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">unsigned</span> <span class="identifier">Digits10</span><span class="special">&gt;</span>
+<span class="keyword">enum</span> <span class="identifier">mpfr_allocation_type</span>
+<span class="special">{</span>
+   <span class="identifier">allocate_stack</span><span class="special">,</span>
+   <span class="identifier">allocate_dynamic</span>
+<span class="special">};</span>
+
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">unsigned</span> <span class="identifier">Digits10</span><span class="special">,</span> <span class="identifier">mpfr_allocation_type</span> <span class="identifier">AllocateType</span> <span class="special">=</span> <span class="identifier">allocate_dynamic</span><span class="special">&gt;</span>
 <span class="keyword">class</span> <span class="identifier">mpfr_float_backend</span><span class="special">;</span>
 
 <span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">mpfr_float_backend</span><span class="special">&lt;</span><span class="number">50</span><span class="special">&gt;</span> <span class="special">&gt;</span>    <span class="identifier">mpfr_float_50</span><span class="special">;</span>
@@ -30,6 +36,9 @@
 <span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">mpfr_float_backend</span><span class="special">&lt;</span><span class="number">500</span><span class="special">&gt;</span> <span class="special">&gt;</span>   <span class="identifier">mpfr_float_500</span><span class="special">;</span>
 <span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">mpfr_float_backend</span><span class="special">&lt;</span><span class="number">1000</span><span class="special">&gt;</span> <span class="special">&gt;</span>  <span class="identifier">mpfr_float_1000</span><span class="special">;</span>
 <span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">mpfr_float_backend</span><span class="special">&lt;</span><span class="number">0</span><span class="special">&gt;</span> <span class="special">&gt;</span>     <span class="identifier">mpfr_float</span><span class="special">;</span>
+
+<span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">mpfr_float_backend</span><span class="special">&lt;</span><span class="number">50</span><span class="special">,</span> <span class="identifier">allocate_stack</span><span class="special">&gt;</span> <span class="special">&gt;</span>    <span class="identifier">static_mpfr_float_50</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">mpfr_float_backend</span><span class="special">&lt;</span><span class="number">100</span><span class="special">,</span> <span class="identifier">allocate_stack</span><span class="special">&gt;</span> <span class="special">&gt;</span>   <span class="identifier">static_mpfr_float_100</span><span class="special">;</span>
 
 <span class="special">}}</span> <span class="comment">// namespaces</span>
 </pre>
@@ -50,6 +59,18 @@
           respectively. The typedef mpfr_float provides a variable precision type
           whose precision can be controlled via the <code class="computeroutput"><span class="identifier">number</span></code>s
           member functions.
+        </p>
+<p>
+          In addition the second template parameter lets you choose between dynamic
+          allocation (the default, and uses MPFR's normal allocation routines), or
+          stack allocation (where all the memory required for the underlying data
+          types is stored within <code class="computeroutput"><span class="identifier">mpfr_float_backend</span></code>).
+          The latter option can result in significantly faster code, at the expense
+          of growing the size of <code class="computeroutput"><span class="identifier">mpfr_float_backend</span></code>.
+          It can only be used at fixed precision, and should only be used for lower
+          digit counts. Note that we can not guarentee that using <code class="computeroutput"><span class="identifier">allocate_stack</span></code>
+          won't cause any calls to mpfr's allocation routines, as mpfr may call these
+          inside it's own code.
         </p>
 <div class="note"><table border="0" summary="Note">
 <tr>

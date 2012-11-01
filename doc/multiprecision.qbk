@@ -730,7 +730,13 @@ as a valid floating point number.
 
    namespace boost{ namespace multiprecision{
 
-   template <unsigned Digits10>
+   enum mpfr_allocation_type
+   {
+      allocate_stack,
+      allocate_dynamic
+   };
+
+   template <unsigned Digits10, mpfr_allocation_type AllocateType = allocate_dynamic>
    class mpfr_float_backend;
 
    typedef number<mpfr_float_backend<50> >    mpfr_float_50;
@@ -738,6 +744,9 @@ as a valid floating point number.
    typedef number<mpfr_float_backend<500> >   mpfr_float_500;
    typedef number<mpfr_float_backend<1000> >  mpfr_float_1000;
    typedef number<mpfr_float_backend<0> >     mpfr_float;
+
+   typedef number<mpfr_float_backend<50, allocate_stack> >    static_mpfr_float_50;
+   typedef number<mpfr_float_backend<100, allocate_stack> >   static_mpfr_float_100;
 
    }} // namespaces
 
@@ -750,6 +759,14 @@ at variable precision by setting the template argument to zero.  The typedefs mp
 mpfr_float_500, mpfr_float_1000 provide arithmetic types at 50, 100, 500 and 1000 decimal digits precision
 respectively.  The typedef mpfr_float provides a variable precision type whose precision can be controlled via the
 `number`s member functions.
+
+In addition the second template parameter lets you choose between dynamic allocation (the default,
+and uses MPFR's normal allocation routines),
+or stack allocation (where all the memory required for the underlying data types is stored
+within `mpfr_float_backend`).  The latter option can result in significantly faster code, at the
+expense of growing the size of `mpfr_float_backend`.  It can only be used at fixed precision, and
+should only be used for lower digit counts.  Note that we can not guarentee that using `allocate_stack`
+won't cause any calls to mpfr's allocation routines, as mpfr may call these inside it's own code.
 
 [note This type only provides `numeric_limits` support when the precision is fixed at compile time.]
 
@@ -2897,6 +2914,7 @@ Windows Vista machine.
 * Added support for fused-multiply-add/subtract with GMP support.
 * Tweaked expression template unpacking to use fewer temporaries when the LHS also appears in the RHS.
 * Refactored `cpp_int_backend` based on review comments with new template parameter structure.
+* Added additional template parameter to `mpfr_float_backend` to allow stack-based allocation.
 
 [h4 Pre-review history]
 
