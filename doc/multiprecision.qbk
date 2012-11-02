@@ -767,6 +767,16 @@ within `mpfr_float_backend`).  The latter option can result in significantly fas
 expense of growing the size of `mpfr_float_backend`.  It can only be used at fixed precision, and
 should only be used for lower digit counts.  Note that we can not guarentee that using `allocate_stack`
 won't cause any calls to mpfr's allocation routines, as mpfr may call these inside it's own code.
+The following table gives an idea of the performance tradeoff's at 50 decimal digits 
+precision[footnote Compiled with VC++10 and /Ox, with MPFR-3.0.0 and MPIR-2.3.0]:
+
+[table
+[[Type][Bessel function evaluation, relative times]]
+[[`number<mpfr_float_backend<50, allocate_static>, et_on>`][1.0 (5.5s)]]
+[[`number<mpfr_float_backend<50, allocate_static>, et_off>`][1.05 (5.8s)]]
+[[`number<mpfr_float_backend<50, allocate_dynamic>, et_on>`][1.05 (5.8s)]]
+[[`number<mpfr_float_backend<50, allocate_dynamic>, et_off>`][1.16 (6.4s)]]
+]
 
 [note This type only provides `numeric_limits` support when the precision is fixed at compile time.]
 

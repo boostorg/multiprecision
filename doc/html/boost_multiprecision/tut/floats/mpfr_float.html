@@ -70,8 +70,81 @@
           It can only be used at fixed precision, and should only be used for lower
           digit counts. Note that we can not guarentee that using <code class="computeroutput"><span class="identifier">allocate_stack</span></code>
           won't cause any calls to mpfr's allocation routines, as mpfr may call these
-          inside it's own code.
+          inside it's own code. The following table gives an idea of the performance
+          tradeoff's at 50 decimal digits precision<a href="#ftn.boost_multiprecision.tut.floats.mpfr_float.f0" class="footnote"><sup class="footnote"><a name="boost_multiprecision.tut.floats.mpfr_float.f0"></a>[2]</sup></a>:
         </p>
+<div class="informaltable"><table class="table">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Type
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Bessel function evaluation, relative times
+                  </p>
+                </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">mpfr_float_backend</span><span class="special">&lt;</span><span class="number">50</span><span class="special">,</span> <span class="identifier">allocate_static</span><span class="special">&gt;,</span>
+                    <span class="identifier">et_on</span><span class="special">&gt;</span></code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    1.0 (5.5s)
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">mpfr_float_backend</span><span class="special">&lt;</span><span class="number">50</span><span class="special">,</span> <span class="identifier">allocate_static</span><span class="special">&gt;,</span>
+                    <span class="identifier">et_off</span><span class="special">&gt;</span></code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    1.05 (5.8s)
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">mpfr_float_backend</span><span class="special">&lt;</span><span class="number">50</span><span class="special">,</span> <span class="identifier">allocate_dynamic</span><span class="special">&gt;,</span>
+                    <span class="identifier">et_on</span><span class="special">&gt;</span></code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    1.05 (5.8s)
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">mpfr_float_backend</span><span class="special">&lt;</span><span class="number">50</span><span class="special">,</span> <span class="identifier">allocate_dynamic</span><span class="special">&gt;,</span>
+                    <span class="identifier">et_off</span><span class="special">&gt;</span></code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    1.16 (6.4s)
+                  </p>
+                </td>
+</tr>
+</tbody>
+</table></div>
 <div class="note"><table border="0" summary="Note">
 <tr>
 <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../images/note.png"></td>
@@ -176,6 +249,12 @@
 </pre>
 <p>
         </p>
+<div class="footnotes">
+<br><hr style="width:100; align:left;">
+<div id="ftn.boost_multiprecision.tut.floats.mpfr_float.f0" class="footnote"><p><a href="#boost_multiprecision.tut.floats.mpfr_float.f0" class="para"><sup class="para">[2] </sup></a>
+            Compiled with VC++10 and /Ox, with MPFR-3.0.0 and MPIR-2.3.0
+          </p></div>
+</div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
