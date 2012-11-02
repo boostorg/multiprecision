@@ -820,7 +820,16 @@ run ../example/tommath_snips.cpp $(TOMMATH)
         : # requirements
          [ check-target-builds ../config//has_tommath : : <build>no ] ;
 run ../example/floating_point_examples.cpp : : : <toolset>gcc:<cxxflags>-std=c++0x ;
-run test_cpp_int_conv.cpp ;
+run test_cpp_int_conv.cpp;
+
+run test_mixed_cpp_int.cpp ;
+run test_mixed_float.cpp
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_gmp : <define>TEST_GMP <library>gmp : ]
+         [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <library>mpfr <library>gmp : ] ;
+
 
 compile include_test/mpfr_include_test.cpp
               : # requirements

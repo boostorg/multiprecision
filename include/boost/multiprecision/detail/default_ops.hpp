@@ -253,7 +253,7 @@ template <class T, class U, class V>
 inline void eval_add_default(T& t, const U& u, const V& v)
 {
    t = u;
-   eval_add(t, u);
+   eval_add(t, v);
 }
 template <class T, class U, class V>
 inline void eval_add(T& t, const U& u, const V& v)
@@ -358,7 +358,7 @@ template <class T, class U, class V>
 inline void eval_multiply_default(T& t, const U& u, const V& v)
 {
    t = u;
-   eval_multiply(t, u);
+   eval_multiply(t, v);
 }
 template <class T, class U, class V>
 inline void eval_multiply(T& t, const U& u, const V& v)
@@ -457,7 +457,7 @@ template <class T, class U, class V>
 inline void eval_divide_default(T& t, const U& u, const V& v)
 {
    t = u;
-   eval_divide(t, u);
+   eval_divide(t, v);
 }
 template <class T, class U, class V>
 inline void eval_divide(T& t, const U& u, const V& v)
@@ -515,7 +515,7 @@ template <class T, class U, class V>
 inline void eval_modulus_default(T& t, const U& u, const V& v)
 {
    t = u;
-   eval_modulus(t, u);
+   eval_modulus(t, v);
 }
 template <class T, class U, class V>
 inline void eval_modulus(T& t, const U& u, const V& v)
@@ -565,7 +565,7 @@ template <class T, class U, class V>
 inline void eval_bitwise_and_default(T& t, const U& u, const V& v)
 {
    t = u;
-   eval_bitwise_and(t, u);
+   eval_bitwise_and(t, v);
 }
 template <class T, class U, class V>
 inline void eval_bitwise_and(T& t, const U& u, const V& v)
@@ -615,7 +615,7 @@ template <class T, class U, class V>
 inline void eval_bitwise_or_default(T& t, const U& u, const V& v)
 {
    t = u;
-   eval_bitwise_or(t, u);
+   eval_bitwise_or(t, v);
 }
 template <class T, class U, class V>
 inline void eval_bitwise_or(T& t, const U& u, const V& v)
@@ -665,7 +665,7 @@ template <class T, class U, class V>
 inline void eval_bitwise_xor_default(T& t, const U& u, const V& v)
 {
    t = u;
-   eval_bitwise_xor(t, u);
+   eval_bitwise_xor(t, v);
 }
 template <class T, class U, class V>
 inline void eval_bitwise_xor(T& t, const U& u, const V& v)
@@ -1107,6 +1107,66 @@ inline bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::deta
 
 } // namespace math
 namespace multiprecision{
+
+template <class B1, class B2, class B3, expression_template_option ET1, expression_template_option ET2, expression_template_option ET3>
+inline number<B1, ET1>& add(number<B1, ET1>& result, const number<B2, ET2>& a, const number<B3, ET3>& b)
+{
+   BOOST_STATIC_ASSERT_MSG((is_convertible<B2, B1>::value), "No conversion to the target of a mixed precision addition exists");
+   BOOST_STATIC_ASSERT_MSG((is_convertible<B3, B1>::value), "No conversion to the target of a mixed precision addition exists");
+   using default_ops::eval_add;
+   eval_add(result.backend(), a.backend(), b.backend());
+   return result;
+}
+
+template <class B1, class B2, class B3, expression_template_option ET1, expression_template_option ET2, expression_template_option ET3>
+inline number<B1, ET1>& subtract(number<B1, ET1>& result, const number<B2, ET2>& a, const number<B3, ET3>& b)
+{
+   BOOST_STATIC_ASSERT_MSG((is_convertible<B2, B1>::value), "No conversion to the target of a mixed precision addition exists");
+   BOOST_STATIC_ASSERT_MSG((is_convertible<B3, B1>::value), "No conversion to the target of a mixed precision addition exists");
+   using default_ops::eval_subtract;
+   eval_subtract(result.backend(), a.backend(), b.backend());
+   return result;
+}
+
+template <class B1, class B2, class B3, expression_template_option ET1, expression_template_option ET2, expression_template_option ET3>
+inline number<B1, ET1>& multiply(number<B1, ET1>& result, const number<B2, ET2>& a, const number<B3, ET3>& b)
+{
+   BOOST_STATIC_ASSERT_MSG((is_convertible<B2, B1>::value), "No conversion to the target of a mixed precision addition exists");
+   BOOST_STATIC_ASSERT_MSG((is_convertible<B3, B1>::value), "No conversion to the target of a mixed precision addition exists");
+   using default_ops::eval_multiply;
+   eval_multiply(result.backend(), a.backend(), b.backend());
+   return result;
+}
+
+template <class B, expression_template_option ET, class I>
+inline typename enable_if_c<is_integral<I>::value, number<B, ET>&>::type 
+   add(number<B, ET>& result, const I& a, const I& b)
+{
+   using default_ops::eval_add;
+   typedef typename detail::canonical<I, B>::type canonical_type;
+   eval_add(result.backend(), static_cast<canonical_type>(a), static_cast<canonical_type>(b));
+   return result;
+}
+
+template <class B, expression_template_option ET, class I>
+inline typename enable_if_c<is_integral<I>::value, number<B, ET>&>::type 
+   subtract(number<B, ET>& result, const I& a, const I& b)
+{
+   using default_ops::eval_subtract;
+   typedef typename detail::canonical<I, B>::type canonical_type;
+   eval_subtract(result.backend(), static_cast<canonical_type>(a), static_cast<canonical_type>(b));
+   return result;
+}
+
+template <class B, expression_template_option ET, class I>
+inline typename enable_if_c<is_integral<I>::value, number<B, ET>&>::type 
+   multiply(number<B, ET>& result, const I& a, const I& b)
+{
+   using default_ops::eval_multiply;
+   typedef typename detail::canonical<I, B>::type canonical_type;
+   eval_multiply(result.backend(), static_cast<canonical_type>(a), static_cast<canonical_type>(b));
+   return result;
+}
 
 template <class tag, class A1, class A2, class A3, class A4, class Policy>
 inline typename detail::expression<tag, A1, A2, A3, A4>::result_type trunc(const detail::expression<tag, A1, A2, A3, A4>& v, const Policy& pol)

@@ -690,7 +690,7 @@ protected:
          BOOST_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
    }
    template <class T, int C>
-   void check_in_range(T val, const mpl::int_<C>&){}
+   void check_in_range(T, const mpl::int_<C>&){}
 
    template <class T>
    void check_in_range(T val)
@@ -817,7 +817,7 @@ protected:
          BOOST_THROW_EXCEPTION(std::range_error("The argument to an unsigned cpp_int constructor was negative."));
    }
    template <class T, int C, bool B>
-   BOOST_FORCEINLINE void check_in_range(T val, const mpl::int_<C>&, const mpl::bool_<B>&){}
+   BOOST_FORCEINLINE void check_in_range(T, const mpl::int_<C>&, const mpl::bool_<B>&){}
 
    template <class T>
    BOOST_FORCEINLINE void check_in_range(T val)
