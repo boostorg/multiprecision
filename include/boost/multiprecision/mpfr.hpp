@@ -608,14 +608,14 @@ struct mpfr_float_backend : public detail::mpfr_float_imp<digits10, AllocationTy
 #ifndef BOOST_NO_RVALUE_REFERENCES
    mpfr_float_backend(mpfr_float_backend&& o) : detail::mpfr_float_imp<digits10, AllocationType>(static_cast<detail::mpfr_float_imp<digits10, AllocationType>&&>(o)) {}
 #endif
-   template <unsigned D>
-   mpfr_float_backend(const mpfr_float_backend<D>& val, typename enable_if_c<D <= digits10>::type* = 0)
+   template <unsigned D, mpfr_allocation_type AT>
+   mpfr_float_backend(const mpfr_float_backend<D, AT>& val, typename enable_if_c<D <= digits10>::type* = 0)
        : detail::mpfr_float_imp<digits10, AllocationType>()
    {
       mpfr_set(this->m_data, val.data(), GMP_RNDN);
    }
-   template <unsigned D>
-   explicit mpfr_float_backend(const mpfr_float_backend<D>& val, typename disable_if_c<D <= digits10>::type* = 0)
+   template <unsigned D, mpfr_allocation_type AT>
+   explicit mpfr_float_backend(const mpfr_float_backend<D, AT>& val, typename disable_if_c<D <= digits10>::type* = 0)
        : detail::mpfr_float_imp<digits10, AllocationType>()
    {
       mpfr_set(this->m_data, val.data(), GMP_RNDN);
@@ -701,8 +701,8 @@ struct mpfr_float_backend : public detail::mpfr_float_imp<digits10, AllocationTy
       return *this;
    }
    // We don't change our precision here, this is a fixed precision type:
-   template <unsigned D>
-   mpfr_float_backend& operator=(const mpfr_float_backend<D>& val) BOOST_NOEXCEPT
+   template <unsigned D, mpfr_allocation_type AT>
+   mpfr_float_backend& operator=(const mpfr_float_backend<D, AT>& val) BOOST_NOEXCEPT
    {
       mpfr_set(this->m_data, val.data(), GMP_RNDN);
       return *this;

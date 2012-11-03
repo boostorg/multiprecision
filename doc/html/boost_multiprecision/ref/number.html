@@ -115,6 +115,14 @@
 <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">expression_template_option</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">istream</span><span class="special">&amp;</span> <span class="keyword">operator</span> <span class="special">&gt;&gt;</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">istream</span><span class="special">&amp;</span> <span class="identifier">is</span><span class="special">,</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">r</span><span class="special">);</span>
 
+<span class="comment">// Arithmetic with a higher precision result:</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">ResultType</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">Source1</span> <span class="keyword">class</span> <span class="identifier">Source2</span><span class="special">&gt;</span>
+<span class="identifier">ResultType</span><span class="special">&amp;</span> <span class="identifier">add</span><span class="special">(</span><span class="identifier">ResultType</span><span class="special">&amp;</span> <span class="identifier">result</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">Source1</span><span class="special">&amp;</span> <span class="identifier">a</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">Source2</span><span class="special">&amp;</span> <span class="identifier">b</span><span class="special">);</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">ResultType</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">Source1</span> <span class="keyword">class</span> <span class="identifier">Source2</span><span class="special">&gt;</span>
+<span class="identifier">ResultType</span><span class="special">&amp;</span> <span class="identifier">subtract</span><span class="special">(</span><span class="identifier">ResultType</span><span class="special">&amp;</span> <span class="identifier">result</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">Source1</span><span class="special">&amp;</span> <span class="identifier">a</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">Source2</span><span class="special">&amp;</span> <span class="identifier">b</span><span class="special">);</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">ResultType</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">Source1</span> <span class="keyword">class</span> <span class="identifier">Source2</span><span class="special">&gt;</span>
+<span class="identifier">ResultType</span><span class="special">&amp;</span> <span class="identifier">multiply</span><span class="special">(</span><span class="identifier">ResultType</span><span class="special">&amp;</span> <span class="identifier">result</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">Source1</span><span class="special">&amp;</span> <span class="identifier">a</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">Source2</span><span class="special">&amp;</span> <span class="identifier">b</span><span class="special">);</span>
+
 <span class="comment">// Non-member function standard library support:</span>
 <span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">abs</span>    <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
 <span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">fabs</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
@@ -566,6 +574,38 @@
       </p>
 <h5>
 <a name="boost_multiprecision.ref.number.h5"></a>
+        <span class="phrase"><a name="boost_multiprecision.ref.number.arithmetic_with_a_higher_precision_result"></a></span><a class="link" href="number.html#boost_multiprecision.ref.number.arithmetic_with_a_higher_precision_result">Arithmetic
+        with a higher precision result</a>
+      </h5>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">ResultType</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">Source1</span> <span class="keyword">class</span> <span class="identifier">Source2</span><span class="special">&gt;</span>
+<span class="identifier">ResultType</span><span class="special">&amp;</span> <span class="identifier">add</span><span class="special">(</span><span class="identifier">ResultType</span><span class="special">&amp;</span> <span class="identifier">result</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">Source1</span><span class="special">&amp;</span> <span class="identifier">a</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">Source2</span><span class="special">&amp;</span> <span class="identifier">b</span><span class="special">);</span>
+
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">ResultType</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">Source1</span> <span class="keyword">class</span> <span class="identifier">Source2</span><span class="special">&gt;</span>
+<span class="identifier">ResultType</span><span class="special">&amp;</span> <span class="identifier">subtract</span><span class="special">(</span><span class="identifier">ResultType</span><span class="special">&amp;</span> <span class="identifier">result</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">Source1</span><span class="special">&amp;</span> <span class="identifier">a</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">Source2</span><span class="special">&amp;</span> <span class="identifier">b</span><span class="special">);</span>
+
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">ResultType</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">Source1</span> <span class="keyword">class</span> <span class="identifier">Source2</span><span class="special">&gt;</span>
+<span class="identifier">ResultType</span><span class="special">&amp;</span> <span class="identifier">multiply</span><span class="special">(</span><span class="identifier">ResultType</span><span class="special">&amp;</span> <span class="identifier">result</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">Source1</span><span class="special">&amp;</span> <span class="identifier">a</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">Source2</span><span class="special">&amp;</span> <span class="identifier">b</span><span class="special">);</span>
+</pre>
+<p>
+        These functions apply the named operator to the arguments <span class="emphasis"><em>a</em></span>
+        and <span class="emphasis"><em>b</em></span> and store the result in <span class="emphasis"><em>result</em></span>,
+        returning <span class="emphasis"><em>result</em></span>. In all cases they behave "as
+        if" arguments <span class="emphasis"><em>a</em></span> and <span class="emphasis"><em>b</em></span> were
+        first promoted to type <code class="computeroutput"><span class="identifier">ResultType</span></code>
+        before applying the operator, though particular backends may well avoid that
+        step by way of an optimization.
+      </p>
+<p>
+        The type <code class="computeroutput"><span class="identifier">ResultType</span></code> must
+        be an instance of class <code class="computeroutput"><span class="identifier">number</span></code>,
+        and the types <code class="computeroutput"><span class="identifier">Source1</span></code> and
+        <code class="computeroutput"><span class="identifier">Source2</span></code> may be either instances
+        of class <code class="computeroutput"><span class="identifier">number</span></code> or native
+        integer types. The latter is an optimization that allows arithmetic to be
+        performed on native integer types producing an extended precision result.
+      </p>
+<h5>
+<a name="boost_multiprecision.ref.number.h6"></a>
         <span class="phrase"><a name="boost_multiprecision.ref.number.non_member_standard_library_function_support"></a></span><a class="link" href="number.html#boost_multiprecision.ref.number.non_member_standard_library_function_support">Non-member
         standard library function support</a>
       </h5>
@@ -1008,7 +1048,7 @@
                   </p></div></td></tr></tbody>
 </table></div>
 <h5>
-<a name="boost_multiprecision.ref.number.h6"></a>
+<a name="boost_multiprecision.ref.number.h7"></a>
         <span class="phrase"><a name="boost_multiprecision.ref.number.traits_class_support"></a></span><a class="link" href="number.html#boost_multiprecision.ref.number.traits_class_support">Traits Class
         Support</a>
       </h5>
@@ -1049,7 +1089,7 @@
         if T is an expression template type derived from <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;&gt;</span></code>, otherwise from <code class="computeroutput"><span class="identifier">mpl</span><span class="special">::</span><span class="identifier">false_</span></code>.
       </p>
 <h5>
-<a name="boost_multiprecision.ref.number.h7"></a>
+<a name="boost_multiprecision.ref.number.h8"></a>
         <span class="phrase"><a name="boost_multiprecision.ref.number.integer_functions"></a></span><a class="link" href="number.html#boost_multiprecision.ref.number.integer_functions">Integer
         functions</a>
       </h5>
@@ -1130,7 +1170,7 @@
         composite less than 0.25^trials.
       </p>
 <h5>
-<a name="boost_multiprecision.ref.number.h8"></a>
+<a name="boost_multiprecision.ref.number.h9"></a>
         <span class="phrase"><a name="boost_multiprecision.ref.number.rational_number_functions"></a></span><a class="link" href="number.html#boost_multiprecision.ref.number.rational_number_functions">Rational
         Number Functions</a>
       </h5>
@@ -1142,7 +1182,7 @@
         respectively.
       </p>
 <h5>
-<a name="boost_multiprecision.ref.number.h9"></a>
+<a name="boost_multiprecision.ref.number.h10"></a>
         <span class="phrase"><a name="boost_multiprecision.ref.number.boost_math_interoperability_support"></a></span><a class="link" href="number.html#boost_multiprecision.ref.number.boost_math_interoperability_support">Boost.Math
         Interoperability Support</a>
       </h5>
@@ -1165,7 +1205,7 @@
         to ensure interoperability.
       </p>
 <h5>
-<a name="boost_multiprecision.ref.number.h10"></a>
+<a name="boost_multiprecision.ref.number.h11"></a>
         <span class="phrase"><a name="boost_multiprecision.ref.number.std__numeric_limits_support"></a></span><a class="link" href="number.html#boost_multiprecision.ref.number.std__numeric_limits_support">std::numeric_limits
         support</a>
       </h5>
