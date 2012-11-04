@@ -32,7 +32,7 @@ namespace backends{
 #pragma warning(disable:4127 4351 4293)
 #endif
 
-template <unsigned MinBits = 0, unsigned MaxBits = 0, cpp_integer_type SignType = signed_magnitude, cpp_int_check_type Checked = unchecked, class Allocator = mpl::if_c<MinBits && (MinBits == MaxBits), void, std::allocator<limb_type> >::type >
+template <unsigned MinBits = 0, unsigned MaxBits = 0, cpp_integer_type SignType = signed_magnitude, cpp_int_check_type Checked = unchecked, class Allocator = typename mpl::if_c<MinBits && (MinBits == MaxBits), void, std::allocator<limb_type> >::type >
 struct cpp_int_backend;
 
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator, bool trivial = false>
