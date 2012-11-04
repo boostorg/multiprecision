@@ -820,7 +820,7 @@ run ../example/tommath_snips.cpp $(TOMMATH)
         : # requirements
          [ check-target-builds ../config//has_tommath : : <build>no ] ;
 run ../example/floating_point_examples.cpp : : : <toolset>gcc:<cxxflags>-std=c++0x ;
-run test_cpp_int_conv.cpp;
+run test_cpp_int_conv.cpp ;
 
 run test_mixed_cpp_int.cpp ;
 run test_mixed_float.cpp
