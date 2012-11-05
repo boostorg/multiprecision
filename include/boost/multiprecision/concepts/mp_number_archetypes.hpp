@@ -11,7 +11,6 @@
 #include <iomanip>
 #include <cmath>
 #include <boost/cstdint.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/mpl/list.hpp>

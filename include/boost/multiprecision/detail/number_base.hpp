@@ -10,7 +10,14 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/type_traits/decay.hpp>
+#ifdef BOOST_MSVC
+#  pragma warning(push)
+#  pragma warning(disable:4307)
+#endif
 #include <boost/lexical_cast.hpp>
+#ifdef BOOST_MSVC
+#  pragma warning(pop)
+#endif
 
 namespace boost{ namespace multiprecision{
 

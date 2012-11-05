@@ -10,9 +10,15 @@
 #include <iomanip>
 #include <sstream>
 #include <boost/cstdint.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/multiprecision/number.hpp>
+#ifdef BOOST_MSVC
+#  pragma warning(push)
+#  pragma warning(disable:4512)
+#endif
 #include <boost/rational.hpp>
+#ifdef BOOST_MSVC
+#  pragma warning(pop)
+#endif
 
 namespace boost{
 namespace multiprecision{

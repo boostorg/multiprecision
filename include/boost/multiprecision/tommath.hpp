@@ -11,7 +11,6 @@
 #include <boost/multiprecision/detail/integer_ops.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/scoped_array.hpp>
 #include <tommath.h>
 #include <cmath>

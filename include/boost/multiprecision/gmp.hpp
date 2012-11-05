@@ -12,8 +12,14 @@
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/lexical_cast.hpp>
+#ifdef BOOST_MSVC
+#  pragma warning(push)
+#  pragma warning(disable:4127)
+#endif
 #include <gmp.h>
+#ifdef BOOST_MSVC
+#  pragma warning(pop)
+#endif
 #include <cmath>
 #include <limits>
 #include <climits>

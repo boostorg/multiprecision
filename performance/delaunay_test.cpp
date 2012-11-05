@@ -135,6 +135,12 @@ BOOST_FORCEINLINE void mul_2n(R& r, const T& a, const T& b)
    r *= b;
 }
 
+template <class B, boost::multiprecision::expression_template_option ET, class T>
+BOOST_FORCEINLINE void mul_2n(boost::multiprecision::number<B, ET>& r, const T& a, const T& b)
+{
+   multiply(r, a, b);
+}
+
 BOOST_FORCEINLINE void mul_2n(int128_t& r, const boost::int64_t& a, const boost::int64_t& b)
 {
    r = mult_64x64_to_128(a, b);
@@ -270,10 +276,15 @@ int main()
    std::cout << "calculating...\n";
 
    do_calc<test_traits<boost::int64_t, boost::int64_t> >("int64_t, int64_t");
-   do_calc<test_traits<number<arithmetic_backend<boost::int64_t>, et_off>, number<arithmetic_backend<boost::int64_t>, et_off> > >("arithmetic_backend<int64_t>");
-   do_calc<test_traits<boost::int64_t, int128_t> >("int64_t, int128_t");
-   do_calc<test_traits<boost::int64_t, int128_t> >("int64_t, int128_t");
-   do_calc<test_traits<boost::int64_t, number<cpp_int_backend<128, true, void>, et_on> > >("int64_t, int128_t (ET)");
+   do_calc<test_traits<number<arithmetic_backend<boost::int64_t>, et_off>, number<arithmetic_backend<boost::int64_t>, et_off> > >("arithmetic_backend<int64_t>, arithmetic_backend<int64_t>");
+   do_calc<test_traits<boost::int64_t, number<arithmetic_backend<boost::int64_t>, et_off> > >("int64_t, arithmetic_backend<int64_t>");
+   do_calc<test_traits<number<cpp_int_backend<64, 64, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void>, et_off>, number<cpp_int_backend<64, 64, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void>, et_off> > >("multiprecision::int64_t, multiprecision::int64_t");
+
+   do_calc<test_traits<boost::int64_t, ::int128_t> >("int64_t, int128_t");
+   do_calc<test_traits<boost::int64_t, boost::multiprecision::int128_t> >("int64_t, boost::multiprecision::int128_t");
+   do_calc<test_traits<boost::int64_t, number<cpp_int_backend<128, 128, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void>, et_on> > >("int64_t, int128_t (ET)");
+   do_calc<test_traits<number<cpp_int_backend<64, 64, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void>, et_off>, boost::multiprecision::int128_t > >("multiprecision::int64_t, multiprecision::int128_t");
+
    do_calc<test_traits<boost::int64_t, cpp_int> >("int64_t, cpp_int");
    do_calc<test_traits<boost::int64_t, number<cpp_int_backend<>, et_off> > >("int64_t, cpp_int (no ET's)");
    do_calc<test_traits<boost::int64_t, number<cpp_int_backend<128> > > >("int64_t, cpp_int(128-bit cache)");

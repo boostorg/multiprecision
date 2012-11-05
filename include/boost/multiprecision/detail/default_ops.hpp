@@ -9,7 +9,6 @@
 #include <boost/math/policies/error_handling.hpp>
 #include <boost/multiprecision/detail/number_base.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/front.hpp>
 #include <boost/cstdint.hpp>

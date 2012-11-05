@@ -10,7 +10,6 @@
 #include <iomanip>
 #include <sstream>
 #include <boost/cstdint.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/multiprecision/number.hpp>
 
 namespace boost{

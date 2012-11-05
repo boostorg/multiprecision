@@ -271,9 +271,7 @@ BOOST_FORCEINLINE typename enable_if_c<
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
 BOOST_FORCEINLINE typename enable_if_c<
          is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value 
-         && is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value
          && is_unsigned_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value 
-         && is_unsigned_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value
          >::type 
    eval_multiply(
       cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result, 
@@ -281,6 +279,157 @@ BOOST_FORCEINLINE typename enable_if_c<
 {
    *result.limbs() = detail::checked_multiply(*result.limbs(), *o.limbs(), typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
    result.normalize();
+}
+
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+BOOST_FORCEINLINE typename enable_if_c<
+         is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value 
+         && is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value
+         && (is_signed_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value 
+            || is_signed_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value)
+         >::type 
+   eval_multiply(
+      cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result, 
+      const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a,
+      const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& b) BOOST_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
+{
+   *result.limbs() = detail::checked_multiply(*a.limbs(), *b.limbs(), typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
+   result.sign(a.sign() != b.sign());
+   result.normalize();
+}
+
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+BOOST_FORCEINLINE typename enable_if_c<
+         is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value 
+         && is_unsigned_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value 
+         >::type 
+   eval_multiply(
+      cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result, 
+      const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a,
+      const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& b) BOOST_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
+{
+   *result.limbs() = detail::checked_multiply(*a.limbs(), *b.limbs(), typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
+   result.normalize();
+}
+
+//
+// Special routines for multiplying two integers to obtain a multiprecision result:
+//
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+BOOST_FORCEINLINE typename enable_if_c<
+            !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value 
+         >::type 
+   eval_multiply(
+      cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result, 
+      signed_double_limb_type a, signed_double_limb_type b)
+{
+   static const signed_double_limb_type mask = ~static_cast<limb_type>(0);
+   static const unsigned limb_bits = sizeof(limb_type) * CHAR_BIT;
+   bool s = false;
+   double_limb_type w, x, y, z;
+   if(a < 0)
+   {
+      a = -a;
+      s = true;
+   }
+   if(b < 0)
+   {
+      b = -b;
+      s = !s;
+   }
+   w = a & mask;
+   x = a >> limb_bits;
+   y = b & mask;
+   z = b >> limb_bits;
+
+   result.resize(4, 4);
+   limb_type* pr = result.limbs();
+
+   double_limb_type carry = w * y;
+   pr[0] = static_cast<limb_type>(carry);
+   carry >>= limb_bits;
+   carry += w * z + x * y;
+   pr[1] = static_cast<limb_type>(carry);
+   carry >>= limb_bits;
+   carry += x * z;
+   pr[2] = static_cast<limb_type>(carry);
+   pr[3] = static_cast<limb_type>(carry >> limb_bits);
+
+   result.sign(s);
+   result.normalize();
+}
+
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+BOOST_FORCEINLINE typename enable_if_c<
+            !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value 
+         >::type 
+   eval_multiply(
+      cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result, 
+      double_limb_type a, double_limb_type b)
+{
+   static const signed_double_limb_type mask = ~static_cast<limb_type>(0);
+   static const unsigned limb_bits = sizeof(limb_type) * CHAR_BIT;
+
+   double_limb_type w, x, y, z;
+   w = a & mask;
+   x = a >> limb_bits;
+   y = b & mask;
+   z = b >> limb_bits;
+
+   result.resize(4, 4);
+   limb_type* pr = result.limbs();
+
+   double_limb_type carry = w * y;
+   pr[0] = static_cast<limb_type>(carry);
+   carry >>= limb_bits;
+   carry += w * z;
+   pr[1] = static_cast<limb_type>(carry);
+   carry >>= limb_bits;
+   pr[2] = static_cast<limb_type>(carry);
+   carry = x * y + pr[1];
+   pr[1] = static_cast<limb_type>(carry);
+   carry >>= limb_bits;
+   carry += pr[2] + x * z;
+   pr[2] = static_cast<limb_type>(carry);
+   pr[3] = static_cast<limb_type>(carry >> limb_bits);
+
+   result.sign(false);
+   result.normalize();
+}
+
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1,
+          unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
+BOOST_FORCEINLINE typename enable_if_c<
+            !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value
+            && is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value
+            && is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value
+         >::type 
+   eval_multiply(
+      cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result, 
+      cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> const& a, 
+      cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> const& b)
+{
+   typedef typename boost::multiprecision::detail::canonical<typename cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>::local_limb_type, cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::type canonical_type;
+   eval_multiply(result, static_cast<canonical_type>(*a.limbs()), static_cast<canonical_type>(*b.limbs()));
+   result.sign(a.sign() != b.sign());
+}
+
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, class SI>
+BOOST_FORCEINLINE typename enable_if_c<is_signed<SI>::value && (sizeof(SI) <= sizeof(signed_double_limb_type) / 2)>::type
+   eval_multiply(
+      cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result, 
+      SI a, SI b)
+{
+   result = static_cast<signed_double_limb_type>(a) * static_cast<signed_double_limb_type>(b);
+}
+
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, class UI>
+BOOST_FORCEINLINE typename enable_if_c<is_unsigned<UI>::value && (sizeof(UI) <= sizeof(signed_double_limb_type) / 2)>::type
+   eval_multiply(
+      cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result, 
+      UI a, UI b)
+{
+   result = static_cast<double_limb_type>(a) * static_cast<double_limb_type>(b);
 }
 
 }}} // namespaces

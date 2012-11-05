@@ -73,11 +73,14 @@ int main()
 
    test<checked_int512_t, checked_int1024_t>();
    test<checked_int256_t, checked_int512_t>();
-   test<number<cpp_int_backend<64, 64, signed_magnitude, checked, void>, et_off>, checked_int512_t>();
+   test<number<cpp_int_backend<64, 64, signed_magnitude, checked, void>, et_off>, checked_int128_t>();
+   test<boost::int64_t, checked_int128_t>();
 
    test<checked_uint512_t, checked_uint1024_t>();
    test<checked_uint256_t, checked_uint512_t>();
-   test<number<cpp_int_backend<64, 64, unsigned_magnitude, checked, void>, et_off>, checked_uint512_t>();
+   test<number<cpp_int_backend<64, 64, unsigned_magnitude, checked, void>, et_off>, checked_uint128_t>();
+   test<boost::uint64_t, checked_int128_t>();
+   
    return boost::report_errors();
 }
 

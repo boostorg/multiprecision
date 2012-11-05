@@ -10,7 +10,6 @@
 #include <boost/multiprecision/gmp.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <boost/multiprecision/detail/digits.hpp>
 #include <mpfr.h>
