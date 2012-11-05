@@ -57,11 +57,11 @@ template<class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 struct is_number_expression<detail::expression<tag, Arg1, Arg2, Arg3, Arg4> > : public mpl::true_ {};
 
 template <class T, class Num>
-struct is_compatible_arithmetic_type 
+struct is_compatible_arithmetic_type
    : public mpl::bool_<
-         is_convertible<T, Num>::value 
-         && !is_same<T, Num>::value 
-         && !is_number_expression<T>::value> 
+         is_convertible<T, Num>::value
+         && !is_same<T, Num>::value
+         && !is_number_expression<T>::value>
 {};
 
 namespace detail{
@@ -90,11 +90,21 @@ typename enable_if_c<(is_unsigned<T>::value), T>::type abs(T t) BOOST_NOEXCEPT
 #  define BOOST_MP_MOVE(x) x
 #endif
 
+template <class T>
+struct bits_of
+{
+   BOOST_STATIC_ASSERT(is_integral<T>::value || std::numeric_limits<T>::is_specialized);
+   static const unsigned value =
+      std::numeric_limits<T>::is_specialized ?
+         std::numeric_limits<T>::digits
+         : sizeof(T) * CHAR_BIT - (is_signed<T>::value ? 1 : 0);
+};
+
 template <int b>
 struct has_enough_bits
 {
    template <class T>
-   struct type : public mpl::bool_<std::numeric_limits<T>::digits >= b>{};
+   struct type : public mpl::bool_<bits_of<T>::value>= b>{};
 };
 
 template <class Val, class Backend, class Tag>
@@ -115,7 +125,7 @@ struct canonical_imp<number<B, et_off>, Backend, Tag>
 template <class Val, class Backend>
 struct canonical_imp<Val, Backend, mpl::int_<0> >
 {
-   typedef typename has_enough_bits<std::numeric_limits<Val>::digits>::template type<mpl::_> pred_type;
+   typedef typename has_enough_bits<bits_of<Val>::value>::template type<mpl::_> pred_type;
    typedef typename mpl::find_if<
       typename Backend::signed_types,
       pred_type
@@ -125,7 +135,7 @@ struct canonical_imp<Val, Backend, mpl::int_<0> >
 template <class Val, class Backend>
 struct canonical_imp<Val, Backend, mpl::int_<1> >
 {
-   typedef typename has_enough_bits<std::numeric_limits<Val>::digits>::template type<mpl::_> pred_type;
+   typedef typename has_enough_bits<bits_of<Val>::value>::template type<mpl::_> pred_type;
    typedef typename mpl::find_if<
       typename Backend::unsigned_types,
       pred_type
@@ -135,7 +145,7 @@ struct canonical_imp<Val, Backend, mpl::int_<1> >
 template <class Val, class Backend>
 struct canonical_imp<Val, Backend, mpl::int_<2> >
 {
-   typedef typename has_enough_bits<std::numeric_limits<Val>::digits>::template type<mpl::_> pred_type;
+   typedef typename has_enough_bits<bits_of<Val>::value>::template type<mpl::_> pred_type;
    typedef typename mpl::find_if<
       typename Backend::float_types,
       pred_type
@@ -393,7 +403,7 @@ struct expression<tag, Arg1, Arg2, Arg3, void>
    typedef typename middle_type::result_type middle_result_type;
    typedef typename right_type::result_type right_result_type;
    typedef typename combine_expression<
-      left_result_type, 
+      left_result_type,
       typename combine_expression<right_result_type, middle_result_type>::type
    >::type result_type;
    typedef tag tag_type;
