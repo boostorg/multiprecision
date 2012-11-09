@@ -1874,7 +1874,7 @@ large as to take "effectively forever" to compute, or else simply run the host m
 Returns ['b[super p] mod m] as an expression template.
 
    template <class Backend, expression_template_option ExpressionTemplates>
-   bool divide_qr(const ``['number-or-expression-template-type]``& x, const ``['number-or-expression-template-type]``& y,
+   void divide_qr(const ``['number-or-expression-template-type]``& x, const ``['number-or-expression-template-type]``& y,
                   number<Backend, ExpressionTemplates>& q, number<Backend, ExpressionTemplates>& r);
 
 Divides x by y and returns both the quotient and remainder.  After the call `q = x / y` and `r = x % y`.
@@ -1887,6 +1887,8 @@ Returns the absolute value of `x % val`.
    unsigned lsb(const ``['number-or-expression-template-type]``& x);
 
 Returns the index of the least significant bit that is set to 1.
+
+Throws a `std::range_error` if the argument is <= 0.
 
    template <class Backend, class ExpressionTemplates>
    bool bit_test(const number<Backend, ExpressionTemplates>& val, unsigned index);

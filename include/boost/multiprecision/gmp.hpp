@@ -1593,6 +1593,15 @@ inline typename enable_if_c<is_signed<I>::value && ((sizeof(I) <= sizeof(long)))
 
 inline unsigned eval_lsb(const gmp_int& val)
 {
+   int c = eval_get_sign(val);
+   if(c == 0)
+   {
+      BOOST_THROW_EXCEPTION(std::range_error("No bits were set in the operand."));
+   }
+   if(c < 0)
+   {
+      BOOST_THROW_EXCEPTION(std::range_error("Testing individual bits in negative values is not supported - results are undefined."));
+   }
    return mpz_scan1(val.data(), 0);
 }
 

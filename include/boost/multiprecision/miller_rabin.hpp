@@ -7,12 +7,14 @@
 #define BOOST_MP_MR_HPP
 
 #include <boost/multiprecision/random.hpp>
+#include <boost/multiprecision/integer.hpp>
 
 namespace boost{
 namespace multiprecision{
+namespace detail{
 
-template <class Backend, expression_template_option ExpressionTemplates>
-bool check_small_factors(const number<Backend, ExpressionTemplates>& n)
+template <class I>
+bool check_small_factors(const I& n)
 {
    static const boost::uint32_t small_factors1[] = {
       3u, 5u, 7u, 11u, 13u, 17u, 19u, 23u };
@@ -117,22 +119,37 @@ inline bool is_small_prime(unsigned n)
    return false;
 }
 
-template <class Backend, expression_template_option ExpressionTemplates, class Engine>
-typename enable_if_c<number_category<Backend>::value == number_kind_integer, bool>::type 
-   miller_rabin_test(const number<Backend, ExpressionTemplates>& n, unsigned trials, Engine& gen)
+template <class I>
+typename enable_if_c<is_convertible<I, unsigned>::value, unsigned>::type
+   cast_to_unsigned(const I& val)
+{
+   return static_cast<unsigned>(val);
+}
+template <class I>
+typename disable_if_c<is_convertible<I, unsigned>::value, unsigned>::type
+   cast_to_unsigned(const I& val)
+{
+   return val.template convert_to<unsigned>();
+}
+
+} // namespace detail
+
+template <class I, class Engine>
+typename enable_if_c<number_category<I>::value == number_kind_integer, bool>::type 
+   miller_rabin_test(const I& n, unsigned trials, Engine& gen)
 {
 #ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable:4127)
 #endif
-   typedef number<Backend, ExpressionTemplates> number_type;
+   typedef I number_type;
 
    if(n <= 227)
-      return is_small_prime(n.template convert_to<unsigned>());
+      return detail::is_small_prime(detail::cast_to_unsigned(n));
    if((n & 1) == 0)
       return false;
 
-   if(!check_small_factors(n))
+   if(!detail::check_small_factors(n))
       return false;
 
    number_type nm1 = n - 1;
@@ -144,15 +161,12 @@ typename enable_if_c<number_category<Backend>::value == number_kind_integer, boo
    if(x != 1u)
       return false;
 
-   q = (n - 1) >> 1;
-   unsigned k = 1;
-   while((q & 1) == 0)
-   {
-      q >>= 1;
-      ++k;
-   }
+   q = n - 1;
+   unsigned k = lsb(q);
+   q >>= k;
+
    // Declare our random number generator:
-   boost::random::uniform_int_distribution<number_type> dist(0, n);
+   boost::random::uniform_int_distribution<number_type> dist(2, n - 2);
    //
    // Execute the trials:
    //
@@ -169,7 +183,7 @@ typename enable_if_c<number_category<Backend>::value == number_kind_integer, boo
             return false; // test failed
          if(++j == k)
             return false; // failed
-         y = (y * y) % n;
+         y = powm(y, 2, n);
       }
    }
    return true;  // Yeheh! probably prime.
@@ -178,8 +192,9 @@ typename enable_if_c<number_category<Backend>::value == number_kind_integer, boo
 #endif
 }
 
-template <class Backend, expression_template_option ExpressionTemplates>
-bool miller_rabin_test(const number<Backend, ExpressionTemplates>& x, unsigned trials)
+template <class I>
+typename enable_if_c<number_category<I>::value == number_kind_integer, bool>::type 
+   miller_rabin_test(const I& x, unsigned trials)
 {
    static mt19937 gen;
    return miller_rabin_test(x, trials, gen);

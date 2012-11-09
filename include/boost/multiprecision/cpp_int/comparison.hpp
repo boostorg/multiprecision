@@ -14,7 +14,7 @@ namespace boost{ namespace multiprecision{ namespace backends{
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
-#pragma warning(disable:4018 4389)
+#pragma warning(disable:4018 4389 4996)
 #endif
 
 //

@@ -110,7 +110,14 @@ inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBit
    eval_lsb(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a) BOOST_NOEXCEPT
 {
    using default_ops::eval_get_sign;
-   BOOST_ASSERT(eval_get_sign(a) != 0);
+   if(eval_get_sign(a) == 0)
+   {
+      BOOST_THROW_EXCEPTION(std::range_error("No bits were set in the operand."));
+   }
+   if(a.sign())
+   {
+      BOOST_THROW_EXCEPTION(std::range_error("Testing individual bits in negative values is not supported - results are undefined."));
+   }
 
    unsigned result = 0;
    //

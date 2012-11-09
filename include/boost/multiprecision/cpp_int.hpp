@@ -29,7 +29,7 @@ namespace backends{
 #ifdef BOOST_MSVC
 // warning C4127: conditional expression is constant
 #pragma warning(push)
-#pragma warning(disable:4127 4351 4293)
+#pragma warning(disable:4127 4351 4293 4996 4307)
 #endif
 
 template <unsigned MinBits = 0, unsigned MaxBits = 0, cpp_integer_type SignType = signed_magnitude, cpp_int_check_type Checked = unchecked, class Allocator = typename mpl::if_c<MinBits && (MinBits == MaxBits), void, std::allocator<limb_type> >::type >
@@ -1735,6 +1735,31 @@ public:
 };
 
 } // namespace backends
+
+namespace detail{
+
+template <class Backend>
+struct double_precision_type;
+
+template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
+struct double_precision_type<backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >
+{
+   typedef typename mpl::if_c<
+      backends::is_fixed_precision<backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value,
+      backends::cpp_int_backend<
+         (is_void<Allocator>::value ?
+            2 * backends::max_precision<backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value
+            : MinBits),
+         2 * backends::max_precision<backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value, 
+         SignType, 
+         Checked, 
+         Allocator>,
+      backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>
+   >::type type;
+};
+
+
+}
 
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked>
 struct expression_template_default<backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, void> >

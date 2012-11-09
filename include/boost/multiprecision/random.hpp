@@ -8,6 +8,11 @@
 #ifndef BOOST_MP_RANDOM_HPP
 #define BOOST_MP_RANDOM_HPP
 
+#ifdef BOOST_MSVC
+#pragma warning(push)
+#pragma warning(disable:4127)
+#endif
+
 #include <boost/multiprecision/number.hpp>
 
 namespace boost{ namespace random{ namespace detail{
@@ -50,7 +55,10 @@ public:
     { return 0; }
     // This is the only function we modify compared to the primary template:
     static result_type max BOOST_PREVENT_MACRO_SUBSTITUTION ()
-    { return (result_type(1) << w) - 1; }
+    {
+       // This expression allows for the possibility that w == std::numeric_limits<result_type>::digits:
+       return (((result_type(1) << (w - 1)) - 1) << 1) + 1; 
+    }
 
     independent_bits_engine() { }
 
@@ -571,5 +579,9 @@ inline boost::multiprecision::number<Backend, ExpressionTemplates>
 
 
 }} // namespaces
+
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
 
 #endif

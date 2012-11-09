@@ -242,6 +242,16 @@ inline typename enable_if_c<number_category<Backend>::value == number_kind_integ
 namespace detail{
 
 //
+// Within powm, we need a type with twice as many digits as the argument type, define
+// a traits class to obtain that type:
+//
+template <class Backend>
+struct double_precision_type
+{
+   typedef Backend type;
+};
+
+//
 // Calculate (a^p)%c:
 //
 template <class Backend>
@@ -253,29 +263,34 @@ void eval_powm(Backend& result, const Backend& a, const Backend& p, const Backen
    using default_ops::eval_modulus;
    using default_ops::eval_right_shift;
 
-   typedef typename canonical<unsigned char, Backend>::type ui_type;
+   typedef typename double_precision_type<Backend>::type double_type;
+   typedef typename canonical<unsigned char, double_type>::type ui_type;
    
-   Backend x, y(a), b(p);
+   double_type x, y(a), b(p), t;
    x = ui_type(1u);
+
    while(eval_get_sign(b) > 0)
    {
       if(eval_bit_test(b, 0))
       {
-         eval_multiply(result, x, y);
-         eval_modulus(x, result, c);
+         eval_multiply(t, x, y);
+         eval_modulus(x, t, c);
       }
-      eval_multiply(result, y, y);
-      eval_modulus(y, result, c);
+      eval_multiply(t, y, y);
+      eval_modulus(y, t, c);
       eval_right_shift(b, ui_type(1));
    }
-   eval_modulus(result, x, c);
+   Backend x2(x);
+   eval_modulus(result, x2, c);
 }
 
 template <class Backend, class Integer>
 void eval_powm(Backend& result, const Backend& a, const Backend& p, Integer c)
 {
-   typedef typename canonical<unsigned char, Backend>::type ui_type;
-   typedef typename canonical<Integer, Backend>::type i_type;
+   typedef typename double_precision_type<Backend>::type double_type;
+   typedef typename canonical<unsigned char, double_type>::type ui_type;
+   typedef typename canonical<Integer, double_type>::type i1_type;
+   typedef typename canonical<Integer, Backend>::type i2_type;
 
    using default_ops::eval_bit_test;
    using default_ops::eval_get_sign;
@@ -288,27 +303,29 @@ void eval_powm(Backend& result, const Backend& a, const Backend& p, Integer c)
       BOOST_THROW_EXCEPTION(std::runtime_error("powm requires a positive exponent."));
    }
 
-   Backend x, y(a), b(p);
+   double_type x, y(a), b(p), t;
    x = ui_type(1u);
+
    while(eval_get_sign(b) > 0)
    {
       if(eval_bit_test(b, 0))
       {
-         eval_multiply(result, x, y);
-         eval_modulus(x, result, static_cast<i_type>(c));
+         eval_multiply(t, x, y);
+         eval_modulus(x, t, static_cast<i1_type>(c));
       }
-      eval_multiply(result, y, y);
-      eval_modulus(y, result, static_cast<i_type>(c));
+      eval_multiply(t, y, y);
+      eval_modulus(y, t, static_cast<i1_type>(c));
       eval_right_shift(b, ui_type(1));
    }
-   eval_modulus(result, x, static_cast<i_type>(c));
+   Backend x2(x);
+   eval_modulus(result, x2, static_cast<i2_type>(c));
 }
 
 template <class Backend, class Integer>
 typename enable_if<is_unsigned<Integer> >::type eval_powm(Backend& result, const Backend& a, Integer b, const Backend& c)
 {
-   typedef typename canonical<unsigned char, Backend>::type ui_type;
-   typedef typename canonical<Integer, Backend>::type i_type;
+   typedef typename double_precision_type<Backend>::type double_type;
+   typedef typename canonical<unsigned char, double_type>::type ui_type;
 
    using default_ops::eval_bit_test;
    using default_ops::eval_get_sign;
@@ -316,20 +333,22 @@ typename enable_if<is_unsigned<Integer> >::type eval_powm(Backend& result, const
    using default_ops::eval_modulus;
    using default_ops::eval_right_shift;
 
-   Backend x, y(a);
+   double_type x, y(a), t;
    x = ui_type(1u);
+
    while(b > 0)
    {
       if(b & 1)
       {
-         eval_multiply(result, x, y);
-         eval_modulus(x, result, c);
+         eval_multiply(t, x, y);
+         eval_modulus(x, t, c);
       }
-      eval_multiply(result, y, y);
-      eval_modulus(y, result, c);
+      eval_multiply(t, y, y);
+      eval_modulus(y, t, c);
       b >>= 1;
    }
-   eval_modulus(result, x, c);
+   Backend x2(x);
+   eval_modulus(result, x2, c);
 }
 
 template <class Backend, class Integer>
@@ -345,8 +364,9 @@ typename enable_if<is_signed<Integer> >::type eval_powm(Backend& result, const B
 template <class Backend, class Integer1, class Integer2>
 typename enable_if<is_unsigned<Integer1> >::type eval_powm(Backend& result, const Backend& a, Integer1 b, Integer2 c)
 {
-   typedef typename canonical<unsigned char, Backend>::type ui_type;
-   typedef typename canonical<Integer1, Backend>::type i1_type;
+   typedef typename double_precision_type<Backend>::type double_type;
+   typedef typename canonical<unsigned char, double_type>::type ui_type;
+   typedef typename canonical<Integer1, double_type>::type i1_type;
    typedef typename canonical<Integer2, Backend>::type i2_type;
 
    using default_ops::eval_bit_test;
@@ -355,20 +375,22 @@ typename enable_if<is_unsigned<Integer1> >::type eval_powm(Backend& result, cons
    using default_ops::eval_modulus;
    using default_ops::eval_right_shift;
 
-   Backend x, y(a);
+   double_type x, y(a), t;
    x = ui_type(1u);
+
    while(b > 0)
    {
       if(b & 1)
       {
-         eval_multiply(result, x, y);
-         eval_modulus(x, result, static_cast<i2_type>(c));
+         eval_multiply(t, x, y);
+         eval_modulus(x, t, static_cast<i1_type>(c));
       }
-      eval_multiply(result, y, y);
-      eval_modulus(y, result, static_cast<i2_type>(c));
+      eval_multiply(t, y, y);
+      eval_modulus(y, t, static_cast<i1_type>(c));
       b >>= 1;
    }
-   eval_modulus(result, x, static_cast<i2_type>(c));
+   Backend x2(x);
+   eval_modulus(result, x2, static_cast<i2_type>(c));
 }
 
 template <class Backend, class Integer1, class Integer2>

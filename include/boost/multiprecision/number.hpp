@@ -88,7 +88,7 @@ public:
    }
    */
    template<expression_template_option ET>
-   BOOST_FORCEINLINE BOOST_CONSTEXPR number(const number<Backend, ET>& val) BOOST_NOEXCEPT_IF(noexcept(Backend(static_cast<const Backend&>(std::declval<Backend>())))) : m_backend(val.m_backend) {}
+   BOOST_FORCEINLINE BOOST_CONSTEXPR number(const number<Backend, ET>& val) BOOST_NOEXCEPT_IF(noexcept(Backend(static_cast<const Backend&>(std::declval<Backend>())))) : m_backend(val.backend()) {}
 
    template <class Other, expression_template_option ET>
    BOOST_FORCEINLINE number(const number<Other, ET>& val, 

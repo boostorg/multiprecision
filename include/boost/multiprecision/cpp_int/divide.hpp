@@ -215,7 +215,7 @@ void divide_unsigned_helper(
       // rather than a full O(N^2) multiply:
       //
       double_limb_type carry = 0;
-      t.resize(y.size() + shift + 1, y.size() + shift + 1);
+      t.resize(y.size() + shift + 1, y.size() + shift);
       bool truncated_t = !CppInt1::variable && (t.size() != y.size() + shift + 1);
       typename CppInt1::limb_pointer pt = t.limbs();
       for(unsigned i = 0; i < shift; ++i)
@@ -235,12 +235,18 @@ void divide_unsigned_helper(
          t.resize(t.size() - 1, t.size() - 1);
       }
       //
-      // Update r:
+      // Update r in a way that won't actually produce a negative result
+      // in case the argument types are unsigned:
       //
-      eval_subtract(r, t);
-      if(r.isneg())
+      if(r.compare(t) > 0)
       {
-         r.negate();
+         eval_subtract(r, t);
+      }
+      else
+      {
+         r.swap(t);
+         eval_subtract(r, t);
+         prem = r.limbs();
          r_neg = !r_neg;
       }
       //
@@ -272,11 +278,13 @@ void divide_unsigned_helper(
       // We have one too many in the result:
       if(result)
          eval_decrement(*result);
-      r.negate();
       if(y.sign())
+      {
+         r.negate();
          eval_subtract(r, y);
+      }
       else
-         eval_add(r, y);
+         eval_subtract(r, y, r);
    }
 
    BOOST_ASSERT(r.compare_unsigned(y) < 0); // remainder must be less than the divisor or our code has failed
