@@ -17,6 +17,40 @@ template <int N>
 struct dummy_size{};
 
 template<typename S, typename T>
+struct has_generic_interconversion
+{
+   typedef typename mpl::if_c<
+      is_number<S>::value && is_number<T>::value,
+      typename mpl::if_c<
+         number_category<S>::value == number_kind_integer,
+         typename mpl::if_c<
+            number_category<T>::value == number_kind_integer 
+            || number_category<T>::value == number_kind_floating_point
+            || number_category<T>::value == number_kind_rational
+            || number_category<T>::value == number_kind_fixed_point,
+            mpl::true_, 
+            mpl::false_
+         >::type,
+         typename mpl::if_c<
+            number_category<S>::value == number_kind_rational,
+            typename mpl::if_c<
+               number_category<T>::value == number_kind_rational
+               || number_category<T>::value == number_kind_rational,
+               mpl::true_,
+               mpl::false_
+            >::type,
+            typename mpl::if_c<
+               number_category<T>::value == number_kind_floating_point,
+               mpl::true_,
+               mpl::false_
+            >::type
+         >::type
+      >::type,
+      mpl::false_
+   >::type type;
+};
+
+template<typename S, typename T>
 struct is_explicitly_convertible_imp
 {
 #ifndef BOOST_NO_SFINAE_EXPR
@@ -30,7 +64,8 @@ struct is_explicitly_convertible_imp
 
    typedef boost::integral_constant<bool,value> type;
 #else
-   typedef typename boost::is_convertible<S, T>::type type;
+   typedef typename has_generic_interconversion<S, T>::type gen_type;
+   typedef mpl::bool_<boost::is_convertible<S, T>::value || gen_type::value> type;
 #endif
 };
 

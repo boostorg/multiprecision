@@ -36,7 +36,6 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
-#include <boost/rational.hpp>
 #include <boost/multiprecision/rational_adapter.hpp>
 #include "test.hpp"
 #include <iostream>

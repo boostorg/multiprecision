@@ -80,6 +80,10 @@ where possible, but provides Boost license alternatives for users who must have 
 unconstrained license.  Which is to say some back-ends rely on 3rd party libraries, but a header-only Boost license version is always
 available (if somewhat slower).
 
+Should you just wish to cut to the chase and use a fully Boost-licensed number type, then skip to
+__cpp_int for multiprecision integers, __cpp_dec_float for multiprecision floating point types
+and __cpp_rational for rational types.
+
 The library is often used via one of the predefined typedefs: for example if you wanted an [@http://en.wikipedia.org/wiki/Arbitrary-precision_arithmetic arbitrary precision]
 integer type using [gmp] as the underlying implementation then you could use:
 
@@ -625,12 +629,12 @@ respectively.  Optionally, you can specify an integer type to use for the expone
 which is more than large enough for the vast majority of use cases, but larger types such as `long long` can also be specified
 if you need a truely huge exponent range.
 
-Normally `cpp_dec_float` allocates no memory: all of the space required for it's digits are allocated
+Normally `cpp_dec_float` allocates no memory: all of the space required for its digits are allocated
 directly within the class.  As a result care should be taken not to use the class with too high a digit count
 as stack space requirements can grow out of control.  If that represents a problem then providing an allocator
 as the final template parameter causes `cpp_dec_float` to dynamically allocate the memory it needs: this
 significantly reduces the size of `cpp_dec_float` and increases the viable upper limit on the number of digits
-at the expense of performance.  However, please bare in mind that arithmetic operations rapidly become ['very] expensive
+at the expense of performance.  However, please bear in mind that arithmetic operations rapidly become ['very] expensive
 as the digit count grows: the current implementation really isn't optimized or designed for large digit counts.
 
 There is full standard library and `numeric_limits` support available for this type.
@@ -639,8 +643,6 @@ Things you should know when using this type:
 
 * Default constructed `cpp_dec_float`s have a value of zero.
 * The radix of this type is 10.  As a result it can behave subtly differently from base-2 types.
-* It is not possible to round-trip this type to and from a string and get back to exactly the same value
-(this is a result of the type having some hidden internal guard digits).
 * The type has a number of internal guard digits over and above those specified in the template argument.
 Normally these should not be visible to the user.
 * The type supports both infinities and NaN's.  An infinity is generated whenever the result would overflow,
@@ -1864,14 +1866,22 @@ A traits class that inherits from `mpl::true_` if T is an expression template ty
 
 [h4 Integer functions]
 
+In addition to functioning with types from this library, these functions are also overloaded for built in integer
+types if you include `<boost/multiprecision/integer.hpp>`.  Further, when used with fixed precision types (whether
+built in integers or multiprecision ones), the functions will promote to a wider type internally when the algorithm
+requires it.  Versions overloaded for built in integer types return that integer type rather than an expression 
+template.
+
    ``['unmentionable-expression-template-type]``    pow(const ``['number-or-expression-template-type]``& b, unsigned p);
 
 Returns ['b[super p]] as an expression template.  Note that this function should be used with extreme care as the result can grow so 
-large as to take "effectively forever" to compute, or else simply run the host machine out of memory.
+large as to take "effectively forever" to compute, or else simply run the host machine out of memory.  This is the one function in
+this category that is not overloaded for built in integer types, further, it's probably not a good idea to use it with
+fixed precision `cpp_int`'s either.
 
    ``['unmentionable-expression-template-type]``    powm(const ``['number-or-expression-template-type]``& b, const ``['number-or-expression-template-type]``& p, const ``['number-or-expression-template-type]``& m);
 
-Returns ['b[super p] mod m] as an expression template.
+Returns ['b[super p] mod m] as an expression template.  Fixed precision types are promoted internally to ensure accuracy.
 
    template <class Backend, expression_template_option ExpressionTemplates>
    void divide_qr(const ``['number-or-expression-template-type]``& x, const ``['number-or-expression-template-type]``& y,
@@ -1917,7 +1927,8 @@ Flips the bit at /index/ in /val/, and returns /val/.
 Tests to see if the number /n/ is probably prime - the test excludes the vast majority of composite numbers
 by excluding small prime factors and performing a single Fermat test.  Then performs /trials/ Miller-Rabin
 tests.  Returns `false` if /n/ is definitely composite, or `true` if /n/ is probably prime with the
-probability of it being composite less than 0.25^trials.
+probability of it being composite less than 0.25^trials.  Fixed precision types are promoted internally
+to ensure accuracy.
 
 [h4 Rational Number Functions]
 
@@ -3030,6 +3041,7 @@ Windows Vista machine.
 * Added additional template parameter to `mpfr_float_backend` to allow stack-based allocation.
 * Added section on mixed precision arithmetic, and added support for operations yielding a higher precision result
 than either of the arguments.
+* Added overloads of integer-specific functions for built in integer types.
 
 [h4 Pre-review history]
 
@@ -3061,15 +3073,15 @@ More a list of what ['could] be done, rather than what ['should] be done (which 
 the hard part is IO and binary-decimal convertion.
 * Should there be a choice of rounding mode (probably MPFR specific)?
 * We can reuse temporaries in multiple subtrees (temporary caching).
+* cpp_dec_float should round to nearest.
+* A 2's complement fixed precision int that uses exactly N bits and no more.
 
 Things requested in review:
 
-* A 2's complement fixed precision int that uses exactly N bits and no more.
 * The performances of mp_number<a_trivial_adaptor<float>, false>respect to 
 float and mp_number<a_trivial_adaptor<int>, false> and int should be 
 given to show the cost of using the generic interface (Mostly done, just need to update docs to the latest results).
-* cpp_dec_float should round to nearest.
-* Should we provide min/max overloads for expression templates?
+* Should we provide min/max overloads for expression templates?  (Not done - we can't overload functions declared in the std namespace :-( ).
 * The rounding applied when converting must be documented (Done).
 * Document why we don't abstract out addition/multiplication algorithms etc. (done - FAQ)
 * Document why we don't use proto (compile times)  (Done).
@@ -3158,7 +3170,7 @@ Open question - what should be the default - int32_t or int64_t?  (done 2012/09/
    complement one favored by most native integer types.  As a result the complement operator is deliberately disabled for
    checked `cpp_int`'s.  Unchecked `cpp_int`'s give the same valued result as a 2's complement type would, but not the same bit-pattern.]]
 [[Why can't I negate an unsigned type?]
-   [The unary negation operator is deliberately disabled for unsigned integer types as it's use would almost always be a programming error.]]
+   [The unary negation operator is deliberately disabled for unsigned integer types as its use would almost always be a programming error.]]
 [[Why doesn't the library use proto?]
    [A very early version of the library did use proto, but compile times became too slow
    for the library to be usable.  Since the library only required a tiny fraction of what

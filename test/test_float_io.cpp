@@ -40,6 +40,10 @@
 #include <iostream>
 #include <iomanip>
 
+#ifdef BOOST_MSVC
+#pragma warning(disable:4127)
+#endif
+
 #if defined(TEST_MPF_50)
 template <unsigned N, boost::multiprecision::expression_template_option ET>
 bool is_mpf(const boost::multiprecision::number<boost::multiprecision::gmp_float<N>, ET>&)
@@ -286,12 +290,10 @@ int main()
 #ifdef TEST_CPP_DEC_FLOAT
    test<boost::multiprecision::cpp_dec_float_50>();
    test<boost::multiprecision::cpp_dec_float_100>();
-
    
    // cpp_dec_float has extra guard digits that messes this up:
    test_round_trip<boost::multiprecision::cpp_dec_float_50>();
    test_round_trip<boost::multiprecision::cpp_dec_float_100>();
-   
 #endif
 #ifdef TEST_MPF_50
    test<boost::multiprecision::mpf_float_50>();

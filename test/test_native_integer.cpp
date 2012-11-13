@@ -38,7 +38,7 @@ void test()
 
    if(std::numeric_limits<I>::is_signed)
    {
-      i = -1;
+      i = static_cast<I>(-1);
       BOOST_CHECK_THROW(lsb(i), std::range_error);
    }
 

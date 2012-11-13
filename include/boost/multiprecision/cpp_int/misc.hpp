@@ -8,6 +8,11 @@
 #ifndef BOOST_MP_CPP_INT_MISC_HPP
 #define BOOST_MP_CPP_INT_MISC_HPP
 
+#ifdef BOOST_MSVC
+#pragma warning(push)
+#pragma warning(disable:4702)
+#endif
+
 namespace boost{ namespace multiprecision{ namespace backends{
 
 template <class R, class CppInt>
@@ -302,6 +307,10 @@ inline typename enable_if_c<
    else
       *result = static_cast<R>(*val.limbs());
 }
+
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
 
 }}} // namespaces
 

@@ -51,15 +51,18 @@
 <li class="listitem">
             We can reuse temporaries in multiple subtrees (temporary caching).
           </li>
+<li class="listitem">
+            cpp_dec_float should round to nearest.
+          </li>
+<li class="listitem">
+            A 2's complement fixed precision int that uses exactly N bits and no
+            more.
+          </li>
 </ul></div>
 <p>
         Things requested in review:
       </p>
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
-<li class="listitem">
-            A 2's complement fixed precision int that uses exactly N bits and no
-            more.
-          </li>
 <li class="listitem">
             The performances of mp_number&lt;a_trivial_adaptor&lt;float&gt;, false&gt;respect
             to float and mp_number&lt;a_trivial_adaptor&lt;int&gt;, false&gt; and
@@ -67,10 +70,8 @@
             done, just need to update docs to the latest results).
           </li>
 <li class="listitem">
-            cpp_dec_float should round to nearest.
-          </li>
-<li class="listitem">
-            Should we provide min/max overloads for expression templates?
+            Should we provide min/max overloads for expression templates? (Not done
+            - we can't overload functions declared in the std namespace :-( ).
           </li>
 <li class="listitem">
             The rounding applied when converting must be documented (Done).

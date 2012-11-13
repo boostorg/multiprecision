@@ -43,6 +43,10 @@
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #endif
 
+#ifdef BOOST_MSVC
+#pragma warning(disable:4127)
+#endif
+
 boost::mt19937 rng;
 
 template <class T>

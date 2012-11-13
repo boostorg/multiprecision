@@ -1093,21 +1093,33 @@
         <span class="phrase"><a name="boost_multiprecision.ref.number.integer_functions"></a></span><a class="link" href="number.html#boost_multiprecision.ref.number.integer_functions">Integer
         functions</a>
       </h5>
+<p>
+        In addition to functioning with types from this library, these functions
+        are also overloaded for built in integer types if you include <code class="computeroutput"><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">integer</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span></code>.
+        Further, when used with fixed precision types (whether built in integers
+        or multiprecision ones), the functions will promote to a wider type internally
+        when the algorithm requires it. Versions overloaded for built in integer
+        types return that integer type rather than an expression template.
+      </p>
 <pre class="programlisting"><span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">pow</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">b</span><span class="special">,</span> <span class="keyword">unsigned</span> <span class="identifier">p</span><span class="special">);</span>
 </pre>
 <p>
         Returns <span class="emphasis"><em>b<sup>p</sup></em></span> as an expression template. Note that this
         function should be used with extreme care as the result can grow so large
         as to take "effectively forever" to compute, or else simply run
-        the host machine out of memory.
+        the host machine out of memory. This is the one function in this category
+        that is not overloaded for built in integer types, further, it's probably
+        not a good idea to use it with fixed precision <code class="computeroutput"><span class="identifier">cpp_int</span></code>'s
+        either.
       </p>
 <pre class="programlisting"><span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">powm</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">b</span><span class="special">,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">p</span><span class="special">,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">m</span><span class="special">);</span>
 </pre>
 <p>
-        Returns <span class="emphasis"><em>b<sup>p</sup> mod m</em></span> as an expression template.
+        Returns <span class="emphasis"><em>b<sup>p</sup> mod m</em></span> as an expression template. Fixed precision
+        types are promoted internally to ensure accuracy.
       </p>
 <pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">expression_template_option</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span>
-<span class="keyword">bool</span> <span class="identifier">divide_qr</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">x</span><span class="special">,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">y</span><span class="special">,</span>
+<span class="keyword">void</span> <span class="identifier">divide_qr</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">x</span><span class="special">,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">y</span><span class="special">,</span>
                <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">q</span><span class="special">,</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">r</span><span class="special">);</span>
 </pre>
 <p>
@@ -1127,6 +1139,9 @@
 </pre>
 <p>
         Returns the index of the least significant bit that is set to 1.
+      </p>
+<p>
+        Throws a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">range_error</span></code> if the argument is &lt;= 0.
       </p>
 <pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span>
 <span class="keyword">bool</span> <span class="identifier">bit_test</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">val</span><span class="special">,</span> <span class="keyword">unsigned</span> <span class="identifier">index</span><span class="special">);</span>
@@ -1167,7 +1182,8 @@
         Miller-Rabin tests. Returns <code class="computeroutput"><span class="keyword">false</span></code>
         if <span class="emphasis"><em>n</em></span> is definitely composite, or <code class="computeroutput"><span class="keyword">true</span></code>
         if <span class="emphasis"><em>n</em></span> is probably prime with the probability of it being
-        composite less than 0.25^trials.
+        composite less than 0.25^trials. Fixed precision types are promoted internally
+        to ensure accuracy.
       </p>
 <h5>
 <a name="boost_multiprecision.ref.number.h9"></a>

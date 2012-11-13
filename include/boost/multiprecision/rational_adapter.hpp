@@ -13,7 +13,7 @@
 #include <boost/multiprecision/number.hpp>
 #ifdef BOOST_MSVC
 #  pragma warning(push)
-#  pragma warning(disable:4512)
+#  pragma warning(disable:4512 4127)
 #endif
 #include <boost/rational.hpp>
 #ifdef BOOST_MSVC

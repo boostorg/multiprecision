@@ -176,6 +176,13 @@ public:
    {
       *this = e;
    }
+   template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+   explicit number(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e, 
+      typename enable_if_c<!is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>::value
+      && boost::multiprecision::detail::is_explicitly_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>::value>::type* = 0)
+   {
+      assign(e);
+   }
 
 #ifndef BOOST_NO_RVALUE_REFERENCES
    BOOST_FORCEINLINE BOOST_CONSTEXPR number(number&& r) BOOST_NOEXCEPT : m_backend(static_cast<Backend&&>(r.m_backend)){}

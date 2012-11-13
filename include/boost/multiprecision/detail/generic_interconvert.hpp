@@ -77,7 +77,7 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
       t.negate();
    // Pick off the first limb:
    limb_type limb;
-   limb_type mask = ~static_cast<limb_type>(0);
+   limb_type mask = static_cast<limb_type>(~static_cast<limb_type>(0));
    From fl;
    eval_bitwise_and(fl, t, mask);
    eval_convert_to(&limb, fl);

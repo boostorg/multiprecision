@@ -40,6 +40,10 @@
 #include <iostream>
 #include <iomanip>
 
+#ifdef BOOST_MSVC
+#pragma warning(disable:4127)
+#endif
+
 template <class T>
 struct unchecked_type{ typedef T type; };
 

@@ -51,7 +51,7 @@
         </p>
 <p>
           Normally <code class="computeroutput"><span class="identifier">cpp_dec_float</span></code>
-          allocates no memory: all of the space required for it's digits are allocated
+          allocates no memory: all of the space required for its digits are allocated
           directly within the class. As a result care should be taken not to use
           the class with too high a digit count as stack space requirements can grow
           out of control. If that represents a problem then providing an allocator
@@ -59,7 +59,7 @@
           to dynamically allocate the memory it needs: this significantly reduces
           the size of <code class="computeroutput"><span class="identifier">cpp_dec_float</span></code>
           and increases the viable upper limit on the number of digits at the expense
-          of performance. However, please bare in mind that arithmetic operations
+          of performance. However, please bear in mind that arithmetic operations
           rapidly become <span class="emphasis"><em>very</em></span> expensive as the digit count grows:
           the current implementation really isn't optimized or designed for large
           digit counts.
@@ -79,11 +79,6 @@
 <li class="listitem">
               The radix of this type is 10. As a result it can behave subtly differently
               from base-2 types.
-            </li>
-<li class="listitem">
-              It is not possible to round-trip this type to and from a string and
-              get back to exactly the same value (this is a result of the type having
-              some hidden internal guard digits).
             </li>
 <li class="listitem">
               The type has a number of internal guard digits over and above those

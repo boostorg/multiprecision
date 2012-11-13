@@ -62,7 +62,9 @@ exe miller_rabin_performance : miller_rabin_performance.cpp /boost/system//boost
           <define>TEST_CPP_INT
           ;
 
-exe sf_performance : sf_performance.cpp /boost/system//boost_system /boost/chrono//boost_chrono /boost/thread//boost_thread
+exe sf_performance : sf_performance.cpp sf_performance_basic.cpp sf_performance_bessel.cpp 
+                     sf_performance_nct.cpp sf_performance_poly.cpp 
+                     /boost/system//boost_system /boost/chrono//boost_chrono /boost/thread//boost_thread
           : release
           [ check-target-builds ../config//has_gmp : <define>TEST_MPF <define>TEST_MPZ <source>gmp : ]
           [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>mpfr : ]

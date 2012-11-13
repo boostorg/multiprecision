@@ -44,6 +44,10 @@
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #endif
 
+#ifdef BOOST_MSVC
+#pragma warning(disable:4127)
+#endif
+
 template <class T>
 T atan2_def(T y, T x)
 {

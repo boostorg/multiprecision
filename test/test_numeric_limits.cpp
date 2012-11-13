@@ -51,6 +51,10 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #endif
 
+#ifdef BOOST_MSVC
+#pragma warning(disable:4127)
+#endif
+
 #define PRINT(x)\
    std::cout << BOOST_STRINGIZE(x) << " = " << std::numeric_limits<Number>::x << std::endl;
 
