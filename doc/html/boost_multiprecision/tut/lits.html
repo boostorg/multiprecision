@@ -1,0 +1,63 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Literal Types and constexpr Support</title>
+<link rel="stylesheet" href="http://www.boost.org/doc/libs/release/doc/src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.77.1">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
+<link rel="up" href="../tut.html" title="Tutorial">
+<link rel="prev" href="primetest.html" title="Primality Testing">
+<link rel="next" href="rounding.html" title="Rounding Rules for Conversions">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="primetest.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../tut.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="rounding.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section boost_multiprecision_tut_lits">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_multiprecision.tut.lits"></a><a class="link" href="lits.html" title="Literal Types and constexpr Support">Literal Types and <code class="computeroutput"><span class="identifier">constexpr</span></code> Support</a>
+</h3></div></div></div>
+<p>
+        There is limited support for <code class="computeroutput"><span class="identifier">constexpr</span></code>
+        in the library, currently the <code class="computeroutput"><span class="identifier">number</span></code>
+        front end supports <code class="computeroutput"><span class="identifier">constexpr</span></code>
+        on default construction and all forwarding constructors, but not on any of
+        the non-member operators. So if some type <code class="computeroutput"><span class="identifier">B</span></code>
+        is a literal type, then <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">B</span><span class="special">&gt;</span></code>
+        is also a literal type, and you will be able to compile-time-construct such
+        a type from any literal that <code class="computeroutput"><span class="identifier">B</span></code>
+        is compile-time-constructible from. However, you will not be able to perform
+        compile-time arithmetic on such types.
+      </p>
+<p>
+        Currently the only backend type provided by the library that is also a literal
+        type are instantiations of <code class="computeroutput"><span class="identifier">cpp_int_backend</span></code>
+        where the Allocator parameter is type <code class="computeroutput"><span class="keyword">void</span></code>,
+        and the Checked parameter is <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">unchecked</span></code>.
+      </p>
+<p>
+        For example:
+      </p>
+<pre class="programlisting"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">;</span>
+
+<span class="identifier">constexpr</span> <span class="identifier">int128_t</span>            <span class="identifier">i</span> <span class="special">=</span> <span class="number">0</span><span class="special">;</span>     <span class="comment">// OK, fixed precision int128_t has no allocator.</span>
+<span class="identifier">constexpr</span> <span class="identifier">uint1024_t</span>          <span class="identifier">j</span> <span class="special">=</span> <span class="number">0</span><span class="identifier">xFFFFFFFF00000000uLL</span><span class="special">;</span>  <span class="comment">// OK, fixed precision uint1024_t has no allocator.</span>
+
+<span class="identifier">constexpr</span> <span class="identifier">checked_uint128_t</span>   <span class="identifier">k</span> <span class="special">=</span> <span class="special">-</span><span class="number">1</span><span class="special">;</span> <span class="comment">// Error, checked type is not a literal type as we need runtime error checking.</span>
+<span class="identifier">constexpr</span> <span class="identifier">cpp_int</span>             <span class="identifier">l</span> <span class="special">=</span> <span class="number">2</span><span class="special">;</span>  <span class="comment">// Error, type is not a literal as it performs memory management.</span>
+</pre>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2012 John Maddock and Christopher Kormanyos<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="primetest.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../tut.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="rounding.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

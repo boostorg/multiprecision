@@ -1,0 +1,4673 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Integer Algorithm Perfomance</title>
+<link rel="stylesheet" href="http://www.boost.org/doc/libs/release/doc/src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.77.1">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
+<link rel="up" href="../perf.html" title="Performance Comparison">
+<link rel="prev" href="float_performance.html" title="Float Algorithm Perfomance">
+<link rel="next" href="rational_performance.html" title="Rational Type Perfomance">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="spirit-nav">
+<a accesskey="p" href="float_performance.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../perf.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="rational_performance.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section boost_multiprecision_perf_integer_performance">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_multiprecision.perf.integer_performance"></a><a class="link" href="integer_performance.html" title="Integer Algorithm Perfomance">Integer
+      Algorithm Perfomance</a>
+</h3></div></div></div>
+<p>
+        Note that these tests are carefully designed to test performance of the underlying
+        algorithms and not memory allocation or variable copying. As usual, performance
+        results should be taken with a healthy dose of scepticism, and real-world
+        performance may vary widely depending upon the specifics of the program.
+        In each table relative times are given first, with the best performer given
+        a score of 1. Total actual times are given in brackets, measured in seconds
+        for 500000 operations.
+      </p>
+<p>
+        Test code was compiled with Microsoft Visual Studio 2010 with all optimisations
+        turned on (/Ox), and used MPIR-2.3.0 and <a href="http://www.mpfr.org" target="_top">MPFR</a>-3.0.0.
+        The tests were run on 32-bit Windows Vista machine.
+      </p>
+<p>
+        Linux x86_64 results are broadly similar, except that libtommath performs
+        much better there.
+      </p>
+<div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator__"></a><p class="title"><b>Table&#160;1.30.&#160;Operator +</b></p>
+<div class="table-contents"><table class="table" summary="Operator +">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.22306 (0.0279933s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.15878 (0.038341s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.24006 (0.0562258s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.32055 (0.0925091s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.56093 (0.0357264s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.71757 (0.05683s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.66497 (0.0754916s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.70376 (0.119354s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.98788 (0.0454986s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.37882 (0.0456216s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.14898 (0.0520959s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0700532s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.022888s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0330875s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0453411s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.07021 (0.074972s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator___int_"></a><p class="title"><b>Table&#160;1.31.&#160;Operator +(int)</b></p>
+<div class="table-contents"><table class="table" summary="Operator +(int)">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0162581s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0196602s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0305476s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0421105s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.3852 (0.0225207s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.84835 (0.036339s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.6111 (0.0492153s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.63014 (0.068646s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.95525 (0.0317886s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.2217 (0.0436791s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.21508 (0.0676653s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.58759 (0.108965s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  13.603 (0.221158s)
+                </p>
+              </td>
+<td>
+                <p>
+                  11.5797 (0.227659s)
+                </p>
+              </td>
+<td>
+                <p>
+                  7.86674 (0.24031s)
+                </p>
+              </td>
+<td>
+                <p>
+                  6.36923 (0.268212s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator___unsigned_long_long_"></a><p class="title"><b>Table&#160;1.32.&#160;Operator +(unsigned long long)</b></p>
+<div class="table-contents"><table class="table" summary="Operator +(unsigned long long)">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0269712s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0296213s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0380242s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.045841s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.38342 (0.0373126s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.51165 (0.0447769s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.54533 (0.05876s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.3971 (0.0640443s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  26.7163 (0.72057s)
+                </p>
+              </td>
+<td>
+                <p>
+                  24.0631 (0.712781s)
+                </p>
+              </td>
+<td>
+                <p>
+                  19.6009 (0.745307s)
+                </p>
+              </td>
+<td>
+                <p>
+                  17.6547 (0.809308s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  19.7493 (0.532664s)
+                </p>
+              </td>
+<td>
+                <p>
+                  18.2944 (0.541905s)
+                </p>
+              </td>
+<td>
+                <p>
+                  14.9127 (0.567043s)
+                </p>
+              </td>
+<td>
+                <p>
+                  12.9059 (0.591619s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator____unsigned_long_long_"></a><p class="title"><b>Table&#160;1.33.&#160;Operator +=(unsigned long long)</b></p>
+<div class="table-contents"><table class="table" summary="Operator +=(unsigned long long)">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.16166 (0.020334s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.15312 (0.0204789s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.21086 (0.0216179s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.28088 (0.0229569s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0175043s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0177595s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0178534s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0179228s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  39.0852 (0.684159s)
+                </p>
+              </td>
+<td>
+                <p>
+                  38.7246 (0.68773s)
+                </p>
+              </td>
+<td>
+                <p>
+                  38.2555 (0.68299s)
+                </p>
+              </td>
+<td>
+                <p>
+                  37.6736 (0.675217s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  30.5872 (0.535408s)
+                </p>
+              </td>
+<td>
+                <p>
+                  29.371 (0.521614s)
+                </p>
+              </td>
+<td>
+                <p>
+                  30.3387 (0.541648s)
+                </p>
+              </td>
+<td>
+                <p>
+                  31.8346 (0.570565s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator0"></a><p class="title"><b>Table&#160;1.34.&#160;Operator -</b></p>
+<div class="table-contents"><table class="table" summary="Operator -">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.12975 (0.0308979s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0392305s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.05392 (0.0543957s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.18166 (0.0860767s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.36853 (0.0374283s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.45987 (0.0572717s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.44606 (0.0746349s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.55935 (0.11359s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.53173 (0.0418917s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.17956 (0.0462749s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.13609 (0.0586365s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0728442s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0273493s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.07293 (0.0420917s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0516126s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.0985 (0.0800191s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator_int0"></a><p class="title"><b>Table&#160;1.35.&#160;Operator -(int)</b></p>
+<div class="table-contents"><table class="table" summary="Operator -(int)">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0146171s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0172176s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.023655s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0313105s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.49086 (0.021792s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.94917 (0.03356s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.89657 (0.0448632s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.82658 (0.057191s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  2.16301 (0.0316169s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.55059 (0.0439151s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.67983 (0.0633913s)
+                </p>
+              </td>
+<td>
+                <p>
+                  3.27949 (0.102682s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  14.0691 (0.20565s)
+                </p>
+              </td>
+<td>
+                <p>
+                  12.527 (0.215684s)
+                </p>
+              </td>
+<td>
+                <p>
+                  9.43355 (0.22315s)
+                </p>
+              </td>
+<td>
+                <p>
+                  7.64671 (0.239422s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator_unsigned_long_long0"></a><p class="title"><b>Table&#160;1.36.&#160;Operator -(unsigned long long)</b></p>
+<div class="table-contents"><table class="table" summary="Operator -(unsigned long long)">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0265242s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0295275s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0377737s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0450106s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.2627 (0.033492s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.47472 (0.0435449s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.47468 (0.055704s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.40667 (0.0633151s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  26.0595 (0.691208s)
+                </p>
+              </td>
+<td>
+                <p>
+                  23.3957 (0.690817s)
+                </p>
+              </td>
+<td>
+                <p>
+                  18.9344 (0.715223s)
+                </p>
+              </td>
+<td>
+                <p>
+                  16.9593 (0.763349s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  19.26 (0.510855s)
+                </p>
+              </td>
+<td>
+                <p>
+                  17.6236 (0.52038s)
+                </p>
+              </td>
+<td>
+                <p>
+                  13.9134 (0.52556s)
+                </p>
+              </td>
+<td>
+                <p>
+                  12.2359 (0.550746s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator_unsigned_long_long1"></a><p class="title"><b>Table&#160;1.37.&#160;Operator -=(unsigned long long)</b></p>
+<div class="table-contents"><table class="table" summary="Operator -=(unsigned long long)">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.28589 (0.0210146s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.3505 (0.0222463s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.34427 (0.0237863s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.22787 (0.0230902s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0163425s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0164727s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0176946s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0188051s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  41.0201 (0.670371s)
+                </p>
+              </td>
+<td>
+                <p>
+                  41.4726 (0.683165s)
+                </p>
+              </td>
+<td>
+                <p>
+                  37.9503 (0.671514s)
+                </p>
+              </td>
+<td>
+                <p>
+                  35.6021 (0.669502s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  32.6952 (0.534322s)
+                </p>
+              </td>
+<td>
+                <p>
+                  31.4882 (0.518695s)
+                </p>
+              </td>
+<td>
+                <p>
+                  29.3988 (0.5202s)
+                </p>
+              </td>
+<td>
+                <p>
+                  29.1175 (0.547558s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator1"></a><p class="title"><b>Table&#160;1.38.&#160;Operator *</b></p>
+<div class="table-contents"><table class="table" summary="Operator *">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.13172 (0.0766099s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.59509 (0.20993s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.40998 (0.70643s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.70758 (2.66895s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.067693s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.27132 (0.167319s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.50102s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (1.563s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.01718 (0.0688559s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.13161s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.13221 (0.567258s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.02292 (1.59883s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.6793 (0.113677s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.66959 (0.351345s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.01091 (1.00751s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.05812 (3.21684s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator_int1"></a><p class="title"><b>Table&#160;1.39.&#160;Operator *(int)</b></p>
+<div class="table-contents"><table class="table" summary="Operator *(int)">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0228822s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.19988 (0.0332404s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.13882 (0.0416226s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.2711 (0.0665655s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.33157 (0.0304692s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.6546 (0.0458376s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.72684 (0.063114s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.83178 (0.0959269s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.00858 (0.0230786s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0277032s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0365488s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0523682s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  10.8491 (0.248252s)
+                </p>
+              </td>
+<td>
+                <p>
+                  9.88511 (0.273849s)
+                </p>
+              </td>
+<td>
+                <p>
+                  8.95509 (0.327298s)
+                </p>
+              </td>
+<td>
+                <p>
+                  8.04172 (0.421131s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator_unsigned_long_long2"></a><p class="title"><b>Table&#160;1.40.&#160;Operator *(unsigned long long)</b></p>
+<div class="table-contents"><table class="table" summary="Operator *(unsigned long long)">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0574926s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0876613s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.146194s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.258556s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.12247 (0.0645337s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.24471 (0.109113s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.19748 (0.175065s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.17442 (0.303653s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  12.271 (0.705488s)
+                </p>
+              </td>
+<td>
+                <p>
+                  8.23054 (0.7215s)
+                </p>
+              </td>
+<td>
+                <p>
+                  5.28668 (0.772883s)
+                </p>
+              </td>
+<td>
+                <p>
+                  3.09816 (0.801047s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  10.2751 (0.590743s)
+                </p>
+              </td>
+<td>
+                <p>
+                  7.36707 (0.645807s)
+                </p>
+              </td>
+<td>
+                <p>
+                  4.88979 (0.71486s)
+                </p>
+              </td>
+<td>
+                <p>
+                  3.43724 (0.888719s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator_unsigned_long_long3"></a><p class="title"><b>Table&#160;1.41.&#160;Operator *=(unsigned long long)</b></p>
+<div class="table-contents"><table class="table" summary="Operator *=(unsigned long long)">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  114.922 (7.57662s)
+                </p>
+              </td>
+<td>
+                <p>
+                  70.5882 (7.61458s)
+                </p>
+              </td>
+<td>
+                <p>
+                  44.3157 (7.67791s)
+                </p>
+              </td>
+<td>
+                <p>
+                  26.2881 (7.81595s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0659286s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.107873s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.173255s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.297319s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  47.9828 (3.16344s)
+                </p>
+              </td>
+<td>
+                <p>
+                  29.4972 (3.18196s)
+                </p>
+              </td>
+<td>
+                <p>
+                  18.1719 (3.14838s)
+                </p>
+              </td>
+<td>
+                <p>
+                  10.6941 (3.17956s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  284.199 (18.7368s)
+                </p>
+              </td>
+<td>
+                <p>
+                  173.129 (18.676s)
+                </p>
+              </td>
+<td>
+                <p>
+                  109.052 (18.8938s)
+                </p>
+              </td>
+<td>
+                <p>
+                  64.5866 (19.2028s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator2"></a><p class="title"><b>Table&#160;1.42.&#160;Operator /</b></p>
+<div class="table-contents"><table class="table" summary="Operator /">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  2.71618 (0.616086s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.09988 (0.737246s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.65898 (0.94343s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.49441 (1.44418s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.226821s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.35109s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.56868s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.966385s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  3.82134 (0.866761s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.75998 (0.969001s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.93226 (1.09884s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.34132 (1.29623s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  13.2978 (3.01622s)
+                </p>
+              </td>
+<td>
+                <p>
+                  11.3314 (3.97833s)
+                </p>
+              </td>
+<td>
+                <p>
+                  9.94138 (5.65347s)
+                </p>
+              </td>
+<td>
+                <p>
+                  13.3423 (12.8938s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator_int2"></a><p class="title"><b>Table&#160;1.43.&#160;Operator /(int)</b></p>
+<div class="table-contents"><table class="table" summary="Operator /(int)">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  4.15094 (0.23911s)
+                </p>
+              </td>
+<td>
+                <p>
+                  3.57962 (0.356615s)
+                </p>
+              </td>
+<td>
+                <p>
+                  3.11624 (0.578256s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.82967 (1.00414s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.42806 (0.139865s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.54164 (0.253208s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.43025 (0.450962s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.37209 (0.841768s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0576038s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0996238s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.185562s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.354863s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  36.3133 (2.09179s)
+                </p>
+              </td>
+<td>
+                <p>
+                  28.2731 (2.81668s)
+                </p>
+              </td>
+<td>
+                <p>
+                  21.8589 (4.05618s)
+                </p>
+              </td>
+<td>
+                <p>
+                  25.8061 (9.15762s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator_unsigned_long_long4"></a><p class="title"><b>Table&#160;1.44.&#160;Operator /(unsigned long long)</b></p>
+<div class="table-contents"><table class="table" summary="Operator /(unsigned long long)">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.53953 (0.716927s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.40156 (1.65075s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.59584 (3.57744s)
+                </p>
+              </td>
+<td>
+                <p>
+                  4.58524 (8.3789s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.465679s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.09556 (1.29034s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.2858 (3.15016s)
+                </p>
+              </td>
+<td>
+                <p>
+                  4.40115 (8.0425s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  2.25405 (1.04967s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (1.17779s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (1.37814s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (1.82736s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  5.03884 (2.34648s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.63459 (3.103s)
+                </p>
+              </td>
+<td>
+                <p>
+                  3.67287 (5.06174s)
+                </p>
+              </td>
+<td>
+                <p>
+                  6.77479 (12.38s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator_unsigned_long_long5"></a><p class="title"><b>Table&#160;1.45.&#160;Operator /=(unsigned long long)</b></p>
+<div class="table-contents"><table class="table" summary="Operator /=(unsigned long long)">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.78744 (0.0586752s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.74065 (0.0616578s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.66814 (0.0740436s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.36231 (0.126362s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0328264s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0354222s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0443871s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0927553s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  21.2392 (0.697207s)
+                </p>
+              </td>
+<td>
+                <p>
+                  19.3517 (0.68548s)
+                </p>
+              </td>
+<td>
+                <p>
+                  15.2936 (0.678837s)
+                </p>
+              </td>
+<td>
+                <p>
+                  7.37138 (0.683734s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  32.8142 (1.07717s)
+                </p>
+              </td>
+<td>
+                <p>
+                  30.5556 (1.08235s)
+                </p>
+              </td>
+<td>
+                <p>
+                  24.7236 (1.09741s)
+                </p>
+              </td>
+<td>
+                <p>
+                  12.4072 (1.15084s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator3"></a><p class="title"><b>Table&#160;1.46.&#160;Operator %</b></p>
+<div class="table-contents"><table class="table" summary="Operator %">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.86833 (0.37472s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.43076 (0.491332s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.30757 (0.708055s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.2528 (1.15842s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.200565s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.343407s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.541503s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.924662s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  3.22603 (0.647027s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.08249 (0.715143s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.5148 (0.82027s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.09519 (1.01268s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  15.4642 (3.10158s)
+                </p>
+              </td>
+<td>
+                <p>
+                  11.5534 (3.9675s)
+                </p>
+              </td>
+<td>
+                <p>
+                  10.5164 (5.69467s)
+                </p>
+              </td>
+<td>
+                <p>
+                  13.8962 (12.8493s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator_int3"></a><p class="title"><b>Table&#160;1.47.&#160;Operator %(int)</b></p>
+<div class="table-contents"><table class="table" summary="Operator %(int)">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.80079 (0.106617s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.96413 (0.207216s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.09096 (0.395682s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.14767 (0.776873s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.73532 (0.10274s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.92036 (0.202599s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.02172 (0.382579s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.07328 (0.749963s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0592053s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.1055s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.189234s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.361727s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  35.6993 (2.11359s)
+                </p>
+              </td>
+<td>
+                <p>
+                  25.3086 (2.67007s)
+                </p>
+              </td>
+<td>
+                <p>
+                  21.2701 (4.02504s)
+                </p>
+              </td>
+<td>
+                <p>
+                  25.8662 (9.3565s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator_construct"></a><p class="title"><b>Table&#160;1.48.&#160;Operator construct</b></p>
+<div class="table-contents"><table class="table" summary="Operator construct">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.17135 (0.00274853s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.00275161s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.00275161s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.00344359s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.00234646s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.54518 (0.00425173s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.2494 (0.00618947s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.73247 (0.00596591s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  85.6802 (0.201045s)
+                </p>
+              </td>
+<td>
+                <p>
+                  72.6635 (0.199941s)
+                </p>
+              </td>
+<td>
+                <p>
+                  78.1286 (0.214979s)
+                </p>
+              </td>
+<td>
+                <p>
+                  58.3553 (0.200952s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  87.9831 (0.206449s)
+                </p>
+              </td>
+<td>
+                <p>
+                  74.8522 (0.205964s)
+                </p>
+              </td>
+<td>
+                <p>
+                  74.8918 (0.206073s)
+                </p>
+              </td>
+<td>
+                <p>
+                  63.4572 (0.218521s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator_construct_unsigned_"></a><p class="title"><b>Table&#160;1.49.&#160;Operator construct(unsigned)</b></p>
+<div class="table-contents"><table class="table" summary="Operator construct(unsigned)">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.43934 (0.00268554s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.00286887s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.00283465s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.00290638s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.00186581s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.7597 (0.00504834s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.07419 (0.00587959s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.89871 (0.00551837s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  125.861 (0.234832s)
+                </p>
+              </td>
+<td>
+                <p>
+                  72.7068 (0.208586s)
+                </p>
+              </td>
+<td>
+                <p>
+                  75.5147 (0.214058s)
+                </p>
+              </td>
+<td>
+                <p>
+                  71.2679 (0.207131s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  240.568 (0.448854s)
+                </p>
+              </td>
+<td>
+                <p>
+                  155.552 (0.446257s)
+                </p>
+              </td>
+<td>
+                <p>
+                  157.598 (0.446734s)
+                </p>
+              </td>
+<td>
+                <p>
+                  160.728 (0.467137s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator_construct_unsigned_long_long_"></a><p class="title"><b>Table&#160;1.50.&#160;Operator construct(unsigned long long)</b></p>
+<div class="table-contents"><table class="table" summary="Operator construct(unsigned long long)">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  2.3528 (0.00771495s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.61678 (0.00717424s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.12087 (0.00715985s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.2104 (0.0078878s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.00327905s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.00443737s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.00638775s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.00651668s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  222.775 (0.730489s)
+                </p>
+              </td>
+<td>
+                <p>
+                  165.447 (0.734148s)
+                </p>
+              </td>
+<td>
+                <p>
+                  114.708 (0.732725s)
+                </p>
+              </td>
+<td>
+                <p>
+                  112.162 (0.730926s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  215.962 (0.70815s)
+                </p>
+              </td>
+<td>
+                <p>
+                  157.945 (0.700858s)
+                </p>
+              </td>
+<td>
+                <p>
+                  109.582 (0.699985s)
+                </p>
+              </td>
+<td>
+                <p>
+                  111.909 (0.729275s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator_str"></a><p class="title"><b>Table&#160;1.51.&#160;Operator str</b></p>
+<div class="table-contents"><table class="table" summary="Operator str">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.46938 (0.00196575s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.37205 (0.00331355s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.5689 (0.00862952s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.57176 (0.0237239s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.00133781s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.00241504s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.00550035s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.20619 (0.0182059s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.65482 (0.00221383s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.38972 (0.00335622s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.13845 (0.0062619s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0150938s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  13.9845 (0.0187087s)
+                </p>
+              </td>
+<td>
+                <p>
+                  18.3179 (0.0442384s)
+                </p>
+              </td>
+<td>
+                <p>
+                  23.3489 (0.128427s)
+                </p>
+              </td>
+<td>
+                <p>
+                  25.3273 (0.382285s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator_gcd"></a><p class="title"><b>Table&#160;1.52.&#160;Operator gcd</b></p>
+<div class="table-contents"><table class="table" summary="Operator gcd">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  2.03241 (5.06795s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.89904 (11.3002s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.99735 (27.4027s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.20708 (73.7574s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.67874 (4.18605s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.70044 (10.1184s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.96475 (26.9554s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.28347 (76.31s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (2.49357s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (5.95047s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (13.7195s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (33.4185s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  5.01832 (12.5135s)
+                </p>
+              </td>
+<td>
+                <p>
+                  4.41659 (26.2808s)
+                </p>
+              </td>
+<td>
+                <p>
+                  4.08042 (55.9814s)
+                </p>
+              </td>
+<td>
+                <p>
+                  3.97901 (132.972s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator4"></a><p class="title"><b>Table&#160;1.53.&#160;Operator &amp;</b></p>
+<div class="table-contents"><table class="table" summary="Operator &amp;">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.00344 (0.0315529s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0426295s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0543214s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.06624 (0.0835064s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0314446s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.0808 (0.046074s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.06116 (0.0576436s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0783186s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.78372 (0.0560885s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.58661 (0.0676363s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.5738 (0.0854908s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.83409 (0.143644s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  4.08054 (0.128311s)
+                </p>
+              </td>
+<td>
+                <p>
+                  3.50852 (0.149567s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.88826 (0.156894s)
+                </p>
+              </td>
+<td>
+                <p>
+                  4.45879 (0.349206s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator_int4"></a><p class="title"><b>Table&#160;1.54.&#160;Operator &amp;(int)</b></p>
+<div class="table-contents"><table class="table" summary="Operator &amp;(int)">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0367605s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0485394s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0650023s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.099751s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.00324 (0.0368795s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.06734 (0.0518081s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.05192 (0.0683771s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.05296 (0.105034s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  4.00058 (0.147063s)
+                </p>
+              </td>
+<td>
+                <p>
+                  3.02928 (0.147039s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.22221 (0.144449s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.45749 (0.145386s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  8.83732 (0.324864s)
+                </p>
+              </td>
+<td>
+                <p>
+                  6.95191 (0.337442s)
+                </p>
+              </td>
+<td>
+                <p>
+                  5.42556 (0.352674s)
+                </p>
+              </td>
+<td>
+                <p>
+                  6.10829 (0.609309s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator5"></a><p class="title"><b>Table&#160;1.55.&#160;Operator |</b></p>
+<div class="table-contents"><table class="table" summary="Operator |">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0312723s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0428385s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0528083s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0827344s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.0311 (0.0322449s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.20267 (0.0515207s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.27028 (0.0670814s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.19432 (0.0988112s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.55273 (0.0485576s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.4656 (0.0627839s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.66721 (0.0880424s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.67004 (0.13817s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  4.15311 (0.129877s)
+                </p>
+              </td>
+<td>
+                <p>
+                  3.39008 (0.145226s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.88739 (0.152478s)
+                </p>
+              </td>
+<td>
+                <p>
+                  4.20575 (0.34796s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator_int5"></a><p class="title"><b>Table&#160;1.56.&#160;Operator |(int)</b></p>
+<div class="table-contents"><table class="table" summary="Operator |(int)">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.01685 (0.030066s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0360965s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0402109s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0527074s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0295677s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.50234 (0.0542292s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.52609 (0.0613656s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.37526 (0.0724863s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  4.84414 (0.14323s)
+                </p>
+              </td>
+<td>
+                <p>
+                  3.99297 (0.144132s)
+                </p>
+              </td>
+<td>
+                <p>
+                  3.85375 (0.154963s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.91129 (0.153447s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  10.8218 (0.319975s)
+                </p>
+              </td>
+<td>
+                <p>
+                  9.05203 (0.326747s)
+                </p>
+              </td>
+<td>
+                <p>
+                  8.32597 (0.334795s)
+                </p>
+              </td>
+<td>
+                <p>
+                  10.948 (0.577039s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator6"></a><p class="title"><b>Table&#160;1.57.&#160;Operator ^</b></p>
+<div class="table-contents"><table class="table" summary="Operator ^">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0311003s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0430909s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0530915s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0842599s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.04721 (0.0325686s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.18557 (0.0510874s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.25714 (0.0667433s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.14462 (0.0964459s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.59277 (0.0495356s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.47967 (0.0637601s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.73243 (0.0919772s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.68499 (0.141977s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  4.17425 (0.12982s)
+                </p>
+              </td>
+<td>
+                <p>
+                  3.41013 (0.146946s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.8988 (0.153902s)
+                </p>
+              </td>
+<td>
+                <p>
+                  4.17074 (0.351426s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator_int6"></a><p class="title"><b>Table&#160;1.58.&#160;Operator ^(int)</b></p>
+<div class="table-contents"><table class="table" summary="Operator ^(int)">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0290428s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0360261s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0409722s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0541785s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.01484 (0.0294736s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.4898 (0.0536716s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.34782 (0.0552234s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.35054 (0.0731703s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  4.94574 (0.143638s)
+                </p>
+              </td>
+<td>
+                <p>
+                  4.05569 (0.146111s)
+                </p>
+              </td>
+<td>
+                <p>
+                  3.65257 (0.149654s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.89039 (0.156597s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  10.8939 (0.316389s)
+                </p>
+              </td>
+<td>
+                <p>
+                  9.21322 (0.331916s)
+                </p>
+              </td>
+<td>
+                <p>
+                  8.17995 (0.335151s)
+                </p>
+              </td>
+<td>
+                <p>
+                  10.6902 (0.579178s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator___"></a><p class="title"><b>Table&#160;1.59.&#160;Operator &lt;&lt;</b></p>
+<div class="table-contents"><table class="table" summary="Operator &lt;&lt;">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0253777s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.04239 (0.034484s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0420979s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0623485s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.05039 (0.0266563s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.40679 (0.0465388s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.34077 (0.0564434s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.20319 (0.0750171s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.0359 (0.0262888s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0330815s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.1625 (0.0489388s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.16511 (0.0726428s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.65904 (0.0421025s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.11201 (0.0698686s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.36727 (0.0996572s)
+                </p>
+              </td>
+<td>
+                <p>
+                  2.701 (0.168403s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="boost_multiprecision.perf.integer_performance.operator7"></a><p class="title"><b>Table&#160;1.60.&#160;Operator &gt;&gt;</b></p>
+<div class="table-contents"><table class="table" summary="Operator &gt;&gt;">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Backend
+                </p>
+              </th>
+<th>
+                <p>
+                  128 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  256 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  512 Bits
+                </p>
+              </th>
+<th>
+                <p>
+                  1024 Bits
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  cpp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0221035s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.0337 (0.0313761s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.03419 (0.0355718s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.20366 (0.0453508s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  cpp_int(fixed)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.1036 (0.0243933s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.12323 (0.0340936s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.40181 (0.0482162s)
+                </p>
+              </td>
+<td>
+                <p>
+                  1.69985 (0.0640463s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  gmp_int
+                </p>
+              </td>
+<td>
+                <p>
+                  1.30456 (0.0288354s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0303532s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0343958s)
+                </p>
+              </td>
+<td>
+                <p>
+                  <span class="bold"><strong>1</strong></span> (0.0376776s)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  tommath_int
+                </p>
+              </td>
+<td>
+                <p>
+                  10.5766 (0.233779s)
+                </p>
+              </td>
+<td>
+                <p>
+                  9.0959 (0.27609s)
+                </p>
+              </td>
+<td>
+                <p>
+                  8.6249 (0.29666s)
+                </p>
+              </td>
+<td>
+                <p>
+                  13.6818 (0.515498s)
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break">
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2012 John Maddock and Christopher Kormanyos<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="float_performance.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../perf.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="rational_performance.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
