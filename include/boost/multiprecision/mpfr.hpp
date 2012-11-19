@@ -1351,7 +1351,7 @@ struct is_explicitly_convertible<backends::mpfr_float_backend<D1, A1>, backends:
 #endif
 
 template<>
-struct number_category<typename detail::canonical<mpfr_t, backends::mpfr_float_backend<0> >::type> : public mpl::int_<number_kind_floating_point>{};
+struct number_category<detail::canonical<mpfr_t, backends::mpfr_float_backend<0> >::type> : public mpl::int_<number_kind_floating_point>{};
 
 using boost::multiprecision::backends::mpfr_float_backend;
 

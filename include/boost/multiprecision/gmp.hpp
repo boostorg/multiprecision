@@ -24,7 +24,7 @@
 #include <limits>
 #include <climits>
 
-namespace boost{ 
+namespace boost{
 namespace multiprecision{
 namespace backends{
 
@@ -343,15 +343,15 @@ struct gmp_float_imp
       d = v;
       return compare(d);
    }
-   mpf_t& data() BOOST_NOEXCEPT 
-   { 
+   mpf_t& data() BOOST_NOEXCEPT
+   {
       BOOST_ASSERT(m_data[0]._mp_d);
-      return m_data; 
+      return m_data;
    }
-   const mpf_t& data()const BOOST_NOEXCEPT 
-   { 
+   const mpf_t& data()const BOOST_NOEXCEPT
+   {
       BOOST_ASSERT(m_data[0]._mp_d);
-      return m_data; 
+      return m_data;
    }
 protected:
    mpf_t m_data;
@@ -849,7 +849,7 @@ inline void eval_convert_to(long long* result, const gmp_float<digits10>& val)
    gmp_float<digits10> t(val);
    if(eval_get_sign(t) < 0)
       t.negate();
-   
+
    long digits = std::numeric_limits<long long>::digits - std::numeric_limits<long>::digits;
 
    if(digits > 0)
@@ -882,7 +882,7 @@ template <unsigned digits10>
 inline void eval_convert_to(unsigned long long* result, const gmp_float<digits10>& val)
 {
    gmp_float<digits10> t(val);
-   
+
    long digits = std::numeric_limits<long long>::digits - std::numeric_limits<long>::digits;
 
    if(digits > 0)
@@ -1256,15 +1256,15 @@ struct gmp_int
       d = v;
       return compare(d);
    }
-   mpz_t& data() 
-   { 
+   mpz_t& data()
+   {
       BOOST_ASSERT(m_data[0]._mp_d);
-      return m_data; 
+      return m_data;
    }
-   const mpz_t& data()const 
-   { 
+   const mpz_t& data()const
+   {
       BOOST_ASSERT(m_data[0]._mp_d);
-      return m_data; 
+      return m_data;
    }
 protected:
    mpz_t m_data;
@@ -1508,7 +1508,7 @@ inline void eval_divide(gmp_int& t, const gmp_int& p, long i)
    if(i < 0)
       mpz_neg(t.data(), t.data());
 }
-   
+
 inline void eval_bitwise_and(gmp_int& result, const gmp_int& u, const gmp_int& v)
 {
    mpz_and(result.data(), u.data(), v.data());
@@ -1625,7 +1625,7 @@ inline void eval_bit_flip(gmp_int& val, unsigned index)
    mpz_combit(val.data(), index);
 }
 
-inline void eval_qr(const gmp_int& x, const gmp_int& y, 
+inline void eval_qr(const gmp_int& x, const gmp_int& y,
    gmp_int& q, gmp_int& r)
 {
    mpz_tdiv_qr(q.data(), r.data(), x.data(), y.data());
@@ -1922,15 +1922,15 @@ struct gmp_rational
       BOOST_ASSERT(m_data[0]._mp_num._mp_d);
       return mpq_cmp_si(m_data, v, 1);
    }
-   mpq_t& data() 
-   { 
+   mpq_t& data()
+   {
       BOOST_ASSERT(m_data[0]._mp_num._mp_d);
-      return m_data; 
+      return m_data;
    }
-   const mpq_t& data()const 
-   { 
+   const mpq_t& data()const
+   {
       BOOST_ASSERT(m_data[0]._mp_num._mp_d);
-      return m_data; 
+      return m_data;
    }
 protected:
    mpq_t m_data;
@@ -1992,7 +1992,7 @@ inline void eval_divide(gmp_rational& t, const gmp_rational& p, const gmp_ration
       BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    mpq_div(t.data(), p.data(), o.data());
 }
-   
+
 inline int eval_get_sign(const gmp_rational& val)
 {
    return mpq_sgn(val.data());
@@ -2161,9 +2161,9 @@ inline number<gmp_int, ET> denominator(const number<gmp_rational, ET>& val)
 namespace detail{
 
 template<>
-struct is_explicitly_convertible<typename canonical<mpf_t, gmp_int>::type, gmp_int> : public mpl::true_ {};
+struct is_explicitly_convertible<canonical<mpf_t, gmp_int>::type, gmp_int> : public mpl::true_ {};
 template<>
-struct is_explicitly_convertible<typename canonical<mpq_t, gmp_int>::type, gmp_int> : public mpl::true_ {};
+struct is_explicitly_convertible<canonical<mpq_t, gmp_int>::type, gmp_int> : public mpl::true_ {};
 template<unsigned Digits10>
 struct is_explicitly_convertible<gmp_float<Digits10>, gmp_int> : public mpl::true_ {};
 template<>
@@ -2176,11 +2176,11 @@ struct is_explicitly_convertible<gmp_float<D1>, gmp_float<D2> > : public mpl::tr
 #endif
 
 template<>
-struct number_category<typename detail::canonical<mpz_t, gmp_int>::type> : public mpl::int_<number_kind_integer>{};
+struct number_category<detail::canonical<mpz_t, gmp_int>::type> : public mpl::int_<number_kind_integer>{};
 template<>
-struct number_category<typename detail::canonical<mpq_t, gmp_rational>::type> : public mpl::int_<number_kind_rational>{};
+struct number_category<detail::canonical<mpq_t, gmp_rational>::type> : public mpl::int_<number_kind_rational>{};
 template<>
-struct number_category<typename detail::canonical<mpf_t, gmp_float<0> >::type> : public mpl::int_<number_kind_floating_point>{};
+struct number_category<detail::canonical<mpf_t, gmp_float<0> >::type> : public mpl::int_<number_kind_floating_point>{};
 
 
 typedef number<gmp_float<50> >    mpf_float_50;
@@ -2198,7 +2198,7 @@ namespace std{
 //
 // numeric_limits [partial] specializations for the types declared in this header:
 //
-template<unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates> 
+template<unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_float<Digits10>, ExpressionTemplates> >
 {
    typedef boost::multiprecision::number<boost::multiprecision::gmp_float<Digits10>, ExpressionTemplates> number_type;
@@ -2210,7 +2210,7 @@ public:
    // exponent values elsewhere.
    //
    BOOST_STATIC_CONSTEXPR number_type (min)() BOOST_NOEXCEPT
-   { 
+   {
       initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if(!value.first)
@@ -2222,7 +2222,7 @@ public:
       return value.second;
    }
    BOOST_STATIC_CONSTEXPR number_type (max)() BOOST_NOEXCEPT
-   { 
+   {
       initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if(!value.first)
@@ -2245,8 +2245,8 @@ public:
    BOOST_STATIC_CONSTEXPR bool is_integer = false;
    BOOST_STATIC_CONSTEXPR bool is_exact = false;
    BOOST_STATIC_CONSTEXPR int radix = 2;
-   BOOST_STATIC_CONSTEXPR number_type epsilon() BOOST_NOEXCEPT 
-   { 
+   BOOST_STATIC_CONSTEXPR number_type epsilon() BOOST_NOEXCEPT
+   {
       initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if(!value.first)
@@ -2258,8 +2258,8 @@ public:
       return value.second;
    }
    // What value should this be????
-   BOOST_STATIC_CONSTEXPR number_type round_error() BOOST_NOEXCEPT 
-   { 
+   BOOST_STATIC_CONSTEXPR number_type round_error() BOOST_NOEXCEPT
+   {
       // returns epsilon/2
       initializer.do_nothing();
       static std::pair<bool, number_type> value;
@@ -2306,10 +2306,10 @@ private:
    static const data_initializer initializer;
 };
 
-template<unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates> 
+template<unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 const typename numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_float<Digits10>, ExpressionTemplates> >::data_initializer numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_float<Digits10>, ExpressionTemplates> >::initializer;
 
-template<boost::multiprecision::expression_template_option ExpressionTemplates> 
+template<boost::multiprecision::expression_template_option ExpressionTemplates>
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> >
 {
    typedef boost::multiprecision::number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> number_type;
@@ -2397,7 +2397,7 @@ BOOST_CONSTEXPR_OR_CONST float_round_style numeric_limits<boost::multiprecision:
 
 #endif
 
-template<boost::multiprecision::expression_template_option ExpressionTemplates> 
+template<boost::multiprecision::expression_template_option ExpressionTemplates>
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_int, ExpressionTemplates> >
 {
    typedef boost::multiprecision::number<boost::multiprecision::gmp_int, ExpressionTemplates> number_type;
@@ -2408,11 +2408,11 @@ public:
    // to zero:
    //
    static number_type (min)() BOOST_NOEXCEPT
-   { 
+   {
       return number_type();
    }
-   static number_type (max)() BOOST_NOEXCEPT 
-   { 
+   static number_type (max)() BOOST_NOEXCEPT
+   {
       return number_type();
    }
    static number_type lowest() BOOST_NOEXCEPT { return (min)(); }
@@ -2495,7 +2495,7 @@ BOOST_CONSTEXPR_OR_CONST float_round_style numeric_limits<boost::multiprecision:
 
 #endif
 
-template<boost::multiprecision::expression_template_option ExpressionTemplates> 
+template<boost::multiprecision::expression_template_option ExpressionTemplates>
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_rational, ExpressionTemplates> >
 {
    typedef boost::multiprecision::number<boost::multiprecision::gmp_rational, ExpressionTemplates> number_type;
@@ -2506,11 +2506,11 @@ public:
    // to zero:
    //
    static number_type (min)() BOOST_NOEXCEPT
-   { 
+   {
       return number_type();
    }
-   static number_type (max)() BOOST_NOEXCEPT 
-   { 
+   static number_type (max)() BOOST_NOEXCEPT
+   {
       return number_type();
    }
    static number_type lowest() BOOST_NOEXCEPT { return (min)(); }
