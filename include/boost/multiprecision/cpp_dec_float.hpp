@@ -50,6 +50,15 @@ struct dynamic_array : public std::vector<T, typename rebind<T, Allocator>::type
 {
    dynamic_array()
       : std::vector<T, typename rebind<T, Allocator>::type>(static_cast<typename std::vector<T, typename rebind<T, Allocator>::type>::size_type>(S), static_cast<T>(0)) {}
+
+   T* data()
+   {
+      return &*this->begin();
+   }
+   const T* data()const
+   {
+      return &*this->begin();
+   }
 };
 
 }
