@@ -404,7 +404,7 @@ private:
       limb_type          m_first_limb;
       double_limb_type   m_double_first_limb;
 
-      BOOST_CONSTEXPR data_type(){}
+      BOOST_CONSTEXPR data_type() : m_first_limb(0) {}
       BOOST_CONSTEXPR data_type(limb_type i) : m_first_limb(i) {}
       BOOST_CONSTEXPR data_type(double_limb_type i) : m_double_first_limb(i) {}
    } m_wrapper;
@@ -539,7 +539,7 @@ private:
       limb_type          m_first_limb;
       double_limb_type   m_double_first_limb;
 
-      BOOST_CONSTEXPR data_type() {}
+      BOOST_CONSTEXPR data_type() : m_first_limb(0) {}
       BOOST_CONSTEXPR data_type(limb_type i) : m_first_limb(i) {}
       BOOST_CONSTEXPR data_type(double_limb_type i) : m_double_first_limb(i) {}
    } m_wrapper;
