@@ -5,3 +5,15 @@
 
 #include <gmp.h>
 
+#ifdef __GNUC__
+#pragma message #__GNU_MP_VERSION
+#pragma message #__GNU_MP_VERSION_MINOR
+#endif 
+
+#if (__GNU_MP_VERSION < 4) || ((__GNU_MP_VERSION == 4) && (__GNU_MP_VERSION_MINOR < 2))
+#error "Incompatible GMP version"
+#endif
+
+
+
+
