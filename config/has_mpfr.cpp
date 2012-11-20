@@ -4,6 +4,7 @@
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <mpfr.h>
+#include <boost/config.hpp>
 
 #ifdef __GNUC__
 #pragma message "MPFR_VERSION_STRING=" MPFR_VERSION_STRING
