@@ -4,10 +4,11 @@
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <gmp.h>
+#include <boost/config.hpp>
 
 #ifdef __GNUC__
-#pragma message #__GNU_MP_VERSION
-#pragma message #__GNU_MP_VERSION_MINOR
+#pragma message "__GNU_MP_VERSION=" BOOST_STRINGIZE(__GNU_MP_VERSION)
+#pragma message "__GNU_MP_VERSION_MINOR=" BOOST_STRINGIZE(__GNU_MP_VERSION_MINOR)
 #endif 
 
 #if (__GNU_MP_VERSION < 4) || ((__GNU_MP_VERSION == 4) && (__GNU_MP_VERSION_MINOR < 2))

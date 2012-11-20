@@ -6,7 +6,7 @@
 #include <mpfr.h>
 
 #ifdef __GNUC__
-#pragma message MPFR_VERSION_STRING
+#pragma message "MPFR_VERSION_STRING=" MPFR_VERSION_STRING
 #endif
 
 #if (__GNU_MP_VERSION < 4) || ((__GNU_MP_VERSION == 4) && (__GNU_MP_VERSION_MINOR < 2))
