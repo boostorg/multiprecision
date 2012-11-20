@@ -15,6 +15,12 @@
 #error "Incompatible GMP version"
 #endif
 
+int main()
+{
+   mpz_t integ;
+   mpz_init (integ);
+   mpz_clear (integ);
 
-
+   return 0;
+}
 

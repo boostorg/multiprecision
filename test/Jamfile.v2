@@ -158,22 +158,106 @@ run test_arithmetic.cpp
         : # command line
         : # input files
         : # requirements
-	      <define>TEST_CPP_INT_1A
-        : test_arithmetic_cpp_int_1a ;
+	      <define>TEST_CPP_INT_4
+        : test_arithmetic_cpp_int_4 ;
 
 run test_arithmetic.cpp
         : # command line
         : # input files
         : # requirements
-	      <define>TEST_CPP_INT_2A
-        : test_arithmetic_cpp_int_2a ;
+	      <define>TEST_CPP_INT_5
+        : test_arithmetic_cpp_int_5 ;
 
 run test_arithmetic.cpp
         : # command line
         : # input files
         : # requirements
-	      <define>TEST_CPP_INT_3A
-        : test_arithmetic_cpp_int_3a ;
+	      <define>TEST_CPP_INT_6
+        : test_arithmetic_cpp_int_6 ;
+
+run test_arithmetic.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_CPP_INT_7
+        : test_arithmetic_cpp_int_7 ;
+
+run test_arithmetic.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_CPP_INT_8
+        : test_arithmetic_cpp_int_8 ;
+
+run test_arithmetic.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_CPP_INT_9
+        : test_arithmetic_cpp_int_9 ;
+
+run test_arithmetic.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_CPP_INT_10
+        : test_arithmetic_cpp_int_10 ;
+
+run test_arithmetic.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_CPP_INT_11
+        : test_arithmetic_cpp_int_11 ;
+
+run test_arithmetic.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_CPP_INT_12
+        : test_arithmetic_cpp_int_12 ;
+
+run test_arithmetic.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_CPP_INT_13
+        : test_arithmetic_cpp_int_13 ;
+
+run test_arithmetic.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_CPP_INT_14
+        : test_arithmetic_cpp_int_14 ;
+
+run test_arithmetic.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_CPP_INT_15
+        : test_arithmetic_cpp_int_15 ;
+
+run test_arithmetic.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_CPP_INT_16
+        : test_arithmetic_cpp_int_16 ;
+
+run test_arithmetic.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_CPP_INT_17
+        : test_arithmetic_cpp_int_17 ;
+
+run test_arithmetic.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_CPP_INT_18
+        : test_arithmetic_cpp_int_18 ;
 
 run test_arithmetic.cpp
         : # command line

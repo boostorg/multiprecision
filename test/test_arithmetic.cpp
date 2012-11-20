@@ -15,39 +15,6 @@
 #include <boost/math/common_factor_rt.hpp>
 #include "test.hpp"
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && \
-   !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ) \
-   && !defined(TEST_TOMMATH) && !defined(TEST_TOMMATH_BOOST_RATIONAL) && !defined(TEST_MPZ_BOOST_RATIONAL)\
-   && !defined(TEST_CPP_INT_1) && !defined(TEST_CPP_INT_2) && !defined(TEST_CPP_INT_3) \
-   && !defined(TEST_CPP_INT_1A) && !defined(TEST_CPP_INT_2A) && !defined(TEST_CPP_INT_3A) \
-   && !defined(TEST_CPP_INT_BR) && !defined(TEST_ARITHMETIC_BACKEND)
-#  define TEST_MPF_50
-#  define TEST_MPF
-#  define TEST_BACKEND
-#  define TEST_MPZ
-#  define TEST_MPFR
-#  define TEST_MPFR_50
-#  define TEST_CPP_DEC_FLOAT
-#  define TEST_MPQ
-#  define TEST_TOMMATH
-#  define TEST_CPP_INT_1
-#  define TEST_CPP_INT_2
-#  define TEST_CPP_INT_3
-#  define TEST_CPP_INT_1A
-#  define TEST_CPP_INT_2A
-#  define TEST_CPP_INT_3A
-#  define TEST_CPP_INT_BR
-#  define TEST_ARITHMETIC_BACKEND
-
-#ifdef _MSC_VER
-#pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
-#endif
-#ifdef __GNUC__
-#pragma warning "CAUTION!!: No backend type specified so testing everything.... this will take some time!!"
-#endif
-
-#endif
-
 #if defined(TEST_ARITHMETIC_BACKEND)
 # include "../performance/arithmetic_backend.hpp"
 #endif
@@ -68,7 +35,11 @@
 #include <boost/multiprecision/tommath.hpp>
 #include <boost/multiprecision/rational_adapter.hpp>
 #endif
-#if defined(TEST_CPP_INT_1) || defined(TEST_CPP_INT_2) || defined(TEST_CPP_INT_3) || defined(TEST_CPP_INT_BR) || defined(TEST_CPP_INT_1A) || defined(TEST_CPP_INT_2A) || defined(TEST_CPP_INT_3A)
+#if defined(TEST_CPP_INT_1) || defined(TEST_CPP_INT_2) || defined(TEST_CPP_INT_3) || defined(TEST_CPP_INT_4)\
+   || defined(TEST_CPP_INT_5) || defined(TEST_CPP_INT_6) || defined(TEST_CPP_INT_7) || defined(TEST_CPP_INT_8)\
+   || defined(TEST_CPP_INT_9) || defined(TEST_CPP_INT_10) || defined(TEST_CPP_INT_11) || defined(TEST_CPP_INT_12)\
+   || defined(TEST_CPP_INT_13) || defined(TEST_CPP_INT_14) || defined(TEST_CPP_INT_15) || defined(TEST_CPP_INT_16)\
+   || defined(TEST_CPP_INT_17) || defined(TEST_CPP_INT_18) || defined(TEST_CPP_INT_BR)
 #include <boost/multiprecision/cpp_int.hpp>
 #endif
 
@@ -154,7 +125,11 @@ struct is_twos_complement_integer : public boost::mpl::true_ {};
 template <>
 struct is_twos_complement_integer<boost::multiprecision::tom_int> : public boost::mpl::false_ {};
 #endif
-#if defined(TEST_CPP_INT_1) || defined(TEST_CPP_INT_2) || defined(TEST_CPP_INT_3) || defined(TEST_CPP_INT_BR) || defined(TEST_CPP_INT_1A) || defined(TEST_CPP_INT_2A) || defined(TEST_CPP_INT_3A)
+#if defined(TEST_CPP_INT_1) || defined(TEST_CPP_INT_2) || defined(TEST_CPP_INT_3) || defined(TEST_CPP_INT_4)\
+   || defined(TEST_CPP_INT_5) || defined(TEST_CPP_INT_6) || defined(TEST_CPP_INT_7) || defined(TEST_CPP_INT_8)\
+   || defined(TEST_CPP_INT_9) || defined(TEST_CPP_INT_10) || defined(TEST_CPP_INT_11) || defined(TEST_CPP_INT_12)\
+   || defined(TEST_CPP_INT_13) || defined(TEST_CPP_INT_14) || defined(TEST_CPP_INT_15) || defined(TEST_CPP_INT_16)\
+   || defined(TEST_CPP_INT_17) || defined(TEST_CPP_INT_18) || defined(TEST_CPP_INT_BR)
 template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
 struct is_twos_complement_integer<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, boost::multiprecision::checked, Allocator>, ExpressionTemplates> > : public boost::mpl::false_ {};
 #endif
@@ -201,7 +176,11 @@ struct related_type<boost::multiprecision::number< boost::multiprecision::mpfr_f
    typedef boost::multiprecision::number< boost::multiprecision::mpfr_float_backend<D/2> > type;
 };
 #endif
-#if defined(TEST_CPP_INT_1) || defined(TEST_CPP_INT_2) || defined(TEST_CPP_INT_3) || defined(TEST_CPP_INT_BR) || defined(TEST_CPP_INT_1A) || defined(TEST_CPP_INT_2A) || defined(TEST_CPP_INT_3A)
+#if defined(TEST_CPP_INT_1) || defined(TEST_CPP_INT_2) || defined(TEST_CPP_INT_3) || defined(TEST_CPP_INT_4)\
+   || defined(TEST_CPP_INT_5) || defined(TEST_CPP_INT_6) || defined(TEST_CPP_INT_7) || defined(TEST_CPP_INT_8)\
+   || defined(TEST_CPP_INT_9) || defined(TEST_CPP_INT_10) || defined(TEST_CPP_INT_11) || defined(TEST_CPP_INT_12)\
+   || defined(TEST_CPP_INT_13) || defined(TEST_CPP_INT_14) || defined(TEST_CPP_INT_15) || defined(TEST_CPP_INT_16)\
+   || defined(TEST_CPP_INT_17) || defined(TEST_CPP_INT_18) || defined(TEST_CPP_INT_BR)
 template <>
 struct related_type<boost::multiprecision::cpp_int>
 {
@@ -1853,34 +1832,58 @@ int main()
 #endif
 #ifdef TEST_CPP_INT_1
    test<boost::multiprecision::cpp_int>();
-   test<boost::multiprecision::int512_t >();
-   test<boost::multiprecision::uint1024_t >();
-#endif
-#ifdef TEST_CPP_INT_1A
-   test<boost::multiprecision::checked_cpp_int>();
-   test<boost::multiprecision::checked_int512_t >();
-   test<boost::multiprecision::checked_uint1024_t >();
 #endif
 #ifdef TEST_CPP_INT_2
-   test<boost::multiprecision::cpp_rational>();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<>, boost::multiprecision::et_off> >();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<500, 500, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> > >();
-#endif
-#ifdef TEST_CPP_INT_2A
-   test<boost::multiprecision::checked_cpp_rational>();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<0, 0, boost::multiprecision::signed_magnitude, boost::multiprecision::checked>, boost::multiprecision::et_off> >();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<500, 500, boost::multiprecision::signed_magnitude, boost::multiprecision::checked, void> > >();
+   test<boost::multiprecision::int512_t >();
 #endif
 #ifdef TEST_CPP_INT_3
+   test<boost::multiprecision::uint1024_t >();
+#endif
+#ifdef TEST_CPP_INT_4
+   test<boost::multiprecision::checked_cpp_int>();
+#endif
+#ifdef TEST_CPP_INT_5
+   test<boost::multiprecision::checked_int512_t >();
+#endif
+#ifdef TEST_CPP_INT_6
+   test<boost::multiprecision::checked_uint1024_t >();
+#endif
+#ifdef TEST_CPP_INT_7
+   test<boost::multiprecision::cpp_rational>();
+#endif
+#ifdef TEST_CPP_INT_8
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<>, boost::multiprecision::et_off> >();
+#endif
+#ifdef TEST_CPP_INT_9
+test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<500, 500, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> > >();
+#endif
+#ifdef TEST_CPP_INT_10
+   test<boost::multiprecision::checked_cpp_rational>();
+#endif
+#ifdef TEST_CPP_INT_11
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<0, 0, boost::multiprecision::signed_magnitude, boost::multiprecision::checked>, boost::multiprecision::et_off> >();
+#endif
+#ifdef TEST_CPP_INT_12
+   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<500, 500, boost::multiprecision::signed_magnitude, boost::multiprecision::checked, void> > >();
+#endif
+#ifdef TEST_CPP_INT_13
    // Again with "trivial" backends:
    test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, 64, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> > >();
+#endif
+#ifdef TEST_CPP_INT_14
    test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, 64, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> > >();
+#endif
+#ifdef TEST_CPP_INT_15
    test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<31, 31, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> > >();
 #endif
-#ifdef TEST_CPP_INT_3A
+#ifdef TEST_CPP_INT_16
    // Again with "trivial" checked backends:
    test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, 64, boost::multiprecision::signed_magnitude, boost::multiprecision::checked, void> > >();
+#endif
+#ifdef TEST_CPP_INT_17
    test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, 64, boost::multiprecision::unsigned_magnitude, boost::multiprecision::checked, void> > >();
+#endif
+#ifdef TEST_CPP_INT_18
    test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<31, 31, boost::multiprecision::signed_magnitude, boost::multiprecision::checked, void> > >();
 #endif
 #ifdef TEST_CPP_INT_BR
