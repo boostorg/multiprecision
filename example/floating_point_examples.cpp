@@ -8,6 +8,9 @@
 #include <boost/math/special_functions/bessel.hpp>
 #include <iostream>
 #include <iomanip>
+
+#ifndef BOOST_NO_CXX11_HDR_ARRAY
+
 #include <array>
 
 //[AOS1
@@ -685,3 +688,9 @@ Program output:
 7.0710678118654752440084436210484903928483593768847403658833986900e-01
 7.0710678118654752440084436210484903928483593768847403658833986900e-01
 */
+
+#else
+
+int main() { return 0; }
+
+#endif
