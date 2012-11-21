@@ -2209,7 +2209,7 @@ public:
    // mpf_get_str on 64-bit Linux builds.  Possibly we could use larger
    // exponent values elsewhere.
    //
-   BOOST_STATIC_CONSTEXPR number_type (min)() BOOST_NOEXCEPT
+   static number_type (min)() BOOST_NOEXCEPT
    {
       initializer.do_nothing();
       static std::pair<bool, number_type> value;
@@ -2221,7 +2221,7 @@ public:
       }
       return value.second;
    }
-   BOOST_STATIC_CONSTEXPR number_type (max)() BOOST_NOEXCEPT
+   static number_type (max)() BOOST_NOEXCEPT
    {
       initializer.do_nothing();
       static std::pair<bool, number_type> value;
@@ -2245,7 +2245,7 @@ public:
    BOOST_STATIC_CONSTEXPR bool is_integer = false;
    BOOST_STATIC_CONSTEXPR bool is_exact = false;
    BOOST_STATIC_CONSTEXPR int radix = 2;
-   BOOST_STATIC_CONSTEXPR number_type epsilon() BOOST_NOEXCEPT
+   static number_type epsilon() BOOST_NOEXCEPT
    {
       initializer.do_nothing();
       static std::pair<bool, number_type> value;
@@ -2258,7 +2258,7 @@ public:
       return value.second;
    }
    // What value should this be????
-   BOOST_STATIC_CONSTEXPR number_type round_error() BOOST_NOEXCEPT
+   static number_type round_error() BOOST_NOEXCEPT
    {
       // returns epsilon/2
       initializer.do_nothing();

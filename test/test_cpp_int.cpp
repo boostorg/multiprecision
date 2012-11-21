@@ -58,32 +58,23 @@ template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer
 struct is_checked_cpp_int<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, boost::multiprecision::checked, Allocator>, ET> > : public boost::mpl::true_ {};
 
 template <class Number>
-void test()
+struct tester
 {
-   using namespace boost::multiprecision;
    typedef Number test_type;
    typedef typename test_type::backend_type::checked_type checked;
 
-   unsigned last_error_count = 0;
+   unsigned last_error_count;
    boost::timer tim;
 
-   BOOST_CHECK_EQUAL(Number(), 0);
+   boost::multiprecision::mpz_int a, b, c, d;
+   int si;
+   unsigned ui;
+   test_type a1, b1, c1, d1;
 
-   for(int i = 0; i < 10000; ++i)
+
+   void t1()
    {
-      mpz_int a = generate_random<mpz_int>(1000);
-      mpz_int b = generate_random<mpz_int>(512);
-      mpz_int c = generate_random<mpz_int>(256);
-      mpz_int d = generate_random<mpz_int>(32);
-
-      int si = d.convert_to<int>();
-      unsigned ui = si;
-
-      test_type a1 = static_cast<test_type>(a.str());
-      test_type b1 = static_cast<test_type>(b.str());
-      test_type c1 = static_cast<test_type>(c.str());
-      test_type d1 = static_cast<test_type>(d.str());
-
+      using namespace boost::multiprecision;
       BOOST_CHECK_EQUAL(a.str(), a1.str());
       BOOST_CHECK_EQUAL(b.str(), b1.str());
       BOOST_CHECK_EQUAL(c.str(), c1.str());
@@ -117,6 +108,11 @@ void test()
       BOOST_CHECK_EQUAL((mpz_int(-a)%=b).str(), (test_type(-a1) %= b1).str());
       BOOST_CHECK_EQUAL(mpz_int(a % d).str(), test_type(a1 % d1).str());
       BOOST_CHECK_EQUAL((mpz_int(a)%=d).str(), (test_type(a1) %= d1).str());
+   }
+
+   void t2()
+   {
+      using namespace boost::multiprecision;
       // bitwise ops:
       BOOST_CHECK_EQUAL(mpz_int(a|b).str(), test_type(a1 | b1).str());
       BOOST_CHECK_EQUAL((mpz_int(a)|=b).str(), (test_type(a1) |= b1).str());
@@ -160,6 +156,11 @@ void test()
          }
          BOOST_CHECK_EQUAL(mpz_int(a >> i).str(), test_type(a1 >> i).str());
       }
+   }
+
+   void t3()
+   {
+      using namespace boost::multiprecision;
       // Now check operations involving signed integers:
       BOOST_CHECK_EQUAL(mpz_int(a + si).str(), test_type(a1 + si).str());
       BOOST_CHECK_EQUAL(mpz_int(a + -si).str(), test_type(a1 + -si).str());
@@ -219,6 +220,11 @@ void test()
       BOOST_CHECK_EQUAL(mpz_int(lcm(-c, -d)).str(), test_type(lcm(-c1, -d1)).str());
       BOOST_CHECK_EQUAL(mpz_int(gcd(a, -b)).str(), test_type(gcd(a1, -b1)).str());
       BOOST_CHECK_EQUAL(mpz_int(lcm(c, -d)).str(), test_type(lcm(c1, -d1)).str());
+   }
+
+   void t4()
+   {
+      using namespace boost::multiprecision;
       // Now check operations involving unsigned integers:
       BOOST_CHECK_EQUAL(mpz_int(a + ui).str(), test_type(a1 + ui).str());
       BOOST_CHECK_EQUAL(mpz_int(-a + ui).str(), test_type(-a1 + ui).str());
@@ -277,7 +283,11 @@ void test()
          }
          BOOST_CHECK_EQUAL(t.str(), t1.str());
       }
+   }
 
+   void t5()
+   {
+      using namespace boost::multiprecision;
       //
       // Now integer functions:
       //
@@ -304,56 +314,87 @@ void test()
          BOOST_CHECK_EQUAL(mpz_int(powm(a, b, ui)).str(), test_type(powm(a1, b1, ui)).str());
          BOOST_CHECK_EQUAL(mpz_int(powm(a, ui, c)).str(), test_type(powm(a1, ui, c1)).str());
       }
-
-      if(last_error_count != (unsigned)boost::detail::test_errors())
-      {
-         last_error_count = boost::detail::test_errors();
-         std::cout << std::hex << std::showbase;
-
-         std::cout << "a    = " << a << std::endl;
-         std::cout << "a1   = " << a1 << std::endl;
-         std::cout << "b    = " << b << std::endl;
-         std::cout << "b1   = " << b1 << std::endl;
-         std::cout << "c    = " << c << std::endl;
-         std::cout << "c1   = " << c1 << std::endl;
-         std::cout << "d    = " << d << std::endl;
-         std::cout << "d1   = " << d1 << std::endl;
-         std::cout << "a + b   = " << a+b << std::endl;
-         std::cout << "a1 + b1 = " << a1+b1 << std::endl;
-         std::cout << std::dec;
-         std::cout << "a - b   = " << a-b << std::endl;
-         std::cout << "a1 - b1 = " << a1-b1 << std::endl;
-         std::cout << "-a + b   = " << mpz_int(-a)+b << std::endl;
-         std::cout << "-a1 + b1 = " << test_type(-a1)+b1 << std::endl;
-         std::cout << "-a - b   = " << mpz_int(-a)-b << std::endl;
-         std::cout << "-a1 - b1 = " << test_type(-a1)-b1 << std::endl;
-         std::cout << "c*d    = " << c*d << std::endl;
-         std::cout << "c1*d1  = " << c1*d1 << std::endl;
-         std::cout << "b*c    = " << b*c << std::endl;
-         std::cout << "b1*c1  = " << b1*c1 << std::endl;
-         std::cout << "a/b    = " << a/b << std::endl;
-         std::cout << "a1/b1  = " << a1/b1 << std::endl;
-         std::cout << "a/d    = " << a/d << std::endl;
-         std::cout << "a1/d1  = " << a1/d1 << std::endl;
-         std::cout << "a%b    = " << a%b << std::endl;
-         std::cout << "a1%b1  = " << a1%b1 << std::endl;
-         std::cout << "a%d    = " << a%d << std::endl;
-         std::cout << "a1%d1  = " << a1%d1 << std::endl;
-      }
-
-      //
-      // Check to see if test is taking too long.
-      // Tests run on the compiler farm time out after 300 seconds, 
-      // so don't get too close to that:
-      //
-      if(tim.elapsed() > 200)
-      {
-         std::cout << "Timeout reached, aborting tests now....\n";
-         break;
-      }
-
    }
-}
+
+   void test()
+   {
+      using namespace boost::multiprecision;
+
+      last_error_count = 0;
+
+      BOOST_CHECK_EQUAL(Number(), 0);
+
+      for(int i = 0; i < 10000; ++i)
+      {
+         a = generate_random<mpz_int>(1000);
+         b = generate_random<mpz_int>(512);
+         c = generate_random<mpz_int>(256);
+         d = generate_random<mpz_int>(32);
+
+         si = d.convert_to<int>();
+         ui = si;
+
+         a1 = static_cast<test_type>(a.str());
+         b1 = static_cast<test_type>(b.str());
+         c1 = static_cast<test_type>(c.str());
+         d1 = static_cast<test_type>(d.str());
+
+         t1();
+         t2();
+         t3();
+         t4();
+         t5();
+
+         if(last_error_count != (unsigned)boost::detail::test_errors())
+         {
+            last_error_count = boost::detail::test_errors();
+            std::cout << std::hex << std::showbase;
+
+            std::cout << "a    = " << a << std::endl;
+            std::cout << "a1   = " << a1 << std::endl;
+            std::cout << "b    = " << b << std::endl;
+            std::cout << "b1   = " << b1 << std::endl;
+            std::cout << "c    = " << c << std::endl;
+            std::cout << "c1   = " << c1 << std::endl;
+            std::cout << "d    = " << d << std::endl;
+            std::cout << "d1   = " << d1 << std::endl;
+            std::cout << "a + b   = " << a+b << std::endl;
+            std::cout << "a1 + b1 = " << a1+b1 << std::endl;
+            std::cout << std::dec;
+            std::cout << "a - b   = " << a-b << std::endl;
+            std::cout << "a1 - b1 = " << a1-b1 << std::endl;
+            std::cout << "-a + b   = " << mpz_int(-a)+b << std::endl;
+            std::cout << "-a1 + b1 = " << test_type(-a1)+b1 << std::endl;
+            std::cout << "-a - b   = " << mpz_int(-a)-b << std::endl;
+            std::cout << "-a1 - b1 = " << test_type(-a1)-b1 << std::endl;
+            std::cout << "c*d    = " << c*d << std::endl;
+            std::cout << "c1*d1  = " << c1*d1 << std::endl;
+            std::cout << "b*c    = " << b*c << std::endl;
+            std::cout << "b1*c1  = " << b1*c1 << std::endl;
+            std::cout << "a/b    = " << a/b << std::endl;
+            std::cout << "a1/b1  = " << a1/b1 << std::endl;
+            std::cout << "a/d    = " << a/d << std::endl;
+            std::cout << "a1/d1  = " << a1/d1 << std::endl;
+            std::cout << "a%b    = " << a%b << std::endl;
+            std::cout << "a1%b1  = " << a1%b1 << std::endl;
+            std::cout << "a%d    = " << a%d << std::endl;
+            std::cout << "a1%d1  = " << a1%d1 << std::endl;
+         }
+
+         //
+         // Check to see if test is taking too long.
+         // Tests run on the compiler farm time out after 300 seconds,
+         // so don't get too close to that:
+         //
+         if(tim.elapsed() > 200)
+         {
+            std::cout << "Timeout reached, aborting tests now....\n";
+            break;
+         }
+
+      }
+   }
+};
 
 #if !defined(TEST1) && !defined(TEST2) && !defined(TEST3)
 #define TEST1
@@ -365,14 +406,17 @@ int main()
 {
    using namespace boost::multiprecision;
 #ifdef TEST1
-   test<cpp_int>();
+   tester<cpp_int> t1;
+   t1.test();
 #endif
 #ifdef TEST2
-   test<number<cpp_int_backend<2048, 2048, signed_magnitude, checked, void> > >();
+   tester<number<cpp_int_backend<2048, 2048, signed_magnitude, checked, void> > > t2;
+   t2.test();
 #endif
 #ifdef TEST3
    // Unchecked test verifies modulo arithmetic:
-   test<number<cpp_int_backend<2048, 2048, signed_magnitude, unchecked, void> > >();
+   tester<number<cpp_int_backend<2048, 2048, signed_magnitude, unchecked, void> > > t3;
+   t3.test();
 #endif
    return boost::report_errors();
 }

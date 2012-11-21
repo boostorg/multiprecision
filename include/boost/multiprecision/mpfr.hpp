@@ -1371,12 +1371,12 @@ namespace math{
 namespace tools{
 
 template <>
-inline int digits<boost::multiprecision::mpfr_float>() BOOST_NOEXCEPT
+inline int digits<boost::multiprecision::mpfr_float>()
 {
    return boost::multiprecision::backends::detail::get_default_precision();
 }
 template <>
-inline int digits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, boost::multiprecision::et_off> >() BOOST_NOEXCEPT
+inline int digits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, boost::multiprecision::et_off> >()
 {
    return boost::multiprecision::backends::detail::get_default_precision();
 }
@@ -1396,7 +1396,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_f
    typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> number_type;
 public:
    BOOST_STATIC_CONSTEXPR bool is_specialized = true;
-   BOOST_STATIC_CONSTEXPR number_type (min)() BOOST_NOEXCEPT
+   static number_type (min)() BOOST_NOEXCEPT
    {
       initializer.do_nothing();
       static std::pair<bool, number_type> value;
@@ -1408,7 +1408,7 @@ public:
       }
       return value.second;
    }
-   BOOST_STATIC_CONSTEXPR number_type (max)() BOOST_NOEXCEPT
+   static number_type (max)() BOOST_NOEXCEPT
    {
       initializer.do_nothing();
       static std::pair<bool, number_type> value;
@@ -1432,7 +1432,7 @@ public:
    BOOST_STATIC_CONSTEXPR bool is_integer = false;
    BOOST_STATIC_CONSTEXPR bool is_exact = false;
    BOOST_STATIC_CONSTEXPR int radix = 2;
-   BOOST_STATIC_CONSTEXPR number_type epsilon() BOOST_NOEXCEPT
+   static number_type epsilon() BOOST_NOEXCEPT
    {
       initializer.do_nothing();
       static std::pair<bool, number_type> value;
@@ -1445,7 +1445,7 @@ public:
       return value.second;
    }
    // What value should this be????
-   BOOST_STATIC_CONSTEXPR number_type round_error() BOOST_NOEXCEPT
+   static number_type round_error() BOOST_NOEXCEPT
    {
       // returns epsilon/2
       initializer.do_nothing();
@@ -1467,7 +1467,7 @@ public:
    BOOST_STATIC_CONSTEXPR bool has_signaling_NaN = false;
    BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm = denorm_absent;
    BOOST_STATIC_CONSTEXPR bool has_denorm_loss = false;
-   BOOST_STATIC_CONSTEXPR number_type infinity() BOOST_NOEXCEPT
+   static number_type infinity() BOOST_NOEXCEPT
    {
       // returns epsilon/2
       initializer.do_nothing();
@@ -1480,7 +1480,7 @@ public:
       }
       return value.second;
    }
-   BOOST_STATIC_CONSTEXPR number_type quiet_NaN() BOOST_NOEXCEPT
+   static number_type quiet_NaN() BOOST_NOEXCEPT
    {
       // returns epsilon/2
       initializer.do_nothing();
