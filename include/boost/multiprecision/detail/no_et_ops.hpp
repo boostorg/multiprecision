@@ -285,7 +285,7 @@ BOOST_FORCEINLINE typename enable_if<is_integral<I>, number<B, et_off> >::type
    return BOOST_MP_MOVE(result);
 }
 
-#ifndef BOOST_NO_RVALUE_REFERENCES
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
 //
 // If we have rvalue references go all over again with rvalue ref overloads and move semantics.
 // Note that while it would be tempting to implement these so they return an rvalue reference

@@ -67,7 +67,7 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
       if(o.m_data[0]._mpfr_d)
          mpfr_set(m_data, o.m_data, GMP_RNDN);
    }
-#ifndef BOOST_NO_RVALUE_REFERENCES
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    mpfr_float_imp(mpfr_float_imp&& o) BOOST_NOEXCEPT
    {
       m_data[0] = o.m_data[0];
@@ -82,7 +82,7 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
          mpfr_set(m_data, o.m_data, GMP_RNDN);
       return *this;
    }
-#ifndef BOOST_NO_RVALUE_REFERENCES
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    mpfr_float_imp& operator = (mpfr_float_imp&& o) BOOST_NOEXCEPT
    {
       mpfr_swap(m_data, o.m_data);
@@ -604,7 +604,7 @@ struct mpfr_float_backend : public detail::mpfr_float_imp<digits10, AllocationTy
 {
    mpfr_float_backend() : detail::mpfr_float_imp<digits10, AllocationType>() {}
    mpfr_float_backend(const mpfr_float_backend& o) : detail::mpfr_float_imp<digits10, AllocationType>(o) {}
-#ifndef BOOST_NO_RVALUE_REFERENCES
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    mpfr_float_backend(mpfr_float_backend&& o) : detail::mpfr_float_imp<digits10, AllocationType>(static_cast<detail::mpfr_float_imp<digits10, AllocationType>&&>(o)) {}
 #endif
    template <unsigned D, mpfr_allocation_type AT>
@@ -666,7 +666,7 @@ struct mpfr_float_backend : public detail::mpfr_float_imp<digits10, AllocationTy
       *static_cast<detail::mpfr_float_imp<digits10, AllocationType>*>(this) = static_cast<detail::mpfr_float_imp<digits10, AllocationType> const&>(o);
       return *this;
    }
-#ifndef BOOST_NO_RVALUE_REFERENCES
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    mpfr_float_backend& operator=(mpfr_float_backend&& o) BOOST_NOEXCEPT
    {
       *static_cast<detail::mpfr_float_imp<digits10, AllocationType>*>(this) = static_cast<detail::mpfr_float_imp<digits10, AllocationType>&&>(o);
@@ -749,7 +749,7 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
       mpfr_set_q(this->m_data, val, GMP_RNDN);
    }
    mpfr_float_backend(const mpfr_float_backend& o) : detail::mpfr_float_imp<0, allocate_dynamic>(o) {}
-#ifndef BOOST_NO_RVALUE_REFERENCES
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    mpfr_float_backend(mpfr_float_backend&& o) BOOST_NOEXCEPT : detail::mpfr_float_imp<0, allocate_dynamic>(static_cast<detail::mpfr_float_imp<0, allocate_dynamic>&&>(o)) {}
 #endif
    mpfr_float_backend(const mpfr_float_backend& o, unsigned digits10)
@@ -786,7 +786,7 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
       mpfr_set(this->m_data, o.data(), GMP_RNDN);
       return *this;
    }
-#ifndef BOOST_NO_RVALUE_REFERENCES
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    mpfr_float_backend& operator=(mpfr_float_backend&& o) BOOST_NOEXCEPT
    {
       *static_cast<detail::mpfr_float_imp<0, allocate_dynamic>*>(this) = static_cast<detail::mpfr_float_imp<0, allocate_dynamic> &&>(o);

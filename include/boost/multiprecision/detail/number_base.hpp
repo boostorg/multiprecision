@@ -84,7 +84,7 @@ typename enable_if_c<(is_unsigned<T>::value), T>::type abs(T t) BOOST_NOEXCEPT
 //
 // Move support:
 //
-#ifndef BOOST_NO_RVALUE_REFERENCES
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
 #  define BOOST_MP_MOVE(x) std::move(x)
 #else
 #  define BOOST_MP_MOVE(x) x
@@ -230,7 +230,7 @@ struct backend_type<expression<tag, A1, A2, A3, A4> >
 template <class T1, class T2>
 struct combine_expression
 {
-#ifdef BOOST_NO_DECLTYPE
+#ifdef BOOST_NO_CXX11_DECLTYPE
    typedef typename mpl::if_c<(sizeof(T1() + T2()) == sizeof(T1)), T1, T2>::type type;
 #else
    typedef decltype(T1() + T2()) type;

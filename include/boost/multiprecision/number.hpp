@@ -184,7 +184,7 @@ public:
       assign(e);
    }
 
-#ifndef BOOST_NO_RVALUE_REFERENCES
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    BOOST_FORCEINLINE BOOST_CONSTEXPR number(number&& r) BOOST_NOEXCEPT : m_backend(static_cast<Backend&&>(r.m_backend)){}
    BOOST_FORCEINLINE number& operator=(number&& r) BOOST_NOEXCEPT 
    {

@@ -275,7 +275,7 @@ public:
       std::copy(o.limbs(), o.limbs() + o.size(), limbs());
       m_sign = o.m_sign;
    }
-#ifndef BOOST_NO_RVALUE_REFERENCES
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    cpp_int_base(cpp_int_base&& o)
       : allocator_type(static_cast<Allocator&&>(o)), m_limbs(o.m_limbs), m_sign(o.m_sign), m_internal(o.m_internal)
    {
@@ -963,7 +963,7 @@ public:
 
    BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend() BOOST_NOEXCEPT{}
    BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(const cpp_int_backend& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value) : base_type(o) {}
-#ifndef BOOST_NO_RVALUE_REFERENCES
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(cpp_int_backend&& o) BOOST_NOEXCEPT
       : base_type(static_cast<base_type&&>(o)) {}
 #endif
@@ -1174,7 +1174,7 @@ public:
       this->assign(o);
       return *this;
    }
-#ifndef BOOST_NO_RVALUE_REFERENCES
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    BOOST_FORCEINLINE cpp_int_backend& operator = (cpp_int_backend&& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
    {
       *static_cast<base_type*>(this) = static_cast<base_type&&>(o);

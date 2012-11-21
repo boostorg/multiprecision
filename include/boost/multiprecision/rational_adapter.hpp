@@ -56,7 +56,7 @@ struct rational_adapter
       m_value = IntBackend(u);
    }
 
-#ifndef BOOST_NO_RVALUE_REFERENCES
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    rational_adapter(rational_adapter&& o) : m_value(o.m_value) {}
    rational_adapter(IntBackend&& o) : m_value(o) {}
    rational_adapter& operator = (rational_adapter&& o)

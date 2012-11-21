@@ -50,7 +50,7 @@ struct tommath_int
    {
       detail::check_tommath_result(mp_init_copy(&m_data, const_cast< ::mp_int*>(&o.m_data)));
    }
-#ifndef BOOST_NO_RVALUE_REFERENCES
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    tommath_int(tommath_int&& o) BOOST_NOEXCEPT
    {
       m_data = o.m_data;
