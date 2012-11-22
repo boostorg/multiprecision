@@ -1636,8 +1636,7 @@ inline typename enable_if<is_unsigned<Integer>, Integer>::type eval_integer_modu
 {
    if((sizeof(Integer) <= sizeof(long)) || (val <= (std::numeric_limits<unsigned long>::max)()))
    {
-      gmp_int r;
-      return mpz_tdiv_r_ui(r.data(), x.data(), val);
+      return mpz_tdiv_ui(x.data(), val);
    }
    else
    {
