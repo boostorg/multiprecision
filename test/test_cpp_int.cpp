@@ -156,6 +156,15 @@ struct tester
          }
          BOOST_CHECK_EQUAL(mpz_int(a >> i).str(), test_type(a1 >> i).str());
       }
+      // gcd/lcm
+      BOOST_CHECK_EQUAL(mpz_int(gcd(a, b)).str(), test_type(gcd(a1, b1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(c, d)).str(), test_type(lcm(c1, d1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(-a, b)).str(), test_type(gcd(-a1, b1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(-c, d)).str(), test_type(lcm(-c1, d1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(-a, -b)).str(), test_type(gcd(-a1, -b1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(-c, -d)).str(), test_type(lcm(-c1, -d1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(a, -b)).str(), test_type(gcd(a1, -b1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(c, -d)).str(), test_type(lcm(c1, -d1)).str());
    }
 
    void t3()
@@ -212,14 +221,22 @@ struct tester
          BOOST_CHECK_EQUAL(mpz_int(si&a).str(), test_type(si&a1).str());
          BOOST_CHECK_EQUAL(mpz_int(si^a).str(), test_type(si^a1).str());
       }
-      BOOST_CHECK_EQUAL(mpz_int(gcd(a, b)).str(), test_type(gcd(a1, b1)).str());
-      BOOST_CHECK_EQUAL(mpz_int(lcm(c, d)).str(), test_type(lcm(c1, d1)).str());
-      BOOST_CHECK_EQUAL(mpz_int(gcd(-a, b)).str(), test_type(gcd(-a1, b1)).str());
-      BOOST_CHECK_EQUAL(mpz_int(lcm(-c, d)).str(), test_type(lcm(-c1, d1)).str());
-      BOOST_CHECK_EQUAL(mpz_int(gcd(-a, -b)).str(), test_type(gcd(-a1, -b1)).str());
-      BOOST_CHECK_EQUAL(mpz_int(lcm(-c, -d)).str(), test_type(lcm(-c1, -d1)).str());
-      BOOST_CHECK_EQUAL(mpz_int(gcd(a, -b)).str(), test_type(gcd(a1, -b1)).str());
-      BOOST_CHECK_EQUAL(mpz_int(lcm(c, -d)).str(), test_type(lcm(c1, -d1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(a, si)).str(), test_type(gcd(a1, si)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(si, b)).str(), test_type(gcd(si, b1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(c, si)).str(), test_type(lcm(c1, si)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(si, d)).str(), test_type(lcm(si, d1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(-a, si)).str(), test_type(gcd(-a1, si)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(-si, b)).str(), test_type(gcd(-si, b1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(-c, si)).str(), test_type(lcm(-c1, si)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(-si, d)).str(), test_type(lcm(-si, d1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(-a, -si)).str(), test_type(gcd(-a1, -si)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(-si, -b)).str(), test_type(gcd(-si, -b1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(-c, -si)).str(), test_type(lcm(-c1, -si)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(-si, -d)).str(), test_type(lcm(-si, -d1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(a, -si)).str(), test_type(gcd(a1, -si)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(si, -b)).str(), test_type(gcd(si, -b1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(c, -si)).str(), test_type(lcm(c1, -si)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(si, -d)).str(), test_type(lcm(si, -d1)).str());
    }
 
    void t4()
@@ -258,14 +275,14 @@ struct tester
       BOOST_CHECK_EQUAL(mpz_int(ui|a).str(), test_type(ui|a1).str());
       BOOST_CHECK_EQUAL(mpz_int(ui&a).str(), test_type(ui&a1).str());
       BOOST_CHECK_EQUAL(mpz_int(ui^a).str(), test_type(ui^a1).str());
-      BOOST_CHECK_EQUAL(mpz_int(gcd(a, b)).str(), test_type(gcd(a1, b1)).str());
-      BOOST_CHECK_EQUAL(mpz_int(lcm(c, d)).str(), test_type(lcm(c1, d1)).str());
-      BOOST_CHECK_EQUAL(mpz_int(gcd(-a, b)).str(), test_type(gcd(-a1, b1)).str());
-      BOOST_CHECK_EQUAL(mpz_int(lcm(-c, d)).str(), test_type(lcm(-c1, d1)).str());
-      BOOST_CHECK_EQUAL(mpz_int(gcd(-a, -b)).str(), test_type(gcd(-a1, -b1)).str());
-      BOOST_CHECK_EQUAL(mpz_int(lcm(-c, -d)).str(), test_type(lcm(-c1, -d1)).str());
-      BOOST_CHECK_EQUAL(mpz_int(gcd(a, -b)).str(), test_type(gcd(a1, -b1)).str());
-      BOOST_CHECK_EQUAL(mpz_int(lcm(c, -d)).str(), test_type(lcm(c1, -d1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(a, ui)).str(), test_type(gcd(a1, ui)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(ui, b)).str(), test_type(gcd(ui, b1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(c, ui)).str(), test_type(lcm(c1, ui)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(ui, d)).str(), test_type(lcm(ui, d1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(-a, ui)).str(), test_type(gcd(-a1, ui)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(-c, ui)).str(), test_type(lcm(-c1, ui)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(ui, -b)).str(), test_type(gcd(ui, -b1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(ui, -d)).str(), test_type(lcm(ui, -d1)).str());
 
       if(std::numeric_limits<test_type>::is_modulo && checked::value)
       {

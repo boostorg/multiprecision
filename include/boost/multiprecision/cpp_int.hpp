@@ -1653,10 +1653,7 @@ public:
       return do_get_string(f, trivial_tag());
    }
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-   typename enable_if_c<
-      !is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value,
-      int
-   >::type compare(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o)const BOOST_NOEXCEPT
+   int compare_imp(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o, const mpl::false_&, const mpl::false_&)const BOOST_NOEXCEPT
    {
       if(this->sign() != o.sign())
          return this->sign() ? -1 : 1;
@@ -1669,28 +1666,19 @@ public:
       return result;
    }
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-   typename enable_if_c<
-      is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value,
-      int
-   >::type compare(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o)const
+   int compare_imp(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o, const mpl::true_&, const mpl::false_&)const
    {
       cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> t(*this);
       return t.compare(o);
    }
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-   typename enable_if_c<
-      !is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value && is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value,
-      int
-   >::type compare(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o)const
+   int compare_imp(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o, const mpl::false_&, const mpl::true_&)const
    {
       cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> t(o);
       return compare(t);
    }
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-   typename enable_if_c<
-      is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value && is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value,
-      int
-   >::type compare(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o)const BOOST_NOEXCEPT
+   int compare_imp(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o, const mpl::true_&, const mpl::true_&)const BOOST_NOEXCEPT
    {
       if(this->sign())
       {
@@ -1707,6 +1695,13 @@ public:
             return 1;
          return *this->limbs() < *o.limbs() ? -1 : (*this->limbs() > *o.limbs() ? 1 : 0);
       }
+   }
+   template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
+   int compare(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o)const BOOST_NOEXCEPT
+   {
+      typedef mpl::bool_<is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value> t1;
+      typedef mpl::bool_<is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value> t2;
+      return compare_imp(o, t1(), t2());
    }
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
    int compare_unsigned(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o)const BOOST_NOEXCEPT
