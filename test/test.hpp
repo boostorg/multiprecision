@@ -37,7 +37,13 @@ inline typename boost::enable_if_c<boost::is_unsigned<T>::value || boost::multip
 }
 
 template <class T>
-T relative_error(T a, T b)
+typename boost::enable_if_c<boost::multiprecision::number_category<T>::value == boost::multiprecision::number_kind_integer, T>::type relative_error(T a, T b)
+{
+   return a > b ? a - b : b - a;
+}
+
+template <class T>
+typename boost::disable_if_c<boost::multiprecision::number_category<T>::value == boost::multiprecision::number_kind_integer, T>::type relative_error(T a, T b)
 {
    using std::abs;
    using detail::abs;
@@ -47,6 +53,9 @@ T relative_error(T a, T b)
 
    if((a != 0) && (b != 0))
    {
+      if(a == b)
+         return 0;
+
       // TODO: use isfinite:
       if(abs(b) >= max_val)
       {
@@ -75,6 +84,15 @@ T relative_error(T a, T b)
    return (std::max)(abs(T((a-b)/a)), abs(T((a-b)/b))) / std::numeric_limits<T>::epsilon();
 }
 
+template <class T, class U>
+typename boost::mpl::if_c<boost::is_convertible<T, U>::value, U, T>::type 
+   relative_error(T a, U b)
+{
+   typedef typename boost::mpl::if_c<boost::is_convertible<T, U>::value, U, T>::type cast_type;
+   return relative_error<cast_type>(static_cast<cast_type>(a), static_cast<cast_type>(b));
+}
+
+
 enum
 {
    warn_on_fail,
@@ -86,7 +104,7 @@ template <class T>
 inline T epsilon_of(const T&)
 {
    BOOST_STATIC_ASSERT(std::numeric_limits<T>::is_specialized);
-   return std::numeric_limits<T>::epsilon();
+   return std::numeric_limits<T>::is_integer ? 1 : std::numeric_limits<T>::epsilon();
 }
 
 template <class T>
@@ -158,11 +176,11 @@ void report_unexpected_exception(const E& e, int severity, const char* file, int
    }BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
 
 #define BOOST_EQUAL_IMP(x, y, severity)\
-   try{ if(x != y){\
+   try{ if(!((x) == (y))){\
    BOOST_MP_REPORT_WHERE << " Failed check for equality: \n" \
    << std::setprecision(digits_of(x)) << std::scientific\
-   << "Value of LHS was: " << x << "\n"\
-   << "Value of RHS was: " << y << "\n"\
+   << "Value of LHS was: " << (x) << "\n"\
+   << "Value of RHS was: " << (y) << "\n"\
    << std::setprecision(3) << std::endl;\
    BOOST_MP_REPORT_SEVERITY(severity);\
    }\
