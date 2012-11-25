@@ -6,6 +6,11 @@
 #ifndef BOOST_MP_NO_ET_OPS_HPP
 #define BOOST_MP_NO_ET_OPS_HPP
 
+#ifdef BOOST_MSVC
+#pragma warning(push)
+#pragma warning(disable: 4714)
+#endif
+
 namespace boost{
 namespace multiprecision{
 
@@ -611,5 +616,9 @@ BOOST_FORCEINLINE typename enable_if<is_integral<I>, number<B, et_off> >::type
 #endif
 
 }} // namespaces
+
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
 
 #endif // BOOST_MP_NO_ET_OPS_HPP
