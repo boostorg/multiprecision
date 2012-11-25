@@ -251,8 +251,15 @@ inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type e
 template <class T, class U, class V>
 inline void eval_add_default(T& t, const U& u, const V& v)
 {
-   t = u;
-   eval_add(t, v);
+   if(is_same<T, V>::value && ((void*)&t == (void*)&v))
+   {
+      eval_add(t, u);
+   }
+   else
+   {
+      t = u;
+      eval_add(t, v);
+   }
 }
 template <class T, class U, class V>
 inline void eval_add(T& t, const U& u, const V& v)
@@ -309,8 +316,16 @@ inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_un
 template <class T, class U, class V>
 inline void eval_subtract_default(T& t, const U& u, const V& v)
 {
-   t = u;
-   eval_subtract(t, v);
+   if(is_same<T, V>::value && ((void*)&t == (void*)&v))
+   {
+      eval_subtract(t, u);
+      t.negate();
+   }
+   else
+   {
+      t = u;
+      eval_subtract(t, v);
+   }
 }
 template <class T, class U, class V>
 inline void eval_subtract(T& t, const U& u, const V& v)
@@ -356,8 +371,15 @@ inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type e
 template <class T, class U, class V>
 inline void eval_multiply_default(T& t, const U& u, const V& v)
 {
-   t = u;
-   eval_multiply(t, v);
+   if(is_same<T, V>::value && ((void*)&t == (void*)&v))
+   {
+      eval_multiply(t, u);
+   }
+   else
+   {
+      t = u;
+      eval_multiply(t, v);
+   }
 }
 template <class T, class U, class V>
 inline void eval_multiply(T& t, const U& u, const V& v)
@@ -455,8 +477,17 @@ inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_co
 template <class T, class U, class V>
 inline void eval_divide_default(T& t, const U& u, const V& v)
 {
-   t = u;
-   eval_divide(t, v);
+   if(is_same<T, V>::value && ((void*)&t == (void*)&v))
+   {
+      T temp(u);
+      eval_divide(temp, v);
+      t = temp;
+   }
+   else
+   {
+      t = u;
+      eval_divide(t, v);
+   }
 }
 template <class T, class U, class V>
 inline void eval_divide(T& t, const U& u, const V& v)
@@ -513,8 +544,17 @@ inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_co
 template <class T, class U, class V>
 inline void eval_modulus_default(T& t, const U& u, const V& v)
 {
-   t = u;
-   eval_modulus(t, v);
+   if(is_same<T, V>::value && ((void*)&t == (void*)&v))
+   {
+      T temp(u);
+      eval_modulus(temp, v);
+      t = temp;
+   }
+   else
+   {
+      t = u;
+      eval_modulus(t, v);
+   }
 }
 template <class T, class U, class V>
 inline void eval_modulus(T& t, const U& u, const V& v)
@@ -563,8 +603,15 @@ inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type e
 template <class T, class U, class V>
 inline void eval_bitwise_and_default(T& t, const U& u, const V& v)
 {
-   t = u;
-   eval_bitwise_and(t, v);
+   if(is_same<T, V>::value && ((void*)&t == (void*)&v))
+   {
+      eval_bitwise_and(t, u);
+   }
+   else
+   {
+      t = u;
+      eval_bitwise_and(t, v);
+   }
 }
 template <class T, class U, class V>
 inline void eval_bitwise_and(T& t, const U& u, const V& v)
@@ -613,8 +660,15 @@ inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type e
 template <class T, class U, class V>
 inline void eval_bitwise_or_default(T& t, const U& u, const V& v)
 {
-   t = u;
-   eval_bitwise_or(t, v);
+   if(is_same<T, V>::value && ((void*)&t == (void*)&v))
+   {
+      eval_bitwise_or(t, u);
+   }
+   else
+   {
+      t = u;
+      eval_bitwise_or(t, v);
+   }
 }
 template <class T, class U, class V>
 inline void eval_bitwise_or(T& t, const U& u, const V& v)
@@ -663,8 +717,15 @@ inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type e
 template <class T, class U, class V>
 inline void eval_bitwise_xor_default(T& t, const U& u, const V& v)
 {
-   t = u;
-   eval_bitwise_xor(t, v);
+   if(is_same<T, V>::value && ((void*)&t == (void*)&v))
+   {
+      eval_bitwise_xor(t, u);
+   }
+   else
+   {
+      t = u;
+      eval_bitwise_xor(t, v);
+   }
 }
 template <class T, class U, class V>
 inline void eval_bitwise_xor(T& t, const U& u, const V& v)
