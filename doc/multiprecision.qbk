@@ -61,12 +61,37 @@
 
 [section:intro Introduction]
 
-The Multiprecision Library provides ['User-defined] integer, rational and floating-point C++ types which
-try to emulate as closely as practicable the C++ built-in types, but provide for more range and
-precision.  Depending upon the number type, precision may be arbitrarily large (limited only by available memory),
-fixed at compile time values, for example 50 decimal
-digits, or a variable controlled at run-time by member functions.  The types are
-expression-template-enabled for better performance than naive user-defined types.
+The Multiprecision Library provides [link boost_multiprecision.tut.ints integer], 
+[link boost_multiprecision.tut.rational rational]
+and [link boost_multiprecision.tut.floats floating-point] types in C++ that have more
+range and precision than C++'s ordinary built-in types.
+The big number types in Multiprecision can be used with a wide
+selection of basic mathematical operations, elementary transcendental
+functions as well as the functions in Boost.Math.
+The Multiprecision types can also interoperate with the
+built-in types in C++ using clearly defined conversion rules.
+This allows Boost.Multiprecision to be used for all
+kinds of mathematical calculations involving integer,
+rational and floating-point types requiring extended
+range and precision.
+
+Multiprecision consists of a generic interface to the
+mathematics of large numbers as well as a selection of
+big number back ends, with support for integer, rational and
+floating-point types. Boost.Multiprecision provides a selection
+of back ends provided off-the-rack in including
+interfaces to GMP, MPFR, MPIR, TomMath as well as
+its own collection of Boost-licensed, header-only back ends for
+integers, rationals and floats. In addition, user-defined back ends
+can be created and used with the interface of Multiprecision,
+provided the class implementation adheres to the necessary 
+[link boost_multiprecision.ref.backendconc concepts].
+
+Depending upon the number type, precision may be arbitrarily large
+(limited only by available memory), fixed at compile time
+(for example 50 or 100 decimal digits), or a variable controlled at run-time
+by member functions. The types are expression-template-enabled for
+better performance than naive user-defined types.
 
 The Multiprecision library comes in two distinct parts:
 
@@ -338,8 +363,11 @@ with MPFR 3.0 and MPIR 2.3.0.
 
 [section:tut Tutorial]
 
-In order to use this library you need to make two choices: what kind of number do I want, and
-which back-end do I want to perform the actual arithmetic?
+In order to use this library you need to make two choices: 
+
+* What kind of number do I want ([link boost_multiprecision.tut.ints integer], 
+[link boost_multiprecision.tut.floats floating point] or [link boost_multiprecision.tut.rational rational]).
+* Which back-end do I want to perform the actual arithmetic (Boost-supplied, GMP, MPFR, Tommath etc)?
 
 [section:ints Integer Types]
 
@@ -822,7 +850,7 @@ as a valid floating point number.
 
 [endsect]
 
-[section:jel Defining a Lambda Function.]
+[section:jel Defining a Special Function.]
 
 [JEL]
 
@@ -1253,7 +1281,9 @@ The following table summarises the situation for conversions from native types:
 
 [section:mixed Mixed Precision Arithmetic]
 
-Mixed precision arithmetic is fully supported by the library, there are two different forms:
+Mixed precision arithmetic is fully supported by the library. 
+
+There are two different forms:
 
 * Where the operands are of different precision.
 * Where the operands are of the same precision, but yield a higher precision result.
@@ -2683,7 +2713,7 @@ inside class `number`:
 [[`number<arithmetic_backend<double>, et_on>`]    [1.2 (0.019s)]     [1.7 (0.79s)]]
 ]
 
-As you can see whether there is an overhead, and how large it is depends on the actual situation,
+As you can see whether or not there is an overhead, and how large it is depends on the actual situation,
 but the overhead is in any cases small.  Expression templates generally add a greater overhead the
 more complex the expression becomes due to the logic of figuring out how to best unpack and evaluate
 the expression, but of course this is also the situation where you save more temporaries.  For a 
@@ -2702,6 +2732,10 @@ for the [@../../performance/voronoi_perfromance.cpp voronoi-diagram builder test
 This test involves mainly creating a lot of temporaries and performing a small amount of arithmetic on them,
 with very little difference in performance between the native and "wrapped" types.
 
+The test code was compiled with Microsoft Visual Studio 2010 with all optimisations
+turned on (/Ox), and used MPIR-2.3.0 and [tommath]-0.42.0.  The tests were run on 32-bit
+Windows Vista machine.
+
 [endsect]
 
 [section:realworld Floating Point Real World Tests]
@@ -2711,10 +2745,6 @@ In each case the best performing library gets a relative score of 1, with the to
 given in brackets.  The first three libraries listed are the various floating point types provided
 by this library, while for comparison, two popular C++ front-ends to [mpfr] ([mpfr_class] and [mpreal])
 are also shown.
-
-Test code was compiled with Microsoft Visual Studio 2010 with all optimisations
-turned on (/Ox), and used MPIR-2.3.0 and [mpfr]-3.0.0.  The tests were run on 32-bit
-Windows Vista machine.
 
 [table Bessel Function Performance
 [[Library][50 Decimal Digits][100 Decimal Digits]]
@@ -2736,13 +2766,13 @@ Windows Vista machine.
 [[[mpreal]]              [2.0 (388.70s)]]
 ]
 
+Test code was compiled with Microsoft Visual Studio 2010 with all optimisations
+turned on (/Ox), and used MPIR-2.3.0 and [mpfr]-3.0.0.  The tests were run on 32-bit
+Windows Vista machine.
+
 [endsect]
 
 [section:int_real_world Integer Real World Tests]
-
-Test code was compiled with Microsoft Visual Studio 2010 with all optimisations
-turned on (/Ox), and used MPIR-2.3.0 and [tommath]-0.42.0.  The tests were run on 32-bit
-Windows Vista machine.
 
 The first set of [@../../performance/voronoi_performance.cpp tests] measure the times taken to
 execute the multiprecision part of the Voronoi-diagram builder from Boost.Polygon.  The tests
@@ -2793,6 +2823,10 @@ altogether - cutting about a third off the total runtime.  Finally the much quic
 much better modular-exponentiation algorithms (GMP's is about 5x faster).  That's an issue which needs to be addressed
 in a future release for __cpp_int.
 
+Test code was compiled with Microsoft Visual Studio 2010 with all optimisations
+turned on (/Ox), and used MPIR-2.3.0 and [mpfr]-3.0.0.  The tests were run on 32-bit
+Windows Vista machine.
+
 [endsect]
 
 [section:float_performance Float Algorithm Perfomance]
@@ -2803,10 +2837,6 @@ with a healthy dose of scepticism, and real-world performance may vary widely de
 specifics of the program.  In each table relative times are given first, with the best performer
 given a score of 1.  Total actual times are given in brackets, measured in seconds for 500000
 operations.
-
-Test code was compiled with Microsoft Visual Studio 2010 with all optimisations
-turned on (/Ox), and used MPIR-2.3.0 and [mpfr]-3.0.0.  The tests were run on 32-bit
-Windows Vista machine.
 
 [table Operator +
 [[Backend][50 Bits][100 Bits][500 Bits]]
@@ -2929,6 +2959,10 @@ Windows Vista machine.
 [[mpfr_float][1.25424 (0.00945658s)][1.24943 (0.012541s)][1.09428 (0.0481601s)]]
 ]
 
+Test code was compiled with Microsoft Visual Studio 2010 with all optimisations
+turned on (/Ox), and used MPIR-2.3.0 and [mpfr]-3.0.0.  The tests were run on 32-bit
+Windows Vista machine.
+
 [endsect]
 
 [section:integer_performance Integer Algorithm Perfomance]
@@ -2939,12 +2973,6 @@ with a healthy dose of scepticism, and real-world performance may vary widely de
 specifics of the program.  In each table relative times are given first, with the best performer
 given a score of 1.  Total actual times are given in brackets, measured in seconds for 500000
 operations.
-
-Test code was compiled with Microsoft Visual Studio 2010 with all optimisations
-turned on (/Ox), and used MPIR-2.3.0 and [mpfr]-3.0.0.  The tests were run on 32-bit
-Windows Vista machine.
-
-Linux x86_64 results are broadly similar, except that libtommath performs much better there.
 
 [table Operator +
 [[Backend][128 Bits][256 Bits][512 Bits][1024 Bits]]
@@ -3164,6 +3192,12 @@ Linux x86_64 results are broadly similar, except that libtommath performs much b
 [[tommath_int][10.5766 (0.233779s)][9.0959 (0.27609s)][8.6249 (0.29666s)][13.6818 (0.515498s)]]
 ]
 
+Test code was compiled with Microsoft Visual Studio 2010 with all optimisations
+turned on (/Ox), and used MPIR-2.3.0 and [mpfr]-3.0.0.  The tests were run on 32-bit
+Windows Vista machine.
+
+Linux x86_64 results are broadly similar, except that libtommath performs much better there.
+
 [endsect]
 
 [section:rational_performance Rational Type Perfomance]
@@ -3174,10 +3208,6 @@ with a healthy dose of scepticism, and real-world performance may vary widely de
 specifics of the program.  In each table relative times are given first, with the best performer
 given a score of 1.  Total actual times are given in brackets, measured in seconds for 500000
 operations.
-
-Test code was compiled with Microsoft Visual Studio 2010 with all optimisations
-turned on (/Ox), and used MPIR-2.3.0 and [mpfr]-3.0.0.  The tests were run on 32-bit
-Windows Vista machine.
 
 [table Operator +
 [[Backend][128 Bits][256 Bits][512 Bits][1024 Bits]]
@@ -3280,6 +3310,10 @@ Windows Vista machine.
 [[mpq_rational][[*1] (0.0038067s)][[*1] (0.00643413s)][[*1] (0.0120606s)][[*1] (0.0294843s)]]
 ]
 
+Test code was compiled with Microsoft Visual Studio 2010 with all optimisations
+turned on (/Ox), and used MPIR-2.3.0 and [mpfr]-3.0.0.  The tests were run on 32-bit
+Windows Vista machine.
+
 [endsect]
 
 [endsect]
@@ -3330,7 +3364,7 @@ More a list of what ['could] be done, rather than what ['should] be done (which 
 * Add a back-end for MPFR interval arithmetic.
 * Add better multiplication routines (Karatsuba, FFT etc) to cpp_int_backend.
 * Add assembly level routines to cpp_int_backend.
-* Add an all C++ binary floating point type.
+* Add an all C++ Boost licenced binary floating point type.
 * Can ring types (exact floating point types) be supported?  The answer should be yes, but someone needs to write it, 
 the hard part is IO and binary-decimal convertion.
 * Should there be a choice of rounding mode (probably MPFR specific)?
@@ -3462,7 +3496,7 @@ Donald E. Knuth, Volume 2: Seminumerical Algorithms, Third Edition
 
 [section:indexes Indexes]
 
-[include ../../../../../trunk/tools/auto_index/include/auto_index_helpers.qbk]
+[include ../../../tools/auto_index/include/auto_index_helpers.qbk]
 [named_index function_name Function Index]
 [named_index class_name Class Index]
 [named_index typedef_name Typedef Index]

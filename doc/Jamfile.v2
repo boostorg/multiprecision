@@ -15,12 +15,12 @@ boostbook standalone
         big_number
     :
         # Path for links to Boost:
-        #<xsl:param>boost.root=http://www.boost.org/doc/libs/release
+        <xsl:param>boost.root=../../../..
         
         # Some general style settings:
         <xsl:param>table.footnote.number.format=1
         <xsl:param>footnote.number.format=1
-        <xsl:param>html.stylesheet=http://www.boost.org/doc/libs/release/doc/src/boostbook.css
+        #<xsl:param>html.stylesheet=../../../../doc/src/boostbook.css
 
         # HTML options first:
         # Use graphics not text for navigation:

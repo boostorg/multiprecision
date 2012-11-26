@@ -2,7 +2,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
 <title>The Overhead in the Number Class Wrapper</title>
-<link rel="stylesheet" href="http://www.boost.org/doc/libs/release/doc/src/boostbook.css" type="text/css">
+<link rel="stylesheet" href="../../../../../../doc/src/boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.77.1">
 <link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
 <link rel="up" href="../perf.html" title="Performance Comparison">
@@ -10,8 +10,17 @@
 <link rel="next" href="realworld.html" title="Floating Point Real World Tests">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="../../../../../../boost.png"></td>
+<td align="center"><a href="../../../../../../index.html">Home</a></td>
+<td align="center"><a href="../../../../../../libs/libraries.htm">Libraries</a></td>
+<td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
+<td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
+<td align="center"><a href="../../../../../../more/index.htm">More</a></td>
+</tr></table>
+<hr>
 <div class="spirit-nav">
-<a accesskey="p" href="../perf.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../perf.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="realworld.html"><img src="../../images/next.png" alt="Next"></a>
+<a accesskey="p" href="../perf.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../perf.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="realworld.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="section boost_multiprecision_perf_overhead">
 <div class="titlepage"><div><div><h3 class="title">
@@ -107,7 +116,7 @@
 </tbody>
 </table></div>
 <p>
-        As you can see whether there is an overhead, and how large it is depends
+        As you can see whether or not there is an overhead, and how large it is depends
         on the actual situation, but the overhead is in any cases small. Expression
         templates generally add a greater overhead the more complex the expression
         becomes due to the logic of figuring out how to best unpack and evaluate
@@ -169,6 +178,11 @@
         small amount of arithmetic on them, with very little difference in performance
         between the native and "wrapped" types.
       </p>
+<p>
+        The test code was compiled with Microsoft Visual Studio 2010 with all optimisations
+        turned on (/Ox), and used MPIR-2.3.0 and <a href="http://libtom.org/?page=features&amp;newsitems=5&amp;whatfile=ltm" target="_top">libtommath</a>-0.42.0.
+        The tests were run on 32-bit Windows Vista machine.
+      </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
@@ -180,7 +194,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="../perf.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../perf.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="realworld.html"><img src="../../images/next.png" alt="Next"></a>
+<a accesskey="p" href="../perf.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../perf.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="realworld.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>
