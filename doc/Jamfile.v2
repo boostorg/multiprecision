@@ -9,10 +9,10 @@ using auto-index ;
 path-constant images_location : html ;
 path-constant here : . ;
 
-xml big_number : multiprecision.qbk ;
+xml multiprecision : multiprecision.qbk ;
 boostbook standalone
     :
-        big_number
+        multiprecision
     :
         # Path for links to Boost:
         <xsl:param>boost.root=../../../..
@@ -74,6 +74,8 @@ boostbook standalone
         <format>pdf:<xsl:param>index.on.type=1
     ;
 
-install pdf-install : standalone : <location>. <install-type>PDF ;
+install pdf-install : standalone : <location>. <install-type>PDF <name>multiprecision.pdf ;
+
+
 
 
