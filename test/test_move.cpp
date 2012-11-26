@@ -11,7 +11,7 @@
 
 #include <boost/config.hpp>
 
-#ifndef BOOST_NO_RVALUE_REFERENCES
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
 
 #if !defined(TEST_GMP) && !defined(TEST_MPFR) && !defined(TEST_TOMMATH) && !defined(TEST_CPP_INT)
 #  define TEST_GMP

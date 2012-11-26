@@ -67,7 +67,7 @@ template <class T>
 void do_round_trip(const T& val, std::ios_base::fmtflags f, const boost::mpl::true_&)
 {
    std::stringstream ss;
-#ifndef BOOST_NO_NUMERIC_LIMITS_LOWEST
+#ifndef BOOST_NO_CXX11_NUMERIC_LIMITS
    ss << std::setprecision(std::numeric_limits<T>::max_digits10);
 #else
    ss << std::setprecision(std::numeric_limits<T>::digits10 + 5);

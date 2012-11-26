@@ -5,7 +5,7 @@
 
 #include <boost/multiprecision/cpp_int.hpp>
 
-#ifndef BOOST_NO_CONSTEXPR
+#ifndef BOOST_NO_CXX11_CONSTEXPR
 
 template <class T>
 void silence_unused(const T&){}

@@ -158,12 +158,12 @@ void test()
    }
    PRINT(max());
    PRINT(min());
-#ifndef BOOST_NO_NUMERIC_LIMITS_LOWEST
+#ifndef BOOST_NO_CXX11_NUMERIC_LIMITS
    PRINT(lowest());
 #endif
    PRINT(digits);
    PRINT(digits10);
-#ifndef BOOST_NO_NUMERIC_LIMITS_LOWEST
+#ifndef BOOST_NO_CXX11_NUMERIC_LIMITS
    PRINT(max_digits10);
 #endif
    PRINT(is_signed);
