@@ -83,6 +83,7 @@ struct tester
       BOOST_CHECK_EQUAL((mpz_int(a)+=b).str(), (test_type(a1) += b1).str());
       BOOST_CHECK_EQUAL((mpz_int(b)+=a).str(), (test_type(b1) += a1).str());
       BOOST_CHECK_EQUAL(mpz_int(a-b).str(), test_type(a1 - b1).str());
+      BOOST_CHECK_EQUAL((mpz_int(a)-=b).str(), (test_type(a1) -= b1).str());
       BOOST_CHECK_EQUAL(mpz_int(mpz_int(-a)+b).str(), test_type(test_type(-a1) + b1).str());
       BOOST_CHECK_EQUAL(mpz_int(mpz_int(-a)-b).str(), test_type(test_type(-a1) - b1).str());
       BOOST_CHECK_EQUAL(mpz_int(c * d).str(), test_type(c1 * d1).str());
