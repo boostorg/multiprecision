@@ -1484,9 +1484,24 @@ void cpp_dec_float<Digits10, ExponentType, Allocator>::extract_parts(double& man
       ++exponent;
    }
 
-   mantissa =     static_cast<double>(data[0])
-      +  (static_cast<double>(data[1]) / static_cast<double>(cpp_dec_float_elem_mask))
-      + ((static_cast<double>(data[2]) / static_cast<double>(cpp_dec_float_elem_mask)) / static_cast<double>(cpp_dec_float_elem_mask));
+   // Establish the upper bound of limbs for extracting the double.
+   const int max_elem_in_double_count =     static_cast<int>(static_cast<boost::int32_t>(std::numeric_limits<double>::digits10) / cpp_dec_float_elem_digits10)
+                                         + (static_cast<int>(static_cast<boost::int32_t>(std::numeric_limits<double>::digits10) % cpp_dec_float_elem_digits10) != 0 ? 1 : 0)
+                                         + 1;
+
+   // And make sure this upper bound stays within bounds of the elems.
+   const std::size_t max_elem_extract_count = static_cast<std::size_t>((std::min)(static_cast<boost::int32_t>(max_elem_in_double_count), cpp_dec_float_elem_number));
+
+   // Extract into the mantissa the first limb, extracted as a double.
+   mantissa = static_cast<double>(data[0]);
+   double scale = 1.0;
+
+   // Extract the rest of the mantissa piecewise from the limbs.
+   for(std::size_t i = 1u; i < max_elem_extract_count; i++)
+   {
+     scale /= static_cast<double>(cpp_dec_float_elem_mask);
+     mantissa += (static_cast<double>(data[i]) * scale);
+   }
 
    mantissa /= static_cast<double>(p10);
 
