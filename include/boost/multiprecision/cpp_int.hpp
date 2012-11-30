@@ -674,7 +674,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
    typedef mpl::int_<Checked>                         checked_type;
 protected:
    BOOST_STATIC_CONSTANT(unsigned, limb_bits = sizeof(local_limb_type) * CHAR_BIT);
-   BOOST_STATIC_CONSTANT(local_limb_type, limb_mask = MinBits < limb_bits ? (local_limb_type(1) << MinBits) -1 : (~local_limb_type(0)));
+   BOOST_STATIC_CONSTANT(local_limb_type, limb_mask = (MinBits < limb_bits) ? ((~local_limb_type(0)) >> (limb_bits - MinBits)) : (~local_limb_type(0)));
 private:
    local_limb_type    m_data;
    bool               m_sign;
@@ -1745,9 +1745,9 @@ struct double_precision_type<backends::cpp_int_backend<MinBits, MaxBits, SignTyp
          (is_void<Allocator>::value ?
             2 * backends::max_precision<backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value
             : MinBits),
-         2 * backends::max_precision<backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value, 
-         SignType, 
-         Checked, 
+         2 * backends::max_precision<backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value,
+         SignType,
+         Checked,
          Allocator>,
       backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>
    >::type type;
