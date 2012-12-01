@@ -685,7 +685,7 @@ private:
    BOOST_STATIC_ASSERT_MSG(MinBits <= sizeof(double_limb_type) * CHAR_BIT, "Template parameter MinBits is inconsistent with the parameter trivial - did you mistakingly try to override the trivial parameter?");
 protected:
    template <class T>
-   typename disable_if_c<std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= MinBits)>::type
+   typename disable_if_c<std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= (int)MinBits)>::type
       check_in_range(T val, const mpl::int_<checked>&)
    {
       BOOST_MP_USING_ABS
@@ -804,7 +804,7 @@ private:
    BOOST_STATIC_ASSERT_MSG(MinBits <= sizeof(double_limb_type) * CHAR_BIT, "Template parameter MinBits is inconsistent with the parameter trivial - did you mistakingly try to override the trivial parameter?");
 protected:
    template <class T>
-   typename disable_if_c<std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= MinBits)>::type
+   typename disable_if_c<std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= (int)MinBits)>::type
       check_in_range(T val, const mpl::int_<checked>&, const mpl::false_&)
    {
       typedef typename common_type<T, local_limb_type>::type common_type;
