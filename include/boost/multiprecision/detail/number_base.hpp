@@ -19,6 +19,12 @@
 #  pragma warning(pop)
 #endif
 
+#if defined(NDEBUG) && !defined(_DEBUG)
+#  define BOOST_MP_FORCEINLINE BOOST_FORCEINLINE
+#else
+#  define BOOST_MP_FORCEINLINE inline
+#endif
+
 namespace boost{ namespace multiprecision{
 
 enum expression_template_option

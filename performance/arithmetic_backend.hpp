@@ -169,7 +169,7 @@ template <class Arithmetic>
 inline typename disable_if_c<std::numeric_limits<Arithmetic>::has_infinity>::type eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& o)
 {
    if(!o.data())
-      BOOST_THROW_EXCEPTION(std::runtime_error("Divide by zero"));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Divide by zero"));
    result.data() /= o.data();
 }
 
@@ -193,7 +193,7 @@ inline typename enable_if_c<(is_arithmetic<A2>::value && !std::numeric_limits<Ar
    eval_divide(arithmetic_backend<Arithmetic>& result, const A2& o)
 {
    if(!o)
-      BOOST_THROW_EXCEPTION(std::runtime_error("Divide by zero"));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Divide by zero"));
    result.data() /= o;
 }
 template <class Arithmetic, class A2>
@@ -227,7 +227,7 @@ template <class Arithmetic>
 inline typename disable_if_c<std::numeric_limits<Arithmetic>::has_infinity>::type eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const arithmetic_backend<Arithmetic>& b)
 {
    if(!b.data())
-      BOOST_THROW_EXCEPTION(std::runtime_error("Divide by zero"));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Divide by zero"));
    result.data() = a.data() / b.data();
 }
 
@@ -251,7 +251,7 @@ inline typename enable_if_c<(is_arithmetic<A2>::value && !std::numeric_limits<Ar
    eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
 {
    if(!b)
-      BOOST_THROW_EXCEPTION(std::runtime_error("Divide by zero"));
+      BOOST_THROW_EXCEPTION(std::overflow_error("Divide by zero"));
    result.data() = a.data() / b;
 }
 template <class Arithmetic, class A2>
@@ -516,6 +516,9 @@ template <class Arithmetic>
 struct number_category<arithmetic_backend<Arithmetic> > : public mpl::int_<is_integral<Arithmetic>::value ? number_kind_integer : number_kind_floating_point>{};
 
 namespace detail{
+
+template <class Backend>
+struct double_precision_type;
 
 template<class Arithmetic, boost::multiprecision::expression_template_option ET>
 struct double_precision_type<number<arithmetic_backend<Arithmetic>, ET> >

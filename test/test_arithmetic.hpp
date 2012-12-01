@@ -1,11 +1,7 @@
 ///////////////////////////////////////////////////////////////
-//  Copyright 2011 John Maddock. Distributed under the Boost
+//  Copyright 2012 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_
-
-#ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
-#endif
 
 #ifdef TEST_VLD
 #include <vld.h>
@@ -15,59 +11,8 @@
 #include <boost/math/common_factor_rt.hpp>
 #include "test.hpp"
 
-#if defined(TEST_ARITHMETIC_BACKEND)
-# include "../performance/arithmetic_backend.hpp"
-#endif
-#if defined(TEST_MPF_50) || defined(TEST_MPF) || defined(TEST_MPZ) || defined(TEST_MPQ) || defined(TEST_MPZ_BOOST_RATIONAL)
-#include <boost/multiprecision/gmp.hpp>
-#include <boost/multiprecision/rational_adapter.hpp>
-#endif
-#ifdef TEST_BACKEND
-#include <boost/multiprecision/concepts/mp_number_archetypes.hpp>
-#endif
-#ifdef TEST_CPP_DEC_FLOAT
-#include <boost/multiprecision/cpp_dec_float.hpp>
-#endif
-#if defined(TEST_MPFR) || defined(TEST_MPFR_50)
-#include <boost/multiprecision/mpfr.hpp>
-#endif
-#if defined(TEST_TOMMATH) || defined(TEST_TOMMATH_BOOST_RATIONAL)
-#include <boost/multiprecision/tommath.hpp>
-#include <boost/multiprecision/rational_adapter.hpp>
-#endif
-#if defined(TEST_CPP_INT_1) || defined(TEST_CPP_INT_2) || defined(TEST_CPP_INT_3) || defined(TEST_CPP_INT_4)\
-   || defined(TEST_CPP_INT_5) || defined(TEST_CPP_INT_6) || defined(TEST_CPP_INT_7) || defined(TEST_CPP_INT_8)\
-   || defined(TEST_CPP_INT_9) || defined(TEST_CPP_INT_10) || defined(TEST_CPP_INT_11) || defined(TEST_CPP_INT_12)\
-   || defined(TEST_CPP_INT_13) || defined(TEST_CPP_INT_14) || defined(TEST_CPP_INT_15) || defined(TEST_CPP_INT_16)\
-   || defined(TEST_CPP_INT_17) || defined(TEST_CPP_INT_18) || defined(TEST_CPP_INT_BR)
-#include <boost/multiprecision/cpp_int.hpp>
-#endif
-
 template <class T>
 struct is_boost_rational : public boost::mpl::false_{};
-
-#if defined(TEST_TOMMATH_BOOST_RATIONAL) || defined(TEST_MPZ_BOOST_RATIONAL)
-#include <boost/rational.hpp>
-
-#define NO_MIXED_OPS
-
-template <class T>
-struct is_boost_rational<boost::rational<T> > : public boost::mpl::true_{};
-
-namespace boost{ namespace multiprecision{
-
-#ifdef TEST_TOMMATH_BOOST_RATIONAL
-template<>
-struct number_category<rational<tom_int> > : public mpl::int_<number_kind_rational> {};
-#endif
-#ifdef TEST_MPZ_BOOST_RATIONAL
-template<>
-struct number_category<rational<mpz_int> > : public mpl::int_<number_kind_rational> {};
-#endif
-
-}}
-
-#endif
 
 #ifdef BOOST_MSVC
 // warning C4127: conditional expression is constant
@@ -95,74 +40,12 @@ typename boost::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4>:
 template <class T>
 struct is_twos_complement_integer : public boost::mpl::true_ {};
 
-#ifdef TEST_TOMMATH
-template <>
-struct is_twos_complement_integer<boost::multiprecision::tom_int> : public boost::mpl::false_ {};
-#endif
-#if defined(TEST_CPP_INT_1) || defined(TEST_CPP_INT_2) || defined(TEST_CPP_INT_3) || defined(TEST_CPP_INT_4)\
-   || defined(TEST_CPP_INT_5) || defined(TEST_CPP_INT_6) || defined(TEST_CPP_INT_7) || defined(TEST_CPP_INT_8)\
-   || defined(TEST_CPP_INT_9) || defined(TEST_CPP_INT_10) || defined(TEST_CPP_INT_11) || defined(TEST_CPP_INT_12)\
-   || defined(TEST_CPP_INT_13) || defined(TEST_CPP_INT_14) || defined(TEST_CPP_INT_15) || defined(TEST_CPP_INT_16)\
-   || defined(TEST_CPP_INT_17) || defined(TEST_CPP_INT_18) || defined(TEST_CPP_INT_BR)
-template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-struct is_twos_complement_integer<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, boost::multiprecision::checked, Allocator>, ExpressionTemplates> > : public boost::mpl::false_ {};
-#endif
-
 template <class T>
 struct related_type
 {
    typedef T type;
 };
 
-#ifdef TEST_MPQ
-template <>
-struct related_type<boost::multiprecision::mpq_rational>
-{
-   typedef boost::multiprecision::mpz_int type;
-};
-#endif
-#if defined(TEST_MPF_50) || defined(TEST_MPF)
-template <unsigned D>
-struct related_type<boost::multiprecision::number< boost::multiprecision::gmp_float<D> > >
-{
-   typedef boost::multiprecision::number< boost::multiprecision::gmp_float<D/2> > type;
-};
-template <>
-struct related_type<boost::multiprecision::mpf_float >
-{
-   typedef boost::multiprecision::mpz_int type;
-};
-#endif
-#ifdef TEST_CPP_DEC_FLOAT
-template <unsigned D>
-struct related_type<boost::multiprecision::number< boost::multiprecision::cpp_dec_float<D> > >
-{
-   typedef boost::multiprecision::number< boost::multiprecision::cpp_dec_float<D/2> > type;
-};
-#endif
-#if defined(TEST_MPFR_50) || defined(TEST_MPFR)
-template <unsigned D>
-struct related_type<boost::multiprecision::number< boost::multiprecision::mpfr_float_backend<D> > >
-{
-   typedef boost::multiprecision::number< boost::multiprecision::mpfr_float_backend<D/2> > type;
-};
-#endif
-#if defined(TEST_CPP_INT_1) || defined(TEST_CPP_INT_2) || defined(TEST_CPP_INT_3) || defined(TEST_CPP_INT_4)\
-   || defined(TEST_CPP_INT_5) || defined(TEST_CPP_INT_6) || defined(TEST_CPP_INT_7) || defined(TEST_CPP_INT_8)\
-   || defined(TEST_CPP_INT_9) || defined(TEST_CPP_INT_10) || defined(TEST_CPP_INT_11) || defined(TEST_CPP_INT_12)\
-   || defined(TEST_CPP_INT_13) || defined(TEST_CPP_INT_14) || defined(TEST_CPP_INT_15) || defined(TEST_CPP_INT_16)\
-   || defined(TEST_CPP_INT_17) || defined(TEST_CPP_INT_18) || defined(TEST_CPP_INT_BR)
-template <>
-struct related_type<boost::multiprecision::cpp_int>
-{
-   typedef boost::multiprecision::int256_t type;
-};
-template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ET>
-struct related_type<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ET> >
-{
-   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits/2, MaxBits/2, SignType, Checked, Allocator>, ET> type;
-};
-#endif
 template <class Real, class Val>
 void test_comparisons(Val, Val, const boost::mpl::false_)
 {}
@@ -900,7 +783,7 @@ void test_negative_mixed(boost::mpl::true_ const&)
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n3)) ,  n3);
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n4)) ,  n4);
 #endif
-#if defined(TEST_MPFR) || defined(TEST_MPFR_50)
+#if defined(TEST_MPFR)
    Num tol = 10 * std::numeric_limits<Num>::epsilon();
 #else
    Num tol = 0;
@@ -1189,7 +1072,7 @@ void test_mixed(const boost::mpl::true_&)
    BOOST_CHECK_EQUAL(static_cast<cast_type>(n2) ,  Real(n2));
    BOOST_CHECK_EQUAL(static_cast<cast_type>(n3) ,  Real(n3));
    BOOST_CHECK_EQUAL(static_cast<cast_type>(n4) ,  Real(n4));
-#if defined(TEST_MPFR) || defined(TEST_MPFR_50)
+#if defined(TEST_MPFR)
    Num tol = 10 * std::numeric_limits<Num>::epsilon();
 #else
    Num tol = 0;
@@ -1751,115 +1634,5 @@ void test()
    test_conditional(a, (a + 0));
 
    test_signed_ops<Real>(boost::mpl::bool_<std::numeric_limits<Real>::is_signed>());
-}
-
-
-int main()
-{
-#ifdef TEST_ARITHMETIC_BACKEND
-   test<boost::multiprecision::number<boost::multiprecision::arithmetic_backend<double> > >();
-   test<boost::multiprecision::number<boost::multiprecision::arithmetic_backend<int> > >();
-   test<boost::multiprecision::number<boost::multiprecision::arithmetic_backend<unsigned int> > >();
-#endif
-#ifdef TEST_BACKEND
-   test<boost::multiprecision::number<boost::multiprecision::concepts::number_backend_float_architype> >();
-#endif
-#ifdef TEST_MPF_50
-   test<boost::multiprecision::mpf_float_50>();
-#endif
-#ifdef TEST_MPF
-   boost::multiprecision::mpf_float::default_precision(1000);
-   BOOST_CHECK_EQUAL(boost::multiprecision::mpf_float::default_precision() ,  1000);
-   test<boost::multiprecision::mpf_float>();
-#endif
-#ifdef TEST_MPZ
-   test<boost::multiprecision::mpz_int>();
-   test<boost::multiprecision::number<boost::multiprecision::rational_adapter<boost::multiprecision::gmp_int> > >();
-#endif
-#ifdef TEST_MPQ
-   test<boost::multiprecision::mpq_rational>();
-#endif
-#ifdef TEST_CPP_DEC_FLOAT
-   test<boost::multiprecision::cpp_dec_float_50>();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<100, long long>, boost::multiprecision::et_off> >();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<100, long long, std::allocator<void> >, boost::multiprecision::et_on> >();
-#endif
-#ifdef TEST_MPFR
-   test<boost::multiprecision::mpfr_float>();
-#endif
-#ifdef TEST_MPFR_50
-   test<boost::multiprecision::mpfr_float_50>();
-   test<boost::multiprecision::static_mpfr_float_50>();
-#endif
-#ifdef TEST_TOMMATH
-   test<boost::multiprecision::tom_int>();
-   test<boost::multiprecision::number<boost::multiprecision::rational_adapter<boost::multiprecision::tommath_int> > >();
-#endif
-#ifdef TEST_TOMMATH_BOOST_RATIONAL
-   test<boost::rational<boost::multiprecision::tom_int> >();
-#endif
-#ifdef TEST_MPZ_BOOST_RATIONAL
-   test<boost::rational<boost::multiprecision::mpz_int> >();
-#endif
-#ifdef TEST_CPP_INT_1
-   test<boost::multiprecision::cpp_int>();
-#endif
-#ifdef TEST_CPP_INT_2
-   test<boost::multiprecision::int512_t >();
-#endif
-#ifdef TEST_CPP_INT_3
-   test<boost::multiprecision::uint1024_t >();
-#endif
-#ifdef TEST_CPP_INT_4
-   test<boost::multiprecision::checked_cpp_int>();
-#endif
-#ifdef TEST_CPP_INT_5
-   test<boost::multiprecision::checked_int512_t >();
-#endif
-#ifdef TEST_CPP_INT_6
-   test<boost::multiprecision::checked_uint1024_t >();
-#endif
-#ifdef TEST_CPP_INT_7
-   test<boost::multiprecision::cpp_rational>();
-#endif
-#ifdef TEST_CPP_INT_8
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<>, boost::multiprecision::et_off> >();
-#endif
-#ifdef TEST_CPP_INT_9
-test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<500, 500, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> > >();
-#endif
-#ifdef TEST_CPP_INT_10
-   test<boost::multiprecision::checked_cpp_rational>();
-#endif
-#ifdef TEST_CPP_INT_11
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<0, 0, boost::multiprecision::signed_magnitude, boost::multiprecision::checked>, boost::multiprecision::et_off> >();
-#endif
-#ifdef TEST_CPP_INT_12
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<500, 500, boost::multiprecision::signed_magnitude, boost::multiprecision::checked, void> > >();
-#endif
-#ifdef TEST_CPP_INT_13
-   // Again with "trivial" backends:
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, 64, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> > >();
-#endif
-#ifdef TEST_CPP_INT_14
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, 64, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> > >();
-#endif
-#ifdef TEST_CPP_INT_15
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<31, 31, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> > >();
-#endif
-#ifdef TEST_CPP_INT_16
-   // Again with "trivial" checked backends:
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, 64, boost::multiprecision::signed_magnitude, boost::multiprecision::checked, void> > >();
-#endif
-#ifdef TEST_CPP_INT_17
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, 64, boost::multiprecision::unsigned_magnitude, boost::multiprecision::checked, void> > >();
-#endif
-#ifdef TEST_CPP_INT_18
-   test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<31, 31, boost::multiprecision::signed_magnitude, boost::multiprecision::checked, void> > >();
-#endif
-#ifdef TEST_CPP_INT_BR
-   test<boost::rational<boost::multiprecision::cpp_int> >();
-#endif
-   return boost::report_errors();
 }
 

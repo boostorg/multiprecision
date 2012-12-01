@@ -204,27 +204,27 @@ public:
    //
    // Direct construction:
    //
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(limb_type i)BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(limb_type i)BOOST_NOEXCEPT
       : m_data(i), m_limbs(1), m_sign(false), m_internal(true) { }
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_limb_type i)BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_limb_type i)BOOST_NOEXCEPT
       : m_data(i), m_limbs(1), m_sign(i < 0), m_internal(true) { }
 #if defined(BOOST_LITTLE_ENDIAN)
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT
       : m_data(i), m_limbs(i > max_limb_value ? 2 : 1), m_sign(false), m_internal(true) { }
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT
       : m_data(i), m_limbs(i < 0 ? (-i > max_limb_value ? 2 : 1) : (i > max_limb_value ? 2 : 1)),
         m_sign(i < 0), m_internal(true) { }
 #endif
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
-   BOOST_FORCEINLINE allocator_type& allocator() BOOST_NOEXCEPT { return *this; }
-   BOOST_FORCEINLINE const allocator_type& allocator()const BOOST_NOEXCEPT { return *this; }
-   BOOST_FORCEINLINE unsigned size()const  BOOST_NOEXCEPT { return m_limbs; }
-   BOOST_FORCEINLINE limb_pointer limbs()  BOOST_NOEXCEPT { return m_internal ? m_data.la : m_data.ld.data; }
-   BOOST_FORCEINLINE const_limb_pointer limbs()const  BOOST_NOEXCEPT { return m_internal ? m_data.la : m_data.ld.data; }
-   BOOST_FORCEINLINE unsigned capacity()const  BOOST_NOEXCEPT { return m_internal ? internal_limb_count : m_data.ld.capacity; }
-   BOOST_FORCEINLINE bool sign()const  BOOST_NOEXCEPT { return m_sign; }
+   BOOST_MP_FORCEINLINE allocator_type& allocator() BOOST_NOEXCEPT { return *this; }
+   BOOST_MP_FORCEINLINE const allocator_type& allocator()const BOOST_NOEXCEPT { return *this; }
+   BOOST_MP_FORCEINLINE unsigned size()const  BOOST_NOEXCEPT { return m_limbs; }
+   BOOST_MP_FORCEINLINE limb_pointer limbs()  BOOST_NOEXCEPT { return m_internal ? m_data.la : m_data.ld.data; }
+   BOOST_MP_FORCEINLINE const_limb_pointer limbs()const  BOOST_NOEXCEPT { return m_internal ? m_data.la : m_data.ld.data; }
+   BOOST_MP_FORCEINLINE unsigned capacity()const  BOOST_NOEXCEPT { return m_internal ? internal_limb_count : m_data.ld.capacity; }
+   BOOST_MP_FORCEINLINE bool sign()const  BOOST_NOEXCEPT { return m_sign; }
    void sign(bool b)  BOOST_NOEXCEPT
    {
       m_sign = b;
@@ -263,13 +263,13 @@ public:
          m_limbs = new_size;
       }
    }
-   BOOST_FORCEINLINE void normalize() BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE void normalize() BOOST_NOEXCEPT
    {
       limb_pointer p = limbs();
       while((m_limbs-1) && !p[m_limbs - 1])--m_limbs;
    }
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() BOOST_NOEXCEPT : m_data(), m_limbs(1), m_sign(false), m_internal(true) {}
-   BOOST_FORCEINLINE cpp_int_base(const cpp_int_base& o) : allocator_type(o), m_limbs(0), m_internal(true)
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() BOOST_NOEXCEPT : m_data(), m_limbs(1), m_sign(false), m_internal(true) {}
+   BOOST_MP_FORCEINLINE cpp_int_base(const cpp_int_base& o) : allocator_type(o), m_limbs(0), m_internal(true)
    {
       resize(o.size(), o.size());
       std::copy(o.limbs(), o.limbs() + o.size(), limbs());
@@ -311,7 +311,7 @@ public:
       return *this;
    }
 #endif
-   BOOST_FORCEINLINE ~cpp_int_base() BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE ~cpp_int_base() BOOST_NOEXCEPT
    {
       if(!m_internal)
          allocator().deallocate(limbs(), capacity());
@@ -327,7 +327,7 @@ public:
          m_sign = o.m_sign;
       }
    }
-   BOOST_FORCEINLINE void negate() BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE void negate() BOOST_NOEXCEPT
    {
       m_sign = !m_sign;
       // Check for zero value:
@@ -337,11 +337,11 @@ public:
             m_sign = false;
       }
    }
-   BOOST_FORCEINLINE bool isneg()const BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE bool isneg()const BOOST_NOEXCEPT
    {
       return m_sign;
    }
-   BOOST_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
       std::swap(m_data, o.m_data);
       std::swap(m_sign, o.m_sign);
@@ -415,14 +415,14 @@ public:
    //
    // Direct construction:
    //
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(limb_type i)BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(limb_type i)BOOST_NOEXCEPT
       : m_wrapper(i), m_limbs(1), m_sign(false) {}
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_limb_type i)BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_limb_type i)BOOST_NOEXCEPT
       : m_wrapper(limb_type(i < 0 ? -i : i)), m_limbs(1), m_sign(i < 0) {}
 #if defined(BOOST_LITTLE_ENDIAN)
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT
       : m_wrapper(i), m_limbs(i > max_limb_value ? 2 : 1), m_sign(false) {}
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT
       : m_wrapper(double_limb_type(i < 0 ? -i : i)),
         m_limbs(i < 0 ? (-i > max_limb_value ? 2 : 1) : (i > max_limb_value ? 2 : 1)),
         m_sign(i < 0) {}
@@ -430,11 +430,11 @@ public:
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
-   BOOST_FORCEINLINE unsigned size()const BOOST_NOEXCEPT { return m_limbs; }
-   BOOST_FORCEINLINE limb_pointer limbs() BOOST_NOEXCEPT { return m_wrapper.m_data; }
-   BOOST_FORCEINLINE const_limb_pointer limbs()const BOOST_NOEXCEPT { return m_wrapper.m_data; }
-   BOOST_FORCEINLINE bool sign()const BOOST_NOEXCEPT { return m_sign; }
-   BOOST_FORCEINLINE void sign(bool b) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE unsigned size()const BOOST_NOEXCEPT { return m_limbs; }
+   BOOST_MP_FORCEINLINE limb_pointer limbs() BOOST_NOEXCEPT { return m_wrapper.m_data; }
+   BOOST_MP_FORCEINLINE const_limb_pointer limbs()const BOOST_NOEXCEPT { return m_wrapper.m_data; }
+   BOOST_MP_FORCEINLINE bool sign()const BOOST_NOEXCEPT { return m_sign; }
+   BOOST_MP_FORCEINLINE void sign(bool b) BOOST_NOEXCEPT
    {
       m_sign = b;
       // Check for zero value:
@@ -444,12 +444,12 @@ public:
             m_sign = false;
       }
    }
-   BOOST_FORCEINLINE void resize(unsigned new_size, unsigned min_size) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE void resize(unsigned new_size, unsigned min_size) BOOST_NOEXCEPT_IF((Checked == unchecked))
    {
       m_limbs = static_cast<boost::uint16_t>((std::min)(new_size, internal_limb_count));
       detail::verify_new_size(m_limbs, min_size, checked_type());
    }
-   BOOST_FORCEINLINE void normalize() BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE void normalize() BOOST_NOEXCEPT_IF((Checked == unchecked))
    {
       limb_pointer p = limbs();
       detail::verify_limb_mask(m_limbs == internal_limb_count, p[internal_limb_count-1], upper_limb_mask, checked_type());
@@ -458,8 +458,8 @@ public:
       if((m_limbs == 1) && (!*p)) m_sign = false; // zero is always unsigned
    }
 
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() : m_wrapper(limb_type(0u)), m_limbs(1), m_sign(false) {}
-   BOOST_FORCEINLINE cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT : m_limbs(o.m_limbs), m_sign(o.m_sign)
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() : m_wrapper(limb_type(0u)), m_limbs(1), m_sign(false) {}
+   BOOST_MP_FORCEINLINE cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT : m_limbs(o.m_limbs), m_sign(o.m_sign)
    {
       std::copy(o.limbs(), o.limbs() + o.size(), limbs());
    }
@@ -473,7 +473,7 @@ public:
          m_sign = o.m_sign;
       }
    }
-   BOOST_FORCEINLINE void negate() BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE void negate() BOOST_NOEXCEPT
    {
       m_sign = !m_sign;
       // Check for zero value:
@@ -483,11 +483,11 @@ public:
             m_sign = false;
       }
    }
-   BOOST_FORCEINLINE bool isneg()const BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE bool isneg()const BOOST_NOEXCEPT
    {
       return m_sign;
    }
-   BOOST_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
       for(unsigned i = 0; i < (std::max)(size(), o.size()); ++i)
          std::swap(m_wrapper.m_data[i], o.m_wrapper.m_data[i]);
@@ -549,30 +549,30 @@ public:
    //
    // Direct construction:
    //
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(limb_type i)BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(limb_type i)BOOST_NOEXCEPT
       : m_wrapper(i), m_limbs(1) {}
-   BOOST_FORCEINLINE cpp_int_base(signed_limb_type i)BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE cpp_int_base(signed_limb_type i)BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_wrapper(limb_type(i < 0 ? -i : i)), m_limbs(1) { if(i < 0) negate(); }
 #ifdef BOOST_LITTLE_ENDIAN
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT
       : m_wrapper(i), m_limbs(i > max_limb_value ? 2 : 1) {}
-   BOOST_FORCEINLINE cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_wrapper(double_limb_type(i < 0 ? -i : i)), m_limbs(i < 0 ? (-i > max_limb_value ? 2 : 1) : (i > max_limb_value ? 2 : 1)) { if(i < 0) negate(); }
 #endif
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
-   BOOST_FORCEINLINE unsigned size()const BOOST_NOEXCEPT { return m_limbs; }
-   BOOST_FORCEINLINE limb_pointer limbs() BOOST_NOEXCEPT { return m_wrapper.m_data; }
-   BOOST_FORCEINLINE const_limb_pointer limbs()const BOOST_NOEXCEPT { return m_wrapper.m_data; }
-   BOOST_FORCEINLINE BOOST_CONSTEXPR bool sign()const BOOST_NOEXCEPT { return false; }
-   BOOST_FORCEINLINE void sign(bool b) BOOST_NOEXCEPT_IF((Checked == unchecked)) {  if(b) negate(); }
-   BOOST_FORCEINLINE void resize(unsigned new_size, unsigned min_size) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE unsigned size()const BOOST_NOEXCEPT { return m_limbs; }
+   BOOST_MP_FORCEINLINE limb_pointer limbs() BOOST_NOEXCEPT { return m_wrapper.m_data; }
+   BOOST_MP_FORCEINLINE const_limb_pointer limbs()const BOOST_NOEXCEPT { return m_wrapper.m_data; }
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR bool sign()const BOOST_NOEXCEPT { return false; }
+   BOOST_MP_FORCEINLINE void sign(bool b) BOOST_NOEXCEPT_IF((Checked == unchecked)) {  if(b) negate(); }
+   BOOST_MP_FORCEINLINE void resize(unsigned new_size, unsigned min_size) BOOST_NOEXCEPT_IF((Checked == unchecked))
    {
       m_limbs = (std::min)(new_size, internal_limb_count);
       detail::verify_new_size(m_limbs, min_size, checked_type());
    }
-   BOOST_FORCEINLINE void normalize() BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE void normalize() BOOST_NOEXCEPT_IF((Checked == unchecked))
    {
       limb_pointer p = limbs();
       detail::verify_limb_mask(m_limbs == internal_limb_count, p[internal_limb_count-1], upper_limb_mask, checked_type());
@@ -580,15 +580,15 @@ public:
       while((m_limbs-1) && !p[m_limbs - 1])--m_limbs;
    }
 
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() BOOST_NOEXCEPT
       : m_wrapper(limb_type(0u)), m_limbs(1) {}
-   BOOST_FORCEINLINE cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT
       : m_limbs(o.m_limbs)
    {
       std::copy(o.limbs(), o.limbs() + o.size(), limbs());
    }
    //~cpp_int_base() BOOST_NOEXCEPT {}
-   BOOST_FORCEINLINE void assign(const cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE void assign(const cpp_int_base& o) BOOST_NOEXCEPT
    {
       if(this != &o)
       {
@@ -619,11 +619,11 @@ public:
       normalize();
       eval_increment(static_cast<cpp_int_backend<MinBits, MinBits, unsigned_magnitude, Checked, void>& >(*this));
    }
-   BOOST_FORCEINLINE BOOST_CONSTEXPR bool isneg()const BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR bool isneg()const BOOST_NOEXCEPT
    {
       return false;
    }
-   BOOST_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
       for(unsigned i = 0; i < (std::max)(size(), o.size()); ++i)
          std::swap(m_wrapper.m_data[i], o.m_wrapper.m_data[i]);
@@ -674,7 +674,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
    typedef mpl::int_<Checked>                         checked_type;
 protected:
    BOOST_STATIC_CONSTANT(unsigned, limb_bits = sizeof(local_limb_type) * CHAR_BIT);
-   BOOST_STATIC_CONSTANT(local_limb_type, limb_mask = (MinBits < limb_bits) ? ((~local_limb_type(0)) >> (limb_bits - MinBits)) : (~local_limb_type(0)));
+   BOOST_STATIC_CONSTANT(local_limb_type, limb_mask = (MinBits < limb_bits) ? local_limb_type((local_limb_type(~local_limb_type(0))) >> (limb_bits - MinBits)) : local_limb_type(~local_limb_type(0)));
 private:
    local_limb_type    m_data;
    bool               m_sign;
@@ -708,31 +708,31 @@ public:
    // Direct construction:
    //
    template <class SI>
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(SI i, typename enable_if_c<is_signed<SI>::value && (Checked == unchecked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(SI i, typename enable_if_c<is_signed<SI>::value && (Checked == unchecked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(i < 0 ? static_cast<local_limb_type>(-i) : static_cast<local_limb_type>(i)), m_sign(i < 0) {}
    template <class SI>
-   BOOST_FORCEINLINE cpp_int_base(SI i, typename enable_if_c<is_signed<SI>::value && (Checked == checked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE cpp_int_base(SI i, typename enable_if_c<is_signed<SI>::value && (Checked == checked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(i < 0 ? static_cast<local_limb_type>(-i) : static_cast<local_limb_type>(i)), m_sign(i < 0) { check_in_range(i); }
    template <class UI>
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(UI i, typename enable_if_c<is_unsigned<UI>::value && (Checked == unchecked)>::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(UI i, typename enable_if_c<is_unsigned<UI>::value && (Checked == unchecked)>::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(static_cast<local_limb_type>(i)), m_sign(false) {}
    template <class UI>
-   BOOST_FORCEINLINE cpp_int_base(UI i, typename enable_if_c<is_unsigned<UI>::value && (Checked == checked)>::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE cpp_int_base(UI i, typename enable_if_c<is_unsigned<UI>::value && (Checked == checked)>::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(static_cast<local_limb_type>(i)), m_sign(false) { check_in_range(i); }
    template <class F>
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(F i, typename enable_if_c<is_floating_point<F>::value && (Checked == unchecked)>::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(F i, typename enable_if_c<is_floating_point<F>::value && (Checked == unchecked)>::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(static_cast<local_limb_type>(std::fabs(i))), m_sign(i < 0) {}
    template <class F>
-   BOOST_FORCEINLINE cpp_int_base(F i, typename enable_if_c<is_floating_point<F>::value && (Checked == checked)>::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE cpp_int_base(F i, typename enable_if_c<is_floating_point<F>::value && (Checked == checked)>::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(static_cast<local_limb_type>(std::fabs(i))), m_sign(i < 0) { check_in_range(i); }
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
-   BOOST_FORCEINLINE BOOST_CONSTEXPR unsigned size()const BOOST_NOEXCEPT { return 1; }
-   BOOST_FORCEINLINE limb_pointer limbs() BOOST_NOEXCEPT { return &m_data; }
-   BOOST_FORCEINLINE const_limb_pointer limbs()const BOOST_NOEXCEPT { return &m_data; }
-   BOOST_FORCEINLINE bool sign()const BOOST_NOEXCEPT { return m_sign; }
-   BOOST_FORCEINLINE void sign(bool b) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR unsigned size()const BOOST_NOEXCEPT { return 1; }
+   BOOST_MP_FORCEINLINE limb_pointer limbs() BOOST_NOEXCEPT { return &m_data; }
+   BOOST_MP_FORCEINLINE const_limb_pointer limbs()const BOOST_NOEXCEPT { return &m_data; }
+   BOOST_MP_FORCEINLINE bool sign()const BOOST_NOEXCEPT { return m_sign; }
+   BOOST_MP_FORCEINLINE void sign(bool b) BOOST_NOEXCEPT
    {
       m_sign = b;
       // Check for zero value:
@@ -741,11 +741,11 @@ public:
          m_sign = false;
       }
    }
-   BOOST_FORCEINLINE void resize(unsigned new_size, unsigned min_size)
+   BOOST_MP_FORCEINLINE void resize(unsigned new_size, unsigned min_size)
    {
       detail::verify_new_size(2, min_size, checked_type());
    }
-   BOOST_FORCEINLINE void normalize() BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE void normalize() BOOST_NOEXCEPT_IF((Checked == unchecked))
    {
       if(!m_data)
          m_sign = false; // zero is always unsigned
@@ -753,16 +753,16 @@ public:
       m_data &= limb_mask;
    }
 
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() : m_data(0), m_sign(false) {}
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() : m_data(0), m_sign(false) {}
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT
       : m_data(o.m_data), m_sign(o.m_sign) {}
    //~cpp_int_base() BOOST_NOEXCEPT {}
-   BOOST_FORCEINLINE void assign(const cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE void assign(const cpp_int_base& o) BOOST_NOEXCEPT
    {
       m_data = o.m_data;
       m_sign = o.m_sign;
    }
-   BOOST_FORCEINLINE void negate() BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE void negate() BOOST_NOEXCEPT
    {
       m_sign = !m_sign;
       // Check for zero value:
@@ -771,11 +771,11 @@ public:
          m_sign = false;
       }
    }
-   BOOST_FORCEINLINE bool isneg()const BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE bool isneg()const BOOST_NOEXCEPT
    {
       return m_sign;
    }
-   BOOST_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
       std::swap(m_sign, o.m_sign);
       std::swap(m_data, o.m_data);
@@ -823,10 +823,10 @@ protected:
          BOOST_THROW_EXCEPTION(std::range_error("The argument to an unsigned cpp_int constructor was negative."));
    }
    template <class T, int C, bool B>
-   BOOST_FORCEINLINE void check_in_range(T, const mpl::int_<C>&, const mpl::bool_<B>&){}
+   BOOST_MP_FORCEINLINE void check_in_range(T, const mpl::int_<C>&, const mpl::bool_<B>&){}
 
    template <class T>
-   BOOST_FORCEINLINE void check_in_range(T val)
+   BOOST_MP_FORCEINLINE void check_in_range(T val)
    {
       check_in_range(val, checked_type(), is_signed<T>());
    }
@@ -836,19 +836,19 @@ public:
    // Direct construction:
    //
    template <class SI>
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(SI i, typename enable_if_c<is_signed<SI>::value && (Checked == unchecked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(SI i, typename enable_if_c<is_signed<SI>::value && (Checked == unchecked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(i < 0 ? 1 + ~static_cast<local_limb_type>(-i) : static_cast<local_limb_type>(i)) {}
    template <class SI>
-   BOOST_FORCEINLINE cpp_int_base(SI i, typename enable_if_c<is_signed<SI>::value && (Checked == checked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE cpp_int_base(SI i, typename enable_if_c<is_signed<SI>::value && (Checked == checked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(i < 0 ? 1 + ~static_cast<local_limb_type>(-i) : static_cast<local_limb_type>(i)) { check_in_range(i); }
    template <class UI>
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(UI i, typename enable_if_c<is_unsigned<UI>::value && (Checked == unchecked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(UI i, typename enable_if_c<is_unsigned<UI>::value && (Checked == unchecked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(static_cast<local_limb_type>(i)) {}
    template <class UI>
-   BOOST_FORCEINLINE cpp_int_base(UI i, typename enable_if_c<is_unsigned<UI>::value && (Checked == checked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE cpp_int_base(UI i, typename enable_if_c<is_unsigned<UI>::value && (Checked == checked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(static_cast<local_limb_type>(i)) { check_in_range(i); }
    template <class F>
-   BOOST_FORCEINLINE cpp_int_base(F i, typename enable_if<is_floating_point<F> >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE cpp_int_base(F i, typename enable_if<is_floating_point<F> >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(static_cast<local_limb_type>(std::fabs(i)))
    {
       check_in_range(i);
@@ -858,34 +858,34 @@ public:
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
-   BOOST_FORCEINLINE BOOST_CONSTEXPR unsigned size()const BOOST_NOEXCEPT { return 1; }
-   BOOST_FORCEINLINE limb_pointer limbs() BOOST_NOEXCEPT { return &m_data; }
-   BOOST_FORCEINLINE const_limb_pointer limbs()const BOOST_NOEXCEPT { return &m_data; }
-   BOOST_FORCEINLINE BOOST_CONSTEXPR bool sign()const BOOST_NOEXCEPT { return false; }
-   BOOST_FORCEINLINE void sign(bool b) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR unsigned size()const BOOST_NOEXCEPT { return 1; }
+   BOOST_MP_FORCEINLINE limb_pointer limbs() BOOST_NOEXCEPT { return &m_data; }
+   BOOST_MP_FORCEINLINE const_limb_pointer limbs()const BOOST_NOEXCEPT { return &m_data; }
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR bool sign()const BOOST_NOEXCEPT { return false; }
+   BOOST_MP_FORCEINLINE void sign(bool b) BOOST_NOEXCEPT_IF((Checked == unchecked))
    {
       if(b)
          negate();
    }
-   BOOST_FORCEINLINE void resize(unsigned new_size, unsigned min_size)
+   BOOST_MP_FORCEINLINE void resize(unsigned new_size, unsigned min_size)
    {
       detail::verify_new_size(2, min_size, checked_type());
    }
-   BOOST_FORCEINLINE void normalize() BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE void normalize() BOOST_NOEXCEPT_IF((Checked == unchecked))
    {
       detail::verify_limb_mask(true, m_data, limb_mask, checked_type());
       m_data &= limb_mask;
    }
 
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() : m_data(0) {}
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() : m_data(0) {}
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT
       : m_data(o.m_data) {}
    //~cpp_int_base() BOOST_NOEXCEPT {}
-   BOOST_FORCEINLINE void assign(const cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE void assign(const cpp_int_base& o) BOOST_NOEXCEPT
    {
       m_data = o.m_data;
    }
-   BOOST_FORCEINLINE void negate() BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE void negate() BOOST_NOEXCEPT_IF((Checked == unchecked))
    {
       if(Checked == checked)
       {
@@ -894,11 +894,11 @@ public:
       m_data = ~m_data;
       ++m_data;
    }
-   BOOST_FORCEINLINE BOOST_CONSTEXPR bool isneg()const BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR bool isneg()const BOOST_NOEXCEPT
    {
       return false;
    }
-   BOOST_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
       std::swap(m_data, o.m_data);
    }
@@ -961,17 +961,17 @@ public:
    >::type                                                           float_types;
    typedef mpl::int_<Checked>                                        checked_type;
 
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend() BOOST_NOEXCEPT{}
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(const cpp_int_backend& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value) : base_type(o) {}
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend() BOOST_NOEXCEPT{}
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(const cpp_int_backend& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value) : base_type(o) {}
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(cpp_int_backend&& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(cpp_int_backend&& o) BOOST_NOEXCEPT
       : base_type(static_cast<base_type&&>(o)) {}
 #endif
    //
    // Direct construction from arithmetic type:
    //
    template <class Arg>
-   BOOST_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(Arg i, typename enable_if_c<is_allowed_cpp_int_base_conversion<Arg, base_type>::value >::type const* = 0)BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(Arg i, typename enable_if_c<is_allowed_cpp_int_base_conversion<Arg, base_type>::value >::type const* = 0)BOOST_NOEXCEPT_IF((Checked == unchecked))
       : base_type(i) {}
 
 private:
@@ -1169,13 +1169,13 @@ public:
       this->sign(other.sign());
    }
 #endif
-   BOOST_FORCEINLINE cpp_int_backend& operator = (const cpp_int_backend& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+   BOOST_MP_FORCEINLINE cpp_int_backend& operator = (const cpp_int_backend& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
    {
       this->assign(o);
       return *this;
    }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-   BOOST_FORCEINLINE cpp_int_backend& operator = (cpp_int_backend&& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+   BOOST_MP_FORCEINLINE cpp_int_backend& operator = (cpp_int_backend&& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
    {
       *static_cast<base_type*>(this) = static_cast<base_type&&>(o);
       return *this;
@@ -1197,13 +1197,13 @@ private:
       this->sign(val < 0);
       this->normalize();
    }
-   BOOST_FORCEINLINE void do_assign_arithmetic(limb_type i, const mpl::false_&) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE void do_assign_arithmetic(limb_type i, const mpl::false_&) BOOST_NOEXCEPT
    {
       this->resize(1, 1);
       *this->limbs() = i;
       this->sign(false);
    }
-   BOOST_FORCEINLINE void do_assign_arithmetic(signed_limb_type i, const mpl::false_&) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE void do_assign_arithmetic(signed_limb_type i, const mpl::false_&) BOOST_NOEXCEPT_IF((Checked == unchecked))
    {
       this->resize(1, 1);
       *this->limbs() = static_cast<limb_type>(std::abs(i));
@@ -1285,7 +1285,7 @@ private:
    }
 public:
    template <class Arithmetic>
-   BOOST_FORCEINLINE cpp_int_backend& operator = (Arithmetic val)
+   BOOST_MP_FORCEINLINE cpp_int_backend& operator = (Arithmetic val)
    {
       do_assign_arithmetic(val, trivial_tag());
       return *this;
@@ -1445,7 +1445,7 @@ public:
       do_assign_string(s, trivial_tag());
       return *this;
    }
-   BOOST_FORCEINLINE void swap(cpp_int_backend& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE void swap(cpp_int_backend& o) BOOST_NOEXCEPT
    {
       this->do_swap(o);
    }
@@ -1720,7 +1720,7 @@ public:
       return 0;
    }
    template <class Arithmetic>
-   BOOST_FORCEINLINE typename enable_if<is_arithmetic<Arithmetic>, int>::type compare(Arithmetic i)const
+   BOOST_MP_FORCEINLINE typename enable_if<is_arithmetic<Arithmetic>, int>::type compare(Arithmetic i)const
    {
       // braindead version:
       cpp_int_backend t;
