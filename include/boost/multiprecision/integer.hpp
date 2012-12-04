@@ -12,19 +12,19 @@ namespace boost{
 namespace multiprecision{
 
 template <class Integer, class I2>
-typename enable_if_c<is_integral<Integer>::value && is_integral<I2>::value, Integer>::type 
+typename enable_if_c<is_integral<Integer>::value && is_integral<I2>::value, Integer>::type
    multiply(Integer& result, const I2& a, const I2& b)
 {
    return result = static_cast<Integer>(a) * static_cast<Integer>(b);
 }
 template <class Integer, class I2>
-typename enable_if_c<is_integral<Integer>::value && is_integral<I2>::value, Integer>::type 
+typename enable_if_c<is_integral<Integer>::value && is_integral<I2>::value, Integer>::type
    add(Integer& result, const I2& a, const I2& b)
 {
    return result = static_cast<Integer>(a) + static_cast<Integer>(b);
 }
 template <class Integer, class I2>
-typename enable_if_c<is_integral<Integer>::value && is_integral<I2>::value, Integer>::type 
+typename enable_if_c<is_integral<Integer>::value && is_integral<I2>::value, Integer>::type
    subtract(Integer& result, const I2& a, const I2& b)
 {
    return result = static_cast<Integer>(a) - static_cast<Integer>(b);
@@ -45,15 +45,15 @@ typename enable_if_c<is_integral<I1>::value && is_integral<I2>::value, I2>::type
 
 namespace detail{
 //
-// Figure out the kind of integer that has twice as many bits as some builtin 
+// Figure out the kind of integer that has twice as many bits as some builtin
 // integer type I.  Use a native type if we can (including types which may not
-// be recognised by boost::int_t because they're larger than long long), 
+// be recognised by boost::int_t because they're larger than long long),
 // otherwise synthesize a cpp_int to do the job.
 //
 template <class I>
 struct double_integer
 {
-   static const unsigned int_t_digits = 
+   static const unsigned int_t_digits =
       2 * sizeof(I) <= sizeof(long long) ? std::numeric_limits<I>::digits * 2 : 1;
 
    typedef typename mpl::if_c<
@@ -103,13 +103,16 @@ typename enable_if_c<is_integral<I1>::value && is_integral<I2>::value && is_inte
 template <class Integer>
 typename enable_if_c<is_integral<Integer>::value, unsigned>::type lsb(const Integer& val)
 {
-   if(val == 0)
+   if(val <= 0)
    {
-      BOOST_THROW_EXCEPTION(std::range_error("No bits were set in the operand."));
-   }
-   if(val < 0)
-   {
-      BOOST_THROW_EXCEPTION(std::range_error("Testing individual bits in negative values is not supported - results are undefined."));
+      if(val == 0)
+      {
+         BOOST_THROW_EXCEPTION(std::range_error("No bits were set in the operand."));
+      }
+      else
+      {
+         BOOST_THROW_EXCEPTION(std::range_error("Testing individual bits in negative values is not supported - results are undefined."));
+      }
    }
    unsigned index = 0;
    Integer mask = 1;

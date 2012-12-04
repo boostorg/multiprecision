@@ -26,7 +26,7 @@ T generate_random(unsigned bits_wanted)
 
    T max_val;
    unsigned digits;
-   if(std::numeric_limits<T>::is_bounded && (bits_wanted == std::numeric_limits<T>::digits))
+   if(std::numeric_limits<T>::is_bounded && (bits_wanted == (unsigned)std::numeric_limits<T>::digits))
    {
       max_val = (std::numeric_limits<T>::max)();
       digits = std::numeric_limits<T>::digits;
@@ -359,9 +359,11 @@ struct tester
 
          t1();
          t2();
+#ifndef SLOW_COMPILER
          t3();
          t4();
          t5();
+#endif
 
          if(last_error_count != (unsigned)boost::detail::test_errors())
          {

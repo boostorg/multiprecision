@@ -99,6 +99,7 @@ int main()
 #ifdef TEST_CPP_DEC_FLOAT
    test<boost::multiprecision::cpp_dec_float_50>();
    test<boost::multiprecision::cpp_dec_float_100>();
+#ifndef SLOW_COMPLER
    // Some "peculiar" digit counts which stress our code:
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<65> > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<64> > >();
@@ -111,6 +112,7 @@ int main()
    // Check low multiprecision digit counts.
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<9> > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<18> > >();
+#endif
 #endif
    return boost::report_errors();
 }

@@ -100,7 +100,7 @@ struct arithmetic_backend
    template <class A>
    typename enable_if<is_arithmetic<A>, int>::type compare(A i)const
    {
-      return m_value > i ? 1 : (m_value < i ? -1 : 0);
+      return m_value > static_cast<Arithmetic>(i) ? 1 : (m_value < static_cast<Arithmetic>(i) ? -1 : 0);
    }
    Arithmetic& data() { return m_value; }
    const Arithmetic& data()const { return m_value; }
@@ -120,9 +120,9 @@ inline bool eval_eq(const arithmetic_backend<Arithmetic>& a, const arithmetic_ba
    return a.data() == b.data();
 }
 template <class Arithmetic, class A2>
-inline bool eval_eq(const arithmetic_backend<Arithmetic>& a, const A2& b)
+inline typename enable_if<is_arithmetic<A2>, bool>::type eval_eq(const arithmetic_backend<Arithmetic>& a, const A2& b)
 {
-   return a.data() == b;
+   return a.data() == static_cast<Arithmetic>(b);
 }
 template <class Arithmetic>
 inline bool eval_lt(const arithmetic_backend<Arithmetic>& a, const arithmetic_backend<Arithmetic>& b)
@@ -130,9 +130,9 @@ inline bool eval_lt(const arithmetic_backend<Arithmetic>& a, const arithmetic_ba
    return a.data() < b.data();
 }
 template <class Arithmetic, class A2>
-inline bool eval_lt(const arithmetic_backend<Arithmetic>& a, const A2& b)
+inline typename enable_if<is_arithmetic<A2>, bool>::type eval_lt(const arithmetic_backend<Arithmetic>& a, const A2& b)
 {
-   return a.data() < b;
+   return a.data() < static_cast<Arithmetic>(b);
 }
 template <class Arithmetic>
 inline bool eval_gt(const arithmetic_backend<Arithmetic>& a, const arithmetic_backend<Arithmetic>& b)
@@ -140,9 +140,9 @@ inline bool eval_gt(const arithmetic_backend<Arithmetic>& a, const arithmetic_ba
    return a.data() > b.data();
 }
 template <class Arithmetic, class A2>
-inline bool eval_gt(const arithmetic_backend<Arithmetic>& a, const A2& b)
+inline typename enable_if<is_arithmetic<A2>, bool>::type eval_gt(const arithmetic_backend<Arithmetic>& a, const A2& b)
 {
-   return a.data() > b;
+   return a.data() > static_cast<Arithmetic>(b);
 }
 
 template <class Arithmetic>
@@ -189,7 +189,7 @@ inline typename enable_if<is_arithmetic<A2> >::type eval_multiply(arithmetic_bac
    result.data() *= o;
 }
 template <class Arithmetic, class A2>
-inline typename enable_if_c<(is_arithmetic<A2>::value && !std::numeric_limits<Arithmetic>::has_infinity)>::type 
+inline typename enable_if_c<(is_arithmetic<A2>::value && !std::numeric_limits<Arithmetic>::has_infinity)>::type
    eval_divide(arithmetic_backend<Arithmetic>& result, const A2& o)
 {
    if(!o)
@@ -197,7 +197,7 @@ inline typename enable_if_c<(is_arithmetic<A2>::value && !std::numeric_limits<Ar
    result.data() /= o;
 }
 template <class Arithmetic, class A2>
-inline typename enable_if_c<(is_arithmetic<A2>::value && std::numeric_limits<Arithmetic>::has_infinity)>::type 
+inline typename enable_if_c<(is_arithmetic<A2>::value && std::numeric_limits<Arithmetic>::has_infinity)>::type
    eval_divide(arithmetic_backend<Arithmetic>& result, const A2& o)
 {
    result.data() /= o;
@@ -247,7 +247,7 @@ inline typename enable_if<is_arithmetic<A2> >::type eval_multiply(arithmetic_bac
    result.data() = a.data() * b;
 }
 template <class Arithmetic, class A2>
-inline typename enable_if_c<(is_arithmetic<A2>::value && !std::numeric_limits<Arithmetic>::has_infinity)>::type 
+inline typename enable_if_c<(is_arithmetic<A2>::value && !std::numeric_limits<Arithmetic>::has_infinity)>::type
    eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
 {
    if(!b)
@@ -255,7 +255,7 @@ inline typename enable_if_c<(is_arithmetic<A2>::value && !std::numeric_limits<Ar
    result.data() = a.data() / b;
 }
 template <class Arithmetic, class A2>
-inline typename enable_if_c<(is_arithmetic<A2>::value && std::numeric_limits<Arithmetic>::has_infinity)>::type 
+inline typename enable_if_c<(is_arithmetic<A2>::value && std::numeric_limits<Arithmetic>::has_infinity)>::type
    eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
 {
    result.data() = a.data() / b;
@@ -268,9 +268,20 @@ inline bool eval_is_zero(const arithmetic_backend<Arithmetic>& val)
 }
 
 template <class Arithmetic>
-inline int eval_get_sign(const arithmetic_backend<Arithmetic>& val)
+inline typename enable_if_c<
+      (!std::numeric_limits<Arithmetic>::is_specialized
+      || std::numeric_limits<Arithmetic>::is_signed), int>::type
+   eval_get_sign(const arithmetic_backend<Arithmetic>& val)
 {
    return val.data() == 0 ? 0 : val.data() < 0 ? -1 : 1;
+}
+template <class Arithmetic>
+inline typename disable_if_c<
+      (std::numeric_limits<Arithmetic>::is_specialized
+      || std::numeric_limits<Arithmetic>::is_signed), int>::type
+   eval_get_sign(const arithmetic_backend<Arithmetic>& val)
+{
+   return val.data() == 0 ? 0 : 1;
 }
 
 template <class T>

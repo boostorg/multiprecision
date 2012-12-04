@@ -61,6 +61,7 @@ void test_extra(T)
    int i(0);
    boost::math::cyl_neumann(v1, v2);
    boost::math::cyl_neumann(i, v2);
+#ifndef SLOW_COMPILER
    boost::math::cyl_bessel_j(v1, v2);
    boost::math::cyl_bessel_j(i, v2);
    boost::math::cyl_bessel_i(v1, v2);
@@ -75,6 +76,7 @@ void test_extra(T)
    boost::math::airy_bi(v1);
    boost::math::airy_ai_prime(v1);
    boost::math::airy_bi_prime(v1);
+#endif
 }
 
 void foo()

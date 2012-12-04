@@ -27,7 +27,7 @@ template <class T> bool isfloat(T){ return false; }
 
 namespace detail{
 
-template<class tag, class Arg1, class Arg2, class Arg3, class Arg4> 
+template<class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 typename boost::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type
    abs(boost::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4> const& v)
 {
@@ -740,13 +740,13 @@ void test_negative_mixed(boost::mpl::true_ const&)
 {
    typedef typename lexical_cast_target_type<Num>::type target_type;
    typedef typename boost::mpl::if_<
-         boost::is_convertible<Num, Real>, 
-         typename boost::mpl::if_c<boost::is_integral<Num>::value && (sizeof(Num) < sizeof(int)), int, Num>::type, 
+         boost::is_convertible<Num, Real>,
+         typename boost::mpl::if_c<boost::is_integral<Num>::value && (sizeof(Num) < sizeof(int)), int, Num>::type,
          Real
       >::type cast_type;
    typedef typename boost::mpl::if_<
-         boost::is_convertible<Num, Real>, 
-         Num, 
+         boost::is_convertible<Num, Real>,
+         Num,
          Real
       >::type simple_cast_type;
    std::cout << "Testing mixed arithmetic with type: " << typeid(Real).name()  << " and " << typeid(Num).name() << std::endl;
@@ -1025,16 +1025,16 @@ void test_mixed(const boost::mpl::true_&)
 {
    typedef typename lexical_cast_target_type<Num>::type target_type;
    typedef typename boost::mpl::if_<
-         boost::is_convertible<Num, Real>, 
-         typename boost::mpl::if_c<boost::is_integral<Num>::value && (sizeof(Num) < sizeof(int)), int, Num>::type, 
+         boost::is_convertible<Num, Real>,
+         typename boost::mpl::if_c<boost::is_integral<Num>::value && (sizeof(Num) < sizeof(int)), int, Num>::type,
          Real
       >::type cast_type;
    typedef typename boost::mpl::if_<
-         boost::is_convertible<Num, Real>, 
-         Num, 
+         boost::is_convertible<Num, Real>,
+         Num,
          Real
       >::type simple_cast_type;
-   
+
    if(std::numeric_limits<Real>::is_specialized && std::numeric_limits<Real>::is_bounded && std::numeric_limits<Real>::digits < std::numeric_limits<Num>::digits)
       return;
 
@@ -1045,7 +1045,7 @@ void test_mixed(const boost::mpl::true_&)
    Num n3 = 0;
    Num n4 = 20;
    Num n5 = 8;
-   
+
    test_comparisons<Real>(n1, n2, boost::is_convertible<Num, Real>());
    test_comparisons<Real>(n1, n3, boost::is_convertible<Num, Real>());
    test_comparisons<Real>(n1, n1, boost::is_convertible<Num, Real>());
@@ -1292,7 +1292,7 @@ void test_signed_ops(const boost::mpl::false_&)
 template <class Real>
 void test()
 {
-#ifndef NO_MIXED_OPS
+#if !defined(NO_MIXED_OPS) && !defined(SLOW_COMPILER)
    boost::multiprecision::is_number<Real> tag;
    test_mixed<Real, unsigned char>(tag);
    test_mixed<Real, signed char>(tag);

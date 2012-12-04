@@ -1,6 +1,6 @@
 # copyright John Maddock 2011
-# Distributed under the Boost Software License, Version 1.0. 
-# (See accompanying file LICENSE_1_0.txt or copy at 
+# Distributed under the Boost Software License, Version 1.0.
+# (See accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt.
 
 import modules ;
@@ -11,23 +11,24 @@ local gmp_path = [ modules.peek : GMP_PATH ] ;
 local mpfr_path = [ modules.peek : MPFR_PATH ] ;
 local tommath_path = [ modules.peek : TOMMATH_PATH ] ;
 
-project : requirements 
-   <include>$(gmp_path) 
-   <include>$(gmp_path)/mpfr 
-   <include>$(gmp_path)/gmpfrxx 
+project : requirements
+   <include>$(gmp_path)
+   <include>$(gmp_path)/mpfr
+   <include>$(gmp_path)/gmpfrxx
    <include>$(mpfr_path)
    <include>$(tommath_path)
-   <include>../../.. 
-   <search>$(gmp_path) 
-   <search>$(mpfr_path) 
+   <include>../../..
+   <search>$(gmp_path)
+   <search>$(mpfr_path)
    <search>$(mpfr_path)/build.vc10/lib/Win32/Debug
-   <search>$(tommath_path) 
+   <search>$(tommath_path)
    # We set these to make it easier to set up and test GMP and MPFR under Win32:
    <toolset>msvc:<runtime-link>static
    <toolset>msvc:<link>static
    <toolset>msvc:<warnings>all
    <toolset>gcc:<cxxflags>-Wall
    <toolset>gcc:<cxxflags>-Wextra
+   <toolset>intel:<define>SLOW_COMPILER
    ;
 
 local enable-specfun = [ MATCH (--enable-specfun) : [ modules.peek : ARGV ] ] ;
@@ -261,49 +262,49 @@ run test_tanh.cpp mpfr
          [ check-target-builds ../config//has_mpfr : : <build>no ]
         : test_tanh_mpfr50 ;
 
-run test_exp.cpp 
+run test_exp.cpp
         : # command line
         : # input files
         : # requirements
 	      <define>TEST_CPP_DEC_FLOAT
         : test_exp_cpp_dec_float ;
 
-run test_sqrt.cpp 
+run test_sqrt.cpp
         : # command line
         : # input files
         : # requirements
 	      <define>TEST_CPP_DEC_FLOAT
         : test_sqrt_cpp_dec_float ;
 
-run test_log.cpp 
+run test_log.cpp
         : # command line
         : # input files
         : # requirements
 	      <define>TEST_CPP_DEC_FLOAT
         : test_log_cpp_dec_float ;
 
-run test_pow.cpp 
+run test_pow.cpp
         : # command line
         : # input files
         : # requirements
 	      <define>TEST_CPP_DEC_FLOAT
         : test_pow_cpp_dec_float ;
 
-run test_sinh.cpp 
+run test_sinh.cpp
         : # command line
         : # input files
         : # requirements
 	      <define>TEST_CPP_DEC_FLOAT
         : test_sinh_cpp_dec_float ;
 
-run test_cosh.cpp 
+run test_cosh.cpp
         : # command line
         : # input files
         : # requirements
 	      <define>TEST_CPP_DEC_FLOAT
         : test_cosh_cpp_dec_float ;
 
-run test_tanh.cpp 
+run test_tanh.cpp
         : # command line
         : # input files
         : # requirements
@@ -635,7 +636,7 @@ run test_cpp_int.cpp gmp
         : # input files
         : # requirements
          [ check-target-builds ../config//has_gmp : : <build>no ]
-         release  # otherwise runtime is too slow!! 
+         release  # otherwise runtime is too slow!!
          <define>TEST1
          : test_cpp_int_1
          ;
@@ -645,7 +646,7 @@ run test_cpp_int.cpp gmp
         : # input files
         : # requirements
          [ check-target-builds ../config//has_gmp : : <build>no ]
-         release  # otherwise runtime is too slow!! 
+         release  # otherwise runtime is too slow!!
          <define>TEST2
          : test_cpp_int_2
          ;
@@ -655,7 +656,7 @@ run test_cpp_int.cpp gmp
         : # input files
         : # requirements
          [ check-target-builds ../config//has_gmp : : <build>no ]
-         release  # otherwise runtime is too slow!! 
+         release  # otherwise runtime is too slow!!
          <define>TEST3
          : test_cpp_int_3
          ;
@@ -667,7 +668,7 @@ run test_miller_rabin.cpp gmp
         : # input files
         : # requirements
          [ check-target-builds ../config//has_gmp : : <build>no ]
-         release  # otherwise runtime is too slow!! 
+         release  # otherwise runtime is too slow!!
          ;
 
 run test_rational_io.cpp $(TOMMATH)
@@ -700,12 +701,12 @@ run test_generic_conv.cpp
         : # command line
         : # input files
         : # requirements
-         [ check-target-builds ../config//has_gmp : <define>TEST_GMP <source>gmp :  ] 
-         [ check-target-builds ../config//has_tommath : <define>TEST_TOMMATH <source>$(TOMMATH) :  ] 
-         [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>mpfr :  ] 
+         [ check-target-builds ../config//has_gmp : <define>TEST_GMP <source>gmp :  ]
+         [ check-target-builds ../config//has_tommath : <define>TEST_TOMMATH <source>$(TOMMATH) :  ]
+         [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>mpfr :  ]
          release # Otherwise runtime is slow
          ;
-      
+
 
 run ../example/gmp_snips.cpp gmp
         : # command line
@@ -746,7 +747,7 @@ compile include_test/mpfr_include_test.cpp
 compile include_test/gmp_include_test.cpp
               : # requirements
                [ check-target-builds ../config//has_gmp : : <build>no ] ;
-compile include_test/tommath_include_test.cpp 
+compile include_test/tommath_include_test.cpp
               : # requirements
                [ check-target-builds ../config//has_tommath : : <build>no ] ;
 compile include_test/cpp_int_include_test.cpp ;
@@ -770,7 +771,7 @@ if $(enable-specfun)
            : # command line
            : # input files
            : # requirements
-            [ check-target-builds ../config//has_mpfr : : <build>no ] 
+            [ check-target-builds ../config//has_mpfr : : <build>no ]
             <define>TEST_MPFR_50
             <optimization>speed
             <define>BOOST_ALL_NO_LIB
@@ -781,7 +782,7 @@ if $(enable-specfun)
            : # command line
            : # input files
            : # requirements
-            [ check-target-builds ../config//has_gmp : : <build>no ] 
+            [ check-target-builds ../config//has_gmp : : <build>no ]
             <optimization>speed
             <define>TEST_MPF_50
             <define>BOOST_ALL_NO_LIB
@@ -803,10 +804,10 @@ if $(enable-specfun)
 
 for local source in [ glob compile_fail/*.cpp ]
 {
-   compile-fail $(source) 
+   compile-fail $(source)
    :
-      [ check-target-builds ../config//has_gmp : <define>TEST_GMP <debug-symbols>off : ]  
-      [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <debug-symbols>off : ]  
+      [ check-target-builds ../config//has_gmp : <define>TEST_GMP <debug-symbols>off : ]
+      [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <debug-symbols>off : ]
    ;
 }
 

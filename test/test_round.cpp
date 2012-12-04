@@ -223,7 +223,7 @@ void test()
       si = itrunc(static_cast<T>((std::numeric_limits<int>::min)()));
       check_trunc_result(static_cast<T>((std::numeric_limits<int>::min)()), si);
       BOOST_TEST(si == itrunc(static_cast<T>((std::numeric_limits<int>::min)()) + 0));
-      
+
       si = iround(static_cast<T>((std::numeric_limits<int>::max)() - 1));
       check_within_half(static_cast<T>((std::numeric_limits<int>::max)() - 1), si);
       si = iround(static_cast<T>((std::numeric_limits<int>::min)() + 1));
@@ -393,6 +393,7 @@ int main()
 #ifdef TEST_CPP_DEC_FLOAT
    test<boost::multiprecision::cpp_dec_float_50>();
    test<boost::multiprecision::cpp_dec_float_100>();
+#ifndef SLOW_COMPLER
    // Some "peculiar" digit counts which stress our code:
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<65> > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<64> > >();
@@ -402,6 +403,7 @@ int main()
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<60, long long> > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<59, long long, std::allocator<void> > > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<58, long long, std::allocator<void> > > >();
+#endif
 #endif
 #ifdef TEST_BACKEND
    test<boost::multiprecision::number<boost::multiprecision::concepts::number_backend_float_architype> >();

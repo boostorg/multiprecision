@@ -72,6 +72,7 @@ void test_extra(T)
    boost::math::double_factorial<T>(i);
    boost::math::rising_factorial(v1, i);
    boost::math::falling_factorial(v1, i);
+#ifndef SLOW_COMPILER
    boost::math::tgamma(v1, v2);
    boost::math::tgamma_lower(v1, v2);
    boost::math::gamma_p(v1, v2);
@@ -97,6 +98,7 @@ void test_extra(T)
    boost::math::ibetac_invb(v1, v2, v3);
    boost::math::gamma_p_derivative(v2, v3);
    boost::math::ibeta_derivative(v1, v2, v3);
+#endif
 }
 
 void foo()
