@@ -20,6 +20,6 @@ struct related_type<boost::multiprecision::number< boost::multiprecision::cpp_de
 int main()
 {
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<100, long long>, boost::multiprecision::et_off> >();
-   return 0;
+   return boost::report_errors();
 }
 

@@ -27,6 +27,6 @@ struct number_category<rational<mpz_int> > : public mpl::int_<number_kind_ration
 int main()
 {
    test<boost::rational<boost::multiprecision::mpz_int> >();
-   return 0;
+   return boost::report_errors();
 }
 

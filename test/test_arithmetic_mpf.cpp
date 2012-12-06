@@ -27,6 +27,6 @@ int main()
    boost::multiprecision::mpf_float::default_precision(1000);
    BOOST_CHECK_EQUAL(boost::multiprecision::mpf_float::default_precision() ,  1000);
    test<boost::multiprecision::mpf_float>();
-   return 0;
+   return boost::report_errors();
 }
 

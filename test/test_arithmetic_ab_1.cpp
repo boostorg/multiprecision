@@ -14,6 +14,6 @@
 int main()
 {
    test<boost::multiprecision::number<boost::multiprecision::arithmetic_backend<double> > >();
-   return 0;
+   return boost::report_errors();
 }
 

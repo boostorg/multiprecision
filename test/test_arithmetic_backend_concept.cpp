@@ -14,6 +14,6 @@
 int main()
 {
    test<boost::multiprecision::number<boost::multiprecision::concepts::number_backend_float_architype> >();
-   return 0;
+   return boost::report_errors();
 }
 

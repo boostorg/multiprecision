@@ -28,6 +28,6 @@ struct related_type<boost::multiprecision::number<boost::multiprecision::cpp_int
 int main()
 {
    test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<>, boost::multiprecision::et_off> >();
-   return 0;
+   return boost::report_errors();
 }
 

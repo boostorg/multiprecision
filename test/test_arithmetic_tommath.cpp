@@ -18,6 +18,6 @@ int main()
 {
    test<boost::multiprecision::tom_int>();
    test<boost::multiprecision::number<boost::multiprecision::rational_adapter<boost::multiprecision::tommath_int> > >();
-   return 0;
+   return boost::report_errors();
 }
 

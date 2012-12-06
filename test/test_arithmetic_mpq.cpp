@@ -20,6 +20,6 @@ struct related_type<boost::multiprecision::mpq_rational>
 int main()
 {
    test<boost::multiprecision::mpq_rational>();
-   return 0;
+   return boost::report_errors();
 }
 

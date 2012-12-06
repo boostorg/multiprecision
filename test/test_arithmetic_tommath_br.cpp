@@ -27,6 +27,6 @@ struct number_category<rational<tom_int> > : public mpl::int_<number_kind_ration
 int main()
 {
    test<boost::rational<boost::multiprecision::tom_int> >();
-   return 0;
+   return boost::report_errors();
 }
 

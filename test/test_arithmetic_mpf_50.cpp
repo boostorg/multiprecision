@@ -25,6 +25,6 @@ struct related_type<boost::multiprecision::mpf_float >
 int main()
 {
    test<boost::multiprecision::mpf_float_50>();
-   return 0;
+   return boost::report_errors();
 }
 
