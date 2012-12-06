@@ -2721,7 +2721,7 @@ the expression, but of course this is also the situation where you save more tem
 a bigger win.
 
 The following table compares arithmetic using either `long long` or `number<arithmetic_backend<long long> >`
-for the [@../../performance/voronoi_perfromance.cpp voronoi-diagram builder test]:
+for the [@../../performance/voronoi_performance.cpp voronoi-diagram builder test]:
 
 [table
 [[Type][Relative time]]

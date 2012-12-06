@@ -151,13 +151,13 @@ void test()
    {
       std::cout << std::hex << std::showbase;
    }
-   PRINT(max());
+   std::cout << "max()" << " = " << (std::numeric_limits<Number>::max)() << std::endl;
    if(std::numeric_limits<Number>::is_integer)
    {
       std::cout << std::dec;
    }
-   PRINT(max());
-   PRINT(min());
+   std::cout << "max()" << " = " << (std::numeric_limits<Number>::max)() << std::endl;
+   std::cout << "min()" << " = " << (std::numeric_limits<Number>::min)() << std::endl;
 #ifndef BOOST_NO_CXX11_NUMERIC_LIMITS
    PRINT(lowest());
 #endif

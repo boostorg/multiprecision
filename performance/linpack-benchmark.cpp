@@ -52,8 +52,6 @@ extern "C" {
 #undef abs
 #undef dabs
 #define dabs abs
-#undef min
-#undef max
 #undef dmin
 #undef dmax
 #define dmin min
@@ -133,7 +131,7 @@ extern "C" int MAIN__()
    /* Builtin functions */
 
    /* Local variables */
-   static real_type a[1001000]	/* was [1001][1000] */, b[1000];
+   static real_type a[1001000] /* was [1001][1000] */, b[1000];
    static integer i__, n;
    static real_type x[1000];
    static double t1;
@@ -214,10 +212,10 @@ extern "C" int MAIN__()
    for (i__ = 1; i__ <= i__1; ++i__) {
       /* Computing MAX */
       d__2 = resid, d__3 = (d__1 = b[i__ - 1], abs(d__1));
-      resid = max(d__2,d__3);
+      resid = (max)(d__2,d__3);
       /* Computing MAX */
       d__2 = normx, d__3 = (d__1 = x[i__ - 1], abs(d__1));
-      normx = max(d__2,d__3);
+      normx = (max)(d__2,d__3);
       /* L30: */
    }
    eps = epslon_(&c_b7);
@@ -294,7 +292,7 @@ extern "C" int MAIN__()
          a[i__ + j * a_dim1] = ran_(init) - .5f;
          /* Computing MAX */
          d__2 = (d__1 = a[i__ + j * a_dim1], abs(d__1));
-         *norma = max(d__2,*norma);
+         *norma = (max)(d__2,*norma);
          /* L20: */
       }
       /* L30: */
