@@ -26,6 +26,9 @@ project : requirements
    <toolset>msvc:<runtime-link>static
    <toolset>msvc:<link>static
    <toolset>msvc:<warnings>all
+   # Speed up compiles:
+   <toolset>msvc:<debug-symbols>off
+   <toolset>intel:<debug-symbols>off
    <toolset>gcc:<cxxflags>-Wall
    <toolset>gcc:<cxxflags>-Wextra
    <toolset>intel:<define>SLOW_COMPILER
@@ -878,4 +881,6 @@ if ! $(disable-concepts)
               : $(source:B)_backend_concept ;
    }
 }
+
+
 
