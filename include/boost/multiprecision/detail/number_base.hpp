@@ -99,7 +99,7 @@ typename enable_if_c<(is_unsigned<T>::value), T>::type abs(T t) BOOST_NOEXCEPT
 template <class T>
 struct bits_of
 {
-   BOOST_STATIC_ASSERT(is_integral<T>::value || std::numeric_limits<T>::is_specialized);
+   BOOST_STATIC_ASSERT(is_integral<T>::value || is_enum<T>::value || std::numeric_limits<T>::is_specialized);
    static const unsigned value =
       std::numeric_limits<T>::is_specialized ?
          std::numeric_limits<T>::digits
