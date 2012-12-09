@@ -86,12 +86,12 @@ inline void eval_gcd(B& result, const B& a, const B& b)
    {
       /* Now u and v are both odd, so diff(u, v) is even.
       Let u = min(u, v), v = diff(u, v)/2. */
-      if(u.compare(v) > 0)
+      s = u.compare(v);
+      if(s > 0)
          u.swap(v);
-      eval_subtract(v, u);
-      // Termination condition tries not to do a full compare if possible:
-      if(eval_is_zero(v))
+      if(s == 0)
          break;
+      eval_subtract(v, u);
       vs = eval_lsb(v);
       eval_right_shift(v, vs);
    } 
