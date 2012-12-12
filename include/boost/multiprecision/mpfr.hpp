@@ -1383,7 +1383,65 @@ inline int digits<boost::multiprecision::number<boost::multiprecision::mpfr_floa
    return boost::multiprecision::backends::detail::get_default_precision();
 }
 
-}
+} // namespace tools
+
+namespace constants{ namespace detail{
+
+template <class T> struct constant_pi;
+template <class T> struct constant_ln_two;
+template <class T> struct constant_euler;
+template <class T> struct constant_catalan;
+
+template<unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
+struct constant_pi<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >
+{
+   typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result_type;
+   template<int N>
+   static inline result_type get(const mpl::int_<N>&)
+   {
+      result_type result;
+      mpfr_const_pi(result.backend().data(), GMP_RNDN);
+      return result;
+   }
+};
+template<unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
+struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >
+{
+   typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result_type;
+   template<int N>
+   static inline result_type get(const mpl::int_<N>&)
+   {
+      result_type result;
+      mpfr_const_log2(result.backend().data(), GMP_RNDN);
+      return result;
+   }
+};
+template<unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
+struct constant_euler<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >
+{
+   typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result_type;
+   template<int N>
+   static inline result_type get(const mpl::int_<N>&)
+   {
+      result_type result;
+      mpfr_const_euler(result.backend().data(), GMP_RNDN);
+      return result;
+   }
+};
+template<unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
+struct constant_catalan<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >
+{
+   typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result_type;
+   template<int N>
+   static inline result_type get(const mpl::int_<N>&)
+   {
+      result_type result;
+      mpfr_const_catalan(result.backend().data(), GMP_RNDN);
+      return result;
+   }
+};
+
+}} // namespaces
 
 }}  // namespaces
 
