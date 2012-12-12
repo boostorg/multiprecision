@@ -971,7 +971,7 @@ public:
    // Direct construction from arithmetic type:
    //
    template <class Arg>
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(Arg i, typename enable_if_c<is_allowed_cpp_int_base_conversion<Arg, base_type>::value >::type const* = 0)BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(Arg i, typename enable_if_c<is_allowed_cpp_int_base_conversion<Arg, base_type>::value >::type const* = 0)BOOST_NOEXCEPT_IF((Checked == unchecked) && boost::is_void<Allocator>::value)
       : base_type(i) {}
 
 private:
@@ -1169,7 +1169,7 @@ public:
       this->sign(other.sign());
    }
 #endif
-   BOOST_MP_FORCEINLINE cpp_int_backend& operator = (const cpp_int_backend& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+   BOOST_MP_FORCEINLINE cpp_int_backend& operator = (const cpp_int_backend& o) BOOST_NOEXCEPT_IF((Checked == unchecked) && boost::is_void<Allocator>::value)
    {
       this->assign(o);
       return *this;

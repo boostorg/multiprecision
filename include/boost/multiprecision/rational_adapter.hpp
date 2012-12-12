@@ -276,15 +276,15 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::ration
 public:
    BOOST_STATIC_CONSTEXPR bool is_integer = false;
    BOOST_STATIC_CONSTEXPR bool is_exact = true;
-   BOOST_STATIC_CONSTEXPR number_type (min)() BOOST_NOEXCEPT { return (base_type::min)(); }
-   BOOST_STATIC_CONSTEXPR number_type (max)() BOOST_NOEXCEPT { return (base_type::max)(); }
-   BOOST_STATIC_CONSTEXPR number_type lowest() BOOST_NOEXCEPT { return -(max)(); }
-   BOOST_STATIC_CONSTEXPR number_type epsilon() BOOST_NOEXCEPT { return base_type::epsilon(); }
-   BOOST_STATIC_CONSTEXPR number_type round_error() BOOST_NOEXCEPT { return epsilon() / 2; }
-   BOOST_STATIC_CONSTEXPR number_type infinity() BOOST_NOEXCEPT { return base_type::infinity(); }
-   BOOST_STATIC_CONSTEXPR number_type quiet_NaN() BOOST_NOEXCEPT { return base_type::quiet_NaN(); }
-   BOOST_STATIC_CONSTEXPR number_type signaling_NaN() BOOST_NOEXCEPT { return base_type::signaling_NaN(); }
-   BOOST_STATIC_CONSTEXPR number_type denorm_min() BOOST_NOEXCEPT { return base_type::denorm_min(); }
+   BOOST_STATIC_CONSTEXPR number_type (min)() { return (base_type::min)(); }
+   BOOST_STATIC_CONSTEXPR number_type (max)() { return (base_type::max)(); }
+   BOOST_STATIC_CONSTEXPR number_type lowest() { return -(max)(); }
+   BOOST_STATIC_CONSTEXPR number_type epsilon() { return base_type::epsilon(); }
+   BOOST_STATIC_CONSTEXPR number_type round_error() { return epsilon() / 2; }
+   BOOST_STATIC_CONSTEXPR number_type infinity() { return base_type::infinity(); }
+   BOOST_STATIC_CONSTEXPR number_type quiet_NaN() { return base_type::quiet_NaN(); }
+   BOOST_STATIC_CONSTEXPR number_type signaling_NaN() { return base_type::signaling_NaN(); }
+   BOOST_STATIC_CONSTEXPR number_type denorm_min() { return base_type::denorm_min(); }
 };
 
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION

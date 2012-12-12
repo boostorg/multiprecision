@@ -132,21 +132,21 @@ struct gmp_float_imp
          mpf_neg(m_data, m_data);
       return *this;
    }
-   gmp_float_imp& operator = (unsigned long i) BOOST_NOEXCEPT
+   gmp_float_imp& operator = (unsigned long i)
    {
       if(m_data[0]._mp_d == 0)
          mpf_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
       mpf_set_ui(m_data, i);
       return *this;
    }
-   gmp_float_imp& operator = (long i) BOOST_NOEXCEPT
+   gmp_float_imp& operator = (long i)
    {
       if(m_data[0]._mp_d == 0)
          mpf_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
       mpf_set_si(m_data, i);
       return *this;
    }
-   gmp_float_imp& operator = (double d) BOOST_NOEXCEPT
+   gmp_float_imp& operator = (double d)
    {
       if(m_data[0]._mp_d == 0)
          mpf_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
@@ -415,21 +415,21 @@ struct gmp_float : public detail::gmp_float_imp<digits10>
    gmp_float& operator=(const gmp_float<D>& o);
    gmp_float& operator=(const gmp_int& o);
    gmp_float& operator=(const gmp_rational& o);
-   gmp_float& operator=(const mpf_t val) BOOST_NOEXCEPT
+   gmp_float& operator=(const mpf_t val)
    {
       if(this->m_data[0]._mp_d == 0)
          mpf_init2(this->m_data, multiprecision::detail::digits10_2_2(digits10));
       mpf_set(this->m_data, val);
       return *this;
    }
-   gmp_float& operator=(const mpz_t val) BOOST_NOEXCEPT
+   gmp_float& operator=(const mpz_t val)
    {
       if(this->m_data[0]._mp_d == 0)
          mpf_init2(this->m_data, multiprecision::detail::digits10_2_2(digits10));
       mpf_set_z(this->m_data, val);
       return *this;
    }
-   gmp_float& operator=(const mpq_t val) BOOST_NOEXCEPT
+   gmp_float& operator=(const mpq_t val)
    {
       if(this->m_data[0]._mp_d == 0)
          mpf_init2(this->m_data, multiprecision::detail::digits10_2_2(digits10));
@@ -574,17 +574,17 @@ inline typename enable_if_c<is_arithmetic<T>::value, bool>::type eval_gt(const g
 }
 
 template <unsigned D1, unsigned D2>
-inline void eval_add(gmp_float<D1>& result, const gmp_float<D2>& o) BOOST_NOEXCEPT
+inline void eval_add(gmp_float<D1>& result, const gmp_float<D2>& o)
 {
    mpf_add(result.data(), result.data(), o.data());
 }
 template <unsigned D1, unsigned D2>
-inline void eval_subtract(gmp_float<D1>& result, const gmp_float<D2>& o) BOOST_NOEXCEPT
+inline void eval_subtract(gmp_float<D1>& result, const gmp_float<D2>& o)
 {
    mpf_sub(result.data(), result.data(), o.data());
 }
 template <unsigned D1, unsigned D2>
-inline void eval_multiply(gmp_float<D1>& result, const gmp_float<D2>& o) BOOST_NOEXCEPT
+inline void eval_multiply(gmp_float<D1>& result, const gmp_float<D2>& o)
 {
    mpf_mul(result.data(), result.data(), o.data());
 }
@@ -601,17 +601,17 @@ inline void eval_divide(gmp_float<D1>& result, const gmp_float<D2>& o)
    mpf_div(result.data(), result.data(), o.data());
 }
 template <unsigned digits10>
-inline void eval_add(gmp_float<digits10>& result, unsigned long i) BOOST_NOEXCEPT
+inline void eval_add(gmp_float<digits10>& result, unsigned long i)
 {
    mpf_add_ui(result.data(), result.data(), i);
 }
 template <unsigned digits10>
-inline void eval_subtract(gmp_float<digits10>& result, unsigned long i) BOOST_NOEXCEPT
+inline void eval_subtract(gmp_float<digits10>& result, unsigned long i)
 {
    mpf_sub_ui(result.data(), result.data(), i);
 }
 template <unsigned digits10>
-inline void eval_multiply(gmp_float<digits10>& result, unsigned long i) BOOST_NOEXCEPT
+inline void eval_multiply(gmp_float<digits10>& result, unsigned long i)
 {
    mpf_mul_ui(result.data(), result.data(), i);
 }
@@ -623,7 +623,7 @@ inline void eval_divide(gmp_float<digits10>& result, unsigned long i)
    mpf_div_ui(result.data(), result.data(), i);
 }
 template <unsigned digits10>
-inline void eval_add(gmp_float<digits10>& result, long i) BOOST_NOEXCEPT
+inline void eval_add(gmp_float<digits10>& result, long i)
 {
    if(i > 0)
       mpf_add_ui(result.data(), result.data(), i);
@@ -631,7 +631,7 @@ inline void eval_add(gmp_float<digits10>& result, long i) BOOST_NOEXCEPT
       mpf_sub_ui(result.data(), result.data(), std::abs(i));
 }
 template <unsigned digits10>
-inline void eval_subtract(gmp_float<digits10>& result, long i) BOOST_NOEXCEPT
+inline void eval_subtract(gmp_float<digits10>& result, long i)
 {
    if(i > 0)
       mpf_sub_ui(result.data(), result.data(), i);
@@ -639,7 +639,7 @@ inline void eval_subtract(gmp_float<digits10>& result, long i) BOOST_NOEXCEPT
       mpf_add_ui(result.data(), result.data(), std::abs(i));
 }
 template <unsigned digits10>
-inline void eval_multiply(gmp_float<digits10>& result, long i) BOOST_NOEXCEPT
+inline void eval_multiply(gmp_float<digits10>& result, long i)
 {
    mpf_mul_ui(result.data(), result.data(), std::abs(i));
    if(i < 0)
@@ -658,17 +658,17 @@ inline void eval_divide(gmp_float<digits10>& result, long i)
 // Specialised 3 arg versions of the basic operators:
 //
 template <unsigned D1, unsigned D2, unsigned D3>
-inline void eval_add(gmp_float<D1>& a, const gmp_float<D2>& x, const gmp_float<D3>& y) BOOST_NOEXCEPT
+inline void eval_add(gmp_float<D1>& a, const gmp_float<D2>& x, const gmp_float<D3>& y)
 {
    mpf_add(a.data(), x.data(), y.data());
 }
 template <unsigned D1, unsigned D2>
-inline void eval_add(gmp_float<D1>& a, const gmp_float<D2>& x, unsigned long y) BOOST_NOEXCEPT
+inline void eval_add(gmp_float<D1>& a, const gmp_float<D2>& x, unsigned long y)
 {
    mpf_add_ui(a.data(), x.data(), y);
 }
 template <unsigned D1, unsigned D2>
-inline void eval_add(gmp_float<D1>& a, const gmp_float<D2>& x, long y) BOOST_NOEXCEPT
+inline void eval_add(gmp_float<D1>& a, const gmp_float<D2>& x, long y)
 {
    if(y < 0)
       mpf_sub_ui(a.data(), x.data(), -y);
@@ -676,12 +676,12 @@ inline void eval_add(gmp_float<D1>& a, const gmp_float<D2>& x, long y) BOOST_NOE
       mpf_add_ui(a.data(), x.data(), y);
 }
 template <unsigned D1, unsigned D2>
-inline void eval_add(gmp_float<D1>& a, unsigned long x, const gmp_float<D2>& y) BOOST_NOEXCEPT
+inline void eval_add(gmp_float<D1>& a, unsigned long x, const gmp_float<D2>& y)
 {
    mpf_add_ui(a.data(), y.data(), x);
 }
 template <unsigned D1, unsigned D2>
-inline void eval_add(gmp_float<D1>& a, long x, const gmp_float<D2>& y) BOOST_NOEXCEPT
+inline void eval_add(gmp_float<D1>& a, long x, const gmp_float<D2>& y)
 {
    if(x < 0)
    {
@@ -692,17 +692,17 @@ inline void eval_add(gmp_float<D1>& a, long x, const gmp_float<D2>& y) BOOST_NOE
       mpf_add_ui(a.data(), y.data(), x);
 }
 template <unsigned D1, unsigned D2, unsigned D3>
-inline void eval_subtract(gmp_float<D1>& a, const gmp_float<D2>& x, const gmp_float<D3>& y) BOOST_NOEXCEPT
+inline void eval_subtract(gmp_float<D1>& a, const gmp_float<D2>& x, const gmp_float<D3>& y)
 {
    mpf_sub(a.data(), x.data(), y.data());
 }
 template <unsigned D1, unsigned D2>
-inline void eval_subtract(gmp_float<D1>& a, const gmp_float<D2>& x, unsigned long y) BOOST_NOEXCEPT
+inline void eval_subtract(gmp_float<D1>& a, const gmp_float<D2>& x, unsigned long y)
 {
    mpf_sub_ui(a.data(), x.data(), y);
 }
 template <unsigned D1, unsigned D2>
-inline void eval_subtract(gmp_float<D1>& a, const gmp_float<D2>& x, long y) BOOST_NOEXCEPT
+inline void eval_subtract(gmp_float<D1>& a, const gmp_float<D2>& x, long y)
 {
    if(y < 0)
       mpf_add_ui(a.data(), x.data(), -y);
@@ -710,12 +710,12 @@ inline void eval_subtract(gmp_float<D1>& a, const gmp_float<D2>& x, long y) BOOS
       mpf_sub_ui(a.data(), x.data(), y);
 }
 template <unsigned D1, unsigned D2>
-inline void eval_subtract(gmp_float<D1>& a, unsigned long x, const gmp_float<D2>& y) BOOST_NOEXCEPT
+inline void eval_subtract(gmp_float<D1>& a, unsigned long x, const gmp_float<D2>& y)
 {
    mpf_ui_sub(a.data(), x, y.data());
 }
 template <unsigned D1, unsigned D2>
-inline void eval_subtract(gmp_float<D1>& a, long x, const gmp_float<D2>& y) BOOST_NOEXCEPT
+inline void eval_subtract(gmp_float<D1>& a, long x, const gmp_float<D2>& y)
 {
    if(x < 0)
    {
@@ -727,17 +727,17 @@ inline void eval_subtract(gmp_float<D1>& a, long x, const gmp_float<D2>& y) BOOS
 }
 
 template <unsigned D1, unsigned D2, unsigned D3>
-inline void eval_multiply(gmp_float<D1>& a, const gmp_float<D2>& x, const gmp_float<D3>& y) BOOST_NOEXCEPT
+inline void eval_multiply(gmp_float<D1>& a, const gmp_float<D2>& x, const gmp_float<D3>& y)
 {
    mpf_mul(a.data(), x.data(), y.data());
 }
 template <unsigned D1, unsigned D2>
-inline void eval_multiply(gmp_float<D1>& a, const gmp_float<D2>& x, unsigned long y) BOOST_NOEXCEPT
+inline void eval_multiply(gmp_float<D1>& a, const gmp_float<D2>& x, unsigned long y)
 {
    mpf_mul_ui(a.data(), x.data(), y);
 }
 template <unsigned D1, unsigned D2>
-inline void eval_multiply(gmp_float<D1>& a, const gmp_float<D2>& x, long y) BOOST_NOEXCEPT
+inline void eval_multiply(gmp_float<D1>& a, const gmp_float<D2>& x, long y)
 {
    if(y < 0)
    {
@@ -748,12 +748,12 @@ inline void eval_multiply(gmp_float<D1>& a, const gmp_float<D2>& x, long y) BOOS
       mpf_mul_ui(a.data(), x.data(), y);
 }
 template <unsigned D1, unsigned D2>
-inline void eval_multiply(gmp_float<D1>& a, unsigned long x, const gmp_float<D2>& y) BOOST_NOEXCEPT
+inline void eval_multiply(gmp_float<D1>& a, unsigned long x, const gmp_float<D2>& y)
 {
    mpf_mul_ui(a.data(), y.data(), x);
 }
 template <unsigned D1, unsigned D2>
-inline void eval_multiply(gmp_float<D1>& a, long x, const gmp_float<D2>& y) BOOST_NOEXCEPT
+inline void eval_multiply(gmp_float<D1>& a, long x, const gmp_float<D2>& y)
 {
    if(x < 0)
    {
@@ -912,39 +912,39 @@ inline void eval_convert_to(unsigned long long* result, const gmp_float<digits10
 // Native non-member operations:
 //
 template <unsigned Digits10>
-inline void eval_sqrt(gmp_float<Digits10>& result, const gmp_float<Digits10>& val) BOOST_NOEXCEPT
+inline void eval_sqrt(gmp_float<Digits10>& result, const gmp_float<Digits10>& val)
 {
    mpf_sqrt(result.data(), val.data());
 }
 
 template <unsigned Digits10>
-inline void eval_abs(gmp_float<Digits10>& result, const gmp_float<Digits10>& val) BOOST_NOEXCEPT
+inline void eval_abs(gmp_float<Digits10>& result, const gmp_float<Digits10>& val)
 {
    mpf_abs(result.data(), val.data());
 }
 
 template <unsigned Digits10>
-inline void eval_fabs(gmp_float<Digits10>& result, const gmp_float<Digits10>& val) BOOST_NOEXCEPT
+inline void eval_fabs(gmp_float<Digits10>& result, const gmp_float<Digits10>& val)
 {
    mpf_abs(result.data(), val.data());
 }
 template <unsigned Digits10>
-inline void eval_ceil(gmp_float<Digits10>& result, const gmp_float<Digits10>& val) BOOST_NOEXCEPT
+inline void eval_ceil(gmp_float<Digits10>& result, const gmp_float<Digits10>& val)
 {
    mpf_ceil(result.data(), val.data());
 }
 template <unsigned Digits10>
-inline void eval_floor(gmp_float<Digits10>& result, const gmp_float<Digits10>& val) BOOST_NOEXCEPT
+inline void eval_floor(gmp_float<Digits10>& result, const gmp_float<Digits10>& val)
 {
    mpf_floor(result.data(), val.data());
 }
 template <unsigned Digits10>
-inline void eval_trunc(gmp_float<Digits10>& result, const gmp_float<Digits10>& val) BOOST_NOEXCEPT
+inline void eval_trunc(gmp_float<Digits10>& result, const gmp_float<Digits10>& val)
 {
    mpf_trunc(result.data(), val.data());
 }
 template <unsigned Digits10>
-inline void eval_ldexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& val, long e) BOOST_NOEXCEPT
+inline void eval_ldexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& val, long e)
 {
    if(e > 0)
       mpf_mul_2exp(result.data(), val.data(), e);
@@ -954,7 +954,7 @@ inline void eval_ldexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& v
       result = val;
 }
 template <unsigned Digits10>
-inline void eval_frexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& val, int* e) BOOST_NOEXCEPT
+inline void eval_frexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& val, int* e)
 {
    long v;
    mpf_get_d_2exp(&v, val.data());
@@ -962,7 +962,7 @@ inline void eval_frexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& v
    eval_ldexp(result, val, -v);
 }
 template <unsigned Digits10>
-inline void eval_frexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& val, long* e) BOOST_NOEXCEPT
+inline void eval_frexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& val, long* e)
 {
    mpf_get_d_2exp(e, val.data());
    eval_ldexp(result, val, -*e);
@@ -2208,7 +2208,7 @@ public:
    // mpf_get_str on 64-bit Linux builds.  Possibly we could use larger
    // exponent values elsewhere.
    //
-   static number_type (min)() BOOST_NOEXCEPT
+   static number_type (min)()
    {
       initializer.do_nothing();
       static std::pair<bool, number_type> value;
@@ -2220,7 +2220,7 @@ public:
       }
       return value.second;
    }
-   static number_type (max)() BOOST_NOEXCEPT
+   static number_type (max)()
    {
       initializer.do_nothing();
       static std::pair<bool, number_type> value;
@@ -2232,7 +2232,7 @@ public:
       }
       return value.second;
    }
-   BOOST_STATIC_CONSTEXPR number_type lowest() BOOST_NOEXCEPT
+   BOOST_STATIC_CONSTEXPR number_type lowest()
    {
       return -(max)();
    }
@@ -2244,7 +2244,7 @@ public:
    BOOST_STATIC_CONSTEXPR bool is_integer = false;
    BOOST_STATIC_CONSTEXPR bool is_exact = false;
    BOOST_STATIC_CONSTEXPR int radix = 2;
-   static number_type epsilon() BOOST_NOEXCEPT
+   static number_type epsilon()
    {
       initializer.do_nothing();
       static std::pair<bool, number_type> value;
@@ -2257,7 +2257,7 @@ public:
       return value.second;
    }
    // What value should this be????
-   static number_type round_error() BOOST_NOEXCEPT
+   static number_type round_error()
    {
       // returns epsilon/2
       initializer.do_nothing();
@@ -2279,10 +2279,10 @@ public:
    BOOST_STATIC_CONSTEXPR bool has_signaling_NaN = false;
    BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm = denorm_absent;
    BOOST_STATIC_CONSTEXPR bool has_denorm_loss = false;
-   BOOST_STATIC_CONSTEXPR number_type infinity() BOOST_NOEXCEPT { return number_type(); }
-   BOOST_STATIC_CONSTEXPR number_type quiet_NaN() BOOST_NOEXCEPT { return number_type(); }
-   BOOST_STATIC_CONSTEXPR number_type signaling_NaN() BOOST_NOEXCEPT { return number_type(); }
-   BOOST_STATIC_CONSTEXPR number_type denorm_min() BOOST_NOEXCEPT { return number_type(); }
+   BOOST_STATIC_CONSTEXPR number_type infinity() { return number_type(); }
+   BOOST_STATIC_CONSTEXPR number_type quiet_NaN() { return number_type(); }
+   BOOST_STATIC_CONSTEXPR number_type signaling_NaN() { return number_type(); }
+   BOOST_STATIC_CONSTEXPR number_type denorm_min() { return number_type(); }
    BOOST_STATIC_CONSTEXPR bool is_iec559 = false;
    BOOST_STATIC_CONSTEXPR bool is_bounded = true;
    BOOST_STATIC_CONSTEXPR bool is_modulo = false;
@@ -2314,9 +2314,9 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_fl
    typedef boost::multiprecision::number<boost::multiprecision::gmp_float<0>, ExpressionTemplates> number_type;
 public:
    BOOST_STATIC_CONSTEXPR bool is_specialized = false;
-   static number_type (min)() BOOST_NOEXCEPT { return number_type(); }
-   static number_type (max)() BOOST_NOEXCEPT { return number_type(); }
-   static number_type lowest() BOOST_NOEXCEPT { return number_type(); }
+   static number_type (min)() { return number_type(); }
+   static number_type (max)() { return number_type(); }
+   static number_type lowest() { return number_type(); }
    BOOST_STATIC_CONSTEXPR int digits = 0;
    BOOST_STATIC_CONSTEXPR int digits10 = 0;
    BOOST_STATIC_CONSTEXPR int max_digits10 = 0;
@@ -2324,8 +2324,8 @@ public:
    BOOST_STATIC_CONSTEXPR bool is_integer = false;
    BOOST_STATIC_CONSTEXPR bool is_exact = false;
    BOOST_STATIC_CONSTEXPR int radix = 0;
-   static number_type epsilon() BOOST_NOEXCEPT { return number_type(); }
-   static number_type round_error() BOOST_NOEXCEPT { return number_type(); }
+   static number_type epsilon() { return number_type(); }
+   static number_type round_error() { return number_type(); }
    BOOST_STATIC_CONSTEXPR int min_exponent = 0;
    BOOST_STATIC_CONSTEXPR int min_exponent10 = 0;
    BOOST_STATIC_CONSTEXPR int max_exponent = 0;
@@ -2335,10 +2335,10 @@ public:
    BOOST_STATIC_CONSTEXPR bool has_signaling_NaN = false;
    BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm = denorm_absent;
    BOOST_STATIC_CONSTEXPR bool has_denorm_loss = false;
-   static number_type infinity() BOOST_NOEXCEPT { return number_type(); }
-   static number_type quiet_NaN() BOOST_NOEXCEPT { return number_type(); }
-   static number_type signaling_NaN() BOOST_NOEXCEPT { return number_type(); }
-   static number_type denorm_min() BOOST_NOEXCEPT { return number_type(); }
+   static number_type infinity() { return number_type(); }
+   static number_type quiet_NaN() { return number_type(); }
+   static number_type signaling_NaN() { return number_type(); }
+   static number_type denorm_min() { return number_type(); }
    BOOST_STATIC_CONSTEXPR bool is_iec559 = false;
    BOOST_STATIC_CONSTEXPR bool is_bounded = false;
    BOOST_STATIC_CONSTEXPR bool is_modulo = false;
@@ -2406,15 +2406,15 @@ public:
    // Largest and smallest numbers are bounded only by available memory, set
    // to zero:
    //
-   static number_type (min)() BOOST_NOEXCEPT
+   static number_type (min)()
    {
       return number_type();
    }
-   static number_type (max)() BOOST_NOEXCEPT
+   static number_type (max)()
    {
       return number_type();
    }
-   static number_type lowest() BOOST_NOEXCEPT { return (min)(); }
+   static number_type lowest() { return (min)(); }
    BOOST_STATIC_CONSTEXPR int digits = INT_MAX;
    BOOST_STATIC_CONSTEXPR int digits10 = (INT_MAX / 1000) * 301L;
    BOOST_STATIC_CONSTEXPR int max_digits10 = digits10 + 2;
@@ -2422,8 +2422,8 @@ public:
    BOOST_STATIC_CONSTEXPR bool is_integer = true;
    BOOST_STATIC_CONSTEXPR bool is_exact = true;
    BOOST_STATIC_CONSTEXPR int radix = 2;
-   static number_type epsilon() BOOST_NOEXCEPT { return number_type(); }
-   static number_type round_error() BOOST_NOEXCEPT { return number_type(); }
+   static number_type epsilon() { return number_type(); }
+   static number_type round_error() { return number_type(); }
    BOOST_STATIC_CONSTEXPR int min_exponent = 0;
    BOOST_STATIC_CONSTEXPR int min_exponent10 = 0;
    BOOST_STATIC_CONSTEXPR int max_exponent = 0;
@@ -2433,10 +2433,10 @@ public:
    BOOST_STATIC_CONSTEXPR bool has_signaling_NaN = false;
    BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm = denorm_absent;
    BOOST_STATIC_CONSTEXPR bool has_denorm_loss = false;
-   static number_type infinity() BOOST_NOEXCEPT { return number_type(); }
-   static number_type quiet_NaN() BOOST_NOEXCEPT { return number_type(); }
-   static number_type signaling_NaN() BOOST_NOEXCEPT { return number_type(); }
-   static number_type denorm_min() BOOST_NOEXCEPT { return number_type(); }
+   static number_type infinity() { return number_type(); }
+   static number_type quiet_NaN() { return number_type(); }
+   static number_type signaling_NaN() { return number_type(); }
+   static number_type denorm_min() { return number_type(); }
    BOOST_STATIC_CONSTEXPR bool is_iec559 = false;
    BOOST_STATIC_CONSTEXPR bool is_bounded = false;
    BOOST_STATIC_CONSTEXPR bool is_modulo = false;
@@ -2504,15 +2504,15 @@ public:
    // Largest and smallest numbers are bounded only by available memory, set
    // to zero:
    //
-   static number_type (min)() BOOST_NOEXCEPT
+   static number_type (min)()
    {
       return number_type();
    }
-   static number_type (max)() BOOST_NOEXCEPT
+   static number_type (max)()
    {
       return number_type();
    }
-   static number_type lowest() BOOST_NOEXCEPT { return (min)(); }
+   static number_type lowest() { return (min)(); }
    // Digits are unbounded, use zero for now:
    BOOST_STATIC_CONSTEXPR int digits = INT_MAX;
    BOOST_STATIC_CONSTEXPR int digits10 = (INT_MAX / 1000) * 301L;
@@ -2521,8 +2521,8 @@ public:
    BOOST_STATIC_CONSTEXPR bool is_integer = false;
    BOOST_STATIC_CONSTEXPR bool is_exact = true;
    BOOST_STATIC_CONSTEXPR int radix = 2;
-   static number_type epsilon() BOOST_NOEXCEPT { return number_type(); }
-   static number_type round_error() BOOST_NOEXCEPT { return number_type(); }
+   static number_type epsilon() { return number_type(); }
+   static number_type round_error() { return number_type(); }
    BOOST_STATIC_CONSTEXPR int min_exponent = 0;
    BOOST_STATIC_CONSTEXPR int min_exponent10 = 0;
    BOOST_STATIC_CONSTEXPR int max_exponent = 0;
@@ -2532,10 +2532,10 @@ public:
    BOOST_STATIC_CONSTEXPR bool has_signaling_NaN = false;
    BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm = denorm_absent;
    BOOST_STATIC_CONSTEXPR bool has_denorm_loss = false;
-   static number_type infinity() BOOST_NOEXCEPT { return number_type(); }
-   static number_type quiet_NaN() BOOST_NOEXCEPT { return number_type(); }
-   static number_type signaling_NaN() BOOST_NOEXCEPT { return number_type(); }
-   static number_type denorm_min() BOOST_NOEXCEPT { return number_type(); }
+   static number_type infinity() { return number_type(); }
+   static number_type quiet_NaN() { return number_type(); }
+   static number_type signaling_NaN() { return number_type(); }
+   static number_type denorm_min() { return number_type(); }
    BOOST_STATIC_CONSTEXPR bool is_iec559 = false;
    BOOST_STATIC_CONSTEXPR bool is_bounded = false;
    BOOST_STATIC_CONSTEXPR bool is_modulo = false;
