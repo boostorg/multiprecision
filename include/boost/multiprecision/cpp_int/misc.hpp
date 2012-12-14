@@ -107,6 +107,64 @@ BOOST_MP_FORCEINLINE typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<Mi
    result.sign(false);
 }
 
+template <class Unsigned, class Tag>
+inline unsigned find_lsb(Unsigned mask, const Tag&)
+{
+   unsigned result = 0;
+   while(!(mask & 1u))
+   {
+      mask >>= 1;
+      ++result;
+   }
+   return result;
+}
+
+#if defined(BOOST_MSVC) && (defined(_M_IX86) || defined(_M_X64))
+BOOST_FORCEINLINE unsigned find_lsb(limb_type mask, const mpl::int_<32>&)
+{
+   unsigned long result;
+   _BitScanForward(&result, mask);
+   return result;
+}
+#ifdef _M_X64
+BOOST_FORCEINLINE unsigned find_lsb(limb_type mask, const mpl::int_<64>&)
+{
+   unsigned long result;
+   _BitScanForward64(&result, mask);
+   return result;
+}
+#endif
+#endif
+
+#if defined(__GNUC__)
+BOOST_FORCEINLINE unsigned find_lsb_imp(limb_type mask, mpl::true_ const&)
+{
+   return __builtin_ctz(mask);
+}
+BOOST_FORCEINLINE unsigned find_lsb_imp(limb_type mask, mpl::false_ const&)
+{
+   return __builtin_ctzll(mask);
+}
+template <class Tag>
+BOOST_FORCEINLINE unsigned find_lsb(limb_type mask, const Tag&)
+{
+   return find_lsb_imp(mask, mpl::bool_<Tag::value <= static_cast<int>(sizeof(unsigned int) * CHAR_BIT)>());
+}
+#elif defined(BOOST_INTEL)
+BOOST_FORCEINLINE unsigned find_lsb_imp(limb_type mask, mpl::true_ const&)
+{
+   return _bit_scan_forward(mask);
+}
+BOOST_FORCEINLINE unsigned find_lsb_imp(limb_type mask, mpl::false_ const&)
+{
+   return find_lsb<limb_type, mpl::int_<0> >(mask, mpl::int_<0>());
+}
+template <class Tag>
+BOOST_FORCEINLINE unsigned find_lsb(limb_type mask, const Tag&)
+{
+   return find_lsb_imp(mask, mpl::bool_<Tag::value <= sizeof(int) * CHAR_BIT>());
+}
+#endif
 //
 // Get the location of the least-significant-bit:
 //
@@ -124,7 +182,6 @@ inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBit
       BOOST_THROW_EXCEPTION(std::range_error("Testing individual bits in negative values is not supported - results are undefined."));
    }
 
-   unsigned result = 0;
    //
    // Find the index of the least significant limb that is non-zero:
    //
@@ -134,12 +191,7 @@ inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBit
    //
    // Find the index of the least significant bit within that limb:
    //
-   limb_type l = a.limbs()[index];
-   while(!(l & 1u))
-   {
-      l >>= 1;
-      ++result;
-   }
+   unsigned result = find_lsb(a.limbs()[index], mpl::int_<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits>());
 
    return result + index * cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits;
 }
@@ -246,6 +298,208 @@ BOOST_MP_FORCEINLINE typename enable_if_c<is_signed<Integer>::value && !is_trivi
    return eval_integer_modulus(x, static_cast<unsigned_type>(abs(val)));
 }
 
+inline limb_type integer_gcd_reduce(limb_type u, limb_type v)
+{
+   do
+   {
+      if(u > v)
+         std::swap(u, v);
+      if(u == v)
+         break;
+      v -= u;
+      v >>= find_lsb(v, mpl::int_<CHAR_BIT * sizeof(limb_type)>());
+   } while(true);
+   return u;
+}
+
+inline double_limb_type integer_gcd_reduce(double_limb_type u, double_limb_type v)
+{
+   do
+   {
+      if(u > v)
+         std::swap(u, v);
+      if(u == v)
+         break;
+      if(v <= ~static_cast<limb_type>(0))
+      {
+         u = integer_gcd_reduce(static_cast<limb_type>(v), static_cast<limb_type>(u));
+         break;
+      }
+      v -= u;
+      while((static_cast<unsigned>(v) & 1u) == 0)
+         v >>= 1;
+   } while(true);
+   return u;
+}
+
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
+   eval_gcd(
+      cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result, 
+      const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a, 
+      limb_type v)
+{
+   using default_ops::eval_lsb;
+   using default_ops::eval_is_zero;
+   using default_ops::eval_get_sign;
+
+   int shift;
+
+   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> u(a);
+
+   int s = eval_get_sign(u);
+
+   /* GCD(0,x) := x */
+   if(s < 0)
+   {
+      u.negate();
+   }
+   else if(s == 0)
+   {
+      result = v;
+      return;
+   }
+   if(v == 0)
+   {
+      result = u;
+      return;
+   }
+
+   /* Let shift := lg K, where K is the greatest power of 2
+   dividing both u and v. */
+
+   unsigned us = eval_lsb(u);
+   unsigned vs = find_lsb(v, mpl::int_<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits>());
+   shift = (std::min)(us, vs);
+   eval_right_shift(u, us);
+   if(vs)
+      v >>= vs;
+
+   do 
+   {
+      /* Now u and v are both odd, so diff(u, v) is even.
+      Let u = min(u, v), v = diff(u, v)/2. */
+      if(u.size() == 1)
+      {
+         v = integer_gcd_reduce(*u.limbs(), v);
+         break;
+      }
+      eval_subtract(u, v);
+      us = eval_lsb(u);
+      eval_right_shift(u, us);
+   } 
+   while(true);
+
+   result = v;
+   eval_left_shift(result, shift);
+}
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, class Integer>
+inline typename enable_if_c<is_unsigned<Integer>::value && (sizeof(Integer) <= sizeof(limb_type)) && !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
+   eval_gcd(
+      cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result, 
+      const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a, 
+      const Integer& v)
+{
+   eval_gcd(result, a, static_cast<limb_type>(v));
+}
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, class Integer>
+inline typename enable_if_c<is_signed<Integer>::value && (sizeof(Integer) <= sizeof(limb_type)) && !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
+   eval_gcd(
+      cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result, 
+      const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a, 
+      const Integer& v)
+{
+   eval_gcd(result, a, static_cast<limb_type>(v < 0 ? -v : v));
+}
+
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
+   eval_gcd(
+      cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result, 
+      const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a, 
+      const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& b)
+{
+   using default_ops::eval_lsb;
+   using default_ops::eval_is_zero;
+   using default_ops::eval_get_sign;
+
+   if(a.size() == 1)
+   {
+      eval_gcd(result, b, *a.limbs());
+      return;
+   }
+   if(b.size() == 1)
+   {
+      eval_gcd(result, a, *b.limbs());
+   }
+
+   int shift;
+
+   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> u(a), v(b);
+
+   int s = eval_get_sign(u);
+
+   /* GCD(0,x) := x */
+   if(s < 0)
+   {
+      u.negate();
+   }
+   else if(s == 0)
+   {
+      result = v;
+      return;
+   }
+   s = eval_get_sign(v);
+   if(s < 0)
+   {
+      v.negate();
+   }
+   else if(s == 0)
+   {
+      result = u;
+      return;
+   }
+
+   /* Let shift := lg K, where K is the greatest power of 2
+   dividing both u and v. */
+
+   unsigned us = eval_lsb(u);
+   unsigned vs = eval_lsb(v);
+   shift = (std::min)(us, vs);
+   eval_right_shift(u, us);
+   eval_right_shift(v, vs);
+
+   do 
+   {
+      /* Now u and v are both odd, so diff(u, v) is even.
+      Let u = min(u, v), v = diff(u, v)/2. */
+      s = u.compare(v);
+      if(s > 0)
+         u.swap(v);
+      if(s == 0)
+         break;
+      if(v.size() <= 2)
+      {
+         if(v.size() == 1)
+            u = integer_gcd_reduce(*v.limbs(), *u.limbs());
+         else
+         {
+            double_limb_type i, j;
+            i = v.limbs()[0] | (static_cast<double_limb_type>(v.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
+            j = (u.size() == 1) ? *u.limbs() : u.limbs()[0] | (static_cast<double_limb_type>(u.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
+            u = integer_gcd_reduce(i, j);
+         }
+         break;
+      }
+      eval_subtract(v, u);
+      vs = eval_lsb(v);
+      eval_right_shift(v, vs);
+   } 
+   while(true);
+
+   result = u;
+   eval_left_shift(result, shift);
+}
 //
 // Now again for trivial backends:
 //
@@ -307,6 +561,25 @@ inline typename enable_if_c<
    }
    else
       *result = static_cast<R>(*val.limbs());
+}
+
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+inline typename enable_if_c<is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value, unsigned>::type
+   eval_lsb(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a)
+{
+   using default_ops::eval_get_sign;
+   if(eval_get_sign(a) == 0)
+   {
+      BOOST_THROW_EXCEPTION(std::range_error("No bits were set in the operand."));
+   }
+   if(a.sign())
+   {
+      BOOST_THROW_EXCEPTION(std::range_error("Testing individual bits in negative values is not supported - results are undefined."));
+   }
+   //
+   // Find the index of the least significant bit within that limb:
+   //
+   return find_lsb(*a.limbs(), mpl::int_<CHAR_BIT * sizeof(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::local_limb_type)>());
 }
 
 #ifdef BOOST_MSVC

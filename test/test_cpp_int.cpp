@@ -332,6 +332,7 @@ struct tester
          BOOST_CHECK_EQUAL(mpz_int(powm(a, b, ui)).str(), test_type(powm(a1, b1, ui)).str());
          BOOST_CHECK_EQUAL(mpz_int(powm(a, ui, c)).str(), test_type(powm(a1, ui, c1)).str());
       }
+      BOOST_CHECK_EQUAL(lsb(a), lsb(a1));
    }
 
    void test()
