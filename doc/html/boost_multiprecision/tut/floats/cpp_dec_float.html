@@ -56,7 +56,8 @@
           to a 32-bit integer type which is more than large enough for the vast majority
           of use cases, but larger types such as <code class="computeroutput"><span class="keyword">long</span>
           <span class="keyword">long</span></code> can also be specified if you
-          need a truely huge exponent range.
+          need a truely huge exponent range. In any case the ExponentType must be
+          a built in signed integer type at least 2 bytes and 16-bits wide.
         </p>
 <p>
           Normally <code class="computeroutput"><span class="identifier">cpp_dec_float</span></code>
