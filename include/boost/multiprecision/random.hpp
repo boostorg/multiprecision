@@ -523,7 +523,7 @@ boost::multiprecision::number<Backend, ExpressionTemplates>
                 static_cast<range_type>(range/mult),
                 boost::mpl::true_());
         if(std::numeric_limits<range_type>::is_bounded && ((std::numeric_limits<range_type>::max)() / mult < result_increment)) {
-          // The multiplcation would overflow.  Reject immediately.
+          // The multiplication would overflow.  Reject immediately.
           continue;
         }
         result_increment *= mult;

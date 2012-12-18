@@ -812,7 +812,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    bool overflow = exp >= cpp_dec_float_max_exp10;
    if(exp == cpp_dec_float_max_exp10)
    {
-      // Check to see if we really truely have an overflow or not...
+      // Check to see if we really truly have an overflow or not...
       if(isneg())
       {
          cpp_dec_float t(*this);

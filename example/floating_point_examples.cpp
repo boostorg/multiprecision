@@ -163,7 +163,7 @@ fix the issue:
 
    JEL(cpp_dec_float_50(v + 0.5), z);
 
-However, if we want the function JEL to be truely reusable, then a better solution might be preferred.
+However, if we want the function JEL to be truly reusable, then a better solution might be preferred.
 To achieve this we can borrow some code from Boost.Math which calculates the return type of mixed-argument
 functions, here's how the new code looks now:
 
@@ -543,7 +543,7 @@ int main(int, char**)
    // to handle expression templates etc.  As a result it's hard to take its
    // address without knowing about its implementation details.  We'll use a 
    // C++11 lambda expression to capture the call.
-   // We also need a typecast on the first argument so we don't accidently pass
+   // We also need a typecast on the first argument so we don't accidentally pass
    // an expression template to a template function:
    //
    const cpp_dec_float_50 d_mp = derivative(

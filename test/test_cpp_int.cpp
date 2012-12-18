@@ -325,7 +325,7 @@ struct tester
       if(!std::numeric_limits<test_type>::is_modulo)
       {
          // We have to take care that our powers don't grow too large, otherwise this takes "forever",
-         // also don't test for modulo types, as these may give a diffferent result from arbitrary
+         // also don't test for modulo types, as these may give a different result from arbitrary
          // precision types:
          BOOST_CHECK_EQUAL(mpz_int(pow(d, ui % 19)).str(), test_type(pow(d1, ui % 19)).str());
          BOOST_CHECK_EQUAL(mpz_int(powm(a, b, c)).str(), test_type(powm(a1, b1, c1)).str());

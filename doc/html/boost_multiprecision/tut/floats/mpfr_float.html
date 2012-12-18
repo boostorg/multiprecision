@@ -77,7 +77,7 @@
           The latter option can result in significantly faster code, at the expense
           of growing the size of <code class="computeroutput"><span class="identifier">mpfr_float_backend</span></code>.
           It can only be used at fixed precision, and should only be used for lower
-          digit counts. Note that we can not guarentee that using <code class="computeroutput"><span class="identifier">allocate_stack</span></code>
+          digit counts. Note that we can not guarantee that using <code class="computeroutput"><span class="identifier">allocate_stack</span></code>
           won't cause any calls to mpfr's allocation routines, as mpfr may call these
           inside it's own code. The following table gives an idea of the performance
           tradeoff's at 50 decimal digits precision<a href="#ftn.boost_multiprecision.tut.floats.mpfr_float.f0" class="footnote"><sup class="footnote"><a name="boost_multiprecision.tut.floats.mpfr_float.f0"></a>[2]</sup></a>:

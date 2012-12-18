@@ -862,7 +862,7 @@ template <class R, class B>
 inline void eval_convert_to(terminal<R>* result, const B& backend)
 {
    //
-   // We ran out of types to try for the convertion, try
+   // We ran out of types to try for the conversion, try
    // a lexical_cast and hope for the best:
    //
    result->value = boost::lexical_cast<R>(backend.str(0, std::ios_base::fmtflags(0)));

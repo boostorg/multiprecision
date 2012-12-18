@@ -120,7 +120,7 @@
           </li></ul></div>
 <pre class="programlisting"><span class="identifier">int128_t</span>     <span class="identifier">i128</span> <span class="special">=</span> <span class="number">0</span><span class="special">;</span>
 <span class="identifier">int266_t</span>     <span class="identifier">i256</span> <span class="special">=</span> <span class="identifier">i128</span><span class="special">;</span>  <span class="comment">// OK implicit widening conversion</span>
-<span class="identifier">i128_t</span>            <span class="special">=</span> <span class="identifier">i256</span><span class="special">;</span>  <span class="comment">// Error, no assignment operator found, narrowing conversion is explict</span>
+<span class="identifier">i128_t</span>            <span class="special">=</span> <span class="identifier">i256</span><span class="special">;</span>  <span class="comment">// Error, no assignment operator found, narrowing conversion is explicit</span>
 <span class="identifier">i128_t</span>            <span class="special">=</span> <span class="keyword">static_cast</span><span class="special">&lt;</span><span class="identifier">int128_t</span><span class="special">&gt;(</span><span class="identifier">i256</span><span class="special">);</span> <span class="comment">// OK, explicit narrowing conversion</span>
 
 <span class="identifier">mpz_int</span>      <span class="identifier">z</span>    <span class="special">=</span> <span class="number">0</span><span class="special">;</span>
@@ -157,7 +157,7 @@
 <p>
         More information on what additional types a backend supports conversions
         from are given in the tutorial for each backend. The converting constructor
-        will be implict if the backend's converting constructor is also implicit,
+        will be implicit if the backend's converting constructor is also implicit,
         and explicit if the backends converting constructor is also explicit.
       </p>
 </div>
