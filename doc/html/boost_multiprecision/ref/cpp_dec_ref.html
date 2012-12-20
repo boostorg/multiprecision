@@ -28,7 +28,7 @@
 </h3></div></div></div>
 <pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">multiprecision</span><span class="special">{</span>
 
-<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">unsigned</span> <span class="identifier">Digits10</span><span class="special">&gt;</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">unsigned</span> <span class="identifier">Digits10</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">ExponentType</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">int32_t</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">Allocator</span> <span class="special">=</span> <span class="keyword">void</span><span class="special">&gt;</span>
 <span class="keyword">class</span> <span class="identifier">cpp_dec_float</span><span class="special">;</span>
 
 <span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float</span><span class="special">&lt;</span><span class="number">50</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">cpp_dec_float_50</span><span class="special">;</span>
@@ -43,13 +43,32 @@
         these are considered implementation details that are subject to change.
       </p>
 <p>
-        The class takes a single template parameter - <code class="computeroutput"><span class="identifier">Digits10</span></code>
-        - which is the number of decimal digits precision the type should support.
-        Note that this type does not ever perform any dynamic memory allocation,
-        as a result the <code class="computeroutput"><span class="identifier">Digits10</span></code>
-        template argument should not be set too high or the class's size will grow
-        unreasonably large.
+        The class takes three template parameters:
       </p>
+<div class="variablelist">
+<p class="title"><b></b></p>
+<dl class="variablelist">
+<dt><span class="term">Digits10</span></dt>
+<dd><p>
+              The number of decimal digits precision the type should support. Note
+              that this type does not normally perform any dynamic memory allocation,
+              and as a result the <code class="computeroutput"><span class="identifier">Digits10</span></code>
+              template argument should not be set too high or the class's size will
+              grow unreasonably large.
+            </p></dd>
+<dt><span class="term">ExponentType</span></dt>
+<dd><p>
+              A signed integer type that represents the exponent of the number
+            </p></dd>
+<dt><span class="term">Allocator</span></dt>
+<dd><p>
+              The allocator used: defaults to type <code class="computeroutput"><span class="keyword">void</span></code>,
+              meaning all storage is within the class, and no dynamic allocation
+              is performed, but can be set to a standard library allocator if dynamic
+              allocation makes more sense.
+            </p></dd>
+</dl>
+</div>
 <p>
         The type of <code class="computeroutput"><span class="identifier">number_category</span><span class="special">&lt;</span><span class="identifier">cpp_int</span><span class="special">&lt;</span><span class="identifier">Args</span><span class="special">...&gt;</span> <span class="special">&gt;::</span><span class="identifier">type</span></code> is <code class="computeroutput"><span class="identifier">mpl</span><span class="special">::</span><span class="identifier">int_</span><span class="special">&lt;</span><span class="identifier">number_kind_floating_point</span><span class="special">&gt;</span></code>.
       </p>

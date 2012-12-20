@@ -42,8 +42,11 @@ void hyp0F1(T& result, const T& b, const T& x)
       tol.negate();
    T term;
 
+   static const unsigned series_limit = 
+      boost::multiprecision::detail::digits2<number<T, et_on> >::value < 100
+      ? 100 : boost::multiprecision::detail::digits2<number<T, et_on> >::value;
    // Series expansion of hyperg_0f1(; b; x).
-   for(n = 2; n < 300; ++n)
+   for(n = 2; n < series_limit; ++n)
    {
       eval_multiply(x_pow_n_div_n_fact, x);
       eval_divide(x_pow_n_div_n_fact, n);
@@ -60,7 +63,7 @@ void hyp0F1(T& result, const T& b, const T& x)
          break;
    }
 
-   if(n >= 300)
+   if(n >= series_limit)
       BOOST_THROW_EXCEPTION(std::runtime_error("H0F1 Failed to Converge"));
 }
 
@@ -399,8 +402,11 @@ void hyp2F1(T& result, const T& a, const T& b, const T& c, const T& x)
    ui_type n;
    T term;
 
+   static const unsigned series_limit = 
+      boost::multiprecision::detail::digits2<number<T, et_on> >::value < 100
+      ? 100 : boost::multiprecision::detail::digits2<number<T, et_on> >::value;
    // Series expansion of hyperg_2f1(a, b; c; x).
-   for(n = 2; n < 300; ++n)
+   for(n = 2; n < series_limit; ++n)
    {
       eval_multiply(x_pow_n_div_n_fact, x);
       eval_divide(x_pow_n_div_n_fact, n);
@@ -422,7 +428,7 @@ void hyp2F1(T& result, const T& a, const T& b, const T& c, const T& x)
       if(lim.compare(term) >= 0)
          break;
    }
-   if(n > 300)
+   if(n > series_limit)
       BOOST_THROW_EXCEPTION(std::runtime_error("H2F1 failed to converge."));
 }
 

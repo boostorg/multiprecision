@@ -114,7 +114,7 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
 #endif
    //
    // The code here only works when the radix of "From" is 2, we could try shifting by other
-   // radixes but it would complicate things.... use a string convertion when the radix is other
+   // radixes but it would complicate things.... use a string conversion when the radix is other
    // than 2:
    //
    if(std::numeric_limits<number<From> >::radix != 2)

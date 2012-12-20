@@ -73,6 +73,10 @@ class cpp_dec_float
 private:
    static const boost::int32_t cpp_dec_float_digits10_setting = Digits10;
 
+   // We need at least 16-bits in the exponent type to do anything sensible:
+   BOOST_STATIC_ASSERT_MSG(sizeof(ExponentType) > 1, "ExponentType is too small.");
+   BOOST_STATIC_ASSERT_MSG(boost::is_signed<ExponentType>::value, "ExponentType must be a signed built in integer type.");
+
 public:
    typedef mpl::list<long long>           signed_types;
    typedef mpl::list<unsigned long long>  unsigned_types;
@@ -808,7 +812,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    bool overflow = exp >= cpp_dec_float_max_exp10;
    if(exp == cpp_dec_float_max_exp10)
    {
-      // Check to see if we really truely have an overflow or not...
+      // Check to see if we really truly have an overflow or not...
       if(isneg())
       {
          cpp_dec_float t(*this);

@@ -24,6 +24,8 @@ project : requirements
    # We set these to make it easier to set up and test GMP and MPFR under Win32:
    <toolset>msvc:<runtime-link>static
    <toolset>msvc:<link>static
+   <toolset>intel-win:<runtime-link>static
+   <toolset>intel-win:<link>static
    <toolset>msvc:<warnings>all
    <toolset>gcc:<cxxflags>-Wall
    <toolset>gcc:<cxxflags>-Wextra

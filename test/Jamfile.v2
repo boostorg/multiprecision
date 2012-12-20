@@ -26,6 +26,8 @@ project : requirements
    <toolset>msvc:<runtime-link>static
    <toolset>msvc:<link>static
    <toolset>msvc:<warnings>all
+   <toolset>intel-win:<runtime-link>static
+   <toolset>intel-win:<link>static
    # Speed up compiles:
    <toolset>msvc:<debug-symbols>off
    <toolset>intel:<debug-symbols>off

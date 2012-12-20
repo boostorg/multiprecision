@@ -10,7 +10,7 @@ namespace boost{ namespace multiprecision{ namespace backends{ namespace detail{
 
 //
 // Simple routines for performing checked arithmetic with a builtin arithmetic type.
-// Note that is is not a complete header, it must be included as part of boost/multiprecision/cpp_int.hpp.
+// Note that this is not a complete header, it must be included as part of boost/multiprecision/cpp_int.hpp.
 //
 
 inline void raise_overflow(std::string op)

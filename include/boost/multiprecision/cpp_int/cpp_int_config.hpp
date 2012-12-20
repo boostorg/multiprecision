@@ -19,7 +19,7 @@ namespace detail{
 
 //
 // These traits calculate the largest type in the list
-// [unsigned] ong long, long, int, which has the specified number
+// [unsigned] long long, long, int, which has the specified number
 // of bits.  Note that intN_t and boost::int_t<N> find the first
 // member of the above list, not the last.  We want the last in the 
 // list to ensure that mixed arithmetic operations are as efficient 
@@ -61,7 +61,7 @@ struct largest_unsigned_type
    >::type type;
 };
 
-} // namepsace detail
+} // namespace detail
 
 #if defined(BOOST_HAS_INT128)
 

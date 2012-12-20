@@ -47,12 +47,12 @@
             Add assembly level routines to cpp_int_backend.
           </li>
 <li class="listitem">
-            Add an all C++ Boost licenced binary floating point type.
+            Add an all C++ Boost licensed binary floating point type.
           </li>
 <li class="listitem">
             Can ring types (exact floating point types) be supported? The answer
             should be yes, but someone needs to write it, the hard part is IO and
-            binary-decimal convertion.
+            binary-decimal conversion.
           </li>
 <li class="listitem">
             Should there be a choice of rounding mode (probably MPFR specific)?
@@ -114,8 +114,8 @@
             scheduled for inclusion: it's deliberately an implementation detail,
             and "optional" requirements are optimisations which can't be
             detected by the user). Not done: this is an implementation detail, the
-            exact list of requirements satisfied is purely an optimimization, not
-            something the user can detect.
+            exact list of requirements satisfied is purely an optimization, not something
+            the user can detect.
           </li>
 <li class="listitem">
             A backend for an overflow aware integers (done 2012/10/31).
@@ -148,7 +148,7 @@
           </li>
 <li class="listitem">
             It is unfortunate that the generic mp_number front end can not make use
-            contexpr as not all the backends can ensure this (done - we can go quite
+            constexpr as not all the backends can ensure this (done - we can go quite
             a way).
           </li>
 <li class="listitem">
@@ -185,7 +185,7 @@
             to TODO list.
           </li>
 <li class="listitem">
-            Make the exponent type for cpp_dec_float a templare parameter, maybe
+            Make the exponent type for cpp_dec_float a template parameter, maybe
             include support for big-integer exponents. Open question - what should
             be the default - int32_t or int64_t? (done 2012/09/06)
           </li>

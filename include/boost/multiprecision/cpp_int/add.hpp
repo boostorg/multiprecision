@@ -79,7 +79,7 @@ inline void add_unsigned(CppInt1& result, const CppInt2& a, const CppInt3& b) BO
 template <class CppInt1, class CppInt2>
 inline void add_unsigned(CppInt1& result, const CppInt2& a, const limb_type& o) BOOST_NOEXCEPT_IF(is_non_throwing_cpp_int<CppInt1>::value)
 {
-   // Addition using modular arithmatic.
+   // Addition using modular arithmetic.
    // Nothing fancy, just let uintmax_t take the strain:
    if(&result != &a)
       result.resize(a.size(), a.size());

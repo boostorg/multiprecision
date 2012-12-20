@@ -355,7 +355,7 @@ public:
    // even if the result of the operator *is never used*.
    // Possibly we could modify our expression wrapper to
    // execute the increment/decrement on destruction, but
-   // correct implemetation will be tricky, so defered for now...
+   // correct implementation will be tricky, so defered for now...
    //
    BOOST_MP_FORCEINLINE number& operator++()
    {
@@ -1687,7 +1687,7 @@ BOOST_MP_FORCEINLINE void swap(number<Backend, ExpressionTemplates>& a, number<B
    a.swap(b);
 }
 
-}  // namespace multipreciion
+}  // namespace multiprecision
 
 template <class T>
 class rational;
