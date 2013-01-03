@@ -43,7 +43,7 @@ typename boost::enable_if_c<boost::multiprecision::number_category<T>::value == 
 }
 
 template <class T>
-typename boost::disable_if_c<boost::multiprecision::number_category<T>::value == boost::multiprecision::number_kind_integer, T>::type relative_error(T a, T b)
+typename boost::disable_if_c<(boost::multiprecision::number_category<T>::value == boost::multiprecision::number_kind_integer) || boost::multiprecision::is_interval_number<T>::value, T>::type relative_error(T a, T b)
 {
    using std::abs;
    using detail::abs;
@@ -71,6 +71,7 @@ typename boost::disable_if_c<boost::multiprecision::number_category<T>::value ==
          b = min_val;
       else if((b > -min_val) && (b < 0))
          b = -min_val;
+
       return (std::max)(abs(T((a-b)/a)), abs(T((a-b)/b))) / std::numeric_limits<T>::epsilon();
    }
 
@@ -81,6 +82,7 @@ typename boost::disable_if_c<boost::multiprecision::number_category<T>::value ==
       a = min_val;
    if(abs(b) < min_val)
       b = min_val;
+
    return (std::max)(abs(T((a-b)/a)), abs(T((a-b)/b))) / std::numeric_limits<T>::epsilon();
 }
 
@@ -92,6 +94,14 @@ typename boost::mpl::if_c<boost::is_convertible<T, U>::value, U, T>::type
    return relative_error<cast_type>(static_cast<cast_type>(a), static_cast<cast_type>(b));
 }
 
+template <class T>
+typename boost::enable_if_c<boost::multiprecision::is_interval_number<T>::value, T>::type relative_error(T a, T b)
+{
+   typename boost::multiprecision::component_type<T>::type am = median(a);
+   typename boost::multiprecision::component_type<T>::type bm = median(b);
+   return relative_error<typename boost::multiprecision::component_type<T>::type>(am, bm);
+}
+   
 
 enum
 {

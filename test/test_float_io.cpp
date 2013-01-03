@@ -9,10 +9,11 @@
 #  define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#if !defined(TEST_MPF_50) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR_50)
+#if !defined(TEST_MPF_50) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50)
 #  define TEST_MPF_50
 #  define TEST_CPP_DEC_FLOAT
 #  define TEST_MPFR_50
+#  define TEST_MPFI_50
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -28,6 +29,9 @@
 #endif
 #if defined(TEST_MPFR_50)
 #include <boost/multiprecision/mpfr.hpp>
+#endif
+#if defined(TEST_MPFI_50)
+#include <boost/multiprecision/mpfi.hpp>
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
 #include <boost/multiprecision/cpp_dec_float.hpp>
@@ -281,6 +285,13 @@ void test_round_trip()
 int main()
 {
 #ifdef TEST_MPFR_50
+   test<boost::multiprecision::mpfr_float_50>();
+   test<boost::multiprecision::mpfr_float_100>();
+
+   test_round_trip<boost::multiprecision::mpfr_float_50>();
+   test_round_trip<boost::multiprecision::mpfr_float_100>();
+#endif
+#ifdef TEST_MPFI_50
    test<boost::multiprecision::mpfr_float_50>();
    test<boost::multiprecision::mpfr_float_100>();
 

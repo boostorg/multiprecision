@@ -9,6 +9,7 @@ import path ;
 local ntl-path = [ modules.peek : NTL_PATH ] ;
 local gmp_path = [ modules.peek : GMP_PATH ] ;
 local mpfr_path = [ modules.peek : MPFR_PATH ] ;
+local mpfi_path = [ modules.peek : MPFI_PATH ] ;
 local tommath_path = [ modules.peek : TOMMATH_PATH ] ;
 
 project : requirements
@@ -16,11 +17,15 @@ project : requirements
    <include>$(gmp_path)/mpfr
    <include>$(gmp_path)/gmpfrxx
    <include>$(mpfr_path)
+   <include>$(mpfi_path)
+   <include>$(mpfi_path)/src
    <include>$(tommath_path)
    <include>../../..
    <search>$(gmp_path)
    <search>$(mpfr_path)
    <search>$(mpfr_path)/build.vc10/lib/Win32/Debug
+   <search>$(mpfi_path) 
+   <search>$(mpfi_path)/src 
    <search>$(tommath_path)
    # We set these to make it easier to set up and test GMP and MPFR under Win32:
    <toolset>msvc:<runtime-link>static
@@ -41,6 +46,7 @@ local disable-concepts = [ MATCH (--disable-concepts) : [ modules.peek : ARGV ] 
 
 lib gmp ;
 lib mpfr ;
+lib mpfi ;
 
 if $(tommath_path)
 {
@@ -93,6 +99,8 @@ run test_arithmetic_cpp_int_br.cpp ;
 run test_arithmetic_ab_1.cpp ;
 run test_arithmetic_ab_2.cpp ;
 run test_arithmetic_ab_3.cpp ;
+
+run test_arithmetic_mpfi_50.cpp mpfi mpfr gmp : : : [ check-target-builds ../config//has_mpfi : : <build>no ] ;
 
 run test_numeric_limits.cpp
         : # command line
@@ -171,288 +179,44 @@ run test_numeric_limits.cpp
 	      <define>TEST_CPP_INT
         : test_numeric_limits_cpp_int ;
 
-run test_exp.cpp gmp
+run test_numeric_limits.cpp mpfi mpfr gmp
         : # command line
         : # input files
         : # requirements
-	      <define>TEST_MPF_50
-         [ check-target-builds ../config//has_gmp : : <build>no ]
-        : test_exp_mpf50 ;
+	      <define>TEST_MPFI_50
+         [ check-target-builds ../config//has_mpfi : : <build>no ]
+        : test_numeric_limits_mpfi_50 ;
 
-run test_log.cpp gmp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPF_50
-         [ check-target-builds ../config//has_gmp : : <build>no ]
-        : test_log_mpf50 ;
-
-run test_pow.cpp gmp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPF_50
-         [ check-target-builds ../config//has_gmp : : <build>no ]
-        : test_pow_mpf50 ;
-
-run test_sinh.cpp gmp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPF_50
-         [ check-target-builds ../config//has_gmp : : <build>no ]
-        : test_sinh_mpf50 ;
-
-run test_cosh.cpp gmp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPF_50
-         [ check-target-builds ../config//has_gmp : : <build>no ]
-        : test_cosh_mpf50 ;
-
-run test_tanh.cpp gmp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPF_50
-         [ check-target-builds ../config//has_gmp : : <build>no ]
-        : test_tanh_mpf50 ;
-
-run test_exp.cpp mpfr
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPFR_50
-         [ check-target-builds ../config//has_mpfr : : <build>no ]
-        : test_exp_mpfr50 ;
-
-run test_log.cpp mpfr
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPFR_50
-         [ check-target-builds ../config//has_mpfr : : <build>no ]
-        : test_log_mpfr50 ;
-
-run test_pow.cpp mpfr
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPFR_50
-         [ check-target-builds ../config//has_mpfr : : <build>no ]
-        : test_pow_mpfr50 ;
-
-run test_sinh.cpp mpfr
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPFR_50
-         [ check-target-builds ../config//has_mpfr : : <build>no ]
-        : test_sinh_mpfr50 ;
-
-run test_cosh.cpp mpfr
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPFR_50
-         [ check-target-builds ../config//has_mpfr : : <build>no ]
-        : test_cosh_mpfr50 ;
-
-run test_tanh.cpp mpfr
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPFR_50
-         [ check-target-builds ../config//has_mpfr : : <build>no ]
-        : test_tanh_mpfr50 ;
-
-run test_exp.cpp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_CPP_DEC_FLOAT
-        : test_exp_cpp_dec_float ;
-
-run test_sqrt.cpp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_CPP_DEC_FLOAT
-        : test_sqrt_cpp_dec_float ;
-
-run test_log.cpp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_CPP_DEC_FLOAT
-        : test_log_cpp_dec_float ;
-
-run test_pow.cpp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_CPP_DEC_FLOAT
-        : test_pow_cpp_dec_float ;
-
-run test_sinh.cpp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_CPP_DEC_FLOAT
-        : test_sinh_cpp_dec_float ;
-
-run test_cosh.cpp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_CPP_DEC_FLOAT
-        : test_cosh_cpp_dec_float ;
-
-run test_tanh.cpp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_CPP_DEC_FLOAT
-        : test_tanh_cpp_dec_float ;
-
-run test_sin.cpp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_CPP_DEC_FLOAT
-        : test_sin_cpp_dec_float ;
-
-run test_sin.cpp gmp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPF_50
-         [ check-target-builds ../config//has_gmp : : <build>no ]
-        : test_sin_mpf50 ;
-
-run test_sin.cpp mpfr
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPFR_50
-         [ check-target-builds ../config//has_mpfr : : <build>no ]
-        : test_sin_mpfr_50 ;
-
-run test_cos.cpp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_CPP_DEC_FLOAT
-        : test_cos_cpp_dec_float ;
-
-run test_cos.cpp gmp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPF_50
-         [ check-target-builds ../config//has_gmp : : <build>no ]
-        : test_cos_mpf50 ;
-
-run test_cos.cpp mpfr
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPFR_50
-         [ check-target-builds ../config//has_mpfr : : <build>no ]
-        : test_cos_mpfr_50 ;
-
-run test_asin.cpp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_CPP_DEC_FLOAT
-        : test_asin_cpp_dec_float ;
-
-run test_asin.cpp gmp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPF_50
-         [ check-target-builds ../config//has_gmp : : <build>no ]
-        : test_asin_mpf50 ;
-
-run test_asin.cpp mpfr
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPFR_50
-         [ check-target-builds ../config//has_mpfr : : <build>no ]
-        : test_asin_mpfr_50 ;
-
-run test_acos.cpp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_CPP_DEC_FLOAT
-        : test_acos_cpp_dec_float ;
-
-run test_acos.cpp gmp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPF_50
-         [ check-target-builds ../config//has_gmp : : <build>no ]
-        : test_acos_mpf50 ;
-
-run test_acos.cpp mpfr
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPFR_50
-         [ check-target-builds ../config//has_mpfr : : <build>no ]
-        : test_acos_mpfr_50 ;
-
-run test_atan.cpp gmp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPF_50
-         [ check-target-builds ../config//has_gmp : : <build>no ]
-        : test_atan_mpf50 ;
-
-run test_atan.cpp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_CPP_DEC_FLOAT
-        : test_atan_cpp_dec_float ;
-
-run test_atan.cpp mpfr
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPFR_50
-         [ check-target-builds ../config//has_mpfr : : <build>no ]
-        : test_atan_mpfr_50 ;
-
-run test_tan.cpp gmp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPF_50
-         [ check-target-builds ../config//has_gmp : : <build>no ]
-        : test_tan_mpf50 ;
-
-run test_tan.cpp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_CPP_DEC_FLOAT
-        : test_tan_cpp_dec_float ;
-
-run test_tan.cpp mpfr
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPFR_50
-         [ check-target-builds ../config//has_mpfr : : <build>no ]
-        : test_tan_mpfr_50 ;
+for local source in test_exp.cpp test_log.cpp test_pow.cpp test_sinh.cpp test_sqrt.cpp test_cosh.cpp test_tanh.cpp test_sin.cpp test_cos.cpp test_tan.cpp test_asin.cpp test_acos.cpp test_atan.cpp test_round.cpp test_fpclassify.cpp
+{
+      run $(source) gmp
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            <define>TEST_MPF_50
+           : $(source:B)_mpf50 ;
+      run $(source) mpfr gmp
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_mpfr : : <build>no ]
+            <define>TEST_MPFR_50
+           : $(source:B)_mpfr50 ;
+      run $(source) mpfi mpfr gmp
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_mpfi : : <build>no ]
+            <define>TEST_MPFI_50
+           : $(source:B)_mpfi50 ;
+      run $(source)
+           : # command line
+           : # input files
+           : # requirements
+            <define>TEST_CPP_DEC_FLOAT
+           : $(source:B)_cpp_dec_float ;
+}
 
 run test_gmp_conversions.cpp gmp
         : # command line
@@ -465,66 +229,6 @@ run test_mpfr_conversions.cpp gmp mpfr
         : # input files
         : # requirements
          [ check-target-builds ../config//has_mpfr : : <build>no ] ;
-
-run test_round.cpp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_BACKEND
-        : test_round_backend_concept ;
-
-run test_round.cpp gmp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPF_50
-         [ check-target-builds ../config//has_gmp : : <build>no ]
-        : test_round_mpf50 ;
-
-run test_round.cpp mpfr
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPFR_50
-         [ check-target-builds ../config//has_mpfr : : <build>no ]
-        : test_round_mpfr_50 ;
-
-run test_round.cpp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_CPP_DEC_FLOAT
-        : test_round_cpp_dec_float ;
-
-run test_fpclassify.cpp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_BACKEND
-        : test_fpclassify_backend_concept ;
-
-run test_fpclassify.cpp gmp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPF_50
-         [ check-target-builds ../config//has_gmp : : <build>no ]
-        : test_fpclassify_mpf50 ;
-
-run test_fpclassify.cpp mpfr
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_MPFR_50
-         [ check-target-builds ../config//has_mpfr : : <build>no ]
-        : test_fpclassify_mpfr_50 ;
-
-run test_fpclassify.cpp
-        : # command line
-        : # input files
-        : # requirements
-	      <define>TEST_CPP_DEC_FLOAT
-        : test_fpclassify_cpp_dec_float ;
 
 run test_constants.cpp gmp
         : # command line
@@ -609,6 +313,15 @@ run test_float_io.cpp mpfr gmp
          release # Otherwise runtime is slow
          [ check-target-builds ../config//has_mpfr : : <build>no ]
         : test_float_io_mpfr ;
+
+run test_float_io.cpp mpfi mpfr gmp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_MPFI_50
+         release # Otherwise runtime is slow
+         [ check-target-builds ../config//has_mpfi : : <build>no ]
+        : test_float_io_mpfi ;
 
 run test_int_io.cpp $(TOMMATH)
         : # command line

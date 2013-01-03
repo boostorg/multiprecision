@@ -579,7 +579,7 @@ inline typename enable_if_c<is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits
    //
    // Find the index of the least significant bit within that limb:
    //
-   return find_lsb(*a.limbs(), mpl::int_<CHAR_BIT * sizeof(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::local_limb_type)>());
+   return find_lsb(*a.limbs(), mpl::int_<CHAR_BIT * sizeof(typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::local_limb_type)>());
 }
 
 #ifdef BOOST_MSVC

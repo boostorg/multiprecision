@@ -8,6 +8,7 @@ import path ;
 
 local gmp_path = [ modules.peek : GMP_PATH ] ;
 local mpfr_path = [ modules.peek : MPFR_PATH ] ;
+local mpfi_path = [ modules.peek : MPFI_PATH ] ;
 local tommath_path = [ modules.peek : TOMMATH_PATH ] ;
 
 project : requirements 
@@ -15,12 +16,16 @@ project : requirements
    <include>$(gmp_path)/mpfr 
    <include>$(gmp_path)/gmpfrxx 
    <include>$(mpfr_path)
+   <include>$(mpfi_path)
+   <include>$(mpfi_path)/src
    <include>$(tommath_path)
    <include>../../.. 
    <search>$(gmp_path) 
    <search>$(mpfr_path) 
    <search>$(mpfr_path)/build.vc10/lib/Win32/Debug
    <search>$(tommath_path) 
+   <search>$(mpfi_path) 
+   <search>$(mpfi_path)/src 
    # We set these to make it easier to set up and test GMP and MPFR under Win32:
    <toolset>msvc:<runtime-link>static
    <toolset>msvc:<link>static
@@ -33,14 +38,18 @@ project : requirements
 
 lib gmp ;
 lib mpfr ;
+lib mpfi ;
 
 exe has_gmp : has_gmp.cpp gmp :
       <include>$(gmp_path) <include>$(gmp_path)/mpfr <include>$(gmp_path)/gmpfrxx ;
 exe has_mpfr : has_mpfr.cpp mpfr gmp :
+      <include>$(mpfr_path) <include>$(gmp_path)/mpfr <include>$(gmp_path)/gmpfrxx <include>$(gmp_path) ;
+exe has_mpfi : has_mpfi.cpp mpfi mpfr gmp :
       <include>$(mpfr_path) <include>$(gmp_path)/mpfr <include>$(gmp_path)/gmpfrxx <include>$(gmp_path) ;
 obj has_tommath : has_tommath.cpp :
       <include>$(tommath_path) ;
 
 explicit has_gmp ;
 explicit has_mpfr ;
+explicit has_mpfi ;
 explicit has_tommath ;

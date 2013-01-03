@@ -701,6 +701,10 @@ template <class Backend, expression_template_option ExpressionTemplates>
 struct is_unsigned_number<number<Backend, ExpressionTemplates> > : public is_unsigned_number<Backend> {};
 template <class T>
 struct is_signed_number : public mpl::bool_<!is_unsigned_number<T>::value> {};
+template <class T>
+struct is_interval_number : public mpl::false_ {};
+template <class Backend, expression_template_option ExpressionTemplates>
+struct is_interval_number<number<Backend, ExpressionTemplates> > : public is_interval_number<Backend>{};
 
 }} // namespaces
 

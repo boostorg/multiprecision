@@ -16,11 +16,12 @@
 #include <boost/array.hpp>
 #include "test.hpp"
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ)
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50)
 #  define TEST_MPF_50
 //#  define TEST_MPF
 #  define TEST_BACKEND
 #  define TEST_CPP_DEC_FLOAT
+#  define TEST_MPFI_50
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -36,6 +37,9 @@
 #endif
 #if defined(TEST_MPFR_50)
 #include <boost/multiprecision/mpfr.hpp>
+#endif
+#if defined(TEST_MPFI_50)
+#include <boost/multiprecision/mpfi.hpp>
 #endif
 #ifdef TEST_BACKEND
 #include <boost/multiprecision/concepts/mp_number_archetypes.hpp>
@@ -194,9 +198,13 @@ void test()
    err = relative_error(T(atan2(T(0), T(1))), atan2_def(T(0), T(1))).template convert_to<unsigned>();
    if(err > max_err)
       max_err = err;
-   err = relative_error(T(atan2(T(0), T(-1))), atan2_def(T(0), T(-1))).template convert_to<unsigned>();
-   if(err > max_err)
-      max_err = err;
+   if(!boost::multiprecision::is_interval_number<T>::value)
+   {
+      // We don't test this with intervals as [-0,0] leads to strange behaviour in atan2...
+      err = relative_error(T(atan2(T(0), T(-1))), atan2_def(T(0), T(-1))).template convert_to<unsigned>();
+      if(err > max_err)
+         max_err = err;
+   }
 
    T pi;
    pi.backend() = boost::multiprecision::default_ops::get_constant_pi<typename T::backend_type>();
@@ -245,6 +253,10 @@ int main()
 #ifdef TEST_MPFR_50
    test<boost::multiprecision::mpfr_float_50>();
    test<boost::multiprecision::mpfr_float_100>();
+#endif
+#ifdef TEST_MPFI_50
+   test<boost::multiprecision::mpfi_float_50>();
+   test<boost::multiprecision::mpfi_float_100>();
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
    test<boost::multiprecision::cpp_dec_float_50>();
