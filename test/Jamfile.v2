@@ -72,6 +72,7 @@ run test_arithmetic_mpq.cpp gmp : : : [ check-target-builds ../config//has_gmp :
 
 run test_arithmetic_mpfr.cpp mpfr gmp : : : [ check-target-builds ../config//has_mpfr : : <build>no ] ;
 run test_arithmetic_mpfr_50.cpp mpfr gmp : : : [ check-target-builds ../config//has_mpfr : : <build>no ] ;
+run test_arithmetic_mpfr_50_static.cpp mpfr gmp : : : [ check-target-builds ../config//has_mpfr : : <build>no ] ;
 
 run test_arithmetic_tommath.cpp $(TOMMATH) : : : [ check-target-builds ../config//has_tommath : : <build>no ] ;
 run test_arithmetic_tommath_br.cpp $(TOMMATH) : : : [ check-target-builds ../config//has_tommath : : <build>no ] ;
