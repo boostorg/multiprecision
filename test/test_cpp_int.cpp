@@ -109,6 +109,24 @@ struct tester
       BOOST_CHECK_EQUAL((mpz_int(-a)%=b).str(), (test_type(-a1) %= b1).str());
       BOOST_CHECK_EQUAL(mpz_int(a % d).str(), test_type(a1 % d1).str());
       BOOST_CHECK_EQUAL((mpz_int(a)%=d).str(), (test_type(a1) %= d1).str());
+
+      if(!std::numeric_limits<test_type>::is_bounded)
+      {
+         test_type p = a1 * b1;
+         test_type r;
+         divide_qr(p, b1, p, r);
+         BOOST_CHECK_EQUAL(p, a1);
+         BOOST_CHECK_EQUAL(r, test_type(0));
+
+         p = a1 * d1;
+         divide_qr(p, d1, p, r);
+         BOOST_CHECK_EQUAL(p, a1);
+         BOOST_CHECK_EQUAL(r, test_type(0));
+
+         divide_qr(p, test_type(1), p, r);
+         BOOST_CHECK_EQUAL(p, a1);
+         BOOST_CHECK_EQUAL(r, test_type(0));
+      }
    }
 
    void t2()
@@ -335,9 +353,47 @@ struct tester
       BOOST_CHECK_EQUAL(lsb(a), lsb(a1));
    }
 
+   void test_bug_cases()
+   {
+      if(!std::numeric_limits<test_type>::is_bounded)
+      {
+         // https://svn.boost.org/trac/boost/ticket/7878
+         test_type a("0x1000000000000000000000000000000000000000000000000000000000000000");
+         test_type b = 0xFFFFFFFF;
+         test_type c = a * b + b;  // quotient has 1 in the final place
+         test_type q, r;
+         divide_qr(c, b, q, r);
+         BOOST_CHECK_EQUAL(a + 1, q);
+         BOOST_CHECK_EQUAL(r, 0);
+
+         b = static_cast<test_type>("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+         c = a * b + b;  // quotient has 1 in the final place
+         divide_qr(c, b, q, r);
+         BOOST_CHECK_EQUAL(a + 1, q);
+         BOOST_CHECK_EQUAL(r, 0);
+         //
+         // Not a bug, but test some other special cases that don't otherwise occur through
+         // random testing:
+         //
+         c = a * b; // quotient has zero in the final place
+         divide_qr(c, b, q, r);
+         BOOST_CHECK_EQUAL(q, a);
+         BOOST_CHECK_EQUAL(r, 0);
+         divide_qr(c, a, q, r);
+         BOOST_CHECK_EQUAL(q, b);
+         BOOST_CHECK_EQUAL(r, 0);
+         ++c;
+         divide_qr(c, b, q, r);
+         BOOST_CHECK_EQUAL(q, a);
+         BOOST_CHECK_EQUAL(r, 1);
+      }
+   }
+
    void test()
    {
       using namespace boost::multiprecision;
+
+      test_bug_cases();
 
       last_error_count = 0;
 

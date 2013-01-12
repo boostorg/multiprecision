@@ -423,9 +423,9 @@ void divide_unsigned_helper(
          }
       }
    }
-   // Termination condition is really just a check that r > y, but with two common
+   // Termination condition is really just a check that r >= y, but with two common
    // short-circuit cases handled first:
-   while(r_order || (pr[r_order] > y));
+   while(r_order || (pr[r_order] >= y));
 
    if(result)
    {
