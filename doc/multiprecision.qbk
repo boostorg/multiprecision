@@ -513,7 +513,7 @@ The latter is an optimisation for larger fixed precision integers, so that a 102
 characteristics as a 128-bit integer, rather than being 4 times slower for addition and 16 times slower for multiplication
  (assuming the values involved would always fit in 128 bits).
 Typically this means you can use
-an integer type wide enough for the "worst case senario" with only minor performance degradation even if most of the time
+an integer type wide enough for the "worst case scenario" with only minor performance degradation even if most of the time
 the arithmetic could in fact be done with a narrower type.
 * When used at fixed precision and MaxBits is smaller than the number of bits in the largest native integer type, then
 internally `cpp_int_backend` switches to a "trivial" implementation where it is just a thin wrapper around a single
@@ -757,8 +757,7 @@ as a valid floating point number.
 [endsect]
 
 [section:mpfr_float mpfr_float]
-
-`#include <boost/multiprecision/mpfr_float.hpp>`
+`#include <boost/multiprecision/mpfr.hpp>`
 
    namespace boost{ namespace multiprecision{
 
@@ -819,7 +818,7 @@ copy constructible and assignable from:
 * The [mpfr] native type `mpfr_t`.
 * The `number` wrappers around those types: `number<mpfr_float_backend<M> >`, `number<mpf_float<M> >`, `number<gmp_int>`, `number<gmp_rational>`.
 
-It's also possible to access the underlying `mpf_t` via the data() member function of `gmp_float`.
+It's also possible to access the underlying `mpfr_t` via the data() member function of `mpfr_float_backend`.
 
 Things you should know when using this type:
 
@@ -1841,7 +1840,7 @@ such as fixed precision or complex types are added to the library later, then th
 
 The precision of these functions is generally determined by the backend implementation.  For example the precision
 of these functions when used with __mpfr_float_backend is determined entirely by [mpfr].  When these functions use our own
-implementations, the accuracy of the transcendental functions is generally a few epsilon.  Note however, that the trigonmetrical
+implementations, the accuracy of the transcendental functions is generally a few epsilon.  Note however, that the trigonometrical
 functions incur the usual accuracy loss when reducing arguments by large multiples of [pi].  Also note that both __mpf_float
 and __cpp_dec_float have a number of guard digits beyond their stated precision, so the error rates listed for these
 are in some sense artificially low.
@@ -2060,7 +2059,7 @@ whose precision can vary at compile time (such as `mpf_float`).
 
    }} // namespaces
 
-Class template `cpp_int_backend` fulfills all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
+Class template `cpp_int_backend` fulfils all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
 Its members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
 to change.
 
@@ -2101,7 +2100,7 @@ More information on this type can be found in the [link boost_multiprecision.tut
 
    }} // namespaces
 
-Class template `gmp_int` fulfills all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
+Class template `gmp_int` fulfils all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
 Its members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
 to change.
 
@@ -2121,7 +2120,7 @@ More information on this type can be found in the [link boost_multiprecision.tut
 
    }} // namespaces
 
-Class template `tommath_int` fulfills all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
+Class template `tommath_int` fulfils all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
 Its members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
 to change.
 
@@ -2146,7 +2145,7 @@ More information on this type can be found in the [link boost_multiprecision.tut
 
    }} // namespaces
 
-Class template `gmp_float` fulfills all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
+Class template `gmp_float` fulfils all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
 Its members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
 to change.
 
@@ -2177,7 +2176,7 @@ More information on this type can be found in the [link boost_multiprecision.tut
 
    }} // namespaces
 
-Class template `mpfr_float_backend` fulfills all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
+Class template `mpfr_float_backend` fulfils all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
 Its members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
 to change.
 
@@ -2205,7 +2204,7 @@ More information on this type can be found in the [link boost_multiprecision.tut
 
    }} // namespaces
 
-Class template `cpp_dec_float` fulfills all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
+Class template `cpp_dec_float` fulfils all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
 Its members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
 to change.
 
@@ -2837,7 +2836,7 @@ Windows Vista machine.
 
 [endsect]
 
-[section:float_performance Float Algorithm Perfomance]
+[section:float_performance Float Algorithm Performance]
 
 Note that these tests are carefully designed to test performance of the underlying algorithms
 and not memory allocation or variable copying.  As usual, performance results should be taken
@@ -2973,7 +2972,7 @@ Windows Vista machine.
 
 [endsect]
 
-[section:integer_performance Integer Algorithm Perfomance]
+[section:integer_performance Integer Algorithm Performance]
 
 Note that these tests are carefully designed to test performance of the underlying algorithms
 and not memory allocation or variable copying.  As usual, performance results should be taken
@@ -3215,7 +3214,7 @@ Linux x86_64 results are broadly similar, except that libtommath performs much b
 
 [endsect]
 
-[section:rational_performance Rational Type Perfomance]
+[section:rational_performance Rational Type Performance]
 
 Note that these tests are carefully designed to test performance of the underlying algorithms
 and not memory allocation or variable copying.  As usual, performance results should be taken
@@ -3336,6 +3335,12 @@ Windows Vista machine.
 [section:map Roadmap]
 
 [section:hist History]
+
+[h4 1.53]
+
+* First Release.
+* Fix bug in [@https://svn.boost.org/trac/boost/ticket/7878 cpp_int division].
+* Fix issue [@https://svn.boost.org/trac/boost/ticket/7806 #7806].
 
 [h4 Post review changes]
 
