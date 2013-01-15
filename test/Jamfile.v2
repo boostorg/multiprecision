@@ -101,6 +101,9 @@ run test_arithmetic_ab_1.cpp ;
 run test_arithmetic_ab_2.cpp ;
 run test_arithmetic_ab_3.cpp ;
 
+run test_arithmetic_logged_1.cpp ;
+run test_arithmetic_logged_2.cpp ;
+
 run test_arithmetic_mpfi_50.cpp mpfi mpfr gmp : : : [ check-target-builds ../config//has_mpfi : : <build>no ] ;
 
 run test_numeric_limits.cpp
@@ -439,6 +442,18 @@ run ../example/mpfr_snips.cpp mpfr
         : # requirements
          [ check-target-builds ../config//has_mpfr : : <build>no ] ;
 
+run ../example/mpfi_snips.cpp mpfi mpfr gmp
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_mpfi : : <build>no ] ;
+
+run ../example/logged_adapter.cpp mpfi mpfr gmp
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_mpfi : : <build>no ] ;
+
 run ../example/cpp_dec_float_snips.cpp ;
 run ../example/cpp_int_snips.cpp ;
 
@@ -595,8 +610,12 @@ if ! $(disable-concepts)
 	            <define>TEST_BACKEND
                <debug-symbols>off
               : $(source:B)_backend_concept ;
+
+      compile $(source)
+              : # requirements
+	            <define>TEST_LOGGED_ADAPTER
+               <debug-symbols>off
+              : $(source:B)_logged_adapter ;
    }
 }
-
-
 

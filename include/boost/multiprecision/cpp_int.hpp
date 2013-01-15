@@ -1731,7 +1731,7 @@ public:
 
 } // namespace backends
 
-namespace detail{
+namespace default_ops{
 
 template <class Backend>
 struct double_precision_type;

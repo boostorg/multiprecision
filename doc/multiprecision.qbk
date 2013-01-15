@@ -21,14 +21,17 @@
 [include html4_symbols.qbk]
 [import ../example/gmp_snips.cpp]
 [import ../example/mpfr_snips.cpp]
+[import ../example/mpfi_snips.cpp]
 [import ../example/cpp_dec_float_snips.cpp]
 [import ../example/tommath_snips.cpp]
 [import ../example/cpp_int_snips.cpp]
 [import ../example/random_snips.cpp]
 [import ../example/safe_prime.cpp]
 [import ../example/mixed_integer_arithmetic.cpp]
+[import ../example/logged_adapter.cpp]
 
 [template mpfr[] [@http://www.mpfr.org MPFR]]
+[template mpfi[] [@http://perso.ens-lyon.fr/nathalie.revol/software.html MPFI]]
 [template gmp[] [@http://gmplib.org GMP]]
 [template mpf_class[] [@http://gmplib.org/manual/C_002b_002b-Interface-Floats.html#C_002b_002b-Interface-Floats mpf_class]]
 [template mpfr_class[] [@http://math.berkeley.edu/~wilken/code/gmpfrxx/ mpfr_class]]
@@ -513,7 +516,7 @@ The latter is an optimisation for larger fixed precision integers, so that a 102
 characteristics as a 128-bit integer, rather than being 4 times slower for addition and 16 times slower for multiplication
  (assuming the values involved would always fit in 128 bits).
 Typically this means you can use
-an integer type wide enough for the "worst case senario" with only minor performance degradation even if most of the time
+an integer type wide enough for the "worst case scenario" with only minor performance degradation even if most of the time
 the arithmetic could in fact be done with a narrower type.
 * When used at fixed precision and MaxBits is smaller than the number of bits in the largest native integer type, then
 internally `cpp_int_backend` switches to a "trivial" implementation where it is just a thin wrapper around a single
@@ -758,7 +761,7 @@ as a valid floating point number.
 
 [section:mpfr_float mpfr_float]
 
-`#include <boost/multiprecision/mpfr_float.hpp>`
+`#include <boost/multiprecision/mpfr.hpp>`
 
    namespace boost{ namespace multiprecision{
 
@@ -819,7 +822,7 @@ copy constructible and assignable from:
 * The [mpfr] native type `mpfr_t`.
 * The `number` wrappers around those types: `number<mpfr_float_backend<M> >`, `number<mpf_float<M> >`, `number<gmp_int>`, `number<gmp_rational>`.
 
-It's also possible to access the underlying `mpf_t` via the data() member function of `gmp_float`.
+It's also possible to access the underlying `mpfr_t` via the data() member function of `mpfr_float_backend`.
 
 Things you should know when using this type:
 
@@ -877,6 +880,143 @@ as a valid floating point number.
 [POLY]
 
 [endsect]
+
+[endsect]
+
+[endsect]
+
+[section:interval Interval Number Types]
+
+There is one currently only one interval number type supported - [mpfi].
+
+[section:mpfi mpfi_float]
+
+`#include <boost/multiprecision/mpfi.hpp>`
+
+   namespace boost{ namespace multiprecision{
+
+   template <unsigned Digits10>
+   class mpfi_float_backend;
+
+   typedef number<mpfi_float_backend<50> >    mpfi_float_50;
+   typedef number<mpfi_float_backend<100> >   mpfifloat_100;
+   typedef number<mpfi_float_backend<500> >   mpfifloat_500;
+   typedef number<mpfi_float_backend<1000> >  mpfi_float_1000;
+   typedef number<mpfi_float_backend<0> >     mpfi_float;
+
+   }} // namespaces
+
+The `mpfi_float_backend` type is used in conjunction with `number`: It acts as a thin wrapper around the [mpfi] `mpfi_t`
+to provide an real-number type that is a drop-in replacement for the native C++ floating-point types, but with 
+much greater precision and implementing interval arithmetic.
+
+Type `mpfi_float_backend` can be used at fixed precision by specifying a non-zero `Digits10` template parameter, or
+at variable precision by setting the template argument to zero.  The typedefs mpfi_float_50, mpfi_float_100,
+mpfi_float_500, mpfi_float_1000 provide arithmetic types at 50, 100, 500 and 1000 decimal digits precision
+respectively.  The typedef mpfi_float provides a variable precision type whose precision can be controlled via the
+`number`s member functions.
+
+[note This type only provides `numeric_limits` support when the precision is fixed at compile time.]
+
+As well as the usual conversions from arithmetic and string types, instances of `number<mpfi_float_backend<N> >` are
+copy constructible and assignable from:
+
+* The [mpfi] native type `mpfi_t`.
+* The `number` wrappers around [mpfi] or [mpfr]: `number<mpfi_float_backend<M> >` and `number<mpfr_float<M> >`.
+* There is a two argument constructor taking two `number<mpfr_float<M> >` arguments specifying the interval.
+
+It's also possible to access the underlying `mpfi_t` via the data() member function of `mpfi_float_backend`.
+
+Things you should know when using this type:
+
+* A default constructed `mpfi_float_backend` is set to a NaN (this is the default [mpfi] behavior).
+* No changes are made to [gmp] or [mpfr] global settings, so this type can coexist with existing
+[mpfr] or [gmp] code.
+* The code can equally use [mpir] in place of [gmp] - indeed that is the preferred option on Win32.
+* This backend supports rvalue-references and is move-aware, making instantiations of `number` on this backend move aware.
+* Conversion from a string results in a `std::runtime_error` being thrown if the string can not be interpreted 
+as a valid floating point number.
+* Division by zero results in an infinity.
+
+There are some additional non member functions for working on intervals:
+
+	template <unsigned Digits10, expression_template_option ExpressionTemplates>
+	number<mpfr_float_backend<Digits10>, ExpressionTemplates> lower(const number<mpfi_float_backend<Digits10>, ExpressionTemplates>& val);
+
+Returns the lower end of the interval.
+
+	template <unsigned Digits10, expression_template_option ExpressionTemplates>
+	number<mpfr_float_backend<Digits10>, ExpressionTemplates> upper(const number<mpfi_float_backend<Digits10>, ExpressionTemplates>& val);
+
+Returns the upper end of the interval.
+
+	template <unsigned Digits10, expression_template_option ExpressionTemplates>
+	number<mpfr_float_backend<Digits10>, ExpressionTemplates> median(const number<mpfi_float_backend<Digits10>, ExpressionTemplates>& val);
+
+Returns the mid point of the interval.
+
+	template <unsigned Digits10, expression_template_option ExpressionTemplates>
+	number<mpfr_float_backend<Digits10>, ExpressionTemplates> width(const number<mpfi_float_backend<Digits10>, ExpressionTemplates>& val);
+
+Returns the absolute width of the interval.
+
+	template <unsigned Digits10, expression_template_option ExpressionTemplates>
+	number<mpfi_float_backend<Digits10>, ExpressionTemplates> intersect(
+		const number<mpfi_float_backend<Digits10>, ExpressionTemplates>& a, 
+		const number<mpfi_float_backend<Digits10>, ExpressionTemplates>&  b);
+
+Returns the interval which is the intersection of the ['a] and ['b].  Returns an 
+unspecified empty interval if there is no such intersection.
+
+	template <unsigned Digits10, expression_template_option ExpressionTemplates>
+	number<mpfi_float_backend<Digits10>, ExpressionTemplates> hull(
+		const number<mpfi_float_backend<Digits10>, ExpressionTemplates>& a, 
+		const number<mpfi_float_backend<Digits10>, ExpressionTemplates>&  b);
+
+Returns the interval which is the union of ['a] and ['b].
+
+	template <unsigned Digits10, expression_template_option ExpressionTemplates>
+	bool overlap(const number<mpfi_float_backend<Digits10>, ExpressionTemplates>& a, 
+	             const number<mpfi_float_backend<Digits10>, ExpressionTemplates>&  b);
+
+Returns `true` only if the intervals ['a] and ['b] overlap.
+
+	template <unsigned Digits10, expression_template_option ExpressionTemplates1, expression_template_option ExpressionTemplates2>
+	bool in(const number<mpfr_float_backend<Digits10>, ExpressionTemplates1>& a, 
+	        const number<mpfi_float_backend<Digits10>, ExpressionTemplates2>&  b);
+
+Returns `true` only if point ['a] is contained within the interval ['b].
+
+	template <unsigned Digits10, expression_template_option ExpressionTemplates>
+	bool zero_in(const number<mpfi_float_backend<Digits10>, ExpressionTemplates>& a);
+
+Returns `true` only if the interval ['a] contains the value zero.
+
+	template <unsigned Digits10, expression_template_option ExpressionTemplates>
+	bool subset(const number<mpfi_float_backend<Digits10>, ExpressionTemplates>& a, 
+	            const number<mpfi_float_backend<Digits10>, ExpressionTemplates>& b);
+
+Returns `true` only if ['a] is a subset of ['b].
+
+	template <unsigned Digits10, expression_template_option ExpressionTemplates>
+	bool proper_subset(const number<mpfi_float_backend<Digits10>, ExpressionTemplates>& a, 
+	                   const number<mpfi_float_backend<Digits10>, ExpressionTemplates>& b);
+
+Returns `true` only if ['a] is a proper subset of ['b].
+
+	template <unsigned Digits10, expression_template_option ExpressionTemplates>
+	bool empty(const number<mpfi_float_backend<Digits10>, ExpressionTemplates>& a);
+
+Returns `true` only if ['a] is an empty interval, equivalent to `upper(a) < lower(a)`.
+
+	template <unsigned Digits10, expression_template_option ExpressionTemplates>
+	bool singleton(const number<mpfi_float_backend<Digits10>, ExpressionTemplates>& a);
+
+Returns `true` if `lower(a) == upper(a)`.
+
+[h5 [mpfi] example:]
+
+[mpfi_eg]
 
 [endsect]
 
@@ -1053,6 +1193,64 @@ So for example, given an integer back-end type `MyIntegerBackend`, the use would
    r /= 3;
    MyInt i = numerator(r);
    assert(i == 2);
+
+[endsect]
+
+[endsect]
+
+[section:misc Miscellaneous Number Types.]
+
+Backend types listed in this section are predominantly designed to aid debugging.
+
+[section:logged_adapter logged_adapter]
+
+`#include <boost/multiprecision/logged_adapter.hpp>`
+
+   namespace boost{ namespace multiprecision{
+
+   template <class Backend>
+   void log_postfix_event(const Backend& result, const char* event_description);
+   template <class Backend, class T>
+   void log_postfix_event(const Backend& result1, const T& result2, const char* event_description);
+
+   template <class Backend>
+   void log_prefix_event(const Backend& arg1, const char* event_description);
+   template <class Backend, class T>
+   void log_prefix_event(const Backend& arg1, const T& arg2, const char* event_description);
+   template <class Backend, class T, class U>
+   void log_prefix_event(const Backend& arg1, const T& arg2, const U& arg3, const char* event_description);
+   template <class Backend, class T, class U, class V>
+   void log_prefix_event(const Backend& arg1, const T& arg2, const U& arg3, const V& arg4, const char* event_description);
+
+   template <Backend>
+   class logged_adapter;
+
+   }} // namespaces
+
+The `logged_adapter` type is used in conjunction with `number` and some other backend type: it acts as a thin wrapper around 
+some other backend to class `number` and logs all the events that take place on that object.  Before any number operation takes
+place, it calls `log_prefix_event` with the arguments to the operation (up to 4), plus a string describing the operation.
+Then after the operation it calls `log_postfix_event` with the result of the operation, plus a string describing the operation.
+Optionally, `log_postfix_event` takes a second result argument: this occurs when the result of the operation is not a `number`,
+for example when `fpclassify` is called, `log_postfix_event` will be called with `result1` being the argument to the function, and
+`result2` being the integer result of `fpclassify`.
+
+The default versions of `log_prefix_event` and `log_postfix_event` do nothing, it is therefore up to the user to overload these
+for the particular backend being observed.
+
+This type provides `numeric_limits` support whenever the template argument Backend does so.
+
+This type is particularly useful when combined with an interval number type - in this case we can use `log_postfix_event`
+to monitor the error accumulated after each operation.  We could either set some kind of trap whenever the accumulated error
+exceeds some threshold, or simply print out diagnostic information.  Using this technique we can quickly locate the cause of
+numerical instability in a particular routine.  The following example demonstrates this technique in a trivial algorithm
+that deliberately introduces cancellation error:
+
+[logged_adapter]
+
+When we examine program output we can clearly see that the diameter of the interval increases after each subtraction:
+
+[logged_adapter_output]
 
 [endsect]
 
@@ -1841,7 +2039,7 @@ such as fixed precision or complex types are added to the library later, then th
 
 The precision of these functions is generally determined by the backend implementation.  For example the precision
 of these functions when used with __mpfr_float_backend is determined entirely by [mpfr].  When these functions use our own
-implementations, the accuracy of the transcendental functions is generally a few epsilon.  Note however, that the trigonmetrical
+implementations, the accuracy of the transcendental functions is generally a few epsilon.  Note however, that the trigonometrical
 functions incur the usual accuracy loss when reducing arguments by large multiples of [pi].  Also note that both __mpf_float
 and __cpp_dec_float have a number of guard digits beyond their stated precision, so the error rates listed for these
 are in some sense artificially low.
@@ -2060,7 +2258,7 @@ whose precision can vary at compile time (such as `mpf_float`).
 
    }} // namespaces
 
-Class template `cpp_int_backend` fulfills all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
+Class template `cpp_int_backend` fulfils all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
 Its members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
 to change.
 
@@ -2101,7 +2299,7 @@ More information on this type can be found in the [link boost_multiprecision.tut
 
    }} // namespaces
 
-Class template `gmp_int` fulfills all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
+Class template `gmp_int` fulfils all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
 Its members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
 to change.
 
@@ -2121,7 +2319,7 @@ More information on this type can be found in the [link boost_multiprecision.tut
 
    }} // namespaces
 
-Class template `tommath_int` fulfills all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
+Class template `tommath_int` fulfils all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
 Its members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
 to change.
 
@@ -2146,7 +2344,7 @@ More information on this type can be found in the [link boost_multiprecision.tut
 
    }} // namespaces
 
-Class template `gmp_float` fulfills all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
+Class template `gmp_float` fulfils all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
 Its members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
 to change.
 
@@ -2177,7 +2375,7 @@ More information on this type can be found in the [link boost_multiprecision.tut
 
    }} // namespaces
 
-Class template `mpfr_float_backend` fulfills all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
+Class template `mpfr_float_backend` fulfils all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
 Its members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
 to change.
 
@@ -2205,7 +2403,7 @@ More information on this type can be found in the [link boost_multiprecision.tut
 
    }} // namespaces
 
-Class template `cpp_dec_float` fulfills all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
+Class template `cpp_dec_float` fulfils all of the requirements for a [link boost_multiprecision.ref.backendconc Backend] type.  
 Its members and non-member functions are deliberately not documented: these are considered implementation details that are subject 
 to change.
 
@@ -2837,7 +3035,7 @@ Windows Vista machine.
 
 [endsect]
 
-[section:float_performance Float Algorithm Perfomance]
+[section:float_performance Float Algorithm Performance]
 
 Note that these tests are carefully designed to test performance of the underlying algorithms
 and not memory allocation or variable copying.  As usual, performance results should be taken
@@ -2973,7 +3171,7 @@ Windows Vista machine.
 
 [endsect]
 
-[section:integer_performance Integer Algorithm Perfomance]
+[section:integer_performance Integer Algorithm Performance]
 
 Note that these tests are carefully designed to test performance of the underlying algorithms
 and not memory allocation or variable copying.  As usual, performance results should be taken
@@ -3215,7 +3413,7 @@ Linux x86_64 results are broadly similar, except that libtommath performs much b
 
 [endsect]
 
-[section:rational_performance Rational Type Perfomance]
+[section:rational_performance Rational Type Performance]
 
 Note that these tests are carefully designed to test performance of the underlying algorithms
 and not memory allocation or variable copying.  As usual, performance results should be taken
@@ -3336,6 +3534,17 @@ Windows Vista machine.
 [section:map Roadmap]
 
 [section:hist History]
+
+[h4 1.54]
+
+* Add support for [mpfi].
+* Add logged_adapter.
+
+[h4 1.53]
+
+* First Release.
+* Fix bug in [@https://svn.boost.org/trac/boost/ticket/7878 cpp_int division].
+* Fix issue [@https://svn.boost.org/trac/boost/ticket/7806 #7806].
 
 [h4 Post review changes]
 
