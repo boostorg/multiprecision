@@ -50,7 +50,7 @@ struct extract_exponent_type<Backend, number_kind_floating_point>
 };
 
 template <class Backend>
-struct logged_adapter
+struct logged_adaptor
 {
    typedef typename Backend::signed_types              signed_types;
    typedef typename Backend::unsigned_types            unsigned_types;
@@ -62,17 +62,17 @@ private:
 
    Backend m_value;
 public:
-   logged_adapter()
+   logged_adaptor()
    {
       log_postfix_event(m_value, "Default construct");
    }
-   logged_adapter(const logged_adapter& o)
+   logged_adaptor(const logged_adaptor& o)
    {
       log_prefix_event(m_value, o.value(), "Copy construct");
       m_value = o.m_value;
       log_postfix_event(m_value, "Copy construct");
    }
-   logged_adapter& operator = (const logged_adapter& o)
+   logged_adaptor& operator = (const logged_adaptor& o)
    {
       log_prefix_event(m_value, o.value(), "Assignment");
       m_value = o.m_value;
@@ -80,27 +80,27 @@ public:
       return *this;
    }
    template <class T>
-   logged_adapter(const T& i, const typename enable_if_c<is_convertible<T, Backend>::value>::type* = 0)
+   logged_adaptor(const T& i, const typename enable_if_c<is_convertible<T, Backend>::value>::type* = 0)
       : m_value(i)
    {
       log_postfix_event(m_value, "construct from arithmetic type");
    }
    template <class T>
-   typename enable_if_c<is_arithmetic<T>::value || is_convertible<T, Backend>::value, logged_adapter&>::type operator = (const T& i)
+   typename enable_if_c<is_arithmetic<T>::value || is_convertible<T, Backend>::value, logged_adaptor&>::type operator = (const T& i)
    {
       log_prefix_event(m_value, i, "Assignment from arithmetic type");
       m_value = i;
       log_postfix_event(m_value, "Assignment from arithmetic type");
       return *this;
    }
-   logged_adapter& operator = (const char* s)
+   logged_adaptor& operator = (const char* s)
    {
       log_prefix_event(m_value, s, "Assignment from string type");
       m_value = s;
       log_postfix_event(m_value, "Assignment from string type");
       return *this;
    }
-   void swap(logged_adapter& o)
+   void swap(logged_adaptor& o)
    {
       log_prefix_event(m_value, o.value(), "swap");
       std::swap(m_value, o.value());
@@ -119,7 +119,7 @@ public:
       m_value.negate();
       log_postfix_event(m_value, "negate");
    }
-   int compare(const logged_adapter& o)const
+   int compare(const logged_adaptor& o)const
    {
       log_prefix_event(m_value, o.value(), "compare");
       int r = m_value.compare(o.value());
@@ -147,11 +147,11 @@ public:
 template <class T>
 inline const T& unwrap_logged_type(const T& a) { return a; }
 template <class Backend>
-inline const Backend& unwrap_logged_type(const logged_adapter<Backend>& a) { return a.value(); }
+inline const Backend& unwrap_logged_type(const logged_adaptor<Backend>& a) { return a.value(); }
 
 #define NON_MEMBER_OP1(name, str) \
    template <class Backend>\
-   inline void BOOST_JOIN(eval_, name)(logged_adapter<Backend>& result)\
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend>& result)\
    {\
       using default_ops::BOOST_JOIN(eval_, name);\
       log_prefix_event(result.value(), str);\
@@ -161,7 +161,7 @@ inline const Backend& unwrap_logged_type(const logged_adapter<Backend>& a) { ret
 
 #define NON_MEMBER_OP2(name, str) \
    template <class Backend, class T>\
-   inline void BOOST_JOIN(eval_, name)(logged_adapter<Backend>& result, const T& a)\
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend>& result, const T& a)\
    {\
       using default_ops::BOOST_JOIN(eval_, name);\
       log_prefix_event(result.value(), unwrap_logged_type(a), str);\
@@ -169,7 +169,7 @@ inline const Backend& unwrap_logged_type(const logged_adapter<Backend>& a) { ret
       log_postfix_event(result.value(), str);\
    }\
    template <class Backend>\
-   inline void BOOST_JOIN(eval_, name)(logged_adapter<Backend>& result, const logged_adapter<Backend>& a)\
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend>& result, const logged_adaptor<Backend>& a)\
    {\
       using default_ops::BOOST_JOIN(eval_, name);\
       log_prefix_event(result.value(), unwrap_logged_type(a), str);\
@@ -179,7 +179,7 @@ inline const Backend& unwrap_logged_type(const logged_adapter<Backend>& a) { ret
 
 #define NON_MEMBER_OP3(name, str) \
    template <class Backend, class T, class U>\
-   inline void BOOST_JOIN(eval_, name)(logged_adapter<Backend>& result, const T& a, const U& b)\
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend>& result, const T& a, const U& b)\
    {\
       using default_ops::BOOST_JOIN(eval_, name);\
       log_prefix_event(result.value(), unwrap_logged_type(a), unwrap_logged_type(b), str);\
@@ -187,7 +187,7 @@ inline const Backend& unwrap_logged_type(const logged_adapter<Backend>& a) { ret
       log_postfix_event(result.value(), str);\
    }\
    template <class Backend, class T>\
-   inline void BOOST_JOIN(eval_, name)(logged_adapter<Backend>& result, const logged_adapter<Backend>& a, const T& b)\
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend>& result, const logged_adaptor<Backend>& a, const T& b)\
    {\
       using default_ops::BOOST_JOIN(eval_, name);\
       log_prefix_event(result.value(), unwrap_logged_type(a), unwrap_logged_type(b), str);\
@@ -195,7 +195,7 @@ inline const Backend& unwrap_logged_type(const logged_adapter<Backend>& a) { ret
       log_postfix_event(result.value(), str);\
    }\
    template <class Backend, class T>\
-   inline void BOOST_JOIN(eval_, name)(logged_adapter<Backend>& result, const T& a, const logged_adapter<Backend>& b)\
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend>& result, const T& a, const logged_adaptor<Backend>& b)\
    {\
       using default_ops::BOOST_JOIN(eval_, name);\
       log_prefix_event(result.value(), unwrap_logged_type(a), unwrap_logged_type(b), str);\
@@ -203,7 +203,7 @@ inline const Backend& unwrap_logged_type(const logged_adapter<Backend>& a) { ret
       log_postfix_event(result.value(), str);\
    }\
    template <class Backend>\
-   inline void BOOST_JOIN(eval_, name)(logged_adapter<Backend>& result, const logged_adapter<Backend>& a, const logged_adapter<Backend>& b)\
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend>& result, const logged_adaptor<Backend>& a, const logged_adaptor<Backend>& b)\
    {\
       using default_ops::BOOST_JOIN(eval_, name);\
       log_prefix_event(result.value(), unwrap_logged_type(a), unwrap_logged_type(b), str);\
@@ -213,7 +213,7 @@ inline const Backend& unwrap_logged_type(const logged_adapter<Backend>& a) { ret
 
 #define NON_MEMBER_OP4(name, str) \
    template <class Backend, class T, class U, class V>\
-   inline void BOOST_JOIN(eval_, name)(logged_adapter<Backend>& result, const T& a, const U& b, const V& c)\
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend>& result, const T& a, const U& b, const V& c)\
    {\
       using default_ops::BOOST_JOIN(eval_, name);\
       log_prefix_event(result.value(), unwrap_logged_type(a), unwrap_logged_type(b), unwrap_logged_type(c), str);\
@@ -221,7 +221,7 @@ inline const Backend& unwrap_logged_type(const logged_adapter<Backend>& a) { ret
       log_postfix_event(result.value(), str);\
    }\
    template <class Backend, class T>\
-   inline void BOOST_JOIN(eval_, name)(logged_adapter<Backend>& result, const logged_adapter<Backend>& a, const logged_adapter<Backend>& b, const T& c)\
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend>& result, const logged_adaptor<Backend>& a, const logged_adaptor<Backend>& b, const T& c)\
    {\
       using default_ops::BOOST_JOIN(eval_, name);\
       log_prefix_event(result.value(), unwrap_logged_type(a), unwrap_logged_type(b), unwrap_logged_type(c), str);\
@@ -229,7 +229,7 @@ inline const Backend& unwrap_logged_type(const logged_adapter<Backend>& a) { ret
       log_postfix_event(result.value(), str);\
    }\
    template <class Backend, class T>\
-   inline void BOOST_JOIN(eval_, name)(logged_adapter<Backend>& result, const logged_adapter<Backend>& a, const T& b, const logged_adapter<Backend>& c)\
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend>& result, const logged_adaptor<Backend>& a, const T& b, const logged_adaptor<Backend>& c)\
    {\
       using default_ops::BOOST_JOIN(eval_, name);\
       log_prefix_event(result.value(), unwrap_logged_type(a), unwrap_logged_type(b), unwrap_logged_type(c), str);\
@@ -237,7 +237,7 @@ inline const Backend& unwrap_logged_type(const logged_adapter<Backend>& a) { ret
       log_postfix_event(result.value(), str);\
    }\
    template <class Backend, class T>\
-   inline void BOOST_JOIN(eval_, name)(logged_adapter<Backend>& result, const T& a, const logged_adapter<Backend>& b, const logged_adapter<Backend>& c)\
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend>& result, const T& a, const logged_adaptor<Backend>& b, const logged_adaptor<Backend>& c)\
    {\
       using default_ops::BOOST_JOIN(eval_, name);\
       log_prefix_event(result.value(), unwrap_logged_type(a), unwrap_logged_type(b), unwrap_logged_type(c), str);\
@@ -245,7 +245,7 @@ inline const Backend& unwrap_logged_type(const logged_adapter<Backend>& a) { ret
       log_postfix_event(result.value(), str);\
    }\
    template <class Backend>\
-   inline void BOOST_JOIN(eval_, name)(logged_adapter<Backend>& result, const logged_adapter<Backend>& a, const logged_adapter<Backend>& b, const logged_adapter<Backend>& c)\
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend>& result, const logged_adaptor<Backend>& a, const logged_adaptor<Backend>& b, const logged_adaptor<Backend>& c)\
    {\
       using default_ops::BOOST_JOIN(eval_, name);\
       log_prefix_event(result.value(), unwrap_logged_type(a), unwrap_logged_type(b), unwrap_logged_type(c), str);\
@@ -253,7 +253,7 @@ inline const Backend& unwrap_logged_type(const logged_adapter<Backend>& a) { ret
       log_postfix_event(result.value(), str);\
    }\
    template <class Backend, class T, class U>\
-   inline void BOOST_JOIN(eval_, name)(logged_adapter<Backend>& result, const logged_adapter<Backend>& a, const T& b, const U& c)\
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend>& result, const logged_adaptor<Backend>& a, const T& b, const U& c)\
    {\
       using default_ops::BOOST_JOIN(eval_, name);\
       log_prefix_event(result.value(), unwrap_logged_type(a), unwrap_logged_type(b), unwrap_logged_type(c), str);\
@@ -267,7 +267,7 @@ NON_MEMBER_OP2(multiply, "*=");
 NON_MEMBER_OP2(divide, "/=");
 
 template <class Backend, class R>
-inline void eval_convert_to(R* result, const logged_adapter<Backend>& val)
+inline void eval_convert_to(R* result, const logged_adaptor<Backend>& val)
 {
    using default_ops::eval_convert_to;
    log_prefix_event(val.value(), "convert_to");
@@ -276,7 +276,7 @@ inline void eval_convert_to(R* result, const logged_adapter<Backend>& val)
 }
 
 template <class Backend, class Exp>
-inline void eval_frexp(logged_adapter<Backend>& result, const logged_adapter<Backend>& arg, Exp* exp)
+inline void eval_frexp(logged_adaptor<Backend>& result, const logged_adaptor<Backend>& arg, Exp* exp)
 {
    log_prefix_event(arg.value(), "frexp");
    eval_frexp(result.value(), arg.value(), exp);
@@ -284,7 +284,7 @@ inline void eval_frexp(logged_adapter<Backend>& result, const logged_adapter<Bac
 }
 
 template <class Backend, class Exp>
-inline void eval_ldexp(logged_adapter<Backend>& result, const logged_adapter<Backend>& arg, Exp exp)
+inline void eval_ldexp(logged_adaptor<Backend>& result, const logged_adaptor<Backend>& arg, Exp exp)
 {
    log_prefix_event(arg.value(), "ldexp");
    eval_ldexp(result.value(), arg.value(), exp);
@@ -296,7 +296,7 @@ NON_MEMBER_OP2(ceil, "ceil");
 NON_MEMBER_OP2(sqrt, "sqrt");
 
 template <class Backend>
-inline int eval_fpclassify(const logged_adapter<Backend>& arg)
+inline int eval_fpclassify(const logged_adaptor<Backend>& arg)
 {
    log_prefix_event(arg.value(), "fpclassify");
    int r = eval_fpclassify(arg.value());
@@ -340,7 +340,7 @@ NON_MEMBER_OP4(qr, "quotient-and-remainder");
 NON_MEMBER_OP2(complement, "~");
 
 template <class Backend>
-inline void eval_left_shift(logged_adapter<Backend>& arg, unsigned a)
+inline void eval_left_shift(logged_adaptor<Backend>& arg, unsigned a)
 {
    using default_ops::eval_left_shift;
    log_prefix_event(arg.value(), a, "<<=");
@@ -348,7 +348,7 @@ inline void eval_left_shift(logged_adapter<Backend>& arg, unsigned a)
    log_postfix_event(arg.value(), "<<=");
 }
 template <class Backend>
-inline void eval_left_shift(logged_adapter<Backend>& arg, const logged_adapter<Backend>& a, unsigned b)
+inline void eval_left_shift(logged_adaptor<Backend>& arg, const logged_adaptor<Backend>& a, unsigned b)
 {
    using default_ops::eval_left_shift;
    log_prefix_event(arg.value(), a, b, "<<");
@@ -356,7 +356,7 @@ inline void eval_left_shift(logged_adapter<Backend>& arg, const logged_adapter<B
    log_postfix_event(arg.value(), "<<");
 }
 template <class Backend>
-inline void eval_right_shift(logged_adapter<Backend>& arg, unsigned a)
+inline void eval_right_shift(logged_adaptor<Backend>& arg, unsigned a)
 {
    using default_ops::eval_right_shift;
    log_prefix_event(arg.value(), a, ">>=");
@@ -364,7 +364,7 @@ inline void eval_right_shift(logged_adapter<Backend>& arg, unsigned a)
    log_postfix_event(arg.value(), ">>=");
 }
 template <class Backend>
-inline void eval_right_shift(logged_adapter<Backend>& arg, const logged_adapter<Backend>& a, unsigned b)
+inline void eval_right_shift(logged_adaptor<Backend>& arg, const logged_adaptor<Backend>& a, unsigned b)
 {
    using default_ops::eval_right_shift;
    log_prefix_event(arg.value(), a, b, ">>");
@@ -373,7 +373,7 @@ inline void eval_right_shift(logged_adapter<Backend>& arg, const logged_adapter<
 }
 
 template <class Backend, class T>
-inline unsigned eval_integer_modulus(const logged_adapter<Backend>& arg, const T& a)
+inline unsigned eval_integer_modulus(const logged_adaptor<Backend>& arg, const T& a)
 {
    using default_ops::eval_integer_modulus;
    log_prefix_event(arg.value(), a, "integer-modulus");
@@ -383,7 +383,7 @@ inline unsigned eval_integer_modulus(const logged_adapter<Backend>& arg, const T
 }
 
 template <class Backend>
-inline unsigned eval_lsb(const logged_adapter<Backend>& arg)
+inline unsigned eval_lsb(const logged_adaptor<Backend>& arg)
 {
    using default_ops::eval_lsb;
    log_prefix_event(arg.value(), "least-significant-bit");
@@ -393,7 +393,7 @@ inline unsigned eval_lsb(const logged_adapter<Backend>& arg)
 }
 
 template <class Backend>
-inline bool eval_bit_test(const logged_adapter<Backend>& arg, unsigned a)
+inline bool eval_bit_test(const logged_adaptor<Backend>& arg, unsigned a)
 {
    using default_ops::eval_bit_test;
    log_prefix_event(arg.value(), a, "bit-test");
@@ -403,7 +403,7 @@ inline bool eval_bit_test(const logged_adapter<Backend>& arg, unsigned a)
 }
 
 template <class Backend>
-inline void eval_bit_set(const logged_adapter<Backend>& arg, unsigned a)
+inline void eval_bit_set(const logged_adaptor<Backend>& arg, unsigned a)
 {
    using default_ops::eval_bit_set;
    log_prefix_event(arg.value(), a, "bit-set");
@@ -411,7 +411,7 @@ inline void eval_bit_set(const logged_adapter<Backend>& arg, unsigned a)
    log_postfix_event(arg.value(), r, "bit-set");
 }
 template <class Backend>
-inline void eval_bit_unset(const logged_adapter<Backend>& arg, unsigned a)
+inline void eval_bit_unset(const logged_adaptor<Backend>& arg, unsigned a)
 {
    using default_ops::eval_bit_unset;
    log_prefix_event(arg.value(), a, "bit-unset");
@@ -419,7 +419,7 @@ inline void eval_bit_unset(const logged_adapter<Backend>& arg, unsigned a)
    log_postfix_event(arg.value(), r, "bit-unset");
 }
 template <class Backend>
-inline void eval_bit_flip(const logged_adapter<Backend>& arg, unsigned a)
+inline void eval_bit_flip(const logged_adaptor<Backend>& arg, unsigned a)
 {
    using default_ops::eval_bit_flip;
    log_prefix_event(arg.value(), a, "bit-flip");
@@ -466,21 +466,21 @@ NON_MEMBER_OP3(atan2, "atan2");
 
 } // namespace backends
 
-using backends::logged_adapter;
+using backends::logged_adaptor;
 
 template<class Backend>
-struct number_category<backends::logged_adapter<Backend> > : public number_category<Backend> {};
+struct number_category<backends::logged_adaptor<Backend> > : public number_category<Backend> {};
 
 }} // namespaces
 
 namespace std{
 
 template <class Backend, boost::multiprecision::expression_template_option ExpressionTemplates>
-class numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::logged_adapter<Backend>, ExpressionTemplates> > 
+class numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<Backend>, ExpressionTemplates> > 
    : public std::numeric_limits<boost::multiprecision::number<Backend, ExpressionTemplates> >
 {
    typedef std::numeric_limits<boost::multiprecision::number<Backend, ExpressionTemplates> > base_type;
-   typedef boost::multiprecision::number<boost::multiprecision::backends::logged_adapter<Backend>, ExpressionTemplates> number_type;
+   typedef boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<Backend>, ExpressionTemplates> number_type;
 public:
    static number_type (min)() BOOST_NOEXCEPT { return (base_type::min)(); }
    static number_type (max)() BOOST_NOEXCEPT { return (base_type::max)(); }
@@ -500,7 +500,7 @@ namespace boost{ namespace math{
 namespace policies{
 
 template <class Backend, boost::multiprecision::expression_template_option ExpressionTemplates, class Policy>
-struct precision< boost::multiprecision::number<boost::multiprecision::logged_adapter<Backend>, ExpressionTemplates>, Policy>
+struct precision< boost::multiprecision::number<boost::multiprecision::logged_adaptor<Backend>, ExpressionTemplates>, Policy>
    : public precision<boost::multiprecision::number<Backend, ExpressionTemplates>, Policy>
 {};
 

@@ -8,14 +8,14 @@
 #endif
 
 #include <boost/multiprecision/gmp.hpp>
-#include <boost/multiprecision/rational_adapter.hpp>
+#include <boost/multiprecision/rational_adaptor.hpp>
 
 #include "test_arithmetic.hpp"
 
 int main()
 {
    test<boost::multiprecision::mpz_int>();
-   test<boost::multiprecision::number<boost::multiprecision::rational_adapter<boost::multiprecision::gmp_int> > >();
+   test<boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::gmp_int> > >();
    return boost::report_errors();
 }
 

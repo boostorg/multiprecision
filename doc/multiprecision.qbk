@@ -28,7 +28,7 @@
 [import ../example/random_snips.cpp]
 [import ../example/safe_prime.cpp]
 [import ../example/mixed_integer_arithmetic.cpp]
-[import ../example/logged_adapter.cpp]
+[import ../example/logged_adaptor.cpp]
 
 [template mpfr[] [@http://www.mpfr.org MPFR]]
 [template mpfi[] [@http://perso.ens-lyon.fr/nathalie.revol/software.html MPFI]]
@@ -409,7 +409,7 @@ The following back-ends provide integer arithmetic:
    { static const expression_template_option value = et_off; };
 
    typedef number<cpp_int_backend<> >              cpp_int;    // arbitrary precision integer
-   typedef rational_adapter<cpp_int_backend<> >    cpp_rational_backend;
+   typedef rational_adaptor<cpp_int_backend<> >    cpp_rational_backend;
    typedef number<cpp_rational_backend>            cpp_rational; // arbitrary precision rational number
 
    // Fixed precision unsigned types:
@@ -426,7 +426,7 @@ The following back-ends provide integer arithmetic:
 
    // Over again, but with checking enabled this time:
    typedef number<cpp_int_backend<0, 0, signed_magnitude, checked> >                 checked_cpp_int;
-   typedef rational_adapter<cpp_int_backend<0, 0, signed_magnitude, checked> >       checked_cpp_rational_backend;
+   typedef rational_adaptor<cpp_int_backend<0, 0, signed_magnitude, checked> >       checked_cpp_rational_backend;
    typedef number<cpp_rational_backend>                                              checked_cpp_rational;
 
    // Checked fixed precision unsigned types:
@@ -1031,7 +1031,7 @@ The following back-ends provide rational number arithmetic:
 [[`cpp_rational`][boost/multiprecision/cpp_int.hpp][2][None][An all C++ Boost-licensed implementation.][Slower than [gmp].]]
 [[`gmp_rational`][boost/multiprecision/gmp.hpp][2][[gmp]][Very fast and efficient back-end.][Dependency on GNU licensed [gmp] library.]]
 [[`tommath_rational`][boost/multiprecision/tommath.hpp][2][[tommath]][All C/C++ implementation that's Boost Software Licence compatible.][Slower than [gmp].]]
-[[`rational_adapter`][boost/multiprecision/rational_adapter.hpp][N/A][none][All C++ adapter that allows any integer back-end type to be used as a rational type.][Requires an underlying integer back-end type.]]
+[[`rational_adaptor`][boost/multiprecision/rational_adaptor.hpp][N/A][none][All C++ adaptor that allows any integer back-end type to be used as a rational type.][Requires an underlying integer back-end type.]]
 [[`boost::rational`][boost/rational.hpp][N/A][None][A C++ rational number type that can used with any `number` integer type.][The expression templates used by `number` end up being "hidden" inside `boost::rational`: performance may well suffer as a result.]]
 ]
 
@@ -1041,7 +1041,7 @@ The following back-ends provide rational number arithmetic:
 
    namespace boost{ namespace multiprecision{
 
-   typedef rational_adapter<cpp_int_backend<> >    cpp_rational_backend;
+   typedef rational_adaptor<cpp_int_backend<> >    cpp_rational_backend;
 
    typedef number<cpp_rational_backend>         cpp_rational;
 
@@ -1172,7 +1172,7 @@ Note that using the library in this way largely negates the effect of the expres
 
 [endsect]
 
-[section:rational_adapter rational_adapter]
+[section:rational_adaptor rational_adaptor]
 
    namespace boost{ namespace multiprecision{
 
@@ -1181,13 +1181,13 @@ Note that using the library in this way largely negates the effect of the expres
 
    }}
 
-The class template `rational_adapter` is a back-end for `number` which converts any existing integer back-end
+The class template `rational_adaptor` is a back-end for `number` which converts any existing integer back-end
 into a rational-number back-end.
 
 So for example, given an integer back-end type `MyIntegerBackend`, the use would be something like:
 
    typedef number<MyIntegerBackend>                    MyInt;
-   typedef number<rational_adapter<MyIntegerBackend> > MyRational;
+   typedef number<rational_adaptor<MyIntegerBackend> > MyRational;
 
    MyRational r = 2;
    r /= 3;
@@ -1202,9 +1202,9 @@ So for example, given an integer back-end type `MyIntegerBackend`, the use would
 
 Backend types listed in this section are predominantly designed to aid debugging.
 
-[section:logged_adapter logged_adapter]
+[section:logged_adaptor logged_adaptor]
 
-`#include <boost/multiprecision/logged_adapter.hpp>`
+`#include <boost/multiprecision/logged_adaptor.hpp>`
 
    namespace boost{ namespace multiprecision{
 
@@ -1223,11 +1223,11 @@ Backend types listed in this section are predominantly designed to aid debugging
    void log_prefix_event(const Backend& arg1, const T& arg2, const U& arg3, const V& arg4, const char* event_description);
 
    template <Backend>
-   class logged_adapter;
+   class logged_adaptor;
 
    }} // namespaces
 
-The `logged_adapter` type is used in conjunction with `number` and some other backend type: it acts as a thin wrapper around 
+The `logged_adaptor` type is used in conjunction with `number` and some other backend type: it acts as a thin wrapper around 
 some other backend to class `number` and logs all the events that take place on that object.  Before any number operation takes
 place, it calls `log_prefix_event` with the arguments to the operation (up to 4), plus a string describing the operation.
 Then after the operation it calls `log_postfix_event` with the result of the operation, plus a string describing the operation.
@@ -1246,11 +1246,11 @@ exceeds some threshold, or simply print out diagnostic information.  Using this 
 numerical instability in a particular routine.  The following example demonstrates this technique in a trivial algorithm
 that deliberately introduces cancellation error:
 
-[logged_adapter]
+[logged_adaptor]
 
 When we examine program output we can clearly see that the diameter of the interval increases after each subtraction:
 
-[logged_adapter_output]
+[logged_adaptor_output]
 
 [endsect]
 
@@ -2224,7 +2224,7 @@ whose precision can vary at compile time (such as `mpf_float`).
    { static const expression_template_option value = et_off; };
 
    typedef number<cpp_int_backend<> >              cpp_int;    // arbitrary precision integer
-   typedef rational_adapter<cpp_int_backend<> >    cpp_rational_backend;
+   typedef rational_adaptor<cpp_int_backend<> >    cpp_rational_backend;
    typedef number<cpp_rational_backend>            cpp_rational; // arbitrary precision rational number
 
    // Fixed precision unsigned types:
@@ -2241,7 +2241,7 @@ whose precision can vary at compile time (such as `mpf_float`).
 
    // Over again, but with checking enabled this time:
    typedef number<cpp_int_backend<0, 0, signed_magnitude, checked> >                 checked_cpp_int;
-   typedef rational_adapter<cpp_int_backend<0, 0, signed_magnitude, checked> >       checked_cpp_rational_backend;
+   typedef rational_adaptor<cpp_int_backend<0, 0, signed_magnitude, checked> >       checked_cpp_rational_backend;
    typedef number<cpp_rational_backend>                                              checked_cpp_rational;
 
    // Checked fixed precision unsigned types:
@@ -2872,7 +2872,7 @@ in point of fact this naming convention shouldn't be necessary, but rather works
 [[number.hpp][Defines the `number` backend, is included by all the backend headers.]]
 [[mpfr.hpp][Defines the mpfr_float_backend backend.]]
 [[random.hpp][Defines code to interoperate with Boost.Random.]]
-[[rational_adapter.hpp][Defines the `rational_adapter` backend.]]
+[[rational_adaptor.hpp][Defines the `rational_adaptor` backend.]]
 [[cpp_dec_float.hpp][Defines the `cpp_dec_float` backend.]]
 [[tommath.hpp][Defines the `tommath_int` backend.]]
 [[concepts/number_archetypes.hpp][Defines a backend concept archetypes for testing use.]]
@@ -3537,8 +3537,9 @@ Windows Vista machine.
 
 [h4 1.54]
 
+* [*Breaking change] renamed `rational_adapter` to `rational_adaptor`.
 * Add support for [mpfi].
-* Add logged_adapter.
+* Add logged_adaptor.
 
 [h4 1.53]
 
@@ -3584,7 +3585,7 @@ code.
 More a list of what ['could] be done, rather than what ['should] be done (which may be a much smaller list!).
 
 * Add back-end support for libdecNumber.
-* Add an adapter back-end for complex number types.
+* Add an adaptor back-end for complex number types.
 * Add a back-end for MPFR interval arithmetic.
 * Add better multiplication routines (Karatsuba, FFT etc) to cpp_int_backend.
 * Add assembly level routines to cpp_int_backend.

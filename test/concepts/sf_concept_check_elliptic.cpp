@@ -54,7 +54,7 @@
 #include <boost/multiprecision/mpfr.hpp>
 #endif
 #ifdef TEST_LOGGED_ADAPTER
-#include <boost/multiprecision/logged_adapter.hpp>
+#include <boost/multiprecision/logged_adaptor.hpp>
 #endif
 
 #include <boost/math/special_functions.hpp>
@@ -118,7 +118,7 @@ void foo()
    test_extra(boost::multiprecision::number<boost::multiprecision::cpp_dec_float<100>, boost::multiprecision::et_off>());
 #endif
 #ifdef TEST_LOGGED_ADAPTER
-   typedef boost::multiprecision::number<boost::multiprecision::logged_adapter<boost::multiprecision::cpp_dec_float<50> > > num_t;
+   typedef boost::multiprecision::number<boost::multiprecision::logged_adaptor<boost::multiprecision::cpp_dec_float<50> > > num_t;
    test_extra(num_t());
 #endif
 }

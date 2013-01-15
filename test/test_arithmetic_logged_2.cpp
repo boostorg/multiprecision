@@ -7,13 +7,13 @@
 #  define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <boost/multiprecision/logged_adapter.hpp>
+#include <boost/multiprecision/logged_adaptor.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 #include "test_arithmetic.hpp"
 
 int main()
 {
-   test<boost::multiprecision::number<boost::multiprecision::logged_adapter<boost::multiprecision::cpp_int_backend<> > > >();
+   test<boost::multiprecision::number<boost::multiprecision::logged_adaptor<boost::multiprecision::cpp_int_backend<> > > >();
    return boost::report_errors();
 }
 

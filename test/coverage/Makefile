@@ -13,7 +13,7 @@ SOURCES=\
 ../../../../boost/multiprecision/random.hpp\
 ../../../../boost/multiprecision/cpp_int.hpp\
 ../../../../boost/multiprecision/miller_rabin.hpp\
-../../../../boost/multiprecision/rational_adapter.hpp\
+../../../../boost/multiprecision/rational_adaptor.hpp\
 ../../../../boost/multiprecision/concepts/mp_number_archetypes.hpp\
 ../../../../boost/multiprecision/detail/big_lanczos.hpp\
 ../../../../boost/multiprecision/detail/digits.hpp\

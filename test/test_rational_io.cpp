@@ -36,7 +36,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
-#include <boost/multiprecision/rational_adapter.hpp>
+#include <boost/multiprecision/rational_adaptor.hpp>
 #include "test.hpp"
 #include <iostream>
 #include <iomanip>
@@ -130,7 +130,7 @@ int main()
 #ifdef TEST_MPQ
    test_round_trip<boost::multiprecision::mpq_rational>();
    test_round_trip<boost::rational<boost::multiprecision::mpz_int> >();
-   test_round_trip<boost::multiprecision::number<boost::multiprecision::rational_adapter<boost::multiprecision::gmp_int> > >();
+   test_round_trip<boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::gmp_int> > >();
 #endif
 #ifdef TEST_TOMMATH
    test_round_trip<boost::rational<boost::multiprecision::tom_int> >();

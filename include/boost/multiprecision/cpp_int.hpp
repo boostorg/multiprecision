@@ -15,7 +15,7 @@
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_floating_point.hpp>
 #include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
-#include <boost/multiprecision/rational_adapter.hpp>
+#include <boost/multiprecision/rational_adaptor.hpp>
 #include <boost/detail/endian.hpp>
 #include <boost/integer/static_min_max.hpp>
 #include <boost/type_traits/common_type.hpp>
@@ -1768,7 +1768,7 @@ template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int
 struct number_category<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> > : public mpl::int_<number_kind_integer>{};
 
 typedef number<cpp_int_backend<> >                   cpp_int;
-typedef rational_adapter<cpp_int_backend<> >         cpp_rational_backend;
+typedef rational_adaptor<cpp_int_backend<> >         cpp_rational_backend;
 typedef number<cpp_rational_backend>                 cpp_rational;
 
 // Fixed precision unsigned types:
@@ -1785,7 +1785,7 @@ typedef number<cpp_int_backend<1024, 1024, signed_magnitude, unchecked, void> > 
 
 // Over again, but with checking enabled this time:
 typedef number<cpp_int_backend<0, 0, signed_magnitude, checked> >  checked_cpp_int;
-typedef rational_adapter<cpp_int_backend<0, 0, signed_magnitude, checked> >  checked_cpp_rational_backend;
+typedef rational_adaptor<cpp_int_backend<0, 0, signed_magnitude, checked> >  checked_cpp_rational_backend;
 typedef number<cpp_rational_backend>                 checked_cpp_rational;
 // Fixed precision unsigned types:
 typedef number<cpp_int_backend<128, 128, unsigned_magnitude, checked, void> >   checked_uint128_t;

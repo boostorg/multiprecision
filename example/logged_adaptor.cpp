@@ -3,10 +3,10 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_
 
-//[logged_adapter
+//[logged_adaptor
 
 #include <boost/multiprecision/mpfi.hpp>
-#include <boost/multiprecision/logged_adapter.hpp>
+#include <boost/multiprecision/logged_adaptor.hpp>
 #include <iostream>
 #include <iomanip>
 //
@@ -35,7 +35,7 @@ inline void log_postfix_event(const mpfi_float_backend<D>&, const T&, const char
 int main()
 {
    using namespace boost::multiprecision;
-   typedef number<logged_adapter<mpfi_float_backend<17> > > logged_type;
+   typedef number<logged_adaptor<mpfi_float_backend<17> > > logged_type;
    //
    // Test case deliberately introduces cancellation error, relative size of interval
    // gradually gets larger after each operation:
@@ -56,7 +56,7 @@ int main()
 //]
 
 /*
-//[logged_adapter_output
+//[logged_adaptor_output
 
 Diameter was nan after operation: Default construct
 Diameter was 0 after operation: Assignment from arithmetic type

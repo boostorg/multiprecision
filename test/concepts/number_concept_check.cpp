@@ -54,7 +54,7 @@
 #include <boost/multiprecision/mpfr.hpp>
 #endif
 #ifdef TEST_LOGGED_ADAPTER
-#include <boost/multiprecision/logged_adapter.hpp>
+#include <boost/multiprecision/logged_adaptor.hpp>
 #endif
 
 #include <boost/math/concepts/real_type_concept.hpp>
@@ -225,7 +225,7 @@ int main()
    BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<boost::multiprecision::cpp_dec_float_50>));
 #endif
 #ifdef TEST_LOGGED_ADAPTER
-   typedef boost::multiprecision::number<boost::multiprecision::logged_adapter<boost::multiprecision::cpp_dec_float<50> > > num_t;
+   typedef boost::multiprecision::number<boost::multiprecision::logged_adaptor<boost::multiprecision::cpp_dec_float<50> > > num_t;
    test_extra(num_t());
 #endif
 

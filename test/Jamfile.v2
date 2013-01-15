@@ -448,7 +448,7 @@ run ../example/mpfi_snips.cpp mpfi mpfr gmp
         : # requirements
          [ check-target-builds ../config//has_mpfi : : <build>no ] ;
 
-run ../example/logged_adapter.cpp mpfi mpfr gmp
+run ../example/logged_adaptor.cpp mpfi mpfr gmp
         : # command line
         : # input files
         : # requirements
@@ -615,7 +615,7 @@ if ! $(disable-concepts)
               : # requirements
 	            <define>TEST_LOGGED_ADAPTER
                <debug-symbols>off
-              : $(source:B)_logged_adapter ;
+              : $(source:B)_logged_adaptor ;
    }
 }
 
