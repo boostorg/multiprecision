@@ -6,7 +6,7 @@
 #ifndef BOOST_MATH_LOGGED_ADAPTER_HPP
 #define BOOST_MATH_LOGGED_ADAPTER_HPP
 
-#include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/traits/extract_exponent_type.hpp>
 
 namespace boost{
 namespace multiprecision{
@@ -37,17 +37,6 @@ inline void log_prefix_event(const Backend&, const T&, const U&, const V&, const
 }
 
 namespace backends{
-
-template <class Backend, int cat>
-struct extract_exponent_type
-{
-   typedef int type;
-};
-template <class Backend>
-struct extract_exponent_type<Backend, number_kind_floating_point>
-{
-   typedef typename Backend::exponent_type type;
-};
 
 template <class Backend>
 struct logged_adaptor
@@ -298,6 +287,7 @@ NON_MEMBER_OP2(sqrt, "sqrt");
 template <class Backend>
 inline int eval_fpclassify(const logged_adaptor<Backend>& arg)
 {
+   using default_ops::eval_fpclassify;
    log_prefix_event(arg.value(), "fpclassify");
    int r = eval_fpclassify(arg.value());
    log_postfix_event(arg.value(), r, "fpclassify");
@@ -508,5 +498,9 @@ struct precision< boost::multiprecision::number<boost::multiprecision::logged_ad
 
 }} // namespaces boost::math
 
+#undef NON_MEMBER_OP1
+#undef NON_MEMBER_OP2
+#undef NON_MEMBER_OP3
+#undef NON_MEMBER_OP4
 
 #endif

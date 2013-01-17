@@ -1254,6 +1254,184 @@ When we examine program output we can clearly see that the diameter of the inter
 
 [endsect]
 
+[section:debug_adaptor debug_adaptor]
+
+`#include <boost/multiprecision/debug_adaptor.hpp>`
+
+   namespace boost{ namespace multiprecision{
+
+   template <Backend>
+   class debug_adaptor;
+
+   }} // namespaces
+
+The `debug_adaptor` type is used in conjunction with `number` and some other backend type: it acts as a thin wrapper around 
+some other backend to class `number` and intercepts all operations on that object storing the result as a string within itself.
+
+This type provides `numeric_limits` support whenever the template argument Backend does so.
+
+This type is particularly useful when your debugger provides a good view of `std::string`: when this is the case
+multiprecision values can easily be inspected in the debugger by looking at the `debug_value` member of `debug_adapter`.
+The down side of this approach is that runtimes are much slower when using this type.  Set against that it can make
+debugging very much easier, certainly much easier than sprinkling code with `printf` statements.
+
+When used in conjunction with the Visual C++ debugger visualisers, the value of a multiprecision type that uses this
+backend is displayed in the debugger just a builtin value would be, here we're inspecting a value of type
+`number<debug_adapter<cpp_dec_float<50> > >`:
+
+[$../debugger1.png]
+
+Otherwise you will need to expand out the view and look at the "debug_value" member:
+
+[$../debugger2.png]
+
+It works for all the backend types equally too, here it is inspecting a `number<debug_adapter<gmp_rational> >`:
+
+[$../debugger3.png]
+
+
+[endsect]
+
+[section:visualizers Visual C++ Debugger Visualizers]
+
+Let's face it debugger multiprecision numbers is hard - simply because we can't easily inspect the value of the numbers.
+Visual C++ provides a partial solution in the shape of "visualizers" which provide improved views of complex data structures,
+these visualizers need to be added to the `[Visualizer]` section of `autoexp.dat` located in the `Common7\Packages\Debugger`
+directory of your Visual Studio installation.
+
+[note These visualizers have only been tested with VC10, also given the ability of buggy visualizers to crash your Visual C++
+debugger, make sure you back up `autoexp.dat` file before using these!!]
+
+This visualizer provides improved views of `debug_adaptor`:
+
+[pre
+boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<*>,*>{
+   preview(
+      \#(
+          \$e.m_backend.debug_value
+      )
+   )
+}
+]
+
+The next visualizer provides improved views of cpp_int: small numbers are displayed as actual values, while larger numbers are
+displayed as an array of hexadecimal parts, with the most significant part first.  
+
+Here's what it looks like for small values:
+
+[$../debugger4.png]
+
+And for larger values:
+
+[$../debugger5.png]
+
+There is also a `~raw` child member that
+lets you see the actual members of the class:
+
+[$../debugger6.png]
+
+Here's the visualizer code:
+
+[pre
+boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<*,*,1,*,void>,*>{
+   preview(
+      \#if(\$e.m_backend.m_limbs == 1) (
+         \#if(\$e.m_backend.m_sign) ( -1 * (__int64)(\$e.m_backend.m_wrapper.m_data\[0\]) ) \#else (\$e.m_backend.m_wrapper.m_data\[0\])
+      ) 
+      \#elif((\$e.m_backend.m_limbs == 2) && (\$e.m_backend.m_wrapper.m_data\[1\] < 0x80000000)) (
+         \#if(\$e.m_backend.m_sign) ( -1 * (__int64)(\$e.m_backend.m_wrapper.m_data\[0\] | ((__int64)\$e.m_backend.m_wrapper.m_data\[1\] << 32)) ) \#else (\$e.m_backend.m_wrapper.m_data\[0\] | ((__int64)\$e.m_backend.m_wrapper.m_data\[1\] << 32))
+      ) \#else (
+         \#( "signbit = ", \$e.m_backend.m_sign, " data = ", \#array ( expr: \$e.m_backend.m_wrapper.m_data\[\$e.m_backend.m_limbs - \$i - 1\], size: \$e.m_backend.m_limbs ) : \[\$e,x\] )
+      )
+   )
+
+   children (
+      \#(
+         \~raw: \[\$c,!\],
+         sign bit: \$e.m_backend.m_sign,
+         \#array (
+               expr: \$e.m_backend.m_wrapper.m_data\[\$e.m_backend.m_limbs - \$i - 1\],
+               size: \$e.m_backend.m_limbs
+         ) : \[\$e,x\]
+      )
+   )
+}
+
+boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<*,*,0,*,void>,*>{
+   preview(
+      \#if(\$e.m_backend.m_limbs == 1) (
+         \$e.m_backend.m_wrapper.m_data\[0\]
+      ) 
+      \#elif(\$e.m_backend.m_limbs == 2) (
+         \$e.m_backend.m_wrapper.m_data\[0\] | ((__int64)\$e.m_backend.m_wrapper.m_data\[1\] << 32)
+      ) \#else (
+         \#array ( expr: \$e.m_backend.m_wrapper.m_data\[\$e.m_backend.m_limbs - \$i - 1\], size: \$e.m_backend.m_limbs ) : \[\$e,x\]
+      )
+   )
+
+   children (
+      \#(
+         \~raw: \[\$c,!\],
+         \#array (
+               expr: \$e.m_backend.m_wrapper.m_data\[\$e.m_backend.m_limbs - \$i - 1\],
+               size: \$e.m_backend.m_limbs
+         ) : \[\$e,x\]
+      )
+   )
+}
+
+boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<0,0,1,*,*>,*>{
+   preview(
+      \#if (\$e.m_backend.m_internal) (
+        \#if(\$e.m_backend.m_limbs == 1) (
+            \#if(\$e.m_backend.m_sign) ( -1 * (__int64)(\$e.m_backend.m_data.first) ) \#else(\$e.m_backend.m_data.first)
+        ) \#elif((\$e.m_backend.m_limbs == 2) && (\$e.m_backend.m_data.la\[1\] < 0x80000000)) (
+            \#if(\$e.m_backend.m_sign) ( -1 * (__int64)(\$e.m_backend.m_data.double_first) ) \#else(\$e.m_backend.m_data.double_first)
+        ) \#else(
+           \#( "signbit = ", \$e.m_backend.m_sign, " data = ", \#array ( expr: \$e.m_backend.m_data.la\[\$e.m_backend.m_limbs - \$i - 1\], size: \$e.m_backend.m_limbs ) : \[\$e,x\] )
+        )
+      ) \#else(
+        \#if(\$e.m_backend.m_limbs == 1) (
+            \#if(\$e.m_backend.m_sign) ( -1 * (__int64)(\$e.m_backend.m_data.ld.data\[0\]) ) \#else(\$e.m_backend.m_data.ld.data\[0\])
+        ) \#elif((\$e.m_backend.m_limbs == 2) && (\$e.m_backend.m_data.ld.data\[1\] < 0x80000000)) (
+            \#if(\$e.m_backend.m_sign) ( -1 * (__int64)(\$e.m_backend.m_data.ld.data\[0\] | ((__int64)\$e.m_backend.m_data.ld.data\[1\] << 32)) ) \#else(\$e.m_backend.m_data.ld.data\[0\] | ((__int64)\$e.m_backend.m_data.ld.data\[1\] << 32))
+        ) \#else(
+            \#( "signbit = ", \$e.m_backend.m_sign, " data = ", \#array ( expr: \$e.m_backend.m_data.ld.data\[\$e.m_backend.m_limbs - \$i - 1\], size: \$e.m_backend.m_limbs ) : \[\$e,x\] )
+        )
+      )
+   )
+
+   children (
+      \#if (\$e.m_backend.m_internal) (
+        \#if(\$e.m_backend.m_limbs == 1) (
+            \#(value: \$e.m_backend.m_data.first)
+         ) \#elif(\$e.m_backend.m_limbs == 1) (
+            \#(value: \$e.m_backend.m_data.double_first)
+         ) \#else (
+            \#(
+            sign bit: \$e.m_backend.m_sign,
+            \#array (
+                expr: \$e.m_backend.m_data.la\[\$e.m_backend.m_limbs - \$i - 1\],
+                size: \$e.m_backend.m_limbs
+            ) : \[\$e,x\]
+            )
+         )
+      ) \#else (
+        \#(
+            \~raw: \[\$c,!\],
+            sign bit: \$e.m_backend.m_sign,
+            \#array (
+                expr: \$e.m_backend.m_data.ld.data\[\$e.m_backend.m_limbs - \$i - 1\],
+                size: \$e.m_backend.m_limbs
+            ) : \[\$e,x\]
+         )
+      )
+   )
+}
+]
+
+[endsect]
+
 [endsect]
 
 [section:conversions Constructing and Interconverting Between Number Types]

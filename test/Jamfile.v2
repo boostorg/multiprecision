@@ -104,6 +104,9 @@ run test_arithmetic_ab_3.cpp ;
 run test_arithmetic_logged_1.cpp ;
 run test_arithmetic_logged_2.cpp ;
 
+run test_arithmetic_dbg_adptr1.cpp ;
+run test_arithmetic_dbg_adptr2.cpp ;
+
 run test_arithmetic_mpfi_50.cpp mpfi mpfr gmp : : : [ check-target-builds ../config//has_mpfi : : <build>no ] ;
 
 run test_numeric_limits.cpp
