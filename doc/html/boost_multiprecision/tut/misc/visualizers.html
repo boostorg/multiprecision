@@ -34,7 +34,10 @@
           improved views of complex data structures, these visualizers need to be
           added to the <code class="computeroutput"><span class="special">[</span><span class="identifier">Visualizer</span><span class="special">]</span></code> section of <code class="computeroutput"><span class="identifier">autoexp</span><span class="special">.</span><span class="identifier">dat</span></code>
           located in the <code class="computeroutput"><span class="identifier">Common7</span><span class="special">\</span><span class="identifier">Packages</span><span class="special">\</span><span class="identifier">Debugger</span></code>
-          directory of your Visual Studio installation.
+          directory of your Visual Studio installation. The actual visualizer code
+          is in the sandbox <a href="https://svn.boost.org/svn/boost/sandbox/boost_docs/subprojects/DebuggerVisualizers/multiprecision.vis.txt" target="_top">here</a>
+          - just cut and paste the code into your <code class="computeroutput"><span class="identifier">autoexp</span><span class="special">.</span><span class="identifier">dat</span></code>
+          file.
         </p>
 <div class="note"><table border="0" summary="Note">
 <tr>
@@ -48,16 +51,11 @@
           </p></td></tr>
 </table></div>
 <p>
-          This visualizer provides improved views of <code class="computeroutput"><span class="identifier">debug_adaptor</span></code>:
+          The first visualizer provides improved views of <code class="computeroutput"><span class="identifier">debug_adaptor</span></code>:
         </p>
-<pre class="programlisting">boost::multiprecision::number&lt;boost::multiprecision::backends::debug_adaptor&lt;<span class="bold"><strong>&gt;,</strong></span>&gt;{
-   preview(
-      #(
-          $e.m_backend.debug_value
-      )
-   )
-}
-</pre>
+<p>
+          <span class="inlinemediaobject"><img src="../../../../debugger1.png" alt="debugger1"></span>
+        </p>
 <p>
           The next visualizer provides improved views of cpp_int: small numbers are
           displayed as actual values, while larger numbers are displayed as an array
@@ -83,104 +81,14 @@
           <span class="inlinemediaobject"><img src="../../../../debugger6.png" alt="debugger6"></span>
         </p>
 <p>
-          Here's the visualizer code:
+          The visualizer for <code class="computeroutput"><span class="identifier">cpp_dec_float</span></code>
+          shows the first few digits of the value in the preview field, and the full
+          array of digits when you expand the view. As before the <code class="computeroutput"><span class="special">~</span><span class="identifier">raw</span></code> child gives you access to the actual
+          data members:
         </p>
-<pre class="programlisting">boost::multiprecision::number&lt;boost::multiprecision::backends::cpp_int_backend&lt;<span class="bold"><strong>,</strong></span>,1,<span class="bold"><strong>,void&gt;,</strong></span>&gt;{
-   preview(
-      #if($e.m_backend.m_limbs == 1) (
-         #if($e.m_backend.m_sign) ( -1 * (__int64)($e.m_backend.m_wrapper.m_data[0]) ) #else ($e.m_backend.m_wrapper.m_data[0])
-      )
-      #elif(($e.m_backend.m_limbs == 2) &amp;&amp; ($e.m_backend.m_wrapper.m_data[1] &lt; 0x80000000)) (
-         #if($e.m_backend.m_sign) ( -1 * (__int64)($e.m_backend.m_wrapper.m_data[0] | ((__int64)$e.m_backend.m_wrapper.m_data[1] &lt;&lt; 32)) ) #else ($e.m_backend.m_wrapper.m_data[0] | ((__int64)$e.m_backend.m_wrapper.m_data[1] &lt;&lt; 32))
-      ) #else (
-         #( "signbit = ", $e.m_backend.m_sign, " data = ", #array ( expr: $e.m_backend.m_wrapper.m_data[$e.m_backend.m_limbs - $i - 1], size: $e.m_backend.m_limbs ) : [$e,x] )
-      )
-   )
-
-   children (
-      #(
-         ~raw: [$c,!],
-         sign bit: $e.m_backend.m_sign,
-         #array (
-               expr: $e.m_backend.m_wrapper.m_data[$e.m_backend.m_limbs - $i - 1],
-               size: $e.m_backend.m_limbs
-         ) : [$e,x]
-      )
-   )
-}
-
-boost::multiprecision::number&lt;boost::multiprecision::backends::cpp_int_backend&lt;<span class="bold"><strong>,</strong></span>,0,<span class="bold"><strong>,void&gt;,</strong></span>&gt;{
-   preview(
-      #if($e.m_backend.m_limbs == 1) (
-         $e.m_backend.m_wrapper.m_data[0]
-      )
-      #elif($e.m_backend.m_limbs == 2) (
-         $e.m_backend.m_wrapper.m_data[0] | ((__int64)$e.m_backend.m_wrapper.m_data[1] &lt;&lt; 32)
-      ) #else (
-         #array ( expr: $e.m_backend.m_wrapper.m_data[$e.m_backend.m_limbs - $i - 1], size: $e.m_backend.m_limbs ) : [$e,x]
-      )
-   )
-
-   children (
-      #(
-         ~raw: [$c,!],
-         #array (
-               expr: $e.m_backend.m_wrapper.m_data[$e.m_backend.m_limbs - $i - 1],
-               size: $e.m_backend.m_limbs
-         ) : [$e,x]
-      )
-   )
-}
-
-boost::multiprecision::number&lt;boost::multiprecision::backends::cpp_int_backend&lt;0,0,1,<span class="bold"><strong>,</strong></span>&gt;,*&gt;{
-   preview(
-      #if ($e.m_backend.m_internal) (
-        #if($e.m_backend.m_limbs == 1) (
-            #if($e.m_backend.m_sign) ( -1 * (__int64)($e.m_backend.m_data.first) ) #else($e.m_backend.m_data.first)
-        ) #elif(($e.m_backend.m_limbs == 2) &amp;&amp; ($e.m_backend.m_data.la[1] &lt; 0x80000000)) (
-            #if($e.m_backend.m_sign) ( -1 * (__int64)($e.m_backend.m_data.double_first) ) #else($e.m_backend.m_data.double_first)
-        ) #else(
-           #( "signbit = ", $e.m_backend.m_sign, " data = ", #array ( expr: $e.m_backend.m_data.la[$e.m_backend.m_limbs - $i - 1], size: $e.m_backend.m_limbs ) : [$e,x] )
-        )
-      ) #else(
-        #if($e.m_backend.m_limbs == 1) (
-            #if($e.m_backend.m_sign) ( -1 * (__int64)($e.m_backend.m_data.ld.data[0]) ) #else($e.m_backend.m_data.ld.data[0])
-        ) #elif(($e.m_backend.m_limbs == 2) &amp;&amp; ($e.m_backend.m_data.ld.data[1] &lt; 0x80000000)) (
-            #if($e.m_backend.m_sign) ( -1 * (__int64)($e.m_backend.m_data.ld.data[0] | ((__int64)$e.m_backend.m_data.ld.data[1] &lt;&lt; 32)) ) #else($e.m_backend.m_data.ld.data[0] | ((__int64)$e.m_backend.m_data.ld.data[1] &lt;&lt; 32))
-        ) #else(
-            #( "signbit = ", $e.m_backend.m_sign, " data = ", #array ( expr: $e.m_backend.m_data.ld.data[$e.m_backend.m_limbs - $i - 1], size: $e.m_backend.m_limbs ) : [$e,x] )
-        )
-      )
-   )
-
-   children (
-      #if ($e.m_backend.m_internal) (
-        #if($e.m_backend.m_limbs == 1) (
-            #(value: $e.m_backend.m_data.first)
-         ) #elif($e.m_backend.m_limbs == 1) (
-            #(value: $e.m_backend.m_data.double_first)
-         ) #else (
-            #(
-            sign bit: $e.m_backend.m_sign,
-            #array (
-                expr: $e.m_backend.m_data.la[$e.m_backend.m_limbs - $i - 1],
-                size: $e.m_backend.m_limbs
-            ) : [$e,x]
-            )
-         )
-      ) #else (
-        #(
-            ~raw: [$c,!],
-            sign bit: $e.m_backend.m_sign,
-            #array (
-                expr: $e.m_backend.m_data.ld.data[$e.m_backend.m_limbs - $i - 1],
-                size: $e.m_backend.m_limbs
-            ) : [$e,x]
-         )
-      )
-   )
-}
-</pre>
+<p>
+          <span class="inlinemediaobject"><img src="../../../../debugger7.png" alt="debugger7"></span>
+        </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
