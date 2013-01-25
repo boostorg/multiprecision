@@ -7,6 +7,7 @@
 #define BOOST_MATH_LOGGED_ADAPTER_HPP
 
 #include <boost/multiprecision/traits/extract_exponent_type.hpp>
+#include <boost/multiprecision/detail/integer_ops.hpp>
 
 namespace boost{
 namespace multiprecision{
@@ -398,7 +399,7 @@ inline void eval_bit_set(const logged_adaptor<Backend>& arg, unsigned a)
    using default_ops::eval_bit_set;
    log_prefix_event(arg.value(), a, "bit-set");
    eval_bit_set(arg.value(), a);
-   log_postfix_event(arg.value(), r, "bit-set");
+   log_postfix_event(arg.value(), arg, "bit-set");
 }
 template <class Backend>
 inline void eval_bit_unset(const logged_adaptor<Backend>& arg, unsigned a)
@@ -406,7 +407,7 @@ inline void eval_bit_unset(const logged_adaptor<Backend>& arg, unsigned a)
    using default_ops::eval_bit_unset;
    log_prefix_event(arg.value(), a, "bit-unset");
    eval_bit_unset(arg.value(), a);
-   log_postfix_event(arg.value(), r, "bit-unset");
+   log_postfix_event(arg.value(), arg, "bit-unset");
 }
 template <class Backend>
 inline void eval_bit_flip(const logged_adaptor<Backend>& arg, unsigned a)
@@ -414,7 +415,7 @@ inline void eval_bit_flip(const logged_adaptor<Backend>& arg, unsigned a)
    using default_ops::eval_bit_flip;
    log_prefix_event(arg.value(), a, "bit-flip");
    eval_bit_flip(arg.value(), a);
-   log_postfix_event(arg.value(), r, "bit-flip");
+   log_postfix_event(arg.value(), arg, "bit-flip");
 }
 
 NON_MEMBER_OP3(gcd, "gcd");
@@ -466,7 +467,7 @@ struct number_category<backends::logged_adaptor<Backend> > : public number_categ
 namespace std{
 
 template <class Backend, boost::multiprecision::expression_template_option ExpressionTemplates>
-class numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<Backend>, ExpressionTemplates> > 
+class numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<Backend>, ExpressionTemplates> >
    : public std::numeric_limits<boost::multiprecision::number<Backend, ExpressionTemplates> >
 {
    typedef std::numeric_limits<boost::multiprecision::number<Backend, ExpressionTemplates> > base_type;

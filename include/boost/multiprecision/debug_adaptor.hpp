@@ -7,6 +7,7 @@
 #define BOOST_MATH_DEBUG_ADAPTER_HPP
 
 #include <boost/multiprecision/traits/extract_exponent_type.hpp>
+#include <boost/multiprecision/detail/integer_ops.hpp>
 
 namespace boost{
 namespace multiprecision{
@@ -412,7 +413,7 @@ struct number_category<backends::debug_adaptor<Backend> > : public number_catego
 namespace std{
 
 template <class Backend, boost::multiprecision::expression_template_option ExpressionTemplates>
-class numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<Backend>, ExpressionTemplates> > 
+class numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::debug_adaptor<Backend>, ExpressionTemplates> >
    : public std::numeric_limits<boost::multiprecision::number<Backend, ExpressionTemplates> >
 {
    typedef std::numeric_limits<boost::multiprecision::number<Backend, ExpressionTemplates> > base_type;

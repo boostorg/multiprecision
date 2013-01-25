@@ -1246,14 +1246,14 @@ inline void eval_pow(mpfr_float_backend<Digits10, AllocateType>& result, const m
 #endif
 
 template <unsigned Digits10, mpfr_allocation_type AllocateType, class Integer>
-inline typename enable_if<mpl::and_<is_signed<Integer>, mpl::bool_<BOOST_MP_ENABLE_IF_WORKAROUND (sizeof(Integer) <= sizeof(long))> > >::type 
+inline typename enable_if<mpl::and_<is_signed<Integer>, mpl::bool_<BOOST_MP_ENABLE_IF_WORKAROUND (sizeof(Integer) <= sizeof(long))> > >::type
    eval_pow(mpfr_float_backend<Digits10, AllocateType>& result, const mpfr_float_backend<Digits10, AllocateType>& b, const Integer& e)
 {
    mpfr_pow_si(result.data(), b.data(), e, GMP_RNDN);
 }
 
 template <unsigned Digits10, mpfr_allocation_type AllocateType, class Integer>
-inline typename enable_if<mpl::and_<is_unsigned<Integer>, mpl::bool_<BOOST_MP_ENABLE_IF_WORKAROUND (sizeof(Integer) <= sizeof(long))> > >::type 
+inline typename enable_if<mpl::and_<is_unsigned<Integer>, mpl::bool_<BOOST_MP_ENABLE_IF_WORKAROUND (sizeof(Integer) <= sizeof(long))> > >::type
    eval_pow(mpfr_float_backend<Digits10, AllocateType>& result, const mpfr_float_backend<Digits10, AllocateType>& b, const Integer& e)
 {
    mpfr_pow_ui(result.data(), b.data(), e, GMP_RNDN);
@@ -1392,15 +1392,47 @@ template <class T> struct constant_ln_two;
 template <class T> struct constant_euler;
 template <class T> struct constant_catalan;
 
+namespace detail{
+
+   template <class T, int N>
+   struct mpfr_constant_initializer
+   {
+      static void force_instantiate()
+      {
+         init.force_instantiate();
+      }
+   private:
+      struct initializer
+      {
+         initializer()
+         {
+            T::get(mpl::int_<N>());
+         }
+         void force_instantiate()const{}
+      };
+      static const initializer init;
+   };
+
+   template <class T, int N>
+   typename mpfr_constant_initializer<T, N>::initializer const mpfr_constant_initializer<T, N>::init;
+
+}
+
 template<unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
 struct constant_pi<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >
 {
    typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result_type;
    template<int N>
-   static inline result_type get(const mpl::int_<N>&)
+   static inline const result_type& get(const mpl::int_<N>&)
    {
-      result_type result;
-      mpfr_const_pi(result.backend().data(), GMP_RNDN);
+      detail::mpfr_constant_initializer<constant_pi<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >, N>::force_instantiate();
+      static result_type result;
+      static bool has_init = false;
+      if(!has_init)
+      {
+         mpfr_const_pi(result.backend().data(), GMP_RNDN);
+         has_init = true;
+      }
       return result;
    }
 };
@@ -1409,10 +1441,16 @@ struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::mpfr
 {
    typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result_type;
    template<int N>
-   static inline result_type get(const mpl::int_<N>&)
+   static inline const result_type& get(const mpl::int_<N>&)
    {
-      result_type result;
-      mpfr_const_log2(result.backend().data(), GMP_RNDN);
+      detail::mpfr_constant_initializer<constant_ln_two<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >, N>::force_instantiate();
+      static result_type result;
+      static bool init = false;
+      if(!init)
+      {
+         mpfr_const_log2(result.backend().data(), GMP_RNDN);
+         init = true;
+      }
       return result;
    }
 };
@@ -1421,10 +1459,16 @@ struct constant_euler<boost::multiprecision::number<boost::multiprecision::mpfr_
 {
    typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result_type;
    template<int N>
-   static inline result_type get(const mpl::int_<N>&)
+   static inline const result_type& get(const mpl::int_<N>&)
    {
-      result_type result;
-      mpfr_const_euler(result.backend().data(), GMP_RNDN);
+      detail::mpfr_constant_initializer<constant_euler<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >, N>::force_instantiate();
+      static result_type result;
+      static bool init = false;
+      if(!init)
+      {
+         mpfr_const_euler(result.backend().data(), GMP_RNDN);
+         init = true;
+      }
       return result;
    }
 };
@@ -1433,10 +1477,16 @@ struct constant_catalan<boost::multiprecision::number<boost::multiprecision::mpf
 {
    typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result_type;
    template<int N>
-   static inline result_type get(const mpl::int_<N>&)
+   static inline const result_type& get(const mpl::int_<N>&)
    {
-      result_type result;
-      mpfr_const_catalan(result.backend().data(), GMP_RNDN);
+      detail::mpfr_constant_initializer<constant_catalan<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >, N>::force_instantiate();
+      static result_type result;
+      static bool init = false;
+      if(!init)
+      {
+         mpfr_const_catalan(result.backend().data(), GMP_RNDN);
+         init = true;
+      }
       return result;
    }
 };
