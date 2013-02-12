@@ -17,7 +17,11 @@
 #define BOOST_MP_CPP_DEC_FLOAT_BACKEND_HPP
 
 #include <boost/cstdint.hpp>
+#ifndef BOOST_NO_CXX11_HDR_ARRAY
+#include <array>
+#else
 #include <boost/array.hpp>
+#endif
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <vector>
@@ -124,10 +128,17 @@ private:
    }
    fpclass_type;
 
+#ifndef BOOST_NO_CXX11_HDR_ARRAY
+   typedef typename mpl::if_<is_void<Allocator>,
+      std::array<boost::uint32_t, cpp_dec_float_elem_number>,
+      detail::dynamic_array<boost::uint32_t, cpp_dec_float_elem_number, Allocator>
+      >::type array_type;
+#else
    typedef typename mpl::if_<is_void<Allocator>,
       boost::array<boost::uint32_t, cpp_dec_float_elem_number>,
       detail::dynamic_array<boost::uint32_t, cpp_dec_float_elem_number, Allocator>
       >::type array_type;
+#endif
 
    array_type      data;
    ExponentType    exp;
