@@ -1192,7 +1192,7 @@ inline void eval_trunc(mpfr_float_backend<Digits10, AllocateType>& result, const
 {
    if(0 == mpfr_number_p(val.data()))
    {
-      result = boost::math::policies::raise_rounding_error("boost::multiprecision::trunc<%1%>(%1%)", 0, number<mpfr_float_backend<Digits10, AllocateType> >(val), 0, boost::math::policies::policy<>()).backend();
+      result = boost::math::policies::raise_rounding_error("boost::multiprecision::trunc<%1%>(%1%)", 0, number<mpfr_float_backend<Digits10, AllocateType> >(val), number<mpfr_float_backend<Digits10, AllocateType> >(val), boost::math::policies::policy<>()).backend();
       return;
    }
    mpfr_trunc(result.data(), val.data());
