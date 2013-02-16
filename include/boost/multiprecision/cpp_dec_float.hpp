@@ -1720,12 +1720,9 @@ cpp_dec_float<Digits10, ExponentType, Allocator> cpp_dec_float<Digits10, Exponen
       // Thus the integer part is zero.
       return zero();
    }
-   else if(exp >= static_cast<ExponentType>(Digits10 - 1))
-   {
-      // The number is too large to resolve the integer part.
-      // Thus it is already a pure integer part.
-      return *this;
-   }
+
+   // Truncate the digits from the decimal part, including guard digits
+   // that do not belong to the integer part.
 
    // Make a local copy.
    cpp_dec_float<Digits10, ExponentType, Allocator> x = *this;

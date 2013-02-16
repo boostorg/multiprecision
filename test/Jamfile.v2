@@ -101,6 +101,8 @@ run test_arithmetic_ab_1.cpp ;
 run test_arithmetic_ab_2.cpp ;
 run test_arithmetic_ab_3.cpp ;
 
+run test_cpp_dec_float_round.cpp ;
+
 run test_arithmetic_logged_1.cpp ;
 run test_arithmetic_logged_2.cpp ;
 
