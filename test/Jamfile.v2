@@ -24,8 +24,8 @@ project : requirements
    <search>$(gmp_path)
    <search>$(mpfr_path)
    <search>$(mpfr_path)/build.vc10/lib/Win32/Debug
-   <search>$(mpfi_path) 
-   <search>$(mpfi_path)/src 
+   <search>$(mpfi_path)
+   <search>$(mpfi_path)/src
    <search>$(tommath_path)
    # We set these to make it easier to set up and test GMP and MPFR under Win32:
    <toolset>msvc:<runtime-link>static
@@ -506,7 +506,7 @@ if $(enable-specfun)
 
    for local source in [ glob math/*.cpp ]
    {
-      run $(source) mpfr gmp /boost/test//boost_test_exec_monitor/<link>static /boost/regex//boost_regex/<link>static
+      run $(source) mpfr gmp /boost/test//boost_unit_test_framework/<link>static /boost/regex//boost_regex/<link>static
            : # command line
            : # input files
            : # requirements
@@ -517,7 +517,7 @@ if $(enable-specfun)
             <toolset>msvc:<cxxflags>-bigobj
             release
            : $(source:B)_mpfr ;
-      run $(source) gmp /boost/test//boost_test_exec_monitor/<link>static /boost/regex//boost_regex/<link>static
+      run $(source) gmp /boost/test//boost_unit_test_framework/<link>static /boost/regex//boost_regex/<link>static
            : # command line
            : # input files
            : # requirements
@@ -528,7 +528,7 @@ if $(enable-specfun)
             <toolset>msvc:<cxxflags>-bigobj
             release
            : $(source:B)_mpf ;
-      run $(source) /boost/test//boost_test_exec_monitor/<link>static /boost/regex//boost_regex/<link>static
+      run $(source) /boost/test//boost_unit_test_framework/<link>static /boost/regex//boost_regex/<link>static
            : # command line
            : # input files
            : # requirements
