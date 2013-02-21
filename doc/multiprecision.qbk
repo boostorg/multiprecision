@@ -3617,6 +3617,8 @@ Windows Vista machine.
 * [*Breaking change] renamed `rational_adapter` to `rational_adaptor`.
 * Add support for [mpfi].
 * Add logged_adaptor.
+* Fix bug in integer division that results in incorrect sign of `cpp_int` when both arguments are small enough
+to fit in a `double_limb_type`.  See [@https://svn.boost.org/trac/boost/ticket/8126 8126].
 
 [h4 1.53]
 

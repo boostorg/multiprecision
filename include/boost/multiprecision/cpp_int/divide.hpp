@@ -114,7 +114,10 @@ void divide_unsigned_helper(
    if(r_order == 0)
    {
       if(result)
+      {
          *result = px[0] / py[0];
+         result->sign(x.sign() != y.sign());
+      }
       r = px[0] % py[0];
       return;
    }
@@ -126,7 +129,10 @@ void divide_unsigned_helper(
          (static_cast<double_limb_type>(py[1]) << CppInt1::limb_bits) | py[0] 
          : py[0];
       if(result)
+      {
          *result = a / b;
+         result->sign(x.sign() != y.sign());
+      }
       r = a % b;
       return;
    }

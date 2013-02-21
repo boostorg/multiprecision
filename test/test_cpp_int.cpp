@@ -470,6 +470,25 @@ struct tester
          }
 
       }
+      //
+      // Specific bug report tests come last:
+      //
+      // Bug https://svn.boost.org/trac/boost/ticket/8126:
+      test_type a("-4294967296");
+      test_type b("4294967296");
+      test_type c("-1");
+      a = (a / b);
+      BOOST_CHECK_EQUAL(a, -1);
+      a = -4294967296;
+      a = (a / b) * c;
+      BOOST_CHECK_EQUAL(a, 1);
+      a = -23;
+      b = 23;
+      a = (a / b) * c;
+      BOOST_CHECK_EQUAL(a, 1);
+      a = -23;
+      a = (a / b) / c;
+      BOOST_CHECK_EQUAL(a, 1);
    }
 };
 
