@@ -211,7 +211,7 @@ inline void subtract_unsigned(CppInt1& result, const CppInt2& a, const limb_type
    result.resize(a.size(), a.size());
    typename CppInt1::limb_pointer pr = result.limbs();
    typename CppInt2::const_limb_pointer pa = a.limbs();
-   if(*pa > b)
+   if(*pa >= b)
    {
       *pr = *pa - b;
       if(&result != &a)

@@ -387,6 +387,37 @@ struct tester
          BOOST_CHECK_EQUAL(q, a);
          BOOST_CHECK_EQUAL(r, 1);
       }
+      // Bug https://svn.boost.org/trac/boost/ticket/8126:
+      test_type a("-4294967296");
+      test_type b("4294967296");
+      test_type c("-1");
+      a = (a / b);
+      BOOST_CHECK_EQUAL(a, -1);
+      a = -4294967296;
+      a = (a / b) * c;
+      BOOST_CHECK_EQUAL(a, 1);
+      a = -23;
+      b = 23;
+      a = (a / b) * c;
+      BOOST_CHECK_EQUAL(a, 1);
+      a = -23;
+      a = (a / b) / c;
+      BOOST_CHECK_EQUAL(a, 1);
+      a = test_type("-26607734784073568386365259775");
+      b = test_type("8589934592");
+      a = a / b;
+      BOOST_CHECK_EQUAL(a, test_type("-3097548007973652377"));
+      // Bug https://svn.boost.org/trac/boost/ticket/8133:
+      a = test_type("0x12345600012434ffffffffffffffffffffffff");
+      unsigned ui = 0xffffffff;
+      a = a - ui;
+      BOOST_CHECK_EQUAL(a, test_type("0x12345600012434ffffffffffffffff00000000"));
+      a = test_type("0x12345600012434ffffffffffffffffffffffff");
+#ifndef BOOST_NO_LONG_LONG
+      unsigned long long ull = 0xffffffffffffffffuLL;
+      a = a - ull;
+      BOOST_CHECK_EQUAL(a, test_type("0x12345600012434ffffffff0000000000000000"));
+#endif
    }
 
    void test()
@@ -470,25 +501,6 @@ struct tester
          }
 
       }
-      //
-      // Specific bug report tests come last:
-      //
-      // Bug https://svn.boost.org/trac/boost/ticket/8126:
-      test_type a("-4294967296");
-      test_type b("4294967296");
-      test_type c("-1");
-      a = (a / b);
-      BOOST_CHECK_EQUAL(a, -1);
-      a = -4294967296;
-      a = (a / b) * c;
-      BOOST_CHECK_EQUAL(a, 1);
-      a = -23;
-      b = 23;
-      a = (a / b) * c;
-      BOOST_CHECK_EQUAL(a, 1);
-      a = -23;
-      a = (a / b) / c;
-      BOOST_CHECK_EQUAL(a, 1);
    }
 };
 
