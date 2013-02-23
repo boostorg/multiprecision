@@ -223,6 +223,10 @@ inline void subtract_unsigned(CppInt1& result, const CppInt2& a, const limb_type
 #endif
          result.sign(a.sign());
       }
+      else if((result.size() == 1) && (*pr == 0))
+      {
+         result.sign(false); // zero is unsigned.
+      }
    }
    else if(result.size() == 1)
    {

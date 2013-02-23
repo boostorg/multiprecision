@@ -418,6 +418,46 @@ struct tester
       a = a - ull;
       BOOST_CHECK_EQUAL(a, test_type("0x12345600012434ffffffff0000000000000000"));
 #endif
+      //
+      // Now check that things which should be zero really are
+      // https://svn.boost.org/trac/boost/ticket/8145:
+      //
+      a = -1;
+      a += 1;
+      BOOST_CHECK_EQUAL(a, 0);
+      a = 1;
+      a += -1;
+      BOOST_CHECK_EQUAL(a, 0);
+      a = -1;
+      a += test_type(1);
+      BOOST_CHECK_EQUAL(a, 0);
+      a = 1;
+      a += test_type(-1);
+      BOOST_CHECK_EQUAL(a, 0);
+      a = test_type("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+      a -= test_type("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+      BOOST_CHECK_EQUAL(a, 0);
+      a = -test_type("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+      a += test_type("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+      BOOST_CHECK_EQUAL(a, 0);
+      a = 2;
+      a *= 0;
+      BOOST_CHECK_EQUAL(a, 0);
+      a = -2;
+      a *= 0;
+      BOOST_CHECK_EQUAL(a, 0);
+      a = 2;
+      a *= test_type(0);
+      BOOST_CHECK_EQUAL(a, 0);
+      a = -2;
+      a *= test_type(0);
+      BOOST_CHECK_EQUAL(a, 0);
+      a = -2;
+      a /= 50;
+      BOOST_CHECK_EQUAL(a, 0);
+      a = -test_type("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+      a /= (1 + test_type("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"));
+      BOOST_CHECK_EQUAL(a, 0);
    }
 
    void test()
