@@ -458,6 +458,13 @@ struct tester
       a = -test_type("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
       a /= (1 + test_type("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"));
       BOOST_CHECK_EQUAL(a, 0);
+      // https://svn.boost.org/trac/boost/ticket/8160
+      a = 1;
+      a = 0 / test_type(1);
+      BOOST_CHECK_EQUAL(a, 0);
+      a = 1;
+      a = 0 % test_type(25);
+      BOOST_CHECK_EQUAL(a, 0);
    }
 
    void test()

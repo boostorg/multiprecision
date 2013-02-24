@@ -339,6 +339,8 @@ void divide_unsigned_helper(
    if((r_order == 0) && (*pr == 0))
    {
       // All the limbs in x are zero, so is the result:
+      if(result)
+         *result = static_cast<limb_type>(0u);
       return;
    }
    //

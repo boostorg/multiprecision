@@ -3617,8 +3617,11 @@ Windows Vista machine.
 * [*Breaking change] renamed `rational_adapter` to `rational_adaptor`.
 * Add support for [mpfi].
 * Add logged_adaptor.
-* Fix bug in integer division that results in incorrect sign of `cpp_int` when both arguments are small enough
+* Fixed bug in integer division of `cpp_int` that results in incorrect sign of `cpp_int` when both arguments are small enough
 to fit in a `double_limb_type`.  See [@https://svn.boost.org/trac/boost/ticket/8126 8126].
+* Fixed bug in subtraction of a single limb in `cpp_int` that results in incorrect value when the result should have a 0
+in the last limb: [@https://svn.boost.org/trac/boost/ticket/8133 8133].
+* Fixed bug in `cpp_int` where division of 0 by something doesn't get zero in the result: [@https://svn.boost.org/trac/boost/ticket/8160 8160].
 
 [h4 1.53]
 
