@@ -336,13 +336,6 @@ void divide_unsigned_helper(
    r.sign(false);
    typename CppInt1::limb_pointer pr = r.limbs();
 
-   if((r_order == 0) && (*pr == 0))
-   {
-      // All the limbs in x are zero, so is the result:
-      if(result)
-         *result = static_cast<limb_type>(0u);
-      return;
-   }
    //
    // check for x < y, try to do this without actually having to 
    // do a full comparison:
