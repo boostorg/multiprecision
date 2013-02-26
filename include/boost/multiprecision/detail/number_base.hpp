@@ -283,13 +283,12 @@ struct arg_type<expression<Tag, Arg1, Arg2, Arg3, Arg4> >
    typedef expression<Tag, Arg1, Arg2, Arg3, Arg4> type;
 };
 
-template <class T>
 struct unmentionable
 {
-   static void proc(){}
+   unmentionable* proc(){ return 0; }
 };
 
-typedef void (*unmentionable_type)();
+typedef unmentionable* (unmentionable::*unmentionable_type)();
 
 template <class T>
 struct expression_storage
@@ -334,7 +333,7 @@ struct expression<tag, Arg1, void, void, void>
    operator unmentionable_type()const
    {
       result_type r(*this);
-      return r ? &unmentionable<void>::proc : 0;
+      return r ? &unmentionable::proc : 0;
    }
 
 private:
@@ -357,7 +356,7 @@ struct expression<terminal, Arg1, void, void, void>
 
    operator unmentionable_type()const
    {
-      return arg ? &unmentionable<void>::proc : 0;
+      return arg ? &unmentionable::proc : 0;
    }
 
 private:
@@ -386,7 +385,7 @@ struct expression<tag, Arg1, Arg2, void, void>
    operator unmentionable_type()const
    {
       result_type r(*this);
-      return r ? &unmentionable<void>::proc : 0;
+      return r ? &unmentionable::proc : 0;
    }
 
    static const unsigned left_depth = left_type::depth + 1;
@@ -426,7 +425,7 @@ struct expression<tag, Arg1, Arg2, Arg3, void>
    operator unmentionable_type()const
    {
       result_type r(*this);
-      return r ? &unmentionable<void>::proc : 0;
+      return r ? &unmentionable::proc : 0;
    }
 
    static const unsigned left_depth = left_type::depth + 1;
@@ -475,7 +474,7 @@ struct expression
    operator unmentionable_type()const
    {
       result_type r(*this);
-      return r ? &unmentionable<void>::proc : 0;
+      return r ? &unmentionable::proc : 0;
    }
 
    static const unsigned left_depth = left_type::depth + 1;
