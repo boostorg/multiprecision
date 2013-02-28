@@ -2621,26 +2621,23 @@ cpp_dec_float<Digits10, ExponentType, Allocator> cpp_dec_float<Digits10, Exponen
        cpp_dec_float("1.701411834604692317316873037158841057280000000000000000000000000000000000000000000000000000000000000e38")
    }};
 
-   if((p > static_cast<ExponentType>(-128)) && (p < static_cast<ExponentType>(+128)))
+   if((p > static_cast<long long>(-128)) && (p < static_cast<long long>(+128)))
    {
       return p2_data[static_cast<std::size_t>(p + ((p2_data.size() - 1u) / 2u))];
    }
-
-   // Compute and return 2^p.
-   if(p < static_cast<ExponentType>(0))
-   {
-      return pow2(static_cast<ExponentType>(-p)).calculate_inv();
-   }
-   else if(p < static_cast<ExponentType>(std::numeric_limits<boost::uint64_t>::digits))
-   {
-      const boost::uint64_t p2 = static_cast<boost::uint64_t>(static_cast<boost::uint64_t>(1uLL) << p);
-      return cpp_dec_float(p2);
-   }
    else
    {
-      cpp_dec_float<Digits10, ExponentType, Allocator> t;
-      default_ops::detail::pow_imp(t, two(), p, mpl::true_());
-      return t;
+      // Compute and return 2^p.
+      if(p < static_cast<long long>(0))
+      {
+         return pow2(static_cast<long long>(-p)).calculate_inv();
+      }
+      else
+      {
+         cpp_dec_float<Digits10, ExponentType, Allocator> t;
+         default_ops::detail::pow_imp(t, two(), p, mpl::true_());
+         return t;
+      }
    }
 }
 
@@ -2827,10 +2824,19 @@ inline void eval_trunc(cpp_dec_float<Digits10, ExponentType, Allocator>& result,
 template <unsigned Digits10, class ExponentType, class Allocator, class ArgType>
 inline void eval_ldexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& x, ArgType e)  
 {
-   if((static_cast<long long>(e) > (std::numeric_limits<ExponentType>::max)()) || (static_cast<long long>(e) < (std::numeric_limits<ExponentType>::min)()))
+   const long long the_exp = static_cast<long long>(e);
+
+   if((the_exp > (std::numeric_limits<ExponentType>::max)()) || (the_exp < (std::numeric_limits<ExponentType>::min)()))
       BOOST_THROW_EXCEPTION(std::runtime_error(std::string("Exponent value is out of range.")));
+
    result = x;
-   result *= cpp_dec_float<Digits10, ExponentType, Allocator>::pow2(e);
+
+   if     ((the_exp > static_cast<long long>(-std::numeric_limits<long long>::digits)) && (the_exp < static_cast<long long>(0)))
+      result.div_unsigned_long_long(1ULL << static_cast<long long>(-the_exp));
+   else if((the_exp < static_cast<long long>( std::numeric_limits<long long>::digits)) && (the_exp > static_cast<long long>(0)))
+      result.mul_unsigned_long_long(1ULL << the_exp);
+   else if(the_exp != static_cast<long long>(0))
+      result *= cpp_dec_float<Digits10, ExponentType, Allocator>::pow2(e);
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
