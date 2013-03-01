@@ -343,7 +343,7 @@ inline void eval_left_shift(logged_adaptor<Backend>& arg, const logged_adaptor<B
 {
    using default_ops::eval_left_shift;
    log_prefix_event(arg.value(), a, b, "<<");
-   eval_left_shift(arg.value(), a, b);
+   eval_left_shift(arg.value(), a.value(), b);
    log_postfix_event(arg.value(), "<<");
 }
 template <class Backend>
@@ -359,7 +359,7 @@ inline void eval_right_shift(logged_adaptor<Backend>& arg, const logged_adaptor<
 {
    using default_ops::eval_right_shift;
    log_prefix_event(arg.value(), a, b, ">>");
-   eval_right_shift(arg.value(), a, b);
+   eval_right_shift(arg.value(), a.value(), b);
    log_postfix_event(arg.value(), ">>");
 }
 

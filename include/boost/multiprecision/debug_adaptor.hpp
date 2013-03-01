@@ -303,7 +303,7 @@ template <class Backend>
 inline void eval_left_shift(debug_adaptor<Backend>& arg, const debug_adaptor<Backend>& a, unsigned b)
 {
    using default_ops::eval_left_shift;
-   eval_left_shift(arg.value(), a, b);
+   eval_left_shift(arg.value(), a.value(), b);
    arg.update_view();\
 }
 template <class Backend>
@@ -317,7 +317,7 @@ template <class Backend>
 inline void eval_right_shift(debug_adaptor<Backend>& arg, const debug_adaptor<Backend>& a, unsigned b)
 {
    using default_ops::eval_right_shift;
-   eval_right_shift(arg.value(), a, b);
+   eval_right_shift(arg.value(), a.value(), b);
    arg.update_view();\
 }
 

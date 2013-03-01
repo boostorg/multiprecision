@@ -319,6 +319,7 @@ struct expression<tag, Arg1, void, void, void>
 {
    typedef mpl::int_<1> arity;
    typedef typename arg_type<Arg1>::type left_type;
+   typedef typename left_type::result_type left_result_type;
    typedef typename left_type::result_type result_type;
    typedef tag tag_type;
 

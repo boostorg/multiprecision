@@ -69,9 +69,38 @@ void test()
    }
 }
 
+void test_rational_mixed()
+{
+   using namespace boost::multiprecision;
+   cpp_int a(2);
+   cpp_rational r(10);
+
+   BOOST_CHECK_EQUAL(a + -r, -8);
+   BOOST_CHECK_EQUAL(-r + a, -8);
+   BOOST_CHECK_EQUAL(-a + r, 8);
+   BOOST_CHECK_EQUAL(r + -a, 8);
+
+   BOOST_CHECK_EQUAL(a - -r, 12);
+   BOOST_CHECK_EQUAL(-r - a, -12);
+   BOOST_CHECK_EQUAL(-a - r, -12);
+   BOOST_CHECK_EQUAL(r - -a, 12);
+
+   BOOST_CHECK_EQUAL(a * -r, -20);
+   BOOST_CHECK_EQUAL(-r * a, -20);
+   BOOST_CHECK_EQUAL(-a * r, -20);
+   BOOST_CHECK_EQUAL(r * -a, -20);
+
+   BOOST_CHECK_EQUAL(a / -r, cpp_rational(-2, 10));
+   BOOST_CHECK_EQUAL(-r / a, -5);
+   BOOST_CHECK_EQUAL(cpp_rational(-a / r), cpp_rational(-2, 10));
+   BOOST_CHECK_EQUAL(r / -a, -5);
+}
+
 int main()
 {
    using namespace boost::multiprecision;
+
+   test_rational_mixed();
 
    test<checked_int512_t, checked_int1024_t>();
    test<checked_int256_t, checked_int512_t>();

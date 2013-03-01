@@ -392,7 +392,7 @@ public:
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The left-shift operation is only valid for integer types");
       detail::check_shift_range(val, mpl::bool_<(sizeof(V) > sizeof(std::size_t))>(), is_signed<V>());
-      eval_left_shift(m_backend, canonical_value(val));
+      eval_left_shift(m_backend, static_cast<std::size_t>(canonical_value(val)));
       return *this;
    }
 
@@ -401,7 +401,7 @@ public:
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The right-shift operation is only valid for integer types");
       detail::check_shift_range(val, mpl::bool_<(sizeof(V) > sizeof(std::size_t))>(), is_signed<V>());
-      eval_right_shift(m_backend, canonical_value(val));
+      eval_right_shift(m_backend, static_cast<std::size_t>(canonical_value(val)));
       return *this;
    }
 
@@ -1114,7 +1114,7 @@ private:
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The right shift operation is only valid for integer types");
       using default_ops::eval_right_shift;
       detail::check_shift_range(val, mpl::bool_<(sizeof(Val) > sizeof(std::size_t))>(), is_signed<Val>());
-      eval_right_shift(m_backend, canonical_value(e.value()), val);
+      eval_right_shift(m_backend, canonical_value(e.value()), static_cast<std::size_t>(val));
    }
 
    template <class Exp, class Val>
@@ -1123,7 +1123,7 @@ private:
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The left shift operation is only valid for integer types");
       using default_ops::eval_left_shift;
       detail::check_shift_range(val, mpl::bool_<(sizeof(Val) > sizeof(std::size_t))>(), is_signed<Val>());
-      eval_left_shift(m_backend, canonical_value(e.value()), val);
+      eval_left_shift(m_backend, canonical_value(e.value()), static_cast<std::size_t>(val));
    }
 
    template <class Exp, class Val, class Tag>
@@ -1133,7 +1133,7 @@ private:
       using default_ops::eval_right_shift;
       self_type temp(e);
       detail::check_shift_range(val, mpl::bool_<(sizeof(Val) > sizeof(std::size_t))>(), is_signed<Val>());
-      eval_right_shift(m_backend, temp.backend(), val);
+      eval_right_shift(m_backend, temp.backend(), static_cast<std::size_t>(val));
    }
 
    template <class Exp, class Val, class Tag>
@@ -1143,7 +1143,7 @@ private:
       using default_ops::eval_left_shift;
       self_type temp(e);
       detail::check_shift_range(val, mpl::bool_<(sizeof(Val) > sizeof(std::size_t))>(), is_signed<Val>());
-      eval_left_shift(m_backend, temp.backend(), val);
+      eval_left_shift(m_backend, temp.backend(), static_cast<std::size_t>(val));
    }
 
    template <class Exp>
