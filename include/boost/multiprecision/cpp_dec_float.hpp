@@ -16,15 +16,16 @@
 #ifndef BOOST_MP_CPP_DEC_FLOAT_BACKEND_HPP
 #define BOOST_MP_CPP_DEC_FLOAT_BACKEND_HPP
 
-#include <boost/cstdint.hpp>
+#include <limits>
 #ifndef BOOST_NO_CXX11_HDR_ARRAY
 #include <array>
 #else
 #include <boost/array.hpp>
 #endif
+#include <boost/cstdint.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/big_lanczos.hpp>
-#include <vector>
+#include <boost/multiprecision/detail/dynamic_array.hpp>
 
 //
 // Headers required for Boost.Math integration:
@@ -44,32 +45,6 @@ template <unsigned Digits10, class ExponentType, class Allocator>
 struct number_category<backends::cpp_dec_float<Digits10, ExponentType, Allocator> > : public mpl::int_<number_kind_floating_point>{};
 
 namespace backends{
-
-namespace detail{
-
-template <class T, class Allocator>
-struct rebind
-{
-   typedef typename Allocator::template rebind<T>::other type;
-};
-
-template <class T, unsigned S, class Allocator>
-struct dynamic_array : public std::vector<T, typename rebind<T, Allocator>::type>
-{
-   dynamic_array()
-      : std::vector<T, typename rebind<T, Allocator>::type>(static_cast<typename std::vector<T, typename rebind<T, Allocator>::type>::size_type>(S), static_cast<T>(0)) {}
-
-   T* data()
-   {
-      return &*this->begin();
-   }
-   const T* data()const
-   {
-      return &*this->begin();
-   }
-};
-
-}
 
 template <unsigned Digits10, class ExponentType, class Allocator>
 class cpp_dec_float
@@ -2214,7 +2189,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float(const double man
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
-cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, ExponentType, Allocator>::operator = (long double a)  
+cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, ExponentType, Allocator>::operator= (long double a)
 {
    // Christopher Kormanyos's original code used a cast to long long here, but that fails
    // when long double has more digits than a long long.
