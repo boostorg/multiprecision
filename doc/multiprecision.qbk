@@ -1271,13 +1271,13 @@ some other backend to class `number` and intercepts all operations on that objec
 This type provides `numeric_limits` support whenever the template argument Backend does so.
 
 This type is particularly useful when your debugger provides a good view of `std::string`: when this is the case
-multiprecision values can easily be inspected in the debugger by looking at the `debug_value` member of `debug_adapter`.
+multiprecision values can easily be inspected in the debugger by looking at the `debug_value` member of `debug_adaptor`.
 The down side of this approach is that runtimes are much slower when using this type.  Set against that it can make
 debugging very much easier, certainly much easier than sprinkling code with `printf` statements.
 
 When used in conjunction with the Visual C++ debugger visualisers, the value of a multiprecision type that uses this
 backend is displayed in the debugger just a builtin value would be, here we're inspecting a value of type
-`number<debug_adapter<cpp_dec_float<50> > >`:
+`number<debug_adaptor<cpp_dec_float<50> > >`:
 
 [$../debugger1.png]
 
@@ -1285,7 +1285,7 @@ Otherwise you will need to expand out the view and look at the "debug_value" mem
 
 [$../debugger2.png]
 
-It works for all the backend types equally too, here it is inspecting a `number<debug_adapter<gmp_rational> >`:
+It works for all the backend types equally too, here it is inspecting a `number<debug_adaptor<gmp_rational> >`:
 
 [$../debugger3.png]
 

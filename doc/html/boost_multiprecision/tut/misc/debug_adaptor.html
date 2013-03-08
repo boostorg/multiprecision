@@ -51,7 +51,7 @@
 <p>
           This type is particularly useful when your debugger provides a good view
           of <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span></code>: when this is the case multiprecision
-          values can easily be inspected in the debugger by looking at the <code class="computeroutput"><span class="identifier">debug_value</span></code> member of <code class="computeroutput"><span class="identifier">debug_adapter</span></code>.
+          values can easily be inspected in the debugger by looking at the <code class="computeroutput"><span class="identifier">debug_value</span></code> member of <code class="computeroutput"><span class="identifier">debug_adaptor</span></code>.
           The down side of this approach is that runtimes are much slower when using
           this type. Set against that it can make debugging very much easier, certainly
           much easier than sprinkling code with <code class="computeroutput"><span class="identifier">printf</span></code>
@@ -61,7 +61,7 @@
           When used in conjunction with the Visual C++ debugger visualisers, the
           value of a multiprecision type that uses this backend is displayed in the
           debugger just a builtin value would be, here we're inspecting a value of
-          type <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">debug_adapter</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float</span><span class="special">&lt;</span><span class="number">50</span><span class="special">&gt;</span> <span class="special">&gt;</span>
+          type <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">debug_adaptor</span><span class="special">&lt;</span><span class="identifier">cpp_dec_float</span><span class="special">&lt;</span><span class="number">50</span><span class="special">&gt;</span> <span class="special">&gt;</span>
           <span class="special">&gt;</span></code>:
         </p>
 <p>
@@ -76,7 +76,7 @@
         </p>
 <p>
           It works for all the backend types equally too, here it is inspecting a
-          <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">debug_adapter</span><span class="special">&lt;</span><span class="identifier">gmp_rational</span><span class="special">&gt;</span>
+          <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">debug_adaptor</span><span class="special">&lt;</span><span class="identifier">gmp_rational</span><span class="special">&gt;</span>
           <span class="special">&gt;</span></code>:
         </p>
 <p>

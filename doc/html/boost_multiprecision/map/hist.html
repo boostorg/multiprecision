@@ -40,6 +40,21 @@
 <li class="listitem">
             Add logged_adaptor.
           </li>
+<li class="listitem">
+            Fixed bug in integer division of <code class="computeroutput"><span class="identifier">cpp_int</span></code>
+            that results in incorrect sign of <code class="computeroutput"><span class="identifier">cpp_int</span></code>
+            when both arguments are small enough to fit in a <code class="computeroutput"><span class="identifier">double_limb_type</span></code>.
+            See <a href="https://svn.boost.org/trac/boost/ticket/8126" target="_top">8126</a>.
+          </li>
+<li class="listitem">
+            Fixed bug in subtraction of a single limb in <code class="computeroutput"><span class="identifier">cpp_int</span></code>
+            that results in incorrect value when the result should have a 0 in the
+            last limb: <a href="https://svn.boost.org/trac/boost/ticket/8133" target="_top">8133</a>.
+          </li>
+<li class="listitem">
+            Fixed bug in <code class="computeroutput"><span class="identifier">cpp_int</span></code>
+            where division of 0 by something doesn't get zero in the result: <a href="https://svn.boost.org/trac/boost/ticket/8160" target="_top">8160</a>.
+          </li>
 </ul></div>
 <h5>
 <a name="boost_multiprecision.map.hist.h1"></a>
