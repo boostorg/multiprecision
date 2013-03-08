@@ -16,6 +16,8 @@
 #ifndef BOOST_MP_CPP_DEC_FLOAT_BACKEND_HPP
 #define BOOST_MP_CPP_DEC_FLOAT_BACKEND_HPP
 
+#include <boost/config.hpp>
+#include <boost/cstdint.hpp>
 #include <limits>
 #ifndef BOOST_NO_CXX11_HDR_ARRAY
 #include <array>
