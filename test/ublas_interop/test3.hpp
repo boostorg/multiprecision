@@ -14,7 +14,7 @@
 #define TEST3_H
 
 #ifdef _MSC_VER
-#  pragma warning(disable:4800 4996)
+#  pragma warning(disable:4800 4996 4127 4100)
 #endif
 
 #include <boost/multiprecision/cpp_dec_float.hpp>
