@@ -19,13 +19,18 @@
 
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
+#ifdef TEST_ET
+typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<50>, boost::multiprecision::et_on> mp_test_type;
+#else
 typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<50>, boost::multiprecision::et_off> mp_test_type;
+#endif
 //typedef double mp_test_type;
 
 #define USE_RANGE
 #define USE_SLICE
 #define USE_FLOAT
-#define USE_UNBOUNDED_ARRAY 
+#define USE_UNBOUNDED_ARRAY
+#define USE_BOUNDED_ARRAY
 #define USE_STD_VECTOR 
 #define USE_BOUNDED_VECTOR USE_MATRIX
 #define USE_UNBOUNDED_ARRAY

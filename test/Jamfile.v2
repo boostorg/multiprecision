@@ -500,6 +500,13 @@ run ublas_interop/test5.cpp ublas_interop/test52.cpp ublas_interop/test53.cpp ;
 run ublas_interop/test6.cpp ublas_interop/test62.cpp ublas_interop/test63.cpp ;
 #run ublas_interop/test7.cpp ublas_interop/test71.cpp ublas_interop/test72.cpp ublas_interop/test73.cpp ;
 
+run ublas_interop/test1.cpp ublas_interop/test11.cpp ublas_interop/test12.cpp ublas_interop/test13.cpp : : : <define>TEST_ET=1 : ublas1_et ;
+run ublas_interop/test2.cpp ublas_interop/test21.cpp ublas_interop/test22.cpp ublas_interop/test23.cpp : : : <define>TEST_ET=1 : ublas2_et ;
+#run ublas_interop/test3.cpp ublas_interop/test31.cpp ublas_interop/test32.cpp ublas_interop/test33.cpp : : : <define>TEST_ET=1 : ublas3_et ;
+run ublas_interop/test4.cpp ublas_interop/test42.cpp ublas_interop/test43.cpp : : : <define>TEST_ET=1 : ublas3_et ;
+run ublas_interop/test5.cpp ublas_interop/test52.cpp ublas_interop/test53.cpp : : : <define>TEST_ET=1 : ublas4_et ;
+run ublas_interop/test6.cpp ublas_interop/test62.cpp ublas_interop/test63.cpp : : : <define>TEST_ET=1 : ublas5_et ;
+#run ublas_interop/test7.cpp ublas_interop/test71.cpp ublas_interop/test72.cpp ublas_interop/test73.cpp : : : <define>TEST_ET=1 : ublas6_et ;
 
 if $(enable-specfun)
 {

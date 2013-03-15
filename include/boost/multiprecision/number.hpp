@@ -541,13 +541,19 @@ public:
    //
    // Use in boolean context:
    //
+#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+   BOOST_MP_FORCEINLINE explicit operator bool()const
+   {
+      return !is_zero();
+   }
+#else
    typedef bool (self_type::*unmentionable_type)()const;
 
    BOOST_MP_FORCEINLINE operator unmentionable_type()const
    {
       return is_zero() ? 0 : &self_type::is_zero;
    }
-
+#endif
    //
    // swap:
    //
@@ -623,11 +629,12 @@ public:
    {
       return this->template convert_to<T>();
    }
+   /*
    explicit operator bool()const
    {
       using default_ops::eval_is_zero;
       return !eval_is_zero(backend());
-   }
+   }*/
    explicit operator void()const {}
 #endif
 #endif
@@ -1764,26 +1771,12 @@ inline multiprecision::number<T, ExpressionTemplates> denominator(const rational
    return a.denominator();
 }
 
-namespace numeric { namespace ublas {
-//
-// uBlas interoperability:
-//
-template<class V>
-class sparse_vector_element;
-
-template <class V, class Backend, multiprecision::expression_template_option ExpressionTemplates>
-inline bool operator == (const sparse_vector_element<V>& a, const ::boost::multiprecision::number<Backend, ExpressionTemplates>& b)
-{
-typedef typename sparse_vector_element<V>::const_reference ref_type;
-   return static_cast<ref_type>(a) == b;
-}
-
-}} // namespaces
-
 #ifdef BOOST_MSVC
 #pragma warning(pop)
 #endif
 
 } // namespaces
+
+#include <boost/multiprecision/detail/ublas_interop.hpp>
 
 #endif
