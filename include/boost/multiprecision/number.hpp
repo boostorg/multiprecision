@@ -539,22 +539,6 @@ public:
       return *this;
    }
    //
-   // Use in boolean context:
-   //
-#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-   BOOST_MP_FORCEINLINE explicit operator bool()const
-   {
-      return !is_zero();
-   }
-#else
-   typedef bool (self_type::*unmentionable_type)()const;
-
-   BOOST_MP_FORCEINLINE operator unmentionable_type()const
-   {
-      return is_zero() ? 0 : &self_type::is_zero;
-   }
-#endif
-   //
    // swap:
    //
    BOOST_MP_FORCEINLINE void swap(self_type& other) BOOST_NOEXCEPT
@@ -605,8 +589,11 @@ public:
       convert_to_imp(&result);
       return result;
    }
+   //
+   // Use in boolean context, and explicit conversion operators:
+   //
 #ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-#if defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ < 7)
+#  if defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ < 7)
    //
    // Horrible workaround for gcc-4.6.x which always prefers the template
    // operator bool() rather than the non-template operator when converting to
@@ -623,20 +610,25 @@ public:
    {
       return this->template convert_to<T>();
    }
-#else
+#  else
    template <class T>
    explicit operator T()const
    {
       return this->template convert_to<T>();
    }
-   /*
-   explicit operator bool()const
+   BOOST_MP_FORCEINLINE explicit operator bool()const
    {
-      using default_ops::eval_is_zero;
-      return !eval_is_zero(backend());
-   }*/
+      return !is_zero();
+   }
    explicit operator void()const {}
-#endif
+#  endif
+#else
+   typedef bool (self_type::*unmentionable_type)()const;
+
+   BOOST_MP_FORCEINLINE operator unmentionable_type()const
+   {
+      return is_zero() ? 0 : &self_type::is_zero;
+   }
 #endif
    //
    // Default precision:
