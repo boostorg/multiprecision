@@ -8,6 +8,7 @@
 #ifndef BOOST_MP_UTYPE_HELPER_HPP
   #define BOOST_MP_UTYPE_HELPER_HPP
 
+  #include <limits>
   #include <boost/cstdint.hpp>
 
   namespace boost { namespace multiprecision {
@@ -82,6 +83,28 @@
   template<> struct utype_helper<62U> { typedef boost::uint64_t exact; };
   template<> struct utype_helper<63U> { typedef boost::uint64_t exact; };
   template<> struct utype_helper<64U> { typedef boost::uint64_t exact; };
+
+  template<class unsigned_type>
+  int utype_prior(unsigned_type ui)
+  {
+    // TBD: Implement a templated binary search for this.
+    int priority_bit;
+
+    unsigned_type priority_mask = unsigned_type(unsigned_type(1U) << (std::numeric_limits<unsigned_type>::digits - 1));
+
+    for(priority_bit = std::numeric_limits<unsigned_type>::digits - 1; priority_bit >= 0; --priority_bit)
+    {
+      if(unsigned_type(priority_mask & ui) != unsigned_type(0U))
+      {
+        break;
+      }
+
+      priority_mask >>= 1;
+    }
+
+    return priority_bit;
+  }
+
   } } }
 
 #endif // BOOST_MP_UTYPE_HELPER_HPP
