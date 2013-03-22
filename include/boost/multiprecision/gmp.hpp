@@ -177,7 +177,7 @@ struct gmp_float_imp
 
       int e;
       long double f, term;
-      mpf_init_set_ui(m_data, 0u);
+      mpf_set_ui(m_data, 0u);
 
       f = frexp(a, &e);
 

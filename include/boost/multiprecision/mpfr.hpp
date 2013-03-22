@@ -39,6 +39,22 @@ namespace backends{
 
 namespace detail{
 
+template <bool b>
+struct mpfr_cleanup
+{
+   struct initializer
+   {
+      initializer() {}
+      ~initializer(){ mpfr_free_cache(); }
+      void force_instantiate()const {}
+   };
+   static const initializer init;
+   static void force_instantiate() { init.force_instantiate(); }
+};
+
+template <bool b>
+typename mpfr_cleanup<b>::initializer const mpfr_cleanup<b>::init;
+
 inline long get_default_precision() { return 50; }
 
 template <unsigned digits10, mpfr_allocation_type AllocationType>
@@ -291,6 +307,7 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
    {
       if(m_data[0]._mpfr_d)
          mpfr_clear(m_data);
+      detail::mpfr_cleanup<true>::force_instantiate();
    }
    void negate() BOOST_NOEXCEPT
    {
@@ -355,6 +372,10 @@ struct mpfr_float_imp<digits10, allocate_stack>
    static const unsigned digits2 = (digits10 * 1000uL) / 301uL + ((digits10 * 1000uL) % 301 ? 2u : 1u);
    static const unsigned limb_count = mpfr_custom_get_size(digits2) / sizeof(mp_limb_t);
 
+   ~mpfr_float_imp() BOOST_NOEXCEPT
+   {
+      detail::mpfr_cleanup<true>::force_instantiate();
+   }
    mpfr_float_imp()
    {
       mpfr_custom_init(m_buffer, digits2);

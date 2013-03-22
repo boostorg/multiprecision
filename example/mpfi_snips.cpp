@@ -38,6 +38,7 @@ void t1()
    std::cout << overlap(i1, i2) << std::endl;
    std::cout << subset(i1, i2) << std::endl;
    //]
+   mpfi_clear(r);
 }
 
 int main()
