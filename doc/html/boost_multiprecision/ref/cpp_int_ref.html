@@ -22,7 +22,7 @@
 <div class="spirit-nav">
 <a accesskey="p" href="number.html"><img src="../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../ref.html"><img src="../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="gmp_int_ref.html"><img src="../../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
-<div class="section">
+<div class="section boost_multiprecision_ref_cpp_int_ref">
 <div class="titlepage"><div><div><h3 class="title">
 <a name="boost_multiprecision.ref.cpp_int_ref"></a><a class="link" href="cpp_int_ref.html" title="cpp_int">cpp_int</a>
 </h3></div></div></div>
@@ -47,7 +47,7 @@
 <span class="special">{</span> <span class="keyword">static</span> <span class="keyword">const</span> <span class="identifier">expression_template_option</span> <span class="identifier">value</span> <span class="special">=</span> <span class="identifier">et_off</span><span class="special">;</span> <span class="special">};</span>
 
 <span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_int_backend</span><span class="special">&lt;&gt;</span> <span class="special">&gt;</span>              <span class="identifier">cpp_int</span><span class="special">;</span>    <span class="comment">// arbitrary precision integer</span>
-<span class="keyword">typedef</span> <span class="identifier">rational_adapter</span><span class="special">&lt;</span><span class="identifier">cpp_int_backend</span><span class="special">&lt;&gt;</span> <span class="special">&gt;</span>    <span class="identifier">cpp_rational_backend</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">rational_adaptor</span><span class="special">&lt;</span><span class="identifier">cpp_int_backend</span><span class="special">&lt;&gt;</span> <span class="special">&gt;</span>    <span class="identifier">cpp_rational_backend</span><span class="special">;</span>
 <span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_rational_backend</span><span class="special">&gt;</span>            <span class="identifier">cpp_rational</span><span class="special">;</span> <span class="comment">// arbitrary precision rational number</span>
 
 <span class="comment">// Fixed precision unsigned types:</span>
@@ -64,7 +64,7 @@
 
 <span class="comment">// Over again, but with checking enabled this time:</span>
 <span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_int_backend</span><span class="special">&lt;</span><span class="number">0</span><span class="special">,</span> <span class="number">0</span><span class="special">,</span> <span class="identifier">signed_magnitude</span><span class="special">,</span> <span class="identifier">checked</span><span class="special">&gt;</span> <span class="special">&gt;</span>                 <span class="identifier">checked_cpp_int</span><span class="special">;</span>
-<span class="keyword">typedef</span> <span class="identifier">rational_adapter</span><span class="special">&lt;</span><span class="identifier">cpp_int_backend</span><span class="special">&lt;</span><span class="number">0</span><span class="special">,</span> <span class="number">0</span><span class="special">,</span> <span class="identifier">signed_magnitude</span><span class="special">,</span> <span class="identifier">checked</span><span class="special">&gt;</span> <span class="special">&gt;</span>       <span class="identifier">checked_cpp_rational_backend</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">rational_adaptor</span><span class="special">&lt;</span><span class="identifier">cpp_int_backend</span><span class="special">&lt;</span><span class="number">0</span><span class="special">,</span> <span class="number">0</span><span class="special">,</span> <span class="identifier">signed_magnitude</span><span class="special">,</span> <span class="identifier">checked</span><span class="special">&gt;</span> <span class="special">&gt;</span>       <span class="identifier">checked_cpp_rational_backend</span><span class="special">;</span>
 <span class="keyword">typedef</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">cpp_rational_backend</span><span class="special">&gt;</span>                                              <span class="identifier">checked_cpp_rational</span><span class="special">;</span>
 
 <span class="comment">// Checked fixed precision unsigned types:</span>

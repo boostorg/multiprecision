@@ -15,7 +15,7 @@
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_floating_point.hpp>
 #include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
-#include <boost/multiprecision/rational_adapter.hpp>
+#include <boost/multiprecision/rational_adaptor.hpp>
 #include <boost/detail/endian.hpp>
 #include <boost/integer/static_min_max.hpp>
 #include <boost/type_traits/common_type.hpp>
@@ -249,7 +249,11 @@ public:
          // Allocate a new buffer and copy everything over:
          cap = (std::min)((std::max)(cap * 4, new_size), max_limbs);
          limb_pointer pl = allocator().allocate(cap);
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1600)
+         std::copy(limbs(), limbs() + size(), stdext::checked_array_iterator<limb_pointer>(pl, cap));
+#else
          std::copy(limbs(), limbs() + size(), pl);
+#endif
          if(!m_internal)
             allocator().deallocate(limbs(), capacity());
          else
@@ -272,7 +276,11 @@ public:
    BOOST_MP_FORCEINLINE cpp_int_base(const cpp_int_base& o) : allocator_type(o), m_limbs(0), m_internal(true)
    {
       resize(o.size(), o.size());
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1600)
+      std::copy(o.limbs(), o.limbs() + o.size(), stdext::checked_array_iterator<limb_pointer>(limbs(), size()));
+#else
       std::copy(o.limbs(), o.limbs() + o.size(), limbs());
+#endif
       m_sign = o.m_sign;
    }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
@@ -281,7 +289,11 @@ public:
    {
       if(m_internal)
       {
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1600)
+         std::copy(o.limbs(), o.limbs() + o.size(), stdext::checked_array_iterator<limb_pointer>(limbs(), size()));
+#else
          std::copy(o.limbs(), o.limbs() + o.size(), limbs());
+#endif
       }
       else
       {
@@ -300,7 +312,11 @@ public:
       m_internal = o.m_internal;
       if(m_internal)
       {
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1600)
+         std::copy(o.limbs(), o.limbs() + o.size(), stdext::checked_array_iterator<limb_pointer>(limbs(), size()));
+#else
          std::copy(o.limbs(), o.limbs() + o.size(), limbs());
+#endif
       }
       else
       {
@@ -323,7 +339,11 @@ public:
          static_cast<allocator_type&>(*this) = static_cast<const allocator_type&>(o);
          m_limbs = 0;
          resize(o.size(), o.size());
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1600)
+         std::copy(o.limbs(), o.limbs() + o.size(), stdext::checked_array_iterator<limb_pointer>(limbs(), size()));
+#else
          std::copy(o.limbs(), o.limbs() + o.size(), limbs());
+#endif
          m_sign = o.m_sign;
       }
    }
@@ -461,7 +481,11 @@ public:
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() : m_wrapper(limb_type(0u)), m_limbs(1), m_sign(false) {}
    BOOST_MP_FORCEINLINE cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT : m_limbs(o.m_limbs), m_sign(o.m_sign)
    {
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1600)
+      std::copy(o.limbs(), o.limbs() + o.size(), stdext::checked_array_iterator<limb_pointer>(limbs(), size()));
+#else
       std::copy(o.limbs(), o.limbs() + o.size(), limbs());
+#endif
    }
    //~cpp_int_base() BOOST_NOEXCEPT {}
    void assign(const cpp_int_base& o) BOOST_NOEXCEPT
@@ -469,7 +493,11 @@ public:
       if(this != &o)
       {
          resize(o.size(), o.size());
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1600)
+         std::copy(o.limbs(), o.limbs() + o.size(), stdext::checked_array_iterator<limb_pointer>(limbs(), size()));
+#else
          std::copy(o.limbs(), o.limbs() + o.size(), limbs());
+#endif
          m_sign = o.m_sign;
       }
    }
@@ -585,7 +613,11 @@ public:
    BOOST_MP_FORCEINLINE cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT
       : m_limbs(o.m_limbs)
    {
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1600)
+      std::copy(o.limbs(), o.limbs() + o.size(), stdext::checked_array_iterator<limb_pointer>(limbs(), size()));
+#else
       std::copy(o.limbs(), o.limbs() + o.size(), limbs());
+#endif
    }
    //~cpp_int_base() BOOST_NOEXCEPT {}
    BOOST_MP_FORCEINLINE void assign(const cpp_int_base& o) BOOST_NOEXCEPT
@@ -593,7 +625,11 @@ public:
       if(this != &o)
       {
          resize(o.size(), o.size());
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1600)
+         std::copy(o.limbs(), o.limbs() + o.size(), stdext::checked_array_iterator<limb_pointer>(limbs(), size()));
+#else
          std::copy(o.limbs(), o.limbs() + o.size(), limbs());
+#endif
       }
    }
 private:
@@ -1018,7 +1054,11 @@ private:
    {
       // regular non-trivial to non-trivial assign:
       this->resize(other.size(), other.size());
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1600)
+      std::copy(other.limbs(), other.limbs() + (std::min)(other.size(), this->size()), stdext::checked_array_iterator<limb_pointer>(this->limbs(), this->size()));
+#else
       std::copy(other.limbs(), other.limbs() + (std::min)(other.size(), this->size()), this->limbs());
+#endif
       this->sign(other.sign());
       this->normalize();
    }
@@ -1093,7 +1133,11 @@ public:
       : base_type()
    {
       this->resize(other.size(), other_size());
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1600)
+      std::copy(other.limbs(), other.limbs() + (std::min)(other.size(), this->size()), stdext::checked_array_iterator<limb_pointer>(this->limbs(), this->size()));
+#else
       std::copy(other.limbs(), other.limbs() + (std::min)(other.size(), this->size()), this->limbs());
+#endif
       this->sign(other.sign());
    }
 
@@ -1125,7 +1169,11 @@ public:
       : base_type()
    {
       this->resize(other.size(), other.size());
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1600)
+      std::copy(other.limbs(), other.limbs() + (std::min)(other.size(), this->size()), stdext::checked_array_iterator<limb_pointer>(this->limbs(), this->size()));
+#else
       std::copy(other.limbs(), other.limbs() + (std::min)(other.size(), this->size()), this->limbs());
+#endif
       this->sign(other.sign());
    }
 
@@ -1152,7 +1200,11 @@ public:
       operator=(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2>& other)
    {
       this->resize(other.size(), other.size());
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1600)
+      std::copy(other.limbs(), other.limbs() + (std::min)(other.size(), this->size()), stdext::checked_array_iterator<limb_pointer>(this->limbs(), this->size()));
+#else
       std::copy(other.limbs(), other.limbs() + (std::min)(other.size(), this->size()), this->limbs());
+#endif
       this->sign(other.sign());
       return *this;
    }
@@ -1731,7 +1783,7 @@ public:
 
 } // namespace backends
 
-namespace detail{
+namespace default_ops{
 
 template <class Backend>
 struct double_precision_type;
@@ -1768,7 +1820,7 @@ template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int
 struct number_category<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> > : public mpl::int_<number_kind_integer>{};
 
 typedef number<cpp_int_backend<> >                   cpp_int;
-typedef rational_adapter<cpp_int_backend<> >         cpp_rational_backend;
+typedef rational_adaptor<cpp_int_backend<> >         cpp_rational_backend;
 typedef number<cpp_rational_backend>                 cpp_rational;
 
 // Fixed precision unsigned types:
@@ -1785,7 +1837,7 @@ typedef number<cpp_int_backend<1024, 1024, signed_magnitude, unchecked, void> > 
 
 // Over again, but with checking enabled this time:
 typedef number<cpp_int_backend<0, 0, signed_magnitude, checked> >  checked_cpp_int;
-typedef rational_adapter<cpp_int_backend<0, 0, signed_magnitude, checked> >  checked_cpp_rational_backend;
+typedef rational_adaptor<cpp_int_backend<0, 0, signed_magnitude, checked> >  checked_cpp_rational_backend;
 typedef number<cpp_rational_backend>                 checked_cpp_rational;
 // Fixed precision unsigned types:
 typedef number<cpp_int_backend<128, 128, unsigned_magnitude, checked, void> >   checked_uint128_t;

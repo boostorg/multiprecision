@@ -20,7 +20,6 @@ struct related_type<boost::multiprecision::number< boost::multiprecision::mpfr_f
 int main()
 {
    test<boost::multiprecision::mpfr_float_50>();
-   test<boost::multiprecision::static_mpfr_float_50>();
    return boost::report_errors();
 }
 

@@ -148,16 +148,16 @@ inline detail::expression<detail::multiply_subtract, typename detail::expression
 // Repeat operator for negated arguments: propagate the negation to the top level to avoid temporaries:
 //
 template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
-inline detail::expression<detail::minus, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >
+inline detail::expression<detail::minus, number<B, ET>, Arg1>
    operator + (const number<B, ET>& a, const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::expression<detail::minus, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >(a, b.left_ref());
+   return detail::expression<detail::minus, number<B, ET>, Arg1>(a, b.left_ref());
 }
 template <class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
-inline detail::expression<detail::minus, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >
+inline detail::expression<detail::minus, number<B, ET>, Arg1>
    operator + (const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& a, const number<B, ET>& b)
 {
-   return detail::expression<detail::minus, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >(b, a.left_ref());
+   return detail::expression<detail::minus, number<B, ET>, Arg1>(b, a.left_ref());
 }
 template <class B>
 inline detail::expression<detail::subtract_immediates, number<B, et_on>, number<B, et_on> >
@@ -250,17 +250,17 @@ inline typename enable_if<is_compatible_arithmetic_type<V, typename detail::expr
 // Repeat operator for negated arguments: propagate the negation to the top level to avoid temporaries:
 //
 template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
-inline detail::expression<detail::plus, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >
+inline detail::expression<detail::plus, number<B, ET>, Arg1>
    operator - (const number<B, ET>& a, const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::expression<detail::plus, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >(a, b.left_ref());
+   return detail::expression<detail::plus, number<B, ET>, Arg1>(a, b.left_ref());
 }
 template <class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
-inline detail::expression<detail::negate, detail::expression<detail::plus, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > >
+inline detail::expression<detail::negate, detail::expression<detail::plus, number<B, ET>, Arg1> >
    operator - (const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& a, const number<B, ET>& b)
 {
-   return detail::expression<detail::negate, detail::expression<detail::plus, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > >(
-      detail::expression<detail::plus, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >(b, a.left_ref()));
+   return detail::expression<detail::negate, detail::expression<detail::plus, number<B, ET>, Arg1> >(
+      detail::expression<detail::plus, number<B, ET>, Arg1>(b, a.left_ref()));
 }
 template <class B>
 inline detail::expression<detail::add_immediates, number<B, et_on>, number<B, et_on> >
@@ -354,18 +354,18 @@ inline typename enable_if<is_compatible_arithmetic_type<V, typename detail::expr
 // Repeat operator for negated arguments: propagate the negation to the top level to avoid temporaries:
 //
 template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
-inline detail::expression<detail::negate, detail::expression<detail::multiplies, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > >
+inline detail::expression<detail::negate, detail::expression<detail::multiplies, number<B, ET>, Arg1> >
    operator * (const number<B, ET>& a, const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::expression<detail::negate, detail::expression<detail::multiplies, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > >(
-      detail::expression<detail::multiplies, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > (a, b.left_ref()));
+   return detail::expression<detail::negate, detail::expression<detail::multiplies, number<B, ET>, Arg1> >(
+      detail::expression<detail::multiplies, number<B, ET>, Arg1> (a, b.left_ref()));
 }
 template <class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
-inline detail::expression<detail::negate, detail::expression<detail::multiplies, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > >
+inline detail::expression<detail::negate, detail::expression<detail::multiplies, number<B, ET>, Arg1> >
    operator * (const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& a, const number<B, ET>& b)
 {
-   return detail::expression<detail::negate, detail::expression<detail::multiplies, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > >(
-      detail::expression<detail::multiplies, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >(b, a.left_ref()));
+   return detail::expression<detail::negate, detail::expression<detail::multiplies, number<B, ET>, Arg1> >(
+      detail::expression<detail::multiplies, number<B, ET>, Arg1>(b, a.left_ref()));
 }
 template <class B>
 inline detail::expression<detail::negate, detail::expression<detail::multiply_immediates, number<B, et_on>, number<B, et_on> > >
@@ -464,18 +464,18 @@ inline typename enable_if<is_compatible_arithmetic_type<V, typename detail::expr
 // Repeat operator for negated arguments: propagate the negation to the top level to avoid temporaries:
 //
 template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
-inline detail::expression<detail::negate, detail::expression<detail::divides, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > >
+inline detail::expression<detail::negate, detail::expression<detail::divides, number<B, ET>, Arg1> >
    operator / (const number<B, ET>& a, const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& b)
 {
-   return detail::expression<detail::negate, detail::expression<detail::divides, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type > >(
-      detail::expression<detail::divides, number<B, ET>, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type >(a, b.left_ref()));
+   return detail::expression<detail::negate, detail::expression<detail::divides, number<B, ET>, Arg1> >(
+      detail::expression<detail::divides, number<B, ET>, Arg1>(a, b.left_ref()));
 }
 template <class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
-inline detail::expression<detail::negate, detail::expression<detail::divides, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type, number<B, ET> > >
+inline detail::expression<detail::negate, detail::expression<detail::divides, Arg1, number<B, ET> > >
    operator / (const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& a, const number<B, ET>& b)
 {
-   return detail::expression<detail::negate, detail::expression<detail::divides, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type, number<B, ET> > >(
-      detail::expression<detail::divides, typename detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>::left_type, number<B, ET> >(a.left_ref(), b));
+   return detail::expression<detail::negate, detail::expression<detail::divides, Arg1, number<B, ET> > >(
+      detail::expression<detail::divides, Arg1, number<B, ET> >(a.left_ref(), b));
 }
 template <class B>
 inline detail::expression<detail::negate, detail::expression<detail::divide_immediates, number<B, et_on>, number<B, et_on> > >

@@ -113,12 +113,12 @@ void expected_results()
    // Finish off by printing out the compiler/stdlib/platform names,
    // we do this to make it easier to mark up expected error rates.
    //
-   std::cout << "Tests run with " << BOOST_COMPILER << ", " 
+   std::cout << "Tests run with " << BOOST_COMPILER << ", "
       << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
 }
 
 
-int test_main(int, char* [])
+BOOST_AUTO_TEST_CASE( test_main )
 {
    using namespace boost::multiprecision;
    expected_results();
@@ -146,7 +146,6 @@ int test_main(int, char* [])
    test_bessel(number<cpp_dec_float<30> >(), "number<cpp_dec_float<30> >");
    test_bessel(number<cpp_dec_float<35, long long, std::allocator<void> > >(), "number<cpp_dec_float<35, long long, std::allocator<void> > >");
 #endif
-   return 0;
 }
 
 

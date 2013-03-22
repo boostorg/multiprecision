@@ -14,12 +14,16 @@
 #define TEST5_H
 
 #ifdef _MSC_VER
-#  pragma warning(disable:4800 4996)
+#  pragma warning(disable:4800 4996 4127 4100)
 #endif
 
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
+#ifdef TEST_ET
+typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<50>, boost::multiprecision::et_on> mp_test_type;
+#else
 typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<50>, boost::multiprecision::et_off> mp_test_type;
+#endif
 //typedef double mp_test_type;
 
 #define USE_RANGE

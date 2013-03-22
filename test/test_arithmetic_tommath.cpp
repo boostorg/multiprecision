@@ -17,7 +17,7 @@ struct is_twos_complement_integer<boost::multiprecision::tom_int> : public boost
 int main()
 {
    test<boost::multiprecision::tom_int>();
-   test<boost::multiprecision::number<boost::multiprecision::rational_adapter<boost::multiprecision::tommath_int> > >();
+   test<boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::tommath_int> > >();
    return boost::report_errors();
 }
 

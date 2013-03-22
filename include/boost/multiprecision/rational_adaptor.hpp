@@ -25,7 +25,7 @@ namespace multiprecision{
 namespace backends{
 
 template <class IntBackend>
-struct rational_adapter
+struct rational_adaptor
 {
    typedef number<IntBackend>                integer_type;
    typedef boost::rational<integer_type>        rational_type;
@@ -34,55 +34,55 @@ struct rational_adapter
    typedef typename IntBackend::unsigned_types  unsigned_types;
    typedef typename IntBackend::float_types     float_types;
 
-   rational_adapter(){}
-   rational_adapter(const rational_adapter& o)
+   rational_adaptor(){}
+   rational_adaptor(const rational_adaptor& o)
    {
       m_value = o.m_value;
    }
-   rational_adapter(const IntBackend& o) : m_value(o) {}
+   rational_adaptor(const IntBackend& o) : m_value(o) {}
 
    template <class U>
-   rational_adapter(const U& u, typename enable_if_c<is_convertible<U, IntBackend>::value>::type* = 0) 
+   rational_adaptor(const U& u, typename enable_if_c<is_convertible<U, IntBackend>::value>::type* = 0) 
       : m_value(IntBackend(u)){}
    template <class U>
-   explicit rational_adapter(const U& u, 
+   explicit rational_adaptor(const U& u, 
       typename enable_if_c<
          boost::multiprecision::detail::is_explicitly_convertible<U, IntBackend>::value && !is_convertible<U, IntBackend>::value
       >::type* = 0) 
       : m_value(IntBackend(u)){}
    template <class U>
-   typename enable_if_c<(boost::multiprecision::detail::is_explicitly_convertible<U, IntBackend>::value && !is_arithmetic<U>::value), rational_adapter&>::type operator = (const U& u) 
+   typename enable_if_c<(boost::multiprecision::detail::is_explicitly_convertible<U, IntBackend>::value && !is_arithmetic<U>::value), rational_adaptor&>::type operator = (const U& u) 
    {
       m_value = IntBackend(u);
    }
 
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-   rational_adapter(rational_adapter&& o) : m_value(o.m_value) {}
-   rational_adapter(IntBackend&& o) : m_value(o) {}
-   rational_adapter& operator = (rational_adapter&& o)
+   rational_adaptor(rational_adaptor&& o) : m_value(o.m_value) {}
+   rational_adaptor(IntBackend&& o) : m_value(o) {}
+   rational_adaptor& operator = (rational_adaptor&& o)
    {
       m_value = static_cast<rational_type&&>(o.m_value);
       return *this;
    }
 #endif
-   rational_adapter& operator = (const rational_adapter& o)
+   rational_adaptor& operator = (const rational_adaptor& o)
    {
       m_value = o.m_value;
       return *this;
    }
-   rational_adapter& operator = (const IntBackend& o)
+   rational_adaptor& operator = (const IntBackend& o)
    {
       m_value = o;
       return *this;
    }
    template <class Int>
-   typename enable_if<is_integral<Int>, rational_adapter&>::type operator = (Int i)
+   typename enable_if<is_integral<Int>, rational_adaptor&>::type operator = (Int i)
    {
       m_value = i;
       return *this;
    }
    template <class Float>
-   typename enable_if<is_floating_point<Float>, rational_adapter&>::type operator = (Float i)
+   typename enable_if<is_floating_point<Float>, rational_adaptor&>::type operator = (Float i)
    {
       int e;
       Float f = std::frexp(i, &e);
@@ -101,7 +101,7 @@ struct rational_adapter
       m_value.assign(num, denom);
       return *this;
    }
-   rational_adapter& operator = (const char* s)
+   rational_adaptor& operator = (const char* s)
    {
       std::string s1;
       multiprecision::number<IntBackend> v1, v2;
@@ -139,7 +139,7 @@ struct rational_adapter
       data().assign(v1, v2);
       return *this;
    }
-   void swap(rational_adapter& o)
+   void swap(rational_adaptor& o)
    {
       std::swap(m_value, o.m_value);
    }
@@ -160,7 +160,7 @@ struct rational_adapter
    {
       m_value = -m_value;
    }
-   int compare(const rational_adapter& o)const
+   int compare(const rational_adaptor& o)const
    {
       return m_value > o.m_value ? 1 : (m_value < o.m_value ? -1 : 0);
    }
@@ -176,22 +176,22 @@ private:
 };
 
 template <class IntBackend>
-inline void eval_add(rational_adapter<IntBackend>& result, const rational_adapter<IntBackend>& o)
+inline void eval_add(rational_adaptor<IntBackend>& result, const rational_adaptor<IntBackend>& o)
 {
    result.data() += o.data();
 }
 template <class IntBackend>
-inline void eval_subtract(rational_adapter<IntBackend>& result, const rational_adapter<IntBackend>& o)
+inline void eval_subtract(rational_adaptor<IntBackend>& result, const rational_adaptor<IntBackend>& o)
 {
    result.data() -= o.data();
 }
 template <class IntBackend>
-inline void eval_multiply(rational_adapter<IntBackend>& result, const rational_adapter<IntBackend>& o)
+inline void eval_multiply(rational_adaptor<IntBackend>& result, const rational_adaptor<IntBackend>& o)
 {
    result.data() *= o.data();
 }
 template <class IntBackend>
-inline void eval_divide(rational_adapter<IntBackend>& result, const rational_adapter<IntBackend>& o)
+inline void eval_divide(rational_adaptor<IntBackend>& result, const rational_adaptor<IntBackend>& o)
 {
    using default_ops::eval_is_zero;
    if(eval_is_zero(o))
@@ -202,25 +202,25 @@ inline void eval_divide(rational_adapter<IntBackend>& result, const rational_ada
 }
 
 template <class R, class IntBackend>
-inline void eval_convert_to(R* result, const rational_adapter<IntBackend>& backend)
+inline void eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
 {
    *result = backend.data().numerator().template convert_to<R>();
    *result /= backend.data().denominator().template convert_to<R>();
 }
 
 template <class IntBackend>
-inline bool eval_is_zero(const rational_adapter<IntBackend>& val)
+inline bool eval_is_zero(const rational_adaptor<IntBackend>& val)
 {
    return eval_is_zero(val.data().numerator().backend());
 }
 template <class IntBackend>
-inline int eval_get_sign(const rational_adapter<IntBackend>& val)
+inline int eval_get_sign(const rational_adaptor<IntBackend>& val)
 {
    return eval_get_sign(val.data().numerator().backend());
 }
 
 template<class IntBackend, class V>
-inline void assign_components(rational_adapter<IntBackend>& result, const V& v1, const V& v2)
+inline void assign_components(rational_adaptor<IntBackend>& result, const V& v1, const V& v2)
 {
    result.data().assign(v1, v2);
 }
@@ -228,26 +228,26 @@ inline void assign_components(rational_adapter<IntBackend>& result, const V& v1,
 } // namespace backends
 
 template<class IntBackend>
-struct expression_template_default<backends::rational_adapter<IntBackend> > : public expression_template_default<IntBackend> {};
+struct expression_template_default<backends::rational_adaptor<IntBackend> > : public expression_template_default<IntBackend> {};
    
 template<class IntBackend>
-struct number_category<backends::rational_adapter<IntBackend> > : public mpl::int_<number_kind_rational>{};
+struct number_category<backends::rational_adaptor<IntBackend> > : public mpl::int_<number_kind_rational>{};
 
-using boost::multiprecision::backends::rational_adapter;
+using boost::multiprecision::backends::rational_adaptor;
 
 template <class T>
-struct component_type<rational_adapter<T> >
+struct component_type<rational_adaptor<T> >
 {
    typedef number<T> type;
 };
 
 template <class IntBackend, expression_template_option ET>
-inline number<IntBackend, ET> numerator(const number<rational_adapter<IntBackend>, ET>& val)
+inline number<IntBackend, ET> numerator(const number<rational_adaptor<IntBackend>, ET>& val)
 {
    return val.backend().data().numerator();
 }
 template <class IntBackend, expression_template_option ET>
-inline number<IntBackend, ET> denominator(const number<rational_adapter<IntBackend>, ET>& val)
+inline number<IntBackend, ET> denominator(const number<rational_adaptor<IntBackend>, ET>& val)
 {
    return val.backend().data().denominator();
 }
@@ -257,7 +257,7 @@ inline number<IntBackend, ET> denominator(const number<rational_adapter<IntBacke
 namespace detail{
 
 template<class U, class IntBackend>
-struct is_explicitly_convertible<U, rational_adapter<IntBackend> > : public is_explicitly_convertible<U, IntBackend> {};
+struct is_explicitly_convertible<U, rational_adaptor<IntBackend> > : public is_explicitly_convertible<U, IntBackend> {};
 
 }
 
@@ -269,10 +269,10 @@ struct is_explicitly_convertible<U, rational_adapter<IntBackend> > : public is_e
 namespace std{
 
 template <class IntBackend, boost::multiprecision::expression_template_option ExpressionTemplates>
-class numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adapter<IntBackend>, ExpressionTemplates> > : public std::numeric_limits<boost::multiprecision::number<IntBackend, ExpressionTemplates> >
+class numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adaptor<IntBackend>, ExpressionTemplates> > : public std::numeric_limits<boost::multiprecision::number<IntBackend, ExpressionTemplates> >
 {
    typedef std::numeric_limits<boost::multiprecision::number<IntBackend> > base_type;
-   typedef boost::multiprecision::number<boost::multiprecision::rational_adapter<IntBackend> > number_type;
+   typedef boost::multiprecision::number<boost::multiprecision::rational_adaptor<IntBackend> > number_type;
 public:
    BOOST_STATIC_CONSTEXPR bool is_integer = false;
    BOOST_STATIC_CONSTEXPR bool is_exact = true;
@@ -290,9 +290,9 @@ public:
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
 
 template <class IntBackend, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adapter<IntBackend>, ExpressionTemplates> >::is_integer;
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adaptor<IntBackend>, ExpressionTemplates> >::is_integer;
 template <class IntBackend, boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adapter<IntBackend>, ExpressionTemplates> >::is_exact;
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adaptor<IntBackend>, ExpressionTemplates> >::is_exact;
 
 #endif
 
