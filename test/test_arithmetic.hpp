@@ -641,6 +641,107 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
 }
 
 template <class Real, class T>
+void test_float_funcs(const T&){}
+
+template <class Real>
+void test_float_funcs(const boost::mpl::true_&)
+{
+   if(boost::multiprecision::is_interval_number<Real>::value)
+      return;
+   //
+   // Test variable reuse in function calls, see https://svn.boost.org/trac/boost/ticket/8326
+   //
+   Real a(2), b(10);
+   a = pow(a, b);
+   BOOST_CHECK_EQUAL(a, 1024);
+   a = 2;
+   b = pow(a, b);
+   BOOST_CHECK_EQUAL(b, 1024);
+   b = 10;
+   a = pow(a, 10);
+   BOOST_CHECK_EQUAL(a, 1024);
+   a = -2;
+   a = abs(a);
+   BOOST_CHECK_EQUAL(a, 2);
+   a = -2;
+   a = fabs(a);
+   BOOST_CHECK_EQUAL(a, 2);
+   a = 2.5;
+   a = floor(a);
+   BOOST_CHECK_EQUAL(a, 2);
+   a = 2.5;
+   a = ceil(a);
+   BOOST_CHECK_EQUAL(a, 3);
+   a = 2.5;
+   a = trunc(a);
+   BOOST_CHECK_EQUAL(a, 2);
+   a = 2.25;
+   a = round(a);
+   BOOST_CHECK_EQUAL(a, 2);
+   a = 2;
+   a = ldexp(a, 1);
+   BOOST_CHECK_EQUAL(a, 4);
+   int i;
+   a = frexp(a, &i);
+   BOOST_CHECK_EQUAL(a, 0.5);
+
+   Real tol = std::numeric_limits<Real>::epsilon() * 3;
+   a = 4;
+   a = sqrt(a);
+   BOOST_CHECK_CLOSE_FRACTION(a, 2, tol);
+   a = 3;
+   a = exp(a);
+   BOOST_CHECK_CLOSE_FRACTION(a, Real(exp(Real(3))), tol);
+   a = 3;
+   a = log(a);
+   BOOST_CHECK_CLOSE_FRACTION(a, Real(log(Real(3))), tol);
+   a = 3;
+   a = log10(a);
+   BOOST_CHECK_CLOSE_FRACTION(a, Real(log10(Real(3))), tol);
+
+   a = 0.5;
+   a = sin(a);
+   BOOST_CHECK_CLOSE_FRACTION(a, Real(sin(Real(0.5))), tol);
+   a = 0.5;
+   a = cos(a);
+   BOOST_CHECK_CLOSE_FRACTION(a, Real(cos(Real(0.5))), tol);
+   a = 0.5;
+   a = tan(a);
+   BOOST_CHECK_CLOSE_FRACTION(a, Real(tan(Real(0.5))), tol);
+   a = 0.5;
+   a = asin(a);
+   BOOST_CHECK_CLOSE_FRACTION(a, Real(asin(Real(0.5))), tol);
+   a = 0.5;
+   a = acos(a);
+   BOOST_CHECK_CLOSE_FRACTION(a, Real(acos(Real(0.5))), tol);
+   a = 0.5;
+   a = atan(a);
+   BOOST_CHECK_CLOSE_FRACTION(a, Real(atan(Real(0.5))), tol);
+   a = 0.5;
+   a = sinh(a);
+   BOOST_CHECK_CLOSE_FRACTION(a, Real(sinh(Real(0.5))), tol);
+   a = 0.5;
+   a = cosh(a);
+   BOOST_CHECK_CLOSE_FRACTION(a, Real(cosh(Real(0.5))), tol);
+   a = 0.5;
+   a = tanh(a);
+   BOOST_CHECK_CLOSE_FRACTION(a, Real(tanh(Real(0.5))), tol);
+   a = 4;
+   b = 2;
+   a = fmod(a, b);
+   BOOST_CHECK_CLOSE_FRACTION(a, Real(fmod(Real(4), Real(2))), tol);
+   a = 4;
+   b = fmod(a, b);
+   BOOST_CHECK_CLOSE_FRACTION(b, Real(fmod(Real(4), Real(2))), tol);
+   b = 2;
+   a = atan2(a, b);
+   BOOST_CHECK_CLOSE_FRACTION(a, Real(atan2(Real(4), Real(2))), tol);
+   a = 4;
+   b = atan2(a, b);
+   BOOST_CHECK_CLOSE_FRACTION(b, Real(atan2(Real(4), Real(2))), tol);
+}
+
+template <class Real, class T>
 void test_float_ops(const T&){}
 
 template <class Real>
@@ -662,15 +763,15 @@ void test_float_ops(const boost::mpl::int_<boost::multiprecision::number_kind_fl
    BOOST_CHECK_EQUAL(ldexp(Real(2), 5) ,  64);
    BOOST_CHECK_EQUAL(ldexp(Real(2), -5) ,  Real(2) / 32);
    Real v(512);
-   int exp;
-   Real r = frexp(v, &exp);
+   int exponent;
+   Real r = frexp(v, &exponent);
    BOOST_CHECK_EQUAL(r ,  0.5);
-   BOOST_CHECK_EQUAL(exp ,  10);
+   BOOST_CHECK_EQUAL(exponent ,  10);
    BOOST_CHECK_EQUAL(v ,  512);
    v = 1 / v;
-   r = frexp(v, &exp);
+   r = frexp(v, &exponent);
    BOOST_CHECK_EQUAL(r ,  0.5);
-   BOOST_CHECK_EQUAL(exp ,  -8);
+   BOOST_CHECK_EQUAL(exponent ,  -8);
    typedef typename Real::backend_type::exponent_type e_type;
    BOOST_CHECK_EQUAL(ldexp(Real(2), e_type(5)) ,  64);
    BOOST_CHECK_EQUAL(ldexp(Real(2), e_type(-5)) ,  Real(2) / 32);
@@ -685,7 +786,7 @@ void test_float_ops(const boost::mpl::int_<boost::multiprecision::number_kind_fl
    BOOST_CHECK_EQUAL(r ,  0.5);
    BOOST_CHECK_EQUAL(exp2 ,  -8);
    //
-   // pow and exp:
+   // pow and exponent:
    //
    v = 3.25;
    r = pow(v, 0);
@@ -719,6 +820,8 @@ void test_float_ops(const boost::mpl::int_<boost::multiprecision::number_kind_fl
          BOOST_CHECK_THROW(Real(Real(20) / 0u), std::overflow_error);
       }
    }
+
+   test_float_funcs<Real>(boost::mpl::bool_<std::numeric_limits<Real>::is_specialized>());
 }
 
 template <class T>
