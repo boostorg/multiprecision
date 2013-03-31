@@ -27,6 +27,7 @@ void t1()
    mpz_init(z);
    mpz_set(z, v.backend().data());
    //]
+   mpz_clear(z);
 }
 
 void t2()
@@ -57,6 +58,7 @@ void t2()
    mpf_init(f);
    mpf_set(f, a.backend().data());
    //]
+   mpf_clear(f);
 }
 
 void t3()
@@ -85,6 +87,7 @@ void t3()
    mpq_init(q);
    mpq_set(q, v.backend().data());
    //]
+   mpq_clear(q);
 }
 
 int main()

@@ -55,6 +55,11 @@
             Fixed bug in <code class="computeroutput"><span class="identifier">cpp_int</span></code>
             where division of 0 by something doesn't get zero in the result: <a href="https://svn.boost.org/trac/boost/ticket/8160" target="_top">8160</a>.
           </li>
+<li class="listitem">
+            Fixed bug in some transcendental functions that caused incorrect return
+            values when variables are reused, for example with <code class="computeroutput"><span class="identifier">a</span>
+            <span class="special">=</span> <span class="identifier">pow</span><span class="special">(</span><span class="identifier">a</span><span class="special">,</span> <span class="identifier">b</span><span class="special">)</span></code>. See <a href="https://svn.boost.org/trac/boost/ticket/8326" target="_top">8326</a>.
+          </li>
 </ul></div>
 <h5>
 <a name="boost_multiprecision.map.hist.h1"></a>

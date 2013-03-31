@@ -118,6 +118,11 @@ int main()
    BOOST_TEST(f100 == 2);
 
    f50 = static_cast<mpfr_float_50>(f100);
+   
+   mpf_clear(mpf);
+   mpz_clear(mpz);
+   mpq_clear(mpq);
+   mpfr_clear(mpfr);
 
    return boost::report_errors();
 }

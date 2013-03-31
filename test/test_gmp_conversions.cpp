@@ -146,6 +146,10 @@ int main()
 
    f100 = f50;
    BOOST_TEST(f100 == 2);
+   
+   mpf_clear(mpf);
+   mpz_clear(mpz);
+   mpq_clear(mpq);
 
    return boost::report_errors();
 }
