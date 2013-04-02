@@ -16,7 +16,7 @@
 #include <boost/array.hpp>
 #include "test.hpp"
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) 
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50)  && !defined(TEST_FLOAT128)
 #  define TEST_MPF_50
 //#  define TEST_MPF
 #  define TEST_BACKEND
@@ -47,6 +47,9 @@
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
 #include <boost/multiprecision/cpp_dec_float.hpp>
+#endif
+#ifdef TEST_FLOAT128
+#include <boost/multiprecision/float128.hpp>
 #endif
 
 template <class T>
@@ -232,6 +235,9 @@ int main()
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<9> > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<18> > >();
 #endif
+#endif
+#ifdef TEST_FLOAT128
+   test<boost::multiprecision::float128>();
 #endif
    return boost::report_errors();
 }

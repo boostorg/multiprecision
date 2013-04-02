@@ -39,6 +39,7 @@ project : requirements
 lib gmp ;
 lib mpfr ;
 lib mpfi ;
+lib quadmath ;
 
 exe has_gmp : has_gmp.cpp gmp :
       <include>$(gmp_path) <include>$(gmp_path)/mpfr <include>$(gmp_path)/gmpfrxx ;
@@ -48,8 +49,11 @@ exe has_mpfi : has_mpfi.cpp mpfi mpfr gmp :
       <include>$(mpfr_path) <include>$(gmp_path)/mpfr <include>$(gmp_path)/gmpfrxx <include>$(gmp_path) ;
 obj has_tommath : has_tommath.cpp :
       <include>$(tommath_path) ;
+exe has_float128 : has_float128.cpp quadmath ;
 
 explicit has_gmp ;
 explicit has_mpfr ;
 explicit has_mpfi ;
 explicit has_tommath ;
+explicit has_float128 ;
+

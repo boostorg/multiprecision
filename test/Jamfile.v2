@@ -47,6 +47,7 @@ local disable-concepts = [ MATCH (--disable-concepts) : [ modules.peek : ARGV ] 
 lib gmp ;
 lib mpfr ;
 lib mpfi ;
+lib quadmath ;
 
 if $(tommath_path)
 {
@@ -110,6 +111,8 @@ run test_arithmetic_dbg_adptr1.cpp ;
 run test_arithmetic_dbg_adptr2.cpp ;
 
 run test_arithmetic_mpfi_50.cpp mpfi mpfr gmp : : : [ check-target-builds ../config//has_mpfi : : <build>no ] ;
+
+run test_arithmetic_float_128.cpp quadmath : : : [ check-target-builds ../config//has_float128 : : <build>no ] ;
 
 run test_numeric_limits.cpp
         : # command line
@@ -196,6 +199,15 @@ run test_numeric_limits.cpp mpfi mpfr gmp
          [ check-target-builds ../config//has_mpfi : : <build>no ]
         : test_numeric_limits_mpfi_50 ;
 
+
+run test_numeric_limits.cpp quadmath
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_FLOAT128
+         [ check-target-builds ../config//has_float128 : : <build>no ]
+        : test_numeric_limits_float128 ;
+
 for local source in test_exp.cpp test_log.cpp test_pow.cpp test_sinh.cpp test_sqrt.cpp test_cosh.cpp test_tanh.cpp test_sin.cpp test_cos.cpp test_tan.cpp test_asin.cpp test_acos.cpp test_atan.cpp test_round.cpp test_fpclassify.cpp
 {
       run $(source) gmp
@@ -225,6 +237,13 @@ for local source in test_exp.cpp test_log.cpp test_pow.cpp test_sinh.cpp test_sq
            : # requirements
             <define>TEST_CPP_DEC_FLOAT
            : $(source:B)_cpp_dec_float ;
+      run $(source) quadmath
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_float128 : : <build>no ]
+            <define>TEST_FLOAT128
+           : $(source:B)_float128 ;
 }
 
 run test_gmp_conversions.cpp gmp
@@ -331,6 +350,15 @@ run test_float_io.cpp mpfi mpfr gmp
          release # Otherwise runtime is slow
          [ check-target-builds ../config//has_mpfi : : <build>no ]
         : test_float_io_mpfi ;
+
+run test_float_io.cpp quadmath
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_FLOAT128
+         release # Otherwise runtime is slow
+         [ check-target-builds ../config//has_float128 : : <build>no ]
+        : test_float_io_float128 ;
 
 run test_int_io.cpp $(TOMMATH)
         : # command line
@@ -467,7 +495,7 @@ run ../example/tommath_snips.cpp $(TOMMATH)
         : # input files
         : # requirements
          [ check-target-builds ../config//has_tommath : : <build>no ] ;
-run ../example/floating_point_examples.cpp : : : <toolset>gcc:<cxxflags>-std=c++0x ;
+run ../example/floating_point_examples.cpp : : : <toolset>gcc:<cxxflags>-std=gnu++0x ;
 run test_cpp_int_conv.cpp ;
 run test_native_integer.cpp ;
 
@@ -545,6 +573,17 @@ if $(enable-specfun)
             <toolset>msvc:<cxxflags>-bigobj
             release
            : $(source:B)_cpp_dec_float ;
+      run $(source) quadmath /boost/test//boost_unit_test_framework/<link>static /boost/regex//boost_regex/<link>static
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_float128 : : <build>no ]
+            <optimization>speed
+            <define>TEST_FLOAT128
+            <define>BOOST_ALL_NO_LIB
+            <toolset>msvc:<cxxflags>-bigobj
+            release
+           : $(source:B)_float128 ;
    }
 }
 

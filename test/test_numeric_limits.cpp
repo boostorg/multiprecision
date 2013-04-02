@@ -11,7 +11,7 @@
 
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && \
    !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ) && \
-   !defined(TEST_TOMMATH) && !defined(TEST_CPP_INT) && !defined(TEST_MPFI_50)
+   !defined(TEST_TOMMATH) && !defined(TEST_CPP_INT) && !defined(TEST_MPFI_50) &&!defined(TEST_FLOAT128)
 #  define TEST_MPF_50
 #  define TEST_MPF
 #  define TEST_BACKEND
@@ -23,6 +23,7 @@
 #  define TEST_TOMMATH
 #  define TEST_CPP_INT
 #  define TEST_MPFI_50
+#  define TEST_FLOAT128
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -53,6 +54,9 @@
 #endif
 #ifdef TEST_CPP_INT
 #include <boost/multiprecision/cpp_int.hpp>
+#endif
+#ifdef TEST_FLOAT128
+#include <boost/multiprecision/float128.hpp>
 #endif
 
 #ifdef BOOST_MSVC
@@ -253,6 +257,9 @@ int main()
    test<boost::multiprecision::uint512_t>();
    test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<200, 200, boost::multiprecision::unsigned_magnitude, boost::multiprecision::checked, void> > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<70, 70, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> > >();
+#endif
+#ifdef TEST_FLOAT128
+   test<boost::multiprecision::float128>();
 #endif
    return boost::report_errors();
 }

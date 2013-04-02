@@ -9,11 +9,13 @@
 #  define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#if !defined(TEST_MPF_50) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50)
+#if !defined(TEST_MPF_50) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR_50) \
+      && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128)
 #  define TEST_MPF_50
 #  define TEST_CPP_DEC_FLOAT
 #  define TEST_MPFR_50
 #  define TEST_MPFI_50
+#  define TEST_FLOAT128
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -35,6 +37,9 @@
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
 #include <boost/multiprecision/cpp_dec_float.hpp>
+#endif
+#ifdef TEST_FLOAT128
+#include <boost/multiprecision/float128.hpp>
 #endif
 
 #include <boost/random/mersenne_twister.hpp>
@@ -315,6 +320,9 @@ int main()
    test_round_trip<boost::multiprecision::mpf_float_50>();
    test_round_trip<boost::multiprecision::mpf_float_100>();
    */
+#endif
+#ifdef TEST_FLOAT128
+   test<boost::multiprecision::float128>();
 #endif
    return boost::report_errors();
 }

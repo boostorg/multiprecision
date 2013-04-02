@@ -3,39 +3,7 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_
 
-#ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
-#endif
-
-#define BOOST_MATH_OVERFLOW_ERROR_POLICY ignore_error
-
-#if !defined(TEST_MPF_50) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR_50)
-#  define TEST_MPF_50
-#  define TEST_MPFR_50
-#  define TEST_CPP_DEC_FLOAT
-
-#ifdef _MSC_VER
-#pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
-#endif
-#ifdef __GNUC__
-#pragma warning "CAUTION!!: No backend type specified so testing everything.... this will take some time!!"
-#endif
-
-#endif
-
-#if defined(TEST_MPF_50)
-#include <boost/multiprecision/gmp.hpp>
-#endif
-#if defined(TEST_MPFR_50)
-#include <boost/multiprecision/mpfr.hpp>
-#endif
-#ifdef TEST_BACKEND
-#include <boost/multiprecision/concepts/mp_number_archetypes.hpp>
-#endif
-#ifdef TEST_CPP_DEC_FLOAT
-#include <boost/multiprecision/cpp_dec_float.hpp>
-#endif
-
+#include "setup.hpp"
 #include "table_type.hpp"
 #define TEST_UDT
 
@@ -70,6 +38,11 @@ void expected_results()
       << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
 }
 
+template <class T>
+void test(T t, const char* p)
+{
+   test_zeta(t, p);
+}
 
 BOOST_AUTO_TEST_CASE( test_main )
 {
@@ -82,23 +55,6 @@ BOOST_AUTO_TEST_CASE( test_main )
    // 30 decimal digits: tests 128-bit long double approximations
    // 35 decimal digits: tests arbitrary precision code
    //
-#ifdef TEST_MPF_50
-   test_zeta(number<gmp_float<18> >(), "number<gmp_float<18> >");
-   test_zeta(number<gmp_float<30> >(), "number<gmp_float<30> >");
-   test_zeta(number<gmp_float<35> >(), "number<gmp_float<35> >");
-   // there should be at least one test with expression templates off:
-   test_zeta(number<gmp_float<35>, et_off>(), "number<gmp_float<35>, et_off>");
-#endif
-#ifdef TEST_MPFR_50
-   test_zeta(number<mpfr_float_backend<18> >(), "number<mpfr_float_backend<18> >");
-   test_zeta(number<mpfr_float_backend<30> >(), "number<mpfr_float_backend<30> >");
-   test_zeta(number<mpfr_float_backend<35> >(), "number<mpfr_float_backend<35> >");
-#endif
-#ifdef TEST_CPP_DEC_FLOAT
-   test_zeta(number<cpp_dec_float<9> >(),  "number<cpp_dec_float<9> >");
-   test_zeta(number<cpp_dec_float<18> >(), "number<cpp_dec_float<18> >");
-   test_zeta(number<cpp_dec_float<30> >(), "number<cpp_dec_float<30> >");
-   test_zeta(number<cpp_dec_float<35, long long, std::allocator<void> > >(), "number<cpp_dec_float<35, long long, std::allocator<void> > >");
-#endif
+   ALL_TESTS
 }
 
