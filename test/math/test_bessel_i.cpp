@@ -12,7 +12,7 @@
 
 #define SC_(x) static_cast<typename table_type<T>::type>(BOOST_STRINGIZE(x))
 
-#include <boost/math/special_functions/bessel.hpp>
+#include <boost/math/special_functions/math_fwd.hpp>
 #include "libs/math/test/test_bessel_i.hpp"
 
 void expected_results()

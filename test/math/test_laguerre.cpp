@@ -7,7 +7,7 @@
 #include "table_type.hpp"
 #define TEST_UDT
 
-#include <boost/math/special_functions/laguerre.hpp>
+#include <boost/math/special_functions/math_fwd.hpp>
 #include "libs/math/test/test_laguerre.hpp"
 
 void expected_results()

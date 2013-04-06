@@ -11,8 +11,7 @@
 #include "setup.hpp"
 
 #include <boost/test/floating_point_comparison.hpp>
-#include <boost/math/special_functions/sqrt1pm1.hpp>
-#include <boost/math/special_functions/powm1.hpp>
+#include <boost/math/special_functions/math_fwd.hpp>
 
 #include "table_type.hpp"
 

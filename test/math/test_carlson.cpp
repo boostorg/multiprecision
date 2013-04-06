@@ -7,10 +7,7 @@
 #include "table_type.hpp"
 #define TEST_UDT
 
-#include <boost/math/special_functions/ellint_rc.hpp>
-#include <boost/math/special_functions/ellint_rj.hpp>
-#include <boost/math/special_functions/ellint_rd.hpp>
-#include <boost/math/special_functions/ellint_rf.hpp>
+#include <boost/math/special_functions/math_fwd.hpp>
 #include "libs/math/test/test_carlson.hpp"
 
 void expected_results()

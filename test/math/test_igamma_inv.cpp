@@ -7,7 +7,7 @@
 #include "table_type.hpp"
 #define TEST_UDT
 
-#include <boost/math/special_functions/gamma.hpp>
+#include <boost/math/special_functions/math_fwd.hpp>
 #include "libs/math/test/test_igamma_inv.hpp"
 
 void expected_results()

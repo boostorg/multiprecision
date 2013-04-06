@@ -11,7 +11,7 @@
 #include "setup.hpp"
 #include "table_type.hpp"
 
-#include <boost/math/special_functions/binomial.hpp>
+#include <boost/math/special_functions/math_fwd.hpp>
 #include "libs/math/test/test_binomial_coeff.hpp"
 
 void expected_results()

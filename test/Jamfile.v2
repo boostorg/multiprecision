@@ -21,12 +21,6 @@ project : requirements
    <include>$(mpfi_path)/src
    <include>$(tommath_path)
    <include>../../..
-   <search>$(gmp_path)
-   <search>$(mpfr_path)
-   <search>$(mpfr_path)/build.vc10/lib/Win32/Debug
-   <search>$(mpfi_path)
-   <search>$(mpfi_path)/src
-   <search>$(tommath_path)
    # We set these to make it easier to set up and test GMP and MPFR under Win32:
    <toolset>msvc:<runtime-link>static
    <toolset>msvc:<link>static
@@ -44,18 +38,19 @@ project : requirements
 local enable-specfun = [ MATCH (--enable-specfun) : [ modules.peek : ARGV ] ] ;
 local disable-concepts = [ MATCH (--disable-concepts) : [ modules.peek : ARGV ] ] ;
 
-lib gmp ;
-lib mpfr ;
-lib mpfi ;
+lib gmp : : <search>$(gmp_path) ;
+lib mpfr : : <search>$(gmp_path) <search>$(mpfr_path) <search>$(mpfr_path)/build.vc10/lib/Win32/Debug ;
+lib mpfi : : <search>$(gmp_path) <search>$(mpfr_path) <search>$(mpfr_path)/build.vc10/lib/Win32/Debug <search>$(mpfi_path) <search>$(mpfi_path)/src ;
 lib quadmath ;
 
 if $(tommath_path)
 {
-   TOMMATH = [ GLOB $(tommath_path) : *.c ] ;
+   lib tommath : [ GLOB $(tommath_path) : *.c ] ;
+   TOMMATH = tommath ;
 }
 else
 {
-   lib tommath ;
+   lib tommath : : <search>$(tommath_path) ;
    TOMMATH = tommath ;
 }
 
@@ -541,7 +536,10 @@ if $(enable-specfun)
 
    for local source in [ glob math/*.cpp ]
    {
-      run $(source) mpfr gmp /boost/test//boost_unit_test_framework/<link>static /boost/regex//boost_regex/<link>static
+      run $(source) mpfr gmp 
+            /boost/test//boost_unit_test_framework/<link>static 
+            /boost/regex//boost_regex/<link>static 
+            math/instances//test_instances_mpfr/<link>static
            : # command line
            : # input files
            : # requirements
@@ -552,7 +550,10 @@ if $(enable-specfun)
             <toolset>msvc:<cxxflags>-bigobj
             release
            : $(source:B)_mpfr ;
-      run $(source) gmp /boost/test//boost_unit_test_framework/<link>static /boost/regex//boost_regex/<link>static
+      run $(source) gmp 
+            /boost/test//boost_unit_test_framework/<link>static 
+            /boost/regex//boost_regex/<link>static
+            math/instances//test_instances_mpf/<link>static
            : # command line
            : # input files
            : # requirements
@@ -563,7 +564,9 @@ if $(enable-specfun)
             <toolset>msvc:<cxxflags>-bigobj
             release
            : $(source:B)_mpf ;
-      run $(source) /boost/test//boost_unit_test_framework/<link>static /boost/regex//boost_regex/<link>static
+      run $(source) /boost/test//boost_unit_test_framework/<link>static 
+               /boost/regex//boost_regex/<link>static
+               math/instances//test_instances_cpp_dec_float/<link>static
            : # command line
            : # input files
            : # requirements
@@ -573,7 +576,10 @@ if $(enable-specfun)
             <toolset>msvc:<cxxflags>-bigobj
             release
            : $(source:B)_cpp_dec_float ;
-      run $(source) quadmath /boost/test//boost_unit_test_framework/<link>static /boost/regex//boost_regex/<link>static
+      run $(source) quadmath 
+            /boost/test//boost_unit_test_framework/<link>static 
+            /boost/regex//boost_regex/<link>static
+            math/instances//test_instances_float128/<link>static
            : # command line
            : # input files
            : # requirements
@@ -669,4 +675,5 @@ if ! $(disable-concepts)
               : $(source:B)_logged_adaptor ;
    }
 }
+
 

@@ -41,6 +41,11 @@
    test(number<gmp_float<35> >(), "number<gmp_float<35> >");\
    /* there should be at least one test with expression templates off: */ \
    test(number<gmp_float<35>, et_off>(), "number<gmp_float<35>, et_off>");
+
+typedef boost::multiprecision::number<boost::multiprecision::gmp_float<18> > test_type_1;
+typedef boost::multiprecision::number<boost::multiprecision::gmp_float<30> > test_type_2;
+typedef boost::multiprecision::number<boost::multiprecision::gmp_float<35> > test_type_3;
+typedef boost::multiprecision::number<boost::multiprecision::gmp_float<35>, boost::multiprecision::et_off> test_type_4;
    
 #else
 
@@ -55,6 +60,10 @@
 #define MPFR_TESTS    test(number<mpfr_float_backend<18> >(), "number<mpfr_float_backend<18> >");\
    test(number<mpfr_float_backend<30> >(), "number<mpfr_float_backend<30> >");\
    test(number<mpfr_float_backend<35> >(), "number<mpfr_float_backend<35> >");
+
+typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<18> > test_type_1;
+typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<30> > test_type_2;
+typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<35> > test_type_3;
 
 #else
 
@@ -72,6 +81,10 @@
    test(number<cpp_dec_float<30> >(), "number<cpp_dec_float<30> >");\
    test(number<cpp_dec_float<35, long long, std::allocator<void> > >(), "number<cpp_dec_float<35, long long, std::allocator<void> > >");
 
+typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<18> > test_type_1;
+typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<30> > test_type_2;
+typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<35, long long, std::allocator<void> > > test_type_3;
+
 #else
 
 #define CPP_DEC_FLOAT_TESTS
@@ -83,16 +96,19 @@
 
 #define FLOAT128_TESTS test(float128(), "float128");
 
+typedef boost::multiprecision::float128 test_type_1;
+
 #else
 
 #define FLOAT128_TESTS
 
 #endif
 
+
+#ifndef BOOST_MATH_TEST_TYPE
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
-
 #endif
 
 #define ALL_TESTS \
@@ -106,4 +122,6 @@
  MPFR_TESTS\
  CPP_DEC_FLOAT_TESTS\
  FLOAT128_TESTS
+
+#endif
 

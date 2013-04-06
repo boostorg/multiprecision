@@ -9,7 +9,7 @@
 
 #define TEST_DATA 3
 
-#include <boost/math/special_functions/beta.hpp>
+#include <boost/math/special_functions/math_fwd.hpp>
 #include "libs/math/test/test_ibeta.hpp"
 
 void expected_results()

@@ -9,8 +9,9 @@
 // in ACM TOMS, {VOL 37, ISSUE 4, (February 2011)} (C) ACM, 2011. http://doi.acm.org/10.1145/1916461.1916469
 
 #include "setup.hpp"
-#include <boost/math/special_functions/log1p.hpp>
-#include <boost/math/special_functions/expm1.hpp>
+//#include <boost/math/special_functions/log1p.hpp>
+//#include <boost/math/special_functions/expm1.hpp>
+#include <boost/math/special_functions/math_fwd.hpp>
 
 #include "table_type.hpp"
 

@@ -7,7 +7,7 @@
 #include "table_type.hpp"
 #define TEST_UDT
 
-#include <boost/math/special_functions/zeta.hpp>
+#include <boost/math/special_functions/math_fwd.hpp>
 #include "libs/math/test/test_zeta.hpp"
 
 void expected_results()

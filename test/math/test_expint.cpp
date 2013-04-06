@@ -7,7 +7,7 @@
 #include "table_type.hpp"
 #define TEST_UDT
 
-#include <boost/math/special_functions/expint.hpp>
+#include <boost/math/special_functions/math_fwd.hpp>
 #include "libs/math/test/test_expint.hpp"
 
 void expected_results()
