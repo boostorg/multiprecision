@@ -323,6 +323,9 @@ int main()
 #endif
 #ifdef TEST_FLOAT128
    test<boost::multiprecision::float128>();
+#ifndef BOOST_INTEL
+   test_round_trip<boost::multiprecision::float128>();
+#endif
 #endif
    return boost::report_errors();
 }

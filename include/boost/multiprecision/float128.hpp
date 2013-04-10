@@ -11,6 +11,7 @@ extern "C" {
 }
 
 #include <boost/multiprecision/number.hpp>
+#include <boost/scoped_array.hpp>
 
 namespace boost{
 namespace multiprecision{
@@ -34,7 +35,7 @@ namespace backends{
 struct float128_backend
 {
    typedef mpl::list<signed char, short, int, long, long long>   signed_types;
-   typedef mpl::list<unsigned char, unsigned short, 
+   typedef mpl::list<unsigned char, unsigned short,
       unsigned int, unsigned long, unsigned long long>           unsigned_types;
    typedef mpl::list<float, double, long double>                 float_types;
    typedef int                                                   exponent_type;
@@ -44,7 +45,7 @@ private:
 public:
    float128_backend() : m_value(0) {}
    float128_backend(const float128_backend& o) : m_value(o.m_value) {}
-   float128_backend& operator = (const float128_backend& o) 
+   float128_backend& operator = (const float128_backend& o)
    {
       m_value = o.m_value;
       return *this;
@@ -75,6 +76,7 @@ public:
    std::string str(std::streamsize digits, std::ios_base::fmtflags f)const
    {
       char buf[100];
+      boost::scoped_array<char> buf2;
       std::string format = "%";
       if(f & std::ios_base::showpos)
          format += "+";
@@ -94,7 +96,16 @@ public:
       int v = quadmath_snprintf (buf, 100, format.c_str(), digits, m_value);
 
       if((v < 0) || (v >= 99))
-         BOOST_THROW_EXCEPTION(std::runtime_error("Formatting quad-float value failed."));
+      {
+         int v_max = v;
+         buf2.reset(new char[v+3]);
+         v = quadmath_snprintf (&buf2[0], v_max + 3, format.c_str(), digits, m_value);
+         if(v >= v_max + 3)
+         {
+            BOOST_THROW_EXCEPTION(std::runtime_error("Formatting of __float128 failed."));
+         }
+         return &buf2[0];
+      }
       return buf;
    }
    void negate()
@@ -262,16 +273,16 @@ inline void eval_trunc(float128_backend& result, const float128_backend& arg)
    if(isnanq(arg.value()) || isinf(arg.value()))
    {
       result = boost::math::policies::raise_rounding_error(
-            "boost::multiprecision::trunc<%1%>(%1%)", 0, 
-            number<float128_backend, et_off>(arg), 
-            number<float128_backend, et_off>(arg), 
+            "boost::multiprecision::trunc<%1%>(%1%)", 0,
+            number<float128_backend, et_off>(arg),
+            number<float128_backend, et_off>(arg),
             boost::math::policies::policy<>()).backend();
       return;
    }
    result.value() = truncq(arg.value());
 }
 /*
-// 
+//
 // This doesn't actually work... rely on our own default version instead.
 //
 inline void eval_round(float128_backend& result, const float128_backend& arg)
@@ -279,9 +290,9 @@ inline void eval_round(float128_backend& result, const float128_backend& arg)
    if(isnanq(arg.value()) || isinf(arg.value()))
    {
       result = boost::math::policies::raise_rounding_error(
-            "boost::multiprecision::trunc<%1%>(%1%)", 0, 
-            number<float128_backend, et_off>(arg), 
-            number<float128_backend, et_off>(arg), 
+            "boost::multiprecision::trunc<%1%>(%1%)", 0,
+            number<float128_backend, et_off>(arg),
+            number<float128_backend, et_off>(arg),
             boost::math::policies::policy<>()).backend();
       return;
    }
