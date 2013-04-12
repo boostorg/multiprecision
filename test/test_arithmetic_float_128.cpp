@@ -14,6 +14,6 @@
 int main()
 {
    test<boost::multiprecision::float128>();
-   return 0;
+   return boost::report_errors();
 }
 
