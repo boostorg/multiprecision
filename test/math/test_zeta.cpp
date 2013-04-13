@@ -23,6 +23,15 @@ void expected_results()
       ".*",                          // test type(s)
       ".*Random values less than 1", // test data group
       ".*", 6000, 3000);             // test function
+#ifdef BOOST_INTEL
+   add_expected_result(
+      ".*",                          // compiler
+      ".*",                          // stdlib
+      ".*",                          // platform
+      "float128",                          // test type(s)
+      ".*close to and less than 1.*",  // test data group
+      ".*", 10000000L, 2000000L);              // test function
+#endif
    add_expected_result(
       ".*",                          // compiler
       ".*",                          // stdlib

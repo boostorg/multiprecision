@@ -134,7 +134,11 @@ void test()
       }
    }
    std::cout << "Max error was: " << max_err << std::endl;
+#if defined(BOOST_INTEL) && defined(TEST_FLOAT128)
+   BOOST_TEST(max_err < 40000);
+#else
    BOOST_TEST(max_err < 5000);
+#endif
 
    static const boost::array<boost::array<T, 2>, 10> exact_data =
    {{

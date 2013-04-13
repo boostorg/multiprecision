@@ -39,6 +39,15 @@ void expected_results()
       ".*",                             // test type(s)
       "(?i).*small.*",                  // test data group
       ".*", 90, 25);  // test function
+#ifdef BOOST_INTEL
+   add_expected_result(
+      "[^|]*",                          // compiler
+      "[^|]*",                          // stdlib
+      "[^|]*",                          // platform
+      "float128",                             // test type(s)
+      "(?i).*medium.*",                 // test data group
+      ".*", 5000, 500);  // test function
+#endif
    add_expected_result(
       "[^|]*",                          // compiler
       "[^|]*",                          // stdlib

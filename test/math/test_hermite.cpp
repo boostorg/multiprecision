@@ -16,6 +16,15 @@ void expected_results()
    // Define the max and mean errors expected for
    // various compilers and platforms.
    //
+#ifdef BOOST_INTEL
+   add_expected_result(
+      ".*",                          // compiler
+      ".*",                          // stdlib
+      ".*",                          // platform
+      "float128",                          // test type(s)
+      ".*",                          // test data group
+      "boost::math::hermite", 70, 25);  // test function
+#endif
    add_expected_result(
       ".*",                          // compiler
       ".*",                          // stdlib

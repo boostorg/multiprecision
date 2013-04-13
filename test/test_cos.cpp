@@ -252,7 +252,11 @@ void test()
          max_err = err;
    }
    std::cout << "Max error was: " << max_err << std::endl;
+#if defined(BOOST_INTEL) && defined(TEST_FLOAT128)
+   BOOST_TEST(max_err < 8000);
+#else
    BOOST_TEST(max_err < 750);
+#endif
 
    //
    // Test with some exact binary values as input - this tests our code
@@ -287,7 +291,11 @@ void test()
    BOOST_TEST(max_err < 20);
 
    BOOST_TEST(cos(T(0)) == 1);
+#if defined(BOOST_INTEL) && defined(TEST_FLOAT128)
+   BOOST_TEST(fabs(cos(half_pi)) < 4 * std::numeric_limits<T>::epsilon());
+#else
    BOOST_TEST(fabs(cos(half_pi)) < std::numeric_limits<T>::epsilon());
+#endif
 }
 
 

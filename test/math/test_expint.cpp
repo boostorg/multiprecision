@@ -37,6 +37,15 @@ void expected_results()
       ".*gmp_float.*",               // test type(s)
       ".*",                          // test data group
       ".*", 250, 100);               // test function
+#ifdef BOOST_INTEL
+   add_expected_result(
+      ".*",                          // compiler
+      ".*",                          // stdlib
+      ".*",                          // platform
+      "float128",               // test type(s)
+      ".*",                          // test data group
+      ".*", 4500, 1000);               // test function
+#endif
    add_expected_result(
       ".*",                          // compiler
       ".*",                          // stdlib

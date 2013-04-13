@@ -30,6 +30,15 @@ void expected_results()
       ".*gmp_float<18>.*",           // test type(s)
       "Inverse Erf.*",               // test data group
       "boost::math::erfc?_inv", 2200, 1500);  // test function
+#ifdef BOOST_INTEL
+      add_expected_result(
+      ".*",                          // compiler
+      ".*",                          // stdlib
+      ".*",                          // platform
+      "float128",                          // test type(s)
+      "Erf Function:.*",             // test data group
+      "boost::math::erfc?", 15000, 1000); // test function
+#endif
    add_expected_result(
       ".*",                          // compiler
       ".*",                          // stdlib

@@ -2,6 +2,12 @@
 //  Copyright 2013 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_
+//
+// Generic routines for converting floating point values to and from decimal strings.
+// Note that these use "naive" algorithms which result in rounding error - so they
+// do not round trip to and from the string representation (but should only be out
+// in the last bit).
+//
 
 #ifndef BOOST_MP_FLOAT_STRING_CVT_HPP
 #define BOOST_MP_FLOAT_STRING_CVT_HPP
@@ -12,6 +18,9 @@ namespace boost{ namespace multiprecision{ namespace detail{
 
 inline void round_string_up_at(std::string& s, int pos)
 {
+   //
+   // Rounds up a string representation of a number at pos:
+   //
    if(pos < 0)
    {
       s.insert(0, 1, '1');
@@ -69,6 +78,9 @@ std::string convert_to_string(Backend b, std::streamsize digits, std::ios_base::
    }
    else
    {
+      //
+      // Start by figuring out the exponent:
+      //
       isneg = b.compare(ui_type(0)) < 0;
       if(isneg)
          b.negate();
@@ -96,10 +108,16 @@ std::string convert_to_string(Backend b, std::streamsize digits, std::ios_base::
       }
       Backend digit;
       ui_type cdigit;
+      //
+      // Adjust the number of digits required based on formatting options:
+      //
       if(((f & std::ios_base::fixed) == std::ios_base::fixed) && (expon != -1))
          digits += expon + 1;
       if((f & std::ios_base::scientific) == std::ios_base::scientific)
          ++digits;
+      //
+      // Extract the digits one at a time:
+      //
       for(unsigned i = 0; i < digits; ++i)
       {
          eval_floor(digit, t);
@@ -169,6 +187,9 @@ void convert_from_string(Backend& b, const char* p)
    bool is_neg_expon = false;
    static const ui_type ten = ui_type(10);
    typename Backend::exponent_type expon = 0;
+   int digits_seen = 0;
+   typedef std::numeric_limits<number<Backend, et_off> > limits;
+   static const int max_digits = limits::is_specialized ? limits::max_digits10 + 1 : INT_MAX;
 
    if(*p == '+') ++p;
    else if(*p == '-')
@@ -191,14 +212,22 @@ void convert_from_string(Backend& b, const char* p)
          b.negate();
       return;
    }
+   //
+   // Grab all the leading digits before the decimal point:
+   //
    while(std::isdigit(*p))
    {
       eval_multiply(b, ten);
       eval_add(b, ui_type(*p - '0'));
       ++p;
+      ++digits_seen;
    }
    if(*p == '.')
    {
+      //
+      // Grab everything after the point, stop when we've seen
+      // enough digits, even if there are actually more available:
+      //
       ++p;
       while(std::isdigit(*p))
       {
@@ -206,8 +235,15 @@ void convert_from_string(Backend& b, const char* p)
          eval_add(b, ui_type(*p - '0'));
          ++p;
          --expon;
+         if(++digits_seen > max_digits)
+            break;
       }
+      while(std::isdigit(*p))
+         ++p;
    }
+   //
+   // Parse the exponent:
+   //
    if((*p == 'e') || (*p == 'E'))
    {
       ++p;
@@ -230,11 +266,25 @@ void convert_from_string(Backend& b, const char* p)
    }
    if(expon)
    {
-      // scale by 10^expon:
+      // Scale by 10^expon, note that 10^expon can be
+      // outside the range of our number type, even though the
+      // result is within range, if that looks likely, then split
+      // the calculation in two:
       Backend t;
       t = ten;
-      eval_pow(t, t, expon);
-      eval_multiply(b, t);
+      if(expon > limits::min_exponent10 + 2)
+      {
+         eval_pow(t, t, expon);
+         eval_multiply(b, t);
+      }
+      else
+      {
+         eval_pow(t, t, expon + digits_seen + 1);
+         eval_multiply(b, t);
+         t = ten;
+         eval_pow(t, t, -digits_seen - 1);
+         eval_multiply(b, t);
+      }
    }
    if(is_neg)
       b.negate();

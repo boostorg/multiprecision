@@ -196,7 +196,11 @@ void test()
          max_err = err;
    }
    std::cout << "Max error was: " << max_err << std::endl;
+#if defined(BOOST_INTEL) && defined(TEST_FLOAT128)
+   BOOST_TEST(max_err < 20);
+#else
    BOOST_TEST(max_err < 10);
+#endif
    BOOST_TEST(log(T(1)) == 0);
 }
 
