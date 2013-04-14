@@ -137,7 +137,7 @@ std::string convert_to_string(Backend b, std::streamsize digits, std::ios_base::
          if((cdigit == 5) && (t.compare(ui_type(0)) == 0))
          {
             // Bankers rounding:
-            if((result.back() - '0') & 1)
+            if((*result.rend() - '0') & 1)
             {
                round_string_up_at(result, result.size() - 1);
             }
