@@ -30,6 +30,7 @@
 <dt><span class="section"><a href="floats/cpp_dec_float.html">cpp_dec_float</a></span></dt>
 <dt><span class="section"><a href="floats/gmp_float.html">gmp_float</a></span></dt>
 <dt><span class="section"><a href="floats/mpfr_float.html">mpfr_float</a></span></dt>
+<dt><span class="section"><a href="floats/float128.html">float128</a></span></dt>
 <dt><span class="section"><a href="floats/fp_eg.html">Examples</a></span></dt>
 <dd><dl>
 <dt><span class="section"><a href="floats/fp_eg/aos.html">Area of
@@ -186,6 +187,40 @@
                 <p>
                   Dependency on GNU licensed <a href="http://gmplib.org" target="_top">GMP</a>
                   and <a href="http://www.mpfr.org" target="_top">MPFR</a> libraries.
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">float128</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  boost/multiprecision/float128.hpp
+                </p>
+              </td>
+<td>
+                <p>
+                  2
+                </p>
+              </td>
+<td>
+                <p>
+                  Either <a href="http://gcc.gnu.org/onlinedocs/libquadmath/" target="_top">libquadmath</a>
+                  or the Intel C++ Math library.
+                </p>
+              </td>
+<td>
+                <p>
+                  Very fast and efficient back-end for 128-bit floating point values
+                  (113-bit mantissa, equivalent to FORTRAN's QUAD real)
+                </p>
+              </td>
+<td>
+                <p>
+                  Depends on the compiler being either recent GCC or Intel C++ versions.
                 </p>
               </td>
 </tr>

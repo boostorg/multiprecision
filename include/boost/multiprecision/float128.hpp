@@ -7,6 +7,7 @@
 #define BOOST_MP_FLOAT128_HPP
 
 #include <boost/config.hpp>
+#include <boost/scoped_array.hpp>
 #include <boost/multiprecision/number.hpp>
 
 
@@ -111,15 +112,15 @@ struct float128_backend
 private:
    __float128 m_value;
 public:
-   float128_backend() : m_value(0) {}
-   float128_backend(const float128_backend& o) : m_value(o.m_value) {}
+   BOOST_CONSTEXPR float128_backend() : m_value(0) {}
+   BOOST_CONSTEXPR float128_backend(const float128_backend& o) : m_value(o.m_value) {}
    float128_backend& operator = (const float128_backend& o) 
    {
       m_value = o.m_value;
       return *this;
    }
    template <class T>
-   float128_backend(const T& i, const typename enable_if_c<is_convertible<T, __float128>::value>::type* = 0)
+   BOOST_CONSTEXPR float128_backend(const T& i, const typename enable_if_c<is_convertible<T, __float128>::value>::type* = 0)
       : m_value(i) {}
    template <class T>
    typename enable_if_c<is_arithmetic<T>::value || is_convertible<T, __float128>::value, float128_backend&>::type operator = (const T& i)
@@ -149,6 +150,7 @@ public:
    {
 #ifndef BOOST_INTEL
       char buf[100];
+      boost::scoped_array<char> buf2;
       std::string format = "%";
       if(f & std::ios_base::showpos)
          format += "+";

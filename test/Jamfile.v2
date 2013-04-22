@@ -324,7 +324,7 @@ run test_move.cpp
         : test_move_cpp_int ;
 
 run test_test.cpp ;
-compile test_constexpr.cpp ;
+compile test_constexpr.cpp : [ check-target-builds ../config//has_float128 : <define>HAVE_FLOAT128 : ] [ check-target-builds ../config//has_intel_quad : <define>HAVE_FLOAT128 : ] ;
 
 run test_float_io.cpp
         : # command line
@@ -498,6 +498,19 @@ run ../example/mpfi_snips.cpp mpfi mpfr gmp
         : # input files
         : # requirements
          [ check-target-builds ../config//has_mpfi : : <build>no ] ;
+
+run ../example/float128_snips.cpp quadmath
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_float128 : : <build>no ] ;
+
+run ../example/float128_snips.cpp
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_intel_quad : <cxxflags>-Qoption,cpp,--extended_float_type : <build>no ] 
+        : float128_snips_intel_quad ;
 
 run ../example/logged_adaptor.cpp mpfi mpfr gmp
         : # command line

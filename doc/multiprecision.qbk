@@ -22,6 +22,7 @@
 [import ../example/gmp_snips.cpp]
 [import ../example/mpfr_snips.cpp]
 [import ../example/mpfi_snips.cpp]
+[import ../example/float128_snips.cpp]
 [import ../example/cpp_dec_float_snips.cpp]
 [import ../example/tommath_snips.cpp]
 [import ../example/cpp_int_snips.cpp]
@@ -38,6 +39,7 @@
 [template mpreal[] [@http://www.holoborodko.com/pavel/mpfr/ mpreal]]
 [template mpir[] [@http://mpir.org/ MPIR]]
 [template tommath[] [@http://libtom.org/?page=features&newsitems=5&whatfile=ltm libtommath]]
+[template quadmath[] [@http://gcc.gnu.org/onlinedocs/libquadmath/ libquadmath]]
 
 [template super[x]'''<superscript>'''[x]'''</superscript>''']
 [template sub[x]'''<subscript>'''[x]'''</subscript>''']
@@ -634,6 +636,7 @@ The following back-ends provide floating point arithmetic:
 [[`cpp_dec_float<N>`][boost/multiprecision/cpp_dec_float.hpp][10][None][Header only, all C++ implementation. Boost licence.][Approximately 2x slower than the [mpfr] or [gmp] libraries.]]
 [[`mpf_float<N>`][boost/multiprecision/gmp.hpp][2][[gmp]][Very fast and efficient back-end.][Dependency on GNU licensed [gmp] library.]]
 [[`mpfr_float<N>`][boost/multiprecision/mpfr.hpp][2][[gmp] and [mpfr]][Very fast and efficient back-end, with its own standard library implementation.][Dependency on GNU licensed [gmp] and [mpfr] libraries.]]
+[[`float128`][boost/multiprecision/float128.hpp][2][Either [quadmath] or the Intel C++ Math library.][Very fast and efficient back-end for 128-bit floating point values (113-bit mantissa, equivalent to FORTRAN's QUAD real)][Depends on the compiler being either recent GCC or Intel C++ versions.]]
 ]
 
 [section:cpp_dec_float cpp_dec_float]
@@ -839,6 +842,50 @@ as a valid floating point number.
 [h5 [mpfr] example:]
 
 [mpfr_eg]
+
+[endsect]
+
+[section:float128 float128]
+
+`#include <boost/multiprecision/float128.hpp>`
+
+   namespace boost{ namespace multiprecision{
+
+   class float128_backend;
+
+   typedef number<float128_backend, et_off>    float128;
+
+   }} // namespaces
+
+The `float128` number type is a very thin wrapper around GCC's `__float128` or Intel's `_Quad` data types
+and provides an real-number type that is a drop-in replacement for the native C++ floating-point types, but with 
+a 113 bit mantissa, and compatible with FORTRAN's 128-bit QUAD real.
+
+All the usual standard library and `numeric_limits` support are available, performance should be equivalent
+to the underlying native types: for example the LINPACK benchmarks for GCC's `__float128` and 
+`boost::multiprecision::float128` both achieved 5.6 MFLOPS[footnote On 64-bit Ubuntu 11.10, GCC-4.8.0, Intel Core 2 Duo T5800.].
+
+As well as the usual conversions from arithmetic and string types, instances of `float128` are
+copy constructible and assignable from GCC's `__float128` and Intel's `_Quad` data types.
+
+It's also possible to access the underlying `__float128` or `_Quad` type via the `data()` member 
+function of `float128_backend`.
+
+Things you should know when using this type:
+
+* Default constructed `float128`s have the value zero.
+* This backend supports rvalue-references and is move-aware, making instantiations of `number` on this backend move aware.
+* It is not possible to round-trip objects of this type to and from a string and get back
+exactly the same value when compiled with Intel's C++ compiler: this is a current limitation of our code.  Round tripping
+when using GCC is possible.
+* Conversion from a string results in a `std::runtime_error` being thrown if the string can not be interpreted 
+as a valid floating point number.
+* Division by zero results in an infinity being produced.
+* Type `float128` can be used as a literal type (constexpr support).
+
+[h5 float128 example:]
+
+[float128_eg]
 
 [endsect]
 

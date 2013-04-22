@@ -4,6 +4,9 @@
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/multiprecision/cpp_int.hpp>
+#if defined(HAVE_FLOAT128)
+#include <boost/multiprecision/float128.hpp>
+#endif
 
 #ifndef BOOST_NO_CXX11_CONSTEXPR
 
@@ -50,5 +53,9 @@ template void test1<number<cpp_int_backend<64, 64, unsigned_magnitude, unchecked
 template void test1<number<cpp_int_backend<64, 64, signed_magnitude, unchecked, void>, et_off> >();
 template void test3<number<cpp_int_backend<2048, 2048, unsigned_magnitude, unchecked, void>, et_off> >();
 template void test2<number<cpp_int_backend<2048, 2048, signed_magnitude, unchecked, void>, et_off> >();
+
+#if defined(HAVE_FLOAT128)
+template void test1<float128>();
+#endif
 
 #endif
