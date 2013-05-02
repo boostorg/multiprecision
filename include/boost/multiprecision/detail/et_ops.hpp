@@ -14,20 +14,20 @@ namespace boost{ namespace multiprecision{
 // Unary operators first:
 //
 template <class B, expression_template_option ExpressionTemplates>
-inline const number<B, ExpressionTemplates>& operator + (const number<B, ExpressionTemplates>& v) { return v; }
+inline BOOST_CONSTEXPR const number<B, ExpressionTemplates>& operator + (const number<B, ExpressionTemplates>& v) { return v; }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-inline const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& operator + (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& v) { return v; }
+inline BOOST_CONSTEXPR const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& operator + (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& v) { return v; }
 template <class B>
-inline detail::expression<detail::negate, number<B, et_on> > operator - (const number<B, et_on>& v) 
+inline detail::expression<detail::negate, number<B, et_on> > operator - (const number<B, et_on>& v)
 {
    BOOST_STATIC_ASSERT_MSG(is_signed_number<B>::value, "Negating an unsigned type results in ill-defined behavior.");
-   return detail::expression<detail::negate, number<B, et_on> >(v); 
+   return detail::expression<detail::negate, number<B, et_on> >(v);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-inline detail::expression<detail::negate, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> > operator - (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& v) 
-{ 
+inline detail::expression<detail::negate, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> > operator - (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& v)
+{
    BOOST_STATIC_ASSERT_MSG((is_signed_number<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value), "Negating an unsigned type results in ill-defined behavior.");
-   return detail::expression<detail::negate, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(v); 
+   return detail::expression<detail::negate, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(v);
 }
 template <class B>
 inline typename enable_if_c<number_category<B>::value == number_kind_integer,
@@ -92,14 +92,14 @@ inline typename enable_if<is_compatible_arithmetic_type<V, typename detail::expr
 // Fused multiply add:
 //
 template <class V, class Arg1, class Arg2, class Arg3, class Arg4>
-inline typename enable_if<is_compatible_arithmetic_type<V, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::result_type>, 
+inline typename enable_if<is_compatible_arithmetic_type<V, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::result_type>,
    detail::expression<detail::multiply_add, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, V> >::type
    operator + (const V& a, const detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>& b)
 {
    return detail::expression<detail::multiply_add, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, V>(b.left(), b.right(), a);
 }
 template <class Arg1, class Arg2, class Arg3, class Arg4, class V>
-inline typename enable_if<is_compatible_arithmetic_type<V, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::result_type>, 
+inline typename enable_if<is_compatible_arithmetic_type<V, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::result_type>,
    detail::expression<detail::multiply_add, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, V> >::type
    operator + (const detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>& a, const V& b)
 {
@@ -121,7 +121,7 @@ inline detail::expression<detail::multiply_add, typename detail::expression<deta
 // Fused multiply subtract:
 //
 template <class V, class Arg1, class Arg2, class Arg3, class Arg4>
-inline typename enable_if<is_compatible_arithmetic_type<V, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::result_type>, 
+inline typename enable_if<is_compatible_arithmetic_type<V, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::result_type>,
    detail::expression<detail::negate, detail::expression<detail::multiply_subtract, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, V> > >::type
    operator - (const V& a, const detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>& b)
 {
@@ -129,7 +129,7 @@ inline typename enable_if<is_compatible_arithmetic_type<V, typename detail::expr
       (detail::expression<detail::multiply_subtract, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, V>(b.left(), b.right(), a));
 }
 template <class Arg1, class Arg2, class Arg3, class Arg4, class V>
-inline typename enable_if<is_compatible_arithmetic_type<V, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::result_type>, 
+inline typename enable_if<is_compatible_arithmetic_type<V, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::result_type>,
    detail::expression<detail::multiply_subtract, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, V> >::type
    operator - (const detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>& a, const V& b)
 {
@@ -534,14 +534,14 @@ inline typename enable_if_c<number_category<B>::value == number_kind_integer,
    return detail::expression<detail::modulus_immediates, number<B, et_on>, number<B, et_on> >(a, b);
 }
 template <class B, class V>
-inline typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer), 
+inline typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer),
    detail::expression<detail::modulus_immediates, number<B, et_on>, V > >::type
    operator % (const number<B, et_on>& a, const V& b)
 {
    return detail::expression<detail::modulus_immediates, number<B, et_on>, V >(a, b);
 }
 template <class V, class B>
-inline typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer), 
+inline typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer),
    detail::expression<detail::modulus_immediates, V, number<B, et_on> > >::type
       operator % (const V& a, const number<B, et_on>& b)
 {
@@ -569,8 +569,8 @@ inline typename enable_if_c<number_category<typename detail::expression<tag, Arg
    return detail::expression<detail::modulus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, detail::expression<tag2, Arg1b, Arg2b, Arg3b, Arg4b> >(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class V>
-inline typename enable_if_c<is_compatible_arithmetic_type<V, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value 
-   && (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer), 
+inline typename enable_if_c<is_compatible_arithmetic_type<V, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value
+   && (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer),
    detail::expression<detail::modulus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, V > >::type
       operator % (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const V& b)
 {
@@ -578,7 +578,7 @@ inline typename enable_if_c<is_compatible_arithmetic_type<V, typename detail::ex
 }
 template <class V, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 inline typename enable_if_c<is_compatible_arithmetic_type<V, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value
-   && (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer), 
+   && (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer),
    detail::expression<detail::modulus, V, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> > >::type
       operator % (const V& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
@@ -594,7 +594,7 @@ inline typename enable_if_c<is_integral<I>::value && (number_category<B>::value 
    return detail::expression<detail::shift_left, number<B, et_on>, I>(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class I>
-inline typename enable_if_c<is_integral<I>::value && (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer), 
+inline typename enable_if_c<is_integral<I>::value && (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer),
    detail::expression<detail::shift_left, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, I> >::type
       operator << (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const I& b)
 {
@@ -604,15 +604,15 @@ inline typename enable_if_c<is_integral<I>::value && (number_category<typename d
 // Right shift:
 //
 template <class B, class I>
-inline typename enable_if_c<is_integral<I>::value && (number_category<B>::value == number_kind_integer), 
+inline typename enable_if_c<is_integral<I>::value && (number_category<B>::value == number_kind_integer),
    detail::expression<detail::shift_right, number<B, et_on>, I > >::type
       operator >> (const number<B, et_on>& a, const I& b)
 {
    return detail::expression<detail::shift_right, number<B, et_on>, I>(a, b);
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class I>
-inline typename enable_if_c<is_integral<I>::value 
-   && (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer), 
+inline typename enable_if_c<is_integral<I>::value
+   && (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer),
    detail::expression<detail::shift_right, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, I> >::type
       operator >> (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const I& b)
 {
@@ -630,7 +630,7 @@ inline typename enable_if_c<number_category<B>::value == number_kind_integer,
 }
 template <class B, class V>
 inline typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value
-   && (number_category<B>::value == number_kind_integer), 
+   && (number_category<B>::value == number_kind_integer),
    detail::expression<detail::bitwise_and_immediates, number<B, et_on>, V > >::type
       operator & (const number<B, et_on>& a, const V& b)
 {
@@ -638,7 +638,7 @@ inline typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >:
 }
 template <class V, class B>
 inline typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value
-   && (number_category<B>::value == number_kind_integer), 
+   && (number_category<B>::value == number_kind_integer),
    detail::expression<detail::bitwise_and_immediates, V, number<B, et_on> > >::type
       operator & (const V& a, const number<B, et_on>& b)
 {
@@ -667,7 +667,7 @@ inline typename enable_if_c<number_category<typename detail::expression<tag, Arg
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class V>
 inline typename enable_if_c<is_compatible_arithmetic_type<V, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value
-   && (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer), 
+   && (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer),
    detail::expression<detail::bitwise_and, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, V > >::type
       operator & (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const V& b)
 {
@@ -675,7 +675,7 @@ inline typename enable_if_c<is_compatible_arithmetic_type<V, typename detail::ex
 }
 template <class V, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 inline typename enable_if_c<is_compatible_arithmetic_type<V, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value
-   && (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer), 
+   && (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer),
    detail::expression<detail::bitwise_and, V, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> > >::type
       operator & (const V& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
@@ -693,7 +693,7 @@ inline typename enable_if_c<number_category<B>::value == number_kind_integer,
 }
 template <class B, class V>
 inline typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value
-   && (number_category<B>::value == number_kind_integer), 
+   && (number_category<B>::value == number_kind_integer),
    detail::expression<detail::bitwise_or_immediates, number<B, et_on>, V > >::type
       operator| (const number<B, et_on>& a, const V& b)
 {
@@ -701,7 +701,7 @@ inline typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >:
 }
 template <class V, class B>
 inline typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value
-   && (number_category<B>::value == number_kind_integer), 
+   && (number_category<B>::value == number_kind_integer),
    detail::expression<detail::bitwise_or_immediates, V, number<B, et_on> > >::type
       operator| (const V& a, const number<B, et_on>& b)
 {
@@ -730,7 +730,7 @@ inline typename enable_if_c<number_category<typename detail::expression<tag, Arg
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class V>
 inline typename enable_if_c<is_compatible_arithmetic_type<V, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value
-   && (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer), 
+   && (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer),
    detail::expression<detail::bitwise_or, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, V > >::type
       operator| (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const V& b)
 {
@@ -738,7 +738,7 @@ inline typename enable_if_c<is_compatible_arithmetic_type<V, typename detail::ex
 }
 template <class V, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
 inline typename enable_if_c<is_compatible_arithmetic_type<V, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value
-   && (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer), 
+   && (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer),
    detail::expression<detail::bitwise_or, V, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> > >::type
       operator| (const V& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
@@ -756,7 +756,7 @@ inline typename enable_if_c<number_category<B>::value == number_kind_integer,
 }
 template <class B, class V>
 inline typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value
-   && (number_category<B>::value == number_kind_integer), 
+   && (number_category<B>::value == number_kind_integer),
    detail::expression<detail::bitwise_xor_immediates, number<B, et_on>, V > >::type
       operator^ (const number<B, et_on>& a, const V& b)
 {
@@ -764,7 +764,7 @@ inline typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >:
 }
 template <class V, class B>
 inline typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value
-   && (number_category<B>::value == number_kind_integer), 
+   && (number_category<B>::value == number_kind_integer),
    detail::expression<detail::bitwise_xor_immediates, V, number<B, et_on> > >::type
       operator^ (const V& a, const number<B, et_on>& b)
 {
@@ -793,7 +793,7 @@ inline typename enable_if_c<number_category<typename detail::expression<tag, Arg
 }
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class V>
 inline typename enable_if_c<is_compatible_arithmetic_type<V, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value
-   && (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer), 
+   && (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_integer),
    detail::expression<detail::bitwise_xor, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, V > >::type
       operator^ (const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const V& b)
 {

@@ -20,10 +20,12 @@
 #include <boost/integer/static_min_max.hpp>
 #include <boost/type_traits/common_type.hpp>
 #include <boost/multiprecision/cpp_int/checked.hpp>
+#ifdef BOOST_MP_USER_DEFINED_LITERALS
+#include <boost/multiprecision/cpp_int/value_pack.hpp>
+#endif
 
 namespace boost{
 namespace multiprecision{
-
 namespace backends{
 
 #ifdef BOOST_MSVC
@@ -427,6 +429,10 @@ private:
       BOOST_CONSTEXPR data_type() : m_first_limb(0) {}
       BOOST_CONSTEXPR data_type(limb_type i) : m_first_limb(i) {}
       BOOST_CONSTEXPR data_type(double_limb_type i) : m_double_first_limb(i) {}
+#if defined(BOOST_MP_USER_DEFINED_LITERALS)
+      template <limb_type...VALUES>
+      BOOST_CONSTEXPR data_type(literals::detail::value_pack<VALUES...>) : m_data{ VALUES... } {}
+#endif
    } m_wrapper;
    boost::uint16_t    m_limbs;
    bool               m_sign;
@@ -447,13 +453,22 @@ public:
         m_limbs(i < 0 ? (-i > max_limb_value ? 2 : 1) : (i > max_limb_value ? 2 : 1)),
         m_sign(i < 0) {}
 #endif
+#if defined(BOOST_MP_USER_DEFINED_LITERALS)
+      template <limb_type...VALUES>
+      BOOST_CONSTEXPR cpp_int_base(literals::detail::value_pack<VALUES...> i)
+         : m_wrapper(i), m_limbs(sizeof...VALUES), m_sign(false) {}
+      BOOST_CONSTEXPR cpp_int_base(literals::detail::value_pack<> i)
+         : m_wrapper(i), m_limbs(1), m_sign(false) {}
+      BOOST_CONSTEXPR cpp_int_base(const cpp_int_base& a, const literals::detail::negate_tag&)
+         : m_wrapper(a.m_wrapper), m_limbs(a.m_limbs), m_sign((a.m_limbs == 1) && (*a.limbs() == 0) ? false : !a.m_sign) {}
+#endif
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
    BOOST_MP_FORCEINLINE unsigned size()const BOOST_NOEXCEPT { return m_limbs; }
    BOOST_MP_FORCEINLINE limb_pointer limbs() BOOST_NOEXCEPT { return m_wrapper.m_data; }
-   BOOST_MP_FORCEINLINE const_limb_pointer limbs()const BOOST_NOEXCEPT { return m_wrapper.m_data; }
-   BOOST_MP_FORCEINLINE bool sign()const BOOST_NOEXCEPT { return m_sign; }
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const_limb_pointer limbs()const BOOST_NOEXCEPT { return m_wrapper.m_data; }
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR bool sign()const BOOST_NOEXCEPT { return m_sign; }
    BOOST_MP_FORCEINLINE void sign(bool b) BOOST_NOEXCEPT
    {
       m_sign = b;
@@ -479,15 +494,10 @@ public:
    }
 
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() : m_wrapper(limb_type(0u)), m_limbs(1), m_sign(false) {}
-   BOOST_MP_FORCEINLINE cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT : m_limbs(o.m_limbs), m_sign(o.m_sign)
-   {
-#if BOOST_WORKAROUND(BOOST_MSVC, >= 1600)
-      std::copy(o.limbs(), o.limbs() + o.size(), stdext::checked_array_iterator<limb_pointer>(limbs(), size()));
-#else
-      std::copy(o.limbs(), o.limbs() + o.size(), limbs());
-#endif
-   }
+   // Defaulted functions:
+   //BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(const cpp_int_base& i)BOOST_NOEXCEPT;
    //~cpp_int_base() BOOST_NOEXCEPT {}
+
    void assign(const cpp_int_base& o) BOOST_NOEXCEPT
    {
       if(this != &o)
@@ -570,6 +580,10 @@ private:
       BOOST_CONSTEXPR data_type() : m_first_limb(0) {}
       BOOST_CONSTEXPR data_type(limb_type i) : m_first_limb(i) {}
       BOOST_CONSTEXPR data_type(double_limb_type i) : m_double_first_limb(i) {}
+#if defined(BOOST_MP_USER_DEFINED_LITERALS)
+      template <limb_type...VALUES>
+      BOOST_CONSTEXPR data_type(literals::detail::value_pack<VALUES...>) : m_data{ VALUES... } {}
+#endif
    } m_wrapper;
    limb_type          m_limbs;
 
@@ -587,12 +601,19 @@ public:
    BOOST_MP_FORCEINLINE cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_wrapper(double_limb_type(i < 0 ? -i : i)), m_limbs(i < 0 ? (-i > max_limb_value ? 2 : 1) : (i > max_limb_value ? 2 : 1)) { if(i < 0) negate(); }
 #endif
+#if defined(BOOST_MP_USER_DEFINED_LITERALS)
+      template <limb_type...VALUES>
+      BOOST_CONSTEXPR cpp_int_base(literals::detail::value_pack<VALUES...> i)
+         : m_wrapper(i), m_limbs(sizeof...VALUES) {}
+      BOOST_CONSTEXPR cpp_int_base(literals::detail::value_pack<>)
+         : m_wrapper(static_cast<limb_type>(0u)), m_limbs(1) {}
+#endif
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
    BOOST_MP_FORCEINLINE unsigned size()const BOOST_NOEXCEPT { return m_limbs; }
    BOOST_MP_FORCEINLINE limb_pointer limbs() BOOST_NOEXCEPT { return m_wrapper.m_data; }
-   BOOST_MP_FORCEINLINE const_limb_pointer limbs()const BOOST_NOEXCEPT { return m_wrapper.m_data; }
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const_limb_pointer limbs()const BOOST_NOEXCEPT { return m_wrapper.m_data; }
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR bool sign()const BOOST_NOEXCEPT { return false; }
    BOOST_MP_FORCEINLINE void sign(bool b) BOOST_NOEXCEPT_IF((Checked == unchecked)) {  if(b) negate(); }
    BOOST_MP_FORCEINLINE void resize(unsigned new_size, unsigned min_size) BOOST_NOEXCEPT_IF((Checked == unchecked))
@@ -610,16 +631,10 @@ public:
 
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() BOOST_NOEXCEPT
       : m_wrapper(limb_type(0u)), m_limbs(1) {}
-   BOOST_MP_FORCEINLINE cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT
-      : m_limbs(o.m_limbs)
-   {
-#if BOOST_WORKAROUND(BOOST_MSVC, >= 1600)
-      std::copy(o.limbs(), o.limbs() + o.size(), stdext::checked_array_iterator<limb_pointer>(limbs(), size()));
-#else
-      std::copy(o.limbs(), o.limbs() + o.size(), limbs());
-#endif
-   }
+   // Defaulted functions:
+   //BOOST_MP_FORCEINLINE cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT;
    //~cpp_int_base() BOOST_NOEXCEPT {}
+
    BOOST_MP_FORCEINLINE void assign(const cpp_int_base& o) BOOST_NOEXCEPT
    {
       if(this != &o)
@@ -761,12 +776,24 @@ public:
    template <class F>
    BOOST_MP_FORCEINLINE cpp_int_base(F i, typename enable_if_c<is_floating_point<F>::value && (Checked == checked)>::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(static_cast<local_limb_type>(std::fabs(i))), m_sign(i < 0) { check_in_range(i); }
+#if defined(BOOST_MP_USER_DEFINED_LITERALS)
+      BOOST_CONSTEXPR cpp_int_base(literals::detail::value_pack<>)
+         : m_data(static_cast<local_limb_type>(0u)), m_sign(false) {}
+      template <limb_type a>
+      BOOST_CONSTEXPR cpp_int_base(literals::detail::value_pack<a>)
+         : m_data(static_cast<local_limb_type>(a)), m_sign(false) {}
+      template <limb_type a, limb_type b>
+      BOOST_CONSTEXPR cpp_int_base(literals::detail::value_pack<a, b>)
+         : m_data(static_cast<local_limb_type>(a) | (static_cast<local_limb_type>(b) << bits_per_limb)), m_sign(false) {}
+      BOOST_CONSTEXPR cpp_int_base(const cpp_int_base& a, const literals::detail::negate_tag&)
+         : m_data(a.m_data), m_sign(a.m_data ? !a.m_sign : false) {}
+#endif
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR unsigned size()const BOOST_NOEXCEPT { return 1; }
    BOOST_MP_FORCEINLINE limb_pointer limbs() BOOST_NOEXCEPT { return &m_data; }
-   BOOST_MP_FORCEINLINE const_limb_pointer limbs()const BOOST_NOEXCEPT { return &m_data; }
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const_limb_pointer limbs()const BOOST_NOEXCEPT { return &m_data; }
    BOOST_MP_FORCEINLINE bool sign()const BOOST_NOEXCEPT { return m_sign; }
    BOOST_MP_FORCEINLINE void sign(bool b) BOOST_NOEXCEPT
    {
@@ -891,12 +918,22 @@ public:
       if(i < 0)
          negate();
    }
+#if defined(BOOST_MP_USER_DEFINED_LITERALS)
+      BOOST_CONSTEXPR cpp_int_base(literals::detail::value_pack<>)
+         : m_data(static_cast<local_limb_type>(0u)) {}
+      template <limb_type a>
+      BOOST_CONSTEXPR cpp_int_base(literals::detail::value_pack<a>)
+         : m_data(static_cast<local_limb_type>(a)) {}
+      template <limb_type a, limb_type b>
+      BOOST_CONSTEXPR cpp_int_base(literals::detail::value_pack<a, b>)
+         : m_data(static_cast<local_limb_type>(a) | (static_cast<local_limb_type>(b) << bits_per_limb)) {}
+#endif
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR unsigned size()const BOOST_NOEXCEPT { return 1; }
    BOOST_MP_FORCEINLINE limb_pointer limbs() BOOST_NOEXCEPT { return &m_data; }
-   BOOST_MP_FORCEINLINE const_limb_pointer limbs()const BOOST_NOEXCEPT { return &m_data; }
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const_limb_pointer limbs()const BOOST_NOEXCEPT { return &m_data; }
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR bool sign()const BOOST_NOEXCEPT { return false; }
    BOOST_MP_FORCEINLINE void sign(bool b) BOOST_NOEXCEPT_IF((Checked == unchecked))
    {
@@ -948,6 +985,9 @@ struct is_allowed_cpp_int_base_conversion : public mpl::if_c<
       is_same<Arg, limb_type>::value || is_same<Arg, signed_limb_type>::value
 #ifdef BOOST_LITTLE_ENDIAN
       || is_same<Arg, double_limb_type>::value || is_same<Arg, signed_double_limb_type>::value
+#endif
+#if defined(BOOST_MP_USER_DEFINED_LITERALS)
+      || literals::detail::is_value_pack<Arg>::value
 #endif
       || (is_trivial_cpp_int<Base>::value && is_arithmetic<Arg>::value),
       mpl::true_,
@@ -1095,132 +1135,11 @@ public:
          mpl::bool_<is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>());
       return *this;
    }
-#if 0
-   template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, class Allocator2>
-   cpp_int_backend(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2>& other, typename enable_if_c<is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2> >::value >::type* = 0)
-      : base_type()
-   {
-       *this = static_cast<
-            typename boost::multiprecision::detail::canonical<
-               typename cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2>::local_limb_type,
-               cpp_int_backend<MinBits, MaxBits, SignType, Allocator>
-            >::type
-         >(*other.limbs());
-      this->sign(other.sign());
-   }
-   template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, class Allocator2>
-   typename enable_if_c<is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2> >::value, cpp_int_backend&>::type
-    operator=(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2>& other)
-   {
-       *this = static_cast<
-            typename boost::multiprecision::detail::canonical<
-               typename cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2>::local_limb_type,
-               cpp_int_backend<MinBits, MaxBits, SignType, Allocator>
-            >::type
-         >(*other.limbs());
-      this->sign(other.sign());
-      return *this;
-   }
-
-   template <unsigned MinBits2, unsigned MaxBits2, bool SignType2, class Allocator2>
-   cpp_int_backend(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2>& other,
-      typename enable_if_c<
-         ((is_signed_number<cpp_int_backend<MinBits, MaxBits, SignType, Allocator> >::value || !is_signed_number<cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2> >::value)
-         && (!is_void<Allocator>::value || (is_void<Allocator2>::value && (MinBits >= MinBits2)))
-         && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2> >::value
-         && !is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Allocator> >::value)
-      >::type* = 0)
-      : base_type()
-   {
-      this->resize(other.size(), other_size());
-#if BOOST_WORKAROUND(BOOST_MSVC, >= 1600)
-      std::copy(other.limbs(), other.limbs() + (std::min)(other.size(), this->size()), stdext::checked_array_iterator<limb_pointer>(this->limbs(), this->size()));
-#else
-      std::copy(other.limbs(), other.limbs() + (std::min)(other.size(), this->size()), this->limbs());
+#ifdef BOOST_MP_USER_DEFINED_LITERALS
+   BOOST_CONSTEXPR cpp_int_backend(const cpp_int_backend& a, const literals::detail::negate_tag& tag)
+      : base_type(static_cast<const base_type&>(a), tag){}
 #endif
-      this->sign(other.sign());
-   }
 
-   template <unsigned MinBits2, unsigned MaxBits2, bool SignType2, class Allocator2>
-   explicit cpp_int_backend(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2>& other,
-      typename enable_if_c<
-         (!((is_signed_number<cpp_int_backend<MinBits, MaxBits, SignType, Allocator> >::value || !is_signed_number<cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2> >::value)
-         && (!is_void<Allocator>::value || (is_void<Allocator2>::value && (MinBits >= MinBits2))))
-         && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2> >::value
-         && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Allocator> >::value)
-      >::type* = 0)
-      : base_type()
-   {
-      double_limb_type v = *other.limbs();
-      if(other.size() > 1)
-         v |= static_cast<double_limb_type>(other.limbs()[1]) << bits_per_limb;
-      *this = v;
-      this->sign(other.sign());
-   }
-
-   template <unsigned MinBits2, unsigned MaxBits2, bool SignType2, class Allocator2>
-   explicit cpp_int_backend(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2>& other,
-      typename enable_if_c<
-         (!((is_signed_number<cpp_int_backend<MinBits, MaxBits, SignType, Allocator> >::value || !is_signed_number<cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2> >::value))
-         && (!is_void<Allocator>::value || (is_void<Allocator2>::value && (MinBits >= MinBits2)))
-         && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2> >::value
-         && !is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Allocator> >::value)
-      >::type* = 0)
-      : base_type()
-   {
-      this->resize(other.size(), other.size());
-#if BOOST_WORKAROUND(BOOST_MSVC, >= 1600)
-      std::copy(other.limbs(), other.limbs() + (std::min)(other.size(), this->size()), stdext::checked_array_iterator<limb_pointer>(this->limbs(), this->size()));
-#else
-      std::copy(other.limbs(), other.limbs() + (std::min)(other.size(), this->size()), this->limbs());
-#endif
-      this->sign(other.sign());
-   }
-
-   template <unsigned MinBits2, unsigned MaxBits2, bool SignType2, class Allocator2>
-   explicit cpp_int_backend(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2>& other,
-      typename enable_if_c<
-         (!((is_signed_number<cpp_int_backend<MinBits, MaxBits, SignType, Allocator> >::value || !is_signed_number<cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2> >::value))
-         && (!is_void<Allocator>::value || (is_void<Allocator2>::value && (MinBits >= MinBits2)))
-         && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2> >::value
-         && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Allocator> >::value)
-      >::type* = 0)
-      : base_type()
-   {
-      double_limb_type v = *other.limbs();
-      if(other.size() > 1)
-         v |= static_cast<double_limb_type>(other.limbs()[1]) << bits_per_limb;
-      *this = v;
-      this->sign(other.sign());
-   }
-
-   template <unsigned MinBits2, unsigned MaxBits2, bool SignType2, class Allocator2>
-   typename enable_if_c<(!is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2> >::value
-         && !is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Allocator> >::value), cpp_int_backend&>::type
-      operator=(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2>& other)
-   {
-      this->resize(other.size(), other.size());
-#if BOOST_WORKAROUND(BOOST_MSVC, >= 1600)
-      std::copy(other.limbs(), other.limbs() + (std::min)(other.size(), this->size()), stdext::checked_array_iterator<limb_pointer>(this->limbs(), this->size()));
-#else
-      std::copy(other.limbs(), other.limbs() + (std::min)(other.size(), this->size()), this->limbs());
-#endif
-      this->sign(other.sign());
-      return *this;
-   }
-
-   template <unsigned MinBits2, unsigned MaxBits2, bool SignType2, class Allocator2>
-   typename enable_if_c<(!is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2> >::value
-         && is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Allocator> >::value), cpp_int_backend&>::type
-      operator=(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Allocator2>& other)
-   {
-      double_limb_type v = *other.limbs();
-      if(other.size() > 1)
-         v |= static_cast<double_limb_type>(other.limbs()[1]) << bits_per_limb;
-      *this = v;
-      this->sign(other.sign());
-   }
-#endif
    BOOST_MP_FORCEINLINE cpp_int_backend& operator = (const cpp_int_backend& o) BOOST_NOEXCEPT_IF((Checked == unchecked) && boost::is_void<Allocator>::value)
    {
       this->assign(o);
@@ -1873,5 +1792,8 @@ struct is_explicitly_convertible<cpp_int_backend<MinBits, MaxBits, SignType, Che
 #include <boost/multiprecision/cpp_int/bitwise.hpp>
 #include <boost/multiprecision/cpp_int/misc.hpp>
 #include <boost/multiprecision/cpp_int/limits.hpp>
+#ifdef BOOST_MP_USER_DEFINED_LITERALS
+#include <boost/multiprecision/cpp_int/literals.hpp>
+#endif
 
 #endif

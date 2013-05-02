@@ -20,19 +20,19 @@ namespace multiprecision{
 // NOTE: these operators have to be defined after the methods in default_ops.hpp.
 //
 template <class B>
-BOOST_MP_FORCEINLINE number<B, et_off> operator - (const number<B, et_off>& v) 
+BOOST_MP_FORCEINLINE number<B, et_off> operator - (const number<B, et_off>& v)
 {
    BOOST_STATIC_ASSERT_MSG(is_signed_number<B>::value, "Negating an unsigned type results in ill-defined behavior.");
    number<B, et_off> result(v);
    result.backend().negate();
-   return BOOST_MP_MOVE(result); 
+   return BOOST_MP_MOVE(result);
 }
 template <class B>
-BOOST_MP_FORCEINLINE number<B, et_off> operator ~ (const number<B, et_off>& v) 
+BOOST_MP_FORCEINLINE number<B, et_off> operator ~ (const number<B, et_off>& v)
 {
    number<B, et_off> result;
    eval_complement(result.backend(), v.backend());
-   return BOOST_MP_MOVE(result); 
+   return BOOST_MP_MOVE(result);
 }
 //
 // Addition:
@@ -303,17 +303,17 @@ BOOST_MP_FORCEINLINE typename enable_if_c<is_integral<I>::value && (number_categ
 // semantics help a great deal in return by value, so performance is still pretty good...
 //
 template <class B>
-BOOST_MP_FORCEINLINE number<B, et_off> operator - (number<B, et_off>&& v) 
+BOOST_MP_FORCEINLINE number<B, et_off> operator - (number<B, et_off>&& v)
 {
    BOOST_STATIC_ASSERT_MSG(is_signed_number<B>::value, "Negating an unsigned type results in ill-defined behavior.");
    v.backend().negate();
-   return static_cast<number<B, et_off>&&>(v); 
+   return static_cast<number<B, et_off>&&>(v);
 }
 template <class B>
-BOOST_MP_FORCEINLINE typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, et_off> >::type operator ~ (number<B, et_off>&& v) 
+BOOST_MP_FORCEINLINE typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, et_off> >::type operator ~ (number<B, et_off>&& v)
 {
    eval_complement(v.backend(), v.backend());
-   return static_cast<number<B, et_off>&&>(v); 
+   return static_cast<number<B, et_off>&&>(v);
 }
 //
 // Addition:

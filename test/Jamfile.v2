@@ -324,6 +324,7 @@ run test_move.cpp
         : test_move_cpp_int ;
 
 run test_test.cpp ;
+run test_cpp_int_lit.cpp ;
 compile test_constexpr.cpp : [ check-target-builds ../config//has_float128 : <define>HAVE_FLOAT128 : ] [ check-target-builds ../config//has_intel_quad : <define>HAVE_FLOAT128 : ] ;
 
 run test_float_io.cpp
