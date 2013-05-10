@@ -456,7 +456,7 @@ public:
 #if defined(BOOST_MP_USER_DEFINED_LITERALS)
       template <limb_type...VALUES>
       BOOST_CONSTEXPR cpp_int_base(literals::detail::value_pack<VALUES...> i)
-         : m_wrapper(i), m_limbs(sizeof...VALUES), m_sign(false) {}
+         : m_wrapper(i), m_limbs(sizeof...(VALUES)), m_sign(false) {}
       BOOST_CONSTEXPR cpp_int_base(literals::detail::value_pack<> i)
          : m_wrapper(i), m_limbs(1), m_sign(false) {}
       BOOST_CONSTEXPR cpp_int_base(const cpp_int_base& a, const literals::detail::negate_tag&)
@@ -604,7 +604,7 @@ public:
 #if defined(BOOST_MP_USER_DEFINED_LITERALS)
       template <limb_type...VALUES>
       BOOST_CONSTEXPR cpp_int_base(literals::detail::value_pack<VALUES...> i)
-         : m_wrapper(i), m_limbs(sizeof...VALUES) {}
+         : m_wrapper(i), m_limbs(sizeof...(VALUES)) {}
       BOOST_CONSTEXPR cpp_int_base(literals::detail::value_pack<>)
          : m_wrapper(static_cast<limb_type>(0u)), m_limbs(1) {}
 #endif
