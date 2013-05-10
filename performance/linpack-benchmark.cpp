@@ -127,6 +127,10 @@ extern "C" int MAIN__()
    mpfr_set_default_prec(((50 + 1) * 1000L) / 301L);
 #elif defined(TEST_CPP_DEC_FLOAT)
    std::cout << "Testing number<cpp_dec_float<50> >" << std::endl;
+#elif defined(NATIVE_FLOAT128)
+   std::cout << "Testing __float128" << std::endl;
+#elif defined(TEST_FLOAT128)
+   std::cout << "Testing number<float128_backend, et_off>" << std::endl;
 #else
    std::cout << "Testing double" << std::endl;
 #endif

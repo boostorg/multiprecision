@@ -9,7 +9,7 @@ extern "C" {
 
 int main()
 {
-   __float128 f = -2;
+   __float128 f = -2.0Q;
    f = fabsq(f);
 
    return 0;
