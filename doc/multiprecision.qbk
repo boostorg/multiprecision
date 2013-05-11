@@ -525,7 +525,10 @@ internally `cpp_int_backend` switches to a "trivial" implementation where it is 
 integer.  Note that it will still be slightly slower than a bare native integer, as it emulates a 
 signed-magnitude representation rather than simply using the platforms native sign representation: this ensures
 there is no step change in behavior as a cpp_int grows in size.
- 
+* Fixed precision `cpp_int`'s have some support for `constexpr` values and user-defined literals, see
+[link boost_multiprecision.tut.lits here] for the full description.  For example `0xfffff_cppi1024`
+specifies a 1024-bit integer with the value 0xffff.  This can be used to generate compile time constants that are
+too large to fit into any built in number type.
 
 [h5 Example:]
 
@@ -1555,7 +1558,12 @@ The following example searches for a prime `p` for which `(p-1)/2` is also proba
 
 [section:lits Literal Types and `constexpr` Support]
 
-There is limited support for `constexpr` in the library, currently the `number` front end supports `constexpr`
+[note The features described in this section make heavy use of C++11 language features, currently 
+(as of May 2013) only
+GCC-4.7 and later, and Clang 3.3 and later have the support required to make these features work.]
+
+There is limited support for `constexpr` and user-defined literals in the library, currently the 
+`number` front end supports `constexpr`
 on default construction and all forwarding constructors, but not on any of the non-member operators.  So if 
 some type `B` is a literal type, then `number<B>` is also a literal type, and you will be able to 
 compile-time-construct such a type from any literal that `B` is compile-time-constructible from.
@@ -1574,6 +1582,67 @@ For example:
 
    constexpr checked_uint128_t   k = -1; // Error, checked type is not a literal type as we need runtime error checking.
    constexpr cpp_int             l = 2;  // Error, type is not a literal as it performs memory management.
+
+There is also limited support for user defined-literals - these are limited to unchecked, fixed precision `cpp_int`'s
+which are specified in hexadecimal notation.  The suffixes supported are:
+
+[table
+[[Suffix][Meaning]]
+[[_cppi][Specifies a value of type: `number<cpp_int_backend<N,N,signed_magnitude,unchecked,void> >`, where N is chosen
+to contain just enough digits to hold the number specified.]]
+[[_cppui][Specifies a value of type: `number<cpp_int_backend<N,N,unsigned_magnitude,unchecked,void> >`, where N is chosen
+to contain just enough digits to hold the number specified.]]
+[[_cppi['N]][Specifies a value of type `number<cpp_int_backend<N,N,signed_magnitude,unchecked,void> >`.]]
+[[_cppui['N]][Specifies a value of type `number<cpp_int_backend<N,N,signed_magnitude,unchecked,void> >`.]]
+]
+
+In each case, use of these suffixes with hexadecimal values produces a `constexpr` result.
+
+Examples:
+
+   //
+   // Any use of user defined literals requires that we import the literal-operators
+   // into current scope first:
+   using namespace boost::multiprecision::literals;
+   //
+   // To keep things simple in the example, we'll make our types used visible to this scope as well:
+   using namespace boost::multiprecision;
+   //
+   // The value zero as a number<cpp_int_backend<4,4,signed_magnitude,unchecked,void> >:
+   constexpr auto a = 0x0_cppi;
+   // The type of each constant has 4 bits per hexadecimal digit,
+   // so this is of type uint256_t (ie number<cpp_int_backend<256,256,unsigned_magnitude,unchecked,void> >):
+   constexpr auto b = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui;
+   //
+   // Smaller values can be assigned to larger values:
+   int256_t c = 0x1234_cppi; // OK
+   //
+   // However, this does not currently work in constexpr contexts:
+   constexpr int256_t d = 0x1_cppi; // Compiler error
+   //
+   // Constants can be padded out with leading zeros to generate wider types:
+   constexpr uint256_t e = 0x0000000000000000000000000000000000000000000FFFFFFFFFFFFFFFFFFFFF_cppui; // OK
+   //
+   // However, specific width types are best produced with specific-width suffixes,
+   // ones supported by default are `_cpp[u]i128`, `_cpp[u]i256`, `_cpp[u]i512`, `_cpp[u]i1024`.
+   //
+   constexpr int128_t f = 0x1234_cppi128; // OK, always produces an int128_t as the result.
+   constexpr uint1024_t g = 0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbccccccccccccccccccccc_cppui1024;
+   //
+   // If other specific width types are required, then there is a macro for generating the operators
+   // for these.  The macro can be used at namespace scope only:
+   //
+   BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(2048);
+   //
+   // Now we can create 2048-bit literals as well:
+   constexpr auto h = 0xff_cppi2048; // h is of type number<cpp_int_backend<2048,2048,signed_magnitude,unchecked,void> >
+   //
+   // Finally negative values are handled via the unary minus operator:
+   //
+   constexpr int1024_t i = -0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui1024;
+   //
+   // Which means this also works:
+   constexpr int1024_t j = -g;   // OK: unary minus operator is constexpr.
 
 [endsect]
 
