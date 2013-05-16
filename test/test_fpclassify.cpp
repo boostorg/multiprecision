@@ -14,12 +14,13 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include "test.hpp"
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ) && !defined(TEST_MPFI_50)
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128)
 #  define TEST_MPF_50
 #  define TEST_MPFR_50
 #  define TEST_MPFI_50
 #  define TEST_BACKEND
 #  define TEST_CPP_DEC_FLOAT
+#  define TEST_FLOAT128
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -44,6 +45,9 @@
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
 #include <boost/multiprecision/cpp_dec_float.hpp>
+#endif
+#ifdef TEST_FLOAT128
+#include <boost/multiprecision/float128.hpp>
 #endif
 
 #ifdef _MSC_VER
@@ -323,6 +327,9 @@ int main()
 #endif
 #ifdef TEST_BACKEND
    test<boost::multiprecision::number<boost::multiprecision::concepts::number_backend_float_architype> >();
+#endif
+#ifdef TEST_FLOAT128
+   test<boost::multiprecision::float128>();
 #endif
    return boost::report_errors();
 }

@@ -669,7 +669,7 @@ public:
    {
       return m_backend;
    }
-   BOOST_MP_FORCEINLINE const Backend& backend()const BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const Backend& backend()const BOOST_NOEXCEPT
    {
       return m_backend;
    }

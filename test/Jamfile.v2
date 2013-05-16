@@ -21,12 +21,6 @@ project : requirements
    <include>$(mpfi_path)/src
    <include>$(tommath_path)
    <include>../../..
-   <search>$(gmp_path)
-   <search>$(mpfr_path)
-   <search>$(mpfr_path)/build.vc10/lib/Win32/Debug
-   <search>$(mpfi_path)
-   <search>$(mpfi_path)/src
-   <search>$(tommath_path)
    # We set these to make it easier to set up and test GMP and MPFR under Win32:
    <toolset>msvc:<runtime-link>static
    <toolset>msvc:<link>static
@@ -44,17 +38,19 @@ project : requirements
 local enable-specfun = [ MATCH (--enable-specfun) : [ modules.peek : ARGV ] ] ;
 local disable-concepts = [ MATCH (--disable-concepts) : [ modules.peek : ARGV ] ] ;
 
-lib gmp ;
-lib mpfr ;
-lib mpfi ;
+lib gmp : : <search>$(gmp_path) ;
+lib mpfr : : <search>$(gmp_path) <search>$(mpfr_path) <search>$(mpfr_path)/build.vc10/lib/Win32/Debug ;
+lib mpfi : : <search>$(gmp_path) <search>$(mpfr_path) <search>$(mpfr_path)/build.vc10/lib/Win32/Debug <search>$(mpfi_path) <search>$(mpfi_path)/src ;
+lib quadmath ;
 
 if $(tommath_path)
 {
-   TOMMATH = [ GLOB $(tommath_path) : *.c ] ;
+   lib tommath : [ GLOB $(tommath_path) : *.c ] ;
+   TOMMATH = tommath ;
 }
 else
 {
-   lib tommath ;
+   lib tommath : : <search>$(tommath_path) ;
    TOMMATH = tommath ;
 }
 
@@ -110,6 +106,9 @@ run test_arithmetic_dbg_adptr1.cpp ;
 run test_arithmetic_dbg_adptr2.cpp ;
 
 run test_arithmetic_mpfi_50.cpp mpfi mpfr gmp : : : [ check-target-builds ../config//has_mpfi : : <build>no ] ;
+
+run test_arithmetic_float_128.cpp quadmath : : : [ check-target-builds ../config//has_float128 : : <build>no ] ;
+run test_arithmetic_float_128.cpp : : : [ check-target-builds ../config//has_intel_quad : <cxxflags>-Qoption,cpp,--extended_float_type : <build>no ] : test_arithmetic_intel_quad ;
 
 run test_numeric_limits.cpp
         : # command line
@@ -196,6 +195,22 @@ run test_numeric_limits.cpp mpfi mpfr gmp
          [ check-target-builds ../config//has_mpfi : : <build>no ]
         : test_numeric_limits_mpfi_50 ;
 
+
+run test_numeric_limits.cpp quadmath
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_FLOAT128
+         [ check-target-builds ../config//has_float128 : : <build>no ]
+        : test_numeric_limits_float128 ;
+run test_numeric_limits.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_FLOAT128
+         [ check-target-builds ../config//has_intel_quad : <cxxflags>-Qoption,cpp,--extended_float_type : <build>no ]
+        : test_numeric_limits_intel_quad ;
+
 for local source in test_exp.cpp test_log.cpp test_pow.cpp test_sinh.cpp test_sqrt.cpp test_cosh.cpp test_tanh.cpp test_sin.cpp test_cos.cpp test_tan.cpp test_asin.cpp test_acos.cpp test_atan.cpp test_round.cpp test_fpclassify.cpp
 {
       run $(source) gmp
@@ -225,6 +240,20 @@ for local source in test_exp.cpp test_log.cpp test_pow.cpp test_sinh.cpp test_sq
            : # requirements
             <define>TEST_CPP_DEC_FLOAT
            : $(source:B)_cpp_dec_float ;
+      run $(source) quadmath
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_float128 : : <build>no ]
+            <define>TEST_FLOAT128
+           : $(source:B)_float128 ;
+      run $(source)
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_intel_quad : <cxxflags>-Qoption,cpp,--extended_float_type : <build>no ]
+            <define>TEST_FLOAT128
+           : $(source:B)_intel_quad ;
 }
 
 run test_gmp_conversions.cpp gmp
@@ -295,7 +324,8 @@ run test_move.cpp
         : test_move_cpp_int ;
 
 run test_test.cpp ;
-compile test_constexpr.cpp ;
+run test_cpp_int_lit.cpp ;
+compile test_constexpr.cpp : [ check-target-builds ../config//has_float128 : <define>HAVE_FLOAT128 : ] [ check-target-builds ../config//has_intel_quad : <define>HAVE_FLOAT128 : ] ;
 
 run test_float_io.cpp
         : # command line
@@ -331,6 +361,23 @@ run test_float_io.cpp mpfi mpfr gmp
          release # Otherwise runtime is slow
          [ check-target-builds ../config//has_mpfi : : <build>no ]
         : test_float_io_mpfi ;
+
+run test_float_io.cpp quadmath
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_FLOAT128
+         release # Otherwise runtime is slow
+         [ check-target-builds ../config//has_float128 : : <build>no ]
+        : test_float_io_float128 ;
+run test_float_io.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      <define>TEST_FLOAT128
+         release # Otherwise runtime is slow
+         [ check-target-builds ../config//has_intel_quad : <cxxflags>-Qoption,cpp,--extended_float_type : <build>no ]
+        : test_float_io_intel_quad ;
 
 run test_int_io.cpp $(TOMMATH)
         : # command line
@@ -453,6 +500,19 @@ run ../example/mpfi_snips.cpp mpfi mpfr gmp
         : # requirements
          [ check-target-builds ../config//has_mpfi : : <build>no ] ;
 
+run ../example/float128_snips.cpp quadmath
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_float128 : : <build>no ] ;
+
+run ../example/float128_snips.cpp
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_intel_quad : <cxxflags>-Qoption,cpp,--extended_float_type : <build>no ] 
+        : float128_snips_intel_quad ;
+
 run ../example/logged_adaptor.cpp mpfi mpfr gmp
         : # command line
         : # input files
@@ -467,7 +527,7 @@ run ../example/tommath_snips.cpp $(TOMMATH)
         : # input files
         : # requirements
          [ check-target-builds ../config//has_tommath : : <build>no ] ;
-run ../example/floating_point_examples.cpp : : : <toolset>gcc:<cxxflags>-std=c++0x ;
+run ../example/floating_point_examples.cpp : : : <toolset>gcc:<cxxflags>-std=gnu++0x ;
 run test_cpp_int_conv.cpp ;
 run test_native_integer.cpp ;
 
@@ -513,7 +573,10 @@ if $(enable-specfun)
 
    for local source in [ glob math/*.cpp ]
    {
-      run $(source) mpfr gmp /boost/test//boost_unit_test_framework/<link>static /boost/regex//boost_regex/<link>static
+      run $(source) mpfr gmp 
+            /boost/test//boost_unit_test_framework/<link>static 
+            /boost/regex//boost_regex/<link>static 
+            math/instances//test_instances_mpfr/<link>static
            : # command line
            : # input files
            : # requirements
@@ -524,7 +587,10 @@ if $(enable-specfun)
             <toolset>msvc:<cxxflags>-bigobj
             release
            : $(source:B)_mpfr ;
-      run $(source) gmp /boost/test//boost_unit_test_framework/<link>static /boost/regex//boost_regex/<link>static
+      run $(source) gmp 
+            /boost/test//boost_unit_test_framework/<link>static 
+            /boost/regex//boost_regex/<link>static
+            math/instances//test_instances_mpf/<link>static
            : # command line
            : # input files
            : # requirements
@@ -535,7 +601,9 @@ if $(enable-specfun)
             <toolset>msvc:<cxxflags>-bigobj
             release
            : $(source:B)_mpf ;
-      run $(source) /boost/test//boost_unit_test_framework/<link>static /boost/regex//boost_regex/<link>static
+      run $(source) /boost/test//boost_unit_test_framework/<link>static 
+               /boost/regex//boost_regex/<link>static
+               math/instances//test_instances_cpp_dec_float/<link>static
            : # command line
            : # input files
            : # requirements
@@ -545,6 +613,34 @@ if $(enable-specfun)
             <toolset>msvc:<cxxflags>-bigobj
             release
            : $(source:B)_cpp_dec_float ;
+      run $(source) quadmath 
+            /boost/test//boost_unit_test_framework/<link>static 
+            /boost/regex//boost_regex/<link>static
+            math/instances//test_instances_float128/<link>static
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_float128 : : <build>no ]
+            <optimization>speed
+            <define>TEST_FLOAT128
+            <define>BOOST_ALL_NO_LIB
+            <toolset>msvc:<cxxflags>-bigobj
+            release
+           : $(source:B)_float128 ;
+      run $(source)
+            /boost/test//boost_unit_test_framework/<link>static 
+            /boost/regex//boost_regex/<link>static
+            math/instances//test_instances_intel_quad/<link>static
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_intel_quad : <cxxflags>-Qoption,cpp,--extended_float_type : <build>no ]
+            <optimization>speed
+            <define>TEST_FLOAT128
+            <define>BOOST_ALL_NO_LIB
+            <toolset>msvc:<cxxflags>-bigobj
+            release
+           : $(source:B)_intel_quad ;
    }
 }
 
@@ -630,4 +726,9 @@ if ! $(disable-concepts)
               : $(source:B)_logged_adaptor ;
    }
 }
+
+
+
+
+
 

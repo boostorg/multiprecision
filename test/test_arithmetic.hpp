@@ -1728,6 +1728,9 @@ void test()
    b = 30;
    c = a + b * c;
    BOOST_CHECK_EQUAL(c ,  20 + 30 * 10);
+   c = 10;
+   c = a + b / c;
+   BOOST_CHECK_EQUAL(c ,  20 + 30 / 10);
 
    //
    // Test conditionals:
