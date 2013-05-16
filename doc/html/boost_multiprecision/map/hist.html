@@ -41,6 +41,14 @@
             Add logged_adaptor.
           </li>
 <li class="listitem">
+            Add support for 128-bit floats via GCC's <code class="computeroutput"><span class="identifier">__float128</span></code>
+            or Intel's <code class="computeroutput"><span class="identifier">_Quad</span></code> data
+            types.
+          </li>
+<li class="listitem">
+            Add support for user-defined literals in cpp_int, improve <code class="computeroutput"><span class="keyword">constexpr</span></code> support.
+          </li>
+<li class="listitem">
             Fixed bug in integer division of <code class="computeroutput"><span class="identifier">cpp_int</span></code>
             that results in incorrect sign of <code class="computeroutput"><span class="identifier">cpp_int</span></code>
             when both arguments are small enough to fit in a <code class="computeroutput"><span class="identifier">double_limb_type</span></code>.

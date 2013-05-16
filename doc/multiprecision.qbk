@@ -3733,6 +3733,8 @@ Windows Vista machine.
 * [*Breaking change] renamed `rational_adapter` to `rational_adaptor`.
 * Add support for [mpfi].
 * Add logged_adaptor.
+* Add support for 128-bit floats via GCC's `__float128` or Intel's `_Quad` data types.
+* Add support for user-defined literals in cpp_int, improve `constexpr` support.
 * Fixed bug in integer division of `cpp_int` that results in incorrect sign of `cpp_int` when both arguments are small enough
 to fit in a `double_limb_type`.  See [@https://svn.boost.org/trac/boost/ticket/8126 8126].
 * Fixed bug in subtraction of a single limb in `cpp_int` that results in incorrect value when the result should have a 0
