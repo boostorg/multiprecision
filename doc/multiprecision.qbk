@@ -2685,8 +2685,8 @@ a variables of type B, `cb`, `cb2` and `cb3` are constant variables of type `con
 `s` is a variable of type `const char*`, `ui` is a variable of type `unsigned`, `bb` is a variable of type `bool`,
 `pa` is a variable of type pointer-to-arithmetic-type, `exp` is a variable of type `B::exp_type`,
 `pexp` is a variable of type `B::exp_type*`, `i` is a variable of type `int`, `pi` pointer to a variable of type `int`, 
-B2 is another type that meets these requirements, b2 is a variable
-of type B2.
+B2 is another type that meets these requirements, b2 is a variable of type B2, `ss` is variable of type `std::streamsize`
+and `ff` is a variable of type `std::ios_base::fmtflags`.
 
 [table Compulsory Requirements on the Backend type.
 [[Expression][Return Type][Comments][Throws]]
@@ -2704,8 +2704,8 @@ of type B2.
             `B::signed_types`, `B::unsigned_types` or `B::float_types`.][[space]]]
 [[`b = s`][`B&`][Assignment from a string.][Throws a `std::runtime_error` if the string could not be interpreted as a valid number.]]
 [[`b.swap(b)`][`void`][Swaps the contents of its arguments.][`noexcept`]]
-[[`cb.str(ui, bb)`][`std::string`][Returns the string representation of `b` with `ui` digits and in scientific format if `bb` is `true`.
-                  If `ui` is zero, then returns as many digits as are required to reconstruct the original value.][[space]]]
+[[`cb.str(ss, ff)`][`std::string`][Returns the string representation of `b` with `ss` digits and formatted according to the flags set in `ff`.
+                  If `ss` is zero, then returns as many digits as are required to reconstruct the original value.][[space]]]
 [[`b.negate()`][`void`][Negates `b`.][[space]]]
 [[`cb.compare(cb2)`][`int`][Compares `cb` and `cb2`, returns a value less than zero if `cb < cb2`, a value greater than zero if `cb > cb2` and zero
                    if `cb == cb2`.][`noexcept`]]
