@@ -1015,8 +1015,9 @@ struct gmp_int
    explicit gmp_int(const gmp_rational& o);
    gmp_int& operator = (const gmp_int& o)
    {
-      if(o.m_data[0]._mp_d)
-         mpz_set(m_data, o.m_data);
+      if(m_data[0]._mp_d == 0)
+         mpz_init(this->m_data);
+      mpz_set(m_data, o.m_data);
       return *this;
    }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
@@ -1728,8 +1729,9 @@ struct gmp_rational
    }
    gmp_rational& operator = (const gmp_rational& o)
    {
-      if(o.m_data[0]._mp_num._mp_d)
-         mpq_set(m_data, o.m_data);
+      if(m_data[0]._mp_den._mp_d == 0)
+         mpq_init(m_data);
+      mpq_set(m_data, o.m_data);
       return *this;
    }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES

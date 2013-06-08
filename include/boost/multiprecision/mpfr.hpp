@@ -702,21 +702,29 @@ struct mpfr_float_backend : public detail::mpfr_float_imp<digits10, AllocationTy
    }
    mpfr_float_backend& operator=(const mpfr_t val)
    {
+      if(this->m_data[0]._mpfr_d == 0)
+         mpfr_init2(this->m_data, multiprecision::detail::digits10_2_2(digits10));
       mpfr_set(this->m_data, val, GMP_RNDN);
       return *this;
    }
    mpfr_float_backend& operator=(const mpf_t val)
    {
+      if(this->m_data[0]._mpfr_d == 0)
+         mpfr_init2(this->m_data, multiprecision::detail::digits10_2_2(digits10));
       mpfr_set_f(this->m_data, val, GMP_RNDN);
       return *this;
    }
    mpfr_float_backend& operator=(const mpz_t val)
    {
+      if(this->m_data[0]._mpfr_d == 0)
+         mpfr_init2(this->m_data, multiprecision::detail::digits10_2_2(digits10));
       mpfr_set_z(this->m_data, val, GMP_RNDN);
       return *this;
    }
    mpfr_float_backend& operator=(const mpq_t val)
    {
+      if(this->m_data[0]._mpfr_d == 0)
+         mpfr_init2(this->m_data, multiprecision::detail::digits10_2_2(digits10));
       mpfr_set_q(this->m_data, val, GMP_RNDN);
       return *this;
    }
@@ -724,22 +732,30 @@ struct mpfr_float_backend : public detail::mpfr_float_imp<digits10, AllocationTy
    template <unsigned D, mpfr_allocation_type AT>
    mpfr_float_backend& operator=(const mpfr_float_backend<D, AT>& val)
    {
+      if(this->m_data[0]._mpfr_d == 0)
+         mpfr_init2(this->m_data, multiprecision::detail::digits10_2_2(digits10));
       mpfr_set(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
    template <unsigned D>
    mpfr_float_backend& operator=(const gmp_float<D>& val)
    {
+      if(this->m_data[0]._mpfr_d == 0)
+         mpfr_init2(this->m_data, multiprecision::detail::digits10_2_2(digits10));
       mpfr_set_f(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
    mpfr_float_backend& operator=(const gmp_int& val)
    {
+      if(this->m_data[0]._mpfr_d == 0)
+         mpfr_init2(this->m_data, multiprecision::detail::digits10_2_2(digits10));
       mpfr_set_z(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
    mpfr_float_backend& operator=(const gmp_rational& val)
    {
+      if(this->m_data[0]._mpfr_d == 0)
+         mpfr_init2(this->m_data, multiprecision::detail::digits10_2_2(digits10));
       mpfr_set_q(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
@@ -803,7 +819,10 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
 
    mpfr_float_backend& operator=(const mpfr_float_backend& o)
    {
-      mpfr_set_prec(this->m_data, mpfr_get_prec(o.data()));
+      if(this->m_data[0]._mpfr_d == 0)
+         mpfr_init2(this->m_data, mpfr_get_prec(o.data()));
+      else
+         mpfr_set_prec(this->m_data, mpfr_get_prec(o.data()));
       mpfr_set(this->m_data, o.data(), GMP_RNDN);
       return *this;
    }
@@ -822,47 +841,67 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
    }
    mpfr_float_backend& operator=(const mpfr_t val)
    {
-      mpfr_set_prec(this->m_data, mpfr_get_prec(val));
+      if(this->m_data[0]._mpfr_d == 0)
+         mpfr_init2(this->m_data, mpfr_get_prec(val));
+      else
+         mpfr_set_prec(this->m_data, mpfr_get_prec(val));
       mpfr_set(this->m_data, val, GMP_RNDN);
       return *this;
    }
    mpfr_float_backend& operator=(const mpf_t val)
    {
-      mpfr_set_prec(this->m_data, mpf_get_prec(val));
+      if(this->m_data[0]._mpfr_d == 0)
+         mpfr_init2(this->m_data, mpf_get_prec(val));
+      else
+         mpfr_set_prec(this->m_data, mpf_get_prec(val));
       mpfr_set_f(this->m_data, val, GMP_RNDN);
       return *this;
    }
    mpfr_float_backend& operator=(const mpz_t val)
    {
+      if(this->m_data[0]._mpfr_d == 0)
+         mpfr_init2(this->m_data, multiprecision::detail::digits10_2_2(get_default_precision()));
       mpfr_set_z(this->m_data, val, GMP_RNDN);
       return *this;
    }
    mpfr_float_backend& operator=(const mpq_t val)
    {
+      if(this->m_data[0]._mpfr_d == 0)
+         mpfr_init2(this->m_data, multiprecision::detail::digits10_2_2(get_default_precision()));
       mpfr_set_q(this->m_data, val, GMP_RNDN);
       return *this;
    }
    template <unsigned D>
    mpfr_float_backend& operator=(const mpfr_float_backend<D>& val)
    {
-      mpfr_set_prec(this->m_data, mpfr_get_prec(val.data()));
+      if(this->m_data[0]._mpfr_d == 0)
+         mpfr_init2(this->m_data, mpfr_get_prec(val.data()));
+      else
+         mpfr_set_prec(this->m_data, mpfr_get_prec(val.data()));
       mpfr_set(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
    template <unsigned D>
    mpfr_float_backend& operator=(const gmp_float<D>& val)
    {
-      mpfr_set_prec(this->m_data, mpf_get_prec(val.data()));
+      if(this->m_data[0]._mpfr_d == 0)
+         mpfr_init2(this->m_data, mpf_get_prec(val.data()));
+      else
+         mpfr_set_prec(this->m_data, mpf_get_prec(val.data()));
       mpfr_set_f(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
    mpfr_float_backend& operator=(const gmp_int& val)
    {
+      if(this->m_data[0]._mpfr_d == 0)
+         mpfr_init2(this->m_data, multiprecision::detail::digits10_2_2(get_default_precision()));
       mpfr_set_z(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
    mpfr_float_backend& operator=(const gmp_rational& val)
    {
+      if(this->m_data[0]._mpfr_d == 0)
+         mpfr_init2(this->m_data, multiprecision::detail::digits10_2_2(get_default_precision()));
       mpfr_set_q(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
