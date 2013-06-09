@@ -82,7 +82,7 @@ void divide_unsigned_helper(
    if((r_order == 0) && (*px == 0))
    {
       // x is zero, so is the result:
-      r = y;
+      r = x;
       if(result)
          *result = x;
       return;
