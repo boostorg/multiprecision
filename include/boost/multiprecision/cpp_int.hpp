@@ -1456,7 +1456,7 @@ private:
          limb_type mask = static_cast<limb_type>((1u << shift) - 1);
          typename base_type::local_limb_type v = *this->limbs();
          result.assign(Bits / shift + (Bits % shift ? 1 : 0), '0');
-         int pos = result.size() - 1;
+         std::string::difference_type pos = result.size() - 1;
          for(unsigned i = 0; i < Bits / shift; ++i)
          {
             char c = '0' + static_cast<char>(v & mask);
@@ -1489,7 +1489,7 @@ private:
       else
       {
          result.assign(Bits / 3 + 1, '0');
-         int pos = result.size() - 1;
+         std::string::difference_type pos = result.size() - 1;
          typename base_type::local_limb_type v(*this->limbs());
          bool neg = false;
          if(this->sign())
@@ -1541,7 +1541,7 @@ private:
          limb_type mask = static_cast<limb_type>((1u << shift) - 1);
          cpp_int_backend t(*this);
          result.assign(Bits / shift + (Bits % shift ? 1 : 0), '0');
-         int pos = result.size() - 1;
+         std::string::difference_type pos = result.size() - 1;
          for(unsigned i = 0; i < Bits / shift; ++i)
          {
             char c = '0' + static_cast<char>(t.limbs()[0] & mask);
@@ -1574,7 +1574,7 @@ private:
       else
       {
          result.assign(Bits / 3 + 1, '0');
-         int pos = result.size() - 1;
+         std::string::difference_type pos = result.size() - 1;
          cpp_int_backend t(*this);
          cpp_int_backend r;
          bool neg = false;
