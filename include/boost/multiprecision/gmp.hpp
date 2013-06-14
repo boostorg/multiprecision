@@ -1225,27 +1225,27 @@ struct gmp_int
 
       return s;
    }
-   ~gmp_int()
+   ~gmp_int() BOOST_NOEXCEPT
    {
       if(m_data[0]._mp_d)
          mpz_clear(m_data);
    }
-   void negate()
+   void negate() BOOST_NOEXCEPT
    {
       BOOST_ASSERT(m_data[0]._mp_d);
       mpz_neg(m_data, m_data);
    }
-   int compare(const gmp_int& o)const
+   int compare(const gmp_int& o)const BOOST_NOEXCEPT
    {
       BOOST_ASSERT(m_data[0]._mp_d && o.m_data[0]._mp_d);
       return mpz_cmp(m_data, o.m_data);
    }
-   int compare(long i)const
+   int compare(long i)const BOOST_NOEXCEPT
    {
       BOOST_ASSERT(m_data[0]._mp_d);
       return mpz_cmp_si(m_data, i);
    }
-   int compare(unsigned long i)const
+   int compare(unsigned long i)const BOOST_NOEXCEPT
    {
       BOOST_ASSERT(m_data[0]._mp_d);
       return mpz_cmp_ui(m_data, i);
@@ -1257,12 +1257,12 @@ struct gmp_int
       d = v;
       return compare(d);
    }
-   mpz_t& data()
+   mpz_t& data() BOOST_NOEXCEPT
    {
       BOOST_ASSERT(m_data[0]._mp_d);
       return m_data;
    }
-   const mpz_t& data()const
+   const mpz_t& data()const BOOST_NOEXCEPT
    {
       BOOST_ASSERT(m_data[0]._mp_d);
       return m_data;
