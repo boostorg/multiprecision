@@ -298,10 +298,7 @@ inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBit
    //
    // We may have shifted off the end and have leading zeros:
    //
-   if(truncated)
-   {
-      result.normalize();
-   }
+   result.normalize();
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>

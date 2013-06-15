@@ -3742,6 +3742,9 @@ in the last limb: [@https://svn.boost.org/trac/boost/ticket/8133 8133].
 * Fixed bug in `cpp_int` where division of 0 by something doesn't get zero in the result: [@https://svn.boost.org/trac/boost/ticket/8160 8160].
 * Fixed bug in some transcendental functions that caused incorrect return values when variables are reused, for example with
 `a = pow(a, b)`.  See [@https://svn.boost.org/trac/boost/ticket/8326 8326].
+* Fixed some assignment operations in the mpfr and gmp backends to be safe if the target has been moved from: [@https://svn.boost.org/trac/boost/ticket/8326 8667].
+* Fixed bug in `cpp_int` that gives incorrect answer for 0%N for large N: [@https://svn.boost.org/trac/boost/ticket/8670 8670].
+* Fixed set_precision in mpfr backend so it doesn't trample over an existing value: [@https://svn.boost.org/trac/boost/ticket/8692 8692].
 
 [h4 1.53]
 

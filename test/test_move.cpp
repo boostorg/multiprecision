@@ -84,6 +84,36 @@ void test_std_lib()
    BOOST_TEST(b == 2);
 }
 
+template <class T, class A>
+void test_move_and_assign(T x, A val)
+{
+   // move away from x, then assign val to x.
+   T z(x);
+   T y(std::move(x));
+   x.assign(val);
+   BOOST_CHECK_EQUAL(x, T(val));
+   BOOST_CHECK_EQUAL(z, y);
+}
+
+template <class T>
+void test_move_and_assign()
+{
+   T x(23);
+   test_move_and_assign(x, static_cast<short>(2));
+   test_move_and_assign(x, static_cast<int>(2));
+   test_move_and_assign(x, static_cast<long>(2));
+   test_move_and_assign(x, static_cast<long long>(2));
+   test_move_and_assign(x, static_cast<unsigned short>(2));
+   test_move_and_assign(x, static_cast<unsigned int>(2));
+   test_move_and_assign(x, static_cast<unsigned long>(2));
+   test_move_and_assign(x, static_cast<unsigned long long>(2));
+   test_move_and_assign(x, static_cast<float>(2));
+   test_move_and_assign(x, static_cast<double>(2));
+   test_move_and_assign(x, static_cast<long double>(2));
+   test_move_and_assign(x, x);
+   test_move_and_assign(x, "23");
+}
+
 
 int main()
 {
@@ -131,6 +161,9 @@ int main()
       d = std::move(e);
       e = d;
       BOOST_TEST(e == d);
+
+      test_move_and_assign<mpfr_float>();
+      test_move_and_assign<mpfr_float_50>();
    }
 #endif
 #ifdef TEST_GMP
@@ -170,6 +203,9 @@ int main()
       d = std::move(e);
       e = d;
       BOOST_TEST(e == d);
+
+      test_move_and_assign<mpf_float>();
+      test_move_and_assign<mpf_float_50>();
    }
    {
       test_std_lib<mpz_int>();
@@ -194,6 +230,8 @@ int main()
       d = std::move(e);
       e = d;
       BOOST_TEST(e == d);
+
+      test_move_and_assign<mpz_int>();
    }
    {
       test_std_lib<mpq_rational>();
@@ -217,6 +255,8 @@ int main()
       d = std::move(e);
       e = d;
       BOOST_TEST(e == d);
+
+      test_move_and_assign<mpq_rational>();
    }
 #endif
 #ifdef TEST_TOMMATH
@@ -245,6 +285,8 @@ int main()
       d = std::move(e);
       e = d;
       BOOST_TEST(e == d);
+
+      test_move_and_assign<tom_int>();
    }
 #endif
 #ifdef TEST_CPP_INT
@@ -273,6 +315,9 @@ int main()
       d = std::move(e);
       e = d;
       BOOST_TEST(e == d);
+
+      test_move_and_assign<cpp_int>();
+      test_move_and_assign<int512_t>();
    }
 #endif
    return boost::report_errors();
