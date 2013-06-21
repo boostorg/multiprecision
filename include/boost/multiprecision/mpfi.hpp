@@ -1068,15 +1068,48 @@ template <class T> struct constant_ln_two;
 template <class T> struct constant_euler;
 template <class T> struct constant_catalan;
 
+//
+// Initializer: ensure all our constants are initialized prior to the first call of main:
+//
+template <class T>
+struct mpfi_initializer
+{
+   struct init
+   {
+      init()
+      {
+         boost::math::constants::pi<T>();
+         boost::math::constants::ln_two<T>();
+         boost::math::constants::euler<T>();
+         boost::math::constants::catalan<T>();
+      }
+      void force_instantiate()const{}
+   };
+   static const init initializer;
+   static void force_instantiate()
+   {
+      initializer.force_instantiate();
+   }
+};
+
+template <class T>
+const typename mpfi_initializer<T>::init mpfi_initializer<T>::initializer;
+
 template<unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
 struct constant_pi<boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> >
 {
    typedef boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> result_type;
    template<int N>
-   static inline result_type get(const mpl::int_<N>&)
+   static inline result_type const& get(const mpl::int_<N>&)
    {
-      result_type result;
-      mpfi_const_pi(result.backend().data());
+      mpfi_initializer<result_type>::force_instantiate();
+      static result_type result;
+      static bool has_init = false;
+      if(!has_init)
+      {
+         has_init = true;
+         mpfi_const_pi(result.backend().data());
+      }
       return result;
    }
 };
@@ -1085,10 +1118,16 @@ struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::mpfi
 {
    typedef boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> result_type;
    template<int N>
-   static inline result_type get(const mpl::int_<N>&)
+   static inline result_type const& get(const mpl::int_<N>&)
    {
-      result_type result;
-      mpfi_const_log2(result.backend().data());
+      mpfi_initializer<result_type>::force_instantiate();
+      static result_type result;
+      static bool has_init = false;
+      if(!has_init)
+      {
+         has_init = true;
+         mpfi_const_log2(result.backend().data());
+      }
       return result;
    }
 };
@@ -1097,10 +1136,16 @@ struct constant_euler<boost::multiprecision::number<boost::multiprecision::mpfi_
 {
    typedef boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> result_type;
    template<int N>
-   static inline result_type get(const mpl::int_<N>&)
+   static inline result_type const& get(const mpl::int_<N>&)
    {
-      result_type result;
-      mpfi_const_euler(result.backend().data());
+      mpfi_initializer<result_type>::force_instantiate();
+      static result_type result;
+      static bool has_init = false;
+      if(!has_init)
+      {
+         has_init = true;
+         mpfi_const_euler(result.backend().data());
+      }
       return result;
    }
 };
@@ -1109,10 +1154,16 @@ struct constant_catalan<boost::multiprecision::number<boost::multiprecision::mpf
 {
    typedef boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> result_type;
    template<int N>
-   static inline result_type get(const mpl::int_<N>&)
+   static inline result_type const& get(const mpl::int_<N>&)
    {
-      result_type result;
-      mpfi_const_catalan(result.backend().data());
+      mpfi_initializer<result_type>::force_instantiate();
+      static result_type result;
+      static bool has_init = false;
+      if(!has_init)
+      {
+         has_init = true;
+         mpfi_const_catalan(result.backend().data());
+      }
       return result;
    }
 };
