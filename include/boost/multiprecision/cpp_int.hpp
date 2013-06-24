@@ -19,6 +19,7 @@
 #include <boost/detail/endian.hpp>
 #include <boost/integer/static_min_max.hpp>
 #include <boost/type_traits/common_type.hpp>
+#include <boost/type_traits/make_signed.hpp>
 #include <boost/multiprecision/cpp_int/checked.hpp>
 #ifdef BOOST_MP_USER_DEFINED_LITERALS
 #include <boost/multiprecision/cpp_int/value_pack.hpp>
@@ -214,7 +215,7 @@ public:
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT
       : m_data(i), m_limbs(i > max_limb_value ? 2 : 1), m_sign(false), m_internal(true) { }
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT
-      : m_data(i), m_limbs(i < 0 ? (-i > max_limb_value ? 2 : 1) : (i > max_limb_value ? 2 : 1)),
+      : m_data(i), m_limbs(i < 0 ? (static_cast<double_limb_type>(-i) > static_cast<double_limb_type>(max_limb_value) ? 2 : 1) : (i > max_limb_value ? 2 : 1)),
         m_sign(i < 0), m_internal(true) { }
 #endif
    //
@@ -450,7 +451,7 @@ public:
       : m_wrapper(i), m_limbs(i > max_limb_value ? 2 : 1), m_sign(false) {}
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT
       : m_wrapper(double_limb_type(i < 0 ? -i : i)),
-        m_limbs(i < 0 ? (-i > max_limb_value ? 2 : 1) : (i > max_limb_value ? 2 : 1)),
+        m_limbs(i < 0 ? (static_cast<double_limb_type>(-i) > max_limb_value ? 2 : 1) : (i > max_limb_value ? 2 : 1)),
         m_sign(i < 0) {}
 #endif
 #if defined(BOOST_MP_USER_DEFINED_LITERALS)
@@ -760,22 +761,22 @@ public:
    //
    template <class SI>
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(SI i, typename enable_if_c<is_signed<SI>::value && (Checked == unchecked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
-      : m_data(i < 0 ? static_cast<local_limb_type>(-i) : static_cast<local_limb_type>(i)), m_sign(i < 0) {}
+      : m_data(i < 0 ? static_cast<local_limb_type>(static_cast<typename make_unsigned<SI>::type>(-i)) & limb_mask : static_cast<local_limb_type>(i) & limb_mask), m_sign(i < 0) {}
    template <class SI>
    BOOST_MP_FORCEINLINE cpp_int_base(SI i, typename enable_if_c<is_signed<SI>::value && (Checked == checked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
-      : m_data(i < 0 ? static_cast<local_limb_type>(-i) : static_cast<local_limb_type>(i)), m_sign(i < 0) { check_in_range(i); }
+      : m_data(i < 0 ? static_cast<local_limb_type>(static_cast<typename make_unsigned<SI>::type>(-i) & limb_mask) : static_cast<local_limb_type>(i) & limb_mask), m_sign(i < 0) { check_in_range(i); }
    template <class UI>
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(UI i, typename enable_if_c<is_unsigned<UI>::value && (Checked == unchecked)>::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
-      : m_data(static_cast<local_limb_type>(i)), m_sign(false) {}
+      : m_data(static_cast<local_limb_type>(i) & limb_mask), m_sign(false) {}
    template <class UI>
    BOOST_MP_FORCEINLINE cpp_int_base(UI i, typename enable_if_c<is_unsigned<UI>::value && (Checked == checked)>::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
-      : m_data(static_cast<local_limb_type>(i)), m_sign(false) { check_in_range(i); }
+      : m_data(static_cast<local_limb_type>(i) & limb_mask), m_sign(false) { check_in_range(i); }
    template <class F>
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(F i, typename enable_if_c<is_floating_point<F>::value && (Checked == unchecked)>::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
-      : m_data(static_cast<local_limb_type>(std::fabs(i))), m_sign(i < 0) {}
+      : m_data(static_cast<local_limb_type>(std::fabs(i)) & limb_mask), m_sign(i < 0) {}
    template <class F>
    BOOST_MP_FORCEINLINE cpp_int_base(F i, typename enable_if_c<is_floating_point<F>::value && (Checked == checked)>::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
-      : m_data(static_cast<local_limb_type>(std::fabs(i))), m_sign(i < 0) { check_in_range(i); }
+      : m_data(static_cast<local_limb_type>(std::fabs(i)) & limb_mask), m_sign(i < 0) { check_in_range(i); }
 #if defined(BOOST_MP_USER_DEFINED_LITERALS)
       BOOST_CONSTEXPR cpp_int_base(literals::detail::value_pack<>)
          : m_data(static_cast<local_limb_type>(0u)), m_sign(false) {}
@@ -855,7 +856,9 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
    typedef const local_limb_type*                     const_limb_pointer;
 private:
    BOOST_STATIC_CONSTANT(unsigned, limb_bits = sizeof(local_limb_type) * CHAR_BIT);
-   BOOST_STATIC_CONSTANT(local_limb_type, limb_mask = (~local_limb_type(0)) >> (limb_bits - MinBits));
+   BOOST_STATIC_CONSTANT(local_limb_type, limb_mask = limb_bits != MinBits ? 
+      static_cast<local_limb_type>(static_cast<local_limb_type>(~local_limb_type(0)) >> (limb_bits - MinBits))
+      : static_cast<local_limb_type>(~local_limb_type(0)));
 
    local_limb_type    m_data;
 
@@ -900,19 +903,19 @@ public:
    //
    template <class SI>
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(SI i, typename enable_if_c<is_signed<SI>::value && (Checked == unchecked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
-      : m_data(i < 0 ? 1 + ~static_cast<local_limb_type>(-i) : static_cast<local_limb_type>(i)) {}
+      : m_data(i < 0 ? (1 + ~static_cast<local_limb_type>(-i)) & limb_mask : static_cast<local_limb_type>(i) & limb_mask) {}
    template <class SI>
    BOOST_MP_FORCEINLINE cpp_int_base(SI i, typename enable_if_c<is_signed<SI>::value && (Checked == checked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(i < 0 ? 1 + ~static_cast<local_limb_type>(-i) : static_cast<local_limb_type>(i)) { check_in_range(i); }
    template <class UI>
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(UI i, typename enable_if_c<is_unsigned<UI>::value && (Checked == unchecked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
-      : m_data(static_cast<local_limb_type>(i)) {}
+      : m_data(static_cast<local_limb_type>(i) & limb_mask) {}
    template <class UI>
    BOOST_MP_FORCEINLINE cpp_int_base(UI i, typename enable_if_c<is_unsigned<UI>::value && (Checked == checked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(static_cast<local_limb_type>(i)) { check_in_range(i); }
    template <class F>
    BOOST_MP_FORCEINLINE cpp_int_base(F i, typename enable_if<is_floating_point<F> >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
-      : m_data(static_cast<local_limb_type>(std::fabs(i)))
+      : m_data(static_cast<local_limb_type>(std::fabs(i)) & limb_mask)
    {
       check_in_range(i);
       if(i < 0)
@@ -1163,8 +1166,9 @@ private:
    template <class A>
    typename disable_if<is_unsigned<A> >::type do_assign_arithmetic(A val, const mpl::true_&)
    {
+      typedef typename make_signed<typename self_type::local_limb_type>::type signed_limb_type;
       this->check_in_range(val);
-      *this->limbs() = (val < 0) ? static_cast<typename self_type::local_limb_type>(-val) : static_cast<typename self_type::local_limb_type>(val);
+      *this->limbs() = (val < 0) ? static_cast<typename self_type::local_limb_type>(-static_cast<signed_limb_type>(val)) : static_cast<typename self_type::local_limb_type>(val);
       this->sign(val < 0);
       this->normalize();
    }
