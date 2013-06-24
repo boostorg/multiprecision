@@ -12,6 +12,7 @@
 #include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/multiprecision/mpfr.hpp>
+#include <boost/math/constants/constants.hpp>
 #include <mpfi.h>
 #include <cmath>
 #include <algorithm>
