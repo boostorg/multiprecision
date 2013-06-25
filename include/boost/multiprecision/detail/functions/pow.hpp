@@ -142,10 +142,6 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
    // There are no checks on input range or parameter boundaries.
 
    typedef typename boost::multiprecision::detail::canonical<int, T>::type si_type;
-   typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
-   typedef typename T::exponent_type exp_type;
-   typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
-   typedef typename mpl::front<typename T::float_types>::type fp_type;
 
    BOOST_ASSERT(&H1F0 != &x);
    BOOST_ASSERT(&H1F0 != &a);
@@ -200,7 +196,6 @@ void eval_exp(T& result, const T& x)
    typedef typename boost::multiprecision::detail::canonical<int, T>::type si_type;
    typedef typename T::exponent_type exp_type;
    typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
-   typedef typename boost::multiprecision::detail::canonical<float, T>::type float_type;
 
    // Handle special arguments.
    int type = eval_fpclassify(x);
@@ -326,7 +321,6 @@ void eval_log(T& result, const T& arg)
    // then let y = x - 1 and compute:
    // log(x) = log(2) * n + log1p(1 + y)
    //
-   typedef typename boost::multiprecision::detail::canonical<int, T>::type si_type;
    typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
    typedef typename T::exponent_type exp_type;
    typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
@@ -409,9 +403,6 @@ inline void eval_pow(T& result, const T& x, const T& a)
 {
    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The pow function is only valid for floating point types.");
    typedef typename boost::multiprecision::detail::canonical<int, T>::type si_type;
-   typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
-   typedef typename T::exponent_type exp_type;
-   typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
    typedef typename mpl::front<typename T::float_types>::type fp_type;
 
    if((&result == &x) || (&result == &a))
@@ -595,10 +586,7 @@ namespace detail{
    template <class T>
    void sinhcosh(const T& x, T* p_sinh, T* p_cosh)
    {
-      typedef typename boost::multiprecision::detail::canonical<int, T>::type si_type;
       typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
-      typedef typename T::exponent_type exp_type;
-      typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
       typedef typename mpl::front<typename T::float_types>::type fp_type;
 
       switch(eval_fpclassify(x))
