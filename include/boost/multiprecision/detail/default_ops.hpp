@@ -1020,6 +1020,15 @@ template <class T>
 inline unsigned eval_lsb(const T& val)
 {
    typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+   int c = eval_get_sign(val);
+   if(c == 0)
+   {
+      BOOST_THROW_EXCEPTION(std::range_error("No bits were set in the operand."));
+   }
+   if(c < 0)
+   {
+      BOOST_THROW_EXCEPTION(std::range_error("Testing individual bits in negative values is not supported - results are undefined."));
+   }
    unsigned result = 0;
    T mask, t;
    mask = ui_type(1);
@@ -1031,6 +1040,28 @@ inline unsigned eval_lsb(const T& val)
    }
    while(eval_is_zero(t));
    
+   return --result;
+}
+
+template <class T>
+inline int eval_msb(const T& val)
+{
+   int c = eval_get_sign(val);
+   if(c == 0)
+   {
+      BOOST_THROW_EXCEPTION(std::range_error("No bits were set in the operand."));
+   }
+   if(c < 0)
+   {
+      BOOST_THROW_EXCEPTION(std::range_error("Testing individual bits in negative values is not supported - results are undefined."));
+   }
+   unsigned result = 0;
+   T t(val);
+   while(!eval_is_zero(t))
+   {
+      eval_right_shift(t, 1);
+      ++result;
+   }
    return --result;
 }
 
@@ -1117,52 +1148,52 @@ template <class tag, class A1, class A2, class A3, class A4>
 inline int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
-   return fpclassify(value_type(arg));
+   return (fpclassify)(value_type(arg));
 }
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
 inline bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
 {
-   int v = fpclassify(arg);
+   int v = (fpclassify)(arg);
    return (v != FP_INFINITE) && (v != FP_NAN);
 }
 template <class tag, class A1, class A2, class A3, class A4>
 inline bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
-   return isfinite(value_type(arg));
+   return (isfinite)(value_type(arg));
 }
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
 inline bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
 {
-   return fpclassify(arg) == FP_NAN;
+   return (fpclassify)(arg) == FP_NAN;
 }
 template <class tag, class A1, class A2, class A3, class A4>
 inline bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
-   return isnan(value_type(arg));
+   return (isnan)(value_type(arg));
 }
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
 inline bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
 {
-   return fpclassify(arg) == FP_INFINITE;
+   return (fpclassify)(arg) == FP_INFINITE;
 }
 template <class tag, class A1, class A2, class A3, class A4>
 inline bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
-   return isinf(value_type(arg));
+   return (isinf)(value_type(arg));
 }
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
 inline bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
 {
-   return fpclassify(arg) == FP_NORMAL;
+   return (fpclassify)(arg) == FP_NORMAL;
 }
 template <class tag, class A1, class A2, class A3, class A4>
 inline bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
-   return isnormal(value_type(arg));
+   return (isnormal)(value_type(arg));
 }
 
 } // namespace math
@@ -1249,7 +1280,7 @@ inline int itrunc(const detail::expression<tag, A1, A2, A3, A4>& v, const Policy
 {
    typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
    number_type r = trunc(v, pol);
-   if((r > (std::numeric_limits<int>::max)()) || r < (std::numeric_limits<int>::min)() || !boost::math::isfinite(v))
+   if((r > (std::numeric_limits<int>::max)()) || r < (std::numeric_limits<int>::min)() || !(boost::math::isfinite)(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::itrunc<%1%>(%1%)", 0, number_type(v), 0, pol);
    return r.template convert_to<int>();
 }
@@ -1262,7 +1293,7 @@ template <class Backend, expression_template_option ExpressionTemplates, class P
 inline int itrunc(const number<Backend, ExpressionTemplates>& v, const Policy& pol)
 {
    number<Backend, ExpressionTemplates> r = trunc(v, pol);
-   if((r > (std::numeric_limits<int>::max)()) || r < (std::numeric_limits<int>::min)() || !boost::math::isfinite(v))
+   if((r > (std::numeric_limits<int>::max)()) || r < (std::numeric_limits<int>::min)() || !(boost::math::isfinite)(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::itrunc<%1%>(%1%)", 0, v, 0, pol);
    return r.template convert_to<int>();
 }
@@ -1276,7 +1307,7 @@ inline long ltrunc(const detail::expression<tag, A1, A2, A3, A4>& v, const Polic
 {
    typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
    number_type r = trunc(v, pol);
-   if((r > (std::numeric_limits<long>::max)()) || r < (std::numeric_limits<long>::min)() || !boost::math::isfinite(v))
+   if((r > (std::numeric_limits<long>::max)()) || r < (std::numeric_limits<long>::min)() || !(boost::math::isfinite)(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::ltrunc<%1%>(%1%)", 0, number_type(v), 0L, pol);
    return r.template convert_to<long>();
 }
@@ -1289,7 +1320,7 @@ template <class T, expression_template_option ExpressionTemplates, class Policy>
 inline long ltrunc(const number<T, ExpressionTemplates>& v, const Policy& pol)
 {
    number<T, ExpressionTemplates> r = trunc(v, pol);
-   if((r > (std::numeric_limits<long>::max)()) || r < (std::numeric_limits<long>::min)() || !boost::math::isfinite(v))
+   if((r > (std::numeric_limits<long>::max)()) || r < (std::numeric_limits<long>::min)() || !(boost::math::isfinite)(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::ltrunc<%1%>(%1%)", 0, v, 0L, pol);
    return r.template convert_to<long>();
 }
@@ -1304,7 +1335,7 @@ inline long long lltrunc(const detail::expression<tag, A1, A2, A3, A4>& v, const
 {
    typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
    number_type r = trunc(v, pol);
-   if((r > (std::numeric_limits<long long>::max)()) || r < (std::numeric_limits<long long>::min)() || !boost::math::isfinite(v))
+   if((r > (std::numeric_limits<long long>::max)()) || r < (std::numeric_limits<long long>::min)() || !(boost::math::isfinite)(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::lltrunc<%1%>(%1%)", 0, number_type(v), 0LL, pol);
    return r.template convert_to<long long>();
 }
@@ -1317,7 +1348,7 @@ template <class T, expression_template_option ExpressionTemplates, class Policy>
 inline long long lltrunc(const number<T, ExpressionTemplates>& v, const Policy& pol)
 {
    number<T, ExpressionTemplates> r = trunc(v, pol);
-   if((r > (std::numeric_limits<long long>::max)()) || r < (std::numeric_limits<long long>::min)() || !boost::math::isfinite(v))
+   if((r > (std::numeric_limits<long long>::max)()) || r < (std::numeric_limits<long long>::min)() || !(boost::math::isfinite)(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::lltrunc<%1%>(%1%)", 0, v, 0LL, pol);
    return r.template convert_to<long long>();
 }
@@ -1347,7 +1378,7 @@ inline int iround(const detail::expression<tag, A1, A2, A3, A4>& v, const Policy
 {
    typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
    number_type r = round(v, pol);
-   if((r > (std::numeric_limits<int>::max)()) || r < (std::numeric_limits<int>::min)() || !boost::math::isfinite(v))
+   if((r > (std::numeric_limits<int>::max)()) || r < (std::numeric_limits<int>::min)() || !(boost::math::isfinite)(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::iround<%1%>(%1%)", 0, number_type(v), 0, pol);
    return r.template convert_to<int>();
 }
@@ -1360,7 +1391,7 @@ template <class T, expression_template_option ExpressionTemplates, class Policy>
 inline int iround(const number<T, ExpressionTemplates>& v, const Policy& pol)
 {
    number<T, ExpressionTemplates> r = round(v, pol);
-   if((r > (std::numeric_limits<int>::max)()) || r < (std::numeric_limits<int>::min)() || !boost::math::isfinite(v))
+   if((r > (std::numeric_limits<int>::max)()) || r < (std::numeric_limits<int>::min)() || !(boost::math::isfinite)(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::iround<%1%>(%1%)", 0, v, 0, pol);
    return r.template convert_to<int>();
 }
@@ -1374,7 +1405,7 @@ inline long lround(const detail::expression<tag, A1, A2, A3, A4>& v, const Polic
 {
    typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
    number_type r = round(v, pol);
-   if((r > (std::numeric_limits<long>::max)()) || r < (std::numeric_limits<long>::min)() || !boost::math::isfinite(v))
+   if((r > (std::numeric_limits<long>::max)()) || r < (std::numeric_limits<long>::min)() || !(boost::math::isfinite)(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::lround<%1%>(%1%)", 0, number_type(v), 0L, pol);
    return r.template convert_to<long>();
 }
@@ -1387,7 +1418,7 @@ template <class T, expression_template_option ExpressionTemplates, class Policy>
 inline long lround(const number<T, ExpressionTemplates>& v, const Policy& pol)
 {
    number<T, ExpressionTemplates> r = round(v, pol);
-   if((r > (std::numeric_limits<long>::max)()) || r < (std::numeric_limits<long>::min)() || !boost::math::isfinite(v))
+   if((r > (std::numeric_limits<long>::max)()) || r < (std::numeric_limits<long>::min)() || !(boost::math::isfinite)(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::lround<%1%>(%1%)", 0, v, 0L, pol);
    return r.template convert_to<long>();
 }
@@ -1402,7 +1433,7 @@ inline long long llround(const detail::expression<tag, A1, A2, A3, A4>& v, const
 {
    typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
    number_type r = round(v, pol);
-   if((r > (std::numeric_limits<long long>::max)()) || r < (std::numeric_limits<long long>::min)() || !boost::math::isfinite(v))
+   if((r > (std::numeric_limits<long long>::max)()) || r < (std::numeric_limits<long long>::min)() || !(boost::math::isfinite)(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::iround<%1%>(%1%)", 0, number_type(v), 0LL, pol);
    return r.template convert_to<long long>();
 }
@@ -1415,7 +1446,7 @@ template <class T, expression_template_option ExpressionTemplates, class Policy>
 inline long long llround(const number<T, ExpressionTemplates>& v, const Policy& pol)
 {
    number<T, ExpressionTemplates> r = round(v, pol);
-   if((r > (std::numeric_limits<long long>::max)()) || r < (std::numeric_limits<long long>::min)() || !boost::math::isfinite(v))
+   if((r > (std::numeric_limits<long long>::max)()) || r < (std::numeric_limits<long long>::min)() || !(boost::math::isfinite)(v))
       return boost::math::policies::raise_rounding_error("boost::multiprecision::iround<%1%>(%1%)", 0, v, 0LL, pol);
    return r.template convert_to<long long>();
 }

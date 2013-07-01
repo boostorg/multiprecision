@@ -336,6 +336,13 @@ inline unsigned eval_lsb(const debug_adaptor<Backend>& arg)
 }
 
 template <class Backend>
+inline unsigned eval_msb(const debug_adaptor<Backend>& arg)
+{
+   using default_ops::eval_msb;
+   return eval_msb(arg.value());
+}
+
+template <class Backend>
 inline bool eval_bit_test(const debug_adaptor<Backend>& arg, unsigned a)
 {
    using default_ops::eval_bit_test;

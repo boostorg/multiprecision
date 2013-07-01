@@ -126,6 +126,30 @@ typename enable_if_c<is_integral<Integer>::value, unsigned>::type lsb(const Inte
 }
 
 template <class Integer>
+typename enable_if_c<is_integral<Integer>::value, unsigned>::type msb(Integer val)
+{
+   if(val <= 0)
+   {
+      if(val == 0)
+      {
+         BOOST_THROW_EXCEPTION(std::range_error("No bits were set in the operand."));
+      }
+      else
+      {
+         BOOST_THROW_EXCEPTION(std::range_error("Testing individual bits in negative values is not supported - results are undefined."));
+      }
+   }
+   unsigned index = 0;
+
+   while(val)
+   {
+      ++index;
+      val >>= 1;
+   }
+   return --index;
+}
+
+template <class Integer>
 typename enable_if_c<is_integral<Integer>::value, bool>::type bit_test(const Integer& val, unsigned index)
 {
    Integer mask = 1;

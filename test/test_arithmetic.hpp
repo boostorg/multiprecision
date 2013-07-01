@@ -813,7 +813,7 @@ void test_float_ops(const boost::mpl::int_<boost::multiprecision::number_kind_fl
    {
       if(std::numeric_limits<Real>::has_infinity)
       {
-         BOOST_CHECK(boost::math::isinf(Real(20) / 0u));
+         BOOST_CHECK((boost::math::isinf)(Real(20) / 0u));
       }
       else
       {

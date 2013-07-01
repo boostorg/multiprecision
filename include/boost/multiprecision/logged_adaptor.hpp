@@ -384,6 +384,16 @@ inline unsigned eval_lsb(const logged_adaptor<Backend>& arg)
 }
 
 template <class Backend>
+inline unsigned eval_msb(const logged_adaptor<Backend>& arg)
+{
+   using default_ops::eval_msb;
+   log_prefix_event(arg.value(), "most-significant-bit");
+   unsigned r = eval_msb(arg.value());
+   log_postfix_event(arg.value(), r, "most-significant-bit");
+   return r;
+}
+
+template <class Backend>
 inline bool eval_bit_test(const logged_adaptor<Backend>& arg, unsigned a)
 {
    using default_ops::eval_bit_test;
