@@ -1427,11 +1427,12 @@ public:
 private:
    std::string do_get_trivial_string(std::ios_base::fmtflags f, const mpl::false_&)const
    {
+      typedef typename mpl::if_c<sizeof(*this->limbs()) == 1, unsigned, typename base_type::local_limb_type>::type io_type;
       if(this->sign() && (((f & std::ios_base::hex) == std::ios_base::hex) || ((f & std::ios_base::oct) == std::ios_base::oct)))
          BOOST_THROW_EXCEPTION(std::runtime_error("Base 8 or 16 printing of negative numbers is not supported."));
       std::stringstream ss;
       ss.flags(f & ~std::ios_base::showpos);
-      ss << *this->limbs();
+      ss << static_cast<io_type>(*this->limbs());
       std::string result;
       if(this->sign())
          result += '-';
