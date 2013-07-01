@@ -1611,7 +1611,7 @@ private:
                }
             }
          }
-         unsigned n = result.find_first_not_of('0');
+         std::string::size_type n = result.find_first_not_of('0');
          result.erase(0, n);
          if(result.empty())
             result = "0";
