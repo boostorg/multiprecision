@@ -3728,6 +3728,16 @@ Windows Vista machine.
 
 [section:hist History]
 
+[h4 1.55]
+
+* Fixed bug in fixed precision cpp_int IO code that causes conversion to string to fail when the
+bit count is very small (less than CHAR_BIT).  See [@https://svn.boost.org/trac/boost/ticket/8745 8745].
+* Fixed bug in cpp_int that causes left shift to fail when a fixed precision type would overflow.
+See [@https://svn.boost.org/trac/boost/ticket/8741 8741].
+* Fixed some cosmetic warnings from cpp_int.  See [@https://svn.boost.org/trac/boost/ticket/8748 8748].
+* Fixed calls to functions which are required to be macros in C99.  See [@https://svn.boost.org/trac/boost/ticket/8732 8732].
+* Fixed bug that causes construction from INT_MIN, LONG_MIN etc to fail in cpp_int.  See [@https://svn.boost.org/trac/boost/ticket/8711 8711].
+
 [h4 1.54]
 
 * [*Breaking change] renamed `rational_adapter` to `rational_adaptor`.
