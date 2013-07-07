@@ -1055,6 +1055,14 @@ inline int eval_msb(const T& val)
    {
       BOOST_THROW_EXCEPTION(std::range_error("Testing individual bits in negative values is not supported - results are undefined."));
    }
+   //
+   // This implementation is really really rubbish - it does
+   // a linear scan for the most-significant-bit.  We should really
+   // do a binary search, but as none of our backends actually needs
+   // this implementation, we'll leave it for now.  In fact for most
+   // backends it's likely that there will always be a more efficient
+   // native implementation possible.
+   //
    unsigned result = 0;
    T t(val);
    while(!eval_is_zero(t))

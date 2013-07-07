@@ -1606,6 +1606,20 @@ inline unsigned eval_lsb(const gmp_int& val)
    return mpz_scan1(val.data(), 0);
 }
 
+inline unsigned eval_msb(const gmp_int& val)
+{
+   int c = eval_get_sign(val);
+   if(c == 0)
+   {
+      BOOST_THROW_EXCEPTION(std::range_error("No bits were set in the operand."));
+   }
+   if(c < 0)
+   {
+      BOOST_THROW_EXCEPTION(std::range_error("Testing individual bits in negative values is not supported - results are undefined."));
+   }
+   return mpz_sizeinbase(val.data(), 2) - 1;
+}
+
 inline bool eval_bit_test(const gmp_int& val, unsigned index)
 {
    return mpz_tstbit(val.data(), index) ? true : false;

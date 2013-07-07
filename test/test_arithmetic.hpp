@@ -557,6 +557,7 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
       if(std::numeric_limits<Real>::is_specialized && (!std::numeric_limits<Real>::is_bounded || ((int)i * 17 < std::numeric_limits<Real>::digits)))
       {
          BOOST_CHECK_EQUAL(lsb(Real(1) << (i * 17)) ,  i * 17);
+         BOOST_CHECK_EQUAL(msb(Real(1) << (i * 17)) ,  i * 17);
          BOOST_CHECK(bit_test(Real(1) << (i * 17), i * 17));
          BOOST_CHECK(!bit_test(Real(1) << (i * 17), i * 17 + 1));
          if(i)

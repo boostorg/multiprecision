@@ -341,6 +341,7 @@ struct tester
       BOOST_CHECK_EQUAL(z2.str(), t2.str());
       BOOST_CHECK_EQUAL(integer_modulus(a, si), integer_modulus(a1, si));
       BOOST_CHECK_EQUAL(lsb(a), lsb(a1));
+      BOOST_CHECK_EQUAL(msb(a), msb(a1));
 
       for(unsigned i = 0; i < 1000; i += 13)
       {
@@ -357,6 +358,7 @@ struct tester
          BOOST_CHECK_EQUAL(mpz_int(powm(a, ui, c)).str(), test_type(powm(a1, ui, c1)).str());
       }
       BOOST_CHECK_EQUAL(lsb(a), lsb(a1));
+      BOOST_CHECK_EQUAL(msb(a), msb(a1));
    }
 
    void test_bug_cases()

@@ -35,6 +35,13 @@ void test()
    BOOST_CHECK(bit_test(bit_set(i, max_index), max_index));
    BOOST_CHECK_EQUAL(bit_unset(i, max_index), 0);
    BOOST_CHECK_EQUAL(bit_flip(bit_set(i, max_index), max_index), 0);
+   i = 0;
+   bit_set(i, max_index);
+   BOOST_CHECK_EQUAL(lsb(i), max_index);
+   BOOST_CHECK_EQUAL(msb(i), max_index);
+   bit_set(i, max_index / 2);
+   BOOST_CHECK_EQUAL(lsb(i), max_index / 2);
+   BOOST_CHECK_EQUAL(msb(i), max_index);
 
    if(std::numeric_limits<I>::is_signed)
    {
@@ -67,8 +74,10 @@ int main()
 {
    using namespace boost::multiprecision;
 
+   test<boost::int16_t, boost::int8_t>();
    test<boost::int32_t, boost::int16_t>();
    test<boost::int64_t, boost::int32_t>();
+   test<boost::uint16_t, boost::uint8_t>();
    test<boost::uint32_t, boost::uint16_t>();
    test<boost::uint64_t, boost::uint32_t>();
    
