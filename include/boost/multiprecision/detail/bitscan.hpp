@@ -104,7 +104,8 @@ BOOST_FORCEINLINE unsigned find_msb(Unsigned mask)
    return find_msb(static_cast<ui_type>(mask), tag_type());
 }
 
-#elif defined(BOOST_GCC)
+#elif defined(BOOST_GCC) || defined(__clang__) || (defined(BOOST_INTEL) && defined(__GNUC__))
+
 BOOST_FORCEINLINE unsigned find_lsb(unsigned mask, mpl::int_<1> const&)
 {
    return __builtin_ctz(mask);
