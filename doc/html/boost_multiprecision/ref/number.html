@@ -184,6 +184,7 @@
 <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Integer</span><span class="special">&gt;</span>
 <span class="identifier">Integer</span> <span class="identifier">integer_modulus</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">x</span><span class="special">,</span> <span class="identifier">Integer</span> <span class="identifier">val</span><span class="special">);</span>
 <span class="keyword">unsigned</span> <span class="identifier">lsb</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">x</span><span class="special">);</span>
+<span class="keyword">unsigned</span> <span class="identifier">msb</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">x</span><span class="special">);</span>
 <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span>
 <span class="keyword">bool</span> <span class="identifier">bit_test</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;&amp;</span> <span class="identifier">val</span><span class="special">,</span> <span class="keyword">unsigned</span> <span class="identifier">index</span><span class="special">);</span>
 <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span>
@@ -1146,7 +1147,16 @@
 <pre class="programlisting"><span class="keyword">unsigned</span> <span class="identifier">lsb</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">x</span><span class="special">);</span>
 </pre>
 <p>
-        Returns the index of the least significant bit that is set to 1.
+        Returns the (zero-based) index of the least significant bit that is set to
+        1.
+      </p>
+<p>
+        Throws a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">range_error</span></code> if the argument is &lt;= 0.
+      </p>
+<pre class="programlisting"><span class="keyword">unsigned</span> <span class="identifier">msb</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;</span> <span class="identifier">x</span><span class="special">);</span>
+</pre>
+<p>
+        Returns the (zero-based) index of the most significant bit.
       </p>
 <p>
         Throws a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">range_error</span></code> if the argument is &lt;= 0.
