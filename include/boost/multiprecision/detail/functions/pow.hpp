@@ -427,7 +427,18 @@ inline void eval_pow(T& result, const T& x, const T& a)
       result = x;
       return;
    case FP_ZERO:
-      result = si_type(1);
+      switch(eval_fpclassify(a))
+      {
+      case FP_ZERO:
+         result = si_type(1);
+         break;
+      case FP_NAN:
+         result = a;
+         break;
+      default:
+         result = x;
+         break;
+      }
       return;
    case FP_NAN:
       result = x;

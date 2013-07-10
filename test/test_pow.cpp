@@ -572,6 +572,17 @@ void test()
       }
    }
    std::cout << "Max error was: " << max_err << std::endl;
+   //
+   // Special cases come last:
+   //
+   BOOST_CHECK_EQUAL(pow(T(0), T(0)), 1);
+   BOOST_CHECK_EQUAL(pow(T(0), 0), 1);
+   BOOST_CHECK_EQUAL(pow(T(0), T(2)), 0);
+   BOOST_CHECK_EQUAL(pow(T(0), 2), 0);
+   BOOST_CHECK_EQUAL(pow(T(1), T(0)), 1);
+   BOOST_CHECK_EQUAL(pow(T(1), 0), 1);
+   BOOST_CHECK_EQUAL(pow(T(1), T(2)), 1);
+   BOOST_CHECK_EQUAL(pow(T(1), 2), 1);
 }
 
 
