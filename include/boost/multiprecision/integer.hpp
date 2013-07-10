@@ -13,19 +13,19 @@ namespace boost{
 namespace multiprecision{
 
 template <class Integer, class I2>
-typename enable_if_c<is_integral<Integer>::value && is_integral<I2>::value, Integer>::type
+typename enable_if_c<is_integral<Integer>::value && is_integral<I2>::value, Integer&>::type
    multiply(Integer& result, const I2& a, const I2& b)
 {
    return result = static_cast<Integer>(a) * static_cast<Integer>(b);
 }
 template <class Integer, class I2>
-typename enable_if_c<is_integral<Integer>::value && is_integral<I2>::value, Integer>::type
+typename enable_if_c<is_integral<Integer>::value && is_integral<I2>::value, Integer&>::type
    add(Integer& result, const I2& a, const I2& b)
 {
    return result = static_cast<Integer>(a) + static_cast<Integer>(b);
 }
 template <class Integer, class I2>
-typename enable_if_c<is_integral<Integer>::value && is_integral<I2>::value, Integer>::type
+typename enable_if_c<is_integral<Integer>::value && is_integral<I2>::value, Integer&>::type
    subtract(Integer& result, const I2& a, const I2& b)
 {
    return result = static_cast<Integer>(a) - static_cast<Integer>(b);
