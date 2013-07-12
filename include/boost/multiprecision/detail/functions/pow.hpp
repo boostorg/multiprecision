@@ -202,7 +202,7 @@ void eval_exp(T& result, const T& x)
    bool isneg = eval_get_sign(x) < 0;
    if(type == FP_NAN)
    {
-      result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
+      result = x;
       return;
    }
    else if(type == FP_INFINITE)
@@ -446,13 +446,14 @@ inline void eval_pow(T& result, const T& x, const T& a)
    default: ;
    }
 
-   if(eval_get_sign(a) == 0)
+   int s = eval_get_sign(a);
+   if(s == 0)
    {
       result = si_type(1);
       return;
    }
 
-   if(a.compare(si_type(-1)) < 0)
+   if(s < 0)
    {
       T t, da;
       t = a;
@@ -462,7 +463,6 @@ inline void eval_pow(T& result, const T& x, const T& a)
       return;
    }
    
-   bool bo_a_isint = false;
    typename boost::multiprecision::detail::canonical<boost::intmax_t, T>::type an;
    T fa;
    try
@@ -480,9 +480,33 @@ inline void eval_pow(T& result, const T& x, const T& a)
       an = (std::numeric_limits<boost::intmax_t>::max)();
    }
 
-   if((eval_get_sign(x) < 0) && !bo_a_isint)
+   if((eval_get_sign(x) < 0))
    {
-      result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
+      typename boost::multiprecision::detail::canonical<boost::uintmax_t, T>::type aun;
+      try
+      {
+         eval_convert_to(&aun, a);
+         if(a.compare(aun) == 0)
+         {
+            fa = x;
+            fa.negate();
+            eval_pow(result, fa, a);
+            if(aun & 1u)
+               result.negate();
+            return;
+         }
+      }
+      catch(const std::exception&)
+      {
+         // conversion failed, just fall through, value is not an integer.
+      }
+      if(std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
+         result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
+      else
+      {
+         BOOST_THROW_EXCEPTION(std::domain_error("Result of pow is undefined or non-real and there is no NaN for this number type."));
+      }
+      return;
    }
 
    T t, da;

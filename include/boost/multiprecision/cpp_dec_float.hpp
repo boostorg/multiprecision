@@ -1708,7 +1708,8 @@ cpp_dec_float<Digits10, ExponentType, Allocator> cpp_dec_float<Digits10, Exponen
    const size_t first_clear = (static_cast<size_t>(x.exp) / static_cast<size_t>(cpp_dec_float_elem_digits10)) + 1u;
    const size_t last_clear  =  static_cast<size_t>(cpp_dec_float_elem_number);
 
-   std::fill(x.data.begin() + first_clear, x.data.begin() + last_clear, static_cast<boost::uint32_t>(0u));
+   if(first_clear < last_clear)
+      std::fill(x.data.begin() + first_clear, x.data.begin() + last_clear, static_cast<boost::uint32_t>(0u));
 
    return x;
 }

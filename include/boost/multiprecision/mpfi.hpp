@@ -834,6 +834,55 @@ inline int eval_fpclassify(const mpfi_float_backend<Digits10>& val) BOOST_NOEXCE
 template <unsigned Digits10>
 inline void eval_pow(mpfi_float_backend<Digits10>& result, const mpfi_float_backend<Digits10>& b, const mpfi_float_backend<Digits10>& e)
 {
+   typedef typename boost::multiprecision::detail::canonical<unsigned, mpfi_float_backend<Digits10> >::type ui_type;
+   using default_ops::eval_get_sign;
+   int s = eval_get_sign(b);
+   if(s == 0)
+   {
+      if(eval_get_sign(e) == 0)
+      {
+         result = ui_type(1);
+      }
+      else
+      {
+         result = ui_type(0);
+      }
+      return;
+   }
+   if(s < 0)
+   {
+      if(eval_get_sign(e) < 0)
+      {
+         mpfi_float_backend<Digits10> t1, t2;
+         t1 = e;
+         t1.negate();
+         eval_pow(t2, b, t1);
+         t1 = ui_type(1);
+         eval_divide(result, t1, t2);
+         return;
+      }
+      typename boost::multiprecision::detail::canonical<boost::uintmax_t, mpfi_float_backend<Digits10> >::type an;
+      try
+      {
+         using default_ops::eval_convert_to;
+         eval_convert_to(&an, e);
+         if(e.compare(an) == 0)
+         {
+            mpfi_float_backend<Digits10> pb(b);
+            pb.negate();
+            eval_pow(result, pb, e);
+            if(an & 1u)
+               result.negate();
+            return;
+         }
+      }
+      catch(const std::exception&)
+      {
+         // conversion failed, just fall through, value is not an integer.
+      }
+      result = std::numeric_limits<number<mpfi_float_backend<Digits10>, et_on> >::quiet_NaN().backend();
+      return;
+   }
    mpfi_log(result.data(), b.data());
    mpfi_mul(result.data(), result.data(), e.data());
    mpfi_exp(result.data(), result.data());
