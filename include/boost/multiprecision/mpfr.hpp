@@ -1175,7 +1175,7 @@ inline void eval_convert_to(unsigned long* result, const mpfr_float_backend<digi
    {
       BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert NaN to integer."));
    }
-   *result = mpfr_get_ui(val.data(), GMP_RNDN);
+   *result = mpfr_get_ui(val.data(), GMP_RNDZ);
 }
 template <unsigned digits10, mpfr_allocation_type AllocationType>
 inline void eval_convert_to(long* result, const mpfr_float_backend<digits10, AllocationType>& val)
@@ -1184,7 +1184,7 @@ inline void eval_convert_to(long* result, const mpfr_float_backend<digits10, All
    {
       BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert NaN to integer."));
    }
-   *result = mpfr_get_si(val.data(), GMP_RNDN);
+   *result = mpfr_get_si(val.data(), GMP_RNDZ);
 }
 #ifdef _MPFR_H_HAVE_INTMAX_T
 template <unsigned digits10, mpfr_allocation_type AllocationType>
@@ -1194,7 +1194,7 @@ inline void eval_convert_to(unsigned long long* result, const mpfr_float_backend
    {
       BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert NaN to integer."));
    }
-   *result = mpfr_get_uj(val.data(), GMP_RNDN);
+   *result = mpfr_get_uj(val.data(), GMP_RNDZ);
 }
 template <unsigned digits10, mpfr_allocation_type AllocationType>
 inline void eval_convert_to(long long* result, const mpfr_float_backend<digits10, AllocationType>& val)
@@ -1203,7 +1203,7 @@ inline void eval_convert_to(long long* result, const mpfr_float_backend<digits10
    {
       BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert NaN to integer."));
    }
-   *result = mpfr_get_sj(val.data(), GMP_RNDN);
+   *result = mpfr_get_sj(val.data(), GMP_RNDZ);
 }
 #endif
 template <unsigned digits10, mpfr_allocation_type AllocationType>
