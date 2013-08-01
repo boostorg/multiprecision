@@ -182,6 +182,59 @@ typename enable_if_c<is_integral<Integer>::value, Integer&>::type bit_flip(Integ
    return val;
 }
 
+template <class Integer>
+typename enable_if_c<is_integral<Integer>::value, Integer>::type sqrt(const Integer& x, Integer& r)
+{
+   //
+   // This is slow bit-by-bit integer square root, see for example
+   // http://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Binary_numeral_system_.28base_2.29
+   // There are better methods such as http://hal.inria.fr/docs/00/07/28/54/PDF/RR-3805.pdf
+   // and http://hal.inria.fr/docs/00/07/21/13/PDF/RR-4475.pdf which should be implemented
+   // at some point.
+   //
+   Integer s = 0;
+   if(x == 0)
+   {
+      r = 0;
+      return s;
+   }
+   int g = msb(x);
+   if(g == 0)
+   {
+      r = 1;
+      return s;
+   }
+   
+   Integer t;
+   r = x;
+   g /= 2;
+   bit_set(s, g);
+   bit_set(t, 2 * g);
+   r = x - t;
+   --g;
+   do
+   {
+      t = s;
+      t <<= g + 1;
+      bit_set(t, 2 * g);
+      if(t <= r)
+      {
+         bit_set(s, g);
+         r -= t;
+      }
+      --g;
+   }
+   while(g >= 0);
+   return s;
+}
+
+template <class Integer>
+typename enable_if_c<is_integral<Integer>::value, Integer>::type sqrt(const Integer& x)
+{
+   Integer r;
+   return sqrt(x, r);
+}
+
 }} // namespaces
 
 #endif

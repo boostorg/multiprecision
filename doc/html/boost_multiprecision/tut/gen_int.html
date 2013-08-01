@@ -144,6 +144,16 @@
 <p>
         Flips the <code class="computeroutput"><span class="identifier">index</span></code> bit in <code class="computeroutput"><span class="identifier">val</span></code>.
       </p>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Integer</span><span class="special">&gt;</span>
+<span class="identifier">Integer</span> <span class="identifier">sqrt</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">Integer</span><span class="special">&amp;</span> <span class="identifier">x</span><span class="special">);</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Integer</span><span class="special">&gt;</span>
+<span class="identifier">Integer</span> <span class="identifier">sqrt</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">Integer</span><span class="special">&amp;</span> <span class="identifier">x</span><span class="special">,</span> <span class="identifier">Integer</span><span class="special">&amp;</span> <span class="identifier">r</span><span class="special">);</span>
+</pre>
+<p>
+        Returns the integer square root <code class="computeroutput"><span class="identifier">s</span></code>
+        of x and sets <code class="computeroutput"><span class="identifier">r</span></code> to the remainder
+        <span class="emphasis"><em>x - s<sup>2</sup></em></span>.
+      </p>
 <pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Engine</span><span class="special">&gt;</span>
 <span class="keyword">bool</span> <span class="identifier">miller_rabin_test</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">number</span><span class="special">-</span><span class="keyword">or</span><span class="special">-</span><span class="identifier">expression</span><span class="special">-</span><span class="keyword">template</span><span class="special">-</span><span class="identifier">type</span><span class="special">&amp;</span> <span class="identifier">n</span><span class="special">,</span> <span class="keyword">unsigned</span> <span class="identifier">trials</span><span class="special">,</span> <span class="identifier">Engine</span><span class="special">&amp;</span> <span class="identifier">gen</span><span class="special">);</span>
 <span class="keyword">bool</span> <span class="identifier">miller_rabin_test</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">number</span><span class="special">-</span><span class="keyword">or</span><span class="special">-</span><span class="identifier">expression</span><span class="special">-</span><span class="keyword">template</span><span class="special">-</span><span class="identifier">type</span><span class="special">&amp;</span> <span class="identifier">n</span><span class="special">,</span> <span class="keyword">unsigned</span> <span class="identifier">trials</span><span class="special">);</span>

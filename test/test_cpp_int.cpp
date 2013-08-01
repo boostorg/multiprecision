@@ -190,6 +190,11 @@ struct tester
       BOOST_CHECK_EQUAL(mpz_int(lcm(-c, -d)).str(), test_type(lcm(-c1, -d1)).str());
       BOOST_CHECK_EQUAL(mpz_int(gcd(a, -b)).str(), test_type(gcd(a1, -b1)).str());
       BOOST_CHECK_EQUAL(mpz_int(lcm(c, -d)).str(), test_type(lcm(c1, -d1)).str());
+      // Integer sqrt:
+      mpz_int r;
+      test_type r1;
+      BOOST_CHECK_EQUAL(sqrt(a, r).str(), sqrt(a1, r1).str());
+      BOOST_CHECK_EQUAL(r.str(), r1.str());
    }
 
    void t3()

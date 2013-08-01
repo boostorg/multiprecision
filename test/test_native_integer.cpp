@@ -68,6 +68,19 @@ void test()
    BOOST_CHECK_EQUAL(integer_modulus(i, j), i % j);
    I p = 456;
    BOOST_CHECK_EQUAL(powm(i, p, j), pow(cpp_int(i), static_cast<unsigned>(p)) % j);
+
+   for(I i = 0; i < (2 < 8) - 1; ++i)
+   {
+      I j = i * i;
+      I s, r;
+      s = sqrt(j, r);
+      BOOST_CHECK_EQUAL(s, i);
+      BOOST_CHECK(r == 0);
+      j += 3;
+      s = sqrt(i, r);
+      BOOST_CHECK_EQUAL(s, i);
+      BOOST_CHECK(r == 3);
+   }
 }
 
 int main()

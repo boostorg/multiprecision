@@ -1116,6 +1116,59 @@ inline void eval_bit_unset(T& val, unsigned index)
       eval_bitwise_xor(val, mask);
 }
 
+template <class B>
+void eval_integer_sqrt(B& s, B& r, const B& x)
+{
+   //
+   // This is slow bit-by-bit integer square root, see for example
+   // http://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Binary_numeral_system_.28base_2.29
+   // There are better methods such as http://hal.inria.fr/docs/00/07/28/54/PDF/RR-3805.pdf
+   // and http://hal.inria.fr/docs/00/07/21/13/PDF/RR-4475.pdf which should be implemented
+   // at some point.
+   //
+   typedef typename boost::multiprecision::detail::canonical<unsigned char, B>::type ui_type;
+
+   s = ui_type(0u);
+   if(eval_get_sign(x) == 0)
+   {
+      r = ui_type(0u);
+      return;
+   }
+   int g = eval_msb(x);
+   if(g == 0)
+   {
+      r = ui_type(1);
+      return;
+   }
+   
+   B t;
+   r = x;
+   g /= 2;
+   int org_g = g;
+   eval_bit_set(s, g);
+   eval_bit_set(t, 2 * g);
+   eval_subtract(r, x, t);
+   --g;
+   int msbr = eval_msb(r);
+   do
+   {
+      if(msbr >= org_g + g + 1)
+      {
+         t = s;
+         eval_left_shift(t, g + 1);
+         eval_bit_set(t, 2 * g);
+         if(t.compare(r) <= 0)
+         {
+            eval_bit_set(s, g);
+            eval_subtract(r, t);
+            msbr = eval_msb(r);
+         }
+      }
+      --g;
+   }
+   while(g >= 0);
+}
+
 //
 // These have to implemented by the backend, declared here so that our macro generated code compiles OK.
 //
@@ -1464,6 +1517,26 @@ inline long long llround(const number<T, ExpressionTemplates>& v)
    return llround(v, boost::math::policies::policy<>());
 }
 #endif
+
+template <class B, expression_template_option ExpressionTemplates>
+inline typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, ExpressionTemplates> >::type
+   sqrt(const number<B, ExpressionTemplates>& x)
+{
+   using default_ops::eval_integer_sqrt;
+   number<B, ExpressionTemplates> s, r;
+   eval_integer_sqrt(s.backend(), r.backend(), x.backend());
+   return s;
+}
+
+template <class B, expression_template_option ExpressionTemplates>
+inline typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, ExpressionTemplates> >::type
+   sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
+{
+   using default_ops::eval_integer_sqrt;
+   number<B, ExpressionTemplates> s;
+   eval_integer_sqrt(s.backend(), r.backend(), x.backend());
+   return s;
+}
 
 #define UNARY_OP_FUNCTOR(func, category)\
 namespace detail{\

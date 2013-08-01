@@ -1592,6 +1592,11 @@ inline typename enable_if_c<is_signed<I>::value && ((sizeof(I) <= sizeof(long)))
    mpz_lcm_ui(result.data(), a.data(), std::abs(b));
 }
 
+inline void eval_integer_sqrt(gmp_int& s, gmp_int& r, const gmp_int& x)
+{
+   mpz_sqrtrem(s.data(), r.data(), x.data());
+}
+
 inline unsigned eval_lsb(const gmp_int& val)
 {
    int c = eval_get_sign(val);

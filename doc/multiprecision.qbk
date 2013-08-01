@@ -1828,6 +1828,13 @@ Unsets the `index` bit in `val`.
 
 Flips the `index` bit in `val`.
 
+   template <class Integer>
+   Integer sqrt(const Integer& x);
+   template <class Integer>
+   Integer sqrt(const Integer& x, Integer& r);
+
+Returns the integer square root `s` of x and sets `r` to the remainder ['x - s[super 2]].
+
    template <class Engine>
    bool miller_rabin_test(const number-or-expression-template-type& n, unsigned trials, Engine& gen);
    bool miller_rabin_test(const number-or-expression-template-type& n, unsigned trials);
@@ -1991,8 +1998,13 @@ generic operations, and so function equally well for built in and multiprecision
    struct is_number_expression;
 
    // Integer specific functions:
+   ``['unmentionable-expression-template-type]``    gcd(const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    lcm(const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
    ``['unmentionable-expression-template-type]``    pow(const ``['number-or-expression-template-type]``&, unsigned);
    ``['unmentionable-expression-template-type]``    powm(const ``['number-or-expression-template-type]``& b, const ``['number-or-expression-template-type]``& p, const ``['number-or-expression-template-type]``& m);
+   ``['unmentionable-expression-template-type]``    sqrt(const ``['number-or-expression-template-type]``&);
+   template <class Backend, expression_template_option ExpressionTemplates>
+   number<Backend, EXpressionTemplates>      sqrt(const ``['number-or-expression-template-type]``&, number<Backend, EXpressionTemplates>&);
    template <class Backend, expression_template_option ExpressionTemplates>
    void divide_qr(const ``['number-or-expression-template-type]``& x, const ``['number-or-expression-template-type]``& y,
                   number<Backend, ExpressionTemplates>& q, number<Backend, ExpressionTemplates>& r);
@@ -2387,6 +2399,14 @@ built in integers or multiprecision ones), the functions will promote to a wider
 requires it.  Versions overloaded for built in integer types return that integer type rather than an expression 
 template.
 
+   ``['unmentionable-expression-template-type]``    gcd(const ``['number-or-expression-template-type]``& a, const ``['number-or-expression-template-type]``& b);
+
+Returns the largest integer `x` that divides both `a` and `b`.
+
+   ``['unmentionable-expression-template-type]``    lcm(const ``['number-or-expression-template-type]``& a, const ``['number-or-expression-template-type]``& b);
+
+Returns the smallest integer `x` that is divisible by both `a` and `b`.
+
    ``['unmentionable-expression-template-type]``    pow(const ``['number-or-expression-template-type]``& b, unsigned p);
 
 Returns ['b[super p]] as an expression template.  Note that this function should be used with extreme care as the result can grow so 
@@ -2397,6 +2417,15 @@ fixed precision `cpp_int`'s either.
    ``['unmentionable-expression-template-type]``    powm(const ``['number-or-expression-template-type]``& b, const ``['number-or-expression-template-type]``& p, const ``['number-or-expression-template-type]``& m);
 
 Returns ['b[super p] mod m] as an expression template.  Fixed precision types are promoted internally to ensure accuracy.
+
+   ``['unmentionable-expression-template-type]``    sqrt(const ``['number-or-expression-template-type]``& a);
+
+Returns the largest integer `x` such that `x * x < a`.
+
+   template <class Backend, expression_template_option ExpressionTemplates>
+   number<Backend, EXpressionTemplates>      sqrt(const ``['number-or-expression-template-type]``& a, number<Backend, EXpressionTemplates>& r);
+
+Returns the largest integer `x` such that `x * x < a`, and sets the remainder `r` such that `r = a - x * x`.
 
    template <class Backend, expression_template_option ExpressionTemplates>
    void divide_qr(const ``['number-or-expression-template-type]``& x, const ``['number-or-expression-template-type]``& y,
@@ -3096,6 +3125,9 @@ and `ff` is a variable of type `std::ios_base::fmtflags`.
 [[`eval_powm(b, cb, a, a2)`][`void`][Sets `b` to the result of ['(cb^a)%a2].
             The type of `a` shall be listed in one of the type lists
             `B::signed_types`, `B::unsigned_types`.
+            The default version of this function is synthesised from other operations above.][[space]]]
+[[`eval_integer_sqrt(b, cb, b2)`][`void`][Sets `b` to the largest integer which when squared is less than `cb`, also
+            sets `b2` to the remainder, ie to ['cb - b[super 2]].
             The default version of this function is synthesised from other operations above.][[space]]]
 
 [[['Sign manipulation:]]]
