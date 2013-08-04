@@ -49,7 +49,7 @@ BOOST_FORCEINLINE unsigned find_msb(unsigned long mask, const mpl::int_<1>&)
    return result;
 }
 #ifdef _M_X64
-BOOST_FORCEINLINE unsigned find_lsb(unsigned __int64, const mpl::int_<2>&)
+BOOST_FORCEINLINE unsigned find_lsb(unsigned __int64 mask, const mpl::int_<2>&)
 {
    unsigned long result;
    _BitScanForward64(&result, mask);
