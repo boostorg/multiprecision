@@ -565,6 +565,11 @@ public:
    {
       return m_backend.str(digits, f);
    }
+   template<class Archive>
+   void serialize(Archive & ar, const unsigned int /*version*/)
+   {
+      ar & m_backend;
+   }
 private:
    template <class T>
    void convert_to_imp(T* result)const

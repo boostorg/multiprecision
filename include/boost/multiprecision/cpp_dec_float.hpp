@@ -554,6 +554,17 @@ public:
       return (bo_order_is_zero ? static_cast<ExponentType>(0) : static_cast<ExponentType>(exp + prefix));
    }
 
+   template<class Archive>
+   void serialize(Archive & ar, const unsigned int /*version*/)
+   {
+      for(unsigned i = 0; i < data.size(); ++i)
+         ar & data[i];
+      ar & exp;
+      ar & neg;
+      ar & fpclass;
+      ar & prec_elem;
+   }
+
 private:
    static bool data_elem_is_non_zero_predicate(const boost::uint32_t& d)  { return (d != static_cast<boost::uint32_t>(0u)); }
    static bool data_elem_is_non_nine_predicate(const boost::uint32_t& d)  { return (d != static_cast<boost::uint32_t>(cpp_dec_float::cpp_dec_float_elem_mask - 1)); }

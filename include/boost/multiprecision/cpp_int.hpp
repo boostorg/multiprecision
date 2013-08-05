@@ -1800,5 +1800,6 @@ struct is_explicitly_convertible<cpp_int_backend<MinBits, MaxBits, SignType, Che
 #ifdef BOOST_MP_USER_DEFINED_LITERALS
 #include <boost/multiprecision/cpp_int/literals.hpp>
 #endif
+#include <boost/multiprecision/cpp_int/serialize.hpp>
 
 #endif

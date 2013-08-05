@@ -568,6 +568,17 @@ run ublas_interop/test5.cpp ublas_interop/test52.cpp ublas_interop/test53.cpp : 
 run ublas_interop/test6.cpp ublas_interop/test62.cpp ublas_interop/test63.cpp : : : <define>TEST_ET=1 : ublas5_et ;
 #run ublas_interop/test7.cpp ublas_interop/test71.cpp ublas_interop/test72.cpp ublas_interop/test73.cpp : : : <define>TEST_ET=1 : ublas6_et ;
 
+#
+# Serialization tests, run in release mode so we cycle through more values:
+#
+run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST1 : test_cpp_int_serial_1 ;
+run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST2 : test_cpp_int_serial_2 ;
+run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST3 : test_cpp_int_serial_3 ;
+run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST4 : test_cpp_int_serial_4 ;
+run test_cpp_dec_float_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST1 : test_cpp_dec_float_serial_1 ;
+run test_cpp_dec_float_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST2 : test_cpp_dec_float_serial_2 ;
+
+
 if $(enable-specfun)
 {
 
