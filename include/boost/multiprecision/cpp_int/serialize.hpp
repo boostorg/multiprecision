@@ -57,10 +57,9 @@ void do_serialize(Archive& ar, Int& val, mpl::false_ const&, mpl::false_ const&,
       pl[i] = 0;
       for(std::size_t j = 0; j < sizeof(limb_type); ++j)
       {
-         limb_type byte;
+         unsigned char byte;
          ar & byte;
-         byte <<= (j * CHAR_BIT);
-         pl[i] |= byte;
+         pl[i] |= static_cast<limb_type>(byte) << (j * CHAR_BIT);
       }
    }
    if(s != val.sign())
@@ -86,7 +85,7 @@ void do_serialize(Archive& ar, Int& val, mpl::true_ const&, mpl::false_ const&, 
       limb_type l = pl[i];
       for(std::size_t j = 0; j < sizeof(limb_type); ++j)
       {
-         unsigned byte = (l >> (j * CHAR_BIT)) & ((1u << CHAR_BIT) - 1);
+         unsigned char byte = static_cast<unsigned char>((l >> (j * CHAR_BIT)) & ((1u << CHAR_BIT) - 1));
          ar & byte;
       }
    }
@@ -104,9 +103,9 @@ void do_serialize(Archive& ar, Int& val, mpl::false_ const&, mpl::true_ const&, 
    ar & limb_count;
    for(std::size_t i = 0; i < limb_count; ++i)
    {
-      typename Int::local_limb_type b;
+      unsigned char b;
       ar & b;
-      l |= b << (i * CHAR_BIT);
+      l |= static_cast<typename Int::local_limb_type>(b) << (i * CHAR_BIT);
    }
    *val.limbs() = l;
    if(s != val.sign())
@@ -125,7 +124,7 @@ void do_serialize(Archive& ar, Int& val, mpl::true_ const&, mpl::true_ const&, m
    ar & limb_count;
    for(std::size_t i = 0; i < limb_count; ++i)
    {
-      typename Int::local_limb_type b = static_cast<typename Int::local_limb_type>(l >> (i * CHAR_BIT)) & static_cast<typename Int::local_limb_type>((1u << CHAR_BIT) - 1);
+      unsigned char b = static_cast<unsigned char>(static_cast<typename Int::local_limb_type>(l >> (i * CHAR_BIT)) & static_cast<typename Int::local_limb_type>((1u << CHAR_BIT) - 1));
       ar & b;
    }
 }
@@ -140,8 +139,7 @@ void do_serialize(Archive& ar, Int& val, mpl::false_ const&, mpl::false_ const&,
    ar & s;
    ar & c;
    val.resize(c, c);
-   for(unsigned i = 0; i < c; ++i)
-      ar & val.limbs()[i];
+   ar.load_binary(val.limbs(), c);
    if(s != val.sign())
       val.negate();
    val.normalize();
@@ -156,8 +154,7 @@ void do_serialize(Archive& ar, Int& val, mpl::true_ const&, mpl::false_ const&, 
    std::size_t c = val.size();
    ar & s;
    ar & c;
-   for(unsigned i = 0; i < c; ++i)
-      ar & val.limbs()[i];
+   ar.save_binary(val.limbs(), c);
 }
 template <class Archive, class Int>
 void do_serialize(Archive& ar, Int& val, mpl::false_ const&, mpl::true_ const&, mpl::true_ const&)
@@ -167,7 +164,7 @@ void do_serialize(Archive& ar, Int& val, mpl::false_ const&, mpl::true_ const&, 
    // Binary.
    bool s;
    ar & s;
-   ar & *val.limbs();
+   ar.load_binary(val.limbs(), sizeof(*val.limbs()));
    if(s != val.sign())
       val.negate();
 }
@@ -179,7 +176,7 @@ void do_serialize(Archive& ar, Int& val, mpl::true_ const&, mpl::true_ const&, m
    // Binary.
    bool s = val.sign();
    ar & s;
-   ar & *val.limbs();
+   ar.save_binary(val.limbs(), sizeof(*val.limbs()));
 }
 
 }

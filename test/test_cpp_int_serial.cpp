@@ -75,12 +75,11 @@ void test_neg(const T& x, const boost::mpl::true_&)
    boost::archive::binary_oarchive ob(ss);
    ob << static_cast<const T&>(val);
    boost::archive::binary_iarchive ib(ss);
-   val2;
    ib >> val2;
    BOOST_CHECK_EQUAL(val, val2);
 }
 template <class T>
-void test_neg(const T& val, const boost::mpl::false_&){}
+void test_neg(const T& , const boost::mpl::false_&){}
 
 template <class T>
 void test()
@@ -106,7 +105,6 @@ void test()
       boost::archive::binary_oarchive ob(ss);
       ob << static_cast<const T&>(val);
       boost::archive::binary_iarchive ib(ss);
-      val2;
       ib >> val2;
       BOOST_CHECK_EQUAL(val, val2);
       
