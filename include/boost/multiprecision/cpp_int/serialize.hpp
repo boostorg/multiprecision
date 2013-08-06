@@ -55,11 +55,12 @@ void do_serialize(Archive& ar, Int& val, mpl::false_ const&, mpl::false_ const&,
    for(std::size_t i = 0; i < limb_count; ++i)
    {
       pl[i] = 0;
-      for(std::size_t j = 0; j < sizeof(limb_type); ++j)
+      for(std::size_t j = 0; (j < sizeof(limb_type)) && byte_count; ++j)
       {
          unsigned char byte;
          ar & byte;
          pl[i] |= static_cast<limb_type>(byte) << (j * CHAR_BIT);
+         --byte_count;
       }
    }
    if(s != val.sign())
@@ -99,9 +100,9 @@ void do_serialize(Archive& ar, Int& val, mpl::false_ const&, mpl::true_ const&, 
    bool s;
    typename Int::local_limb_type l = 0;
    ar & s;
-   std::size_t limb_count;
-   ar & limb_count;
-   for(std::size_t i = 0; i < limb_count; ++i)
+   std::size_t byte_count;
+   ar & byte_count;
+   for(std::size_t i = 0; i < byte_count; ++i)
    {
       unsigned char b;
       ar & b;
