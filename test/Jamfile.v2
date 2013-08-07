@@ -576,6 +576,7 @@ run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : :
 run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST3 : test_cpp_int_serial_3 ;
 run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST4 : test_cpp_int_serial_4 ;
 run test_cpp_int_deserial.cpp ../../serialization/build//boost_serialization : : : release ;
+run test_cpp_rat_serial.cpp ../../serialization/build//boost_serialization : : : release ;
 run test_cpp_dec_float_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST1 : test_cpp_dec_float_serial_1 ;
 run test_cpp_dec_float_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST2 : test_cpp_dec_float_serial_2 ;
 

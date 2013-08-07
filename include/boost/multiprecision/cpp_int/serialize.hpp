@@ -140,7 +140,7 @@ void do_serialize(Archive& ar, Int& val, mpl::false_ const&, mpl::false_ const&,
    ar & s;
    ar & c;
    val.resize(c, c);
-   ar.load_binary(val.limbs(), c);
+   ar.load_binary(val.limbs(), c * sizeof(limb_type));
    if(s != val.sign())
       val.negate();
    val.normalize();
@@ -155,7 +155,7 @@ void do_serialize(Archive& ar, Int& val, mpl::true_ const&, mpl::false_ const&, 
    std::size_t c = val.size();
    ar & s;
    ar & c;
-   ar.save_binary(val.limbs(), c);
+   ar.save_binary(val.limbs(), c * sizeof(limb_type));
 }
 template <class Archive, class Int>
 void do_serialize(Archive& ar, Int& val, mpl::false_ const&, mpl::true_ const&, mpl::true_ const&)
