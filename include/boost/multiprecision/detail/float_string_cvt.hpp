@@ -54,7 +54,7 @@ std::string convert_to_string(Backend b, std::streamsize digits, std::ios_base::
    std::string result;
    bool iszero = false;
    bool isneg = false;
-   exponent_type expon;
+   exponent_type expon = 0;
    std::streamsize org_digits = digits;
    BOOST_ASSERT(digits > 0);
 

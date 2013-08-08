@@ -132,6 +132,13 @@ public:
    {
       return m_value;
    }
+   template <class Archive>
+   void serialize(Archive& ar, const unsigned int /*version*/)
+   {
+      log_prefix_event(m_value, "serialize");
+      ar & m_value;
+      log_postfix_event(m_value, "serialize");
+   }
 };
 
 template <class T>

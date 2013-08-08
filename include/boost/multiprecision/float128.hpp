@@ -17,11 +17,13 @@ extern "C" {
 #include <quadmath.h>
 }
 
+typedef __float128 float128_type;
+
 #else
 
 #include <boost/multiprecision/detail/float_string_cvt.hpp>
 
-typedef _Quad __float128;
+typedef _Quad float128_type;
 
 extern "C" {
 _Quad __ldexpq(_Quad, int);
@@ -95,7 +97,7 @@ using backends::float128_backend;
 template<>
 struct number_category<backends::float128_backend> : public mpl::int_<number_kind_floating_point> {};
 template<>
-struct number_category<__float128> : public mpl::int_<number_kind_floating_point> {};
+struct number_category<float128_type> : public mpl::int_<number_kind_floating_point> {};
 
 typedef number<float128_backend, et_off> float128;
 
@@ -110,7 +112,7 @@ struct float128_backend
    typedef int                                                   exponent_type;
 
 private:
-   __float128 m_value;
+   float128_type m_value;
 public:
    BOOST_CONSTEXPR float128_backend() : m_value(0) {}
    BOOST_CONSTEXPR float128_backend(const float128_backend& o) : m_value(o.m_value) {}
@@ -120,10 +122,10 @@ public:
       return *this;
    }
    template <class T>
-   BOOST_CONSTEXPR float128_backend(const T& i, const typename enable_if_c<is_convertible<T, __float128>::value>::type* = 0)
+   BOOST_CONSTEXPR float128_backend(const T& i, const typename enable_if_c<is_convertible<T, float128_type>::value>::type* = 0)
       : m_value(i) {}
    template <class T>
-   typename enable_if_c<is_arithmetic<T>::value || is_convertible<T, __float128>::value, float128_backend&>::type operator = (const T& i)
+   typename enable_if_c<is_arithmetic<T>::value || is_convertible<T, float128_type>::value, float128_backend&>::type operator = (const T& i)
    {
       m_value = i;
       return *this;
@@ -176,7 +178,7 @@ public:
          v = quadmath_snprintf (&buf2[0], v_max + 3, format.c_str(), digits, m_value);
          if(v >= v_max + 3)
          {
-            BOOST_THROW_EXCEPTION(std::runtime_error("Formatting of __float128 failed."));
+            BOOST_THROW_EXCEPTION(std::runtime_error("Formatting of float128_type failed."));
          }
          return &buf2[0];
       }
@@ -198,11 +200,11 @@ public:
    {
       return m_value == i ? 0 : m_value < i ? -1 : 1;
    }
-   __float128& value()
+   float128_type& value()
    {
       return m_value;
    }
-   const __float128& value()const
+   const float128_type& value()const
    {
       return m_value;
    }
@@ -441,6 +443,62 @@ inline void eval_atan2(float128_backend& result, const float128_backend& a, cons
 } // namespace backends
 
 }} // namespaces
+
+namespace boost{ 
+namespace archive{
+
+class binary_oarchive;
+class binary_iarchive;
+
+}
+   
+namespace serialization{ namespace float128_detail{
+
+template <class Archive>
+void do_serialize(Archive& ar, boost::multiprecision::backends::float128_backend& val, const mpl::false_&, const mpl::false_&)
+{
+   // saving
+   // non-binary
+   std::string s(val.str(0, std::ios_base::scientific));
+   ar & s;
+}
+template <class Archive>
+void do_serialize(Archive& ar, boost::multiprecision::backends::float128_backend& val, const mpl::true_&, const mpl::false_&)
+{
+   // loading
+   // non-binary
+   std::string s;
+   ar & s;
+   val = s.c_str();
+}
+
+template <class Archive>
+void do_serialize(Archive& ar, boost::multiprecision::backends::float128_backend& val, const mpl::false_&, const mpl::true_&)
+{
+   // saving
+   // binary
+   ar.save_binary(&val, sizeof(val));
+}
+template <class Archive>
+void do_serialize(Archive& ar, boost::multiprecision::backends::float128_backend& val, const mpl::true_&, const mpl::true_&)
+{
+   // loading
+   // binary
+   ar.load_binary(&val, sizeof(val));
+}
+
+} // detail
+
+template <class Archive>
+void serialize(Archive& ar, boost::multiprecision::backends::float128_backend& val, unsigned int /*version*/)
+{
+   typedef typename Archive::is_loading load_tag;
+   typedef typename mpl::bool_<boost::is_same<Archive, boost::archive::binary_oarchive>::value || boost::is_same<Archive, boost::archive::binary_iarchive>::value> binary_tag;
+
+   float128_detail::do_serialize(ar, val, load_tag(), binary_tag());
+}
+
+}}
 
 namespace std{
 

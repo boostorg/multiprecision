@@ -108,6 +108,14 @@ public:
    {
       return m_value;
    }
+   template <class Archive>
+   void serialize(Archive& ar, const unsigned int /*version*/)
+   {
+      ar & m_value;
+      typedef typename Archive::is_loading tag;
+      if(tag::value)
+         update_view();
+   }
 };
 
 template <class Backend>

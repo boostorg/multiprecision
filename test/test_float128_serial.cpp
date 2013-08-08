@@ -11,24 +11,14 @@
 #  define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <boost/multiprecision/cpp_dec_float.hpp>
+#include <boost/multiprecision/float128.hpp>
 #include "test_float_serial.hpp"
-
-#if !defined(TEST1) && !defined(TEST2)
-#  define TEST1
-#  define TEST2
-#endif
 
 
 int main()
 {
    using namespace boost::multiprecision;
-#ifdef TEST1
-   test<cpp_dec_float_50>();
-#endif
-#ifndef TEST2
-   test<number<cpp_dec_float<100, boost::int64_t, std::allocator<void> > > >();
-#endif
+   test<float128>();
    return boost::report_errors();
 }
 
