@@ -29,6 +29,9 @@ namespace boost{
 namespace multiprecision{
 namespace backends{
 
+  using boost::enable_if;
+
+
 #ifdef BOOST_MSVC
 // warning C4127: conditional expression is constant
 #pragma warning(push)
@@ -737,7 +740,7 @@ private:
    BOOST_STATIC_ASSERT_MSG(MinBits <= sizeof(double_limb_type) * CHAR_BIT, "Template parameter MinBits is inconsistent with the parameter trivial - did you mistakingly try to override the trivial parameter?");
 protected:
    template <class T>
-   typename disable_if_c<std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= (int)MinBits)>::type
+   typename boost::disable_if_c<std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= (int)MinBits)>::type
       check_in_range(T val, const mpl::int_<checked>&)
    {
       BOOST_MP_USING_ABS
@@ -760,22 +763,22 @@ public:
    // Direct construction:
    //
    template <class SI>
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(SI i, typename enable_if_c<is_signed<SI>::value && (Checked == unchecked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(SI i, typename boost::enable_if_c<is_signed<SI>::value && (Checked == unchecked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(i < 0 ? static_cast<local_limb_type>(static_cast<typename make_unsigned<SI>::type>(-i)) & limb_mask : static_cast<local_limb_type>(i) & limb_mask), m_sign(i < 0) {}
    template <class SI>
-   BOOST_MP_FORCEINLINE cpp_int_base(SI i, typename enable_if_c<is_signed<SI>::value && (Checked == checked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE cpp_int_base(SI i, typename boost::enable_if_c<is_signed<SI>::value && (Checked == checked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(i < 0 ? static_cast<local_limb_type>(static_cast<typename make_unsigned<SI>::type>(-i) & limb_mask) : static_cast<local_limb_type>(i) & limb_mask), m_sign(i < 0) { check_in_range(i); }
    template <class UI>
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(UI i, typename enable_if_c<is_unsigned<UI>::value && (Checked == unchecked)>::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(UI i, typename boost::enable_if_c<is_unsigned<UI>::value && (Checked == unchecked)>::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(static_cast<local_limb_type>(i) & limb_mask), m_sign(false) {}
    template <class UI>
-   BOOST_MP_FORCEINLINE cpp_int_base(UI i, typename enable_if_c<is_unsigned<UI>::value && (Checked == checked)>::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE cpp_int_base(UI i, typename boost::enable_if_c<is_unsigned<UI>::value && (Checked == checked)>::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(static_cast<local_limb_type>(i) & limb_mask), m_sign(false) { check_in_range(i); }
    template <class F>
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(F i, typename enable_if_c<is_floating_point<F>::value && (Checked == unchecked)>::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(F i, typename boost::enable_if_c<is_floating_point<F>::value && (Checked == unchecked)>::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(static_cast<local_limb_type>(std::fabs(i)) & limb_mask), m_sign(i < 0) {}
    template <class F>
-   BOOST_MP_FORCEINLINE cpp_int_base(F i, typename enable_if_c<is_floating_point<F>::value && (Checked == checked)>::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE cpp_int_base(F i, typename boost::enable_if_c<is_floating_point<F>::value && (Checked == checked)>::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(static_cast<local_limb_type>(std::fabs(i)) & limb_mask), m_sign(i < 0) { check_in_range(i); }
 #if defined(BOOST_MP_USER_DEFINED_LITERALS)
       BOOST_CONSTEXPR cpp_int_base(literals::detail::value_pack<>)
@@ -870,7 +873,7 @@ private:
    BOOST_STATIC_ASSERT_MSG(MinBits <= sizeof(double_limb_type) * CHAR_BIT, "Template parameter MinBits is inconsistent with the parameter trivial - did you mistakingly try to override the trivial parameter?");
 protected:
    template <class T>
-   typename disable_if_c<std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= (int)MinBits)>::type
+   typename boost::disable_if_c<std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= (int)MinBits)>::type
       check_in_range(T val, const mpl::int_<checked>&, const mpl::false_&)
    {
       typedef typename common_type<T, local_limb_type>::type common_type;
@@ -902,19 +905,19 @@ public:
    // Direct construction:
    //
    template <class SI>
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(SI i, typename enable_if_c<is_signed<SI>::value && (Checked == unchecked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(SI i, typename boost::enable_if_c<is_signed<SI>::value && (Checked == unchecked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(i < 0 ? (1 + ~static_cast<local_limb_type>(-i)) & limb_mask : static_cast<local_limb_type>(i) & limb_mask) {}
    template <class SI>
-   BOOST_MP_FORCEINLINE cpp_int_base(SI i, typename enable_if_c<is_signed<SI>::value && (Checked == checked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE cpp_int_base(SI i, typename boost::enable_if_c<is_signed<SI>::value && (Checked == checked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(i < 0 ? 1 + ~static_cast<local_limb_type>(-i) : static_cast<local_limb_type>(i)) { check_in_range(i); }
    template <class UI>
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(UI i, typename enable_if_c<is_unsigned<UI>::value && (Checked == unchecked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(UI i, typename boost::enable_if_c<is_unsigned<UI>::value && (Checked == unchecked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(static_cast<local_limb_type>(i) & limb_mask) {}
    template <class UI>
-   BOOST_MP_FORCEINLINE cpp_int_base(UI i, typename enable_if_c<is_unsigned<UI>::value && (Checked == checked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE cpp_int_base(UI i, typename boost::enable_if_c<is_unsigned<UI>::value && (Checked == checked) >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(static_cast<local_limb_type>(i)) { check_in_range(i); }
    template <class F>
-   BOOST_MP_FORCEINLINE cpp_int_base(F i, typename enable_if<is_floating_point<F> >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE cpp_int_base(F i, typename boost::enable_if<is_floating_point<F> >::type const* = 0) BOOST_NOEXCEPT_IF((Checked == unchecked))
       : m_data(static_cast<local_limb_type>(std::fabs(i)) & limb_mask)
    {
       check_in_range(i);
@@ -1050,7 +1053,7 @@ public:
    // Direct construction from arithmetic type:
    //
    template <class Arg>
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(Arg i, typename enable_if_c<is_allowed_cpp_int_base_conversion<Arg, base_type>::value >::type const* = 0)BOOST_NOEXCEPT_IF((Checked == unchecked) && boost::is_void<Allocator>::value)
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(Arg i, typename boost::enable_if_c<is_allowed_cpp_int_base_conversion<Arg, base_type>::value >::type const* = 0)BOOST_NOEXCEPT_IF((Checked == unchecked) && boost::is_void<Allocator>::value)
       : base_type(i) {}
 
 private:
@@ -1109,7 +1112,7 @@ public:
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
    cpp_int_backend(
       const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other,
-      typename enable_if_c<is_implicit_cpp_int_conversion<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>, self_type>::value>::type* = 0)
+      typename boost::enable_if_c<is_implicit_cpp_int_conversion<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>, self_type>::value>::type* = 0)
       : base_type()
    {
       do_assign(
@@ -1120,7 +1123,7 @@ public:
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
    explicit cpp_int_backend(
       const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other,
-      typename disable_if_c<is_implicit_cpp_int_conversion<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>, self_type>::value>::type* = 0)
+      typename boost::disable_if_c<is_implicit_cpp_int_conversion<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>, self_type>::value>::type* = 0)
       : base_type()
    {
       do_assign(
@@ -1157,14 +1160,14 @@ public:
 #endif
 private:
    template <class A>
-   typename enable_if<is_unsigned<A> >::type do_assign_arithmetic(A val, const mpl::true_&)
+   typename boost::enable_if<is_unsigned<A> >::type do_assign_arithmetic(A val, const mpl::true_&)
    {
       this->check_in_range(val);
       *this->limbs() = static_cast<typename self_type::local_limb_type>(val);
       this->normalize();
    }
    template <class A>
-   typename disable_if<is_unsigned<A> >::type do_assign_arithmetic(A val, const mpl::true_&)
+   typename boost::disable_if<is_unsigned<A> >::type do_assign_arithmetic(A val, const mpl::true_&)
    {
       typedef typename make_signed<typename self_type::local_limb_type>::type signed_limb_type;
       this->check_in_range(val);
@@ -1696,7 +1699,7 @@ public:
       return 0;
    }
    template <class Arithmetic>
-   BOOST_MP_FORCEINLINE typename enable_if<is_arithmetic<Arithmetic>, int>::type compare(Arithmetic i)const
+   BOOST_MP_FORCEINLINE typename boost::enable_if<is_arithmetic<Arithmetic>, int>::type compare(Arithmetic i)const
    {
       // braindead version:
       cpp_int_backend t;
