@@ -1149,6 +1149,8 @@ void eval_integer_sqrt(B& s, B& r, const B& x)
    eval_bit_set(t, 2 * g);
    eval_subtract(r, x, t);
    --g;
+   if(eval_get_sign(r) == 0)
+      return;
    int msbr = eval_msb(r);
    do
    {
@@ -1161,6 +1163,8 @@ void eval_integer_sqrt(B& s, B& r, const B& x)
          {
             eval_bit_set(s, g);
             eval_subtract(r, t);
+            if(eval_get_sign(r) == 0)
+               return;
             msbr = eval_msb(r);
          }
       }
