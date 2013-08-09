@@ -11,7 +11,7 @@
 #include <boost/multiprecision/number.hpp>
 
 
-#ifndef BOOST_INTEL
+#if !defined(BOOST_INTEL) || (defined(BOOST_INTEL_CXX_VERSION) && (BOOST_INTEL_CXX_VERSION >= 1310) && defined(__GNUC__))
 
 extern "C" {
 #include <quadmath.h>
@@ -20,6 +20,8 @@ extern "C" {
 typedef __float128 float128_type;
 
 #else
+
+#define BOOST_MP_FLOAT128_IS_INTEL_QUAD
 
 #include <boost/multiprecision/detail/float_string_cvt.hpp>
 
@@ -132,7 +134,7 @@ public:
    }
    float128_backend& operator = (const char* s)
    {
-#ifndef BOOST_INTEL
+#ifndef BOOST_MP_FLOAT128_IS_INTEL_QUAD
       char* p_end;
       m_value = strtoflt128(s, &p_end);
       if(p_end - s != (std::ptrdiff_t)std::strlen(s))
@@ -150,7 +152,7 @@ public:
    }
    std::string str(std::streamsize digits, std::ios_base::fmtflags f)const
    {
-#ifndef BOOST_INTEL
+#ifndef BOOST_MP_FLOAT128_IS_INTEL_QUAD
       char buf[100];
       boost::scoped_array<char> buf2;
       std::string format = "%";
