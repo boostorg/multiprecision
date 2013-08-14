@@ -1291,7 +1291,7 @@ public:
       {
          value.first = true;
          value.second = 1;
-         mpfi_div_2exp(value.second.backend().data(), value.second.backend().data(), digits);
+         mpfi_div_2exp(value.second.backend().data(), value.second.backend().data(), 1);
       }
       return value.second;
    }

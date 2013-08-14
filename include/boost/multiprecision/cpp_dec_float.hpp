@@ -2960,7 +2960,7 @@ namespace std
       BOOST_STATIC_CONSTEXPR ExponentType          max_exponent      = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_max_exp;      // Type differs from int.
       BOOST_STATIC_CONSTEXPR ExponentType          max_exponent10    = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_max_exp10;    // Type differs from int.
       BOOST_STATIC_CONSTEXPR int                     radix             = boost::multiprecision::cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_radix;
-      BOOST_STATIC_CONSTEXPR std::float_round_style  round_style       = std::round_to_nearest;
+      BOOST_STATIC_CONSTEXPR std::float_round_style  round_style       = std::round_indeterminate;
       BOOST_STATIC_CONSTEXPR bool                    has_infinity      = true;
       BOOST_STATIC_CONSTEXPR bool                    has_quiet_NaN     = true;
       BOOST_STATIC_CONSTEXPR bool                    has_signaling_NaN = false;

@@ -2287,7 +2287,6 @@ public:
       {
          value.first = true;
          value.second = 1;
-         mpf_div_2exp(value.second.backend().data(), value.second.backend().data(), digits);
       }
       return value.second;
    }
@@ -2309,7 +2308,7 @@ public:
    BOOST_STATIC_CONSTEXPR bool is_modulo = false;
    BOOST_STATIC_CONSTEXPR bool traps = true;
    BOOST_STATIC_CONSTEXPR bool tinyness_before = false;
-   BOOST_STATIC_CONSTEXPR float_round_style round_style = round_to_nearest;
+   BOOST_STATIC_CONSTEXPR float_round_style round_style = round_indeterminate;
 
 private:
    struct data_initializer
@@ -2365,7 +2364,7 @@ public:
    BOOST_STATIC_CONSTEXPR bool is_modulo = false;
    BOOST_STATIC_CONSTEXPR bool traps = false;
    BOOST_STATIC_CONSTEXPR bool tinyness_before = false;
-   BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
+   BOOST_STATIC_CONSTEXPR float_round_style round_style = round_indeterminate;
 };
 
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION

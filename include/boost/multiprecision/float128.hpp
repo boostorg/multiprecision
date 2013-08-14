@@ -521,7 +521,7 @@ public:
    BOOST_STATIC_CONSTEXPR bool is_exact = false;
    BOOST_STATIC_CONSTEXPR int radix = 2;
    static number_type epsilon() { return 1.92592994438723585305597794258492732e-34Q; }
-   static number_type round_error() { return 0; }
+   static number_type round_error() { return 0.5; }
    BOOST_STATIC_CONSTEXPR int min_exponent = -16381;
    BOOST_STATIC_CONSTEXPR int min_exponent10 = min_exponent * 301L / 1000L;
    BOOST_STATIC_CONSTEXPR int max_exponent = 16384;
@@ -540,7 +540,7 @@ public:
    BOOST_STATIC_CONSTEXPR bool is_modulo = false;
    BOOST_STATIC_CONSTEXPR bool traps = false;
    BOOST_STATIC_CONSTEXPR bool tinyness_before = false;
-   BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
+   BOOST_STATIC_CONSTEXPR float_round_style round_style = round_to_nearest;
 };
 
 } // namespace std
