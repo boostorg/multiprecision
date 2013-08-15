@@ -10,8 +10,30 @@
 #include <boost/scoped_array.hpp>
 #include <boost/multiprecision/number.hpp>
 
+#if defined(BOOST_INTEL) && !defined(BOOST_MP_USE_FLOAT128) && !defined(BOOST_MP_USE_QUAD)
+#  if defined(BOOST_INTEL_CXX_VERSION) && (BOOST_INTEL_CXX_VERSION >= 1310) && defined(__GNUC__)
+#    if (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6))
+#      define BOOST_MP_USE_FLOAT128
+#    endif
+#  endif
 
-#if !defined(BOOST_INTEL) || (defined(BOOST_INTEL_CXX_VERSION) && (BOOST_INTEL_CXX_VERSION >= 1310) && defined(__GNUC__))
+#  ifndef BOOST_MP_USE_FLOAT128
+#    define BOOST_MP_USE_QUAD
+#  endif
+#endif
+
+#if defined(__GNUC__) && !defined(BOOST_MP_USE_FLOAT128) && !defined(BOOST_MP_USE_QUAD)
+#  define BOOST_MP_USE_FLOAT128
+#endif
+
+#if !defined(BOOST_MP_USE_FLOAT128) && !defined(BOOST_MP_USE_QUAD)
+#  error "Sorry compiler is neither GCC, not Intel, don't know how to configure this header."
+#endif
+#if defined(BOOST_MP_USE_FLOAT128) && defined(BOOST_MP_USE_QUAD)
+#  error "Oh dear, both BOOST_MP_USE_FLOAT128 and BOOST_MP_USE_QUAD are defined, which one should I be using?"
+#endif
+
+#if defined(BOOST_MP_USE_FLOAT128)
 
 extern "C" {
 #include <quadmath.h>
@@ -19,9 +41,7 @@ extern "C" {
 
 typedef __float128 float128_type;
 
-#else
-
-#define BOOST_MP_FLOAT128_IS_INTEL_QUAD
+#elif defined(BOOST_MP_USE_QUAD)
 
 #include <boost/multiprecision/detail/float_string_cvt.hpp>
 
@@ -134,7 +154,7 @@ public:
    }
    float128_backend& operator = (const char* s)
    {
-#ifndef BOOST_MP_FLOAT128_IS_INTEL_QUAD
+#ifndef BOOST_MP_USE_QUAD
       char* p_end;
       m_value = strtoflt128(s, &p_end);
       if(p_end - s != (std::ptrdiff_t)std::strlen(s))
@@ -152,7 +172,7 @@ public:
    }
    std::string str(std::streamsize digits, std::ios_base::fmtflags f)const
    {
-#ifndef BOOST_MP_FLOAT128_IS_INTEL_QUAD
+#ifndef BOOST_MP_USE_QUAD
       char buf[100];
       boost::scoped_array<char> buf2;
       std::string format = "%";
