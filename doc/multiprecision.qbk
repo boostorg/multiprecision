@@ -879,12 +879,15 @@ Things you should know when using this type:
 * Default constructed `float128`s have the value zero.
 * This backend supports rvalue-references and is move-aware, making instantiations of `number` on this backend move aware.
 * It is not possible to round-trip objects of this type to and from a string and get back
-exactly the same value when compiled with Intel's C++ compiler: this is a current limitation of our code.  Round tripping
-when using GCC is possible.
+exactly the same value when compiled with Intel's C++ compiler and using `_Quad` as the underlying type: this is a current limitation of 
+our code.  Round tripping when using `__float128` as the underlying type is possible (both for GCC and Intel).
 * Conversion from a string results in a `std::runtime_error` being thrown if the string can not be interpreted 
 as a valid floating point number.
 * Division by zero results in an infinity being produced.
 * Type `float128` can be used as a literal type (constexpr support).
+* When using the Intel compiler, the underlying type defaults to `__float128` if it's available and `_Quad` if not.  You can override
+the default by defining either `BOOST_MP_USE_FLOAT128` or `BOOST_MP_USE_QUAD`.
+* When the underlying type is Intel's `_Quad` type, the code must be compiled with the compiler option `-Qoption,cpp,--extended_float_type`.
 
 [h5 float128 example:]
 

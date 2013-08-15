@@ -80,8 +80,10 @@
 <li class="listitem">
               It is not possible to round-trip objects of this type to and from a
               string and get back exactly the same value when compiled with Intel's
-              C++ compiler: this is a current limitation of our code. Round tripping
-              when using GCC is possible.
+              C++ compiler and using <code class="computeroutput"><span class="identifier">_Quad</span></code>
+              as the underlying type: this is a current limitation of our code. Round
+              tripping when using <code class="computeroutput"><span class="identifier">__float128</span></code>
+              as the underlying type is possible (both for GCC and Intel).
             </li>
 <li class="listitem">
               Conversion from a string results in a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
@@ -94,6 +96,16 @@
 <li class="listitem">
               Type <code class="computeroutput"><span class="identifier">float128</span></code> can be
               used as a literal type (constexpr support).
+            </li>
+<li class="listitem">
+              When using the Intel compiler, the underlying type defaults to <code class="computeroutput"><span class="identifier">__float128</span></code> if it's available and
+              <code class="computeroutput"><span class="identifier">_Quad</span></code> if not. You can
+              override the default by defining either <code class="computeroutput"><span class="identifier">BOOST_MP_USE_FLOAT128</span></code>
+              or <code class="computeroutput"><span class="identifier">BOOST_MP_USE_QUAD</span></code>.
+            </li>
+<li class="listitem">
+              When the underlying type is Intel's <code class="computeroutput"><span class="identifier">_Quad</span></code>
+              type, the code must be compiled with the compiler option <code class="computeroutput"><span class="special">-</span><span class="identifier">Qoption</span><span class="special">,</span><span class="identifier">cpp</span><span class="special">,--</span><span class="identifier">extended_float_type</span></code>.
             </li>
 </ul></div>
 <h6>
