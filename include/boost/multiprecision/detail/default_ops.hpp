@@ -11,6 +11,7 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/front.hpp>
+#include <boost/mpl/fold.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/type_traits/make_unsigned.hpp>
 
@@ -808,6 +809,7 @@ struct terminal
 template<class R, class B>
 struct calculate_next_larger_type
 {
+   // Find which list we're looking through:
    typedef typename mpl::if_<
       is_signed<R>,
       typename B::signed_types,
@@ -817,11 +819,23 @@ struct calculate_next_larger_type
          typename B::float_types
       >::type
    >::type list_type;
+   // A predicate to find a type with enough bits:
    typedef typename has_enough_bits<R, std::numeric_limits<R>::digits>::template type<mpl::_> pred_type;
+   // See if the last type is in the list, if so we have to start after this:
    typedef typename mpl::find_if<
       list_type,
+      is_same<R, mpl::_>
+   >::type start_last;
+   // Where we're starting from, either the start of the sequence or the last type found:
+   typedef typename mpl::if_<is_same<start_last, typename mpl::end<list_type>::type>, typename mpl::begin<list_type>::type, start_last>::type start_seq;
+   // The range we're searching:
+   typedef mpl::iterator_range<start_seq, typename mpl::end<list_type>::type> range;
+   // Find the next type:
+   typedef typename mpl::find_if<
+      range,
       pred_type
    >::type iter_type;
+   // Either the next type, or a "terminal" to indicate we've run out of types to search:
    typedef typename mpl::eval_if<
       is_same<typename mpl::end<list_type>::type, iter_type>,
       mpl::identity<terminal<R> >,
