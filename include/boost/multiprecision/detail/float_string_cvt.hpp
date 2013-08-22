@@ -16,7 +16,7 @@
 
 namespace boost{ namespace multiprecision{ namespace detail{
 
-inline void round_string_up_at(std::string& s, int pos)
+inline void round_string_up_at(std::string& s, int pos, int& expon)
 {
    //
    // Rounds up a string representation of a number at pos:
@@ -24,14 +24,18 @@ inline void round_string_up_at(std::string& s, int pos)
    if(pos < 0)
    {
       s.insert(0, 1, '1');
+      s.erase(s.size() - 1);
+      ++expon;
    }
    else if(s[pos] == '9')
    {
       s[pos] = '0';
-      round_string_up_at(s, pos - 1);
+      round_string_up_at(s, pos - 1, expon);
    }
    else
    {
+      if((pos == 0) && (s[pos] == '0') && (s.size() == 1))
+         ++expon;
       ++s[pos];
    }
 }
@@ -152,12 +156,12 @@ std::string convert_to_string(Backend b, std::streamsize digits, std::ios_base::
             // Bankers rounding:
             if((*result.rbegin() - '0') & 1)
             {
-               round_string_up_at(result, result.size() - 1);
+               round_string_up_at(result, result.size() - 1, expon);
             }
          }
          else if(cdigit >= 5)
          {
-            round_string_up_at(result, result.size() - 1);
+            round_string_up_at(result, result.size() - 1, expon);
          }
       }
    }
