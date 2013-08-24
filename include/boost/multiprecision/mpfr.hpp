@@ -952,7 +952,10 @@ inline void eval_subtract(mpfr_float_backend<D1, A1>& result, const mpfr_float_b
 template <unsigned D1, unsigned D2, mpfr_allocation_type A1, mpfr_allocation_type A2>
 inline void eval_multiply(mpfr_float_backend<D1, A1>& result, const mpfr_float_backend<D2, A2>& o)
 {
-   mpfr_mul(result.data(), result.data(), o.data(), GMP_RNDN);
+   if(&o == &result)
+      mpfr_sqr(result.data(), o.data(), GMP_RNDN);
+   else
+      mpfr_mul(result.data(), result.data(), o.data(), GMP_RNDN);
 }
 template <unsigned D1, unsigned D2, mpfr_allocation_type A1, mpfr_allocation_type A2>
 inline void eval_divide(mpfr_float_backend<D1, A1>& result, const mpfr_float_backend<D2, A2>& o)
@@ -1084,7 +1087,10 @@ inline void eval_subtract(mpfr_float_backend<D1, A1>& a, long x, const mpfr_floa
 template <unsigned D1, unsigned D2, mpfr_allocation_type A1, mpfr_allocation_type A2, unsigned D3>
 inline void eval_multiply(mpfr_float_backend<D1, A1>& a, const mpfr_float_backend<D2, A2>& x, const mpfr_float_backend<D3>& y)
 {
-   mpfr_mul(a.data(), x.data(), y.data(), GMP_RNDN);
+   if(&x == &y)
+      mpfr_sqr(a.data(), x.data(), GMP_RNDN);
+   else
+      mpfr_mul(a.data(), x.data(), y.data(), GMP_RNDN);
 }
 template <unsigned D1, unsigned D2, mpfr_allocation_type A1, mpfr_allocation_type A2>
 inline void eval_multiply(mpfr_float_backend<D1, A1>& a, const mpfr_float_backend<D2, A2>& x, unsigned long y)
