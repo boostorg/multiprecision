@@ -477,7 +477,7 @@ inline void eval_subtract(mpfi_float_backend<D1>& result, const mpfi_float_backe
 template <unsigned D1, unsigned D2>
 inline void eval_multiply(mpfi_float_backend<D1>& result, const mpfi_float_backend<D2>& o)
 {
-   if(&result == &o)
+   if((void*)&result == (void*)&o)
       mpfi_sqr(result.data(), o.data());
    else
       mpfi_mul(result.data(), result.data(), o.data());
@@ -612,7 +612,7 @@ inline void eval_subtract(mpfi_float_backend<D1>& a, long x, const mpfi_float_ba
 template <unsigned D1, unsigned D2, unsigned D3>
 inline void eval_multiply(mpfi_float_backend<D1>& a, const mpfi_float_backend<D2>& x, const mpfi_float_backend<D3>& y)
 {
-   if(&x == &y)
+   if((void*)&x == (void*)&y)
       mpfi_sqr(a.data(), x.data());
    else
       mpfi_mul(a.data(), x.data(), y.data());
