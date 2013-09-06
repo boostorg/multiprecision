@@ -1680,8 +1680,14 @@ inline std::ostream& operator << (std::ostream& os, const expression<tag, A1, A2
 template <class Backend, expression_template_option ExpressionTemplates>
 inline std::istream& operator >> (std::istream& is, number<Backend, ExpressionTemplates>& r)
 {
+   bool hex_format = (is.flags() & std::ios_base::hex) == std::ios_base::hex;
+   bool oct_format = (is.flags() & std::ios_base::oct) == std::ios_base::oct;
    std::string s;
    is >> s;
+   if(hex_format && (number_category<Backend>::value == number_kind_integer) && ((s[0] != '0') || (s[1] != 'x')))
+      s.insert(s.find_first_not_of("+-"), "0x");
+   if(oct_format && (number_category<Backend>::value == number_kind_integer) && (s[0] != '0'))
+      s.insert(s.find_first_not_of("+-"), "0");
    r.assign(s);
    return is;
 }
@@ -1704,6 +1710,8 @@ inline std::istream& operator >> (std::istream& is, rational<multiprecision::num
    multiprecision::number<Backend, ExpressionTemplates> v1, v2;
    char c;
    bool have_hex = false;
+   bool hex_format = (is.flags() & std::ios_base::hex) == std::ios_base::hex;
+   bool oct_format = (is.flags() & std::ios_base::oct) == std::ios_base::oct;
 
    while((EOF != (c = static_cast<char>(is.peek()))) && (c == 'x' || c == 'X' || c == '-' || c == '+' || (c >= '0' && c <= '9') || (have_hex && (c >= 'a' && c <= 'f')) || (have_hex && (c >= 'A' && c <= 'F'))))
    {
@@ -1712,6 +1720,10 @@ inline std::istream& operator >> (std::istream& is, rational<multiprecision::num
       s1.append(1, c);
       is.get();
    }
+   if(hex_format && ((s1[0] != '0') || (s1[1] != 'x')))
+      s1.insert(0, "0x");
+   if(oct_format && (s1[0] != '0'))
+      s1.insert(0, "0");
    v1.assign(s1);
    s1.erase();
    if(c == '/')
@@ -1724,6 +1736,10 @@ inline std::istream& operator >> (std::istream& is, rational<multiprecision::num
          s1.append(1, c);
          is.get();
       }
+      if(hex_format && ((s1[0] != '0') || (s1[1] != 'x')))
+         s1.insert(0, "0x");
+      if(oct_format && (s1[0] != '0'))
+         s1.insert(0, "0");
       v2.assign(s1);
    }
    else
