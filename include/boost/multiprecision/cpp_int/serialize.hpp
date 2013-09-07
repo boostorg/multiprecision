@@ -78,7 +78,7 @@ void do_serialize(Archive& ar, Int& val, mpl::true_ const&, mpl::false_ const&, 
    ar & s;
    limb_type* pl = val.limbs();
    std::size_t limb_count = val.size();
-   std::size_t byte_count = limb_count * sizeof(limb_count);
+   std::size_t byte_count = limb_count * sizeof(limb_type);
    ar & byte_count;
 
    for(std::size_t i = 0; i < limb_count; ++i)
