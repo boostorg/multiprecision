@@ -15,6 +15,7 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
+#include <boost/exception/all.hpp>
 
 
 #ifndef BOOST_MP_TEST_FLOAT_SERIAL_HPP
@@ -48,33 +49,45 @@ void test()
    while(true)
    {
       T val = generate_random<T>(boost::math::tools::digits<T>());
-      std::stringstream ss;
-      boost::archive::text_oarchive oa(ss);
-      oa << static_cast<const T&>(val);
-      boost::archive::text_iarchive ia(ss);
-      T val2;
-      ia >> val2;
-      BOOST_CHECK_EQUAL(val, val2);
-      ss.clear();
-      boost::archive::binary_oarchive ba(ss);
-      ba << static_cast<const T&>(val);
-      boost::archive::binary_iarchive ib(ss);
-      ib >> val2;
-      BOOST_CHECK_EQUAL(val, val2);
+      try{
+         std::stringstream ss;
+         boost::archive::text_oarchive oa(ss);
+         oa << static_cast<const T&>(val);
+         boost::archive::text_iarchive ia(ss);
+         T val2;
+         ia >> val2;
+         BOOST_CHECK_EQUAL(val, val2);
+         ss.clear();
+         boost::archive::binary_oarchive ba(ss);
+         ba << static_cast<const T&>(val);
+         boost::archive::binary_iarchive ib(ss);
+         ib >> val2;
+         BOOST_CHECK_EQUAL(val, val2);
       
-      val = -val;
-      ss.clear();
-      boost::archive::text_oarchive oa2(ss);
-      oa2 << static_cast<const T&>(val);
-      boost::archive::text_iarchive ia2(ss);
-      ia2 >> val2;
-      BOOST_CHECK_EQUAL(val, val2);
-      ss.clear();
-      boost::archive::binary_oarchive ba2(ss);
-      ba2 << static_cast<const T&>(val);
-      boost::archive::binary_iarchive ib2(ss);
-      ib2 >> val2;
-      BOOST_CHECK_EQUAL(val, val2);
+         val = -val;
+         ss.clear();
+         boost::archive::text_oarchive oa2(ss);
+         oa2 << static_cast<const T&>(val);
+         boost::archive::text_iarchive ia2(ss);
+         ia2 >> val2;
+         BOOST_CHECK_EQUAL(val, val2);
+         ss.clear();
+         boost::archive::binary_oarchive ba2(ss);
+         ba2 << static_cast<const T&>(val);
+         boost::archive::binary_iarchive ib2(ss);
+         ib2 >> val2;
+         BOOST_CHECK_EQUAL(val, val2);
+      }
+      catch(const boost::exception& e)
+      {
+         std::cout << "Caught boost::exception with:\n";
+         std::cout << diagnostic_information(e);
+      }
+      catch(const std::exception& e)
+      {
+         std::cout << "Caught std::exception with:\n";
+         std::cout << e.what() << std::endl;
+      }
       //
       // Check to see if test is taking too long.
       // Tests run on the compiler farm time out after 300 seconds,

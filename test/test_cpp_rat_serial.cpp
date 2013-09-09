@@ -24,6 +24,7 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
+#include <boost/exception/all.hpp>
 
 template <class T>
 T generate_random(unsigned bits_wanted)
@@ -65,20 +66,33 @@ template <class T>
 void test_neg(const T& x, const boost::mpl::true_&)
 {
    T val = -x;
-   std::stringstream ss;
-   boost::archive::text_oarchive oa(ss);
-   oa << static_cast<const T&>(val);
-   boost::archive::text_iarchive ia(ss);
-   T val2;
-   ia >> val2;
-   BOOST_CHECK_EQUAL(val, val2);
+   try
+   {
+      std::stringstream ss;
+      boost::archive::text_oarchive oa(ss);
+      oa << static_cast<const T&>(val);
+      boost::archive::text_iarchive ia(ss);
+      T val2;
+      ia >> val2;
+      BOOST_CHECK_EQUAL(val, val2);
 
-   ss.clear();
-   boost::archive::binary_oarchive ob(ss);
-   ob << static_cast<const T&>(val);
-   boost::archive::binary_iarchive ib(ss);
-   ib >> val2;
-   BOOST_CHECK_EQUAL(val, val2);
+      ss.clear();
+      boost::archive::binary_oarchive ob(ss);
+      ob << static_cast<const T&>(val);
+      boost::archive::binary_iarchive ib(ss);
+      ib >> val2;
+      BOOST_CHECK_EQUAL(val, val2);
+   }
+   catch(const boost::exception& e)
+   {
+      std::cout << "Caught boost::exception with:\n";
+      std::cout << diagnostic_information(e);
+   }
+   catch(const std::exception& e)
+   {
+      std::cout << "Caught std::exception with:\n";
+      std::cout << e.what() << std::endl;
+   }
 }
 template <class T>
 void test_neg(const T& , const boost::mpl::false_&){}
@@ -95,20 +109,33 @@ void test()
    while(true)
    {
       T val(generate_random<typename component_type<T>::type>(d(gen)), generate_random<typename component_type<T>::type>(d(gen)));
-      std::stringstream ss;
-      boost::archive::text_oarchive oa(ss);
-      oa << static_cast<const T&>(val);
-      boost::archive::text_iarchive ia(ss);
-      T val2;
-      ia >> val2;
-      BOOST_CHECK_EQUAL(val, val2);
+      try
+      {
+         std::stringstream ss;
+         boost::archive::text_oarchive oa(ss);
+         oa << static_cast<const T&>(val);
+         boost::archive::text_iarchive ia(ss);
+         T val2;
+         ia >> val2;
+         BOOST_CHECK_EQUAL(val, val2);
 
-      ss.clear();
-      boost::archive::binary_oarchive ob(ss);
-      ob << static_cast<const T&>(val);
-      boost::archive::binary_iarchive ib(ss);
-      ib >> val2;
-      BOOST_CHECK_EQUAL(val, val2);
+         ss.clear();
+         boost::archive::binary_oarchive ob(ss);
+         ob << static_cast<const T&>(val);
+         boost::archive::binary_iarchive ib(ss);
+         ib >> val2;
+         BOOST_CHECK_EQUAL(val, val2);
+      }
+      catch(const boost::exception& e)
+      {
+         std::cout << "Caught boost::exception with:\n";
+         std::cout << diagnostic_information(e);
+      }
+      catch(const std::exception& e)
+      {
+         std::cout << "Caught std::exception with:\n";
+         std::cout << e.what() << std::endl;
+      }
       
       test_neg(val, boost::mpl::bool_<std::numeric_limits<T>::is_signed>());
 

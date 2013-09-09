@@ -21,7 +21,7 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
-
+#include <boost/exception/all.hpp>
 
 template <class T>
 void test64()
@@ -1032,6 +1032,9 @@ void test64()
       };
 
    std::ifstream is("cpp_int64_serial64.txt");
+   std::cout << "Testing cpp_int64_serial64.txt with T=" << typeid(T).name() << std::endl;
+   is.peek();
+   BOOST_CHECK(is.good());
    boost::archive::text_iarchive ia(is);
    for(unsigned i = 0; i < sizeof(text_array) / sizeof(text_array[0]); ++i)
    {
@@ -1041,6 +1044,9 @@ void test64()
    }
 
    std::ifstream is2("cpp_int64_serial32.txt");
+   std::cout << "Testing cpp_int64_serial32.txt with T=" << typeid(T).name() << std::endl;
+   is2.peek();
+   BOOST_CHECK(is2.good());
    boost::archive::text_iarchive ia2(is2);
    for(unsigned i = 0; i < sizeof(text_array) / sizeof(text_array[0]); ++i)
    {
@@ -2059,21 +2065,53 @@ void test128()
    };
 
    std::ifstream is("cpp_int128_serial64.txt");
+   std::cout << "Testing cpp_int128_serial64.txt with T=" << typeid(T).name() << std::endl;
+   is.peek();
+   BOOST_CHECK(is.good());
    boost::archive::text_iarchive ia(is);
    for(unsigned i = 0; i < sizeof(text_array) / sizeof(text_array[0]); ++i)
    {
-      T val;
-      ia >> val;
-      BOOST_CHECK_EQUAL(val, T(text_array[i]));
+      try
+      {
+         T val;
+         ia >> val;
+         BOOST_CHECK_EQUAL(val, T(text_array[i]));
+      }
+      catch(const boost::exception& e)
+      {
+         std::cout << "Caught boost::exception with:\n";
+         std::cout << diagnostic_information(e);
+      }
+      catch(const std::exception& e)
+      {
+         std::cout << "Caught std::exception with:\n";
+         std::cout << e.what() << std::endl;
+      }
    }
 
    std::ifstream is2("cpp_int128_serial32.txt");
+   std::cout << "Testing cpp_int128_serial32.txt with T=" << typeid(T).name() << std::endl;
+   is2.peek();
+   BOOST_CHECK(is2.good());
    boost::archive::text_iarchive ia2(is2);
    for(unsigned i = 0; i < sizeof(text_array) / sizeof(text_array[0]); ++i)
    {
-      T val;
-      ia2 >> val;
-      BOOST_CHECK_EQUAL(val, T(text_array[i]));
+      try
+      {
+         T val;
+         ia2 >> val;
+         BOOST_CHECK_EQUAL(val, T(text_array[i]));
+      }
+      catch(const boost::exception& e)
+      {
+         std::cout << "Caught boost::exception with:\n";
+         std::cout << diagnostic_information(e);
+      }
+      catch(const std::exception& e)
+      {
+         std::cout << "Caught std::exception with:\n";
+         std::cout << e.what() << std::endl;
+      }
    }
 }
 
@@ -3086,21 +3124,53 @@ void test1024()
    };
 
    std::ifstream is("cpp_int1024_serial64.txt");
+   std::cout << "Testing cpp_int1024_serial64.txt with T=" << typeid(T).name() << std::endl;
+   is.peek();
+   BOOST_CHECK(is.good());
    boost::archive::text_iarchive ia(is);
    for(unsigned i = 0; i < sizeof(text_array) / sizeof(text_array[0]); ++i)
    {
-      T val;
-      ia >> val;
-      BOOST_CHECK_EQUAL(val, T(text_array[i]));
+      try
+      {
+         T val;
+         ia >> val;
+         BOOST_CHECK_EQUAL(val, T(text_array[i]));
+      }
+      catch(const boost::exception& e)
+      {
+         std::cout << "Caught boost::exception with:\n";
+         std::cout << diagnostic_information(e);
+      }
+      catch(const std::exception& e)
+      {
+         std::cout << "Caught std::exception with:\n";
+         std::cout << e.what() << std::endl;
+      }
    }
 
    std::ifstream is2("cpp_int1024_serial32.txt");
+   std::cout << "Testing cpp_int1024_serial32.txt with T=" << typeid(T).name() << std::endl;
+   is2.peek();
+   BOOST_CHECK(is2.good());
    boost::archive::text_iarchive ia2(is2);
    for(unsigned i = 0; i < sizeof(text_array) / sizeof(text_array[0]); ++i)
    {
-      T val;
-      ia2 >> val;
-      BOOST_CHECK_EQUAL(val, T(text_array[i]));
+      try
+      {
+         T val;
+         ia2 >> val;
+         BOOST_CHECK_EQUAL(val, T(text_array[i]));
+      }
+      catch(const boost::exception& e)
+      {
+         std::cout << "Caught boost::exception with:\n";
+         std::cout << diagnostic_information(e);
+      }
+      catch(const std::exception& e)
+      {
+         std::cout << "Caught std::exception with:\n";
+         std::cout << e.what() << std::endl;
+      }
    }
 }
 
