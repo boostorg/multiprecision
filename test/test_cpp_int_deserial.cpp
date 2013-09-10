@@ -22,6 +22,10 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/exception/all.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/fstream.hpp>
+
+boost::filesystem::path root;
 
 template <class T>
 void test64()
@@ -1031,7 +1035,7 @@ void test64()
       "-30820"
       };
 
-   std::ifstream is("cpp_int64_serial64.txt");
+   boost::filesystem::ifstream is(root / "cpp_int64_serial64.txt");
    std::cout << "Testing cpp_int64_serial64.txt with T=" << typeid(T).name() << std::endl;
    is.peek();
    BOOST_CHECK(is.good());
@@ -1043,7 +1047,7 @@ void test64()
       BOOST_CHECK_EQUAL(val, T(text_array[i]));
    }
 
-   std::ifstream is2("cpp_int64_serial32.txt");
+   boost::filesystem::ifstream is2(root / "cpp_int64_serial32.txt");
    std::cout << "Testing cpp_int64_serial32.txt with T=" << typeid(T).name() << std::endl;
    is2.peek();
    BOOST_CHECK(is2.good());
@@ -2064,7 +2068,7 @@ void test128()
       "-375838207",
    };
 
-   std::ifstream is("cpp_int128_serial64.txt");
+   boost::filesystem::ifstream is(root / "cpp_int128_serial64.txt");
    std::cout << "Testing cpp_int128_serial64.txt with T=" << typeid(T).name() << std::endl;
    is.peek();
    BOOST_CHECK(is.good());
@@ -2089,7 +2093,7 @@ void test128()
       }
    }
 
-   std::ifstream is2("cpp_int128_serial32.txt");
+   boost::filesystem::ifstream is2(root / "cpp_int128_serial32.txt");
    std::cout << "Testing cpp_int128_serial32.txt with T=" << typeid(T).name() << std::endl;
    is2.peek();
    BOOST_CHECK(is2.good());
@@ -3123,7 +3127,7 @@ void test1024()
       "-1604105217156493424796219158328988017738562338480346273566670218046",
    };
 
-   std::ifstream is("cpp_int1024_serial64.txt");
+   boost::filesystem::ifstream is(root / "cpp_int1024_serial64.txt");
    std::cout << "Testing cpp_int1024_serial64.txt with T=" << typeid(T).name() << std::endl;
    is.peek();
    BOOST_CHECK(is.good());
@@ -3148,7 +3152,7 @@ void test1024()
       }
    }
 
-   std::ifstream is2("cpp_int1024_serial32.txt");
+   boost::filesystem::ifstream is2(root / "cpp_int1024_serial32.txt");
    std::cout << "Testing cpp_int1024_serial32.txt with T=" << typeid(T).name() << std::endl;
    is2.peek();
    BOOST_CHECK(is2.good());
@@ -3174,8 +3178,13 @@ void test1024()
    }
 }
 
-int main()
+int main(int argc, char const* argv[])
 {
+   if(argc == 2)
+   {
+      root = argv[1];
+      std::cout << "Setting root directory to " << argv[1] << std::endl;
+   }
    using namespace boost::multiprecision;
    test64<cpp_int>();
    test64<number<cpp_int_backend<64, 64> > >();
