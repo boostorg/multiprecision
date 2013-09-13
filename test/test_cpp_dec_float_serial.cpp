@@ -26,7 +26,7 @@ int main()
 #ifdef TEST1
    test<cpp_dec_float_50>();
 #endif
-#ifndef TEST2
+#ifdef TEST2
    test<number<cpp_dec_float<100, boost::int64_t, std::allocator<void> > > >();
 #endif
    return boost::report_errors();
