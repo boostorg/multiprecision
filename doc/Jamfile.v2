@@ -74,8 +74,7 @@ boostbook standalone
         <format>pdf:<xsl:param>index.on.type=1
     ;
 
-install pdf-install : standalone : <location>. <install-type>PDF <name>multiprecision.pdf ;
-
-
+install pdfinstall : standalone/<format>pdf : <location>. <install-type>PDF <name>multiprecision.pdf ;
+explicit pdfinstall ;
 
 
