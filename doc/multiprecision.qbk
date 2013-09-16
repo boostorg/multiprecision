@@ -63,6 +63,11 @@
 [def __gmp_rational [link boost_multiprecision.tut.rational.gmp_rational gmp_rational]]
 [def __cpp_rational [link boost_multiprecision.tut.rational.cpp_rational cpp_rational]]
 [def __tommath_rational [link boost_multiprecision.tut.rational.tommath_rational tommath_rational]]
+[def __number [link boost_multiprecision.ref.number number]]
+[def __float128 [link boost_multiprecision.tut.floats.float128 float128]]
+[def __debug_adaptor [link boost_multiprecision.tut.misc.debug_adaptor debug_adaptor]]
+[def __logged_adaptor [link boost_multiprecision.tut.misc.logged_adaptor logged_adaptor]]
+[def __rational_adaptor [link boost_multiprecision.tut.rational.rational_adaptor rational_adaptor]]
 
 [section:intro Introduction]
 
@@ -1844,6 +1849,16 @@ Returns the integer square root `s` of x and sets `r` to the remainder ['x - s[s
 
 The regular Miller-Rabin functions in `<boost/multiprecision/miller_rabin.hpp>` are defined in terms of the above
 generic operations, and so function equally well for built in and multiprecision types.
+
+[endsect]
+
+[section:serial Boost.Serialization Support]
+
+Support for serialization comes in two forms:
+
+* Classes __number, __debug_adaptor, __logged_adaptor and __rational_adaptor have "pass through" serialization 
+support which requires the underlying backend to be serializable.
+* Backends __cpp_int, __cpp_dec_float and __float128 have full support for Boost.Serialization.
 
 [endsect]
 
@@ -3863,6 +3878,13 @@ Windows Vista machine.
 [section:map Roadmap]
 
 [section:hist History]
+
+[h4 1.56]
+
+* Added support for Boost.Serialization.
+* Suppressed some GCC warnings.  See [@https://svn.boost.org/trac/boost/ticket/8872 8872].
+* Fixed bug in pow for large integer arguments.  See [@https://svn.boost.org/trac/boost/ticket/8809 8809].
+* Fixed bug in pow for calculation of 0[super N].  See [@https://svn.boost.org/trac/boost/ticket/8798 8798].
 
 [h4 1.55]
 
