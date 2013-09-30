@@ -3879,15 +3879,12 @@ Windows Vista machine.
 
 [section:hist History]
 
-[h4 1.56]
+[h4 1.55]
 
 * Added support for Boost.Serialization.
 * Suppressed some GCC warnings.  See [@https://svn.boost.org/trac/boost/ticket/8872 8872].
 * Fixed bug in pow for large integer arguments.  See [@https://svn.boost.org/trac/boost/ticket/8809 8809].
 * Fixed bug in pow for calculation of 0[super N].  See [@https://svn.boost.org/trac/boost/ticket/8798 8798].
-
-[h4 1.55]
-
 * Fixed bug in fixed precision cpp_int IO code that causes conversion to string to fail when the
 bit count is very small (less than CHAR_BIT).  See [@https://svn.boost.org/trac/boost/ticket/8745 8745].
 * Fixed bug in cpp_int that causes left shift to fail when a fixed precision type would overflow.
@@ -4101,4 +4098,5 @@ Donald E. Knuth, Volume 2: Seminumerical Algorithms, Third Edition
 [index]
 
 [endsect]
+
 
