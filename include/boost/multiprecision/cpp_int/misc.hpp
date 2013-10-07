@@ -240,6 +240,31 @@ inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBit
    r.sign(x.sign());
 }
 
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
+   eval_qr(
+      const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& x,
+      limb_type y,
+      cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& q,
+      cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& r) BOOST_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
+{
+   divide_unsigned_helper(&q, x, y, r);
+   q.sign(x.sign());
+   r.sign(x.sign());
+}
+
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, class U>
+inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
+   eval_qr(
+      const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& x,
+      U y,
+      cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& q,
+      cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& r) BOOST_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
+{
+   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> t(y);
+   eval_qr(x, t, q, r);
+}
+
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, class Integer>
 inline typename enable_if_c<is_unsigned<Integer>::value && !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value, Integer>::type
    eval_integer_modulus(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& x, Integer val)
