@@ -506,12 +506,8 @@ public:
    {
       if(this != &o)
       {
-         resize(o.size(), o.size());
-#if BOOST_WORKAROUND(BOOST_MSVC, >= 1600)
-         std::copy(o.limbs(), o.limbs() + o.size(), stdext::checked_array_iterator<limb_pointer>(limbs(), size()));
-#else
-         std::copy(o.limbs(), o.limbs() + o.size(), limbs());
-#endif
+         m_limbs = o.m_limbs;
+         std::memcpy(limbs(), o.limbs(), o.size() * sizeof(o.limbs()[0]));
          m_sign = o.m_sign;
       }
    }
@@ -643,12 +639,8 @@ public:
    {
       if(this != &o)
       {
-         resize(o.size(), o.size());
-#if BOOST_WORKAROUND(BOOST_MSVC, >= 1600)
-         std::copy(o.limbs(), o.limbs() + o.size(), stdext::checked_array_iterator<limb_pointer>(limbs(), size()));
-#else
-         std::copy(o.limbs(), o.limbs() + o.size(), limbs());
-#endif
+         m_limbs = o.m_limbs;
+         std::memcpy(limbs(), o.limbs(), o.size() * sizeof(limbs()[0]));
       }
    }
 private:
