@@ -254,13 +254,13 @@ inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBit
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, class U>
-inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
-   eval_qr(
+inline typename enable_if_c<is_integral<U>::value>::type eval_qr(
       const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& x,
       U y,
       cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& q,
       cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& r) BOOST_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
 {
+   using default_ops::eval_qr;
    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> t(y);
    eval_qr(x, t, q, r);
 }
