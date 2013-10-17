@@ -488,8 +488,11 @@ void eval_asin(T& result, const T& x)
 
    result = fp_type(std::asin(dd));
 
+   unsigned current_digits = std::numeric_limits<double>::digits - 5;
+   unsigned target_precision = boost::multiprecision::detail::digits2<number<T, et_on> >::value;
+
    // Newton-Raphson iteration
-   while(true)
+   while(current_digits < target_precision)
    {
       T s, c;
       eval_sin(s, result);
@@ -498,6 +501,8 @@ void eval_asin(T& result, const T& x)
       eval_divide(s, c);
       eval_subtract(result, s);
 
+      current_digits *= 2;
+      /*
       T lim;
       eval_ldexp(lim, result, 1 - boost::multiprecision::detail::digits2<number<T, et_on> >::value);
       if(eval_get_sign(s) < 0)
@@ -506,6 +511,7 @@ void eval_asin(T& result, const T& x)
          lim.negate();
       if(lim.compare(s) >= 0)
          break;
+         */
    }
    if(b_neg)
       result.negate();

@@ -227,7 +227,7 @@ void eval_exp(T& result, const T& x)
       xx.negate();
 
    // Check the range of the argument.
-   static const canonical_exp_type maximum_arg_for_exp = std::numeric_limits<number<T, et_on> >::max_exponent == 0 ? (std::numeric_limits<long>::max)() : std::numeric_limits<number<T, et_on> >::max_exponent;
+   static const canonical_exp_type maximum_arg_for_exp = std::numeric_limits<number<T, et_on> >::max_exponent == 0 ? static_cast<canonical_exp_type>((std::numeric_limits<long>::max)()) : std::numeric_limits<number<T, et_on> >::max_exponent;
 
    if(xx.compare(maximum_arg_for_exp) >= 0)
    {

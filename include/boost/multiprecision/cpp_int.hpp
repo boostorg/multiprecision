@@ -283,7 +283,7 @@ public:
    }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    cpp_int_base(cpp_int_base&& o)
-      : allocator_type(static_cast<Allocator&&>(o)), m_limbs(o.m_limbs), m_sign(o.m_sign), m_internal(o.m_internal)
+      : allocator_type(static_cast<allocator_type&&>(o)), m_limbs(o.m_limbs), m_sign(o.m_sign), m_internal(o.m_internal)
    {
       if(m_internal)
       {
@@ -300,7 +300,7 @@ public:
    {
       if(!m_internal)
          allocator().deallocate(m_data.ld.data, m_data.ld.capacity);
-      *static_cast<Allocator*>(this) = static_cast<Allocator&&>(o);
+      *static_cast<allocator_type*>(this) = static_cast<allocator_type&&>(o);
       m_limbs = o.m_limbs;
       m_sign = o.m_sign;
       m_internal = o.m_internal;
