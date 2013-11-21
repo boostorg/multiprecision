@@ -70,8 +70,8 @@ public:
    static const boost::int32_t cpp_dec_float_digits10          = ((cpp_dec_float_digits10_setting < cpp_dec_float_digits10_limit_lo) ? cpp_dec_float_digits10_limit_lo : ((cpp_dec_float_digits10_setting > cpp_dec_float_digits10_limit_hi) ? cpp_dec_float_digits10_limit_hi : cpp_dec_float_digits10_setting));
    static const ExponentType cpp_dec_float_max_exp10         = (static_cast<ExponentType>(1) << (std::numeric_limits<ExponentType>::digits - 5));
    static const ExponentType cpp_dec_float_min_exp10         = -cpp_dec_float_max_exp10;
-   static const ExponentType cpp_dec_float_max_exp           = static_cast<ExponentType>((cpp_dec_float_max_exp10 / 301LL) * 1000LL);
-   static const ExponentType cpp_dec_float_min_exp           = static_cast<ExponentType>((cpp_dec_float_min_exp10 / 301LL) * 1000LL);
+   static const ExponentType cpp_dec_float_max_exp           = cpp_dec_float_max_exp10;
+   static const ExponentType cpp_dec_float_min_exp           = cpp_dec_float_min_exp10;
 
    BOOST_STATIC_ASSERT((cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_max_exp10 == -cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_min_exp10));
 
