@@ -227,17 +227,6 @@ void eval_exp(T& result, const T& x)
       xx.negate();
 
    // Check the range of the argument.
-   static const canonical_exp_type maximum_arg_for_exp = std::numeric_limits<number<T, et_on> >::max_exponent == 0 ? static_cast<canonical_exp_type>((std::numeric_limits<long>::max)()) : std::numeric_limits<number<T, et_on> >::max_exponent;
-
-   if(xx.compare(maximum_arg_for_exp) >= 0)
-   {
-      // Overflow / underflow
-      if(isneg)
-         result = ui_type(0);
-      else
-         result = std::numeric_limits<number<T, et_on> >::has_infinity ? std::numeric_limits<number<T, et_on> >::infinity().backend() : (std::numeric_limits<number<T, et_on> >::max)().backend();
-      return;
-   }
    if(xx.compare(si_type(1)) <= 0)
    {
       //

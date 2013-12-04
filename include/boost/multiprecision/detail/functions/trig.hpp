@@ -39,7 +39,7 @@ void hyp0F1(T& result, const T& b, const T& x)
       tol.negate();
    T term;
 
-   static const unsigned series_limit = 
+   static const int series_limit = 
       boost::multiprecision::detail::digits2<number<T, et_on> >::value < 100
       ? 100 : boost::multiprecision::detail::digits2<number<T, et_on> >::value;
    // Series expansion of hyperg_0f1(; b; x).

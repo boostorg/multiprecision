@@ -369,7 +369,7 @@ cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& cpp_bin_float
          cpp_int q, r;
          divide_qr(n, d, q, r);
          int gb = msb(q);
-         BOOST_ASSERT((gb >= cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1));
+         BOOST_ASSERT((gb >= static_cast<int>(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count) - 1));
          //
          // Check for rounding conditions we have to
          // handle ourselves:
