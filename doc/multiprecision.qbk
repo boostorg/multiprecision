@@ -711,9 +711,9 @@ is completely opaque, the suggestion would be to use an allocator with `void` `v
 The final template parameters determine the type and range of the exponent: parameter `Exponent` can be
 any signed integer type, but note that `MinExponent` and `MaxExponent` can not go right up to the limits
 of the `Exponent` type as there has to be a little extra headroom for internal calculations.  You will 
-get a compile time error if if this is the case.  In addition if MinExponent or MaxExponent are zero, then
+get a compile time error if this is the case.  In addition if MinExponent or MaxExponent are zero, then
 the library will choose suitable values that are as large as possible given the constraints of the type
-and need for extra headhoom for internal calculations.
+and need for extra headroom for internal calculations.
 
 There is full standard library and `numeric_limits` support available for this type.
 
@@ -729,7 +729,7 @@ for example you can convert from `number<cpp_bin_float<50> >` to `number<cpp_bin
 Narrowing conversions round to nearest and are `explicit`.
 * Conversion from a string results in a `std::runtime_error` being thrown if the string can not be interpreted
 as a valid floating point number.
-* All arithmetic operations are correctly rounded to nearest.  String comversions and the `sqrt` function
+* All arithmetic operations are correctly rounded to nearest.  String conversions and the `sqrt` function
 are also correctly rounded, but transcendental functions (sin, cos, pow, exp etc) are not.
 
 [h5 cpp_bin_float example:]
@@ -2204,7 +2204,7 @@ then the final string will match the original 15 decimal digit string.
 * If a `double` floating-point number is converted to a decimal string
 with at least 17 decimal digits
 and then converted back to `double`,
-then the result will be binary indentical to the original `double` value.
+then the result will be binary identical to the original `double` value.
 
 For most purposes, you will much more likely want
 `std::numeric_limits<>::max_digits10`,
@@ -2465,7 +2465,7 @@ the maximum potential error caused by rounding.  For typical floating-point type
 [round_error_1]
 
 There are, of course, many occasions when much bigger loss of precision occurs,
-for exampe, caused by
+for example, caused by
 [@http://en.wikipedia.org/wiki/Loss_of_significance Loss of significance or cancellation error]
 or very many iterations.
 
@@ -2652,7 +2652,7 @@ There appears to be no way to tell these apart from rational types, unless they 
 
    std::numeric_limits<T>::is_exact == false
 
-This is because these types are in essense a rational type with a fixed denominator.
+This is because these types are in essence a rational type with a fixed denominator.
 
 [h4 Floating Point Types]
 
@@ -2767,7 +2767,7 @@ with the extra stipulation that the error should have a correct sign
 for the current rounding direction."]]
 
 So not only is correct rounding for the full number of digits not required,
-but even if the *optional* recomended practice is followed,
+but even if the *optional* recommended practice is followed,
 then the value of these last few digits is unspecified
 as long as the value is within certain bounds.
 
@@ -3037,7 +3037,7 @@ Class `number` has two template arguments:
 [[Backend][The actual arithmetic back-end that does all the work.]]
 [[ExpressionTemplates][A Boolean value: when `et_on`, then expression templates are enabled, otherwise when set to `et_off` they are disabled.
    The default for this parameter is computed via the traits class `expression_template_default` whose member `value` defaults to `et_on` unless
-   the the traits class is specialized for a particular backend.]]
+   the traits class is specialized for a particular backend.]]
 ]
 
    number();
@@ -3707,7 +3707,7 @@ The class takes six template parameters:
 
 [variablelist
 [[Digits][The number of digits precision the type
-should support.  This is normally expresed as base-10 digits, but that can be changed via the second template parameter.]]
+should support.  This is normally expressed as base-10 digits, but that can be changed via the second template parameter.]]
 [[base][An enumerated value (either `digit_base_10` or `digit_base_2`) that indicates whether `Digits` is base-10 or base-2]]
 [[Allocator][The allocator used: defaults to type `void`, meaning all storage is within the class, and no dynamic
 allocation is performed, but can be set to a standard library allocator if dynamic allocation makes more sense.]]
@@ -3761,7 +3761,7 @@ again until we have an unambiguously rounded result.
 Binary to decimal conversion proceeds very similarly to the above, our aim is to calculate
 `mantissa * 2^shift * 10^E` where `E` is the decimal exponent and `shift` is calculated
 so that the result is an N bit integer assuming we want N digits printed in the result.
-As before we use limitted precision arithmetic to calculate the result and up the
+As before we use limited precision arithmetic to calculate the result and up the
 precision as necessary until the result is unambiguously correctly rounded.  In addition
 our initial calculation of the decimal exponent may be out by 1, so we have to correct
 that and loop as well in the that case.
@@ -4276,7 +4276,7 @@ in point of fact this naming convention shouldn't be necessary, but rather works
 [[detail/generic_interconvert.hpp][Generic interconversion routines.]]
 [[detail/number_base.hpp][All the expression template code, metaprogramming, and operator overloads for `number`.]]
 [[detail/no_et_ops.hpp][The non-expression template operators.]]
-[[defail/functions/constants.hpp][Defines constants used by the floating point functions.]]
+[[detail/functions/constants.hpp][Defines constants used by the floating point functions.]]
 [[detail/functions/pow.hpp][Defines default versions of the power and exponential related floating point functions.]]
 [[detail/functions/trig.hpp][Defines default versions of the trigonometric related floating point functions.]]
 ]
