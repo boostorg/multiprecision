@@ -1730,8 +1730,7 @@ struct gmp_rational
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    gmp_rational(gmp_rational&& o) BOOST_NOEXCEPT
    {
-      m_data[0]._mp_num = o.data()[0]._mp_num;
-      m_data[0]._mp_den = o.data()[0]._mp_den;
+      m_data[0] = o.m_data[0];
       o.m_data[0]._mp_num._mp_d = 0;
       o.m_data[0]._mp_den._mp_d = 0;
    }
