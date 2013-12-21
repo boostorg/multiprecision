@@ -103,10 +103,10 @@
           and <code class="computeroutput"><span class="identifier">MaxExponent</span></code> can not
           go right up to the limits of the <code class="computeroutput"><span class="identifier">Exponent</span></code>
           type as there has to be a little extra headroom for internal calculations.
-          You will get a compile time error if if this is the case. In addition if
-          MinExponent or MaxExponent are zero, then the library will choose suitable
-          values that are as large as possible given the constraints of the type
-          and need for extra headhoom for internal calculations.
+          You will get a compile time error if this is the case. In addition if MinExponent
+          or MaxExponent are zero, then the library will choose suitable values that
+          are as large as possible given the constraints of the type and need for
+          extra headroom for internal calculations.
         </p>
 <p>
           There is full standard library and <code class="computeroutput"><span class="identifier">numeric_limits</span></code>
@@ -146,7 +146,7 @@
             </li>
 <li class="listitem">
               All arithmetic operations are correctly rounded to nearest. String
-              comversions and the <code class="computeroutput"><span class="identifier">sqrt</span></code>
+              conversions and the <code class="computeroutput"><span class="identifier">sqrt</span></code>
               function are also correctly rounded, but transcendental functions (sin,
               cos, pow, exp etc) are not.
             </li>
