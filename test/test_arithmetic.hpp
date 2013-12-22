@@ -1777,5 +1777,24 @@ void test()
    test_conditional(a, (a + 0));
 
    test_signed_ops<Real>(boost::mpl::bool_<std::numeric_limits<Real>::is_signed>());
+   //
+   // Test move:
+   //
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   Real m(static_cast<Real&&>(a));
+   BOOST_CHECK_EQUAL(m, 20);
+   // Move from already moved from object:
+   Real m2(static_cast<Real&&>(a));
+   // assign from moved from object 
+   // (may result in "a" being left in valid state as implementation artifact):
+   c = static_cast<Real&&>(a);
+   // assignment to moved-from objects:
+   c = static_cast<Real&&>(m);
+   BOOST_CHECK_EQUAL(c, 20);
+   m2 = c;
+   BOOST_CHECK_EQUAL(c, 20);
+   // Destructor of "a" checks destruction of moved-from-object...
+   Real m3(static_cast<Real&&>(a));
+#endif
 }
 

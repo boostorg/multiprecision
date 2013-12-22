@@ -58,7 +58,7 @@ struct tommath_int
    }
    tommath_int& operator = (tommath_int&& o)
    {
-      mp_exch(&m_data, &o.data());
+      mp_exch(&m_data, &o.m_data);
       return *this;
    }
 #endif
