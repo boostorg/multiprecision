@@ -359,6 +359,13 @@ public:
          BOOST_ASSERT(eval_is_zero(m_data));
       }
    }
+   template<class Archive>
+   void serialize(Archive & ar, const unsigned int /*version*/)
+   {
+      ar & m_data;
+      ar & m_exponent;
+      ar & m_sign;
+   }
 };
 
 #ifdef BOOST_MSVC

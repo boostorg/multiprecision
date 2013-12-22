@@ -1949,7 +1949,7 @@ Support for serialization comes in two forms:
 
 * Classes __number, __debug_adaptor, __logged_adaptor and __rational_adaptor have "pass through" serialization 
 support which requires the underlying backend to be serializable.
-* Backends __cpp_int, __cpp_dec_float and __float128 have full support for Boost.Serialization.
+* Backends __cpp_int, __cpp_bin_float, __cpp_dec_float and __float128 have full support for Boost.Serialization.
 
 [endsect]
 

@@ -630,6 +630,8 @@ run test_adapt_serial.cpp ../../serialization/build//boost_serialization : : : r
 run test_cpp_dec_float_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST1 : test_cpp_dec_float_serial_1 ;
 run test_cpp_dec_float_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST2 : test_cpp_dec_float_serial_2 ;
 run test_float128_serial.cpp ../../serialization/build//boost_serialization quadmath : : : release [ check-target-builds ../config//has_float128 : : <build>no ]  ;
+run test_cpp_bin_float_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST1 : test_bin_dec_float_serial_1 ;
+run test_cpp_bin_float_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST2 : test_bin_dec_float_serial_2 ;
 
 
 if $(enable-specfun)
