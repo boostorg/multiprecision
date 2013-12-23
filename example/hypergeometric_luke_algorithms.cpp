@@ -19,24 +19,54 @@
 #include <limits>
 #include <numeric>
 #include <vector>
+#include <boost/chrono.hpp>
 
-#define USE_CPP_BIN_FLOAT
+//#define USE_CPP_BIN_FLOAT
 //#define USE_CPP_DEC_FLOAT
+//#define USE_MPFR
+
+#ifndef DIGIT_COUNT
+#error "No precision specificied - set the macro DIGIT_COUNT to the number of decimal digits to test"
+#endif
 
 #if defined(USE_CPP_BIN_FLOAT) && defined(USE_CPP_DEC_FLOAT)
   #error the multiple precision type is ambiguous
 #elif defined(USE_CPP_BIN_FLOAT)
   #include <boost/multiprecision/cpp_bin_float.hpp>
-  typedef boost::multiprecision::number<boost::multiprecision::cpp_bin_float<110>, boost::multiprecision::et_off> mp_type;
+  typedef boost::multiprecision::number<boost::multiprecision::cpp_bin_float<DIGIT_COUNT> > mp_type;
 #elif defined(USE_CPP_DEC_FLOAT)
   #include <boost/multiprecision/cpp_dec_float.hpp>
-  typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<110>, boost::multiprecision::et_off> mp_type;
+  typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<DIGIT_COUNT> > mp_type;
+#elif defined(USE_MPFR)
+  #include <boost/multiprecision/mpfr.hpp>
+  typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<DIGIT_COUNT> > mp_type;
 #else
   #error no multiple precision type is defined
 #endif
 
 #include <boost/math/constants/constants.hpp>
 #include <boost/noncopyable.hpp>
+
+template <class Clock>
+struct stopwatch
+{
+   typedef typename Clock::duration duration;
+   stopwatch()
+   {
+      m_start = Clock::now();
+   }
+   duration elapsed()
+   {
+      return Clock::now() - m_start;
+   }
+   void reset()
+   {
+      m_start = Clock::now();
+   }
+
+private:
+   typename Clock::time_point m_start;
+};
 
 namespace my_math
 {
@@ -268,7 +298,7 @@ namespace util
                                                                           
     T1 operator()(const T1& sum, const T2& ck)
     {
-      const T1 the_sum = (!b_neg_term ? (sum + ck) : (sum - ck));
+      const T1 the_sum = (!b_neg_term ? T1(sum + ck) : T1(sum - ck));
       b_neg_term = !b_neg_term;
       return the_sum + initial;
     }
@@ -671,6 +701,8 @@ mp_type examples::nr_006::luke_ccoef2_hyperg_2f1(const mp_type& a, const mp_type
 
 int main()
 {
+  stopwatch<boost::chrono::high_resolution_clock> w;
+
   std::vector<mp_type> hypergeometric_2f1_results(20U);
   std::vector<mp_type> hypergeometric_1f2_results(20U);
   std::vector<mp_type> hypergeometric_1f1_results(20U);
@@ -761,4 +793,7 @@ int main()
                             << h
                             << std::endl;
                 });
+  double t = boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
+  std::cout << "Total execution time = " << std::setprecision(3) << t << "s" << std::endl;
+  return 0;
 }
