@@ -1,9 +1,10 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Copyright Christopher Kormanyos 2013.
-// Distributed under the Boost
-// Software License, Version 1.0. (See accompanying file
-// LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+// Copyright John Maddock 2013.
+// Distributed under the Boost Software License,
+// Version 1.0. (See accompanying file LICENSE_1_0.txt
+// or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 // This work is based on an earlier work:
 // "Algorithm 910: A Portable C++ Multiple-Precision System for Special-Function Calculations",
@@ -19,53 +20,60 @@
 #include <limits>
 #include <numeric>
 #include <vector>
-#include <boost/chrono.hpp>
-
-//#define USE_CPP_BIN_FLOAT
-//#define USE_CPP_DEC_FLOAT
-//#define USE_MPFR
-
-#ifndef DIGIT_COUNT
-#error "No precision specificied - set the macro DIGIT_COUNT to the number of decimal digits to test"
-#endif
-
-#if defined(USE_CPP_BIN_FLOAT) && defined(USE_CPP_DEC_FLOAT)
-  #error the multiple precision type is ambiguous
-#elif defined(USE_CPP_BIN_FLOAT)
-  #include <boost/multiprecision/cpp_bin_float.hpp>
-  typedef boost::multiprecision::number<boost::multiprecision::cpp_bin_float<DIGIT_COUNT> > mp_type;
-#elif defined(USE_CPP_DEC_FLOAT)
-  #include <boost/multiprecision/cpp_dec_float.hpp>
-  typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<DIGIT_COUNT> > mp_type;
-#elif defined(USE_MPFR)
-  #include <boost/multiprecision/mpfr.hpp>
-  typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<DIGIT_COUNT> > mp_type;
-#else
-  #error no multiple precision type is defined
-#endif
-
 #include <boost/math/constants/constants.hpp>
 #include <boost/noncopyable.hpp>
 
-template <class Clock>
+//#define USE_CPP_BIN_FLOAT
+#define USE_CPP_DEC_FLOAT
+//#define USE_MPFR
+
+#if !defined(DIGIT_COUNT)
+#define DIGIT_COUNT 100
+#endif
+
+#define HAS_STD_CHRONO
+
+#if defined(HAS_STD_CHRONO)
+  #include <chrono>
+  #define STD_CHRONO std::chrono
+#else
+  #include <boost/chrono.hpp>
+  #define STD_CHRONO boost::chrono
+#endif
+
+#if defined(USE_CPP_BIN_FLOAT)
+  #include <boost/multiprecision/cpp_bin_float.hpp>
+  typedef boost::multiprecision::number<boost::multiprecision::cpp_bin_float<DIGIT_COUNT + 10> > mp_type;
+#elif defined(USE_CPP_DEC_FLOAT)
+  #include <boost/multiprecision/cpp_dec_float.hpp>
+  typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<DIGIT_COUNT + 10> > mp_type;
+#elif defined(USE_MPFR)
+  #include <boost/multiprecision/mpfr.hpp>
+  typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<DIGIT_COUNT + 10> > mp_type;
+#else
+  #error no multiprecision floating type is defined
+#endif
+
+template <class clock_type>
 struct stopwatch
 {
-   typedef typename Clock::duration duration;
-   stopwatch()
+public:
+   typedef typename clock_type::duration duration_type;
+
+   stopwatch() : m_start(clock_type::now()) { }
+
+   duration_type elapsed() const
    {
-      m_start = Clock::now();
+     return clock_type::now() - m_start;
    }
-   duration elapsed()
-   {
-      return Clock::now() - m_start;
-   }
+
    void reset()
    {
-      m_start = Clock::now();
+     m_start = clock_type::now();
    }
 
 private:
-   typename Clock::time_point m_start;
+   typename clock_type::time_point m_start;
 };
 
 namespace my_math
@@ -105,7 +113,7 @@ namespace orthogonal_polynomial_series
     // Compute the value of an orthogonal polynomial of one of the following types:
     // Chebyshev 1st, Chebyshev 2nd, Laguerre, or Hermite
 
-    if(vp != static_cast<std::vector<T>*>(0u))
+    if(vp != nullptr)
     {
       vp->clear();
       vp->reserve(static_cast<std::size_t>(n + 1u));
@@ -113,7 +121,7 @@ namespace orthogonal_polynomial_series
 
     T y0 = my_math::one();
 
-    if(vp != static_cast<std::vector<T>*>(0u))
+    if(vp != nullptr)
     {
       vp->push_back(y0);
     }
@@ -138,7 +146,7 @@ namespace orthogonal_polynomial_series
       y1 = x * static_cast<std::uint32_t>(2u);
     }
 
-    if(vp != static_cast<std::vector<T>*>(0u))
+    if(vp != nullptr)
     {
       vp->push_back(y1);
     }
@@ -153,10 +161,10 @@ namespace orthogonal_polynomial_series
     T c = my_math::one();
 
     T yk;
-  
+
     // Calculate higher orders using the recurrence relation.
-    // The direction of stability is upward recurrence.
-    for(std::int32_t k = static_cast<std::int32_t>(2); k <= static_cast<std::int32_t>(n); k++)
+    // The direction of stability is upward recursion.
+    for(std::int32_t k = static_cast<std::int32_t>(2); k <= static_cast<std::int32_t>(n); ++k)
     {
       if(type == laguerre_l_type)
       {
@@ -174,7 +182,7 @@ namespace orthogonal_polynomial_series
       y0 = y1;
       y1 = yk;
 
-      if(vp != static_cast<std::vector<T>*>(0u))
+      if(vp != nullptr)
       {
         vp->push_back(yk);
       }
@@ -215,7 +223,7 @@ mp_type my_math::chebyshev_u(const std::int32_t n, const mp_type& x)
 
     const mp_type y = chebyshev_u(n, -x);
 
-    return (!b_negate ? y : -y);
+    return ((!b_negate) ? y : -y);
   }
 
   if(n < static_cast<std::int32_t>(0))
@@ -288,99 +296,9 @@ mp_type my_math::laguerre   (const std::uint32_t n, const mp_type& x, std::vecto
 
 namespace util
 {
-  template<typename T1,
-           typename T2 = T1>
-  struct alternating_sum
-  {
-  public:
-    alternating_sum(const bool b_neg = false, const T2& init = T2(0)) : b_neg_term(b_neg),
-                                                                        initial   (init) { }
-                                                                          
-    T1 operator()(const T1& sum, const T2& ck)
-    {
-      const T1 the_sum = (!b_neg_term ? T1(sum + ck) : T1(sum - ck));
-      b_neg_term = !b_neg_term;
-      return the_sum + initial;
-    }
-
-  private:
-    bool b_neg_term;
-    const T2 initial;
-
-    const alternating_sum& operator=(const alternating_sum&);
-  };
-
-  template<typename T1,
-           typename T2 = T1>
-  struct point
-  {
-    T1 x;
-    T2 y;
-
-    point(const T1& X = T1(),
-          const T2& Y = T2()) : x(X), y(Y) { }
-  };
-
-  template<typename T1,
-           typename T2>
-  inline bool operator<(const point<T1, T2>& left,
-                        const point<T1, T2>& right)
-  {
-    return (left.x < right.x);
-  }
-
-  template<typename T1,
-           typename T2 = T1>
-  struct linear_interpolate
-  {
-    static T2 interpolate(const T1& x, const std::vector<util::point<T1, T2> >& points)
-    {
-      if(points.empty())
-      {
-        return T2(0);
-      }
-      else if(x <= points.front().x || points.size() == static_cast<std::size_t>(1u))
-      {
-        return points.front().y;
-      }
-      else if(x >= points.back().x)
-      {
-        return points.back().y;
-      }
-      else
-      {
-        const util::point<T1, T2> x_find(x);
-
-        const typename std::vector<util::point<T1, T2> >::const_iterator it =
-          std::lower_bound(points.begin(), points.end(), x_find);
-
-        const T1 xn            = (it - 1u)->x;
-        const T1 xnp1_minus_xn = it->x - xn;
-        const T1 delta_x       = x - xn;
-        const T2 yn            = (it - 1u)->y;
-        const T2 ynp1_minus_yn = it->y - yn;
-
-        return T2(yn + T2((delta_x * ynp1_minus_yn) / xnp1_minus_xn));
-      }
-    }
-  };
-
   double digit_scale()
   {
-    const std::array<util::point<double>, static_cast<std::size_t>(5U)> scale_data =
-    {{
-      util::point<double>(  50.0, 1.0 / 6.0),
-      util::point<double>( 100.0, 1.0 / 3.0),
-      util::point<double>( 200.0, 1.0 / 2.0),
-      util::point<double>( 300.0, 1.0),
-      util::point<double>(1000.0, 3.0 + (1.0 / 3.0)),
-    }};
-
-    const std::vector<util::point<double> > scale(scale_data.begin(), scale_data.end());
-
-    const double the_scale = util::linear_interpolate<double>::interpolate(static_cast<double>(std::numeric_limits<mp_type>::digits10), scale);
-
-    return the_scale;
+    return static_cast<double>((std::max)(std::numeric_limits<mp_type>::digits10, 15)) / 300.0;
   }
 }
 
@@ -388,39 +306,25 @@ namespace examples
 {
   namespace nr_006
   {
-    template<typename T> class HypergPFQ_Base : private boost::noncopyable
+    template<typename T> class hypergeometric_pfq_base : private boost::noncopyable
     {
-    protected:
-      const   T       Z;
-      const   mp_type W;
-              std::int32_t   N;
-      mutable std::deque<T> C;
-
-
-    protected:
-
-      HypergPFQ_Base(const T& z,
-                     const mp_type& w) : Z(z),
-                                         W(w),
-                                         N(static_cast<std::int32_t>(util::digit_scale() * 500.0)),
-                                         C(0u) { }
-
     public:
+      virtual ~hypergeometric_pfq_base() { }
 
-      virtual ~HypergPFQ_Base() { }
+      virtual void ccoef() const = 0;
 
-      virtual void ccoef(void) const = 0;
-
-      virtual T series(void) const
+      virtual T series() const
       {
         using my_math::chebyshev_t;
 
         // Compute the Chebyshev coefficients.
         // Get the values of the shifted Chebyshev polynomials.
-        std::vector<T> Tn_shifted;
+        std::vector<T> chebyshev_t_shifted_values;
         const T z_shifted = ((Z / W) * static_cast<std::int32_t>(2)) - static_cast<std::int32_t>(1);
 
-        chebyshev_t(static_cast<std::uint32_t>(C.size()), z_shifted, &Tn_shifted);
+        chebyshev_t(static_cast<std::uint32_t>(C.size()),
+                    z_shifted,
+                    &chebyshev_t_shifted_values);
 
         // Luke: C     ---------- COMPUTE SCALE FACTOR                       ----------
         // Luke: C
@@ -429,38 +333,56 @@ namespace examples
 
         // The coefficient scaling is preformed after the Chebyshev summation,
         // and it is carried out with a single division operation.
-        const T scale = std::accumulate(C.begin(), C.end(), T(0), util::alternating_sum<T>());
+        bool b_neg = false;
+
+        const T scale = std::accumulate(C.begin(),
+                                        C.end(),
+                                        T(0),
+                                        [&b_neg](T& scale_sum, const T& ck) -> T
+                                        {
+                                          ((!b_neg) ? (scale_sum += ck) : (scale_sum -= ck));
+                                          b_neg = (!b_neg);
+                                          return scale_sum;
+                                        });
 
         // Compute the result of the series expansion using unscaled coefficients.
-        const T sum = std::inner_product(C.begin(), C.end(), Tn_shifted.begin(), T(0));
+        const T sum = std::inner_product(C.begin(),
+                                         C.end(),
+                                         chebyshev_t_shifted_values.begin(),
+                                         T(0));
 
         // Return the properly scaled result.
         return sum / scale;
       }
+
+    protected:
+      const   T             Z;
+      const   mp_type       W;
+      mutable std::deque<T> C;
+
+      hypergeometric_pfq_base(const T& z,
+                              const mp_type& w) : Z(z),
+                                                  W(w),
+                                                  C(0u) { }
+
+      virtual std::int32_t N() const { return static_cast<std::int32_t>(util::digit_scale() * 500.0); }
     };
 
-    template<typename T> class Ccoef3Hyperg1F1 : public HypergPFQ_Base<T>
+    template<typename T> class ccoef4_hypergeometric_0f1 : public hypergeometric_pfq_base<T>
     {
-    private:
-
-      const T AP;
-      const T CP;
-
     public:
+      ccoef4_hypergeometric_0f1(const T& c,
+                                const T& z,
+                                const mp_type& w) : hypergeometric_pfq_base<T>(z, w),
+                                                    CP(c) { }
 
-      Ccoef3Hyperg1F1(const T& a, const T& c, const T& z, const mp_type& w) : HypergPFQ_Base<T>(z, w),
-                                                                              AP(a),
-                                                                              CP(c) { }
+      virtual ~ccoef4_hypergeometric_0f1() { }
 
-      virtual ~Ccoef3Hyperg1F1() { }
-
-    public:
-
-      virtual void ccoef(void) const
+      virtual void ccoef() const
       {
-        // See Luke 1977 page 74.
-        const std::int32_t N1 = static_cast<std::int32_t>(HypergPFQ_Base<T>::N + static_cast<std::int32_t>(1));
-        const std::int32_t N2 = static_cast<std::int32_t>(HypergPFQ_Base<T>::N + static_cast<std::int32_t>(2));
+        // See Luke 1977 page 80.
+        const std::int32_t N1 = static_cast<std::int32_t>(N() + static_cast<std::int32_t>(1));
+        const std::int32_t N2 = static_cast<std::int32_t>(N() + static_cast<std::int32_t>(2));
 
         // Luke: C     ---------- START COMPUTING COEFFICIENTS USING         ----------
         // Luke: C     ---------- BACKWARD RECURRENCE SCHEME                 ----------
@@ -469,7 +391,122 @@ namespace examples
         T A2(0);
         T A1(1);
 
-        HypergPFQ_Base<T>::C.resize(1u, A1);
+        hypergeometric_pfq_base<T>::C.resize(1u, A1);
+
+        std::int32_t X1 = N2;
+
+        T C1 = T(1) - CP;
+
+        const T Z1 = T(4) / hypergeometric_pfq_base<T>::W;
+
+        for(std::int32_t k = static_cast<std::int32_t>(0); k < N1; ++k)
+        {
+          const T DIVFAC = T(1) / X1;
+
+          --X1;
+
+          // The terms have been slightly re-arranged resulting in lower complexity.
+          // Parentheses have been added to avoid reliance on operator precedence.
+          const T term =   (A2 - ((A3 * DIVFAC) * X1))
+                         + ((A2 * X1) * ((1 + (C1 + X1)) * Z1))
+                         + ((A1 * X1) * ((DIVFAC - (C1 * Z1)) + (X1 * Z1)));
+
+          hypergeometric_pfq_base<T>::C.push_front(term);
+
+          A3 = A2;
+          A2 = A1;
+          A1 = hypergeometric_pfq_base<T>::C.front();
+        }
+
+        hypergeometric_pfq_base<T>::C.front() /= static_cast<std::int32_t>(2);
+      }
+
+    private:
+      const T CP;
+    };
+
+    template<typename T> class ccoef1_hypergeometric_1f0 : public hypergeometric_pfq_base<T>
+    {
+    public:
+      ccoef1_hypergeometric_1f0(const T& a,
+                                const T& z,
+                                const mp_type& w) : hypergeometric_pfq_base<T>(z, w),
+                                                    AP(a) { }
+
+      virtual ~ccoef1_hypergeometric_1f0() { }
+
+      virtual void ccoef() const
+      {
+        // See Luke 1977 page 67.
+        const std::int32_t N1 = static_cast<std::int32_t>(N() + static_cast<std::int32_t>(1));
+        const std::int32_t N2 = static_cast<std::int32_t>(N() + static_cast<std::int32_t>(2));
+
+        // Luke: C     ---------- START COMPUTING COEFFICIENTS USING         ----------
+        // Luke: C     ---------- BACKWARD RECURRENCE SCHEME                 ----------
+        // Luke: C
+        T A2(0);
+        T A1(1);
+
+        hypergeometric_pfq_base<T>::C.resize(1u, A1);
+
+        std::int32_t X1 = N2;
+
+        T V1 = T(1) - AP;
+
+        // Here, we have corrected what appears to be an error in
+        // Luke's code. Luke has "AFAC = 2 + FOUR/W". But it appears
+        // as though "AFAC = 2 - FOUR/W" is correct.
+        const T AFAC = 2 - (T(4) / hypergeometric_pfq_base<T>::W);
+
+        for(std::int32_t k = static_cast<std::int32_t>(0); k < N1; ++k)
+        {
+          --X1;
+
+          // The terms have been slightly re-arranged resulting in lower complexity.
+          // Parentheses have been added to avoid reliance on operator precedence.
+          const T term = -(X1 * AFAC * A1 + (X1 + V1) * A2) / (X1 - V1);
+
+          hypergeometric_pfq_base<T>::C.push_front(term);
+
+          A2 = A1;
+          A1 = hypergeometric_pfq_base<T>::C.front();
+        }
+
+        hypergeometric_pfq_base<T>::C.front() /= static_cast<std::int32_t>(2);
+      }
+
+    private:
+      const T AP;
+
+      virtual std::int32_t N() const { return static_cast<std::int32_t>(util::digit_scale() * 1600.0); }
+    };
+
+    template<typename T> class ccoef3_hypergeometric_1f1 : public hypergeometric_pfq_base<T>
+    {
+    public:
+      ccoef3_hypergeometric_1f1(const T& a,
+                                const T& c,
+                                const T& z,
+                                const mp_type& w) : hypergeometric_pfq_base<T>(z, w),
+                                                    AP(a),
+                                                    CP(c) { }
+
+      virtual ~ccoef3_hypergeometric_1f1() { }
+
+      virtual void ccoef() const
+      {
+        // See Luke 1977 page 74.
+        const std::int32_t N1 = static_cast<std::int32_t>(N() + static_cast<std::int32_t>(1));
+        const std::int32_t N2 = static_cast<std::int32_t>(N() + static_cast<std::int32_t>(2));
+
+        // Luke: C     ---------- START COMPUTING COEFFICIENTS USING         ----------
+        // Luke: C     ---------- BACKWARD RECURRENCE SCHEME                 ----------
+        // Luke: C
+        T A3(0);
+        T A2(0);
+        T A1(1);
+
+        hypergeometric_pfq_base<T>::C.resize(1u, A1);
 
         std::int32_t X  = N1;
         std::int32_t X1 = N2;
@@ -477,9 +514,9 @@ namespace examples
         T XA  =  X + AP;
         T X3A = (X + 3) - AP;
 
-        const T Z1 = T(4) / HypergPFQ_Base<T>::W;
+        const T Z1 = T(4) / hypergeometric_pfq_base<T>::W;
 
-        for(std::int32_t k = static_cast<std::int32_t>(0); k < N1; k++)
+        for(std::int32_t k = static_cast<std::int32_t>(0); k < N1; ++k)
         {
           --X;
           --X1;
@@ -488,7 +525,7 @@ namespace examples
 
           const T X3A_over_X2 = X3A / static_cast<std::int32_t>(X + 2);
 
-          // The terms have been slightly re-arranged resulting in fewer multiplications.
+          // The terms have been slightly re-arranged resulting in lower complexity.
           // Parentheses have been added to avoid reliance on operator precedence.
           const T PART1 =  A1 * (((X + CP) * Z1) - X3A_over_X2);
           const T PART2 =  A2 * (Z1 * ((X + 3) - CP) + (XA / X1));
@@ -496,44 +533,39 @@ namespace examples
 
           const T term = (((PART1 + PART2) + PART3) * X1) / XA;
 
-          HypergPFQ_Base<T>::C.push_front(term);
+          hypergeometric_pfq_base<T>::C.push_front(term);
 
           A3 = A2;
           A2 = A1;
-          A1 = HypergPFQ_Base<T>::C.front();
+          A1 = hypergeometric_pfq_base<T>::C.front();
         }
 
-        HypergPFQ_Base<T>::C.front() /= static_cast<std::int32_t>(2);
+        hypergeometric_pfq_base<T>::C.front() /= static_cast<std::int32_t>(2);
       }
+
+    private:
+      const T AP;
+      const T CP;
     };
 
-    template<typename T> class Ccoef6Hyperg1F2 : public HypergPFQ_Base<T>
+    template<typename T> class ccoef6_hypergeometric_1f2 : public hypergeometric_pfq_base<T>
     {
-    private:
-
-      const T AP;
-      const T BP;
-      const T CP;
-
     public:
+      ccoef6_hypergeometric_1f2(const T& a,
+                                const T& b,
+                                const T& c,
+                                const T& z,
+                                const mp_type& w) : hypergeometric_pfq_base<T>(z, w),
+                                                    AP(a),
+                                                    BP(b),
+                                                    CP(c) { }
 
-      Ccoef6Hyperg1F2(const T& a,
-                      const T& b,
-                      const T& c,
-                      const T& z,
-                      const mp_type& w) : HypergPFQ_Base<T>(z, w),
-                                          AP(a),
-                                          BP(b),
-                                          CP(c) { }
+      virtual ~ccoef6_hypergeometric_1f2() { }
 
-      virtual ~Ccoef6Hyperg1F2() { }
-
-    public:
-
-      virtual void ccoef(void) const
+      virtual void ccoef() const
       {
         // See Luke 1977 page 85.
-        const std::int32_t N1 = static_cast<std::int32_t>(HypergPFQ_Base<T>::N + static_cast<std::int32_t>(1));
+        const std::int32_t N1 = static_cast<std::int32_t>(N() + static_cast<std::int32_t>(1));
 
         // Luke: C     ---------- START COMPUTING COEFFICIENTS USING         ----------
         // Luke: C     ---------- BACKWARD RECURRENCE SCHEME                 ----------
@@ -543,14 +575,14 @@ namespace examples
         T A2(0);
         T A1(1);
 
-        HypergPFQ_Base<T>::C.resize(1u, A1);
+        hypergeometric_pfq_base<T>::C.resize(1u, A1);
 
         std::int32_t X  = N1;
-        T     PP = X + AP;
+        T            PP = X + AP;
 
-        const T Z1 = T(4) / HypergPFQ_Base<T>::W;
+        const T Z1 = T(4) / hypergeometric_pfq_base<T>::W;
 
-        for(std::int32_t k = static_cast<std::int32_t>(0); k < N1; k++)
+        for(std::int32_t k = static_cast<std::int32_t>(0); k < N1; ++k)
         {
           --X;
           --PP;
@@ -563,7 +595,7 @@ namespace examples
           const T QQ = T(TWO_X + 3) / static_cast<std::int32_t>(TWO_X + static_cast<std::int32_t>(5));
           const T SS = (X + BP) * (X + CP);
 
-          // The terms have been slightly re-arranged resulting in fewer multiplications.
+          // The terms have been slightly re-arranged resulting in lower complexity.
           // Parentheses have been added to avoid reliance on operator precedence.
           const T PART1 =   A1 * (((PP - (QQ * (PP + 1))) * 2) + (SS * Z1));
           const T PART2 =  (A2 * (X + 2)) * ((((TWO_X + 1) * PP) / X_PLUS_1) - ((QQ * 4) * (PP + 1)) + (((TWO_X + 3) * (PP + 2)) / X_PLUS_3) + ((Z1 * 2) * (SS - (QQ * (X_PLUS_1 + BP)) * (X_PLUS_1 + CP))));
@@ -572,50 +604,42 @@ namespace examples
 
           const T term = (((PART1 - PART2) + (PART3 - PART4)) * X_PLUS_1) / PP;
 
-          HypergPFQ_Base<T>::C.push_front(term);
+          hypergeometric_pfq_base<T>::C.push_front(term);
 
           A4 = A3;
           A3 = A2;
           A2 = A1;
-          A1 = HypergPFQ_Base<T>::C.front();
+          A1 = hypergeometric_pfq_base<T>::C.front();
         }
 
-        HypergPFQ_Base<T>::C.front() /= static_cast<std::int32_t>(2);
+        hypergeometric_pfq_base<T>::C.front() /= static_cast<std::int32_t>(2);
       }
-    };
 
-    template<typename T> class Ccoef2Hyperg2F1 : public HypergPFQ_Base<T>
-    {
     private:
-
       const T AP;
       const T BP;
       const T CP;
+    };
 
+    template<typename T> class ccoef2_hypergeometric_2f1 : public hypergeometric_pfq_base<T>
+    {
     public:
+      ccoef2_hypergeometric_2f1(const T& a,
+                                const T& b,
+                                const T& c,
+                                const T& z,
+                                const mp_type& w) : hypergeometric_pfq_base<T>(z, w),
+                                                    AP(a),
+                                                    BP(b),
+                                                    CP(c) { }
 
-      Ccoef2Hyperg2F1(const T& a,
-                      const T& b,
-                      const T& c,
-                      const T& z,
-                      const mp_type& w) : HypergPFQ_Base<T>(z, w),
-                                          AP(a),
-                                          BP(b),
-                                          CP(c)
-      {
-        // Set anew the number of terms in the Chebyshev expansion.
-        HypergPFQ_Base<T>::N = static_cast<std::int32_t>(util::digit_scale() * 1600.0);
-      }
+      virtual ~ccoef2_hypergeometric_2f1() { }
 
-      virtual ~Ccoef2Hyperg2F1() { }
-
-    public:
-
-      virtual void ccoef(void) const
+      virtual void ccoef() const
       {
         // See Luke 1977 page 59.
-        const std::int32_t N1 = static_cast<std::int32_t>(HypergPFQ_Base<T>::N + static_cast<std::int32_t>(1));
-        const std::int32_t N2 = static_cast<std::int32_t>(HypergPFQ_Base<T>::N + static_cast<std::int32_t>(2));
+        const std::int32_t N1 = static_cast<std::int32_t>(N() + static_cast<std::int32_t>(1));
+        const std::int32_t N2 = static_cast<std::int32_t>(N() + static_cast<std::int32_t>(2));
 
         // Luke: C     ---------- START COMPUTING COEFFICIENTS USING         ----------
         // Luke: C     ---------- BACKWARD RECURRENCE SCHEME                 ----------
@@ -624,18 +648,18 @@ namespace examples
         T A2(0);
         T A1(1);
 
-        HypergPFQ_Base<T>::C.resize(1u, A1);
+        hypergeometric_pfq_base<T>::C.resize(1u, A1);
 
         std::int32_t X  = N1;
         std::int32_t X1 = N2;
-        std::int32_t X3  = static_cast<std::int32_t>((X * 2) + 3);
+        std::int32_t X3 = static_cast<std::int32_t>((X * 2) + 3);
 
         T X3A = (X + 3) - AP;
         T X3B = (X + 3) - BP;
 
-        const T Z1 = T(4) / HypergPFQ_Base<T>::W;
+        const T Z1 = T(4) / hypergeometric_pfq_base<T>::W;
 
-        for(std::int32_t k = static_cast<std::int32_t>(0); k < N1; k++)
+        for(std::int32_t k = static_cast<std::int32_t>(0); k < N1; ++k)
         {
           --X;
           --X1;
@@ -647,7 +671,7 @@ namespace examples
 
           const T XAB = T(1) / ((X + AP) * (X + BP));
 
-          // The terms have been slightly re-arranged resulting in fewer multiplications.
+          // The terms have been slightly re-arranged resulting in lower complexity.
           // Parentheses have been added to avoid reliance on operator precedence.
           const T PART1 = (A1 * X1) * (2 - (((AP + X1) * (BP + X1)) * ((T(X3) / X_PLUS_2) * XAB)) + ((CP + X) * (XAB * Z1)));
           const T PART2 = (A2 * XAB) * ((X3A * X3B) - (X3 * ((X3A + X3B) - 1)) + (((3 - CP) + X) * (X1 * Z1)));
@@ -655,57 +679,87 @@ namespace examples
 
           const T term = (PART1 + PART2) - PART3;
 
-          HypergPFQ_Base<T>::C.push_front(term);
+          hypergeometric_pfq_base<T>::C.push_front(term);
 
           A3 = A2;
           A2 = A1;
-          A1 = HypergPFQ_Base<T>::C.front();
+          A1 = hypergeometric_pfq_base<T>::C.front();
         }
 
-        HypergPFQ_Base<T>::C.front() /= static_cast<std::int32_t>(2);
+        hypergeometric_pfq_base<T>::C.front() /= static_cast<std::int32_t>(2);
       }
+
+    private:
+      const T AP;
+      const T BP;
+      const T CP;
+
+      virtual std::int32_t N() const { return static_cast<std::int32_t>(util::digit_scale() * 1600.0); }
     };
 
-    mp_type luke_ccoef3_hyperg_1f1(const mp_type& a, const mp_type& b, const mp_type& x);
-    mp_type luke_ccoef6_hyperg_1f2(const mp_type& a, const mp_type& b, const mp_type& c, const mp_type& x);
-    mp_type luke_ccoef2_hyperg_2f1(const mp_type& a, const mp_type& b, const mp_type& c, const mp_type& x);
+    mp_type luke_ccoef4_hypergeometric_0f1(const mp_type& a, const mp_type& x);
+    mp_type luke_ccoef1_hypergeometric_1f0(const mp_type& a, const mp_type& x);
+    mp_type luke_ccoef3_hypergeometric_1f1(const mp_type& a, const mp_type& b, const mp_type& x);
+    mp_type luke_ccoef6_hypergeometric_1f2(const mp_type& a, const mp_type& b, const mp_type& c, const mp_type& x);
+    mp_type luke_ccoef2_hypergeometric_2f1(const mp_type& a, const mp_type& b, const mp_type& c, const mp_type& x);
   }
 }
 
-mp_type examples::nr_006::luke_ccoef3_hyperg_1f1(const mp_type& a, const mp_type& b, const mp_type& x)
+mp_type examples::nr_006::luke_ccoef4_hypergeometric_0f1(const mp_type& a, const mp_type& x)
 {
-  const Ccoef3Hyperg1F1<mp_type> c3_h1f1(a, b, x, mp_type(-10));
+  const ccoef4_hypergeometric_0f1<mp_type> hypergeometric_0f1_object(a, x, mp_type(-20));
 
-  c3_h1f1.ccoef();
+  hypergeometric_0f1_object.ccoef();
 
-  return c3_h1f1.series();
+  return hypergeometric_0f1_object.series();
 }
 
-mp_type examples::nr_006::luke_ccoef6_hyperg_1f2(const mp_type& a, const mp_type& b, const mp_type& c, const mp_type& x)
+mp_type examples::nr_006::luke_ccoef1_hypergeometric_1f0(const mp_type& a, const mp_type& x)
 {
-  const Ccoef6Hyperg1F2<mp_type> c6_h1f2(a, b, c, x, mp_type(-10));
+  const ccoef1_hypergeometric_1f0<mp_type> hypergeometric_1f0_object(a, x, mp_type(-20));
 
-  c6_h1f2.ccoef();
+  hypergeometric_1f0_object.ccoef();
 
-  return c6_h1f2.series();
+  return hypergeometric_1f0_object.series();
 }
 
-mp_type examples::nr_006::luke_ccoef2_hyperg_2f1(const mp_type& a, const mp_type& b, const mp_type& c, const mp_type& x)
+mp_type examples::nr_006::luke_ccoef3_hypergeometric_1f1(const mp_type& a, const mp_type& b, const mp_type& x)
 {
-  const Ccoef2Hyperg2F1<mp_type> c2_h2f1(a, b, c, x, mp_type(-20));
+  const ccoef3_hypergeometric_1f1<mp_type> hypergeometric_1f1_object(a, b, x, mp_type(-20));
 
-  c2_h2f1.ccoef();
+  hypergeometric_1f1_object.ccoef();
 
-  return c2_h2f1.series();
+  return hypergeometric_1f1_object.series();
+}
+
+mp_type examples::nr_006::luke_ccoef6_hypergeometric_1f2(const mp_type& a, const mp_type& b, const mp_type& c, const mp_type& x)
+{
+  const ccoef6_hypergeometric_1f2<mp_type> hypergeometric_1f2_object(a, b, c, x, mp_type(-20));
+
+  hypergeometric_1f2_object.ccoef();
+
+  return hypergeometric_1f2_object.series();
+}
+
+mp_type examples::nr_006::luke_ccoef2_hypergeometric_2f1(const mp_type& a, const mp_type& b, const mp_type& c, const mp_type& x)
+{
+  const ccoef2_hypergeometric_2f1<mp_type> hypergeometric_2f1_object(a, b, c, x, mp_type(-20));
+
+  hypergeometric_2f1_object.ccoef();
+
+  return hypergeometric_2f1_object.series();
 }
 
 int main()
 {
-  stopwatch<boost::chrono::high_resolution_clock> w;
+  stopwatch<STD_CHRONO::high_resolution_clock> my_stopwatch;
+  double total_time = 0.0;
 
+  std::vector<mp_type> hypergeometric_0f1_results(20U);
+  std::vector<mp_type> hypergeometric_1f0_results(20U);
+  std::vector<mp_type> hypergeometric_1f1_results(20U);
   std::vector<mp_type> hypergeometric_2f1_results(20U);
   std::vector<mp_type> hypergeometric_1f2_results(20U);
-  std::vector<mp_type> hypergeometric_1f1_results(20U);
 
   const mp_type a(mp_type(3) / 7);
   const mp_type b(mp_type(2) / 3);
@@ -713,35 +767,93 @@ int main()
 
   std::int_least16_t i;
 
+  std::cout << "test hypergeometric_0f1." << std::endl;
+  i = 1U;
+  my_stopwatch.reset();
+
+  // Generate a table of values of Hypergeometric0F1.
+  // Compare with the Mathematica command:
+  // Table[N[HypergeometricPFQ[{}, {3/7}, -(i*EulerGamma)], 100], {i, 1, 20, 1}]
+  std::for_each(hypergeometric_0f1_results.begin(),
+                hypergeometric_0f1_results.end(),
+                [&i, &a](mp_type& new_value)
+                {
+                  const mp_type x(-(boost::math::constants::euler<mp_type>() * i));
+
+                  new_value = examples::nr_006::luke_ccoef4_hypergeometric_0f1(a, x);
+
+                  ++i;
+                });
+
+  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<double> >(my_stopwatch.elapsed()).count();
+
+  // Print the values of Hypergeometric0F1.
+  std::for_each(hypergeometric_0f1_results.begin(),
+                hypergeometric_0f1_results.end(),
+                [](const mp_type& h)
+                {
+                  std::cout << std::setprecision(DIGIT_COUNT) << h << std::endl;
+                });
+
+  std::cout << "test hypergeometric_1f0." << std::endl;
+  i = 1U;
+  my_stopwatch.reset();
+
+  // Generate a table of values of Hypergeometric1F0.
+  // Compare with the Mathematica command:
+  // Table[N[HypergeometricPFQ[{3/7}, {}, -(i*EulerGamma)], 100], {i, 1, 20, 1}]
+  std::for_each(hypergeometric_1f0_results.begin(),
+                hypergeometric_1f0_results.end(),
+                [&i, &a](mp_type& new_value)
+                {
+                  const mp_type x(-(boost::math::constants::euler<mp_type>() * i));
+
+                  new_value = examples::nr_006::luke_ccoef1_hypergeometric_1f0(a, x);
+
+                  ++i;
+                });
+
+  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<double> >(my_stopwatch.elapsed()).count();
+
+  // Print the values of Hypergeometric1F0.
+  std::for_each(hypergeometric_1f0_results.begin(),
+                hypergeometric_1f0_results.end(),
+                [](const mp_type& h)
+                {
+                  std::cout << std::setprecision(DIGIT_COUNT) << h << std::endl;
+                });
+
   std::cout << "test hypergeometric_1f1." << std::endl;
   i = 1U;
+  my_stopwatch.reset();
 
   // Generate a table of values of Hypergeometric1F1.
   // Compare with the Mathematica command:
   // Table[N[HypergeometricPFQ[{3/7}, {2/3}, -(i*EulerGamma)], 100], {i, 1, 20, 1}]
   std::for_each(hypergeometric_1f1_results.begin(),
                 hypergeometric_1f1_results.end(),
-                [&i, &a, &b, &c](mp_type& new_value)
+                [&i, &a, &b](mp_type& new_value)
                 {
                   const mp_type x(-(boost::math::constants::euler<mp_type>() * i));
 
-                  new_value = examples::nr_006::luke_ccoef3_hyperg_1f1(a, b, x);
+                  new_value = examples::nr_006::luke_ccoef3_hypergeometric_1f1(a, b, x);
 
                   ++i;
                 });
+
+  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<double> >(my_stopwatch.elapsed()).count();
 
   // Print the values of Hypergeometric1F1.
   std::for_each(hypergeometric_1f1_results.begin(),
                 hypergeometric_1f1_results.end(),
                 [](const mp_type& h)
                 {
-                  std::cout << std::setprecision(std::numeric_limits<mp_type>::digits10 - 10)
-                            << h
-                            << std::endl;
+                  std::cout << std::setprecision(DIGIT_COUNT) << h << std::endl;
                 });
 
   std::cout << "test hypergeometric_1f2." << std::endl;
   i = 1U;
+  my_stopwatch.reset();
 
   // Generate a table of values of Hypergeometric1F2.
   // Compare with the Mathematica command:
@@ -752,23 +864,24 @@ int main()
                 {
                   const mp_type x(-(boost::math::constants::euler<mp_type>() * i));
 
-                  new_value = examples::nr_006::luke_ccoef6_hyperg_1f2(a, b, c, x);
+                  new_value = examples::nr_006::luke_ccoef6_hypergeometric_1f2(a, b, c, x);
 
                   ++i;
                 });
+
+  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<double> >(my_stopwatch.elapsed()).count();
 
   // Print the values of Hypergeometric1F2.
   std::for_each(hypergeometric_1f2_results.begin(),
                 hypergeometric_1f2_results.end(),
                 [](const mp_type& h)
                 {
-                  std::cout << std::setprecision(std::numeric_limits<mp_type>::digits10 - 10)
-                            << h
-                            << std::endl;
+                  std::cout << std::setprecision(DIGIT_COUNT) << h << std::endl;
                 });
 
   std::cout << "test hypergeometric_2f1." << std::endl;
   i = 1U;
+  my_stopwatch.reset();
 
   // Generate a table of values of Hypergeometric2F1.
   // Compare with the Mathematica command:
@@ -779,21 +892,22 @@ int main()
                 {
                   const mp_type x(-(boost::math::constants::euler<mp_type>() * i));
 
-                  new_value = examples::nr_006::luke_ccoef2_hyperg_2f1(a, b, c, x);
+                  new_value = examples::nr_006::luke_ccoef2_hypergeometric_2f1(a, b, c, x);
 
                   ++i;
                 });
+
+  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<double> >(my_stopwatch.elapsed()).count();
 
   // Print the values of Hypergeometric2F1.
   std::for_each(hypergeometric_2f1_results.begin(),
                 hypergeometric_2f1_results.end(),
                 [](const mp_type& h)
                 {
-                  std::cout << std::setprecision(std::numeric_limits<mp_type>::digits10 - 10)
-                            << h
-                            << std::endl;
+                  std::cout << std::setprecision(DIGIT_COUNT) << h << std::endl;
                 });
-  double t = boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
-  std::cout << "Total execution time = " << std::setprecision(3) << t << "s" << std::endl;
+
+  std::cout << "Total execution time = " << std::setprecision(3) << total_time << "s" << std::endl;
+
   return 0;
 }
