@@ -396,6 +396,8 @@ int main()
   // 78871305322190941528281744734605934497977375094921646511687434038062987482900167
   // 45127557400365419545e-22
 
+  // Mathematica(R) or Wolfram's Alpha:
+  // N[AiryAi[120 / 7], 300]
   std::cout << std::setprecision(digits_characteristics::digits10)
             << gauss_laguerre_airy_a(mp_type(120) / 7)
             << std::endl;
