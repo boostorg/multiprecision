@@ -8,7 +8,6 @@
 #include <boost/math/special_functions/cbrt.hpp>
 #include <boost/math/special_functions/factorials.hpp>
 #include <boost/math/special_functions/gamma.hpp>
-#include <boost/math/special_functions/detail/bessel_jy_zero.hpp>
 #include <boost/math/tools/roots.hpp>
 #include <boost/noncopyable.hpp>
 
@@ -64,12 +63,14 @@ public:
   T operator()(const T& x) const
   {
     // Calculate (via forward recursion) the value of the Laguerre
-    // function L(n, alpha, x) (p2), the value of its derivative (d2),
-    // and the value of the corresponding Laguerre function of previous
-    // order (p1). Return the value of the function in order to be
-    // used as a functor with Boost.Math root-finding. Store the values
-    // of the Laguerre function derivative (d2) and the Laguerre
-    // function of previous order (p1) in class members for later use.
+    // function L(n, alpha, x), called (p2), the value of the derivative
+    // of the Laguerre function (d2), and the value of the corresponding
+    // Laguerre function of previous order (p1).
+
+    // Return the value of the function in order to be used as a function
+    // object with Boost.Math root-finding. Store the values of the
+    // Laguerre function derivative (d2) and the Laguerre function of
+    // previous order (p1) in class members for later use.
 
       p1 = T(0);
     T p2 = T(1);
@@ -227,8 +228,8 @@ private:
     else
     {
       // Calculate an estimate of the 1st root of a generalized Laguerre
-      // polynomial using an expansion in the first Bessel function zero.
-      // The expansion is from Tricomi.
+      // polynomial using either Taylor series or an expansion in Bessel
+      // function zeros. The expansion is from Tricomi.
 
       // Here, we obtain an estimate of the first zero of J_alpha(x).
 
@@ -468,6 +469,10 @@ int main()
 
   // 50 digits.
   // 3.8990420982303275013276114626640705170145070824318e-22
+
+  // 100 digits.
+  // 3.899042098230327501327611462664070517014507082431797677146153303523108862015228
+  // 864136051942933142648e-22
 
   // 200 digits.
   // 3.899042098230327501327611462664070517014507082431797677146153303523108862015228
