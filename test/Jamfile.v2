@@ -720,6 +720,24 @@ if $(enable-specfun)
             release
            : $(source:B)_intel_quad ;
    }
+   #
+   # High precision tests are rather different, as they test only one
+   # multiprecision type and are more a test of Boost.Math:
+   #
+   for local source in [ glob math/high_prec/*.cpp ]
+   {
+      run $(source)
+            /boost/test//boost_unit_test_framework/<link>static 
+            /boost/regex//boost_regex/<link>static 
+           : # command line
+           : # input files
+           : # requirements
+            <optimization>speed
+            <define>BOOST_ALL_NO_LIB
+            <toolset>msvc:<cxxflags>-bigobj
+            [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>gmp <source>mpfr :  ]
+            release ;
+   }
 }
 
 for local source in [ glob compile_fail/*.cpp ]
