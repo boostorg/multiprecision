@@ -62,22 +62,23 @@ public:
 
   T operator()(const T& x) const
   {
-    // Calculate (via forward recursion) the value of the Laguerre
-    // function L(n, alpha, x), called (p2), the value of the derivative
-    // of the Laguerre function (d2), and the value of the corresponding
-    // Laguerre function of previous order (p1).
+    // Calculate (via forward recursion):
+    // * the value of the Laguerre function L(n, alpha, x), called (p2),
+    // * the value of the derivative of the Laguerre function (d2),
+    // * and the value of the corresponding Laguerre function of
+    //   previous order (p1).
 
-    // Return the value of the function in order to be used as a function
-    // object with Boost.Math root-finding. Store the values of the
-    // Laguerre function derivative (d2) and the Laguerre function of
-    // previous order (p1) in class members for later use.
+    // Return the value of the function (p2) in order to be used as a
+    // function object with Boost.Math root-finding. Store the values
+    // of the Laguerre function derivative (d2) and the Laguerre function
+    // of previous order (p1) in class members for later use.
 
       p1 = T(0);
     T p2 = T(1);
       d2 = T(0);
 
     T j_plus_alpha(alpha);
-    T two_j_plus_one_plus_alpha_minus_x(alpha + 1 - x);
+    T two_j_plus_one_plus_alpha_minus_x(1 + alpha - x);
 
     int j;
 
@@ -130,16 +131,16 @@ template<typename T>
 class guass_laguerre_abscissas_and_weights : private boost::noncopyable
 {
 public:
-  guass_laguerre_abscissas_and_weights(const int n,
-                                       const T a) : order(n),
-                                                    alpha(a),
-                                                    valid(true),
-                                                    xi   (),
-                                                    wi   ()
+  guass_laguerre_abscissas_and_weights(const int n, const T a) : order(n),
+                                                                 alpha(a),
+                                                                 valid(true),
+                                                                 xi   (),
+                                                                 wi   ()
   {
     if(alpha < -20.0F)
     {
-      // TBD: If we ever boostify this, throw a range error here and document it.
+      // TBD: If we ever boostify this, throw a range error here.
+      // If so, then also document it in the docs.
       std::cout << "Range error: the order of the Laguerre function must exceed -20.0." << std::endl;
     }
     else
@@ -175,7 +176,8 @@ private:
 
     const laguerre_function_object<T> laguerre_object(order, alpha);
 
-    // Set some initial values to be used for finding the estimate of the first root.
+    // Set the initial values of the step size and the running step
+    // to be used for finding the estimate of the first root.
     T step_size  = 0.01F;
     T step       = step_size;
 
@@ -228,8 +230,8 @@ private:
     else
     {
       // Calculate an estimate of the 1st root of a generalized Laguerre
-      // polynomial using either Taylor series or an expansion in Bessel
-      // function zeros. The expansion is from Tricomi.
+      // function using either a Taylor series or an expansion in Bessel
+      // function zeros. The Bessel function zeros expansion is from Tricomi.
 
       // Here, we obtain an estimate of the first zero of J_alpha(x).
 
@@ -270,7 +272,8 @@ private:
     {
       bool this_laguerre_value_is_negative = (laguerre_object(mp_type(0)) < 0);
 
-      // Re-set the initial value of the step-size based on the estimate of the first root.
+      // Re-set the initial value of the step-size based on the
+      // estimate of the first root.
       step_size = first_laguerre_root / 2;
       step      = step_size;
 
@@ -345,7 +348,7 @@ private:
       {
         std::cout << "calculating abscissa and weight for index: " << i << std::endl;
 
-        // Find the abscissas using iterative root-finding.
+        // Calculate the abscissas using iterative root-finding.
 
         // Select the maximum allowed iterations, being at least 20.
         // The determination of the maximum allowed iterations is
@@ -364,11 +367,12 @@ private:
                                                                     laguerre_function_object<T>::root_tolerance,
                                                                     number_of_iterations_used);
 
-        // Re-assess the validity of the Guass-Laguerre abscissas and weights
-        // object based on the validity of *each* root-finding operation.
+        // Based on the result of *each* root-finding operation, re-assess
+        // the validity of the Guass-Laguerre abscissas and weights object.
         valid &= (number_of_iterations_used < number_of_iterations_allowed);
 
-        // Compute the Laguerre root as the average of the values from the solved root bracket.
+        // Compute the Laguerre root as the average of the values from
+        // the solved root bracket.
         const T laguerre_root = (  laguerre_root_bracket.first
                                  + laguerre_root_bracket.second) / 2;
 
@@ -386,83 +390,91 @@ private:
   }
 };
 
-template<typename T>
-struct gauss_laguerre_ai
+namespace
 {
-public:
-  gauss_laguerre_ai(const T X) : x(X)
+  template<typename T>
+  struct gauss_laguerre_ai
   {
-    using std::exp;
-    using std::sqrt;
+  public:
+    gauss_laguerre_ai(const T X) : x(X)
+    {
+      using std::exp;
+      using std::sqrt;
 
-    zeta = ((sqrt(x) * x) * 2) / 3;
+      zeta = ((sqrt(x) * x) * 2) / 3;
 
-    const T zeta_times_48_pow_sixth = sqrt(boost::math::cbrt(zeta * 48));
+      const T zeta_times_48_pow_sixth = sqrt(boost::math::cbrt(zeta * 48));
 
-    factor = 1 / ((sqrt(boost::math::constants::pi<T>()) * zeta_times_48_pow_sixth) * (exp(zeta) * gamma_of_five_sixths()));
-  }
+      factor = 1 / ((sqrt(boost::math::constants::pi<T>()) * zeta_times_48_pow_sixth) * (exp(zeta) * gamma_of_five_sixths()));
+    }
 
-  gauss_laguerre_ai(const gauss_laguerre_ai& other) : x     (other.x),
-                                                      zeta  (other.zeta),
-                                                      factor(other.factor) { }
+    gauss_laguerre_ai(const gauss_laguerre_ai& other) : x     (other.x),
+                                                        zeta  (other.zeta),
+                                                        factor(other.factor) { }
 
-  T operator()(const T& t) const
+    T operator()(const T& t) const
+    {
+      using std::sqrt;
+
+      return factor / sqrt(boost::math::cbrt(2 + (t / zeta)));
+    }
+
+  private:
+    const T x;
+    T zeta;
+    T factor;
+
+    static const T& gamma_of_five_sixths()
+    {
+      static const T value = boost::math::tgamma(T(5) / 6);
+
+      return value;
+    }
+
+    const gauss_laguerre_ai& operator=(const gauss_laguerre_ai&);
+  };
+
+  template<typename T>
+  T gauss_laguerre_airy_ai(const T x)
   {
-    using std::sqrt;
+    static const float digits_factor  = static_cast<float>(std::numeric_limits<mp_type>::digits10) / 300.0F;
+    static const int   laguerre_order = static_cast<int>(600.0F * digits_factor);
 
-    return factor / sqrt(boost::math::cbrt(2 + (t / zeta)));
+    static const guass_laguerre_abscissas_and_weights<T> abscissas_and_weights(laguerre_order, -T(1) / 6);
+
+    T airy_ai_result;
+
+    if(abscissas_and_weights.get_valid())
+    {
+      const gauss_laguerre_ai<T> this_gauss_laguerre_ai(x);
+
+      airy_ai_result =
+        std::inner_product(abscissas_and_weights.abscissas().begin(),
+                           abscissas_and_weights.abscissas().end(),
+                           abscissas_and_weights.weights().begin(),
+                           T(0),
+                           std::plus<T>(),
+                           [&this_gauss_laguerre_ai](const T& this_abscissa, const T& this_weight) -> T
+                           {
+                             return this_gauss_laguerre_ai(this_abscissa) * this_weight;
+                           });
+    }
+    else
+    {
+      // TBD: Consider an error message.
+      airy_ai_result = T(0);
+    }
+
+    return airy_ai_result;
   }
-
-private:
-  const T x;
-  T zeta;
-  T factor;
-
-  static const T& gamma_of_five_sixths()
-  {
-    static const T value = boost::math::tgamma(T(5) / 6);
-
-    return value;
-  }
-
-  const gauss_laguerre_ai& operator=(const gauss_laguerre_ai&);
-};
-
-template<typename T>
-T gauss_laguerre_airy_a(const T x)
-{
-  static const float digits_factor  = static_cast<float>(std::numeric_limits<mp_type>::digits10) / 300.0F;
-  static const int   laguerre_order = static_cast<int>(600.0F * digits_factor);
-
-  static const guass_laguerre_abscissas_and_weights<T> aw(laguerre_order, -T(1) / 6);
-
-  T airy_ai_result;
-
-  if(aw.get_valid())
-  {
-    const gauss_laguerre_ai<T> ai(x);
-
-    airy_ai_result = std::inner_product(aw.abscissas().begin(),
-                                        aw.abscissas().end(),
-                                        aw.weights().begin(),
-                                        T(0),
-                                        std::plus<T>(),
-                                        [&ai](const T& a, const T& w) -> T
-                                        {
-                                          return ai(a) * w;
-                                        });
-  }
-  else
-  {
-    airy_ai_result = T(0);
-  }
-
-  return airy_ai_result;
 }
 
 int main()
 {
   // Use Gauss-Laguerre integration to compute airy_ai(120 / 7).
+
+  // 9 digits
+  // 3.89904210e-22
 
   // 10 digits
   // 3.899042098e-22
@@ -497,6 +509,6 @@ int main()
   // Mathematica(R) or Wolfram's Alpha:
   // N[AiryAi[120 / 7], 300]
   std::cout << std::setprecision(digits_characteristics::digits10)
-            << gauss_laguerre_airy_a(mp_type(120) / 7)
+            << gauss_laguerre_airy_ai(mp_type(120) / 7)
             << std::endl;
 }
