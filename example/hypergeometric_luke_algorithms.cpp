@@ -381,8 +381,8 @@ namespace examples
       virtual void ccoef() const
       {
         // See Luke 1977 page 80.
-        const std::int32_t N1 = static_cast<std::int32_t>(N() + static_cast<std::int32_t>(1));
-        const std::int32_t N2 = static_cast<std::int32_t>(N() + static_cast<std::int32_t>(2));
+        const std::int32_t N1 = static_cast<std::int32_t>(this->N() + static_cast<std::int32_t>(1));
+        const std::int32_t N2 = static_cast<std::int32_t>(this->N() + static_cast<std::int32_t>(2));
 
         // Luke: C     ---------- START COMPUTING COEFFICIENTS USING         ----------
         // Luke: C     ---------- BACKWARD RECURRENCE SCHEME                 ----------
@@ -496,8 +496,8 @@ namespace examples
       virtual void ccoef() const
       {
         // See Luke 1977 page 74.
-        const std::int32_t N1 = static_cast<std::int32_t>(N() + static_cast<std::int32_t>(1));
-        const std::int32_t N2 = static_cast<std::int32_t>(N() + static_cast<std::int32_t>(2));
+        const std::int32_t N1 = static_cast<std::int32_t>(this->N() + static_cast<std::int32_t>(1));
+        const std::int32_t N2 = static_cast<std::int32_t>(this->N() + static_cast<std::int32_t>(2));
 
         // Luke: C     ---------- START COMPUTING COEFFICIENTS USING         ----------
         // Luke: C     ---------- BACKWARD RECURRENCE SCHEME                 ----------
@@ -565,7 +565,7 @@ namespace examples
       virtual void ccoef() const
       {
         // See Luke 1977 page 85.
-        const std::int32_t N1 = static_cast<std::int32_t>(N() + static_cast<std::int32_t>(1));
+        const std::int32_t N1 = static_cast<std::int32_t>(this->N() + static_cast<std::int32_t>(1));
 
         // Luke: C     ---------- START COMPUTING COEFFICIENTS USING         ----------
         // Luke: C     ---------- BACKWARD RECURRENCE SCHEME                 ----------
