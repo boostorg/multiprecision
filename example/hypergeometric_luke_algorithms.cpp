@@ -273,13 +273,13 @@ namespace examples
 
     protected:
       const   T             Z;
-      const   mp_type       W;
+      const   T             W;
       mutable std::deque<T> C;
 
       hypergeometric_pfq_base(const T& z,
-                              const mp_type& w) : Z(z),
-                                                  W(w),
-                                                  C(0u) { }
+                              const T& w) : Z(z),
+                                            W(w),
+                                            C(0u) { }
 
       virtual std::int32_t N() const { return static_cast<std::int32_t>(util::digit_scale<T>() * 500.0); }
     };
@@ -289,8 +289,8 @@ namespace examples
     public:
       ccoef4_hypergeometric_0f1(const T& c,
                                 const T& z,
-                                const mp_type& w) : hypergeometric_pfq_base<T>(z, w),
-                                                    CP(c) { }
+                                const T& w) : hypergeometric_pfq_base<T>(z, w),
+                                              CP(c) { }
 
       virtual ~ccoef4_hypergeometric_0f1() { }
 
@@ -346,8 +346,8 @@ namespace examples
     public:
       ccoef1_hypergeometric_1f0(const T& a,
                                 const T& z,
-                                const mp_type& w) : hypergeometric_pfq_base<T>(z, w),
-                                                    AP(a) { }
+                                const T& w) : hypergeometric_pfq_base<T>(z, w),
+                                              AP(a) { }
 
       virtual ~ccoef1_hypergeometric_1f0() { }
 
@@ -407,9 +407,9 @@ namespace examples
       ccoef3_hypergeometric_1f1(const T& a,
                                 const T& c,
                                 const T& z,
-                                const mp_type& w) : hypergeometric_pfq_base<T>(z, w),
-                                                    AP(a),
-                                                    CP(c) { }
+                                const T& w) : hypergeometric_pfq_base<T>(z, w),
+                                              AP(a),
+                                              CP(c) { }
 
       virtual ~ccoef3_hypergeometric_1f1() { }
 
@@ -475,10 +475,10 @@ namespace examples
                                 const T& b,
                                 const T& c,
                                 const T& z,
-                                const mp_type& w) : hypergeometric_pfq_base<T>(z, w),
-                                                    AP(a),
-                                                    BP(b),
-                                                    CP(c) { }
+                                const T& w) : hypergeometric_pfq_base<T>(z, w),
+                                              AP(a),
+                                              BP(b),
+                                              CP(c) { }
 
       virtual ~ccoef6_hypergeometric_1f2() { }
 
@@ -548,10 +548,10 @@ namespace examples
                                 const T& b,
                                 const T& c,
                                 const T& z,
-                                const mp_type& w) : hypergeometric_pfq_base<T>(z, w),
-                                                    AP(a),
-                                                    BP(b),
-                                                    CP(c) { }
+                                const T& w) : hypergeometric_pfq_base<T>(z, w),
+                                              AP(a),
+                                              BP(b),
+                                              CP(c) { }
 
       virtual ~ccoef2_hypergeometric_2f1() { }
 
@@ -617,53 +617,58 @@ namespace examples
       virtual std::int32_t N() const { return static_cast<std::int32_t>(util::digit_scale<T>() * 1600.0); }
     };
 
-    mp_type luke_ccoef4_hypergeometric_0f1(const mp_type& a, const mp_type& x);
-    mp_type luke_ccoef1_hypergeometric_1f0(const mp_type& a, const mp_type& x);
-    mp_type luke_ccoef3_hypergeometric_1f1(const mp_type& a, const mp_type& b, const mp_type& x);
-    mp_type luke_ccoef6_hypergeometric_1f2(const mp_type& a, const mp_type& b, const mp_type& c, const mp_type& x);
-    mp_type luke_ccoef2_hypergeometric_2f1(const mp_type& a, const mp_type& b, const mp_type& c, const mp_type& x);
+    template<class T> T luke_ccoef4_hypergeometric_0f1(const T& a, const T& x);
+    template<class T> T luke_ccoef1_hypergeometric_1f0(const T& a, const T& x);
+    template<class T> T luke_ccoef3_hypergeometric_1f1(const T& a, const T& b, const T& x);
+    template<class T> T luke_ccoef6_hypergeometric_1f2(const T& a, const T& b, const T& c, const T& x);
+    template<class T> T luke_ccoef2_hypergeometric_2f1(const T& a, const T& b, const T& c, const T& x);
   }
 }
 
-mp_type examples::nr_006::luke_ccoef4_hypergeometric_0f1(const mp_type& a, const mp_type& x)
+template<class T>
+T examples::nr_006::luke_ccoef4_hypergeometric_0f1(const T& a, const T& x)
 {
-  const ccoef4_hypergeometric_0f1<mp_type> hypergeometric_0f1_object(a, x, mp_type(-20));
+  const ccoef4_hypergeometric_0f1<T> hypergeometric_0f1_object(a, x, T(-20));
 
   hypergeometric_0f1_object.ccoef();
 
   return hypergeometric_0f1_object.series();
 }
 
-mp_type examples::nr_006::luke_ccoef1_hypergeometric_1f0(const mp_type& a, const mp_type& x)
+template<class T>
+T examples::nr_006::luke_ccoef1_hypergeometric_1f0(const T& a, const T& x)
 {
-  const ccoef1_hypergeometric_1f0<mp_type> hypergeometric_1f0_object(a, x, mp_type(-20));
+  const ccoef1_hypergeometric_1f0<T> hypergeometric_1f0_object(a, x, T(-20));
 
   hypergeometric_1f0_object.ccoef();
 
   return hypergeometric_1f0_object.series();
 }
 
-mp_type examples::nr_006::luke_ccoef3_hypergeometric_1f1(const mp_type& a, const mp_type& b, const mp_type& x)
+template<class T>
+T examples::nr_006::luke_ccoef3_hypergeometric_1f1(const T& a, const T& b, const T& x)
 {
-  const ccoef3_hypergeometric_1f1<mp_type> hypergeometric_1f1_object(a, b, x, mp_type(-20));
+  const ccoef3_hypergeometric_1f1<T> hypergeometric_1f1_object(a, b, x, T(-20));
 
   hypergeometric_1f1_object.ccoef();
 
   return hypergeometric_1f1_object.series();
 }
 
-mp_type examples::nr_006::luke_ccoef6_hypergeometric_1f2(const mp_type& a, const mp_type& b, const mp_type& c, const mp_type& x)
+template<class T>
+T examples::nr_006::luke_ccoef6_hypergeometric_1f2(const T& a, const T& b, const T& c, const T& x)
 {
-  const ccoef6_hypergeometric_1f2<mp_type> hypergeometric_1f2_object(a, b, c, x, mp_type(-20));
+  const ccoef6_hypergeometric_1f2<T> hypergeometric_1f2_object(a, b, c, x, T(-20));
 
   hypergeometric_1f2_object.ccoef();
 
   return hypergeometric_1f2_object.series();
 }
 
-mp_type examples::nr_006::luke_ccoef2_hypergeometric_2f1(const mp_type& a, const mp_type& b, const mp_type& c, const mp_type& x)
+template<class T>
+T examples::nr_006::luke_ccoef2_hypergeometric_2f1(const T& a, const T& b, const T& c, const T& x)
 {
-  const ccoef2_hypergeometric_2f1<mp_type> hypergeometric_2f1_object(a, b, c, x, mp_type(-20));
+  const ccoef2_hypergeometric_2f1<T> hypergeometric_2f1_object(a, b, c, x, T(-20));
 
   hypergeometric_2f1_object.ccoef();
 
@@ -673,7 +678,7 @@ mp_type examples::nr_006::luke_ccoef2_hypergeometric_2f1(const mp_type& a, const
 int main()
 {
   stopwatch<STD_CHRONO::high_resolution_clock> my_stopwatch;
-  double total_time = 0.0;
+  float total_time = 0.0F;
 
   std::vector<mp_type> hypergeometric_0f1_results(20U);
   std::vector<mp_type> hypergeometric_1f0_results(20U);
@@ -705,7 +710,7 @@ int main()
                   ++i;
                 });
 
-  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<double> >(my_stopwatch.elapsed()).count();
+  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<float> >(my_stopwatch.elapsed()).count();
 
   // Print the values of Hypergeometric0F1.
   std::for_each(hypergeometric_0f1_results.begin(),
@@ -733,7 +738,7 @@ int main()
                   ++i;
                 });
 
-  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<double> >(my_stopwatch.elapsed()).count();
+  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<float> >(my_stopwatch.elapsed()).count();
 
   // Print the values of Hypergeometric1F0.
   std::for_each(hypergeometric_1f0_results.begin(),
@@ -761,7 +766,7 @@ int main()
                   ++i;
                 });
 
-  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<double> >(my_stopwatch.elapsed()).count();
+  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<float> >(my_stopwatch.elapsed()).count();
 
   // Print the values of Hypergeometric1F1.
   std::for_each(hypergeometric_1f1_results.begin(),
@@ -789,7 +794,7 @@ int main()
                   ++i;
                 });
 
-  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<double> >(my_stopwatch.elapsed()).count();
+  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<float> >(my_stopwatch.elapsed()).count();
 
   // Print the values of Hypergeometric1F2.
   std::for_each(hypergeometric_1f2_results.begin(),
@@ -817,7 +822,7 @@ int main()
                   ++i;
                 });
 
-  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<double> >(my_stopwatch.elapsed()).count();
+  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<float> >(my_stopwatch.elapsed()).count();
 
   // Print the values of Hypergeometric2F1.
   std::for_each(hypergeometric_2f1_results.begin(),
