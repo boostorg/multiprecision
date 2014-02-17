@@ -78,23 +78,15 @@ private:
 
 namespace my_math
 {
-  mp_type chebyshev_t(const std::int32_t n, const mp_type& x);
-  mp_type chebyshev_u(const std::int32_t n, const mp_type& x);
-  mp_type hermite    (const std::int32_t n, const mp_type& x);
-  mp_type laguerre   (const std::int32_t n, const mp_type& x);
-  mp_type legendre_p (const std::int32_t n, const mp_type& x);
-  mp_type legendre_q (const std::int32_t n, const mp_type& x);
+  template<class T> T chebyshev_t(const std::int32_t n, const T& x);
 
-  mp_type chebyshev_t(const std::uint32_t n, const mp_type& x, std::vector<mp_type>* vp);
-  mp_type chebyshev_u(const std::uint32_t n, const mp_type& x, std::vector<mp_type>* vp);
-  mp_type hermite    (const std::uint32_t n, const mp_type& x, std::vector<mp_type>* vp);
-  mp_type laguerre   (const std::uint32_t n, const mp_type& x, std::vector<mp_type>* vp);
+  template<class T> T  chebyshev_t(const std::uint32_t n, const T& x, std::vector<T>* vp);
 
-  bool isneg(const mp_type& x) { return (x < mp_type(0)); }
+  template<class T> bool isneg(const T& x) { return (x < T(0)); }
 
-  const mp_type& zero() { static const mp_type value_zero(0); return value_zero; }
-  const mp_type& one () { static const mp_type value_one (1); return value_one; }
-  const mp_type& two () { static const mp_type value_two (2); return value_two; }
+  template<class T> const T& zero() { static const T value_zero(0); return value_zero; }
+  template<class T> const T& one () { static const T value_one (1); return value_one; }
+  template<class T> const T& two () { static const T value_two (2); return value_two; }
 }
 
 namespace orthogonal_polynomial_series
@@ -119,7 +111,7 @@ namespace orthogonal_polynomial_series
       vp->reserve(static_cast<std::size_t>(n + 1u));
     }
 
-    T y0 = my_math::one();
+    T y0 = my_math::one<T>();
 
     if(vp != nullptr)
     {
@@ -139,7 +131,7 @@ namespace orthogonal_polynomial_series
     }
     else if(type == laguerre_l_type)
     {
-      y1 = my_math::one() - x;
+      y1 = my_math::one<T>() - x;
     }
     else
     {
@@ -156,9 +148,9 @@ namespace orthogonal_polynomial_series
       return y1;
     }
 
-    T a = my_math::two();
-    T b = my_math::zero();
-    T c = my_math::one();
+    T a = my_math::two <T>();
+    T b = my_math::zero<T>();
+    T c = my_math::one <T>();
 
     T yk;
 
@@ -168,17 +160,17 @@ namespace orthogonal_polynomial_series
     {
       if(type == laguerre_l_type)
       {
-        a = -my_math::one() / k;
-        b =  my_math::two() + a;
-        c =  my_math::one() + a;
+        a = -my_math::one<T>() / k;
+        b =  my_math::two<T>() + a;
+        c =  my_math::one<T>() + a;
       }
       else if(type == hermite_h_type)
       {
-        c = my_math::two() * (k - my_math::one());
+        c = my_math::two<T>() * (k - my_math::one<T>());
       }
-      
+
       yk = (((a * x) + b) * y1) - (c * y0);
-      
+
       y0 = y1;
       y1 = yk;
 
@@ -192,13 +184,13 @@ namespace orthogonal_polynomial_series
   }
 }
 
-mp_type my_math::chebyshev_t(const std::int32_t n, const mp_type& x)
+template<class T> T my_math::chebyshev_t(const std::int32_t n, const T& x)
 {
   if(my_math::isneg(x))
   {
     const bool b_negate = ((n % static_cast<std::int32_t>(2)) != static_cast<std::int32_t>(0));
 
-    const mp_type y = chebyshev_t(n, -x);
+    const T y = chebyshev_t(n, -x);
 
     return (!b_negate ? y : -y);
   }
@@ -215,90 +207,14 @@ mp_type my_math::chebyshev_t(const std::int32_t n, const mp_type& x)
   }
 }
 
-mp_type my_math::chebyshev_u(const std::int32_t n, const mp_type& x)
-{
-  if(my_math::isneg(x))
-  {
-    const bool b_negate = ((n % static_cast<std::int32_t>(2)) != static_cast<std::int32_t>(0));
-
-    const mp_type y = chebyshev_u(n, -x);
-
-    return ((!b_negate) ? y : -y);
-  }
-
-  if(n < static_cast<std::int32_t>(0))
-  {
-    if(n == static_cast<std::int32_t>(-2))
-    {
-      return my_math::one();
-    }
-    else if(n == static_cast<std::int32_t>(-1))
-    {
-      return my_math::zero();
-    }
-    else
-    {
-      const std::int32_t n_minus_two = static_cast<std::int32_t>(static_cast<std::int32_t>(-n) - static_cast<std::int32_t>(2));
-
-      return -chebyshev_u(n_minus_two, x);
-    }
-  }
-  else
-  {
-    return orthogonal_polynomial_series::orthogonal_polynomial_template(x, static_cast<std::uint32_t>(n), orthogonal_polynomial_series::chebyshev_u_type);
-  }
-}
-
-mp_type my_math::hermite(const std::int32_t n, const mp_type& x)
-{
-  if(n < static_cast<std::int32_t>(0))
-  {
-    // Negative order is not supported.
-    return my_math::zero();
-  }
-  else
-  {
-    return orthogonal_polynomial_series::orthogonal_polynomial_template(x, static_cast<std::uint32_t>(n), orthogonal_polynomial_series::hermite_h_type);
-  }
-}
-
-mp_type my_math::laguerre(const std::int32_t n, const mp_type& x)
-{
-  if(n < static_cast<std::int32_t>(0))
-  {
-    // Negative order is not supported.
-    return my_math::zero();
-  }
-  else if(n == static_cast<std::int32_t>(0))
-  {
-    return my_math::one();
-  }
-  else if(n == static_cast<std::int32_t>(1))
-  {
-    return my_math::one() - x;
-  }
-
-  if(my_math::isneg(x))
-  {
-    // Negative argument is not supported.
-    return my_math::zero();
-  }
-  else
-  {
-    return orthogonal_polynomial_series::orthogonal_polynomial_template(x, static_cast<std::uint32_t>(n), orthogonal_polynomial_series::laguerre_l_type);
-  }
-}
-
-mp_type my_math::chebyshev_t(const std::uint32_t n, const mp_type& x, std::vector<mp_type>* const vp) { return orthogonal_polynomial_series::orthogonal_polynomial_template(x, static_cast<std::int32_t>(n), orthogonal_polynomial_series::chebyshev_t_type, vp); }
-mp_type my_math::chebyshev_u(const std::uint32_t n, const mp_type& x, std::vector<mp_type>* const vp) { return orthogonal_polynomial_series::orthogonal_polynomial_template(x, static_cast<std::int32_t>(n), orthogonal_polynomial_series::chebyshev_u_type, vp); }
-mp_type my_math::hermite    (const std::uint32_t n, const mp_type& x, std::vector<mp_type>* const vp) { return orthogonal_polynomial_series::orthogonal_polynomial_template(x, static_cast<std::int32_t>(n), orthogonal_polynomial_series::hermite_h_type,   vp); }
-mp_type my_math::laguerre   (const std::uint32_t n, const mp_type& x, std::vector<mp_type>* const vp) { return orthogonal_polynomial_series::orthogonal_polynomial_template(x, static_cast<std::int32_t>(n), orthogonal_polynomial_series::laguerre_l_type,  vp); }
+template<class T> T my_math::chebyshev_t(const std::uint32_t n, const T& x, std::vector<T>* const vp) { return orthogonal_polynomial_series::orthogonal_polynomial_template(x, static_cast<std::int32_t>(n), orthogonal_polynomial_series::chebyshev_t_type, vp); }
 
 namespace util
 {
-  double digit_scale()
+  template <class T> float digit_scale()
   {
-    return static_cast<double>((std::max)(std::numeric_limits<mp_type>::digits10, 15)) / 300.0;
+    const int d = ((std::max)(std::numeric_limits<T>::digits10, 15));
+    return static_cast<float>(d) / 300.0F;
   }
 }
 
@@ -365,7 +281,7 @@ namespace examples
                                                   W(w),
                                                   C(0u) { }
 
-      virtual std::int32_t N() const { return static_cast<std::int32_t>(util::digit_scale() * 500.0); }
+      virtual std::int32_t N() const { return static_cast<std::int32_t>(util::digit_scale<T>() * 500.0); }
     };
 
     template<typename T> class ccoef4_hypergeometric_0f1 : public hypergeometric_pfq_base<T>
@@ -453,9 +369,13 @@ namespace examples
 
         T V1 = T(1) - AP;
 
-        // Here, we have corrected what appears to be an error in
-        // Luke's code. Luke has "AFAC = 2 + FOUR/W". But it appears
-        // as though "AFAC = 2 - FOUR/W" is correct.
+        // Here, we have corrected what appears to be an error in Luke's code.
+
+        // Luke's original code listing has:
+        //  AFAC = 2 + FOUR/W
+        // But it appears as though the correct form is:
+        //  AFAC = 2 - FOUR/W.
+
         const T AFAC = 2 - (T(4) / hypergeometric_pfq_base<T>::W);
 
         for(std::int32_t k = static_cast<std::int32_t>(0); k < N1; ++k)
@@ -478,7 +398,7 @@ namespace examples
     private:
       const T AP;
 
-      virtual std::int32_t N() const { return static_cast<std::int32_t>(util::digit_scale() * 1600.0); }
+      virtual std::int32_t N() const { return static_cast<std::int32_t>(util::digit_scale<T>() * 1600.0); }
     };
 
     template<typename T> class ccoef3_hypergeometric_1f1 : public hypergeometric_pfq_base<T>
@@ -694,7 +614,7 @@ namespace examples
       const T BP;
       const T CP;
 
-      virtual std::int32_t N() const { return static_cast<std::int32_t>(util::digit_scale() * 1600.0); }
+      virtual std::int32_t N() const { return static_cast<std::int32_t>(util::digit_scale<T>() * 1600.0); }
     };
 
     mp_type luke_ccoef4_hypergeometric_0f1(const mp_type& a, const mp_type& x);
