@@ -22,7 +22,6 @@
 #include <vector>
 #include <boost/math/constants/constants.hpp>
 #include <boost/noncopyable.hpp>
-
 //#define USE_CPP_BIN_FLOAT
 #define USE_CPP_DEC_FLOAT
 //#define USE_MPFR
@@ -80,7 +79,7 @@ namespace my_math
 {
   template<class T> T chebyshev_t(const std::int32_t n, const T& x);
 
-  template<class T> T  chebyshev_t(const std::uint32_t n, const T& x, std::vector<T>* vp);
+  template<class T> T chebyshev_t(const std::uint32_t n, const T& x, std::vector<T>* vp);
 
   template<class T> bool isneg(const T& x) { return (x < T(0)); }
 
@@ -91,19 +90,9 @@ namespace my_math
 
 namespace orthogonal_polynomial_series
 {
-  typedef enum enum_polynomial_type
+  template<typename T> static inline T orthogonal_polynomial_template(const T& x, const std::uint32_t n, std::vector<T>* const vp = static_cast<std::vector<T>*>(0u))
   {
-    chebyshev_t_type = 1,
-    chebyshev_u_type = 2,
-    laguerre_l_type  = 3,
-    hermite_h_type   = 4
-  }
-  polynomial_type;
-
-  template<typename T> static inline T orthogonal_polynomial_template(const T& x, const std::uint32_t n, const polynomial_type type, std::vector<T>* const vp = static_cast<std::vector<T>*>(0u))
-  {
-    // Compute the value of an orthogonal polynomial of one of the following types:
-    // Chebyshev 1st, Chebyshev 2nd, Laguerre, or Hermite
+    // Compute the value of an orthogonal chebyshev polinomial:
 
     if(vp != nullptr)
     {
@@ -123,20 +112,7 @@ namespace orthogonal_polynomial_series
       return y0;
     }
     
-    T y1;
-
-    if(type == chebyshev_t_type)
-    {
-      y1 = x;
-    }
-    else if(type == laguerre_l_type)
-    {
-      y1 = my_math::one<T>() - x;
-    }
-    else
-    {
-      y1 = x * static_cast<std::uint32_t>(2u);
-    }
+    T y1 = x;
 
     if(vp != nullptr)
     {
@@ -158,17 +134,6 @@ namespace orthogonal_polynomial_series
     // The direction of stability is upward recursion.
     for(std::int32_t k = static_cast<std::int32_t>(2); k <= static_cast<std::int32_t>(n); ++k)
     {
-      if(type == laguerre_l_type)
-      {
-        a = -my_math::one<T>() / k;
-        b =  my_math::two<T>() + a;
-        c =  my_math::one<T>() + a;
-      }
-      else if(type == hermite_h_type)
-      {
-        c = my_math::two<T>() * (k - my_math::one<T>());
-      }
-
       yk = (((a * x) + b) * y1) - (c * y0);
 
       y0 = y1;
@@ -203,11 +168,11 @@ template<class T> T my_math::chebyshev_t(const std::int32_t n, const T& x)
   }
   else
   {
-    return orthogonal_polynomial_series::orthogonal_polynomial_template(x, static_cast<std::uint32_t>(n), orthogonal_polynomial_series::chebyshev_t_type);
+    return orthogonal_polynomial_series::orthogonal_polynomial_template(x, static_cast<std::uint32_t>(n));
   }
 }
 
-template<class T> T my_math::chebyshev_t(const std::uint32_t n, const T& x, std::vector<T>* const vp) { return orthogonal_polynomial_series::orthogonal_polynomial_template(x, static_cast<std::int32_t>(n), orthogonal_polynomial_series::chebyshev_t_type, vp); }
+template<class T> T my_math::chebyshev_t(const std::uint32_t n, const T& x, std::vector<T>* const vp) { return orthogonal_polynomial_series::orthogonal_polynomial_template(x, static_cast<std::int32_t>(n),  vp); }
 
 namespace util
 {
