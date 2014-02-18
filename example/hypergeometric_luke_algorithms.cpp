@@ -1,6 +1,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright Christopher Kormanyos 2013.
+// Copyright Christopher Kormanyos 2013 - 2014.
 // Copyright John Maddock 2013.
 // Distributed under the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt
@@ -22,6 +22,7 @@
 #include <vector>
 #include <boost/math/constants/constants.hpp>
 #include <boost/noncopyable.hpp>
+
 //#define USE_CPP_BIN_FLOAT
 #define USE_CPP_DEC_FLOAT
 //#define USE_MPFR
@@ -798,6 +799,4 @@ int main()
                 });
 
   std::cout << "Total execution time = " << std::setprecision(3) << total_time << "s" << std::endl;
-
-  return 0;
 }
