@@ -12,7 +12,6 @@
 //
 
 #include <algorithm>
-#include <array>
 #include <cstdint>
 #include <deque>
 #include <functional>
@@ -58,22 +57,32 @@ template <class clock_type>
 struct stopwatch
 {
 public:
-   typedef typename clock_type::duration duration_type;
+  typedef typename clock_type::duration duration_type;
 
-   stopwatch() : m_start(clock_type::now()) { }
+  stopwatch() : m_start(clock_type::now()) { }
 
-   duration_type elapsed() const
-   {
-     return clock_type::now() - m_start;
-   }
+  stopwatch(const stopwatch& other) : m_start(other.m_start) { }
 
-   void reset()
-   {
-     m_start = clock_type::now();
-   }
+  stopwatch& operator=(const stopwatch& other)
+  {
+    m_start = other.m_start;
+    return *this;
+  }
+
+  ~stopwatch() { }
+
+  duration_type elapsed() const
+  {
+    return (clock_type::now() - m_start);
+  }
+
+  void reset()
+  {
+    m_start = clock_type::now();
+  }
 
 private:
-   typename clock_type::time_point m_start;
+  typename clock_type::time_point m_start;
 };
 
 namespace my_math
@@ -93,7 +102,8 @@ namespace orthogonal_polynomial_series
 {
   template<typename T> static inline T orthogonal_polynomial_template(const T& x, const std::uint32_t n, std::vector<T>* const vp = static_cast<std::vector<T>*>(0u))
   {
-    // Compute the value of an orthogonal chebyshev polinomial:
+    // Compute the value of an orthogonal chebyshev polinomial.
+    // Use stable upward recursion.
 
     if(vp != nullptr)
     {
@@ -103,22 +113,16 @@ namespace orthogonal_polynomial_series
 
     T y0 = my_math::one<T>();
 
-    if(vp != nullptr)
-    {
-      vp->push_back(y0);
-    }
+    if(vp != nullptr) { vp->push_back(y0); }
 
     if(n == static_cast<std::uint32_t>(0u))
     {
       return y0;
     }
-    
+
     T y1 = x;
 
-    if(vp != nullptr)
-    {
-      vp->push_back(y1);
-    }
+    if(vp != nullptr) { vp->push_back(y1); }
 
     if(n == static_cast<std::uint32_t>(1u))
     {
@@ -140,10 +144,7 @@ namespace orthogonal_polynomial_series
       y0 = y1;
       y1 = yk;
 
-      if(vp != nullptr)
-      {
-        vp->push_back(yk);
-      }
+      if(vp != nullptr) { vp->push_back(yk); }
     }
 
     return yk;
@@ -247,7 +248,7 @@ namespace examples
                                             W(w),
                                             C(0u) { }
 
-      virtual std::int32_t N() const { return static_cast<std::int32_t>(util::digit_scale<T>() * 500.0); }
+      virtual std::int32_t N() const { return static_cast<std::int32_t>(util::digit_scale<T>() * 500.0F); }
     };
 
     template<typename T> class ccoef4_hypergeometric_0f1 : public hypergeometric_pfq_base<T>
@@ -271,7 +272,7 @@ namespace examples
         // Luke: C
         T A3(0);
         T A2(0);
-        T A1(1);
+        T A1(boost::math::tools::root_epsilon<T>());
 
         hypergeometric_pfq_base<T>::C.resize(1u, A1);
 
@@ -327,7 +328,7 @@ namespace examples
         // Luke: C     ---------- BACKWARD RECURRENCE SCHEME                 ----------
         // Luke: C
         T A2(0);
-        T A1(1);
+        T A1(boost::math::tools::root_epsilon<T>());
 
         hypergeometric_pfq_base<T>::C.resize(1u, A1);
 
@@ -350,7 +351,7 @@ namespace examples
 
           // The terms have been slightly re-arranged resulting in lower complexity.
           // Parentheses have been added to avoid reliance on operator precedence.
-          const T term = -(X1 * AFAC * A1 + (X1 + V1) * A2) / (X1 - V1);
+          const T term = -(((X1 * AFAC) * A1) + ((X1 + V1) * A2)) / (X1 - V1);
 
           hypergeometric_pfq_base<T>::C.push_front(term);
 
@@ -364,7 +365,7 @@ namespace examples
     private:
       const T AP;
 
-      virtual std::int32_t N() const { return static_cast<std::int32_t>(util::digit_scale<T>() * 1600.0); }
+      virtual std::int32_t N() const { return static_cast<std::int32_t>(util::digit_scale<T>() * 1600.0F); }
     };
 
     template<typename T> class ccoef3_hypergeometric_1f1 : public hypergeometric_pfq_base<T>
@@ -390,7 +391,7 @@ namespace examples
         // Luke: C
         T A3(0);
         T A2(0);
-        T A1(1);
+        T A1(boost::math::tools::root_epsilon<T>());
 
         hypergeometric_pfq_base<T>::C.resize(1u, A1);
 
@@ -459,7 +460,7 @@ namespace examples
         T A4(0);
         T A3(0);
         T A2(0);
-        T A1(1);
+        T A1(boost::math::tools::root_epsilon<T>());
 
         hypergeometric_pfq_base<T>::C.resize(1u, A1);
 
@@ -532,7 +533,7 @@ namespace examples
         // Luke: C
         T A3(0);
         T A2(0);
-        T A1(1);
+        T A1(boost::math::tools::root_epsilon<T>());
 
         hypergeometric_pfq_base<T>::C.resize(1u, A1);
 
@@ -580,7 +581,7 @@ namespace examples
       const T BP;
       const T CP;
 
-      virtual std::int32_t N() const { return static_cast<std::int32_t>(util::digit_scale<T>() * 1600.0); }
+      virtual std::int32_t N() const { return static_cast<std::int32_t>(util::digit_scale<T>() * 1600.0F); }
     };
 
     template<class T> T luke_ccoef4_hypergeometric_0f1(const T& a, const T& x);
