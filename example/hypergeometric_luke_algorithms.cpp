@@ -1,6 +1,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
-// Copyright Christopher Kormanyos 2013.
+// Copyright Christopher Kormanyos 2013 - 2014.
 // Copyright John Maddock 2013.
 // Distributed under the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt
@@ -12,7 +12,6 @@
 //
 
 #include <algorithm>
-#include <array>
 #include <cstdint>
 #include <deque>
 #include <functional>
@@ -58,60 +57,53 @@ template <class clock_type>
 struct stopwatch
 {
 public:
-   typedef typename clock_type::duration duration_type;
+  typedef typename clock_type::duration duration_type;
 
-   stopwatch() : m_start(clock_type::now()) { }
+  stopwatch() : m_start(clock_type::now()) { }
 
-   duration_type elapsed() const
-   {
-     return clock_type::now() - m_start;
-   }
+  stopwatch(const stopwatch& other) : m_start(other.m_start) { }
 
-   void reset()
-   {
-     m_start = clock_type::now();
-   }
+  stopwatch& operator=(const stopwatch& other)
+  {
+    m_start = other.m_start;
+    return *this;
+  }
+
+  ~stopwatch() { }
+
+  duration_type elapsed() const
+  {
+    return (clock_type::now() - m_start);
+  }
+
+  void reset()
+  {
+    m_start = clock_type::now();
+  }
 
 private:
-   typename clock_type::time_point m_start;
+  typename clock_type::time_point m_start;
 };
 
 namespace my_math
 {
-  mp_type chebyshev_t(const std::int32_t n, const mp_type& x);
-  mp_type chebyshev_u(const std::int32_t n, const mp_type& x);
-  mp_type hermite    (const std::int32_t n, const mp_type& x);
-  mp_type laguerre   (const std::int32_t n, const mp_type& x);
-  mp_type legendre_p (const std::int32_t n, const mp_type& x);
-  mp_type legendre_q (const std::int32_t n, const mp_type& x);
+  template<class T> T chebyshev_t(const std::int32_t n, const T& x);
 
-  mp_type chebyshev_t(const std::uint32_t n, const mp_type& x, std::vector<mp_type>* vp);
-  mp_type chebyshev_u(const std::uint32_t n, const mp_type& x, std::vector<mp_type>* vp);
-  mp_type hermite    (const std::uint32_t n, const mp_type& x, std::vector<mp_type>* vp);
-  mp_type laguerre   (const std::uint32_t n, const mp_type& x, std::vector<mp_type>* vp);
+  template<class T> T chebyshev_t(const std::uint32_t n, const T& x, std::vector<T>* vp);
 
-  bool isneg(const mp_type& x) { return (x < mp_type(0)); }
+  template<class T> bool isneg(const T& x) { return (x < T(0)); }
 
-  const mp_type& zero() { static const mp_type value_zero(0); return value_zero; }
-  const mp_type& one () { static const mp_type value_one (1); return value_one; }
-  const mp_type& two () { static const mp_type value_two (2); return value_two; }
+  template<class T> const T& zero() { static const T value_zero(0); return value_zero; }
+  template<class T> const T& one () { static const T value_one (1); return value_one; }
+  template<class T> const T& two () { static const T value_two (2); return value_two; }
 }
 
 namespace orthogonal_polynomial_series
 {
-  typedef enum enum_polynomial_type
+  template<typename T> static inline T orthogonal_polynomial_template(const T& x, const std::uint32_t n, std::vector<T>* const vp = static_cast<std::vector<T>*>(0u))
   {
-    chebyshev_t_type = 1,
-    chebyshev_u_type = 2,
-    laguerre_l_type  = 3,
-    hermite_h_type   = 4
-  }
-  polynomial_type;
-
-  template<typename T> static inline T orthogonal_polynomial_template(const T& x, const std::uint32_t n, const polynomial_type type, std::vector<T>* const vp = static_cast<std::vector<T>*>(0u))
-  {
-    // Compute the value of an orthogonal polynomial of one of the following types:
-    // Chebyshev 1st, Chebyshev 2nd, Laguerre, or Hermite
+    // Compute the value of an orthogonal chebyshev polinomial.
+    // Use stable upward recursion.
 
     if(vp != nullptr)
     {
@@ -119,46 +111,27 @@ namespace orthogonal_polynomial_series
       vp->reserve(static_cast<std::size_t>(n + 1u));
     }
 
-    T y0 = my_math::one();
+    T y0 = my_math::one<T>();
 
-    if(vp != nullptr)
-    {
-      vp->push_back(y0);
-    }
+    if(vp != nullptr) { vp->push_back(y0); }
 
     if(n == static_cast<std::uint32_t>(0u))
     {
       return y0;
     }
-    
-    T y1;
 
-    if(type == chebyshev_t_type)
-    {
-      y1 = x;
-    }
-    else if(type == laguerre_l_type)
-    {
-      y1 = my_math::one() - x;
-    }
-    else
-    {
-      y1 = x * static_cast<std::uint32_t>(2u);
-    }
+    T y1 = x;
 
-    if(vp != nullptr)
-    {
-      vp->push_back(y1);
-    }
+    if(vp != nullptr) { vp->push_back(y1); }
 
     if(n == static_cast<std::uint32_t>(1u))
     {
       return y1;
     }
 
-    T a = my_math::two();
-    T b = my_math::zero();
-    T c = my_math::one();
+    T a = my_math::two <T>();
+    T b = my_math::zero<T>();
+    T c = my_math::one <T>();
 
     T yk;
 
@@ -166,39 +139,25 @@ namespace orthogonal_polynomial_series
     // The direction of stability is upward recursion.
     for(std::int32_t k = static_cast<std::int32_t>(2); k <= static_cast<std::int32_t>(n); ++k)
     {
-      if(type == laguerre_l_type)
-      {
-        a = -my_math::one() / k;
-        b =  my_math::two() + a;
-        c =  my_math::one() + a;
-      }
-      else if(type == hermite_h_type)
-      {
-        c = my_math::two() * (k - my_math::one());
-      }
-      
       yk = (((a * x) + b) * y1) - (c * y0);
-      
+
       y0 = y1;
       y1 = yk;
 
-      if(vp != nullptr)
-      {
-        vp->push_back(yk);
-      }
+      if(vp != nullptr) { vp->push_back(yk); }
     }
 
     return yk;
   }
 }
 
-mp_type my_math::chebyshev_t(const std::int32_t n, const mp_type& x)
+template<class T> T my_math::chebyshev_t(const std::int32_t n, const T& x)
 {
   if(my_math::isneg(x))
   {
     const bool b_negate = ((n % static_cast<std::int32_t>(2)) != static_cast<std::int32_t>(0));
 
-    const mp_type y = chebyshev_t(n, -x);
+    const T y = chebyshev_t(n, -x);
 
     return (!b_negate ? y : -y);
   }
@@ -211,94 +170,18 @@ mp_type my_math::chebyshev_t(const std::int32_t n, const mp_type& x)
   }
   else
   {
-    return orthogonal_polynomial_series::orthogonal_polynomial_template(x, static_cast<std::uint32_t>(n), orthogonal_polynomial_series::chebyshev_t_type);
+    return orthogonal_polynomial_series::orthogonal_polynomial_template(x, static_cast<std::uint32_t>(n));
   }
 }
 
-mp_type my_math::chebyshev_u(const std::int32_t n, const mp_type& x)
-{
-  if(my_math::isneg(x))
-  {
-    const bool b_negate = ((n % static_cast<std::int32_t>(2)) != static_cast<std::int32_t>(0));
-
-    const mp_type y = chebyshev_u(n, -x);
-
-    return ((!b_negate) ? y : -y);
-  }
-
-  if(n < static_cast<std::int32_t>(0))
-  {
-    if(n == static_cast<std::int32_t>(-2))
-    {
-      return my_math::one();
-    }
-    else if(n == static_cast<std::int32_t>(-1))
-    {
-      return my_math::zero();
-    }
-    else
-    {
-      const std::int32_t n_minus_two = static_cast<std::int32_t>(static_cast<std::int32_t>(-n) - static_cast<std::int32_t>(2));
-
-      return -chebyshev_u(n_minus_two, x);
-    }
-  }
-  else
-  {
-    return orthogonal_polynomial_series::orthogonal_polynomial_template(x, static_cast<std::uint32_t>(n), orthogonal_polynomial_series::chebyshev_u_type);
-  }
-}
-
-mp_type my_math::hermite(const std::int32_t n, const mp_type& x)
-{
-  if(n < static_cast<std::int32_t>(0))
-  {
-    // Negative order is not supported.
-    return my_math::zero();
-  }
-  else
-  {
-    return orthogonal_polynomial_series::orthogonal_polynomial_template(x, static_cast<std::uint32_t>(n), orthogonal_polynomial_series::hermite_h_type);
-  }
-}
-
-mp_type my_math::laguerre(const std::int32_t n, const mp_type& x)
-{
-  if(n < static_cast<std::int32_t>(0))
-  {
-    // Negative order is not supported.
-    return my_math::zero();
-  }
-  else if(n == static_cast<std::int32_t>(0))
-  {
-    return my_math::one();
-  }
-  else if(n == static_cast<std::int32_t>(1))
-  {
-    return my_math::one() - x;
-  }
-
-  if(my_math::isneg(x))
-  {
-    // Negative argument is not supported.
-    return my_math::zero();
-  }
-  else
-  {
-    return orthogonal_polynomial_series::orthogonal_polynomial_template(x, static_cast<std::uint32_t>(n), orthogonal_polynomial_series::laguerre_l_type);
-  }
-}
-
-mp_type my_math::chebyshev_t(const std::uint32_t n, const mp_type& x, std::vector<mp_type>* const vp) { return orthogonal_polynomial_series::orthogonal_polynomial_template(x, static_cast<std::int32_t>(n), orthogonal_polynomial_series::chebyshev_t_type, vp); }
-mp_type my_math::chebyshev_u(const std::uint32_t n, const mp_type& x, std::vector<mp_type>* const vp) { return orthogonal_polynomial_series::orthogonal_polynomial_template(x, static_cast<std::int32_t>(n), orthogonal_polynomial_series::chebyshev_u_type, vp); }
-mp_type my_math::hermite    (const std::uint32_t n, const mp_type& x, std::vector<mp_type>* const vp) { return orthogonal_polynomial_series::orthogonal_polynomial_template(x, static_cast<std::int32_t>(n), orthogonal_polynomial_series::hermite_h_type,   vp); }
-mp_type my_math::laguerre   (const std::uint32_t n, const mp_type& x, std::vector<mp_type>* const vp) { return orthogonal_polynomial_series::orthogonal_polynomial_template(x, static_cast<std::int32_t>(n), orthogonal_polynomial_series::laguerre_l_type,  vp); }
+template<class T> T my_math::chebyshev_t(const std::uint32_t n, const T& x, std::vector<T>* const vp) { return orthogonal_polynomial_series::orthogonal_polynomial_template(x, static_cast<std::int32_t>(n),  vp); }
 
 namespace util
 {
-  double digit_scale()
+  template <class T> float digit_scale()
   {
-    return static_cast<double>((std::max)(std::numeric_limits<mp_type>::digits10, 15)) / 300.0;
+    const int d = ((std::max)(std::numeric_limits<T>::digits10, 15));
+    return static_cast<float>(d) / 300.0F;
   }
 }
 
@@ -357,15 +240,15 @@ namespace examples
 
     protected:
       const   T             Z;
-      const   mp_type       W;
+      const   T             W;
       mutable std::deque<T> C;
 
       hypergeometric_pfq_base(const T& z,
-                              const mp_type& w) : Z(z),
-                                                  W(w),
-                                                  C(0u) { }
+                              const T& w) : Z(z),
+                                            W(w),
+                                            C(0u) { }
 
-      virtual std::int32_t N() const { return static_cast<std::int32_t>(util::digit_scale() * 500.0); }
+      virtual std::int32_t N() const { return static_cast<std::int32_t>(util::digit_scale<T>() * 500.0F); }
     };
 
     template<typename T> class ccoef4_hypergeometric_0f1 : public hypergeometric_pfq_base<T>
@@ -373,8 +256,8 @@ namespace examples
     public:
       ccoef4_hypergeometric_0f1(const T& c,
                                 const T& z,
-                                const mp_type& w) : hypergeometric_pfq_base<T>(z, w),
-                                                    CP(c) { }
+                                const T& w) : hypergeometric_pfq_base<T>(z, w),
+                                              CP(c) { }
 
       virtual ~ccoef4_hypergeometric_0f1() { }
 
@@ -389,7 +272,7 @@ namespace examples
         // Luke: C
         T A3(0);
         T A2(0);
-        T A1(1);
+        T A1(boost::math::tools::root_epsilon<T>());
 
         hypergeometric_pfq_base<T>::C.resize(1u, A1);
 
@@ -430,8 +313,8 @@ namespace examples
     public:
       ccoef1_hypergeometric_1f0(const T& a,
                                 const T& z,
-                                const mp_type& w) : hypergeometric_pfq_base<T>(z, w),
-                                                    AP(a) { }
+                                const T& w) : hypergeometric_pfq_base<T>(z, w),
+                                              AP(a) { }
 
       virtual ~ccoef1_hypergeometric_1f0() { }
 
@@ -445,7 +328,7 @@ namespace examples
         // Luke: C     ---------- BACKWARD RECURRENCE SCHEME                 ----------
         // Luke: C
         T A2(0);
-        T A1(1);
+        T A1(boost::math::tools::root_epsilon<T>());
 
         hypergeometric_pfq_base<T>::C.resize(1u, A1);
 
@@ -453,9 +336,13 @@ namespace examples
 
         T V1 = T(1) - AP;
 
-        // Here, we have corrected what appears to be an error in
-        // Luke's code. Luke has "AFAC = 2 + FOUR/W". But it appears
-        // as though "AFAC = 2 - FOUR/W" is correct.
+        // Here, we have corrected what appears to be an error in Luke's code.
+
+        // Luke's original code listing has:
+        //  AFAC = 2 + FOUR/W
+        // But it appears as though the correct form is:
+        //  AFAC = 2 - FOUR/W.
+
         const T AFAC = 2 - (T(4) / hypergeometric_pfq_base<T>::W);
 
         for(std::int32_t k = static_cast<std::int32_t>(0); k < N1; ++k)
@@ -464,7 +351,7 @@ namespace examples
 
           // The terms have been slightly re-arranged resulting in lower complexity.
           // Parentheses have been added to avoid reliance on operator precedence.
-          const T term = -(X1 * AFAC * A1 + (X1 + V1) * A2) / (X1 - V1);
+          const T term = -(((X1 * AFAC) * A1) + ((X1 + V1) * A2)) / (X1 - V1);
 
           hypergeometric_pfq_base<T>::C.push_front(term);
 
@@ -478,7 +365,7 @@ namespace examples
     private:
       const T AP;
 
-      virtual std::int32_t N() const { return static_cast<std::int32_t>(util::digit_scale() * 1600.0); }
+      virtual std::int32_t N() const { return static_cast<std::int32_t>(util::digit_scale<T>() * 1600.0F); }
     };
 
     template<typename T> class ccoef3_hypergeometric_1f1 : public hypergeometric_pfq_base<T>
@@ -487,9 +374,9 @@ namespace examples
       ccoef3_hypergeometric_1f1(const T& a,
                                 const T& c,
                                 const T& z,
-                                const mp_type& w) : hypergeometric_pfq_base<T>(z, w),
-                                                    AP(a),
-                                                    CP(c) { }
+                                const T& w) : hypergeometric_pfq_base<T>(z, w),
+                                              AP(a),
+                                              CP(c) { }
 
       virtual ~ccoef3_hypergeometric_1f1() { }
 
@@ -504,7 +391,7 @@ namespace examples
         // Luke: C
         T A3(0);
         T A2(0);
-        T A1(1);
+        T A1(boost::math::tools::root_epsilon<T>());
 
         hypergeometric_pfq_base<T>::C.resize(1u, A1);
 
@@ -555,10 +442,10 @@ namespace examples
                                 const T& b,
                                 const T& c,
                                 const T& z,
-                                const mp_type& w) : hypergeometric_pfq_base<T>(z, w),
-                                                    AP(a),
-                                                    BP(b),
-                                                    CP(c) { }
+                                const T& w) : hypergeometric_pfq_base<T>(z, w),
+                                              AP(a),
+                                              BP(b),
+                                              CP(c) { }
 
       virtual ~ccoef6_hypergeometric_1f2() { }
 
@@ -573,7 +460,7 @@ namespace examples
         T A4(0);
         T A3(0);
         T A2(0);
-        T A1(1);
+        T A1(boost::math::tools::root_epsilon<T>());
 
         hypergeometric_pfq_base<T>::C.resize(1u, A1);
 
@@ -628,10 +515,10 @@ namespace examples
                                 const T& b,
                                 const T& c,
                                 const T& z,
-                                const mp_type& w) : hypergeometric_pfq_base<T>(z, w),
-                                                    AP(a),
-                                                    BP(b),
-                                                    CP(c) { }
+                                const T& w) : hypergeometric_pfq_base<T>(z, w),
+                                              AP(a),
+                                              BP(b),
+                                              CP(c) { }
 
       virtual ~ccoef2_hypergeometric_2f1() { }
 
@@ -646,7 +533,7 @@ namespace examples
         // Luke: C
         T A3(0);
         T A2(0);
-        T A1(1);
+        T A1(boost::math::tools::root_epsilon<T>());
 
         hypergeometric_pfq_base<T>::C.resize(1u, A1);
 
@@ -694,56 +581,61 @@ namespace examples
       const T BP;
       const T CP;
 
-      virtual std::int32_t N() const { return static_cast<std::int32_t>(util::digit_scale() * 1600.0); }
+      virtual std::int32_t N() const { return static_cast<std::int32_t>(util::digit_scale<T>() * 1600.0F); }
     };
 
-    mp_type luke_ccoef4_hypergeometric_0f1(const mp_type& a, const mp_type& x);
-    mp_type luke_ccoef1_hypergeometric_1f0(const mp_type& a, const mp_type& x);
-    mp_type luke_ccoef3_hypergeometric_1f1(const mp_type& a, const mp_type& b, const mp_type& x);
-    mp_type luke_ccoef6_hypergeometric_1f2(const mp_type& a, const mp_type& b, const mp_type& c, const mp_type& x);
-    mp_type luke_ccoef2_hypergeometric_2f1(const mp_type& a, const mp_type& b, const mp_type& c, const mp_type& x);
+    template<class T> T luke_ccoef4_hypergeometric_0f1(const T& a, const T& x);
+    template<class T> T luke_ccoef1_hypergeometric_1f0(const T& a, const T& x);
+    template<class T> T luke_ccoef3_hypergeometric_1f1(const T& a, const T& b, const T& x);
+    template<class T> T luke_ccoef6_hypergeometric_1f2(const T& a, const T& b, const T& c, const T& x);
+    template<class T> T luke_ccoef2_hypergeometric_2f1(const T& a, const T& b, const T& c, const T& x);
   }
 }
 
-mp_type examples::nr_006::luke_ccoef4_hypergeometric_0f1(const mp_type& a, const mp_type& x)
+template<class T>
+T examples::nr_006::luke_ccoef4_hypergeometric_0f1(const T& a, const T& x)
 {
-  const ccoef4_hypergeometric_0f1<mp_type> hypergeometric_0f1_object(a, x, mp_type(-20));
+  const ccoef4_hypergeometric_0f1<T> hypergeometric_0f1_object(a, x, T(-20));
 
   hypergeometric_0f1_object.ccoef();
 
   return hypergeometric_0f1_object.series();
 }
 
-mp_type examples::nr_006::luke_ccoef1_hypergeometric_1f0(const mp_type& a, const mp_type& x)
+template<class T>
+T examples::nr_006::luke_ccoef1_hypergeometric_1f0(const T& a, const T& x)
 {
-  const ccoef1_hypergeometric_1f0<mp_type> hypergeometric_1f0_object(a, x, mp_type(-20));
+  const ccoef1_hypergeometric_1f0<T> hypergeometric_1f0_object(a, x, T(-20));
 
   hypergeometric_1f0_object.ccoef();
 
   return hypergeometric_1f0_object.series();
 }
 
-mp_type examples::nr_006::luke_ccoef3_hypergeometric_1f1(const mp_type& a, const mp_type& b, const mp_type& x)
+template<class T>
+T examples::nr_006::luke_ccoef3_hypergeometric_1f1(const T& a, const T& b, const T& x)
 {
-  const ccoef3_hypergeometric_1f1<mp_type> hypergeometric_1f1_object(a, b, x, mp_type(-20));
+  const ccoef3_hypergeometric_1f1<T> hypergeometric_1f1_object(a, b, x, T(-20));
 
   hypergeometric_1f1_object.ccoef();
 
   return hypergeometric_1f1_object.series();
 }
 
-mp_type examples::nr_006::luke_ccoef6_hypergeometric_1f2(const mp_type& a, const mp_type& b, const mp_type& c, const mp_type& x)
+template<class T>
+T examples::nr_006::luke_ccoef6_hypergeometric_1f2(const T& a, const T& b, const T& c, const T& x)
 {
-  const ccoef6_hypergeometric_1f2<mp_type> hypergeometric_1f2_object(a, b, c, x, mp_type(-20));
+  const ccoef6_hypergeometric_1f2<T> hypergeometric_1f2_object(a, b, c, x, T(-20));
 
   hypergeometric_1f2_object.ccoef();
 
   return hypergeometric_1f2_object.series();
 }
 
-mp_type examples::nr_006::luke_ccoef2_hypergeometric_2f1(const mp_type& a, const mp_type& b, const mp_type& c, const mp_type& x)
+template<class T>
+T examples::nr_006::luke_ccoef2_hypergeometric_2f1(const T& a, const T& b, const T& c, const T& x)
 {
-  const ccoef2_hypergeometric_2f1<mp_type> hypergeometric_2f1_object(a, b, c, x, mp_type(-20));
+  const ccoef2_hypergeometric_2f1<T> hypergeometric_2f1_object(a, b, c, x, T(-20));
 
   hypergeometric_2f1_object.ccoef();
 
@@ -753,7 +645,7 @@ mp_type examples::nr_006::luke_ccoef2_hypergeometric_2f1(const mp_type& a, const
 int main()
 {
   stopwatch<STD_CHRONO::high_resolution_clock> my_stopwatch;
-  double total_time = 0.0;
+  float total_time = 0.0F;
 
   std::vector<mp_type> hypergeometric_0f1_results(20U);
   std::vector<mp_type> hypergeometric_1f0_results(20U);
@@ -785,7 +677,7 @@ int main()
                   ++i;
                 });
 
-  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<double> >(my_stopwatch.elapsed()).count();
+  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<float> >(my_stopwatch.elapsed()).count();
 
   // Print the values of Hypergeometric0F1.
   std::for_each(hypergeometric_0f1_results.begin(),
@@ -813,7 +705,7 @@ int main()
                   ++i;
                 });
 
-  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<double> >(my_stopwatch.elapsed()).count();
+  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<float> >(my_stopwatch.elapsed()).count();
 
   // Print the values of Hypergeometric1F0.
   std::for_each(hypergeometric_1f0_results.begin(),
@@ -841,7 +733,7 @@ int main()
                   ++i;
                 });
 
-  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<double> >(my_stopwatch.elapsed()).count();
+  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<float> >(my_stopwatch.elapsed()).count();
 
   // Print the values of Hypergeometric1F1.
   std::for_each(hypergeometric_1f1_results.begin(),
@@ -869,7 +761,7 @@ int main()
                   ++i;
                 });
 
-  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<double> >(my_stopwatch.elapsed()).count();
+  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<float> >(my_stopwatch.elapsed()).count();
 
   // Print the values of Hypergeometric1F2.
   std::for_each(hypergeometric_1f2_results.begin(),
@@ -897,7 +789,7 @@ int main()
                   ++i;
                 });
 
-  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<double> >(my_stopwatch.elapsed()).count();
+  total_time += STD_CHRONO::duration_cast<STD_CHRONO::duration<float> >(my_stopwatch.elapsed()).count();
 
   // Print the values of Hypergeometric2F1.
   std::for_each(hypergeometric_2f1_results.begin(),
@@ -908,6 +800,4 @@ int main()
                 });
 
   std::cout << "Total execution time = " << std::setprecision(3) << total_time << "s" << std::endl;
-
-  return 0;
 }
