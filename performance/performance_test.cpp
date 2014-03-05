@@ -839,7 +839,7 @@ int main()
 #ifdef TEST_CPP_BIN_FLOAT
    test<boost::multiprecision::cpp_bin_float_50>("cpp_bin_float", 50);
    test<boost::multiprecision::cpp_bin_float_100>("cpp_bin_float", 100);
-   test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<500> >::digits> > >("cpp_bin_float", 500);
+   test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<500> > >("cpp_bin_float", 500);
 #endif
 #ifdef TEST_MPFR
    test<boost::multiprecision::mpfr_float_50>("mpfr_float", 50);
