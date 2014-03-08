@@ -20,11 +20,13 @@ project : requirements
    <include>$(mpfi_path)
    <include>$(mpfi_path)/src
    <include>$(tommath_path)
+   <include>../include
    <include>../../..
    # We set these to make it easier to set up and test GMP and MPFR under Win32:
    <toolset>msvc:<runtime-link>static
    <toolset>msvc:<link>static
    <toolset>msvc:<warnings>all
+   <toolset>msvc:<cxxflags>/fp:precise
    <toolset>intel-win:<runtime-link>static
    <toolset>intel-win:<link>static
    # Speed up compiles:

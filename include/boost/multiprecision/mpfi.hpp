@@ -138,11 +138,10 @@ struct mpfi_float_imp
    }
    mpfi_float_imp& operator = (long long i)
    {
-      BOOST_MP_USING_ABS
       if(m_data[0].left._mpfr_d == 0)
          mpfi_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
       bool neg = i < 0;
-      *this = static_cast<unsigned long long>(abs(i));
+      *this = boost::multiprecision::detail::unsigned_abs(i);
       if(neg)
          mpfi_neg(m_data, m_data);
       return *this;

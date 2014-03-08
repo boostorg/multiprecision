@@ -144,11 +144,10 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
    }
    mpfr_float_imp& operator = (long long i)
    {
-      BOOST_MP_USING_ABS
       if(m_data[0]._mpfr_d == 0)
          mpfr_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
       bool neg = i < 0;
-      *this = static_cast<unsigned long long>(abs(i));
+      *this = boost::multiprecision::detail::unsigned_abs(i);
       if(neg)
          mpfr_neg(m_data, m_data, GMP_RNDN);
       return *this;
@@ -427,9 +426,8 @@ struct mpfr_float_imp<digits10, allocate_stack>
    }
    mpfr_float_imp& operator = (long long i)
    {
-      BOOST_MP_USING_ABS
       bool neg = i < 0;
-      *this = static_cast<unsigned long long>(abs(i));
+      *this = boost::multiprecision::detail::unsigned_abs(i);
       if(neg)
          mpfr_neg(m_data, m_data, GMP_RNDN);
       return *this;

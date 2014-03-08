@@ -93,11 +93,10 @@ struct tommath_int
    }
    tommath_int& operator = (long long i)
    {
-      BOOST_MP_USING_ABS
       if(m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
       bool neg = i < 0;
-      *this = static_cast<unsigned long long>(abs(i));
+      *this = boost::multiprecision::detail::unsigned_abs(i);
       if(neg)
          detail::check_tommath_result(mp_neg(&m_data, &m_data));
       return *this;

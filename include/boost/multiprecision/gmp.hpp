@@ -123,11 +123,10 @@ struct gmp_float_imp
    }
    gmp_float_imp& operator = (long long i)
    {
-      BOOST_MP_USING_ABS
       if(m_data[0]._mp_d == 0)
          mpf_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
       bool neg = i < 0;
-      *this = static_cast<unsigned long long>(abs(i));
+      *this = static_cast<unsigned long long>(boost::multiprecision::detail::unsigned_abs(i));
       if(neg)
          mpf_neg(m_data, m_data);
       return *this;
@@ -1050,11 +1049,10 @@ struct gmp_int
    }
    gmp_int& operator = (long long i)
    {
-      BOOST_MP_USING_ABS
       if(m_data[0]._mp_d == 0)
          mpz_init(this->m_data);
       bool neg = i < 0;
-      *this = static_cast<unsigned long long>(abs(i));
+      *this = boost::multiprecision::detail::unsigned_abs(i);
       if(neg)
          mpz_neg(m_data, m_data);
       return *this;
@@ -1782,11 +1780,10 @@ struct gmp_rational
    }
    gmp_rational& operator = (long long i)
    {
-      BOOST_MP_USING_ABS
       if(m_data[0]._mp_den._mp_d == 0)
          mpq_init(m_data);
       bool neg = i < 0;
-      *this = static_cast<unsigned long long>(abs(i));
+      *this = boost::multiprecision::detail::unsigned_abs(i);
       if(neg)
          mpq_neg(m_data, m_data);
       return *this;

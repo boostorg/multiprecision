@@ -75,17 +75,35 @@ namespace detail{
 // Workaround for missing abs(long long) and abs(__int128) on some compilers:
 //
 template <class T>
-typename enable_if_c<(is_signed<T>::value || is_floating_point<T>::value), T>::type abs(T t) BOOST_NOEXCEPT
+BOOST_CONSTEXPR typename enable_if_c<(is_signed<T>::value || is_floating_point<T>::value), T>::type abs(T t) BOOST_NOEXCEPT
 {
-   return t < 0 ? -t : t;
+   // This strange expression avoids a hardware trap in the corner case
+   // that val is the most negative value permitted in long long.
+   // See https://svn.boost.org/trac/boost/ticket/9740.
+   return t < 0 ? T(1u) + T(-(t + 1)) : t;
 }
 template <class T>
-typename enable_if_c<(is_unsigned<T>::value), T>::type abs(T t) BOOST_NOEXCEPT
+BOOST_CONSTEXPR typename enable_if_c<(is_unsigned<T>::value), T>::type abs(T t) BOOST_NOEXCEPT
 {
    return t;
 }
 
 #define BOOST_MP_USING_ABS using boost::multiprecision::detail::abs;
+
+template <class T>
+BOOST_CONSTEXPR typename enable_if_c<(is_signed<T>::value || is_floating_point<T>::value), typename make_unsigned<T>::type>::type unsigned_abs(T t) BOOST_NOEXCEPT
+{
+   // This strange expression avoids a hardware trap in the corner case
+   // that val is the most negative value permitted in long long.
+   // See https://svn.boost.org/trac/boost/ticket/9740.
+   typedef typename make_unsigned<T>::type ui_type;
+   return t < 0 ? static_cast<ui_type>(1u) + static_cast<ui_type>(-(t + 1)) : static_cast<ui_type>(t);
+}
+template <class T>
+BOOST_CONSTEXPR typename enable_if_c<(is_unsigned<T>::value), T>::type unsigned_abs(T t) BOOST_NOEXCEPT
+{
+   return t;
+}
 
 //
 // Move support:

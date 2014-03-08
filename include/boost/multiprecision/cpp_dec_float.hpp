@@ -203,7 +203,7 @@ public:
       {
          if(i < 0)
          {
-            from_unsigned_long_long(-i);
+            from_unsigned_long_long(boost::multiprecision::detail::unsigned_abs(i));
             negate();
          }
          else
@@ -1617,7 +1617,21 @@ signed long long cpp_dec_float<Digits10, ExponentType, Allocator>::extract_signe
       }
    }
 
-   return ((!b_neg) ? static_cast<signed long long>(val) : static_cast<signed long long>(-static_cast<signed long long>(val)));
+   if (!b_neg)
+   {
+      return static_cast<signed long long>(val);
+   }
+   else
+   {
+      // This strange expression avoids a hardware trap in the corner case
+      // that val is the most negative value permitted in long long.
+      // See https://svn.boost.org/trac/boost/ticket/9740.
+      //
+      signed long long sval = static_cast<signed long long>(val - 1);
+      sval = -sval;
+      --sval;
+      return sval;
+   }
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
