@@ -1151,7 +1151,6 @@ private:
    template <class A>
    typename boost::disable_if_c<is_unsigned<A>::value || !is_integral<A>::value >::type do_assign_arithmetic(A val, const mpl::true_&)
    {
-      typedef typename make_signed<typename self_type::local_limb_type>::type signed_limb_type;
       this->check_in_range(val);
       *this->limbs() = (val < 0) ? static_cast<typename self_type::local_limb_type>(boost::multiprecision::detail::unsigned_abs(val)) : static_cast<typename self_type::local_limb_type>(val);
       this->sign(val < 0);
@@ -1160,7 +1159,6 @@ private:
    template <class A>
    typename boost::enable_if_c< !is_integral<A>::value>::type do_assign_arithmetic(A val, const mpl::true_&)
    {
-      typedef typename make_signed<typename self_type::local_limb_type>::type signed_limb_type;
       this->check_in_range(val);
       *this->limbs() = (val < 0) ? static_cast<typename self_type::local_limb_type>(boost::multiprecision::detail::abs(val)) : static_cast<typename self_type::local_limb_type>(val);
       this->sign(val < 0);

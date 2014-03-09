@@ -2672,7 +2672,7 @@ template <unsigned Digits10, class ExponentType, class Allocator>
 inline void eval_add(cpp_dec_float<Digits10, ExponentType, Allocator>& result, long long o)
 {
    if(o < 0)
-      result.sub_unsigned_long_long(-o);
+      result.sub_unsigned_long_long(boost::multiprecision::detail::unsigned_abs(o));
    else
       result.add_unsigned_long_long(o);
 }
@@ -2680,7 +2680,7 @@ template <unsigned Digits10, class ExponentType, class Allocator>
 inline void eval_subtract(cpp_dec_float<Digits10, ExponentType, Allocator>& result, long long o)
 {
    if(o < 0)
-      result.add_unsigned_long_long(-o);
+      result.add_unsigned_long_long(boost::multiprecision::detail::unsigned_abs(o));
    else
       result.sub_unsigned_long_long(o);
 }
@@ -2689,7 +2689,7 @@ inline void eval_multiply(cpp_dec_float<Digits10, ExponentType, Allocator>& resu
 {
    if(o < 0)
    {
-      result.mul_unsigned_long_long(-o);
+      result.mul_unsigned_long_long(boost::multiprecision::detail::unsigned_abs(o));
       result.negate();
    }
    else
@@ -2700,7 +2700,7 @@ inline void eval_divide(cpp_dec_float<Digits10, ExponentType, Allocator>& result
 {
    if(o < 0)
    {
-      result.div_unsigned_long_long(-o);
+      result.div_unsigned_long_long(boost::multiprecision::detail::unsigned_abs(o));
       result.negate();
    }
    else

@@ -529,7 +529,7 @@ inline void eval_add(mpfi_float_backend<digits10>& result, long i)
    if(i > 0)
       mpfi_add_ui(result.data(), result.data(), i);
    else
-      mpfi_sub_ui(result.data(), result.data(), std::abs(i));
+      mpfi_sub_ui(result.data(), result.data(), boost::multiprecision::detail::unsigned_abs(i));
 }
 template <unsigned digits10>
 inline void eval_subtract(mpfi_float_backend<digits10>& result, long i)
@@ -537,19 +537,19 @@ inline void eval_subtract(mpfi_float_backend<digits10>& result, long i)
    if(i > 0)
       mpfi_sub_ui(result.data(), result.data(), i);
    else
-      mpfi_add_ui(result.data(), result.data(), std::abs(i));
+      mpfi_add_ui(result.data(), result.data(), boost::multiprecision::detail::unsigned_abs(i));
 }
 template <unsigned digits10>
 inline void eval_multiply(mpfi_float_backend<digits10>& result, long i)
 {
-   mpfi_mul_ui(result.data(), result.data(), std::abs(i));
+   mpfi_mul_ui(result.data(), result.data(), boost::multiprecision::detail::unsigned_abs(i));
    if(i < 0)
       mpfi_neg(result.data(), result.data());
 }
 template <unsigned digits10>
 inline void eval_divide(mpfi_float_backend<digits10>& result, long i)
 {
-   mpfi_div_ui(result.data(), result.data(), std::abs(i));
+   mpfi_div_ui(result.data(), result.data(), boost::multiprecision::detail::unsigned_abs(i));
    if(i < 0)
       mpfi_neg(result.data(), result.data());
 }
@@ -570,7 +570,7 @@ template <unsigned D1, unsigned D2>
 inline void eval_add(mpfi_float_backend<D1>& a, const mpfi_float_backend<D2>& x, long y)
 {
    if(y < 0)
-      mpfi_sub_ui(a.data(), x.data(), -y);
+      mpfi_sub_ui(a.data(), x.data(), boost::multiprecision::detail::unsigned_abs(y));
    else
       mpfi_add_ui(a.data(), x.data(), y);
 }
@@ -584,7 +584,7 @@ inline void eval_add(mpfi_float_backend<D1>& a, long x, const mpfi_float_backend
 {
    if(x < 0)
    {
-      mpfi_ui_sub(a.data(), -x, y.data());
+      mpfi_ui_sub(a.data(), boost::multiprecision::detail::unsigned_abs(x), y.data());
       mpfi_neg(a.data(), a.data());
    }
    else
@@ -604,7 +604,7 @@ template <unsigned D1, unsigned D2>
 inline void eval_subtract(mpfi_float_backend<D1>& a, const mpfi_float_backend<D2>& x, long y)
 {
    if(y < 0)
-      mpfi_add_ui(a.data(), x.data(), -y);
+      mpfi_add_ui(a.data(), x.data(), boost::multiprecision::detail::unsigned_abs(y));
    else
       mpfi_sub_ui(a.data(), x.data(), y);
 }
@@ -618,7 +618,7 @@ inline void eval_subtract(mpfi_float_backend<D1>& a, long x, const mpfi_float_ba
 {
    if(x < 0)
    {
-      mpfi_add_ui(a.data(), y.data(), -x);
+      mpfi_add_ui(a.data(), y.data(), boost::multiprecision::detail::unsigned_abs(x));
       mpfi_neg(a.data(), a.data());
    }
    else
@@ -643,7 +643,7 @@ inline void eval_multiply(mpfi_float_backend<D1>& a, const mpfi_float_backend<D2
 {
    if(y < 0)
    {
-      mpfi_mul_ui(a.data(), x.data(), -y);
+      mpfi_mul_ui(a.data(), x.data(), boost::multiprecision::detail::unsigned_abs(y));
       a.negate();
    }
    else
@@ -659,7 +659,7 @@ inline void eval_multiply(mpfi_float_backend<D1>& a, long x, const mpfi_float_ba
 {
    if(x < 0)
    {
-      mpfi_mul_ui(a.data(), y.data(), -x);
+      mpfi_mul_ui(a.data(), y.data(), boost::multiprecision::detail::unsigned_abs(x));
       mpfi_neg(a.data(), a.data());
    }
    else
@@ -681,7 +681,7 @@ inline void eval_divide(mpfi_float_backend<D1>& a, const mpfi_float_backend<D2>&
 {
    if(y < 0)
    {
-      mpfi_div_ui(a.data(), x.data(), -y);
+      mpfi_div_ui(a.data(), x.data(), boost::multiprecision::detail::unsigned_abs(y));
       a.negate();
    }
    else
@@ -697,7 +697,7 @@ inline void eval_divide(mpfi_float_backend<D1>& a, long x, const mpfi_float_back
 {
    if(x < 0)
    {
-      mpfi_ui_div(a.data(), -x, y.data());
+      mpfi_ui_div(a.data(), boost::multiprecision::detail::unsigned_abs(x), y.data());
       mpfi_neg(a.data(), a.data());
    }
    else

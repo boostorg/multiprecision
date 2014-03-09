@@ -123,8 +123,20 @@ typename boost::enable_if_c<boost::multiprecision::is_interval_number<T>::value>
 //
 // We may not have an abs overload for long long so provide a fall back:
 //
+inline unsigned safe_abs(int const& v)
+{
+   return v < 0 ? static_cast<unsigned>(1u) + static_cast<unsigned>(-(v+1)) : v;
+}
+inline unsigned long safe_abs(long const& v)
+{
+   return v < 0 ? static_cast<unsigned long>(1u) + static_cast<unsigned long>(-(v+1)) : v;
+}
+inline unsigned long long safe_abs(long long const& v)
+{
+   return v < 0 ? static_cast<unsigned long long>(1u) + static_cast<unsigned long long>(-(v+1)) : v;
+}
 template <class T>
-inline T safe_abs(T const& v ...)
+inline typename boost::disable_if_c<boost::is_integral<T>::value, T>::type safe_abs(T const& v)
 {
    return v < 0 ? -v : v;
 }

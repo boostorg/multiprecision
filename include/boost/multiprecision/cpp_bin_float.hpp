@@ -273,7 +273,7 @@ public:
       else
       {
          typedef typename make_unsigned<I>::type ui_type;
-         ui_type fi = static_cast<ui_type>(boost::multiprecision::detail::abs(i));
+         ui_type fi = static_cast<ui_type>(boost::multiprecision::detail::unsigned_abs(i));
          typedef typename boost::multiprecision::detail::canonical<ui_type, rep_type>::type ar_type;
          m_data = static_cast<ar_type>(fi);
          unsigned shift = msb(fi);
@@ -750,7 +750,7 @@ template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exp
 inline typename enable_if_c<is_signed<S>::value>::type eval_multiply(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> &res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> &a, const S &b)
 {
    typedef typename make_unsigned<S>::type ui_type;
-   eval_multiply(res, a, static_cast<ui_type>(boost::multiprecision::detail::abs(b)));
+   eval_multiply(res, a, static_cast<ui_type>(boost::multiprecision::detail::unsigned_abs(b)));
    if(b < 0)
       res.negate();
 }
@@ -998,7 +998,7 @@ template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exp
 inline typename enable_if_c<is_signed<S>::value>::type eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> &res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> &u, const S &v)
 {
    typedef typename make_unsigned<S>::type ui_type;
-   eval_divide(res, u, static_cast<ui_type>(boost::multiprecision::detail::abs(v)));
+   eval_divide(res, u, static_cast<ui_type>(boost::multiprecision::detail::unsigned_abs(v)));
    if(v < 0)
       res.negate();
 }
@@ -1054,18 +1054,22 @@ inline void eval_convert_to(long long *res, const cpp_bin_float<Digits, DigitBas
       *res = 0;
       return;
    }
-   else if(shift < 0)
+   if(arg.sign() && (arg.compare((std::numeric_limits<long long>::min)()) <= 0))
    {
-      // TODO: what if we have fewer cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count than a long long?
+      *res = (std::numeric_limits<long long>::min)();
+      return;
+   }
+   else if(!arg.sign() && (arg.compare((std::numeric_limits<long long>::max)()) >= 0))
+   {
       *res = (std::numeric_limits<long long>::max)();
-      if(arg.sign())
-         *res = -*res;
       return;
    }
    eval_right_shift(man, shift);
    eval_convert_to(res, man);
    if(arg.sign())
+   {
       *res = -*res;
+   }
 }
 
 template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>

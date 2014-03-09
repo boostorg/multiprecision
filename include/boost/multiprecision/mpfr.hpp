@@ -986,7 +986,7 @@ inline void eval_add(mpfr_float_backend<digits10, AllocationType>& result, long 
    if(i > 0)
       mpfr_add_ui(result.data(), result.data(), i, GMP_RNDN);
    else
-      mpfr_sub_ui(result.data(), result.data(), std::abs(i), GMP_RNDN);
+      mpfr_sub_ui(result.data(), result.data(), boost::multiprecision::detail::unsigned_abs(i), GMP_RNDN);
 }
 template <unsigned digits10, mpfr_allocation_type AllocationType>
 inline void eval_subtract(mpfr_float_backend<digits10, AllocationType>& result, long i)
@@ -994,19 +994,19 @@ inline void eval_subtract(mpfr_float_backend<digits10, AllocationType>& result, 
    if(i > 0)
       mpfr_sub_ui(result.data(), result.data(), i, GMP_RNDN);
    else
-      mpfr_add_ui(result.data(), result.data(), std::abs(i), GMP_RNDN);
+      mpfr_add_ui(result.data(), result.data(), boost::multiprecision::detail::unsigned_abs(i), GMP_RNDN);
 }
 template <unsigned digits10, mpfr_allocation_type AllocationType>
 inline void eval_multiply(mpfr_float_backend<digits10, AllocationType>& result, long i)
 {
-   mpfr_mul_ui(result.data(), result.data(), std::abs(i), GMP_RNDN);
+   mpfr_mul_ui(result.data(), result.data(), boost::multiprecision::detail::unsigned_abs(i), GMP_RNDN);
    if(i < 0)
       mpfr_neg(result.data(), result.data(), GMP_RNDN);
 }
 template <unsigned digits10, mpfr_allocation_type AllocationType>
 inline void eval_divide(mpfr_float_backend<digits10, AllocationType>& result, long i)
 {
-   mpfr_div_ui(result.data(), result.data(), std::abs(i), GMP_RNDN);
+   mpfr_div_ui(result.data(), result.data(), boost::multiprecision::detail::unsigned_abs(i), GMP_RNDN);
    if(i < 0)
       mpfr_neg(result.data(), result.data(), GMP_RNDN);
 }
@@ -1027,7 +1027,7 @@ template <unsigned D1, unsigned D2, mpfr_allocation_type A1, mpfr_allocation_typ
 inline void eval_add(mpfr_float_backend<D1, A1>& a, const mpfr_float_backend<D2, A2>& x, long y)
 {
    if(y < 0)
-      mpfr_sub_ui(a.data(), x.data(), -y, GMP_RNDN);
+      mpfr_sub_ui(a.data(), x.data(), boost::multiprecision::detail::unsigned_abs(y), GMP_RNDN);
    else
       mpfr_add_ui(a.data(), x.data(), y, GMP_RNDN);
 }
@@ -1041,7 +1041,7 @@ inline void eval_add(mpfr_float_backend<D1, A1>& a, long x, const mpfr_float_bac
 {
    if(x < 0)
    {
-      mpfr_ui_sub(a.data(), -x, y.data(), GMP_RNDN);
+      mpfr_ui_sub(a.data(), boost::multiprecision::detail::unsigned_abs(x), y.data(), GMP_RNDN);
       mpfr_neg(a.data(), a.data(), GMP_RNDN);
    }
    else
@@ -1061,7 +1061,7 @@ template <unsigned D1, unsigned D2, mpfr_allocation_type A1, mpfr_allocation_typ
 inline void eval_subtract(mpfr_float_backend<D1, A1>& a, const mpfr_float_backend<D2, A2>& x, long y)
 {
    if(y < 0)
-      mpfr_add_ui(a.data(), x.data(), -y, GMP_RNDN);
+      mpfr_add_ui(a.data(), x.data(), boost::multiprecision::detail::unsigned_abs(y), GMP_RNDN);
    else
       mpfr_sub_ui(a.data(), x.data(), y, GMP_RNDN);
 }
@@ -1075,7 +1075,7 @@ inline void eval_subtract(mpfr_float_backend<D1, A1>& a, long x, const mpfr_floa
 {
    if(x < 0)
    {
-      mpfr_add_ui(a.data(), y.data(), -x, GMP_RNDN);
+      mpfr_add_ui(a.data(), y.data(), boost::multiprecision::detail::unsigned_abs(x), GMP_RNDN);
       mpfr_neg(a.data(), a.data(), GMP_RNDN);
    }
    else
@@ -1100,7 +1100,7 @@ inline void eval_multiply(mpfr_float_backend<D1, A1>& a, const mpfr_float_backen
 {
    if(y < 0)
    {
-      mpfr_mul_ui(a.data(), x.data(), -y, GMP_RNDN);
+      mpfr_mul_ui(a.data(), x.data(), boost::multiprecision::detail::unsigned_abs(y), GMP_RNDN);
       a.negate();
    }
    else
@@ -1116,7 +1116,7 @@ inline void eval_multiply(mpfr_float_backend<D1, A1>& a, long x, const mpfr_floa
 {
    if(x < 0)
    {
-      mpfr_mul_ui(a.data(), y.data(), -x, GMP_RNDN);
+      mpfr_mul_ui(a.data(), y.data(), boost::multiprecision::detail::unsigned_abs(x), GMP_RNDN);
       mpfr_neg(a.data(), a.data(), GMP_RNDN);
    }
    else
@@ -1138,7 +1138,7 @@ inline void eval_divide(mpfr_float_backend<D1, A1>& a, const mpfr_float_backend<
 {
    if(y < 0)
    {
-      mpfr_div_ui(a.data(), x.data(), -y, GMP_RNDN);
+      mpfr_div_ui(a.data(), x.data(), boost::multiprecision::detail::unsigned_abs(y), GMP_RNDN);
       a.negate();
    }
    else
@@ -1154,7 +1154,7 @@ inline void eval_divide(mpfr_float_backend<D1, A1>& a, long x, const mpfr_float_
 {
    if(x < 0)
    {
-      mpfr_ui_div(a.data(), -x, y.data(), GMP_RNDN);
+      mpfr_ui_div(a.data(), boost::multiprecision::detail::unsigned_abs(x), y.data(), GMP_RNDN);
       mpfr_neg(a.data(), a.data(), GMP_RNDN);
    }
    else
