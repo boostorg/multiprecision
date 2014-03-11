@@ -40,8 +40,10 @@
 <p>
         These functions perform a Miller-Rabin test for primality, if the result
         is <code class="computeroutput"><span class="keyword">false</span></code> then <span class="emphasis"><em>n</em></span>
-        is definitely composite, while if the result is <code class="computeroutput"><span class="keyword">true</span></code>
-        then <span class="emphasis"><em>n</em></span> is prime with probability <span class="emphasis"><em>0.25^trials</em></span>.
+        is definitely composite, while if the result is true then n is probably prime.
+        The probability to declare a composite n as probable prime is at most 0.25<sup>trials</sup>.
+        Note that this does not allow a statement about the probability of n being
+        actually prime (for that, the prior probability would have to be known).
         The algorithm used performs some trial divisions to exclude small prime factors,
         does one Fermat test to exclude many more composites, and then uses the Miller-Rabin
         algorithm straight out of Knuth Vol 2, which recommends 25 trials for a pretty

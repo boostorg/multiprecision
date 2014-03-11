@@ -1639,7 +1639,9 @@ The library implements a Miller-Rabin test for primality:
    bool miller_rabin_test(const number<Backend, ExpressionTemplates>& n, unsigned trials);
 
 These functions perform a Miller-Rabin test for primality, if the result is `false` then /n/ is definitely composite,
-while if the result is `true` then /n/ is prime with probability ['0.25^trials].  The algorithm used performs some
+while if the result is true then n is probably prime. The probability to declare a composite n as probable prime is 
+at most 0.25[super trials]. Note that this does not allow a statement about the probability of n being actually 
+prime (for that, the prior probability would have to be known).  The algorithm used performs some
 trial divisions to exclude small prime factors, does one Fermat test to exclude many more composites, and then
 uses the Miller-Rabin algorithm straight out of
 Knuth Vol 2, which recommends 25 trials for a pretty strong likelihood that /n/ is prime.
