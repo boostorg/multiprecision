@@ -96,8 +96,7 @@ BOOST_CONSTEXPR typename enable_if_c<(is_signed<T>::value || is_floating_point<T
    // This strange expression avoids a hardware trap in the corner case
    // that val is the most negative value permitted in long long.
    // See https://svn.boost.org/trac/boost/ticket/9740.
-   typedef typename make_unsigned<T>::type ui_type;
-   return t < 0 ? static_cast<ui_type>(1u) + static_cast<ui_type>(-(t + 1)) : static_cast<ui_type>(t);
+   return t < 0 ? static_cast<typename make_unsigned<T>::type>(1u) + static_cast<typename make_unsigned<T>::type>(-(t + 1)) : static_cast<typename make_unsigned<T>::type>(t);
 }
 template <class T>
 BOOST_CONSTEXPR typename enable_if_c<(is_unsigned<T>::value), T>::type unsigned_abs(T t) BOOST_NOEXCEPT
