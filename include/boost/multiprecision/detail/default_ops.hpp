@@ -962,7 +962,7 @@ inline void eval_trunc(T& result, const T& a)
 {
    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The trunc function is only valid for floating point types.");
    int c = eval_fpclassify(a);
-   if(c == FP_NAN || c == FP_INFINITE)
+   if(c == (int)FP_NAN || c == (int)FP_INFINITE)
    {
       result = boost::math::policies::raise_rounding_error("boost::multiprecision::trunc<%1%>(%1%)", 0, number<T>(a), number<T>(a), boost::math::policies::policy<>()).backend();
       return;
