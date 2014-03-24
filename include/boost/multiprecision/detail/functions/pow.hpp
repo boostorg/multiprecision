@@ -200,12 +200,12 @@ void eval_exp(T& result, const T& x)
    // Handle special arguments.
    int type = eval_fpclassify(x);
    bool isneg = eval_get_sign(x) < 0;
-   if(type == FP_NAN)
+   if(type == (int)FP_NAN)
    {
       result = x;
       return;
    }
-   else if(type == FP_INFINITE)
+   else if(type == (int)FP_INFINITE)
    {
       result = x;
       if(isneg)
@@ -214,7 +214,7 @@ void eval_exp(T& result, const T& x)
          result = x;
       return;
    }
-   else if(type == FP_ZERO)
+   else if(type == (int)FP_ZERO)
    {
       result = ui_type(1);
       return;

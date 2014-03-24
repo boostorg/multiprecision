@@ -204,11 +204,11 @@ struct mpfi_float_imp
             part.erase();
          b = part.c_str();
 
-         if(eval_fpclassify(a) == FP_NAN)
+         if(eval_fpclassify(a) == (int)FP_NAN)
          {
             mpfi_set_fr(this->data(), a.data());
          }
-         else if(eval_fpclassify(b) == FP_NAN)
+         else if(eval_fpclassify(b) == (int)FP_NAN)
          {
             mpfi_set_fr(this->data(), b.data());
          }
@@ -762,11 +762,11 @@ template <unsigned D1, unsigned D2, mpfr_allocation_type AllocationType>
 inline void assign_components(mpfi_float_backend<D1>& result, const mpfr_float_backend<D2, AllocationType>& a, const mpfr_float_backend<D2, AllocationType>& b)
 {
    using default_ops::eval_fpclassify;
-   if(eval_fpclassify(a) == FP_NAN)
+   if(eval_fpclassify(a) == (int)FP_NAN)
    {
       mpfi_set_fr(result.data(), a.data());
    }
-   else if(eval_fpclassify(b) == FP_NAN)
+   else if(eval_fpclassify(b) == (int)FP_NAN)
    {
       mpfi_set_fr(result.data(), b.data());
    }

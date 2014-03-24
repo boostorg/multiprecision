@@ -67,12 +67,12 @@ void eval_exp(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> 
 
    int type = eval_fpclassify(arg);
    bool isneg = eval_get_sign(arg) < 0;
-   if(type == FP_NAN)
+   if(type == (int)FP_NAN)
    {
       res = arg;
       return;
    }
-   else if(type == FP_INFINITE)
+   else if(type == (int)FP_INFINITE)
    {
       res = arg;
       if(isneg)
@@ -81,7 +81,7 @@ void eval_exp(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> 
          res = arg;
       return;
    }
-   else if(type == FP_ZERO)
+   else if(type == (int)FP_ZERO)
    {
       res = limb_type(1);
       return;
