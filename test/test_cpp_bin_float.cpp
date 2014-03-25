@@ -55,6 +55,8 @@ void test_special_cases()
    test_type eps = std::numeric_limits<test_type>::epsilon();
    test_type inf_val = (std::numeric_limits<test_type>::infinity)();
    test_type nan_val = (std::numeric_limits<test_type>::quiet_NaN)();
+   test_type half = 0.5;
+   test_type one_point_5 = 1.5;
    
    BOOST_CHECK((boost::math::isnormal)(max_val));
    BOOST_CHECK((boost::math::isnormal)(-max_val));
@@ -76,13 +78,13 @@ void test_special_cases()
    BOOST_CHECK_EQUAL(-max_val - max_val * eps, -inf_val);
    BOOST_CHECK_EQUAL(max_val * 2, inf_val);
    BOOST_CHECK_EQUAL(max_val * -2, -inf_val);
-   BOOST_CHECK_EQUAL(max_val / 0.5, inf_val);
-   BOOST_CHECK_EQUAL(max_val / -0.5, -inf_val);
+   BOOST_CHECK_EQUAL(max_val / half, inf_val);
+   BOOST_CHECK_EQUAL(max_val / -half, -inf_val);
    // Underflow:
-   BOOST_CHECK_EQUAL(min_val * 2 - 1.5 * min_val, 0);
-   BOOST_CHECK_EQUAL(-min_val * 2 + 1.5 * min_val, 0);
+   BOOST_CHECK_EQUAL(min_val * 2 - one_point_5 * min_val, 0);
+   BOOST_CHECK_EQUAL(-min_val * 2 + one_point_5 * min_val, 0);
    BOOST_CHECK_EQUAL(min_val / 2, 0);
-   BOOST_CHECK_EQUAL(min_val * 0.5, 0);
+   BOOST_CHECK_EQUAL(min_val * half, 0);
    BOOST_CHECK_EQUAL(min_val - min_val, 0);
    BOOST_CHECK_EQUAL(max_val - max_val, 0);
    BOOST_CHECK_EQUAL(-min_val + min_val, 0);

@@ -168,6 +168,14 @@ void test_specific(const T&)
 template <class Number>
 void test()
 {
+   typedef typename boost::mpl::if_c<
+      std::numeric_limits<Number>::is_specialized,
+      typename boost::multiprecision::number_category<Number>::type,
+      boost::mpl::int_<500> // not a number type
+   >::type fp_test_type;
+
+   test_specific<Number>(fp_test_type());
+
    //
    // Note really a test just yet, but we can at least print out all the values:
    //
@@ -218,14 +226,6 @@ void test()
    PRINT(traps);
    PRINT(tinyness_before);
    PRINT(round_style);
-
-   typedef typename boost::mpl::if_c<
-      std::numeric_limits<Number>::is_specialized,
-      typename boost::multiprecision::number_category<Number>::type,
-      boost::mpl::int_<500> // not a number type
-   >::type fp_test_type;
-
-   test_specific<Number>(fp_test_type());
 }
 
 
