@@ -527,7 +527,7 @@ std::string cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::s
 #else
       boost::intmax_t max_bits = cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + (cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count % limb_bits ? limb_bits - cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count % limb_bits : 0) + limb_bits;
       if(power10)
-         max_bits += (msb(std::abs(power10)) / 8) * limb_bits;
+         max_bits += (msb(boost::multiprecision::detail::abs(power10)) / 8) * limb_bits;
 #endif
       do
       {

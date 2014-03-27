@@ -19,6 +19,21 @@ struct is_boost_rational : public boost::mpl::false_{};
 #pragma warning(disable:4127)
 #endif
 
+template <class Target, class Source>
+Target checked_lexical_cast(const Source& val)
+{
+   try
+   {
+      return boost::lexical_cast<Target>(val);
+   }
+   catch(...)
+   {
+      std::cerr << "Error in lexical cast\nSource type = " << typeid(Source).name() << " \"" << val << "\"\n";
+      std::cerr << "Target type = " << typeid(Target).name() << std::endl;
+      throw;
+   }
+}
+
 
 bool isfloat(float){ return true; }
 bool isfloat(double){ return true; }
@@ -927,11 +942,11 @@ void test_negative_mixed(boost::mpl::true_ const&)
    std::ios_base::fmtflags f = boost::is_floating_point<Num>::value ? std::ios_base::scientific : std::ios_base::fmtflags(0);
    if(std::numeric_limits<target_type>::digits <= std::numeric_limits<Real>::digits)
    {
-      BOOST_CHECK_CLOSE(n1, boost::lexical_cast<target_type>(Real(n1).str(0, f)), tol);
+      BOOST_CHECK_CLOSE(n1, checked_lexical_cast<target_type>(Real(n1).str(0, f)), tol);
    }
-   BOOST_CHECK_CLOSE(n2, boost::lexical_cast<target_type>(Real(n2).str(0, f)), 0);
-   BOOST_CHECK_CLOSE(n3, boost::lexical_cast<target_type>(Real(n3).str(0, f)), 0);
-   BOOST_CHECK_CLOSE(n4, boost::lexical_cast<target_type>(Real(n4).str(0, f)), 0);
+   BOOST_CHECK_CLOSE(n2, checked_lexical_cast<target_type>(Real(n2).str(0, f)), 0);
+   BOOST_CHECK_CLOSE(n3, checked_lexical_cast<target_type>(Real(n3).str(0, f)), 0);
+   BOOST_CHECK_CLOSE(n4, checked_lexical_cast<target_type>(Real(n4).str(0, f)), 0);
    // Assignment:
    Real r(0);
    BOOST_CHECK(r != static_cast<cast_type>(n1));
@@ -1220,11 +1235,11 @@ void test_mixed(const boost::mpl::true_&)
    std::ios_base::fmtflags f = boost::is_floating_point<Num>::value ? std::ios_base::scientific : std::ios_base::fmtflags(0);
    if(std::numeric_limits<target_type>::digits <= std::numeric_limits<Real>::digits)
    {
-      BOOST_CHECK_CLOSE(n1, boost::lexical_cast<target_type>(Real(n1).str(0, f)), tol);
+      BOOST_CHECK_CLOSE(n1, checked_lexical_cast<target_type>(Real(n1).str(0, f)), tol);
    }
-   BOOST_CHECK_CLOSE(n2, boost::lexical_cast<target_type>(Real(n2).str(0, f)), 0);
-   BOOST_CHECK_CLOSE(n3, boost::lexical_cast<target_type>(Real(n3).str(0, f)), 0);
-   BOOST_CHECK_CLOSE(n4, boost::lexical_cast<target_type>(Real(n4).str(0, f)), 0);
+   BOOST_CHECK_CLOSE(n2, checked_lexical_cast<target_type>(Real(n2).str(0, f)), 0);
+   BOOST_CHECK_CLOSE(n3, checked_lexical_cast<target_type>(Real(n3).str(0, f)), 0);
+   BOOST_CHECK_CLOSE(n4, checked_lexical_cast<target_type>(Real(n4).str(0, f)), 0);
    // Assignment:
    Real r(0);
    BOOST_CHECK(r != static_cast<cast_type>(n1));
