@@ -785,7 +785,22 @@ inline R real_cast(const boost::multiprecision::detail::expression<tag, A1, A2, 
 }
 
 
-}}}
+}
+
+namespace constants{
+
+   template <class T>
+   struct is_explicitly_convertible_from_string;
+
+   template <class B, boost::multiprecision::expression_template_option ET>
+   struct is_explicitly_convertible_from_string<boost::multiprecision::number<B, ET> >
+   {
+      static const bool value = true;
+   };
+
+}
+
+}}
 
 #endif // BOOST_MATH_BIG_NUM_BASE_HPP
 
