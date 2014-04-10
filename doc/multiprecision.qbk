@@ -196,7 +196,7 @@ In addition the non-expression template operator overloads (see below) are move 
 that look something like:
 
    template <class B>
-   number<B, et_off> operator + (number&& a, const number& b)
+   number<B, et_off> operator + (number<B, et_off>&& a, const number<B, et_off>& b)
    {
        return std::move(a += b);
    }
