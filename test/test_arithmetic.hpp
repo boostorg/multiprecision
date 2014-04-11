@@ -940,13 +940,15 @@ void test_negative_mixed(boost::mpl::true_ const&)
    Num tol = 0;
 #endif
    std::ios_base::fmtflags f = boost::is_floating_point<Num>::value ? std::ios_base::scientific : std::ios_base::fmtflags(0);
+   int digits_to_print = boost::is_floating_point<Num>::value && std::numeric_limits<Num>::is_specialized
+      ? std::numeric_limits<Num>::digits10 + 5 : 0;
    if(std::numeric_limits<target_type>::digits <= std::numeric_limits<Real>::digits)
    {
-      BOOST_CHECK_CLOSE(n1, checked_lexical_cast<target_type>(Real(n1).str(0, f)), tol);
+      BOOST_CHECK_CLOSE(n1, checked_lexical_cast<target_type>(Real(n1).str(digits_to_print, f)), tol);
    }
-   BOOST_CHECK_CLOSE(n2, checked_lexical_cast<target_type>(Real(n2).str(0, f)), 0);
-   BOOST_CHECK_CLOSE(n3, checked_lexical_cast<target_type>(Real(n3).str(0, f)), 0);
-   BOOST_CHECK_CLOSE(n4, checked_lexical_cast<target_type>(Real(n4).str(0, f)), 0);
+   BOOST_CHECK_CLOSE(n2, checked_lexical_cast<target_type>(Real(n2).str(digits_to_print, f)), 0);
+   BOOST_CHECK_CLOSE(n3, checked_lexical_cast<target_type>(Real(n3).str(digits_to_print, f)), 0);
+   BOOST_CHECK_CLOSE(n4, checked_lexical_cast<target_type>(Real(n4).str(digits_to_print, f)), 0);
    // Assignment:
    Real r(0);
    BOOST_CHECK(r != static_cast<cast_type>(n1));
@@ -1233,13 +1235,15 @@ void test_mixed(const boost::mpl::true_&)
    Num tol = 0;
 #endif
    std::ios_base::fmtflags f = boost::is_floating_point<Num>::value ? std::ios_base::scientific : std::ios_base::fmtflags(0);
+   int digits_to_print = boost::is_floating_point<Num>::value && std::numeric_limits<Num>::is_specialized 
+      ? std::numeric_limits<Num>::digits10 + 5 : 0;
    if(std::numeric_limits<target_type>::digits <= std::numeric_limits<Real>::digits)
    {
-      BOOST_CHECK_CLOSE(n1, checked_lexical_cast<target_type>(Real(n1).str(0, f)), tol);
+      BOOST_CHECK_CLOSE(n1, checked_lexical_cast<target_type>(Real(n1).str(digits_to_print, f)), tol);
    }
-   BOOST_CHECK_CLOSE(n2, checked_lexical_cast<target_type>(Real(n2).str(0, f)), 0);
-   BOOST_CHECK_CLOSE(n3, checked_lexical_cast<target_type>(Real(n3).str(0, f)), 0);
-   BOOST_CHECK_CLOSE(n4, checked_lexical_cast<target_type>(Real(n4).str(0, f)), 0);
+   BOOST_CHECK_CLOSE(n2, checked_lexical_cast<target_type>(Real(n2).str(digits_to_print, f)), 0);
+   BOOST_CHECK_CLOSE(n3, checked_lexical_cast<target_type>(Real(n3).str(digits_to_print, f)), 0);
+   BOOST_CHECK_CLOSE(n4, checked_lexical_cast<target_type>(Real(n4).str(digits_to_print, f)), 0);
    // Assignment:
    Real r(0);
    BOOST_CHECK(r != static_cast<cast_type>(n1));
