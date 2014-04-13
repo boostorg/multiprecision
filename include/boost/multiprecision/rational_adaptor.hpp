@@ -226,10 +226,19 @@ inline void eval_divide(rational_adaptor<IntBackend>& result, const rational_ada
 }
 
 template <class R, class IntBackend>
-inline void eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
+inline typename disable_if_c<is_integral<R>::value>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
 {
    *result = backend.data().numerator().template convert_to<R>();
    *result /= backend.data().denominator().template convert_to<R>();
+}
+
+template <class R, class IntBackend>
+inline typename enable_if_c<is_integral<R>::value>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
+{
+   typedef typename component_type<number<rational_adaptor<IntBackend> > >::type comp_t;
+   comp_t t = backend.data().numerator();
+   t /= backend.data().denominator();
+   *result = t.template convert_to<R>();
 }
 
 template <class IntBackend>
