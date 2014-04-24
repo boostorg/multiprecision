@@ -1258,7 +1258,7 @@ private:
    void do_assign_string(const char* s, const mpl::true_&)
    {
       std::size_t n = s ? std::strlen(s) : 0;
-      *this->limbs() = 0;
+      *this = 0;
       unsigned radix = 10;
       bool isneg = false;
       if(n && (*s == '-'))
