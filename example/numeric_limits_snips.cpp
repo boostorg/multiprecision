@@ -44,7 +44,7 @@ bool nearly_equal(RealType a, RealType b)
         && (a + tolerance * std::abs(a) >= b - tolerance * std::abs(b));
 }
 
-int main()
+int test_main(int argc, char**const argv)
 {
   try
   {
@@ -308,15 +308,7 @@ with Boost.Test's macro `BOOST_CHECK_CLOSE_FRACTION`
     T expected = 1.0;
     T calculated = 1.0 + std::numeric_limits<T>::epsilon();
 
-    using boost::test_tools::check_is_close;
-
-    bool r = check_is_close(expected, calculated, tolerance);
-    std::cout <<  std::boolalpha << r << std::endl;  // true
-
-/*`If using Boost.Test, then call the macro version:
-``BOOST_CHECK_CLOSE_FRACTION(expected, calculated, tolerance);``
-*/
-
+    BOOST_CHECK_CLOSE_FRACTION(expected, calculated, tolerance);
 
 //] [/tolerance_1]
   } 
@@ -336,10 +328,8 @@ so the default expression template parameter has been replaced by `et_off`.]
   cpp_dec_float_50 tolerance =  3 * std::numeric_limits<cpp_dec_float_50>::epsilon(); 
   cpp_dec_float_50 expected = boost::math::constants::two_pi<cpp_dec_float_50>();
   cpp_dec_float_50 calculated = 2 * boost::math::constants::pi<cpp_dec_float_50>();
-  using boost::test_tools::check_is_close;
 
-  bool r = check_is_close(expected, calculated, tolerance);
-  std::cout <<  std::boolalpha << r << std::endl;  // true
+  BOOST_CHECK_CLOSE_FRACTION(expected, calculated, tolerance);
 
 //] [/tolerance_2]
   }
@@ -352,10 +342,8 @@ so the default expression template parameter has been replaced by `et_off`.]
   cpp_bin_float_quad tolerance =  3 * std::numeric_limits<cpp_bin_float_quad>::epsilon(); 
   cpp_bin_float_quad expected = boost::math::constants::two_pi<cpp_bin_float_quad>();
   cpp_bin_float_quad calculated = 2 * boost::math::constants::pi<cpp_bin_float_quad>();
-  using boost::test_tools::check_is_close;
 
-  bool r = check_is_close(expected, calculated, tolerance);
-  std::cout <<  std::boolalpha << r << std::endl;  // true
+  BOOST_CHECK_CLOSE_FRACTION(expected, calculated, tolerance);
 
 //] [/tolerance_3]
   }
@@ -376,13 +364,11 @@ so the default expression template parameter has been replaced by `et_off`.]
 
     cpp_bin_float_quad expected = NaN;
     cpp_bin_float_quad calculated = 2 * NaN;
-    using boost::test_tools::check_is_close;
-
-    bool r = check_is_close(expected, expected, tolerance);
-    std::cout <<  std::boolalpha << r << std::endl;  // false, as expected because all comparisons with NaNs are false.
-
-    r = check_is_close(expected, calculated, tolerance);
-    std::cout <<  std::boolalpha << r << std::endl;  // false, as expected because all comparisons with NaNs are false.
+    // Comparisons of NaN's always fail:
+    bool b = expected == calculated;
+    std::cout << b << std::endl;
+    BOOST_CHECK_NE(expected, expected);
+    BOOST_CHECK_NE(expected, calculated);
   }
   else
   {
@@ -444,7 +430,6 @@ Similarly we can do the same with NaN (except that we cannot use `assert`)
     assert(ss.str() == "nan"); 
     std::cout << "NaN output was " << ss.str() << std::endl;
     ss >> n; // Read back in.
-    assert(NaN == n); // Confirms that the floating-point values really are identical.
     std::cout << "NaN input was " << n << std::endl;
   }
 /*`
@@ -454,5 +439,7 @@ Similarly we can do the same with NaN (except that we cannot use `assert`)
 */
 //] [/facet_1]
   }
+
+  return 0;
 
 } // int main()
