@@ -315,7 +315,9 @@ public:
       if(m_sign != o.m_sign)
          return m_sign ? -1 : 1;
       int result;
-      if(m_exponent != o.m_exponent)
+      if(m_exponent == exponent_nan)
+         return -1;
+      else if(m_exponent != o.m_exponent)
       {
          if(m_exponent == exponent_zero)
             result = -1;
