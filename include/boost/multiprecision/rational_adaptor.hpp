@@ -232,15 +232,61 @@ inline void eval_divide(rational_adaptor<IntBackend>& result, const rational_ada
    result.data() /= o.data();
 }
 
-template <class R, class IntBackend>
-inline typename disable_if_c<is_integral<R>::value>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
+template <class R, class LargeInteger>
+R safe_convert_to_float(const LargeInteger& i)
 {
-   *result = backend.data().numerator().template convert_to<R>();
-   *result /= backend.data().denominator().template convert_to<R>();
+   using std::ldexp;
+   if(!i)
+      return R(0);
+   if(std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::max_exponent)
+   {
+      unsigned mb = msb(i);
+      if(mb >= std::numeric_limits<R>::max_exponent)
+      {
+         int scale_factor = (int)mb + 1 - std::numeric_limits<R>::max_exponent;
+         BOOST_ASSERT(scale_factor >= 1);
+         LargeInteger val(i >> scale_factor);
+         R result = val.template convert_to<R>();
+         if(std::numeric_limits<R>::digits == 0 || std::numeric_limits<R>::digits >= std::numeric_limits<R>::max_exponent)
+         {
+            //
+            // Calculate and add on the remainder, only if there are more
+            // digits in the mantissa that the size of the exponent, in 
+            // other words if we are dropping digits in the conversion
+            // otherwise:
+            //
+            LargeInteger remainder(i);
+            remainder &= (LargeInteger(1) << scale_factor) - 1;
+            result += ldexp(safe_convert_to_float<R>(remainder), -scale_factor);
+         }
+         return result;
+      }
+   }
+   return i.template convert_to<R>();
 }
 
 template <class R, class IntBackend>
-inline typename enable_if_c<is_integral<R>::value>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
+inline typename enable_if_c<number_category<R>::value == number_kind_floating_point>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
+{
+   typedef typename component_type<number<rational_adaptor<IntBackend> > >::type comp_t;
+   comp_t num(backend.data().numerator());
+   comp_t denom(backend.data().denominator());
+   *result = safe_convert_to_float<R>(num);
+   *result /= safe_convert_to_float<R>(denom);
+}
+
+template <class R, class IntBackend>
+inline typename enable_if_c<(number_category<R>::value != number_kind_integer) && (number_category<R>::value != number_kind_floating_point)>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
+{
+   typedef typename component_type<number<rational_adaptor<IntBackend> > >::type comp_t;
+   comp_t num(backend.data().numerator());
+   comp_t denom(backend.data().denominator());
+   *result = num.template convert_to<R>();
+   *result /= denom.template convert_to<R>();
+}
+
+template <class R, class IntBackend>
+inline typename enable_if_c<number_category<R>::value == number_kind_integer>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
 {
    typedef typename component_type<number<rational_adaptor<IntBackend> > >::type comp_t;
    comp_t t = backend.data().numerator();
