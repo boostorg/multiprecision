@@ -1202,6 +1202,23 @@ template <class T>
 typename enable_if_c<sizeof(T) == 0>::type eval_ldexp();
 template <class T>
 typename enable_if_c<sizeof(T) == 0>::type eval_frexp();
+
+//
+// eval_logb and eval_scalbn simply assume base 2 and forward to
+// eval_ldexp and eval_frexp:
+//
+template <class B>
+inline void eval_logb(B& result, const B& val)
+{
+   typename B::exponent_type e;
+   eval_frexp(result, val, &e);
+   result = static_cast<boost::intmax_t>(e);
+}
+template <class B, class A>
+inline void eval_scalbn(B& result, const B& val, A e)
+{
+   eval_ldexp(result, val, static_cast<typename B::exponent_type>(e));
+}
 //
 // These functions are implemented in separate files, but expanded inline here,
 // DO NOT CHANGE THE ORDER OF THESE INCLUDES:
@@ -2018,6 +2035,12 @@ HETERO_BINARY_OP_FUNCTOR_B(frexp, long long*, number_kind_floating_point)
 BINARY_OP_FUNCTOR(pow, number_kind_floating_point)
 BINARY_OP_FUNCTOR(fmod, number_kind_floating_point)
 BINARY_OP_FUNCTOR(atan2, number_kind_floating_point)
+
+UNARY_OP_FUNCTOR(logb, number_kind_floating_point)
+HETERO_BINARY_OP_FUNCTOR(scalbn, short, number_kind_floating_point)
+HETERO_BINARY_OP_FUNCTOR_B(scalbn, int, number_kind_floating_point)
+HETERO_BINARY_OP_FUNCTOR_B(scalbn, long, number_kind_floating_point)
+HETERO_BINARY_OP_FUNCTOR_B(scalbn, long long, number_kind_floating_point)
 
 //
 // Integer functions:

@@ -222,6 +222,43 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
    eval_divide(to, fn.backend(), fd.backend());
 }
 
+namespace detail{
+
+template <class To, class From>
+void generic_interconvert_float2rational(To& to, const From& from, const mpl::int_<2>& /*radix*/)
+{
+   BOOST_MATH_STD_USING
+   typedef typename mpl::front<typename To::unsigned_types>::type ui_type;
+   static const int shift = std::numeric_limits<long long>::digits;
+   typename From::exponent_type e;
+   typename component_type<To>::type num, denom;
+   number<From> val(from);
+   val = frexp(val, &e);
+   while(val)
+   {
+      val = ldexp(val, shift);
+      e -= shift;
+      long long ll = boost::math::lltrunc(val);
+      val -= ll;
+      num <<= shift;
+      num += ll;
+   }
+   denom = ui_type(1u);
+   if(e < 0)
+      denom <<= -e;
+   else if(e > 0)
+      num <<= e;
+   assign_components(to, num, denom);
+}
+
+}
+
+template <class To, class From>
+void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_rational>& /*to_type*/, const mpl::int_<number_kind_floating_point>& /*from_type*/)
+{
+   detail::generic_interconvert_float2rational(to, from, mpl::int_<std::numeric_limits<number<From> >::radix>());
+}
+
 }}} // namespaces
 
 #endif  // BOOST_MP_GENERIC_INTERCONVERT_HPP
