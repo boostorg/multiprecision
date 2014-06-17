@@ -251,6 +251,40 @@ void generic_interconvert_float2rational(To& to, const From& from, const mpl::in
    assign_components(to, num, denom);
 }
 
+template <class To, class From, int Radix>
+void generic_interconvert_float2rational(To& to, const From& from, const mpl::int_<Radix>& /*radix*/)
+{
+   //
+   // This is almost the same as the binary case above, but we have to use
+   // scalbn and ilogb rather than ldexp and frexp, we also only extract
+   // one Radix digit at a time which is terribly inefficient!
+   //
+   typedef typename mpl::front<typename To::unsigned_types>::type ui_type;
+   typename From::exponent_type e;
+   typename component_type<To>::type num, denom;
+   number<From> val(from);
+   e = ilogb(val);
+   val = scalbn(val, -e);
+   while(val)
+   {
+      long long ll = boost::math::lltrunc(val);
+      val -= ll;
+      val = scalbn(val, 1);
+      num *= Radix;
+      num += ll;
+      --e;
+   }
+   ++e;
+   denom = ui_type(Radix);
+   denom = pow(denom, abs(e));
+   if(e > 0)
+   {
+      num *= denom;
+      denom = 1;
+   }
+   assign_components(to, num, denom);
+}
+
 }
 
 template <class To, class From>
