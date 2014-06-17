@@ -5,6 +5,7 @@
 
 import modules ;
 import path ;
+import ../../config/checks/config : requires ;
 
 local ntl-path = [ modules.peek : NTL_PATH ] ;
 local gmp_path = [ modules.peek : GMP_PATH ] ;
@@ -344,7 +345,10 @@ run test_move.cpp
 
 run test_test.cpp ;
 run test_cpp_int_lit.cpp ;
-compile test_constexpr.cpp : [ check-target-builds ../config//has_float128 : <define>HAVE_FLOAT128 : ] [ check-target-builds ../config//has_intel_quad : <cxxflags>-Qoption,cpp,--extended_float_type <define>HAVE_FLOAT128 : ] ;
+compile test_constexpr.cpp : 
+   [ check-target-builds ../config//has_float128 : <define>HAVE_FLOAT128 : ] 
+   [ check-target-builds ../config//has_intel_quad : <cxxflags>-Qoption,cpp,--extended_float_type <define>HAVE_FLOAT128 : ] 
+   [ requires cxx11_constexpr cxx11_user_defined_literals ] ;
 
 run test_cpp_bin_float_io.cpp /boost/system//boost_system /boost/chrono//boost_chrono
         : # command line

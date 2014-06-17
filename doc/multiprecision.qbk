@@ -2947,11 +2947,14 @@ which may be useful to ensure that columns line up.
    ``['unmentionable-expression-template-type]``    sinh   (const ``['number-or-expression-template-type]``&);
    ``['unmentionable-expression-template-type]``    tanh   (const ``['number-or-expression-template-type]``&);
 
-   ``['unmentionable-expression-template-type]``    ldexp (const ``['number-or-expression-template-type]``&, int);
-   ``['unmentionable-expression-template-type]``    frexp (const ``['number-or-expression-template-type]``&, int*);
+   ``['unmentionable-expression-template-type]``    ldexp (const ``['number-or-expression-template-type]``&, ``['integer-type]``);
+   ``['unmentionable-expression-template-type]``    frexp (const ``['number-or-expression-template-type]``&, ``['integer-type]``*);
    ``['unmentionable-expression-template-type]``    pow   (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
    ``['unmentionable-expression-template-type]``    fmod  (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
    ``['unmentionable-expression-template-type]``    atan2 (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    scalbn(const ``['number-or-expression-template-type]``&, ``['integer-type]``);
+   ``['unmentionable-expression-template-type]``    logb  (const ``['number-or-expression-template-type]``&);
+   ``['integer-type]``                              ilogb (const ``['number-or-expression-template-type]``&);
 
    // Traits support:
    template <class T>
@@ -3283,15 +3286,21 @@ that allows arithmetic to be performed on native integer types producing an exte
    ``['unmentionable-expression-template-type]``    sinh   (const ``['number-or-expression-template-type]``&);
    ``['unmentionable-expression-template-type]``    tanh   (const ``['number-or-expression-template-type]``&);
 
-   ``['unmentionable-expression-template-type]``    ldexp (const ``['number-or-expression-template-type]``&, int);
-   ``['unmentionable-expression-template-type]``    frexp (const ``['number-or-expression-template-type]``&, int*);
+   ``['unmentionable-expression-template-type]``    ldexp (const ``['number-or-expression-template-type]``&, ``['integer-type]``);
+   ``['unmentionable-expression-template-type]``    frexp (const ``['number-or-expression-template-type]``&, ``['integer-type]``*);
    ``['unmentionable-expression-template-type]``    pow   (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
    ``['unmentionable-expression-template-type]``    fmod  (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
    ``['unmentionable-expression-template-type]``    atan2 (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    scalbn(const ``['number-or-expression-template-type]``&, ``['integer-type]``);
+   ``['unmentionable-expression-template-type]``    logb  (const ``['number-or-expression-template-type]``&);
+   ``['integer-type]``                              ilogb (const ``['number-or-expression-template-type]``&);
 
 These functions all behave exactly as their standard library C++11 counterparts do: their argument is either an instance of `number` or
 an expression template derived from it; If the argument is of type `number<Backend, et_off>` then that is also the return type,
 otherwise the return type is an expression template.
+
+The integer type arguments to `ldexp`, `frexp`, `scalbn` and `ilogb` may be either type `int`, or the actual
+type of the exponent of the number type.
 
 These functions are normally implemented by the Backend type.  However, default versions are provided for Backend types that
 don't have native support for these functions.  Please note however, that this default support requires the precision of the type
@@ -4233,6 +4242,12 @@ and `ff` is a variable of type `std::ios_base::fmtflags`.
             The default version of this function is synthesised from other operations above.][[space]]]
 [[`eval_atan2(b, cb, cb2)`][`void`][Performs the equivalent operation to `std::atan` on arguments `cb` and `cb2`, and store the result in `b`.  Only required when `B` is an floating-point type.
             The default version of this function is synthesised from other operations above.][[space]]]
+[[`eval_scalbn(b, cb, e)`][`void`][Scales value `cb` by ['r[super e]], where ['r] is the radix of the type.  The default version of this function
+                  is implemented in terms of eval_ldexp, consequently this function must be provided for types with a radix other than 2.]]
+[[`eval_ilogb(cb)`][`B::exponent_type`][Returns the exponent ['e] of value `cb` such that ['1 <= cb*r[super -e] < r], where ['r] is the radix of type B.
+                    The default version of this function is implemented in terms of eval_frexp, consequently this function must be provided for types with a radix other than 2.]
+[[`eval_logb(b, cb)`][`B::exponent_type`][Sets `b` to the exponent ['e] of value `cb` such that ['1 <= cb*r[super -b] < r], where ['r] is the radix of type B.
+                  The default version of this function is implemented in terms of `eval_ilogb`.]
 ]
 
 When the tables above place no ['throws] requirements on an operation, then it is up to each type modelling this concept to

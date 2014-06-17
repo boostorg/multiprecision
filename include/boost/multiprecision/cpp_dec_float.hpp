@@ -2806,10 +2806,10 @@ inline void eval_trunc(cpp_dec_float<Digits10, ExponentType, Allocator>& result,
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
-inline void eval_logb(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& val)
+inline ExponentType eval_ilogb(const cpp_dec_float<Digits10, ExponentType, Allocator>& val)
 {
    // Set result, to the exponent of val:
-   result = static_cast<long long>(val.order());
+   return val.order();
 }
 template <unsigned Digits10, class ExponentType, class Allocator, class ArgType>
 inline void eval_scalbn(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& val, ArgType e_)

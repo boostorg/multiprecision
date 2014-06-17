@@ -240,12 +240,15 @@ R safe_convert_to_float(const LargeInteger& i)
       return R(0);
    if(std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::max_exponent)
    {
-      unsigned mb = msb(i);
+      LargeInteger val(i);
+      if(val.sign() < 0)
+         val = -val;
+      unsigned mb = msb(val);
       if(mb >= std::numeric_limits<R>::max_exponent)
       {
          int scale_factor = (int)mb + 1 - std::numeric_limits<R>::max_exponent;
          BOOST_ASSERT(scale_factor >= 1);
-         LargeInteger val(i >> scale_factor);
+         val >>= scale_factor;
          R result = val.template convert_to<R>();
          if(std::numeric_limits<R>::digits == 0 || std::numeric_limits<R>::digits >= std::numeric_limits<R>::max_exponent)
          {
@@ -259,7 +262,7 @@ R safe_convert_to_float(const LargeInteger& i)
             remainder &= (LargeInteger(1) << scale_factor) - 1;
             result += ldexp(safe_convert_to_float<R>(remainder), -scale_factor);
          }
-         return result;
+         return i.sign() < 0 ? static_cast<R>(-result) : result;
       }
    }
    return i.template convert_to<R>();
