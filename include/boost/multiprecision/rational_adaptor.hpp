@@ -271,11 +271,17 @@ R safe_convert_to_float(const LargeInteger& i)
 template <class R, class IntBackend>
 inline typename enable_if_c<number_category<R>::value == number_kind_floating_point>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
 {
+   //
+   // The generic conversion is as good as anything we can write here:
+   //
+   ::boost::multiprecision::detail::generic_convert_rational_to_float(*result, backend);
+   /*
    typedef typename component_type<number<rational_adaptor<IntBackend> > >::type comp_t;
    comp_t num(backend.data().numerator());
    comp_t denom(backend.data().denominator());
    *result = safe_convert_to_float<R>(num);
    *result /= safe_convert_to_float<R>(denom);
+   */
 }
 
 template <class R, class IntBackend>

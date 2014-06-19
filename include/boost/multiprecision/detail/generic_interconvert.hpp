@@ -210,24 +210,127 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
    assign_components(to, n.backend(), d.backend());
 }
 
-template <class To, class From>
-void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_floating_point>& /*to_type*/, const mpl::int_<number_kind_rational>& /*from_type*/)
+template <class To, class Integer>
+inline typename disable_if_c<is_number<To>::value || is_floating_point<To>::value>::type 
+   generic_convert_rational_to_float_imp(To& result, const Integer& n, const Integer& d, const mpl::true_&)
 {
-   typedef typename component_type<number<From> >::type   from_component_type;
+   //
+   // If we get here, then there's something about one type or the other
+   // that prevents an exactly rounded result from being calculated
+   // (or at least it's not clear how to implement such a thing).
+   //
    using default_ops::eval_divide;
-
-   number<From> t(from);
-   from_component_type n(numerator(t)), d(denominator(t));
    number<To> fn(n), fd(d);
-   eval_divide(to, fn.backend(), fd.backend());
+   eval_divide(result, fn.backend(), fd.backend());
+}
+template <class To, class Integer>
+inline typename enable_if_c<is_number<To>::value || is_floating_point<To>::value>::type 
+   generic_convert_rational_to_float_imp(To& result, const Integer& n, const Integer& d, const mpl::true_&)
+{
+   //
+   // If we get here, then there's something about one type or the other
+   // that prevents an exactly rounded result from being calculated
+   // (or at least it's not clear how to implement such a thing).
+   //
+   To fd(d);
+   result = n;
+   result /= fd;
 }
 
-namespace detail{
+template <class To, class Integer>
+typename enable_if_c<is_number<To>::value || is_floating_point<To>::value>::type 
+   generic_convert_rational_to_float_imp(To& result, Integer& num, Integer& denom, const mpl::false_&)
+{
+   //
+   // If we get here, then the precision of type To is known, and the integer type is unbounded
+   // so we can use integer division plus manipulation of the remainder to get an exactly
+   // rounded result.
+   //
+   bool s = false;
+   if(num < 0)
+   {
+      s = true;
+      num = -num;
+   }
+   int denom_bits = msb(denom);
+   int shift = std::numeric_limits<To>::digits + denom_bits - msb(num);
+   if(shift > 0)
+      num <<= shift;
+   else if(shift < 0)
+      denom <<= shift;
+   Integer q, r;
+   divide_qr(num, denom, q, r);
+   int q_bits = msb(q);
+   if(q_bits == std::numeric_limits<To>::digits)
+   {
+      //
+      // Round up if 2 * r > denom:
+      //
+      r <<= 1;
+      int c = r.compare(denom);
+      if(c > 0)
+         ++q;
+      else if((c == 0) && (q & 1u))
+      {
+         ++q;
+      }
+   }
+   else
+   {
+      BOOST_ASSERT(q_bits == 1 + std::numeric_limits<To>::digits);
+      //
+      // We basically already have the rounding info:
+      //
+      if((q & 1u) && r)
+         ++q;
+   }
+   using std::ldexp;
+   result = static_cast<To>(q);
+   result = ldexp(result, -shift);
+   if(s)
+      result = -result;
+}
+template <class To, class Integer>
+inline typename disable_if_c<is_number<To>::value || is_floating_point<To>::value>::type
+   generic_convert_rational_to_float_imp(To& result, Integer& num, Integer& denom, const mpl::false_& tag)
+{
+   number<To> t;
+   generic_convert_rational_to_float_imp(t, num, denom, tag);
+   result = t.backend();
+}
+
+template <class To, class From>
+inline void generic_convert_rational_to_float(To& result, const From& f)
+{
+   //
+   // Type From is always a Backend to number<>, or an
+   // instance of number<>, but we allow
+   // To to be either a Backend type, or a real number type,
+   // that way we can call this from generic conversions, and
+   // from specific conversions to built in types.
+   //
+   typedef typename mpl::if_c<is_number<From>::value, From, number<From> >::type actual_from_type;
+   typedef typename mpl::if_c<is_number<To>::value || is_floating_point<To>::value, To, number<To> >::type actual_to_type;
+   typedef typename component_type<actual_from_type>::type integer_type;
+   typedef mpl::bool_<!std::numeric_limits<integer_type>::is_specialized 
+                      || std::numeric_limits<integer_type>::is_bounded
+                      || !std::numeric_limits<actual_to_type>::is_specialized 
+                      || !std::numeric_limits<actual_to_type>::is_bounded
+                      || (std::numeric_limits<actual_to_type>::radix != 2)> dispatch_tag;
+
+   integer_type n(numerator(static_cast<actual_from_type>(f))), d(denominator(static_cast<actual_from_type>(f)));
+   generic_convert_rational_to_float_imp(result, n, d, dispatch_tag());
+}
+
+template <class To, class From>
+inline void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_floating_point>& /*to_type*/, const mpl::int_<number_kind_rational>& /*from_type*/)
+{
+   generic_convert_rational_to_float(to, from);
+}
 
 template <class To, class From>
 void generic_interconvert_float2rational(To& to, const From& from, const mpl::int_<2>& /*radix*/)
 {
-   BOOST_MATH_STD_USING
    typedef typename mpl::front<typename To::unsigned_types>::type ui_type;
    static const int shift = std::numeric_limits<long long>::digits;
    typename From::exponent_type e;
@@ -285,12 +388,10 @@ void generic_interconvert_float2rational(To& to, const From& from, const mpl::in
    assign_components(to, num, denom);
 }
 
-}
-
 template <class To, class From>
 void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_rational>& /*to_type*/, const mpl::int_<number_kind_floating_point>& /*from_type*/)
 {
-   detail::generic_interconvert_float2rational(to, from, mpl::int_<std::numeric_limits<number<From> >::radix>());
+   generic_interconvert_float2rational(to, from, mpl::int_<std::numeric_limits<number<From> >::radix>());
 }
 
 }}} // namespaces
