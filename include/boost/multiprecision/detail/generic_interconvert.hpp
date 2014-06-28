@@ -210,6 +210,42 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
    assign_components(to, n.backend(), d.backend());
 }
 
+template <class R, class LargeInteger>
+R safe_convert_to_float(const LargeInteger& i)
+{
+   using std::ldexp;
+   if(!i)
+      return R(0);
+   if(std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::max_exponent)
+   {
+      LargeInteger val(i);
+      if(val.sign() < 0)
+         val = -val;
+      unsigned mb = msb(val);
+      if(mb >= std::numeric_limits<R>::max_exponent)
+      {
+         int scale_factor = (int)mb + 1 - std::numeric_limits<R>::max_exponent;
+         BOOST_ASSERT(scale_factor >= 1);
+         val >>= scale_factor;
+         R result = val.template convert_to<R>();
+         if(std::numeric_limits<R>::digits == 0 || std::numeric_limits<R>::digits >= std::numeric_limits<R>::max_exponent)
+         {
+            //
+            // Calculate and add on the remainder, only if there are more
+            // digits in the mantissa that the size of the exponent, in 
+            // other words if we are dropping digits in the conversion
+            // otherwise:
+            //
+            LargeInteger remainder(i);
+            remainder &= (LargeInteger(1) << scale_factor) - 1;
+            result += ldexp(safe_convert_to_float<R>(remainder), -scale_factor);
+         }
+         return i.sign() < 0 ? static_cast<R>(-result) : result;
+      }
+   }
+   return i.template convert_to<R>();
+}
+
 template <class To, class Integer>
 inline typename disable_if_c<is_number<To>::value || is_floating_point<To>::value>::type 
    generic_convert_rational_to_float_imp(To& result, const Integer& n, const Integer& d, const mpl::true_&)
@@ -220,7 +256,7 @@ inline typename disable_if_c<is_number<To>::value || is_floating_point<To>::valu
    // (or at least it's not clear how to implement such a thing).
    //
    using default_ops::eval_divide;
-   number<To> fn(n), fd(d);
+   number<To> fn(safe_convert_to_float<To>(n)), fd(safe_convert_to_float<To>(d));
    eval_divide(result, fn.backend(), fd.backend());
 }
 template <class To, class Integer>
@@ -232,8 +268,8 @@ inline typename enable_if_c<is_number<To>::value || is_floating_point<To>::value
    // that prevents an exactly rounded result from being calculated
    // (or at least it's not clear how to implement such a thing).
    //
-   To fd(d);
-   result = n;
+   To fd(safe_convert_to_float<To>(d));
+   result = safe_convert_to_float<To>(n);
    result /= fd;
 }
 
@@ -246,6 +282,11 @@ typename enable_if_c<is_number<To>::value || is_floating_point<To>::value>::type
    // so we can use integer division plus manipulation of the remainder to get an exactly
    // rounded result.
    //
+   if(num == 0)
+   {
+      result = 0;
+      return;
+   }
    bool s = false;
    if(num < 0)
    {
@@ -257,7 +298,7 @@ typename enable_if_c<is_number<To>::value || is_floating_point<To>::value>::type
    if(shift > 0)
       num <<= shift;
    else if(shift < 0)
-      denom <<= shift;
+      denom <<= std::abs(shift);
    Integer q, r;
    divide_qr(num, denom, q, r);
    int q_bits = msb(q);
