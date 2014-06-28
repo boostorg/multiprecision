@@ -545,8 +545,25 @@ run test_rat_float_interconv.cpp /boost/system//boost_system /boost/chrono//boos
         : # command line
         : # input files
         : # requirements
+        <define>TEST2
         release 
         : test_rat_float_interconv_2 ;
+
+run test_rat_float_interconv.cpp /boost/system//boost_system /boost/chrono//boost_chrono
+        : # command line
+        : # input files
+        : # requirements
+        <define>TEST3
+        release 
+        : test_rat_float_interconv_3 ;
+
+run test_rat_float_interconv.cpp /boost/system//boost_system /boost/chrono//boost_chrono
+        : # command line
+        : # input files
+        : # requirements
+        <define>TEST4
+        release 
+        : test_rat_float_interconv_4 ;
 
 run ../example/gmp_snips.cpp gmp
         : # command line

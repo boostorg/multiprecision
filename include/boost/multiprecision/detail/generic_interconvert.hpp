@@ -294,7 +294,7 @@ typename enable_if_c<is_number<To>::value || is_floating_point<To>::value>::type
       num = -num;
    }
    int denom_bits = msb(denom);
-   int shift = std::numeric_limits<To>::digits + denom_bits - msb(num);
+   int shift = std::numeric_limits<To>::digits + denom_bits - msb(num) + 1;
    if(shift > 0)
       num <<= shift;
    else if(shift < 0)
