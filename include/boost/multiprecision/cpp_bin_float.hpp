@@ -855,11 +855,12 @@ inline void eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Mi
       //
       // OK we have cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count+1 bits, 
       // so we already have rounding info,
-      // we just need to changes things if the last bit is 1 and the
-      // remainder is non-zero (ie we do not have a tie).
+      // we just need to changes things if the last bit is 1 and either the
+      // remainder is non-zero (ie we do not have a tie) or the quotient would
+      // be odd if it were shifted to the correct number of bits (ie a tiebreak).
       //
       BOOST_ASSERT((eval_msb(q) == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count));
-      if((q.limbs()[0] & 1u) && eval_get_sign(r))
+      if((q.limbs()[0] & 1u) && (eval_get_sign(r) || (q.limbs()[0] & 2u)))
       {
          eval_increment(q);
       }
