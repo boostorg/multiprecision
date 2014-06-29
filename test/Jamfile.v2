@@ -565,6 +565,24 @@ run test_rat_float_interconv.cpp /boost/system//boost_system /boost/chrono//boos
         release 
         : test_rat_float_interconv_4 ;
 
+run test_rat_float_interconv.cpp /boost/system//boost_system /boost/chrono//boost_chrono mpfr gmp
+        : # command line
+        : # input files
+        : # requirements
+        <define>TEST6
+        [ check-target-builds ../config//has_mpfr : : <build>no ]
+        release 
+        : test_rat_float_interconv_6 ;
+
+run test_rat_float_interconv.cpp /boost/system//boost_system /boost/chrono//boost_chrono mpfr gmp
+        : # command line
+        : # input files
+        : # requirements
+        <define>TEST7
+        [ check-target-builds ../config//has_mpfr : : <build>no ]
+        release 
+        : test_rat_float_interconv_7 ;
+
 run ../example/gmp_snips.cpp gmp
         : # command line
         : # input files

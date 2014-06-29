@@ -8,6 +8,11 @@
 
 #include <boost/multiprecision/detail/default_ops.hpp>
 
+#ifdef BOOST_MSVC
+#pragma warning(push)
+#pragma warning(disable:4127)
+#endif
+
 namespace boost{ namespace multiprecision{ namespace detail{
 
 template <class To, class From>
@@ -256,7 +261,7 @@ inline typename disable_if_c<is_number<To>::value || is_floating_point<To>::valu
    // (or at least it's not clear how to implement such a thing).
    //
    using default_ops::eval_divide;
-   number<To> fn(safe_convert_to_float<To>(n)), fd(safe_convert_to_float<To>(d));
+   number<To> fn(safe_convert_to_float<number<To> >(n)), fd(safe_convert_to_float<number<To> >(d));
    eval_divide(result, fn.backend(), fd.backend());
 }
 template <class To, class Integer>
@@ -322,8 +327,11 @@ typename enable_if_c<is_number<To>::value || is_floating_point<To>::value>::type
       //
       // We basically already have the rounding info:
       //
-      if((q & 1u) && r)
-         ++q;
+      if(q & 1u)
+      {
+         if(r || (q & 2u))
+            ++q;
+      }
    }
    using std::ldexp;
    result = static_cast<To>(q);
@@ -375,7 +383,7 @@ void generic_interconvert_float2rational(To& to, const From& from, const mpl::in
    typedef typename mpl::front<typename To::unsigned_types>::type ui_type;
    static const int shift = std::numeric_limits<long long>::digits;
    typename From::exponent_type e;
-   typename component_type<To>::type num, denom;
+   typename component_type<number<To> >::type num, denom;
    number<From> val(from);
    val = frexp(val, &e);
    while(val)
@@ -392,7 +400,7 @@ void generic_interconvert_float2rational(To& to, const From& from, const mpl::in
       denom <<= -e;
    else if(e > 0)
       num <<= e;
-   assign_components(to, num, denom);
+   assign_components(to, num.backend(), denom.backend());
 }
 
 template <class To, class From, int Radix>
@@ -436,6 +444,10 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
 }
 
 }}} // namespaces
+
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
 
 #endif  // BOOST_MP_GENERIC_INTERCONVERT_HPP
 
