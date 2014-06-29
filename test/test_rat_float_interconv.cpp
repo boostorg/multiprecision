@@ -133,10 +133,12 @@ void do_round_trip(const Float& val)
 template <class Float, class Rat>
 void test_round_trip()
 {
-   std::cout << "Testing type " << typeid(Float).name() << std::endl;
+   std::cout << "Testing types " << typeid(Float).name() << " <<==>> " << typeid(Rat).name() << std::endl;
    std::cout << "digits = " << std::numeric_limits<Float>::digits << std::endl;
    std::cout << "digits10 = " << std::numeric_limits<Float>::digits10 << std::endl;
+#ifndef BOOST_NO_CXX11_NUMERIC_LIMITS
    std::cout << "max_digits10 = " << std::numeric_limits<Float>::max_digits10 << std::endl;
+#endif
 
    stopwatch<boost::chrono::high_resolution_clock> w;
 
@@ -178,6 +180,13 @@ Int generate_random_int()
 template <class Float, class Rat>
 void test_random_rationals()
 {
+   std::cout << "Testing types " << typeid(Float).name() << " <<==>> " << typeid(Rat).name() << std::endl;
+   std::cout << "digits = " << std::numeric_limits<Float>::digits << std::endl;
+   std::cout << "digits10 = " << std::numeric_limits<Float>::digits10 << std::endl;
+#ifndef BOOST_NO_CXX11_NUMERIC_LIMITS
+   std::cout << "max_digits10 = " << std::numeric_limits<Float>::max_digits10 << std::endl;
+#endif
+
    typedef typename boost::multiprecision::component_type<Rat>::type i_type;
    stopwatch<boost::chrono::high_resolution_clock> w;
 
@@ -232,6 +241,8 @@ int main()
    test_round_trip<mpfr_float_100, mpq_rational>();
 #elif defined(TEST7)
    test_random_rationals<mpfr_float_100, mpq_rational>();
+#elif defined(TEST8)
+   test_random_rationals<double, mpq_rational>();
 #endif
    return boost::report_errors();
 }
