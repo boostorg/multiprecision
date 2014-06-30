@@ -209,6 +209,10 @@ void do_round_trip(const T& val, std::ios_base::fmtflags f)
 template <class T>
 void do_round_trip(const T& val)
 {
+   std::cout << "Testing value....";
+   if(val.backend().sign())
+      std::cout << "-";
+   std::cout << boost::multiprecision::cpp_int(val.backend().bits()) << "e" << val.backend().exponent() << std::endl;
    do_round_trip(val, std::ios_base::fmtflags(0));
    do_round_trip(val, std::ios_base::fmtflags(std::ios_base::scientific));
    if((fabs(val) > 1) && (fabs(val) < 1e100))
