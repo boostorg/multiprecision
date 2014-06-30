@@ -1507,6 +1507,16 @@ In particular:
    mpz_int z(2);
    int i = z.template convert_to<int>(); // sets i to 2
 
+* Conversions to rational numbers from floating point ones are always allowed, and are exact and implicit
+as long as the rational number uses an unbounded integer type.  Please be aware that constructing a rational
+number from an extended precision floating point type with a large exponent range can effectively run the system
+out of memory, as in the extreme case ['2[super max_exponent] / CHAR_BITS] bytes of storage may be required.  This
+does not represent a problem for built in floating point types however, as the exponent range for these is rather
+limited.
+
+* Conversions to floating point numbers from rational ones are rounded to nearest (less than 0.5ulp error)
+as long as the floating point number is binary, and the integer type used by the rational number is unbounded.
+
 Additional conversions may be supported by particular backends.
 
 * A `number` can be converted to any built in type, via an explicit conversion operator:
@@ -4245,9 +4255,9 @@ and `ff` is a variable of type `std::ios_base::fmtflags`.
 [[`eval_scalbn(b, cb, e)`][`void`][Scales value `cb` by ['r[super e]], where ['r] is the radix of the type.  The default version of this function
                   is implemented in terms of eval_ldexp, consequently this function must be provided for types with a radix other than 2.]]
 [[`eval_ilogb(cb)`][`B::exponent_type`][Returns the exponent ['e] of value `cb` such that ['1 <= cb*r[super -e] < r], where ['r] is the radix of type B.
-                    The default version of this function is implemented in terms of eval_frexp, consequently this function must be provided for types with a radix other than 2.]
+                    The default version of this function is implemented in terms of eval_frexp, consequently this function must be provided for types with a radix other than 2.]]
 [[`eval_logb(b, cb)`][`B::exponent_type`][Sets `b` to the exponent ['e] of value `cb` such that ['1 <= cb*r[super -b] < r], where ['r] is the radix of type B.
-                  The default version of this function is implemented in terms of `eval_ilogb`.]
+                  The default version of this function is implemented in terms of `eval_ilogb`.]]
 ]
 
 When the tables above place no ['throws] requirements on an operation, then it is up to each type modelling this concept to
@@ -4934,6 +4944,11 @@ Windows Vista machine.
 
 [section:hist History]
 
+[h4 Multiprecision-2.2.3]
+
+* Changed rational to float conversions to exactly round to nearest, see [https://svn.boost.org/trac/boost/ticket/10085 10085].
+* Added improved generic float to rational conversions.
+
 [h4 Multiprecision-2.2.2 (Boost-1.56)]
 
 * Change floating point to rational conversions to be implicit, see [https://svn.boost.org/trac/boost/ticket/10082 10082].
@@ -5165,7 +5180,6 @@ Donald E. Knuth, Volume 2: Seminumerical Algorithms, Third Edition
 
 [section:indexes Indexes]
 
-[/temp for sandbox version]
 [include ../../../tools/auto_index/include/auto_index_helpers.qbk]
 [named_index function_name Function Index]
 [named_index class_name Class Index]
