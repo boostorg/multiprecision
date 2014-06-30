@@ -1019,7 +1019,7 @@ public:
    typedef typename mpl::if_<
       trivial_tag,
       mpl::list<unsigned char, unsigned short, unsigned,
-      unsigned long long, double_limb_type>,
+      unsigned long, unsigned long long, double_limb_type>,
       mpl::list<limb_type, double_limb_type>
    >::type                                                           unsigned_types;
    typedef typename mpl::if_<
@@ -1749,9 +1749,9 @@ typedef number<cpp_int_backend<512, 512, signed_magnitude, unchecked, void> >   
 typedef number<cpp_int_backend<1024, 1024, signed_magnitude, unchecked, void> >  int1024_t;
 
 // Over again, but with checking enabled this time:
-typedef number<cpp_int_backend<0, 0, signed_magnitude, checked> >  checked_cpp_int;
-typedef rational_adaptor<cpp_int_backend<0, 0, signed_magnitude, checked> >  checked_cpp_rational_backend;
-typedef number<cpp_rational_backend>                 checked_cpp_rational;
+typedef number<cpp_int_backend<0, 0, signed_magnitude, checked> >               checked_cpp_int;
+typedef rational_adaptor<cpp_int_backend<0, 0, signed_magnitude, checked> >     checked_cpp_rational_backend;
+typedef number<checked_cpp_rational_backend>                                    checked_cpp_rational;
 // Fixed precision unsigned types:
 typedef number<cpp_int_backend<128, 128, unsigned_magnitude, checked, void> >   checked_uint128_t;
 typedef number<cpp_int_backend<256, 256, unsigned_magnitude, checked, void> >   checked_uint256_t;

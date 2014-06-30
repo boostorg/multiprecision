@@ -165,9 +165,16 @@ struct rational_adaptor
       return m_value > o.m_value ? 1 : (m_value < o.m_value ? -1 : 0);
    }
    template <class Arithmatic>
-   typename enable_if<is_arithmetic<Arithmatic>, int>::type compare(Arithmatic i)const
+   typename enable_if_c<is_arithmetic<Arithmatic>::value && !is_floating_point<Arithmatic>::value, int>::type compare(Arithmatic i)const
    {
       return m_value > i ? 1 : (m_value < i ? -1 : 0);
+   }
+   template <class Arithmatic>
+   typename enable_if_c<is_floating_point<Arithmatic>::value, int>::type compare(Arithmatic i)const
+   {
+      rational_adaptor r;
+      r = i;
+      return this->compare(r);
    }
    rational_type& data() { return m_value; }
    const rational_type& data()const { return m_value; }

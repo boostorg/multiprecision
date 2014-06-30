@@ -216,7 +216,7 @@ typename enable_if_c<is_integral<Integer>::value, Integer>::type sqrt(const Inte
       return s;
    }
    
-   Integer t;
+   Integer t = 0;
    r = x;
    g /= 2;
    bit_set(s, g);
