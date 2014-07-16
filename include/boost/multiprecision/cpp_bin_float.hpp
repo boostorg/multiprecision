@@ -472,10 +472,10 @@ inline void do_eval_add(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Mi
          res = b;
       else
          res = a;
-      return; // ault is still infinite.
+      return; // result is still infinite.
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
       res = a;
-      return; // ault is still a NaN.
+      return; // result is still a NaN.
    }
    switch(b.exponent())
    {
@@ -486,10 +486,10 @@ inline void do_eval_add(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Mi
       res = b;
       if(res.sign())
          res.negate();
-      return; // ault is infinite.
+      return; // result is infinite.
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
       res = b;
-      return; // ault is a NaN.
+      return; // result is a NaN.
    }
    
    typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type e_diff = a.exponent() - b.exponent();
