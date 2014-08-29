@@ -43,7 +43,7 @@ struct rational_adaptor
 
    template <class U>
    rational_adaptor(const U& u, typename enable_if_c<is_convertible<U, IntBackend>::value>::type* = 0) 
-      : m_value(IntBackend(u)){}
+      : m_value(static_cast<integer_type>(u)){}
    template <class U>
    explicit rational_adaptor(const U& u, 
       typename enable_if_c<

@@ -76,7 +76,7 @@ run cpp_bin_float_snips.cpp ;
 run debug_adaptor_snips.cpp ;
 run float128_snips.cpp quadmath : : : [ check-target-builds ../config//has_float128 : : <build>no ] ;
 run floating_point_examples.cpp ;
-run gauss_laguerre_quadrature.cpp ;
+run gauss_laguerre_quadrature.cpp : : : release ;
 run hypergeometric_luke_algorithms.cpp ;
 run integer_examples.cpp ;
 run logged_adaptor.cpp mpfi mpfr gmp :  :  : [ check-target-builds ../config//has_mpfi : : <build>no ] ;

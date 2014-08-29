@@ -601,53 +601,9 @@ run test_rat_float_interconv.cpp /boost/system//boost_system /boost/chrono//boos
         release 
         : test_rat_float_interconv_8 ;
 
-run ../example/gmp_snips.cpp gmp
-        : # command line
-        : # input files
-        : # requirements
-         [ check-target-builds ../config//has_gmp : : <build>no ] ;
+build-project ../example ;
 
-run ../example/mpfr_snips.cpp mpfr
-        : # command line
-        : # input files
-        : # requirements
-         [ check-target-builds ../config//has_mpfr : : <build>no ] ;
 
-run ../example/mpfi_snips.cpp mpfi mpfr gmp
-        : # command line
-        : # input files
-        : # requirements
-         [ check-target-builds ../config//has_mpfi : : <build>no ] ;
-
-run ../example/float128_snips.cpp quadmath
-        : # command line
-        : # input files
-        : # requirements
-         [ check-target-builds ../config//has_float128 : : <build>no ] ;
-
-run ../example/float128_snips.cpp
-        : # command line
-        : # input files
-        : # requirements
-         [ check-target-builds ../config//has_intel_quad : <cxxflags>-Qoption,cpp,--extended_float_type : <build>no ] [ check-target-builds ../config//has_float128 : <source>quadmath ]
-        : float128_snips_intel_quad ;
-
-run ../example/logged_adaptor.cpp mpfi mpfr gmp
-        : # command line
-        : # input files
-        : # requirements
-         [ check-target-builds ../config//has_mpfi : : <build>no ] ;
-
-run ../example/cpp_dec_float_snips.cpp ;
-run ../example/cpp_int_snips.cpp ;
-run ../example/cpp_bin_float_snips.cpp ;
-
-run ../example/tommath_snips.cpp $(TOMMATH)
-        : # command line
-        : # input files
-        : # requirements
-         [ check-target-builds ../config//has_tommath : : <build>no ] ;
-run ../example/floating_point_examples.cpp ;
 run test_cpp_int_conv.cpp ;
 run test_native_integer.cpp ;
 
