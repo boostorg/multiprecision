@@ -152,6 +152,8 @@ void test_round_trip()
       do_round_trip<Float, Rat>(Float(1/val));
       do_round_trip<Float, Rat>(Float(-1/val));
       count += 4;
+      if(boost::detail::test_errors() > 100)
+         break;
    }
 
    std::cout << "Execution time = " << boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count() << "s" << std::endl;
@@ -216,6 +218,8 @@ void test_random_rationals()
       {
          // Values were equal... nothing to test.
       }
+      if(boost::detail::test_errors() > 100)
+         break;
    }
 
    std::cout << "Execution time = " << boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count() << "s" << std::endl;
