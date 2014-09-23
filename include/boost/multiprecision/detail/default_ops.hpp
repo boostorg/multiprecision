@@ -1219,7 +1219,8 @@ inline typename B::exponent_type eval_ilogb(const B& val)
 template <class B>
 inline void eval_logb(B& result, const B& val)
 {
-   result = static_cast<boost::intmax_t>(eval_ilogb(val));
+   typedef typename boost::mpl::if_c<boost::is_same<boost::intmax_t, long>::value, long long, boost::intmax_t>::type max_t;
+   result = static_cast<max_t>(eval_ilogb(val));
 }
 template <class B, class A>
 inline void eval_scalbn(B& result, const B& val, A e)
