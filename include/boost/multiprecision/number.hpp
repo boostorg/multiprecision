@@ -1810,6 +1810,17 @@ inline multiprecision::number<T, ExpressionTemplates> denominator(const rational
    return a.denominator();
 }
 
+namespace multiprecision
+{
+
+template <class I>
+struct component_type<boost::rational<I> >
+{
+   typedef I type;
+};
+
+}
+
 #ifdef BOOST_MSVC
 #pragma warning(pop)
 #endif

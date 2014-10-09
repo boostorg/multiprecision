@@ -86,6 +86,7 @@ T generate_random_float()
 template <class Float, class Rat>
 void do_round_trip(const Float& val)
 {
+#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
    BOOST_MATH_STD_USING
    Rat rat(val);
    Float new_f(rat);
@@ -96,6 +97,7 @@ void do_round_trip(const Float& val)
    //
    typename exponent_type<Float>::type e;
    Float t = frexp(val, &e);
+   (void)t; // warning suppression
    e -= std::numeric_limits<Float>::digits + 2;
    BOOST_ASSERT(val == (val + ldexp(Float(1), e)));
    Rat delta, rounded;
@@ -128,11 +130,13 @@ void do_round_trip(const Float& val)
    rounded = rat - delta;
    new_f = static_cast<Float>(rounded);
    BOOST_CHECK_EQUAL(val, new_f);
+#endif
 }
 
 template <class Float, class Rat>
 void test_round_trip()
 {
+#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
    std::cout << "Testing types " << typeid(Float).name() << " <<==>> " << typeid(Rat).name() << std::endl;
    std::cout << "digits = " << std::numeric_limits<Float>::digits << std::endl;
    std::cout << "digits10 = " << std::numeric_limits<Float>::digits10 << std::endl;
@@ -156,6 +160,7 @@ void test_round_trip()
 
    std::cout << "Execution time = " << boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count() << "s" << std::endl;
    std::cout << "Total values tested: " << count << std::endl;
+#endif
 }
 
 template <class Int>
@@ -180,6 +185,7 @@ Int generate_random_int()
 template <class Float, class Rat>
 void test_random_rationals()
 {
+#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
    std::cout << "Testing types " << typeid(Float).name() << " <<==>> " << typeid(Rat).name() << std::endl;
    std::cout << "digits = " << std::numeric_limits<Float>::digits << std::endl;
    std::cout << "digits10 = " << std::numeric_limits<Float>::digits10 << std::endl;
@@ -192,7 +198,7 @@ void test_random_rationals()
 
    int count = 0;
 
-   while(boost::chrono::duration_cast<boost::chrono::duration<double>>(w.elapsed()).count() < 200)
+   while(boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count() < 200)
    {
       Rat rat(generate_random_int<i_type>(), generate_random_int<i_type>());
       Float f(rat);
@@ -220,6 +226,7 @@ void test_random_rationals()
 
    std::cout << "Execution time = " << boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count() << "s" << std::endl;
    std::cout << "Total values tested: " << count << std::endl;
+#endif
 }
 
 int main()

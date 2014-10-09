@@ -16,6 +16,17 @@
 namespace boost{ namespace multiprecision{ namespace detail{
 
 template <class To, class From>
+inline To do_cast(const From & from)
+{
+   return static_cast<To>(from);
+}
+template <class To, class B, ::boost::multiprecision::expression_template_option et>
+inline To do_cast(const number<B, et>& from)
+{
+   return from.template convert_to<To>();
+}
+
+template <class To, class From>
 void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_floating_point>& /*to_type*/, const mpl::int_<number_kind_integer>& /*from_type*/)
 {
    using default_ops::eval_get_sign;
@@ -334,7 +345,7 @@ typename enable_if_c<is_number<To>::value || is_floating_point<To>::value>::type
       }
    }
    using std::ldexp;
-   result = static_cast<To>(q);
+   result = do_cast<To>(q);
    result = ldexp(result, -shift);
    if(s)
       result = -result;
