@@ -410,8 +410,8 @@ The following back-ends provide integer arithmetic:
    enum cpp_integer_type    { signed_magnitude, unsigned_magnitude };
    enum cpp_int_check_type  { checked, unchecked };
 
-   template <unsigned MinDigits = 0,
-             unsigned MaxDits = 0,
+   template <unsigned MinBits = 0,
+             unsigned MaxBits = 0,
              cpp_integer_type SignType = signed_magnitude,
              cpp_int_check_type Checked = unchecked,
              class Allocator = std::allocator<limb_type> >
@@ -419,8 +419,8 @@ The following back-ends provide integer arithmetic:
    //
    // Expression templates default to et_off if there is no allocator:
    //
-   template <unsigned MinDigits, unsigned MaxDigits, cpp_integer_type SignType, cpp_int_check_type Checked>
-   struct expression_template_default<cpp_int_backend<MinDigits, MaxDigits, SignType, Checked, void> >
+   template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked>
+   struct expression_template_default<cpp_int_backend<MinBits, MaxBits, SignType, Checked, void> >
    { static const expression_template_option value = et_off; };
 
    typedef number<cpp_int_backend<> >              cpp_int;    // arbitrary precision integer
