@@ -2805,6 +2805,21 @@ inline void eval_trunc(cpp_dec_float<Digits10, ExponentType, Allocator>& result,
    result = x.extract_integer_part();
 }
 
+template <unsigned Digits10, class ExponentType, class Allocator>
+inline ExponentType eval_ilogb(const cpp_dec_float<Digits10, ExponentType, Allocator>& val)
+{
+   // Set result, to the exponent of val:
+   return val.order();
+}
+template <unsigned Digits10, class ExponentType, class Allocator, class ArgType>
+inline void eval_scalbn(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& val, ArgType e_)
+{
+   using default_ops::eval_multiply;
+   const ExponentType e = e_;
+   cpp_dec_float<Digits10, ExponentType, Allocator> t(1.0, e);
+   eval_multiply(result, val, t);
+}
+
 template <unsigned Digits10, class ExponentType, class Allocator, class ArgType>
 inline void eval_ldexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& x, ArgType e)
 {

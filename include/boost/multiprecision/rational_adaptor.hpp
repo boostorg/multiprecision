@@ -43,7 +43,7 @@ struct rational_adaptor
 
    template <class U>
    rational_adaptor(const U& u, typename enable_if_c<is_convertible<U, IntBackend>::value>::type* = 0) 
-      : m_value(IntBackend(u)){}
+      : m_value(static_cast<integer_type>(u)){}
    template <class U>
    explicit rational_adaptor(const U& u, 
       typename enable_if_c<
@@ -233,14 +233,26 @@ inline void eval_divide(rational_adaptor<IntBackend>& result, const rational_ada
 }
 
 template <class R, class IntBackend>
-inline typename disable_if_c<is_integral<R>::value>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
+inline typename enable_if_c<number_category<R>::value == number_kind_floating_point>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
 {
-   *result = backend.data().numerator().template convert_to<R>();
-   *result /= backend.data().denominator().template convert_to<R>();
+   //
+   // The generic conversion is as good as anything we can write here:
+   //
+   ::boost::multiprecision::detail::generic_convert_rational_to_float(*result, backend);
 }
 
 template <class R, class IntBackend>
-inline typename enable_if_c<is_integral<R>::value>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
+inline typename enable_if_c<(number_category<R>::value != number_kind_integer) && (number_category<R>::value != number_kind_floating_point)>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
+{
+   typedef typename component_type<number<rational_adaptor<IntBackend> > >::type comp_t;
+   comp_t num(backend.data().numerator());
+   comp_t denom(backend.data().denominator());
+   *result = num.template convert_to<R>();
+   *result /= denom.template convert_to<R>();
+}
+
+template <class R, class IntBackend>
+inline typename enable_if_c<number_category<R>::value == number_kind_integer>::type eval_convert_to(R* result, const rational_adaptor<IntBackend>& backend)
 {
    typedef typename component_type<number<rational_adaptor<IntBackend> > >::type comp_t;
    comp_t t = backend.data().numerator();

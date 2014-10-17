@@ -598,7 +598,7 @@ public:
    // Use in boolean context, and explicit conversion operators:
    //
 #ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-#  if defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ < 7)
+#  if (defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ < 7)) || (defined(BOOST_INTEL) && (BOOST_INTEL <= 1500))
    //
    // Horrible workaround for gcc-4.6.x which always prefers the template
    // operator bool() rather than the non-template operator when converting to
@@ -1808,6 +1808,17 @@ template <class T, multiprecision::expression_template_option ExpressionTemplate
 inline multiprecision::number<T, ExpressionTemplates> denominator(const rational<multiprecision::number<T, ExpressionTemplates> >& a)
 {
    return a.denominator();
+}
+
+namespace multiprecision
+{
+
+template <class I>
+struct component_type<boost::rational<I> >
+{
+   typedef I type;
+};
+
 }
 
 #ifdef BOOST_MSVC

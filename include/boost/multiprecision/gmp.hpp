@@ -2015,7 +2015,14 @@ inline int eval_get_sign(const gmp_rational& val)
 }
 inline void eval_convert_to(double* result, const gmp_rational& val)
 {
-   *result = mpq_get_d(val.data());
+   //
+   // This does not round correctly:
+   //
+   //*result = mpq_get_d(val.data());
+   //
+   // This does:
+   //
+   boost::multiprecision::detail::generic_convert_rational_to_float(*result, val);
 }
 
 inline void eval_convert_to(long* result, const gmp_rational& val)
