@@ -860,7 +860,7 @@ private:
 protected:
    template <class T>
    typename boost::disable_if_c<std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= (int)MinBits)>::type
-      check_in_range(T val, const mpl::int_<checked>&, const mpl::false_&)
+      check_in_range(T val, const mpl::int_<checked>&, const boost::false_type&)
    {
       typedef typename common_type<T, local_limb_type>::type common_type;
 
@@ -868,7 +868,7 @@ protected:
          BOOST_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
    }
    template <class T>
-   void check_in_range(T val, const mpl::int_<checked>&, const mpl::true_&)
+   void check_in_range(T val, const mpl::int_<checked>&, const boost::true_type&)
    {
       typedef typename common_type<T, local_limb_type>::type common_type;
 
@@ -878,7 +878,7 @@ protected:
          BOOST_THROW_EXCEPTION(std::range_error("The argument to an unsigned cpp_int constructor was negative."));
    }
    template <class T, int C, bool B>
-   BOOST_MP_FORCEINLINE void check_in_range(T, const mpl::int_<C>&, const mpl::bool_<B>&){}
+   BOOST_MP_FORCEINLINE void check_in_range(T, const mpl::int_<C>&, const boost::integral_constant<bool, B>&){}
 
    template <class T>
    BOOST_MP_FORCEINLINE void check_in_range(T val)
