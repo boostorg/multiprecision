@@ -174,7 +174,11 @@ public:
       {
          f = ldexp(f, bits);
          e -= bits;
+#ifndef BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
          int ipart = itrunc(f);
+#else
+         int ipart = static_cast<int>(f);
+#endif
          f -= ipart;
          m_exponent += bits;
          eval_add(*this, ipart);
