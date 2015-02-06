@@ -326,14 +326,22 @@ public:
    static const cpp_dec_float& long_double_min()
    {
       init.do_nothing();
+#ifdef BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
+      static cpp_dec_float val(static_cast<long double>((std::numeric_limits<double>::min)()));
+#else
       static cpp_dec_float val((std::numeric_limits<long double>::min)());
+#endif
       return val;
    }
 
    static const cpp_dec_float& long_double_max()
    {
       init.do_nothing();
+#ifdef BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
+      static cpp_dec_float val(static_cast<long double>((std::numeric_limits<double>::max)()));
+#else
       static cpp_dec_float val((std::numeric_limits<long double>::max)());
+#endif
       return val;
    }
 
