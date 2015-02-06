@@ -2232,6 +2232,8 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    *this = zero();
 
    f = frexp(a, &e);
+   // See https://svn.boost.org/trac/boost/ticket/10924 for an example of why this may go wrong:
+   BOOST_ASSERT((boost::math::isfinite)(f));
 
    static const int shift = std::numeric_limits<int>::digits - 1;
 
@@ -2239,6 +2241,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    {
       // extract int sized bits from f:
       f = ldexp(f, shift);
+      BOOST_ASSERT((boost::math::isfinite)(f));
       term = floor(f);
       e -= shift;
       *this *= pow2(shift);
