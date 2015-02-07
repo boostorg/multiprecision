@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////
+//////////////////3/////////////////////////////////////////////
 //  Copyright 2012 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_
@@ -477,7 +477,7 @@ public:
       if((m_limbs == 1) && (!*p)) m_sign = false; // zero is always unsigned
    }
 
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() : m_wrapper(limb_type(0u)), m_limbs(1), m_sign(false) {}
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base()BOOST_NOEXCEPT : m_wrapper(limb_type(0u)), m_limbs(1), m_sign(false) {}
    // Defaulted functions:
    //BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(const cpp_int_base& i)BOOST_NOEXCEPT;
    //~cpp_int_base() BOOST_NOEXCEPT {}
@@ -806,7 +806,7 @@ public:
       m_data &= limb_mask;
    }
 
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() : m_data(0), m_sign(false) {}
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() BOOST_NOEXCEPT : m_data(0), m_sign(false) {}
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT
       : m_data(o.m_data), m_sign(o.m_sign) {}
    //~cpp_int_base() BOOST_NOEXCEPT {}
@@ -942,7 +942,7 @@ public:
       m_data &= limb_mask;
    }
 
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() : m_data(0) {}
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() BOOST_NOEXCEPT : m_data(0) {}
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT
       : m_data(o.m_data) {}
    //~cpp_int_base() BOOST_NOEXCEPT {}
@@ -1039,7 +1039,7 @@ public:
    // Direct construction from arithmetic type:
    //
    template <class Arg>
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(Arg i, typename boost::enable_if_c<is_allowed_cpp_int_base_conversion<Arg, base_type>::value >::type const* = 0)BOOST_NOEXCEPT_IF((Checked == unchecked) && boost::is_void<Allocator>::value)
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(Arg i, typename boost::enable_if_c<is_allowed_cpp_int_base_conversion<Arg, base_type>::value >::type const* = 0)BOOST_NOEXCEPT_IF(noexcept(base_type(std::declval<Arg>())))
       : base_type(i) {}
 
 private:
@@ -1128,13 +1128,13 @@ public:
       : base_type(static_cast<const base_type&>(a), tag){}
 #endif
 
-   BOOST_MP_FORCEINLINE cpp_int_backend& operator = (const cpp_int_backend& o) BOOST_NOEXCEPT_IF((Checked == unchecked) && boost::is_void<Allocator>::value)
+   BOOST_MP_FORCEINLINE cpp_int_backend& operator = (const cpp_int_backend& o) BOOST_NOEXCEPT_IF(noexcept(std::declval<cpp_int_backend>().assign(std::declval<const cpp_int_backend&>())))
    {
       this->assign(o);
       return *this;
    }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-   BOOST_MP_FORCEINLINE cpp_int_backend& operator = (cpp_int_backend&& o) BOOST_NOEXCEPT_IF(boost::is_void<Allocator>::value)
+   BOOST_MP_FORCEINLINE cpp_int_backend& operator = (cpp_int_backend&& o) BOOST_NOEXCEPT_IF(noexcept(std::declval<base_type>() = std::declval<base_type>()))
    {
       *static_cast<base_type*>(this) = static_cast<base_type&&>(o);
       return *this;
@@ -1170,13 +1170,13 @@ private:
       *this->limbs() = i;
       this->sign(false);
    }
-   BOOST_MP_FORCEINLINE void do_assign_arithmetic(signed_limb_type i, const mpl::false_&) BOOST_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE void do_assign_arithmetic(signed_limb_type i, const mpl::false_&) BOOST_NOEXCEPT_IF(noexcept(std::declval<cpp_int_backend>().sign(true)))
    {
       this->resize(1, 1);
       *this->limbs() = static_cast<limb_type>(boost::multiprecision::detail::unsigned_abs(i));
       this->sign(i < 0);
    }
-   void do_assign_arithmetic(double_limb_type i, const mpl::false_&)
+   void do_assign_arithmetic(double_limb_type i, const mpl::false_&) BOOST_NOEXCEPT
    {
       BOOST_STATIC_ASSERT(sizeof(i) == 2 * sizeof(limb_type));
       BOOST_STATIC_ASSERT(base_type::internal_limb_count >= 2);
@@ -1186,7 +1186,7 @@ private:
       this->resize(p[1] ? 2 : 1, p[1] ? 2 : 1);
       this->sign(false);
    }
-   void do_assign_arithmetic(signed_double_limb_type i, const mpl::false_&)
+   void do_assign_arithmetic(signed_double_limb_type i, const mpl::false_&) BOOST_NOEXCEPT_IF(noexcept(std::declval<cpp_int_backend>().sign(true)))
    {
       BOOST_STATIC_ASSERT(sizeof(i) == 2 * sizeof(limb_type));
       BOOST_STATIC_ASSERT(base_type::internal_limb_count >= 2);
@@ -1249,7 +1249,7 @@ private:
    }
 public:
    template <class Arithmetic>
-   BOOST_MP_FORCEINLINE cpp_int_backend& operator = (Arithmetic val)
+   BOOST_MP_FORCEINLINE cpp_int_backend& operator = (Arithmetic val) BOOST_NOEXCEPT_IF(noexcept(std::declval<cpp_int_backend>().do_assign_arithmetic(std::declval<Arithmetic>(), trivial_tag())))
    {
       do_assign_arithmetic(val, trivial_tag());
       return *this;
