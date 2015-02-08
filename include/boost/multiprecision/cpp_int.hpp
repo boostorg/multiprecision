@@ -1134,7 +1134,7 @@ public:
       return *this;
    }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-   BOOST_MP_FORCEINLINE cpp_int_backend& operator = (cpp_int_backend&& o) BOOST_NOEXCEPT_IF(noexcept(std::declval<base_type>() = std::declval<base_type>()))
+   BOOST_MP_FORCEINLINE cpp_int_backend& operator = (cpp_int_backend&& o) BOOST_NOEXCEPT_IF(noexcept(std::declval<base_type&>() = std::declval<base_type>()))
    {
       *static_cast<base_type*>(this) = static_cast<base_type&&>(o);
       return *this;
