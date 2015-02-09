@@ -138,13 +138,12 @@ BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::checked_uint512
 
 #if defined(BOOST_LITTLE_ENDIAN)
 //
+// We can also nothrow construct from a double_limb_type (or smaller obviously) as long as double_limb_type is smaller than the type
+// in question (so don't test 128-bit integers in case double_limb_type is __int128).
+//
 // Construct from int:
 //
 BOOST_STATIC_ASSERT(noexcept(boost::multiprecision::cpp_int(std::declval<boost::multiprecision::signed_double_limb_type>())));
-BOOST_STATIC_ASSERT(noexcept(boost::multiprecision::int128_t(std::declval<boost::multiprecision::signed_double_limb_type>())));
-BOOST_STATIC_ASSERT(noexcept(boost::multiprecision::checked_int128_t(std::declval<boost::multiprecision::signed_double_limb_type>())));
-BOOST_STATIC_ASSERT(noexcept(boost::multiprecision::uint128_t(std::declval<boost::multiprecision::signed_double_limb_type>())));
-BOOST_STATIC_ASSERT(!noexcept(boost::multiprecision::checked_uint128_t(std::declval<boost::multiprecision::signed_double_limb_type>())));
 BOOST_STATIC_ASSERT(noexcept(boost::multiprecision::int512_t(std::declval<boost::multiprecision::signed_double_limb_type>())));
 BOOST_STATIC_ASSERT(noexcept(boost::multiprecision::checked_int512_t(std::declval<boost::multiprecision::signed_double_limb_type>())));
 BOOST_STATIC_ASSERT(noexcept(boost::multiprecision::uint512_t(std::declval<boost::multiprecision::signed_double_limb_type>())));
@@ -153,10 +152,6 @@ BOOST_STATIC_ASSERT(!noexcept(boost::multiprecision::checked_uint512_t(std::decl
 // Construct from unsigned int:
 //
 BOOST_STATIC_ASSERT(noexcept(boost::multiprecision::cpp_int(std::declval<boost::multiprecision::double_limb_type>())));
-BOOST_STATIC_ASSERT(noexcept(boost::multiprecision::int128_t(std::declval<boost::multiprecision::double_limb_type>())));
-BOOST_STATIC_ASSERT(noexcept(boost::multiprecision::checked_int128_t(std::declval<boost::multiprecision::double_limb_type>())));
-BOOST_STATIC_ASSERT(noexcept(boost::multiprecision::uint128_t(std::declval<boost::multiprecision::double_limb_type>())));
-BOOST_STATIC_ASSERT(noexcept(boost::multiprecision::checked_uint128_t(std::declval<boost::multiprecision::double_limb_type>())));
 BOOST_STATIC_ASSERT(noexcept(boost::multiprecision::int512_t(std::declval<boost::multiprecision::double_limb_type>())));
 BOOST_STATIC_ASSERT(noexcept(boost::multiprecision::checked_int512_t(std::declval<boost::multiprecision::double_limb_type>())));
 BOOST_STATIC_ASSERT(noexcept(boost::multiprecision::uint512_t(std::declval<boost::multiprecision::double_limb_type>())));
@@ -165,10 +160,6 @@ BOOST_STATIC_ASSERT(noexcept(boost::multiprecision::checked_uint512_t(std::declv
 // Assign from int:
 //
 BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::cpp_int>() = std::declval<boost::multiprecision::signed_double_limb_type>()));
-BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::int128_t>() = std::declval<boost::multiprecision::signed_double_limb_type>()));
-BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::checked_int128_t>() = std::declval<boost::multiprecision::signed_double_limb_type>()));
-BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::uint128_t>() = std::declval<boost::multiprecision::signed_double_limb_type>()));
-BOOST_STATIC_ASSERT(!noexcept(std::declval<boost::multiprecision::checked_uint128_t>() = std::declval<boost::multiprecision::signed_double_limb_type>()));
 BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::int512_t>() = std::declval<boost::multiprecision::signed_double_limb_type>()));
 BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::checked_int512_t>() = std::declval<boost::multiprecision::signed_double_limb_type>()));
 BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::uint512_t>() = std::declval<boost::multiprecision::signed_double_limb_type>()));
@@ -177,10 +168,6 @@ BOOST_STATIC_ASSERT(!noexcept(std::declval<boost::multiprecision::checked_uint51
 // Assign from unsigned int:
 //
 BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::cpp_int>() = std::declval<boost::multiprecision::double_limb_type>()));
-BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::int128_t>() = std::declval<boost::multiprecision::double_limb_type>()));
-BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::checked_int128_t>() = std::declval<boost::multiprecision::double_limb_type>()));
-BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::uint128_t>() = std::declval<boost::multiprecision::double_limb_type>()));
-BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::checked_uint128_t>() = std::declval<boost::multiprecision::double_limb_type>()));
 BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::int512_t>() = std::declval<boost::multiprecision::double_limb_type>()));
 BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::checked_int512_t>() = std::declval<boost::multiprecision::double_limb_type>()));
 BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::uint512_t>() = std::declval<boost::multiprecision::double_limb_type>()));
