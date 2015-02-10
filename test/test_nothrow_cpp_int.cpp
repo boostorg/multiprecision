@@ -174,5 +174,77 @@ BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::uint512_t>() = 
 BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::checked_uint512_t>() = std::declval<boost::multiprecision::double_limb_type>()));
 
 #endif // little endian
+
+typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<32, 32, boost::multiprecision::signed_magnitude, boost::multiprecision::checked, void> >    checked_int32_t;
+typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<32, 32, boost::multiprecision::unsigned_magnitude, boost::multiprecision::checked, void> >    checked_uint32_t;
+typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<32, 32, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> >    unchecked_int32_t;
+typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<32, 32, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> >    unchecked_uint32_t;
+
+//
+// Construct from int:
+//
+BOOST_STATIC_ASSERT(noexcept(unchecked_int32_t(std::declval<boost::int32_t>())));
+BOOST_STATIC_ASSERT(noexcept(checked_int32_t(std::declval<boost::int32_t>())));
+BOOST_STATIC_ASSERT(noexcept(unchecked_uint32_t(std::declval<boost::int32_t>())));
+BOOST_STATIC_ASSERT(!noexcept(checked_uint32_t(std::declval<boost::int32_t>())));
+//
+// Construct from unsigned int:
+//
+BOOST_STATIC_ASSERT(noexcept(unchecked_int32_t(std::declval<boost::uint32_t>())));
+BOOST_STATIC_ASSERT(noexcept(checked_int32_t(std::declval<boost::uint32_t>())));
+BOOST_STATIC_ASSERT(noexcept(unchecked_uint32_t(std::declval<boost::uint32_t>())));
+BOOST_STATIC_ASSERT(noexcept(checked_uint32_t(std::declval<boost::uint32_t>())));
+//
+// Assign from int:
+//
+BOOST_STATIC_ASSERT(noexcept(std::declval<unchecked_int32_t>() = std::declval<boost::int32_t>()));
+BOOST_STATIC_ASSERT(noexcept(std::declval<checked_int32_t>() = std::declval<boost::int32_t>()));
+BOOST_STATIC_ASSERT(noexcept(std::declval<unchecked_uint32_t>() = std::declval<boost::int32_t>()));
+BOOST_STATIC_ASSERT(!noexcept(std::declval<checked_uint32_t>() = std::declval<boost::int32_t>()));
+//
+// Assign from unsigned int:
+//
+BOOST_STATIC_ASSERT(noexcept(std::declval<unchecked_int32_t>() = std::declval<boost::uint32_t>()));
+BOOST_STATIC_ASSERT(noexcept(std::declval<checked_int32_t>() = std::declval<boost::uint32_t>()));
+BOOST_STATIC_ASSERT(noexcept(std::declval<unchecked_uint32_t>() = std::declval<boost::uint32_t>()));
+BOOST_STATIC_ASSERT(noexcept(std::declval<checked_uint32_t>() = std::declval<boost::uint32_t>()));
+
+//
+// And finally some things which should *not* be noexcept:
+//
+typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<30, 30, boost::multiprecision::signed_magnitude, boost::multiprecision::checked, void> >    checked_int30_t;
+typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<30, 30, boost::multiprecision::unsigned_magnitude, boost::multiprecision::checked, void> >    checked_uint30_t;
+typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<30, 30, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> >    unchecked_int30_t;
+typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<30, 30, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> >    unchecked_uint30_t;
+
+//
+// Construct from int:
+//
+BOOST_STATIC_ASSERT(!noexcept(checked_int30_t(std::declval<boost::int32_t>())));
+BOOST_STATIC_ASSERT(!noexcept(checked_uint30_t(std::declval<boost::int32_t>())));
+BOOST_STATIC_ASSERT(!noexcept(checked_int32_t(std::declval<boost::int64_t>())));
+BOOST_STATIC_ASSERT(!noexcept(checked_uint32_t(std::declval<boost::int64_t>())));
+//
+// Construct from unsigned int:
+//
+BOOST_STATIC_ASSERT(!noexcept(checked_int30_t(std::declval<boost::uint32_t>())));
+BOOST_STATIC_ASSERT(!noexcept(checked_uint30_t(std::declval<boost::uint32_t>())));
+BOOST_STATIC_ASSERT(!noexcept(checked_int32_t(std::declval<boost::uint64_t>())));
+BOOST_STATIC_ASSERT(!noexcept(checked_uint32_t(std::declval<boost::uint64_t>())));
+//
+// Assign from int:
+//
+BOOST_STATIC_ASSERT(!noexcept(std::declval<checked_int30_t>() = std::declval<boost::int32_t>()));
+BOOST_STATIC_ASSERT(!noexcept(std::declval<checked_uint30_t>() = std::declval<boost::int32_t>()));
+BOOST_STATIC_ASSERT(!noexcept(std::declval<checked_int32_t>() = std::declval<boost::int64_t>()));
+BOOST_STATIC_ASSERT(!noexcept(std::declval<checked_uint32_t>() = std::declval<boost::int64_t>()));
+//
+// Assign from unsigned int:
+//
+BOOST_STATIC_ASSERT(!noexcept(std::declval<checked_int30_t>() = std::declval<boost::uint32_t>()));
+BOOST_STATIC_ASSERT(!noexcept(std::declval<checked_uint30_t>() = std::declval<boost::uint32_t>()));
+BOOST_STATIC_ASSERT(!noexcept(std::declval<checked_int32_t>() = std::declval<boost::uint64_t>()));
+BOOST_STATIC_ASSERT(!noexcept(std::declval<checked_uint32_t>() = std::declval<boost::uint64_t>()));
+
 #endif // noexcept
 
