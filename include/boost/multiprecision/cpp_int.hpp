@@ -355,9 +355,6 @@ public:
       std::swap(m_limbs, o.m_limbs);
    }
 protected:
-#ifdef BOOST_INTEL
-public:
-#endif
    template <class A>
    BOOST_CONSTEXPR void check_in_range(const A&) BOOST_NOEXCEPT {}
 };
@@ -519,9 +516,6 @@ public:
       std::swap(m_limbs, o.m_limbs);
    }
 protected:
-#ifdef BOOST_INTEL
-public:
-#endif
    template <class A>
    BOOST_CONSTEXPR void check_in_range(const A&) BOOST_NOEXCEPT {}
 };
@@ -673,9 +667,6 @@ public:
       std::swap(m_limbs, o.m_limbs);
    }
 protected:
-#ifdef BOOST_INTEL
-public:
-#endif
    template <class A>
    BOOST_CONSTEXPR void check_in_range(const A&) BOOST_NOEXCEPT {}
 };
@@ -733,9 +724,6 @@ private:
    //
    BOOST_STATIC_ASSERT_MSG(MinBits <= sizeof(double_limb_type) * CHAR_BIT, "Template parameter MinBits is inconsistent with the parameter trivial - did you mistakingly try to override the trivial parameter?");
 protected:
-#ifdef BOOST_INTEL
-public:
-#endif
    template <class T>
    typename boost::disable_if_c<!boost::is_integral<T>::value || (std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= (int)MinBits))>::type
       check_in_range(T val, const mpl::int_<checked>&)
@@ -879,9 +867,6 @@ private:
    //
    BOOST_STATIC_ASSERT_MSG(MinBits <= sizeof(double_limb_type) * CHAR_BIT, "Template parameter MinBits is inconsistent with the parameter trivial - did you mistakingly try to override the trivial parameter?");
 protected:
-#ifdef BOOST_INTEL
-public:
-#endif
    template <class T>
    typename boost::disable_if_c<std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= (int)MinBits)>::type
       check_in_range(T val, const mpl::int_<checked>&, const boost::false_type&)
