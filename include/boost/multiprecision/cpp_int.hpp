@@ -481,8 +481,10 @@ public:
    }
 
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base()BOOST_NOEXCEPT : m_wrapper(limb_type(0u)), m_limbs(1), m_sign(false) {}
+   // Not defaulted, it breaks constexpr support in the Intel compiler for some reason:
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(const cpp_int_base& o)BOOST_NOEXCEPT
+      : m_wrapper(o.m_wrapper), m_limbs(o.m_limbs), m_sign(o.m_sign) {}
    // Defaulted functions:
-   //BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(const cpp_int_base& i)BOOST_NOEXCEPT;
    //~cpp_int_base() BOOST_NOEXCEPT {}
 
    void assign(const cpp_int_base& o) BOOST_NOEXCEPT
@@ -621,8 +623,9 @@ public:
 
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() BOOST_NOEXCEPT
       : m_wrapper(limb_type(0u)), m_limbs(1) {}
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT
+      : m_wrapper(o.m_wrapper), m_limbs(o.m_limbs) {}
    // Defaulted functions:
-   //BOOST_MP_FORCEINLINE cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT;
    //~cpp_int_base() BOOST_NOEXCEPT {}
 
    BOOST_MP_FORCEINLINE void assign(const cpp_int_base& o) BOOST_NOEXCEPT
