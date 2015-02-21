@@ -145,6 +145,18 @@ struct canonical_imp<number<B, et_off>, Backend, Tag>
 {
    typedef B type;
 };
+#ifdef __SUNPRO_CC
+template <class B, class Backend>
+struct canonical_imp<number<B, et_on>, Backend, mpl::int_<3> >
+{
+   typedef B type;
+};
+template <class B, class Backend>
+struct canonical_imp<number<B, et_off>, Backend, mpl::int_<3> >
+{
+   typedef B type;
+};
+#endif
 template <class Val, class Backend>
 struct canonical_imp<Val, Backend, mpl::int_<0> >
 {
