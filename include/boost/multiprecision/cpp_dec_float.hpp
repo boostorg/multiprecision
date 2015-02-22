@@ -1971,7 +1971,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       // Remove all trailing insignificant zeros.
       const std::string::const_reverse_iterator rit_non_zero = std::find_if(str.rbegin(), str.rend(), char_is_nonzero_predicate);
 
-      if(rit_non_zero != str.rbegin())
+      if(rit_non_zero != static_cast<std::string::const_reverse_iterator>(str.rbegin()))
       {
          const std::string::size_type ofs = str.length() - std::distance<std::string::const_reverse_iterator>(str.rbegin(), rit_non_zero);
          str.erase(str.begin() + ofs, str.end());
