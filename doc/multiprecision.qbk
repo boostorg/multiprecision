@@ -4944,9 +4944,16 @@ Windows Vista machine.
 
 [section:hist History]
 
+[ Multiprecision-2.2.4 (Boost-1.58)]
+
+* Changed `frexp` to always be non-expression template generating, see: [@https://svn.boost.org/trac/boost/ticket/10993 10993].
+* Improved support of cpp_dec_float on Cygwin and other platforms with missing long double support, see [@https://svn.boost.org/trac/boost/ticket/10924 10924].
+* Improved noexcept support and added some more tests, see [@https://svn.boost.org/trac/boost/ticket/10990 10990].
+* Various workarounds applied for Intel-15.0 and Solaris-12.4 compilers.
+
 [h4 Multiprecision-2.2.3 (Boost-1.57)]
 
-* Changed rational to float conversions to exactly round to nearest, see [https://svn.boost.org/trac/boost/ticket/10085 10085].
+* Changed rational to float conversions to exactly round to nearest, see [@https://svn.boost.org/trac/boost/ticket/10085 10085].
 * Added improved generic float to rational conversions.
 * Fixed rare bug in exponent function for __cpp_bin_float.
 * Fixed various minor documentation issues.
