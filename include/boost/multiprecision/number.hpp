@@ -1692,7 +1692,7 @@ inline std::ostream& operator << (std::ostream& os, const number<Backend, Expres
       if((os.flags() & std::ios_base::left) == std::ios_base::left)
          s.append(static_cast<std::string::size_type>(ss - s.size()), fill);
       else
-         s.insert(0, static_cast<std::string::size_type>(ss - s.size()), fill);
+         s.insert(static_cast<std::string::size_type>(0), static_cast<std::string::size_type>(ss - s.size()), fill);
    }
    return os << s;
 }
@@ -1754,9 +1754,9 @@ inline std::istream& operator >> (std::istream& is, rational<multiprecision::num
       is.get();
    }
    if(hex_format && ((s1[0] != '0') || (s1[1] != 'x')))
-      s1.insert(0, "0x");
+      s1.insert(static_cast<std::string::size_type>(0), "0x");
    if(oct_format && (s1[0] != '0'))
-      s1.insert(0, "0");
+      s1.insert(static_cast<std::string::size_type>(0), "0");
    v1.assign(s1);
    s1.erase();
    if(c == '/')
@@ -1770,9 +1770,9 @@ inline std::istream& operator >> (std::istream& is, rational<multiprecision::num
          is.get();
       }
       if(hex_format && ((s1[0] != '0') || (s1[1] != 'x')))
-         s1.insert(0, "0x");
+         s1.insert(static_cast<std::string::size_type>(0), "0x");
       if(oct_format && (s1[0] != '0'))
-         s1.insert(0, "0");
+         s1.insert(static_cast<std::string::size_type>(0), "0");
       v2.assign(s1);
    }
    else

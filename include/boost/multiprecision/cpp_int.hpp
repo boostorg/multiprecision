@@ -1491,7 +1491,7 @@ private:
          if(f & std::ios_base::showbase)
          {
             const char* pp = base == 8 ? "0" : "0x";
-            result.insert(0, pp);
+            result.insert(static_cast<std::string::size_type>(0), pp);
          }
       }
       else
@@ -1515,9 +1515,9 @@ private:
          if(result.empty())
             result = "0";
          if(neg)
-            result.insert(0, 1, '-');
+            result.insert(static_cast<std::string::size_type>(0), 1, '-');
          else if(f & std::ios_base::showpos)
-            result.insert(0, 1, '+');
+            result.insert(static_cast<std::string::size_type>(0), 1, '+');
       }
       return result;
    }
@@ -1576,7 +1576,7 @@ private:
          if(f & std::ios_base::showbase)
          {
             const char* pp = base == 8 ? "0" : "0x";
-            result.insert(0, pp);
+            result.insert(static_cast<std::string::size_type>(0), pp);
          }
       }
       else
@@ -1620,9 +1620,9 @@ private:
          if(result.empty())
             result = "0";
          if(neg)
-            result.insert(0, 1, '-');
+            result.insert(static_cast<std::string::size_type>(0), 1, '-');
          else if(f & std::ios_base::showpos)
-            result.insert(0, 1, '+');
+            result.insert(static_cast<std::string::size_type>(0), 1, '+');
       }
       return result;
    }

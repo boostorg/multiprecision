@@ -1216,10 +1216,10 @@ struct gmp_int
       {
          int pos = s[0] == '-' ? 1 : 0;
          const char* pp = base == 8 ? "0" : "0x";
-         s.insert(pos, pp);
+         s.insert(static_cast<std::string::size_type>(pos), pp);
       }
       if((f & std::ios_base::showpos) && (s[0] != '-'))
-         s.insert(0, 1, '+');
+         s.insert(static_cast<std::string::size_type>(0), 1, '+');
 
       return s;
    }

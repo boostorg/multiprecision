@@ -1775,7 +1775,7 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(boost::intmax_
       // We only get here if the output format is "fixed" and we just need to
       // round the first non-zero digit.
       number_of_digits -= my_exp + 1; // reset to original value
-      str.insert(0, std::string::size_type(number_of_digits), '0');
+      str.insert(static_cast<std::string::size_type>(0), std::string::size_type(number_of_digits), '0');
       have_leading_zeros = true;
    }
 
@@ -1783,7 +1783,7 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(boost::intmax_
    {
       str = "0";
       if(isneg())
-         str.insert(0, 1, '-');
+         str.insert(static_cast<std::string::size_type>(0), 1, '-');
       boost::multiprecision::detail::format_float_string(str, 0, number_of_digits - my_exp - 1, f, this->iszero());
       return str;
    }
@@ -1874,7 +1874,7 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(boost::intmax_
    }
 
    if(isneg())
-      str.insert(0, 1, '-');
+      str.insert(static_cast<std::string::size_type>(0), 1, '-');
 
    boost::multiprecision::detail::format_float_string(str, my_exp, org_digits, f, this->iszero());
    return str;
@@ -2001,7 +2001,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
 
          // Bring one single digit into the mantissa and adjust the exponent accordingly.
          str.erase(str.begin(), it_non_zero);
-         str.insert(static_cast<std::size_t>(1u), ".");
+         str.insert(static_cast<std::string::size_type>(1u), ".");
          exp -= static_cast<ExponentType>(delta_exp + 1u);
       }
    }
@@ -2037,9 +2037,9 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
    // Do the decimal point shift.
    if(n_shift != static_cast<std::size_t>(0u))
    {
-      str.insert(static_cast<std::size_t>(pos_plus_one + n_shift), ".");
+      str.insert(static_cast<std::string::size_type>(pos_plus_one + n_shift), ".");
 
-      str.erase(pos, static_cast<std::size_t>(1u));
+      str.erase(pos, static_cast<std::string::size_type>(1u));
 
       exp -= static_cast<ExponentType>(n_shift);
    }
