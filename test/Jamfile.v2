@@ -350,6 +350,14 @@ compile test_constexpr.cpp :
    [ check-target-builds ../config//has_intel_quad : <cxxflags>-Qoption,cpp,--extended_float_type <define>HAVE_FLOAT128 : ] 
    [ requires cxx11_constexpr cxx11_user_defined_literals ] ;
 
+compile test_nothrow_cpp_int.cpp ;
+compile test_nothrow_cpp_rational.cpp ;
+compile test_nothrow_cpp_bin_float.cpp ;
+compile test_nothrow_cpp_dec_float.cpp ;
+compile test_nothrow_float128.cpp : [ check-target-builds ../config//has_float128 : : <build>no ] ;
+compile test_nothrow_gmp.cpp : [ check-target-builds ../config//has_gmp : : <build>no ] ;
+compile test_nothrow_mpfr.cpp : [ check-target-builds ../config//has_mpfr : : <build>no ] ;
+
 run test_cpp_bin_float_io.cpp /boost/system//boost_system /boost/chrono//boost_chrono
         : # command line
         : # input files

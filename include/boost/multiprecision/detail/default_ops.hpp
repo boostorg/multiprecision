@@ -1561,6 +1561,71 @@ inline long long llround(const number<T, ExpressionTemplates>& v)
    return llround(v, boost::math::policies::policy<>());
 }
 #endif
+//
+// frexp does not return an expression template since we require the
+// integer argument to be evaluated even if the returned value is
+// not assigned to anything...
+//
+template <class T, expression_template_option ExpressionTemplates>
+inline typename enable_if_c<number_category<T>::value == number_kind_floating_point, number<T, ExpressionTemplates> >::type frexp(const number<T, ExpressionTemplates>& v, short* pint)
+{
+   using default_ops::eval_frexp;
+   number<T, ExpressionTemplates> result;
+   eval_frexp(result.backend(), v.backend(), pint);
+   return BOOST_MP_MOVE(result);
+}
+template <class tag, class A1, class A2, class A3, class A4>
+inline typename enable_if_c<number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_floating_point, typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type 
+   frexp(const detail::expression<tag, A1, A2, A3, A4>& v, short* pint)
+{
+   typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
+   return BOOST_MP_MOVE(frexp(static_cast<number_type>(v), pint));
+}
+template <class T, expression_template_option ExpressionTemplates>
+inline typename enable_if_c<number_category<T>::value == number_kind_floating_point, number<T, ExpressionTemplates> >::type frexp(const number<T, ExpressionTemplates>& v, int* pint)
+{
+   using default_ops::eval_frexp;
+   number<T, ExpressionTemplates> result;
+   eval_frexp(result.backend(), v.backend(), pint);
+   return BOOST_MP_MOVE(result);
+}
+template <class tag, class A1, class A2, class A3, class A4>
+inline typename enable_if_c<number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_floating_point, typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
+frexp(const detail::expression<tag, A1, A2, A3, A4>& v, int* pint)
+{
+   typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
+   return BOOST_MP_MOVE(frexp(static_cast<number_type>(v), pint));
+}
+template <class T, expression_template_option ExpressionTemplates>
+inline typename enable_if_c<number_category<T>::value == number_kind_floating_point, number<T, ExpressionTemplates> >::type frexp(const number<T, ExpressionTemplates>& v, long* pint)
+{
+   using default_ops::eval_frexp;
+   number<T, ExpressionTemplates> result;
+   eval_frexp(result.backend(), v.backend(), pint);
+   return BOOST_MP_MOVE(result);
+}
+template <class tag, class A1, class A2, class A3, class A4>
+inline typename enable_if_c<number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_floating_point, typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
+frexp(const detail::expression<tag, A1, A2, A3, A4>& v, long* pint)
+{
+   typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
+   return BOOST_MP_MOVE(frexp(static_cast<number_type>(v), pint));
+}
+template <class T, expression_template_option ExpressionTemplates>
+inline typename enable_if_c<number_category<T>::value == number_kind_floating_point, number<T, ExpressionTemplates> >::type frexp(const number<T, ExpressionTemplates>& v, long long* pint)
+{
+   using default_ops::eval_frexp;
+   number<T, ExpressionTemplates> result;
+   eval_frexp(result.backend(), v.backend(), pint);
+   return BOOST_MP_MOVE(result);
+}
+template <class tag, class A1, class A2, class A3, class A4>
+inline typename enable_if_c<number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_floating_point, typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
+frexp(const detail::expression<tag, A1, A2, A3, A4>& v, long long* pint)
+{
+   typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
+   return BOOST_MP_MOVE(frexp(static_cast<number_type>(v), pint));
+}
 
 template <class B, expression_template_option ExpressionTemplates>
 inline typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, ExpressionTemplates> >::type
@@ -2034,13 +2099,13 @@ UNARY_OP_FUNCTOR(sinh, number_kind_floating_point)
 UNARY_OP_FUNCTOR(tanh, number_kind_floating_point)
 
 HETERO_BINARY_OP_FUNCTOR(ldexp, short, number_kind_floating_point)
-HETERO_BINARY_OP_FUNCTOR(frexp, short*, number_kind_floating_point)
+//HETERO_BINARY_OP_FUNCTOR(frexp, short*, number_kind_floating_point)
 HETERO_BINARY_OP_FUNCTOR_B(ldexp, int, number_kind_floating_point)
-HETERO_BINARY_OP_FUNCTOR_B(frexp, int*, number_kind_floating_point)
+//HETERO_BINARY_OP_FUNCTOR_B(frexp, int*, number_kind_floating_point)
 HETERO_BINARY_OP_FUNCTOR_B(ldexp, long, number_kind_floating_point)
-HETERO_BINARY_OP_FUNCTOR_B(frexp, long*, number_kind_floating_point)
+//HETERO_BINARY_OP_FUNCTOR_B(frexp, long*, number_kind_floating_point)
 HETERO_BINARY_OP_FUNCTOR_B(ldexp, long long, number_kind_floating_point)
-HETERO_BINARY_OP_FUNCTOR_B(frexp, long long*, number_kind_floating_point)
+//HETERO_BINARY_OP_FUNCTOR_B(frexp, long long*, number_kind_floating_point)
 BINARY_OP_FUNCTOR(pow, number_kind_floating_point)
 BINARY_OP_FUNCTOR(fmod, number_kind_floating_point)
 BINARY_OP_FUNCTOR(atan2, number_kind_floating_point)
