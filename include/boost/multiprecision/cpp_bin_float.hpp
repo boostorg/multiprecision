@@ -136,6 +136,7 @@ public:
    {
       BOOST_MATH_STD_USING
       using default_ops::eval_add;
+      typedef typename boost::multiprecision::detail::canonical<int, cpp_bin_float>::type bf_int_type;
 
       switch((boost::math::fpclassify)(f))
       {
@@ -181,7 +182,9 @@ public:
 #endif
          f -= ipart;
          m_exponent += bits;
-         eval_add(*this, ipart);
+         cpp_bin_float t;
+         t = static_cast<bf_int_type>(ipart);
+         eval_add(*this, t);
       }
       m_exponent += static_cast<Exponent>(e);
       return *this;
