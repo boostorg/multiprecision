@@ -356,7 +356,7 @@ public:
    }
 protected:
    template <class A>
-   BOOST_CONSTEXPR void check_in_range(const A&) BOOST_NOEXCEPT {}
+   void check_in_range(const A&) BOOST_NOEXCEPT {}
 };
 
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
@@ -519,7 +519,7 @@ public:
    }
 protected:
    template <class A>
-   BOOST_CONSTEXPR void check_in_range(const A&) BOOST_NOEXCEPT {}
+   void check_in_range(const A&) BOOST_NOEXCEPT {}
 };
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
 
@@ -671,7 +671,7 @@ public:
    }
 protected:
    template <class A>
-   BOOST_CONSTEXPR void check_in_range(const A&) BOOST_NOEXCEPT {}
+   void check_in_range(const A&) BOOST_NOEXCEPT {}
 };
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
 
