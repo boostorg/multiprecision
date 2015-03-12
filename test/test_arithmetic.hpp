@@ -959,6 +959,17 @@ void test_negative_mixed(boost::mpl::true_ const&)
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n3)) ,  n3);
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n4)) ,  n4);
 #endif
+   // Conversions when source is an expression template:
+   BOOST_CHECK_EQUAL((Real(n1) + 0).template convert_to<Num>() ,  n1);
+   BOOST_CHECK_EQUAL((Real(n2) + 0).template convert_to<Num>(), n2);
+   BOOST_CHECK_EQUAL((Real(n3) + 0).template convert_to<Num>(), n3);
+   BOOST_CHECK_EQUAL((Real(n4) + 0).template convert_to<Num>(), n4);
+#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+   BOOST_CHECK_EQUAL(static_cast<Num>((Real(n1) + 0)), n1);
+   BOOST_CHECK_EQUAL(static_cast<Num>((Real(n2) + 0)), n2);
+   BOOST_CHECK_EQUAL(static_cast<Num>((Real(n3) + 0)), n3);
+   BOOST_CHECK_EQUAL(static_cast<Num>((Real(n4) + 0)), n4);
+#endif
 #if defined(TEST_MPFR)
    Num tol = 10 * std::numeric_limits<Num>::epsilon();
 #else
@@ -1250,7 +1261,18 @@ void test_mixed(const boost::mpl::true_&)
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n3)) ,  n3);
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n4)) ,  n4);
 #endif
-   BOOST_CHECK_EQUAL(static_cast<cast_type>(n1) ,  Real(n1));
+   // Again with expression templates:
+   BOOST_CHECK_EQUAL((Real(n1) + 0).template convert_to<Num>(), n1);
+   BOOST_CHECK_EQUAL((Real(n2) + 0).template convert_to<Num>(), n2);
+   BOOST_CHECK_EQUAL((Real(n3) + 0).template convert_to<Num>(), n3);
+   BOOST_CHECK_EQUAL((Real(n4) + 0).template convert_to<Num>(), n4);
+#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+   BOOST_CHECK_EQUAL(static_cast<Num>(Real(n1) + 0), n1);
+   BOOST_CHECK_EQUAL(static_cast<Num>(Real(n2) + 0), n2);
+   BOOST_CHECK_EQUAL(static_cast<Num>(Real(n3) + 0), n3);
+   BOOST_CHECK_EQUAL(static_cast<Num>(Real(n4) + 0), n4);
+#endif
+   BOOST_CHECK_EQUAL(static_cast<cast_type>(n1), Real(n1));
    BOOST_CHECK_EQUAL(static_cast<cast_type>(n2) ,  Real(n2));
    BOOST_CHECK_EQUAL(static_cast<cast_type>(n3) ,  Real(n3));
    BOOST_CHECK_EQUAL(static_cast<cast_type>(n4) ,  Real(n4));
