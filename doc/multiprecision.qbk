@@ -4944,7 +4944,7 @@ Windows Vista machine.
 
 [section:hist History]
 
-[ Multiprecision-2.2.4 (Boost-1.58)]
+[h4 Multiprecision-2.2.4 (Boost-1.58)]
 
 * Changed `frexp` to always be non-expression template generating, see: [@https://svn.boost.org/trac/boost/ticket/10993 10993].
 * Improved support of cpp_dec_float on Cygwin and other platforms with missing long double support, see [@https://svn.boost.org/trac/boost/ticket/10924 10924].
