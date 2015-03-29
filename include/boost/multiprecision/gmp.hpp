@@ -59,10 +59,15 @@ namespace detail{
 template <unsigned digits10>
 struct gmp_float_imp
 {
-   typedef mpl::list<long, long long>                 signed_types;
+#ifdef BOOST_HAS_LONG_LONG
+   typedef mpl::list<long, long long>                     signed_types;
    typedef mpl::list<unsigned long, unsigned long long>   unsigned_types;
-   typedef mpl::list<double, long double>            float_types;
-   typedef long                                      exponent_type;
+#else
+   typedef mpl::list<long>                                signed_types;
+   typedef mpl::list<unsigned long>                       unsigned_types;
+#endif
+   typedef mpl::list<double, long double>                 float_types;
+   typedef long                                           exponent_type;
 
    gmp_float_imp() BOOST_NOEXCEPT {}
 
@@ -100,27 +105,36 @@ struct gmp_float_imp
       return *this;
    }
 #endif
+
+#ifdef BOOST_HAS_LONG_LONG
+#if defined(ULLONG_MAX) && (ULLONG_MAX == ULONG_MAX)
+   gmp_float_imp& operator = (unsigned long long i)
+   {
+      *this = static_cast<unsigned long>(i);
+   }
+#else
    gmp_float_imp& operator = (unsigned long long i)
    {
       if(m_data[0]._mp_d == 0)
          mpf_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
-      unsigned long long mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
+      unsigned long long mask = ((((1uLL << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1uLL);
       unsigned shift = 0;
       mpf_t t;
       mpf_init2(t, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
       mpf_set_ui(m_data, 0);
       while(i)
       {
-         mpf_set_ui(t, static_cast<unsigned>(i & mask));
+         mpf_set_ui(t, static_cast<unsigned long>(i & mask));
          if(shift)
             mpf_mul_2exp(t, t, shift);
          mpf_add(m_data, m_data, t);
-         shift += std::numeric_limits<unsigned>::digits;
-         i >>= std::numeric_limits<unsigned>::digits;
+         shift += std::numeric_limits<unsigned long>::digits;
+         i >>= std::numeric_limits<unsigned long>::digits;
       }
       mpf_clear(t);
       return *this;
    }
+#endif
    gmp_float_imp& operator = (long long i)
    {
       if(m_data[0]._mp_d == 0)
@@ -131,6 +145,7 @@ struct gmp_float_imp
          mpf_neg(m_data, m_data);
       return *this;
    }
+#endif
    gmp_float_imp& operator = (unsigned long i)
    {
       if(m_data[0]._mp_d == 0)
@@ -969,8 +984,13 @@ inline void eval_frexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& v
 
 struct gmp_int
 {
+#ifdef BOOST_HAS_LONG_LONG
    typedef mpl::list<long, long long>                     signed_types;
    typedef mpl::list<unsigned long, unsigned long long>   unsigned_types;
+#else
+   typedef mpl::list<long>                                signed_types;
+   typedef mpl::list<unsigned long>                       unsigned_types;
+#endif
    typedef mpl::list<double, long double>                 float_types;
 
    gmp_int()
@@ -1026,27 +1046,35 @@ struct gmp_int
       return *this;
    }
 #endif
+#ifdef BOOST_HAS_LONG_LONG
+#if defined(ULLONG_MAX) && (ULLONG_MAX == ULONG_MAX)
+   gmp_int& operator = (unsigned long long i)
+   {
+      *this = static_cast<unsigned long>(i);
+   }
+#else
    gmp_int& operator = (unsigned long long i)
    {
       if(m_data[0]._mp_d == 0)
          mpz_init(this->m_data);
-      unsigned long long mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
+      unsigned long long mask = ((((1uLL << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1uLL);
       unsigned shift = 0;
       mpz_t t;
       mpz_set_ui(m_data, 0);
       mpz_init_set_ui(t, 0);
       while(i)
       {
-         mpz_set_ui(t, static_cast<unsigned>(i & mask));
+         mpz_set_ui(t, static_cast<unsigned long>(i & mask));
          if(shift)
             mpz_mul_2exp(t, t, shift);
          mpz_add(m_data, m_data, t);
-         shift += std::numeric_limits<unsigned>::digits;
-         i >>= std::numeric_limits<unsigned>::digits;
+         shift += std::numeric_limits<unsigned long>::digits;
+         i >>= std::numeric_limits<unsigned long>::digits;
       }
       mpz_clear(t);
       return *this;
    }
+#endif
    gmp_int& operator = (long long i)
    {
       if(m_data[0]._mp_d == 0)
@@ -1057,6 +1085,7 @@ struct gmp_int
          mpz_neg(m_data, m_data);
       return *this;
    }
+#endif
    gmp_int& operator = (unsigned long i)
    {
       if(m_data[0]._mp_d == 0)
@@ -1706,9 +1735,14 @@ void eval_add(gmp_rational& t, const gmp_rational& o);
 
 struct gmp_rational
 {
-   typedef mpl::list<long, long long>                 signed_types;
+#ifdef BOOST_HAS_LONG_LONG
+   typedef mpl::list<long, long long>                     signed_types;
    typedef mpl::list<unsigned long, unsigned long long>   unsigned_types;
-   typedef mpl::list<double, long double>            float_types;
+#else
+   typedef mpl::list<long>                                signed_types;
+   typedef mpl::list<unsigned long>                       unsigned_types;
+#endif
+   typedef mpl::list<double, long double>                 float_types;
 
    gmp_rational()
    {
@@ -1757,25 +1791,20 @@ struct gmp_rational
       return *this;
    }
 #endif
+#ifdef BOOST_HAS_LONG_LONG
+#if defined(ULLONG_MAX) && (ULLONG_MAX == ULONG_MAX)
+   gmp_rational& operator = (unsigned long long i)
+   {
+      *this = static_cast<unsigned long>(i);
+   }
+#else
    gmp_rational& operator = (unsigned long long i)
    {
       if(m_data[0]._mp_den._mp_d == 0)
          mpq_init(m_data);
-      unsigned long long mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
-      unsigned shift = 0;
-      mpq_t t;
-      mpq_set_ui(m_data, 0, 1);
-      mpq_init(t);
-      while(i)
-      {
-         mpq_set_ui(t, static_cast<unsigned>(i & mask), 1);
-         if(shift)
-            mpq_mul_2exp(t, t, shift);
-         mpq_add(m_data, m_data, t);
-         shift += std::numeric_limits<unsigned>::digits;
-         i >>= std::numeric_limits<unsigned>::digits;
-      }
-      mpq_clear(t);
+      gmp_int zi;
+      zi = i;
+      mpq_set_z(m_data, zi.data());
       return *this;
    }
    gmp_rational& operator = (long long i)
@@ -1788,6 +1817,8 @@ struct gmp_rational
          mpq_neg(m_data, m_data);
       return *this;
    }
+#endif
+#endif
    gmp_rational& operator = (unsigned long i)
    {
       if(m_data[0]._mp_den._mp_d == 0)
