@@ -127,9 +127,9 @@ namespace backends{
 
 struct float128_backend
 {
-   typedef mpl::list<signed char, short, int, long, long long>   signed_types;
+   typedef mpl::list<signed char, short, int, long, boost::long_long_type>   signed_types;
    typedef mpl::list<unsigned char, unsigned short, 
-      unsigned int, unsigned long, unsigned long long>           unsigned_types;
+      unsigned int, unsigned long, boost::ulong_long_type>           unsigned_types;
    typedef mpl::list<float, double, long double>                 float_types;
    typedef int                                                   exponent_type;
 

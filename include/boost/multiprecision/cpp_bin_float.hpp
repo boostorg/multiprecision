@@ -1045,7 +1045,7 @@ inline bool eval_eq(const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, 
 }
 
 template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
-inline void eval_convert_to(long long *res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> &arg)
+inline void eval_convert_to(boost::long_long_type *res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> &arg)
 {
    switch(arg.exponent())
    {
@@ -1055,7 +1055,7 @@ inline void eval_convert_to(long long *res, const cpp_bin_float<Digits, DigitBas
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
       BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert NaN to integer."));
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
-      *res = (std::numeric_limits<long long>::max)();
+      *res = (std::numeric_limits<boost::long_long_type>::max)();
       if(arg.sign())
          *res = -*res;
       return;
@@ -1068,14 +1068,14 @@ inline void eval_convert_to(long long *res, const cpp_bin_float<Digits, DigitBas
       *res = 0;
       return;
    }
-   if(arg.sign() && (arg.compare((std::numeric_limits<long long>::min)()) <= 0))
+   if(arg.sign() && (arg.compare((std::numeric_limits<boost::long_long_type>::min)()) <= 0))
    {
-      *res = (std::numeric_limits<long long>::min)();
+      *res = (std::numeric_limits<boost::long_long_type>::min)();
       return;
    }
-   else if(!arg.sign() && (arg.compare((std::numeric_limits<long long>::max)()) >= 0))
+   else if(!arg.sign() && (arg.compare((std::numeric_limits<boost::long_long_type>::max)()) >= 0))
    {
-      *res = (std::numeric_limits<long long>::max)();
+      *res = (std::numeric_limits<boost::long_long_type>::max)();
       return;
    }
    eval_right_shift(man, shift);
@@ -1087,7 +1087,7 @@ inline void eval_convert_to(long long *res, const cpp_bin_float<Digits, DigitBas
 }
 
 template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
-inline void eval_convert_to(unsigned long long *res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> &arg)
+inline void eval_convert_to(boost::ulong_long_type *res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> &arg)
 {
    switch(arg.exponent())
    {
@@ -1097,7 +1097,7 @@ inline void eval_convert_to(unsigned long long *res, const cpp_bin_float<Digits,
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
       BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert NaN to integer."));
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
-      *res = (std::numeric_limits<unsigned long long>::max)();
+      *res = (std::numeric_limits<boost::ulong_long_type>::max)();
       return;
    }
    typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::rep_type man(arg.bits());
@@ -1110,8 +1110,8 @@ inline void eval_convert_to(unsigned long long *res, const cpp_bin_float<Digits,
    }
    else if(shift < 0)
    {
-      // TODO: what if we have fewer cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count than a long long?
-      *res = (std::numeric_limits<long long>::max)();
+      // TODO: what if we have fewer cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count than a boost::long_long_type?
+      *res = (std::numeric_limits<boost::long_long_type>::max)();
       return;
    }
    eval_right_shift(man, shift);

@@ -689,7 +689,7 @@ const bool cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, fal
 #endif
 //
 // Traits classes to figure out a native type with N bits, these vary from boost::uint_t<N> only
-// because some platforms have native integer types longer than long long, "really long long" anyone??
+// because some platforms have native integer types longer than boost::long_long_type, "really boost::long_long_type" anyone??
 //
 template <unsigned N, bool s>
 struct trivial_limb_type_imp
@@ -704,7 +704,7 @@ struct trivial_limb_type_imp<N, true>
 };
 
 template <unsigned N>
-struct trivial_limb_type : public trivial_limb_type_imp<N, N <= sizeof(long long) * CHAR_BIT> {};
+struct trivial_limb_type : public trivial_limb_type_imp<N, N <= sizeof(boost::long_long_type) * CHAR_BIT> {};
 //
 // Backend for fixed precision signed-magnitude type which will fit entirely inside a "double_limb_type":
 //
@@ -1025,13 +1025,13 @@ public:
       trivial_tag,
       mpl::list<
       signed char, short, int, long,
-      long long, signed_double_limb_type>,
+      boost::long_long_type, signed_double_limb_type>,
       mpl::list<signed_limb_type, signed_double_limb_type>
    >::type                                                           signed_types;
    typedef typename mpl::if_<
       trivial_tag,
       mpl::list<unsigned char, unsigned short, unsigned,
-      unsigned long, unsigned long long, double_limb_type>,
+      unsigned long, boost::ulong_long_type, double_limb_type>,
       mpl::list<limb_type, double_limb_type>
    >::type                                                           unsigned_types;
    typedef typename mpl::if_<
