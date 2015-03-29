@@ -56,8 +56,8 @@ template <unsigned digits10>
 struct mpfi_float_imp
 {
 #ifdef BOOST_HAS_LONG_LONG
-   typedef mpl::list<long, long long>                     signed_types;
-   typedef mpl::list<unsigned long, unsigned long long>   unsigned_types;
+   typedef mpl::list<long, boost::long_long_type>                     signed_types;
+   typedef mpl::list<unsigned long, boost::ulong_long_type>   unsigned_types;
 #else
    typedef mpl::list<long>                                signed_types;
    typedef mpl::list<unsigned long>                       unsigned_types;
@@ -104,7 +104,7 @@ struct mpfi_float_imp
 #endif
 #ifdef BOOST_HAS_LONG_LONG
 #ifdef _MPFR_H_HAVE_INTMAX_T
-   mpfi_float_imp& operator = (unsigned long long i)
+   mpfi_float_imp& operator = (boost::ulong_long_type i)
    {
       if(m_data[0].left._mpfr_d == 0)
          mpfi_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
@@ -112,7 +112,7 @@ struct mpfi_float_imp
       mpfr_set_uj(right_data(), i, GMP_RNDU);
       return *this;
    }
-   mpfi_float_imp& operator = (long long i)
+   mpfi_float_imp& operator = (boost::long_long_type i)
    {
       if(m_data[0].left._mpfr_d == 0)
          mpfi_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
@@ -121,14 +121,14 @@ struct mpfi_float_imp
       return *this;
    }
 #else
-   mpfi_float_imp& operator = (unsigned long long i)
+   mpfi_float_imp& operator = (boost::ulong_long_type i)
    {
       if(m_data[0].left._mpfr_d == 0)
          mpfi_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
-      unsigned long long mask = (((1uLL << (std::numeric_limits<unsigned long>::digits - 1) - 1) << 1) | 1u);
+      boost::ulong_long_type mask = (((1uLL << (std::numeric_limits<unsigned long>::digits - 1) - 1) << 1) | 1u);
       unsigned shift = 0;
       mpfi_t t;
-      mpfi_init2(t, (std::max)(static_cast<unsigned>(std::numeric_limits<unsigned long long>::digits), static_cast<unsigned long>(multiprecision::detail::digits10_2_2(digits10))));
+      mpfi_init2(t, (std::max)(static_cast<unsigned>(std::numeric_limits<boost::ulong_long_type>::digits), static_cast<unsigned long>(multiprecision::detail::digits10_2_2(digits10))));
       mpfi_set_ui(m_data, 0);
       while(i)
       {
@@ -142,7 +142,7 @@ struct mpfi_float_imp
       mpfi_clear(t);
       return *this;
    }
-   mpfi_float_imp& operator = (long long i)
+   mpfi_float_imp& operator = (boost::long_long_type i)
    {
       if(m_data[0].left._mpfr_d == 0)
          mpfi_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
@@ -738,14 +738,14 @@ inline void eval_convert_to(long* result, const mpfi_float_backend<digits10>& va
 }
 #ifdef _MPFR_H_HAVE_INTMAX_T
 template <unsigned digits10>
-inline void eval_convert_to(unsigned long long* result, const mpfi_float_backend<digits10>& val)
+inline void eval_convert_to(boost::ulong_long_type* result, const mpfi_float_backend<digits10>& val)
 {
    mpfr_float_backend<digits10> t;
    mpfi_mid(t.data(), val.data());
    eval_convert_to(result, t);
 }
 template <unsigned digits10>
-inline void eval_convert_to(long long* result, const mpfi_float_backend<digits10>& val)
+inline void eval_convert_to(boost::long_long_type* result, const mpfi_float_backend<digits10>& val)
 {
    mpfr_float_backend<digits10> t;
    mpfi_mid(t.data(), val.data());

@@ -38,8 +38,8 @@ void eval_add(tommath_int& t, const tommath_int& o);
 
 struct tommath_int
 {
-   typedef mpl::list<boost::int32_t, long long>             signed_types;
-   typedef mpl::list<boost::uint32_t, unsigned long long>   unsigned_types;
+   typedef mpl::list<boost::int32_t, boost::long_long_type>             signed_types;
+   typedef mpl::list<boost::uint32_t, boost::ulong_long_type>   unsigned_types;
    typedef mpl::list<long double>                           float_types;
 
    tommath_int()
@@ -70,11 +70,11 @@ struct tommath_int
          detail::check_tommath_result(mp_copy(const_cast< ::mp_int*>(&o.m_data), &m_data));
       return *this;
    }
-   tommath_int& operator = (unsigned long long i)
+   tommath_int& operator = (boost::ulong_long_type i)
    {
       if(m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
-      unsigned long long mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
+      boost::ulong_long_type mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
       unsigned shift = 0;
       ::mp_int t;
       detail::check_tommath_result(mp_init(&t));
@@ -91,7 +91,7 @@ struct tommath_int
       mp_clear(&t);
       return *this;
    }
-   tommath_int& operator = (long long i)
+   tommath_int& operator = (boost::long_long_type i)
    {
       if(m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
@@ -222,7 +222,7 @@ struct tommath_int
             unsigned shift = radix == 8 ? 3 : 4;
             unsigned block_count = DIGIT_BIT / shift;
             unsigned block_shift = shift * block_count;
-            unsigned long long val, block;
+            boost::ulong_long_type val, block;
             while(*s)
             {
                block = 0;
@@ -536,7 +536,7 @@ inline void eval_complement(tommath_int& result, const tommath_int& u)
 
    // Create a mask providing the extra bits we need and add to result:
    tommath_int mask;
-   mask = static_cast<long long>((1u << padding) - 1);
+   mask = static_cast<boost::long_long_type>((1u << padding) - 1);
    eval_left_shift(mask, shift);
    add(result, mask);
 }

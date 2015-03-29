@@ -60,8 +60,8 @@ template <unsigned digits10>
 struct gmp_float_imp
 {
 #ifdef BOOST_HAS_LONG_LONG
-   typedef mpl::list<long, long long>                     signed_types;
-   typedef mpl::list<unsigned long, unsigned long long>   unsigned_types;
+   typedef mpl::list<long, boost::long_long_type>                     signed_types;
+   typedef mpl::list<unsigned long, boost::ulong_long_type>   unsigned_types;
 #else
    typedef mpl::list<long>                                signed_types;
    typedef mpl::list<unsigned long>                       unsigned_types;
@@ -108,16 +108,17 @@ struct gmp_float_imp
 
 #ifdef BOOST_HAS_LONG_LONG
 #if defined(ULLONG_MAX) && (ULLONG_MAX == ULONG_MAX)
-   gmp_float_imp& operator = (unsigned long long i)
+   gmp_float_imp& operator = (boost::ulong_long_type i)
    {
       *this = static_cast<unsigned long>(i);
+      return *this;
    }
 #else
-   gmp_float_imp& operator = (unsigned long long i)
+   gmp_float_imp& operator = (boost::ulong_long_type i)
    {
       if(m_data[0]._mp_d == 0)
          mpf_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
-      unsigned long long mask = ((((1uLL << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1uLL);
+      boost::ulong_long_type mask = ((((1uLL << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1uLL);
       unsigned shift = 0;
       mpf_t t;
       mpf_init2(t, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
@@ -135,12 +136,12 @@ struct gmp_float_imp
       return *this;
    }
 #endif
-   gmp_float_imp& operator = (long long i)
+   gmp_float_imp& operator = (boost::long_long_type i)
    {
       if(m_data[0]._mp_d == 0)
          mpf_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
       bool neg = i < 0;
-      *this = static_cast<unsigned long long>(boost::multiprecision::detail::unsigned_abs(i));
+      *this = static_cast<boost::ulong_long_type>(boost::multiprecision::detail::unsigned_abs(i));
       if(neg)
          mpf_neg(m_data, m_data);
       return *this;
@@ -858,13 +859,13 @@ inline void eval_convert_to(double* result, const gmp_float<digits10>& val) BOOS
 }
 #ifdef BOOST_HAS_LONG_LONG
 template <unsigned digits10>
-inline void eval_convert_to(long long* result, const gmp_float<digits10>& val)
+inline void eval_convert_to(boost::long_long_type* result, const gmp_float<digits10>& val)
 {
    gmp_float<digits10> t(val);
    if(eval_get_sign(t) < 0)
       t.negate();
 
-   long digits = std::numeric_limits<long long>::digits - std::numeric_limits<long>::digits;
+   long digits = std::numeric_limits<boost::long_long_type>::digits - std::numeric_limits<long>::digits;
 
    if(digits > 0)
       mpf_div_2exp(t.data(), t.data(), digits);
@@ -872,9 +873,9 @@ inline void eval_convert_to(long long* result, const gmp_float<digits10>& val)
    if(!mpf_fits_slong_p(t.data()))
    {
       if(eval_get_sign(val) < 0)
-         *result = (std::numeric_limits<long long>::min)();
+         *result = (std::numeric_limits<boost::long_long_type>::min)();
       else
-         *result = (std::numeric_limits<long long>::max)();
+         *result = (std::numeric_limits<boost::long_long_type>::max)();
       return;
    };
 
@@ -893,18 +894,18 @@ inline void eval_convert_to(long long* result, const gmp_float<digits10>& val)
       *result = -*result;
 }
 template <unsigned digits10>
-inline void eval_convert_to(unsigned long long* result, const gmp_float<digits10>& val)
+inline void eval_convert_to(boost::ulong_long_type* result, const gmp_float<digits10>& val)
 {
    gmp_float<digits10> t(val);
 
-   long digits = std::numeric_limits<long long>::digits - std::numeric_limits<long>::digits;
+   long digits = std::numeric_limits<boost::long_long_type>::digits - std::numeric_limits<long>::digits;
 
    if(digits > 0)
       mpf_div_2exp(t.data(), t.data(), digits);
 
    if(!mpf_fits_ulong_p(t.data()))
    {
-      *result = (std::numeric_limits<long long>::max)();
+      *result = (std::numeric_limits<boost::long_long_type>::max)();
       return;
    }
 
@@ -985,8 +986,8 @@ inline void eval_frexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& v
 struct gmp_int
 {
 #ifdef BOOST_HAS_LONG_LONG
-   typedef mpl::list<long, long long>                     signed_types;
-   typedef mpl::list<unsigned long, unsigned long long>   unsigned_types;
+   typedef mpl::list<long, boost::long_long_type>                     signed_types;
+   typedef mpl::list<unsigned long, boost::ulong_long_type>   unsigned_types;
 #else
    typedef mpl::list<long>                                signed_types;
    typedef mpl::list<unsigned long>                       unsigned_types;
@@ -1048,16 +1049,17 @@ struct gmp_int
 #endif
 #ifdef BOOST_HAS_LONG_LONG
 #if defined(ULLONG_MAX) && (ULLONG_MAX == ULONG_MAX)
-   gmp_int& operator = (unsigned long long i)
+   gmp_int& operator = (boost::ulong_long_type i)
    {
       *this = static_cast<unsigned long>(i);
+      return *this;
    }
 #else
-   gmp_int& operator = (unsigned long long i)
+   gmp_int& operator = (boost::ulong_long_type i)
    {
       if(m_data[0]._mp_d == 0)
          mpz_init(this->m_data);
-      unsigned long long mask = ((((1uLL << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1uLL);
+      boost::ulong_long_type mask = ((((1uLL << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1uLL);
       unsigned shift = 0;
       mpz_t t;
       mpz_set_ui(m_data, 0);
@@ -1075,7 +1077,7 @@ struct gmp_int
       return *this;
    }
 #endif
-   gmp_int& operator = (long long i)
+   gmp_int& operator = (boost::long_long_type i)
    {
       if(m_data[0]._mp_d == 0)
          mpz_init(this->m_data);
@@ -1736,8 +1738,8 @@ void eval_add(gmp_rational& t, const gmp_rational& o);
 struct gmp_rational
 {
 #ifdef BOOST_HAS_LONG_LONG
-   typedef mpl::list<long, long long>                     signed_types;
-   typedef mpl::list<unsigned long, unsigned long long>   unsigned_types;
+   typedef mpl::list<long, boost::long_long_type>                     signed_types;
+   typedef mpl::list<unsigned long, boost::ulong_long_type>   unsigned_types;
 #else
    typedef mpl::list<long>                                signed_types;
    typedef mpl::list<unsigned long>                       unsigned_types;
@@ -1793,12 +1795,13 @@ struct gmp_rational
 #endif
 #ifdef BOOST_HAS_LONG_LONG
 #if defined(ULLONG_MAX) && (ULLONG_MAX == ULONG_MAX)
-   gmp_rational& operator = (unsigned long long i)
+   gmp_rational& operator = (boost::ulong_long_type i)
    {
       *this = static_cast<unsigned long>(i);
+      return *this;
    }
 #else
-   gmp_rational& operator = (unsigned long long i)
+   gmp_rational& operator = (boost::ulong_long_type i)
    {
       if(m_data[0]._mp_den._mp_d == 0)
          mpq_init(m_data);
@@ -1807,7 +1810,7 @@ struct gmp_rational
       mpq_set_z(m_data, zi.data());
       return *this;
    }
-   gmp_rational& operator = (long long i)
+   gmp_rational& operator = (boost::long_long_type i)
    {
       if(m_data[0]._mp_den._mp_d == 0)
          mpq_init(m_data);

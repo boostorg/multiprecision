@@ -72,13 +72,13 @@ struct is_compatible_arithmetic_type
 
 namespace detail{
 //
-// Workaround for missing abs(long long) and abs(__int128) on some compilers:
+// Workaround for missing abs(boost::long_long_type) and abs(__int128) on some compilers:
 //
 template <class T>
 BOOST_CONSTEXPR typename enable_if_c<(is_signed<T>::value || is_floating_point<T>::value), T>::type abs(T t) BOOST_NOEXCEPT
 {
    // This strange expression avoids a hardware trap in the corner case
-   // that val is the most negative value permitted in long long.
+   // that val is the most negative value permitted in boost::long_long_type.
    // See https://svn.boost.org/trac/boost/ticket/9740.
    return t < 0 ? T(1u) + T(-(t + 1)) : t;
 }
@@ -94,7 +94,7 @@ template <class T>
 BOOST_CONSTEXPR typename enable_if_c<(is_signed<T>::value || is_floating_point<T>::value), typename make_unsigned<T>::type>::type unsigned_abs(T t) BOOST_NOEXCEPT
 {
    // This strange expression avoids a hardware trap in the corner case
-   // that val is the most negative value permitted in long long.
+   // that val is the most negative value permitted in boost::long_long_type.
    // See https://svn.boost.org/trac/boost/ticket/9740.
    return t < 0 ? static_cast<typename make_unsigned<T>::type>(1u) + static_cast<typename make_unsigned<T>::type>(-(t + 1)) : static_cast<typename make_unsigned<T>::type>(t);
 }
