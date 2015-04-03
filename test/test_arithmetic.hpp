@@ -757,6 +757,44 @@ void test_float_funcs(const boost::mpl::true_&)
    BOOST_CHECK_CLOSE_FRACTION(b, Real(atan2(Real(4), Real(2))), tol);
 }
 
+template <class T, class U>
+void compare_NaNs(const T& a, const U& b)
+{
+   BOOST_CHECK_EQUAL(a == b, false);
+   BOOST_CHECK_EQUAL(a != b, true);
+   BOOST_CHECK_EQUAL(a <= b, false);
+   BOOST_CHECK_EQUAL(a >= b, false);
+   BOOST_CHECK_EQUAL(a > b, false);
+   BOOST_CHECK_EQUAL(a < b, false);
+   //
+   // Again where LHS may be an expression template:
+   //
+   BOOST_CHECK_EQUAL(1 * a == b, false);
+   BOOST_CHECK_EQUAL(1 * a != b, true);
+   BOOST_CHECK_EQUAL(1 * a <= b, false);
+   BOOST_CHECK_EQUAL(1 * a >= b, false);
+   BOOST_CHECK_EQUAL(1 * a > b, false);
+   BOOST_CHECK_EQUAL(1 * a < b, false);
+   //
+   // Again where RHS may be an expression template:
+   //
+   BOOST_CHECK_EQUAL(a == b * 1, false);
+   BOOST_CHECK_EQUAL(a != b * 1, true);
+   BOOST_CHECK_EQUAL(a <= b * 1, false);
+   BOOST_CHECK_EQUAL(a >= b * 1, false);
+   BOOST_CHECK_EQUAL(a > b * 1, false);
+   BOOST_CHECK_EQUAL(a < b * 1, false);
+   //
+   // Again where LHS and RHS may be an expression templates:
+   //
+   BOOST_CHECK_EQUAL(1 * a == b * 1, false);
+   BOOST_CHECK_EQUAL(1 * a != b * 1, true);
+   BOOST_CHECK_EQUAL(1 * a <= b * 1, false);
+   BOOST_CHECK_EQUAL(1 * a >= b * 1, false);
+   BOOST_CHECK_EQUAL(1 * a > b * 1, false);
+   BOOST_CHECK_EQUAL(1 * a < b * 1, false);
+}
+
 template <class Real, class T>
 void test_float_ops(const T&){}
 
@@ -859,6 +897,33 @@ void test_float_ops(const boost::mpl::int_<boost::multiprecision::number_kind_fl
       else
       {
          BOOST_CHECK_THROW(Real(Real(20) / 0u), std::overflow_error);
+      }
+   }
+   //
+   // Comparisons of NaN's should always fail:
+   //
+   if(std::numeric_limits<Real>::has_quiet_NaN)
+   {
+      r = v = std::numeric_limits<Real>::quiet_NaN();
+      compare_NaNs(r, v);
+      v = 0;
+      compare_NaNs(r, v);
+      r.swap(v);
+      compare_NaNs(r, v);
+      //
+      // Conmpare NaN to int:
+      //
+      compare_NaNs(v, 0);
+      compare_NaNs(0, v);
+      //
+      // Compare to floats:
+      //
+      compare_NaNs(v, 0.5);
+      compare_NaNs(0.5, v);
+      if(std::numeric_limits<double>::has_quiet_NaN)
+      {
+         compare_NaNs(r, std::numeric_limits<double>::quiet_NaN());
+         compare_NaNs(std::numeric_limits<double>::quiet_NaN(), r);
       }
    }
 
