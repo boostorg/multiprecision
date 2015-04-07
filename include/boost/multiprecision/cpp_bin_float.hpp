@@ -1462,9 +1462,9 @@ public:
       return -(max)();
    }
    BOOST_STATIC_CONSTEXPR int digits = boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count;
-   BOOST_STATIC_CONSTEXPR int digits10 = digits * 301 / 1000;
+   BOOST_STATIC_CONSTEXPR int digits10 = (digits - 1) * 301 / 1000;
    // Is this really correct???
-   BOOST_STATIC_CONSTEXPR int max_digits10 = digits10 + 2;
+   BOOST_STATIC_CONSTEXPR int max_digits10 = (digits * 301 / 1000) + 2;
    BOOST_STATIC_CONSTEXPR bool is_signed = true;
    BOOST_STATIC_CONSTEXPR bool is_integer = false;
    BOOST_STATIC_CONSTEXPR bool is_exact = false;
