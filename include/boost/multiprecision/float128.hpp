@@ -534,7 +534,7 @@ public:
    static number_type (max)() BOOST_NOEXCEPT { return 1.18973149535723176508575932662800702e4932Q; }
    static number_type lowest() BOOST_NOEXCEPT { return -(max)(); }
    BOOST_STATIC_CONSTEXPR int digits = 113;
-   BOOST_STATIC_CONSTEXPR int digits10 = 34;
+   BOOST_STATIC_CONSTEXPR int digits10 = 33;
    BOOST_STATIC_CONSTEXPR int max_digits10 = 36;
    BOOST_STATIC_CONSTEXPR bool is_signed = true;
    BOOST_STATIC_CONSTEXPR bool is_integer = false;
