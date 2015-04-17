@@ -1905,5 +1905,11 @@ void test()
    // Destructor of "a" checks destruction of moved-from-object...
    Real m3(static_cast<Real&&>(a));
 #endif
+   //
+   // Bug cases, self assignment first:
+   //
+   a = 20;
+   a = a;
+   BOOST_CHECK_EQUAL(a, 20);
 }
 
