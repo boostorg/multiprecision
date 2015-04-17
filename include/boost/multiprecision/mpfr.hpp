@@ -831,11 +831,14 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
 
    mpfr_float_backend& operator=(const mpfr_float_backend& o)
    {
-      if(this->m_data[0]._mpfr_d == 0)
-         mpfr_init2(this->m_data, mpfr_get_prec(o.data()));
-      else
-         mpfr_set_prec(this->m_data, mpfr_get_prec(o.data()));
-      mpfr_set(this->m_data, o.data(), GMP_RNDN);
+      if(this != &o)
+      {
+         if(this->m_data[0]._mpfr_d == 0)
+            mpfr_init2(this->m_data, mpfr_get_prec(o.data()));
+         else
+            mpfr_set_prec(this->m_data, mpfr_get_prec(o.data()));
+         mpfr_set(this->m_data, o.data(), GMP_RNDN);
+      }
       return *this;
    }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
