@@ -40,15 +40,16 @@ lib gmp ;
 lib mpfr ;
 lib mpfi ;
 lib quadmath ;
+lib tommath ;
 
-exe has_gmp : has_gmp.cpp gmp :
-      <include>$(gmp_path) <include>$(gmp_path)/mpfr <include>$(gmp_path)/gmpfrxx ;
-exe has_mpfr : has_mpfr.cpp mpfr gmp :
-      <include>$(mpfr_path) <include>$(gmp_path)/mpfr <include>$(gmp_path)/gmpfrxx <include>$(gmp_path) ;
-exe has_mpfi : has_mpfi.cpp mpfi mpfr gmp :
-      <include>$(mpfr_path) <include>$(gmp_path)/mpfr <include>$(gmp_path)/gmpfrxx <include>$(gmp_path) ;
-obj has_tommath : has_tommath.cpp :
-      <include>$(tommath_path) ;
+run has_gmp.cpp gmp : : :
+      <include>$(gmp_path) <include>$(gmp_path)/mpfr <include>$(gmp_path)/gmpfrxx : has_gmp ;
+run has_mpfr.cpp mpfr gmp : : :
+      <include>$(mpfr_path) <include>$(gmp_path)/mpfr <include>$(gmp_path)/gmpfrxx <include>$(gmp_path) : has_mpfr ;
+run has_mpfi.cpp mpfi mpfr gmp : : :
+      <include>$(mpfr_path) <include>$(gmp_path)/mpfr <include>$(gmp_path)/gmpfrxx <include>$(gmp_path) : has_mpfi ;
+run has_tommath.cpp tommath : : :
+      <include>$(tommath_path) : has_tommath ;
 run has_float128.cpp quadmath : : : : has_float128 ;
 exe has_intel_quad : has_intel_quad.cpp : <cxxflags>-Qoption,cpp,--extended_float_type ;
 
@@ -58,7 +59,6 @@ explicit has_mpfi ;
 explicit has_tommath ;
 explicit has_float128 ;
 explicit has_intel_quad ;
-
 
 
 
