@@ -128,7 +128,7 @@ struct mpfi_float_imp
       boost::ulong_long_type mask = (((1uLL << (std::numeric_limits<unsigned long>::digits - 1) - 1) << 1) | 1u);
       unsigned shift = 0;
       mpfi_t t;
-      mpfi_init2(t, (std::max)(static_cast<unsigned>(std::numeric_limits<boost::ulong_long_type>::digits), static_cast<unsigned long>(multiprecision::detail::digits10_2_2(digits10))));
+      mpfi_init2(t, (std::max)(static_cast<unsigned long>(std::numeric_limits<boost::ulong_long_type>::digits), static_cast<unsigned long>(multiprecision::detail::digits10_2_2(digits10))));
       mpfi_set_ui(m_data, 0);
       while(i)
       {

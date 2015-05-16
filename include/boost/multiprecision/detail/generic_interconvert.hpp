@@ -314,7 +314,7 @@ typename enable_if_c<is_number<To>::value || is_floating_point<To>::value>::type
    if(shift > 0)
       num <<= shift;
    else if(shift < 0)
-      denom <<= std::abs(shift);
+      denom <<= boost::multiprecision::detail::unsigned_abs(shift);
    Integer q, r;
    divide_qr(num, denom, q, r);
    int q_bits = msb(q);

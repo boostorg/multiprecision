@@ -118,7 +118,7 @@ struct tommath_int
       if(m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
       bool neg = i < 0;
-      *this = static_cast<boost::uint32_t>(std::abs(i));
+      *this = boost::multiprecision::detail::unsigned_abs(i);
       if(neg)
          detail::check_tommath_result(mp_neg(&m_data, &m_data));
       return *this;
@@ -641,7 +641,7 @@ template <class Integer>
 inline typename enable_if<is_signed<Integer>, Integer>::type eval_integer_modulus(const tommath_int& x, Integer val)
 {
    typedef typename make_unsigned<Integer>::type unsigned_type;
-   return eval_integer_modulus(x, static_cast<unsigned_type>(std::abs(val)));
+   return eval_integer_modulus(x, boost::multiprecision::detail::unsigned_abs(val));
 }
 
 } // namespace backends

@@ -643,7 +643,7 @@ inline void eval_add(gmp_float<digits10>& result, long i)
    if(i > 0)
       mpf_add_ui(result.data(), result.data(), i);
    else
-      mpf_sub_ui(result.data(), result.data(), std::abs(i));
+      mpf_sub_ui(result.data(), result.data(), boost::multiprecision::detail::unsigned_abs(i));
 }
 template <unsigned digits10>
 inline void eval_subtract(gmp_float<digits10>& result, long i)
@@ -651,12 +651,12 @@ inline void eval_subtract(gmp_float<digits10>& result, long i)
    if(i > 0)
       mpf_sub_ui(result.data(), result.data(), i);
    else
-      mpf_add_ui(result.data(), result.data(), std::abs(i));
+      mpf_add_ui(result.data(), result.data(), boost::multiprecision::detail::unsigned_abs(i));
 }
 template <unsigned digits10>
 inline void eval_multiply(gmp_float<digits10>& result, long i)
 {
-   mpf_mul_ui(result.data(), result.data(), std::abs(i));
+   mpf_mul_ui(result.data(), result.data(), boost::multiprecision::detail::unsigned_abs(i));
    if(i < 0)
       mpf_neg(result.data(), result.data());
 }
@@ -665,7 +665,7 @@ inline void eval_divide(gmp_float<digits10>& result, long i)
 {
    if(i == 0)
       BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
-   mpf_div_ui(result.data(), result.data(), std::abs(i));
+   mpf_div_ui(result.data(), result.data(), boost::multiprecision::detail::unsigned_abs(i));
    if(i < 0)
       mpf_neg(result.data(), result.data());
 }
@@ -1410,19 +1410,19 @@ inline void eval_subtract(gmp_int& t, long i)
 }
 inline void eval_multiply(gmp_int& t, long i)
 {
-   mpz_mul_ui(t.data(), t.data(), std::abs(i));
+   mpz_mul_ui(t.data(), t.data(), boost::multiprecision::detail::unsigned_abs(i));
    if(i < 0)
       mpz_neg(t.data(), t.data());
 }
 inline void eval_modulus(gmp_int& t, long i)
 {
-   mpz_tdiv_r_ui(t.data(), t.data(), std::abs(i));
+   mpz_tdiv_r_ui(t.data(), t.data(), boost::multiprecision::detail::unsigned_abs(i));
 }
 inline void eval_divide(gmp_int& t, long i)
 {
    if(i == 0)
       BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
-   mpz_tdiv_q_ui(t.data(), t.data(), std::abs(i));
+   mpz_tdiv_q_ui(t.data(), t.data(), boost::multiprecision::detail::unsigned_abs(i));
    if(i < 0)
       mpz_neg(t.data(), t.data());
 }
@@ -1522,19 +1522,19 @@ inline void eval_subtract(gmp_int& t, const gmp_int& p, long i)
 }
 inline void eval_multiply(gmp_int& t, const gmp_int& p, long i)
 {
-   mpz_mul_ui(t.data(), p.data(), std::abs(i));
+   mpz_mul_ui(t.data(), p.data(), boost::multiprecision::detail::unsigned_abs(i));
    if(i < 0)
       mpz_neg(t.data(), t.data());
 }
 inline void eval_modulus(gmp_int& t, const gmp_int& p, long i)
 {
-   mpz_tdiv_r_ui(t.data(), p.data(), std::abs(i));
+   mpz_tdiv_r_ui(t.data(), p.data(), boost::multiprecision::detail::unsigned_abs(i));
 }
 inline void eval_divide(gmp_int& t, const gmp_int& p, long i)
 {
    if(i == 0)
       BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
-   mpz_tdiv_q_ui(t.data(), p.data(), std::abs(i));
+   mpz_tdiv_q_ui(t.data(), p.data(), boost::multiprecision::detail::unsigned_abs(i));
    if(i < 0)
       mpz_neg(t.data(), t.data());
 }
@@ -1613,12 +1613,12 @@ inline typename enable_if_c<(is_unsigned<I>::value && (sizeof(I) <= sizeof(unsig
 template <class I>
 inline typename enable_if_c<(is_signed<I>::value && (sizeof(I) <= sizeof(long)))>::type eval_gcd(gmp_int& result, const gmp_int& a, const I b)
 {
-   mpz_gcd_ui(result.data(), a.data(), std::abs(b));
+   mpz_gcd_ui(result.data(), a.data(), boost::multiprecision::detail::unsigned_abs(b));
 }
 template <class I>
 inline typename enable_if_c<is_signed<I>::value && ((sizeof(I) <= sizeof(long)))>::type eval_lcm(gmp_int& result, const gmp_int& a, const I b)
 {
-   mpz_lcm_ui(result.data(), a.data(), std::abs(b));
+   mpz_lcm_ui(result.data(), a.data(), boost::multiprecision::detail::unsigned_abs(b));
 }
 
 inline void eval_integer_sqrt(gmp_int& s, gmp_int& r, const gmp_int& x)
@@ -1696,7 +1696,7 @@ template <class Integer>
 inline typename enable_if<is_signed<Integer>, Integer>::type eval_integer_modulus(const gmp_int& x, Integer val)
 {
    typedef typename make_unsigned<Integer>::type unsigned_type;
-   return eval_integer_modulus(x, static_cast<unsigned_type>(std::abs(val)));
+   return eval_integer_modulus(x, boost::multiprecision::detail::unsigned_abs(val));
 }
 inline void eval_powm(gmp_int& result, const gmp_int& base, const gmp_int& p, const gmp_int& m)
 {
