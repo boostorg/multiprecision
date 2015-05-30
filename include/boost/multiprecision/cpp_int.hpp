@@ -1224,6 +1224,13 @@ private:
       using std::ldexp;
       using std::floor;
 
+      if(a < 0)
+      {
+         do_assign_arithmetic(-a, mpl::false_());
+         this->sign(true);
+         return;
+      }
+
       if (a == 0) {
          *this = static_cast<limb_type>(0u);
       }
