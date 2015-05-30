@@ -24,6 +24,22 @@ void is_valid_bitwise_op(
       cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&,
       const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& , const mpl::int_<unchecked>&){}
 
+template <unsigned MinBits1, unsigned MaxBits1, cpp_int_check_type Checked1, class Allocator1>
+void is_valid_bitwise_op(
+      const cpp_int_backend<MinBits1, MaxBits1, signed_magnitude, Checked1, Allocator1>& result, const mpl::int_<checked>&)
+{
+   if(result.sign())
+      BOOST_THROW_EXCEPTION(std::range_error("Bitwise operations on negative values results in undefined behavior."));
+}
+
+template <unsigned MinBits1, unsigned MaxBits1, cpp_int_check_type Checked1, class Allocator1>
+void is_valid_bitwise_op(
+   const cpp_int_backend<MinBits1, MaxBits1, unsigned_magnitude, Checked1, Allocator1>&, const mpl::int_<checked>&){}
+
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+void is_valid_bitwise_op(
+      cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&, const mpl::int_<unchecked>&){}
+
 template <class CppInt1, class CppInt2, class Op>
 void bitwise_op(
    CppInt1& result,
@@ -285,6 +301,7 @@ inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBit
       cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
       double_limb_type s) BOOST_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
 {
+   is_valid_bitwise_op(result, typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
    if(!s)
       return;
 
@@ -361,8 +378,13 @@ inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBit
       cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
       double_limb_type s) BOOST_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
 {
+   is_valid_bitwise_op(result, typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
    if(!s)
       return;
+
+   bool is_neg = result.sign();
+   if(is_neg)
+      eval_increment(result);
 
    limb_type offset = static_cast<limb_type>(s / cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits);
    limb_type shift  = static_cast<limb_type>(s % cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits);
@@ -370,7 +392,10 @@ inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBit
    unsigned rs = ors;
    if(offset >= rs)
    {
-      result = limb_type(0);
+      if(is_neg)
+         result = signed_limb_type(-1);
+      else
+         result = limb_type(0);
       return;
    }
    rs -= offset;
@@ -379,7 +404,10 @@ inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBit
       --rs;
    if(rs == 0)
    {
-      result = limb_type(0);
+      if(is_neg)
+         result = signed_limb_type(-1);
+      else
+         result = limb_type(0);
       return;
    }
    unsigned i = 0;
@@ -399,6 +427,8 @@ inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBit
          pr[i] = pr[i + offset];
    }
    result.resize(rs, rs);
+   if(is_neg)
+      eval_decrement(result);
 }
 
 //
@@ -408,6 +438,7 @@ template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_
 BOOST_MP_FORCEINLINE typename enable_if<is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> > >::type
    eval_left_shift(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result, T s) BOOST_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
 {
+   is_valid_bitwise_op(result, typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
    *result.limbs() = detail::checked_left_shift(*result.limbs(), s, typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
    result.normalize();
 }
@@ -417,6 +448,7 @@ BOOST_MP_FORCEINLINE typename enable_if<is_trivial_cpp_int<cpp_int_backend<MinBi
    eval_right_shift(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result, T s) BOOST_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
 {
    // Nothing to check here... just make sure we don't invoke undefined behavior:
+   is_valid_bitwise_op(result, typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
    *result.limbs() = (static_cast<unsigned>(s) >= sizeof(*result.limbs()) * CHAR_BIT) ? 0 : *result.limbs() >> s;
 }
 

@@ -172,14 +172,22 @@ struct tester
          if(!std::numeric_limits<test_type>::is_bounded)
          {
             BOOST_CHECK_EQUAL(mpz_int(a << i).str(), test_type(a1 << i).str());
+            BOOST_CHECK_EQUAL(mpz_int(-a << i).str(), test_type(-a1 << i).str());
          }
          else if(!is_checked_cpp_int<test_type>::value)
          {
             test_type t1(mpz_int(a << i).str());
             test_type t2 = a1 << i;
             BOOST_CHECK_EQUAL(t1, t2);
+            t1 = test_type(mpz_int(-a << i).str());
+            t2 = -a1 << i;
+            BOOST_CHECK_EQUAL(t1, t2);
          }
          BOOST_CHECK_EQUAL(mpz_int(a >> i).str(), test_type(a1 >> i).str());
+         if(!is_checked_cpp_int<test_type>::value)
+         {
+            BOOST_CHECK_EQUAL(mpz_int(-a >> i).str(), test_type(-a1 >> i).str());
+         }
       }
       // gcd/lcm
       BOOST_CHECK_EQUAL(mpz_int(gcd(a, b)).str(), test_type(gcd(a1, b1)).str());
