@@ -12,6 +12,11 @@
 // This file has no include guards or namespaces - it's expanded inline inside default_ops.hpp
 // 
 
+#ifdef BOOST_MSVC
+#pragma warning(push)
+#pragma warning(disable:6326)  // comparison of two constants
+#endif
+
 namespace detail{
 
 template<typename T, typename U> 
@@ -692,3 +697,6 @@ inline void eval_tanh(T& result, const T& x)
   eval_divide(result, c);
 }
 
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif

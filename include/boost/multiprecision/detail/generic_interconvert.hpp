@@ -10,7 +10,7 @@
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
-#pragma warning(disable:4127)
+#pragma warning(disable:4127 6326)
 #endif
 
 namespace boost{ namespace multiprecision{ namespace detail{

@@ -21,7 +21,7 @@ enum digit_base_type
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
-#pragma warning(disable:4522)  // multiple assignment operators specified
+#pragma warning(disable:4522 6326)  // multiple assignment operators specified, comparison of two constants
 #endif
 
 namespace detail{
@@ -37,7 +37,7 @@ template <unsigned Digits, digit_base_type DigitBase = digit_base_10, class Allo
 class cpp_bin_float
 {
 public:
-   static const unsigned bit_count = DigitBase == digit_base_2 ? Digits : (Digits * 1000uL) / 301uL + ((Digits * 1000uL) % 301 ? 2u : 1u);
+   static const unsigned bit_count = DigitBase == digit_base_2 ? Digits : (Digits * 1000uL) / 301uL + (((Digits * 1000uL) % 301) ? 2u : 1u);
    typedef cpp_int_backend<is_void<Allocator>::value ? bit_count : 0, bit_count, is_void<Allocator>::value ? unsigned_magnitude : signed_magnitude, unchecked, Allocator> rep_type;
    typedef cpp_int_backend<is_void<Allocator>::value ? 2 * bit_count : 0, 2 * bit_count, is_void<Allocator>::value ? unsigned_magnitude : signed_magnitude, unchecked, Allocator> double_rep_type;
 
@@ -773,6 +773,10 @@ inline typename enable_if_c<is_signed<S>::value>::type eval_multiply(cpp_bin_flo
 template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
 inline void eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> &res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> &u, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> &v)
 {
+#ifdef BOOST_MSVC
+#pragma warning(push)
+#pragma warning(disable:6326)  // comparison of two constants
+#endif
    using default_ops::eval_subtract;
    using default_ops::eval_qr;
    using default_ops::eval_bit_test;
@@ -882,7 +886,7 @@ inline void eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Mi
       // how we'll be rounding.
       //
       BOOST_ASSERT((eval_msb(q) == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1));
-      static const unsigned lshift = cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count < limb_bits ? 2 : limb_bits;
+      static const unsigned lshift = (cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count < limb_bits) ? 2 : limb_bits;
       eval_left_shift(q, lshift);
       res.exponent() -= lshift;
       eval_left_shift(r, 1u);
@@ -893,6 +897,9 @@ inline void eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Mi
          q.limbs()[0] |= (static_cast<limb_type>(1u) << (lshift - 1)) + static_cast<limb_type>(1u);
    }
    copy_and_round(res, q);
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
 }
 
 template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
@@ -904,6 +911,10 @@ inline void eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Mi
 template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, class U>
 inline typename enable_if_c<is_unsigned<U>::value>::type eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> &res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> &u, const U &v)
 {
+#ifdef BOOST_MSVC
+#pragma warning(push)
+#pragma warning(disable:6326)  // comparison of two constants
+#endif
    using default_ops::eval_subtract;
    using default_ops::eval_qr;
    using default_ops::eval_bit_test;
@@ -1000,6 +1011,9 @@ inline typename enable_if_c<is_unsigned<U>::value>::type eval_divide(cpp_bin_flo
          q.limbs()[0] |= (static_cast<limb_type>(1u) << (lshift - 1)) + static_cast<limb_type>(1u);
    }
    copy_and_round(res, q);
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
 }
 
 template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, class U>

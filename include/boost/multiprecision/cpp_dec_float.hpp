@@ -34,6 +34,11 @@
 //
 #include <boost/math/policies/policy.hpp>
 
+#ifdef BOOST_MSVC
+#pragma warning(push)
+#pragma warning(disable:6326)  // comparison of two constants
+#endif
+
 namespace boost{
 namespace multiprecision{
 namespace backends{
@@ -3077,5 +3082,9 @@ struct precision< boost::multiprecision::number<boost::multiprecision::cpp_dec_f
 } // namespace policies
 
 }} // namespaces boost::math
+
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
 
 #endif

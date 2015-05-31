@@ -35,7 +35,7 @@ namespace backends{
 #ifdef BOOST_MSVC
 // warning C4127: conditional expression is constant
 #pragma warning(push)
-#pragma warning(disable:4127 4351 4293 4996 4307 4702)
+#pragma warning(disable:4127 4351 4293 4996 4307 4702 6285)
 #endif
 
 template <unsigned MinBits = 0, unsigned MaxBits = 0, cpp_integer_type SignType = signed_magnitude, cpp_int_check_type Checked = unchecked, class Allocator = typename mpl::if_c<MinBits && (MinBits == MaxBits), void, std::allocator<limb_type> >::type >
@@ -181,8 +181,8 @@ public:
    BOOST_STATIC_CONSTANT(limb_type, sign_bit_mask = 1u << (limb_bits - 1));
    BOOST_STATIC_CONSTANT(unsigned, internal_limb_count =
       MinBits
-         ? MinBits / limb_bits + (MinBits % limb_bits ? 1 : 0)
-         : sizeof(limb_data) / sizeof(limb_type));
+         ? (MinBits / limb_bits + ((MinBits % limb_bits) ? 1 : 0))
+         : (sizeof(limb_data) / sizeof(limb_type)));
    BOOST_STATIC_CONSTANT(bool, variable = true);
 
 private:
@@ -243,7 +243,7 @@ public:
    }
    void resize(unsigned new_size, unsigned min_size)
    {
-      static const unsigned max_limbs = MaxBits / (CHAR_BIT * sizeof(limb_type)) + (MaxBits % (CHAR_BIT * sizeof(limb_type)) ? 1 : 0);
+      static const unsigned max_limbs = MaxBits / (CHAR_BIT * sizeof(limb_type)) + ((MaxBits % (CHAR_BIT * sizeof(limb_type))) ? 1 : 0);
       // We never resize beyond MaxSize:
       if(new_size > max_limbs)
          new_size = max_limbs;
@@ -402,9 +402,9 @@ public:
    BOOST_STATIC_CONSTANT(unsigned, limb_bits = sizeof(limb_type) * CHAR_BIT);
    BOOST_STATIC_CONSTANT(limb_type, max_limb_value = ~static_cast<limb_type>(0u));
    BOOST_STATIC_CONSTANT(limb_type, sign_bit_mask = 1u << (limb_bits - 1));
-   BOOST_STATIC_CONSTANT(unsigned, internal_limb_count = MinBits / limb_bits + (MinBits % limb_bits ? 1 : 0));
+   BOOST_STATIC_CONSTANT(unsigned, internal_limb_count = MinBits / limb_bits + ((MinBits % limb_bits) ? 1 : 0));
    BOOST_STATIC_CONSTANT(bool, variable = false);
-   BOOST_STATIC_CONSTANT(limb_type, upper_limb_mask = MinBits % limb_bits ? (limb_type(1) << (MinBits % limb_bits)) -1 : (~limb_type(0)));
+   BOOST_STATIC_CONSTANT(limb_type, upper_limb_mask = (MinBits % limb_bits) ? (limb_type(1) << (MinBits % limb_bits)) -1 : (~limb_type(0)));
    BOOST_STATIC_ASSERT_MSG(internal_limb_count >= 2, "A fixed precision integer type must have at least 2 limbs");
 
 private:
@@ -554,9 +554,9 @@ public:
    BOOST_STATIC_CONSTANT(unsigned, limb_bits = sizeof(limb_type) * CHAR_BIT);
    BOOST_STATIC_CONSTANT(limb_type, max_limb_value = ~static_cast<limb_type>(0u));
    BOOST_STATIC_CONSTANT(limb_type, sign_bit_mask = 1u << (limb_bits - 1));
-   BOOST_STATIC_CONSTANT(unsigned, internal_limb_count = MinBits / limb_bits + (MinBits % limb_bits ? 1 : 0));
+   BOOST_STATIC_CONSTANT(unsigned, internal_limb_count = MinBits / limb_bits + ((MinBits % limb_bits) ? 1 : 0));
    BOOST_STATIC_CONSTANT(bool, variable = false);
-   BOOST_STATIC_CONSTANT(limb_type, upper_limb_mask = MinBits % limb_bits ? (limb_type(1) << (MinBits % limb_bits)) -1 : (~limb_type(0)));
+   BOOST_STATIC_CONSTANT(limb_type, upper_limb_mask = (MinBits % limb_bits) ? (limb_type(1) << (MinBits % limb_bits)) -1 : (~limb_type(0)));
    BOOST_STATIC_ASSERT_MSG(internal_limb_count >= 2, "A fixed precision integer type must have at least 2 limbs");
 
 private:
@@ -1555,7 +1555,7 @@ private:
          limb_type shift = base == 8 ? 3 : 4;
          limb_type mask = static_cast<limb_type>((1u << shift) - 1);
          cpp_int_backend t(*this);
-         result.assign(Bits / shift + (Bits % shift ? 1 : 0), '0');
+         result.assign(Bits / shift + ((Bits % shift) ? 1 : 0), '0');
          std::string::difference_type pos = result.size() - 1;
          for(unsigned i = 0; i < Bits / shift; ++i)
          {
