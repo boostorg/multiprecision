@@ -31,7 +31,7 @@ namespace boost{ namespace multiprecision{
 // warning C4127: conditional expression is constant
 // warning C4714: function marked as __forceinline not inlined
 #pragma warning(push)
-#pragma warning(disable:4127 4714)
+#pragma warning(disable:4127 4714 6326)
 #endif
 
 template <class Backend, expression_template_option ExpressionTemplates>

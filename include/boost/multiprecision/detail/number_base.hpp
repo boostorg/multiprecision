@@ -25,7 +25,13 @@
 #  define BOOST_MP_FORCEINLINE inline
 #endif
 
-namespace boost{ namespace multiprecision{
+#ifdef BOOST_MSVC
+#  pragma warning(push)
+#  pragma warning(disable:6326)
+#endif
+
+namespace boost{
+   namespace multiprecision{
 
 enum expression_template_option
 {
@@ -813,6 +819,10 @@ namespace constants{
 }
 
 }}
+
+#ifdef BOOST_MSVC
+#  pragma warning(pop)
+#endif
 
 #endif // BOOST_MATH_BIG_NUM_BASE_HPP
 
