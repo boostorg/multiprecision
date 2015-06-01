@@ -71,32 +71,18 @@ void test_extra(T)
 {
    T v1, v2, v3;
    int i;
-   boost::math::tgamma(v1);
-   boost::math::tgamma1pm1(v1);
-   boost::math::lgamma(v1);
-   boost::math::lgamma(v1, &i);
-   boost::math::digamma(v1);
-   boost::math::tgamma_ratio(v1, v2);
-   boost::math::tgamma_delta_ratio(v1, v2);
-   boost::math::factorial<T>(i);
-   boost::math::unchecked_factorial<T>(i);
-   i = boost::math::max_factorial<T>::value;
-   boost::math::double_factorial<T>(i);
-   boost::math::rising_factorial(v1, i);
-   boost::math::falling_factorial(v1, i);
-   boost::math::gamma_p_derivative(v2, v3);
-   boost::math::tgamma(v1, v2);
-   boost::math::tgamma_lower(v1, v2);
-   boost::math::gamma_p(v1, v2);
-   boost::math::gamma_q(v1, v2);
-   boost::math::gamma_p_inv(v1, v2);
-   boost::math::gamma_q_inv(v1, v2);
-   boost::math::gamma_p_inva(v1, v2);
-   boost::math::gamma_q_inva(v1, v2);
-   boost::math::erf(v1);
-   boost::math::erfc(v1);
-   boost::math::erf_inv(v1);
-   boost::math::erfc_inv(v1);
+   boost::math::beta(v1, v2);
+   boost::math::beta(v1, v2, v3);
+   boost::math::betac(v1, v2, v3);
+   boost::math::ibeta(v1, v2, v3);
+   boost::math::ibetac(v1, v2, v3);
+   boost::math::ibeta_inv(v1, v2, v3);
+   boost::math::ibetac_inv(v1, v2, v3);
+   boost::math::ibeta_inva(v1, v2, v3);
+   boost::math::ibetac_inva(v1, v2, v3);
+   boost::math::ibeta_invb(v1, v2, v3);
+   boost::math::ibetac_invb(v1, v2, v3);
+   boost::math::ibeta_derivative(v1, v2, v3);
 }
 
 void foo()

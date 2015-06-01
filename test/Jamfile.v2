@@ -70,6 +70,7 @@ run test_arithmetic_cpp_bin_float_3.cpp ;
 run test_arithmetic_mpf_50.cpp gmp : : : [ check-target-builds ../config//has_gmp : : <build>no ] ;
 run test_arithmetic_mpf.cpp gmp : : : [ check-target-builds ../config//has_gmp : : <build>no ] ;
 run test_arithmetic_mpz.cpp gmp : : : [ check-target-builds ../config//has_gmp : : <build>no ] ;
+run test_arithmetic_mpz_rat.cpp gmp : : : [ check-target-builds ../config//has_gmp : : <build>no ] ;
 run test_arithmetic_mpz_br.cpp gmp : : : [ check-target-builds ../config//has_gmp : : <build>no ] ;
 run test_arithmetic_mpq.cpp gmp : : : [ check-target-builds ../config//has_gmp : : <build>no ] ;
 
@@ -78,6 +79,7 @@ run test_arithmetic_mpfr_50.cpp mpfr gmp : : : [ check-target-builds ../config//
 run test_arithmetic_mpfr_50_static.cpp mpfr gmp : : : [ check-target-builds ../config//has_mpfr : : <build>no ] ;
 
 run test_arithmetic_tommath.cpp $(TOMMATH) : : : [ check-target-builds ../config//has_tommath : : <build>no ] ;
+run test_arithmetic_tommath_rat.cpp $(TOMMATH) : : : [ check-target-builds ../config//has_tommath : : <build>no ] ;
 run test_arithmetic_tommath_br.cpp $(TOMMATH) : : : [ check-target-builds ../config//has_tommath : : <build>no ] ;
 
 run test_arithmetic_cpp_int_1.cpp ;
