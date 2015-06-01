@@ -670,6 +670,15 @@ run test_float128_serial.cpp ../../serialization/build//boost_serialization quad
 run test_cpp_bin_float_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST1 : test_bin_dec_float_serial_1 ;
 run test_cpp_bin_float_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST2 : test_bin_dec_float_serial_2 ;
 
+#
+# Mixed mode comparison tests, see: https://svn.boost.org/trac/boost/ticket/11328
+#
+run test_checked_mixed_cpp_int.cpp ;
+run test_mixed_cpp_bin_float.cpp ;
+run test_mixed_cpp_dec_float.cpp ;
+run test_mixed_mpf_float.cpp gmp : : : [ check-target-builds ../config//has_gmp : : <build>no ] ;
+run test_mixed_mpfr_float.cpp  mpfr gmp : : : [ check-target-builds ../config//has_mpfr : : <build>no ] ;
+
 
 if $(enable-specfun)
 {

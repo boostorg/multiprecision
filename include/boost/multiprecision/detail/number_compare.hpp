@@ -6,6 +6,8 @@
 #ifndef BOOST_MP_COMPARE_HPP
 #define BOOST_MP_COMPARE_HPP
 
+#include <boost/multiprecision/traits/is_backend.hpp>
+
 //
 // Comparison operators for number.
 //
@@ -19,23 +21,17 @@ inline bool eval_eq(const B& a, const B& b)
 {
    return a.compare(b) == 0;
 }
-//
-// For the default version which compares to some arbitrary type convertible to
-// our number type, we don't know what value the ExpressionTemplates parameter to
-// class number should be.  We generally prefer ExpressionTemplates to be enabled
-// in case type A is itself an expression template, but we need to test both options
-// with is_convertible in case A has an implicit conversion operator to number<B,something>.
-// This is the case with many uBlas types for example.
-//
-template <class B, class A>
-inline bool eval_eq(const B& a, const A& b)
+template <class T, class U>
+inline typename enable_if_c<boost::multiprecision::detail::is_first_backend<T, U>::value, bool>::type eval_eq(const T& a, const U& b)
 {
-   typedef typename mpl::if_c<
-      is_convertible<A, number<B, et_on> >::value,
-      number<B, et_on>,
-      number<B, et_off> >::type mp_type;
-   mp_type t(b);
+   typename boost::multiprecision::detail::number_from_backend<T, U>::type t(b);
    return eval_eq(a, t.backend());
+}
+template <class T, class U>
+inline typename enable_if_c<boost::multiprecision::detail::is_second_backend<T, U>::value, bool>::type eval_eq(const T& a, const U& b)
+{
+   typename boost::multiprecision::detail::number_from_backend<U, T>::type t(a);
+   return eval_eq(t.backend(), b);
 }
 
 template <class B>
@@ -43,15 +39,17 @@ inline bool eval_lt(const B& a, const B& b)
 {
    return a.compare(b) < 0;
 }
-template <class B, class A>
-inline bool eval_lt(const B& a, const A& b)
+template <class T, class U>
+inline typename enable_if_c<boost::multiprecision::detail::is_first_backend<T, U>::value, bool>::type eval_lt(const T& a, const U& b)
 {
-   typedef typename mpl::if_c<
-      is_convertible<A, number<B, et_on> >::value,
-      number<B, et_on>,
-      number<B, et_off> >::type mp_type;
-   mp_type t(b);
+   typename boost::multiprecision::detail::number_from_backend<T, U>::type t(b);
    return eval_lt(a, t.backend());
+}
+template <class T, class U>
+inline typename enable_if_c<boost::multiprecision::detail::is_second_backend<T, U>::value, bool>::type eval_lt(const T& a, const U& b)
+{
+   typename boost::multiprecision::detail::number_from_backend<U, T>::type t(a);
+   return eval_lt(t.backend(), b);
 }
 
 template <class B>
@@ -59,15 +57,17 @@ inline bool eval_gt(const B& a, const B& b)
 {
    return a.compare(b) > 0;
 }
-template <class B, class A>
-inline bool eval_gt(const B& a, const A& b)
+template <class T, class U>
+inline typename enable_if_c<boost::multiprecision::detail::is_first_backend<T, U>::value, bool>::type eval_gt(const T& a, const U& b)
 {
-   typedef typename mpl::if_c<
-      is_convertible<A, number<B, et_on> >::value,
-      number<B, et_on>,
-      number<B, et_off> >::type mp_type;
-   mp_type t(b);
+   typename boost::multiprecision::detail::number_from_backend<T, U>::type t(b);
    return eval_gt(a, t.backend());
+}
+template <class T, class U>
+inline typename enable_if_c<boost::multiprecision::detail::is_second_backend<T, U>::value, bool>::type eval_gt(const T& a, const U& b)
+{
+   typename boost::multiprecision::detail::number_from_backend<U, T>::type t(a);
+   return eval_gt(t.backend(), b);
 }
 
 } // namespace default_ops
