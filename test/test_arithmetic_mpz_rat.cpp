@@ -7,16 +7,14 @@
 #  define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <boost/multiprecision/tommath.hpp>
+#include <boost/multiprecision/gmp.hpp>
+#include <boost/multiprecision/rational_adaptor.hpp>
 
 #include "test_arithmetic.hpp"
 
-template <>
-struct is_twos_complement_integer<boost::multiprecision::tom_int> : public boost::mpl::false_ {};
-
 int main()
 {
-   test<boost::multiprecision::tom_int>();
+   test<boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::gmp_int> > >();
    return boost::report_errors();
 }
 
