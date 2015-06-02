@@ -50,7 +50,7 @@ namespace boost{ namespace multiprecision{  namespace detail{
    template <bool b, class T, class U>
    struct is_second_backend_imp{ static const bool value = false; };
    template <class T, class U>
-   struct is_second_backend_imp<true, T, U>{ static const bool value = is_convertible<T, number<U> >::value || is_convertible<T, number<U, et_off> >::value; };
+   struct is_second_backend_imp<true, T, U>{ static const bool value = (is_convertible<T, number<U, et_on> >::value || is_convertible<T, number<U, et_off> >::value) && !is_first_backend<T, U>::value; };
 
    template <class T, class U>
    struct is_second_backend : is_second_backend_imp<is_backend<U>::value, T, U> {};
