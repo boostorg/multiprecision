@@ -1695,7 +1695,6 @@ inline typename enable_if<is_unsigned<Integer>, Integer>::type eval_integer_modu
 template <class Integer>
 inline typename enable_if<is_signed<Integer>, Integer>::type eval_integer_modulus(const gmp_int& x, Integer val)
 {
-   typedef typename make_unsigned<Integer>::type unsigned_type;
    return eval_integer_modulus(x, boost::multiprecision::detail::unsigned_abs(val));
 }
 inline void eval_powm(gmp_int& result, const gmp_int& base, const gmp_int& p, const gmp_int& m)
