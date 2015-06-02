@@ -7,6 +7,7 @@
 #define BOOST_MP_IS_BACKEND_HPP
 
 #include <boost/mpl/has_xxx.hpp>
+#include <boost/type_traits/conditional.hpp>
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/multiprecision/detail/number_base.hpp>
 
