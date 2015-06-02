@@ -159,7 +159,6 @@ void bitwise_op(
    //
    if(static_cast<signed_limb_type>(next_limb) < 0)
    {
-      result.sign(true);
       double_limb_type carry = 1;
       for(unsigned i = 0; i < x; ++i)
       {
@@ -167,6 +166,13 @@ void bitwise_op(
          pr[i] = static_cast<limb_type>(carry);
          carry >>= CppInt1::limb_bits;
       }
+      if(carry)
+      {
+         result.resize(x + 1, x);
+         if(result.size() > x)
+            result.limbs()[x] = static_cast<limb_type>(carry);
+      }
+      result.sign(true);
    }
    else
       result.sign(false);

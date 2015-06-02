@@ -486,6 +486,14 @@ struct tester
       a = 1;
       a = 0 % test_type(25);
       BOOST_CHECK_EQUAL(a, 0);
+#ifndef TEST2
+      // https://svn.boost.org/trac/boost/ticket/11364
+      a = 0xfffffffeu;
+      b = -2;
+      c = a ^ b;
+      test_type d = ~(a ^ ~b);
+      BOOST_CHECK_EQUAL(c, d);
+#endif
    }
 
    void test()
