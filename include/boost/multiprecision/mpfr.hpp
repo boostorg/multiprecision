@@ -134,7 +134,7 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
       boost::ulong_long_type mask = (((1uLL << (std::numeric_limits<unsigned long>::digits - 1) - 1) << 1) | 1uLL);
       unsigned shift = 0;
       mpfr_t t;
-      mpfr_init2(t, (std::max)(static_cast<unsigned>(std::numeric_limits<boost::ulong_long_type>::digits), static_cast<unsigned long>(multiprecision::detail::digits10_2_2(digits10))));
+      mpfr_init2(t, (std::max)(static_cast<unsigned long>(std::numeric_limits<boost::ulong_long_type>::digits), static_cast<unsigned long>(multiprecision::detail::digits10_2_2(digits10))));
       mpfr_set_ui(m_data, 0, GMP_RNDN);
       while(i)
       {
