@@ -165,7 +165,7 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
    si_type n;
    T term, part;
 
-   static const unsigned series_limit = 
+   static const si_type series_limit =
       boost::multiprecision::detail::digits2<number<T, et_on> >::value < 100
       ? 100 : boost::multiprecision::detail::digits2<number<T, et_on> >::value;
    // Series expansion of hyperg_1f0(a; ; x).
