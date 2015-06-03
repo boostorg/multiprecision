@@ -16,22 +16,33 @@ namespace boost{ namespace multiprecision{
 
 namespace default_ops{
 
+//
+// The dispatching mechanism used here to deal with differently typed arguments
+// could be better replaced with enable_if overloads, but that breaks MSVC-12
+// under strange and hard to reproduce circumstances.
+//
 template <class B>
 inline bool eval_eq(const B& a, const B& b)
 {
    return a.compare(b) == 0;
 }
 template <class T, class U>
-inline typename enable_if_c<boost::multiprecision::detail::is_first_backend<T, U>::value, bool>::type eval_eq(const T& a, const U& b)
+inline bool eval_eq_imp(const T& a, const U& b, const mpl::true_&)
 {
    typename boost::multiprecision::detail::number_from_backend<T, U>::type t(b);
    return eval_eq(a, t.backend());
 }
 template <class T, class U>
-inline typename enable_if_c<boost::multiprecision::detail::is_second_backend<T, U>::value, bool>::type eval_eq(const T& a, const U& b)
+inline bool eval_eq_imp(const T& a, const U& b, const mpl::false_&)
 {
    typename boost::multiprecision::detail::number_from_backend<U, T>::type t(a);
    return eval_eq(t.backend(), b);
+}
+template <class T, class U>
+inline bool eval_eq(const T& a, const U& b)
+{
+   typedef mpl::bool_<boost::multiprecision::detail::is_first_backend<T, U>::value> tag_type;
+   return eval_eq_imp(a, b, tag_type());
 }
 
 template <class B>
@@ -40,16 +51,22 @@ inline bool eval_lt(const B& a, const B& b)
    return a.compare(b) < 0;
 }
 template <class T, class U>
-inline typename enable_if_c<boost::multiprecision::detail::is_first_backend<T, U>::value, bool>::type eval_lt(const T& a, const U& b)
+inline bool eval_lt_imp(const T& a, const U& b, const mpl::true_&)
 {
    typename boost::multiprecision::detail::number_from_backend<T, U>::type t(b);
    return eval_lt(a, t.backend());
 }
 template <class T, class U>
-inline typename enable_if_c<boost::multiprecision::detail::is_second_backend<T, U>::value, bool>::type eval_lt(const T& a, const U& b)
+inline bool eval_lt_imp(const T& a, const U& b, const mpl::false_&)
 {
    typename boost::multiprecision::detail::number_from_backend<U, T>::type t(a);
    return eval_lt(t.backend(), b);
+}
+template <class T, class U>
+inline bool eval_lt(const T& a, const U& b)
+{
+   typedef mpl::bool_<boost::multiprecision::detail::is_first_backend<T, U>::value> tag_type;
+   return eval_lt_imp(a, b, tag_type());
 }
 
 template <class B>
@@ -58,16 +75,22 @@ inline bool eval_gt(const B& a, const B& b)
    return a.compare(b) > 0;
 }
 template <class T, class U>
-inline typename enable_if_c<boost::multiprecision::detail::is_first_backend<T, U>::value, bool>::type eval_gt(const T& a, const U& b)
+inline bool eval_gt_imp(const T& a, const U& b, const mpl::true_&)
 {
    typename boost::multiprecision::detail::number_from_backend<T, U>::type t(b);
    return eval_gt(a, t.backend());
 }
 template <class T, class U>
-inline typename enable_if_c<boost::multiprecision::detail::is_second_backend<T, U>::value, bool>::type eval_gt(const T& a, const U& b)
+inline bool eval_gt_imp(const T& a, const U& b, const mpl::false_&)
 {
    typename boost::multiprecision::detail::number_from_backend<U, T>::type t(a);
    return eval_gt(t.backend(), b);
+}
+template <class T, class U>
+inline bool eval_gt(const T& a, const U& b)
+{
+   typedef mpl::bool_<boost::multiprecision::detail::is_first_backend<T, U>::value> tag_type;
+   return eval_gt_imp(a, b, tag_type());
 }
 
 } // namespace default_ops
