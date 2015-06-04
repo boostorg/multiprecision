@@ -71,12 +71,12 @@ void test_extra(T)
 {
    T v1, v2, v3;
    int i;
-   boost::math::beta(v1, v2);
-   boost::math::beta(v1, v2, v3);
-   boost::math::betac(v1, v2, v3);
-   boost::math::ibeta(v1, v2, v3);
-   boost::math::ibetac(v1, v2, v3);
-   boost::math::ibeta_derivative(v1, v2, v3);
+   boost::math::ibeta_inv(v1, v2, v3);
+   boost::math::ibetac_inv(v1, v2, v3);
+   boost::math::ibeta_inva(v1, v2, v3);
+   boost::math::ibetac_inva(v1, v2, v3);
+   boost::math::ibeta_invb(v1, v2, v3);
+   boost::math::ibetac_invb(v1, v2, v3);
 }
 
 void foo()
