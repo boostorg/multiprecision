@@ -6,8 +6,10 @@
 #include "setup.hpp"
 #include "table_type.hpp"
 #define TEST_UDT
+#define TEST1
 
 #include <boost/math/special_functions/math_fwd.hpp>
+#include <boost/math/special_functions/ellint_rf.hpp>
 #include "libs/math/test/test_carlson.hpp"
 
 void expected_results()
