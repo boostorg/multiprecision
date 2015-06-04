@@ -698,7 +698,9 @@ if $(enable-specfun)
             <define>TEST_MPFR_50
             <optimization>speed
             <define>BOOST_ALL_NO_LIB
+            <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
             <toolset>msvc:<cxxflags>-bigobj
+            <include>../../math/include_private
             release
            : $(source:B)_mpfr ;
       run $(source) gmp 
@@ -712,7 +714,9 @@ if $(enable-specfun)
             <optimization>speed
             <define>TEST_MPF_50
             <define>BOOST_ALL_NO_LIB
+            <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
             <toolset>msvc:<cxxflags>-bigobj
+            <include>../../math/include_private
             release
            : $(source:B)_mpf ;
       run $(source) /boost/test//boost_unit_test_framework/<link>static 
@@ -723,8 +727,10 @@ if $(enable-specfun)
            : # requirements
             <define>TEST_CPP_DEC_FLOAT
             <define>BOOST_ALL_NO_LIB
+            <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
             <optimization>speed
             <toolset>msvc:<cxxflags>-bigobj
+            <include>../../math/include_private
             release
            : $(source:B)_cpp_dec_float ;
       run $(source) /boost/test//boost_unit_test_framework/<link>static 
@@ -735,8 +741,10 @@ if $(enable-specfun)
            : # requirements
             <define>TEST_CPP_BIN_FLOAT
             <define>BOOST_ALL_NO_LIB
+            <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
             <optimization>speed
             <toolset>msvc:<cxxflags>-bigobj
+            <include>../../math/include_private
             release
            : $(source:B)_cpp_bin_float ;
       run $(source) quadmath 
@@ -750,7 +758,9 @@ if $(enable-specfun)
             <optimization>speed
             <define>TEST_FLOAT128
             <define>BOOST_ALL_NO_LIB
+            <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
             <toolset>msvc:<cxxflags>-bigobj
+            <include>../../math/include_private
             release
            : $(source:B)_float128 ;
       run $(source)
@@ -764,7 +774,9 @@ if $(enable-specfun)
             <optimization>speed
             <define>TEST_FLOAT128
             <define>BOOST_ALL_NO_LIB
+            <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
             <toolset>msvc:<cxxflags>-bigobj
+            <include>../../math/include_private
             release
            : $(source:B)_intel_quad ;
    }
@@ -782,8 +794,10 @@ if $(enable-specfun)
            : # requirements
             <optimization>speed
             <define>BOOST_ALL_NO_LIB
+            <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
             <toolset>msvc:<cxxflags>-bigobj
             [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>gmp <source>mpfr :  ]
+            <include>../../math/include_private
             release ;
    }
 }
