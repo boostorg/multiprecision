@@ -134,7 +134,7 @@ struct rational_adaptor
          v2 = 1;
       if(*s)
       {
-         BOOST_THROW_EXCEPTION(std::runtime_error(std::string("Could parse the string \"") + p + std::string("\" as a valid rational number.")));
+         BOOST_THROW_EXCEPTION(std::runtime_error(std::string("Could not parse the string \"") + p + std::string("\" as a valid rational number.")));
       }
       data().assign(v1, v2);
       return *this;
