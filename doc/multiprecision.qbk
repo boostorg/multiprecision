@@ -4976,6 +4976,8 @@ Windows Vista machine.
 * Depricated boost/multiprecision/random.hpp as it's no longer needed, updated random examples to match.
 * Fixed a bug in cpp_int's right shift operator when shifting negative values - semantics now gives the
 same values as shifting 2's compliment integers, though not the same bit pattern.
+* Fixed support for GCC-4.6.4 in C++0x mode by disabling conditional noexcept suppoprt for that compiler
+see [@https://svn.boost.org/trac/boost/ticket/11402 #11402].
 
 [h4 Multiprecision-2.2.4 (Boost-1.58)]
 
