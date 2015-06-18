@@ -31,10 +31,21 @@
         <span class="phrase"><a name="boost_multiprecision.map.hist.multiprecision_2_2_5_boost_1_59"></a></span><a class="link" href="hist.html#boost_multiprecision.map.hist.multiprecision_2_2_5_boost_1_59">Multiprecision-2.2.5
         (Boost-1.59)</a>
       </h5>
-<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
             Depricated boost/multiprecision/random.hpp as it's no longer needed,
             updated random examples to match.
-          </li></ul></div>
+          </li>
+<li class="listitem">
+            Fixed a bug in cpp_int's right shift operator when shifting negative
+            values - semantics now gives the same values as shifting 2's compliment
+            integers, though not the same bit pattern.
+          </li>
+<li class="listitem">
+            Fixed support for GCC-4.6.4 in C++0x mode by disabling conditional noexcept
+            suppoprt for that compiler see <a href="https://svn.boost.org/trac/boost/ticket/11402" target="_top">#11402</a>.
+          </li>
+</ul></div>
 <h5>
 <a name="boost_multiprecision.map.hist.h1"></a>
         <span class="phrase"><a name="boost_multiprecision.map.hist.multiprecision_2_2_4_boost_1_58"></a></span><a class="link" href="hist.html#boost_multiprecision.map.hist.multiprecision_2_2_4_boost_1_58">Multiprecision-2.2.4
