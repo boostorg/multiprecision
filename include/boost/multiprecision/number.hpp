@@ -40,8 +40,8 @@ class number
    typedef number<Backend, ExpressionTemplates> self_type;
 public:
    typedef Backend backend_type;
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR number() BOOST_NOEXCEPT_IF(noexcept(Backend())) {}
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR number(const number& e) BOOST_NOEXCEPT_IF(noexcept(Backend(std::declval<Backend const&>()))) : m_backend(e.m_backend){}
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR number() BOOST_MP_NOEXCEPT_IF(noexcept(Backend())) {}
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR number(const number& e) BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<Backend const&>()))) : m_backend(e.m_backend){}
    template <class V>
    BOOST_MP_FORCEINLINE number(const V& v, typename boost::enable_if_c<
             (boost::is_arithmetic<V>::value || is_same<std::string, V>::value || is_convertible<V, const char*>::value)
@@ -57,11 +57,11 @@ public:
             && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value
    >::type* = 0) 
 #ifndef BOOST_INTEL
-          BOOST_NOEXCEPT_IF(noexcept(Backend(std::declval<typename detail::canonical<V, Backend>::type const&>())))
+          BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<typename detail::canonical<V, Backend>::type const&>())))
 #endif
       : m_backend(canonical_value(v)) {}
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR number(const number& e, unsigned digits10) 
-      BOOST_NOEXCEPT_IF(noexcept(Backend(std::declval<Backend const&>(), std::declval<unsigned>())))
+      BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<Backend const&>(), std::declval<unsigned>())))
       : m_backend(e.m_backend, digits10){}
    template <class V>
    explicit BOOST_MP_FORCEINLINE number(const V& v, typename boost::enable_if_c<
@@ -69,7 +69,7 @@ public:
             && !detail::is_explicitly_convertible<typename detail::canonical<V, Backend>::type, Backend>::value
             && detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value
          >::type* = 0) 
-         BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend&>() = std::declval<typename detail::canonical<V, Backend>::type const&>()))
+         BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend&>() = std::declval<typename detail::canonical<V, Backend>::type const&>()))
    {
       m_backend = canonical_value(v);
    }
@@ -79,7 +79,7 @@ public:
             && (detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value
                 || !is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value)
          >::type* = 0)
-         BOOST_NOEXCEPT_IF(noexcept(Backend(std::declval<typename detail::canonical<V, Backend>::type const&>())))
+         BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<typename detail::canonical<V, Backend>::type const&>())))
       : m_backend(canonical_value(v)) {}
    /*
    //
@@ -95,12 +95,12 @@ public:
    */
    template<expression_template_option ET>
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR number(const number<Backend, ET>& val)
-      BOOST_NOEXCEPT_IF(noexcept(Backend(std::declval<Backend const&>()))) : m_backend(val.backend()) {}
+      BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<Backend const&>()))) : m_backend(val.backend()) {}
 
    template <class Other, expression_template_option ET>
    BOOST_MP_FORCEINLINE number(const number<Other, ET>& val,
          typename boost::enable_if_c<(boost::is_convertible<Other, Backend>::value && !detail::is_restricted_conversion<Other, Backend>::value)>::type* = 0)
-      BOOST_NOEXCEPT_IF(noexcept(Backend(std::declval<Other const&>())))
+      BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<Other const&>())))
       : m_backend(val.backend()) {}
 
    template <class Other, expression_template_option ET>
@@ -117,7 +117,7 @@ public:
    explicit BOOST_MP_FORCEINLINE number(const number<Other, ET>& val, typename boost::enable_if_c<
          (detail::is_explicitly_convertible<Other, Backend>::value
             && (detail::is_restricted_conversion<Other, Backend>::value || !boost::is_convertible<Other, Backend>::value))
-         >::type* = 0) BOOST_NOEXCEPT_IF(noexcept(Backend(std::declval<Other const&>())))
+         >::type* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<Other const&>())))
       : m_backend(val.backend()) {}
 
    template <class V>
@@ -149,7 +149,7 @@ public:
    }
 
    BOOST_MP_FORCEINLINE number& operator=(const number& e)
-      BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend&>() = std::declval<Backend const&>()))
+      BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend&>() = std::declval<Backend const&>()))
    {
       m_backend = e.m_backend;
       return *this;
@@ -158,14 +158,14 @@ public:
    template <class V>
    BOOST_MP_FORCEINLINE typename boost::enable_if<is_convertible<V, self_type>, number<Backend, ExpressionTemplates>& >::type
       operator=(const V& v)
-      BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend&>() = std::declval<const typename detail::canonical<V, Backend>::type&>()))
+      BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend&>() = std::declval<const typename detail::canonical<V, Backend>::type&>()))
    {
       m_backend = canonical_value(v);
       return *this;
    }
    template <class V>
    BOOST_MP_FORCEINLINE number<Backend, ExpressionTemplates>& assign(const V& v)
-      BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend&>() = std::declval<const typename detail::canonical<V, Backend>::type&>()))
+      BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend&>() = std::declval<const typename detail::canonical<V, Backend>::type&>()))
    {
       m_backend = canonical_value(v);
       return *this;
@@ -196,9 +196,9 @@ public:
 
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR number(number&& r)
-      BOOST_NOEXCEPT_IF(noexcept(Backend(std::declval<Backend>())))
+      BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<Backend>())))
       : m_backend(static_cast<Backend&&>(r.m_backend)){}
-   BOOST_MP_FORCEINLINE number& operator=(number&& r) BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend&>() = std::declval<Backend>()))
+   BOOST_MP_FORCEINLINE number& operator=(number&& r) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend&>() = std::declval<Backend>()))
    {
       m_backend = static_cast<Backend&&>(r.m_backend);
       return *this;
@@ -547,7 +547,7 @@ public:
    //
    // swap:
    //
-   BOOST_MP_FORCEINLINE void swap(self_type& other) BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend>().swap(std::declval<Backend&>())))
+   BOOST_MP_FORCEINLINE void swap(self_type& other) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend>().swap(std::declval<Backend&>())))
    {
       m_backend.swap(other.backend());
    }
@@ -664,7 +664,7 @@ public:
    // Comparison:
    //
    BOOST_MP_FORCEINLINE int compare(const number<Backend, ExpressionTemplates>& o)const
-      BOOST_NOEXCEPT_IF(noexcept(std::declval<Backend>().compare(std::declval<Backend>())))
+      BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend>().compare(std::declval<Backend>())))
    {
       return m_backend.compare(o.m_backend);
    }
@@ -1726,7 +1726,7 @@ inline std::istream& operator >> (std::istream& is, number<Backend, ExpressionTe
 
 template <class Backend, expression_template_option ExpressionTemplates>
 BOOST_MP_FORCEINLINE void swap(number<Backend, ExpressionTemplates>& a, number<Backend, ExpressionTemplates>& b) 
-   BOOST_NOEXCEPT_IF(noexcept(std::declval<number<Backend, ExpressionTemplates>&>() = std::declval<number<Backend, ExpressionTemplates>&>()))
+   BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<number<Backend, ExpressionTemplates>&>() = std::declval<number<Backend, ExpressionTemplates>&>()))
 {
    a.swap(b);
 }

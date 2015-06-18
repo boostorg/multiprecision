@@ -170,7 +170,7 @@ private:
 
 public:
    // Constructors
-   cpp_dec_float() BOOST_NOEXCEPT_IF(noexcept(array_type())) :
+   cpp_dec_float() BOOST_MP_NOEXCEPT_IF(noexcept(array_type())) :
       data(),
       exp (static_cast<ExponentType>(0)),
       neg (false),
@@ -215,7 +215,7 @@ public:
             from_unsigned_long_long(i);
       }
 
-   cpp_dec_float(const cpp_dec_float& f) BOOST_NOEXCEPT_IF(noexcept(array_type(std::declval<const array_type&>()))) :
+   cpp_dec_float(const cpp_dec_float& f) BOOST_MP_NOEXCEPT_IF(noexcept(array_type(std::declval<const array_type&>()))) :
       data (f.data),
       exp (f.exp),
       neg (f.neg),
@@ -379,7 +379,7 @@ public:
    }
 
    // Basic operations.
-   cpp_dec_float& operator=(const cpp_dec_float& v) BOOST_NOEXCEPT_IF(noexcept(std::declval<array_type&>() = std::declval<const array_type&>()))
+   cpp_dec_float& operator=(const cpp_dec_float& v) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<array_type&>() = std::declval<const array_type&>()))
    {
       data = v.data;
       exp = v.exp;
