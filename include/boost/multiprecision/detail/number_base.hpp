@@ -25,6 +25,12 @@
 #  define BOOST_MP_FORCEINLINE inline
 #endif
 
+#if defined(BOOST_GCC) && (BOOST_GCC <= 40700)
+#  define BOOST_MP_NOEXCEPT_IF(x)
+#else
+#  define BOOST_MP_NOEXCEPT_IF(x) BOOST_NOEXCEPT_IF(x)
+#endif
+
 #ifdef BOOST_MSVC
 #  pragma warning(push)
 #  pragma warning(disable:6326)

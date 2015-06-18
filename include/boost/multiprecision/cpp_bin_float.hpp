@@ -67,9 +67,9 @@ private:
    exponent_type m_exponent;
    bool m_sign;
 public:
-   cpp_bin_float() BOOST_NOEXCEPT_IF(noexcept(rep_type())) : m_data(), m_exponent(exponent_nan), m_sign(false) {}
+   cpp_bin_float() BOOST_MP_NOEXCEPT_IF(noexcept(rep_type())) : m_data(), m_exponent(exponent_nan), m_sign(false) {}
 
-   cpp_bin_float(const cpp_bin_float &o) BOOST_NOEXCEPT_IF(noexcept(rep_type(std::declval<const rep_type&>())))
+   cpp_bin_float(const cpp_bin_float &o) BOOST_MP_NOEXCEPT_IF(noexcept(rep_type(std::declval<const rep_type&>())))
       : m_data(o.m_data), m_exponent(o.m_exponent), m_sign(o.m_sign) {}
 
    template <unsigned D, digit_base_type B, class A, class E, E MinE, E MaxE>
@@ -104,7 +104,7 @@ public:
       this->assign_float(f);
    }
 
-   cpp_bin_float& operator=(const cpp_bin_float &o) BOOST_NOEXCEPT_IF(noexcept(std::declval<rep_type&>() = std::declval<const rep_type&>()))
+   cpp_bin_float& operator=(const cpp_bin_float &o) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<rep_type&>() = std::declval<const rep_type&>()))
    {
       m_data = o.m_data;
       m_exponent = o.m_exponent;
