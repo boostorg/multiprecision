@@ -679,7 +679,7 @@ public:
    static number_type lowest() { return (min)(); }
    BOOST_STATIC_CONSTEXPR int digits = INT_MAX;
    BOOST_STATIC_CONSTEXPR int digits10 = (INT_MAX / 1000) * 301L;
-   BOOST_STATIC_CONSTEXPR int max_digits10 = digits10 + 2;
+   BOOST_STATIC_CONSTEXPR int max_digits10 = digits10 + 3;
    BOOST_STATIC_CONSTEXPR bool is_signed = true;
    BOOST_STATIC_CONSTEXPR bool is_integer = true;
    BOOST_STATIC_CONSTEXPR bool is_exact = true;
