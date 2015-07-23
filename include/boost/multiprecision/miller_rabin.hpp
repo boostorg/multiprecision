@@ -104,7 +104,7 @@ inline bool is_small_prime(unsigned n)
 {
    static const unsigned char p[] = 
    {
-      3u, 5u, 7u, 11u, 13u, 17u, 19u, 23u, 29u, 31u, 
+      2u, 3u, 5u, 7u, 11u, 13u, 17u, 19u, 23u, 29u, 31u, 
       37u, 41u, 43u, 47u, 53u, 59u, 61u, 67u, 71u, 73u, 
       79u, 83u, 89u, 97u, 101u, 103u, 107u, 109u, 113u, 
       127u, 131u, 137u, 139u, 149u, 151u, 157u, 163u, 
@@ -144,7 +144,7 @@ typename enable_if_c<number_category<I>::value == number_kind_integer, bool>::ty
 #endif
    typedef I number_type;
 
-   if(bit_test(n, 0) == 0)
+   if(bit_test(n, 0) == 0 && n != 2)
       return false;  // n is even
    if(n <= 227)
       return detail::is_small_prime(detail::cast_to_unsigned(n));
