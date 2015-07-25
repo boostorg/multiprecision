@@ -54,8 +54,8 @@ BOOST_AUTO_TEST_CASE(test_numeric_limits_snips)
 // Example of portable way to get `std::numeric_limits<T>::max_digits10`.
 //[max_digits10_1
 
-/*`For example, to be portable, including older platforms for type `T` where `T` may be:
- `float`, `double`, `long double`, `cpp_dec_float_50`, `128-bit quad type` ...
+/*`For example, to be portable (including obselete platforms) for type `T` where `T` may be:
+ `float`, `double`, `long double`, `128-bit quad type`, `cpp_bin_float_50` ...
 */
 
   typedef float T;

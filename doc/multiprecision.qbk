@@ -1556,7 +1556,6 @@ are not lossy:
 
 * Any number type can be streamed to and from the C++ iostreams:
 
-
    cpp_dec_float_50 df = "3.14159265358979323846264338327950288419716939937510";
    // Now print at full precision:
    std::cout << std::setprecision(std::numeric_limits<cpp_dec_float_50>::max_digits10)
@@ -2252,7 +2251,8 @@ the number of decimal digits that ensure that a change of one least significant 
 produces a different decimal digits string.
 
 For the most common `double` floating-point type,`max_digits10` is `digits10+2`,
-but you should use C++11 `max_digits10` where possible (see [link boost_multiprecision.tut.limits.constants.max_digits10 below]).
+but you should use C++11 `max_digits10`
+where possible (see [link boost_multiprecision.tut.limits.constants.max_digits10 below]).
 
 [h4:max_digits10 max_digits10]
 
@@ -2319,12 +2319,20 @@ In C++, the equations for what Kahan (on page 4) describes as  'at least' and  '
   static_cast<int>(ceil(1 + significand_digits * log10Two)); // == max_digits10  - 'at most'.
 
 Unfortunately, these cannot be evaluated (at least by C++03) at [*compile-time].
-So the following equations are often used instead.
+So the following expression is often used instead.
 
-  max_digits10 = 2 + std::numeric_limits<T>::digits * 3010U/10000U; // For double and 64-bit long double.
-  max_digits10 = 3 + std::numeric_limits<T>::digits * 3010U/10000U; // For float,  80-bit long-double and __float128.
+  max_digits10 = 2 + std::numeric_limits<T>::digits * 3010U/10000U;
 
-The factor is ['log[sub 10](2) = 0.3010]
+  // == 2 + std::numeric_limits<T>::digits for double and 64-bit long double.
+  // == 3 + std::numeric_limits<T>::digits for float,  80-bit long-double and __float128.
+
+often the actual values are computed for the C limits macros:
+
+  #define FLT_MAXDIG10 (2+FLT_MANT_DIG * 3010U/10000U)  // 9
+  #define DBL_MAXDIG10 (2+ (DBL_MANT_DIG * 3010U)/10000U) // 17
+  #define LDBL_MAXDIG10 (2+ (LDBL_MANT_DIG * 3010U)/10000U) // 17 for MSVC, 18 for others.
+
+The factor 3010U/10000U is ['log[sub 10](2) = 0.3010]
 that can be evaluated at compile-time using only `short unsigned int`s to be a desirable `const` or `constexpr` (and usually also `static`).
 
 Boost macros allow this to be done portably, see
