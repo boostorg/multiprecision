@@ -1145,11 +1145,17 @@ namespace tools{
 
 template <>
 inline int digits<boost::multiprecision::mpfi_float>()
+#ifdef BOOST_MATH_NOEXCEPT
+   BOOST_NOEXCEPT
+#endif
 {
    return boost::multiprecision::backends::detail::get_default_precision();
 }
 template <>
 inline int digits<boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<0>, boost::multiprecision::et_off> >()
+#ifdef BOOST_MATH_NOEXCEPT
+   BOOST_NOEXCEPT
+#endif
 {
    return boost::multiprecision::backends::detail::get_default_precision();
 }
