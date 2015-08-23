@@ -193,7 +193,7 @@ public:
    template <class Float>
    typename boost::enable_if_c<
       (number_category<Float>::value == number_kind_floating_point) 
-         && !is_floating_point<Float>::value
+         && !boost::is_floating_point<Float>::value
          /*&& (std::numeric_limits<number<Float> >::radix == 2)*/, 
       cpp_bin_float&>::type assign_float(Float f)
    {
