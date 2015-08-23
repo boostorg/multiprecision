@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(test_numeric_limits_snips)
 #else
   #if(_MSC_VER <= 1600) 
    //  Wrong value for std::numeric_limits<float>::max_digits10.
-    std::cout.precision(max_digits10<T>();
+    std::cout.precision(max_digits10<T>());
   #else // Use the C++11 max_digits10.
      std::cout.precision(std::numeric_limits<T>::max_digits10);
   #endif
