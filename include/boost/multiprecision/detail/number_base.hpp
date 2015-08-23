@@ -135,6 +135,10 @@ struct bits_of
          : sizeof(T) * CHAR_BIT - (is_signed<T>::value ? 1 : 0);
 };
 
+#if defined(_GLIBCXX_USE_FLOAT128) && defined(BOOST_GCC) && !defined(__STRICT_ANSI__)
+template<> struct bits_of<__float128> { static const unsigned value = 113; };
+#endif
+
 template <int b>
 struct has_enough_bits
 {
@@ -177,7 +181,8 @@ struct canonical_imp<Val, Backend, mpl::int_<0> >
       typename Backend::signed_types,
       pred_type
    >::type iter_type;
-   typedef typename mpl::deref<iter_type>::type type;
+   typedef typename mpl::end<typename Backend::signed_types>::type end_type;
+   typedef typename mpl::eval_if<boost::is_same<iter_type, end_type>, mpl::identity<Val>, mpl::deref<iter_type> >::type type;
 };
 template <class Val, class Backend>
 struct canonical_imp<Val, Backend, mpl::int_<1> >
@@ -187,7 +192,8 @@ struct canonical_imp<Val, Backend, mpl::int_<1> >
       typename Backend::unsigned_types,
       pred_type
    >::type iter_type;
-   typedef typename mpl::deref<iter_type>::type type;
+   typedef typename mpl::end<typename Backend::unsigned_types>::type end_type;
+   typedef typename mpl::eval_if<boost::is_same<iter_type, end_type>, mpl::identity<Val>, mpl::deref<iter_type> >::type type;
 };
 template <class Val, class Backend>
 struct canonical_imp<Val, Backend, mpl::int_<2> >
@@ -197,7 +203,8 @@ struct canonical_imp<Val, Backend, mpl::int_<2> >
       typename Backend::float_types,
       pred_type
    >::type iter_type;
-   typedef typename mpl::deref<iter_type>::type type;
+   typedef typename mpl::end<typename Backend::float_types>::type end_type;
+   typedef typename mpl::eval_if<boost::is_same<iter_type, end_type>, mpl::identity<Val>, mpl::deref<iter_type> >::type type;
 };
 template <class Val, class Backend>
 struct canonical_imp<Val, Backend, mpl::int_<3> >
