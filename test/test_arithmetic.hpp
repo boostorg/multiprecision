@@ -742,6 +742,7 @@ void test_float_funcs(const boost::mpl::true_&)
    a = 0.5;
    a = tanh(a);
    BOOST_CHECK_CLOSE_FRACTION(a, Real(tanh(Real(0.5))), tol);
+   // fmod, need to check all the sign permutations:
    a = 4;
    b = 2;
    a = fmod(a, b);
@@ -749,6 +750,30 @@ void test_float_funcs(const boost::mpl::true_&)
    a = 4;
    b = fmod(a, b);
    BOOST_CHECK_CLOSE_FRACTION(b, Real(fmod(Real(4), Real(2))), tol);
+   a = 4;
+   b = 2;
+   a = fmod(-a, b);
+   BOOST_CHECK_CLOSE_FRACTION(a, Real(fmod(-Real(4), Real(2))), tol);
+   a = 4;
+   b = fmod(-a, b);
+   BOOST_CHECK_CLOSE_FRACTION(b, Real(-fmod(Real(4), Real(2))), tol);
+   a = 4;
+   b = 2;
+   a = fmod(a, -b);
+   BOOST_CHECK_CLOSE_FRACTION(a, Real(fmod(Real(4), -Real(2))), tol);
+   a = 4;
+   b = fmod(a, -b);
+   BOOST_CHECK_CLOSE_FRACTION(b, Real(fmod(Real(4), -Real(2))), tol);
+   a = 4;
+   b = 2;
+   a = fmod(-a, -b);
+   BOOST_CHECK_CLOSE_FRACTION(a, Real(fmod(-Real(4), -Real(2))), tol);
+   a = 4;
+   b = fmod(-a, -b);
+   BOOST_CHECK_CLOSE_FRACTION(b, Real(fmod(-Real(4), -Real(2))), tol);
+
+
+
    b = 2;
    a = atan2(a, b);
    BOOST_CHECK_CLOSE_FRACTION(a, Real(atan2(Real(4), Real(2))), tol);
