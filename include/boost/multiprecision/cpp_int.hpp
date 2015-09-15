@@ -1355,43 +1355,91 @@ private:
             n -= 1;
          }
       }
+      //
+      // Exception guarentee: create the result in stack variable "result"
+      // then do a swap at the end.  In the event of a throw, *this will
+      // be left unchanged.
+      //
+      cpp_int_backend result;
       if(n)
       {
-         if(radix == 8 || radix == 16)
+         if(radix == 16)
          {
-            unsigned shift = radix == 8 ? 3 : 4;
-            unsigned block_count = base_type::limb_bits / shift;
-            unsigned block_shift = shift * block_count;
-            limb_type val, block;
+            while(*s == '0') ++s;
+            std::size_t bitcount = 4 * std::strlen(s);
+            limb_type val;
+            std::size_t limb, shift;
+            bitcount -= 4;
+            std::size_t newsize = bitcount / (sizeof(limb_type) * CHAR_BIT) + 1;
+            result.resize(static_cast<unsigned>(newsize), static_cast<unsigned>(newsize));  // will throw if this is a checked integer that cannot be resized
+            std::memset(result.limbs(), 0, result.size() * sizeof(limb_type));
             while(*s)
             {
-               block = 0;
-               for(unsigned i = 0; (i < block_count); ++i)
+               if(*s >= '0' && *s <= '9')
+                  val = *s - '0';
+               else if(*s >= 'a' && *s <= 'f')
+                  val = 10 + *s - 'a';
+               else if(*s >= 'A' && *s <= 'F')
+                  val = 10 + *s - 'A';
+               else
                {
-                  if(*s >= '0' && *s <= '9')
-                     val = *s - '0';
-                  else if(*s >= 'a' && *s <= 'f')
-                     val = 10 + *s - 'a';
-                  else if(*s >= 'A' && *s <= 'F')
-                     val = 10 + *s - 'A';
-                  else
-                     val = base_type::max_limb_value;
-                  if(val >= radix)
+                  BOOST_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
+               }
+               limb = bitcount / (sizeof(limb_type) * CHAR_BIT);
+               shift = bitcount % (sizeof(limb_type) * CHAR_BIT);
+               val <<= shift;
+               if(result.size() > limb)
+               {
+                  result.limbs()[limb] |= val;
+               }
+               ++s;
+               bitcount -= 4;
+            }
+            result.normalize();
+         }
+         else if(radix == 8)
+         {
+            while(*s == '0') ++s;
+            std::size_t bitcount = 3 * std::strlen(s);
+            limb_type val;
+            std::size_t limb, shift;
+            bitcount -= 3;
+            std::size_t newsize = bitcount / (sizeof(limb_type) * CHAR_BIT) + 1;
+            result.resize(static_cast<unsigned>(newsize), static_cast<unsigned>(newsize));  // will throw if this is a checked integer that cannot be resized
+            std::memset(result.limbs(), 0, result.size() * sizeof(limb_type));
+            while(*s)
+            {
+               if(*s >= '0' && *s <= '7')
+                  val = *s - '0';
+               else
+               {
+                  BOOST_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
+               }
+               limb = bitcount / (sizeof(limb_type) * CHAR_BIT);
+               shift = bitcount % (sizeof(limb_type) * CHAR_BIT);
+               if(result.size() > limb)
+               {
+                  result.limbs()[limb] |= (val << shift);
+                  if(shift > sizeof(limb_type) * CHAR_BIT - 3)
                   {
-                     BOOST_THROW_EXCEPTION(std::runtime_error("Unexpected content found while parsing character string."));
-                  }
-                  block <<= shift;
-                  block |= val;
-                  if(!*++s)
-                  {
-                     // final shift is different:
-                     block_shift = (i + 1) * shift;
-                     break;
+                     // Deal with the bits in val that overflow into the next limb:
+                     val >>= (sizeof(limb_type) * CHAR_BIT - shift);
+                     if(val)
+                     {
+                        // If this is the most-significant-limb, we may need to allocate an extra one for the overflow:
+                        if(limb + 1 == newsize)
+                           result.resize(static_cast<unsigned>(newsize + 1), static_cast<unsigned>(newsize + 1));
+                        if(result.size() > limb + 1)
+                        {
+                           result.limbs()[limb + 1] |= val;
+                        }
+                     }
                   }
                }
-               eval_left_shift(*this, block_shift);
-               this->limbs()[0] |= block;
+               ++s;
+               bitcount -= 3;
             }
+            result.normalize();
          }
          else
          {
@@ -1416,13 +1464,14 @@ private:
                      break;
                   }
                }
-               eval_multiply(*this, block_mult);
-               eval_add(*this, block);
+               eval_multiply(result, block_mult);
+               eval_add(result, block);
             }
          }
       }
       if(isneg)
-         this->negate();
+         result.negate();
+      result.swap(*this);
    }
 public:
    cpp_int_backend& operator = (const char* s)
