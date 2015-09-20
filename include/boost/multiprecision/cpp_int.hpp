@@ -1370,7 +1370,10 @@ private:
             std::size_t bitcount = 4 * std::strlen(s);
             limb_type val;
             std::size_t limb, shift;
-            bitcount -= 4;
+            if(bitcount > 4)
+               bitcount -= 4;
+            else
+               bitcount = 0;
             std::size_t newsize = bitcount / (sizeof(limb_type) * CHAR_BIT) + 1;
             result.resize(static_cast<unsigned>(newsize), static_cast<unsigned>(newsize));  // will throw if this is a checked integer that cannot be resized
             std::memset(result.limbs(), 0, result.size() * sizeof(limb_type));
@@ -1404,7 +1407,10 @@ private:
             std::size_t bitcount = 3 * std::strlen(s);
             limb_type val;
             std::size_t limb, shift;
-            bitcount -= 3;
+            if(bitcount > 3)
+               bitcount -= 3;
+            else
+               bitcount = 0;
             std::size_t newsize = bitcount / (sizeof(limb_type) * CHAR_BIT) + 1;
             result.resize(static_cast<unsigned>(newsize), static_cast<unsigned>(newsize));  // will throw if this is a checked integer that cannot be resized
             std::memset(result.limbs(), 0, result.size() * sizeof(limb_type));
