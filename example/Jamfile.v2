@@ -69,6 +69,8 @@ else
 }
 
 run cpp_int_snips.cpp ;
+run cpp_int_import_export.cpp ;
+run cpp_bin_float_import_export.cpp ;
 
 run cpp_dec_float_snips.cpp ;
 

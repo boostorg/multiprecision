@@ -16,6 +16,7 @@
 #include <boost/type_traits/is_floating_point.hpp>
 #include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
 #include <boost/multiprecision/rational_adaptor.hpp>
+#include <boost/multiprecision/traits/is_byte_container.hpp>
 #include <boost/detail/endian.hpp>
 #include <boost/integer/static_min_max.hpp>
 #include <boost/type_traits/common_type.hpp>
@@ -38,7 +39,7 @@ namespace backends{
 #pragma warning(disable:4127 4351 4293 4996 4307 4702 6285)
 #endif
 
-template <unsigned MinBits = 0, unsigned MaxBits = 0, cpp_integer_type SignType = signed_magnitude, cpp_int_check_type Checked = unchecked, class Allocator = typename mpl::if_c<MinBits && (MinBits == MaxBits), void, std::allocator<limb_type> >::type >
+template <unsigned MinBits = 0, unsigned MaxBits = 0, boost::multiprecision::cpp_integer_type SignType = signed_magnitude, cpp_int_check_type Checked = unchecked, class Allocator = typename mpl::if_c<MinBits && (MinBits == MaxBits), void, std::allocator<limb_type> >::type >
 struct cpp_int_backend;
 
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator, bool trivial = false>
@@ -944,7 +945,7 @@ public:
       if(b)
          negate();
    }
-   BOOST_MP_FORCEINLINE void resize(unsigned new_size, unsigned min_size)
+   BOOST_MP_FORCEINLINE void resize(unsigned, unsigned min_size)
    {
       detail::verify_new_size(2, min_size, checked_type());
    }
@@ -1270,7 +1271,7 @@ private:
    }
 public:
    template <class Arithmetic>
-   BOOST_MP_FORCEINLINE cpp_int_backend& operator = (Arithmetic val) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_backend>().do_assign_arithmetic(std::declval<Arithmetic>(), trivial_tag())))
+   BOOST_MP_FORCEINLINE typename boost::enable_if_c<!boost::multiprecision::detail::is_byte_container<Arithmetic>::value, cpp_int_backend&>::type operator = (Arithmetic val) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_backend>().do_assign_arithmetic(std::declval<Arithmetic>(), trivial_tag())))
    {
       do_assign_arithmetic(val, trivial_tag());
       return *this;
@@ -1687,6 +1688,67 @@ public:
    {
       return do_get_string(f, trivial_tag());
    }
+private:
+   template <class Container>
+   void construct_from_container(const Container& c, const mpl::false_&)
+   {
+      //
+      // We assume that c is a sequence of (unsigned) bytes with the most significant byte first:
+      //
+      unsigned newsize = static_cast<unsigned>(c.size() / sizeof(limb_type));
+      if(c.size() % sizeof(limb_type))
+      {
+         ++newsize;
+      }
+      if(newsize)
+      {
+         this->resize(newsize, newsize);   // May throw
+         std::memset(this->limbs(), 0, this->size());
+         typename Container::const_iterator i(c.begin()), j(c.end());
+         unsigned byte_location = static_cast<unsigned>(c.size() - 1);
+         while(i != j)
+         {
+            unsigned limb = byte_location / sizeof(limb_type);
+            unsigned shift = (byte_location % sizeof(limb_type))  * CHAR_BIT;
+            if(this->size() > limb)
+               this->limbs()[limb] |= static_cast<limb_type>(static_cast<unsigned char>(*i)) << shift;
+            ++i;
+            --byte_location;
+         }
+      }
+   }
+   template <class Container>
+   void construct_from_container(const Container& c, const mpl::true_&)
+   {
+      //
+      // We assume that c is a sequence of (unsigned) bytes with the most significant byte first:
+      //
+      typedef typename base_type::local_limb_type local_limb_type;
+      *this->limbs() = 0;
+      if(c.size())
+      {
+         typename Container::const_iterator i(c.begin()), j(c.end());
+         unsigned byte_location = static_cast<unsigned>(c.size() - 1);
+         while(i != j)
+         {
+            unsigned limb = byte_location / sizeof(local_limb_type);
+            unsigned shift = (byte_location % sizeof(local_limb_type)) * CHAR_BIT;
+            if(limb == 0)
+               this->limbs()[0] |= static_cast<limb_type>(static_cast<unsigned char>(*i)) << shift;
+            ++i;
+            --byte_location;
+         }
+      }
+   }
+public:
+   template <class Container>
+   cpp_int_backend(const Container& c, typename boost::enable_if_c<boost::multiprecision::detail::is_byte_container<Container>::value>::type const* = 0)
+   {
+      //
+      // We assume that c is a sequence of (unsigned) bytes with the most significant byte first:
+      //
+      construct_from_container(c, trivial_tag());
+   }
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
    int compare_imp(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o, const mpl::false_&, const mpl::false_&)const BOOST_NOEXCEPT
    {
@@ -1860,5 +1922,6 @@ struct is_explicitly_convertible<cpp_int_backend<MinBits, MaxBits, SignType, Che
 #include <boost/multiprecision/cpp_int/literals.hpp>
 #endif
 #include <boost/multiprecision/cpp_int/serialize.hpp>
+#include <boost/multiprecision/cpp_int/import_export.hpp>
 
 #endif

@@ -569,7 +569,7 @@
 <span class="preprocessor">#else</span>
   <span class="preprocessor">#if</span><span class="special">(</span><span class="identifier">_MSC_VER</span> <span class="special">&lt;=</span> <span class="number">1600</span><span class="special">)</span>
    <span class="comment">//  Wrong value for std::numeric_limits&lt;float&gt;::max_digits10.</span>
-    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span><span class="special">.</span><span class="identifier">precision</span><span class="special">(</span><span class="identifier">max_digits10</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;();</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span><span class="special">.</span><span class="identifier">precision</span><span class="special">(</span><span class="identifier">max_digits10</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;());</span>
   <span class="preprocessor">#else</span> <span class="comment">// Use the C++11 max_digits10.</span>
      <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span><span class="special">.</span><span class="identifier">precision</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">max_digits10</span><span class="special">);</span>
   <span class="preprocessor">#endif</span>
