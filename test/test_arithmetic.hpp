@@ -567,7 +567,7 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    BOOST_CHECK_EQUAL(c ,  a / b);
    BOOST_CHECK_EQUAL(r ,  a % b);
    BOOST_CHECK_EQUAL(integer_modulus(a, 57) ,  a % 57);
-   for(unsigned i = 0; i < 20; ++i)
+   for(i = 0; i < 20; ++i)
    {
       if(std::numeric_limits<Real>::is_specialized && (!std::numeric_limits<Real>::is_bounded || ((int)i * 17 < std::numeric_limits<Real>::digits)))
       {
@@ -872,9 +872,8 @@ void test_float_ops(const boost::mpl::int_<boost::multiprecision::number_kind_fl
    {
       BOOST_CHECK_EQUAL(scalbn(Real(2), 5), 2 * pow(double(std::numeric_limits<Real>::radix), 5));
       BOOST_CHECK_EQUAL(scalbn(Real(2), -5), Real(2) / pow(double(std::numeric_limits<Real>::radix), 5));
-      Real v(512);
-      int exponent;
-      Real r;
+      v = 512;
+      exponent;
       exponent = ilogb(v);
       r = scalbn(v, -exponent);
       BOOST_CHECK(r >= 1);
