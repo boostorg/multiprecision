@@ -494,6 +494,16 @@ struct tester
       test_type d = ~(a ^ ~b);
       BOOST_CHECK_EQUAL(c, d);
 #endif
+#if defined(TEST2) || defined(TEST3)
+      // https://svn.boost.org/trac/boost/ticket/11648
+      a = (std::numeric_limits<test_type>::max)() - 69;
+      b = a / 139;
+      ++b;
+      c = a / b;
+      test_type r = a % b;
+      BOOST_CHECK(r < b);
+      BOOST_CHECK_EQUAL(a - c * b, r);
+#endif
    }
 
    void test()
