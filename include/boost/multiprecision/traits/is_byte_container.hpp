@@ -1,6 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright Vicente J. Botet Escriba 2009-2011
-//  Copyright 2012 John Maddock. Distributed under the Boost
+//  Copyright 2015 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
