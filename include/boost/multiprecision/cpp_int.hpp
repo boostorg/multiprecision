@@ -42,6 +42,17 @@ namespace backends{
 template <unsigned MinBits = 0, unsigned MaxBits = 0, boost::multiprecision::cpp_integer_type SignType = signed_magnitude, cpp_int_check_type Checked = unchecked, class Allocator = typename mpl::if_c<MinBits && (MinBits == MaxBits), void, std::allocator<limb_type> >::type >
 struct cpp_int_backend;
 
+} // namespace backends
+
+namespace detail {
+
+   template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator>
+   struct is_byte_container<backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> > : public boost::false_type {};
+
+} // namespace detail
+
+namespace backends{
+
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator, bool trivial = false>
 struct cpp_int_base;
 //
