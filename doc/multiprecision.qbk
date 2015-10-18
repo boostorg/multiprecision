@@ -1612,59 +1612,32 @@ backends converting constructor is also explicit.
 
 [section:random Generating Random Numbers]
 
-Random numbers are generated in conjunction with Boost.Random.
+Random numbers are generated in conjunction with Boost.Random.  However, since Boost.Random is unaware
+of [@http://en.wikipedia.org/wiki/Arbitrary-precision_arithmetic arbitrary precision] numbers, it's necessary to include the header:
 
-There is a single generator that supports generating random integers with large bit counts:
-[@http://www.boost.org/doc/html/boost/random/independent_bits_engine.html `independent_bits_engine`].
-This type can be used with either ['unbounded] integer types, or with ['bounded] (ie fixed precision) unsigned integers:
+   #include <boost/multiprecision/random.hpp>
+
+In order to act as a bridge between the two libraries.
+
+Integers with /N/ random bits are generated using `independent_bits_engine`:
 
 [random_eg1]
 
-Program output is:
-
-[random_eg1_out]
-
-In addition, the generator adaptors [@http://www.boost.org/doc/html/boost/random/discard_block_engine.html `discard_block`],
-[@http://www.boost.org/doc/html/boost/random/xor_combine_engine.html `xor_combine_engine`] and
-[@http://www.boost.org/doc/html/boost/random/discrete_distribution.html `discrete_distribution`] can be used
-with multiprecision types.  Note that if you seed an `independent_bits_engine`, then you are actually seeding
-the underlying generator, and should therefore provide a sequence of unsigned 32-bit values as the seed.
-
-Alternatively we can generate integers in a given range using
-[@http://www.boost.org/doc/html/boost/random/uniform_int_distribution.html `uniform_int_distribution`], this will
+Alternatively we can generate integers in a given range using `uniform_int_distribution`, this will
 invoke the underlying engine multiple times to build up the required number of bits in the result:
 
 [random_eg2]
 
-[random_eg2_out]
-
-It is also possible to use [@http://www.boost.org/doc/html/boost/random/uniform_int_distribution.html `uniform_int_distribution`]
-with a multiprecision generator such as [@http://www.boost.org/doc/html/boost/random/independent_bits_engine.html `independent_bits_engine`].
-Or to use [@http://www.boost.org/doc/html/boost/random/uniform_smallint.html `uniform_smallint`] or
-[@http://www.boost.org/doc/html/boost/random/random_number_generator.html `random_number_generator`] with multiprecision types.
-
-floating-point values in \[0,1) are most easily generated using [@http://www.boost.org/doc/html/boost/random/generate_canonical.html `generate_canonical`],
-note that `generate_canonical` will call the generator multiple times to produce the requested number of bits, for example we can use
-it with a regular generator like so:
+Floating point values in \[0,1) are generated using `uniform_01`, the trick here is to ensure
+that the underlying generator produces as many random bits as there are digits in the floating
+point type.  As above `independent_bits_engine` can be used for this purpose, note that we also have to
+convert decimal digits (in the floating point type) to bits (in the random number generator):
 
 [random_eg3]
 
-[random_eg3_out]
-
-Note however, the distributions do not invoke the generator multiple times to fill up the mantissa of a multiprecision floating-point type
-with random bits.  For these therefore, we should probably use a multiprecision generator (ie `independent_bits_engine`) in combination
-with the distribution:
+Finally, we can modify the above example to produce numbers distributed according to some distribution:
 
 [random_eg4]
-
-[random_eg4_out]
-
-And finally, it is possible to use the floating-point generators [@http://www.boost.org/doc/html/boost/random/lagged_fibonacci_01_engine.html `lagged_fibonacci_01_engine`]
-and [@http://www.boost.org/doc/html/boost/random/subtract_with_idp144360752.html `subtract_with_carry_01_engine`] directly with multiprecision floating-point types.
-It's worth noting however, that there is a distinct lack of literature on generating high bit-count random numbers, and therefore a lack of "known good" parameters to
-use with these generators in this situation.  For this reason, these should probably be used for research purposes only:
-
-[random_eg5]
 
 [endsect]
 
@@ -5076,7 +5049,6 @@ Windows Vista machine.
 
 [h4 Multiprecision-2.2.5 (Boost-1.59)]
 
-* Depricated boost/multiprecision/random.hpp as it's no longer needed, updated random examples to match.
 * Fixed a bug in cpp_int's right shift operator when shifting negative values - semantics now gives the
 same values as shifting 2's compliment integers, though not the same bit pattern.
 * Fixed support for GCC-4.6.4 in C++0x mode by disabling conditional noexcept suppoprt for that compiler
