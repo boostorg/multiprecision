@@ -33,6 +33,10 @@
       </h5>
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
 <li class="listitem">
+            Depricated boost/multiprecision/random.hpp as it's no longer needed,
+            updated random examples to match.
+          </li>
+<li class="listitem">
             Fixed a bug in cpp_int's right shift operator when shifting negative
             values - semantics now gives the same values as shifting 2's compliment
             integers, though not the same bit pattern.
@@ -42,15 +46,7 @@
             suppoprt for that compiler see <a href="https://svn.boost.org/trac/boost/ticket/11402" target="_top">#11402</a>.
           </li>
 <li class="listitem">
-            Fixed issue with GCC-4.6.x not handling <code class="computeroutput"><span class="keyword">noexcept</span></code>
-            fully enough for this library to use.
-          </li>
-<li class="listitem">
             Suppressed numerous compiler warnings.
-          </li>
-<li class="listitem">
-            Fixed some bugs in cpp_int's bitwise operators when one or both numbers
-            are signed.
           </li>
 </ul></div>
 <h5>
@@ -101,7 +97,7 @@
       </h5>
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
 <li class="listitem">
-            Change floating point to rational conversions to be implicit, see <a href="https://svn.boost.org/trac/boost/ticket/10082" target="_top">10082</a>.
+            Change floating-point to rational conversions to be implicit, see <a href="https://svn.boost.org/trac/boost/ticket/10082" target="_top">10082</a>.
           </li>
 <li class="listitem">
             Fix definition of checked_cpp_rational typedef.
@@ -126,7 +122,7 @@
           </li>
 <li class="listitem">
             Added new <a class="link" href="../tut/floats/cpp_bin_float.html" title="cpp_bin_float">cpp_bin_float</a>
-            backend for binary floating point.
+            backend for binary floating-point.
           </li>
 <li class="listitem">
             Added MSVC-specific #include for compiler intrinsics, see <a href="https://svn.boost.org/trac/boost/ticket/9336" target="_top">9336</a>.
@@ -316,14 +312,14 @@
             to Christopher's code, and adds support for other backends.
           </li>
 <li class="listitem">
-            2011, Christopher Kormanyos publishes the decimal floating point code
+            2011, Christopher Kormanyos publishes the decimal floating-point code
             under the Boost Software Licence. The code is published as: <a href="http://doi.acm.org/10.1145/1916461.1916469" target="_top">"Algorithm
             910: A Portable C++ Multiple-Precision System for Special-Function Calculations"</a>,
             in ACM TOMS, {VOL 37, ISSUE 4, (February 2011)} (C) ACM, 2011.
           </li>
 <li class="listitem">
             2002-2011, Christopher Kormanyos develops the all C++ decimal arithmetic
-            floating point code.
+            floating-point code.
           </li>
 </ul></div>
 </div>

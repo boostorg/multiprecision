@@ -615,6 +615,7 @@ build-project ../example ;
 
 
 run test_cpp_int_conv.cpp ;
+run test_cpp_int_import_export.cpp ;
 run test_native_integer.cpp ;
 
 run test_mixed_cpp_int.cpp ;

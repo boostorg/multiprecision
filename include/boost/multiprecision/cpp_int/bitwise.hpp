@@ -8,6 +8,11 @@
 #ifndef BOOST_MP_CPP_INT_BIT_HPP
 #define BOOST_MP_CPP_INT_BIT_HPP
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4319)
+#endif
+
 namespace boost{ namespace multiprecision{ namespace backends{
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
@@ -652,5 +657,9 @@ inline typename enable_if_c<
 }
 
 }}} // namespaces
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 #endif

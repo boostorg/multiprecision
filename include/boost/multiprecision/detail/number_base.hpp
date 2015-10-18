@@ -135,6 +135,10 @@ struct bits_of
          : sizeof(T) * CHAR_BIT - (is_signed<T>::value ? 1 : 0);
 };
 
+#if defined(_GLIBCXX_USE_FLOAT128) && defined(BOOST_GCC) && !defined(__STRICT_ANSI__)
+template<> struct bits_of<__float128> { static const unsigned value = 113; };
+#endif
+
 template <int b>
 struct has_enough_bits
 {
@@ -177,7 +181,8 @@ struct canonical_imp<Val, Backend, mpl::int_<0> >
       typename Backend::signed_types,
       pred_type
    >::type iter_type;
-   typedef typename mpl::deref<iter_type>::type type;
+   typedef typename mpl::end<typename Backend::signed_types>::type end_type;
+   typedef typename mpl::eval_if<boost::is_same<iter_type, end_type>, mpl::identity<Val>, mpl::deref<iter_type> >::type type;
 };
 template <class Val, class Backend>
 struct canonical_imp<Val, Backend, mpl::int_<1> >
@@ -187,7 +192,8 @@ struct canonical_imp<Val, Backend, mpl::int_<1> >
       typename Backend::unsigned_types,
       pred_type
    >::type iter_type;
-   typedef typename mpl::deref<iter_type>::type type;
+   typedef typename mpl::end<typename Backend::unsigned_types>::type end_type;
+   typedef typename mpl::eval_if<boost::is_same<iter_type, end_type>, mpl::identity<Val>, mpl::deref<iter_type> >::type type;
 };
 template <class Val, class Backend>
 struct canonical_imp<Val, Backend, mpl::int_<2> >
@@ -197,7 +203,8 @@ struct canonical_imp<Val, Backend, mpl::int_<2> >
       typename Backend::float_types,
       pred_type
    >::type iter_type;
-   typedef typename mpl::deref<iter_type>::type type;
+   typedef typename mpl::end<typename Backend::float_types>::type end_type;
+   typedef typename mpl::eval_if<boost::is_same<iter_type, end_type>, mpl::identity<Val>, mpl::deref<iter_type> >::type type;
 };
 template <class Val, class Backend>
 struct canonical_imp<Val, Backend, mpl::int_<3> >
@@ -372,11 +379,36 @@ struct expression<tag, Arg1, void, void, void>
 
    static const unsigned depth = left_type::depth + 1;
 #ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-   explicit operator bool()const
+#  if (defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ < 7)) || (defined(BOOST_INTEL) && (BOOST_INTEL <= 1500))
+   //
+   // Horrible workaround for gcc-4.6.x which always prefers the template
+   // operator bool() rather than the non-template operator when converting to
+   // an arithmetic type:
+   //
+   template <class T, typename boost::enable_if<is_same<T, bool>, int>::type = 0>
+   explicit operator T ()const
    {
       result_type r(*this);
       return static_cast<bool>(r);
    }
+   template <class T, typename boost::disable_if_c<is_same<T, bool>::value || is_void<T>::value || is_number<T>::value, int>::type = 0>
+   explicit operator T ()const
+   {
+      return static_cast<T>(static_cast<result_type>(*this));
+   }
+#  else
+   template <class T, typename boost::disable_if_c<is_number<T>::value, int>::type = 0>
+   explicit operator T()const
+   {
+      return static_cast<T>(static_cast<result_type>(*this));
+   }
+   BOOST_MP_FORCEINLINE explicit operator bool()const
+   {
+      result_type r(*this);
+      return static_cast<bool>(r);
+   }
+   explicit operator void()const {}
+#  endif
 #else
    operator unmentionable_type()const
    {
@@ -384,6 +416,13 @@ struct expression<tag, Arg1, void, void, void>
       return r ? &unmentionable::proc : 0;
    }
 #endif
+
+   template <class T>
+   T convert_to()
+   {
+      result_type r(*this);
+      return r.template convert_to<T>();
+   }
 
 private:
    typename expression_storage<Arg1>::type arg;
@@ -404,16 +443,49 @@ struct expression<terminal, Arg1, void, void, void>
    static const unsigned depth = 0;
 
 #ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-   explicit operator bool()const
+#  if (defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ < 7)) || (defined(BOOST_INTEL) && (BOOST_INTEL <= 1500))
+   //
+   // Horrible workaround for gcc-4.6.x which always prefers the template
+   // operator bool() rather than the non-template operator when converting to
+   // an arithmetic type:
+   //
+   template <class T, typename boost::enable_if<is_same<T, bool>, int>::type = 0>
+   explicit operator T ()const
    {
-      return static_cast<bool>(arg);
+      result_type r(*this);
+      return static_cast<bool>(r);
+}
+   template <class T, typename boost::disable_if_c<is_same<T, bool>::value || is_void<T>::value || is_number<T>::value, int>::type = 0>
+   explicit operator T ()const
+   {
+      return static_cast<T>(static_cast<result_type>(*this));
    }
+#  else
+   template <class T, typename boost::disable_if_c<is_number<T>::value, int>::type = 0>
+   explicit operator T()const
+   {
+      return static_cast<T>(static_cast<result_type>(*this));
+   }
+   BOOST_MP_FORCEINLINE explicit operator bool()const
+   {
+      result_type r(*this);
+      return static_cast<bool>(r);
+   }
+   explicit operator void()const {}
+#  endif
 #else
    operator unmentionable_type()const
    {
       return arg ? &unmentionable::proc : 0;
    }
 #endif
+
+   template <class T>
+   T convert_to()
+   {
+      result_type r(*this);
+      return r.template convert_to<T>();
+   }
 
 private:
    typename expression_storage<Arg1>::type arg;
@@ -439,11 +511,36 @@ struct expression<tag, Arg1, Arg2, void, void>
    const Arg2& right_ref()const BOOST_NOEXCEPT { return arg2; }
 
 #ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-   explicit operator bool()const
+#  if (defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ < 7)) || (defined(BOOST_INTEL) && (BOOST_INTEL <= 1500))
+      //
+      // Horrible workaround for gcc-4.6.x which always prefers the template
+      // operator bool() rather than the non-template operator when converting to
+      // an arithmetic type:
+      //
+      template <class T, typename boost::enable_if<is_same<T, bool>, int>::type = 0>
+   explicit operator T ()const
+   {
+      result_type r(*this);
+      return static_cast<bool>(r);
+}
+   template <class T, typename boost::disable_if_c<is_same<T, bool>::value || is_void<T>::value || is_number<T>::value, int>::type = 0>
+   explicit operator T ()const
+   {
+      return static_cast<T>(static_cast<result_type>(*this));
+   }
+#  else
+      template <class T, typename boost::disable_if_c<is_number<T>::value, int>::type = 0>
+   explicit operator T()const
+   {
+      return static_cast<T>(static_cast<result_type>(*this));
+   }
+   BOOST_MP_FORCEINLINE explicit operator bool()const
    {
       result_type r(*this);
       return static_cast<bool>(r);
    }
+   explicit operator void()const {}
+#  endif
 #else
    operator unmentionable_type()const
    {
@@ -451,6 +548,13 @@ struct expression<tag, Arg1, Arg2, void, void>
       return r ? &unmentionable::proc : 0;
    }
 #endif
+   template <class T>
+   T convert_to()
+   {
+      result_type r(*this);
+      return r.template convert_to<T>();
+   }
+
    static const unsigned left_depth = left_type::depth + 1;
    static const unsigned right_depth = right_type::depth + 1;
    static const unsigned depth = left_depth > right_depth ? left_depth : right_depth;
@@ -486,11 +590,36 @@ struct expression<tag, Arg1, Arg2, Arg3, void>
    const Arg3& right_ref()const BOOST_NOEXCEPT { return arg3; }
 
 #ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-   explicit operator bool()const
+#  if (defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ < 7)) || (defined(BOOST_INTEL) && (BOOST_INTEL <= 1500))
+      //
+      // Horrible workaround for gcc-4.6.x which always prefers the template
+      // operator bool() rather than the non-template operator when converting to
+      // an arithmetic type:
+      //
+      template <class T, typename boost::enable_if<is_same<T, bool>, int>::type = 0>
+   explicit operator T ()const
+   {
+      result_type r(*this);
+      return static_cast<bool>(r);
+}
+   template <class T, typename boost::disable_if_c<is_same<T, bool>::value || is_void<T>::value || is_number<T>::value, int>::type = 0>
+   explicit operator T ()const
+   {
+      return static_cast<T>(static_cast<result_type>(*this));
+   }
+#  else
+      template <class T, typename boost::disable_if_c<is_number<T>::value, int>::type = 0>
+   explicit operator T()const
+   {
+      return static_cast<T>(static_cast<result_type>(*this));
+   }
+   BOOST_MP_FORCEINLINE explicit operator bool()const
    {
       result_type r(*this);
       return static_cast<bool>(r);
    }
+   explicit operator void()const {}
+#  endif
 #else
    operator unmentionable_type()const
    {
@@ -498,6 +627,13 @@ struct expression<tag, Arg1, Arg2, Arg3, void>
       return r ? &unmentionable::proc : 0;
    }
 #endif
+   template <class T>
+   T convert_to()
+   {
+      result_type r(*this);
+      return r.template convert_to<T>();
+   }
+
    static const unsigned left_depth = left_type::depth + 1;
    static const unsigned middle_depth = middle_type::depth + 1;
    static const unsigned right_depth = right_type::depth + 1;
@@ -542,11 +678,36 @@ struct expression
    const Arg4& right_ref()const BOOST_NOEXCEPT { return arg4; }
 
 #ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-   explicit operator bool()const
+#  if (defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ < 7)) || (defined(BOOST_INTEL) && (BOOST_INTEL <= 1500))
+      //
+      // Horrible workaround for gcc-4.6.x which always prefers the template
+      // operator bool() rather than the non-template operator when converting to
+      // an arithmetic type:
+      //
+      template <class T, typename boost::enable_if<is_same<T, bool>, int>::type = 0>
+   explicit operator T ()const
+   {
+      result_type r(*this);
+      return static_cast<bool>(r);
+}
+   template <class T, typename boost::disable_if_c<is_same<T, bool>::value || is_void<T>::value || is_number<T>::value, int>::type = 0>
+   explicit operator T ()const
+   {
+      return static_cast<T>(static_cast<result_type>(*this));
+   }
+#  else
+   template <class T, typename boost::disable_if_c<is_number<T>::value, int>::type = 0>
+   explicit operator T()const
+   {
+      return static_cast<T>(static_cast<result_type>(*this));
+   }
+   BOOST_MP_FORCEINLINE explicit operator bool()const
    {
       result_type r(*this);
       return static_cast<bool>(r);
    }
+   explicit operator void()const {}
+#  endif
 #else
    operator unmentionable_type()const
    {
@@ -554,6 +715,13 @@ struct expression
       return r ? &unmentionable::proc : 0;
    }
 #endif
+   template <class T>
+   T convert_to()
+   {
+      result_type r(*this);
+      return r.template convert_to<T>();
+   }
+
    static const unsigned left_depth = left_type::depth + 1;
    static const unsigned left_middle_depth = left_middle_type::depth + 1;
    static const unsigned right_middle_depth = right_middle_type::depth + 1;

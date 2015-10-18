@@ -24,6 +24,7 @@
 #include <boost/multiprecision/traits/is_restricted_conversion.hpp>
 #include <istream>  // stream operators
 #include <cstdio>   // EOF
+#include <cctype>   // isspace
 
 namespace boost{ namespace multiprecision{
 
@@ -1706,6 +1707,48 @@ inline std::ostream& operator << (std::ostream& os, const expression<tag, A1, A2
    value_type temp(r);
    return os << temp;
 }
+//
+// What follows is the input streaming code: this is not "proper" iostream code at all
+// but that's fiendishly hard to write when dealing with multiple backends all
+// with different requirements... yes we could deligate this to the backend author...
+// but we really want backends to be EASY to write!
+// For now just pull in all the characters that could possibly form the number
+// and let the backend's string parser make use of it.  This fixes most use cases
+// including CSV type formats such as those used by the Random lib.
+//
+inline std::string read_string_while(std::istream& is, std::string const& permitted_chars)
+{
+   std::ios_base::iostate state = std::ios_base::goodbit;
+   const std::istream::sentry sentry_check(is);
+   std::string result;
+
+   if(sentry_check)
+   {
+      int c = is.rdbuf()->sgetc();
+
+      for(;; c = is.rdbuf()->snextc())
+         if(std::istream::traits_type::eq_int_type(std::istream::traits_type::eof(), c))
+         {	// end of file:
+            state |= std::ios_base::eofbit;
+            break;
+         }
+         else if(permitted_chars.find_first_of(std::istream::traits_type::to_char_type(c)) == std::string::npos)
+         {
+            // Invalid numeric character, stop reading:
+            is.rdbuf()->sputbackc(static_cast<char>(c));
+            break;
+         }
+         else
+         {	
+            result.append(1, std::istream::traits_type::to_char_type(c));
+         }
+   }
+
+   if(!result.size())
+      state |= std::ios_base::failbit;
+   is.setstate(state);
+   return result;
+}
 
 } // namespace detail
 
@@ -1715,12 +1758,27 @@ inline std::istream& operator >> (std::istream& is, number<Backend, ExpressionTe
    bool hex_format = (is.flags() & std::ios_base::hex) == std::ios_base::hex;
    bool oct_format = (is.flags() & std::ios_base::oct) == std::ios_base::oct;
    std::string s;
-   is >> s;
-   if(hex_format && (number_category<Backend>::value == number_kind_integer) && ((s[0] != '0') || (s[1] != 'x')))
-      s.insert(s.find_first_not_of("+-"), "0x");
-   if(oct_format && (number_category<Backend>::value == number_kind_integer) && (s[0] != '0'))
-      s.insert(s.find_first_not_of("+-"), "0");
-   r.assign(s);
+   switch(boost::multiprecision::number_category<number<Backend, ExpressionTemplates> >::value)
+   {
+   case boost::multiprecision::number_kind_integer:
+      s = detail::read_string_while(is, "+-0xX123456789");
+      break;
+   case boost::multiprecision::number_kind_floating_point:
+      s = detail::read_string_while(is, "+-eE.0123456789infINFnanNANinfinityINFINITY");
+      break;
+   default:
+      is >> s;
+   }
+   if(s.size())
+   {
+      if(hex_format && (number_category<Backend>::value == number_kind_integer) && ((s[0] != '0') || (s[1] != 'x')))
+         s.insert(s.find_first_not_of("+-"), "0x");
+      if(oct_format && (number_category<Backend>::value == number_kind_integer) && (s[0] != '0'))
+         s.insert(s.find_first_not_of("+-"), "0");
+      r.assign(s);
+   }
+   else if(!is.fail())
+      is.setstate(std::istream::failbit);
    return is;
 }
 

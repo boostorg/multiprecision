@@ -1455,11 +1455,17 @@ namespace tools{
 
 template <>
 inline int digits<boost::multiprecision::mpfr_float>()
+#ifdef BOOST_MATH_NOEXCEPT
+   BOOST_NOEXCEPT
+#endif
 {
    return boost::multiprecision::backends::detail::get_default_precision();
 }
 template <>
 inline int digits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, boost::multiprecision::et_off> >()
+#ifdef BOOST_MATH_NOEXCEPT
+   BOOST_NOEXCEPT
+#endif
 {
    return boost::multiprecision::backends::detail::get_default_precision();
 }
@@ -1618,7 +1624,7 @@ public:
    BOOST_STATIC_CONSTEXPR int digits = static_cast<int>((Digits10 * 1000L) / 301L + ((Digits10 * 1000L) % 301 ? 2 : 1));
    BOOST_STATIC_CONSTEXPR int digits10 = Digits10;
    // Is this really correct???
-   BOOST_STATIC_CONSTEXPR int max_digits10 = Digits10 + 2;
+   BOOST_STATIC_CONSTEXPR int max_digits10 = Digits10 + 3;
    BOOST_STATIC_CONSTEXPR bool is_signed = true;
    BOOST_STATIC_CONSTEXPR bool is_integer = false;
    BOOST_STATIC_CONSTEXPR bool is_exact = false;

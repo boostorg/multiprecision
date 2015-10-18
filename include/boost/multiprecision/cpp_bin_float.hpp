@@ -193,7 +193,7 @@ public:
    template <class Float>
    typename boost::enable_if_c<
       (number_category<Float>::value == number_kind_floating_point) 
-         && !is_floating_point<Float>::value
+         && !boost::is_floating_point<Float>::value
          /*&& (std::numeric_limits<number<Float> >::radix == 2)*/, 
       cpp_bin_float&>::type assign_float(Float f)
    {
@@ -1478,7 +1478,7 @@ public:
    BOOST_STATIC_CONSTEXPR int digits = boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count;
    BOOST_STATIC_CONSTEXPR int digits10 = (digits - 1) * 301 / 1000;
    // Is this really correct???
-   BOOST_STATIC_CONSTEXPR int max_digits10 = (digits * 301 / 1000) + 2;
+   BOOST_STATIC_CONSTEXPR int max_digits10 = (digits * 301 / 1000) + 3;
    BOOST_STATIC_CONSTEXPR bool is_signed = true;
    BOOST_STATIC_CONSTEXPR bool is_integer = false;
    BOOST_STATIC_CONSTEXPR bool is_exact = false;
