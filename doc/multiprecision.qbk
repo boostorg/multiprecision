@@ -5081,6 +5081,7 @@ Windows Vista machine.
 same values as shifting 2's compliment integers, though not the same bit pattern.
 * Fixed support for GCC-4.6.4 in C++0x mode by disabling conditional noexcept suppoprt for that compiler
 see [@https://svn.boost.org/trac/boost/ticket/11402 #11402].
+* Suppressed numerous compiler warnings.
 
 [h4 Multiprecision-2.2.4 (Boost-1.58)]
 
