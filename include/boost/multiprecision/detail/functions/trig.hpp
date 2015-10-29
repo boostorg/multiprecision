@@ -488,12 +488,12 @@ void eval_asin(T& result, const T& x)
    }
 
    // Get initial estimate using standard math function asin.
-   double dd;
+   long double dd;
    eval_convert_to(&dd, xx);
 
-   result = fp_type(std::asin(dd));
+   result = (long double)(std::asin(dd));
 
-   unsigned current_digits = std::numeric_limits<double>::digits - 5;
+   unsigned current_digits = std::numeric_limits<long double>::digits - 5;
    unsigned target_precision = boost::multiprecision::detail::digits2<number<T, et_on> >::value;
 
    // Newton-Raphson iteration
