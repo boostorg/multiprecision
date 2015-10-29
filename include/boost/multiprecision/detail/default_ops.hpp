@@ -801,7 +801,7 @@ struct terminal
 {
    terminal(const R& v) : value(v){}
    terminal(){}
-   terminal& operator = (R val) {  value = val;  }
+   terminal& operator = (R val) { value = val;  return *this; }
    R value;
    operator R()const {  return value;  }
 };
