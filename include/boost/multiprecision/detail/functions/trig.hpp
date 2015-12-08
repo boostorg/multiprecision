@@ -486,14 +486,18 @@ void eval_asin(T& result, const T& x)
          result.negate();
       return;
    }
-
+#ifndef BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
+   typedef typename boost::multiprecision::detail::canonical<long double, T>::type guess_type;
+#else
+   typedef fp_type guess_type;
+#endif
    // Get initial estimate using standard math function asin.
-   double dd;
+   guess_type dd;
    eval_convert_to(&dd, xx);
 
-   result = fp_type(std::asin(dd));
+   result = (guess_type)(std::asin(dd));
 
-   unsigned current_digits = std::numeric_limits<double>::digits - 5;
+   unsigned current_digits = std::numeric_limits<guess_type>::digits - 5;
    unsigned target_precision = boost::multiprecision::detail::digits2<number<T, et_on> >::value;
 
    // Newton-Raphson iteration

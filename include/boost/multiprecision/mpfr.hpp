@@ -131,7 +131,7 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
    {
       if(m_data[0]._mpfr_d == 0)
          mpfr_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
-      boost::ulong_long_type mask = (((1uLL << (std::numeric_limits<unsigned long>::digits - 1) - 1) << 1) | 1uLL);
+      boost::ulong_long_type mask = ((((1uLL << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1uLL);
       unsigned shift = 0;
       mpfr_t t;
       mpfr_init2(t, (std::max)(static_cast<unsigned long>(std::numeric_limits<boost::ulong_long_type>::digits), static_cast<unsigned long>(multiprecision::detail::digits10_2_2(digits10))));
@@ -419,7 +419,7 @@ struct mpfr_float_imp<digits10, allocate_stack>
 #else
    mpfr_float_imp& operator = (boost::ulong_long_type i)
    {
-      boost::ulong_long_type mask = (((1uLL << (std::numeric_limits<unsigned long>::digits - 1) - 1) << 1) | 1uL);
+      boost::ulong_long_type mask = ((((1uLL << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1uL);
       unsigned shift = 0;
       mpfr_t t;
       mp_limb_t t_limbs[limb_count];
@@ -1468,6 +1468,46 @@ inline int digits<boost::multiprecision::number<boost::multiprecision::mpfr_floa
 #endif
 {
    return boost::multiprecision::backends::detail::get_default_precision();
+}
+
+template <>
+inline boost::multiprecision::mpfr_float
+   max_value<boost::multiprecision::mpfr_float>()
+{
+   boost::multiprecision::mpfr_float result(0.5);
+   mpfr_mul_2exp(result.backend().data(), result.backend().data(), mpfr_get_emax(), GMP_RNDN);
+   BOOST_ASSERT(mpfr_number_p(result.backend().data()));
+   return result;
+}
+
+template <>
+inline boost::multiprecision::mpfr_float
+   min_value<boost::multiprecision::mpfr_float>()
+{
+   boost::multiprecision::mpfr_float result(0.5);
+   mpfr_div_2exp(result.backend().data(), result.backend().data(), -mpfr_get_emin(), GMP_RNDN);
+   BOOST_ASSERT(mpfr_number_p(result.backend().data()));
+   return result;
+}
+
+template <>
+inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, boost::multiprecision::et_off> 
+   max_value<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, boost::multiprecision::et_off> >()
+{
+   boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, boost::multiprecision::et_off> result(0.5);
+   mpfr_mul_2exp(result.backend().data(), result.backend().data(), mpfr_get_emax(), GMP_RNDN);
+   BOOST_ASSERT(mpfr_number_p(result.backend().data()));
+   return result;
+}
+
+template <>
+inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, boost::multiprecision::et_off>
+   min_value<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, boost::multiprecision::et_off> >()
+{
+   boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, boost::multiprecision::et_off> result(0.5);
+   mpfr_div_2exp(result.backend().data(), result.backend().data(), -mpfr_get_emin(), GMP_RNDN);
+   BOOST_ASSERT(mpfr_number_p(result.backend().data()));
+   return result;
 }
 
 } // namespace tools

@@ -48,6 +48,31 @@ BOOST_STATIC_ASSERT(boost::has_nothrow_copy<boost::multiprecision::float128>::va
 BOOST_STATIC_ASSERT(boost::has_nothrow_assign<boost::multiprecision::float128>::value);
 #endif
 
+BOOST_STATIC_ASSERT(noexcept(boost::multiprecision::float128()));
+BOOST_STATIC_ASSERT(noexcept(boost::multiprecision::float128(std::declval<const boost::multiprecision::float128&>())));
+BOOST_STATIC_ASSERT(noexcept(boost::multiprecision::float128(std::declval<boost::multiprecision::float128>())));
+BOOST_STATIC_ASSERT(noexcept(boost::multiprecision::float128(std::declval<const float128_type&>())));
+BOOST_STATIC_ASSERT(noexcept(boost::multiprecision::float128(std::declval<float128_type>())));
+BOOST_STATIC_ASSERT(noexcept(boost::multiprecision::float128(std::declval<const double&>())));
+BOOST_STATIC_ASSERT(noexcept(boost::multiprecision::float128(std::declval<double>())));
+BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::float128&>() = std::declval<const boost::multiprecision::float128&>()));
+BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::float128&>() = std::declval<boost::multiprecision::float128>()));
+BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::float128&>() = std::declval<const float128_type&>()));
+BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::float128&>() = std::declval<float128_type>()));
+BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::float128&>() = std::declval<const double&>()));
+BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::float128&>() = std::declval<double>()));
+
+struct any_convert
+{
+   template <class T>
+   operator T ()const;   // Can throw!
+};
+
+BOOST_STATIC_ASSERT(!noexcept(boost::multiprecision::float128(std::declval<const any_convert&>())));
+BOOST_STATIC_ASSERT(!noexcept(boost::multiprecision::float128(std::declval<any_convert>())));
+BOOST_STATIC_ASSERT(!noexcept(std::declval<boost::multiprecision::float128&>() = std::declval<const any_convert&>()));
+BOOST_STATIC_ASSERT(!noexcept(std::declval<boost::multiprecision::float128&>() = std::declval<any_convert>()));
+
 #endif // noexcept
 
 

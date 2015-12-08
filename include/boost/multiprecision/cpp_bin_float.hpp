@@ -43,7 +43,7 @@ public:
 
    typedef typename rep_type::signed_types                        signed_types;
    typedef typename rep_type::unsigned_types                      unsigned_types;
-   typedef boost::mpl::list<double, long double>                  float_types;
+   typedef boost::mpl::list<float, double, long double>           float_types;
    typedef Exponent                                               exponent_type;
 
    static const exponent_type max_exponent_limit = boost::integer_traits<exponent_type>::const_max - 2 * static_cast<exponent_type>(bit_count);
@@ -104,6 +104,18 @@ public:
       this->assign_float(f);
    }
 
+   template <class Float>
+   explicit cpp_bin_float(const Float& f,
+      typename boost::enable_if_c<
+      (number_category<Float>::value == number_kind_floating_point)
+      && (std::numeric_limits<Float>::digits > (int)bit_count)
+      && (std::numeric_limits<Float>::radix == 2)
+      >::type const* = 0)
+      : m_data(), m_exponent(0), m_sign(false)
+   {
+      this->assign_float(f);
+   }
+
    cpp_bin_float& operator=(const cpp_bin_float &o) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<rep_type&>() = std::declval<const rep_type&>()))
    {
       m_data = o.m_data;
@@ -125,7 +137,7 @@ public:
    template <class Float>
    typename boost::enable_if_c<
       (number_category<Float>::value == number_kind_floating_point)
-      && (std::numeric_limits<Float>::digits <= (int)bit_count)
+      //&& (std::numeric_limits<Float>::digits <= (int)bit_count)
       && (std::numeric_limits<Float>::radix == 2), cpp_bin_float&>::type operator=(const Float& f)
    {
       return assign_float(f);
@@ -1405,6 +1417,8 @@ namespace detail{
 
 template<unsigned D1, backends::digit_base_type B1, class A1, class E1, E1 M1, E1 M2, unsigned D2, backends::digit_base_type B2, class A2, class E2, E2 M3, E2 M4>
 struct is_explicitly_convertible<backends::cpp_bin_float<D1, B1, A1, E1, M1, M2>, backends::cpp_bin_float<D2, B2, A2, E2, M3, M4> > : public mpl::true_ {};
+template<class FloatT, unsigned D2, backends::digit_base_type B2, class A2, class E2, E2 M3, E2 M4>
+struct is_explicitly_convertible<FloatT, backends::cpp_bin_float<D2, B2, A2, E2, M3, M4> > : public boost::is_floating_point<FloatT> {};
 
 }
 #endif
