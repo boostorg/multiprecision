@@ -5074,6 +5074,17 @@ Windows Vista machine.
 
 [section:hist History]
 
+[h4 Multiprecision-2.2.6 (Boost-1.60)]
+
+* Fixed result of Miller Rabin primality test for value 2, see [@https://svn.boost.org/trac/boost/ticket/11495 #11495].
+* Improved initialization of cpp_int from very large strings of hex or octal digits, see [@https://svn.boost.org/trac/boost/ticket/11590 #11590].
+* Fixed fmod behaviour for negative divisors, see [@https://svn.boost.org/trac/boost/ticket/11641 #11641].
+* Fixed infinite division loop in cpp_int special case, see [@https://svn.boost.org/trac/boost/ticket/11648 #11648].
+* Patched missing return statement in [@https://svn.boost.org/trac/boost/ticket/11762 #11762].
+* Fixed mixed mode arithmetic compiler error in [@https://svn.boost.org/trac/boost/ticket/11764 #11764].
+* Fixed over-aggressive use of noexcept in [@https://svn.boost.org/trac/boost/ticket/11826 #11826].
+
+
 [h4 Multiprecision-2.2.5 (Boost-1.59)]
 
 * Depricated boost/multiprecision/random.hpp as it's no longer needed, updated random examples to match.
