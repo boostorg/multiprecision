@@ -18,6 +18,13 @@
 #include <boost/timer.hpp>
 #include "test.hpp"
 
+
+#if !defined(TEST1) && !defined(TEST2) && !defined(TEST3)
+#define TEST1
+#define TEST2
+#define TEST3
+#endif
+
 template <class T>
 T generate_random(unsigned bits_wanted)
 {
@@ -589,12 +596,6 @@ struct tester
       }
    }
 };
-
-#if !defined(TEST1) && !defined(TEST2) && !defined(TEST3)
-#define TEST1
-#define TEST2
-#define TEST3
-#endif
 
 int main()
 {
