@@ -685,6 +685,10 @@ run test_mixed_mpfr_float.cpp  mpfr gmp : : : [ check-target-builds ../config//h
 # Check for narrowing conversions:
 #
 run test_float_conversions.cpp ;
+#
+# specific bug cases:
+#
+compile bug11922.cpp ;
 
 if $(enable-specfun)
 {
