@@ -1761,7 +1761,12 @@ inline std::istream& operator >> (std::istream& is, number<Backend, ExpressionTe
    switch(boost::multiprecision::number_category<number<Backend, ExpressionTemplates> >::value)
    {
    case boost::multiprecision::number_kind_integer:
-      s = detail::read_string_while(is, "+-0xX123456789");
+      if(oct_format)
+         s = detail::read_string_while(is, "+-01234567");
+      else if(hex_format)
+         s = detail::read_string_while(is, "+-xXabcdefABCDEF0123456789");
+      else
+         s = detail::read_string_while(is, "+-0123456789");
       break;
    case boost::multiprecision::number_kind_floating_point:
       s = detail::read_string_while(is, "+-eE.0123456789infINFnanNANinfinityINFINITY");

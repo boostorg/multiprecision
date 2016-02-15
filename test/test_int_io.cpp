@@ -89,6 +89,8 @@ void do_round_trip(const T& val, std::ios_base::fmtflags f)
    BOOST_CHECK_EQUAL(new_val, val);
    new_val = static_cast<T>(val.str(0, f));
    BOOST_CHECK_EQUAL(new_val, val);
+   ss >> new_val;
+   BOOST_CHECK_EQUAL(new_val, val);
 }
 
 template <class T>
