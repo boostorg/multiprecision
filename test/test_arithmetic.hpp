@@ -13,6 +13,8 @@
 
 template <class T>
 struct is_boost_rational : public boost::mpl::false_{};
+template <class T>
+struct is_checked_cpp_int : public boost::mpl::false_ {};
 
 #ifdef BOOST_MSVC
 // warning C4127: conditional expression is constant
@@ -344,6 +346,27 @@ void test_signed_integer_ops(const boost::mpl::true_&)
    BOOST_CHECK_EQUAL(c ,  a / b);
    BOOST_CHECK_EQUAL(r ,  a % b);
    BOOST_CHECK_EQUAL(integer_modulus(a, -57) ,  abs(a % -57));
+#ifndef TEST_CHECKED_INT
+   if(is_checked_cpp_int<Real>::value)
+   {
+      a = -1;
+      BOOST_CHECK_THROW(a << 2, std::range_error);
+      BOOST_CHECK_THROW(a >> 2, std::range_error);
+      BOOST_CHECK_THROW(a <<= 2, std::range_error);
+      BOOST_CHECK_THROW(a >>= 2, std::range_error);
+   }
+   else
+   {
+      a = -1;
+      BOOST_CHECK_EQUAL(a << 10, (boost::intmax_t(-1) << 10));
+      a = -23;
+      BOOST_CHECK_EQUAL(a << 10, (boost::intmax_t(-23) << 10));
+      a = -23456;
+      BOOST_CHECK_EQUAL(a >> 10, (boost::intmax_t(-23456) >> 10));
+      a = -3;
+      BOOST_CHECK_EQUAL(a >> 10, (boost::intmax_t(-3) >> 10));
+   }
+#endif
 }
 template <class Real>
 void test_signed_integer_ops(const boost::mpl::false_&)
