@@ -11,6 +11,12 @@
 #  define _SCL_SECURE_NO_WARNINGS
 #endif
 
+//
+// This ensures all our code gets tested, even though it may
+// not be the fastest configuration in normal use:
+//
+#define BOOST_MP_USE_LIMB_SHIFT
+
 #include <boost/multiprecision/gmp.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/random/mersenne_twister.hpp>
