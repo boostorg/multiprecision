@@ -95,8 +95,8 @@
 </tr>
 <tr><td align="left" valign="top"><p>
           If you're exporting to non-native byte layout, then use <a href="http://www.boost.org/doc/libs/release/libs/endian/doc/index.html" target="_top">Boost.Endian</a>
-          to create a custom OutputIterator that reverses the byte order prior to
-          actually storing the result.
+          to create a custom OutputIterator that reverses the byte order of each
+          chunk prior to actually storing the result.
         </p></td></tr>
 </table></div>
 <pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">unsigned</span> <span class="identifier">MinBits</span><span class="special">,</span> <span class="keyword">unsigned</span> <span class="identifier">MaxBits</span><span class="special">,</span> <span class="identifier">cpp_integer_type</span> <span class="identifier">SignType</span><span class="special">,</span> <span class="identifier">cpp_int_check_type</span> <span class="identifier">Checked</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">Allocator</span><span class="special">,</span>
@@ -124,9 +124,20 @@
         sign bit is significant (be particularly careful if you expect type <code class="computeroutput"><span class="keyword">char</span></code> to contain 8-bit values, as by default
         it will extract only 7-bits at a time if <code class="computeroutput"><span class="keyword">char</span></code>
         is signed). As with exporting, if the external data is to be in a non-native
-        byte order, then you will need to create an iterator adaptor that presents
-        it in native order (see <a href="http://www.boost.org/doc/libs/release/libs/endian/doc/index.html" target="_top">Boost.Endian</a>).
+        byte order (within each chunk), then you will need to create an iterator
+        adaptor that presents it in native order (see <a href="http://www.boost.org/doc/libs/release/libs/endian/doc/index.html" target="_top">Boost.Endian</a>).
       </p>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../../../../doc/src/images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+          Note that this function is optimized for the case where the data can be
+          memcpy'ed from the source to the integer - in this case both iterators
+          much be pointers, and everything must be little-endian.
+        </p></td></tr>
+</table></div>
 <h5>
 <a name="boost_multiprecision.tut.import_export.h0"></a>
         <span class="phrase"><a name="boost_multiprecision.tut.import_export.examples"></a></span><a class="link" href="import_export.html#boost_multiprecision.tut.import_export.examples">Examples</a>
