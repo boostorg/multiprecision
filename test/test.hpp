@@ -114,7 +114,7 @@ template <class T>
 inline T epsilon_of(const T&)
 {
    BOOST_STATIC_ASSERT(std::numeric_limits<T>::is_specialized);
-   return std::numeric_limits<T>::is_integer ? 1 : std::numeric_limits<T>::epsilon();
+   return std::numeric_limits<T>::is_integer ? static_cast<T>(1) : std::numeric_limits<T>::epsilon();
 }
 
 template <class T>

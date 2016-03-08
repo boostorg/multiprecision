@@ -615,8 +615,8 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    //
    // pow, powm:
    //
-   BOOST_CHECK_EQUAL(pow(Real(3), 4) ,  81);
-   BOOST_CHECK_EQUAL(pow(Real(3) + Real(0), 4) ,  81);
+   BOOST_CHECK_EQUAL(pow(Real(3), 4u) ,  81);
+   BOOST_CHECK_EQUAL(pow(Real(3) + Real(0), 4u) ,  81);
    BOOST_CHECK_EQUAL(powm(Real(3), Real(4), Real(13)) ,  81 % 13);
    BOOST_CHECK_EQUAL(powm(Real(3), Real(4), 13) ,  81 % 13);
    BOOST_CHECK_EQUAL(powm(Real(3), Real(4), Real(13) + 0) ,  81 % 13);
@@ -1608,6 +1608,47 @@ void test_signed_ops(const boost::mpl::false_&)
 }
 
 template <class Real>
+void test_basic_conditionals(Real a, Real b)
+{
+   if(a)
+   {
+      BOOST_ERROR("Unexpected non-zero result");
+   }
+   if(!a){}
+   else
+   {
+      BOOST_ERROR("Unexpected zero result");
+   }
+   b = 2;
+   if(!b)
+   {
+      BOOST_ERROR("Unexpected zero result");
+   }
+   if(b){}
+   else
+   {
+      BOOST_ERROR("Unexpected non-zero result");
+   }
+   if(a && b)
+   {
+      BOOST_ERROR("Unexpected zero result");
+   }
+   if(!(a || b))
+   {
+      BOOST_ERROR("Unexpected zero result");
+   }
+   if(a + b){}
+   else
+   {
+      BOOST_ERROR("Unexpected zero result");
+   }
+   if(b - 2)
+   {
+      BOOST_ERROR("Unexpected non-zero result");
+   }
+}
+
+template <class Real>
 void test()
 {
 #if !defined(NO_MIXED_OPS) && !defined(SLOW_COMPILER)
@@ -1844,42 +1885,8 @@ void test()
    // Use in Boolean context:
    //
    a = 0;
-   if(a)
-   {
-      BOOST_ERROR("Unexpected non-zero result");
-   }
-   if(!a){}
-   else
-   {
-      BOOST_ERROR("Unexpected zero result");
-   }
    b = 2;
-   if(!b)
-   {
-      BOOST_ERROR("Unexpected zero result");
-   }
-   if(b){}
-   else
-   {
-      BOOST_ERROR("Unexpected non-zero result");
-   }
-   if(a && b)
-   {
-      BOOST_ERROR("Unexpected zero result");
-   }
-   if(!(a || b))
-   {
-      BOOST_ERROR("Unexpected zero result");
-   }
-   if(a + b){}
-   else
-   {
-      BOOST_ERROR("Unexpected zero result");
-   }
-   if(b - 2)
-   {
-      BOOST_ERROR("Unexpected non-zero result");
-   }
+   test_basic_conditionals(a, b);
    //
    // Test iostreams:
    //

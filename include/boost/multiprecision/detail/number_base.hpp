@@ -26,7 +26,7 @@
 #  define BOOST_MP_FORCEINLINE inline
 #endif
 
-#if defined(BOOST_GCC) && (BOOST_GCC <= 40700)
+#if (defined(BOOST_GCC) && (BOOST_GCC <= 40700)) || defined(__SUNPRO_CC)
 #  define BOOST_MP_NOEXCEPT_IF(x)
 #else
 #  define BOOST_MP_NOEXCEPT_IF(x) BOOST_NOEXCEPT_IF(x)
