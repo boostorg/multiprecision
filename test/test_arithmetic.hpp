@@ -13,6 +13,8 @@
 
 template <class T>
 struct is_boost_rational : public boost::mpl::false_{};
+template <class T>
+struct is_checked_cpp_int : public boost::mpl::false_ {};
 
 #ifdef BOOST_MSVC
 // warning C4127: conditional expression is constant
@@ -344,6 +346,27 @@ void test_signed_integer_ops(const boost::mpl::true_&)
    BOOST_CHECK_EQUAL(c ,  a / b);
    BOOST_CHECK_EQUAL(r ,  a % b);
    BOOST_CHECK_EQUAL(integer_modulus(a, -57) ,  abs(a % -57));
+#ifndef TEST_CHECKED_INT
+   if(is_checked_cpp_int<Real>::value)
+   {
+      a = -1;
+      BOOST_CHECK_THROW(a << 2, std::range_error);
+      BOOST_CHECK_THROW(a >> 2, std::range_error);
+      BOOST_CHECK_THROW(a <<= 2, std::range_error);
+      BOOST_CHECK_THROW(a >>= 2, std::range_error);
+   }
+   else
+   {
+      a = -1;
+      BOOST_CHECK_EQUAL(a << 10, (boost::intmax_t(-1) << 10));
+      a = -23;
+      BOOST_CHECK_EQUAL(a << 10, (boost::intmax_t(-23) << 10));
+      a = -23456;
+      BOOST_CHECK_EQUAL(a >> 10, (boost::intmax_t(-23456) >> 10));
+      a = -3;
+      BOOST_CHECK_EQUAL(a >> 10, (boost::intmax_t(-3) >> 10));
+   }
+#endif
 }
 template <class Real>
 void test_signed_integer_ops(const boost::mpl::false_&)
@@ -1950,6 +1973,41 @@ void test()
    BOOST_CHECK_EQUAL(c, 20);
    // Destructor of "a" checks destruction of moved-from-object...
    Real m3(static_cast<Real&&>(a));
+#endif
+   //
+   // min and max overloads:
+   //
+#if !defined(min) && !defined(max)
+   using std::max;
+   using std::min;
+   a = 2;
+   b = 5;
+   c = 6;
+   BOOST_CHECK_EQUAL(min(a, b), a);
+   BOOST_CHECK_EQUAL(min(b, a), a);
+   BOOST_CHECK_EQUAL(max(a, b), b);
+   BOOST_CHECK_EQUAL(max(b, a), b);
+   BOOST_CHECK_EQUAL(min(a, b + c), a);
+   BOOST_CHECK_EQUAL(min(b + c, a), a);
+   BOOST_CHECK_EQUAL(min(a, c - b), 1);
+   BOOST_CHECK_EQUAL(min(c - b, a), 1);
+   BOOST_CHECK_EQUAL(max(a, b + c), 11);
+   BOOST_CHECK_EQUAL(max(b + c, a), 11);
+   BOOST_CHECK_EQUAL(max(a, c - b), a);
+   BOOST_CHECK_EQUAL(max(c - b, a), a);
+   BOOST_CHECK_EQUAL(min(a + b, b + c), 7);
+   BOOST_CHECK_EQUAL(min(b + c, a + b), 7);
+   BOOST_CHECK_EQUAL(max(a + b, b + c), 11);
+   BOOST_CHECK_EQUAL(max(b + c, a + b), 11);
+   BOOST_CHECK_EQUAL(min(a + b, c - a), 4);
+   BOOST_CHECK_EQUAL(min(c - a, a + b), 4);
+   BOOST_CHECK_EQUAL(max(a + b, c - a), 7);
+   BOOST_CHECK_EQUAL(max(c - a, a + b), 7);
+
+   long l1(2), l2(3), l3;
+   l3 = min(l1, l2) + max(l1, l2) + max<long>(l1, l2) + min<long>(l1, l2);
+   BOOST_CHECK_EQUAL(l3, 10);
+
 #endif
    //
    // Bug cases, self assignment first:
