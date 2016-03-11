@@ -1065,7 +1065,7 @@ void test_negative_mixed(boost::mpl::true_ const&)
    BOOST_CHECK_EQUAL(Real(n2).template convert_to<Num>() ,  n2);
    BOOST_CHECK_EQUAL(Real(n3).template convert_to<Num>() ,  n3);
    BOOST_CHECK_EQUAL(Real(n4).template convert_to<Num>() ,  n4);
-#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+#ifndef BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n1)) ,  n1);
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n2)) ,  n2);
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n3)) ,  n3);
@@ -1076,7 +1076,7 @@ void test_negative_mixed(boost::mpl::true_ const&)
    BOOST_CHECK_EQUAL((Real(n2) + 0).template convert_to<Num>(), n2);
    BOOST_CHECK_EQUAL((Real(n3) + 0).template convert_to<Num>(), n3);
    BOOST_CHECK_EQUAL((Real(n4) + 0).template convert_to<Num>(), n4);
-#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+#ifndef BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
    BOOST_CHECK_EQUAL(static_cast<Num>((Real(n1) + 0)), n1);
    BOOST_CHECK_EQUAL(static_cast<Num>((Real(n2) + 0)), n2);
    BOOST_CHECK_EQUAL(static_cast<Num>((Real(n3) + 0)), n3);
@@ -1367,7 +1367,7 @@ void test_mixed(const boost::mpl::true_&)
    BOOST_CHECK_EQUAL(Real(n2).template convert_to<Num>() ,  n2);
    BOOST_CHECK_EQUAL(Real(n3).template convert_to<Num>() ,  n3);
    BOOST_CHECK_EQUAL(Real(n4).template convert_to<Num>() ,  n4);
-#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+#ifndef BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n1)) ,  n1);
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n2)) ,  n2);
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n3)) ,  n3);
@@ -1378,7 +1378,7 @@ void test_mixed(const boost::mpl::true_&)
    BOOST_CHECK_EQUAL((Real(n2) + 0).template convert_to<Num>(), n2);
    BOOST_CHECK_EQUAL((Real(n3) + 0).template convert_to<Num>(), n3);
    BOOST_CHECK_EQUAL((Real(n4) + 0).template convert_to<Num>(), n4);
-#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+#ifndef BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n1) + 0), n1);
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n2) + 0), n2);
    BOOST_CHECK_EQUAL(static_cast<Num>(Real(n3) + 0), n3);
