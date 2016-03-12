@@ -1877,7 +1877,7 @@ typename boost::enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator
 template <class T, multiprecision::expression_template_option ExpressionTemplates, class Arithmetic>
 typename boost::enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator < (const Arithmetic& b, const rational<multiprecision::number<T, ExpressionTemplates> >& a)
 {
-   return a < multiprecision::number<T, ExpressionTemplates>(b);
+   return a > multiprecision::number<T, ExpressionTemplates>(b);
 }
 
 template <class T, multiprecision::expression_template_option ExpressionTemplates, class Arithmetic>
@@ -1889,7 +1889,7 @@ typename boost::enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator
 template <class T, multiprecision::expression_template_option ExpressionTemplates, class Arithmetic>
 typename boost::enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator <= (const Arithmetic& b, const rational<multiprecision::number<T, ExpressionTemplates> >& a)
 {
-   return a <= multiprecision::number<T, ExpressionTemplates>(b);
+   return a >= multiprecision::number<T, ExpressionTemplates>(b);
 }
 
 template <class T, multiprecision::expression_template_option ExpressionTemplates, class Arithmetic>
@@ -1901,7 +1901,7 @@ typename boost::enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator
 template <class T, multiprecision::expression_template_option ExpressionTemplates, class Arithmetic>
 typename boost::enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator > (const Arithmetic& b, const rational<multiprecision::number<T, ExpressionTemplates> >& a)
 {
-   return a > multiprecision::number<T, ExpressionTemplates>(b);
+   return a < multiprecision::number<T, ExpressionTemplates>(b);
 }
 
 template <class T, multiprecision::expression_template_option ExpressionTemplates, class Arithmetic>
@@ -1913,7 +1913,7 @@ typename boost::enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator
 template <class T, multiprecision::expression_template_option ExpressionTemplates, class Arithmetic>
 typename boost::enable_if<boost::is_arithmetic<Arithmetic>, bool>::type operator >= (const Arithmetic& b, const rational<multiprecision::number<T, ExpressionTemplates> >& a)
 {
-   return a >= multiprecision::number<T, ExpressionTemplates>(b);
+   return a <= multiprecision::number<T, ExpressionTemplates>(b);
 }
 
 template <class T, multiprecision::expression_template_option ExpressionTemplates>

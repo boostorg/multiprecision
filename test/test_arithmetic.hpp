@@ -1880,6 +1880,26 @@ void test()
    BOOST_CHECK_EQUAL((72 >= b+a) ,  true);
    BOOST_CHECK_EQUAL((72 > b+a) ,  false);
 
+   BOOST_CHECK_EQUAL((b + a == 8), false);
+   BOOST_CHECK_EQUAL((b + a != 8), true);
+   BOOST_CHECK_EQUAL((b + a >= 8), true);
+   BOOST_CHECK_EQUAL((b + a > 8), true);
+   BOOST_CHECK_EQUAL((b + a <= 8), false);
+   BOOST_CHECK_EQUAL((b + a < 8), false);
+   BOOST_CHECK_EQUAL((b + a == 800), false);
+   BOOST_CHECK_EQUAL((b + a != 800), true);
+   BOOST_CHECK_EQUAL((b + a <= 800), true);
+   BOOST_CHECK_EQUAL((b + a < 800), true);
+   BOOST_CHECK_EQUAL((b + a >= 800), false);
+   BOOST_CHECK_EQUAL((b + a > 800), false);
+   BOOST_CHECK_EQUAL((b + a == 72), true);
+   BOOST_CHECK_EQUAL((b + a != 72), false);
+   BOOST_CHECK_EQUAL((b + a >= 72), true);
+   BOOST_CHECK_EQUAL((b + a > 72), false);
+   BOOST_CHECK_EQUAL((b + a <= 72), true);
+   BOOST_CHECK_EQUAL((b + a < 72), false);
+
+
    test_members(a);
    //
    // Use in Boolean context:
