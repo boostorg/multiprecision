@@ -689,6 +689,7 @@ run test_float_conversions.cpp ;
 # specific bug cases:
 #
 compile bug11922.cpp ;
+run bug12039.cpp ;
 
 if $(enable-specfun)
 {

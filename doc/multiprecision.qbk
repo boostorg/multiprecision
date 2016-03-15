@@ -5090,6 +5090,8 @@ Windows Vista machine.
 * Fix bug in right shifting negative small integers in cpp_int see [@https://svn.boost.org/trac/boost/ticket/11999 #11999].
 * Use memmove for bitshifts in cpp_int when possible see [@https://svn.boost.org/trac/boost/ticket/9233 #9233].
 * Use memcpy for data import into cpp_int where possible, see [@https://svn.boost.org/trac/boost/ticket/9235 #9235].
+* Changed `cpp_bin_float.convert_to<double>()` to a function template rather than proceding via `long double` to avoid
+double-rounding bug, see [@https://svn.boost.org/trac/boost/ticket/12039 #12039].
 
 
 [h4 Multiprecision-2.2.6 (Boost-1.60)]

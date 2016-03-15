@@ -51,6 +51,11 @@
 <li class="listitem">
             Use memcpy for data import into cpp_int where possible, see <a href="https://svn.boost.org/trac/boost/ticket/9235" target="_top">#9235</a>.
           </li>
+<li class="listitem">
+            Changed <code class="computeroutput"><span class="identifier">cpp_bin_float</span><span class="special">.</span><span class="identifier">convert_to</span><span class="special">&lt;</span><span class="keyword">double</span><span class="special">&gt;()</span></code> to a function template rather than
+            proceding via <code class="computeroutput"><span class="keyword">long</span> <span class="keyword">double</span></code>
+            to avoid double-rounding bug, see <a href="https://svn.boost.org/trac/boost/ticket/12039" target="_top">#12039</a>.
+          </li>
 </ul></div>
 <h5>
 <a name="boost_multiprecision.map.hist.h1"></a>

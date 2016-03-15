@@ -1144,8 +1144,8 @@ inline void eval_convert_to(boost::ulong_long_type *res, const cpp_bin_float<Dig
    eval_convert_to(res, man);
 }
 
-template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
-inline void eval_convert_to(long double *res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> &arg)
+template <class Float, unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
+inline typename boost::enable_if_c<boost::is_float<Float>::value>::type eval_convert_to(Float *res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> &arg)
 {
    switch(arg.exponent())
    {
@@ -1153,21 +1153,21 @@ inline void eval_convert_to(long double *res, const cpp_bin_float<Digits, DigitB
       *res = 0;
       return;
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
-      *res = std::numeric_limits<long double>::quiet_NaN();
+      *res = std::numeric_limits<Float>::quiet_NaN();
       return;
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
-      *res = (std::numeric_limits<long double>::infinity)();
+      *res = (std::numeric_limits<Float>::infinity)();
       if(arg.sign())
          *res = -*res;
       return;
    }
    typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type e = arg.exponent();
    e -= cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1;
-   *res = std::ldexp(static_cast<long double>(*arg.bits().limbs()), e);
+   *res = std::ldexp(static_cast<Float>(*arg.bits().limbs()), e);
    for(unsigned i = 1; i < arg.bits().size(); ++i)
    {
       e += sizeof(*arg.bits().limbs()) * CHAR_BIT;
-      *res += std::ldexp(static_cast<long double>(arg.bits().limbs()[i]), e);
+      *res += std::ldexp(static_cast<Float>(arg.bits().limbs()[i]), e);
    }
    if(arg.sign())
       *res = -*res;
