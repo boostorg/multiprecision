@@ -1145,8 +1145,12 @@ inline void eval_convert_to(boost::ulong_long_type *res, const cpp_bin_float<Dig
 }
 
 template <class Float, unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
-inline typename boost::enable_if_c<boost::is_float<Float>::value>::type eval_convert_to(Float *res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> &arg)
+inline typename boost::enable_if_c<boost::is_float<Float>::value>::type eval_convert_to(Float *res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> &original_arg)
 {
+   //
+   // Perform rounding first, then afterwards extract the digits:
+   //
+   cpp_bin_float<std::numeric_limits<Float>::digits, digit_base_2, void, Exponent, MinE, MaxE> arg(original_arg);
    switch(arg.exponent())
    {
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero:
@@ -1162,7 +1166,7 @@ inline typename boost::enable_if_c<boost::is_float<Float>::value>::type eval_con
       return;
    }
    typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type e = arg.exponent();
-   e -= cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1;
+   e -= cpp_bin_float<std::numeric_limits<Float>::digits, digit_base_2, void, Exponent, MinE, MaxE>::bit_count - 1;
    *res = std::ldexp(static_cast<Float>(*arg.bits().limbs()), e);
    for(unsigned i = 1; i < arg.bits().size(); ++i)
    {
