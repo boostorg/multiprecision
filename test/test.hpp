@@ -256,6 +256,7 @@ void report_unexpected_exception(const E& e, int severity, const char* file, int
    }\
    }BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
 
+#ifndef BOOST_NO_EXCEPTIONS
 #define BOOST_MT_CHECK_THROW_IMP(x, E, severity)\
    BOOST_MP_TRY{ \
       x;\
@@ -264,6 +265,9 @@ void report_unexpected_exception(const E& e, int severity, const char* file, int
    }\
    catch(const E&){}\
    BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
+#else
+#define BOOST_MT_CHECK_THROW_IMP(x, E, severity)
+#endif
 
 #define BOOST_CHECK_CLOSE(x, y, tol) BOOST_CLOSE_IMP(x, y, ((tol / (100 * epsilon_of(x)))), error_on_fail)
 #define BOOST_WARN_CLOSE(x, y, tol)  BOOST_CLOSE_IMP(x, y, (tol / (100 * epsilon_of(x))), warn_on_fail)
