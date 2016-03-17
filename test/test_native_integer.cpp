@@ -25,10 +25,10 @@ void test()
 
    I i(0);
 
-   BOOST_CHECK_THROW(lsb(i), std::range_error);
 #ifndef BOOST_NO_EXCEPTIONS
-   BOOST_CHECK(bit_test(bit_set(i, 0), 0));
+   BOOST_CHECK_THROW(lsb(i), std::range_error);
 #endif
+   BOOST_CHECK(bit_test(bit_set(i, 0), 0));
    BOOST_CHECK_EQUAL(bit_set(i, 0), 1);
    BOOST_CHECK_EQUAL(bit_unset(i, 0), 0);
    BOOST_CHECK_EQUAL(bit_flip(bit_set(i, 0), 0), 0);
