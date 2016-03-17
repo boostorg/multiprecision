@@ -1888,7 +1888,9 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(boost::intmax_
 template <unsigned Digits10, class ExponentType, class Allocator>
 bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* const s)
 {
+#ifndef BOOST_NO_EXCEPTIONS
    try{
+#endif
 
    std::string str(s);
 
@@ -2146,6 +2148,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       }
    }
 
+#ifndef BOOST_NO_EXCEPTIONS
    }
    catch(const bad_lexical_cast&)
    {
@@ -2155,7 +2158,7 @@ bool cpp_dec_float<Digits10, ExponentType, Allocator>::rd_string(const char* con
       msg += "\" as a floating point value.";
       throw std::runtime_error(msg);
    }
-
+#endif
    return true;
 }
 

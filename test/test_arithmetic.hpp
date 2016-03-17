@@ -24,9 +24,12 @@ struct is_checked_cpp_int : public boost::mpl::false_ {};
 template <class Target, class Source>
 Target checked_lexical_cast(const Source& val)
 {
+#ifndef BOOST_NO_EXCEPTIONS
    try
    {
+#endif
       return boost::lexical_cast<Target>(val);
+#ifndef BOOST_NO_EXCEPTIONS
    }
    catch(...)
    {
@@ -34,6 +37,7 @@ Target checked_lexical_cast(const Source& val)
       std::cerr << "Target type = " << typeid(Target).name() << std::endl;
       throw;
    }
+#endif
 }
 
 
@@ -226,8 +230,10 @@ void test_rational(const boost::mpl::false_&)
    b /= 6;
    BOOST_CHECK_EQUAL(a ,  b);
 
+#ifndef BOOST_NO_EXCEPTIONS
    BOOST_CHECK_THROW(Real(a / 0), std::overflow_error);
    BOOST_CHECK_THROW(Real("3.14"), std::runtime_error);
+#endif
    b = Real("2/3");
    BOOST_CHECK_EQUAL(a, b);
    //
@@ -350,10 +356,12 @@ void test_signed_integer_ops(const boost::mpl::true_&)
    if(is_checked_cpp_int<Real>::value)
    {
       a = -1;
+#ifndef BOOST_NO_EXCEPTIONS
       BOOST_CHECK_THROW(a << 2, std::range_error);
       BOOST_CHECK_THROW(a >> 2, std::range_error);
       BOOST_CHECK_THROW(a <<= 2, std::range_error);
       BOOST_CHECK_THROW(a >>= 2, std::range_error);
+#endif
    }
    else
    {
@@ -421,32 +429,38 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    BOOST_CHECK_EQUAL(a ,  2000L << 20);
    a >>= 20u;
    BOOST_CHECK_EQUAL(a ,  2000);
+#ifndef BOOST_NO_EXCEPTIONS
    BOOST_CHECK_THROW(a <<= -20, std::out_of_range);
    BOOST_CHECK_THROW(a >>= -20, std::out_of_range);
    BOOST_CHECK_THROW(Real(a << -20), std::out_of_range);
    BOOST_CHECK_THROW(Real(a >> -20), std::out_of_range);
+#endif
 #ifndef BOOST_NO_LONG_LONG
    if(sizeof(long long) > sizeof(std::size_t))
    {
       // extreme values should trigger an exception:
+#ifndef BOOST_NO_EXCEPTIONS
       BOOST_CHECK_THROW(a >>= (1uLL << (sizeof(long long) * CHAR_BIT - 2)), std::out_of_range);
       BOOST_CHECK_THROW(a <<= (1uLL << (sizeof(long long) * CHAR_BIT - 2)), std::out_of_range);
       BOOST_CHECK_THROW(a >>= -(1LL << (sizeof(long long) * CHAR_BIT - 2)), std::out_of_range);
       BOOST_CHECK_THROW(a <<= -(1LL << (sizeof(long long) * CHAR_BIT - 2)), std::out_of_range);
       BOOST_CHECK_THROW(a >>= (1LL << (sizeof(long long) * CHAR_BIT - 2)), std::out_of_range);
       BOOST_CHECK_THROW(a <<= (1LL << (sizeof(long long) * CHAR_BIT - 2)), std::out_of_range);
+#endif
       // Unless they fit within range:
       a = 2000L;
       BOOST_CHECK_EQUAL((a <<= 20uLL) ,  (2000L << 20));
       a = 2000;
       BOOST_CHECK_EQUAL((a <<= 20LL)  ,  (2000L << 20));
 
+#ifndef BOOST_NO_EXCEPTIONS
       BOOST_CHECK_THROW(Real(a >> (1uLL << (sizeof(long long) * CHAR_BIT - 2))), std::out_of_range);
       BOOST_CHECK_THROW(Real(a <<= (1uLL << (sizeof(long long) * CHAR_BIT - 2))), std::out_of_range);
       BOOST_CHECK_THROW(Real(a >>= -(1LL << (sizeof(long long) * CHAR_BIT - 2))), std::out_of_range);
       BOOST_CHECK_THROW(Real(a <<= -(1LL << (sizeof(long long) * CHAR_BIT - 2))), std::out_of_range);
       BOOST_CHECK_THROW(Real(a >>= (1LL << (sizeof(long long) * CHAR_BIT - 2))), std::out_of_range);
       BOOST_CHECK_THROW(Real(a <<= (1LL << (sizeof(long long) * CHAR_BIT - 2))), std::out_of_range);
+#endif
       // Unless they fit within range:
       a = 2000L;
       BOOST_CHECK_EQUAL(Real(a << 20uLL) ,  (2000L << 20));
@@ -594,8 +608,8 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    {
       if(std::numeric_limits<Real>::is_specialized && (!std::numeric_limits<Real>::is_bounded || ((int)i * 17 < std::numeric_limits<Real>::digits)))
       {
-         BOOST_CHECK_EQUAL(lsb(Real(1) << (i * 17)) ,  i * 17);
-         BOOST_CHECK_EQUAL(msb(Real(1) << (i * 17)) ,  i * 17);
+         BOOST_CHECK_EQUAL(lsb(Real(1) << (i * 17)),  static_cast<unsigned>(i * 17));
+         BOOST_CHECK_EQUAL(msb(Real(1) << (i * 17)), static_cast<unsigned>(i * 17));
          BOOST_CHECK(bit_test(Real(1) << (i * 17), i * 17));
          BOOST_CHECK(!bit_test(Real(1) << (i * 17), i * 17 + 1));
          if(i)
@@ -640,12 +654,14 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    //
    test_conditional(Real(powm(Real(3), Real(4), Real(13))), powm(Real(3), Real(4), Real(13)));
 
+#ifndef BOOST_NO_EXCEPTIONS
    //
    // Things that are expected errors:
    //
    BOOST_CHECK_THROW(Real("3.14"), std::runtime_error);
    BOOST_CHECK_THROW(Real("3L"), std::runtime_error);
    BOOST_CHECK_THROW(Real(Real(20) / 0u), std::overflow_error);
+#endif
    //
    // Extra tests added for full coverage:
    //
@@ -931,6 +947,8 @@ void test_float_ops(const boost::mpl::int_<boost::multiprecision::number_kind_fl
    BOOST_CHECK_EQUAL(r ,  boost::math::pow<6>(3.25));
    r = pow(v, 25);
    BOOST_CHECK_EQUAL(r ,  boost::math::pow<25>(Real(3.25)));
+
+#ifndef BOOST_NO_EXCEPTIONS
    //
    // Things that are expected errors:
    //
@@ -946,6 +964,7 @@ void test_float_ops(const boost::mpl::int_<boost::multiprecision::number_kind_fl
          BOOST_CHECK_THROW(Real(Real(20) / 0u), std::overflow_error);
       }
    }
+#endif
    //
    // Comparisons of NaN's should always fail:
    //

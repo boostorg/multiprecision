@@ -2078,11 +2078,14 @@ void test128()
    boost::archive::text_iarchive ia(is);
    for(unsigned i = 0; i < sizeof(text_array) / sizeof(text_array[0]); ++i)
    {
+#ifndef BOOST_NO_EXCEPTIONS
       try
       {
+#endif
          T val;
          ia >> val;
          BOOST_CHECK_EQUAL(val, T(text_array[i]));
+#ifndef BOOST_NO_EXCEPTIONS
       }
       catch(const boost::exception& e)
       {
@@ -2094,6 +2097,7 @@ void test128()
          std::cout << "Caught std::exception with:\n";
          std::cout << e.what() << std::endl;
       }
+#endif
    }
 
    boost::filesystem::ifstream is2(root / "cpp_int128_serial32.txt");
@@ -2103,11 +2107,14 @@ void test128()
    boost::archive::text_iarchive ia2(is2);
    for(unsigned i = 0; i < sizeof(text_array) / sizeof(text_array[0]); ++i)
    {
+#ifndef BOOST_NO_EXCEPTIONS
       try
       {
+#endif
          T val;
          ia2 >> val;
          BOOST_CHECK_EQUAL(val, T(text_array[i]));
+#ifndef BOOST_NO_EXCEPTIONS
       }
       catch(const boost::exception& e)
       {
@@ -2119,6 +2126,7 @@ void test128()
          std::cout << "Caught std::exception with:\n";
          std::cout << e.what() << std::endl;
       }
+#endif
    }
 }
 
@@ -3137,11 +3145,14 @@ void test1024()
    boost::archive::text_iarchive ia(is);
    for(unsigned i = 0; i < sizeof(text_array) / sizeof(text_array[0]); ++i)
    {
+#ifndef BOOST_NO_EXCEPTIONS
       try
       {
+#endif
          T val;
          ia >> val;
          BOOST_CHECK_EQUAL(val, T(text_array[i]));
+#ifndef BOOST_NO_EXCEPTIONS
       }
       catch(const boost::exception& e)
       {
@@ -3153,6 +3164,7 @@ void test1024()
          std::cout << "Caught std::exception with:\n";
          std::cout << e.what() << std::endl;
       }
+#endif
    }
 
    boost::filesystem::ifstream is2(root / "cpp_int1024_serial32.txt");
@@ -3162,11 +3174,14 @@ void test1024()
    boost::archive::text_iarchive ia2(is2);
    for(unsigned i = 0; i < sizeof(text_array) / sizeof(text_array[0]); ++i)
    {
+#ifndef BOOST_NO_EXCEPTIONS
       try
       {
+#endif
          T val;
          ia2 >> val;
          BOOST_CHECK_EQUAL(val, T(text_array[i]));
+#ifndef BOOST_NO_EXCEPTIONS
       }
       catch(const boost::exception& e)
       {
@@ -3178,6 +3193,7 @@ void test1024()
          std::cout << "Caught std::exception with:\n";
          std::cout << e.what() << std::endl;
       }
+#endif
    }
 }
 
