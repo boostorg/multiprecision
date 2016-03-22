@@ -595,7 +595,7 @@ inline void do_eval_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponen
    if((e_diff > 0) || ((e_diff == 0) && a.bits().compare(b.bits()) >= 0))
    {
       dt = a.bits();
-      if(e_diff < (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count)
+      if(e_diff <= (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count)
       {
          eval_left_shift(dt, e_diff);
          res.exponent() = a.exponent() - e_diff;
@@ -607,7 +607,7 @@ inline void do_eval_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponen
    else
    {
       dt = b.bits();
-      if(-e_diff < (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count)
+      if(-e_diff <= (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count)
       {
          eval_left_shift(dt, -e_diff);
          res.exponent() = b.exponent() + e_diff;
