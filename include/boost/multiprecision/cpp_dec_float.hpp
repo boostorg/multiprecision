@@ -662,6 +662,12 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       return operator=(v);
    }
 
+   if((v.isnan)() || (v.isinf)())
+   {
+      *this = v;
+      return *this;
+   }
+
    // Get the offset for the add/sub operation.
    static const ExponentType max_delta_exp = static_cast<ExponentType>((cpp_dec_float_elem_number - 1) * cpp_dec_float_elem_digits10);
 
