@@ -57,7 +57,7 @@ else
    TOMMATH = tommath ;
 }
 
-obj no_eh_support : no_eh_test_support.cpp ;
+lib no_eh_support : no_eh_test_support.cpp ;
 
 run test_arithmetic_backend_concept.cpp no_eh_support ;
 
