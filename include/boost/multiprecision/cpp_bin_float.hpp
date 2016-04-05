@@ -74,24 +74,15 @@ public:
 
    template <unsigned D, digit_base_type B, class A, class E, E MinE, E MaxE>
    cpp_bin_float(const cpp_bin_float<D, B, A, E, MinE, MaxE> &o, typename boost::enable_if_c<(bit_count >= cpp_bin_float<D, B, A, E, MinE, MaxE>::bit_count)>::type const* = 0)
-      : m_exponent(o.exponent()), m_sign(o.sign()) 
    {
-      typename cpp_bin_float<D, B, A, E, MinE, MaxE>::rep_type b(o.bits());
-      this->sign() = o.sign();
-      this->exponent() = o.exponent() + (int)bit_count - (int)cpp_bin_float<D, B, A, E, MinE, MaxE>::bit_count;
-      copy_and_round(*this, b);
+      *this = o;
    }
-
    template <unsigned D, digit_base_type B, class A, class E, E MinE, E MaxE>
    explicit cpp_bin_float(const cpp_bin_float<D, B, A, E, MinE, MaxE> &o, typename boost::disable_if_c<(bit_count >= cpp_bin_float<D, B, A, E, MinE, MaxE>::bit_count)>::type const* = 0)
       : m_exponent(o.exponent()), m_sign(o.sign()) 
    {
-      typename cpp_bin_float<D, B, A, E, MinE, MaxE>::rep_type b(o.bits());
-      this->sign() = o.sign();
-      this->exponent() = o.exponent() - (int)(cpp_bin_float<D, B, A, E, MinE, MaxE>::bit_count - bit_count);
-      copy_and_round(*this, b);
+      *this = o;
    }
-
    template <class Float>
    cpp_bin_float(const Float& f, 
       typename boost::enable_if_c<
@@ -125,12 +116,31 @@ public:
    }
 
    template <unsigned D, digit_base_type B, class A, class E, E MinE, E MaxE>
-   cpp_bin_float& operator=(const cpp_bin_float<D, B, A, E, MinE, MaxE> &o)
+   cpp_bin_float& operator=(const cpp_bin_float<D, B, A, E, MinE, MaxE> &f)
    {
-      typename cpp_bin_float<D, B, A, E, MinE, MaxE>::rep_type b(o.bits());
-      this->exponent() = o.exponent() + (int)bit_count - (int)cpp_bin_float<D, B, A, E, MinE, MaxE>::bit_count;
-      this->sign() = o.sign();
-      copy_and_round(*this, b);
+      switch(eval_fpclassify(f))
+      {
+      case FP_ZERO:
+         m_data = limb_type(0);
+         m_sign = false;
+         m_exponent = exponent_zero;
+         break;
+      case FP_NAN:
+         m_data = limb_type(0);
+         m_sign = false;
+         m_exponent = exponent_nan;
+         break;;
+      case FP_INFINITE:
+         m_data = limb_type(0);
+         m_sign = f.sign();
+         m_exponent = exponent_infinity;
+         break;
+      default:
+         typename cpp_bin_float<D, B, A, E, MinE, MaxE>::rep_type b(f.bits());
+         this->exponent() = f.exponent() + (int)bit_count - (int)cpp_bin_float<D, B, A, E, MinE, MaxE>::bit_count;
+         this->sign() = f.sign();
+         copy_and_round(*this, b);
+      }
       return *this;
    }
 
@@ -164,7 +174,7 @@ public:
          return *this;
       case FP_INFINITE:
          m_data = limb_type(0);
-         m_sign = false;
+         m_sign = (f < 0);
          m_exponent = exponent_infinity;
          return *this;
       }
@@ -232,7 +242,7 @@ public:
          return *this;
       case FP_INFINITE:
          m_data = limb_type(0);
-         m_sign = false;
+         m_sign = (f < 0);
          m_exponent = exponent_infinity;
          return *this;
       }

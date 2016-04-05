@@ -152,6 +152,21 @@ public:
       m_value = i;
       return *this;
    }
+   float128_backend(long double const& f)
+   {
+      if(boost::math::isinf(f))
+         m_value = (f < 0) ? -1.0Q / 0.0Q : 1.0Q / 0.0Q;
+      else
+         m_value = f;
+   }
+   float128_backend& operator=(long double const& f)
+   {
+      if(boost::math::isinf(f))
+         m_value = (f < 0) ? -1.0Q / 0.0Q : 1.0Q / 0.0Q;
+      else
+         m_value = f;
+      return *this;
+   }
    float128_backend& operator = (const char* s)
    {
 #ifndef BOOST_MP_USE_QUAD

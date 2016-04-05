@@ -2236,7 +2236,12 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       return *this = one();
 
    if((boost::math::isinf)(a))
-      return *this = inf();
+   {
+      *this = inf();
+      if(a < 0)
+         this->negate();
+      return *this;
+   }
 
    if((boost::math::isnan)(a))
       return *this = nan();

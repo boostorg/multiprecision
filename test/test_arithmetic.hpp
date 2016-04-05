@@ -1412,6 +1412,27 @@ void test_mixed(const boost::mpl::false_&)
 {
 }
 
+template <class Real>
+inline bool check_is_nan(const Real& val, const boost::mpl::true_&)
+{
+   return boost::math::isnan(val);
+}
+template <class Real>
+inline bool check_is_nan(const Real&, const boost::mpl::false_&)
+{
+   return false;
+}
+template <class Real>
+inline Real negate(const Real& val, const boost::mpl::true_&)
+{
+   return -val;
+}
+template <class Real>
+inline Real negate(const Real& val, const boost::mpl::false_&)
+{
+   return val;
+}
+
 template <class Real, class Num>
 void test_mixed(const boost::mpl::true_&)
 {
@@ -1613,6 +1634,21 @@ void test_mixed(const boost::mpl::true_&)
    BOOST_CHECK_EQUAL(d ,  3 * 4 - 2);
    d = b * static_cast<cast_type>(n3) - static_cast<cast_type>(n1);
    BOOST_CHECK_EQUAL(d ,  3 * 4 - 2);
+
+   if(std::numeric_limits<Real>::has_infinity && std::numeric_limits<Num>::has_infinity)
+   {
+      d = static_cast<Real>(std::numeric_limits<Num>::infinity());
+      BOOST_CHECK_GT(d, (std::numeric_limits<Real>::max)());
+      d = static_cast<Real>(negate(std::numeric_limits<Num>::infinity(), boost::mpl::bool_<std::numeric_limits<Num>::is_signed>()));
+      BOOST_CHECK_LT(d, negate((std::numeric_limits<Real>::max)(), boost::mpl::bool_<std::numeric_limits<Real>::is_signed>()));
+   }
+   if(std::numeric_limits<Real>::has_quiet_NaN && std::numeric_limits<Num>::has_quiet_NaN)
+   {
+      d = static_cast<Real>(std::numeric_limits<Num>::quiet_NaN());
+      BOOST_CHECK(check_is_nan(d, boost::mpl::bool_<std::numeric_limits<Real>::has_quiet_NaN>()));
+      d = static_cast<Real>(negate(std::numeric_limits<Num>::quiet_NaN(), boost::mpl::bool_<std::numeric_limits<Num>::is_signed>()));
+      BOOST_CHECK(check_is_nan(d, boost::mpl::bool_<std::numeric_limits<Real>::has_quiet_NaN>()));
+   }
 }
 
 template <class Real>
