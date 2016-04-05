@@ -68,7 +68,7 @@ else
    TOMMATH = tommath ;
 }
 
-obj no_eh_eg_support : ../test/no_eh_test_support.cpp ;
+lib no_eh_eg_support : ../test/no_eh_test_support.cpp ;
 
 run cpp_int_snips.cpp no_eh_eg_support ;
 run cpp_int_import_export.cpp no_eh_eg_support ;
