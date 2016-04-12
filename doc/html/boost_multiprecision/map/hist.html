@@ -56,6 +56,40 @@
             proceding via <code class="computeroutput"><span class="keyword">long</span> <span class="keyword">double</span></code>
             to avoid double-rounding bug, see <a href="https://svn.boost.org/trac/boost/ticket/12039" target="_top">#12039</a>.
           </li>
+<li class="listitem">
+            Fixed conversions from NaN's and Infinities, see <a href="https://svn.boost.org/trac/boost/ticket/12112" target="_top">#12112</a>.
+          </li>
+<li class="listitem">
+            Enabled better support for Clang on Windows.
+          </li>
+<li class="listitem">
+            Fixed handling of NaN's and Infinities in basic arithmetic for cpp_dec_float
+            and cpp_bin_float, see <a href="https://svn.boost.org/trac/boost/ticket/12090" target="_top">#12090</a>.
+          </li>
+<li class="listitem">
+            Fixed fencepost error in cpp_bin_float subtraction.
+          </li>
+<li class="listitem">
+            Fixed double-rounding in conversion to float routines for cpp_bin_float,
+            see <a href="https://svn.boost.org/trac/boost/ticket/12039" target="_top">#12039</a>.
+          </li>
+<li class="listitem">
+            Make float128 denorm aware, see <a href="https://svn.boost.org/trac/boost/ticket/12075" target="_top">#12075</a>.
+          </li>
+<li class="listitem">
+            Allow the library and tests to be used without exception handling support,
+            see <a href="https://svn.boost.org/trac/boost/ticket/12070" target="_top">#12070</a>.
+          </li>
+<li class="listitem">
+            Fixed buggy comparison operator overloads for boost::rational.
+          </li>
+<li class="listitem">
+            Added some workarounds for Oracle C++.
+          </li>
+<li class="listitem">
+            Fixed some missing typecasts for cases where cpp_int's limb_type is wider
+            than unsigned.
+          </li>
 </ul></div>
 <h5>
 <a name="boost_multiprecision.map.hist.h1"></a>
