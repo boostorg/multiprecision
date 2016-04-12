@@ -26,10 +26,14 @@
 #  define BOOST_MP_FORCEINLINE inline
 #endif
 
-#if defined(BOOST_GCC) && (BOOST_GCC <= 40700)
+#if (defined(BOOST_GCC) && (BOOST_GCC <= 40700)) || defined(__SUNPRO_CC)
 #  define BOOST_MP_NOEXCEPT_IF(x)
 #else
 #  define BOOST_MP_NOEXCEPT_IF(x) BOOST_NOEXCEPT_IF(x)
+#endif
+
+#if defined(BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS) || defined(__SUNPRO_CC)
+#define BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
 #endif
 
 #ifdef BOOST_MSVC
@@ -379,7 +383,7 @@ struct expression<tag, Arg1, void, void, void>
    const Arg1& left_ref()const BOOST_NOEXCEPT { return arg; }
 
    static const unsigned depth = left_type::depth + 1;
-#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+#ifndef BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
 #  if (defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ < 7) && !defined(__clang__)) || (defined(BOOST_INTEL) && (BOOST_INTEL <= 1500))
    //
    // Horrible workaround for gcc-4.6.x which always prefers the template
@@ -443,7 +447,7 @@ struct expression<terminal, Arg1, void, void, void>
 
    static const unsigned depth = 0;
 
-#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+#ifndef BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
 #  if (defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ < 7) && !defined(__clang__)) || (defined(BOOST_INTEL) && (BOOST_INTEL <= 1500))
    //
    // Horrible workaround for gcc-4.6.x which always prefers the template
@@ -511,7 +515,7 @@ struct expression<tag, Arg1, Arg2, void, void>
    const Arg1& left_ref()const BOOST_NOEXCEPT { return arg1; }
    const Arg2& right_ref()const BOOST_NOEXCEPT { return arg2; }
 
-#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+#ifndef BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
 #  if (defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ < 7) && !defined(__clang__)) || (defined(BOOST_INTEL) && (BOOST_INTEL <= 1500))
       //
       // Horrible workaround for gcc-4.6.x which always prefers the template
@@ -590,7 +594,7 @@ struct expression<tag, Arg1, Arg2, Arg3, void>
    const Arg2& middle_ref()const BOOST_NOEXCEPT { return arg2; }
    const Arg3& right_ref()const BOOST_NOEXCEPT { return arg3; }
 
-#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+#ifndef BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
 #  if (defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ < 7) && !defined(__clang__)) || (defined(BOOST_INTEL) && (BOOST_INTEL <= 1500))
       //
       // Horrible workaround for gcc-4.6.x which always prefers the template
@@ -678,7 +682,7 @@ struct expression
    const Arg3& right_middle_ref()const BOOST_NOEXCEPT { return arg3; }
    const Arg4& right_ref()const BOOST_NOEXCEPT { return arg4; }
 
-#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+#ifndef BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
 #  if (defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ < 7) && !defined(__clang__)) || (defined(BOOST_INTEL) && (BOOST_INTEL <= 1500))
       //
       // Horrible workaround for gcc-4.6.x which always prefers the template

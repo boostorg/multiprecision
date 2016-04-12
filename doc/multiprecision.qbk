@@ -5090,6 +5090,18 @@ Windows Vista machine.
 * Fix bug in right shifting negative small integers in cpp_int see [@https://svn.boost.org/trac/boost/ticket/11999 #11999].
 * Use memmove for bitshifts in cpp_int when possible see [@https://svn.boost.org/trac/boost/ticket/9233 #9233].
 * Use memcpy for data import into cpp_int where possible, see [@https://svn.boost.org/trac/boost/ticket/9235 #9235].
+* Changed `cpp_bin_float.convert_to<double>()` to a function template rather than proceding via `long double` to avoid
+double-rounding bug, see [@https://svn.boost.org/trac/boost/ticket/12039 #12039].
+* Fixed conversions from NaN's and Infinities, see [@https://svn.boost.org/trac/boost/ticket/12112 #12112].
+* Enabled better support for Clang on Windows.
+* Fixed handling of NaN's and Infinities in basic arithmetic for cpp_dec_float and cpp_bin_float, see [@https://svn.boost.org/trac/boost/ticket/12090 #12090].
+* Fixed fencepost error in cpp_bin_float subtraction.
+* Fixed double-rounding in conversion to float routines for cpp_bin_float, see [@https://svn.boost.org/trac/boost/ticket/12039 #12039].
+* Make float128 denorm aware, see [@https://svn.boost.org/trac/boost/ticket/12075 #12075].
+* Allow the library and tests to be used without exception handling support, see [@https://svn.boost.org/trac/boost/ticket/12070 #12070].
+* Fixed buggy comparison operator overloads for boost::rational.
+* Added some workarounds for Oracle C++.
+* Fixed some missing typecasts for cases where cpp_int's limb_type is wider than unsigned.
 
 
 [h4 Multiprecision-2.2.6 (Boost-1.60)]
