@@ -51,6 +51,23 @@ T generate_random()
 }
 
 template <class T>
+void test_round_trip_neg(T val, const boost::mpl::true_&)
+{
+   // Try some negative values:
+   std::vector<unsigned char> cv;
+   T newval;
+   val = -val;
+   export_bits(val, std::back_inserter(cv), 8, false);
+   import_bits(newval, cv.begin(), cv.end(), 8, false);
+   BOOST_CHECK_EQUAL(-val, newval);
+}
+
+template <class T>
+void test_round_trip_neg(const T&, const boost::mpl::false_&)
+{
+}
+
+template <class T>
 void test_round_trip()
 {
    std::cout << std::hex;
@@ -122,6 +139,8 @@ void test_round_trip()
       export_bits(val, std::back_inserter(cv), 6, false);
       import_bits(newval, cv.begin(), cv.end(), 6, false);
       BOOST_CHECK_EQUAL(val, newval);
+
+      test_round_trip_neg(val, boost::mpl::bool_<std::numeric_limits<T>::is_signed>());
    }
 }
 

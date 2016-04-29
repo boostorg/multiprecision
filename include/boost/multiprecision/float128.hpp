@@ -489,6 +489,11 @@ inline void eval_atan2(float128_backend& result, const float128_backend& a, cons
    result.value() = atan2q(a.value(), b.value());
 }
 
+inline std::size_t hash_value(const float128_backend& val)
+{
+   return  hash_value(static_cast<double>(val.value()));
+}
+
 } // namespace backends
 
 }} // namespaces

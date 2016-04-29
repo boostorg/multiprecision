@@ -1793,6 +1793,14 @@ BOOST_MP_FORCEINLINE void swap(number<Backend, ExpressionTemplates>& a, number<B
 {
    a.swap(b);
 }
+//
+// Boost.Hash support, just call hash_value for the backend, which may or may not be supported:
+//
+template <class Backend, expression_template_option ExpressionTemplates>
+inline std::size_t hash_value(const number<Backend, ExpressionTemplates>& val)
+{
+   return hash_value(val.backend());
+}
 
 }  // namespace multiprecision
 
@@ -1944,6 +1952,22 @@ struct component_type<boost::rational<I> >
 #endif
 
 } // namespaces
+
+#ifndef BOOST_NO_CXX11_HDR_FUNCTIONAL
+
+#include <functional>
+
+namespace std {
+
+   template <class Backend, boost::multiprecision::expression_template_option ExpressionTemplates>
+   struct hash<boost::multiprecision::number<Backend, ExpressionTemplates> >
+   {
+      std::size_t operator()(const boost::multiprecision::number<Backend, ExpressionTemplates>& val) { return hash_value(val); }
+   };
+
+}
+
+#endif
 
 #include <boost/multiprecision/detail/ublas_interop.hpp>
 

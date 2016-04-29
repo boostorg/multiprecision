@@ -221,7 +221,7 @@ namespace boost {
             ++out;
             return out;
          }
-         unsigned bitcount = msb(val) + 1;
+         unsigned bitcount = boost::multiprecision::backends::eval_msb_imp(val.backend()) + 1;
          unsigned chunks = bitcount / chunk_size;
          if(bitcount % chunk_size)
             ++chunks;

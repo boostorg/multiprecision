@@ -434,6 +434,13 @@ NON_MEMBER_OP3(fmod, "fmod");
 NON_MEMBER_OP3(pow, "pow");
 NON_MEMBER_OP3(atan2, "atan2");
 
+template <class Backend>
+std::size_t hash_value(const debug_adaptor<Backend>& val)
+{
+   return hash_value(val.value());
+}
+
+
 } // namespace backends
 
 using backends::debug_adaptor;

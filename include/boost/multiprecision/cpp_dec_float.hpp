@@ -257,6 +257,17 @@ public:
 
    cpp_dec_float(const double mantissa, const ExponentType exponent);
 
+   std::size_t hash()const
+   {
+      std::size_t result = 0;
+      for(int i = 0; i < prec_elem; ++i)
+         boost::hash_combine(result, data[i]);
+      boost::hash_combine(result, exp);
+      boost::hash_combine(result, neg);
+      boost::hash_combine(result, fpclass);
+      return result;
+   }
+
    // Specific special values.
    static const cpp_dec_float& nan()
    {
@@ -2955,6 +2966,12 @@ template <unsigned Digits10, class ExponentType, class Allocator>
 inline int eval_get_sign(const cpp_dec_float<Digits10, ExponentType, Allocator>& val)
 {
    return val.iszero() ? 0 : val.isneg() ? -1 : 1;
+}
+
+template <unsigned Digits10, class ExponentType, class Allocator>
+inline std::size_t hash_value(const cpp_dec_float<Digits10, ExponentType, Allocator>& val)
+{
+   return val.hash();
 }
 
 } // namespace backends

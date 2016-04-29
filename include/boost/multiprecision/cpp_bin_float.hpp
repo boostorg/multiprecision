@@ -1423,6 +1423,16 @@ inline void eval_ceil(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE
    eval_left_shift(res.bits(), shift);
 }
 
+template<unsigned D1, backends::digit_base_type B1, class A1, class E1, E1 M1, E1 M2>
+inline std::size_t hash_value(const cpp_bin_float<D1, B1, A1, E1, M1, M2>& val)
+{
+   std::size_t result = hash_value(val.bits());
+   boost::hash_combine(result, val.exponent());
+   boost::hash_combine(result, val.sign());
+   return result;
+}
+
+
 } // namespace backends
 
 #ifdef BOOST_NO_SFINAE_EXPR

@@ -277,6 +277,15 @@ inline void assign_components(rational_adaptor<IntBackend>& result, const V& v1,
    result.data().assign(v1, v2);
 }
 
+template <class IntBackend>
+inline std::size_t hash_value(const rational_adaptor<IntBackend>& val)
+{
+   std::size_t result = hash_value(val.data().numerator());
+   boost::hash_combine(result, val.data().denominator());
+   return result;
+}
+
+
 } // namespace backends
 
 template<class IntBackend>
