@@ -983,6 +983,17 @@ inline void eval_frexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& v
    eval_ldexp(result, val, -*e);
 }
 
+template <unsigned Digits10>
+inline std::size_t hash_value(const gmp_float<Digits10>& val)
+{
+   std::size_t result = 0;
+   for(int i = 0; i < std::abs(val.data()[0]._mp_size); ++i)
+      boost::hash_combine(result, val.data()[0]._mp_d[i]);
+   boost::hash_combine(result, val.data()[0]._mp_exp);
+   boost::hash_combine(result, val.data()[0]._mp_size);
+   return result;
+}
+
 struct gmp_int
 {
 #ifdef BOOST_HAS_LONG_LONG
@@ -1731,6 +1742,16 @@ inline typename enable_if<
    mpz_powm_ui(result.data(), base.data(), p, m.data());
 }
 
+inline std::size_t hash_value(const gmp_int& val)
+{
+   // We should really use mpz_limbs_read here, but that's unsupported on older versions:
+   std::size_t result = 0;
+   for(int i = 0; i < std::abs(val.data()[0]._mp_size); ++i)
+      boost::hash_combine(result, val.data()[0]._mp_d[i]);
+   boost::hash_combine(result, val.data()[0]._mp_size);
+   return result;
+}
+
 struct gmp_rational;
 void eval_add(gmp_rational& t, const gmp_rational& o);
 
@@ -2092,6 +2113,17 @@ inline void assign_components(gmp_rational& result, gmp_int const& v1, gmp_int c
    mpz_set(mpq_numref(result.data()), v1.data());
    mpz_set(mpq_denref(result.data()), v2.data());
    mpq_canonicalize(result.data());
+}
+
+inline std::size_t hash_value(const gmp_rational& val)
+{
+   std::size_t result = 0;
+   for(int i = 0; i < std::abs(val.data()[0]._mp_num._mp_size); ++i)
+      boost::hash_combine(result, val.data()[0]._mp_num._mp_d[i]);
+   for(int i = 0; i < std::abs(val.data()[0]._mp_den._mp_size); ++i)
+      boost::hash_combine(result, val.data()[0]._mp_den._mp_d[i]);
+   boost::hash_combine(result, val.data()[0]._mp_num._mp_size);
+   return result;
 }
 
 //

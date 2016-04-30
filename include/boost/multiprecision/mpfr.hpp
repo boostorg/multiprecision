@@ -1425,6 +1425,20 @@ inline void eval_tanh(mpfr_float_backend<Digits10, AllocateType>& result, const 
    mpfr_tanh(result.data(), arg.data(), GMP_RNDN);
 }
 
+template <unsigned Digits10, mpfr_allocation_type AllocateType>
+inline std::size_t hash_value(const mpfr_float_backend<Digits10, AllocateType>& val)
+{
+   std::size_t result = 0;
+   std::size_t len = val.data()[0]._mpfr_prec / mp_bits_per_limb;
+   if(val.data()[0]._mpfr_prec % mp_bits_per_limb)
+      ++len;
+   for(int i = 0; i < len; ++i)
+      boost::hash_combine(result, val.data()[0]._mpfr_d[i]);
+   boost::hash_combine(result, val.data()[0]._mpfr_exp);
+   boost::hash_combine(result, val.data()[0]._mpfr_sign);
+   return result;
+}
+
 } // namespace backends
 
 #ifdef BOOST_NO_SFINAE_EXPR

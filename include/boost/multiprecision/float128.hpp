@@ -8,6 +8,7 @@
 
 #include <boost/config.hpp>
 #include <boost/scoped_array.hpp>
+#include <boost/functional/hash.hpp>
 #include <boost/multiprecision/number.hpp>
 
 #if defined(BOOST_INTEL) && !defined(BOOST_MP_USE_FLOAT128) && !defined(BOOST_MP_USE_QUAD)
@@ -491,7 +492,7 @@ inline void eval_atan2(float128_backend& result, const float128_backend& a, cons
 
 inline std::size_t hash_value(const float128_backend& val)
 {
-   return  hash_value(static_cast<double>(val.value()));
+   return  boost::hash_value(static_cast<double>(val.value()));
 }
 
 } // namespace backends

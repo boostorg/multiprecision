@@ -700,6 +700,9 @@ run bug12039.cpp no_eh_support ;
 run test_hash.cpp : : : 
    [ check-target-builds ../config//has_float128 : <define>TEST_FLOAT128 <source>quadmath : ]
    [ check-target-builds ../config//has_gmp : <define>TEST_GMP <source>gmp : ]
+   [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>gmp <source>mpfr : ]
+   [ check-target-builds ../config//has_mpfi : <define>TEST_MPFI <source>gmp <source>mpfr <source>mpfi : ]
+   [ check-target-builds ../config//has_tommath : <define>TEST_TOMMATH <source>tommath : ]
     ;
 
 if $(enable-specfun)

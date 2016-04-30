@@ -651,6 +651,16 @@ inline typename enable_if<is_signed<Integer>, Integer>::type eval_integer_modulu
    return eval_integer_modulus(x, boost::multiprecision::detail::unsigned_abs(val));
 }
 
+inline std::size_t hash_value(const tommath_int& val)
+{
+   std::size_t result = 0;
+   std::size_t len = val.data().used;
+   for(std::size_t i = 0; i < len; ++i)
+      boost::hash_combine(result, val.data().dp[i]);
+   boost::hash_combine(result, val.data().sign);
+   return result;
+}
+
 } // namespace backends
 
 using boost::multiprecision::backends::tommath_int;
