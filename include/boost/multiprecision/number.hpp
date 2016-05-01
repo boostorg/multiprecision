@@ -1962,7 +1962,7 @@ namespace std {
    template <class Backend, boost::multiprecision::expression_template_option ExpressionTemplates>
    struct hash<boost::multiprecision::number<Backend, ExpressionTemplates> >
    {
-      std::size_t operator()(const boost::multiprecision::number<Backend, ExpressionTemplates>& val) { return hash_value(val); }
+      std::size_t operator()(const boost::multiprecision::number<Backend, ExpressionTemplates>& val)const { return hash_value(val); }
    };
 
 }

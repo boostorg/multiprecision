@@ -38,6 +38,7 @@
 [import ../example/mixed_integer_arithmetic.cpp]
 [import ../example/logged_adaptor.cpp]
 [import ../example/numeric_limits_snips.cpp]
+[import ../example/hashing_examples.cpp]
 
 [template mpfr[] [@http://www.mpfr.org MPFR]]
 [template mpfi[] [@http://perso.ens-lyon.fr/nathalie.revol/software.html MPFI]]
@@ -2953,6 +2954,18 @@ which may be useful to ensure that columns line up.
 
 [endsect] [/section:input_output  Input Output]
 
+[section:hash Hash Function Support]
+
+[hash1]
+
+[hash2]
+
+[hash3]
+
+[hash4]
+
+[endsect][/hash]
+
 
 [endsect]
 
@@ -4396,6 +4409,9 @@ and `ff` is a variable of type `std::ios_base::fmtflags`.
                     The default version of this function is implemented in terms of eval_frexp, consequently this function must be provided for types with a radix other than 2.]]
 [[`eval_logb(b, cb)`][`B::exponent_type`][Sets `b` to the exponent ['e] of value `cb` such that ['1 <= cb*r[super -b] < r], where ['r] is the radix of type B.
                   The default version of this function is implemented in terms of `eval_ilogb`.]]
+[[['hashing:]]]
+[[`hash_value(cb)`][`std::size_t`]
+         [Returns a hash value for the argument that is suitable for use with `std::hash` etc.  If not provided then no automatic hashing support will be available for the number type.]]
 ]
 
 When the tables above place no ['throws] requirements on an operation, then it is up to each type modelling this concept to
