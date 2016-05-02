@@ -959,6 +959,18 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
 template <unsigned Digits10, class ExponentType, class Allocator>
 cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, ExponentType, Allocator>::operator/=(const cpp_dec_float<Digits10, ExponentType, Allocator>& v)
 {
+   if(iszero())
+   {
+      if((v.isnan)())
+      {
+         return *this = v;
+      }
+      else if(v.iszero())
+      {
+         return *this = nan();
+      }
+   }
+
    const bool u_and_v_are_finite_and_identical = ( (isfinite)()
       && (fpclass == v.fpclass)
       && (exp == v.exp)
@@ -977,14 +989,6 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
    }
    else
    {
-      if(iszero())
-      {
-         if((v.isnan)() || v.iszero())
-         {
-            return *this = v;
-         }
-         return *this;
-      }
       cpp_dec_float t(v);
       t.calculate_inv();
       return operator*=(t);

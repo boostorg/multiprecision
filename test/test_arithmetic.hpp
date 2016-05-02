@@ -1060,6 +1060,31 @@ void test_float_ops(const boost::mpl::int_<boost::multiprecision::number_kind_fl
       t = v;
       BOOST_CHECK((t /= r) == 0);
    }
+   //
+   // Operations that should produce NaN as a result:
+   //
+   if(std::numeric_limits<Real>::has_quiet_NaN)
+   {
+      v = r = 0;
+      Real t = v / r;
+      BOOST_CHECK((boost::math::isnan)(t));
+      v /= r;
+      BOOST_CHECK((boost::math::isnan)(v));
+      t = v / 0;
+      BOOST_CHECK((boost::math::isnan)(v));
+      if(std::numeric_limits<Real>::has_infinity)
+      {
+         v = 0;
+         r = std::numeric_limits<Real>::infinity();
+         t = v * r;
+         BOOST_CHECK((boost::math::isnan)(t));
+         t = r * 0;
+         BOOST_CHECK((boost::math::isnan)(t));
+         v = r;
+         t = r / v;
+         BOOST_CHECK((boost::math::isnan)(t));
+      }
+   }
 
    test_float_funcs<Real>(boost::mpl::bool_<std::numeric_limits<Real>::is_specialized>());
 }
