@@ -1077,9 +1077,12 @@ void test_float_ops(const boost::mpl::int_<boost::multiprecision::number_kind_fl
          v = 0;
          r = std::numeric_limits<Real>::infinity();
          t = v * r;
-         BOOST_CHECK((boost::math::isnan)(t));
-         t = r * 0;
-         BOOST_CHECK((boost::math::isnan)(t));
+         if(!boost::multiprecision::is_interval_number<Real>::value)
+         {
+            BOOST_CHECK((boost::math::isnan)(t));
+            t = r * 0;
+            BOOST_CHECK((boost::math::isnan)(t));
+         }
          v = r;
          t = r / v;
          BOOST_CHECK((boost::math::isnan)(t));
