@@ -30,6 +30,9 @@ namespace backends{
 template <unsigned digits10, mpfr_allocation_type AllocationType = allocate_dynamic>
 struct mpfr_float_backend;
 
+template <>
+struct mpfr_float_backend<0, allocate_stack>;
+
 } // namespace backends
 
 template <unsigned digits10, mpfr_allocation_type AllocationType>
