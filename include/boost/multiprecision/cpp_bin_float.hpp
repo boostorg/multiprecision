@@ -871,6 +871,29 @@ inline void eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Mi
    //
    // We can set the exponent and sign of the result up front:
    //
+   if((v.exponent() < 0) && (u.exponent() > 0))
+   {
+      // Check for overflow:
+      if(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::max_exponent + v.exponent() < u.exponent() - 1)
+      {
+         res.exponent() = cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity;
+         res.sign() = u.sign() != v.sign();
+         res.bits() = static_cast<limb_type>(0u);
+         return;
+      }
+   }
+   else if((v.exponent() > 0) && (u.exponent() < 0))
+   {
+      // Check for underflow:
+      if(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::min_exponent + v.exponent() > u.exponent() - 1)
+      {
+         // We will certainly underflow:
+         res.exponent() = cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero;
+         res.sign() = false;
+         res.bits() = static_cast<limb_type>(0u);
+         return;
+      }
+   }
    res.exponent() = u.exponent() - v.exponent() - 1;
    res.sign() = u.sign() != v.sign();
    //

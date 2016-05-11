@@ -80,10 +80,13 @@ void test_special_cases()
    BOOST_CHECK_EQUAL(max_val * -2, -inf_val);
    BOOST_CHECK_EQUAL(max_val / half, inf_val);
    BOOST_CHECK_EQUAL(max_val / -half, -inf_val);
+   BOOST_CHECK_EQUAL(max_val / min_val, inf_val);
+   BOOST_CHECK_EQUAL(max_val / -min_val, -inf_val);
    // Underflow:
    BOOST_CHECK_EQUAL(min_val * 2 - one_point_5 * min_val, 0);
    BOOST_CHECK_EQUAL(-min_val * 2 + one_point_5 * min_val, 0);
    BOOST_CHECK_EQUAL(min_val / 2, 0);
+   BOOST_CHECK_EQUAL(min_val / max_val, 0);
    BOOST_CHECK_EQUAL(min_val * half, 0);
    BOOST_CHECK_EQUAL(min_val - min_val, 0);
    BOOST_CHECK_EQUAL(max_val - max_val, 0);
@@ -146,6 +149,11 @@ void test_special_cases()
    BOOST_CHECK((boost::math::isnan)(0 / nan_val));
    BOOST_CHECK((boost::math::isnan)(inf_val * nan_val));
    BOOST_CHECK((boost::math::isnan)(inf_val / nan_val));
+   // Corner cases:
+   BOOST_CHECK_EQUAL((max_val * half) / half, max_val);
+   BOOST_CHECK_EQUAL((max_val / 2) * 2, max_val);
+   BOOST_CHECK_EQUAL((min_val / half) * half, min_val);
+   BOOST_CHECK_EQUAL((min_val * 2) / 2, min_val);
 }
 
 int main()
