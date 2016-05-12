@@ -291,6 +291,56 @@ void test()
       std::cout << "Signaling NaN's not tested" << std::endl;
    }
 #endif
+   //
+   // Try sign manipulation functions as well:
+   //
+   T one(1), minus_one(-1), zero(0);
+   BOOST_CHECK((::boost::math::sign)(one) > 0);
+   BOOST_CHECK((::boost::math::sign)(minus_one) < 0);
+   BOOST_CHECK((::boost::math::sign)(zero) == 0);
+   BOOST_CHECK((::boost::math::sign)(one + 2) > 0);
+   BOOST_CHECK((::boost::math::sign)(minus_one - 30) < 0);
+   BOOST_CHECK((::boost::math::sign)(-zero) == 0);
+
+   BOOST_CHECK((::boost::math::signbit)(one) == 0);
+   BOOST_CHECK((::boost::math::signbit)(minus_one) > 0);
+   BOOST_CHECK((::boost::math::signbit)(zero) == 0);
+   BOOST_CHECK((::boost::math::signbit)(one + 2) == 0);
+   BOOST_CHECK((::boost::math::signbit)(minus_one - 30) > 0);
+   //BOOST_CHECK((::boost::math::signbit)(-zero) == 0);
+
+   BOOST_CHECK((::boost::math::signbit)(boost::math::changesign(one)) > 0);
+   BOOST_CHECK((::boost::math::signbit)(boost::math::changesign(minus_one)) == 0);
+   //BOOST_CHECK((::boost::math::signbit)(zero) == 0);
+   BOOST_CHECK((::boost::math::signbit)(boost::math::changesign(one + 2)) > 0);
+   BOOST_CHECK((::boost::math::signbit)(boost::math::changesign(minus_one - 30)) == 0);
+   //BOOST_CHECK((::boost::math::signbit)(-zero) == 0);
+
+   BOOST_CHECK((::boost::math::signbit)(boost::math::copysign(one, one)) == 0);
+   BOOST_CHECK((::boost::math::signbit)(boost::math::copysign(one, minus_one)) > 0);
+   BOOST_CHECK((::boost::math::signbit)(boost::math::copysign(minus_one, one)) == 0);
+   BOOST_CHECK((::boost::math::signbit)(boost::math::copysign(minus_one, minus_one)) > 0);
+   BOOST_CHECK((::boost::math::signbit)(boost::math::copysign(one + 1, one + 2)) == 0);
+   BOOST_CHECK((::boost::math::signbit)(boost::math::copysign(one + 30, minus_one - 20)) > 0);
+   BOOST_CHECK((::boost::math::signbit)(boost::math::copysign(minus_one + 2, one + 2)) == 0);
+   BOOST_CHECK((::boost::math::signbit)(boost::math::copysign(minus_one - 20, minus_one - 30)) > 0);
+
+   // Things involving signed zero, need to detect it first:
+   T neg_zero_test = -(std::numeric_limits<T>::min)();
+   neg_zero_test /= 10000000;
+   BOOST_CHECK_EQUAL(neg_zero_test, 0);
+   BOOST_CHECK((::boost::math::sign)(neg_zero_test) == 0);
+   if(std::numeric_limits<T>::has_infinity && (one / neg_zero_test < 0))
+   {
+      // We got -INF, so we have a signed zero:
+      BOOST_CHECK((::boost::math::signbit)(neg_zero_test) > 0);
+      BOOST_CHECK((::boost::math::signbit)(boost::math::changesign(zero)) > 0);
+      BOOST_CHECK((::boost::math::signbit)(boost::math::changesign(neg_zero_test)) == 0);
+      BOOST_CHECK((::boost::math::signbit)(boost::math::copysign(zero, one)) == 0);
+      BOOST_CHECK((::boost::math::signbit)(boost::math::copysign(zero, minus_one)) > 0);
+      BOOST_CHECK((::boost::math::signbit)(boost::math::copysign(neg_zero_test, one)) == 0);
+      BOOST_CHECK((::boost::math::signbit)(boost::math::copysign(neg_zero_test, minus_one)) > 0);
+   }
 }
 
 int main()

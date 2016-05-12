@@ -1301,8 +1301,48 @@ inline bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::deta
    return (isnormal)(value_type(arg));
 }
 
+// Default versions of sign manipulation functions, if individual backends can do better than this
+// (for example with signed zero), then they should overload these functions further:
+
+template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+inline int sign BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
+{
+   return arg.sign();
+}
+template <class tag, class A1, class A2, class A3, class A4>
+inline int sign BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
+{
+   typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+   return (sign)(value_type(arg));
+}
+
+template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+inline int signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
+{
+   return arg.sign() < 0;
+}
+template <class tag, class A1, class A2, class A3, class A4>
+inline int signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
+{
+   typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+   return (signbit)(value_type(arg));
+}
+
 } // namespace math
+
 namespace multiprecision{
+
+   //
+   // Import Math functions here, so they can be found via ADL:
+   //
+   using boost::math::signbit;
+   using boost::math::sign;
+   using boost::math::copysign;
+   using boost::math::changesign;
+   using boost::math::fpclassify;
+   using boost::math::isinf;
+   using boost::math::isnan;
+   using boost::math::isnormal;
 
 template <class B1, class B2, class B3, expression_template_option ET1, expression_template_option ET2, expression_template_option ET3>
 inline number<B1, ET1>& add(number<B1, ET1>& result, const number<B2, ET2>& a, const number<B3, ET3>& b)
