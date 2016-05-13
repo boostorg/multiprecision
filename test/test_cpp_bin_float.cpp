@@ -162,6 +162,19 @@ void test_special_cases()
    BOOST_CHECK_EQUAL((max_val / 2) * 2, max_val);
    BOOST_CHECK_EQUAL((min_val / half) * half, min_val);
    BOOST_CHECK_EQUAL((min_val * 2) / 2, min_val);
+   // Signed zeros:
+   BOOST_CHECK(boost::math::signbit(min_val * -min_val));
+   BOOST_CHECK(boost::math::signbit(min_val * min_val) == 0);
+   BOOST_CHECK(boost::math::signbit(-min_val * -min_val) == 0);
+   BOOST_CHECK(boost::math::signbit(-min_val * min_val));
+   BOOST_CHECK(boost::math::signbit(min_val / max_val) == 0);
+   BOOST_CHECK(boost::math::signbit(min_val / -max_val));
+   BOOST_CHECK(boost::math::signbit(-min_val / -max_val) == 0);
+   BOOST_CHECK(boost::math::signbit(-min_val / max_val));
+   BOOST_CHECK(boost::math::signbit(min_val / 2) == 0);
+   BOOST_CHECK(boost::math::signbit(min_val / -2));
+   BOOST_CHECK(boost::math::signbit(-min_val / -2) == 0);
+   BOOST_CHECK(boost::math::signbit(-min_val / 2));
 }
 
 int main()
