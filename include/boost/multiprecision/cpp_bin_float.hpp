@@ -691,7 +691,9 @@ inline void eval_multiply(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, 
          res = b;
          break;
       default:
+         bool s = a.sign() != b.sign();
          res = a;
+         res.sign() = s;
          break;
       }
       return;
@@ -701,7 +703,9 @@ inline void eval_multiply(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, 
    }
    if(b.exponent() > cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::max_exponent)
    {
+      bool s = a.sign() != b.sign();
       res = b;
+      res.sign() = s;
       return;
    }
    if((a.exponent() > 0) && (b.exponent() > 0))
@@ -709,8 +713,9 @@ inline void eval_multiply(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, 
       if(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::max_exponent + 2 - a.exponent() < b.exponent())
       {
          // We will certainly overflow:
+         bool s = a.sign() != b.sign();
          res.exponent() = cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity;
-         res.sign() = a.sign() != b.sign();
+         res.sign() = s;
          res.bits() = static_cast<limb_type>(0u);
          return;
       }
@@ -823,6 +828,7 @@ inline void eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Mi
       res = u;
       return;
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
+   {
       switch(v.exponent())
       {
       case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
@@ -830,8 +836,11 @@ inline void eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Mi
          res = std::numeric_limits<number<cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> > >::quiet_NaN().backend();
          return;
       }
+      bool s = u.sign() != v.sign();
       res = u;
+      res.sign() = s;
       return;
+   }
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
       res = std::numeric_limits<number<cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> > >::quiet_NaN().backend();
       return;

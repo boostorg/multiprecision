@@ -112,10 +112,18 @@ void test_special_cases()
    BOOST_CHECK((boost::math::isnan)(inf_val - inf_val));
    BOOST_CHECK_EQUAL(inf_val * 2, inf_val);
    BOOST_CHECK_EQUAL(-inf_val * 2, -inf_val);
+   BOOST_CHECK_EQUAL(inf_val * -2, -inf_val);
+   BOOST_CHECK_EQUAL(-inf_val * -2, inf_val);
+   BOOST_CHECK_EQUAL(inf_val * test_type(-2), -inf_val);
+   BOOST_CHECK_EQUAL(-inf_val * test_type(-2), inf_val);
    BOOST_CHECK((boost::math::isnan)(inf_val * 0));
    BOOST_CHECK((boost::math::isnan)(-inf_val * 0));
    BOOST_CHECK_EQUAL(inf_val / 2, inf_val);
    BOOST_CHECK_EQUAL(-inf_val / 2, -inf_val);
+   BOOST_CHECK_EQUAL(inf_val / -2, -inf_val);
+   BOOST_CHECK_EQUAL(-inf_val / -2, inf_val);
+   BOOST_CHECK_EQUAL(inf_val / test_type(-2), -inf_val);
+   BOOST_CHECK_EQUAL(-inf_val / test_type(-2), inf_val);
    BOOST_CHECK_EQUAL(inf_val / 0, inf_val);
    BOOST_CHECK_EQUAL(-inf_val / 0, -inf_val);
    BOOST_CHECK((boost::math::isnan)(inf_val / inf_val));
