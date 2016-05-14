@@ -491,8 +491,12 @@ inline void do_eval_add(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Mi
    switch(a.exponent())
    {
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero:
+   {
+      bool s = a.sign();
       res = b;
+      res.sign() = s;
       return;
+   }
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
       if(b.exponent() == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan)
          res = b;
@@ -567,8 +571,9 @@ inline void do_eval_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponen
          res = std::numeric_limits<number<cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> > >::quiet_NaN().backend();
       else
       {
+         bool s = a.sign();
          res = b;
-         if(!res.sign())
+         if(res.sign() == s)
             res.negate();
       }
       return;

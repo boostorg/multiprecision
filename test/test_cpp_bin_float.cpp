@@ -175,6 +175,61 @@ void test_special_cases()
    BOOST_CHECK(boost::math::signbit(min_val / -2));
    BOOST_CHECK(boost::math::signbit(-min_val / -2) == 0);
    BOOST_CHECK(boost::math::signbit(-min_val / 2));
+   test_type neg_zero = min_val * -min_val;
+   // Arithmetic involving signed zero:
+   BOOST_CHECK_EQUAL(-neg_zero, 0);
+   BOOST_CHECK(!boost::math::signbit(-neg_zero));
+   BOOST_CHECK_EQUAL(neg_zero + 2, 2);
+   BOOST_CHECK_EQUAL(neg_zero + test_type(2), 2);
+   BOOST_CHECK_EQUAL(2 + neg_zero, 2);
+   BOOST_CHECK_EQUAL(test_type(2) + neg_zero, 2);
+   BOOST_CHECK_EQUAL(neg_zero + -2, -2);
+   BOOST_CHECK_EQUAL(neg_zero + test_type(-2), -2);
+   BOOST_CHECK_EQUAL(-2 + neg_zero, -2);
+   BOOST_CHECK_EQUAL(test_type(-2) + neg_zero, -2);
+   BOOST_CHECK_EQUAL(neg_zero - 2, -2);
+   BOOST_CHECK_EQUAL(neg_zero - test_type(2), -2);
+   BOOST_CHECK_EQUAL(2 - neg_zero, 2);
+   BOOST_CHECK_EQUAL(test_type(2) - neg_zero, 2);
+   BOOST_CHECK_EQUAL(neg_zero - -2, 2);
+   BOOST_CHECK_EQUAL(neg_zero - test_type(-2), 2);
+   BOOST_CHECK_EQUAL(-2 - neg_zero, -2);
+   BOOST_CHECK_EQUAL(test_type(-2) - neg_zero, -2);
+
+   BOOST_CHECK_EQUAL(neg_zero * 2, 0);
+   BOOST_CHECK_EQUAL(neg_zero * test_type(2), 0);
+   BOOST_CHECK_EQUAL(2 * neg_zero, 0);
+   BOOST_CHECK_EQUAL(test_type(2) * neg_zero, 0);
+   BOOST_CHECK_EQUAL(neg_zero * -2, 0);
+   BOOST_CHECK_EQUAL(neg_zero * test_type(-2), 0);
+   BOOST_CHECK_EQUAL(-2 * neg_zero, 0);
+   BOOST_CHECK_EQUAL(test_type(-2) * neg_zero, 0);
+   BOOST_CHECK(boost::math::signbit(neg_zero * 2));
+   BOOST_CHECK(boost::math::signbit(neg_zero * test_type(2)));
+   BOOST_CHECK(boost::math::signbit(2 * neg_zero));
+   BOOST_CHECK(boost::math::signbit(test_type(2) * neg_zero));
+   BOOST_CHECK(!boost::math::signbit(neg_zero * -2));
+   BOOST_CHECK(!boost::math::signbit(neg_zero * test_type(-2)));
+   BOOST_CHECK(!boost::math::signbit(-2 * neg_zero));
+   BOOST_CHECK(!boost::math::signbit(test_type(-2) * neg_zero));
+
+   BOOST_CHECK_EQUAL(neg_zero / 2, 0);
+   BOOST_CHECK_EQUAL(neg_zero / test_type(2), 0);
+   BOOST_CHECK_EQUAL(2 / neg_zero, -inf_val);
+   BOOST_CHECK_EQUAL(test_type(2) / neg_zero, -inf_val);
+   BOOST_CHECK_EQUAL(neg_zero / -2, 0);
+   BOOST_CHECK_EQUAL(neg_zero / test_type(-2), 0);
+   BOOST_CHECK_EQUAL(-2 / neg_zero, inf_val);
+   BOOST_CHECK_EQUAL(test_type(-2) / neg_zero, inf_val);
+   BOOST_CHECK(boost::math::signbit(neg_zero / 2));
+   BOOST_CHECK(boost::math::signbit(neg_zero / test_type(2)));
+   BOOST_CHECK(boost::math::signbit(2 / neg_zero));
+   BOOST_CHECK(boost::math::signbit(test_type(2) / neg_zero));
+   BOOST_CHECK(!boost::math::signbit(neg_zero / -2));
+   BOOST_CHECK(!boost::math::signbit(neg_zero / test_type(-2)));
+   BOOST_CHECK(!boost::math::signbit(-2 / neg_zero));
+   BOOST_CHECK(!boost::math::signbit(test_type(-2) / neg_zero));
+
    // Conversions to other types of special values:
    if(std::numeric_limits<float>::has_infinity)
    {
