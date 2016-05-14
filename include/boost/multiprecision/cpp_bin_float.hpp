@@ -476,7 +476,6 @@ inline void copy_and_round(cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
       // Underflow:
       res.exponent() = cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero;
       res.bits() = static_cast<limb_type>(0u);
-      res.sign() = false;
    }
 }
 
