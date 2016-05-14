@@ -670,7 +670,7 @@ std::string cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::s
       switch(exponent())
       {
       case exponent_zero:
-         s = "0";
+         s = sign() ? "-0" : f & std::ios_base::showpos ? "+0" : "0";
          boost::multiprecision::detail::format_float_string(s, 0, dig, f, true);
          break;
       case exponent_nan:
