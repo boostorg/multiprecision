@@ -1214,22 +1214,23 @@ inline typename boost::enable_if_c<boost::is_float<Float>::value>::type eval_con
    //
    // Perform rounding first, then afterwards extract the digits:
    //
-   cpp_bin_float<std::numeric_limits<Float>::digits, digit_base_2, void, Exponent, MinE, MaxE> arg(original_arg);
+   typedef cpp_bin_float<std::numeric_limits<Float>::digits, digit_base_2, void, Exponent, MinE, MaxE> conv_type;
+   conv_type arg(original_arg);
    switch(arg.exponent())
    {
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero:
+   case conv_type::exponent_zero:
       *res = 0;
       return;
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
+   case conv_type::exponent_nan:
       *res = std::numeric_limits<Float>::quiet_NaN();
       return;
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
+   case conv_type::exponent_infinity:
       *res = (std::numeric_limits<Float>::infinity)();
       if(arg.sign())
          *res = -*res;
       return;
    }
-   typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type e = arg.exponent();
+   typename conv_type::exponent_type e = arg.exponent();
    e -= cpp_bin_float<std::numeric_limits<Float>::digits, digit_base_2, void, Exponent, MinE, MaxE>::bit_count - 1;
    *res = std::ldexp(static_cast<Float>(*arg.bits().limbs()), e);
    for(unsigned i = 1; i < arg.bits().size(); ++i)

@@ -175,6 +175,34 @@ void test_special_cases()
    BOOST_CHECK(boost::math::signbit(min_val / -2));
    BOOST_CHECK(boost::math::signbit(-min_val / -2) == 0);
    BOOST_CHECK(boost::math::signbit(-min_val / 2));
+   // Conversions to other types of special values:
+   if(std::numeric_limits<float>::has_infinity)
+   {
+      BOOST_CHECK_EQUAL(inf_val.convert_to<float>(), std::numeric_limits<float>::infinity());
+      BOOST_CHECK_EQUAL((-inf_val).convert_to<float>(), -std::numeric_limits<float>::infinity());
+   }
+   if(std::numeric_limits<float>::has_quiet_NaN)
+   {
+      BOOST_CHECK((boost::math::isnan)(nan_val.convert_to<float>()));
+   }
+   if(std::numeric_limits<double>::has_infinity)
+   {
+      BOOST_CHECK_EQUAL(inf_val.convert_to<double>(), std::numeric_limits<double>::infinity());
+      BOOST_CHECK_EQUAL((-inf_val).convert_to<double>(), -std::numeric_limits<double>::infinity());
+   }
+   if(std::numeric_limits<double>::has_quiet_NaN)
+   {
+      BOOST_CHECK((boost::math::isnan)(nan_val.convert_to<double>()));
+   }
+   if(std::numeric_limits<long double>::has_infinity)
+   {
+      BOOST_CHECK_EQUAL(inf_val.convert_to<long double>(), std::numeric_limits<long double>::infinity());
+      BOOST_CHECK_EQUAL((-inf_val).convert_to<long double>(), -std::numeric_limits<long double>::infinity());
+   }
+   if(std::numeric_limits<long double>::has_quiet_NaN)
+   {
+      BOOST_CHECK((boost::math::isnan)(nan_val.convert_to<long double>()));
+   }
 }
 
 int main()
