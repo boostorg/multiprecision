@@ -482,8 +482,19 @@ inline void copy_and_round(cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
 template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
 inline void do_eval_add(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> &res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> &a, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> &b)
 {
+   if(a.exponent() < b.exponent())
+   {
+      bool s = a.sign();
+      do_eval_add(res, b, a);
+      if(res.sign() != s)
+         res.negate();
+      return;
+   }
+
    using default_ops::eval_add;
    using default_ops::eval_bit_test;
+
+   typedef typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type exponent_type;
 
    typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::double_rep_type dt;
 
@@ -521,32 +532,22 @@ inline void do_eval_add(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Mi
       res = b;
       return; // result is a NaN.
    }
-   
-   typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type e_diff = a.exponent() - b.exponent();
+
+   BOOST_STATIC_ASSERT(boost::integer_traits<exponent_type>::const_max - cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count > cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::max_exponent);
+
    bool s = a.sign();
-   if(e_diff >= 0)
+   dt = a.bits();
+   if(a.exponent() > (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + b.exponent())
    {
-      dt = a.bits();
-      if(e_diff < (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count)
-      {
-         eval_left_shift(dt, e_diff);
-         res.exponent() = a.exponent() - e_diff;
-         eval_add(dt, b.bits());
-      }
-      else
-         res.exponent() = a.exponent();
+      res.exponent() = a.exponent();
    }
    else
    {
-      dt= b.bits();
-      if(-e_diff < (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count)
-      {
-         eval_left_shift(dt, -e_diff);
-         res.exponent() = b.exponent() + e_diff;
-         eval_add(dt, a.bits());
-      }
-      else
-         res.exponent() = b.exponent();
+      exponent_type e_diff = a.exponent() - b.exponent();
+      BOOST_ASSERT(e_diff >= 0);
+      eval_left_shift(dt, e_diff);
+      res.exponent() = a.exponent() - e_diff;
+      eval_add(dt, b.bits());
    }
    
    copy_and_round(res, dt);
@@ -602,13 +603,13 @@ inline void do_eval_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponen
       return; // result is still a NaN.
    }
 
-   typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type e_diff = a.exponent() - b.exponent();
    bool s = a.sign();
-   if((e_diff > 0) || ((e_diff == 0) && a.bits().compare(b.bits()) >= 0))
+   if((a.exponent() > b.exponent()) || ((a.exponent() == b.exponent()) && a.bits().compare(b.bits()) >= 0))
    {
       dt = a.bits();
-      if(e_diff <= (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count)
+      if(a.exponent() <= (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + b.exponent())
       {
+         typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type e_diff = a.exponent() - b.exponent();
          eval_left_shift(dt, e_diff);
          res.exponent() = a.exponent() - e_diff;
          eval_subtract(dt, b.bits());
@@ -619,8 +620,9 @@ inline void do_eval_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponen
    else
    {
       dt = b.bits();
-      if(-e_diff <= (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count)
+      if(b.exponent() <= a.exponent() + (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count)
       {
+         typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type e_diff = a.exponent() - b.exponent();
          eval_left_shift(dt, -e_diff);
          res.exponent() = b.exponent() + e_diff;
          eval_subtract(dt, a.bits());
