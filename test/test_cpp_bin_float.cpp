@@ -70,8 +70,17 @@ void test_special_cases()
    if(std::numeric_limits<test_type>::has_denorm)
       min_val = std::numeric_limits<test_type>::denorm_min();
 
+   // Adding epsilon will increment 1.0:
    BOOST_CHECK(test_type(1) + eps != test_type(1));
    BOOST_CHECK(test_type(1) + eps / 2 == test_type(1));
+   // But it's not the smallest value that will do that:
+   test_type small = 1 + eps;
+   small = ldexp(small, -std::numeric_limits<test_type>::digits);
+   BOOST_CHECK(test_type(1) + small != test_type(1));
+   // And if we increment 1.0 first, then an even smaller 
+   // addition will round up:
+   test_type one_next = test_type(1) + eps;
+   BOOST_CHECK(one_next + eps / 2 != one_next);
 
    // Overflow:
    BOOST_CHECK_EQUAL(max_val + max_val * eps, inf_val);
