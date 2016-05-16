@@ -632,7 +632,6 @@ public:
    {
       return !is_zero();
    }
-   explicit operator void()const {}
 #  endif
 #else
    typedef bool (self_type::*unmentionable_type)()const;

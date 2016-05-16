@@ -351,7 +351,6 @@ inline void left_shift_limb(Int& result, double_limb_type s)
       ++rs; // Most significant limb will overflow when shifted
    rs += offset;
    result.resize(rs, rs);
-   bool truncated = result.size() != rs;
 
    typename Int::limb_pointer pr = result.limbs();
 
