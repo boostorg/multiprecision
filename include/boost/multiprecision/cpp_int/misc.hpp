@@ -10,6 +10,7 @@
 
 #include <boost/multiprecision/detail/bitscan.hpp> // lsb etc
 #include <boost/integer/common_factor_rt.hpp> // gcd/lcm
+#include <boost/functional/hash_fwd.hpp>
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
