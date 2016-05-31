@@ -767,7 +767,7 @@ inline typename enable_if_c<is_unsigned<U>::value>::type eval_multiply(cpp_bin_f
    {
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero:
    {
-      bool s = a.sign() != (b < 0);
+      bool s = a.sign();
       res = a;
       res.sign() = s;
       return;
