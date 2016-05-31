@@ -1212,6 +1212,15 @@ inline typename B::exponent_type eval_ilogb(const B& val)
 {
    BOOST_STATIC_ASSERT_MSG(!std::numeric_limits<number<B> >::is_specialized || (std::numeric_limits<number<B> >::radix == 2), "The default implementation of ilogb requires a base 2 number type");
    typename B::exponent_type e;
+   switch(eval_fpclassify(val))
+   {
+   case FP_NAN:
+      return (std::numeric_limits<typename B::exponent_type>::min)();
+   case FP_INFINITE:
+      return (std::numeric_limits<typename B::exponent_type>::max)();
+   case FP_ZERO:
+      return (std::numeric_limits<typename B::exponent_type>::min)();
+   }
    B result;
    eval_frexp(result, val, &e);
    return e - 1;
