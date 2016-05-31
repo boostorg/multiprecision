@@ -49,6 +49,13 @@ void expected_results()
       ".*",                          // stdlib
       ".*",                          // platform
       ".*",                          // test type(s)
+      ".*Near the Positive Root.*",  // test data group
+      ".*", 6000, 1000);              // test function
+   add_expected_result(
+      ".*",                          // compiler
+      ".*",                          // stdlib
+      ".*",                          // platform
+      ".*",                          // test type(s)
       ".*",                          // test data group
       ".*", 80, 30);                 // test function
    //

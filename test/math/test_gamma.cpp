@@ -66,7 +66,7 @@ void expected_results()
       ".*",                          // platform
       ".*",                          // test type(s)
       "near.*",                      // test data group
-      "lgamma", 50, 30);  // test function
+      "lgamma", 1400, 250);  // test function
    add_expected_result(
       ".*",                          // compiler
       ".*",                          // stdlib
