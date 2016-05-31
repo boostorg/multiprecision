@@ -139,6 +139,22 @@ public:
       ar & m_value;
       log_postfix_event(m_value, "serialize");
    }
+   static unsigned default_precision() BOOST_NOEXCEPT
+   {
+      return Backend::default_precision();
+   }
+   static void default_precision(unsigned v) BOOST_NOEXCEPT
+   {
+      Backend::default_precision(v);
+   }
+   unsigned precision()const BOOST_NOEXCEPT
+   {
+      return value().precision();
+   }
+   void precision(unsigned digits10) BOOST_NOEXCEPT
+   {
+      value().precision(digits10);
+   }
 };
 
 template <class T>
