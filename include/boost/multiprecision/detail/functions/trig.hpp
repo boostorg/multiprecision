@@ -497,11 +497,16 @@ void eval_asin(T& result, const T& x)
 
    result = (guess_type)(std::asin(dd));
 
-   unsigned current_digits = std::numeric_limits<guess_type>::digits - 5;
-   unsigned target_precision = boost::multiprecision::detail::digits2<number<T, et_on> >::value;
+   // Newton-Raphson iteration, we should double our precision with each iteration, 
+   // in practice this seems to not quite work in all cases... so terminate when we
+   // have at least 2/3 of the digits correct on the assumption that the correction 
+   // we've just added will finish the job...
+
+   int current_precision = eval_ilogb(result);
+   int target_precision = current_precision - 1 - (std::numeric_limits<number<T> >::digits * 2) / 3;
 
    // Newton-Raphson iteration
-   while(current_digits < target_precision)
+   while(current_precision > target_precision)
    {
       T sine, cosine;
       eval_sin(sine, result);
@@ -509,18 +514,11 @@ void eval_asin(T& result, const T& x)
       eval_subtract(sine, xx);
       eval_divide(sine, cosine);
       eval_subtract(result, sine);
-
-      current_digits *= 2;
-      /*
-      T lim;
-      eval_ldexp(lim, result, 1 - boost::multiprecision::detail::digits2<number<T, et_on> >::value);
-      if(eval_get_sign(s) < 0)
-         s.negate();
-      if(eval_get_sign(lim) < 0)
-         lim.negate();
-      if(lim.compare(s) >= 0)
+      current_precision = eval_ilogb(sine);
+#ifdef FP_ILOGB0
+      if(current_precision == FP_ILOGB0)
          break;
-         */
+#endif
    }
    if(b_neg)
       result.negate();
@@ -646,11 +644,16 @@ void eval_atan(T& result, const T& x)
    eval_convert_to(&d, xx);
    result = fp_type(std::atan(d));
 
-   // Newton-Raphson iteration
-   static const boost::int32_t double_digits10_minus_a_few = std::numeric_limits<double>::digits10 - 3;
+   // Newton-Raphson iteration, we should double our precision with each iteration, 
+   // in practice this seems to not quite work in all cases... so terminate when we
+   // have at least 2/3 of the digits correct on the assumption that the correction 
+   // we've just added will finish the job...
+
+   int current_precision = eval_ilogb(result);
+   int target_precision = current_precision - 1 - (std::numeric_limits<number<T> >::digits * 2) / 3;
 
    T s, c, t;
-   for(boost::int32_t digits = double_digits10_minus_a_few; digits <= std::numeric_limits<number<T, et_on> >::digits10; digits *= 2)
+   while(current_precision > target_precision)
    {
       eval_sin(s, result);
       eval_cos(c, result);
@@ -658,6 +661,11 @@ void eval_atan(T& result, const T& x)
       eval_subtract(t, s);
       eval_multiply(s, t, c);
       eval_add(result, s);
+      current_precision = eval_ilogb(s);
+#ifdef FP_ILOGB0
+      if(current_precision == FP_ILOGB0)
+         break;
+#endif
    }
    if(b_neg)
       result.negate();
