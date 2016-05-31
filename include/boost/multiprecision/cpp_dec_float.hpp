@@ -25,6 +25,7 @@
 #include <boost/array.hpp>
 #endif
 #include <boost/cstdint.hpp>
+#include <boost/functional/hash_fwd.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <boost/multiprecision/detail/dynamic_array.hpp>

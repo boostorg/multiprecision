@@ -912,7 +912,6 @@ void test_float_ops(const boost::mpl::int_<boost::multiprecision::number_kind_fl
       BOOST_CHECK_EQUAL(scalbn(Real(2), 5), 2 * pow(double(std::numeric_limits<Real>::radix), 5));
       BOOST_CHECK_EQUAL(scalbn(Real(2), -5), Real(2) / pow(double(std::numeric_limits<Real>::radix), 5));
       v = 512;
-      exponent;
       exponent = ilogb(v);
       r = scalbn(v, -exponent);
       BOOST_CHECK(r >= 1);

@@ -12,6 +12,7 @@
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/functional/hash_fwd.hpp>
 #ifdef BOOST_MSVC
 #  pragma warning(push)
 #  pragma warning(disable:4127)

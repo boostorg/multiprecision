@@ -101,6 +101,13 @@ void test_special_cases()
    BOOST_CHECK_EQUAL(max_val - max_val, 0);
    BOOST_CHECK_EQUAL(-min_val + min_val, 0);
    BOOST_CHECK_EQUAL(-max_val + max_val, 0);
+   // Things which should not over/underflow:
+   BOOST_CHECK_EQUAL((min_val * 2) / 2, min_val);
+   BOOST_CHECK_EQUAL((max_val / 2) * 2, max_val);
+   BOOST_CHECK_GE((min_val * 2.0000001) / 1.9999999999999999, min_val);
+   BOOST_CHECK_LE((max_val / 2.0000001) * 1.9999999999999999, max_val);
+   BOOST_CHECK_EQUAL(min_val * 2 - min_val, min_val);
+   BOOST_CHECK_EQUAL(max_val / 2 + max_val / 2, max_val);
    // Things involving zero:
    BOOST_CHECK_EQUAL(max_val + 0, max_val);
    BOOST_CHECK_EQUAL(max_val - 0, max_val);

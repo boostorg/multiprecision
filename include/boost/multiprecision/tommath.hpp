@@ -12,6 +12,7 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/scoped_array.hpp>
+#include <boost/functional/hash_fwd.hpp>
 #include <tommath.h>
 #include <cmath>
 #include <limits>

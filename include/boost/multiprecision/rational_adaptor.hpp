@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <sstream>
 #include <boost/cstdint.hpp>
+#include <boost/functional/hash_fwd.hpp>
 #include <boost/multiprecision/number.hpp>
 #ifdef BOOST_MSVC
 #  pragma warning(push)
