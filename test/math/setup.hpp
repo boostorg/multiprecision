@@ -31,8 +31,13 @@
 
 #if defined(TEST_MPF_50)
 #include <boost/multiprecision/gmp.hpp>
+#include <boost/multiprecision/debug_adaptor.hpp>
 
-#define MPF_TESTS    test(number<gmp_float<18> >(), "number<gmp_float<18> >");\
+#define MPF_TESTS    /*test(number<gmp_float<18> >(), "number<gmp_float<18> >");*/\
+   mpf_float::default_precision(20);\
+   test(mpf_float(), "number<gmp_float<0> > (20 digit precision)");\
+   mpf_float::default_precision(35);\
+   test(mpf_float(), "number<gmp_float<0> > (35 digit precision)");\
    test(number<gmp_float<30> >(), "number<gmp_float<30> >");\
    test(number<gmp_float<35> >(), "number<gmp_float<35> >");\
    /* there should be at least one test with expression templates off: */ \
@@ -41,13 +46,18 @@
    test(number<gmp_float<30> >(), "number<gmp_float<30> >");\
    test(number<gmp_float<35> >(), "number<gmp_float<35> >");\
    /* there should be at least one test with expression templates off: */ \
-   test(number<gmp_float<35>, et_off>(), "number<gmp_float<35>, et_off>");
+   test(number<gmp_float<35>, et_off>(), "number<gmp_float<35>, et_off>");\
+   mpf_float::default_precision(20); \
+   test(mpf_float(), "number<gmp_float<0> > (20 digit precision)"); \
+   mpf_float::default_precision(35); \
+   test(mpf_float(), "number<gmp_float<0> > (35 digit precision)"); \
 
 typedef boost::multiprecision::number<boost::multiprecision::gmp_float<18> > test_type_1;
 typedef boost::multiprecision::number<boost::multiprecision::gmp_float<30> > test_type_2;
 typedef boost::multiprecision::number<boost::multiprecision::gmp_float<35> > test_type_3;
 typedef boost::multiprecision::number<boost::multiprecision::gmp_float<35>, boost::multiprecision::et_off> test_type_4;
-   
+typedef boost::multiprecision::mpf_float test_type_5;
+
 #else
 
 #define MPF_TESTS

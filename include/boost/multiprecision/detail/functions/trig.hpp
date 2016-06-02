@@ -38,15 +38,15 @@ void hyp0F1(T& result, const T& b, const T& x)
 
    T tol;
    tol = ui_type(1);
-   eval_ldexp(tol, tol, 1 - boost::multiprecision::detail::digits2<number<T, et_on> >::value);
+   eval_ldexp(tol, tol, 1 - boost::multiprecision::detail::digits2<number<T, et_on> >::value());
    eval_multiply(tol, result);
    if(eval_get_sign(tol) < 0)
       tol.negate();
    T term;
 
-   static const int series_limit = 
-      boost::multiprecision::detail::digits2<number<T, et_on> >::value < 100
-      ? 100 : boost::multiprecision::detail::digits2<number<T, et_on> >::value;
+   const int series_limit = 
+      boost::multiprecision::detail::digits2<number<T, et_on> >::value() < 100
+      ? 100 : boost::multiprecision::detail::digits2<number<T, et_on> >::value();
    // Series expansion of hyperg_0f1(; b; x).
    for(n = 2; n < series_limit; ++n)
    {
@@ -365,7 +365,7 @@ void hyp2F1(T& result, const T& a, const T& b, const T& c, const T& x)
    eval_add(result, ui_type(1));
 
    T lim;
-   eval_ldexp(lim, result, 1 - boost::multiprecision::detail::digits2<number<T, et_on> >::value);
+   eval_ldexp(lim, result, 1 - boost::multiprecision::detail::digits2<number<T, et_on> >::value());
 
    if(eval_get_sign(lim) < 0)
       lim.negate();
@@ -373,9 +373,9 @@ void hyp2F1(T& result, const T& a, const T& b, const T& c, const T& x)
    ui_type n;
    T term;
 
-   static const unsigned series_limit = 
-      boost::multiprecision::detail::digits2<number<T, et_on> >::value < 100
-      ? 100 : boost::multiprecision::detail::digits2<number<T, et_on> >::value;
+   const unsigned series_limit = 
+      boost::multiprecision::detail::digits2<number<T, et_on> >::value() < 100
+      ? 100 : boost::multiprecision::detail::digits2<number<T, et_on> >::value();
    // Series expansion of hyperg_2f1(a, b; c; x).
    for(n = 2; n < series_limit; ++n)
    {

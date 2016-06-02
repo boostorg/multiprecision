@@ -103,7 +103,7 @@ void hyp0F0(T& H0F0, const T& x)
    typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
 
    BOOST_ASSERT(&H0F0 != &x);
-   long tol = boost::multiprecision::detail::digits2<number<T, et_on> >::value;
+   long tol = boost::multiprecision::detail::digits2<number<T, et_on> >::value();
    T t;
 
    T x_pow_n_div_n_fact(x);
@@ -117,9 +117,9 @@ void hyp0F0(T& H0F0, const T& x)
 
    ui_type n;
 
-   static const unsigned series_limit = 
-      boost::multiprecision::detail::digits2<number<T, et_on> >::value < 100
-      ? 100 : boost::multiprecision::detail::digits2<number<T, et_on> >::value;
+   const unsigned series_limit = 
+      boost::multiprecision::detail::digits2<number<T, et_on> >::value() < 100
+      ? 100 : boost::multiprecision::detail::digits2<number<T, et_on> >::value();
    // Series expansion of hyperg_0f0(; ; x).
    for(n = 2; n < series_limit; ++n)
    {
@@ -158,16 +158,16 @@ void hyp1F0(T& H1F0, const T& a, const T& x)
    eval_multiply(H1F0, pochham_a, x_pow_n_div_n_fact);
    eval_add(H1F0, si_type(1));
    T lim;
-   eval_ldexp(lim, H1F0, 1 - boost::multiprecision::detail::digits2<number<T, et_on> >::value);
+   eval_ldexp(lim, H1F0, 1 - boost::multiprecision::detail::digits2<number<T, et_on> >::value());
    if(eval_get_sign(lim) < 0)
       lim.negate();
 
    si_type n;
    T term, part;
 
-   static const si_type series_limit =
-      boost::multiprecision::detail::digits2<number<T, et_on> >::value < 100
-      ? 100 : boost::multiprecision::detail::digits2<number<T, et_on> >::value;
+   const si_type series_limit =
+      boost::multiprecision::detail::digits2<number<T, et_on> >::value() < 100
+      ? 100 : boost::multiprecision::detail::digits2<number<T, et_on> >::value();
    // Series expansion of hyperg_1f0(a; ; x).
    for(n = 2; n < series_limit; n++)
    {
@@ -237,7 +237,14 @@ void eval_exp(T& result, const T& x)
       //
       // Use series for exp(x) - 1:
       //
-      T lim = std::numeric_limits<number<T, et_on> >::epsilon().backend();
+      T lim;
+      if(std::numeric_limits<number<T, et_on> >::is_specialized)
+         lim = std::numeric_limits<number<T, et_on> >::epsilon().backend();
+      else
+      {
+         result = ui_type(1);
+         eval_ldexp(lim, result, 1 - boost::multiprecision::detail::digits2<number<T, et_on> >::value());
+      }
       unsigned k = 2;
       exp_series = xx;
       result = si_type(1);
@@ -286,7 +293,7 @@ void eval_exp(T& result, const T& x)
    eval_convert_to(&n, result);
 
    // The scaling is 2^11 = 2048.
-   static const si_type p2 = static_cast<si_type>(si_type(1) << 11);
+   const si_type p2 = static_cast<si_type>(si_type(1) << 11);
 
    eval_multiply(exp_series, get_constant_ln2<T>(), static_cast<canonical_exp_type>(n));
    eval_subtract(exp_series, xx);
@@ -346,7 +353,10 @@ void eval_log(T& result, const T& arg)
    else
       eval_subtract(result, t);
 
-   eval_multiply(lim, result, std::numeric_limits<number<T, et_on> >::epsilon().backend());
+   if(std::numeric_limits<number<T, et_on> >::is_specialized)
+      eval_multiply(lim, result, std::numeric_limits<number<T, et_on> >::epsilon().backend());
+   else
+      eval_ldexp(lim, result, 1 - boost::multiprecision::detail::digits2<number<T, et_on> >::value());
    if(eval_get_sign(lim) < 0)
       lim.negate();
    INSTRUMENT_BACKEND(lim);
@@ -369,14 +379,17 @@ void eval_log(T& result, const T& arg)
 template <class T>
 const T& get_constant_log10()
 {
-   static T result;
-   static bool b = false;
-   if(!b)
+   static BOOST_MP_THREAD_LOCAL T result;
+   static BOOST_MP_THREAD_LOCAL bool b = false;
+   static BOOST_MP_THREAD_LOCAL long digits = boost::multiprecision::detail::digits2<number<T> >::value();
+   if(!b || (digits != boost::multiprecision::detail::digits2<number<T> >::value()))
    {
       typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
       T ten;
       ten = ui_type(10u);
       eval_log(result, ten);
+      b = true;
+      digits = boost::multiprecision::detail::digits2<number<T> >::value();
    }
 
    constant_initializer<T, &get_constant_log10<T> >::do_nothing();
@@ -606,7 +619,7 @@ namespace detail{
       ui_type k = 1;
 
       T lim(x);
-      eval_ldexp(lim, lim, 1 - boost::multiprecision::detail::digits2<number<T, et_on> >::value);
+      eval_ldexp(lim, lim, 1 - boost::multiprecision::detail::digits2<number<T, et_on> >::value());
 
       do
       {
