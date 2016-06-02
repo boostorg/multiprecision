@@ -36,6 +36,19 @@
 #define BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
 #endif
 
+//
+// Thread local storage:
+//
+#ifndef BOOST_NO_CXX11_HDR_THREAD
+#  define BOOST_MP_THREAD_LOCAL thread_local
+#elif defined(__GNUC__)
+#  define BOOST_MP_THREAD_LOCAL __thread
+#elif defined(__MSC_VER__)
+#  define BOOST_MP_THREAD_LOCAL __declspec(thread)
+#else
+#  define BOOST_MP_THREAD_LOCAL
+#endif
+
 #ifdef BOOST_MSVC
 #  pragma warning(push)
 #  pragma warning(disable:6326)
@@ -750,7 +763,8 @@ struct digits2
    BOOST_STATIC_ASSERT((std::numeric_limits<T>::radix == 2) || (std::numeric_limits<T>::radix == 10));
    // If we really have so many digits that this fails, then we're probably going to hit other problems anyway:
    BOOST_STATIC_ASSERT(LONG_MAX / 1000 > (std::numeric_limits<T>::digits + 1));
-   static const long value = std::numeric_limits<T>::radix == 10 ?  (((std::numeric_limits<T>::digits + 1) * 1000L) / 301L) : std::numeric_limits<T>::digits;
+   static const long m_value = std::numeric_limits<T>::radix == 10 ?  (((std::numeric_limits<T>::digits + 1) * 1000L) / 301L) : std::numeric_limits<T>::digits;
+   static inline BOOST_CONSTEXPR long value()BOOST_NOEXCEPT { return m_value; }
 };
 
 #ifndef BOOST_MP_MIN_EXPONENT_DIGITS

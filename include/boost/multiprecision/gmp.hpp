@@ -7,6 +7,7 @@
 #define BOOST_MATH_ER_GMP_BACKEND_HPP
 
 #include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/debug_adaptor.hpp>
 #include <boost/multiprecision/detail/integer_ops.hpp>
 #include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <boost/multiprecision/detail/digits.hpp>
@@ -2245,9 +2246,9 @@ inline number<gmp_int, ET> denominator(const number<gmp_rational, ET>& val)
    return result;
 }
 
-#ifdef BOOST_NO_SFINAE_EXPR
-
 namespace detail{
+
+#ifdef BOOST_NO_SFINAE_EXPR
 
 template<>
 struct is_explicitly_convertible<canonical<mpf_t, gmp_int>::type, gmp_int> : public mpl::true_ {};
@@ -2260,9 +2261,45 @@ struct is_explicitly_convertible<gmp_rational, gmp_int> : public mpl::true_ {};
 template<unsigned D1, unsigned D2>
 struct is_explicitly_convertible<gmp_float<D1>, gmp_float<D2> > : public mpl::true_ {};
 
-}
-
 #endif
+
+template <>
+struct digits2<number<gmp_float<0>, et_on> >
+{
+   static long value()
+   {
+      return  multiprecision::detail::digits10_2_2(gmp_float<0>::default_precision());
+   }
+};
+
+template <>
+struct digits2<number<gmp_float<0>, et_off> >
+{
+   static long value()
+   {
+      return  multiprecision::detail::digits10_2_2(gmp_float<0>::default_precision());
+   }
+};
+
+template <>
+struct digits2<number<debug_adaptor<gmp_float<0> >, et_on> >
+{
+   static long value()
+   {
+      return  multiprecision::detail::digits10_2_2(gmp_float<0>::default_precision());
+   }
+};
+
+template <>
+struct digits2<number<debug_adaptor<gmp_float<0> >, et_off> >
+{
+   static long value()
+   {
+      return  multiprecision::detail::digits10_2_2(gmp_float<0>::default_precision());
+   }
+};
+
+}
 
 template<>
 struct number_category<detail::canonical<mpz_t, gmp_int>::type> : public mpl::int_<number_kind_integer>{};
@@ -2280,7 +2317,113 @@ typedef number<gmp_float<0> >     mpf_float;
 typedef number<gmp_int >         mpz_int;
 typedef number<gmp_rational >    mpq_rational;
 
-}}  // namespaces
+}  // namespace multiprecision
+
+namespace math { namespace tools{
+
+   template <>
+   inline int digits<boost::multiprecision::mpf_float>()
+#ifdef BOOST_MATH_NOEXCEPT
+      BOOST_NOEXCEPT
+#endif
+   {
+      return multiprecision::detail::digits10_2_2(boost::multiprecision::mpf_float::default_precision());
+   }
+   template <>
+   inline int digits<boost::multiprecision::number<boost::multiprecision::gmp_float<0>, boost::multiprecision::et_off> >()
+#ifdef BOOST_MATH_NOEXCEPT
+      BOOST_NOEXCEPT
+#endif
+   {
+      return multiprecision::detail::digits10_2_2(boost::multiprecision::mpf_float::default_precision());
+   }
+
+   template <>
+   inline boost::multiprecision::mpf_float
+      max_value<boost::multiprecision::mpf_float>()
+   {
+      boost::multiprecision::mpf_float result(0.5);
+      mpf_mul_2exp(result.backend().data(), result.backend().data(), (std::numeric_limits<mp_exp_t>::max)() / 64 + 1);
+      return result;
+   }
+
+   template <>
+   inline boost::multiprecision::mpf_float
+      min_value<boost::multiprecision::mpf_float>()
+   {
+      boost::multiprecision::mpf_float result(0.5);
+      mpf_div_2exp(result.backend().data(), result.backend().data(), (std::numeric_limits<mp_exp_t>::min)() / 64 + 1);
+      return result;
+   }
+
+   template <>
+   inline boost::multiprecision::number<boost::multiprecision::gmp_float<0>, boost::multiprecision::et_off>
+      max_value<boost::multiprecision::number<boost::multiprecision::gmp_float<0>, boost::multiprecision::et_off> >()
+   {
+      boost::multiprecision::number<boost::multiprecision::gmp_float<0>, boost::multiprecision::et_off> result(0.5);
+      mpf_mul_2exp(result.backend().data(), result.backend().data(), (std::numeric_limits<mp_exp_t>::max)() / 64 + 1);
+      return result;
+   }
+
+   template <>
+   inline boost::multiprecision::number<boost::multiprecision::gmp_float<0>, boost::multiprecision::et_off>
+      min_value<boost::multiprecision::number<boost::multiprecision::gmp_float<0>, boost::multiprecision::et_off> >()
+   {
+      boost::multiprecision::number<boost::multiprecision::gmp_float<0>, boost::multiprecision::et_off> result(0.5);
+      mpf_div_2exp(result.backend().data(), result.backend().data(), (std::numeric_limits<mp_exp_t>::max)() / 64 + 1);
+      return result;
+   }
+
+   template <>
+   inline int digits<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpf_float::backend_type> >>()
+#ifdef BOOST_MATH_NOEXCEPT
+      BOOST_NOEXCEPT
+#endif
+   {
+      return multiprecision::detail::digits10_2_2(boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpf_float::backend_type> >::default_precision());
+   }
+   template <>
+   inline int digits<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::gmp_float<0> >, boost::multiprecision::et_off> >()
+#ifdef BOOST_MATH_NOEXCEPT
+      BOOST_NOEXCEPT
+#endif
+   {
+      return multiprecision::detail::digits10_2_2(boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpf_float::backend_type> >::default_precision());
+   }
+
+   template <>
+   inline boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpf_float::backend_type> >
+      max_value<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpf_float::backend_type> >>()
+   {
+      return max_value<boost::multiprecision::mpf_float>().backend();
+   }
+
+   template <>
+   inline boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpf_float::backend_type> >
+      min_value<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpf_float::backend_type> >>()
+   {
+      return min_value<boost::multiprecision::mpf_float>().backend();
+   }
+
+   template <>
+   inline boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::gmp_float<0> >, boost::multiprecision::et_off>
+      max_value<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::gmp_float<0> >, boost::multiprecision::et_off> >()
+   {
+      return max_value<boost::multiprecision::mpf_float>().backend();
+   }
+
+   template <>
+   inline boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::gmp_float<0> >, boost::multiprecision::et_off>
+      min_value<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::gmp_float<0> >, boost::multiprecision::et_off> >()
+   {
+      return min_value<boost::multiprecision::mpf_float>().backend();
+   }
+
+
+}} // namespaces math::tools
+
+
+}  // namespace boost
 
 namespace std{
 
