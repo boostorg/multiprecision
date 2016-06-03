@@ -10,6 +10,7 @@
 #endif
 
 #define BOOST_MATH_OVERFLOW_ERROR_POLICY ignore_error
+#undef BOOST_MATH_SMALL_CONSTANT
 #define BOOST_MATH_SMALL_CONSTANT(x) x
 
 #if !defined(TEST_MPF_50) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) \

@@ -36,7 +36,7 @@ void expected_results()
       ".*",                          // platform
       ".*",                          // test type(s)
       "factorials",                  // test data group
-      "tgamma", 140, 70);  // test function
+      "tgamma", 170, 70);  // test function
    add_expected_result(
       ".*",                          // compiler
       ".*",                          // stdlib
