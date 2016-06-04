@@ -488,7 +488,6 @@ struct expression<terminal, Arg1, void, void, void>
       result_type r(*this);
       return static_cast<bool>(r);
    }
-   explicit operator void()const {}
 #  endif
 #else
    operator unmentionable_type()const
@@ -556,7 +555,6 @@ struct expression<tag, Arg1, Arg2, void, void>
       result_type r(*this);
       return static_cast<bool>(r);
    }
-   explicit operator void()const {}
 #  endif
 #else
    operator unmentionable_type()const
@@ -635,7 +633,6 @@ struct expression<tag, Arg1, Arg2, Arg3, void>
       result_type r(*this);
       return static_cast<bool>(r);
    }
-   explicit operator void()const {}
 #  endif
 #else
    operator unmentionable_type()const
@@ -723,7 +720,6 @@ struct expression
       result_type r(*this);
       return static_cast<bool>(r);
    }
-   explicit operator void()const {}
 #  endif
 #else
    operator unmentionable_type()const
