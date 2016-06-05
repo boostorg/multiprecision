@@ -34,9 +34,10 @@ namespace backends{
 
 
 #ifdef BOOST_MSVC
-// warning C4127: conditional expression is constant
 #pragma warning(push)
-#pragma warning(disable:4127 4351 4293 4996 4307 4702 6285)
+#pragma warning(disable:4307) // integral constant overflow (oveflow is in a branch not taken when it would overflow)
+#pragma warning(disable:4127) // conditional expression is constant
+#pragma warning(disable:4702) // Unreachable code (reachability depends on template params)
 #endif
 
 template <unsigned MinBits = 0, unsigned MaxBits = 0, boost::multiprecision::cpp_integer_type SignType = signed_magnitude, cpp_int_check_type Checked = unchecked, class Allocator = typename mpl::if_c<MinBits && (MinBits == MaxBits), void, std::allocator<limb_type> >::type >
@@ -1921,6 +1922,10 @@ template<unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_
 struct is_explicitly_convertible<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> > : public mpl::true_ {};
 
 }
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(pop)
 #endif
 
 }} // namespaces

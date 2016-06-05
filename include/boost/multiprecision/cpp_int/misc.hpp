@@ -15,7 +15,9 @@
 #ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable:4702)
+#pragma warning(disable:4127) // conditional expression is constant
 #endif
+
 
 namespace boost{ namespace multiprecision{ namespace backends{
 

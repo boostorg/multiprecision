@@ -8,6 +8,12 @@
 
 namespace boost{ namespace multiprecision{ namespace cpp_bf_io_detail{
 
+#ifdef BOOST_MSVC
+#pragma warning(push)
+#pragma warning(disable:4127) // conditional expression is constant
+#endif
+
+
 //
 // Multiplies a by b and shifts the result so it fits inside max_bits bits, 
 // returns by how much the result was shifted.
@@ -683,6 +689,10 @@ std::string cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::s
    }
    return s;
 }
+
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
 
 }}} // namespaces
 

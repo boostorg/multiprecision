@@ -12,6 +12,11 @@ namespace std{
 
 namespace detail{
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4307)
+#endif
+
 template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
 inline boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>
    get_min(const boost::mpl::true_&, const boost::mpl::true_&)
@@ -209,6 +214,9 @@ BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost
 template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST float_round_style numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>  >::round_style;
 
+#endif
+#ifdef _MSC_VER
+#pragma warning(pop)
 #endif
 
 } // namespace std

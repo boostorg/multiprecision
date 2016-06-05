@@ -255,6 +255,9 @@ const T& get_constant_ln2()
 
    return result;
 }
+#ifndef BOOST_MP_THREAD_LOCAL
+#error 1
+#endif
 
 template <class T>
 const T& get_constant_e()

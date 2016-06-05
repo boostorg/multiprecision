@@ -10,6 +10,11 @@
 
 namespace boost{ namespace multiprecision{ namespace backends{
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4127) // conditional expression is constant
+#endif
+
 //
 // This is the key addition routine where all the argument types are non-trivial cpp_int's:
 //
@@ -523,6 +528,10 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
    *result.limbs() = detail::checked_subtract(*result.limbs(), *o.limbs(), typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
    result.normalize();
 }
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 }}} // namespaces
 

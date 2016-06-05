@@ -502,8 +502,8 @@ void eval_asin(T& result, const T& x)
    // have at least 2/3 of the digits correct on the assumption that the correction 
    // we've just added will finish the job...
 
-   int current_precision = eval_ilogb(result);
-   int target_precision = current_precision - 1 - (std::numeric_limits<number<T> >::digits * 2) / 3;
+   boost::intmax_t current_precision = eval_ilogb(result);
+   boost::intmax_t target_precision = current_precision - 1 - (std::numeric_limits<number<T> >::digits * 2) / 3;
 
    // Newton-Raphson iteration
    while(current_precision > target_precision)
@@ -649,8 +649,8 @@ void eval_atan(T& result, const T& x)
    // have at least 2/3 of the digits correct on the assumption that the correction 
    // we've just added will finish the job...
 
-   int current_precision = eval_ilogb(result);
-   int target_precision = current_precision - 1 - (std::numeric_limits<number<T> >::digits * 2) / 3;
+   boost::intmax_t current_precision = eval_ilogb(result);
+   boost::intmax_t target_precision = current_precision - 1 - (std::numeric_limits<number<T> >::digits * 2) / 3;
 
    T s, c, t;
    while(current_precision > target_precision)

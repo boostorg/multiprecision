@@ -878,10 +878,11 @@ void test_float_ops(const boost::mpl::int_<boost::multiprecision::number_kind_fl
    //
    // ldexp and frexp, these pretty much have to be implemented by each backend:
    //
+   typedef typename Real::backend_type::exponent_type e_type;
    BOOST_CHECK_EQUAL(ldexp(Real(2), 5) ,  64);
    BOOST_CHECK_EQUAL(ldexp(Real(2), -5) ,  Real(2) / 32);
    Real v(512);
-   int exponent;
+   e_type exponent;
    Real r = frexp(v, &exponent);
    BOOST_CHECK_EQUAL(r ,  0.5);
    BOOST_CHECK_EQUAL(exponent ,  10);
@@ -890,7 +891,6 @@ void test_float_ops(const boost::mpl::int_<boost::multiprecision::number_kind_fl
    r = frexp(v, &exponent);
    BOOST_CHECK_EQUAL(r ,  0.5);
    BOOST_CHECK_EQUAL(exponent ,  -8);
-   typedef typename Real::backend_type::exponent_type e_type;
    BOOST_CHECK_EQUAL(ldexp(Real(2), e_type(5)) ,  64);
    BOOST_CHECK_EQUAL(ldexp(Real(2), e_type(-5)) ,  Real(2) / 32);
    v = 512;
