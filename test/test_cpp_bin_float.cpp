@@ -121,10 +121,41 @@ void test_special_cases()
    BOOST_CHECK_EQUAL(0 / -max_val, 0);
    // Things involving infinity:
    BOOST_CHECK_EQUAL(inf_val + 2, inf_val);
-   BOOST_CHECK_EQUAL(inf_val + inf_val, inf_val);
-   BOOST_CHECK_EQUAL(-inf_val - 2, -inf_val);
    BOOST_CHECK_EQUAL(inf_val - 2, inf_val);
+   BOOST_CHECK_EQUAL(inf_val + -2, inf_val);
+   BOOST_CHECK_EQUAL(inf_val - -2, inf_val);
    BOOST_CHECK_EQUAL(-inf_val + 2, -inf_val);
+   BOOST_CHECK_EQUAL(-inf_val - 2, -inf_val);
+   BOOST_CHECK_EQUAL(-inf_val + -2, -inf_val);
+   BOOST_CHECK_EQUAL(-inf_val - -2, -inf_val);
+
+   BOOST_CHECK_EQUAL(2 + inf_val, inf_val);
+   BOOST_CHECK_EQUAL(2 - inf_val, -inf_val);
+   BOOST_CHECK_EQUAL(-2 + inf_val, inf_val);
+   BOOST_CHECK_EQUAL(-2 - inf_val, -inf_val);
+   BOOST_CHECK_EQUAL(2 + (-inf_val), -inf_val);
+   BOOST_CHECK_EQUAL(2 - (-inf_val), inf_val);
+   BOOST_CHECK_EQUAL(-2 + (-inf_val), -inf_val);
+   BOOST_CHECK_EQUAL(-2 - (-inf_val), inf_val);
+
+   BOOST_CHECK_EQUAL(inf_val + test_type(2), inf_val);
+   BOOST_CHECK_EQUAL(inf_val - test_type(2), inf_val);
+   BOOST_CHECK_EQUAL(inf_val + test_type(-2), inf_val);
+   BOOST_CHECK_EQUAL(inf_val - test_type(-2), inf_val);
+   BOOST_CHECK_EQUAL(-inf_val + test_type(2), -inf_val);
+   BOOST_CHECK_EQUAL(-inf_val - test_type(2), -inf_val);
+   BOOST_CHECK_EQUAL(-inf_val + test_type(-2), -inf_val);
+   BOOST_CHECK_EQUAL(-inf_val - test_type(-2), -inf_val);
+
+   BOOST_CHECK_EQUAL(test_type(2) + inf_val, inf_val);
+   BOOST_CHECK_EQUAL(test_type(2) - inf_val, -inf_val);
+   BOOST_CHECK_EQUAL(test_type(-2) + inf_val, inf_val);
+   BOOST_CHECK_EQUAL(test_type(-2) - inf_val, -inf_val);
+   BOOST_CHECK_EQUAL(test_type(2) + (-inf_val), -inf_val);
+   BOOST_CHECK_EQUAL(test_type(2) - (-inf_val), inf_val);
+   BOOST_CHECK_EQUAL(test_type(-2) + (-inf_val), -inf_val);
+   BOOST_CHECK_EQUAL(test_type(-2) - (-inf_val), inf_val);
+
    BOOST_CHECK((boost::math::isnan)(inf_val - inf_val));
    BOOST_CHECK_EQUAL(inf_val * 2, inf_val);
    BOOST_CHECK_EQUAL(-inf_val * 2, -inf_val);
