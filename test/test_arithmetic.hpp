@@ -414,8 +414,10 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    BOOST_CHECK_EQUAL(a ,  20 % 7);
 #endif
    a = 20;
-   BOOST_CHECK_EQUAL(++a ,  21);
-   BOOST_CHECK_EQUAL(--a ,  20);
+   ++a;
+   BOOST_CHECK_EQUAL(a ,  21);
+   --a;
+   BOOST_CHECK_EQUAL(a ,  20);
    BOOST_CHECK_EQUAL(a++ ,  20);
    BOOST_CHECK_EQUAL(a ,  21);
    BOOST_CHECK_EQUAL(a-- ,  21);
@@ -449,9 +451,11 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
 #endif
       // Unless they fit within range:
       a = 2000L;
-      BOOST_CHECK_EQUAL((a <<= 20uLL) ,  (2000L << 20));
+      a <<= 20uLL;
+      BOOST_CHECK_EQUAL(a,  (2000L << 20));
       a = 2000;
-      BOOST_CHECK_EQUAL((a <<= 20LL)  ,  (2000L << 20));
+      a <<= 20LL;
+      BOOST_CHECK_EQUAL(a,  (2000L << 20));
 
 #ifndef BOOST_NO_EXCEPTIONS
       BOOST_CHECK_THROW(Real(a >> (1uLL << (sizeof(long long) * CHAR_BIT - 2))), std::out_of_range);
