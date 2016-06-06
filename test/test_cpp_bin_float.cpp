@@ -281,6 +281,14 @@ void test_special_cases()
    BOOST_CHECK(!boost::math::signbit(-2 / neg_zero));
    BOOST_CHECK(!boost::math::signbit(test_type(-2) / neg_zero));
 
+   BOOST_CHECK(boost::math::signbit(neg_zero.convert_to<double>()));
+   BOOST_CHECK(boost::math::signbit(neg_zero.convert_to<float>()));
+   BOOST_CHECK(boost::math::signbit(neg_zero.convert_to<long double>()));
+   test_type zero(0);
+   BOOST_CHECK(!boost::math::signbit(zero.convert_to<double>()));
+   BOOST_CHECK(!boost::math::signbit(zero.convert_to<float>()));
+   BOOST_CHECK(!boost::math::signbit(zero.convert_to<long double>()));
+
    // Conversions to other types of special values:
    if(std::numeric_limits<float>::has_infinity)
    {

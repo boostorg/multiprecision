@@ -1227,6 +1227,8 @@ inline typename boost::enable_if_c<boost::is_float<Float>::value>::type eval_con
    {
    case conv_type::exponent_zero:
       *res = 0;
+      if(arg.sign())
+         *res = -*res;
       return;
    case conv_type::exponent_nan:
       *res = std::numeric_limits<Float>::quiet_NaN();
