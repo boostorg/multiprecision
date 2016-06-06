@@ -138,6 +138,9 @@ void test_special_cases()
    BOOST_CHECK_EQUAL(-2 + (-inf_val), -inf_val);
    BOOST_CHECK_EQUAL(-2 - (-inf_val), inf_val);
 
+   BOOST_CHECK_EQUAL(sqrt(inf_val), inf_val);
+   BOOST_CHECK(boost::math::isnan(sqrt(-inf_val)));
+
    BOOST_CHECK_EQUAL(inf_val + test_type(2), inf_val);
    BOOST_CHECK_EQUAL(inf_val - test_type(2), inf_val);
    BOOST_CHECK_EQUAL(inf_val + test_type(-2), inf_val);
