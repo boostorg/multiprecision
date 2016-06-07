@@ -566,7 +566,7 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
    }
    unsigned precision()const BOOST_NOEXCEPT
    {
-      return multiprecision::detail::digits2_2_10(mpf_get_prec(this->m_data));
+      return static_cast<unsigned>(multiprecision::detail::digits2_2_10(mpf_get_prec(this->m_data)));
    }
    void precision(unsigned digits10) BOOST_NOEXCEPT
    {
@@ -1650,7 +1650,7 @@ inline unsigned eval_lsb(const gmp_int& val)
    {
       BOOST_THROW_EXCEPTION(std::range_error("Testing individual bits in negative values is not supported - results are undefined."));
    }
-   return mpz_scan1(val.data(), 0);
+   return static_cast<unsigned>(mpz_scan1(val.data(), 0));
 }
 
 inline unsigned eval_msb(const gmp_int& val)
@@ -1664,7 +1664,7 @@ inline unsigned eval_msb(const gmp_int& val)
    {
       BOOST_THROW_EXCEPTION(std::range_error("Testing individual bits in negative values is not supported - results are undefined."));
    }
-   return mpz_sizeinbase(val.data(), 2) - 1;
+   return static_cast<unsigned>(mpz_sizeinbase(val.data(), 2) - 1);
 }
 
 inline bool eval_bit_test(const gmp_int& val, unsigned index)
