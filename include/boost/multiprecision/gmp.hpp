@@ -22,6 +22,13 @@
 #ifdef BOOST_MSVC
 #  pragma warning(pop)
 #endif
+
+#if defined(__MPIR_VERSION) && defined(__MPIR_VERSION_MINOR) && defined(__MPIR_VERSION_PATCHLEVEL)
+#  define BOOST_MP_MPIR_VERSION (__MPIR_VERSION * 10000 + __MPIR_VERSION_MINOR * 100 + __MPIR_VERSION_PATCHLEVEL)
+#else
+#  define BOOST_MP_MPIR_VERSION 0
+#endif
+
 #include <cmath>
 #include <limits>
 #include <climits>
@@ -973,16 +980,28 @@ inline void eval_ldexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& v
 template <unsigned Digits10>
 inline void eval_frexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& val, int* e)
 {
+#if BOOST_MP_MPIR_VERSION >= 20600
+   mpir_si v;
+   mpf_get_d_2exp(&v, val.data());
+#else
    long v;
    mpf_get_d_2exp(&v, val.data());
+#endif
    *e = v;
    eval_ldexp(result, val, -v);
 }
 template <unsigned Digits10>
 inline void eval_frexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& val, long* e)
 {
+#if BOOST_MP_MPIR_VERSION >= 20600
+   mpir_si v;
+   mpf_get_d_2exp(&v, val.data());
+   *e = v;
+   eval_ldexp(result, val, -v);
+#else
    mpf_get_d_2exp(e, val.data());
    eval_ldexp(result, val, -*e);
+#endif
 }
 
 template <unsigned Digits10>
