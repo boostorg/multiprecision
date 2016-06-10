@@ -5098,6 +5098,21 @@ Windows Vista machine.
 
 [section:hist History]
 
+[h4 Multiprecision-2.2.8 (Boost-1.62)]
+
+* Added support for hashing via `Boost.Hash` or `std::hash`.
+* Fixed some arithmetic operations in cpp_bin_float and cpp_dec_float that should generate a NaN, see [@https://svn.boost.org/trac/boost/ticket/12157 #12157].
+* Prevent inadvertant instantiation of variable-precision `mpfr_float_backend` with fixed allocation.
+* Fixed division over/underflow in cpp_bin_float, see [@https://svn.boost.org/trac/boost/ticket/12167 #12167].
+* Added support for signed-zeros throughout the library, including support for `signbit` and `copysign`, mpfr, float128, and cpp_bin_float types
+should now respect signed-zeros correctly.
+* Fixed bug in conversion of cpp_bin_float infinities to double etc, see [@https://svn.boost.org/trac/boost/ticket/12196 #12196].
+* Fix add and subtract of cpp_bin_float when the exponents would overflow., see [@https://svn.boost.org/trac/boost/ticket/12198 #12198].
+* Improve variable-precision support in mpfr and mpf backends, allow these types to be used with Boost.Math.
+* Fixed bug in subtraction of signed infinities in cpp_bin_float, see [@https://svn.boost.org/trac/boost/ticket/12209 #12209].
+* Fix result of sqrt(infinity) in cpp_bin_float (result should be infinity), see [@https://svn.boost.org/trac/boost/ticket/12227 #12227].
+* Added workaround in gmp.hpp for recent MPIR releases which are not quite source-compatible with GMP on Windows x64.
+
 [h4 Multiprecision-2.2.7 (Boost-1.61)]
 
 * Fixed bug in stream input for integer types, see [@https://svn.boost.org/trac/boost/ticket/11857 #11857].
