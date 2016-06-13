@@ -36,7 +36,7 @@ inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBit
    while(p != pe)
    {
       carry += static_cast<double_limb_type>(*pa) * static_cast<double_limb_type>(val);
-      *p = static_cast<limb_type>(carry);
+      *p = carry & ~static_cast<limb_type>(0);
       carry >>= cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits;
       ++p, ++pa;
    }
