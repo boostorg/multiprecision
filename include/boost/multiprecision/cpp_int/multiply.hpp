@@ -36,7 +36,11 @@ inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBit
    while(p != pe)
    {
       carry += static_cast<double_limb_type>(*pa) * static_cast<double_limb_type>(val);
+#ifdef __MSVC_RUNTIME_CHECKS
+      *p = static_cast<limb_type>(carry & ~static_cast<limb_type>(0));
+#else
       *p = static_cast<limb_type>(carry);
+#endif
       carry >>= cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits;
       ++p, ++pa;
    }
@@ -144,7 +148,11 @@ inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBit
          carry += static_cast<double_limb_type>(pa[i]) * static_cast<double_limb_type>(pb[j]);
          BOOST_ASSERT(!std::numeric_limits<double_limb_type>::is_specialized || ((std::numeric_limits<double_limb_type>::max)() - carry >= pr[i+j]));
          carry += pr[i + j];
+#ifdef __MSVC_RUNTIME_CHECKS
+         pr[i + j] = static_cast<limb_type>(carry & ~static_cast<limb_type>(0));
+#else
          pr[i + j] = static_cast<limb_type>(carry);
+#endif
          carry >>= cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits;
          BOOST_ASSERT(carry <= (cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::max_limb_value));
       }
@@ -353,6 +361,16 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
    limb_type* pr = result.limbs();
 
    double_limb_type carry = w * y;
+#ifdef __MSVC_RUNTIME_CHECKS
+   pr[0] = static_cast<limb_type>(carry & ~static_cast<limb_type>(0));
+   carry >>= limb_bits;
+   carry += w * z + x * y;
+   pr[1] = static_cast<limb_type>(carry & ~static_cast<limb_type>(0));
+   carry >>= limb_bits;
+   carry += x * z;
+   pr[2] = static_cast<limb_type>(carry & ~static_cast<limb_type>(0));
+   pr[3] = static_cast<limb_type>(carry >> limb_bits);
+#else
    pr[0] = static_cast<limb_type>(carry);
    carry >>= limb_bits;
    carry += w * z + x * y;
@@ -361,7 +379,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
    carry += x * z;
    pr[2] = static_cast<limb_type>(carry);
    pr[3] = static_cast<limb_type>(carry >> limb_bits);
-
+#endif
    result.sign(s);
    result.normalize();
 }
@@ -387,6 +405,20 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
    limb_type* pr = result.limbs();
 
    double_limb_type carry = w * y;
+#ifdef __MSVC_RUNTIME_CHECKS
+   pr[0] = static_cast<limb_type>(carry & ~static_cast<limb_type>(0));
+   carry >>= limb_bits;
+   carry += w * z;
+   pr[1] = static_cast<limb_type>(carry & ~static_cast<limb_type>(0));
+   carry >>= limb_bits;
+   pr[2] = static_cast<limb_type>(carry & ~static_cast<limb_type>(0));
+   carry = x * y + pr[1];
+   pr[1] = static_cast<limb_type>(carry & ~static_cast<limb_type>(0));
+   carry >>= limb_bits;
+   carry += pr[2] + x * z;
+   pr[2] = static_cast<limb_type>(carry & ~static_cast<limb_type>(0));
+   pr[3] = static_cast<limb_type>(carry >> limb_bits);
+#else
    pr[0] = static_cast<limb_type>(carry);
    carry >>= limb_bits;
    carry += w * z;
@@ -399,7 +431,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
    carry += pr[2] + x * z;
    pr[2] = static_cast<limb_type>(carry);
    pr[3] = static_cast<limb_type>(carry >> limb_bits);
-
+#endif
    result.sign(false);
    result.normalize();
 }

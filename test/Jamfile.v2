@@ -36,6 +36,9 @@ project : requirements
    <toolset>gcc:<cxxflags>-Wall
    <toolset>gcc:<cxxflags>-Wextra
    <toolset>intel:<define>SLOW_COMPILER
+   <toolset>msvc,<optimization>off:<cxxflags>-RTC1
+   <toolset>msvc,<optimization>off:<cxxflags>-RTCc
+   <toolset>msvc,<optimization>off:<define>_ALLOW_RTCc_IN_STL
    ;
 
 local enable-specfun = [ MATCH (--enable-specfun) : [ modules.peek : ARGV ] ] ;

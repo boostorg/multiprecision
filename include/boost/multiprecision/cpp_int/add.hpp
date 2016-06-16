@@ -49,7 +49,11 @@ inline void add_unsigned(CppInt1& result, const CppInt2& a, const CppInt3& b) BO
    while(pr != pr_end)
    {
       carry += static_cast<double_limb_type>(*pa) + static_cast<double_limb_type>(*pb);
+#ifdef __MSVC_RUNTIME_CHECKS
+      *pr = static_cast<limb_type>(carry & ~static_cast<limb_type>(0));
+#else
       *pr = static_cast<limb_type>(carry);
+#endif
       carry >>= CppInt1::limb_bits;
       ++pr, ++pa, ++pb;
    }
@@ -68,7 +72,11 @@ inline void add_unsigned(CppInt1& result, const CppInt2& a, const CppInt3& b) BO
          break;
       }
       carry += static_cast<double_limb_type>(*pa);
+#ifdef __MSVC_RUNTIME_CHECKS
+      *pr = static_cast<limb_type>(carry & ~static_cast<limb_type>(0));
+#else
       *pr = static_cast<limb_type>(carry);
+#endif
       carry >>= CppInt1::limb_bits;
       ++pr, ++pa;
    }
@@ -100,7 +108,11 @@ inline void add_unsigned(CppInt1& result, const CppInt2& a, const limb_type& o) 
    for(; carry && (i < result.size()); ++i)
    {
       carry += static_cast<double_limb_type>(pa[i]);
+#ifdef __MSVC_RUNTIME_CHECKS
+      pr[i] = static_cast<limb_type>(carry & ~static_cast<limb_type>(0));
+#else
       pr[i] = static_cast<limb_type>(carry);
+#endif
       carry >>= CppInt1::limb_bits;
    }
    // Just copy any remaining digits:

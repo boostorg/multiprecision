@@ -774,10 +774,10 @@ public:
    //
    template <class SI>
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(SI i, typename boost::enable_if_c<is_signed<SI>::value && (Checked == unchecked) >::type const* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_base>().check_in_range(std::declval<SI>())))
-      : m_data(i < 0 ? static_cast<local_limb_type>(static_cast<typename make_unsigned<SI>::type>(boost::multiprecision::detail::unsigned_abs(i)) & limb_mask) : static_cast<local_limb_type>(i)& limb_mask), m_sign(i < 0) {}
+      : m_data(i < 0 ? static_cast<local_limb_type>(static_cast<typename make_unsigned<SI>::type>(boost::multiprecision::detail::unsigned_abs(i)) & limb_mask) : static_cast<local_limb_type>(i & limb_mask)), m_sign(i < 0) {}
    template <class SI>
    BOOST_MP_FORCEINLINE cpp_int_base(SI i, typename boost::enable_if_c<is_signed<SI>::value && (Checked == checked) >::type const* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_base>().check_in_range(std::declval<SI>())))
-      : m_data(i < 0 ? (static_cast<local_limb_type>(static_cast<typename make_unsigned<SI>::type>(boost::multiprecision::detail::unsigned_abs(i)) & limb_mask)) : static_cast<local_limb_type>(i)& limb_mask), m_sign(i < 0) 
+      : m_data(i < 0 ? (static_cast<local_limb_type>(static_cast<typename make_unsigned<SI>::type>(boost::multiprecision::detail::unsigned_abs(i)) & limb_mask)) : static_cast<local_limb_type>(i & limb_mask)), m_sign(i < 0)
    { check_in_range(i); }
    template <class UI>
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(UI i, typename boost::enable_if_c<is_unsigned<UI>::value && (Checked == unchecked)>::type const* = 0) BOOST_NOEXCEPT
@@ -915,6 +915,20 @@ public:
    //
    // Direct construction:
    //
+#ifdef __MSVC_RUNTIME_CHECKS
+   template <class SI>
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(SI i, typename boost::enable_if_c<is_signed<SI>::value && (Checked == unchecked) >::type const* = 0) BOOST_NOEXCEPT
+      : m_data(i < 0 ? (1 + ~static_cast<local_limb_type>(-i & limb_mask)) & limb_mask : static_cast<local_limb_type>(i & limb_mask)) {}
+   template <class SI>
+   BOOST_MP_FORCEINLINE cpp_int_base(SI i, typename boost::enable_if_c<is_signed<SI>::value && (Checked == checked) >::type const* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_base>().check_in_range(std::declval<SI>())))
+      : m_data(i < 0 ? 1 + ~static_cast<local_limb_type>(-i & limb_mask) : static_cast<local_limb_type>(i & limb_mask)) { check_in_range(i); }
+   template <class UI>
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(UI i, typename boost::enable_if_c<is_unsigned<UI>::value && (Checked == unchecked) >::type const* = 0) BOOST_NOEXCEPT
+      : m_data(static_cast<local_limb_type>(i & limb_mask)) {}
+   template <class UI>
+   BOOST_MP_FORCEINLINE cpp_int_base(UI i, typename boost::enable_if_c<is_unsigned<UI>::value && (Checked == checked) >::type const* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_base>().check_in_range(std::declval<UI>())))
+      : m_data(static_cast<local_limb_type>(i & limb_mask)) { check_in_range(i); }
+#else
    template <class SI>
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(SI i, typename boost::enable_if_c<is_signed<SI>::value && (Checked == unchecked) >::type const* = 0) BOOST_NOEXCEPT
       : m_data(i < 0 ? (1 + ~static_cast<local_limb_type>(-i)) & limb_mask : static_cast<local_limb_type>(i) & limb_mask) {}
@@ -927,6 +941,7 @@ public:
    template <class UI>
    BOOST_MP_FORCEINLINE cpp_int_base(UI i, typename boost::enable_if_c<is_unsigned<UI>::value && (Checked == checked) >::type const* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_base>().check_in_range(std::declval<UI>())))
       : m_data(static_cast<local_limb_type>(i)) { check_in_range(i); }
+#endif
    template <class F>
    BOOST_MP_FORCEINLINE cpp_int_base(F i, typename boost::enable_if<is_floating_point<F> >::type const* = 0) BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
       : m_data(static_cast<local_limb_type>(std::fabs(i)) & limb_mask)
@@ -1208,7 +1223,11 @@ private:
       BOOST_STATIC_ASSERT(sizeof(i) == 2 * sizeof(limb_type));
       BOOST_STATIC_ASSERT(base_type::internal_limb_count >= 2);
       typename base_type::limb_pointer p = this->limbs();
+#ifdef __MSVC_RUNTIME_CHECKS
+      *p = static_cast<limb_type>(i & ~static_cast<limb_type>(0));
+#else
       *p = static_cast<limb_type>(i);
+#endif
       p[1] = static_cast<limb_type>(i >> base_type::limb_bits);
       this->resize(p[1] ? 2 : 1, p[1] ? 2 : 1);
       this->sign(false);
@@ -1223,7 +1242,11 @@ private:
          s = true;
       ui = static_cast<double_limb_type>(boost::multiprecision::detail::unsigned_abs(i));
       typename base_type::limb_pointer p = this->limbs();
+#ifdef __MSVC_RUNTIME_CHECKS
+      *p = static_cast<limb_type>(ui & ~static_cast<limb_type>(0));
+#else
       *p = static_cast<limb_type>(ui);
+#endif
       p[1] = static_cast<limb_type>(ui >> base_type::limb_bits);
       this->resize(p[1] ? 2 : 1, p[1] ? 2 : 1);
       this->sign(s);

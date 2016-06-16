@@ -326,7 +326,11 @@ inline double_limb_type integer_gcd_reduce(double_limb_type u, double_limb_type 
          break;
       }
       v -= u;
+#ifdef __MSVC_RUNTIME_CHECKS
+      while((v & 1u) == 0)
+#else
       while((static_cast<unsigned>(v) & 1u) == 0)
+#endif
          v >>= 1;
    } while(true);
    return u;

@@ -227,12 +227,20 @@ void divide_unsigned_helper(
       for(unsigned i = 0; i < y.size(); ++i)
       {
          carry += static_cast<double_limb_type>(py[i]) * static_cast<double_limb_type>(guess);
+#ifdef __MSVC_RUNTIME_CHECKS
+         pt[i + shift] = static_cast<limb_type>(carry & ~static_cast<limb_type>(0));
+#else
          pt[i + shift] = static_cast<limb_type>(carry);
+#endif
          carry >>= CppInt1::limb_bits;
       }
       if(carry && !truncated_t)
       {
+#ifdef __MSVC_RUNTIME_CHECKS
+         pt[t.size() - 1] = static_cast<limb_type>(carry & ~static_cast<limb_type>(0));
+#else
          pt[t.size() - 1] = static_cast<limb_type>(carry);
+#endif
       }
       else if(!truncated_t)
       {

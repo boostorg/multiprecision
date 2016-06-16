@@ -20,7 +20,7 @@ namespace boost {
 
             limb_type mask = chunk_bits >= sizeof(limb_type) * CHAR_BIT ? ~static_cast<limb_type>(0u) : (static_cast<limb_type>(1u) << chunk_bits) - 1;
 
-            limb_type value = (static_cast<limb_type>(bits) & mask) << shift;
+            limb_type value = static_cast<limb_type>(bits & mask) << shift;
             if(value)
             {
                if(val.size() == limb)
@@ -132,7 +132,7 @@ namespace boost {
             if(byte_len % sizeof(limb_type))
                ++limb_len;
             cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>& result = val.backend();
-            result.resize(limb_len, limb_len);  // checked types may throw here if they're not large enough to hold the data!
+            result.resize(static_cast<unsigned>(limb_len), static_cast<unsigned>(limb_len));  // checked types may throw here if they're not large enough to hold the data!
             result.limbs()[result.size() - 1] = 0u;
             std::memcpy(result.limbs(), i, std::min(byte_len, result.size() * sizeof(limb_type)));
             result.normalize(); // In case data has leading zeros.
@@ -149,7 +149,7 @@ namespace boost {
             if(byte_len % sizeof(result.limbs()[0]))
                ++limb_len;
             result.limbs()[0] = 0u;
-            result.resize(limb_len, limb_len);  // checked types may throw here if they're not large enough to hold the data!
+            result.resize(static_cast<unsigned>(limb_len), static_cast<unsigned>(limb_len));  // checked types may throw here if they're not large enough to hold the data!
             std::memcpy(result.limbs(), i, std::min(byte_len, result.size() * sizeof(result.limbs()[0])));
             result.normalize(); // In case data has leading zeros.
             return val;
