@@ -42,9 +42,9 @@
 #if defined(__has_feature) && defined(__clang__)
 
 #if __has_feature(cxx_thread_local)
-#  define BOOST_MATH_THREAD_LOCAL thread_local
+#  define BOOST_MP_THREAD_LOCAL thread_local
 #else
-#  define BOOST_MATH_THREAD_LOCAL
+#  define BOOST_MP_THREAD_LOCAL
 #endif
 
 #else
