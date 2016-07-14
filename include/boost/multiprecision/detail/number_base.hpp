@@ -421,6 +421,9 @@ struct expression<tag, Arg1, void, void, void>
       result_type r(*this);
       return static_cast<bool>(r);
    }
+#if BOOST_WORKAROUND(BOOST_GCC_VERSION, < 40800)
+   BOOST_MP_FORCEINLINE explicit operator void()const {}
+#endif
 #  endif
 #else
    operator unmentionable_type()const
@@ -484,6 +487,9 @@ struct expression<terminal, Arg1, void, void, void>
       result_type r(*this);
       return static_cast<bool>(r);
    }
+#if BOOST_WORKAROUND(BOOST_GCC_VERSION, < 40800)
+   BOOST_MP_FORCEINLINE explicit operator void()const {}
+#endif
 #  endif
 #else
    operator unmentionable_type()const
@@ -551,6 +557,9 @@ struct expression<tag, Arg1, Arg2, void, void>
       result_type r(*this);
       return static_cast<bool>(r);
    }
+#if BOOST_WORKAROUND(BOOST_GCC_VERSION, < 40800)
+   BOOST_MP_FORCEINLINE explicit operator void()const {}
+#endif
 #  endif
 #else
    operator unmentionable_type()const
@@ -629,6 +638,9 @@ struct expression<tag, Arg1, Arg2, Arg3, void>
       result_type r(*this);
       return static_cast<bool>(r);
    }
+#if BOOST_WORKAROUND(BOOST_GCC_VERSION, < 40800)
+   BOOST_MP_FORCEINLINE explicit operator void()const {}
+#endif
 #  endif
 #else
    operator unmentionable_type()const
@@ -716,6 +728,9 @@ struct expression
       result_type r(*this);
       return static_cast<bool>(r);
    }
+#if BOOST_WORKAROUND(BOOST_GCC_VERSION, < 40800)
+   BOOST_MP_FORCEINLINE explicit operator void()const {}
+#endif
 #  endif
 #else
    operator unmentionable_type()const

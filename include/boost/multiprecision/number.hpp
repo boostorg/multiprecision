@@ -632,6 +632,9 @@ public:
    {
       return !is_zero();
    }
+#if BOOST_WORKAROUND(BOOST_GCC_VERSION, < 40800)
+   BOOST_MP_FORCEINLINE explicit operator void()const {}
+#endif
 #  endif
 #else
    typedef bool (self_type::*unmentionable_type)()const;
