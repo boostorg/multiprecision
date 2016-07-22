@@ -546,15 +546,26 @@ inline typename enable_if_c<
    typedef typename common_type<R, typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::local_limb_type>::type common_type;
    if(std::numeric_limits<R>::is_specialized && (static_cast<common_type>(*val.limbs()) > static_cast<common_type>((std::numeric_limits<R>::max)())))
    {
-      conversion_overflow(typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
-      *result = (std::numeric_limits<R>::max)();
+      if(val.isneg())
+      {
+         if(static_cast<common_type>(*val.limbs()) > -static_cast<common_type>((std::numeric_limits<R>::min)()))
+            conversion_overflow(typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
+         *result = (std::numeric_limits<R>::min)();
+      }
+      else
+      {
+         conversion_overflow(typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
+         *result = (std::numeric_limits<R>::max)();
+      }
    }
    else
-      *result = static_cast<R>(*val.limbs());
-   if(val.isneg())
    {
-      check_is_negative(mpl::bool_<boost::is_signed<R>::value || boost::is_floating_point<R>::value>());
-      *result = negate_integer(*result, mpl::bool_<boost::is_signed<R>::value || boost::is_floating_point<R>::value>());
+      *result = static_cast<R>(*val.limbs());
+      if(val.isneg())
+      {
+         check_is_negative(mpl::bool_<boost::is_signed<R>::value || boost::is_floating_point<R>::value>());
+         *result = negate_integer(*result, mpl::bool_<boost::is_signed<R>::value || boost::is_floating_point<R>::value>());
+      }
    }
 }
 

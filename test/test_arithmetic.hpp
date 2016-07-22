@@ -381,6 +381,23 @@ void test_signed_integer_ops(const boost::mpl::false_&)
 {
 }
 
+template <class Real, class Int>
+void test_integer_round_trip()
+{
+   if(std::numeric_limits<Real>::digits >= std::numeric_limits<Int>::digits)
+   {
+      Real m((std::numeric_limits<Int>::max)());
+      Int r = m.template convert_to<Int>();
+      BOOST_CHECK_EQUAL(m, r);
+      if(std::numeric_limits<Real>::is_signed && (std::numeric_limits<Real>::digits > std::numeric_limits<Int>::digits))
+      {
+         m = (std::numeric_limits<Int>::min)();
+         r = m.template convert_to<Int>();
+         BOOST_CHECK_EQUAL(m, r);
+      }
+   }
+}
+
 template <class Real>
 void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_integer>&)
 {
@@ -697,6 +714,21 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    BOOST_CHECK_EQUAL(c ,  (20 ^ 7));
    c = 20 ^ (b + 0);
    BOOST_CHECK_EQUAL(c ,  (20 ^ 7));
+
+
+   //
+   // Round tripping of built in integers:
+   //
+   test_integer_round_trip<Real, short>();
+   test_integer_round_trip<Real, unsigned short>();
+   test_integer_round_trip<Real, int>();
+   test_integer_round_trip<Real, unsigned int>();
+   test_integer_round_trip<Real, long>();
+   test_integer_round_trip<Real, unsigned long>();
+#ifndef BOOST_NO_CXX11_LONG_LONG
+   test_integer_round_trip<Real, long long>();
+   test_integer_round_trip<Real, unsigned long long>();
+#endif
 }
 
 template <class Real, class T>
