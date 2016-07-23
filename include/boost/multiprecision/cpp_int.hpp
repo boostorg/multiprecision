@@ -227,7 +227,7 @@ public:
       : m_data(i), m_limbs(1), m_sign(false), m_internal(true) { }
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_limb_type i)BOOST_NOEXCEPT
       : m_data(i), m_limbs(1), m_sign(i < 0), m_internal(true) { }
-#if defined(BOOST_LITTLE_ENDIAN)
+#if defined(BOOST_LITTLE_ENDIAN) && !defined(BOOST_MP_TEST_NO_LE)
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT
       : m_data(i), m_limbs(i > max_limb_value ? 2 : 1), m_sign(false), m_internal(true) { }
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT
@@ -445,7 +445,7 @@ public:
       : m_wrapper(i), m_limbs(1), m_sign(false) {}
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_limb_type i)BOOST_NOEXCEPT
       : m_wrapper(limb_type(i < 0 ? static_cast<limb_type>(-static_cast<signed_double_limb_type>(i)) : i)), m_limbs(1), m_sign(i < 0) {}
-#if defined(BOOST_LITTLE_ENDIAN)
+#if defined(BOOST_LITTLE_ENDIAN) && !defined(BOOST_MP_TEST_NO_LE)
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT
       : m_wrapper(i), m_limbs(i > max_limb_value ? 2 : 1), m_sign(false) {}
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT
@@ -596,7 +596,7 @@ public:
       : m_wrapper(i), m_limbs(1) {}
    BOOST_MP_FORCEINLINE cpp_int_base(signed_limb_type i)BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
       : m_wrapper(limb_type(i < 0 ? static_cast<limb_type>(-static_cast<signed_double_limb_type>(i)) : i)), m_limbs(1) { if(i < 0) negate(); }
-#ifdef BOOST_LITTLE_ENDIAN
+#if defined(BOOST_LITTLE_ENDIAN) && !defined(BOOST_MP_TEST_NO_LE)
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT
       : m_wrapper(i), m_limbs(i > max_limb_value ? 2 : 1) {}
    BOOST_MP_FORCEINLINE cpp_int_base(signed_double_limb_type i)BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
@@ -1015,7 +1015,7 @@ public:
 template <class Arg, class Base>
 struct is_allowed_cpp_int_base_conversion : public mpl::if_c<
       is_same<Arg, limb_type>::value || is_same<Arg, signed_limb_type>::value
-#ifdef BOOST_LITTLE_ENDIAN
+#if defined(BOOST_LITTLE_ENDIAN) && !defined(BOOST_MP_TEST_NO_LE)
       || is_same<Arg, double_limb_type>::value || is_same<Arg, signed_double_limb_type>::value
 #endif
 #if defined(BOOST_MP_USER_DEFINED_LITERALS)

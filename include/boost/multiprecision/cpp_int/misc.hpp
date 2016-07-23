@@ -271,7 +271,8 @@ inline typename enable_if_c<is_integral<U>::value>::type eval_qr(
       cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& r) BOOST_MP_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
 {
    using default_ops::eval_qr;
-   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> t(y);
+   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> t;
+   t = y;
    eval_qr(x, t, q, r);
 }
 

@@ -309,7 +309,14 @@ inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_si
    t.negate();
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_unsigned_number<T>::value>::type eval_subtract_default(T& t, const U& u, const T& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value && is_unsigned_number<T>::value>::type eval_subtract_default(T& t, const U& u, const T& v)
+{
+   T temp;
+   temp = u;
+   eval_subtract(t, temp, v);
+}
+template <class T, class U>
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value && is_unsigned_number<T>::value>::type eval_subtract_default(T& t, const U& u, const T& v)
 {
    T temp(u);
    eval_subtract(t, temp, v);
