@@ -233,12 +233,40 @@ void test_random_rationals()
 #endif
 }
 
+#if defined(TEST2)
+
+void double_spot_tests()
+{
+   boost::multiprecision::cpp_rational rat = 1;
+   boost::multiprecision::cpp_rational twiddle(boost::multiprecision::cpp_int(1), boost::multiprecision::cpp_int(boost::multiprecision::cpp_int(1) << 54));
+   rat += boost::multiprecision::cpp_rational(boost::multiprecision::cpp_int(1), boost::multiprecision::cpp_int(boost::multiprecision::cpp_int(1) << 50));
+
+   double d = rat.convert_to<double>();
+
+   rat += twiddle;
+   BOOST_CHECK_EQUAL(d, rat.convert_to<double>());
+   rat += twiddle;
+   // tie: round to even rounds down
+   BOOST_CHECK_EQUAL(d, rat.convert_to<double>());
+   rat += twiddle;
+   BOOST_CHECK_NE(d, rat.convert_to<double>());
+   rat -= twiddle;
+   BOOST_CHECK_EQUAL(d, rat.convert_to<double>());
+   rat += boost::multiprecision::cpp_rational(boost::multiprecision::cpp_int(1), boost::multiprecision::cpp_int(boost::multiprecision::cpp_int(1) << 52));
+   // tie, but last bit is now a 1 so we round up:
+   BOOST_CHECK_NE(d, rat.convert_to<double>());
+
+}
+
+#endif
+
 int main()
 {
    using namespace boost::multiprecision;
 #if defined(TEST1) && !defined(BOOST_MSVC)
    test_round_trip<number<cpp_bin_float<113, digit_base_2, void, boost::int16_t> >, cpp_rational>();
 #elif defined(TEST2)
+   double_spot_tests();
    test_round_trip<double, cpp_rational>();
 #elif defined(TEST3) && !defined(BOOST_MSVC)
    test_random_rationals<number<cpp_bin_float<113, digit_base_2, void, boost::int16_t> >, cpp_rational>();

@@ -310,7 +310,7 @@ typename enable_if_c<is_number<To>::value || is_floating_point<To>::value>::type
       num = -num;
    }
    int denom_bits = msb(denom);
-   int shift = std::numeric_limits<To>::digits + denom_bits - msb(num) + 1;
+   int shift = std::numeric_limits<To>::digits + denom_bits - msb(num);
    if(shift > 0)
       num <<= shift;
    else if(shift < 0)
@@ -318,7 +318,7 @@ typename enable_if_c<is_number<To>::value || is_floating_point<To>::value>::type
    Integer q, r;
    divide_qr(num, denom, q, r);
    int q_bits = msb(q);
-   if(q_bits == std::numeric_limits<To>::digits)
+   if(q_bits == std::numeric_limits<To>::digits - 1)
    {
       //
       // Round up if 2 * r > denom:
@@ -334,7 +334,7 @@ typename enable_if_c<is_number<To>::value || is_floating_point<To>::value>::type
    }
    else
    {
-      BOOST_ASSERT(q_bits == 1 + std::numeric_limits<To>::digits);
+      BOOST_ASSERT(q_bits == std::numeric_limits<To>::digits);
       //
       // We basically already have the rounding info:
       //
