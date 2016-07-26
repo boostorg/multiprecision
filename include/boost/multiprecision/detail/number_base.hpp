@@ -26,13 +26,13 @@
 #  define BOOST_MP_FORCEINLINE inline
 #endif
 
-#if (defined(BOOST_GCC) && (BOOST_GCC <= 40700)) || defined(__SUNPRO_CC)
+#if (defined(BOOST_GCC) && (BOOST_GCC <= 40700)) || BOOST_WORKAROUND(__SUNPRO_CC, < 0x5140)
 #  define BOOST_MP_NOEXCEPT_IF(x)
 #else
 #  define BOOST_MP_NOEXCEPT_IF(x) BOOST_NOEXCEPT_IF(x)
 #endif
 
-#if defined(BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS) || defined(__SUNPRO_CC)
+#if defined(BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS) || BOOST_WORKAROUND(__SUNPRO_CC, < 0x5140)
 #define BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
 #endif
 
@@ -411,7 +411,11 @@ struct expression<tag, Arg1, void, void, void>
       return static_cast<T>(static_cast<result_type>(*this));
    }
 #  else
-   template <class T, typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value, int>::type = 0>
+   template <class T
+#ifndef __SUNPRO_CC
+, typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value, int>::type = 0
+#endif
+>
    explicit operator T()const
    {
       return static_cast<T>(static_cast<result_type>(*this));
@@ -477,7 +481,11 @@ struct expression<terminal, Arg1, void, void, void>
       return static_cast<T>(static_cast<result_type>(*this));
    }
 #  else
-   template <class T, typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value, int>::type = 0>
+   template <class T
+#ifndef __SUNPRO_CC
+, typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value, int>::type = 0
+#endif
+>
    explicit operator T()const
    {
       return static_cast<T>(static_cast<result_type>(*this));
@@ -547,7 +555,11 @@ struct expression<tag, Arg1, Arg2, void, void>
       return static_cast<T>(static_cast<result_type>(*this));
    }
 #  else
-   template <class T, typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value, int>::type = 0>
+   template <class T
+#ifndef __SUNPRO_CC
+, typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value, int>::type = 0
+#endif
+>
    explicit operator T()const
    {
       return static_cast<T>(static_cast<result_type>(*this));
@@ -622,13 +634,20 @@ struct expression<tag, Arg1, Arg2, Arg3, void>
       result_type r(*this);
       return static_cast<bool>(r);
 }
-   template <class T, typename boost::disable_if_c<is_same<T, bool>::value || is_void<T>::value || is_number<T>::value, int>::type = 0>
+#ifndef __SUNPRO_CC
+, typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value, int>::type = 0
+#endif
+>
    explicit operator T ()const
    {
       return static_cast<T>(static_cast<result_type>(*this));
    }
 #  else
-   template <class T, typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value, int>::type = 0>
+   template <class T
+#ifndef __SUNPRO_CC
+, typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value, int>::type = 0
+#endif
+>
    explicit operator T()const
    {
       return static_cast<T>(static_cast<result_type>(*this));
@@ -718,7 +737,11 @@ struct expression
       return static_cast<T>(static_cast<result_type>(*this));
    }
 #  else
-   template <class T, typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value, int>::type = 0>
+   template <class T
+#ifndef __SUNPRO_CC
+, typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value, int>::type = 0
+#endif
+>
    explicit operator T()const
    {
       return static_cast<T>(static_cast<result_type>(*this));

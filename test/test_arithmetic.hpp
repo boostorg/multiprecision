@@ -1478,7 +1478,7 @@ void test_mixed(const boost::mpl::false_&)
 template <class Real>
 inline bool check_is_nan(const Real& val, const boost::mpl::true_&)
 {
-   return boost::math::isnan(val);
+   return (boost::math::isnan)(val);
 }
 template <class Real>
 inline bool check_is_nan(const Real&, const boost::mpl::false_&)
