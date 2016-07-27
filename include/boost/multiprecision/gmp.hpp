@@ -2394,7 +2394,7 @@ namespace math { namespace tools{
    }
 
    template <>
-   inline int digits<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpf_float::backend_type> >>()
+   inline int digits<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpf_float::backend_type> > >()
 #ifdef BOOST_MATH_NOEXCEPT
       BOOST_NOEXCEPT
 #endif
@@ -2412,14 +2412,14 @@ namespace math { namespace tools{
 
    template <>
    inline boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpf_float::backend_type> >
-      max_value<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpf_float::backend_type> >>()
+      max_value<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpf_float::backend_type> > >()
    {
       return max_value<boost::multiprecision::mpf_float>().backend();
    }
 
    template <>
    inline boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpf_float::backend_type> >
-      min_value<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpf_float::backend_type> >>()
+      min_value<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpf_float::backend_type> > >()
    {
       return min_value<boost::multiprecision::mpf_float>().backend();
    }

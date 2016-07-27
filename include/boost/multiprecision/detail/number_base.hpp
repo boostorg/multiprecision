@@ -39,7 +39,7 @@
 //
 // Thread local storage:
 //
-#ifndef BOOST_NO_CXX11_THREAD_LOCAL
+#if !defined(BOOST_NO_CXX11_THREAD_LOCAL) && !defined(BOOST_INTEL)
 #  define BOOST_MP_THREAD_LOCAL thread_local
 #else
 #  define BOOST_MP_THREAD_LOCAL
@@ -634,10 +634,7 @@ struct expression<tag, Arg1, Arg2, Arg3, void>
       result_type r(*this);
       return static_cast<bool>(r);
 }
-#ifndef __SUNPRO_CC
-, typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value, int>::type = 0
-#endif
->
+   template <class T, typename boost::disable_if_c<is_same<T, bool>::value || is_void<T>::value || is_number<T>::value, int>::type = 0>
    explicit operator T ()const
    {
       return static_cast<T>(static_cast<result_type>(*this));
