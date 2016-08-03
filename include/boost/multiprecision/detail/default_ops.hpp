@@ -981,6 +981,38 @@ inline void eval_trunc(T& result, const T& a)
 }
 
 template <class T>
+inline void eval_modf(T& result, T const& arg, T* pipart)
+{
+   typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+   int c = eval_fpclassify(arg);
+   if(c == (int)FP_NAN)
+   {
+      if(pipart)
+         *pipart = arg;
+      result = arg;
+      return;
+   }
+   else if(c == (int)FP_INFINITE)
+   {
+      if(pipart)
+         *pipart = arg;
+      result = ui_type(0u);
+      return;
+   }
+   if(pipart)
+   {
+      eval_trunc(*pipart, arg);
+      eval_subtract(result, arg, *pipart);
+   }
+   else
+   {
+      T ipart;
+      eval_trunc(ipart, arg);
+      eval_subtract(result, arg, ipart);
+   }
+}
+
+template <class T>
 inline void eval_round(T& result, const T& a)
 {
    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The round function is only valid for floating point types.");
@@ -1682,7 +1714,31 @@ frexp(const detail::expression<tag, A1, A2, A3, A4>& v, boost::long_long_type* p
    typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
    return BOOST_MP_MOVE(frexp(static_cast<number_type>(v), pint));
 }
+//
+// modf does not return an expression template since we require the
+// second argument to be evaluated even if the returned value is
+// not assigned to anything...
+//
+template <class T, expression_template_option ExpressionTemplates>
+inline typename enable_if_c<number_category<T>::value == number_kind_floating_point, number<T, ExpressionTemplates> >::type modf(const number<T, ExpressionTemplates>& v, number<T, ExpressionTemplates>* pipart)
+{
+   using default_ops::eval_modf;
+   number<T, ExpressionTemplates> result;
+   eval_modf(result.backend(), v.backend(), pipart ? &pipart->backend() : 0);
+   return BOOST_MP_MOVE(result);
+}
+template <class T, expression_template_option ExpressionTemplates, class tag, class A1, class A2, class A3, class A4>
+inline typename enable_if_c<number_category<T>::value == number_kind_floating_point, number<T, ExpressionTemplates> >::type modf(const detail::expression<tag, A1, A2, A3, A4>& v, number<T, ExpressionTemplates>* pipart)
+{
+   using default_ops::eval_modf;
+   number<T, ExpressionTemplates> result, arg(v);
+   eval_modf(result.backend(), arg.backend(), pipart ? &pipart->backend() : 0);
+   return BOOST_MP_MOVE(result);
+}
 
+//
+// Integer square root:
+//
 template <class B, expression_template_option ExpressionTemplates>
 inline typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, ExpressionTemplates> >::type
    sqrt(const number<B, ExpressionTemplates>& x)
