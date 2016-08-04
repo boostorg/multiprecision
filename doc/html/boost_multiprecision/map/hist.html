@@ -75,6 +75,31 @@
             Added workaround in gmp.hpp for recent MPIR releases which are not quite
             source-compatible with GMP on Windows x64.
           </li>
+<li class="listitem">
+            Allow <code class="computeroutput"><span class="identifier">cpp_int</span></code> code to
+            be used with /RTCc with MSVC.
+          </li>
+<li class="listitem">
+            Fix conversion of <code class="computeroutput"><span class="identifier">cpp_int</span></code>
+            to signed integer when the result is INT_MIN, see <a href="https://svn.boost.org/trac/boost/ticket/12343" target="_top">#12343</a>.
+          </li>
+<li class="listitem">
+            Update uBlas support to match latest uBlas code.
+          </li>
+<li class="listitem">
+            Fix some errors present when building on big-endian machines (not all
+            <code class="computeroutput"><span class="identifier">cpp_int</span></code> constructors
+            are available on non-little-endian machines).
+          </li>
+<li class="listitem">
+            Fix fencepost error in rational to float conversion routines, see <a href="https://svn.boost.org/trac/boost/ticket/12327" target="_top">#12327</a>.
+          </li>
+<li class="listitem">
+            Fix some Oracle C++ compiler compatibility issues.
+          </li>
+<li class="listitem">
+            Add modf support to complete C90 compatibility.
+          </li>
 </ul></div>
 <h5>
 <a name="boost_multiprecision.map.hist.h1"></a>

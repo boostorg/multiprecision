@@ -3081,41 +3081,43 @@ which may be useful to ensure that columns line up.
    ``['number]``                                    min    (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
    ``['number]``                                    max    (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
 
-   // Non-member function standard library support:
+   // C90 Non-member function standard library support:
    ``['unmentionable-expression-template-type]``    abs    (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    fabs   (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    sqrt   (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    floor  (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    ceil   (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    trunc  (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    itrunc (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    ltrunc (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    lltrunc(const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    round  (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    iround (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    lround (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    llround(const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    exp    (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    log    (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    log10    (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    cos    (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    sin    (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    tan    (const ``['number-or-expression-template-type]``&);
    ``['unmentionable-expression-template-type]``    acos   (const ``['number-or-expression-template-type]``&);
    ``['unmentionable-expression-template-type]``    asin   (const ``['number-or-expression-template-type]``&);
    ``['unmentionable-expression-template-type]``    atan   (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    atan2  (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    ceil   (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    cos    (const ``['number-or-expression-template-type]``&);
    ``['unmentionable-expression-template-type]``    cosh   (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    exp    (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    fabs   (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    floor  (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    fmod   (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    frexp  (const ``['number-or-expression-template-type]``&, ``['integer-type]``*);
+   ``['unmentionable-expression-template-type]``    ldexp  (const ``['number-or-expression-template-type]``&, ``['integer-type]``);
+   ``['unmentionable-expression-template-type]``    log    (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    log10  (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    modf   (const ``['number-or-expression-template-type]``&, ``['number]``*);
+   ``['unmentionable-expression-template-type]``    pow    (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    sin    (const ``['number-or-expression-template-type]``&);
    ``['unmentionable-expression-template-type]``    sinh   (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    sqrt   (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    tan    (const ``['number-or-expression-template-type]``&);
    ``['unmentionable-expression-template-type]``    tanh   (const ``['number-or-expression-template-type]``&);
-
-   ``['unmentionable-expression-template-type]``    ldexp (const ``['number-or-expression-template-type]``&, ``['integer-type]``);
-   ``['unmentionable-expression-template-type]``    frexp (const ``['number-or-expression-template-type]``&, ``['integer-type]``*);
-   ``['unmentionable-expression-template-type]``    pow   (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    fmod  (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    atan2 (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    scalbn(const ``['number-or-expression-template-type]``&, ``['integer-type]``);
-   ``['unmentionable-expression-template-type]``    logb  (const ``['number-or-expression-template-type]``&);
-   ``['integer-type]``                              ilogb (const ``['number-or-expression-template-type]``&);
+   // C99 Non-member function standard library support:
+   ``['integer-type]``                              ilogb  (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    llround(const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    logb   (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    lround (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    round  (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    scalbn (const ``['number-or-expression-template-type]``&, ``['integer-type]``);
+   ``['unmentionable-expression-template-type]``    trunc  (const ``['number-or-expression-template-type]``&);
+   // Misc other common C library functions:
+   ``['unmentionable-expression-template-type]``    itrunc (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    ltrunc (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    lltrunc(const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    iround (const ``['number-or-expression-template-type]``&);
 
    // Traits support:
    template <class T>
@@ -4036,7 +4038,7 @@ Optional requirements have default implementations that are called if the backen
 it's own.  Typically the backend will implement these to improve performance.
 
 In the following tables, type B is the `Backend` template argument to `number`, `b` and `b2` are
-a variables of type B, `cb`, `cb2` and `cb3` are constant variables of type `const B`,
+a variables of type B, `pb` is a variable of type B*, `cb`, `cb2` and `cb3` are constant variables of type `const B`,
 `rb` is a variable of type `B&&`, `a` and `a2` are variables of Arithmetic type,
 `s` is a variable of type `const char*`, `ui` is a variable of type `unsigned`, `bb` is a variable of type `bool`,
 `pa` is a variable of type pointer-to-arithmetic-type, `exp` is a variable of type `B::exp_type`,
@@ -4398,6 +4400,9 @@ and `ff` is a variable of type `std::ios_base::fmtflags`.
 [[`eval_tanh(b, cb)`][`void`][Performs the equivalent operation to `std::tanh` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.
             The default version of this function is synthesised from other operations above.][[space]]]
 [[`eval_fmod(b, cb, cb2)`][`void`][Performs the equivalent operation to `std::fmod` on arguments `cb` and `cb2`, and store the result in `b`.  Only required when `B` is an floating-point type.
+            The default version of this function is synthesised from other operations above.][[space]]]
+[[`eval_modf(b, cb, pb)`][`void`][Performs the equivalent operation to `std::modf` on argument `cb`, and store the integer result in `*pb` and the fractional part in `b`.  
+            Only required when `B` is an floating-point type.
             The default version of this function is synthesised from other operations above.][[space]]]
 [[`eval_pow(b, cb, cb2)`][`void`][Performs the equivalent operation to `std::pow` on arguments `cb` and `cb2`, and store the result in `b`.  Only required when `B` is an floating-point type.
             The default version of this function is synthesised from other operations above.][[space]]]
@@ -5112,6 +5117,13 @@ should now respect signed-zeros correctly.
 * Fixed bug in subtraction of signed infinities in cpp_bin_float, see [@https://svn.boost.org/trac/boost/ticket/12209 #12209].
 * Fix result of sqrt(infinity) in cpp_bin_float (result should be infinity), see [@https://svn.boost.org/trac/boost/ticket/12227 #12227].
 * Added workaround in gmp.hpp for recent MPIR releases which are not quite source-compatible with GMP on Windows x64.
+* Allow `cpp_int` code to be used with /RTCc with MSVC.
+* Fix conversion of `cpp_int` to signed integer when the result is INT_MIN, see [@https://svn.boost.org/trac/boost/ticket/12343 #12343].
+* Update uBlas support to match latest uBlas code.
+* Fix some errors present when building on big-endian machines (not all `cpp_int` constructors are available on non-little-endian machines).
+* Fix fencepost error in rational to float conversion routines, see [@https://svn.boost.org/trac/boost/ticket/12327 #12327].
+* Fix some Oracle C++ compiler compatibility issues.
+* Add modf support to complete C90 compatibility.
 
 [h4 Multiprecision-2.2.7 (Boost-1.61)]
 
