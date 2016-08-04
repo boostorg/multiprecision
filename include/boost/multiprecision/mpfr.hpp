@@ -1433,6 +1433,26 @@ inline void eval_tanh(mpfr_float_backend<Digits10, AllocateType>& result, const 
 }
 
 template <unsigned Digits10, mpfr_allocation_type AllocateType>
+inline void eval_modf(mpfr_float_backend<Digits10, AllocateType>& result, const mpfr_float_backend<Digits10, AllocateType>& arg, mpfr_float_backend<Digits10, AllocateType>* pipart)
+{
+   if(0 == pipart)
+   {
+      mpfr_float_backend<Digits10, AllocateType> ipart;
+      mpfr_modf(ipart.data(), result.data(), arg.data(), GMP_RNDN);
+   }
+   else
+   {
+      mpfr_modf(pipart->data(), result.data(), arg.data(), GMP_RNDN);
+   }
+}
+
+template <unsigned Digits10, mpfr_allocation_type AllocateType>
+inline void eval_fmod(mpfr_float_backend<Digits10, AllocateType>& result, const mpfr_float_backend<Digits10, AllocateType>& a, const mpfr_float_backend<Digits10, AllocateType>& b)
+{
+   mpfr_fmod(result.data(), a.data(), b.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10, mpfr_allocation_type AllocateType>
 inline std::size_t hash_value(const mpfr_float_backend<Digits10, AllocateType>& val)
 {
    std::size_t result = 0;

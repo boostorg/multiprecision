@@ -742,7 +742,7 @@ void test_float_funcs(const boost::mpl::true_&)
    //
    // Test variable reuse in function calls, see https://svn.boost.org/trac/boost/ticket/8326
    //
-   Real a(2), b(10);
+   Real a(2), b(10), c;
    a = pow(a, b);
    BOOST_CHECK_EQUAL(a, 1024);
    a = 2;
@@ -846,9 +846,52 @@ void test_float_funcs(const boost::mpl::true_&)
    a = 4;
    b = fmod(-a, -b);
    BOOST_CHECK_CLOSE_FRACTION(b, Real(fmod(-Real(4), -Real(2))), tol);
+   // modf:
+   a = 5;
+   a /= 2;
+   b = modf(a, &c);
+   BOOST_CHECK_EQUAL(b + c, a);
+   BOOST_CHECK_EQUAL(b > 0, a > 0);
+   BOOST_CHECK_EQUAL(c > 0, a > 0);
+   a = -a;
+   b = modf(a, &c);
+   BOOST_CHECK_EQUAL(b + c, a);
+   BOOST_CHECK_EQUAL(b > 0, a > 0);
+   BOOST_CHECK_EQUAL(c > 0, a > 0);
+   b = modf(a, &c);
+   c = 0;
+   modf(a, &c);
+   BOOST_CHECK_EQUAL(b + c, a);
+   BOOST_CHECK_EQUAL(b > 0, a > 0);
+   BOOST_CHECK_EQUAL(c > 0, a > 0);
+   a = -a;
+   b = modf(a, &c);
+   c = 0;
+   modf(a, &c);
+   BOOST_CHECK_EQUAL(b + c, a);
+   BOOST_CHECK_EQUAL(b > 0, a > 0);
+   BOOST_CHECK_EQUAL(c > 0, a > 0);
 
+   if(std::numeric_limits<Real>::has_infinity)
+   {
+      a = std::numeric_limits<Real>::infinity();
+      b = modf(a, &c);
+      BOOST_CHECK_EQUAL(a, c);
+      BOOST_CHECK_EQUAL(b, 0);
+      a = -std::numeric_limits<Real>::infinity();
+      b = modf(a, &c);
+      BOOST_CHECK_EQUAL(a, c);
+      BOOST_CHECK_EQUAL(b, 0);
+   }
+   if(std::numeric_limits<Real>::has_quiet_NaN)
+   {
+      a = std::numeric_limits<Real>::quiet_NaN();
+      b = modf(a, &c);
+      BOOST_CHECK((isnan)(b));
+      BOOST_CHECK((isnan)(c));
+   }
 
-
+   a = 4;
    b = 2;
    a = atan2(a, b);
    BOOST_CHECK_CLOSE_FRACTION(a, Real(atan2(Real(4), Real(2))), tol);
