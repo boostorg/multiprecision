@@ -3106,18 +3106,26 @@ which may be useful to ensure that columns line up.
    ``['unmentionable-expression-template-type]``    tan    (const ``['number-or-expression-template-type]``&);
    ``['unmentionable-expression-template-type]``    tanh   (const ``['number-or-expression-template-type]``&);
    // C99 Non-member function standard library support:
-   ``['integer-type]``                              ilogb  (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    llround(const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    logb   (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    lround (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    round  (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    scalbn (const ``['number-or-expression-template-type]``&, ``['integer-type]``);
-   ``['unmentionable-expression-template-type]``    trunc  (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    copysign  (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   int                                              fpclassify(const ``['number-or-expression-template-type]``&);
+   bool                                             isinf     (const ``['number-or-expression-template-type]``&);
+   bool                                             isnan     (const ``['number-or-expression-template-type]``&);
+   bool                                             isnormal  (const ``['number-or-expression-template-type]``&);
+   ``['integer-type]``                              ilogb     (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    llround   (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    logb      (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    lround    (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    round     (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    scalbn    (const ``['number-or-expression-template-type]``&, ``['integer-type]``);
+   int                                              signbit   (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    trunc     (const ``['number-or-expression-template-type]``&);
    // Misc other common C library functions:
-   ``['unmentionable-expression-template-type]``    itrunc (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    ltrunc (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    lltrunc(const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    iround (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    changesign(const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    itrunc    (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    ltrunc    (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    lltrunc   (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    iround    (const ``['number-or-expression-template-type]``&);
+   int                                              sign      (const ``['number-or-expression-template-type]``&);
 
    // Traits support:
    template <class T>
