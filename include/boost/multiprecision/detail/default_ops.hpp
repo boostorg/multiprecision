@@ -1381,6 +1381,22 @@ inline typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
    return changesign BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
 }
+template <class Backend, multiprecision::expression_template_option ExpressionTemplates, class tag, class A1, class A2, class A3, class A4>
+inline multiprecision::number<Backend, ExpressionTemplates> copysign BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& a, const multiprecision::detail::expression<tag, A1, A2, A3, A4>& b)
+{
+   return copysign BOOST_PREVENT_MACRO_SUBSTITUTION(a, multiprecision::number<Backend, ExpressionTemplates>(b));
+}
+template <class tag, class A1, class A2, class A3, class A4, class Backend, multiprecision::expression_template_option ExpressionTemplates>
+inline multiprecision::number<Backend, ExpressionTemplates> copysign BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& a, const multiprecision::number<Backend, ExpressionTemplates>& b)
+{
+   return copysign BOOST_PREVENT_MACRO_SUBSTITUTION(multiprecision::number<Backend, ExpressionTemplates>(a), b);
+}
+template <class tag, class A1, class A2, class A3, class A4, class tagb, class A1b, class A2b, class A3b, class A4b>
+inline typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type copysign BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& a, const multiprecision::detail::expression<tagb, A1b, A2b, A3b, A4b>& b)
+{
+   typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+   return copysign BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(a), value_type(b));
+}
 
 } // namespace math
 
