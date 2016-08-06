@@ -34,6 +34,15 @@
 // Headers required for Boost.Math integration:
 //
 #include <boost/math/policies/policy.hpp>
+//
+// Some includes we need from Boost.Math, since we rely on that library to provide these functions:
+//
+#include <boost/math/special_functions/asinh.hpp>
+#include <boost/math/special_functions/acosh.hpp>
+#include <boost/math/special_functions/atanh.hpp>
+#include <boost/math/special_functions/cbrt.hpp>
+#include <boost/math/special_functions/expm1.hpp>
+#include <boost/math/special_functions/gamma.hpp>
 
 #ifdef BOOST_MSVC
 #pragma warning(push)

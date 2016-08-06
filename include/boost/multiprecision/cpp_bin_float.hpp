@@ -11,6 +11,16 @@
 #include <boost/math/special_functions/trunc.hpp>
 #include <boost/multiprecision/detail/float_string_cvt.hpp>
 
+//
+// Some includes we need from Boost.Math, since we rely on that library to provide these functions:
+//
+#include <boost/math/special_functions/asinh.hpp>
+#include <boost/math/special_functions/acosh.hpp>
+#include <boost/math/special_functions/atanh.hpp>
+#include <boost/math/special_functions/cbrt.hpp>
+#include <boost/math/special_functions/expm1.hpp>
+#include <boost/math/special_functions/gamma.hpp>
+
 namespace boost{ namespace multiprecision{ namespace backends{
 
 enum digit_base_type
@@ -1559,6 +1569,11 @@ namespace math {
 
 
 } // namespace math
+
+namespace multiprecision {
+   using ::boost::math::signbit;
+   using ::boost::math::copysign;
+}
 
 } // namespace boost
 

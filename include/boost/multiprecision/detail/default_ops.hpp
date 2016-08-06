@@ -1301,52 +1301,52 @@ template <class tag, class A1, class A2, class A3, class A4>
 inline int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
-   return (fpclassify)(value_type(arg));
+   return fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
 }
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
 inline bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
 {
-   int v = (fpclassify)(arg);
+   int v = fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg);
    return (v != (int)FP_INFINITE) && (v != (int)FP_NAN);
 }
 template <class tag, class A1, class A2, class A3, class A4>
 inline bool isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
-   return (isfinite)(value_type(arg));
+   return isfinite BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
 }
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
 inline bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
 {
-   return (fpclassify)(arg) == (int)FP_NAN;
+   return fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg) == (int)FP_NAN;
 }
 template <class tag, class A1, class A2, class A3, class A4>
 inline bool isnan BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
-   return (isnan)(value_type(arg));
+   return isnan BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
 }
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
 inline bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
 {
-   return (fpclassify)(arg) == (int)FP_INFINITE;
+   return fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg) == (int)FP_INFINITE;
 }
 template <class tag, class A1, class A2, class A3, class A4>
 inline bool isinf BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
-   return (isinf)(value_type(arg));
+   return isinf BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
 }
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
 inline bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
 {
-   return (fpclassify)(arg) == (int)FP_NORMAL;
+   return fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(arg) == (int)FP_NORMAL;
 }
 template <class tag, class A1, class A2, class A3, class A4>
 inline bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
-   return (isnormal)(value_type(arg));
+   return isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
 }
 
 // Default versions of sign manipulation functions, if individual backends can do better than this
@@ -1361,7 +1361,7 @@ template <class tag, class A1, class A2, class A3, class A4>
 inline int sign BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
-   return (sign)(value_type(arg));
+   return sign BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
 }
 
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
@@ -1373,7 +1373,13 @@ template <class tag, class A1, class A2, class A3, class A4>
 inline int signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
-   return (signbit)(value_type(arg));
+   return signbit BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
+}
+template <class tag, class A1, class A2, class A3, class A4>
+inline typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type changesign BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
+{
+   typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+   return changesign BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
 }
 
 } // namespace math
@@ -1391,6 +1397,94 @@ namespace multiprecision{
    using boost::math::isinf;
    using boost::math::isnan;
    using boost::math::isnormal;
+
+   typedef ::boost::math::policies::policy<
+      ::boost::math::policies::domain_error<::boost::math::policies::errno_on_error>,
+      ::boost::math::policies::pole_error<::boost::math::policies::errno_on_error>,
+      ::boost::math::policies::overflow_error<::boost::math::policies::errno_on_error>,
+      ::boost::math::policies::evaluation_error<::boost::math::policies::errno_on_error>,
+      ::boost::math::policies::rounding_error<::boost::math::policies::errno_on_error>
+   > c99_error_policy;
+
+   template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+   inline multiprecision::number<Backend, ExpressionTemplates> asinh BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
+   {
+      return boost::math::asinh(arg, c99_error_policy());
+   }
+   template <class tag, class A1, class A2, class A3, class A4>
+   inline typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type asinh BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
+   {
+      typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+      return asinh(value_type(arg));
+   }
+   template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+   inline multiprecision::number<Backend, ExpressionTemplates> acosh BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
+   {
+      return boost::math::acosh(arg, c99_error_policy());
+   }
+   template <class tag, class A1, class A2, class A3, class A4>
+   inline typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type acosh BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
+   {
+      typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+      return acosh(value_type(arg));
+   }
+   template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+   inline multiprecision::number<Backend, ExpressionTemplates> atanh BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
+   {
+      return boost::math::atanh(arg, c99_error_policy());
+   }
+   template <class tag, class A1, class A2, class A3, class A4>
+   inline typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type atanh BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
+   {
+      typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+      return atanh(value_type(arg));
+   }
+   template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+   inline multiprecision::number<Backend, ExpressionTemplates> cbrt BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
+   {
+      return boost::math::cbrt(arg, c99_error_policy());
+   }
+   template <class tag, class A1, class A2, class A3, class A4>
+   inline typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type cbrt BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
+   {
+      typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+      return cbrt(value_type(arg));
+   }
+   template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+   inline multiprecision::number<Backend, ExpressionTemplates> erf BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
+   {
+      return boost::math::erf(arg, c99_error_policy());
+   }
+   template <class tag, class A1, class A2, class A3, class A4>
+   inline typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type erf BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
+   {
+      typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+      return erf(value_type(arg));
+   }
+   template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+   inline multiprecision::number<Backend, ExpressionTemplates> erfc BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
+   {
+      return boost::math::erfc(arg, c99_error_policy());
+   }
+   template <class tag, class A1, class A2, class A3, class A4>
+   inline typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type erfc BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
+   {
+      typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+      return erfc(value_type(arg));
+   }
+   template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+   inline multiprecision::number<Backend, ExpressionTemplates> expm1 BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
+   {
+      return boost::math::expm1(arg, c99_error_policy());
+   }
+   template <class tag, class A1, class A2, class A3, class A4>
+   inline typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type expm1 BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
+   {
+      typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+      return expm1(value_type(arg));
+   }
+
+
 
 template <class B1, class B2, class B3, expression_template_option ET1, expression_template_option ET2, expression_template_option ET3>
 inline number<B1, ET1>& add(number<B1, ET1>& result, const number<B2, ET2>& a, const number<B3, ET3>& b)

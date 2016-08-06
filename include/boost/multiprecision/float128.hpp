@@ -572,6 +572,11 @@ inline boost::multiprecision::number<boost::multiprecision::backends::float128_b
 
 } // namespace math
 
+namespace multiprecision {
+   using ::boost::math::signbit;
+   using ::boost::math::copysign;
+}
+
 } // namespace boost
 
 namespace std{
