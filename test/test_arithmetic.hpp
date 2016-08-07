@@ -887,8 +887,8 @@ void test_float_funcs(const boost::mpl::true_&)
    {
       a = std::numeric_limits<Real>::quiet_NaN();
       b = modf(a, &c);
-      BOOST_CHECK((isnan)(b));
-      BOOST_CHECK((isnan)(c));
+      BOOST_CHECK((boost::math::isnan)(b));
+      BOOST_CHECK((boost::math::isnan)(c));
    }
 
    a = 4;
