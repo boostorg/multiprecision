@@ -497,6 +497,43 @@ inline std::size_t hash_value(const float128_backend& val)
 
 } // namespace backends
 
+   template<boost::multiprecision::expression_template_option ExpressionTemplates>
+   inline boost::multiprecision::number<float128_backend, ExpressionTemplates> asinh BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
+   {
+      return asinhq(arg.backend().value());
+   }
+   template<boost::multiprecision::expression_template_option ExpressionTemplates>
+   inline boost::multiprecision::number<float128_backend, ExpressionTemplates> acosh BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
+   {
+      return acoshq(arg.backend().value());
+   }
+   template<boost::multiprecision::expression_template_option ExpressionTemplates>
+   inline boost::multiprecision::number<float128_backend, ExpressionTemplates> atanh BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
+   {
+      return atanhq(arg.backend().value());
+   }
+   template<boost::multiprecision::expression_template_option ExpressionTemplates>
+   inline boost::multiprecision::number<float128_backend, ExpressionTemplates> cbrt BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
+   {
+      return cbrtq(arg.backend().value());
+   }
+   template<boost::multiprecision::expression_template_option ExpressionTemplates>
+   inline boost::multiprecision::number<float128_backend, ExpressionTemplates> erf BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
+   {
+      return erfq(arg.backend().value());
+   }
+   template<boost::multiprecision::expression_template_option ExpressionTemplates>
+   inline boost::multiprecision::number<float128_backend, ExpressionTemplates> erfc BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
+   {
+      return erfcq(arg.backend().value());
+   }
+   template<boost::multiprecision::expression_template_option ExpressionTemplates>
+   inline boost::multiprecision::number<float128_backend, ExpressionTemplates> expm1 BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
+   {
+      return expm1q(arg.backend().value());
+   }
+
+
 }} // namespaces
 
 namespace boost{ 
