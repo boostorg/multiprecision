@@ -964,6 +964,103 @@ inline typename enable_if<is_arithmetic<A>, void>::type eval_fmod(T& result, con
    eval_fmod(result, c, a);
 }
 
+template<class T>
+inline void eval_fdim(T& result, const T& a, const T& b)
+{
+   typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+   static const ui_type zero = 0u;
+   switch(eval_fpclassify(b))
+   {
+   case FP_NAN:
+   case FP_INFINITE:
+      result = zero;
+      return;
+   }
+   switch(eval_fpclassify(a))
+   {
+   case FP_NAN:
+      result = zero;
+      return;
+   case FP_INFINITE:
+      result = a;
+      return;
+   }
+   if(eval_gt(a, b))
+   {
+      eval_subtract(result, a, b);
+   }
+   else
+      result = zero;
+}
+
+template<class T, class A>
+inline typename boost::enable_if_c<boost::is_arithmetic<A>::value>::type eval_fdim(T& result, const T& a, const A& b)
+{
+   typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+   typedef typename boost::multiprecision::detail::canonical<A, T>::type arithmetic_type;
+   static const ui_type zero = 0u;
+   arithmetic_type canonical_b = b;
+   switch(boost::math::fpclassify(b))
+   {
+   case FP_NAN:
+   case FP_INFINITE:
+      result = zero;
+      return;
+   }
+   switch(eval_fpclassify(a))
+   {
+   case FP_NAN:
+      result = zero;
+      return;
+   case FP_INFINITE:
+      result = a;
+      return;
+   }
+   if(eval_gt(a, canonical_b))
+   {
+      eval_subtract(result, a, canonical_b);
+   }
+   else
+      result = zero;
+}
+
+template<class T, class A>
+inline typename boost::enable_if_c<boost::is_arithmetic<A>::value>::type eval_fdim(T& result, const A& a, const T& b)
+{
+   typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+   typedef typename boost::multiprecision::detail::canonical<A, T>::type arithmetic_type;
+   static const ui_type zero = 0u;
+   arithmetic_type canonical_a = a;
+   switch(eval_fpclassify(b))
+   {
+   case FP_NAN:
+   case FP_INFINITE:
+      result = zero;
+      return;
+   }
+   switch(boost::math::fpclassify(a))
+   {
+   case FP_NAN:
+      result = zero;
+      return;
+   case FP_INFINITE:
+      result = std::numeric_limits<number<T> >::infinity().backend();
+      return;
+   }
+   if(eval_gt(canonical_a, b))
+   {
+      eval_subtract(result, canonical_a, b);
+   }
+   else
+      result = zero;
+}
+
+template <class T1, class T2, class T3, class T4>
+inline void eval_fma(T1& result, const T2& a, const T3& b, const T4& c)
+{
+}
+
+
 template <class T>
 inline void eval_trunc(T& result, const T& a)
 {
@@ -2331,6 +2428,7 @@ HETERO_BINARY_OP_FUNCTOR_B(ldexp, boost::long_long_type, number_kind_floating_po
 BINARY_OP_FUNCTOR(pow, number_kind_floating_point)
 BINARY_OP_FUNCTOR(fmod, number_kind_floating_point)
 BINARY_OP_FUNCTOR(atan2, number_kind_floating_point)
+BINARY_OP_FUNCTOR(fdim, number_kind_floating_point)
 
 UNARY_OP_FUNCTOR(logb, number_kind_floating_point)
 HETERO_BINARY_OP_FUNCTOR(scalbn, short, number_kind_floating_point)
