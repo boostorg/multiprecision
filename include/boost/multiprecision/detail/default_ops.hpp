@@ -358,6 +358,7 @@ inline void eval_multiply_default(T& t, const T& u, const T& v)
       eval_multiply(t, v);
    }
 }
+#if !BOOST_WORKAROUND(BOOST_MSVC, < 1900)
 template <class T, class U>
 inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_multiply_default(T& t, const T& u, const U& v)
 {
@@ -376,6 +377,7 @@ inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type e
 {
    eval_multiply(t, v, u);
 }
+#endif
 template <class T, class U, class V>
 inline void eval_multiply_default(T& t, const U& u, const V& v)
 {
@@ -456,6 +458,7 @@ inline void eval_divide_default(T& t, const T& u, const T& v)
       eval_divide(t, v);
    }
 }
+#if !BOOST_WORKAROUND(BOOST_MSVC, < 1900)
 template <class T, class U>
 inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_divide_default(T& t, const T& u, const U& v)
 {
@@ -482,12 +485,14 @@ inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_co
    T uu(u);
    eval_divide(t, uu, v);
 }
+#endif
 template <class T, class U, class V>
 inline void eval_divide_default(T& t, const U& u, const V& v)
 {
    if(is_same<T, V>::value && ((void*)&t == (void*)&v))
    {
-      T temp(u);
+      T temp;
+      temp = u;
       eval_divide(temp, v);
       t = temp;
    }
