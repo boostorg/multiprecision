@@ -564,8 +564,8 @@ inline typename enable_if_c<
       *result = static_cast<R>(*val.limbs());
       if(val.isneg())
       {
-         check_is_negative(mpl::bool_<boost::is_signed<R>::value || boost::is_floating_point<R>::value>());
-         *result = negate_integer(*result, mpl::bool_<boost::is_signed<R>::value || boost::is_floating_point<R>::value>());
+         check_is_negative(mpl::bool_<is_signed_number<R>::value || (number_category<R>::value == number_kind_floating_point)>());
+         *result = negate_integer(*result, mpl::bool_<is_signed_number<R>::value || (number_category<R>::value == number_kind_floating_point)>());
       }
    }
 }

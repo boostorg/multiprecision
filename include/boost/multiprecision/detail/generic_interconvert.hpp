@@ -35,36 +35,37 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
    using default_ops::eval_right_shift;
    using default_ops::eval_ldexp;
    using default_ops::eval_add;
+   using default_ops::eval_is_zero;
    // smallest unsigned type handled natively by "From" is likely to be it's limb_type:
-   typedef typename canonical<unsigned char, From>::type   limb_type;
+   typedef typename canonical<unsigned char, From>::type   l_limb_type;
    // get the corresponding type that we can assign to "To":
-   typedef typename canonical<limb_type, To>::type         to_type;
+   typedef typename canonical<l_limb_type, To>::type         to_type;
    From t(from);
    bool is_neg = eval_get_sign(t) < 0;
    if(is_neg)
       t.negate();
    // Pick off the first limb:
-   limb_type limb;
-   limb_type mask = ~static_cast<limb_type>(0);
+   l_limb_type limb;
+   l_limb_type mask = static_cast<l_limb_type>(~static_cast<l_limb_type>(0));
    From fl;
    eval_bitwise_and(fl, t, mask);
    eval_convert_to(&limb, fl);
    to = static_cast<to_type>(limb);
-   eval_right_shift(t, std::numeric_limits<limb_type>::digits);
+   eval_right_shift(t, std::numeric_limits<l_limb_type>::digits);
    //
    // Then keep picking off more limbs until "t" is zero:
    //
    To l;
-   unsigned shift = std::numeric_limits<limb_type>::digits;
+   unsigned shift = std::numeric_limits<l_limb_type>::digits;
    while(!eval_is_zero(t))
    {
       eval_bitwise_and(fl, t, mask);
       eval_convert_to(&limb, fl);
       l = static_cast<to_type>(limb);
-      eval_right_shift(t, std::numeric_limits<limb_type>::digits);
+      eval_right_shift(t, std::numeric_limits<l_limb_type>::digits);
       eval_ldexp(l, l, shift);
       eval_add(to, l);
-      shift += std::numeric_limits<limb_type>::digits;
+      shift += std::numeric_limits<l_limb_type>::digits;
    }
    //
    // Finish off by setting the sign:
