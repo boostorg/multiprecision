@@ -1392,7 +1392,7 @@ private:
          }
       }
       //
-      // Exception guarentee: create the result in stack variable "result"
+      // Exception guarantee: create the result in stack variable "result"
       // then do a swap at the end.  In the event of a throw, *this will
       // be left unchanged.
       //
