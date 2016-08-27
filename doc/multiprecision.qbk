@@ -3709,7 +3709,7 @@ whose precision can vary at compile time (such as `mpf_float`).
    // Over again, but with checking enabled this time:
    typedef number<cpp_int_backend<0, 0, signed_magnitude, checked> >                 checked_cpp_int;
    typedef rational_adaptor<cpp_int_backend<0, 0, signed_magnitude, checked> >       checked_cpp_rational_backend;
-   typedef number<cpp_rational_backend>                                              checked_cpp_rational;
+   typedef number<checked_cpp_rational_backend>                                      checked_cpp_rational;
 
    // Checked fixed precision unsigned types:
    typedef number<cpp_int_backend<128, 128, unsigned_magnitude, checked, void> >     checked_uint128_t;
