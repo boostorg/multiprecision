@@ -100,6 +100,16 @@
 <li class="listitem">
             Add modf support to complete C90 compatibility.
           </li>
+<li class="listitem">
+            Fix self assignment bug in expression template code for expressions such
+            as <code class="computeroutput"><span class="identifier">a</span> <span class="special">=</span>
+            <span class="identifier">a</span> <span class="special">*</span>
+            <span class="identifier">a</span> <span class="special">*</span>
+            <span class="identifier">a</span></code>, see <a href="https://svn.boost.org/trac/boost/ticket/12408" target="_top">#12408</a>.
+          </li>
+<li class="listitem">
+            Fixed some compiler errors that occur when converting from <code class="computeroutput"><span class="identifier">cpp_int</span></code> to <code class="computeroutput"><span class="identifier">cpp_bin_float</span></code>.
+          </li>
 </ul></div>
 <h5>
 <a name="boost_multiprecision.map.hist.h1"></a>
