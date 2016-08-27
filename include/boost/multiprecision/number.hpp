@@ -761,7 +761,12 @@ private:
       bool bl = contains_self(e.left());
       bool br = contains_self(e.right());
 
-      if(bl && is_self(e.left()))
+      if(bl && br)
+      {
+         self_type temp(e);
+         temp.m_backend.swap(this->m_backend);
+      }
+      else if(bl && is_self(e.left()))
       {
          // Ignore the left node, it's *this, just add the right:
          do_add(e.right(), typename right_type::tag_type());
@@ -770,11 +775,6 @@ private:
       {
          // Ignore the right node, it's *this, just add the left:
          do_add(e.left(), typename left_type::tag_type());
-      }
-      else if(bl && br)
-      {
-         self_type temp(e);
-         temp.m_backend.swap(this->m_backend);
       }
       else if(!br && (bl || (left_depth >= right_depth)))
       { // br is always false, but if bl is true we must take the this branch:
@@ -799,7 +799,12 @@ private:
       bool bl = contains_self(e.left());
       bool br = contains_self(e.right());
 
-      if(bl && is_self(e.left()))
+      if(bl && br)
+      {
+         self_type temp(e);
+         temp.m_backend.swap(this->m_backend);
+      }
+      else if(bl && is_self(e.left()))
       {
          // Ignore the left node, it's *this, just subtract the right:
          do_subtract(e.right(), typename right_type::tag_type());
@@ -809,11 +814,6 @@ private:
          // Ignore the right node, it's *this, just subtract the left and negate the result:
          do_subtract(e.left(), typename left_type::tag_type());
          m_backend.negate();
-      }
-      else if(bl && br)
-      {
-         self_type temp(e);
-         temp.m_backend.swap(this->m_backend);
       }
       else if(!br && (bl || (left_depth >= right_depth)))
       { // br is always false, but if bl is true we must take the this branch:
@@ -839,7 +839,12 @@ private:
       bool bl = contains_self(e.left());
       bool br = contains_self(e.right());
 
-      if(bl && is_self(e.left()))
+      if(bl && br)
+      {
+         self_type temp(e);
+         temp.m_backend.swap(this->m_backend);
+      }
+      else if(bl && is_self(e.left()))
       {
          // Ignore the left node, it's *this, just add the right:
          do_multiplies(e.right(), typename right_type::tag_type());
@@ -848,11 +853,6 @@ private:
       {
          // Ignore the right node, it's *this, just add the left:
          do_multiplies(e.left(), typename left_type::tag_type());
-      }
-      else if(bl && br)
-      {
-         self_type temp(e);
-         temp.m_backend.swap(this->m_backend);
       }
       else if(!br && (bl || (left_depth >= right_depth)))
       { // br is always false, but if bl is true we must take the this branch:

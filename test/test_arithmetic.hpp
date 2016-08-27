@@ -2271,5 +2271,27 @@ void test()
    a = 20;
    a = a;
    BOOST_CHECK_EQUAL(a, 20);
+
+   a = 2;
+   a = a * a * a;
+   BOOST_CHECK_EQUAL(a, 8);
+   a = 2;
+   a = a + a + a;
+   BOOST_CHECK_EQUAL(a, 6);
+   a = 2;
+   a = a - a + a;
+   BOOST_CHECK_EQUAL(a, 2);
+   a = 2;
+   a = a + a - a;
+   BOOST_CHECK_EQUAL(a, 2);
+   a = 2;
+   a = a * a - a;
+   BOOST_CHECK_EQUAL(a, 2);
+   a = 2;
+   a = a + a * a;
+   BOOST_CHECK_EQUAL(a, 6);
+   a = 2;
+   a = (a + a) * a;
+   BOOST_CHECK_EQUAL(a, 8);
 }
 
