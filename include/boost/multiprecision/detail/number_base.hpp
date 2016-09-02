@@ -74,6 +74,18 @@ struct is_number : public mpl::false_ {};
 template <class Backend, expression_template_option ExpressionTemplates>
 struct is_number<number<Backend, ExpressionTemplates> > : public mpl::true_ {};
 
+template <class T>
+struct is_et_number : public mpl::false_ {};
+
+template <class Backend>
+struct is_et_number<number<Backend, et_on> > : public mpl::true_ {};
+
+template <class T>
+struct is_no_et_number : public mpl::false_ {};
+
+template <class Backend>
+struct is_no_et_number<number<Backend, et_off> > : public mpl::true_ {};
+
 namespace detail{
 
 // Forward-declare an expression wrapper
@@ -696,11 +708,11 @@ struct expression
    typedef typename right_middle_type::result_type right_middle_result_type;
    typedef typename right_type::result_type right_result_type;
    typedef typename combine_expression<
+      left_result_type,
       typename combine_expression<
-         typename combine_expression<left_result_type, left_middle_result_type>::type,
-         right_middle_result_type
-      >::type,
-      right_result_type
+         left_middle_result_type,
+         typename combine_expression<right_middle_result_type, right_result_type>::type
+      >::type
    >::type result_type;
    typedef tag tag_type;
 

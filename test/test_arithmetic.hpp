@@ -742,7 +742,7 @@ void test_float_funcs(const boost::mpl::true_&)
    //
    // Test variable reuse in function calls, see https://svn.boost.org/trac/boost/ticket/8326
    //
-   Real a(2), b(10), c;
+   Real a(2), b(10), c, d;
    a = pow(a, b);
    BOOST_CHECK_EQUAL(a, 1024);
    a = 2;
@@ -898,6 +898,25 @@ void test_float_funcs(const boost::mpl::true_&)
    a = 4;
    b = atan2(a, b);
    BOOST_CHECK_CLOSE_FRACTION(b, Real(atan2(Real(4), Real(2))), tol);
+
+   // fma:
+   a = 2;
+   b = 4;
+   c = 6;
+   BOOST_CHECK_EQUAL(fma(a, b, c), 14);
+   BOOST_CHECK_EQUAL(fma(a, 4, c), 14);
+   BOOST_CHECK_EQUAL(fma(a, b, 6), 14);
+   BOOST_CHECK_EQUAL(fma(a, 4, 6), 14);
+   BOOST_CHECK_EQUAL(fma(a + 0, b, c), 14);
+   BOOST_CHECK_EQUAL(fma(a - 0, 4, c), 14);
+   BOOST_CHECK_EQUAL(fma(a * 1, b, 6), 14);
+   BOOST_CHECK_EQUAL(fma(a / 1, 4, 6), 14);
+   BOOST_CHECK_EQUAL(fma(2, b, c), 14);
+   BOOST_CHECK_EQUAL(fma(2, b, 6), 14);
+   BOOST_CHECK_EQUAL(fma(2, b * 1, c), 14);
+   BOOST_CHECK_EQUAL(fma(2, b + 0, 6), 14);
+   BOOST_CHECK_EQUAL(fma(2, 4, c), 14);
+   BOOST_CHECK_EQUAL(fma(2, 4, c + 0), 14);
 }
 
 template <class T, class U>

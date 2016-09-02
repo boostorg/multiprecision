@@ -1453,6 +1453,31 @@ inline void eval_fmod(mpfr_float_backend<Digits10, AllocateType>& result, const 
 }
 
 template <unsigned Digits10, mpfr_allocation_type AllocateType>
+inline void eval_multiply_add(mpfr_float_backend<Digits10, AllocateType>& result, const mpfr_float_backend<Digits10, AllocateType>& a, const mpfr_float_backend<Digits10, AllocateType>& b)
+{
+   mpfr_fma(result.data(), a.data(), b.data(), result.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10, mpfr_allocation_type AllocateType>
+inline void eval_multiply_add(mpfr_float_backend<Digits10, AllocateType>& result, const mpfr_float_backend<Digits10, AllocateType>& a, const mpfr_float_backend<Digits10, AllocateType>& b, const mpfr_float_backend<Digits10, AllocateType>& c)
+{
+   mpfr_fma(result.data(), a.data(), b.data(), c.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10, mpfr_allocation_type AllocateType>
+inline void eval_multiply_subtract(mpfr_float_backend<Digits10, AllocateType>& result, const mpfr_float_backend<Digits10, AllocateType>& a, const mpfr_float_backend<Digits10, AllocateType>& b)
+{
+   mpfr_fms(result.data(), a.data(), b.data(), result.data(), GMP_RNDN);
+   result.negate();
+}
+
+template <unsigned Digits10, mpfr_allocation_type AllocateType>
+inline void eval_multiply_subtract(mpfr_float_backend<Digits10, AllocateType>& result, const mpfr_float_backend<Digits10, AllocateType>& a, const mpfr_float_backend<Digits10, AllocateType>& b, const mpfr_float_backend<Digits10, AllocateType>& c)
+{
+   mpfr_fms(result.data(), a.data(), b.data(), c.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10, mpfr_allocation_type AllocateType>
 inline std::size_t hash_value(const mpfr_float_backend<Digits10, AllocateType>& val)
 {
    std::size_t result = 0;

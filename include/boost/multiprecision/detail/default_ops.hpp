@@ -385,7 +385,7 @@ inline void eval_multiply_default(T& t, const U& u, const V& v)
    }
    else
    {
-      t = u;
+      t = number<T>::canonical_value(u);
       eval_multiply(t, v);
    }
 }
@@ -395,13 +395,13 @@ inline void eval_multiply(T& t, const U& u, const V& v)
    eval_multiply_default(t, u, v);
 }
 
-template <class T, class U, class V, class X>
-inline typename disable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_add(T& t, const U& u, const V& v, const X& x)
+template <class T>
+inline void eval_multiply_add(T& t, const T& u, const T& v, const T& x)
 {
    if((void*)&x == (void*)&t)
    {
       T z;
-      z = x;
+      z = number<T>::canonical_value(x);
       eval_multiply_add(t, u, v, z);
    }
    else
@@ -409,6 +409,25 @@ inline typename disable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::typ
       eval_multiply(t, u, v);
       eval_add(t, x);
    }
+}
+
+template <class T, class U>
+inline typename boost::disable_if_c<boost::is_same<T, U>::value, T>::type make_T(const U& u)
+{
+   T t;
+   t = number<T>::canonical_value(u);
+   return BOOST_MP_MOVE(t);
+}
+template <class T>
+inline const T& make_T(const T& t)
+{
+   return t;
+}
+
+template <class T, class U, class V, class X>
+inline typename disable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_add(T& t, const U& u, const V& v, const X& x)
+{
+   eval_multiply_add(t, make_T<T>(u), make_T<T>(v), make_T<T>(x));
 }
 template <class T, class U, class V, class X>
 inline typename enable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_add(T& t, const U& u, const V& v, const X& x)
@@ -1000,7 +1019,7 @@ inline typename boost::enable_if_c<boost::is_arithmetic<A>::value>::type eval_fd
    typedef typename boost::multiprecision::detail::canonical<A, T>::type arithmetic_type;
    static const ui_type zero = 0u;
    arithmetic_type canonical_b = b;
-   switch(boost::math::fpclassify(b))
+   switch((::boost::math::fpclassify)(b))
    {
    case FP_NAN:
    case FP_INFINITE:
@@ -1038,7 +1057,7 @@ inline typename boost::enable_if_c<boost::is_arithmetic<A>::value>::type eval_fd
       result = zero;
       return;
    }
-   switch(boost::math::fpclassify(a))
+   switch((::boost::math::fpclassify)(a))
    {
    case FP_NAN:
       result = zero;
@@ -1054,12 +1073,6 @@ inline typename boost::enable_if_c<boost::is_arithmetic<A>::value>::type eval_fd
    else
       result = zero;
 }
-
-template <class T1, class T2, class T3, class T4>
-inline void eval_fma(T1& result, const T2& a, const T3& b, const T4& c)
-{
-}
-
 
 template <class T>
 inline void eval_trunc(T& result, const T& a)
@@ -1512,11 +1525,11 @@ namespace multiprecision{
    using boost::math::isnormal;
 
    typedef ::boost::math::policies::policy<
-      ::boost::math::policies::domain_error<::boost::math::policies::errno_on_error>,
-      ::boost::math::policies::pole_error<::boost::math::policies::errno_on_error>,
-      ::boost::math::policies::overflow_error<::boost::math::policies::errno_on_error>,
-      ::boost::math::policies::evaluation_error<::boost::math::policies::errno_on_error>,
-      ::boost::math::policies::rounding_error<::boost::math::policies::errno_on_error>
+      ::boost::math::policies::domain_error< ::boost::math::policies::errno_on_error>,
+      ::boost::math::policies::pole_error< ::boost::math::policies::errno_on_error>,
+      ::boost::math::policies::overflow_error< ::boost::math::policies::errno_on_error>,
+      ::boost::math::policies::evaluation_error< ::boost::math::policies::errno_on_error>,
+      ::boost::math::policies::rounding_error< ::boost::math::policies::errno_on_error>
    > c99_error_policy;
 
    template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
@@ -1954,6 +1967,200 @@ inline typename enable_if_c<number_category<B>::value == number_kind_integer, nu
    number<B, ExpressionTemplates> s, r;
    eval_integer_sqrt(s.backend(), r.backend(), x.backend());
    return s;
+}
+//
+// fma:
+//
+
+namespace default_ops {
+
+   struct fma_func
+   {
+      template <class B, class T, class U, class V>
+      void operator()(B& result, const T& a, const U& b, const V& c)const
+      {
+         eval_multiply_add(result, a, b, c);
+      }
+   };
+
+
+}
+
+template <class Backend, class U, class V>
+inline typename enable_if<
+   mpl::and_<
+      mpl::bool_<number_category<number<Backend, et_on> >::value == number_kind_floating_point>,
+      mpl::or_<
+         is_number<U>,
+         is_number_expression<U>,
+         is_arithmetic<U>
+      >,
+      mpl::or_<
+         is_number<V>,
+         is_number_expression<V>,
+         is_arithmetic<V>
+      >
+   >,
+   detail::expression<detail::function, default_ops::fma_func, number<Backend, et_on>, U, V>
+>::type
+fma(const number<Backend, et_on>& a, const U& b, const V& c)
+{
+   return detail::expression<detail::function, default_ops::fma_func, number<Backend, et_on>, U, V>(
+      default_ops::fma_func(), a, b, c);
+}
+
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class U, class V>
+inline typename enable_if<
+   mpl::and_<
+   mpl::bool_<number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type >::value == number_kind_floating_point>,
+   mpl::or_<
+   is_number<U>,
+   is_number_expression<U>,
+   is_arithmetic<U>
+   >,
+   mpl::or_<
+   is_number<V>,
+   is_number_expression<V>,
+   is_arithmetic<V>
+   >
+   >,
+   detail::expression<detail::function, default_ops::fma_func, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, U, V>
+>::type
+fma(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const U& b, const V& c)
+{
+   return detail::expression<detail::function, default_ops::fma_func, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, U, V>(
+      default_ops::fma_func(), a, b, c);
+}
+
+template <class Backend, class U, class V>
+inline typename enable_if<
+   mpl::and_<
+   mpl::bool_<number_category<number<Backend, et_off> >::value == number_kind_floating_point>,
+   mpl::or_<
+   is_number<U>,
+   is_number_expression<U>,
+   is_arithmetic<U>
+   >,
+   mpl::or_<
+   is_number<V>,
+   is_number_expression<V>,
+   is_arithmetic<V>
+   >
+   >,
+   number<Backend, et_off>
+>::type
+fma(const number<Backend, et_off>& a, const U& b, const V& c)
+{
+   using default_ops::eval_multiply_add;
+   number<Backend, et_off> result;
+   eval_multiply_add(result.backend(), number<Backend, et_off>::canonical_value(a), number<Backend, et_off>::canonical_value(b), number<Backend, et_off>::canonical_value(c));
+   return BOOST_MP_MOVE(result);
+}
+
+template <class U, class Backend, class V>
+inline typename enable_if<
+   mpl::and_<
+      mpl::bool_<number_category<number<Backend, et_on> >::value == number_kind_floating_point>,
+      is_arithmetic<U>,
+      mpl::or_<
+         is_number<V>,
+         is_number_expression<V>,
+         is_arithmetic<V>
+      >
+   >,
+   detail::expression<detail::function, default_ops::fma_func, U, number<Backend, et_on>, V>
+>::type
+fma(const U& a, const number<Backend, et_on>& b, const V& c)
+{
+   return detail::expression<detail::function, default_ops::fma_func, U, number<Backend, et_on>, V>(
+      default_ops::fma_func(), a, b, c);
+}
+
+template <class U, class tag, class Arg1, class Arg2, class Arg3, class Arg4, class V>
+inline typename enable_if<
+   mpl::and_<
+      mpl::bool_<number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type >::value == number_kind_floating_point>,
+      is_arithmetic<U>,
+      mpl::or_<
+         is_number<V>,
+         is_number_expression<V>,
+         is_arithmetic<V>
+      >
+   >,
+   detail::expression<detail::function, default_ops::fma_func, U, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, V>
+>::type
+fma(const U& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b, const V& c)
+{
+   return detail::expression<detail::function, default_ops::fma_func, U, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, V>(
+      default_ops::fma_func(), a, b, c);
+}
+
+template <class U, class Backend, class V>
+inline typename enable_if<
+   mpl::and_<
+      mpl::bool_<number_category<number<Backend, et_off> >::value == number_kind_floating_point>,
+      is_arithmetic<U>,
+      mpl::or_<
+         is_number<V>,
+         is_number_expression<V>,
+         is_arithmetic<V>
+      >
+   >,
+   number<Backend, et_off>
+>::type
+fma(const U& a, const number<Backend, et_off>& b, const V& c)
+{
+   using default_ops::eval_multiply_add;
+   number<Backend, et_off> result;
+   eval_multiply_add(result.backend(), number<Backend, et_off>::canonical_value(a), number<Backend, et_off>::canonical_value(b), number<Backend, et_off>::canonical_value(c));
+   return BOOST_MP_MOVE(result);
+}
+
+template <class U, class V, class Backend>
+inline typename enable_if<
+   mpl::and_<
+   mpl::bool_<number_category<number<Backend, et_on> >::value == number_kind_floating_point>,
+      is_arithmetic<U>,
+      is_arithmetic<V>
+   >,
+   detail::expression<detail::function, default_ops::fma_func, U, V, number<Backend, et_on> >
+>::type
+fma(const U& a, const V& b, const number<Backend, et_on>& c)
+{
+   return detail::expression<detail::function, default_ops::fma_func, U, V, number<Backend, et_on> >(
+      default_ops::fma_func(), a, b, c);
+}
+
+template <class U, class V, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline typename enable_if<
+   mpl::and_<
+   mpl::bool_<number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type >::value == number_kind_floating_point>,
+      is_arithmetic<U>,
+      is_arithmetic<V>
+   >,
+   detail::expression<detail::function, default_ops::fma_func, U, V, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >
+>::type
+fma(const U& a, const V& b, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& c)
+{
+   return detail::expression<detail::function, default_ops::fma_func, U, V, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(
+      default_ops::fma_func(), a, b, c);
+}
+
+template <class U, class V, class Backend>
+inline typename enable_if<
+   mpl::and_<
+   mpl::bool_<number_category<number<Backend, et_off> >::value == number_kind_floating_point>,
+      is_arithmetic<U>,
+      is_arithmetic<V>
+   >,
+   number<Backend, et_off>
+>::type
+fma(const U& a, const V& b, const number<Backend, et_off>& c)
+{
+   using default_ops::eval_multiply_add;
+   number<Backend, et_off> result;
+   eval_multiply_add(result.backend(), number<Backend, et_off>::canonical_value(a), number<Backend, et_off>::canonical_value(b), number<Backend, et_off>::canonical_value(c));
+   return BOOST_MP_MOVE(result);
 }
 
 template <class B, expression_template_option ExpressionTemplates>
