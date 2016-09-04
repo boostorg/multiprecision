@@ -983,6 +983,11 @@ inline typename enable_if<is_arithmetic<A>, void>::type eval_fmod(T& result, con
    eval_fmod(result, c, a);
 }
 
+template <class B>
+bool eval_gt(const B& a, const B& b);
+template <class T, class U>
+bool eval_gt(const T& a, const U& b);
+
 template<class T>
 inline void eval_fdim(T& result, const T& a, const T& b)
 {
@@ -1396,8 +1401,6 @@ inline void eval_scalbn(B& result, const B& val, A e)
 
 }
 
-} // namespace multiprecision
-namespace math{
 //
 // Default versions of floating point classification routines:
 //
@@ -1485,11 +1488,21 @@ inline int signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
    return signbit BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
 }
+template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+inline multiprecision::number<Backend, ExpressionTemplates> changesign BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
+{
+   return -arg;
+}
 template <class tag, class A1, class A2, class A3, class A4>
 inline typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type changesign BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
    return changesign BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
+}
+template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+inline multiprecision::number<Backend, ExpressionTemplates> copysign BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& a, const multiprecision::number<Backend, ExpressionTemplates>& b)
+{
+   return (boost::multiprecision::signbit)(a) != (boost::multiprecision::signbit)(b) ? (boost::multiprecision::changesign)(a) : a;
 }
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates, class tag, class A1, class A2, class A3, class A4>
 inline multiprecision::number<Backend, ExpressionTemplates> copysign BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& a, const multiprecision::detail::expression<tag, A1, A2, A3, A4>& b)
@@ -1508,21 +1521,26 @@ inline typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_
    return copysign BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(a), value_type(b));
 }
 
-} // namespace math
+} // namespace multiprecision
+
+namespace math {
+
+   //
+   // Import Math functions here, so they can be found by Boost.Math:
+   //
+   using boost::multiprecision::signbit;
+   using boost::multiprecision::sign;
+   using boost::multiprecision::copysign;
+   using boost::multiprecision::changesign;
+   using boost::multiprecision::fpclassify;
+   using boost::multiprecision::isinf;
+   using boost::multiprecision::isnan;
+   using boost::multiprecision::isnormal;
+   using boost::multiprecision::isfinite;
+
+}
 
 namespace multiprecision{
-
-   //
-   // Import Math functions here, so they can be found via ADL:
-   //
-   using boost::math::signbit;
-   using boost::math::sign;
-   using boost::math::copysign;
-   using boost::math::changesign;
-   using boost::math::fpclassify;
-   using boost::math::isinf;
-   using boost::math::isnan;
-   using boost::math::isnormal;
 
    typedef ::boost::math::policies::policy<
       ::boost::math::policies::domain_error< ::boost::math::policies::errno_on_error>,

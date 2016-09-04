@@ -537,8 +537,28 @@ inline std::size_t hash_value(const float128_backend& val)
       return expm1q(arg.backend().value());
    }
 
+   template <multiprecision::expression_template_option ExpressionTemplates>
+   inline int signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates>& arg)
+   {
+      return ::signbitq(arg.backend().value());
+   }
 
-}} // namespaces
+   template <multiprecision::expression_template_option ExpressionTemplates>
+   inline boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates> copysign BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates>& a, const boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates>& b)
+   {
+      return ::copysignq(a.backend().value(), b.backend().value());
+   }
+
+} // namespace multiprecision
+
+namespace math {
+
+   using boost::multiprecision::signbit;
+   using boost::multiprecision::copysign;
+
+} // namespace math
+
+} // namespace boost
 
 namespace boost{ 
 namespace archive{
@@ -594,29 +614,7 @@ void serialize(Archive& ar, boost::multiprecision::backends::float128_backend& v
    float128_detail::do_serialize(ar, val, load_tag(), binary_tag());
 }
 
-} // namepsace multiprecision
-
-namespace math{
-
-template <multiprecision::expression_template_option ExpressionTemplates>
-inline int signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates>& arg)
-{
-   return ::signbitq(arg.backend().value());
-}
-
-template <multiprecision::expression_template_option ExpressionTemplates>
-inline boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates> copysign BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates>& a, const boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates>& b)
-{
-   return ::copysignq(a.backend().value(), b.backend().value());
-}
-
-
-} // namespace math
-
-namespace multiprecision {
-   using ::boost::math::signbit;
-   using ::boost::math::copysign;
-}
+} // namepsace archive
 
 } // namespace boost
 

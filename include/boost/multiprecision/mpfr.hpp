@@ -1857,10 +1857,6 @@ struct constant_catalan<boost::multiprecision::number<boost::multiprecision::deb
 
 }} // namespaces
 
-} // namespace multiprecision
-
-namespace math{
-
 template<unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
 inline int signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>& arg)
 {
@@ -1885,12 +1881,16 @@ inline boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost:
    return (boost::math::signbit)(a) != (boost::math::signbit)(b) ? boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates>(-a) : a;
 }
 
+} // namespace multiprecision
+
+namespace math{
+
+   using boost::multiprecision::signbit;
+   using boost::multiprecision::copysign;
+
 } // namespace math
 
 namespace multiprecision {
-   using ::boost::math::signbit;
-   using ::boost::math::copysign;
-
    //
    // Overloaded special functions which call native mpfr routines:
    //

@@ -249,8 +249,91 @@ void test()
    BOOST_CHECK_EQUAL(fdim(2, val), 0);
 }
 
+template <class T>
+void test_poison()
+{
+   // use these macros as proxies for determining C99 support:
+#if defined(FP_ILOGB0) && defined(FP_INFINITE)
+   //
+   // These tests verify that our function overloads for Boost.Multiprecision
+   // don't do anything nasty to the std:: overloads for built in types:
+   //
+   using namespace std;
+   using namespace boost::multiprecision;
+   //using namespace boost::math;
+
+   T a(2), b(0.3f), c(4), result(0);
+   int i;
+
+   result += abs(a);
+   result += cosh(a);
+   result += fmod(a, b);
+   result += logb(a);
+   result += remquo(a, b, &i);
+   result += acos(b);
+   result += erf(a);
+   result += frexp(a, &i);
+   result += lrint(a);
+   result += rint(a);
+   result += acosh(b);
+   result += erfc(b);
+   result += hypot(a, b);
+   result += lround(c);
+   result += round(c);
+   result += asin(b);
+   result += exp2(a);
+   result += ilogb(b);
+   result += modf(a, &b);
+   result += scalbln(a, i);
+   result += asinh(b);
+   result += exp(b);
+   result += ldexp(a, i);
+   result += scalbn(a, i);
+   result += atan(b);
+   result += expm1(a);
+   result += lgamma(a);
+   result += sin(b);
+   result += atan2(a, c);
+   result += fabs(a);
+   result += llrint(a);
+   result += sinh(b);
+   result += atanh(b);
+   result += fdim(a, b);
+   result += llround(a);
+   result += nearbyint(a);
+   result += sqrt(b);
+   result += cbrt(a);
+   result += floor(b);
+   result += log(a);
+   result += nextafter(a, b);
+   result += tan(b);
+   result += ceil(b);
+   result += fma(a, b, c);
+   result += log10(a);
+   result += nexttoward(a, b);
+   result += tanh(a);
+   result += copysign(a, b);
+   result += fmax(a, b);
+   result += log1p(a);
+   result += pow(a, b);
+   result += tgamma(a);
+   result += cos(b);
+   result += fmin(a, b);
+   result += log2(a);
+   result += remainder(a, b);
+   result += trunc(b);
+   result += min(a, b);
+   result += max(a, b);
+
+   i = fpclassify(a) + isgreaterequal(a, b) + islessequal(a, b) + isnan(a) + isunordered(a, b)
+      + isfinite(a) + isinf(a) + islessgreater(a, b) + isnormal(a) + signbit(a) + isgreater(a, b) + isless(a, b);
+#endif
+}
+
 int main()
 {
+   test_poison<float>();
+   test_poison<double>();
 #ifdef TEST_MPF_50
    test<boost::multiprecision::mpf_float_50>();
    test<boost::multiprecision::mpf_float_100>();
