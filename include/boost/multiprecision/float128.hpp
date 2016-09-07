@@ -536,6 +536,11 @@ inline std::size_t hash_value(const float128_backend& val)
    {
       return expm1q(arg.backend().value());
    }
+   template<boost::multiprecision::expression_template_option ExpressionTemplates>
+   inline boost::multiprecision::number<float128_backend, ExpressionTemplates> lgamma BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
+   {
+      return lgammaq(arg.backend().value());
+   }
 
    template <multiprecision::expression_template_option ExpressionTemplates>
    inline int signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates>& arg)

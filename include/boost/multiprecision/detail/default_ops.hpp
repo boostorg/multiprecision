@@ -1752,8 +1752,40 @@ namespace multiprecision{
       typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
       return expm1(value_type(arg));
    }
+   template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+   inline multiprecision::number<Backend, ExpressionTemplates> lgamma BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
+   {
+      return boost::math::lgamma(arg, c99_error_policy());
+   }
+   template <class tag, class A1, class A2, class A3, class A4>
+   inline typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type lgamma BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
+   {
+      typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+      return lgamma(value_type(arg));
+   }
 
-
+   template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+   inline long lrint BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
+   {
+      return lround(arg);
+   }
+   template <class tag, class A1, class A2, class A3, class A4>
+   inline long lrint BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
+   {
+      return lround(arg);
+   }
+#ifndef BOOST_NO_LONG_LONG
+   template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+   inline boost::long_long_type llrint BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
+   {
+      return llround(arg);
+   }
+   template <class tag, class A1, class A2, class A3, class A4>
+   inline boost::long_long_type llrint BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
+   {
+      return llround(arg);
+   }
+#endif
 
 template <class B1, class B2, class B3, expression_template_option ET1, expression_template_option ET2, expression_template_option ET3>
 inline number<B1, ET1>& add(number<B1, ET1>& result, const number<B2, ET2>& a, const number<B3, ET3>& b)

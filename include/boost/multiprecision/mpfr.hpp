@@ -1939,6 +1939,13 @@ namespace multiprecision {
       mpfr_expm1(result.backend().data(), arg.backend().data(), GMP_RNDN);
       return BOOST_MP_MOVE(result);
    }
+   template<unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
+   inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> lgamma BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>& arg)
+   {
+      boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result;
+      mpfr_lngamma(result.backend().data(), arg.backend().data(), GMP_RNDN);
+      return BOOST_MP_MOVE(result);
+   }
 
 }
 
