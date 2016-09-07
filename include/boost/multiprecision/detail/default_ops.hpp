@@ -25,7 +25,16 @@
 #endif
 
 
-namespace boost{ namespace multiprecision{ namespace default_ops{
+namespace boost{ namespace multiprecision{ 
+   
+   namespace detail {
+
+      template <class T>
+      struct is_backend;
+
+   }
+   
+namespace default_ops{
 
 #ifdef BOOST_MSVC
 // warning C4127: conditional expression is constant
@@ -987,6 +996,10 @@ template <class B>
 bool eval_gt(const B& a, const B& b);
 template <class T, class U>
 bool eval_gt(const T& a, const U& b);
+template <class B>
+bool eval_lt(const B& a, const B& b);
+template <class T, class U>
+bool eval_lt(const T& a, const U& b);
 
 template<class T>
 inline void eval_fdim(T& result, const T& a, const T& b)
@@ -1391,6 +1404,118 @@ inline void eval_scalbn(B& result, const B& val, A e)
    BOOST_STATIC_ASSERT_MSG(!std::numeric_limits<number<B> >::is_specialized || (std::numeric_limits<number<B> >::radix == 2), "The default implementation of scalbn requires a base 2 number type");
    eval_ldexp(result, val, static_cast<typename B::exponent_type>(e));
 }
+
+template <class T>
+inline bool is_arg_nan(const T& val, mpl::true_ const&, const mpl::false_&)
+{
+   return eval_fpclassify(val) == FP_NAN;
+}
+template <class T>
+inline bool is_arg_nan(const T& val, mpl::false_ const&, const mpl::true_&)
+{
+   return (boost::math::isnan)(val);
+}
+template <class T>
+inline bool is_arg_nan(const T&, mpl::false_ const&, const mpl::false_&)
+{
+   return false;
+}
+
+template <class T>
+inline bool is_arg_nan(const T& val)
+{
+   return is_arg_nan(val, mpl::bool_<boost::multiprecision::detail::is_backend<T>::value>(), is_floating_point<T>());
+}
+
+template <class T, class U, class V>
+inline void eval_fmax(T& result, const U& a, const V& b)
+{
+   if(is_arg_nan(a))
+      result = number<T>::canonical_value(b);
+   else if(is_arg_nan(b))
+      result = number<T>::canonical_value(a);
+   else if(eval_lt(number<T>::canonical_value(a), number<T>::canonical_value(b)))
+      result = number<T>::canonical_value(b);
+   else
+      result = number<T>::canonical_value(a);
+}
+template <class T, class U, class V>
+inline void eval_fmin(T& result, const U& a, const V& b)
+{
+   if(is_arg_nan(a))
+      result = number<T>::canonical_value(b);
+   else if(is_arg_nan(b))
+      result = number<T>::canonical_value(a);
+   else if(eval_lt(number<T>::canonical_value(a), number<T>::canonical_value(b)))
+      result = number<T>::canonical_value(a);
+   else
+      result = number<T>::canonical_value(b);
+}
+
+template <class R, class T, class U>
+inline void eval_hypot(R& result, const T& a, const U& b)
+{
+   //
+   // Normalize x and y, so that both are positive and x >= y:
+   //
+   R x, y;
+   x = number<R>::canonical_value(a);
+   y = number<R>::canonical_value(b);
+   if(eval_get_sign(x) < 0)
+      x.negate();
+   if(eval_get_sign(y) < 0)
+      y.negate();
+
+   // Special case, see C99 Annex F.
+   // The order of the if's is important: do not change!
+   int c1 = eval_fpclassify(x);
+   int c2 = eval_fpclassify(y);
+
+   if(c1 == FP_ZERO)
+   {
+      result = y;
+      return;
+   }
+   if(c2 == FP_ZERO)
+   {
+      result = x;
+      return;
+   }
+   if(c1 == FP_INFINITE)
+   {
+      result = x;
+      return;
+   }
+   if((c2 == FP_INFINITE) || (c2 == FP_NAN))
+   {
+      result = y;
+      return;
+   }
+   if(c1 == FP_NAN)
+   {
+      result = x;
+      return;
+   }
+
+   if(eval_gt(y, x))
+      x.swap(y);
+
+   eval_multiply(result, x, std::numeric_limits<number<R> >::epsilon().backend());
+
+   if(eval_gt(result, y))
+   {
+      result = x;
+      return;
+   }
+
+   R rat;
+   eval_divide(rat, y, x);
+   eval_multiply(result, rat, rat);
+   eval_increment(result);
+   eval_sqrt(rat, result);
+   eval_multiply(result, rat, x);
+}
+
 //
 // These functions are implemented in separate files, but expanded inline here,
 // DO NOT CHANGE THE ORDER OF THESE INCLUDES:
@@ -2652,8 +2777,11 @@ HETERO_BINARY_OP_FUNCTOR_B(ldexp, boost::long_long_type, number_kind_floating_po
 //HETERO_BINARY_OP_FUNCTOR_B(frexp, boost::long_long_type*, number_kind_floating_point)
 BINARY_OP_FUNCTOR(pow, number_kind_floating_point)
 BINARY_OP_FUNCTOR(fmod, number_kind_floating_point)
+BINARY_OP_FUNCTOR(fmax, number_kind_floating_point)
+BINARY_OP_FUNCTOR(fmin, number_kind_floating_point)
 BINARY_OP_FUNCTOR(atan2, number_kind_floating_point)
 BINARY_OP_FUNCTOR(fdim, number_kind_floating_point)
+BINARY_OP_FUNCTOR(hypot, number_kind_floating_point)
 
 UNARY_OP_FUNCTOR(logb, number_kind_floating_point)
 HETERO_BINARY_OP_FUNCTOR(scalbn, short, number_kind_floating_point)

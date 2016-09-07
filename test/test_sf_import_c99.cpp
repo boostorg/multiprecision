@@ -72,6 +72,94 @@
 #undef isnormal
 #endif
 
+template <class T, class U>
+void test_less(T a, U b)
+{
+   BOOST_CHECK(a < b);
+   BOOST_CHECK(a <= b);
+   BOOST_CHECK(!(a > b));
+   BOOST_CHECK(!(a >= b));
+   BOOST_CHECK(!(a == b));
+   BOOST_CHECK((a != b));
+
+   BOOST_CHECK(b > a);
+   BOOST_CHECK(b >= a);
+   BOOST_CHECK(!(b < a));
+   BOOST_CHECK(!(b <= a));
+   BOOST_CHECK(!(b == a));
+   BOOST_CHECK((b != a));
+
+   BOOST_CHECK(isless(a, b));
+   BOOST_CHECK(islessequal(a, b));
+   BOOST_CHECK(!isgreater(a, b));
+   BOOST_CHECK(!isgreaterequal(a, b));
+   BOOST_CHECK(islessgreater(a, b));
+
+   BOOST_CHECK(!isless(b, a));
+   BOOST_CHECK(!islessequal(b, a));
+   BOOST_CHECK(isgreater(b, a));
+   BOOST_CHECK(isgreaterequal(b, a));
+   BOOST_CHECK(islessgreater(b, a));
+}
+template <class T, class U>
+void test_equal(T a, U b)
+{
+   BOOST_CHECK(!(a < b));
+   BOOST_CHECK(a <= b);
+   BOOST_CHECK(!(a > b));
+   BOOST_CHECK((a >= b));
+   BOOST_CHECK((a == b));
+   BOOST_CHECK(!(a != b));
+
+   BOOST_CHECK(!(b > a));
+   BOOST_CHECK(b >= a);
+   BOOST_CHECK(!(b < a));
+   BOOST_CHECK((b <= a));
+   BOOST_CHECK((b == a));
+   BOOST_CHECK(!(b != a));
+
+   BOOST_CHECK(!isless(a, b));
+   BOOST_CHECK(islessequal(a, b));
+   BOOST_CHECK(!isgreater(a, b));
+   BOOST_CHECK(isgreaterequal(a, b));
+   BOOST_CHECK(!islessgreater(a, b));
+
+   BOOST_CHECK(!isless(b, a));
+   BOOST_CHECK(islessequal(b, a));
+   BOOST_CHECK(!isgreater(b, a));
+   BOOST_CHECK(isgreaterequal(b, a));
+   BOOST_CHECK(!islessgreater(b, a));
+}
+template <class T, class U>
+void test_unordered(T a, U b)
+{
+   BOOST_CHECK(!(a < b));
+   BOOST_CHECK(!(a <= b));
+   BOOST_CHECK(!(a > b));
+   BOOST_CHECK(!(a >= b));
+   BOOST_CHECK(!(a == b));
+   BOOST_CHECK((a != b));
+
+   BOOST_CHECK(!(b > a));
+   BOOST_CHECK(!(b >= a));
+   BOOST_CHECK(!(b < a));
+   BOOST_CHECK(!(b <= a));
+   BOOST_CHECK(!(b == a));
+   BOOST_CHECK((b != a));
+
+   BOOST_CHECK(!isless(a, b));
+   BOOST_CHECK(!islessequal(a, b));
+   BOOST_CHECK(!isgreater(a, b));
+   BOOST_CHECK(!isgreaterequal(a, b));
+   BOOST_CHECK(!islessgreater(a, b));
+
+   BOOST_CHECK(!isless(b, a));
+   BOOST_CHECK(!islessequal(b, a));
+   BOOST_CHECK(!isgreater(b, a));
+   BOOST_CHECK(!isgreaterequal(b, a));
+   BOOST_CHECK(!islessgreater(b, a));
+}
+
 template <class T>
 void test()
 {
@@ -247,6 +335,89 @@ void test()
    BOOST_CHECK_EQUAL(fdim(s * 2, val), 0);
    BOOST_CHECK_EQUAL(fdim(val, 2), 18);
    BOOST_CHECK_EQUAL(fdim(2, val), 0);
+
+   BOOST_CHECK_EQUAL(fmax(val, s), val);
+   BOOST_CHECK_EQUAL(fmax(s, val), val);
+   BOOST_CHECK_EQUAL(fmax(val * 2, s), val * 2);
+   BOOST_CHECK_EQUAL(fmax(val, s * 2), val);
+   BOOST_CHECK_EQUAL(fmax(val * 2, s * 2), val * 2);
+   BOOST_CHECK_EQUAL(fmin(val, s), s);
+   BOOST_CHECK_EQUAL(fmin(s, val), s);
+   BOOST_CHECK_EQUAL(fmin(val * 2, s), s);
+   BOOST_CHECK_EQUAL(fmin(val, s * 2), s * 2);
+   BOOST_CHECK_EQUAL(fmin(val * 2, s * 2), s * 2);
+
+   BOOST_CHECK_EQUAL(fmax(val, 2), val);
+   BOOST_CHECK_EQUAL(fmax(val, 2.0), val);
+   BOOST_CHECK_EQUAL(fmax(20, s), val);
+   BOOST_CHECK_EQUAL(fmax(20.0, s), val);
+   BOOST_CHECK_EQUAL(fmin(val, 2), s);
+   BOOST_CHECK_EQUAL(fmin(val, 2.0), s);
+   BOOST_CHECK_EQUAL(fmin(20, s), s);
+   BOOST_CHECK_EQUAL(fmin(20.0, s), s);
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      BOOST_CHECK_EQUAL(fmax(val, std::numeric_limits<T>::quiet_NaN()), val);
+      BOOST_CHECK_EQUAL(fmax(std::numeric_limits<T>::quiet_NaN(), val), val);
+      BOOST_CHECK_EQUAL(fmin(val, std::numeric_limits<T>::quiet_NaN()), val);
+      BOOST_CHECK_EQUAL(fmin(std::numeric_limits<T>::quiet_NaN(), val), val);
+   }
+   if(std::numeric_limits<double>::has_quiet_NaN)
+   {
+      BOOST_CHECK_EQUAL(fmax(val, std::numeric_limits<double>::quiet_NaN()), val);
+      BOOST_CHECK_EQUAL(fmax(std::numeric_limits<double>::quiet_NaN(), val), val);
+      BOOST_CHECK_EQUAL(fmin(val, std::numeric_limits<double>::quiet_NaN()), val);
+      BOOST_CHECK_EQUAL(fmin(std::numeric_limits<double>::quiet_NaN(), val), val);
+   }
+
+   test_less(s, val);
+   test_less(2, val);
+   test_less(s, 20);
+   test_less(s + 0, val);
+   test_less(s, val * 1);
+   test_less(s * 1, val * 1);
+   test_less(s * 1, 20);
+   test_less(s + 2, val * 2);
+
+   test_equal(val, val);
+   test_equal(20, val);
+   test_equal(val, 20);
+   test_equal(val + 0, val);
+   test_equal(val, val * 1);
+   test_equal(val * 1, val * 1);
+   test_equal(val * 1, 20);
+   test_equal(val * 20, val * 20);
+
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      s = std::numeric_limits<T>::quiet_NaN();
+      test_unordered(s, val);
+      test_unordered(s, 20);
+      test_unordered(s + 0, val);
+      test_unordered(s, val * 1);
+      test_unordered(s * 1, val * 1);
+      test_unordered(s * 1, 20);
+      test_unordered(s + 2, val * 2);
+      if(std::numeric_limits<double>::has_quiet_NaN)
+      {
+         double n = std::numeric_limits<double>::quiet_NaN();
+         test_unordered(n, val);
+      }
+   }
+
+   T tol = 8 * std::numeric_limits<T>::epsilon();
+   s = 2;
+   BOOST_CHECK_CLOSE_FRACTION(T(hypot(val, s)), T("20.099751242241780540438529825519152373890046940052754581145656594656982463103940762472355384907904704732599006530"), tol);
+   BOOST_CHECK_CLOSE_FRACTION(T(hypot(val, 2)), T("20.099751242241780540438529825519152373890046940052754581145656594656982463103940762472355384907904704732599006530"), tol);
+   BOOST_CHECK_CLOSE_FRACTION(T(hypot(val, 2.0)), T("20.099751242241780540438529825519152373890046940052754581145656594656982463103940762472355384907904704732599006530"), tol);
+   BOOST_CHECK_CLOSE_FRACTION(T(hypot(20, s)), T("20.099751242241780540438529825519152373890046940052754581145656594656982463103940762472355384907904704732599006530"), tol);
+   BOOST_CHECK_CLOSE_FRACTION(T(hypot(20.0, s)), T("20.099751242241780540438529825519152373890046940052754581145656594656982463103940762472355384907904704732599006530"), tol);
+   BOOST_CHECK_CLOSE_FRACTION(T(hypot(val * 1, s)), T("20.099751242241780540438529825519152373890046940052754581145656594656982463103940762472355384907904704732599006530"), tol);
+   BOOST_CHECK_CLOSE_FRACTION(T(hypot(val * 1, s * 1)), T("20.099751242241780540438529825519152373890046940052754581145656594656982463103940762472355384907904704732599006530"), tol);
+   BOOST_CHECK_CLOSE_FRACTION(T(hypot(val * 1, 2)), T("20.099751242241780540438529825519152373890046940052754581145656594656982463103940762472355384907904704732599006530"), tol);
+   BOOST_CHECK_CLOSE_FRACTION(T(hypot(val * 1, 2.0)), T("20.099751242241780540438529825519152373890046940052754581145656594656982463103940762472355384907904704732599006530"), tol);
+   BOOST_CHECK_CLOSE_FRACTION(T(hypot(20, s * 1)), T("20.099751242241780540438529825519152373890046940052754581145656594656982463103940762472355384907904704732599006530"), tol);
+   BOOST_CHECK_CLOSE_FRACTION(T(hypot(20.0, s * 1)), T("20.099751242241780540438529825519152373890046940052754581145656594656982463103940762472355384907904704732599006530"), tol);
 }
 
 template <class T>
