@@ -1433,6 +1433,12 @@ inline void eval_tanh(mpfr_float_backend<Digits10, AllocateType>& result, const 
 }
 
 template <unsigned Digits10, mpfr_allocation_type AllocateType>
+inline void eval_log2(mpfr_float_backend<Digits10, AllocateType>& result, const mpfr_float_backend<Digits10, AllocateType>& arg)
+{
+   mpfr_log2(result.data(), arg.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10, mpfr_allocation_type AllocateType>
 inline void eval_modf(mpfr_float_backend<Digits10, AllocateType>& result, const mpfr_float_backend<Digits10, AllocateType>& arg, mpfr_float_backend<Digits10, AllocateType>* pipart)
 {
    if(0 == pipart)
@@ -1944,6 +1950,13 @@ namespace multiprecision {
    {
       boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result;
       mpfr_lngamma(result.backend().data(), arg.backend().data(), GMP_RNDN);
+      return BOOST_MP_MOVE(result);
+   }
+   template<unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
+   inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> log1p BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>& arg)
+   {
+      boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result;
+      mpfr_log1p(result.backend().data(), arg.backend().data(), GMP_RNDN);
       return BOOST_MP_MOVE(result);
    }
 

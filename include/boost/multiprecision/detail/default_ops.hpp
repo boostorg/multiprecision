@@ -1516,6 +1516,16 @@ inline void eval_hypot(R& result, const T& a, const U& b)
    eval_multiply(result, rat, x);
 }
 
+template <class T>
+const T& get_constant_ln2();
+
+template <class R, class T>
+inline void eval_log2(R& result, const T& a)
+{
+   eval_log(result, a);
+   eval_divide(result, get_constant_ln2<R>());
+}
+
 //
 // These functions are implemented in separate files, but expanded inline here,
 // DO NOT CHANGE THE ORDER OF THESE INCLUDES:
@@ -1786,6 +1796,17 @@ namespace multiprecision{
       return llround(arg);
    }
 #endif
+   template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+   inline multiprecision::number<Backend, ExpressionTemplates> log1p BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
+   {
+      return boost::math::log1p(arg, c99_error_policy());
+   }
+   template <class tag, class A1, class A2, class A3, class A4>
+   inline typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type log1p BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
+   {
+      typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+      return log1p(value_type(arg));
+   }
 
 template <class B1, class B2, class B3, expression_template_option ET1, expression_template_option ET2, expression_template_option ET3>
 inline number<B1, ET1>& add(number<B1, ET1>& result, const number<B2, ET2>& a, const number<B3, ET3>& b)
@@ -2798,6 +2819,7 @@ UNARY_OP_FUNCTOR(atan, number_kind_floating_point)
 UNARY_OP_FUNCTOR(cosh, number_kind_floating_point)
 UNARY_OP_FUNCTOR(sinh, number_kind_floating_point)
 UNARY_OP_FUNCTOR(tanh, number_kind_floating_point)
+UNARY_OP_FUNCTOR(log2, number_kind_floating_point)
 
 HETERO_BINARY_OP_FUNCTOR(ldexp, short, number_kind_floating_point)
 //HETERO_BINARY_OP_FUNCTOR(frexp, short*, number_kind_floating_point)

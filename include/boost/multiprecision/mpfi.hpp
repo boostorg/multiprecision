@@ -1022,6 +1022,12 @@ inline void eval_tanh(mpfi_float_backend<Digits10>& result, const mpfi_float_bac
 }
 
 template <unsigned Digits10>
+inline void eval_log2(mpfi_float_backend<Digits10>& result, const mpfi_float_backend<Digits10>& arg)
+{
+   mpfi_log2(result.data(), arg.data());
+}
+
+template <unsigned Digits10>
 inline std::size_t hash_value(const mpfi_float_backend<Digits10>& val)
 {
    std::size_t result = 0;
@@ -1205,6 +1211,13 @@ inline boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<D
 {
    boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> result;
    mpfi_expm1(result.backend().data(), arg.backend().data());
+   return BOOST_MP_MOVE(result);
+}
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+inline boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> log1p BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>& arg)
+{
+   boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> result;
+   mpfi_log1p(result.backend().data(), arg.backend().data());
    return BOOST_MP_MOVE(result);
 }
 
