@@ -9,6 +9,7 @@
 #include <boost/math/policies/error_handling.hpp>
 #include <boost/multiprecision/detail/number_base.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <boost/math/special_functions/next.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/front.hpp>
 #include <boost/mpl/fold.hpp>
@@ -1525,6 +1526,11 @@ inline void eval_log2(R& result, const T& a)
    eval_log(result, a);
    eval_divide(result, get_constant_ln2<R>());
 }
+template <class R, class T>
+inline void eval_nearbyint(R& result, const T& a)
+{
+   eval_round(result, a);
+}
 
 //
 // These functions are implemented in separate files, but expanded inline here,
@@ -1806,6 +1812,49 @@ namespace multiprecision{
    {
       typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
       return log1p(value_type(arg));
+   }
+
+   template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+   inline multiprecision::number<Backend, ExpressionTemplates> nextafter BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& a, const multiprecision::number<Backend, ExpressionTemplates>& b)
+   {
+      return boost::math::nextafter(a, b, c99_error_policy());
+   }
+   template <class Backend, multiprecision::expression_template_option ExpressionTemplates, class tag, class A1, class A2, class A3, class A4>
+   inline multiprecision::number<Backend, ExpressionTemplates> nextafter BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& a, const multiprecision::detail::expression<tag, A1, A2, A3, A4>& b)
+   {
+      return nextafter BOOST_PREVENT_MACRO_SUBSTITUTION(a, multiprecision::number<Backend, ExpressionTemplates>(b));
+   }
+   template <class tag, class A1, class A2, class A3, class A4, class Backend, multiprecision::expression_template_option ExpressionTemplates>
+   inline multiprecision::number<Backend, ExpressionTemplates> nextafter BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& a, const multiprecision::number<Backend, ExpressionTemplates>& b)
+   {
+      return nextafter BOOST_PREVENT_MACRO_SUBSTITUTION(multiprecision::number<Backend, ExpressionTemplates>(a), b);
+   }
+   template <class tag, class A1, class A2, class A3, class A4, class tagb, class A1b, class A2b, class A3b, class A4b>
+   inline typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type nextafter BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& a, const multiprecision::detail::expression<tagb, A1b, A2b, A3b, A4b>& b)
+   {
+      typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+      return nextafter BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(a), value_type(b));
+   }
+   template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+   inline multiprecision::number<Backend, ExpressionTemplates> nexttoward BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& a, const multiprecision::number<Backend, ExpressionTemplates>& b)
+   {
+      return boost::math::nextafter(a, b, c99_error_policy());
+   }
+   template <class Backend, multiprecision::expression_template_option ExpressionTemplates, class tag, class A1, class A2, class A3, class A4>
+   inline multiprecision::number<Backend, ExpressionTemplates> nexttoward BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& a, const multiprecision::detail::expression<tag, A1, A2, A3, A4>& b)
+   {
+      return nexttoward BOOST_PREVENT_MACRO_SUBSTITUTION(a, multiprecision::number<Backend, ExpressionTemplates>(b));
+   }
+   template <class tag, class A1, class A2, class A3, class A4, class Backend, multiprecision::expression_template_option ExpressionTemplates>
+   inline multiprecision::number<Backend, ExpressionTemplates> nexttoward BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& a, const multiprecision::number<Backend, ExpressionTemplates>& b)
+   {
+      return nexttoward BOOST_PREVENT_MACRO_SUBSTITUTION(multiprecision::number<Backend, ExpressionTemplates>(a), b);
+   }
+   template <class tag, class A1, class A2, class A3, class A4, class tagb, class A1b, class A2b, class A3b, class A4b>
+   inline typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type nexttoward BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& a, const multiprecision::detail::expression<tagb, A1b, A2b, A3b, A4b>& b)
+   {
+      typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+      return nexttoward BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(a), value_type(b));
    }
 
 template <class B1, class B2, class B3, expression_template_option ET1, expression_template_option ET2, expression_template_option ET3>
@@ -2820,6 +2869,7 @@ UNARY_OP_FUNCTOR(cosh, number_kind_floating_point)
 UNARY_OP_FUNCTOR(sinh, number_kind_floating_point)
 UNARY_OP_FUNCTOR(tanh, number_kind_floating_point)
 UNARY_OP_FUNCTOR(log2, number_kind_floating_point)
+UNARY_OP_FUNCTOR(nearbyint, number_kind_floating_point)
 
 HETERO_BINARY_OP_FUNCTOR(ldexp, short, number_kind_floating_point)
 //HETERO_BINARY_OP_FUNCTOR(frexp, short*, number_kind_floating_point)

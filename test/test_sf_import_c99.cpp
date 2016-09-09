@@ -433,6 +433,20 @@ void test()
    val = 20;
    BOOST_CHECK_CLOSE_FRACTION(T(log2(val)), T("4.321928094887362347870319429489390175864831393024580612054756395815934776608625215850139743359370155099657371710"), tol);
    BOOST_CHECK_CLOSE_FRACTION(T(log2(val + 0)), T("4.321928094887362347870319429489390175864831393024580612054756395815934776608625215850139743359370155099657371710"), tol);
+
+   BOOST_CHECK_EQUAL(T(nearbyint(val)), 20);
+   BOOST_CHECK_EQUAL(T(nearbyint(val + 0.25)), 20);
+
+   BOOST_CHECK_GT(nextafter(val, T(200)), val);
+   BOOST_CHECK_GT(nextafter(val + 0, T(200)), val);
+   BOOST_CHECK_GT(nextafter(val + 0, T(200) + 1), val);
+   BOOST_CHECK_GT(nextafter(val, T(200) + 1), val);
+
+   BOOST_CHECK_GT(nexttoward(val, T(200)), val);
+   BOOST_CHECK_GT(nexttoward(val + 0, T(200)), val);
+   BOOST_CHECK_GT(nexttoward(val + 0, T(200) + 1), val);
+   BOOST_CHECK_GT(nexttoward(val, T(200) + 1), val);
+
 }
 
 template <class T>
