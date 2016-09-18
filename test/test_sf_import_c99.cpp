@@ -489,6 +489,8 @@ void test()
    BOOST_CHECK_CLOSE_FRACTION(tgamma(val), T("35.211611852799685705225257690531248115026311138908448314086859575901217653313145619623624570033258659272301335544"), tol);
    BOOST_CHECK_CLOSE_FRACTION(tgamma(val + 1), T("184.86096222719834995243260287528905260388813347926935364895601277348139267989401450302402899267460796117958201160"), tol);
 
+   i = fpclassify(val) + isgreaterequal(val, s) + islessequal(val, s) + isnan(val) + isunordered(val, s)
+      + isfinite(val) + isinf(val) + islessgreater(val, s) + isnormal(val) + signbit(val) + isgreater(val, s) + isless(val, s);
 }
 
 template <class T>
