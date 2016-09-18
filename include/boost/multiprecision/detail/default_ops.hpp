@@ -1451,6 +1451,11 @@ inline void eval_scalbn(B& result, const B& val, A e)
    BOOST_STATIC_ASSERT_MSG(!std::numeric_limits<number<B> >::is_specialized || (std::numeric_limits<number<B> >::radix == 2), "The default implementation of scalbn requires a base 2 number type");
    eval_ldexp(result, val, static_cast<typename B::exponent_type>(e));
 }
+template <class B, class A>
+inline void eval_scalbln(B& result, const B& val, A e)
+{
+   eval_scalbn(result, val, e);
+}
 
 template <class T>
 inline bool is_arg_nan(const T& val, mpl::true_ const&, const mpl::false_&)
@@ -1567,6 +1572,11 @@ template <class R, class T>
 inline void eval_nearbyint(R& result, const T& a)
 {
    eval_round(result, a);
+}
+template <class R, class T>
+inline void eval_rint(R& result, const T& a)
+{
+   eval_nearbyint(result, a);
 }
 
 //
@@ -1815,6 +1825,17 @@ namespace multiprecision{
    {
       typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
       return lgamma(value_type(arg));
+   }
+   template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+   inline multiprecision::number<Backend, ExpressionTemplates> tgamma BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
+   {
+      return boost::math::tgamma(arg, c99_error_policy());
+   }
+   template <class tag, class A1, class A2, class A3, class A4>
+   inline typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type tgamma BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
+   {
+      typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+      return tgamma(value_type(arg));
    }
 
    template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
@@ -2993,6 +3014,7 @@ UNARY_OP_FUNCTOR(sinh, number_kind_floating_point)
 UNARY_OP_FUNCTOR(tanh, number_kind_floating_point)
 UNARY_OP_FUNCTOR(log2, number_kind_floating_point)
 UNARY_OP_FUNCTOR(nearbyint, number_kind_floating_point)
+UNARY_OP_FUNCTOR(rint, number_kind_floating_point)
 
 HETERO_BINARY_OP_FUNCTOR(ldexp, short, number_kind_floating_point)
 //HETERO_BINARY_OP_FUNCTOR(frexp, short*, number_kind_floating_point)
@@ -3013,9 +3035,13 @@ BINARY_OP_FUNCTOR(remainder, number_kind_floating_point)
 
 UNARY_OP_FUNCTOR(logb, number_kind_floating_point)
 HETERO_BINARY_OP_FUNCTOR(scalbn, short, number_kind_floating_point)
+HETERO_BINARY_OP_FUNCTOR(scalbln, short, number_kind_floating_point)
 HETERO_BINARY_OP_FUNCTOR_B(scalbn, int, number_kind_floating_point)
+HETERO_BINARY_OP_FUNCTOR_B(scalbln, int, number_kind_floating_point)
 HETERO_BINARY_OP_FUNCTOR_B(scalbn, long, number_kind_floating_point)
+HETERO_BINARY_OP_FUNCTOR_B(scalbln, long, number_kind_floating_point)
 HETERO_BINARY_OP_FUNCTOR_B(scalbn, boost::long_long_type, number_kind_floating_point)
+HETERO_BINARY_OP_FUNCTOR_B(scalbln, boost::long_long_type, number_kind_floating_point)
 
 //
 // Integer functions:

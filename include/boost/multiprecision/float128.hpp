@@ -542,6 +542,11 @@ inline std::size_t hash_value(const float128_backend& val)
       return lgammaq(arg.backend().value());
    }
    template<boost::multiprecision::expression_template_option ExpressionTemplates>
+   inline boost::multiprecision::number<float128_backend, ExpressionTemplates> tgamma BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
+   {
+      return tgammaq(arg.backend().value());
+   }
+   template<boost::multiprecision::expression_template_option ExpressionTemplates>
    inline boost::multiprecision::number<float128_backend, ExpressionTemplates> log1p BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
    {
       return log1pq(arg.backend().value());
