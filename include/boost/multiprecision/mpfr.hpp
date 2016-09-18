@@ -1451,6 +1451,18 @@ inline void eval_modf(mpfr_float_backend<Digits10, AllocateType>& result, const 
       mpfr_modf(pipart->data(), result.data(), arg.data(), GMP_RNDN);
    }
 }
+template <unsigned Digits10, mpfr_allocation_type AllocateType>
+inline void eval_remainder(mpfr_float_backend<Digits10, AllocateType>& result, const mpfr_float_backend<Digits10, AllocateType>& a, const mpfr_float_backend<Digits10, AllocateType>& b)
+{
+   mpfr_remainder(result.data(), a.data(), b.data(), GMP_RNDN);
+}
+template <unsigned Digits10, mpfr_allocation_type AllocateType>
+inline void eval_remquo(mpfr_float_backend<Digits10, AllocateType>& result, const mpfr_float_backend<Digits10, AllocateType>& a, const mpfr_float_backend<Digits10, AllocateType>& b, int* pi)
+{
+   long l;
+   mpfr_remquo(result.data(), &l, a.data(), b.data(), GMP_RNDN);
+   if(pi) *pi = l;
+}
 
 template <unsigned Digits10, mpfr_allocation_type AllocateType>
 inline void eval_fmod(mpfr_float_backend<Digits10, AllocateType>& result, const mpfr_float_backend<Digits10, AllocateType>& a, const mpfr_float_backend<Digits10, AllocateType>& b)

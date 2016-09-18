@@ -559,6 +559,15 @@ inline std::size_t hash_value(const float128_backend& val)
       return ::copysignq(a.backend().value(), b.backend().value());
    }
 
+   inline void eval_remainder(float128_backend& result, const float128_backend& a, const float128_backend& b)
+   {
+      result.value() = remainderq(a.value(), b.value());
+   }
+   inline void eval_remainder(float128_backend& result, const float128_backend& a, const float128_backend& b, int* pi)
+   {
+      result.value() = remquoq(a.value(), b.value(), pi);
+   }
+
 } // namespace multiprecision
 
 namespace math {

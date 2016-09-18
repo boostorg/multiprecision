@@ -993,6 +993,52 @@ inline typename enable_if<is_arithmetic<A>, void>::type eval_fmod(T& result, con
    eval_fmod(result, c, a);
 }
 
+template <class T>
+void eval_round(T& result, const T& a);
+
+template <class T>
+inline void eval_remquo(T& result, const T& a, const T& b, int* pi)
+{
+   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The remquo function is only valid for floating point types.");
+   if((&result == &a) || (&result == &b))
+   {
+      T temp;
+      eval_remquo(temp, a, b, pi);
+      result = temp;
+      return;
+   }
+   T n;
+   eval_divide(result, a, b);
+   eval_round(n, result);
+   eval_convert_to(pi, n);
+   eval_multiply(n, b);
+   eval_subtract(result, a, n);
+}
+template<class T, class A>
+inline typename enable_if<is_arithmetic<A>, void>::type eval_remquo(T& result, const T& x, const A& a, int* pi)
+{
+   typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
+   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+   cast_type c;
+   c = a;
+   eval_remquo(result, x, c, pi);
+}
+template<class T, class A>
+inline typename enable_if<is_arithmetic<A>, void>::type eval_remquo(T& result, const A& x, const T& a, int* pi)
+{
+   typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
+   typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+   cast_type c;
+   c = x;
+   eval_remquo(result, c, a, pi);
+}
+template <class T, class U, class V>
+inline void eval_remainder(T& result, const U& a, const V& b)
+{
+   int i;
+   eval_remquo(result, a, b, &i);
+}
+
 template <class B>
 bool eval_gt(const B& a, const B& b);
 template <class T, class U>
@@ -1517,15 +1563,6 @@ inline void eval_hypot(R& result, const T& a, const U& b)
    eval_multiply(result, rat, x);
 }
 
-template <class T>
-const T& get_constant_ln2();
-
-template <class R, class T>
-inline void eval_log2(R& result, const T& a)
-{
-   eval_log(result, a);
-   eval_divide(result, get_constant_ln2<R>());
-}
 template <class R, class T>
 inline void eval_nearbyint(R& result, const T& a)
 {
@@ -2408,6 +2445,92 @@ fma(const U& a, const V& b, const number<Backend, et_off>& c)
    return BOOST_MP_MOVE(result);
 }
 
+namespace default_ops {
+
+   struct remquo_func
+   {
+      template <class B, class T, class U>
+      void operator()(B& result, const T& a, const U& b, int* pi)const
+      {
+         eval_remquo(result, a, b, pi);
+      }
+   };
+
+}
+
+template <class Backend, class U>
+inline typename enable_if_c<
+   number_category<number<Backend, et_on> >::value == number_kind_floating_point,
+   detail::expression<detail::function, default_ops::remquo_func, number<Backend, et_on>, U, int*>
+>::type
+remquo(const number<Backend, et_on>& a, const U& b, int* pi)
+{
+   return detail::expression<detail::function, default_ops::remquo_func, number<Backend, et_on>, U, int*>(
+      default_ops::remquo_func(), a, b, pi);
+}
+
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class U>
+inline typename enable_if_c<
+   number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type >::value == number_kind_floating_point,
+   detail::expression<detail::function, default_ops::remquo_func, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, U, int*>
+>::type
+remquo(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const U& b, int* pi)
+{
+   return detail::expression<detail::function, default_ops::remquo_func, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, U, int*>(
+      default_ops::remquo_func(), a, b, pi);
+}
+
+template <class U, class Backend>
+inline typename enable_if_c<
+   (number_category<number<Backend, et_on> >::value == number_kind_floating_point)
+   && !is_number<U>::value && !is_number_expression<U>::value,
+   detail::expression<detail::function, default_ops::remquo_func, U, number<Backend, et_on>, int*>
+>::type
+remquo(const U& a, const number<Backend, et_on>& b, int* pi)
+{
+   return detail::expression<detail::function, default_ops::remquo_func, U, number<Backend, et_on>, int*>(
+      default_ops::remquo_func(), a, b, pi);
+}
+
+template <class U, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+inline typename enable_if_c<
+   (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type >::value == number_kind_floating_point)
+   && !is_number<U>::value && !is_number_expression<U>::value,
+   detail::expression<detail::function, default_ops::remquo_func, U, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, int*>
+>::type
+remquo(const U& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b, int* pi)
+{
+   return detail::expression<detail::function, default_ops::remquo_func, U, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, int*>(
+      default_ops::remquo_func(), a, b, pi);
+}
+
+template <class Backend, class U>
+inline typename enable_if_c<
+   number_category<number<Backend, et_on> >::value == number_kind_floating_point,
+   number<Backend, et_off>
+>::type
+remquo(const number<Backend, et_off>& a, const U& b, int* pi)
+{
+   using default_ops::eval_remquo;
+   number<Backend, et_off> result;
+   eval_remquo(result.backend(), a.backend(), number<Backend, et_off>::canonical_value(b), pi);
+   return BOOST_MP_MOVE(result);
+}
+template <class U, class Backend>
+inline typename enable_if_c<
+(number_category<number<Backend, et_on> >::value == number_kind_floating_point)
+&& !is_number<U>::value && !is_number_expression<U>::value,
+number<Backend, et_off>
+>::type
+remquo(const U& a, const number<Backend, et_off>& b, int* pi)
+{
+   using default_ops::eval_remquo;
+   number<Backend, et_off> result;
+   eval_remquo(result.backend(), number<Backend, et_off>::canonical_value(a), b.backend(), pi);
+   return BOOST_MP_MOVE(result);
+}
+
+
 template <class B, expression_template_option ExpressionTemplates>
 inline typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, ExpressionTemplates> >::type
    sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
@@ -2886,6 +3009,7 @@ BINARY_OP_FUNCTOR(fmin, number_kind_floating_point)
 BINARY_OP_FUNCTOR(atan2, number_kind_floating_point)
 BINARY_OP_FUNCTOR(fdim, number_kind_floating_point)
 BINARY_OP_FUNCTOR(hypot, number_kind_floating_point)
+BINARY_OP_FUNCTOR(remainder, number_kind_floating_point)
 
 UNARY_OP_FUNCTOR(logb, number_kind_floating_point)
 HETERO_BINARY_OP_FUNCTOR(scalbn, short, number_kind_floating_point)

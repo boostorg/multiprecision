@@ -405,6 +405,13 @@ void eval_log10(T& result, const T& arg)
    eval_divide(result, get_constant_log10<T>());
 }
 
+template <class R, class T>
+inline void eval_log2(R& result, const T& a)
+{
+   eval_log(result, a);
+   eval_divide(result, get_constant_ln2<R>());
+}
+
 template<typename T> 
 inline void eval_pow(T& result, const T& x, const T& a)
 {

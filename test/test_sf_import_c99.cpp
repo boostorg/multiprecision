@@ -447,6 +447,42 @@ void test()
    BOOST_CHECK_GT(nexttoward(val + 0, T(200) + 1), val);
    BOOST_CHECK_GT(nexttoward(val, T(200) + 1), val);
 
+   val = 21;
+   s = 5;
+   BOOST_CHECK_EQUAL(T(remainder(val, s)), 1);
+   BOOST_CHECK_EQUAL(T(remainder(val, 5)), 1);
+   BOOST_CHECK_EQUAL(T(remainder(21, s)), 1);
+   BOOST_CHECK_EQUAL(T(remainder(val * 1, s)), 1);
+   BOOST_CHECK_EQUAL(T(remainder(val * 1, s * 1)), 1);
+   BOOST_CHECK_EQUAL(T(remainder(val, s * 1)), 1);
+   BOOST_CHECK_EQUAL(T(remainder(val * 1, 5)), 1);
+   BOOST_CHECK_EQUAL(T(remainder(21, s * 1)), 1);
+   int i(0);
+   BOOST_CHECK_EQUAL(T(remquo(val, s, &i)), 1);
+   BOOST_CHECK_EQUAL(i, 4);
+   i = 0;
+   BOOST_CHECK_EQUAL(T(remquo(val, 5, &i)), 1);
+   BOOST_CHECK_EQUAL(i, 4);
+   i = 0;
+   BOOST_CHECK_EQUAL(T(remquo(21, s, &i)), 1);
+   BOOST_CHECK_EQUAL(i, 4);
+   i = 0;
+   BOOST_CHECK_EQUAL(T(remquo(val * 1, s, &i)), 1);
+   BOOST_CHECK_EQUAL(i, 4);
+   i = 0;
+   BOOST_CHECK_EQUAL(T(remquo(val * 1, s * 1, &i)), 1);
+   BOOST_CHECK_EQUAL(i, 4);
+   i = 0;
+   BOOST_CHECK_EQUAL(T(remquo(val, s * 1, &i)), 1);
+   BOOST_CHECK_EQUAL(i, 4);
+   i = 0;
+   BOOST_CHECK_EQUAL(T(remquo(val * 1, 5, &i)), 1);
+   BOOST_CHECK_EQUAL(i, 4);
+   i = 0;
+   BOOST_CHECK_EQUAL(T(remquo(21, s * 1, &i)), 1);
+   BOOST_CHECK_EQUAL(i, 4);
+   i = 0;
+
 }
 
 template <class T>
