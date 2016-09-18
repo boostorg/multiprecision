@@ -22,7 +22,7 @@
 #define BOOST_MP_TEST_FLOAT_SERIAL_HPP
 
 template <class T>
-T generate_random(unsigned bits_wanted)
+T generate_random(unsigned /*bits_wanted*/)
 {
    typedef typename T::backend_type::exponent_type e_type;
    static boost::random::mt19937 gen;
