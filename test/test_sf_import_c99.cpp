@@ -569,8 +569,11 @@ void test_poison()
    result += min(a, b);
    result += max(a, b);
 
+#if !BOOST_WORKAROUND(BOOST_LIBSTDCXX_VERSION, < 60000)
+
    i = fpclassify(a) + isgreaterequal(a, b) + islessequal(a, b) + isnan(a) + isunordered(a, b)
       + isfinite(a) + isinf(a) + islessgreater(a, b) + isnormal(a) + signbit(a) + isgreater(a, b) + isless(a, b);
+#endif
 #endif
 }
 
