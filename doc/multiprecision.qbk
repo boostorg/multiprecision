@@ -3081,51 +3081,85 @@ which may be useful to ensure that columns line up.
    ``['number]``                                    min    (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
    ``['number]``                                    max    (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
 
-   // C90 Non-member function standard library support:
-   ``['unmentionable-expression-template-type]``    abs    (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    acos   (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    asin   (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    atan   (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    atan2  (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    ceil   (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    cos    (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    cosh   (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    exp    (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    fabs   (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    floor  (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    fmod   (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
-   ``['number]``                                    frexp  (const ``['number-or-expression-template-type]``&, ``['integer-type]``*);
-   ``['unmentionable-expression-template-type]``    ldexp  (const ``['number-or-expression-template-type]``&, ``['integer-type]``);
-   ``['unmentionable-expression-template-type]``    log    (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    log10  (const ``['number-or-expression-template-type]``&);
-   ``['number]``                                    modf   (const ``['number-or-expression-template-type]``&, ``['number]``*);
-   ``['unmentionable-expression-template-type]``    pow    (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    sin    (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    sinh   (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    sqrt   (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    tan    (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    tanh   (const ``['number-or-expression-template-type]``&);
    // C99 Non-member function standard library support:
-   ``['number]``                                    copysign  (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
-   int                                              fpclassify(const ``['number-or-expression-template-type]``&);
-   bool                                             isinf     (const ``['number-or-expression-template-type]``&);
-   bool                                             isnan     (const ``['number-or-expression-template-type]``&);
-   bool                                             isnormal  (const ``['number-or-expression-template-type]``&);
-   ``['integer-type]``                              ilogb     (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    llround   (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    logb      (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    lround    (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    round     (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    scalbn    (const ``['number-or-expression-template-type]``&, ``['integer-type]``);
-   int                                              signbit   (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    trunc     (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    abs        (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    acos       (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    acosh      (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    asin       (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    asinh      (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    atan       (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    atan2      (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    atanh      (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    cbrt       (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    ceil       (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    copysign   (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    cos        (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    cosh       (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    erf        (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    erfc       (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    exp        (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    exp2       (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    expm1      (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    fabs       (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    fdim       (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    floor      (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    fma        (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    fmin       (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    fmax       (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    fmod       (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    frexp      (const ``['number-or-expression-template-type]``&, ``['integer-type]``*);
+   ``['unmentionable-expression-template-type]``    hypot      (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['integer-type]``                              ilogb      (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    ldexp      (const ``['number-or-expression-template-type]``&, ``['integer-type]``);
+   ``['number]``                                    lgamma     (const ``['number-or-expression-template-type]``&);
+   long long                                 llrint     (const ``['number-or-expression-template-type]``&);
+   long long                                 llround    (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    log        (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    log2       (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    log10      (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    log1p      (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    logb       (const ``['number-or-expression-template-type]``&);
+   long                                      lrint      (const ``['number-or-expression-template-type]``&);
+   long                                      lround     (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    modf       (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    nearbyint  (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    nextafter  (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    nexttoward (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    pow        (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    remainder  (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    remquo     (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&, int*);
+   ``['unmentionable-expression-template-type]``    rint       (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    round      (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    scalbn     (const ``['number-or-expression-template-type]``&, ``['integer-type]``);
+   ``['unmentionable-expression-template-type]``    scalbln    (const ``['number-or-expression-template-type]``&, ``['integer-type]``);
+   ``['unmentionable-expression-template-type]``    sin        (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    sinh       (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    sqrt       (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    tan        (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    tanh       (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    tgamma     (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    trunc      (const ``['number-or-expression-template-type]``&);
+
+   int                                       fpclassify (const ``['number-or-expression-template-type]``&);
+   bool                                      isfinite   (const ``['number-or-expression-template-type]``&);
+   bool                                      isinf      (const ``['number-or-expression-template-type]``&);
+   bool                                      isnan      (const ``['number-or-expression-template-type]``&);
+   bool                                      isnormal   (const ``['number-or-expression-template-type]``&);
+   int                                       signbit    (const ``['number-or-expression-template-type]``&);
+
+   bool                                      isgreater  (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   bool                                      isgreaterequal(const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   bool                                      isless     (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   bool                                      islessequal(const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   bool                                      islessgreater(const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   bool                                      isunordered(const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
    // Misc other common C library functions:
+   ``['unmentionable-expression-template-type]``    itrunc (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    ltrunc (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    lltrunc(const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    iround (const ``['number-or-expression-template-type]``&);
    ``['number]``                                    changesign(const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    itrunc    (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    ltrunc    (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    lltrunc   (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    iround    (const ``['number-or-expression-template-type]``&);
-   int                                              sign      (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    copysign(const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
 
    // Traits support:
    template <class T>
@@ -3431,49 +3465,95 @@ that allows arithmetic to be performed on native integer types producing an exte
 
 [h4 Non-member standard library function support]
 
-   ``['unmentionable-expression-template-type]``    abs    (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    fabs   (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    sqrt   (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    floor  (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    ceil   (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    trunc  (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    itrunc (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    ltrunc (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    lltrunc(const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    round  (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    iround (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    lround (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    llround(const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    exp    (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    log    (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    log10    (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    cos    (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    sin    (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    tan    (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    acos   (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    asin   (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    atan   (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    cosh   (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    sinh   (const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    tanh   (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    abs        (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    acos       (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    acosh      (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    asin       (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    asinh      (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    atan       (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    atan2      (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    atanh      (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    cbrt       (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    ceil       (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    copysign   (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    cos        (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    cosh       (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    erf        (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    erfc       (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    exp        (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    exp2       (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    expm1      (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    fabs       (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    fdim       (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    floor      (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    fma        (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    fmin       (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    fmax       (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    fmod       (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    frexp      (const ``['number-or-expression-template-type]``&, ``['integer-type]``*);
+   ``['unmentionable-expression-template-type]``    hypot      (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['integer-type]``                              ilogb      (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    ldexp      (const ``['number-or-expression-template-type]``&, ``['integer-type]``);
+   ``['number]``                                    lgamma     (const ``['number-or-expression-template-type]``&);
+   long long                                 llrint     (const ``['number-or-expression-template-type]``&);
+   long long                                 llround    (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    log        (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    log2       (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    log10      (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    log1p      (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    logb       (const ``['number-or-expression-template-type]``&);
+   long                                      lrint      (const ``['number-or-expression-template-type]``&);
+   long                                      lround     (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    modf       (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    nearbyint  (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    nextafter  (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    nexttoward (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    pow        (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    remainder  (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    remquo     (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&, int*);
+   ``['unmentionable-expression-template-type]``    rint       (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    round      (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    scalbn     (const ``['number-or-expression-template-type]``&, ``['integer-type]``);
+   ``['unmentionable-expression-template-type]``    scalbln    (const ``['number-or-expression-template-type]``&, ``['integer-type]``);
+   ``['unmentionable-expression-template-type]``    sin        (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    sinh       (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    sqrt       (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    tan        (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    tanh       (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    tgamma     (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    trunc      (const ``['number-or-expression-template-type]``&);
 
-   ``['unmentionable-expression-template-type]``    ldexp (const ``['number-or-expression-template-type]``&, ``['integer-type]``);
-   ``['unmentionable-expression-template-type]``    frexp (const ``['number-or-expression-template-type]``&, ``['integer-type]``*);
-   ``['unmentionable-expression-template-type]``    pow   (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    fmod  (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    atan2 (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
-   ``['unmentionable-expression-template-type]``    scalbn(const ``['number-or-expression-template-type]``&, ``['integer-type]``);
-   ``['unmentionable-expression-template-type]``    logb  (const ``['number-or-expression-template-type]``&);
-   ``['integer-type]``                              ilogb (const ``['number-or-expression-template-type]``&);
+   int                                       fpclassify (const ``['number-or-expression-template-type]``&);
+   bool                                      isfinite   (const ``['number-or-expression-template-type]``&);
+   bool                                      isinf      (const ``['number-or-expression-template-type]``&);
+   bool                                      isnan      (const ``['number-or-expression-template-type]``&);
+   bool                                      isnormal   (const ``['number-or-expression-template-type]``&);
+   int                                       signbit    (const ``['number-or-expression-template-type]``&);
+
+   bool                                      isgreater  (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   bool                                      isgreaterequal(const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   bool                                      isless     (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   bool                                      islessequal(const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   bool                                      islessgreater(const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   bool                                      isunordered(const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
 
 These functions all behave exactly as their standard library C++11 counterparts do: their argument is either an instance of `number` or
 an expression template derived from it; If the argument is of type `number<Backend, et_off>` then that is also the return type,
-otherwise the return type is an expression template.
+otherwise the return type is an expression template unless otherwise stated.
 
 The integer type arguments to `ldexp`, `frexp`, `scalbn` and `ilogb` may be either type `int`, or the actual
 type of the exponent of the number type.
 
-These functions are normally implemented by the Backend type.  However, default versions are provided for Backend types that
+There are also some functions implemented for compatibility with the Boost.Math functions of the same name:
+
+   ``['unmentionable-expression-template-type]``    itrunc (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    ltrunc (const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    lltrunc(const ``['number-or-expression-template-type]``&);
+   ``['unmentionable-expression-template-type]``    iround (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    changesign(const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    copysign(const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+
+All these functions are normally implemented by the Backend type.  However, default versions are provided for Backend types that
 don't have native support for these functions.  Please note however, that this default support requires the precision of the type
 to be a compile time constant - this means for example that the [gmp] MPF Backend will not work with these functions when that type is
 used at variable precision.
@@ -4418,10 +4498,37 @@ and `ff` is a variable of type `std::ios_base::fmtflags`.
             The default version of this function is synthesised from other operations above.][[space]]]
 [[`eval_scalbn(b, cb, e)`][`void`][Scales value `cb` by ['r[super e]], where ['r] is the radix of the type.  The default version of this function
                   is implemented in terms of eval_ldexp, consequently this function must be provided for types with a radix other than 2.]]
+[[`eval_scalbln(b, cb, e)`][`void`][Calls `eval_scalbn(b, cb, e)`.]]
 [[`eval_ilogb(cb)`][`B::exponent_type`][Returns the exponent ['e] of value `cb` such that ['1 <= cb*r[super -e] < r], where ['r] is the radix of type B.
                     The default version of this function is implemented in terms of eval_frexp, consequently this function must be provided for types with a radix other than 2.]]
+[[`eval_remquo(b, cb, cb2, pi)`][`void`][Sets `b = cb - n * cb2` and stores `n` in `*pi`.]]
+[[`eval_remquo(b, cb, a, pi)`][`void`][Default version converts a to type B and calls the overload above.]]
+[[`eval_remquo(b, a, cb, pi)`][`void`][Default version converts a to type B and calls the overload above.]]
+[[`eval_remainder(b, cb, cb2)`][`void`][Default version calls eval_remquo with a dummy final argument.]]
+[[`eval_remainder(b, cb, a)`][`void`][Default version calls eval_remquo with a dummy final argument.]]
+[[`eval_remainder(b, a, cb)`][`void`][Default version calls eval_remquo with a dummy final argument.]]
+
+[[`eval_fdim(b, cb, cb2)`][`void`][Default version sets `b = cb - cb2` if `cb > cb2` and zero otherwise.  Special cases are handled as in the C99 annex.]]
+[[`eval_fdim(b, cb, a)`][`void`][Default version sets `b = cb - cb2` if `cb > cb2` and zero otherwise.  Special cases are handled as in the C99 annex.]]
+[[`eval_fdim(b, a, cb)`][`void`][Default version sets `b = cb - cb2` if `cb > cb2` and zero otherwise.  Special cases are handled as in the C99 annex.]]
+
+[[`eval_fmax(b, cb, cb2)`][`void`][Sets `b` to the larger of `cb` and `cb2`.]]
+[[`eval_fmax(b, cb, a)`][`void`][Sets `b` to the larger of `cb` and `a`.]]
+[[`eval_fmax(b, a, cb)`][`void`][Sets `b` to the larger of `cb` and `a`.]]
+[[`eval_fmin(b, cb, cb2)`][`void`][Sets `b` to the smaller of `cb` and `cb2`.]]
+[[`eval_fmin(b, cb, a)`][`void`][Sets `b` to the smaller of `cb` and `a`.]]
+[[`eval_fmin(b, a, cb)`][`void`][Sets `b` to the smaller of `cb` and `a`.]]
+
+[[`eval_hypot(b, cb, cb2)`][`void`][Sets `b` to the square root of the sum of the squares of `cb` and `cb2` without undue over or under flow.]]
+[[`eval_hypot(b, cb, a)`][`void`][As above.]]
+[[`eval_hypot(b, a, cb)`][`void`][As above.]]
+
 [[`eval_logb(b, cb)`][`B::exponent_type`][Sets `b` to the exponent ['e] of value `cb` such that ['1 <= cb*r[super -b] < r], where ['r] is the radix of type B.
                   The default version of this function is implemented in terms of `eval_ilogb`.]]
+[[`eval_nearbyint(b, cb)`][`void`][Calls `eval_round(b, cb)`.]]
+[[`eval_rint(b, cb)`][`void`][Calls `eval_nearbyint(b, cb)`.]]
+[[`eval_log2(b, cb)`][`void`][Sets `b` to the logarithm base 2 of `cb`.]]
+
 [[['hashing:]]]
 [[`hash_value(cb)`][`std::size_t`]
          [Returns a hash value for the argument that is suitable for use with `std::hash` etc.  If not provided then no automatic hashing support will be available for the number type.]]
@@ -4435,6 +4542,31 @@ whenever the result of an operation would be infinite, and `std::underflow_error
 [note
 The non-member functions are all named with an "eval_" prefix to avoid conflicts with template classes of the same name -
 in point of fact this naming convention shouldn't be necessary, but rather works around some compiler bugs.]
+
+[h4 Overloadable Functions]
+
+Some of the C99 math functions do not have `eval_` functions but must be overloaded directly: these functions 
+are either trivial or are forwarded to the Boost.Math implementations by default.
+The full list of these functions is:
+
+   int           sign       (const ``['number-or-expression-template-type]``&);
+   int           signbit    (const ``['number-or-expression-template-type]``&);
+   ``['number]``        changesign (const ``['number-or-expression-template-type]``&);
+   ``['number]``        copysign   (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['number]``        asinh      (const ``['number-or-expression-template-type]``&);
+   ``['number]``        acosh      (const ``['number-or-expression-template-type]``&);
+   ``['number]``        atanh      (const ``['number-or-expression-template-type]``&);
+   ``['number]``        cbrt       (const ``['number-or-expression-template-type]``&);
+   ``['number]``        erf        (const ``['number-or-expression-template-type]``&);
+   ``['number]``        erfc       (const ``['number-or-expression-template-type]``&);
+   ``['number]``        expm1      (const ``['number-or-expression-template-type]``&);
+   ``['number]``        log1p      (const ``['number-or-expression-template-type]``&);
+   ``['number]``        tgamma     (const ``['number-or-expression-template-type]``&);
+   ``['number]``        lgamma     (const ``['number-or-expression-template-type]``&);
+   long          lrint      (const ``['number-or-expression-template-type]``&);
+   long long     llrint     (const ``['number-or-expression-template-type]``&);
+   ``['number]``        nextafter  (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   ``['number]``        nexttoward (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
 
 [endsect]
 
