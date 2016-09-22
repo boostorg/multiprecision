@@ -1361,6 +1361,12 @@ inline void eval_exp(mpfr_float_backend<Digits10, AllocateType>& result, const m
 }
 
 template <unsigned Digits10, mpfr_allocation_type AllocateType>
+inline void eval_exp2(mpfr_float_backend<Digits10, AllocateType>& result, const mpfr_float_backend<Digits10, AllocateType>& arg)
+{
+   mpfr_exp2(result.data(), arg.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10, mpfr_allocation_type AllocateType>
 inline void eval_log(mpfr_float_backend<Digits10, AllocateType>& result, const mpfr_float_backend<Digits10, AllocateType>& arg)
 {
    mpfr_log(result.data(), arg.data(), GMP_RNDN);

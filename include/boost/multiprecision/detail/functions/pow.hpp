@@ -313,6 +313,15 @@ void eval_exp(T& result, const T& x)
 }
 
 template <class T>
+void eval_exp2(T& result, const T& arg)
+{
+   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The log function is only valid for floating point types.");
+   T base;
+   base = static_cast<typename mpl::front<typename T::unsigned_types>::type>(2u);
+   eval_pow(result, base, arg);
+}
+
+template <class T>
 void eval_log(T& result, const T& arg)
 {
    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The log function is only valid for floating point types.");

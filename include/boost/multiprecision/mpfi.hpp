@@ -950,6 +950,12 @@ inline void eval_exp(mpfi_float_backend<Digits10>& result, const mpfi_float_back
 }
 
 template <unsigned Digits10>
+inline void eval_exp2(mpfi_float_backend<Digits10>& result, const mpfi_float_backend<Digits10>& arg)
+{
+   mpfi_exp2(result.data(), arg.data());
+}
+
+template <unsigned Digits10>
 inline void eval_log(mpfi_float_backend<Digits10>& result, const mpfi_float_backend<Digits10>& arg)
 {
    mpfi_log(result.data(), arg.data());
