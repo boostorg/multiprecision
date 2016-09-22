@@ -433,10 +433,6 @@ inline void eval_exp(float128_backend& result, const float128_backend& arg)
 {
    result.value() = expq(arg.value());
 }
-inline void eval_exp2(float128_backend& result, const float128_backend& arg)
-{
-   result.value() = exp2q(arg.value());
-}
 inline void eval_log(float128_backend& result, const float128_backend& arg)
 {
    result.value() = logq(arg.value());
