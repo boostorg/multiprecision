@@ -4465,6 +4465,8 @@ and `ff` is a variable of type `std::ios_base::fmtflags`.
             The default version of this function is synthesised from other operations above.][[space]]]
 [[`eval_exp(b, cb)`][`void`][Performs the equivalent operation to `std::exp` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.
             The default version of this function is synthesised from other operations above.][[space]]]
+[[`eval_exp2(b, cb)`][`void`][Performs the equivalent operation to `std::exp2` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.
+            The default version of this function is implemented in terms of `eval_pow`.][[space]]]
 [[`eval_log(b, cb)`][`void`][Performs the equivalent operation to `std::log` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.
             The default version of this function is synthesised from other operations above.][[space]]]
 [[`eval_log10(b, cb)`][`void`][Performs the equivalent operation to `std::log10` on argument `cb` and stores the result in `b`.  Only required when `B` is an floating-point type.

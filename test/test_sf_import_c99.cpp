@@ -491,6 +491,9 @@ void test()
 
    BOOST_CHECK_CLOSE_FRACTION(T(exp2(val)), T("38.054627680087074134959999057935229289375106958842157216608071191022933383261349115865003025220405558913196632792"), tol);
    BOOST_CHECK_CLOSE_FRACTION(T(exp2(val + 1)), T("76.109255360174148269919998115870458578750213917684314433216142382045866766522698231730006050440811117826393265585"), tol);
+   val = 15;
+   BOOST_CHECK_CLOSE_FRACTION(T(exp2(val)), T(32768uL), tol);
+   BOOST_CHECK_CLOSE_FRACTION(T(exp2(val + 1)), T(65536uL), tol);
 
    i = fpclassify(val) + isgreaterequal(val, s) + islessequal(val, s) + isnan(val) + isunordered(val, s)
       + isfinite(val) + isinf(val) + islessgreater(val, s) + isnormal(val) + signbit(val) + isgreater(val, s) + isless(val, s);

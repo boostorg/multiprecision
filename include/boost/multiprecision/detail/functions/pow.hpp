@@ -316,9 +316,21 @@ template <class T>
 void eval_exp2(T& result, const T& arg)
 {
    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The log function is only valid for floating point types.");
-   T base;
-   base = static_cast<typename mpl::front<typename T::unsigned_types>::type>(2u);
-   eval_pow(result, base, arg);
+
+   // Check for pure-integer arguments which can be either signed or unsigned.
+   typename boost::multiprecision::detail::canonical<typename T::exponent_type, T>::type i;
+   T temp;
+   eval_trunc(temp, arg);
+   eval_convert_to(&i, temp);
+   if(arg.compare(i) == 0)
+   {
+      temp = static_cast<typename mpl::front<typename T::unsigned_types>::type>(1u);
+      eval_ldexp(result, temp, i);
+      return;
+   }
+
+   temp = static_cast<typename mpl::front<typename T::unsigned_types>::type>(2u);
+   eval_pow(result, temp, arg);
 }
 
 template <class T>
