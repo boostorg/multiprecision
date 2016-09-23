@@ -33,7 +33,18 @@ namespace boost{ namespace multiprecision{
       template <class T>
       struct is_backend;
 
-   }
+      template <class To, class From>
+      void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_floating_point>& /*to_type*/, const mpl::int_<number_kind_integer>& /*from_type*/);
+      template <class To, class From>
+      void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_integer>& /*to_type*/, const mpl::int_<number_kind_integer>& /*from_type*/);
+      template <class To, class From>
+      void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_floating_point>& /*to_type*/, const mpl::int_<number_kind_floating_point>& /*from_type*/);
+      template <class To, class From>
+      void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_rational>& /*to_type*/, const mpl::int_<number_kind_rational>& /*from_type*/);
+      template <class To, class From>
+      void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_rational>& /*to_type*/, const mpl::int_<number_kind_integer>& /*from_type*/);
+
+}
    
 namespace default_ops{
 
@@ -368,6 +379,7 @@ inline void eval_multiply_default(T& t, const T& u, const T& v)
       eval_multiply(t, v);
    }
 }
+#if !BOOST_WORKAROUND(BOOST_MSVC, < 1900)
 template <class T, class U>
 inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_multiply_default(T& t, const T& u, const U& v)
 {
@@ -386,6 +398,7 @@ inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type e
 {
    eval_multiply(t, v, u);
 }
+#endif
 template <class T, class U, class V>
 inline void eval_multiply_default(T& t, const U& u, const V& v)
 {
@@ -485,6 +498,7 @@ inline void eval_divide_default(T& t, const T& u, const T& v)
       eval_divide(t, v);
    }
 }
+#if !BOOST_WORKAROUND(BOOST_MSVC, < 1900)
 template <class T, class U>
 inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_divide_default(T& t, const T& u, const U& v)
 {
@@ -511,12 +525,14 @@ inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_co
    T uu(u);
    eval_divide(t, uu, v);
 }
+#endif
 template <class T, class U, class V>
 inline void eval_divide_default(T& t, const U& u, const V& v)
 {
    if(is_same<T, V>::value && ((void*)&t == (void*)&v))
    {
-      T temp(u);
+      T temp;
+      temp = u;
       eval_divide(temp, v);
       t = temp;
    }
@@ -916,6 +932,16 @@ inline void eval_convert_to(terminal<R>* result, const B& backend)
    // a lexical_cast and hope for the best:
    //
    result->value = boost::lexical_cast<R>(backend.str(0, std::ios_base::fmtflags(0)));
+}
+
+template <class B1, class B2, expression_template_option et>
+inline void eval_convert_to(terminal<number<B1, et> >* result, const B2& backend)
+{
+   //
+   // We ran out of types to try for the conversion, try
+   // a generic conversion and hope for the best:
+   //
+   boost::multiprecision::detail::generic_interconvert(result->value.backend(), backend, number_category<B1>(), number_category<B2>());
 }
 
 template <class B>

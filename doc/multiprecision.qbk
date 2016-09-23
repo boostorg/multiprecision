@@ -3789,7 +3789,7 @@ whose precision can vary at compile time (such as `mpf_float`).
    // Over again, but with checking enabled this time:
    typedef number<cpp_int_backend<0, 0, signed_magnitude, checked> >                 checked_cpp_int;
    typedef rational_adaptor<cpp_int_backend<0, 0, signed_magnitude, checked> >       checked_cpp_rational_backend;
-   typedef number<cpp_rational_backend>                                              checked_cpp_rational;
+   typedef number<checked_cpp_rational_backend>                                      checked_cpp_rational;
 
    // Checked fixed precision unsigned types:
    typedef number<cpp_int_backend<128, 128, unsigned_magnitude, checked, void> >     checked_uint128_t;
@@ -5266,6 +5266,8 @@ should now respect signed-zeros correctly.
 * Fix fencepost error in rational to float conversion routines, see [@https://svn.boost.org/trac/boost/ticket/12327 #12327].
 * Fix some Oracle C++ compiler compatibility issues.
 * Add modf support to complete C90 compatibility.
+* Fix self assignment bug in expression template code for expressions such as `a = a * a * a`, see [@https://svn.boost.org/trac/boost/ticket/12408 #12408].
+* Fixed some compiler errors that occur when converting from `cpp_int` to `cpp_bin_float`.
 
 [h4 Multiprecision-2.2.7 (Boost-1.61)]
 
