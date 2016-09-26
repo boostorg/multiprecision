@@ -5245,6 +5245,10 @@ Windows Vista machine.
 
 [section:hist History]
 
+[h4 Multiprecision-2.3.0]
+
+* Added support for all the C99 math functions.
+
 [h4 Multiprecision-2.2.8 (Boost-1.62)]
 
 * Added support for hashing via `Boost.Hash` or `std::hash`.
