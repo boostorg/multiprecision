@@ -585,7 +585,7 @@ private:
       eval_convert_to(result, m_backend);
    }
    template <class B2, expression_template_option ET>
-   typename enable_if_c<detail::is_explicitly_convertible<Backend, B2>::value>::type convert_to_imp(number<B2, ET>* result)const
+   void convert_to_imp(number<B2, ET>* result)const
    {
       result->assign(*this);
    }
