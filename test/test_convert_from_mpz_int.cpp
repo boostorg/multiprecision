@@ -7,13 +7,13 @@
 #  define _SCL_SECURE_NO_WARNINGS
 #endif
 
+#if defined(HAS_GMP)
+
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/random/mersenne_twister.hpp>
+#include <boost/multiprecision/gmp.hpp>
 #include "test.hpp"
 
-#if defined(HAS_GMP)
-#include <boost/multiprecision/gmp.hpp>
-#endif
 #if defined(HAS_MPFR)
 #include <boost/multiprecision/mpfr.hpp>
 #endif
@@ -173,53 +173,33 @@ void test_convert()
 
 int main()
 {
-   test_convert<cpp_int, int128_t>();
-   test_convert<int128_t, cpp_int>();
 
-   test_convert<cpp_int, cpp_rational>();
-   test_convert<int128_t, cpp_rational>();
-   test_convert<uint128_t, cpp_rational>();
+   test_convert<mpz_int, cpp_int>();
+   test_convert<mpz_int, int128_t>();
+   test_convert<mpz_int, uint128_t>();
+   test_convert<mpz_int, cpp_rational>();
 
-   test_convert<cpp_int, cpp_bin_float_50>();
-   test_convert<int128_t, cpp_bin_float_50>();
-   test_convert<uint128_t, cpp_bin_float_50>();
+   test_convert<mpz_int, cpp_dec_float_50>();
+   test_convert<mpz_int, cpp_bin_float_50>();
+   test_convert<mpz_int, mpq_rational>();
+   test_convert<mpz_int, mpf_float_50>();
 
-   test_convert<cpp_int, cpp_dec_float_50>();
-   test_convert<int128_t, cpp_dec_float_50>();
-   test_convert<uint128_t, cpp_dec_float_50>();
-
-#if defined(HAS_GMP)
-   test_convert<cpp_int, mpz_int>();
-   test_convert<int128_t, mpz_int>();
-   test_convert<uint128_t, mpz_int>();
-
-   test_convert<cpp_int, mpq_rational>();
-   test_convert<int128_t, mpq_rational>();
-   test_convert<uint128_t, mpq_rational>();
-
-   test_convert<cpp_int, mpf_float_50>();
-   test_convert<int128_t, mpf_float_50>();
-   test_convert<uint128_t, mpf_float_50>();
-#endif
 #if defined(HAS_MPFR)
-   test_convert<cpp_int, mpfr_float_50>();
-   test_convert<int128_t, mpfr_float_50>();
-   test_convert<uint128_t, mpfr_float_50>();
+   test_convert<mpz_int, mpfr_float_50>();
 #endif
 #if defined(HAS_MPFI)
-   test_convert<cpp_int, mpfi_float_50>();
-   test_convert<int128_t, mpfi_float_50>();
-   test_convert<uint128_t, mpfi_float_50>();
+   test_convert<mpz_int, mpfi_float_50>();
 #endif
 #ifdef HAS_TOMMATH
-   test_convert<cpp_int, tom_int>();
-   test_convert<int128_t, tom_int>();
-   test_convert<uint128_t, tom_int>();
+   test_convert<mpz_int, tom_int>();
 
-   test_convert<cpp_int, tom_rational>();
-   test_convert<int128_t, tom_rational>();
-   test_convert<uint128_t, tom_rational>();
+   test_convert<mpz_int, tom_rational>();
 #endif
    return boost::report_errors();
 }
 
+#else
+
+int main() { return 0; }
+
+#endif

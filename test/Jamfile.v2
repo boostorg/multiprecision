@@ -367,6 +367,28 @@ compile test_nothrow_gmp.cpp : [ check-target-builds ../config//has_gmp : : <bui
 compile test_nothrow_mpfr.cpp : [ check-target-builds ../config//has_mpfr : : <build>no ] ;
 
 #
+# Interconversion tests:
+#
+run test_convert_from_cpp_int.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      [ check-target-builds ../config//has_gmp : <define>HAS_GMP : ]
+	      [ check-target-builds ../config//has_mpfr : <define>HAS_MPFR : ]
+	      [ check-target-builds ../config//has_mpfi : <define>HAS_MPFI : ]
+	      [ check-target-builds ../config//has_tommath : <define>HAS_TOMMATH : ]
+        ;
+run test_convert_from_mpz_int.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      [ check-target-builds ../config//has_gmp : <define>HAS_GMP : ]
+	      [ check-target-builds ../config//has_mpfr : <define>HAS_MPFR : ]
+	      [ check-target-builds ../config//has_mpfi : <define>HAS_MPFI : ]
+	      [ check-target-builds ../config//has_tommath : <define>HAS_TOMMATH : ]
+        ;
+
+#
 # This take too long to run as a regular part of the tests:
 #
 # run test_cpp_bin_float_round.cpp mpfr gmp ;
