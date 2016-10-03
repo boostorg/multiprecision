@@ -373,19 +373,61 @@ run test_convert_from_cpp_int.cpp
         : # command line
         : # input files
         : # requirements
-	      [ check-target-builds ../config//has_gmp : <define>HAS_GMP : ]
-	      [ check-target-builds ../config//has_mpfr : <define>HAS_MPFR : ]
-	      [ check-target-builds ../config//has_mpfi : <define>HAS_MPFI : ]
-	      [ check-target-builds ../config//has_tommath : <define>HAS_TOMMATH : ]
+	      [ check-target-builds ../config//has_gmp : <define>HAS_GMP <source>gmp : ]
+	      [ check-target-builds ../config//has_mpfr : <define>HAS_MPFR <source>gmp <source>mpfr : ]
+	      [ check-target-builds ../config//has_mpfi : <define>HAS_MPFI <source>gmp <source>mpfr <source>mpfi : ]
+	      [ check-target-builds ../config//has_tommath : <define>HAS_TOMMATH <source>tommath : ]
+         [ check-target-builds ../config//has_float128 : <define>HAS_FLOAT128 <source>quadmath : ] 
         ;
 run test_convert_from_mpz_int.cpp
         : # command line
         : # input files
         : # requirements
-	      [ check-target-builds ../config//has_gmp : <define>HAS_GMP : ]
-	      [ check-target-builds ../config//has_mpfr : <define>HAS_MPFR : ]
-	      [ check-target-builds ../config//has_mpfi : <define>HAS_MPFI : ]
-	      [ check-target-builds ../config//has_tommath : <define>HAS_TOMMATH : ]
+	      [ check-target-builds ../config//has_gmp : <define>HAS_GMP <source>gmp : ]
+	      [ check-target-builds ../config//has_mpfr : <define>HAS_MPFR <source>gmp <source>mpfr : ]
+	      [ check-target-builds ../config//has_mpfi : <define>HAS_MPFI <source>gmp <source>mpfr <source>mpfi : ]
+	      [ check-target-builds ../config//has_tommath : <define>HAS_TOMMATH <source>tommath : ]
+         [ check-target-builds ../config//has_float128 : <define>HAS_FLOAT128 <source>quadmath : ] 
+        ;
+run test_convert_from_tom_int.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      [ check-target-builds ../config//has_gmp : <define>HAS_GMP <source>gmp : ]
+	      [ check-target-builds ../config//has_mpfr : <define>HAS_MPFR <source>gmp <source>mpfr : ]
+	      [ check-target-builds ../config//has_mpfi : <define>HAS_MPFI <source>gmp <source>mpfr <source>mpfi : ]
+	      [ check-target-builds ../config//has_tommath : <define>HAS_TOMMATH <source>tommath : ]
+         [ check-target-builds ../config//has_float128 : <define>HAS_FLOAT128 <source>quadmath : ] 
+        ;
+run test_convert_from_cpp_rational.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      [ check-target-builds ../config//has_gmp : <define>HAS_GMP <source>gmp : ]
+	      [ check-target-builds ../config//has_mpfr : <define>HAS_MPFR <source>gmp <source>mpfr : ]
+	      [ check-target-builds ../config//has_mpfi : <define>HAS_MPFI <source>gmp <source>mpfr <source>mpfi : ]
+	      [ check-target-builds ../config//has_tommath : <define>HAS_TOMMATH <source>tommath : ]
+         [ check-target-builds ../config//has_float128 : <define>HAS_FLOAT128 <source>quadmath : ] 
+        ;
+run test_convert_from_gmp_rational.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      [ check-target-builds ../config//has_gmp : <define>HAS_GMP <source>gmp : ]
+	      [ check-target-builds ../config//has_mpfr : <define>HAS_MPFR <source>gmp <source>mpfr : ]
+	      [ check-target-builds ../config//has_mpfi : <define>HAS_MPFI <source>gmp <source>mpfr <source>mpfi : ]
+	      [ check-target-builds ../config//has_tommath : <define>HAS_TOMMATH <source>tommath : ]
+         [ check-target-builds ../config//has_float128 : <define>HAS_FLOAT128 <source>quadmath : ] 
+        ;
+run test_convert_from_tom_rational.cpp
+        : # command line
+        : # input files
+        : # requirements
+	      [ check-target-builds ../config//has_gmp : <define>HAS_GMP <source>gmp : ]
+	      [ check-target-builds ../config//has_mpfr : <define>HAS_MPFR <source>gmp <source>mpfr : ]
+	      [ check-target-builds ../config//has_mpfi : <define>HAS_MPFI <source>gmp <source>mpfr <source>mpfi : ]
+	      [ check-target-builds ../config//has_tommath : <define>HAS_TOMMATH <source>tommath : ]
+         [ check-target-builds ../config//has_float128 : <define>HAS_FLOAT128 <source>quadmath : ] 
         ;
 
 #

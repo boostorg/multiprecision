@@ -455,7 +455,18 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
    generic_interconvert_float2rational(to, from, mpl::int_<std::numeric_limits<number<From> >::radix>());
 }
 
-}}} // namespaces
+template <class To, class From>
+void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_integer>& /*to_type*/, const mpl::int_<number_kind_rational>& /*from_type*/)
+{
+   number<From> t(from);
+   number<To> result(numerator(t) / denominator(t));
+   to = result.backend();
+}
+
+
+}
+}
+} // namespaces
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)
