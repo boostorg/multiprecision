@@ -213,7 +213,7 @@ public:
    }
 
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   number& operator+=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
+   typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator+=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       // Create a copy if e contains this, but not if we're just doing a
       //    x += x
@@ -256,7 +256,7 @@ public:
    }
 
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   number& operator-=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
+   typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator-=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       // Create a copy if e contains this:
       if(contains_self(e))
@@ -299,7 +299,7 @@ public:
    }
 
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   number& operator*=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
+   typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator*=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       // Create a temporary if the RHS references *this, but not
       // if we're just doing an   x *= x;
@@ -331,7 +331,7 @@ public:
       return *this;
    }
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   number& operator%=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
+   typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator%=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
       // Create a temporary if the RHS references *this:
@@ -419,7 +419,7 @@ public:
    }
 
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   number& operator/=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
+   typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator/=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       // Create a temporary if the RHS references *this:
       if(contains_self(e))
@@ -451,7 +451,7 @@ public:
    }
 
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   number& operator&=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
+   typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator&=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise & operation is only valid for integer types");
       // Create a temporary if the RHS references *this, but not
@@ -486,7 +486,7 @@ public:
    }
 
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   number& operator|=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
+   typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator|=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise | operation is only valid for integer types");
       // Create a temporary if the RHS references *this, but not
@@ -521,7 +521,7 @@ public:
    }
 
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   number& operator^=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
+   typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator^=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise ^ operation is only valid for integer types");
       if(contains_self(e))
