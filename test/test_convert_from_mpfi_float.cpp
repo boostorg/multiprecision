@@ -47,25 +47,13 @@ T generate_random()
    static boost::random::mt19937 gen;
    T val = gen();
    T prev_val = -1;
-   try {
-      while(val != prev_val)
-      {
-         val *= (gen.max)();
-         prev_val = val;
-         val += gen();
-      }
-   }
-   catch(const boost::multiprecision::interval_error& e)
+   int digits_so_far = 0;
+   while(digits_so_far < std::numeric_limits<T>::digits)
    {
-      std::cout << e.what() << std::endl;
-   }
-   catch(const std::exception& e)
-   {
-      std::cout << e.what() << std::endl;
-   }
-   catch(...)
-   {
-      std::cout << "Help!!" << std::endl;
+      val *= (gen.max)();
+      prev_val = val;
+      val += gen();
+      digits_so_far += std::numeric_limits<boost::random::mt19937::result_type>::digits;
    }
    e_type e;
    val = frexp(val, &e);
@@ -108,8 +96,8 @@ void test_convert_neg_rat(From from, const boost::mpl::true_&)
    from = -from;
    To t3(from);
    To t4 = from.template convert_to<To>();
-   BOOST_CHECK_EQUAL(From(t3), from);
-   BOOST_CHECK_EQUAL(From(t4), from);
+   BOOST_CHECK_EQUAL(From(t3), median(from));
+   BOOST_CHECK_EQUAL(From(t4), median(from));
 }
 template <class From, class To>
 void test_convert_rat_int(From const&, const boost::mpl::false_&)
@@ -124,8 +112,8 @@ void test_convert_imp(boost::mpl::int_<number_kind_floating_point> const&, boost
       From from = generate_random<From>();
       To t1(from);
       To t2 = from.template convert_to<To>();
-      BOOST_CHECK_EQUAL(From(t1), from);
-      BOOST_CHECK_EQUAL(From(t2), from);
+      BOOST_CHECK_EQUAL(From(t1), median(from));
+      BOOST_CHECK_EQUAL(From(t2), median(from));
       test_convert_neg_rat<From, To>(from, boost::mpl::bool_<std::numeric_limits<From>::is_signed && std::numeric_limits<To>::is_signed>());
    }
 }
@@ -136,7 +124,7 @@ void test_convert_neg_float(From from, const boost::mpl::true_&)
    from = -from;
    To t3(from);
    To t4 = from.template convert_to<To>();
-   To answer(from.str());
+   To answer(median(from).str());
    To tol = (std::max)(std::numeric_limits<To>::epsilon(), To(std::numeric_limits<From>::epsilon())) * 2;
    BOOST_CHECK_CLOSE_FRACTION(t3, answer, tol);
    BOOST_CHECK_CLOSE_FRACTION(t4, answer, tol);
@@ -154,7 +142,7 @@ void test_convert_imp(boost::mpl::int_<number_kind_floating_point> const&, boost
       From from = generate_random<From>();
       To t1(from);
       To t2 = from.template convert_to<To>();
-      To answer(from.str());
+      To answer(median(from).str());
       To tol = (std::max)(std::numeric_limits<To>::epsilon(), To(std::numeric_limits<From>::epsilon())) * 2;
       BOOST_CHECK_CLOSE_FRACTION(t1, answer, tol);
       BOOST_CHECK_CLOSE_FRACTION(t2, answer, tol);
