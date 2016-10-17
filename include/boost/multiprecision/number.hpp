@@ -112,7 +112,8 @@ public:
       //
       // Attempt a generic interconvertion:
       //
-      detail::generic_interconvert(backend(), val.backend(), number_category<Backend>(), number_category<Other>());
+      using detail::generic_interconvert;
+      generic_interconvert(backend(), val.backend(), number_category<Backend>(), number_category<Other>());
    }
    template <class Other, expression_template_option ET>
    explicit BOOST_MP_FORCEINLINE number(const number<Other, ET>& val, typename boost::enable_if_c<
@@ -178,7 +179,8 @@ public:
       //
       // Attempt a generic interconvertion:
       //
-      detail::generic_interconvert(backend(), v.backend(), number_category<Backend>(), number_category<Other>());
+      using detail::generic_interconvert;
+      generic_interconvert(backend(), v.backend(), number_category<Backend>(), number_category<Other>());
       return *this;
    }
 

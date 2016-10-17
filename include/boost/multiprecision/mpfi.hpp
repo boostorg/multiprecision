@@ -1055,41 +1055,44 @@ inline std::size_t hash_value(const mpfi_float_backend<Digits10>& val)
    return result;
 }
 
+template <class To, unsigned D>
+void generic_interconvert(To& to, const mpfi_float_backend<D>& from, const mpl::int_<number_kind_integer>& to_type, const mpl::int_<number_kind_floating_point>& from_type)
+{
+   using boost::multiprecision::detail::generic_interconvert;
+   mpfr_float_backend<D> t;
+   mpfi_mid(t.data(), from.data());
+   generic_interconvert(to, t, to_type, from_type);
+}
+
+template <class To, unsigned D>
+void generic_interconvert(To& to, const mpfi_float_backend<D>& from, const mpl::int_<number_kind_rational>& to_type, const mpl::int_<number_kind_floating_point>& from_type)
+{
+   using boost::multiprecision::detail::generic_interconvert;
+   mpfr_float_backend<D> t;
+   mpfi_mid(t.data(), from.data());
+   generic_interconvert(to, t, to_type, from_type);
+}
+
+template <class To, unsigned D>
+void generic_interconvert(To& to, const mpfi_float_backend<D>& from, const mpl::int_<number_kind_floating_point>& to_type, const mpl::int_<number_kind_floating_point>& from_type)
+{
+   using boost::multiprecision::detail::generic_interconvert;
+   mpfr_float_backend<D> t;
+   mpfi_mid(t.data(), from.data());
+   generic_interconvert(to, t, to_type, from_type);
+}
+
 } // namespace backends
 
-namespace detail{
-
-template <class To, unsigned D>
-void generic_interconvert(To& to, const backends::mpfi_float_backend<D>& from, const mpl::int_<number_kind_integer>& to_type, const mpl::int_<number_kind_floating_point>& from_type)
-{
-   mpfr_float_backend<D> t;
-   mpfi_mid(t.data(), from.data());
-   generic_interconvert(to, t, to_type, from_type);
-}
-
-template <class To, unsigned D>
-void generic_interconvert(To& to, const backends::mpfi_float_backend<D>& from, const mpl::int_<number_kind_rational>& to_type, const mpl::int_<number_kind_floating_point>& from_type)
-{
-   mpfr_float_backend<D> t;
-   mpfi_mid(t.data(), from.data());
-   generic_interconvert(to, t, to_type, from_type);
-}
-
-template <class To, unsigned D>
-void generic_interconvert(To& to, const backends::mpfi_float_backend<D>& from, const mpl::int_<number_kind_floating_point>& to_type, const mpl::int_<number_kind_floating_point>& from_type)
-{
-   mpfr_float_backend<D> t;
-   mpfi_mid(t.data(), from.data());
-   generic_interconvert(to, t, to_type, from_type);
-}
-
 #ifdef BOOST_NO_SFINAE_EXPR
+
+namespace detail{
 
 template<unsigned D1, unsigned D2>
 struct is_explicitly_convertible<backends::mpfi_float_backend<D1>, backends::mpfi_float_backend<D2> > : public mpl::true_ {};
 
-#endif
 }
+#endif
 
 template<>
 struct number_category<detail::canonical<mpfi_t, backends::mpfi_float_backend<0> >::type> : public mpl::int_<number_kind_floating_point>{};
