@@ -5248,6 +5248,8 @@ Windows Vista machine.
 [h4 Multiprecision-2.3.0]
 
 * Added support for all the C99 math functions.
+* Extended generic-interconversions to handle narrowing cases as well, changed convert_to member function and hence explicit 
+conversion operators to use the same conversion code as the explicit constructors.
 
 [h4 Multiprecision-2.2.8 (Boost-1.62)]
 
