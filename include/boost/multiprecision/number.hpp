@@ -1739,7 +1739,7 @@ inline std::string read_string_while(std::istream& is, std::string const& permit
          else if(permitted_chars.find_first_of(std::istream::traits_type::to_char_type(c)) == std::string::npos)
          {
             // Invalid numeric character, stop reading:
-            is.rdbuf()->sputbackc(static_cast<char>(c));
+            //is.rdbuf()->sputbackc(static_cast<char>(c));
             break;
          }
          else
