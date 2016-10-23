@@ -83,10 +83,12 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
    mpfr_float_imp()
    {
       mpfr_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
+      mpfr_set_ui(m_data, 0u, GMP_RNDN);
    }
    mpfr_float_imp(unsigned prec)
    {
       mpfr_init2(m_data, prec);
+      mpfr_set_ui(m_data, 0u, GMP_RNDN);
    }
 
    mpfr_float_imp(const mpfr_float_imp& o)
@@ -398,6 +400,7 @@ struct mpfr_float_imp<digits10, allocate_stack>
    {
       mpfr_custom_init(m_buffer, digits2);
       mpfr_custom_init_set(m_data, MPFR_NAN_KIND, 0, digits2, m_buffer);
+      mpfr_set_ui(m_data, 0u, GMP_RNDN);
    }
 
    mpfr_float_imp(const mpfr_float_imp& o)

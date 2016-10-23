@@ -77,7 +77,7 @@ private:
    exponent_type m_exponent;
    bool m_sign;
 public:
-   cpp_bin_float() BOOST_MP_NOEXCEPT_IF(noexcept(rep_type())) : m_data(), m_exponent(exponent_nan), m_sign(false) {}
+   cpp_bin_float() BOOST_MP_NOEXCEPT_IF(noexcept(rep_type())) : m_data(), m_exponent(exponent_zero), m_sign(false) {}
 
    cpp_bin_float(const cpp_bin_float &o) BOOST_MP_NOEXCEPT_IF(noexcept(rep_type(std::declval<const rep_type&>())))
       : m_data(o.m_data), m_exponent(o.m_exponent), m_sign(o.m_sign) {}
@@ -1660,7 +1660,6 @@ public:
    BOOST_STATIC_CONSTEXPR bool has_denorm_loss = false;
    static number_type infinity()
    {
-      // returns epsilon/2
       initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if(!value.first)
@@ -1672,7 +1671,14 @@ public:
    }
    static number_type quiet_NaN()
    {
-      return number_type();
+      initializer.do_nothing();
+      static std::pair<bool, number_type> value;
+      if(!value.first)
+      {
+         value.first = true;
+         value.second.backend().exponent() = boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan;
+      }
+      return value.second;
    }
    BOOST_STATIC_CONSTEXPR number_type signaling_NaN()
    {

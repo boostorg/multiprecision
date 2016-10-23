@@ -74,10 +74,12 @@ struct mpfi_float_imp
    mpfi_float_imp()
    {
       mpfi_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
+      mpfi_set_ui(m_data, 0u);
    }
    mpfi_float_imp(unsigned prec)
    {
       mpfi_init2(m_data, prec);
+      mpfi_set_ui(m_data, 0u);
    }
 
    mpfi_float_imp(const mpfi_float_imp& o)

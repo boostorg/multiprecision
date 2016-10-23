@@ -917,6 +917,10 @@ void test_float_funcs(const boost::mpl::true_&)
    BOOST_CHECK_EQUAL(fma(2, b + 0, 6), 14);
    BOOST_CHECK_EQUAL(fma(2, 4, c), 14);
    BOOST_CHECK_EQUAL(fma(2, 4, c + 0), 14);
+
+   // Default construct, for consistency with native floats, default constructed values are zero:
+   Real zero;
+   BOOST_CHECK_EQUAL(zero, 0);
 }
 
 template <class T, class U>
