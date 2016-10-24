@@ -935,7 +935,7 @@ It's also possible to access the underlying `mpfr_t` via the data() member funct
 
 Things you should know when using this type:
 
-* A default constructed `mpfr_float_backend` is set to a NaN (this is the default [mpfr] behavior).
+* A default constructed `mpfr_float_backend` is set to zero (['Note that this is [*not] the default [mpfr] behavior]).
 * All operations use round to nearest.
 * No changes are made to [gmp] or [mpfr] global settings, so this type can coexist with existing
 [mpfr] or [gmp] code.
@@ -1085,7 +1085,7 @@ It's also possible to access the underlying `mpfi_t` via the data() member funct
 
 Things you should know when using this type:
 
-* A default constructed `mpfi_float_backend` is set to a NaN (this is the default [mpfi] behavior).
+* A default constructed `mpfi_float_backend` is set to zero (['Note that this is [*not] the default [mpfi] behavior]).
 * No changes are made to [gmp] or [mpfr] global settings, so this type can coexist with existing
 [mpfr] or [gmp] code.
 * The code can equally use [mpir] in place of [gmp] - indeed that is the preferred option on Win32.
@@ -5250,6 +5250,8 @@ Windows Vista machine.
 * Added support for all the C99 math functions.
 * Extended generic-interconversions to handle narrowing cases as well, changed convert_to member function and hence explicit 
 conversion operators to use the same conversion code as the explicit constructors.
+* Fix IO stream parsing error, see [@https://svn.boost.org/trac/boost/ticket/12488 #12488].
+* Make default constructed floating point types all zero for consistency, see [@https://svn.boost.org/trac/boost/ticket/12500 #12500].
 
 [h4 Multiprecision-2.2.8 (Boost-1.62)]
 
