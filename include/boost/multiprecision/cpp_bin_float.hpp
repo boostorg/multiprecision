@@ -1231,7 +1231,8 @@ inline typename boost::enable_if_c<boost::is_float<Float>::value>::type eval_con
    //
    // Perform rounding first, then afterwards extract the digits:
    //
-   typedef cpp_bin_float<std::numeric_limits<Float>::digits, digit_base_2, void, Exponent, MinE, MaxE> conv_type;
+   typedef cpp_bin_float<std::numeric_limits<Float>::digits, digit_base_2, void, Exponent, MinE, MaxE>  conv_type;
+   typedef typename common_type<typename conv_type::exponent_type, int>::type                           common_exp_type;
    conv_type arg(original_arg);
    switch(arg.exponent())
    {
@@ -1249,13 +1250,26 @@ inline typename boost::enable_if_c<boost::is_float<Float>::value>::type eval_con
          *res = -*res;
       return;
    }
-   typename conv_type::exponent_type e = arg.exponent();
+   common_exp_type e = arg.exponent();
+   static const common_exp_type min_exp_limit = std::numeric_limits<Float>::min_exponent 
+      - (common_exp_type)cpp_bin_float<std::numeric_limits<Float>::digits, digit_base_2, void, Exponent, MinE, MaxE>::bit_count - std::numeric_limits<Float>::digits - 2;
    e -= cpp_bin_float<std::numeric_limits<Float>::digits, digit_base_2, void, Exponent, MinE, MaxE>::bit_count - 1;
-   *res = std::ldexp(static_cast<Float>(*arg.bits().limbs()), e);
+   if(e < min_exp_limit)
+   {
+      *res = 0;
+      return;
+   }
+   if(e > std::numeric_limits<Float>::max_exponent)
+   {
+      *res = std::numeric_limits<Float>::has_infinity ? std::numeric_limits<Float>::infinity() : (std::numeric_limits<Float>::max)();
+      return;
+   }
+
+   *res = std::ldexp(static_cast<Float>(*arg.bits().limbs()), static_cast<int>(e));
    for(unsigned i = 1; i < arg.bits().size(); ++i)
    {
       e += sizeof(*arg.bits().limbs()) * CHAR_BIT;
-      *res += std::ldexp(static_cast<Float>(arg.bits().limbs()[i]), e);
+      *res += std::ldexp(static_cast<Float>(arg.bits().limbs()[i]), static_cast<int>(e));
    }
    if(arg.sign())
       *res = -*res;

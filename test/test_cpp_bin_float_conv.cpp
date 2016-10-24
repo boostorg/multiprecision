@@ -79,6 +79,16 @@ int main()
    f100h = ui128.convert_to<cpp_bin_float_100>();
    BOOST_CHECK_EQUAL(f100h, 98);
 
+   cpp_bin_float_quad q = (std::numeric_limits<float>::min)();
+   BOOST_CHECK_EQUAL(q.convert_to<float>(), (std::numeric_limits<float>::min)());
+   q = (std::numeric_limits<float>::max)();
+   BOOST_CHECK_EQUAL(q.convert_to<float>(), (std::numeric_limits<float>::max)());
+   q = (std::numeric_limits<float>::denorm_min)();
+   BOOST_CHECK_EQUAL(q.convert_to<float>(), (std::numeric_limits<float>::denorm_min)());
+   // See https://svn.boost.org/trac/boost/ticket/12512:
+   boost::multiprecision::number<boost::multiprecision::backends::cpp_bin_float<128, boost::multiprecision::backends::digit_base_2, void, int64_t> > ext_float("1e-646456978");
+   BOOST_CHECK_EQUAL(ext_float.convert_to<float>(), 0);
+
    return boost::report_errors();
 }
 
