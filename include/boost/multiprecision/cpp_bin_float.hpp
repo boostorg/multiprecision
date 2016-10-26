@@ -1499,7 +1499,9 @@ inline void eval_ceil(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE
    }
    if(shift >= (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count)
    {
+      bool s = arg.sign(); // takes care of signed zeros
       res = static_cast<signed_limb_type>(arg.sign() ? 0 : 1);
+      res.sign() = s;
       return;
    }
    bool fractional = (int)eval_lsb(arg.bits()) < shift;

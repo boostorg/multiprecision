@@ -262,6 +262,15 @@ void test_special_cases()
    BOOST_CHECK(boost::math::signbit(neg_zero - zero));
    BOOST_CHECK(!boost::math::signbit(zero - neg_zero));
    BOOST_CHECK(!boost::math::signbit(neg_zero - neg_zero));
+   small = 0.25;
+   BOOST_CHECK(!boost::math::signbit(floor(small)));
+   BOOST_CHECK(!boost::math::signbit(round(small)));
+   BOOST_CHECK(!boost::math::signbit(trunc(small)));
+   small = -small;
+   BOOST_CHECK(boost::math::signbit(ceil(small)));
+   BOOST_CHECK(boost::math::signbit(round(small)));
+   BOOST_CHECK(boost::math::signbit(trunc(small)));
+
 
    BOOST_CHECK_EQUAL(neg_zero * 2, 0);
    BOOST_CHECK_EQUAL(neg_zero * test_type(2), 0);
