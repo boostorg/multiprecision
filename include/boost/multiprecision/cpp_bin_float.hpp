@@ -584,7 +584,9 @@ inline void do_eval_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponen
       {
          bool s = a.sign();
          res = b;
-         if(res.sign() == s)
+         if(res.exponent() == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero)
+            res.sign() = false;
+         else if(res.sign() == s)
             res.negate();
       }
       return;
@@ -643,7 +645,9 @@ inline void do_eval_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponen
    }
    
    copy_and_round(res, dt);
-   if(res.sign() != s)
+   if(res.exponent() == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero)
+      res.sign() = false;
+   else if(res.sign() != s)
       res.negate();
    res.check_invariants();
 }
