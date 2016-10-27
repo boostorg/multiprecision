@@ -5253,6 +5253,8 @@ conversion operators to use the same conversion code as the explicit constructor
 * Fix IO stream parsing error, see [@https://svn.boost.org/trac/boost/ticket/12488 #12488].
 * Make default constructed floating point types all zero for consistency, see [@https://svn.boost.org/trac/boost/ticket/12500 #12500].
 * Fix conversion of cpp_bin_float to float/double/long double when the exponent value would overflow an int, see [@https://svn.boost.org/trac/boost/ticket/12512 #12512].
+* Fix cpp_bin_float subtractions that yield signed-zeros, see [@https://svn.boost.org/trac/boost/ticket/12524 #12524].
+* Fix ceil/trunc/round applied to cpp_bin_float and yielding a signed zero, see [@https://svn.boost.org/trac/boost/ticket/12525 #12525].
 
 [h4 Multiprecision-2.2.8 (Boost-1.62)]
 
