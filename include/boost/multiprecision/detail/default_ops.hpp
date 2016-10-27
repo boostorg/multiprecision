@@ -65,7 +65,7 @@ namespace default_ops{
 // code even more....
 //
 template <class T, class V>
-inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && !is_convertible<V, T>::value >::type 
+inline typename disable_if_c<is_convertible<V, T>::value >::type 
    eval_add(T& result, V const& v)
 {
    T t;
@@ -73,14 +73,14 @@ inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && !is_c
    eval_add(result, t);
 }
 template <class T, class V>
-inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && is_convertible<V, T>::value >::type 
+inline typename enable_if_c<is_convertible<V, T>::value >::type 
    eval_add(T& result, V const& v)
 {
    T t(v);
    eval_add(result, t);
 }
 template <class T, class V>
-inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && !is_convertible<V, T>::value>::type
+inline typename disable_if_c<is_convertible<V, T>::value>::type
    eval_subtract(T& result, V const& v)
 {
    T t;
@@ -88,14 +88,14 @@ inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && !is_c
    eval_subtract(result, t);
 }
 template <class T, class V>
-inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && is_convertible<V, T>::value>::type
+inline typename enable_if_c<is_convertible<V, T>::value>::type
    eval_subtract(T& result, V const& v)
 {
    T t(v);
    eval_subtract(result, t);
 }
 template <class T, class V>
-inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && !is_convertible<V, T>::value>::type
+inline typename disable_if_c<is_convertible<V, T>::value>::type
    eval_multiply(T& result, V const& v)
 {
    T t;
@@ -103,7 +103,7 @@ inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && !is_c
    eval_multiply(result, t);
 }
 template <class T, class V>
-inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && is_convertible<V, T>::value>::type
+inline typename enable_if_c<is_convertible<V, T>::value>::type
    eval_multiply(T& result, V const& v)
 {
    T t(v);
@@ -636,14 +636,14 @@ inline void eval_bitwise_and_default(T& t, const T& u, const T& v)
    }
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_bitwise_and_default(T& t, const T& u, const U& v)
+inline typename disable_if_c<is_convertible<U, T>::value>::type eval_bitwise_and_default(T& t, const T& u, const U& v)
 {
    T vv;
    vv = v;
    eval_bitwise_and(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_bitwise_and_default(T& t, const T& u, const U& v)
+inline typename enable_if_c<is_convertible<U, T>::value>::type eval_bitwise_and_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_bitwise_and(t, u, vv);
@@ -654,17 +654,10 @@ inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type e
    eval_bitwise_and(t, v, u);
 }
 template <class T, class U, class V>
-inline void eval_bitwise_and_default(T& t, const U& u, const V& v)
+inline typename disable_if_c<is_same<T, U>::value || is_same<T, V>::value>::type eval_bitwise_and_default(T& t, const U& u, const V& v)
 {
-   if(is_same<T, V>::value && ((void*)&t == (void*)&v))
-   {
-      eval_bitwise_and(t, u);
-   }
-   else
-   {
-      t = u;
-      eval_bitwise_and(t, v);
-   }
+   t = u;
+   eval_bitwise_and(t, v);
 }
 template <class T, class U, class V>
 inline void eval_bitwise_and(T& t, const U& u, const V& v)
