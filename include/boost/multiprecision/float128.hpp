@@ -489,6 +489,10 @@ inline void eval_atan2(float128_backend& result, const float128_backend& a, cons
 {
    result.value() = atan2q(a.value(), b.value());
 }
+inline void eval_multiply_add(float128_backend& result, const float128_backend& a, const float128_backend& b, const float128_backend& c)
+{
+   result.value() = fmaq(a.value(), b.value(), c.value());
+}
 
 inline std::size_t hash_value(const float128_backend& val)
 {
@@ -497,7 +501,88 @@ inline std::size_t hash_value(const float128_backend& val)
 
 } // namespace backends
 
-}} // namespaces
+   template<boost::multiprecision::expression_template_option ExpressionTemplates>
+   inline boost::multiprecision::number<float128_backend, ExpressionTemplates> asinh BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
+   {
+      return asinhq(arg.backend().value());
+   }
+   template<boost::multiprecision::expression_template_option ExpressionTemplates>
+   inline boost::multiprecision::number<float128_backend, ExpressionTemplates> acosh BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
+   {
+      return acoshq(arg.backend().value());
+   }
+   template<boost::multiprecision::expression_template_option ExpressionTemplates>
+   inline boost::multiprecision::number<float128_backend, ExpressionTemplates> atanh BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
+   {
+      return atanhq(arg.backend().value());
+   }
+   template<boost::multiprecision::expression_template_option ExpressionTemplates>
+   inline boost::multiprecision::number<float128_backend, ExpressionTemplates> cbrt BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
+   {
+      return cbrtq(arg.backend().value());
+   }
+   template<boost::multiprecision::expression_template_option ExpressionTemplates>
+   inline boost::multiprecision::number<float128_backend, ExpressionTemplates> erf BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
+   {
+      return erfq(arg.backend().value());
+   }
+   template<boost::multiprecision::expression_template_option ExpressionTemplates>
+   inline boost::multiprecision::number<float128_backend, ExpressionTemplates> erfc BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
+   {
+      return erfcq(arg.backend().value());
+   }
+   template<boost::multiprecision::expression_template_option ExpressionTemplates>
+   inline boost::multiprecision::number<float128_backend, ExpressionTemplates> expm1 BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
+   {
+      return expm1q(arg.backend().value());
+   }
+   template<boost::multiprecision::expression_template_option ExpressionTemplates>
+   inline boost::multiprecision::number<float128_backend, ExpressionTemplates> lgamma BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
+   {
+      return lgammaq(arg.backend().value());
+   }
+   template<boost::multiprecision::expression_template_option ExpressionTemplates>
+   inline boost::multiprecision::number<float128_backend, ExpressionTemplates> tgamma BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
+   {
+      return tgammaq(arg.backend().value());
+   }
+   template<boost::multiprecision::expression_template_option ExpressionTemplates>
+   inline boost::multiprecision::number<float128_backend, ExpressionTemplates> log1p BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
+   {
+      return log1pq(arg.backend().value());
+   }
+
+   template <multiprecision::expression_template_option ExpressionTemplates>
+   inline int signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates>& arg)
+   {
+      return ::signbitq(arg.backend().value());
+   }
+
+   template <multiprecision::expression_template_option ExpressionTemplates>
+   inline boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates> copysign BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates>& a, const boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates>& b)
+   {
+      return ::copysignq(a.backend().value(), b.backend().value());
+   }
+
+   inline void eval_remainder(float128_backend& result, const float128_backend& a, const float128_backend& b)
+   {
+      result.value() = remainderq(a.value(), b.value());
+   }
+   inline void eval_remainder(float128_backend& result, const float128_backend& a, const float128_backend& b, int* pi)
+   {
+      result.value() = remquoq(a.value(), b.value(), pi);
+   }
+
+} // namespace multiprecision
+
+namespace math {
+
+   using boost::multiprecision::signbit;
+   using boost::multiprecision::copysign;
+
+} // namespace math
+
+} // namespace boost
 
 namespace boost{ 
 namespace archive{
@@ -553,24 +638,7 @@ void serialize(Archive& ar, boost::multiprecision::backends::float128_backend& v
    float128_detail::do_serialize(ar, val, load_tag(), binary_tag());
 }
 
-} // namepsace multiprecision
-
-namespace math{
-
-template <multiprecision::expression_template_option ExpressionTemplates>
-inline int signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates>& arg)
-{
-   return ::signbitq(arg.backend().value());
-}
-
-template <multiprecision::expression_template_option ExpressionTemplates>
-inline boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates> copysign BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates>& a, const boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates>& b)
-{
-   return ::copysignq(a.backend().value(), b.backend().value());
-}
-
-
-} // namespace math
+} // namepsace archive
 
 } // namespace boost
 

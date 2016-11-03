@@ -28,6 +28,38 @@
 </h3></div></div></div>
 <h5>
 <a name="boost_multiprecision.map.hist.h0"></a>
+        <span class="phrase"><a name="boost_multiprecision.map.hist.multiprecision_2_3_0"></a></span><a class="link" href="hist.html#boost_multiprecision.map.hist.multiprecision_2_3_0">Multiprecision-2.3.0</a>
+      </h5>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+            Added support for all the C99 math functions.
+          </li>
+<li class="listitem">
+            Extended generic-interconversions to handle narrowing cases as well,
+            changed convert_to member function and hence explicit conversion operators
+            to use the same conversion code as the explicit constructors.
+          </li>
+<li class="listitem">
+            Fix IO stream parsing error, see <a href="https://svn.boost.org/trac/boost/ticket/12488" target="_top">#12488</a>.
+          </li>
+<li class="listitem">
+            Make default constructed floating point types all zero for consistency,
+            see <a href="https://svn.boost.org/trac/boost/ticket/12500" target="_top">#12500</a>.
+          </li>
+<li class="listitem">
+            Fix conversion of cpp_bin_float to float/double/long double when the
+            exponent value would overflow an int, see <a href="https://svn.boost.org/trac/boost/ticket/12512" target="_top">#12512</a>.
+          </li>
+<li class="listitem">
+            Fix cpp_bin_float subtractions that yield signed-zeros, see <a href="https://svn.boost.org/trac/boost/ticket/12524" target="_top">#12524</a>.
+          </li>
+<li class="listitem">
+            Fix ceil/trunc/round applied to cpp_bin_float and yielding a signed zero,
+            see <a href="https://svn.boost.org/trac/boost/ticket/12525" target="_top">#12525</a>.
+          </li>
+</ul></div>
+<h5>
+<a name="boost_multiprecision.map.hist.h1"></a>
         <span class="phrase"><a name="boost_multiprecision.map.hist.multiprecision_2_2_8_boost_1_62"></a></span><a class="link" href="hist.html#boost_multiprecision.map.hist.multiprecision_2_2_8_boost_1_62">Multiprecision-2.2.8
         (Boost-1.62)</a>
       </h5>
@@ -112,7 +144,7 @@
           </li>
 </ul></div>
 <h5>
-<a name="boost_multiprecision.map.hist.h1"></a>
+<a name="boost_multiprecision.map.hist.h2"></a>
         <span class="phrase"><a name="boost_multiprecision.map.hist.multiprecision_2_2_7_boost_1_61"></a></span><a class="link" href="hist.html#boost_multiprecision.map.hist.multiprecision_2_2_7_boost_1_61">Multiprecision-2.2.7
         (Boost-1.61)</a>
       </h5>
@@ -177,7 +209,7 @@
           </li>
 </ul></div>
 <h5>
-<a name="boost_multiprecision.map.hist.h2"></a>
+<a name="boost_multiprecision.map.hist.h3"></a>
         <span class="phrase"><a name="boost_multiprecision.map.hist.multiprecision_2_2_6_boost_1_60"></a></span><a class="link" href="hist.html#boost_multiprecision.map.hist.multiprecision_2_2_6_boost_1_60">Multiprecision-2.2.6
         (Boost-1.60)</a>
       </h5>
@@ -206,7 +238,7 @@
           </li>
 </ul></div>
 <h5>
-<a name="boost_multiprecision.map.hist.h3"></a>
+<a name="boost_multiprecision.map.hist.h4"></a>
         <span class="phrase"><a name="boost_multiprecision.map.hist.multiprecision_2_2_5_boost_1_59"></a></span><a class="link" href="hist.html#boost_multiprecision.map.hist.multiprecision_2_2_5_boost_1_59">Multiprecision-2.2.5
         (Boost-1.59)</a>
       </h5>
@@ -229,7 +261,7 @@
           </li>
 </ul></div>
 <h5>
-<a name="boost_multiprecision.map.hist.h4"></a>
+<a name="boost_multiprecision.map.hist.h5"></a>
         <span class="phrase"><a name="boost_multiprecision.map.hist.multiprecision_2_2_4_boost_1_58"></a></span><a class="link" href="hist.html#boost_multiprecision.map.hist.multiprecision_2_2_4_boost_1_58">Multiprecision-2.2.4
         (Boost-1.58)</a>
       </h5>
@@ -250,7 +282,7 @@
           </li>
 </ul></div>
 <h5>
-<a name="boost_multiprecision.map.hist.h5"></a>
+<a name="boost_multiprecision.map.hist.h6"></a>
         <span class="phrase"><a name="boost_multiprecision.map.hist.multiprecision_2_2_3_boost_1_57"></a></span><a class="link" href="hist.html#boost_multiprecision.map.hist.multiprecision_2_2_3_boost_1_57">Multiprecision-2.2.3
         (Boost-1.57)</a>
       </h5>
@@ -270,7 +302,7 @@
           </li>
 </ul></div>
 <h5>
-<a name="boost_multiprecision.map.hist.h6"></a>
+<a name="boost_multiprecision.map.hist.h7"></a>
         <span class="phrase"><a name="boost_multiprecision.map.hist.multiprecision_2_2_2_boost_1_56"></a></span><a class="link" href="hist.html#boost_multiprecision.map.hist.multiprecision_2_2_2_boost_1_56">Multiprecision-2.2.2
         (Boost-1.56)</a>
       </h5>
@@ -283,14 +315,14 @@
           </li>
 </ul></div>
 <h5>
-<a name="boost_multiprecision.map.hist.h7"></a>
+<a name="boost_multiprecision.map.hist.h8"></a>
         <span class="phrase"><a name="boost_multiprecision.map.hist.multiprecision_2_2_1"></a></span><a class="link" href="hist.html#boost_multiprecision.map.hist.multiprecision_2_2_1">Multiprecision-2.2.1</a>
       </h5>
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
             Fix bug in assignment from string in cpp_int, see <a href="https://svn.boost.org/trac/boost/ticket/9936" target="_top">9936</a>.
           </li></ul></div>
 <h5>
-<a name="boost_multiprecision.map.hist.h8"></a>
+<a name="boost_multiprecision.map.hist.h9"></a>
         <span class="phrase"><a name="boost_multiprecision.map.hist.multiprecision_2_2_0"></a></span><a class="link" href="hist.html#boost_multiprecision.map.hist.multiprecision_2_2_0">Multiprecision-2.2.0</a>
       </h5>
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
@@ -318,7 +350,7 @@
           </li>
 </ul></div>
 <h5>
-<a name="boost_multiprecision.map.hist.h9"></a>
+<a name="boost_multiprecision.map.hist.h10"></a>
         <span class="phrase"><a name="boost_multiprecision.map.hist.boost_1_55"></a></span><a class="link" href="hist.html#boost_multiprecision.map.hist.boost_1_55">Boost-1.55</a>
       </h5>
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
@@ -356,7 +388,7 @@
           </li>
 </ul></div>
 <h5>
-<a name="boost_multiprecision.map.hist.h10"></a>
+<a name="boost_multiprecision.map.hist.h11"></a>
         <span class="phrase"><a name="boost_multiprecision.map.hist.1_54"></a></span><a class="link" href="hist.html#boost_multiprecision.map.hist.1_54">1.54</a>
       </h5>
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
@@ -411,7 +443,7 @@
           </li>
 </ul></div>
 <h5>
-<a name="boost_multiprecision.map.hist.h11"></a>
+<a name="boost_multiprecision.map.hist.h12"></a>
         <span class="phrase"><a name="boost_multiprecision.map.hist.1_53"></a></span><a class="link" href="hist.html#boost_multiprecision.map.hist.1_53">1.53</a>
       </h5>
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
@@ -427,7 +459,7 @@
           </li>
 </ul></div>
 <h5>
-<a name="boost_multiprecision.map.hist.h12"></a>
+<a name="boost_multiprecision.map.hist.h13"></a>
         <span class="phrase"><a name="boost_multiprecision.map.hist.post_review_changes"></a></span><a class="link" href="hist.html#boost_multiprecision.map.hist.post_review_changes">Post
         review changes</a>
       </h5>
@@ -481,7 +513,7 @@
           </li>
 </ul></div>
 <h5>
-<a name="boost_multiprecision.map.hist.h13"></a>
+<a name="boost_multiprecision.map.hist.h14"></a>
         <span class="phrase"><a name="boost_multiprecision.map.hist.pre_review_history"></a></span><a class="link" href="hist.html#boost_multiprecision.map.hist.pre_review_history">Pre-review
         history</a>
       </h5>

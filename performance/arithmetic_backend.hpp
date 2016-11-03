@@ -32,7 +32,10 @@ struct arithmetic_backend
    typedef mpl::list<float, double, long double>                                       float_types;
    typedef int                                                                         exponent_type;
 
-   arithmetic_backend(){}
+   arithmetic_backend()
+   {
+      m_value = 0;
+   }
    arithmetic_backend(const arithmetic_backend& o)
    {
       m_value = o.m_value;

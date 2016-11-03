@@ -230,6 +230,7 @@ void test_special_cases()
    BOOST_CHECK(boost::math::signbit(-min_val / -2) == 0);
    BOOST_CHECK(boost::math::signbit(-min_val / 2));
    test_type neg_zero = min_val * -min_val;
+   test_type zero = 0;
    // Arithmetic involving signed zero:
    BOOST_CHECK_EQUAL(-neg_zero, 0);
    BOOST_CHECK(!boost::math::signbit(-neg_zero));
@@ -249,6 +250,27 @@ void test_special_cases()
    BOOST_CHECK_EQUAL(neg_zero - test_type(-2), 2);
    BOOST_CHECK_EQUAL(-2 - neg_zero, -2);
    BOOST_CHECK_EQUAL(test_type(-2) - neg_zero, -2);
+   BOOST_CHECK(!boost::math::signbit(test_type(2) + test_type(-2)));
+   BOOST_CHECK(!boost::math::signbit(test_type(2) - test_type(2)));
+   BOOST_CHECK(!boost::math::signbit(test_type(-2) - test_type(-2)));
+   BOOST_CHECK(!boost::math::signbit(test_type(-2) + test_type(2)));
+   BOOST_CHECK(!boost::math::signbit(zero + zero));
+   BOOST_CHECK(!boost::math::signbit(zero - zero));
+   BOOST_CHECK(!boost::math::signbit(neg_zero + zero));
+   BOOST_CHECK(!boost::math::signbit(zero + neg_zero));
+   BOOST_CHECK(boost::math::signbit(neg_zero + neg_zero));
+   BOOST_CHECK(boost::math::signbit(neg_zero - zero));
+   BOOST_CHECK(!boost::math::signbit(zero - neg_zero));
+   BOOST_CHECK(!boost::math::signbit(neg_zero - neg_zero));
+   small = 0.25;
+   BOOST_CHECK(!boost::math::signbit(floor(small)));
+   BOOST_CHECK(!boost::math::signbit(round(small)));
+   BOOST_CHECK(!boost::math::signbit(trunc(small)));
+   small = -small;
+   BOOST_CHECK(boost::math::signbit(ceil(small)));
+   BOOST_CHECK(boost::math::signbit(round(small)));
+   BOOST_CHECK(boost::math::signbit(trunc(small)));
+
 
    BOOST_CHECK_EQUAL(neg_zero * 2, 0);
    BOOST_CHECK_EQUAL(neg_zero * test_type(2), 0);
@@ -287,7 +309,6 @@ void test_special_cases()
    BOOST_CHECK(boost::math::signbit(neg_zero.convert_to<double>()));
    BOOST_CHECK(boost::math::signbit(neg_zero.convert_to<float>()));
    BOOST_CHECK(boost::math::signbit(neg_zero.convert_to<long double>()));
-   test_type zero(0);
    BOOST_CHECK(!boost::math::signbit(zero.convert_to<double>()));
    BOOST_CHECK(!boost::math::signbit(zero.convert_to<float>()));
    BOOST_CHECK(!boost::math::signbit(zero.convert_to<long double>()));

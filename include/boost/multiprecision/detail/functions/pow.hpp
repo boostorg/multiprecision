@@ -405,6 +405,13 @@ void eval_log10(T& result, const T& arg)
    eval_divide(result, get_constant_log10<T>());
 }
 
+template <class R, class T>
+inline void eval_log2(R& result, const T& a)
+{
+   eval_log(result, a);
+   eval_divide(result, get_constant_ln2<R>());
+}
+
 template<typename T> 
 inline void eval_pow(T& result, const T& x, const T& a)
 {
@@ -601,6 +608,27 @@ inline typename enable_if<is_arithmetic<A>, void>::type eval_pow(T& result, cons
    cast_type c;
    c = x;
    eval_pow(result, c, a);
+}
+
+template <class T>
+void eval_exp2(T& result, const T& arg)
+{
+   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The log function is only valid for floating point types.");
+
+   // Check for pure-integer arguments which can be either signed or unsigned.
+   typename boost::multiprecision::detail::canonical<typename T::exponent_type, T>::type i;
+   T temp;
+   eval_trunc(temp, arg);
+   eval_convert_to(&i, temp);
+   if(arg.compare(i) == 0)
+   {
+      temp = static_cast<typename mpl::front<typename T::unsigned_types>::type>(1u);
+      eval_ldexp(result, temp, i);
+      return;
+   }
+
+   temp = static_cast<typename mpl::front<typename T::unsigned_types>::type>(2u);
+   eval_pow(result, temp, arg);
 }
 
 namespace detail{
