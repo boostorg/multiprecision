@@ -1237,26 +1237,25 @@ inline typename boost::enable_if_c<boost::is_float<Float>::value>::type eval_con
    //
    typedef cpp_bin_float<std::numeric_limits<Float>::digits, digit_base_2, void, Exponent, MinE, MaxE>  conv_type;
    typedef typename common_type<typename conv_type::exponent_type, int>::type                           common_exp_type;
-   conv_type arg(original_arg);
-   switch(arg.exponent())
+   switch(original_arg.exponent())
    {
-   case conv_type::exponent_zero:
+   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero:
       *res = 0;
-      if(arg.sign())
+      if(original_arg.sign())
          *res = -*res;
       return;
-   case conv_type::exponent_nan:
+   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
       *res = std::numeric_limits<Float>::quiet_NaN();
       return;
-   case conv_type::exponent_infinity:
+   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
       *res = (std::numeric_limits<Float>::infinity)();
-      if(arg.sign())
+      if(original_arg.sign())
          *res = -*res;
       return;
    }
-   common_exp_type e = arg.exponent();
    static const common_exp_type min_exp_limit = std::numeric_limits<Float>::min_exponent 
       - (common_exp_type)cpp_bin_float<std::numeric_limits<Float>::digits, digit_base_2, void, Exponent, MinE, MaxE>::bit_count - std::numeric_limits<Float>::digits - 2;
+   common_exp_type e = original_arg.exponent();
    e -= cpp_bin_float<std::numeric_limits<Float>::digits, digit_base_2, void, Exponent, MinE, MaxE>::bit_count - 1;
    if(e < min_exp_limit)
    {
@@ -1268,7 +1267,22 @@ inline typename boost::enable_if_c<boost::is_float<Float>::value>::type eval_con
       *res = std::numeric_limits<Float>::has_infinity ? std::numeric_limits<Float>::infinity() : (std::numeric_limits<Float>::max)();
       return;
    }
+   if(original_arg.exponent() < std::numeric_limits<Float>::min_exponent - 1)
+   {
+      // Result is not zero but is denormalized, in order to avoid double rounding we need to use
+      // a little trickery to ensure rounding occurs in the right place, and just once, thanks
+      // to Michael Shatz for this, see: https://svn.boost.org/trac/boost/attachment/ticket/12527
+      using default_ops::eval_add;
+      cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> temp(original_arg);
+      eval_add(temp, original_arg.sign() ? -std::numeric_limits<Float>::min() : std::numeric_limits<Float>::min());
+      eval_convert_to(res, temp);
+      *res -= original_arg.sign() ? -std::numeric_limits<Float>::min() : std::numeric_limits<Float>::min();
+      return;
+   }
 
+   conv_type arg(original_arg);
+   e = arg.exponent();
+   e -= cpp_bin_float<std::numeric_limits<Float>::digits, digit_base_2, void, Exponent, MinE, MaxE>::bit_count - 1;
    *res = std::ldexp(static_cast<Float>(*arg.bits().limbs()), static_cast<int>(e));
    for(unsigned i = 1; i < arg.bits().size(); ++i)
    {

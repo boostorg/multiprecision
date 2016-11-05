@@ -89,6 +89,37 @@ int main()
    boost::multiprecision::number<boost::multiprecision::backends::cpp_bin_float<128, boost::multiprecision::backends::digit_base_2, void, int64_t> > ext_float("1e-646456978");
    BOOST_CHECK_EQUAL(ext_float.convert_to<float>(), 0);
 
+   q = -(std::numeric_limits<float>::min)();
+   BOOST_CHECK_EQUAL(q.convert_to<float>(), -(std::numeric_limits<float>::min)());
+   q = -(std::numeric_limits<float>::max)();
+   BOOST_CHECK_EQUAL(q.convert_to<float>(), -(std::numeric_limits<float>::max)());
+   q = -(std::numeric_limits<float>::denorm_min)();
+   BOOST_CHECK_EQUAL(q.convert_to<float>(), -(std::numeric_limits<float>::denorm_min)());
+   // See https://svn.boost.org/trac/boost/ticket/12512:
+   ext_float = boost::multiprecision::number<boost::multiprecision::backends::cpp_bin_float<128, boost::multiprecision::backends::digit_base_2, void, int64_t> >("-1e-646456978");
+   BOOST_CHECK_EQUAL(ext_float.convert_to<float>(), 0);
+   //
+   // Check for double rounding when the result would be a denorm.
+   // See https://svn.boost.org/trac/boost/ticket/12527
+   //
+   cpp_bin_float_50 r1 = ldexp(cpp_bin_float_50(0x8000000000000bffull), -63 - 1023);
+   double d1 = r1.convert_to<double>();
+   double d2 = boost::math::nextafter(d1, d1 < r1 ? DBL_MAX : -DBL_MAX);
+   BOOST_CHECK(((abs(d1 - r1) <= abs(d2 - r1))));
+   r1 = -r1;
+   d1 = r1.convert_to<double>();
+   d2 = boost::math::nextafter(d1, d1 < r1 ? DBL_MAX : -DBL_MAX);
+   BOOST_CHECK(((abs(d1 - r1) <= abs(d2 - r1))));
+
+   r1 = ldexp(cpp_bin_float_50(0x8000017f), -31 - 127);
+   float f1 = r1.convert_to<float>();
+   float f2 = boost::math::nextafter(f1, f1 < r1 ? FLT_MAX : -FLT_MAX);
+   BOOST_CHECK(((abs(f1 - r1) <= abs(f2 - r1))));
+   r1 = -r1;
+   f1 = r1.convert_to<float>();
+   f2 = boost::math::nextafter(f1, f1 < r1 ? FLT_MAX : -FLT_MAX);
+   BOOST_CHECK(((abs(f1 - r1) <= abs(f2 - r1))));
+
    return boost::report_errors();
 }
 

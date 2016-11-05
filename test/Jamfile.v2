@@ -493,7 +493,9 @@ run test_convert_from_float128.cpp
 #
 # This take too long to run as a regular part of the tests:
 #
-# run test_cpp_bin_float_round.cpp mpfr gmp ;
+run test_cpp_bin_float_round.cpp mpfr gmp ;
+explicit test_cpp_bin_float_round ;
+
 run test_cpp_bin_float_conv.cpp ;
 
 run test_cpp_bin_float_io.cpp no_eh_support /boost/system//boost_system /boost/chrono//boost_chrono
