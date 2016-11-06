@@ -119,6 +119,39 @@ int main()
    f1 = r1.convert_to<float>();
    f2 = boost::math::nextafter(f1, f1 < r1 ? FLT_MAX : -FLT_MAX);
    BOOST_CHECK(((abs(f1 - r1) <= abs(f2 - r1))));
+   //
+   // Check convertion to signed zero works OK:
+   //
+   r1 = -ldexp(cpp_bin_float_50(1), -3000);
+   BOOST_CHECK(boost::math::signbit(r1.convert_to<double>()));
+   BOOST_CHECK(boost::math::signbit(r1.convert_to<float>()));
+   r1 = 0;
+   r1 = -r1;
+   BOOST_CHECK(boost::math::signbit(r1));
+   BOOST_CHECK(boost::math::signbit(r1.convert_to<double>()));
+   BOOST_CHECK(boost::math::signbit(r1.convert_to<float>()));
+   //
+   // Check boundary as the exponent drops below what a double can cope with
+   // but we will be rounding up:
+   //
+   r1 = 3;
+   r1 = ldexp(r1, std::numeric_limits<double>::min_exponent);
+   do
+   {
+      d1 = r1.convert_to<double>();
+      d2 = boost::math::nextafter(d1, d1 < r1 ? DBL_MAX : -DBL_MAX);
+      BOOST_CHECK(((abs(d1 - r1) <= abs(d2 - r1))));
+      r1 = ldexp(r1, -1);
+   } while(d1);
+   r1 = -3;
+   r1 = ldexp(r1, std::numeric_limits<double>::min_exponent);
+   do
+   {
+      d1 = r1.convert_to<double>();
+      d2 = boost::math::nextafter(d1, d1 < r1 ? DBL_MAX : -DBL_MAX);
+      BOOST_CHECK(((abs(d1 - r1) <= abs(d2 - r1))));
+      r1 = ldexp(r1, -1);
+   } while(d1);
 
    return boost::report_errors();
 }

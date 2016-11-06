@@ -1260,6 +1260,8 @@ inline typename boost::enable_if_c<boost::is_float<Float>::value>::type eval_con
    if(e < min_exp_limit)
    {
       *res = 0;
+      if(original_arg.sign())
+         *res = -*res;
       return;
    }
    if(e > std::numeric_limits<Float>::max_exponent)
