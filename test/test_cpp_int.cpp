@@ -517,6 +517,14 @@ struct tester
       BOOST_CHECK(r < b);
       BOOST_CHECK_EQUAL(a - c * b, r);
 #endif
+      for(unsigned int ui = 0; ui < 1000; ++ui)
+      {
+         boost::multiprecision::mpz_int r;
+         boost::multiprecision::mpz_int s1 = sqrt(boost::multiprecision::mpz_int(ui), r);
+         a = sqrt(test_type(ui), b);
+         BOOST_CHECK_EQUAL(a.str(), s1.str());
+         BOOST_CHECK_EQUAL(b.str(), r.str());
+      }
    }
 
    void test()

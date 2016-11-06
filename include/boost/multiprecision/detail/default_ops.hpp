@@ -1382,9 +1382,10 @@ void eval_integer_sqrt(B& s, B& r, const B& x)
       return;
    }
    int g = eval_msb(x);
-   if(g == 0)
+   if(g <= 1)
    {
-      r = ui_type(1);
+      s = ui_type(1);
+      eval_subtract(r, x, s);
       return;
    }
    
@@ -1408,6 +1409,7 @@ void eval_integer_sqrt(B& s, B& r, const B& x)
          eval_bit_set(t, 2 * g);
          if(t.compare(r) <= 0)
          {
+            BOOST_ASSERT(g >= 0);
             eval_bit_set(s, g);
             eval_subtract(r, t);
             if(eval_get_sign(r) == 0)
