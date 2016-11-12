@@ -414,10 +414,10 @@ public:
 #endif
 
 template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, class Int>
-inline void copy_and_round(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> &res, Int &arg)
+inline void copy_and_round(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> &res, Int &arg, int bits_to_keep = cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count)
 {
    // Precondition: exponent of res must have been set before this function is called
-   // as we may need to adjust it based on how many cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count in arg are set.
+   // as we may need to adjust it based on how many bits_to_keep in arg are set.
    using default_ops::eval_msb;
    using default_ops::eval_lsb;
    using default_ops::eval_left_shift;
@@ -435,37 +435,55 @@ inline void copy_and_round(cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
       return;
    }
    int msb = eval_msb(arg);
-   if(static_cast<int>(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count) > msb + 1)
+   if(static_cast<int>(bits_to_keep) > msb + 1)
    {
-      // Must have had cancellation in subtraction, shift left and copy:
+      // Must have had cancellation in subtraction,
+      // or be converting from a narrower type, so shift left:
       res.bits() = arg;
-      eval_left_shift(res.bits(), cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - msb - 1);
-      res.exponent() -= static_cast<Exponent>(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - msb - 1);
+      eval_left_shift(res.bits(), bits_to_keep - msb - 1);
+      res.exponent() -= static_cast<Exponent>(bits_to_keep - msb - 1);
    }
-   else if(static_cast<int>(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count) < msb + 1)
+   else if(static_cast<int>(bits_to_keep) < msb + 1)
    {
-      // We have more cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count than we need, so round as required, 
+      // We have more bits_to_keep than we need, so round as required, 
       // first get the rounding bit:
-      bool roundup = eval_bit_test(arg, msb - cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count);
+      bool roundup = eval_bit_test(arg, msb - bits_to_keep);
       // Then check for a tie:
-      if(roundup && (msb - cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count == eval_lsb(arg)))
+      if(roundup && (msb - bits_to_keep == (int)eval_lsb(arg)))
       {
          // Ties round towards even:
-         if(!eval_bit_test(arg, msb - cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + 1))
+         if(!eval_bit_test(arg, msb - bits_to_keep + 1))
             roundup = false;
       }
-      // Shift off the cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count we don't need:
-      eval_right_shift(arg, msb - cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + 1);
-      res.exponent() += static_cast<Exponent>(msb - (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + 1);
+      // Shift off the bits_to_keep we don't need:
+      eval_right_shift(arg, msb - bits_to_keep + 1);
+      res.exponent() += static_cast<Exponent>(msb - bits_to_keep + 1);
       if(roundup)
       {
          eval_increment(arg);
-         if(eval_bit_test(arg, cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count))
+         if(bits_to_keep)
          {
-            // This happens very very rairly:
-            eval_right_shift(arg, 1u);
-            ++res.exponent();
+            if(eval_bit_test(arg, bits_to_keep))
+            {
+               // This happens very very rairly, all the bits left after
+               // truncation must be 1's and we're rounding up an order of magnitude:
+               eval_right_shift(arg, 1u);
+               ++res.exponent();
+            }
          }
+         else
+         {
+            // We get here when bits_to_keep is zero but we're rounding up,
+            // as a result we end up with a single digit that is a 1:
+            ++bits_to_keep;
+         }
+      }
+      if(bits_to_keep != cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count)
+      {
+         // Normalize result when we're rounding to fewer bits than we can hold, only happens in conversions
+         // to narrower types:
+         eval_left_shift(arg, cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - bits_to_keep);
+         res.exponent() -= static_cast<Exponent>(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - bits_to_keep);
       }
       res.bits() = arg;
    }
@@ -473,7 +491,14 @@ inline void copy_and_round(cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
    {
       res.bits() = arg;
    }
-   BOOST_ASSERT((eval_msb(res.bits()) == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1));
+   if(!bits_to_keep && !res.bits().limbs()[0])
+   {
+      // We're keeping zero bits and did not round up, so result is zero:
+      res.exponent() = cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero;
+      return;
+   }
+   // Result must be normalized:
+   BOOST_ASSERT(((int)eval_msb(res.bits()) == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1));
 
    if(res.exponent() > cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::max_exponent)
    {
@@ -1232,11 +1257,11 @@ inline void eval_convert_to(boost::ulong_long_type *res, const cpp_bin_float<Dig
 template <class Float, unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
 inline typename boost::enable_if_c<boost::is_float<Float>::value>::type eval_convert_to(Float *res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> &original_arg)
 {
-   //
-   // Perform rounding first, then afterwards extract the digits:
-   //
    typedef cpp_bin_float<std::numeric_limits<Float>::digits, digit_base_2, void, Exponent, MinE, MaxE>  conv_type;
    typedef typename common_type<typename conv_type::exponent_type, int>::type                           common_exp_type;
+   //
+   // Special cases first:
+   //
    switch(original_arg.exponent())
    {
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero:
@@ -1253,45 +1278,49 @@ inline typename boost::enable_if_c<boost::is_float<Float>::value>::type eval_con
          *res = -*res;
       return;
    }
-   static const common_exp_type min_exp_limit = std::numeric_limits<Float>::min_exponent 
-      - (common_exp_type)cpp_bin_float<std::numeric_limits<Float>::digits, digit_base_2, void, Exponent, MinE, MaxE>::bit_count - std::numeric_limits<Float>::digits - 2;
-   common_exp_type e = original_arg.exponent();
-   e -= cpp_bin_float<std::numeric_limits<Float>::digits, digit_base_2, void, Exponent, MinE, MaxE>::bit_count - 1;
-   if(e < min_exp_limit)
+   //
+   // Check for super large exponent that must be converted to infinity:
+   //
+   if(original_arg.exponent() > std::numeric_limits<Float>::max_exponent)
    {
+      *res = std::numeric_limits<Float>::has_infinity ? std::numeric_limits<Float>::infinity() : (std::numeric_limits<Float>::max)();
+      return;
+   }
+   //
+   // Figure out how many digits we will have in our result, 
+   // allowing for a possibly denormalized result:
+   //
+   common_exp_type digits_to_round_to = std::numeric_limits<Float>::digits;
+   if(original_arg.exponent() < std::numeric_limits<Float>::min_exponent - 1)
+   {
+      common_exp_type diff = original_arg.exponent();
+      diff -= std::numeric_limits<Float>::min_exponent - 1;
+      digits_to_round_to += diff;
+   }
+   if(digits_to_round_to < 0)
+   {
+      // Result must be zero:
       *res = 0;
       if(original_arg.sign())
          *res = -*res;
       return;
    }
-   if(e > std::numeric_limits<Float>::max_exponent)
-   {
-      *res = std::numeric_limits<Float>::has_infinity ? std::numeric_limits<Float>::infinity() : (std::numeric_limits<Float>::max)();
-      return;
-   }
-   if(original_arg.exponent() < std::numeric_limits<Float>::min_exponent - 1)
-   {
-      // Result is not zero but is denormalized, in order to avoid double rounding we need to use
-      // a little trickery to ensure rounding occurs in the right place, and just once, thanks
-      // to Michael Shatz for this, see: https://svn.boost.org/trac/boost/attachment/ticket/12527
-      using default_ops::eval_add;
-      cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> temp(original_arg);
-      eval_add(temp, original_arg.sign() ? -std::numeric_limits<Float>::min() : std::numeric_limits<Float>::min());
-      eval_convert_to(res, temp);
-      *res -= original_arg.sign() ? -std::numeric_limits<Float>::min() : std::numeric_limits<Float>::min();
-      return;
-   }
-
-   conv_type arg(original_arg);
-   e = arg.exponent();
-   e -= cpp_bin_float<std::numeric_limits<Float>::digits, digit_base_2, void, Exponent, MinE, MaxE>::bit_count - 1;
+   //
+   // Perform rounding first, then afterwards extract the digits:
+   //
+   cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> arg;
+   typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::rep_type bits(original_arg.bits());
+   arg.exponent() = original_arg.exponent();
+   copy_and_round(arg, bits, (int)digits_to_round_to);
+   common_exp_type e = arg.exponent();
+   e -= cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1;
    *res = std::ldexp(static_cast<Float>(*arg.bits().limbs()), static_cast<int>(e));
    for(unsigned i = 1; i < arg.bits().size(); ++i)
    {
       e += sizeof(*arg.bits().limbs()) * CHAR_BIT;
       *res += std::ldexp(static_cast<Float>(arg.bits().limbs()[i]), static_cast<int>(e));
    }
-   if(arg.sign())
+   if(original_arg.sign())
       *res = -*res;
 }
 
