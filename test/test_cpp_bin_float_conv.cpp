@@ -126,6 +126,25 @@ int main()
    // See https://svn.boost.org/trac/boost/ticket/12512:
    ext_float = boost::multiprecision::number<boost::multiprecision::backends::cpp_bin_float<128, boost::multiprecision::backends::digit_base_2, void, int64_t> >("-1e-646456978");
    BOOST_CHECK_EQUAL(ext_float.convert_to<float>(), 0);
+   ext_float = (std::numeric_limits<double>::max)();
+   ext_float *= 16;
+   if(std::numeric_limits<double>::has_infinity)
+   {
+      BOOST_CHECK_EQUAL(ext_float.convert_to<double>(), std::numeric_limits<double>::infinity());
+   }
+   else
+   {
+      BOOST_CHECK_EQUAL(ext_float.convert_to<double>(), (std::numeric_limits<double>::max)());
+   }
+   ext_float = -ext_float;
+   if(std::numeric_limits<double>::has_infinity)
+   {
+      BOOST_CHECK_EQUAL(ext_float.convert_to<double>(), -std::numeric_limits<double>::infinity());
+   }
+   else
+   {
+      BOOST_CHECK_EQUAL(ext_float.convert_to<double>(), -(std::numeric_limits<double>::max)());
+   }
    //
    // Check for double rounding when the result would be a denorm.
    // See https://svn.boost.org/trac/boost/ticket/12527

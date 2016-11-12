@@ -1284,6 +1284,8 @@ inline typename boost::enable_if_c<boost::is_float<Float>::value>::type eval_con
    if(original_arg.exponent() > std::numeric_limits<Float>::max_exponent)
    {
       *res = std::numeric_limits<Float>::has_infinity ? std::numeric_limits<Float>::infinity() : (std::numeric_limits<Float>::max)();
+      if(original_arg.sign())
+         *res = -*res;
       return;
    }
    //
