@@ -14,9 +14,32 @@
 
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/cpp_bin_float.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int.hpp>
+
 
 template <class T>
-void check_round(const T& val)
+T generate_random()
+{
+   typedef int e_type;
+   static boost::random::mt19937 gen;
+   T val = gen();
+   T prev_val = -1;
+   while(val != prev_val)
+   {
+      val *= (gen.max)();
+      prev_val = val;
+      val += gen();
+   }
+   e_type e;
+   val = frexp(val, &e);
+
+   static boost::random::uniform_int_distribution<e_type> ui(-20, 20);
+   return ldexp(val, ui(gen));
+}
+
+template <class T>
+void check_round(const T& val, bool check_extended = false)
 {
    double d1 = val.template convert_to<double>();
    double d2 = boost::math::nextafter(d1, d1 < val ? DBL_MAX : -DBL_MAX);
@@ -40,6 +63,30 @@ void check_round(const T& val)
    float f2 = boost::math::nextafter(f1, f1 < val ? FLT_MAX : -FLT_MAX);
    BOOST_CHECK(((abs(f1 - val) <= abs(f2 - val))));
    BOOST_CHECK_EQUAL(boost::math::signbit(val), boost::math::signbit(f1));
+
+   if(check_extended)
+   {
+      //
+      // We should check long double as well:
+      //
+      long double l1 = val.template convert_to<long double>();
+      long double l2 = boost::math::nextafter(d1, d1 < val ? LDBL_MAX : -LDBL_MAX);
+      diff1 = abs(l1 - val);
+      diff2 = abs(l2 - val);
+      if(diff2 < diff1)
+      {
+         // Some debugging code here...
+         std::cout << val.str() << std::endl;
+         std::cout << std::setprecision(18);
+         std::cout << l1 << std::endl;
+         std::cout << l2 << std::endl;
+         std::cout << diff1 << std::endl;
+         std::cout << diff2 << std::endl;
+         l1 = val.template convert_to<long double>();
+      }
+      BOOST_CHECK(diff2 >= diff1);
+      BOOST_CHECK_EQUAL(boost::math::signbit(val), boost::math::signbit(l1));
+   }
 }
 
 
@@ -210,9 +257,14 @@ int main()
       check_round(boost::math::float_prior(r1));
       r1 = ldexp(r1, -1);
    } while(ilogb(r1) > std::numeric_limits<double>::min_exponent - 5 - std::numeric_limits<double>::digits);
+   //
+   // Test random conversions:
+   //
+   for(unsigned j = 0; j < 10000; ++j)
+   {
+      check_round(generate_random<cpp_bin_float_50>(), true);
+   }
 
    return boost::report_errors();
 }
-
-
 

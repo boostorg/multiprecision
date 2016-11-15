@@ -1310,17 +1310,22 @@ inline typename boost::enable_if_c<boost::is_float<Float>::value>::type eval_con
    //
    // Perform rounding first, then afterwards extract the digits:
    //
-   cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> arg;
+   cpp_bin_float<std::numeric_limits<Float>::digits, digit_base_2, Allocator, Exponent, MinE, MaxE> arg;
    typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::rep_type bits(original_arg.bits());
    arg.exponent() = original_arg.exponent();
    copy_and_round(arg, bits, (int)digits_to_round_to);
    common_exp_type e = arg.exponent();
    e -= cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1;
-   *res = std::ldexp(static_cast<Float>(*arg.bits().limbs()), static_cast<int>(e));
-   for(unsigned i = 1; i < arg.bits().size(); ++i)
+   static const unsigned limbs_needed = std::numeric_limits<Float>::digits / (sizeof(*arg.bits().limbs()) * CHAR_BIT)
+      + (std::numeric_limits<Float>::digits % (sizeof(*arg.bits().limbs()) * CHAR_BIT) ? 1 : 0);
+   unsigned first_limb_needed = arg.bits().size() - limbs_needed;
+   *res = 0;
+   e += first_limb_needed * sizeof(*arg.bits().limbs()) * CHAR_BIT;
+   while(first_limb_needed < arg.bits().size())
    {
+      *res += std::ldexp(static_cast<Float>(arg.bits().limbs()[first_limb_needed]), static_cast<int>(e));
+      ++first_limb_needed;
       e += sizeof(*arg.bits().limbs()) * CHAR_BIT;
-      *res += std::ldexp(static_cast<Float>(arg.bits().limbs()[i]), static_cast<int>(e));
    }
    if(original_arg.sign())
       *res = -*res;
