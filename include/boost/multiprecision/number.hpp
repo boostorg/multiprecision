@@ -1732,7 +1732,7 @@ inline std::string read_string_while(std::istream& is, std::string const& permit
 
       for(;; c = is.rdbuf()->snextc())
          if(std::istream::traits_type::eq_int_type(std::istream::traits_type::eof(), c))
-         {	// end of file:
+         { // end of file:
             state |= std::ios_base::eofbit;
             break;
          }
@@ -1743,7 +1743,7 @@ inline std::string read_string_while(std::istream& is, std::string const& permit
             break;
          }
          else
-         {	
+         {
             result.append(1, std::istream::traits_type::to_char_type(c));
          }
    }

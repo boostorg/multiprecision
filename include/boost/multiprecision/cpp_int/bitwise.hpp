@@ -326,7 +326,7 @@ inline void left_shift_byte(Int& result, double_limb_type s)
    if(rs != ors)
       pr[rs - 1] = 0u;
    std::size_t bytes = static_cast<std::size_t>(s / CHAR_BIT);
-   std::size_t len = std::min(ors * sizeof(limb_type), rs * sizeof(limb_type) - bytes);
+   std::size_t len = (std::min)(ors * sizeof(limb_type), rs * sizeof(limb_type) - bytes);
    if(bytes >= rs * sizeof(limb_type))
       result = static_cast<limb_type>(0u);
    else
