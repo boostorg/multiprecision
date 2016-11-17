@@ -596,6 +596,7 @@ inline void do_eval_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponen
 {
    using default_ops::eval_subtract;
    using default_ops::eval_bit_test;
+   using default_ops::eval_decrement;
 
    typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::double_rep_type dt;
    
@@ -651,18 +652,40 @@ inline void do_eval_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponen
          res.exponent() = a.exponent() - e_diff;
          eval_subtract(dt, b.bits());
       }
+      else if(a.exponent() == (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + b.exponent() + 1)
+      {
+         if(eval_lsb(b.bits()) != cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1)
+         {
+            eval_left_shift(dt, 1);
+            eval_decrement(dt);
+            res.exponent() = a.exponent() - 1;
+         }
+         else
+            res.exponent() = a.exponent();
+      }
       else
          res.exponent() = a.exponent();
    }
    else
    {
       dt = b.bits();
-      if(b.exponent() <= a.exponent() + (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count)
+      if(b.exponent() <= (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + a.exponent())
       {
          typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type e_diff = a.exponent() - b.exponent();
          eval_left_shift(dt, -e_diff);
          res.exponent() = b.exponent() + e_diff;
          eval_subtract(dt, a.bits());
+      }
+      else if(b.exponent() == (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + a.exponent() + 1)
+      {
+         if(eval_lsb(a.bits()) != cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1)
+         {
+            eval_left_shift(dt, 1);
+            eval_decrement(dt);
+            res.exponent() = b.exponent() - 1;
+         }
+         else
+            res.exponent() = b.exponent();
       }
       else
          res.exponent() = b.exponent();
