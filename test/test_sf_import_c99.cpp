@@ -40,11 +40,13 @@
 #endif
 #ifdef TEST_CPP_BIN_FLOAT
 #include <boost/multiprecision/cpp_bin_float.hpp>
+#include <boost/multiprecision/debug_adaptor.hpp>
 #endif
 #ifdef TEST_FLOAT128
 #include <boost/multiprecision/float128.hpp>
 #endif
 
+#include <boost/math/constants/constants.hpp>
 #include "test.hpp"
 
 #ifdef signbit
@@ -583,6 +585,1412 @@ void test_poison()
 #endif
 }
 
+template <class T>
+typename boost::enable_if_c<std::numeric_limits<T>::is_specialized>::type check_invalid(const T& val)
+{
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      BOOST_CHECK(isnan(val));
+   }
+   else
+   {
+      BOOST_CHECK_EQUAL(val, 0);
+   }
+   BOOST_CHECK_EQUAL(errno, EDOM);
+   errno = 0;
+}
+
+template <class T>
+typename boost::disable_if_c<std::numeric_limits<T>::is_specialized>::type check_invalid(const T& val)
+{
+   check_invalid(static_cast<typename T::result_type>(val));
+}
+
+void check_erange()
+{
+   BOOST_CHECK_EQUAL(errno, ERANGE);
+   errno = 0;
+}
+
+template <class T>
+void test_c99_appendix_F()
+{
+   //
+   // Tests conformance to non-normative appendix F.9.1 of C99, basically how to handle
+   // special cases, infinities and NaN's.
+   //
+   errno = 0;
+   // F.9.1.1:
+   T arg = 1;
+   T val = acos(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = 2;
+   check_invalid(acos(arg));
+   arg = -2;
+   check_invalid(acos(arg));
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      check_invalid(acos(arg));
+      arg = -std::numeric_limits<T>::infinity();
+      check_invalid(acos(arg));
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(acos(arg));
+      arg = -std::numeric_limits<T>::quiet_NaN();
+      check_invalid(acos(arg));
+   }
+   // F.9.1.2:
+   arg = 0;
+   val = asin(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = asin(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+   }
+   arg = 2;
+   check_invalid(asin(arg));
+   arg = -2;
+   check_invalid(asin(arg));
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      check_invalid(asin(arg));
+      arg = -std::numeric_limits<T>::infinity();
+      check_invalid(asin(arg));
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(asin(arg));
+      arg = -std::numeric_limits<T>::quiet_NaN();
+      check_invalid(asin(arg));
+   }
+   // F.9.1.3:
+   arg = 0;
+   val = atan(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = atan(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      val = atan(arg);
+      BOOST_CHECK_EQUAL(val, boost::math::constants::half_pi<T>());
+      arg = -std::numeric_limits<T>::infinity();
+      val = atan(arg);
+      BOOST_CHECK_EQUAL(val, -boost::math::constants::half_pi<T>());
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(asin(arg));
+      arg = -std::numeric_limits<T>::quiet_NaN();
+      check_invalid(asin(arg));
+   }
+   // F.9.1.4:
+   arg = 0;
+   T arg2 = 0;
+   val = atan2(arg, arg2);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = atan2(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+   }
+   arg2 = -arg2;
+   if(signbit(arg2))
+   {
+      arg = 0;
+      val = atan2(arg, arg2);
+      BOOST_CHECK_EQUAL(val, boost::math::constants::pi<T>());
+      BOOST_CHECK(signbit(val) == 0);
+      arg = -arg;
+      val = atan2(arg, arg2);
+      BOOST_CHECK_EQUAL(val, -boost::math::constants::pi<T>());
+      BOOST_CHECK(signbit(val));
+   }
+   arg = 0;
+   arg2 = -2;
+   val = atan2(arg, arg2);
+   BOOST_CHECK_EQUAL(val, boost::math::constants::pi<T>());
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = atan2(arg, arg2);
+      BOOST_CHECK_EQUAL(val, -boost::math::constants::pi<T>());
+   }
+   arg = 0;
+   arg2 = 2;
+   val = atan2(arg, arg2);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = atan2(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+   }
+   arg = -2;
+   arg2 = 0;
+   val = atan2(arg, arg2);
+   BOOST_CHECK_EQUAL(val, -boost::math::constants::half_pi<T>());
+   arg2 = -arg2;
+   if(signbit(arg2))
+   {
+      val = atan2(arg, arg2);
+      BOOST_CHECK_EQUAL(val, -boost::math::constants::half_pi<T>());
+   }
+   arg = 2;
+   arg2 = 0;
+   val = atan2(arg, arg2);
+   BOOST_CHECK_EQUAL(val, boost::math::constants::half_pi<T>());
+   arg2 = -arg2;
+   if(signbit(arg2))
+   {
+      val = atan2(arg, arg2);
+      BOOST_CHECK_EQUAL(val, boost::math::constants::half_pi<T>());
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = 2;
+      arg2 = -std::numeric_limits<T>::infinity();
+      val = atan2(arg, arg2);
+      BOOST_CHECK_EQUAL(val, boost::math::constants::pi<T>());
+      arg = -arg;
+      val = atan2(arg, arg2);
+      BOOST_CHECK_EQUAL(val, -boost::math::constants::pi<T>());
+      arg = 2;
+      arg2 = std::numeric_limits<T>::infinity();
+      val = atan2(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val) == 0);
+      arg = -arg;
+      val = atan2(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+      arg = std::numeric_limits<T>::infinity();
+      arg2 = 2;
+      val = atan2(arg, arg2);
+      BOOST_CHECK_EQUAL(val, boost::math::constants::half_pi<T>());
+      arg = -arg;
+      val = atan2(arg, arg2);
+      BOOST_CHECK_EQUAL(val, -boost::math::constants::half_pi<T>());
+      arg = std::numeric_limits<T>::infinity();
+      arg2 = -2;
+      val = atan2(arg, arg2);
+      BOOST_CHECK_EQUAL(val, boost::math::constants::half_pi<T>());
+      arg = -arg;
+      val = atan2(arg, arg2);
+      BOOST_CHECK_EQUAL(val, -boost::math::constants::half_pi<T>());
+      arg = std::numeric_limits<T>::infinity();
+      arg2 = -std::numeric_limits<T>::infinity();
+      val = atan2(arg, arg2);
+      BOOST_CHECK_EQUAL(val, boost::math::constants::three_quarters_pi<T>());
+      arg = -arg;
+      val = atan2(arg, arg2);
+      BOOST_CHECK_EQUAL(val, -boost::math::constants::three_quarters_pi<T>());
+      arg = std::numeric_limits<T>::infinity();
+      arg2 = std::numeric_limits<T>::infinity();
+      val = atan2(arg, arg2);
+      BOOST_CHECK_EQUAL(val, ldexp(boost::math::constants::pi<T>(), -2));
+      arg = -arg;
+      val = atan2(arg, arg2);
+      BOOST_CHECK_EQUAL(val, -ldexp(boost::math::constants::pi<T>(), -2));
+      if(std::numeric_limits<T>::has_quiet_NaN)
+      {
+         arg = std::numeric_limits<T>::quiet_NaN();
+         arg2 = 2;
+         check_invalid(atan2(arg, arg2));
+         std::swap(arg, arg2);
+         check_invalid(atan2(arg, arg2));
+         arg = std::numeric_limits<T>::quiet_NaN();
+         check_invalid(atan2(arg, arg2));
+      }
+   }
+   // F.9.1.5:
+   arg = 0;
+   val = cos(arg);
+   BOOST_CHECK_EQUAL(val, 1);
+   arg = -arg;
+   BOOST_CHECK_EQUAL(val, 1);
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      check_invalid(cos(arg));
+      arg = -std::numeric_limits<T>::infinity();
+      check_invalid(cos(arg));
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(cos(arg));
+      arg = -std::numeric_limits<T>::quiet_NaN();
+      check_invalid(cos(arg));
+   }
+   // F.9.1.6:
+   arg = 0;
+   val = sin(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = sin(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      check_invalid(sin(arg));
+      arg = -std::numeric_limits<T>::infinity();
+      check_invalid(sin(arg));
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(sin(arg));
+      arg = -std::numeric_limits<T>::quiet_NaN();
+      check_invalid(sin(arg));
+   }
+   // F.9.1.7:
+   arg = 0;
+   val = tan(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = tan(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      check_invalid(tan(arg));
+      arg = -std::numeric_limits<T>::infinity();
+      check_invalid(tan(arg));
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(tan(arg));
+      arg = -std::numeric_limits<T>::quiet_NaN();
+      check_invalid(tan(arg));
+   }
+   // F.9.2.1:
+   arg = 1;
+   val = acosh(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   check_invalid(acosh(arg));
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      val = acosh(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+
+      arg = -std::numeric_limits<T>::infinity();
+      check_invalid(acosh(arg));
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(acosh(arg));
+      arg = -std::numeric_limits<T>::quiet_NaN();
+      check_invalid(acosh(arg));
+   }
+   // F.9.2.2:
+   arg = 0;
+   val = asinh(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = asinh(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      val = asinh(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+
+      arg = -std::numeric_limits<T>::infinity();
+      val = asinh(arg);
+      BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(asinh(arg));
+      arg = -std::numeric_limits<T>::quiet_NaN();
+      check_invalid(asinh(arg));
+   }
+   // F.9.2.3:
+   arg = 0;
+   val = atanh(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = atanh(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+   }
+   arg = 2;
+   check_invalid(atanh(arg));
+   arg = -3;
+   check_invalid(atanh(arg));
+
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = 1;
+      val = atanh(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      BOOST_CHECK(signbit(val) == 0);
+      check_erange();
+      arg = -arg;
+      val = atanh(arg);
+      BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+      BOOST_CHECK(signbit(val));
+      check_erange();
+
+      arg = std::numeric_limits<T>::infinity();
+      check_invalid(atanh(arg));
+      arg = -std::numeric_limits<T>::infinity();
+      check_invalid(atanh(arg));
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(atanh(arg));
+      arg = -std::numeric_limits<T>::quiet_NaN();
+      check_invalid(atanh(arg));
+   }
+   // F.9.2.4:
+   arg = 0;
+   val = cosh(arg);
+   BOOST_CHECK_EQUAL(val, 1);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = cosh(arg);
+      BOOST_CHECK_EQUAL(val, 1);
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = (std::numeric_limits<T>::max)();
+      val = cosh(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = -arg;
+      val = cosh(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = std::numeric_limits<T>::infinity();
+      val = cosh(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = -arg;
+      val = cosh(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(cosh(arg));
+      arg = -std::numeric_limits<T>::quiet_NaN();
+      check_invalid(cosh(arg));
+   }
+   // F.9.2.5:
+   arg = 0;
+   val = sinh(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = sinh(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = (std::numeric_limits<T>::max)();
+      val = sinh(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = -arg;
+      val = sinh(arg);
+      BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+      arg = std::numeric_limits<T>::infinity();
+      val = sinh(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = -arg;
+      val = sinh(arg);
+      BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(sinh(arg));
+      arg = -std::numeric_limits<T>::quiet_NaN();
+      check_invalid(sinh(arg));
+   }
+   // F.9.2.6:
+   arg = 0;
+   val = tanh(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = tanh(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+   }
+   arg = (std::numeric_limits<T>::max)();
+   val = tanh(arg);
+   BOOST_CHECK_EQUAL(val, 1);
+   arg = -arg;
+   val = tanh(arg);
+   BOOST_CHECK_EQUAL(val, -1);
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      val = tanh(arg);
+      BOOST_CHECK_EQUAL(val, 1);
+      arg = -arg;
+      val = tanh(arg);
+      BOOST_CHECK_EQUAL(val, -1);
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(tanh(arg));
+      arg = -std::numeric_limits<T>::quiet_NaN();
+      check_invalid(tanh(arg));
+   }
+   // F.9.3.1:
+   arg = 0;
+   val = exp(arg);
+   BOOST_CHECK_EQUAL(val, 1);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = exp(arg);
+      BOOST_CHECK_EQUAL(val, 1);
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      val = exp(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = -arg;
+      val = exp(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val) == 0);
+      arg = (std::numeric_limits<T>::max)();
+      val = exp(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = -arg;
+      val = exp(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val) == 0);
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(exp(arg));
+      arg = -std::numeric_limits<T>::quiet_NaN();
+      check_invalid(exp(arg));
+   }
+   // F.9.3.2:
+   arg = 0;
+   val = exp2(arg);
+   BOOST_CHECK_EQUAL(val, 1);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = exp2(arg);
+      BOOST_CHECK_EQUAL(val, 1);
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      val = exp2(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = -arg;
+      val = exp2(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val) == 0);
+      arg = (std::numeric_limits<T>::max)();
+      val = exp2(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = -arg;
+      val = exp2(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val) == 0);
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(exp2(arg));
+      arg = -std::numeric_limits<T>::quiet_NaN();
+      check_invalid(exp2(arg));
+   }
+   // F.9.3.3:
+   arg = 0;
+   val = expm1(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = expm1(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      val = expm1(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = -arg;
+      val = expm1(arg);
+      BOOST_CHECK_EQUAL(val, -1);
+      arg = (std::numeric_limits<T>::max)();
+      val = expm1(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = -arg;
+      val = expm1(arg);
+      BOOST_CHECK_EQUAL(val, -1);
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(expm1(arg));
+      arg = -std::numeric_limits<T>::quiet_NaN();
+      check_invalid(expm1(arg));
+   }
+   // F.9.3.4:
+   arg = 0;
+   int ival;
+   val = frexp(arg, &ival);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK_EQUAL(ival, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = frexp(arg, &ival);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+      BOOST_CHECK(signbit(val));
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      val = frexp(arg, &ival);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = -arg;
+      val = frexp(arg, &ival);
+      BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      val = frexp(arg, &ival);
+      BOOST_CHECK(isnan(val));
+   }
+   // F.9.3.5:
+   int fp_ilogb0 =
+#ifdef FP_ILOGB0
+      FP_ILOGB0;
+#else
+      INT_MIN;
+#endif
+   int fp_ilogbnan = 
+#ifdef FP_ILOGBNAN
+      FP_ILOGBNAN;
+#else
+      INT_MAX;
+#endif
+
+   arg = 0;
+   ival = ilogb(arg);
+   BOOST_CHECK_EQUAL(ival, fp_ilogb0);
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      ival = ilogb(arg);
+      BOOST_CHECK_EQUAL(ival, INT_MAX);
+      arg = -arg;
+      ival = ilogb(arg);
+      BOOST_CHECK_EQUAL(ival, INT_MAX);
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      ival = ilogb(arg);
+      BOOST_CHECK_EQUAL(ival, fp_ilogbnan);
+   }
+   // F.9.3.7:
+   arg = 1;
+   val = log(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = 0;
+      val = log(arg);
+      BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+      check_erange();
+      arg = -arg;
+      if(signbit(arg))
+      {
+         val = log(arg);
+         BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+         check_erange();
+      }
+      arg = -1;
+      check_invalid(log(arg));
+      arg = -std::numeric_limits<T>::infinity();
+      check_invalid(log(arg));
+      arg = std::numeric_limits<T>::infinity();
+      val = log(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(log(arg));
+      arg = -std::numeric_limits<T>::quiet_NaN();
+      check_invalid(log(arg));
+   }
+   // F.9.3.8:
+   arg = 1;
+   val = log10(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = 0;
+      val = log10(arg);
+      BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+      check_erange();
+      arg = -arg;
+      if(signbit(arg))
+      {
+         val = log10(arg);
+         BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+         check_erange();
+      }
+      arg = -1;
+      check_invalid(log10(arg));
+      arg = -std::numeric_limits<T>::infinity();
+      check_invalid(log10(arg));
+      arg = std::numeric_limits<T>::infinity();
+      val = log10(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(log10(arg));
+      arg = -std::numeric_limits<T>::quiet_NaN();
+      check_invalid(log10(arg));
+   }
+   // F.9.3.9:
+   arg = 0;
+   val = log1p(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = log1p(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = -1;
+      val = log1p(arg);
+      BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+      check_erange();
+      arg = -2;
+      check_invalid(log1p(arg));
+      arg = -std::numeric_limits<T>::infinity();
+      check_invalid(log1p(arg));
+      arg = std::numeric_limits<T>::infinity();
+      val = log1p(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(log1p(arg));
+      arg = -std::numeric_limits<T>::quiet_NaN();
+      check_invalid(log1p(arg));
+   }
+   // F.9.3.10:
+   arg = 1;
+   val = log2(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = 0;
+      val = log2(arg);
+      BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+      check_erange();
+      arg = -arg;
+      if(signbit(arg))
+      {
+         val = log2(arg);
+         BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+         check_erange();
+      }
+      arg = -1;
+      check_invalid(log2(arg));
+      arg = -std::numeric_limits<T>::infinity();
+      check_invalid(log2(arg));
+      arg = std::numeric_limits<T>::infinity();
+      val = log2(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(log2(arg));
+      arg = -std::numeric_limits<T>::quiet_NaN();
+      check_invalid(log2(arg));
+   }
+   // F.9.3.11:
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = 0;
+      val = logb(arg);
+      BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+      check_erange();
+      arg = -arg;
+      if(signbit(arg))
+      {
+         val = logb(arg);
+         BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+         check_erange();
+      }
+      arg = std::numeric_limits<T>::infinity();
+      val = logb(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = -std::numeric_limits<T>::infinity();
+      val = logb(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(logb(arg));
+      arg = -std::numeric_limits<T>::quiet_NaN();
+      check_invalid(logb(arg));
+   }
+   // F.9.3.13:
+   arg = 0;
+   val = scalbn(arg, 2);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = scalbn(arg, 2);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      val = scalbn(arg, -100);
+      BOOST_CHECK_EQUAL(val, arg);
+      arg = -arg;
+      val = scalbn(arg, -100);
+      BOOST_CHECK_EQUAL(val, arg);
+   }
+   // F.9.4.1:
+   arg = 0;
+   val = cbrt(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = cbrt(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      val = cbrt(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = -std::numeric_limits<T>::infinity();
+      val = cbrt(arg);
+      BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(cbrt(arg));
+      arg = -std::numeric_limits<T>::quiet_NaN();
+      check_invalid(cbrt(arg));
+   }
+   // F.9.4.2:
+   arg = 0;
+   val = fabs(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = fabs(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val) == 0);
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      val = fabs(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = -std::numeric_limits<T>::infinity();
+      val = fabs(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+   }
+   // F.9.4.3:
+   arg = 2;
+   arg2 = 0;
+   val = hypot(arg, arg2);
+   BOOST_CHECK_EQUAL(val, arg);
+   arg2 = -arg2;
+   val = hypot(arg, arg2);
+   BOOST_CHECK_EQUAL(val, arg);
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      arg2 = 2;
+      val = hypot(arg, arg2);
+      BOOST_CHECK_EQUAL(val, arg);
+      arg = -arg;
+      val = hypot(arg, arg2);
+      BOOST_CHECK_EQUAL(val, -arg);
+      arg2 = std::numeric_limits<T>::quiet_NaN();
+      val = hypot(arg, arg2);
+      BOOST_CHECK_EQUAL(val, -arg);
+      arg = -arg;
+      val = hypot(arg, arg2);
+      BOOST_CHECK_EQUAL(val, arg);
+   }
+   // F.9.4.4:
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = 0;
+      arg2 = -3;
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      check_erange();
+      arg = -arg;
+      if(signbit(arg))
+      {
+         val = pow(arg, arg2);
+         BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+         check_erange();
+      }
+      arg = 0;
+      arg2 = -2;
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      check_erange();
+      arg = -arg;
+      if(signbit(arg))
+      {
+         val = pow(arg, arg2);
+         BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+         check_erange();
+      }
+      arg = 0;
+      arg2 = 3;
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val) == 0);
+      arg = -arg;
+      if(signbit(arg))
+      {
+         val = pow(arg, arg2);
+         BOOST_CHECK_EQUAL(val, 0);
+         BOOST_CHECK(signbit(val));
+      }
+      arg = 0;
+      arg2 = 2;
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val) == 0);
+      arg = -arg;
+      if(signbit(arg))
+      {
+         val = pow(arg, arg2);
+         BOOST_CHECK_EQUAL(val, 0);
+         BOOST_CHECK(signbit(val));
+      }
+      arg = -1;
+      arg2 = std::numeric_limits<T>::infinity();
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 1);
+      arg2 = -std::numeric_limits<T>::infinity();
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 1);
+      arg = 1;
+      arg2 = 0;
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 1);
+      arg2 = std::numeric_limits<T>::infinity();
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 1);
+      arg2 = -std::numeric_limits<T>::infinity();
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 1);
+      arg2 = std::numeric_limits<T>::quiet_NaN();
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 1);
+      arg = 0;
+      arg2 = 0;
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 1);
+      arg2 = -arg2;
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 1);
+      arg = std::numeric_limits<T>::infinity();
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 1);
+      arg2 = -arg2;
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 1);
+      arg = std::numeric_limits<T>::quiet_NaN();
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 1);
+      arg2 = -arg2;
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 1);
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = -2.5;
+      arg2 = 2.5;
+      check_invalid(pow(arg, arg2));
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = 0.5;
+      arg2 = -std::numeric_limits<T>::infinity();
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = -0.25;
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = 2.5;
+      arg2 = -std::numeric_limits<T>::infinity();
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 0);
+      arg = -arg;
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 0);
+      arg = 2.5;
+      arg2 = std::numeric_limits<T>::infinity();
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = -arg;
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = -std::numeric_limits<T>::infinity();
+      arg2 = -3;
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+      arg2 = -2;
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val) == 0);
+      arg2 = -2.5;
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val) == 0);
+      arg2 = 3;
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+      arg2 = 2;
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg2 = 2.5;
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = -arg; // +INF
+      arg2 = -2;
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val) == 0);
+      arg2 = -3;
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val) == 0);
+      arg2 = -3.5;
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val) == 0);
+      arg2 = 2;
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg2 = 3;
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg2 = 3.5;
+      val = pow(arg, arg2);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+   }
+   // F.9.4.5:
+   arg = 0;
+   val = sqrt(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = sqrt(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      val = sqrt(arg);
+      BOOST_CHECK_EQUAL(val, arg);
+      arg = -arg;
+      check_invalid(sqrt(arg));
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(sqrt(arg));
+   }
+   // F.9.5.1:
+   arg = 0;
+   val = erf(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = erf(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      val = erf(arg);
+      BOOST_CHECK_EQUAL(val, 1);
+      arg = -arg;
+      val = erf(arg);
+      BOOST_CHECK_EQUAL(val, -1);
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(erf(arg));
+   }
+   // F.9.5.2:
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      val = erfc(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val) == 0);
+      arg = -arg;
+      val = erfc(arg);
+      BOOST_CHECK_EQUAL(val, 2);
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(erfc(arg));
+   }
+   // F.9.5.3:
+   arg = 1;
+   val = lgamma(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = 2;
+   val = lgamma(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = 0;
+   val = lgamma(arg);
+   BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+   check_erange();
+   arg = -1;
+   val = lgamma(arg);
+   BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+   check_erange();
+   arg = -2;
+   val = lgamma(arg);
+   BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+   check_erange();
+   arg = -std::numeric_limits<T>::infinity();
+   val = lgamma(arg);
+   BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+   arg = std::numeric_limits<T>::infinity();
+   val = lgamma(arg);
+   BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(lgamma(arg));
+   }
+   // F.9.5.4:
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = 0;
+      val = tgamma(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      check_erange();
+      arg = -arg;
+      if(signbit(arg))
+      {
+         val = tgamma(arg);
+         BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+         check_erange();
+      }
+      arg = -1;
+      check_invalid(tgamma(arg));
+      arg = -std::numeric_limits<T>::infinity();
+      check_invalid(tgamma(arg));
+      arg = std::numeric_limits<T>::infinity();
+      val = tgamma(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(tgamma(arg));
+   }
+   // F.9.6.1:
+   arg = 0;
+   val = ceil(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = ceil(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      val = ceil(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = -arg;
+      val = ceil(arg);
+      BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(ceil(arg));
+   }
+   // F.9.6.2:
+   arg = 0;
+   val = floor(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = floor(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      val = floor(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = -arg;
+      val = floor(arg);
+      BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(floor(arg));
+   }
+   // F.9.6.3:
+   arg = 0;
+   val = nearbyint(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = nearbyint(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      val = nearbyint(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = -arg;
+      val = nearbyint(arg);
+      BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(nearbyint(arg));
+   }
+   // F.9.6.4:
+   arg = 0;
+   val = rint(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = rint(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      val = rint(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = -arg;
+      val = rint(arg);
+      BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(rint(arg));
+   }
+   // F.9.6.6:
+   arg = 0;
+   val = round(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = round(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      val = round(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = -arg;
+      val = round(arg);
+      BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(round(arg));
+   }
+   // F.9.6.8:
+   arg = 0;
+   val = trunc(arg);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = trunc(arg);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      val = trunc(arg);
+      BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+      arg = -arg;
+      val = trunc(arg);
+      BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      check_invalid(trunc(arg));
+   }
+   // F.9.7.1:
+   arg = 0;
+   arg2 = 2;
+   val = fmod(arg, arg2);
+   BOOST_CHECK_EQUAL(val, 0);
+   BOOST_CHECK(signbit(val) == 0);
+   arg = -arg;
+   if(signbit(arg))
+   {
+      val = fmod(arg, arg2);
+      BOOST_CHECK_EQUAL(val, 0);
+      BOOST_CHECK(signbit(val));
+   }
+   if(std::numeric_limits<T>::has_infinity)
+   {
+      arg = std::numeric_limits<T>::infinity();
+      check_invalid(fmod(arg, arg2));
+      arg = -arg;
+      check_invalid(fmod(arg, arg2));
+      arg = 2;
+      arg2 = 0;
+      check_invalid(fmod(arg, arg2));
+      check_invalid(fmod(arg, -arg2));
+   }
+   if(std::numeric_limits<T>::has_quiet_NaN)
+   {
+      arg = std::numeric_limits<T>::quiet_NaN();
+      arg2 = 2;
+      check_invalid(fmod(arg, arg2));
+      swap(arg, arg2);
+      check_invalid(fmod(arg, arg2));
+      check_invalid(fmod(arg2, arg2));
+   }
+}
+
 int main()
 {
    test_poison<float>();
@@ -617,6 +2025,8 @@ int main()
 #ifdef TEST_CPP_BIN_FLOAT
    test<boost::multiprecision::cpp_bin_float_50>();
    test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<100>, boost::multiprecision::et_on> >();
+   test_c99_appendix_F<boost::multiprecision::cpp_bin_float_50>();
+   test_c99_appendix_F<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<100>, boost::multiprecision::et_on> >();
 #endif
 #ifdef TEST_FLOAT128
    test<boost::multiprecision::float128>();

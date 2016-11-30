@@ -983,6 +983,25 @@ inline void eval_fmod(T& result, const T& a, const T& b)
       result = temp;
       return;
    }
+   switch(eval_fpclassify(a))
+   {
+   case FP_ZERO:
+      result = a;
+      return;
+   case FP_INFINITE:
+   case FP_NAN:
+      result = std::numeric_limits<number<T> >::quiet_NaN().backend();
+      errno = EDOM;
+      return;
+   }
+   switch(eval_fpclassify(b))
+   {
+   case FP_ZERO:
+   case FP_NAN:
+      result = std::numeric_limits<number<T> >::quiet_NaN().backend();
+      errno = EDOM;
+      return;
+   }
    T n;
    eval_divide(result, a, b);
    if(eval_get_sign(result) < 0)
@@ -1162,10 +1181,14 @@ template <class T>
 inline void eval_trunc(T& result, const T& a)
 {
    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The trunc function is only valid for floating point types.");
-   int c = eval_fpclassify(a);
-   if(c == (int)FP_NAN || c == (int)FP_INFINITE)
+   switch(eval_fpclassify(a))
    {
-      result = boost::math::policies::raise_rounding_error("boost::multiprecision::trunc<%1%>(%1%)", 0, number<T>(a), number<T>(a), boost::math::policies::policy<>()).backend();
+   case FP_NAN:
+      errno = EDOM;
+      // fallthrough...
+   case FP_ZERO:
+   case FP_INFINITE:
+      result = a;
       return;
    }
    if(eval_get_sign(a) < 0)
@@ -1212,12 +1235,17 @@ inline void eval_round(T& result, const T& a)
    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The round function is only valid for floating point types.");
    typedef typename boost::multiprecision::detail::canonical<float, T>::type fp_type;
    int c = eval_fpclassify(a);
-   if((c == (int)FP_NAN) || (c == (int)FP_INFINITE))
+   if(c == (int)FP_NAN)
    {
-      result = boost::math::policies::raise_rounding_error("boost::multiprecision::round<%1%>(%1%)", 0, number<T>(a), number<T>(a), boost::math::policies::policy<>()).backend();
+      result = a;
+      errno = EDOM;
       return;
    }
-   if(eval_get_sign(a) < 0)
+   if((c == FP_ZERO) || (c == (int)FP_INFINITE))
+   {
+      result = a;
+   }
+   else if(eval_get_sign(a) < 0)
    {
       eval_subtract(result, a, fp_type(0.5f));
       eval_ceil(result, result);
@@ -1450,19 +1478,48 @@ inline typename B::exponent_type eval_ilogb(const B& val)
    switch(eval_fpclassify(val))
    {
    case FP_NAN:
-      return (std::numeric_limits<typename B::exponent_type>::min)();
+#ifdef FP_ILOGBNAN
+      return FP_ILOGBNAN;
+#else
+      return (std::numeric_limits<typename B::exponent_type>::max)();
+#endif
    case FP_INFINITE:
       return (std::numeric_limits<typename B::exponent_type>::max)();
    case FP_ZERO:
+#ifdef FP_ILOGB0
+      return FP_ILOGB0;
+#else
       return (std::numeric_limits<typename B::exponent_type>::min)();
+#endif
    }
    B result;
    eval_frexp(result, val, &e);
    return e - 1;
 }
+
+template <class T>
+int eval_signbit(const T& val);
+
 template <class B>
 inline void eval_logb(B& result, const B& val)
 {
+   switch(eval_fpclassify(val))
+   {
+   case FP_NAN:
+      result = val;
+      errno = EDOM;
+      return;
+   case FP_ZERO:
+      result = std::numeric_limits<number<B> >::infinity().backend();
+      result.negate();
+      errno = ERANGE;
+      return;
+   case FP_INFINITE:
+      result = val;
+      if(eval_signbit(val))
+         result.negate();
+      return;
+   }
    typedef typename boost::mpl::if_c<boost::is_same<boost::intmax_t, long>::value, boost::long_long_type, boost::intmax_t>::type max_t;
    result = static_cast<max_t>(eval_ilogb(val));
 }
@@ -1600,6 +1657,12 @@ inline void eval_rint(R& result, const T& a)
    eval_nearbyint(result, a);
 }
 
+template <class T>
+inline int eval_signbit(const T& val)
+{
+   return eval_get_sign(val) < 0 ? 1 : 0;
+}
+
 //
 // These functions are implemented in separate files, but expanded inline here,
 // DO NOT CHANGE THE ORDER OF THESE INCLUDES:
@@ -1689,7 +1752,8 @@ inline int sign BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::e
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
 inline int signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
 {
-   return arg.sign() < 0;
+   using default_ops::eval_signbit;
+   return eval_signbit(arg.backend());
 }
 template <class tag, class A1, class A2, class A3, class A4>
 inline int signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
@@ -1839,7 +1903,14 @@ namespace multiprecision{
    template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
    inline multiprecision::number<Backend, ExpressionTemplates> lgamma BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
    {
-      return boost::math::lgamma(arg, c99_error_policy());
+      multiprecision::number<Backend, ExpressionTemplates> result;
+      result = boost::math::lgamma(arg, c99_error_policy());
+      if((boost::multiprecision::isnan)(result) && !(boost::multiprecision::isnan)(arg))
+      {
+         result = std::numeric_limits<multiprecision::number<Backend, ExpressionTemplates> >::infinity();
+         errno = ERANGE;
+      }
+      return result;
    }
    template <class tag, class A1, class A2, class A3, class A4>
    inline typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type lgamma BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
@@ -1850,6 +1921,11 @@ namespace multiprecision{
    template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
    inline multiprecision::number<Backend, ExpressionTemplates> tgamma BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
    {
+      if((arg == 0) && std::numeric_limits<multiprecision::number<Backend, ExpressionTemplates> >::has_infinity)
+      {
+         errno = ERANGE;
+         return 1 / arg;
+      }
       return boost::math::tgamma(arg, c99_error_policy());
    }
    template <class tag, class A1, class A2, class A3, class A4>

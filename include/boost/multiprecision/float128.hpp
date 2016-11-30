@@ -399,15 +399,6 @@ inline void eval_fabs(float128_backend& result, const float128_backend& arg)
 
 inline void eval_trunc(float128_backend& result, const float128_backend& arg)
 {
-   if(isnanq(arg.value()) || isinfq(arg.value()))
-   {
-      result = boost::math::policies::raise_rounding_error(
-            "boost::multiprecision::trunc<%1%>(%1%)", 0, 
-            number<float128_backend, et_off>(arg), 
-            number<float128_backend, et_off>(arg), 
-            boost::math::policies::policy<>()).backend();
-      return;
-   }
    result.value() = truncq(arg.value());
 }
 /*
@@ -494,6 +485,11 @@ inline void eval_multiply_add(float128_backend& result, const float128_backend& 
    result.value() = fmaq(a.value(), b.value(), c.value());
 }
 
+inline int eval_signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const float128_backend& arg)
+{
+   return ::signbitq(arg.value());
+}
+
 inline std::size_t hash_value(const float128_backend& val)
 {
    return  boost::hash_value(static_cast<double>(val.value()));
@@ -550,12 +546,6 @@ inline std::size_t hash_value(const float128_backend& val)
    inline boost::multiprecision::number<float128_backend, ExpressionTemplates> log1p BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
    {
       return log1pq(arg.backend().value());
-   }
-
-   template <multiprecision::expression_template_option ExpressionTemplates>
-   inline int signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates>& arg)
-   {
-      return ::signbitq(arg.backend().value());
    }
 
    template <multiprecision::expression_template_option ExpressionTemplates>

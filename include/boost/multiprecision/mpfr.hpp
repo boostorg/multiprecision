@@ -1286,11 +1286,6 @@ inline void eval_floor(mpfr_float_backend<Digits10, AllocateType>& result, const
 template <unsigned Digits10, mpfr_allocation_type AllocateType>
 inline void eval_trunc(mpfr_float_backend<Digits10, AllocateType>& result, const mpfr_float_backend<Digits10, AllocateType>& val)
 {
-   if(0 == mpfr_number_p(val.data()))
-   {
-      result = boost::math::policies::raise_rounding_error("boost::multiprecision::trunc<%1%>(%1%)", 0, number<mpfr_float_backend<Digits10, AllocateType> >(val), number<mpfr_float_backend<Digits10, AllocateType> >(val), boost::math::policies::policy<>()).backend();
-      return;
-   }
    mpfr_trunc(result.data(), val.data());
 }
 template <unsigned Digits10, mpfr_allocation_type AllocateType>
@@ -1505,6 +1500,12 @@ inline void eval_multiply_subtract(mpfr_float_backend<Digits10, AllocateType>& r
 }
 
 template <unsigned Digits10, mpfr_allocation_type AllocateType>
+inline int eval_signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const mpfr_float_backend<Digits10, AllocateType>& arg)
+{
+   return (arg.data()[0]._mpfr_sign < 0) ? 1 : 0;
+}
+
+template <unsigned Digits10, mpfr_allocation_type AllocateType>
 inline std::size_t hash_value(const mpfr_float_backend<Digits10, AllocateType>& val)
 {
    std::size_t result = 0;
@@ -1546,21 +1547,9 @@ typedef number<mpfr_float_backend<50, allocate_stack> >    static_mpfr_float_50;
 typedef number<mpfr_float_backend<100, allocate_stack> >   static_mpfr_float_100;
 
 template<unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
-inline int signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>& arg)
-{
-   return (arg.backend().data()[0]._mpfr_sign < 0) ? 1 : 0;
-}
-
-template<unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
 inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> copysign BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>& a, const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>& b)
 {
    return (boost::multiprecision::signbit)(a) != (boost::multiprecision::signbit)(b) ? boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>(-a) : a;
-}
-
-template<unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
-inline int signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType> >, ExpressionTemplates>& arg)
-{
-   return (arg.backend().value().data()[0]._mpfr_sign < 0) ? 1 : 0;
 }
 
 template<unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
