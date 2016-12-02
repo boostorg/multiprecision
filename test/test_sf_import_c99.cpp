@@ -586,6 +586,25 @@ void test_poison()
 }
 
 template <class T>
+bool type_sets_errno(const T&)
+{
+   return true;
+}
+#ifdef TEST_MPFR_50
+template<unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
+bool type_sets_errno(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> &)
+{
+   return false;
+}
+#endif
+#ifdef TEST_FLOAT128
+bool type_sets_errno(const boost::multiprecision::float128 &)
+{
+   return false;
+}
+#endif
+
+template <class T>
 typename boost::enable_if_c<std::numeric_limits<T>::is_specialized>::type check_invalid(const T& val)
 {
    if(std::numeric_limits<T>::has_quiet_NaN)
@@ -596,7 +615,8 @@ typename boost::enable_if_c<std::numeric_limits<T>::is_specialized>::type check_
    {
       BOOST_CHECK_EQUAL(val, 0);
    }
-   BOOST_CHECK_EQUAL(errno, EDOM);
+   if(type_sets_errno(val))
+      BOOST_CHECK_EQUAL(errno, EDOM);
    errno = 0;
 }
 
@@ -606,9 +626,11 @@ typename boost::disable_if_c<std::numeric_limits<T>::is_specialized>::type check
    check_invalid(static_cast<typename T::result_type>(val));
 }
 
-void check_erange()
+template <class T>
+void check_erange(const T& val)
 {
-   BOOST_CHECK_EQUAL(errno, ERANGE);
+   if(type_sets_errno(val))
+      BOOST_CHECK_EQUAL(errno, ERANGE);
    errno = 0;
 }
 
@@ -620,6 +642,7 @@ void test_c99_appendix_F()
    // special cases, infinities and NaN's.
    //
    errno = 0;
+   T tol = std::numeric_limits<T>::epsilon();
    // F.9.1.1:
    T arg = 1;
    T val = acos(arg);
@@ -783,9 +806,12 @@ void test_c99_appendix_F()
       BOOST_CHECK_EQUAL(val, 0);
       BOOST_CHECK(signbit(val) == 0);
       arg = -arg;
-      val = atan2(arg, arg2);
-      BOOST_CHECK_EQUAL(val, 0);
-      BOOST_CHECK(signbit(val));
+      if(signbit(-T(0)))
+      {
+         val = atan2(arg, arg2);
+         BOOST_CHECK_EQUAL(val, 0);
+         BOOST_CHECK(signbit(val));
+      }
       arg = std::numeric_limits<T>::infinity();
       arg2 = 2;
       val = atan2(arg, arg2);
@@ -803,17 +829,17 @@ void test_c99_appendix_F()
       arg = std::numeric_limits<T>::infinity();
       arg2 = -std::numeric_limits<T>::infinity();
       val = atan2(arg, arg2);
-      BOOST_CHECK_EQUAL(val, boost::math::constants::three_quarters_pi<T>());
+      BOOST_CHECK_CLOSE_FRACTION(val, boost::math::constants::three_quarters_pi<T>(), tol);
       arg = -arg;
       val = atan2(arg, arg2);
-      BOOST_CHECK_EQUAL(val, -boost::math::constants::three_quarters_pi<T>());
+      BOOST_CHECK_CLOSE_FRACTION(val, -boost::math::constants::three_quarters_pi<T>(), tol);
       arg = std::numeric_limits<T>::infinity();
       arg2 = std::numeric_limits<T>::infinity();
       val = atan2(arg, arg2);
-      BOOST_CHECK_EQUAL(val, ldexp(boost::math::constants::pi<T>(), -2));
+      BOOST_CHECK_CLOSE_FRACTION(val, ldexp(boost::math::constants::pi<T>(), -2), tol);
       arg = -arg;
       val = atan2(arg, arg2);
-      BOOST_CHECK_EQUAL(val, -ldexp(boost::math::constants::pi<T>(), -2));
+      BOOST_CHECK_CLOSE_FRACTION(val, -ldexp(boost::math::constants::pi<T>(), -2), tol);
       if(std::numeric_limits<T>::has_quiet_NaN)
       {
          arg = std::numeric_limits<T>::quiet_NaN();
@@ -972,12 +998,12 @@ void test_c99_appendix_F()
       val = atanh(arg);
       BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
       BOOST_CHECK(signbit(val) == 0);
-      check_erange();
+      check_erange(val);
       arg = -arg;
       val = atanh(arg);
       BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
       BOOST_CHECK(signbit(val));
-      check_erange();
+      check_erange(val);
 
       arg = std::numeric_limits<T>::infinity();
       check_invalid(atanh(arg));
@@ -1265,13 +1291,13 @@ void test_c99_appendix_F()
       arg = 0;
       val = log(arg);
       BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
-      check_erange();
+      check_erange(val);
       arg = -arg;
       if(signbit(arg))
       {
          val = log(arg);
          BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
-         check_erange();
+         check_erange(val);
       }
       arg = -1;
       check_invalid(log(arg));
@@ -1298,13 +1324,13 @@ void test_c99_appendix_F()
       arg = 0;
       val = log10(arg);
       BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
-      check_erange();
+      check_erange(val);
       arg = -arg;
       if(signbit(arg))
       {
          val = log10(arg);
          BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
-         check_erange();
+         check_erange(val);
       }
       arg = -1;
       check_invalid(log10(arg));
@@ -1338,7 +1364,7 @@ void test_c99_appendix_F()
       arg = -1;
       val = log1p(arg);
       BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
-      check_erange();
+      check_erange(val);
       arg = -2;
       check_invalid(log1p(arg));
       arg = -std::numeric_limits<T>::infinity();
@@ -1364,13 +1390,13 @@ void test_c99_appendix_F()
       arg = 0;
       val = log2(arg);
       BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
-      check_erange();
+      check_erange(val);
       arg = -arg;
       if(signbit(arg))
       {
          val = log2(arg);
          BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
-         check_erange();
+         check_erange(val);
       }
       arg = -1;
       check_invalid(log2(arg));
@@ -1393,13 +1419,13 @@ void test_c99_appendix_F()
       arg = 0;
       val = logb(arg);
       BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
-      check_erange();
+      check_erange(val);
       arg = -arg;
       if(signbit(arg))
       {
          val = logb(arg);
          BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
-         check_erange();
+         check_erange(val);
       }
       arg = std::numeric_limits<T>::infinity();
       val = logb(arg);
@@ -1516,25 +1542,25 @@ void test_c99_appendix_F()
       arg2 = -3;
       val = pow(arg, arg2);
       BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
-      check_erange();
+      check_erange(val);
       arg = -arg;
       if(signbit(arg))
       {
          val = pow(arg, arg2);
          BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
-         check_erange();
+         check_erange(val);
       }
       arg = 0;
       arg2 = -2;
       val = pow(arg, arg2);
       BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
-      check_erange();
+      check_erange(val);
       arg = -arg;
       if(signbit(arg))
       {
          val = pow(arg, arg2);
          BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
-         check_erange();
+         check_erange(val);
       }
       arg = 0;
       arg2 = 3;
@@ -1558,7 +1584,7 @@ void test_c99_appendix_F()
       {
          val = pow(arg, arg2);
          BOOST_CHECK_EQUAL(val, 0);
-         BOOST_CHECK(signbit(val));
+         BOOST_CHECK(signbit(val) == 0);
       }
       arg = -1;
       arg2 = std::numeric_limits<T>::infinity();
@@ -1633,7 +1659,8 @@ void test_c99_appendix_F()
       arg2 = -3;
       val = pow(arg, arg2);
       BOOST_CHECK_EQUAL(val, 0);
-      BOOST_CHECK(signbit(val));
+      if(signbit(-T(0)))
+         BOOST_CHECK(signbit(val));
       arg2 = -2;
       val = pow(arg, arg2);
       BOOST_CHECK_EQUAL(val, 0);
@@ -1753,15 +1780,15 @@ void test_c99_appendix_F()
    arg = 0;
    val = lgamma(arg);
    BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
-   check_erange();
+   check_erange(val);
    arg = -1;
    val = lgamma(arg);
    BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
-   check_erange();
+   check_erange(val);
    arg = -2;
    val = lgamma(arg);
    BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
-   check_erange();
+   check_erange(val);
    arg = -std::numeric_limits<T>::infinity();
    val = lgamma(arg);
    BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
@@ -1779,13 +1806,13 @@ void test_c99_appendix_F()
       arg = 0;
       val = tgamma(arg);
       BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
-      check_erange();
+      check_erange(val);
       arg = -arg;
       if(signbit(arg))
       {
          val = tgamma(arg);
          BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
-         check_erange();
+         check_erange(val);
       }
       arg = -1;
       check_invalid(tgamma(arg));
@@ -2002,6 +2029,7 @@ int main()
 #ifdef TEST_MPFR_50
    test<boost::multiprecision::mpfr_float_50>();
    test<boost::multiprecision::mpfr_float_100>();
+   test_c99_appendix_F<boost::multiprecision::mpfr_float_50>();
 #endif
 #ifdef TEST_MPFI_50
    test<boost::multiprecision::mpfi_float_50>();
@@ -2010,6 +2038,7 @@ int main()
 #ifdef TEST_CPP_DEC_FLOAT
    test<boost::multiprecision::cpp_dec_float_50>();
    test<boost::multiprecision::cpp_dec_float_100>();
+   test_c99_appendix_F<boost::multiprecision::cpp_dec_float_50>();
 #ifndef SLOW_COMPLER
    // Some "peculiar" digit counts which stress our code:
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<65> > >();
@@ -2030,6 +2059,7 @@ int main()
 #endif
 #ifdef TEST_FLOAT128
    test<boost::multiprecision::float128>();
+   test_c99_appendix_F<boost::multiprecision::float128>();
 #endif
 
    return boost::report_errors();

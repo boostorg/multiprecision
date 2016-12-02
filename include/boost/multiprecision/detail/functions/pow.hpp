@@ -213,7 +213,6 @@ void eval_exp(T& result, const T& x)
    }
    else if(type == (int)FP_INFINITE)
    {
-      result = x;
       if(isneg)
          result = ui_type(0u);
       else 
@@ -276,6 +275,17 @@ void eval_exp(T& result, const T& x)
    if(x.compare(ll) == 0)
    {
       detail::pow_imp(result, get_constant_e<T>(), ll, mpl::true_());
+      return;
+   }
+   else if(exp_series.compare(x) == 0)
+   {
+      // We have a value that has no fractional part, but is too large to fit 
+      // in a long long, in this situation the code below will fail, so
+      // we're just going to assume that this will overflow:
+      if(isneg)
+         result = ui_type(0);
+      else
+         result = std::numeric_limits<number<T> >::has_infinity ? std::numeric_limits<number<T> >::infinity().backend() : (std::numeric_limits<number<T> >::max)().backend();
       return;
    }
 
@@ -482,12 +492,29 @@ inline void eval_pow(T& result, const T& x, const T& a)
          {
             boost::intmax_t i;
             eval_convert_to(&i, a);
-            if((a.compare(i) == 0) && (i & 1) && eval_signbit(a))
+            if(a.compare(i) == 0)
             {
-               result = std::numeric_limits<number<T> >::infinity().backend();
-               if(eval_signbit(x))
-                  result.negate();
-               errno = ERANGE;
+               if(eval_signbit(a))
+               {
+                  if(i & 1)
+                  {
+                     result = std::numeric_limits<number<T> >::infinity().backend();
+                     if(eval_signbit(x))
+                        result.negate();
+                     errno = ERANGE;
+                  }
+                  else
+                  {
+                     result = std::numeric_limits<number<T> >::infinity().backend();
+                     errno = ERANGE;
+                  }
+               }
+               else if(i & 1)
+               {
+                  result = x;
+               }
+               else
+                  result = si_type(0);
                return;
             }
          }
@@ -792,6 +819,8 @@ namespace detail{
          T e_px, e_mx;
          eval_exp(e_px, x);
          eval_divide(e_mx, ui_type(1), e_px);
+         if(eval_signbit(e_mx) != eval_signbit(e_px))
+            e_mx.negate();  // Handles lack of signed zero in some types
 
          if(p_sinh) 
          { 

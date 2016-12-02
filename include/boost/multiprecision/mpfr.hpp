@@ -1322,7 +1322,12 @@ inline int eval_fpclassify(const mpfr_float_backend<Digits10, AllocateType>& val
 template <unsigned Digits10, mpfr_allocation_type AllocateType>
 inline void eval_pow(mpfr_float_backend<Digits10, AllocateType>& result, const mpfr_float_backend<Digits10, AllocateType>& b, const mpfr_float_backend<Digits10, AllocateType>& e)
 {
-   mpfr_pow(result.data(), b.data(), e.data(), GMP_RNDN);
+   if(mpfr_zero_p(b.data()) && mpfr_integer_p(e.data()) && (mpfr_signbit(e.data()) == 0) && mpfr_fits_ulong_p(e.data(), GMP_RNDN) && (mpfr_get_ui(e.data(), GMP_RNDN) & 1))
+   {
+      mpfr_set(result.data(), b.data(), GMP_RNDN);
+   }
+   else
+      mpfr_pow(result.data(), b.data(), e.data(), GMP_RNDN);
 }
 
 #ifdef BOOST_MSVC
