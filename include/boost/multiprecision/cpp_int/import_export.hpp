@@ -199,8 +199,8 @@ namespace boost {
          template <class Backend>
          inline boost::uintmax_t extract_bits(const Backend& val, unsigned location, unsigned count, const mpl::true_&)
          {
-            boost::uintmax_t result = *val.limbs();
-            boost::uintmax_t mask = count == std::numeric_limits<boost::uintmax_t>::digits ? ~static_cast<boost::uintmax_t>(0) : (static_cast<boost::uintmax_t>(1u) << count) - 1;
+            typename Backend::local_limb_type result = *val.limbs();
+            typename Backend::local_limb_type mask = count >= std::numeric_limits<typename Backend::local_limb_type>::digits ? ~static_cast<typename Backend::local_limb_type>(0) : (static_cast<typename Backend::local_limb_type>(1u) << count) - 1;
             return (result >> location) & mask;
          }
 
