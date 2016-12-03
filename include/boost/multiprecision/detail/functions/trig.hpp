@@ -527,10 +527,8 @@ void eval_asin(T& result, const T& x)
       eval_divide(sine, cosine);
       eval_subtract(result, sine);
       current_precision = eval_ilogb(sine);
-#ifdef FP_ILOGB0
-      if(current_precision == FP_ILOGB0)
+      if(current_precision <= (std::numeric_limits<typename T::exponent_type>::min)() + 1)
          break;
-#endif
    }
    if(b_neg)
       result.negate();
@@ -681,10 +679,8 @@ void eval_atan(T& result, const T& x)
       eval_multiply(s, t, c);
       eval_add(result, s);
       current_precision = eval_ilogb(s);
-#ifdef FP_ILOGB0
-      if(current_precision == FP_ILOGB0)
+      if(current_precision <= (std::numeric_limits<typename T::exponent_type>::min)() + 1)
          break;
-#endif
    }
    if(b_neg)
       result.negate();

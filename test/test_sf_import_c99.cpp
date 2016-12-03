@@ -1250,12 +1250,7 @@ void test_c99_appendix_F()
       BOOST_CHECK(isnan(val));
    }
    // F.9.3.5:
-   int fp_ilogb0 =
-#ifdef FP_ILOGB0
-      FP_ILOGB0;
-#else
-      INT_MIN;
-#endif
+   int fp_ilogb0 = (std::numeric_limits<typename T::backend_type::exponent_type>::min)();
    int fp_ilogbnan = 
 #ifdef FP_ILOGBNAN
       FP_ILOGBNAN;

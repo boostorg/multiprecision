@@ -2876,11 +2876,7 @@ template <unsigned Digits10, class ExponentType, class Allocator>
 inline ExponentType eval_ilogb(const cpp_dec_float<Digits10, ExponentType, Allocator>& val)
 {
    if(val.iszero())
-#ifdef FP_ILOGB0
-      return  FP_ILOGB0;
-#else
-      return INT_MIN;
-#endif
+      return (std::numeric_limits<ExponentType>::min)();
    if((val.isinf)())
       return INT_MAX;
    if((val.isnan)())

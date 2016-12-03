@@ -1486,11 +1486,7 @@ inline typename B::exponent_type eval_ilogb(const B& val)
    case FP_INFINITE:
       return (std::numeric_limits<typename B::exponent_type>::max)();
    case FP_ZERO:
-#ifdef FP_ILOGB0
-      return FP_ILOGB0;
-#else
       return (std::numeric_limits<typename B::exponent_type>::min)();
-#endif
    }
    B result;
    eval_frexp(result, val, &e);
