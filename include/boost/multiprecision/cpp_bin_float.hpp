@@ -21,6 +21,10 @@
 #include <boost/math/special_functions/expm1.hpp>
 #include <boost/math/special_functions/gamma.hpp>
 
+#ifdef BOOST_HAS_FLOAT128
+#include <quadmath.h>
+#endif
+
 namespace boost{ namespace multiprecision{ namespace backends{
 
 enum digit_base_type
@@ -162,6 +166,64 @@ public:
    {
       return assign_float(f);
    }
+
+#ifdef BOOST_HAS_FLOAT128
+   cpp_bin_float& operator=(__float128 f)
+   {
+      using default_ops::eval_add;
+      typedef typename boost::multiprecision::detail::canonical<int, cpp_bin_float>::type bf_int_type;
+
+      if(f == 0)
+      {
+         m_data = limb_type(0);
+         m_sign = (signbitq(f) > 0);
+         m_exponent = exponent_zero;
+         return *this;
+      }
+      else if(isnanq(f))
+      {
+         m_data = limb_type(0);
+         m_sign = false;
+         m_exponent = exponent_nan;
+         return *this;
+      }
+      else if(isinfq(f))
+      {
+         m_data = limb_type(0);
+         m_sign = (f < 0);
+         m_exponent = exponent_infinity;
+         return *this;
+      }
+      if(f < 0)
+      {
+         *this = -f;
+         this->negate();
+         return *this;
+      }
+
+      typedef typename mpl::front<unsigned_types>::type ui_type;
+      m_data = static_cast<ui_type>(0u);
+      m_sign = false;
+      m_exponent = 0;
+
+      static const int bits = sizeof(int) * CHAR_BIT - 1;
+      int e;
+      f = frexpq(f, &e);
+      while(f)
+      {
+         f = ldexpq(f, bits);
+         e -= bits;
+         int ipart = (int)truncq(f);
+         f -= ipart;
+         m_exponent += bits;
+         cpp_bin_float t;
+         t = static_cast<bf_int_type>(ipart);
+         eval_add(*this, t);
+      }
+      m_exponent += static_cast<Exponent>(e);
+      return *this;
+   }
+#endif
 
    template <class Float>
    typename boost::enable_if_c<is_floating_point<Float>::value, cpp_bin_float&>::type assign_float(Float f)
