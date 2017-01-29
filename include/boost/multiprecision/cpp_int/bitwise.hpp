@@ -411,14 +411,14 @@ inline void left_shift_generic(Int& result, double_limb_type s)
          ++i;
       }
    }
-   for(; ors > 1 + i; ++i)
+   for(; rs - i >= 2 + offset; ++i)
    {
-      pr[rs - 1 - i] = pr[ors - 1 - i] << shift;
-      pr[rs - 1 - i] |= pr[ors - 2 - i] >> (Int::limb_bits - shift);
+      pr[rs - 1 - i] = pr[rs - 1 - i - offset] << shift;
+      pr[rs - 1 - i] |= pr[rs - 2 - i - offset] >> (Int::limb_bits - shift);
    }
-   if(ors >= 1 + i)
+   if(rs - i >= 1 + offset)
    {
-      pr[rs - 1 - i] = pr[ors - 1 - i] << shift;
+      pr[rs - 1 - i] = pr[rs - 1 - i - offset] << shift;
       ++i;
    }
    for(; i < rs; ++i)

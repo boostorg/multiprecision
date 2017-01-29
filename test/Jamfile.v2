@@ -605,6 +605,14 @@ run test_int_io.cpp no_eh_support
          release # Otherwise runtime is slow
         : test_int_io_cpp_int ;
 
+run test_cpp_int_left_shift.cpp gmp no_eh_support
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+         release  # otherwise runtime is too slow!!
+         ;
+
 run test_cpp_int.cpp gmp no_eh_support
         : # command line
         : # input files
