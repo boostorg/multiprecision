@@ -490,7 +490,7 @@ inline void eval_pow(T& result, const T& x, const T& a)
          // Need to check for a an odd integer as a special case:
          try 
          {
-            boost::intmax_t i;
+            typename boost::multiprecision::detail::canonical<boost::intmax_t, T>::type i;
             eval_convert_to(&i, a);
             if(a.compare(i) == 0)
             {

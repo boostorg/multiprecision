@@ -75,7 +75,7 @@ void test_value(const T& val)
 
 void test(const boost::mpl::int_<200>&) {}
 
-template <unsigned N>
+template <int N>
 void test(boost::mpl::int_<N> const&)
 {
    test(boost::mpl::int_<N + 4>());
