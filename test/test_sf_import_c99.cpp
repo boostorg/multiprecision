@@ -1790,10 +1790,10 @@ void test_c99_appendix_F()
    val = lgamma(arg);
    BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
    check_erange(val);
-#endif
    arg = -std::numeric_limits<T>::infinity();
    val = lgamma(arg);
    BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
+#endif
    arg = std::numeric_limits<T>::infinity();
    val = lgamma(arg);
    BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
