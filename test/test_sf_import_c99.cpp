@@ -1260,22 +1260,22 @@ void test_c99_appendix_F()
 #endif
 
    arg = 0;
-   ival = ilogb(arg);
-   BOOST_CHECK_EQUAL(ival, fp_ilogb0);
+   eval = ilogb(arg);
+   BOOST_CHECK_EQUAL(eval, fp_ilogb0);
    if(std::numeric_limits<T>::has_infinity)
    {
       arg = std::numeric_limits<T>::infinity();
       eval = ilogb(arg);
-      BOOST_CHECK_EQUAL(ival, (std::numeric_limits<typename T::backend_type::exponent_type>::max)());
+      BOOST_CHECK_EQUAL(eval, (std::numeric_limits<typename T::backend_type::exponent_type>::max)());
       arg = -arg;
       eval = ilogb(arg);
-      BOOST_CHECK_EQUAL(ival, (std::numeric_limits<typename T::backend_type::exponent_type>::max)());
+      BOOST_CHECK_EQUAL(eval, (std::numeric_limits<typename T::backend_type::exponent_type>::max)());
    }
    if(std::numeric_limits<T>::has_quiet_NaN)
    {
       arg = std::numeric_limits<T>::quiet_NaN();
-      ival = ilogb(arg);
-      BOOST_CHECK_EQUAL(ival, fp_ilogbnan);
+      eval = ilogb(arg);
+      BOOST_CHECK_EQUAL(eval, fp_ilogbnan);
    }
    // F.9.3.7:
    arg = 1;
