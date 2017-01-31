@@ -74,6 +74,10 @@
 #undef isnormal
 #endif
 
+#ifdef MPFR_VERSION_MAJOR
+#define BOOST_MPFR_VERSION MPFR_VERSION_MAJOR * 10000 + MPFR_VERSION_MINOR * 100 + MPFR_VERSION_PATCHLEVEL
+#endif
+
 template <class T, class U>
 void test_less(T a, U b)
 {
@@ -1773,6 +1777,7 @@ void test_c99_appendix_F()
    val = lgamma(arg);
    BOOST_CHECK_EQUAL(val, 0);
    BOOST_CHECK(signbit(val) == 0);
+#if !defined(BOOST_MPFR_VERSION) || (BOOST_MPFR_VERSION > 30103)
    arg = 0;
    val = lgamma(arg);
    BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
@@ -1785,6 +1790,7 @@ void test_c99_appendix_F()
    val = lgamma(arg);
    BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
    check_erange(val);
+#endif
    arg = -std::numeric_limits<T>::infinity();
    val = lgamma(arg);
    BOOST_CHECK_EQUAL(val, std::numeric_limits<T>::infinity());
