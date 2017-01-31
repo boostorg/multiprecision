@@ -1250,8 +1250,9 @@ void test_c99_appendix_F()
       BOOST_CHECK(isnan(val));
    }
    // F.9.3.5:
-   int fp_ilogb0 = (std::numeric_limits<typename T::backend_type::exponent_type>::min)();
-   int fp_ilogbnan = 
+   typename T::backend_type::exponent_type eval;
+   typename T::backend_type::exponent_type fp_ilogb0 = (std::numeric_limits<typename T::backend_type::exponent_type>::min)();
+   typename T::backend_type::exponent_type fp_ilogbnan =
 #ifdef FP_ILOGBNAN
       FP_ILOGBNAN;
 #else
@@ -1264,11 +1265,11 @@ void test_c99_appendix_F()
    if(std::numeric_limits<T>::has_infinity)
    {
       arg = std::numeric_limits<T>::infinity();
-      ival = ilogb(arg);
-      BOOST_CHECK_EQUAL(ival, INT_MAX);
+      eval = ilogb(arg);
+      BOOST_CHECK_EQUAL(ival, (std::numeric_limits<typename T::backend_type::exponent_type>::max)());
       arg = -arg;
-      ival = ilogb(arg);
-      BOOST_CHECK_EQUAL(ival, INT_MAX);
+      eval = ilogb(arg);
+      BOOST_CHECK_EQUAL(ival, (std::numeric_limits<typename T::backend_type::exponent_type>::max)());
    }
    if(std::numeric_limits<T>::has_quiet_NaN)
    {
