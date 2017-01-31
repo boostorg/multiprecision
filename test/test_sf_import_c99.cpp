@@ -2022,6 +2022,7 @@ int main()
    test<boost::multiprecision::mpf_float_100>();
 #endif
 #ifdef TEST_MPFR_50
+   std::cout << "Testing MPFR: " << MPFR_VERSION_STRING << std::endl;
    test<boost::multiprecision::mpfr_float_50>();
    test<boost::multiprecision::mpfr_float_100>();
    test_c99_appendix_F<boost::multiprecision::mpfr_float_50>();
