@@ -48,7 +48,7 @@ inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBit
    {
       unsigned i = result.size();
       result.resize(i + 1, i + 1);
-      if(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::variable || (result.size() > i))
+      if(result.size() > i)
          result.limbs()[i] = static_cast<limb_type>(carry);
    }
    result.sign(a.sign());
@@ -157,7 +157,7 @@ inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBit
          BOOST_ASSERT(carry <= (cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::max_limb_value));
       }
       resize_for_carry(result, as + bs);  // May throw if checking is enabled
-      if(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::variable || (i + bs < result.size()))
+      if(i + bs < result.size())
          pr[i + bs] = static_cast<limb_type>(carry);
       carry = 0;
    }

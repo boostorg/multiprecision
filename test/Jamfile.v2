@@ -643,6 +643,26 @@ run test_cpp_int.cpp gmp no_eh_support
          : test_cpp_int_3
          ;
 
+run test_cpp_int.cpp gmp no_eh_support
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+         release  # otherwise runtime is too slow!!
+         <define>TEST4
+         : test_cpp_int_4
+         ;
+
+run test_cpp_int.cpp gmp no_eh_support
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+         release  # otherwise runtime is too slow!!
+         <define>TEST5
+         : test_cpp_int_5
+         ;
+
 run test_checked_cpp_int.cpp no_eh_support ;
 
 run test_miller_rabin.cpp no_eh_support gmp
