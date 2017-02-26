@@ -1420,7 +1420,7 @@ struct constant_pi<boost::multiprecision::number<boost::multiprecision::mpfi_flo
 {
    typedef boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> result_type;
    template<int N>
-   static inline result_type const& get(const mpl::int_<N>&)
+   static inline const result_type& get(const mpl::int_<N>&)
    {
       mpfi_initializer<result_type>::force_instantiate();
       static result_type result;
@@ -1444,7 +1444,7 @@ struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::mpfi
 {
    typedef boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> result_type;
    template<int N>
-   static inline result_type get(const mpl::int_<N>&)
+   static inline const result_type& get(const mpl::int_<N>&)
    {
       mpfi_initializer<result_type>::force_instantiate();
       static result_type result;
