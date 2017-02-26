@@ -1042,7 +1042,7 @@ inline std::size_t hash_value(const mpfi_float_backend<Digits10>& val)
    std::size_t len = val.left_data()[0]._mpfr_prec / mp_bits_per_limb;
    if(val.left_data()[0]._mpfr_prec % mp_bits_per_limb)
       ++len;
-   for(int i = 0; i < len; ++i)
+   for(std::size_t i = 0; i < len; ++i)
       boost::hash_combine(result, val.left_data()[0]._mpfr_d[i]);
    boost::hash_combine(result, val.left_data()[0]._mpfr_exp);
    boost::hash_combine(result, val.left_data()[0]._mpfr_sign);
@@ -1050,7 +1050,7 @@ inline std::size_t hash_value(const mpfi_float_backend<Digits10>& val)
    len = val.right_data()[0]._mpfr_prec / mp_bits_per_limb;
    if(val.right_data()[0]._mpfr_prec % mp_bits_per_limb)
       ++len;
-   for(int i = 0; i < len; ++i)
+   for(std::size_t i = 0; i < len; ++i)
       boost::hash_combine(result, val.right_data()[0]._mpfr_d[i]);
    boost::hash_combine(result, val.right_data()[0]._mpfr_exp);
    boost::hash_combine(result, val.right_data()[0]._mpfr_sign);
