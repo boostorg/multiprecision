@@ -1517,7 +1517,7 @@ inline std::size_t hash_value(const mpfr_float_backend<Digits10, AllocateType>& 
    std::size_t len = val.data()[0]._mpfr_prec / mp_bits_per_limb;
    if(val.data()[0]._mpfr_prec % mp_bits_per_limb)
       ++len;
-   for(int i = 0; i < len; ++i)
+   for(std::size_t i = 0; i < len; ++i)
       boost::hash_combine(result, val.data()[0]._mpfr_d[i]);
    boost::hash_combine(result, val.data()[0]._mpfr_exp);
    boost::hash_combine(result, val.data()[0]._mpfr_sign);
