@@ -1474,6 +1474,10 @@ void test_c99_appendix_F()
       BOOST_CHECK_EQUAL(val, 0);
       BOOST_CHECK(signbit(val));
    }
+#if !(defined(TEST_FLOAT128) && defined(BOOST_GCC_VERSION) && (BOOST_GCC_VERSION < 40800))
+   //
+   // This test fails with early implementations of libquadmath - not our issue!
+   //
    if(std::numeric_limits<T>::has_infinity)
    {
       arg = std::numeric_limits<T>::infinity();
@@ -1483,6 +1487,7 @@ void test_c99_appendix_F()
       val = cbrt(arg);
       BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
    }
+#endif
    if(std::numeric_limits<T>::has_quiet_NaN)
    {
       arg = std::numeric_limits<T>::quiet_NaN();
@@ -1713,6 +1718,10 @@ void test_c99_appendix_F()
       BOOST_CHECK_EQUAL(val, 0);
       BOOST_CHECK(signbit(val));
    }
+#if !(defined(TEST_FLOAT128) && defined(BOOST_GCC_VERSION) && (BOOST_GCC_VERSION < 40800))
+   //
+   // This test fails with early implementations of libquadmath - not our issue!
+   //
    if(std::numeric_limits<T>::has_infinity)
    {
       arg = std::numeric_limits<T>::infinity();
@@ -1721,6 +1730,7 @@ void test_c99_appendix_F()
       arg = -arg;
       check_invalid(sqrt(arg));
    }
+#endif
    if(std::numeric_limits<T>::has_quiet_NaN)
    {
       arg = std::numeric_limits<T>::quiet_NaN();
