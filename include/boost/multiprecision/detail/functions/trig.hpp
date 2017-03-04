@@ -91,12 +91,15 @@ void eval_sin(T& result, const T& x)
    case FP_INFINITE:
    case FP_NAN:
       if(std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
+      {
          result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
+         errno = EDOM;
+      }
       else
          BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
       return;
    case FP_ZERO:
-      result = ui_type(0);
+      result = x;
       return;
    default: ;
    }
@@ -238,7 +241,10 @@ void eval_cos(T& result, const T& x)
    case FP_INFINITE:
    case FP_NAN:
       if(std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
+      {
          result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
+         errno = EDOM;
+      }
       else
          BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
       return;
@@ -422,12 +428,15 @@ void eval_asin(T& result, const T& x)
    case FP_NAN:
    case FP_INFINITE:
       if(std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
+      {
          result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
+         errno = EDOM;
+      }
       else
          BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
       return;
    case FP_ZERO:
-      result = ui_type(0);
+      result = x;
       return;
    default: ;
    }
@@ -442,7 +451,10 @@ void eval_asin(T& result, const T& x)
    if(c > 0)
    {
       if(std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
+      {
          result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
+         errno = EDOM;
+      }
       else
          BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
       return;
@@ -515,10 +527,8 @@ void eval_asin(T& result, const T& x)
       eval_divide(sine, cosine);
       eval_subtract(result, sine);
       current_precision = eval_ilogb(sine);
-#ifdef FP_ILOGB0
-      if(current_precision == FP_ILOGB0)
+      if(current_precision <= (std::numeric_limits<typename T::exponent_type>::min)() + 1)
          break;
-#endif
    }
    if(b_neg)
       result.negate();
@@ -535,7 +545,10 @@ inline void eval_acos(T& result, const T& x)
    case FP_NAN:
    case FP_INFINITE:
       if(std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
+      {
          result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
+         errno = EDOM;
+      }
       else
          BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
       return;
@@ -551,7 +564,10 @@ inline void eval_acos(T& result, const T& x)
    if(c > 0)
    {
       if(std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
+      {
          result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
+         errno = EDOM;
+      }
       else
          BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
       return;
@@ -584,9 +600,10 @@ void eval_atan(T& result, const T& x)
    {
    case FP_NAN:
       result = x;
+      errno = EDOM;
       return;
    case FP_ZERO:
-      result = ui_type(0);
+      result = x;
       return;
    case FP_INFINITE:
       if(eval_get_sign(x) < 0)
@@ -662,10 +679,8 @@ void eval_atan(T& result, const T& x)
       eval_multiply(s, t, c);
       eval_add(result, s);
       current_precision = eval_ilogb(s);
-#ifdef FP_ILOGB0
-      if(current_precision == FP_ILOGB0)
+      if(current_precision <= (std::numeric_limits<typename T::exponent_type>::min)() + 1)
          break;
-#endif
    }
    if(b_neg)
       result.negate();
@@ -694,24 +709,41 @@ void eval_atan2(T& result, const T& y, const T& x)
    {
    case FP_NAN:
       result = y;
+      errno = EDOM;
       return;
    case FP_ZERO:
       {
-         int c = eval_get_sign(x);
-         if(c < 0)
+         if(eval_signbit(x))
+         {
             result = get_constant_pi<T>();
-         else if(c >= 0)
-            result = ui_type(0); // Note we allow atan2(0,0) to be zero, even though it's mathematically undefined
+            if(eval_signbit(y))
+               result.negate();
+         }
+         else
+         {
+            result = y; // Note we allow atan2(0,0) to be +-zero, even though it's mathematically undefined
+         }
          return;
       }
    case FP_INFINITE:
       {
          if(eval_fpclassify(x) == FP_INFINITE)
          {
-            if(std::numeric_limits<number<T, et_on> >::has_quiet_NaN)
-               result = std::numeric_limits<number<T, et_on> >::quiet_NaN().backend();
+            if(eval_signbit(x))
+            {
+               // 3Pi/4
+               eval_ldexp(result, get_constant_pi<T>(), -2);
+               eval_subtract(result, get_constant_pi<T>());
+               if(eval_get_sign(y) >= 0)
+                  result.negate();
+            }
             else
-               BOOST_THROW_EXCEPTION(std::domain_error("Result is undefined or complex and there is no NaN for this number type."));
+            {
+               // Pi/4
+               eval_ldexp(result, get_constant_pi<T>(), -2);
+               if(eval_get_sign(y) < 0)
+                  result.negate();
+            }
          }
          else
          {
@@ -727,6 +759,7 @@ void eval_atan2(T& result, const T& y, const T& x)
    {
    case FP_NAN:
       result = x;
+      errno = EDOM;
       return;
    case FP_ZERO:
       {

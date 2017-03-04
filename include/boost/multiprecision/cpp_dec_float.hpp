@@ -1254,9 +1254,15 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
 {
    // Compute the square root of *this.
 
+   if((isinf)() && !isneg())
+   {
+      return *this;
+   }
+
    if(isneg() || (!(isfinite)()))
    {
       *this = nan();
+      errno = EDOM;
       return *this;
    }
 
@@ -2312,6 +2318,11 @@ void cpp_dec_float<Digits10, ExponentType, Allocator>::from_unsigned_long_long(c
    fpclass = cpp_dec_float_finite;
    prec_elem = cpp_dec_float_elem_number;
 
+   if(u == 0)
+   {
+      return;
+   }
+
    std::size_t i =static_cast<std::size_t>(0u);
 
    boost::ulong_long_type uu = u;
@@ -2822,6 +2833,8 @@ inline void eval_floor(cpp_dec_float<Digits10, ExponentType, Allocator>& result,
    result = x;
    if(!(x.isfinite)() || x.isint())
    {
+      if((x.isnan)())
+         errno = EDOM;
       return;
    }
 
@@ -2836,6 +2849,8 @@ inline void eval_ceil(cpp_dec_float<Digits10, ExponentType, Allocator>& result, 
    result = x;
    if(!(x.isfinite)() || x.isint())
    {
+      if((x.isnan)())
+         errno = EDOM;
       return;
    }
 
@@ -2847,14 +2862,11 @@ inline void eval_ceil(cpp_dec_float<Digits10, ExponentType, Allocator>& result, 
 template <unsigned Digits10, class ExponentType, class Allocator>
 inline void eval_trunc(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& x)
 {
-   if(!(x.isfinite)())
-   {
-      result = boost::math::policies::raise_rounding_error("boost::multiprecision::trunc<%1%>(%1%)", 0, number<cpp_dec_float<Digits10, ExponentType, Allocator> >(x), number<cpp_dec_float<Digits10, ExponentType, Allocator> >(x), boost::math::policies::policy<>()).backend();
-      return;
-   }
-   else if(x.isint())
+   if(x.isint() || !(x.isfinite)())
    {
       result = x;
+      if((x.isnan)())
+         errno = EDOM;
       return;
    }
    result = x.extract_integer_part();
@@ -2863,6 +2875,16 @@ inline void eval_trunc(cpp_dec_float<Digits10, ExponentType, Allocator>& result,
 template <unsigned Digits10, class ExponentType, class Allocator>
 inline ExponentType eval_ilogb(const cpp_dec_float<Digits10, ExponentType, Allocator>& val)
 {
+   if(val.iszero())
+      return (std::numeric_limits<ExponentType>::min)();
+   if((val.isinf)())
+      return INT_MAX;
+   if((val.isnan)())
+#ifdef FP_ILOGBNAN
+      return FP_ILOGBNAN;
+#else
+      return INT_MAX;
+#endif
    // Set result, to the exponent of val:
    return val.order();
 }
@@ -2897,14 +2919,15 @@ template <unsigned Digits10, class ExponentType, class Allocator>
 inline void eval_frexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& x, ExponentType* e)
 {
    result = x;
-   if(result.isneg())
-      result.negate();
 
-   if(result.iszero())
+   if(result.iszero() || (result.isinf)() || (result.isnan)())
    {
       *e = 0;
       return;
    }
+
+   if(result.isneg())
+      result.negate();
 
    ExponentType t = result.order();
    BOOST_MP_USING_ABS

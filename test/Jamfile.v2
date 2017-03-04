@@ -493,7 +493,9 @@ run test_convert_from_float128.cpp
 #
 # This take too long to run as a regular part of the tests:
 #
-# run test_cpp_bin_float_round.cpp mpfr gmp ;
+run test_cpp_bin_float_round.cpp mpfr gmp ;
+explicit test_cpp_bin_float_round ;
+
 run test_cpp_bin_float_conv.cpp ;
 
 run test_cpp_bin_float_io.cpp no_eh_support /boost/system//boost_system /boost/chrono//boost_chrono
@@ -603,6 +605,14 @@ run test_int_io.cpp no_eh_support
          release # Otherwise runtime is slow
         : test_int_io_cpp_int ;
 
+run test_cpp_int_left_shift.cpp gmp no_eh_support
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+         release  # otherwise runtime is too slow!!
+         ;
+
 run test_cpp_int.cpp gmp no_eh_support
         : # command line
         : # input files
@@ -631,6 +641,26 @@ run test_cpp_int.cpp gmp no_eh_support
          release  # otherwise runtime is too slow!!
          <define>TEST3
          : test_cpp_int_3
+         ;
+
+run test_cpp_int.cpp gmp no_eh_support
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+         release  # otherwise runtime is too slow!!
+         <define>TEST4
+         : test_cpp_int_4
+         ;
+
+run test_cpp_int.cpp gmp no_eh_support
+        : # command line
+        : # input files
+        : # requirements
+         [ check-target-builds ../config//has_gmp : : <build>no ]
+         release  # otherwise runtime is too slow!!
+         <define>TEST5
+         : test_cpp_int_5
          ;
 
 run test_checked_cpp_int.cpp no_eh_support ;
