@@ -664,6 +664,7 @@ run test_cpp_int.cpp gmp no_eh_support
          ;
 
 run test_checked_cpp_int.cpp no_eh_support ;
+run test_unchecked_cpp_int.cpp no_eh_support : : : release ;
 
 run test_miller_rabin.cpp no_eh_support gmp
         : # command line
