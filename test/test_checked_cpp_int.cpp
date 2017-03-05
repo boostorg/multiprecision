@@ -128,6 +128,8 @@ void test()
                ++val2;
                BOOST_CHECK(val2 - val == (std::numeric_limits<test_type>::min)());
             }
+            unsigned shift = std::numeric_limits<test_type>::digits - msb(val);
+            BOOST_CHECK_THROW((val << shift) > 0, std::overflow_error);
          }
       }
    }
