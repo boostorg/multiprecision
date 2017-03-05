@@ -69,6 +69,12 @@ void test()
             test_type c = static_cast<test_type>(cpp_int(a) * cpp_int(b));
             test_type d = a * b;
             BOOST_CHECK_EQUAL(c, d);
+
+            if((k == 0) && (j == 0))
+            {
+               for(unsigned s = 1; s < std::numeric_limits<test_type>::digits; ++s)
+                  BOOST_CHECK_EQUAL(a << s, test_type(cpp_int(a) << s));
+            }
          }
       }
    }
