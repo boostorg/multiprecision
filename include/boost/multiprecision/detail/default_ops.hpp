@@ -3201,10 +3201,21 @@ inline multiprecision::number<Backend, ExpressionTemplates> sinhc_pi(const multi
    return BOOST_MP_MOVE(boost::math::sinhc_pi(x));
 }
 
+using boost::multiprecision::gcd;
+using boost::multiprecision::lcm;
+
 #ifdef BOOST_MSVC
 #pragma warning(pop)
 #endif
 } // namespace math
+
+namespace integer {
+
+using boost::multiprecision::gcd;
+using boost::multiprecision::lcm;
+
+}
+
 } // namespace boost
 
 //
