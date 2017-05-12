@@ -128,7 +128,13 @@ void eval_sin(T& result, const T& x)
       eval_fmod(t, n_pi, t);
       const bool b_n_pi_is_even = eval_get_sign(t) == 0;
       eval_multiply(n_pi, get_constant_pi<T>());
-      eval_subtract(xx, n_pi);
+      if (n_pi.compare(get_constant_one_over_epsilon<T>()) > 0)
+      {
+         result = ui_type(0);
+         return;
+      }
+      else
+         eval_subtract(xx, n_pi);
 
       BOOST_MATH_INSTRUMENT_CODE(xx.str(0, std::ios_base::scientific));
       BOOST_MATH_INSTRUMENT_CODE(n_pi.str(0, std::ios_base::scientific));
@@ -276,7 +282,20 @@ void eval_cos(T& result, const T& x)
       BOOST_MATH_INSTRUMENT_CODE(n_pi.str(0, std::ios_base::scientific));
       eval_multiply(t, n_pi, get_constant_pi<T>());
       BOOST_MATH_INSTRUMENT_CODE(t.str(0, std::ios_base::scientific));
-      eval_subtract(xx, t);
+      //
+      // If t is so large that all digits cancel the result of this subtraction
+      // is completely meaningless, just assume the result is zero for now...
+      //
+      // TODO We should of course do much better, see:
+      // "ARGUMENT REDUCTION FOR HUGE ARGUMENTS" K C Ng 1992
+      //
+      if (n_pi.compare(get_constant_one_over_epsilon<T>()) > 0)
+      {
+         result = ui_type(1);
+         return;
+      }
+      else
+         eval_subtract(xx, t);
       BOOST_MATH_INSTRUMENT_CODE(xx.str(0, std::ios_base::scientific));
 
       // Adjust signs if the multiple of pi is not even.
