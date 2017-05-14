@@ -797,6 +797,15 @@ void test()
    BOOST_CHECK_EQUAL(pow(T(1), 0), 1);
    BOOST_CHECK_EQUAL(pow(T(1), T(2)), 1);
    BOOST_CHECK_EQUAL(pow(T(1), 2), 1);
+
+   T bug_case = -1.0005 * log((std::numeric_limits<T>::max)()) / log(T(1.01));
+
+   for(unsigned i = 0; i < 100; ++i, bug_case *= 1.05)
+   {
+      BOOST_CHECK_EQUAL(pow(T(1.01), bug_case), 0);
+   }
+
+
 }
 
 
