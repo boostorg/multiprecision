@@ -865,7 +865,7 @@ inline void eval_convert_to(long* result, const gmp_float<digits10>& val) BOOST_
 {
    if(0 == mpf_fits_slong_p(val.data()))
    {
-      *result = (std::numeric_limits<unsigned long>::max)();
+      *result = (std::numeric_limits<long>::max)();
       *result *= mpf_sgn(val.data());
    }
    else
