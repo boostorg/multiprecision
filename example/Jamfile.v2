@@ -87,7 +87,7 @@ run integer_examples.cpp no_eh_eg_support ;
 run logged_adaptor.cpp no_eh_eg_support mpfi mpfr gmp :  :  : [ check-target-builds ../config//has_mpfi : : <build>no ] ;
 run mixed_integer_arithmetic.cpp no_eh_eg_support ;
 run numeric_limits_snips.cpp no_eh_eg_support /boost//test_exec_monitor : : : [ requires cxx11_numeric_limits ]   ;
-run random_snips.cpp gmp no_eh_eg_support : : : [ check-target-builds ../config//has_gmp : : <build>no ] ;
+run random_snips.cpp gmp no_eh_eg_support : : : [ requires cxx11_explicit_conversion_operators ] [ check-target-builds ../config//has_gmp : : <build>no ] ;
 run safe_prime.cpp no_eh_eg_support ;
 
 run gmp_snips.cpp gmp no_eh_eg_support : : : [ check-target-builds ../config//has_gmp : : <build>no ] ;
