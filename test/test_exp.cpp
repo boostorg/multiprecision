@@ -183,25 +183,25 @@ void test()
 
    BOOST_TEST(exp(T(0)) == 1);
 
-   std::cout << std::numeric_limits<T>::max() << std::endl;
-   std::cout << std::numeric_limits<T>::min() << std::endl;
-
-   T bug_case = -1.05 * log((std::numeric_limits<T>::max)());
-   for (unsigned i = 0; bug_case > -20 / std::numeric_limits<T>::epsilon(); ++i, bug_case *= 1.05)
+   if (!boost::multiprecision::is_interval_number<T>::value)
    {
-      if (std::numeric_limits<T>::has_infinity)
+      T bug_case = -1.05 * log((std::numeric_limits<T>::max)());
+      for (unsigned i = 0; bug_case > -20 / std::numeric_limits<T>::epsilon(); ++i, bug_case *= 1.05)
       {
-         BOOST_CHECK_EQUAL(exp(bug_case), 0);
+         if (std::numeric_limits<T>::has_infinity)
+         {
+            BOOST_CHECK_EQUAL(exp(bug_case), 0);
+         }
+         else
+         {
+            BOOST_CHECK_LE(exp(bug_case), std::numeric_limits<T>::min());
+         }
       }
-      else
+      bug_case = log((std::numeric_limits<T>::max)()) / -1.0005;
+      for (unsigned i = 0; i < 20; ++i, bug_case /= 1.05)
       {
-         BOOST_CHECK_LE(exp(bug_case), std::numeric_limits<T>::min());
+         BOOST_CHECK_GE(exp(bug_case), (std::numeric_limits<T>::min)());
       }
-   }
-   bug_case = log((std::numeric_limits<T>::max)()) / -1.0005;
-   for (unsigned i = 0; i < 20; ++i, bug_case /= 1.05)
-   {
-      BOOST_CHECK_GE(exp(bug_case), (std::numeric_limits<T>::min)());
    }
 
 }
