@@ -320,7 +320,7 @@ install:
 script:
   - |-
     echo "using $TOOLSET : : $COMPILER : <cxxflags>-std=$CXXSTD ;" > ~/user-config.jam
-  - ./b2 libs/multiprecision/test toolset=$TOOLSET
+  - ./b2 libs/multiprecision/test toolset=$TOOLSET  --disable-concepts
 
 notifications:
   email:
