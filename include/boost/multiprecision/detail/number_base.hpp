@@ -988,6 +988,19 @@ template <class Backend, expression_template_option ExpressionTemplates>
 struct number_category<number<Backend, ExpressionTemplates> > : public number_category<Backend>{};
 template <class tag, class A1, class A2, class A3, class A4>
 struct number_category<detail::expression<tag, A1, A2, A3, A4> > : public number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>{};
+//
+// Specializations for types which do not always have numberic_limits specializations:
+//
+#ifdef BOOST_HAS_INT128
+template <>
+struct number_category<__int128> : public mpl::int_<number_kind_integer> {};
+template <>
+struct number_category<unsigned __int128> : public mpl::int_<number_kind_integer> {};
+#endif
+#ifdef BOOST_HAS_FLOAT128
+template <>
+struct number_category<__float128> : public mpl::int_<number_kind_floating_point> {};
+#endif
 
 template <class T>
 struct component_type;
