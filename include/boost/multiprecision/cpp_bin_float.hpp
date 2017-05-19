@@ -99,7 +99,6 @@ public:
    }
 #ifdef BOOST_HAS_FLOAT128
    cpp_bin_float(const __float128& f)
-      : m_data(o.m_data), m_exponent(o.m_exponent), m_sign(o.m_sign) 
    {
       *this = f;
    }
