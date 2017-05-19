@@ -97,6 +97,13 @@ public:
    {
       *this = o;
    }
+#ifdef BOOST_HAS_FLOAT128
+   cpp_bin_float(const __float128& f)
+      : m_data(o.m_data), m_exponent(o.m_exponent), m_sign(o.m_sign) 
+   {
+      *this = f;
+   }
+#endif
    template <class Float>
    cpp_bin_float(const Float& f, 
       typename boost::enable_if_c<
@@ -168,7 +175,7 @@ public:
    }
 
 #ifdef BOOST_HAS_FLOAT128
-   cpp_bin_float& operator=(__float128 f)
+   cpp_bin_float& operator=(const __float128& f)
    {
       using default_ops::eval_add;
       typedef typename boost::multiprecision::detail::canonical<int, cpp_bin_float>::type bf_int_type;
