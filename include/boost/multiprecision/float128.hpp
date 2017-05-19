@@ -119,8 +119,10 @@ using backends::float128_backend;
 
 template<>
 struct number_category<backends::float128_backend> : public mpl::int_<number_kind_floating_point> {};
+#if defined(BOOST_MP_USE_QUAD)
 template<>
 struct number_category<float128_type> : public mpl::int_<number_kind_floating_point> {};
+#endif
 
 typedef number<float128_backend, et_off> float128;
 
