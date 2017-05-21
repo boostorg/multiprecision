@@ -255,7 +255,11 @@ public:
    }
 
    template <class F>
-   cpp_dec_float(const F val, typename enable_if<is_floating_point<F> >::type* = 0) :
+   cpp_dec_float(const F val, typename enable_if_c<is_floating_point<F>::value
+#ifdef BOOST_HAS_FLOAT128
+      && !boost::is_same<F, __float128>::value
+#endif
+   >::type* = 0) :
       data(),
       exp (static_cast<ExponentType>(0)),
       neg (false),

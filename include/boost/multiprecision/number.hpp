@@ -48,6 +48,9 @@ public:
             (boost::is_arithmetic<V>::value || is_same<std::string, V>::value || is_convertible<V, const char*>::value)
             && !is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value
             && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value
+#ifdef BOOST_HAS_FLOAT128
+            && !boost::is_same<V, __float128>::value
+#endif
          >::type* = 0)
    {
       m_backend = canonical_value(v);
