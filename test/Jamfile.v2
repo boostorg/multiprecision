@@ -125,6 +125,58 @@ run test_arithmetic_mpfi_50.cpp mpfi mpfr gmp no_eh_support : : : [ check-target
 run test_arithmetic_float_128.cpp quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : : <build>no ] ;
 run test_arithmetic_float_128.cpp no_eh_support : : : [ check-target-builds ../config//has_intel_quad : <cxxflags>-Qoption,cpp,--extended_float_type : <build>no ] [ check-target-builds ../config//has_float128 : <source>quadmath ] : test_arithmetic_intel_quad ;
 
+alias arithmetic_tests : 
+	test_arithmetic_backend_concept 
+	test_arithmetic_cpp_dec_float_1 
+	test_arithmetic_cpp_dec_float_2 
+	test_arithmetic_cpp_dec_float_3
+	test_arithmetic_cpp_bin_float_1
+	test_arithmetic_cpp_bin_float_2
+	test_arithmetic_cpp_bin_float_3
+	test_arithmetic_mpf_50
+	test_arithmetic_mpf
+	test_arithmetic_mpz
+	test_arithmetic_mpz_rat
+	test_arithmetic_mpz_br
+	test_arithmetic_mpq
+	test_arithmetic_mpfr
+	test_arithmetic_mpfr_50 
+	test_arithmetic_mpfr_50_static
+	test_arithmetic_tommath
+	test_arithmetic_tommath_rat
+	test_arithmetic_tommath_br
+	test_arithmetic_cpp_int_1
+	test_arithmetic_cpp_int_2
+	test_arithmetic_cpp_int_3
+	test_arithmetic_cpp_int_4
+	test_arithmetic_cpp_int_5
+	test_arithmetic_cpp_int_6
+	test_arithmetic_cpp_int_7
+	test_arithmetic_cpp_int_8
+	test_arithmetic_cpp_int_9
+	test_arithmetic_cpp_int_10
+	test_arithmetic_cpp_int_11
+	test_arithmetic_cpp_int_12
+	test_arithmetic_cpp_int_13
+	test_arithmetic_cpp_int_14
+	test_arithmetic_cpp_int_15
+	test_arithmetic_cpp_int_16
+	test_arithmetic_cpp_int_17
+	test_arithmetic_cpp_int_18
+	test_arithmetic_cpp_int_br
+	test_arithmetic_ab_1
+	test_arithmetic_ab_2
+	test_arithmetic_ab_3
+	test_cpp_dec_float_round
+	test_arithmetic_logged_1
+	test_arithmetic_logged_2
+	test_arithmetic_dbg_adptr1
+	test_arithmetic_dbg_adptr2
+	test_arithmetic_mpfi_50
+	test_arithmetic_float_128
+	test_arithmetic_float_128 ;
+
+
 run test_numeric_limits.cpp no_eh_support
         : # command line
         : # input files
@@ -283,6 +335,141 @@ for local source in test_exp.cpp test_log.cpp test_pow.cpp test_sinh.cpp test_sq
             <define>TEST_FLOAT128
            : $(source:B)_intel_quad ;
 }
+
+alias functions_and_limits :
+	test_numeric_limits_backend_concept
+	test_numeric_limits_mpf50
+	test_numeric_limits_mpf
+	test_numeric_limits_mpz
+	test_numeric_limits_mpq
+	test_numeric_limits_mpfr
+	test_numeric_limits_mpfr_50
+	test_numeric_limits_cpp_dec_float
+	test_numeric_limits_cpp_bin_float
+	test_numeric_limits_tommath
+	test_numeric_limits_cpp_int
+	test_numeric_limits_mpfi_50
+	test_numeric_limits_float128
+
+	test_exp_mpf50
+	test_log_mpf50
+	test_pow_mpf50
+	test_sinh_mpf50
+	test_sqrt_mpf50
+	test_cosh_mpf50
+	test_tanh_mpf50
+	test_sin_mpf50
+	test_cos_mpf50
+	test_tan_mpf50
+	test_asin_mpf50
+	test_acos_mpf50
+	test_atan_mpf50
+	test_round_mpf50
+	test_fpclassify_mpf50
+	test_sf_import_c99_mpf50
+
+	test_exp_mpfr50
+	test_log_mpfr50
+	test_pow_mpfr50
+	test_sinh_mpfr50
+	test_sqrt_mpfr50
+	test_cosh_mpfr50
+	test_tanh_mpfr50
+	test_sin_mpfr50
+	test_cos_mpfr50
+	test_tan_mpfr50
+	test_asin_mpfr50
+	test_acos_mpfr50
+	test_atan_mpfr50
+	test_round_mpfr50
+	test_fpclassify_mpfr50
+	test_sf_import_c99_mpfr50
+
+	test_exp_mpfi50
+	test_log_mpfi50
+	test_pow_mpfi50
+	test_sinh_mpfi50
+	test_sqrt_mpfi50
+	test_cosh_mpfi50
+	test_tanh_mpfi50
+	test_sin_mpfi50
+	test_cos_mpfi50
+	test_tan_mpfi50
+	test_asin_mpfi50
+	test_acos_mpfi50
+	test_atan_mpfi50
+	test_round_mpfi50
+	test_fpclassify_mpfi50
+	test_sf_import_c99_mpfi50
+
+	test_exp_cpp_dec_float
+	test_log_cpp_dec_float
+	test_pow_cpp_dec_float
+	test_sinh_cpp_dec_float
+	test_sqrt_cpp_dec_float
+	test_cosh_cpp_dec_float
+	test_tanh_cpp_dec_float
+	test_sin_cpp_dec_float
+	test_cos_cpp_dec_float
+	test_tan_cpp_dec_float
+	test_asin_cpp_dec_float
+	test_acos_cpp_dec_float
+	test_atan_cpp_dec_float
+	test_round_cpp_dec_float
+	test_fpclassify_cpp_dec_float
+	test_sf_import_c99_cpp_dec_float
+
+	test_exp_cpp_bin_float
+	test_log_cpp_bin_float
+	test_pow_cpp_bin_float
+	test_sinh_cpp_bin_float
+	test_sqrt_cpp_bin_float
+	test_cosh_cpp_bin_float
+	test_tanh_cpp_bin_float
+	test_sin_cpp_bin_float
+	test_cos_cpp_bin_float
+	test_tan_cpp_bin_float
+	test_asin_cpp_bin_float
+	test_acos_cpp_bin_float
+	test_atan_cpp_bin_float
+	test_round_cpp_bin_float
+	test_fpclassify_cpp_bin_float
+	test_sf_import_c99_cpp_bin_float
+
+	test_exp_float128
+	test_log_float128
+	test_pow_float128
+	test_sinh_float128
+	test_sqrt_float128
+	test_cosh_float128
+	test_tanh_float128
+	test_sin_float128
+	test_cos_float128
+	test_tan_float128
+	test_asin_float128
+	test_acos_float128
+	test_atan_float128
+	test_round_float128
+	test_fpclassify_float128
+	test_sf_import_c99_float128
+
+	test_exp_intel_quad
+	test_log_intel_quad
+	test_pow_intel_quad
+	test_sinh_intel_quad
+	test_sqrt_intel_quad
+	test_cosh_intel_quad
+	test_tanh_intel_quad
+	test_sin_intel_quad
+	test_cos_intel_quad
+	test_tan_intel_quad
+	test_asin_intel_quad
+	test_acos_intel_quad
+	test_atan_intel_quad
+	test_round_intel_quad
+	test_fpclassify_intel_quad
+	test_sf_import_c99_intel_quad
+;
 
 run test_gmp_conversions.cpp gmp no_eh_support
         : # command line
