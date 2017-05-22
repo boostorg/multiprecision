@@ -33,6 +33,7 @@ matrix:
         apt:
           packages:
             - g++-6
+			- libgmp-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -42,6 +43,7 @@ matrix:
         apt:
           packages:
             - g++-6
+			- libgmp-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -51,6 +53,7 @@ matrix:
         apt:
           packages:
             - g++-6
+			- libgmp-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -60,6 +63,7 @@ matrix:
         apt:
           packages:
             - g++-6
+			- libgmp-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -69,6 +73,7 @@ matrix:
         apt:
           packages:
             - g++-6
+			- libgmp-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -78,6 +83,7 @@ matrix:
         apt:
           packages:
             - g++-6
+			- libgmp-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -87,6 +93,7 @@ matrix:
         apt:
           packages:
             - g++-6
+			- libgmp-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -96,6 +103,7 @@ matrix:
         apt:
           packages:
             - g++-6
+			- libgmp-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -105,9 +113,59 @@ matrix:
         apt:
           packages:
             - g++-6
+			- libgmp-dev
           sources:
             - ubuntu-toolchain-r-test
 
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=conversions
+      addons:
+        apt:
+          packages:
+            - g++-6
+			- libgmp-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=conversions
+      addons:
+        apt:
+          packages:
+            - g++-6
+			- libgmp-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=conversions
+      addons:
+        apt:
+          packages:
+            - g++-6
+			- libgmp-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE=conversions
+      addons:
+        apt:
+          packages:
+            - g++-6
+			- libgmp-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=conversions
+      addons:
+        apt:
+          packages:
+            - g++-6
+			- libgmp-dev
+          sources:
+            - ubuntu-toolchain-r-test
 
 install:
   - cd ..
@@ -125,7 +183,7 @@ script:
   - |-
     echo "using $TOOLSET : : $COMPILER : <cxxflags>-std=$CXXSTD ;" > ~/user-config.jam
   - (cd libs/config/test && ../../../b2 config_info_travis_install toolset=$TOOLSET && ./config_info_travis)
-  - (cd libs/multiprecision/test && ../../../b2 toolset=$TOOLSET $TEST_SUITE)
+  - (cd libs/multiprecision/test && ../../../b2 -j3 toolset=$TOOLSET $TEST_SUITE)
 
 notifications:
   email:

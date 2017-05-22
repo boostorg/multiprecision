@@ -677,6 +677,7 @@ run test_convert_from_float128.cpp
          [ check-target-builds ../config//has_float128 : <define>HAS_FLOAT128 <source>quadmath : ] 
         ;
 
+
 #
 # This take too long to run as a regular part of the tests:
 #
@@ -979,6 +980,78 @@ run test_mixed_float.cpp no_eh_support
         : # requirements
          [ check-target-builds ../config//has_gmp : <define>TEST_GMP <library>gmp : ]
          [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <library>mpfr <library>gmp : ] ;
+
+alias conversions :
+	test_gmp_conversions
+	test_mpfr_conversions
+	test_constants_mpf50
+	test_constants_mpfr_50
+	test_constants_cpp_dec_float
+	test_move_gmp
+	test_move_mpfr
+	test_move_tommath
+	test_move_cpp_int
+	test_test
+	test_cpp_int_lit
+	test_constexpr
+	test_nothrow_cpp_int
+	test_nothrow_cpp_rational
+	test_nothrow_cpp_bin_float
+	test_nothrow_cpp_dec_float
+	test_nothrow_float128
+	test_nothrow_gmp
+	test_nothrow_mpfr
+	test_convert_from_cpp_int
+	test_convert_from_mpz_int
+	test_convert_from_tom_int
+	test_convert_from_cpp_rational
+	test_convert_from_gmp_rational
+	test_convert_from_tom_rational
+	test_convert_from_cpp_bin_float
+	test_convert_from_cpp_dec_float
+	test_convert_from_mpf_float
+	test_convert_from_mpfr_float
+	test_convert_from_mpfi_float
+	test_convert_from_float128
+test_cpp_bin_float_io_1
+test_cpp_bin_float_io_2
+test_cpp_bin_float
+test_float_io_cpp_dec_float
+test_float_io_mpf
+test_float_io_mpfr
+test_float_io_mpfi
+test_float_io_float128
+test_float_io_intel_quad
+test_int_io_tommath
+test_int_io_mpz
+test_int_io_cpp_int
+test_cpp_int_left_shift
+test_cpp_int_1
+test_cpp_int_2
+test_cpp_int_3
+test_cpp_int_4
+test_cpp_int_5
+test_checked_cpp_int
+test_unchecked_cpp_int
+test_miller_rabin
+test_rational_io_tommath
+test_rational_io_mpz
+test_rational_io_cpp_int
+test_generic_conv
+test_rat_float_interconv_1
+test_rat_float_interconv_2
+test_rat_float_interconv_3
+test_rat_float_interconv_4
+test_rat_float_interconv_5
+test_rat_float_interconv_6
+test_rat_float_interconv_7
+test_rat_float_interconv_8
+test_cpp_int_conv
+test_cpp_int_import_export
+test_native_integer
+test_mixed_cpp_int
+test_mixed_float
+;
 
 
 compile include_test/mpfr_include_test.cpp
