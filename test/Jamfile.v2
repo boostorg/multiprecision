@@ -1013,44 +1013,44 @@ alias conversions :
 	test_convert_from_mpfr_float
 	test_convert_from_mpfi_float
 	test_convert_from_float128
-test_cpp_bin_float_io_1
-test_cpp_bin_float_io_2
-test_cpp_bin_float
-test_float_io_cpp_dec_float
-test_float_io_mpf
-test_float_io_mpfr
-test_float_io_mpfi
-test_float_io_float128
-test_float_io_intel_quad
-test_int_io_tommath
-test_int_io_mpz
-test_int_io_cpp_int
-test_cpp_int_left_shift
-test_cpp_int_1
-test_cpp_int_2
-test_cpp_int_3
-test_cpp_int_4
-test_cpp_int_5
-test_checked_cpp_int
-test_unchecked_cpp_int
-test_miller_rabin
-test_rational_io_tommath
-test_rational_io_mpz
-test_rational_io_cpp_int
-test_generic_conv
-test_rat_float_interconv_1
-test_rat_float_interconv_2
-test_rat_float_interconv_3
-test_rat_float_interconv_4
-test_rat_float_interconv_5
-test_rat_float_interconv_6
-test_rat_float_interconv_7
-test_rat_float_interconv_8
-test_cpp_int_conv
-test_cpp_int_import_export
-test_native_integer
-test_mixed_cpp_int
-test_mixed_float
+	test_cpp_bin_float_io_1
+	test_cpp_bin_float_io_2
+	test_cpp_bin_float
+	test_float_io_cpp_dec_float
+	test_float_io_mpf
+	test_float_io_mpfr
+	test_float_io_mpfi
+	test_float_io_float128
+	test_float_io_intel_quad
+	test_int_io_tommath
+	test_int_io_mpz
+	test_int_io_cpp_int
+	test_cpp_int_left_shift
+	test_cpp_int_1
+	test_cpp_int_2
+	test_cpp_int_3
+	test_cpp_int_4
+	test_cpp_int_5
+	test_checked_cpp_int
+	test_unchecked_cpp_int
+	test_miller_rabin
+	test_rational_io_tommath
+	test_rational_io_mpz
+	test_rational_io_cpp_int
+	test_generic_conv
+	test_rat_float_interconv_1
+	test_rat_float_interconv_2
+	test_rat_float_interconv_3
+	test_rat_float_interconv_4
+	test_rat_float_interconv_5
+	test_rat_float_interconv_6
+	test_rat_float_interconv_7
+	test_rat_float_interconv_8
+	test_cpp_int_conv
+	test_cpp_int_import_export
+	test_native_integer
+	test_mixed_cpp_int
+	test_mixed_float
 ;
 
 
@@ -1124,6 +1124,46 @@ run test_hash.cpp : : :
    [ check-target-builds ../config//has_mpfi : <define>TEST_MPFI <source>gmp <source>mpfr <source>mpfi : ]
    [ check-target-builds ../config//has_tommath : <define>TEST_TOMMATH <source>tommath : ]
     ;
+
+alias misc :
+	mpfr_include_test
+	gmp_include_test
+	tommath_include_test
+	cpp_int_include_test
+	cpp_dec_float_include_test
+	cpp_bin_float_include_test
+	test1
+	test2
+	test4
+	test5
+	test6
+	ublas1_et
+	ublas2_et
+	ublas3_et
+	ublas4_et
+	ublas5_et
+	test_cpp_int_serial_1
+	test_cpp_int_serial_2
+	test_cpp_int_serial_3
+	test_cpp_int_serial_4
+	test_cpp_int_deserial
+	test_cpp_rat_serial
+	test_adapt_serial
+	test_cpp_dec_float_serial_1
+	test_cpp_dec_float_serial_2
+	test_float128_serial
+	test_bin_dec_float_serial_1
+	test_bin_dec_float_serial_2
+	test_checked_mixed_cpp_int
+	test_mixed_cpp_bin_float
+	test_mixed_cpp_dec_float
+	test_mixed_mpf_float
+	test_mixed_mpfr_float
+	test_float_conversions
+	bug11922
+	bug12039
+	test_hash
+;
 
 if $(enable-specfun)
 {

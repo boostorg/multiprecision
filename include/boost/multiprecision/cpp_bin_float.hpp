@@ -127,7 +127,7 @@ public:
    cpp_bin_float(const Float& f,
       typename boost::enable_if_c<
       boost::is_same<Float, __float128>::value
-      && ((int)bit_count >= 128)
+      && ((int)bit_count >= 113)
       >::type const* = 0)
       : m_data(), m_exponent(0), m_sign(false)
    {
@@ -137,7 +137,7 @@ public:
    explicit cpp_bin_float(const Float& f,
       typename boost::enable_if_c<
       boost::is_same<Float, __float128>::value
-      && ((int)bit_count < 128)
+      && ((int)bit_count < 113)
       >::type const* = 0)
       : m_data(), m_exponent(0), m_sign(false)
    {
