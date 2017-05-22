@@ -33,7 +33,7 @@ matrix:
         apt:
           packages:
             - g++-6
-			- libgmp-dev
+            - libgmp-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -43,7 +43,7 @@ matrix:
         apt:
           packages:
             - g++-6
-			- libgmp-dev
+            - libgmp-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -53,7 +53,7 @@ matrix:
         apt:
           packages:
             - g++-6
-			- libgmp-dev
+            - libgmp-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -63,7 +63,7 @@ matrix:
         apt:
           packages:
             - g++-6
-			- libgmp-dev
+            - libgmp-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -73,7 +73,7 @@ matrix:
         apt:
           packages:
             - g++-6
-			- libgmp-dev
+            - libgmp-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -83,7 +83,7 @@ matrix:
         apt:
           packages:
             - g++-6
-			- libgmp-dev
+            - libgmp-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -93,7 +93,7 @@ matrix:
         apt:
           packages:
             - g++-6
-			- libgmp-dev
+            - libgmp-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -103,7 +103,7 @@ matrix:
         apt:
           packages:
             - g++-6
-			- libgmp-dev
+            - libgmp-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -113,7 +113,7 @@ matrix:
         apt:
           packages:
             - g++-6
-			- libgmp-dev
+            - libgmp-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -123,7 +123,7 @@ matrix:
         apt:
           packages:
             - g++-6
-			- libgmp-dev
+            - libgmp-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -133,7 +133,7 @@ matrix:
         apt:
           packages:
             - g++-6
-			- libgmp-dev
+            - libgmp-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -143,7 +143,7 @@ matrix:
         apt:
           packages:
             - g++-6
-			- libgmp-dev
+            - libgmp-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -153,7 +153,7 @@ matrix:
         apt:
           packages:
             - g++-6
-			- libgmp-dev
+            - libgmp-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -163,7 +163,7 @@ matrix:
         apt:
           packages:
             - g++-6
-			- libgmp-dev
+            - libgmp-dev
           sources:
             - ubuntu-toolchain-r-test
 
