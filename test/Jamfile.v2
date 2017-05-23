@@ -993,14 +993,6 @@ alias conversions :
 	test_move_cpp_int
 	test_test
 	test_cpp_int_lit
-	test_constexpr
-	test_nothrow_cpp_int
-	test_nothrow_cpp_rational
-	test_nothrow_cpp_bin_float
-	test_nothrow_cpp_dec_float
-	test_nothrow_float128
-	test_nothrow_gmp
-	test_nothrow_mpfr
 	test_convert_from_cpp_int
 	test_convert_from_mpz_int
 	test_convert_from_tom_int
@@ -1126,6 +1118,14 @@ run test_hash.cpp : : :
     ;
 
 alias misc :
+	test_constexpr
+	test_nothrow_cpp_int
+	test_nothrow_cpp_rational
+	test_nothrow_cpp_bin_float
+	test_nothrow_cpp_dec_float
+	test_nothrow_float128
+	test_nothrow_gmp
+	test_nothrow_mpfr
 	mpfr_include_test
 	gmp_include_test
 	tommath_include_test
@@ -1284,6 +1284,8 @@ if $(enable-specfun)
             release ;
    }
 }
+
+alias compile_fail ;
 
 for local source in [ glob compile_fail/*.cpp ]
 {
