@@ -236,6 +236,114 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
 
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=arithmetic_tests
+      addons:
+        apt:
+          packages:
+            - g++-5
+            - libgmp-dev
+            - libmpfr-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=functions_and_limits
+      addons:
+        apt:
+          packages:
+            - g++-5
+            - libgmp-dev
+            - libmpfr-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=conversions
+      addons:
+        apt:
+          packages:
+            - g++-5
+            - libgmp-dev
+            - libmpfr-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=misc
+      addons:
+        apt:
+          packages:
+            - g++-5
+            - libgmp-dev
+            - libmpfr-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests
+      osx_image: xcode8.1
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=functions_and_limits
+      osx_image: xcode8.1
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=conversions
+      osx_image: xcode8.1
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=misc
+      osx_image: xcode8.1
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests
+      osx_image: xcode8.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=functions_and_limits
+      osx_image: xcode8.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=conversions
+      osx_image: xcode8.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=misc
+      osx_image: xcode8.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests
+      osx_image: xcode7.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=functions_and_limits
+      osx_image: xcode7.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=conversions
+      osx_image: xcode7.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=misc
+      osx_image: xcode7.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests
+      osx_image: xcode6.4
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=functions_and_limits
+      osx_image: xcode6.4
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=conversions
+      osx_image: xcode6.4
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=misc
+      osx_image: xcode6.4
+
 install:
   - cd ..
   - git clone -b $TRAVIS_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
