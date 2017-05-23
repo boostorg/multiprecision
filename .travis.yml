@@ -237,6 +237,50 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=compile_fail
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - libgmp-dev
+            - libmpfr-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=compile_fail
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - libgmp-dev
+            - libmpfr-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=compile_fail
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - libgmp-dev
+            - libmpfr-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=compile_fail
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - libgmp-dev
+            - libmpfr-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
       env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=arithmetic_tests
       addons:
         apt:
@@ -280,6 +324,17 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
 
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=compile_fail
+      addons:
+        apt:
+          packages:
+            - g++-5
+            - libgmp-dev
+            - libmpfr-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
     - os: osx
       env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests
       osx_image: xcode8.1
@@ -297,6 +352,10 @@ matrix:
       osx_image: xcode8.1
 
     - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=compile_fail
+      osx_image: xcode8.1
+
+    - os: osx
       env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests
       osx_image: xcode8.3
 
@@ -313,6 +372,10 @@ matrix:
       osx_image: xcode8.3
 
     - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=compile_fail
+      osx_image: xcode8.3
+
+    - os: osx
       env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests
       osx_image: xcode7.3
 
@@ -326,6 +389,10 @@ matrix:
 
     - os: osx
       env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=misc
+      osx_image: xcode7.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=compile_fail
       osx_image: xcode7.3
 
     - os: osx
@@ -342,6 +409,10 @@ matrix:
 
     - os: osx
       env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=misc
+      osx_image: xcode6.4
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=compile_fail
       osx_image: xcode6.4
 
 install:
