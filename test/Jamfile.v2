@@ -1129,7 +1129,9 @@ alias arithmetic_tests :
 	test_arithmetic_mpfi_50
 	test_arithmetic_float_128
 	test_arithmetic_float_128 
+	;
 
+alias cpp_int_tests :
 	test_cpp_int_left_shift
 	test_cpp_int_1
 	test_cpp_int_2
@@ -1138,9 +1140,19 @@ alias arithmetic_tests :
 	test_cpp_int_5
 	test_checked_cpp_int
 	test_unchecked_cpp_int
-	;
+	test_cpp_int_lit
+	test_cpp_int_serial_1
+	test_cpp_int_serial_2
+	test_cpp_int_serial_3
+	test_cpp_int_serial_4
+	test_cpp_int_deserial
+	test_cpp_rat_serial
+	test_cpp_bin_float_io_1
+	test_cpp_bin_float_io_2
+	test_cpp_bin_float
+;
 
-	alias functions_and_limits :
+alias functions_and_limits :
 	test_numeric_limits_backend_concept
 	test_numeric_limits_mpf50
 	test_numeric_limits_mpf
@@ -1278,7 +1290,6 @@ alias arithmetic_tests :
 	test_move_tommath
 	test_move_cpp_int
 	test_test
-	test_cpp_int_lit
 	test_miller_rabin
 ;
 
@@ -1300,9 +1311,6 @@ alias conversions :
 	test_convert_from_mpfr_float
 	test_convert_from_mpfi_float
 	test_convert_from_float128
-	test_cpp_bin_float_io_1
-	test_cpp_bin_float_io_2
-	test_cpp_bin_float
 	test_float_io_cpp_dec_float
 	test_float_io_mpf
 	test_float_io_mpfr
@@ -1356,12 +1364,6 @@ alias misc :
 	ublas3_et
 	ublas4_et
 	ublas5_et
-	test_cpp_int_serial_1
-	test_cpp_int_serial_2
-	test_cpp_int_serial_3
-	test_cpp_int_serial_4
-	test_cpp_int_deserial
-	test_cpp_rat_serial
 	test_adapt_serial
 	test_cpp_dec_float_serial_1
 	test_cpp_dec_float_serial_2
