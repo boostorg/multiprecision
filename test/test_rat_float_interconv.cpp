@@ -148,7 +148,11 @@ void test_round_trip()
 
    int count = 0;
 
-   while(boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count() < 200)
+#ifndef CI_SUPPRESS_KNOWN_ISSUES
+   while (boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count() < 200)
+#else
+   while (boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count() < 50)
+#endif
    {
       Float val = generate_random_float<Float>();
       do_round_trip<Float, Rat>(val);
@@ -200,7 +204,11 @@ void test_random_rationals()
 
    int count = 0;
 
-   while(boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count() < 200)
+#ifndef CI_SUPPRESS_KNOWN_ISSUES
+   while (boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count() < 200)
+#else
+   while (boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count() < 50)
+#endif
    {
       Rat rat(generate_random_int<i_type>(), generate_random_int<i_type>());
       Float f(rat);

@@ -1146,10 +1146,6 @@ alias cpp_int_tests :
 	test_cpp_int_serial_3
 	test_cpp_int_serial_4
 	test_cpp_int_deserial
-	test_cpp_rat_serial
-	test_cpp_bin_float_io_1
-	test_cpp_bin_float_io_2
-	test_cpp_bin_float
 ;
 
 alias functions_and_limits :
@@ -1291,6 +1287,8 @@ alias functions_and_limits :
 	test_move_cpp_int
 	test_test
 	test_miller_rabin
+	test_cpp_bin_float_io_1
+	test_cpp_bin_float_io_2
 ;
 
 alias conversions :
@@ -1337,6 +1335,8 @@ alias conversions :
 	test_native_integer
 	test_mixed_cpp_int
 	test_mixed_float
+	test_cpp_rat_serial
+	test_cpp_bin_float
 ;
 
 alias misc :
