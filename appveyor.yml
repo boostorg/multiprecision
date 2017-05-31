@@ -58,5 +58,5 @@ test_script:
   - cd libs\config\test
   - ..\..\..\b2 config_info_travis_install toolset=%TOOLSET%
   - config_info_travis
-  - cd ..\..\integer\test
+  - cd ..\..\multiprecision\test
   - ..\..\..\b2 -j3 toolset=%TOOLSET% define=CI_SUPPRESS_KNOWN_ISSUES
