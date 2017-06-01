@@ -46,7 +46,7 @@ install:
   - cd boost-root
   - git submodule update --init tools/build
   - git submodule update --init libs/config
-  - xcopy /s /e /q %APPVEYOR_BUILD_FOLDER% libs\integer
+  - xcopy /s /e /q %APPVEYOR_BUILD_FOLDER% libs\multiprecision
   - git submodule update --init tools/boostdep
   - python tools/boostdep/depinst/depinst.py multiprecision
   - bootstrap
