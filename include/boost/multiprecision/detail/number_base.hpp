@@ -364,26 +364,32 @@ struct unmentionable
 
 typedef unmentionable* (unmentionable::*unmentionable_type)();
 
-template <class T>
+template <class T, bool b = boost::is_arithmetic<T>::value>
 struct expression_storage
 {
    typedef const T& type;
 };
 
 template <class T>
-struct expression_storage<T*>
+struct expression_storage<T, true>
+{
+   typedef T type;
+};
+
+template <class T>
+struct expression_storage<T*, false>
 {
    typedef T* type;
 };
 
 template <class T>
-struct expression_storage<const T*>
+struct expression_storage<const T*, false>
 {
    typedef const T* type;
 };
 
 template <class tag, class A1, class A2, class A3, class A4>
-struct expression_storage<expression<tag, A1, A2, A3, A4> >
+struct expression_storage<expression<tag, A1, A2, A3, A4>, false>
 {
    typedef expression<tag, A1, A2, A3, A4> type;
 };
