@@ -1512,7 +1512,7 @@ In particular:
 * A `number` can be converted to any built in type, via the `convert_to` member function:
 
    mpz_int z(2);
-   int i = z.template convert_to<int>(); // sets i to 2
+   int i = z.convert_to<int>(); // sets i to 2
 
 * Conversions to rational numbers from floating-point ones are always allowed, and are exact and implicit
 as long as the rational number uses an unbounded integer type.  Please be aware that constructing a rational
