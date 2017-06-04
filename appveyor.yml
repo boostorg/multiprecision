@@ -59,4 +59,4 @@ test_script:
   - ..\..\..\b2 config_info_travis_install %ARGS%
   - config_info_travis
   - cd ..\..\multiprecision\test
-  - ..\..\..\b2 -j3 %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES
+  - ..\..\..\b2 --hash -j3 %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES

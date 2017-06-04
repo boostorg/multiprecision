@@ -16,6 +16,7 @@
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
+#include <boost/cstdint.hpp>
 
 
 template <class T>
@@ -161,7 +162,7 @@ int main()
    q = (std::numeric_limits<float>::denorm_min)();
    BOOST_CHECK_EQUAL(q.convert_to<float>(), (std::numeric_limits<float>::denorm_min)());
    // See https://svn.boost.org/trac/boost/ticket/12512:
-   boost::multiprecision::number<boost::multiprecision::backends::cpp_bin_float<128, boost::multiprecision::backends::digit_base_2, void, int64_t> > ext_float("1e-646456978");
+   boost::multiprecision::number<boost::multiprecision::backends::cpp_bin_float<128, boost::multiprecision::backends::digit_base_2, void, boost::int64_t> > ext_float("1e-646456978");
    BOOST_CHECK_EQUAL(ext_float.convert_to<float>(), 0);
 
    q = -(std::numeric_limits<float>::min)();
@@ -171,7 +172,7 @@ int main()
    q = -(std::numeric_limits<float>::denorm_min)();
    BOOST_CHECK_EQUAL(q.convert_to<float>(), -(std::numeric_limits<float>::denorm_min)());
    // See https://svn.boost.org/trac/boost/ticket/12512:
-   ext_float = boost::multiprecision::number<boost::multiprecision::backends::cpp_bin_float<128, boost::multiprecision::backends::digit_base_2, void, int64_t> >("-1e-646456978");
+   ext_float = boost::multiprecision::number<boost::multiprecision::backends::cpp_bin_float<128, boost::multiprecision::backends::digit_base_2, void, boost::int64_t> >("-1e-646456978");
    BOOST_CHECK_EQUAL(ext_float.convert_to<float>(), 0);
    ext_float = (std::numeric_limits<double>::max)();
    ext_float *= 16;
