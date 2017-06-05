@@ -833,18 +833,18 @@ run ublas_interop/test6.cpp ublas_interop/test62.cpp ublas_interop/test63.cpp no
 # Serialization tests, run in release mode so we cycle through more values:
 #
 path-constant here : . ;
-run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST1 : test_cpp_int_serial_1 ;
-run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST2 : test_cpp_int_serial_2 ;
-run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST3 : test_cpp_int_serial_3 ;
-run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST4 : test_cpp_int_serial_4 ;
-run test_cpp_int_deserial.cpp ../../serialization/build//boost_serialization ../../filesystem/build//boost_filesystem : $(here) : : release ;
-run test_cpp_rat_serial.cpp ../../serialization/build//boost_serialization : : : release ;
-run test_adapt_serial.cpp ../../serialization/build//boost_serialization : : : release ;
-run test_cpp_dec_float_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST1 : test_cpp_dec_float_serial_1 ;
-run test_cpp_dec_float_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST2 : test_cpp_dec_float_serial_2 ;
-run test_float128_serial.cpp ../../serialization/build//boost_serialization quadmath : : : release [ check-target-builds ../config//has_float128 : : <build>no ]  ;
-run test_cpp_bin_float_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST1 : test_bin_dec_float_serial_1 ;
-run test_cpp_bin_float_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST2 : test_bin_dec_float_serial_2 ;
+run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST1 <toolset>gcc-mingw:<link>static : test_cpp_int_serial_1 ;
+run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST2 <toolset>gcc-mingw:<link>static : test_cpp_int_serial_2 ;
+run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST3 <toolset>gcc-mingw:<link>static : test_cpp_int_serial_3 ;
+run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST4 <toolset>gcc-mingw:<link>static : test_cpp_int_serial_4 ;
+run test_cpp_int_deserial.cpp ../../serialization/build//boost_serialization ../../filesystem/build//boost_filesystem : $(here) : : release <toolset>gcc-mingw:<link>static  ;
+run test_cpp_rat_serial.cpp ../../serialization/build//boost_serialization : : : release <toolset>gcc-mingw:<link>static  ;
+run test_adapt_serial.cpp ../../serialization/build//boost_serialization : : : release <toolset>gcc-mingw:<link>static  ;
+run test_cpp_dec_float_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST1 <toolset>gcc-mingw:<link>static  : test_cpp_dec_float_serial_1 ;
+run test_cpp_dec_float_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST2 <toolset>gcc-mingw:<link>static  : test_cpp_dec_float_serial_2 ;
+run test_float128_serial.cpp ../../serialization/build//boost_serialization quadmath : : : release <toolset>gcc-mingw:<link>static  [ check-target-builds ../config//has_float128 : : <build>no ]  ;
+run test_cpp_bin_float_serial.cpp ../../serialization/build//boost_serialization : : : release <toolset>gcc-mingw:<link>static  <define>TEST1 : test_bin_dec_float_serial_1 ;
+run test_cpp_bin_float_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST2 <toolset>gcc-mingw:<link>static  : test_bin_dec_float_serial_2 ;
 
 #
 # Mixed mode comparison tests, see: https://svn.boost.org/trac/boost/ticket/11328
