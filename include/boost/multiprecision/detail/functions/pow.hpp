@@ -303,7 +303,7 @@ void eval_exp(T& result, const T& x)
    exp_type n;
    eval_convert_to(&n, result);
 
-   if (n == std::numeric_limits<exp_type>::max())
+   if (n == (std::numeric_limits<exp_type>::max)())
    {
       // Exponent is too large to fit in our exponent type:
       if (isneg)
