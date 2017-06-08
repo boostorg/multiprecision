@@ -351,17 +351,45 @@
       template argument getting converted to an <code class="computeroutput"><span class="identifier">mpfr_float_100</span></code>
       internally by the Boost.Math library.
     </p>
+<div class="caution"><table border="0" summary="Caution">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Caution]" src="../../../../../doc/src/images/caution.png"></td>
+<th align="left">Caution</th>
+</tr>
+<tr><td align="left" valign="top">
 <p>
-      One other potential pitfall that's only possible in C++11: you should never
-      store an expression template using:
-    </p>
-<pre class="programlisting"><span class="keyword">auto</span> <span class="identifier">my_expression</span> <span class="special">=</span> <span class="identifier">a</span> <span class="special">+</span> <span class="identifier">b</span> <span class="special">-</span> <span class="identifier">c</span><span class="special">;</span>
-</pre>
+        In C++11 you should never store an expression template using:
+      </p>
 <p>
-      unless you're absolutely sure that the lifetimes of <code class="computeroutput"><span class="identifier">a</span></code>,
-      <code class="computeroutput"><span class="identifier">b</span></code> and <code class="computeroutput"><span class="identifier">c</span></code>
-      will outlive that of <code class="computeroutput"><span class="identifier">my_expression</span></code>.
-    </p>
+        <code class="computeroutput"><span class="keyword">auto</span> <span class="identifier">my_expression</span>
+        <span class="special">=</span> <span class="identifier">a</span> <span class="special">+</span> <span class="identifier">b</span> <span class="special">-</span>
+        <span class="identifier">c</span><span class="special">;</span></code>
+      </p>
+<p>
+        unless you're absolutely sure that the lifetimes of <code class="computeroutput"><span class="identifier">a</span></code>,
+        <code class="computeroutput"><span class="identifier">b</span></code> and <code class="computeroutput"><span class="identifier">c</span></code>
+        will outlive that of <code class="computeroutput"><span class="identifier">my_expression</span></code>.
+      </p>
+<p>
+        In fact it is particularly easy to create dangling references by mixing expression
+        templates with the auto keyword, for example:
+      </p>
+<p>
+        <code class="computeroutput"><span class="keyword">auto</span> <span class="identifier">val</span>
+        <span class="special">=</span> <span class="identifier">cpp_dec_float_50</span><span class="special">(</span><span class="string">"23.1"</span><span class="special">)</span> <span class="special">*</span> <span class="number">100</span><span class="special">;</span></code>
+      </p>
+<p>
+        In this situation the integer literal is stored directly in the expression
+        template - so it's use is OK here - but the cpp_dec_float_50 temporary is
+        stored by reference and then destructed when the statement completes leaving
+        a dangling reference.
+      </p>
+<p>
+        <span class="bold"><strong><span class="emphasis"><em>If in doubt, do not ever mix expression templates
+        with the auto keyword.</em></span></strong></span>
+      </p>
+</td></tr>
+</table></div>
 <p>
       And finally... the performance improvements from an expression template library
       like this are often not as dramatic as the reduction in number of temporaries
