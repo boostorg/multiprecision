@@ -2896,7 +2896,7 @@ template <unsigned Digits10, class ExponentType, class Allocator, class ArgType>
 inline void eval_scalbn(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& val, ArgType e_)
 {
    using default_ops::eval_multiply;
-   const ExponentType e = e_;
+   const ExponentType e = static_cast<ExponentType>(e_);
    cpp_dec_float<Digits10, ExponentType, Allocator> t(1.0, e);
    eval_multiply(result, val, t);
 }

@@ -38,8 +38,9 @@
 
 //
 // Thread local storage:
+// Note fails on Mingw, see https://sourceforge.net/p/mingw-w64/bugs/527/
 //
-#if !defined(BOOST_NO_CXX11_THREAD_LOCAL) && !defined(BOOST_INTEL)
+#if !defined(BOOST_NO_CXX11_THREAD_LOCAL) && !defined(BOOST_INTEL) && !defined(__MINGW32__)
 #  define BOOST_MP_THREAD_LOCAL thread_local
 #else
 #  define BOOST_MP_THREAD_LOCAL
