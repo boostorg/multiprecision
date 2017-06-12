@@ -1263,7 +1263,7 @@ void test_c99_appendix_F()
    typename T::backend_type::exponent_type fp_ilogb0 = (std::numeric_limits<typename T::backend_type::exponent_type>::min)();
    typename T::backend_type::exponent_type fp_ilogbnan =
 #ifdef FP_ILOGBNAN
-      FP_ILOGBNAN;
+      FP_ILOGBNAN < 0 ? (std::numeric_limits<typename T::backend_type::exponent_type>::min)() : (std::numeric_limits<typename T::backend_type::exponent_type>::max)();
 #else
       INT_MAX;
 #endif
