@@ -1479,7 +1479,7 @@ inline typename B::exponent_type eval_ilogb(const B& val)
    {
    case FP_NAN:
 #ifdef FP_ILOGBNAN
-      return FP_ILOGBNAN;
+      return FP_ILOGBNAN > 0 ? (std::numeric_limits<typename B::exponent_type>::max)() : (std::numeric_limits<typename B::exponent_type>::min)();
 #else
       return (std::numeric_limits<typename B::exponent_type>::max)();
 #endif

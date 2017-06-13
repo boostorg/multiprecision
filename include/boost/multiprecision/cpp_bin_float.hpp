@@ -104,6 +104,9 @@ public:
          && (std::numeric_limits<Float>::digits <= (int)bit_count)
          && (std::numeric_limits<Float>::radix == 2)
          && (std::numeric_limits<Float>::is_specialized)
+#ifdef BOOST_HAS_FLOAT128
+         && !boost::is_same<Float, __float128>::value
+#endif
       >::type const* = 0)
       : m_data(), m_exponent(0), m_sign(false)
    {
@@ -117,7 +120,10 @@ public:
          && (std::numeric_limits<Float>::digits > (int)bit_count)
          && (std::numeric_limits<Float>::radix == 2)
          && (std::numeric_limits<Float>::is_specialized)
-      >::type const* = 0)
+#ifdef BOOST_HAS_FLOAT128
+        && !boost::is_same<Float, __float128>::value
+#endif
+>::type const* = 0)
       : m_data(), m_exponent(0), m_sign(false)
    {
       this->assign_float(f);
