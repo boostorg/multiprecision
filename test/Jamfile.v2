@@ -3,6 +3,7 @@
 # (See accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt.
 
+import testing ;
 import modules ;
 import path ;
 import ../../config/checks/config : requires ;
@@ -284,6 +285,11 @@ for local source in test_exp.cpp test_log.cpp test_pow.cpp test_sinh.cpp test_sq
            : $(source:B)_intel_quad ;
 }
 
+run test_sf_import_c99.cpp : : : <define>TEST_CPP_DEC_FLOAT_2 : test_sf_import_c99_cpp_dec_float_2 ;
+run test_sf_import_c99.cpp : : : <define>TEST_CPP_DEC_FLOAT_3 : test_sf_import_c99_cpp_dec_float_3 ;
+run test_sf_import_c99.cpp : : : <define>TEST_CPP_DEC_FLOAT_4 : test_sf_import_c99_cpp_dec_float_4 ;
+run test_sf_import_c99.cpp : : : <define>TEST_CPP_DEC_FLOAT_5 : test_sf_import_c99_cpp_dec_float_5 ;
+
 run test_gmp_conversions.cpp gmp no_eh_support
         : # command line
         : # input files
@@ -490,6 +496,7 @@ run test_convert_from_float128.cpp
          [ check-target-builds ../config//has_float128 : <define>HAS_FLOAT128 <source>quadmath : ] 
         ;
 
+
 #
 # This take too long to run as a regular part of the tests:
 #
@@ -664,6 +671,7 @@ run test_cpp_int.cpp gmp no_eh_support
          ;
 
 run test_checked_cpp_int.cpp no_eh_support ;
+run test_unchecked_cpp_int.cpp no_eh_support : : : release ;
 
 run test_miller_rabin.cpp no_eh_support gmp
         : # command line
@@ -792,7 +800,6 @@ run test_mixed_float.cpp no_eh_support
          [ check-target-builds ../config//has_gmp : <define>TEST_GMP <library>gmp : ]
          [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <library>mpfr <library>gmp : ] ;
 
-
 compile include_test/mpfr_include_test.cpp
               : # requirements
                [ check-target-builds ../config//has_mpfr : : <build>no ] ;
@@ -826,18 +833,18 @@ run ublas_interop/test6.cpp ublas_interop/test62.cpp ublas_interop/test63.cpp no
 # Serialization tests, run in release mode so we cycle through more values:
 #
 path-constant here : . ;
-run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST1 : test_cpp_int_serial_1 ;
-run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST2 : test_cpp_int_serial_2 ;
-run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST3 : test_cpp_int_serial_3 ;
-run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST4 : test_cpp_int_serial_4 ;
-run test_cpp_int_deserial.cpp ../../serialization/build//boost_serialization ../../filesystem/build//boost_filesystem : $(here) : : release ;
-run test_cpp_rat_serial.cpp ../../serialization/build//boost_serialization : : : release ;
-run test_adapt_serial.cpp ../../serialization/build//boost_serialization : : : release ;
-run test_cpp_dec_float_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST1 : test_cpp_dec_float_serial_1 ;
-run test_cpp_dec_float_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST2 : test_cpp_dec_float_serial_2 ;
-run test_float128_serial.cpp ../../serialization/build//boost_serialization quadmath : : : release [ check-target-builds ../config//has_float128 : : <build>no ]  ;
-run test_cpp_bin_float_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST1 : test_bin_dec_float_serial_1 ;
-run test_cpp_bin_float_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST2 : test_bin_dec_float_serial_2 ;
+run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST1 <toolset>gcc-mingw:<link>static : test_cpp_int_serial_1 ;
+run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST2 <toolset>gcc-mingw:<link>static : test_cpp_int_serial_2 ;
+run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST3 <toolset>gcc-mingw:<link>static : test_cpp_int_serial_3 ;
+run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST4 <toolset>gcc-mingw:<link>static : test_cpp_int_serial_4 ;
+run test_cpp_int_deserial.cpp ../../serialization/build//boost_serialization ../../filesystem/build//boost_filesystem : $(here) : : release <toolset>gcc-mingw:<link>static  ;
+run test_cpp_rat_serial.cpp ../../serialization/build//boost_serialization : : : release <toolset>gcc-mingw:<link>static  ;
+run test_adapt_serial.cpp ../../serialization/build//boost_serialization : : : release <toolset>gcc-mingw:<link>static  ;
+run test_cpp_dec_float_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST1 <toolset>gcc-mingw:<link>static  : test_cpp_dec_float_serial_1 ;
+run test_cpp_dec_float_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST2 <toolset>gcc-mingw:<link>static  : test_cpp_dec_float_serial_2 ;
+run test_float128_serial.cpp ../../serialization/build//boost_serialization quadmath : : : release <toolset>gcc-mingw:<link>static  [ check-target-builds ../config//has_float128 : : <build>no ]  ;
+run test_cpp_bin_float_serial.cpp ../../serialization/build//boost_serialization : : : release <toolset>gcc-mingw:<link>static  <define>TEST1 : test_bin_dec_float_serial_1 ;
+run test_cpp_bin_float_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST2 <toolset>gcc-mingw:<link>static  : test_bin_dec_float_serial_2 ;
 
 #
 # Mixed mode comparison tests, see: https://svn.boost.org/trac/boost/ticket/11328
@@ -984,14 +991,19 @@ if $(enable-specfun)
    }
 }
 
+local compile_fail_tests ;
+
 for local source in [ glob compile_fail/*.cpp ]
 {
+   compile_fail_tests +=  $(source:B) ;
    compile-fail $(source)
    :
       [ check-target-builds ../config//has_gmp : <define>TEST_GMP <debug-symbols>off : ]
       [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <debug-symbols>off : ]
    ;
 }
+
+alias compile_fail :  $(compile_fail_tests) ;
 
 if ! $(disable-concepts)
 {
@@ -1072,6 +1084,316 @@ if ! $(disable-concepts)
               : $(source:B)_logged_adaptor ;
    }
 }
+
+alias arithmetic_tests : 
+	test_arithmetic_backend_concept 
+	test_arithmetic_cpp_dec_float_1 
+	test_arithmetic_cpp_dec_float_2 
+	test_arithmetic_cpp_dec_float_3
+	test_arithmetic_cpp_bin_float_1
+	test_arithmetic_cpp_bin_float_2
+	test_arithmetic_cpp_bin_float_3
+	test_arithmetic_mpf_50
+	test_arithmetic_mpf
+	test_arithmetic_mpz
+	test_arithmetic_mpz_rat
+	test_arithmetic_mpz_br
+	test_arithmetic_mpq
+	test_arithmetic_mpfr
+	test_arithmetic_mpfr_50 
+	test_arithmetic_mpfr_50_static
+	test_arithmetic_tommath
+	test_arithmetic_tommath_rat
+	test_arithmetic_tommath_br
+	test_arithmetic_cpp_int_1
+	test_arithmetic_cpp_int_2
+	test_arithmetic_cpp_int_3
+	test_arithmetic_cpp_int_4
+	test_arithmetic_cpp_int_5
+	test_arithmetic_cpp_int_6
+	test_arithmetic_cpp_int_7
+	test_arithmetic_cpp_int_8
+	test_arithmetic_cpp_int_9
+	test_arithmetic_cpp_int_10
+	test_arithmetic_cpp_int_11
+	test_arithmetic_cpp_int_12
+	test_arithmetic_cpp_int_13
+	test_arithmetic_cpp_int_14
+	test_arithmetic_cpp_int_15
+	test_arithmetic_cpp_int_16
+	test_arithmetic_cpp_int_17
+	test_arithmetic_cpp_int_18
+	test_arithmetic_cpp_int_br
+	test_arithmetic_ab_1
+	test_arithmetic_ab_2
+	test_arithmetic_ab_3
+	test_cpp_dec_float_round
+	test_arithmetic_logged_1
+	test_arithmetic_logged_2
+	test_arithmetic_dbg_adptr1
+	test_arithmetic_dbg_adptr2
+	test_arithmetic_mpfi_50
+	test_arithmetic_float_128
+	test_arithmetic_float_128 
+	;
+
+alias cpp_int_tests :
+	test_cpp_int_left_shift
+	test_cpp_int_1
+	test_cpp_int_2
+	test_cpp_int_3
+	test_cpp_int_4
+	test_cpp_int_5
+	test_checked_cpp_int
+	test_unchecked_cpp_int
+	test_cpp_int_lit
+	test_cpp_int_serial_1
+	test_cpp_int_serial_2
+	test_cpp_int_serial_3
+	test_cpp_int_serial_4
+	test_cpp_int_deserial
+;
+
+alias functions_and_limits :
+	test_numeric_limits_backend_concept
+	test_numeric_limits_mpf50
+	test_numeric_limits_mpf
+	test_numeric_limits_mpz
+	test_numeric_limits_mpq
+	test_numeric_limits_mpfr
+	test_numeric_limits_mpfr_50
+	test_numeric_limits_cpp_dec_float
+	test_numeric_limits_cpp_bin_float
+	test_numeric_limits_tommath
+	test_numeric_limits_cpp_int
+	test_numeric_limits_mpfi_50
+	test_numeric_limits_float128
+
+	test_exp_mpf50
+	test_log_mpf50
+	test_pow_mpf50
+	test_sinh_mpf50
+	test_sqrt_mpf50
+	test_cosh_mpf50
+	test_tanh_mpf50
+	test_sin_mpf50
+	test_cos_mpf50
+	test_tan_mpf50
+	test_asin_mpf50
+	test_acos_mpf50
+	test_atan_mpf50
+	test_round_mpf50
+	test_fpclassify_mpf50
+	test_sf_import_c99_mpf50
+
+	test_exp_mpfr50
+	test_log_mpfr50
+	test_pow_mpfr50
+	test_sinh_mpfr50
+	test_sqrt_mpfr50
+	test_cosh_mpfr50
+	test_tanh_mpfr50
+	test_sin_mpfr50
+	test_cos_mpfr50
+	test_tan_mpfr50
+	test_asin_mpfr50
+	test_acos_mpfr50
+	test_atan_mpfr50
+	test_round_mpfr50
+	test_fpclassify_mpfr50
+	test_sf_import_c99_mpfr50
+
+	test_exp_mpfi50
+	test_log_mpfi50
+	test_pow_mpfi50
+	test_sinh_mpfi50
+	test_sqrt_mpfi50
+	test_cosh_mpfi50
+	test_tanh_mpfi50
+	test_sin_mpfi50
+	test_cos_mpfi50
+	test_tan_mpfi50
+	test_asin_mpfi50
+	test_acos_mpfi50
+	test_atan_mpfi50
+	test_round_mpfi50
+	test_fpclassify_mpfi50
+	test_sf_import_c99_mpfi50
+
+	test_exp_cpp_dec_float
+	test_log_cpp_dec_float
+	test_pow_cpp_dec_float
+	test_sinh_cpp_dec_float
+	test_sqrt_cpp_dec_float
+	test_cosh_cpp_dec_float
+	test_tanh_cpp_dec_float
+	test_sin_cpp_dec_float
+	test_cos_cpp_dec_float
+	test_tan_cpp_dec_float
+	test_asin_cpp_dec_float
+	test_acos_cpp_dec_float
+	test_atan_cpp_dec_float
+	test_round_cpp_dec_float
+	test_fpclassify_cpp_dec_float
+	test_sf_import_c99_cpp_dec_float
+	test_sf_import_c99_cpp_dec_float_2
+	test_sf_import_c99_cpp_dec_float_3
+	test_sf_import_c99_cpp_dec_float_4
+	test_sf_import_c99_cpp_dec_float_5
+
+	test_exp_cpp_bin_float
+	test_log_cpp_bin_float
+	test_pow_cpp_bin_float
+	test_sinh_cpp_bin_float
+	test_sqrt_cpp_bin_float
+	test_cosh_cpp_bin_float
+	test_tanh_cpp_bin_float
+	test_sin_cpp_bin_float
+	test_cos_cpp_bin_float
+	test_tan_cpp_bin_float
+	test_asin_cpp_bin_float
+	test_acos_cpp_bin_float
+	test_atan_cpp_bin_float
+	test_round_cpp_bin_float
+	test_fpclassify_cpp_bin_float
+	test_sf_import_c99_cpp_bin_float
+
+	test_exp_float128
+	test_log_float128
+	test_pow_float128
+	test_sinh_float128
+	test_sqrt_float128
+	test_cosh_float128
+	test_tanh_float128
+	test_sin_float128
+	test_cos_float128
+	test_tan_float128
+	test_asin_float128
+	test_acos_float128
+	test_atan_float128
+	test_round_float128
+	test_fpclassify_float128
+	test_sf_import_c99_float128
+
+	test_exp_intel_quad
+	test_log_intel_quad
+	test_pow_intel_quad
+	test_sinh_intel_quad
+	test_sqrt_intel_quad
+	test_cosh_intel_quad
+	test_tanh_intel_quad
+	test_sin_intel_quad
+	test_cos_intel_quad
+	test_tan_intel_quad
+	test_asin_intel_quad
+	test_acos_intel_quad
+	test_atan_intel_quad
+	test_round_intel_quad
+	test_fpclassify_intel_quad
+	test_sf_import_c99_intel_quad
+	test_move_gmp
+	test_move_mpfr
+	test_move_tommath
+	test_move_cpp_int
+	test_test
+	test_miller_rabin
+	test_cpp_bin_float_io_1
+	test_cpp_bin_float_io_2
+;
+
+alias conversions :
+	test_gmp_conversions
+	test_mpfr_conversions
+	test_constants_mpf50
+	test_constants_mpfr_50
+	test_constants_cpp_dec_float
+	test_convert_from_cpp_int
+	test_convert_from_mpz_int
+	test_convert_from_tom_int
+	test_convert_from_cpp_rational
+	test_convert_from_gmp_rational
+	test_convert_from_tom_rational
+	test_convert_from_cpp_bin_float
+	test_convert_from_cpp_dec_float
+	test_convert_from_mpf_float
+	test_convert_from_mpfr_float
+	test_convert_from_mpfi_float
+	test_convert_from_float128
+	test_float_io_cpp_dec_float
+	test_float_io_mpf
+	test_float_io_mpfr
+	test_float_io_mpfi
+	test_float_io_float128
+	test_float_io_intel_quad
+	test_int_io_tommath
+	test_int_io_mpz
+	test_int_io_cpp_int
+	test_rational_io_tommath
+	test_rational_io_mpz
+	test_rational_io_cpp_int
+	test_generic_conv
+	test_rat_float_interconv_1
+	test_rat_float_interconv_2
+	test_rat_float_interconv_3
+	test_rat_float_interconv_4
+	test_rat_float_interconv_5
+	test_rat_float_interconv_6
+	test_rat_float_interconv_7
+	test_rat_float_interconv_8
+	test_cpp_int_conv
+	test_cpp_int_import_export
+	test_native_integer
+	test_mixed_cpp_int
+	test_mixed_float
+	test_cpp_rat_serial
+	test_cpp_bin_float
+;
+
+alias misc :
+	test_constexpr
+	test_nothrow_cpp_int
+	test_nothrow_cpp_rational
+	test_nothrow_cpp_bin_float
+	test_nothrow_cpp_dec_float
+	test_nothrow_float128
+	test_nothrow_gmp
+	test_nothrow_mpfr
+	mpfr_include_test
+	gmp_include_test
+	tommath_include_test
+	cpp_int_include_test
+	cpp_dec_float_include_test
+	cpp_bin_float_include_test
+	test1
+	test2
+	test4
+	test5
+	test6
+	ublas1_et
+	ublas2_et
+	ublas3_et
+	ublas4_et
+	ublas5_et
+	test_adapt_serial
+	test_cpp_dec_float_serial_1
+	test_cpp_dec_float_serial_2
+	test_float128_serial
+	test_bin_dec_float_serial_1
+	test_bin_dec_float_serial_2
+	test_checked_mixed_cpp_int
+	test_mixed_cpp_bin_float
+	test_mixed_cpp_dec_float
+	test_mixed_mpf_float
+	test_mixed_mpfr_float
+	test_float_conversions
+	bug11922
+	bug12039
+	test_hash
+;
+
+
+
+
 
 
 

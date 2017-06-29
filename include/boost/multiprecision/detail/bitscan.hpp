@@ -143,9 +143,12 @@ BOOST_FORCEINLINE unsigned find_msb(boost::ulong_long_type mask, mpl::int_<3> co
    return sizeof(boost::ulong_long_type) * CHAR_BIT - 1 - __builtin_clzll(mask);
 }
 #ifdef BOOST_HAS_INT128
-BOOST_FORCEINLINE unsigned find_msb(unsigned __int128 mask, mpl::int_<0> const&)
+
+__extension__  typedef unsigned __int128 uint128_type;
+
+BOOST_FORCEINLINE unsigned find_msb(uint128_type mask, mpl::int_<0> const&)
 {
-   union { unsigned __int128 v; boost::uint64_t sv[2]; } val;
+   union { uint128_type v; boost::uint64_t sv[2]; } val;
    val.v = mask;
 #ifdef BOOST_LITTLE_ENDIAN
    if(val.sv[1])
@@ -157,9 +160,9 @@ BOOST_FORCEINLINE unsigned find_msb(unsigned __int128 mask, mpl::int_<0> const&)
    return find_msb(val.sv[1], mpl::int_<3>());
 #endif
 }
-BOOST_FORCEINLINE unsigned find_lsb(unsigned __int128 mask, mpl::int_<0> const&)
+BOOST_FORCEINLINE unsigned find_lsb(uint128_type mask, mpl::int_<0> const&)
 {
-   union { unsigned __int128 v; boost::uint64_t sv[2]; } val;
+   union { uint128_type v; boost::uint64_t sv[2]; } val;
    val.v = mask;
 #ifdef BOOST_LITTLE_ENDIAN
    if(val.sv[0] == 0)

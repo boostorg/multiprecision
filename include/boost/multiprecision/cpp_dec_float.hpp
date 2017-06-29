@@ -255,7 +255,11 @@ public:
    }
 
    template <class F>
-   cpp_dec_float(const F val, typename enable_if<is_floating_point<F> >::type* = 0) :
+   cpp_dec_float(const F val, typename enable_if_c<is_floating_point<F>::value
+#ifdef BOOST_HAS_FLOAT128
+      && !boost::is_same<F, __float128>::value
+#endif
+   >::type* = 0) :
       data(),
       exp (static_cast<ExponentType>(0)),
       neg (false),
@@ -2892,7 +2896,7 @@ template <unsigned Digits10, class ExponentType, class Allocator, class ArgType>
 inline void eval_scalbn(cpp_dec_float<Digits10, ExponentType, Allocator>& result, const cpp_dec_float<Digits10, ExponentType, Allocator>& val, ArgType e_)
 {
    using default_ops::eval_multiply;
-   const ExponentType e = e_;
+   const ExponentType e = static_cast<ExponentType>(e_);
    cpp_dec_float<Digits10, ExponentType, Allocator> t(1.0, e);
    eval_multiply(result, val, t);
 }

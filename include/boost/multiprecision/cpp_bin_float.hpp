@@ -103,6 +103,10 @@ public:
          (number_category<Float>::value == number_kind_floating_point)
          && (std::numeric_limits<Float>::digits <= (int)bit_count)
          && (std::numeric_limits<Float>::radix == 2)
+         && (std::numeric_limits<Float>::is_specialized)
+#ifdef BOOST_HAS_FLOAT128
+         && !boost::is_same<Float, __float128>::value
+#endif
       >::type const* = 0)
       : m_data(), m_exponent(0), m_sign(false)
    {
@@ -113,14 +117,39 @@ public:
    explicit cpp_bin_float(const Float& f,
       typename boost::enable_if_c<
       (number_category<Float>::value == number_kind_floating_point)
-      && (std::numeric_limits<Float>::digits > (int)bit_count)
-      && (std::numeric_limits<Float>::radix == 2)
+         && (std::numeric_limits<Float>::digits > (int)bit_count)
+         && (std::numeric_limits<Float>::radix == 2)
+         && (std::numeric_limits<Float>::is_specialized)
+#ifdef BOOST_HAS_FLOAT128
+        && !boost::is_same<Float, __float128>::value
+#endif
+>::type const* = 0)
+      : m_data(), m_exponent(0), m_sign(false)
+   {
+      this->assign_float(f);
+   }
+#ifdef BOOST_HAS_FLOAT128
+   template <class Float>
+   cpp_bin_float(const Float& f,
+      typename boost::enable_if_c<
+      boost::is_same<Float, __float128>::value
+      && ((int)bit_count >= 113)
       >::type const* = 0)
       : m_data(), m_exponent(0), m_sign(false)
    {
       this->assign_float(f);
    }
-
+   template <class Float>
+   explicit cpp_bin_float(const Float& f,
+      typename boost::enable_if_c<
+      boost::is_same<Float, __float128>::value
+      && ((int)bit_count < 113)
+      >::type const* = 0)
+      : m_data(), m_exponent(0), m_sign(false)
+   {
+      this->assign_float(f);
+   }
+#endif
    cpp_bin_float& operator=(const cpp_bin_float &o) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<rep_type&>() = std::declval<const rep_type&>()))
    {
       m_data = o.m_data;
@@ -157,22 +186,31 @@ public:
       }
       return *this;
    }
-
+#ifdef BOOST_HAS_FLOAT128
    template <class Float>
    typename boost::enable_if_c<
       (number_category<Float>::value == number_kind_floating_point)
       //&& (std::numeric_limits<Float>::digits <= (int)bit_count)
-      && (std::numeric_limits<Float>::radix == 2), cpp_bin_float&>::type operator=(const Float& f)
+      && ((std::numeric_limits<Float>::radix == 2) || (boost::is_same<Float, __float128>::value)), cpp_bin_float&>::type 
+      operator=(const Float& f)
+#else
+   template <class Float>
+   typename boost::enable_if_c<
+      (number_category<Float>::value == number_kind_floating_point)
+      //&& (std::numeric_limits<Float>::digits <= (int)bit_count)
+      && (std::numeric_limits<Float>::radix == 2), cpp_bin_float&>::type 
+      operator=(const Float& f)
+#endif
    {
       return assign_float(f);
    }
 
 #ifdef BOOST_HAS_FLOAT128
-   cpp_bin_float& operator=(__float128 f)
+   template <class Float>
+   typename boost::enable_if_c<boost::is_same<Float, __float128>::value, cpp_bin_float& >::type assign_float(Float f)
    {
       using default_ops::eval_add;
       typedef typename boost::multiprecision::detail::canonical<int, cpp_bin_float>::type bf_int_type;
-
       if(f == 0)
       {
          m_data = limb_type(0);
@@ -224,9 +262,13 @@ public:
       return *this;
    }
 #endif
-
+#ifdef BOOST_HAS_FLOAT128
+   template <class Float>
+   typename boost::enable_if_c<is_floating_point<Float>::value && !is_same<Float, __float128>::value, cpp_bin_float&>::type assign_float(Float f)
+#else
    template <class Float>
    typename boost::enable_if_c<is_floating_point<Float>::value, cpp_bin_float&>::type assign_float(Float f)
+#endif
    {
       BOOST_MATH_STD_USING
       using default_ops::eval_add;

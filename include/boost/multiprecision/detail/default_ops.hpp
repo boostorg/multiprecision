@@ -1479,7 +1479,7 @@ inline typename B::exponent_type eval_ilogb(const B& val)
    {
    case FP_NAN:
 #ifdef FP_ILOGBNAN
-      return FP_ILOGBNAN;
+      return FP_ILOGBNAN > 0 ? (std::numeric_limits<typename B::exponent_type>::max)() : (std::numeric_limits<typename B::exponent_type>::min)();
 #else
       return (std::numeric_limits<typename B::exponent_type>::max)();
 #endif
@@ -3201,10 +3201,21 @@ inline multiprecision::number<Backend, ExpressionTemplates> sinhc_pi(const multi
    return BOOST_MP_MOVE(boost::math::sinhc_pi(x));
 }
 
+using boost::multiprecision::gcd;
+using boost::multiprecision::lcm;
+
 #ifdef BOOST_MSVC
 #pragma warning(pop)
 #endif
 } // namespace math
+
+namespace integer {
+
+using boost::multiprecision::gcd;
+using boost::multiprecision::lcm;
+
+}
+
 } // namespace boost
 
 //

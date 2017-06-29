@@ -48,6 +48,7 @@ int max_digits10()
 
 BOOST_AUTO_TEST_CASE(test_numeric_limits_snips)
 {
+#if !(defined(CI_SUPPRESS_KNOWN_ISSUES) && defined(BOOST_MSVC) && (BOOST_MSVC == 1600))
   try
   {
 
@@ -318,6 +319,7 @@ with Boost.Test's macro `BOOST_CHECK_CLOSE_FRACTION`
 //] [/tolerance_1]
   }
 
+#if !(defined(CI_SUPPRESS_KNOWN_ISSUES) && defined(__GNUC__) && defined(_WIN32))
   {
 //[tolerance_2
 
@@ -445,6 +447,7 @@ Similarly we can do the same with NaN (except that we cannot use `assert`)
 //] [/facet_1]
   }
 
-
+#endif
+#endif
 } // BOOST_AUTO_TEST_CASE(test_numeric_limits_snips)
 

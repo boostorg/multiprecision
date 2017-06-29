@@ -322,11 +322,23 @@ to the underlying number type without you having to do anything, so:
 Will work just fine, with the `a + delta` expression template argument getting converted to an `mpfr_float_100`
 internally by the Boost.Math library.
 
-One other potential pitfall that's only possible in C++11: you should never store an expression template using:
+[caution In C++11 you should never store an expression template using:
 
-   auto my_expression = a + b - c;
+`auto my_expression = a + b - c;`
 
 unless you're absolutely sure that the lifetimes of `a`, `b` and `c` will outlive that of `my_expression`.
+
+In fact it is particularly easy to create dangling references by mixing expression templates with the auto
+keyword, for example:
+
+`auto val = cpp_dec_float_50("23.1") * 100;`
+
+In this situation the integer literal is stored directly in the expression template - so it's use is OK here -
+but the cpp_dec_float_50 temporary is stored by reference and then destructed when the statement completes 
+leaving a dangling reference.
+
+[*['If in doubt, do not ever mix expression templates with the auto keyword.]]
+]
 
 And finally... the performance improvements from an expression template library like this are often not as
 dramatic as the reduction in number of temporaries would suggest.  For example if we compare this library with
@@ -1512,7 +1524,7 @@ In particular:
 * A `number` can be converted to any built in type, via the `convert_to` member function:
 
    mpz_int z(2);
-   int i = z.template convert_to<int>(); // sets i to 2
+   int i = z.convert_to<int>(); // sets i to 2
 
 * Conversions to rational numbers from floating-point ones are always allowed, and are exact and implicit
 as long as the rational number uses an unbounded integer type.  Please be aware that constructing a rational
@@ -5244,6 +5256,12 @@ Windows Vista machine.
 [section:map Roadmap]
 
 [section:hist History]
+
+[h4 Multiprecision-2.3.2 (Boost-1.65)]
+
+* Updated expression templates to store arithmetic literals directly in the expression template to prevent dangling references, see [@https://github.com/boostorg/multiprecision/issues/19 #19].
+* Fix various issues with huge values and overflow in the trig, pow and exp functions, see [@https://github.com/boostorg/multiprecision/issues/24 #24].
+* Fix error handling of checked cpp_int multiply that could cause some overflows to be missed.
 
 [h4 Multiprecision-2.3.1 (Boost-1.64)]
 

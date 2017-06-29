@@ -303,6 +303,16 @@ void eval_exp(T& result, const T& x)
    exp_type n;
    eval_convert_to(&n, result);
 
+   if (n == (std::numeric_limits<exp_type>::max)())
+   {
+      // Exponent is too large to fit in our exponent type:
+      if (isneg)
+         result = ui_type(0);
+      else
+         result = std::numeric_limits<number<T> >::has_infinity ? std::numeric_limits<number<T> >::infinity().backend() : (std::numeric_limits<number<T> >::max)().backend();
+      return;
+   }
+
    // The scaling is 2^11 = 2048.
    const si_type p2 = static_cast<si_type>(si_type(1) << 11);
 

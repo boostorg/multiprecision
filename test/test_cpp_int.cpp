@@ -24,6 +24,9 @@
 #include <boost/timer.hpp>
 #include "test.hpp"
 
+#ifdef _MSC_VER
+#pragma warning(disable:4127)  //  Conditional expression is constant
+#endif
 
 #if !defined(TEST1) && !defined(TEST2) && !defined(TEST3)
 #define TEST1
@@ -387,7 +390,7 @@ struct tester
       BOOST_CHECK_EQUAL(msb(a), msb(a1));
    }
 
-   void test_bug_cases()
+   static void test_bug_cases()
    {
       if(!std::numeric_limits<test_type>::is_bounded)
       {
@@ -517,13 +520,13 @@ struct tester
       BOOST_CHECK(r < b);
       BOOST_CHECK_EQUAL(a - c * b, r);
 #endif
-      for(unsigned int ui = 0; ui < 1000; ++ui)
+      for(ui = 0; ui < 1000; ++ui)
       {
-         boost::multiprecision::mpz_int r;
-         boost::multiprecision::mpz_int s1 = sqrt(boost::multiprecision::mpz_int(ui), r);
+         boost::multiprecision::mpz_int t;
+         boost::multiprecision::mpz_int s1 = sqrt(boost::multiprecision::mpz_int(ui), t);
          a = sqrt(test_type(ui), b);
          BOOST_CHECK_EQUAL(a.str(), s1.str());
-         BOOST_CHECK_EQUAL(b.str(), r.str());
+         BOOST_CHECK_EQUAL(b.str(), t.str());
       }
    }
 
@@ -601,7 +604,11 @@ struct tester
          // Tests run on the compiler farm time out after 300 seconds,
          // so don't get too close to that:
          //
+#ifndef CI_SUPPRESS_KNOWN_ISSUES
          if(tim.elapsed() > 200)
+#else
+         if (tim.elapsed() > 25)
+#endif
          {
             std::cout << "Timeout reached, aborting tests now....\n";
             break;
