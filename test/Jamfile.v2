@@ -863,6 +863,7 @@ run test_float_conversions.cpp no_eh_support ;
 #
 compile bug11922.cpp ;
 run bug12039.cpp no_eh_support ;
+compile git_issue_30.cpp ;
 run test_hash.cpp : : : 
    [ check-target-builds ../config//has_float128 : <define>TEST_FLOAT128 <source>quadmath : ]
    [ check-target-builds ../config//has_gmp : <define>TEST_GMP <source>gmp : ]
