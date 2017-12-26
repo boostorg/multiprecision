@@ -342,28 +342,28 @@ NON_MEMBER_OP4(qr, "quotient-and-remainder")
 NON_MEMBER_OP2(complement, "~")
 
 template <class Backend>
-inline void eval_left_shift(debug_adaptor<Backend>& arg, unsigned a)
+inline void eval_left_shift(debug_adaptor<Backend>& arg, std::size_t a)
 {
    using default_ops::eval_left_shift;
    eval_left_shift(arg.value(), a);
    arg.update_view();\
 }
 template <class Backend>
-inline void eval_left_shift(debug_adaptor<Backend>& arg, const debug_adaptor<Backend>& a, unsigned b)
+inline void eval_left_shift(debug_adaptor<Backend>& arg, const debug_adaptor<Backend>& a, std::size_t b)
 {
    using default_ops::eval_left_shift;
    eval_left_shift(arg.value(), a.value(), b);
    arg.update_view();\
 }
 template <class Backend>
-inline void eval_right_shift(debug_adaptor<Backend>& arg, unsigned a)
+inline void eval_right_shift(debug_adaptor<Backend>& arg, std::size_t a)
 {
    using default_ops::eval_right_shift;
    eval_right_shift(arg.value(), a);
    arg.update_view();\
 }
 template <class Backend>
-inline void eval_right_shift(debug_adaptor<Backend>& arg, const debug_adaptor<Backend>& a, unsigned b)
+inline void eval_right_shift(debug_adaptor<Backend>& arg, const debug_adaptor<Backend>& a, std::size_t b)
 {
    using default_ops::eval_right_shift;
    eval_right_shift(arg.value(), a.value(), b);

@@ -371,7 +371,7 @@ NON_MEMBER_OP4(qr, "quotient-and-remainder")
 NON_MEMBER_OP2(complement, "~")
 
 template <class Backend>
-inline void eval_left_shift(logged_adaptor<Backend>& arg, unsigned a)
+inline void eval_left_shift(logged_adaptor<Backend>& arg, std::size_t a)
 {
    using default_ops::eval_left_shift;
    log_prefix_event(arg.value(), a, "<<=");
@@ -379,7 +379,7 @@ inline void eval_left_shift(logged_adaptor<Backend>& arg, unsigned a)
    log_postfix_event(arg.value(), "<<=");
 }
 template <class Backend>
-inline void eval_left_shift(logged_adaptor<Backend>& arg, const logged_adaptor<Backend>& a, unsigned b)
+inline void eval_left_shift(logged_adaptor<Backend>& arg, const logged_adaptor<Backend>& a, std::size_t b)
 {
    using default_ops::eval_left_shift;
    log_prefix_event(arg.value(), a, b, "<<");
@@ -387,7 +387,7 @@ inline void eval_left_shift(logged_adaptor<Backend>& arg, const logged_adaptor<B
    log_postfix_event(arg.value(), "<<");
 }
 template <class Backend>
-inline void eval_right_shift(logged_adaptor<Backend>& arg, unsigned a)
+inline void eval_right_shift(logged_adaptor<Backend>& arg, std::size_t a)
 {
    using default_ops::eval_right_shift;
    log_prefix_event(arg.value(), a, ">>=");
@@ -395,7 +395,7 @@ inline void eval_right_shift(logged_adaptor<Backend>& arg, unsigned a)
    log_postfix_event(arg.value(), ">>=");
 }
 template <class Backend>
-inline void eval_right_shift(logged_adaptor<Backend>& arg, const logged_adaptor<Backend>& a, unsigned b)
+inline void eval_right_shift(logged_adaptor<Backend>& arg, const logged_adaptor<Backend>& a, std::size_t b)
 {
    using default_ops::eval_right_shift;
    log_prefix_event(arg.value(), a, b, ">>");
