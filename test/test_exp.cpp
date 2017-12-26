@@ -141,7 +141,7 @@ void test()
 #if defined(BOOST_INTEL) && defined(TEST_FLOAT128)
    BOOST_TEST(max_err < 40000);
 #elif defined(TEST_CPP_BIN_FLOAT)
-   BOOST_TEST(max_err < 6000);
+   BOOST_TEST(max_err < 6200);
 #else
    BOOST_TEST(max_err < 5000);
 #endif
@@ -247,6 +247,7 @@ int main()
 #endif
 #ifdef TEST_CPP_BIN_FLOAT
    test<boost::multiprecision::cpp_bin_float_50>();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<35, boost::multiprecision::digit_base_10, std::allocator<void>, boost::long_long_type> > >();
 #endif
    return boost::report_errors();
 }

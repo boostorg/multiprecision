@@ -95,7 +95,7 @@ void test()
    }
    std::cout << "Max error was: " << max_err << std::endl;
 #ifdef TEST_CPP_BIN_FLOAT
-   BOOST_TEST(max_err < 120);
+   BOOST_TEST(max_err < 320);
 #else
    BOOST_TEST(max_err < 60);
 #endif
@@ -140,6 +140,7 @@ int main()
 #endif
 #ifdef TEST_CPP_BIN_FLOAT
    test<boost::multiprecision::cpp_bin_float_50>();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<35, boost::multiprecision::digit_base_10, std::allocator<void>, boost::long_long_type> > >();
 #endif
    return boost::report_errors();
 }
