@@ -10,6 +10,7 @@
 
 #ifdef _MSC_VER
 #  define _SCL_SECURE_NO_WARNINGS
+#pragma warning (disable:4127)
 #endif
 
 #include <boost/detail/lightweight_test.hpp>

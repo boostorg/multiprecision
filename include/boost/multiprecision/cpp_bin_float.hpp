@@ -1831,7 +1831,8 @@ public:
       if(!value.first)
       {
          value.first = true;
-         value.second = 1u;
+         typedef typename boost::mpl::front<typename number_type::backend_type::unsigned_types>::type ui_type;
+         value.second.backend() = ui_type(1u);
          value.second.backend().exponent() = boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::min_exponent;
       }
       return value.second;
@@ -1876,8 +1877,10 @@ public:
       static std::pair<bool, number_type> value;
       if(!value.first)
       {
+         // We jump through hoops here just to keep VC12 happy (ie compiler workaround, for very strange compiler bug):
+         typedef typename boost::mpl::front<typename number_type::backend_type::unsigned_types>::type ui_type;
          value.first = true;
-         value.second = 1;
+         value.second.backend() = ui_type(1u);
          value.second = ldexp(value.second, 1 - (int)digits);
       }
       return value.second;
@@ -1891,7 +1894,9 @@ public:
       if(!value.first)
       {
          value.first = true;
-         value.second = 1;
+         // We jump through hoops here just to keep VC12 happy (ie compiler workaround, for very strange compiler bug):
+         typedef typename boost::mpl::front<typename number_type::backend_type::unsigned_types>::type ui_type;
+         value.second.backend() = ui_type(1u);
          value.second = ldexp(value.second, -1);
       }
       return value.second;
