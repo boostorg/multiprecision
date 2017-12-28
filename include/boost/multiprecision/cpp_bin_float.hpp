@@ -1848,12 +1848,20 @@ public:
             eval_complement(value.second.backend().bits(), value.second.backend().bits());
          else
          {
-            typedef boost::multiprecision::number<typename number_type::backend_type::rep_type> int_type;
-            int_type i = 1;
-            i <<= boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1;
-            int_type j(i);
-            j += --i;
-            value.second.backend().bits() = j.backend();
+            // We jump through hoops here using the backend type directly just to keep VC12 happy 
+            // (ie compiler workaround, for very strange compiler bug):
+            using boost::multiprecision::default_ops::eval_add;
+            using boost::multiprecision::default_ops::eval_decrement;
+            using boost::multiprecision::default_ops::eval_left_shift;
+            typedef typename number_type::backend_type::rep_type int_backend_type;
+            typedef typename boost::mpl::front<typename int_backend_type::unsigned_types>::type ui_type;
+            int_backend_type i;
+            i = ui_type(1u);
+            eval_left_shift(i, boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1);
+            int_backend_type j(i);
+            eval_decrement(i);
+            eval_add(j, i);
+            value.second.backend().bits() = j;
          }
          value.second.backend().exponent() = boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::max_exponent;
       }
