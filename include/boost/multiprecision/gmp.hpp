@@ -1607,7 +1607,11 @@ inline int eval_get_sign(const gmp_int& val)
 }
 inline void eval_convert_to(unsigned long* result, const gmp_int& val)
 {
-   if(0 == mpz_fits_ulong_p(val.data()))
+   if (mpz_sgn(val.data()) < 0)
+   {
+      BOOST_THROW_EXCEPTION(std::range_error("Conversion from negative integer to an unsigned type results in undefined behaviour"));
+   }
+   else if(0 == mpz_fits_ulong_p(val.data()))
    {
       *result = (std::numeric_limits<unsigned long>::max)();
    }
@@ -1618,8 +1622,7 @@ inline void eval_convert_to(long* result, const gmp_int& val)
 {
    if(0 == mpz_fits_slong_p(val.data()))
    {
-      *result = (std::numeric_limits<unsigned long>::max)();
-      *result *= mpz_sgn(val.data());
+      *result = mpz_sgn(val.data()) < 0 ? (std::numeric_limits<long>::min)()  : (std::numeric_limits<long>::max)();
    }
    else
       *result = mpz_get_si(val.data());

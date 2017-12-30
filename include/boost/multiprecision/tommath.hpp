@@ -558,6 +558,7 @@ inline int eval_get_sign(const tommath_int& val)
 {
    return mp_iszero(&val.data()) ? 0 : SIGN(&val.data()) ? -1 : 1;
 }
+/*
 template <class A>
 inline void eval_convert_to(A* result, const tommath_int& val)
 {
@@ -575,6 +576,7 @@ inline void eval_convert_to(signed char* result, const tommath_int& val)
 {
    *result = static_cast<signed char>(boost::lexical_cast<int>(val.str(0, std::ios_base::fmtflags(0))));
 }
+*/
 inline void eval_abs(tommath_int& result, const tommath_int& val)
 {
    detail::check_tommath_result(mp_abs(const_cast< ::mp_int*>(&val.data()), &result.data()));

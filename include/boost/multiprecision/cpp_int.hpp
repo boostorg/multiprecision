@@ -1192,6 +1192,7 @@ private:
    {
       this->check_in_range(val);
       *this->limbs() = static_cast<typename self_type::local_limb_type>(val);
+      this->sign(false);
       this->normalize();
    }
    template <class A>

@@ -21,6 +21,9 @@ struct related_type<boost::multiprecision::number<boost::multiprecision::cpp_int
    typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits/2, MaxBits/2, SignType, Checked, Allocator>, ET> type;
 };
 
+template <>
+struct is_checked_cpp_int<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, 64, boost::multiprecision::unsigned_magnitude, boost::multiprecision::checked, void> > > : public boost::mpl::true_{};
+
 int main()
 {
    test<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, 64, boost::multiprecision::unsigned_magnitude, boost::multiprecision::checked, void> > >();

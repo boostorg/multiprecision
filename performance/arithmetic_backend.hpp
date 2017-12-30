@@ -14,6 +14,7 @@
 #include <boost/math/concepts/real_concept.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/math/common_factor_rt.hpp>
+#include <boost/type_traits/common_type.hpp>
 
 namespace boost{
 namespace multiprecision{
@@ -116,7 +117,24 @@ private:
 };
 
 template <class R, class Arithmetic>
-inline void eval_convert_to(R* result, const arithmetic_backend<Arithmetic>& backend)
+inline typename enable_if_c<boost::is_integral<R>::value>::type eval_convert_to(R* result, const arithmetic_backend<Arithmetic>& backend)
+{
+   typedef typename boost::common_type<R, Arithmetic>::type c_type;
+   static const c_type max = static_cast<c_type>((std::numeric_limits<R>::max)());
+   static const c_type min = static_cast<c_type>((std::numeric_limits<R>::min)());
+   c_type ct = static_cast<c_type>(backend.data());
+   if ((backend.data() < 0) && !std::numeric_limits<R>::is_signed)
+      BOOST_THROW_EXCEPTION(std::range_error("Attempt to convert negative number to unsigned type."));
+   if (ct > max)
+      *result = (std::numeric_limits<R>::max)();
+   else if (std::numeric_limits<Arithmetic>::is_signed && (ct < min))
+      *result = (std::numeric_limits<R>::min)();
+   else
+      *result = backend.data();
+}
+
+template <class R, class Arithmetic>
+inline typename disable_if_c<boost::is_integral<R>::value>::type eval_convert_to(R* result, const arithmetic_backend<Arithmetic>& backend)
 {
    *result = backend.data();
 }
