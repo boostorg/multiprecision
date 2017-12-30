@@ -5257,6 +5257,21 @@ Windows Vista machine.
 
 [section:hist History]
 
+[h4 Multiprecision-3.0.0 (Boost-1.67)]
+
+* [*Breaking Change:] When converting a multiprecision integer to a narrower type, if the value is too large (or negative) to
+fit in the smaller type, then the result is either the maximum (or minimum) value of the target type.  This was always the intended
+behaviour, but was somewhat haphazardly enforced before.  If you really do want just the low order N bits of a value, then you will
+need to mask these out prior to the case, for example: `static_cast<unsigned>(~static_cast<unsigned>(0) & my_value)`.  Note that 
+technically (to avoid undefined behaviour) you should do the same thing with built in integer types too.
+See [@https://svn.boost.org/trac/boost/ticket/13109 #13109].
+* Fix bug in conversion of decimal to rational types (zero needs special handling), see [@https://svn.boost.org/trac/boost/ticket/13148 #13148].
+* Fix conversion from cpp_bin_float to a wider built in integer type, see [@https://svn.boost.org/trac/boost/ticket/13301 #13301].
+* Improve performance heurists used in cpp_bin_float exp function.
+* Fix bug in floor/ceil and cpp_bin_float when the exponent type is wider than an int, see [@https://svn.boost.org/trac/boost/ticket/13264 #13264].
+* Disable explicit conversion operator when the target type is already constructible from this type, see  [@https://github.com/boostorg/multiprecision/issues/30 #30].
+* Fix support for changes new to MPIR-3.0, see [@https://svn.boost.org/trac/boost/ticket/13124 #13124].
+
 [h4 Multiprecision-2.3.2 (Boost-1.65)]
 
 * Updated expression templates to store arithmetic literals directly in the expression template to prevent dangling references, see [@https://github.com/boostorg/multiprecision/issues/19 #19].
