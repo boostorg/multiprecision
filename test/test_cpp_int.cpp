@@ -432,6 +432,9 @@ struct tester
 	  BOOST_CHECK_EQUAL(a, 0);
 	  BOOST_CHECK_EQUAL(a, test_type(0));
 
+	  test_type a = test_type(1) + test_type(-1);
+	  BOOST_CHECK_EQUAL(a, 0);
+
       // Bug https://svn.boost.org/trac/boost/ticket/8126:
       test_type a("-4294967296");
       test_type b("4294967296");
