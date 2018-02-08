@@ -528,6 +528,13 @@ struct tester
          BOOST_CHECK_EQUAL(a.str(), s1.str());
          BOOST_CHECK_EQUAL(b.str(), t.str());
       }
+      a = -1;
+      ++a;
+      BOOST_CHECK_EQUAL(a, 0);
+      ++--a;
+      BOOST_CHECK_EQUAL(a, 0);
+      --++a;
+      BOOST_CHECK_EQUAL(a, 0);
    }
 
    void test()
