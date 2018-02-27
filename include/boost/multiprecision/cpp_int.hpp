@@ -171,10 +171,15 @@ inline void verify_limb_mask(bool /*b*/, U /*limb*/, U /*mask*/, const mpl::int_
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class Allocator>
 struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false> : private Allocator::template rebind<limb_type>::other
 {
-   typedef typename Allocator::template rebind<limb_type>::other allocator_type;
-   typedef typename allocator_type::pointer                      limb_pointer;
-   typedef typename allocator_type::const_pointer                const_limb_pointer;
-   typedef mpl::int_<Checked>                                    checked_type;
+   typedef typename Allocator::template rebind<limb_type>::other          allocator_type;
+#ifdef BOOST_NO_CXX11_ALLOCATOR
+   typedef typename allocator_type::pointer                               limb_pointer;
+   typedef typename allocator_type::const_pointer                         const_limb_pointer;
+#else
+   typedef typename std::allocator_traits<allocator_type>::pointer        limb_pointer;
+   typedef typename std::allocator_traits<allocator_type>::const_pointer  const_limb_pointer;
+#endif
+   typedef mpl::int_<Checked>                                             checked_type;
 
    //
    // Interface invariants:
@@ -1187,6 +1192,7 @@ private:
    {
       this->check_in_range(val);
       *this->limbs() = static_cast<typename self_type::local_limb_type>(val);
+      this->sign(false);
       this->normalize();
    }
    template <class A>

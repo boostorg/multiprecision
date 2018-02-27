@@ -429,6 +429,13 @@ void generic_interconvert_float2rational(To& to, const From& from, const mpl::in
    typename From::exponent_type e;
    typename component_type<number<To> >::type num, denom;
    number<From> val(from);
+
+   if (!val)
+   {
+      to = ui_type(0u);
+      return;
+   }
+
    e = ilogb(val);
    val = scalbn(val, -e);
    while(val)

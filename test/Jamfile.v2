@@ -290,6 +290,9 @@ run test_sf_import_c99.cpp : : : <define>TEST_CPP_DEC_FLOAT_3 : test_sf_import_c
 run test_sf_import_c99.cpp : : : <define>TEST_CPP_DEC_FLOAT_4 : test_sf_import_c99_cpp_dec_float_4 ;
 run test_sf_import_c99.cpp : : : <define>TEST_CPP_DEC_FLOAT_5 : test_sf_import_c99_cpp_dec_float_5 ;
 
+run test_sf_import_c99.cpp : : : <define>TEST_CPP_BIN_FLOAT_2 : test_sf_import_c99_cpp_bin_float_2 ;
+run test_sf_import_c99.cpp : : : <define>TEST_CPP_BIN_FLOAT_2 : test_sf_import_c99_cpp_bin_float_3 ;
+
 run test_gmp_conversions.cpp gmp no_eh_support
         : # command line
         : # input files
@@ -863,6 +866,9 @@ run test_float_conversions.cpp no_eh_support ;
 #
 compile bug11922.cpp ;
 run bug12039.cpp no_eh_support ;
+compile git_issue_30.cpp ;
+run issue_13301.cpp ;
+run issue_13148.cpp ;
 run test_hash.cpp : : : 
    [ check-target-builds ../config//has_float128 : <define>TEST_FLOAT128 <source>quadmath : ]
    [ check-target-builds ../config//has_gmp : <define>TEST_GMP <source>gmp : ]
@@ -1257,6 +1263,7 @@ alias functions_and_limits :
 	test_round_cpp_bin_float
 	test_fpclassify_cpp_bin_float
 	test_sf_import_c99_cpp_bin_float
+	test_sf_import_c99_cpp_bin_float_2
 
 	test_exp_float128
 	test_log_float128

@@ -381,6 +381,91 @@ void test_signed_integer_ops(const boost::mpl::false_&)
 {
 }
 
+template <class Real>
+inline Real negate_if_signed(Real r, const boost::mpl::bool_<true>&)
+{
+   return -r;
+}
+template <class Real>
+inline Real negate_if_signed(Real r, const boost::mpl::bool_<false>&)
+{
+   return r;
+}
+
+template <class Real, class Int>
+void test_integer_overflow()
+{
+   if (std::numeric_limits<Real>::digits > std::numeric_limits<Int>::digits)
+   {
+      Real m((std::numeric_limits<Int>::max)());
+      Int r;
+      ++m;
+      if (is_checked_cpp_int<Real>::value)
+      {
+         BOOST_CHECK_THROW(m.template convert_to<Int>(), std::overflow_error);
+      }
+      else
+      {
+         r = m.template convert_to<Int>();
+         BOOST_CHECK_EQUAL(r, (std::numeric_limits<Int>::max)());
+      }
+      // Again with much larger value:
+      m = 1u;
+      m <<= (std::min)(std::numeric_limits<Real>::digits - 1, 1000);
+      if (is_checked_cpp_int<Real>::value)
+      {
+         BOOST_CHECK_THROW(m.template convert_to<Int>(), std::overflow_error);
+      }
+      else
+      {
+         r = m.template convert_to<Int>();
+         BOOST_CHECK_EQUAL(r, (std::numeric_limits<Int>::max)());
+      }
+
+      if (std::numeric_limits<Real>::is_signed && (std::numeric_limits<Int>::is_signed))
+      {
+         m = (std::numeric_limits<Int>::min)();
+         --m;
+         if (is_checked_cpp_int<Real>::value)
+         {
+            BOOST_CHECK_THROW(m.template convert_to<Int>(), std::overflow_error);
+         }
+         else
+         {
+            r = m.template convert_to<Int>();
+            BOOST_CHECK_EQUAL(r, (std::numeric_limits<Int>::min)());
+         }
+         // Again with much larger value:
+         m = 2u;
+         m = pow(m, (std::min)(std::numeric_limits<Real>::digits - 1, 1000));
+         ++m;
+         m = negate_if_signed(m, boost::mpl::bool_<std::numeric_limits<Real>::is_signed>());
+         if (is_checked_cpp_int<Real>::value)
+         {
+            BOOST_CHECK_THROW(m.template convert_to<Int>(), std::overflow_error);
+         }
+         else
+         {
+            r = m.template convert_to<Int>();
+            BOOST_CHECK_EQUAL(r, (std::numeric_limits<Int>::min)());
+         }
+      }
+      else if (std::numeric_limits<Real>::is_signed && !std::numeric_limits<Int>::is_signed)
+      {
+         // signed to unsigned converison with overflow, it's really not clear what should happen here!
+         m = (std::numeric_limits<Int>::max)();
+         ++m;
+         m = negate_if_signed(m, boost::mpl::bool_<std::numeric_limits<Real>::is_signed>());
+         BOOST_CHECK_THROW(m.template convert_to<Int>(), std::range_error);
+         // Again with much larger value:
+         m = 2u;
+         m = pow(m, (std::min)(std::numeric_limits<Real>::digits - 1, 1000));
+         m = negate_if_signed(m, boost::mpl::bool_<std::numeric_limits<Real>::is_signed>());
+         BOOST_CHECK_THROW(m.template convert_to<Int>(), std::range_error);
+      }
+   }
+}
+
 template <class Real, class Int>
 void test_integer_round_trip()
 {
@@ -396,6 +481,7 @@ void test_integer_round_trip()
          BOOST_CHECK_EQUAL(m, r);
       }
    }
+   test_integer_overflow<Real, Int>();
 }
 
 template <class Real>

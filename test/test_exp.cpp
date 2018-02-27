@@ -10,6 +10,7 @@
 
 #ifdef _MSC_VER
 #  define _SCL_SECURE_NO_WARNINGS
+#pragma warning (disable:4127)
 #endif
 
 #include <boost/detail/lightweight_test.hpp>
@@ -141,7 +142,7 @@ void test()
 #if defined(BOOST_INTEL) && defined(TEST_FLOAT128)
    BOOST_TEST(max_err < 40000);
 #elif defined(TEST_CPP_BIN_FLOAT)
-   BOOST_TEST(max_err < 6000);
+   BOOST_TEST(max_err < 6200);
 #else
    BOOST_TEST(max_err < 5000);
 #endif
@@ -235,8 +236,8 @@ int main()
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<62> > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<61, long long> > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<60, long long> > >();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<59, long long, std::allocator<void> > > >();
-   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<58, long long, std::allocator<void> > > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<59, long long, std::allocator<char> > > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<58, long long, std::allocator<char> > > >();
    // Check low multiprecision digit counts.
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<9> > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<18> > >();
@@ -247,6 +248,7 @@ int main()
 #endif
 #ifdef TEST_CPP_BIN_FLOAT
    test<boost::multiprecision::cpp_bin_float_50>();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<35, boost::multiprecision::digit_base_10, std::allocator<char>, boost::long_long_type> > >();
 #endif
    return boost::report_errors();
 }

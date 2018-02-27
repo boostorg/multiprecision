@@ -528,6 +528,13 @@ struct tester
          BOOST_CHECK_EQUAL(a.str(), s1.str());
          BOOST_CHECK_EQUAL(b.str(), t.str());
       }
+      a = -1;
+      ++a;
+      BOOST_CHECK_EQUAL(a, 0);
+      ++--a;
+      BOOST_CHECK_EQUAL(a, 0);
+      --++a;
+      BOOST_CHECK_EQUAL(a, 0);
    }
 
    void test()
@@ -636,7 +643,7 @@ int main()
    t3.test();
 #endif
 #ifdef TEST4
-   tester<number<cpp_int_backend<0, 2048, signed_magnitude, unchecked, std::allocator<void> > > > t4;
+   tester<number<cpp_int_backend<0, 2048, signed_magnitude, unchecked, std::allocator<char> > > > t4;
    t4.test();
 #endif
 #ifdef TEST5

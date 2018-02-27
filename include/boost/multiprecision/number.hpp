@@ -628,8 +628,12 @@ public:
       return this->template convert_to<T>();
    }
 #  else
+#if BOOST_WORKAROUND(BOOST_MSVC, < 1900)
    template <class T>
-   explicit operator T()const
+#else
+   template <class T, class = typename boost::disable_if_c<boost::is_constructible<T, self_type const&>::value || !boost::is_default_constructible<T>::value, T>::type>
+#endif
+   explicit operator T ()const
    {
       return this->template convert_to<T>();
    }

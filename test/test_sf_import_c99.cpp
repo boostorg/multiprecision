@@ -4,13 +4,13 @@
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#pragma warning(disable:4127) // conditional expression is constant
 #endif
 
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT)\
    && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128)\
    && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DEC_FLOAT_2) && !defined(TEST_CPP_DEC_FLOAT_3)\
-  && !defined(TEST_CPP_DEC_FLOAT_4) && !defined(TEST_CPP_DEC_FLOAT_5)
+  && !defined(TEST_CPP_DEC_FLOAT_4) && !defined(TEST_CPP_DEC_FLOAT_5) && !defined(TEST_CPP_BIN_FLOAT_2) && !defined(TEST_CPP_BIN_FLOAT_3)
 #  define TEST_MPF_50
 #  define TEST_MPFR_50
 #  define TEST_MPFI_50
@@ -21,6 +21,8 @@
 #  define TEST_CPP_DEC_FLOAT_5
 #  define TEST_FLOAT128
 #  define TEST_CPP_BIN_FLOAT
+#  define TEST_CPP_BIN_FLOAT_2
+#  define TEST_CPP_BIN_FLOAT_3
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -43,7 +45,7 @@
 #if defined(TEST_CPP_DEC_FLOAT) || defined(TEST_CPP_DEC_FLOAT_2) || defined(TEST_CPP_DEC_FLOAT_3) || defined(TEST_CPP_DEC_FLOAT_4) || defined(TEST_CPP_DEC_FLOAT_5)
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #endif
-#ifdef TEST_CPP_BIN_FLOAT
+#if defined(TEST_CPP_BIN_FLOAT) ||  defined(TEST_CPP_BIN_FLOAT_2) || defined(TEST_CPP_BIN_FLOAT_3)
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/debug_adaptor.hpp>
 #endif
@@ -2055,7 +2057,7 @@ int main()
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
    test<boost::multiprecision::cpp_dec_float_50>();
-#if !(defined(CI_SUPPRESS_KNOWN_ISSUES) && defined(__GNUC__) && defined(_WIN32)) // Object file too large otherwise
+#if !(defined(__GNUC__) && defined(_WIN32)) // Object file too large otherwise
    test<boost::multiprecision::cpp_dec_float_100>();
 #endif
    test_c99_appendix_F<boost::multiprecision::cpp_dec_float_50>();
@@ -2063,31 +2065,36 @@ int main()
 #ifdef TEST_CPP_DEC_FLOAT_2
    // Some "peculiar" digit counts which stress our code:
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<65> > >();
-#if !(defined(CI_SUPPRESS_KNOWN_ISSUES) && defined(__GNUC__) && defined(_WIN32)) // Object file too large otherwise
+#if !(defined(__GNUC__) && defined(_WIN32)) // Object file too large otherwise
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<64> > >();
 #endif
 #endif
 #ifdef TEST_CPP_DEC_FLOAT_3
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<63> > >();
-#if !(defined(CI_SUPPRESS_KNOWN_ISSUES) && defined(__GNUC__) && defined(_WIN32)) // Object file too large otherwise
+#if !(defined(__GNUC__) && defined(_WIN32)) // Object file too large otherwise
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<62> > >();
 #endif
 #endif
 #ifdef TEST_CPP_DEC_FLOAT_4
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<61, long long> > >();
-#if !(defined(CI_SUPPRESS_KNOWN_ISSUES) && defined(__GNUC__) && defined(_WIN32)) // Object file too large otherwise
+#if !(defined(__GNUC__) && defined(_WIN32)) // Object file too large otherwise
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<60, long long> > >();
 #endif
 #endif
 #ifdef TEST_CPP_DEC_FLOAT_5
-   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<59, long long, std::allocator<void> > > >();
-#if !(defined(CI_SUPPRESS_KNOWN_ISSUES) && defined(__GNUC__) && defined(_WIN32)) // Object file too large otherwise
-   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<58, long long, std::allocator<void> > > >();
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<59, long long, std::allocator<char> > > >();
+#if !(defined(__GNUC__) && defined(_WIN32)) // Object file too large otherwise
+   test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<58, long long, std::allocator<char> > > >();
 #endif
 #endif
 #ifdef TEST_CPP_BIN_FLOAT
    test<boost::multiprecision::cpp_bin_float_50>();
    test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<100>, boost::multiprecision::et_on> >();
+#endif
+#ifdef TEST_CPP_BIN_FLOAT_2
+   test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<35, boost::multiprecision::digit_base_10, std::allocator<char>, boost::long_long_type> > >();
+#endif
+#ifdef TEST_CPP_BIN_FLOAT_3
    test_c99_appendix_F<boost::multiprecision::cpp_bin_float_50>();
    test_c99_appendix_F<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<100>, boost::multiprecision::et_on> >();
 #endif

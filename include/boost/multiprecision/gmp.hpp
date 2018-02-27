@@ -858,7 +858,7 @@ inline void eval_convert_to(unsigned long* result, const gmp_float<digits10>& va
    if(0 == mpf_fits_ulong_p(val.data()))
       *result = (std::numeric_limits<unsigned long>::max)();
    else
-      *result = mpf_get_ui(val.data());
+      *result = (unsigned long)mpf_get_ui(val.data());
 }
 template <unsigned digits10>
 inline void eval_convert_to(long* result, const gmp_float<digits10>& val) BOOST_NOEXCEPT
@@ -869,7 +869,7 @@ inline void eval_convert_to(long* result, const gmp_float<digits10>& val) BOOST_
       *result *= mpf_sgn(val.data());
    }
    else
-      *result = mpf_get_si(val.data());
+      *result = (long)mpf_get_si(val.data());
 }
 template <unsigned digits10>
 inline void eval_convert_to(double* result, const gmp_float<digits10>& val) BOOST_NOEXCEPT
@@ -904,7 +904,7 @@ inline void eval_convert_to(boost::long_long_type* result, const gmp_float<digit
       *result <<= digits;
       digits -= std::numeric_limits<unsigned long>::digits;
       mpf_mul_2exp(t.data(), t.data(), digits >= 0 ? std::numeric_limits<unsigned long>::digits : std::numeric_limits<unsigned long>::digits + digits);
-      unsigned long l = mpf_get_ui(t.data());
+      unsigned long l = (unsigned long)mpf_get_ui(t.data());
       if(digits < 0)
          l >>= -digits;
       *result |= l;
@@ -934,7 +934,7 @@ inline void eval_convert_to(boost::ulong_long_type* result, const gmp_float<digi
       *result <<= digits;
       digits -= std::numeric_limits<unsigned long>::digits;
       mpf_mul_2exp(t.data(), t.data(), digits >= 0 ? std::numeric_limits<unsigned long>::digits : std::numeric_limits<unsigned long>::digits + digits);
-      unsigned long l = mpf_get_ui(t.data());
+      unsigned long l = (unsigned long)mpf_get_ui(t.data());
       if(digits < 0)
          l >>= -digits;
       *result |= l;
@@ -990,7 +990,7 @@ inline void eval_ldexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& v
 template <unsigned Digits10>
 inline void eval_frexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& val, int* e)
 {
-#if BOOST_MP_MPIR_VERSION >= 20600
+#if (BOOST_MP_MPIR_VERSION >= 20600) && (BOOST_MP_MPIR_VERSION < 30000)
    mpir_si v;
    mpf_get_d_2exp(&v, val.data());
 #else
@@ -1003,7 +1003,7 @@ inline void eval_frexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& v
 template <unsigned Digits10>
 inline void eval_frexp(gmp_float<Digits10>& result, const gmp_float<Digits10>& val, long* e)
 {
-#if BOOST_MP_MPIR_VERSION >= 20600
+#if (BOOST_MP_MPIR_VERSION >= 20600) && (BOOST_MP_MPIR_VERSION < 30000)
    mpir_si v;
    mpf_get_d_2exp(&v, val.data());
    *e = v;
@@ -1607,22 +1607,25 @@ inline int eval_get_sign(const gmp_int& val)
 }
 inline void eval_convert_to(unsigned long* result, const gmp_int& val)
 {
-   if(0 == mpz_fits_ulong_p(val.data()))
+   if (mpz_sgn(val.data()) < 0)
+   {
+      BOOST_THROW_EXCEPTION(std::range_error("Conversion from negative integer to an unsigned type results in undefined behaviour"));
+   }
+   else if(0 == mpz_fits_ulong_p(val.data()))
    {
       *result = (std::numeric_limits<unsigned long>::max)();
    }
    else
-      *result = mpz_get_ui(val.data());
+      *result = (unsigned long)mpz_get_ui(val.data());
 }
 inline void eval_convert_to(long* result, const gmp_int& val)
 {
    if(0 == mpz_fits_slong_p(val.data()))
    {
-      *result = (std::numeric_limits<unsigned long>::max)();
-      *result *= mpz_sgn(val.data());
+      *result = mpz_sgn(val.data()) < 0 ? (std::numeric_limits<long>::min)()  : (std::numeric_limits<long>::max)();
    }
    else
-      *result = mpz_get_si(val.data());
+      *result = (signed long)mpz_get_si(val.data());
 }
 inline void eval_convert_to(double* result, const gmp_int& val)
 {
@@ -1725,9 +1728,13 @@ inline void eval_qr(const gmp_int& x, const gmp_int& y,
 template <class Integer>
 inline typename enable_if<is_unsigned<Integer>, Integer>::type eval_integer_modulus(const gmp_int& x, Integer val)
 {
+#if defined(__MPIR_VERSION) && (__MPIR_VERSION >= 3)
+   if((sizeof(Integer) <= sizeof(mpir_ui)) || (val <= (std::numeric_limits<mpir_ui>::max)()))
+#else
    if((sizeof(Integer) <= sizeof(long)) || (val <= (std::numeric_limits<unsigned long>::max)()))
+#endif
    {
-      return mpz_tdiv_ui(x.data(), val);
+      return static_cast<Integer>(mpz_tdiv_ui(x.data(), val));
    }
    else
    {

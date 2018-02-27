@@ -124,13 +124,14 @@ void eval_exp(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> 
    BOOST_ASSERT(t.compare(default_ops::get_constant_ln2<cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> >()) < 0);
 
    k = nn ? Exponent(1) << (msb(nn) / 2) : 0;
+   k = (std::min)(k, (Exponent)(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count / 4));
    eval_ldexp(t, t, -k);
 
    eval_exp_taylor(res, t);
    //
    // Square 1 + res k times:
    //
-   for(int s = 0; s < k; ++s)
+   for(Exponent s = 0; s < k; ++s)
    {
       t.swap(res);
       eval_multiply(res, t, t);
