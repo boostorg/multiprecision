@@ -126,6 +126,8 @@ run test_arithmetic_mpfi_50.cpp mpfi mpfr gmp no_eh_support : : : [ check-target
 run test_arithmetic_float_128.cpp quadmath no_eh_support : : : [ check-target-builds ../config//has_float128 : : <build>no ] ;
 run test_arithmetic_float_128.cpp no_eh_support : : : [ check-target-builds ../config//has_intel_quad : <cxxflags>-Qoption,cpp,--extended_float_type : <build>no ] [ check-target-builds ../config//has_float128 : <source>quadmath ] : test_arithmetic_intel_quad ;
 
+run test_arithmetic_mpc.cpp ;
+
 run test_numeric_limits.cpp no_eh_support
         : # command line
         : # input files
@@ -1141,6 +1143,7 @@ alias arithmetic_tests :
 	test_arithmetic_mpfi_50
 	test_arithmetic_float_128
 	test_arithmetic_float_128 
+   test_arithmetic_mpc.cpp
 	;
 
 alias cpp_int_tests :

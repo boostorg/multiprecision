@@ -1702,6 +1702,7 @@ inline Real negate_value(const Real& val, const boost::mpl::false_&)
 template <class Real, class Num>
 void test_mixed_numeric_limits(const boost::mpl::true_&)
 {
+   Real d;
    if (std::numeric_limits<Real>::has_infinity && std::numeric_limits<Num>::has_infinity)
    {
       d = static_cast<Real>(std::numeric_limits<Num>::infinity());
