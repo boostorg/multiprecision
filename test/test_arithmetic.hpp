@@ -1867,7 +1867,28 @@ void test_mixed(const boost::mpl::true_&)
 }
 
 template <class Real>
-void test_members(Real)
+typename boost::enable_if_c<boost::multiprecision::number_category<Real>::value == boost::multiprecision::number_kind_complex>::type test_members(Real)
+{
+   //
+   // Test sign and zero functions:
+   //
+   Real a = 20;
+   Real b = 30;
+   BOOST_CHECK(!a.is_zero());
+   a = -20;
+   BOOST_CHECK(!a.is_zero());
+   a = 0;
+   BOOST_CHECK(a.is_zero());
+
+   a = 20;
+   b = 30;
+   a.swap(b);
+   BOOST_CHECK_EQUAL(a, 30);
+   BOOST_CHECK_EQUAL(b, 20);
+}
+
+template <class Real>
+typename boost::enable_if_c<boost::multiprecision::number_category<Real>::value != boost::multiprecision::number_kind_complex>::type test_members(Real)
 {
    //
    // Test sign and zero functions:

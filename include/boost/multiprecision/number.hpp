@@ -681,11 +681,17 @@ public:
       return m_backend.compare(o.m_backend);
    }
    template <class V>
-   BOOST_MP_FORCEINLINE typename boost::enable_if<is_arithmetic<V>, int>::type compare(const V& o)const
+   BOOST_MP_FORCEINLINE typename boost::enable_if_c<is_arithmetic<V>::value && (number_category<Backend>::value != number_kind_complex), int>::type compare(const V& o)const
    {
       using default_ops::eval_get_sign;
       if(o == 0)
          return eval_get_sign(m_backend);
+      return m_backend.compare(canonical_value(o));
+   }
+   template <class V>
+   BOOST_MP_FORCEINLINE typename boost::enable_if_c<is_arithmetic<V>::value && (number_category<Backend>::value == number_kind_complex), int>::type compare(const V& o)const
+   {
+      using default_ops::eval_get_sign;
       return m_backend.compare(canonical_value(o));
    }
    BOOST_MP_FORCEINLINE Backend& backend() BOOST_NOEXCEPT

@@ -97,16 +97,14 @@ struct mpc_float_imp
    {
       if(m_data[0].re[0]._mpfr_d == 0)
          mpc_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
-      mpfr_set_uj(left_data(), i, GMP_RNDD);
-      mpfr_set_uj(right_data(), i, GMP_RNDU);
+      mpc_set_uj(data(), i, GMP_RNDD);
       return *this;
    }
    mpc_float_imp& operator = (boost::long_long_type i)
    {
       if(m_data[0].re[0]._mpfr_d == 0)
          mpc_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
-      mpfr_set_sj(left_data(), i, GMP_RNDD);
-      mpfr_set_sj(right_data(), i, GMP_RNDU);
+      mpc_set_sj(data(), i, GMP_RNDD);
       return *this;
    }
 #else
@@ -138,7 +136,7 @@ struct mpc_float_imp
       bool neg = i < 0;
       *this = boost::multiprecision::detail::unsigned_abs(i);
       if(neg)
-         mpc_neg(m_data, m_data);
+         mpc_neg(m_data, m_data, GMP_RNDD);
       return *this;
    }
 #endif
@@ -210,14 +208,10 @@ struct mpc_float_imp
          }
          else
          {
-            if(a.compare(b) > 0)
-            {
-               BOOST_THROW_EXCEPTION(std::runtime_error("Attempt to create interval with invalid range (start is greater than end)."));
-            }
-            mpc_interv_fr(m_data, a.data(), b.data());
+            mpc_set_fr_fr(m_data, a.data(), b.data(), GMP_RNDN);
          }
       }
-      else if(mpc_set_str(m_data, s, 10) != 0)
+      else if(mpc_set_str(m_data, s, 10, GMP_RNDN) != 0)
       {
          BOOST_THROW_EXCEPTION(std::runtime_error(std::string("Unable to parse string \"") + s + std::string("\"as a valid floating point number.")));
       }
@@ -249,19 +243,12 @@ struct mpc_float_imp
    void negate() BOOST_NOEXCEPT
    {
       BOOST_ASSERT(m_data[0].re[0]._mpfr_d);
-      mpc_neg(m_data, m_data);
+      mpc_neg(m_data, m_data, GMP_RNDD);
    }
    int compare(const mpc_float_imp& o)const BOOST_NOEXCEPT
    {
       BOOST_ASSERT(m_data[0].re[0]._mpfr_d && o.m_data[0].re[0]._mpfr_d);
-      if(mpfr_cmp(right_data(), o.left_data()) < 0)
-         return -1;
-      if(mpfr_cmp(left_data(), o.right_data()) > 0)
-         return 1;
-      if((mpfr_cmp(left_data(), o.left_data()) == 0) && (mpfr_cmp(right_data(), o.right_data()) == 0))
-         return 0;
-      BOOST_THROW_EXCEPTION(interval_error("Ambiguous comparison between two values."));
-      return 0;
+      return mpc_cmp(m_data, o.m_data);
    }
    template <class V>
    int compare(V v)const BOOST_NOEXCEPT
@@ -561,7 +548,7 @@ inline void eval_add(mpc_float_backend<D1>& a, long x, const mpc_float_backend<D
    if(x < 0)
    {
       mpc_ui_sub(a.data(), boost::multiprecision::detail::unsigned_abs(x), y.data(), GMP_RNDN);
-      mpc_neg(a.data(), a.data());
+      mpc_neg(a.data(), a.data(), GMP_RNDD);
    }
    else
       mpc_add_ui(a.data(), y.data(), x, GMP_RNDD);
@@ -595,7 +582,7 @@ inline void eval_subtract(mpc_float_backend<D1>& a, long x, const mpc_float_back
    if(x < 0)
    {
       mpc_add_ui(a.data(), y.data(), boost::multiprecision::detail::unsigned_abs(x));
-      mpc_neg(a.data(), a.data());
+      mpc_neg(a.data(), a.data(), GMP_RNDD);
    }
    else
       mpc_ui_sub(a.data(), x, y.data(), GMP_RNDN);
@@ -674,7 +661,7 @@ inline void eval_divide(mpc_float_backend<D1>& a, long x, const mpc_float_backen
    if(x < 0)
    {
       mpc_ui_div(a.data(), boost::multiprecision::detail::unsigned_abs(x), y.data(), GMP_RNDD);
-      mpc_neg(a.data(), a.data());
+      mpc_neg(a.data(), a.data(), GMP_RNDD);
    }
    else
       mpc_ui_div(a.data(), x, y.data(), GMP_RNDD);
@@ -683,54 +670,81 @@ inline void eval_divide(mpc_float_backend<D1>& a, long x, const mpc_float_backen
 template <unsigned digits10>
 inline bool eval_is_zero(const mpc_float_backend<digits10>& val) BOOST_NOEXCEPT
 {
-   return 0 != mpc_is_zero(val.data());
+   return (0 != mpfr_zero_p(mpc_realref(val.data()))) && (0 != mpfr_zero_p(mpc_imagref(val.data())));
 }
 template <unsigned digits10>
 inline int eval_get_sign(const mpc_float_backend<digits10>& val)
 {
-   return detail::mpc_sgn(val.data());
+   BOOST_STATIC_ASSERT_MSG(digits10 == UINT_MAX, "Complex numbers have no sign bit."); // designed to always fail
+   return 0;
 }
 
 template <unsigned digits10>
 inline void eval_convert_to(unsigned long* result, const mpc_float_backend<digits10>& val)
 {
+   if (0 == mpfr_zero_p(mpc_imagref(val.data())))
+   {
+      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
+   }
    mpfr_float_backend<digits10> t;
-   mpc_mid(t.data(), val.data());
+   mpc_real(t.data(), val.data(), GMP_RNDN);
    eval_convert_to(result, t);
 }
 template <unsigned digits10>
 inline void eval_convert_to(long* result, const mpc_float_backend<digits10>& val)
 {
+   if (0 == mpfr_zero_p(mpc_imagref(val.data())))
+   {
+      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
+   }
    mpfr_float_backend<digits10> t;
-   mpc_mid(t.data(), val.data());
+   mpc_real(t.data(), val.data(), GMP_RNDN);
    eval_convert_to(result, t);
 }
 #ifdef _MPFR_H_HAVE_INTMAX_T
 template <unsigned digits10>
 inline void eval_convert_to(boost::ulong_long_type* result, const mpc_float_backend<digits10>& val)
 {
+   if (0 == mpfr_zero_p(mpc_imagref(val.data())))
+   {
+      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
+   }
    mpfr_float_backend<digits10> t;
-   mpc_mid(t.data(), val.data());
+   mpc_real(t.data(), val.data(), GMP_RNDN);
    eval_convert_to(result, t);
 }
 template <unsigned digits10>
 inline void eval_convert_to(boost::long_long_type* result, const mpc_float_backend<digits10>& val)
 {
+   if (0 == mpfr_zero_p(mpc_imagref(val.data())))
+   {
+      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
+   }
    mpfr_float_backend<digits10> t;
-   mpc_mid(t.data(), val.data());
+   mpc_real(t.data(), val.data(), GMP_RNDN);
    eval_convert_to(result, t);
 }
 #endif
 template <unsigned digits10>
 inline void eval_convert_to(double* result, const mpc_float_backend<digits10>& val) BOOST_NOEXCEPT
 {
-   *result = mpc_get_d(val.data());
+   if (0 == mpfr_zero_p(mpc_imagref(val.data())))
+   {
+      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
+   }
+   mpfr_float_backend<digits10> t;
+   mpc_real(t.data(), val.data(), GMP_RNDN);
+   eval_convert_to(result, t);
 }
 template <unsigned digits10>
 inline void eval_convert_to(long double* result, const mpc_float_backend<digits10>& val) BOOST_NOEXCEPT
 {
+   if (0 == mpfr_zero_p(mpc_imagref(val.data())))
+   {
+      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
+   }
    mpfr_float_backend<digits10> t;
-   mpc_mid(t.data(), val.data());
+   mpc_real(t.data(), val.data(), GMP_RNDN);
    eval_convert_to(result, t);
 }
 
