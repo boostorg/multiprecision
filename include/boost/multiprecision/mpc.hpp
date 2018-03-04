@@ -581,7 +581,7 @@ inline void eval_subtract(mpc_float_backend<D1>& a, long x, const mpc_float_back
 {
    if(x < 0)
    {
-      mpc_add_ui(a.data(), y.data(), boost::multiprecision::detail::unsigned_abs(x));
+      mpc_add_ui(a.data(), y.data(), boost::multiprecision::detail::unsigned_abs(x), GMP_RNDD);
       mpc_neg(a.data(), a.data(), GMP_RNDD);
    }
    else
