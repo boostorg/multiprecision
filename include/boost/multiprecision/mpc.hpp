@@ -177,12 +177,12 @@ struct mpc_float_imp
       if(m_data[0].re[0]._mpfr_d == 0)
          mpc_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
 
-      if(s && (*s == '{'))
+      if(s && (*s == '('))
       {
          mpfr_float_backend<digits10> a, b;
          std::string part;
          const char* p = ++s;
-         while(*p && (*p != ',') && (*p != '}'))
+         while(*p && (*p != ',') && (*p != ')'))
             ++p;
          part.assign(s + 1, p);
          a = part.c_str();
@@ -190,7 +190,7 @@ struct mpc_float_imp
          if(*p && (*p != '}'))
          {
             ++p;
-            while(*p && (*p != ',') && (*p != '}'))
+            while(*p && (*p != ',') && (*p != ')'))
                ++p;
             part.assign(s + 1, p);
          }
@@ -230,10 +230,10 @@ struct mpc_float_imp
       mpc_real(a.data(), m_data, GMP_RNDD);
       mpc_imag(b.data(), m_data, GMP_RNDD);
 
-      if(a.compare(b) == 0)
+      if(eval_is_zero(b))
          return a.str(digits, f);
 
-      return "{" + a.str(digits, f) + "," + b.str(digits, f) + "}";
+      return "(" + a.str(digits, f) + "," + b.str(digits, f) + ")";
    }
    ~mpc_float_imp() BOOST_NOEXCEPT
    {

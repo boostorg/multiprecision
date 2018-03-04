@@ -77,7 +77,8 @@ int normalize_compare_result(int r)
 }
 
 template <class Real, class Val>
-void test_comparisons(Val a, Val b, const boost::mpl::true_)
+typename boost::disable_if_c<boost::multiprecision::number_category<Real>::value == boost::multiprecision::number_kind_complex>::type 
+   test_comparisons(Val a, Val b, const boost::mpl::true_)
 {
    Real r1(a);
    Real r2(b);
@@ -145,6 +146,56 @@ void test_comparisons(Val a, Val b, const boost::mpl::true_)
    BOOST_CHECK_EQUAL(normalize_compare_result(r2.compare(r1)), -cr);
    BOOST_CHECK_EQUAL(normalize_compare_result(r1.compare(b)), cr);
    BOOST_CHECK_EQUAL(normalize_compare_result(r2.compare(a)), -cr);
+}
+
+template <class Real, class Val>
+typename boost::enable_if_c<boost::multiprecision::number_category<Real>::value == boost::multiprecision::number_kind_complex>::type
+  test_comparisons(Val a, Val b, const boost::mpl::true_)
+{
+   Real r1(a);
+   Real r2(b);
+   Real z(1);
+
+   int cr = a < b ? -1 : a > b ? 1 : 0;
+
+   BOOST_CHECK_EQUAL(r1 == r2, a == b);
+   BOOST_CHECK_EQUAL(r1 != r2, a != b);
+
+   BOOST_CHECK_EQUAL(r1 == b, a == b);
+   BOOST_CHECK_EQUAL(r1 != b, a != b);
+
+   BOOST_CHECK_EQUAL(a == r2, a == b);
+   BOOST_CHECK_EQUAL(a != r2, a != b);
+
+   BOOST_CHECK_EQUAL(r1*z == r2, a == b);
+   BOOST_CHECK_EQUAL(r1*z != r2, a != b);
+
+   BOOST_CHECK_EQUAL(r1 == r2 * z, a == b);
+   BOOST_CHECK_EQUAL(r1 != r2 * z, a != b);
+
+   BOOST_CHECK_EQUAL(r1*z == r2 * z, a == b);
+   BOOST_CHECK_EQUAL(r1*z != r2 * z, a != b);
+
+   BOOST_CHECK_EQUAL(r1*z == b, a == b);
+   BOOST_CHECK_EQUAL(r1*z != b, a != b);
+
+   BOOST_CHECK_EQUAL(a == r2 * z, a == b);
+   BOOST_CHECK_EQUAL(a != r2 * z, a != b);
+
+   if (r1 == r2)
+   {
+      BOOST_CHECK_EQUAL(normalize_compare_result(r1.compare(r2)), 0);
+      BOOST_CHECK_EQUAL(normalize_compare_result(r2.compare(r1)), 0);
+      BOOST_CHECK_EQUAL(normalize_compare_result(r1.compare(b)), 0);
+      BOOST_CHECK_EQUAL(normalize_compare_result(r2.compare(a)), 0);
+   }
+   else
+   {
+      BOOST_CHECK_NE(normalize_compare_result(r1.compare(r2)), 0);
+      BOOST_CHECK_NE(normalize_compare_result(r2.compare(r1)), 0);
+      BOOST_CHECK_NE(normalize_compare_result(r1.compare(b)), 0);
+      BOOST_CHECK_NE(normalize_compare_result(r2.compare(a)), 0);
+   }
 }
 
 template <class Real, class Exp>
@@ -1649,6 +1700,29 @@ inline Real negate_value(const Real& val, const boost::mpl::false_&)
 }
 
 template <class Real, class Num>
+void test_mixed_numeric_limits(const boost::mpl::true_&)
+{
+   if (std::numeric_limits<Real>::has_infinity && std::numeric_limits<Num>::has_infinity)
+   {
+      d = static_cast<Real>(std::numeric_limits<Num>::infinity());
+      BOOST_CHECK_GT(d, (std::numeric_limits<Real>::max)());
+      d = static_cast<Real>(negate_value(std::numeric_limits<Num>::infinity(), boost::mpl::bool_<std::numeric_limits<Num>::is_signed>()));
+      BOOST_CHECK_LT(d, negate_value((std::numeric_limits<Real>::max)(), boost::mpl::bool_<std::numeric_limits<Real>::is_signed>()));
+   }
+   if (std::numeric_limits<Real>::has_quiet_NaN && std::numeric_limits<Num>::has_quiet_NaN)
+   {
+      d = static_cast<Real>(std::numeric_limits<Num>::quiet_NaN());
+      BOOST_CHECK(check_is_nan(d, boost::mpl::bool_<std::numeric_limits<Real>::has_quiet_NaN>()));
+      d = static_cast<Real>(negate_value(std::numeric_limits<Num>::quiet_NaN(), boost::mpl::bool_<std::numeric_limits<Num>::is_signed>()));
+      BOOST_CHECK(check_is_nan(d, boost::mpl::bool_<std::numeric_limits<Real>::has_quiet_NaN>()));
+   }
+}
+template <class Real, class Num>
+void test_mixed_numeric_limits(const boost::mpl::false_&)
+{
+}
+
+template <class Real, class Num>
 void test_mixed(const boost::mpl::true_&)
 {
    typedef typename lexical_cast_target_type<Num>::type target_type;
@@ -1850,20 +1924,7 @@ void test_mixed(const boost::mpl::true_&)
    d = b * static_cast<cast_type>(n3) - static_cast<cast_type>(n1);
    BOOST_CHECK_EQUAL(d ,  3 * 4 - 2);
 
-   if(std::numeric_limits<Real>::has_infinity && std::numeric_limits<Num>::has_infinity)
-   {
-      d = static_cast<Real>(std::numeric_limits<Num>::infinity());
-      BOOST_CHECK_GT(d, (std::numeric_limits<Real>::max)());
-      d = static_cast<Real>(negate_value(std::numeric_limits<Num>::infinity(), boost::mpl::bool_<std::numeric_limits<Num>::is_signed>()));
-      BOOST_CHECK_LT(d, negate_value((std::numeric_limits<Real>::max)(), boost::mpl::bool_<std::numeric_limits<Real>::is_signed>()));
-   }
-   if(std::numeric_limits<Real>::has_quiet_NaN && std::numeric_limits<Num>::has_quiet_NaN)
-   {
-      d = static_cast<Real>(std::numeric_limits<Num>::quiet_NaN());
-      BOOST_CHECK(check_is_nan(d, boost::mpl::bool_<std::numeric_limits<Real>::has_quiet_NaN>()));
-      d = static_cast<Real>(negate_value(std::numeric_limits<Num>::quiet_NaN(), boost::mpl::bool_<std::numeric_limits<Num>::is_signed>()));
-      BOOST_CHECK(check_is_nan(d, boost::mpl::bool_<std::numeric_limits<Real>::has_quiet_NaN>()));
-   }
+   test_mixed_numeric_limits<Real, Num>(boost::mpl::bool_<std::numeric_limits<Real>::is_specialized>());
 }
 
 template <class Real>
@@ -2005,6 +2066,147 @@ void test_basic_conditionals(Real a, Real b)
    {
       BOOST_ERROR("Unexpected non-zero result");
    }
+}
+
+template <class T>
+typename boost::enable_if_c<boost::multiprecision::number_category<T>::value == boost::multiprecision::number_kind_complex>::type 
+   test_relationals(T a, T b)
+{
+   BOOST_CHECK_EQUAL((a == b), false);
+   BOOST_CHECK_EQUAL((a != b), true);
+
+   BOOST_CHECK_EQUAL((a + b == b), false);
+   BOOST_CHECK_EQUAL((a + b != b), true);
+
+   BOOST_CHECK_EQUAL((a == b + a), false);
+   BOOST_CHECK_EQUAL((a != b + a), true);
+
+   BOOST_CHECK_EQUAL((a + b == b + a), true);
+   BOOST_CHECK_EQUAL((a + b != b + a), false);
+
+   BOOST_CHECK_EQUAL((8 == b + a), false);
+   BOOST_CHECK_EQUAL((8 != b + a), true);
+   BOOST_CHECK_EQUAL((800 == b + a), false);
+   BOOST_CHECK_EQUAL((800 != b + a), true);
+   BOOST_CHECK_EQUAL((72 == b + a), true);
+   BOOST_CHECK_EQUAL((72 != b + a), false);
+
+   BOOST_CHECK_EQUAL((b + a == 8), false);
+   BOOST_CHECK_EQUAL((b + a != 8), true);
+   BOOST_CHECK_EQUAL((b + a == 800), false);
+   BOOST_CHECK_EQUAL((b + a != 800), true);
+   BOOST_CHECK_EQUAL((b + a == 72), true);
+   BOOST_CHECK_EQUAL((b + a != 72), false);
+}
+
+template <class T>
+typename boost::disable_if_c<boost::multiprecision::number_category<T>::value == boost::multiprecision::number_kind_complex>::type
+test_relationals(T a, T b)
+{
+   BOOST_CHECK_EQUAL((a == b), false);
+   BOOST_CHECK_EQUAL((a != b), true);
+   BOOST_CHECK_EQUAL((a <= b), true);
+   BOOST_CHECK_EQUAL((a < b), true);
+   BOOST_CHECK_EQUAL((a >= b), false);
+   BOOST_CHECK_EQUAL((a > b), false);
+
+   BOOST_CHECK_EQUAL((a + b == b), false);
+   BOOST_CHECK_EQUAL((a + b != b), true);
+   BOOST_CHECK_EQUAL((a + b >= b), true);
+   BOOST_CHECK_EQUAL((a + b > b), true);
+   BOOST_CHECK_EQUAL((a + b <= b), false);
+   BOOST_CHECK_EQUAL((a + b < b), false);
+
+   BOOST_CHECK_EQUAL((a == b + a), false);
+   BOOST_CHECK_EQUAL((a != b + a), true);
+   BOOST_CHECK_EQUAL((a <= b + a), true);
+   BOOST_CHECK_EQUAL((a < b + a), true);
+   BOOST_CHECK_EQUAL((a >= b + a), false);
+   BOOST_CHECK_EQUAL((a > b + a), false);
+
+   BOOST_CHECK_EQUAL((a + b == b + a), true);
+   BOOST_CHECK_EQUAL((a + b != b + a), false);
+   BOOST_CHECK_EQUAL((a + b <= b + a), true);
+   BOOST_CHECK_EQUAL((a + b < b + a), false);
+   BOOST_CHECK_EQUAL((a + b >= b + a), true);
+   BOOST_CHECK_EQUAL((a + b > b + a), false);
+
+   BOOST_CHECK_EQUAL((8 == b + a), false);
+   BOOST_CHECK_EQUAL((8 != b + a), true);
+   BOOST_CHECK_EQUAL((8 <= b + a), true);
+   BOOST_CHECK_EQUAL((8 < b + a), true);
+   BOOST_CHECK_EQUAL((8 >= b + a), false);
+   BOOST_CHECK_EQUAL((8 > b + a), false);
+   BOOST_CHECK_EQUAL((800 == b + a), false);
+   BOOST_CHECK_EQUAL((800 != b + a), true);
+   BOOST_CHECK_EQUAL((800 >= b + a), true);
+   BOOST_CHECK_EQUAL((800 > b + a), true);
+   BOOST_CHECK_EQUAL((800 <= b + a), false);
+   BOOST_CHECK_EQUAL((800 < b + a), false);
+   BOOST_CHECK_EQUAL((72 == b + a), true);
+   BOOST_CHECK_EQUAL((72 != b + a), false);
+   BOOST_CHECK_EQUAL((72 <= b + a), true);
+   BOOST_CHECK_EQUAL((72 < b + a), false);
+   BOOST_CHECK_EQUAL((72 >= b + a), true);
+   BOOST_CHECK_EQUAL((72 > b + a), false);
+
+   BOOST_CHECK_EQUAL((b + a == 8), false);
+   BOOST_CHECK_EQUAL((b + a != 8), true);
+   BOOST_CHECK_EQUAL((b + a >= 8), true);
+   BOOST_CHECK_EQUAL((b + a > 8), true);
+   BOOST_CHECK_EQUAL((b + a <= 8), false);
+   BOOST_CHECK_EQUAL((b + a < 8), false);
+   BOOST_CHECK_EQUAL((b + a == 800), false);
+   BOOST_CHECK_EQUAL((b + a != 800), true);
+   BOOST_CHECK_EQUAL((b + a <= 800), true);
+   BOOST_CHECK_EQUAL((b + a < 800), true);
+   BOOST_CHECK_EQUAL((b + a >= 800), false);
+   BOOST_CHECK_EQUAL((b + a > 800), false);
+   BOOST_CHECK_EQUAL((b + a == 72), true);
+   BOOST_CHECK_EQUAL((b + a != 72), false);
+   BOOST_CHECK_EQUAL((b + a >= 72), true);
+   BOOST_CHECK_EQUAL((b + a > 72), false);
+   BOOST_CHECK_EQUAL((b + a <= 72), true);
+   BOOST_CHECK_EQUAL((b + a < 72), false);
+
+   T c;
+   //
+   // min and max overloads:
+   //
+#if !defined(min) && !defined(max)
+   using std::max;
+   using std::min;
+   a = 2;
+   b = 5;
+   c = 6;
+   BOOST_CHECK_EQUAL(min(a, b), a);
+   BOOST_CHECK_EQUAL(min(b, a), a);
+   BOOST_CHECK_EQUAL(max(a, b), b);
+   BOOST_CHECK_EQUAL(max(b, a), b);
+   BOOST_CHECK_EQUAL(min(a, b + c), a);
+   BOOST_CHECK_EQUAL(min(b + c, a), a);
+   BOOST_CHECK_EQUAL(min(a, c - b), 1);
+   BOOST_CHECK_EQUAL(min(c - b, a), 1);
+   BOOST_CHECK_EQUAL(max(a, b + c), 11);
+   BOOST_CHECK_EQUAL(max(b + c, a), 11);
+   BOOST_CHECK_EQUAL(max(a, c - b), a);
+   BOOST_CHECK_EQUAL(max(c - b, a), a);
+   BOOST_CHECK_EQUAL(min(a + b, b + c), 7);
+   BOOST_CHECK_EQUAL(min(b + c, a + b), 7);
+   BOOST_CHECK_EQUAL(max(a + b, b + c), 11);
+   BOOST_CHECK_EQUAL(max(b + c, a + b), 11);
+   BOOST_CHECK_EQUAL(min(a + b, c - a), 4);
+   BOOST_CHECK_EQUAL(min(c - a, a + b), 4);
+   BOOST_CHECK_EQUAL(max(a + b, c - a), 7);
+   BOOST_CHECK_EQUAL(max(c - a, a + b), 7);
+
+   long l1(2), l2(3), l3;
+   l3 = min(l1, l2) + max(l1, l2) + max<long>(l1, l2) + min<long>(l1, l2);
+   BOOST_CHECK_EQUAL(l3, 10);
+
+#endif
+
+
 }
 
 template <class Real>
@@ -2192,73 +2394,7 @@ void test()
    //
    // Comparisons:
    //
-   BOOST_CHECK_EQUAL((a == b) ,  false);
-   BOOST_CHECK_EQUAL((a != b) ,  true);
-   BOOST_CHECK_EQUAL((a <= b) ,  true);
-   BOOST_CHECK_EQUAL((a < b) ,  true);
-   BOOST_CHECK_EQUAL((a >= b) ,  false);
-   BOOST_CHECK_EQUAL((a > b) ,  false);
-
-   BOOST_CHECK_EQUAL((a+b == b) ,  false);
-   BOOST_CHECK_EQUAL((a+b != b) ,  true);
-   BOOST_CHECK_EQUAL((a+b >= b) ,  true);
-   BOOST_CHECK_EQUAL((a+b > b) ,  true);
-   BOOST_CHECK_EQUAL((a+b <= b) ,  false);
-   BOOST_CHECK_EQUAL((a+b < b) ,  false);
-
-   BOOST_CHECK_EQUAL((a == b+a) ,  false);
-   BOOST_CHECK_EQUAL((a != b+a) ,  true);
-   BOOST_CHECK_EQUAL((a <= b+a) ,  true);
-   BOOST_CHECK_EQUAL((a < b+a) ,  true);
-   BOOST_CHECK_EQUAL((a >= b+a) ,  false);
-   BOOST_CHECK_EQUAL((a > b+a) ,  false);
-
-   BOOST_CHECK_EQUAL((a+b == b+a) ,  true);
-   BOOST_CHECK_EQUAL((a+b != b+a) ,  false);
-   BOOST_CHECK_EQUAL((a+b <= b+a) ,  true);
-   BOOST_CHECK_EQUAL((a+b < b+a) ,  false);
-   BOOST_CHECK_EQUAL((a+b >= b+a) ,  true);
-   BOOST_CHECK_EQUAL((a+b > b+a) ,  false);
-
-   BOOST_CHECK_EQUAL((8 == b+a) ,  false);
-   BOOST_CHECK_EQUAL((8 != b+a) ,  true);
-   BOOST_CHECK_EQUAL((8 <= b+a) ,  true);
-   BOOST_CHECK_EQUAL((8 < b+a) ,  true);
-   BOOST_CHECK_EQUAL((8 >= b+a) ,  false);
-   BOOST_CHECK_EQUAL((8 > b+a) ,  false);
-   BOOST_CHECK_EQUAL((800 == b+a) ,  false);
-   BOOST_CHECK_EQUAL((800 != b+a) ,  true);
-   BOOST_CHECK_EQUAL((800 >= b+a) ,  true);
-   BOOST_CHECK_EQUAL((800 > b+a) ,  true);
-   BOOST_CHECK_EQUAL((800 <= b+a) ,  false);
-   BOOST_CHECK_EQUAL((800 < b+a) ,  false);
-   BOOST_CHECK_EQUAL((72 == b+a) ,  true);
-   BOOST_CHECK_EQUAL((72 != b+a) ,  false);
-   BOOST_CHECK_EQUAL((72 <= b+a) ,  true);
-   BOOST_CHECK_EQUAL((72 < b+a) ,  false);
-   BOOST_CHECK_EQUAL((72 >= b+a) ,  true);
-   BOOST_CHECK_EQUAL((72 > b+a) ,  false);
-
-   BOOST_CHECK_EQUAL((b + a == 8), false);
-   BOOST_CHECK_EQUAL((b + a != 8), true);
-   BOOST_CHECK_EQUAL((b + a >= 8), true);
-   BOOST_CHECK_EQUAL((b + a > 8), true);
-   BOOST_CHECK_EQUAL((b + a <= 8), false);
-   BOOST_CHECK_EQUAL((b + a < 8), false);
-   BOOST_CHECK_EQUAL((b + a == 800), false);
-   BOOST_CHECK_EQUAL((b + a != 800), true);
-   BOOST_CHECK_EQUAL((b + a <= 800), true);
-   BOOST_CHECK_EQUAL((b + a < 800), true);
-   BOOST_CHECK_EQUAL((b + a >= 800), false);
-   BOOST_CHECK_EQUAL((b + a > 800), false);
-   BOOST_CHECK_EQUAL((b + a == 72), true);
-   BOOST_CHECK_EQUAL((b + a != 72), false);
-   BOOST_CHECK_EQUAL((b + a >= 72), true);
-   BOOST_CHECK_EQUAL((b + a > 72), false);
-   BOOST_CHECK_EQUAL((b + a <= 72), true);
-   BOOST_CHECK_EQUAL((b + a < 72), false);
-
-
+   test_relationals(a, b);
    test_members(a);
    //
    // Use in Boolean context:
@@ -2359,41 +2495,6 @@ void test()
    BOOST_CHECK_EQUAL(c, 20);
    // Destructor of "a" checks destruction of moved-from-object...
    Real m3(static_cast<Real&&>(a));
-#endif
-   //
-   // min and max overloads:
-   //
-#if !defined(min) && !defined(max)
-   using std::max;
-   using std::min;
-   a = 2;
-   b = 5;
-   c = 6;
-   BOOST_CHECK_EQUAL(min(a, b), a);
-   BOOST_CHECK_EQUAL(min(b, a), a);
-   BOOST_CHECK_EQUAL(max(a, b), b);
-   BOOST_CHECK_EQUAL(max(b, a), b);
-   BOOST_CHECK_EQUAL(min(a, b + c), a);
-   BOOST_CHECK_EQUAL(min(b + c, a), a);
-   BOOST_CHECK_EQUAL(min(a, c - b), 1);
-   BOOST_CHECK_EQUAL(min(c - b, a), 1);
-   BOOST_CHECK_EQUAL(max(a, b + c), 11);
-   BOOST_CHECK_EQUAL(max(b + c, a), 11);
-   BOOST_CHECK_EQUAL(max(a, c - b), a);
-   BOOST_CHECK_EQUAL(max(c - b, a), a);
-   BOOST_CHECK_EQUAL(min(a + b, b + c), 7);
-   BOOST_CHECK_EQUAL(min(b + c, a + b), 7);
-   BOOST_CHECK_EQUAL(max(a + b, b + c), 11);
-   BOOST_CHECK_EQUAL(max(b + c, a + b), 11);
-   BOOST_CHECK_EQUAL(min(a + b, c - a), 4);
-   BOOST_CHECK_EQUAL(min(c - a, a + b), 4);
-   BOOST_CHECK_EQUAL(max(a + b, c - a), 7);
-   BOOST_CHECK_EQUAL(max(c - a, a + b), 7);
-
-   long l1(2), l2(3), l3;
-   l3 = min(l1, l2) + max(l1, l2) + max<long>(l1, l2) + min<long>(l1, l2);
-   BOOST_CHECK_EQUAL(l3, 10);
-
 #endif
    //
    // Bug cases, self assignment first:
