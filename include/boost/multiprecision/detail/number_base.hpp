@@ -989,7 +989,8 @@ enum number_category_type
    number_kind_integer = 0,
    number_kind_floating_point = 1,
    number_kind_rational = 2,
-   number_kind_fixed_point = 3
+   number_kind_fixed_point = 3,
+   number_kind_complex = 4
 };
 
 template <class Num>
