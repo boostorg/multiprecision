@@ -47,7 +47,7 @@
 [template mpfr_class[] [@http://math.berkeley.edu/~wilken/code/gmpfrxx/ mpfr_class]]
 [template mpreal[] [@http://www.holoborodko.com/pavel/mpfr/ mpreal]]
 [template mpir[] [@http://mpir.org/ MPIR]]
-[template tommath[] [@http://libtom.org/?page=features&newsitems=5&whatfile=ltm libtommath]]
+[template tommath[] [@http://libtom.net libtommath]]
 [template quadmath[] [@http://gcc.gnu.org/onlinedocs/libquadmath/ libquadmath]]
 
 [template super[x]'''<superscript>'''[x]'''</superscript>''']
