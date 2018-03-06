@@ -3,9 +3,10 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_MATH_BN_MPC_HPP
-#define BOOST_MATH_BN_MPC_HPP
+#ifndef BOOST_MULTIPRECISION_MPC_HPP
+#define BOOST_MULTIPRECISION_MPC_HPP
 
+#include <boost/multiprecision/mpfi.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/cstdint.hpp>
@@ -173,7 +174,7 @@ struct mpc_float_imp
    mpc_float_imp& operator = (const char* s)
    {
       using default_ops::eval_fpclassify;
-   
+
       if(m_data[0].re[0]._mpfr_d == 0)
          mpc_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
 
@@ -771,7 +772,7 @@ inline void assign_components(mpc_float_backend<D1>& result, const mpfr_float_ba
 }
 
 template <unsigned Digits10, class V>
-inline typename enable_if_c<is_convertible<V, number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on> >::value >::type 
+inline typename enable_if_c<is_convertible<V, number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on> >::value >::type
    assign_components(mpc_float_backend<Digits10>& result, const V& a, const V& b)
 {
    number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on> x(a), y(b);
