@@ -13,7 +13,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/math/concepts/real_concept.hpp>
 #include <boost/multiprecision/number.hpp>
-#include <boost/math/common_factor_rt.hpp>
+#include <boost/integer/common_factor_rt.hpp>
 #include <boost/type_traits/common_type.hpp>
 
 namespace boost{
@@ -531,13 +531,13 @@ inline void eval_complement(arithmetic_backend<Arithmetic>& result, const arithm
 template <class Arithmetic>
 inline void eval_gcd(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const arithmetic_backend<Arithmetic>& b)
 {
-   result.data() = boost::math::gcd(a.data(), b.data());
+   result.data() = boost::integer::gcd(a.data(), b.data());
 }
 
 template <class Arithmetic>
 inline void eval_lcm(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const arithmetic_backend<Arithmetic>& b)
 {
-   result.data() = boost::math::lcm(a.data(), b.data());
+   result.data() = boost::integer::lcm(a.data(), b.data());
 }
 
 #ifdef BOOST_MSVC
