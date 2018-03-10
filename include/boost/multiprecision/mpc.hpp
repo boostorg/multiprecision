@@ -781,7 +781,7 @@ inline typename enable_if_c<is_convertible<V, number<mpfr_float_backend<Digits10
 template <unsigned Digits10>
 inline void eval_sqrt(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& val)
 {
-   mpc_sqrt(result.data(), val.data());
+   mpc_sqrt(result.data(), val.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
@@ -791,190 +791,63 @@ inline void eval_abs(mpc_float_backend<Digits10>& result, const mpc_float_backen
 }
 
 template <unsigned Digits10>
-inline void eval_fabs(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& val)
-{
-   mpc_abs(result.data(), val.data());
-}
-template <unsigned Digits10>
-inline void eval_ceil(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& val)
-{
-   mpfr_float_backend<Digits10> a, b;
-   mpfr_set(a.data(), val.left_data(), GMP_RNDN);
-   mpfr_set(b.data(), val.right_data(), GMP_RNDN);
-   eval_ceil(a, a);
-   eval_ceil(b, b);
-   if(a.compare(b) != 0)
-   {
-      BOOST_THROW_EXCEPTION(interval_error("Attempt to take the ceil of a value that straddles an integer boundary."));
-   }
-   mpc_set_fr(result.data(), a.data(), GMP_RNDN);
-}
-template <unsigned Digits10>
-inline void eval_floor(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& val)
-{
-   mpfr_float_backend<Digits10> a, b;
-   mpfr_set(a.data(), val.left_data(), GMP_RNDN);
-   mpfr_set(b.data(), val.right_data(), GMP_RNDN);
-   eval_floor(a, a);
-   eval_floor(b, b);
-   if(a.compare(b) != 0)
-   {
-      BOOST_THROW_EXCEPTION(interval_error("Attempt to take the floor of a value that straddles an integer boundary."));
-   }
-   mpc_set_fr(result.data(), a.data(), GMP_RNDN);
-}
-template <unsigned Digits10>
-inline void eval_ldexp(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& val, long e)
-{
-   if(e > 0)
-      mpc_mul_2exp(result.data(), val.data(), e);
-   else if(e < 0)
-      mpc_div_2exp(result.data(), val.data(), -e);
-   else
-      result = val;
-}
-template <unsigned Digits10>
-inline void eval_frexp(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& val, int* e)
-{
-   mpfr_float_backend<Digits10> t, rt;
-   mpc_mid(t.data(), val.data());
-   eval_frexp(rt, t, e);
-   eval_ldexp(result, val, -*e);
-}
-template <unsigned Digits10>
-inline void eval_frexp(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& val, long* e)
-{
-   mpfr_float_backend<Digits10> t, rt;
-   mpc_mid(t.data(), val.data());
-   eval_frexp(rt, t, e);
-   eval_ldexp(result, val, -*e);
-}
-
-template <unsigned Digits10>
-inline int eval_fpclassify(const mpc_float_backend<Digits10>& val) BOOST_NOEXCEPT
-{
-   return mpc_inf_p(val.data()) ? FP_INFINITE : mpc_nan_p(val.data()) ? FP_NAN : mpc_is_zero(val.data()) ? FP_ZERO : FP_NORMAL;
-}
-
-template <unsigned Digits10>
 inline void eval_pow(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& b, const mpc_float_backend<Digits10>& e)
 {
-   typedef typename boost::multiprecision::detail::canonical<unsigned, mpc_float_backend<Digits10> >::type ui_type;
-   using default_ops::eval_get_sign;
-   int s = eval_get_sign(b);
-   if(s == 0)
-   {
-      if(eval_get_sign(e) == 0)
-      {
-         result = ui_type(1);
-      }
-      else
-      {
-         result = ui_type(0);
-      }
-      return;
-   }
-   if(s < 0)
-   {
-      if(eval_get_sign(e) < 0)
-      {
-         mpc_float_backend<Digits10> t1, t2;
-         t1 = e;
-         t1.negate();
-         eval_pow(t2, b, t1);
-         t1 = ui_type(1);
-         eval_divide(result, t1, t2);
-         return;
-      }
-      typename boost::multiprecision::detail::canonical<boost::uintmax_t, mpc_float_backend<Digits10> >::type an;
-#ifndef BOOST_NO_EXCEPTIONS
-      try
-      {
-#endif
-         using default_ops::eval_convert_to;
-         eval_convert_to(&an, e);
-         if(e.compare(an) == 0)
-         {
-            mpc_float_backend<Digits10> pb(b);
-            pb.negate();
-            eval_pow(result, pb, e);
-            if(an & 1u)
-               result.negate();
-            return;
-         }
-#ifndef BOOST_NO_EXCEPTIONS
-      }
-      catch(const std::exception&)
-      {
-         // conversion failed, just fall through, value is not an integer.
-      }
-#endif
-      result = std::numeric_limits<number<mpc_float_backend<Digits10>, et_on> >::quiet_NaN().backend();
-      return;
-   }
-   mpc_log(result.data(), b.data());
-   mpc_mul(result.data(), result.data(), e.data());
-   mpc_exp(result.data(), result.data());
+   mpc_pow(result.data(), b.data(), e.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
 inline void eval_exp(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& arg)
 {
-   mpc_exp(result.data(), arg.data());
-}
-
-template <unsigned Digits10>
-inline void eval_exp2(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& arg)
-{
-   mpc_exp2(result.data(), arg.data());
+   mpc_exp(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
 inline void eval_log(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& arg)
 {
-   mpc_log(result.data(), arg.data());
+   mpc_log(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
 inline void eval_log10(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& arg)
 {
-   mpc_log10(result.data(), arg.data());
+   mpc_log10(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
 inline void eval_sin(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& arg)
 {
-   mpc_sin(result.data(), arg.data());
+   mpc_sin(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
 inline void eval_cos(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& arg)
 {
-   mpc_cos(result.data(), arg.data());
+   mpc_cos(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
 inline void eval_tan(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& arg)
 {
-   mpc_tan(result.data(), arg.data());
+   mpc_tan(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
 inline void eval_asin(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& arg)
 {
-   mpc_asin(result.data(), arg.data());
+   mpc_asin(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
 inline void eval_acos(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& arg)
 {
-   mpc_acos(result.data(), arg.data());
+   mpc_acos(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
 inline void eval_atan(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& arg)
 {
-   mpc_atan(result.data(), arg.data());
+   mpc_atan(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
@@ -999,12 +872,6 @@ template <unsigned Digits10>
 inline void eval_tanh(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& arg)
 {
    mpc_tanh(result.data(), arg.data());
-}
-
-template <unsigned Digits10>
-inline void eval_log2(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& arg)
-{
-   mpc_log2(result.data(), arg.data());
 }
 
 template <unsigned Digits10>

@@ -1817,6 +1817,27 @@ inline typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
    return copysign BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(a), value_type(b));
 }
+//
+// Complex number functions, these are overloaded at the Backend level, we just provide the
+// expression template versions here:
+//
+template <class tag, class A1, class A2, class A3, class A4>
+inline typename boost::enable_if_c<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_complex, 
+   typename component_type<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type>::type 
+   real(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
+{
+   typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+   return real(value_type(arg));
+}
+
+template <class tag, class A1, class A2, class A3, class A4>
+inline typename boost::enable_if_c<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_complex,
+   typename component_type<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type>::type
+   imag(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
+{
+   typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
+   return imag(value_type(arg));
+}
 
 } // namespace multiprecision
 
@@ -2686,7 +2707,7 @@ inline typename enable_if_c<number_category<B>::value == number_kind_integer, nu
 #define UNARY_OP_FUNCTOR(func, category)\
 namespace detail{\
 template <class Backend> \
-struct BOOST_JOIN(func, _funct)\
+struct BOOST_JOIN(category, BOOST_JOIN(func, _funct))\
 {\
    void operator()(Backend& result, const Backend& arg)const\
    {\
@@ -2701,17 +2722,17 @@ template <class tag, class A1, class A2, class A3, class A4> \
 inline typename enable_if_c<number_category<detail::expression<tag, A1, A2, A3, A4> >::value == category,\
    detail::expression<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type> \
+  , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type> \
   , detail::expression<tag, A1, A2, A3, A4> > \
 >::type \
 func(const detail::expression<tag, A1, A2, A3, A4>& arg)\
 {\
     return detail::expression<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type> \
+  , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type> \
   , detail::expression<tag, A1, A2, A3, A4> \
 > (\
-        detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type>() \
+        detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type>() \
       , arg   \
     );\
 }\
@@ -2719,17 +2740,17 @@ template <class Backend> \
 inline typename enable_if_c<number_category<Backend>::value == category,\
    detail::expression<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<Backend> \
+  , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend> \
   , number<Backend, et_on> > \
 >::type \
 func(const number<Backend, et_on>& arg)\
 {\
     return detail::expression<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<Backend> \
+  , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend> \
   , number<Backend, et_on> \
   >(\
-        detail::BOOST_JOIN(func, _funct)<Backend>() \
+        detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend>() \
       , arg   \
     );\
 }\
@@ -2748,7 +2769,7 @@ func(const number<Backend, et_off>& arg)\
 #define BINARY_OP_FUNCTOR(func, category)\
 namespace detail{\
 template <class Backend> \
-struct BOOST_JOIN(func, _funct)\
+struct BOOST_JOIN(category, BOOST_JOIN(func, _funct))\
 {\
    void operator()(Backend& result, const Backend& arg, const Backend& a)const\
    {\
@@ -2774,7 +2795,7 @@ template <class Backend> \
 inline typename enable_if_c<number_category<Backend>::value == category,\
    detail::expression<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<Backend> \
+  , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend> \
   , number<Backend, et_on> \
   , number<Backend, et_on> > \
 >::type \
@@ -2782,11 +2803,11 @@ func(const number<Backend, et_on>& arg, const number<Backend, et_on>& a)\
 {\
     return detail::expression<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<Backend> \
+  , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend> \
   , number<Backend, et_on> \
   , number<Backend, et_on> \
   >(\
-        detail::BOOST_JOIN(func, _funct)<Backend>() \
+        detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend>() \
       , arg,\
       a\
     );\
@@ -2796,7 +2817,7 @@ inline typename enable_if_c<\
    (number_category<Backend>::value == category) && (number_category<detail::expression<tag, A1, A2, A3, A4> >::value == category),\
    detail::expression<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<Backend> \
+  , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend> \
   , number<Backend, et_on> \
   , detail::expression<tag, A1, A2, A3, A4> > \
 >::type \
@@ -2804,11 +2825,11 @@ func(const number<Backend, et_on>& arg, const detail::expression<tag, A1, A2, A3
 {\
     return detail::expression<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<Backend> \
+  , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend> \
   , number<Backend, et_on> \
   , detail::expression<tag, A1, A2, A3, A4> \
   >(\
-        detail::BOOST_JOIN(func, _funct)<Backend>() \
+        detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend>() \
       , arg,\
       a\
     );\
@@ -2818,7 +2839,7 @@ inline typename enable_if_c<\
    (number_category<Backend>::value == category) && (number_category<detail::expression<tag, A1, A2, A3, A4> >::value == category),\
    detail::expression<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<Backend> \
+  , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend> \
   , detail::expression<tag, A1, A2, A3, A4> \
   , number<Backend, et_on> > \
 >::type \
@@ -2826,11 +2847,11 @@ func(const detail::expression<tag, A1, A2, A3, A4>& arg, const number<Backend, e
 {\
     return detail::expression<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<Backend> \
+  , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend> \
   , detail::expression<tag, A1, A2, A3, A4> \
   , number<Backend, et_on> \
   >(\
-        detail::BOOST_JOIN(func, _funct)<Backend>() \
+        detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend>() \
       , arg,\
       a\
     );\
@@ -2840,7 +2861,7 @@ inline typename enable_if_c<\
       (number_category<detail::expression<tag, A1, A2, A3, A4> >::value == category) && (number_category<detail::expression<tagb, A1b, A2b, A3b, A4b> >::value == category),\
    detail::expression<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type> \
+  , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type> \
   , detail::expression<tag, A1, A2, A3, A4> \
   , detail::expression<tagb, A1b, A2b, A3b, A4b> > \
 >::type \
@@ -2848,11 +2869,11 @@ func(const detail::expression<tag, A1, A2, A3, A4>& arg, const detail::expressio
 {\
     return detail::expression<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type> \
+  , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type> \
   , detail::expression<tag, A1, A2, A3, A4> \
   , detail::expression<tagb, A1b, A2b, A3b, A4b> \
   >(\
-        detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type>() \
+        detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type>() \
       , arg,\
       a\
     );\
@@ -2862,7 +2883,7 @@ inline typename enable_if_c<\
    is_arithmetic<Arithmetic>::value && (number_category<Backend>::value == category),\
    detail::expression<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<Backend> \
+  , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend> \
   , number<Backend, et_on> \
   , Arithmetic\
   > \
@@ -2871,11 +2892,11 @@ func(const number<Backend, et_on>& arg, const Arithmetic& a)\
 {\
     return detail::expression<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<Backend> \
+  , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend> \
   , number<Backend, et_on> \
   , Arithmetic\
   >(\
-        detail::BOOST_JOIN(func, _funct)<Backend>() \
+        detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend>() \
       , arg,\
       a\
     );\
@@ -2885,7 +2906,7 @@ inline typename enable_if_c<\
    is_arithmetic<Arithmetic>::value && (number_category<detail::expression<tag, A1, A2, A3, A4> >::value == category),\
    detail::expression<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type> \
+  , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type> \
   , detail::expression<tag, A1, A2, A3, A4> \
   , Arithmetic\
   > \
@@ -2894,11 +2915,11 @@ func(const detail::expression<tag, A1, A2, A3, A4>& arg, const Arithmetic& a)\
 {\
     return detail::expression<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type> \
+  , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type> \
   , detail::expression<tag, A1, A2, A3, A4> \
   , Arithmetic\
    >(\
-        detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type>() \
+        detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type>() \
       , arg,\
       a\
     );\
@@ -2908,7 +2929,7 @@ inline typename enable_if_c<\
    is_arithmetic<Arithmetic>::value && (number_category<Backend>::value == category),\
    detail::expression<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<Backend> \
+  , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend> \
   , Arithmetic \
   , number<Backend, et_on> \
   > \
@@ -2917,11 +2938,11 @@ func(const Arithmetic& arg, const number<Backend, et_on>& a)\
 {\
     return detail::expression<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<Backend> \
+  , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend> \
   , Arithmetic \
   , number<Backend, et_on> \
   >(\
-        detail::BOOST_JOIN(func, _funct)<Backend>() \
+        detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend>() \
       , arg,\
       a\
     );\
@@ -2931,7 +2952,7 @@ inline typename enable_if_c<\
    is_arithmetic<Arithmetic>::value && (number_category<detail::expression<tag, A1, A2, A3, A4> >::value == category),\
    detail::expression<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type> \
+  , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type> \
   , Arithmetic \
   , detail::expression<tag, A1, A2, A3, A4> \
   > \
@@ -2940,11 +2961,11 @@ func(const Arithmetic& arg, const detail::expression<tag, A1, A2, A3, A4>& a)\
 {\
     return detail::expression<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type> \
+  , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type> \
   , Arithmetic \
   , detail::expression<tag, A1, A2, A3, A4> \
    >(\
-        detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type>() \
+        detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type>() \
       , arg,\
       a\
     );\
@@ -2993,7 +3014,7 @@ inline typename enable_if_c<\
    (number_category<detail::expression<tag, A1, A2, A3, A4> >::value == category),\
    detail::expression<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type> \
+  , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type> \
   , detail::expression<tag, A1, A2, A3, A4> \
   , Arg2> \
 >::type \
@@ -3001,11 +3022,11 @@ func(const detail::expression<tag, A1, A2, A3, A4>& arg, Arg2 const& a)\
 {\
     return detail::expression<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type> \
+  , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type> \
   , detail::expression<tag, A1, A2, A3, A4> \
   , Arg2\
    >(\
-        detail::BOOST_JOIN(func, _funct)<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type>() \
+        detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type>() \
       , arg, a   \
     );\
 }\
@@ -3014,7 +3035,7 @@ inline typename enable_if_c<\
    (number_category<Backend>::value == category),\
   detail::expression<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<Backend> \
+  , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend> \
   , number<Backend, et_on> \
   , Arg2> \
 >::type \
@@ -3022,11 +3043,11 @@ func(const number<Backend, et_on>& arg, Arg2 const& a)\
 {\
     return detail::expression<\
     detail::function\
-  , detail::BOOST_JOIN(func, _funct)<Backend> \
+  , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend> \
   , number<Backend, et_on> \
   , Arg2\
   >(\
-        detail::BOOST_JOIN(func, _funct)<Backend>() \
+        detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend>() \
       , arg,\
       a\
     );\
@@ -3046,7 +3067,7 @@ func(const number<Backend, et_off>& arg, Arg2 const& a)\
 #define HETERO_BINARY_OP_FUNCTOR(func, Arg2, category)\
 namespace detail{\
 template <class Backend> \
-struct BOOST_JOIN(func, _funct)\
+struct BOOST_JOIN(category, BOOST_JOIN(func, _funct))\
 {\
    template <class Arg>\
    void operator()(Backend& result, Backend const& arg, Arg a)const\
@@ -3166,11 +3187,26 @@ HETERO_BINARY_OP_FUNCTOR_B(scalbn, boost::long_long_type, number_kind_floating_p
 HETERO_BINARY_OP_FUNCTOR_B(scalbln, boost::long_long_type, number_kind_floating_point)
 
 //
+// Complex functions:
+//
+UNARY_OP_FUNCTOR(exp, number_kind_complex)
+UNARY_OP_FUNCTOR(log, number_kind_complex)
+UNARY_OP_FUNCTOR(log10, number_kind_complex)
+BINARY_OP_FUNCTOR(pow, number_kind_complex)
+UNARY_OP_FUNCTOR(sqrt, number_kind_complex)
+UNARY_OP_FUNCTOR(sin, number_kind_complex)
+UNARY_OP_FUNCTOR(cos, number_kind_complex)
+UNARY_OP_FUNCTOR(tan, number_kind_complex)
+UNARY_OP_FUNCTOR(asin, number_kind_complex)
+UNARY_OP_FUNCTOR(acos, number_kind_complex)
+UNARY_OP_FUNCTOR(atan, number_kind_complex)
+
+//
 // Integer functions:
 //
 BINARY_OP_FUNCTOR(gcd, number_kind_integer)
 BINARY_OP_FUNCTOR(lcm, number_kind_integer)
-HETERO_BINARY_OP_FUNCTOR_B(pow, unsigned, number_kind_integer)
+HETERO_BINARY_OP_FUNCTOR(pow, unsigned, number_kind_integer)
 
 #undef BINARY_OP_FUNCTOR
 #undef UNARY_OP_FUNCTOR
