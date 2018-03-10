@@ -1493,6 +1493,13 @@ template <class T>
 typename enable_if_c<sizeof(T) == 0>::type eval_ldexp();
 template <class T>
 typename enable_if_c<sizeof(T) == 0>::type eval_frexp();
+// TODO implement default versions of these:
+template <class T>
+typename enable_if_c<sizeof(T) == 0>::type eval_asinh();
+template <class T>
+typename enable_if_c<sizeof(T) == 0>::type eval_acosh();
+template <class T>
+typename enable_if_c<sizeof(T) == 0>::type eval_atanh();
 
 //
 // eval_logb and eval_scalbn simply assume base 2 and forward to
@@ -3200,6 +3207,12 @@ UNARY_OP_FUNCTOR(tan, number_kind_complex)
 UNARY_OP_FUNCTOR(asin, number_kind_complex)
 UNARY_OP_FUNCTOR(acos, number_kind_complex)
 UNARY_OP_FUNCTOR(atan, number_kind_complex)
+UNARY_OP_FUNCTOR(sinh, number_kind_complex)
+UNARY_OP_FUNCTOR(cosh, number_kind_complex)
+UNARY_OP_FUNCTOR(tanh, number_kind_complex)
+UNARY_OP_FUNCTOR(asinh, number_kind_complex)
+UNARY_OP_FUNCTOR(acosh, number_kind_complex)
+UNARY_OP_FUNCTOR(atanh, number_kind_complex)
 
 //
 // Integer functions:

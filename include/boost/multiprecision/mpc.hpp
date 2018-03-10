@@ -6,15 +6,13 @@
 #ifndef BOOST_MULTIPRECISION_MPC_HPP
 #define BOOST_MULTIPRECISION_MPC_HPP
 
-#include <boost/multiprecision/mpfi.hpp>
 #include <boost/multiprecision/number.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/multiprecision/mpfr.hpp>
-#include <boost/multiprecision/logged_adaptor.hpp>
-#include <boost/math/constants/constants.hpp>
+#include <boost/math/special_functions/asinh.hpp>
+#include <boost/math/special_functions/acosh.hpp>
+#include <boost/math/special_functions/atanh.hpp>
 #include <boost/functional/hash_fwd.hpp>
 #include <mpc.h>
 #include <cmath>
@@ -851,27 +849,39 @@ inline void eval_atan(mpc_float_backend<Digits10>& result, const mpc_float_backe
 }
 
 template <unsigned Digits10>
-inline void eval_atan2(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& arg1, const mpc_float_backend<Digits10>& arg2)
-{
-   mpc_atan2(result.data(), arg1.data(), arg2.data());
-}
-
-template <unsigned Digits10>
 inline void eval_sinh(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& arg)
 {
-   mpc_sinh(result.data(), arg.data());
+   mpc_sinh(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
 inline void eval_cosh(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& arg)
 {
-   mpc_cosh(result.data(), arg.data());
+   mpc_cosh(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
 inline void eval_tanh(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& arg)
 {
-   mpc_tanh(result.data(), arg.data());
+   mpc_tanh(result.data(), arg.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10>
+inline void eval_asinh(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& arg)
+{
+   mpc_asinh(result.data(), arg.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10>
+inline void eval_acosh(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& arg)
+{
+   mpc_acosh(result.data(), arg.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10>
+inline void eval_atanh(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& arg)
+{
+   mpc_atanh(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
@@ -946,165 +956,8 @@ inline typename component_type<boost::multiprecision::number<boost::multiprecisi
 }
 
 
-
 } // namespace multiprecision
 
-namespace math{
-
-namespace tools{
-
-template <>
-inline int digits<boost::multiprecision::mpc_float>()
-#ifdef BOOST_MATH_NOEXCEPT
-   BOOST_NOEXCEPT
-#endif
-{
-   return  multiprecision::detail::digits10_2_2(boost::multiprecision::mpc_float::default_precision());
-}
-template <>
-inline int digits<boost::multiprecision::number<boost::multiprecision::mpc_float_backend<0>, boost::multiprecision::et_off> >()
-#ifdef BOOST_MATH_NOEXCEPT
-   BOOST_NOEXCEPT
-#endif
-{
-   return  multiprecision::detail::digits10_2_2(boost::multiprecision::mpc_float::default_precision());
-}
-
-} // namespace tools
-
-namespace constants{ namespace detail{
-
-template <class T> struct constant_pi;
-template <class T> struct constant_ln_two;
-template <class T> struct constant_euler;
-template <class T> struct constant_catalan;
-
-//
-// Initializer: ensure all our constants are initialized prior to the first call of main:
-//
-template <class T>
-struct mpc_initializer
-{
-   struct init
-   {
-      init()
-      {
-         boost::math::constants::pi<T>();
-         boost::math::constants::ln_two<T>();
-         boost::math::constants::euler<T>();
-         boost::math::constants::catalan<T>();
-      }
-      void force_instantiate()const{}
-   };
-   static const init initializer;
-   static void force_instantiate()
-   {
-      initializer.force_instantiate();
-   }
-};
-
-template <class T>
-const typename mpc_initializer<T>::init mpc_initializer<T>::initializer;
-
-template<unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
-struct constant_pi<boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> >
-{
-   typedef boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> result_type;
-   template<int N>
-   static inline const result_type& get(const mpl::int_<N>&)
-   {
-      mpc_initializer<result_type>::force_instantiate();
-      static result_type result;
-      static bool has_init = false;
-      if(!has_init)
-      {
-         has_init = true;
-         mpc_const_pi(result.backend().data());
-      }
-      return result;
-   }
-   static inline result_type get(const mpl::int_<0>&)
-   {
-      result_type result;
-      mpc_const_pi(result.backend().data());
-      return result;
-   }
-};
-template<unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
-struct constant_ln_two<boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> >
-{
-   typedef boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> result_type;
-   template<int N>
-   static inline const result_type& get(const mpl::int_<N>&)
-   {
-      mpc_initializer<result_type>::force_instantiate();
-      static result_type result;
-      static bool has_init = false;
-      if(!has_init)
-      {
-         has_init = true;
-         mpc_const_log2(result.backend().data());
-      }
-      return result;
-   }
-   static inline result_type get(const mpl::int_<0>&)
-   {
-      result_type result;
-      mpc_const_log2(result.backend().data());
-      return result;
-   }
-};
-template<unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
-struct constant_euler<boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> >
-{
-   typedef boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> result_type;
-   template<int N>
-   static inline result_type const& get(const mpl::int_<N>&)
-   {
-      mpc_initializer<result_type>::force_instantiate();
-      static result_type result;
-      static bool has_init = false;
-      if(!has_init)
-      {
-         has_init = true;
-         mpc_const_euler(result.backend().data());
-      }
-      return result;
-   }
-   static inline result_type get(const mpl::int_<0>&)
-   {
-      result_type result;
-      mpc_const_euler(result.backend().data());
-      return result;
-   }
-};
-template<unsigned Digits10, boost::multiprecision::expression_template_option ExpressionTemplates>
-struct constant_catalan<boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> >
-{
-   typedef boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> result_type;
-   template<int N>
-   static inline result_type const& get(const mpl::int_<N>&)
-   {
-      mpc_initializer<result_type>::force_instantiate();
-      static result_type result;
-      static bool has_init = false;
-      if(!has_init)
-      {
-         has_init = true;
-         mpc_const_catalan(result.backend().data());
-      }
-      return result;
-   }
-   static inline result_type get(const mpl::int_<0>&)
-   {
-      result_type result;
-      mpc_const_catalan(result.backend().data());
-      return result;
-   }
-};
-
-}} // namespaces
-
-}}  // namespaces
+}  // namespaces
 
 #endif
