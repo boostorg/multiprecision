@@ -763,11 +763,7 @@ inline void assign_components(mpc_float_backend<D1>& result, const mpfr_float_ba
    }
    else
    {
-      if(a.compare(b) > 0)
-      {
-         BOOST_THROW_EXCEPTION(std::runtime_error("Attempt to create interval with invalid range (start is greater than end)."));
-      }
-      mpc_interv_fr(result.data(), a.data(), b.data());
+      mpc_set_fr_fr(result.data(), a.data(), b.data(), GMP_RNDN);
    }
 }
 
@@ -1033,33 +1029,6 @@ inline std::size_t hash_value(const mpc_float_backend<Digits10>& val)
    return result;
 }
 
-template <class To, unsigned D>
-void generic_interconvert(To& to, const mpc_float_backend<D>& from, const mpl::int_<number_kind_integer>& to_type, const mpl::int_<number_kind_floating_point>& from_type)
-{
-   using boost::multiprecision::detail::generic_interconvert;
-   mpfr_float_backend<D> t;
-   mpc_mid(t.data(), from.data());
-   generic_interconvert(to, t, to_type, from_type);
-}
-
-template <class To, unsigned D>
-void generic_interconvert(To& to, const mpc_float_backend<D>& from, const mpl::int_<number_kind_rational>& to_type, const mpl::int_<number_kind_floating_point>& from_type)
-{
-   using boost::multiprecision::detail::generic_interconvert;
-   mpfr_float_backend<D> t;
-   mpc_mid(t.data(), from.data());
-   generic_interconvert(to, t, to_type, from_type);
-}
-
-template <class To, unsigned D>
-void generic_interconvert(To& to, const mpc_float_backend<D>& from, const mpl::int_<number_kind_floating_point>& to_type, const mpl::int_<number_kind_floating_point>& from_type)
-{
-   using boost::multiprecision::detail::generic_interconvert;
-   mpfr_float_backend<D> t;
-   mpc_mid(t.data(), from.data());
-   generic_interconvert(to, t, to_type, from_type);
-}
-
 } // namespace backends
 
 #ifdef BOOST_NO_SFINAE_EXPR
@@ -1085,151 +1054,30 @@ typedef number<mpc_float_backend<500> >   mpc_float_500;
 typedef number<mpc_float_backend<1000> >  mpc_float_1000;
 typedef number<mpc_float_backend<0> >     mpc_float;
 
-//
-// Special interval specific functions:
-//
-template <unsigned Digits10, expression_template_option ExpressionTemplates>
-inline number<mpfr_float_backend<Digits10>, ExpressionTemplates> lower(const number<mpc_float_backend<Digits10>, ExpressionTemplates>& val)
-{
-   number<mpfr_float_backend<Digits10> > result;
-   mpfr_set(result.backend().data(), val.backend().left_data(), GMP_RNDN);
-   return result;
-}
-
-template <unsigned Digits10, expression_template_option ExpressionTemplates>
-inline number<mpfr_float_backend<Digits10>, ExpressionTemplates> upper(const number<mpc_float_backend<Digits10>, ExpressionTemplates>& val)
-{
-   number<mpfr_float_backend<Digits10> > result;
-   mpfr_set(result.backend().data(), val.backend().right_data(), GMP_RNDN);
-   return result;
-}
-
-template <unsigned Digits10, expression_template_option ExpressionTemplates>
-inline number<mpfr_float_backend<Digits10>, ExpressionTemplates> median(const number<mpc_float_backend<Digits10>, ExpressionTemplates>& val)
-{
-   number<mpfr_float_backend<Digits10> > result;
-   mpc_mid(result.backend().data(), val.backend().data());
-   return result;
-}
-
-template <unsigned Digits10, expression_template_option ExpressionTemplates>
-inline number<mpfr_float_backend<Digits10>, ExpressionTemplates> width(const number<mpc_float_backend<Digits10>, ExpressionTemplates>& val)
-{
-   number<mpfr_float_backend<Digits10> > result;
-   mpc_diam_abs(result.backend().data(), val.backend().data());
-   return result;
-}
-
-template <unsigned Digits10, expression_template_option ExpressionTemplates>
-inline number<mpc_float_backend<Digits10>, ExpressionTemplates> intersect(const number<mpc_float_backend<Digits10>, ExpressionTemplates>& a, const number<mpc_float_backend<Digits10>, ExpressionTemplates>&  b)
-{
-   number<mpc_float_backend<Digits10>, ExpressionTemplates> result;
-   mpc_intersect(result.backend().data(), a.backend().data(), b.backend().data());
-   return result;
-}
-
-template <unsigned Digits10, expression_template_option ExpressionTemplates>
-inline number<mpc_float_backend<Digits10>, ExpressionTemplates> hull(const number<mpc_float_backend<Digits10>, ExpressionTemplates>& a, const number<mpc_float_backend<Digits10>, ExpressionTemplates>&  b)
-{
-   number<mpc_float_backend<Digits10>, ExpressionTemplates> result;
-   mpc_union(result.backend().data(), a.backend().data(), b.backend().data());
-   return result;
-}
-
-template <unsigned Digits10, expression_template_option ExpressionTemplates>
-inline bool overlap(const number<mpc_float_backend<Digits10>, ExpressionTemplates>& a, const number<mpc_float_backend<Digits10>, ExpressionTemplates>&  b)
-{
-  return (lower(a) <= lower(b) && lower(b) <= upper(a)) ||
-         (lower(b) <= lower(a) && lower(a) <= upper(b));
-}
-
-template <unsigned Digits10, expression_template_option ExpressionTemplates1, expression_template_option ExpressionTemplates2>
-inline bool in(const number<mpfr_float_backend<Digits10>, ExpressionTemplates1>& a, const number<mpc_float_backend<Digits10>, ExpressionTemplates2>&  b)
-{
-  return mpc_is_inside_fr(a.backend().data(), b.backend().data()) != 0;
-}
-
-template <unsigned Digits10, expression_template_option ExpressionTemplates>
-inline bool zero_in(const number<mpc_float_backend<Digits10>, ExpressionTemplates>&  a)
-{
-  return mpc_has_zero(a.backend().data()) != 0;
-}
-
-template <unsigned Digits10, expression_template_option ExpressionTemplates>
-inline bool subset(const number<mpc_float_backend<Digits10>, ExpressionTemplates>& a, const number<mpc_float_backend<Digits10>, ExpressionTemplates>&  b)
-{
-  return mpc_is_inside(a.backend().data(), b.backend().data()) != 0;
-}
-
-template <unsigned Digits10, expression_template_option ExpressionTemplates>
-inline bool proper_subset(const number<mpc_float_backend<Digits10>, ExpressionTemplates>& a, const number<mpc_float_backend<Digits10>, ExpressionTemplates>&  b)
-{
-  return mpc_is_strictly_inside(a.backend().data(), b.backend().data()) != 0;
-}
-
-template <unsigned Digits10, expression_template_option ExpressionTemplates>
-inline bool empty(const number<mpc_float_backend<Digits10>, ExpressionTemplates>&  a)
-{
-  return mpc_is_empty(a.backend().data()) != 0;
-}
-
-template <unsigned Digits10, expression_template_option ExpressionTemplates>
-inline bool singleton(const number<mpc_float_backend<Digits10>, ExpressionTemplates>&  a)
-{
-  return mpfr_cmp(a.backend().left_data(), a.backend().right_data()) == 0;
-}
-
 template <unsigned Digits10, expression_template_option ExpressionTemplates>
 struct component_type<number<mpc_float_backend<Digits10>, ExpressionTemplates> >
 {
    typedef number<mpfr_float_backend<Digits10>, ExpressionTemplates> type;
 };
 
-//
-// Overloaded special functions which call native mpfr routines:
-//
 template <unsigned Digits10, expression_template_option ExpressionTemplates>
-inline boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> asinh BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates>& arg)
+inline typename component_type<boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> >::type 
+   real(const boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates>& arg)
 {
-   boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> result;
-   mpc_asinh(result.backend().data(), arg.backend().data());
-   return BOOST_MP_MOVE(result);
+   typename component_type<boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> >::type result;
+   mpc_real(result.backend().data(), arg.backend().data(), GMP_RNDN);
+   return result;
 }
+
 template <unsigned Digits10, expression_template_option ExpressionTemplates>
-inline boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> acosh BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates>& arg)
+inline typename component_type<boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> >::type 
+   imag(const boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates>& arg)
 {
-   boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> result;
-   mpc_acosh(result.backend().data(), arg.backend().data());
-   return BOOST_MP_MOVE(result);
+   typename component_type<boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> >::type result;
+   mpc_imag(result.backend().data(), arg.backend().data(), GMP_RNDN);
+   return result;
 }
-template <unsigned Digits10, expression_template_option ExpressionTemplates>
-inline boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> atanh BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates>& arg)
-{
-   boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> result;
-   mpc_atanh(result.backend().data(), arg.backend().data());
-   return BOOST_MP_MOVE(result);
-}
-template <unsigned Digits10, expression_template_option ExpressionTemplates>
-inline boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> cbrt BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates>& arg)
-{
-   boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> result;
-   mpc_cbrt(result.backend().data(), arg.backend().data());
-   return BOOST_MP_MOVE(result);
-}
-template <unsigned Digits10, expression_template_option ExpressionTemplates>
-inline boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> expm1 BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates>& arg)
-{
-   boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> result;
-   mpc_expm1(result.backend().data(), arg.backend().data());
-   return BOOST_MP_MOVE(result);
-}
-template <unsigned Digits10, expression_template_option ExpressionTemplates>
-inline boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> log1p BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates>& arg)
-{
-   boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> result;
-   mpc_log1p(result.backend().data(), arg.backend().data());
-   return BOOST_MP_MOVE(result);
-}
+
 
 
 } // namespace multiprecision
@@ -1253,28 +1101,6 @@ inline int digits<boost::multiprecision::number<boost::multiprecision::mpc_float
 #endif
 {
    return  multiprecision::detail::digits10_2_2(boost::multiprecision::mpc_float::default_precision());
-}
-
-
-// mpfi gets used with logged_adaptor fairly often, so specialize for that use case as well:
-typedef boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpc_float::backend_type>, boost::multiprecision::et_on> logged_type1;
-typedef boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<boost::multiprecision::mpc_float::backend_type>, boost::multiprecision::et_off> logged_type2;
-
-template <>
-inline int digits<logged_type1>()
-#ifdef BOOST_MATH_NOEXCEPT
-BOOST_NOEXCEPT
-#endif
-{
-   return  multiprecision::detail::digits10_2_2(logged_type1::default_precision());
-}
-template <>
-inline int digits<logged_type2 >()
-#ifdef BOOST_MATH_NOEXCEPT
-BOOST_NOEXCEPT
-#endif
-{
-   return  multiprecision::detail::digits10_2_2(logged_type1::default_precision());
 }
 
 } // namespace tools

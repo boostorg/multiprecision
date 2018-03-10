@@ -1947,6 +1947,14 @@ typename boost::enable_if_c<boost::multiprecision::number_category<Real>::value 
    a.swap(b);
    BOOST_CHECK_EQUAL(a, 30);
    BOOST_CHECK_EQUAL(b, 20);
+
+   Real c(2, 3);
+
+   BOOST_CHECK_EQUAL(a.real(), 30);
+   BOOST_CHECK_EQUAL(a.imag(), 0);
+   BOOST_CHECK_EQUAL(c.real(), 2);
+   BOOST_CHECK_EQUAL(c.imag(), 3);
+
 }
 
 template <class Real>

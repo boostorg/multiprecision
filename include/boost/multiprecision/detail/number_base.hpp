@@ -1020,6 +1020,19 @@ struct component_type<number<T, ExpressionTemplates> > : public component_type<T
 template <class tag, class A1, class A2, class A3, class A4>
 struct component_type<detail::expression<tag, A1, A2, A3, A4> > : public component_type<typename detail::expression<tag, A1, A2, A3, A4>::result_type>{};
 
+template <class Number, bool IsComplex>
+struct real_and_imag_result_imp
+{
+   typedef Number type;
+};
+template <class Number>
+struct real_and_imag_result_imp<Number, true>
+{
+   typedef typename component_type<Number>::type type;
+};
+template <class Number>
+struct real_and_imag_result : public real_and_imag_result_imp<Number, number_category<Number>::value == number_kind_complex> {};
+
 template <class T>
 struct is_unsigned_number : public mpl::false_{};
 template <class Backend, expression_template_option ExpressionTemplates>
