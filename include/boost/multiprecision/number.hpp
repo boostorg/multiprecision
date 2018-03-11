@@ -22,6 +22,7 @@
 #include <boost/multiprecision/detail/generic_interconvert.hpp>
 #include <boost/multiprecision/detail/number_compare.hpp>
 #include <boost/multiprecision/traits/is_restricted_conversion.hpp>
+#include <boost/container_hash/hash.hpp>
 #include <istream>  // stream operators
 #include <cstdio>   // EOF
 #include <cctype>   // isspace
