@@ -9,6 +9,8 @@
 
 #include <boost/math/special_functions/pow.hpp>
 #include <boost/math/common_factor_rt.hpp>
+#include <boost/functional/hash.hpp>
+#include <functional>
 #include "test.hpp"
 
 template <class T>
@@ -2704,6 +2706,16 @@ void test()
    test_conditional(a, (a + 0));
 
    test_signed_ops<Real>(boost::mpl::bool_<std::numeric_limits<Real>::is_signed>());
+   //
+   // Test hashing:
+   //
+   boost::hash<Real> hasher;
+   std::size_t s = hasher(a);
+   BOOST_CHECK_NE(s, 0);
+   std::hash<Real> hasher2;
+   s = hasher2(a);
+   BOOST_CHECK_NE(s, 0);
+
    //
    // Test move:
    //

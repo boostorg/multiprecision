@@ -106,33 +106,16 @@ struct mpc_float_imp
 #else
    mpc_float_imp& operator = (boost::ulong_long_type i)
    {
-      if(m_data[0].re[0]._mpfr_d == 0)
-         mpc_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
-      boost::ulong_long_type mask = ((((1uLL << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1u);
-      unsigned shift = 0;
-      mpc_t t;
-      mpc_init2(t, (std::max)(static_cast<unsigned long>(std::numeric_limits<boost::ulong_long_type>::digits), static_cast<unsigned long>(multiprecision::detail::digits10_2_2(digits10))));
-      mpc_set_ui(m_data, 0, GMP_RNDN);
-      while(i)
-      {
-         mpc_set_ui(t, static_cast<unsigned long>(i & mask), GMP_RNDN);
-         if(shift)
-            mpc_mul_2exp(t, t, shift);
-         mpc_add(m_data, m_data, t);
-         shift += std::numeric_limits<unsigned long>::digits;
-         i >>= std::numeric_limits<unsigned long>::digits;
-      }
-      mpc_clear(t);
+      mpfr_float_backend<digits10> f;
+      f = i;
+      mpc_set_fr(this->data(), f.data(), GMP_RNDN);
       return *this;
    }
    mpc_float_imp& operator = (boost::long_long_type i)
    {
-      if(m_data[0].re[0]._mpfr_d == 0)
-         mpc_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
-      bool neg = i < 0;
-      *this = boost::multiprecision::detail::unsigned_abs(i);
-      if(neg)
-         mpc_neg(m_data, m_data, GMP_RNDD);
+      mpfr_float_backend<digits10> f;
+      f = i;
+      mpc_set_fr(this->data(), f.data(), GMP_RNDN);
       return *this;
    }
 #endif
@@ -160,10 +143,9 @@ struct mpc_float_imp
    }
    mpc_float_imp& operator = (long double a)
    {
-      if(m_data[0].re[0]._mpfr_d == 0)
+      if (m_data[0].re[0]._mpfr_d == 0)
          mpc_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
-      mpfr_set_ld(left_data(), a, GMP_RNDD);
-      mpfr_set_ld(right_data(), a, GMP_RNDU);
+      mpc_set_ld(m_data, d, GMP_RNDN);
       return *this;
    }
    mpc_float_imp& operator = (const char* s)
@@ -897,21 +879,21 @@ template <unsigned Digits10>
 inline std::size_t hash_value(const mpc_float_backend<Digits10>& val)
 {
    std::size_t result = 0;
-   std::size_t len = val.left_data()[0]._mpfr_prec / mp_bits_per_limb;
-   if(val.left_data()[0]._mpfr_prec % mp_bits_per_limb)
+   std::size_t len = val.data()[0].re[0]._mpfr_prec / mp_bits_per_limb;
+   if(val.data()[0].re[0]._mpfr_prec % mp_bits_per_limb)
       ++len;
    for(std::size_t i = 0; i < len; ++i)
-      boost::hash_combine(result, val.left_data()[0]._mpfr_d[i]);
-   boost::hash_combine(result, val.left_data()[0]._mpfr_exp);
-   boost::hash_combine(result, val.left_data()[0]._mpfr_sign);
+      boost::hash_combine(result, val.data()[0].re[0]._mpfr_d[i]);
+   boost::hash_combine(result, val.data()[0].re[0]._mpfr_exp);
+   boost::hash_combine(result, val.data()[0].re[0]._mpfr_sign);
 
-   len = val.right_data()[0]._mpfr_prec / mp_bits_per_limb;
-   if(val.right_data()[0]._mpfr_prec % mp_bits_per_limb)
+   len = val.data()[0].im[0]._mpfr_prec / mp_bits_per_limb;
+   if(val.data()[0].im[0]._mpfr_prec % mp_bits_per_limb)
       ++len;
    for(std::size_t i = 0; i < len; ++i)
-      boost::hash_combine(result, val.right_data()[0]._mpfr_d[i]);
-   boost::hash_combine(result, val.right_data()[0]._mpfr_exp);
-   boost::hash_combine(result, val.right_data()[0]._mpfr_sign);
+      boost::hash_combine(result, val.data()[0].im[0]._mpfr_d[i]);
+   boost::hash_combine(result, val.data()[0].im[0]._mpfr_exp);
+   boost::hash_combine(result, val.data()[0].im[0]._mpfr_sign);
    return result;
 }
 
