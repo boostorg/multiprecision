@@ -10,9 +10,6 @@
 #include <boost/cstdint.hpp>
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/multiprecision/mpfr.hpp>
-#include <boost/math/special_functions/asinh.hpp>
-#include <boost/math/special_functions/acosh.hpp>
-#include <boost/math/special_functions/atanh.hpp>
 #include <boost/functional/hash_fwd.hpp>
 #include <mpc.h>
 #include <cmath>
@@ -885,6 +882,18 @@ inline void eval_atanh(mpc_float_backend<Digits10>& result, const mpc_float_back
 }
 
 template <unsigned Digits10>
+inline void eval_conj(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& arg)
+{
+   mpc_conj(result.data(), arg.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10>
+inline void eval_proj(mpc_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& arg)
+{
+   mpc_proj(result.data(), arg.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10>
 inline std::size_t hash_value(const mpc_float_backend<Digits10>& val)
 {
    std::size_t result = 0;
@@ -955,6 +964,12 @@ inline typename component_type<boost::multiprecision::number<boost::multiprecisi
    return result;
 }
 
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+number<backends::mpc_float_backend<Digits10> > polar(number<backends::mpfr_float_backend<Digits10>, ExpressionTemplates>const& r, number<backends::mpfr_float_backend<Digits10>, ExpressionTemplates> const& theta)
+{
+   number<backends::mpc_float_backend<Digits10> > result(number<backends::mpfr_float_backend<Digits10>, ExpressionTemplates>(r * cos(theta)), number<backends::mpfr_float_backend<Digits10>, ExpressionTemplates>(r * sin(theta)));
+   return result;
+}
 
 } // namespace multiprecision
 

@@ -1710,6 +1710,8 @@ private:
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR bool is_realy_self(const self_type& v)const BOOST_NOEXCEPT{ return &v == this; }
 
    static BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const Backend& function_arg_value(const self_type& v) BOOST_NOEXCEPT {  return v.backend();  }
+   template <class Other, expression_template_option ET2>
+   static BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const Other& function_arg_value(const number<Other, ET2>& v) BOOST_NOEXCEPT {  return v.backend();  }
    template <class V>
    static BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const V& function_arg_value(const V& v) BOOST_NOEXCEPT {  return v;  }
    template <class A1, class A2, class A3, class A4>
