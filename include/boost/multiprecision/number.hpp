@@ -1921,6 +1921,14 @@ inline multiprecision::number<T, ExpressionTemplates> denominator(const rational
    return a.denominator();
 }
 
+template <class T, multiprecision::expression_template_option ExpressionTemplates>
+inline std::size_t hash_value(const rational<multiprecision::number<T, ExpressionTemplates> >& val)
+{
+   std::size_t result = hash_value(val.numerator());
+   boost::hash_combine(result, hash_value(val.denominator()));
+   return result;
+}
+
 namespace multiprecision
 {
 
@@ -1948,6 +1956,16 @@ namespace std {
    struct hash<boost::multiprecision::number<Backend, ExpressionTemplates> >
    {
       std::size_t operator()(const boost::multiprecision::number<Backend, ExpressionTemplates>& val)const { return hash_value(val); }
+   };
+   template <class Backend, boost::multiprecision::expression_template_option ExpressionTemplates>
+   struct hash<boost::rational<boost::multiprecision::number<Backend, ExpressionTemplates> > >
+   {
+      std::size_t operator()(const boost::rational<boost::multiprecision::number<Backend, ExpressionTemplates> >& val)const 
+      { 
+         std::size_t result = hash_value(val.numerator());
+         boost::hash_combine(result, hash_value(val.denominator()));
+         return result; 
+      }
    };
 
 }
