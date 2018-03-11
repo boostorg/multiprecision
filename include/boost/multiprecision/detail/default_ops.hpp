@@ -3156,7 +3156,7 @@ struct abs_funct
 }
 
 template <class tag, class A1, class A2, class A3, class A4>
-inline typename boost::disable_if_c<component_type<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_complex, 
+inline typename boost::disable_if_c<number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_complex, 
    detail::expression<
     detail::function
   , detail::abs_funct<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type>
