@@ -8,7 +8,7 @@
 #endif
 
 #include <boost/math/special_functions/pow.hpp>
-#include <boost/math/common_factor_rt.hpp>
+#include <boost/integer/common_factor_rt.hpp>
 #include <boost/functional/hash.hpp>
 #include <functional>
 #include "test.hpp"
@@ -371,10 +371,10 @@ void test_signed_integer_ops(const boost::mpl::true_&)
 #endif
    a = 400;
    b = 45;
-   BOOST_CHECK_EQUAL(gcd(a, -45) ,  boost::math::gcd(400, 45));
-   BOOST_CHECK_EQUAL(lcm(a, -45) ,  boost::math::lcm(400, 45));
-   BOOST_CHECK_EQUAL(gcd(-400, b) ,  boost::math::gcd(400, 45));
-   BOOST_CHECK_EQUAL(lcm(-400, b) ,  boost::math::lcm(400, 45));
+   BOOST_CHECK_EQUAL(gcd(a, -45) ,  boost::integer::gcd(400, 45));
+   BOOST_CHECK_EQUAL(lcm(a, -45) ,  boost::integer::lcm(400, 45));
+   BOOST_CHECK_EQUAL(gcd(-400, b) ,  boost::integer::gcd(400, 45));
+   BOOST_CHECK_EQUAL(lcm(-400, b) ,  boost::integer::lcm(400, 45));
    a = -20;
    BOOST_CHECK_EQUAL(abs(a) ,  20);
    BOOST_CHECK_EQUAL(abs(-a) ,  20);
@@ -385,12 +385,12 @@ void test_signed_integer_ops(const boost::mpl::true_&)
    BOOST_CHECK_EQUAL(abs(+a) ,  20);
    a = -400;
    b = 45;
-   BOOST_CHECK_EQUAL(gcd(a, b) ,  boost::math::gcd(-400, 45));
-   BOOST_CHECK_EQUAL(lcm(a, b) ,  boost::math::lcm(-400, 45));
-   BOOST_CHECK_EQUAL(gcd(a, 45) ,  boost::math::gcd(-400, 45));
-   BOOST_CHECK_EQUAL(lcm(a, 45) ,  boost::math::lcm(-400, 45));
-   BOOST_CHECK_EQUAL(gcd(-400, b) ,  boost::math::gcd(-400, 45));
-   BOOST_CHECK_EQUAL(lcm(-400, b) ,  boost::math::lcm(-400, 45));
+   BOOST_CHECK_EQUAL(gcd(a, b) ,  boost::integer::gcd(-400, 45));
+   BOOST_CHECK_EQUAL(lcm(a, b) ,  boost::integer::lcm(-400, 45));
+   BOOST_CHECK_EQUAL(gcd(a, 45) ,  boost::integer::gcd(-400, 45));
+   BOOST_CHECK_EQUAL(lcm(a, 45) ,  boost::integer::lcm(-400, 45));
+   BOOST_CHECK_EQUAL(gcd(-400, b) ,  boost::integer::gcd(-400, 45));
+   BOOST_CHECK_EQUAL(lcm(-400, b) ,  boost::integer::lcm(-400, 45));
    Real r;
    divide_qr(a, b, c, r);
    BOOST_CHECK_EQUAL(c ,  a / b);
@@ -735,16 +735,16 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    //
    a = 400;
    b = 45;
-   BOOST_CHECK_EQUAL(gcd(a, b) ,  boost::math::gcd(400, 45));
-   BOOST_CHECK_EQUAL(lcm(a, b) ,  boost::math::lcm(400, 45));
-   BOOST_CHECK_EQUAL(gcd(a, 45) ,  boost::math::gcd(400, 45));
-   BOOST_CHECK_EQUAL(lcm(a, 45) ,  boost::math::lcm(400, 45));
-   BOOST_CHECK_EQUAL(gcd(a, 45u) ,  boost::math::gcd(400, 45));
-   BOOST_CHECK_EQUAL(lcm(a, 45u) ,  boost::math::lcm(400, 45));
-   BOOST_CHECK_EQUAL(gcd(400, b) ,  boost::math::gcd(400, 45));
-   BOOST_CHECK_EQUAL(lcm(400, b) ,  boost::math::lcm(400, 45));
-   BOOST_CHECK_EQUAL(gcd(400u, b) ,  boost::math::gcd(400, 45));
-   BOOST_CHECK_EQUAL(lcm(400u, b) ,  boost::math::lcm(400, 45));
+   BOOST_CHECK_EQUAL(gcd(a, b) ,  boost::integer::gcd(400, 45));
+   BOOST_CHECK_EQUAL(lcm(a, b) ,  boost::integer::lcm(400, 45));
+   BOOST_CHECK_EQUAL(gcd(a, 45) ,  boost::integer::gcd(400, 45));
+   BOOST_CHECK_EQUAL(lcm(a, 45) ,  boost::integer::lcm(400, 45));
+   BOOST_CHECK_EQUAL(gcd(a, 45u) ,  boost::integer::gcd(400, 45));
+   BOOST_CHECK_EQUAL(lcm(a, 45u) ,  boost::integer::lcm(400, 45));
+   BOOST_CHECK_EQUAL(gcd(400, b) ,  boost::integer::gcd(400, 45));
+   BOOST_CHECK_EQUAL(lcm(400, b) ,  boost::integer::lcm(400, 45));
+   BOOST_CHECK_EQUAL(gcd(400u, b) ,  boost::integer::gcd(400, 45));
+   BOOST_CHECK_EQUAL(lcm(400u, b) ,  boost::integer::lcm(400, 45));
 
    //
    // Conditionals involving 2 arg functions:
@@ -2764,4 +2764,3 @@ void test()
    a = (a + a) * a;
    BOOST_CHECK_EQUAL(a, 8);
 }
-
