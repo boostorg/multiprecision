@@ -709,37 +709,19 @@ public:
    //
    // Complex number real and imag:
    //
-private:
-   typename real_and_imag_result<number<Backend, ExpressionTemplates> >::type
-      real_imp(const mpl::true_&)const
-   {
-      return boost::multiprecision::real(*this);  // Individual backend must overload the non-member function "real".
-   }
-   typename real_and_imag_result<number<Backend, ExpressionTemplates> >::type
-      imag_imp(const mpl::true_&)const
-   {
-      return boost::multiprecision::imag(*this);  // Individual backend must overload the non-member function "imag".
-   }
-   typename real_and_imag_result<number<Backend, ExpressionTemplates> >::type
-      real_imp(const mpl::false_&)const
-   {
-      return *this;
-   }
-   typename real_and_imag_result<number<Backend, ExpressionTemplates> >::type
-      imag_imp(const mpl::false_&)const
-   {
-      return 0;
-   }
-public:
    typename real_and_imag_result<number<Backend, ExpressionTemplates> >::type
       real()const
    {
-      return real_imp(mpl::bool_<number_category<Backend>::value == number_kind_complex>());
+      typename real_and_imag_result<multiprecision::number<Backend, ExpressionTemplates> >::type result;
+      eval_real(result.backend(), backend());
+      return result;
    }
    typename real_and_imag_result<number<Backend, ExpressionTemplates> >::type
       imag()const
    {
-      return imag_imp(mpl::bool_<number_category<Backend>::value == number_kind_complex>());
+      typename real_and_imag_result<multiprecision::number<Backend, ExpressionTemplates> >::type result;
+      eval_imag(result.backend(), backend());
+      return result;
    }
 private:
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>

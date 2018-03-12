@@ -876,6 +876,17 @@ inline void eval_proj(mpc_float_backend<Digits10>& result, const mpc_float_backe
 }
 
 template <unsigned Digits10>
+inline void eval_real(mpfr_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& arg)
+{
+   mpc_real(result.data(), arg.data(), GMP_RNDN);
+}
+template <unsigned Digits10>
+inline void eval_imag(mpfr_float_backend<Digits10>& result, const mpc_float_backend<Digits10>& arg)
+{
+   mpc_imag(result.data(), arg.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10>
 inline std::size_t hash_value(const mpc_float_backend<Digits10>& val)
 {
    std::size_t result = 0;
@@ -927,24 +938,6 @@ struct component_type<number<mpc_float_backend<Digits10>, ExpressionTemplates> >
 {
    typedef number<mpfr_float_backend<Digits10>, ExpressionTemplates> type;
 };
-
-template <unsigned Digits10, expression_template_option ExpressionTemplates>
-inline typename component_type<boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> >::type 
-   real(const boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates>& arg)
-{
-   typename component_type<boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> >::type result;
-   mpc_real(result.backend().data(), arg.backend().data(), GMP_RNDN);
-   return result;
-}
-
-template <unsigned Digits10, expression_template_option ExpressionTemplates>
-inline typename component_type<boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> >::type 
-   imag(const boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates>& arg)
-{
-   typename component_type<boost::multiprecision::number<boost::multiprecision::mpc_float_backend<Digits10>, ExpressionTemplates> >::type result;
-   mpc_imag(result.backend().data(), arg.backend().data(), GMP_RNDN);
-   return result;
-}
 
 template <unsigned Digits10, expression_template_option ExpressionTemplates>
 number<backends::mpc_float_backend<Digits10> > polar(number<backends::mpfr_float_backend<Digits10>, ExpressionTemplates>const& r, number<backends::mpfr_float_backend<Digits10>, ExpressionTemplates> const& theta)

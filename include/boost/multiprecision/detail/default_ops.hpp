@@ -1700,6 +1700,21 @@ inline int eval_signbit(const T& val)
 }
 
 //
+// Real and imaginary parts:
+//
+template <class To, class From>
+inline void eval_real(To& to, const From& from)
+{
+   to = from;
+}
+template <class To, class From>
+inline void eval_imag(To& to, const From& from)
+{
+   typedef typename mpl::front<typename To::unsigned_types>::type ui_type;
+   to = ui_type(0);
+}
+
+//
 // These functions are implemented in separate files, but expanded inline here,
 // DO NOT CHANGE THE ORDER OF THESE INCLUDES:
 //
@@ -1830,12 +1845,27 @@ inline typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_
    return copysign BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(a), value_type(b));
 }
 //
-// Complex number functions, these are overloaded at the Backend level, we just provide the
-// expression template versions here:
+// real and imag:
 //
+template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+inline typename real_and_imag_result<multiprecision::number<Backend, ExpressionTemplates> >::type
+   real(const multiprecision::number<Backend, ExpressionTemplates>& a)
+{
+   typename real_and_imag_result<multiprecision::number<Backend, ExpressionTemplates> >::type result;
+   eval_real(result.backend(), a.backend());
+   return result;
+}
+template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+inline typename real_and_imag_result<multiprecision::number<Backend, ExpressionTemplates> >::type
+   imag(const multiprecision::number<Backend, ExpressionTemplates>& a)
+{
+   typename real_and_imag_result<multiprecision::number<Backend, ExpressionTemplates> >::type result;
+   eval_imag(result.backend(), a.backend());
+   return result;
+}
+
 template <class tag, class A1, class A2, class A3, class A4>
-inline typename boost::enable_if_c<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_complex, 
-   typename component_type<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type>::type 
+inline typename component_type<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type
    real(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
@@ -1843,14 +1873,17 @@ inline typename boost::enable_if_c<number_category<typename multiprecision::deta
 }
 
 template <class tag, class A1, class A2, class A3, class A4>
-inline typename boost::enable_if_c<number_category<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_complex,
-   typename component_type<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type>::type
+inline typename component_type<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type
    imag(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
    return imag(value_type(arg));
 }
 
+//
+// Complex number functions, these are overloaded at the Backend level, we just provide the
+// expression template versions here:
+//
 template <class T, expression_template_option ExpressionTemplates>
 inline typename boost::lazy_enable_if_c<number_category<T>::value == number_kind_complex, component_type<number<T, ExpressionTemplates> > >::type
    abs(const number<T, ExpressionTemplates>& v)
