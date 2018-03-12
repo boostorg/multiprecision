@@ -1883,7 +1883,7 @@ template <class T, expression_template_option ExpressionTemplates>
 inline typename boost::lazy_enable_if_c<number_category<T>::value == number_kind_complex, component_type<number<T, ExpressionTemplates> > >::type
 norm(const number<T, ExpressionTemplates>& v)
 {
-   typename component_type<number<T, ExpressionTemplates> >::type a(v.real()), b(v.imag());
+   typename component_type<number<T, ExpressionTemplates> >::type a(real(v)), b(imag(v));
    return BOOST_MP_MOVE(a * a + b * b);
 }
 template <class tag, class A1, class A2, class A3, class A4>

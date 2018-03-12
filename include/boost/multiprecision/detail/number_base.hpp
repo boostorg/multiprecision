@@ -1043,6 +1043,13 @@ template <class T>
 struct is_interval_number : public mpl::false_ {};
 template <class Backend, expression_template_option ExpressionTemplates>
 struct is_interval_number<number<Backend, ExpressionTemplates> > : public is_interval_number<Backend>{};
+//
+// These will never be enabled, but their presence allows us to use real() and imag() for ADL later:
+//
+template <class T>
+typename boost::enable_if_c<sizeof(T) == INT_MAX>::type real();
+template <class T>
+typename boost::enable_if_c<sizeof(T) == INT_MAX>::type imag();
 
 }} // namespaces
 

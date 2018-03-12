@@ -141,7 +141,7 @@ struct mpc_float_imp
       mpc_set_d(m_data, d, GMP_RNDN);
       return *this;
    }
-   mpc_float_imp& operator = (long double a)
+   mpc_float_imp& operator = (long double d)
    {
       if (m_data[0].re[0]._mpfr_d == 0)
          mpc_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
