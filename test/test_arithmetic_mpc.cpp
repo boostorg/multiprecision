@@ -8,14 +8,14 @@
 #include "libs/multiprecision/test/test_arithmetic.hpp"
 
 template <unsigned D>
-struct related_type<boost::multiprecision::number< boost::multiprecision::mpc_float_backend<D> > >
+struct related_type<boost::multiprecision::number< boost::multiprecision::mpc_complex_backend<D> > >
 {
    typedef boost::multiprecision::number< boost::multiprecision::mpfr_float_backend<D> > type;
 };
 
 int main()
 {
-   test<boost::multiprecision::mpc_float_50>();
+   test<boost::multiprecision::mpc_complex_50>();
    return boost::report_errors();
 }
 
