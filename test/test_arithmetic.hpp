@@ -363,17 +363,6 @@ void test_signed_integer_ops(const boost::mpl::true_&)
       BOOST_CHECK_THROW(a >>= 2, std::range_error);
 #endif
    }
-   else
-   {
-      a = -1;
-      BOOST_CHECK_EQUAL(a << 10, (boost::intmax_t(-1) << 10));
-      a = -23;
-      BOOST_CHECK_EQUAL(a << 10, (boost::intmax_t(-23) << 10));
-      a = -23456;
-      BOOST_CHECK_EQUAL(a >> 10, (boost::intmax_t(-23456) >> 10));
-      a = -3;
-      BOOST_CHECK_EQUAL(a >> 10, (boost::intmax_t(-3) >> 10));
-   }
 #endif
 }
 template <class Real>
