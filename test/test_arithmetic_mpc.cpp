@@ -7,12 +7,15 @@
 
 #include "libs/multiprecision/test/test_arithmetic.hpp"
 
+template <unsigned D>
+struct related_type<boost::multiprecision::number< boost::multiprecision::mpc_float_backend<D> > >
+{
+   typedef boost::multiprecision::number< boost::multiprecision::mpfr_float_backend<D> > type;
+};
+
 int main()
 {
    test<boost::multiprecision::mpc_float_50>();
-   //test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<21> > >();
-   //test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<1000, boost::multiprecision::digit_base_10, std::allocator<char> > > >();
-   //test<boost::multiprecision::cpp_bin_float_quad>();
    return boost::report_errors();
 }
 

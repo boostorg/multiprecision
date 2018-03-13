@@ -268,23 +268,13 @@ struct mpc_float_backend : public detail::mpc_float_imp<digits10>
    mpc_float_backend(const mpc_float_backend<D>& val, typename enable_if_c<D <= digits10>::type* = 0)
        : detail::mpc_float_imp<digits10>()
    {
-      mpc_set(this->m_data, val.data());
+      mpc_set(this->m_data, val.data(), GMP_RNDN);
    }
    template <unsigned D>
    explicit mpc_float_backend(const mpc_float_backend<D>& val, typename disable_if_c<D <= digits10>::type* = 0)
        : detail::mpc_float_imp<digits10>()
    {
-      mpc_set(this->m_data, val.data());
-   }
-   mpc_float_backend(const mpc_t val)
-       : detail::mpc_float_imp<digits10>()
-   {
-      mpc_set(this->m_data, val);
-   }
-   mpc_float_backend& operator=(const mpc_float_backend& o)
-   {
-      *static_cast<detail::mpc_float_imp<digits10>*>(this) = static_cast<detail::mpc_float_imp<digits10> const&>(o);
-      return *this;
+      mpc_set(this->m_data, val.data(), GMP_RNDN);
    }
    template <unsigned D>
    mpc_float_backend(const mpfr_float_backend<D>& val, typename enable_if_c<D <= digits10>::type* = 0)
@@ -293,16 +283,20 @@ struct mpc_float_backend : public detail::mpc_float_imp<digits10>
       mpc_set_fr(this->m_data, val.data(), GMP_RNDN);
    }
    template <unsigned D>
-   mpc_float_backend& operator=(const mpfr_float_backend<D>& val)
-   {
-      mpc_set_fr(this->m_data, val.data(), GMP_RNDN);
-      return *this;
-   }
-   template <unsigned D>
    explicit mpc_float_backend(const mpfr_float_backend<D>& val, typename disable_if_c<D <= digits10>::type* = 0)
        : detail::mpc_float_imp<digits10>()
    {
-      mpc_set_fr(this->m_data, val.data(), GMP_RNDN);
+      mpc_set(this->m_data, val.data(), GMP_RNDN);
+   }
+   mpc_float_backend(const mpc_t val)
+       : detail::mpc_float_imp<digits10>()
+   {
+      mpc_set(this->m_data, val, GMP_RNDN);
+   }
+   mpc_float_backend& operator=(const mpc_float_backend& o)
+   {
+      *static_cast<detail::mpc_float_imp<digits10>*>(this) = static_cast<detail::mpc_float_imp<digits10> const&>(o);
+      return *this;
    }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    mpc_float_backend& operator=(mpc_float_backend&& o) BOOST_NOEXCEPT
@@ -329,6 +323,12 @@ struct mpc_float_backend : public detail::mpc_float_imp<digits10>
       mpc_set(this->m_data, val.data());
       return *this;
    }
+   template <unsigned D>
+   mpc_float_backend& operator=(const mpfr_float_backend<D>& val)
+   {
+      mpc_set_fr(this->m_data, val.data(), GMP_RNDN);
+      return *this;
+   }
 };
 
 template <>
@@ -353,7 +353,13 @@ struct mpc_float_backend<0> : public detail::mpc_float_imp<0>
    mpc_float_backend(const mpc_float_backend<D>& val)
       : detail::mpc_float_imp<0>(mpc_get_prec(val.data()))
    {
-      mpc_set(this->m_data, val.data());
+      mpc_set(this->m_data, val.data(), GMP_RNDN);
+   }
+   template <unsigned D>
+   mpc_float_backend(const mpfr_float_backend<D>& val)
+      : detail::mpc_float_imp<0>(mpfr_get_prec(val.data()))
+   {
+      mpc_set_fr(this->m_data, val.data(), GMP_RNDN);
    }
    mpc_float_backend& operator=(const mpc_float_backend& o)
    {
@@ -384,7 +390,14 @@ struct mpc_float_backend<0> : public detail::mpc_float_imp<0>
    mpc_float_backend& operator=(const mpc_float_backend<D>& val)
    {
       mpc_set_prec(this->m_data, mpc_get_prec(val.data()));
-      mpc_set(this->m_data, val.data());
+      mpc_set(this->m_data, val.data(), GMP_RNDN);
+      return *this;
+   }
+   template <unsigned D>
+   mpc_float_backend& operator=(const mpfr_float_backend<D>& val)
+   {
+      mpc_set_prec(this->m_data, mpfr_get_prec(val.data()));
+      mpc_set_fr(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
    static unsigned default_precision() BOOST_NOEXCEPT
