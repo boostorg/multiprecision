@@ -1479,6 +1479,17 @@ void eval_integer_sqrt(B& s, B& r, const B& x)
    while(g >= 0);
 }
 
+template <class B>
+inline void eval_conj(B& result, const B& val)
+{
+   result = val;  // assume non-complex result.
+}
+template <class B>
+inline void eval_proj(B& result, const B& val)
+{
+   result = val;  // assume non-complex result.
+}
+
 //
 // These have to implemented by the backend, declared here so that our macro generated code compiles OK.
 //
@@ -1501,10 +1512,6 @@ template <class T>
 typename enable_if_c<sizeof(T) == 0>::type eval_acosh();
 template <class T>
 typename enable_if_c<sizeof(T) == 0>::type eval_atanh();
-template <class T>
-typename enable_if_c<sizeof(T) == 0>::type eval_conj();
-template <class T>
-typename enable_if_c<sizeof(T) == 0>::type eval_proj();
 
 //
 // eval_logb and eval_scalbn simply assume base 2 and forward to
@@ -1708,7 +1715,7 @@ inline void eval_real(To& to, const From& from)
    to = from;
 }
 template <class To, class From>
-inline void eval_imag(To& to, const From& from)
+inline void eval_imag(To& to, const From& )
 {
    typedef typename mpl::front<typename To::unsigned_types>::type ui_type;
    to = ui_type(0);
@@ -1851,6 +1858,7 @@ template <class Backend, multiprecision::expression_template_option ExpressionTe
 inline typename real_and_imag_result<multiprecision::number<Backend, ExpressionTemplates> >::type
    real(const multiprecision::number<Backend, ExpressionTemplates>& a)
 {
+   using default_ops::eval_real;
    typename real_and_imag_result<multiprecision::number<Backend, ExpressionTemplates> >::type result;
    eval_real(result.backend(), a.backend());
    return result;
@@ -1859,13 +1867,14 @@ template <class Backend, multiprecision::expression_template_option ExpressionTe
 inline typename real_and_imag_result<multiprecision::number<Backend, ExpressionTemplates> >::type
    imag(const multiprecision::number<Backend, ExpressionTemplates>& a)
 {
+   using default_ops::eval_imag;
    typename real_and_imag_result<multiprecision::number<Backend, ExpressionTemplates> >::type result;
    eval_imag(result.backend(), a.backend());
    return result;
 }
 
 template <class tag, class A1, class A2, class A3, class A4>
-inline typename component_type<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type
+inline typename real_and_imag_result<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type
    real(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
@@ -1873,7 +1882,7 @@ inline typename component_type<typename multiprecision::detail::expression<tag, 
 }
 
 template <class tag, class A1, class A2, class A3, class A4>
-inline typename component_type<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type
+inline typename real_and_imag_result<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type
    imag(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
@@ -1882,7 +1891,7 @@ inline typename component_type<typename multiprecision::detail::expression<tag, 
 
 //
 // Complex number functions, these are overloaded at the Backend level, we just provide the
-// expression template versions here:
+// expression template versions here, plus overloads for non-complex types:
 //
 template <class T, expression_template_option ExpressionTemplates>
 inline typename boost::lazy_enable_if_c<number_category<T>::value == number_kind_complex, component_type<number<T, ExpressionTemplates> > >::type
@@ -1899,13 +1908,19 @@ inline typename boost::lazy_enable_if_c<number_category<typename detail::express
 }
 
 template <class T, expression_template_option ExpressionTemplates>
-inline typename boost::lazy_enable_if_c<number_category<T>::value == number_kind_complex, component_type<number<T, ExpressionTemplates> > >::type
+inline typename enable_if_c<number_category<T>::value == number_kind_complex, typename real_and_imag_result<number<T, ExpressionTemplates> >::type>::type
 arg(const number<T, ExpressionTemplates>& v)
 {
    return BOOST_MP_MOVE(atan2(imag(v), real(v)));
 }
+template <class T, expression_template_option ExpressionTemplates>
+inline typename enable_if_c<number_category<T>::value == number_kind_floating_point, typename real_and_imag_result<number<T, ExpressionTemplates> >::type>::type
+arg(const number<T, ExpressionTemplates>&)
+{
+   return 0;
+}
 template <class tag, class A1, class A2, class A3, class A4>
-inline typename boost::lazy_enable_if_c<number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_complex, component_type<typename detail::expression<tag, A1, A2, A3, A4>::result_type> >::type
+inline typename enable_if_c<number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_complex || number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_floating_point, typename real_and_imag_result<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type>::type
 arg(const detail::expression<tag, A1, A2, A3, A4>& v)
 {
    typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
@@ -1919,8 +1934,14 @@ norm(const number<T, ExpressionTemplates>& v)
    typename component_type<number<T, ExpressionTemplates> >::type a(real(v)), b(imag(v));
    return BOOST_MP_MOVE(a * a + b * b);
 }
+template <class T, expression_template_option ExpressionTemplates>
+inline typename boost::enable_if_c<number_category<T>::value != number_kind_complex, typename real_and_imag_result<number<T, ExpressionTemplates> >::type >::type
+norm(const number<T, ExpressionTemplates>& v)
+{
+   return v * v;
+}
 template <class tag, class A1, class A2, class A3, class A4>
-inline typename boost::lazy_enable_if_c<number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_complex, component_type<typename detail::expression<tag, A1, A2, A3, A4>::result_type> >::type
+inline typename real_and_imag_result<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
 norm(const detail::expression<tag, A1, A2, A3, A4>& v)
 {
    typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
@@ -3185,6 +3206,24 @@ struct abs_funct
       eval_abs(result, arg);
    }
 };
+template <class Backend>
+struct conj_funct
+{
+   void operator()(Backend& result, const Backend& arg)const
+   {
+      using default_ops::eval_conj;
+      eval_conj(result, arg);
+   }
+};
+template <class Backend>
+struct proj_funct
+{
+   void operator()(Backend& result, const Backend& arg)const
+   {
+      using default_ops::eval_proj;
+      eval_proj(result, arg);
+   }
+};
 
 }
 
@@ -3229,6 +3268,90 @@ abs(const number<Backend, et_off>& arg)
    number<Backend, et_off> result;
    using default_ops::eval_abs;
    eval_abs(result.backend(), arg.backend());
+   return BOOST_MP_MOVE(result);
+}
+
+template <class tag, class A1, class A2, class A3, class A4>
+inline detail::expression<
+    detail::function
+  , detail::conj_funct<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type>
+  , detail::expression<tag, A1, A2, A3, A4> >
+conj(const detail::expression<tag, A1, A2, A3, A4>& arg)
+{
+    return detail::expression<
+    detail::function
+  , detail::conj_funct<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type>
+  , detail::expression<tag, A1, A2, A3, A4>
+> (
+        detail::conj_funct<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type>()
+      , arg
+    );
+}
+template <class Backend>
+inline detail::expression<
+    detail::function
+  , detail::conj_funct<Backend>
+  , number<Backend, et_on> >
+conj(const number<Backend, et_on>& arg)
+{
+    return detail::expression<
+    detail::function
+  , detail::conj_funct<Backend>
+  , number<Backend, et_on>
+  >(
+        detail::conj_funct<Backend>()
+      , arg
+    );
+}
+template <class Backend>
+inline number<Backend, et_off>
+conj(const number<Backend, et_off>& arg)
+{
+   number<Backend, et_off> result;
+   using default_ops::eval_conj;
+   eval_conj(result.backend(), arg.backend());
+   return BOOST_MP_MOVE(result);
+}
+
+template <class tag, class A1, class A2, class A3, class A4>
+inline detail::expression<
+    detail::function
+  , detail::proj_funct<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type>
+  , detail::expression<tag, A1, A2, A3, A4> >
+proj(const detail::expression<tag, A1, A2, A3, A4>& arg)
+{
+    return detail::expression<
+    detail::function
+  , detail::proj_funct<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type>
+  , detail::expression<tag, A1, A2, A3, A4>
+> (
+        detail::proj_funct<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type>()
+      , arg
+    );
+}
+template <class Backend>
+inline detail::expression<
+    detail::function
+  , detail::proj_funct<Backend>
+  , number<Backend, et_on> >
+proj(const number<Backend, et_on>& arg)
+{
+    return detail::expression<
+    detail::function
+  , detail::proj_funct<Backend>
+  , number<Backend, et_on>
+  >(
+        detail::proj_funct<Backend>()
+      , arg
+    );
+}
+template <class Backend>
+inline number<Backend, et_off>
+proj(const number<Backend, et_off>& arg)
+{
+   number<Backend, et_off> result;
+   using default_ops::eval_proj;
+   eval_proj(result.backend(), arg.backend());
    return BOOST_MP_MOVE(result);
 }
 
@@ -3302,8 +3425,6 @@ UNARY_OP_FUNCTOR(tanh, number_kind_complex)
 UNARY_OP_FUNCTOR(asinh, number_kind_complex)
 UNARY_OP_FUNCTOR(acosh, number_kind_complex)
 UNARY_OP_FUNCTOR(atanh, number_kind_complex)
-UNARY_OP_FUNCTOR(conj, number_kind_complex)
-UNARY_OP_FUNCTOR(proj, number_kind_complex)
 
 //
 // Integer functions:

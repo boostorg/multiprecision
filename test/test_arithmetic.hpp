@@ -1061,6 +1061,16 @@ void test_float_funcs(const boost::mpl::true_&)
    // Default construct, for consistency with native floats, default constructed values are zero:
    Real zero;
    BOOST_CHECK_EQUAL(zero, 0);
+
+   //
+   // Complex number functions on scalars:
+   //
+   a = 40;
+   BOOST_CHECK_EQUAL(Real(arg(a)), 0);
+   BOOST_CHECK_EQUAL(Real(arg(a + 0)), 0);
+   a - 20;
+   BOOST_CHECK_EQUAL(Real(arg(a)), 0);
+   BOOST_CHECK_EQUAL(Real(arg(a - 20)), 0);
 }
 
 template <class T, class U>
@@ -2202,6 +2212,19 @@ typename boost::enable_if_c<boost::multiprecision::number_category<Real>::value 
    a.swap(b);
    BOOST_CHECK_EQUAL(a ,  30);
    BOOST_CHECK_EQUAL(b ,  20);
+   //
+   // Test complex number functions which are also overloaded for scalar type:
+   //
+   BOOST_CHECK_EQUAL(real(a), a);
+   BOOST_CHECK_EQUAL(imag(a), 0);
+   BOOST_CHECK_EQUAL(real(a + 0), a);
+   BOOST_CHECK_EQUAL(imag(a + 2), 0);
+   BOOST_CHECK_EQUAL(norm(a), a * a);
+   BOOST_CHECK_EQUAL(norm(a * 1), a * a);
+   BOOST_CHECK_EQUAL(conj(a), a);
+   BOOST_CHECK_EQUAL(conj(a * 1), a);
+   BOOST_CHECK_EQUAL(proj(a), a);
+   BOOST_CHECK_EQUAL(proj(a * 1), a);
 }
 
 template <class Real>
