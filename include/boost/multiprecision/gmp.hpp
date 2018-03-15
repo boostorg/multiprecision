@@ -306,6 +306,7 @@ struct gmp_float_imp
                         round_up = true;
                         break;
                      }
+                     ++i;
                   }
                   if(round_up)
                   {
