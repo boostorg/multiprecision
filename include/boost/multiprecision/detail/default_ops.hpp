@@ -3110,7 +3110,7 @@ func(const number<Backend, et_off>& arg, const Arithmetic& a)\
 }\
 template <class Backend, class Arithmetic> \
 inline typename enable_if_c<\
-   is_compatible_arithmetic_type<Arithmetic, number<Backend, et_off>>::value && (number_category<Backend>::value == category),\
+   is_compatible_arithmetic_type<Arithmetic, number<Backend, et_off> >::value && (number_category<Backend>::value == category),\
    number<Backend, et_off> \
 >::type \
 func(const Arithmetic& a, const number<Backend, et_off>& arg)\
