@@ -1030,11 +1030,10 @@ struct component_type<number<mpc_complex_backend<Digits10>, ExpressionTemplates>
 };
 
 template <unsigned Digits10, expression_template_option ExpressionTemplates>
-number<backends::mpc_complex_backend<Digits10> > polar(number<backends::mpfr_float_backend<Digits10>, ExpressionTemplates>const& r, number<backends::mpfr_float_backend<Digits10>, ExpressionTemplates> const& theta)
+struct complex_result_from_scalar<number<mpfr_float_backend<Digits10>, ExpressionTemplates> >
 {
-   number<backends::mpc_complex_backend<Digits10> > result(number<backends::mpfr_float_backend<Digits10>, ExpressionTemplates>(r * cos(theta)), number<backends::mpfr_float_backend<Digits10>, ExpressionTemplates>(r * sin(theta)));
-   return result;
-}
+   typedef number<mpc_complex_backend<Digits10>, ExpressionTemplates> type;
+};
 
 } // namespace multiprecision
 

@@ -1948,6 +1948,56 @@ norm(const detail::expression<tag, A1, A2, A3, A4>& v)
    return BOOST_MP_MOVE(norm(static_cast<number_type>(v)));
 }
 
+template <class Backend, expression_template_option ExpressionTemplates>
+typename complex_result_from_scalar<number<Backend, ExpressionTemplates> >::type polar(number<Backend, ExpressionTemplates> const& r, number<Backend, ExpressionTemplates> const& theta)
+{
+   return typename complex_result_from_scalar<number<Backend, ExpressionTemplates> >::type(number<Backend, ExpressionTemplates>(r * cos(theta)), number<Backend, ExpressionTemplates>(r * sin(theta)));
+}
+
+template <class tag, class A1, class A2, class A3, class A4, class Backend, expression_template_option ExpressionTemplates>
+typename enable_if_c<boost::is_same<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, ExpressionTemplates> >::value, 
+   typename complex_result_from_scalar<number<Backend, ExpressionTemplates> >::type>::type 
+      polar(detail::expression<tag, A1, A2, A3, A4> const& r, number<Backend, ExpressionTemplates> const& theta)
+{
+   return typename complex_result_from_scalar<number<Backend, ExpressionTemplates> >::type(number<Backend, ExpressionTemplates>(r * cos(theta)), number<Backend, ExpressionTemplates>(r * sin(theta)));
+}
+
+template <class Backend, expression_template_option ExpressionTemplates, class tag, class A1, class A2, class A3, class A4>
+typename enable_if_c<boost::is_same<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, ExpressionTemplates> >::value, 
+   typename complex_result_from_scalar<number<Backend, ExpressionTemplates> >::type>::type 
+      polar(number<Backend, ExpressionTemplates> const& r, detail::expression<tag, A1, A2, A3, A4> const& theta)
+{
+   return typename complex_result_from_scalar<number<Backend, ExpressionTemplates> >::type(number<Backend, ExpressionTemplates>(r * cos(theta)), number<Backend, ExpressionTemplates>(r * sin(theta)));
+}
+
+template <class tag, class A1, class A2, class A3, class A4, class tagb, class A1b, class A2b, class A3b, class A4b>
+typename enable_if_c<boost::is_same<typename detail::expression<tag, A1, A2, A3, A4>::result_type, typename detail::expression<tagb, A1b, A2b, A3b, A4b>::result_type >::value,
+   typename complex_result_from_scalar<typename detail::expression<tag, A1, A2, A3, A4>::result_type >::type>::type
+      polar(detail::expression<tag, A1, A2, A3, A4> const& r, detail::expression<tagb, A1b, A2b, A3b, A4b> const& theta)
+{
+   typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type scalar_type;
+   return typename complex_result_from_scalar<scalar_type>::type(scalar_type(r * cos(theta)), scalar_type(r * sin(theta)));
+}
+//
+// We also allow the first argument to polar to be an arithmetic type (probably a literal):
+//
+template <class Scalar, class Backend, expression_template_option ExpressionTemplates>
+typename boost::enable_if_c<boost::is_arithmetic<Scalar>::value, typename complex_result_from_scalar<number<Backend, ExpressionTemplates> >::type>::type 
+   polar(Scalar const& r, number<Backend, ExpressionTemplates> const& theta)
+{
+   return typename complex_result_from_scalar<number<Backend, ExpressionTemplates> >::type(number<Backend, ExpressionTemplates>(r * cos(theta)), number<Backend, ExpressionTemplates>(r * sin(theta)));
+}
+
+template <class tag, class A1, class A2, class A3, class A4, class Scalar>
+typename enable_if_c<boost::is_arithmetic<Scalar>::value,
+   typename complex_result_from_scalar<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type>::type
+   polar(Scalar const& r, detail::expression<tag, A1, A2, A3, A4> const& theta)
+{
+   typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type scalar_type;
+   return typename complex_result_from_scalar<scalar_type>::type(scalar_type(r * cos(theta)), scalar_type(r * sin(theta)));
+}
+
+
 } // namespace multiprecision
 
 namespace math {

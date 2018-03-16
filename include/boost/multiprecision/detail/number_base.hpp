@@ -1026,6 +1026,9 @@ struct scalar_result_from_possible_complex
 };
 
 template <class T>
+struct complex_result_from_scalar; // individual backends must specialize this trait.
+
+template <class T>
 struct is_unsigned_number : public mpl::false_{};
 template <class Backend, expression_template_option ExpressionTemplates>
 struct is_unsigned_number<number<Backend, ExpressionTemplates> > : public is_unsigned_number<Backend> {};

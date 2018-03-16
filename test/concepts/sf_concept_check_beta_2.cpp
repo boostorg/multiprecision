@@ -74,10 +74,6 @@ void test_extra(T)
    int i;
    boost::math::ibeta_inv(v1, v2, v3);
    boost::math::ibetac_inv(v1, v2, v3);
-   boost::math::ibeta_inva(v1, v2, v3);
-   boost::math::ibetac_inva(v1, v2, v3);
-   boost::math::ibeta_invb(v1, v2, v3);
-   boost::math::ibetac_invb(v1, v2, v3);
 }
 
 void foo()
