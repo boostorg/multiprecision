@@ -1014,24 +1014,16 @@ struct number_category<__float128> : public mpl::int_<number_kind_floating_point
 #endif
 
 template <class T>
-struct component_type;
-template <class T, expression_template_option ExpressionTemplates>
-struct component_type<number<T, ExpressionTemplates> > : public component_type<T>{};
+struct component_type { typedef T type; };
 template <class tag, class A1, class A2, class A3, class A4>
 struct component_type<detail::expression<tag, A1, A2, A3, A4> > : public component_type<typename detail::expression<tag, A1, A2, A3, A4>::result_type>{};
 
-template <class Number, bool IsComplex>
-struct real_and_imag_result_imp
+template <class T>
+struct scalar_result_from_possible_complex
 {
-   typedef Number type;
+   typedef typename mpl::if_c<number_category<T>::value == number_kind_complex,
+      typename component_type<T>::type, T>::type type;
 };
-template <class Number>
-struct real_and_imag_result_imp<Number, true>
-{
-   typedef typename component_type<Number>::type type;
-};
-template <class Number>
-struct real_and_imag_result : public real_and_imag_result_imp<Number, number_category<Number>::value == number_kind_complex> {};
 
 template <class T>
 struct is_unsigned_number : public mpl::false_{};

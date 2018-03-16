@@ -1855,26 +1855,26 @@ inline typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_
 // real and imag:
 //
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
-inline typename real_and_imag_result<multiprecision::number<Backend, ExpressionTemplates> >::type
+inline typename scalar_result_from_possible_complex<multiprecision::number<Backend, ExpressionTemplates> >::type
    real(const multiprecision::number<Backend, ExpressionTemplates>& a)
 {
    using default_ops::eval_real;
-   typename real_and_imag_result<multiprecision::number<Backend, ExpressionTemplates> >::type result;
+   typename scalar_result_from_possible_complex<multiprecision::number<Backend, ExpressionTemplates> >::type result;
    eval_real(result.backend(), a.backend());
    return result;
 }
 template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
-inline typename real_and_imag_result<multiprecision::number<Backend, ExpressionTemplates> >::type
+inline typename scalar_result_from_possible_complex<multiprecision::number<Backend, ExpressionTemplates> >::type
    imag(const multiprecision::number<Backend, ExpressionTemplates>& a)
 {
    using default_ops::eval_imag;
-   typename real_and_imag_result<multiprecision::number<Backend, ExpressionTemplates> >::type result;
+   typename scalar_result_from_possible_complex<multiprecision::number<Backend, ExpressionTemplates> >::type result;
    eval_imag(result.backend(), a.backend());
    return result;
 }
 
 template <class tag, class A1, class A2, class A3, class A4>
-inline typename real_and_imag_result<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type
+inline typename scalar_result_from_possible_complex<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type
    real(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
@@ -1882,7 +1882,7 @@ inline typename real_and_imag_result<typename multiprecision::detail::expression
 }
 
 template <class tag, class A1, class A2, class A3, class A4>
-inline typename real_and_imag_result<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type
+inline typename scalar_result_from_possible_complex<typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type>::type
    imag(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
 {
    typedef typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type value_type;
@@ -1908,19 +1908,19 @@ inline typename boost::lazy_enable_if_c<number_category<typename detail::express
 }
 
 template <class T, expression_template_option ExpressionTemplates>
-inline typename enable_if_c<number_category<T>::value == number_kind_complex, typename real_and_imag_result<number<T, ExpressionTemplates> >::type>::type
+inline typename enable_if_c<number_category<T>::value == number_kind_complex, typename scalar_result_from_possible_complex<number<T, ExpressionTemplates> >::type>::type
 arg(const number<T, ExpressionTemplates>& v)
 {
    return BOOST_MP_MOVE(atan2(imag(v), real(v)));
 }
 template <class T, expression_template_option ExpressionTemplates>
-inline typename enable_if_c<number_category<T>::value == number_kind_floating_point, typename real_and_imag_result<number<T, ExpressionTemplates> >::type>::type
+inline typename enable_if_c<number_category<T>::value == number_kind_floating_point, typename scalar_result_from_possible_complex<number<T, ExpressionTemplates> >::type>::type
 arg(const number<T, ExpressionTemplates>&)
 {
    return 0;
 }
 template <class tag, class A1, class A2, class A3, class A4>
-inline typename enable_if_c<number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_complex || number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_floating_point, typename real_and_imag_result<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type>::type
+inline typename enable_if_c<number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_complex || number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_floating_point, typename scalar_result_from_possible_complex<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type>::type
 arg(const detail::expression<tag, A1, A2, A3, A4>& v)
 {
    typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
@@ -1935,13 +1935,13 @@ norm(const number<T, ExpressionTemplates>& v)
    return BOOST_MP_MOVE(a * a + b * b);
 }
 template <class T, expression_template_option ExpressionTemplates>
-inline typename boost::enable_if_c<number_category<T>::value != number_kind_complex, typename real_and_imag_result<number<T, ExpressionTemplates> >::type >::type
+inline typename boost::enable_if_c<number_category<T>::value != number_kind_complex, typename scalar_result_from_possible_complex<number<T, ExpressionTemplates> >::type >::type
 norm(const number<T, ExpressionTemplates>& v)
 {
    return v * v;
 }
 template <class tag, class A1, class A2, class A3, class A4>
-inline typename real_and_imag_result<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
+inline typename scalar_result_from_possible_complex<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
 norm(const detail::expression<tag, A1, A2, A3, A4>& v)
 {
    typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;

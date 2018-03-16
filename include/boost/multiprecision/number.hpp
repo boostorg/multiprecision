@@ -42,6 +42,7 @@ class number
    typedef number<Backend, ExpressionTemplates> self_type;
 public:
    typedef Backend backend_type;
+   typedef typename component_type<self_type>::type value_type;
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR number() BOOST_MP_NOEXCEPT_IF(noexcept(Backend())) {}
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR number(const number& e) BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<Backend const&>()))) : m_backend(e.m_backend){}
    template <class V>
@@ -709,17 +710,17 @@ public:
    //
    // Complex number real and imag:
    //
-   typename real_and_imag_result<number<Backend, ExpressionTemplates> >::type
+   typename scalar_result_from_possible_complex<number<Backend, ExpressionTemplates> >::type
       real()const
    {
-      typename real_and_imag_result<multiprecision::number<Backend, ExpressionTemplates> >::type result;
+      typename scalar_result_from_possible_complex<multiprecision::number<Backend, ExpressionTemplates> >::type result;
       eval_real(result.backend(), backend());
       return result;
    }
-   typename real_and_imag_result<number<Backend, ExpressionTemplates> >::type
+   typename scalar_result_from_possible_complex<number<Backend, ExpressionTemplates> >::type
       imag()const
    {
-      typename real_and_imag_result<multiprecision::number<Backend, ExpressionTemplates> >::type result;
+      typename scalar_result_from_possible_complex<multiprecision::number<Backend, ExpressionTemplates> >::type result;
       eval_imag(result.backend(), backend());
       return result;
    }
