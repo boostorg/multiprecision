@@ -1996,6 +1996,22 @@ typename enable_if_c<boost::is_arithmetic<Scalar>::value,
    typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type scalar_type;
    return typename complex_result_from_scalar<scalar_type>::type(scalar_type(r * cos(theta)), scalar_type(r * sin(theta)));
 }
+//
+// Single argument overloads:
+//
+template <class Backend, expression_template_option ExpressionTemplates>
+typename complex_result_from_scalar<number<Backend, ExpressionTemplates> >::type polar(number<Backend, ExpressionTemplates> const& r)
+{
+   return typename complex_result_from_scalar<number<Backend, ExpressionTemplates> >::type(r);
+}
+
+template <class tag, class A1, class A2, class A3, class A4>
+typename complex_result_from_scalar<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
+   polar(detail::expression<tag, A1, A2, A3, A4> const& r)
+{
+   return typename complex_result_from_scalar<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type(r);
+}
+
 
 
 } // namespace multiprecision
@@ -2878,6 +2894,14 @@ struct BOOST_JOIN(category, BOOST_JOIN(func, _funct))\
    {\
       using default_ops::BOOST_JOIN(eval_,func);\
       BOOST_JOIN(eval_,func)(result, arg);\
+   }\
+   template <class U>\
+   void operator()(U& result, const Backend& arg)const\
+   {\
+      using default_ops::BOOST_JOIN(eval_,func);\
+      Backend temp;\
+      BOOST_JOIN(eval_,func)(temp, arg);\
+      result = temp;\
    }\
 };\
 \
