@@ -741,7 +741,7 @@ inline bool eval_is_zero(const mpc_complex_backend<digits10>& val) BOOST_NOEXCEP
    return (0 != mpfr_zero_p(mpc_realref(val.data()))) && (0 != mpfr_zero_p(mpc_imagref(val.data())));
 }
 template <unsigned digits10>
-inline int eval_get_sign(const mpc_complex_backend<digits10>& val)
+inline int eval_get_sign(const mpc_complex_backend<digits10>&)
 {
    BOOST_STATIC_ASSERT_MSG(digits10 == UINT_MAX, "Complex numbers have no sign bit."); // designed to always fail
    return 0;
