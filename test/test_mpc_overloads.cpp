@@ -13,6 +13,12 @@ void test_overloads()
   auto I1 = I0/2 + yb*h;
 
   I1 = I0;
+
+  Complex z{2, 3};
+  typename Complex::value_type theta = 0.2;
+  int n = 2;
+  using std::sin;
+  Complex arg = z*sin(theta) - n*theta;
 }
 
 int main()
