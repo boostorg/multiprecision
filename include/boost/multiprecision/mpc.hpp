@@ -1043,8 +1043,6 @@ struct is_explicitly_convertible<backends::mpc_complex_backend<D1>, backends::mp
 
 template<>
 struct number_category<detail::canonical<mpc_t, backends::mpc_complex_backend<0> >::type> : public mpl::int_<number_kind_floating_point>{};
-template <unsigned Digits10>
-struct is_interval_number<backends::mpc_complex_backend<Digits10> > : public mpl::true_ {};
 
 using boost::multiprecision::backends::mpc_complex_backend;
 
