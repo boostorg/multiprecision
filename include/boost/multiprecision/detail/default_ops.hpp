@@ -971,6 +971,40 @@ inline void eval_convert_to(std::string* result, const B& backend)
 {
    *result = backend.str(0, std::ios_base::fmtflags(0));
 }
+
+template <class B>
+inline void eval_convert_to(std::complex<float>* result, const B& backend)
+{
+   typedef typename scalar_result_from_possible_complex<multiprecision::number<B> >::type scalar_type;
+   scalar_type re, im;
+   eval_real(re.backend(), backend);
+   eval_imag(im.backend(), backend);
+   
+   *result = std::complex<float>(re.template convert_to<float>(), im.template convert_to<float>());
+}
+
+template <class B>
+inline void eval_convert_to(std::complex<double>* result, const B& backend)
+{
+   typedef typename scalar_result_from_possible_complex<multiprecision::number<B> >::type scalar_type;
+   scalar_type re, im;
+   eval_real(re.backend(), backend);
+   eval_imag(im.backend(), backend);
+   
+   *result = std::complex<double>(re.template convert_to<double>(), im.template convert_to<double>());
+}
+
+template <class B>
+inline void eval_convert_to(std::complex<long double>* result, const B& backend)
+{
+   typedef typename scalar_result_from_possible_complex<multiprecision::number<B> >::type scalar_type;
+   scalar_type re, im;
+   eval_real(re.backend(), backend);
+   eval_imag(im.backend(), backend);
+   
+   *result = std::complex<long double>(re.template convert_to<long double>(), im.template convert_to<long double>());
+}
+
 //
 // Functions:
 //

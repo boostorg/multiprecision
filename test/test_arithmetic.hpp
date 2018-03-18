@@ -1390,6 +1390,35 @@ void test_negative_mixed_minmax(boost::mpl::false_ const&)
 }
 
 template <class Real, class Num>
+void test_negative_mixed_numeric_limits(boost::mpl::true_ const&)
+{
+   typedef typename lexical_cast_target_type<Num>::type target_type;
+#if defined(TEST_MPFR)
+   Num tol = 10 * std::numeric_limits<Num>::epsilon();
+#else
+   Num tol = 0;
+#endif
+   static const int left_shift = std::numeric_limits<Num>::digits - 1;
+   Num n1 = -static_cast<Num>(1uLL << ((left_shift < 63) && (left_shift > 0) ? left_shift : 10));
+   Num n2 = -1;
+   Num n3 = 0;
+   Num n4 = -20;
+   std::ios_base::fmtflags f = boost::is_floating_point<Num>::value ? std::ios_base::scientific : std::ios_base::fmtflags(0);
+   int digits_to_print = boost::is_floating_point<Num>::value && std::numeric_limits<Num>::is_specialized
+   ? std::numeric_limits<Num>::digits10 + 5 : 0;
+   if(std::numeric_limits<target_type>::digits <= std::numeric_limits<Real>::digits)
+   {
+   BOOST_CHECK_CLOSE(n1, checked_lexical_cast<target_type>(Real(n1).str(digits_to_print, f)), tol);
+   }
+   BOOST_CHECK_CLOSE(n2, checked_lexical_cast<target_type>(Real(n2).str(digits_to_print, f)), 0);
+   BOOST_CHECK_CLOSE(n3, checked_lexical_cast<target_type>(Real(n3).str(digits_to_print, f)), 0);
+   BOOST_CHECK_CLOSE(n4, checked_lexical_cast<target_type>(Real(n4).str(digits_to_print, f)), 0);
+}
+
+template <class Real, class Num>
+void test_negative_mixed_numeric_limits(boost::mpl::false_ const&){}
+
+template <class Real, class Num>
 void test_negative_mixed(boost::mpl::true_ const&)
 {
    typedef typename lexical_cast_target_type<Num>::type target_type;
@@ -1448,21 +1477,7 @@ void test_negative_mixed(boost::mpl::true_ const&)
    BOOST_CHECK_EQUAL(static_cast<Num>((Real(n3) + 0)), n3);
    BOOST_CHECK_EQUAL(static_cast<Num>((Real(n4) + 0)), n4);
 #endif
-#if defined(TEST_MPFR)
-   Num tol = 10 * std::numeric_limits<Num>::epsilon();
-#else
-   Num tol = 0;
-#endif
-   std::ios_base::fmtflags f = boost::is_floating_point<Num>::value ? std::ios_base::scientific : std::ios_base::fmtflags(0);
-   int digits_to_print = boost::is_floating_point<Num>::value && std::numeric_limits<Num>::is_specialized
-      ? std::numeric_limits<Num>::digits10 + 5 : 0;
-   if(std::numeric_limits<target_type>::digits <= std::numeric_limits<Real>::digits)
-   {
-      BOOST_CHECK_CLOSE(n1, checked_lexical_cast<target_type>(Real(n1).str(digits_to_print, f)), tol);
-   }
-   BOOST_CHECK_CLOSE(n2, checked_lexical_cast<target_type>(Real(n2).str(digits_to_print, f)), 0);
-   BOOST_CHECK_CLOSE(n3, checked_lexical_cast<target_type>(Real(n3).str(digits_to_print, f)), 0);
-   BOOST_CHECK_CLOSE(n4, checked_lexical_cast<target_type>(Real(n4).str(digits_to_print, f)), 0);
+   test_negative_mixed_numeric_limits<Real, Num>(boost::mpl::bool_<std::numeric_limits<Real>::is_specialized>());
    // Assignment:
    Real r(0);
    BOOST_CHECK(r != static_cast<cast_type>(n1));
@@ -1511,7 +1526,7 @@ void test_negative_mixed(boost::mpl::true_ const&)
    BOOST_CHECK_EQUAL(r ,  static_cast<cast_type>(n4 - n5));
    r = static_cast<simple_cast_type>(n4) * Real(n5);
    BOOST_CHECK_EQUAL(r ,  static_cast<cast_type>(n4 * n5));
-   r = static_cast<cast_type>(4 * n4) / Real(4);
+   r = static_cast<cast_type>(Num(4) * n4) / Real(4);
    BOOST_CHECK_EQUAL(r ,  static_cast<cast_type>(n4));
 
    Real a, b, c;
@@ -1715,6 +1730,13 @@ inline Real negate_value(const Real& val, const boost::mpl::false_&)
 template <class Real, class Num>
 void test_mixed_numeric_limits(const boost::mpl::true_&)
 {
+   typedef typename lexical_cast_target_type<Num>::type target_type;
+#if defined(TEST_MPFR)
+   Num tol = 10 * std::numeric_limits<Num>::epsilon();
+#else
+   Num tol = 0;
+#endif
+
    Real d;
    if (std::numeric_limits<Real>::has_infinity && std::numeric_limits<Num>::has_infinity)
    {
@@ -1730,6 +1752,23 @@ void test_mixed_numeric_limits(const boost::mpl::true_&)
       d = static_cast<Real>(negate_value(std::numeric_limits<Num>::quiet_NaN(), boost::mpl::bool_<std::numeric_limits<Num>::is_signed>()));
       BOOST_CHECK(check_is_nan(d, boost::mpl::bool_<std::numeric_limits<Real>::has_quiet_NaN>()));
    }
+
+   static const int left_shift = std::numeric_limits<Num>::digits - 1;
+   Num n1 = static_cast<Num>(1uLL << ((left_shift < 63) && (left_shift > 0) ? left_shift : 10));
+   Num n2 = 1;
+   Num n3 = 0;
+   Num n4 = 20;
+
+   std::ios_base::fmtflags f = boost::is_floating_point<Num>::value ? std::ios_base::scientific : std::ios_base::fmtflags(0);
+   int digits_to_print = boost::is_floating_point<Num>::value && std::numeric_limits<Num>::is_specialized
+      ? std::numeric_limits<Num>::digits10 + 5 : 0;
+   if(std::numeric_limits<target_type>::digits <= std::numeric_limits<Real>::digits)
+   {
+   BOOST_CHECK_CLOSE(n1, checked_lexical_cast<target_type>(Real(n1).str(digits_to_print, f)), tol);
+   }
+   BOOST_CHECK_CLOSE(n2, checked_lexical_cast<target_type>(Real(n2).str(digits_to_print, f)), 0);
+   BOOST_CHECK_CLOSE(n3, checked_lexical_cast<target_type>(Real(n3).str(digits_to_print, f)), 0);
+   BOOST_CHECK_CLOSE(n4, checked_lexical_cast<target_type>(Real(n4).str(digits_to_print, f)), 0);
 }
 template <class Real, class Num>
 void test_mixed_numeric_limits(const boost::mpl::false_&)
@@ -1799,21 +1838,6 @@ void test_mixed(const boost::mpl::true_&)
    BOOST_CHECK_EQUAL(static_cast<cast_type>(n2) ,  Real(n2));
    BOOST_CHECK_EQUAL(static_cast<cast_type>(n3) ,  Real(n3));
    BOOST_CHECK_EQUAL(static_cast<cast_type>(n4) ,  Real(n4));
-#if defined(TEST_MPFR)
-   Num tol = 10 * std::numeric_limits<Num>::epsilon();
-#else
-   Num tol = 0;
-#endif
-   std::ios_base::fmtflags f = boost::is_floating_point<Num>::value ? std::ios_base::scientific : std::ios_base::fmtflags(0);
-   int digits_to_print = boost::is_floating_point<Num>::value && std::numeric_limits<Num>::is_specialized 
-      ? std::numeric_limits<Num>::digits10 + 5 : 0;
-   if(std::numeric_limits<target_type>::digits <= std::numeric_limits<Real>::digits)
-   {
-      BOOST_CHECK_CLOSE(n1, checked_lexical_cast<target_type>(Real(n1).str(digits_to_print, f)), tol);
-   }
-   BOOST_CHECK_CLOSE(n2, checked_lexical_cast<target_type>(Real(n2).str(digits_to_print, f)), 0);
-   BOOST_CHECK_CLOSE(n3, checked_lexical_cast<target_type>(Real(n3).str(digits_to_print, f)), 0);
-   BOOST_CHECK_CLOSE(n4, checked_lexical_cast<target_type>(Real(n4).str(digits_to_print, f)), 0);
    // Assignment:
    Real r(0);
    BOOST_CHECK(r != static_cast<cast_type>(n1));
@@ -1858,7 +1882,7 @@ void test_mixed(const boost::mpl::true_&)
    BOOST_CHECK_EQUAL(r ,  static_cast<cast_type>(n4 - n5));
    r = static_cast<simple_cast_type>(n4) * Real(n5);
    BOOST_CHECK_EQUAL(r ,  static_cast<cast_type>(n4 * n5));
-   r = static_cast<cast_type>(4 * n4) / Real(4);
+   r = static_cast<cast_type>(Num(4) * n4) / Real(4);
    BOOST_CHECK_EQUAL(r ,  static_cast<cast_type>(n4));
 
    typedef boost::mpl::bool_<
@@ -2510,6 +2534,11 @@ void test()
    boost::mpl::bool_<boost::multiprecision::is_number<Real>::value && !boost::is_same<related_type, Real>::value>  tag2;
 
    test_mixed<Real, related_type>(tag2);
+
+   boost::mpl::bool_<boost::multiprecision::is_number<Real>::value && (boost::multiprecision::number_category<Real>::value == boost::multiprecision::number_kind_complex)> complex_tag;
+   test_mixed<Real, std::complex<float> >(complex_tag);
+   test_mixed<Real, std::complex<double> >(complex_tag);
+   test_mixed<Real, std::complex<long double> >(complex_tag);
 
 #endif
    //

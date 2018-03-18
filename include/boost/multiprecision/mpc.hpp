@@ -14,6 +14,7 @@
 #include <mpc.h>
 #include <cmath>
 #include <algorithm>
+#include <complex>
 
 #ifndef BOOST_MULTIPRECISION_MPFI_DEFAULT_PRECISION
 #  define BOOST_MULTIPRECISION_MPFI_DEFAULT_PRECISION 20
@@ -310,6 +311,21 @@ struct mpc_complex_backend : public detail::mpc_complex_imp<digits10>
    {
       mpc_set(this->m_data, val, GMP_RNDN);
    }
+   mpc_complex_backend(const std::complex<float>& val)
+       : detail::mpc_complex_imp<digits10>()
+   {
+      mpc_set_d_d(this->m_data, val.real(), val.imag(), GMP_RNDN);
+   }
+   mpc_complex_backend(const std::complex<double>& val)
+       : detail::mpc_complex_imp<digits10>()
+   {
+      mpc_set_d_d(this->m_data, val.real(), val.imag(), GMP_RNDN);
+   }
+   mpc_complex_backend(const std::complex<long double>& val)
+       : detail::mpc_complex_imp<digits10>()
+   {
+      mpc_set_ld_ld(this->m_data, val.real(), val.imag(), GMP_RNDN);
+   }
    mpc_complex_backend& operator=(const mpc_complex_backend& o)
    {
       *static_cast<detail::mpc_complex_imp<digits10>*>(this) = static_cast<detail::mpc_complex_imp<digits10> const&>(o);
@@ -330,7 +346,22 @@ struct mpc_complex_backend : public detail::mpc_complex_imp<digits10>
    }
    mpc_complex_backend& operator=(const mpc_t val)
    {
-      mpc_set(this->m_data, val);
+      mpc_set(this->m_data, val, GMP_RNDN);
+      return *this;
+   }
+   mpc_complex_backend& operator=(const std::complex<float>& val)
+   {
+      mpc_set_d_d(this->m_data, val.real(), val.imag(), GMP_RNDN);
+      return *this;
+   }
+   mpc_complex_backend& operator=(const std::complex<double>& val)
+   {
+      mpc_set_d_d(this->m_data, val.real(), val.imag(), GMP_RNDN);
+      return *this;
+   }
+   mpc_complex_backend& operator=(const std::complex<long double>& val)
+   {
+      mpc_set_ld_ld(this->m_data, val.real(), val.imag(), GMP_RNDN);
       return *this;
    }
    // We don't change our precision here, this is a fixed precision type:
