@@ -10,7 +10,7 @@ void test_overloads()
   Complex yb = {8.2, 7.3};
   typename Complex::value_type h = 0.0001;
   auto I0 = (ya + yb)*h;
-  auto I1 = I0/2 + yb*h;
+  Complex I1 = I0/2 + yb*h;
 
   I1 = I0;
 
