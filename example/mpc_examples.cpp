@@ -27,8 +27,11 @@ void complex_number_examples()
     std::cout << "Norm                  : " << norm(z1) << std::endl;
     std::cout << "Complex conjugate     : " << conj(z1) << std::endl;
     std::cout << "Projection onto Riemann sphere: " <<  proj(z1) << std::endl;
-    // TODO: Make this work!
-    //std::cout << "Polar coordinates     : " << polar(z1) << std::endl;
+    typename Complex::value_type r = 1;
+    typename Complex::value_type theta = 0.8;
+    using std::polar;
+    std::cout << "Polar coordinates (phase = 0)    : " << polar(r) << std::endl;
+    std::cout << "Polar coordinates (phase !=0)    : " << polar(r, theta) << std::endl;
 
     std::cout << "\nElementary special functions:\n";
     using std::exp;
@@ -71,6 +74,9 @@ void complex_number_examples()
     std::cout << "Reinterpret cast to real part: " << reinterpret_cast<typename Complex::value_type(&)[2]>(z1)[0] << std::endl;
     std::cout << "Reinterpret cast to imaginary part: " << reinterpret_cast<typename Complex::value_type(&)[2]>(z1)[1] << std::endl;
     #pragma GCC diagnostic pop
+
+    using namespace std::complex_literals;
+    Complex z3 = 1. + 2i;
 }
 
 int main()
