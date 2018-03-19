@@ -14,7 +14,7 @@ void test_overloads()
   auto I0 = (ya + yb)*h;
   Complex I1 = I0/2 + yb*h;
 
-  I1 = I0;
+  //I1 = I0;  // not supposed to work.
 
   Complex z{2, 3};
   typename Complex::value_type theta = 0.2;

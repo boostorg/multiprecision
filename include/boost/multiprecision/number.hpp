@@ -1216,7 +1216,7 @@ private:
    template <class F, class Exp, class Tag>
    void do_assign_function_1(const F& f, const Exp& val, const Tag&)
    {
-      number t(val);
+      typename Exp::result_type t(val);
       f(m_backend, t.backend());
    }
    template <class Exp>
@@ -1236,20 +1236,20 @@ private:
    template <class F, class Exp1, class Exp2, class Tag1>
    void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const Tag1&, const detail::terminal&)
    {
-      self_type temp1(val1);
+      typename Exp1::result_type temp1(val1);
       f(m_backend, BOOST_MP_MOVE(temp1.backend()), function_arg_value(val2));
    }
    template <class F, class Exp1, class Exp2, class Tag2>
    void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const detail::terminal&, const Tag2&)
    {
-      self_type temp2(val2);
+      typename Exp2::result_type temp2(val2);
       f(m_backend, function_arg_value(val1), BOOST_MP_MOVE(temp2.backend()));
    }
    template <class F, class Exp1, class Exp2, class Tag1, class Tag2>
    void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const Tag1&, const Tag2&)
    {
-      self_type temp1(val1);
-      self_type temp2(val2);
+      typename Exp1::result_type temp1(val1);
+      typename Exp2::result_type temp2(val2);
       f(m_backend, BOOST_MP_MOVE(temp1.backend()), BOOST_MP_MOVE(temp2.backend()));
    }
 
@@ -1272,7 +1272,7 @@ private:
    template <class F, class Exp1, class Exp2, class Exp3, class Tag1, class Tag2, class Tag3>
    void do_assign_function_3a(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const Tag1&, const Tag2& t2, const Tag3& t3)
    {
-      number t(val1);
+      typename Exp1::result_type t(val1);
       do_assign_function_3b(f, BOOST_MP_MOVE(t), val2, val3, t2, t3);
    }
    template <class F, class Exp1, class Exp2, class Exp3, class Tag3>
@@ -1283,7 +1283,7 @@ private:
    template <class F, class Exp1, class Exp2, class Exp3, class Tag2, class Tag3>
    void do_assign_function_3b(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const Tag2& /*t2*/, const Tag3& t3)
    {
-      number t(val2);
+      typename Exp2::result_type t(val2);
       do_assign_function_3c(f, val1, BOOST_MP_MOVE(t), val3, t3);
    }
    template <class F, class Exp1, class Exp2, class Exp3>
@@ -1294,7 +1294,7 @@ private:
    template <class F, class Exp1, class Exp2, class Exp3, class Tag3>
    void do_assign_function_3c(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const Tag3& /*t3*/)
    {
-      number t(val3);
+      typename Exp3::result_type t(val3);
       do_assign_function_3c(f, val1, val2, BOOST_MP_MOVE(t), detail::terminal());
    }
 
