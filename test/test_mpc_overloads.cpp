@@ -30,8 +30,12 @@ void test_overloads()
   Real cscv = 8.2;
   Complex den = z + v*cscv*exp(-v*cotv);
 
-  if (h <= -cotv) {
-    h = 0.01;
+
+  boost::multiprecision::number<boost::multiprecision::backends::mpc_complex_backend<100> > a = 2;
+  boost::multiprecision::number<boost::multiprecision::backends::mpc_complex_backend<100> > b = 3;
+
+  if (a <= b) {
+    b = a;
   }
 }
 
@@ -50,7 +54,7 @@ template<class Complex>
 void test_functional()
 {
   typedef typename Complex::value_type Real;
-  auto f = [](Real x)->Complex { Complex z{x, 3.0}; return z;};
+  auto f = [](Real x)->Complex { Complex z{x, 3}; return z;};
   Real a = 0;
   Real b = 1;
   Complex some_functional(f, a, b);
