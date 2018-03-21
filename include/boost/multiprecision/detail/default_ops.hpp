@@ -821,8 +821,8 @@ inline int eval_get_sign(const T& val)
    return val.compare(static_cast<ui_type>(0));
 }
 
-template <class T, class V>
-inline void assign_components_imp(T& result, const V& v1, const V& v2, const mpl::int_<number_kind_rational>&)
+template <class T, class V, class U>
+inline void assign_components_imp(T& result, const V& v1, const U& v2, const mpl::int_<number_kind_rational>&)
 {
    result = v1;
    T t;
@@ -830,8 +830,8 @@ inline void assign_components_imp(T& result, const V& v1, const V& v2, const mpl
    eval_divide(result, t);
 }
 
-template <class T, class V>
-inline void assign_components(T& result, const V& v1, const V& v2)
+template <class T, class V, class U>
+inline void assign_components(T& result, const V& v1, const U& v2)
 {
    return assign_components_imp(result, v1, v2, typename number_category<T>::type());
 }

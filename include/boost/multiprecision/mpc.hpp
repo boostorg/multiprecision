@@ -865,12 +865,72 @@ inline void assign_components(mpc_complex_backend<D1>& result, const mpfr_float_
    }
 }
 
-template <unsigned Digits10, class V>
+template <unsigned Digits10, class V, class U>
 inline typename enable_if_c<is_convertible<V, number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on> >::value >::type
-   assign_components(mpc_complex_backend<Digits10>& result, const V& a, const V& b)
+   assign_components(mpc_complex_backend<Digits10>& result, const V& a, const U& b)
 {
    number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on> x(a), y(b);
    assign_components(result, x.backend(), y.backend());
+}
+
+template <unsigned D1, unsigned D2, mpfr_allocation_type AllocationType>
+inline void assign_components(mpc_complex_backend<D1>& result, unsigned long a, unsigned long b)
+{
+   mpc_set_ui_ui(result.data(), a, b, GMP_RNDN);
+}
+
+template <unsigned D1, unsigned D2, mpfr_allocation_type AllocationType>
+inline void assign_components(mpc_complex_backend<D1>& result, long a, long b)
+{
+   mpc_set_si_si(result.data(), a, b, GMP_RNDN);
+}
+
+#if defined(BOOST_HAS_LONG_LONG) && defined(_MPFR_H_HAVE_INTMAX_T)
+template <unsigned D1, unsigned D2, mpfr_allocation_type AllocationType>
+inline void assign_components(mpc_complex_backend<D1>& result, unsigned long long a, unsigned long long b)
+{
+   mpc_set_uj_uj(result.data(), a, b, GMP_RNDN);
+}
+
+template <unsigned D1, unsigned D2, mpfr_allocation_type AllocationType>
+inline void assign_components(mpc_complex_backend<D1>& result, long long a, long long b)
+{
+   mpc_set_sj_sj(result.data(), a, b, GMP_RNDN);
+}
+#endif
+
+template <unsigned D1, unsigned D2, mpfr_allocation_type AllocationType>
+inline void assign_components(mpc_complex_backend<D1>& result, double a, double b)
+{
+   if ((boost::math::isnan)(a))
+   {
+      mpc_set_d(result.data(), a, GMP_RNDN);
+   }
+   else if ((boost::math::isnan)(b))
+   {
+      mpc_set_d(result.data(), b, GMP_RNDN);
+   }
+   else
+   {
+      mpc_set_d_d(result.data(), a, b, GMP_RNDN);
+   }
+}
+
+template <unsigned D1, unsigned D2, mpfr_allocation_type AllocationType>
+inline void assign_components(mpc_complex_backend<D1>& result, long double a, long double b)
+{
+   if ((boost::math::isnan)(a))
+   {
+      mpc_set_d(result.data(), a, GMP_RNDN);
+   }
+   else if ((boost::math::isnan)(b))
+   {
+      mpc_set_d(result.data(), b, GMP_RNDN);
+   }
+   else
+   {
+      mpc_set_ld_ld(result.data(), a, b, GMP_RNDN);
+   }
 }
 
 //

@@ -1992,6 +1992,37 @@ typename boost::enable_if_c<boost::multiprecision::number_category<Real>::value 
    BOOST_CHECK_EQUAL(c.real(), 2);
    BOOST_CHECK_EQUAL(c.imag(), 3);
 
+   //
+   // try some more 2-argument constructors:
+   //
+   {
+      Real d(40.5, 2);
+      BOOST_CHECK_EQUAL(d.real(), 40.5);
+      BOOST_CHECK_EQUAL(d.imag(), 2);
+   }
+   {
+      Real d("40.5", "2");
+      BOOST_CHECK_EQUAL(d.real(), 40.5);
+      BOOST_CHECK_EQUAL(d.imag(), 2);
+   }
+   {
+      Real d("40.5", std::string("2"));
+      BOOST_CHECK_EQUAL(d.real(), 40.5);
+      BOOST_CHECK_EQUAL(d.imag(), 2);
+   }
+   {
+      typename Real::value_type x(40.5), y(2);
+      Real d(x, y);
+      BOOST_CHECK_EQUAL(d.real(), 40.5);
+      BOOST_CHECK_EQUAL(d.imag(), 2);
+   }
+   {
+      typename Real::value_type x(40.5), y(2);
+      Real d(x.backend().data(), y.backend().data());
+      BOOST_CHECK_EQUAL(d.real(), 40.5);
+      BOOST_CHECK_EQUAL(d.imag(), 2);
+   }
+
    BOOST_CHECK_EQUAL(real(a), 30);
    BOOST_CHECK_EQUAL(imag(a), 0);
    BOOST_CHECK_EQUAL(real(c), 2);

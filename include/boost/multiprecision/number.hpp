@@ -127,11 +127,20 @@ public:
          >::type* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<Other const&>())))
       : m_backend(val.backend()) {}
 
-   template <class V>
-   BOOST_MP_FORCEINLINE number(V v1, V v2, typename boost::enable_if<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > >::type* = 0)
+   template <class V, class U>
+   BOOST_MP_FORCEINLINE number(const V& v1, const U& v2, 
+      typename boost::enable_if_c<(is_compatible_arithmetic_type<V, value_type>::value && is_compatible_arithmetic_type<U, value_type>::value)>::type* = 0)
    {
       using default_ops::assign_components;
       assign_components(m_backend, canonical_value(v1), canonical_value(v2));
+   }
+   template <class V, class U>
+   BOOST_MP_FORCEINLINE number(const V& v1, const U& v2,
+      typename boost::enable_if_c<((is_same<std::string, V>::value || is_convertible<V, const char*>::value) && (is_same<std::string, U>::value || is_convertible<U, const char*>::value))>::type* = 0)
+   {
+      using default_ops::assign_components;
+      value_type x(v1), y(v2);
+      assign_components(m_backend, canonical_value(x), canonical_value(y));
    }
    template <class Other, expression_template_option ET>
    BOOST_MP_FORCEINLINE number(const number<Other, ET>& v1, const number<Other, ET>& v2, typename boost::enable_if<boost::is_convertible<Other, Backend> >::type* = 0)
