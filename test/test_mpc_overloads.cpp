@@ -1,6 +1,7 @@
 #include <type_traits>
 #include "test.hpp"
 #include <boost/multiprecision/mpc.hpp>
+#include <boost/math/constants/constants.hpp>
 
 using boost::multiprecision::mpc_complex_100;
 
@@ -28,6 +29,31 @@ void test_overloads()
   Real cotv = 7.8;
   Real cscv = 8.2;
   Complex den = z + v*cscv*exp(-v*cotv);
+
+  if (h <= -cotv) {
+    h = 0.01;
+  }
+}
+
+template<class F, class Real>
+typename std::result_of_t<F(Real)> some_functional(F f, Real a, Real b)
+{
+  if(a <= -boost::math::tools::max_value<Real>()) {
+    return f(a);
+  } 
+
+  return f(b);
+
+}
+
+template<class Complex>
+void test_functional()
+{
+  typedef typename Complex::value_type Real;
+  auto f = [](Real x)->Complex { Complex z{x, 3.0}; return z;};
+  Real a = 0;
+  Real b = 1;
+  Complex some_functional(f, a, b);
 }
 
 
@@ -35,5 +61,5 @@ void test_overloads()
 int main()
 {
   test_overloads<mpc_complex_100>();
-  
+  test_functional<mpc_complex_100>();
 }
