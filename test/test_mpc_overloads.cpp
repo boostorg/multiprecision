@@ -33,10 +33,10 @@ void test_overloads()
 
   boost::multiprecision::number<boost::multiprecision::backends::mpc_complex_backend<100> > a = 2;
   boost::multiprecision::number<boost::multiprecision::backends::mpc_complex_backend<100> > b = 3;
-
+  /*
   if (a <= b) {
     b = a;
-  }
+  }*/
 }
 
 template<class F, class Real>
