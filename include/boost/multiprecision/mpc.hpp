@@ -865,14 +865,6 @@ inline void assign_components(mpc_complex_backend<D1>& result, const mpfr_float_
    }
 }
 
-template <unsigned Digits10, class V, class U>
-inline typename enable_if_c<is_convertible<V, number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on> >::value >::type
-   assign_components(mpc_complex_backend<Digits10>& result, const V& a, const U& b)
-{
-   number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on> x(a), y(b);
-   assign_components(result, x.backend(), y.backend());
-}
-
 template <unsigned D1, unsigned D2, mpfr_allocation_type AllocationType>
 inline void assign_components(mpc_complex_backend<D1>& result, unsigned long a, unsigned long b)
 {

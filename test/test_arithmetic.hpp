@@ -2022,6 +2022,24 @@ typename boost::enable_if_c<boost::multiprecision::number_category<Real>::value 
       BOOST_CHECK_EQUAL(d.real(), 40.5);
       BOOST_CHECK_EQUAL(d.imag(), 2);
    }
+   {
+      typename Real::value_type x(40.5);
+      Real d(x, 2);
+      BOOST_CHECK_EQUAL(d.real(), 40.5);
+      BOOST_CHECK_EQUAL(d.imag(), 2);
+   }
+   {
+      typename Real::value_type x(40.5);
+      Real d(2, x);
+      BOOST_CHECK_EQUAL(d.imag(), 40.5);
+      BOOST_CHECK_EQUAL(d.real(), 2);
+   }
+   {
+      typename Real::value_type x(real(a)*real(b) + imag(a)*imag(b)), y(imag(a)*real(b) - real(a)*imag(b));
+      Real d(real(a)*real(b) + imag(a)*imag(b), imag(a)*real(b) - real(a)*imag(b));
+      Real e(x, y);
+      BOOST_CHECK_EQUAL(d, e);
+   }
 
    BOOST_CHECK_EQUAL(real(a), 30);
    BOOST_CHECK_EQUAL(imag(a), 0);

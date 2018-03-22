@@ -830,6 +830,15 @@ inline void assign_components_imp(T& result, const V& v1, const U& v2, const mpl
    eval_divide(result, t);
 }
 
+template <class T, class V, class U, int N>
+inline void assign_components_imp(T& result, const V& v1, const U& v2, const mpl::int_<N>&)
+{
+   typedef typename component_type<number<T> >::type component_number_type;
+
+   component_number_type x(v1), y(v2);
+   assign_components(result, x.backend(), y.backend());
+}
+
 template <class T, class V, class U>
 inline void assign_components(T& result, const V& v1, const U& v2)
 {

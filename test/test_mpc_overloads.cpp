@@ -54,10 +54,10 @@ template<class Complex>
 void test_functional()
 {
   typedef typename Complex::value_type Real;
-  auto f = [](Real x)->Complex { Complex z{x, 3}; return z;};
+  auto f = [](Real x)->Complex { Complex z(x, 3); return z;};
   Real a = 0;
   Real b = 1;
-  Complex some_functional(f, a, b);
+  Complex result = some_functional(f, a, b);
 }
 
 

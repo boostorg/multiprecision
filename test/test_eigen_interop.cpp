@@ -9,6 +9,8 @@
 #include <boost/multiprecision/gmp.hpp>
 #include <boost/multiprecision/mpc.hpp>
 
+#include "test.hpp"
+
 
 using namespace Eigen;
 
@@ -143,18 +145,29 @@ struct related_number<boost::multiprecision::cpp_dec_float_100>
 template <class Num>
 void example1()
 {
+   // expected results first:
+   Matrix<Num, 2, 2> r1, r2;
+   r1 << 3, 5, 4, 8;
+   r2 << -1, -1, 2, 0;
+   Matrix<Num, 3, 1> r3;
+   r3 << -1, -4, -6;
+
+
    Matrix<Num, 2, 2> a;
    a << 1, 2, 3, 4;
    Matrix<Num, Dynamic, Dynamic> b(2,2);
    b << 2, 3, 1, 4;
    std::cout << "a + b =\n" << a + b << std::endl;
+   BOOST_CHECK_EQUAL(a + b, r1);
    std::cout << "a - b =\n" << a - b << std::endl;
+   BOOST_CHECK_EQUAL(a - b, r2);
    std::cout << "Doing a += b;" << std::endl;
    a += b;
    std::cout << "Now a =\n" << a << std::endl;
    Matrix<Num, 3, 1> v(1,2,3);
    Matrix<Num, 3, 1> w(1,0,0);
    std::cout << "-v + w - v =\n" << -v + w - v << std::endl;
+   BOOST_CHECK_EQUAL(-v + w - v, r3);
 }
 
 template <class Num>
@@ -438,6 +451,13 @@ void example18()
    cout << "Here is mat.minCoeff():  " << mat.minCoeff() << endl;
    cout << "Here is mat.maxCoeff():  " << mat.maxCoeff() << endl;
    cout << "Here is mat.trace():     " << mat.trace() << endl;
+
+   BOOST_CHECK_EQUAL(mat.sum(), 10);
+   BOOST_CHECK_EQUAL(mat.prod(), 24);
+   BOOST_CHECK_EQUAL(mat.mean(), Num(5) / 2);
+   BOOST_CHECK_EQUAL(mat.minCoeff(), 1);
+   BOOST_CHECK_EQUAL(mat.maxCoeff(), 4);
+   BOOST_CHECK_EQUAL(mat.trace(), 5);
 }
 
 template <class Num>
@@ -577,17 +597,23 @@ void test_complex_type()
 
 int main()
 {
-   test_integer_type<boost::multiprecision::int256_t>();
-   test_integer_type<boost::multiprecision::cpp_int>();
-   test_integer_type<boost::multiprecision::cpp_rational>();
+   test_integer_type<int>();
+
+   test_float_type<double>();
+   test_complex_type<std::complex<double> >();
+
    test_float_type<boost::multiprecision::cpp_dec_float_100>();
    test_float_type<boost::multiprecision::cpp_bin_float_50>();
 
    test_float_type<boost::multiprecision::mpfr_float>();
+#if 0
+   test_integer_type<boost::multiprecision::int256_t>();
+   test_integer_type<boost::multiprecision::cpp_int>();
+   test_integer_type<boost::multiprecision::cpp_rational>();
    test_integer_type<boost::multiprecision::mpz_int>();
    test_integer_type<boost::multiprecision::mpq_rational>();
    
    test_complex_type<boost::multiprecision::mpc_complex>();
-
+#endif
    return 0;
 }
