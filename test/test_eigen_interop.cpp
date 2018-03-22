@@ -39,19 +39,28 @@ namespace Eigen
       }
       static Real dummy_precision() 
       { 
-         return epsilon(); 
+         return sqrt(epsilon()); 
       }
       static Real highest() 
       { 
-         return (std::numeric_limits<Real>::max)(); 
+         return (std::numeric_limits<Real>::max)();
       }
       static Real lowest() 
       { 
          return (std::numeric_limits<Real>::min)(); 
       }
+      static int digits10_imp(const boost::mpl::true_&)
+      {
+         return std::numeric_limits<Real>::digits10;
+      }
+      template <bool B>
+      static int digits10_imp(const boost::mpl::bool_<B>&)
+      {
+         return Real::default_precision();
+      }
       static int digits10() 
       { 
-         return std::numeric_limits<Real>::digits10; 
+         return digits10_imp(boost::mpl::bool_<std::numeric_limits<Real>::digits10 && (std::numeric_limits<Real>::digits10 != INT_MAX) ? true : false>());
       }
    };
 
@@ -547,6 +556,12 @@ void test_integer_type()
 template <class Num>
 void test_float_type()
 {
+   std::cout << "Epsilon    = " << Eigen::NumTraits<Num>::epsilon() << std::endl;
+   std::cout << "Dummy Prec = " << Eigen::NumTraits<Num>::dummy_precision() << std::endl;
+   std::cout << "Highest    = " << Eigen::NumTraits<Num>::highest() << std::endl;
+   std::cout << "Lowest     = " << Eigen::NumTraits<Num>::lowest() << std::endl;
+   std::cout << "Digits10   = " << Eigen::NumTraits<Num>::digits10() << std::endl;
+
    example1<Num>();
    example2<Num>();
    example4<Num>();
@@ -573,6 +588,12 @@ void test_float_type()
 template <class Num>
 void test_complex_type()
 {
+   std::cout << "Epsilon    = " << Eigen::NumTraits<Num>::epsilon() << std::endl;
+   std::cout << "Dummy Prec = " << Eigen::NumTraits<Num>::dummy_precision() << std::endl;
+   std::cout << "Highest    = " << Eigen::NumTraits<Num>::highest() << std::endl;
+   std::cout << "Lowest     = " << Eigen::NumTraits<Num>::lowest() << std::endl;
+   std::cout << "Digits10   = " << Eigen::NumTraits<Num>::digits10() << std::endl;
+
    example1<Num>();
    example2<Num>();
    example3<Num>();
@@ -597,23 +618,23 @@ void test_complex_type()
 
 int main()
 {
+   test_float_type<boost::multiprecision::cpp_bin_float_50>();
+   test_float_type<boost::multiprecision::mpfr_float>();
+   test_complex_type<boost::multiprecision::mpc_complex>();
+#if 0
    test_integer_type<int>();
 
    test_float_type<double>();
    test_complex_type<std::complex<double> >();
 
    test_float_type<boost::multiprecision::cpp_dec_float_100>();
-   test_float_type<boost::multiprecision::cpp_bin_float_50>();
 
-   test_float_type<boost::multiprecision::mpfr_float>();
-#if 0
    test_integer_type<boost::multiprecision::int256_t>();
    test_integer_type<boost::multiprecision::cpp_int>();
    test_integer_type<boost::multiprecision::cpp_rational>();
    test_integer_type<boost::multiprecision::mpz_int>();
    test_integer_type<boost::multiprecision::mpq_rational>();
    
-   test_complex_type<boost::multiprecision::mpc_complex>();
 #endif
    return 0;
 }

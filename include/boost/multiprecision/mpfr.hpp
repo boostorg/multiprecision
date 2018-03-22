@@ -2191,7 +2191,7 @@ public:
    static number_type(max)()
    {
       number_type value(0.5);
-      mpfr_div_2exp(value.backend().data(), value.backend().data(), -mpfr_get_emax(), GMP_RNDN);
+      mpfr_mul_2exp(value.backend().data(), value.backend().data(), mpfr_get_emax(), GMP_RNDN);
       return value;
    }
    static number_type lowest()
