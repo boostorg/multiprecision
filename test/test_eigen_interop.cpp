@@ -382,7 +382,7 @@ void example13()
       9, 10, 11, 12,
       13, 14, 15, 16;
    cout << "Block in the middle" << endl;
-   cout << m.block<2, 2>(1, 1) << endl << endl;
+   cout << m.template block<2, 2>(1, 1) << endl << endl;
    for (int i = 1; i <= 3; ++i)
    {
       cout << "Block of size " << i << "x" << i << endl;
@@ -399,7 +399,7 @@ void example14()
       3, 4;
    Array<Num, 4, 4> a = Array<Num, 4, 4>::Constant(0.6);
    cout << "Here is the array a:" << endl << a << endl << endl;
-   a.block<2, 2>(1, 1) = m;
+   a.template block<2, 2>(1, 1) = m;
    cout << "Here is now a with m copied into its central 2x2 block:" << endl << a << endl << endl;
    a.block(0, 0, 2, 3) = a.block(2, 1, 2, 3);
    cout << "Here is now a with bottom-right 2x3 block copied into top-left 2x2 block:" << endl << a << endl << endl;
@@ -430,7 +430,7 @@ void example16()
       9, 10, 11, 12,
       13, 14, 15, 16;
    cout << "m.leftCols(2) =" << endl << m.leftCols(2) << endl << endl;
-   cout << "m.bottomRows<2>() =" << endl << m.bottomRows<2>() << endl << endl;
+   cout << "m.bottomRows<2>() =" << endl << m.template bottomRows<2>() << endl << endl;
    m.topLeftCorner(1, 3) = m.bottomRightCorner(3, 1).transpose();
    cout << "After assignment, m = " << endl << m << endl;
 }
@@ -442,7 +442,7 @@ void example17()
    Array<Num, Dynamic, 1> v(6);
    v << 1, 2, 3, 4, 5, 6;
    cout << "v.head(3) =" << endl << v.head(3) << endl << endl;
-   cout << "v.tail<3>() = " << endl << v.tail<3>() << endl << endl;
+   cout << "v.tail<3>() = " << endl << v.template tail<3>() << endl << endl;
    v.segment(1, 4) *= 2;
    cout << "after 'v.segment(1,4) *= 2', v =" << endl << v << endl;
 }
@@ -498,13 +498,13 @@ void example19()
       -3, 4;
    cout << "v.squaredNorm() = " << v.squaredNorm() << endl;
    cout << "v.norm() = " << v.norm() << endl;
-   cout << "v.lpNorm<1>() = " << v.lpNorm<1>() << endl;
-   cout << "v.lpNorm<Infinity>() = " << v.lpNorm<Infinity>() << endl;
+   cout << "v.lpNorm<1>() = " << v.template lpNorm<1>() << endl;
+   cout << "v.lpNorm<Infinity>() = " << v.template lpNorm<Infinity>() << endl;
    cout << endl;
    cout << "m.squaredNorm() = " << m.squaredNorm() << endl;
    cout << "m.norm() = " << m.norm() << endl;
-   cout << "m.lpNorm<1>() = " << m.lpNorm<1>() << endl;
-   cout << "m.lpNorm<Infinity>() = " << m.lpNorm<Infinity>() << endl;
+   cout << "m.lpNorm<1>() = " << m.template lpNorm<1>() << endl;
+   cout << "m.lpNorm<Infinity>() = " << m.template lpNorm<Infinity>() << endl;
 }
 
 template <class Num>
