@@ -10,6 +10,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/multiprecision/mpfr.hpp>
+#include <boost/multiprecision/logged_adaptor.hpp>
 #include <boost/functional/hash_fwd.hpp>
 #include <mpc.h>
 #include <cmath>
@@ -149,6 +150,21 @@ struct mpc_complex_imp
       mpc_set_ld(m_data, d, GMP_RNDN);
       return *this;
    }
+   mpc_complex_imp& operator = (mpz_t i)
+   {
+      if (m_data[0].re[0]._mpfr_d == 0)
+         mpc_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
+      mpc_set_z(m_data, i, GMP_RNDN);
+      return *this;
+   }
+   mpc_complex_imp& operator = (gmp_int i)
+   {
+      if (m_data[0].re[0]._mpfr_d == 0)
+         mpc_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
+      mpc_set_z(m_data, i.data(), GMP_RNDN);
+      return *this;
+   }
+   
    mpc_complex_imp& operator = (const char* s)
    {
       using default_ops::eval_fpclassify;
@@ -326,6 +342,14 @@ struct mpc_complex_backend : public detail::mpc_complex_imp<digits10>
    {
       mpc_set_ld_ld(this->m_data, val.real(), val.imag(), GMP_RNDN);
    }
+   mpc_complex_backend(mpz_t val) : detail::mpc_complex_imp<digits10>()
+   {
+      mpc_set_z(this->m_data, val, GMP_RNDN);
+   }
+   mpc_complex_backend(gmp_int const& val) : detail::mpc_complex_imp<digits10>()
+   {
+      mpc_set_z(this->m_data, val.data(), GMP_RNDN);
+   }
    mpc_complex_backend& operator=(const mpc_complex_backend& o)
    {
       *static_cast<detail::mpc_complex_imp<digits10>*>(this) = static_cast<detail::mpc_complex_imp<digits10> const&>(o);
@@ -409,6 +433,30 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
    {
       mpc_set_fr(this->m_data, val.data(), GMP_RNDN);
    }
+   mpc_complex_backend(mpz_t val) : detail::mpc_complex_imp<0>() 
+   {
+      mpc_set_z(this->m_data, val, GMP_RNDN);
+   }
+   mpc_complex_backend(gmp_int const& val) : detail::mpc_complex_imp<0>() 
+   {
+      mpc_set_z(this->m_data, val.data(), GMP_RNDN);
+   }
+   mpc_complex_backend(const std::complex<float>& val)
+      : detail::mpc_complex_imp<0>()
+   {
+      mpc_set_d_d(this->m_data, val.real(), val.imag(), GMP_RNDN);
+   }
+   mpc_complex_backend(const std::complex<double>& val)
+      : detail::mpc_complex_imp<0>()
+   {
+      mpc_set_d_d(this->m_data, val.real(), val.imag(), GMP_RNDN);
+   }
+   mpc_complex_backend(const std::complex<long double>& val)
+      : detail::mpc_complex_imp<0>()
+   {
+      mpc_set_ld_ld(this->m_data, val.real(), val.imag(), GMP_RNDN);
+   }
+
    mpc_complex_backend& operator=(const mpc_complex_backend& o)
    {
       if (this != &o)
@@ -451,6 +499,21 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
       mpc_set_fr(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
+   mpc_complex_backend& operator=(const std::complex<float>& val)
+   {
+      mpc_set_d_d(this->m_data, val.real(), val.imag(), GMP_RNDN);
+      return *this;
+   }
+   mpc_complex_backend& operator=(const std::complex<double>& val)
+   {
+      mpc_set_d_d(this->m_data, val.real(), val.imag(), GMP_RNDN);
+      return *this;
+   }
+   mpc_complex_backend& operator=(const std::complex<long double>& val)
+   {
+      mpc_set_ld_ld(this->m_data, val.real(), val.imag(), GMP_RNDN);
+      return *this;
+   }
    static unsigned default_precision() BOOST_NOEXCEPT
    {
       return get_default_precision();
@@ -465,7 +528,7 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
    }
    void precision(unsigned digits10) BOOST_NOEXCEPT
    {
-      mpc_set_prec(this->m_data, multiprecision::detail::digits2_2_10((digits10)));
+      mpc_set_prec(this->m_data, multiprecision::detail::digits10_2_2((digits10)));
    }
 };
 

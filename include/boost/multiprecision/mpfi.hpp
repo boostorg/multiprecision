@@ -475,7 +475,7 @@ struct mpfi_float_backend<0> : public detail::mpfi_float_imp<0>
    }
    void precision(unsigned digits10) BOOST_NOEXCEPT
    {
-      mpfi_set_prec(this->m_data, multiprecision::detail::digits2_2_10((digits10)));
+      mpfi_set_prec(this->m_data, multiprecision::detail::digits10_2_2((digits10)));
    }
 };
 
