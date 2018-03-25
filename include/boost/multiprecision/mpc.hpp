@@ -411,8 +411,11 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
    }
    mpc_complex_backend& operator=(const mpc_complex_backend& o)
    {
-      mpc_set_prec(this->m_data, mpc_get_prec(o.data()));
-      mpc_set(this->m_data, o.data(), GMP_RNDN);
+      if (this != &o)
+      {
+         mpc_set_prec(this->m_data, mpc_get_prec(o.data()));
+         mpc_set(this->m_data, o.data(), GMP_RNDN);
+      }
       return *this;
    }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
@@ -1106,6 +1109,12 @@ typedef number<mpc_complex_backend<0> >     mpc_complex;
 
 template <unsigned Digits10, expression_template_option ExpressionTemplates>
 struct component_type<number<mpc_complex_backend<Digits10>, ExpressionTemplates> >
+{
+   typedef number<mpfr_float_backend<Digits10>, ExpressionTemplates> type;
+};
+
+template <unsigned Digits10, expression_template_option ExpressionTemplates>
+struct component_type<number<logged_adaptor<mpc_complex_backend<Digits10> >, ExpressionTemplates> >
 {
    typedef number<mpfr_float_backend<Digits10>, ExpressionTemplates> type;
 };
