@@ -69,6 +69,7 @@ mp-run-simple has_tommath.cpp tommath : : :
       <include>$(tommath_path) : has_tommath ;
 mp-run-simple has_float128.cpp quadmath : : : : has_float128 ;
 exe has_intel_quad : has_intel_quad.cpp : <cxxflags>-Qoption,cpp,--extended_float_type ;
+exe has_eigen : has_eigen.cpp ;
 
 explicit has_gmp ;
 explicit has_mpfr ;
@@ -77,6 +78,6 @@ explicit has_tommath ;
 explicit has_float128 ;
 explicit has_intel_quad ;
 explicit has_mpc ;
-
+explicit has_eigen ;
 
 

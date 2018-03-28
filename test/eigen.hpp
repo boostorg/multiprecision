@@ -1,158 +1,20 @@
+///////////////////////////////////////////////////////////////////////////////
+//  Copyright 2018 John Maddock. Distributed under the Boost
+//  Software License, Version 1.0. (See accompanying file
+//  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/multiprecision/cpp_int.hpp>
-#include <boost/multiprecision/cpp_dec_float.hpp>
-#include <boost/multiprecision/cpp_bin_float.hpp>
+#include <boost/multiprecision/eigen.hpp>
 #include <iostream>
 #include <Eigen/Dense>
-
-#include <boost/multiprecision/mpfr.hpp>
-#include <boost/multiprecision/logged_adaptor.hpp>
-#include <boost/multiprecision/gmp.hpp>
-#include <boost/multiprecision/mpc.hpp>
-
 #include "test.hpp"
 
-
 using namespace Eigen;
-
-namespace Eigen
-{
-   template <class Backend, boost::multiprecision::expression_template_option ExpressionTemplates>
-   struct NumTraits<boost::multiprecision::number<Backend, ExpressionTemplates> >
-   {
-      typedef boost::multiprecision::number<Backend, ExpressionTemplates> self_type;
-      typedef typename boost::multiprecision::scalar_result_from_possible_complex<self_type>::type Real;
-      typedef self_type NonInteger; // Not correct but we can't do much better??
-      typedef double Literal;
-      typedef self_type Nested;
-      enum {
-         IsComplex = boost::multiprecision::number_category<self_type>::value == boost::multiprecision::number_kind_complex,
-         IsInteger = boost::multiprecision::number_category<self_type>::value == boost::multiprecision::number_kind_integer,
-         ReadCost = 1,
-         AddCost = 4,
-         MulCost = 8,
-         IsSigned = std::numeric_limits<self_type>::is_specialized ? std::numeric_limits<self_type>::is_signed : true,
-         RequireInitialization = 1,
-      };
-      static Real epsilon() 
-      { 
-         return std::numeric_limits<Real>::epsilon(); 
-      }
-      static Real dummy_precision() 
-      { 
-         return sqrt(epsilon()); 
-      }
-      static Real highest() 
-      { 
-         return (std::numeric_limits<Real>::max)();
-      }
-      static Real lowest() 
-      { 
-         return (std::numeric_limits<Real>::min)(); 
-      }
-      static int digits10_imp(const boost::mpl::true_&)
-      {
-         return std::numeric_limits<Real>::digits10;
-      }
-      template <bool B>
-      static int digits10_imp(const boost::mpl::bool_<B>&)
-      {
-         return Real::default_precision();
-      }
-      static int digits10() 
-      { 
-         return digits10_imp(boost::mpl::bool_<std::numeric_limits<Real>::digits10 && (std::numeric_limits<Real>::digits10 != INT_MAX) ? true : false>());
-      }
-   };
-
-#define BOOST_MP_EIGEN_SCALAR_TRAITS_DECL(A)\
-   template<class Backend, boost::multiprecision::expression_template_option ExpressionTemplates, typename BinaryOp>\
-   struct ScalarBinaryOpTraits<boost::multiprecision::number<Backend, ExpressionTemplates>, A, BinaryOp>\
-   {\
-      static_assert(boost::multiprecision::is_compatible_arithmetic_type<A, boost::multiprecision::number<Backend, ExpressionTemplates> >::value, "Interoperability with this arithmetic type is not supported.");\
-      typedef boost::multiprecision::number<Backend, ExpressionTemplates> ReturnType;\
-   };\
-   template<class Backend, boost::multiprecision::expression_template_option ExpressionTemplates, typename BinaryOp>\
-   struct ScalarBinaryOpTraits<A, boost::multiprecision::number<Backend, ExpressionTemplates>, BinaryOp>\
-   {\
-      static_assert(boost::multiprecision::is_compatible_arithmetic_type<A, boost::multiprecision::number<Backend, ExpressionTemplates> >::value, "Interoperability with this arithmetic type is not supported.");\
-      typedef boost::multiprecision::number<Backend, ExpressionTemplates> ReturnType;\
-   };\
-
-   BOOST_MP_EIGEN_SCALAR_TRAITS_DECL(float)
-      BOOST_MP_EIGEN_SCALAR_TRAITS_DECL(double)
-      BOOST_MP_EIGEN_SCALAR_TRAITS_DECL(long double)
-      BOOST_MP_EIGEN_SCALAR_TRAITS_DECL(char)
-      BOOST_MP_EIGEN_SCALAR_TRAITS_DECL(unsigned char)
-      BOOST_MP_EIGEN_SCALAR_TRAITS_DECL(signed char)
-      BOOST_MP_EIGEN_SCALAR_TRAITS_DECL(short)
-      BOOST_MP_EIGEN_SCALAR_TRAITS_DECL(unsigned short)
-      BOOST_MP_EIGEN_SCALAR_TRAITS_DECL(int)
-      BOOST_MP_EIGEN_SCALAR_TRAITS_DECL(unsigned int)
-      BOOST_MP_EIGEN_SCALAR_TRAITS_DECL(long)
-      BOOST_MP_EIGEN_SCALAR_TRAITS_DECL(unsigned long)
-#if 0    
-   template<class Backend, boost::multiprecision::expression_template_option ExpressionTemplates, class Backend2, boost::multiprecision::expression_template_option ExpressionTemplates2, typename BinaryOp>
-   struct ScalarBinaryOpTraits<boost::multiprecision::number<Backend, ExpressionTemplates>, boost::multiprecision::number<Backend2, ExpressionTemplates2>, BinaryOp>
-   {
-      static_assert(
-         boost::multiprecision::is_compatible_arithmetic_type<boost::multiprecision::number<Backend2, ExpressionTemplates2>, boost::multiprecision::number<Backend, ExpressionTemplates> >::value
-         || boost::multiprecision::is_compatible_arithmetic_type<boost::multiprecision::number<Backend, ExpressionTemplates>, boost::multiprecision::number<Backend2, ExpressionTemplates2> >::value, "Interoperability with this arithmetic type is not supported.");
-      typedef typename boost::mpl::if_c<boost::is_convertible<boost::multiprecision::number<Backend2, ExpressionTemplates2>, boost::multiprecision::number<Backend, ExpressionTemplates> >::value, 
-         boost::multiprecision::number<Backend, ExpressionTemplates>, boost::multiprecision::number<Backend2, ExpressionTemplates2> >::type ReturnType;
-   }; 
-
-   template<unsigned D, typename BinaryOp>
-   struct ScalarBinaryOpTraits<boost::multiprecision::number<boost::multiprecision::backends::mpc_complex_backend<D>, boost::multiprecision::et_on>, boost::multiprecision::mpfr_float, BinaryOp>
-   {
-      typedef boost::multiprecision::number<boost::multiprecision::backends::mpc_complex_backend<D>, boost::multiprecision::et_on> ReturnType;
-   }; 
-
-   template<typename BinaryOp>
-   struct ScalarBinaryOpTraits<boost::multiprecision::mpfr_float, boost::multiprecision::mpc_complex, BinaryOp>
-   {
-      typedef boost::multiprecision::number<boost::multiprecision::backends::mpc_complex_backend<0>, boost::multiprecision::et_on> ReturnType;
-   }; 
-
-   template<class Backend, boost::multiprecision::expression_template_option ExpressionTemplates, typename BinaryOp>
-   struct ScalarBinaryOpTraits<boost::multiprecision::number<Backend, ExpressionTemplates>, boost::multiprecision::number<Backend, ExpressionTemplates>, BinaryOp>
-   {
-      typedef boost::multiprecision::number<Backend, ExpressionTemplates> ReturnType;
-   }; 
-#endif
-   template<class Backend, boost::multiprecision::expression_template_option ExpressionTemplates, class tag, class Arg1, class Arg2, class Arg3, class Arg4, typename BinaryOp>
-   struct ScalarBinaryOpTraits<boost::multiprecision::number<Backend, ExpressionTemplates>, boost::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, BinaryOp>
-   {
-      static_assert(boost::is_convertible<typename boost::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, boost::multiprecision::number<Backend, ExpressionTemplates> >::value, "Interoperability with this arithmetic type is not supported.");
-      typedef boost::multiprecision::number<Backend, ExpressionTemplates> ReturnType;
-   };
-
-   template<class tag, class Arg1, class Arg2, class Arg3, class Arg4, class Backend, boost::multiprecision::expression_template_option ExpressionTemplates, typename BinaryOp>
-   struct ScalarBinaryOpTraits<boost::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, boost::multiprecision::number<Backend, ExpressionTemplates>, BinaryOp>
-   {
-      static_assert(boost::is_convertible<typename boost::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, boost::multiprecision::number<Backend, ExpressionTemplates> >::value, "Interoperability with this arithmetic type is not supported.");
-      typedef boost::multiprecision::number<Backend, ExpressionTemplates> ReturnType;
-   };
-
-}
-
 
 template <class T>
 struct related_number
 {
    typedef T type;
 };
-/*
-template <>
-struct related_number<boost::multiprecision::cpp_bin_float_50>
-{
-   typedef boost::multiprecision::cpp_bin_float_quad type;
-};
-template <>
-struct related_number<boost::multiprecision::cpp_dec_float_100>
-{
-   typedef boost::multiprecision::cpp_dec_float_50 type;
-};*/
 
 template <class Num>
 void example1()
@@ -167,7 +29,7 @@ void example1()
 
    Matrix<Num, 2, 2> a;
    a << 1, 2, 3, 4;
-   Matrix<Num, Dynamic, Dynamic> b(2,2);
+   Matrix<Num, Dynamic, Dynamic> b(2, 2);
    b << 2, 3, 1, 4;
    std::cout << "a + b =\n" << a + b << std::endl;
    BOOST_CHECK_EQUAL(a + b, r1);
@@ -176,8 +38,8 @@ void example1()
    std::cout << "Doing a += b;" << std::endl;
    a += b;
    std::cout << "Now a =\n" << a << std::endl;
-   Matrix<Num, 3, 1> v(1,2,3);
-   Matrix<Num, 3, 1> w(1,0,0);
+   Matrix<Num, 3, 1> v(1, 2, 3);
+   Matrix<Num, 3, 1> w(1, 0, 0);
    std::cout << "-v + w - v =\n" << -v + w - v << std::endl;
    BOOST_CHECK_EQUAL(-v + w - v, r3);
 }
@@ -207,8 +69,6 @@ void example2()
    v *= r * r;
    std::cout << "Now v =\n" << v << std::endl;
    std::cout << "RelatedType^2 * v =\n" << r * r * v << std::endl;
-
-   static_assert(boost::is_same<typename Eigen::ScalarBinaryOpTraits<Num, related_type, Eigen::internal::scalar_product_op<Num, related_type> >::ReturnType, Num>::value, "Incorrect type.");
 }
 
 template <class Num>
@@ -618,10 +478,45 @@ void test_float_type()
    example15<Num>();
    example16<Num>();
    example17<Num>();
+   /*
    example18<Num>();
    example19<Num>();
    example20<Num>();
    example21<Num>();
+   example22<Num>();
+   example23<Num>();
+   example24<Num>();
+   */
+}
+
+template <class Num>
+void test_float_type_2()
+{
+   std::cout << "Epsilon    = " << Eigen::NumTraits<Num>::epsilon() << std::endl;
+   std::cout << "Dummy Prec = " << Eigen::NumTraits<Num>::dummy_precision() << std::endl;
+   std::cout << "Highest    = " << Eigen::NumTraits<Num>::highest() << std::endl;
+   std::cout << "Lowest     = " << Eigen::NumTraits<Num>::lowest() << std::endl;
+   std::cout << "Digits10   = " << Eigen::NumTraits<Num>::digits10() << std::endl;
+
+   example18<Num>();
+   example19<Num>();
+   example20<Num>();
+   example21<Num>();
+   
+   //example22<Num>();
+   //example23<Num>();
+   //example24<Num>();
+}
+
+template <class Num>
+void test_float_type_3()
+{
+   std::cout << "Epsilon    = " << Eigen::NumTraits<Num>::epsilon() << std::endl;
+   std::cout << "Dummy Prec = " << Eigen::NumTraits<Num>::dummy_precision() << std::endl;
+   std::cout << "Highest    = " << Eigen::NumTraits<Num>::highest() << std::endl;
+   std::cout << "Lowest     = " << Eigen::NumTraits<Num>::lowest() << std::endl;
+   std::cout << "Digits10   = " << Eigen::NumTraits<Num>::digits10() << std::endl;
+
    example22<Num>();
    example23<Num>();
    example24<Num>();
@@ -660,41 +555,3 @@ void test_complex_type()
    example24<Num>();
 }
 
-namespace boost {
-   namespace multiprecision {
-
-      template <unsigned D>
-      inline void log_postfix_event(const mpc_complex_backend<D>& val, const char* event_description)
-      {
-         if (mpfr_nan_p(mpc_realref(val.data())))
-         {
-            std::cout << "Found a NaN! " << event_description << std::endl;
-         }
-      }
-
-   }
-}
-
-int main()
-{
-   using namespace boost::multiprecision;
-   test_complex_type<mpc_complex>();
-#if 0
-   test_integer_type<int>();
-
-   test_float_type<double>();
-   test_complex_type<std::complex<double> >();
-
-   test_float_type<boost::multiprecision::cpp_dec_float_100>();
-   test_float_type<boost::multiprecision::cpp_bin_float_50>();
-   test_float_type<boost::multiprecision::mpfr_float>();
-
-   test_integer_type<boost::multiprecision::int256_t>();
-   test_integer_type<boost::multiprecision::cpp_int>();
-   test_integer_type<boost::multiprecision::cpp_rational>();
-   test_integer_type<boost::multiprecision::mpz_int>();
-   test_integer_type<boost::multiprecision::mpq_rational>();
-   
-#endif
-   return 0;
-}
