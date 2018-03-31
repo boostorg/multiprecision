@@ -2047,6 +2047,53 @@ typename boost::enable_if_c<boost::multiprecision::number_category<Real>::value 
    BOOST_CHECK_EQUAL(real(c), 4);
    c.imag(-55);
    BOOST_CHECK_EQUAL(imag(c), -55);
+   typename Real::value_type z(20);
+   c.real(z);
+   BOOST_CHECK_EQUAL(real(c), 20);
+   c.real(21L);
+   BOOST_CHECK_EQUAL(real(c), 21);
+   c.real(22L);
+   BOOST_CHECK_EQUAL(real(c), 22);
+   c.real(23UL);
+   BOOST_CHECK_EQUAL(real(c), 23);
+   c.real(24U);
+   BOOST_CHECK_EQUAL(real(c), 24);
+   c.real(25.0f);
+   BOOST_CHECK_EQUAL(real(c), 25);
+   c.real(26.0);
+   BOOST_CHECK_EQUAL(real(c), 26);
+   c.real(27.0L);
+   BOOST_CHECK_EQUAL(real(c), 27);
+#if defined(BOOST_HAS_LONG_LONG)
+   c.real(28LL);
+   BOOST_CHECK_EQUAL(real(c), 28);
+   c.real(29ULL);
+   BOOST_CHECK_EQUAL(real(c), 29);
+#endif
+   c.imag(z);
+   BOOST_CHECK_EQUAL(imag(c), 20);
+   c.imag(21L);
+   BOOST_CHECK_EQUAL(imag(c), 21);
+   c.imag(22L);
+   BOOST_CHECK_EQUAL(imag(c), 22);
+   c.imag(23UL);
+   BOOST_CHECK_EQUAL(imag(c), 23);
+   c.imag(24U);
+   BOOST_CHECK_EQUAL(imag(c), 24);
+   c.imag(25.0f);
+   BOOST_CHECK_EQUAL(imag(c), 25);
+   c.imag(26.0);
+   BOOST_CHECK_EQUAL(imag(c), 26);
+   c.imag(27.0L);
+   BOOST_CHECK_EQUAL(imag(c), 27);
+#if defined(BOOST_HAS_LONG_LONG)
+   c.imag(28LL);
+   BOOST_CHECK_EQUAL(imag(c), 28);
+   c.imag(29ULL);
+   BOOST_CHECK_EQUAL(imag(c), 29);
+#endif
+   
+   
    c.real(2).imag(3);
 
    BOOST_CHECK_EQUAL(real(a), 30);

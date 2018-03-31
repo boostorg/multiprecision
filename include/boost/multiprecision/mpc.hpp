@@ -1136,6 +1136,121 @@ inline void eval_set_real(mpc_complex_backend<Digits10>& result, const mpfr_floa
 {
    mpfr_set(mpc_realref(result.data()), arg.data(), GMP_RNDN);
 }
+template <unsigned Digits10>
+inline void eval_set_real(mpc_complex_backend<Digits10>& result, const gmp_int& arg)
+{
+   mpfr_set_z(mpc_realref(result.data()), arg.data(), GMP_RNDN);
+}
+template <unsigned Digits10>
+inline void eval_set_real(mpc_complex_backend<Digits10>& result, const gmp_rational& arg)
+{
+   mpfr_set_q(mpc_realref(result.data()), arg.data(), GMP_RNDN);
+}
+template <unsigned Digits10>
+inline void eval_set_real(mpc_complex_backend<Digits10>& result, const unsigned& arg)
+{
+   mpfr_set_ui(mpc_realref(result.data()), arg, GMP_RNDN);
+}
+template <unsigned Digits10>
+inline void eval_set_real(mpc_complex_backend<Digits10>& result, const unsigned long& arg)
+{
+   mpfr_set_ui(mpc_realref(result.data()), arg, GMP_RNDN);
+}
+template <unsigned Digits10>
+inline void eval_set_real(mpc_complex_backend<Digits10>& result, const int& arg)
+{
+   mpfr_set_si(mpc_realref(result.data()), arg, GMP_RNDN);
+}
+template <unsigned Digits10>
+inline void eval_set_real(mpc_complex_backend<Digits10>& result, const long& arg)
+{
+   mpfr_set_si(mpc_realref(result.data()), arg, GMP_RNDN);
+}
+template <unsigned Digits10>
+inline void eval_set_real(mpc_complex_backend<Digits10>& result, const float& arg)
+{
+   mpfr_set_flt(mpc_realref(result.data()), arg, GMP_RNDN);
+}
+template <unsigned Digits10>
+inline void eval_set_real(mpc_complex_backend<Digits10>& result, const double& arg)
+{
+   mpfr_set_d(mpc_realref(result.data()), arg, GMP_RNDN);
+}
+template <unsigned Digits10>
+inline void eval_set_real(mpc_complex_backend<Digits10>& result, const long double& arg)
+{
+   mpfr_set_ld(mpc_realref(result.data()), arg, GMP_RNDN);
+}
+#if defined(BOOST_HAS_LONG_LONG) && defined(_MPFR_H_HAVE_INTMAX_T)
+template <unsigned Digits10>
+inline void eval_set_real(mpc_complex_backend<Digits10>& result, const unsigned long long& arg)
+{
+   mpfr_set_uj(mpc_realref(result.data()), arg, GMP_RNDN);
+}
+template <unsigned Digits10>
+inline void eval_set_real(mpc_complex_backend<Digits10>& result, const long long& arg)
+{
+   mpfr_set_sj(mpc_realref(result.data()), arg, GMP_RNDN);
+}
+#endif
+
+template <unsigned Digits10>
+inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const gmp_int& arg)
+{
+   mpfr_set_z(mpc_imagref(result.data()), arg.data(), GMP_RNDN);
+}
+template <unsigned Digits10>
+inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const gmp_rational& arg)
+{
+   mpfr_set_q(mpc_imagref(result.data()), arg.data(), GMP_RNDN);
+}
+template <unsigned Digits10>
+inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const unsigned& arg)
+{
+   mpfr_set_ui(mpc_imagref(result.data()), arg, GMP_RNDN);
+}
+template <unsigned Digits10>
+inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const unsigned long& arg)
+{
+   mpfr_set_ui(mpc_imagref(result.data()), arg, GMP_RNDN);
+}
+template <unsigned Digits10>
+inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const int& arg)
+{
+   mpfr_set_si(mpc_imagref(result.data()), arg, GMP_RNDN);
+}
+template <unsigned Digits10>
+inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const long& arg)
+{
+   mpfr_set_si(mpc_imagref(result.data()), arg, GMP_RNDN);
+}
+template <unsigned Digits10>
+inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const float& arg)
+{
+   mpfr_set_flt(mpc_imagref(result.data()), arg, GMP_RNDN);
+}
+template <unsigned Digits10>
+inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const double& arg)
+{
+   mpfr_set_d(mpc_imagref(result.data()), arg, GMP_RNDN);
+}
+template <unsigned Digits10>
+inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const long double& arg)
+{
+   mpfr_set_ld(mpc_imagref(result.data()), arg, GMP_RNDN);
+}
+#if defined(BOOST_HAS_LONG_LONG) && defined(_MPFR_H_HAVE_INTMAX_T)
+template <unsigned Digits10>
+inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const unsigned long long& arg)
+{
+   mpfr_set_uj(mpc_imagref(result.data()), arg, GMP_RNDN);
+}
+template <unsigned Digits10>
+inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const long long& arg)
+{
+   mpfr_set_sj(mpc_imagref(result.data()), arg, GMP_RNDN);
+}
+#endif
 
 template <unsigned Digits10>
 inline std::size_t hash_value(const mpc_complex_backend<Digits10>& val)
