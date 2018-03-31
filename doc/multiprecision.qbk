@@ -25,6 +25,7 @@
 
 [import ../example/gmp_snips.cpp]
 [import ../example/mpfr_snips.cpp]
+[import ../example/mpc_examples.cpp]
 [import ../example/mpfi_snips.cpp]
 [import ../example/float128_snips.cpp]
 [import ../example/cpp_dec_float_snips.cpp]
@@ -41,6 +42,7 @@
 [import ../example/hashing_examples.cpp]
 
 [template mpfr[] [@http://www.mpfr.org MPFR]]
+[template mpc[] [@http://www.multiprecision.org MPC]]
 [template mpfi[] [@http://perso.ens-lyon.fr/nathalie.revol/software.html MPFI]]
 [template gmp[] [@http://gmplib.org GMP]]
 [template mpf_class[] [@http://gmplib.org/manual/C_002b_002b-Interface-Floats.html#C_002b_002b-Interface-Floats mpf_class]]
@@ -1222,6 +1224,9 @@ The following backends provide complex number arithmetic:
 
    namespace boost{ namespace multiprecision{
 
+   template <unsigned Digits10>
+   class mpc_complex_backend;
+
    typedef number<mpc_complex_backend<50> >    mpc_complex_50;
    typedef number<mpc_complex_backend<100> >   mpc_complex_100;
    typedef number<mpc_complex_backend<500> >   mpc_complex_500;
@@ -1230,12 +1235,52 @@ The following backends provide complex number arithmetic:
 
    }} // namespaces
 
-The `mpc` back-end acts as a thin wrapper around the [mpc] `mpc_t` to provide a
-complex number type that is a drop-in replacement for the native C++ complex types, but with unlimited precision.
+The `mpc_complex_backend` type is used in conjunction with `number`: It acts as a thin wrapper around the [mpc] `mpc_t`
+to provide an real-number type that is a drop-in replacement for `std::complex`, but with
+much greater precision.
+
+Type `mpc_complex_backend` can be used at fixed precision by specifying a non-zero `Digits10` template parameter, or
+at variable precision by setting the template argument to zero.  The typedefs mpc_complex_50, mpc_complex_100,
+mpc_complex_500, mpc_complex_1000 provide complex types at 50, 100, 500 and 1000 decimal digits precision
+respectively.  The typedef mpc_complex provides a variable precision type whose precision can be controlled via the
+`number`s member functions.
 
 The `mpc` backend should allow use of the same syntax as the C++ standard library complex type.
-When using this backend, remember to link with the flags `-lmpc -lmpfr`.
+When using this backend, remember to link with the flags `-lmpc -lmpfr -lgmp`.
 
+As well as the usual conversions from arithmetic and string types, instances of `number<mpc_complex_backend<N> >` are
+copy constructible and assignable from:
+
+* The [gmp] native types `mpf_t`, `mpz_t`, `mpq_t`.
+* The [mpfr] native type `mpfr_t`.
+* The [mpc] native type `mpc_t`.
+* The `number` wrappers around those types: `number<mpfr_float_backend<M> >`, `number<mpf_float<M> >`, `number<gmp_int>`, `number<gmp_rational>`.
+
+It's also possible to access the underlying `mpc_t` via the data() member function of `mpfr_float_backend`.
+
+Things you should know when using this type:
+
+* A default constructed `mpc_complex_backend` is set to zero (['Note that this is [*not] the default [mpc] behavior]).
+* All operations use round to nearest.
+* No changes are made to [mpc], [gmp] or [mpfr] global settings, so this type can coexist with existing
+[mpc], [mpfr] or [gmp] code.
+* The code can equally use [mpir] in place of [gmp] - indeed that is the preferred option on Win32.
+* This backend supports rvalue-references and is move-aware, making instantiations of `number` on this backend move aware.
+* Conversion from a string results in a `std::runtime_error` being thrown if the string can not be interpreted
+as a valid complex number.
+* Division by zero results in a complex-infinity.
+* Unlike `std::complex`, you can not use `reinterpret_cast` to treat this type as an array of the underlying floating point type.
+* Unlike `std::complex`, there are no literals for imaginary values.
+
+[h5 [mpc] example:]
+
+[mpc_eg]
+
+Which produces the output (for the multiprecision type):
+
+[mpc_out]
+
+[endsect]
 
 [endsect]
 
@@ -3046,6 +3091,10 @@ which may be useful to ensure that columns line up.
    template <class Backend, expression_template_option ExpressionTemplates = expression_template_default<Backend>::value>
    class number
    {
+   public:
+      typedef          Backend                          backend_type;
+      typedef typename component_type<self_type>::type  value_type;
+
       number();
       number(see-below);
       number& operator=(see-below);
@@ -3092,6 +3141,13 @@ which may be useful to ensure that columns line up.
       template <class V>
       typename enable_if<is_convertible<V, number<Backend, ExpressionTemplates> >, int>::type
          compare(const V& o)const;
+      // real and imaginary parts:
+      value_type real()const;
+      value_type imag()const;
+      template <class T>
+      void real(const T& val);
+      template <class T>
+      void imag(const T& val);
       // Access to the underlying implementation:
       Backend& backend();
       const Backend& backend()const;
@@ -3214,6 +3270,15 @@ which may be useful to ensure that columns line up.
    bool                                      islessequal(const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
    bool                                      islessgreater(const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
    bool                                      isunordered(const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   // Complex number functions:
+   ``['number<...>::value_type]``                   real  (const ``['number-or-expression-template-type]``&);
+   ``['number<...>::value_type]``                   imag  (const ``['number-or-expression-template-type]``&);
+   ``['number<...>::value_type]``                   abs   (const ``['number-or-expression-template-type]``&);
+   ``['number<...>::value_type]``                   arg   (const ``['number-or-expression-template-type]``&);
+   ``['number<...>::value_type]``                   norm  (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    conj  (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    proj  (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    polar (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
    // Misc other common C library functions:
    ``['unmentionable-expression-template-type]``    itrunc (const ``['number-or-expression-template-type]``&);
    ``['unmentionable-expression-template-type]``    ltrunc (const ``['number-or-expression-template-type]``&);
@@ -3437,6 +3502,19 @@ Returns:
 * A value greater that 0 for `*this > other`
 * Zero for `*this == other`
 
+      value_type real()const;
+      value_type imag()const;
+
+These return the real and imaginary parts respectively.  If the number is not a complex type, then the imaginary part is always zero.
+
+      template <class T>
+      void real(const T& val);
+      template <class T>
+      void imag(const T& val);
+
+These set the real and imaginary parts respectively of the number.  If the number is not a complex type, then setting the real part
+is equivalent to assignment, and attempting to set the imaginary part will result in a compile time error.
+
       Backend& backend();
       const Backend& backend()const;
 
@@ -3604,6 +3682,21 @@ otherwise the return type is an expression template unless otherwise stated.
 
 The integer type arguments to `ldexp`, `frexp`, `scalbn` and `ilogb` may be either type `int`, or the actual
 type of the exponent of the number type.
+
+Complex number types support the following functions:
+
+   // Complex number functions:
+   ``['number<...>::value_type]``                   real  (const ``['number-or-expression-template-type]``&);
+   ``['number<...>::value_type]``                   imag  (const ``['number-or-expression-template-type]``&);
+   ``['number<...>::value_type]``                   abs   (const ``['number-or-expression-template-type]``&);
+   ``['number<...>::value_type]``                   arg   (const ``['number-or-expression-template-type]``&);
+   ``['number<...>::value_type]``                   norm  (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    conj  (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    proj  (const ``['number-or-expression-template-type]``&);
+   ``['number]``                                    polar (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+
+In addition the functions `real`, `imag`, `arg`, `norm`, `conj` and `proj` are overloaded for scalar (ie non-complex) types in the same
+manner as `<complex>` and treat the argument as a value whose imaginary part is zero.
 
 There are also some functions implemented for compatibility with the Boost.Math functions of the same name:
 
@@ -4244,8 +4337,14 @@ and `ff` is a variable of type `std::ios_base::fmtflags`.
 [[`eval_floor(b, cb)`][`void`][Stores the floor of `cb` in `b`, only required when `B` is a floating-point type.][[space]]]
 [[`eval_ceil(b, cb)`][`void`][Stores the ceiling of `cb` in `b`, only required when `B` is a floating-point type.][[space]]]
 [[`eval_sqrt(b, cb)`][`void`][Stores the square root of `cb` in `b`, only required when `B` is a floating-point type.][[space]]]
-[[`boost::multiprecision::number_category<B>::type`][`mpl::int_<N>`][`N` is one of the values `number_kind_integer`, `number_kind_floating_point`, `number_kind_rational` or `number_kind_fixed_point`.
+[[`boost::multiprecision::number_category<B>::type`][`mpl::int_<N>`][`N` is one of the values `number_kind_integer`, `number_kind_floating_point`, `number_kind_complex`, `number_kind_rational` or `number_kind_fixed_point`.
                                                 Defaults to `number_kind_floating_point`.][[space]]]
+[[`eval_conj(b, cb)`][`void`][Sets `b` to the complex conjugate of `cb`.  Required for complex types only - other types have a sensible default.][[space]]]
+[[`eval_proj(b, cb)`][`void`][Sets `b` to the Riemann projection of `cb`.  Required for complex types only - other types have a sensible default.][[space]]]
+[[`eval_real(b, cb)`][`void`][Sets `b` to the real part of `cb`.  Required for complex types only - other types have a sensible default.][[space]]]
+[[`eval_imag(b, cb)`][`void`][Sets `b` to the imaginary of `cb`.  Required for complex types only - other types have a sensible default.][[space]]]
+[[`eval_set_real(b, a)`][`void`][Sets the real part of `b` to `cb`.  Required for complex types only - other types have a sensible default.][[space]]]
+[[`eval_set_imag(b, a)`][`void`][Sets the imaginary part of `b` to `cb`.  Required for complex types only - other types have a sensible default.][[space]]]
 ]
 
 [table Optional Requirements on the Backend Type

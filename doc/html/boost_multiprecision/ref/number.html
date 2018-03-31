@@ -40,6 +40,10 @@
 <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">expression_template_option</span> <span class="identifier">ExpressionTemplates</span> <span class="special">=</span> <span class="identifier">expression_template_default</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">&gt;::</span><span class="identifier">value</span><span class="special">&gt;</span>
 <span class="keyword">class</span> <span class="identifier">number</span>
 <span class="special">{</span>
+<span class="keyword">public</span><span class="special">:</span>
+   <span class="keyword">typedef</span>          <span class="identifier">Backend</span>                          <span class="identifier">backend_type</span><span class="special">;</span>
+   <span class="keyword">typedef</span> <span class="keyword">typename</span> <span class="identifier">component_type</span><span class="special">&lt;</span><span class="identifier">self_type</span><span class="special">&gt;::</span><span class="identifier">type</span>  <span class="identifier">value_type</span><span class="special">;</span>
+
    <span class="identifier">number</span><span class="special">();</span>
    <span class="identifier">number</span><span class="special">(</span><span class="identifier">see</span><span class="special">-</span><span class="identifier">below</span><span class="special">);</span>
    <span class="identifier">number</span><span class="special">&amp;</span> <span class="keyword">operator</span><span class="special">=(</span><span class="identifier">see</span><span class="special">-</span><span class="identifier">below</span><span class="special">);</span>
@@ -86,6 +90,13 @@
    <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">V</span><span class="special">&gt;</span>
    <span class="keyword">typename</span> <span class="identifier">enable_if</span><span class="special">&lt;</span><span class="identifier">is_convertible</span><span class="special">&lt;</span><span class="identifier">V</span><span class="special">,</span> <span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">Backend</span><span class="special">,</span> <span class="identifier">ExpressionTemplates</span><span class="special">&gt;</span> <span class="special">&gt;,</span> <span class="keyword">int</span><span class="special">&gt;::</span><span class="identifier">type</span>
       <span class="identifier">compare</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">V</span><span class="special">&amp;</span> <span class="identifier">o</span><span class="special">)</span><span class="keyword">const</span><span class="special">;</span>
+   <span class="comment">// real and imaginary parts:</span>
+   <span class="identifier">value_type</span> <span class="identifier">real</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
+   <span class="identifier">value_type</span> <span class="identifier">imag</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
+   <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+   <span class="keyword">void</span> <span class="identifier">real</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">T</span><span class="special">&amp;</span> <span class="identifier">val</span><span class="special">);</span>
+   <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+   <span class="keyword">void</span> <span class="identifier">imag</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">T</span><span class="special">&amp;</span> <span class="identifier">val</span><span class="special">);</span>
    <span class="comment">// Access to the underlying implementation:</span>
    <span class="identifier">Backend</span><span class="special">&amp;</span> <span class="identifier">backend</span><span class="special">();</span>
    <span class="keyword">const</span> <span class="identifier">Backend</span><span class="special">&amp;</span> <span class="identifier">backend</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
@@ -208,6 +219,15 @@
 <span class="keyword">bool</span>                                      <span class="identifier">islessequal</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
 <span class="keyword">bool</span>                                      <span class="identifier">islessgreater</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
 <span class="keyword">bool</span>                                      <span class="identifier">isunordered</span><span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="comment">// Complex number functions:</span>
+<span class="emphasis"><em>number&lt;...&gt;::value_type</em></span>                   <span class="identifier">real</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>number&lt;...&gt;::value_type</em></span>                   <span class="identifier">imag</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>number&lt;...&gt;::value_type</em></span>                   <span class="identifier">abs</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>number&lt;...&gt;::value_type</em></span>                   <span class="identifier">arg</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>number&lt;...&gt;::value_type</em></span>                   <span class="identifier">norm</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>number</em></span>                                    <span class="identifier">conj</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>number</em></span>                                    <span class="identifier">proj</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>number</em></span>                                    <span class="identifier">polar</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
 <span class="comment">// Misc other common C library functions:</span>
 <span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">itrunc</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
 <span class="emphasis"><em>unmentionable-expression-template-type</em></span>    <span class="identifier">ltrunc</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
@@ -530,11 +550,29 @@
             Zero for <code class="computeroutput"><span class="special">*</span><span class="keyword">this</span>
             <span class="special">==</span> <span class="identifier">other</span></code>
           </p>
-<pre class="programlisting"><span class="identifier">Backend</span><span class="special">&amp;</span> <span class="identifier">backend</span><span class="special">();</span>
-<span class="keyword">const</span> <span class="identifier">Backend</span><span class="special">&amp;</span> <span class="identifier">backend</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
+<pre class="programlisting"><span class="identifier">value_type</span> <span class="identifier">real</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
+<span class="identifier">value_type</span> <span class="identifier">imag</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
 </pre>
 </li>
 </ul></div>
+<p>
+        These return the real and imaginary parts respectively. If the number is
+        not a complex type, then the imaginary part is always zero.
+      </p>
+<pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="keyword">void</span> <span class="identifier">real</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">T</span><span class="special">&amp;</span> <span class="identifier">val</span><span class="special">);</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="keyword">void</span> <span class="identifier">imag</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">T</span><span class="special">&amp;</span> <span class="identifier">val</span><span class="special">);</span>
+</pre>
+<p>
+        These set the real and imaginary parts respectively of the number. If the
+        number is not a complex type, then setting the real part is equivalent to
+        assignment, and attempting to set the imaginary part will result in a compile
+        time error.
+      </p>
+<pre class="programlisting"><span class="identifier">Backend</span><span class="special">&amp;</span> <span class="identifier">backend</span><span class="special">();</span>
+<span class="keyword">const</span> <span class="identifier">Backend</span><span class="special">&amp;</span> <span class="identifier">backend</span><span class="special">()</span><span class="keyword">const</span><span class="special">;</span>
+</pre>
 <p>
         Returns the underlying back-end instance used by <code class="computeroutput"><span class="special">*</span><span class="keyword">this</span></code>.
       </p>
@@ -762,6 +800,27 @@
         and <code class="computeroutput"><span class="identifier">ilogb</span></code> may be either type
         <code class="computeroutput"><span class="keyword">int</span></code>, or the actual type of the
         exponent of the number type.
+      </p>
+<p>
+        Complex number types support the following functions:
+      </p>
+<pre class="programlisting"><span class="comment">// Complex number functions:</span>
+<span class="emphasis"><em>number&lt;...&gt;::value_type</em></span>                   <span class="identifier">real</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>number&lt;...&gt;::value_type</em></span>                   <span class="identifier">imag</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>number&lt;...&gt;::value_type</em></span>                   <span class="identifier">abs</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>number&lt;...&gt;::value_type</em></span>                   <span class="identifier">arg</span>   <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>number&lt;...&gt;::value_type</em></span>                   <span class="identifier">norm</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>number</em></span>                                    <span class="identifier">conj</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>number</em></span>                                    <span class="identifier">proj</span>  <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+<span class="emphasis"><em>number</em></span>                                    <span class="identifier">polar</span> <span class="special">(</span><span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;,</span> <span class="keyword">const</span> <span class="emphasis"><em>number-or-expression-template-type</em></span><span class="special">&amp;);</span>
+</pre>
+<p>
+        In addition the functions <code class="computeroutput"><span class="identifier">real</span></code>,
+        <code class="computeroutput"><span class="identifier">imag</span></code>, <code class="computeroutput"><span class="identifier">arg</span></code>,
+        <code class="computeroutput"><span class="identifier">norm</span></code>, <code class="computeroutput"><span class="identifier">conj</span></code>
+        and <code class="computeroutput"><span class="identifier">proj</span></code> are overloaded for
+        scalar (ie non-complex) types in the same manner as <code class="computeroutput"><span class="special">&lt;</span><span class="identifier">complex</span><span class="special">&gt;</span></code>
+        and treat the argument as a value whose imaginary part is zero.
       </p>
 <p>
         There are also some functions implemented for compatibility with the Boost.Math
