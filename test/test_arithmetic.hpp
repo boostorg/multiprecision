@@ -2040,6 +2040,14 @@ typename boost::enable_if_c<boost::multiprecision::number_category<Real>::value 
       Real e(x, y);
       BOOST_CHECK_EQUAL(d, e);
    }
+   //
+   // real and imag setters:
+   //
+   c.real(4);
+   BOOST_CHECK_EQUAL(real(c), 4);
+   c.imag(-55);
+   BOOST_CHECK_EQUAL(imag(c), -55);
+   c.real(2).imag(3);
 
    BOOST_CHECK_EQUAL(real(a), 30);
    BOOST_CHECK_EQUAL(imag(a), 0);
@@ -2321,6 +2329,10 @@ typename boost::enable_if_c<boost::multiprecision::number_category<Real>::value 
    BOOST_CHECK_EQUAL(conj(a * 1), a);
    BOOST_CHECK_EQUAL(proj(a), a);
    BOOST_CHECK_EQUAL(proj(a * 1), a);
+   BOOST_CHECK_EQUAL(a.real(), a);
+   BOOST_CHECK_EQUAL(a.imag(), 0);
+   a.real(55);
+   BOOST_CHECK_EQUAL(a, 55);
 }
 
 template <class Real>

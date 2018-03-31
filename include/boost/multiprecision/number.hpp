@@ -722,6 +722,7 @@ public:
    typename scalar_result_from_possible_complex<number<Backend, ExpressionTemplates> >::type
       real()const
    {
+      using default_ops::eval_real;
       typename scalar_result_from_possible_complex<multiprecision::number<Backend, ExpressionTemplates> >::type result;
       eval_real(result.backend(), backend());
       return result;
@@ -729,9 +730,24 @@ public:
    typename scalar_result_from_possible_complex<number<Backend, ExpressionTemplates> >::type
       imag()const
    {
+      using default_ops::eval_imag;
       typename scalar_result_from_possible_complex<multiprecision::number<Backend, ExpressionTemplates> >::type result;
       eval_imag(result.backend(), backend());
       return result;
+   }
+   template <class T>
+   inline typename enable_if_c<boost::is_convertible<T, self_type>::value, self_type&>::type real(const T& val)
+   {
+      using default_ops::eval_set_real;
+      eval_set_real(backend(), canonical_value(val));
+      return *this;
+   }
+   template <class T>
+   inline typename enable_if_c<boost::is_convertible<T, self_type>::value && number_category<self_type>::value == number_kind_complex, self_type&>::type imag(const T& val)
+   {
+      using default_ops::eval_set_imag;
+      eval_set_imag(backend(), canonical_value(val));
+      return *this;
    }
 private:
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>

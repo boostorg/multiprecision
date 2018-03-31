@@ -1126,6 +1126,18 @@ inline void eval_imag(mpfr_float_backend<Digits10>& result, const mpc_complex_ba
 }
 
 template <unsigned Digits10>
+inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg)
+{
+   mpfr_set(mpc_imagref(result.data()), arg.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10>
+inline void eval_set_real(mpc_complex_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg)
+{
+   mpfr_set(mpc_realref(result.data()), arg.data(), GMP_RNDN);
+}
+
+template <unsigned Digits10>
 inline std::size_t hash_value(const mpc_complex_backend<Digits10>& val)
 {
    std::size_t result = 0;

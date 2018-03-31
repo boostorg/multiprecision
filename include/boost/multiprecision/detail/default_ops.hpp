@@ -1764,6 +1764,55 @@ inline void eval_imag(To& to, const From& )
    to = ui_type(0);
 }
 
+} namespace default_ops_adl {
+
+template <class To, class From>
+inline void eval_set_real_imp(To& to, const From& from)
+{
+   typedef typename component_type<number<To> >::type to_component_type;
+   typename to_component_type::backend_type to_component;
+   to_component = from;
+   eval_set_real(to, to_component);
+}
+template <class To, class From>
+inline void eval_set_imag_imp(To& to, const From& from)
+{
+   typedef typename component_type<number<To> >::type to_component_type;
+   typename to_component_type::backend_type to_component;
+   to_component = from;
+   eval_set_imag(to, to_component);
+}
+
+} namespace default_ops{
+
+template <class To, class From>
+inline typename enable_if_c<number_category<To>::value == number_kind_complex>::type eval_set_real(To& to, const From& from)
+{
+   default_ops_adl::eval_set_real_imp(to, from);
+}
+template <class To, class From>
+inline typename disable_if_c<number_category<To>::value == number_kind_complex>::type eval_set_real(To& to, const From& from)
+{
+   to = from;
+}
+
+template <class To, class From>
+inline void eval_set_imag(To& to, const From& from)
+{
+   default_ops_adl::eval_set_imag_imp(to, from);
+}
+
+template <class T>
+inline void eval_set_real(T& to, const T& from)
+{
+   to = from;
+}
+template <class T>
+void eval_set_imag(T&, const T&)
+{
+   BOOST_STATIC_ASSERT_MSG(sizeof(T) == INT_MAX, "eval_set_imag needs to be specialised for each specific backend");
+}
+
 //
 // These functions are implemented in separate files, but expanded inline here,
 // DO NOT CHANGE THE ORDER OF THESE INCLUDES:
