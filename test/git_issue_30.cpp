@@ -21,7 +21,8 @@ void g(boost::multiprecision::cpp_rational const& r)
 
 int main()
 {
-#if !defined(BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS) && !BOOST_WORKAROUND(BOOST_MSVC, < 1900)
+#if !defined(BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS) && !BOOST_WORKAROUND(BOOST_MSVC, < 1900)\
+      && !(defined(__APPLE_CC__) && defined(CI_SUPPRESS_KNOWN_ISSUES))
    boost::multiprecision::cpp_int r = 3;
    g(r);
    E x1(r);  // triggers explicit conversion operator.
