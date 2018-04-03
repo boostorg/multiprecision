@@ -482,15 +482,16 @@ inline void eval_atan2(float128_backend& result, const float128_backend& a, cons
 {
    result.value() = atan2q(a.value(), b.value());
 }
+#ifndef BOOST_MP_USE_QUAD
 inline void eval_multiply_add(float128_backend& result, const float128_backend& a, const float128_backend& b, const float128_backend& c)
 {
    result.value() = fmaq(a.value(), b.value(), c.value());
 }
-
 inline int eval_signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const float128_backend& arg)
 {
    return ::signbitq(arg.value());
 }
+#endif
 
 inline std::size_t hash_value(const float128_backend& val)
 {
@@ -550,6 +551,7 @@ inline std::size_t hash_value(const float128_backend& val)
       return log1pq(arg.backend().value());
    }
 
+#ifndef BOOST_MP_USE_QUAD
    template <multiprecision::expression_template_option ExpressionTemplates>
    inline boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates> copysign BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates>& a, const boost::multiprecision::number<boost::multiprecision::backends::float128_backend, ExpressionTemplates>& b)
    {
@@ -564,6 +566,7 @@ inline std::size_t hash_value(const float128_backend& val)
    {
       result.value() = remquoq(a.value(), b.value(), pi);
    }
+#endif
 
 } // namespace multiprecision
 
