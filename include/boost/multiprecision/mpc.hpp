@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright 2011 John Maddock. Distributed under the Boost
+//  Copyright 2018 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -998,12 +998,6 @@ template <unsigned Digits10>
 inline void eval_sqrt(mpc_complex_backend<Digits10>& result, const mpc_complex_backend<Digits10>& val)
 {
    mpc_sqrt(result.data(), val.data(), GMP_RNDN);
-}
-
-template <unsigned Digits10>
-inline void eval_abs(mpc_complex_backend<Digits10>& result, const mpc_complex_backend<Digits10>& val)
-{
-   mpc_abs(result.data(), val.data());
 }
 
 template <unsigned Digits10>

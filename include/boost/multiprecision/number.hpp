@@ -129,14 +129,14 @@ public:
 
    template <class V, class U>
    BOOST_MP_FORCEINLINE number(const V& v1, const U& v2, 
-      typename boost::enable_if_c<(is_convertible<value_type, V>::value && is_convertible<value_type, U>::value && !is_same<typename component_type<self_type>::type, self_type>::value)>::type* = 0)
+      typename boost::enable_if_c<(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value && !is_same<typename component_type<self_type>::type, self_type>::value)>::type* = 0)
    {
       using default_ops::assign_components;
       assign_components(m_backend, canonical_value(v1), canonical_value(v2));
    }
    template <class V, class U>
    BOOST_MP_FORCEINLINE explicit number(const V& v1, const U& v2,
-      typename boost::enable_if_c<(is_constructible<value_type, V>::value && is_constructible<value_type, U>::value && !is_same<typename component_type<self_type>::type, self_type>::value) && !(is_convertible<value_type, V>::value && is_convertible<value_type, U>::value)>::type* = 0)
+      typename boost::enable_if_c<((is_constructible<value_type, V>::value || is_convertible<V, std::string>::value) && (is_constructible<value_type, U>::value || is_convertible<U, std::string>::value) && !is_same<typename component_type<self_type>::type, self_type>::value) && !(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value)>::type* = 0)
    {
       using default_ops::assign_components;
       assign_components(m_backend, canonical_value(v1), canonical_value(v2));
