@@ -4,6 +4,7 @@
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_
 
 #include <boost/multiprecision/mpc.hpp>
+#define TEST_MPC
 
 #include "libs/multiprecision/test/test_arithmetic.hpp"
 

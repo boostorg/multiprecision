@@ -2014,7 +2014,7 @@ typename boost::enable_if_c<boost::multiprecision::number_category<Real>::value 
       BOOST_CHECK_EQUAL(d.real(), 40.5);
       BOOST_CHECK_EQUAL(d.imag(), 2);
    }
-#if 0
+#ifdef TEST_MPC
    {
       typename Real::value_type x(40.5), y(2);
       Real d(x.backend().data(), y.backend().data());
