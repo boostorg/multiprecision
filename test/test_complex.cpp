@@ -18,6 +18,9 @@
 #endif
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/complex_adaptor.hpp>
+#ifdef BOOST_HAS_FLOAT128
+#include <boost/multiprecision/complex128.hpp>
+#endif
 
 #include "test.hpp"
 
@@ -135,7 +138,10 @@ int main()
    local::test<boost::multiprecision::mpc_complex_50>();
    local::test<boost::multiprecision::mpc_complex_100>();
 #endif
-   local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::cpp_bin_float<50> > > >();
-
+   local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::cpp_bin_float<50> >, boost::multiprecision::et_on> >();
+   local::test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::cpp_bin_float<50> >, boost::multiprecision::et_off> >();
+#ifdef BOOST_HAS_FLOAT128
+   local::test<boost::multiprecision::complex128>();
+#endif
    return boost::report_errors();
 }

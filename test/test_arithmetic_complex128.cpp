@@ -3,14 +3,18 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_
 
-#include <boost/multiprecision/cpp_complex.hpp>
+#include <boost/config.hpp>
+#ifdef BOOST_HAS_FLOAT128
+#include <boost/multiprecision/complex128.hpp>
+#endif
 
 #include "libs/multiprecision/test/test_arithmetic.hpp"
 
 int main()
 {
-   test<boost::multiprecision::cpp_complex_50>();
-   test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::cpp_bin_float<50> >, boost::multiprecision::et_on> >();
+#ifdef BOOST_HAS_FLOAT128
+   test<boost::multiprecision::complex128>();
+#endif
    return boost::report_errors();
 }
 

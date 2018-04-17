@@ -3061,13 +3061,13 @@ struct BOOST_JOIN(category, BOOST_JOIN(func, _funct))\
    void operator()(Backend& result, const Backend& arg, const Arithmetic& a)const\
    {\
       using default_ops:: BOOST_JOIN(eval_,func);\
-      BOOST_JOIN(eval_,func)(result, arg, a);\
+      BOOST_JOIN(eval_,func)(result, arg, number<Backend>::canonical_value(a));\
    }\
    template <class Arithmetic> \
    void operator()(Backend& result, const Arithmetic& arg, const Backend& a)const\
    {\
       using default_ops:: BOOST_JOIN(eval_,func);\
-      BOOST_JOIN(eval_,func)(result, arg, a);\
+      BOOST_JOIN(eval_,func)(result, number<Backend>::canonical_value(arg), a);\
    }\
 };\
 \
@@ -3268,10 +3268,9 @@ inline typename enable_if_c<\
 >::type \
 func(const number<Backend, et_off>& arg, const Arithmetic& a)\
 {\
-   typedef typename detail::canonical<Arithmetic, Backend>::type canonical_type;\
    number<Backend, et_off> result;\
    using default_ops:: BOOST_JOIN(eval_,func);\
-   BOOST_JOIN(eval_,func)(result.backend(), arg.backend(), static_cast<canonical_type>(a));\
+   BOOST_JOIN(eval_,func)(result.backend(), arg.backend(), number<Backend, et_off>::canonical_value(a));\
    return BOOST_MP_MOVE(result);\
 }\
 template <class Backend, class Arithmetic> \
@@ -3281,10 +3280,9 @@ inline typename enable_if_c<\
 >::type \
 func(const Arithmetic& a, const number<Backend, et_off>& arg)\
 {\
-   typedef typename detail::canonical<Arithmetic, Backend>::type canonical_type;\
    number<Backend, et_off> result;\
    using default_ops:: BOOST_JOIN(eval_,func);\
-   BOOST_JOIN(eval_,func)(result.backend(), static_cast<canonical_type>(a), arg.backend());\
+   BOOST_JOIN(eval_,func)(result.backend(), number<Backend, et_off>::canonical_value(a), arg.backend());\
    return BOOST_MP_MOVE(result);\
 }\
 

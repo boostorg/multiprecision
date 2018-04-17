@@ -1421,7 +1421,6 @@ void test_negative_mixed_numeric_limits(boost::mpl::false_ const&){}
 template <class Real, class Num>
 void test_negative_mixed(boost::mpl::true_ const&)
 {
-   typedef typename lexical_cast_target_type<Num>::type target_type;
    typedef typename boost::mpl::if_<
          boost::is_convertible<Num, Real>,
          typename boost::mpl::if_c<boost::is_integral<Num>::value && (sizeof(Num) < sizeof(int)), int, Num>::type,
@@ -1778,7 +1777,6 @@ void test_mixed_numeric_limits(const boost::mpl::false_&)
 template <class Real, class Num>
 void test_mixed(const boost::mpl::true_&)
 {
-   typedef typename lexical_cast_target_type<Num>::type target_type;
    typedef typename boost::mpl::if_<
          boost::is_convertible<Num, Real>,
          typename boost::mpl::if_c<boost::is_integral<Num>::value && (sizeof(Num) < sizeof(int)), int, Num>::type,

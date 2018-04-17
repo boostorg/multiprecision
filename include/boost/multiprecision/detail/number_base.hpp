@@ -1518,6 +1518,12 @@ void check_shift_range(V val, const mpl::true_&, const mpl::false_&)
 template <class V>
 void check_shift_range(V, const mpl::false_&, const mpl::false_&) BOOST_NOEXCEPT{}
 
+template <class T>
+const T& evaluate_if_expression(const T& val) { return val; }
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+typename expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type evaluate_if_expression(const expression<tag, Arg1, Arg2, Arg3, Arg4>& val) { return val; }
+
+
 } // namespace detail
 
 //

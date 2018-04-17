@@ -147,6 +147,7 @@ public:
    template <class T>
    int compare(const T& val)const
    {
+      using default_ops::eval_is_zero;
       return (m_real.compare(val) == 0) && eval_is_zero(m_imag) ? 0 : 1;
    }
    void swap(complex_adaptor& o)
@@ -156,6 +157,7 @@ public:
    }
    std::string str(std::streamsize dig, std::ios_base::fmtflags f)const
    {
+      using default_ops::eval_is_zero;
       if (eval_is_zero(imag_data()))
          return m_real.str(dig, f);
       return "(" + m_real.str(dig, f) + "," + m_imag.str(dig, f) + ")";
@@ -317,6 +319,7 @@ inline int eval_get_sign(const complex_adaptor<Backend>&)
 template <class Result, class Backend>
 inline typename disable_if_c<boost::is_complex<Result>::value>::type eval_convert_to(Result* result, const complex_adaptor<Backend>& val)
 {
+   using default_ops::eval_is_zero;
    using default_ops::eval_convert_to;
    if (!eval_is_zero(val.imag_data()))
    {
@@ -680,6 +683,8 @@ inline void eval_conj(complex_adaptor<Backend>& result, const complex_adaptor<Ba
 template <class Backend>
 inline void eval_proj(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& arg)
 {
+   using default_ops::eval_get_sign;
+
    typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
    ui_type zero = (ui_type)0u;
 
@@ -747,10 +752,10 @@ using boost::multiprecision::backends::complex_adaptor;
 template <class Backend>
 struct number_category<complex_adaptor<Backend> > : public boost::mpl::int_<boost::multiprecision::number_kind_complex> {};
 
-template <class Backend>
-struct component_type<number<complex_adaptor<Backend> > >
+template <class Backend, expression_template_option ExpressionTemplates>
+struct component_type<number<complex_adaptor<Backend>, ExpressionTemplates> >
 {
-   typedef number<Backend> type;
+   typedef number<Backend, ExpressionTemplates> type;
 };
 
 template <class Backend, expression_template_option ExpressionTemplates>
