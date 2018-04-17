@@ -119,7 +119,7 @@ void test_move_and_assign()
 int main()
 {
 #if defined(TEST_MPFR) || defined(TEST_GMP)
-#if defined(MPFR_VERSION) && (MPFR_VERSION > 3)
+#if defined(MPFR_VERSION) && (MPFR_VERSION_MAJOR > 3)
    mpfr_mp_memory_cleanup();
 #endif
    mp_get_memory_functions(&alloc_func_ptr, &realloc_func_ptr, &free_func_ptr);
