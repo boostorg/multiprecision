@@ -25,7 +25,6 @@
 
 [import ../example/gmp_snips.cpp]
 [import ../example/mpfr_snips.cpp]
-[import ../example/mpc_examples.cpp]
 [import ../example/mpfi_snips.cpp]
 [import ../example/float128_snips.cpp]
 [import ../example/cpp_dec_float_snips.cpp]
@@ -40,6 +39,9 @@
 [import ../example/logged_adaptor.cpp]
 [import ../example/numeric_limits_snips.cpp]
 [import ../example/hashing_examples.cpp]
+[import ../example/cpp_complex_examples.cpp]
+[import ../example/mpc_examples.cpp]
+[import ../example/complex128_examples.cpp]
 
 [template mpfr[] [@http://www.mpfr.org MPFR]]
 [template mpc[] [@http://www.multiprecision.org MPC]]
@@ -82,6 +84,10 @@
 [def __debug_adaptor [link boost_multiprecision.tut.misc.debug_adaptor debug_adaptor]]
 [def __logged_adaptor [link boost_multiprecision.tut.misc.logged_adaptor logged_adaptor]]
 [def __rational_adaptor [link boost_multiprecision.tut.rational.rational_adaptor rational_adaptor]]
+[def __cpp_complex [link boost_multiprecision.tut.complex.cpp_complex cpp_complex]]
+[def __mpc_complex [link boost_multiprecision.tut.complex.mpc_complex mpc_complex]]
+[def __complex128 [link boost_multiprecision.tut.complex.complex128 complex128]]
+[def __complex_adaptor [link boost_multiprecision.tut.complex.complex_adaptor complex_adaptor]]
 
 [section:intro Introduction]
 
@@ -1205,6 +1211,8 @@ The following backends provide complex number arithmetic:
 [[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
 [[`cpp_complex`][boost/multiprecision/cpp_complex.hpp][2][None][An all C++ Boost-licensed implementation.][Slower than [mpc].]]
 [[`mpc`][boost/multiprecision/mpc.hpp][2][[mpc]][Very fast and efficient back-end.][Dependency on LGLP-licensed [MPC] library.]]
+[[`compplex128`][boost/multiprecision/complex128.hpp][2][`__float128` and libquadmath][Very fast and efficient number type.][128-bit precision only, and resticted to GCC.]]
+[[`complex_adaptor`][boost/multiprecision/complex_adaptor.hpp][-][none][Can convert any backend type into a complex number backend.][Not a numbe rin it's own right, and hard to use as a result.]]
 ]
 
 [section:cpp_complex cpp_complex]
@@ -1213,8 +1221,85 @@ The following backends provide complex number arithmetic:
 
    namespace boost{ namespace multiprecision{
 
+      template <unsigned Digits, backends::digit_base_type DigitBase = backends::digit_base_10, class Allocator = void, class Exponent = int, Exponent MinExponent = 0, Exponent MaxExponent = 0>
+      using cpp_complex_backend = complex_adaptor<cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinExponent, MaxExponent> >;
+
+      template <unsigned Digits, backends::digit_base_type DigitBase = digit_base_10, class Allocator = void, class Exponent = int, Exponent MinExponent = 0, Exponent MaxExponent = 0, expression_template_option ExpressionTemplates = et_off>
+      using cpp_complex = number<complex_adaptor<cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinExponent, MaxExponent> >, ExpressionTemplates>;
+
+      typedef cpp_complex<50> cpp_complex_50;
+      typedef cpp_complex<100> cpp_complex_100;
+
+      typedef cpp_complex<24, backends::digit_base_2, void, boost::int16_t, -126, 127> cpp_complex_single;
+      typedef cpp_complex<53, backends::digit_base_2, void, boost::int16_t, -1022, 1023> cpp_complex_double;
+      typedef cpp_complex<64, backends::digit_base_2, void, boost::int16_t, -16382, 16383> cpp_complex_extended;
+      typedef cpp_complex<113, backends::digit_base_2, void, boost::int16_t, -16382, 16383> cpp_complex_quad;
+
+
    }} // namespaces
 
+The `cpp_complex_backend` back-end is used in conjunction with `number`: It acts as an entirely C++ (header only and dependency free)
+complex number type that is a drop-in replacement for `std::complex`, but with much greater precision.
+
+The template alias `cpp_complex` avoids the need to use class `number` directly.
+
+Type `cpp_complex` can be used at fixed precision by specifying a non-zero `Digits` template parameter.
+The typedefs `cpp_complex_50` and `cpp_complex_100` provide complex number types at 50 and 100 decimal digits precision
+respectively.
+
+Optionally, you can specify whether the precision is specified in decimal digits or binary bits - for example
+to declare a `cpp_complex` with exactly the same precision as `std::complex<double>` one would use
+`cpp_complex<53, digit_base_2>`.  The typedefs `cpp_complex_single`, `cpp_complex_double`,
+`cpp_complex_quad` and `cpp_complex_double_extended` provide
+software analogues of the IEEE single, double and quad float data types, plus the Intel-extended-double type respectively.
+Note that while these types are functionally equivalent to the native IEEE types, but they do not have the same size
+or bit-layout as true IEEE compatible types.
+
+Normally `cpp_complex` allocates no memory: all of the space required for its digits are allocated
+directly within the class.  As a result care should be taken not to use the class with too high a digit count
+as stack space requirements can grow out of control.  If that represents a problem then providing an allocator
+as a template parameter causes `cpp_complex` to dynamically allocate the memory it needs: this
+significantly reduces the size of `cpp_complex` and increases the viable upper limit on the number of digits
+at the expense of performance.  However, please bear in mind that arithmetic operations rapidly become ['very] expensive
+as the digit count grows: the current implementation really isn't optimized or designed for large digit counts.
+Note that since the actual type of the objects allocated
+is completely opaque, the suggestion would be to use an allocator with `char` `value_type`, for example:
+`cpp_complex<1000, digit_base_10, std::allocator<char> >`.
+
+The next template parameters determine the type and range of the exponent: parameter `Exponent` can be
+any signed integer type, but note that `MinExponent` and `MaxExponent` can not go right up to the limits
+of the `Exponent` type as there has to be a little extra headroom for internal calculations.  You will
+get a compile time error if this is the case.  In addition if MinExponent or MaxExponent are zero, then
+the library will choose suitable values that are as large as possible given the constraints of the type
+and need for extra headroom for internal calculations.
+
+Finally, as with class `number`, the final template parameter determines whether expression templates are turn
+on or not.  Since by default this type allocates no memory, expression template support is off by default.
+However, you should probably turn it on if you specify an allocator.
+
+There is full standard library support available for this type, comparable with what `std::complex` provides.
+
+Things you should know when using this type:
+
+* Default constructed `cpp_complex`s have a value of zero.
+* The radix of this type is 2, even when the precision is specified as decimal digits.
+* The type supports both infinities and NaN's.  An infinity is generated whenever the result would overflow,
+and a NaN is generated for any mathematically undefined operation.
+* There is no `std::numeric_limits` specialisation for this type: this is the same behaviour as `std::complex`.  If you need
+`std::numeric_limits` support you need to look at `std::numeric_limits<my_complex_number_type::value_type>`.
+* Any `number` instantiated on this type, is convertible to any other `number` instantiated on this type -
+for example you can convert from `number<cpp_complex<50> >` to `number<cpp_bin_float<SomeOtherValue> >`.
+Narrowing conversions round to nearest and are `explicit`.
+* Conversion from a string results in a `std::runtime_error` being thrown if the string can not be interpreted
+as a valid complex number.
+
+[h5 example:]
+
+[cpp_complex_eg]
+
+Which produces the output (for the multiprecision type):
+
+[cpp_complex_out]
 
 [endsect]
 
@@ -1279,6 +1364,68 @@ as a valid complex number.
 Which produces the output (for the multiprecision type):
 
 [mpc_out]
+
+[endsect]
+
+[section:complex128 complex128]
+
+`#include <boost/multiprecision/complex128.hpp>`
+
+   namespace boost{ namespace multiprecision{
+
+   class complex128_backend;
+
+   typedef number<complex128_backend, et_off>    complex128;
+
+   }} // namespaces
+
+The `complex128` number type is a very thin wrapper around GCC's `__float128` or Intel's `_Quad` data types
+and provides a complex-number type that is a drop-in replacement for the native C++ floating-point types, but with
+a 113 bit mantissa, and compatible with FORTRAN's 128-bit QUAD real.
+
+All the usual standard library functions are available, performance should be equivalent
+to the underlying native types.
+
+As well as the usual conversions from arithmetic and string types, instances of `float128` are
+copy constructible and assignable from GCC's `__float128` and Intel's `_Quad` data types.
+
+Things you should know when using this type:
+
+* Default constructed `complex128`s have the value zero.
+* This backend supports rvalue-references and is move-aware, making instantiations of `number` on this backend move aware.
+* It is not possible to round-trip objects of this type to and from a string and get back
+exactly the same value when compiled with Intel's C++ compiler and using `_Quad` as the underlying type: this is a current limitation of
+our code.  Round tripping when using `__float128` as the underlying type is possible (both for GCC and Intel).
+* Conversion from a string results in a `std::runtime_error` being thrown if the string can not be interpreted
+as a valid floating-point number.
+* Division by zero results in an infinity being produced.
+* When using the Intel compiler, the underlying type defaults to `__float128` if it's available and `_Quad` if not.  You can override
+the default by defining either `BOOST_MP_USE_FLOAT128` or `BOOST_MP_USE_QUAD`.
+* When the underlying type is Intel's `_Quad` type, the code must be compiled with the compiler option `-Qoption,cpp,--extended_float_type`.
+
+[h5 complex128 example:]
+
+[complex128_eg]
+
+Which results in the output:
+
+[complex128_out]
+
+[endsect]
+
+[section:complex_adaptor complex_adaptor]
+
+   namespace boost{ namespace multiprecision{
+   
+   template <class Backend>
+   struct complex_adaptor;
+   
+   }}
+
+Class template `complex_adaptor` is designed to sit inbetween class `number` and an actual floating point backend, 
+in order to create a new complex number type.
+
+It is the means by which we implement __cpp_complex and __complex128.
 
 [endsect]
 

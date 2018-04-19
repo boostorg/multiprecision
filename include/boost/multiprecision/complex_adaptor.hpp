@@ -350,6 +350,15 @@ inline void eval_sqrt(complex_adaptor<Backend>& result, const complex_adaptor<Ba
    using default_ops::eval_abs;
    using default_ops::eval_divide;
    using default_ops::eval_add;
+   using default_ops::eval_is_zero;
+
+   if (eval_is_zero(val.imag_data()) && (eval_get_sign(val.real_data())>= 0))
+   {
+      static const typename mpl::front<typename Backend::unsigned_types>::type zero = 0u;
+      eval_sqrt(result.real_data(), val.real_data());
+      result.imag_data() = zero;
+      return;
+   }
 
    const bool __my_real_part_is_neg(eval_get_sign(val.real_data()) < 0);
 
