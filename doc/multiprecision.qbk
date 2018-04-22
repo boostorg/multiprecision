@@ -42,6 +42,7 @@
 [import ../example/cpp_complex_examples.cpp]
 [import ../example/mpc_examples.cpp]
 [import ../example/complex128_examples.cpp]
+[import ../example/eigen_example.cpp]
 
 [template mpfr[] [@http://www.mpfr.org MPFR]]
 [template mpc[] [@http://www.multiprecision.org MPC]]
@@ -3219,7 +3220,23 @@ which may be useful to ensure that columns line up.
 
 [endsect][/hash]
 
+[section:eigen Eigen Interoperability]
 
+This library provides the header:
+
+   #include <boost/multiprecision/eigen.hpp>
+
+which defines the traits classes and functions that the Eigen library needs all user-defined number types to provide.
+
+For example the following code performs quad-precision matrix solving on complex numbers:
+
+[eigen_eg]
+
+Which produces the following output:
+
+[eigen_out]
+
+[endsect]
 [endsect]
 
 [section:ref Reference]
