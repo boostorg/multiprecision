@@ -15,6 +15,7 @@
 #include <boost/multiprecision/number.hpp>
 #include <boost/integer/common_factor_rt.hpp>
 #include <boost/type_traits/common_type.hpp>
+#include <boost/container_hash/hash.hpp>
 
 namespace boost{
 namespace multiprecision{
@@ -538,6 +539,13 @@ template <class Arithmetic>
 inline void eval_lcm(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const arithmetic_backend<Arithmetic>& b)
 {
    result.data() = boost::integer::lcm(a.data(), b.data());
+}
+
+template <class Arithmetic>
+inline std::size_t hash_value(const arithmetic_backend<Arithmetic>& a)
+{
+   boost::hash<Arithmetic> hasher;
+   return hasher(a.data());
 }
 
 #ifdef BOOST_MSVC

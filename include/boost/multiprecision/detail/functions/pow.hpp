@@ -88,7 +88,7 @@ inline void pow_imp(T& result, const T& t, const U& p, const mpl::true_&)
 } // namespace detail
 
 template<typename T, typename U> 
-inline typename enable_if<is_integral<U> >::type eval_pow(T& result, const T& t, const U& p)
+inline typename enable_if_c<is_integral<U>::value>::type eval_pow(T& result, const T& t, const U& p)
 {
    detail::pow_imp(result, t, p, boost::is_signed<U>());
 }
@@ -715,7 +715,12 @@ inline void eval_pow(T& result, const T& x, const T& a)
 }
 
 template<class T, class A> 
-inline typename enable_if<is_floating_point<A>, void>::type eval_pow(T& result, const T& x, const A& a)
+#if BOOST_WORKAROUND(BOOST_MSVC, < 1800)
+inline typename enable_if_c<!is_integral<A>::value, void>::type 
+#else
+inline typename enable_if_c<is_compatible_arithmetic_type<A, number<T> >::value && !is_integral<A>::value, void>::type 
+#endif
+   eval_pow(T& result, const T& x, const A& a)
 {
    // Note this one is restricted to float arguments since pow.hpp already has a version for
    // integer powers....
@@ -727,7 +732,12 @@ inline typename enable_if<is_floating_point<A>, void>::type eval_pow(T& result, 
 }
 
 template<class T, class A> 
-inline typename enable_if<is_arithmetic<A>, void>::type eval_pow(T& result, const A& x, const T& a)
+#if BOOST_WORKAROUND(BOOST_MSVC, < 1800)
+inline void
+#else
+inline typename enable_if_c<is_compatible_arithmetic_type<A, number<T> >::value, void>::type
+#endif
+   eval_pow(T& result, const A& x, const T& a)
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
    typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
