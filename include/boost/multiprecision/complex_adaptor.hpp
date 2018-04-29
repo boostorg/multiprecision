@@ -209,6 +209,7 @@ inline void eval_divide(complex_adaptor<Backend>& result, const complex_adaptor<
    using default_ops::eval_multiply;
    using default_ops::eval_subtract;
    using default_ops::eval_add;
+   using default_ops::eval_is_zero;
    Backend t1, t2;
 
    if (eval_is_zero(z.imag_data()))
@@ -468,6 +469,7 @@ inline void eval_exp(complex_adaptor<Backend>& result, const complex_adaptor<Bac
    using default_ops::eval_cos;
    using default_ops::eval_exp;
    using default_ops::eval_multiply;
+   using default_ops::eval_is_zero;
 
    if (eval_is_zero(arg.imag_data()))
    {
@@ -495,6 +497,8 @@ inline void eval_log(complex_adaptor<Backend>& result, const complex_adaptor<Bac
    using default_ops::eval_multiply;
    using default_ops::eval_add;
    using default_ops::eval_atan2;
+   using default_ops::eval_is_zero;
+   using default_ops::eval_get_sign;
 
    if (eval_is_zero(arg.imag_data()) && (eval_get_sign(arg.real_data()) >= 0))
    {
@@ -622,6 +626,7 @@ inline void eval_atan(complex_adaptor<Backend>& result, const complex_adaptor<Ba
    using default_ops::eval_add;
    using default_ops::eval_log;
    using default_ops::eval_subtract;
+   using default_ops::eval_is_zero;
 
    complex_adaptor<Backend> __my_z_times_i, t1, t2, t3;
    assign_components(__my_z_times_i, arg.imag_data(), arg.real_data());
