@@ -210,6 +210,15 @@ inline void eval_divide(complex_adaptor<Backend>& result, const complex_adaptor<
    using default_ops::eval_subtract;
    using default_ops::eval_add;
    Backend t1, t2;
+
+   if (eval_is_zero(z.imag_data()))
+   {
+      eval_divide(result.real_data(), z.real_data());
+      eval_divide(result.imag_data(), z.real_data());
+      return;
+   }
+
+
    eval_fabs(t1, z.real_data());
    eval_fabs(t2, z.imag_data());
    if (t1.compare(t2) < 0)
@@ -407,6 +416,45 @@ inline void eval_abs(Backend& result, const complex_adaptor<Backend>& val)
 template <class Backend>
 inline void eval_pow(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& b, const complex_adaptor<Backend>& e)
 {
+   using default_ops::eval_is_zero;
+   using default_ops::eval_get_sign;
+   using default_ops::eval_acos;
+   using default_ops::eval_multiply;
+   using default_ops::eval_exp;
+   using default_ops::eval_cos;
+   using default_ops::eval_sin;
+
+   if (eval_is_zero(e))
+   {
+      typename mpl::front<typename Backend::unsigned_types>::type one(1);
+      result = one;
+      return;
+   }
+   else if (eval_is_zero(b))
+   {
+      if (eval_is_zero(e.real_data()))
+      {
+         Backend n = std::numeric_limits<number<Backend> >::quiet_NaN().backend();
+         result.real_data() = n;
+         result.imag_data() = n;
+      }
+      else if (eval_get_sign(e.real_data()) < 0)
+      {
+         Backend n = std::numeric_limits<number<Backend> >::infinity().backend();
+         result.real_data() = n;
+         typename mpl::front<typename Backend::unsigned_types>::type zero(0);
+         if (eval_is_zero(e.imag_data()))
+            result.imag_data() = zero;
+         else
+            result.imag_data() = n;
+      }
+      else
+      {
+         typename mpl::front<typename Backend::unsigned_types>::type zero(0);
+         result = zero;
+      }
+      return;
+   }
    complex_adaptor<Backend> t;
    eval_log(t, b);
    eval_multiply(t, e);
@@ -421,11 +469,23 @@ inline void eval_exp(complex_adaptor<Backend>& result, const complex_adaptor<Bac
    using default_ops::eval_exp;
    using default_ops::eval_multiply;
 
+   if (eval_is_zero(arg.imag_data()))
+   {
+      eval_exp(result.real_data(), arg.real_data());
+      typename mpl::front<typename Backend::unsigned_types>::type zero(0);
+      result.imag_data() = zero;
+      return;
+   }
    eval_cos(result.real_data(), arg.imag_data());
    eval_sin(result.imag_data(), arg.imag_data());
    Backend e;
    eval_exp(e, arg.real_data());
-   eval_multiply(result, e);
+   if (eval_is_zero(result.real_data()))
+      eval_multiply(result.imag_data(), e);
+   else if (eval_is_zero(result.imag_data()))
+      eval_multiply(result.real_data(), e);
+   else
+      eval_multiply(result, e);
 }
 
 template <class Backend>
@@ -435,6 +495,14 @@ inline void eval_log(complex_adaptor<Backend>& result, const complex_adaptor<Bac
    using default_ops::eval_multiply;
    using default_ops::eval_add;
    using default_ops::eval_atan2;
+
+   if (eval_is_zero(arg.imag_data()) && (eval_get_sign(arg.real_data()) >= 0))
+   {
+      eval_log(result.real_data(), arg.real_data());
+      typename mpl::front<typename Backend::unsigned_types>::type zero(0);
+      result.imag_data() = zero;
+      return;
+   }
 
    Backend t1, t2;
    eval_multiply(t1, arg.real_data(), arg.real_data());
@@ -515,16 +583,16 @@ inline void eval_asin(complex_adaptor<Backend>& result, const complex_adaptor<Ba
 
    typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
 
-   complex_adaptor<Backend> __my_z_times_i, t1, t2;
-   assign_components(__my_z_times_i, arg.imag_data(), arg.real_data());
-   __my_z_times_i.real_data().negate();
+   if (eval_is_zero(arg))
+   {
+      result = arg;
+      return;
+   }
 
-   eval_multiply(t1, arg, arg);
-   t1.negate();
-   eval_add(t2, t1, static_cast<ui_type>(1u));
-   eval_sqrt(t1, t2);
-   eval_add(t1, __my_z_times_i);
-   eval_log(t2, t1);
+   complex_adaptor<Backend> t1, t2;
+   assign_components(t1, arg.imag_data(), arg.real_data());
+   t1.real_data().negate();
+   eval_asinh(t2, t1);
 
    assign_components(result, t2.imag_data(), t2.real_data());
    result.imag_data().negate();
@@ -567,7 +635,8 @@ inline void eval_atan(complex_adaptor<Backend>& result, const complex_adaptor<Ba
 
    eval_ldexp(result.real_data(), t1.imag_data(), -1);
    eval_ldexp(result.imag_data(), t1.real_data(), -1);
-   result.real_data().negate();
+   if(!eval_is_zero(result.real_data()))
+      result.real_data().negate();
 }
 
 template <class Backend>
