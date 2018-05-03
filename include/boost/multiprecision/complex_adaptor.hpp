@@ -585,8 +585,6 @@ inline void eval_asin(complex_adaptor<Backend>& result, const complex_adaptor<Ba
    using default_ops::eval_add;
    using default_ops::eval_multiply;
 
-   typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
-
    if (eval_is_zero(arg))
    {
       result = arg;
