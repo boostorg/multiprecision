@@ -1612,10 +1612,6 @@ inline void eval_convert_to(unsigned long* result, const gmp_int& val)
    {
       BOOST_THROW_EXCEPTION(std::range_error("Conversion from negative integer to an unsigned type results in undefined behaviour"));
    }
-   else if(0 == mpz_fits_ulong_p(val.data()))
-   {
-      *result = (std::numeric_limits<unsigned long>::max)();
-   }
    else
       *result = (unsigned long)mpz_get_ui(val.data());
 }

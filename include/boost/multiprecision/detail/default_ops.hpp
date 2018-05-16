@@ -915,7 +915,7 @@ inline typename boost::enable_if_c<boost::is_integral<R>::value>::type eval_conv
    typedef typename calculate_next_larger_type<R, B>::type next_type;
    next_type n;
    eval_convert_to(&n, backend);
-   if(std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::is_bounded && (n > (next_type)(std::numeric_limits<R>::max)()))
+   if(!boost::is_unsigned<R>::value && std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::is_bounded && (n > (next_type)(std::numeric_limits<R>::max)()))
    {
       *result = (std::numeric_limits<R>::max)();
    }
@@ -942,7 +942,7 @@ inline typename boost::disable_if_c<boost::is_integral<R>::value>::type eval_con
 }
 
 template <class R, class B>
-inline void eval_convert_to(terminal<R>* result, const B& backend)
+inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, const mpl::false_&)
 {
    //
    // We ran out of types to try for the conversion, try
@@ -963,6 +963,40 @@ inline void eval_convert_to(terminal<R>* result, const B& backend)
       else
          *result = (std::numeric_limits<R>::max)();
    }
+}
+
+template <class R, class B>
+inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, const mpl::true_&)
+{
+   //
+   // We ran out of types to try for the conversion, try
+   // a lexical_cast and hope for the best:
+   //
+   if (std::numeric_limits<R>::is_integer && !std::numeric_limits<R>::is_signed && (eval_get_sign(backend) < 0))
+      BOOST_THROW_EXCEPTION(std::range_error("Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
+   try 
+   {
+      B t(backend);
+      R mask = ~static_cast<R>(0u);
+      eval_bitwise_and(t, mask);
+      result->value = boost::lexical_cast<R>(t.str(0, std::ios_base::fmtflags(0)));
+   }
+   catch (const bad_lexical_cast&)
+   {
+      if (eval_get_sign(backend) < 0)
+      {
+         *result = std::numeric_limits<R>::is_integer && std::numeric_limits<R>::is_signed ? (std::numeric_limits<R>::min)() : -(std::numeric_limits<R>::max)();
+      }
+      else
+         *result = (std::numeric_limits<R>::max)();
+   }
+}
+
+template <class R, class B>
+inline void eval_convert_to(terminal<R>* result, const B& backend)
+{
+   typedef mpl::bool_<boost::is_unsigned<R>::value && number_category<B>::value == number_kind_integer> tag_type;
+   last_chance_eval_convert_to(result, backend, tag_type());
 }
 
 template <class B1, class B2, expression_template_option et>

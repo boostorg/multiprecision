@@ -127,7 +127,7 @@ inline typename enable_if_c<boost::is_integral<R>::value>::type eval_convert_to(
    if ((backend.data() < 0) && !std::numeric_limits<R>::is_signed)
       BOOST_THROW_EXCEPTION(std::range_error("Attempt to convert negative number to unsigned type."));
    if (ct > max)
-      *result = (std::numeric_limits<R>::max)();
+      *result = boost::is_signed<R>::value ? (std::numeric_limits<R>::max)() : backend.data();
    else if (std::numeric_limits<Arithmetic>::is_signed && (ct < min))
       *result = (std::numeric_limits<R>::min)();
    else

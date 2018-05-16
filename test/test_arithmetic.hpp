@@ -458,10 +458,15 @@ void test_integer_overflow()
       {
          BOOST_CHECK_THROW(m.template convert_to<Int>(), std::overflow_error);
       }
-      else
+      else if(boost::is_signed<Int>::value)
       {
          r = m.template convert_to<Int>();
          BOOST_CHECK_EQUAL(r, (std::numeric_limits<Int>::max)());
+      }
+      else
+      {
+         r = m.template convert_to<Int>();
+         BOOST_CHECK_EQUAL(r, 0);
       }
       // Again with much larger value:
       m = 1u;
@@ -470,13 +475,18 @@ void test_integer_overflow()
       {
          BOOST_CHECK_THROW(m.template convert_to<Int>(), std::overflow_error);
       }
-      else
+      else if (boost::is_signed<Int>::value)
       {
          r = m.template convert_to<Int>();
          BOOST_CHECK_EQUAL(r, (std::numeric_limits<Int>::max)());
       }
+      else
+      {
+         r = m.template convert_to<Int>();
+         BOOST_CHECK_EQUAL(r, 0);
+      }
 
-      if (std::numeric_limits<Real>::is_signed && (std::numeric_limits<Int>::is_signed))
+      if (std::numeric_limits<Real>::is_signed && (boost::is_signed<Int>::value))
       {
          m = (std::numeric_limits<Int>::min)();
          --m;
@@ -504,7 +514,7 @@ void test_integer_overflow()
             BOOST_CHECK_EQUAL(r, (std::numeric_limits<Int>::min)());
          }
       }
-      else if (std::numeric_limits<Real>::is_signed && !std::numeric_limits<Int>::is_signed)
+      else if (std::numeric_limits<Real>::is_signed && !boost::is_signed<Int>::value)
       {
          // signed to unsigned converison with overflow, it's really not clear what should happen here!
          m = (std::numeric_limits<Int>::max)();

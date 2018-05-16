@@ -28,7 +28,7 @@ void check_in_range(const CppInt& val, const mpl::int_<checked>&)
    typedef typename boost::multiprecision::detail::canonical<R, CppInt>::type cast_type;
    if(val.sign())
    {
-      if(std::numeric_limits<R>::is_signed == false)
+      if(boost::is_signed<R>::value == false)
          BOOST_THROW_EXCEPTION(std::range_error("Attempt to assign a negative value to an unsigned type."));
       if(val.compare(static_cast<cast_type>((std::numeric_limits<R>::min)())) < 0)
          BOOST_THROW_EXCEPTION(std::overflow_error("Could not convert to the target type - -value is out of range."));
@@ -68,12 +68,12 @@ inline typename enable_if_c<is_integral<R>::value && !is_trivial_cpp_int<cpp_int
 
    if (std::numeric_limits<R>::digits < cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits)
    {
-      if ((backend.sign() && std::numeric_limits<R>::is_signed) && (1 + static_cast<boost::multiprecision::limb_type>((std::numeric_limits<R>::max)()) <= backend.limbs()[0]))
+      if ((backend.sign() && boost::is_signed<R>::value) && (1 + static_cast<boost::multiprecision::limb_type>((std::numeric_limits<R>::max)()) <= backend.limbs()[0]))
       {
          *result = (std::numeric_limits<R>::min)();
          return;
       }
-      else if (!backend.sign() && static_cast<boost::multiprecision::limb_type>((std::numeric_limits<R>::max)()) <= backend.limbs()[0])
+      else if (boost::is_signed<R>::value && !backend.sign() && static_cast<boost::multiprecision::limb_type>((std::numeric_limits<R>::max)()) <= backend.limbs()[0])
       {
          *result = (std::numeric_limits<R>::max)();
          return;
@@ -109,7 +109,7 @@ inline typename enable_if_c<is_integral<R>::value && !is_trivial_cpp_int<cpp_int
                check_is_negative(boost::is_signed<R>());
                *result = (std::numeric_limits<R>::min)();
             }
-            else
+            else if(boost::is_signed<R>::value)
                *result = (std::numeric_limits<R>::max)();
             return;
          }
@@ -123,7 +123,7 @@ inline typename enable_if_c<is_integral<R>::value && !is_trivial_cpp_int<cpp_int
          check_is_negative(boost::is_signed<R>());
          *result = (std::numeric_limits<R>::min)();
       }
-      else
+      else if(boost::is_signed<R>::value)
          *result = (std::numeric_limits<R>::max)();
       return;
    }
@@ -607,7 +607,7 @@ inline typename enable_if_c<
    {
       if(val.isneg())
       {
-         check_is_negative(mpl::bool_<std::numeric_limits<R>::is_signed || (number_category<R>::value == number_kind_floating_point)>());
+         check_is_negative(mpl::bool_<boost::is_signed<R>::value || (number_category<R>::value == number_kind_floating_point)>());
          if(static_cast<common_type>(*val.limbs()) > -static_cast<common_type>((std::numeric_limits<R>::min)()))
             conversion_overflow(typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
          *result = (std::numeric_limits<R>::min)();
@@ -615,7 +615,7 @@ inline typename enable_if_c<
       else
       {
          conversion_overflow(typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
-         *result = (std::numeric_limits<R>::max)();
+         *result = boost::is_signed<R>::value ? (std::numeric_limits<R>::max)() : static_cast<R>(*val.limbs());
       }
    }
    else
@@ -623,7 +623,7 @@ inline typename enable_if_c<
       *result = static_cast<R>(*val.limbs());
       if(val.isneg())
       {
-         check_is_negative(mpl::bool_<std::numeric_limits<R>::is_signed || (number_category<R>::value == number_kind_floating_point)>());
+         check_is_negative(mpl::bool_<boost::is_signed<R>::value || (number_category<R>::value == number_kind_floating_point)>());
          *result = negate_integer(*result, mpl::bool_<is_signed_number<R>::value || (number_category<R>::value == number_kind_floating_point)>());
       }
    }
@@ -641,7 +641,7 @@ inline typename enable_if_c<
    if(std::numeric_limits<R>::is_specialized && (static_cast<common_type>(*val.limbs()) > static_cast<common_type>((std::numeric_limits<R>::max)())))
    {
       conversion_overflow(typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
-      *result = (std::numeric_limits<R>::max)();
+      *result = boost::is_signed<R>::value ? (std::numeric_limits<R>::max)() : static_cast<R>(*val.limbs());
    }
    else
       *result = static_cast<R>(*val.limbs());
