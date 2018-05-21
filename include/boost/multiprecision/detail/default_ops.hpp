@@ -3103,6 +3103,30 @@ struct BOOST_JOIN(category, BOOST_JOIN(func, _funct))\
       using default_ops:: BOOST_JOIN(eval_,func);\
       BOOST_JOIN(eval_,func)(result, number<Backend>::canonical_value(arg), a);\
    }\
+   template <class U>\
+   void operator()(U& result, const Backend& arg, const Backend& a)const\
+   {\
+      using default_ops:: BOOST_JOIN(eval_,func);\
+      Backend r;\
+      BOOST_JOIN(eval_,func)(r, arg, a);\
+      result = r;\
+   }\
+   template <class U, class Arithmetic> \
+   void operator()(U& result, const Backend& arg, const Arithmetic& a)const\
+   {\
+      using default_ops:: BOOST_JOIN(eval_,func);\
+      Backend r;\
+      BOOST_JOIN(eval_,func)(r, arg, number<Backend>::canonical_value(a));\
+      result = r;\
+   }\
+   template <class U, class Arithmetic> \
+   void operator()(U& result, const Arithmetic& arg, const Backend& a)const\
+   {\
+      using default_ops:: BOOST_JOIN(eval_,func);\
+      Backend r;\
+      BOOST_JOIN(eval_,func)(r, number<Backend>::canonical_value(arg), a);\
+      result = r;\
+   }\
 };\
 \
 }\
