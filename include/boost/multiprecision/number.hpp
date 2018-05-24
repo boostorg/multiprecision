@@ -639,10 +639,10 @@ public:
       return this->template convert_to<T>();
    }
 #  else
-#if 1//BOOST_WORKAROUND(BOOST_MSVC, < 1900)
+#if BOOST_WORKAROUND(BOOST_MSVC, < 1900)
    template <class T>
 #else
-   template <class T, class = typename boost::disable_if_c<boost::is_constructible<T, self_type const&>::value || !boost::is_default_constructible<T>::value, T>::type>
+   template <class T, class = typename boost::disable_if_c<std::is_constructible<T, self_type const&>::value || !std::is_default_constructible<T>::value, T>::type>
 #endif
    explicit operator T ()const
    {
