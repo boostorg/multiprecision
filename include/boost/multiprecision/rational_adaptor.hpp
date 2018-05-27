@@ -298,10 +298,10 @@ struct number_category<backends::rational_adaptor<IntBackend> > : public mpl::in
 
 using boost::multiprecision::backends::rational_adaptor;
 
-template <class T>
-struct component_type<rational_adaptor<T> >
+template <class Backend, expression_template_option ExpressionTemplates>
+struct component_type<number<backends::rational_adaptor<Backend>, ExpressionTemplates> >
 {
-   typedef number<T> type;
+   typedef number<Backend, ExpressionTemplates> type;
 };
 
 template <class IntBackend, expression_template_option ET>

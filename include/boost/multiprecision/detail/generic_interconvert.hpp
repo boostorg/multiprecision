@@ -525,6 +525,59 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
    generic_interconvert_float2int(to, from, mpl::int_<std::numeric_limits<number<From> >::radix>());
 }
 
+template <class To, class From, class tag>
+void generic_interconvert_complex_to_scalar(To& to, const From& from, const mpl::true_&, const tag&)
+{
+   // We just want the real part, and "to" is the correct type already:
+   eval_real(to, from);
+
+   To im;
+   eval_imag(im, from);
+   if(!eval_is_zero(im))
+      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
+}
+template <class To, class From>
+void generic_interconvert_complex_to_scalar(To& to, const From& from, const mpl::false_&, const mpl::true_&)
+{
+   typedef typename component_type<number<From> >::type component_number;
+   typedef typename component_number::backend_type component_backend;
+   //
+   // Get the real part and copy-construct the result from it:
+   //
+   component_backend r;
+   generic_interconvert_complex_to_scalar(r, from, mpl::true_(), mpl::true_());
+   to = r;
+}
+template <class To, class From>
+void generic_interconvert_complex_to_scalar(To& to, const From& from, const mpl::false_&, const mpl::false_&)
+{
+   typedef typename component_type<number<From> >::type component_number;
+   typedef typename component_number::backend_type component_backend;
+   //
+   // Get the real part and use a generic_interconvert to type To:
+   //
+   component_backend r;
+   generic_interconvert_complex_to_scalar(r, from, mpl::true_(), mpl::true_());
+   generic_interconvert(to, r, mpl::int_<number_category<To>::value>(), mpl::int_<number_category<To>::value>());
+}
+
+template <class To, class From>
+void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_floating_point>& /*to_type*/, const mpl::int_<number_kind_complex>& /*from_type*/)
+{
+   typedef typename component_type<number<From> >::type component_number;
+   typedef typename component_number::backend_type component_backend;
+
+   generic_interconvert_complex_to_scalar(to, from, mpl::bool_<boost::is_same<component_backend, To>::value>(), mpl::bool_<boost::is_constructible<To, const component_backend&>::value>());
+}
+template <class To, class From>
+void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_integer>& /*to_type*/, const mpl::int_<number_kind_complex>& /*from_type*/)
+{
+   typedef typename component_type<number<From> >::type component_number;
+   typedef typename component_number::backend_type component_backend;
+
+   generic_interconvert_complex_to_scalar(to, from, mpl::bool_<boost::is_same<component_backend, To>::value>(), mpl::bool_<boost::is_constructible<To, const component_backend&>::value>());
+}
+
 }
 }
 } // namespaces

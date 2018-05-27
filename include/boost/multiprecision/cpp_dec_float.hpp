@@ -431,7 +431,7 @@ public:
    {
       if(v < 0)
       {
-         from_unsigned_long_long(-v);
+         from_unsigned_long_long(1u - boost::ulong_long_type(v + 1)); // Avoid undefined behaviour in negation of minimum value for long long
          negate();
       }
       else

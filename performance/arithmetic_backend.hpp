@@ -13,8 +13,9 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/math/concepts/real_concept.hpp>
 #include <boost/multiprecision/number.hpp>
-#include <boost/math/common_factor_rt.hpp>
+#include <boost/integer/common_factor_rt.hpp>
 #include <boost/type_traits/common_type.hpp>
+#include <boost/container_hash/hash.hpp>
 
 namespace boost{
 namespace multiprecision{
@@ -126,7 +127,7 @@ inline typename enable_if_c<boost::is_integral<R>::value>::type eval_convert_to(
    if ((backend.data() < 0) && !std::numeric_limits<R>::is_signed)
       BOOST_THROW_EXCEPTION(std::range_error("Attempt to convert negative number to unsigned type."));
    if (ct > max)
-      *result = (std::numeric_limits<R>::max)();
+      *result = boost::is_signed<R>::value ? (std::numeric_limits<R>::max)() : backend.data();
    else if (std::numeric_limits<Arithmetic>::is_signed && (ct < min))
       *result = (std::numeric_limits<R>::min)();
    else
@@ -531,13 +532,20 @@ inline void eval_complement(arithmetic_backend<Arithmetic>& result, const arithm
 template <class Arithmetic>
 inline void eval_gcd(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const arithmetic_backend<Arithmetic>& b)
 {
-   result.data() = boost::math::gcd(a.data(), b.data());
+   result.data() = boost::integer::gcd(a.data(), b.data());
 }
 
 template <class Arithmetic>
 inline void eval_lcm(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const arithmetic_backend<Arithmetic>& b)
 {
-   result.data() = boost::math::lcm(a.data(), b.data());
+   result.data() = boost::integer::lcm(a.data(), b.data());
+}
+
+template <class Arithmetic>
+inline std::size_t hash_value(const arithmetic_backend<Arithmetic>& a)
+{
+   boost::hash<Arithmetic> hasher;
+   return hasher(a.data());
 }
 
 #ifdef BOOST_MSVC

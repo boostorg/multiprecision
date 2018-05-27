@@ -306,6 +306,7 @@ struct gmp_float_imp
                         round_up = true;
                         break;
                      }
+                     ++i;
                   }
                   if(round_up)
                   {
@@ -1611,10 +1612,6 @@ inline void eval_convert_to(unsigned long* result, const gmp_int& val)
    {
       BOOST_THROW_EXCEPTION(std::range_error("Conversion from negative integer to an unsigned type results in undefined behaviour"));
    }
-   else if(0 == mpz_fits_ulong_p(val.data()))
-   {
-      *result = (std::numeric_limits<unsigned long>::max)();
-   }
    else
       *result = (unsigned long)mpz_get_ui(val.data());
 }
@@ -2261,10 +2258,10 @@ using boost::multiprecision::backends::gmp_int;
 using boost::multiprecision::backends::gmp_rational;
 using boost::multiprecision::backends::gmp_float;
 
-template <>
-struct component_type<number<gmp_rational> >
+template <expression_template_option ExpressionTemplates>
+struct component_type<number<gmp_rational, ExpressionTemplates> >
 {
-   typedef number<gmp_int> type;
+   typedef number<gmp_int, ExpressionTemplates> type;
 };
 
 template <expression_template_option ET>

@@ -281,7 +281,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=compile_fail
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE="compile_fail examples"
       addons:
         apt:
           packages:
@@ -292,7 +292,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=compile_fail
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE="compile_fail examples"
       addons:
         apt:
           packages:
@@ -303,7 +303,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=compile_fail
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE="compile_fail examples"
       addons:
         apt:
           packages:
@@ -314,7 +314,50 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=compile_fail
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE="compile_fail examples"
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - libgmp-dev
+            - libmpfr-dev
+          sources:
+            - ubuntu-toolchain-r-test
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=concepts
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - libgmp-dev
+            - libmpfr-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=concepts
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - libgmp-dev
+            - libmpfr-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=concepts
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - libgmp-dev
+            - libmpfr-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=concepts
       addons:
         apt:
           packages:
@@ -380,7 +423,18 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=compile_fail
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE="compile_fail examples"
+      addons:
+        apt:
+          packages:
+            - g++-5
+            - libgmp-dev
+            - libmpfr-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=concepts
       addons:
         apt:
           packages:
@@ -392,27 +446,31 @@ matrix:
 
     - os: osx
       env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests
-      osx_image: xcode8.1
+      osx_image: xcode9.3
 
     - os: osx
       env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=cpp_int_tests
-      osx_image: xcode8.1
+      osx_image: xcode9.3
 
     - os: osx
       env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=functions_and_limits
-      osx_image: xcode8.1
+      osx_image: xcode9.3
 
     - os: osx
       env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=conversions
-      osx_image: xcode8.1
+      osx_image: xcode9.3
 
     - os: osx
       env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=misc
-      osx_image: xcode8.1
+      osx_image: xcode9.3
 
     - os: osx
-      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=compile_fail
-      osx_image: xcode8.1
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="compile_fail examples"
+      osx_image: xcode9.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=concepts
+      osx_image: xcode9.3
 
     - os: osx
       env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests
@@ -435,7 +493,11 @@ matrix:
       osx_image: xcode8.3
 
     - os: osx
-      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=compile_fail
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="compile_fail examples"
+      osx_image: xcode8.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=concepts
       osx_image: xcode8.3
 
     - os: osx
@@ -459,32 +521,12 @@ matrix:
       osx_image: xcode7.3
 
     - os: osx
-      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=compile_fail
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="compile_fail examples"
       osx_image: xcode7.3
 
     - os: osx
-      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests
-      osx_image: xcode6.4
-
-    - os: osx
-      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=cpp_int_tests
-      osx_image: xcode6.4
-
-    - os: osx
-      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=functions_and_limits
-      osx_image: xcode6.4
-
-    - os: osx
-      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=conversions
-      osx_image: xcode6.4
-
-    - os: osx
-      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=misc
-      osx_image: xcode6.4
-
-    - os: osx
-      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=compile_fail
-      osx_image: xcode6.4
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=concepts
+      osx_image: xcode7.3
 
 install:
   - cd ..

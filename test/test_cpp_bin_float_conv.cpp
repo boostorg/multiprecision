@@ -65,6 +65,8 @@ void check_round(const T& val, bool check_extended = false)
    BOOST_CHECK(((abs(f1 - val) <= abs(f2 - val))));
    BOOST_CHECK_EQUAL(boost::math::signbit(val), boost::math::signbit(f1));
 
+#if !defined(BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS)
+
    if(check_extended)
    {
       //
@@ -88,6 +90,9 @@ void check_round(const T& val, bool check_extended = false)
       BOOST_CHECK(diff2 >= diff1);
       BOOST_CHECK_EQUAL(boost::math::signbit(val), boost::math::signbit(l1));
    }
+
+#endif
+
 }
 
 

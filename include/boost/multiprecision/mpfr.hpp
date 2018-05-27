@@ -278,6 +278,7 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
                         round_up = true;
                         break;
                      }
+                     ++i;
                   }
                   if(round_up)
                   {
@@ -2182,33 +2183,64 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_f
    typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, ExpressionTemplates> number_type;
 public:
    BOOST_STATIC_CONSTEXPR bool is_specialized = false;
-   static number_type (min)() { return number_type(0); }
-   static number_type (max)() { return number_type(0); }
-   static number_type lowest() { return number_type(0); }
-   BOOST_STATIC_CONSTEXPR int digits = 0;
-   BOOST_STATIC_CONSTEXPR int digits10 = 0;
-   BOOST_STATIC_CONSTEXPR int max_digits10 = 0;
-   BOOST_STATIC_CONSTEXPR bool is_signed = false;
+   static number_type(min)()
+   {
+      number_type value(0.5);
+      mpfr_div_2exp(value.backend().data(), value.backend().data(), -mpfr_get_emin(), GMP_RNDN);
+      return value;
+   }
+   static number_type(max)()
+   {
+      number_type value(0.5);
+      mpfr_mul_2exp(value.backend().data(), value.backend().data(), mpfr_get_emax(), GMP_RNDN);
+      return value;
+   }
+   static number_type lowest()
+   {
+      return -(max)();
+   }
+   BOOST_STATIC_CONSTEXPR int digits = INT_MAX;
+   BOOST_STATIC_CONSTEXPR int digits10 = INT_MAX;
+   BOOST_STATIC_CONSTEXPR int max_digits10 = INT_MAX;
+   BOOST_STATIC_CONSTEXPR bool is_signed = true;
    BOOST_STATIC_CONSTEXPR bool is_integer = false;
    BOOST_STATIC_CONSTEXPR bool is_exact = false;
-   BOOST_STATIC_CONSTEXPR int radix = 0;
-   static number_type epsilon() { return number_type(0); }
-   static number_type round_error() { return number_type(0); }
-   BOOST_STATIC_CONSTEXPR int min_exponent = 0;
-   BOOST_STATIC_CONSTEXPR int min_exponent10 = 0;
-   BOOST_STATIC_CONSTEXPR int max_exponent = 0;
-   BOOST_STATIC_CONSTEXPR int max_exponent10 = 0;
-   BOOST_STATIC_CONSTEXPR bool has_infinity = false;
-   BOOST_STATIC_CONSTEXPR bool has_quiet_NaN = false;
+   BOOST_STATIC_CONSTEXPR int radix = 2;
+   static number_type epsilon()
+   {
+      number_type value(1);
+      mpfr_div_2exp(value.backend().data(), value.backend().data(), boost::multiprecision::detail::digits10_2_2(number_type::default_precision()) - 1, GMP_RNDN);
+      return value;
+   }
+   static number_type round_error()
+   {
+      return epsilon() / 2;
+   }
+   BOOST_STATIC_CONSTEXPR long min_exponent = MPFR_EMIN_DEFAULT;
+   BOOST_STATIC_CONSTEXPR long min_exponent10 = (MPFR_EMIN_DEFAULT / 1000) * 301L;
+   BOOST_STATIC_CONSTEXPR long max_exponent = MPFR_EMAX_DEFAULT;
+   BOOST_STATIC_CONSTEXPR long max_exponent10 = (MPFR_EMAX_DEFAULT / 1000) * 301L;
+   BOOST_STATIC_CONSTEXPR bool has_infinity = true;
+   BOOST_STATIC_CONSTEXPR bool has_quiet_NaN = true;
    BOOST_STATIC_CONSTEXPR bool has_signaling_NaN = false;
    BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm = denorm_absent;
    BOOST_STATIC_CONSTEXPR bool has_denorm_loss = false;
-   static number_type infinity() { return number_type(0); }
-   static number_type quiet_NaN() { return number_type(0); }
+   static number_type infinity()
+   {
+      number_type value;
+      mpfr_set_inf(value.backend().data(), 1);
+      return value;
+   }
+   static number_type quiet_NaN()
+   {
+      number_type value;
+      mpfr_set_nan(value.backend().data());
+      return value;
+   }
    static number_type signaling_NaN() { return number_type(0); }
    static number_type denorm_min() { return number_type(0); }
    BOOST_STATIC_CONSTEXPR bool is_iec559 = false;
-   BOOST_STATIC_CONSTEXPR bool is_bounded = false;
+   BOOST_STATIC_CONSTEXPR bool is_bounded = true;
    BOOST_STATIC_CONSTEXPR bool is_modulo = false;
    BOOST_STATIC_CONSTEXPR bool traps = false;
    BOOST_STATIC_CONSTEXPR bool tinyness_before = false;
@@ -2232,13 +2264,13 @@ BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, ExpressionTemplates> >::radix;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, ExpressionTemplates> >::min_exponent;
+BOOST_CONSTEXPR_OR_CONST long numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, ExpressionTemplates> >::min_exponent;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, ExpressionTemplates> >::min_exponent10;
+BOOST_CONSTEXPR_OR_CONST long numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, ExpressionTemplates> >::min_exponent10;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, ExpressionTemplates> >::max_exponent;
+BOOST_CONSTEXPR_OR_CONST long numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, ExpressionTemplates> >::max_exponent;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, ExpressionTemplates> >::max_exponent10;
+BOOST_CONSTEXPR_OR_CONST long numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, ExpressionTemplates> >::max_exponent10;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<0>, ExpressionTemplates> >::has_infinity;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>

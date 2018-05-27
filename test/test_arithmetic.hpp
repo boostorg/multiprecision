@@ -8,7 +8,9 @@
 #endif
 
 #include <boost/math/special_functions/pow.hpp>
-#include <boost/math/common_factor_rt.hpp>
+#include <boost/integer/common_factor_rt.hpp>
+#include <boost/functional/hash.hpp>
+#include <functional>
 #include "test.hpp"
 
 template <class T>
@@ -77,7 +79,8 @@ int normalize_compare_result(int r)
 }
 
 template <class Real, class Val>
-void test_comparisons(Val a, Val b, const boost::mpl::true_)
+typename boost::disable_if_c<boost::multiprecision::number_category<Real>::value == boost::multiprecision::number_kind_complex>::type 
+   test_comparisons(Val a, Val b, const boost::mpl::true_)
 {
    Real r1(a);
    Real r2(b);
@@ -145,6 +148,57 @@ void test_comparisons(Val a, Val b, const boost::mpl::true_)
    BOOST_CHECK_EQUAL(normalize_compare_result(r2.compare(r1)), -cr);
    BOOST_CHECK_EQUAL(normalize_compare_result(r1.compare(b)), cr);
    BOOST_CHECK_EQUAL(normalize_compare_result(r2.compare(a)), -cr);
+}
+
+template <class Real, class Val>
+typename boost::enable_if_c<boost::multiprecision::number_category<Real>::value == boost::multiprecision::number_kind_complex>::type
+  test_comparisons(Val a, Val b, const boost::mpl::true_)
+{
+   Real r1(a);
+   Real r2(b);
+   Real z(1);
+
+   int cr = a < b ? -1 : a > b ? 1 : 0;
+   (void)cr;
+
+   BOOST_CHECK_EQUAL(r1 == r2, a == b);
+   BOOST_CHECK_EQUAL(r1 != r2, a != b);
+
+   BOOST_CHECK_EQUAL(r1 == b, a == b);
+   BOOST_CHECK_EQUAL(r1 != b, a != b);
+
+   BOOST_CHECK_EQUAL(a == r2, a == b);
+   BOOST_CHECK_EQUAL(a != r2, a != b);
+
+   BOOST_CHECK_EQUAL(r1*z == r2, a == b);
+   BOOST_CHECK_EQUAL(r1*z != r2, a != b);
+
+   BOOST_CHECK_EQUAL(r1 == r2 * z, a == b);
+   BOOST_CHECK_EQUAL(r1 != r2 * z, a != b);
+
+   BOOST_CHECK_EQUAL(r1*z == r2 * z, a == b);
+   BOOST_CHECK_EQUAL(r1*z != r2 * z, a != b);
+
+   BOOST_CHECK_EQUAL(r1*z == b, a == b);
+   BOOST_CHECK_EQUAL(r1*z != b, a != b);
+
+   BOOST_CHECK_EQUAL(a == r2 * z, a == b);
+   BOOST_CHECK_EQUAL(a != r2 * z, a != b);
+
+   if (r1 == r2)
+   {
+      BOOST_CHECK_EQUAL(normalize_compare_result(r1.compare(r2)), 0);
+      BOOST_CHECK_EQUAL(normalize_compare_result(r2.compare(r1)), 0);
+      BOOST_CHECK_EQUAL(normalize_compare_result(r1.compare(b)), 0);
+      BOOST_CHECK_EQUAL(normalize_compare_result(r2.compare(a)), 0);
+   }
+   else
+   {
+      BOOST_CHECK_NE(normalize_compare_result(r1.compare(r2)), 0);
+      BOOST_CHECK_NE(normalize_compare_result(r2.compare(r1)), 0);
+      BOOST_CHECK_NE(normalize_compare_result(r1.compare(b)), 0);
+      BOOST_CHECK_NE(normalize_compare_result(r2.compare(a)), 0);
+   }
 }
 
 template <class Real, class Exp>
@@ -317,10 +371,10 @@ void test_signed_integer_ops(const boost::mpl::true_&)
 #endif
    a = 400;
    b = 45;
-   BOOST_CHECK_EQUAL(gcd(a, -45) ,  boost::math::gcd(400, 45));
-   BOOST_CHECK_EQUAL(lcm(a, -45) ,  boost::math::lcm(400, 45));
-   BOOST_CHECK_EQUAL(gcd(-400, b) ,  boost::math::gcd(400, 45));
-   BOOST_CHECK_EQUAL(lcm(-400, b) ,  boost::math::lcm(400, 45));
+   BOOST_CHECK_EQUAL(gcd(a, -45) ,  boost::integer::gcd(400, 45));
+   BOOST_CHECK_EQUAL(lcm(a, -45) ,  boost::integer::lcm(400, 45));
+   BOOST_CHECK_EQUAL(gcd(-400, b) ,  boost::integer::gcd(400, 45));
+   BOOST_CHECK_EQUAL(lcm(-400, b) ,  boost::integer::lcm(400, 45));
    a = -20;
    BOOST_CHECK_EQUAL(abs(a) ,  20);
    BOOST_CHECK_EQUAL(abs(-a) ,  20);
@@ -331,12 +385,12 @@ void test_signed_integer_ops(const boost::mpl::true_&)
    BOOST_CHECK_EQUAL(abs(+a) ,  20);
    a = -400;
    b = 45;
-   BOOST_CHECK_EQUAL(gcd(a, b) ,  boost::math::gcd(-400, 45));
-   BOOST_CHECK_EQUAL(lcm(a, b) ,  boost::math::lcm(-400, 45));
-   BOOST_CHECK_EQUAL(gcd(a, 45) ,  boost::math::gcd(-400, 45));
-   BOOST_CHECK_EQUAL(lcm(a, 45) ,  boost::math::lcm(-400, 45));
-   BOOST_CHECK_EQUAL(gcd(-400, b) ,  boost::math::gcd(-400, 45));
-   BOOST_CHECK_EQUAL(lcm(-400, b) ,  boost::math::lcm(-400, 45));
+   BOOST_CHECK_EQUAL(gcd(a, b) ,  boost::integer::gcd(-400, 45));
+   BOOST_CHECK_EQUAL(lcm(a, b) ,  boost::integer::lcm(-400, 45));
+   BOOST_CHECK_EQUAL(gcd(a, 45) ,  boost::integer::gcd(-400, 45));
+   BOOST_CHECK_EQUAL(lcm(a, 45) ,  boost::integer::lcm(-400, 45));
+   BOOST_CHECK_EQUAL(gcd(-400, b) ,  boost::integer::gcd(-400, 45));
+   BOOST_CHECK_EQUAL(lcm(-400, b) ,  boost::integer::lcm(-400, 45));
    Real r;
    divide_qr(a, b, c, r);
    BOOST_CHECK_EQUAL(c ,  a / b);
@@ -366,13 +420,13 @@ void test_signed_integer_ops(const boost::mpl::true_&)
    else
    {
       a = -1;
-      BOOST_CHECK_EQUAL(a << 10, (boost::intmax_t(-1) << 10));
+      BOOST_CHECK_EQUAL(a << 10, -1024);
       a = -23;
-      BOOST_CHECK_EQUAL(a << 10, (boost::intmax_t(-23) << 10));
+      BOOST_CHECK_EQUAL(a << 10, -23552);
       a = -23456;
-      BOOST_CHECK_EQUAL(a >> 10, (boost::intmax_t(-23456) >> 10));
+      BOOST_CHECK_EQUAL(a >> 10, -23);
       a = -3;
-      BOOST_CHECK_EQUAL(a >> 10, (boost::intmax_t(-3) >> 10));
+      BOOST_CHECK_EQUAL(a >> 10, -1);
    }
 #endif
 }
@@ -404,10 +458,15 @@ void test_integer_overflow()
       {
          BOOST_CHECK_THROW(m.template convert_to<Int>(), std::overflow_error);
       }
-      else
+      else if(boost::is_signed<Int>::value)
       {
          r = m.template convert_to<Int>();
          BOOST_CHECK_EQUAL(r, (std::numeric_limits<Int>::max)());
+      }
+      else
+      {
+         r = m.template convert_to<Int>();
+         BOOST_CHECK_EQUAL(r, 0);
       }
       // Again with much larger value:
       m = 1u;
@@ -416,13 +475,18 @@ void test_integer_overflow()
       {
          BOOST_CHECK_THROW(m.template convert_to<Int>(), std::overflow_error);
       }
-      else
+      else if (boost::is_signed<Int>::value)
       {
          r = m.template convert_to<Int>();
          BOOST_CHECK_EQUAL(r, (std::numeric_limits<Int>::max)());
       }
+      else
+      {
+         r = m.template convert_to<Int>();
+         BOOST_CHECK_EQUAL(r, 0);
+      }
 
-      if (std::numeric_limits<Real>::is_signed && (std::numeric_limits<Int>::is_signed))
+      if (std::numeric_limits<Real>::is_signed && (boost::is_signed<Int>::value))
       {
          m = (std::numeric_limits<Int>::min)();
          --m;
@@ -450,7 +514,7 @@ void test_integer_overflow()
             BOOST_CHECK_EQUAL(r, (std::numeric_limits<Int>::min)());
          }
       }
-      else if (std::numeric_limits<Real>::is_signed && !std::numeric_limits<Int>::is_signed)
+      else if (std::numeric_limits<Real>::is_signed && !boost::is_signed<Int>::value)
       {
          // signed to unsigned converison with overflow, it's really not clear what should happen here!
          m = (std::numeric_limits<Int>::max)();
@@ -681,16 +745,16 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    //
    a = 400;
    b = 45;
-   BOOST_CHECK_EQUAL(gcd(a, b) ,  boost::math::gcd(400, 45));
-   BOOST_CHECK_EQUAL(lcm(a, b) ,  boost::math::lcm(400, 45));
-   BOOST_CHECK_EQUAL(gcd(a, 45) ,  boost::math::gcd(400, 45));
-   BOOST_CHECK_EQUAL(lcm(a, 45) ,  boost::math::lcm(400, 45));
-   BOOST_CHECK_EQUAL(gcd(a, 45u) ,  boost::math::gcd(400, 45));
-   BOOST_CHECK_EQUAL(lcm(a, 45u) ,  boost::math::lcm(400, 45));
-   BOOST_CHECK_EQUAL(gcd(400, b) ,  boost::math::gcd(400, 45));
-   BOOST_CHECK_EQUAL(lcm(400, b) ,  boost::math::lcm(400, 45));
-   BOOST_CHECK_EQUAL(gcd(400u, b) ,  boost::math::gcd(400, 45));
-   BOOST_CHECK_EQUAL(lcm(400u, b) ,  boost::math::lcm(400, 45));
+   BOOST_CHECK_EQUAL(gcd(a, b) ,  boost::integer::gcd(400, 45));
+   BOOST_CHECK_EQUAL(lcm(a, b) ,  boost::integer::lcm(400, 45));
+   BOOST_CHECK_EQUAL(gcd(a, 45) ,  boost::integer::gcd(400, 45));
+   BOOST_CHECK_EQUAL(lcm(a, 45) ,  boost::integer::lcm(400, 45));
+   BOOST_CHECK_EQUAL(gcd(a, 45u) ,  boost::integer::gcd(400, 45));
+   BOOST_CHECK_EQUAL(lcm(a, 45u) ,  boost::integer::lcm(400, 45));
+   BOOST_CHECK_EQUAL(gcd(400, b) ,  boost::integer::gcd(400, 45));
+   BOOST_CHECK_EQUAL(lcm(400, b) ,  boost::integer::lcm(400, 45));
+   BOOST_CHECK_EQUAL(gcd(400u, b) ,  boost::integer::gcd(400, 45));
+   BOOST_CHECK_EQUAL(lcm(400u, b) ,  boost::integer::lcm(400, 45));
 
    //
    // Conditionals involving 2 arg functions:
@@ -1007,6 +1071,16 @@ void test_float_funcs(const boost::mpl::true_&)
    // Default construct, for consistency with native floats, default constructed values are zero:
    Real zero;
    BOOST_CHECK_EQUAL(zero, 0);
+
+   //
+   // Complex number functions on scalars:
+   //
+   a = 40;
+   BOOST_CHECK_EQUAL(Real(arg(a)), 0);
+   BOOST_CHECK_EQUAL(Real(arg(a + 0)), 0);
+   a - 20;
+   BOOST_CHECK_EQUAL(Real(arg(a)), 0);
+   BOOST_CHECK_EQUAL(Real(arg(a - 20)), 0);
 }
 
 template <class T, class U>
@@ -1326,9 +1400,37 @@ void test_negative_mixed_minmax(boost::mpl::false_ const&)
 }
 
 template <class Real, class Num>
-void test_negative_mixed(boost::mpl::true_ const&)
+void test_negative_mixed_numeric_limits(boost::mpl::true_ const&)
 {
    typedef typename lexical_cast_target_type<Num>::type target_type;
+#if defined(TEST_MPFR)
+   Num tol = 10 * std::numeric_limits<Num>::epsilon();
+#else
+   Num tol = 0;
+#endif
+   static const int left_shift = std::numeric_limits<Num>::digits - 1;
+   Num n1 = -static_cast<Num>(1uLL << ((left_shift < 63) && (left_shift > 0) ? left_shift : 10));
+   Num n2 = -1;
+   Num n3 = 0;
+   Num n4 = -20;
+   std::ios_base::fmtflags f = boost::is_floating_point<Num>::value ? std::ios_base::scientific : std::ios_base::fmtflags(0);
+   int digits_to_print = boost::is_floating_point<Num>::value && std::numeric_limits<Num>::is_specialized
+   ? std::numeric_limits<Num>::digits10 + 5 : 0;
+   if(std::numeric_limits<target_type>::digits <= std::numeric_limits<Real>::digits)
+   {
+   BOOST_CHECK_CLOSE(n1, checked_lexical_cast<target_type>(Real(n1).str(digits_to_print, f)), tol);
+   }
+   BOOST_CHECK_CLOSE(n2, checked_lexical_cast<target_type>(Real(n2).str(digits_to_print, f)), 0);
+   BOOST_CHECK_CLOSE(n3, checked_lexical_cast<target_type>(Real(n3).str(digits_to_print, f)), 0);
+   BOOST_CHECK_CLOSE(n4, checked_lexical_cast<target_type>(Real(n4).str(digits_to_print, f)), 0);
+}
+
+template <class Real, class Num>
+void test_negative_mixed_numeric_limits(boost::mpl::false_ const&){}
+
+template <class Real, class Num>
+void test_negative_mixed(boost::mpl::true_ const&)
+{
    typedef typename boost::mpl::if_<
          boost::is_convertible<Num, Real>,
          typename boost::mpl::if_c<boost::is_integral<Num>::value && (sizeof(Num) < sizeof(int)), int, Num>::type,
@@ -1384,21 +1486,7 @@ void test_negative_mixed(boost::mpl::true_ const&)
    BOOST_CHECK_EQUAL(static_cast<Num>((Real(n3) + 0)), n3);
    BOOST_CHECK_EQUAL(static_cast<Num>((Real(n4) + 0)), n4);
 #endif
-#if defined(TEST_MPFR)
-   Num tol = 10 * std::numeric_limits<Num>::epsilon();
-#else
-   Num tol = 0;
-#endif
-   std::ios_base::fmtflags f = boost::is_floating_point<Num>::value ? std::ios_base::scientific : std::ios_base::fmtflags(0);
-   int digits_to_print = boost::is_floating_point<Num>::value && std::numeric_limits<Num>::is_specialized
-      ? std::numeric_limits<Num>::digits10 + 5 : 0;
-   if(std::numeric_limits<target_type>::digits <= std::numeric_limits<Real>::digits)
-   {
-      BOOST_CHECK_CLOSE(n1, checked_lexical_cast<target_type>(Real(n1).str(digits_to_print, f)), tol);
-   }
-   BOOST_CHECK_CLOSE(n2, checked_lexical_cast<target_type>(Real(n2).str(digits_to_print, f)), 0);
-   BOOST_CHECK_CLOSE(n3, checked_lexical_cast<target_type>(Real(n3).str(digits_to_print, f)), 0);
-   BOOST_CHECK_CLOSE(n4, checked_lexical_cast<target_type>(Real(n4).str(digits_to_print, f)), 0);
+   test_negative_mixed_numeric_limits<Real, Num>(boost::mpl::bool_<std::numeric_limits<Real>::is_specialized>());
    // Assignment:
    Real r(0);
    BOOST_CHECK(r != static_cast<cast_type>(n1));
@@ -1447,7 +1535,7 @@ void test_negative_mixed(boost::mpl::true_ const&)
    BOOST_CHECK_EQUAL(r ,  static_cast<cast_type>(n4 - n5));
    r = static_cast<simple_cast_type>(n4) * Real(n5);
    BOOST_CHECK_EQUAL(r ,  static_cast<cast_type>(n4 * n5));
-   r = static_cast<cast_type>(4 * n4) / Real(4);
+   r = static_cast<cast_type>(Num(4) * n4) / Real(4);
    BOOST_CHECK_EQUAL(r ,  static_cast<cast_type>(n4));
 
    Real a, b, c;
@@ -1649,9 +1737,56 @@ inline Real negate_value(const Real& val, const boost::mpl::false_&)
 }
 
 template <class Real, class Num>
-void test_mixed(const boost::mpl::true_&)
+void test_mixed_numeric_limits(const boost::mpl::true_&)
 {
    typedef typename lexical_cast_target_type<Num>::type target_type;
+#if defined(TEST_MPFR)
+   Num tol = 10 * std::numeric_limits<Num>::epsilon();
+#else
+   Num tol = 0;
+#endif
+
+   Real d;
+   if (std::numeric_limits<Real>::has_infinity && std::numeric_limits<Num>::has_infinity)
+   {
+      d = static_cast<Real>(std::numeric_limits<Num>::infinity());
+      BOOST_CHECK_GT(d, (std::numeric_limits<Real>::max)());
+      d = static_cast<Real>(negate_value(std::numeric_limits<Num>::infinity(), boost::mpl::bool_<std::numeric_limits<Num>::is_signed>()));
+      BOOST_CHECK_LT(d, negate_value((std::numeric_limits<Real>::max)(), boost::mpl::bool_<std::numeric_limits<Real>::is_signed>()));
+   }
+   if (std::numeric_limits<Real>::has_quiet_NaN && std::numeric_limits<Num>::has_quiet_NaN)
+   {
+      d = static_cast<Real>(std::numeric_limits<Num>::quiet_NaN());
+      BOOST_CHECK(check_is_nan(d, boost::mpl::bool_<std::numeric_limits<Real>::has_quiet_NaN>()));
+      d = static_cast<Real>(negate_value(std::numeric_limits<Num>::quiet_NaN(), boost::mpl::bool_<std::numeric_limits<Num>::is_signed>()));
+      BOOST_CHECK(check_is_nan(d, boost::mpl::bool_<std::numeric_limits<Real>::has_quiet_NaN>()));
+   }
+
+   static const int left_shift = std::numeric_limits<Num>::digits - 1;
+   Num n1 = static_cast<Num>(1uLL << ((left_shift < 63) && (left_shift > 0) ? left_shift : 10));
+   Num n2 = 1;
+   Num n3 = 0;
+   Num n4 = 20;
+
+   std::ios_base::fmtflags f = boost::is_floating_point<Num>::value ? std::ios_base::scientific : std::ios_base::fmtflags(0);
+   int digits_to_print = boost::is_floating_point<Num>::value && std::numeric_limits<Num>::is_specialized
+      ? std::numeric_limits<Num>::digits10 + 5 : 0;
+   if(std::numeric_limits<target_type>::digits <= std::numeric_limits<Real>::digits)
+   {
+   BOOST_CHECK_CLOSE(n1, checked_lexical_cast<target_type>(Real(n1).str(digits_to_print, f)), tol);
+   }
+   BOOST_CHECK_CLOSE(n2, checked_lexical_cast<target_type>(Real(n2).str(digits_to_print, f)), 0);
+   BOOST_CHECK_CLOSE(n3, checked_lexical_cast<target_type>(Real(n3).str(digits_to_print, f)), 0);
+   BOOST_CHECK_CLOSE(n4, checked_lexical_cast<target_type>(Real(n4).str(digits_to_print, f)), 0);
+}
+template <class Real, class Num>
+void test_mixed_numeric_limits(const boost::mpl::false_&)
+{
+}
+
+template <class Real, class Num>
+void test_mixed(const boost::mpl::true_&)
+{
    typedef typename boost::mpl::if_<
          boost::is_convertible<Num, Real>,
          typename boost::mpl::if_c<boost::is_integral<Num>::value && (sizeof(Num) < sizeof(int)), int, Num>::type,
@@ -1711,21 +1846,6 @@ void test_mixed(const boost::mpl::true_&)
    BOOST_CHECK_EQUAL(static_cast<cast_type>(n2) ,  Real(n2));
    BOOST_CHECK_EQUAL(static_cast<cast_type>(n3) ,  Real(n3));
    BOOST_CHECK_EQUAL(static_cast<cast_type>(n4) ,  Real(n4));
-#if defined(TEST_MPFR)
-   Num tol = 10 * std::numeric_limits<Num>::epsilon();
-#else
-   Num tol = 0;
-#endif
-   std::ios_base::fmtflags f = boost::is_floating_point<Num>::value ? std::ios_base::scientific : std::ios_base::fmtflags(0);
-   int digits_to_print = boost::is_floating_point<Num>::value && std::numeric_limits<Num>::is_specialized 
-      ? std::numeric_limits<Num>::digits10 + 5 : 0;
-   if(std::numeric_limits<target_type>::digits <= std::numeric_limits<Real>::digits)
-   {
-      BOOST_CHECK_CLOSE(n1, checked_lexical_cast<target_type>(Real(n1).str(digits_to_print, f)), tol);
-   }
-   BOOST_CHECK_CLOSE(n2, checked_lexical_cast<target_type>(Real(n2).str(digits_to_print, f)), 0);
-   BOOST_CHECK_CLOSE(n3, checked_lexical_cast<target_type>(Real(n3).str(digits_to_print, f)), 0);
-   BOOST_CHECK_CLOSE(n4, checked_lexical_cast<target_type>(Real(n4).str(digits_to_print, f)), 0);
    // Assignment:
    Real r(0);
    BOOST_CHECK(r != static_cast<cast_type>(n1));
@@ -1770,7 +1890,7 @@ void test_mixed(const boost::mpl::true_&)
    BOOST_CHECK_EQUAL(r ,  static_cast<cast_type>(n4 - n5));
    r = static_cast<simple_cast_type>(n4) * Real(n5);
    BOOST_CHECK_EQUAL(r ,  static_cast<cast_type>(n4 * n5));
-   r = static_cast<cast_type>(4 * n4) / Real(4);
+   r = static_cast<cast_type>(Num(4) * n4) / Real(4);
    BOOST_CHECK_EQUAL(r ,  static_cast<cast_type>(n4));
 
    typedef boost::mpl::bool_<
@@ -1850,24 +1970,386 @@ void test_mixed(const boost::mpl::true_&)
    d = b * static_cast<cast_type>(n3) - static_cast<cast_type>(n1);
    BOOST_CHECK_EQUAL(d ,  3 * 4 - 2);
 
-   if(std::numeric_limits<Real>::has_infinity && std::numeric_limits<Num>::has_infinity)
-   {
-      d = static_cast<Real>(std::numeric_limits<Num>::infinity());
-      BOOST_CHECK_GT(d, (std::numeric_limits<Real>::max)());
-      d = static_cast<Real>(negate_value(std::numeric_limits<Num>::infinity(), boost::mpl::bool_<std::numeric_limits<Num>::is_signed>()));
-      BOOST_CHECK_LT(d, negate_value((std::numeric_limits<Real>::max)(), boost::mpl::bool_<std::numeric_limits<Real>::is_signed>()));
-   }
-   if(std::numeric_limits<Real>::has_quiet_NaN && std::numeric_limits<Num>::has_quiet_NaN)
-   {
-      d = static_cast<Real>(std::numeric_limits<Num>::quiet_NaN());
-      BOOST_CHECK(check_is_nan(d, boost::mpl::bool_<std::numeric_limits<Real>::has_quiet_NaN>()));
-      d = static_cast<Real>(negate_value(std::numeric_limits<Num>::quiet_NaN(), boost::mpl::bool_<std::numeric_limits<Num>::is_signed>()));
-      BOOST_CHECK(check_is_nan(d, boost::mpl::bool_<std::numeric_limits<Real>::has_quiet_NaN>()));
-   }
+   test_mixed_numeric_limits<Real, Num>(boost::mpl::bool_<std::numeric_limits<Real>::is_specialized>());
 }
 
 template <class Real>
-void test_members(Real)
+typename boost::enable_if_c<boost::multiprecision::number_category<Real>::value == boost::multiprecision::number_kind_complex>::type test_members(Real)
+{
+   //
+   // Test sign and zero functions:
+   //
+   Real a = 20;
+   Real b = 30;
+   BOOST_CHECK(!a.is_zero());
+   a = -20;
+   BOOST_CHECK(!a.is_zero());
+   a = 0;
+   BOOST_CHECK(a.is_zero());
+
+   a = 20;
+   b = 30;
+   a.swap(b);
+   BOOST_CHECK_EQUAL(a, 30);
+   BOOST_CHECK_EQUAL(b, 20);
+
+   Real c(2, 3);
+
+   BOOST_CHECK_EQUAL(a.real(), 30);
+   BOOST_CHECK_EQUAL(a.imag(), 0);
+   BOOST_CHECK_EQUAL(c.real(), 2);
+   BOOST_CHECK_EQUAL(c.imag(), 3);
+
+   //
+   // try some more 2-argument constructors:
+   //
+   {
+      Real d(40.5, 2);
+      BOOST_CHECK_EQUAL(d.real(), 40.5);
+      BOOST_CHECK_EQUAL(d.imag(), 2);
+   }
+   {
+      Real d("40.5", "2");
+      BOOST_CHECK_EQUAL(d.real(), 40.5);
+      BOOST_CHECK_EQUAL(d.imag(), 2);
+   }
+   {
+      Real d("40.5", std::string("2"));
+      BOOST_CHECK_EQUAL(d.real(), 40.5);
+      BOOST_CHECK_EQUAL(d.imag(), 2);
+   }
+   {
+      typename Real::value_type x(40.5), y(2);
+      Real d(x, y);
+      BOOST_CHECK_EQUAL(d.real(), 40.5);
+      BOOST_CHECK_EQUAL(d.imag(), 2);
+   }
+#ifdef TEST_MPC
+   {
+      typename Real::value_type x(40.5), y(2);
+      Real d(x.backend().data(), y.backend().data());
+      BOOST_CHECK_EQUAL(d.real(), 40.5);
+      BOOST_CHECK_EQUAL(d.imag(), 2);
+   }
+#endif
+   {
+      typename Real::value_type x(40.5);
+      Real d(x, 2);
+      BOOST_CHECK_EQUAL(d.real(), 40.5);
+      BOOST_CHECK_EQUAL(d.imag(), 2);
+   }
+   {
+      typename Real::value_type x(40.5);
+      Real d(2, x);
+      BOOST_CHECK_EQUAL(d.imag(), 40.5);
+      BOOST_CHECK_EQUAL(d.real(), 2);
+   }
+   {
+      typename Real::value_type x(real(a)*real(b) + imag(a)*imag(b)), y(imag(a)*real(b) - real(a)*imag(b));
+      Real d(real(a)*real(b) + imag(a)*imag(b), imag(a)*real(b) - real(a)*imag(b));
+      Real e(x, y);
+      BOOST_CHECK_EQUAL(d, e);
+   }
+   //
+   // real and imag setters:
+   //
+   c.real(4);
+   BOOST_CHECK_EQUAL(real(c), 4);
+   c.imag(-55);
+   BOOST_CHECK_EQUAL(imag(c), -55);
+   typename Real::value_type z(20);
+   c.real(z);
+   BOOST_CHECK_EQUAL(real(c), 20);
+   c.real(21L);
+   BOOST_CHECK_EQUAL(real(c), 21);
+   c.real(22L);
+   BOOST_CHECK_EQUAL(real(c), 22);
+   c.real(23UL);
+   BOOST_CHECK_EQUAL(real(c), 23);
+   c.real(24U);
+   BOOST_CHECK_EQUAL(real(c), 24);
+   c.real(25.0f);
+   BOOST_CHECK_EQUAL(real(c), 25);
+   c.real(26.0);
+   BOOST_CHECK_EQUAL(real(c), 26);
+   c.real(27.0L);
+   BOOST_CHECK_EQUAL(real(c), 27);
+#if defined(BOOST_HAS_LONG_LONG)
+   c.real(28LL);
+   BOOST_CHECK_EQUAL(real(c), 28);
+   c.real(29ULL);
+   BOOST_CHECK_EQUAL(real(c), 29);
+#endif
+   c.imag(z);
+   BOOST_CHECK_EQUAL(imag(c), 20);
+   c.imag(21L);
+   BOOST_CHECK_EQUAL(imag(c), 21);
+   c.imag(22L);
+   BOOST_CHECK_EQUAL(imag(c), 22);
+   c.imag(23UL);
+   BOOST_CHECK_EQUAL(imag(c), 23);
+   c.imag(24U);
+   BOOST_CHECK_EQUAL(imag(c), 24);
+   c.imag(25.0f);
+   BOOST_CHECK_EQUAL(imag(c), 25);
+   c.imag(26.0);
+   BOOST_CHECK_EQUAL(imag(c), 26);
+   c.imag(27.0L);
+   BOOST_CHECK_EQUAL(imag(c), 27);
+#if defined(BOOST_HAS_LONG_LONG)
+   c.imag(28LL);
+   BOOST_CHECK_EQUAL(imag(c), 28);
+   c.imag(29ULL);
+   BOOST_CHECK_EQUAL(imag(c), 29);
+#endif
+   
+   
+   c.real(2).imag(3);
+
+   BOOST_CHECK_EQUAL(real(a), 30);
+   BOOST_CHECK_EQUAL(imag(a), 0);
+   BOOST_CHECK_EQUAL(real(c), 2);
+   BOOST_CHECK_EQUAL(imag(c), 3);
+   BOOST_CHECK_EQUAL(real(a + 0), 30);
+   BOOST_CHECK_EQUAL(imag(a + 0), 0);
+   BOOST_CHECK_EQUAL(real(c + 0), 2);
+   BOOST_CHECK_EQUAL(imag(c + 0), 3);
+
+   typedef typename boost::multiprecision::component_type<Real>::type real_type;
+
+   real_type r(3);
+   real_type tol = std::numeric_limits<real_type>::epsilon() * 30;
+
+   a = r;
+   BOOST_CHECK_EQUAL(real(a), 3);
+   BOOST_CHECK_EQUAL(imag(a), 0);
+
+   a += r;
+   BOOST_CHECK_EQUAL(real(a), 6);
+   BOOST_CHECK_EQUAL(imag(a), 0);
+
+   a *= r;
+   BOOST_CHECK_EQUAL(real(a), 18);
+   BOOST_CHECK_EQUAL(imag(a), 0);
+
+   a = a / r;
+   BOOST_CHECK_EQUAL(real(a), 6);
+   BOOST_CHECK_EQUAL(imag(a), 0);
+   a = a - r;
+   BOOST_CHECK_EQUAL(real(a), 3);
+   BOOST_CHECK_EQUAL(imag(a), 0);
+   a = r + a;
+   BOOST_CHECK_EQUAL(real(a), 6);
+   BOOST_CHECK_EQUAL(imag(a), 0);
+
+   r = abs(c);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("3.60555127546398929311922126747049594625129657384524621271045305622716694829301044520461908201849071767351418202406"), r, tol);
+   r = arg(c);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("0.98279372324732906798571061101466601449687745363162855676142508831798807154979603538970653437281731110816513970201"), r, tol);
+   r = norm(c);
+   BOOST_CHECK_CLOSE_FRACTION(real_type(13), r, tol);
+   a = conj(c);
+   BOOST_CHECK_EQUAL(real(a), 2);
+   BOOST_CHECK_EQUAL(imag(a), -3);
+   a = proj(c);
+   BOOST_CHECK_EQUAL(real(a), 2);
+   BOOST_CHECK_EQUAL(imag(a), 3);
+   a = polar(real_type(3), real_type(-10));
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-2.517214587229357356776591843472194503559790495399505640507861193146377760598812305202801138281266416782353163216"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.63206333266810944021424298555413184505092903874867167472255203785027162892148027712122702168494964847488147271478"), imag(a), tol);
+   a = polar(real_type(3) + 0, real_type(-10));
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-2.517214587229357356776591843472194503559790495399505640507861193146377760598812305202801138281266416782353163216"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.63206333266810944021424298555413184505092903874867167472255203785027162892148027712122702168494964847488147271478"), imag(a), tol);
+   a = polar(real_type(3), real_type(-10) + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-2.517214587229357356776591843472194503559790495399505640507861193146377760598812305202801138281266416782353163216"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.63206333266810944021424298555413184505092903874867167472255203785027162892148027712122702168494964847488147271478"), imag(a), tol);
+   a = polar(real_type(3) + 0, real_type(-10) + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-2.517214587229357356776591843472194503559790495399505640507861193146377760598812305202801138281266416782353163216"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.63206333266810944021424298555413184505092903874867167472255203785027162892148027712122702168494964847488147271478"), imag(a), tol);
+   a = polar(3, real_type(-10));
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-2.517214587229357356776591843472194503559790495399505640507861193146377760598812305202801138281266416782353163216"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.63206333266810944021424298555413184505092903874867167472255203785027162892148027712122702168494964847488147271478"), imag(a), tol);
+   a = polar(3.0, real_type(-10) + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-2.517214587229357356776591843472194503559790495399505640507861193146377760598812305202801138281266416782353163216"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.63206333266810944021424298555413184505092903874867167472255203785027162892148027712122702168494964847488147271478"), imag(a), tol);
+
+   a = polar(real_type(3));
+   BOOST_CHECK_EQUAL(3, real(a));
+   BOOST_CHECK_EQUAL(0, imag(a));
+   a = polar(real_type(3) + 0);
+   BOOST_CHECK_EQUAL(3, real(a));
+   BOOST_CHECK_EQUAL(0, imag(a));
+
+   r = abs(c + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("3.60555127546398929311922126747049594625129657384524621271045305622716694829301044520461908201849071767351418202406"), r, tol);
+   r = arg(c + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("0.98279372324732906798571061101466601449687745363162855676142508831798807154979603538970653437281731110816513970201"), r, tol);
+   r = norm(c + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type(13), r, tol);
+   a = conj(c + 0);
+   BOOST_CHECK_EQUAL(real(a), 2);
+   BOOST_CHECK_EQUAL(imag(a), -3);
+   a = proj(c + 0);
+   BOOST_CHECK_EQUAL(real(a), 2);
+   BOOST_CHECK_EQUAL(imag(a), 3);
+
+   a = exp(c);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-7.3151100949011025174865361510507893218698794489446322367845159660828327860599907104337742108443234172141249777"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.0427436562359044141015039404625521939183300604422348975424523449538886779880818796291971422701951470533151185"), imag(a), tol);
+
+   a = log(c);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.282474678730768368026743720782659302402633972380103558209522755331732333662205089699787331720244744384629096046"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("0.9827937232473290679857106110146660144968774536316285567614250883179880715497960353897065343728173111081651397020"), imag(a), tol);
+
+   a = log10(c);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("0.556971676153418384603252578971164215414864594193534135900595487498776545815097120403823727129449829836488977743"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("0.426821890855466638944275673291166123449562356934437957244904971730668088711719757900679614536803436424488603794"), imag(a), tol);
+
+   a = exp(c + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-7.3151100949011025174865361510507893218698794489446322367845159660828327860599907104337742108443234172141249777"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.0427436562359044141015039404625521939183300604422348975424523449538886779880818796291971422701951470533151185"), imag(a), tol);
+
+   a = log(c + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.282474678730768368026743720782659302402633972380103558209522755331732333662205089699787331720244744384629096046"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("0.9827937232473290679857106110146660144968774536316285567614250883179880715497960353897065343728173111081651397020"), imag(a), tol);
+
+   a = log10(c + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("0.556971676153418384603252578971164215414864594193534135900595487498776545815097120403823727129449829836488977743"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("0.426821890855466638944275673291166123449562356934437957244904971730668088711719757900679614536803436424488603794"), imag(a), tol);
+
+   // Powers where one arg is an integer.
+   b = Real(5, -2);
+   a = pow(c, b);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-3053.8558566606567369633610140423321260211388217942246293871310470377722279440084474789529228008638668934381183"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("3097.9975862915005132449772136982559285192410496951232473245540634244845290672745578327467396750607773968246915"), imag(a), tol);
+   a = pow(c, 3);
+   BOOST_CHECK_CLOSE_FRACTION(real_type(-46), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type(9), imag(a), tol);
+   a = pow(3, c);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-8.8931513442797186948734782808862447235385767991868219480917324534839621090167050538805196124711247247992169338"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-1.3826999557878897572499699021550296885662132089951379549068064961882821777067532977546360861176011175070188118"), imag(a), tol * 3);
+   a = pow(c + 0, b);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-3053.8558566606567369633610140423321260211388217942246293871310470377722279440084474789529228008638668934381183"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("3097.9975862915005132449772136982559285192410496951232473245540634244845290672745578327467396750607773968246915"), imag(a), tol);
+   a = pow(c + 0, 3);
+   BOOST_CHECK_CLOSE_FRACTION(real_type(-46), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type(9), imag(a), tol);
+   a = pow(3, c + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-8.8931513442797186948734782808862447235385767991868219480917324534839621090167050538805196124711247247992169338"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-1.3826999557878897572499699021550296885662132089951379549068064961882821777067532977546360861176011175070188118"), imag(a), tol * 3);
+
+   r = 3;
+   // Powers where one arg is a real_type.
+   a = pow(c, r);
+   BOOST_CHECK_CLOSE_FRACTION(real_type(-46), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type(9), imag(a), tol);
+   a = pow(r, c);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-8.8931513442797186948734782808862447235385767991868219480917324534839621090167050538805196124711247247992169338"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-1.3826999557878897572499699021550296885662132089951379549068064961882821777067532977546360861176011175070188118"), imag(a), tol * 3);
+   a = pow(c + 0, r);
+   BOOST_CHECK_CLOSE_FRACTION(real_type(-46), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type(9), imag(a), tol);
+   a = pow(r, c + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-8.8931513442797186948734782808862447235385767991868219480917324534839621090167050538805196124711247247992169338"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-1.3826999557878897572499699021550296885662132089951379549068064961882821777067532977546360861176011175070188118"), imag(a), tol * 3);
+
+   // Powers where one arg is an float.
+   a = pow(c, 3.0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type(-46), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type(9), imag(a), tol);
+   a = pow(3.0, c);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-8.8931513442797186948734782808862447235385767991868219480917324534839621090167050538805196124711247247992169338"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-1.3826999557878897572499699021550296885662132089951379549068064961882821777067532977546360861176011175070188118"), imag(a), tol * 3);
+   a = pow(c + 0, 3.0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type(-46), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type(9), imag(a), tol);
+   a = pow(3.0, c + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-8.8931513442797186948734782808862447235385767991868219480917324534839621090167050538805196124711247247992169338"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-1.3826999557878897572499699021550296885662132089951379549068064961882821777067532977546360861176011175070188118"), imag(a), tol * 3);
+
+   a = sqrt(c);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.674149228035540040448039300849051821674708677883920366727287836003399240343274891876712629708287692163156802065"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("0.8959774761298381247157337552900434410433241995549314932449006989874470582160955817053273057885402621549320588976"), imag(a), tol);
+   a = sin(c);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("9.154499146911429573467299544609832559158860568765182977899828142590020335321896403936690014669532606510294425039"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-4.168906959966564350754813058853754843573565604758055889965478710592666260138453299795649308385497563475115931624"), imag(a), tol);
+   a = cos(c);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-4.1896256909688072301325550196159737286219454041279210357407905058369727912162626993926269783331491034500484583"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-9.1092278937553365979791972627788621213326202389201695649104967309554222940748568716960841549279996556547993373"), imag(a), tol);
+   a = tan(c);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-0.0037640256415042482927512211303226908396306202016580864328644932511249097100916559688254811519914564480500042311"), real(a), tol * 5);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.0032386273536098014463585978219272598077897241071003399272426939850671219193120708438426543945017427085738411"), imag(a), tol);
+   a = asin(c);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("0.5706527843210994007102838796856696501828032450960401365302732598209740064262509342420347149436326252483895113827"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.983387029916535432347076902894039565014248302909345356125267430944752731616095111727103650117987412058949254132"), imag(a), tol);
+   a = acos(c);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.000143542473797218521037811954081791915781454591512773957199036332934196716853565071982697727425908742684531873"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-1.983387029916535432347076902894039565014248302909345356125267430944752731616095111727103650117987412058949254132"), imag(a), tol);
+   a = atan(c);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.409921049596575522530619384460420782588207051908724814771070766475530084440199227135813201495737846771570458568"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("0.2290726829685387662958818029420027678625253049770656169479919704951963414344907622560676377741902308144912055002"), imag(a), tol);
+   a = sqrt(c + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.674149228035540040448039300849051821674708677883920366727287836003399240343274891876712629708287692163156802065"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("0.8959774761298381247157337552900434410433241995549314932449006989874470582160955817053273057885402621549320588976"), imag(a), tol);
+   a = sin(c + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("9.154499146911429573467299544609832559158860568765182977899828142590020335321896403936690014669532606510294425039"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-4.168906959966564350754813058853754843573565604758055889965478710592666260138453299795649308385497563475115931624"), imag(a), tol);
+   a = cos(c + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-4.1896256909688072301325550196159737286219454041279210357407905058369727912162626993926269783331491034500484583"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-9.1092278937553365979791972627788621213326202389201695649104967309554222940748568716960841549279996556547993373"), imag(a), tol);
+   a = tan(c + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-0.0037640256415042482927512211303226908396306202016580864328644932511249097100916559688254811519914564480500042311"), real(a), tol * 5);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.0032386273536098014463585978219272598077897241071003399272426939850671219193120708438426543945017427085738411"), imag(a), tol);
+   a = asin(c + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("0.5706527843210994007102838796856696501828032450960401365302732598209740064262509342420347149436326252483895113827"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.983387029916535432347076902894039565014248302909345356125267430944752731616095111727103650117987412058949254132"), imag(a), tol);
+   a = acos(c + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.000143542473797218521037811954081791915781454591512773957199036332934196716853565071982697727425908742684531873"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-1.983387029916535432347076902894039565014248302909345356125267430944752731616095111727103650117987412058949254132"), imag(a), tol);
+   a = atan(c + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.409921049596575522530619384460420782588207051908724814771070766475530084440199227135813201495737846771570458568"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("0.2290726829685387662958818029420027678625253049770656169479919704951963414344907622560676377741902308144912055002"), imag(a), tol);
+
+   a = sinh(c);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-3.5905645899857799520125654477948167931949136757293015099986213974178826801534614215227593814301490087307920223"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("0.53092108624851980526704009066067655967277345095149103008706855371803528753067068552935673000832252607835087747"), imag(a), tol);
+   a = cosh(c);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-3.7245455049153225654739707032559725286749657732153307267858945686649501059065292889110148294141744084833329553"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("0.51182256998738460883446384980187563424555660949074386745538379123585339045741119409984041226187262097496424111"), imag(a), tol);
+   a = tanh(c);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("0.965385879022133124278480269394560685879729650005757773636908240066639772853967550095754361348005358178253777920"), real(a), tol * 5);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-0.00988437503832249372031403430350121097961813353467039031861010606115560355679254344335582852193041894874685555114"), imag(a), tol);
+   a = asinh(c);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.968637925793096291788665095245498189520731012682010573842811017352748255492485345887875752070076230641308014923"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("0.9646585044076027920454110594995323555197773725073316527132580297155508786089335572049608301897631767195194427315"), imag(a), tol);
+   a = acosh(c);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.983387029916535432347076902894039565014248302909345356125267430944752731616095111727103650117987412058949254132"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.000143542473797218521037811954081791915781454591512773957199036332934196716853565071982697727425908742684531873"), imag(a), tol);
+   a = atanh(c);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("0.1469466662255297520474327851547159424423449403442452953891851939502023996823900422792744078835711416939934387775"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.338972522294493561124193575909144241084316172544492778582005751793809271060233646663717270678614587712809117131"), imag(a), tol);
+   a = sinh(c + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-3.5905645899857799520125654477948167931949136757293015099986213974178826801534614215227593814301490087307920223"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("0.53092108624851980526704009066067655967277345095149103008706855371803528753067068552935673000832252607835087747"), imag(a), tol);
+   a = cosh(c + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-3.7245455049153225654739707032559725286749657732153307267858945686649501059065292889110148294141744084833329553"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("0.51182256998738460883446384980187563424555660949074386745538379123585339045741119409984041226187262097496424111"), imag(a), tol);
+   a = tanh(c + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("0.965385879022133124278480269394560685879729650005757773636908240066639772853967550095754361348005358178253777920"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-0.00988437503832249372031403430350121097961813353467039031861010606115560355679254344335582852193041894874685555114"), imag(a), tol);
+   a = asinh(c + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.968637925793096291788665095245498189520731012682010573842811017352748255492485345887875752070076230641308014923"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("0.9646585044076027920454110594995323555197773725073316527132580297155508786089335572049608301897631767195194427315"), imag(a), tol);
+   a = acosh(c + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.983387029916535432347076902894039565014248302909345356125267430944752731616095111727103650117987412058949254132"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.000143542473797218521037811954081791915781454591512773957199036332934196716853565071982697727425908742684531873"), imag(a), tol);
+   a = atanh(c + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("0.1469466662255297520474327851547159424423449403442452953891851939502023996823900422792744078835711416939934387775"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("1.338972522294493561124193575909144241084316172544492778582005751793809271060233646663717270678614587712809117131"), imag(a), tol);
+}
+
+template <class Real>
+typename boost::enable_if_c<boost::multiprecision::number_category<Real>::value != boost::multiprecision::number_kind_complex>::type test_members(Real)
 {
    //
    // Test sign and zero functions:
@@ -1891,6 +2373,23 @@ void test_members(Real)
    a.swap(b);
    BOOST_CHECK_EQUAL(a ,  30);
    BOOST_CHECK_EQUAL(b ,  20);
+   //
+   // Test complex number functions which are also overloaded for scalar type:
+   //
+   BOOST_CHECK_EQUAL(real(a), a);
+   BOOST_CHECK_EQUAL(imag(a), 0);
+   BOOST_CHECK_EQUAL(real(a + 0), a);
+   BOOST_CHECK_EQUAL(imag(a + 2), 0);
+   BOOST_CHECK_EQUAL(norm(a), a * a);
+   BOOST_CHECK_EQUAL(norm(a * 1), a * a);
+   BOOST_CHECK_EQUAL(conj(a), a);
+   BOOST_CHECK_EQUAL(conj(a * 1), a);
+   BOOST_CHECK_EQUAL(proj(a), a);
+   BOOST_CHECK_EQUAL(proj(a * 1), a);
+   BOOST_CHECK_EQUAL(a.real(), a);
+   BOOST_CHECK_EQUAL(a.imag(), 0);
+   a.real(55);
+   BOOST_CHECK_EQUAL(a, 55);
 }
 
 template <class Real>
@@ -1986,6 +2485,147 @@ void test_basic_conditionals(Real a, Real b)
    }
 }
 
+template <class T>
+typename boost::enable_if_c<boost::multiprecision::number_category<T>::value == boost::multiprecision::number_kind_complex>::type 
+   test_relationals(T a, T b)
+{
+   BOOST_CHECK_EQUAL((a == b), false);
+   BOOST_CHECK_EQUAL((a != b), true);
+
+   BOOST_CHECK_EQUAL((a + b == b), false);
+   BOOST_CHECK_EQUAL((a + b != b), true);
+
+   BOOST_CHECK_EQUAL((a == b + a), false);
+   BOOST_CHECK_EQUAL((a != b + a), true);
+
+   BOOST_CHECK_EQUAL((a + b == b + a), true);
+   BOOST_CHECK_EQUAL((a + b != b + a), false);
+
+   BOOST_CHECK_EQUAL((8 == b + a), false);
+   BOOST_CHECK_EQUAL((8 != b + a), true);
+   BOOST_CHECK_EQUAL((800 == b + a), false);
+   BOOST_CHECK_EQUAL((800 != b + a), true);
+   BOOST_CHECK_EQUAL((72 == b + a), true);
+   BOOST_CHECK_EQUAL((72 != b + a), false);
+
+   BOOST_CHECK_EQUAL((b + a == 8), false);
+   BOOST_CHECK_EQUAL((b + a != 8), true);
+   BOOST_CHECK_EQUAL((b + a == 800), false);
+   BOOST_CHECK_EQUAL((b + a != 800), true);
+   BOOST_CHECK_EQUAL((b + a == 72), true);
+   BOOST_CHECK_EQUAL((b + a != 72), false);
+}
+
+template <class T>
+typename boost::disable_if_c<boost::multiprecision::number_category<T>::value == boost::multiprecision::number_kind_complex>::type
+test_relationals(T a, T b)
+{
+   BOOST_CHECK_EQUAL((a == b), false);
+   BOOST_CHECK_EQUAL((a != b), true);
+   BOOST_CHECK_EQUAL((a <= b), true);
+   BOOST_CHECK_EQUAL((a < b), true);
+   BOOST_CHECK_EQUAL((a >= b), false);
+   BOOST_CHECK_EQUAL((a > b), false);
+
+   BOOST_CHECK_EQUAL((a + b == b), false);
+   BOOST_CHECK_EQUAL((a + b != b), true);
+   BOOST_CHECK_EQUAL((a + b >= b), true);
+   BOOST_CHECK_EQUAL((a + b > b), true);
+   BOOST_CHECK_EQUAL((a + b <= b), false);
+   BOOST_CHECK_EQUAL((a + b < b), false);
+
+   BOOST_CHECK_EQUAL((a == b + a), false);
+   BOOST_CHECK_EQUAL((a != b + a), true);
+   BOOST_CHECK_EQUAL((a <= b + a), true);
+   BOOST_CHECK_EQUAL((a < b + a), true);
+   BOOST_CHECK_EQUAL((a >= b + a), false);
+   BOOST_CHECK_EQUAL((a > b + a), false);
+
+   BOOST_CHECK_EQUAL((a + b == b + a), true);
+   BOOST_CHECK_EQUAL((a + b != b + a), false);
+   BOOST_CHECK_EQUAL((a + b <= b + a), true);
+   BOOST_CHECK_EQUAL((a + b < b + a), false);
+   BOOST_CHECK_EQUAL((a + b >= b + a), true);
+   BOOST_CHECK_EQUAL((a + b > b + a), false);
+
+   BOOST_CHECK_EQUAL((8 == b + a), false);
+   BOOST_CHECK_EQUAL((8 != b + a), true);
+   BOOST_CHECK_EQUAL((8 <= b + a), true);
+   BOOST_CHECK_EQUAL((8 < b + a), true);
+   BOOST_CHECK_EQUAL((8 >= b + a), false);
+   BOOST_CHECK_EQUAL((8 > b + a), false);
+   BOOST_CHECK_EQUAL((800 == b + a), false);
+   BOOST_CHECK_EQUAL((800 != b + a), true);
+   BOOST_CHECK_EQUAL((800 >= b + a), true);
+   BOOST_CHECK_EQUAL((800 > b + a), true);
+   BOOST_CHECK_EQUAL((800 <= b + a), false);
+   BOOST_CHECK_EQUAL((800 < b + a), false);
+   BOOST_CHECK_EQUAL((72 == b + a), true);
+   BOOST_CHECK_EQUAL((72 != b + a), false);
+   BOOST_CHECK_EQUAL((72 <= b + a), true);
+   BOOST_CHECK_EQUAL((72 < b + a), false);
+   BOOST_CHECK_EQUAL((72 >= b + a), true);
+   BOOST_CHECK_EQUAL((72 > b + a), false);
+
+   BOOST_CHECK_EQUAL((b + a == 8), false);
+   BOOST_CHECK_EQUAL((b + a != 8), true);
+   BOOST_CHECK_EQUAL((b + a >= 8), true);
+   BOOST_CHECK_EQUAL((b + a > 8), true);
+   BOOST_CHECK_EQUAL((b + a <= 8), false);
+   BOOST_CHECK_EQUAL((b + a < 8), false);
+   BOOST_CHECK_EQUAL((b + a == 800), false);
+   BOOST_CHECK_EQUAL((b + a != 800), true);
+   BOOST_CHECK_EQUAL((b + a <= 800), true);
+   BOOST_CHECK_EQUAL((b + a < 800), true);
+   BOOST_CHECK_EQUAL((b + a >= 800), false);
+   BOOST_CHECK_EQUAL((b + a > 800), false);
+   BOOST_CHECK_EQUAL((b + a == 72), true);
+   BOOST_CHECK_EQUAL((b + a != 72), false);
+   BOOST_CHECK_EQUAL((b + a >= 72), true);
+   BOOST_CHECK_EQUAL((b + a > 72), false);
+   BOOST_CHECK_EQUAL((b + a <= 72), true);
+   BOOST_CHECK_EQUAL((b + a < 72), false);
+
+   T c;
+   //
+   // min and max overloads:
+   //
+#if !defined(min) && !defined(max)
+   using std::max;
+   using std::min;
+   a = 2;
+   b = 5;
+   c = 6;
+   BOOST_CHECK_EQUAL(min(a, b), a);
+   BOOST_CHECK_EQUAL(min(b, a), a);
+   BOOST_CHECK_EQUAL(max(a, b), b);
+   BOOST_CHECK_EQUAL(max(b, a), b);
+   BOOST_CHECK_EQUAL(min(a, b + c), a);
+   BOOST_CHECK_EQUAL(min(b + c, a), a);
+   BOOST_CHECK_EQUAL(min(a, c - b), 1);
+   BOOST_CHECK_EQUAL(min(c - b, a), 1);
+   BOOST_CHECK_EQUAL(max(a, b + c), 11);
+   BOOST_CHECK_EQUAL(max(b + c, a), 11);
+   BOOST_CHECK_EQUAL(max(a, c - b), a);
+   BOOST_CHECK_EQUAL(max(c - b, a), a);
+   BOOST_CHECK_EQUAL(min(a + b, b + c), 7);
+   BOOST_CHECK_EQUAL(min(b + c, a + b), 7);
+   BOOST_CHECK_EQUAL(max(a + b, b + c), 11);
+   BOOST_CHECK_EQUAL(max(b + c, a + b), 11);
+   BOOST_CHECK_EQUAL(min(a + b, c - a), 4);
+   BOOST_CHECK_EQUAL(min(c - a, a + b), 4);
+   BOOST_CHECK_EQUAL(max(a + b, c - a), 7);
+   BOOST_CHECK_EQUAL(max(c - a, a + b), 7);
+
+   long l1(2), l2(3), l3;
+   l3 = min(l1, l2) + max(l1, l2) + max<long>(l1, l2) + min<long>(l1, l2);
+   BOOST_CHECK_EQUAL(l3, 10);
+
+#endif
+
+
+}
+
 template <class Real>
 void test()
 {
@@ -2012,6 +2652,11 @@ void test()
    boost::mpl::bool_<boost::multiprecision::is_number<Real>::value && !boost::is_same<related_type, Real>::value>  tag2;
 
    test_mixed<Real, related_type>(tag2);
+
+   boost::mpl::bool_<boost::multiprecision::is_number<Real>::value && (boost::multiprecision::number_category<Real>::value == boost::multiprecision::number_kind_complex)> complex_tag;
+   test_mixed<Real, std::complex<float> >(complex_tag);
+   test_mixed<Real, std::complex<double> >(complex_tag);
+   test_mixed<Real, std::complex<long double> >(complex_tag);
 
 #endif
    //
@@ -2171,73 +2816,7 @@ void test()
    //
    // Comparisons:
    //
-   BOOST_CHECK_EQUAL((a == b) ,  false);
-   BOOST_CHECK_EQUAL((a != b) ,  true);
-   BOOST_CHECK_EQUAL((a <= b) ,  true);
-   BOOST_CHECK_EQUAL((a < b) ,  true);
-   BOOST_CHECK_EQUAL((a >= b) ,  false);
-   BOOST_CHECK_EQUAL((a > b) ,  false);
-
-   BOOST_CHECK_EQUAL((a+b == b) ,  false);
-   BOOST_CHECK_EQUAL((a+b != b) ,  true);
-   BOOST_CHECK_EQUAL((a+b >= b) ,  true);
-   BOOST_CHECK_EQUAL((a+b > b) ,  true);
-   BOOST_CHECK_EQUAL((a+b <= b) ,  false);
-   BOOST_CHECK_EQUAL((a+b < b) ,  false);
-
-   BOOST_CHECK_EQUAL((a == b+a) ,  false);
-   BOOST_CHECK_EQUAL((a != b+a) ,  true);
-   BOOST_CHECK_EQUAL((a <= b+a) ,  true);
-   BOOST_CHECK_EQUAL((a < b+a) ,  true);
-   BOOST_CHECK_EQUAL((a >= b+a) ,  false);
-   BOOST_CHECK_EQUAL((a > b+a) ,  false);
-
-   BOOST_CHECK_EQUAL((a+b == b+a) ,  true);
-   BOOST_CHECK_EQUAL((a+b != b+a) ,  false);
-   BOOST_CHECK_EQUAL((a+b <= b+a) ,  true);
-   BOOST_CHECK_EQUAL((a+b < b+a) ,  false);
-   BOOST_CHECK_EQUAL((a+b >= b+a) ,  true);
-   BOOST_CHECK_EQUAL((a+b > b+a) ,  false);
-
-   BOOST_CHECK_EQUAL((8 == b+a) ,  false);
-   BOOST_CHECK_EQUAL((8 != b+a) ,  true);
-   BOOST_CHECK_EQUAL((8 <= b+a) ,  true);
-   BOOST_CHECK_EQUAL((8 < b+a) ,  true);
-   BOOST_CHECK_EQUAL((8 >= b+a) ,  false);
-   BOOST_CHECK_EQUAL((8 > b+a) ,  false);
-   BOOST_CHECK_EQUAL((800 == b+a) ,  false);
-   BOOST_CHECK_EQUAL((800 != b+a) ,  true);
-   BOOST_CHECK_EQUAL((800 >= b+a) ,  true);
-   BOOST_CHECK_EQUAL((800 > b+a) ,  true);
-   BOOST_CHECK_EQUAL((800 <= b+a) ,  false);
-   BOOST_CHECK_EQUAL((800 < b+a) ,  false);
-   BOOST_CHECK_EQUAL((72 == b+a) ,  true);
-   BOOST_CHECK_EQUAL((72 != b+a) ,  false);
-   BOOST_CHECK_EQUAL((72 <= b+a) ,  true);
-   BOOST_CHECK_EQUAL((72 < b+a) ,  false);
-   BOOST_CHECK_EQUAL((72 >= b+a) ,  true);
-   BOOST_CHECK_EQUAL((72 > b+a) ,  false);
-
-   BOOST_CHECK_EQUAL((b + a == 8), false);
-   BOOST_CHECK_EQUAL((b + a != 8), true);
-   BOOST_CHECK_EQUAL((b + a >= 8), true);
-   BOOST_CHECK_EQUAL((b + a > 8), true);
-   BOOST_CHECK_EQUAL((b + a <= 8), false);
-   BOOST_CHECK_EQUAL((b + a < 8), false);
-   BOOST_CHECK_EQUAL((b + a == 800), false);
-   BOOST_CHECK_EQUAL((b + a != 800), true);
-   BOOST_CHECK_EQUAL((b + a <= 800), true);
-   BOOST_CHECK_EQUAL((b + a < 800), true);
-   BOOST_CHECK_EQUAL((b + a >= 800), false);
-   BOOST_CHECK_EQUAL((b + a > 800), false);
-   BOOST_CHECK_EQUAL((b + a == 72), true);
-   BOOST_CHECK_EQUAL((b + a != 72), false);
-   BOOST_CHECK_EQUAL((b + a >= 72), true);
-   BOOST_CHECK_EQUAL((b + a > 72), false);
-   BOOST_CHECK_EQUAL((b + a <= 72), true);
-   BOOST_CHECK_EQUAL((b + a < 72), false);
-
-
+   test_relationals(a, b);
    test_members(a);
    //
    // Use in Boolean context:
@@ -2321,6 +2900,18 @@ void test()
 
    test_signed_ops<Real>(boost::mpl::bool_<std::numeric_limits<Real>::is_signed>());
    //
+   // Test hashing:
+   //
+   boost::hash<Real> hasher;
+   std::size_t s = hasher(a);
+   BOOST_CHECK_NE(s, 0);
+#ifndef BOOST_NO_CXX11_HDR_FUNCTIONAL
+   std::hash<Real> hasher2;
+   s = hasher2(a);
+   BOOST_CHECK_NE(s, 0);
+#endif
+
+   //
    // Test move:
    //
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
@@ -2338,41 +2929,6 @@ void test()
    BOOST_CHECK_EQUAL(c, 20);
    // Destructor of "a" checks destruction of moved-from-object...
    Real m3(static_cast<Real&&>(a));
-#endif
-   //
-   // min and max overloads:
-   //
-#if !defined(min) && !defined(max)
-   using std::max;
-   using std::min;
-   a = 2;
-   b = 5;
-   c = 6;
-   BOOST_CHECK_EQUAL(min(a, b), a);
-   BOOST_CHECK_EQUAL(min(b, a), a);
-   BOOST_CHECK_EQUAL(max(a, b), b);
-   BOOST_CHECK_EQUAL(max(b, a), b);
-   BOOST_CHECK_EQUAL(min(a, b + c), a);
-   BOOST_CHECK_EQUAL(min(b + c, a), a);
-   BOOST_CHECK_EQUAL(min(a, c - b), 1);
-   BOOST_CHECK_EQUAL(min(c - b, a), 1);
-   BOOST_CHECK_EQUAL(max(a, b + c), 11);
-   BOOST_CHECK_EQUAL(max(b + c, a), 11);
-   BOOST_CHECK_EQUAL(max(a, c - b), a);
-   BOOST_CHECK_EQUAL(max(c - b, a), a);
-   BOOST_CHECK_EQUAL(min(a + b, b + c), 7);
-   BOOST_CHECK_EQUAL(min(b + c, a + b), 7);
-   BOOST_CHECK_EQUAL(max(a + b, b + c), 11);
-   BOOST_CHECK_EQUAL(max(b + c, a + b), 11);
-   BOOST_CHECK_EQUAL(min(a + b, c - a), 4);
-   BOOST_CHECK_EQUAL(min(c - a, a + b), 4);
-   BOOST_CHECK_EQUAL(max(a + b, c - a), 7);
-   BOOST_CHECK_EQUAL(max(c - a, a + b), 7);
-
-   long l1(2), l2(3), l3;
-   l3 = min(l1, l2) + max(l1, l2) + max<long>(l1, l2) + min<long>(l1, l2);
-   BOOST_CHECK_EQUAL(l3, 10);
-
 #endif
    //
    // Bug cases, self assignment first:
@@ -2403,4 +2959,3 @@ void test()
    a = (a + a) * a;
    BOOST_CHECK_EQUAL(a, 8);
 }
-

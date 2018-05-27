@@ -28,25 +28,26 @@
 </h2></div></div></div>
 <p>
       The Multiprecision Library provides <a class="link" href="tut/ints.html" title="Integer Types">integer</a>,
-      <a class="link" href="tut/rational.html" title="Rational Number Types">rational</a> and <a class="link" href="tut/floats.html" title="floating-point Numbers">floating-point</a> types in C++
-      that have more range and precision than C++'s ordinary built-in types. The
-      big number types in Multiprecision can be used with a wide selection of basic
-      mathematical operations, elementary transcendental functions as well as the
-      functions in Boost.Math. The Multiprecision types can also interoperate with
-      the built-in types in C++ using clearly defined conversion rules. This allows
-      Boost.Multiprecision to be used for all kinds of mathematical calculations
+      <a class="link" href="tut/rational.html" title="Rational Number Types">rational</a>, <a class="link" href="tut/floats.html" title="floating-point Numbers">floating-point</a>,
+      and <a class="link" href="tut/complex.html" title="Complex Number Types">complex</a> types in
+      C++ that have more range and precision than C++'s ordinary built-in types.
+      The big number types in Multiprecision can be used with a wide selection of
+      basic mathematical operations, elementary transcendental functions as well
+      as the functions in Boost.Math. The Multiprecision types can also interoperate
+      with the built-in types in C++ using clearly defined conversion rules. This
+      allows Boost.Multiprecision to be used for all kinds of mathematical calculations
       involving integer, rational and floating-point types requiring extended range
       and precision.
     </p>
 <p>
       Multiprecision consists of a generic interface to the mathematics of large
       numbers as well as a selection of big number back ends, with support for integer,
-      rational and floating-point types. Boost.Multiprecision provides a selection
-      of back ends provided off-the-rack in including interfaces to GMP, MPFR, MPIR,
-      TomMath as well as its own collection of Boost-licensed, header-only back ends
-      for integers, rationals and floats. In addition, user-defined back ends can
-      be created and used with the interface of Multiprecision, provided the class
-      implementation adheres to the necessary <a class="link" href="ref/backendconc.html" title="Backend Requirements">concepts</a>.
+      rational, floating-point, and complex types. Boost.Multiprecision provides
+      a selection of back ends provided off-the-rack in including interfaces to GMP,
+      MPFR, MPIR, MPC, TomMath as well as its own collection of Boost-licensed, header-only
+      back ends for integers, rationals and floats. In addition, user-defined back
+      ends can be created and used with the interface of Multiprecision, provided
+      the class implementation adheres to the necessary <a class="link" href="ref/backendconc.html" title="Backend Requirements">concepts</a>.
     </p>
 <p>
       Depending upon the number type, precision may be arbitrarily large (limited
@@ -79,9 +80,10 @@
 <p>
       Should you just wish to cut to the chase and use a fully Boost-licensed number
       type, then skip to <a class="link" href="tut/ints/cpp_int.html" title="cpp_int">cpp_int</a>
-      for multiprecision integers, <a class="link" href="tut/floats/cpp_dec_float.html" title="cpp_dec_float">cpp_dec_float</a>
-      for multiprecision floating-point types and <a class="link" href="tut/rational/cpp_rational.html" title="cpp_rational">cpp_rational</a>
-      for rational types.
+      for multiprecision integers, <a class="link" href="tut/rational/cpp_rational.html" title="cpp_rational">cpp_rational</a>
+      for rational types, <a class="link" href="tut/floats/cpp_dec_float.html" title="cpp_dec_float">cpp_dec_float</a>
+      for multiprecision floating-point types and <a class="link" href="tut/complex/cpp_complex.html" title="cpp_complex">cpp_complex</a>
+      for complex types.
     </p>
 <p>
       The library is often used via one of the predefined typedefs: for example if
@@ -145,7 +147,7 @@
       However conversions that are inherently lossy are either declared explicit
       or else forbidden altogether:
     </p>
-<pre class="programlisting"><span class="identifier">d</span> <span class="special">=</span> <span class="number">3.14</span><span class="special">;</span>  <span class="comment">// Error implicit conversion from float not allowed.</span>
+<pre class="programlisting"><span class="identifier">d</span> <span class="special">=</span> <span class="number">3.14</span><span class="special">;</span>  <span class="comment">// Error implicit conversion from double not allowed.</span>
 <span class="identifier">d</span> <span class="special">=</span> <span class="keyword">static_cast</span><span class="special">&lt;</span><span class="identifier">mp</span><span class="special">::</span><span class="identifier">int512_t</span><span class="special">&gt;(</span><span class="number">3.14</span><span class="special">);</span>  <span class="comment">// OK explicit construction is allowed</span>
 </pre>
 <p>
@@ -179,12 +181,12 @@
 <p>
       These operator overloads ensure that many expressions can be evaluated without
       actually generating any temporaries. However, there are still many simple expressions
-      such as:
+      such as
     </p>
 <pre class="programlisting"><span class="identifier">a</span> <span class="special">=</span> <span class="identifier">b</span> <span class="special">*</span> <span class="identifier">c</span><span class="special">;</span>
 </pre>
 <p>
-      Which don't noticeably benefit from move support. Therefore, optimal performance
+      which don't noticeably benefit from move support. Therefore, optimal performance
       comes from having both move-support, and expression templates enabled.
     </p>
 <p>
@@ -380,7 +382,7 @@
       </p>
 <p>
         In this situation the integer literal is stored directly in the expression
-        template - so it's use is OK here - but the cpp_dec_float_50 temporary is
+        template - so its use is OK here - but the cpp_dec_float_50 temporary is
         stored by reference and then destructed when the statement completes leaving
         a dangling reference.
       </p>
@@ -716,7 +718,7 @@
 <div class="footnotes">
 <br><hr style="width:100; align:left;">
 <div id="ftn.boost_multiprecision.intro.f0" class="footnote"><p><a href="#boost_multiprecision.intro.f0" class="para"><sup class="para">[1] </sup></a>
-        The actual number generated will depend on the compiler, how well it optimises
+        The actual number generated will depend on the compiler, how well it optimizes
         the code, and whether it supports rvalue references. The number of 11 temporaries
         was generated with Visual C++ 10
       </p></div>

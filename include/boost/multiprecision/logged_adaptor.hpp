@@ -62,6 +62,21 @@ public:
       m_value = o.m_value;
       log_postfix_event(m_value, "Copy construct");
    }
+#ifndef BOOST_NO_RVALUE_REFERENCES
+   logged_adaptor(logged_adaptor&& o)
+   {
+      log_prefix_event(m_value, o.value(), "Move construct");
+      m_value = static_cast<Backend&&>(o.m_value);
+      log_postfix_event(m_value, "Move construct");
+   }
+   logged_adaptor& operator = (logged_adaptor&& o)
+   {
+      log_prefix_event(m_value, o.value(), "Move Assignment");
+      m_value = static_cast<Backend&&>(o.m_value);
+      log_postfix_event(m_value, "Move construct");
+      return *this;
+   }
+#endif
    logged_adaptor& operator = (const logged_adaptor& o)
    {
       log_prefix_event(m_value, o.value(), "Assignment");
@@ -72,6 +87,12 @@ public:
    template <class T>
    logged_adaptor(const T& i, const typename enable_if_c<is_convertible<T, Backend>::value>::type* = 0)
       : m_value(i)
+   {
+      log_postfix_event(m_value, "construct from arithmetic type");
+   }
+   template <class T>
+   logged_adaptor(const logged_adaptor<T>& i, const typename enable_if_c<is_convertible<T, Backend>::value>::type* = 0)
+      : m_value(i.value())
    {
       log_postfix_event(m_value, "construct from arithmetic type");
    }
@@ -518,6 +539,35 @@ std::size_t hash_value(const logged_adaptor<Backend>& val)
 {
    return hash_value(val.value());
 }
+
+#define NON_MEMBER_COMPLEX_TO_REAL(name, str) \
+   template <class B1, class B2>\
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<B1>& result, const logged_adaptor<B2>& a)\
+   {\
+      using default_ops::BOOST_JOIN(eval_, name);\
+      log_prefix_event(a.value(), a.value(), str);\
+      BOOST_JOIN(eval_, name)(result.value(), a.value());\
+      log_postfix_event(result.value(), str);\
+   }\
+   template <class B1, class B2>\
+   inline void BOOST_JOIN(eval_, name)(B1& result, const logged_adaptor<B2>& a)\
+   {\
+      using default_ops::BOOST_JOIN(eval_, name);\
+      log_prefix_event(a.value(), a.value(), str);\
+      BOOST_JOIN(eval_, name)(result, a.value());\
+      log_postfix_event(result, str);\
+   }
+
+NON_MEMBER_COMPLEX_TO_REAL(real, "real")
+NON_MEMBER_COMPLEX_TO_REAL(imag, "imag")
+
+template <class T, class V, class U>
+inline void assign_components(logged_adaptor<T>& result, const V& v1, const U& v2)
+{
+   assign_components(result.value(), v1, v2);
+}
+
+
 
 } // namespace backends
 
