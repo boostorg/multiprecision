@@ -5574,6 +5574,19 @@ Windows Vista machine.
 [h4 Multiprecision-3.1.0 (Boost-1.68)]
 
 * Support added for complex multiprecision numbers.
+* Changed conversion to unsigned integer types to be truncating to match standard defined behaviour.
+* Correct bug in MPFR string formatting.
+* Fix undefined behaviour in cpp_dec_float conversion from long long.
+* Add support for Eigen interoperability.
+* float128.hpp: Fix Intel on Windows build.
+* Fix type used in temporaries when expanding expression templates containing mixed expressions.
+* Fix infinite loop in gmp_float to fixed-point string conversion.
+* Update the expression templates to issue static_asserts with better error messages when you try and do something unsupported.
+* Fix bug in cpp_int where incrementing to zero doesn't set the sign correctly.
+* Remove erroneous use of std::move, and rely on NVRO instead.
+* Fix up support for changes to MPIR-3.0.
+* Fix various conversion errors in cpp_bin_float when the exponent type is a `long long`, or else we're converting to
+an integer that is wider than we are.
 
 [h4 Multiprecision-3.0.0 (Boost-1.67)]
 

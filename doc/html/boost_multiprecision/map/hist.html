@@ -31,9 +31,52 @@
         <span class="phrase"><a name="boost_multiprecision.map.hist.multiprecision_3_1_0_boost_1_68"></a></span><a class="link" href="hist.html#boost_multiprecision.map.hist.multiprecision_3_1_0_boost_1_68">Multiprecision-3.1.0
         (Boost-1.68)</a>
       </h5>
-<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
             Support added for complex multiprecision numbers.
-          </li></ul></div>
+          </li>
+<li class="listitem">
+            Changed conversion to unsigned integer types to be truncating to match
+            standard defined behaviour.
+          </li>
+<li class="listitem">
+            Correct bug in MPFR string formatting.
+          </li>
+<li class="listitem">
+            Fix undefined behaviour in cpp_dec_float conversion from long long.
+          </li>
+<li class="listitem">
+            Add support for Eigen interoperability.
+          </li>
+<li class="listitem">
+            float128.hpp: Fix Intel on Windows build.
+          </li>
+<li class="listitem">
+            Fix type used in temporaries when expanding expression templates containing
+            mixed expressions.
+          </li>
+<li class="listitem">
+            Fix infinite loop in gmp_float to fixed-point string conversion.
+          </li>
+<li class="listitem">
+            Update the expression templates to issue static_asserts with better error
+            messages when you try and do something unsupported.
+          </li>
+<li class="listitem">
+            Fix bug in cpp_int where incrementing to zero doesn't set the sign correctly.
+          </li>
+<li class="listitem">
+            Remove erroneous use of std::move, and rely on NVRO instead.
+          </li>
+<li class="listitem">
+            Fix up support for changes to MPIR-3.0.
+          </li>
+<li class="listitem">
+            Fix various conversion errors in cpp_bin_float when the exponent type
+            is a <code class="computeroutput"><span class="keyword">long</span> <span class="keyword">long</span></code>,
+            or else we're converting to an integer that is wider than we are.
+          </li>
+</ul></div>
 <h5>
 <a name="boost_multiprecision.map.hist.h1"></a>
         <span class="phrase"><a name="boost_multiprecision.map.hist.multiprecision_3_0_0_boost_1_67"></a></span><a class="link" href="hist.html#boost_multiprecision.map.hist.multiprecision_3_0_0_boost_1_67">Multiprecision-3.0.0
