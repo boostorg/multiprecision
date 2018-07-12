@@ -5587,6 +5587,7 @@ Windows Vista machine.
 * Fix up support for changes to MPIR-3.0.
 * Fix various conversion errors in cpp_bin_float when the exponent type is a `long long`, or else we're converting to
 an integer that is wider than we are.
+* Fix compatibility issue with GCC-8 caused by the introduction of `std::byte`.
 
 [h4 Multiprecision-3.0.0 (Boost-1.67)]
 
