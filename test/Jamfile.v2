@@ -137,6 +137,7 @@ test-suite arithmetic_tests :
    [ run test_arithmetic_cpp_int_16.cpp no_eh_support ]
    [ run test_arithmetic_cpp_int_17.cpp no_eh_support ]
    [ run test_arithmetic_cpp_int_18.cpp no_eh_support ]
+   [ run test_arithmetic_cpp_int_19.cpp no_eh_support ]
    [ run test_arithmetic_cpp_int_br.cpp no_eh_support ]
 
    [ run test_arithmetic_ab_1.cpp no_eh_support ]

@@ -265,11 +265,13 @@ inline typename enable_if_c<number_category<R>::value == number_kind_integer>::t
 template <class IntBackend>
 inline bool eval_is_zero(const rational_adaptor<IntBackend>& val)
 {
+   using default_ops::eval_is_zero;
    return eval_is_zero(val.data().numerator().backend());
 }
 template <class IntBackend>
 inline int eval_get_sign(const rational_adaptor<IntBackend>& val)
 {
+   using default_ops::eval_get_sign;
    return eval_get_sign(val.data().numerator().backend());
 }
 

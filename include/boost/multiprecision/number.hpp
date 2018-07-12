@@ -17,6 +17,7 @@
 #include <boost/type_traits/is_unsigned.hpp>
 #include <boost/type_traits/is_floating_point.hpp>
 #include <boost/type_traits/is_integral.hpp>
+#include <boost/type_traits/is_complex.hpp>
 #include <boost/type_traits/make_unsigned.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/multiprecision/detail/generic_interconvert.hpp>
@@ -642,7 +643,7 @@ public:
 #if BOOST_WORKAROUND(BOOST_MSVC, < 1900) || (defined(__APPLE_CC__) && BOOST_WORKAROUND(__clang_major__, < 9))
    template <class T>
 #else
-   template <class T, class = typename boost::disable_if_c<std::is_constructible<T, self_type const&>::value || !std::is_default_constructible<T>::value, T>::type>
+   template <class T, class = typename boost::disable_if_c<boost::is_constructible<T, self_type const&>::value || !boost::is_default_constructible<T>::value || (!boost::is_arithmetic<T>::value && !boost::is_complex<T>::value), T>::type>
 #endif
    explicit operator T ()const
    {
