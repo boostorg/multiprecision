@@ -2114,6 +2114,20 @@ typename boost::enable_if_c<boost::multiprecision::number_category<Real>::value 
    BOOST_CHECK_EQUAL(imag(a + 0), 0);
    BOOST_CHECK_EQUAL(real(c + 0), 2);
    BOOST_CHECK_EQUAL(imag(c + 0), 3);
+   
+   // string construction:
+   a = Real("2");
+   BOOST_CHECK_EQUAL(real(a), 2);
+   BOOST_CHECK_EQUAL(imag(a), 0);
+   a = Real("(2)");
+   BOOST_CHECK_EQUAL(real(a), 2);
+   BOOST_CHECK_EQUAL(imag(a), 0);
+   a = Real("(,2)");
+   BOOST_CHECK_EQUAL(real(a), 0);
+   BOOST_CHECK_EQUAL(imag(a), 2);
+   a = Real("(2,3)");
+   BOOST_CHECK_EQUAL(real(a), 2);
+   BOOST_CHECK_EQUAL(imag(a), 3);
 
    typedef typename boost::multiprecision::component_type<Real>::type real_type;
 

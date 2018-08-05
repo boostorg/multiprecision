@@ -172,43 +172,51 @@ struct mpc_complex_imp
       if(m_data[0].re[0]._mpfr_d == 0)
          mpc_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
 
+      mpfr_float_backend<digits10> a, b;
+
       if(s && (*s == '('))
       {
-         mpfr_float_backend<digits10> a, b;
          std::string part;
          const char* p = ++s;
          while(*p && (*p != ',') && (*p != ')'))
             ++p;
-         part.assign(s + 1, p);
-         a = part.c_str();
+         part.assign(s, p);
+         if(part.size())
+            a = part.c_str();
+         else
+            a = 0uL;
          s = p;
-         if(*p && (*p != '}'))
+         if(*p && (*p != ')'))
          {
             ++p;
-            while(*p && (*p != ',') && (*p != ')'))
+            while(*p && (*p != ')'))
                ++p;
             part.assign(s + 1, p);
          }
          else
             part.erase();
-         b = part.c_str();
-
-         if(eval_fpclassify(a) == (int)FP_NAN)
-         {
-            mpc_set_fr(this->data(), a.data(), GMP_RNDN);
-         }
-         else if(eval_fpclassify(b) == (int)FP_NAN)
-         {
-            mpc_set_fr(this->data(), b.data(), GMP_RNDN);
-         }
+         if(part.size())
+            b = part.c_str();
          else
-         {
-            mpc_set_fr_fr(m_data, a.data(), b.data(), GMP_RNDN);
-         }
+            b = 0uL;
       }
-      else if(mpc_set_str(m_data, s, 10, GMP_RNDN) != 0)
+      else
       {
-         BOOST_THROW_EXCEPTION(std::runtime_error(std::string("Unable to parse string \"") + s + std::string("\"as a valid floating point number.")));
+         a = s;
+         b = 0uL;
+      }
+
+      if(eval_fpclassify(a) == (int)FP_NAN)
+      {
+         mpc_set_fr(this->data(), a.data(), GMP_RNDN);
+      }
+      else if(eval_fpclassify(b) == (int)FP_NAN)
+      {
+         mpc_set_fr(this->data(), b.data(), GMP_RNDN);
+      }
+      else
+      {
+         mpc_set_fr_fr(m_data, a.data(), b.data(), GMP_RNDN);
       }
       return *this;
    }
