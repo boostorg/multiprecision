@@ -63,7 +63,7 @@ struct mpc_complex_imp
 
    mpc_complex_imp(const mpc_complex_imp& o)
    {
-      mpc_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
+      mpc_init2(m_data, mpc_get_prec(o.m_data));
       if(o.m_data[0].re[0]._mpfr_d)
          mpc_set(m_data, o.m_data, GMP_RNDN);
    }
@@ -76,10 +76,16 @@ struct mpc_complex_imp
 #endif
    mpc_complex_imp& operator = (const mpc_complex_imp& o)
    {
-      if(m_data[0].re[0]._mpfr_d == 0)
-         mpc_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
-      if(o.m_data[0].re[0]._mpfr_d)
-         mpc_set(m_data, o.m_data, GMP_RNDD);
+      if (o.m_data[0].re[0]._mpfr_d)
+      {
+         if (m_data[0].re[0]._mpfr_d == 0)
+            mpc_init2(m_data, mpc_get_prec(o.m_data));
+         else
+         {
+            mpc_set_precision(m_data, mpc_get_prec(o.m_data));
+            mpc_set(m_data, o.m_data, GMP_RNDD);
+         }
+      }
       return *this;
    }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
@@ -1119,12 +1125,14 @@ inline void eval_proj(mpc_complex_backend<Digits10>& result, const mpc_complex_b
 template <unsigned Digits10>
 inline void eval_real(mpfr_float_backend<Digits10>& result, const mpc_complex_backend<Digits10>& arg)
 {
-   mpc_real(result.data(), arg.data(), GMP_RNDN);
+   mpfr_set_prec(result.data(), mpfr_get_prec(mpc_realref(arg.data())));
+   mpfr_set(result.data(), mpc_realref(arg.data()), GMP_RNDN);
 }
 template <unsigned Digits10>
 inline void eval_imag(mpfr_float_backend<Digits10>& result, const mpc_complex_backend<Digits10>& arg)
 {
-   mpc_imag(result.data(), arg.data(), GMP_RNDN);
+   mpfr_set_prec(result.data(), mpfr_get_prec(mpc_imagref(arg.data())));
+   mpfr_set(result.data(), mpc_imagref(arg.data()), GMP_RNDN);
 }
 
 template <unsigned Digits10>

@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+#///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2011 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -93,7 +93,7 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
 
    mpfr_float_imp(const mpfr_float_imp& o)
    {
-      mpfr_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
+      mpfr_init2(m_data, mpfr_get_prec(o.m_data));
       if(o.m_data[0]._mpfr_d)
          mpfr_set(m_data, o.m_data, GMP_RNDN);
    }
@@ -106,10 +106,16 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
 #endif
    mpfr_float_imp& operator = (const mpfr_float_imp& o)
    {
-      if(m_data[0]._mpfr_d == 0)
-         mpfr_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
-      if(o.m_data[0]._mpfr_d)
-         mpfr_set(m_data, o.m_data, GMP_RNDN);
+      if (o.m_data[0]._mpfr_d)
+      {
+         if (m_data[0]._mpfr_d == 0)
+            mpfr_init2(m_data, mpfr_get_prec(o.m_data));
+         else
+         {
+            mpfr_set_prec(m_data, mpfr_get_prec(o.m_data));
+            mpfr_set(m_data, o.m_data, GMP_RNDN);
+         }
+      }
       return *this;
    }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
