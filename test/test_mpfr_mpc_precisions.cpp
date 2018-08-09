@@ -39,7 +39,7 @@ int main()
       mpfr_float b(2);
       BOOST_CHECK_EQUAL(b.precision(), 20);
       b = a;
-      BOOST_CHECK_EQUAL(b.precision(), 100);
+      BOOST_CHECK_EQUAL(b.precision(), 20);
    }
    {
       // test assignment from rvalue:
@@ -69,7 +69,7 @@ int main()
       mpc_complex b(2);
       BOOST_CHECK_EQUAL(b.precision(), 20);
       b = ca;
-      BOOST_CHECK_EQUAL(b.precision(), 100);
+      BOOST_CHECK_EQUAL(b.precision(), 20);
    }
    {
       // test assignment from rvalue:
@@ -91,6 +91,9 @@ int main()
    // real and imaginary:
    BOOST_CHECK_EQUAL(ca.real().precision(), 100);
    BOOST_CHECK_EQUAL(ca.imag().precision(), 100);
+   BOOST_CHECK_EQUAL(real(ca).precision(), 100);
+   BOOST_CHECK_EQUAL(imag(ca).precision(), 100);
+   // BOOST_CHECK_EQUAL(mpc_complex(conj(ca)).precision(), 100);
    // What happens to arithmetic if the precision has changed??
    //BOOST_CHECK_EQUAL(norm(ca).precision(), 100);
 

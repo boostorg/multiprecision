@@ -76,15 +76,11 @@ struct mpc_complex_imp
 #endif
    mpc_complex_imp& operator = (const mpc_complex_imp& o)
    {
-      if (o.m_data[0].re[0]._mpfr_d)
+      if( (o.m_data[0].re[0]._mpfr_d) && (this != &o) )
       {
          if (m_data[0].re[0]._mpfr_d == 0)
             mpc_init2(m_data, mpc_get_prec(o.m_data));
-         else
-         {
-            mpc_set_precision(m_data, mpc_get_prec(o.m_data));
-            mpc_set(m_data, o.m_data, GMP_RNDD);
-         }
+         mpc_set(m_data, o.m_data, GMP_RNDD);
       }
       return *this;
    }
@@ -475,7 +471,7 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
    {
       if (this != &o)
       {
-         mpc_set_prec(this->m_data, mpc_get_prec(o.data()));
+         //mpc_set_prec(this->m_data, mpc_get_prec(o.data()));
          mpc_set(this->m_data, o.data(), GMP_RNDN);
       }
       return *this;

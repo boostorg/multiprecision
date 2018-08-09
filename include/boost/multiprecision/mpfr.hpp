@@ -106,15 +106,11 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
 #endif
    mpfr_float_imp& operator = (const mpfr_float_imp& o)
    {
-      if (o.m_data[0]._mpfr_d)
+      if( (o.m_data[0]._mpfr_d) && (this != &o) )
       {
          if (m_data[0]._mpfr_d == 0)
             mpfr_init2(m_data, mpfr_get_prec(o.m_data));
-         else
-         {
-            mpfr_set_prec(m_data, mpfr_get_prec(o.m_data));
-            mpfr_set(m_data, o.m_data, GMP_RNDN);
-         }
+         mpfr_set(m_data, o.m_data, GMP_RNDN);
       }
       return *this;
    }
@@ -852,8 +848,6 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
       {
          if(this->m_data[0]._mpfr_d == 0)
             mpfr_init2(this->m_data, mpfr_get_prec(o.data()));
-         else
-            mpfr_set_prec(this->m_data, mpfr_get_prec(o.data()));
          mpfr_set(this->m_data, o.data(), GMP_RNDN);
       }
       return *this;

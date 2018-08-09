@@ -35,6 +35,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -46,6 +48,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -57,6 +61,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -68,6 +74,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -79,6 +87,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -90,6 +100,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -101,6 +113,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -112,6 +126,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -123,6 +139,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -134,6 +152,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -145,6 +165,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -156,6 +178,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -167,6 +191,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -178,6 +204,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -189,6 +217,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -200,6 +230,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -211,6 +243,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -222,6 +256,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -233,6 +269,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -244,6 +282,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -255,6 +295,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -266,6 +308,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -277,6 +321,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -288,6 +334,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -299,6 +347,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -310,6 +360,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -321,6 +373,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
     - os: linux
@@ -331,6 +385,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -342,6 +398,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -353,6 +411,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -364,6 +424,8 @@ matrix:
             - g++-6
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -375,6 +437,8 @@ matrix:
             - g++-5
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -386,6 +450,8 @@ matrix:
             - g++-5
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -397,6 +463,8 @@ matrix:
             - g++-5
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -408,6 +476,8 @@ matrix:
             - g++-5
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -419,6 +489,8 @@ matrix:
             - g++-5
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -430,6 +502,8 @@ matrix:
             - g++-5
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -441,6 +515,8 @@ matrix:
             - g++-5
             - libgmp-dev
             - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -453,6 +529,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -465,6 +542,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -477,6 +555,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -489,6 +568,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -501,6 +581,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -513,6 +594,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -525,6 +607,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -537,6 +620,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -549,6 +633,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -561,6 +646,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -573,6 +659,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -585,6 +672,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -597,6 +685,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -609,6 +698,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -621,6 +711,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -633,6 +724,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -645,6 +737,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -657,6 +750,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -669,6 +763,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -681,6 +776,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -693,6 +789,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -705,6 +802,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -717,6 +815,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -729,6 +828,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -741,6 +841,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -753,6 +854,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -765,6 +867,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
     - os: linux
@@ -776,6 +879,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -788,6 +892,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -800,6 +905,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -812,6 +918,7 @@ matrix:
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
+            - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
 

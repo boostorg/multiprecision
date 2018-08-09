@@ -347,6 +347,14 @@ test-suite functions_and_limits :
                [ check-target-builds ../config//has_mpfr : : <build>no ]
               : test_move_mpfr ]
 
+      [ run test_move.cpp mpc mpfr gmp no_eh_support
+              : # command line
+              : # input files
+              : # requirements
+	            <define>TEST_MPC
+               [ check-target-builds ../config//has_mpc : : <build>no ]
+              : test_move_mpc ]
+
       [ run test_move.cpp gmp no_eh_support
               : # command line
               : # input files
