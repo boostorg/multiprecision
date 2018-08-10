@@ -38,6 +38,15 @@ namespace backends{
 namespace detail{
 
 template <unsigned digits10>
+inline typename boost::enable_if_c<digits10>::type copy_precision(mpfr_float_backend<digits10>&, const mpc_complex_backend<digits10>&) {}
+template <unsigned digits10>
+inline typename boost::disable_if_c<digits10>::type copy_precision(mpfr_float_backend<digits10>& a, const mpc_complex_backend<digits10>& b)
+{
+   if (a.precision() != b.precision())
+      a.precision(b.precision());
+}
+
+template <unsigned digits10>
 struct mpc_complex_imp
 {
 #ifdef BOOST_HAS_LONG_LONG
@@ -175,6 +184,8 @@ struct mpc_complex_imp
          mpc_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
 
       mpfr_float_backend<digits10> a, b;
+      copy_precision(a, static_cast<mpc_complex_backend<digits10>const&>(*this));
+      copy_precision(b, static_cast<mpc_complex_backend<digits10>const&>(*this));
 
       if(s && (*s == '('))
       {
