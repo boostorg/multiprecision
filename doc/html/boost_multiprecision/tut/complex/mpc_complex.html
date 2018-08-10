@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
 <title>mpc_complex</title>
 <link rel="stylesheet" href="../../../../../../../doc/src/boostbook.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.77.1">
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
 <link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
 <link rel="up" href="../complex.html" title="Complex Number Types">
 <link rel="prev" href="cpp_complex.html" title="cpp_complex">
@@ -136,6 +136,15 @@
 <li class="listitem">
               Unlike <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">complex</span></code>, there are no literals for
               imaginary values.
+            </li>
+<li class="listitem">
+              When using the variable precision type <code class="computeroutput"><span class="identifier">mpc_complex</span></code>,
+              then copy construction and assignment <span class="emphasis"><em>copies the precision
+              of the source variable</em></span>. Likewise move construction and assignment.
+              Regular assignment though, retains the precision of the <span class="emphasis"><em>destination</em></span>
+              variable. This latter behaviour makes it possible to perform arithmetic
+              at a differing precision by assigning to variables that were constructed
+              with the precision desired.
             </li>
 </ul></div>
 <h6>

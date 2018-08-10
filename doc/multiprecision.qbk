@@ -970,6 +970,10 @@ Things you should know when using this type:
 * Conversion from a string results in a `std::runtime_error` being thrown if the string can not be interpreted
 as a valid floating-point number.
 * Division by zero results in an infinity.
+* When using the variable precision type `mpfr_float`, then copy construction and assignment ['copies the precision
+of the source variable].  Likewise move construction and assignment.  Regular assignment though, retains the precision
+of the ['destination] variable.  This latter behaviour makes it possible to perform arithmetic at a differing precision
+by assigning to variables that were constructed with the precision desired.
 
 [h5 [mpfr] example:]
 
@@ -1357,6 +1361,10 @@ as a valid complex number.
 * Division by zero results in a complex-infinity.
 * Unlike `std::complex`, you can not use `reinterpret_cast` to treat this type as an array of the underlying floating point type.
 * Unlike `std::complex`, there are no literals for imaginary values.
+* When using the variable precision type `mpc_complex`, then copy construction and assignment ['copies the precision
+of the source variable].  Likewise move construction and assignment.  Regular assignment though, retains the precision
+of the ['destination] variable.  This latter behaviour makes it possible to perform arithmetic at a differing precision
+by assigning to variables that were constructed with the precision desired.
 
 [h5 [mpc] example:]
 
