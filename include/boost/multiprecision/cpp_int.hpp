@@ -1281,8 +1281,10 @@ private:
          *this = static_cast<limb_type>(1u);
       }
 
-      BOOST_ASSERT(!(boost::math::isinf)(a));
-      BOOST_ASSERT(!(boost::math::isnan)(a));
+      if ((boost::math::isinf)(a) || (boost::math::isnan)(a))
+      {
+         BOOST_THROW_EXCEPTION(std::runtime_error("Cannot convert a non-finite number to an integer."));
+      }
 
       int e;
       long double f, term;
