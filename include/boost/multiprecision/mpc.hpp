@@ -64,9 +64,9 @@ struct mpc_complex_imp
       mpc_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
       mpc_set_ui(m_data, 0u, GMP_RNDN);
    }
-   mpc_complex_imp(unsigned prec)
+   mpc_complex_imp(unsigned digits2)
    {
-      mpc_init2(m_data, multiprecision::detail::digits10_2_2(prec));
+      mpc_init2(m_data, digits2);
       mpc_set_ui(m_data, 0u, GMP_RNDN);
    }
 
@@ -480,7 +480,7 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
    // Construction with precision:
    template <class T, class U>
    mpc_complex_backend(const T& a, const U& b, unsigned digits10)
-      : detail::mpc_complex_imp<0>(digits10)
+      : detail::mpc_complex_imp<0>(multiprecision::detail::digits10_2_2(digits10))
    {
       using default_ops::assign_components;
       assign_components(*this, a, b);
@@ -510,21 +510,21 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
    }
    mpc_complex_backend& operator=(const mpc_t val)
    {
-      mpc_set_prec(this->m_data, mpc_get_prec(val));
+      // mpc_set_prec(this->m_data, mpc_get_prec(val));
       mpc_set(this->m_data, val, GMP_RNDN);
       return *this;
    }
    template <unsigned D>
    mpc_complex_backend& operator=(const mpc_complex_backend<D>& val)
    {
-      mpc_set_prec(this->m_data, mpc_get_prec(val.data()));
+      // mpc_set_prec(this->m_data, mpc_get_prec(val.data()));
       mpc_set(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
    template <unsigned D>
    mpc_complex_backend& operator=(const mpfr_float_backend<D>& val)
    {
-      mpc_set_prec(this->m_data, mpfr_get_prec(val.data()));
+      // mpc_set_prec(this->m_data, mpfr_get_prec(val.data()));
       mpc_set_fr(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }

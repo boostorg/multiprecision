@@ -117,6 +117,19 @@ int main()
       BOOST_CHECK_EQUAL(f150.precision(), 150);
    }
    //
+   // Copying precision:
+   //
+   {
+      mpc_complex c(ca.backend().data());
+      BOOST_CHECK_EQUAL(c.precision(), 100);
+      mpc_complex_100 c100(2);
+      mpc_complex d(c100);
+      BOOST_CHECK_EQUAL(d.precision(), 100);
+      mpfr_float_100 f100(2);
+      mpc_complex e(f100);
+      BOOST_CHECK_EQUAL(d.precision(), 100);
+   }
+   //
    // Check that the overloads for precision don't mess up 2-arg
    // construction:
    //

@@ -85,9 +85,9 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
       mpfr_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
       mpfr_set_ui(m_data, 0u, GMP_RNDN);
    }
-   mpfr_float_imp(unsigned dig10)
+   mpfr_float_imp(unsigned digits2)
    {
-      mpfr_init2(m_data, multiprecision::detail::digits10_2_2(dig10));
+      mpfr_init2(m_data, digits2);
       mpfr_set_ui(m_data, 0u, GMP_RNDN);
    }
 
@@ -816,7 +816,7 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
 #endif
    template <class V>
    mpfr_float_backend(const V& o, unsigned digits10)
-      : detail::mpfr_float_imp<0, allocate_dynamic>(digits10)
+      : detail::mpfr_float_imp<0, allocate_dynamic>(multiprecision::detail::digits10_2_2(digits10))
    {
       *this = o;
    }
@@ -870,8 +870,8 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
    {
       if(this->m_data[0]._mpfr_d == 0)
          mpfr_init2(this->m_data, mpfr_get_prec(val));
-      else
-         mpfr_set_prec(this->m_data, mpfr_get_prec(val));
+      //else
+      //   mpfr_set_prec(this->m_data, mpfr_get_prec(val));
       mpfr_set(this->m_data, val, GMP_RNDN);
       return *this;
    }
@@ -879,8 +879,8 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
    {
       if(this->m_data[0]._mpfr_d == 0)
          mpfr_init2(this->m_data, mpf_get_prec(val));
-      else
-         mpfr_set_prec(this->m_data, mpf_get_prec(val));
+      //else
+      //   mpfr_set_prec(this->m_data, mpf_get_prec(val));
       mpfr_set_f(this->m_data, val, GMP_RNDN);
       return *this;
    }
@@ -903,8 +903,8 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
    {
       if(this->m_data[0]._mpfr_d == 0)
          mpfr_init2(this->m_data, mpfr_get_prec(val.data()));
-      else
-         mpfr_set_prec(this->m_data, mpfr_get_prec(val.data()));
+      //else
+      //   mpfr_set_prec(this->m_data, mpfr_get_prec(val.data()));
       mpfr_set(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
@@ -913,8 +913,8 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
    {
       if(this->m_data[0]._mpfr_d == 0)
          mpfr_init2(this->m_data, mpf_get_prec(val.data()));
-      else
-         mpfr_set_prec(this->m_data, mpf_get_prec(val.data()));
+      //else
+      //   mpfr_set_prec(this->m_data, mpf_get_prec(val.data()));
       mpfr_set_f(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
