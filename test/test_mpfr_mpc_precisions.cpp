@@ -145,6 +145,22 @@ int main()
       mpc_complex c(2, 3, 100);
       BOOST_CHECK_EQUAL(c.precision(), 100);
    }
+   //
+   // From https://github.com/boostorg/multiprecision/issues/65
+   //
+   {
+      mpfr_float a(2);
+      a.precision(100);
+      BOOST_CHECK_EQUAL(a, 2);
+      BOOST_CHECK_EQUAL(a.precision(), 100);
+   }
+   {
+      mpc_complex a(2, 3);
+      a.precision(100);
+      BOOST_CHECK_EQUAL(a.real(), 2);
+      BOOST_CHECK_EQUAL(a.imag(), 3);
+      BOOST_CHECK_EQUAL(a.precision(), 100);
+   }
 
 
 

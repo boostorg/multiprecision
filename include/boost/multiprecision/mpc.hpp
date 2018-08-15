@@ -557,7 +557,8 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
    }
    void precision(unsigned digits10) BOOST_NOEXCEPT
    {
-      mpc_set_prec(this->m_data, multiprecision::detail::digits10_2_2((digits10)));
+      mpfr_prec_round(mpc_realref(this->m_data), multiprecision::detail::digits10_2_2((digits10)), GMP_RNDN);
+      mpfr_prec_round(mpc_imagref(this->m_data), multiprecision::detail::digits10_2_2((digits10)), GMP_RNDN);
    }
 };
 
