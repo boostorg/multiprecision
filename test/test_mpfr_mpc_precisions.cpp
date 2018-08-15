@@ -100,9 +100,39 @@ int main()
    BOOST_CHECK_EQUAL(ca.imag().precision(), 100);
    BOOST_CHECK_EQUAL(real(ca).precision(), 100);
    BOOST_CHECK_EQUAL(imag(ca).precision(), 100);
-   // BOOST_CHECK_EQUAL(mpc_complex(conj(ca)).precision(), 100);
-   // What happens to arithmetic if the precision has changed??
-   //BOOST_CHECK_EQUAL(norm(ca).precision(), 100);
+
+   //
+   // Construction at specific precision:
+   //
+   {
+      mpfr_float f150(mpfr_float(), 150u);
+      BOOST_CHECK_EQUAL(f150.precision(), 150);
+   }
+   {
+      mpfr_float f150(2, 150);
+      BOOST_CHECK_EQUAL(f150.precision(), 150);
+   }
+   {
+      mpfr_float f150("1.2", 150);
+      BOOST_CHECK_EQUAL(f150.precision(), 150);
+   }
+   //
+   // Check that the overloads for precision don't mess up 2-arg
+   // construction:
+   //
+   {
+      mpc_complex c(2, 3u);
+      BOOST_CHECK_EQUAL(c.real(), 2);
+      BOOST_CHECK_EQUAL(c.imag(), 3);
+   }
+   //
+   // 3-arg complex number construction with 3rd arg a precision:
+   //
+   {
+      mpc_complex c(2, 3, 100);
+      BOOST_CHECK_EQUAL(c.precision(), 100);
+   }
+
 
 
    return boost::report_errors();

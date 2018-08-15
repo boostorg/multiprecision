@@ -974,6 +974,8 @@ as a valid floating-point number.
 of the source variable].  Likewise move construction and assignment.  Regular assignment though, retains the precision
 of the ['destination] variable.  This latter behaviour makes it possible to perform arithmetic at a differing precision
 by assigning to variables that were constructed with the precision desired.
+* When constructing the variable precision type `mpfr_float` you can specify two arguments to the constructor - the first
+is the value to assign to the variable, the second is an unsigned integer specifying the precision in decimal places.
 
 [h5 [mpfr] example:]
 
@@ -1365,6 +1367,8 @@ as a valid complex number.
 of the source variable].  Likewise move construction and assignment.  Regular assignment though, retains the precision
 of the ['destination] variable.  This latter behaviour makes it possible to perform arithmetic at a differing precision
 by assigning to variables that were constructed with the precision desired.
+* When constructing the variable precision type `mpc_complex` then you can provide 3 arguments to the constructor - the first two
+are values for the real and imaginary parts respectively, the third is the precision of the variable in decimal places.
 
 [h5 [mpc] example:]
 

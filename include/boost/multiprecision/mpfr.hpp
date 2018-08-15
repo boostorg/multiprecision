@@ -85,9 +85,9 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
       mpfr_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
       mpfr_set_ui(m_data, 0u, GMP_RNDN);
    }
-   mpfr_float_imp(unsigned prec)
+   mpfr_float_imp(unsigned dig10)
    {
-      mpfr_init2(m_data, prec);
+      mpfr_init2(m_data, multiprecision::detail::digits10_2_2(dig10));
       mpfr_set_ui(m_data, 0u, GMP_RNDN);
    }
 
@@ -814,7 +814,8 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    mpfr_float_backend(mpfr_float_backend&& o) BOOST_NOEXCEPT : detail::mpfr_float_imp<0, allocate_dynamic>(static_cast<detail::mpfr_float_imp<0, allocate_dynamic>&&>(o)) {}
 #endif
-   mpfr_float_backend(const mpfr_float_backend& o, unsigned digits10)
+   template <class V>
+   mpfr_float_backend(const V& o, unsigned digits10)
       : detail::mpfr_float_imp<0, allocate_dynamic>(digits10)
    {
       *this = o;

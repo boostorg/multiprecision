@@ -67,7 +67,18 @@ public:
           BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<typename detail::canonical<V, Backend>::type const&>())))
 #endif
       : m_backend(canonical_value(v)) {}
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR number(const number& e, unsigned digits10) 
+   template <class V>
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR number(const V& v, unsigned digits10, typename boost::enable_if_c<
+      (boost::is_arithmetic<V>::value || is_same<std::string, V>::value || is_convertible<V, const char*>::value)
+      && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value
+      && (boost::multiprecision::number_category<Backend>::value != boost::multiprecision::number_kind_complex)
+      && (boost::multiprecision::number_category<Backend>::value != boost::multiprecision::number_kind_rational)
+#ifdef BOOST_HAS_FLOAT128
+      && !boost::is_same<V, __float128>::value
+#endif
+   >::type* = 0)
+      : m_backend(canonical_value(v), digits10) {}
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR number(const number& e, unsigned digits10)
       BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<Backend const&>(), std::declval<unsigned>())))
       : m_backend(e.m_backend, digits10){}
    template <class V>
@@ -88,6 +99,14 @@ public:
          >::type* = 0)
          BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<typename detail::canonical<V, Backend>::type const&>())))
       : m_backend(canonical_value(v)) {}
+   template <class V>
+   explicit BOOST_MP_FORCEINLINE BOOST_CONSTEXPR number(const V& v, unsigned digits10, typename boost::enable_if_c<
+      (boost::is_arithmetic<V>::value || is_same<std::string, V>::value || is_convertible<V, const char*>::value)
+      && detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value
+      && (boost::multiprecision::number_category<Backend>::value != boost::multiprecision::number_kind_complex)
+      && (boost::multiprecision::number_category<Backend>::value != boost::multiprecision::number_kind_rational)
+   >::type* = 0)
+      : m_backend(canonical_value(v), digits10) {}
    /*
    //
    // This conflicts with component based initialization (for rational and complex types)
@@ -142,6 +161,16 @@ public:
       using default_ops::assign_components;
       assign_components(m_backend, canonical_value(detail::evaluate_if_expression(v1)), canonical_value(detail::evaluate_if_expression(v2)));
    }
+
+   template <class V, class U>
+   BOOST_MP_FORCEINLINE number(const V& v1, const U& v2, unsigned digits10,
+      typename boost::enable_if_c<(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value && !is_same<typename component_type<self_type>::type, self_type>::value)>::type* = 0)
+      : m_backend(canonical_value(detail::evaluate_if_expression(v1)), canonical_value(detail::evaluate_if_expression(v2)), digits10) {}
+   template <class V, class U>
+   BOOST_MP_FORCEINLINE explicit number(const V& v1, const U& v2, unsigned digits10,
+      typename boost::enable_if_c<((is_constructible<value_type, V>::value || is_convertible<V, std::string>::value) && (is_constructible<value_type, U>::value || is_convertible<U, std::string>::value) && !is_same<typename component_type<self_type>::type, self_type>::value) && !(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value)>::type* = 0)
+      : m_backend(canonical_value(detail::evaluate_if_expression(v1)), canonical_value(detail::evaluate_if_expression(v2)), digits10){}
+
 
    template <class Other, expression_template_option ET>
    BOOST_MP_FORCEINLINE number(const number<Other, ET>& v1, const number<Other, ET>& v2, typename boost::enable_if<boost::is_convertible<Other, Backend> >::type* = 0)

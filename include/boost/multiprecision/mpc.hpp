@@ -66,7 +66,7 @@ struct mpc_complex_imp
    }
    mpc_complex_imp(unsigned prec)
    {
-      mpc_init2(m_data, prec);
+      mpc_init2(m_data, multiprecision::detail::digits10_2_2(prec));
       mpc_set_ui(m_data, 0u, GMP_RNDN);
    }
 
@@ -476,6 +476,14 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
       : detail::mpc_complex_imp<0>()
    {
       mpc_set_ld_ld(this->m_data, val.real(), val.imag(), GMP_RNDN);
+   }
+   // Construction with precision:
+   template <class T, class U>
+   mpc_complex_backend(const T& a, const U& b, unsigned digits10)
+      : detail::mpc_complex_imp<0>(digits10)
+   {
+      using default_ops::assign_components;
+      assign_components(*this, a, b);
    }
 
    mpc_complex_backend& operator=(const mpc_complex_backend& o)
