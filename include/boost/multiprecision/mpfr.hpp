@@ -820,6 +820,14 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
    {
       *this = o;
    }
+#ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
+   mpfr_float_backend(const std::string_view& o, unsigned digits10)
+      : detail::mpfr_float_imp<0, allocate_dynamic>(multiprecision::detail::digits10_2_2(digits10))
+   {
+      std::string s(o);
+      *this = s.c_str();
+   }
+#endif
    template <unsigned D>
    mpfr_float_backend(const mpfr_float_backend<D>& val)
       : detail::mpfr_float_imp<0, allocate_dynamic>(mpfr_get_prec(val.data()))

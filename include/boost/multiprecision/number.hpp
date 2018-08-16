@@ -27,6 +27,9 @@
 #include <istream>  // stream operators
 #include <cstdio>   // EOF
 #include <cctype>   // isspace
+#ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
+#include <string_view>
+#endif
 
 namespace boost{ namespace multiprecision{
 
@@ -107,18 +110,7 @@ public:
       && (boost::multiprecision::number_category<Backend>::value != boost::multiprecision::number_kind_rational)
    >::type* = 0)
       : m_backend(canonical_value(v), digits10) {}
-   /*
-   //
-   // This conflicts with component based initialization (for rational and complex types)
-   // which is arguably more useful.  Disabled for now.
-   //
-   template <class V>
-   number(V v, unsigned digits10, typename boost::enable_if<mpl::or_<boost::is_arithmetic<V>, is_same<std::string, V>, is_convertible<V, const char*> > >::type* dummy1 = 0)
-   {
-      m_backend.precision(digits10);
-      m_backend = canonical_value(v);
-   }
-   */
+
    template<expression_template_option ET>
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR number(const number<Backend, ET>& val)
       BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<Backend const&>()))) : m_backend(val.backend()) {}
@@ -161,6 +153,26 @@ public:
       using default_ops::assign_components;
       assign_components(m_backend, canonical_value(detail::evaluate_if_expression(v1)), canonical_value(detail::evaluate_if_expression(v2)));
    }
+#ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
+   //
+   // Support for new types in C++17
+   //
+   template <class Traits>
+   explicit inline number(const std::basic_string_view<char, Traits>& view)
+   {
+      using default_ops::assign_from_string_view; 
+      assign_from_string_view(this->backend(), view);
+   }
+   template <class Traits>
+   explicit inline number(const std::basic_string_view<char, Traits>& view_x, const std::basic_string_view<char, Traits>& view_y)
+   {
+      using default_ops::assign_from_string_view;
+      assign_from_string_view(this->backend(), view_x, view_y);
+   }
+   template <class Traits>
+   explicit BOOST_MP_FORCEINLINE number(const std::basic_string_view<char, Traits>& v, unsigned digits10)
+      : m_backend(canonical_value(v), digits10) {}
+#endif
 
    template <class V, class U>
    BOOST_MP_FORCEINLINE number(const V& v1, const U& v2, unsigned digits10,

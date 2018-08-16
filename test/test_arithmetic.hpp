@@ -2018,6 +2018,15 @@ typename boost::enable_if_c<boost::multiprecision::number_category<Real>::value 
       BOOST_CHECK_EQUAL(d.real(), 40.5);
       BOOST_CHECK_EQUAL(d.imag(), 2);
    }
+#ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
+   {
+      std::string sx("40.550"), sy("222");
+      std::string_view vx(sx.c_str(), 4), vy(sy.c_str(), 1);
+      Real d(vx, vy);
+      BOOST_CHECK_EQUAL(d.real(), 40.5);
+      BOOST_CHECK_EQUAL(d.imag(), 2);
+   }
+#endif
    {
       typename Real::value_type x(40.5), y(2);
       Real d(x, y);
@@ -2944,6 +2953,20 @@ void test()
    // Destructor of "a" checks destruction of moved-from-object...
    Real m3(static_cast<Real&&>(a));
 #endif
+   //
+   // string and string_view:
+   //
+   {
+      std::string s("2");
+      Real x(s);
+      BOOST_CHECK_EQUAL(x, 2);
+#ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
+      s = "20";
+      std::string_view v(s.c_str(), 1);
+      Real y(v);
+      BOOST_CHECK_EQUAL(y, 2);
+#endif
+   }
    //
    // Bug cases, self assignment first:
    //

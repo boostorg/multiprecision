@@ -16,6 +16,9 @@
 #include <boost/mpl/fold.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/type_traits/make_unsigned.hpp>
+#ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
+#include <string_view>
+#endif
 
 #ifndef INSTRUMENT_BACKEND
 #ifndef BOOST_MP_INSTRUMENT
@@ -844,7 +847,24 @@ inline void assign_components(T& result, const V& v1, const U& v2)
 {
    return assign_components_imp(result, v1, v2, typename number_category<T>::type());
 }
-
+#ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
+template <class Result, class Traits>
+inline void assign_from_string_view(Result& result, const std::basic_string_view<char, Traits>& view)
+{
+   // since most (all?) backends require a const char* to construct from, we just
+   // convert to that:
+   std::string s(view);
+   result = s.c_str();
+}
+template <class Result, class Traits>
+inline void assign_from_string_view(Result& result, const std::basic_string_view<char, Traits>& view_x, const std::basic_string_view<char, Traits>& view_y)
+{
+   // since most (all?) backends require a const char* to construct from, we just
+   // convert to that:
+   std::string x(view_x), y(view_y);
+   assign_components(result, x.c_str(), y.c_str());
+}
+#endif
 template <class R, int b>
 struct has_enough_bits
 {
