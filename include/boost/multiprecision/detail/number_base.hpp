@@ -42,6 +42,7 @@
 //
 #if !defined(BOOST_NO_CXX11_THREAD_LOCAL) && !defined(BOOST_INTEL) && !defined(__MINGW32__)
 #  define BOOST_MP_THREAD_LOCAL thread_local
+#  define BOOST_MP_USING_THREAD_LOCAL
 #else
 #  define BOOST_MP_THREAD_LOCAL
 #endif
