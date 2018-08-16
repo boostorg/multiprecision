@@ -298,13 +298,16 @@ const T& get_constant_pi()
 template <class T>
 const T& get_constant_one_over_epsilon()
 {
-   static const bool is_init = false;
-   static T result;
-   if (is_init == false)
+   static BOOST_MP_THREAD_LOCAL T result;
+   static BOOST_MP_THREAD_LOCAL bool b = false;
+   static BOOST_MP_THREAD_LOCAL long digits = boost::multiprecision::detail::digits2<number<T> >::value();
+   if(!b || (digits != boost::multiprecision::detail::digits2<number<T> >::value()))
    {
       typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
       result = static_cast<ui_type>(1u);
       eval_divide(result, std::numeric_limits<number<T> >::epsilon().backend());
+      b = true;
+      digits = boost::multiprecision::detail::digits2<number<T> >::value();
    }
 
    constant_initializer<T, &get_constant_one_over_epsilon<T> >::do_nothing();
