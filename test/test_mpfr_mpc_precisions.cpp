@@ -187,6 +187,47 @@ int main()
 
       BOOST_CHECK_EQUAL(z.precision(), 100);
    }
+   // Swap:
+   {
+      mpfr_float x(2, 100);  // 100 digits precision.
+      mpfr_float y(3, 50);   // 50 digits precision.
+      swap(x, y);
+      BOOST_CHECK_EQUAL(x, 3);
+      BOOST_CHECK_EQUAL(y, 2);
+      BOOST_CHECK_EQUAL(x.precision(), 50);
+      BOOST_CHECK_EQUAL(y.precision(), 100);
+      x.swap(y);
+      BOOST_CHECK_EQUAL(x, 2);
+      BOOST_CHECK_EQUAL(y, 3);
+      BOOST_CHECK_EQUAL(x.precision(), 100);
+      BOOST_CHECK_EQUAL(y.precision(), 50);
+
+      x = std::move(mpfr_float(y));
+      BOOST_CHECK_EQUAL(x, y);
+      BOOST_CHECK_EQUAL(x.precision(), y.precision());
+   }
+   {
+      mpc_complex x(2, 3, 100);  // 100 digits precision.
+      mpc_complex y(3, 4, 50);   // 50 digits precision.
+      swap(x, y);
+      BOOST_CHECK_EQUAL(x.real(), 3);
+      BOOST_CHECK_EQUAL(x.imag(), 4);
+      BOOST_CHECK_EQUAL(y.real(), 2);
+      BOOST_CHECK_EQUAL(y.imag(), 3);
+      BOOST_CHECK_EQUAL(x.precision(), 50);
+      BOOST_CHECK_EQUAL(y.precision(), 100);
+      x.swap(y);
+      BOOST_CHECK_EQUAL(x.real(), 2);
+      BOOST_CHECK_EQUAL(x.imag(), 3);
+      BOOST_CHECK_EQUAL(y.real(), 3);
+      BOOST_CHECK_EQUAL(y.imag(), 4);
+      BOOST_CHECK_EQUAL(x.precision(), 100);
+      BOOST_CHECK_EQUAL(y.precision(), 50);
+
+      x = std::move(mpc_complex(y));
+      BOOST_CHECK_EQUAL(x, y);
+      BOOST_CHECK_EQUAL(x.precision(), y.precision());
+   }
 
 
 

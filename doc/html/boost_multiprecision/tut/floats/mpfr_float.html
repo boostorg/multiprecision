@@ -233,6 +233,15 @@
               with the precision desired.
             </li>
 <li class="listitem">
+              If you want to assign both value and precision in the variable precision
+              mpfr_float type, the easiest way is to move assign a copy, as in:
+              <code class="computeroutput"><span class="identifier">x</span> <span class="special">=</span>
+              <span class="identifier">std</span><span class="special">::</span><span class="identifier">move</span><span class="special">(</span><span class="identifier">mpfr_float</span><span class="special">(</span><span class="identifier">y</span><span class="special">))</span></code>,
+              in fact the call to <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">move</span></code>
+              there is superfluous since the temporary copy is already an <span class="emphasis"><em>rvalue</em></span>,
+              but it helps express intent. Alternatively <code class="computeroutput"><span class="identifier">swap</span><span class="special">(</span><span class="identifier">x</span><span class="special">,</span> <span class="identifier">y</span><span class="special">)</span></code> will swap both values and precision.
+            </li>
+<li class="listitem">
               When constructing the variable precision type <code class="computeroutput"><span class="identifier">mpfr_float</span></code>
               you can specify two arguments to the constructor - the first is the
               value to assign to the variable, the second is an unsigned integer
