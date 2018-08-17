@@ -707,10 +707,11 @@ The following back-ends provide floating-point arithmetic:
    typedef number<cpp_bin_float<50> > cpp_bin_float_50;
    typedef number<cpp_bin_float<100> > cpp_bin_float_100;
 
-   typedef number<backends::cpp_bin_float<24, backends::digit_base_2, void, boost::int16_t, -126, 127>, et_off>       cpp_bin_float_single;
-   typedef number<backends::cpp_bin_float<53, backends::digit_base_2, void, boost::int16_t, -1022, 1023>, et_off>     cpp_bin_float_double;
-   typedef number<backends::cpp_bin_float<64, backends::digit_base_2, void, boost::int16_t, -16382, 16383>, et_off>   cpp_bin_float_double_extended;
-   typedef number<backends::cpp_bin_float<113, backends::digit_base_2, void, boost::int16_t, -16382, 16383>, et_off>  cpp_bin_float_quad;
+   typedef number<backends::cpp_bin_float<24, backends::digit_base_2, void, boost::int16_t, -126, 127>, et_off>         cpp_bin_float_single;
+   typedef number<backends::cpp_bin_float<53, backends::digit_base_2, void, boost::int16_t, -1022, 1023>, et_off>       cpp_bin_float_double;
+   typedef number<backends::cpp_bin_float<64, backends::digit_base_2, void, boost::int16_t, -16382, 16383>, et_off>     cpp_bin_float_double_extended;
+   typedef number<backends::cpp_bin_float<113, backends::digit_base_2, void, boost::int16_t, -16382, 16383>, et_off>    cpp_bin_float_quad;
+   typedef number<backends::cpp_bin_float<237, backends::digit_base_2, void, boost::int32_t, -262142, 262143>, et_off>  cpp_bin_float_oct;
 
    }} // namespaces
 
@@ -725,8 +726,8 @@ respectively.
 Optionally, you can specify whether the precision is specified in decimal digits or binary bits - for example
 to declare a `cpp_bin_float` with exactly the same precision as `double` one would use
 `number<cpp_bin_float<53, digit_base_2> >`.  The typedefs `cpp_bin_float_single`, `cpp_bin_float_double`,
-`cpp_bin_float_quad` and `cpp_bin_float_double_extended` provide
-software analogues of the IEEE single, double and quad float data types, plus the Intel-extended-double type respectively.
+`cpp_bin_float_quad`, `cpp_bin_float_oct` and `cpp_bin_float_double_extended` provide
+software analogues of the IEEE single, double, quad and octuple float data types, plus the Intel-extended-double type respectively.
 Note that while these types are functionally equivalent to the native IEEE types, but they do not have the same size
 or bit-layout as true IEEE compatible types.
 
@@ -1244,6 +1245,7 @@ The following backends provide complex number arithmetic:
       typedef cpp_complex<53, backends::digit_base_2, void, boost::int16_t, -1022, 1023> cpp_complex_double;
       typedef cpp_complex<64, backends::digit_base_2, void, boost::int16_t, -16382, 16383> cpp_complex_extended;
       typedef cpp_complex<113, backends::digit_base_2, void, boost::int16_t, -16382, 16383> cpp_complex_quad;
+      typedef cpp_complex<237, backends::digit_base_2, void, boost::int32_t, -262142, 262143> cpp_complex_oct;
 
 
    }} // namespaces
@@ -1260,8 +1262,8 @@ respectively.
 Optionally, you can specify whether the precision is specified in decimal digits or binary bits - for example
 to declare a `cpp_complex` with exactly the same precision as `std::complex<double>` one would use
 `cpp_complex<53, digit_base_2>`.  The typedefs `cpp_complex_single`, `cpp_complex_double`,
-`cpp_complex_quad` and `cpp_complex_double_extended` provide
-software analogues of the IEEE single, double and quad float data types, plus the Intel-extended-double type respectively.
+`cpp_complex_quad`, `cpp_complex_oct` and `cpp_complex_double_extended` provide
+software analogues of the IEEE single, double, quad and octuple float data types, plus the Intel-extended-double type respectively.
 Note that while these types are functionally equivalent to the native IEEE types, but they do not have the same size
 or bit-layout as true IEEE compatible types.
 
@@ -4290,10 +4292,11 @@ More information on this type can be found in the [link boost_multiprecision.tut
    typedef number<cpp_bin_float<50> > cpp_bin_float_50;
    typedef number<cpp_bin_float<100> > cpp_bin_float_100;
 
-   typedef number<backends::cpp_bin_float<24, backends::digit_base_2, void, boost::int16_t, -126, 127>, et_off>       cpp_bin_float_single;
-   typedef number<backends::cpp_bin_float<53, backends::digit_base_2, void, boost::int16_t, -1022, 1023>, et_off>     cpp_bin_float_double;
-   typedef number<backends::cpp_bin_float<64, backends::digit_base_2, void, boost::int16_t, -16382, 16383>, et_off>   cpp_bin_float_double_extended;
-   typedef number<backends::cpp_bin_float<113, backends::digit_base_2, void, boost::int16_t, -16382, 16383>, et_off>  cpp_bin_float_quad;
+   typedef number<backends::cpp_bin_float<24, backends::digit_base_2, void, boost::int16_t, -126, 127>, et_off>         cpp_bin_float_single;
+   typedef number<backends::cpp_bin_float<53, backends::digit_base_2, void, boost::int16_t, -1022, 1023>, et_off>       cpp_bin_float_double;
+   typedef number<backends::cpp_bin_float<64, backends::digit_base_2, void, boost::int16_t, -16382, 16383>, et_off>     cpp_bin_float_double_extended;
+   typedef number<backends::cpp_bin_float<113, backends::digit_base_2, void, boost::int16_t, -16382, 16383>, et_off>    cpp_bin_float_quad;
+   typedef number<backends::cpp_bin_float<237, backends::digit_base_2, void, boost::int32_t, -262142, 262143>, et_off>  cpp_bin_float_oct;
 
    }} // namespaces
 

@@ -143,6 +143,7 @@ int main()
 
    test_conversion_time<cpp_bin_float_double>("cpp_bin_float_double");
    test_conversion_time<cpp_bin_float_quad>("cpp_bin_float_quad");
+   test_conversion_time<cpp_bin_float_oct>("cpp_bin_float_oct");
    test_conversion_time<cpp_bin_float_50>("cpp_bin_float_50");
    test_conversion_time<cpp_bin_float_100>("cpp_bin_float_100");
 
