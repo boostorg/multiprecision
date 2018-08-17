@@ -2953,6 +2953,7 @@ void test()
    // Destructor of "a" checks destruction of moved-from-object...
    Real m3(static_cast<Real&&>(a));
 #endif
+#ifndef BOOST_MP_NOT_TESTING_NUMBER
    //
    // string and string_view:
    //
@@ -2960,13 +2961,20 @@ void test()
       std::string s("2");
       Real x(s);
       BOOST_CHECK_EQUAL(x, 2);
+      s = "3";
+      x.assign(s);
+      BOOST_CHECK_EQUAL(x, 3);
 #ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
       s = "20";
       std::string_view v(s.c_str(), 1);
       Real y(v);
       BOOST_CHECK_EQUAL(y, 2);
+      std::string_view v2(s.c_str(), 2);
+      y.assign(v2);
+      BOOST_CHECK_EQUAL(y, 20);
 #endif
    }
+#endif
    //
    // Bug cases, self assignment first:
    //

@@ -172,6 +172,13 @@ public:
    template <class Traits>
    explicit BOOST_MP_FORCEINLINE number(const std::basic_string_view<char, Traits>& v, unsigned digits10)
       : m_backend(canonical_value(v), digits10) {}
+   template <class Traits>
+   number& assign(const std::basic_string_view<char, Traits>& view)
+   {
+      using default_ops::assign_from_string_view;
+      assign_from_string_view(this->backend(), view);
+      return *this;
+   }
 #endif
 
    template <class V, class U>
