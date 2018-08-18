@@ -171,9 +171,30 @@ int main()
          "-0.80743891267394610982659071452346156102764312401571972642394120395608291471029347812645125986123123904123471209381289471230512983491286102875870192091283712396550981723409812740981263471230498715096104897123094710923879065981740928740981271801391209238470129560941870129387409812883437894183883841283700483832883218128438938184289148239164079329657861209381892037483468937489237419236509823723705612893489712412306531274812364980127304981648712483248732");
       mpc_complex::default_precision(40);
       mpfr_float::default_precision(40);
-
       BOOST_CHECK_EQUAL(a, a);
    }
+
+
+   //
+   // string_view with explicit precision:
+   //
+#ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
+   {
+      std::string s("222");
+      std::string_view v(s.c_str(), 1);
+      mpfr_float f(v, 100);
+      BOOST_CHECK_EQUAL(f, 2);
+      BOOST_CHECK_EQUAL(f.precision(), 100);
+   }
+   {
+      std::string x("222"), y("333");
+      std::string_view vx(x.c_str(), 1), vy(y.c_str(), 1);
+      mpc_complex c(vx, vy, 100);
+      BOOST_CHECK_EQUAL(c.real(), 2);
+      BOOST_CHECK_EQUAL(c.imag(), 3);
+      BOOST_CHECK_EQUAL(c.precision(), 100);
+   }
+#endif
    {
       mpc_complex::default_precision(100);
       mpfr_float::default_precision(100);
