@@ -201,10 +201,11 @@ int main()
       BOOST_CHECK_EQUAL(y, 3);
       BOOST_CHECK_EQUAL(x.precision(), 100);
       BOOST_CHECK_EQUAL(y.precision(), 50);
-
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
       x = std::move(mpfr_float(y));
       BOOST_CHECK_EQUAL(x, y);
       BOOST_CHECK_EQUAL(x.precision(), y.precision());
+#endif
    }
    {
       mpc_complex x(2, 3, 100);  // 100 digits precision.
@@ -223,10 +224,11 @@ int main()
       BOOST_CHECK_EQUAL(y.imag(), 4);
       BOOST_CHECK_EQUAL(x.precision(), 100);
       BOOST_CHECK_EQUAL(y.precision(), 50);
-
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
       x = std::move(mpc_complex(y));
       BOOST_CHECK_EQUAL(x, y);
       BOOST_CHECK_EQUAL(x.precision(), y.precision());
+#endif
    }
 
 
