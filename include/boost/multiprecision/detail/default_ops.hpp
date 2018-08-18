@@ -3173,7 +3173,7 @@ func(const number<Backend, et_on>& arg, const number<Backend, et_on>& a)\
 }\
 template <class Backend, class tag, class A1, class A2, class A3, class A4> \
 inline typename enable_if_c<\
-   (number_category<Backend>::value == category) && (number_category<detail::expression<tag, A1, A2, A3, A4> >::value == category),\
+   (number_category<Backend>::value == category) && (boost::is_convertible<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, et_on> >::value),\
    detail::expression<\
     detail::function\
   , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend> \
@@ -3195,7 +3195,7 @@ func(const number<Backend, et_on>& arg, const detail::expression<tag, A1, A2, A3
 }\
 template <class tag, class A1, class A2, class A3, class A4, class Backend> \
 inline typename enable_if_c<\
-   (number_category<Backend>::value == category) && (number_category<detail::expression<tag, A1, A2, A3, A4> >::value == category),\
+   (number_category<Backend>::value == category) && (boost::is_convertible<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, et_on> >::value),\
    detail::expression<\
     detail::function\
   , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend> \

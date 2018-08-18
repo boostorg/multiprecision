@@ -119,14 +119,14 @@ struct mpc_complex_imp
 #else
    mpc_complex_imp& operator = (boost::ulong_long_type i)
    {
-      mpfr_float_backend<digits10> f;
+      mpfr_float_backend<digits10> f(0uL, mpc_get_prec(m_data));
       f = i;
       mpc_set_fr(this->data(), f.data(), GMP_RNDN);
       return *this;
    }
    mpc_complex_imp& operator = (boost::long_long_type i)
    {
-      mpfr_float_backend<digits10> f;
+      mpfr_float_backend<digits10> f(0uL, mpc_get_prec(m_data));
       f = i;
       mpc_set_fr(this->data(), f.data(), GMP_RNDN);
       return *this;
@@ -183,9 +183,7 @@ struct mpc_complex_imp
       if(m_data[0].re[0]._mpfr_d == 0)
          mpc_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
 
-      mpfr_float_backend<digits10> a, b;
-      copy_precision(a, static_cast<mpc_complex_backend<digits10>const&>(*this));
-      copy_precision(b, static_cast<mpc_complex_backend<digits10>const&>(*this));
+      mpfr_float_backend<digits10> a(0uL, mpc_get_prec(m_data)), b(0uL, mpc_get_prec(m_data));
 
       if(s && (*s == '('))
       {
@@ -241,7 +239,7 @@ struct mpc_complex_imp
    {
       BOOST_ASSERT(m_data[0].re[0]._mpfr_d);
 
-      mpfr_float_backend<digits10> a, b;
+      mpfr_float_backend<digits10> a(0uL, mpc_get_prec(m_data)), b(0uL, mpc_get_prec(m_data));
 
       mpc_real(a.data(), m_data, GMP_RNDD);
       mpc_imag(b.data(), m_data, GMP_RNDD);
@@ -266,6 +264,11 @@ struct mpc_complex_imp
       BOOST_ASSERT(m_data[0].re[0]._mpfr_d && o.m_data[0].re[0]._mpfr_d);
       return mpc_cmp(m_data, o.m_data);
    }
+   int compare(const mpc_complex_backend<digits10>& o)const BOOST_NOEXCEPT
+   {
+      BOOST_ASSERT(m_data[0].re[0]._mpfr_d && o.m_data[0].re[0]._mpfr_d);
+      return mpc_cmp(m_data, o.data());
+   }
    int compare(long int i)const BOOST_NOEXCEPT
    {
       BOOST_ASSERT(m_data[0].re[0]._mpfr_d);
@@ -277,16 +280,16 @@ struct mpc_complex_imp
       static const unsigned long int max_val = (std::numeric_limits<long>::max)();
       if (i > max_val)
       {
-         mpc_complex_imp d;
+         mpc_complex_imp d(mpc_get_prec(m_data));
          d = i;
          return compare(d);
       }
       return mpc_cmp_si(m_data, (long)i);
    }
    template <class V>
-   int compare(V v)const BOOST_NOEXCEPT
+   int compare(const V& v)const BOOST_NOEXCEPT
    {
-      mpc_complex_imp d;
+      mpc_complex_imp d(mpc_get_prec(m_data));
       d = v;
       return compare(d);
    }
@@ -482,8 +485,16 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
    mpc_complex_backend(const T& a, const U& b, unsigned digits10)
       : detail::mpc_complex_imp<0>(multiprecision::detail::digits10_2_2(digits10))
    {
-      using default_ops::assign_components;
-      assign_components(*this, a, b);
+      // We can't use assign_components here because it copies the precision of
+      // a and b, not digits10....
+      mpfr_float ca(a), cb(b);
+      mpc_set_fr_fr(this->data(), ca.backend().data(), cb.backend().data(), GMP_RNDN);
+   }
+   template <unsigned N>
+   mpc_complex_backend(const mpfr_float_backend<N>& a, const mpfr_float_backend<N>& b, unsigned digits10)
+      : detail::mpc_complex_imp<0>(multiprecision::detail::digits10_2_2(digits10))
+   {
+      mpc_set_fr_fr(this->data(), a.data(), b.data(), GMP_RNDN);
    }
 
    mpc_complex_backend& operator=(const mpc_complex_backend& o)
@@ -946,6 +957,15 @@ inline void eval_convert_to(long double* result, const mpc_complex_backend<digit
 template <unsigned D1, unsigned D2, mpfr_allocation_type AllocationType>
 inline void assign_components(mpc_complex_backend<D1>& result, const mpfr_float_backend<D2, AllocationType>& a, const mpfr_float_backend<D2, AllocationType>& b)
 {
+   //
+   // This is called from class number's constructors, so if we have variable
+   // precision, then copy the precision of the source variables.
+   //
+   if (!D1)
+   {
+      unsigned long prec = std::max(mpfr_get_prec(a.data()), mpfr_get_prec(b.data()));
+      mpc_set_prec(result.data(), prec);
+   }
    using default_ops::eval_fpclassify;
    if(eval_fpclassify(a) == (int)FP_NAN)
    {
