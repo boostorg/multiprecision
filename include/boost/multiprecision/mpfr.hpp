@@ -63,6 +63,24 @@ struct mpfr_cleanup
 template <bool b>
 typename mpfr_cleanup<b>::initializer const mpfr_cleanup<b>::init;
 
+inline void mpfr_copy_precision(mpfr_t dest, const mpfr_t src)
+{
+   mpfr_prec_t p_dest = mpfr_get_prec(dest);
+   mpfr_prec_t p_src = mpfr_get_prec(src);
+   if (p_dest != p_src)
+      mpfr_set_prec(dest, p_src);
+}
+inline void mpfr_copy_precision(mpfr_t dest, const mpfr_t src1, const mpfr_t src2)
+{
+   mpfr_prec_t p_dest = mpfr_get_prec(dest);
+   mpfr_prec_t p_src1 = mpfr_get_prec(src1);
+   mpfr_prec_t p_src2 = mpfr_get_prec(src2);
+   if (p_src2 > p_src1)
+      p_src1 = p_src2;
+   if (p_dest != p_src1)
+      mpfr_set_prec(dest, p_src1);
+}
+
 
 template <unsigned digits10, mpfr_allocation_type AllocationType>
 struct mpfr_float_imp;
@@ -827,6 +845,18 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
       *this = o;
    }
    template <unsigned D>
+   mpfr_float_backend(const gmp_float<D>& val, unsigned digits10)
+      : detail::mpfr_float_imp<0, allocate_dynamic>(multiprecision::detail::digits10_2_2(digits10))
+   {
+      mpfr_set_f(this->m_data, val.data(), GMP_RNDN);
+   }
+   template <unsigned D>
+   mpfr_float_backend(const mpfr_float_backend<D>& val, unsigned digits10)
+      : detail::mpfr_float_imp<0, allocate_dynamic>(multiprecision::detail::digits10_2_2(digits10))
+   {
+      mpfr_set(this->m_data, val.data(), GMP_RNDN);
+   }
+   template <unsigned D>
    mpfr_float_backend(const mpfr_float_backend<D>& val)
       : detail::mpfr_float_imp<0, allocate_dynamic>(mpfr_get_prec(val.data()))
    {
@@ -853,8 +883,10 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
    {
       if(this != &o)
       {
-         if(this->m_data[0]._mpfr_d == 0)
+         if (this->m_data[0]._mpfr_d == 0)
             mpfr_init2(this->m_data, mpfr_get_prec(o.data()));
+         else
+            detail::mpfr_copy_precision(this->m_data, o.data());
          mpfr_set(this->m_data, o.data(), GMP_RNDN);
       }
       return *this;
@@ -876,17 +908,17 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
    {
       if(this->m_data[0]._mpfr_d == 0)
          mpfr_init2(this->m_data, mpfr_get_prec(val));
-      //else
-      //   mpfr_set_prec(this->m_data, mpfr_get_prec(val));
+      else
+         mpfr_set_prec(this->m_data, mpfr_get_prec(val));
       mpfr_set(this->m_data, val, GMP_RNDN);
       return *this;
    }
    mpfr_float_backend& operator=(const mpf_t val)
    {
       if(this->m_data[0]._mpfr_d == 0)
-         mpfr_init2(this->m_data, mpf_get_prec(val));
-      //else
-      //   mpfr_set_prec(this->m_data, mpf_get_prec(val));
+         mpfr_init2(this->m_data, (mpfr_prec_t)mpf_get_prec(val));
+      else
+         mpfr_set_prec(this->m_data, mpf_get_prec(val));
       mpfr_set_f(this->m_data, val, GMP_RNDN);
       return *this;
    }
@@ -909,8 +941,8 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
    {
       if(this->m_data[0]._mpfr_d == 0)
          mpfr_init2(this->m_data, mpfr_get_prec(val.data()));
-      //else
-      //   mpfr_set_prec(this->m_data, mpfr_get_prec(val.data()));
+      else
+         mpfr_set_prec(this->m_data, mpfr_get_prec(val.data()));
       mpfr_set(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
@@ -919,8 +951,8 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
    {
       if(this->m_data[0]._mpfr_d == 0)
          mpfr_init2(this->m_data, mpf_get_prec(val.data()));
-      //else
-      //   mpfr_set_prec(this->m_data, mpf_get_prec(val.data()));
+      else
+         mpfr_set_prec(this->m_data, mpf_get_prec(val.data()));
       mpfr_set_f(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
@@ -1544,6 +1576,12 @@ struct is_explicitly_convertible<backends::mpfr_float_backend<D1, A1>, backends:
 }
 
 #endif
+
+namespace detail
+{
+   template<>
+   struct is_variable_precision<backends::mpfr_float_backend<0> > : public true_type {};
+}
 
 template<>
 struct number_category<detail::canonical<mpfr_t, backends::mpfr_float_backend<0> >::type> : public mpl::int_<number_kind_floating_point>{};

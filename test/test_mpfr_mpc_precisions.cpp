@@ -39,7 +39,7 @@ int main()
       mpfr_float b(2);
       BOOST_CHECK_EQUAL(b.precision(), 20);
       b = a;
-      BOOST_CHECK_EQUAL(b.precision(), 20);
+      BOOST_CHECK_EQUAL(b.precision(), a.precision());
    }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    {
@@ -47,7 +47,7 @@ int main()
       mpfr_float b(2);
       BOOST_CHECK_EQUAL(b.precision(), 20);
       b = make_rvalue_copy(a);
-      BOOST_CHECK_EQUAL(b.precision(), 100);
+      BOOST_CHECK_EQUAL(b.precision(), a.precision());
    }
 #endif
    mpfr_float::default_precision(20);
@@ -72,7 +72,7 @@ int main()
       mpc_complex b(2);
       BOOST_CHECK_EQUAL(b.precision(), 20);
       b = ca;
-      BOOST_CHECK_EQUAL(b.precision(), 20);
+      BOOST_CHECK_EQUAL(b.precision(), ca.precision());
    }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    {
@@ -80,19 +80,19 @@ int main()
       mpc_complex b(2);
       BOOST_CHECK_EQUAL(b.precision(), 20);
       b = make_rvalue_copy(ca);
-      BOOST_CHECK_EQUAL(b.precision(), 100);
+      BOOST_CHECK_EQUAL(b.precision(), ca.precision());
    }
 #endif
    {
       // test construct from lvalue:
       mpc_complex b(ca);
-      BOOST_CHECK_EQUAL(b.precision(), 100);
+      BOOST_CHECK_EQUAL(b.precision(), ca.precision());
    }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    {
       // test construct from rvalue:
       mpc_complex b(make_rvalue_copy(ca));
-      BOOST_CHECK_EQUAL(b.precision(), 100);
+      BOOST_CHECK_EQUAL(b.precision(), ca.precision());
    }
 #endif
    // real and imaginary:
@@ -107,6 +107,10 @@ int main()
    {
       mpfr_float f150(mpfr_float(), 150u);
       BOOST_CHECK_EQUAL(f150.precision(), 150);
+      mpc_complex f150c(mpc_complex(), 150u);
+      BOOST_CHECK_EQUAL(f150c.precision(), 150);
+      mpc_complex f150cc(mpfr_float(), mpfr_float(), 150u);
+      BOOST_CHECK_EQUAL(f150cc.precision(), 150);
    }
    {
       mpfr_float f150(2, 150);
@@ -230,7 +234,11 @@ int main()
       BOOST_CHECK_EQUAL(x.precision(), y.precision());
 #endif
    }
-
+   {
+      mpfr_float c(4), d(8), e(9), f;
+      f = (c + d) * d / e;
+      mpfr_float g((c + d) * d / e);
+   }
 
 
    return boost::report_errors();
