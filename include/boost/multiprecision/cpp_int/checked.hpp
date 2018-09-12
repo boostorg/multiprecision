@@ -35,7 +35,7 @@ inline void raise_div_overflow()
 }
 
 template <class A>
-inline A checked_add_imp(A a, A b, const mpl::true_&)
+inline BOOST_CXX14_CONSTEXPR A checked_add_imp(A a, A b, const mpl::true_&)
 {
    if(a > 0)
    {
@@ -50,25 +50,25 @@ inline A checked_add_imp(A a, A b, const mpl::true_&)
    return a + b;
 }
 template <class A>
-inline A checked_add_imp(A a, A b, const mpl::false_&)
+inline BOOST_CXX14_CONSTEXPR A checked_add_imp(A a, A b, const mpl::false_&)
 {
    if((integer_traits<A>::const_max - b) < a)
       raise_add_overflow();
    return a + b;
 }
 template <class A>
-inline A checked_add(A a, A b, const mpl::int_<checked>&)
+inline BOOST_CXX14_CONSTEXPR A checked_add(A a, A b, const mpl::int_<checked>&)
 {
-   return checked_add_imp(a, b, boost::is_signed<A>());
+   return checked_add_imp(a, b, mpl::bool_<boost::is_signed<A>::value>());
 }
 template <class A>
-inline A checked_add(A a, A b, const mpl::int_<unchecked>&)
+inline BOOST_CXX14_CONSTEXPR A checked_add(A a, A b, const mpl::int_<unchecked>&)
 {
    return a + b;
 }
 
 template <class A>
-inline A checked_subtract_imp(A a, A b, const mpl::true_&)
+inline BOOST_CXX14_CONSTEXPR A checked_subtract_imp(A a, A b, const mpl::true_&)
 {
    if(a > 0)
    {
@@ -83,25 +83,25 @@ inline A checked_subtract_imp(A a, A b, const mpl::true_&)
    return a - b;
 }
 template <class A>
-inline A checked_subtract_imp(A a, A b, const mpl::false_&)
+inline BOOST_CXX14_CONSTEXPR A checked_subtract_imp(A a, A b, const mpl::false_&)
 {
    if(a < b)
       raise_subtract_overflow();
    return a - b;
 }
 template <class A>
-inline A checked_subtract(A a, A b, const mpl::int_<checked>&)
+inline BOOST_CXX14_CONSTEXPR A checked_subtract(A a, A b, const mpl::int_<checked>&)
 {
-   return checked_subtract_imp(a, b, boost::is_signed<A>());
+   return checked_subtract_imp(a, b, mpl::bool_<boost::is_signed<A>::value>());
 }
 template <class A>
-inline A checked_subtract(A a, A b, const mpl::int_<unchecked>&)
+inline BOOST_CXX14_CONSTEXPR A checked_subtract(A a, A b, const mpl::int_<unchecked>&)
 {
    return a - b;
 }
 
 template <class A>
-inline A checked_multiply(A a, A b, const mpl::int_<checked>&)
+inline BOOST_CXX14_CONSTEXPR A checked_multiply(A a, A b, const mpl::int_<checked>&)
 {
    BOOST_MP_USING_ABS
    if(a && (integer_traits<A>::const_max / abs(a) < abs(b)))
@@ -109,26 +109,26 @@ inline A checked_multiply(A a, A b, const mpl::int_<checked>&)
    return a * b;
 }
 template <class A>
-inline A checked_multiply(A a, A b, const mpl::int_<unchecked>&)
+inline BOOST_CXX14_CONSTEXPR A checked_multiply(A a, A b, const mpl::int_<unchecked>&)
 {
    return a * b;
 }
 
 template <class A>
-inline A checked_divide(A a, A b, const mpl::int_<checked>&)
+inline BOOST_CXX14_CONSTEXPR A checked_divide(A a, A b, const mpl::int_<checked>&)
 {
    if(b == 0)
       raise_div_overflow();
    return a / b;
 }
 template <class A>
-inline A checked_divide(A a, A b, const mpl::int_<unchecked>&)
+inline BOOST_CXX14_CONSTEXPR A checked_divide(A a, A b, const mpl::int_<unchecked>&)
 {
    return a / b;
 }
 
 template <class A>
-inline A checked_left_shift(A a, boost::ulong_long_type shift, const mpl::int_<checked>&)
+inline BOOST_CXX14_CONSTEXPR A checked_left_shift(A a, boost::ulong_long_type shift, const mpl::int_<checked>&)
 {
    if(a && shift)
    {
@@ -138,7 +138,7 @@ inline A checked_left_shift(A a, boost::ulong_long_type shift, const mpl::int_<c
    return a << shift;
 }
 template <class A>
-inline A checked_left_shift(A a, boost::ulong_long_type shift, const mpl::int_<unchecked>&)
+inline BOOST_CXX14_CONSTEXPR A checked_left_shift(A a, boost::ulong_long_type shift, const mpl::int_<unchecked>&)
 {
    return (shift >= sizeof(A) * CHAR_BIT) ? 0 : a << shift;
 }

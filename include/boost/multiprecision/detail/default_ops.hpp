@@ -70,7 +70,7 @@ namespace default_ops{
 // code even more....
 //
 template <class T, class V>
-inline typename disable_if_c<is_convertible<V, T>::value >::type 
+inline BOOST_CXX14_CONSTEXPR typename disable_if_c<is_convertible<V, T>::value >::type
    eval_add(T& result, V const& v)
 {
    T t;
@@ -78,14 +78,14 @@ inline typename disable_if_c<is_convertible<V, T>::value >::type
    eval_add(result, t);
 }
 template <class T, class V>
-inline typename enable_if_c<is_convertible<V, T>::value >::type 
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<V, T>::value >::type
    eval_add(T& result, V const& v)
 {
    T t(v);
    eval_add(result, t);
 }
 template <class T, class V>
-inline typename disable_if_c<is_convertible<V, T>::value>::type
+inline BOOST_CXX14_CONSTEXPR typename disable_if_c<is_convertible<V, T>::value>::type
    eval_subtract(T& result, V const& v)
 {
    T t;
@@ -93,14 +93,14 @@ inline typename disable_if_c<is_convertible<V, T>::value>::type
    eval_subtract(result, t);
 }
 template <class T, class V>
-inline typename enable_if_c<is_convertible<V, T>::value>::type
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<V, T>::value>::type
    eval_subtract(T& result, V const& v)
 {
    T t(v);
    eval_subtract(result, t);
 }
 template <class T, class V>
-inline typename disable_if_c<is_convertible<V, T>::value>::type
+inline BOOST_CXX14_CONSTEXPR typename disable_if_c<is_convertible<V, T>::value>::type
    eval_multiply(T& result, V const& v)
 {
    T t;
@@ -108,7 +108,7 @@ inline typename disable_if_c<is_convertible<V, T>::value>::type
    eval_multiply(result, t);
 }
 template <class T, class V>
-inline typename enable_if_c<is_convertible<V, T>::value>::type
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<V, T>::value>::type
    eval_multiply(T& result, V const& v)
 {
    T t(v);
@@ -116,34 +116,34 @@ inline typename enable_if_c<is_convertible<V, T>::value>::type
 }
 
 template <class T, class U, class V>
-void eval_multiply(T& t, const U& u, const V& v);
+BOOST_CXX14_CONSTEXPR void eval_multiply(T& t, const U& u, const V& v);
 
 template <class T, class U, class V>
-inline typename disable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_add(T& t, const U& u, const V& v)
+inline BOOST_CXX14_CONSTEXPR typename disable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_add(T& t, const U& u, const V& v)
 {
    T z;
    eval_multiply(z, u, v);
    eval_add(t, z);
 }
 template <class T, class U, class V>
-inline typename enable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_add(T& t, const U& u, const V& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_add(T& t, const U& u, const V& v)
 {
    eval_multiply_add(t, v, u);
 }
 template <class T, class U, class V>
-inline typename disable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_subtract(T& t, const U& u, const V& v)
+inline BOOST_CXX14_CONSTEXPR typename disable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_subtract(T& t, const U& u, const V& v)
 {
    T z;
    eval_multiply(z, u, v);
    eval_subtract(t, z);
 }
 template <class T, class U, class V>
-inline typename enable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_subtract(T& t, const U& u, const V& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_subtract(T& t, const U& u, const V& v)
 {
    eval_multiply_subtract(t, v, u);
 }
 template <class T, class V>
-inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && !is_convertible<V, T>::value>::type
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<V, number<T, et_on> >::value && !is_convertible<V, T>::value>::type
    eval_divide(T& result, V const& v)
 {
    T t;
@@ -151,14 +151,14 @@ inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && !is_c
    eval_divide(result, t);
 }
 template <class T, class V>
-inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && is_convertible<V, T>::value>::type
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<V, number<T, et_on> >::value && is_convertible<V, T>::value>::type
    eval_divide(T& result, V const& v)
 {
    T t(v);
    eval_divide(result, t);
 }
 template <class T, class V>
-inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && !is_convertible<V, T>::value>::type
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<V, number<T, et_on> >::value && !is_convertible<V, T>::value>::type
    eval_modulus(T& result, V const& v)
 {
    T t;
@@ -166,14 +166,14 @@ inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && !is_c
    eval_modulus(result, t);
 }
 template <class T, class V>
-inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value&& is_convertible<V, T>::value>::type
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<V, number<T, et_on> >::value&& is_convertible<V, T>::value>::type
    eval_modulus(T& result, V const& v)
 {
    T t(v);
    eval_modulus(result, t);
 }
 template <class T, class V>
-inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && !is_convertible<V, T>::value>::type
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<V, number<T, et_on> >::value && !is_convertible<V, T>::value>::type
    eval_bitwise_and(T& result, V const& v)
 {
    T t;
@@ -181,14 +181,14 @@ inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && !is_c
    eval_bitwise_and(result, t);
 }
 template <class T, class V>
-inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && is_convertible<V, T>::value>::type
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<V, number<T, et_on> >::value && is_convertible<V, T>::value>::type
    eval_bitwise_and(T& result, V const& v)
 {
    T t(v);
    eval_bitwise_and(result, t);
 }
 template <class T, class V>
-inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && !is_convertible<V, T>::value>::type
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<V, number<T, et_on> >::value && !is_convertible<V, T>::value>::type
    eval_bitwise_or(T& result, V const& v)
 {
    T t;
@@ -196,14 +196,14 @@ inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && !is_c
    eval_bitwise_or(result, t);
 }
 template <class T, class V>
-inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && is_convertible<V, T>::value>::type
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<V, number<T, et_on> >::value && is_convertible<V, T>::value>::type
    eval_bitwise_or(T& result, V const& v)
 {
    T t(v);
    eval_bitwise_or(result, t);
 }
 template <class T, class V>
-inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && !is_convertible<V, T>::value>::type
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<V, number<T, et_on> >::value && !is_convertible<V, T>::value>::type
    eval_bitwise_xor(T& result, V const& v)
 {
    T t;
@@ -211,7 +211,7 @@ inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && !is_c
    eval_bitwise_xor(result, t);
 }
 template <class T, class V>
-inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && is_convertible<V, T>::value>::type
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<V, number<T, et_on> >::value && is_convertible<V, T>::value>::type
    eval_bitwise_xor(T& result, V const& v)
 {
    T t(v);
@@ -219,7 +219,7 @@ inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && is_co
 }
 
 template <class T, class V>
-inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && !is_convertible<V, T>::value>::type
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<V, number<T, et_on> >::value && !is_convertible<V, T>::value>::type
    eval_complement(T& result, V const& v)
 {
    T t;
@@ -227,7 +227,7 @@ inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && !is_c
    eval_complement(result, t);
 }
 template <class T, class V>
-inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && is_convertible<V, T>::value>::type
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<V, number<T, et_on> >::value && is_convertible<V, T>::value>::type
    eval_complement(T& result, V const& v)
 {
    T t(v);
@@ -238,10 +238,10 @@ inline typename enable_if_c<is_convertible<V, number<T, et_on> >::value && is_co
 // Default versions of 3-arg arithmetic functions, these mostly just forward to the 2 arg versions:
 //
 template <class T, class U, class V>
-void eval_add(T& t, const U& u, const V& v);
+BOOST_CXX14_CONSTEXPR void eval_add(T& t, const U& u, const V& v);
 
 template <class T>
-inline void eval_add_default(T& t, const T& u, const T& v)
+inline BOOST_CXX14_CONSTEXPR void eval_add_default(T& t, const T& u, const T& v)
 {
    if(&t == &v)
    {
@@ -258,25 +258,25 @@ inline void eval_add_default(T& t, const T& u, const T& v)
    }
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_add_default(T& t, const T& u, const U& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_add_default(T& t, const T& u, const U& v)
 {
    T vv;
    vv = v;
    eval_add(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_add_default(T& t, const T& u, const U& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_add_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_add(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type eval_add_default(T& t, const U& u, const T& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type eval_add_default(T& t, const U& u, const T& v)
 {
    eval_add(t, v, u);
 }
 template <class T, class U, class V>
-inline void eval_add_default(T& t, const U& u, const V& v)
+inline BOOST_CXX14_CONSTEXPR void eval_add_default(T& t, const U& u, const V& v)
 {
    if(is_same<T, V>::value && ((void*)&t == (void*)&v))
    {
@@ -289,16 +289,16 @@ inline void eval_add_default(T& t, const U& u, const V& v)
    }
 }
 template <class T, class U, class V>
-inline void eval_add(T& t, const U& u, const V& v)
+inline BOOST_CXX14_CONSTEXPR void eval_add(T& t, const U& u, const V& v)
 {
    eval_add_default(t, u, v);
 }
 
 template <class T, class U, class V>
-void eval_subtract(T& t, const U& u, const V& v);
+BOOST_CXX14_CONSTEXPR void eval_subtract(T& t, const U& u, const V& v);
 
 template <class T>
-inline void eval_subtract_default(T& t, const T& u, const T& v)
+inline BOOST_CXX14_CONSTEXPR void eval_subtract_default(T& t, const T& u, const T& v)
 {
    if((&t == &v) && is_signed_number<T>::value)
    {
@@ -316,39 +316,39 @@ inline void eval_subtract_default(T& t, const T& u, const T& v)
    }
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_subtract_default(T& t, const T& u, const U& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_subtract_default(T& t, const T& u, const U& v)
 {
    T vv;
    vv = v;
    eval_subtract(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_subtract_default(T& t, const T& u, const U& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_subtract_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_subtract(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_signed_number<T>::value>::type eval_subtract_default(T& t, const U& u, const T& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_signed_number<T>::value>::type eval_subtract_default(T& t, const U& u, const T& v)
 {
    eval_subtract(t, v, u);
    t.negate();
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value && is_unsigned_number<T>::value>::type eval_subtract_default(T& t, const U& u, const T& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value && is_unsigned_number<T>::value>::type eval_subtract_default(T& t, const U& u, const T& v)
 {
    T temp;
    temp = u;
    eval_subtract(t, temp, v);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value && is_unsigned_number<T>::value>::type eval_subtract_default(T& t, const U& u, const T& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value && is_unsigned_number<T>::value>::type eval_subtract_default(T& t, const U& u, const T& v)
 {
    T temp(u);
    eval_subtract(t, temp, v);
 }
 template <class T, class U, class V>
-inline void eval_subtract_default(T& t, const U& u, const V& v)
+inline BOOST_CXX14_CONSTEXPR void eval_subtract_default(T& t, const U& u, const V& v)
 {
    if(is_same<T, V>::value && ((void*)&t == (void*)&v))
    {
@@ -362,13 +362,13 @@ inline void eval_subtract_default(T& t, const U& u, const V& v)
    }
 }
 template <class T, class U, class V>
-inline void eval_subtract(T& t, const U& u, const V& v)
+inline BOOST_CXX14_CONSTEXPR void eval_subtract(T& t, const U& u, const V& v)
 {
    eval_subtract_default(t, u, v);
 }
 
 template <class T>
-inline void eval_multiply_default(T& t, const T& u, const T& v)
+inline BOOST_CXX14_CONSTEXPR void eval_multiply_default(T& t, const T& u, const T& v)
 {
    if(&t == &v)
    {
@@ -386,26 +386,26 @@ inline void eval_multiply_default(T& t, const T& u, const T& v)
 }
 #if !BOOST_WORKAROUND(BOOST_MSVC, < 1900)
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_multiply_default(T& t, const T& u, const U& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_multiply_default(T& t, const T& u, const U& v)
 {
    T vv;
    vv = v;
    eval_multiply(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_multiply_default(T& t, const T& u, const U& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_multiply_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_multiply(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type eval_multiply_default(T& t, const U& u, const T& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type eval_multiply_default(T& t, const U& u, const T& v)
 {
    eval_multiply(t, v, u);
 }
 #endif
 template <class T, class U, class V>
-inline void eval_multiply_default(T& t, const U& u, const V& v)
+inline BOOST_CXX14_CONSTEXPR void eval_multiply_default(T& t, const U& u, const V& v)
 {
    if(is_same<T, V>::value && ((void*)&t == (void*)&v))
    {
@@ -418,13 +418,13 @@ inline void eval_multiply_default(T& t, const U& u, const V& v)
    }
 }
 template <class T, class U, class V>
-inline void eval_multiply(T& t, const U& u, const V& v)
+inline BOOST_CXX14_CONSTEXPR void eval_multiply(T& t, const U& u, const V& v)
 {
    eval_multiply_default(t, u, v);
 }
 
 template <class T>
-inline void eval_multiply_add(T& t, const T& u, const T& v, const T& x)
+inline BOOST_CXX14_CONSTEXPR void eval_multiply_add(T& t, const T& u, const T& v, const T& x)
 {
    if((void*)&x == (void*)&t)
    {
@@ -440,30 +440,30 @@ inline void eval_multiply_add(T& t, const T& u, const T& v, const T& x)
 }
 
 template <class T, class U>
-inline typename boost::disable_if_c<boost::is_same<T, U>::value, T>::type make_T(const U& u)
+inline BOOST_CXX14_CONSTEXPR typename boost::disable_if_c<boost::is_same<T, U>::value, T>::type make_T(const U& u)
 {
    T t;
    t = number<T>::canonical_value(u);
    return BOOST_MP_MOVE(t);
 }
 template <class T>
-inline const T& make_T(const T& t)
+inline BOOST_CXX14_CONSTEXPR const T& make_T(const T& t)
 {
    return t;
 }
 
 template <class T, class U, class V, class X>
-inline typename disable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_add(T& t, const U& u, const V& v, const X& x)
+inline BOOST_CXX14_CONSTEXPR typename disable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_add(T& t, const U& u, const V& v, const X& x)
 {
    eval_multiply_add(t, make_T<T>(u), make_T<T>(v), make_T<T>(x));
 }
 template <class T, class U, class V, class X>
-inline typename enable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_add(T& t, const U& u, const V& v, const X& x)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_add(T& t, const U& u, const V& v, const X& x)
 {
    eval_multiply_add(t, v, u, x);
 }
 template <class T, class U, class V, class X>
-inline typename disable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_subtract(T& t, const U& u, const V& v, const X& x)
+inline BOOST_CXX14_CONSTEXPR typename disable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_subtract(T& t, const U& u, const V& v, const X& x)
 {
    if((void*)&x == (void*)&t)
    {
@@ -478,16 +478,16 @@ inline typename disable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::typ
    }
 }
 template <class T, class U, class V, class X>
-inline typename enable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_subtract(T& t, const U& u, const V& v, const X& x)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_subtract(T& t, const U& u, const V& v, const X& x)
 {
    eval_multiply_subtract(t, v, u, x);
 }
 
 template <class T, class U, class V>
-void eval_divide(T& t, const U& u, const V& v);
+BOOST_CXX14_CONSTEXPR void eval_divide(T& t, const U& u, const V& v);
 
 template <class T>
-inline void eval_divide_default(T& t, const T& u, const T& v)
+inline BOOST_CXX14_CONSTEXPR void eval_divide_default(T& t, const T& u, const T& v)
 {
    if(&t == &u)
       eval_divide(t, v);
@@ -505,34 +505,34 @@ inline void eval_divide_default(T& t, const T& u, const T& v)
 }
 #if !BOOST_WORKAROUND(BOOST_MSVC, < 1900)
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_divide_default(T& t, const T& u, const U& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_divide_default(T& t, const T& u, const U& v)
 {
    T vv;
    vv = v;
    eval_divide(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_divide_default(T& t, const T& u, const U& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_divide_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_divide(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_divide_default(T& t, const U& u, const T& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_divide_default(T& t, const U& u, const T& v)
 {
    T uu;
    uu = u;
    eval_divide(t, uu, v);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_divide_default(T& t, const U& u, const T& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_divide_default(T& t, const U& u, const T& v)
 {
    T uu(u);
    eval_divide(t, uu, v);
 }
 #endif
 template <class T, class U, class V>
-inline void eval_divide_default(T& t, const U& u, const V& v)
+inline BOOST_CXX14_CONSTEXPR void eval_divide_default(T& t, const U& u, const V& v)
 {
    if(is_same<T, V>::value && ((void*)&t == (void*)&v))
    {
@@ -548,16 +548,16 @@ inline void eval_divide_default(T& t, const U& u, const V& v)
    }
 }
 template <class T, class U, class V>
-inline void eval_divide(T& t, const U& u, const V& v)
+inline BOOST_CXX14_CONSTEXPR void eval_divide(T& t, const U& u, const V& v)
 {
    eval_divide_default(t, u, v);
 }
 
 template <class T, class U, class V>
-void eval_modulus(T& t, const U& u, const V& v);
+BOOST_CXX14_CONSTEXPR void eval_modulus(T& t, const U& u, const V& v);
 
 template <class T>
-inline void eval_modulus_default(T& t, const T& u, const T& v)
+inline BOOST_CXX14_CONSTEXPR void eval_modulus_default(T& t, const T& u, const T& v)
 {
    if(&t == &u)
       eval_modulus(t, v);
@@ -574,33 +574,33 @@ inline void eval_modulus_default(T& t, const T& u, const T& v)
    }
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_modulus_default(T& t, const T& u, const U& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_modulus_default(T& t, const T& u, const U& v)
 {
    T vv;
    vv = v;
    eval_modulus(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_modulus_default(T& t, const T& u, const U& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_modulus_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_modulus(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_modulus_default(T& t, const U& u, const T& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_modulus_default(T& t, const U& u, const T& v)
 {
    T uu;
    uu = u;
    eval_modulus(t, uu, v);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_modulus_default(T& t, const U& u, const T& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_modulus_default(T& t, const U& u, const T& v)
 {
    T uu(u);
    eval_modulus(t, uu, v);
 }
 template <class T, class U, class V>
-inline void eval_modulus_default(T& t, const U& u, const V& v)
+inline BOOST_CXX14_CONSTEXPR void eval_modulus_default(T& t, const U& u, const V& v)
 {
    if(is_same<T, V>::value && ((void*)&t == (void*)&v))
    {
@@ -615,16 +615,16 @@ inline void eval_modulus_default(T& t, const U& u, const V& v)
    }
 }
 template <class T, class U, class V>
-inline void eval_modulus(T& t, const U& u, const V& v)
+inline BOOST_CXX14_CONSTEXPR void eval_modulus(T& t, const U& u, const V& v)
 {
    eval_modulus_default(t, u, v);
 }
 
 template <class T, class U, class V>
-void eval_bitwise_and(T& t, const U& u, const V& v);
+BOOST_CXX14_CONSTEXPR void eval_bitwise_and(T& t, const U& u, const V& v);
 
 template <class T>
-inline void eval_bitwise_and_default(T& t, const T& u, const T& v)
+inline BOOST_CXX14_CONSTEXPR void eval_bitwise_and_default(T& t, const T& u, const T& v)
 {
    if(&t == &v)
    {
@@ -641,40 +641,40 @@ inline void eval_bitwise_and_default(T& t, const T& u, const T& v)
    }
 }
 template <class T, class U>
-inline typename disable_if_c<is_convertible<U, T>::value>::type eval_bitwise_and_default(T& t, const T& u, const U& v)
+inline BOOST_CXX14_CONSTEXPR typename disable_if_c<is_convertible<U, T>::value>::type eval_bitwise_and_default(T& t, const T& u, const U& v)
 {
    T vv;
    vv = v;
    eval_bitwise_and(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, T>::value>::type eval_bitwise_and_default(T& t, const T& u, const U& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, T>::value>::type eval_bitwise_and_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_bitwise_and(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type eval_bitwise_and_default(T& t, const U& u, const T& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type eval_bitwise_and_default(T& t, const U& u, const T& v)
 {
    eval_bitwise_and(t, v, u);
 }
 template <class T, class U, class V>
-inline typename disable_if_c<is_same<T, U>::value || is_same<T, V>::value>::type eval_bitwise_and_default(T& t, const U& u, const V& v)
+inline BOOST_CXX14_CONSTEXPR typename disable_if_c<is_same<T, U>::value || is_same<T, V>::value>::type eval_bitwise_and_default(T& t, const U& u, const V& v)
 {
    t = u;
    eval_bitwise_and(t, v);
 }
 template <class T, class U, class V>
-inline void eval_bitwise_and(T& t, const U& u, const V& v)
+inline BOOST_CXX14_CONSTEXPR void eval_bitwise_and(T& t, const U& u, const V& v)
 {
    eval_bitwise_and_default(t, u, v);
 }
 
 template <class T, class U, class V>
-void eval_bitwise_or(T& t, const U& u, const V& v);
+BOOST_CXX14_CONSTEXPR void eval_bitwise_or(T& t, const U& u, const V& v);
 
 template <class T>
-inline void eval_bitwise_or_default(T& t, const T& u, const T& v)
+inline BOOST_CXX14_CONSTEXPR void eval_bitwise_or_default(T& t, const T& u, const T& v)
 {
    if(&t == &v)
    {
@@ -691,25 +691,25 @@ inline void eval_bitwise_or_default(T& t, const T& u, const T& v)
    }
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_bitwise_or_default(T& t, const T& u, const U& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_bitwise_or_default(T& t, const T& u, const U& v)
 {
    T vv;
    vv = v;
    eval_bitwise_or(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_bitwise_or_default(T& t, const T& u, const U& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_bitwise_or_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_bitwise_or(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type eval_bitwise_or_default(T& t, const U& u, const T& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type eval_bitwise_or_default(T& t, const U& u, const T& v)
 {
    eval_bitwise_or(t, v, u);
 }
 template <class T, class U, class V>
-inline void eval_bitwise_or_default(T& t, const U& u, const V& v)
+inline BOOST_CXX14_CONSTEXPR void eval_bitwise_or_default(T& t, const U& u, const V& v)
 {
    if(is_same<T, V>::value && ((void*)&t == (void*)&v))
    {
@@ -722,16 +722,16 @@ inline void eval_bitwise_or_default(T& t, const U& u, const V& v)
    }
 }
 template <class T, class U, class V>
-inline void eval_bitwise_or(T& t, const U& u, const V& v)
+inline BOOST_CXX14_CONSTEXPR void eval_bitwise_or(T& t, const U& u, const V& v)
 {
    eval_bitwise_or_default(t, u, v);
 }
 
 template <class T, class U, class V>
-void eval_bitwise_xor(T& t, const U& u, const V& v);
+BOOST_CXX14_CONSTEXPR void eval_bitwise_xor(T& t, const U& u, const V& v);
 
 template <class T>
-inline void eval_bitwise_xor_default(T& t, const T& u, const T& v)
+inline BOOST_CXX14_CONSTEXPR void eval_bitwise_xor_default(T& t, const T& u, const T& v)
 {
    if(&t == &v)
    {
@@ -748,25 +748,25 @@ inline void eval_bitwise_xor_default(T& t, const T& u, const T& v)
    }
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_bitwise_xor_default(T& t, const T& u, const U& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_bitwise_xor_default(T& t, const T& u, const U& v)
 {
    T vv;
    vv = v;
    eval_bitwise_xor(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_bitwise_xor_default(T& t, const T& u, const U& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_bitwise_xor_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_bitwise_xor(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type eval_bitwise_xor_default(T& t, const U& u, const T& v)
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type eval_bitwise_xor_default(T& t, const U& u, const T& v)
 {
    eval_bitwise_xor(t, v, u);
 }
 template <class T, class U, class V>
-inline void eval_bitwise_xor_default(T& t, const U& u, const V& v)
+inline BOOST_CXX14_CONSTEXPR void eval_bitwise_xor_default(T& t, const U& u, const V& v)
 {
    if(is_same<T, V>::value && ((void*)&t == (void*)&v))
    {
@@ -779,53 +779,53 @@ inline void eval_bitwise_xor_default(T& t, const U& u, const V& v)
    }
 }
 template <class T, class U, class V>
-inline void eval_bitwise_xor(T& t, const U& u, const V& v)
+inline BOOST_CXX14_CONSTEXPR void eval_bitwise_xor(T& t, const U& u, const V& v)
 {
    eval_bitwise_xor_default(t, u, v);
 }
 
 template <class T>
-inline void eval_increment(T& val)
+inline BOOST_CXX14_CONSTEXPR void eval_increment(T& val)
 {
    typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
    eval_add(val, static_cast<ui_type>(1u));
 }
 template <class T>
-inline void eval_decrement(T& val)
+inline BOOST_CXX14_CONSTEXPR void eval_decrement(T& val)
 {
    typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
    eval_subtract(val, static_cast<ui_type>(1u));
 }
 
 template <class T, class V>
-inline void eval_left_shift(T& result, const T& arg, const V val)
+inline BOOST_CXX14_CONSTEXPR void eval_left_shift(T& result, const T& arg, const V val)
 {
    result = arg;
    eval_left_shift(result, val);
 }
 
 template <class T, class V>
-inline void eval_right_shift(T& result, const T& arg, const V val)
+inline BOOST_CXX14_CONSTEXPR void eval_right_shift(T& result, const T& arg, const V val)
 {
    result = arg;
    eval_right_shift(result, val);
 }
 
 template <class T>
-inline bool eval_is_zero(const T& val)
+inline BOOST_CXX14_CONSTEXPR bool eval_is_zero(const T& val)
 {
    typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
    return val.compare(static_cast<ui_type>(0)) == 0;
 }
 template <class T>
-inline int eval_get_sign(const T& val)
+inline BOOST_CXX14_CONSTEXPR int eval_get_sign(const T& val)
 {
    typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
    return val.compare(static_cast<ui_type>(0));
 }
 
 template <class T, class V, class U>
-inline void assign_components_imp(T& result, const V& v1, const U& v2, const mpl::int_<number_kind_rational>&)
+inline BOOST_CXX14_CONSTEXPR void assign_components_imp(T& result, const V& v1, const U& v2, const mpl::int_<number_kind_rational>&)
 {
    result = v1;
    T t;
@@ -834,7 +834,7 @@ inline void assign_components_imp(T& result, const V& v1, const U& v2, const mpl
 }
 
 template <class T, class V, class U, int N>
-inline void assign_components_imp(T& result, const V& v1, const U& v2, const mpl::int_<N>&)
+inline BOOST_CXX14_CONSTEXPR void assign_components_imp(T& result, const V& v1, const U& v2, const mpl::int_<N>&)
 {
    typedef typename component_type<number<T> >::type component_number_type;
 
@@ -843,7 +843,7 @@ inline void assign_components_imp(T& result, const V& v1, const U& v2, const mpl
 }
 
 template <class T, class V, class U>
-inline void assign_components(T& result, const V& v1, const U& v2)
+inline BOOST_CXX14_CONSTEXPR void assign_components(T& result, const V& v1, const U& v2)
 {
    return assign_components_imp(result, v1, v2, typename number_category<T>::type());
 }
@@ -920,7 +920,7 @@ struct calculate_next_larger_type
 };
 
 template <class R, class T>
-inline typename boost::enable_if_c<boost::is_integral<R>::value, bool>::type check_in_range(const T& t)
+inline BOOST_CXX14_CONSTEXPR typename boost::enable_if_c<boost::is_integral<R>::value, bool>::type check_in_range(const T& t)
 {
    // Can t fit in an R?
    if((t > 0) && std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::is_bounded && (t > (std::numeric_limits<R>::max)()))
@@ -930,7 +930,7 @@ inline typename boost::enable_if_c<boost::is_integral<R>::value, bool>::type che
 }
 
 template <class R, class B>
-inline typename boost::enable_if_c<boost::is_integral<R>::value>::type eval_convert_to(R* result, const B& backend)
+inline BOOST_CXX14_CONSTEXPR typename boost::enable_if_c<boost::is_integral<R>::value>::type eval_convert_to(R* result, const B& backend)
 {
    typedef typename calculate_next_larger_type<R, B>::type next_type;
    next_type n;
@@ -948,7 +948,7 @@ inline typename boost::enable_if_c<boost::is_integral<R>::value>::type eval_conv
 }
 
 template <class R, class B>
-inline typename boost::disable_if_c<boost::is_integral<R>::value>::type eval_convert_to(R* result, const B& backend)
+inline BOOST_CXX14_CONSTEXPR typename boost::disable_if_c<boost::is_integral<R>::value>::type eval_convert_to(R* result, const B& backend)
 {
    typedef typename calculate_next_larger_type<R, B>::type next_type;
    next_type n;
@@ -1013,7 +1013,7 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
 }
 
 template <class R, class B>
-inline void eval_convert_to(terminal<R>* result, const B& backend)
+inline BOOST_CXX14_CONSTEXPR void eval_convert_to(terminal<R>* result, const B& backend)
 {
    typedef mpl::bool_<boost::is_unsigned<R>::value && number_category<B>::value == number_kind_integer> tag_type;
    last_chance_eval_convert_to(result, backend, tag_type());
@@ -1158,10 +1158,10 @@ inline typename enable_if<is_arithmetic<A>, void>::type eval_fmod(T& result, con
 }
 
 template <class T>
-void eval_round(T& result, const T& a);
+void BOOST_CXX14_CONSTEXPR eval_round(T& result, const T& a);
 
 template <class T>
-inline void eval_remquo(T& result, const T& a, const T& b, int* pi)
+inline BOOST_CXX14_CONSTEXPR void eval_remquo(T& result, const T& a, const T& b, int* pi)
 {
    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The remquo function is only valid for floating point types.");
    if((&result == &a) || (&result == &b))
@@ -1179,7 +1179,7 @@ inline void eval_remquo(T& result, const T& a, const T& b, int* pi)
    eval_subtract(result, a, n);
 }
 template<class T, class A>
-inline typename enable_if<is_arithmetic<A>, void>::type eval_remquo(T& result, const T& x, const A& a, int* pi)
+inline BOOST_CXX14_CONSTEXPR typename enable_if<is_arithmetic<A>, void>::type eval_remquo(T& result, const T& x, const A& a, int* pi)
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
    typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
@@ -1188,7 +1188,7 @@ inline typename enable_if<is_arithmetic<A>, void>::type eval_remquo(T& result, c
    eval_remquo(result, x, c, pi);
 }
 template<class T, class A>
-inline typename enable_if<is_arithmetic<A>, void>::type eval_remquo(T& result, const A& x, const T& a, int* pi)
+inline BOOST_CXX14_CONSTEXPR typename enable_if<is_arithmetic<A>, void>::type eval_remquo(T& result, const A& x, const T& a, int* pi)
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
    typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
@@ -1197,7 +1197,7 @@ inline typename enable_if<is_arithmetic<A>, void>::type eval_remquo(T& result, c
    eval_remquo(result, c, a, pi);
 }
 template <class T, class U, class V>
-inline void eval_remainder(T& result, const U& a, const V& b)
+inline BOOST_CXX14_CONSTEXPR void eval_remainder(T& result, const U& a, const V& b)
 {
    int i;
    eval_remquo(result, a, b, &i);
@@ -1356,7 +1356,7 @@ inline void eval_modf(T& result, T const& arg, T* pipart)
 }
 
 template <class T>
-inline void eval_round(T& result, const T& a)
+inline BOOST_CXX14_CONSTEXPR void eval_round(T& result, const T& a)
 {
    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The round function is only valid for floating point types.");
    typedef typename boost::multiprecision::detail::canonical<float, T>::type fp_type;
@@ -1418,7 +1418,7 @@ inline typename enable_if<is_integral<Arithmetic> >::type eval_lcm(T& result, co
 }
 
 template <class T>
-inline unsigned eval_lsb(const T& val)
+inline BOOST_CXX14_CONSTEXPR unsigned eval_lsb(const T& val)
 {
    typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
    int c = eval_get_sign(val);
@@ -1445,7 +1445,7 @@ inline unsigned eval_lsb(const T& val)
 }
 
 template <class T>
-inline int eval_msb(const T& val)
+inline BOOST_CXX14_CONSTEXPR int eval_msb(const T& val)
 {
    int c = eval_get_sign(val);
    if(c == 0)
@@ -1475,7 +1475,7 @@ inline int eval_msb(const T& val)
 }
 
 template <class T>
-inline bool eval_bit_test(const T& val, unsigned index)
+inline BOOST_CXX14_CONSTEXPR bool eval_bit_test(const T& val, unsigned index)
 {
    typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
    T mask, t;
@@ -1486,7 +1486,7 @@ inline bool eval_bit_test(const T& val, unsigned index)
 }
 
 template <class T>
-inline void eval_bit_set(T& val, unsigned index)
+inline BOOST_CXX14_CONSTEXPR void eval_bit_set(T& val, unsigned index)
 {
    typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
    T mask;
@@ -1496,7 +1496,7 @@ inline void eval_bit_set(T& val, unsigned index)
 }
 
 template <class T>
-inline void eval_bit_flip(T& val, unsigned index)
+inline BOOST_CXX14_CONSTEXPR void eval_bit_flip(T& val, unsigned index)
 {
    typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
    T mask;
@@ -1506,7 +1506,7 @@ inline void eval_bit_flip(T& val, unsigned index)
 }
 
 template <class T>
-inline void eval_bit_unset(T& val, unsigned index)
+inline BOOST_CXX14_CONSTEXPR void eval_bit_unset(T& val, unsigned index)
 {
    typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
    T mask, t;

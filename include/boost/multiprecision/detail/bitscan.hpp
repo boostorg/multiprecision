@@ -18,7 +18,7 @@
 namespace boost{ namespace multiprecision{ namespace detail{
 
 template <class Unsigned>
-inline unsigned find_lsb(Unsigned mask, const mpl::int_<0>&)
+inline BOOST_CXX14_CONSTEXPR unsigned find_lsb(Unsigned mask, const mpl::int_<0>&)
 {
    unsigned result = 0;
    while(!(mask & 1u))
@@ -30,7 +30,7 @@ inline unsigned find_lsb(Unsigned mask, const mpl::int_<0>&)
 }
 
 template <class Unsigned>
-inline unsigned find_msb(Unsigned mask, const mpl::int_<0>&)
+inline BOOST_CXX14_CONSTEXPR unsigned find_msb(Unsigned mask, const mpl::int_<0>&)
 {
    unsigned index = 0;
    while(mask)
@@ -248,12 +248,12 @@ BOOST_FORCEINLINE unsigned find_msb(Unsigned mask)
 }
 #else
 template <class Unsigned>
-BOOST_FORCEINLINE unsigned find_lsb(Unsigned mask)
+BOOST_FORCEINLINE BOOST_CXX14_CONSTEXPR unsigned find_lsb(Unsigned mask)
 {
    return find_lsb(mask, mpl::int_<0>());
 }
 template <class Unsigned>
-BOOST_FORCEINLINE unsigned find_msb(Unsigned mask)
+BOOST_FORCEINLINE BOOST_CXX14_CONSTEXPR unsigned find_msb(Unsigned mask)
 {
    return find_msb(mask, mpl::int_<0>());
 }
