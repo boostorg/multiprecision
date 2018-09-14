@@ -202,7 +202,7 @@ public:
    BOOST_CXX14_CONSTEXPR typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       typedef typename is_same<number, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::type tag_type;
-      do_assign(e, tag_type());
+      do_assign(e, mpl::bool_<tag_type::value>());
       return *this;
    }
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
@@ -613,19 +613,19 @@ public:
    //
    // swap:
    //
-   BOOST_MP_FORCEINLINE void swap(self_type& other) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend>().swap(std::declval<Backend&>())))
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR void swap(self_type& other) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend>().swap(std::declval<Backend&>())))
    {
       m_backend.swap(other.backend());
    }
    //
    // Zero and sign:
    //
-   BOOST_MP_FORCEINLINE bool is_zero()const
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR bool is_zero()const
    {
       using default_ops::eval_is_zero;
       return eval_is_zero(m_backend);
    }
-   BOOST_MP_FORCEINLINE int sign()const
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR int sign()const
    {
       using default_ops::eval_get_sign;
       return eval_get_sign(m_backend);
@@ -1903,7 +1903,7 @@ inline std::istream& operator >> (std::istream& is, number<Backend, ExpressionTe
 }
 
 template <class Backend, expression_template_option ExpressionTemplates>
-BOOST_MP_FORCEINLINE void swap(number<Backend, ExpressionTemplates>& a, number<Backend, ExpressionTemplates>& b) 
+BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR void swap(number<Backend, ExpressionTemplates>& a, number<Backend, ExpressionTemplates>& b)
    BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<number<Backend, ExpressionTemplates>&>() = std::declval<number<Backend, ExpressionTemplates>&>()))
 {
    a.swap(b);

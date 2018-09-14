@@ -542,12 +542,12 @@ public:
    {
       return m_sign;
    }
-   BOOST_MP_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
       for(unsigned i = 0; i < (std::max)(size(), o.size()); ++i)
-         std::swap(m_wrapper.m_data[i], o.m_wrapper.m_data[i]);
-      std::swap(m_sign, o.m_sign);
-      std::swap(m_limbs, o.m_limbs);
+         boost::multiprecision::detail::swap(m_wrapper.m_data[i], o.m_wrapper.m_data[i]);
+      boost::multiprecision::detail::swap(m_sign, o.m_sign);
+      boost::multiprecision::detail::swap(m_limbs, o.m_limbs);
    }
 protected:
    template <class A>
@@ -691,11 +691,11 @@ public:
    {
       return false;
    }
-   BOOST_MP_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
       for(unsigned i = 0; i < (std::max)(size(), o.size()); ++i)
-         std::swap(m_wrapper.m_data[i], o.m_wrapper.m_data[i]);
-      std::swap(m_limbs, o.m_limbs);
+         boost::multiprecision::detail::swap(m_wrapper.m_data[i], o.m_wrapper.m_data[i]);
+      boost::multiprecision::detail::swap(m_limbs, o.m_limbs);
    }
 protected:
    template <class A>
@@ -868,10 +868,10 @@ public:
    {
       return m_sign;
    }
-   BOOST_MP_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
-      std::swap(m_sign, o.m_sign);
-      std::swap(m_data, o.m_data);
+      boost::multiprecision::detail::swap(m_sign, o.m_sign);
+      boost::multiprecision::detail::swap(m_data, o.m_data);
    }
 };
 //
@@ -1018,9 +1018,9 @@ public:
    {
       return false;
    }
-   BOOST_MP_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
-      std::swap(m_data, o.m_data);
+      boost::multiprecision::detail::swap(m_data, o.m_data);
    }
 };
 //
@@ -1157,7 +1157,7 @@ private:
    {
       // regular non-trivial to non-trivial assign:
       this->resize(other.size(), other.size());
-      std::memcpy(this->limbs(), other.limbs(), (std::min)(other.size(), this->size()) * sizeof(this->limbs()[0]));
+      boost::multiprecision::detail::copy(other.limbs(), other.limbs() + (std::min)(other.size(), this->size()), this->limbs());
       this->sign(other.sign());
       this->normalize();
    }
@@ -1555,7 +1555,7 @@ public:
       do_assign_string(s, trivial_tag());
       return *this;
    }
-   BOOST_MP_FORCEINLINE void swap(cpp_int_backend& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR void swap(cpp_int_backend& o) BOOST_NOEXCEPT
    {
       this->do_swap(o);
    }

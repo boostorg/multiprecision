@@ -359,7 +359,7 @@ BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR typename enable_if_c<
    BOOST_MP_STATIC_OR_CXX14_CONSTEXPR const signed_double_limb_type mask = ~static_cast<limb_type>(0);
    BOOST_MP_STATIC_OR_CXX14_CONSTEXPR const unsigned limb_bits = sizeof(limb_type) * CHAR_BIT;
    bool s = false;
-   double_limb_type w, x, y, z;
+   //double_limb_type w, x, y, z;
    if(a < 0)
    {
       a = -a;
@@ -370,10 +370,10 @@ BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR typename enable_if_c<
       b = -b;
       s = !s;
    }
-   w = a & mask;
-   x = a >> limb_bits;
-   y = b & mask;
-   z = b >> limb_bits;
+   double_limb_type w = a & mask;
+   double_limb_type x = a >> limb_bits;
+   double_limb_type y = b & mask;
+   double_limb_type z = b >> limb_bits;
 
    result.resize(4, 4);
    limb_type* pr = result.limbs();
@@ -413,11 +413,11 @@ BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR typename enable_if_c<
    BOOST_MP_STATIC_OR_CXX14_CONSTEXPR const signed_double_limb_type mask = ~static_cast<limb_type>(0);
    BOOST_MP_STATIC_OR_CXX14_CONSTEXPR const unsigned limb_bits = sizeof(limb_type) * CHAR_BIT;
 
-   double_limb_type w, x, y, z;
-   w = a & mask;
-   x = a >> limb_bits;
-   y = b & mask;
-   z = b >> limb_bits;
+   //double_limb_type w, x, y, z;
+   double_limb_type w = a & mask;
+   double_limb_type x = a >> limb_bits;
+   double_limb_type y = b & mask;
+   double_limb_type z = b >> limb_bits;
 
    result.resize(4, 4);
    limb_type* pr = result.limbs();

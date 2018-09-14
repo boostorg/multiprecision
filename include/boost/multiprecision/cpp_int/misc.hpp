@@ -356,12 +356,12 @@ BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR typename enable_if_c<is_signed<Intege
    return eval_integer_modulus(x, boost::multiprecision::detail::unsigned_abs(val));
 }
 
-inline limb_type integer_gcd_reduce(limb_type u, limb_type v)
+inline BOOST_CXX14_CONSTEXPR limb_type integer_gcd_reduce(limb_type u, limb_type v)
 {
    do
    {
       if(u > v)
-         std::swap(u, v);
+         boost::multiprecision::detail::swap(u, v);
       if(u == v)
          break;
       v -= u;
@@ -405,8 +405,6 @@ inline BOOST_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_ba
    using default_ops::eval_is_zero;
    using default_ops::eval_get_sign;
 
-   int shift;
-
    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> u(a);
 
    int s = eval_get_sign(u);
@@ -432,7 +430,7 @@ inline BOOST_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_ba
 
    unsigned us = eval_lsb(u);
    unsigned vs = boost::multiprecision::detail::find_lsb(v);
-   shift = (std::min)(us, vs);
+   int shift = (std::min)(us, vs);
    eval_right_shift(u, us);
    if(vs)
       v >>= vs;
@@ -447,8 +445,8 @@ inline BOOST_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_ba
             v = integer_gcd_reduce(*u.limbs(), v);
          else
          {
-            double_limb_type i;
-            i = u.limbs()[0] | (static_cast<double_limb_type>(u.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
+            //double_limb_type i;
+            double_limb_type i = u.limbs()[0] | (static_cast<double_limb_type>(u.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
             v = static_cast<limb_type>(integer_gcd_reduce(i, static_cast<double_limb_type>(v)));
          }
          break;
@@ -503,8 +501,6 @@ inline BOOST_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_ba
       return;
    }
 
-   int shift;
-
    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> u(a), v(b);
 
    int s = eval_get_sign(u);
@@ -535,7 +531,7 @@ inline BOOST_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_ba
 
    unsigned us = eval_lsb(u);
    unsigned vs = eval_lsb(v);
-   shift = (std::min)(us, vs);
+   int shift = (std::min)(us, vs);
    eval_right_shift(u, us);
    eval_right_shift(v, vs);
 
@@ -554,9 +550,9 @@ inline BOOST_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_ba
             u = integer_gcd_reduce(*v.limbs(), *u.limbs());
          else
          {
-            double_limb_type i, j;
-            i = v.limbs()[0] | (static_cast<double_limb_type>(v.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
-            j = (u.size() == 1) ? *u.limbs() : u.limbs()[0] | (static_cast<double_limb_type>(u.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
+            //double_limb_type i, j;
+            double_limb_type i = v.limbs()[0] | (static_cast<double_limb_type>(v.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
+            double_limb_type j = (u.size() == 1) ? *u.limbs() : u.limbs()[0] | (static_cast<double_limb_type>(u.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
             u = integer_gcd_reduce(i, j);
          }
          break;

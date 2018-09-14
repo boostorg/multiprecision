@@ -78,7 +78,7 @@ BOOST_FORCEINLINE unsigned find_msb(Unsigned mask, const mpl::int_<2>&)
 #endif
 
 template <class Unsigned>
-BOOST_FORCEINLINE unsigned find_lsb(Unsigned mask)
+BOOST_FORCEINLINE BOOST_CXX14_CONSTEXPR unsigned find_lsb(Unsigned mask)
 {
    typedef typename make_unsigned<Unsigned>::type ui_type;
    typedef typename mpl::if_c<
@@ -98,7 +98,7 @@ BOOST_FORCEINLINE unsigned find_lsb(Unsigned mask)
 }
 
 template <class Unsigned>
-BOOST_FORCEINLINE unsigned find_msb(Unsigned mask)
+BOOST_FORCEINLINE BOOST_CXX14_CONSTEXPR unsigned find_msb(Unsigned mask)
 {
    typedef typename make_unsigned<Unsigned>::type ui_type;
    typedef typename mpl::if_c<
@@ -119,27 +119,27 @@ BOOST_FORCEINLINE unsigned find_msb(Unsigned mask)
 
 #elif defined(BOOST_GCC) || defined(__clang__) || (defined(BOOST_INTEL) && defined(__GNUC__))
 
-BOOST_FORCEINLINE unsigned find_lsb(unsigned mask, mpl::int_<1> const&)
+BOOST_FORCEINLINE BOOST_CXX14_CONSTEXPR unsigned find_lsb(unsigned mask, mpl::int_<1> const&)
 {
    return __builtin_ctz(mask);
 }
-BOOST_FORCEINLINE unsigned find_lsb(unsigned long mask, mpl::int_<2> const&)
+BOOST_FORCEINLINE BOOST_CXX14_CONSTEXPR unsigned find_lsb(unsigned long mask, mpl::int_<2> const&)
 {
    return __builtin_ctzl(mask);
 }
-BOOST_FORCEINLINE unsigned find_lsb(boost::ulong_long_type mask, mpl::int_<3> const&)
+BOOST_FORCEINLINE BOOST_CXX14_CONSTEXPR unsigned find_lsb(boost::ulong_long_type mask, mpl::int_<3> const&)
 {
    return __builtin_ctzll(mask);
 }
-BOOST_FORCEINLINE unsigned find_msb(unsigned mask, mpl::int_<1> const&)
+BOOST_FORCEINLINE BOOST_CXX14_CONSTEXPR unsigned find_msb(unsigned mask, mpl::int_<1> const&)
 {
    return sizeof(unsigned) * CHAR_BIT - 1 - __builtin_clz(mask);
 }
-BOOST_FORCEINLINE unsigned find_msb(unsigned long mask, mpl::int_<2> const&)
+BOOST_FORCEINLINE BOOST_CXX14_CONSTEXPR unsigned find_msb(unsigned long mask, mpl::int_<2> const&)
 {
    return sizeof(unsigned long) * CHAR_BIT - 1 - __builtin_clzl(mask);
 }
-BOOST_FORCEINLINE unsigned find_msb(boost::ulong_long_type mask, mpl::int_<3> const&)
+BOOST_FORCEINLINE BOOST_CXX14_CONSTEXPR unsigned find_msb(boost::ulong_long_type mask, mpl::int_<3> const&)
 {
    return sizeof(boost::ulong_long_type) * CHAR_BIT - 1 - __builtin_clzll(mask);
 }
@@ -178,7 +178,7 @@ BOOST_FORCEINLINE unsigned find_lsb(uint128_type mask, mpl::int_<0> const&)
 #endif
 
 template <class Unsigned>
-BOOST_FORCEINLINE unsigned find_lsb(Unsigned mask)
+BOOST_FORCEINLINE BOOST_CXX14_CONSTEXPR unsigned find_lsb(Unsigned mask)
 {
    typedef typename make_unsigned<Unsigned>::type ui_type;
    typedef typename mpl::if_c<
@@ -197,7 +197,7 @@ BOOST_FORCEINLINE unsigned find_lsb(Unsigned mask)
    return find_lsb(static_cast<ui_type>(mask), tag_type());
 }
 template <class Unsigned>
-BOOST_FORCEINLINE unsigned find_msb(Unsigned mask)
+BOOST_FORCEINLINE BOOST_CXX14_CONSTEXPR unsigned find_msb(Unsigned mask)
 {
    typedef typename make_unsigned<Unsigned>::type ui_type;
    typedef typename mpl::if_c<
@@ -216,16 +216,16 @@ BOOST_FORCEINLINE unsigned find_msb(Unsigned mask)
    return find_msb(static_cast<ui_type>(mask), tag_type());
 }
 #elif defined(BOOST_INTEL)
-BOOST_FORCEINLINE unsigned find_lsb(unsigned mask, mpl::int_<1> const&)
+BOOST_FORCEINLINE BOOST_CXX14_CONSTEXPR unsigned find_lsb(unsigned mask, mpl::int_<1> const&)
 {
    return _bit_scan_forward(mask);
 }
-BOOST_FORCEINLINE unsigned find_msb(unsigned mask, mpl::int_<1> const&)
+BOOST_FORCEINLINE BOOST_CXX14_CONSTEXPR unsigned find_msb(unsigned mask, mpl::int_<1> const&)
 {
    return _bit_scan_reverse(mask);
 }
 template <class Unsigned>
-BOOST_FORCEINLINE unsigned find_lsb(Unsigned mask)
+BOOST_FORCEINLINE BOOST_CXX14_CONSTEXPR unsigned find_lsb(Unsigned mask)
 {
    typedef typename make_unsigned<Unsigned>::type ui_type;
    typedef typename mpl::if_c<
@@ -236,7 +236,7 @@ BOOST_FORCEINLINE unsigned find_lsb(Unsigned mask)
    return find_lsb(static_cast<ui_type>(mask), tag_type());
 }
 template <class Unsigned>
-BOOST_FORCEINLINE unsigned find_msb(Unsigned mask)
+BOOST_FORCEINLINE BOOST_CXX14_CONSTEXPR unsigned find_msb(Unsigned mask)
 {
    typedef typename make_unsigned<Unsigned>::type ui_type;
    typedef typename mpl::if_c<

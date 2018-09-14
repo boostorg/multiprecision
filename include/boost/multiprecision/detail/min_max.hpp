@@ -26,13 +26,13 @@ namespace boost{ namespace multiprecision{
 // which fails to compile as "long" is not a valid backend type.
 //
 template <class Backend>
-inline typename boost::enable_if_c < boost::multiprecision::detail::is_backend<Backend>::value, const number<Backend, et_on>&>::type
+inline BOOST_CXX14_CONSTEXPR typename boost::enable_if_c < boost::multiprecision::detail::is_backend<Backend>::value, const number<Backend, et_on>&>::type
    (min)(const number<Backend, et_on>& a, const number<Backend, et_on>& b)
 {
    return a < b ? a : b;
 }
 template <class Backend, class tag, class A1, class A2, class A3, class A4>
-inline typename boost::enable_if_c < boost::multiprecision::detail::is_backend<Backend>::value, const number<Backend, et_on> >::type
+inline BOOST_CXX14_CONSTEXPR typename boost::enable_if_c < boost::multiprecision::detail::is_backend<Backend>::value, const number<Backend, et_on> >::type
    (min)(const number<Backend, et_on>& a, const detail::expression<tag, A1, A2, A3, A4>& b)
 {
    number<Backend, et_on> t(b);
@@ -41,7 +41,7 @@ inline typename boost::enable_if_c < boost::multiprecision::detail::is_backend<B
    return BOOST_MP_MOVE(t);
 }
 template <class tag, class A1, class A2, class A3, class A4, class Backend>
-inline typename boost::enable_if_c < boost::multiprecision::detail::is_backend<Backend>::value, const number<Backend, et_on> >::type
+inline BOOST_CXX14_CONSTEXPR typename boost::enable_if_c < boost::multiprecision::detail::is_backend<Backend>::value, const number<Backend, et_on> >::type
    (min)(const detail::expression<tag, A1, A2, A3, A4>& a, const number<Backend, et_on>& b)
 {
    number<Backend, et_on> t(a);
@@ -50,7 +50,7 @@ inline typename boost::enable_if_c < boost::multiprecision::detail::is_backend<B
    return b;
 }
 template <class tag, class A1, class A2, class A3, class A4, class tagb, class A1b, class A2b, class A3b, class A4b>
-inline typename detail::expression<tag, A1, A2, A3, A4>::result_type
+inline BOOST_CXX14_CONSTEXPR typename detail::expression<tag, A1, A2, A3, A4>::result_type
       (min)(const detail::expression<tag, A1, A2, A3, A4>& a, const detail::expression<tagb, A1b, A2b, A3b, A4b>& b)
 {
    typename detail::expression<tag, A1, A2, A3, A4>::result_type t1(a), t2(b);
@@ -59,7 +59,7 @@ inline typename detail::expression<tag, A1, A2, A3, A4>::result_type
    return BOOST_MP_MOVE(t2);
 }
 template <class tag, class A1, class A2, class A3, class A4>
-inline typename detail::expression<tag, A1, A2, A3, A4>::result_type (min)(const detail::expression<tag, A1, A2, A3, A4>& a, const detail::expression<tag, A1, A2, A3, A4>& b)
+inline BOOST_CXX14_CONSTEXPR typename detail::expression<tag, A1, A2, A3, A4>::result_type (min)(const detail::expression<tag, A1, A2, A3, A4>& a, const detail::expression<tag, A1, A2, A3, A4>& b)
 {
    typename detail::expression<tag, A1, A2, A3, A4>::result_type t1(a), t2(b);
    if(t1 < t2)
@@ -68,13 +68,13 @@ inline typename detail::expression<tag, A1, A2, A3, A4>::result_type (min)(const
 }
 
 template <class Backend>
-inline typename boost::enable_if_c < boost::multiprecision::detail::is_backend<Backend>::value, const number<Backend, et_on>&>::type
+inline BOOST_CXX14_CONSTEXPR typename boost::enable_if_c < boost::multiprecision::detail::is_backend<Backend>::value, const number<Backend, et_on>&>::type
    (max)(const number<Backend, et_on>& a, const number<Backend, et_on>& b)
 {
    return a > b ? a : b;
 }
 template <class Backend, class tag, class A1, class A2, class A3, class A4>
-inline typename boost::enable_if_c < boost::multiprecision::detail::is_backend<Backend>::value, const number<Backend, et_on> >::type
+inline BOOST_CXX14_CONSTEXPR typename boost::enable_if_c < boost::multiprecision::detail::is_backend<Backend>::value, const number<Backend, et_on> >::type
    (max)(const number<Backend, et_on>& a, const detail::expression<tag, A1, A2, A3, A4>& b)
 {
    number<Backend, et_on> t(b);
@@ -83,7 +83,7 @@ inline typename boost::enable_if_c < boost::multiprecision::detail::is_backend<B
    return BOOST_MP_MOVE(t);
 }
 template <class tag, class A1, class A2, class A3, class A4, class Backend>
-inline typename boost::enable_if_c < boost::multiprecision::detail::is_backend<Backend>::value, const number<Backend, et_on> >::type
+inline BOOST_CXX14_CONSTEXPR typename boost::enable_if_c < boost::multiprecision::detail::is_backend<Backend>::value, const number<Backend, et_on> >::type
    (max)(const detail::expression<tag, A1, A2, A3, A4>& a, const number<Backend, et_on>& b)
 {
    number<Backend, et_on> t(a);
@@ -92,7 +92,7 @@ inline typename boost::enable_if_c < boost::multiprecision::detail::is_backend<B
    return b;
 }
 template <class tag, class A1, class A2, class A3, class A4, class tagb, class A1b, class A2b, class A3b, class A4b>
-inline typename detail::expression<tag, A1, A2, A3, A4>::result_type
+inline BOOST_CXX14_CONSTEXPR typename detail::expression<tag, A1, A2, A3, A4>::result_type
       (max)(const detail::expression<tag, A1, A2, A3, A4>& a, const detail::expression<tagb, A1b, A2b, A3b, A4b>& b)
 {
    typename detail::expression<tag, A1, A2, A3, A4>::result_type t1(a), t2(b);
@@ -101,7 +101,7 @@ inline typename detail::expression<tag, A1, A2, A3, A4>::result_type
    return BOOST_MP_MOVE(t2);
 }
 template <class tag, class A1, class A2, class A3, class A4>
-inline typename detail::expression<tag, A1, A2, A3, A4>::result_type (max)(const detail::expression<tag, A1, A2, A3, A4>& a, const detail::expression<tag, A1, A2, A3, A4>& b)
+inline BOOST_CXX14_CONSTEXPR typename detail::expression<tag, A1, A2, A3, A4>::result_type (max)(const detail::expression<tag, A1, A2, A3, A4>& a, const detail::expression<tag, A1, A2, A3, A4>& b)
 {
    typename detail::expression<tag, A1, A2, A3, A4>::result_type t1(a), t2(b);
    if(t1 > t2)

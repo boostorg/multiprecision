@@ -1072,7 +1072,7 @@ inline void eval_convert_to(std::complex<long double>* result, const B& backend)
 // Functions:
 //
 template <class T>
-void eval_abs(T& result, const T& arg)
+BOOST_CXX14_CONSTEXPR void eval_abs(T& result, const T& arg)
 {
    typedef typename T::signed_types type_list;
    typedef typename mpl::front<type_list>::type front;
@@ -1199,7 +1199,7 @@ inline BOOST_CXX14_CONSTEXPR typename enable_if<is_arithmetic<A>, void>::type ev
 template <class T, class U, class V>
 inline BOOST_CXX14_CONSTEXPR void eval_remainder(T& result, const U& a, const V& b)
 {
-   int i;
+   int i(0);
    eval_remquo(result, a, b, &i);
 }
 
@@ -1384,12 +1384,12 @@ inline BOOST_CXX14_CONSTEXPR void eval_round(T& result, const T& a)
 }
 
 template <class B>
-void eval_lcm(B& result, const B& a, const B& b);
+BOOST_CXX14_CONSTEXPR void eval_lcm(B& result, const B& a, const B& b);
 template <class B>
-void eval_gcd(B& result, const B& a, const B& b);
+BOOST_CXX14_CONSTEXPR void eval_gcd(B& result, const B& a, const B& b);
 
 template <class T, class Arithmetic>
-inline typename enable_if<is_integral<Arithmetic> >::type eval_gcd(T& result, const T& a, const Arithmetic& b)
+inline BOOST_CXX14_CONSTEXPR typename enable_if<is_integral<Arithmetic> >::type eval_gcd(T& result, const T& a, const Arithmetic& b)
 {
    typedef typename boost::multiprecision::detail::canonical<Arithmetic, T>::type si_type;
    using default_ops::eval_gcd;
@@ -1398,12 +1398,12 @@ inline typename enable_if<is_integral<Arithmetic> >::type eval_gcd(T& result, co
    eval_gcd(result, a, t);
 }
 template <class T, class Arithmetic>
-inline typename enable_if<is_integral<Arithmetic> >::type eval_gcd(T& result, const Arithmetic& a, const T& b)
+inline BOOST_CXX14_CONSTEXPR typename enable_if<is_integral<Arithmetic> >::type eval_gcd(T& result, const Arithmetic& a, const T& b)
 {
    eval_gcd(result, b, a);
 }
 template <class T, class Arithmetic>
-inline typename enable_if<is_integral<Arithmetic> >::type eval_lcm(T& result, const T& a, const Arithmetic& b)
+inline BOOST_CXX14_CONSTEXPR typename enable_if<is_integral<Arithmetic> >::type eval_lcm(T& result, const T& a, const Arithmetic& b)
 {
    typedef typename boost::multiprecision::detail::canonical<Arithmetic, T>::type si_type;
    using default_ops::eval_lcm;
@@ -1412,7 +1412,7 @@ inline typename enable_if<is_integral<Arithmetic> >::type eval_lcm(T& result, co
    eval_lcm(result, a, t);
 }
 template <class T, class Arithmetic>
-inline typename enable_if<is_integral<Arithmetic> >::type eval_lcm(T& result, const Arithmetic& a, const T& b)
+inline BOOST_CXX14_CONSTEXPR typename enable_if<is_integral<Arithmetic> >::type eval_lcm(T& result, const Arithmetic& a, const T& b)
 {
    eval_lcm(result, b, a);
 }
@@ -1518,7 +1518,7 @@ inline BOOST_CXX14_CONSTEXPR void eval_bit_unset(T& val, unsigned index)
 }
 
 template <class B>
-void eval_integer_sqrt(B& s, B& r, const B& x)
+BOOST_CXX14_CONSTEXPR void eval_integer_sqrt(B& s, B& r, const B& x)
 {
    //
    // This is slow bit-by-bit integer square root, see for example
@@ -2732,7 +2732,7 @@ inline typename enable_if_c<number_category<T>::value == number_kind_floating_po
 // Integer square root:
 //
 template <class B, expression_template_option ExpressionTemplates>
-inline typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, ExpressionTemplates> >::type
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, ExpressionTemplates> >::type
    sqrt(const number<B, ExpressionTemplates>& x)
 {
    using default_ops::eval_integer_sqrt;
@@ -2749,7 +2749,7 @@ namespace default_ops {
    struct fma_func
    {
       template <class B, class T, class U, class V>
-      void operator()(B& result, const T& a, const U& b, const V& c)const
+      BOOST_CXX14_CONSTEXPR void operator()(B& result, const T& a, const U& b, const V& c)const
       {
          eval_multiply_add(result, a, b, c);
       }
@@ -2759,7 +2759,7 @@ namespace default_ops {
 }
 
 template <class Backend, class U, class V>
-inline typename enable_if<
+inline BOOST_CXX14_CONSTEXPR typename enable_if<
    mpl::and_<
       mpl::bool_<number_category<number<Backend, et_on> >::value == number_kind_floating_point>,
       mpl::or_<
@@ -2782,7 +2782,7 @@ fma(const number<Backend, et_on>& a, const U& b, const V& c)
 }
 
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class U, class V>
-inline typename enable_if<
+inline BOOST_CXX14_CONSTEXPR typename enable_if<
    mpl::and_<
    mpl::bool_<number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type >::value == number_kind_floating_point>,
    mpl::or_<
@@ -2805,7 +2805,7 @@ fma(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const U& b, const 
 }
 
 template <class Backend, class U, class V>
-inline typename enable_if<
+inline BOOST_CXX14_CONSTEXPR typename enable_if<
    mpl::and_<
    mpl::bool_<number_category<number<Backend, et_off> >::value == number_kind_floating_point>,
    mpl::or_<
@@ -2830,7 +2830,7 @@ fma(const number<Backend, et_off>& a, const U& b, const V& c)
 }
 
 template <class U, class Backend, class V>
-inline typename enable_if<
+inline BOOST_CXX14_CONSTEXPR typename enable_if<
    mpl::and_<
       mpl::bool_<number_category<number<Backend, et_on> >::value == number_kind_floating_point>,
       is_arithmetic<U>,
@@ -2849,7 +2849,7 @@ fma(const U& a, const number<Backend, et_on>& b, const V& c)
 }
 
 template <class U, class tag, class Arg1, class Arg2, class Arg3, class Arg4, class V>
-inline typename enable_if<
+inline BOOST_CXX14_CONSTEXPR typename enable_if<
    mpl::and_<
       mpl::bool_<number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type >::value == number_kind_floating_point>,
       is_arithmetic<U>,
@@ -2868,7 +2868,7 @@ fma(const U& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b, const 
 }
 
 template <class U, class Backend, class V>
-inline typename enable_if<
+inline BOOST_CXX14_CONSTEXPR typename enable_if<
    mpl::and_<
       mpl::bool_<number_category<number<Backend, et_off> >::value == number_kind_floating_point>,
       is_arithmetic<U>,
@@ -2889,7 +2889,7 @@ fma(const U& a, const number<Backend, et_off>& b, const V& c)
 }
 
 template <class U, class V, class Backend>
-inline typename enable_if<
+inline BOOST_CXX14_CONSTEXPR typename enable_if<
    mpl::and_<
    mpl::bool_<number_category<number<Backend, et_on> >::value == number_kind_floating_point>,
       is_arithmetic<U>,
@@ -2904,7 +2904,7 @@ fma(const U& a, const V& b, const number<Backend, et_on>& c)
 }
 
 template <class U, class V, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-inline typename enable_if<
+inline BOOST_CXX14_CONSTEXPR typename enable_if<
    mpl::and_<
    mpl::bool_<number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type >::value == number_kind_floating_point>,
       is_arithmetic<U>,
@@ -2919,7 +2919,7 @@ fma(const U& a, const V& b, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4
 }
 
 template <class U, class V, class Backend>
-inline typename enable_if<
+inline BOOST_CXX14_CONSTEXPR typename enable_if<
    mpl::and_<
    mpl::bool_<number_category<number<Backend, et_off> >::value == number_kind_floating_point>,
       is_arithmetic<U>,
@@ -2940,7 +2940,7 @@ namespace default_ops {
    struct remquo_func
    {
       template <class B, class T, class U>
-      void operator()(B& result, const T& a, const U& b, int* pi)const
+      BOOST_CXX14_CONSTEXPR void operator()(B& result, const T& a, const U& b, int* pi)const
       {
          eval_remquo(result, a, b, pi);
       }
@@ -2949,7 +2949,7 @@ namespace default_ops {
 }
 
 template <class Backend, class U>
-inline typename enable_if_c<
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<
    number_category<number<Backend, et_on> >::value == number_kind_floating_point,
    detail::expression<detail::function, default_ops::remquo_func, number<Backend, et_on>, U, int*>
 >::type
@@ -2960,7 +2960,7 @@ remquo(const number<Backend, et_on>& a, const U& b, int* pi)
 }
 
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class U>
-inline typename enable_if_c<
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<
    number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type >::value == number_kind_floating_point,
    detail::expression<detail::function, default_ops::remquo_func, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, U, int*>
 >::type
@@ -2971,7 +2971,7 @@ remquo(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const U& b, int
 }
 
 template <class U, class Backend>
-inline typename enable_if_c<
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<
    (number_category<number<Backend, et_on> >::value == number_kind_floating_point)
    && !is_number<U>::value && !is_number_expression<U>::value,
    detail::expression<detail::function, default_ops::remquo_func, U, number<Backend, et_on>, int*>
@@ -2983,7 +2983,7 @@ remquo(const U& a, const number<Backend, et_on>& b, int* pi)
 }
 
 template <class U, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-inline typename enable_if_c<
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<
    (number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type >::value == number_kind_floating_point)
    && !is_number<U>::value && !is_number_expression<U>::value,
    detail::expression<detail::function, default_ops::remquo_func, U, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, int*>
@@ -2995,7 +2995,7 @@ remquo(const U& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b, int
 }
 
 template <class Backend, class U>
-inline typename enable_if_c<
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<
    number_category<number<Backend, et_on> >::value == number_kind_floating_point,
    number<Backend, et_off>
 >::type
@@ -3007,7 +3007,7 @@ remquo(const number<Backend, et_off>& a, const U& b, int* pi)
    return BOOST_MP_MOVE(result);
 }
 template <class U, class Backend>
-inline typename enable_if_c<
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<
 (number_category<number<Backend, et_on> >::value == number_kind_floating_point)
 && !is_number<U>::value && !is_number_expression<U>::value,
 number<Backend, et_off>
@@ -3022,7 +3022,7 @@ remquo(const U& a, const number<Backend, et_off>& b, int* pi)
 
 
 template <class B, expression_template_option ExpressionTemplates>
-inline typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, ExpressionTemplates> >::type
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, ExpressionTemplates> >::type
    sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
 {
    using default_ops::eval_integer_sqrt;
@@ -3036,13 +3036,13 @@ namespace detail{\
 template <class Backend> \
 struct BOOST_JOIN(category, BOOST_JOIN(func, _funct))\
 {\
-   void operator()(Backend& result, const Backend& arg)const\
+   BOOST_CXX14_CONSTEXPR void operator()(Backend& result, const Backend& arg)const\
    {\
       using default_ops::BOOST_JOIN(eval_,func);\
       BOOST_JOIN(eval_,func)(result, arg);\
    }\
    template <class U>\
-   void operator()(U& result, const Backend& arg)const\
+   BOOST_CXX14_CONSTEXPR void operator()(U& result, const Backend& arg)const\
    {\
       using default_ops::BOOST_JOIN(eval_,func);\
       Backend temp;\
@@ -3054,7 +3054,7 @@ struct BOOST_JOIN(category, BOOST_JOIN(func, _funct))\
 }\
 \
 template <class tag, class A1, class A2, class A3, class A4> \
-inline typename enable_if_c<number_category<detail::expression<tag, A1, A2, A3, A4> >::value == category,\
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<number_category<detail::expression<tag, A1, A2, A3, A4> >::value == category,\
    detail::expression<\
     detail::function\
   , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<typename detail::backend_type<detail::expression<tag, A1, A2, A3, A4> >::type> \
@@ -3072,7 +3072,7 @@ func(const detail::expression<tag, A1, A2, A3, A4>& arg)\
     );\
 }\
 template <class Backend> \
-inline typename enable_if_c<number_category<Backend>::value == category,\
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == category,\
    detail::expression<\
     detail::function\
   , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend> \
@@ -3090,7 +3090,7 @@ func(const number<Backend, et_on>& arg)\
     );\
 }\
 template <class Backend> \
-inline typename boost::enable_if_c<\
+inline BOOST_CXX14_CONSTEXPR typename boost::enable_if_c<\
    boost::multiprecision::number_category<Backend>::value == category,\
    number<Backend, et_off> >::type \
 func(const number<Backend, et_off>& arg)\
@@ -3106,25 +3106,25 @@ namespace detail{\
 template <class Backend> \
 struct BOOST_JOIN(category, BOOST_JOIN(func, _funct))\
 {\
-   void operator()(Backend& result, const Backend& arg, const Backend& a)const\
+   BOOST_CXX14_CONSTEXPR void operator()(Backend& result, const Backend& arg, const Backend& a)const\
    {\
       using default_ops:: BOOST_JOIN(eval_,func);\
       BOOST_JOIN(eval_,func)(result, arg, a);\
    }\
    template <class Arithmetic> \
-   void operator()(Backend& result, const Backend& arg, const Arithmetic& a)const\
+   BOOST_CXX14_CONSTEXPR void operator()(Backend& result, const Backend& arg, const Arithmetic& a)const\
    {\
       using default_ops:: BOOST_JOIN(eval_,func);\
       BOOST_JOIN(eval_,func)(result, arg, number<Backend>::canonical_value(a));\
    }\
    template <class Arithmetic> \
-   void operator()(Backend& result, const Arithmetic& arg, const Backend& a)const\
+   BOOST_CXX14_CONSTEXPR void operator()(Backend& result, const Arithmetic& arg, const Backend& a)const\
    {\
       using default_ops:: BOOST_JOIN(eval_,func);\
       BOOST_JOIN(eval_,func)(result, number<Backend>::canonical_value(arg), a);\
    }\
    template <class U>\
-   void operator()(U& result, const Backend& arg, const Backend& a)const\
+   BOOST_CXX14_CONSTEXPR void operator()(U& result, const Backend& arg, const Backend& a)const\
    {\
       using default_ops:: BOOST_JOIN(eval_,func);\
       Backend r;\
@@ -3132,7 +3132,7 @@ struct BOOST_JOIN(category, BOOST_JOIN(func, _funct))\
       result = r;\
    }\
    template <class U, class Arithmetic> \
-   void operator()(U& result, const Backend& arg, const Arithmetic& a)const\
+   BOOST_CXX14_CONSTEXPR void operator()(U& result, const Backend& arg, const Arithmetic& a)const\
    {\
       using default_ops:: BOOST_JOIN(eval_,func);\
       Backend r;\
@@ -3140,7 +3140,7 @@ struct BOOST_JOIN(category, BOOST_JOIN(func, _funct))\
       result = r;\
    }\
    template <class U, class Arithmetic> \
-   void operator()(U& result, const Arithmetic& arg, const Backend& a)const\
+   BOOST_CXX14_CONSTEXPR void operator()(U& result, const Arithmetic& arg, const Backend& a)const\
    {\
       using default_ops:: BOOST_JOIN(eval_,func);\
       Backend r;\
@@ -3151,7 +3151,7 @@ struct BOOST_JOIN(category, BOOST_JOIN(func, _funct))\
 \
 }\
 template <class Backend> \
-inline typename enable_if_c<number_category<Backend>::value == category,\
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<number_category<Backend>::value == category,\
    detail::expression<\
     detail::function\
   , detail::BOOST_JOIN(category, BOOST_JOIN(func, _funct))<Backend> \
@@ -3172,7 +3172,7 @@ func(const number<Backend, et_on>& arg, const number<Backend, et_on>& a)\
     );\
 }\
 template <class Backend, class tag, class A1, class A2, class A3, class A4> \
-inline typename enable_if_c<\
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<\
    (number_category<Backend>::value == category) && (boost::is_convertible<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, et_on> >::value),\
    detail::expression<\
     detail::function\
@@ -3194,7 +3194,7 @@ func(const number<Backend, et_on>& arg, const detail::expression<tag, A1, A2, A3
     );\
 }\
 template <class tag, class A1, class A2, class A3, class A4, class Backend> \
-inline typename enable_if_c<\
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<\
    (number_category<Backend>::value == category) && (boost::is_convertible<typename detail::expression<tag, A1, A2, A3, A4>::result_type, number<Backend, et_on> >::value),\
    detail::expression<\
     detail::function\
@@ -3216,7 +3216,7 @@ func(const detail::expression<tag, A1, A2, A3, A4>& arg, const number<Backend, e
     );\
 }\
 template <class tag, class A1, class A2, class A3, class A4, class tagb, class A1b, class A2b, class A3b, class A4b> \
-inline typename enable_if_c<\
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<\
       (number_category<detail::expression<tag, A1, A2, A3, A4> >::value == category) && (number_category<detail::expression<tagb, A1b, A2b, A3b, A4b> >::value == category),\
    detail::expression<\
     detail::function\
@@ -3238,7 +3238,7 @@ func(const detail::expression<tag, A1, A2, A3, A4>& arg, const detail::expressio
     );\
 }\
 template <class Backend, class Arithmetic> \
-inline typename enable_if_c<\
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<\
    is_compatible_arithmetic_type<Arithmetic, number<Backend, et_on> >::value && (number_category<Backend>::value == category),\
    detail::expression<\
     detail::function\
@@ -3261,7 +3261,7 @@ func(const number<Backend, et_on>& arg, const Arithmetic& a)\
     );\
 }\
 template <class tag, class A1, class A2, class A3, class A4, class Arithmetic> \
-inline typename enable_if_c<\
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<\
    is_compatible_arithmetic_type<Arithmetic, typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value && (number_category<detail::expression<tag, A1, A2, A3, A4> >::value == category),\
    detail::expression<\
     detail::function\
@@ -3284,7 +3284,7 @@ func(const detail::expression<tag, A1, A2, A3, A4>& arg, const Arithmetic& a)\
     );\
 }\
 template <class Backend, class Arithmetic> \
-inline typename enable_if_c<\
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<\
    is_compatible_arithmetic_type<Arithmetic, number<Backend, et_on> >::value && (number_category<Backend>::value == category),\
    detail::expression<\
     detail::function\
@@ -3307,7 +3307,7 @@ func(const Arithmetic& arg, const number<Backend, et_on>& a)\
     );\
 }\
 template <class tag, class A1, class A2, class A3, class A4, class Arithmetic> \
-inline typename enable_if_c<\
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<\
    is_compatible_arithmetic_type<Arithmetic, typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value && (number_category<detail::expression<tag, A1, A2, A3, A4> >::value == category),\
    detail::expression<\
     detail::function\
@@ -3330,7 +3330,7 @@ func(const Arithmetic& arg, const detail::expression<tag, A1, A2, A3, A4>& a)\
     );\
 }\
 template <class Backend> \
-inline typename enable_if_c<(number_category<Backend>::value == category),\
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<(number_category<Backend>::value == category),\
    number<Backend, et_off> >::type \
 func(const number<Backend, et_off>& arg, const number<Backend, et_off>& a)\
 {\
@@ -3340,7 +3340,7 @@ func(const number<Backend, et_off>& arg, const number<Backend, et_off>& a)\
    return BOOST_MP_MOVE(result);\
 }\
 template <class Backend, class Arithmetic> \
-inline typename enable_if_c<\
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<\
    is_compatible_arithmetic_type<Arithmetic, number<Backend, et_off> >::value && (number_category<Backend>::value == category),\
    number<Backend, et_off> \
 >::type \
@@ -3352,7 +3352,7 @@ func(const number<Backend, et_off>& arg, const Arithmetic& a)\
    return BOOST_MP_MOVE(result);\
 }\
 template <class Backend, class Arithmetic> \
-inline typename enable_if_c<\
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<\
    is_compatible_arithmetic_type<Arithmetic, number<Backend, et_off> >::value && (number_category<Backend>::value == category),\
    number<Backend, et_off> \
 >::type \
@@ -3367,7 +3367,7 @@ func(const Arithmetic& a, const number<Backend, et_off>& arg)\
 
 #define HETERO_BINARY_OP_FUNCTOR_B(func, Arg2, category)\
 template <class tag, class A1, class A2, class A3, class A4> \
-inline typename enable_if_c<\
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<\
    (number_category<detail::expression<tag, A1, A2, A3, A4> >::value == category),\
    detail::expression<\
     detail::function\
@@ -3388,7 +3388,7 @@ func(const detail::expression<tag, A1, A2, A3, A4>& arg, Arg2 const& a)\
     );\
 }\
 template <class Backend> \
-inline typename enable_if_c<\
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<\
    (number_category<Backend>::value == category),\
   detail::expression<\
     detail::function\
@@ -3410,7 +3410,7 @@ func(const number<Backend, et_on>& arg, Arg2 const& a)\
     );\
 }\
 template <class Backend> \
-inline typename enable_if_c<\
+inline BOOST_CXX14_CONSTEXPR typename enable_if_c<\
   (number_category<Backend>::value == category),\
   number<Backend, et_off> >::type \
 func(const number<Backend, et_off>& arg, Arg2 const& a)\
@@ -3427,7 +3427,7 @@ template <class Backend> \
 struct BOOST_JOIN(category, BOOST_JOIN(func, _funct))\
 {\
    template <class Arg>\
-   void operator()(Backend& result, Backend const& arg, Arg a)const\
+   BOOST_CXX14_CONSTEXPR void operator()(Backend& result, Backend const& arg, Arg a)const\
    {\
       using default_ops:: BOOST_JOIN(eval_,func);\
       BOOST_JOIN(eval_,func)(result, arg, a);\
@@ -3487,7 +3487,7 @@ abs(const detail::expression<tag, A1, A2, A3, A4>& arg)
     );
 }
 template <class Backend>
-inline typename disable_if_c<number_category<Backend>::value == number_kind_complex, 
+inline BOOST_CXX14_CONSTEXPR typename disable_if_c<number_category<Backend>::value == number_kind_complex,
    detail::expression<
     detail::function
   , detail::abs_funct<Backend>
@@ -3504,13 +3504,13 @@ abs(const number<Backend, et_on>& arg)
     );
 }
 template <class Backend>
-inline typename disable_if_c<number_category<Backend>::value == number_kind_complex, number<Backend, et_off> >::type
+inline BOOST_CXX14_CONSTEXPR typename disable_if_c<number_category<Backend>::value == number_kind_complex, number<Backend, et_off> >::type
 abs(const number<Backend, et_off>& arg)
 {
    number<Backend, et_off> result;
    using default_ops::eval_abs;
    eval_abs(result.backend(), arg.backend());
-   return BOOST_MP_MOVE(result);
+   return result;
 }
 
 template <class tag, class A1, class A2, class A3, class A4>
