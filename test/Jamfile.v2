@@ -728,6 +728,8 @@ test-suite cpp_int_tests :
       [ run test_cpp_int_deserial.cpp ../../serialization/build//boost_serialization ../../filesystem/build//boost_filesystem : $(here) : : release <toolset>gcc-mingw:<link>static  ]
       [ run test_cpp_rat_serial.cpp ../../serialization/build//boost_serialization : : : release <toolset>gcc-mingw:<link>static  ]
 
+      [ compile cpp_int_constexpr_arithmetic.cpp : [ requires cxx14_constexpr ] ]
+
 ;
 
 test-suite misc :
