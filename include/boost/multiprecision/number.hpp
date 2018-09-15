@@ -224,7 +224,8 @@ public:
       BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
          if (boost::multiprecision::detail::current_precision_of(e) != boost::multiprecision::detail::current_precision_of(*this))
          {
-            number t(e);
+            number t;
+            t.assign(e);
             return *this = BOOST_MP_MOVE(t);
          }
       do_assign(e, tag_type());
