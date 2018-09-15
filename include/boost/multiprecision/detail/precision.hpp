@@ -12,48 +12,54 @@
 namespace boost{ namespace multiprecision{  namespace detail{
 
    template <class B, boost::multiprecision::expression_template_option ET>
-   inline boost::uintmax_t current_precision_of_imp(const boost::multiprecision::number<B, ET>& n, const mpl::true_&)
+   inline unsigned current_precision_of_imp(const boost::multiprecision::number<B, ET>& n, const mpl::true_&)
    {
       return n.precision();
    }
    template <class B, boost::multiprecision::expression_template_option ET>
-   inline BOOST_CONSTEXPR boost::uintmax_t current_precision_of_imp(const boost::multiprecision::number<B, ET>&, const mpl::false_&)
+   inline BOOST_CONSTEXPR unsigned current_precision_of_imp(const boost::multiprecision::number<B, ET>&, const mpl::false_&)
    {
       return std::numeric_limits<boost::multiprecision::number<B, ET> >::digits10;
    }
 
    template <class Terminal>
-   inline BOOST_CONSTEXPR boost::uintmax_t current_precision_of(const Terminal&)
+   inline BOOST_CONSTEXPR unsigned current_precision_of(const Terminal&)
    {
       return std::numeric_limits<Terminal>::digits10;
    }
 
+   template <class Terminal, std::size_t N>
+   inline BOOST_CONSTEXPR unsigned current_precision_of(const Terminal(&)[N])
+   { // For string literals:
+      return 0;
+   }
+
    template <class B, boost::multiprecision::expression_template_option ET>
-   inline BOOST_CONSTEXPR boost::uintmax_t current_precision_of(const boost::multiprecision::number<B, ET>& n)
+   inline BOOST_CONSTEXPR unsigned current_precision_of(const boost::multiprecision::number<B, ET>& n)
    {
       return current_precision_of_imp(n, boost::multiprecision::detail::is_variable_precision<boost::multiprecision::number<B, ET> >());
    }
 
    template<class tag, class Arg1>
-   inline BOOST_CONSTEXPR boost::uintmax_t current_precision_of(const expression<tag, Arg1, void, void, void>& expr)
+   inline BOOST_CONSTEXPR unsigned current_precision_of(const expression<tag, Arg1, void, void, void>& expr)
    {
       return current_precision_of(expr.left_ref());
    }
 
    template<class Arg1>
-   inline BOOST_CONSTEXPR boost::uintmax_t current_precision_of(const expression<terminal, Arg1, void, void, void>& expr)
+   inline BOOST_CONSTEXPR unsigned current_precision_of(const expression<terminal, Arg1, void, void, void>& expr)
    {
       return current_precision_of(expr.value());
    }
 
    template <class tag, class Arg1, class Arg2>
-   inline BOOST_CONSTEXPR boost::uintmax_t current_precision_of(const expression<tag, Arg1, Arg2, void, void>& expr)
+   inline BOOST_CONSTEXPR unsigned current_precision_of(const expression<tag, Arg1, Arg2, void, void>& expr)
    {
       return (std::max)(current_precision_of(expr.left_ref()), current_precision_of(expr.right_ref()));
    }
 
    template <class tag, class Arg1, class Arg2, class Arg3>
-   inline BOOST_CONSTEXPR boost::uintmax_t current_precision_of(const expression<tag, Arg1, Arg2, Arg3, void>& expr)
+   inline BOOST_CONSTEXPR unsigned current_precision_of(const expression<tag, Arg1, Arg2, Arg3, void>& expr)
    {
       return (std::max)((std::max)(current_precision_of(expr.left_ref()), current_precision_of(expr.right_ref())), current_precision_of(expr.middle_ref()));
    }
@@ -92,13 +98,13 @@ namespace boost{ namespace multiprecision{  namespace detail{
          R::default_precision(m_prec);
       }
    private:
-      void init(boost::uintmax_t p)
+      void init(unsigned p)
       {
          m_prec = R::default_precision();
          if (p)
             R::default_precision(p);
       }
-      boost::uintmax_t m_prec;
+      unsigned m_prec;
    };
 
 #ifndef BOOST_NO_CXX17_IF_CONSTEXPR

@@ -239,6 +239,16 @@ int main()
       f = (c + d) * d / e;
       mpfr_float g((c + d) * d / e);
    }
+   {
+      mpfr_float::default_precision(100);
+      mpfr_float f1;
+      f1 = 3;
+      BOOST_CHECK_EQUAL(f1.precision(), 100);
+      f1 = 3.5;
+      BOOST_CHECK_EQUAL(f1.precision(), 100);
+      mpfr_float f2(3.5);
+      BOOST_CHECK_EQUAL(f2.precision(), 100);
+   }
 
 
    return boost::report_errors();
