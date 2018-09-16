@@ -121,7 +121,7 @@ inline limb_type block_multiplier(unsigned count)
 static const unsigned bits_per_limb = sizeof(limb_type) * CHAR_BIT;
 
 template <class T>
-inline BOOST_CXX14_CONSTEXPR void minmax(const T& a, const T& b, T& aa, T& bb)
+inline BOOST_MP_CXX14_CONSTEXPR void minmax(const T& a, const T& b, T& aa, T& bb)
 {
    if(a < b)
    {

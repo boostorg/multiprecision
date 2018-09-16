@@ -20,7 +20,7 @@
 namespace detail{
 
 template<typename T, typename U> 
-inline BOOST_CXX14_CONSTEXPR void pow_imp(T& result, const T& t, const U& p, const mpl::false_&)
+inline BOOST_MP_CXX14_CONSTEXPR void pow_imp(T& result, const T& t, const U& p, const mpl::false_&)
 {
    // Compute the pure power of typename T t^p.
    // Use the S-and-X binary method, as described in
@@ -88,7 +88,7 @@ inline void pow_imp(T& result, const T& t, const U& p, const mpl::true_&)
 } // namespace detail
 
 template<typename T, typename U> 
-inline BOOST_CXX14_CONSTEXPR typename enable_if_c<is_integral<U>::value>::type eval_pow(T& result, const T& t, const U& p)
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<U>::value>::type eval_pow(T& result, const T& t, const U& p)
 {
    detail::pow_imp(result, t, p, mpl::bool_<boost::is_signed<U>::value>());
 }
