@@ -933,7 +933,11 @@ template <class R, class B>
 inline BOOST_CXX14_CONSTEXPR typename boost::enable_if_c<boost::is_integral<R>::value>::type eval_convert_to(R* result, const B& backend)
 {
    typedef typename calculate_next_larger_type<R, B>::type next_type;
+#ifndef BOOST_NO_CXX14_CONSTEXPR
+   next_type n{};
+#else
    next_type n;
+#endif
    eval_convert_to(&n, backend);
    if(!boost::is_unsigned<R>::value && std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::is_bounded && (n > (next_type)(std::numeric_limits<R>::max)()))
    {
@@ -951,7 +955,11 @@ template <class R, class B>
 inline BOOST_CXX14_CONSTEXPR typename boost::disable_if_c<boost::is_integral<R>::value>::type eval_convert_to(R* result, const B& backend)
 {
    typedef typename calculate_next_larger_type<R, B>::type next_type;
+#ifndef BOOST_NO_CXX14_CONSTEXPR
+   next_type n{};
+#else
    next_type n;
+#endif
    eval_convert_to(&n, backend);
    if(std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::is_bounded && ((n > (next_type)(std::numeric_limits<R>::max)() || (n < (next_type)-(std::numeric_limits<R>::max)()) )))
    {
@@ -1183,7 +1191,11 @@ inline BOOST_CXX14_CONSTEXPR typename enable_if<is_arithmetic<A>, void>::type ev
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
    typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+#ifndef BOOST_NO_CXX14_CONSTEXPR
+   cast_type c{};
+#else
    cast_type c;
+#endif
    c = a;
    eval_remquo(result, x, c, pi);
 }
@@ -1192,7 +1204,11 @@ inline BOOST_CXX14_CONSTEXPR typename enable_if<is_arithmetic<A>, void>::type ev
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
    typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
+#ifndef BOOST_NO_CXX14_CONSTEXPR
+   cast_type c{};
+#else
    cast_type c;
+#endif
    c = x;
    eval_remquo(result, c, a, pi);
 }

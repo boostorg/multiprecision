@@ -1,6 +1,12 @@
-#include <boost\multiprecision\cpp_int.hpp>
+///////////////////////////////////////////////////////////////////////////////
+//  Copyright 2018 John Maddock. Distributed under the Boost
+//  Software License, Version 1.0. (See accompanying file
+//  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#include <boost/multiprecision/cpp_int.hpp>
 #include <iostream>
 
+#if !BOOST_WORKAROUND(BOOST_GCC, < 70000)  // GCC prior to 7.x has serious problems with this.
 
 template <class T>
 constexpr T make_rvalue_ref(T t) { return t; }
@@ -297,3 +303,11 @@ int main()
 
    return 0;
 }
+
+
+#else
+
+int main() { return 0; }
+
+#endif
+

@@ -419,7 +419,9 @@ BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR typename enable_if_c<
    double_limb_type y = b & mask;
    double_limb_type z = b >> limb_bits;
 
-   result.resize(4, 4);
+   result.resize(4, 3);
+   unsigned new_size = result.size();
+   BOOST_ASSERT(new_size > 2);
    limb_type* pr = result.limbs();
 
    double_limb_type carry = w * y;
@@ -435,7 +437,8 @@ BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR typename enable_if_c<
    carry >>= limb_bits;
    carry += pr[2] + x * z;
    pr[2] = static_cast<limb_type>(carry & ~static_cast<limb_type>(0));
-   pr[3] = static_cast<limb_type>(carry >> limb_bits);
+   if(new_size > 3)
+      pr[3] = static_cast<limb_type>(carry >> limb_bits);
 #else
    pr[0] = static_cast<limb_type>(carry);
    carry >>= limb_bits;
@@ -448,7 +451,8 @@ BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR typename enable_if_c<
    carry >>= limb_bits;
    carry += pr[2] + x * z;
    pr[2] = static_cast<limb_type>(carry);
-   pr[3] = static_cast<limb_type>(carry >> limb_bits);
+   if(new_size > 3)
+      pr[3] = static_cast<limb_type>(carry >> limb_bits);
 #endif
    result.sign(false);
    result.normalize();

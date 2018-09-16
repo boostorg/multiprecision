@@ -1102,7 +1102,7 @@ public:
       : base_type(i) {}
 
    template <class Arg>
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(Arg i,
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR cpp_int_backend(Arg i,
       typename boost::enable_if_c<
       is_allowed_cpp_int_base_conversion<Arg, base_type>::value
       && (boost::is_signed<Arg>::value && (SignType == unsigned_magnitude) && !is_trivial_cpp_int<self_type>::value)

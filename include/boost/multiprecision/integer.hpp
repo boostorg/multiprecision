@@ -85,7 +85,11 @@ BOOST_CXX14_CONSTEXPR typename enable_if_c<is_integral<I1>::value && is_unsigned
    typedef typename detail::double_integer<I1>::type double_type;
 
    I1 x(1), y(a);
+#ifndef BOOST_NO_CXX14_CONSTEXPR
+   double_type result{};
+#else
    double_type result;
+#endif
 
    while(b > 0)
    {
