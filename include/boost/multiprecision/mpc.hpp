@@ -9,6 +9,7 @@
 #include <boost/multiprecision/number.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/multiprecision/detail/digits.hpp>
+#include <boost/multiprecision/traits/is_variable_precision.hpp>
 #include <boost/multiprecision/mpfr.hpp>
 #include <boost/multiprecision/logged_adaptor.hpp>
 #include <boost/functional/hash_fwd.hpp>
@@ -37,15 +38,26 @@ namespace backends{
 
 namespace detail{
 
-template <unsigned digits10>
-inline typename boost::enable_if_c<digits10>::type copy_precision(mpfr_float_backend<digits10>&, const mpc_complex_backend<digits10>&) {}
-template <unsigned digits10>
-inline typename boost::disable_if_c<digits10>::type copy_precision(mpfr_float_backend<digits10>& a, const mpc_complex_backend<digits10>& b)
+
+inline void mpc_copy_precision(mpc_t dest, const mpc_t src)
 {
-   if (a.precision() != b.precision())
-      a.precision(b.precision());
+   mpfr_prec_t p_dest = mpc_get_prec(dest);
+   mpfr_prec_t p_src = mpc_get_prec(src);
+   if (p_dest != p_src)
+      mpc_set_prec(dest, p_src);
+}
+inline void mpc_copy_precision(mpc_t dest, const mpc_t src1, const mpc_t src2)
+{
+   mpfr_prec_t p_dest = mpc_get_prec(dest);
+   mpfr_prec_t p_src1 = mpc_get_prec(src1);
+   mpfr_prec_t p_src2 = mpc_get_prec(src2);
+   if (p_src2 > p_src1)
+      p_src1 = p_src2;
+   if (p_dest != p_src1)
+      mpc_set_prec(dest, p_src1);
 }
 
+   
 template <unsigned digits10>
 struct mpc_complex_imp
 {
@@ -441,9 +453,9 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
    mpc_complex_backend(mpc_complex_backend&& o) BOOST_NOEXCEPT : detail::mpc_complex_imp<0>(static_cast<detail::mpc_complex_imp<0>&&>(o)) {}
 #endif
    mpc_complex_backend(const mpc_complex_backend& o, unsigned digits10)
-      : detail::mpc_complex_imp<0>(digits10)
+      : detail::mpc_complex_imp<0>(multiprecision::detail::digits10_2_2(digits10))
    {
-      *this = o;
+      mpc_set(this->m_data, o.data(), GMP_RNDN);
    }
    template <unsigned D>
    mpc_complex_backend(const mpc_complex_backend<D>& val)
@@ -501,7 +513,7 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
    {
       if (this != &o)
       {
-         //mpc_set_prec(this->m_data, mpc_get_prec(o.data()));
+         detail::mpc_copy_precision(this->m_data, o.data());
          mpc_set(this->m_data, o.data(), GMP_RNDN);
       }
       return *this;
@@ -521,21 +533,21 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
    }
    mpc_complex_backend& operator=(const mpc_t val)
    {
-      // mpc_set_prec(this->m_data, mpc_get_prec(val));
+      mpc_set_prec(this->m_data, mpc_get_prec(val));
       mpc_set(this->m_data, val, GMP_RNDN);
       return *this;
    }
    template <unsigned D>
    mpc_complex_backend& operator=(const mpc_complex_backend<D>& val)
    {
-      // mpc_set_prec(this->m_data, mpc_get_prec(val.data()));
+      mpc_set_prec(this->m_data, mpc_get_prec(val.data()));
       mpc_set(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
    template <unsigned D>
    mpc_complex_backend& operator=(const mpfr_float_backend<D>& val)
    {
-      // mpc_set_prec(this->m_data, mpfr_get_prec(val.data()));
+      mpc_set_prec(this->m_data, mpfr_get_prec(val.data()));
       mpc_set_fr(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
@@ -1331,6 +1343,12 @@ struct is_explicitly_convertible<backends::mpc_complex_backend<D1>, backends::mp
 
 }
 #endif
+
+namespace detail
+{
+   template<>
+   struct is_variable_precision<backends::mpc_complex_backend<0> > : public true_type {};
+}
 
 template<>
 struct number_category<detail::canonical<mpc_t, backends::mpc_complex_backend<0> >::type> : public mpl::int_<number_kind_floating_point>{};

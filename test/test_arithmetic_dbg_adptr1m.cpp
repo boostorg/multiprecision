@@ -7,7 +7,7 @@
 #  define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#define NO_MIXED_OPS
+#define MIXED_OPS_ONLY
 
 #include <boost/multiprecision/debug_adaptor.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>

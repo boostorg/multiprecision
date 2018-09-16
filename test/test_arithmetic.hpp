@@ -2688,6 +2688,7 @@ void test()
    test_mixed<Real, std::complex<long double> >(complex_tag);
 
 #endif
+#ifndef MIXED_OPS_ONLY
    //
    // Integer only functions:
    //
@@ -3009,4 +3010,5 @@ void test()
    a = 2;
    a = (a + a) * a;
    BOOST_CHECK_EQUAL(a, 8);
+#endif
 }

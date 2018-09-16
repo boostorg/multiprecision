@@ -972,14 +972,12 @@ Things you should know when using this type:
 as a valid floating-point number.
 * Division by zero results in an infinity.
 * When using the variable precision type `mpfr_float`, then copy construction and assignment ['copies the precision
-of the source variable].  Likewise move construction and assignment.  Regular assignment though, retains the precision
-of the ['destination] variable.  This latter behaviour makes it possible to perform arithmetic at a differing precision
-by assigning to variables that were constructed with the precision desired.
-* If you want to assign both value and precision in the variable precision mpfr_float type, the easiest way is to
-move assign a copy, as in: `x = std::move(mpfr_float(y))`, in fact the call to `std::move` there is superfluous since the
-temporary copy is already an ['rvalue], but it helps express intent.  Alternatively `swap(x, y)` will swap both values and precision.
+of the source variable].  Likewise move construction and assignment.
 * When constructing the variable precision type `mpfr_float` you can specify two arguments to the constructor - the first
-is the value to assign to the variable, the second is an unsigned integer specifying the precision in decimal places.
+is the value to assign to the variable, the second is an unsigned integer specifying the precision in decimal places.  The
+`assign` member function similarly has a 2-argument overload taking the value to assign and the precision.  You can use this
+to preserve the precision of the target variable using the somewhat arcane: `a.assign(b, a.precision())`, which assigns `b` to `a`
+but preserves the precision of `a`.
 
 [h5 [mpfr] example:]
 
@@ -1369,14 +1367,12 @@ as a valid complex number.
 * Unlike `std::complex`, you can not use `reinterpret_cast` to treat this type as an array of the underlying floating point type.
 * Unlike `std::complex`, there are no literals for imaginary values.
 * When using the variable precision type `mpc_complex`, then copy construction and assignment ['copies the precision
-of the source variable].  Likewise move construction and assignment.  Regular assignment though, retains the precision
-of the ['destination] variable.  This latter behaviour makes it possible to perform arithmetic at a differing precision
-by assigning to variables that were constructed with the precision desired.
-* If you want to assign both value and precision in the variable precision mpc_complex type, the easiest way is to
-move assign a copy, as in: `x = std::move(mpc_complex(y))`, in fact the call to `std::move` there is superfluous since the
-temporary copy is already an ['rvalue], but it helps express intent.  Alternatively `swap(x, y)` will swap both values and precision.
-* When constructing the variable precision type `mpc_complex` then you can provide 3 arguments to the constructor - the first two
-are values for the real and imaginary parts respectively, the third is the precision of the variable in decimal places.
+of the source variable].  Likewise move construction and assignment.
+* When constructing the variable precision type `mpc_complex` you can specify two arguments to the constructor - the first
+is the value to assign to the variable, the second is an unsigned integer specifying the precision in decimal places.  The
+`assign` member function similarly has a 2-argument overload taking the value to assign and the precision.  You can use this
+to preserve the precision of the target variable using the somewhat arcane: `a.assign(b, a.precision())`, which assigns `b` to `a`
+but preserves the precision of `a`.
 
 [h5 [mpc] example:]
 
@@ -3602,6 +3598,15 @@ two argument constructor:
    number(arg1, arg2);
 
 Where the two args must either be arithmetic types, or types that are convertible to the two components of `this`.
+
+Finally, when the type has a variable precision, then there are constructors:
+
+   number(arg1, precision);
+   number(arg1, arg2, precision);
+
+Where `precision` is an unsigned value, the 2 arg version is active for scalar types and/or copy-construction with specific precision, and the 3-arg version for complex types.
+
+Likewise `assign` has a 2-arg overloaded, with the second argument being the precision.
 
       number& operator+=(const ``['see-below]``&);
       number& operator-=(const ``['see-below]``&);
