@@ -254,6 +254,13 @@ public:
       m_backend = canonical_value(v);
       return *this;
    }
+   template <class V>
+   BOOST_MP_FORCEINLINE number<Backend, ExpressionTemplates>& assign(const V& v, unsigned digits10)
+      BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend&>() = std::declval<const typename detail::canonical<V, Backend>::type&>()))
+   {
+      number t(v, digits10);
+      return *this = t;
+   }
    template <class Other, expression_template_option ET>
    typename boost::disable_if<boost::multiprecision::detail::is_explicitly_convertible<Other, Backend>, number<Backend, ExpressionTemplates>& >::type
       assign(const number<Other, ET>& v)

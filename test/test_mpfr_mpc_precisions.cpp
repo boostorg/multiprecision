@@ -248,6 +248,14 @@ int main()
       BOOST_CHECK_EQUAL(f1.precision(), 100);
       mpfr_float f2(3.5);
       BOOST_CHECK_EQUAL(f2.precision(), 100);
+      mpfr_float f3("5.1");
+      BOOST_CHECK_EQUAL(f3.precision(), 100);
+
+      mpfr_float::default_precision(50);
+      mpfr_float f4(f3, 50);
+      BOOST_CHECK_EQUAL(f4.precision(), 50);
+      f4.assign(f1, f4.precision());
+      BOOST_CHECK_EQUAL(f4.precision(), 50);
    }
 
 
