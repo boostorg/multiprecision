@@ -300,7 +300,6 @@ int main()
       checked_int64_t kc = get_constexpr<checked_int64_t>();
    constexpr
       checked_uint64_t lc = get_constexpr<checked_uint64_t>();
-
    return 0;
 }
 

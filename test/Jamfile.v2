@@ -99,9 +99,11 @@ test-suite arithmetic_tests :
    [ run test_arithmetic_cpp_dec_float_1.cpp no_eh_support ]
    [ run test_arithmetic_cpp_dec_float_2.cpp no_eh_support ]
    [ run test_arithmetic_cpp_dec_float_3.cpp no_eh_support ]
+   [ run test_arithmetic_cpp_dec_float_3m.cpp no_eh_support ]
 
    [ run test_arithmetic_cpp_bin_float_1.cpp no_eh_support ]
    [ run test_arithmetic_cpp_bin_float_2.cpp no_eh_support ]
+   [ run test_arithmetic_cpp_bin_float_2m.cpp no_eh_support ]
    [ run test_arithmetic_cpp_bin_float_3.cpp no_eh_support ]
 
    [ run test_arithmetic_mpf_50.cpp gmp no_eh_support : : : [ check-target-builds ../config//has_gmp : : <build>no ] ]
@@ -150,6 +152,7 @@ test-suite arithmetic_tests :
    [ run test_arithmetic_logged_2.cpp no_eh_support ]
 
    [ run test_arithmetic_dbg_adptr1.cpp no_eh_support ]
+   [ run test_arithmetic_dbg_adptr1m.cpp no_eh_support ]
    [ run test_arithmetic_dbg_adptr2.cpp no_eh_support ]
 
    [ run test_arithmetic_mpfi_50.cpp mpfi mpfr gmp no_eh_support : : : [ check-target-builds ../config//has_mpfi : : <build>no ] ]
@@ -161,6 +164,7 @@ test-suite arithmetic_tests :
    [ run test_mpfr_mpc_precisions.cpp mpc mpfr gmp : : : [ check-target-builds ../config//has_mpc : : <build>no ] ]
    [ run test_complex.cpp : : : [ check-target-builds ../config//has_mpc : <define>TEST_MPC <source>mpc <source>mpfr <source>gmp ] [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_arithmetic_complex_adaptor.cpp ]
+   [ run test_arithmetic_complex_adaptor_2.cpp ]
    [ run test_arithmetic_complex128.cpp : : : [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
 
 ;
@@ -335,6 +339,7 @@ test-suite functions_and_limits :
       [ run test_sf_import_c99.cpp : : : <define>TEST_CPP_DEC_FLOAT_3 : test_sf_import_c99_cpp_dec_float_3 ]
       [ run test_sf_import_c99.cpp : : : <define>TEST_CPP_DEC_FLOAT_4 : test_sf_import_c99_cpp_dec_float_4 ]
       [ run test_sf_import_c99.cpp : : : <define>TEST_CPP_DEC_FLOAT_5 : test_sf_import_c99_cpp_dec_float_5 ]
+      [ run test_sf_import_c99.cpp : : : <define>TEST_CPP_DEC_FLOAT_6 : test_sf_import_c99_cpp_dec_float_6 ]
 
       [ run test_sf_import_c99.cpp : : : <define>TEST_CPP_BIN_FLOAT_2 : test_sf_import_c99_cpp_bin_float_2 ]
       [ run test_sf_import_c99.cpp : : : <define>TEST_CPP_BIN_FLOAT_2 : test_sf_import_c99_cpp_bin_float_3 ]
@@ -1114,6 +1119,7 @@ rule get_concept_checks
 	            <define>TEST_MPFR_50
                [ check-target-builds ../config//has_mpfr : : <build>no ]
                <debug-symbols>off
+               <optimization>space
               : $(source:B)_mpfr_50 ] ;
 
       result += [ compile $(source)  mpfr
@@ -1121,6 +1127,7 @@ rule get_concept_checks
 	            <define>TEST_MPFR_6
                [ check-target-builds ../config//has_mpfr : : <build>no ]
                <debug-symbols>off
+               <optimization>space
               : $(source:B)_mpfr_6 ] ;
 
       result += [ compile $(source)  mpfr
@@ -1128,6 +1135,7 @@ rule get_concept_checks
 	            <define>TEST_MPFR_15
                [ check-target-builds ../config//has_mpfr : : <build>no ]
                <debug-symbols>off
+               <optimization>space
               : $(source:B)_mpfr_15 ] ;
 
       result += [ compile $(source)  mpfr
@@ -1135,6 +1143,7 @@ rule get_concept_checks
 	            <define>TEST_MPFR_17
                [ check-target-builds ../config//has_mpfr : : <build>no ]
                <debug-symbols>off
+               <optimization>space
               : $(source:B)_mpfr_17 ] ;
 
       result += [ compile $(source)  mpfr
@@ -1142,6 +1151,7 @@ rule get_concept_checks
 	            <define>TEST_MPFR_30
                [ check-target-builds ../config//has_mpfr : : <build>no ]
                <debug-symbols>off
+               <optimization>space
               : $(source:B)_mpfr_30 ] ;
 
       result += [ compile $(source)  gmp
@@ -1149,36 +1159,42 @@ rule get_concept_checks
 	            <define>TEST_MPF_50
                [ check-target-builds ../config//has_gmp : : <build>no ]
                <debug-symbols>off
+               <optimization>space
               : $(source:B)_mpf50 ] ;
 
       result += [ compile $(source)
               : # requirements
 	            <define>TEST_CPP_DEC_FLOAT
                <debug-symbols>off
+               <optimization>space
               : $(source:B)_cpp_dec_float ] ;
 
       result += [ compile $(source)
               : # requirements
 	            <define>TEST_CPP_BIN_FLOAT
                <debug-symbols>off
+               <optimization>space
               : $(source:B)_cpp_bin_float ] ;
 
       result += [ compile $(source)
               : # requirements
 	            <define>TEST_CPP_DEC_FLOAT_NO_ET
                <debug-symbols>off
+               <optimization>space
               : $(source:B)_cpp_dec_float_no_et ] ;
 
       result += [ compile $(source)
               : # requirements
 	            <define>TEST_BACKEND
                <debug-symbols>off
+               <optimization>space
               : $(source:B)_backend_concept ] ;
 
       result += [ compile $(source)
               : # requirements
 	            <define>TEST_LOGGED_ADAPTER
                <debug-symbols>off
+               <optimization>space
               : $(source:B)_logged_adaptor ] ;
    }
    return $(result) ;

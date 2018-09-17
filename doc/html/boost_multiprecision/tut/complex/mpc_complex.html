@@ -141,25 +141,17 @@
               When using the variable precision type <code class="computeroutput"><span class="identifier">mpc_complex</span></code>,
               then copy construction and assignment <span class="emphasis"><em>copies the precision
               of the source variable</em></span>. Likewise move construction and assignment.
-              Regular assignment though, retains the precision of the <span class="emphasis"><em>destination</em></span>
-              variable. This latter behaviour makes it possible to perform arithmetic
-              at a differing precision by assigning to variables that were constructed
-              with the precision desired.
-            </li>
-<li class="listitem">
-              If you want to assign both value and precision in the variable precision
-              mpc_complex type, the easiest way is to move assign a copy, as in:
-              <code class="computeroutput"><span class="identifier">x</span> <span class="special">=</span>
-              <span class="identifier">std</span><span class="special">::</span><span class="identifier">move</span><span class="special">(</span><span class="identifier">mpc_complex</span><span class="special">(</span><span class="identifier">y</span><span class="special">))</span></code>,
-              in fact the call to <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">move</span></code>
-              there is superfluous since the temporary copy is already an <span class="emphasis"><em>rvalue</em></span>,
-              but it helps express intent. Alternatively <code class="computeroutput"><span class="identifier">swap</span><span class="special">(</span><span class="identifier">x</span><span class="special">,</span> <span class="identifier">y</span><span class="special">)</span></code> will swap both values and precision.
             </li>
 <li class="listitem">
               When constructing the variable precision type <code class="computeroutput"><span class="identifier">mpc_complex</span></code>
-              then you can provide 3 arguments to the constructor - the first two
-              are values for the real and imaginary parts respectively, the third
-              is the precision of the variable in decimal places.
+              you can specify two arguments to the constructor - the first is the
+              value to assign to the variable, the second is an unsigned integer
+              specifying the precision in decimal places. The <code class="computeroutput"><span class="identifier">assign</span></code>
+              member function similarly has a 2-argument overload taking the value
+              to assign and the precision. You can use this to preserve the precision
+              of the target variable using the somewhat arcane: <code class="computeroutput"><span class="identifier">a</span><span class="special">.</span><span class="identifier">assign</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">a</span><span class="special">.</span><span class="identifier">precision</span><span class="special">())</span></code>, which assigns <code class="computeroutput"><span class="identifier">b</span></code>
+              to <code class="computeroutput"><span class="identifier">a</span></code> but preserves
+              the precision of <code class="computeroutput"><span class="identifier">a</span></code>.
             </li>
 </ul></div>
 <h6>
