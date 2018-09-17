@@ -662,7 +662,7 @@ public:
    template <class T>
    BOOST_MP_CXX14_CONSTEXPR T convert_to()const
    {
-#ifndef BOOST_NO_CXX14_CONSTEXPR
+#ifndef BOOST_MP_NO_CXX14_CONSTEXPR
       T result{};
 #else
       T result;

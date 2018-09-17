@@ -37,9 +37,10 @@
 #endif
 
 #if defined(BOOST_NO_CXX14_CONSTEXPR) || BOOST_WORKAROUND(BOOST_GCC, < 60000)\
-  || (defined( __APPLE_CC__) && (__clang_major__ < 9))
+  || (defined( __APPLE_CC__) && (__clang_major__ < 9)) || (__clang_major__ < 6)
 #define BOOST_MP_STATIC_OR_CXX14_CONSTEXPR static
 #define BOOST_MP_CXX14_CONSTEXPR
+#define BOOST_MP_NO_CXX14_CONSTEXPR
 #else
 #define BOOST_MP_STATIC_OR_CXX14_CONSTEXPR constexpr
 #define BOOST_MP_CXX14_CONSTEXPR constexpr

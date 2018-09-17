@@ -426,7 +426,7 @@ public:
    BOOST_STATIC_ASSERT_MSG(internal_limb_count >= 2, "A fixed precision integer type must have at least 2 limbs");
 
 private:
-#ifdef BOOST_NO_CXX14_CONSTEXPR
+#ifdef BOOST_MP_NO_CXX14_CONSTEXPR
    union data_type{
       limb_type          m_data[internal_limb_count];
       limb_type          m_first_limb;
@@ -594,7 +594,7 @@ public:
 private:
    union data_type{
       limb_type          m_data[internal_limb_count];
-#ifdef BOOST_NO_CXX14_CONSTEXPR
+#ifdef BOOST_MP_NO_CXX14_CONSTEXPR
       limb_type          m_first_limb;
       double_limb_type   m_double_first_limb;
 

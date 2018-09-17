@@ -933,7 +933,7 @@ template <class R, class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<boost::is_integral<R>::value>::type eval_convert_to(R* result, const B& backend)
 {
    typedef typename calculate_next_larger_type<R, B>::type next_type;
-#ifndef BOOST_NO_CXX14_CONSTEXPR
+#ifndef BOOST_MP_NO_CXX14_CONSTEXPR
    next_type n{};
 #else
    next_type n;
@@ -955,7 +955,7 @@ template <class R, class B>
 inline BOOST_MP_CXX14_CONSTEXPR typename boost::disable_if_c<boost::is_integral<R>::value>::type eval_convert_to(R* result, const B& backend)
 {
    typedef typename calculate_next_larger_type<R, B>::type next_type;
-#ifndef BOOST_NO_CXX14_CONSTEXPR
+#ifndef BOOST_MP_NO_CXX14_CONSTEXPR
    next_type n{};
 #else
    next_type n;
@@ -1191,7 +1191,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_arithmetic<A>, void>::type
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
    typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
-#ifndef BOOST_NO_CXX14_CONSTEXPR
+#ifndef BOOST_MP_NO_CXX14_CONSTEXPR
    cast_type c{};
 #else
    cast_type c;
@@ -1204,7 +1204,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_arithmetic<A>, void>::type
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type canonical_type;
    typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
-#ifndef BOOST_NO_CXX14_CONSTEXPR
+#ifndef BOOST_MP_NO_CXX14_CONSTEXPR
    cast_type c{};
 #else
    cast_type c;

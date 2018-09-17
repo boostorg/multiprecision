@@ -85,7 +85,7 @@ BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<I1>::value && is_unsig
    typedef typename detail::double_integer<I1>::type double_type;
 
    I1 x(1), y(a);
-#ifndef BOOST_NO_CXX14_CONSTEXPR
+#ifndef BOOST_MP_NO_CXX14_CONSTEXPR
    double_type result{};
 #else
    double_type result;

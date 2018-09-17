@@ -678,7 +678,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<
       cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
       const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o) BOOST_MP_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
 {
-#ifndef BOOST_NO_CXX14_CONSTEXPR
+#ifndef BOOST_MP_NO_CXX14_CONSTEXPR
    // Workaround for msvc which doesn't like the all-in-one expression 
    // below when used in a constexpr context:
    auto t = *(o.limbs());
