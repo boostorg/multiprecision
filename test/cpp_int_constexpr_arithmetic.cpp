@@ -6,7 +6,7 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <iostream>
 
-#if !BOOST_WORKAROUND(BOOST_GCC, < 70000)  // GCC prior to 7.x has serious problems with this.
+#ifndef BOOST_MP_NO_CXX14_CONSTEXPR
 
 template <class T>
 constexpr T make_rvalue_ref(T t) { return t; }
