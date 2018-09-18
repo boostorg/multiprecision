@@ -971,14 +971,15 @@ public:
    //
    // Direct access to the underlying backend:
    //
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR Backend& backend() BOOST_NOEXCEPT
-   {
-      return m_backend;
-   }
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const Backend& backend()const BOOST_NOEXCEPT
-   {
-      return m_backend;
-   }
+#if !(defined(BOOST_NO_CXX11_RVALUE_REFERENCES) || BOOST_WORKAROUND(BOOST_GCC, < 50000))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR Backend&              backend()& BOOST_NOEXCEPT               { return m_backend; }
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const Backend&                 backend()const& BOOST_NOEXCEPT          { return m_backend; }
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR Backend&&             backend()&& BOOST_NOEXCEPT              { return static_cast<Backend&&>(m_backend); }
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR Backend const&&       backend()const&& BOOST_NOEXCEPT         { return static_cast<Backend const&&>(m_backend); }
+#else
+   BOOST_MP_FORCEINLINE Backend&              backend() BOOST_NOEXCEPT { return m_backend; }
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const Backend& backend()const BOOST_NOEXCEPT { return m_backend; }
+#endif
    //
    // Complex number real and imag:
    //
