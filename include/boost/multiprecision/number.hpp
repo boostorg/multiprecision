@@ -967,7 +967,7 @@ public:
    //
    // Direct access to the underlying backend:
    //
-#if !(defined(BOOST_NO_CXX11_RVALUE_REFERENCES) || BOOST_WORKAROUND(BOOST_GCC, < 50000))
+#if !(defined(BOOST_NO_CXX11_RVALUE_REFERENCES) || defined(BOOST_NO_CXX11_REF_QUALIFIERS) || BOOST_WORKAROUND(BOOST_GCC, < 50000))
    BOOST_MP_FORCEINLINE Backend&              backend()& BOOST_NOEXCEPT               { return m_backend; }
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const Backend& backend()const& BOOST_NOEXCEPT { return m_backend; }
    BOOST_MP_FORCEINLINE Backend&&             backend()&& BOOST_NOEXCEPT              { return static_cast<Backend&&>(m_backend); }
