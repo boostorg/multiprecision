@@ -366,7 +366,7 @@ public:
 
    number& operator+=(const self_type& val)
    {
-      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(val);
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, val);
       //
       // If the current precision of *this differs from that of expression e, then we
       // create a temporary (which will have the correct precision thanks to precision_guard)
@@ -389,10 +389,10 @@ public:
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
    typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator+=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
-      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(e);
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, e);
       // Create a copy if e contains this, but not if we're just doing a
       //    x += x
-      if((contains_self(e) && !is_self(e)) || (boost::multiprecision::detail::current_precision_of(e) != boost::multiprecision::detail::current_precision_of(*this)))
+      if((contains_self(e) && !is_self(e)))
       {
          self_type temp(e);
          do_add(detail::expression<detail::terminal, self_type>(temp), detail::terminal());
@@ -407,7 +407,7 @@ public:
    template <class Arg1, class Arg2, class Arg3, class Arg4>
    number& operator+=(const detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>& e)
    {
-      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(e);
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, e);
       //
       // If the current precision of *this differs from that of expression e, then we
       // create a temporary (which will have the correct precision thanks to precision_guard)
@@ -442,7 +442,7 @@ public:
 
    number& operator-=(const self_type& val)
    {
-      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(val);
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, val);
       //
       // If the current precision of *this differs from that of expression e, then we
       // create a temporary (which will have the correct precision thanks to precision_guard)
@@ -465,9 +465,9 @@ public:
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
    typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator-=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
-      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(e);
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, e);
       // Create a copy if e contains this:
-      if(contains_self(e) || (boost::multiprecision::detail::current_precision_of(e) != boost::multiprecision::detail::current_precision_of(*this)))
+      if(contains_self(e))
       {
          self_type temp(e);
          do_subtract(detail::expression<detail::terminal, self_type>(temp), detail::terminal());
@@ -491,7 +491,7 @@ public:
    template <class Arg1, class Arg2, class Arg3, class Arg4>
    number& operator-=(const detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>& e)
    {
-      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(e);
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, e);
       //
       // If the current precision of *this differs from that of expression e, then we
       // create a temporary (which will have the correct precision thanks to precision_guard)
@@ -518,7 +518,7 @@ public:
 
    number& operator *= (const self_type& e)
    {
-      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(e);
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, e);
       //
       // If the current precision of *this differs from that of expression e, then we
       // create a temporary (which will have the correct precision thanks to precision_guard)
@@ -541,10 +541,10 @@ public:
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
    typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator*=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
-      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(e);
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, e);
       // Create a temporary if the RHS references *this, but not
       // if we're just doing an   x *= x;
-      if((contains_self(e) && !is_self(e)) || (boost::multiprecision::detail::current_precision_of(e) != boost::multiprecision::detail::current_precision_of(*this)))
+      if((contains_self(e) && !is_self(e)))
       {
          self_type temp(e);
          do_multiplies(detail::expression<detail::terminal, self_type>(temp), detail::terminal());
@@ -568,7 +568,7 @@ public:
    number& operator%=(const self_type& e)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
-      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(e);
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, e);
       //
       // If the current precision of *this differs from that of expression e, then we
       // create a temporary (which will have the correct precision thanks to precision_guard)
@@ -591,9 +591,9 @@ public:
    typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator%=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
-      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(e);
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, e);
       // Create a temporary if the RHS references *this:
-      if(contains_self(e) || (boost::multiprecision::detail::current_precision_of(e) != boost::multiprecision::detail::current_precision_of(*this)))
+      if(contains_self(e))
       {
          self_type temp(e);
          do_modulus(detail::expression<detail::terminal, self_type>(temp), detail::terminal());
@@ -672,7 +672,7 @@ public:
 
    BOOST_MP_FORCEINLINE number& operator /= (const self_type& e)
    {
-      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(e);
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, e);
       //
       // If the current precision of *this differs from that of expression e, then we
       // create a temporary (which will have the correct precision thanks to precision_guard)
@@ -695,9 +695,9 @@ public:
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
    typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator/=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
-      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(e);
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, e);
       // Create a temporary if the RHS references *this:
-      if(contains_self(e) || (boost::multiprecision::detail::current_precision_of(e) != boost::multiprecision::detail::current_precision_of(*this)))
+      if(contains_self(e))
       {
          self_type temp(e);
          do_divide(detail::expression<detail::terminal, self_type>(temp), detail::terminal());
@@ -1032,30 +1032,35 @@ private:
    void do_assign(const Exp& e, const detail::add_immediates&)
    {
       using default_ops::eval_add;
+      boost::multiprecision::detail::maybe_promote_precision(this);
       eval_add(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
    template <class Exp>
    void do_assign(const Exp& e, const detail::subtract_immediates&)
    {
       using default_ops::eval_subtract;
+      boost::multiprecision::detail::maybe_promote_precision(this);
       eval_subtract(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
    template <class Exp>
    void do_assign(const Exp& e, const detail::multiply_immediates&)
    {
       using default_ops::eval_multiply;
+      boost::multiprecision::detail::maybe_promote_precision(this);
       eval_multiply(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
    template <class Exp>
    void do_assign(const Exp& e, const detail::multiply_add&)
    {
       using default_ops::eval_multiply_add;
+      boost::multiprecision::detail::maybe_promote_precision(this);
       eval_multiply_add(m_backend, canonical_value(e.left().value()), canonical_value(e.middle().value()), canonical_value(e.right().value()));
    }
    template <class Exp>
    void do_assign(const Exp& e, const detail::multiply_subtract&)
    {
       using default_ops::eval_multiply_subtract;
+      boost::multiprecision::detail::maybe_promote_precision(this);
       eval_multiply_subtract(m_backend, canonical_value(e.left().value()), canonical_value(e.middle().value()), canonical_value(e.right().value()));
    }
 
@@ -1063,6 +1068,7 @@ private:
    void do_assign(const Exp& e, const detail::divide_immediates&)
    {
       using default_ops::eval_divide;
+      boost::multiprecision::detail::maybe_promote_precision(this);
       eval_divide(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
 
@@ -1249,6 +1255,7 @@ private:
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
       using default_ops::eval_modulus;
+      boost::multiprecision::detail::maybe_promote_precision(this);
       eval_modulus(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
 
@@ -1398,6 +1405,7 @@ private:
    void do_assign(const Exp& e, const detail::function&)
    {
       typedef typename Exp::arity tag_type;
+      boost::multiprecision::detail::maybe_promote_precision(this);
       do_assign_function(e, tag_type());
    }
    template <class Exp>
@@ -1589,6 +1597,7 @@ private:
    void do_add(const Exp& e, const detail::terminal&)
    {
       using default_ops::eval_add;
+      boost::multiprecision::detail::maybe_promote_precision(this);
       eval_add(m_backend, canonical_value(e.value()));
    }
 
@@ -1596,6 +1605,7 @@ private:
    void do_add(const Exp& e, const detail::negate&)
    {
       typedef typename Exp::left_type left_type;
+      boost::multiprecision::detail::maybe_promote_precision(this);
       do_subtract(e.left(), typename left_type::tag_type());
    }
 
@@ -1628,6 +1638,7 @@ private:
    void do_add(const Exp& e, const detail::add_immediates&)
    {
       using default_ops::eval_add;
+      boost::multiprecision::detail::maybe_promote_precision(this);
       eval_add(m_backend, canonical_value(e.left().value()));
       eval_add(m_backend, canonical_value(e.right().value()));
    }
@@ -1636,6 +1647,7 @@ private:
    {
       using default_ops::eval_add;
       using default_ops::eval_subtract;
+      boost::multiprecision::detail::maybe_promote_precision(this);
       eval_add(m_backend, canonical_value(e.left().value()));
       eval_subtract(m_backend, canonical_value(e.right().value()));
    }
@@ -1643,6 +1655,7 @@ private:
    void do_subtract(const Exp& e, const detail::terminal&)
    {
       using default_ops::eval_subtract;
+      boost::multiprecision::detail::maybe_promote_precision(this);
       eval_subtract(m_backend, canonical_value(e.value()));
    }
 
@@ -1674,6 +1687,7 @@ private:
    void do_subtract(const Exp& e, const detail::add_immediates&)
    {
       using default_ops::eval_subtract;
+      boost::multiprecision::detail::maybe_promote_precision(this);
       eval_subtract(m_backend, canonical_value(e.left().value()));
       eval_subtract(m_backend, canonical_value(e.right().value()));
    }
@@ -1696,6 +1710,7 @@ private:
    void do_multiplies(const Exp& e, const detail::terminal&)
    {
       using default_ops::eval_multiply;
+      boost::multiprecision::detail::maybe_promote_precision(this);
       eval_multiply(m_backend, canonical_value(e.value()));
    }
 
@@ -1733,6 +1748,7 @@ private:
    void do_multiplies(const Exp& e, const detail::multiply_immediates&)
    {
       using default_ops::eval_multiply;
+      boost::multiprecision::detail::maybe_promote_precision(this);
       eval_multiply(m_backend, canonical_value(e.left().value()));
       eval_multiply(m_backend, canonical_value(e.right().value()));
    }
@@ -1746,6 +1762,7 @@ private:
    {
       using default_ops::eval_multiply;
       using default_ops::eval_divide;
+      boost::multiprecision::detail::maybe_promote_precision(this);
       eval_multiply(m_backend, canonical_value(e.left().value()));
       eval_divide(m_backend, canonical_value(e.right().value()));
    }
@@ -1753,6 +1770,7 @@ private:
    void do_multiplies(const Exp& e, const unknown&)
    {
       using default_ops::eval_multiply;
+      boost::multiprecision::detail::maybe_promote_precision(this);
       self_type temp(e);
       eval_multiply(m_backend, temp.m_backend);
    }
@@ -1761,6 +1779,7 @@ private:
    void do_divide(const Exp& e, const detail::terminal&)
    {
       using default_ops::eval_divide;
+      boost::multiprecision::detail::maybe_promote_precision(this);
       eval_divide(m_backend, canonical_value(e.value()));
    }
 
@@ -1806,6 +1825,7 @@ private:
       do_divides(const Exp& e, const detail::multiply_immediates&)
    {
       using default_ops::eval_divide;
+      boost::multiprecision::detail::maybe_promote_precision(this);
       eval_divide(m_backend, canonical_value(e.left().value()));
       eval_divide(m_backend, canonical_value(e.right().value()));
    }
@@ -1819,6 +1839,7 @@ private:
    {
       using default_ops::eval_multiply;
       using default_ops::eval_divide;
+      boost::multiprecision::detail::maybe_promote_precision(this);
       eval_divide(m_backend, canonical_value(e.left().value()));
       mutiply(m_backend, canonical_value(e.right().value()));
    }
@@ -1827,6 +1848,7 @@ private:
    void do_divide(const Exp& e, const unknown&)
    {
       using default_ops::eval_multiply;
+      boost::multiprecision::detail::maybe_promote_precision(this);
       self_type temp(e);
       eval_divide(m_backend, temp.m_backend);
    }
@@ -1836,6 +1858,7 @@ private:
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
       using default_ops::eval_modulus;
+      boost::multiprecision::detail::maybe_promote_precision(this);
       eval_modulus(m_backend, canonical_value(e.value()));
    }
 
@@ -1844,6 +1867,7 @@ private:
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
       using default_ops::eval_modulus;
+      boost::multiprecision::detail::maybe_promote_precision(this);
       self_type temp(e);
       eval_modulus(m_backend, canonical_value(temp));
    }

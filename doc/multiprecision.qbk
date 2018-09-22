@@ -43,6 +43,7 @@
 [import ../example/mpc_examples.cpp]
 [import ../example/complex128_examples.cpp]
 [import ../example/eigen_example.cpp]
+[import ../example/mpfr_precision.cpp]
 
 [template mpfr[] [@http://www.mpfr.org MPFR]]
 [template mpc[] [@http://www.multiprecision.org MPC]]
@@ -1070,6 +1071,12 @@ the default by defining either `BOOST_MP_USE_FLOAT128` or `BOOST_MP_USE_QUAD`.
 [POLY]
 
 [endsect] [/section:poly_eg Polynomial Evaluation]
+
+[section:variable_precision Variable Precision Newton Evaluation]
+
+[mpfr_variable]
+
+[endsect]
 
 [endsect] [/section:fp_eg Examples]
 
