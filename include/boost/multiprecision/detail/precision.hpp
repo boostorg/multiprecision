@@ -108,10 +108,10 @@ namespace boost{ namespace multiprecision{  namespace detail{
    };
 
    template <class T>
-   inline BOOST_CONSTEXPR void maybe_promote_precision(T* obj, const mpl::false_&){}
+   inline void maybe_promote_precision(T* obj, const mpl::false_&){}
 
    template <class T>
-   inline BOOST_CONSTEXPR void maybe_promote_precision(T* obj, const mpl::true_&) 
+   inline void maybe_promote_precision(T* obj, const mpl::true_&)
    {
       if (obj->precision() != T::default_precision())
       {
@@ -120,7 +120,7 @@ namespace boost{ namespace multiprecision{  namespace detail{
    }
 
    template <class T>
-   inline BOOST_CONSTEXPR void maybe_promote_precision(T* obj)
+   inline void maybe_promote_precision(T* obj)
    {
       maybe_promote_precision(obj, boost::multiprecision::detail::is_variable_precision<T>());
    }
