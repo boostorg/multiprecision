@@ -435,35 +435,53 @@ inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int
    if(!s)
       return;
 
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+   if (BOOST_MP_IS_CONSTEXPR_VARIABLE(s))
+   {
+      constexpr const limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits - 1;
+      if ((s & limb_shift_mask) == 0)
+      {
+         left_shift_limb(result, s);
+      }
+      else
+         left_shift_generic(result, s);
+   }
+   else 
+   {
+#endif
+
 #if defined(BOOST_LITTLE_ENDIAN) && defined(BOOST_MP_USE_LIMB_SHIFT)
-   BOOST_MP_STATIC_OR_CXX14_CONSTEXPR const limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits - 1;
-   BOOST_MP_STATIC_OR_CXX14_CONSTEXPR const limb_type byte_shift_mask = CHAR_BIT - 1;
-   if((s & limb_shift_mask) == 0)
-   {
-      left_shift_limb(result, s);
-   }
-   else if((s & byte_shift_mask) == 0)
-   {
-      left_shift_byte(result, s);
-   }
+      BOOST_MP_STATIC_OR_CXX14_CONSTEXPR const limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits - 1;
+      BOOST_MP_STATIC_OR_CXX14_CONSTEXPR const limb_type byte_shift_mask = CHAR_BIT - 1;
+      if ((s & limb_shift_mask) == 0)
+      {
+         left_shift_limb(result, s);
+      }
+      else if ((s & byte_shift_mask) == 0)
+      {
+         left_shift_byte(result, s);
+      }
 #elif defined(BOOST_LITTLE_ENDIAN)
-   BOOST_MP_STATIC_OR_CXX14_CONSTEXPR const limb_type byte_shift_mask = CHAR_BIT - 1;
-   if((s & byte_shift_mask) == 0)
-   {
-      left_shift_byte(result, s);
-   }
+      BOOST_MP_STATIC_OR_CXX14_CONSTEXPR const limb_type byte_shift_mask = CHAR_BIT - 1;
+      if ((s & byte_shift_mask) == 0)
+      {
+         left_shift_byte(result, s);
+      }
 #else
-   static const limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits - 1;
-   if((s & limb_shift_mask) == 0)
-   {
-      left_shift_limb(result, s);
+      BOOST_MP_STATIC_OR_CXX14_CONSTEXPR const limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits - 1;
+      if ((s & limb_shift_mask) == 0)
+      {
+         left_shift_limb(result, s);
+      }
+#endif
+      else
+      {
+         left_shift_generic(result, s);
+      }
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
    }
 #endif
-   else
-   {
-      left_shift_generic(result, s);
-   }
-   //
+      //
    // We may have shifted off the end and have leading zeros:
    //
    result.normalize();

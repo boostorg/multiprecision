@@ -46,6 +46,12 @@
 #define BOOST_MP_CXX14_CONSTEXPR constexpr
 #endif
 
+#if !defined(BOOST_MP_NO_CXX14_CONSTEXPR) && !defined(BOOST_NO_CXX17_IF_CONSTEXPR) && (defined(__GNUC__) || defined(__clang__))
+#  define BOOST_MP_IS_CONSTEXPR_VARIABLE(x) __builtin_constant_p(x)
+#else
+#  define BOOST_MP_NO_CONSTEXPR_DETECTION
+#endif
+
 //
 // Thread local storage:
 // Note fails on Mingw, see https://sourceforge.net/p/mingw-w64/bugs/527/
