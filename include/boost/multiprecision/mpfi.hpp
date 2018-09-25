@@ -414,6 +414,14 @@ struct mpfi_float_backend : public detail::mpfi_float_imp<digits10>
    }
 };
 
+template <unsigned D1, unsigned D2, mpfr_allocation_type AllocationType>
+void assign_components(mpfi_float_backend<D1>& result, const mpfr_float_backend<D2, AllocationType>& a, const mpfr_float_backend<D2, AllocationType>& b);
+
+template <unsigned Digits10, class V>
+typename enable_if_c<is_constructible<number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on>, V>::value >::type
+   assign_components(mpfi_float_backend<Digits10>& result, const V& a, const V& b);
+
+
 template <>
 struct mpfi_float_backend<0> : public detail::mpfi_float_imp<0>
 {

@@ -108,7 +108,7 @@ namespace boost{ namespace multiprecision{  namespace detail{
    };
 
    template <class T>
-   inline void maybe_promote_precision(T* obj, const mpl::false_&){}
+   inline void maybe_promote_precision(T*, const mpl::false_&){}
 
    template <class T>
    inline void maybe_promote_precision(T* obj, const mpl::true_&)
