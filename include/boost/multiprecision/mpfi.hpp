@@ -84,7 +84,7 @@ struct mpfi_float_imp
 
    mpfi_float_imp(const mpfi_float_imp& o)
    {
-      mpfi_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
+      mpfi_init2(m_data, mpfi_get_prec(o.data()));
       if(o.m_data[0].left._mpfr_d)
          mpfi_set(m_data, o.m_data);
    }
@@ -98,9 +98,18 @@ struct mpfi_float_imp
    mpfi_float_imp& operator = (const mpfi_float_imp& o)
    {
       if(m_data[0].left._mpfr_d == 0)
-         mpfi_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
-      if(o.m_data[0].left._mpfr_d)
-         mpfi_set(m_data, o.m_data);
+         mpfi_init2(m_data, mpfi_get_prec(o.data()));
+      if (mpfi_get_prec(o.data()) != mpfi_get_prec(data()))
+      {
+         mpfi_float_imp t(mpfi_get_prec(o.data()));
+         t = o;
+         t.swap(*this);
+      }
+      else
+      {
+         if (o.m_data[0].left._mpfr_d)
+            mpfi_set(m_data, o.m_data);
+      }
       return *this;
    }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
@@ -419,10 +428,17 @@ struct mpfi_float_backend<0> : public detail::mpfi_float_imp<0>
    mpfi_float_backend(mpfi_float_backend&& o) BOOST_NOEXCEPT : detail::mpfi_float_imp<0>(static_cast<detail::mpfi_float_imp<0>&&>(o)) {}
 #endif
    mpfi_float_backend(const mpfi_float_backend& o, unsigned digits10)
-      : detail::mpfi_float_imp<0>(digits10)
+      : detail::mpfi_float_imp<0>(multiprecision::detail::digits10_2_2(digits10))
    {
-      *this = o;
+      mpfi_set(this->m_data, o.data());
    }
+   template <class V>
+   mpfi_float_backend(const V& a, const V& b, unsigned digits10)
+      : detail::mpfi_float_imp<0>(multiprecision::detail::digits10_2_2(digits10))
+   {
+      assign_components(*this, a, b);
+   }
+
    template <unsigned D>
    mpfi_float_backend(const mpfi_float_backend<D>& val)
       : detail::mpfi_float_imp<0>(mpfi_get_prec(val.data()))
@@ -475,7 +491,8 @@ struct mpfi_float_backend<0> : public detail::mpfi_float_imp<0>
    }
    void precision(unsigned digits10) BOOST_NOEXCEPT
    {
-      mpfi_set_prec(this->m_data, multiprecision::detail::digits10_2_2((digits10)));
+      mpfi_float_backend t(*this, digits10);
+      this->swap(t);
    }
 };
 
@@ -796,7 +813,7 @@ inline void assign_components(mpfi_float_backend<D1>& result, const mpfr_float_b
 }
 
 template <unsigned Digits10, class V>
-inline typename enable_if_c<is_convertible<V, number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on> >::value >::type 
+inline typename enable_if_c<is_constructible<number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on>, V>::value >::type 
    assign_components(mpfi_float_backend<Digits10>& result, const V& a, const V& b)
 {
    number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on> x(a), y(b);

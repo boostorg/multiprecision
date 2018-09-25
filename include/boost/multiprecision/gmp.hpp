@@ -88,7 +88,10 @@ struct gmp_float_imp
    typedef mpl::list<double, long double>                 float_types;
    typedef long                                           exponent_type;
 
-   gmp_float_imp() BOOST_NOEXCEPT {}
+   gmp_float_imp() BOOST_NOEXCEPT 
+   {
+      m_data[0]._mp_d = 0; // uninitialized m_data
+   }
 
    gmp_float_imp(const gmp_float_imp& o)
    {
@@ -98,7 +101,7 @@ struct gmp_float_imp
       // to get the right value, but if it's then used in further calculations
       // things go badly wrong!!
       //
-      mpf_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
+      mpf_init2(m_data, mpf_get_prec(o.data()));
       if(o.m_data[0]._mp_d)
          mpf_set(m_data, o.m_data);
    }
@@ -112,9 +115,20 @@ struct gmp_float_imp
    gmp_float_imp& operator = (const gmp_float_imp& o)
    {
       if(m_data[0]._mp_d == 0)
-         mpf_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
-      if(o.m_data[0]._mp_d)
-         mpf_set(m_data, o.m_data);
+         mpf_init2(m_data, mpf_get_prec(o.data()));
+      if (mpf_get_prec(data()) != mpf_get_prec(o.data()))
+      {
+         mpf_t t;
+         mpf_init2(t, mpf_get_prec(o.data()));
+         mpf_set(t, o.data());
+         mpf_swap(data(), t);
+         mpf_clear(t);
+      }
+      else
+      {
+         if (o.m_data[0]._mp_d)
+            mpf_set(m_data, o.m_data);
+      }
       return *this;
    }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
@@ -517,6 +531,12 @@ struct gmp_float<0> : public detail::gmp_float_imp<0>
    {
       mpf_init2(this->m_data, multiprecision::detail::digits10_2_2(digits10));
       mpf_set(this->m_data, o.data());
+   }
+   template <class V>
+   gmp_float(const V& o, unsigned digits10)
+   {
+      mpf_init2(this->m_data, multiprecision::detail::digits10_2_2(digits10));
+      *this = o;
    }
 
    gmp_float& operator=(const gmp_float& o)

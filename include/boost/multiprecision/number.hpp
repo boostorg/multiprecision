@@ -151,7 +151,13 @@ public:
    }
    template <class V, class U>
    BOOST_MP_FORCEINLINE explicit number(const V& v1, const U& v2,
-      typename boost::enable_if_c<((is_constructible<value_type, V>::value || is_convertible<V, std::string>::value) && (is_constructible<value_type, U>::value || is_convertible<U, std::string>::value) && !is_same<typename component_type<self_type>::type, self_type>::value) && !(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value)>::type* = 0)
+      typename boost::enable_if_c<
+            (is_constructible<value_type, V>::value || is_convertible<V, std::string>::value) 
+            && (is_constructible<value_type, U>::value || is_convertible<U, std::string>::value) 
+            && !is_same<typename component_type<self_type>::type, self_type>::value
+            && !is_same<V, self_type>::value
+            && !(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value)
+      >::type* = 0)
    {
       using default_ops::assign_components;
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(v1, v2);

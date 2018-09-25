@@ -162,6 +162,8 @@ test-suite arithmetic_tests :
 
    [ run test_arithmetic_mpc.cpp mpc mpfr gmp : : : [ check-target-builds ../config//has_mpc : : <build>no ] ]
    [ run test_mpfr_mpc_precisions.cpp mpc mpfr gmp : : : [ check-target-builds ../config//has_mpc : : <build>no ] ]
+   [ run test_mpfi_precisions.cpp mpfi mpfr gmp : : : [ check-target-builds ../config//has_mpfi : : <build>no ] ]
+   [ run test_mpf_precisions.cpp gmp : : : [ check-target-builds ../config//has_gmp : : <build>no ] ]
    [ run test_complex.cpp : : : [ check-target-builds ../config//has_mpc : <define>TEST_MPC <source>mpc <source>mpfr <source>gmp ] [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
    [ run test_arithmetic_complex_adaptor.cpp ]
    [ run test_arithmetic_complex_adaptor_2.cpp ]
