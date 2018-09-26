@@ -418,7 +418,7 @@ template <unsigned D1, unsigned D2, mpfr_allocation_type AllocationType>
 void assign_components(mpfi_float_backend<D1>& result, const mpfr_float_backend<D2, AllocationType>& a, const mpfr_float_backend<D2, AllocationType>& b);
 
 template <unsigned Digits10, class V>
-typename enable_if_c<is_constructible<number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on>, V>::value >::type
+typename enable_if_c<boost::is_constructible<number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on>, V>::value || boost::is_convertible<V, const char*>::value >::type
    assign_components(mpfi_float_backend<Digits10>& result, const V& a, const V& b);
 
 
@@ -821,7 +821,7 @@ inline void assign_components(mpfi_float_backend<D1>& result, const mpfr_float_b
 }
 
 template <unsigned Digits10, class V>
-inline typename enable_if_c<is_constructible<number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on>, V>::value >::type 
+inline typename enable_if_c<boost::is_constructible<number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on>, V>::value || boost::is_convertible<V, const char*>::value>::type 
    assign_components(mpfi_float_backend<Digits10>& result, const V& a, const V& b)
 {
    number<mpfr_float_backend<Digits10, allocate_dynamic>, et_on> x(a), y(b);

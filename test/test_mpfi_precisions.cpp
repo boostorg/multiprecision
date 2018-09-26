@@ -88,7 +88,7 @@ int main()
    {
       std::string s("222");
       std::string_view v(s.c_str(), 1);
-      mpfi_float f(v, 100);
+      mpfi_float f(v, v, 100);
       BOOST_CHECK_EQUAL(f, 2);
       BOOST_CHECK_EQUAL(f.precision(), 100);
    }
