@@ -402,6 +402,12 @@ test-suite conversions :
            : # requirements
             [ check-target-builds ../config//has_mpfr : : <build>no ] ]
 
+   [ run test_mpc_conversions.cpp gmp mpfr mpc no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_mpc : : <build>no ] ]
+
    [ run test_constants.cpp gmp no_eh_support
            : # command line
            : # input files

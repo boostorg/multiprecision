@@ -815,12 +815,12 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
 {
    mpfr_float_backend() : detail::mpfr_float_imp<0, allocate_dynamic>() {}
    mpfr_float_backend(const mpfr_t val)
-      : detail::mpfr_float_imp<0, allocate_dynamic>(mpfr_get_prec(val))
+      : detail::mpfr_float_imp<0, allocate_dynamic>((unsigned)mpfr_get_prec(val))
    {
       mpfr_set(this->m_data, val, GMP_RNDN);
    }
    mpfr_float_backend(const mpf_t val)
-      : detail::mpfr_float_imp<0, allocate_dynamic>(mpf_get_prec(val))
+      : detail::mpfr_float_imp<0, allocate_dynamic>((unsigned)mpf_get_prec(val))
    {
       mpfr_set_f(this->m_data, val, GMP_RNDN);
    }
@@ -926,7 +926,7 @@ struct mpfr_float_backend<0, allocate_dynamic> : public detail::mpfr_float_imp<0
       if(this->m_data[0]._mpfr_d == 0)
          mpfr_init2(this->m_data, (mpfr_prec_t)mpf_get_prec(val));
       else
-         mpfr_set_prec(this->m_data, mpf_get_prec(val));
+         mpfr_set_prec(this->m_data, (unsigned)mpf_get_prec(val));
       mpfr_set_f(this->m_data, val, GMP_RNDN);
       return *this;
    }

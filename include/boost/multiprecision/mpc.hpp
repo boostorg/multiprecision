@@ -378,13 +378,81 @@ struct mpc_complex_backend : public detail::mpc_complex_imp<digits10>
    {
       mpc_set_ld_ld(this->m_data, val.real(), val.imag(), GMP_RNDN);
    }
-   mpc_complex_backend(mpz_t val) : detail::mpc_complex_imp<digits10>()
+   mpc_complex_backend(mpz_srcptr val) : detail::mpc_complex_imp<digits10>()
    {
       mpc_set_z(this->m_data, val, GMP_RNDN);
+   }
+   mpc_complex_backend& operator=(mpz_srcptr val)
+   {
+      mpc_set_z(this->m_data, val, GMP_RNDN);
+      return *this;
    }
    mpc_complex_backend(gmp_int const& val) : detail::mpc_complex_imp<digits10>()
    {
       mpc_set_z(this->m_data, val.data(), GMP_RNDN);
+   }
+   mpc_complex_backend& operator=(gmp_int const& val)
+   {
+      mpc_set_z(this->m_data, val.data(), GMP_RNDN);
+      return *this;
+   }
+   mpc_complex_backend(mpf_srcptr val) : detail::mpc_complex_imp<digits10>()
+   {
+      mpc_set_f(this->m_data, val, GMP_RNDN);
+   }
+   mpc_complex_backend& operator=(mpf_srcptr val)
+   {
+      mpc_set_f(this->m_data, val, GMP_RNDN);
+      return *this;
+   }
+   template <unsigned D10>
+   mpc_complex_backend(gmp_float<D10> const& val) : detail::mpc_complex_imp<digits10>()
+   {
+      mpc_set_f(this->m_data, val.data(), GMP_RNDN);
+   }
+   template <unsigned digits10>
+   mpc_complex_backend& operator=(gmp_float<digits10> const& val)
+   {
+      mpc_set_f(this->m_data, val.data(), GMP_RNDN);
+      return *this;
+   }
+   mpc_complex_backend(mpq_srcptr val) : detail::mpc_complex_imp<digits10>()
+   {
+      mpc_set_q(this->m_data, val, GMP_RNDN);
+   }
+   mpc_complex_backend& operator=(mpq_srcptr val)
+   {
+      mpc_set_q(this->m_data, val, GMP_RNDN);
+      return *this;
+   }
+   mpc_complex_backend(gmp_rational const& val) : detail::mpc_complex_imp<digits10>()
+   {
+      mpc_set_q(this->m_data, val.data(), GMP_RNDN);
+   }
+   mpc_complex_backend& operator=(gmp_rational const& val)
+   {
+      mpc_set_q(this->m_data, val.data(), GMP_RNDN);
+      return *this;
+   }
+   mpc_complex_backend(mpfr_srcptr val) : detail::mpc_complex_imp<digits10>()
+   {
+      mpc_set_fr(this->m_data, val, GMP_RNDN);
+   }
+   mpc_complex_backend& operator=(mpfr_srcptr val)
+   {
+      mpc_set_fr(this->m_data, val, GMP_RNDN);
+      return *this;
+   }
+   template <unsigned digits10>
+   mpc_complex_backend(mpfr_float_backend<digits10> const& val) : detail::mpc_complex_imp<digits10>()
+   {
+      mpc_set_fr(this->m_data, val.data(), GMP_RNDN);
+   }
+   template <unsigned digits10>
+   mpc_complex_backend& operator=(mpfr_float_backend<digits10> const& val)
+   {
+      mpc_set_fr(this->m_data, val.data(), GMP_RNDN);
+      return *this;
    }
    mpc_complex_backend& operator=(const mpc_complex_backend& o)
    {
@@ -428,13 +496,7 @@ struct mpc_complex_backend : public detail::mpc_complex_imp<digits10>
    template <unsigned D>
    mpc_complex_backend& operator=(const mpc_complex_backend<D>& val)
    {
-      mpc_set(this->m_data, val.data());
-      return *this;
-   }
-   template <unsigned D>
-   mpc_complex_backend& operator=(const mpfr_float_backend<D>& val)
-   {
-      mpc_set_fr(this->m_data, val.data(), GMP_RNDN);
+      mpc_set(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
 };
@@ -469,13 +531,88 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
    {
       mpc_set_fr(this->m_data, val.data(), GMP_RNDN);
    }
-   mpc_complex_backend(mpz_t val) : detail::mpc_complex_imp<0>() 
+   mpc_complex_backend(mpz_srcptr val) : detail::mpc_complex_imp<0>()
    {
       mpc_set_z(this->m_data, val, GMP_RNDN);
+   }
+   mpc_complex_backend& operator=(mpz_srcptr val)
+   {
+      mpc_set_z(this->m_data, val, GMP_RNDN);
+      return *this;
    }
    mpc_complex_backend(gmp_int const& val) : detail::mpc_complex_imp<0>() 
    {
       mpc_set_z(this->m_data, val.data(), GMP_RNDN);
+   }
+   mpc_complex_backend& operator=(gmp_int const& val)
+   {
+      mpc_set_z(this->m_data, val.data(), GMP_RNDN);
+      return *this;
+   }
+   mpc_complex_backend(mpf_srcptr val) : detail::mpc_complex_imp<0>((unsigned)mpf_get_prec(val))
+   {
+      mpc_set_f(this->m_data, val, GMP_RNDN);
+   }
+   mpc_complex_backend& operator=(mpf_srcptr val)
+   {
+      if (mpc_get_prec(data()) != mpf_get_prec(val))
+      {
+         mpc_complex_backend t(val);
+         t.swap(*this);
+      }
+      else
+         mpc_set_f(this->m_data, val, GMP_RNDN);
+      return *this;
+   }
+   template <unsigned digits10>
+   mpc_complex_backend(gmp_float<digits10> const& val) : detail::mpc_complex_imp<0>((unsigned)mpf_get_prec(val.data()))
+   {
+      mpc_set_f(this->m_data, val.data(), GMP_RNDN);
+   }
+   template <unsigned digits10>
+   mpc_complex_backend& operator=(gmp_float<digits10> const& val)
+   {
+      if (mpc_get_prec(data()) != mpf_get_prec(val.data()))
+      {
+         mpc_complex_backend t(val);
+         t.swap(*this);
+      }
+      else
+         mpc_set_f(this->m_data, val.data(), GMP_RNDN);
+      return *this;
+   }
+   mpc_complex_backend(mpq_srcptr val) : detail::mpc_complex_imp<0>()
+   {
+      mpc_set_q(this->m_data, val, GMP_RNDN);
+   }
+   mpc_complex_backend& operator=(mpq_srcptr val)
+   {
+      mpc_set_q(this->m_data, val, GMP_RNDN);
+      return *this;
+   }
+   mpc_complex_backend(gmp_rational const& val) : detail::mpc_complex_imp<0>()
+   {
+      mpc_set_q(this->m_data, val.data(), GMP_RNDN);
+   }
+   mpc_complex_backend& operator=(gmp_rational const& val)
+   {
+      mpc_set_q(this->m_data, val.data(), GMP_RNDN);
+      return *this;
+   }
+   mpc_complex_backend(mpfr_srcptr val) : detail::mpc_complex_imp<0>(mpfr_get_prec(val))
+   {
+      mpc_set_fr(this->m_data, val, GMP_RNDN);
+   }
+   mpc_complex_backend& operator=(mpfr_srcptr val)
+   {
+      if (mpc_get_prec(data()) != mpfr_get_prec(val))
+      {
+         mpc_complex_backend t(val);
+         t.swap(*this);
+      }
+      else
+         mpc_set_fr(this->m_data, val, GMP_RNDN);
+      return *this;
    }
    mpc_complex_backend(const std::complex<float>& val)
       : detail::mpc_complex_imp<0>()
