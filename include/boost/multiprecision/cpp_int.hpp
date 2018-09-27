@@ -11,6 +11,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/integer_ops.hpp>
+#include <boost/multiprecision/detail/rebind.hpp>
 #include <boost/array.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_floating_point.hpp>
@@ -169,9 +170,9 @@ inline void verify_limb_mask(bool /*b*/, U /*limb*/, U /*mask*/, const mpl::int_
 // starting with the default arbitrary precision signed integer type:
 //
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class Allocator>
-struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false> : private Allocator::template rebind<limb_type>::other
+struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false> : private detail::rebind<limb_type, Allocator>::type
 {
-   typedef typename Allocator::template rebind<limb_type>::other          allocator_type;
+   typedef typename detail::rebind<limb_type, Allocator>::type            allocator_type;
 #ifdef BOOST_NO_CXX11_ALLOCATOR
    typedef typename allocator_type::pointer                               limb_pointer;
    typedef typename allocator_type::const_pointer                         const_limb_pointer;
