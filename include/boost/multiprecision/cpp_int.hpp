@@ -18,7 +18,7 @@
 #include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
 #include <boost/multiprecision/rational_adaptor.hpp>
 #include <boost/multiprecision/traits/is_byte_container.hpp>
-#include <boost/detail/endian.hpp>
+#include <boost/predef/other/endian.h>
 #include <boost/integer/static_min_max.hpp>
 #include <boost/type_traits/common_type.hpp>
 #include <boost/type_traits/make_signed.hpp>
@@ -215,7 +215,7 @@ private:
       BOOST_CONSTEXPR data_type() : first(0) {}
       BOOST_CONSTEXPR data_type(limb_type i) : first(i) {}
       BOOST_CONSTEXPR data_type(signed_limb_type i) : first(i < 0 ? static_cast<limb_type>(boost::multiprecision::detail::unsigned_abs(i)) : i) {}
-#ifdef BOOST_LITTLE_ENDIAN
+#if BOOST_ENDIAN_LITTLE_BYTE
       BOOST_CONSTEXPR data_type(double_limb_type i) : double_first(i) {}
       BOOST_CONSTEXPR data_type(signed_double_limb_type i) : double_first(i < 0 ? static_cast<double_limb_type>(boost::multiprecision::detail::unsigned_abs(i)) : i) {}
 #endif
@@ -233,7 +233,7 @@ public:
       : m_data(i), m_limbs(1), m_sign(false), m_internal(true) { }
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_limb_type i)BOOST_NOEXCEPT
       : m_data(i), m_limbs(1), m_sign(i < 0), m_internal(true) { }
-#if defined(BOOST_LITTLE_ENDIAN) && !defined(BOOST_MP_TEST_NO_LE)
+#if BOOST_ENDIAN_LITTLE_BYTE && !defined(BOOST_MP_TEST_NO_LE)
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT
       : m_data(i), m_limbs(i > max_limb_value ? 2 : 1), m_sign(false), m_internal(true) { }
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT
@@ -451,7 +451,7 @@ public:
       : m_wrapper(i), m_limbs(1), m_sign(false) {}
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_limb_type i)BOOST_NOEXCEPT
       : m_wrapper(limb_type(i < 0 ? static_cast<limb_type>(-static_cast<signed_double_limb_type>(i)) : i)), m_limbs(1), m_sign(i < 0) {}
-#if defined(BOOST_LITTLE_ENDIAN) && !defined(BOOST_MP_TEST_NO_LE)
+#if BOOST_ENDIAN_LITTLE_BYTE && !defined(BOOST_MP_TEST_NO_LE)
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT
       : m_wrapper(i), m_limbs(i > max_limb_value ? 2 : 1), m_sign(false) {}
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_double_limb_type i)BOOST_NOEXCEPT
@@ -602,7 +602,7 @@ public:
       : m_wrapper(i), m_limbs(1) {}
    BOOST_MP_FORCEINLINE cpp_int_base(signed_limb_type i)BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
       : m_wrapper(limb_type(i < 0 ? static_cast<limb_type>(-static_cast<signed_double_limb_type>(i)) : i)), m_limbs(1) { if(i < 0) negate(); }
-#if defined(BOOST_LITTLE_ENDIAN) && !defined(BOOST_MP_TEST_NO_LE)
+#if BOOST_ENDIAN_LITTLE_BYTE && !defined(BOOST_MP_TEST_NO_LE)
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(double_limb_type i)BOOST_NOEXCEPT
       : m_wrapper(i), m_limbs(i > max_limb_value ? 2 : 1) {}
    BOOST_MP_FORCEINLINE cpp_int_base(signed_double_limb_type i)BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
@@ -1021,7 +1021,7 @@ public:
 template <class Arg, class Base>
 struct is_allowed_cpp_int_base_conversion : public mpl::if_c<
       is_same<Arg, limb_type>::value || is_same<Arg, signed_limb_type>::value
-#if defined(BOOST_LITTLE_ENDIAN) && !defined(BOOST_MP_TEST_NO_LE)
+#if BOOST_ENDIAN_LITTLE_BYTE && !defined(BOOST_MP_TEST_NO_LE)
       || is_same<Arg, double_limb_type>::value || is_same<Arg, signed_double_limb_type>::value
 #endif
 #if defined(BOOST_MP_USER_DEFINED_LITERALS)

@@ -205,7 +205,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<Mi
    }
    else
    {
-#if defined(BOOST_LITTLE_ENDIAN) && !defined(BOOST_MP_TEST_NO_LE)
+#if BOOST_ENDIAN_LITTLE_BYTE && !defined(BOOST_MP_TEST_NO_LE)
       cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> t(val);
 #else
       cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> t;
@@ -266,7 +266,7 @@ inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBit
       result.negate();
       return;
    }
-#if defined(BOOST_LITTLE_ENDIAN) && !defined(BOOST_MP_TEST_NO_LE)
+#if BOOST_ENDIAN_LITTLE_BYTE && !defined(BOOST_MP_TEST_NO_LE)
    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> t(val);
 #else
    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> t;
