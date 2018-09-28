@@ -410,8 +410,8 @@ struct mpc_complex_backend : public detail::mpc_complex_imp<digits10>
    {
       mpc_set_f(this->m_data, val.data(), GMP_RNDN);
    }
-   template <unsigned digits10>
-   mpc_complex_backend& operator=(gmp_float<digits10> const& val)
+   template <unsigned D10>
+   mpc_complex_backend& operator=(gmp_float<D10> const& val)
    {
       mpc_set_f(this->m_data, val.data(), GMP_RNDN);
       return *this;
