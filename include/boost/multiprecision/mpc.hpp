@@ -443,13 +443,13 @@ struct mpc_complex_backend : public detail::mpc_complex_imp<digits10>
       mpc_set_fr(this->m_data, val, GMP_RNDN);
       return *this;
    }
-   template <unsigned digits10>
-   mpc_complex_backend(mpfr_float_backend<digits10> const& val) : detail::mpc_complex_imp<digits10>()
+   template <unsigned D10, mpfr_allocation_type AllocationType>
+   mpc_complex_backend(mpfr_float_backend<D10, AllocationType> const& val) : detail::mpc_complex_imp<digits10>()
    {
       mpc_set_fr(this->m_data, val.data(), GMP_RNDN);
    }
-   template <unsigned digits10>
-   mpc_complex_backend& operator=(mpfr_float_backend<digits10> const& val)
+   template <unsigned D10, mpfr_allocation_type AllocationType>
+   mpc_complex_backend& operator=(mpfr_float_backend<D10, AllocationType> const& val)
    {
       mpc_set_fr(this->m_data, val.data(), GMP_RNDN);
       return *this;
