@@ -46,7 +46,7 @@
 #define BOOST_MP_CXX14_CONSTEXPR constexpr
 #endif
 
-#if !defined(BOOST_MP_NO_CXX14_CONSTEXPR) && !defined(BOOST_NO_CXX17_IF_CONSTEXPR) && (defined(__GNUC__) || defined(__clang__))
+#if !defined(BOOST_MP_NO_CXX14_CONSTEXPR) && (defined(__GNUC__))
 #  define BOOST_MP_IS_CONSTEXPR_VARIABLE(x) __builtin_constant_p(x)
 #else
 #  define BOOST_MP_NO_CONSTEXPR_DETECTION

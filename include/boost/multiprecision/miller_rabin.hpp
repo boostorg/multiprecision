@@ -14,11 +14,11 @@ namespace multiprecision{
 namespace detail{
 
 template <class I>
-bool check_small_factors(const I& n)
+BOOST_MP_CXX14_CONSTEXPR bool check_small_factors(const I& n)
 {
-   static const boost::uint32_t small_factors1[] = {
+   BOOST_MP_STATIC_OR_CXX14_CONSTEXPR const boost::uint32_t small_factors1[] = {
       3u, 5u, 7u, 11u, 13u, 17u, 19u, 23u };
-   static const boost::uint32_t pp1 = 223092870u;
+   BOOST_MP_STATIC_OR_CXX14_CONSTEXPR const boost::uint32_t pp1 = 223092870u;
 
    boost::uint32_t m1 = integer_modulus(n, pp1);
 
@@ -29,9 +29,9 @@ bool check_small_factors(const I& n)
          return false;
    }
 
-   static const boost::uint32_t small_factors2[] = {
+   BOOST_MP_STATIC_OR_CXX14_CONSTEXPR const boost::uint32_t small_factors2[] = {
       29u, 31u, 37u, 41u, 43u, 47u };
-   static const boost::uint32_t pp2 = 2756205443u;
+   BOOST_MP_STATIC_OR_CXX14_CONSTEXPR const boost::uint32_t pp2 = 2756205443u;
 
    m1 = integer_modulus(n, pp2);
 
@@ -42,9 +42,9 @@ bool check_small_factors(const I& n)
          return false;
    }
 
-   static const boost::uint32_t small_factors3[] = {
+   BOOST_MP_STATIC_OR_CXX14_CONSTEXPR const boost::uint32_t small_factors3[] = {
       53u, 59u, 61u, 67u, 71u };
-   static const boost::uint32_t pp3 = 907383479u;
+   BOOST_MP_STATIC_OR_CXX14_CONSTEXPR const boost::uint32_t pp3 = 907383479u;
 
    m1 = integer_modulus(n, pp3);
 
@@ -55,9 +55,9 @@ bool check_small_factors(const I& n)
          return false;
    }
 
-   static const boost::uint32_t small_factors4[] = {
+   BOOST_MP_STATIC_OR_CXX14_CONSTEXPR const boost::uint32_t small_factors4[] = {
       73u, 79u, 83u, 89u, 97u };
-   static const boost::uint32_t pp4 = 4132280413u;
+   BOOST_MP_STATIC_OR_CXX14_CONSTEXPR const boost::uint32_t pp4 = 4132280413u;
 
    m1 = integer_modulus(n, pp4);
 
@@ -68,7 +68,7 @@ bool check_small_factors(const I& n)
          return false;
    }
 
-   static const boost::uint32_t small_factors5[6][4] = {
+   BOOST_MP_STATIC_OR_CXX14_CONSTEXPR const boost::uint32_t small_factors5[6][4] = {
       { 101u, 103u, 107u, 109u },
       { 113u, 127u, 131u, 137u },
       { 139u, 149u, 151u, 157u },
@@ -76,7 +76,7 @@ bool check_small_factors(const I& n)
       { 181u, 191u, 193u, 197u },
       { 199u, 211u, 223u, 227u }
    };
-   static const boost::uint32_t pp5[6] = 
+   BOOST_MP_STATIC_OR_CXX14_CONSTEXPR const boost::uint32_t pp5[6] =
    { 
       121330189u, 
       113u * 127u * 131u * 137u, 
@@ -100,9 +100,9 @@ bool check_small_factors(const I& n)
    return true;
 }
 
-inline bool is_small_prime(unsigned n)
+inline BOOST_MP_CXX14_CONSTEXPR bool is_small_prime(unsigned n)
 {
-   static const unsigned char p[] = 
+   BOOST_MP_STATIC_OR_CXX14_CONSTEXPR const unsigned char p[] =
    {
       3u, 5u, 7u, 11u, 13u, 17u, 19u, 23u, 29u, 31u, 
       37u, 41u, 43u, 47u, 53u, 59u, 61u, 67u, 71u, 73u, 
@@ -120,13 +120,13 @@ inline bool is_small_prime(unsigned n)
 }
 
 template <class I>
-typename enable_if_c<is_convertible<I, unsigned>::value, unsigned>::type
+BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_convertible<I, unsigned>::value, unsigned>::type
    cast_to_unsigned(const I& val)
 {
    return static_cast<unsigned>(val);
 }
 template <class I>
-typename disable_if_c<is_convertible<I, unsigned>::value, unsigned>::type
+BOOST_MP_CXX14_CONSTEXPR typename disable_if_c<is_convertible<I, unsigned>::value, unsigned>::type
    cast_to_unsigned(const I& val)
 {
    return val.template convert_to<unsigned>();
@@ -135,7 +135,7 @@ typename disable_if_c<is_convertible<I, unsigned>::value, unsigned>::type
 } // namespace detail
 
 template <class I, class Engine>
-typename enable_if_c<number_category<I>::value == number_kind_integer, bool>::type 
+BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<I>::value == number_kind_integer, bool>::type
    miller_rabin_test(const I& n, unsigned trials, Engine& gen)
 {
 #ifdef BOOST_MSVC
@@ -199,7 +199,7 @@ typename enable_if_c<number_category<I>::value == number_kind_integer, bool>::ty
 }
 
 template <class I>
-typename enable_if_c<number_category<I>::value == number_kind_integer, bool>::type 
+typename enable_if_c<number_category<I>::value == number_kind_integer, bool>::type
    miller_rabin_test(const I& x, unsigned trials)
 {
    static mt19937 gen;

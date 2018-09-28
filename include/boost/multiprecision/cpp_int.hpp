@@ -522,9 +522,23 @@ public:
       if(this != &o)
       {
          m_limbs = o.m_limbs;
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+         if (BOOST_MP_IS_CONSTEXPR_VARIABLE(m_limbs))
+         {
+            for (unsigned i = 0; i < o.size(); ++i)
+               limbs()[i] = o.limbs()[i];
+         }
+         else
+         {
+            std::memcpy(limbs(), o.limbs(), o.size() * sizeof(o.limbs()[0]));
+         }
+#elif !defined(BOOST_MP_NO_CXX14_CONSTEXPR)
          //std::memcpy(limbs(), o.limbs(), o.size() * sizeof(o.limbs()[0]));
          for (unsigned i = 0; i < o.size(); ++i)
             limbs()[i] = o.limbs()[i];
+#else
+         std::memcpy(limbs(), o.limbs(), o.size() * sizeof(o.limbs()[0]));
+#endif
          m_sign = o.m_sign;
       }
    }
@@ -675,9 +689,22 @@ public:
       if(this != &o)
       {
          m_limbs = o.m_limbs;
-         //std::memcpy(limbs(), o.limbs(), o.size() * sizeof(limbs()[0]));
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+         if (BOOST_MP_IS_CONSTEXPR_VARIABLE(m_limbs))
+         {
+            for (std::size_t i = 0; i < o.size(); ++i)
+               limbs()[i] = o.limbs()[i];
+         }
+         else
+         {
+            std::memcpy(limbs(), o.limbs(), o.size() * sizeof(limbs()[0]));
+         }
+#elif !defined(BOOST_MP_NO_CXX14_CONSTEXPR)
          for (std::size_t i = 0; i < o.size(); ++i)
             limbs()[i] = o.limbs()[i];
+#else
+          std::memcpy(limbs(), o.limbs(), o.size() * sizeof(limbs()[0]));
+#endif
       }
    }
 protected:

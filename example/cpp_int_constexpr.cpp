@@ -99,10 +99,11 @@ private:
 };
 
 template <class UnsignedInteger>
-constexpr UnsignedInteger random_value()
+constexpr UnsignedInteger random_value(unsigned count = 0)
 {
    std::uint64_t date_hash = string_to_hash(__DATE__);
    multiprecision_generator<UnsignedInteger> big_gen(date_hash);
+   for (unsigned i = 0; i < count; ++i) big_gen();
    return big_gen();
 }
 
@@ -115,7 +116,7 @@ int main()
 
    std::cout << boost::hash_value(__DATE__) << std::endl;
 
-   constexpr uint1024_t rand = random_value<uint1024_t>();
+   constexpr uint1024_t rand = random_value<uint1024_t>(1000);
 
    return 0;
 }
