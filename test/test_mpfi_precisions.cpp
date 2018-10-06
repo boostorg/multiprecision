@@ -136,6 +136,30 @@ int main()
       f4.assign(f1, f4.precision());
       BOOST_CHECK_EQUAL(f4.precision(), 50);
    }
+   {
+      //
+      // Check additional non-member functions, 
+      // see https://github.com/boostorg/multiprecision/issues/91
+      //
+      mpfi_float::default_precision(100);
+      mpfi_float f1;
+      f1 = 3;
+      BOOST_CHECK_EQUAL(f1.precision(), 100);
+      mpfi_float::default_precision(20);
+      BOOST_CHECK_EQUAL(lower(f1).precision(), 100);
+      BOOST_CHECK_EQUAL(upper(f1).precision(), 100);
+      BOOST_CHECK_EQUAL(median(f1).precision(), 100);
+      BOOST_CHECK_EQUAL(width(f1).precision(), 100);
+      BOOST_CHECK_EQUAL(intersect(f1, f1).precision(), 100);
+      BOOST_CHECK_EQUAL(hull(f1, f1).precision(), 100);
+
+      BOOST_CHECK_EQUAL(asinh(f1).precision(), 100);
+      BOOST_CHECK_EQUAL(acosh(f1).precision(), 100);
+      BOOST_CHECK_EQUAL(atanh(f1).precision(), 100);
+      BOOST_CHECK_EQUAL(log1p(f1).precision(), 100);
+      BOOST_CHECK_EQUAL(expm1(f1).precision(), 100);
+      BOOST_CHECK_EQUAL(cbrt(f1).precision(), 100);
+   }
 
 
    return boost::report_errors();

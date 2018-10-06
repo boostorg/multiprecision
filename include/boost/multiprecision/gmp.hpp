@@ -2373,6 +2373,12 @@ struct number_category<detail::canonical<mpq_t, gmp_rational>::type> : public mp
 template<>
 struct number_category<detail::canonical<mpf_t, gmp_float<0> >::type> : public mpl::int_<number_kind_floating_point>{};
 
+namespace detail
+{
+   template<>
+   struct is_variable_precision<backends::gmp_float<0> > : public true_type {};
+}
+
 
 typedef number<gmp_float<50> >    mpf_float_50;
 typedef number<gmp_float<100> >   mpf_float_100;

@@ -278,7 +278,27 @@ int main()
       f4.assign(f1, f4.precision());
       BOOST_CHECK_EQUAL(f4.precision(), 50);
    }
-
+   {
+      //
+      // Overloads of Math lib functions, discovered while fixing
+      // https://github.com/boostorg/multiprecision/issues/91
+      //
+      mpfr_float::default_precision(100);
+      mpfr_float f1;
+      f1 = 3;
+      BOOST_CHECK_EQUAL(f1.precision(), 100);
+      mpfr_float::default_precision(20);
+      BOOST_CHECK_EQUAL(asinh(f1).precision(), 100);
+      BOOST_CHECK_EQUAL(acosh(f1).precision(), 100);
+      BOOST_CHECK_EQUAL(atanh(f1).precision(), 100);
+      BOOST_CHECK_EQUAL(cbrt(f1).precision(), 100);
+      BOOST_CHECK_EQUAL(erf(f1).precision(), 100);
+      BOOST_CHECK_EQUAL(erfc(f1).precision(), 100);
+      BOOST_CHECK_EQUAL(expm1(f1).precision(), 100);
+      BOOST_CHECK_EQUAL(lgamma(f1).precision(), 100);
+      BOOST_CHECK_EQUAL(tgamma(f1).precision(), 100);
+      BOOST_CHECK_EQUAL(log1p(f1).precision(), 100);
+   }
 
    return boost::report_errors();
 }
