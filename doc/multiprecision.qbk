@@ -5604,6 +5604,17 @@ Windows Vista machine.
 
 [section:hist History]
 
+[h4 Multiprecision-3.1.1 (Boost-1.69)]
+
+* Big update to better support variable precision types so that the precision of the result
+is always the largest of all the arguments.
+* Add support for allocators that are `final` in __cpp_int.
+* Removed use of deprecated Boost.Endian in favour of Predef.
+* Add support for `std::string_view`.
+* Fixed minor bug in constant initialization.  See [@https://github.com/boostorg/multiprecision/issues/67 #67].
+* Make assignment of non-finite value to `cpp_int` a runtime errors.  See [@https://github.com/boostorg/multiprecision/issues/58 #58].
+* Added typedefs for `cpp_bin_float_oct` and `cpp_complex_oct`.
+
 [h4 Multiprecision-3.1.0 (Boost-1.68)]
 
 * Support added for complex multiprecision numbers.
