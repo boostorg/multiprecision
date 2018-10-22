@@ -26,7 +26,7 @@
 #  define BOOST_MP_FORCEINLINE inline
 #endif
 
-#if (defined(BOOST_GCC) && (BOOST_GCC <= 40700)) || BOOST_WORKAROUND(__SUNPRO_CC, < 0x5140)
+#if (defined(BOOST_GCC) && (BOOST_GCC <= 40700)) || BOOST_WORKAROUND(__SUNPRO_CC, < 0x5140) || (defined(__clang_major__) && (__clang_major__ == 3) && (__clang_minor__ < 5))
 #  define BOOST_MP_NOEXCEPT_IF(x)
 #else
 #  define BOOST_MP_NOEXCEPT_IF(x) BOOST_NOEXCEPT_IF(x)
@@ -42,6 +42,7 @@
 //
 #if !defined(BOOST_NO_CXX11_THREAD_LOCAL) && !defined(BOOST_INTEL) && !defined(__MINGW32__)
 #  define BOOST_MP_THREAD_LOCAL thread_local
+#  define BOOST_MP_USING_THREAD_LOCAL
 #else
 #  define BOOST_MP_THREAD_LOCAL
 #endif

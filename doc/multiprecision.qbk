@@ -43,6 +43,7 @@
 [import ../example/mpc_examples.cpp]
 [import ../example/complex128_examples.cpp]
 [import ../example/eigen_example.cpp]
+[import ../example/mpfr_precision.cpp]
 
 [template mpfr[] [@http://www.mpfr.org MPFR]]
 [template mpc[] [@http://www.multiprecision.org MPC]]
@@ -707,10 +708,11 @@ The following back-ends provide floating-point arithmetic:
    typedef number<cpp_bin_float<50> > cpp_bin_float_50;
    typedef number<cpp_bin_float<100> > cpp_bin_float_100;
 
-   typedef number<backends::cpp_bin_float<24, backends::digit_base_2, void, boost::int16_t, -126, 127>, et_off>       cpp_bin_float_single;
-   typedef number<backends::cpp_bin_float<53, backends::digit_base_2, void, boost::int16_t, -1022, 1023>, et_off>     cpp_bin_float_double;
-   typedef number<backends::cpp_bin_float<64, backends::digit_base_2, void, boost::int16_t, -16382, 16383>, et_off>   cpp_bin_float_double_extended;
-   typedef number<backends::cpp_bin_float<113, backends::digit_base_2, void, boost::int16_t, -16382, 16383>, et_off>  cpp_bin_float_quad;
+   typedef number<backends::cpp_bin_float<24, backends::digit_base_2, void, boost::int16_t, -126, 127>, et_off>         cpp_bin_float_single;
+   typedef number<backends::cpp_bin_float<53, backends::digit_base_2, void, boost::int16_t, -1022, 1023>, et_off>       cpp_bin_float_double;
+   typedef number<backends::cpp_bin_float<64, backends::digit_base_2, void, boost::int16_t, -16382, 16383>, et_off>     cpp_bin_float_double_extended;
+   typedef number<backends::cpp_bin_float<113, backends::digit_base_2, void, boost::int16_t, -16382, 16383>, et_off>    cpp_bin_float_quad;
+   typedef number<backends::cpp_bin_float<237, backends::digit_base_2, void, boost::int32_t, -262142, 262143>, et_off>  cpp_bin_float_oct;
 
    }} // namespaces
 
@@ -725,8 +727,8 @@ respectively.
 Optionally, you can specify whether the precision is specified in decimal digits or binary bits - for example
 to declare a `cpp_bin_float` with exactly the same precision as `double` one would use
 `number<cpp_bin_float<53, digit_base_2> >`.  The typedefs `cpp_bin_float_single`, `cpp_bin_float_double`,
-`cpp_bin_float_quad` and `cpp_bin_float_double_extended` provide
-software analogues of the IEEE single, double and quad float data types, plus the Intel-extended-double type respectively.
+`cpp_bin_float_quad`, `cpp_bin_float_oct` and `cpp_bin_float_double_extended` provide
+software analogues of the IEEE single, double, quad and octuple float data types, plus the Intel-extended-double type respectively.
 Note that while these types are functionally equivalent to the native IEEE types, but they do not have the same size
 or bit-layout as true IEEE compatible types.
 
@@ -970,6 +972,13 @@ Things you should know when using this type:
 * Conversion from a string results in a `std::runtime_error` being thrown if the string can not be interpreted
 as a valid floating-point number.
 * Division by zero results in an infinity.
+* When using the variable precision type `mpfr_float`, then copy construction and assignment ['copies the precision
+of the source variable].  Likewise move construction and assignment.
+* When constructing the variable precision type `mpfr_float` you can specify two arguments to the constructor - the first
+is the value to assign to the variable, the second is an unsigned integer specifying the precision in decimal places.  The
+`assign` member function similarly has a 2-argument overload taking the value to assign and the precision.  You can use this
+to preserve the precision of the target variable using the somewhat arcane: `a.assign(b, a.precision())`, which assigns `b` to `a`
+but preserves the precision of `a`.
 
 [h5 [mpfr] example:]
 
@@ -1062,6 +1071,12 @@ the default by defining either `BOOST_MP_USE_FLOAT128` or `BOOST_MP_USE_QUAD`.
 [POLY]
 
 [endsect] [/section:poly_eg Polynomial Evaluation]
+
+[section:variable_precision Variable Precision Newton Evaluation]
+
+[mpfr_variable]
+
+[endsect]
 
 [endsect] [/section:fp_eg Examples]
 
@@ -1235,6 +1250,7 @@ The following backends provide complex number arithmetic:
       typedef cpp_complex<53, backends::digit_base_2, void, boost::int16_t, -1022, 1023> cpp_complex_double;
       typedef cpp_complex<64, backends::digit_base_2, void, boost::int16_t, -16382, 16383> cpp_complex_extended;
       typedef cpp_complex<113, backends::digit_base_2, void, boost::int16_t, -16382, 16383> cpp_complex_quad;
+      typedef cpp_complex<237, backends::digit_base_2, void, boost::int32_t, -262142, 262143> cpp_complex_oct;
 
 
    }} // namespaces
@@ -1251,8 +1267,8 @@ respectively.
 Optionally, you can specify whether the precision is specified in decimal digits or binary bits - for example
 to declare a `cpp_complex` with exactly the same precision as `std::complex<double>` one would use
 `cpp_complex<53, digit_base_2>`.  The typedefs `cpp_complex_single`, `cpp_complex_double`,
-`cpp_complex_quad` and `cpp_complex_double_extended` provide
-software analogues of the IEEE single, double and quad float data types, plus the Intel-extended-double type respectively.
+`cpp_complex_quad`, `cpp_complex_oct` and `cpp_complex_double_extended` provide
+software analogues of the IEEE single, double, quad and octuple float data types, plus the Intel-extended-double type respectively.
 Note that while these types are functionally equivalent to the native IEEE types, but they do not have the same size
 or bit-layout as true IEEE compatible types.
 
@@ -1357,6 +1373,13 @@ as a valid complex number.
 * Division by zero results in a complex-infinity.
 * Unlike `std::complex`, you can not use `reinterpret_cast` to treat this type as an array of the underlying floating point type.
 * Unlike `std::complex`, there are no literals for imaginary values.
+* When using the variable precision type `mpc_complex`, then copy construction and assignment ['copies the precision
+of the source variable].  Likewise move construction and assignment.
+* When constructing the variable precision type `mpc_complex` you can specify two arguments to the constructor - the first
+is the value to assign to the variable, the second is an unsigned integer specifying the precision in decimal places.  The
+`assign` member function similarly has a 2-argument overload taking the value to assign and the precision.  You can use this
+to preserve the precision of the target variable using the somewhat arcane: `a.assign(b, a.precision())`, which assigns `b` to `a`
+but preserves the precision of `a`.
 
 [h5 [mpc] example:]
 
@@ -3583,6 +3606,15 @@ two argument constructor:
 
 Where the two args must either be arithmetic types, or types that are convertible to the two components of `this`.
 
+Finally, when the type has a variable precision, then there are constructors:
+
+   number(arg1, precision);
+   number(arg1, arg2, precision);
+
+Where `precision` is an unsigned value, the 2 arg version is active for scalar types and/or copy-construction with specific precision, and the 3-arg version for complex types.
+
+Likewise `assign` has a 2-arg overloaded, with the second argument being the precision.
+
       number& operator+=(const ``['see-below]``&);
       number& operator-=(const ``['see-below]``&);
       number& operator*=(const ``['see-below]``&);
@@ -4272,10 +4304,11 @@ More information on this type can be found in the [link boost_multiprecision.tut
    typedef number<cpp_bin_float<50> > cpp_bin_float_50;
    typedef number<cpp_bin_float<100> > cpp_bin_float_100;
 
-   typedef number<backends::cpp_bin_float<24, backends::digit_base_2, void, boost::int16_t, -126, 127>, et_off>       cpp_bin_float_single;
-   typedef number<backends::cpp_bin_float<53, backends::digit_base_2, void, boost::int16_t, -1022, 1023>, et_off>     cpp_bin_float_double;
-   typedef number<backends::cpp_bin_float<64, backends::digit_base_2, void, boost::int16_t, -16382, 16383>, et_off>   cpp_bin_float_double_extended;
-   typedef number<backends::cpp_bin_float<113, backends::digit_base_2, void, boost::int16_t, -16382, 16383>, et_off>  cpp_bin_float_quad;
+   typedef number<backends::cpp_bin_float<24, backends::digit_base_2, void, boost::int16_t, -126, 127>, et_off>         cpp_bin_float_single;
+   typedef number<backends::cpp_bin_float<53, backends::digit_base_2, void, boost::int16_t, -1022, 1023>, et_off>       cpp_bin_float_double;
+   typedef number<backends::cpp_bin_float<64, backends::digit_base_2, void, boost::int16_t, -16382, 16383>, et_off>     cpp_bin_float_double_extended;
+   typedef number<backends::cpp_bin_float<113, backends::digit_base_2, void, boost::int16_t, -16382, 16383>, et_off>    cpp_bin_float_quad;
+   typedef number<backends::cpp_bin_float<237, backends::digit_base_2, void, boost::int32_t, -262142, 262143>, et_off>  cpp_bin_float_oct;
 
    }} // namespaces
 
@@ -5570,6 +5603,17 @@ Windows Vista machine.
 * Support for atomic loads and stores is not currently supported, but will become more important as a larger number of floating point algorithms become parallelized.
 
 [section:hist History]
+
+[h4 Multiprecision-3.1.1 (Boost-1.69)]
+
+* Big update to better support variable precision types so that the precision of the result
+is always the largest of all the arguments.
+* Add support for allocators that are `final` in __cpp_int.
+* Removed use of deprecated Boost.Endian in favour of Predef.
+* Add support for `std::string_view`.
+* Fixed minor bug in constant initialization.  See [@https://github.com/boostorg/multiprecision/issues/67 #67].
+* Make assignment of non-finite value to `cpp_int` a runtime errors.  See [@https://github.com/boostorg/multiprecision/issues/58 #58].
+* Added typedefs for `cpp_bin_float_oct` and `cpp_complex_oct`.
 
 [h4 Multiprecision-3.1.0 (Boost-1.68)]
 

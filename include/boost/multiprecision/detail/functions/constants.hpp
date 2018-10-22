@@ -242,37 +242,44 @@ template <class T>
 const T& get_constant_ln2()
 {
    static BOOST_MP_THREAD_LOCAL T result;
+   static BOOST_MP_THREAD_LOCAL long digits = 0;
+#ifndef BOOST_MP_USING_THREAD_LOCAL
    static BOOST_MP_THREAD_LOCAL bool b = false;
-   static BOOST_MP_THREAD_LOCAL long digits = boost::multiprecision::detail::digits2<number<T> >::value();
+   constant_initializer<T, &get_constant_ln2<T> >::do_nothing();
+
    if(!b || (digits != boost::multiprecision::detail::digits2<number<T> >::value()))
    {
-      calc_log2(result, boost::multiprecision::detail::digits2<number<T, et_on> >::value());
       b = true;
+#else
+   if ((digits != boost::multiprecision::detail::digits2<number<T> >::value()))
+   {
+#endif
+      calc_log2(result, boost::multiprecision::detail::digits2<number<T, et_on> >::value());
       digits = boost::multiprecision::detail::digits2<number<T> >::value();
    }
 
-   constant_initializer<T, &get_constant_ln2<T> >::do_nothing();
-
    return result;
 }
-#ifndef BOOST_MP_THREAD_LOCAL
-#error 1
-#endif
 
 template <class T>
 const T& get_constant_e()
 {
    static BOOST_MP_THREAD_LOCAL T result;
+   static BOOST_MP_THREAD_LOCAL long digits = 0;
+#ifndef BOOST_MP_USING_THREAD_LOCAL
    static BOOST_MP_THREAD_LOCAL bool b = false;
-   static BOOST_MP_THREAD_LOCAL long digits = boost::multiprecision::detail::digits2<number<T> >::value();
-   if(!b || (digits != boost::multiprecision::detail::digits2<number<T> >::value()))
+   constant_initializer<T, &get_constant_e<T> >::do_nothing();
+
+   if (!b || (digits != boost::multiprecision::detail::digits2<number<T> >::value()))
    {
-      calc_e(result, boost::multiprecision::detail::digits2<number<T, et_on> >::value());
       b = true;
+#else
+   if ((digits != boost::multiprecision::detail::digits2<number<T> >::value()))
+   {
+#endif
+      calc_e(result, boost::multiprecision::detail::digits2<number<T, et_on> >::value());
       digits = boost::multiprecision::detail::digits2<number<T> >::value();
    }
-
-   constant_initializer<T, &get_constant_e<T> >::do_nothing();
 
    return result;
 }
@@ -281,16 +288,21 @@ template <class T>
 const T& get_constant_pi()
 {
    static BOOST_MP_THREAD_LOCAL T result;
+   static BOOST_MP_THREAD_LOCAL long digits = 0;
+#ifndef BOOST_MP_USING_THREAD_LOCAL
    static BOOST_MP_THREAD_LOCAL bool b = false;
-   static BOOST_MP_THREAD_LOCAL long digits = boost::multiprecision::detail::digits2<number<T> >::value();
-   if(!b || (digits != boost::multiprecision::detail::digits2<number<T> >::value()))
+   constant_initializer<T, &get_constant_pi<T> >::do_nothing();
+
+   if (!b || (digits != boost::multiprecision::detail::digits2<number<T> >::value()))
    {
-      calc_pi(result, boost::multiprecision::detail::digits2<number<T, et_on> >::value());
       b = true;
+#else
+   if ((digits != boost::multiprecision::detail::digits2<number<T> >::value()))
+   {
+#endif
+      calc_pi(result, boost::multiprecision::detail::digits2<number<T, et_on> >::value());
       digits = boost::multiprecision::detail::digits2<number<T> >::value();
    }
-
-   constant_initializer<T, &get_constant_pi<T> >::do_nothing();
 
    return result;
 }
@@ -298,16 +310,23 @@ const T& get_constant_pi()
 template <class T>
 const T& get_constant_one_over_epsilon()
 {
-   static const bool is_init = false;
-   static T result;
-   if (is_init == false)
+   static BOOST_MP_THREAD_LOCAL T result;
+   static BOOST_MP_THREAD_LOCAL long digits = 0;
+#ifndef BOOST_MP_USING_THREAD_LOCAL
+   static BOOST_MP_THREAD_LOCAL bool b = false;
+   constant_initializer<T, &get_constant_one_over_epsilon<T> >::do_nothing();
+
+   if (!b || (digits != boost::multiprecision::detail::digits2<number<T> >::value()))
    {
+      b = true;
+#else
+   if ((digits != boost::multiprecision::detail::digits2<number<T> >::value()))
+   {
+#endif
       typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
       result = static_cast<ui_type>(1u);
       eval_divide(result, std::numeric_limits<number<T> >::epsilon().backend());
    }
-
-   constant_initializer<T, &get_constant_one_over_epsilon<T> >::do_nothing();
 
    return result;
 }

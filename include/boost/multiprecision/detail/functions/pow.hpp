@@ -424,19 +424,24 @@ template <class T>
 const T& get_constant_log10()
 {
    static BOOST_MP_THREAD_LOCAL T result;
+   static BOOST_MP_THREAD_LOCAL long digits = 0;
+#ifndef BOOST_MP_USING_THREAD_LOCAL
    static BOOST_MP_THREAD_LOCAL bool b = false;
-   static BOOST_MP_THREAD_LOCAL long digits = boost::multiprecision::detail::digits2<number<T> >::value();
-   if(!b || (digits != boost::multiprecision::detail::digits2<number<T> >::value()))
+   constant_initializer<T, &get_constant_log10<T> >::do_nothing();
+
+   if (!b || (digits != boost::multiprecision::detail::digits2<number<T> >::value()))
    {
+      b = true;
+#else
+   if ((digits != boost::multiprecision::detail::digits2<number<T> >::value()))
+   {
+#endif
       typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
       T ten;
       ten = ui_type(10u);
       eval_log(result, ten);
-      b = true;
       digits = boost::multiprecision::detail::digits2<number<T> >::value();
    }
-
-   constant_initializer<T, &get_constant_log10<T> >::do_nothing();
 
    return result;
 }

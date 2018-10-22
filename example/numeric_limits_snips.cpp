@@ -356,6 +356,20 @@ so the default expression template parameter has been replaced by `et_off`.]
   }
 
   {
+//[tolerance_4
+
+  using boost::multiprecision::cpp_bin_float_oct;
+
+  cpp_bin_float_oct tolerance =  3 * std::numeric_limits<cpp_bin_float_oct>::epsilon();
+  cpp_bin_float_oct expected = boost::math::constants::two_pi<cpp_bin_float_oct>();
+  cpp_bin_float_oct calculated = 2 * boost::math::constants::pi<cpp_bin_float_oct>();
+
+  BOOST_CHECK_CLOSE_FRACTION(expected, calculated, tolerance);
+
+//] [/tolerance_4]
+  }
+
+  {
 //[nan_1]
 
 /*`NaN can be used with binary multiprecision types like `cpp_bin_float_quad`:

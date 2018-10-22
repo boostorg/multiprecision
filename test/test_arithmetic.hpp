@@ -2018,6 +2018,15 @@ typename boost::enable_if_c<boost::multiprecision::number_category<Real>::value 
       BOOST_CHECK_EQUAL(d.real(), 40.5);
       BOOST_CHECK_EQUAL(d.imag(), 2);
    }
+#ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
+   {
+      std::string sx("40.550"), sy("222");
+      std::string_view vx(sx.c_str(), 4), vy(sy.c_str(), 1);
+      Real d(vx, vy);
+      BOOST_CHECK_EQUAL(d.real(), 40.5);
+      BOOST_CHECK_EQUAL(d.imag(), 2);
+   }
+#endif
    {
       typename Real::value_type x(40.5), y(2);
       Real d(x, y);
@@ -2114,6 +2123,20 @@ typename boost::enable_if_c<boost::multiprecision::number_category<Real>::value 
    BOOST_CHECK_EQUAL(imag(a + 0), 0);
    BOOST_CHECK_EQUAL(real(c + 0), 2);
    BOOST_CHECK_EQUAL(imag(c + 0), 3);
+   
+   // string construction:
+   a = Real("2");
+   BOOST_CHECK_EQUAL(real(a), 2);
+   BOOST_CHECK_EQUAL(imag(a), 0);
+   a = Real("(2)");
+   BOOST_CHECK_EQUAL(real(a), 2);
+   BOOST_CHECK_EQUAL(imag(a), 0);
+   a = Real("(,2)");
+   BOOST_CHECK_EQUAL(real(a), 0);
+   BOOST_CHECK_EQUAL(imag(a), 2);
+   a = Real("(2,3)");
+   BOOST_CHECK_EQUAL(real(a), 2);
+   BOOST_CHECK_EQUAL(imag(a), 3);
 
    typedef typename boost::multiprecision::component_type<Real>::type real_type;
 
@@ -2250,6 +2273,12 @@ typename boost::enable_if_c<boost::multiprecision::number_category<Real>::value 
    BOOST_CHECK_CLOSE_FRACTION(real_type(-46), real(a), tol);
    BOOST_CHECK_CLOSE_FRACTION(real_type(9), imag(a), tol);
    a = pow(r, c + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-8.8931513442797186948734782808862447235385767991868219480917324534839621090167050538805196124711247247992169338"), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type("-1.3826999557878897572499699021550296885662132089951379549068064961882821777067532977546360861176011175070188118"), imag(a), tol * 3);
+   a = pow(c, r + 0);
+   BOOST_CHECK_CLOSE_FRACTION(real_type(-46), real(a), tol);
+   BOOST_CHECK_CLOSE_FRACTION(real_type(9), imag(a), tol);
+   a = pow(r + 0, c);
    BOOST_CHECK_CLOSE_FRACTION(real_type("-8.8931513442797186948734782808862447235385767991868219480917324534839621090167050538805196124711247247992169338"), real(a), tol);
    BOOST_CHECK_CLOSE_FRACTION(real_type("-1.3826999557878897572499699021550296885662132089951379549068064961882821777067532977546360861176011175070188118"), imag(a), tol * 3);
 
@@ -2659,6 +2688,7 @@ void test()
    test_mixed<Real, std::complex<long double> >(complex_tag);
 
 #endif
+#ifndef MIXED_OPS_ONLY
    //
    // Integer only functions:
    //
@@ -2930,6 +2960,28 @@ void test()
    // Destructor of "a" checks destruction of moved-from-object...
    Real m3(static_cast<Real&&>(a));
 #endif
+#ifndef BOOST_MP_NOT_TESTING_NUMBER
+   //
+   // string and string_view:
+   //
+   {
+      std::string s("2");
+      Real x(s);
+      BOOST_CHECK_EQUAL(x, 2);
+      s = "3";
+      x.assign(s);
+      BOOST_CHECK_EQUAL(x, 3);
+#ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
+      s = "20";
+      std::string_view v(s.c_str(), 1);
+      Real y(v);
+      BOOST_CHECK_EQUAL(y, 2);
+      std::string_view v2(s.c_str(), 2);
+      y.assign(v2);
+      BOOST_CHECK_EQUAL(y, 20);
+#endif
+   }
+#endif
    //
    // Bug cases, self assignment first:
    //
@@ -2958,4 +3010,5 @@ void test()
    a = 2;
    a = (a + a) * a;
    BOOST_CHECK_EQUAL(a, 8);
+#endif
 }

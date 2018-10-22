@@ -157,6 +157,18 @@ void test_convert()
 
 int main()
 {
+   //
+   // Some basic sanity checks first:
+   //
+   BOOST_CHECK_EQUAL(std::numeric_limits<float128>::epsilon(), float128("1.92592994438723585305597794258492732e-34"));
+   BOOST_CHECK_EQUAL((std::numeric_limits<float128>::min)(), float128("3.36210314311209350626267781732175260e-4932"));
+   BOOST_CHECK_EQUAL((std::numeric_limits<float128>::max)(), float128("1.18973149535723176508575932662800702e4932"));
+   BOOST_CHECK_EQUAL((std::numeric_limits<float128>::denorm_min)(), float128("6.475175119438025110924438958227646552e-4966"));
+   BOOST_CHECK((boost::math::isinf)((std::numeric_limits<float128>::infinity)()));
+   BOOST_CHECK((std::numeric_limits<float128>::infinity)() > 0);
+   BOOST_CHECK((boost::math::isnan)((std::numeric_limits<float128>::quiet_NaN)()));
+
+
    test_convert<float128, cpp_int>();
    test_convert<float128, int128_t>();
    test_convert<float128, uint128_t>();

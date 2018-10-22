@@ -3,6 +3,8 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_
 
+#define NO_MIXED_OPS
+
 #include <boost/multiprecision/cpp_bin_float.hpp>
 
 #include "libs/multiprecision/test/test_arithmetic.hpp"

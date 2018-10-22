@@ -435,7 +435,7 @@ inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBit
    if(!s)
       return;
 
-#if defined(BOOST_LITTLE_ENDIAN) && defined(BOOST_MP_USE_LIMB_SHIFT)
+#if BOOST_ENDIAN_LITTLE_BYTE && defined(BOOST_MP_USE_LIMB_SHIFT)
    static const limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits - 1;
    static const limb_type byte_shift_mask = CHAR_BIT - 1;
    if((s & limb_shift_mask) == 0)
@@ -446,7 +446,7 @@ inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBit
    {
       left_shift_byte(result, s);
    }
-#elif defined(BOOST_LITTLE_ENDIAN)
+#elif BOOST_ENDIAN_LITTLE_BYTE
    static const limb_type byte_shift_mask = CHAR_BIT - 1;
    if((s & byte_shift_mask) == 0)
    {
@@ -562,14 +562,14 @@ inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBit
    if(!s)
       return;
 
-#if defined(BOOST_LITTLE_ENDIAN) && defined(BOOST_MP_USE_LIMB_SHIFT)
+#if BOOST_ENDIAN_LITTLE_BYTE && defined(BOOST_MP_USE_LIMB_SHIFT)
    static const limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, signed_magnitude, Checked1, Allocator1>::limb_bits - 1;
    static const limb_type byte_shift_mask = CHAR_BIT - 1;
    if((s & limb_shift_mask) == 0)
       right_shift_limb(result, s);
    else if((s & byte_shift_mask) == 0)
       right_shift_byte(result, s);
-#elif defined(BOOST_LITTLE_ENDIAN)
+#elif BOOST_ENDIAN_LITTLE_BYTE
    static const limb_type byte_shift_mask = CHAR_BIT - 1;
    if((s & byte_shift_mask) == 0)
       right_shift_byte(result, s);
@@ -595,14 +595,14 @@ inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBit
    if(is_neg)
       eval_increment(result);
 
-#if defined(BOOST_LITTLE_ENDIAN) && defined(BOOST_MP_USE_LIMB_SHIFT)
+#if BOOST_ENDIAN_LITTLE_BYTE && defined(BOOST_MP_USE_LIMB_SHIFT)
    static const limb_type limb_shift_mask = cpp_int_backend<MinBits1, MaxBits1, signed_magnitude, Checked1, Allocator1>::limb_bits - 1;
    static const limb_type byte_shift_mask = CHAR_BIT - 1;
    if((s & limb_shift_mask) == 0)
       right_shift_limb(result, s);
    else if((s & byte_shift_mask) == 0)
       right_shift_byte(result, s);
-#elif defined(BOOST_LITTLE_ENDIAN)
+#elif BOOST_ENDIAN_LITTLE_BYTE
    static const limb_type byte_shift_mask = CHAR_BIT - 1;
    if((s & byte_shift_mask) == 0)
       right_shift_byte(result, s);

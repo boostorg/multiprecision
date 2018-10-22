@@ -8,7 +8,7 @@
 #ifndef BOOST_MP_DETAIL_BITSCAN_HPP
 #define BOOST_MP_DETAIL_BITSCAN_HPP
 
-#include <boost/detail/endian.hpp>
+#include <boost/predef/other/endian.h>
 #include <boost/cstdint.hpp>
 
 #if (defined(BOOST_MSVC) || (defined(__clang__) && defined(__c2__)) || (defined(BOOST_INTEL) && defined(_MSC_VER))) && (defined(_M_IX86) || defined(_M_X64))
@@ -151,7 +151,7 @@ BOOST_FORCEINLINE unsigned find_msb(uint128_type mask, mpl::int_<0> const&)
 {
    union { uint128_type v; boost::uint64_t sv[2]; } val;
    val.v = mask;
-#ifdef BOOST_LITTLE_ENDIAN
+#if BOOST_ENDIAN_LITTLE_BYTE
    if(val.sv[1])
       return find_msb(val.sv[1], mpl::int_<3>()) + 64;
    return find_msb(val.sv[0], mpl::int_<3>());
@@ -165,7 +165,7 @@ BOOST_FORCEINLINE unsigned find_lsb(uint128_type mask, mpl::int_<0> const&)
 {
    union { uint128_type v; boost::uint64_t sv[2]; } val;
    val.v = mask;
-#ifdef BOOST_LITTLE_ENDIAN
+#if BOOST_ENDIAN_LITTLE_BYTE
    if(val.sv[0] == 0)
       return find_lsb(val.sv[1], mpl::int_<3>()) + 64;
    return find_lsb(val.sv[0], mpl::int_<3>());

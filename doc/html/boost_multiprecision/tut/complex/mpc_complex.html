@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
 <title>mpc_complex</title>
 <link rel="stylesheet" href="../../../../../../../doc/src/boostbook.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.77.1">
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
 <link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
 <link rel="up" href="../complex.html" title="Complex Number Types">
 <link rel="prev" href="cpp_complex.html" title="cpp_complex">
@@ -136,6 +136,22 @@
 <li class="listitem">
               Unlike <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">complex</span></code>, there are no literals for
               imaginary values.
+            </li>
+<li class="listitem">
+              When using the variable precision type <code class="computeroutput"><span class="identifier">mpc_complex</span></code>,
+              then copy construction and assignment <span class="emphasis"><em>copies the precision
+              of the source variable</em></span>. Likewise move construction and assignment.
+            </li>
+<li class="listitem">
+              When constructing the variable precision type <code class="computeroutput"><span class="identifier">mpc_complex</span></code>
+              you can specify two arguments to the constructor - the first is the
+              value to assign to the variable, the second is an unsigned integer
+              specifying the precision in decimal places. The <code class="computeroutput"><span class="identifier">assign</span></code>
+              member function similarly has a 2-argument overload taking the value
+              to assign and the precision. You can use this to preserve the precision
+              of the target variable using the somewhat arcane: <code class="computeroutput"><span class="identifier">a</span><span class="special">.</span><span class="identifier">assign</span><span class="special">(</span><span class="identifier">b</span><span class="special">,</span> <span class="identifier">a</span><span class="special">.</span><span class="identifier">precision</span><span class="special">())</span></code>, which assigns <code class="computeroutput"><span class="identifier">b</span></code>
+              to <code class="computeroutput"><span class="identifier">a</span></code> but preserves
+              the precision of <code class="computeroutput"><span class="identifier">a</span></code>.
             </li>
 </ul></div>
 <h6>
