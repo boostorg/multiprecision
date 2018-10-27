@@ -55,7 +55,7 @@ project : requirements
    <toolset>msvc:<runtime-link>static
    <toolset>msvc:<link>static
    <toolset>msvc:<warnings>all
-   <toolset>msvc:<cxxflags>/fp:precise
+   <toolset>msvc:<cxxflags>/fp\:precise
    <toolset>intel-win:<runtime-link>static
    <toolset>intel-win:<link>static
    # Speed up compiles:
