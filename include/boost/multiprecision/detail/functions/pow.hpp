@@ -537,6 +537,7 @@ inline void eval_pow(T& result, const T& x, const T& a)
          {
             // fallthrough..
          }
+         BOOST_FALLTHROUGH;
       }
       default:
          if(eval_signbit(a))
