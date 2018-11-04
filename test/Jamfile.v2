@@ -947,6 +947,7 @@ test-suite misc :
          [ check-target-builds ../config//has_mpfi : <define>TEST_MPFI <source>gmp <source>mpfr <source>mpfi : ]
          [ check-target-builds ../config//has_tommath : <define>TEST_TOMMATH <source>tommath : ]
           ]
+      [ run test_optional_compat.cpp ]
       #
       # Eigen interoperability:
       #
