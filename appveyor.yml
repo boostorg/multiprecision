@@ -33,9 +33,11 @@ environment:
     #- ARGS: --toolset=msvc-14.0 address-model=64 cxxflags=-std:c++latest
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       ARGS: --toolset=msvc-14.1 address-model=64 arithmetic_tests cpp_int_tests functions_and_limits
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       ARGS: --toolset=msvc-14.1 address-model=64 conversions misc compile_fail examples concepts
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       ARGS: --toolset=msvc-14.1 address-model=32 arithmetic_tests cpp_int_tests functions_and_limits
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       ARGS: --toolset=msvc-14.1 address-model=32 conversions misc compile_fail examples concepts
     #- APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
     #  ARGS: --toolset=msvc-14.1 address-model=64 cxxflags=-std:c++latest
