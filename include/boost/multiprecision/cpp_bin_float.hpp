@@ -45,6 +45,42 @@ inline typename enable_if_c<is_unsigned<U>::value, bool>::type is_negative(U) { 
 template <class S>
 inline typename disable_if_c<is_unsigned<S>::value, bool>::type is_negative(S s) { return s < 0; }
 
+template <class Float, int, bool = number_category<Float>::value == number_kind_floating_point>
+struct is_cpp_bin_float_implicitly_constructible_from_type 
+{
+   static const bool value = false;
+};
+
+template <class Float, int bit_count>
+struct is_cpp_bin_float_implicitly_constructible_from_type<Float, bit_count, true>
+{
+   static const bool value = (std::numeric_limits<Float>::digits <= (int)bit_count)
+      && (std::numeric_limits<Float>::radix == 2)
+      && std::numeric_limits<Float>::is_specialized
+#ifdef BOOST_HAS_FLOAT128
+      && !boost::is_same<Float, __float128>::value
+#endif
+      ;
+};
+
+template <class Float, int, bool = number_category<Float>::value == number_kind_floating_point>
+struct is_cpp_bin_float_explicitly_constructible_from_type 
+{
+   static const bool value = false;
+};
+
+template <class Float, int bit_count>
+struct is_cpp_bin_float_explicitly_constructible_from_type<Float, bit_count, true>
+{
+   static const bool value = (std::numeric_limits<Float>::digits > (int)bit_count)
+      && (std::numeric_limits<Float>::radix == 2)
+      && std::numeric_limits<Float>::is_specialized
+#ifdef BOOST_HAS_FLOAT128
+      && !boost::is_same<Float, __float128>::value
+#endif
+      ;
+};
+
 }
 
 template <unsigned Digits, digit_base_type DigitBase = digit_base_10, class Allocator = void, class Exponent = int, Exponent MinExponent = 0, Exponent MaxExponent = 0>
@@ -99,15 +135,7 @@ public:
    }
    template <class Float>
    cpp_bin_float(const Float& f, 
-      typename boost::enable_if_c<
-         (number_category<Float>::value == number_kind_floating_point)
-         && (std::numeric_limits<Float>::digits <= (int)bit_count)
-         && (std::numeric_limits<Float>::radix == 2)
-         && (std::numeric_limits<Float>::is_specialized)
-#ifdef BOOST_HAS_FLOAT128
-         && !boost::is_same<Float, __float128>::value
-#endif
-      >::type const* = 0)
+      typename boost::enable_if_c<detail::is_cpp_bin_float_implicitly_constructible_from_type<Float, bit_count>::value>::type const* = 0)
       : m_data(), m_exponent(0), m_sign(false)
    {
       this->assign_float(f);
@@ -115,15 +143,7 @@ public:
 
    template <class Float>
    explicit cpp_bin_float(const Float& f,
-      typename boost::enable_if_c<
-      (number_category<Float>::value == number_kind_floating_point)
-         && (std::numeric_limits<Float>::digits > (int)bit_count)
-         && (std::numeric_limits<Float>::radix == 2)
-         && (std::numeric_limits<Float>::is_specialized)
-#ifdef BOOST_HAS_FLOAT128
-        && !boost::is_same<Float, __float128>::value
-#endif
->::type const* = 0)
+      typename boost::enable_if_c<detail::is_cpp_bin_float_explicitly_constructible_from_type<Float, bit_count>::value>::type const* = 0)
       : m_data(), m_exponent(0), m_sign(false)
    {
       this->assign_float(f);
