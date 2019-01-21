@@ -2657,12 +2657,13 @@ you must use `os.precision(std::numeric_limits<T>::max_digits10)`.
 `std::numeric_limits<float>::max_digits10` is wrongly defined as 8. It should be 9.
 ]
 
-[note For Microsoft Visual Studio before 2013, and default float format,
-a small range of values approximately 0.0001 to 0.004, with exponent values of 3F2 to 3F6,
-are wrongly input by one least significant bit,
-probably every third value of significand.
-
-A workaround is using scientific or exponential format `<< std::scientific`.
+[note For Microsoft Visual Studio before 2013 and the default floating-point
+format, a small range of double-precision floating-point values with a
+significand of approximately 0.0001 to 0.004 and exponent values of 1010 to
+1014 do not round-trip exactly being off by one least significant bit,
+for probably every third value of the significand.
+ 
+A workaround is using the scientific or exponential format `std::scientific`.
 ]
 
 [note BOOST_NO_CXX11_NUMERIC_LIMITS is a suitable feature-test macro to determine if
