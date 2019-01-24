@@ -1540,8 +1540,12 @@ enum number_category_type
    number_kind_complex = 4
 };
 
+template <class Num, bool, bool>
+struct number_category_base : public mpl::int_<number_kind_unknown> {};
 template <class Num>
-struct number_category : public mpl::int_<std::numeric_limits<Num>::is_integer ? number_kind_integer : (std::numeric_limits<Num>::max_exponent ? number_kind_floating_point : number_kind_unknown)> {};
+struct number_category_base<Num, true, false> : public mpl::int_<std::numeric_limits<Num>::is_integer ? number_kind_integer : (std::numeric_limits<Num>::max_exponent ? number_kind_floating_point : number_kind_unknown)> {};
+template <class Num>
+struct number_category : public number_category_base<Num, boost::is_class<Num>::value || boost::is_arithmetic<Num>::value, boost::is_abstract<Num>::value> {};
 template <class Backend, expression_template_option ExpressionTemplates>
 struct number_category<number<Backend, ExpressionTemplates> > : public number_category<Backend>{};
 template <class tag, class A1, class A2, class A3, class A4>

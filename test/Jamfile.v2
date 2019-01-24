@@ -58,6 +58,7 @@ project : requirements
    <toolset>msvc:<cxxflags>/fp\:precise
    <toolset>intel-win:<runtime-link>static
    <toolset>intel-win:<link>static
+   <toolset>clang-win:<link>static
    # Speed up compiles:
    <toolset>msvc:<debug-symbols>off
    <toolset>intel:<debug-symbols>off
@@ -938,6 +939,11 @@ test-suite misc :
       [ compile bug11922.cpp ]
       [ run bug12039.cpp no_eh_support ]
       [ compile git_issue_30.cpp ]
+      [ compile git_issue_98.cpp : 
+         [ check-target-builds ../config//has_float128 : <define>TEST_FLOAT128 <source>quadmath : ]
+         [ check-target-builds ../config//has_gmp : <define>TEST_GMP <source>gmp : ]
+         [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>gmp <source>mpfr : ]
+         [ check-target-builds ../config//has_mpc : <define>TEST_MPC <source>gmp <source>mpfr <source>mpc : ] ]
       [ run issue_13301.cpp ]
       [ run issue_13148.cpp ]
       [ run test_hash.cpp : : : 
