@@ -1027,6 +1027,7 @@ as a valid floating-point number.
 the default by defining either `BOOST_MP_USE_FLOAT128` or `BOOST_MP_USE_QUAD`.
 * When the underlying type is Intel's `_Quad` type, the code must be compiled with the compiler option `-Qoption,cpp,--extended_float_type`.
 * When compiling with `gcc`, you need to use the flag `--std=gnu++11/14/17`, as the numeric literal operator 'operator""Q' is a GNU extension. Compilation fails with the flag `--std=c++11/14/17`.
+
 [h5 float128 example:]
 
 [float128_eg]
