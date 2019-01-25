@@ -101,7 +101,7 @@ namespace boost{ namespace multiprecision{  namespace detail{
       //
       // This function is never called: in C++17 it won't be compiled either:
       //
-      BOOST_CONSTEXPR unsigned precision()const 
+      unsigned precision()const 
       { 
          BOOST_ASSERT("This function should never be called!!" == 0);
          return 0; 
