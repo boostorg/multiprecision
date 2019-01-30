@@ -60,6 +60,7 @@ struct is_cpp_bin_float_implicitly_constructible_from_type<Float, bit_count, tru
 #ifdef BOOST_HAS_FLOAT128
       && !boost::is_same<Float, __float128>::value
 #endif
+      && (is_floating_point<Float>::value || is_number<Float>::value)
       ;
 };
 
@@ -350,7 +351,7 @@ public:
    typename boost::enable_if_c<
       (number_category<Float>::value == number_kind_floating_point) 
          && !boost::is_floating_point<Float>::value
-         /*&& (std::numeric_limits<number<Float> >::radix == 2)*/, 
+         && is_number<Float>::value, 
       cpp_bin_float&>::type assign_float(Float f)
    {
       BOOST_MATH_STD_USING
