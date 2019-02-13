@@ -830,7 +830,7 @@ public:
    template<class Archive>
    void serialize(Archive & ar, const unsigned int /*version*/)
    {
-      ar & m_backend;
+      ar & boost::serialization::make_nvp("backend", m_backend);
    }
 private:
    template <class T>

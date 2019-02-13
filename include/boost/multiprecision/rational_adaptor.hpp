@@ -186,16 +186,16 @@ struct rational_adaptor
    {
       // Saving
       integer_type n(m_value.numerator()), d(m_value.denominator());
-      ar & n;
-      ar & d;
+      ar & boost::serialization::make_nvp("numerator", n);
+      ar & boost::serialization::make_nvp("denominator", d);
    }
    template <class Archive>
    void serialize(Archive& ar, const mpl::false_&)
    {
       // Loading
       integer_type n, d;
-      ar & n;
-      ar & d;
+      ar & boost::serialization::make_nvp("numerator", n);
+      ar & boost::serialization::make_nvp("denominator", d);
       m_value.assign(n, d);
    }
    template <class Archive>

@@ -53,6 +53,15 @@
 #endif
 
 namespace boost{
+
+   namespace serialization
+   {
+      template <class T>
+      struct nvp;
+      template<class T>
+      const nvp< T > make_nvp(const char * name, T & t);
+   }
+   
    namespace multiprecision{
 
 enum expression_template_option
