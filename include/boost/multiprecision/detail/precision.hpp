@@ -26,7 +26,7 @@ namespace boost{ namespace multiprecision{  namespace detail{
       // least-significant-bit, ie the number of bits required to represent the
       // the value assuming we will have an exponent to shift things by:
       //
-      return val.is_zero() ? 1 : digits2_2_10(msb(val) - lsb(val) + 1);
+      return val.is_zero() ? 1 : digits2_2_10(msb(abs(val)) - lsb(abs(val)) + 1);
    }
 
 
