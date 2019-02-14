@@ -1555,9 +1555,9 @@ struct number_category<detail::expression<tag, A1, A2, A3, A4> > : public number
 //
 #ifdef BOOST_HAS_INT128
 template <>
-struct number_category<__int128> : public mpl::int_<number_kind_integer> {};
+struct number_category<boost::int128_type> : public mpl::int_<number_kind_integer> {};
 template <>
-struct number_category<unsigned __int128> : public mpl::int_<number_kind_integer> {};
+struct number_category<boost::uint128_type> : public mpl::int_<number_kind_integer> {};
 #endif
 #ifdef BOOST_HAS_FLOAT128
 template <>
