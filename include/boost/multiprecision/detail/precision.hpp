@@ -88,6 +88,11 @@ namespace boost{ namespace multiprecision{  namespace detail{
       return (std::max)((std::max)(current_precision_of(expr.left_ref()), current_precision_of(expr.right_ref())), current_precision_of(expr.middle_ref()));
    }
 
+#ifdef BOOST_MSVC
+#pragma warning(push)
+#pragma warning(disable:4130)
+#endif
+
    template <class R, bool = boost::multiprecision::detail::is_variable_precision<R>::value>
    struct scoped_default_precision
    {
@@ -107,6 +112,10 @@ namespace boost{ namespace multiprecision{  namespace detail{
          return 0; 
       }
    };
+
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
 
    template <class R>
    struct scoped_default_precision<R, true>
