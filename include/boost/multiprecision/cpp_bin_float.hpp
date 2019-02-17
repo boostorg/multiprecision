@@ -528,9 +528,9 @@ public:
    template<class Archive>
    void serialize(Archive & ar, const unsigned int /*version*/)
    {
-      ar & m_data;
-      ar & m_exponent;
-      ar & m_sign;
+      ar & boost::serialization::make_nvp("data", m_data);
+      ar & boost::serialization::make_nvp("exponent", m_exponent);
+      ar & boost::serialization::make_nvp("sign", m_sign);
    }
 };
 

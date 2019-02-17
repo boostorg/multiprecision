@@ -26,6 +26,8 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/xml_iarchive.hpp>
+#include <boost/archive/xml_oarchive.hpp>
 #include <boost/exception/all.hpp>
 
 template <class T>
@@ -70,20 +72,33 @@ void test_neg(const T& x, const boost::mpl::true_&)
    try
    {
 #endif
-      std::stringstream ss;
-      boost::archive::text_oarchive oa(ss);
-      oa << static_cast<const T&>(val);
-      boost::archive::text_iarchive ia(ss);
       T val2;
-      ia >> val2;
-      BOOST_CHECK_EQUAL(val, val2);
-
-      ss.clear();
-      boost::archive::binary_oarchive ob(ss);
-      ob << static_cast<const T&>(val);
-      boost::archive::binary_iarchive ib(ss);
-      ib >> val2;
-      BOOST_CHECK_EQUAL(val, val2);
+      {
+         std::stringstream ss;
+         boost::archive::text_oarchive oa(ss);
+         oa << static_cast<const T&>(val);
+         boost::archive::text_iarchive ia(ss);
+         ia >> val2;
+         BOOST_CHECK_EQUAL(val, val2);
+      }
+      {
+         std::stringstream ss;
+         {
+            boost::archive::xml_oarchive oa(ss);
+            oa << boost::serialization::make_nvp("value", static_cast<const T&>(val));
+         }
+         boost::archive::xml_iarchive ia(ss);
+         ia >> boost::serialization::make_nvp("value", val2);
+         BOOST_CHECK_EQUAL(val, val2);
+      }
+      {
+         std::stringstream ss;
+         boost::archive::binary_oarchive ob(ss);
+         ob << static_cast<const T&>(val);
+         boost::archive::binary_iarchive ib(ss);
+         ib >> val2;
+         BOOST_CHECK_EQUAL(val, val2);
+      }
 #ifndef BOOST_NO_EXCEPTIONS
    }
    catch(const boost::exception& e)
@@ -117,20 +132,33 @@ void test()
       try
       {
 #endif
-         std::stringstream ss;
-         boost::archive::text_oarchive oa(ss);
-         oa << static_cast<const T&>(val);
-         boost::archive::text_iarchive ia(ss);
          T val2;
-         ia >> val2;
-         BOOST_CHECK_EQUAL(val, val2);
-
-         ss.clear();
-         boost::archive::binary_oarchive ob(ss);
-         ob << static_cast<const T&>(val);
-         boost::archive::binary_iarchive ib(ss);
-         ib >> val2;
-         BOOST_CHECK_EQUAL(val, val2);
+         {
+            std::stringstream ss;
+            boost::archive::text_oarchive oa(ss);
+            oa << static_cast<const T&>(val);
+            boost::archive::text_iarchive ia(ss);
+            ia >> val2;
+            BOOST_CHECK_EQUAL(val, val2);
+         }
+         {
+            std::stringstream ss;
+            {
+               boost::archive::xml_oarchive oa(ss);
+               oa << boost::serialization::make_nvp("value", static_cast<const T&>(val));
+            }
+            boost::archive::xml_iarchive ia(ss);
+            ia >> boost::serialization::make_nvp("value", val2);
+            BOOST_CHECK_EQUAL(val, val2);
+         }
+         {
+            std::stringstream ss;
+            boost::archive::binary_oarchive ob(ss);
+            ob << static_cast<const T&>(val);
+            boost::archive::binary_iarchive ib(ss);
+            ib >> val2;
+            BOOST_CHECK_EQUAL(val, val2);
+         }
 #ifndef BOOST_NO_EXCEPTIONS
       }
       catch(const boost::exception& e)
