@@ -481,9 +481,15 @@ void generic_interconvert_float2int(To& to, const From& from, const mpl::int_<2>
    number<To>   num(0u);
    number<From> val(from);
    val = frexp(val, &e);
+   bool neg = false;
+   if (val.sign() < 0)
+   {
+      val.backend().negate();
+      neg = true;
+   }
    while(e > 0)
    {
-      int s = (std::min)(e, shift);
+      exponent_type s = (std::min)(e, shift);
       val = ldexp(val, s);
       e -= s;
       boost::long_long_type ll = boost::math::lltrunc(val);
@@ -492,6 +498,8 @@ void generic_interconvert_float2int(To& to, const From& from, const mpl::int_<2>
       num += ll;
    }
    to = num.backend();
+   if (neg)
+      to.negate();
 }
 
 template <class To, class From, int Radix>
