@@ -342,8 +342,19 @@ struct gmp_float_imp
             }
             else if(digits > 0)
             {
+               mp_exp_t old_e = e;
                ps = mpf_get_str (0, &e, 10, static_cast<std::size_t>(digits), m_data);
                --e;  // To match with what our formatter expects.
+               if (old_e > e)
+               {
+                  // in some cases, when we ask for more digits of precision, it will
+                  // change the number of digits to the left of the decimal, if that
+                  // happens, account for it here.
+                  // example: cout << fixed << setprecision(3) << mpf_float_50("99.9809")
+                  digits -= old_e - e;
+                  ps = mpf_get_str (0, &e, 10, static_cast<std::size_t>(digits), m_data);
+                  --e;  // To match with what our formatter expects.
+               }
             }
             else
             {
