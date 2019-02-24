@@ -158,6 +158,8 @@ int main()
    test_convert<cpp_bin_float_50, cpp_int>();
    test_convert<cpp_bin_float_50, int128_t>();
    test_convert<cpp_bin_float_50, uint128_t>();
+   test_convert<cpp_bin_float_quad, checked_int1024_t>();
+   test_convert<cpp_bin_float_quad, checked_uint1024_t>();
 
 
    test_convert<cpp_bin_float_50, cpp_rational>();

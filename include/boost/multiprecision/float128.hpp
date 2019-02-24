@@ -668,7 +668,7 @@ void do_serialize(Archive& ar, boost::multiprecision::backends::float128_backend
    // saving
    // non-binary
    std::string s(val.str(0, std::ios_base::scientific));
-   ar & s;
+   ar & boost::serialization::make_nvp("value", s);
 }
 template <class Archive>
 void do_serialize(Archive& ar, boost::multiprecision::backends::float128_backend& val, const mpl::true_&, const mpl::false_&)
@@ -676,7 +676,7 @@ void do_serialize(Archive& ar, boost::multiprecision::backends::float128_backend
    // loading
    // non-binary
    std::string s;
-   ar & s;
+   ar & boost::serialization::make_nvp("value", s);
    val = s.c_str();
 }
 

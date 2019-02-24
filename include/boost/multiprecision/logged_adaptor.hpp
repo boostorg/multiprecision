@@ -157,7 +157,7 @@ public:
    void serialize(Archive& ar, const unsigned int /*version*/)
    {
       log_prefix_event(m_value, "serialize");
-      ar & m_value;
+      ar & boost::serialization::make_nvp("value", m_value);
       log_postfix_event(m_value, "serialize");
    }
    static unsigned default_precision() BOOST_NOEXCEPT

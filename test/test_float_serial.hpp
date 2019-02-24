@@ -15,6 +15,8 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/xml_iarchive.hpp>
+#include <boost/archive/xml_oarchive.hpp>
 #include <boost/exception/all.hpp>
 
 
@@ -67,6 +69,18 @@ void test()
          }
          {
             std::stringstream ss(std::ios_base::in | std::ios_base::out | std::ios_base::binary);
+            {
+               boost::archive::xml_oarchive oa(ss);
+               oa << boost::serialization::make_nvp("value", static_cast<const T&>(val));
+               stream_contents = ss.str();
+            }
+            boost::archive::xml_iarchive ia(ss);
+            T val2;
+            ia >> boost::serialization::make_nvp("value", val2);
+            BOOST_CHECK_EQUAL(val, val2);
+         }
+         {
+            std::stringstream ss(std::ios_base::in | std::ios_base::out | std::ios_base::binary);
             ++test_id;
             boost::archive::binary_oarchive ba(ss);
             ba << static_cast<const T&>(val);
@@ -86,6 +100,19 @@ void test()
             boost::archive::text_iarchive ia2(ss);
             T val2;
             ia2 >> val2;
+            BOOST_CHECK_EQUAL(val, val2);
+         }
+         {
+            std::stringstream ss(std::ios_base::in | std::ios_base::out | std::ios_base::binary);
+            ++test_id;
+            {
+               boost::archive::xml_oarchive oa2(ss);
+               oa2 << boost::serialization::make_nvp("value", static_cast<const T&>(val));
+               stream_contents = ss.str();
+            }
+            boost::archive::xml_iarchive ia2(ss);
+            T val2;
+            ia2 >> boost::serialization::make_nvp("value", val2);
             BOOST_CHECK_EQUAL(val, val2);
          }
          {

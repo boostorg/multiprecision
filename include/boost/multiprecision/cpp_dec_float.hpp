@@ -608,11 +608,11 @@ public:
    void serialize(Archive & ar, const unsigned int /*version*/)
    {
       for(unsigned i = 0; i < data.size(); ++i)
-         ar & data[i];
-      ar & exp;
-      ar & neg;
-      ar & fpclass;
-      ar & prec_elem;
+         ar & boost::serialization::make_nvp("digit", data[i]);
+      ar & boost::serialization::make_nvp("exponent", exp);
+      ar & boost::serialization::make_nvp("sign", neg);
+      ar & boost::serialization::make_nvp("class-type", fpclass);
+      ar & boost::serialization::make_nvp("precision", prec_elem);
    }
 
 private:

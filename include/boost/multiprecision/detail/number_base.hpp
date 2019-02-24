@@ -53,6 +53,15 @@
 #endif
 
 namespace boost{
+
+   namespace serialization
+   {
+      template <class T>
+      struct nvp;
+      template<class T>
+      const nvp< T > make_nvp(const char * name, T & t);
+   }
+   
    namespace multiprecision{
 
 enum expression_template_option
@@ -1540,8 +1549,12 @@ enum number_category_type
    number_kind_complex = 4
 };
 
+template <class Num, bool, bool>
+struct number_category_base : public mpl::int_<number_kind_unknown> {};
 template <class Num>
-struct number_category : public mpl::int_<std::numeric_limits<Num>::is_integer ? number_kind_integer : (std::numeric_limits<Num>::max_exponent ? number_kind_floating_point : number_kind_unknown)> {};
+struct number_category_base<Num, true, false> : public mpl::int_<std::numeric_limits<Num>::is_integer ? number_kind_integer : (std::numeric_limits<Num>::max_exponent ? number_kind_floating_point : number_kind_unknown)> {};
+template <class Num>
+struct number_category : public number_category_base<Num, boost::is_class<Num>::value || boost::is_arithmetic<Num>::value, boost::is_abstract<Num>::value> {};
 template <class Backend, expression_template_option ExpressionTemplates>
 struct number_category<number<Backend, ExpressionTemplates> > : public number_category<Backend>{};
 template <class tag, class A1, class A2, class A3, class A4>
@@ -1551,9 +1564,9 @@ struct number_category<detail::expression<tag, A1, A2, A3, A4> > : public number
 //
 #ifdef BOOST_HAS_INT128
 template <>
-struct number_category<__int128> : public mpl::int_<number_kind_integer> {};
+struct number_category<boost::int128_type> : public mpl::int_<number_kind_integer> {};
 template <>
-struct number_category<unsigned __int128> : public mpl::int_<number_kind_integer> {};
+struct number_category<boost::uint128_type> : public mpl::int_<number_kind_integer> {};
 #endif
 #ifdef BOOST_HAS_FLOAT128
 template <>

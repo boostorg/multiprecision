@@ -8,8 +8,27 @@
 
 #include <boost/multiprecision/traits/is_variable_precision.hpp>
 #include <boost/multiprecision/detail/number_base.hpp>
+#include <boost/multiprecision/detail/digits.hpp>
 
 namespace boost{ namespace multiprecision{  namespace detail{
+
+   template <class B, boost::multiprecision::expression_template_option ET>
+   inline BOOST_CONSTEXPR unsigned current_precision_of_last_chance_imp(const boost::multiprecision::number<B, ET>&, const mpl::false_&)
+   {
+      return std::numeric_limits<boost::multiprecision::number<B, ET> >::digits10;
+   }
+   template <class B, boost::multiprecision::expression_template_option ET>
+   inline unsigned current_precision_of_last_chance_imp(const boost::multiprecision::number<B, ET>& val, const mpl::true_&)
+   {
+      //
+      // We have an arbitrary precision integer, take it's "precision" as the
+      // location of the most-significant-bit less the location of the
+      // least-significant-bit, ie the number of bits required to represent the
+      // the value assuming we will have an exponent to shift things by:
+      //
+      return val.is_zero() ? 1 : digits2_2_10(msb(abs(val)) - lsb(abs(val)) + 1);
+   }
+
 
    template <class B, boost::multiprecision::expression_template_option ET>
    inline unsigned current_precision_of_imp(const boost::multiprecision::number<B, ET>& n, const mpl::true_&)
@@ -17,9 +36,14 @@ namespace boost{ namespace multiprecision{  namespace detail{
       return n.precision();
    }
    template <class B, boost::multiprecision::expression_template_option ET>
-   inline BOOST_CONSTEXPR unsigned current_precision_of_imp(const boost::multiprecision::number<B, ET>&, const mpl::false_&)
+   inline BOOST_CONSTEXPR unsigned current_precision_of_imp(const boost::multiprecision::number<B, ET>& val, const mpl::false_&)
    {
-      return std::numeric_limits<boost::multiprecision::number<B, ET> >::digits10;
+      return current_precision_of_last_chance_imp(val, 
+         mpl::bool_<
+            std::numeric_limits<boost::multiprecision::number<B, ET> >::is_specialized 
+            && std::numeric_limits<boost::multiprecision::number<B, ET> >::is_integer 
+            && std::numeric_limits<boost::multiprecision::number<B, ET> >::is_exact 
+            && !std::numeric_limits<boost::multiprecision::number<B, ET> >::is_modulo>());
    }
 
    template <class Terminal>
@@ -64,47 +88,74 @@ namespace boost{ namespace multiprecision{  namespace detail{
       return (std::max)((std::max)(current_precision_of(expr.left_ref()), current_precision_of(expr.right_ref())), current_precision_of(expr.middle_ref()));
    }
 
+#ifdef BOOST_MSVC
+#pragma warning(push)
+#pragma warning(disable:4130)
+#endif
+
    template <class R, bool = boost::multiprecision::detail::is_variable_precision<R>::value>
    struct scoped_default_precision
    {
       template <class T>
-      scoped_default_precision(const T&) {}
+      BOOST_CONSTEXPR scoped_default_precision(const T&) {}
       template <class T, class U>
-      scoped_default_precision(const T&, const U&) {}
+      BOOST_CONSTEXPR scoped_default_precision(const T&, const U&) {}
       template <class T, class U, class V>
-      scoped_default_precision(const T&, const U&, const V&) {}
+      BOOST_CONSTEXPR scoped_default_precision(const T&, const U&, const V&) {}
+
+      //
+      // This function is never called: in C++17 it won't be compiled either:
+      //
+      unsigned precision()const 
+      { 
+         BOOST_ASSERT("This function should never be called!!" == 0);
+         return 0; 
+      }
    };
+
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
 
    template <class R>
    struct scoped_default_precision<R, true>
    {
       template <class T>
-      scoped_default_precision(const T& a) 
+      BOOST_CXX14_CONSTEXPR scoped_default_precision(const T& a) 
       {
          init(current_precision_of(a));
       }
       template <class T, class U>
-      scoped_default_precision(const T& a, const U& b)
+      BOOST_CXX14_CONSTEXPR scoped_default_precision(const T& a, const U& b)
       {
          init((std::max)(current_precision_of(a), current_precision_of(b)));
       }
       template <class T, class U, class V>
-      scoped_default_precision(const T& a, const U& b, const V& c)
+      BOOST_CXX14_CONSTEXPR scoped_default_precision(const T& a, const U& b, const V& c)
       {
          init((std::max)((std::max)(current_precision_of(a), current_precision_of(b)), current_precision_of(c)));
       }
       ~scoped_default_precision()
       {
-         R::default_precision(m_prec);
+         R::default_precision(m_old_prec);
+      }
+      BOOST_CXX14_CONSTEXPR unsigned precision()const
+      {
+         return m_new_prec;
       }
    private:
-      void init(unsigned p)
+      BOOST_CXX14_CONSTEXPR void init(unsigned p)
       {
-         m_prec = R::default_precision();
+         m_old_prec = R::default_precision();
          if (p)
+         {
             R::default_precision(p);
+            m_new_prec = p;
+         }
+         else
+            m_new_prec = m_old_prec;
       }
-      unsigned m_prec;
+      unsigned m_old_prec, m_new_prec;
    };
 
    template <class T>
