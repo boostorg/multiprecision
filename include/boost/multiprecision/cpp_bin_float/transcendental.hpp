@@ -64,6 +64,7 @@ void eval_exp(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> 
    using default_ops::eval_subtract;
    using default_ops::eval_add;
    using default_ops::eval_convert_to;
+   using default_ops::eval_increment;
 
    int type = eval_fpclassify(arg);
    bool isneg = eval_get_sign(arg) < 0;
@@ -104,6 +105,13 @@ void eval_exp(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> 
    eval_multiply(t, n, default_ops::get_constant_ln2<cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> >());
    eval_subtract(t, arg);
    t.negate();
+   if (t.compare(default_ops::get_constant_ln2<cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> >()) > 0)
+   {
+      // There are some rare cases where the multiply rounds down leaving a remainder > ln2
+      // See https://github.com/boostorg/multiprecision/issues/120
+      eval_increment(n);
+      t = limb_type(0);
+   }
    if(eval_get_sign(t) < 0)
    {
       // There are some very rare cases where arg/ln2 is an integer, and the subsequent multiply
