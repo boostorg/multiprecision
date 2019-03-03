@@ -2157,9 +2157,9 @@ namespace math {
       boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result;
       mpfr_erf(result.backend().data(), arg.backend().data(), GMP_RNDN);
       if (mpfr_inf_p(result.backend().data()))
-         return policies::raise_overflow_error<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >("erf<%1%>(%1%)", 0, Policy());
+         return policies::raise_overflow_error<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >("erf<%1%>(%1%)", 0, pol);
       if (mpfr_nan_p(result.backend().data()))
-         return policies::raise_evaluation_error("erf<%1%>(%1%)", "Unknown error, result is a NaN", result, Policy());
+         return policies::raise_evaluation_error("erf<%1%>(%1%)", "Unknown error, result is a NaN", result, pol);
       return result;
    }
    template<unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
@@ -2176,9 +2176,9 @@ namespace math {
       boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result;
       mpfr_erfc(result.backend().data(), arg.backend().data(), GMP_RNDN);
       if (mpfr_inf_p(result.backend().data()))
-         return policies::raise_overflow_error<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >("erfc<%1%>(%1%)", 0, Policy());
+         return policies::raise_overflow_error<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >("erfc<%1%>(%1%)", 0, pol);
       if (mpfr_nan_p(result.backend().data()))
-         return policies::raise_evaluation_error("erfc<%1%>(%1%)", "Unknown error, result is a NaN", result, Policy());
+         return policies::raise_evaluation_error("erfc<%1%>(%1%)", "Unknown error, result is a NaN", result, pol);
       return result;
    }
    template<unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
@@ -2195,9 +2195,9 @@ namespace math {
       boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result;
       mpfr_expm1(result.backend().data(), arg.backend().data(), GMP_RNDN);
       if (mpfr_inf_p(result.backend().data()))
-         return policies::raise_overflow_error<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >("expm1<%1%>(%1%)", 0, Policy());
+         return policies::raise_overflow_error<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >("expm1<%1%>(%1%)", 0, pol);
       if (mpfr_nan_p(result.backend().data()))
-         return policies::raise_evaluation_error("expm1<%1%>(%1%)", "Unknown error, result is a NaN", result, Policy());
+         return policies::raise_evaluation_error("expm1<%1%>(%1%)", "Unknown error, result is a NaN", result, pol);
       return result;
    }
    template<unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
@@ -2229,9 +2229,9 @@ namespace math {
          result = log(boost::math::constants::pi<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >()) - lgamma(arg, 0, pol) - log(t);
       }
       if (mpfr_inf_p(result.backend().data()))
-         return policies::raise_overflow_error<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >("lgamma<%1%>(%1%)", 0, Policy());
+         return policies::raise_overflow_error<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >("lgamma<%1%>(%1%)", 0, pol);
       if (mpfr_nan_p(result.backend().data()))
-         return policies::raise_evaluation_error("lgamma<%1%>(%1%)", "Unknown error, result is a NaN", result, Policy());
+         return policies::raise_evaluation_error("lgamma<%1%>(%1%)", "Unknown error, result is a NaN", result, pol);
       if (sign)
       {
          boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> phase = 1 - arg;
@@ -2259,20 +2259,17 @@ namespace math {
       return lgamma(arg, 0, policies::policy<>());
    }
 
-
-
-
    template<unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates, class Policy>
-   inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> tgamma BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>& arg, const Policy& pol)
+   inline typename boost::enable_if_c<boost::math::policies::is_policy<Policy>::value, boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >::type tgamma BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>& arg, const Policy& pol)
    {
       boost::multiprecision::detail::scoped_default_precision<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> > precision_guard(arg);
 
       boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result;
       mpfr_gamma(result.backend().data(), arg.backend().data(), GMP_RNDN);
       if (mpfr_inf_p(result.backend().data()))
-         return policies::raise_overflow_error<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >("tgamma<%1%>(%1%)", 0, Policy());
+         return policies::raise_overflow_error<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >("tgamma<%1%>(%1%)", 0, pol);
       if (mpfr_nan_p(result.backend().data()))
-         return policies::raise_evaluation_error("tgamma<%1%>(%1%)", "Unknown error, result is a NaN", result, Policy());
+         return policies::raise_evaluation_error("tgamma<%1%>(%1%)", "Unknown error, result is a NaN", result, pol);
       return result;
    }
    template<unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
@@ -2289,9 +2286,9 @@ namespace math {
       boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result;
       mpfr_log1p(result.backend().data(), arg.backend().data(), GMP_RNDN);
       if (mpfr_inf_p(result.backend().data()))
-         return policies::raise_overflow_error<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >("log1p<%1%>(%1%)", 0, Policy());
+         return policies::raise_overflow_error<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >("log1p<%1%>(%1%)", 0, pol);
       if (mpfr_nan_p(result.backend().data()))
-         return policies::raise_evaluation_error("log1p<%1%>(%1%)", "Unknown error, result is a NaN", result, Policy());
+         return policies::raise_evaluation_error("log1p<%1%>(%1%)", "Unknown error, result is a NaN", result, pol);
       return result;
    }
    template<unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
