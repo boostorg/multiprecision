@@ -310,16 +310,21 @@
             </li>
 <li class="listitem">
               When used at fixed precision, the size of this type is always one machine
-              word larger than you would expect for an N-bit integer: the extra word
-              stores both the sign, and how many machine words in the integer are
-              actually in use. The latter is an optimisation for larger fixed precision
-              integers, so that a 1024-bit integer has almost the same performance
-              characteristics as a 128-bit integer, rather than being 4 times slower
-              for addition and 16 times slower for multiplication (assuming the values
-              involved would always fit in 128 bits). Typically this means you can
-              use an integer type wide enough for the "worst case scenario"
-              with only minor performance degradation even if most of the time the
-              arithmetic could in fact be done with a narrower type.
+              word (plus any compiler-applied alignment padding) larger than you
+              would expect for an N-bit integer: the extra word stores both the sign,
+              and how many machine words in the integer are actually in use. The
+              latter is an optimisation for larger fixed precision integers, so that
+              a 1024-bit integer has almost the same performance characteristics
+              as a 128-bit integer, rather than being 4 times slower for addition
+              and 16 times slower for multiplication (assuming the values involved
+              would always fit in 128 bits). Typically this means you can use an
+              integer type wide enough for the "worst case scenario" with
+              only minor performance degradation even if most of the time the arithmetic
+              could in fact be done with a narrower type. Also note that unsigned
+              fixed precision types small enough to fit inside the largest native
+              integer become a simple wrapper around that type, this includes the
+              "checked" variants. Small signed types will always have an
+              extra sign word and so be larger than their native equivalent.
             </li>
 <li class="listitem">
               When used at fixed precision and MaxBits is smaller than the number
@@ -363,14 +368,15 @@
    <span class="keyword">for</span><span class="special">(</span><span class="keyword">unsigned</span> <span class="identifier">i</span> <span class="special">=</span> <span class="number">1</span><span class="special">;</span> <span class="identifier">i</span> <span class="special">&lt;=</span> <span class="number">20</span><span class="special">;</span> <span class="special">++</span><span class="identifier">i</span><span class="special">)</span>
       <span class="identifier">v</span> <span class="special">*=</span> <span class="identifier">i</span><span class="special">;</span>
 
-   <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">v</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span> <span class="comment">// prints 20!</span>
+   <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">v</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span> <span class="comment">// prints 2432902008176640000 (i.e. 20!)</span>
 
    <span class="comment">// Repeat at arbitrary precision:</span>
    <span class="identifier">cpp_int</span> <span class="identifier">u</span> <span class="special">=</span> <span class="number">1</span><span class="special">;</span>
    <span class="keyword">for</span><span class="special">(</span><span class="keyword">unsigned</span> <span class="identifier">i</span> <span class="special">=</span> <span class="number">1</span><span class="special">;</span> <span class="identifier">i</span> <span class="special">&lt;=</span> <span class="number">100</span><span class="special">;</span> <span class="special">++</span><span class="identifier">i</span><span class="special">)</span>
       <span class="identifier">u</span> <span class="special">*=</span> <span class="identifier">i</span><span class="special">;</span>
 
-   <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">u</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span> <span class="comment">// prints 100!</span>
+   <span class="comment">// prints 93326215443944152681699238856266700490715968264381621468592963895217599993229915608941463976156518286253697920827223758251185210916864000000000000000000000000 (i.e. 100!)</span>
+   <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">u</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
 
    <span class="keyword">return</span> <span class="number">0</span><span class="special">;</span>
 <span class="special">}</span>

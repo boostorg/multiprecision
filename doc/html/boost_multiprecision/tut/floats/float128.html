@@ -106,6 +106,12 @@
               When the underlying type is Intel's <code class="computeroutput"><span class="identifier">_Quad</span></code>
               type, the code must be compiled with the compiler option <code class="computeroutput"><span class="special">-</span><span class="identifier">Qoption</span><span class="special">,</span><span class="identifier">cpp</span><span class="special">,--</span><span class="identifier">extended_float_type</span></code>.
             </li>
+<li class="listitem">
+              When compiling with <code class="computeroutput"><span class="identifier">gcc</span></code>,
+              you need to use the flag <code class="computeroutput"><span class="special">--</span><span class="identifier">std</span><span class="special">=</span><span class="identifier">gnu</span><span class="special">++</span><span class="number">11</span><span class="special">/</span><span class="number">14</span><span class="special">/</span><span class="number">17</span></code>,
+              as the numeric literal operator 'operator""Q' is a GNU extension.
+              Compilation fails with the flag <code class="computeroutput"><span class="special">--</span><span class="identifier">std</span><span class="special">=</span><span class="identifier">c</span><span class="special">++</span><span class="number">11</span><span class="special">/</span><span class="number">14</span><span class="special">/</span><span class="number">17</span></code>.
+            </li>
 </ul></div>
 <h6>
 <a name="boost_multiprecision.tut.floats.float128.h0"></a>

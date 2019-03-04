@@ -487,13 +487,30 @@
 </tr>
 <tr><td align="left" valign="top">
 <p>
-            For Microsoft Visual Studio before 2013, and default float format, a
-            small range of values approximately 0.0001 to 0.004, with exponent values
-            of 3F2 to 3F6, are wrongly input by one least significant bit, probably
-            every third value of significand.
+            For Microsoft Visual Studio before 2013 and the default floating-point
+            format, a small range of double-precision floating-point values with
+            a significand of approximately 0.0001 to 0.004 and exponent values of
+            1010 to 1014 do not round-trip exactly being off by one least significant
+            bit, for probably every third value of the significand.
           </p>
 <p>
-            A workaround is using scientific or exponential format <code class="computeroutput"><span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">scientific</span></code>.
+            A workaround is using the scientific or exponential format <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">scientific</span></code>.
+          </p>
+<p>
+            Other compilers also fail to implement round-tripping entirely fault-free,
+            for example, see <a href="https://www.exploringbinary.com/incorrectly-rounded-conversions-in-gcc-and-glibc/" target="_top">Incorrectly
+            Rounded Conversions in GCC and GLIBC</a>.
+          </p>
+<p>
+            For more details see <a href="https://www.exploringbinary.com/incorrect-round-trip-conversions-in-visual-c-plus-plus/" target="_top">Incorrect
+            Round-Trip Conversions in Visual C++</a>, and references therein
+            and <a href="https://arxiv.org/pdf/1310.8121.pdf" target="_top">Easy Accurate Reading
+            and Writing of Floating-Point Numbers, Aubrey Jaffer (August 2018)</a>.
+          </p>
+<p>
+            Microsoft VS2017 and other recent compilers, now use the <a href="https://doi.org/10.1145/3192366.3192369" target="_top">Ryu
+            fast float-to-string conversion by Ulf Adams</a> algorithm, claimed
+            to be both exact and fast for 32 and 64-bit floating-point numbers.
           </p>
 </td></tr>
 </table></div>
