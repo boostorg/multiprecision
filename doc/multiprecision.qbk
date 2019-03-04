@@ -555,7 +555,8 @@ the feature off.
  been thrown.
 * Unary negation of unsigned types results in a compiler error (static assertion).
 * This backend supports rvalue-references and is move-aware, making instantiations of `number` on this backend move aware.
-* When used at fixed precision, the size of this type is always one machine word larger than you would expect for an N-bit integer:
+* When used at fixed precision, the size of this type is always one machine word (plus any compiler-applied alignment padding) 
+larger than you would expect for an N-bit integer:
 the extra word stores both the sign, and how many machine words in the integer are actually in use.
 The latter is an optimisation for larger fixed precision integers, so that a 1024-bit integer has almost the same performance
 characteristics as a 128-bit integer, rather than being 4 times slower for addition and 16 times slower for multiplication
@@ -563,6 +564,8 @@ characteristics as a 128-bit integer, rather than being 4 times slower for addit
 Typically this means you can use
 an integer type wide enough for the "worst case scenario" with only minor performance degradation even if most of the time
 the arithmetic could in fact be done with a narrower type.
+Also note that unsigned fixed precision types small enough to fit inside the largest native integer become a simple wrapper around that type,
+this includes the "checked" variants.  Small signed types will always have an extra sign word and so be larger than their native equivalent.
 * When used at fixed precision and MaxBits is smaller than the number of bits in the largest native integer type, then
 internally `cpp_int_backend` switches to a "trivial" implementation where it is just a thin wrapper around a single
 integer.  Note that it will still be slightly slower than a bare native integer, as it emulates a
@@ -5618,6 +5621,17 @@ Windows Vista machine.
 * Support for atomic loads and stores is not currently supported, but will become more important as a larger number of floating point algorithms become parallelized.
 
 [section:hist History]
+
+[h4 Multiprecision-3.1.2 (Boost-1.70)]
+
+* Fix various conversion issues in the traits classes, check for compatibility with Boost.Optional.
+* Prevent instantiation of `std::numeric_limits` on any old type when checking for convertibility.  See [@https://github.com/boostorg/multiprecision/issues/98 #98].
+* Update variable precision code to accound for arbitrary precision integers.  See [@https://github.com/boostorg/multiprecision/issues/103 #103].
+* Add support for XML serialization archives.
+* Fix bug in fixed precision iostream formatting in `mpf_float` and `mpfr_float`.  See [@https://github.com/boostorg/multiprecision/issues/113 #113].
+* Add more overloads for special functions which are better handled natively by MPFR.
+* Fixed bug in generic `exp` implementation which could cause invariant failure.
+* Fixed generic conversion from float to integer to avoid undefined behaviour.  See [@https://github.com/boostorg/multiprecision/issues/110 #110].
 
 [h4 Multiprecision-3.1.1 (Boost-1.69)]
 

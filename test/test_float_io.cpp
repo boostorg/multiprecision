@@ -203,6 +203,15 @@ void test()
       val = static_cast<T>("nan");
       BOOST_CHECK((boost::math::isnan)(val));
    }
+   //
+   // Bug cases:
+   //
+   // https://github.com/boostorg/multiprecision/issues/113
+   //
+   {
+      T val("99.9809");
+      BOOST_CHECK_EQUAL(val.str(3, std::ios_base::fixed), "99.981");
+   }
 }
 
 template <class T>
