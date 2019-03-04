@@ -283,7 +283,7 @@ public:
          format += "g";
 
       int v;
-      if (f & (std::ios_base::floatfield) ) {
+      if ((f & std::ios_base::scientific) && (f & std::ios_base::fixed) ) {
          v = quadmath_snprintf (buf, sizeof buf, "%Qa", m_value);
       } else {
          v = quadmath_snprintf (buf, sizeof buf, format.c_str(), digits, m_value);
