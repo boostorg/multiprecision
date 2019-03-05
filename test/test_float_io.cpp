@@ -320,7 +320,7 @@ void test_hexadecimal_floating_point()
    // hexadecimal representation of pi; test a round trip:
    float128 pi1 = 0x1.921fb54442d18469898cc51701b8p+1Q;
    s = pi1.str(0, std::ios_base::fmtflags(std::ios_base::floatfield));
-   float128 pi2{s};
+   float128 pi2(s);
    BOOST_CHECK_EQUAL(pi1, pi2);
 
 }
