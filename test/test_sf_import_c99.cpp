@@ -55,6 +55,7 @@
 #endif
 
 #include <boost/math/constants/constants.hpp>
+#include <boost/math/special_functions/gamma.hpp>
 #include "test.hpp"
 
 #ifdef signbit
@@ -2036,6 +2037,45 @@ void test_c99_appendix_F()
       check_invalid(fmod(arg, arg2));
       check_invalid(fmod(arg2, arg2));
    }
+   //
+   // Bugs:
+   //
+   int sign = 0;
+   boost::math::lgamma(T(0.000001), &sign);
+   BOOST_CHECK_EQUAL(sign, 1);
+   sign = 0;
+   boost::math::lgamma(T(0.5), &sign);
+   BOOST_CHECK_EQUAL(sign, 1);
+   sign = 0;
+   boost::math::lgamma(T(0.9), &sign);
+   BOOST_CHECK_EQUAL(sign, 1);
+   sign = 0;
+   boost::math::lgamma(T(1.1), &sign);
+   BOOST_CHECK_EQUAL(sign, 1);
+   sign = 0;
+   boost::math::lgamma(T(1.9), &sign);
+   BOOST_CHECK_EQUAL(sign, 1);
+   sign = 0;
+   boost::math::lgamma(T(2.1), &sign);
+   BOOST_CHECK_EQUAL(sign, 1);
+   sign = 0;
+   boost::math::lgamma(T(20), &sign);
+   BOOST_CHECK_EQUAL(sign, 1);
+   sign = 0;
+   boost::math::lgamma(T(-0.0000000000001), &sign);
+   BOOST_CHECK_EQUAL(sign, -1);
+   sign = 0;
+   boost::math::lgamma(T(-0.5), &sign);
+   BOOST_CHECK_EQUAL(sign, -1);
+   sign = 0;
+   boost::math::lgamma(T(-1.5), &sign);
+   BOOST_CHECK_EQUAL(sign, 1);
+   sign = 0;
+   boost::math::lgamma(T(-2.5), &sign);
+   BOOST_CHECK_EQUAL(sign, -1);
+   sign = 0;
+   boost::math::lgamma(T(-3.5), &sign);
+   BOOST_CHECK_EQUAL(sign, 1);
 }
 
 int main()
