@@ -2212,8 +2212,12 @@ namespace math {
       boost::multiprecision::detail::scoped_default_precision<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> > precision_guard(arg);
 
       boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result;
-      if(arg > 0)
+      if (arg > 0)
+      {
          mpfr_lngamma(result.backend().data(), arg.backend().data(), GMP_RNDN);
+         if (sign)
+            *sign = 1;
+      }
       else
       {
          if (floor(arg) == arg)
@@ -2227,20 +2231,20 @@ namespace math {
             t = -t;
          }
          result = log(boost::math::constants::pi<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >()) - lgamma(arg, 0, pol) - log(t);
+         if (sign)
+         {
+            boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> phase = 1 - arg;
+            phase = floor(phase) / 2;
+            if (floor(phase) == phase)
+               *sign = -1;
+            else
+               *sign = 1;
+         }
       }
       if (mpfr_inf_p(result.backend().data()))
          return policies::raise_overflow_error<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >("lgamma<%1%>(%1%)", 0, pol);
       if (mpfr_nan_p(result.backend().data()))
          return policies::raise_evaluation_error("lgamma<%1%>(%1%)", "Unknown error, result is a NaN", result, pol);
-      if (sign)
-      {
-         boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> phase = 1 - arg;
-         phase = floor(phase) / 2;
-         if (floor(phase) == phase)
-            *sign = 1;
-         else
-            *sign = -1;
-      }
       return result;
    }
    template<unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
