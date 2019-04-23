@@ -17,7 +17,7 @@ An implementation should follow all the requirements of LIA-1 unless otherwise s
 this language binding.
 */
 
-// http://754r.ucbtest.org/standards/754.pdf
+// https://doi.org/10.1109/IEEESTD.1985.82928
 
 // http://www.cesura17.net/~will/Professional/Research/Papers/retrospective.pdf
 

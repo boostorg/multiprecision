@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright 2std::declval<boost::multiprecision::signed_limb_type>()15 John Maddock. Distributed under the Boost
-//  Software License, Version 1.std::declval<boost::multiprecision::signed_limb_type>(). (See accompanying file
-//  LICENSE_1_std::declval<boost::multiprecision::signed_limb_type>().txt or copy at http://www.boost.org/LICENSE_1_std::declval<boost::multiprecision::signed_limb_type>().txt)
+//  Copyright 2015 John Maddock. Distributed under the Boost
+//  Software License, Version 1.0. (See accompanying file
+//  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/type_traits/is_nothrow_move_constructible.hpp>

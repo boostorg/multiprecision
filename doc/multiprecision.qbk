@@ -2374,7 +2374,7 @@ Information technology Language independent arithmetic Part 1: Integer and float
 
 That C Standard in turn refers to
 
-[@http://754r.ucbtest.org/standards/754.pdf IEEE754 IEEE Standard for Binary
+[@https://doi.org/10.1109/IEEESTD.1985.82928 IEEE754 IEEE Standard for Binary
 Floating-Point Arithmetic]
 
 There is a useful summary at
