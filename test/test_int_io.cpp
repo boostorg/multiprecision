@@ -145,8 +145,8 @@ void test_round_trip()
    BOOST_CHECK_EQUAL(T(1002).str(0, std::ios_base::showpos), "+1002");
    BOOST_CHECK_EQUAL(T(1002).str(0, std::ios_base::oct), "1752");
    BOOST_CHECK_EQUAL(T(1002).str(0, std::ios_base::oct|std::ios_base::showbase), "01752");
-   BOOST_CHECK_EQUAL(boost::to_lower_copy(T(1002).str(0, std::ios_base::hex)), "3ea");
-   BOOST_CHECK_EQUAL(boost::to_lower_copy(T(1002).str(0, std::ios_base::hex|std::ios_base::showbase)), "0x3ea");
+   BOOST_CHECK_EQUAL(T(1002).str(0, std::ios_base::hex), "3ea");
+   BOOST_CHECK_EQUAL(T(1002).str(0, std::ios_base::hex|std::ios_base::showbase), "0x3ea");
    BOOST_CHECK_EQUAL(T(1002).str(0, std::ios_base::hex|std::ios_base::uppercase), "3EA");
    BOOST_CHECK_EQUAL(T(1002).str(0, std::ios_base::hex|std::ios_base::showbase|std::ios_base::uppercase), "0X3EA");
    BOOST_CHECK_EQUAL(T(1002).str(0, std::ios_base::dec), "1002");
