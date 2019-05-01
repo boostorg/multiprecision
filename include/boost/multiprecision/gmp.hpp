@@ -39,6 +39,7 @@
 #  define BOOST_MP_MPIR_VERSION 0
 #endif
 
+#include <cctype>
 #include <cmath>
 #include <limits>
 #include <climits>
@@ -1328,11 +1329,13 @@ struct gmp_int
       std::string s = ps;
       mp_get_memory_functions(&alloc_func_ptr, &realloc_func_ptr, &free_func_ptr);
       (*free_func_ptr)((void*)ps, std::strlen(ps) + 1);
-
+      if (f & std::ios_base::uppercase)
+          for (size_t i = 0; i < s.length(); ++i)
+              s[i] = std::toupper(s[i]);
       if((base != 10) && (f & std::ios_base::showbase))
       {
          int pos = s[0] == '-' ? 1 : 0;
-         const char* pp = base == 8 ? "0" : "0x";
+         const char* pp = base == 8 ? "0" : (f & std::ios_base::uppercase) ? "0X" : "0x";
          s.insert(static_cast<std::string::size_type>(pos), pp);
       }
       if((f & std::ios_base::showpos) && (s[0] != '-'))
