@@ -824,6 +824,15 @@ inline int eval_get_sign(const T& val)
    return val.compare(static_cast<ui_type>(0));
 }
 
+template<class U, class T>
+inline void assign_components_imp(T& result, const long long& v1, const U& v2, const mpl::int_<number_kind_modulus>&)
+{
+    result.m_params = v2;
+    result = v1;
+    eval_multiply(result, v2.R2().backend());
+    //eval_multiply(result, v1);
+}
+
 template <class T, class V, class U>
 inline void assign_components_imp(T& result, const V& v1, const U& v2, const mpl::int_<number_kind_rational>&)
 {
@@ -837,7 +846,6 @@ template <class T, class V, class U, int N>
 inline void assign_components_imp(T& result, const V& v1, const U& v2, const mpl::int_<N>&)
 {
    typedef typename component_type<number<T> >::type component_number_type;
-
    component_number_type x(v1), y(v2);
    assign_components(result, x.backend(), y.backend());
 }
