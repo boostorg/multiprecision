@@ -1,26 +1,35 @@
 include(CMTest)
 
-find_package(${CMAKE_WORKSPACE_NAME}_algorithm)
-find_package(${CMAKE_WORKSPACE_NAME}_chrono)
-find_package(${CMAKE_WORKSPACE_NAME}_exception)
-find_package(${CMAKE_WORKSPACE_NAME}_timer)
-find_package(${CMAKE_WORKSPACE_NAME}_numeric_ublas)
-find_package(${CMAKE_WORKSPACE_NAME}_filesystem)
-find_package(${CMAKE_WORKSPACE_NAME}_test)
-find_package(${CMAKE_WORKSPACE_NAME}_serialization)
-find_package(${CMAKE_WORKSPACE_NAME}_numeric_interval)
+if(BOOST_CMAKE)
+    cm_find_package(${CMAKE_WORKSPACE_NAME}_algorithm)
+    cm_find_package(${CMAKE_WORKSPACE_NAME}_chrono)
+    cm_find_package(${CMAKE_WORKSPACE_NAME}_exception)
+    cm_find_package(${CMAKE_WORKSPACE_NAME}_timer)
+    cm_find_package(${CMAKE_WORKSPACE_NAME}_numeric_ublas)
+    cm_find_package(${CMAKE_WORKSPACE_NAME}_filesystem)
+    cm_find_package(${CMAKE_WORKSPACE_NAME}_test)
+    cm_find_package(${CMAKE_WORKSPACE_NAME}_serialization)
+    cm_find_package(${CMAKE_WORKSPACE_NAME}_numeric_interval)
 
-cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_multiprecision
-                       ${CMAKE_WORKSPACE_NAME}::algorithm
-                       ${CMAKE_WORKSPACE_NAME}::chrono
-                       ${CMAKE_WORKSPACE_NAME}::exception
-                       ${CMAKE_WORKSPACE_NAME}::timer
-                       ${CMAKE_WORKSPACE_NAME}::numeric_ublas
-                       ${CMAKE_WORKSPACE_NAME}::filesystem
-                       ${CMAKE_WORKSPACE_NAME}::test
-                       ${CMAKE_WORKSPACE_NAME}::serialization
-                       ${CMAKE_WORKSPACE_NAME}::numeric_interval
-                       )
+    cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_multiprecision
+                           ${CMAKE_WORKSPACE_NAME}::algorithm
+                           ${CMAKE_WORKSPACE_NAME}::chrono
+                           ${CMAKE_WORKSPACE_NAME}::exception
+                           ${CMAKE_WORKSPACE_NAME}::timer
+                           ${CMAKE_WORKSPACE_NAME}::numeric_ublas
+                           ${CMAKE_WORKSPACE_NAME}::filesystem
+                           ${CMAKE_WORKSPACE_NAME}::test
+                           ${CMAKE_WORKSPACE_NAME}::serialization
+                           ${CMAKE_WORKSPACE_NAME}::numeric_interval
+                           )
+else()
+    cm_find_package(Boost COMPONENTS chrono timer exception filesystem
+                    unit_test_framework serialization)
+
+    cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_multiprecision
+                           ${Boost_LIBS}
+                           )
+endif()
 
 # copyright John Maddock 2011
 # Distributed under the Boost Software License, Version 1.0.

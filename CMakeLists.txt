@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.5)
 
+set(BOOST_CMAKE FALSE)
+
 if(${CMAKE_WORKSPACE_NAME} STREQUAL boost)
+    set(BOOST_CMAKE TRUE)
+
     find_package(CM)
     include(CMDeploy)
     include(CMSetupVersion)
@@ -47,7 +51,7 @@ if(${CMAKE_WORKSPACE_NAME} STREQUAL boost)
     target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${CMAKE_WORKSPACE_NAME}::math)
 
 else()
-    cm_workspace(boost)
+    cm_workspace(boost SOURCES_DIR "${CMAKE_CURRENT_LIST_DIR}")
 
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/share/modules/cmake")
 
@@ -64,11 +68,10 @@ else()
     set_property(TARGET ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTY EXPORT_NAME multiprecision)
 
     target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${Boost_LIBS})
-
 endif()
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE ${CURRENT_SOURCES_DIR}/include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-add_subdirectory(test)
+#add_subdirectory(test)
