@@ -27,7 +27,7 @@ else()
                     unit_test_framework serialization)
 
     cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_multiprecision
-                           ${Boost_LIBS}
+                           ${Boost_LIBRARIES}
                            )
 endif()
 
