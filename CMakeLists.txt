@@ -51,8 +51,6 @@ if(${CMAKE_WORKSPACE_NAME} STREQUAL boost)
     target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${CMAKE_WORKSPACE_NAME}::math)
 
 else()
-    cm_workspace(boost SOURCES_DIR "${CMAKE_CURRENT_LIST_DIR}")
-
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/share/modules/cmake")
 
     include(CMConfig)
