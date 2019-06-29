@@ -555,7 +555,7 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
    }
    mpc_complex_backend& operator=(mpf_srcptr val)
    {
-      if (mpc_get_prec(data()) != mpf_get_prec(val))
+      if ((mp_bitcnt_t)mpc_get_prec(data()) != mpf_get_prec(val))
       {
          mpc_complex_backend t(val);
          t.swap(*this);
