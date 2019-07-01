@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////
 //  Copyright 2013 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
-//  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_
+//  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
 #ifndef BOOST_MP_FLOAT128_HPP
 #define BOOST_MP_FLOAT128_HPP
@@ -264,8 +264,7 @@ public:
    std::string str(std::streamsize digits, std::ios_base::fmtflags f)const
    {
 #ifndef BOOST_MP_USE_QUAD
-      char buf[100];
-      boost::scoped_array<char> buf2;
+      char buf[128];
       std::string format = "%";
       if(f & std::ios_base::showpos)
          format += "+";
@@ -275,6 +274,7 @@ public:
       if(digits == 0)
          digits = 36;
       format += "Q";
+
       if(f & std::ios_base::scientific)
          format += "e";
       else if(f & std::ios_base::fixed)
@@ -282,11 +282,17 @@ public:
       else
          format += "g";
 
-      int v = quadmath_snprintf (buf, 100, format.c_str(), digits, m_value);
+      int v;
+      if ((f & std::ios_base::scientific) && (f & std::ios_base::fixed) ) {
+         v = quadmath_snprintf (buf, sizeof buf, "%Qa", m_value);
+      } else {
+         v = quadmath_snprintf (buf, sizeof buf, format.c_str(), digits, m_value);
+      }
 
-      if((v < 0) || (v >= 99))
+      if((v < 0) || (v >= 127))
       {
          int v_max = v;
+         boost::scoped_array<char> buf2;
          buf2.reset(new char[v+3]);
          v = quadmath_snprintf (&buf2[0], v_max + 3, format.c_str(), digits, m_value);
          if(v >= v_max + 3)

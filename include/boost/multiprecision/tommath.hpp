@@ -14,6 +14,7 @@
 #include <boost/scoped_array.hpp>
 #include <boost/functional/hash_fwd.hpp>
 #include <tommath.h>
+#include <cctype>
 #include <cmath>
 #include <limits>
 #include <climits>
@@ -311,10 +312,13 @@ struct tommath_int
       boost::scoped_array<char> a(new char[s+1]);
       detail::check_tommath_result(mp_toradix_n(const_cast< ::mp_int*>(&m_data), a.get(), base, s+1));
       std::string result = a.get();
+      if (f & std::ios_base::uppercase)
+          for (size_t i = 0; i < result.length(); ++i)
+              result[i] = std::toupper(result[i]);
       if((base != 10) && (f & std::ios_base::showbase))
       {
          int pos = result[0] == '-' ? 1 : 0;
-         const char* pp = base == 8 ? "0" : "0x";
+         const char* pp = base == 8 ? "0" : (f & std::ios_base::uppercase) ? "0X" : "0x";
          result.insert(static_cast<std::string::size_type>(pos), pp);
       }
       if((f & std::ios_base::showpos) && (result[0] != '-'))

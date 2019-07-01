@@ -1,7 +1,7 @@
 //////////////////3/////////////////////////////////////////////
 //  Copyright 2012 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
-//  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_
+//  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
 #ifndef BOOST_MP_CPP_INT_HPP
 #define BOOST_MP_CPP_INT_HPP
@@ -1577,11 +1577,12 @@ private:
          typename base_type::local_limb_type v = *this->limbs();
          result.assign(Bits / shift + (Bits % shift ? 1 : 0), '0');
          std::string::difference_type pos = result.size() - 1;
+         char letter_a = f & std::ios_base::uppercase ? 'A' : 'a';
          for(unsigned i = 0; i < Bits / shift; ++i)
          {
             char c = '0' + static_cast<char>(v & mask);
             if(c > '9')
-               c += 'A' - '9' - 1;
+               c += letter_a - '9' - 1;
             result[pos--] = c;
             v >>= shift;
          }
@@ -1590,7 +1591,7 @@ private:
             mask = static_cast<limb_type>((1u << (Bits % shift)) - 1);
             char c = '0' + static_cast<char>(v & mask);
             if(c > '9')
-               c += 'A' - '9';
+               c += letter_a - '9';
             result[pos] = c;
          }
          //
@@ -1602,7 +1603,7 @@ private:
          result.erase(0, n);
          if(f & std::ios_base::showbase)
          {
-            const char* pp = base == 8 ? "0" : "0x";
+            const char* pp = base == 8 ? "0" : (f & std::ios_base::uppercase) ? "0X" : "0x";
             result.insert(static_cast<std::string::size_type>(0), pp);
          }
       }
@@ -1662,11 +1663,12 @@ private:
          cpp_int_backend t(*this);
          result.assign(Bits / shift + ((Bits % shift) ? 1 : 0), '0');
          std::string::difference_type pos = result.size() - 1;
+         char letter_a = f & std::ios_base::uppercase ? 'A' : 'a';
          for(unsigned i = 0; i < Bits / shift; ++i)
          {
             char c = '0' + static_cast<char>(t.limbs()[0] & mask);
             if(c > '9')
-               c += 'A' - '9' - 1;
+               c += letter_a - '9' - 1;
             result[pos--] = c;
             eval_right_shift(t, shift);
          }
@@ -1675,7 +1677,7 @@ private:
             mask = static_cast<limb_type>((1u << (Bits % shift)) - 1);
             char c = '0' + static_cast<char>(t.limbs()[0] & mask);
             if(c > '9')
-               c += 'A' - '9';
+               c += letter_a - '9';
             result[pos] = c;
          }
          //
@@ -1687,7 +1689,7 @@ private:
          result.erase(0, n);
          if(f & std::ios_base::showbase)
          {
-            const char* pp = base == 8 ? "0" : "0x";
+            const char* pp = base == 8 ? "0" : (f & std::ios_base::uppercase) ? "0X" : "0x";
             result.insert(static_cast<std::string::size_type>(0), pp);
          }
       }

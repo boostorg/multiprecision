@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////
 //  Copyright 2012 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
-//  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_
+//  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
 //
 // Compare arithmetic results using fixed_int to GMP results.
@@ -535,6 +535,150 @@ struct tester
       BOOST_CHECK_EQUAL(a, 0);
       --++a;
       BOOST_CHECK_EQUAL(a, 0);
+
+      {
+         typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<> > bigint;
+         typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, 64, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> > u64;
+         typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<128, 128, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> > u128;
+         typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<256, 256, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> > u256;
+         typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<256, 256, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> > s256;
+         typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<160, 160, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> > u160;
+         typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<160, 160, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> > s160;
+         typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<512, 512, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> > u512;
+         typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<512, 512, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> > s512;
+
+         {
+            u256 a = 14;
+            bigint b = bigint("115792089237316195423570985008687907853269984665640564039457584007913129639948");
+            // to fix cast `a` to dev::bigint
+            BOOST_CHECK(a < b);
+         }
+         {
+            u256 a = 1;
+            boost::uint64_t amount = 1;
+            u256 b = a << amount;
+            BOOST_CHECK_EQUAL(b, 2);
+
+            u256 high_bit = u256{ 0 };
+            bit_set(high_bit, 255);
+            BOOST_CHECK_EQUAL(a << 255, high_bit);
+            BOOST_CHECK_EQUAL(a << boost::uint64_t(256), 0);
+            BOOST_CHECK_EQUAL(a << 0, a);
+
+            u256 c = 3;
+            BOOST_CHECK_EQUAL(c, 3);
+            BOOST_CHECK_EQUAL(c << boost::uint64_t(256), 0);
+            BOOST_CHECK_EQUAL(c << 0, c);
+
+            // Bug workaround:
+            BOOST_CHECK_EQUAL(static_cast<u256>(bigint(u256(3)) << 255), u256(1) << 255);
+         }
+         {
+            BOOST_CHECK_EQUAL(u256(3) << 255, u256(1) << 255);
+
+            u256 a = 1;
+            boost::uint64_t amount = 1;
+            u256 b = a >> amount;
+            BOOST_CHECK_EQUAL(b, 0);
+            BOOST_CHECK_EQUAL(a >> 255, 0);
+            BOOST_CHECK_EQUAL(a >> boost::uint64_t(256), 0);
+            BOOST_CHECK_EQUAL(a >> boost::uint64_t(-1), 0);
+
+            u256 h;
+            bit_set(h, 255);
+            BOOST_CHECK_EQUAL(h >> 0, u256(1) << 255);
+            BOOST_CHECK_EQUAL(h >> 1, u256(1) << 254);
+            BOOST_CHECK_EQUAL(h >> 2, u256(1) << 253);
+            BOOST_CHECK_EQUAL(h >> 254, u256(1) << 1);
+            BOOST_CHECK_EQUAL(h >> 255, u256(1) << 0);
+            BOOST_CHECK_EQUAL(h >> 256, 0);
+            BOOST_CHECK_EQUAL(h >> boost::uint64_t(-1), 0);
+
+            u256 g;
+            bit_set(g, 255);
+            bit_set(g, 254);
+            BOOST_CHECK_EQUAL(g >> 255, 1);
+            BOOST_CHECK_EQUAL(g >> 254, 3);
+            BOOST_CHECK_EQUAL(g >> 253, 3 << 1);
+            BOOST_CHECK_EQUAL(g >> 252, 3 << 2);
+            BOOST_CHECK_EQUAL(g >> 251, 3 << 3);
+            BOOST_CHECK_EQUAL(g >> 0, u256(3) << 254);
+            BOOST_CHECK_EQUAL(g >> 1, u256(3) << 253);
+            BOOST_CHECK_EQUAL(g >> 2, u256(3) << 252);
+            BOOST_CHECK_EQUAL(g >> 3, u256(3) << 251);
+            BOOST_CHECK_EQUAL(g >> 100, u256(3) << 154);
+            BOOST_CHECK_EQUAL(g >> 256, 0);
+            BOOST_CHECK_EQUAL(g >> 257, 0);
+            BOOST_CHECK_EQUAL(g >> boost::uint32_t(-1), 0);
+            BOOST_CHECK_EQUAL(g >> boost::uint64_t(-1), 0);
+            BOOST_CHECK_EQUAL(g >> boost::uint16_t(-1), 0);
+            BOOST_CHECK_EQUAL(g >> (boost::uint16_t(-1) - 1), 0);
+         }
+         {
+            s256 a = 1;
+            uint64_t amount = 1;
+            s256 b = a >> amount;
+            BOOST_CHECK_EQUAL(b, 0);
+            BOOST_CHECK_EQUAL(a >> 255, 0);
+            BOOST_CHECK_EQUAL(a >> boost::uint64_t(256), 0);
+            BOOST_CHECK_EQUAL(a >> boost::uint64_t(-1), 0);
+
+            s256 n = -1;
+            BOOST_CHECK_EQUAL(n >> 0, n);
+            BOOST_CHECK_EQUAL(n >> 1, n);
+            BOOST_CHECK_EQUAL(n >> 2, n);
+            BOOST_CHECK_EQUAL(n >> 254, n);
+            BOOST_CHECK_EQUAL(n >> 255, n);
+            BOOST_CHECK_EQUAL(n >> 256, n);
+            BOOST_CHECK_EQUAL(n >> 257, n);
+            BOOST_CHECK_EQUAL(n >> ~boost::uint64_t(0), n);
+
+            // Test min value. This actually -(2^256-1), not -(2^255) as in C.
+            s256 h = std::numeric_limits<s256>::min();
+            BOOST_CHECK_LT(h, 0);
+            BOOST_CHECK_EQUAL(h >> 0, h);
+            BOOST_CHECK_EQUAL(h >> 256, -1);
+
+            // Test EVM min value.
+            s256 g = s256(-1) << 255;
+            BOOST_CHECK_LT(g, 0);
+            BOOST_CHECK_EQUAL(static_cast<u256>(g), u256(1) << 255);
+            BOOST_CHECK_EQUAL(g >> 0, g);
+            BOOST_CHECK_EQUAL(static_cast<u256>(g >> 1), u256(0b11) << 254);
+            BOOST_CHECK_EQUAL(static_cast<u256>(g >> 2), u256(0b111) << 253);
+            BOOST_CHECK_EQUAL(static_cast<u256>(g >> 3), u256(0b1111) << 252);
+
+            BOOST_CHECK_EQUAL(static_cast<u256>(g >> 255), ~u256(0));
+            BOOST_CHECK_EQUAL(static_cast<u256>(g >> 254), ~u256(0b1));
+            BOOST_CHECK_EQUAL(static_cast<u256>(g >> 253), ~u256(0b11));
+
+            // Test shifting more that one bit.
+            s256 k = s256(0b111) << 252;
+            BOOST_CHECK_EQUAL(k, u256(0b111) << 252);
+            BOOST_CHECK_EQUAL(k >> 1, u256(0b111) << 251);
+            BOOST_CHECK_EQUAL(k >> 2, u256(0b111) << 250);
+            BOOST_CHECK_EQUAL(k >> 252, 0b111);
+            BOOST_CHECK_EQUAL(k >> 253, 0b11);
+            BOOST_CHECK_EQUAL(k >> 254, 0b1);
+            BOOST_CHECK_EQUAL(k >> 255, 0);
+            BOOST_CHECK_EQUAL(k >> 256, 0);
+            BOOST_CHECK_EQUAL(k >> ~boost::uint32_t(0), 0);
+
+            // Division equivalence.
+
+            // Built-in type:
+            if (std::numeric_limits< boost::int64_t>::is_specialized)
+            {
+               boost::int64_t d = (std::numeric_limits<boost::int64_t>::min)();
+               BOOST_CHECK_EQUAL(d >> 1, d / 2);
+               int64_t e = d + 1;
+               BOOST_CHECK_EQUAL(e >> 1, e / 2 - 1);
+
+               // Boost type:
+               BOOST_CHECK_EQUAL(h >> 1, h / 2 - 1);
+            }
+         }
+      }
    }
 
    void test()

@@ -6,6 +6,7 @@
 #ifndef BOOST_MATH_EXTENDED_REAL_HPP
 #define BOOST_MATH_EXTENDED_REAL_HPP
 
+#include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/mpl/max.hpp>
 #include <boost/mpl/plus.hpp>
@@ -130,7 +131,8 @@ public:
       //
       // Attempt a generic interconvertion:
       //
-      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(val);
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard_1(val);
+      detail::scoped_default_precision<number<Other, ET> > precision_guard_2(val);
       using detail::generic_interconvert;
       generic_interconvert(backend(), val.backend(), number_category<Backend>(), number_category<Other>());
    }
@@ -295,6 +297,7 @@ public:
       //
       using detail::generic_interconvert;
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(v);
+      detail::scoped_default_precision<number<Other, ET> > precision_guard2(v);
       //
       // If the current precision of *this differs from that of value v, then we
       // create a temporary (which will have the correct precision thanks to precision_guard)
