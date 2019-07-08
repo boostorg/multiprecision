@@ -101,12 +101,43 @@
               This was deemed not to be practical: these algorithms are intimately
               tied to the actual data representation used.
             </p></dd>
+<dt><span class="term">How do I choose between Boost.Multiprecision cpp_bin_50 and cpp_dec_50?</span></dt>
+<dd>
+<p>
+              Unless you have a specific reason to choose <code class="computeroutput"><span class="identifier">cpp_dec_</span></code>,
+              then the default choice should be <code class="computeroutput"><span class="identifier">cpp_bin_</span></code>,
+              for example using the convenience <code class="computeroutput"><span class="identifier">typedefs</span></code>
+              like <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">cpp_bin_50</span></code> or <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">cpp_bin_100</span></code>.
+            </p>
+<p>
+              In general, both work well and give the same results and at roughly
+              the same speed with <code class="computeroutput"><span class="identifier">cpp_dec_50</span></code>
+              sometimes faster.
+            </p>
+<p>
+              <code class="computeroutput"><span class="identifier">cpp_dec_</span></code> was developed
+              first paving the way for <code class="computeroutput"><span class="identifier">cpp_bin_</span></code>.
+              <code class="computeroutput"><span class="identifier">cpp_dec_</span></code> has several
+              guard digits and is not rounded at all, using 'brute force' to get
+              the promised number of decimal digits correct, but making it difficult
+              to reason about precision and computational uncertainty, for example
+              see <span class="bold"><strong>https://svn.boost.org/trac10/ticket/12133</strong></span>.
+              It also has a fast but imprecise division operator giving surprising
+              results sometimes, see <span class="bold"><strong>https://svn.boost.org/trac10/ticket/11178</strong></span>.
+            </p>
+<p>
+              <code class="computeroutput"><span class="identifier">cpp_bin_</span></code> is correctly/exactly
+              rounded making it possible to reason about both the precision and rounding
+              of the results.
+            </p>
+</dd>
 </dl>
 </div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2013 John Maddock and Christopher Kormanyos<p>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2019 John Maddock
+      and Christopher Kormanyos<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

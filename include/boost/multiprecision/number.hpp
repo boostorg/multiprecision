@@ -6,6 +6,7 @@
 #ifndef BOOST_MATH_EXTENDED_REAL_HPP
 #define BOOST_MATH_EXTENDED_REAL_HPP
 
+#include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/mpl/max.hpp>
 #include <boost/mpl/plus.hpp>
