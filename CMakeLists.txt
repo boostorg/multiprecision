@@ -56,6 +56,8 @@ else()
     include(CMConfig)
     include(CMSetupVersion)
 
+    cm_workspace(boost SOURCES_DIR "${CMAKE_CURRENT_LIST_DIR}")
+
     cm_project(multiprecision WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
     find_package(Boost COMPONENTS REQUIRED random)
