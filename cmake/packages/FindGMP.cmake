@@ -72,7 +72,7 @@ find_library(GMP_LIBRARIES gmp PATHS $ENV{GMPDIR} ${LIB_INSTALL_DIR})
 include(${CMAKE_CURRENT_LIST_DIR}/FindPackageHandleStandardArgs.cmake)
 find_package_handle_standard_args(GMP DEFAULT_MSG
                                   GMP_INCLUDES GMP_LIBRARIES GMP_VERSION_OK)
-if (GMP_FOUND)
+if(GMP_FOUND)
     set(HAVE_GMP "${GMP_FOUND}")
 endif()
 

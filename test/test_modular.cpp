@@ -1,16 +1,20 @@
+//---------------------------------------------------------------------------//
+// Copyright (c) 2018-2019 Nil Foundation AG
+// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
+// Copyright (c) 2018-2019 Alexey Moskvin
 //
-// Created by Zerg1996 on 2019-04-27.
-//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
 
-//#include <boost/multiprecision/detail/default_ops.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/montgomery_int/montgomery_int.hpp>
 #include <boost/multiprecision/montgomery_int/montgomery_params.hpp>
 #include <iostream>
 
 
-int main()
-{
+int main() {
 
     using namespace boost::multiprecision;
     using default_ops::eval_msb;

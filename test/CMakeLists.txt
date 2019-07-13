@@ -39,8 +39,8 @@ if(BOOST_CMAKE)
                            ${CMAKE_WORKSPACE_NAME}::regexp
                            )
 else()
-    find_package(Boost 1.70.0 REQUIRED chrono exception timer filesystem filesystem
-            unit_test_framework serialization regex  )
+    find_package(Boost 1.68.0 REQUIRED chrono exception timer filesystem
+                 unit_test_framework serialization regex)
 
     cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_multiprecision
                            ${Boost_LIBRARIES}
@@ -75,23 +75,31 @@ cm_test_link_libraries(multiprecision_test_settings)
 # target_link_libraries(no_eh_support boost_throw_exception)
 # cm_target_link_test_libs(no_eh_support)
 
-try_compile(GMP_COMPILED ${CMAKE_BINARY_DIR} ${CURRENT_TEST_SOURCES_DIR}/../config/has_gmp.cpp
-            LINK_LIBRARIES ${GMP_LIBRARIES}
-            CMAKE_FLAGS "-DCMAKE_CXX_LINK_EXECUTABLE='echo not linking now...'" "-DINCLUDE_DIRECTORIES=${GMP_INCLUDES}")
+if(GMP_FOUND)
+    try_compile(GMP_COMPILED ${CMAKE_BINARY_DIR} ${CURRENT_TEST_SOURCES_DIR}/../config/has_gmp.cpp
+                LINK_LIBRARIES ${GMP_LIBRARIES}
+                CMAKE_FLAGS "-DCMAKE_CXX_LINK_EXECUTABLE='echo not linking now...'" "-DINCLUDE_DIRECTORIES=${GMP_INCLUDES}")
+endif()
 
-try_compile(MPFR_COMPILED ${CMAKE_BINARY_DIR} ${CURRENT_TEST_SOURCES_DIR}/../config/has_mpfr.cpp
-            LINK_LIBRARIES ${MPFR_LIBRARIES}
-            CMAKE_FLAGS "-DCMAKE_CXX_LINK_EXECUTABLE='echo not linking now...'" "-DINCLUDE_DIRECTORIES=${MPFR_INCLUDES}")
+if(MPFR_FOUND)
+    try_compile(MPFR_COMPILED ${CMAKE_BINARY_DIR} ${CURRENT_TEST_SOURCES_DIR}/../config/has_mpfr.cpp
+                LINK_LIBRARIES ${MPFR_LIBRARIES}
+                CMAKE_FLAGS "-DCMAKE_CXX_LINK_EXECUTABLE='echo not linking now...'" "-DINCLUDE_DIRECTORIES=${MPFR_INCLUDES}")
+endif()
 
-try_compile(TOMMATH_COMPILED ${CMAKE_BINARY_DIR} ${CURRENT_TEST_SOURCES_DIR}/../config/has_tommath.cpp
-            LINK_LIBRARIES ${TomMath_LIBRARIES}
-            CMAKE_FLAGS "-DCMAKE_CXX_LINK_EXECUTABLE='echo not linking now...'" "-DINCLUDE_DIRECTORIES=${TomMath_INCLUDES}")
+if(TOMMATH_FOUND)
+    try_compile(TOMMATH_COMPILED ${CMAKE_BINARY_DIR} ${CURRENT_TEST_SOURCES_DIR}/../config/has_tommath.cpp
+                LINK_LIBRARIES ${TomMath_LIBRARIES}
+                CMAKE_FLAGS "-DCMAKE_CXX_LINK_EXECUTABLE='echo not linking now...'" "-DINCLUDE_DIRECTORIES=${TomMath_INCLUDES}")
+endif()
 
 try_compile(FLOAT128_COMPILED ${CMAKE_BINARY_DIR} ${CURRENT_TEST_SOURCES_DIR}/../config/has_float128.cpp)
 
-try_compile(MPFI_COMPILED ${CMAKE_BINARY_DIR} ${CURRENT_TEST_SOURCES_DIR}/../config/has_mpfi.cpp
-            LINK_LIBRARIES ${MPFI_LIBRARIES}
-            CMAKE_FLAGS "-DCMAKE_CXX_LINK_EXECUTABLE='echo not linking now...'" "-DINCLUDE_DIRECTORIES=${MPFI_INCLUDES}")
+if(MPFI_FOUND)
+    try_compile(MPFI_COMPILED ${CMAKE_BINARY_DIR} ${CURRENT_TEST_SOURCES_DIR}/../config/has_mpfi.cpp
+                LINK_LIBRARIES ${MPFI_LIBRARIES}
+                CMAKE_FLAGS "-DCMAKE_CXX_LINK_EXECUTABLE='echo not linking now...'" "-DINCLUDE_DIRECTORIES=${MPFI_INCLUDES}")
+endif()
 
 try_compile(INTEL_QUAD_COMPILED ${CMAKE_BINARY_DIR} ${CURRENT_TEST_SOURCES_DIR}/../config/has_intel_quad.cpp CMAKE_FLAGS
             "-DCMAKE_CXX_LINK_EXECUTABLE='echo not linking now...'")
@@ -100,18 +108,10 @@ try_compile(MPC_COMPILED ${CMAKE_BINARY_DIR} ${CURRENT_TEST_SOURCES_DIR}/../conf
             LINK_LIBRARIES ${MPC_LIBRARIES}
             CMAKE_FLAGS "-DCMAKE_CXX_LINK_EXECUTABLE='echo not linking now...'" "-DINCLUDE_DIRECTORIES=${MPC_INCLUDES}")
 
-try_compile(EIGEN_COMPILED ${CMAKE_BINARY_DIR} ${CURRENT_TEST_SOURCES_DIR}/../config/has_eigen.cpp
-        CMAKE_FLAGS "-DCMAKE_CXX_LINK_EXECUTABLE='echo not linking now...'" "-DINCLUDE_DIRECTORIES=${EIGEN3_INCLUDE_DIR}")
-
-message(${EIGEN3_INCLUDE_DIR})
-message(GMP_COMPILED=${GMP_COMPILED})
-message(MPFR_COMPILED=${MPFR_COMPILED})
-message(TOMMATH_COMPILED=${TOMMATH_COMPILED})
-message(FLOAT128_COMPILED=${FLOAT128_COMPILED})
-message(MPFI_COMPILED=${MPFI_COMPILED})
-message(INTEL_QUAD_COMPILED=${INTEL_QUAD_COMPILED})
-message(MPC_COMPILED=${MPC_COMPILED})
-message(EIGEN_COMPILED=${EIGEN_COMPILED})
+if(EIGEN_FOUND)
+    try_compile(EIGEN_COMPILED ${CMAKE_BINARY_DIR} ${CURRENT_TEST_SOURCES_DIR}/../config/has_eigen.cpp
+                CMAKE_FLAGS "-DCMAKE_CXX_LINK_EXECUTABLE='echo not linking now...'" "-DINCLUDE_DIRECTORIES=${EIGEN3_INCLUDE_DIR}")
+endif()
 
 #cm_test(NAME GMP_MY SOURCES ${CURRENT_TEST_SOURCES_DIR}/../config/has_float128.cpp)
 #target_link_libraries(GMP_MY ${Quadmath_LIBRARY})
@@ -125,7 +125,7 @@ target_link_libraries(multiprecision_test_test_arithmetic_backend_concept no_eh_
 cm_test(NAME multiprecision_test_test_arithmetic_cpp_dec_float_1 SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_arithmetic_cpp_dec_float_1.cpp)
 target_link_libraries(multiprecision_test_test_arithmetic_cpp_dec_float_1 no_eh_support)
 cm_test(NAME multiprecision_test_test_arithmetic_cpp_dec_float_2 SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_arithmetic_cpp_dec_float_2.cpp)
-target_link_libraries( multiprecision_test_test_arithmetic_cpp_dec_float_2 no_eh_support)
+target_link_libraries(multiprecision_test_test_arithmetic_cpp_dec_float_2 no_eh_support)
 cm_test(NAME multiprecision_test_test_arithmetic_cpp_dec_float_3 SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_arithmetic_cpp_dec_float_3.cpp)
 target_link_libraries(multiprecision_test_test_arithmetic_cpp_dec_float_3 no_eh_support)
 cm_test(NAME multiprecision_test_test_arithmetic_cpp_dec_float_3m SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_arithmetic_cpp_dec_float_3m.cpp)
@@ -254,15 +254,15 @@ if(MPFI_COMPILED)
     target_include_directories(multiprecision_test_test_arithmetic_mpfi_50 PRIVATE ${MPFI_INCLUDES})
 endif()
 
-if (INTEL_QUAD_COMPILED)
+if(INTEL_QUAD_COMPILED)
     cm_test(NAME multiprecision_test_test_arithmetic_float_128 SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_arithmetic_float_128.cpp)
 endif()
 
-if (FLOAT128_COMPILED)
+if(FLOAT128_COMPILED)
     cm_test(NAME multiprecision_test_test_arithmetic_float_128_quad SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_arithmetic_float_128.cpp)
 endif()
 
-if (MPC_COMPILED)
+if(MPC_COMPILED)
     cm_test(NAME multiprecision_test_test_arithmetic_mpc SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_arithmetic_mpc.cpp)
     target_link_libraries(multiprecision_test_test_arithmetic_mpc ${MPC_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
     target_include_directories(multiprecision_test_test_arithmetic_mpc PRIVATE ${GMP_INCLUDES})
@@ -270,25 +270,25 @@ if (MPC_COMPILED)
     target_link_libraries(multiprecision_test_test_mpfr_mpc_precisions ${MPC_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
     target_include_directories(multiprecision_test_test_mpfr_mpc_precisions PRIVATE ${GMP_INCLUDES})
 endif()
-if (MPFI_COMPILED)
+if(MPFI_COMPILED)
     cm_test(NAME multiprecision_test_test_mpfi_precisions SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_mpfi_precisions.cpp)
     target_link_libraries(multiprecision_test_test_mpfi_precisions ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
     target_include_directories(multiprecision_test_test_mpfi_precisions PRIVATE ${MPFI_INCLUDES})
 endif()
 
-if (GMP_COMPILED)
+if(GMP_COMPILED)
     cm_test(NAME multiprecision_test_test_mpf_precisions SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_mpf_precisions.cpp)
     target_link_libraries(multiprecision_test_test_mpf_precisions ${GMP_LIBRARIES})
     target_include_directories(multiprecision_test_test_mpf_precisions PRIVATE ${GMP_INCLUDES})
 endif()
 
-if ((MPC_COMPILED) AND (FLOAT128_COMPILED))
+if((MPC_COMPILED) AND (FLOAT128_COMPILED))
     cm_test(NAME multiprecision_test_test_complex SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_complex.cpp)
 endif()
 cm_test(NAME multiprecision_test_test_arithmetic_complex_adaptor SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_arithmetic_complex_adaptor.cpp)
 cm_test(NAME multiprecision_test_test_arithmetic_complex_adaptor_2 SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_arithmetic_complex_adaptor_2.cpp)
 
-if (FLOAT128_COMPILED)
+if(FLOAT128_COMPILED)
     cm_test(NAME multiprecision_test_test_arithmetic_complex128 SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_arithmetic_complex128.cpp)
 endif()
 
@@ -448,11 +448,11 @@ if(TOMMATH_COMPILED)
     cm_test(NAME multiprecision_test_test_move_tommath SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_move.cpp)
     target_compile_definitions(multiprecision_test_test_move_tommath PUBLIC -DTEST_TOMMATH)
     target_link_libraries(multiprecision_test_test_move_tommath ${TomMath_LIBRARIES} no_eh_support)
+    target_compile_definitions(multiprecision_test_test_move_tommath PUBLIC -DTEST_CPP_INT)
+    target_link_libraries(multiprecision_test_test_move_tommath no_eh_support)
 endif()
 
 cm_test(NAME multiprecision_test_test_move_cpp_int SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_move.cpp)
-target_compile_definitions(multiprecision_test_test_move_tommath PUBLIC -DTEST_CPP_INT)
-target_link_libraries(multiprecision_test_test_move_tommath no_eh_support)
 
 if(GMP_COMPILED)
     cm_test(NAME multiprecision_test_test_gmp_conversions SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_gmp_conversions.cpp)
@@ -495,7 +495,7 @@ cm_test(NAME multiprecision_test_test_test SOURCES ${CURRENT_TEST_SOURCES_DIR}/t
 cm_test(NAME multiprecision_test_test_cpp_int_lit SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_cpp_int_lit.cpp)
 target_link_libraries(multiprecision_test_test_cpp_int_lit no_eh_support)
 
-if ((GMP_COMPILED) AND (MPFR_COMPILED) AND (MPFI_COMPILED) AND (TOMMATH_COMPILED) AND (FLOAT128_COMPILED))
+if((GMP_COMPILED) AND (MPFR_COMPILED) AND (MPFI_COMPILED) AND (TOMMATH_COMPILED) AND (FLOAT128_COMPILED))
     cm_test(NAME multiprecision_test_test_convert_from_cpp_int SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_convert_from_cpp_int.cpp)
     target_link_libraries(multiprecision_test_test_convert_from_cpp_int ${QUADMATH_LIBRARIES} ${TomMath_LIBRARIES}
                           ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
@@ -503,57 +503,57 @@ if ((GMP_COMPILED) AND (MPFR_COMPILED) AND (MPFI_COMPILED) AND (TOMMATH_COMPILED
 
     cm_test(NAME multiprecision_test_test_convert_from_mpz_int SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_convert_from_mpz_int.cpp)
     target_link_libraries(multiprecision_test_test_convert_from_mpz_int ${QUADMATH_LIBRARIES} ${TomMath_LIBRARIES}
-            ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
+                          ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
     target_compile_definitions(multiprecision_test_test_convert_from_mpz_int PRIVATE -DHAS_GMP -DHAS_MPFR -DHAS_MPFI -DHAS_TOMMATH -DFLOAT128_COMPILED)
 
     cm_test(NAME multiprecision_test_test_convert_from_tom_int SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_convert_from_tom_int.cpp)
     target_link_libraries(multiprecision_test_test_convert_from_tom_int ${QUADMATH_LIBRARIES} ${TomMath_LIBRARIES}
-            ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
+                          ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
     target_compile_definitions(multiprecision_test_test_convert_from_tom_int PRIVATE -DHAS_GMP -DHAS_MPFR -DHAS_MPFI -DHAS_TOMMATH -DFLOAT128_COMPILED)
 
     cm_test(NAME multiprecision_test_test_convert_from_cpp_rational SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_convert_from_cpp_rational.cpp)
     target_link_libraries(multiprecision_test_test_convert_from_cpp_rational ${QUADMATH_LIBRARIES} ${TomMath_LIBRARIES}
-            ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
+                          ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
     target_compile_definitions(multiprecision_test_test_convert_from_cpp_rational PRIVATE -DHAS_GMP -DHAS_MPFR -DHAS_MPFI -DHAS_TOMMATH -DFLOAT128_COMPILED)
 
     cm_test(NAME multiprecision_test_test_convert_from_gmp_rational SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_convert_from_gmp_rational.cpp)
     target_link_libraries(test_convert_from_gmp_rational ${QUADMATH_LIBRARIES} ${TomMath_LIBRARIES}
-            ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
+                          ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
     target_compile_definitions(multiprecision_test_test_convert_from_gmp_rational PRIVATE -DHAS_GMP -DHAS_MPFR -DHAS_MPFI -DHAS_TOMMATH -DFLOAT128_COMPILED)
 
     cm_test(NAME multiprecision_test_test_convert_from_tom_rational SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_convert_from_tom_rational.cpp)
     target_link_libraries(test_convert_from_tom_rational ${QUADMATH_LIBRARIES} ${TomMath_LIBRARIES}
-            ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
+                          ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
     target_compile_definitions(multiprecision_test_test_convert_from_tom_rational PRIVATE -DHAS_GMP -DHAS_MPFR -DHAS_MPFI -DHAS_TOMMATH -DFLOAT128_COMPILED)
 
     cm_test(NAME multiprecision_test_test_convert_from_cpp_bin_float SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_convert_from_cpp_bin_float.cpp)
     target_link_libraries(test_convert_from_cpp_bin_float ${QUADMATH_LIBRARIES} ${TomMath_LIBRARIES}
-            ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
+                          ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
     target_compile_definitions(multiprecision_test_test_convert_from_cpp_bin_float PRIVATE -DHAS_GMP -DHAS_MPFR -DHAS_MPFI -DHAS_TOMMATH -DFLOAT128_COMPILED)
 
     cm_test(NAME multiprecision_test_test_convert_from_cpp_dec_float SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_convert_from_cpp_dec_float.cpp)
     target_link_libraries(test_convert_from_cpp_dec_float ${QUADMATH_LIBRARIES} ${TomMath_LIBRARIES}
-            ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
+                          ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
     target_compile_definitions(multiprecision_test_test_convert_from_cpp_dec_float PRIVATE -DHAS_GMP -DHAS_MPFR -DHAS_MPFI -DHAS_TOMMATH -DFLOAT128_COMPILED)
 
     cm_test(NAME multiprecision_test_test_convert_from_mpf_float SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_convert_from_mpf_float.cpp)
     target_link_libraries(test_convert_from_mpf_float ${QUADMATH_LIBRARIES} ${TomMath_LIBRARIES}
-            ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
+                          ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
     target_compile_definitions(multiprecision_test_test_convert_from_mpf_float PRIVATE -DHAS_GMP -DHAS_MPFR -DHAS_MPFI -DHAS_TOMMATH -DFLOAT128_COMPILED)
 
     cm_test(NAME multiprecision_test_test_convert_from_mpfr_float SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_convert_from_mpfr_float.cpp)
     target_link_libraries(test_convert_from_mpfr_float ${QUADMATH_LIBRARIES} ${TomMath_LIBRARIES}
-            ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
+                          ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
     target_compile_definitions(multiprecision_test_test_convert_from_mpfr_float PRIVATE -DHAS_GMP -DHAS_MPFR -DHAS_MPFI -DHAS_TOMMATH -DFLOAT128_COMPILED)
 
     cm_test(NAME multiprecision_test_test_convert_from_mpfi_float SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_convert_from_mpfi_float.cpp)
     target_link_libraries(test_convert_from_mpfi_float ${QUADMATH_LIBRARIES} ${TomMath_LIBRARIES}
-            ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
+                          ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
     target_compile_definitions(multiprecision_test_test_convert_from_mpfi_float PRIVATE -DHAS_GMP -DHAS_MPFR -DHAS_MPFI -DHAS_TOMMATH -DFLOAT128_COMPILED)
 
     cm_test(NAME multiprecision_test_test_convert_from_float128 SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_convert_from_float128.cpp)
     target_link_libraries(test_convert_from_float128 ${QUADMATH_LIBRARIES} ${TomMath_LIBRARIES}
-            ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
+                          ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
     target_compile_definitions(multiprecision_test_test_convert_from_float128 PRIVATE -DHAS_GMP -DHAS_MPFR -DHAS_MPFI -DHAS_TOMMATH -DFLOAT128_COMPILED)
 
 endif()
@@ -594,7 +594,7 @@ endif()
 if(MPFI_COMPILED)
     cm_test(NAME multiprecision_test_test_float_io_mpfi SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_float_io.cpp)
     target_compile_definitions(multiprecision_test_test_float_io_mpfi PUBLIC -DTEST_MPFI_50)
-    target_link_libraries(multiprecision_test_test_float_io_mpfi ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES}  ${TomMath_LIBRARIES} no_eh_support)
+    target_link_libraries(multiprecision_test_test_float_io_mpfi ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES} ${TomMath_LIBRARIES} no_eh_support)
     target_include_directories(multiprecision_test_test_float_io_mpfi PRIVATE ${GMP_INCLUDES} ${MPFI_INCLUDES})
 endif()
 
@@ -899,7 +899,7 @@ target_link_libraries(multiprecision_test_bug12039 no_eh_support)
 cm_test(NAME multiprecision_test_git_issue_30 SOURCES ${CURRENT_TEST_SOURCES_DIR}/git_issue_30.cpp COMPILE_ONLY)
 cm_test(NAME multiprecision_test_git_issue_98 SOURCES ${CURRENT_TEST_SOURCES_DIR}/git_issue_98.cpp COMPILE_ONLY)
 
-if ((GMP_COMPILED) AND (MPFR_COMPILED) AND (MPC_COMPILED) AND (FLOAT128_COMPILED))
+if((GMP_COMPILED) AND (MPFR_COMPILED) AND (MPC_COMPILED) AND (FLOAT128_COMPILED))
     cm_test(NAME multiprecision_test_git_issue_98 ${CURRENT_TEST_SOURCES_DIR}/git_issue_98.cpp COMPILE_ONLY)
     target_link_libraries(multiprecision_test_git_issue_98 ${QUADMATH_LIBRARIES} ${MPC_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES})
     target_compile_definitions(multiprecision_test_git_issue_98 PRIVATE -DHAS_GMP -DHAS_MPFR -DHAS_MPC -DFLOAT128_COMPILED)
@@ -908,10 +908,10 @@ endif()
 cm_test(NAME multiprecision_test_issue_13301 SOURCES ${CURRENT_TEST_SOURCES_DIR}/issue_13301.cpp)
 cm_test(NAME multiprecision_test_issue_13148 SOURCES ${CURRENT_TEST_SOURCES_DIR}/issue_13148.cpp)
 
-if ((GMP_COMPILED) AND (MPFR_COMPILED) AND (MPFI_COMPILED) AND (TomMath_COMPILED) AND (FLOAT128_COMPILED))
+if((GMP_COMPILED) AND (MPFR_COMPILED) AND (MPFI_COMPILED) AND (TomMath_COMPILED) AND (FLOAT128_COMPILED))
     cm_test(NAME multiprecision_test_test_hash ${CURRENT_TEST_SOURCES_DIR}/test_hash.cpp COMPILE_ONLY)
     target_link_libraries(multiprecision_test_test_hash ${QUADMATH_LIBRARIES} ${MPFI_LIBRARIES} ${MPFR_LIBRARIES}
-            ${GMP_LIBRARIES} ${TomMath_LIBRARIES})
+                          ${GMP_LIBRARIES} ${TomMath_LIBRARIES})
     target_compile_definitions(multiprecision_test_test_hash PRIVATE -DHAS_GMP -DHAS_MPFR -DHAS_MPFI -DHAS_TOMMATH -DFLOAT128_COMPILED)
 endif()
 
@@ -1031,19 +1031,19 @@ endif()
 ]]
 file(GLOB TEST_FILES ${CURRENT_TEST_SOURCES_DIR}/compile_fail/*.cpp)
 foreach(FILEB ${TEST_FILES})
-    if ((GMP_COMPILED) AND (MPFR_COMPILED))
+    if((GMP_COMPILED) AND (MPFR_COMPILED))
         get_filename_component(NAME ${FILEB} NAME_WE)
         cm_test(NAME multiprecision_test_compile_fail_${NAME} SOURCES ${FILEB} COMPILE_ONLY WILL_FAIL)
         target_compile_definitions(multiprecision_test_compile_fail_${NAME} PRIVATE -DTEST_GMP -DTEST_MPFR)
     endif()
 endforeach()
 
-if (BUILD_WITH_SOURCES_DIR)
+if(BUILD_WITH_SOURCES_DIR)
     file(GLOB TEST_FILES ${CURRENT_TEST_SOURCES_DIR}/concepts/*.cpp)
     foreach(FILEB ${TEST_FILES})
         get_filename_component(NAME ${FILEB} NAME_WE)
 
-        if (MPFR_COMPILED)
+        if(MPFR_COMPILED)
             cm_test(NAME multiprecision_test_concepts_${NAME}_mpfr_50 SOURCES ${FILEB} COMPILE_ONLY)
             target_compile_definitions(multiprecision_test_concepts_${NAME}_mpfr_50 PUBLIC -DTEST_MPFR_50)
             target_link_libraries(multiprecision_test_concepts_${NAME}_mpfr_50 ${MPFR_LIBRARIES})
@@ -1071,7 +1071,7 @@ if (BUILD_WITH_SOURCES_DIR)
 
         endif()
 
-        if (GMP_COMPILED)
+        if(GMP_COMPILED)
             cm_test(NAME multiprecision_test_concepts_${NAME}_mpf50 SOURCES ${FILEB} COMPILE_ONLY)
             target_compile_definitions(multiprecision_test_concepts_${NAME}_mpf50 PUBLIC -DTEST_MPF_50)
             target_link_libraries(multiprecision_test_concepts_${NAME}_mpf50 ${GMP_LIBRARIES})
@@ -1118,7 +1118,7 @@ target_link_libraries(multiprecision_test_cpp_bin_float_snips no_eh_support)
 cm_test(NAME multiprecision_test_debug_adaptor_snips SOURCES ${CURRENT_TEST_SOURCES_DIR}/../example/debug_adaptor_snips.cpp)
 target_link_libraries(multiprecision_test_debug_adaptor_snips no_eh_support)
 
-if (FLOAT128_COMPILED)
+if(FLOAT128_COMPILED)
     #TODO: fix this
     #[ run float128_snips.cpp quadmath no_eh_eg_support : : : [ check-target-builds ../config//has_float128 : : <build>no ] ]
     cm_test(NAME multiprecision_test_debug_adaptor_snips SOURCES ${CURRENT_TEST_SOURCES_DIR}/../example/debug_adaptor_snips.cpp)
@@ -1139,7 +1139,7 @@ target_link_libraries(multiprecision_test_floating_point_examples no_eh_support)
 cm_test(NAME multiprecision_test_integer_examples SOURCES ${CURRENT_TEST_SOURCES_DIR}/../example/integer_examples.cpp)
 target_link_libraries(multiprecision_test_integer_examples no_eh_support)
 
-if (MPFI_COMPILED)
+if(MPFI_COMPILED)
     cm_test(NAME multiprecision_test_logged_adaptor SOURCES ${CURRENT_TEST_SOURCES_DIR}/../example/logged_adaptor.cpp)
     target_link_libraries(multiprecision_test_logged_adaptor ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${MPFI_LIBRARIES} no_eh_support)
     target_include_directories(multiprecision_test_logged_adaptor PRIVATE ${GMP_INCLUDES} ${MPFI_INCLUDES})
@@ -1148,12 +1148,12 @@ endif()
 cm_test(NAME multiprecision_test_mixed_integer_arithmetic SOURCES ${CURRENT_TEST_SOURCES_DIR}/../example/mixed_integer_arithmetic.cpp)
 target_link_libraries(multiprecision_test_mixed_integer_arithmetic no_eh_support)
 
-if (FLOAT128_COMPILED)
+if(FLOAT128_COMPILED)
     #TODO: fix this
     #[ run numeric_limits_snips.cpp no_eh_eg_support /boost//test_exec_monitor : : : [ requires cxx11_numeric_limits ]  [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
 endif()
 
-if (GMP_COMPILED)
+if(GMP_COMPILED)
     #TODO: enable this
     #cm_test(NAME multiprecision_test_random_snips SOURCES ${CURRENT_TEST_SOURCES_DIR}/../example/random_snips.cpp)
     #target_link_libraries(multiprecision_test_random_snips ${GMP_LIBRARIES} no_eh_support)
@@ -1163,25 +1163,25 @@ endif()
 cm_test(NAME multiprecision_test_safe_prime SOURCES ${CURRENT_TEST_SOURCES_DIR}/../example/safe_prime.cpp)
 target_link_libraries(multiprecision_test_safe_prime no_eh_support)
 
-if (GMP_COMPILED)
+if(GMP_COMPILED)
     cm_test(NAME multiprecision_test_gmp_snips SOURCES ${CURRENT_TEST_SOURCES_DIR}/../example/gmp_snips.cpp)
     target_link_libraries(multiprecision_test_gmp_snips ${GMP_LIBRARIES} no_eh_support)
     target_include_directories(multiprecision_test_gmp_snips PRIVATE ${GMP_INCLUDES})
 endif()
 
-if (MPFI_COMPILED)
+if(MPFI_COMPILED)
     cm_test(NAME multiprecision_test_mpfi_snips SOURCES ${CURRENT_TEST_SOURCES_DIR}/../example/mpfi_snips.cpp)
     target_link_libraries(multiprecision_test_mpfi_snips ${GMP_LIBRARIES} ${MPFI_LIBRARIES} ${MPFR_LIBRARIES} no_eh_support)
     target_include_directories(multiprecision_test_mpfi_snips PRIVATE ${GMP_INCLUDES} ${MPFI_INCLUDES})
 endif()
 
-if (MPFR_COMPILED)
+if(MPFR_COMPILED)
     cm_test(NAME multiprecision_test_mpfr_snips SOURCES ${CURRENT_TEST_SOURCES_DIR}/../example/mpfr_snips.cpp)
     target_link_libraries(multiprecision_test_mpfr_snips ${GMP_LIBRARIES} ${MPFR_LIBRARIES} no_eh_support)
     target_include_directories(multiprecision_test_mpfr_snips PRIVATE ${GMP_INCLUDES})
 endif()
 
-if (TOMMATH_COMPILED)
+if(TOMMATH_COMPILED)
     cm_test(NAME multiprecision_test_tommath_snips SOURCES ${CURRENT_TEST_SOURCES_DIR}/../example/tommath_snips.cpp)
     target_link_libraries(multiprecision_test_tommath_snips ${TomMath_LIBRARIES} no_eh_support)
     target_include_directories(multiprecision_test_tommath_snips PRIVATE ${TomMath_INCLUDES})

@@ -1,18 +1,27 @@
+//---------------------------------------------------------------------------//
+// Copyright (c) 2018-2019 Nil Foundation AG
+// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
+// Copyright (c) 2018-2019 Alexey Moskvin
 //
-// Created by Zerg1996 on 2019-05-07.
-//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_INVERSE_H
 #define CRYPTO3_INVERSE_H
+
 #define CRYPTO3_MP_WORD_BITS 64
+
 namespace boost {
     namespace multiprecision {
 
         limb_type monty_inverse(limb_type a) {
             const limb_type MP_WORD_MAX = ~static_cast<limb_type>(0);
 
-            if (a % 2 == 0)
+            if (a % 2 == 0) {
                 throw std::invalid_argument("monty_inverse only valid for odd integers");
+            }
 
             /*
             * From "A New Algorithm for Inversion mod p^k" by Çetin Kaya Koç

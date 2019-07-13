@@ -19,7 +19,7 @@
 # Redistribution and use is allowed according to the terms of the BSD license.
 
 find_path(MPFR_INCLUDES NAMES mpfr.h PATHS $ENV{GMPDIR} $ENV{MPFRDIR}
-        ${INCLUDE_INSTALL_DIR})
+          ${INCLUDE_INSTALL_DIR})
 
 # Set MPFR_FIND_VERSION to 1.0.0 if no minimum version is specified
 if(NOT MPFR_FIND_VERSION)
@@ -33,7 +33,7 @@ if(NOT MPFR_FIND_VERSION)
         set(MPFR_FIND_VERSION_PATCH 0)
     endif()
     set(MPFR_FIND_VERSION
-            "${MPFR_FIND_VERSION_MAJOR}.${MPFR_FIND_VERSION_MINOR}.${MPFR_FIND_VERSION_PATCH}")
+        "${MPFR_FIND_VERSION_MAJOR}.${MPFR_FIND_VERSION_MINOR}.${MPFR_FIND_VERSION_PATCH}")
 endif()
 
 if(MPFR_INCLUDES)
@@ -41,17 +41,17 @@ if(MPFR_INCLUDES)
     file(READ "${MPFR_INCLUDES}/mpfr.h" _mpfr_version_header)
 
     string(REGEX MATCH "define[ \t]+MPFR_VERSION_MAJOR[ \t]+([0-9]+)"
-            _mpfr_major_version_match "${_mpfr_version_header}")
+           _mpfr_major_version_match "${_mpfr_version_header}")
     set(MPFR_MAJOR_VERSION "${CMAKE_MATCH_1}")
     string(REGEX MATCH "define[ \t]+MPFR_VERSION_MINOR[ \t]+([0-9]+)"
-            _mpfr_minor_version_match "${_mpfr_version_header}")
+           _mpfr_minor_version_match "${_mpfr_version_header}")
     set(MPFR_MINOR_VERSION "${CMAKE_MATCH_1}")
     string(REGEX MATCH "define[ \t]+MPFR_VERSION_PATCHLEVEL[ \t]+([0-9]+)"
-            _mpfr_patchlevel_version_match "${_mpfr_version_header}")
+           _mpfr_patchlevel_version_match "${_mpfr_version_header}")
     set(MPFR_PATCHLEVEL_VERSION "${CMAKE_MATCH_1}")
 
     set(MPFR_VERSION
-            ${MPFR_MAJOR_VERSION}.${MPFR_MINOR_VERSION}.${MPFR_PATCHLEVEL_VERSION})
+        ${MPFR_MAJOR_VERSION}.${MPFR_MINOR_VERSION}.${MPFR_PATCHLEVEL_VERSION})
 
     # Check whether found version exceeds minimum required
     if(${MPFR_VERSION} VERSION_LESS ${MPFR_FIND_VERSION})
@@ -64,9 +64,9 @@ if(MPFR_INCLUDES)
 endif()
 
 find_library(MPFR_LIBRARIES mpfr
-        PATHS $ENV{GMPDIR} $ENV{MPFRDIR} ${LIB_INSTALL_DIR})
+             PATHS $ENV{GMPDIR} $ENV{MPFRDIR} ${LIB_INSTALL_DIR})
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(MPFR DEFAULT_MSG
-        MPFR_INCLUDES MPFR_LIBRARIES MPFR_VERSION_OK)
+                                  MPFR_INCLUDES MPFR_LIBRARIES MPFR_VERSION_OK)
 mark_as_advanced(MPFR_INCLUDES MPFR_LIBRARIES)

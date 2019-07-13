@@ -33,8 +33,8 @@ include(CMakePushCheckState)
 include(CheckCXXSourceCompiles)
 
 if(Quadmath_INCLUDE_DIR AND Quadmath_LIBRARY)
-  # Already in cache, be silent
-  set(Quadmath_FIND_QUIETLY TRUE)
+    # Already in cache, be silent
+    set(Quadmath_FIND_QUIETLY TRUE)
 endif()
 
 find_path(Quadmath_INCLUDE_DIR NAMES quadmath.h PATHS /usr/local/lib)
@@ -44,19 +44,19 @@ message(--- ${Quadmath_INCLUDE_DIR})
 message(--- ${Quadmath_LIBRARY})
 
 if(NOT Quadmath_INCLUDE_DIR OR NOT Quadmath_LIBRARY)
-  cmake_push_check_state(RESET)
-  list(APPEND CMAKE_REQUIRED_LIBRARIES "quadmath")
-  CHECK_CXX_SOURCE_COMPILES("
+    cmake_push_check_state(RESET)
+    list(APPEND CMAKE_REQUIRED_LIBRARIES "quadmath")
+    check_cxx_source_compiles("
         #include <quadmath.h>
         int main(void){
             __float128 foo = ::sqrtq(123.456);
         }"
-          Quadmath_USE_DIRECTLY)
-  cmake_pop_check_state()
-  if (Quadmath_USE_DIRECTLY)
-    set(Quadmath_INCLUDE_DIR "unused" CACHE PATH "" FORCE)
-    set(Quadmath_LIBRARY "quadmath" CACHE FILEPATH "" FORCE)
-  endif()
+                              Quadmath_USE_DIRECTLY)
+    cmake_pop_check_state()
+    if(Quadmath_USE_DIRECTLY)
+        set(Quadmath_INCLUDE_DIR "unused" CACHE PATH "" FORCE)
+        set(Quadmath_LIBRARY "quadmath" CACHE FILEPATH "" FORCE)
+    endif()
 endif()
 
 find_package_handle_standard_args(Quadmath DEFAULT_MSG Quadmath_LIBRARY Quadmath_INCLUDE_DIR)
@@ -65,18 +65,18 @@ mark_as_advanced(Quadmath_INCLUDE_DIR Quadmath_LIBRARY)
 
 # NOTE: this has been adapted from CMake's FindPNG.cmake.
 if(Quadmath_FOUND AND NOT TARGET Quadmath::quadmath)
-  message(STATUS "Creating the 'Quadmath::quadmath' imported target.")
-  if(Quadmath_USE_DIRECTLY)
-    message(STATUS "libquadmath will be included and linked directly.")
-    # If we are using it directly, we must define an interface library,
-    # as we do not have the full path to the shared library.
-    add_library(Quadmath::quadmath INTERFACE IMPORTED)
-    set_target_properties(Quadmath::quadmath PROPERTIES INTERFACE_LINK_LIBRARIES "${Quadmath_LIBRARY}")
-  else()
-    # Otherwise, we proceed as usual.
-    add_library(Quadmath::quadmath UNKNOWN IMPORTED)
-    set_target_properties(Quadmath::quadmath PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${Quadmath_INCLUDE_DIR}"
-            IMPORTED_LINK_INTERFACE_LANGUAGES "C"
-            IMPORTED_LOCATION "${Quadmath_LIBRARY}")
-  endif()
+    message(STATUS "Creating the 'Quadmath::quadmath' imported target.")
+    if(Quadmath_USE_DIRECTLY)
+        message(STATUS "libquadmath will be included and linked directly.")
+        # If we are using it directly, we must define an interface library,
+        # as we do not have the full path to the shared library.
+        add_library(Quadmath::quadmath INTERFACE IMPORTED)
+        set_target_properties(Quadmath::quadmath PROPERTIES INTERFACE_LINK_LIBRARIES "${Quadmath_LIBRARY}")
+    else()
+        # Otherwise, we proceed as usual.
+        add_library(Quadmath::quadmath UNKNOWN IMPORTED)
+        set_target_properties(Quadmath::quadmath PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${Quadmath_INCLUDE_DIR}"
+                              IMPORTED_LINK_INTERFACE_LANGUAGES "C"
+                              IMPORTED_LOCATION "${Quadmath_LIBRARY}")
+    endif()
 endif()
