@@ -2,12 +2,18 @@ cmake_minimum_required(VERSION 3.5)
 
 set(BOOST_CMAKE FALSE)
 
-if(${CMAKE_WORKSPACE_NAME} STREQUAL boost)
-    set(BOOST_CMAKE TRUE)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake"
+        "${CMAKE_CURRENT_LIST_DIR}/cmake/packages"
+        "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/share/modules/cmake")
 
-    find_package(CM)
-    include(CMDeploy)
-    include(CMSetupVersion)
+include(CMDeploy)
+include(CMConfig)
+include(CMSetupVersion)
+
+cm_setup_version(VERSION 1.70.0)
+
+if ("${CMAKE_WORKSPACE_NAME}" STREQUAL boost)
+    set(BOOST_CMAKE TRUE)
 
     cm_project(multiprecision WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
@@ -27,8 +33,6 @@ if(${CMAKE_WORKSPACE_NAME} STREQUAL boost)
     find_package(${CMAKE_WORKSPACE_NAME}_config)
     find_package(${CMAKE_WORKSPACE_NAME}_throw_exception)
     find_package(${CMAKE_WORKSPACE_NAME}_math)
-
-    cm_setup_version(VERSION 1.60.0)
 
     add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
     set_property(TARGET ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTY EXPORT_NAME multiprecision)
@@ -51,16 +55,11 @@ if(${CMAKE_WORKSPACE_NAME} STREQUAL boost)
     target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${CMAKE_WORKSPACE_NAME}::math)
 
 else()
-    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/share/modules/cmake")
-
-    include(CMConfig)
-    include(CMSetupVersion)
+    cm_workspace(boost SOURCES_DIR "${CMAKE_CURRENT_LIST_DIR}")
 
     cm_project(multiprecision WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
     find_package(Boost COMPONENTS REQUIRED random)
-
-    cm_setup_version(VERSION 1.60.0)
 
     add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
     set_property(TARGET ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTY EXPORT_NAME multiprecision)
@@ -72,4 +71,4 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE ${CURRENT_SOURCES_DIR}/include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-#add_subdirectory(test)
+add_subdirectory(test)
