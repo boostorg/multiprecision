@@ -1,4 +1,5 @@
 # Copyright 2016, 2017 Peter Dimov
+# Copyright 2019 Mikhail Komarov <nemo@nilfoundation.org>
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
@@ -33,6 +34,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -46,6 +48,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -59,6 +62,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -72,6 +76,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -85,6 +90,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -98,6 +104,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -111,6 +118,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -124,6 +132,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -137,6 +146,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -150,6 +160,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -163,6 +174,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -176,6 +188,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -189,6 +202,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -202,6 +216,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -215,6 +230,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -228,6 +244,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -241,6 +258,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -254,6 +272,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -267,6 +286,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -280,6 +300,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -293,6 +314,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -306,6 +328,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -319,6 +342,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -332,6 +356,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -345,6 +370,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -358,6 +384,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -371,6 +398,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -383,6 +411,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -396,6 +425,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -409,6 +439,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -422,6 +453,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -435,6 +467,7 @@ matrix:
         apt:
           packages:
             - g++-5
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -448,6 +481,7 @@ matrix:
         apt:
           packages:
             - g++-5
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -461,6 +495,7 @@ matrix:
         apt:
           packages:
             - g++-5
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -474,6 +509,7 @@ matrix:
         apt:
           packages:
             - g++-5
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -487,6 +523,7 @@ matrix:
         apt:
           packages:
             - g++-5
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -500,6 +537,7 @@ matrix:
         apt:
           packages:
             - g++-5
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -513,6 +551,7 @@ matrix:
         apt:
           packages:
             - g++-5
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -526,6 +565,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -539,6 +579,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -552,6 +593,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -565,6 +607,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -578,6 +621,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -591,6 +635,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -604,6 +649,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -617,6 +663,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -630,6 +677,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -643,6 +691,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -656,6 +705,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -669,6 +719,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -682,6 +733,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -695,6 +747,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -708,6 +761,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -721,6 +775,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -734,6 +789,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -747,6 +803,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -760,6 +817,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -773,6 +831,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -786,6 +845,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -799,6 +859,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -812,6 +873,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -825,6 +887,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -838,6 +901,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -851,6 +915,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -864,6 +929,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -876,6 +942,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -889,6 +956,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -902,6 +970,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -915,6 +984,7 @@ matrix:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -1021,6 +1091,10 @@ install:
   - python tools/boostdep/depinst/depinst.py multiprecision
   - ./bootstrap.sh
   - ./b2 headers
+  - mkdir cmake-build
+  - cd cmake-build
+  - cmake ..
+  - cd ..
 
 script:
   - |-
