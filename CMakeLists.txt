@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.5)
 set(BOOST_CMAKE FALSE)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake"
-        "${CMAKE_CURRENT_LIST_DIR}/cmake/packages"
-        "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/share/modules/cmake")
+     "${CMAKE_CURRENT_LIST_DIR}/cmake/packages"
+     "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/share/modules/cmake")
 
 include(CMDeploy)
 include(CMConfig)
@@ -12,7 +12,7 @@ include(CMSetupVersion)
 
 cm_setup_version(VERSION 1.70.0)
 
-if ("${CMAKE_WORKSPACE_NAME}" STREQUAL boost)
+if("${CMAKE_WORKSPACE_NAME}" STREQUAL boost)
     set(BOOST_CMAKE TRUE)
 
     cm_project(multiprecision WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
@@ -71,4 +71,4 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE ${CURRENT_SOURCES_DIR}/include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-#add_subdirectory(test)
+add_subdirectory(test)

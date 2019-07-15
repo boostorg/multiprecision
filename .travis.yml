@@ -1100,7 +1100,16 @@ script:
   - |-
     echo "using $TOOLSET : : $COMPILER : <cxxflags>-std=$CXXSTD ;" > ~/user-config.jam
   - (cd libs/config/test && ../../../b2 config_info_travis_install toolset=$TOOLSET && ./config_info_travis)
-  - (cd libs/multiprecision/test && ../../../b2 -j3 toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER)
+  - if [[ $TRAVIS_OS_NAME == linux ]]; then
+      (cd libs/multiprecision/test && ../../../b2 -j$(nproc) toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER)
+    elif [[ $TRAVIS_OS_NAME == osx ]]; then
+      (cd libs/multiprecision/test && ../../../b2 -j$(sysctl -n hw.ncpu) toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER)
+    fi
+  - if [[ $TRAVIS_OS_NAME == linux ]]; then
+      (cd cmake-build && ../../../b2 -j$(nproc) toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER)
+    elif [[ $TRAVIS_OS_NAME == osx ]]; then
+      (cd cmake-build && ../../../b2 -j$(sysctl -n hw.ncpu) toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER)
+    fi
 
 notifications:
   email:

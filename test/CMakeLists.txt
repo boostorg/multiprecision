@@ -23,12 +23,11 @@ if(BOOST_CMAKE)
                            ${CMAKE_WORKSPACE_NAME}::numeric_interval
                            )
 else()
-    cm_find_package(Boost COMPONENTS chrono timer exception filesystem
+    find_package(Boost COMPONENTS chrono timer exception filesystem
                     unit_test_framework serialization)
 
     cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_multiprecision
-                           ${Boost_LIBRARIES}
-                           )
+                           ${Boost_LIBRARIES})
 endif()
 
 # copyright John Maddock 2011
