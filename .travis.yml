@@ -17,6 +17,8 @@ branches:
   only:
     - master
     - develop
+    - cmake-develop
+    - cmake-master
 
 env:
   matrix:
@@ -1091,10 +1093,6 @@ install:
   - python tools/boostdep/depinst/depinst.py multiprecision
   - ./bootstrap.sh
   - ./b2 headers
-  - mkdir cmake-build
-  - cd cmake-build
-  - cmake ..
-  - cd ..
 
 script:
   - |-
@@ -1106,10 +1104,19 @@ script:
       (cd libs/multiprecision/test && ../../../b2 -j$(sysctl -n hw.ncpu) toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER)
     fi
   - if [[ $TRAVIS_OS_NAME == linux ]]; then
-      (cd cmake-build && ../../../b2 -j$(nproc) toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER)
+      ./b2 -j$(nproc) install
     elif [[ $TRAVIS_OS_NAME == osx ]]; then
-      (cd cmake-build && ../../../b2 -j$(sysctl -n hw.ncpu) toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER)
+      ./b2 -j$(sysctl -n hw.ncpu) install
     fi
+  - mkdir cmake-build
+  - cd cmake-build
+  - cmake ..
+  - if [[ $TRAVIS_OS_NAME == linux ]]; then
+      make -j$(nproc) tests-multiprecision
+    elif [[ $TRAVIS_OS_NAME == osx ]]; then
+      make -j$(sysctl -n hw.ncpu) tests-multiprecision
+    fi
+  - ctest .
 
 notifications:
   email:
