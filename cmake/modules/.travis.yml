@@ -1,0 +1,50 @@
+sudo: required
+dist: trusty
+language: cpp
+script: cmake
+
+matrix:
+    include:
+        # OSX
+        - os: osx
+          compiler: clang
+
+        - os: linux
+          compiler: gcc
+          addons: &gcc
+            apt:
+              packages:
+                - util-linux
+                - g++-4.9
+              sources:
+                - ubuntu-toolchain-r-test
+
+install:
+    - export CHECKOUT_PATH=`pwd`
+    # Setup deps directory
+    - export DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
+    - mkdir ${DEPS_DIR} && cd ${DEPS_DIR}
+    - mkdir usr
+    - export PATH=${DEPS_DIR}/usr/bin:${PATH}
+    # Install cmake
+    - CMAKE_URL="http://cmake.org/files/v3.5/cmake-3.5.2-Linux-x86_64.tar.gz"
+    - if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C usr; fi
+    # Show compiler info
+    - $CXX --version
+    - which $CXX
+    - $CC --version
+    - which $CC
+    - which cmake
+    - cmake --version
+    
+script:
+    - export INSTALL_PREFIX_PATH="${TRAVIS_BUILD_DIR}/usr"
+    - mkdir -p "$INSTALL_PREFIX_PATH"
+    - cd $CHECKOUT_PATH
+    - mkdir build
+    - cd build
+    - cmake -DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX_PATH ..
+    - make check
+    - make install
+    - rm -rf "$INSTALL_PREFIX_PATH"
+
