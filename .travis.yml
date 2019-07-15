@@ -1112,7 +1112,8 @@ script:
     elif [[ $TRAVIS_OS_NAME == osx ]]; then
       sudo ./b2 -j$(sysctl -n hw.ncpu) install;
     fi
-  - cd libs/multiprecision && mkdir cmake-build && cd cmake-build && cmake ..
+  - cd libs/multiprecision && mkdir cmake-build && cd cmake-build
+  - cmake -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9]*//g') ..
   - if [[ $TRAVIS_OS_NAME == linux ]]; then
       make -j$(nproc) tests-multiprecision;
     elif [[ $TRAVIS_OS_NAME == osx ]]; then
