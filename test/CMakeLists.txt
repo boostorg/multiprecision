@@ -1,3 +1,13 @@
+#---------------------------------------------------------------------------#
+# Copyright (c) 2018-2019 Nil Foundation AG
+# Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
+# Copyright (c) 2018-2019 Alexey Moskvin
+#
+# Distributed under the Boost Software License, Version 1.0
+# See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt
+#---------------------------------------------------------------------------#
+
 include(CMTest)
 
 find_package(GMP)
@@ -39,12 +49,11 @@ if(BOOST_CMAKE)
                            ${CMAKE_WORKSPACE_NAME}::regexp
                            )
 else()
-    find_package(Boost REQUIRED chrono exception timer filesystem
+    find_package(Boost 1.70 REQUIRED COMPONENTS chrono exception timer filesystem
                  unit_test_framework serialization regex)
 
     cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_multiprecision
-                           ${Boost_LIBRARIES}
-                           )
+                           ${Boost_LIBRARIES})
 
     include_directories(${Boost_INCLUDE_DIRS})
 endif()

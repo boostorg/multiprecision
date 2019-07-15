@@ -1,3 +1,13 @@
+#---------------------------------------------------------------------------#
+# Copyright (c) 2018-2019 Nil Foundation AG
+# Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
+# Copyright (c) 2018-2019 Alexey Moskvin
+#
+# Distributed under the Boost Software License, Version 1.0
+# See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt
+#---------------------------------------------------------------------------#
+
 cmake_minimum_required(VERSION 3.5)
 
 set(BOOST_CMAKE FALSE)
