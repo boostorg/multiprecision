@@ -9,8 +9,8 @@
 
 #define TEST_DATA 4
 
-#include <boost/math/special_functions/math_fwd.hpp>
 #include "libs/math/test/test_ibeta_inv.hpp"
+#include <boost/math/special_functions/math_fwd.hpp>
 
 void expected_results()
 {
@@ -19,39 +19,39 @@ void expected_results()
    // various compilers and platforms.
    //
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*mpfr_float_backend<0>.*",  // test type(s)
-      ".*",                          // test data group
-      ".*", 20000000, 1000000);      // test function
+       ".*",                        // compiler
+       ".*",                        // stdlib
+       ".*",                        // platform
+       ".*mpfr_float_backend<0>.*", // test type(s)
+       ".*",                        // test data group
+       ".*", 20000000, 1000000);    // test function
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*gmp_float<0>.*",  // test type(s)
-      ".*",                          // test data group
-      ".*", 20000000, 1000000);      // test function
+       ".*",                     // compiler
+       ".*",                     // stdlib
+       ".*",                     // platform
+       ".*gmp_float<0>.*",       // test type(s)
+       ".*",                     // test data group
+       ".*", 20000000, 1000000); // test function
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*mpfr_float_backend<18>.*",  // test type(s)
-      ".*",                          // test data group
-      ".*", 50000000, 7000000);      // test function
+       ".*",                         // compiler
+       ".*",                         // stdlib
+       ".*",                         // platform
+       ".*mpfr_float_backend<18>.*", // test type(s)
+       ".*",                         // test data group
+       ".*", 50000000, 7000000);     // test function
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*",                          // test type(s)
-      ".*",                          // test data group
-      ".*", 1000000, 100000);        // test function
+       ".*",                   // compiler
+       ".*",                   // stdlib
+       ".*",                   // platform
+       ".*",                   // test type(s)
+       ".*",                   // test data group
+       ".*", 1000000, 100000); // test function
    //
    // Finish off by printing out the compiler/stdlib/platform names,
    // we do this to make it easier to mark up expected error rates.
    //
    std::cout << "Tests run with " << BOOST_COMPILER << ", "
-      << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
+             << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
 }
 
 template <class T>
@@ -60,7 +60,7 @@ void test(T t, const char* p)
    test_beta(t, p);
 }
 
-BOOST_AUTO_TEST_CASE( test_main )
+BOOST_AUTO_TEST_CASE(test_main)
 {
    using namespace boost::multiprecision;
    expected_results();
@@ -72,4 +72,3 @@ BOOST_AUTO_TEST_CASE( test_main )
    //
    ALL_SMALL_TESTS
 }
-

@@ -12,19 +12,18 @@
 // plus some closely related ones and compares the results to those produced by MPFR.
 //
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
+#include "test.hpp"
+#include <boost/math/special_functions/next.hpp>
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/mpfr.hpp>
-#include <boost/math/special_functions/next.hpp>
-#include "test.hpp"
 
 using namespace boost::multiprecision;
 
-typedef number<mpfr_float_backend<35> > good_type;
+typedef number<mpfr_float_backend<35> >                                                     good_type;
 typedef number<cpp_bin_float<std::numeric_limits<good_type>::digits, digit_base_2>, et_off> test_type;
-
 
 int main()
 {
@@ -32,7 +31,7 @@ int main()
 
    do
    {
-      float fr1, fr2;
+      float     fr1, fr2;
       good_type gf(f), gf2(f);
       test_type tf(f), tf2(f);
       fr1 = gf.convert_to<float>();
@@ -59,10 +58,10 @@ int main()
       int e;
       std::frexp(f, &e);
       float extra = std::ldexp(1.0f, e - std::numeric_limits<float>::digits - 1);
-      gf = gf2 += extra;
-      tf = tf2 += extra;
-      fr1 = gf.convert_to<float>();
-      fr2 = tf.convert_to<float>();
+      gf          = gf2 += extra;
+      tf          = tf2 += extra;
+      fr1         = gf.convert_to<float>();
+      fr2         = tf.convert_to<float>();
       BOOST_CHECK_EQUAL(fr1, fr2);
       // next represenation:
       gf = boost::math::float_next(gf2);
@@ -82,8 +81,7 @@ int main()
       BOOST_CHECK_EQUAL(fr1, fr2);
 
       f = boost::math::float_prior(f);
-   } while(f);
+   } while (f);
 
    return boost::report_errors();
 }
-

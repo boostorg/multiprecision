@@ -9,8 +9,8 @@
 
 #define TEST_DATA 1
 
-#include <boost/math/special_functions/math_fwd.hpp>
 #include "libs/math/test/test_ibeta.hpp"
+#include <boost/math/special_functions/math_fwd.hpp>
 
 void expected_results()
 {
@@ -19,62 +19,62 @@ void expected_results()
    // various compilers and platforms.
    //
    add_expected_result(
-      "[^|]*",                          // compiler
-      "[^|]*",                          // stdlib
-      "[^|]*",                          // platform
-      ".*gmp_float<18>.*",              // test type(s)
-      "(?i).*small.*",                  // test data group
-      ".*", 3000, 1000);                // test function
+       "[^|]*",             // compiler
+       "[^|]*",             // stdlib
+       "[^|]*",             // platform
+       ".*gmp_float<18>.*", // test type(s)
+       "(?i).*small.*",     // test data group
+       ".*", 3000, 1000);   // test function
    add_expected_result(
-      "[^|]*",                          // compiler
-      "[^|]*",                          // stdlib
-      "[^|]*",                          // platform
-      ".*mpfr_float_backend<18>.*",     // test type(s)
-      "(?i).*small.*",                  // test data group
-      ".*", 2000, 500);                  // test function
+       "[^|]*",                      // compiler
+       "[^|]*",                      // stdlib
+       "[^|]*",                      // platform
+       ".*mpfr_float_backend<18>.*", // test type(s)
+       "(?i).*small.*",              // test data group
+       ".*", 2000, 500);             // test function
    add_expected_result(
-      "[^|]*",                          // compiler
-      "[^|]*",                          // stdlib
-      "[^|]*",                          // platform
-      ".*mpfr_float_backend<0>.*",     // test type(s)
-      "(?i).*small.*",                  // test data group
-      ".*", 1000, 100);                  // test function
+       "[^|]*",                     // compiler
+       "[^|]*",                     // stdlib
+       "[^|]*",                     // platform
+       ".*mpfr_float_backend<0>.*", // test type(s)
+       "(?i).*small.*",             // test data group
+       ".*", 1000, 100);            // test function
 #ifdef BOOST_INTEL
    add_expected_result(
-      "[^|]*",                          // compiler
-      "[^|]*",                          // stdlib
-      "[^|]*",                          // platform
-      "float128",                             // test type(s)
-      "(?i).*small.*",                  // test data group
-      ".*", 500, 100);  // test function
+       "[^|]*",         // compiler
+       "[^|]*",         // stdlib
+       "[^|]*",         // platform
+       "float128",      // test type(s)
+       "(?i).*small.*", // test data group
+       ".*", 500, 100); // test function
 #endif
    add_expected_result(
-      "[^|]*",                          // compiler
-      "[^|]*",                          // stdlib
-      "[^|]*",                          // platform
-      ".*",                             // test type(s)
-      "(?i).*small.*",                  // test data group
-      ".*", 90, 25);  // test function
+       "[^|]*",         // compiler
+       "[^|]*",         // stdlib
+       "[^|]*",         // platform
+       ".*",            // test type(s)
+       "(?i).*small.*", // test data group
+       ".*", 90, 25);   // test function
    add_expected_result(
-      "[^|]*",                          // compiler
-      "[^|]*",                          // stdlib
-      "[^|]*",                          // platform
-      ".*",                             // test type(s)
-      "(?i).*medium.*",                 // test data group
-      ".*", 150, 50);  // test function
+       "[^|]*",          // compiler
+       "[^|]*",          // stdlib
+       "[^|]*",          // platform
+       ".*",             // test type(s)
+       "(?i).*medium.*", // test data group
+       ".*", 150, 50);   // test function
    add_expected_result(
-      "[^|]*",                          // compiler
-      "[^|]*",                          // stdlib
-      "[^|]*",                          // platform
-      ".*",                             // test type(s)
-      "(?i).*large.*",                  // test data group
-      ".*", 5000, 500);                 // test function
+       "[^|]*",          // compiler
+       "[^|]*",          // stdlib
+       "[^|]*",          // platform
+       ".*",             // test type(s)
+       "(?i).*large.*",  // test data group
+       ".*", 5000, 500); // test function
    //
    // Finish off by printing out the compiler/stdlib/platform names,
    // we do this to make it easier to mark up expected error rates.
    //
    std::cout << "Tests run with " << BOOST_COMPILER << ", "
-      << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
+             << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
 }
 
 template <class T>
@@ -83,8 +83,7 @@ void test(T t, const char* p)
    test_beta(t, p);
 }
 
-
-BOOST_AUTO_TEST_CASE( test_main )
+BOOST_AUTO_TEST_CASE(test_main)
 {
    using namespace boost::multiprecision;
    expected_results();
@@ -96,4 +95,3 @@ BOOST_AUTO_TEST_CASE( test_main )
    //
    ALL_TESTS
 }
-

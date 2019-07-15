@@ -6,20 +6,19 @@
 #define BOOST_MP_MATH_SETUP_HPP
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
 #define BOOST_MATH_OVERFLOW_ERROR_POLICY ignore_error
 #undef BOOST_MATH_SMALL_CONSTANT
 #define BOOST_MATH_SMALL_CONSTANT(x) x
 
-#if !defined(TEST_MPF_50) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) \
-      && !defined(TEST_MPFR_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT)
-#  define TEST_MPF_50
-#  define TEST_MPFR_50
-#  define TEST_CPP_DEC_FLOAT
-#  define TEST_FLOAT128
-#  define TEST_CPP_BIN_FLOAT
+#if !defined(TEST_MPF_50) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT)
+#define TEST_MPF_50
+#define TEST_MPFR_50
+#define TEST_CPP_DEC_FLOAT
+#define TEST_FLOAT128
+#define TEST_CPP_BIN_FLOAT
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -31,33 +30,33 @@
 #endif
 
 #if defined(TEST_MPF_50)
-#include <boost/multiprecision/gmp.hpp>
 #include <boost/multiprecision/debug_adaptor.hpp>
+#include <boost/multiprecision/gmp.hpp>
 
-#define MPF_TESTS    /*test(number<gmp_float<18> >(), "number<gmp_float<18> >");*/\
-   mpf_float::default_precision(20);\
-   test(mpf_float(), "number<gmp_float<0> > (20 digit precision)");\
-   mpf_float::default_precision(35);\
-   test(mpf_float(), "number<gmp_float<0> > (35 digit precision)");\
-   test(number<gmp_float<30> >(), "number<gmp_float<30> >");\
-   test(number<gmp_float<35> >(), "number<gmp_float<35> >");\
-   /* there should be at least one test with expression templates off: */ \
+#define MPF_TESTS /*test(number<gmp_float<18> >(), "number<gmp_float<18> >");*/ \
+   mpf_float::default_precision(20);                                            \
+   test(mpf_float(), "number<gmp_float<0> > (20 digit precision)");             \
+   mpf_float::default_precision(35);                                            \
+   test(mpf_float(), "number<gmp_float<0> > (35 digit precision)");             \
+   test(number<gmp_float<30> >(), "number<gmp_float<30> >");                    \
+   test(number<gmp_float<35> >(), "number<gmp_float<35> >");                    \
+   /* there should be at least one test with expression templates off: */       \
    test(number<gmp_float<35>, et_off>(), "number<gmp_float<35>, et_off>");
-#define MPF_SMALL_TESTS    /*test(number<gmp_float<18> >(), "number<gmp_float<18> >");*/\
-   test(number<gmp_float<30> >(), "number<gmp_float<30> >");\
-   test(number<gmp_float<35> >(), "number<gmp_float<35> >");\
-   /* there should be at least one test with expression templates off: */ \
-   test(number<gmp_float<35>, et_off>(), "number<gmp_float<35>, et_off>");\
-   mpf_float::default_precision(20); \
-   test(mpf_float(), "number<gmp_float<0> > (20 digit precision)"); \
-   mpf_float::default_precision(35); \
-   test(mpf_float(), "number<gmp_float<0> > (35 digit precision)"); \
+#define MPF_SMALL_TESTS /*test(number<gmp_float<18> >(), "number<gmp_float<18> >");*/ \
+   test(number<gmp_float<30> >(), "number<gmp_float<30> >");                          \
+   test(number<gmp_float<35> >(), "number<gmp_float<35> >");                          \
+   /* there should be at least one test with expression templates off: */             \
+   test(number<gmp_float<35>, et_off>(), "number<gmp_float<35>, et_off>");            \
+   mpf_float::default_precision(20);                                                  \
+   test(mpf_float(), "number<gmp_float<0> > (20 digit precision)");                   \
+   mpf_float::default_precision(35);                                                  \
+   test(mpf_float(), "number<gmp_float<0> > (35 digit precision)");
 
-typedef boost::multiprecision::number<boost::multiprecision::gmp_float<18> > test_type_1;
-typedef boost::multiprecision::number<boost::multiprecision::gmp_float<30> > test_type_2;
-typedef boost::multiprecision::number<boost::multiprecision::gmp_float<35> > test_type_3;
+typedef boost::multiprecision::number<boost::multiprecision::gmp_float<18> >                               test_type_1;
+typedef boost::multiprecision::number<boost::multiprecision::gmp_float<30> >                               test_type_2;
+typedef boost::multiprecision::number<boost::multiprecision::gmp_float<35> >                               test_type_3;
 typedef boost::multiprecision::number<boost::multiprecision::gmp_float<35>, boost::multiprecision::et_off> test_type_4;
-typedef boost::multiprecision::mpf_float test_type_5;
+typedef boost::multiprecision::mpf_float                                                                   test_type_5;
 
 #else
 
@@ -69,19 +68,20 @@ typedef boost::multiprecision::mpf_float test_type_5;
 #if defined(TEST_MPFR_50)
 #include <boost/multiprecision/mpfr.hpp>
 
-#define MPFR_TESTS    test(number<mpfr_float_backend<18> >(), "number<mpfr_float_backend<18> >");\
-   test(number<mpfr_float_backend<30> >(), "number<mpfr_float_backend<30> >");\
-   test(number<mpfr_float_backend<35> >(), "number<mpfr_float_backend<35> >");\
-  /* Test variable precision at 2 different precisions - checks our ability to handle dynamic changes in precision */\
-  mpfr_float::default_precision(20);\
-  test(mpfr_float(), "number<mpfr_float_backend<0> > (20-digit precision)");\
-  mpfr_float::default_precision(35);\
-  test(mpfr_float(), "number<mpfr_float_backend<0> > (35-digit precision)");
+#define MPFR_TESTS                                                                                                     \
+   test(number<mpfr_float_backend<18> >(), "number<mpfr_float_backend<18> >");                                         \
+   test(number<mpfr_float_backend<30> >(), "number<mpfr_float_backend<30> >");                                         \
+   test(number<mpfr_float_backend<35> >(), "number<mpfr_float_backend<35> >");                                         \
+   /* Test variable precision at 2 different precisions - checks our ability to handle dynamic changes in precision */ \
+   mpfr_float::default_precision(20);                                                                                  \
+   test(mpfr_float(), "number<mpfr_float_backend<0> > (20-digit precision)");                                          \
+   mpfr_float::default_precision(35);                                                                                  \
+   test(mpfr_float(), "number<mpfr_float_backend<0> > (35-digit precision)");
 
 typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<18> > test_type_1;
 typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<30> > test_type_2;
 typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<35> > test_type_3;
-typedef boost::multiprecision::mpfr_float test_type_4;
+typedef boost::multiprecision::mpfr_float                                             test_type_4;
 
 #else
 
@@ -95,12 +95,13 @@ typedef boost::multiprecision::mpfr_float test_type_4;
 #ifdef TEST_CPP_DEC_FLOAT
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
-#define CPP_DEC_FLOAT_TESTS    test(number<cpp_dec_float<18> >(), "number<cpp_dec_float<18> >");\
-   test(number<cpp_dec_float<30> >(), "number<cpp_dec_float<30> >");\
+#define CPP_DEC_FLOAT_TESTS                                          \
+   test(number<cpp_dec_float<18> >(), "number<cpp_dec_float<18> >"); \
+   test(number<cpp_dec_float<30> >(), "number<cpp_dec_float<30> >"); \
    test(number<cpp_dec_float<35, long long, std::allocator<char> > >(), "number<cpp_dec_float<35, long long, std::allocator<char> > >");
 
-typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<18> > test_type_1;
-typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<30> > test_type_2;
+typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<18> >                                   test_type_1;
+typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<30> >                                   test_type_2;
 typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<35, long long, std::allocator<char> > > test_type_3;
 
 #else
@@ -138,26 +139,24 @@ typedef boost::multiprecision::float128 test_type_1;
 
 #endif
 
-
 #ifndef BOOST_MATH_TEST_TYPE
 #define BOOST_TEST_MAIN
-#include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
+#include <boost/test/unit_test.hpp>
 #endif
 
-#define ALL_TESTS \
- MPF_TESTS\
- MPFR_TESTS\
- CPP_DEC_FLOAT_TESTS\
- FLOAT128_TESTS\
- CPP_BIN_FLOAT_TESTS
+#define ALL_TESTS      \
+   MPF_TESTS           \
+   MPFR_TESTS          \
+   CPP_DEC_FLOAT_TESTS \
+   FLOAT128_TESTS      \
+   CPP_BIN_FLOAT_TESTS
 
-#define ALL_SMALL_TESTS\
- MPF_SMALL_TESTS\
- MPFR_TESTS\
- CPP_DEC_FLOAT_TESTS\
- FLOAT128_TESTS\
- CPP_BIN_FLOAT_TESTS
+#define ALL_SMALL_TESTS \
+   MPF_SMALL_TESTS      \
+   MPFR_TESTS           \
+   CPP_DEC_FLOAT_TESTS  \
+   FLOAT128_TESTS       \
+   CPP_BIN_FLOAT_TESTS
 
 #endif
-

@@ -8,14 +8,14 @@
 //
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <boost/multiprecision/integer.hpp>
 #include "test.hpp"
+#include <boost/multiprecision/integer.hpp>
 
 #ifdef BOOST_MSVC
-#pragma warning(disable:4146)
+#pragma warning(disable : 4146)
 #endif
 
 template <class I, class H>
@@ -46,7 +46,7 @@ void test()
    BOOST_CHECK_EQUAL(msb(i), max_index);
 
 #ifndef BOOST_NO_EXCEPTIONS
-   if(std::numeric_limits<I>::is_signed)
+   if (std::numeric_limits<I>::is_signed)
    {
       i = static_cast<I>(-1);
       BOOST_CHECK_THROW(lsb(i), std::range_error);
@@ -56,13 +56,13 @@ void test()
 
    BOOST_CHECK_EQUAL(multiply(i, mx, mx), static_cast<I>(mx) * static_cast<I>(mx));
    BOOST_CHECK_EQUAL(add(i, mx, mx), static_cast<I>(mx) + static_cast<I>(mx));
-   if(std::numeric_limits<I>::is_signed)
+   if (std::numeric_limits<I>::is_signed)
    {
       BOOST_CHECK_EQUAL(subtract(i, mx, static_cast<H>(-mx)), static_cast<I>(mx) - static_cast<I>(-mx));
       BOOST_CHECK_EQUAL(add(i, static_cast<H>(-mx), static_cast<H>(-mx)), static_cast<I>(-mx) + static_cast<I>(-mx));
    }
 
-   i = (std::numeric_limits<I>::max)();
+   i   = (std::numeric_limits<I>::max)();
    I j = 12345;
    I r, q;
    divide_qr(i, j, q, r);
@@ -72,7 +72,7 @@ void test()
    I p = 456;
    BOOST_CHECK_EQUAL(powm(i, p, j), pow(cpp_int(i), static_cast<unsigned>(p)) % j);
 
-   for(I i = 0; i < (2 < 8) - 1; ++i)
+   for (I i = 0; i < (2 < 8) - 1; ++i)
    {
       I j = i * i;
       I s, r;
@@ -96,9 +96,6 @@ int main()
    test<boost::uint16_t, boost::uint8_t>();
    test<boost::uint32_t, boost::uint16_t>();
    test<boost::uint64_t, boost::uint32_t>();
-   
+
    return boost::report_errors();
 }
-
-
-

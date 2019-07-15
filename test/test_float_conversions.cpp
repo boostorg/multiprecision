@@ -5,15 +5,15 @@
 //
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <boost/detail/lightweight_test.hpp>
-#include <boost/array.hpp>
 #include "test.hpp"
+#include <boost/array.hpp>
+#include <boost/detail/lightweight_test.hpp>
 
-#include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/math/constants/constants.hpp>
+#include <boost/multiprecision/cpp_bin_float.hpp>
 
 int main()
 {
@@ -38,6 +38,3 @@ int main()
 
    return boost::report_errors();
 }
-
-
-

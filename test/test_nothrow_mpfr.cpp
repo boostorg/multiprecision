@@ -4,12 +4,12 @@
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/multiprecision/mpfr.hpp>
-#include <boost/type_traits/is_nothrow_move_constructible.hpp>
-#include <boost/type_traits/is_nothrow_move_assignable.hpp>
-#include <boost/type_traits/has_nothrow_constructor.hpp>
-#include <boost/type_traits/has_nothrow_assign.hpp>
-#include <boost/type_traits/has_nothrow_copy.hpp>
 #include <boost/static_assert.hpp>
+#include <boost/type_traits/has_nothrow_assign.hpp>
+#include <boost/type_traits/has_nothrow_constructor.hpp>
+#include <boost/type_traits/has_nothrow_copy.hpp>
+#include <boost/type_traits/is_nothrow_move_assignable.hpp>
+#include <boost/type_traits/is_nothrow_move_constructible.hpp>
 
 #ifndef BOOST_NO_CXX11_NOEXCEPT
 
@@ -32,5 +32,3 @@ BOOST_STATIC_ASSERT(boost::is_nothrow_move_assignable<boost::multiprecision::mpf
 #endif
 
 #endif // noexcept
-
-

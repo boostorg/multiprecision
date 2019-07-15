@@ -14,7 +14,7 @@
 #define TEST7_H
 
 #ifdef _MSC_VER
-#  pragma warning(disable:4800 4996)
+#pragma warning(disable : 4800 4996)
 #endif
 
 #include <boost/multiprecision/cpp_dec_float.hpp>
@@ -31,16 +31,16 @@ typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<50>, 
 #define USE_FLOAT
 #define USE_UNBOUNDED_ARRAY
 #define USE_BOUNDED_ARRAY
-#define USE_STD_VECTOR 
+#define USE_STD_VECTOR
 #define USE_BOUNDED_VECTOR USE_MATRIX
 #define USE_UNBOUNDED_ARRAY
-#define USE_MAP_ARRAY 
+#define USE_MAP_ARRAY
 #define USE_STD_MAP
-#define USE_MAPPED_VECTOR 
-#define USE_COMPRESSED_VECTOR 
+#define USE_MAPPED_VECTOR
+#define USE_COMPRESSED_VECTOR
 #define USE_COORDINATE_VECTOR
-#define USE_MAPPED_MATRIX 
-#define USE_COMPRESSED_MATRIX 
+#define USE_MAPPED_MATRIX
+#define USE_COMPRESSED_MATRIX
 #define USE_COORDINATE_MATRIX
 
 #include <iostream>
@@ -48,19 +48,18 @@ typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<50>, 
 #include <boost/numeric/interval.hpp>
 #include <boost/numeric/interval/io.hpp>
 
-#include <boost/numeric/ublas/vector.hpp>
-#include <boost/numeric/ublas/vector_proxy.hpp>
+#include <boost/numeric/ublas/io.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
-#include <boost/numeric/ublas/io.hpp>
+#include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/vector_proxy.hpp>
 
 namespace ublas = boost::numeric::ublas;
 
 #include "common/init.hpp"
 
-void test_vector ();
-void test_matrix_vector ();
-void test_matrix ();
-
+void test_vector();
+void test_matrix_vector();
+void test_matrix();
 
 #endif

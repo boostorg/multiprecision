@@ -8,12 +8,11 @@
 //
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <boost/multiprecision/float128.hpp>
 #include "test_float_serial.hpp"
-
+#include <boost/multiprecision/float128.hpp>
 
 int main()
 {
@@ -21,6 +20,3 @@ int main()
    test<float128>();
    return boost::report_errors();
 }
-
-
-

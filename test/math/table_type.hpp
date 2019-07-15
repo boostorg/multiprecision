@@ -6,24 +6,25 @@
 #ifndef BOOST_MP_TABLE_TYPE
 #define BOOST_MP_TABLE_TYPE
 
-#include <libs/math/test/table_type.hpp>
 #include <boost/multiprecision/number.hpp>
+#include <libs/math/test/table_type.hpp>
 
 struct string_table_entry
 {
-private:
+ private:
    const char* m_data;
-public:
+
+ public:
    string_table_entry(const char* p) : m_data(p) {}
 
    template <class T>
-   operator T () const
+   operator T() const
    {
       return static_cast<T>(m_data);
    }
 };
 
-inline std::ostream& operator << (std::ostream& os, string_table_entry const & what)
+inline std::ostream& operator<<(std::ostream& os, string_table_entry const& what)
 {
    return os << static_cast<const char*>(what);
 }
@@ -37,4 +38,3 @@ struct table_type<boost::multiprecision::number<Backend, ExpressionTemplates> >
 #define SC_(x) string_table_entry(BOOST_STRINGIZE(x))
 
 #endif
-

@@ -6,9 +6,9 @@
 #define BOOST_CHRONO_HEADER_ONLY
 
 #if !defined(TEST_MPZ) && !defined(TEST_TOMMATH) && !defined(TEST_CPP_INT)
-#  define TEST_MPZ
-#  define TEST_TOMMATH
-#  define TEST_CPP_INT
+#define TEST_MPZ
+#define TEST_TOMMATH
+#define TEST_CPP_INT
 #endif
 
 #ifdef TEST_MPZ
@@ -20,8 +20,8 @@
 #ifdef TEST_CPP_INT
 #include <boost/multiprecision/cpp_int.hpp>
 #endif
-#include <boost/multiprecision/miller_rabin.hpp>
 #include <boost/chrono.hpp>
+#include <boost/multiprecision/miller_rabin.hpp>
 #include <map>
 
 template <class Clock>
@@ -41,28 +41,28 @@ struct stopwatch
       m_start = Clock::now();
    }
 
-private:
+ private:
    typename Clock::time_point m_start;
 };
 
 unsigned allocation_count = 0;
 
-void *(*alloc_func_ptr) (size_t);
-void *(*realloc_func_ptr) (void *, size_t, size_t);
-void (*free_func_ptr) (void *, size_t);
+void* (*alloc_func_ptr)(size_t);
+void* (*realloc_func_ptr)(void*, size_t, size_t);
+void (*free_func_ptr)(void*, size_t);
 
-void *alloc_func(size_t n)
+void* alloc_func(size_t n)
 {
    ++allocation_count;
    return (*alloc_func_ptr)(n);
 }
 
-void free_func(void * p, size_t n)
+void free_func(void* p, size_t n)
 {
    (*free_func_ptr)(p, n);
 }
 
-void * realloc_func(void * p, size_t old, size_t n)
+void* realloc_func(void* p, size_t old, size_t n)
 {
    ++allocation_count;
    return (*realloc_func_ptr)(p, old, n);
@@ -78,7 +78,7 @@ boost::chrono::duration<double> test_miller_rabin_gmp()
 
    independent_bits_engine<mt11213b, 256, mpz_int> gen;
 
-   for(unsigned i = 0; i < 1000; ++i)
+   for (unsigned i = 0; i < 1000; ++i)
    {
       mpz_int n = gen();
       mpz_probab_prime_p(n.backend().data(), 25);
@@ -88,7 +88,7 @@ boost::chrono::duration<double> test_miller_rabin_gmp()
 #endif
 
 std::map<std::string, double> results;
-double min_time = (std::numeric_limits<double>::max)();
+double                        min_time = (std::numeric_limits<double>::max)();
 
 template <class IntType>
 boost::chrono::duration<double> test_miller_rabin(const char* name)
@@ -102,18 +102,18 @@ boost::chrono::duration<double> test_miller_rabin(const char* name)
    // We must use a different generator for the tests and number generation, otherwise
    // we get false positives.
    //
-   mt19937 gen2;
+   mt19937  gen2;
    unsigned result_count = 0;
 
-   for(unsigned i = 0; i < 1000; ++i)
+   for (unsigned i = 0; i < 1000; ++i)
    {
       IntType n = gen();
-      if(boost::multiprecision::miller_rabin_test(n, 25, gen2))
+      if (boost::multiprecision::miller_rabin_test(n, 25, gen2))
          ++result_count;
    }
    boost::chrono::duration<double> t = c.elapsed();
-   double d = t.count();
-   if(d < min_time)
+   double                          d = t.count();
+   if (d < min_time)
       min_time = d;
    results[name] = d;
    std::cout << "Time for " << std::setw(30) << std::left << name << " = " << d << std::endl;
@@ -127,13 +127,13 @@ void generate_quickbook()
 
    std::map<std::string, double>::const_iterator i(results.begin()), j(results.end());
 
-   while(i != j)
+   while (i != j)
    {
       double rel = i->second / min_time;
       std::cout << "[[" << i->first << "][" << rel << "(" << i->second << "s)]]\n";
       ++i;
    }
-   
+
    std::cout << "]\n";
 }
 
@@ -164,4 +164,3 @@ int main()
 
    return 0;
 }
-

@@ -5,23 +5,23 @@
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <cmath>
-#include <math.h>
+#include "test.hpp"
 #include <boost/limits.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include "test.hpp"
+#include <cmath>
+#include <math.h>
 
 #if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPQ) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT)
-#  define TEST_MPF_50
-#  define TEST_MPFR_50
-#  define TEST_MPFI_50
-#  define TEST_BACKEND
-#  define TEST_CPP_DEC_FLOAT
-#  define TEST_FLOAT128
-#  define TEST_CPP_BIN_FLOAT
+#define TEST_MPF_50
+#define TEST_MPFR_50
+#define TEST_MPFI_50
+#define TEST_BACKEND
+#define TEST_CPP_DEC_FLOAT
+#define TEST_FLOAT128
+#define TEST_CPP_BIN_FLOAT
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -55,7 +55,7 @@
 #endif
 
 #ifdef _MSC_VER
-#pragma warning(disable: 4127) //  conditional expression is constant
+#pragma warning(disable : 4127) //  conditional expression is constant
 #endif
 
 const char* method_name(const boost::math::detail::native_tag&)
@@ -104,7 +104,7 @@ void test()
    BOOST_CHECK_EQUAL((::boost::math::isnormal)(t), true);
    BOOST_CHECK_EQUAL((::boost::math::isnormal)(-t), true);
    BOOST_CHECK_EQUAL((::boost::math::fpclassify)(t), (::boost::math::fpclassify)(t + 0));
-   if(std::numeric_limits<T>::is_specialized)
+   if (std::numeric_limits<T>::is_specialized)
    {
       t = (std::numeric_limits<T>::max)();
       BOOST_CHECK_EQUAL((::boost::math::fpclassify)(t), (int)FP_NORMAL);
@@ -131,11 +131,11 @@ void test()
       BOOST_CHECK_EQUAL((::boost::math::isnormal)(-t), true);
       BOOST_CHECK_EQUAL((::boost::math::fpclassify)(t), (::boost::math::fpclassify)(t + 0));
    }
-   if(std::numeric_limits<T>::has_denorm)
+   if (std::numeric_limits<T>::has_denorm)
    {
       t = (std::numeric_limits<T>::min)();
       t /= 2;
-      if(t != 0)
+      if (t != 0)
       {
          BOOST_CHECK_EQUAL((::boost::math::fpclassify)(t), (int)FP_SUBNORMAL);
          BOOST_CHECK_EQUAL((::boost::math::fpclassify)(-t), (int)FP_SUBNORMAL);
@@ -150,7 +150,7 @@ void test()
          BOOST_CHECK_EQUAL((::boost::math::fpclassify)(t), (::boost::math::fpclassify)(t + 0));
       }
       t = std::numeric_limits<T>::denorm_min();
-      if((t != 0) && (t < (std::numeric_limits<T>::min)()))
+      if ((t != 0) && (t < (std::numeric_limits<T>::min)()))
       {
          BOOST_CHECK_EQUAL((::boost::math::fpclassify)(t), (int)FP_SUBNORMAL);
          BOOST_CHECK_EQUAL((::boost::math::fpclassify)(-t), (int)FP_SUBNORMAL);
@@ -194,9 +194,9 @@ void test()
    BOOST_CHECK_EQUAL((::boost::math::isnormal)(-t), false);
    BOOST_CHECK_EQUAL((::boost::math::fpclassify)(t), (::boost::math::fpclassify)(t + 0));
    // infinity:
-   if(std::numeric_limits<T>::has_infinity) 
+   if (std::numeric_limits<T>::has_infinity)
    {
-      // At least one std::numeric_limits<T>::infinity)() returns zero 
+      // At least one std::numeric_limits<T>::infinity)() returns zero
       // (Compaq true64 cxx), hence the check.
       t = (std::numeric_limits<T>::infinity)();
       BOOST_CHECK_EQUAL((::boost::math::fpclassify)(t), (int)FP_INFINITE);
@@ -252,7 +252,7 @@ void test()
    // NaN's:
    // Note that Borland throws an exception if we even try to obtain a Nan
    // by calling std::numeric_limits<T>::quiet_NaN() !!!!!!!
-   if(std::numeric_limits<T>::has_quiet_NaN)
+   if (std::numeric_limits<T>::has_quiet_NaN)
    {
       t = std::numeric_limits<T>::quiet_NaN();
       BOOST_CHECK_EQUAL((::boost::math::fpclassify)(t), (int)FP_NAN);
@@ -270,7 +270,7 @@ void test()
    {
       std::cout << "Quiet NaN's not tested" << std::endl;
    }
-   if(std::numeric_limits<T>::has_signaling_NaN)
+   if (std::numeric_limits<T>::has_signaling_NaN)
    {
       t = std::numeric_limits<T>::signaling_NaN();
       BOOST_CHECK_EQUAL((::boost::math::fpclassify)(t), (int)FP_NAN);
@@ -338,7 +338,7 @@ void test()
    // Things involving signed zero, need to detect it first:
    T neg_zero_test = -(std::numeric_limits<T>::min)();
    neg_zero_test /= (std::numeric_limits<T>::max)();
-   if(std::numeric_limits<T>::has_infinity && (one / neg_zero_test < 0))
+   if (std::numeric_limits<T>::has_infinity && (one / neg_zero_test < 0))
    {
 #ifndef TEST_MPFI_50
       // Note that testing this with mpfi is in the "too difficult" drawer at present.
@@ -410,4 +410,3 @@ int main()
 #endif
    return boost::report_errors();
 }
-

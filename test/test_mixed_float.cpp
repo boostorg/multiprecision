@@ -8,7 +8,7 @@
 //
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
 #ifdef TEST_GMP
@@ -17,8 +17,8 @@
 #ifdef TEST_MPFR
 #include <boost/multiprecision/mpfr.hpp>
 #endif
-#include <boost/multiprecision/cpp_dec_float.hpp>
 #include "test.hpp"
+#include <boost/multiprecision/cpp_dec_float.hpp>
 
 template <class Number, class BigNumber>
 void test()
@@ -52,6 +52,3 @@ int main()
 
    return boost::report_errors();
 }
-
-
-

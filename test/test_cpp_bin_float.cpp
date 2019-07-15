@@ -6,27 +6,27 @@
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #ifdef TEST_MPFR
 #include <boost/multiprecision/mpfr.hpp>
 #endif
+#include "libs/multiprecision/test/test.hpp"
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
-#include "libs/multiprecision/test/test.hpp"
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 
 template <class T>
 T generate_random()
 {
-   typedef int e_type;
+   typedef int                   e_type;
    static boost::random::mt19937 gen;
-   T val = gen();
-   T prev_val = -1;
-   while(val != prev_val)
+   T                             val      = gen();
+   T                             prev_val = -1;
+   while (val != prev_val)
    {
       val *= (gen.max)();
       prev_val = val;
@@ -39,7 +39,6 @@ T generate_random()
    return ldexp(val, ui(gen));
 }
 
-
 using namespace boost::multiprecision;
 #ifdef TEST_MPFR
 typedef number<mpfr_float_backend<35> > good_type;
@@ -50,14 +49,14 @@ typedef number<cpp_bin_float<std::numeric_limits<good_type>::digits, digit_base_
 
 void test_special_cases()
 {
-   test_type max_val = (std::numeric_limits<test_type>::max)();
-   test_type min_val = (std::numeric_limits<test_type>::min)();
-   test_type eps = std::numeric_limits<test_type>::epsilon();
-   test_type inf_val = (std::numeric_limits<test_type>::infinity)();
-   test_type nan_val = (std::numeric_limits<test_type>::quiet_NaN)();
-   test_type half = 0.5;
+   test_type max_val     = (std::numeric_limits<test_type>::max)();
+   test_type min_val     = (std::numeric_limits<test_type>::min)();
+   test_type eps         = std::numeric_limits<test_type>::epsilon();
+   test_type inf_val     = (std::numeric_limits<test_type>::infinity)();
+   test_type nan_val     = (std::numeric_limits<test_type>::quiet_NaN)();
+   test_type half        = 0.5;
    test_type one_point_5 = 1.5;
-   
+
    BOOST_CHECK((boost::math::isnormal)(max_val));
    BOOST_CHECK((boost::math::isnormal)(-max_val));
    BOOST_CHECK((boost::math::isnormal)(min_val));
@@ -67,7 +66,7 @@ void test_special_cases()
    BOOST_CHECK((boost::math::isnan)(nan_val));
    BOOST_CHECK((boost::math::isnan)(-nan_val));
 
-   if(std::numeric_limits<test_type>::has_denorm)
+   if (std::numeric_limits<test_type>::has_denorm)
       min_val = std::numeric_limits<test_type>::denorm_min();
 
    // Adding epsilon will increment 1.0:
@@ -75,9 +74,9 @@ void test_special_cases()
    BOOST_CHECK(test_type(1) + eps / 2 == test_type(1));
    // But it's not the smallest value that will do that:
    test_type small = 1 + eps;
-   small = ldexp(small, -std::numeric_limits<test_type>::digits);
+   small           = ldexp(small, -std::numeric_limits<test_type>::digits);
    BOOST_CHECK(test_type(1) + small != test_type(1));
-   // And if we increment 1.0 first, then an even smaller 
+   // And if we increment 1.0 first, then an even smaller
    // addition will round up:
    test_type one_next = test_type(1) + eps;
    BOOST_CHECK(one_next + eps / 2 != one_next);
@@ -230,7 +229,7 @@ void test_special_cases()
    BOOST_CHECK(boost::math::signbit(-min_val / -2) == 0);
    BOOST_CHECK(boost::math::signbit(-min_val / 2));
    test_type neg_zero = min_val * -min_val;
-   test_type zero = 0;
+   test_type zero     = 0;
    // Arithmetic involving signed zero:
    BOOST_CHECK_EQUAL(-neg_zero, 0);
    BOOST_CHECK(!boost::math::signbit(-neg_zero));
@@ -270,7 +269,6 @@ void test_special_cases()
    BOOST_CHECK(boost::math::signbit(ceil(small)));
    BOOST_CHECK(boost::math::signbit(round(small)));
    BOOST_CHECK(boost::math::signbit(trunc(small)));
-
 
    BOOST_CHECK_EQUAL(neg_zero * 2, 0);
    BOOST_CHECK_EQUAL(neg_zero * test_type(2), 0);
@@ -314,30 +312,30 @@ void test_special_cases()
    BOOST_CHECK(!boost::math::signbit(zero.convert_to<long double>()));
 
    // Conversions to other types of special values:
-   if(std::numeric_limits<float>::has_infinity)
+   if (std::numeric_limits<float>::has_infinity)
    {
       BOOST_CHECK_EQUAL(inf_val.convert_to<float>(), std::numeric_limits<float>::infinity());
       BOOST_CHECK_EQUAL((-inf_val).convert_to<float>(), -std::numeric_limits<float>::infinity());
    }
-   if(std::numeric_limits<float>::has_quiet_NaN)
+   if (std::numeric_limits<float>::has_quiet_NaN)
    {
       BOOST_CHECK((boost::math::isnan)(nan_val.convert_to<float>()));
    }
-   if(std::numeric_limits<double>::has_infinity)
+   if (std::numeric_limits<double>::has_infinity)
    {
       BOOST_CHECK_EQUAL(inf_val.convert_to<double>(), std::numeric_limits<double>::infinity());
       BOOST_CHECK_EQUAL((-inf_val).convert_to<double>(), -std::numeric_limits<double>::infinity());
    }
-   if(std::numeric_limits<double>::has_quiet_NaN)
+   if (std::numeric_limits<double>::has_quiet_NaN)
    {
       BOOST_CHECK((boost::math::isnan)(nan_val.convert_to<double>()));
    }
-   if(std::numeric_limits<long double>::has_infinity)
+   if (std::numeric_limits<long double>::has_infinity)
    {
       BOOST_CHECK_EQUAL(inf_val.convert_to<long double>(), std::numeric_limits<long double>::infinity());
       BOOST_CHECK_EQUAL((-inf_val).convert_to<long double>(), -std::numeric_limits<long double>::infinity());
    }
-   if(std::numeric_limits<long double>::has_quiet_NaN)
+   if (std::numeric_limits<long double>::has_quiet_NaN)
    {
       BOOST_CHECK((boost::math::isnan)(nan_val.convert_to<long double>()));
    }
@@ -369,7 +367,7 @@ void test_special_cases()
    BOOST_CHECK_EQUAL(good_type(test_type(-a + -b)), good_type(-ga + -gb));
    BOOST_CHECK_EQUAL(good_type(test_type(-b + -a)), good_type(-gb + -ga));
 
-   b = ldexp(test_type(0.5), -std::numeric_limits<test_type>::digits);
+   b  = ldexp(test_type(0.5), -std::numeric_limits<test_type>::digits);
    gb = ldexp(good_type(0.5), -std::numeric_limits<good_type>::digits);
    BOOST_CHECK_EQUAL(good_type(test_type(a - b)), good_type(ga - gb));
    BOOST_CHECK_EQUAL(good_type(test_type(b - a)), good_type(gb - ga));
@@ -391,7 +389,7 @@ void test_special_cases()
    BOOST_CHECK_EQUAL(good_type(test_type(-a + -b)), good_type(-ga + -gb));
    BOOST_CHECK_EQUAL(good_type(test_type(-b + -a)), good_type(-gb + -ga));
 
-   b = ldexp(test_type(1), -std::numeric_limits<test_type>::digits);
+   b  = ldexp(test_type(1), -std::numeric_limits<test_type>::digits);
    gb = ldexp(good_type(1), -std::numeric_limits<good_type>::digits);
    BOOST_CHECK_EQUAL(good_type(test_type(a - b)), good_type(ga - gb));
    BOOST_CHECK_EQUAL(good_type(test_type(b - a)), good_type(gb - ga));
@@ -413,7 +411,7 @@ void test_special_cases()
    BOOST_CHECK_EQUAL(good_type(test_type(-a + -b)), good_type(-ga + -gb));
    BOOST_CHECK_EQUAL(good_type(test_type(-b + -a)), good_type(-gb + -ga));
 
-   b = ldexp(test_type(0.50000000001), -std::numeric_limits<test_type>::digits);
+   b  = ldexp(test_type(0.50000000001), -std::numeric_limits<test_type>::digits);
    gb = ldexp(good_type(0.50000000001), -std::numeric_limits<good_type>::digits);
    BOOST_CHECK_EQUAL(good_type(test_type(a - b)), good_type(ga - gb));
    BOOST_CHECK_EQUAL(good_type(test_type(b - a)), good_type(gb - ga));
@@ -435,7 +433,7 @@ void test_special_cases()
    BOOST_CHECK_EQUAL(good_type(test_type(-a + -b)), good_type(-ga + -gb));
    BOOST_CHECK_EQUAL(good_type(test_type(-b + -a)), good_type(-gb + -ga));
 
-   a = a + ldexp(a, -20);
+   a  = a + ldexp(a, -20);
    ga = ga + ldexp(ga, -20);
    BOOST_CHECK_EQUAL(good_type(test_type(a - b)), good_type(ga - gb));
    BOOST_CHECK_EQUAL(good_type(test_type(b - a)), good_type(gb - ga));
@@ -457,7 +455,7 @@ void test_special_cases()
    BOOST_CHECK_EQUAL(good_type(test_type(-a + -b)), good_type(-ga + -gb));
    BOOST_CHECK_EQUAL(good_type(test_type(-b + -a)), good_type(-gb + -ga));
 
-   b = ldexp(test_type(0.5), -std::numeric_limits<test_type>::digits);
+   b  = ldexp(test_type(0.5), -std::numeric_limits<test_type>::digits);
    gb = ldexp(good_type(0.5), -std::numeric_limits<good_type>::digits);
    BOOST_CHECK_EQUAL(good_type(test_type(a - b)), good_type(ga - gb));
    BOOST_CHECK_EQUAL(good_type(test_type(b - a)), good_type(gb - ga));
@@ -479,7 +477,7 @@ void test_special_cases()
    BOOST_CHECK_EQUAL(good_type(test_type(-a + -b)), good_type(-ga + -gb));
    BOOST_CHECK_EQUAL(good_type(test_type(-b + -a)), good_type(-gb + -ga));
 
-   b = ldexp(test_type(1), -std::numeric_limits<test_type>::digits);
+   b  = ldexp(test_type(1), -std::numeric_limits<test_type>::digits);
    gb = ldexp(good_type(1), -std::numeric_limits<good_type>::digits);
    BOOST_CHECK_EQUAL(good_type(test_type(a - b)), good_type(ga - gb));
    BOOST_CHECK_EQUAL(good_type(test_type(b - a)), good_type(gb - ga));
@@ -501,7 +499,7 @@ void test_special_cases()
    BOOST_CHECK_EQUAL(good_type(test_type(-a + -b)), good_type(-ga + -gb));
    BOOST_CHECK_EQUAL(good_type(test_type(-b + -a)), good_type(-gb + -ga));
 
-   b = ldexp(test_type(0.50000000001), -std::numeric_limits<test_type>::digits);
+   b  = ldexp(test_type(0.50000000001), -std::numeric_limits<test_type>::digits);
    gb = ldexp(good_type(0.50000000001), -std::numeric_limits<good_type>::digits);
    BOOST_CHECK_EQUAL(good_type(test_type(a - b)), good_type(ga - gb));
    BOOST_CHECK_EQUAL(good_type(test_type(b - a)), good_type(gb - ga));
@@ -523,8 +521,8 @@ void test_special_cases()
    BOOST_CHECK_EQUAL(good_type(test_type(-a + -b)), good_type(-ga + -gb));
    BOOST_CHECK_EQUAL(good_type(test_type(-b + -a)), good_type(-gb + -ga));
 
-   a = 1;
-   a = boost::math::float_prior(a);
+   a  = 1;
+   a  = boost::math::float_prior(a);
    ga = 1;
    ga = boost::math::float_prior(ga);
    BOOST_CHECK_EQUAL(good_type(test_type(a - b)), good_type(ga - gb));
@@ -547,7 +545,7 @@ void test_special_cases()
    BOOST_CHECK_EQUAL(good_type(test_type(-a + -b)), good_type(-ga + -gb));
    BOOST_CHECK_EQUAL(good_type(test_type(-b + -a)), good_type(-gb + -ga));
 
-   b = ldexp(test_type(0.5), -std::numeric_limits<test_type>::digits);
+   b  = ldexp(test_type(0.5), -std::numeric_limits<test_type>::digits);
    gb = ldexp(good_type(0.5), -std::numeric_limits<good_type>::digits);
    BOOST_CHECK_EQUAL(good_type(test_type(a - b)), good_type(ga - gb));
    BOOST_CHECK_EQUAL(good_type(test_type(b - a)), good_type(gb - ga));
@@ -569,7 +567,7 @@ void test_special_cases()
    BOOST_CHECK_EQUAL(good_type(test_type(-a + -b)), good_type(-ga + -gb));
    BOOST_CHECK_EQUAL(good_type(test_type(-b + -a)), good_type(-gb + -ga));
 
-   b = ldexp(test_type(1), -std::numeric_limits<test_type>::digits);
+   b  = ldexp(test_type(1), -std::numeric_limits<test_type>::digits);
    gb = ldexp(good_type(1), -std::numeric_limits<good_type>::digits);
    BOOST_CHECK_EQUAL(good_type(test_type(a - b)), good_type(ga - gb));
    BOOST_CHECK_EQUAL(good_type(test_type(b - a)), good_type(gb - ga));
@@ -591,7 +589,7 @@ void test_special_cases()
    BOOST_CHECK_EQUAL(good_type(test_type(-a + -b)), good_type(-ga + -gb));
    BOOST_CHECK_EQUAL(good_type(test_type(-b + -a)), good_type(-gb + -ga));
 
-   b = ldexp(test_type(0.50000000001), -std::numeric_limits<test_type>::digits);
+   b  = ldexp(test_type(0.50000000001), -std::numeric_limits<test_type>::digits);
    gb = ldexp(good_type(0.50000000001), -std::numeric_limits<good_type>::digits);
    BOOST_CHECK_EQUAL(good_type(test_type(a - b)), good_type(ga - gb));
    BOOST_CHECK_EQUAL(good_type(test_type(b - a)), good_type(gb - ga));
@@ -618,7 +616,7 @@ int main()
 {
    test_special_cases();
    unsigned error_count = 0;
-   for(unsigned i = 0; i < 100000; ++i)
+   for (unsigned i = 0; i < 100000; ++i)
    {
       good_type a = generate_random<good_type>();
       good_type b = generate_random<good_type>();
@@ -685,7 +683,7 @@ int main()
       BOOST_CHECK_EQUAL(test_type(a / ui), ta / ui);
       BOOST_CHECK_EQUAL(test_type(-a / ui), -ta / ui);
       // Error reporting:
-      if(boost::detail::test_errors() != error_count)
+      if (boost::detail::test_errors() != error_count)
       {
          error_count = boost::detail::test_errors();
          std::cout << std::setprecision(std::numeric_limits<test_type>::max_digits10) << std::scientific;
@@ -699,4 +697,3 @@ int main()
    }
    return boost::report_errors();
 }
-

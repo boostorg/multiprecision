@@ -9,15 +9,15 @@
 // in ACM TOMS, {VOL 37, ISSUE 4, (February 2011)} (C) ACM, 2011. http://doi.acm.org/10.1145/1916461.1916469
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <boost/detail/lightweight_test.hpp>
-#include <boost/array.hpp>
 #include "test.hpp"
+#include <boost/array.hpp>
+#include <boost/detail/lightweight_test.hpp>
 
-#include <boost/multiprecision/mpfr.hpp>
 #include <boost/multiprecision/gmp.hpp>
+#include <boost/multiprecision/mpfr.hpp>
 
 int main()
 {
@@ -25,9 +25,9 @@ int main()
    //
    // Test interconversions between GMP supported backends:
    //
-   mpf_t mpf;
-   mpz_t mpz;
-   mpq_t mpq;
+   mpf_t  mpf;
+   mpz_t  mpz;
+   mpq_t  mpq;
    mpfr_t mpfr;
    mpf_init2(mpf, 100);
    mpf_set_ui(mpf, 2u);
@@ -47,7 +47,7 @@ int main()
    BOOST_TEST(mpfr_float(mpfr) == 2);
    BOOST_TEST(mpfr_float_50(mpfr) == 2);
 
-   mpfr_float f0;
+   mpfr_float    f0;
    mpfr_float_50 f50;
    f0 = mpf;
    BOOST_TEST(f0 == 2);
@@ -72,26 +72,26 @@ int main()
    BOOST_TEST(f50 == 2);
 
    f50 = 4;
-   f0 = f50;
+   f0  = f50;
    BOOST_TEST(f0 == 4);
-   f0 = 3;
+   f0  = 3;
    f50 = f0;
    BOOST_TEST(f50 == 3);
    f50 = 4;
    BOOST_TEST(mpfr_float(f50) == 4);
    BOOST_TEST(mpfr_float_50(f0) == 3);
 
-   mpz_int iz(2);
+   mpz_int      iz(2);
    mpq_rational rat(2);
-   mpf_float gf(2);
+   mpf_float    gf(2);
    f50 = 3;
    f50 = iz;
    BOOST_TEST(f50 == 2);
    f50 = 3;
-   f0 = iz;
+   f0  = iz;
    BOOST_TEST(f0 == 2);
    f50 = 3;
-   f0 = gf;
+   f0  = gf;
    BOOST_TEST(f0 == 2);
    BOOST_TEST(mpfr_float(iz) == 2);
    BOOST_TEST(mpfr_float_50(iz) == 2);
@@ -105,9 +105,9 @@ int main()
    //
    mpfr_float::default_precision(30);
    f50 = 2;
-   mpfr_float_100   f100(3);
-   mpfr_float       f0a(4);
-   mpfr_float       f0b(f100);
+   mpfr_float_100 f100(3);
+   mpfr_float     f0a(4);
+   mpfr_float     f0b(f100);
    BOOST_TEST(f0a.precision() == 30);
    BOOST_TEST(f0b.precision() == 100);
    f0a = f100;
@@ -118,7 +118,7 @@ int main()
    BOOST_TEST(f100 == 2);
 
    f50 = static_cast<mpfr_float_50>(f100);
-   
+
    mpf_clear(mpf);
    mpz_clear(mpz);
    mpq_clear(mpq);
@@ -126,6 +126,3 @@ int main()
 
    return boost::report_errors();
 }
-
-
-

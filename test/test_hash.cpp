@@ -6,12 +6,12 @@
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/debug_adaptor.hpp>
 #include <boost/multiprecision/logged_adaptor.hpp>
 
@@ -34,21 +34,21 @@
 #include <boost/functional/hash.hpp>
 
 #include "test.hpp"
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 
 template <class T>
 void test()
 {
-   T val = 23;
-   std::size_t t1 = boost::hash<T>()(val);
+   T           val = 23;
+   std::size_t t1  = boost::hash<T>()(val);
    BOOST_CHECK(t1);
 
 #ifndef BOOST_NO_CXX11_HDR_FUNCTIONAL
    std::size_t t2 = std::hash<T>()(val);
    BOOST_CHECK_EQUAL(t1, t2);
 #endif
-   val = -23;
+   val            = -23;
    std::size_t t3 = boost::hash<T>()(val);
    BOOST_CHECK_NE(t1, t3);
 #ifndef BOOST_NO_CXX11_HDR_FUNCTIONAL
@@ -56,7 +56,6 @@ void test()
    BOOST_CHECK_EQUAL(t3, t2);
 #endif
 }
-
 
 int main()
 {
@@ -97,4 +96,3 @@ int main()
 
    return boost::report_errors();
 }
-

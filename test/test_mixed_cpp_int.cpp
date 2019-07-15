@@ -8,11 +8,11 @@
 //
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <boost/multiprecision/cpp_int.hpp>
 #include "test.hpp"
+#include <boost/multiprecision/cpp_int.hpp>
 
 template <class Number, class BigNumber>
 void test()
@@ -30,7 +30,7 @@ void test()
    multiply(r, h, h);
    BOOST_CHECK_EQUAL(r, cpp_int(h) * cpp_int(h));
 
-   if(std::numeric_limits<test_type>::is_signed)
+   if (std::numeric_limits<test_type>::is_signed)
    {
       subtract(r, l, h);
       BOOST_CHECK_EQUAL(r, cpp_int(l) - cpp_int(h));
@@ -43,10 +43,16 @@ void test()
    //
    // Try again with integer types as the source:
    //
-   enum{ max_digits = std::numeric_limits<test_type>::is_signed ? std::numeric_limits<long long>::digits : std::numeric_limits<unsigned long long>::digits };
-   enum{ require_digits = std::numeric_limits<test_type>::digits <= 2 * max_digits ? std::numeric_limits<test_type>::digits / 2 : max_digits };
-   typedef typename boost::uint_t<require_digits>::least uint_least;
-   typedef typename boost::int_t<require_digits>::least  int_least;
+   enum
+   {
+      max_digits = std::numeric_limits<test_type>::is_signed ? std::numeric_limits<long long>::digits : std::numeric_limits<unsigned long long>::digits
+   };
+   enum
+   {
+      require_digits = std::numeric_limits<test_type>::digits <= 2 * max_digits ? std::numeric_limits<test_type>::digits / 2 : max_digits
+   };
+   typedef typename boost::uint_t<require_digits>::least                                                     uint_least;
+   typedef typename boost::int_t<require_digits>::least                                                      int_least;
    typedef typename boost::mpl::if_c<std::numeric_limits<test_type>::is_signed, int_least, uint_least>::type i_type;
 
    i_type ih = (std::numeric_limits<i_type>::max)();
@@ -58,7 +64,7 @@ void test()
    multiply(r, ih, ih);
    BOOST_CHECK_EQUAL(r, cpp_int(ih) * cpp_int(ih));
 
-   if(std::numeric_limits<test_type>::is_signed)
+   if (std::numeric_limits<test_type>::is_signed)
    {
       subtract(r, il, ih);
       BOOST_CHECK_EQUAL(r, cpp_int(il) - cpp_int(ih));
@@ -72,7 +78,7 @@ void test()
 void test_rational_mixed()
 {
    using namespace boost::multiprecision;
-   cpp_int a(2);
+   cpp_int      a(2);
    cpp_rational r(10);
 
    BOOST_CHECK_EQUAL(a + -r, -8);
@@ -114,6 +120,3 @@ int main()
 
    return boost::report_errors();
 }
-
-
-

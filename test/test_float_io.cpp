@@ -6,16 +6,15 @@
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#if !defined(TEST_MPF_50) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR_50) \
-      && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128)
-#  define TEST_MPF_50
-#  define TEST_CPP_DEC_FLOAT
-#  define TEST_MPFR_50
-#  define TEST_MPFI_50
-#  define TEST_FLOAT128
+#if !defined(TEST_MPF_50) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128)
+#define TEST_MPF_50
+#define TEST_CPP_DEC_FLOAT
+#define TEST_MPFR_50
+#define TEST_MPFI_50
+#define TEST_FLOAT128
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -42,43 +41,50 @@
 #include <boost/multiprecision/float128.hpp>
 #endif
 
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_int.hpp>
 #include "test.hpp"
 #include <boost/array.hpp>
-#include <iostream>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int.hpp>
 #include <iomanip>
+#include <iostream>
 
 #ifdef BOOST_MSVC
-#pragma warning(disable:4127)
+#pragma warning(disable : 4127)
 #endif
 
 #if defined(TEST_MPF_50)
 template <unsigned N, boost::multiprecision::expression_template_option ET>
 bool has_bad_bankers_rounding(const boost::multiprecision::number<boost::multiprecision::gmp_float<N>, ET>&)
-{  return true;  }
+{
+   return true;
+}
 #endif
 #if defined(TEST_FLOAT128) && defined(BOOST_INTEL)
 bool has_bad_bankers_rounding(const boost::multiprecision::float128&)
-{  return true;  }
+{
+   return true;
+}
 #endif
 template <class T>
-bool has_bad_bankers_rounding(const T&) { return false; }
+bool has_bad_bankers_rounding(const T&)
+{
+   return false;
+}
 
 bool is_bankers_rounding_error(const std::string& s, const char* expect)
 {
    // This check isn't foolproof: that would require *much* more sophisticated code!!!
    std::string::size_type l = std::strlen(expect);
-   if(l != s.size())
+   if (l != s.size())
       return false;
    std::string::size_type len = s.find('e');
-   if(len == std::string::npos)
+   if (len == std::string::npos)
       len = l - 1;
    else
       --len;
-   if(s.compare(0, len, expect, len))
+   if (s.compare(0, len, expect, len))
       return false;
-   if(s[len] != expect[len] + 1)
+   if (s[len] != expect[len] + 1)
       return false;
    return true;
 }
@@ -86,51 +92,48 @@ bool is_bankers_rounding_error(const std::string& s, const char* expect)
 void print_flags(std::ios_base::fmtflags f)
 {
    std::cout << "Formatting flags were: ";
-   if(f & std::ios_base::scientific)
+   if (f & std::ios_base::scientific)
       std::cout << "scientific ";
-   if(f & std::ios_base::fixed)
+   if (f & std::ios_base::fixed)
       std::cout << "fixed ";
-   if(f & std::ios_base::showpoint)
+   if (f & std::ios_base::showpoint)
       std::cout << "showpoint ";
-   if(f & std::ios_base::showpos)
+   if (f & std::ios_base::showpos)
       std::cout << "showpos ";
    std::cout << std::endl;
 }
 
-
 template <class T>
 void test()
 {
-   typedef T mp_t;
-   boost::array<std::ios_base::fmtflags, 9> f = 
-   {{
-      std::ios_base::fmtflags(0), std::ios_base::showpoint, std::ios_base::showpos, std::ios_base::scientific, std::ios_base::scientific|std::ios_base::showpos,
-      std::ios_base::scientific|std::ios_base::showpoint, std::ios_base::fixed, std::ios_base::fixed|std::ios_base::showpoint,
-      std::ios_base::fixed|std::ios_base::showpos
-   }};
+   typedef T                                mp_t;
+   boost::array<std::ios_base::fmtflags, 9> f =
+       {{std::ios_base::fmtflags(0), std::ios_base::showpoint, std::ios_base::showpos, std::ios_base::scientific, std::ios_base::scientific | std::ios_base::showpos,
+         std::ios_base::scientific | std::ios_base::showpoint, std::ios_base::fixed, std::ios_base::fixed | std::ios_base::showpoint,
+         std::ios_base::fixed | std::ios_base::showpos}};
 
    boost::array<boost::array<const char*, 13 * 9>, 40> string_data = {{
 #include "libs/multiprecision/test/string_data.ipp"
    }};
 
-   double num = 123456789.0;
+   double num   = 123456789.0;
    double denom = 1;
-   double val = num;
-   for(unsigned j = 0; j < 40; ++j)
+   double val   = num;
+   for (unsigned j = 0; j < 40; ++j)
    {
       unsigned col = 0;
-      for(unsigned prec = 1; prec < 14; ++prec)
+      for (unsigned prec = 1; prec < 14; ++prec)
       {
-         for(unsigned i = 0; i < f.size(); ++i, ++col)
+         for (unsigned i = 0; i < f.size(); ++i, ++col)
          {
             std::stringstream ss;
             ss.precision(prec);
             ss.flags(f[i]);
             ss << mp_t(val);
             const char* expect = string_data[j][col];
-            if(ss.str() != expect)
+            if (ss.str() != expect)
             {
-               if(has_bad_bankers_rounding(mp_t()) && is_bankers_rounding_error(ss.str(), expect))
+               if (has_bad_bankers_rounding(mp_t()) && is_bankers_rounding_error(ss.str(), expect))
                {
                   std::cout << "Ignoring bankers-rounding error with GMP mp_f.\n";
                }
@@ -148,26 +151,26 @@ void test()
          }
       }
       num = -num;
-      if(j & 1)
+      if (j & 1)
          denom *= 8;
       val = num / denom;
    }
 
-   boost::array<const char*, 13 * 9> zeros = 
-       {{ "0", "0.", "+0", "0.0e+00", "+0.0e+00", "0.0e+00", "0.0", "0.0", "+0.0", "0", "0.0", "+0", "0.00e+00", "+0.00e+00", "0.00e+00", "0.00", "0.00", "+0.00", "0", "0.00", "+0", "0.000e+00", "+0.000e+00", "0.000e+00", "0.000", "0.000", "+0.000", "0", "0.000", "+0", "0.0000e+00", "+0.0000e+00", "0.0000e+00", "0.0000", "0.0000", "+0.0000", "0", "0.0000", "+0", "0.00000e+00", "+0.00000e+00", "0.00000e+00", "0.00000", "0.00000", "+0.00000", "0", "0.00000", "+0", "0.000000e+00", "+0.000000e+00", "0.000000e+00", "0.000000", "0.000000", "+0.000000", "0", "0.000000", "+0", "0.0000000e+00", "+0.0000000e+00", "0.0000000e+00", "0.0000000", "0.0000000", "+0.0000000", "0", "0.0000000", "+0", "0.00000000e+00", "+0.00000000e+00", "0.00000000e+00", "0.00000000", "0.00000000", "+0.00000000", "0", "0.00000000", "+0", "0.000000000e+00", "+0.000000000e+00", "0.000000000e+00", "0.000000000", "0.000000000", "+0.000000000", "0", "0.000000000", "+0", "0.0000000000e+00", "+0.0000000000e+00", "0.0000000000e+00", "0.0000000000", "0.0000000000", "+0.0000000000", "0", "0.0000000000", "+0", "0.00000000000e+00", "+0.00000000000e+00", "0.00000000000e+00", "0.00000000000", "0.00000000000", "+0.00000000000", "0", "0.00000000000", "+0", "0.000000000000e+00", "+0.000000000000e+00", "0.000000000000e+00", "0.000000000000", "0.000000000000", "+0.000000000000", "0", "0.000000000000", "+0", "0.0000000000000e+00", "+0.0000000000000e+00", "0.0000000000000e+00", "0.0000000000000", "0.0000000000000", "+0.0000000000000"  }};
+   boost::array<const char*, 13 * 9> zeros =
+       {{"0", "0.", "+0", "0.0e+00", "+0.0e+00", "0.0e+00", "0.0", "0.0", "+0.0", "0", "0.0", "+0", "0.00e+00", "+0.00e+00", "0.00e+00", "0.00", "0.00", "+0.00", "0", "0.00", "+0", "0.000e+00", "+0.000e+00", "0.000e+00", "0.000", "0.000", "+0.000", "0", "0.000", "+0", "0.0000e+00", "+0.0000e+00", "0.0000e+00", "0.0000", "0.0000", "+0.0000", "0", "0.0000", "+0", "0.00000e+00", "+0.00000e+00", "0.00000e+00", "0.00000", "0.00000", "+0.00000", "0", "0.00000", "+0", "0.000000e+00", "+0.000000e+00", "0.000000e+00", "0.000000", "0.000000", "+0.000000", "0", "0.000000", "+0", "0.0000000e+00", "+0.0000000e+00", "0.0000000e+00", "0.0000000", "0.0000000", "+0.0000000", "0", "0.0000000", "+0", "0.00000000e+00", "+0.00000000e+00", "0.00000000e+00", "0.00000000", "0.00000000", "+0.00000000", "0", "0.00000000", "+0", "0.000000000e+00", "+0.000000000e+00", "0.000000000e+00", "0.000000000", "0.000000000", "+0.000000000", "0", "0.000000000", "+0", "0.0000000000e+00", "+0.0000000000e+00", "0.0000000000e+00", "0.0000000000", "0.0000000000", "+0.0000000000", "0", "0.0000000000", "+0", "0.00000000000e+00", "+0.00000000000e+00", "0.00000000000e+00", "0.00000000000", "0.00000000000", "+0.00000000000", "0", "0.00000000000", "+0", "0.000000000000e+00", "+0.000000000000e+00", "0.000000000000e+00", "0.000000000000", "0.000000000000", "+0.000000000000", "0", "0.000000000000", "+0", "0.0000000000000e+00", "+0.0000000000000e+00", "0.0000000000000e+00", "0.0000000000000", "0.0000000000000", "+0.0000000000000"}};
 
    unsigned col = 0;
-   val = 0;
-   for(unsigned prec = 1; prec < 14; ++prec)
+   val          = 0;
+   for (unsigned prec = 1; prec < 14; ++prec)
    {
-      for(unsigned i = 0; i < f.size(); ++i, ++col)
+      for (unsigned i = 0; i < f.size(); ++i, ++col)
       {
          std::stringstream ss;
          ss.precision(prec);
          ss.flags(f[i]);
          ss << mp_t(val);
          const char* expect = zeros[col];
-         if(ss.str() != expect)
+         if (ss.str() != expect)
          {
             std::cout << std::setprecision(20) << "Testing value " << val << std::endl;
             print_flags(f[i]);
@@ -180,7 +183,7 @@ void test()
       }
    }
 
-   if(std::numeric_limits<mp_t>::has_infinity)
+   if (std::numeric_limits<mp_t>::has_infinity)
    {
       T val = std::numeric_limits<T>::infinity();
       BOOST_CHECK_EQUAL(val.str(), "inf");
@@ -196,7 +199,7 @@ void test()
       val = static_cast<T>("-inf");
       BOOST_CHECK_EQUAL(val, -std::numeric_limits<T>::infinity());
    }
-   if(std::numeric_limits<mp_t>::has_quiet_NaN)
+   if (std::numeric_limits<mp_t>::has_quiet_NaN)
    {
       T val = std::numeric_limits<T>::quiet_NaN();
       BOOST_CHECK_EQUAL(val.str(), "nan");
@@ -218,10 +221,10 @@ template <class T>
 T generate_random()
 {
    typedef typename T::backend_type::exponent_type e_type;
-   static boost::random::mt19937 gen;
-   T val = gen();
-   T prev_val = -1;
-   while(val != prev_val)
+   static boost::random::mt19937                   gen;
+   T                                               val      = gen();
+   T                                               prev_val = -1;
+   while (val != prev_val)
    {
       val *= (gen.max)();
       prev_val = val;
@@ -283,20 +286,20 @@ void do_round_trip(const T& val)
 {
    do_round_trip(val, std::ios_base::fmtflags(0));
    do_round_trip(val, std::ios_base::fmtflags(std::ios_base::scientific));
-   if((fabs(val) > 1) && (fabs(val) < 1e100))
+   if ((fabs(val) > 1) && (fabs(val) < 1e100))
       do_round_trip(val, std::ios_base::fmtflags(std::ios_base::fixed));
 }
 
 template <class T>
 void test_round_trip()
 {
-   for(unsigned i = 0; i < 1000; ++i)
+   for (unsigned i = 0; i < 1000; ++i)
    {
       T val = generate_random<T>();
       do_round_trip(val);
       do_round_trip(T(-val));
-      do_round_trip(T(1/val));
-      do_round_trip(T(-1/val));
+      do_round_trip(T(1 / val));
+      do_round_trip(T(-1 / val));
    }
 }
 
@@ -319,10 +322,9 @@ void test_hexadecimal_floating_point()
 
    // hexadecimal representation of pi; test a round trip:
    float128 pi1 = 0x1.921fb54442d18469898cc51701b8p+1Q;
-   s = pi1.str(0, std::ios_base::fmtflags(std::ios_base::floatfield));
+   s            = pi1.str(0, std::ios_base::fmtflags(std::ios_base::floatfield));
    float128 pi2(s);
    BOOST_CHECK_EQUAL(pi1, pi2);
-
 }
 #endif
 
@@ -345,7 +347,7 @@ int main()
 #ifdef TEST_CPP_DEC_FLOAT
    test<boost::multiprecision::cpp_dec_float_50>();
    test<boost::multiprecision::cpp_dec_float_100>();
-   
+
    // cpp_dec_float has extra guard digits that messes this up:
    test_round_trip<boost::multiprecision::cpp_dec_float_50>();
    test_round_trip<boost::multiprecision::cpp_dec_float_100>();
@@ -369,4 +371,3 @@ int main()
 #endif
    return boost::report_errors();
 }
-

@@ -4,17 +4,16 @@
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <boost/multiprecision/gmp.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
-#include <boost/multiprecision/miller_rabin.hpp>
-#include <boost/math/special_functions/prime.hpp>
-#include <iostream>
-#include <iomanip>
 #include "test.hpp"
-
+#include <boost/math/special_functions/prime.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/gmp.hpp>
+#include <boost/multiprecision/miller_rabin.hpp>
+#include <iomanip>
+#include <iostream>
 
 template <class I>
 void test()
@@ -31,10 +30,10 @@ void test()
 
    typedef I test_type;
 
-   static const unsigned test_bits = 
-      std::numeric_limits<test_type>::digits && (std::numeric_limits<test_type>::digits <= 256)
-      ? std::numeric_limits<test_type>::digits
-      : 128;
+   static const unsigned test_bits =
+       std::numeric_limits<test_type>::digits && (std::numeric_limits<test_type>::digits <= 256)
+           ? std::numeric_limits<test_type>::digits
+           : 128;
 
    independent_bits_engine<mt11213b, test_bits, test_type> gen;
    //
@@ -47,7 +46,7 @@ void test()
    //
    // Begin by testing the primes in our table as all these should return true:
    //
-   for(unsigned i = 1; i < boost::math::max_prime; ++i)
+   for (unsigned i = 1; i < boost::math::max_prime; ++i)
    {
       BOOST_TEST(miller_rabin_test(test_type(boost::math::prime(i)), 25, gen));
       BOOST_TEST(mpz_probab_prime_p(mpz_int(boost::math::prime(i)).backend().data(), 25));
@@ -55,16 +54,16 @@ void test()
    //
    // Now test some random values and compare GMP's native routine with ours.
    //
-   for(unsigned i = 0; i < 10000; ++i)
+   for (unsigned i = 0; i < 10000; ++i)
    {
-      test_type n = gen();
-      bool is_prime_boost = miller_rabin_test(n, 25, gen2);
-      bool is_gmp_prime = mpz_probab_prime_p(mpz_int(n).backend().data(), 25) ? true : false;
-      if(is_prime_boost && is_gmp_prime)
+      test_type n              = gen();
+      bool      is_prime_boost = miller_rabin_test(n, 25, gen2);
+      bool      is_gmp_prime   = mpz_probab_prime_p(mpz_int(n).backend().data(), 25) ? true : false;
+      if (is_prime_boost && is_gmp_prime)
       {
          std::cout << "We have a prime: " << std::hex << std::showbase << n << std::endl;
       }
-      if(is_prime_boost != is_gmp_prime)
+      if (is_prime_boost != is_gmp_prime)
          std::cout << std::hex << std::showbase << "n = " << n << std::endl;
       BOOST_CHECK_EQUAL(is_prime_boost, is_gmp_prime);
    }
@@ -86,5 +85,3 @@ int main()
 
    return boost::report_errors();
 }
-
-

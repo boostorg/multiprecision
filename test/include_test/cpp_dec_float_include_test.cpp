@@ -11,5 +11,3 @@ int main()
 {
    cpp_dec_float<50> a;
 }
-
-

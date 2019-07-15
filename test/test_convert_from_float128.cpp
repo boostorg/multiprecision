@@ -4,15 +4,15 @@
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
 #ifdef HAS_FLOAT128
 
+#include "test.hpp"
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
-#include "test.hpp"
 
 #if defined(HAS_GMP)
 #include <boost/multiprecision/gmp.hpp>
@@ -32,22 +32,20 @@
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
-
 using namespace boost::multiprecision;
 
 #ifdef BOOST_MSVC
-#pragma warning(disable:4127)
+#pragma warning(disable : 4127)
 #endif
-
 
 template <class T>
 T generate_random()
 {
-   typedef int e_type;
+   typedef int                   e_type;
    static boost::random::mt19937 gen;
-   T val = gen();
-   T prev_val = -1;
-   while(val != prev_val)
+   T                             val      = gen();
+   T                             prev_val = -1;
+   while (val != prev_val)
    {
       val *= (gen.max)();
       prev_val = val;
@@ -77,14 +75,14 @@ void test_convert_neg_int(From const&, const boost::mpl::false_&)
 template <class From, class To>
 void test_convert_imp(boost::mpl::int_<number_kind_floating_point> const&, boost::mpl::int_<number_kind_integer> const&)
 {
-   for(unsigned i = 0; i < 100; ++i)
+   for (unsigned i = 0; i < 100; ++i)
    {
       From from = generate_random<From>();
-      To t1(from);
-      To t2 = from.template convert_to<To>();
+      To   t1(from);
+      To   t2 = from.template convert_to<To>();
       BOOST_CHECK_EQUAL(From(trunc(from)), From(t1));
       BOOST_CHECK_EQUAL(From(trunc(from)), From(t2));
-      test_convert_neg_int<From, To>(from, boost::mpl::bool_<std::numeric_limits<From>::is_signed && std::numeric_limits<To>::is_signed>());
+      test_convert_neg_int<From, To>(from, boost::mpl::bool_ < std::numeric_limits<From>::is_signed && std::numeric_limits<To>::is_signed > ());
    }
 }
 
@@ -105,14 +103,14 @@ void test_convert_rat_int(From const&, const boost::mpl::false_&)
 template <class From, class To>
 void test_convert_imp(boost::mpl::int_<number_kind_floating_point> const&, boost::mpl::int_<number_kind_rational> const&)
 {
-   for(unsigned i = 0; i < 100; ++i)
+   for (unsigned i = 0; i < 100; ++i)
    {
       From from = generate_random<From>();
-      To t1(from);
-      To t2 = from.template convert_to<To>();
+      To   t1(from);
+      To   t2 = from.template convert_to<To>();
       BOOST_CHECK_EQUAL(From(t1), from);
       BOOST_CHECK_EQUAL(From(t2), from);
-      test_convert_neg_rat<From, To>(from, boost::mpl::bool_<std::numeric_limits<From>::is_signed && std::numeric_limits<To>::is_signed>());
+      test_convert_neg_rat<From, To>(from, boost::mpl::bool_ < std::numeric_limits<From>::is_signed && std::numeric_limits<To>::is_signed > ());
    }
 }
 
@@ -135,16 +133,16 @@ void test_convert_neg_float(From const&, const boost::mpl::false_&)
 template <class From, class To>
 void test_convert_imp(boost::mpl::int_<number_kind_floating_point> const&, boost::mpl::int_<number_kind_floating_point> const&)
 {
-   for(unsigned i = 0; i < 100; ++i)
+   for (unsigned i = 0; i < 100; ++i)
    {
       From from = generate_random<From>();
-      To t1(from);
-      To t2 = from.template convert_to<To>();
-      To answer(from.str());
-      To tol = (std::max)(std::numeric_limits<To>::epsilon(), To(std::numeric_limits<From>::epsilon())) * 2;
+      To   t1(from);
+      To   t2 = from.template convert_to<To>();
+      To   answer(from.str());
+      To   tol = (std::max)(std::numeric_limits<To>::epsilon(), To(std::numeric_limits<From>::epsilon())) * 2;
       BOOST_CHECK_CLOSE_FRACTION(t1, answer, tol);
       BOOST_CHECK_CLOSE_FRACTION(t2, answer, tol);
-      test_convert_neg_float<From, To>(from, boost::mpl::bool_<std::numeric_limits<From>::is_signed && std::numeric_limits<To>::is_signed>());
+      test_convert_neg_float<From, To>(from, boost::mpl::bool_ < std::numeric_limits<From>::is_signed && std::numeric_limits<To>::is_signed > ());
    }
 }
 
@@ -153,7 +151,6 @@ void test_convert()
 {
    test_convert_imp<From, To>(typename number_category<From>::type(), typename number_category<To>::type());
 }
-
 
 int main()
 {
@@ -168,11 +165,9 @@ int main()
    BOOST_CHECK((std::numeric_limits<float128>::infinity)() > 0);
    BOOST_CHECK((boost::math::isnan)((std::numeric_limits<float128>::quiet_NaN)()));
 
-
    test_convert<float128, cpp_int>();
    test_convert<float128, int128_t>();
    test_convert<float128, uint128_t>();
-
 
    test_convert<float128, cpp_rational>();
 

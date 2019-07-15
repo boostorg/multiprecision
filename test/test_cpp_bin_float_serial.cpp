@@ -8,17 +8,16 @@
 //
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <boost/multiprecision/cpp_bin_float.hpp>
 #include "test_float_serial.hpp"
+#include <boost/multiprecision/cpp_bin_float.hpp>
 
 #if !defined(TEST1) && !defined(TEST2)
-#  define TEST1
-#  define TEST2
+#define TEST1
+#define TEST2
 #endif
-
 
 int main()
 {
@@ -31,6 +30,3 @@ int main()
 #endif
    return boost::report_errors();
 }
-
-
-

@@ -6,33 +6,33 @@
 #ifndef BOOST_MATH_FLOAT_BACKEND_HPP
 #define BOOST_MATH_FLOAT_BACKEND_HPP
 
-#include <iostream>
-#include <iomanip>
-#include <sstream>
+#include <boost/container_hash/hash.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/integer/common_factor_rt.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/math/concepts/real_concept.hpp>
 #include <boost/multiprecision/number.hpp>
-#include <boost/integer/common_factor_rt.hpp>
 #include <boost/type_traits/common_type.hpp>
-#include <boost/container_hash/hash.hpp>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 
-namespace boost{
-namespace multiprecision{
-namespace backends{
+namespace boost {
+namespace multiprecision {
+namespace backends {
 
 #ifdef BOOST_MSVC
-#  pragma warning(push)
-#  pragma warning(disable:4389 4244 4018 4244 4127)
+#pragma warning(push)
+#pragma warning(disable : 4389 4244 4018 4244 4127)
 #endif
 
 template <class Arithmetic>
 struct arithmetic_backend
 {
-   typedef mpl::list<short, int, long, long long>                                      signed_types;
-   typedef mpl::list<unsigned short, unsigned, unsigned long, unsigned long long>      unsigned_types;
-   typedef mpl::list<float, double, long double>                                       float_types;
-   typedef int                                                                         exponent_type;
+   typedef mpl::list<short, int, long, long long>                                 signed_types;
+   typedef mpl::list<unsigned short, unsigned, unsigned long, unsigned long long> unsigned_types;
+   typedef mpl::list<float, double, long double>                                  float_types;
+   typedef int                                                                    exponent_type;
 
    arithmetic_backend()
    {
@@ -46,24 +46,24 @@ struct arithmetic_backend
    arithmetic_backend(const A& o, const typename enable_if<is_arithmetic<A> >::type* = 0) : m_value(o) {}
    template <class A>
    arithmetic_backend(const arithmetic_backend<A>& o) : m_value(o.data()) {}
-   arithmetic_backend& operator = (const arithmetic_backend& o)
+   arithmetic_backend& operator=(const arithmetic_backend& o)
    {
       m_value = o.m_value;
       return *this;
    }
    template <class A>
-   typename enable_if<is_arithmetic<A>, arithmetic_backend&>::type operator = (A i)
+   typename enable_if<is_arithmetic<A>, arithmetic_backend&>::type operator=(A i)
    {
       m_value = i;
       return *this;
    }
    template <class A>
-   arithmetic_backend& operator = (const arithmetic_backend<A>& i)
+   arithmetic_backend& operator=(const arithmetic_backend<A>& i)
    {
       m_value = i.data();
       return *this;
    }
-   arithmetic_backend& operator = (const char* s)
+   arithmetic_backend& operator=(const char* s)
    {
 #ifndef BOOST_NO_EXCEPTIONS
       try
@@ -72,7 +72,7 @@ struct arithmetic_backend
          m_value = boost::lexical_cast<Arithmetic>(s);
 #ifndef BOOST_NO_EXCEPTIONS
       }
-      catch(const bad_lexical_cast&)
+      catch (const bad_lexical_cast&)
       {
          throw std::runtime_error(std::string("Unable to interpret the string provided: \"") + s + std::string("\" as a compatible number type."));
       }
@@ -83,7 +83,7 @@ struct arithmetic_backend
    {
       std::swap(m_value, o.m_value);
    }
-   std::string str(std::streamsize digits, std::ios_base::fmtflags f)const
+   std::string str(std::streamsize digits, std::ios_base::fmtflags f) const
    {
       std::stringstream ss;
       ss.flags(f);
@@ -102,18 +102,19 @@ struct arithmetic_backend
    {
       do_negate(is_unsigned<Arithmetic>());
    }
-   int compare(const arithmetic_backend& o)const
+   int compare(const arithmetic_backend& o) const
    {
       return m_value > o.m_value ? 1 : (m_value < o.m_value ? -1 : 0);
    }
    template <class A>
-   typename enable_if<is_arithmetic<A>, int>::type compare(A i)const
+   typename enable_if<is_arithmetic<A>, int>::type compare(A i) const
    {
       return m_value > static_cast<Arithmetic>(i) ? 1 : (m_value < static_cast<Arithmetic>(i) ? -1 : 0);
    }
-   Arithmetic& data() { return m_value; }
-   const Arithmetic& data()const { return m_value; }
-private:
+   Arithmetic&       data() { return m_value; }
+   const Arithmetic& data() const { return m_value; }
+
+ private:
    Arithmetic m_value;
 };
 
@@ -121,9 +122,9 @@ template <class R, class Arithmetic>
 inline typename enable_if_c<boost::is_integral<R>::value>::type eval_convert_to(R* result, const arithmetic_backend<Arithmetic>& backend)
 {
    typedef typename boost::common_type<R, Arithmetic>::type c_type;
-   static const c_type max = static_cast<c_type>((std::numeric_limits<R>::max)());
-   static const c_type min = static_cast<c_type>((std::numeric_limits<R>::min)());
-   c_type ct = static_cast<c_type>(backend.data());
+   static const c_type                                      max = static_cast<c_type>((std::numeric_limits<R>::max)());
+   static const c_type                                      min = static_cast<c_type>((std::numeric_limits<R>::min)());
+   c_type                                                   ct  = static_cast<c_type>(backend.data());
    if ((backend.data() < 0) && !std::numeric_limits<R>::is_signed)
       BOOST_THROW_EXCEPTION(std::range_error("Attempt to convert negative number to unsigned type."));
    if (ct > max)
@@ -194,7 +195,7 @@ inline typename enable_if_c<std::numeric_limits<Arithmetic>::has_infinity>::type
 template <class Arithmetic>
 inline typename disable_if_c<std::numeric_limits<Arithmetic>::has_infinity>::type eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& o)
 {
-   if(!o.data())
+   if (!o.data())
       BOOST_THROW_EXCEPTION(std::overflow_error("Divide by zero"));
    result.data() /= o.data();
 }
@@ -216,15 +217,15 @@ inline typename enable_if<is_arithmetic<A2> >::type eval_multiply(arithmetic_bac
 }
 template <class Arithmetic, class A2>
 inline typename enable_if_c<(is_arithmetic<A2>::value && !std::numeric_limits<Arithmetic>::has_infinity)>::type
-   eval_divide(arithmetic_backend<Arithmetic>& result, const A2& o)
+eval_divide(arithmetic_backend<Arithmetic>& result, const A2& o)
 {
-   if(!o)
+   if (!o)
       BOOST_THROW_EXCEPTION(std::overflow_error("Divide by zero"));
    result.data() /= o;
 }
 template <class Arithmetic, class A2>
 inline typename enable_if_c<(is_arithmetic<A2>::value && std::numeric_limits<Arithmetic>::has_infinity)>::type
-   eval_divide(arithmetic_backend<Arithmetic>& result, const A2& o)
+eval_divide(arithmetic_backend<Arithmetic>& result, const A2& o)
 {
    result.data() /= o;
 }
@@ -252,7 +253,7 @@ inline typename enable_if_c<std::numeric_limits<Arithmetic>::has_infinity>::type
 template <class Arithmetic>
 inline typename disable_if_c<std::numeric_limits<Arithmetic>::has_infinity>::type eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const arithmetic_backend<Arithmetic>& b)
 {
-   if(!b.data())
+   if (!b.data())
       BOOST_THROW_EXCEPTION(std::overflow_error("Divide by zero"));
    result.data() = a.data() / b.data();
 }
@@ -274,15 +275,15 @@ inline typename enable_if<is_arithmetic<A2> >::type eval_multiply(arithmetic_bac
 }
 template <class Arithmetic, class A2>
 inline typename enable_if_c<(is_arithmetic<A2>::value && !std::numeric_limits<Arithmetic>::has_infinity)>::type
-   eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
+eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
 {
-   if(!b)
+   if (!b)
       BOOST_THROW_EXCEPTION(std::overflow_error("Divide by zero"));
    result.data() = a.data() / b;
 }
 template <class Arithmetic, class A2>
 inline typename enable_if_c<(is_arithmetic<A2>::value && std::numeric_limits<Arithmetic>::has_infinity)>::type
-   eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
+eval_divide(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& a, const A2& b)
 {
    result.data() = a.data() / b;
 }
@@ -295,17 +296,15 @@ inline bool eval_is_zero(const arithmetic_backend<Arithmetic>& val)
 
 template <class Arithmetic>
 inline typename enable_if_c<
-      (!std::numeric_limits<Arithmetic>::is_specialized
-      || std::numeric_limits<Arithmetic>::is_signed), int>::type
-   eval_get_sign(const arithmetic_backend<Arithmetic>& val)
+    (!std::numeric_limits<Arithmetic>::is_specialized || std::numeric_limits<Arithmetic>::is_signed), int>::type
+eval_get_sign(const arithmetic_backend<Arithmetic>& val)
 {
    return val.data() == 0 ? 0 : val.data() < 0 ? -1 : 1;
 }
 template <class Arithmetic>
 inline typename disable_if_c<
-      (std::numeric_limits<Arithmetic>::is_specialized
-      || std::numeric_limits<Arithmetic>::is_signed), int>::type
-   eval_get_sign(const arithmetic_backend<Arithmetic>& val)
+    (std::numeric_limits<Arithmetic>::is_specialized || std::numeric_limits<Arithmetic>::is_signed), int>::type
+eval_get_sign(const arithmetic_backend<Arithmetic>& val)
 {
    return val.data() == 0 ? 0 : 1;
 }
@@ -316,8 +315,8 @@ inline typename enable_if<is_unsigned<T>, T>::type abs(T v) { return v; }
 template <class Arithmetic>
 inline void eval_abs(arithmetic_backend<Arithmetic>& result, const arithmetic_backend<Arithmetic>& o)
 {
-   using std::abs;
    using boost::multiprecision::backends::abs;
+   using std::abs;
    result.data() = abs(o.data());
 }
 
@@ -549,7 +548,7 @@ inline std::size_t hash_value(const arithmetic_backend<Arithmetic>& a)
 }
 
 #ifdef BOOST_MSVC
-#  pragma warning(pop)
+#pragma warning(pop)
 #endif
 
 } // namespace backends
@@ -557,27 +556,28 @@ inline std::size_t hash_value(const arithmetic_backend<Arithmetic>& a)
 using boost::multiprecision::backends::arithmetic_backend;
 
 template <class Arithmetic>
-struct number_category<arithmetic_backend<Arithmetic> > : public mpl::int_<is_integral<Arithmetic>::value ? number_kind_integer : number_kind_floating_point>{};
+struct number_category<arithmetic_backend<Arithmetic> > : public mpl::int_<is_integral<Arithmetic>::value ? number_kind_integer : number_kind_floating_point>
+{};
 
-namespace detail{
+namespace detail {
 
 template <class Backend>
 struct double_precision_type;
 
-template<class Arithmetic, boost::multiprecision::expression_template_option ET>
+template <class Arithmetic, boost::multiprecision::expression_template_option ET>
 struct double_precision_type<number<arithmetic_backend<Arithmetic>, ET> >
 {
    typedef number<arithmetic_backend<typename double_precision_type<Arithmetic>::type>, ET> type;
 };
-template<>
+template <>
 struct double_precision_type<arithmetic_backend<boost::int32_t> >
 {
    typedef arithmetic_backend<boost::int64_t> type;
 };
 
-}
+} // namespace detail
 
-}} // namespaces
+}} // namespace boost::multiprecision
 #if !(defined(__SGI_STL_PORT) || defined(BOOST_NO_LIMITS_COMPILE_TIME_CONSTANTS))
 //
 // We shouldn't need these to get code to compile, however for the sake of
@@ -586,57 +586,58 @@ struct double_precision_type<arithmetic_backend<boost::int32_t> >
 // by the inverse of pp-logic in real_concept.hpp which defines these as a workaround
 // for STLPort plus some other old/broken standartd libraries.
 //
-namespace boost{ namespace math{ namespace tools{
+namespace boost { namespace math { namespace tools {
 
-   template <>
-   inline unsigned int real_cast<unsigned int, concepts::real_concept>(concepts::real_concept r)
-   {
-      return static_cast<unsigned int>(r.value());
-   }
+template <>
+inline unsigned int real_cast<unsigned int, concepts::real_concept>(concepts::real_concept r)
+{
+   return static_cast<unsigned int>(r.value());
+}
 
-   template <>
-   inline int real_cast<int, concepts::real_concept>(concepts::real_concept r)
-   {
-      return static_cast<int>(r.value());
-   }
+template <>
+inline int real_cast<int, concepts::real_concept>(concepts::real_concept r)
+{
+   return static_cast<int>(r.value());
+}
 
-   template <>
-   inline long real_cast<long, concepts::real_concept>(concepts::real_concept r)
-   {
-      return static_cast<long>(r.value());
-   }
+template <>
+inline long real_cast<long, concepts::real_concept>(concepts::real_concept r)
+{
+   return static_cast<long>(r.value());
+}
 
-   // Converts from T to narrower floating-point types, float, double & long double.
+// Converts from T to narrower floating-point types, float, double & long double.
 
-   template <>
-   inline float real_cast<float, concepts::real_concept>(concepts::real_concept r)
-   {
-      return static_cast<float>(r.value());
-   }
-   template <>
-   inline double real_cast<double, concepts::real_concept>(concepts::real_concept r)
-   {
-      return static_cast<double>(r.value());
-   }
-   template <>
-   inline long double real_cast<long double, concepts::real_concept>(concepts::real_concept r)
-   {
-      return r.value();
-   }
+template <>
+inline float real_cast<float, concepts::real_concept>(concepts::real_concept r)
+{
+   return static_cast<float>(r.value());
+}
+template <>
+inline double real_cast<double, concepts::real_concept>(concepts::real_concept r)
+{
+   return static_cast<double>(r.value());
+}
+template <>
+inline long double real_cast<long double, concepts::real_concept>(concepts::real_concept r)
+{
+   return r.value();
+}
 
-}}}
+}}} // namespace boost::math::tools
 #endif
 
-namespace std{
+namespace std {
 
 template <class Arithmetic, boost::multiprecision::expression_template_option ExpressionTemplates>
-class numeric_limits<boost::multiprecision::number<boost::multiprecision::arithmetic_backend<Arithmetic>, ExpressionTemplates > > : public std::numeric_limits<Arithmetic>
+class numeric_limits<boost::multiprecision::number<boost::multiprecision::arithmetic_backend<Arithmetic>, ExpressionTemplates> > : public std::numeric_limits<Arithmetic>
 {
-   typedef std::numeric_limits<Arithmetic> base_type;
+   typedef std::numeric_limits<Arithmetic>                                                                           base_type;
    typedef boost::multiprecision::number<boost::multiprecision::arithmetic_backend<Arithmetic>, ExpressionTemplates> number_type;
-public:
-   BOOST_STATIC_CONSTEXPR number_type (min)() BOOST_NOEXCEPT { return (base_type::min)(); }
-   BOOST_STATIC_CONSTEXPR number_type (max)() BOOST_NOEXCEPT { return (base_type::max)(); }
+
+ public:
+   BOOST_STATIC_CONSTEXPR number_type(min)() BOOST_NOEXCEPT { return (base_type::min)(); }
+   BOOST_STATIC_CONSTEXPR number_type(max)() BOOST_NOEXCEPT { return (base_type::max)(); }
    BOOST_STATIC_CONSTEXPR number_type lowest() BOOST_NOEXCEPT { return -(max)(); }
    BOOST_STATIC_CONSTEXPR number_type epsilon() BOOST_NOEXCEPT { return base_type::epsilon(); }
    BOOST_STATIC_CONSTEXPR number_type round_error() BOOST_NOEXCEPT { return epsilon() / 2; }
@@ -646,14 +647,15 @@ public:
    BOOST_STATIC_CONSTEXPR number_type denorm_min() BOOST_NOEXCEPT { return base_type::denorm_min(); }
 };
 
-template<>
+template <>
 class numeric_limits<boost::math::concepts::real_concept> : public std::numeric_limits<long double>
 {
-   typedef std::numeric_limits<long double> base_type;
+   typedef std::numeric_limits<long double>    base_type;
    typedef boost::math::concepts::real_concept number_type;
-public:
-   static const number_type (min)() BOOST_NOEXCEPT { return (base_type::min)(); }
-   static const number_type (max)() BOOST_NOEXCEPT { return (base_type::max)(); }
+
+ public:
+   static const number_type(min)() BOOST_NOEXCEPT { return (base_type::min)(); }
+   static const number_type(max)() BOOST_NOEXCEPT { return (base_type::max)(); }
    static const number_type lowest() BOOST_NOEXCEPT { return -(max)(); }
    static const number_type epsilon() BOOST_NOEXCEPT { return base_type::epsilon(); }
    static const number_type round_error() BOOST_NOEXCEPT { return epsilon() / 2; }
@@ -663,7 +665,7 @@ public:
    static const number_type denorm_min() BOOST_NOEXCEPT { return base_type::denorm_min(); }
 };
 
-}
+} // namespace std
 
 #include <boost/multiprecision/detail/integer_ops.hpp>
 

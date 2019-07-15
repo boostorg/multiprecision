@@ -9,11 +9,11 @@
 // in ACM TOMS, {VOL 37, ISSUE 4, (February 2011)} (C) ACM, 2011. http://doi.acm.org/10.1145/1916461.1916469
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <boost/detail/lightweight_test.hpp>
 #include "test.hpp"
+#include <boost/detail/lightweight_test.hpp>
 
 #include <boost/multiprecision/mpfi.hpp>
 
@@ -80,23 +80,22 @@ int main()
       BOOST_CHECK_EQUAL(a.precision(), 100);
    }
 
-
    //
    // string_view with explicit precision:
    //
 #ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
    {
-      std::string s("222");
+      std::string      s("222");
       std::string_view v(s.c_str(), 1);
-      mpfi_float f(v, v, 100);
+      mpfi_float       f(v, v, 100);
       BOOST_CHECK_EQUAL(f, 2);
       BOOST_CHECK_EQUAL(f.precision(), 100);
    }
 #endif
    // Swap:
    {
-      mpfi_float x(2, 2, 100);  // 100 digits precision.
-      mpfi_float y(3, 3, 50);   // 50 digits precision.
+      mpfi_float x(2, 2, 100); // 100 digits precision.
+      mpfi_float y(3, 3, 50);  // 50 digits precision.
       swap(x, y);
       BOOST_CHECK_EQUAL(x, 3);
       BOOST_CHECK_EQUAL(y, 2);
@@ -138,7 +137,7 @@ int main()
    }
    {
       //
-      // Check additional non-member functions, 
+      // Check additional non-member functions,
       // see https://github.com/boostorg/multiprecision/issues/91
       //
       mpfi_float::default_precision(100);
@@ -161,7 +160,5 @@ int main()
       BOOST_CHECK_EQUAL(cbrt(f1).precision(), 100);
    }
 
-
    return boost::report_errors();
 }
-
