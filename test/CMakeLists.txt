@@ -46,7 +46,10 @@ else()
                            ${Boost_LIBRARIES}
                            )
 
-    include_directories(${Boost_INCLUDE_DIRS})
+    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../include"
+                        "${CMAKE_BINARY_DIR}/include"
+
+                        ${Boost_INCLUDE_DIRS})
 endif()
 
 # copyright John Maddock 2011
