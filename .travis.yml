@@ -1108,9 +1108,9 @@ script:
       (cd libs/multiprecision/test && ../../../b2 -j$(sysctl -n hw.ncpu) toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER);
     fi
   - if [[ $TRAVIS_OS_NAME == linux ]]; then
-      ./b2 -j$(nproc) install;
+      sudo ./b2 -j$(nproc) install;
     elif [[ $TRAVIS_OS_NAME == osx ]]; then
-      ./b2 -j$(sysctl -n hw.ncpu) install;
+      sudo ./b2 -j$(sysctl -n hw.ncpu) install;
     fi
   - mkdir cmake-build
   - cd cmake-build
