@@ -6,7 +6,7 @@
 #ifndef BOOST_MP_DIGITS_HPP
 #define BOOST_MP_DIGITS_HPP
 
-namespace boost{ namespace multiprecision{ namespace detail{
+namespace boost { namespace multiprecision { namespace detail {
 
 inline unsigned long digits10_2_2(unsigned long d10)
 {
@@ -18,6 +18,6 @@ inline unsigned long digits2_2_10(unsigned long d2)
    return (d2 * 301uL) / 1000uL;
 }
 
-}}} // namespaces
+}}} // namespace boost::multiprecision::detail
 
 #endif
