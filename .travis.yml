@@ -1120,7 +1120,7 @@ script:
     elif [[ $TRAVIS_OS_NAME == osx ]]; then
       make -j$(sysctl -n hw.ncpu) tests-multiprecision;
     fi
-  - ctest .
+  - ctest ..
 
 notifications:
   email:
