@@ -49,7 +49,7 @@ if(BOOST_CMAKE)
                            ${CMAKE_WORKSPACE_NAME}::regexp
                            )
 else()
-    find_package(Boost 1.70 REQUIRED COMPONENTS chrono exception timer filesystem
+    find_package(Boost REQUIRED COMPONENTS chrono exception timer filesystem
                  unit_test_framework serialization regex)
 
     cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_multiprecision
