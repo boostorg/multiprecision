@@ -29,3 +29,5 @@ BraceWrapping:
   BeforeElse: true
   SplitEmptyFunction: false
   SplitEmptyRecord: false
+PointerAlignment: Left
+

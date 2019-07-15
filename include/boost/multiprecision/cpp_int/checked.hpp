@@ -6,7 +6,7 @@
 #ifndef BOOST_MP_CPP_INT_CHECKED_HPP
 #define BOOST_MP_CPP_INT_CHECKED_HPP
 
-namespace boost{ namespace multiprecision{ namespace backends{ namespace detail{
+namespace boost { namespace multiprecision { namespace backends { namespace detail {
 
 //
 // Simple routines for performing checked arithmetic with a builtin arithmetic type.
@@ -37,14 +37,14 @@ inline void raise_div_overflow()
 template <class A>
 inline A checked_add_imp(A a, A b, const mpl::true_&)
 {
-   if(a > 0)
+   if (a > 0)
    {
-      if((b > 0) && ((integer_traits<A>::const_max - b) < a))
+      if ((b > 0) && ((integer_traits<A>::const_max - b) < a))
          raise_add_overflow();
    }
    else
    {
-      if((b < 0) && ((integer_traits<A>::const_min - b) > a))
+      if ((b < 0) && ((integer_traits<A>::const_min - b) > a))
          raise_add_overflow();
    }
    return a + b;
@@ -52,7 +52,7 @@ inline A checked_add_imp(A a, A b, const mpl::true_&)
 template <class A>
 inline A checked_add_imp(A a, A b, const mpl::false_&)
 {
-   if((integer_traits<A>::const_max - b) < a)
+   if ((integer_traits<A>::const_max - b) < a)
       raise_add_overflow();
    return a + b;
 }
@@ -70,14 +70,14 @@ inline A checked_add(A a, A b, const mpl::int_<unchecked>&)
 template <class A>
 inline A checked_subtract_imp(A a, A b, const mpl::true_&)
 {
-   if(a > 0)
+   if (a > 0)
    {
-      if((b < 0) && ((integer_traits<A>::const_max + b) < a))
+      if ((b < 0) && ((integer_traits<A>::const_max + b) < a))
          raise_subtract_overflow();
    }
    else
    {
-      if((b > 0) && ((integer_traits<A>::const_min + b) > a))
+      if ((b > 0) && ((integer_traits<A>::const_min + b) > a))
          raise_subtract_overflow();
    }
    return a - b;
@@ -85,7 +85,7 @@ inline A checked_subtract_imp(A a, A b, const mpl::true_&)
 template <class A>
 inline A checked_subtract_imp(A a, A b, const mpl::false_&)
 {
-   if(a < b)
+   if (a < b)
       raise_subtract_overflow();
    return a - b;
 }
@@ -104,7 +104,7 @@ template <class A>
 inline A checked_multiply(A a, A b, const mpl::int_<checked>&)
 {
    BOOST_MP_USING_ABS
-   if(a && (integer_traits<A>::const_max / abs(a) < abs(b)))
+   if (a && (integer_traits<A>::const_max / abs(a) < abs(b)))
       raise_mul_overflow();
    return a * b;
 }
@@ -117,7 +117,7 @@ inline A checked_multiply(A a, A b, const mpl::int_<unchecked>&)
 template <class A>
 inline A checked_divide(A a, A b, const mpl::int_<checked>&)
 {
-   if(b == 0)
+   if (b == 0)
       raise_div_overflow();
    return a / b;
 }
@@ -130,9 +130,9 @@ inline A checked_divide(A a, A b, const mpl::int_<unchecked>&)
 template <class A>
 inline A checked_left_shift(A a, boost::ulong_long_type shift, const mpl::int_<checked>&)
 {
-   if(a && shift)
+   if (a && shift)
    {
-      if((shift > sizeof(A) * CHAR_BIT) || (a >> (sizeof(A) * CHAR_BIT - shift)))
+      if ((shift > sizeof(A) * CHAR_BIT) || (a >> (sizeof(A) * CHAR_BIT - shift)))
          BOOST_THROW_EXCEPTION(std::overflow_error("Shift out of range"));
    }
    return a << shift;
@@ -143,7 +143,6 @@ inline A checked_left_shift(A a, boost::ulong_long_type shift, const mpl::int_<u
    return (shift >= sizeof(A) * CHAR_BIT) ? 0 : a << shift;
 }
 
-}}}} // namespaces
+}}}} // namespace boost::multiprecision::backends::detail
 
 #endif
-

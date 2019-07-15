@@ -37,36 +37,36 @@ struct number_backend_float_architype
       m_value = 0;
       std::cout << "Default construct" << std::endl;
    }
-   number_backend_float_architype(const number_backend_float_architype &o)
+   number_backend_float_architype(const number_backend_float_architype& o)
    {
       std::cout << "Copy construct" << std::endl;
       m_value = o.m_value;
    }
-   number_backend_float_architype &operator=(const number_backend_float_architype &o)
+   number_backend_float_architype& operator=(const number_backend_float_architype& o)
    {
       m_value = o.m_value;
       std::cout << "Assignment (" << m_value << ")" << std::endl;
       return *this;
    }
-   number_backend_float_architype &operator=(boost::ulong_long_type i)
+   number_backend_float_architype& operator=(boost::ulong_long_type i)
    {
       m_value = i;
       std::cout << "UInt Assignment (" << i << ")" << std::endl;
       return *this;
    }
-   number_backend_float_architype &operator=(boost::long_long_type i)
+   number_backend_float_architype& operator=(boost::long_long_type i)
    {
       m_value = i;
       std::cout << "Int Assignment (" << i << ")" << std::endl;
       return *this;
    }
-   number_backend_float_architype &operator=(long double d)
+   number_backend_float_architype& operator=(long double d)
    {
       m_value = d;
       std::cout << "long double Assignment (" << d << ")" << std::endl;
       return *this;
    }
-   number_backend_float_architype &operator=(const char *s)
+   number_backend_float_architype& operator=(const char* s)
    {
 #ifndef BOOST_NO_EXCEPTIONS
       try
@@ -75,7 +75,7 @@ struct number_backend_float_architype
          m_value = boost::lexical_cast<long double>(s);
 #ifndef BOOST_NO_EXCEPTIONS
       }
-      catch (const std::exception &)
+      catch (const std::exception&)
       {
          BOOST_THROW_EXCEPTION(std::runtime_error(std::string("Unable to parse input string: \"") + s + std::string("\" as a valid floating point number.")));
       }
@@ -83,7 +83,7 @@ struct number_backend_float_architype
       std::cout << "const char* Assignment (" << s << ")" << std::endl;
       return *this;
    }
-   void swap(number_backend_float_architype &o)
+   void swap(number_backend_float_architype& o)
    {
       std::cout << "Swapping (" << m_value << " with " << o.m_value << ")" << std::endl;
       std::swap(m_value, o.m_value);
@@ -113,7 +113,7 @@ struct number_backend_float_architype
       std::cout << "Negating (" << m_value << ")" << std::endl;
       m_value = -m_value;
    }
-   int compare(const number_backend_float_architype &o) const
+   int compare(const number_backend_float_architype& o) const
    {
       std::cout << "Comparison" << std::endl;
       return m_value > o.m_value ? 1 : (m_value < o.m_value ? -1 : 0);
@@ -136,71 +136,71 @@ struct number_backend_float_architype
    long double m_value;
 };
 
-inline void eval_add(number_backend_float_architype &result, const number_backend_float_architype &o)
+inline void eval_add(number_backend_float_architype& result, const number_backend_float_architype& o)
 {
    std::cout << "Addition (" << result.m_value << " += " << o.m_value << ")" << std::endl;
    result.m_value += o.m_value;
 }
-inline void eval_subtract(number_backend_float_architype &result, const number_backend_float_architype &o)
+inline void eval_subtract(number_backend_float_architype& result, const number_backend_float_architype& o)
 {
    std::cout << "Subtraction (" << result.m_value << " -= " << o.m_value << ")" << std::endl;
    result.m_value -= o.m_value;
 }
-inline void eval_multiply(number_backend_float_architype &result, const number_backend_float_architype &o)
+inline void eval_multiply(number_backend_float_architype& result, const number_backend_float_architype& o)
 {
    std::cout << "Multiplication (" << result.m_value << " *= " << o.m_value << ")" << std::endl;
    result.m_value *= o.m_value;
 }
-inline void eval_divide(number_backend_float_architype &result, const number_backend_float_architype &o)
+inline void eval_divide(number_backend_float_architype& result, const number_backend_float_architype& o)
 {
    std::cout << "Division (" << result.m_value << " /= " << o.m_value << ")" << std::endl;
    result.m_value /= o.m_value;
 }
 
-inline void eval_convert_to(boost::ulong_long_type *result, const number_backend_float_architype &val)
+inline void eval_convert_to(boost::ulong_long_type* result, const number_backend_float_architype& val)
 {
    *result = static_cast<boost::ulong_long_type>(val.m_value);
 }
-inline void eval_convert_to(boost::long_long_type *result, const number_backend_float_architype &val)
+inline void eval_convert_to(boost::long_long_type* result, const number_backend_float_architype& val)
 {
    *result = static_cast<boost::long_long_type>(val.m_value);
 }
-inline void eval_convert_to(long double *result, number_backend_float_architype &val)
+inline void eval_convert_to(long double* result, number_backend_float_architype& val)
 {
    *result = val.m_value;
 }
 
-inline void eval_frexp(number_backend_float_architype &result, const number_backend_float_architype &arg, int *exp)
+inline void eval_frexp(number_backend_float_architype& result, const number_backend_float_architype& arg, int* exp)
 {
    result = std::frexp(arg.m_value, exp);
 }
 
-inline void eval_ldexp(number_backend_float_architype &result, const number_backend_float_architype &arg, int exp)
+inline void eval_ldexp(number_backend_float_architype& result, const number_backend_float_architype& arg, int exp)
 {
    result = std::ldexp(arg.m_value, exp);
 }
 
-inline void eval_floor(number_backend_float_architype &result, const number_backend_float_architype &arg)
+inline void eval_floor(number_backend_float_architype& result, const number_backend_float_architype& arg)
 {
    result = std::floor(arg.m_value);
 }
 
-inline void eval_ceil(number_backend_float_architype &result, const number_backend_float_architype &arg)
+inline void eval_ceil(number_backend_float_architype& result, const number_backend_float_architype& arg)
 {
    result = std::ceil(arg.m_value);
 }
 
-inline void eval_sqrt(number_backend_float_architype &result, const number_backend_float_architype &arg)
+inline void eval_sqrt(number_backend_float_architype& result, const number_backend_float_architype& arg)
 {
    result = std::sqrt(arg.m_value);
 }
 
-inline int eval_fpclassify(const number_backend_float_architype &arg)
+inline int eval_fpclassify(const number_backend_float_architype& arg)
 {
    return (boost::math::fpclassify)(arg.m_value);
 }
 
-inline std::size_t hash_value(const number_backend_float_architype &v)
+inline std::size_t hash_value(const number_backend_float_architype& v)
 {
    boost::hash<long double> hasher;
    return hasher(v.m_value);
