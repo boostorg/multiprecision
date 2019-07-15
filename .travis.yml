@@ -1,4 +1,5 @@
 # Copyright 2016, 2017 Peter Dimov
+# Copyright 2019 Nil Foundation AG
 # Copyright 2019 Mikhail Komarov <nemo@nilfoundation.org>
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
@@ -1119,7 +1120,11 @@ script:
     elif [[ $TRAVIS_OS_NAME == osx ]]; then
       make -j$(sysctl -n hw.ncpu) tests-multiprecision;
     fi
-  - ctest ..
+  - if [[ $TRAVIS_OS_NAME == linux ]]; then
+      ctest -j$(nproc) ..;
+    elif [[ $TRAVIS_OS_NAME == osx ]]; then
+      ctest -j$(sysctl -n hw.ncpu) ..;
+    fi
 
 notifications:
   email:
