@@ -1082,7 +1082,11 @@ matrix:
 
 install:
   - cd ..
-  - git clone -b $TRAVIS_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
+  - if [[ $TRAVIS_BRANCH == master || $TRAVIS_BRANCH == cmake-master ]]; then
+      git clone -b master --depth 1 https://github.com/boostorg/boost.git boost-root
+    elif [[ $TRAVIS_BRANCH == develop || $TRAVIS_BRANCH == cmake-develop ]]; then
+      git clone -b develop --depth 1 https://github.com/boostorg/boost.git boost-root
+    fi
   - cd boost-root
   - git submodule update --init tools/build
   - git submodule update --init libs/config
