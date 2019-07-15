@@ -5,7 +5,7 @@
 
 language: cpp
 
-sudo: false
+sudo: true
 
 python: "2.7"
 
