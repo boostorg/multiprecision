@@ -1083,9 +1083,9 @@ matrix:
 install:
   - cd ..
   - if [[ $TRAVIS_BRANCH == master || $TRAVIS_BRANCH == cmake-master ]]; then
-      git clone -b master --depth 1 https://github.com/boostorg/boost.git boost-root
+      git clone -b master --depth 1 https://github.com/boostorg/boost.git boost-root;
     elif [[ $TRAVIS_BRANCH == develop || $TRAVIS_BRANCH == cmake-develop ]]; then
-      git clone -b develop --depth 1 https://github.com/boostorg/boost.git boost-root
+      git clone -b develop --depth 1 https://github.com/boostorg/boost.git boost-root;
     fi
   - cd boost-root
   - git submodule update --init tools/build
@@ -1103,22 +1103,22 @@ script:
     echo "using $TOOLSET : : $COMPILER : <cxxflags>-std=$CXXSTD ;" > ~/user-config.jam
   - (cd libs/config/test && ../../../b2 config_info_travis_install toolset=$TOOLSET && ./config_info_travis)
   - if [[ $TRAVIS_OS_NAME == linux ]]; then
-      (cd libs/multiprecision/test && ../../../b2 -j$(nproc) toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER)
+      (cd libs/multiprecision/test && ../../../b2 -j$(nproc) toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER);
     elif [[ $TRAVIS_OS_NAME == osx ]]; then
-      (cd libs/multiprecision/test && ../../../b2 -j$(sysctl -n hw.ncpu) toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER)
+      (cd libs/multiprecision/test && ../../../b2 -j$(sysctl -n hw.ncpu) toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER);
     fi
   - if [[ $TRAVIS_OS_NAME == linux ]]; then
-      ./b2 -j$(nproc) install
+      ./b2 -j$(nproc) install;
     elif [[ $TRAVIS_OS_NAME == osx ]]; then
-      ./b2 -j$(sysctl -n hw.ncpu) install
+      ./b2 -j$(sysctl -n hw.ncpu) install;
     fi
   - mkdir cmake-build
   - cd cmake-build
   - cmake ..
   - if [[ $TRAVIS_OS_NAME == linux ]]; then
-      make -j$(nproc) tests-multiprecision
+      make -j$(nproc) tests-multiprecision;
     elif [[ $TRAVIS_OS_NAME == osx ]]; then
-      make -j$(sysctl -n hw.ncpu) tests-multiprecision
+      make -j$(sysctl -n hw.ncpu) tests-multiprecision;
     fi
   - ctest .
 
