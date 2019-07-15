@@ -8,7 +8,8 @@
 #include "test_arithmetic.hpp"
 
 template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-struct is_twos_complement_integer<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, boost::multiprecision::checked, Allocator>, ExpressionTemplates> > : public boost::mpl::false_ {};
+struct is_twos_complement_integer<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, boost::multiprecision::checked, Allocator>, ExpressionTemplates> > : public boost::mpl::false_
+{};
 
 template <>
 struct related_type<boost::multiprecision::cpp_int>
@@ -18,15 +19,15 @@ struct related_type<boost::multiprecision::cpp_int>
 template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ET>
 struct related_type<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ET> >
 {
-   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits/2, MaxBits/2, SignType, Checked, Allocator>, ET> type;
+   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits / 2, MaxBits / 2, SignType, Checked, Allocator>, ET> type;
 };
 
 template <>
-struct is_checked_cpp_int<boost::multiprecision::checked_uint1024_t> : public boost::mpl::true_ {};
+struct is_checked_cpp_int<boost::multiprecision::checked_uint1024_t> : public boost::mpl::true_
+{};
 
 int main()
 {
-   test<boost::multiprecision::checked_uint1024_t >();
+   test<boost::multiprecision::checked_uint1024_t>();
    return boost::report_errors();
 }
-

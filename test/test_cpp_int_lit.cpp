@@ -6,7 +6,7 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include "test.hpp"
 
-#if ! (BOOST_WORKAROUND(BOOST_MSVC, <= 1900) && defined(CI_SUPPRESS_KNOWN_ISSUES)) && defined(BOOST_MP_USER_DEFINED_LITERALS)
+#if !(BOOST_WORKAROUND(BOOST_MSVC, <= 1900) && defined(CI_SUPPRESS_KNOWN_ISSUES)) && defined(BOOST_MP_USER_DEFINED_LITERALS)
 
 using namespace boost::multiprecision;
 
@@ -16,26 +16,26 @@ void test_literal(T val, const char* p)
    BOOST_CHECK_EQUAL(val, cpp_int(p));
 }
 
-#define TEST_LITERAL(x)\
-{\
-   constexpr auto val1 = BOOST_JOIN(x, _cppi);\
-   constexpr int1024_t val2 = BOOST_JOIN(x, _cppi1024);\
-   constexpr auto val3 = BOOST_JOIN(x, _cppui);\
-   constexpr uint1024_t val4 = BOOST_JOIN(x, _cppui1024);\
-   test_literal(val1, BOOST_STRINGIZE(x));\
-   test_literal(val2, BOOST_STRINGIZE(x));\
-   test_literal(val3, BOOST_STRINGIZE(x));\
-   test_literal(val4, BOOST_STRINGIZE(x));\
-   /* Negative values: */\
-   constexpr auto val5 = -BOOST_JOIN(x, _cppi);\
-   constexpr int1024_t val6 = -BOOST_JOIN(x, _cppi1024);\
-   constexpr auto val7 = -val1;\
-   constexpr int1024_t val8 = -val2;\
-   BOOST_CHECK_EQUAL(val5, -cpp_int(val1));\
-   BOOST_CHECK_EQUAL(val6, -cpp_int(val1));\
-   BOOST_CHECK_EQUAL(val7, -cpp_int(val1));\
-   BOOST_CHECK_EQUAL(val8, -cpp_int(val1));\
-}\
+#define TEST_LITERAL(x)                                      \
+   {                                                         \
+      constexpr auto val1       = BOOST_JOIN(x, _cppi);      \
+      constexpr int1024_t val2  = BOOST_JOIN(x, _cppi1024);  \
+      constexpr auto      val3  = BOOST_JOIN(x, _cppui);     \
+      constexpr uint1024_t val4 = BOOST_JOIN(x, _cppui1024); \
+      test_literal(val1, BOOST_STRINGIZE(x));                \
+      test_literal(val2, BOOST_STRINGIZE(x));                \
+      test_literal(val3, BOOST_STRINGIZE(x));                \
+      test_literal(val4, BOOST_STRINGIZE(x));                \
+      /* Negative values: */                                 \
+      constexpr auto val5      = -BOOST_JOIN(x, _cppi);      \
+      constexpr int1024_t val6 = -BOOST_JOIN(x, _cppi1024);  \
+      constexpr auto      val7 = -val1;                      \
+      constexpr int1024_t val8 = -val2;                      \
+      BOOST_CHECK_EQUAL(val5, -cpp_int(val1));               \
+      BOOST_CHECK_EQUAL(val6, -cpp_int(val1));               \
+      BOOST_CHECK_EQUAL(val7, -cpp_int(val1));               \
+      BOOST_CHECK_EQUAL(val8, -cpp_int(val1));               \
+   }
 
 int main()
 {
@@ -50,6 +50,5 @@ int main()
 #else
 
 int main() { return 0; }
-
 
 #endif

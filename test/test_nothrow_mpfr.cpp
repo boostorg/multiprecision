@@ -32,5 +32,3 @@ BOOST_STATIC_ASSERT(boost::is_nothrow_move_assignable<boost::multiprecision::mpf
 #endif
 
 #endif // noexcept
-
-

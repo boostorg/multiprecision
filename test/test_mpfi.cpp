@@ -4,7 +4,7 @@
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
 #include "test.hpp"
@@ -20,16 +20,16 @@ void test_exp()
 
    mpfr_float_50 val = 1.25;
 
-   for(unsigned i = 0; i < 2000; ++i)
+   for (unsigned i = 0; i < 2000; ++i)
    {
       mpfr_float_100 a(val);
-      mpfr_float_100 b = exp(a);
-      mpfi_float_50 in = val;
-      in = exp(in);
+      mpfr_float_100 b  = exp(a);
+      mpfi_float_50  in = val;
+      in                = exp(in);
       BOOST_CHECK((boost::math::isfinite)(in));
       BOOST_CHECK(lower(in) <= b);
       BOOST_CHECK(upper(in) >= b);
-      b = log(a);
+      b  = log(a);
       in = val;
       in = log(in);
       BOOST_CHECK((boost::math::isfinite)(in));
@@ -38,16 +38,16 @@ void test_exp()
       val *= 1.01;
    }
    val = 1;
-   for(unsigned i = 0; i < 2000; ++i)
+   for (unsigned i = 0; i < 2000; ++i)
    {
       mpfr_float_100 a(val);
-      mpfr_float_100 b = exp(a);
-      mpfi_float_50 in = val;
-      in = exp(in);
+      mpfr_float_100 b  = exp(a);
+      mpfi_float_50  in = val;
+      in                = exp(in);
       BOOST_CHECK((boost::math::isfinite)(in));
       BOOST_CHECK(lower(in) <= b);
       BOOST_CHECK(upper(in) >= b);
-      b = log(a);
+      b  = log(a);
       in = val;
       in = log(in);
       BOOST_CHECK((boost::math::isfinite)(in));
@@ -61,14 +61,14 @@ void test_pow()
 {
    std::cout << "Testing pow function\n";
 
-   mt19937 gen;
+   mt19937                                  gen;
    uniform_real_distribution<mpfr_float_50> dist1(0, 400);
 
-   for(unsigned i = 0; i < 5000; ++i)
+   for (unsigned i = 0; i < 5000; ++i)
    {
       mpfr_float_50 base, p;
       base = dist1(gen);
-      p = dist1(gen);
+      p    = dist1(gen);
       mpfr_float_100 a, b, r;
       a = base;
       b = p;
@@ -87,49 +87,49 @@ void test_trig()
 {
    std::cout << "Testing trig functions\n";
 
-   mt19937 gen;
+   mt19937                                  gen;
    uniform_real_distribution<mpfr_float_50> dist1(-1.57079632679, 1.57079632679);
    uniform_real_distribution<mpfr_float_50> dist2(-1, 1);
 
-   for(unsigned i = 0; i < 5000; ++i)
+   for (unsigned i = 0; i < 5000; ++i)
    {
       mpfr_float_50 val;
-      val = dist1(gen);
-      mpfr_float_100 a = val;
-      mpfr_float_100 b = sin(a);
-      mpfi_float_50 a2 = val;
-      mpfi_float_50 b2 = sin(a2);
+      val               = dist1(gen);
+      mpfr_float_100 a  = val;
+      mpfr_float_100 b  = sin(a);
+      mpfi_float_50  a2 = val;
+      mpfi_float_50  b2 = sin(a2);
       BOOST_CHECK((boost::math::isfinite)(b2));
       BOOST_CHECK(lower(b2) <= b);
       BOOST_CHECK(upper(b2) >= b);
-      b = cos(a);
+      b  = cos(a);
       b2 = cos(a2);
       BOOST_CHECK((boost::math::isfinite)(b2));
       BOOST_CHECK(lower(b2) <= b);
       BOOST_CHECK(upper(b2) >= b);
-      b = tan(a);
+      b  = tan(a);
       b2 = tan(a2);
       BOOST_CHECK((boost::math::isfinite)(b2));
       BOOST_CHECK(lower(b2) <= b);
       BOOST_CHECK(upper(b2) >= b);
    }
-   for(unsigned i = 0; i < 5000; ++i)
+   for (unsigned i = 0; i < 5000; ++i)
    {
       mpfr_float_50 val;
-      val = dist2(gen);
-      mpfr_float_100 a = val;
-      mpfr_float_100 b = asin(a);
-      mpfi_float_50 a2 = val;
-      mpfi_float_50 b2 = asin(a2);
+      val               = dist2(gen);
+      mpfr_float_100 a  = val;
+      mpfr_float_100 b  = asin(a);
+      mpfi_float_50  a2 = val;
+      mpfi_float_50  b2 = asin(a2);
       BOOST_CHECK((boost::math::isfinite)(b2));
       BOOST_CHECK(lower(b2) <= b);
       BOOST_CHECK(upper(b2) >= b);
-      b = acos(a);
+      b  = acos(a);
       b2 = acos(a2);
       BOOST_CHECK((boost::math::isfinite)(b2));
       BOOST_CHECK(lower(b2) <= b);
       BOOST_CHECK(upper(b2) >= b);
-      b = atan(a);
+      b  = atan(a);
       b2 = atan(a2);
       BOOST_CHECK((boost::math::isfinite)(b2));
       BOOST_CHECK(lower(b2) <= b);
@@ -141,27 +141,27 @@ void test_hyp()
 {
    std::cout << "Testing hyperbolic trig functions\n";
 
-   mt19937 gen;
+   mt19937                                  gen;
    uniform_real_distribution<mpfr_float_50> dist1(-10, 10);
    uniform_real_distribution<mpfr_float_50> dist2(-1, 1);
 
-   for(unsigned i = 0; i < 5000; ++i)
+   for (unsigned i = 0; i < 5000; ++i)
    {
       mpfr_float_50 val;
-      val = dist1(gen);
-      mpfr_float_100 a = val;
-      mpfr_float_100 b = sinh(a);
-      mpfi_float_50 a2 = val;
-      mpfi_float_50 b2 = sinh(a2);
+      val               = dist1(gen);
+      mpfr_float_100 a  = val;
+      mpfr_float_100 b  = sinh(a);
+      mpfi_float_50  a2 = val;
+      mpfi_float_50  b2 = sinh(a2);
       BOOST_CHECK((boost::math::isfinite)(b2));
       BOOST_CHECK(lower(b2) <= b);
       BOOST_CHECK(upper(b2) >= b);
-      b = cosh(a);
+      b  = cosh(a);
       b2 = cosh(a2);
       BOOST_CHECK((boost::math::isfinite)(b2));
       BOOST_CHECK(lower(b2) <= b);
       BOOST_CHECK(upper(b2) >= b);
-      b = tanh(a);
+      b  = tanh(a);
       b2 = tanh(a2);
       BOOST_CHECK((boost::math::isfinite)(b2));
       BOOST_CHECK(lower(b2) <= b);
@@ -208,17 +208,17 @@ typedef number<mpfi_float_backend<25> > mpfi_float_25;
 
 void test_log1p_expm1()
 {
-#  include "../../math/test/log1p_expm1_data.ipp"
+#include "../../math/test/log1p_expm1_data.ipp"
 
    std::cout << std::setprecision(std::numeric_limits<mpfi_float_25>::max_digits10);
    std::cout << "Testing log1p and expm1\n";
 
-   for(unsigned i = 0; i < log1p_expm1_data.size(); ++i)
+   for (unsigned i = 0; i < log1p_expm1_data.size(); ++i)
    {
       mpfi_float_25 in(log1p_expm1_data[i][0]);
       mpfi_float_25 out = boost::math::log1p(in);
       mpfi_float_25 expected(log1p_expm1_data[i][1]);
-      if(!subset(expected, out))
+      if (!subset(expected, out))
       {
          std::cout << in << std::endl;
          std::cout << out << std::endl;
@@ -226,9 +226,9 @@ void test_log1p_expm1()
          BOOST_CHECK(lower(out) <= lower(expected));
          BOOST_CHECK(upper(out) >= upper(expected));
       }
-      out = boost::math::expm1(in);
+      out      = boost::math::expm1(in);
       expected = mpfi_float_25(log1p_expm1_data[i][2]);
-      if(!subset(expected, out))
+      if (!subset(expected, out))
       {
          std::cout << in << std::endl;
          std::cout << out << std::endl;
@@ -247,13 +247,13 @@ void test_bessel()
    std::cout << std::setprecision(std::numeric_limits<mpfi_float_25>::max_digits10);
    std::cout << "Testing Bessel Functions\n";
 
-   for(unsigned i = 0; i < bessel_i_int_data.size(); ++i)
+   for (unsigned i = 0; i < bessel_i_int_data.size(); ++i)
    {
-      int v = boost::lexical_cast<int>(static_cast<const char*>(bessel_i_int_data[i][0]));
+      int           v = boost::lexical_cast<int>(static_cast<const char*>(bessel_i_int_data[i][0]));
       mpfi_float_25 in(bessel_i_int_data[i][1]);
       mpfi_float_25 out = boost::math::cyl_bessel_i(v, in);
       mpfi_float_25 expected(bessel_i_int_data[i][2]);
-      if(!subset(expected, out))
+      if (!subset(expected, out))
       {
          std::cout << in << std::endl;
          std::cout << out << std::endl;
@@ -279,6 +279,3 @@ int main()
    test_hyp();
    return boost::report_errors();
 }
-
-
-

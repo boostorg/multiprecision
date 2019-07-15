@@ -6,23 +6,21 @@
 #define BOOST_CHRONO_HEADER_ONLY
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
 #if !defined(TEST_MPF) && !defined(TEST_MPZ) && \
-   !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPQ) \
-   && !defined(TEST_TOMMATH) && !defined(TEST_TOMMATH_BOOST_RATIONAL) && !defined(TEST_MPZ_BOOST_RATIONAL)\
-   && !defined(TEST_CPP_INT) && !defined(TEST_CPP_INT_RATIONAL) && !defined(TEST_CPP_BIN_FLOAT)
-#  define TEST_MPF
-#  define TEST_MPZ
-#  define TEST_MPQ
-#  define TEST_MPFR
-#  define TEST_CPP_DEC_FLOAT
-#  define TEST_MPQ
-#  define TEST_TOMMATH
-#  define TEST_CPP_INT
-#  define TEST_CPP_INT_RATIONAL
-#  define TEST_CPP_BIN_FLOAT
+    !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPQ) && !defined(TEST_TOMMATH) && !defined(TEST_TOMMATH_BOOST_RATIONAL) && !defined(TEST_MPZ_BOOST_RATIONAL) && !defined(TEST_CPP_INT) && !defined(TEST_CPP_INT_RATIONAL) && !defined(TEST_CPP_BIN_FLOAT)
+#define TEST_MPF
+#define TEST_MPZ
+#define TEST_MPQ
+#define TEST_MPFR
+#define TEST_CPP_DEC_FLOAT
+#define TEST_MPQ
+#define TEST_TOMMATH
+#define TEST_CPP_INT
+#define TEST_CPP_INT_RATIONAL
+#define TEST_CPP_BIN_FLOAT
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -82,7 +80,7 @@ struct stopwatch
       m_start = Clock::now();
    }
 
-private:
+ private:
    typename Clock::time_point m_start;
 };
 
@@ -94,7 +92,7 @@ struct tester
    tester()
    {
       a.assign(500, 0);
-      for(int i = 0; i < 500; ++i)
+      for (int i = 0; i < 500; ++i)
       {
          b.push_back(generate_random());
          c.push_back(generate_random());
@@ -104,9 +102,9 @@ struct tester
    double test_add()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] + c[i];
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -114,9 +112,9 @@ struct tester
    double test_subtract()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] - c[i];
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -124,9 +122,9 @@ struct tester
    double test_add_int()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] + 1;
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -134,9 +132,9 @@ struct tester
    double test_subtract_int()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] - 1;
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -144,9 +142,9 @@ struct tester
    double test_multiply()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned k = 0; k < b.size(); ++k)
+         for (unsigned k = 0; k < b.size(); ++k)
             a[k] = b[k] * c[k];
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -154,9 +152,9 @@ struct tester
    double test_multiply_int()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] * 3;
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -164,9 +162,9 @@ struct tester
    double test_divide()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] / c[i] + b[i] / small[i];
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -174,9 +172,9 @@ struct tester
    double test_divide_int()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] / 3;
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -184,14 +182,14 @@ struct tester
    double test_str(const boost::mpl::false_&)
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < b.size(); ++i)
+      for (unsigned i = 0; i < b.size(); ++i)
          a[i] = boost::lexical_cast<T>(boost::lexical_cast<std::string>(b[i]));
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
    double test_str(const boost::mpl::true_&)
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < b.size(); ++i)
+      for (unsigned i = 0; i < b.size(); ++i)
          a[i].assign(b[i].str());
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
@@ -205,9 +203,9 @@ struct tester
    double test_mod()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] % c[i] + b[i] % small[i];
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -215,9 +213,9 @@ struct tester
    double test_mod_int()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] % 254;
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -225,9 +223,9 @@ struct tester
    double test_or()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] | c[i];
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -235,9 +233,9 @@ struct tester
    double test_or_int()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] | 234;
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -245,9 +243,9 @@ struct tester
    double test_and()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] & c[i];
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -255,9 +253,9 @@ struct tester
    double test_and_int()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] & 234;
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -265,9 +263,9 @@ struct tester
    double test_xor()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] ^ c[i];
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -275,9 +273,9 @@ struct tester
    double test_xor_int()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] ^ 234;
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -285,33 +283,33 @@ struct tester
    double test_complement()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] = ~b[i];
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
    double test_left_shift()
    {
-      int max_shift = std::numeric_limits<T>::is_bounded ? std::numeric_limits<T>::digits : bits_wanted;
-      int shift = 0;
+      int                                             max_shift = std::numeric_limits<T>::is_bounded ? std::numeric_limits<T>::digits : bits_wanted;
+      int                                             shift     = 0;
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] << (shift++ % max_shift);
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
    double test_right_shift()
    {
-      int max_shift = 2 + std::numeric_limits<T>::is_bounded ? std::numeric_limits<T>::digits : bits_wanted;
-      int shift  = 0;
+      int                                             max_shift = 2 + std::numeric_limits<T>::is_bounded ? std::numeric_limits<T>::digits : bits_wanted;
+      int                                             shift     = 0;
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] >> (shift++) % max_shift;
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -320,9 +318,9 @@ struct tester
    {
       using boost::integer::gcd;
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] = gcd(b[i], c[i]);
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -330,24 +328,24 @@ struct tester
    double test_powm()
    {
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 25; ++i)
+      for (unsigned i = 0; i < 25; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] = powm(b[i], b[i] / 2, c[i]);
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
    double test_construct()
    {
-      std::allocator<T> a;
-      T* pt = a.allocate(1000);
+      std::allocator<T>                               a;
+      T*                                              pt = a.allocate(1000);
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < 1000; ++i)
-            new(pt+i) T();
-         for(unsigned i = 0; i < 1000; ++i)
-            a.destroy(pt+i);
+         for (unsigned i = 0; i < 1000; ++i)
+            new (pt + i) T();
+         for (unsigned i = 0; i < 1000; ++i)
+            a.destroy(pt + i);
       }
       double result = boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
       a.deallocate(pt, 1000);
@@ -355,15 +353,15 @@ struct tester
    }
    double test_construct_unsigned()
    {
-      std::allocator<T> a;
-      T* pt = a.allocate(1000);
+      std::allocator<T>                               a;
+      T*                                              pt = a.allocate(1000);
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < 1000; ++i)
-            new(pt+i) T(i);
-         for(unsigned i = 0; i < 1000; ++i)
-            a.destroy(pt+i);
+         for (unsigned i = 0; i < 1000; ++i)
+            new (pt + i) T(i);
+         for (unsigned i = 0; i < 1000; ++i)
+            a.destroy(pt + i);
       }
       double result = boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
       a.deallocate(pt, 1000);
@@ -371,15 +369,15 @@ struct tester
    }
    double test_construct_unsigned_ll()
    {
-      std::allocator<T> a;
-      T* pt = a.allocate(1000);
+      std::allocator<T>                               a;
+      T*                                              pt = a.allocate(1000);
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned long long j = 0; j < 1000; ++j)
-            new(pt+j) T(j);
-         for(unsigned j = 0; j < 1000; ++j)
-            a.destroy(pt+j);
+         for (unsigned long long j = 0; j < 1000; ++j)
+            new (pt + j) T(j);
+         for (unsigned j = 0; j < 1000; ++j)
+            a.destroy(pt + j);
       }
       double result = boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
       a.deallocate(pt, 1000);
@@ -407,11 +405,11 @@ struct tester
    template <class U>
    double test_multiply_hetero()
    {
-      static const U val = get_hetero_test_value<U>();
+      static const U                                  val = get_hetero_test_value<U>();
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] * val;
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -420,12 +418,12 @@ struct tester
    double test_inplace_multiply_hetero()
    {
       static const U val = get_hetero_test_value<U>();
-      for(unsigned i = 0; i < b.size(); ++i)
+      for (unsigned i = 0; i < b.size(); ++i)
          a[i] = b[i];
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] *= val;
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -433,11 +431,11 @@ struct tester
    template <class U>
    double test_add_hetero()
    {
-      static const U val = get_hetero_test_value<U>();
+      static const U                                  val = get_hetero_test_value<U>();
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] + val;
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -446,12 +444,12 @@ struct tester
    double test_inplace_add_hetero()
    {
       static const U val = get_hetero_test_value<U>();
-      for(unsigned i = 0; i < b.size(); ++i)
+      for (unsigned i = 0; i < b.size(); ++i)
          a[i] = b[i];
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] += val;
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -459,11 +457,11 @@ struct tester
    template <class U>
    double test_subtract_hetero()
    {
-      static const U val = get_hetero_test_value<U>();
+      static const U                                  val = get_hetero_test_value<U>();
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] - val;
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -472,12 +470,12 @@ struct tester
    double test_inplace_subtract_hetero()
    {
       static const U val = get_hetero_test_value<U>();
-      for(unsigned i = 0; i < b.size(); ++i)
+      for (unsigned i = 0; i < b.size(); ++i)
          a[i] = b[i];
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] -= val;
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -485,11 +483,11 @@ struct tester
    template <class U>
    double test_divide_hetero()
    {
-      static const U val = get_hetero_test_value<U>();
+      static const U                                  val = get_hetero_test_value<U>();
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] = b[i] / val;
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
@@ -498,26 +496,27 @@ struct tester
    double test_inplace_divide_hetero()
    {
       static const U val = get_hetero_test_value<U>();
-      for(unsigned i = 0; i < b.size(); ++i)
+      for (unsigned i = 0; i < b.size(); ++i)
          a[i] = b[i];
       stopwatch<boost::chrono::high_resolution_clock> w;
-      for(unsigned i = 0; i < 1000; ++i)
+      for (unsigned i = 0; i < 1000; ++i)
       {
-         for(unsigned i = 0; i < b.size(); ++i)
+         for (unsigned i = 0; i < b.size(); ++i)
             a[i] /= val;
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
-private:
+
+ private:
    T generate_random()
    {
       return generate_random(boost::mpl::int_<Type>());
    }
    T generate_random(const boost::mpl::int_<boost::multiprecision::number_kind_floating_point>&)
    {
-      T val = gen();
+      T val      = gen();
       T prev_val = -1;
-      while(val != prev_val)
+      while (val != prev_val)
       {
          val *= (gen.max)();
          prev_val = val;
@@ -526,7 +525,7 @@ private:
       int e;
       val = frexp(val, &e);
 
-      typedef typename T::backend_type::exponent_type e_type;
+      typedef typename T::backend_type::exponent_type        e_type;
       static boost::random::uniform_int_distribution<e_type> ui(-30, 30);
       return ldexp(val, static_cast<int>(ui(gen)));
    }
@@ -534,26 +533,27 @@ private:
    {
       typedef boost::random::mt19937::result_type random_type;
 
-      T max_val;
+      T        max_val;
       unsigned digits;
-      if(std::numeric_limits<T>::is_bounded)
+      if (std::numeric_limits<T>::is_bounded)
       {
          max_val = (std::numeric_limits<T>::max)();
-         digits = std::numeric_limits<T>::digits;
+         digits  = std::numeric_limits<T>::digits;
       }
       else
       {
          max_val = T(1) << bits_wanted;
-         digits = bits_wanted;
+         digits  = bits_wanted;
       }
 
       unsigned bits_per_r_val = std::numeric_limits<random_type>::digits - 1;
-      while((random_type(1) << bits_per_r_val) > (gen.max)()) --bits_per_r_val;
+      while ((random_type(1) << bits_per_r_val) > (gen.max)())
+         --bits_per_r_val;
 
       unsigned terms_needed = digits / bits_per_r_val + 1;
 
       T val = 0;
-      for(unsigned i = 0; i < terms_needed; ++i)
+      for (unsigned i = 0; i < terms_needed; ++i)
       {
          val *= (gen.max)();
          val += gen();
@@ -563,46 +563,47 @@ private:
    }
    T generate_random(const boost::mpl::int_<boost::multiprecision::number_kind_rational>&)
    {
-      typedef boost::random::mt19937::result_type random_type;
+      typedef boost::random::mt19937::result_type                     random_type;
       typedef typename boost::multiprecision::component_type<T>::type IntType;
 
-      IntType max_val;
+      IntType  max_val;
       unsigned digits;
-      if(std::numeric_limits<IntType>::is_bounded)
+      if (std::numeric_limits<IntType>::is_bounded)
       {
          max_val = (std::numeric_limits<IntType>::max)();
-         digits = std::numeric_limits<IntType>::digits;
+         digits  = std::numeric_limits<IntType>::digits;
       }
       else
       {
          max_val = IntType(1) << bits_wanted;
-         digits = bits_wanted;
+         digits  = bits_wanted;
       }
 
       unsigned bits_per_r_val = std::numeric_limits<random_type>::digits - 1;
-      while((random_type(1) << bits_per_r_val) > (gen.max)()) --bits_per_r_val;
+      while ((random_type(1) << bits_per_r_val) > (gen.max)())
+         --bits_per_r_val;
 
       unsigned terms_needed = digits / bits_per_r_val + 1;
 
-      IntType val = 0;
+      IntType val   = 0;
       IntType denom = 0;
-      for(unsigned i = 0; i < terms_needed; ++i)
+      for (unsigned i = 0; i < terms_needed; ++i)
       {
          val *= (gen.max)();
          val += gen();
       }
-      for(unsigned i = 0; i < terms_needed; ++i)
+      for (unsigned i = 0; i < terms_needed; ++i)
       {
          denom *= (gen.max)();
          denom += gen();
       }
-      if(denom == 0)
+      if (denom == 0)
          denom = 1;
       val %= max_val;
       denom %= max_val;
       return T(val, denom);
    }
-   std::vector<T> a, b, c, small;
+   std::vector<T>                a, b, c, small;
    static boost::random::mt19937 gen;
 };
 
@@ -667,7 +668,7 @@ void test(const char* type, unsigned precision)
 {
    bits_wanted = precision;
    tester<Number, boost::multiprecision::number_category<Number>::value> t;
-   const char* cat = category_name(typename boost::multiprecision::number_category<Number>::type());
+   const char*                                                           cat = category_name(typename boost::multiprecision::number_category<Number>::type());
    //
    // call t.test_multiply() first so that the destination operands are
    // forced to perform whatever memory allocation may be needed.  That way
@@ -713,50 +714,50 @@ void quickbook_results()
    // Precision
    // Time
    //
-   typedef std::map<std::string, std::map<std::string, std::map<std::string, std::map<int, double> > > >::const_iterator  category_iterator;
-   typedef std::map<std::string, std::map<std::string, std::map<int, double> > >::const_iterator                          operator_iterator;
-   typedef std::map<std::string, std::map<int, double> >::const_iterator                                                  type_iterator;
-   typedef std::map<int, double>::const_iterator                                                                          precision_iterator;
+   typedef std::map<std::string, std::map<std::string, std::map<std::string, std::map<int, double> > > >::const_iterator category_iterator;
+   typedef std::map<std::string, std::map<std::string, std::map<int, double> > >::const_iterator                         operator_iterator;
+   typedef std::map<std::string, std::map<int, double> >::const_iterator                                                 type_iterator;
+   typedef std::map<int, double>::const_iterator                                                                         precision_iterator;
 
-   for(category_iterator i = result_table.begin(); i != result_table.end(); ++i)
+   for (category_iterator i = result_table.begin(); i != result_table.end(); ++i)
    {
       std::string cat = i->first;
-      cat[0] = std::toupper(cat[0]);
+      cat[0]          = std::toupper(cat[0]);
       std::cout << "[section:" << i->first << "_performance " << cat << " Type Perfomance]" << std::endl;
 
-      for(operator_iterator j = i->second.begin(); j != i->second.end(); ++j)
+      for (operator_iterator j = i->second.begin(); j != i->second.end(); ++j)
       {
          std::string op = j->first;
          std::cout << "[table Operator " << op << std::endl;
          std::cout << "[[Backend]";
 
-         for(precision_iterator k = j->second.begin()->second.begin(); k != j->second.begin()->second.end(); ++k)
+         for (precision_iterator k = j->second.begin()->second.begin(); k != j->second.begin()->second.end(); ++k)
          {
             std::cout << "[" << k->first << " Bits]";
          }
          std::cout << "]\n";
 
          std::vector<double> best_times(j->second.begin()->second.size(), (std::numeric_limits<double>::max)());
-         for(unsigned m = 0; m < j->second.begin()->second.size(); ++m)
+         for (unsigned m = 0; m < j->second.begin()->second.size(); ++m)
          {
-            for(type_iterator k = j->second.begin(); k != j->second.end(); ++k)
+            for (type_iterator k = j->second.begin(); k != j->second.end(); ++k)
             {
                precision_iterator l = k->second.begin();
                std::advance(l, m);
-               if(best_times[m] > l->second)
+               if (best_times[m] > l->second)
                   best_times[m] = l->second ? l->second : best_times[m];
             }
          }
 
-         for(type_iterator k = j->second.begin(); k != j->second.end(); ++k)
+         for (type_iterator k = j->second.begin(); k != j->second.end(); ++k)
          {
             std::cout << "[[" << k->first << "]";
 
             unsigned m = 0;
-            for(precision_iterator l = k->second.begin(); l != k->second.end(); ++l)
+            for (precision_iterator l = k->second.begin(); l != k->second.end(); ++l)
             {
                double rel_time = l->second / best_times[m];
-               if(rel_time == 1)
+               if (rel_time == 1)
                   std::cout << "[[*" << rel_time << "]";
                else
                   std::cout << "[" << rel_time;
@@ -773,7 +774,6 @@ void quickbook_results()
       std::cout << "[endsect]" << std::endl;
    }
 }
-
 
 int main()
 {
@@ -849,4 +849,3 @@ int main()
    quickbook_results();
    return 0;
 }
-

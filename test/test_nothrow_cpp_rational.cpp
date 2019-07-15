@@ -11,14 +11,14 @@
 #include <boost/type_traits/has_nothrow_copy.hpp>
 #include <boost/static_assert.hpp>
 
-typedef boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::int128_t::backend_type> > rat128_t;
+typedef boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::int128_t::backend_type> >  rat128_t;
 typedef boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::uint128_t::backend_type> > urat128_t;
-typedef boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::int512_t::backend_type> > rat512_t;
+typedef boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::int512_t::backend_type> >  rat512_t;
 typedef boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::uint512_t::backend_type> > urat512_t;
 
-typedef boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::checked_int128_t::backend_type> > checked_rat128_t;
+typedef boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::checked_int128_t::backend_type> >  checked_rat128_t;
 typedef boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::checked_uint128_t::backend_type> > checked_urat128_t;
-typedef boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::checked_int512_t::backend_type> > checked_rat512_t;
+typedef boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::checked_int512_t::backend_type> >  checked_rat512_t;
 typedef boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::checked_uint512_t::backend_type> > checked_urat512_t;
 
 #ifndef BOOST_NO_CXX11_NOEXCEPT
@@ -205,4 +205,3 @@ BOOST_STATIC_ASSERT(noexcept(std::declval<checked_urat512_t>() = std::declval<bo
 #endif
 #endif // little endian
 #endif // noexcept
-

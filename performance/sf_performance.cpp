@@ -7,22 +7,22 @@
 
 unsigned allocation_count = 0;
 
-void *(*alloc_func_ptr) (size_t);
-void *(*realloc_func_ptr) (void *, size_t, size_t);
-void (*free_func_ptr) (void *, size_t);
+void* (*alloc_func_ptr)(size_t);
+void* (*realloc_func_ptr)(void*, size_t, size_t);
+void (*free_func_ptr)(void*, size_t);
 
-void *alloc_func(size_t n)
+void* alloc_func(size_t n)
 {
    ++allocation_count;
    return (*alloc_func_ptr)(n);
 }
 
-void free_func(void * p, size_t n)
+void free_func(void* p, size_t n)
 {
    (*free_func_ptr)(p, n);
 }
 
-void * realloc_func(void * p, size_t old, size_t n)
+void* realloc_func(void* p, size_t old, size_t n)
 {
    ++allocation_count;
    return (*realloc_func_ptr)(p, old, n);
@@ -42,4 +42,3 @@ int main()
    poly_tests();
    nct_tests();
 }
-

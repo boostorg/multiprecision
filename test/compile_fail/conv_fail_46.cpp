@@ -11,7 +11,7 @@ using namespace boost::multiprecision;
 
 int main()
 {
-   mpf_t f;
+   mpf_t   f;
    mpz_int i;
    i = f;
 }
