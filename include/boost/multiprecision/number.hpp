@@ -6,8 +6,7 @@
 #ifndef BOOST_MATH_EXTENDED_REAL_HPP
 #define BOOST_MATH_EXTENDED_REAL_HPP
 
-#include <boost/assert.hpp>
-#include <boost/container_hash/hash.hpp>
+#include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/mpl/find_if.hpp>
 #include <boost/mpl/max.hpp>

@@ -495,19 +495,21 @@ template <> struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0> {
       t.swap(*this);
     } else
       mpc_set_f(this->m_data, val, GMP_RNDN);
-    return *this;
-  }
-  template <unsigned digits10>
-  mpc_complex_backend(gmp_float<digits10> const &val)
-      : detail::mpc_complex_imp<0>((unsigned)mpf_get_prec(val.data())) {
-    mpc_set_f(this->m_data, val.data(), GMP_RNDN);
-  }
-  template <unsigned digits10>
-  mpc_complex_backend &operator=(gmp_float<digits10> const &val) {
-    if (mpc_get_prec(data()) != mpf_get_prec(val.data())) {
-      mpc_complex_backend t(val);
-      t.swap(*this);
-    } else
+   }
+   mpc_complex_backend& operator=(mpf_srcptr val)
+   {
+      if ((mp_bitcnt_t)mpc_get_prec(data()) != mpf_get_prec(val))
+      {
+         mpc_complex_backend t(val);
+         t.swap(*this);
+      }
+      else
+         mpc_set_f(this->m_data, val, GMP_RNDN);
+      return *this;
+   }
+   template <unsigned digits10>
+   mpc_complex_backend(gmp_float<digits10> const& val) : detail::mpc_complex_imp<0>((unsigned)mpf_get_prec(val.data()))
+   {
       mpc_set_f(this->m_data, val.data(), GMP_RNDN);
     return *this;
   }

@@ -422,7 +422,7 @@ inline void eval_bit_flip(const debug_adaptor<Backend>& arg, unsigned a)
 
 NON_MEMBER_OP3(gcd, "gcd")
 NON_MEMBER_OP3(lcm, "lcm")
-NON_MEMBER_OP4(powm, "powm");
+NON_MEMBER_OP4(powm, "powm")
 
 /*********************************************************************
 *
