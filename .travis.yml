@@ -2164,17 +2164,17 @@ script:
         sudo ./b2 -j$(nproc) install;
       elif [[ $TRAVIS_OS_NAME == osx ]]; then
         sudo ./b2 -j$(sysctl -n hw.ncpu) install;
-      fi
+      fi;
       cd libs/multiprecision && mkdir cmake-build && cd cmake-build;
       if [[ $(echo $CXXSTD | sed 's/[^0-9]*//g') == 03 ]]; then
         CXXSTD=c++98;
-      fi
+      fi;
       cmake -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9]*//g') ..;
       if [[ $TRAVIS_OS_NAME == linux ]]; then
         make -j$(nproc) tests-multiprecision;
       elif [[ $TRAVIS_OS_NAME == osx ]]; then
         make -j$(sysctl -n hw.ncpu) tests-multiprecision;
-      fi
+      fi;
       if [[ $TRAVIS_OS_NAME == linux ]]; then
         ctest -j$(nproc) ..;
       elif [[ $TRAVIS_OS_NAME == osx ]]; then
