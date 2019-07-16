@@ -1,2 +1,0 @@
-sphinx
-sphinx-boost>0.0.2
