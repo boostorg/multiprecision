@@ -2174,7 +2174,7 @@ script:
         make -j$(nproc) multiprecision_test_suite_$TEST_SUITE;
       elif [[ $TRAVIS_OS_NAME == osx ]]; then
         make -j$(sysctl -n hw.ncpu) multiprecision_test_suite_$TEST_SUITE;
-      fi;
+      fi
 #      if [[ $TRAVIS_OS_NAME == linux ]]; then
 #        ctest -j$(nproc) ..;
 #      elif [[ $TRAVIS_OS_NAME == osx ]]; then
