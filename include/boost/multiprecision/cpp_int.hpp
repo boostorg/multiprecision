@@ -205,7 +205,7 @@ public:
    BOOST_STATIC_CONSTANT(unsigned, internal_limb_count =
       MinBits
          ? (MinBits / limb_bits + ((MinBits % limb_bits) ? 1 : 0))
-         : (sizeof(limb_data) / sizeof(limb_type)));
+         : (sizeof(limb_data) / sizeof(limb_type)) > 1 ? (sizeof(limb_data) / sizeof(limb_type)) : 2);
    BOOST_STATIC_CONSTANT(bool, variable = true);
 
 private:
