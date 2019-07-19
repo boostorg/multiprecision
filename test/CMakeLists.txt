@@ -123,12 +123,16 @@ if(MPFI_FOUND)
                 CMAKE_FLAGS "-DCMAKE_CXX_LINK_EXECUTABLE='echo not linking now...'" "-DINCLUDE_DIRECTORIES=${MPFI_INCLUDES}")
 endif()
 
-try_compile(INTEL_QUAD_COMPILED ${CMAKE_BINARY_DIR} ${CURRENT_TEST_SOURCES_DIR}/../config/has_intel_quad.cpp CMAKE_FLAGS
-            "-DCMAKE_CXX_LINK_EXECUTABLE='echo not linking now...'")
+if(Quadmath_FOUND)
+    try_compile(INTEL_QUAD_COMPILED ${CMAKE_BINARY_DIR} ${CURRENT_TEST_SOURCES_DIR}/../config/has_intel_quad.cpp CMAKE_FLAGS
+                "-DCMAKE_CXX_LINK_EXECUTABLE='echo not linking now...'")
+endif()
 
-try_compile(MPC_COMPILED ${CMAKE_BINARY_DIR} ${CURRENT_TEST_SOURCES_DIR}/../config/has_mpc.cpp
-            LINK_LIBRARIES ${MPC_LIBRARIES}
-            CMAKE_FLAGS "-DCMAKE_CXX_LINK_EXECUTABLE='echo not linking now...'" "-DINCLUDE_DIRECTORIES=${MPC_INCLUDES}")
+if(MPC_FOUND)
+    try_compile(MPC_COMPILED ${CMAKE_BINARY_DIR} ${CURRENT_TEST_SOURCES_DIR}/../config/has_mpc.cpp
+                LINK_LIBRARIES ${MPC_LIBRARIES}
+                CMAKE_FLAGS "-DCMAKE_CXX_LINK_EXECUTABLE='echo not linking now...'" "-DINCLUDE_DIRECTORIES=${MPC_INCLUDES}")
+endif()
 
 if(EIGEN_FOUND)
     try_compile(EIGEN_COMPILED ${CMAKE_BINARY_DIR} ${CURRENT_TEST_SOURCES_DIR}/../config/has_eigen.cpp
@@ -1435,9 +1439,9 @@ add_dependencies(multiprecision_test_suite_examples multiprecision_test_debug_ad
 if(FLOAT128_COMPILED)
     #TODO: fix this
     #[ run float128_snips.cpp quadmath no_eh_eg_support : : : [ check-target-builds ../config//has_float128 : : <build>no ] ]
-#    cm_test(NAME multiprecision_test_debug_adaptor_snips SOURCES ${CURRENT_TEST_SOURCES_DIR}/../example/debug_adaptor_snips.cpp)
-#    target_link_libraries(multiprecision_test_debug_adaptor_snips no_eh_support)
-#    add_dependencies(multiprecision_test_suite_examples multiprecision_test_debug_adaptor_snips)
+    #    cm_test(NAME multiprecision_test_debug_adaptor_snips SOURCES ${CURRENT_TEST_SOURCES_DIR}/../example/debug_adaptor_snips.cpp)
+    #    target_link_libraries(multiprecision_test_debug_adaptor_snips no_eh_support)
+    #    add_dependencies(multiprecision_test_suite_examples multiprecision_test_debug_adaptor_snips)
 endif()
 
 cm_test(NAME multiprecision_test_floating_point_examples SOURCES ${CURRENT_TEST_SOURCES_DIR}/../example/floating_point_examples.cpp)
