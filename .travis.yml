@@ -2171,9 +2171,9 @@ script:
       fi;
       cmake -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9]*//g') ..;
       if [[ $TRAVIS_OS_NAME == linux ]]; then
-        make -j$(nproc) multiprecision_test_suite_$TEST_SUITE;
+        cmake --build --target tests-multiprecision_$TEST_SUITE -j$(nproc);
       elif [[ $TRAVIS_OS_NAME == osx ]]; then
-        make -j$(sysctl -n hw.ncpu) multiprecision_test_suite_$TEST_SUITE;
+        cmake --build --target tests-multiprecision_$TEST_SUITE -j$(nproc);
       fi
     fi
 
