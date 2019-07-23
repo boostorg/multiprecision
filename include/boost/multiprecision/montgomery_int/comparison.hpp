@@ -1,3 +1,13 @@
+//---------------------------------------------------------------------------//
+// Copyright (c) 2018-2019 Nil Foundation AG
+// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
+// Copyright (c) 2018-2019 Alexey Moskvin
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
+
 #ifndef CRYPTO3_MP_MONTGOMERY_INT_COMPARISON_HPP
 #define CRYPTO3_MP_MONTGOMERY_INT_COMPARISON_HPP
 
@@ -24,27 +34,28 @@ template <template <unsigned, unsigned, cpp_integer_type, cpp_int_check_type,
 BOOST_MP_FORCEINLINE typename enable_if_c<
     !is_trivial_montgomery_int<
         montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator,
-                               ParamsBackend>>::value &&
+                               ParamsBackend> >::value &&
     !is_trivial_montgomery_int<Backend<MinBits, MaxBits, SignType, Checked,
-                                       Allocator, ParamsBackend>>::value &&
+                                       Allocator, ParamsBackend> >::value &&
     is_equal_montgomery_int_backend<Backend<MinBits, MaxBits, SignType, Checked,
-                                            Allocator, ParamsBackend>>::value>
+                                            Allocator, ParamsBackend> >::value>
 
     ::type
     eval_eq(const montgomery_int_backend<MinBits, MaxBits, SignType, Checked,
                                          Allocator, ParamsBackend> &a,
             const Backend<MinBits, MaxBits, SignType, Checked, Allocator,
-                          ParamsBackend> &b) BOOST_NOEXCEPT {
+                          ParamsBackend> &                          b) BOOST_NOEXCEPT
+{
 #if BOOST_WORKAROUND(BOOST_MSVC, >= 1600)
-  return (a.sign() == b.sign()) && (a.size() == b.size()) &&
-         std::equal(
-             a.limbs(), a.limbs() + a.size(),
-             stdext::checked_array_iterator<montgomery_int_backend<
-                 MinBits, MaxBits, SignType, Checked, Allocator,
-                 ParamsBackend>::const_limb_pointer>(b.limbs(), b.size()));
+   return (a.sign() == b.sign()) && (a.size() == b.size()) &&
+          std::equal(
+              a.limbs(), a.limbs() + a.size(),
+              stdext::checked_array_iterator<montgomery_int_backend<
+                  MinBits, MaxBits, SignType, Checked, Allocator,
+                  ParamsBackend>::const_limb_pointer>(b.limbs(), b.size()));
 #else
-  return (a.sign() == b.sign()) && (a.size() == b.size()) &&
-         std::equal(a.limbs(), a.limbs() + a.size(), b.limbs());
+   return (a.sign() == b.sign()) && (a.size() == b.size()) &&
+          std::equal(a.limbs(), a.limbs() + a.size(), b.limbs());
 #endif
 }
 
@@ -59,29 +70,30 @@ template <template <unsigned, unsigned, cpp_integer_type, cpp_int_check_type,
 BOOST_MP_FORCEINLINE typename enable_if_c<
     !is_trivial_montgomery_int<
         montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                               Allocator1, ParamsBackend1>>::value &&
+                               Allocator1, ParamsBackend1> >::value &&
     !is_trivial_montgomery_int<Backend<MinBits2, MaxBits2, SignType2, Checked2,
-                                       Allocator2, ParamsBackend2>>::value &&
+                                       Allocator2, ParamsBackend2> >::value &&
     is_equal_montgomery_int_backend<
         Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2,
-                ParamsBackend2>>::value>
+                ParamsBackend2> >::value>
 
     ::type eval_eq(
         const montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
                                      Allocator1, ParamsBackend1> &a,
         const Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2,
-                      ParamsBackend2> &b) BOOST_NOEXCEPT {
+                      ParamsBackend2> &                           b) BOOST_NOEXCEPT
+{
 #if BOOST_WORKAROUND(BOOST_MSVC, >= 1600)
-  return (a.sign() == b.sign()) && (a.size() == b.size()) &&
-         std::equal(
-             a.limbs(), a.limbs() + a.size(),
-             stdext::checked_array_iterator<
-                 Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2,
-                         ParamsBackend2>::const_limb_pointer>(b.limbs(),
-                                                              b.size()));
+   return (a.sign() == b.sign()) && (a.size() == b.size()) &&
+          std::equal(
+              a.limbs(), a.limbs() + a.size(),
+              stdext::checked_array_iterator<
+                  Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2,
+                          ParamsBackend2>::const_limb_pointer>(b.limbs(),
+                                                               b.size()));
 #else
-  return (a.sign() == b.sign()) && (a.size() == b.size()) &&
-         std::equal(a.limbs(), a.limbs() + a.size(), b.limbs());
+   return (a.sign() == b.sign()) && (a.size() == b.size()) &&
+          std::equal(a.limbs(), a.limbs() + a.size(), b.limbs());
 #endif
 }
 
@@ -90,14 +102,15 @@ template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
 BOOST_MP_FORCEINLINE
     typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
                              MinBits, MaxBits, signed_magnitude, Checked,
-                             Allocator, ParamsBackend>>::value,
+                             Allocator, ParamsBackend> >::value,
                          bool>
 
     ::type
     eval_eq(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
                                          Checked, Allocator, ParamsBackend> &a,
-            limb_type b) BOOST_NOEXCEPT {
-  return (a.sign() == false) && (a.size() == 1) && (*a.limbs() == b);
+            limb_type                                                        b) BOOST_NOEXCEPT
+{
+   return (a.sign() == false) && (a.size() == 1) && (*a.limbs() == b);
 }
 
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
@@ -105,15 +118,16 @@ template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
 BOOST_MP_FORCEINLINE
     typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
                              MinBits, MaxBits, signed_magnitude, Checked,
-                             Allocator, ParamsBackend>>::value,
+                             Allocator, ParamsBackend> >::value,
                          bool>
 
     ::type
     eval_eq(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
                                          Checked, Allocator, ParamsBackend> &a,
-            signed_limb_type b) BOOST_NOEXCEPT {
-  return (a.sign() == (b < 0)) && (a.size() == 1) &&
-         (*a.limbs() == boost::multiprecision::detail::unsigned_abs(b));
+            signed_limb_type                                                 b) BOOST_NOEXCEPT
+{
+   return (a.sign() == (b < 0)) && (a.size() == 1) &&
+          (*a.limbs() == boost::multiprecision::detail::unsigned_abs(b));
 }
 
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
@@ -121,14 +135,15 @@ template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
 BOOST_MP_FORCEINLINE
     typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
                              MinBits, MaxBits, unsigned_magnitude, Checked,
-                             Allocator, ParamsBackend>>::value,
+                             Allocator, ParamsBackend> >::value,
                          bool>
 
     ::type
     eval_eq(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
                                          Checked, Allocator, ParamsBackend> &a,
-            limb_type b) BOOST_NOEXCEPT {
-  return (a.size() == 1) && (*a.limbs() == b);
+            limb_type                                                        b) BOOST_NOEXCEPT
+{
+   return (a.size() == 1) && (*a.limbs() == b);
 }
 
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
@@ -136,103 +151,20 @@ template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
 BOOST_MP_FORCEINLINE
     typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
                              MinBits, MaxBits, unsigned_magnitude, Checked,
-                             Allocator, ParamsBackend>>::value,
+                             Allocator, ParamsBackend> >::value,
                          bool>
 
     ::type
     eval_eq(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
                                          Checked, Allocator, ParamsBackend> &a,
-            signed_limb_type b) BOOST_NOEXCEPT {
-  return (b < 0)
-             ? eval_eq(
-                   a,
-                   montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
-                                          Checked, Allocator, ParamsBackend>(b))
-             : eval_eq(a, static_cast<limb_type>(
-                              b)); // Use bit pattern of b for comparison
-}
-
-template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
-          class Allocator, typename ParamsBackend>
-BOOST_MP_FORCEINLINE
-    typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
-                             MinBits, MaxBits, signed_magnitude, Checked,
-                             Allocator, ParamsBackend>>::value,
-                         bool>
-
-    ::type
-    eval_lt(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
-                                         Checked, Allocator, ParamsBackend> &a,
-            limb_type b) BOOST_NOEXCEPT {
-  if (a.sign()) {
-    return true;
-  }
-  if (a.size() > 1) {
-    return false;
-  }
-  return *a.limbs() < b;
-}
-
-template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
-          class Allocator, typename ParamsBackend>
-inline typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
-                                MinBits, MaxBits, signed_magnitude, Checked,
-                                Allocator, ParamsBackend>>::value,
-                            bool>
-
-    ::type
-    eval_lt(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
-                                         Checked, Allocator, ParamsBackend> &a,
-            signed_limb_type b) BOOST_NOEXCEPT {
-  if ((b == 0) || (a.sign() != (b < 0))) {
-    return a.sign();
-  }
-  if (a.sign()) {
-    if (a.size() > 1) {
-      return true;
-    }
-    return *a.limbs() > boost::multiprecision::detail::unsigned_abs(b);
-  } else {
-    if (a.size() > 1) {
-      return false;
-    }
-    return *a.limbs() < boost::multiprecision::detail::unsigned_abs(b);
-  }
-}
-
-template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
-          class Allocator, typename ParamsBackend>
-BOOST_MP_FORCEINLINE
-    typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
-                             MinBits, MaxBits, unsigned_magnitude, Checked,
-                             Allocator, ParamsBackend>>::value,
-                         bool>
-
-    ::type
-    eval_lt(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
-                                         Checked, Allocator, ParamsBackend> &a,
-            limb_type b) BOOST_NOEXCEPT {
-  if (a.size() > 1) {
-    return false;
-  }
-  return *a.limbs() < b;
-}
-
-template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
-          class Allocator, typename ParamsBackend>
-BOOST_MP_FORCEINLINE
-    typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
-                             MinBits, MaxBits, unsigned_magnitude, Checked,
-                             Allocator, ParamsBackend>>::value,
-                         bool>
-
-    ::type
-    eval_lt(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
-                                         Checked, Allocator, ParamsBackend> &a,
-            signed_limb_type b) BOOST_NOEXCEPT {
-  return (b < 0) ? a.compare(b) < 0
-                 : eval_lt(a,
-                           static_cast<limb_type>(
+            signed_limb_type                                                 b) BOOST_NOEXCEPT
+{
+   return (b < 0)
+              ? eval_eq(
+                    a,
+                    montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
+                                           Checked, Allocator, ParamsBackend>(b))
+              : eval_eq(a, static_cast<limb_type>(
                                b)); // Use bit pattern of b for comparison
 }
 
@@ -241,50 +173,178 @@ template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
 BOOST_MP_FORCEINLINE
     typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
                              MinBits, MaxBits, signed_magnitude, Checked,
-                             Allocator, ParamsBackend>>::value,
+                             Allocator, ParamsBackend> >::value,
+                         bool>
+
+    ::type
+    eval_lt(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
+                                         Checked, Allocator, ParamsBackend> &a,
+            limb_type                                                        b) BOOST_NOEXCEPT
+{
+   if (a.sign())
+   {
+      return true;
+   }
+   if (a.size() > 1)
+   {
+      return false;
+   }
+   return *a.limbs() < b;
+}
+
+template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
+          class Allocator, typename ParamsBackend>
+inline typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
+                                MinBits, MaxBits, signed_magnitude, Checked,
+                                Allocator, ParamsBackend> >::value,
+                            bool>
+
+    ::type
+    eval_lt(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
+                                         Checked, Allocator, ParamsBackend> &a,
+            signed_limb_type                                                 b) BOOST_NOEXCEPT
+{
+   if ((b == 0) || (a.sign() != (b < 0)))
+   {
+      return a.sign();
+   }
+   if (a.sign())
+   {
+      if (a.size() > 1)
+      {
+         return true;
+      }
+      return *a.limbs() > boost::multiprecision::detail::unsigned_abs(b);
+   }
+   else
+   {
+      if (a.size() > 1)
+      {
+         return false;
+      }
+      return *a.limbs() < boost::multiprecision::detail::unsigned_abs(b);
+   }
+}
+
+template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
+          class Allocator, typename ParamsBackend>
+BOOST_MP_FORCEINLINE
+    typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
+                             MinBits, MaxBits, unsigned_magnitude, Checked,
+                             Allocator, ParamsBackend> >::value,
+                         bool>
+
+    ::type
+    eval_lt(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
+                                         Checked, Allocator, ParamsBackend> &a,
+            limb_type                                                        b) BOOST_NOEXCEPT
+{
+   if (a.size() > 1)
+   {
+      return false;
+   }
+   return *a.limbs() < b;
+}
+
+template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
+          class Allocator, typename ParamsBackend>
+BOOST_MP_FORCEINLINE
+    typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
+                             MinBits, MaxBits, unsigned_magnitude, Checked,
+                             Allocator, ParamsBackend> >::value,
+                         bool>
+
+    ::type
+    eval_lt(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
+                                         Checked, Allocator, ParamsBackend> &a,
+            signed_limb_type                                                 b) BOOST_NOEXCEPT
+{
+   return (b < 0) ? a.compare(b) < 0
+                  : eval_lt(a,
+                            static_cast<limb_type>(
+                                b)); // Use bit pattern of b for comparison
+}
+
+template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
+          class Allocator, typename ParamsBackend>
+BOOST_MP_FORCEINLINE
+    typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
+                             MinBits, MaxBits, signed_magnitude, Checked,
+                             Allocator, ParamsBackend> >::value,
                          bool>
 
     ::type
     eval_gt(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
                                          Checked, Allocator, ParamsBackend> &a,
-            limb_type b) BOOST_NOEXCEPT {
-  if (a.sign()) {
-    return false;
-  }
-  if (a.size() > 1) {
-    return true;
-  }
-  return *a.limbs() > b;
+            limb_type                                                        b) BOOST_NOEXCEPT
+{
+   if (a.sign())
+   {
+      return false;
+   }
+   if (a.size() > 1)
+   {
+      return true;
+   }
+   return *a.limbs() > b;
 }
 
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
           class Allocator, typename ParamsBackend>
 inline typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
                                 MinBits, MaxBits, unsigned_magnitude, Checked,
-                                Allocator, ParamsBackend>>::value,
+                                Allocator, ParamsBackend> >::value,
                             bool>
 
     ::type
     eval_gt(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
                                          Checked, Allocator, ParamsBackend> &a,
-            signed_limb_type b) BOOST_NOEXCEPT {
-  if (b == 0) {
-    return !a.sign() && ((a.size() > 1) || *a.limbs());
-  }
-  if (a.sign() != (b < 0)) {
-    return !a.sign();
-  }
-  if (a.sign()) {
-    if (a.size() > 1) {
-      return false;
-    }
-    return *a.limbs() < boost::multiprecision::detail::unsigned_abs(b);
-  } else {
-    if (a.size() > 1) {
+            signed_limb_type                                                 b) BOOST_NOEXCEPT
+{
+   if (b == 0)
+   {
+      return !a.sign() && ((a.size() > 1) || *a.limbs());
+   }
+   if (a.sign() != (b < 0))
+   {
+      return !a.sign();
+   }
+   if (a.sign())
+   {
+      if (a.size() > 1)
+      {
+         return false;
+      }
+      return *a.limbs() < boost::multiprecision::detail::unsigned_abs(b);
+   }
+   else
+   {
+      if (a.size() > 1)
+      {
+         return true;
+      }
+      return *a.limbs() > boost::multiprecision::detail::unsigned_abs(b);
+   }
+}
+
+template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
+          class Allocator, typename ParamsBackend>
+BOOST_MP_FORCEINLINE
+    typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
+                             MinBits, MaxBits, unsigned_magnitude, Checked,
+                             Allocator, ParamsBackend> >::value,
+                         bool>
+
+    ::type
+    eval_gt(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
+                                         Checked, Allocator, ParamsBackend> &a,
+            limb_type                                                        b) BOOST_NOEXCEPT
+{
+   if (a.size() > 1)
+   {
       return true;
-    }
-    return *a.limbs() > boost::multiprecision::detail::unsigned_abs(b);
-  }
+   }
+   return *a.limbs() > b;
 }
 
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
@@ -292,35 +352,18 @@ template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
 BOOST_MP_FORCEINLINE
     typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
                              MinBits, MaxBits, unsigned_magnitude, Checked,
-                             Allocator, ParamsBackend>>::value,
+                             Allocator, ParamsBackend> >::value,
                          bool>
 
     ::type
     eval_gt(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
                                          Checked, Allocator, ParamsBackend> &a,
-            limb_type b) BOOST_NOEXCEPT {
-  if (a.size() > 1) {
-    return true;
-  }
-  return *a.limbs() > b;
-}
-
-template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
-          class Allocator, typename ParamsBackend>
-BOOST_MP_FORCEINLINE
-    typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
-                             MinBits, MaxBits, unsigned_magnitude, Checked,
-                             Allocator, ParamsBackend>>::value,
-                         bool>
-
-    ::type
-    eval_gt(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
-                                         Checked, Allocator, ParamsBackend> &a,
-            signed_limb_type b) BOOST_NOEXCEPT {
-  return (b < 0) ? a.compare(b) > 0
-                 : eval_gt(a,
-                           static_cast<limb_type>(
-                               b)); // Use bit pattern of b for comparison.
+            signed_limb_type                                                 b) BOOST_NOEXCEPT
+{
+   return (b < 0) ? a.compare(b) > 0
+                  : eval_gt(a,
+                            static_cast<limb_type>(
+                                b)); // Use bit pattern of b for comparison.
 }
 
 /*!template<template<unsigned, unsigned, cpp_integer_type, cpp_int_check_type,
@@ -347,19 +390,20 @@ template <template <unsigned, unsigned, cpp_integer_type, cpp_int_check_type,
 
 BOOST_MP_FORCEINLINE typename enable_if_c<
     is_trivial_montgomery_int<montgomery_int_backend<
-        MinBits, MaxBits, signed_magnitude, Checked, void>>::value &&
+        MinBits, MaxBits, signed_magnitude, Checked, void> >::value &&
     is_trivial_montgomery_int<Backend<MinBits, MaxBits, signed_magnitude,
-                                      Checked, void, ParamsBackend>>::value &&
+                                      Checked, void, ParamsBackend> >::value &&
     is_equal_montgomery_int_backend<
         Backend<MinBits, MaxBits, signed_magnitude, Checked, void,
-                ParamsBackend>>::value>
+                ParamsBackend> >::value>
 
     ::value
     eval_eq(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
                                          Checked, void, ParamsBackend> &a,
             const Backend<MinBits, MaxBits, signed_magnitude, Checked, void,
-                          ParamsBackend> &b) BOOST_NOEXCEPT {
-  return (a.sign() == b.sign()) && (*a.limbs() == *b.limbs());
+                          ParamsBackend> &                              b) BOOST_NOEXCEPT
+{
+   return (a.sign() == b.sign()) && (*a.limbs() == *b.limbs());
 }
 
 template <template <unsigned, unsigned, cpp_integer_type, cpp_int_check_type,
@@ -371,17 +415,18 @@ template <template <unsigned, unsigned, cpp_integer_type, cpp_int_check_type,
 BOOST_MP_FORCEINLINE
     typename enable_if_c<is_trivial_montgomery_int<montgomery_int_backend<
                              MinBits, MaxBits, unsigned_magnitude, Checked,
-                             void, ParamsBackend>>::value &&
+                             void, ParamsBackend> >::value &&
                          is_equal_montgomery_int_backend<
                              Backend<MinBits, MaxBits, unsigned_magnitude,
-                                     Checked, void, ParamsBackend>>::value>
+                                     Checked, void, ParamsBackend> >::value>
 
     ::value
     eval_eq(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
                                          Checked, void, ParamsBackend> &a,
             const Backend<MinBits, MaxBits, unsigned_magnitude, Checked, void,
-                          ParamsBackend> &b) BOOST_NOEXCEPT {
-  return *a.limbs() == *b.limbs();
+                          ParamsBackend> &                              b) BOOST_NOEXCEPT
+{
+   return *a.limbs() == *b.limbs();
 }
 
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
@@ -389,14 +434,15 @@ template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
 BOOST_MP_FORCEINLINE typename enable_if_c<
     is_unsigned<U>::value &&
         is_trivial_montgomery_int<montgomery_int_backend<
-            MinBits, MaxBits, signed_magnitude, Checked, void>>::value,
+            MinBits, MaxBits, signed_magnitude, Checked, void> >::value,
     bool>
 
     ::type
     eval_eq(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
                                          Checked, void> &a,
-            U b) BOOST_NOEXCEPT {
-  return !a.sign() && (*a.limbs() == b);
+            U                                            b) BOOST_NOEXCEPT
+{
+   return !a.sign() && (*a.limbs() == b);
 }
 
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
@@ -404,15 +450,16 @@ template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
 BOOST_MP_FORCEINLINE typename enable_if_c<
     is_signed<S>::value &&
         is_trivial_montgomery_int<montgomery_int_backend<
-            MinBits, MaxBits, signed_magnitude, Checked, void>>::value,
+            MinBits, MaxBits, signed_magnitude, Checked, void> >::value,
     bool>
 
     ::type
     eval_eq(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
                                          Checked, void> &a,
-            S b) BOOST_NOEXCEPT {
-  return (a.sign() == (b < 0)) &&
-         (*a.limbs() == boost::multiprecision::detail::unsigned_abs(b));
+            S                                            b) BOOST_NOEXCEPT
+{
+   return (a.sign() == (b < 0)) &&
+          (*a.limbs() == boost::multiprecision::detail::unsigned_abs(b));
 }
 
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
@@ -420,14 +467,15 @@ template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
 BOOST_MP_FORCEINLINE typename enable_if_c<
     is_unsigned<U>::value &&
         is_trivial_montgomery_int<montgomery_int_backend<
-            MinBits, MaxBits, unsigned_magnitude, Checked, void>>::value,
+            MinBits, MaxBits, unsigned_magnitude, Checked, void> >::value,
     bool>
 
     ::type
     eval_eq(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
                                          Checked, void> &a,
-            U b) BOOST_NOEXCEPT {
-  return *a.limbs() == b;
+            U                                            b) BOOST_NOEXCEPT
+{
+   return *a.limbs() == b;
 }
 
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
@@ -435,21 +483,25 @@ template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
 BOOST_MP_FORCEINLINE typename enable_if_c<
     is_signed<S>::value &&
         is_trivial_montgomery_int<montgomery_int_backend<
-            MinBits, MaxBits, unsigned_magnitude, Checked, void>>::value,
+            MinBits, MaxBits, unsigned_magnitude, Checked, void> >::value,
     bool>
 
     ::type
     eval_eq(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
                                          Checked, void> &a,
-            S b) BOOST_NOEXCEPT {
-  typedef typename make_unsigned<S>::type ui_type;
-  if (b < 0) {
-    montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void>
-        t(b);
-    return *a.limbs() == *t.limbs();
-  } else {
-    return *a.limbs() == static_cast<ui_type>(b);
-  }
+            S                                            b) BOOST_NOEXCEPT
+{
+   typedef typename make_unsigned<S>::type ui_type;
+   if (b < 0)
+   {
+      montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void>
+          t(b);
+      return *a.limbs() == *t.limbs();
+   }
+   else
+   {
+      return *a.limbs() == static_cast<ui_type>(b);
+   }
 }
 
 template <template <unsigned, unsigned, cpp_integer_type, cpp_int_check_type,
@@ -460,22 +512,24 @@ template <template <unsigned, unsigned, cpp_integer_type, cpp_int_check_type,
 BOOST_MP_FORCEINLINE typename enable_if_c<
     is_trivial_montgomery_int<
         montgomery_int_backend<MinBits, MaxBits, signed_magnitude, Checked,
-                               void, ParamsBackend>>::value &&
+                               void, ParamsBackend> >::value &&
     is_trivial_montgomery_int<Backend<MinBits, MaxBits, signed_magnitude,
-                                      Checked, void, ParamsBackend>>::value &&
+                                      Checked, void, ParamsBackend> >::value &&
     is_equal_montgomery_int_backend<
         Backend<MinBits, MaxBits, unsigned_magnitude, Checked, void,
-                ParamsBackend>>::value>
+                ParamsBackend> >::value>
 
     ::type
     eval_lt(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
                                          Checked, void, ParamsBackend> &a,
             const Backend<MinBits, MaxBits, unsigned_magnitude, Checked, void,
-                          ParamsBackend> &b) BOOST_NOEXCEPT {
-  if (a.sign() != b.sign()) {
-    return a.sign();
-  }
-  return a.sign() ? *a.limbs() > *b.limbs() : *a.limbs() < *b.limbs();
+                          ParamsBackend> &                              b) BOOST_NOEXCEPT
+{
+   if (a.sign() != b.sign())
+   {
+      return a.sign();
+   }
+   return a.sign() ? *a.limbs() > *b.limbs() : *a.limbs() < *b.limbs();
 }
 
 template <template <unsigned, unsigned, cpp_integer_type, cpp_int_check_type,
@@ -486,20 +540,21 @@ template <template <unsigned, unsigned, cpp_integer_type, cpp_int_check_type,
 BOOST_MP_FORCEINLINE typename enable_if_c<
     is_trivial_montgomery_int<
         montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked,
-                               void, ParamsBackend>>::value &&
+                               void, ParamsBackend> >::value &&
     is_trivial_montgomery_int<Backend<MinBits, MaxBits, unsigned_magnitude,
-                                      Checked, void, ParamsBackend>>::value &&
+                                      Checked, void, ParamsBackend> >::value &&
     is_equal_montgomery_int_backend<
         Backend<MinBits, MaxBits, unsigned_magnitude, Checked, void,
-                ParamsBackend>>::value>
+                ParamsBackend> >::value>
 
     ::type
     eval_lt(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
                                          Checked, void, ParamsBackend> &a,
             const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
                                          Checked, void, ParamsBackend> &b)
-        BOOST_NOEXCEPT {
-  return *a.limbs() < *b.limbs();
+        BOOST_NOEXCEPT
+{
+   return *a.limbs() < *b.limbs();
 }
 
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
@@ -507,17 +562,19 @@ template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
 BOOST_MP_FORCEINLINE typename enable_if_c<
     is_unsigned<U>::value &&
         is_trivial_montgomery_int<montgomery_int_backend<
-            MinBits, MaxBits, signed_magnitude, Checked, void>>::value,
+            MinBits, MaxBits, signed_magnitude, Checked, void> >::value,
     bool>
 
     ::type
     eval_lt(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
                                          Checked, void> &a,
-            U b) BOOST_NOEXCEPT {
-  if (a.sign()) {
-    return true;
-  }
-  return *a.limbs() < b;
+            U                                            b) BOOST_NOEXCEPT
+{
+   if (a.sign())
+   {
+      return true;
+   }
+   return *a.limbs() < b;
 }
 
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
@@ -525,19 +582,21 @@ template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
 BOOST_MP_FORCEINLINE typename enable_if_c<
     is_signed<S>::value &&
         is_trivial_montgomery_int<montgomery_int_backend<
-            MinBits, MaxBits, signed_magnitude, Checked, void>>::value,
+            MinBits, MaxBits, signed_magnitude, Checked, void> >::value,
     bool>
 
     ::type
     eval_lt(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
                                          Checked, void> &a,
-            S b) BOOST_NOEXCEPT {
-  if (a.sign() != (b < 0)) {
-    return a.sign();
-  }
-  return a.sign()
-             ? (*a.limbs() > boost::multiprecision::detail::unsigned_abs(b))
-             : (*a.limbs() < boost::multiprecision::detail::unsigned_abs(b));
+            S                                            b) BOOST_NOEXCEPT
+{
+   if (a.sign() != (b < 0))
+   {
+      return a.sign();
+   }
+   return a.sign()
+              ? (*a.limbs() > boost::multiprecision::detail::unsigned_abs(b))
+              : (*a.limbs() < boost::multiprecision::detail::unsigned_abs(b));
 }
 
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
@@ -545,14 +604,15 @@ template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
 BOOST_MP_FORCEINLINE typename enable_if_c<
     is_unsigned<U>::value &&
         is_trivial_montgomery_int<montgomery_int_backend<
-            MinBits, MaxBits, unsigned_magnitude, Checked, void>>::value,
+            MinBits, MaxBits, unsigned_magnitude, Checked, void> >::value,
     bool>
 
     ::type
     eval_lt(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
                                          Checked, void> &a,
-            U b) BOOST_NOEXCEPT {
-  return *a.limbs() < b;
+            U                                            b) BOOST_NOEXCEPT
+{
+   return *a.limbs() < b;
 }
 
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
@@ -560,21 +620,25 @@ template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
 BOOST_MP_FORCEINLINE typename enable_if_c<
     is_signed<S>::value &&
         is_trivial_montgomery_int<montgomery_int_backend<
-            MinBits, MaxBits, unsigned_magnitude, Checked, void>>::value,
+            MinBits, MaxBits, unsigned_magnitude, Checked, void> >::value,
     bool>
 
     ::type
     eval_lt(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
                                          Checked, void> &a,
-            S b) BOOST_NOEXCEPT {
-  typedef typename make_unsigned<S>::type ui_type;
-  if (b < 0) {
-    montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void>
-        t(b);
-    return *a.limbs() < *t.limbs();
-  } else {
-    return *a.limbs() < static_cast<ui_type>(b);
-  }
+            S                                            b) BOOST_NOEXCEPT
+{
+   typedef typename make_unsigned<S>::type ui_type;
+   if (b < 0)
+   {
+      montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void>
+          t(b);
+      return *a.limbs() < *t.limbs();
+   }
+   else
+   {
+      return *a.limbs() < static_cast<ui_type>(b);
+   }
 }
 
 template <template <unsigned, unsigned, cpp_integer_type, cpp_int_check_type,
@@ -585,22 +649,24 @@ template <template <unsigned, unsigned, cpp_integer_type, cpp_int_check_type,
 BOOST_MP_FORCEINLINE typename enable_if_c<
     is_trivial_montgomery_int<
         montgomery_int_backend<MinBits, MaxBits, signed_magnitude, Checked,
-                               void, ParamsBackend>>::value &&
+                               void, ParamsBackend> >::value &&
     is_trivial_montgomery_int<Backend<MinBits, MaxBits, signed_magnitude,
-                                      Checked, void, ParamsBackend>>::value &&
+                                      Checked, void, ParamsBackend> >::value &&
     is_equal_montgomery_int_backend<
         Backend<MinBits, MaxBits, signed_magnitude, Checked, void,
-                ParamsBackend>>::value>
+                ParamsBackend> >::value>
 
     ::type
     eval_gt(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
                                          Checked, void, ParamsBackend> &a,
             const Backend<MinBits, MaxBits, signed_magnitude, Checked, void,
-                          ParamsBackend> &b) BOOST_NOEXCEPT {
-  if (a.sign() != b.sign()) {
-    return !a.sign();
-  }
-  return a.sign() ? *a.limbs() < *b.limbs() : *a.limbs() > *b.limbs();
+                          ParamsBackend> &                              b) BOOST_NOEXCEPT
+{
+   if (a.sign() != b.sign())
+   {
+      return !a.sign();
+   }
+   return a.sign() ? *a.limbs() < *b.limbs() : *a.limbs() > *b.limbs();
 }
 
 template <template <unsigned, unsigned, cpp_integer_type, cpp_int_check_type,
@@ -611,19 +677,20 @@ template <template <unsigned, unsigned, cpp_integer_type, cpp_int_check_type,
 BOOST_MP_FORCEINLINE typename enable_if_c<
     is_trivial_montgomery_int<
         montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked,
-                               void, ParamsBackend>>::value &&
+                               void, ParamsBackend> >::value &&
     is_trivial_montgomery_int<Backend<MinBits, MaxBits, unsigned_magnitude,
-                                      Checked, void, ParamsBackend>>::value &&
+                                      Checked, void, ParamsBackend> >::value &&
     is_equal_montgomery_int_backend<
         Backend<MinBits, MaxBits, unsigned_magnitude, Checked, void,
-                ParamsBackend>>::value>
+                ParamsBackend> >::value>
 
     ::type
     eval_gt(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
                                          Checked, void, ParamsBackend> &a,
             const Backend<MinBits, MaxBits, unsigned_magnitude, Checked, void,
-                          ParamsBackend> &b) BOOST_NOEXCEPT {
-  return *a.limbs() > *b.limbs();
+                          ParamsBackend> &                              b) BOOST_NOEXCEPT
+{
+   return *a.limbs() > *b.limbs();
 }
 
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
@@ -632,17 +699,19 @@ BOOST_MP_FORCEINLINE
     typename enable_if_c<is_unsigned<U>::value &&
                              is_trivial_montgomery_int<montgomery_int_backend<
                                  MinBits, MaxBits, signed_magnitude, Checked,
-                                 void, ParamsBackend>>::value,
+                                 void, ParamsBackend> >::value,
                          bool>
 
     ::type
     eval_gt(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
                                          Checked, void, ParamsBackend> &a,
-            U b) BOOST_NOEXCEPT {
-  if (a.sign()) {
-    return false;
-  }
-  return *a.limbs() > b;
+            U                                                           b) BOOST_NOEXCEPT
+{
+   if (a.sign())
+   {
+      return false;
+   }
+   return *a.limbs() > b;
 }
 
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
@@ -650,19 +719,21 @@ template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
 BOOST_MP_FORCEINLINE typename enable_if_c<
     is_signed<S>::value &&
         is_trivial_montgomery_int<montgomery_int_backend<
-            MinBits, MaxBits, signed_magnitude, Checked, void>>::value,
+            MinBits, MaxBits, signed_magnitude, Checked, void> >::value,
     bool>
 
     ::type
     eval_gt(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
                                          Checked, void> &a,
-            S b) BOOST_NOEXCEPT {
-  if (a.sign() != (b < 0)) {
-    return !a.sign();
-  }
-  return a.sign()
-             ? (*a.limbs() < boost::multiprecision::detail::unsigned_abs(b))
-             : (*a.limbs() > boost::multiprecision::detail::unsigned_abs(b));
+            S                                            b) BOOST_NOEXCEPT
+{
+   if (a.sign() != (b < 0))
+   {
+      return !a.sign();
+   }
+   return a.sign()
+              ? (*a.limbs() < boost::multiprecision::detail::unsigned_abs(b))
+              : (*a.limbs() > boost::multiprecision::detail::unsigned_abs(b));
 }
 
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
@@ -670,14 +741,15 @@ template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
 BOOST_MP_FORCEINLINE typename enable_if_c<
     is_unsigned<U>::value &&
         is_trivial_montgomery_int<montgomery_int_backend<
-            MinBits, MaxBits, unsigned_magnitude, Checked, void>>::value,
+            MinBits, MaxBits, unsigned_magnitude, Checked, void> >::value,
     bool>
 
     ::type
     eval_gt(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
                                          Checked, void> &a,
-            U b) BOOST_NOEXCEPT {
-  return *a.limbs() > b;
+            U                                            b) BOOST_NOEXCEPT
+{
+   return *a.limbs() > b;
 }
 
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
@@ -685,29 +757,33 @@ template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked,
 BOOST_MP_FORCEINLINE typename enable_if_c<
     is_signed<S>::value &&
         is_trivial_montgomery_int<montgomery_int_backend<
-            MinBits, MaxBits, unsigned_magnitude, Checked, void>>::value,
+            MinBits, MaxBits, unsigned_magnitude, Checked, void> >::value,
     bool>
 
     ::type
     eval_gt(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
                                          Checked, void> &a,
-            S b) BOOST_NOEXCEPT {
-  typedef typename make_unsigned<S>::type ui_type;
-  if (b < 0) {
-    montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void>
-        t(b);
-    return *a.limbs() > *t.limbs();
-  } else {
-    return *a.limbs() > static_cast<ui_type>(b);
-  }
+            S                                            b) BOOST_NOEXCEPT
+{
+   typedef typename make_unsigned<S>::type ui_type;
+   if (b < 0)
+   {
+      montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude, Checked, void>
+          t(b);
+      return *a.limbs() > *t.limbs();
+   }
+   else
+   {
+      return *a.limbs() > static_cast<ui_type>(b);
+   }
 }
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)
 #endif
 
-} // namespace backends
-} // namespace multiprecision
-} // namespace boost
+}
+}
+} // namespace boost::multiprecision::backends
 
 #endif

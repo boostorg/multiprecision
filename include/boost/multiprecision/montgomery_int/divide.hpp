@@ -1,3 +1,13 @@
+//---------------------------------------------------------------------------//
+// Copyright (c) 2018-2019 Nil Foundation AG
+// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
+// Copyright (c) 2018-2019 Alexey Moskvin
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
+
 #ifndef CRYPTO3_MP_MONTGOMERY_INT_DIV_HPP
 #define CRYPTO3_MP_MONTGOMERY_INT_DIV_HPP
 
@@ -13,20 +23,21 @@ template <typename Backend2, typename Backend3, unsigned MinBits1,
 BOOST_MP_FORCEINLINE
     typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
                              MinBits1, MaxBits1, SignType1, Checked1,
-                             Allocator1, ParamsBackend1>>::value &&
+                             Allocator1, ParamsBackend1> >::value &&
                          !is_trivial_montgomery_int<Backend2>::value &&
                          !is_trivial_montgomery_int<Backend3>::value>
 
     ::type
     eval_divide(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
                                        Allocator1, ParamsBackend1> &result,
-                const Backend2 &a, const Backend3 &b) {
-  montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                         ParamsBackend1>
-      r;
-  bool s = a.sign() != b.sign();
-  divide_unsigned_helper(&result, a, b, r);
-  result.sign(s);
+                const Backend2 &a, const Backend3 &b)
+{
+   montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
+                          ParamsBackend1>
+       r;
+   bool s = a.sign() != b.sign();
+   divide_unsigned_helper(&result, a, b, r);
+   result.sign(s);
 }
 
 template <typename Backend2, unsigned MinBits1, unsigned MaxBits1,
@@ -35,19 +46,20 @@ template <typename Backend2, unsigned MinBits1, unsigned MaxBits1,
 BOOST_MP_FORCEINLINE
     typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
                              MinBits1, MaxBits1, SignType1, Checked1,
-                             Allocator1, ParamsBackend1>>::value &&
+                             Allocator1, ParamsBackend1> >::value &&
                          !is_trivial_montgomery_int<Backend2>::value>
 
     ::type
     eval_divide(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
                                        Allocator1, ParamsBackend1> &result,
-                const Backend2 &a, limb_type &b) {
-  montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                         ParamsBackend1>
-      r;
-  bool s = a.sign();
-  divide_unsigned_helper(&result, a, b, r);
-  result.sign(s);
+                const Backend2 &a, limb_type &b)
+{
+   montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
+                          ParamsBackend1>
+       r;
+   bool s = a.sign();
+   divide_unsigned_helper(&result, a, b, r);
+   result.sign(s);
 }
 
 template <typename Backend2, unsigned MinBits1, unsigned MaxBits1,
@@ -56,22 +68,23 @@ template <typename Backend2, unsigned MinBits1, unsigned MaxBits1,
 BOOST_MP_FORCEINLINE
     typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
                              MinBits1, MaxBits1, SignType1, Checked1,
-                             Allocator1, ParamsBackend1>>::value &&
+                             Allocator1, ParamsBackend1> >::value &&
                          !is_trivial_montgomery_int<Backend2>::value>
 
     ::type
     eval_divide(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
                                        Allocator1, ParamsBackend1> &result,
-                const Backend2 &a, signed_limb_type &b) {
-  montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                         ParamsBackend1>
-      r;
-  bool s = a.sign() != (b < 0);
-  divide_unsigned_helper(
-      &result, a,
-      static_cast<limb_type>(boost::multiprecision::detail::unsigned_abs(b)),
-      r);
-  result.sign(s);
+                const Backend2 &a, signed_limb_type &b)
+{
+   montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
+                          ParamsBackend1>
+       r;
+   bool s = a.sign() != (b < 0);
+   divide_unsigned_helper(
+       &result, a,
+       static_cast<limb_type>(boost::multiprecision::detail::unsigned_abs(b)),
+       r);
+   result.sign(s);
 }
 
 template <typename Backend2, unsigned MinBits1, unsigned MaxBits1,
@@ -80,18 +93,19 @@ template <typename Backend2, unsigned MinBits1, unsigned MaxBits1,
 BOOST_MP_FORCEINLINE
     typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
                              MinBits1, MaxBits1, SignType1, Checked1,
-                             Allocator1, ParamsBackend1>>::value &&
+                             Allocator1, ParamsBackend1> >::value &&
                          !is_trivial_montgomery_int<Backend2>::value>
 
     ::type
     eval_divide(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
                                        Allocator1, ParamsBackend1> &result,
-                const Backend2 &b) {
-  // There is no in place divide:
-  montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                         ParamsBackend1>
-      a(result);
-  eval_divide(result, a, b);
+                const Backend2 &                                    b)
+{
+   // There is no in place divide:
+   montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
+                          ParamsBackend1>
+       a(result);
+   eval_divide(result, a, b);
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1,
@@ -99,17 +113,18 @@ template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1,
           typename ParamsBackend1>
 BOOST_MP_FORCEINLINE typename enable_if_c<!is_trivial_montgomery_int<
     montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                           ParamsBackend1>>::value>
+                           ParamsBackend1> >::value>
 
     ::type
     eval_divide(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
                                        Allocator1, ParamsBackend1> &result,
-                limb_type b) {
-  // There is no in place divide:
-  montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                         ParamsBackend1>
-      a(result);
-  eval_divide(result, a, b);
+                limb_type                                           b)
+{
+   // There is no in place divide:
+   montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
+                          ParamsBackend1>
+       a(result);
+   eval_divide(result, a, b);
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1,
@@ -117,17 +132,18 @@ template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1,
           typename ParamsBackend1>
 BOOST_MP_FORCEINLINE typename enable_if_c<!is_trivial_montgomery_int<
     montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                           ParamsBackend1>>::value>
+                           ParamsBackend1> >::value>
 
     ::type
     eval_divide(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
                                        Allocator1, ParamsBackend1> &result,
-                signed_limb_type b) {
-  // There is no in place divide:
-  montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                         ParamsBackend1>
-      a(result);
-  eval_divide(result, a, b);
+                signed_limb_type                                    b)
+{
+   // There is no in place divide:
+   montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
+                          ParamsBackend1>
+       a(result);
+   eval_divide(result, a, b);
 }
 
 template <typename Backend2, typename Backend3, unsigned MinBits1,
@@ -137,21 +153,22 @@ template <typename Backend2, typename Backend3, unsigned MinBits1,
 BOOST_MP_FORCEINLINE
     typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
                              MinBits1, MaxBits1, SignType1, Checked1,
-                             Allocator1, ParamsBackend1>>::value &&
+                             Allocator1, ParamsBackend1> >::value &&
                          !is_trivial_montgomery_int<Backend2>::value &&
                          !is_trivial_montgomery_int<Backend3>::value>
 
     ::type
     eval_modulus(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
                                         Allocator1, ParamsBackend1> &result,
-                 const Backend2 &a, const Backend3 &b) {
-  bool s = a.sign();
-  divide_unsigned_helper(
-      static_cast<
-          montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                 Allocator1, ParamsBackend1> *>(0),
-      a, b, result);
-  result.sign(s);
+                 const Backend2 &a, const Backend3 &b)
+{
+   bool s = a.sign();
+   divide_unsigned_helper(
+       static_cast<
+           montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
+                                  Allocator1, ParamsBackend1> *>(0),
+       a, b, result);
+   result.sign(s);
 }
 
 template <typename Backend2, unsigned MinBits1, unsigned MaxBits1,
@@ -160,20 +177,21 @@ template <typename Backend2, unsigned MinBits1, unsigned MaxBits1,
 BOOST_MP_FORCEINLINE
     typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
                              MinBits1, MaxBits1, SignType1, Checked1,
-                             Allocator1, ParamsBackend1>>::value &&
+                             Allocator1, ParamsBackend1> >::value &&
                          !is_trivial_montgomery_int<Backend2>::value>
 
     ::type
     eval_modulus(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
                                         Allocator1, ParamsBackend1> &result,
-                 const Backend2 &a, limb_type b) {
-  bool s = a.sign();
-  divide_unsigned_helper(
-      static_cast<
-          montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                 Allocator1, ParamsBackend1> *>(0),
-      a, b, result);
-  result.sign(s);
+                 const Backend2 &a, limb_type b)
+{
+   bool s = a.sign();
+   divide_unsigned_helper(
+       static_cast<
+           montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
+                                  Allocator1, ParamsBackend1> *>(0),
+       a, b, result);
+   result.sign(s);
 }
 
 template <typename Backend2, unsigned MinBits1, unsigned MaxBits1,
@@ -182,21 +200,22 @@ template <typename Backend2, unsigned MinBits1, unsigned MaxBits1,
 BOOST_MP_FORCEINLINE
     typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
                              MinBits1, MaxBits1, SignType1, Checked1,
-                             Allocator1, ParamsBackend1>>::value &&
+                             Allocator1, ParamsBackend1> >::value &&
                          !is_trivial_montgomery_int<Backend2>::value>
 
     ::type
     eval_modulus(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
                                         Allocator1, ParamsBackend1> &result,
-                 const Backend2 &a, signed_limb_type b) {
-  bool s = a.sign();
-  divide_unsigned_helper(
-      static_cast<
-          montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                 Allocator1, ParamsBackend1> *>(0),
-      a, static_cast<limb_type>(boost::multiprecision::detail::unsigned_abs(b)),
-      result);
-  result.sign(s);
+                 const Backend2 &a, signed_limb_type b)
+{
+   bool s = a.sign();
+   divide_unsigned_helper(
+       static_cast<
+           montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
+                                  Allocator1, ParamsBackend1> *>(0),
+       a, static_cast<limb_type>(boost::multiprecision::detail::unsigned_abs(b)),
+       result);
+   result.sign(s);
 }
 
 template <typename Backend2, unsigned MinBits1, unsigned MaxBits1,
@@ -205,18 +224,19 @@ template <typename Backend2, unsigned MinBits1, unsigned MaxBits1,
 BOOST_MP_FORCEINLINE
     typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
                              MinBits1, MaxBits1, SignType1, Checked1,
-                             Allocator1, ParamsBackend1>>::value &&
+                             Allocator1, ParamsBackend1> >::value &&
                          !is_trivial_montgomery_int<Backend2>::value>
 
     ::type
     eval_modulus(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
                                         Allocator1, ParamsBackend1> &result,
-                 const Backend2 &b) {
-  // There is no in place divide:
-  montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                         ParamsBackend1>
-      a(result);
-  eval_modulus(result, a, b);
+                 const Backend2 &                                    b)
+{
+   // There is no in place divide:
+   montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
+                          ParamsBackend1>
+       a(result);
+   eval_modulus(result, a, b);
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1,
@@ -224,17 +244,18 @@ template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1,
           typename ParamsBackend1>
 BOOST_MP_FORCEINLINE typename enable_if_c<!is_trivial_montgomery_int<
     montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                           ParamsBackend1>>::value>
+                           ParamsBackend1> >::value>
 
     ::type
     eval_modulus(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
                                         Allocator1, ParamsBackend1> &result,
-                 limb_type b) {
-  // There is no in place divide:
-  montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                         ParamsBackend1>
-      a(result);
-  eval_modulus(result, a, b);
+                 limb_type                                           b)
+{
+   // There is no in place divide:
+   montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
+                          ParamsBackend1>
+       a(result);
+   eval_modulus(result, a, b);
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1,
@@ -242,17 +263,18 @@ template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1,
           typename ParamsBackend1>
 BOOST_MP_FORCEINLINE typename enable_if_c<!is_trivial_montgomery_int<
     montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                           ParamsBackend1>>::value>
+                           ParamsBackend1> >::value>
 
     ::type
     eval_modulus(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
                                         Allocator1, ParamsBackend1> &result,
-                 signed_limb_type b) {
-  // There is no in place divide:
-  montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                         ParamsBackend1>
-      a(result);
-  eval_modulus(result, a, b);
+                 signed_limb_type                                    b)
+{
+   // There is no in place divide:
+   montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
+                          ParamsBackend1>
+       a(result);
+   eval_modulus(result, a, b);
 }
 
 //
@@ -264,22 +286,24 @@ template <typename Backend, unsigned MinBits1, unsigned MaxBits1,
 BOOST_MP_FORCEINLINE typename enable_if_c<
     is_trivial_montgomery_int<
         montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                               Allocator1, ParamsBackend1>>::value &&
+                               Allocator1, ParamsBackend1> >::value &&
     is_trivial_montgomery_int<Backend>::value &&
     (is_signed_number<
          montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                Allocator1, ParamsBackend1>>::value ||
+                                Allocator1, ParamsBackend1> >::value ||
      is_signed_number<Backend>::value)>
 
     ::type
     eval_divide(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
                                        Allocator1, ParamsBackend1> &result,
-                const Backend &o) {
-  if (!*o.limbs()) {
-    BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
-  }
-  *result.limbs() /= *o.limbs();
-  result.sign(result.sign() != o.sign());
+                const Backend &                                     o)
+{
+   if (!*o.limbs())
+   {
+      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+   }
+   *result.limbs() /= *o.limbs();
+   result.sign(result.sign() != o.sign());
 }
 
 template <typename Backend, unsigned MinBits1, unsigned MaxBits1,
@@ -288,21 +312,23 @@ template <typename Backend, unsigned MinBits1, unsigned MaxBits1,
 BOOST_MP_FORCEINLINE typename enable_if_c<
     is_trivial_montgomery_int<
         montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                               Allocator1, ParamsBackend1>>::value &&
+                               Allocator1, ParamsBackend1> >::value &&
     is_trivial_montgomery_int<Backend>::value &&
     is_unsigned_number<
         montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                               Allocator1, ParamsBackend1>>::value &&
+                               Allocator1, ParamsBackend1> >::value &&
     is_unsigned_number<Backend>::value>
 
     ::type
     eval_divide(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
                                        Allocator1, ParamsBackend1> &result,
-                const Backend &o) {
-  if (!*o.limbs()) {
-    BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
-  }
-  *result.limbs() /= *o.limbs();
+                const Backend &                                     o)
+{
+   if (!*o.limbs())
+   {
+      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+   }
+   *result.limbs() /= *o.limbs();
 }
 
 template <typename Backend, unsigned MinBits1, unsigned MaxBits1,
@@ -311,18 +337,20 @@ template <typename Backend, unsigned MinBits1, unsigned MaxBits1,
 BOOST_MP_FORCEINLINE
     typename enable_if_c<is_trivial_montgomery_int<montgomery_int_backend<
                              MinBits1, MaxBits1, SignType1, Checked1,
-                             Allocator1, ParamsBackend1>>::value &&
+                             Allocator1, ParamsBackend1> >::value &&
                          is_trivial_montgomery_int<Backend>::value>
 
     ::type
     eval_modulus(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
                                         Allocator1, ParamsBackend1> &result,
-                 const Backend &o) {
-  if (!*o.limbs()) {
-    BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
-  }
-  *result.limbs() %= *o.limbs();
-  result.sign(result.sign());
+                 const Backend &                                     o)
+{
+   if (!*o.limbs())
+   {
+      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+   }
+   *result.limbs() %= *o.limbs();
+   result.sign(result.sign());
 }
 /*
 template<unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1,
@@ -603,8 +631,8 @@ ParamsBackend1> &o) { if (!*o.limbs()) {
 }
  */
 
-} // namespace backends
-} // namespace multiprecision
-} // namespace boost
+}
+}
+} // namespace boost::multiprecision::backends
 
 #endif
