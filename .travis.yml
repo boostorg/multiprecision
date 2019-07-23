@@ -2313,15 +2313,15 @@ script:
       cmake -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9]*//g') ..;
       if [[ $TEST_SUITE == compile_fail ]]; then
         if [[ $TRAVIS_OS_NAME == linux ]]; then
-          ctest --build-and-test .. . --build-generator="Unix Makefiles" --tests-regex "multiprecision_test_compile_fail_*" -j $(nproc);
+          ctest --build-and-test .. . --build-generator="Unix Makefiles" --tests-regex "multiprecision_test_compile_fail_*" -j $(($(nproc) + 1));
         elif [[ $TRAVIS_OS_NAME == osx ]]; then
-          ctest --build-and-test .. . --build-generator="Unix Makefiles" --tests-regex "multiprecision_test_compile_fail_*" -j $(sysctl -n hw.ncpu);
+          ctest --build-and-test .. . --build-generator="Unix Makefiles" --tests-regex "multiprecision_test_compile_fail_*" -j $(($(sysctl -n hw.ncpu) + 1));
         fi
       else
         if [[ $TRAVIS_OS_NAME == linux ]]; then
-          cmake --build . --target multiprecision_test_suite_$TEST_SUITE -j $(nproc);
+          cmake --build . --target multiprecision_test_suite_$TEST_SUITE -j $(($(nproc) + 1));
         elif [[ $TRAVIS_OS_NAME == osx ]]; then
-          cmake --build . --target multiprecision_test_suite_$TEST_SUITE -j $(sysctl -n hw.ncpu);
+          cmake --build . --target multiprecision_test_suite_$TEST_SUITE -j $(($(sysctl -n hw.ncpu) + 1));
         fi
       fi
     fi
