@@ -11,2177 +11,2321 @@ sudo: true
 python: "2.7"
 
 os:
-    - linux
-    - osx
+  - linux
+  - osx
 
 branches:
-    only:
-        - master
-        - develop
-        - cmake-develop
-        - cmake-master
+  only:
+    - master
+    - develop
+    - cmake-develop
+    - cmake-master
 
 env:
-    matrix:
-        - BOGUS_JOB=true
+  matrix:
+    - BOGUS_JOB=true
 
 matrix:
 
-    exclude:
-        - env: BOGUS_JOB=true
-
-    include:
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=arithmetic_tests CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=arithmetic_tests CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=arithmetic_tests CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=arithmetic_tests CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=cpp_int_tests CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=cpp_int_tests CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=cpp_int_tests CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=cpp_int_tests CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=cpp_int_tests CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=cpp_int_tests CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=cpp_int_tests CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=cpp_int_tests CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=functions_and_limits CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=functions_and_limits CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=conversions CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=conversions CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=conversions CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=conversions CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=conversions CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=conversions CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE=conversions CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE=conversions CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=conversions CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=conversions CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=misc CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=misc CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=misc CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=misc CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=misc CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=misc CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE=misc CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE=misc CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=misc CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=misc CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE="compile_fail examples" CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE="compile_fail examples" CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE="compile_fail examples" CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE="compile_fail examples" CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE="compile_fail examples" CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE="compile_fail examples" CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE="compile_fail examples" CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE="compile_fail examples" CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=concepts CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=concepts CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=concepts CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=concepts CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=concepts CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=concepts CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=concepts CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=concepts CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-6
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-5
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=arithmetic_tests CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-5
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=cpp_int_tests CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-5
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=cpp_int_tests CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-5
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-5
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-5
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=conversions CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-5
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=conversions CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-5
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=misc CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-5
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=misc CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-5
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE="compile_fail examples" CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-5
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE="compile_fail examples" CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-5
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=concepts CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-5
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=concepts CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-5
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=arithmetic_tests CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=arithmetic_tests CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=arithmetic_tests CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=arithmetic_tests CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=cpp_int_tests CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=cpp_int_tests CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=cpp_int_tests CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=cpp_int_tests CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=cpp_int_tests CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=cpp_int_tests CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=cpp_int_tests CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=cpp_int_tests CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=conversions CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=conversions CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=conversions CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=conversions CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=conversions CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=conversions CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++14 TEST_SUITE=conversions CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++14 TEST_SUITE=conversions CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=conversions CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=conversions CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=misc CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=misc CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=misc CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=misc CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=misc CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=misc CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++14 TEST_SUITE=misc CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++14 TEST_SUITE=misc CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=misc CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=misc CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE="compile_fail examples" CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE="compile_fail examples" CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE="compile_fail examples" CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE="compile_fail examples" CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE="compile_fail examples" CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE="compile_fail examples" CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE="compile_fail examples" CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE="compile_fail examples" CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=concepts CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=concepts CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=concepts CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=concepts CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=concepts CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=concepts CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=concepts CMAKE_BUILD=true
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: linux
-          env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=concepts CMAKE_BUILD=false
-          addons:
-              apt:
-                  packages:
-                      - g++-8
-                      - cmake
-                      - libgmp-dev
-                      - libmpfr-dev
-                      - libmpc-dev
-                      - libmpfi-dev
-                  sources:
-                      - ubuntu-toolchain-r-test
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
-          osx_image: xcode9.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests CMAKE_BUILD=false
-          osx_image: xcode9.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=cpp_int_tests CMAKE_BUILD=true
-          osx_image: xcode9.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=cpp_int_tests CMAKE_BUILD=false
-          osx_image: xcode9.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
-          osx_image: xcode9.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
-          osx_image: xcode9.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=conversions CMAKE_BUILD=true
-          osx_image: xcode9.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=conversions CMAKE_BUILD=false
-          osx_image: xcode9.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=misc CMAKE_BUILD=true
-          osx_image: xcode9.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=misc CMAKE_BUILD=false
-          osx_image: xcode9.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="compile_fail examples" CMAKE_BUILD=true
-          osx_image: xcode9.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="compile_fail examples" CMAKE_BUILD=false
-          osx_image: xcode9.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=concepts CMAKE_BUILD=true
-          osx_image: xcode9.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=concepts CMAKE_BUILD=false
-          osx_image: xcode9.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
-          osx_image: xcode8.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests CMAKE_BUILD=false
-          osx_image: xcode8.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=cpp_int_tests CMAKE_BUILD=true
-          osx_image: xcode8.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=cpp_int_tests CMAKE_BUILD=false
-          osx_image: xcode8.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
-          osx_image: xcode8.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
-          osx_image: xcode8.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=conversions CMAKE_BUILD=true
-          osx_image: xcode8.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=conversions CMAKE_BUILD=false
-          osx_image: xcode8.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=misc CMAKE_BUILD=true
-          osx_image: xcode8.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=misc CMAKE_BUILD=false
-          osx_image: xcode8.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="compile_fail examples" CMAKE_BUILD=true
-          osx_image: xcode8.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="compile_fail examples" CMAKE_BUILD=false
-          osx_image: xcode8.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=concepts CMAKE_BUILD=true
-          osx_image: xcode8.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=concepts CMAKE_BUILD=false
-          osx_image: xcode8.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
-          osx_image: xcode7.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests CMAKE_BUILD=false
-          osx_image: xcode7.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=cpp_int_tests CMAKE_BUILD=true
-          osx_image: xcode7.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=cpp_int_tests CMAKE_BUILD=false
-          osx_image: xcode7.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
-          osx_image: xcode7.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
-          osx_image: xcode7.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=conversions CMAKE_BUILD=true
-          osx_image: xcode7.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=conversions CMAKE_BUILD=false
-          osx_image: xcode7.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=misc CMAKE_BUILD=true
-          osx_image: xcode7.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=misc CMAKE_BUILD=false
-          osx_image: xcode7.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="compile_fail examples" CMAKE_BUILD=true
-          osx_image: xcode7.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="compile_fail examples" CMAKE_BUILD=false
-          osx_image: xcode7.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=concepts CMAKE_BUILD=true
-          osx_image: xcode7.3
-
-        - os: osx
-          env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=concepts CMAKE_BUILD=false
-          osx_image: xcode7.3
+  exclude:
+    - env: BOGUS_JOB=true
+
+  allow_failures:
+    - env: CMAKE_BUILD=true TEST_SUITE=compile_fail
+
+  include:
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=arithmetic_tests CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=arithmetic_tests CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=arithmetic_tests CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=arithmetic_tests CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=cpp_int_tests CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=cpp_int_tests CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=cpp_int_tests CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=cpp_int_tests CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=cpp_int_tests CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=cpp_int_tests CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=cpp_int_tests CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=cpp_int_tests CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=functions_and_limits CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=functions_and_limits CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=conversions CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=conversions CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=conversions CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=conversions CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=conversions CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=conversions CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE=conversions CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE=conversions CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=conversions CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=conversions CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=misc CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=misc CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=misc CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=misc CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=misc CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=misc CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE=misc CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE=misc CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=misc CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=misc CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE="compile_fail" CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE="examples" CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE="compile_fail examples" CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE="compile_fail" CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE="examples" CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE="compile_fail examples" CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE="compile_fail" CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE="examples" CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE="compile_fail examples" CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE="compile_fail" CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE="examples" CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE="compile_fail examples" CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=concepts CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=concepts CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=concepts CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=concepts CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=concepts CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=concepts CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=concepts CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=concepts CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-5
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=arithmetic_tests CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-5
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=cpp_int_tests CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-5
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=cpp_int_tests CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-5
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-5
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-5
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=conversions CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-5
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=conversions CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-5
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=misc CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-5
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=misc CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-5
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE="compile_fail" CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-5
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE="examples" CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-5
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE="compile_fail examples" CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-5
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=concepts CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-5
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=concepts CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-5
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=arithmetic_tests CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=arithmetic_tests CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=arithmetic_tests CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=arithmetic_tests CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=cpp_int_tests CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=cpp_int_tests CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=cpp_int_tests CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=cpp_int_tests CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=cpp_int_tests CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=cpp_int_tests CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=cpp_int_tests CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=cpp_int_tests CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=conversions CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=conversions CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=conversions CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=conversions CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=conversions CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=conversions CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++14 TEST_SUITE=conversions CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++14 TEST_SUITE=conversions CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=conversions CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=conversions CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=misc CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=misc CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=misc CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=misc CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=misc CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=misc CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++14 TEST_SUITE=misc CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++14 TEST_SUITE=misc CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=misc CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=misc CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE="compile_fail" CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE="examples" CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE="compile_fail examples" CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE="compile_fail" CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE="examples" CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE="compile_fail examples" CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE="compile_fail" CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE="examples" CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE="compile_fail examples" CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE="compile_fail" CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE="examples" CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE="compile_fail examples" CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=concepts CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=concepts CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=concepts CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=concepts CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=concepts CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=concepts CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=concepts CMAKE_BUILD=true
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=concepts CMAKE_BUILD=false
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
+      osx_image: xcode9.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests CMAKE_BUILD=false
+      osx_image: xcode9.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=cpp_int_tests CMAKE_BUILD=true
+      osx_image: xcode9.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=cpp_int_tests CMAKE_BUILD=false
+      osx_image: xcode9.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
+      osx_image: xcode9.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
+      osx_image: xcode9.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=conversions CMAKE_BUILD=true
+      osx_image: xcode9.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=conversions CMAKE_BUILD=false
+      osx_image: xcode9.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=misc CMAKE_BUILD=true
+      osx_image: xcode9.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=misc CMAKE_BUILD=false
+      osx_image: xcode9.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="compile_fail" CMAKE_BUILD=true
+      osx_image: xcode9.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="examples" CMAKE_BUILD=true
+      osx_image: xcode9.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="compile_fail examples" CMAKE_BUILD=false
+      osx_image: xcode9.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=concepts CMAKE_BUILD=true
+      osx_image: xcode9.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=concepts CMAKE_BUILD=false
+      osx_image: xcode9.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
+      osx_image: xcode8.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests CMAKE_BUILD=false
+      osx_image: xcode8.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=cpp_int_tests CMAKE_BUILD=true
+      osx_image: xcode8.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=cpp_int_tests CMAKE_BUILD=false
+      osx_image: xcode8.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
+      osx_image: xcode8.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
+      osx_image: xcode8.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=conversions CMAKE_BUILD=true
+      osx_image: xcode8.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=conversions CMAKE_BUILD=false
+      osx_image: xcode8.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=misc CMAKE_BUILD=true
+      osx_image: xcode8.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=misc CMAKE_BUILD=false
+      osx_image: xcode8.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="compile_fail" CMAKE_BUILD=true
+      osx_image: xcode8.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="examples" CMAKE_BUILD=true
+      osx_image: xcode8.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="compile_fail examples" CMAKE_BUILD=false
+      osx_image: xcode8.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=concepts CMAKE_BUILD=true
+      osx_image: xcode8.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=concepts CMAKE_BUILD=false
+      osx_image: xcode8.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
+      osx_image: xcode7.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests CMAKE_BUILD=false
+      osx_image: xcode7.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=cpp_int_tests CMAKE_BUILD=true
+      osx_image: xcode7.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=cpp_int_tests CMAKE_BUILD=false
+      osx_image: xcode7.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=true
+      osx_image: xcode7.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=functions_and_limits CMAKE_BUILD=false
+      osx_image: xcode7.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=conversions CMAKE_BUILD=true
+      osx_image: xcode7.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=conversions CMAKE_BUILD=false
+      osx_image: xcode7.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=misc CMAKE_BUILD=true
+      osx_image: xcode7.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=misc CMAKE_BUILD=false
+      osx_image: xcode7.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="compile_fail" CMAKE_BUILD=true
+      osx_image: xcode7.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="examples" CMAKE_BUILD=true
+      osx_image: xcode7.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="compile_fail examples" CMAKE_BUILD=false
+      osx_image: xcode7.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=concepts CMAKE_BUILD=true
+      osx_image: xcode7.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=concepts CMAKE_BUILD=false
+      osx_image: xcode7.3
 
 install:
-    - cd ..
-    - if [[ $TRAVIS_BRANCH == master || $TRAVIS_BRANCH == cmake-master ]]; then
-        git clone -b master --depth 1 https://github.com/boostorg/boost.git boost-root;
-        elif [[ $TRAVIS_BRANCH == develop || $TRAVIS_BRANCH == cmake-develop ]]; then
-        git clone -b develop --depth 1 https://github.com/boostorg/boost.git boost-root;
-        fi
-    - cd boost-root
-    - git submodule update --init tools/build
-    - git submodule update --init libs/config
-    - git submodule update --init tools/boost_install
-    - git submodule update --init libs/headers
-    - git submodule update --init tools/boostdep
-    - cp -r $TRAVIS_BUILD_DIR/* libs/multiprecision
-    - python tools/boostdep/depinst/depinst.py multiprecision
-    - ./bootstrap.sh
-    - ./b2 headers
+  - cd ..
+  - if [[ $TRAVIS_BRANCH == master || $TRAVIS_BRANCH == cmake-master ]]; then
+      git clone -b master --depth 1 https://github.com/boostorg/boost.git boost-root;
+    elif [[ $TRAVIS_BRANCH == develop || $TRAVIS_BRANCH == cmake-develop ]]; then
+      git clone -b develop --depth 1 https://github.com/boostorg/boost.git boost-root;
+    fi
+  - cd boost-root
+  - git submodule update --init tools/build
+  - git submodule update --init libs/config
+  - git submodule update --init tools/boost_install
+  - git submodule update --init libs/headers
+  - git submodule update --init tools/boostdep
+  - cp -r $TRAVIS_BUILD_DIR/* libs/multiprecision
+  - python tools/boostdep/depinst/depinst.py multiprecision
+  - ./bootstrap.sh
+  - ./b2 headers
 
 script:
-    - |-
-        echo "using $TOOLSET : : $COMPILER : <cxxflags>-std=$CXXSTD ;" > ~/user-config.jam
-    - if [[ $CMAKE_BUILD == false ]]; then
-        (cd libs/config/test && ../../../b2 config_info_travis_install toolset=$TOOLSET && ./config_info_travis);
-        if [[ $TRAVIS_OS_NAME == linux ]]; then
-        (cd libs/multiprecision/test && ../../../b2 -j$(nproc) toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER);
-        elif [[ $TRAVIS_OS_NAME == osx ]]; then
-        (cd libs/multiprecision/test && ../../../b2 -j$(sysctl -n hw.ncpu) toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER);
-        fi
-        elif [[ $CMAKE_BUILD == true ]]; then
-        if [[ $TRAVIS_OS_NAME == linux ]]; then
+  - |-
+    echo "using $TOOLSET : : $COMPILER : <cxxflags>-std=$CXXSTD ;" > ~/user-config.jam
+  - if [[ $CMAKE_BUILD == false ]]; then
+      (cd libs/config/test && ../../../b2 config_info_travis_install toolset=$TOOLSET && ./config_info_travis);
+      if [[ $TRAVIS_OS_NAME == linux ]]; then
+        (cd libs/multiprecision/test && ../../../b2 -j$(($(nproc) + 1)) toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER);
+      elif [[ $TRAVIS_OS_NAME == osx ]]; then
+        (cd libs/multiprecision/test && ../../../b2 -j$(($(sysctl -n hw.ncpu) + 1)) toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER);
+      fi
+    elif [[ $CMAKE_BUILD == true ]]; then
+      if [[ $TRAVIS_OS_NAME == linux ]]; then
         sudo ./b2 -j$(nproc) install;
-        elif [[ $TRAVIS_OS_NAME == osx ]]; then
+      elif [[ $TRAVIS_OS_NAME == osx ]]; then
         sudo ./b2 -j$(sysctl -n hw.ncpu) install;
-        fi;
-        cd libs/multiprecision && mkdir cmake-build && cd cmake-build;
-        if [[ $(echo $CXXSTD | sed 's/[^0-9]*//g') == 03 ]]; then
+      fi;
+      cd libs/multiprecision && mkdir cmake-build && cd cmake-build;
+      if [[ $(echo $CXXSTD | sed 's/[^0-9]*//g') == 03 ]]; then
         CXXSTD=c++98;
-        fi;
-        cmake -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9]*//g') ..;
+      fi;
+      cmake -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9]*//g') ..;
+      if [[ $TEST_SUITE == compile_fail ]]; then
         if [[ $TRAVIS_OS_NAME == linux ]]; then
-        make -j$(nproc) tests-multiprecision;
+          ctest --build-and-test .. . --build-generator "Unix Makefiles" --tests-regex "multiprecision_test_compile_fail_*" -j $(($(nproc) + 1));
         elif [[ $TRAVIS_OS_NAME == osx ]]; then
-        make -j$(sysctl -n hw.ncpu) tests-multiprecision;
-        fi;
+          ctest --build-and-test .. . --build-generator "Unix Makefiles" --tests-regex "multiprecision_test_compile_fail_*" -j $(($(sysctl -n hw.ncpu) + 1));
+        fi
+      else
         if [[ $TRAVIS_OS_NAME == linux ]]; then
-        ctest -j$(nproc) ..;
+          cmake --build . --target multiprecision_test_suite_$TEST_SUITE -j $(($(nproc) + 1));
         elif [[ $TRAVIS_OS_NAME == osx ]]; then
-        ctest -j$(sysctl -n hw.ncpu) ..;
+          cmake --build . --target multiprecision_test_suite_$TEST_SUITE -j $(($(sysctl -n hw.ncpu) + 1));
         fi
-        fi
+      fi
+    fi
 
 notifications:
-    email:
-        on_success: always
+  email:
+    on_success: always
