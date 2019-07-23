@@ -30,6 +30,9 @@ matrix:
   exclude:
     - env: BOGUS_JOB=true
 
+  allow_failures:
+    - env: CMAKE_BUILD=true TEST_SUITE=compile_fail
+
   include:
     - os: linux
       env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=arithmetic_tests CMAKE_BUILD=true
