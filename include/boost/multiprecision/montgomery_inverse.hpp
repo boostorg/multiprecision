@@ -8,13 +8,13 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MONTGOMERY_INVERSE_HPP
-#define CRYPTO3_MONTGOMERY_INVERSE_HPP
+#ifndef BOOST_MULTIPRECISION_MONTGOMERY_INVERSE_HPP
+#define BOOST_MULTIPRECISION_MONTGOMERY_INVERSE_HPP
 
 #include <boost/multiprecision/pow_mod.hpp>
 
-namespace nil {
-namespace crypto3 {
+namespace boost {
+namespace multiprecision {
 template <typename Backend>
 inline Backend eval_almost_montgomery_inverse(Backend &result, const Backend &a,
                                               const Backend &b)
@@ -141,6 +141,6 @@ normalized_montgomery_inverse(const number<Backend, ExpressionTemplates> &a,
        eval_normalized_montgomery_inverse(a.backend(), p.backend()));
 }
 }
-} // namespace nil::crypto3
+} // namespace boost::multiprecision
 
-#endif // CRYPTO3_MONTGOMERY_INVERSE_HPP
+#endif // BOOST_MULTIPRECISION_MONTGOMERY_INVERSE_HPP

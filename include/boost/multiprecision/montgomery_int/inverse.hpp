@@ -8,8 +8,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_INVERSE_H
-#define CRYPTO3_INVERSE_H
+#ifndef BOOST_MULTIPRECISION_INVERSE_HPP
+#define BOOST_MULTIPRECISION_INVERSE_HPP
 
 namespace nil {
 namespace crypto3 {
@@ -45,4 +45,4 @@ limb_type monty_inverse(limb_type a)
 }
 }
 } // namespace nil::crypto3
-#endif //CRYPTO3_INVERSE_H
+#endif //BOOST_MULTIPRECISION_INVERSE_H

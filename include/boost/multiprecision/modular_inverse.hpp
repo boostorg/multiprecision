@@ -8,8 +8,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MOD_INVERSE_HPP
-#define CRYPTO3_MOD_INVERSE_HPP
+#ifndef BOOST_MULTIPRECISION_MOD_INVERSE_HPP
+#define BOOST_MULTIPRECISION_MOD_INVERSE_HPP
 
 #include <exception>
 
@@ -17,9 +17,8 @@
 
 #include <boost/multiprecision/inverse_euclid.hpp>
 
-namespace nil {
-namespace crypto3 {
-using namespace boost::multiprecision;
+namespace boost {
+namespace multiprecision {
 
 template <typename Backend>
 inline Backend eval_ct_inverse_mod_odd_modulus(const Backend &n,
@@ -212,6 +211,6 @@ ct_inverse_mod_odd_modulus(const number<Backend, ExpressionTemplates> &n,
        eval_ct_inverse_mod_odd_modulus(n.backend(), mod.backend()));
 }
 }
-} // namespace nil::crypto3
+} // namespace boost::multiprecision
 
-#endif // CRYPTO3_MOD_INVERSE_HPP
+#endif // BOOST_MULTIPRECISION_MOD_INVERSE_HPP

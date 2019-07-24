@@ -8,22 +8,15 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_RESSOL_HPP
-#define CRYPTO3_RESSOL_HPP
+#ifndef BOOST_MULTIPRECISION_RESSOL_HPP
+#define BOOST_MULTIPRECISION_RESSOL_HPP
 
 #include <boost/multiprecision/jacobi.hpp>
 #include <boost/multiprecision/pow_mod.hpp>
 
-namespace nil {
-namespace crypto3 {
-/**
- * Compute the square root of x modulo a prime using the
- * Shanks-Tonnelli algorithm
- *
- * @param x the input
- * @param p the prime
- * @return y such that (y*y)%p == x, or -1 if no such integer
- */
+namespace boost {
+namespace multiprecision {
+
 template <typename Backend>
 inline Backend eval_ressol(const Backend &a, const Backend &p)
 {
@@ -133,6 +126,14 @@ inline Backend eval_ressol(const Backend &a, const Backend &p)
    return r;
 }
 
+/**
+ * Compute the square root of x modulo a prime using the
+ * Shanks-Tonnelli algorithm
+ *
+ * @param x the input
+ * @param p the prime
+ * @return y such that (y*y)%p == x, or -1 if no such integer
+ */
 template <typename Backend, expression_template_option ExpressionTemplates>
 inline number<Backend, ExpressionTemplates>
 ressol(const number<Backend, ExpressionTemplates> &a,
@@ -142,6 +143,6 @@ ressol(const number<Backend, ExpressionTemplates> &a,
        eval_ressol(a.backend(), p.backend()));
 }
 }
-} // namespace nil::crypto3
+} // namespace boost::multiprecision
 
-#endif // CRYPTO3_RESSOL_HPP
+#endif // BOOST_MULTIPRECISION_RESSOL_HPP

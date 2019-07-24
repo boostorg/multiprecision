@@ -8,8 +8,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MASK_BITS_HPP
-#define CRYPTO3_MASK_BITS_HPP
+#ifndef BOOST_MULTIPRECISION_MASK_BITS_HPP
+#define BOOST_MULTIPRECISION_MASK_BITS_HPP
 
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/detail/number_base.hpp>
@@ -48,4 +48,4 @@ void eval_mask_bits(Backend &val, Integer n)
 }
 } // namespace boost::multiprecision
 
-#endif //CRYPTO3_MASK_BITS_HPP
+#endif //BOOST_MULTIPRECISION_MASK_BITS_HPP

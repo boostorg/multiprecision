@@ -8,8 +8,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MP_MONTGOMERY_INT_MUL_HPP
-#define CRYPTO3_MP_MONTGOMERY_INT_MUL_HPP
+#ifndef BOOST_MULTIPRECISION_MONTGOMERY_INT_MUL_HPP
+#define BOOST_MULTIPRECISION_MONTGOMERY_INT_MUL_HPP
 
 namespace boost {
 namespace multiprecision {

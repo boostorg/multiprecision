@@ -8,8 +8,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MP_MONTGOMERY_INT_BIT_HPP
-#define CRYPTO3_MP_MONTGOMERY_INT_BIT_HPP
+#ifndef BOOST_MULTIPRECISION_MONTGOMERY_INT_BIT_HPP
+#define BOOST_MULTIPRECISION_MONTGOMERY_INT_BIT_HPP
 
 #ifdef _MSC_VER
 #pragma warning(push)

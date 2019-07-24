@@ -8,8 +8,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_INVERSE_H
-#define CRYPTO3_INVERSE_H
+#ifndef BOOST_MULTIPRECISION_INVERSE_HPP
+#define BOOST_MULTIPRECISION_INVERSE_HPP
 
 #define CRYPTO3_MP_WORD_BITS 64
 
@@ -50,4 +50,4 @@ limb_type monty_inverse(limb_type a)
 }
 }
 } // namespace boost::multiprecision
-#endif //CRYPTO3_INVERSE_H
+#endif //BOOST_MULTIPRECISION_INVERSE_H

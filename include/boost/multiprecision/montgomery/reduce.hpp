@@ -20,8 +20,8 @@
 //#include <boost/multiprecision/detail/default_ops.hpp>
 //#include <nil/crypto3/multiprecision/detail/default_ops.hpp>
 
-#ifndef CRYPTO3_MP_MONTGOMERY_INT_REDC_HPP
-#define CRYPTO3_MP_MONTGOMERY_INT_REDC_HPP
+#ifndef BOOST_MULTIPRECISION_MONTGOMERY_INT_REDC_HPP
+#define BOOST_MULTIPRECISION_MONTGOMERY_INT_REDC_HPP
 
 namespace boost {
 namespace multiprecision {

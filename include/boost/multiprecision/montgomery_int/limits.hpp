@@ -8,8 +8,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MP_MONTGOMERY_INT_LIM_HPP
-#define CRYPTO3_MP_MONTGOMERY_INT_LIM_HPP
+#ifndef BOOST_MULTIPRECISION_MONTGOMERY_INT_LIM_HPP
+#define BOOST_MULTIPRECISION_MONTGOMERY_INT_LIM_HPP
 
 namespace std {
 

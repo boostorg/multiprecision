@@ -8,8 +8,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MP_MONTGOMERY_INT_SERIALIZE_HPP
-#define CRYPTO3_MP_MONTGOMERY_INT_SERIALIZE_HPP
+#ifndef BOOST_MULTIPRECISION_MONTGOMERY_INT_SERIALIZE_HPP
+#define BOOST_MULTIPRECISION_MONTGOMERY_INT_SERIALIZE_HPP
 
 namespace boost {
 
@@ -244,4 +244,4 @@ void serialize(Archive &                                             ar,
 } // namespace serialization
 } // namespace boost
 
-#endif // CRYPTO3_MP_MONTGOMERY_INT_SERIALIZE_HPP
+#endif // BOOST_MULTIPRECISION_MP_MONTGOMERY_INT_SERIALIZE_HPP

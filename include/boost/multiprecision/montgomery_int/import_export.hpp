@@ -8,8 +8,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MP_MONTGOMERY_INT_IMPORT_EXPORT_HPP
-#define CRYPTO3_MP_MONTGOMERY_INT_IMPORT_EXPORT_HPP
+#ifndef BOOST_MULTIPRECISION_MONTGOMERY_INT_IMPORT_EXPORT_HPP
+#define BOOST_MULTIPRECISION_MONTGOMERY_INT_IMPORT_EXPORT_HPP
 
 //#include <boost/multiprecision/montgomery_int/montgomery_int.hpp>
 //#include <boost/multiprecision/montgomery_int/misc.hpp>
@@ -344,4 +344,4 @@ OutputIterator export_bits(const number<montgomery_int_backend<MinBits, MaxBits,
 }
 } // namespace boost::multiprecision
 
-#endif // CRYPTO3_MP_MONTGOMERY_INT_IMPORT_EXPORT_HPP
+#endif // BOOST_MULTIPRECISION_MP_MONTGOMERY_INT_IMPORT_EXPORT_HPP

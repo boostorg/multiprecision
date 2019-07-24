@@ -8,8 +8,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MP_MONTGOMERY_INT_MISC_HPP
-#define CRYPTO3_MP_MONTGOMERY_INT_MISC_HPP
+#ifndef BOOST_MULTIPRECISION_MONTGOMERY_INT_MISC_HPP
+#define BOOST_MULTIPRECISION_MONTGOMERY_INT_MISC_HPP
 
 #include <boost/functional/hash_fwd.hpp>
 #include <boost/integer/common_factor_rt.hpp>      // gcd/lcm

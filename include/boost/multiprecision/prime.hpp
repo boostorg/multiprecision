@@ -8,15 +8,13 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_NUMBER_THEORY_H_
-#define CRYPTO3_NUMBER_THEORY_H_
+#ifndef BOOST_MULTIPRECISION_NUMBER_THEORY_H_
+#define BOOST_MULTIPRECISION_NUMBER_THEORY_H_
 
 #include <boost/hash/sha.hpp>
 
 #include <boost/multiprecision/modular_reduce.hpp>
 #include <boost/multiprecision/pow_mod.hpp>
-
-#include <boost/multiprecision/mp_core???.hpp>
 
 #include <boost/utilities/bit_ops.hpp>
 #include <boost/utilities/ct_utils.hpp>
@@ -24,10 +22,8 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/miller_rabin.hpp>
 
-namespace nil {
-namespace crypto3 {
-
-using namespace boost::multiprecision;
+namespace boost {
+namespace multiprecision {
 
 namespace detail {
 /*
@@ -430,6 +426,6 @@ bool generate_dsa_primes(number<Backend, ExpressionTemplates> &q_out,
    return false;
 }
 }
-} // namespace nil::crypto3
+} // namespace boost::multiprecision
 
 #endif

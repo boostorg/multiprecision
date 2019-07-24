@@ -8,8 +8,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MP_MONTGOMERY_INT_LITERALS_HPP
-#define CRYPTO3_MP_MONTGOMERY_INT_LITERALS_HPP
+#ifndef BOOST_MULTIPRECISION_MONTGOMERY_INT_LITERALS_HPP
+#define BOOST_MULTIPRECISION_MONTGOMERY_INT_LITERALS_HPP
 
 #include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
 #include <boost/multiprecision/cpp_int/literals.hpp>
@@ -117,4 +117,4 @@ constexpr number<montgomery_int_backend<MinBits, MinBits, signed_magnitude, Chec
 }
 } // namespace boost::multiprecision
 
-#endif // CRYPTO3_MP_MONTGOMERY_INT_CORE_HPP
+#endif // BOOST_MULTIPRECISION_MP_MONTGOMERY_INT_CORE_HPP

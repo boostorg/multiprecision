@@ -8,11 +8,12 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_REDUCE_BELOW_HPP
-#define CRYPTO3_REDUCE_BELOW_HPP
+#ifndef BOOST_MULTIPRECISION_REDUCE_BELOW_HPP
+#define BOOST_MULTIPRECISION_REDUCE_BELOW_HPP
 
 namespace boost {
 namespace multiprecision {
+
 template <typename Backend>
 void eval_reduce_below(Backend &val, const Backend &mod)
 {
@@ -38,4 +39,4 @@ number<Backend, ExpressionTemplates> reduce_below(number<Backend, ExpressionTemp
 }
 } // namespace boost::multiprecision
 
-#endif //CRYPTO3_REDUCE_BELOW_HPP
+#endif //BOOST_MULTIPRECISION_REDUCE_BELOW_HPP

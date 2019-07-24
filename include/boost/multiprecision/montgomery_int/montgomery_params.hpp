@@ -8,8 +8,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MONTY_INT_H_
-#define CRYPTO3_MONTY_INT_H_
+#ifndef BOOST_MULTIPRECISION_MONTY_INT_HPP
+#define BOOST_MULTIPRECISION_MONTY_INT_HPP
 
 #include <boost/multiprecision/montgomery_int/inverse.hpp>
 #include <boost/multiprecision/montgomery_int/modular_reduce.hpp>

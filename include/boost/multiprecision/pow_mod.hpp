@@ -8,15 +8,13 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_POWER_MOD_H_
-#define CRYPTO3_POWER_MOD_H_
+#ifndef BOOST_MULTIPRECISION_POWER_MOD_HPP
+#define BOOST_MULTIPRECISION_POWER_MOD_HPP
 
 #include <boost/multiprecision/cpp_int.hpp>
 
-namespace nil {
-namespace crypto3 {
-
-using namespace boost::multiprecision;
+namespace boost {
+namespace multiprecision {
 
 /**
  * Modular Exponentiator Interface
@@ -217,6 +215,6 @@ power_mod(const number<Backend, ExpressionTemplates> &base,
        eval_power_mod(base.backend(), exp.backend(), mod.backend()));
 }
 }
-} // namespace nil::crypto3
+} // namespace boost::multiprecision
 
 #endif

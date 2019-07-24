@@ -8,16 +8,14 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MONTY_INT_H_
-#define CRYPTO3_MONTY_INT_H_
+#ifndef BOOST_MULTIPRECISION_MONTY_INT_HPP
+#define BOOST_MULTIPRECISION_MONTY_INT_HPP
 
 #include <boost/multiprecision/montgomery/inverse.hpp>
 #include <boost/multiprecision/montgomery/modular_reduce.hpp>
 
-using namespace boost::multiprecision;
-
-class modular_reducer;
-
+namespace boost {
+namespace multiprecision {
 /**
  * Parameters for Montgomery Reduction
  */
@@ -144,6 +142,8 @@ class montgomery_params
    size_t     m_p_words;
    NumberType m_mod;
 };
+}
+} // namespace boost::multiprecision
 
 /**
  * The Montgomery representation of an integer

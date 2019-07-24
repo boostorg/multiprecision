@@ -8,14 +8,13 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_JACOBI_HPP
-#define CRYPTO3_JACOBI_HPP
+#ifndef BOOST_MULTIPRECISION_JACOBI_HPP
+#define BOOST_MULTIPRECISION_JACOBI_HPP
 
 #include <boost/multiprecision/cpp_int.hpp>
 
-namespace nil {
-namespace crypto3 {
-using namespace boost::multiprecision;
+namespace boost {
+namespace multiprecision {
 
 template <typename Backend>
 inline limb_type eval_jacobi(const Backend &a, const Backend &n)
@@ -98,6 +97,6 @@ inline typename std::enable_if<number_category<Backend>::value == number_kind_in
    return number<Backend, ExpressionTemplates>(eval_jacobi(a.backend(), n.backend()));
 }
 }
-} // namespace nil::crypto3
+} // namespace boost::multiprecision
 
-#endif //CRYPTO3_JACOBI_HPP
+#endif //BOOST_MULTIPRECISION_JACOBI_HPP
