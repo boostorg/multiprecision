@@ -2319,9 +2319,9 @@ script:
         fi
       else
         if [[ $TRAVIS_OS_NAME == linux ]]; then
-          cmake --build . --target multiprecision_test_suite_$TEST_SUITE -j $(($(nproc) + 1));
+          cmake --build . --target multiprecision_test_suite_$TEST_SUITE -- -j$(($(nproc) + 1));
         elif [[ $TRAVIS_OS_NAME == osx ]]; then
-          cmake --build . --target multiprecision_test_suite_$TEST_SUITE -j $(($(sysctl -n hw.ncpu) + 1));
+          cmake --build . --target multiprecision_test_suite_$TEST_SUITE -- -j$(($(sysctl -n hw.ncpu) + 1));
         fi
       fi
     fi
