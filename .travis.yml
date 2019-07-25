@@ -2313,7 +2313,7 @@ script:
       if [[ $CXXSTD == c++1z ]]; then
         CXXSTD=c++17;
       fi;
-      cmake -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9]*//g') ..;
+      cmake -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9]*//g') -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE ..;
       if [[ $TEST_SUITE == compile_fail ]]; then
         if [[ $TRAVIS_OS_NAME == linux ]]; then
           ctest --build-and-test .. . --build-generator "Unix Makefiles" --tests-regex "multiprecision_test_compile_fail_*" -j $(($(nproc) + 1));
