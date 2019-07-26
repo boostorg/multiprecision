@@ -11,7 +11,7 @@
 #ifndef BOOST_NO_CXX11_CONSTEXPR
 
 template <class T>
-void silence_unused(const T&){}
+void silence_unused(const T&) {}
 
 template <class T>
 void test1()

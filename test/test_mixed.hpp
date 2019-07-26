@@ -65,7 +65,6 @@ void test()
    BOOST_CHECK_EQUAL(small_val * 1 > big_val * 1, false);
    BOOST_CHECK_EQUAL(small_val * 1 != big_val * 1, true);
 
-
    BOOST_CHECK_EQUAL(small_val + big_val, Big(small_val) + big_val);
    BOOST_CHECK_EQUAL(small_val - big_val, Big(small_val) - big_val);
    BOOST_CHECK_EQUAL(small_val * big_val, Big(small_val) * big_val);

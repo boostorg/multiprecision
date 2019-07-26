@@ -175,10 +175,10 @@ BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::checked_uint512
 
 #endif // little endian
 
-typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<32, 32, boost::multiprecision::signed_magnitude, boost::multiprecision::checked, void> >    checked_int32_t;
-typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<32, 32, boost::multiprecision::unsigned_magnitude, boost::multiprecision::checked, void> >    checked_uint32_t;
-typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<32, 32, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> >    unchecked_int32_t;
-typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<32, 32, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> >    unchecked_uint32_t;
+typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<32, 32, boost::multiprecision::signed_magnitude, boost::multiprecision::checked, void> >     checked_int32_t;
+typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<32, 32, boost::multiprecision::unsigned_magnitude, boost::multiprecision::checked, void> >   checked_uint32_t;
+typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<32, 32, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> >   unchecked_int32_t;
+typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<32, 32, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> > unchecked_uint32_t;
 
 //
 // Construct from int:
@@ -212,10 +212,10 @@ BOOST_STATIC_ASSERT(noexcept(std::declval<checked_uint32_t>() = std::declval<boo
 //
 // And finally some things which should *not* be noexcept:
 //
-typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<30, 30, boost::multiprecision::signed_magnitude, boost::multiprecision::checked, void> >    checked_int30_t;
-typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<30, 30, boost::multiprecision::unsigned_magnitude, boost::multiprecision::checked, void> >    checked_uint30_t;
-typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<30, 30, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> >    unchecked_int30_t;
-typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<30, 30, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> >    unchecked_uint30_t;
+typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<30, 30, boost::multiprecision::signed_magnitude, boost::multiprecision::checked, void> >     checked_int30_t;
+typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<30, 30, boost::multiprecision::unsigned_magnitude, boost::multiprecision::checked, void> >   checked_uint30_t;
+typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<30, 30, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> >   unchecked_int30_t;
+typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<30, 30, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> > unchecked_uint30_t;
 
 //
 // Construct from int:
@@ -247,4 +247,3 @@ BOOST_STATIC_ASSERT(!noexcept(std::declval<checked_int32_t>() = std::declval<boo
 BOOST_STATIC_ASSERT(!noexcept(std::declval<checked_uint32_t>() = std::declval<boost::uint64_t>()));
 
 #endif // noexcept
-

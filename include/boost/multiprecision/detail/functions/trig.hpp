@@ -18,7 +18,7 @@
 #endif
 
 template <class T>
-void hyp0F1(T &result, const T &b, const T &x)
+void hyp0F1(T& result, const T& b, const T& x)
 {
    typedef typename boost::multiprecision::detail::canonical<boost::int32_t, T>::type  si_type;
    typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
@@ -71,7 +71,7 @@ void hyp0F1(T &result, const T &b, const T &x)
 }
 
 template <class T>
-void eval_sin(T &result, const T &x)
+void eval_sin(T& result, const T& x)
 {
    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The sin function is only valid for floating point types.");
    if (&result == &x)
@@ -228,7 +228,7 @@ void eval_sin(T &result, const T &x)
 }
 
 template <class T>
-void eval_cos(T &result, const T &x)
+void eval_cos(T& result, const T& x)
 {
    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The cos function is only valid for floating point types.");
    if (&result == &x)
@@ -352,7 +352,7 @@ void eval_cos(T &result, const T &x)
 }
 
 template <class T>
-void eval_tan(T &result, const T &x)
+void eval_tan(T& result, const T& x)
 {
    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The tan function is only valid for floating point types.");
    if (&result == &x)
@@ -369,7 +369,7 @@ void eval_tan(T &result, const T &x)
 }
 
 template <class T>
-void hyp2F1(T &result, const T &a, const T &b, const T &c, const T &x)
+void hyp2F1(T& result, const T& a, const T& b, const T& c, const T& x)
 {
    // Compute the series representation of hyperg_2f1 taken from
    // Abramowitz and Stegun 15.1.1.
@@ -431,7 +431,7 @@ void hyp2F1(T &result, const T &a, const T &b, const T &c, const T &x)
 }
 
 template <class T>
-void eval_asin(T &result, const T &x)
+void eval_asin(T& result, const T& x)
 {
    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The asin function is only valid for floating point types.");
    typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
@@ -556,7 +556,7 @@ void eval_asin(T &result, const T &x)
 }
 
 template <class T>
-inline void eval_acos(T &result, const T &x)
+inline void eval_acos(T& result, const T& x)
 {
    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The acos function is only valid for floating point types.");
    typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
@@ -610,7 +610,7 @@ inline void eval_acos(T &result, const T &x)
 }
 
 template <class T>
-void eval_atan(T &result, const T &x)
+void eval_atan(T& result, const T& x)
 {
    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The atan function is only valid for floating point types.");
    typedef typename boost::multiprecision::detail::canonical<boost::int32_t, T>::type  si_type;
@@ -707,7 +707,7 @@ void eval_atan(T &result, const T &x)
 }
 
 template <class T>
-void eval_atan2(T &result, const T &y, const T &x)
+void eval_atan2(T& result, const T& y, const T& x)
 {
    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The atan2 function is only valid for floating point types.");
    if (&result == &y)
@@ -821,7 +821,7 @@ void eval_atan2(T &result, const T &y, const T &x)
    }
 }
 template <class T, class A>
-inline typename enable_if<is_arithmetic<A>, void>::type eval_atan2(T &result, const T &x, const A &a)
+inline typename enable_if<is_arithmetic<A>, void>::type eval_atan2(T& result, const T& x, const A& a)
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type          canonical_type;
    typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
@@ -831,7 +831,7 @@ inline typename enable_if<is_arithmetic<A>, void>::type eval_atan2(T &result, co
 }
 
 template <class T, class A>
-inline typename enable_if<is_arithmetic<A>, void>::type eval_atan2(T &result, const A &x, const T &a)
+inline typename enable_if<is_arithmetic<A>, void>::type eval_atan2(T& result, const A& x, const T& a)
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type          canonical_type;
    typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;

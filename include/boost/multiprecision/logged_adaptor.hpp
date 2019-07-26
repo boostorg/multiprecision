@@ -33,270 +33,273 @@ inline void log_prefix_event(const Backend &, const T &, const U &, const V &,
 
 namespace backends {
 
-template <class Backend> struct logged_adaptor {
-  typedef typename Backend::signed_types signed_types;
-  typedef typename Backend::unsigned_types unsigned_types;
-  typedef typename Backend::float_types float_types;
-  typedef typename extract_exponent_type<
-      Backend, number_category<Backend>::value>::type exponent_type;
+template <class Backend>
+struct logged_adaptor
+{
+   typedef typename Backend::signed_types   signed_types;
+   typedef typename Backend::unsigned_types unsigned_types;
+   typedef typename Backend::float_types    float_types;
+   typedef typename extract_exponent_type<
+       Backend, number_category<Backend>::value>::type exponent_type;
 
-private:
-  Backend m_value;
+ private:
+   Backend m_value;
 
-public:
-  logged_adaptor() { log_postfix_event(m_value, "Default construct"); }
-  logged_adaptor(const logged_adaptor &o) {
-    log_prefix_event(m_value, o.value(), "Copy construct");
-    m_value = o.m_value;
-    log_postfix_event(m_value, "Copy construct");
-  }
+ public:
+   logged_adaptor()
+   {
+      log_postfix_event(m_value, "Default construct");
+   }
+   logged_adaptor(const logged_adaptor& o)
+   {
+      log_prefix_event(m_value, o.value(), "Copy construct");
+      m_value = o.m_value;
+      log_postfix_event(m_value, "Copy construct");
+   }
 #ifndef BOOST_NO_RVALUE_REFERENCES
-  logged_adaptor(logged_adaptor &&o) {
-    log_prefix_event(m_value, o.value(), "Move construct");
-    m_value = static_cast<Backend &&>(o.m_value);
-    log_postfix_event(m_value, "Move construct");
-  }
-  logged_adaptor &operator=(logged_adaptor &&o) {
-    log_prefix_event(m_value, o.value(), "Move Assignment");
-    m_value = static_cast<Backend &&>(o.m_value);
-    log_postfix_event(m_value, "Move construct");
-    return *this;
-  }
+   logged_adaptor(logged_adaptor&& o)
+   {
+      log_prefix_event(m_value, o.value(), "Move construct");
+      m_value = static_cast<Backend&&>(o.m_value);
+      log_postfix_event(m_value, "Move construct");
+   }
+   logged_adaptor& operator=(logged_adaptor&& o)
+   {
+      log_prefix_event(m_value, o.value(), "Move Assignment");
+      m_value = static_cast<Backend&&>(o.m_value);
+      log_postfix_event(m_value, "Move construct");
+      return *this;
+   }
 #endif
-  logged_adaptor &operator=(const logged_adaptor &o) {
-    log_prefix_event(m_value, o.value(), "Assignment");
-    m_value = o.m_value;
-    log_postfix_event(m_value, "Copy construct");
-    return *this;
-  }
-  template <class T>
-  logged_adaptor(
-      const T &i,
-      const typename enable_if_c<is_convertible<T, Backend>::value>::type * = 0)
-      : m_value(i) {
-    log_postfix_event(m_value, "construct from arithmetic type");
-  }
-  template <class T>
-  logged_adaptor(
-      const logged_adaptor<T> &i,
-      const typename enable_if_c<is_convertible<T, Backend>::value>::type * = 0)
-      : m_value(i.value()) {
-    log_postfix_event(m_value, "construct from arithmetic type");
-  }
-  template <class T>
-  typename enable_if_c<is_arithmetic<T>::value ||
-                           is_convertible<T, Backend>::value,
-                       logged_adaptor &>::type
-  operator=(const T &i) {
-    log_prefix_event(m_value, i, "Assignment from arithmetic type");
-    m_value = i;
-    log_postfix_event(m_value, "Assignment from arithmetic type");
-    return *this;
-  }
-  logged_adaptor &operator=(const char *s) {
-    log_prefix_event(m_value, s, "Assignment from string type");
-    m_value = s;
-    log_postfix_event(m_value, "Assignment from string type");
-    return *this;
-  }
-  void swap(logged_adaptor &o) {
-    log_prefix_event(m_value, o.value(), "swap");
-    std::swap(m_value, o.value());
-    log_postfix_event(m_value, "swap");
-  }
-  std::string str(std::streamsize digits, std::ios_base::fmtflags f) const {
-    log_prefix_event(m_value, "Conversion to string");
-    std::string s = m_value.str(digits, f);
-    log_postfix_event(m_value, s, "Conversion to string");
-    return s;
-  }
-  void negate() {
-    log_prefix_event(m_value, "negate");
-    m_value.negate();
-    log_postfix_event(m_value, "negate");
-  }
-  int compare(const logged_adaptor &o) const {
-    log_prefix_event(m_value, o.value(), "compare");
-    int r = m_value.compare(o.value());
-    log_postfix_event(m_value, r, "compare");
-    return r;
-  }
-  template <class T> int compare(const T &i) const {
-    log_prefix_event(m_value, i, "compare");
-    int r = m_value.compare(i);
-    log_postfix_event(m_value, r, "compare");
-    return r;
-  }
-  Backend &value() { return m_value; }
-  const Backend &value() const { return m_value; }
-  template <class Archive>
-  void serialize(Archive &ar, const unsigned int /*version*/) {
-    log_prefix_event(m_value, "serialize");
-    ar &boost::serialization::make_nvp("value", m_value);
-    log_postfix_event(m_value, "serialize");
-  }
-  static unsigned default_precision() BOOST_NOEXCEPT {
-    return Backend::default_precision();
-  }
-  static void default_precision(unsigned v) BOOST_NOEXCEPT {
-    Backend::default_precision(v);
-  }
-  unsigned precision() const BOOST_NOEXCEPT { return value().precision(); }
-  void precision(unsigned digits10) BOOST_NOEXCEPT {
-    value().precision(digits10);
-  }
+   logged_adaptor& operator=(const logged_adaptor& o)
+   {
+      log_prefix_event(m_value, o.value(), "Assignment");
+      m_value = o.m_value;
+      log_postfix_event(m_value, "Copy construct");
+      return *this;
+   }
+   template <class T>
+   logged_adaptor(const T& i, const typename enable_if_c<is_convertible<T, Backend>::value>::type* = 0)
+       : m_value(i)
+   {
+      log_postfix_event(m_value, "construct from arithmetic type");
+   }
+   template <class T>
+   logged_adaptor(const logged_adaptor<T>& i, const typename enable_if_c<is_convertible<T, Backend>::value>::type* = 0)
+       : m_value(i.value())
+   {
+      log_postfix_event(m_value, "construct from arithmetic type");
+   }
+   template <class T>
+   typename enable_if_c<is_arithmetic<T>::value || is_convertible<T, Backend>::value, logged_adaptor&>::type operator=(const T& i)
+   {
+      log_prefix_event(m_value, i, "Assignment from arithmetic type");
+      m_value = i;
+      log_postfix_event(m_value, "Assignment from arithmetic type");
+      return *this;
+   }
+   logged_adaptor& operator=(const char* s)
+   {
+      log_prefix_event(m_value, s, "Assignment from string type");
+      m_value = s;
+      log_postfix_event(m_value, "Assignment from string type");
+      return *this;
+   }
+   void swap(logged_adaptor& o)
+   {
+      log_prefix_event(m_value, o.value(), "swap");
+      std::swap(m_value, o.value());
+      log_postfix_event(m_value, "swap");
+   }
+   std::string str(std::streamsize digits, std::ios_base::fmtflags f) const
+   {
+      log_prefix_event(m_value, "Conversion to string");
+      std::string s = m_value.str(digits, f);
+      log_postfix_event(m_value, s, "Conversion to string");
+      return s;
+   }
+   void negate()
+   {
+      log_prefix_event(m_value, "negate");
+      m_value.negate();
+      log_postfix_event(m_value, "negate");
+   }
+   int compare(const logged_adaptor& o) const
+   {
+      log_prefix_event(m_value, o.value(), "compare");
+      int r = m_value.compare(o.value());
+      log_postfix_event(m_value, r, "compare");
+      return r;
+   }
+   template <class T>
+   int compare(const T& i) const
+   {
+      log_prefix_event(m_value, i, "compare");
+      int r = m_value.compare(i);
+      log_postfix_event(m_value, r, "compare");
+      return r;
+   }
+   Backend& value()
+   {
+      return m_value;
+   }
+   const Backend& value() const
+   {
+      return m_value;
+   }
+   template <class Archive>
+   void serialize(Archive& ar, const unsigned int /*version*/)
+   {
+      log_prefix_event(m_value, "serialize");
+      ar& boost::serialization::make_nvp("value", m_value);
+      log_postfix_event(m_value, "serialize");
+   }
+   static unsigned default_precision() BOOST_NOEXCEPT
+   {
+      return Backend::default_precision();
+   }
+   static void default_precision(unsigned v) BOOST_NOEXCEPT
+   {
+      Backend::default_precision(v);
+   }
+   unsigned precision() const BOOST_NOEXCEPT
+   {
+      return value().precision();
+   }
+   void precision(unsigned digits10) BOOST_NOEXCEPT
+   {
+      value().precision(digits10);
+   }
 };
 
 template <class T> inline const T &unwrap_logged_type(const T &a) { return a; }
 template <class Backend>
-inline const Backend &unwrap_logged_type(const logged_adaptor<Backend> &a) {
-  return a.value();
-}
+inline const Backend& unwrap_logged_type(const logged_adaptor<Backend>& a) { return a.value(); }
 
-#define NON_MEMBER_OP1(name, str)                                              \
-  template <class Backend>                                                     \
-  inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend> & result) {      \
-    using default_ops::BOOST_JOIN(eval_, name);                                \
-    log_prefix_event(result.value(), str);                                     \
-    BOOST_JOIN(eval_, name)(result.value());                                   \
-    log_postfix_event(result.value(), str);                                    \
-  }
+#define NON_MEMBER_OP1(name, str)                                        \
+   template <class Backend>                                              \
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend> & result) \
+   {                                                                     \
+      using default_ops::BOOST_JOIN(eval_, name);                        \
+      log_prefix_event(result.value(), str);                             \
+      BOOST_JOIN(eval_, name)                                            \
+      (result.value());                                                  \
+      log_postfix_event(result.value(), str);                            \
+   }
 
-#define NON_MEMBER_OP2(name, str)                                              \
-  template <class Backend, class T>                                            \
-  inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend> & result,        \
-                                      const T &a) {                            \
-    using default_ops::BOOST_JOIN(eval_, name);                                \
-    log_prefix_event(result.value(), unwrap_logged_type(a), str);              \
-    BOOST_JOIN(eval_, name)(result.value(), unwrap_logged_type(a));            \
-    log_postfix_event(result.value(), str);                                    \
-  }                                                                            \
-  template <class Backend>                                                     \
-  inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend> & result,        \
-                                      const logged_adaptor<Backend> &a) {      \
-    using default_ops::BOOST_JOIN(eval_, name);                                \
-    log_prefix_event(result.value(), unwrap_logged_type(a), str);              \
-    BOOST_JOIN(eval_, name)(result.value(), unwrap_logged_type(a));            \
-    log_postfix_event(result.value(), str);                                    \
-  }
+#define NON_MEMBER_OP2(name, str)                                                                          \
+   template <class Backend, class T>                                                                       \
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend> & result, const T& a)                       \
+   {                                                                                                       \
+      using default_ops::BOOST_JOIN(eval_, name);                                                          \
+      log_prefix_event(result.value(), unwrap_logged_type(a), str);                                        \
+      BOOST_JOIN(eval_, name)                                                                              \
+      (result.value(), unwrap_logged_type(a));                                                             \
+      log_postfix_event(result.value(), str);                                                              \
+   }                                                                                                       \
+   template <class Backend>                                                                                \
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend> & result, const logged_adaptor<Backend>& a) \
+   {                                                                                                       \
+      using default_ops::BOOST_JOIN(eval_, name);                                                          \
+      log_prefix_event(result.value(), unwrap_logged_type(a), str);                                        \
+      BOOST_JOIN(eval_, name)                                                                              \
+      (result.value(), unwrap_logged_type(a));                                                             \
+      log_postfix_event(result.value(), str);                                                              \
+   }
 
-#define NON_MEMBER_OP3(name, str)                                              \
-  template <class Backend, class T, class U>                                   \
-  inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend> & result,        \
-                                      const T &a, const U &b) {                \
-    using default_ops::BOOST_JOIN(eval_, name);                                \
-    log_prefix_event(result.value(), unwrap_logged_type(a),                    \
-                     unwrap_logged_type(b), str);                              \
-    BOOST_JOIN(eval_, name)                                                    \
-    (result.value(), unwrap_logged_type(a), unwrap_logged_type(b));            \
-    log_postfix_event(result.value(), str);                                    \
-  }                                                                            \
-  template <class Backend, class T>                                            \
-  inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend> & result,        \
-                                      const logged_adaptor<Backend> &a,        \
-                                      const T &b) {                            \
-    using default_ops::BOOST_JOIN(eval_, name);                                \
-    log_prefix_event(result.value(), unwrap_logged_type(a),                    \
-                     unwrap_logged_type(b), str);                              \
-    BOOST_JOIN(eval_, name)                                                    \
-    (result.value(), unwrap_logged_type(a), unwrap_logged_type(b));            \
-    log_postfix_event(result.value(), str);                                    \
-  }                                                                            \
-  template <class Backend, class T>                                            \
-  inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend> & result,        \
-                                      const T &a,                              \
-                                      const logged_adaptor<Backend> &b) {      \
-    using default_ops::BOOST_JOIN(eval_, name);                                \
-    log_prefix_event(result.value(), unwrap_logged_type(a),                    \
-                     unwrap_logged_type(b), str);                              \
-    BOOST_JOIN(eval_, name)                                                    \
-    (result.value(), unwrap_logged_type(a), unwrap_logged_type(b));            \
-    log_postfix_event(result.value(), str);                                    \
-  }                                                                            \
-  template <class Backend>                                                     \
-  inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend> & result,        \
-                                      const logged_adaptor<Backend> &a,        \
-                                      const logged_adaptor<Backend> &b) {      \
-    using default_ops::BOOST_JOIN(eval_, name);                                \
-    log_prefix_event(result.value(), unwrap_logged_type(a),                    \
-                     unwrap_logged_type(b), str);                              \
-    BOOST_JOIN(eval_, name)                                                    \
-    (result.value(), unwrap_logged_type(a), unwrap_logged_type(b));            \
-    log_postfix_event(result.value(), str);                                    \
-  }
+#define NON_MEMBER_OP3(name, str)                                                                                                            \
+   template <class Backend, class T, class U>                                                                                                \
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend> & result, const T& a, const U& b)                                             \
+   {                                                                                                                                         \
+      using default_ops::BOOST_JOIN(eval_, name);                                                                                            \
+      log_prefix_event(result.value(), unwrap_logged_type(a), unwrap_logged_type(b), str);                                                   \
+      BOOST_JOIN(eval_, name)                                                                                                                \
+      (result.value(), unwrap_logged_type(a), unwrap_logged_type(b));                                                                        \
+      log_postfix_event(result.value(), str);                                                                                                \
+   }                                                                                                                                         \
+   template <class Backend, class T>                                                                                                         \
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend> & result, const logged_adaptor<Backend>& a, const T& b)                       \
+   {                                                                                                                                         \
+      using default_ops::BOOST_JOIN(eval_, name);                                                                                            \
+      log_prefix_event(result.value(), unwrap_logged_type(a), unwrap_logged_type(b), str);                                                   \
+      BOOST_JOIN(eval_, name)                                                                                                                \
+      (result.value(), unwrap_logged_type(a), unwrap_logged_type(b));                                                                        \
+      log_postfix_event(result.value(), str);                                                                                                \
+   }                                                                                                                                         \
+   template <class Backend, class T>                                                                                                         \
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend> & result, const T& a, const logged_adaptor<Backend>& b)                       \
+   {                                                                                                                                         \
+      using default_ops::BOOST_JOIN(eval_, name);                                                                                            \
+      log_prefix_event(result.value(), unwrap_logged_type(a), unwrap_logged_type(b), str);                                                   \
+      BOOST_JOIN(eval_, name)                                                                                                                \
+      (result.value(), unwrap_logged_type(a), unwrap_logged_type(b));                                                                        \
+      log_postfix_event(result.value(), str);                                                                                                \
+   }                                                                                                                                         \
+   template <class Backend>                                                                                                                  \
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend> & result, const logged_adaptor<Backend>& a, const logged_adaptor<Backend>& b) \
+   {                                                                                                                                         \
+      using default_ops::BOOST_JOIN(eval_, name);                                                                                            \
+      log_prefix_event(result.value(), unwrap_logged_type(a), unwrap_logged_type(b), str);                                                   \
+      BOOST_JOIN(eval_, name)                                                                                                                \
+      (result.value(), unwrap_logged_type(a), unwrap_logged_type(b));                                                                        \
+      log_postfix_event(result.value(), str);                                                                                                \
+   }
 
-#define NON_MEMBER_OP4(name, str)                                              \
-  template <class Backend, class T, class U, class V>                          \
-  inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend> & result,        \
-                                      const T &a, const U &b, const V &c) {    \
-    using default_ops::BOOST_JOIN(eval_, name);                                \
-    log_prefix_event(result.value(), unwrap_logged_type(a),                    \
-                     unwrap_logged_type(b), unwrap_logged_type(c), str);       \
-    BOOST_JOIN(eval_, name)                                                    \
-    (result.value(), unwrap_logged_type(a), unwrap_logged_type(b),             \
-     unwrap_logged_type(c));                                                   \
-    log_postfix_event(result.value(), str);                                    \
-  }                                                                            \
-  template <class Backend, class T>                                            \
-  inline void BOOST_JOIN(eval_, name)(                                         \
-      logged_adaptor<Backend> & result, const logged_adaptor<Backend> &a,      \
-      const logged_adaptor<Backend> &b, const T &c) {                          \
-    using default_ops::BOOST_JOIN(eval_, name);                                \
-    log_prefix_event(result.value(), unwrap_logged_type(a),                    \
-                     unwrap_logged_type(b), unwrap_logged_type(c), str);       \
-    BOOST_JOIN(eval_, name)                                                    \
-    (result.value(), unwrap_logged_type(a), unwrap_logged_type(b),             \
-     unwrap_logged_type(c));                                                   \
-    log_postfix_event(result.value(), str);                                    \
-  }                                                                            \
-  template <class Backend, class T>                                            \
-  inline void BOOST_JOIN(eval_, name)(                                         \
-      logged_adaptor<Backend> & result, const logged_adaptor<Backend> &a,      \
-      const T &b, const logged_adaptor<Backend> &c) {                          \
-    using default_ops::BOOST_JOIN(eval_, name);                                \
-    log_prefix_event(result.value(), unwrap_logged_type(a),                    \
-                     unwrap_logged_type(b), unwrap_logged_type(c), str);       \
-    BOOST_JOIN(eval_, name)                                                    \
-    (result.value(), unwrap_logged_type(a), unwrap_logged_type(b),             \
-     unwrap_logged_type(c));                                                   \
-    log_postfix_event(result.value(), str);                                    \
-  }                                                                            \
-  template <class Backend, class T>                                            \
-  inline void BOOST_JOIN(eval_, name)(                                         \
-      logged_adaptor<Backend> & result, const T &a,                            \
-      const logged_adaptor<Backend> &b, const logged_adaptor<Backend> &c) {    \
-    using default_ops::BOOST_JOIN(eval_, name);                                \
-    log_prefix_event(result.value(), unwrap_logged_type(a),                    \
-                     unwrap_logged_type(b), unwrap_logged_type(c), str);       \
-    BOOST_JOIN(eval_, name)                                                    \
-    (result.value(), unwrap_logged_type(a), unwrap_logged_type(b),             \
-     unwrap_logged_type(c));                                                   \
-    log_postfix_event(result.value(), str);                                    \
-  }                                                                            \
-  template <class Backend>                                                     \
-  inline void BOOST_JOIN(eval_, name)(                                         \
-      logged_adaptor<Backend> & result, const logged_adaptor<Backend> &a,      \
-      const logged_adaptor<Backend> &b, const logged_adaptor<Backend> &c) {    \
-    using default_ops::BOOST_JOIN(eval_, name);                                \
-    log_prefix_event(result.value(), unwrap_logged_type(a),                    \
-                     unwrap_logged_type(b), unwrap_logged_type(c), str);       \
-    BOOST_JOIN(eval_, name)                                                    \
-    (result.value(), unwrap_logged_type(a), unwrap_logged_type(b),             \
-     unwrap_logged_type(c));                                                   \
-    log_postfix_event(result.value(), str);                                    \
-  }                                                                            \
-  template <class Backend, class T, class U>                                   \
-  inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend> & result,        \
-                                      const logged_adaptor<Backend> &a,        \
-                                      const T &b, const U &c) {                \
-    using default_ops::BOOST_JOIN(eval_, name);                                \
-    log_prefix_event(result.value(), unwrap_logged_type(a),                    \
-                     unwrap_logged_type(b), unwrap_logged_type(c), str);       \
-    BOOST_JOIN(eval_, name)                                                    \
-    (result.value(), unwrap_logged_type(a), unwrap_logged_type(b),             \
-     unwrap_logged_type(c));                                                   \
-    log_postfix_event(result.value(), str);                                    \
-  }
+#define NON_MEMBER_OP4(name, str)                                                                                                                                              \
+   template <class Backend, class T, class U, class V>                                                                                                                         \
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend> & result, const T& a, const U& b, const V& c)                                                                   \
+   {                                                                                                                                                                           \
+      using default_ops::BOOST_JOIN(eval_, name);                                                                                                                              \
+      log_prefix_event(result.value(), unwrap_logged_type(a), unwrap_logged_type(b), unwrap_logged_type(c), str);                                                              \
+      BOOST_JOIN(eval_, name)                                                                                                                                                  \
+      (result.value(), unwrap_logged_type(a), unwrap_logged_type(b), unwrap_logged_type(c));                                                                                   \
+      log_postfix_event(result.value(), str);                                                                                                                                  \
+   }                                                                                                                                                                           \
+   template <class Backend, class T>                                                                                                                                           \
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend> & result, const logged_adaptor<Backend>& a, const logged_adaptor<Backend>& b, const T& c)                       \
+   {                                                                                                                                                                           \
+      using default_ops::BOOST_JOIN(eval_, name);                                                                                                                              \
+      log_prefix_event(result.value(), unwrap_logged_type(a), unwrap_logged_type(b), unwrap_logged_type(c), str);                                                              \
+      BOOST_JOIN(eval_, name)                                                                                                                                                  \
+      (result.value(), unwrap_logged_type(a), unwrap_logged_type(b), unwrap_logged_type(c));                                                                                   \
+      log_postfix_event(result.value(), str);                                                                                                                                  \
+   }                                                                                                                                                                           \
+   template <class Backend, class T>                                                                                                                                           \
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend> & result, const logged_adaptor<Backend>& a, const T& b, const logged_adaptor<Backend>& c)                       \
+   {                                                                                                                                                                           \
+      using default_ops::BOOST_JOIN(eval_, name);                                                                                                                              \
+      log_prefix_event(result.value(), unwrap_logged_type(a), unwrap_logged_type(b), unwrap_logged_type(c), str);                                                              \
+      BOOST_JOIN(eval_, name)                                                                                                                                                  \
+      (result.value(), unwrap_logged_type(a), unwrap_logged_type(b), unwrap_logged_type(c));                                                                                   \
+      log_postfix_event(result.value(), str);                                                                                                                                  \
+   }                                                                                                                                                                           \
+   template <class Backend, class T>                                                                                                                                           \
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend> & result, const T& a, const logged_adaptor<Backend>& b, const logged_adaptor<Backend>& c)                       \
+   {                                                                                                                                                                           \
+      using default_ops::BOOST_JOIN(eval_, name);                                                                                                                              \
+      log_prefix_event(result.value(), unwrap_logged_type(a), unwrap_logged_type(b), unwrap_logged_type(c), str);                                                              \
+      BOOST_JOIN(eval_, name)                                                                                                                                                  \
+      (result.value(), unwrap_logged_type(a), unwrap_logged_type(b), unwrap_logged_type(c));                                                                                   \
+      log_postfix_event(result.value(), str);                                                                                                                                  \
+   }                                                                                                                                                                           \
+   template <class Backend>                                                                                                                                                    \
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend> & result, const logged_adaptor<Backend>& a, const logged_adaptor<Backend>& b, const logged_adaptor<Backend>& c) \
+   {                                                                                                                                                                           \
+      using default_ops::BOOST_JOIN(eval_, name);                                                                                                                              \
+      log_prefix_event(result.value(), unwrap_logged_type(a), unwrap_logged_type(b), unwrap_logged_type(c), str);                                                              \
+      BOOST_JOIN(eval_, name)                                                                                                                                                  \
+      (result.value(), unwrap_logged_type(a), unwrap_logged_type(b), unwrap_logged_type(c));                                                                                   \
+      log_postfix_event(result.value(), str);                                                                                                                                  \
+   }                                                                                                                                                                           \
+   template <class Backend, class T, class U>                                                                                                                                  \
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<Backend> & result, const logged_adaptor<Backend>& a, const T& b, const U& c)                                             \
+   {                                                                                                                                                                           \
+      using default_ops::BOOST_JOIN(eval_, name);                                                                                                                              \
+      log_prefix_event(result.value(), unwrap_logged_type(a), unwrap_logged_type(b), unwrap_logged_type(c), str);                                                              \
+      BOOST_JOIN(eval_, name)                                                                                                                                                  \
+      (result.value(), unwrap_logged_type(a), unwrap_logged_type(b), unwrap_logged_type(c));                                                                                   \
+      log_postfix_event(result.value(), str);                                                                                                                                  \
+   }
 
 NON_MEMBER_OP2(add, "+=")
 NON_MEMBER_OP2(subtract, "-=")
@@ -530,23 +533,25 @@ std::size_t hash_value(const logged_adaptor<Backend> &val) {
   return hash_value(val.value());
 }
 
-#define NON_MEMBER_COMPLEX_TO_REAL(name, str)                                  \
-  template <class B1, class B2>                                                \
-  inline void BOOST_JOIN(eval_, name)(logged_adaptor<B1> & result,             \
-                                      const logged_adaptor<B2> &a) {           \
-    using default_ops::BOOST_JOIN(eval_, name);                                \
-    log_prefix_event(a.value(), a.value(), str);                               \
-    BOOST_JOIN(eval_, name)(result.value(), a.value());                        \
-    log_postfix_event(result.value(), str);                                    \
-  }                                                                            \
-  template <class B1, class B2>                                                \
-  inline void BOOST_JOIN(eval_, name)(B1 & result,                             \
-                                      const logged_adaptor<B2> &a) {           \
-    using default_ops::BOOST_JOIN(eval_, name);                                \
-    log_prefix_event(a.value(), a.value(), str);                               \
-    BOOST_JOIN(eval_, name)(result, a.value());                                \
-    log_postfix_event(result, str);                                            \
-  }
+#define NON_MEMBER_COMPLEX_TO_REAL(name, str)                                                    \
+   template <class B1, class B2>                                                                 \
+   inline void BOOST_JOIN(eval_, name)(logged_adaptor<B1> & result, const logged_adaptor<B2>& a) \
+   {                                                                                             \
+      using default_ops::BOOST_JOIN(eval_, name);                                                \
+      log_prefix_event(a.value(), a.value(), str);                                               \
+      BOOST_JOIN(eval_, name)                                                                    \
+      (result.value(), a.value());                                                               \
+      log_postfix_event(result.value(), str);                                                    \
+   }                                                                                             \
+   template <class B1, class B2>                                                                 \
+   inline void BOOST_JOIN(eval_, name)(B1 & result, const logged_adaptor<B2>& a)                 \
+   {                                                                                             \
+      using default_ops::BOOST_JOIN(eval_, name);                                                \
+      log_prefix_event(a.value(), a.value(), str);                                               \
+      BOOST_JOIN(eval_, name)                                                                    \
+      (result, a.value());                                                                       \
+      log_postfix_event(result, str);                                                            \
+   }
 
 NON_MEMBER_COMPLEX_TO_REAL(real, "real")
 NON_MEMBER_COMPLEX_TO_REAL(imag, "imag")
@@ -562,45 +567,30 @@ inline void assign_components(logged_adaptor<T> &result, const V &v1,
 using backends::logged_adaptor;
 
 template <class Backend>
-struct number_category<backends::logged_adaptor<Backend>>
-    : public number_category<Backend> {};
+struct number_category<backends::logged_adaptor<Backend> > : public number_category<Backend>
+{};
 
-} // namespace multiprecision
-} // namespace boost
+}} // namespace boost::multiprecision
 
 namespace std {
 
-template <class Backend,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-class numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::backends::logged_adaptor<Backend>,
-    ExpressionTemplates>>
-    : public std::numeric_limits<
-          boost::multiprecision::number<Backend, ExpressionTemplates>> {
-  typedef std::numeric_limits<
-      boost::multiprecision::number<Backend, ExpressionTemplates>>
-      base_type;
-  typedef boost::multiprecision::number<
-      boost::multiprecision::backends::logged_adaptor<Backend>,
-      ExpressionTemplates>
-      number_type;
+template <class Backend, boost::multiprecision::expression_template_option ExpressionTemplates>
+class numeric_limits<boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<Backend>, ExpressionTemplates> >
+    : public std::numeric_limits<boost::multiprecision::number<Backend, ExpressionTemplates> >
+{
+   typedef std::numeric_limits<boost::multiprecision::number<Backend, ExpressionTemplates> >                            base_type;
+   typedef boost::multiprecision::number<boost::multiprecision::backends::logged_adaptor<Backend>, ExpressionTemplates> number_type;
 
-public:
-  static number_type(min)() BOOST_NOEXCEPT { return (base_type::min)(); }
-  static number_type(max)() BOOST_NOEXCEPT { return (base_type::max)(); }
-  static number_type lowest() BOOST_NOEXCEPT { return -(max)(); }
-  static number_type epsilon() BOOST_NOEXCEPT { return base_type::epsilon(); }
-  static number_type round_error() BOOST_NOEXCEPT { return epsilon() / 2; }
-  static number_type infinity() BOOST_NOEXCEPT { return base_type::infinity(); }
-  static number_type quiet_NaN() BOOST_NOEXCEPT {
-    return base_type::quiet_NaN();
-  }
-  static number_type signaling_NaN() BOOST_NOEXCEPT {
-    return base_type::signaling_NaN();
-  }
-  static number_type denorm_min() BOOST_NOEXCEPT {
-    return base_type::denorm_min();
-  }
+ public:
+   static number_type(min)() BOOST_NOEXCEPT { return (base_type::min)(); }
+   static number_type(max)() BOOST_NOEXCEPT { return (base_type::max)(); }
+   static number_type lowest() BOOST_NOEXCEPT { return -(max)(); }
+   static number_type epsilon() BOOST_NOEXCEPT { return base_type::epsilon(); }
+   static number_type round_error() BOOST_NOEXCEPT { return epsilon() / 2; }
+   static number_type infinity() BOOST_NOEXCEPT { return base_type::infinity(); }
+   static number_type quiet_NaN() BOOST_NOEXCEPT { return base_type::quiet_NaN(); }
+   static number_type signaling_NaN() BOOST_NOEXCEPT { return base_type::signaling_NaN(); }
+   static number_type denorm_min() BOOST_NOEXCEPT { return base_type::denorm_min(); }
 };
 
 } // namespace std
@@ -610,21 +600,14 @@ namespace math {
 
 namespace policies {
 
-template <class Backend,
-          boost::multiprecision::expression_template_option ExpressionTemplates,
-          class Policy>
-struct precision<
-    boost::multiprecision::number<
-        boost::multiprecision::logged_adaptor<Backend>, ExpressionTemplates>,
-    Policy>
-    : public precision<
-          boost::multiprecision::number<Backend, ExpressionTemplates>, Policy> {
-};
+template <class Backend, boost::multiprecision::expression_template_option ExpressionTemplates, class Policy>
+struct precision<boost::multiprecision::number<boost::multiprecision::logged_adaptor<Backend>, ExpressionTemplates>, Policy>
+    : public precision<boost::multiprecision::number<Backend, ExpressionTemplates>, Policy>
+{};
 
-} // namespace policies
+}
 
-} // namespace math
-} // namespace boost
+}} // namespace boost::math::policies
 
 #undef NON_MEMBER_OP1
 #undef NON_MEMBER_OP2

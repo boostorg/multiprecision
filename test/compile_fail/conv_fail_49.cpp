@@ -12,7 +12,7 @@ using namespace boost::multiprecision;
 int main()
 {
    mpfr_float_100 f(2);
-   mpfr_float_50 f2;
+   mpfr_float_50  f2;
    f2 = f;
 }
 

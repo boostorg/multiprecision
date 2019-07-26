@@ -4,7 +4,7 @@
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
 #include <boost/multiprecision/gmp.hpp>
@@ -17,4 +17,3 @@ int main()
    test<boost::multiprecision::number<boost::multiprecision::rational_adaptor<boost::multiprecision::gmp_int> > >();
    return boost::report_errors();
 }
-

@@ -3,7 +3,6 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-
 #include <boost/multiprecision/cpp_bin_float.hpp>
 
 int main()
@@ -19,7 +18,7 @@ int main()
    boost::uintmax_t m(1), n;
    m <<= std::numeric_limits<boost::uintmax_t>::digits - 1;
    qf = m;
-   n = qf.convert_to<boost::uintmax_t>();
+   n  = qf.convert_to<boost::uintmax_t>();
    if (m != n)
       return 2;
    qf *= 2;
@@ -28,7 +27,7 @@ int main()
    if (m != n)
       return 3;
 
-   qf = 256;
+   qf     = 256;
    int si = qf.convert_to<int>();
    if (si != 256)
       return 4;
@@ -63,17 +62,16 @@ int main()
       return 9;
 
    // Now try conversion to cpp_int:
-   qf = 256;
+   qf                               = 256;
    boost::multiprecision::cpp_int i = qf.convert_to<boost::multiprecision::cpp_int>(), j;
    if (i != 256)
       return 10;
    qf = ldexp(qf, 126);
-   i = qf.convert_to<boost::multiprecision::cpp_int>();
-   j = 256;
+   i  = qf.convert_to<boost::multiprecision::cpp_int>();
+   j  = 256;
    j <<= 126;
    if (i != j)
       return 11;
 
    return 0;
 }
-

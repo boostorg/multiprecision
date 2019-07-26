@@ -49,30 +49,30 @@ void expected_results()
    // Catch all cases come last:
    //
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*mpfr_float_backend<18>.*",  // test type(s)
-      ".*",                          // test data group
-      ".*",                          // test function
-      300,                           // Max Peek error
-      50);                           // Max mean error
+       ".*",                         // compiler
+       ".*",                         // stdlib
+       ".*",                         // platform
+       ".*mpfr_float_backend<18>.*", // test type(s)
+       ".*",                         // test data group
+       ".*",                         // test function
+       300,                          // Max Peek error
+       50);                          // Max mean error
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*",                          // test type(s)
-      ".*",                          // test data group
-      ".*",                          // test function
-      15,                             // Max Peek error
-      5);                            // Max mean error
+       ".*", // compiler
+       ".*", // stdlib
+       ".*", // platform
+       ".*", // test type(s)
+       ".*", // test data group
+       ".*", // test function
+       15,   // Max Peek error
+       5);   // Max mean error
 
    //
    // Finish off by printing out the compiler/stdlib/platform names,
    // we do this to make it easier to mark up expected error rates.
    //
    std::cout << "Tests run with " << BOOST_COMPILER << ", "
-      << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
+             << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
 }
 
 template <class T>
@@ -81,7 +81,7 @@ void test(T t, const char* p)
    test_powm1_sqrtp1m1(t, p);
 }
 
-BOOST_AUTO_TEST_CASE( test_main )
+BOOST_AUTO_TEST_CASE(test_main)
 {
    using namespace boost::multiprecision;
    expected_results();
@@ -93,6 +93,3 @@ BOOST_AUTO_TEST_CASE( test_main )
    //
    ALL_SMALL_TESTS
 }
-
-
-

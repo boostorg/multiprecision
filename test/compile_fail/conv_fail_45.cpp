@@ -14,7 +14,7 @@ void foo(mpz_int i);
 int main()
 {
    mpf_t f
-   foo(f);
+       foo(f);
 }
 
 #else

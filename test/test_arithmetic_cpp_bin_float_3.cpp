@@ -8,10 +8,10 @@
 #include "libs/multiprecision/test/test_arithmetic.hpp"
 
 template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinExponent, Exponent MaxExponent, boost::multiprecision::expression_template_option ET>
-struct related_type<boost::multiprecision::number< boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinExponent, MaxExponent>, ET> >
+struct related_type<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinExponent, MaxExponent>, ET> >
 {
-   typedef boost::multiprecision::number< boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinExponent, MaxExponent>, ET> number_type;
-   typedef boost::multiprecision::number< boost::multiprecision::cpp_bin_float<((std::numeric_limits<number_type>::digits / 2) > std::numeric_limits<long double>::digits ? Digits / 2 : Digits), DigitBase, Allocator, Exponent, MinExponent, MaxExponent>, ET> type;
+   typedef boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinExponent, MaxExponent>, ET>                                                                                                            number_type;
+   typedef boost::multiprecision::number<boost::multiprecision::cpp_bin_float<((std::numeric_limits<number_type>::digits / 2) > std::numeric_limits<long double>::digits ? Digits / 2 : Digits), DigitBase, Allocator, Exponent, MinExponent, MaxExponent>, ET> type;
 };
 
 int main()
@@ -21,4 +21,3 @@ int main()
    test<boost::multiprecision::cpp_bin_float_quad>();
    return boost::report_errors();
 }
-

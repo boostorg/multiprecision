@@ -4,7 +4,7 @@
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
 #include <boost/multiprecision/gmp.hpp>
@@ -16,18 +16,19 @@
 #include <boost/rational.hpp>
 
 template <class T>
-struct is_boost_rational<boost::rational<T> > : public boost::mpl::true_{};
+struct is_boost_rational<boost::rational<T> > : public boost::mpl::true_
+{};
 
-namespace boost{ namespace multiprecision{
+namespace boost { namespace multiprecision {
 
-template<>
-struct number_category<rational<mpz_int> > : public mpl::int_<number_kind_rational> {};
+template <>
+struct number_category<rational<mpz_int> > : public mpl::int_<number_kind_rational>
+{};
 
-}}
+}} // namespace boost::multiprecision
 
 int main()
 {
    test<boost::rational<boost::multiprecision::mpz_int> >();
    return boost::report_errors();
 }
-

@@ -12,9 +12,10 @@
 
 #include "test1.hpp"
 
-int main () {
-    test_vector ();
-    test_matrix_vector ();
-    test_matrix ();
-    return 0;
+int main()
+{
+   test_vector();
+   test_matrix_vector();
+   test_matrix();
+   return 0;
 }
