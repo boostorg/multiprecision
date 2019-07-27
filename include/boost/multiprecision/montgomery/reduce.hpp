@@ -8,6 +8,9 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
+#ifndef BOOST_MULTIPRECISION_MONTGOMERY_INT_REDC_HPP
+#define BOOST_MULTIPRECISION_MONTGOMERY_INT_REDC_HPP
+
 #include <nil/crypto3/utilities/ct_utils.hpp>
 
 #include <boost/container/vector.hpp>
@@ -16,12 +19,6 @@
 
 #include <nil/crypto3/multiprecision/montgomery_int/comparison.hpp>
 #include <nil/crypto3/multiprecision/montgomery_int/misc.hpp>
-
-//#include <boost/multiprecision/detail/default_ops.hpp>
-//#include <nil/crypto3/multiprecision/detail/default_ops.hpp>
-
-#ifndef BOOST_MULTIPRECISION_MONTGOMERY_INT_REDC_HPP
-#define BOOST_MULTIPRECISION_MONTGOMERY_INT_REDC_HPP
 
 namespace boost {
 namespace multiprecision {
@@ -32,7 +29,7 @@ namespace multiprecision {
 #endif
 
 template <typename MontgomeryBackend>
-inline void redc(MontgomeryBackend &result)
+inline void redc(MontgomeryBackend& result)
 
     BOOST_MP_NOEXCEPT_IF(
         is_non_throwing_montgomery_int<MontgomeryBackend>::value)

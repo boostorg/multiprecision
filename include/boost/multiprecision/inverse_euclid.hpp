@@ -7,7 +7,7 @@ namespace boost {
 namespace multiprecision {
 
 template <typename Backend, expression_template_option ExpressionTemplates>
-inline Backend eval_inverse_euclid(const Backend &n, const Backend &mod)
+inline Backend eval_inverse_euclid(const Backend& n, const Backend& mod)
 {
 
    typedef typename default_ops::double_precision_type<Backend>::type                         double_type;
@@ -107,8 +107,8 @@ inline Backend eval_inverse_euclid(const Backend &n, const Backend &mod)
          * @note Non-const time
          */
 template <typename Backend, expression_template_option ExpressionTemplates>
-inline number<Backend, ExpressionTemplates> inverse_euclid(const number<Backend, ExpressionTemplates> &n,
-                                                           const number<Backend, ExpressionTemplates> &mod)
+inline number<Backend, ExpressionTemplates> inverse_euclid(const number<Backend, ExpressionTemplates>& n,
+                                                           const number<Backend, ExpressionTemplates>& mod)
 {
    return number<Backend, ExpressionTemplates>(eval_inverse_euclid(n.backend(), mod.backend()));
 }

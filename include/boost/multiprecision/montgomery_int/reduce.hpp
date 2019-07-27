@@ -31,7 +31,7 @@ namespace backends {
 #pragma warning(disable : 4127) // conditional expression is constant
 #endif
 template <typename MontgomeryBackend>
-inline void redc(MontgomeryBackend &result) BOOST_MP_NOEXCEPT_IF(
+inline void redc(MontgomeryBackend& result) BOOST_MP_NOEXCEPT_IF(
     is_non_throwing_montgomery_int<MontgomeryBackend>::value)
 {
 

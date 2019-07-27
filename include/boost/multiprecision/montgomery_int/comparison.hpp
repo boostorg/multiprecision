@@ -42,9 +42,9 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
 
     ::type
     eval_eq(const montgomery_int_backend<MinBits, MaxBits, SignType, Checked,
-                                         Allocator, ParamsBackend> &a,
+                                         Allocator, ParamsBackend>& a,
             const Backend<MinBits, MaxBits, SignType, Checked, Allocator,
-                          ParamsBackend> &                          b) BOOST_NOEXCEPT
+                          ParamsBackend>&                           b) BOOST_NOEXCEPT
 {
 #if BOOST_WORKAROUND(BOOST_MSVC, >= 1600)
    return (a.sign() == b.sign()) && (a.size() == b.size()) &&
@@ -79,9 +79,9 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
 
     ::type eval_eq(
         const montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                     Allocator1, ParamsBackend1> &a,
+                                     Allocator1, ParamsBackend1>& a,
         const Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2,
-                      ParamsBackend2> &                           b) BOOST_NOEXCEPT
+                      ParamsBackend2>&                            b) BOOST_NOEXCEPT
 {
 #if BOOST_WORKAROUND(BOOST_MSVC, >= 1600)
    return (a.sign() == b.sign()) && (a.size() == b.size()) &&
@@ -107,7 +107,7 @@ BOOST_MP_FORCEINLINE
 
     ::type
     eval_eq(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
-                                         Checked, Allocator, ParamsBackend> &a,
+                                         Checked, Allocator, ParamsBackend>& a,
             limb_type                                                        b) BOOST_NOEXCEPT
 {
    return (a.sign() == false) && (a.size() == 1) && (*a.limbs() == b);
@@ -123,7 +123,7 @@ BOOST_MP_FORCEINLINE
 
     ::type
     eval_eq(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
-                                         Checked, Allocator, ParamsBackend> &a,
+                                         Checked, Allocator, ParamsBackend>& a,
             signed_limb_type                                                 b) BOOST_NOEXCEPT
 {
    return (a.sign() == (b < 0)) && (a.size() == 1) &&
@@ -140,7 +140,7 @@ BOOST_MP_FORCEINLINE
 
     ::type
     eval_eq(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
-                                         Checked, Allocator, ParamsBackend> &a,
+                                         Checked, Allocator, ParamsBackend>& a,
             limb_type                                                        b) BOOST_NOEXCEPT
 {
    return (a.size() == 1) && (*a.limbs() == b);
@@ -156,7 +156,7 @@ BOOST_MP_FORCEINLINE
 
     ::type
     eval_eq(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
-                                         Checked, Allocator, ParamsBackend> &a,
+                                         Checked, Allocator, ParamsBackend>& a,
             signed_limb_type                                                 b) BOOST_NOEXCEPT
 {
    return (b < 0)
@@ -178,7 +178,7 @@ BOOST_MP_FORCEINLINE
 
     ::type
     eval_lt(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
-                                         Checked, Allocator, ParamsBackend> &a,
+                                         Checked, Allocator, ParamsBackend>& a,
             limb_type                                                        b) BOOST_NOEXCEPT
 {
    if (a.sign())
@@ -201,7 +201,7 @@ inline typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
 
     ::type
     eval_lt(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
-                                         Checked, Allocator, ParamsBackend> &a,
+                                         Checked, Allocator, ParamsBackend>& a,
             signed_limb_type                                                 b) BOOST_NOEXCEPT
 {
    if ((b == 0) || (a.sign() != (b < 0)))
@@ -236,7 +236,7 @@ BOOST_MP_FORCEINLINE
 
     ::type
     eval_lt(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
-                                         Checked, Allocator, ParamsBackend> &a,
+                                         Checked, Allocator, ParamsBackend>& a,
             limb_type                                                        b) BOOST_NOEXCEPT
 {
    if (a.size() > 1)
@@ -256,7 +256,7 @@ BOOST_MP_FORCEINLINE
 
     ::type
     eval_lt(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
-                                         Checked, Allocator, ParamsBackend> &a,
+                                         Checked, Allocator, ParamsBackend>& a,
             signed_limb_type                                                 b) BOOST_NOEXCEPT
 {
    return (b < 0) ? a.compare(b) < 0
@@ -275,7 +275,7 @@ BOOST_MP_FORCEINLINE
 
     ::type
     eval_gt(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
-                                         Checked, Allocator, ParamsBackend> &a,
+                                         Checked, Allocator, ParamsBackend>& a,
             limb_type                                                        b) BOOST_NOEXCEPT
 {
    if (a.sign())
@@ -298,7 +298,7 @@ inline typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
 
     ::type
     eval_gt(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
-                                         Checked, Allocator, ParamsBackend> &a,
+                                         Checked, Allocator, ParamsBackend>& a,
             signed_limb_type                                                 b) BOOST_NOEXCEPT
 {
    if (b == 0)
@@ -337,7 +337,7 @@ BOOST_MP_FORCEINLINE
 
     ::type
     eval_gt(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
-                                         Checked, Allocator, ParamsBackend> &a,
+                                         Checked, Allocator, ParamsBackend>& a,
             limb_type                                                        b) BOOST_NOEXCEPT
 {
    if (a.size() > 1)
@@ -357,7 +357,7 @@ BOOST_MP_FORCEINLINE
 
     ::type
     eval_gt(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
-                                         Checked, Allocator, ParamsBackend> &a,
+                                         Checked, Allocator, ParamsBackend>& a,
             signed_limb_type                                                 b) BOOST_NOEXCEPT
 {
    return (b < 0) ? a.compare(b) > 0
@@ -399,9 +399,9 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
 
     ::value
     eval_eq(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
-                                         Checked, void, ParamsBackend> &a,
+                                         Checked, void, ParamsBackend>& a,
             const Backend<MinBits, MaxBits, signed_magnitude, Checked, void,
-                          ParamsBackend> &                              b) BOOST_NOEXCEPT
+                          ParamsBackend>&                               b) BOOST_NOEXCEPT
 {
    return (a.sign() == b.sign()) && (*a.limbs() == *b.limbs());
 }
@@ -422,9 +422,9 @@ BOOST_MP_FORCEINLINE
 
     ::value
     eval_eq(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
-                                         Checked, void, ParamsBackend> &a,
+                                         Checked, void, ParamsBackend>& a,
             const Backend<MinBits, MaxBits, unsigned_magnitude, Checked, void,
-                          ParamsBackend> &                              b) BOOST_NOEXCEPT
+                          ParamsBackend>&                               b) BOOST_NOEXCEPT
 {
    return *a.limbs() == *b.limbs();
 }
@@ -439,7 +439,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
 
     ::type
     eval_eq(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
-                                         Checked, void> &a,
+                                         Checked, void>& a,
             U                                            b) BOOST_NOEXCEPT
 {
    return !a.sign() && (*a.limbs() == b);
@@ -455,7 +455,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
 
     ::type
     eval_eq(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
-                                         Checked, void> &a,
+                                         Checked, void>& a,
             S                                            b) BOOST_NOEXCEPT
 {
    return (a.sign() == (b < 0)) &&
@@ -472,7 +472,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
 
     ::type
     eval_eq(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
-                                         Checked, void> &a,
+                                         Checked, void>& a,
             U                                            b) BOOST_NOEXCEPT
 {
    return *a.limbs() == b;
@@ -488,7 +488,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
 
     ::type
     eval_eq(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
-                                         Checked, void> &a,
+                                         Checked, void>& a,
             S                                            b) BOOST_NOEXCEPT
 {
    typedef typename make_unsigned<S>::type ui_type;
@@ -521,9 +521,9 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
 
     ::type
     eval_lt(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
-                                         Checked, void, ParamsBackend> &a,
+                                         Checked, void, ParamsBackend>& a,
             const Backend<MinBits, MaxBits, unsigned_magnitude, Checked, void,
-                          ParamsBackend> &                              b) BOOST_NOEXCEPT
+                          ParamsBackend>&                               b) BOOST_NOEXCEPT
 {
    if (a.sign() != b.sign())
    {
@@ -549,9 +549,9 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
 
     ::type
     eval_lt(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
-                                         Checked, void, ParamsBackend> &a,
+                                         Checked, void, ParamsBackend>& a,
             const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
-                                         Checked, void, ParamsBackend> &b)
+                                         Checked, void, ParamsBackend>& b)
         BOOST_NOEXCEPT
 {
    return *a.limbs() < *b.limbs();
@@ -567,7 +567,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
 
     ::type
     eval_lt(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
-                                         Checked, void> &a,
+                                         Checked, void>& a,
             U                                            b) BOOST_NOEXCEPT
 {
    if (a.sign())
@@ -587,7 +587,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
 
     ::type
     eval_lt(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
-                                         Checked, void> &a,
+                                         Checked, void>& a,
             S                                            b) BOOST_NOEXCEPT
 {
    if (a.sign() != (b < 0))
@@ -609,7 +609,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
 
     ::type
     eval_lt(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
-                                         Checked, void> &a,
+                                         Checked, void>& a,
             U                                            b) BOOST_NOEXCEPT
 {
    return *a.limbs() < b;
@@ -625,7 +625,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
 
     ::type
     eval_lt(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
-                                         Checked, void> &a,
+                                         Checked, void>& a,
             S                                            b) BOOST_NOEXCEPT
 {
    typedef typename make_unsigned<S>::type ui_type;
@@ -658,9 +658,9 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
 
     ::type
     eval_gt(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
-                                         Checked, void, ParamsBackend> &a,
+                                         Checked, void, ParamsBackend>& a,
             const Backend<MinBits, MaxBits, signed_magnitude, Checked, void,
-                          ParamsBackend> &                              b) BOOST_NOEXCEPT
+                          ParamsBackend>&                               b) BOOST_NOEXCEPT
 {
    if (a.sign() != b.sign())
    {
@@ -686,9 +686,9 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
 
     ::type
     eval_gt(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
-                                         Checked, void, ParamsBackend> &a,
+                                         Checked, void, ParamsBackend>& a,
             const Backend<MinBits, MaxBits, unsigned_magnitude, Checked, void,
-                          ParamsBackend> &                              b) BOOST_NOEXCEPT
+                          ParamsBackend>&                               b) BOOST_NOEXCEPT
 {
    return *a.limbs() > *b.limbs();
 }
@@ -704,7 +704,7 @@ BOOST_MP_FORCEINLINE
 
     ::type
     eval_gt(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
-                                         Checked, void, ParamsBackend> &a,
+                                         Checked, void, ParamsBackend>& a,
             U                                                           b) BOOST_NOEXCEPT
 {
    if (a.sign())
@@ -724,7 +724,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
 
     ::type
     eval_gt(const montgomery_int_backend<MinBits, MaxBits, signed_magnitude,
-                                         Checked, void> &a,
+                                         Checked, void>& a,
             S                                            b) BOOST_NOEXCEPT
 {
    if (a.sign() != (b < 0))
@@ -746,7 +746,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
 
     ::type
     eval_gt(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
-                                         Checked, void> &a,
+                                         Checked, void>& a,
             U                                            b) BOOST_NOEXCEPT
 {
    return *a.limbs() > b;
@@ -762,7 +762,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
 
     ::type
     eval_gt(const montgomery_int_backend<MinBits, MaxBits, unsigned_magnitude,
-                                         Checked, void> &a,
+                                         Checked, void>& a,
             S                                            b) BOOST_NOEXCEPT
 {
    typedef typename make_unsigned<S>::type ui_type;

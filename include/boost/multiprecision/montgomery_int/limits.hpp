@@ -25,7 +25,7 @@ template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer
 inline boost::multiprecision::number<
     boost::multiprecision::montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>,
     ExpressionTemplates>
-get_min(const boost::mpl::true_ &, const boost::mpl::true_ &)
+get_min(const boost::mpl::true_&, const boost::mpl::true_&)
 {
    // Bounded and signed.
    typedef boost::multiprecision::number<
@@ -45,7 +45,7 @@ template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer
 inline boost::multiprecision::number<
     boost::multiprecision::montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>,
     ExpressionTemplates>
-get_min(const boost::mpl::true_ &, const boost::mpl::false_ &)
+get_min(const boost::mpl::true_&, const boost::mpl::false_&)
 {
    // Bounded and unsigned:
    static const boost::multiprecision::number<
@@ -60,7 +60,7 @@ template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer
 inline boost::multiprecision::number<
     boost::multiprecision::montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>,
     ExpressionTemplates>
-get_min(const boost::mpl::false_ &, const boost::mpl::true_ &)
+get_min(const boost::mpl::false_&, const boost::mpl::true_&)
 {
    // Unbounded and signed.
    // There is no minimum value, just return 0:
@@ -76,7 +76,7 @@ template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer
 inline boost::multiprecision::number<
     boost::multiprecision::montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>,
     ExpressionTemplates>
-get_min(const boost::mpl::false_ &, const boost::mpl::false_ &)
+get_min(const boost::mpl::false_&, const boost::mpl::false_&)
 {
    // Unbound and unsigned:
    static const boost::multiprecision::number<
@@ -91,7 +91,7 @@ template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer
 inline boost::multiprecision::number<
     boost::multiprecision::montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>,
     ExpressionTemplates>
-get_max(const boost::mpl::true_ &, const boost::mpl::true_ &)
+get_max(const boost::mpl::true_&, const boost::mpl::true_&)
 {
    // Bounded and signed.
    typedef boost::multiprecision::number<
@@ -111,7 +111,7 @@ template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer
 inline boost::multiprecision::number<
     boost::multiprecision::montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>,
     ExpressionTemplates>
-get_max(const boost::mpl::true_ &, const boost::mpl::false_ &)
+get_max(const boost::mpl::true_&, const boost::mpl::false_&)
 {
    // Bound and unsigned:
    typedef boost::multiprecision::number<
@@ -131,7 +131,7 @@ template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer
 inline boost::multiprecision::number<
     boost::multiprecision::montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>,
     ExpressionTemplates>
-get_max(const boost::mpl::false_ &, const boost::mpl::true_ &)
+get_max(const boost::mpl::false_&, const boost::mpl::true_&)
 {
    // Unbounded and signed.
    // There is no maximum value, just return 0:
@@ -147,7 +147,7 @@ template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer
 inline boost::multiprecision::number<
     boost::multiprecision::montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>,
     ExpressionTemplates>
-get_max(const boost::mpl::false_ &, const boost::mpl::false_ &)
+get_max(const boost::mpl::false_&, const boost::mpl::false_&)
 {
    // Unbound and unsigned:
    static const boost::multiprecision::number<

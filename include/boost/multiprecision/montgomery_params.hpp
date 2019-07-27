@@ -33,8 +33,8 @@ class montgomery_params
    // work_only_with_cpp_int
    template <typename Backend, expression_template_option ExpressionTemplates>
    explicit montgomery_params(
-       const number<Backend, ExpressionTemplates> &p,
-       const number<Backend, ExpressionTemplates> &redc_module)
+       const number<Backend, ExpressionTemplates>& p,
+       const number<Backend, ExpressionTemplates>& redc_module)
    {
 
       if (p < 0 || !(p % 2))
@@ -75,7 +75,7 @@ class montgomery_params
    * can be shared by all values in a specific Montgomery domain.
    */
    template <typename Backend, expression_template_option ExpressionTemplates>
-   explicit montgomery_params(const number<Backend, ExpressionTemplates> &p)
+   explicit montgomery_params(const number<Backend, ExpressionTemplates>& p)
    {
 
       if (p < 0 || !(p % 2))
@@ -106,15 +106,15 @@ class montgomery_params
       mod_redc(m_r3.backend(), p.backend());
    }
 
-   const number_type &mod() const { return m_mod; }
+   const number_type& mod() const { return m_mod; }
 
-   const number_type &p() const { return m_p; }
+   const number_type& p() const { return m_p; }
 
-   const number_type &R1() const { return m_r1; }
+   const number_type& R1() const { return m_r1; }
 
-   const number_type &R2() const { return m_r2; }
+   const number_type& R2() const { return m_r2; }
 
-   const number_type &R3() const { return m_r3; }
+   const number_type& R3() const { return m_r3; }
 
    limb_type p_dash() const { return m_p_dash; }
 

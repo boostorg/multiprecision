@@ -29,8 +29,8 @@ BOOST_MP_FORCEINLINE
 
     ::type
     eval_divide(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                       Allocator1, ParamsBackend1> &result,
-                const Backend2 &a, const Backend3 &b)
+                                       Allocator1, ParamsBackend1>& result,
+                const Backend2& a, const Backend3& b)
 {
    montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
                           ParamsBackend1>
@@ -51,8 +51,8 @@ BOOST_MP_FORCEINLINE
 
     ::type
     eval_divide(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                       Allocator1, ParamsBackend1> &result,
-                const Backend2 &a, limb_type &b)
+                                       Allocator1, ParamsBackend1>& result,
+                const Backend2& a, limb_type& b)
 {
    montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
                           ParamsBackend1>
@@ -73,8 +73,8 @@ BOOST_MP_FORCEINLINE
 
     ::type
     eval_divide(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                       Allocator1, ParamsBackend1> &result,
-                const Backend2 &a, signed_limb_type &b)
+                                       Allocator1, ParamsBackend1>& result,
+                const Backend2& a, signed_limb_type& b)
 {
    montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
                           ParamsBackend1>
@@ -98,8 +98,8 @@ BOOST_MP_FORCEINLINE
 
     ::type
     eval_divide(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                       Allocator1, ParamsBackend1> &result,
-                const Backend2 &                                    b)
+                                       Allocator1, ParamsBackend1>& result,
+                const Backend2&                                     b)
 {
    // There is no in place divide:
    montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
@@ -117,7 +117,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<!is_trivial_montgomery_int<
 
     ::type
     eval_divide(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                       Allocator1, ParamsBackend1> &result,
+                                       Allocator1, ParamsBackend1>& result,
                 limb_type                                           b)
 {
    // There is no in place divide:
@@ -136,7 +136,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<!is_trivial_montgomery_int<
 
     ::type
     eval_divide(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                       Allocator1, ParamsBackend1> &result,
+                                       Allocator1, ParamsBackend1>& result,
                 signed_limb_type                                    b)
 {
    // There is no in place divide:
@@ -159,14 +159,14 @@ BOOST_MP_FORCEINLINE
 
     ::type
     eval_modulus(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                        Allocator1, ParamsBackend1> &result,
-                 const Backend2 &a, const Backend3 &b)
+                                        Allocator1, ParamsBackend1>& result,
+                 const Backend2& a, const Backend3& b)
 {
    bool s = a.sign();
    divide_unsigned_helper(
        static_cast<
            montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                  Allocator1, ParamsBackend1> *>(0),
+                                  Allocator1, ParamsBackend1>*>(0),
        a, b, result);
    result.sign(s);
 }
@@ -182,14 +182,14 @@ BOOST_MP_FORCEINLINE
 
     ::type
     eval_modulus(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                        Allocator1, ParamsBackend1> &result,
-                 const Backend2 &a, limb_type b)
+                                        Allocator1, ParamsBackend1>& result,
+                 const Backend2& a, limb_type b)
 {
    bool s = a.sign();
    divide_unsigned_helper(
        static_cast<
            montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                  Allocator1, ParamsBackend1> *>(0),
+                                  Allocator1, ParamsBackend1>*>(0),
        a, b, result);
    result.sign(s);
 }
@@ -205,14 +205,14 @@ BOOST_MP_FORCEINLINE
 
     ::type
     eval_modulus(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                        Allocator1, ParamsBackend1> &result,
-                 const Backend2 &a, signed_limb_type b)
+                                        Allocator1, ParamsBackend1>& result,
+                 const Backend2& a, signed_limb_type b)
 {
    bool s = a.sign();
    divide_unsigned_helper(
        static_cast<
            montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                  Allocator1, ParamsBackend1> *>(0),
+                                  Allocator1, ParamsBackend1>*>(0),
        a, static_cast<limb_type>(boost::multiprecision::detail::unsigned_abs(b)),
        result);
    result.sign(s);
@@ -229,8 +229,8 @@ BOOST_MP_FORCEINLINE
 
     ::type
     eval_modulus(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                        Allocator1, ParamsBackend1> &result,
-                 const Backend2 &                                    b)
+                                        Allocator1, ParamsBackend1>& result,
+                 const Backend2&                                     b)
 {
    // There is no in place divide:
    montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
@@ -248,7 +248,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<!is_trivial_montgomery_int<
 
     ::type
     eval_modulus(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                        Allocator1, ParamsBackend1> &result,
+                                        Allocator1, ParamsBackend1>& result,
                  limb_type                                           b)
 {
    // There is no in place divide:
@@ -267,7 +267,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<!is_trivial_montgomery_int<
 
     ::type
     eval_modulus(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                        Allocator1, ParamsBackend1> &result,
+                                        Allocator1, ParamsBackend1>& result,
                  signed_limb_type                                    b)
 {
    // There is no in place divide:
@@ -295,8 +295,8 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
 
     ::type
     eval_divide(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                       Allocator1, ParamsBackend1> &result,
-                const Backend &                                     o)
+                                       Allocator1, ParamsBackend1>& result,
+                const Backend&                                      o)
 {
    if (!*o.limbs())
    {
@@ -321,8 +321,8 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
 
     ::type
     eval_divide(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                       Allocator1, ParamsBackend1> &result,
-                const Backend &                                     o)
+                                       Allocator1, ParamsBackend1>& result,
+                const Backend&                                      o)
 {
    if (!*o.limbs())
    {
@@ -342,8 +342,8 @@ BOOST_MP_FORCEINLINE
 
     ::type
     eval_modulus(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                        Allocator1, ParamsBackend1> &result,
-                 const Backend &                                     o)
+                                        Allocator1, ParamsBackend1>& result,
+                 const Backend&                                      o)
 {
    if (!*o.limbs())
    {

@@ -29,8 +29,8 @@ BOOST_MP_FORCEINLINE
                          !is_trivial_montgomery_int<Backend>::value>::type
     eval_multiply_helper(
         montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                               Allocator1, ParamsBackend1> &result,
-        const Backend &a, const limb_type &val)
+                               Allocator1, ParamsBackend1>& result,
+        const Backend& a, const limb_type& val)
         BOOST_MP_NOEXCEPT_IF(
             (is_non_throwing_montgomery_int<
                 montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -42,7 +42,7 @@ BOOST_MP_FORCEINLINE
       redc(result);
       return;
    }
-   if ((void *)&a != (void *)&result)
+   if ((void*)&a != (void*)&result)
    {
       result.resize(a.size(), a.size());
    }
@@ -95,14 +95,14 @@ template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1,
           typename ParamsBackend1>
 inline void resize_for_carry(
     montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                           ParamsBackend1> & /*result*/,
+                           ParamsBackend1>& /*result*/,
     unsigned /*required*/) {}
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1,
           class Allocator1, typename ParamsBackend1>
 inline void
 resize_for_carry(montgomery_int_backend<MinBits1, MaxBits1, SignType1, checked,
-                                        Allocator1, ParamsBackend1> &result,
+                                        Allocator1, ParamsBackend1>& result,
                  unsigned                                            required)
 {
    if (result.size() < required)
@@ -124,8 +124,8 @@ BOOST_MP_FORCEINLINE
                          !is_trivial_montgomery_int<Backend2>::value>::type
     eval_multiply_helper(
         montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                               Allocator1, ParamsBackend1> &result,
-        const Backend1 &a, const Backend2 &b)
+                               Allocator1, ParamsBackend1>& result,
+        const Backend1& a, const Backend2& b)
         BOOST_MP_NOEXCEPT_IF(
             (is_non_throwing_montgomery_int<
                 montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -167,7 +167,7 @@ BOOST_MP_FORCEINLINE
       return;
    }
 
-   if ((void *)&result == (void *)&a)
+   if ((void*)&result == (void*)&a)
    {
       montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
                              ParamsBackend1>
@@ -175,7 +175,7 @@ BOOST_MP_FORCEINLINE
       eval_multiply_helper(result, t, b);
       return;
    }
-   if ((void *)&result == (void *)&b)
+   if ((void*)&result == (void*)&b)
    {
       // montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
       // Allocator1, ParamsBackend1> t(b); //TODO: fix it!!! Very bad if b -
@@ -271,8 +271,8 @@ BOOST_MP_FORCEINLINE
                          !is_trivial_montgomery_int<Backend>::value>::type
     eval_multiply_helper(
         montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                               Allocator1, ParamsBackend1> &result,
-        const Backend &                                     a)
+                               Allocator1, ParamsBackend1>& result,
+        const Backend&                                      a)
         BOOST_MP_NOEXCEPT_IF(
             (is_non_throwing_montgomery_int<
                 montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -289,8 +289,8 @@ BOOST_MP_FORCEINLINE typename enable_if_c<!is_trivial_montgomery_int<
     montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
                            ParamsBackend1> >::value>::type
 eval_multiply(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                     Allocator1, ParamsBackend1> &result,
-              const limb_type &                                   val)
+                                     Allocator1, ParamsBackend1>& result,
+              const limb_type&                                    val)
     BOOST_MP_NOEXCEPT_IF(
         (is_non_throwing_montgomery_int<
             montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -310,8 +310,8 @@ BOOST_MP_FORCEINLINE
                          !is_trivial_montgomery_int<Backend>::value>::type
     eval_multiply_helper(
         montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                               Allocator1, ParamsBackend1> &result,
-        const Backend &a, const double_limb_type &val)
+                               Allocator1, ParamsBackend1>& result,
+        const Backend& a, const double_limb_type& val)
         BOOST_MP_NOEXCEPT_IF(
             (is_non_throwing_montgomery_int<
                 montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -346,8 +346,8 @@ BOOST_MP_FORCEINLINE typename enable_if_c<!is_trivial_montgomery_int<
 
     ::type eval_multiply(
         montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                               Allocator1, ParamsBackend1> &result,
-        const double_limb_type &                            val)
+                               Allocator1, ParamsBackend1>& result,
+        const double_limb_type&                             val)
 
         BOOST_MP_NOEXCEPT_IF(
             (is_non_throwing_cpp_int<
@@ -367,8 +367,8 @@ BOOST_MP_FORCEINLINE
                          !is_trivial_montgomery_int<Backend>::value>::type
     eval_multiply_helper(
         montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                               Allocator1, ParamsBackend1> &result,
-        const Backend &a, const signed_limb_type &val)
+                               Allocator1, ParamsBackend1>& result,
+        const Backend& a, const signed_limb_type& val)
         BOOST_MP_NOEXCEPT_IF(
             (is_non_throwing_montgomery_int<
                 montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -396,8 +396,8 @@ BOOST_MP_FORCEINLINE typename enable_if_c<!is_trivial_montgomery_int<
 
     ::type eval_multiply(
         montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                               Allocator1, ParamsBackend1> &result,
-        const signed_limb_type &                            val)
+                               Allocator1, ParamsBackend1>& result,
+        const signed_limb_type&                             val)
 
         BOOST_MP_NOEXCEPT_IF(
             (is_non_throwing_cpp_int<
@@ -416,8 +416,8 @@ inline typename enable_if_c<!is_trivial_montgomery_int<montgomery_int_backend<
                             !is_trivial_montgomery_int<Backend>::value>::type
 eval_multiply_helper(
     montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                           ParamsBackend1> &result,
-    const Backend &a, const signed_double_limb_type &val)
+                           ParamsBackend1>& result,
+    const Backend& a, const signed_double_limb_type& val)
     BOOST_MP_NOEXCEPT_IF(
         (is_non_throwing_montgomery_int<
             montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -463,8 +463,8 @@ BOOST_MP_FORCEINLINE typename enable_if_c<!is_trivial_montgomery_int<
 
     ::type eval_multiply(
         montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                               Allocator1, ParamsBackend1> &result,
-        const signed_double_limb_type &                     val)
+                               Allocator1, ParamsBackend1>& result,
+        const signed_double_limb_type&                      val)
 
         BOOST_MP_NOEXCEPT_IF(
             (is_non_throwing_cpp_int<
@@ -491,8 +491,8 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
      is_signed_number<Backend>::value)>::type
 eval_multiply_helper(
     montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                           ParamsBackend1> &result,
-    const Backend &                         o)
+                           ParamsBackend1>& result,
+    const Backend&                          o)
     BOOST_MP_NOEXCEPT_IF(
         (is_non_throwing_montgomery_int<
             montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -524,8 +524,8 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
     is_unsigned_number<Backend>::value>::type
 eval_multiply_helper(
     montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                           ParamsBackend1> &result,
-    const Backend &                         o)
+                           ParamsBackend1>& result,
+    const Backend&                          o)
     BOOST_MP_NOEXCEPT_IF(
         (is_non_throwing_montgomery_int<
             montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -555,8 +555,8 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
      is_signed_number<Backend>::value)>::type
 eval_multiply_helper(
     montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                           ParamsBackend1> &result,
-    const Backend &a, const Backend &b)
+                           ParamsBackend1>& result,
+    const Backend& a, const Backend& b)
     BOOST_MP_NOEXCEPT_IF(
         (is_non_throwing_montgomery_int<
             montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -587,8 +587,8 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
     is_unsigned_number<Backend>::value>::type
 eval_multiply_helper(
     montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                           ParamsBackend1> &result,
-    const Backend &a, const Backend &b)
+                           ParamsBackend1>& result,
+    const Backend& a, const Backend& b)
     BOOST_MP_NOEXCEPT_IF(
         (is_non_throwing_montgomery_int<
             montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -615,7 +615,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<!is_trivial_montgomery_int<
     montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
                            ParamsBackend1> >::value>::type
 eval_multiply(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                     Allocator1, ParamsBackend1> &result,
+                                     Allocator1, ParamsBackend1>& result,
               signed_double_limb_type a, signed_double_limb_type b)
 {
    static const signed_double_limb_type mask      = ~static_cast<limb_type>(0);
@@ -638,7 +638,7 @@ eval_multiply(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
    z = b >> limb_bits;
 
    result.resize(4, 4);
-   limb_type *pr = result.limbs();
+   limb_type* pr = result.limbs();
 
    double_limb_type carry = w * y;
 #ifdef __MSVC_RUNTIME_CHECKS
@@ -674,7 +674,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<!is_trivial_montgomery_int<
 
     ::type eval_multiply(
         montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                               Allocator1, ParamsBackend1> &result,
+                               Allocator1, ParamsBackend1>& result,
         double_limb_type a, double_limb_type b)
 {
    static const signed_double_limb_type mask      = ~static_cast<limb_type>(0);
@@ -687,7 +687,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<!is_trivial_montgomery_int<
    z = b >> limb_bits;
 
    result.resize(4, 4);
-   limb_type *pr = result.limbs();
+   limb_type* pr = result.limbs();
 
    double_limb_type carry = w * y;
 #ifdef __MSVC_RUNTIME_CHECKS
@@ -734,8 +734,8 @@ BOOST_MP_FORCEINLINE
                          is_trivial_montgomery_int<Backend>::value>::type
     eval_multiply_helper(
         montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                               Allocator1, ParamsBackend1> &result,
-        Backend const &a, Backend const &b)
+                               Allocator1, ParamsBackend1>& result,
+        Backend const& a, Backend const& b)
 {
    typedef typename boost::multiprecision::detail::canonical<
        typename Backend::local_limb_type,
@@ -753,7 +753,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
     is_signed<SI>::value &&
     (sizeof(SI) <= sizeof(signed_double_limb_type) / 2)>::type
 eval_multiply(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                     Allocator1, ParamsBackend1> &result,
+                                     Allocator1, ParamsBackend1>& result,
               SI a, SI b)
 {
    result = static_cast<signed_double_limb_type>(a) *
@@ -768,7 +768,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
     is_unsigned<UI>::value &&
     (sizeof(UI) <= sizeof(signed_double_limb_type) / 2)>::type
 eval_multiply(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                     Allocator1, ParamsBackend1> &result,
+                                     Allocator1, ParamsBackend1>& result,
               UI a, UI b)
 {
    result = static_cast<double_limb_type>(a) * static_cast<double_limb_type>(b);
@@ -797,10 +797,10 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
         Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2,
                 ParamsBackend2> >::value>::type
 eval_multiply(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                     Allocator1, ParamsBackend1> &result,
+                                     Allocator1, ParamsBackend1>& result,
               const Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2,
-                            ParamsBackend2> &                     a,
-              const limb_type &                                   val)
+                            ParamsBackend2>&                      a,
+              const limb_type&                                    val)
     BOOST_MP_NOEXCEPT_IF(
         (is_non_throwing_montgomery_int<
             montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -827,9 +827,9 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
                                             Checked2, Allocator2> >::value>::type
 eval_multiply(
     montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                           ParamsBackend1> &                            result,
-    const Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> &a,
-    const limb_type &                                                   val)
+                           ParamsBackend1>&                             result,
+    const Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
+    const limb_type&                                                    val)
     BOOST_MP_NOEXCEPT_IF(
         (is_non_throwing_montgomery_int<
             montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -872,11 +872,11 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
         Backend2<MinBits3, MaxBits3, SignType3, Checked3, Allocator3,
                  ParamsBackend3> >::value>::type
 eval_multiply(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                     Allocator1, ParamsBackend1> &result,
+                                     Allocator1, ParamsBackend1>& result,
               const Backend1<MinBits2, MaxBits2, SignType2, Checked2,
-                             Allocator2, ParamsBackend2> &        a,
+                             Allocator2, ParamsBackend2>&         a,
               const Backend2<MinBits3, MaxBits3, SignType3, Checked3,
-                             Allocator3, ParamsBackend3> &        b)
+                             Allocator3, ParamsBackend3>&         b)
     BOOST_MP_NOEXCEPT_IF(
         (is_non_throwing_montgomery_int<
             montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -914,10 +914,10 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
         MinBits3, MaxBits3, SignType3, Checked3, Allocator3> >::value>::type
 eval_multiply(
     montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                           ParamsBackend1> &                             result,
+                           ParamsBackend1>&                              result,
     const Backend1<MinBits2, MaxBits2, SignType2, Checked2, Allocator2,
-                   ParamsBackend2> &                                     a,
-    const Backend2<MinBits3, MaxBits3, SignType3, Checked3, Allocator3> &b)
+                   ParamsBackend2>&                                      a,
+    const Backend2<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>& b)
     BOOST_MP_NOEXCEPT_IF(
         (is_non_throwing_montgomery_int<
             montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -955,10 +955,10 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
         MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>::type
 eval_multiply(
     montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                           ParamsBackend1> &                             result,
-    const Backend1<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> &a,
+                           ParamsBackend1>&                              result,
+    const Backend1<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
     const Backend2<MinBits3, MaxBits3, SignType3, Checked3, Allocator3,
-                   ParamsBackend3> &                                     b)
+                   ParamsBackend3>&                                      b)
     BOOST_MP_NOEXCEPT_IF(
         (is_non_throwing_montgomery_int<
             montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -995,9 +995,9 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
         MinBits3, MaxBits3, SignType3, Checked3, Allocator3> >::value>::type
 eval_multiply(
     montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                           ParamsBackend1> &                             result,
-    const Backend1<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> &a,
-    const Backend2<MinBits3, MaxBits3, SignType3, Checked3, Allocator3> &b)
+                           ParamsBackend1>&                              result,
+    const Backend1<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
+    const Backend2<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>& b)
     BOOST_MP_NOEXCEPT_IF(
         (is_non_throwing_montgomery_int<
             montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -1025,9 +1025,9 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
         Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2,
                 ParamsBackend2> >::value>::type
 eval_multiply(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                     Allocator1, ParamsBackend1> &result,
+                                     Allocator1, ParamsBackend1>& result,
               const Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2,
-                            ParamsBackend2> &                     a)
+                            ParamsBackend2>&                      a)
     BOOST_MP_NOEXCEPT_IF(
         (is_non_throwing_montgomery_int<
             montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -1055,8 +1055,8 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
                                             Checked2, Allocator2> >::value>::type
 eval_multiply(
     montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                           ParamsBackend1> &                            result,
-    const Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> &a)
+                           ParamsBackend1>&                             result,
+    const Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a)
     BOOST_MP_NOEXCEPT_IF(
         (is_non_throwing_montgomery_int<
             montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -1085,10 +1085,10 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
         Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2,
                 ParamsBackend2> >::value>::type
 eval_multiply(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                     Allocator1, ParamsBackend1> &result,
+                                     Allocator1, ParamsBackend1>& result,
               const Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2,
-                            ParamsBackend2> &                     a,
-              const double_limb_type &                            val)
+                            ParamsBackend2>&                      a,
+              const double_limb_type&                             val)
     BOOST_MP_NOEXCEPT_IF(
         (is_non_throwing_montgomery_int<
             montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -1116,9 +1116,9 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
                                             Checked2, Allocator2> >::value>::type
 eval_multiply(
     montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                           ParamsBackend1> &                            result,
-    const Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> &a,
-    const double_limb_type &                                            val)
+                           ParamsBackend1>&                             result,
+    const Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
+    const double_limb_type&                                             val)
     BOOST_MP_NOEXCEPT_IF(
         (is_non_throwing_montgomery_int<
             montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -1145,10 +1145,10 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
         Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2,
                 ParamsBackend2> >::value>::type
 eval_multiply(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                     Allocator1, ParamsBackend1> &result,
+                                     Allocator1, ParamsBackend1>& result,
               const Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2,
-                            ParamsBackend2> &                     a,
-              const signed_limb_type &                            val)
+                            ParamsBackend2>&                      a,
+              const signed_limb_type&                             val)
     BOOST_MP_NOEXCEPT_IF(
         (is_non_throwing_montgomery_int<
             montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -1175,9 +1175,9 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
                                             Checked2, Allocator2> >::value>::type
 eval_multiply(
     montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                           ParamsBackend1> &                            result,
-    const Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> &a,
-    const signed_limb_type &                                            val)
+                           ParamsBackend1>&                             result,
+    const Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
+    const signed_limb_type&                                             val)
     BOOST_MP_NOEXCEPT_IF(
         (is_non_throwing_montgomery_int<
             montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -1204,10 +1204,10 @@ inline typename enable_if_c<
         Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2,
                 ParamsBackend2> >::value>::type
 eval_multiply(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                     Allocator1, ParamsBackend1> &result,
+                                     Allocator1, ParamsBackend1>& result,
               const Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2,
-                            ParamsBackend2> &                     a,
-              const signed_double_limb_type &                     val)
+                            ParamsBackend2>&                      a,
+              const signed_double_limb_type&                      val)
     BOOST_MP_NOEXCEPT_IF(
         (is_non_throwing_montgomery_int<
             montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -1234,9 +1234,9 @@ inline typename enable_if_c<
                                             Checked2, Allocator2> >::value>::type
 eval_multiply(
     montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                           ParamsBackend1> &                            result,
-    const Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> &a,
-    const signed_double_limb_type &                                     val)
+                           ParamsBackend1>&                             result,
+    const Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
+    const signed_double_limb_type&                                      val)
     BOOST_MP_NOEXCEPT_IF(
         (is_non_throwing_montgomery_int<
             montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -1269,9 +1269,9 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
         Backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
                 ParamsBackend1> >::value>::type
 eval_multiply(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                     Allocator1, ParamsBackend1> &result,
+                                     Allocator1, ParamsBackend1>& result,
               const Backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                            ParamsBackend1> &                     o)
+                            ParamsBackend1>&                      o)
     BOOST_MP_NOEXCEPT_IF(
         (is_non_throwing_montgomery_int<
             montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -1302,8 +1302,8 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
                                             Checked1, Allocator1> >::value>::type
 eval_multiply(
     montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                           ParamsBackend1> &                            result,
-    const Backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &o)
+                           ParamsBackend1>&                             result,
+    const Backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& o)
     BOOST_MP_NOEXCEPT_IF(
         (is_non_throwing_montgomery_int<
             montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -1334,9 +1334,9 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
         Backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
                 ParamsBackend1> >::value>::type
 eval_multiply(montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                     Allocator1, ParamsBackend1> &result,
+                                     Allocator1, ParamsBackend1>& result,
               const Backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                            ParamsBackend1> &                     o)
+                            ParamsBackend1>&                      o)
     BOOST_MP_NOEXCEPT_IF(
         (is_non_throwing_montgomery_int<
             montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
@@ -1366,8 +1366,8 @@ BOOST_MP_FORCEINLINE typename enable_if_c<
                                             Checked1, Allocator1> >::value>::type
 eval_multiply(
     montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1,
-                           ParamsBackend1> &                            result,
-    const Backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &o)
+                           ParamsBackend1>&                             result,
+    const Backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& o)
     BOOST_MP_NOEXCEPT_IF(
         (is_non_throwing_montgomery_int<
             montgomery_int_backend<MinBits1, MaxBits1, SignType1, Checked1,

@@ -97,7 +97,7 @@ BOOST_MP_DEFINE_SIZED_MNT_INT_LITERAL(1024)
 //
 template <unsigned MinBits, cpp_int_check_type Checked>
 constexpr number<montgomery_int_backend<MinBits, MinBits, signed_magnitude, Checked, void>, et_off> operator-(
-    const number<montgomery_int_backend<MinBits, MinBits, signed_magnitude, Checked, void>, et_off> &a)
+    const number<montgomery_int_backend<MinBits, MinBits, signed_magnitude, Checked, void>, et_off>& a)
 {
    return montgomery_int_backend<MinBits, MinBits, signed_magnitude, Checked, void>(a.backend(),
                                                                                     boost::multiprecision::literals::detail::make_negate_tag());
@@ -105,11 +105,11 @@ constexpr number<montgomery_int_backend<MinBits, MinBits, signed_magnitude, Chec
 
 template <unsigned MinBits, cpp_int_check_type Checked>
 constexpr number<montgomery_int_backend<MinBits, MinBits, signed_magnitude, Checked, void>, et_off> operator-(
-    number<montgomery_int_backend<MinBits, MinBits, signed_magnitude, Checked, void>, et_off> &&a)
+    number<montgomery_int_backend<MinBits, MinBits, signed_magnitude, Checked, void>, et_off>&& a)
 {
    return montgomery_int_backend<MinBits, MinBits, signed_magnitude, Checked, void>(
        static_cast<const number<montgomery_int_backend<MinBits, MinBits, signed_magnitude, Checked, void>,
-                                et_off> &>(a)
+                                et_off>&>(a)
            .backend(),
        boost::multiprecision::literals::detail::make_negate_tag());
 }

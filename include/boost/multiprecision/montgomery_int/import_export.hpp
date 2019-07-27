@@ -20,7 +20,7 @@ namespace multiprecision {
 namespace detail {
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked,
           class Allocator, typename ParamsBackend, class Iterator>
-montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend> &eval_import_bits_generic(montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend> &val, Iterator i, Iterator j, unsigned chunk_size = 0,
+montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>& eval_import_bits_generic(montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>& val, Iterator i, Iterator j, unsigned chunk_size = 0,
                                                                                                                 bool msv_first = true)
 {
    montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend> newval;
@@ -62,8 +62,8 @@ montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBac
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked,
           class Allocator, typename ParamsBackend, typename T>
 inline typename boost::disable_if_c<backends::is_trivial_cpp_int<montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend> >::value,
-                                    montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend> &>::type
-eval_import_bits_fast(montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend> &val, T *i, T *j, unsigned chunk_size = 0)
+                                    montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>&>::type
+eval_import_bits_fast(montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>& val, T* i, T* j, unsigned chunk_size = 0)
 {
    std::size_t byte_len = (j - i) * (chunk_size ? chunk_size / CHAR_BIT : sizeof(*i));
    std::size_t limb_len = byte_len / sizeof(limb_type);
@@ -82,8 +82,8 @@ eval_import_bits_fast(montgomery_int_backend<MinBits, MaxBits, SignType, Checked
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked,
           class Allocator, typename ParamsBackend, class T>
 inline typename boost::enable_if_c<backends::is_trivial_cpp_int<montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend> >::value,
-                                   montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend> &>::type
-eval_import_bits_fast(montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend> &val, T *i, T *j, unsigned chunk_size = 0)
+                                   montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>&>::type
+eval_import_bits_fast(montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>& val, T* i, T* j, unsigned chunk_size = 0)
 {
    std::size_t byte_len = (j - i) * (chunk_size ? chunk_size / CHAR_BIT : sizeof(*i));
    std::size_t limb_len = byte_len / sizeof(val.limbs()[0]);
@@ -102,10 +102,10 @@ eval_import_bits_fast(montgomery_int_backend<MinBits, MaxBits, SignType, Checked
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked,
           class Allocator, typename ParamsBackend, expression_template_option ExpressionTemplates, class Iterator>
 number<montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>,
-       ExpressionTemplates> &
+       ExpressionTemplates>&
 import_bits_generic(
     number<montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>,
-           ExpressionTemplates> &val,
+           ExpressionTemplates>& val,
     Iterator i, Iterator j, unsigned chunk_size = 0,
     bool msv_first = true)
 {
@@ -152,11 +152,11 @@ template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int
 inline typename boost::disable_if_c<boost::multiprecision::backends::is_trivial_montgomery_int<
                                         montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend> >::value,
                                     number<montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>,
-                                           ExpressionTemplates> &>
+                                           ExpressionTemplates>&>
 
     ::type import_bits_fast(number<montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>,
-                                   ExpressionTemplates> &val,
-                            T *i, T *j, unsigned chunk_size = 0)
+                                   ExpressionTemplates>& val,
+                            T* i, T* j, unsigned chunk_size = 0)
 {
    std::size_t byte_len = (j - i) * (chunk_size ? chunk_size / CHAR_BIT : sizeof(*i));
    std::size_t limb_len = byte_len / sizeof(limb_type);
@@ -164,7 +164,7 @@ inline typename boost::disable_if_c<boost::multiprecision::backends::is_trivial_
    {
       ++limb_len;
    }
-   montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend> &result = val.backend();
+   montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>& result = val.backend();
    result.resize(static_cast<unsigned>(limb_len),
                  static_cast<unsigned>(limb_len)); // checked types may throw here if they're not large enough to hold the data!
    result.limbs()[result.size() - 1] = 0u;
@@ -178,13 +178,13 @@ template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int
 inline typename boost::enable_if_c<boost::multiprecision::backends::is_trivial_montgomery_int<
                                        montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend> >::value,
                                    number<montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>,
-                                          ExpressionTemplates> &>
+                                          ExpressionTemplates>&>
 
     ::type import_bits_fast(number<montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>,
-                                   ExpressionTemplates> &val,
-                            T *i, T *j, unsigned chunk_size = 0)
+                                   ExpressionTemplates>& val,
+                            T* i, T* j, unsigned chunk_size = 0)
 {
-   montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend> &result   = val.backend();
+   montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>& result   = val.backend();
    std::size_t                                                                            byte_len = (j - i) * (chunk_size ? chunk_size / CHAR_BIT : sizeof(*i));
    std::size_t                                                                            limb_len = byte_len / sizeof(result.limbs()[0]);
    if (byte_len % sizeof(result.limbs()[0]))
@@ -202,7 +202,7 @@ inline typename boost::enable_if_c<boost::multiprecision::backends::is_trivial_m
 
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked,
           class Allocator, typename ParamsBackend, class Iterator>
-inline montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend> &eval_import_bits(montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend> &val, Iterator i, Iterator j, unsigned chunk_size = 0,
+inline montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>& eval_import_bits(montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>& val, Iterator i, Iterator j, unsigned chunk_size = 0,
                                                                                                                bool msv_first = true)
 {
    return detail::eval_import_bits_generic(val, i, j, chunk_size, msv_first);
@@ -210,7 +210,7 @@ inline montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, Pa
 
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked,
           class Allocator, typename ParamsBackend, class T>
-inline montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend> &eval_import_bits(montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend> &val, T *i, T *j, unsigned chunk_size = 0, bool msv_first = true)
+inline montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>& eval_import_bits(montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>& val, T* i, T* j, unsigned chunk_size = 0, bool msv_first = true)
 {
 #ifdef BOOST_LITTLE_ENDIAN
    if (((chunk_size % CHAR_BIT) == 0) && !msv_first)
@@ -223,7 +223,7 @@ inline montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, Pa
 
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked,
           class Allocator, typename ParamsBackend, class OutputIterator>
-OutputIterator eval_export_bits(const montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend> &val, OutputIterator out, unsigned chunk_size,
+OutputIterator eval_export_bits(const montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>& val, OutputIterator out, unsigned chunk_size,
                                 bool msv_first = true)
 {
 #ifdef _MSC_VER
@@ -268,10 +268,10 @@ OutputIterator eval_export_bits(const montgomery_int_backend<MinBits, MaxBits, S
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked,
           class Allocator, typename ParamsBackend, expression_template_option ExpressionTemplates, class Iterator>
 inline number<montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>,
-              ExpressionTemplates> &
+              ExpressionTemplates>&
 import_bits(
     number<montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>,
-           ExpressionTemplates> &val,
+           ExpressionTemplates>& val,
     Iterator i, Iterator j, unsigned chunk_size = 0,
     bool msv_first = true)
 {
@@ -281,11 +281,11 @@ import_bits(
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked,
           class Allocator, typename ParamsBackend, expression_template_option ExpressionTemplates, class T>
 inline number<montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>,
-              ExpressionTemplates> &
+              ExpressionTemplates>&
 import_bits(
     number<montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>,
-           ExpressionTemplates> &val,
-    T *i, T *j, unsigned chunk_size = 0, bool msv_first = true)
+           ExpressionTemplates>& val,
+    T* i, T* j, unsigned chunk_size = 0, bool msv_first = true)
 {
 #ifdef BOOST_LITTLE_ENDIAN
    if (((chunk_size % CHAR_BIT) == 0) && !msv_first)
@@ -299,7 +299,7 @@ import_bits(
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked,
           class Allocator, typename ParamsBackend, expression_template_option ExpressionTemplates, class OutputIterator>
 OutputIterator export_bits(const number<montgomery_int_backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend>,
-                                        ExpressionTemplates> &val,
+                                        ExpressionTemplates>& val,
                            OutputIterator out, unsigned chunk_size, bool msv_first = true)
 {
 #ifdef _MSC_VER

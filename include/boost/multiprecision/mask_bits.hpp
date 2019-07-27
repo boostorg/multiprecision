@@ -9,7 +9,7 @@ namespace boost {
 namespace multiprecision {
 
 template <typename Backend, typename Integer>
-void eval_mask_bits(Backend &val, Integer n)
+void eval_mask_bits(Backend& val, Integer n)
 {
    typedef typename boost::multiprecision::limb_type limb_type;
 

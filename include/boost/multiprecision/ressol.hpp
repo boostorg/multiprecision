@@ -18,7 +18,7 @@ namespace boost {
 namespace multiprecision {
 
 template <typename Backend>
-inline Backend eval_ressol(const Backend &a, const Backend &p)
+inline Backend eval_ressol(const Backend& a, const Backend& p)
 {
    using default_ops::eval_bit_set;
    using default_ops::eval_eq;
@@ -136,8 +136,8 @@ inline Backend eval_ressol(const Backend &a, const Backend &p)
  */
 template <typename Backend, expression_template_option ExpressionTemplates>
 inline number<Backend, ExpressionTemplates>
-ressol(const number<Backend, ExpressionTemplates> &a,
-       const number<Backend, ExpressionTemplates> &p)
+ressol(const number<Backend, ExpressionTemplates>& a,
+       const number<Backend, ExpressionTemplates>& p)
 {
    return number<Backend, ExpressionTemplates>(
        eval_ressol(a.backend(), p.backend()));

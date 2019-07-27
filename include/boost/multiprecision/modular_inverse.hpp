@@ -21,8 +21,8 @@ namespace boost {
 namespace multiprecision {
 
 template <typename Backend>
-inline Backend eval_ct_inverse_mod_odd_modulus(const Backend &n,
-                                               const Backend &mod)
+inline Backend eval_ct_inverse_mod_odd_modulus(const Backend& n,
+                                               const Backend& mod)
 {
 
    typedef
@@ -148,7 +148,7 @@ inline Backend eval_ct_inverse_mod_odd_modulus(const Backend &n,
 }
 
 template <typename Backend>
-inline Backend eval_inverse_mod(const Backend &x, const Backend &mod)
+inline Backend eval_inverse_mod(const Backend& x, const Backend& mod)
 {
    using default_ops::eval_get_sign;
    using default_ops::eval_is_zero;
@@ -188,8 +188,8 @@ inline Backend eval_inverse_mod(const Backend &x, const Backend &mod)
  */
 template <typename Backend, expression_template_option ExpressionTemplates>
 inline number<Backend, ExpressionTemplates>
-inverse_mod(const number<Backend, ExpressionTemplates> &x,
-            const number<Backend, ExpressionTemplates> &mod)
+inverse_mod(const number<Backend, ExpressionTemplates>& x,
+            const number<Backend, ExpressionTemplates>& mod)
 {
    return eval_inverse_mod(x.backend(), mod.backend());
 }
@@ -204,8 +204,8 @@ inverse_mod(const number<Backend, ExpressionTemplates> &x,
  */
 template <typename Backend, expression_template_option ExpressionTemplates>
 inline number<Backend, ExpressionTemplates>
-ct_inverse_mod_odd_modulus(const number<Backend, ExpressionTemplates> &n,
-                           const number<Backend, ExpressionTemplates> &mod)
+ct_inverse_mod_odd_modulus(const number<Backend, ExpressionTemplates>& n,
+                           const number<Backend, ExpressionTemplates>& mod)
 {
    return number<Backend, ExpressionTemplates>(
        eval_ct_inverse_mod_odd_modulus(n.backend(), mod.backend()));

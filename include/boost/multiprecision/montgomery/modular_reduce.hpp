@@ -26,7 +26,7 @@ namespace backends {
 #endif
 
 template <typename Backend>
-inline void mod_redc(Backend &result, const Backend &mod)
+inline void mod_redc(Backend& result, const Backend& mod)
 
     BOOST_MP_NOEXCEPT_IF(
         is_non_throwing_cpp_int<Backend>::value)

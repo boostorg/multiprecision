@@ -442,12 +442,12 @@ struct montgomery_int_base<MinBits, MaxBits, signed_magnitude, Checked,
    // Helper functions for getting at our internal data, and manipulating
    // storage:
    //
-   BOOST_MP_FORCEINLINE allocator_type &allocator() BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE allocator_type& allocator() BOOST_NOEXCEPT
    {
       return *this;
    }
 
-   BOOST_MP_FORCEINLINE const allocator_type &allocator() const BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE const allocator_type& allocator() const BOOST_NOEXCEPT
    {
       return *this;
    }
@@ -536,7 +536,7 @@ struct montgomery_int_base<MinBits, MaxBits, signed_magnitude, Checked,
          m_sign(false),
          m_internal(true) {}
 
-   BOOST_MP_FORCEINLINE montgomery_int_base(const montgomery_int_base &o)
+   BOOST_MP_FORCEINLINE montgomery_int_base(const montgomery_int_base& o)
        : allocator_type(o), m_limbs(0), m_internal(true)
    {
       resize(o.size(), o.size());
@@ -546,8 +546,8 @@ struct montgomery_int_base<MinBits, MaxBits, signed_magnitude, Checked,
 
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
 
-   montgomery_int_base(montgomery_int_base &&o)
-       : allocator_type(static_cast<allocator_type &&>(o)), m_limbs(o.m_limbs),
+   montgomery_int_base(montgomery_int_base&& o)
+       : allocator_type(static_cast<allocator_type&&>(o)), m_limbs(o.m_limbs),
          m_sign(o.m_sign), m_internal(o.m_internal)
    {
       if (m_internal)
@@ -562,16 +562,16 @@ struct montgomery_int_base<MinBits, MaxBits, signed_magnitude, Checked,
       }
    }
 
-   montgomery_int_base &operator=(montgomery_int_base &&o) BOOST_NOEXCEPT
+   montgomery_int_base& operator=(montgomery_int_base&& o) BOOST_NOEXCEPT
    {
       if (!m_internal)
       {
          allocator().deallocate(m_data.ld.data, m_data.ld.capacity);
       }
-      *static_cast<allocator_type *>(this) = static_cast<allocator_type &&>(o);
-      m_limbs                              = o.m_limbs;
-      m_sign                               = o.m_sign;
-      m_internal                           = o.m_internal;
+      *static_cast<allocator_type*>(this) = static_cast<allocator_type&&>(o);
+      m_limbs                             = o.m_limbs;
+      m_sign                              = o.m_sign;
+      m_internal                          = o.m_internal;
       if (m_internal)
       {
          std::memcpy(limbs(), o.limbs(), o.size() * sizeof(limbs()[0]));
@@ -595,12 +595,12 @@ struct montgomery_int_base<MinBits, MaxBits, signed_magnitude, Checked,
       }
    }
 
-   void assign(const montgomery_int_base &o)
+   void assign(const montgomery_int_base& o)
    {
       if (this != &o)
       {
-         static_cast<allocator_type &>(*this) =
-             static_cast<const allocator_type &>(o);
+         static_cast<allocator_type&>(*this) =
+             static_cast<const allocator_type&>(o);
          m_limbs = 0;
          resize(o.size(), o.size());
          std::memcpy(limbs(), o.limbs(), o.size() * sizeof(limbs()[0]));
@@ -623,7 +623,7 @@ struct montgomery_int_base<MinBits, MaxBits, signed_magnitude, Checked,
 
    BOOST_MP_FORCEINLINE bool isneg() const BOOST_NOEXCEPT { return m_sign; }
 
-   BOOST_MP_FORCEINLINE void do_swap(montgomery_int_base &o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE void do_swap(montgomery_int_base& o) BOOST_NOEXCEPT
    {
       std::swap(m_data, o.m_data);
       std::swap(m_sign, o.m_sign);
@@ -633,7 +633,7 @@ struct montgomery_int_base<MinBits, MaxBits, signed_magnitude, Checked,
 
  protected:
    template <class A>
-   void check_in_range(const A &) BOOST_NOEXCEPT {}
+   void check_in_range(const A&) BOOST_NOEXCEPT {}
 };
 
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
@@ -688,8 +688,8 @@ template <unsigned MinBits, cpp_int_check_type Checked, typename ParamsBackend>
 struct montgomery_int_base<MinBits, MinBits, signed_magnitude, Checked, void,
                            ParamsBackend, false>
 {
-   typedef limb_type *        limb_pointer;
-   typedef const limb_type *  const_limb_pointer;
+   typedef limb_type*         limb_pointer;
+   typedef const limb_type*   const_limb_pointer;
    typedef mpl::int_<Checked> checked_type;
 
    //
@@ -797,8 +797,8 @@ struct montgomery_int_base<MinBits, MinBits, signed_magnitude, Checked, void,
    BOOST_CONSTEXPR montgomery_int_base(literals::detail::value_pack<> i)
        : m_wrapper(i), m_limbs(1), m_sign(false) {}
 
-   BOOST_CONSTEXPR montgomery_int_base(const montgomery_int_base &a,
-                                       const literals::detail::negate_tag &)
+   BOOST_CONSTEXPR montgomery_int_base(const montgomery_int_base& a,
+                                       const literals::detail::negate_tag&)
        : m_wrapper(a.m_wrapper), m_limbs(a.m_limbs),
          m_sign((a.m_limbs == 1) && (*a.limbs() == 0) ? false : !a.m_sign) {}
 
@@ -871,14 +871,14 @@ struct montgomery_int_base<MinBits, MinBits, signed_magnitude, Checked, void,
    // Not defaulted, it breaks constexpr support in the Intel compiler for some
    // reason:
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR
-   montgomery_int_base(const montgomery_int_base &o) BOOST_NOEXCEPT
+   montgomery_int_base(const montgomery_int_base& o) BOOST_NOEXCEPT
        : m_wrapper(o.m_wrapper),
          m_limbs(o.m_limbs),
          m_sign(o.m_sign) {}
    // Defaulted functions:
    //~montgomery_int_base() BOOST_NOEXCEPT {}
 
-   void assign(const montgomery_int_base &o) BOOST_NOEXCEPT
+   void assign(const montgomery_int_base& o) BOOST_NOEXCEPT
    {
       if (this != &o)
       {
@@ -903,7 +903,7 @@ struct montgomery_int_base<MinBits, MinBits, signed_magnitude, Checked, void,
 
    BOOST_MP_FORCEINLINE bool isneg() const BOOST_NOEXCEPT { return m_sign; }
 
-   BOOST_MP_FORCEINLINE void do_swap(montgomery_int_base &o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE void do_swap(montgomery_int_base& o) BOOST_NOEXCEPT
    {
       for (unsigned i = 0; i < (std::max)(size(), o.size()); ++i)
       {
@@ -915,7 +915,7 @@ struct montgomery_int_base<MinBits, MinBits, signed_magnitude, Checked, void,
 
  protected:
    template <class A>
-   void check_in_range(const A &) BOOST_NOEXCEPT {}
+   void check_in_range(const A&) BOOST_NOEXCEPT {}
 };
 
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
@@ -946,8 +946,8 @@ template <unsigned MinBits, cpp_int_check_type Checked, typename ParamsBackend>
 struct montgomery_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void,
                            ParamsBackend, false>
 {
-   typedef limb_type *        limb_pointer;
-   typedef const limb_type *  const_limb_pointer;
+   typedef limb_type*         limb_pointer;
+   typedef const limb_type*   const_limb_pointer;
    typedef mpl::int_<Checked> checked_type;
 
    //
@@ -1120,14 +1120,14 @@ struct montgomery_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void,
          m_limbs(1) {}
 
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR
-   montgomery_int_base(const montgomery_int_base &o) BOOST_NOEXCEPT
+   montgomery_int_base(const montgomery_int_base& o) BOOST_NOEXCEPT
        : m_wrapper(o.m_wrapper),
          m_limbs(o.m_limbs) {}
    // Defaulted functions:
    //~montgomery_int_base() BOOST_NOEXCEPT {}
 
    BOOST_MP_FORCEINLINE void
-   assign(const montgomery_int_base &o) BOOST_NOEXCEPT
+   assign(const montgomery_int_base& o) BOOST_NOEXCEPT
    {
       if (this != &o)
       {
@@ -1137,13 +1137,13 @@ struct montgomery_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void,
    }
 
  private:
-   void check_negate(const mpl::int_<checked> &)
+   void check_negate(const mpl::int_<checked>&)
    {
       BOOST_THROW_EXCEPTION(
           std::range_error("Attempt to negate an unsigned number."));
    }
 
-   void check_negate(const mpl::int_<unchecked> &) {}
+   void check_negate(const mpl::int_<unchecked>&) {}
 
  public:
    void negate() BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
@@ -1168,7 +1168,7 @@ struct montgomery_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void,
       normalize();
       eval_increment(
           static_cast<montgomery_int_backend<MinBits, MinBits, unsigned_magnitude,
-                                             Checked, void> &>(*this));
+                                             Checked, void>&>(*this));
    }
 
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR bool isneg() const BOOST_NOEXCEPT
@@ -1176,7 +1176,7 @@ struct montgomery_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void,
       return false;
    }
 
-   BOOST_MP_FORCEINLINE void do_swap(montgomery_int_base &o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE void do_swap(montgomery_int_base& o) BOOST_NOEXCEPT
    {
       for (unsigned i = 0; i < (std::max)(size(), o.size()); ++i)
       {
@@ -1187,7 +1187,7 @@ struct montgomery_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void,
 
  protected:
    template <class A>
-   void check_in_range(const A &) BOOST_NOEXCEPT {}
+   void check_in_range(const A&) BOOST_NOEXCEPT {}
 };
 
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
@@ -1244,8 +1244,8 @@ struct montgomery_int_base<MinBits, MinBits, signed_magnitude, Checked, void,
                            ParamsBackend, true>
 {
    typedef typename trivial_limb_type<MinBits>::type local_limb_type;
-   typedef local_limb_type *                         limb_pointer;
-   typedef const local_limb_type *                   const_limb_pointer;
+   typedef local_limb_type*                          limb_pointer;
+   typedef const local_limb_type*                    const_limb_pointer;
    typedef mpl::int_<Checked>                        checked_type;
 
  protected:
@@ -1277,7 +1277,7 @@ struct montgomery_int_base<MinBits, MinBits, signed_magnitude, Checked, void,
                                 (std::numeric_limits<T>::is_specialized &&
                                  (std::numeric_limits<T>::digits <=
                                   (int)MinBits))>::type
-   check_in_range(T val, const mpl::int_<checked> &)
+   check_in_range(T val, const mpl::int_<checked>&)
    {
       typedef typename common_type<typename make_unsigned<T>::type,
                                    local_limb_type>::type common_type;
@@ -1294,7 +1294,7 @@ struct montgomery_int_base<MinBits, MinBits, signed_magnitude, Checked, void,
                                 (std::numeric_limits<T>::is_specialized &&
                                  (std::numeric_limits<T>::digits <=
                                   (int)MinBits))>::type
-   check_in_range(T val, const mpl::int_<checked> &)
+   check_in_range(T val, const mpl::int_<checked>&)
    {
       using std::abs;
       typedef typename common_type<T, local_limb_type>::type common_type;
@@ -1307,7 +1307,7 @@ struct montgomery_int_base<MinBits, MinBits, signed_magnitude, Checked, void,
    }
 
    template <class T, int C>
-   void check_in_range(T, const mpl::int_<C> &) BOOST_NOEXCEPT {}
+   void check_in_range(T, const mpl::int_<C>&) BOOST_NOEXCEPT {}
 
    template <class T>
    void check_in_range(T val) BOOST_MP_NOEXCEPT_IF(noexcept(
@@ -1325,7 +1325,7 @@ struct montgomery_int_base<MinBits, MinBits, signed_magnitude, Checked, void,
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR montgomery_int_base(
        SI i,
        typename boost::enable_if_c<is_signed<SI>::value &&
-                                   (Checked == unchecked)>::type const * = 0)
+                                   (Checked == unchecked)>::type const* = 0)
        BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<montgomery_int_base>()
                                          .check_in_range(std::declval<SI>())))
        : m_data(i < 0 ? static_cast<local_limb_type>(
@@ -1338,7 +1338,7 @@ struct montgomery_int_base<MinBits, MinBits, signed_magnitude, Checked, void,
    template <class SI>
    BOOST_MP_FORCEINLINE montgomery_int_base(
        SI i, typename boost::enable_if_c<is_signed<SI>::value &&
-                                         (Checked == checked)>::type const * = 0)
+                                         (Checked == checked)>::type const* = 0)
        BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<montgomery_int_base>()
                                          .check_in_range(std::declval<SI>())))
        : m_data(i < 0 ? (static_cast<local_limb_type>(
@@ -1355,14 +1355,14 @@ struct montgomery_int_base<MinBits, MinBits, signed_magnitude, Checked, void,
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR montgomery_int_base(
        UI i,
        typename boost::enable_if_c<is_unsigned<UI>::value &&
-                                   (Checked == unchecked)>::type const * = 0)
+                                   (Checked == unchecked)>::type const* = 0)
        BOOST_NOEXCEPT : m_data(static_cast<local_limb_type>(i) & limb_mask),
                         m_sign(false) {}
 
    template <class UI>
    BOOST_MP_FORCEINLINE montgomery_int_base(
        UI i, typename boost::enable_if_c<is_unsigned<UI>::value &&
-                                         (Checked == checked)>::type const * = 0)
+                                         (Checked == checked)>::type const* = 0)
        BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<montgomery_int_base>()
                                          .check_in_range(std::declval<UI>())))
        : m_data(static_cast<local_limb_type>(i) & limb_mask), m_sign(false)
@@ -1373,7 +1373,7 @@ struct montgomery_int_base<MinBits, MinBits, signed_magnitude, Checked, void,
    template <class F>
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR montgomery_int_base(
        F i, typename boost::enable_if_c<is_floating_point<F>::value &&
-                                        (Checked == unchecked)>::type const * =
+                                        (Checked == unchecked)>::type const* =
                 0) BOOST_NOEXCEPT
        : m_data(static_cast<local_limb_type>(std::fabs(i)) & limb_mask),
          m_sign(i < 0) {}
@@ -1381,7 +1381,7 @@ struct montgomery_int_base<MinBits, MinBits, signed_magnitude, Checked, void,
    template <class F>
    BOOST_MP_FORCEINLINE montgomery_int_base(
        F i, typename boost::enable_if_c<is_floating_point<F>::value &&
-                                        (Checked == checked)>::type const * = 0)
+                                        (Checked == checked)>::type const* = 0)
        : m_data(static_cast<local_limb_type>(std::fabs(i)) & limb_mask),
          m_sign(i < 0)
    {
@@ -1409,8 +1409,8 @@ struct montgomery_int_base<MinBits, MinBits, signed_magnitude, Checked, void,
          m_sign(false) {}
 
    BOOST_CONSTEXPR
-   montgomery_int_base(const montgomery_int_base &a,
-                       const literals::detail::negate_tag &) BOOST_NOEXCEPT
+   montgomery_int_base(const montgomery_int_base& a,
+                       const literals::detail::negate_tag&) BOOST_NOEXCEPT
        : m_data(a.m_data),
          m_sign(a.m_data ? !a.m_sign : false) {}
 
@@ -1465,12 +1465,12 @@ struct montgomery_int_base<MinBits, MinBits, signed_magnitude, Checked, void,
          m_sign(false) {}
 
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR
-   montgomery_int_base(const montgomery_int_base &o) BOOST_NOEXCEPT
+   montgomery_int_base(const montgomery_int_base& o) BOOST_NOEXCEPT
        : m_data(o.m_data),
          m_sign(o.m_sign) {}
    //~montgomery_int_base() BOOST_NOEXCEPT {}
    BOOST_MP_FORCEINLINE void
-   assign(const montgomery_int_base &o) BOOST_NOEXCEPT
+   assign(const montgomery_int_base& o) BOOST_NOEXCEPT
    {
       m_data = o.m_data;
       m_sign = o.m_sign;
@@ -1488,7 +1488,7 @@ struct montgomery_int_base<MinBits, MinBits, signed_magnitude, Checked, void,
 
    BOOST_MP_FORCEINLINE bool isneg() const BOOST_NOEXCEPT { return m_sign; }
 
-   BOOST_MP_FORCEINLINE void do_swap(montgomery_int_base &o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE void do_swap(montgomery_int_base& o) BOOST_NOEXCEPT
    {
       std::swap(m_sign, o.m_sign);
       std::swap(m_data, o.m_data);
@@ -1504,8 +1504,8 @@ struct montgomery_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void,
                            ParamsBackend, true>
 {
    typedef typename trivial_limb_type<MinBits>::type local_limb_type;
-   typedef local_limb_type *                         limb_pointer;
-   typedef const local_limb_type *                   const_limb_pointer;
+   typedef local_limb_type*                          limb_pointer;
+   typedef const local_limb_type*                    const_limb_pointer;
 
  private:
    BOOST_STATIC_CONSTANT(unsigned,
@@ -1535,7 +1535,7 @@ struct montgomery_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void,
    typename boost::disable_if_c<std::numeric_limits<T>::is_specialized &&
                                 (std::numeric_limits<T>::digits <=
                                  (int)MinBits)>::type
-   check_in_range(T val, const mpl::int_<checked> &, const boost::false_type &)
+   check_in_range(T val, const mpl::int_<checked>&, const boost::false_type&)
    {
       typedef typename common_type<T, local_limb_type>::type common_type;
 
@@ -1546,8 +1546,8 @@ struct montgomery_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void,
    }
 
    template <class T>
-   void check_in_range(T val, const mpl::int_<checked> &,
-                       const boost::true_type &)
+   void check_in_range(T val, const mpl::int_<checked>&,
+                       const boost::true_type&)
    {
       typedef typename common_type<T, local_limb_type>::type common_type;
 
@@ -1562,8 +1562,8 @@ struct montgomery_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void,
 
    template <class T, int C, bool B>
    BOOST_MP_FORCEINLINE void
-   check_in_range(T, const mpl::int_<C> &,
-                  const boost::integral_constant<bool, B> &) BOOST_NOEXCEPT {}
+   check_in_range(T, const mpl::int_<C>&,
+                  const boost::integral_constant<bool, B>&) BOOST_NOEXCEPT {}
 
    template <class T>
    BOOST_MP_FORCEINLINE void check_in_range(T val) BOOST_MP_NOEXCEPT_IF(
@@ -1581,7 +1581,7 @@ struct montgomery_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void,
    template <class SI>
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR montgomery_int_base(
        SI i, typename boost::enable_if_c<is_signed<SI>::value &&
-                                         (Checked == unchecked)>::type const * =
+                                         (Checked == unchecked)>::type const* =
                  0) BOOST_NOEXCEPT
        : m_data(i < 0 ? (1 + ~static_cast<local_limb_type>(-i & limb_mask)) &
                             limb_mask
@@ -1590,7 +1590,7 @@ struct montgomery_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void,
    template <class SI>
    BOOST_MP_FORCEINLINE montgomery_int_base(
        SI i, typename boost::enable_if_c<is_signed<SI>::value &&
-                                         (Checked == checked)>::type const * = 0)
+                                         (Checked == checked)>::type const* = 0)
        BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<montgomery_int_base>()
                                          .check_in_range(std::declval<SI>())))
        : m_data(i < 0 ? 1 + ~static_cast<local_limb_type>(-i & limb_mask)
@@ -1602,12 +1602,12 @@ struct montgomery_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void,
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR montgomery_int_base(
        UI i,
        typename boost::enable_if_c<is_unsigned<UI>::value &&
-                                   (Checked == unchecked)>::type const * = 0)
-       BOOST_NOEXCEPT : m_data(static_cast<local_limb_type>(i &limb_mask)) {}
+                                   (Checked == unchecked)>::type const* = 0)
+       BOOST_NOEXCEPT : m_data(static_cast<local_limb_type>(i& limb_mask)) {}
    template <class UI>
    BOOST_MP_FORCEINLINE montgomery_int_base(
        UI i, typename boost::enable_if_c<is_unsigned<UI>::value &&
-                                         (Checked == checked)>::type const * = 0)
+                                         (Checked == checked)>::type const* = 0)
        BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<montgomery_int_base>()
                                          .check_in_range(std::declval<UI>())))
        : m_data(static_cast<local_limb_type>(i & limb_mask))
@@ -1619,7 +1619,7 @@ struct montgomery_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void,
    template <class SI>
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR montgomery_int_base(
        SI i, typename boost::enable_if_c<is_signed<SI>::value &&
-                                         (Checked == unchecked)>::type const * =
+                                         (Checked == unchecked)>::type const* =
                  0) BOOST_NOEXCEPT
        : m_data(i < 0 ? (1 + ~static_cast<local_limb_type>(-i)) & limb_mask
                       : static_cast<local_limb_type>(i) & limb_mask)
@@ -1628,7 +1628,7 @@ struct montgomery_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void,
    template <class SI>
    BOOST_MP_FORCEINLINE montgomery_int_base(
        SI i, typename boost::enable_if_c<is_signed<SI>::value &&
-                                         (Checked == checked)>::type const * = 0)
+                                         (Checked == checked)>::type const* = 0)
        BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<montgomery_int_base>()
                                          .check_in_range(std::declval<SI>())))
        : m_data(i < 0 ? 1 + ~static_cast<local_limb_type>(-i)
@@ -1641,13 +1641,13 @@ struct montgomery_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void,
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR montgomery_int_base(
        UI i,
        typename boost::enable_if_c<is_unsigned<UI>::value &&
-                                   (Checked == unchecked)>::type const * = 0)
+                                   (Checked == unchecked)>::type const* = 0)
        BOOST_NOEXCEPT : m_data(static_cast<local_limb_type>(i) & limb_mask) {}
 
    template <class UI>
    BOOST_MP_FORCEINLINE montgomery_int_base(
        UI i, typename boost::enable_if_c<is_unsigned<UI>::value &&
-                                         (Checked == checked)>::type const * = 0)
+                                         (Checked == checked)>::type const* = 0)
        BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<montgomery_int_base>()
                                          .check_in_range(std::declval<UI>())))
        : m_data(static_cast<local_limb_type>(i))
@@ -1659,7 +1659,7 @@ struct montgomery_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void,
 
    template <class F>
    BOOST_MP_FORCEINLINE montgomery_int_base(
-       F i, typename boost::enable_if<is_floating_point<F> >::type const * = 0)
+       F i, typename boost::enable_if<is_floating_point<F> >::type const* = 0)
        BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
        : m_data(static_cast<local_limb_type>(std::fabs(i)) & limb_mask)
    {
@@ -1735,10 +1735,10 @@ struct montgomery_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void,
        : m_data(0) {}
 
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR montgomery_int_base(
-       const montgomery_int_base &o) BOOST_NOEXCEPT : m_data(o.m_data) {}
+       const montgomery_int_base& o) BOOST_NOEXCEPT : m_data(o.m_data) {}
    //~montgomery_int_base() BOOST_NOEXCEPT {}
    BOOST_MP_FORCEINLINE void
-   assign(const montgomery_int_base &o) BOOST_NOEXCEPT
+   assign(const montgomery_int_base& o) BOOST_NOEXCEPT
    {
       m_data = o.m_data;
    }
@@ -1760,7 +1760,7 @@ struct montgomery_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void,
       return false;
    }
 
-   BOOST_MP_FORCEINLINE void do_swap(montgomery_int_base &o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE void do_swap(montgomery_int_base& o) BOOST_NOEXCEPT
    {
       std::swap(m_data, o.m_data);
    }
@@ -1852,15 +1852,15 @@ struct montgomery_int_backend
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2,
              cpp_int_check_type Checked2, class Allocator2>
    montgomery_int_backend(const cpp_int_backend<MinBits2, MaxBits2, SignType2,
-                                                Checked2, Allocator2> &   o,
-                          const nil::crypto3::montgomery_params<cpp_int> &params)
+                                                Checked2, Allocator2>&    o,
+                          const nil::crypto3::montgomery_params<cpp_int>& params)
        : base_type(o)
    {
       m_params = params;
    }
 
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR
-   montgomery_int_backend(const montgomery_int_backend &o)
+   montgomery_int_backend(const montgomery_int_backend& o)
        BOOST_MP_NOEXCEPT_IF(boost::is_void<Allocator>::value)
        : base_type(o)
    {
@@ -1870,16 +1870,16 @@ struct montgomery_int_backend
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
 
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR
-   montgomery_int_backend(montgomery_int_backend &&o) BOOST_NOEXCEPT
-       : base_type(static_cast<base_type &&>(o))
+   montgomery_int_backend(montgomery_int_backend&& o) BOOST_NOEXCEPT
+       : base_type(static_cast<base_type&&>(o))
    {}
 
 #endif
    template <class Arg>
    montgomery_int_backend(
-       Arg i, const nil::crypto3::montgomery_params<cpp_int> &p,
+       Arg i, const nil::crypto3::montgomery_params<cpp_int>& p,
        typename boost::enable_if_c<is_allowed_montgomery_int_base_conversion<
-           Arg, base_type>::value>::type const * = 0)
+           Arg, base_type>::value>::type const* = 0)
        BOOST_MP_NOEXCEPT_IF(noexcept(base_type(std::declval<Arg>())))
        : base_type(i)
    {
@@ -1892,7 +1892,7 @@ struct montgomery_int_backend
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR montgomery_int_backend(
        Arg i,
        typename boost::enable_if_c<is_allowed_montgomery_int_base_conversion<
-           Arg, base_type>::value>::type const * = 0)
+           Arg, base_type>::value>::type const* = 0)
        BOOST_MP_NOEXCEPT_IF(noexcept(base_type(std::declval<Arg>())))
        : base_type(i) {}
 
@@ -1902,8 +1902,8 @@ struct montgomery_int_backend
              typename ParamsBackend2>
    void do_assign(
        const montgomery_int_backend<MinBits2, MaxBits2, SignType2, Checked2,
-                                    Allocator2, ParamsBackend2> &other,
-       mpl::true_ const &, mpl::true_ const &)
+                                    Allocator2, ParamsBackend2>& other,
+       mpl::true_ const&, mpl::true_ const&)
    {
       // Assigning trivial type to trivial type:
       this->check_in_range(*other.limbs());
@@ -1918,8 +1918,8 @@ struct montgomery_int_backend
              typename ParamsBackend2>
    void do_assign(
        const montgomery_int_backend<MinBits2, MaxBits2, SignType2, Checked2,
-                                    Allocator2, ParamsBackend2> &other,
-       mpl::true_ const &, mpl::false_ const &)
+                                    Allocator2, ParamsBackend2>& other,
+       mpl::true_ const&, mpl::false_ const&)
    {
       // non-trivial to trivial narrowing conversion:
       double_limb_type v = *other.limbs();
@@ -1943,8 +1943,8 @@ struct montgomery_int_backend
              typename ParamsBackend2>
    void do_assign(
        const montgomery_int_backend<MinBits2, MaxBits2, SignType2, Checked2,
-                                    Allocator2, ParamsBackend2> &other,
-       mpl::false_ const &, mpl::true_ const &)
+                                    Allocator2, ParamsBackend2>& other,
+       mpl::false_ const&, mpl::true_ const&)
    {
       // trivial to non-trivial, treat the trivial argument as if it were an
       // unsigned arithmetic type, then set the sign afterwards:
@@ -1961,8 +1961,8 @@ struct montgomery_int_backend
              typename ParamsBackend2>
    void do_assign(
        const montgomery_int_backend<MinBits2, MaxBits2, SignType2, Checked2,
-                                    Allocator2, ParamsBackend2> &other,
-       mpl::false_ const &, mpl::false_ const &)
+                                    Allocator2, ParamsBackend2>& other,
+       mpl::false_ const&, mpl::false_ const&)
    {
       // regular non-trivial to non-trivial assign:
       this->resize(other.size(), other.size());
@@ -1979,11 +1979,11 @@ struct montgomery_int_backend
              typename ParamsBackend2>
    montgomery_int_backend(
        const montgomery_int_backend<MinBits2, MaxBits2, SignType2, Checked2,
-                                    Allocator2, ParamsBackend2> &other,
+                                    Allocator2, ParamsBackend2>& other,
        typename boost::enable_if_c<is_implicit_cpp_int_conversion<
            montgomery_int_backend<MinBits2, MaxBits2, SignType2, Checked2,
                                   Allocator2, ParamsBackend2>,
-           self_type>::value>::type * = 0)
+           self_type>::value>::type* = 0)
        : base_type()
    {
       do_assign(
@@ -1997,11 +1997,11 @@ struct montgomery_int_backend
              typename ParamsBackend2>
    explicit montgomery_int_backend(
        const montgomery_int_backend<MinBits2, MaxBits2, SignType2, Checked2,
-                                    Allocator2, ParamsBackend2> &other,
+                                    Allocator2, ParamsBackend2>& other,
        typename boost::disable_if_c<is_implicit_cpp_int_conversion<
            montgomery_int_backend<MinBits2, MaxBits2, SignType2, Checked2,
                                   Allocator2, ParamsBackend2>,
-           self_type>::value>::type * = 0)
+           self_type>::value>::type* = 0)
        : base_type()
    {
       do_assign(
@@ -2013,9 +2013,9 @@ struct montgomery_int_backend
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2,
              cpp_int_check_type Checked2, class Allocator2,
              typename ParamsBackend2>
-   montgomery_int_backend &operator=(
+   montgomery_int_backend& operator=(
        const montgomery_int_backend<MinBits2, MaxBits2, SignType2, Checked2,
-                                    Allocator2, ParamsBackend2> &other)
+                                    Allocator2, ParamsBackend2>& other)
    {
       do_assign(
           other, mpl::bool_<is_trivial_montgomery_int<self_type>::value>(),
@@ -2027,16 +2027,16 @@ struct montgomery_int_backend
 #ifdef BOOST_MP_USER_DEFINED_LITERALS
 
    BOOST_CONSTEXPR
-   montgomery_int_backend(const montgomery_int_backend &      a,
-                          const literals::detail::negate_tag &tag)
-       : base_type(static_cast<const base_type &>(a), tag) {}
+   montgomery_int_backend(const montgomery_int_backend&       a,
+                          const literals::detail::negate_tag& tag)
+       : base_type(static_cast<const base_type&>(a), tag) {}
 
 #endif
 
-   BOOST_MP_FORCEINLINE montgomery_int_backend &
-   operator=(const montgomery_int_backend &o) BOOST_MP_NOEXCEPT_IF(
+   BOOST_MP_FORCEINLINE montgomery_int_backend&
+   operator=(const montgomery_int_backend& o) BOOST_MP_NOEXCEPT_IF(
        noexcept(std::declval<montgomery_int_backend>().assign(
-           std::declval<const montgomery_int_backend &>())))
+           std::declval<const montgomery_int_backend&>())))
    {
       this->assign(o);
       m_params = o.m_params;
@@ -2053,11 +2053,11 @@ struct montgomery_int_backend
   */
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
 
-   BOOST_MP_FORCEINLINE montgomery_int_backend &
-   operator=(montgomery_int_backend &&o) BOOST_MP_NOEXCEPT_IF(
-       noexcept(std::declval<base_type &>() = std::declval<base_type>()))
+   BOOST_MP_FORCEINLINE montgomery_int_backend&
+   operator=(montgomery_int_backend&& o) BOOST_MP_NOEXCEPT_IF(
+       noexcept(std::declval<base_type&>() = std::declval<base_type>()))
    {
-      *static_cast<base_type *>(this) = static_cast<base_type &&>(o);
+      *static_cast<base_type*>(this) = static_cast<base_type&&>(o);
       return *this;
    }
 
@@ -2065,7 +2065,7 @@ struct montgomery_int_backend
  private:
    template <class A>
    typename boost::enable_if<is_unsigned<A> >::type
-   do_assign_arithmetic(A val, const mpl::true_ &)
+   do_assign_arithmetic(A val, const mpl::true_&)
        BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<montgomery_int_backend>()
                                          .check_in_range(std::declval<A>())))
    {
@@ -2077,7 +2077,7 @@ struct montgomery_int_backend
    template <class A>
    typename boost::disable_if_c<is_unsigned<A>::value ||
                                 !is_integral<A>::value>::type
-   do_assign_arithmetic(A val, const mpl::true_ &) BOOST_MP_NOEXCEPT_IF(
+   do_assign_arithmetic(A val, const mpl::true_&) BOOST_MP_NOEXCEPT_IF(
        noexcept(std::declval<montgomery_int_backend>().check_in_range(
            std::declval<A>())) &&
        noexcept(std::declval<montgomery_int_backend>().sign(true)))
@@ -2093,7 +2093,7 @@ struct montgomery_int_backend
 
    template <class A>
    typename boost::enable_if_c<!is_integral<A>::value>::type
-   do_assign_arithmetic(A val, const mpl::true_ &)
+   do_assign_arithmetic(A val, const mpl::true_&)
    {
       this->check_in_range(val);
       *this->limbs() =
@@ -2105,7 +2105,7 @@ struct montgomery_int_backend
    }
 
    BOOST_MP_FORCEINLINE void
-   do_assign_arithmetic(limb_type i, const mpl::false_ &) BOOST_NOEXCEPT
+   do_assign_arithmetic(limb_type i, const mpl::false_&) BOOST_NOEXCEPT
    {
       this->resize(1, 1);
       *this->limbs() = i;
@@ -2113,7 +2113,7 @@ struct montgomery_int_backend
    }
 
    BOOST_MP_FORCEINLINE void do_assign_arithmetic(signed_limb_type i,
-                                                  const mpl::false_ &)
+                                                  const mpl::false_&)
        BOOST_MP_NOEXCEPT_IF(
            noexcept(std::declval<montgomery_int_backend>().sign(true)))
    {
@@ -2124,7 +2124,7 @@ struct montgomery_int_backend
    }
 
    void do_assign_arithmetic(double_limb_type i,
-                             const mpl::false_ &) BOOST_NOEXCEPT
+                             const mpl::false_&) BOOST_NOEXCEPT
    {
       BOOST_STATIC_ASSERT(sizeof(i) == 2 * sizeof(limb_type));
       BOOST_STATIC_ASSERT(base_type::internal_limb_count >= 2);
@@ -2139,7 +2139,7 @@ struct montgomery_int_backend
       this->sign(false);
    }
 
-   void do_assign_arithmetic(signed_double_limb_type i, const mpl::false_ &)
+   void do_assign_arithmetic(signed_double_limb_type i, const mpl::false_&)
        BOOST_MP_NOEXCEPT_IF(
            noexcept(std::declval<montgomery_int_backend>().sign(true)))
    {
@@ -2164,7 +2164,7 @@ struct montgomery_int_backend
       this->sign(s);
    }
 
-   void do_assign_arithmetic(long double a, const mpl::false_ &)
+   void do_assign_arithmetic(long double a, const mpl::false_&)
    {
       using default_ops::eval_add;
       using default_ops::eval_subtract;
@@ -2231,7 +2231,7 @@ struct montgomery_int_backend
    template <class Arithmetic>
    BOOST_MP_FORCEINLINE typename boost::enable_if_c<
        !boost::multiprecision::detail::is_byte_container<Arithmetic>::value,
-       montgomery_int_backend &>::type
+       montgomery_int_backend&>::type
    operator=(Arithmetic val) BOOST_MP_NOEXCEPT_IF(
        noexcept(std::declval<montgomery_int_backend>().do_assign_arithmetic(
            std::declval<Arithmetic>(), trivial_tag())))
@@ -2241,7 +2241,7 @@ struct montgomery_int_backend
    }
 
  private:
-   void do_assign_string(const char *s, const mpl::true_ &)
+   void do_assign_string(const char* s, const mpl::true_&)
    {
       std::size_t n  = s ? std::strlen(s) : 0;
       *this          = 0;
@@ -2310,7 +2310,7 @@ struct montgomery_int_backend
       }
    }
 
-   void do_assign_string(const char *s, const mpl::false_ &)
+   void do_assign_string(const char* s, const mpl::false_&)
    {
       using default_ops::eval_add;
       using default_ops::eval_multiply;
@@ -2503,20 +2503,20 @@ struct montgomery_int_backend
    }
 
  public:
-   montgomery_int_backend &operator=(const char *s)
+   montgomery_int_backend& operator=(const char* s)
    {
       do_assign_string(s, trivial_tag());
       return *this;
    }
 
-   BOOST_MP_FORCEINLINE void swap(montgomery_int_backend &o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE void swap(montgomery_int_backend& o) BOOST_NOEXCEPT
    {
       this->do_swap(o);
    }
 
  private:
    std::string do_get_trivial_string(std::ios_base::fmtflags f,
-                                     const mpl::false_ &) const
+                                     const mpl::false_&) const
    {
       typedef
           typename mpl::if_c<sizeof(typename base_type::local_limb_type) == 1,
@@ -2543,7 +2543,7 @@ struct montgomery_int_backend
    }
 
    std::string do_get_trivial_string(std::ios_base::fmtflags f,
-                                     const mpl::true_ &) const
+                                     const mpl::true_&) const
    {
       // Even though we have only one limb, we can't do IO on it :-(
       int base = 10;
@@ -2600,7 +2600,7 @@ struct montgomery_int_backend
          result.erase(0, n);
          if (f & std::ios_base::showbase)
          {
-            const char *pp = base == 8 ? "0" : "0x";
+            const char* pp = base == 8 ? "0" : "0x";
             result.insert(static_cast<std::string::size_type>(0), pp);
          }
       }
@@ -2639,7 +2639,7 @@ struct montgomery_int_backend
    }
 
    std::string do_get_string(std::ios_base::fmtflags f,
-                             const mpl::true_ &) const
+                             const mpl::true_&) const
    {
 #ifdef BOOST_MP_NO_DOUBLE_LIMB_TYPE_IO
       return do_get_trivial_string(
@@ -2651,7 +2651,7 @@ struct montgomery_int_backend
    }
 
    std::string do_get_string(std::ios_base::fmtflags f,
-                             const mpl::false_ &) const
+                             const mpl::false_&) const
    {
       using default_ops::eval_get_sign;
       int base = 10;
@@ -2708,7 +2708,7 @@ struct montgomery_int_backend
          result.erase(0, n);
          if (f & std::ios_base::showbase)
          {
-            const char *pp = base == 8 ? "0" : "0x";
+            const char* pp = base == 8 ? "0" : "0x";
             result.insert(static_cast<std::string::size_type>(0), pp);
          }
       }
@@ -2777,7 +2777,7 @@ struct montgomery_int_backend
 
  private:
    template <class Container>
-   void construct_from_container(const Container &c, const mpl::false_ &)
+   void construct_from_container(const Container& c, const mpl::false_&)
    {
       //
       // We assume that c is a sequence of (unsigned) bytes with the most
@@ -2812,7 +2812,7 @@ struct montgomery_int_backend
    }
 
    template <class Container>
-   void construct_from_container(const Container &c, const mpl::true_ &)
+   void construct_from_container(const Container& c, const mpl::true_&)
    {
       //
       // We assume that c is a sequence of (unsigned) bytes with the most
@@ -2841,10 +2841,10 @@ struct montgomery_int_backend
 
  public:
    template <class Container>
-   montgomery_int_backend(const Container &c,
+   montgomery_int_backend(const Container& c,
                           typename boost::enable_if_c<
                               boost::multiprecision::detail::is_byte_container<
-                                  Container>::value>::type const * = 0)
+                                  Container>::value>::type const* = 0)
    {
       //
       // We assume that c is a sequence of (unsigned) bytes with the most
@@ -2865,9 +2865,9 @@ struct montgomery_int_backend
                                         Allocator2, ParamsBackend2> >::value,
                             int>::type
        compare_imp(const Backend<MinBits2, MaxBits2, SignType2, Checked2,
-                                 Allocator2, ParamsBackend2> &o,
-                   const mpl::false_ &,
-                   const mpl::false_ &) const BOOST_NOEXCEPT
+                                 Allocator2, ParamsBackend2>& o,
+                   const mpl::false_&,
+                   const mpl::false_&) const BOOST_NOEXCEPT
    {
       if (this->sign() != o.sign())
       {
@@ -2900,8 +2900,8 @@ struct montgomery_int_backend
        // SignType2, cpp_int_check_type Checked2,
        //        class Allocator2, typename ParamsBackend>
        ::type compare_imp(const Backend<MinBits2, MaxBits2, SignType2, Checked2,
-                                        Allocator2, ParamsBackend2> &o,
-                          const mpl::true_ &, const mpl::false_ &) const
+                                        Allocator2, ParamsBackend2>& o,
+                          const mpl::true_&, const mpl::false_&) const
    {
       Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2, ParamsBackend2>
           t(*this);
@@ -2920,8 +2920,8 @@ struct montgomery_int_backend
                                         Allocator2, ParamsBackend2> >::value,
                             int>::type
        compare_imp(const Backend<MinBits2, MaxBits2, SignType2, Checked2,
-                                 Allocator2, ParamsBackend2> &o,
-                   const mpl::false_ &, const mpl::true_ &) const
+                                 Allocator2, ParamsBackend2>& o,
+                   const mpl::false_&, const mpl::true_&) const
    {
       Backend<MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend> t(o);
       return compare(t);
@@ -2939,8 +2939,8 @@ struct montgomery_int_backend
                                         Allocator2, ParamsBackend2> >::value,
                             int>::type
        compare_imp(const Backend<MinBits2, MaxBits2, SignType2, Checked2,
-                                 Allocator2, ParamsBackend2> &o,
-                   const mpl::true_ &, const mpl::true_ &) const BOOST_NOEXCEPT
+                                 Allocator2, ParamsBackend2>& o,
+                   const mpl::true_&, const mpl::true_&) const BOOST_NOEXCEPT
    {
       if (this->sign())
       {
@@ -2979,7 +2979,7 @@ struct montgomery_int_backend
                                         Allocator2, ParamsBackend2> >::value,
                             int>::type
        compare(const Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2,
-                             ParamsBackend2> &o) const BOOST_NOEXCEPT
+                             ParamsBackend2>& o) const BOOST_NOEXCEPT
    {
       typedef mpl::bool_<is_trivial_montgomery_int<Backend<
           MinBits, MaxBits, SignType, Checked, Allocator, ParamsBackend> >::value>
@@ -3003,7 +3003,7 @@ struct montgomery_int_backend
                                         Allocator2, ParamsBackend2> >::value,
                             int>::type
        compare_unsigned(const Backend<MinBits2, MaxBits2, SignType2, Checked2,
-                                      Allocator2, ParamsBackend2> &o) const
+                                      Allocator2, ParamsBackend2>& o) const
        BOOST_NOEXCEPT
    {
       if (this->size() != o.size())
@@ -3032,7 +3032,7 @@ struct montgomery_int_backend
            Backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value,
        int>::type
    compare_unsigned(const Backend<MinBits2, MaxBits2, SignType2, Checked2,
-                                  Allocator2> &o) const BOOST_NOEXCEPT
+                                  Allocator2>& o) const BOOST_NOEXCEPT
    {
       if (this->size() != o.size())
       {

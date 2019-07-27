@@ -16,8 +16,8 @@
 namespace boost {
 namespace multiprecision {
 template <typename Backend>
-inline Backend eval_almost_montgomery_inverse(Backend &result, const Backend &a,
-                                              const Backend &b)
+inline Backend eval_almost_montgomery_inverse(Backend& result, const Backend& a,
+                                              const Backend& b)
 {
    typedef
        typename default_ops::double_precision_type<Backend>::type double_type;
@@ -96,9 +96,9 @@ inline Backend eval_almost_montgomery_inverse(Backend &result, const Backend &a,
  */
 template <typename Backend, expression_template_option ExpressionTemplates>
 inline number<Backend, ExpressionTemplates>
-almost_montgomery_inverse(number<Backend, ExpressionTemplates> &      result,
-                          const number<Backend, ExpressionTemplates> &a,
-                          const number<Backend, ExpressionTemplates> &b)
+almost_montgomery_inverse(number<Backend, ExpressionTemplates>&       result,
+                          const number<Backend, ExpressionTemplates>& a,
+                          const number<Backend, ExpressionTemplates>& b)
 {
    return number<Backend, ExpressionTemplates>(eval_almost_montgomery_inverse(
        result.backend(), a.backend(), b.backend()));
@@ -108,8 +108,8 @@ almost_montgomery_inverse(number<Backend, ExpressionTemplates> &      result,
  * Call almost_montgomery_inverse and correct the result to a^-1 mod b
  */
 template <typename Backend>
-inline Backend eval_normalized_montgomery_inverse(const Backend &a,
-                                                  const Backend &p)
+inline Backend eval_normalized_montgomery_inverse(const Backend& a,
+                                                  const Backend& p)
 {
    using default_ops::eval_add;
    using default_ops::eval_integer_modulus;
@@ -134,8 +134,8 @@ inline Backend eval_normalized_montgomery_inverse(const Backend &a,
  */
 template <typename Backend, expression_template_option ExpressionTemplates>
 inline number<Backend, ExpressionTemplates>
-normalized_montgomery_inverse(const number<Backend, ExpressionTemplates> &a,
-                              const number<Backend, ExpressionTemplates> &p)
+normalized_montgomery_inverse(const number<Backend, ExpressionTemplates>& a,
+                              const number<Backend, ExpressionTemplates>& p)
 {
    return number<Backend, ExpressionTemplates>(
        eval_normalized_montgomery_inverse(a.backend(), p.backend()));

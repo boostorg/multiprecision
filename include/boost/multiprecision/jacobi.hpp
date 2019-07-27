@@ -17,7 +17,7 @@ namespace boost {
 namespace multiprecision {
 
 template <typename Backend>
-inline limb_type eval_jacobi(const Backend &a, const Backend &n)
+inline limb_type eval_jacobi(const Backend& a, const Backend& n)
 {
    using default_ops::eval_get_sign;
    using default_ops::eval_gt;
@@ -92,7 +92,7 @@ inline limb_type eval_jacobi(const Backend &a, const Backend &n)
          */
 template <typename Backend, expression_template_option ExpressionTemplates>
 inline typename std::enable_if<number_category<Backend>::value == number_kind_integer, limb_type>::type jacobi(
-    const number<Backend, ExpressionTemplates> &a, const number<Backend, ExpressionTemplates> &n)
+    const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& n)
 {
    return number<Backend, ExpressionTemplates>(eval_jacobi(a.backend(), n.backend()));
 }

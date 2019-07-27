@@ -15,7 +15,7 @@ namespace boost {
 namespace multiprecision {
 
 template <typename Backend>
-void eval_reduce_below(Backend &val, const Backend &mod)
+void eval_reduce_below(Backend& val, const Backend& mod)
 {
    using default_ops::eval_lt;
 
@@ -31,8 +31,8 @@ void eval_reduce_below(Backend &val, const Backend &mod)
 }
 
 template <typename Backend, expression_template_option ExpressionTemplates>
-number<Backend, ExpressionTemplates> reduce_below(number<Backend, ExpressionTemplates> &      val,
-                                                  const number<Backend, ExpressionTemplates> &mod)
+number<Backend, ExpressionTemplates> reduce_below(number<Backend, ExpressionTemplates>&       val,
+                                                  const number<Backend, ExpressionTemplates>& mod)
 {
    return number<Backend, ExpressionTemplates>(eval_reduce_below(val.backend(), mod.backend()));
 }
