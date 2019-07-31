@@ -108,9 +108,10 @@
             </li>
 <li class="listitem">
               When compiling with <code class="computeroutput"><span class="identifier">gcc</span></code>,
-              you need to use the flag <code class="computeroutput"><span class="special">--</span><span class="identifier">std</span><span class="special">=</span><span class="identifier">gnu</span><span class="special">++</span><span class="number">11</span><span class="special">/</span><span class="number">14</span><span class="special">/</span><span class="number">17</span></code>,
-              as the numeric literal operator 'operator""Q' is a GNU extension.
-              Compilation fails with the flag <code class="computeroutput"><span class="special">--</span><span class="identifier">std</span><span class="special">=</span><span class="identifier">c</span><span class="special">++</span><span class="number">11</span><span class="special">/</span><span class="number">14</span><span class="special">/</span><span class="number">17</span></code>.
+              you need to use the flag <code class="computeroutput"><span class="special">-</span><span class="identifier">std</span><span class="special">=</span><span class="identifier">gnu</span><span class="special">++</span><span class="number">11</span><span class="special">/</span><span class="number">14</span><span class="special">/</span><span class="number">17</span></code>,
+              as the suffix 'Q' is a GNU extension.
+              Compilation fails with the flag <code class="computeroutput"><span class="special">-</span><span class="identifier">std</span><span class="special">=</span><span class="identifier">c</span><span class="special">++</span><span class="number">11</span><span class="special">/</span><span class="number">14</span><span class="special">/</span><span class="number">17</span></code>
+              unless you also use <code class="computeroutput"><span class="identifier">-fext-numeric-literals</span></code>.
             </li>
 </ul></div>
 <h6>
