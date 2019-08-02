@@ -207,9 +207,9 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
    BOOST_STATIC_CONSTANT(limb_type, max_limb_value = ~static_cast<limb_type>(0u));
    BOOST_STATIC_CONSTANT(limb_type, sign_bit_mask = static_cast<limb_type>(1u) << (limb_bits - 1));
    BOOST_STATIC_CONSTANT(unsigned, internal_limb_count =
-                                       MinBits
-                                           ? (MinBits / limb_bits + ((MinBits % limb_bits) ? 1 : 0))
-                                           : (sizeof(limb_data) / sizeof(limb_type)));
+      MinBits
+         ? (MinBits / limb_bits + ((MinBits % limb_bits) ? 1 : 0))
+         : (sizeof(limb_data) / sizeof(limb_type)) > 1 ? (sizeof(limb_data) / sizeof(limb_type)) : 2);
    BOOST_STATIC_CONSTANT(bool, variable = true);
 
  private:
