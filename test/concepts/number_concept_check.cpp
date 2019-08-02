@@ -8,34 +8,30 @@
 // conceptual requirements.
 //
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
-#  pragma warning(disable:4800)
-#  pragma warning(disable:4512)
-#  pragma warning(disable:4127)
-#  pragma warning(disable:4512)
-#  pragma warning(disable:4503) // decorated name length exceeded, name was truncated
+#define _SCL_SECURE_NO_WARNINGS
+#pragma warning(disable : 4800)
+#pragma warning(disable : 4512)
+#pragma warning(disable : 4127)
+#pragma warning(disable : 4512)
+#pragma warning(disable : 4503) // decorated name length exceeded, name was truncated
 #endif
 
 #include <boost/container_hash/hash.hpp>
 #include <libs/math/test/compile_test/poison.hpp>
 
-#if !defined(TEST_MPF_50) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) \
-   && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR_50)\
-   && !defined(TEST_MPFR_6) && !defined(TEST_MPFR_15) && !defined(TEST_MPFR_17) \
-   && !defined(TEST_MPFR_30) && !defined(TEST_CPP_DEC_FLOAT_NO_ET) && !defined(TEST_LOGGED_ADAPTER)\
-   && !defined(TEST_CPP_BIN_FLOAT)
-#  define TEST_MPF_50
-#  define TEST_BACKEND
-#  define TEST_MPZ
-#  define TEST_MPFR_50
-#  define TEST_MPFR_6
-#  define TEST_MPFR_15
-#  define TEST_MPFR_17
-#  define TEST_MPFR_30
-#  define TEST_CPP_DEC_FLOAT
-#  define TEST_CPP_DEC_FLOAT_NO_ET
-#  define TEST_LOGGED_ADAPTER
-#  define TEST_CPP_BIN_FLOAT
+#if !defined(TEST_MPF_50) && !defined(TEST_BACKEND) && !defined(TEST_MPZ) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR_50) && !defined(TEST_MPFR_6) && !defined(TEST_MPFR_15) && !defined(TEST_MPFR_17) && !defined(TEST_MPFR_30) && !defined(TEST_CPP_DEC_FLOAT_NO_ET) && !defined(TEST_LOGGED_ADAPTER) && !defined(TEST_CPP_BIN_FLOAT)
+#define TEST_MPF_50
+#define TEST_BACKEND
+#define TEST_MPZ
+#define TEST_MPFR_50
+#define TEST_MPFR_6
+#define TEST_MPFR_15
+#define TEST_MPFR_17
+#define TEST_MPFR_30
+#define TEST_CPP_DEC_FLOAT
+#define TEST_CPP_DEC_FLOAT_NO_ET
+#define TEST_LOGGED_ADAPTER
+#define TEST_CPP_BIN_FLOAT
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -71,115 +67,115 @@ template <class T>
 void test_extra(T)
 {
    T t = 1;
-   t = abs(t);
-   t = abs(t*t);
+   t   = abs(t);
+   t   = abs(t * t);
 
    t = fabs(t);
-   t = fabs(t*t);
+   t = fabs(t * t);
 
    t = sqrt(t);
-   t = sqrt(t*t);
+   t = sqrt(t * t);
 
    t = floor(t);
-   t = floor(t*t);
+   t = floor(t * t);
 
    t = ceil(t);
-   t = ceil(t*t);
+   t = ceil(t * t);
 
    t = trunc(t);
-   t = trunc(t*t);
+   t = trunc(t * t);
 
    t = round(t);
-   t = round(t*t);
+   t = round(t * t);
 
    t = exp(t);
-   t = exp(t*t);
+   t = exp(t * t);
 
    t = log(t);
-   t = log(t*t);
+   t = log(t * t);
 
    t = log10(t);
-   t = log10(t*t);
+   t = log10(t * t);
 
    t = cos(t);
-   t = cos(t*t);
+   t = cos(t * t);
 
    t = sin(t);
-   t = sin(t*t);
+   t = sin(t * t);
 
    t = tan(t);
-   t = tan(t*t);
+   t = tan(t * t);
 
    t = asin(t);
-   t = asin(t*t);
+   t = asin(t * t);
 
    t = atan(t);
-   t = atan(t*t);
+   t = atan(t * t);
 
    t = acos(t);
-   t = acos(t*t);
+   t = acos(t * t);
 
    t = cosh(t);
-   t = cosh(t*t);
+   t = cosh(t * t);
 
    t = sinh(t);
-   t = sinh(t*t);
+   t = sinh(t * t);
 
    t = tanh(t);
-   t = tanh(t*t);
+   t = tanh(t * t);
 
    double dval = 2;
-   t = pow(t, t);
-   t = pow(t, t*t);
-   t = pow(t, dval);
-   t = pow(t*t, t);
-   t = pow(t*t, t*t);
-   t = pow(t*t, dval);
-   t = pow(dval, t);
-   t = pow(dval, t*t);
+   t           = pow(t, t);
+   t           = pow(t, t * t);
+   t           = pow(t, dval);
+   t           = pow(t * t, t);
+   t           = pow(t * t, t * t);
+   t           = pow(t * t, dval);
+   t           = pow(dval, t);
+   t           = pow(dval, t * t);
 
    t = atan2(t, t);
-   t = atan2(t, t*t);
+   t = atan2(t, t * t);
    t = atan2(t, dval);
-   t = atan2(t*t, t);
-   t = atan2(t*t, t*t);
-   t = atan2(t*t, dval);
+   t = atan2(t * t, t);
+   t = atan2(t * t, t * t);
+   t = atan2(t * t, dval);
    t = atan2(dval, t);
-   t = atan2(dval, t*t);
+   t = atan2(dval, t * t);
 
    t = fmod(t, t);
-   t = fmod(t, t*t);
+   t = fmod(t, t * t);
    t = fmod(t, dval);
-   t = fmod(t*t, t);
-   t = fmod(t*t, t*t);
-   t = fmod(t*t, dval);
+   t = fmod(t * t, t);
+   t = fmod(t * t, t * t);
+   t = fmod(t * t, dval);
    t = fmod(dval, t);
-   t = fmod(dval, t*t);
+   t = fmod(dval, t * t);
 
-   typedef typename T::backend_type backend_type;
+   typedef typename T::backend_type             backend_type;
    typedef typename backend_type::exponent_type exp_type;
-   exp_type e = 0;
-   int i = 0;
+   exp_type                                     e = 0;
+   int                                          i = 0;
 
    t = ldexp(t, i);
-   t = ldexp(t*t, i);
+   t = ldexp(t * t, i);
    t = ldexp(t, e);
-   t = ldexp(t*t, e);
+   t = ldexp(t * t, e);
 
    t = frexp(t, &i);
-   t = frexp(t*t, &i);
+   t = frexp(t * t, &i);
    t = frexp(t, &e);
-   t = frexp(t*t, &e);
+   t = frexp(t * t, &e);
 
    t = scalbn(t, i);
-   t = scalbn(t*t, i);
+   t = scalbn(t * t, i);
    t = scalbn(t, e);
-   t = scalbn(t*t, e);
+   t = scalbn(t * t, e);
 
    t = logb(t);
-   t = logb(t*t);
+   t = logb(t * t);
    e = ilogb(t);
-   e = ilogb(t*t);
+   e = ilogb(t * t);
 }
 
 void foo()
@@ -252,5 +248,4 @@ int main()
    typedef boost::multiprecision::number<boost::multiprecision::logged_adaptor<boost::multiprecision::cpp_dec_float<50> > > num_t;
    test_extra(num_t());
 #endif
-
 }

@@ -18,26 +18,26 @@ void expected_results()
    //
 #ifdef BOOST_INTEL
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      "float128",                          // test type(s)
-      ".*",                          // test data group
-      "hermite", 70, 25);  // test function
+       ".*",               // compiler
+       ".*",               // stdlib
+       ".*",               // platform
+       "float128",         // test type(s)
+       ".*",               // test data group
+       "hermite", 70, 25); // test function
 #endif
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*",                          // test type(s)
-      ".*",                          // test data group
-      "hermite", 10, 5);  // test function
+       ".*",              // compiler
+       ".*",              // stdlib
+       ".*",              // platform
+       ".*",              // test type(s)
+       ".*",              // test data group
+       "hermite", 10, 5); // test function
    //
    // Finish off by printing out the compiler/stdlib/platform names,
    // we do this to make it easier to mark up expected error rates.
    //
    std::cout << "Tests run with " << BOOST_COMPILER << ", "
-      << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
+             << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
 }
 
 template <class T>
@@ -46,7 +46,7 @@ void test(T t, const char* p)
    test_hermite(t, p);
 }
 
-BOOST_AUTO_TEST_CASE( test_main )
+BOOST_AUTO_TEST_CASE(test_main)
 {
    using namespace boost::multiprecision;
    expected_results();
@@ -58,4 +58,3 @@ BOOST_AUTO_TEST_CASE( test_main )
    //
    ALL_TESTS
 }
-

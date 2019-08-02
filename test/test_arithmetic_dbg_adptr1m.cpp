@@ -4,7 +4,7 @@
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
 #define MIXED_OPS_ONLY
@@ -18,4 +18,3 @@ int main()
    test<boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::cpp_dec_float<50> > > >();
    return boost::report_errors();
 }
-

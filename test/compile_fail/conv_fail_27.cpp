@@ -11,6 +11,6 @@ using namespace boost::multiprecision;
 int main()
 {
    cpp_dec_float_50 a(2), b(3);
-   cpp_int i(3);
+   cpp_int          i(3);
    i |= a * b;
 }

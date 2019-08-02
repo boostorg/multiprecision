@@ -17,55 +17,55 @@ void expected_results()
    // various compilers and platforms.
    //
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*gmp_float<18>.*",             // test type(s)
-      ".*",                          // test data group
-      ".*", 2500, 1500);             // test function
+       ".*",                // compiler
+       ".*",                // stdlib
+       ".*",                // platform
+       ".*gmp_float<18>.*", // test type(s)
+       ".*",                // test data group
+       ".*", 2500, 1500);   // test function
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*mpfr_float_backend<18>.*",  // test type(s)
-      ".*",                          // test data group
-      ".*", 1000, 500);              // test function
+       ".*",                         // compiler
+       ".*",                         // stdlib
+       ".*",                         // platform
+       ".*mpfr_float_backend<18>.*", // test type(s)
+       ".*",                         // test data group
+       ".*", 1000, 500);             // test function
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*gmp_float.*",               // test type(s)
-      ".*",                          // test data group
-      ".*", 250, 100);               // test function
+       ".*",            // compiler
+       ".*",            // stdlib
+       ".*",            // platform
+       ".*gmp_float.*", // test type(s)
+       ".*",            // test data group
+       ".*", 250, 100); // test function
 #ifdef BOOST_INTEL
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      "float128",               // test type(s)
-      ".*",                          // test data group
-      ".*", 4500, 1000);               // test function
+       ".*",              // compiler
+       ".*",              // stdlib
+       ".*",              // platform
+       "float128",        // test type(s)
+       ".*",              // test data group
+       ".*", 4500, 1000); // test function
 #endif
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*cpp_bin_float.*",           // test type(s)
-      ".*",                          // test data group
-      ".*", 5000, 2000);                // test function
+       ".*",                // compiler
+       ".*",                // stdlib
+       ".*",                // platform
+       ".*cpp_bin_float.*", // test type(s)
+       ".*",                // test data group
+       ".*", 5000, 2000);   // test function
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*",                          // test type(s)
-      ".*",                          // test data group
-      ".*", 250, 50);                // test function
+       ".*",           // compiler
+       ".*",           // stdlib
+       ".*",           // platform
+       ".*",           // test type(s)
+       ".*",           // test data group
+       ".*", 250, 50); // test function
    //
    // Finish off by printing out the compiler/stdlib/platform names,
    // we do this to make it easier to mark up expected error rates.
    //
    std::cout << "Tests run with " << BOOST_COMPILER << ", "
-      << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
+             << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
 }
 
 template <class T>
@@ -74,7 +74,7 @@ void test(T t, const char* p)
    test_expint(t, p);
 }
 
-BOOST_AUTO_TEST_CASE( test_main )
+BOOST_AUTO_TEST_CASE(test_main)
 {
    using namespace boost::multiprecision;
    expected_results();
@@ -86,4 +86,3 @@ BOOST_AUTO_TEST_CASE( test_main )
    //
    ALL_TESTS
 }
-

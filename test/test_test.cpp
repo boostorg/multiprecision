@@ -4,7 +4,7 @@
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
 #include "test.hpp"
@@ -27,17 +27,17 @@ int main()
    --boost::detail::test_errors();
 
    boost::multiprecision::cpp_dec_float_50 a_tol = a1 + a1 * 100 * std::numeric_limits<boost::multiprecision::cpp_dec_float_50>::epsilon();
-   boost::multiprecision::cpp_dec_float_50 tol = 100 * std::numeric_limits<boost::multiprecision::cpp_dec_float_50>::epsilon();
+   boost::multiprecision::cpp_dec_float_50 tol   = 100 * std::numeric_limits<boost::multiprecision::cpp_dec_float_50>::epsilon();
 
-   BOOST_CHECK_CLOSE(a1, a_tol, tol * 102);  // Passes
-   BOOST_WARN_CLOSE(a1, a_tol, tol * 98);    // fails
-   BOOST_CHECK_CLOSE(a1, a_tol, tol * 98);    // fails
+   BOOST_CHECK_CLOSE(a1, a_tol, tol * 102); // Passes
+   BOOST_WARN_CLOSE(a1, a_tol, tol * 98);   // fails
+   BOOST_CHECK_CLOSE(a1, a_tol, tol * 98);  // fails
    BOOST_CHECK(boost::detail::test_errors() == 1);
    --boost::detail::test_errors();
 
-   BOOST_CHECK_CLOSE_FRACTION(a1, a_tol, tol * 1.02);  // Passes
-   BOOST_WARN_CLOSE_FRACTION(a1, a_tol, tol * 0.98);    // fails
-   BOOST_CHECK_CLOSE_FRACTION(a1, a_tol, tol * 0.98);    // fails
+   BOOST_CHECK_CLOSE_FRACTION(a1, a_tol, tol * 1.02); // Passes
+   BOOST_WARN_CLOSE_FRACTION(a1, a_tol, tol * 0.98);  // fails
+   BOOST_CHECK_CLOSE_FRACTION(a1, a_tol, tol * 0.98); // fails
    BOOST_CHECK(boost::detail::test_errors() == 1);
    --boost::detail::test_errors();
 
@@ -81,11 +81,10 @@ int main()
 
 #ifndef BOOST_NO_EXCEPTIONS
    BOOST_CHECK_THROW(proc_that_throws(), std::runtime_error);
-   BOOST_CHECK_THROW(a1+b+c, std::runtime_error);
+   BOOST_CHECK_THROW(a1 + b + c, std::runtime_error);
 #endif
    BOOST_CHECK(boost::detail::test_errors() == 1);
    --boost::detail::test_errors();
 
    return boost::report_errors();
 }
-

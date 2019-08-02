@@ -15,4 +15,3 @@ int main()
    test<boost::multiprecision::number<boost::multiprecision::complex_adaptor<boost::multiprecision::cpp_bin_float<50> >, boost::multiprecision::et_on> >();
    return boost::report_errors();
 }
-

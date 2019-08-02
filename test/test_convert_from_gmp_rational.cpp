@@ -4,7 +4,7 @@
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
 #if defined(HAS_GMP)
@@ -29,40 +29,39 @@
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
-
 using namespace boost::multiprecision;
 
 #ifdef BOOST_MSVC
-#pragma warning(disable:4127)
+#pragma warning(disable : 4127)
 #endif
-
 
 template <class T>
 T generate_random_int(unsigned bits_wanted)
 {
-   static boost::random::mt19937 gen;
+   static boost::random::mt19937               gen;
    typedef boost::random::mt19937::result_type random_type;
 
-   T max_val;
+   T        max_val;
    unsigned digits;
-   if(std::numeric_limits<T>::is_bounded && (bits_wanted == (unsigned)std::numeric_limits<T>::digits))
+   if (std::numeric_limits<T>::is_bounded && (bits_wanted == (unsigned)std::numeric_limits<T>::digits))
    {
       max_val = (std::numeric_limits<T>::max)();
-      digits = std::numeric_limits<T>::digits;
+      digits  = std::numeric_limits<T>::digits;
    }
    else
    {
       max_val = T(1) << bits_wanted;
-      digits = bits_wanted;
+      digits  = bits_wanted;
    }
 
    unsigned bits_per_r_val = std::numeric_limits<random_type>::digits - 1;
-   while((random_type(1) << bits_per_r_val) > (gen.max)()) --bits_per_r_val;
+   while ((random_type(1) << bits_per_r_val) > (gen.max)())
+      --bits_per_r_val;
 
    unsigned terms_needed = digits / bits_per_r_val + 1;
 
    T val = 0;
-   for(unsigned i = 0; i < terms_needed; ++i)
+   for (unsigned i = 0; i < terms_needed; ++i)
    {
       val *= (gen.max)();
       val += gen();
@@ -75,17 +74,17 @@ template <class T>
 T generate_random(unsigned bits_wanted)
 {
    typedef typename component_type<T>::type int_type;
-   T val(generate_random_int<int_type>(bits_wanted), generate_random_int<int_type>(bits_wanted));
+   T                                        val(generate_random_int<int_type>(bits_wanted), generate_random_int<int_type>(bits_wanted));
    return val;
 }
 
 template <class From, class To>
 void test_convert_neg_val(From from, const boost::mpl::true_&)
 {
-   from = -from;
+   from                                       = -from;
    typename component_type<From>::type answer = numerator(from) / denominator(from);
-   To t3(from);
-   To t4 = from.template convert_to<To>();
+   To                                  t3(from);
+   To                                  t4 = from.template convert_to<To>();
    BOOST_CHECK_EQUAL(answer.str(), t3.str());
    BOOST_CHECK_EQUAL(answer.str(), t4.str());
 }
@@ -99,22 +98,22 @@ void test_convert_imp(boost::mpl::int_<number_kind_rational> const&, boost::mpl:
 {
    int bits_wanted = (std::min)((std::min)(std::numeric_limits<From>::digits, std::numeric_limits<To>::digits), 2000);
 
-   for(unsigned i = 0; i < 100; ++i)
+   for (unsigned i = 0; i < 100; ++i)
    {
-      From from = generate_random<From>(bits_wanted);
+      From                                from   = generate_random<From>(bits_wanted);
       typename component_type<From>::type answer = numerator(from) / denominator(from);
-      To t1(from);
-      To t2 = from.template convert_to<To>();
+      To                                  t1(from);
+      To                                  t2 = from.template convert_to<To>();
       BOOST_CHECK_EQUAL(answer.str(), t1.str());
       BOOST_CHECK_EQUAL(answer.str(), t2.str());
-      test_convert_neg_val<From, To>(from, boost::mpl::bool_<std::numeric_limits<From>::is_signed && std::numeric_limits<To>::is_signed>());
+      test_convert_neg_val<From, To>(from, boost::mpl::bool_ < std::numeric_limits<From>::is_signed && std::numeric_limits<To>::is_signed > ());
    }
 }
 
 template <class From, class To>
 void test_convert_neg_float_val(From from, To const& tol, const boost::mpl::true_&)
 {
-   from = -from;
+   from      = -from;
    To answer = To(numerator(from)) / To(denominator(from));
    To t3(from);
    To t4 = from.template convert_to<To>();
@@ -131,17 +130,17 @@ void test_convert_imp(boost::mpl::int_<number_kind_rational> const&, boost::mpl:
 {
    int bits_wanted = (std::min)((std::min)(std::numeric_limits<From>::digits, std::numeric_limits<To>::digits), 2000);
 
-   for(unsigned i = 0; i < 100; ++i)
+   for (unsigned i = 0; i < 100; ++i)
    {
-      From from = generate_random<From>(bits_wanted);
-      To answer = To(numerator(from)) / To(denominator(from));
-      To t1(from);
-      To t2 = from.template convert_to<To>();
-      To tol = std::numeric_limits<To>::is_specialized ? std::numeric_limits<To>::epsilon() : ldexp(To(1), 1 - bits_wanted);
+      From from   = generate_random<From>(bits_wanted);
+      To   answer = To(numerator(from)) / To(denominator(from));
+      To   t1(from);
+      To   t2  = from.template convert_to<To>();
+      To   tol = std::numeric_limits<To>::is_specialized ? std::numeric_limits<To>::epsilon() : ldexp(To(1), 1 - bits_wanted);
       tol *= 2;
       BOOST_CHECK_CLOSE_FRACTION(answer, t1, tol);
       BOOST_CHECK_CLOSE_FRACTION(answer, t2, tol);
-      test_convert_neg_float_val<From, To>(from, tol, boost::mpl::bool_<std::numeric_limits<From>::is_signed && std::numeric_limits<To>::is_signed>());
+      test_convert_neg_float_val<From, To>(from, tol, boost::mpl::bool_ < std::numeric_limits<From>::is_signed && std::numeric_limits<To>::is_signed > ());
    }
 }
 
@@ -164,26 +163,22 @@ void test_convert_imp(boost::mpl::int_<number_kind_rational> const&, boost::mpl:
 {
    int bits_wanted = (std::min)((std::min)(std::numeric_limits<From>::digits, std::numeric_limits<To>::digits), 2000);
 
-   for(unsigned i = 0; i < 100; ++i)
+   for (unsigned i = 0; i < 100; ++i)
    {
       From from = generate_random<From>(bits_wanted);
-      To t1(from);
-      To t2 = from.template convert_to<To>();
+      To   t1(from);
+      To   t2 = from.template convert_to<To>();
       BOOST_CHECK_EQUAL(from.str(), t1.str());
       BOOST_CHECK_EQUAL(from.str(), t2.str());
-      test_convert_neg_rat_val<From, To>(from, boost::mpl::bool_<std::numeric_limits<From>::is_signed && std::numeric_limits<To>::is_signed>());
+      test_convert_neg_rat_val<From, To>(from, boost::mpl::bool_ < std::numeric_limits<From>::is_signed && std::numeric_limits<To>::is_signed > ());
    }
 }
-
-
-
 
 template <class From, class To>
 void test_convert()
 {
    test_convert_imp<From, To>(typename number_category<From>::type(), typename number_category<To>::type());
 }
-
 
 int main()
 {

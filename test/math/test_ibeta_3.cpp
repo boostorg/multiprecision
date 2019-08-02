@@ -19,32 +19,32 @@ void expected_results()
    // various compilers and platforms.
    //
    add_expected_result(
-      "[^|]*",                          // compiler
-      "[^|]*",                          // stdlib
-      "[^|]*",                          // platform
-      ".*",                             // test type(s)
-      "(?i).*small.*",                  // test data group
-      ".*", 90, 25);  // test function
+       "[^|]*",         // compiler
+       "[^|]*",         // stdlib
+       "[^|]*",         // platform
+       ".*",            // test type(s)
+       "(?i).*small.*", // test data group
+       ".*", 90, 25);   // test function
    add_expected_result(
-      "[^|]*",                          // compiler
-      "[^|]*",                          // stdlib
-      "[^|]*",                          // platform
-      ".*",                             // test type(s)
-      "(?i).*medium.*",                 // test data group
-      ".*", 200, 50);  // test function
+       "[^|]*",          // compiler
+       "[^|]*",          // stdlib
+       "[^|]*",          // platform
+       ".*",             // test type(s)
+       "(?i).*medium.*", // test data group
+       ".*", 200, 50);   // test function
    add_expected_result(
-      "[^|]*",                          // compiler
-      "[^|]*",                          // stdlib
-      "[^|]*",                          // platform
-      ".*",                             // test type(s)
-      "(?i).*large.*",                  // test data group
-      ".*", 6000000, 500000);           // test function
+       "[^|]*",                // compiler
+       "[^|]*",                // stdlib
+       "[^|]*",                // platform
+       ".*",                   // test type(s)
+       "(?i).*large.*",        // test data group
+       ".*", 6000000, 500000); // test function
    //
    // Finish off by printing out the compiler/stdlib/platform names,
    // we do this to make it easier to mark up expected error rates.
    //
    std::cout << "Tests run with " << BOOST_COMPILER << ", "
-      << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
+             << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
 }
 
 template <class T>
@@ -53,7 +53,7 @@ void test(T t, const char* p)
    test_beta(t, p);
 }
 
-BOOST_AUTO_TEST_CASE( test_main )
+BOOST_AUTO_TEST_CASE(test_main)
 {
    using namespace boost::multiprecision;
    expected_results();
@@ -65,4 +65,3 @@ BOOST_AUTO_TEST_CASE( test_main )
    //
    ALL_TESTS
 }
-

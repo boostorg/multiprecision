@@ -8,7 +8,7 @@
 //
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
 #include <boost/multiprecision/cpp_int.hpp>
@@ -31,29 +31,30 @@
 template <class T>
 T generate_random(unsigned bits_wanted)
 {
-   static boost::random::mt19937 gen;
+   static boost::random::mt19937               gen;
    typedef boost::random::mt19937::result_type random_type;
 
-   T max_val;
+   T        max_val;
    unsigned digits;
-   if(std::numeric_limits<T>::is_bounded && (bits_wanted == (unsigned)std::numeric_limits<T>::digits))
+   if (std::numeric_limits<T>::is_bounded && (bits_wanted == (unsigned)std::numeric_limits<T>::digits))
    {
       max_val = (std::numeric_limits<T>::max)();
-      digits = std::numeric_limits<T>::digits;
+      digits  = std::numeric_limits<T>::digits;
    }
    else
    {
       max_val = T(1) << bits_wanted;
-      digits = bits_wanted;
+      digits  = bits_wanted;
    }
 
    unsigned bits_per_r_val = std::numeric_limits<random_type>::digits - 1;
-   while((random_type(1) << bits_per_r_val) > (gen.max)()) --bits_per_r_val;
+   while ((random_type(1) << bits_per_r_val) > (gen.max)())
+      --bits_per_r_val;
 
    unsigned terms_needed = digits / bits_per_r_val + 1;
 
    T val = 0;
-   for(unsigned i = 0; i < terms_needed; ++i)
+   for (unsigned i = 0; i < terms_needed; ++i)
    {
       val *= (gen.max)();
       val += gen();
@@ -67,13 +68,14 @@ void test_neg(const T& x, const boost::mpl::true_&)
 {
    T val = -x;
 #ifndef BOOST_NO_EXCEPTIONS
-   try{
+   try
+   {
 #endif
-      std::stringstream ss;
+      std::stringstream             ss;
       boost::archive::text_oarchive oa(ss);
       oa << static_cast<const T&>(val);
       boost::archive::text_iarchive ia(ss);
-      T val2;
+      T                             val2;
       ia >> val2;
       BOOST_CHECK_EQUAL(val, val2);
 
@@ -85,12 +87,12 @@ void test_neg(const T& x, const boost::mpl::true_&)
       BOOST_CHECK_EQUAL(val, val2);
 #ifndef BOOST_NO_EXCEPTIONS
    }
-   catch(const boost::exception& e)
+   catch (const boost::exception& e)
    {
       std::cout << "Caught boost::exception with:\n";
       std::cout << diagnostic_information(e);
    }
-   catch(const std::exception& e)
+   catch (const std::exception& e)
    {
       std::cout << "Caught std::exception with:\n";
       std::cout << e.what() << std::endl;
@@ -98,7 +100,7 @@ void test_neg(const T& x, const boost::mpl::true_&)
 #endif
 }
 template <class T>
-void test_neg(const T& , const boost::mpl::false_&){}
+void test_neg(const T&, const boost::mpl::false_&) {}
 
 template <class T>
 void test()
@@ -106,10 +108,10 @@ void test()
    using namespace boost::multiprecision;
 
    boost::random::mt19937 gen;
-   boost::uniform_int<> d(3, std::numeric_limits<T>::is_bounded ? std::numeric_limits<T>::digits : 3000);
-   boost::timer tim;
+   boost::uniform_int<>   d(3, std::numeric_limits<T>::is_bounded ? std::numeric_limits<T>::digits : 3000);
+   boost::timer           tim;
 
-   while(true)
+   while (true)
    {
       T val = generate_random<T>(d(gen));
 #ifndef BOOST_NO_EXCEPTIONS
@@ -118,7 +120,7 @@ void test()
 #endif
          T val2;
          {
-            std::stringstream ss;
+            std::stringstream             ss;
             boost::archive::text_oarchive oa(ss);
             oa << static_cast<const T&>(val);
             boost::archive::text_iarchive ia(ss);
@@ -126,7 +128,7 @@ void test()
             BOOST_CHECK_EQUAL(val, val2);
          }
          {
-            std::stringstream ss;
+            std::stringstream               ss;
             boost::archive::binary_oarchive ob(ss);
             ob << static_cast<const T&>(val);
             boost::archive::binary_iarchive ib(ss);
@@ -146,17 +148,17 @@ void test()
 
 #ifndef BOOST_NO_EXCEPTIONS
       }
-      catch(const boost::exception& e)
+      catch (const boost::exception& e)
       {
          std::cout << "Caught boost::exception with:\n";
          std::cout << diagnostic_information(e);
       }
-      catch(const std::exception& e)
+      catch (const std::exception& e)
       {
          std::cout << "Caught std::exception with:\n";
          std::cout << e.what() << std::endl;
       }
-#endif      
+#endif
       test_neg(val, boost::mpl::bool_<std::numeric_limits<T>::is_signed>());
       //
       // Check to see if test is taking too long.
@@ -164,9 +166,9 @@ void test()
       // so don't get too close to that:
       //
 #ifndef CI_SUPPRESS_KNOWN_ISSUES
-      if(tim.elapsed() > 150)
+      if (tim.elapsed() > 150)
 #else
-      if(tim.elapsed() > 25)
+      if (tim.elapsed() > 25)
 #endif
       {
          std::cout << "Timeout reached, aborting tests now....\n";
@@ -176,10 +178,10 @@ void test()
 }
 
 #if !defined(TEST1) && !defined(TEST2) && !defined(TEST3) && !defined(TEST4)
-#  define TEST1
-#  define TEST2
-#  define TEST3
-#  define TEST4
+#define TEST1
+#define TEST2
+#define TEST3
+#define TEST4
 #endif
 
 int main()
@@ -199,6 +201,3 @@ int main()
 #endif
    return boost::report_errors();
 }
-
-
-

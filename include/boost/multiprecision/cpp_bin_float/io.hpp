@@ -19,7 +19,7 @@ namespace cpp_bf_io_detail {
 // returns by how much the result was shifted.
 //
 template <class I>
-inline I restricted_multiply(cpp_int &result, const cpp_int &a, const cpp_int &b, I max_bits, boost::int64_t &error)
+inline I restricted_multiply(cpp_int& result, const cpp_int& a, const cpp_int& b, I max_bits, boost::int64_t& error)
 {
    result   = a * b;
    I gb     = msb(result);
@@ -56,7 +56,7 @@ inline I restricted_multiply(cpp_int &result, const cpp_int &a, const cpp_int &b
 // to the right we are shifted.
 //
 template <class I>
-inline I restricted_pow(cpp_int &result, const cpp_int &a, I e, I max_bits, boost::int64_t &error)
+inline I restricted_pow(cpp_int& result, const cpp_int& a, I e, I max_bits, boost::int64_t& error)
 {
    BOOST_ASSERT(&result != &a);
    I exp = 0;
@@ -84,7 +84,7 @@ inline I restricted_pow(cpp_int &result, const cpp_int &a, I e, I max_bits, boos
    return exp;
 }
 
-inline int get_round_mode(const cpp_int &what, boost::int64_t location, boost::int64_t error)
+inline int get_round_mode(const cpp_int& what, boost::int64_t location, boost::int64_t error)
 {
    //
    // Can we round what at /location/, if the error in what is /error/ in
@@ -119,7 +119,7 @@ inline int get_round_mode(const cpp_int &what, boost::int64_t location, boost::i
    return 0;
 }
 
-inline int get_round_mode(cpp_int &r, cpp_int &d, boost::int64_t error, const cpp_int &q)
+inline int get_round_mode(cpp_int& r, cpp_int& d, boost::int64_t error, const cpp_int& q)
 {
    //
    // Lets suppose we have an inexact division by d+delta, where the true
@@ -170,7 +170,7 @@ inline int get_round_mode(cpp_int &r, cpp_int &d, boost::int64_t error, const cp
 namespace backends {
 
 template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
-cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> &cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::operator=(const char *s)
+cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::operator=(const char* s)
 {
    cpp_int                      n;
    boost::intmax_t              decimal_exp     = 0;
