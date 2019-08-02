@@ -6,7 +6,7 @@
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
 #include <boost/multiprecision/cpp_int.hpp>
@@ -19,17 +19,19 @@
 #include <iomanip>
 
 #ifdef BOOST_MSVC
-#pragma warning(disable:4127)
+#pragma warning(disable : 4127)
 #endif
 template <class T>
-struct unchecked_type { typedef T type; };
+struct unchecked_type
+{
+   typedef T type;
+};
 
 template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
 struct unchecked_type<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates> >
 {
    typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, boost::multiprecision::unchecked, Allocator>, ExpressionTemplates> type;
 };
-
 
 template <class T>
 T generate_random()
@@ -39,10 +41,10 @@ T generate_random()
    static const unsigned limbs = std::numeric_limits<T>::is_specialized && std::numeric_limits<T>::is_bounded ? std::numeric_limits<T>::digits / std::numeric_limits<unsigned>::digits + 3 : 20;
 
    static boost::random::uniform_int_distribution<unsigned> ui(0, limbs);
-   static boost::random::mt19937 gen;
-   unchecked_T val = gen();
-   unsigned lim = ui(gen);
-   for(unsigned i = 0; i < lim; ++i)
+   static boost::random::mt19937                            gen;
+   unchecked_T                                              val = gen();
+   unsigned                                                 lim = ui(gen);
+   for (unsigned i = 0; i < lim; ++i)
    {
       val *= (gen.max)();
       val += gen();
@@ -55,7 +57,7 @@ void test_round_trip_neg(T val, const boost::mpl::true_&)
 {
    // Try some negative values:
    std::vector<unsigned char> cv;
-   T newval;
+   T                          newval;
    val = -val;
    export_bits(val, std::back_inserter(cv), 8, false);
    import_bits(newval, cv.begin(), cv.end(), 8, false);
@@ -143,13 +145,13 @@ void test_round_trip()
 {
    std::cout << std::hex;
    std::cerr << std::hex;
-   for(unsigned i = 0; i < 1000; ++i)
+   for (unsigned i = 0; i < 1000; ++i)
    {
       T val = generate_random<T>();
       test_round_trip(val);
    }
    //
-   // Bug cases. 
+   // Bug cases.
    // See https://github.com/boostorg/multiprecision/issues/21
    T bug(1);
    bug << std::numeric_limits<T>::digits - 1;
@@ -161,9 +163,8 @@ int main()
 {
    test_round_trip<boost::multiprecision::cpp_int>();
    test_round_trip<boost::multiprecision::checked_int1024_t>();
-   test_round_trip<boost::multiprecision::checked_uint512_t >();
+   test_round_trip<boost::multiprecision::checked_uint512_t>();
    test_round_trip<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, 64, boost::multiprecision::unsigned_magnitude, boost::multiprecision::checked, void> > >();
    test_round_trip<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<23, 23, boost::multiprecision::unsigned_magnitude, boost::multiprecision::checked, void> > >();
    return boost::report_errors();
 }
-

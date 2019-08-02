@@ -16,16 +16,16 @@
 #include <boost/optional/optional.hpp>
 #include <boost/core/lightweight_test.hpp>
 
-inline boost::optional< boost::multiprecision::int128_t > foo()
+inline boost::optional<boost::multiprecision::int128_t> foo()
 {
-    return boost::optional< boost::multiprecision::int128_t >(10);
+   return boost::optional<boost::multiprecision::int128_t>(10);
 }
 
 int main()
 {
-    boost::optional< boost::multiprecision::int128_t > num = foo();
-    BOOST_TEST(!!num);
-    BOOST_TEST(*num == 10);
+   boost::optional<boost::multiprecision::int128_t> num = foo();
+   BOOST_TEST(!!num);
+   BOOST_TEST(*num == 10);
 
-    return boost::report_errors();
+   return boost::report_errors();
 }

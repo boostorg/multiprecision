@@ -11,5 +11,3 @@ int main()
 {
    mpfr_float a;
 }
-
-

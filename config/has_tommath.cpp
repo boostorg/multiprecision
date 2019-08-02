@@ -5,13 +5,11 @@
 
 #include <tommath.h>
 
-
 int main()
 {
    mp_int v;
    mp_init(&v);
-   if(v.dp)
+   if (v.dp)
       mp_clear(&v);
    return 0;
 }
-

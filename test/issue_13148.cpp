@@ -3,7 +3,6 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/multiprecision/cpp_bin_float.hpp>
@@ -11,14 +10,14 @@
 boost::multiprecision::cpp_rational rationalfromStr(const char* str)
 {
    boost::multiprecision::cpp_dec_float_50 d1(str);
-   boost::multiprecision::cpp_rational result(d1); // <--- eats CPU forever
+   boost::multiprecision::cpp_rational     result(d1); // <--- eats CPU forever
    return result;
 }
 
 boost::multiprecision::cpp_rational rationalfromStr2(const char* str)
 {
    boost::multiprecision::cpp_bin_float_50 d1(str);
-   boost::multiprecision::cpp_rational result(d1); // <--- eats CPU forever
+   boost::multiprecision::cpp_rational     result(d1); // <--- eats CPU forever
    return result;
 }
 
@@ -55,7 +54,7 @@ int main()
       boost::multiprecision::cpp_rational expected = 0;
       // reacheble code
       assert(expected == rationalfromStr2("0")); // cpp_rational from cpp_dec_float_50 is not ok
-                                                // unreacheble code
+                                                 // unreacheble code
    }
    return 0;
 }

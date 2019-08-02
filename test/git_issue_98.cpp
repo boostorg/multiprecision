@@ -3,7 +3,6 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
@@ -21,7 +20,10 @@
 #include <boost/multiprecision/mpc.hpp>
 #endif
 
-struct A { virtual void g() = 0; };
+struct A
+{
+   virtual void g() = 0;
+};
 
 void f(A&);
 void f(boost::multiprecision::cpp_bin_float_50);
@@ -44,7 +46,7 @@ void f(boost::multiprecision::mpfr_float);
 void f(boost::multiprecision::mpc_complex);
 #endif
 
-void h(A&a)
+void h(A& a)
 {
    f(a);
 }

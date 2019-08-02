@@ -11,4 +11,3 @@
 //#define BOOST_MATH_TEST_TYPE double
 //#define TEST_GROUP_1
 #include "../../../../math/test/test_instances/test_instances.hpp"
-

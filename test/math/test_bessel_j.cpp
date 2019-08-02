@@ -22,81 +22,81 @@ void expected_results()
    //
 
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*mpfr_float_backend<18>.*",          // test type(s)
-      ".*J0.*Tricky.*",              // test data group
-      ".*", 10000000000L, 5000000000L); // test function
+       ".*",                             // compiler
+       ".*",                             // stdlib
+       ".*",                             // platform
+       ".*mpfr_float_backend<18>.*",     // test type(s)
+       ".*J0.*Tricky.*",                 // test data group
+       ".*", 10000000000L, 5000000000L); // test function
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*",                  // test type(s)
-      ".*J0.*Tricky.*",              // test data group
-      ".*", 400000000, 400000000);   // test function
+       ".*",                        // compiler
+       ".*",                        // stdlib
+       ".*",                        // platform
+       ".*",                        // test type(s)
+       ".*J0.*Tricky.*",            // test data group
+       ".*", 400000000, 400000000); // test function
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*mpfr_float_backend<18>.*",          // test type(s)
-      ".*J1.*Tricky.*",              // test data group
-      ".*", 1000000000L, 500000000L);  // test function
+       ".*",                           // compiler
+       ".*",                           // stdlib
+       ".*",                           // platform
+       ".*mpfr_float_backend<18>.*",   // test type(s)
+       ".*J1.*Tricky.*",               // test data group
+       ".*", 1000000000L, 500000000L); // test function
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*",                  // test type(s)
-      ".*J1.*Tricky.*",              // test data group
-      ".*", 10000000, 5000000);       // test function
+       ".*",                     // compiler
+       ".*",                     // stdlib
+       ".*",                     // platform
+       ".*",                     // test type(s)
+       ".*J1.*Tricky.*",         // test data group
+       ".*", 10000000, 5000000); // test function
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*cpp_bin_float.*",                  // test type(s)
-      ".*JN.*Integer.*",              // test data group
-      ".*", 500000, 150000);       // test function
+       ".*",                  // compiler
+       ".*",                  // stdlib
+       ".*",                  // platform
+       ".*cpp_bin_float.*",   // test type(s)
+       ".*JN.*Integer.*",     // test data group
+       ".*", 500000, 150000); // test function
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*",                  // test type(s)
-      ".*JN.*Integer.*",              // test data group
-      ".*", 50000, 15000);       // test function
+       ".*",                // compiler
+       ".*",                // stdlib
+       ".*",                // platform
+       ".*",                // test type(s)
+       ".*JN.*Integer.*",   // test data group
+       ".*", 50000, 15000); // test function
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*mpfr_float_backend<18>.*",  // test type(s)
-      ".*(JN|j).*|.*Tricky.*",       // test data group
-      ".*", 70000, 7000);               // test function
+       ".*",                         // compiler
+       ".*",                         // stdlib
+       ".*",                         // platform
+       ".*mpfr_float_backend<18>.*", // test type(s)
+       ".*(JN|j).*|.*Tricky.*",      // test data group
+       ".*", 70000, 7000);           // test function
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*cpp_bin_float.*",           // test type(s)
-      ".*(JN|j).*|.*Tricky.*",       // test data group
-      ".*", 500000, 200000);               // test function
+       ".*",                    // compiler
+       ".*",                    // stdlib
+       ".*",                    // platform
+       ".*cpp_bin_float.*",     // test type(s)
+       ".*(JN|j).*|.*Tricky.*", // test data group
+       ".*", 500000, 200000);   // test function
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*",                  // test type(s)
-      ".*(JN|j).*|.*Tricky.*",       // test data group
-      ".*", 7000, 3000);               // test function
+       ".*",                    // compiler
+       ".*",                    // stdlib
+       ".*",                    // platform
+       ".*",                    // test type(s)
+       ".*(JN|j).*|.*Tricky.*", // test data group
+       ".*", 7000, 3000);       // test function
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*",                  // test type(s)
-      ".*",                          // test data group
-      ".*", 40, 20);                 // test function
+       ".*",          // compiler
+       ".*",          // stdlib
+       ".*",          // platform
+       ".*",          // test type(s)
+       ".*",          // test data group
+       ".*", 40, 20); // test function
    //
    // Finish off by printing out the compiler/stdlib/platform names,
    // we do this to make it easier to mark up expected error rates.
    //
    std::cout << "Tests run with " << BOOST_COMPILER << ", "
-      << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
+             << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
 }
 
 template <class T>
@@ -105,8 +105,7 @@ void test(T t, const char* p)
    test_bessel(t, p);
 }
 
-
-BOOST_AUTO_TEST_CASE( test_main )
+BOOST_AUTO_TEST_CASE(test_main)
 {
    using namespace boost::multiprecision;
    expected_results();
@@ -118,6 +117,3 @@ BOOST_AUTO_TEST_CASE( test_main )
    //
    ALL_TESTS
 }
-
-
-

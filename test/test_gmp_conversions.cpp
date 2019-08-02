@@ -9,7 +9,7 @@
 // in ACM TOMS, {VOL 37, ISSUE 4, (February 2011)} (C) ACM, 2011. http://doi.acm.org/10.1145/1916461.1916469
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
 #include <boost/detail/lightweight_test.hpp>
@@ -41,7 +41,7 @@ int main()
    BOOST_TEST(mpf_float(mpq) == 2);
    BOOST_TEST(mpf_float_50(mpq) == 2);
 
-   mpf_float f0;
+   mpf_float    f0;
    mpf_float_50 f50;
    f0 = mpf;
    BOOST_TEST(f0 == 2);
@@ -62,16 +62,16 @@ int main()
    BOOST_TEST(f50 == 2);
 
    f50 = 4;
-   f0 = f50;
+   f0  = f50;
    BOOST_TEST(f0 == 4);
-   f0 = 3;
+   f0  = 3;
    f50 = f0;
    BOOST_TEST(f50 == 3);
    f50 = 4;
    BOOST_TEST(mpf_float(f50) == 4);
    BOOST_TEST(mpf_float_50(f0) == 3);
 
-   mpz_int iz(2);
+   mpz_int      iz(2);
    mpq_rational rat(2);
    f50 = iz;
    BOOST_TEST(f50 == 2);
@@ -86,15 +86,15 @@ int main()
    BOOST_TEST(mpz_int(mpz) == 2);
    BOOST_TEST(mpz_int(mpq) == 2);
    iz = 3;
-   iz = mpz_int(mpf);  // explicit conversion only
+   iz = mpz_int(mpf); // explicit conversion only
    BOOST_TEST(iz == 2);
    iz = 3;
    iz = mpz;
    BOOST_TEST(iz == 2);
    iz = 4;
-   iz = mpz_int(mpq);  // explicit conversion only
+   iz = mpz_int(mpq); // explicit conversion only
    BOOST_TEST(iz == 2);
-   f0 = 2;
+   f0  = 2;
    f50 = 2;
 
    BOOST_TEST(mpz_int(f0) == 2);
@@ -135,9 +135,9 @@ int main()
    //
    mpf_float::default_precision(30);
    f50 = 2;
-   mpf_float_100   f100(3);
-   mpf_float       f0a(4);
-   mpf_float       f0b(f100);
+   mpf_float_100 f100(3);
+   mpf_float     f0a(4);
+   mpf_float     f0b(f100);
    BOOST_TEST(f0a.precision() >= 30);
    BOOST_TEST(f0b.precision() >= 100);
    f0a = f100;
@@ -146,13 +146,10 @@ int main()
 
    f100 = f50;
    BOOST_TEST(f100 == 2);
-   
+
    mpf_clear(mpf);
    mpz_clear(mpz);
    mpq_clear(mpq);
 
    return boost::report_errors();
 }
-
-
-

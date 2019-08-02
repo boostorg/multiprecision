@@ -18,23 +18,23 @@
 #include <boost/type_traits/is_unsigned.hpp>
 #include <boost/multiprecision/number.hpp>
 
-namespace detail{
+namespace detail {
 
 template <class T>
-inline typename boost::disable_if_c<boost::is_unsigned<T>::value || boost::multiprecision::is_unsigned_number<T>::value, T>::type 
-   abs(const T& a)
+inline typename boost::disable_if_c<boost::is_unsigned<T>::value || boost::multiprecision::is_unsigned_number<T>::value, T>::type
+abs(const T& a)
 {
    return a < 0 ? -a : a;
 }
 
 template <class T>
-inline typename boost::enable_if_c<boost::is_unsigned<T>::value || boost::multiprecision::is_unsigned_number<T>::value, T>::type 
-   abs(const T& a)
+inline typename boost::enable_if_c<boost::is_unsigned<T>::value || boost::multiprecision::is_unsigned_number<T>::value, T>::type
+abs(const T& a)
 {
    return a;
 }
 
-}
+} // namespace detail
 
 template <class T>
 typename boost::enable_if_c<boost::multiprecision::number_category<T>::value == boost::multiprecision::number_kind_integer, T>::type relative_error(T a, T b)
@@ -45,50 +45,50 @@ typename boost::enable_if_c<boost::multiprecision::number_category<T>::value == 
 template <class T>
 typename boost::disable_if_c<(boost::multiprecision::number_category<T>::value == boost::multiprecision::number_kind_integer) || boost::multiprecision::is_interval_number<T>::value, T>::type relative_error(T a, T b)
 {
-   using std::abs;
    using ::detail::abs;
+   using std::abs;
 
    T min_val = (std::numeric_limits<T>::min)();
    T max_val = (std::numeric_limits<T>::max)();
 
-   if((a != 0) && (b != 0))
+   if ((a != 0) && (b != 0))
    {
-      if(a == b)
+      if (a == b)
          return 0;
 
       // TODO: use isfinite:
-      if(abs(b) >= max_val)
+      if (abs(b) >= max_val)
       {
-         if(abs(a) >= max_val)
-            return 0;  // one infinity is as good as another!
+         if (abs(a) >= max_val)
+            return 0; // one infinity is as good as another!
       }
       // If the result is denormalised, treat all denorms as equivalent:
-      if((a < min_val) && (a > 0))
+      if ((a < min_val) && (a > 0))
          a = min_val;
-      else if((a > -min_val) && (a < 0))
+      else if ((a > -min_val) && (a < 0))
          a = -min_val;
-      if((b < min_val) && (b > 0))
+      if ((b < min_val) && (b > 0))
          b = min_val;
-      else if((b > -min_val) && (b < 0))
+      else if ((b > -min_val) && (b < 0))
          b = -min_val;
 
-      return (std::max)(abs(T((a-b)/a)), abs(T((a-b)/b))) / std::numeric_limits<T>::epsilon();
+      return (std::max)(abs(T((a - b) / a)), abs(T((a - b) / b))) / std::numeric_limits<T>::epsilon();
    }
 
    // Handle special case where one or both are zero:
-   if(min_val == 0)
-      return abs(T(a-b));
-   if(abs(a) < min_val)
+   if (min_val == 0)
+      return abs(T(a - b));
+   if (abs(a) < min_val)
       a = min_val;
-   if(abs(b) < min_val)
+   if (abs(b) < min_val)
       b = min_val;
 
-   return (std::max)(abs(T((a-b)/a)), abs(T((a-b)/b))) / std::numeric_limits<T>::epsilon();
+   return (std::max)(abs(T((a - b) / a)), abs(T((a - b) / b))) / std::numeric_limits<T>::epsilon();
 }
 
 template <class T, class U>
-typename boost::mpl::if_c<boost::is_convertible<T, U>::value, U, T>::type 
-   relative_error(T a, U b)
+typename boost::mpl::if_c<boost::is_convertible<T, U>::value, U, T>::type
+relative_error(T a, U b)
 {
    typedef typename boost::mpl::if_c<boost::is_convertible<T, U>::value, U, T>::type cast_type;
    return relative_error<cast_type>(static_cast<cast_type>(a), static_cast<cast_type>(b));
@@ -101,7 +101,6 @@ typename boost::enable_if_c<boost::multiprecision::is_interval_number<T>::value,
    typename boost::multiprecision::component_type<T>::type bm = median(b);
    return relative_error<typename boost::multiprecision::component_type<T>::type>(am, bm);
 }
-   
 
 enum
 {
@@ -125,8 +124,8 @@ inline int digits_of(const T&)
 
 inline std::ostream& report_where(const char* file, int line, const char* function)
 {
-   if(function)
-      BOOST_LIGHTWEIGHT_TEST_OSTREAM << "In function: "<< function << std::endl;
+   if (function)
+      BOOST_LIGHTWEIGHT_TEST_OSTREAM << "In function: " << function << std::endl;
    BOOST_LIGHTWEIGHT_TEST_OSTREAM << file << ":" << line;
    return BOOST_LIGHTWEIGHT_TEST_OSTREAM;
 }
@@ -135,9 +134,9 @@ inline std::ostream& report_where(const char* file, int line, const char* functi
 
 inline void report_severity(int severity)
 {
-   if(severity == error_on_fail)
+   if (severity == error_on_fail)
       ++boost::detail::test_errors();
-   else if(severity == abort_on_fail)
+   else if (severity == abort_on_fail)
    {
       ++boost::detail::test_errors();
       abort();
@@ -149,133 +148,174 @@ inline void report_severity(int severity)
 template <class E>
 void report_unexpected_exception(const E& e, int severity, const char* file, int line, const char* function)
 {
-   report_where(file, line, function)  << " Unexpected exception of type " << typeid(e).name() << std::endl;
+   report_where(file, line, function) << " Unexpected exception of type " << typeid(e).name() << std::endl;
    BOOST_LIGHTWEIGHT_TEST_OSTREAM << "Errot message was: " << e.what() << std::endl;
    BOOST_MP_REPORT_SEVERITY(severity);
 }
 
 #ifndef BOOST_NO_EXCEPTIONS
-#define BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity) \
-   catch(const std::exception& e) \
-   {  report_unexpected_exception(e, severity, __FILE__, __LINE__, BOOST_CURRENT_FUNCTION); }\
-   catch(...)\
-   {  std::cout << "Exception of unknown type was thrown" << std::endl; report_severity(severity); }
+#define BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)                                       \
+   catch (const std::exception& e)                                                          \
+   {                                                                                        \
+      report_unexpected_exception(e, severity, __FILE__, __LINE__, BOOST_CURRENT_FUNCTION); \
+   }                                                                                        \
+   catch (...)                                                                              \
+   {                                                                                        \
+      std::cout << "Exception of unknown type was thrown" << std::endl;                     \
+      report_severity(severity);                                                            \
+   }
 #define BOOST_MP_TRY try
 #else
 #define BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
 #define BOOST_MP_TRY
 #endif
 
-#define BOOST_CHECK_IMP(x, severity)\
-   BOOST_MP_TRY{ if(x){}else{\
-   BOOST_MP_REPORT_WHERE << " Failed predicate: " << BOOST_STRINGIZE(x) << std::endl;\
-   BOOST_MP_REPORT_SEVERITY(severity);\
-   }\
-   }BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
+#define BOOST_CHECK_IMP(x, severity)                                                        \
+   BOOST_MP_TRY                                                                             \
+   {                                                                                        \
+      if (x)                                                                                \
+      {                                                                                     \
+      }                                                                                     \
+      else                                                                                  \
+      {                                                                                     \
+         BOOST_MP_REPORT_WHERE << " Failed predicate: " << BOOST_STRINGIZE(x) << std::endl; \
+         BOOST_MP_REPORT_SEVERITY(severity);                                                \
+      }                                                                                     \
+   }                                                                                        \
+   BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
 
 #define BOOST_CHECK(x) BOOST_CHECK_IMP(x, error_on_fail)
-#define BOOST_WARN(x)  BOOST_CHECK_IMP(x, warn_on_fail)
-#define BOOST_REQUIRE(x)  BOOST_CHECK_IMP(x, abort_on_fail)
+#define BOOST_WARN(x) BOOST_CHECK_IMP(x, warn_on_fail)
+#define BOOST_REQUIRE(x) BOOST_CHECK_IMP(x, abort_on_fail)
 
-#define BOOST_CLOSE_IMP(x, y, tol, severity)\
-   BOOST_MP_TRY{ if(relative_error(x, y) > tol){\
-   BOOST_MP_REPORT_WHERE << " Failed check for closeness: \n" \
-   << std::setprecision(digits_of(x)) << std::scientific\
-   << "Value of LHS was: " << x << "\n"\
-   << "Value of RHS was: " << y << "\n"\
-   << std::setprecision(5) << std::fixed\
-   << "Relative error was: " << relative_error(x, y) << "eps\n"\
-   << "Tolerance was: " << tol << "eps" << std::endl;\
-   BOOST_MP_REPORT_SEVERITY(severity);\
-   }\
-   }BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
+#define BOOST_CLOSE_IMP(x, y, tol, severity)                                                \
+   BOOST_MP_TRY                                                                             \
+   {                                                                                        \
+      if (relative_error(x, y) > tol)                                                       \
+      {                                                                                     \
+         BOOST_MP_REPORT_WHERE << " Failed check for closeness: \n"                         \
+                               << std::setprecision(digits_of(x)) << std::scientific        \
+                               << "Value of LHS was: " << x << "\n"                         \
+                               << "Value of RHS was: " << y << "\n"                         \
+                               << std::setprecision(5) << std::fixed                        \
+                               << "Relative error was: " << relative_error(x, y) << "eps\n" \
+                               << "Tolerance was: " << tol << "eps" << std::endl;           \
+         BOOST_MP_REPORT_SEVERITY(severity);                                                \
+      }                                                                                     \
+   }                                                                                        \
+   BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
 
-#define BOOST_EQUAL_IMP(x, y, severity)\
-   BOOST_MP_TRY{ if(!((x) == (y))){\
-   BOOST_MP_REPORT_WHERE << " Failed check for equality: \n" \
-   << std::setprecision(digits_of(x)) << std::scientific\
-   << "Value of LHS was: " << (x) << "\n"\
-   << "Value of RHS was: " << (y) << "\n"\
-   << std::setprecision(3) << std::endl;\
-   BOOST_MP_REPORT_SEVERITY(severity);\
-   }\
-   }BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
+#define BOOST_EQUAL_IMP(x, y, severity)                                              \
+   BOOST_MP_TRY                                                                      \
+   {                                                                                 \
+      if (!((x) == (y)))                                                             \
+      {                                                                              \
+         BOOST_MP_REPORT_WHERE << " Failed check for equality: \n"                   \
+                               << std::setprecision(digits_of(x)) << std::scientific \
+                               << "Value of LHS was: " << (x) << "\n"                \
+                               << "Value of RHS was: " << (y) << "\n"                \
+                               << std::setprecision(3) << std::endl;                 \
+         BOOST_MP_REPORT_SEVERITY(severity);                                         \
+      }                                                                              \
+   }                                                                                 \
+   BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
 
-#define BOOST_NE_IMP(x, y, severity)\
-   BOOST_MP_TRY{ if(!(x != y)){\
-   BOOST_MP_REPORT_WHERE << " Failed check for non-equality: \n" \
-   << std::setprecision(digits_of(x)) << std::scientific\
-   << "Value of LHS was: " << x << "\n"\
-   << "Value of RHS was: " << y << "\n"\
-   << std::setprecision(3) << std::endl;\
-   BOOST_MP_REPORT_SEVERITY(severity);\
-   }\
-   }BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
+#define BOOST_NE_IMP(x, y, severity)                                                 \
+   BOOST_MP_TRY                                                                      \
+   {                                                                                 \
+      if (!(x != y))                                                                 \
+      {                                                                              \
+         BOOST_MP_REPORT_WHERE << " Failed check for non-equality: \n"               \
+                               << std::setprecision(digits_of(x)) << std::scientific \
+                               << "Value of LHS was: " << x << "\n"                  \
+                               << "Value of RHS was: " << y << "\n"                  \
+                               << std::setprecision(3) << std::endl;                 \
+         BOOST_MP_REPORT_SEVERITY(severity);                                         \
+      }                                                                              \
+   }                                                                                 \
+   BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
 
-#define BOOST_LT_IMP(x, y, severity)\
-   BOOST_MP_TRY{ if(!(x < y)){\
-   BOOST_MP_REPORT_WHERE << " Failed check for less than: \n" \
-   << std::setprecision(digits_of(x)) << std::scientific\
-   << "Value of LHS was: " << x << "\n"\
-   << "Value of RHS was: " << y << "\n"\
-   << std::setprecision(3) << std::endl;\
-   BOOST_MP_REPORT_SEVERITY(severity);\
-   }\
-   }BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
+#define BOOST_LT_IMP(x, y, severity)                                                 \
+   BOOST_MP_TRY                                                                      \
+   {                                                                                 \
+      if (!(x < y))                                                                  \
+      {                                                                              \
+         BOOST_MP_REPORT_WHERE << " Failed check for less than: \n"                  \
+                               << std::setprecision(digits_of(x)) << std::scientific \
+                               << "Value of LHS was: " << x << "\n"                  \
+                               << "Value of RHS was: " << y << "\n"                  \
+                               << std::setprecision(3) << std::endl;                 \
+         BOOST_MP_REPORT_SEVERITY(severity);                                         \
+      }                                                                              \
+   }                                                                                 \
+   BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
 
-#define BOOST_GT_IMP(x, y, severity)\
-   BOOST_MP_TRY{ if(!(x > y)){\
-   BOOST_MP_REPORT_WHERE << " Failed check for greater than: \n" \
-   << std::setprecision(digits_of(x)) << std::scientific\
-   << "Value of LHS was: " << x << "\n"\
-   << "Value of RHS was: " << y << "\n"\
-   << std::setprecision(3) << std::endl;\
-   BOOST_MP_REPORT_SEVERITY(severity);\
-   }\
-   }BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
+#define BOOST_GT_IMP(x, y, severity)                                                 \
+   BOOST_MP_TRY                                                                      \
+   {                                                                                 \
+      if (!(x > y))                                                                  \
+      {                                                                              \
+         BOOST_MP_REPORT_WHERE << " Failed check for greater than: \n"               \
+                               << std::setprecision(digits_of(x)) << std::scientific \
+                               << "Value of LHS was: " << x << "\n"                  \
+                               << "Value of RHS was: " << y << "\n"                  \
+                               << std::setprecision(3) << std::endl;                 \
+         BOOST_MP_REPORT_SEVERITY(severity);                                         \
+      }                                                                              \
+   }                                                                                 \
+   BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
 
-#define BOOST_LE_IMP(x, y, severity)\
-   BOOST_MP_TRY{ if(!(x <= y)){\
-   BOOST_MP_REPORT_WHERE << " Failed check for less-than-equal-to: \n" \
-   << std::setprecision(digits_of(x)) << std::scientific\
-   << "Value of LHS was: " << x << "\n"\
-   << "Value of RHS was: " << y << "\n"\
-   << std::setprecision(3) << std::endl;\
-   BOOST_MP_REPORT_SEVERITY(severity);\
-   }\
-   }BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
+#define BOOST_LE_IMP(x, y, severity)                                                 \
+   BOOST_MP_TRY                                                                      \
+   {                                                                                 \
+      if (!(x <= y))                                                                 \
+      {                                                                              \
+         BOOST_MP_REPORT_WHERE << " Failed check for less-than-equal-to: \n"         \
+                               << std::setprecision(digits_of(x)) << std::scientific \
+                               << "Value of LHS was: " << x << "\n"                  \
+                               << "Value of RHS was: " << y << "\n"                  \
+                               << std::setprecision(3) << std::endl;                 \
+         BOOST_MP_REPORT_SEVERITY(severity);                                         \
+      }                                                                              \
+   }                                                                                 \
+   BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
 
-#define BOOST_GE_IMP(x, y, severity)\
-   BOOST_MP_TRY{ if(!(x >= y)){\
-   BOOST_MP_REPORT_WHERE << " Failed check for greater-than-equal-to \n" \
-   << std::setprecision(digits_of(x)) << std::scientific\
-   << "Value of LHS was: " << x << "\n"\
-   << "Value of RHS was: " << y << "\n"\
-   << std::setprecision(3) << std::endl;\
-   BOOST_MP_REPORT_SEVERITY(severity);\
-   }\
-   }BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
+#define BOOST_GE_IMP(x, y, severity)                                                 \
+   BOOST_MP_TRY                                                                      \
+   {                                                                                 \
+      if (!(x >= y))                                                                 \
+      {                                                                              \
+         BOOST_MP_REPORT_WHERE << " Failed check for greater-than-equal-to \n"       \
+                               << std::setprecision(digits_of(x)) << std::scientific \
+                               << "Value of LHS was: " << x << "\n"                  \
+                               << "Value of RHS was: " << y << "\n"                  \
+                               << std::setprecision(3) << std::endl;                 \
+         BOOST_MP_REPORT_SEVERITY(severity);                                         \
+      }                                                                              \
+   }                                                                                 \
+   BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
 
 #ifndef BOOST_NO_EXCEPTIONS
-#define BOOST_MT_CHECK_THROW_IMP(x, E, severity)\
-   BOOST_MP_TRY{ \
-      x;\
-   BOOST_MP_REPORT_WHERE << " Expected exception not thrown in expression " << BOOST_STRINGIZE(x) << std::endl;\
-   BOOST_MP_REPORT_SEVERITY(severity);\
-   }\
-   catch(const E&){}\
+#define BOOST_MT_CHECK_THROW_IMP(x, E, severity)                                                                   \
+   BOOST_MP_TRY                                                                                                    \
+   {                                                                                                               \
+      x;                                                                                                           \
+      BOOST_MP_REPORT_WHERE << " Expected exception not thrown in expression " << BOOST_STRINGIZE(x) << std::endl; \
+      BOOST_MP_REPORT_SEVERITY(severity);                                                                          \
+   }                                                                                                               \
+   catch (const E&) {}                                                                                             \
    BOOST_MP_UNEXPECTED_EXCEPTION_CHECK(severity)
 #else
 #define BOOST_MT_CHECK_THROW_IMP(x, E, severity)
 #endif
 
 #define BOOST_CHECK_CLOSE(x, y, tol) BOOST_CLOSE_IMP(x, y, ((tol / (100 * epsilon_of(x)))), error_on_fail)
-#define BOOST_WARN_CLOSE(x, y, tol)  BOOST_CLOSE_IMP(x, y, (tol / (100 * epsilon_of(x))), warn_on_fail)
-#define BOOST_REQUIRE_CLOSE(x, y, tol)  BOOST_CLOSE_IMP(x, y, (tol / (100 * epsilon_of(x))), abort_on_fail)
+#define BOOST_WARN_CLOSE(x, y, tol) BOOST_CLOSE_IMP(x, y, (tol / (100 * epsilon_of(x))), warn_on_fail)
+#define BOOST_REQUIRE_CLOSE(x, y, tol) BOOST_CLOSE_IMP(x, y, (tol / (100 * epsilon_of(x))), abort_on_fail)
 
 #define BOOST_CHECK_CLOSE_FRACTION(x, y, tol) BOOST_CLOSE_IMP(x, y, ((tol / (epsilon_of(x)))), error_on_fail)
-#define BOOST_WARN_CLOSE_FRACTION(x, y, tol)  BOOST_CLOSE_IMP(x, y, (tol / (epsilon_of(x))), warn_on_fail)
-#define BOOST_REQUIRE_CLOSE_FRACTION(x, y, tol)  BOOST_CLOSE_IMP(x, y, (tol / (epsilon_of(x))), abort_on_fail)
+#define BOOST_WARN_CLOSE_FRACTION(x, y, tol) BOOST_CLOSE_IMP(x, y, (tol / (epsilon_of(x))), warn_on_fail)
+#define BOOST_REQUIRE_CLOSE_FRACTION(x, y, tol) BOOST_CLOSE_IMP(x, y, (tol / (epsilon_of(x))), abort_on_fail)
 
 #define BOOST_CHECK_EQUAL(x, y) BOOST_EQUAL_IMP(x, y, error_on_fail)
 #define BOOST_WARN_EQUAL(x, y) BOOST_EQUAL_IMP(x, y, warn_on_fail)

@@ -16,9 +16,8 @@ extern "C" {
 int main()
 {
    __float128 f = -2.0Q;
-   f = fabsq(f);
-   f = expq(f);
+   f            = fabsq(f);
+   f            = expq(f);
 
    return 0;
 }
-

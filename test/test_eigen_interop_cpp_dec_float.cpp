@@ -13,7 +13,6 @@ struct related_number<boost::multiprecision::cpp_dec_float_100>
    typedef boost::multiprecision::cpp_dec_float_50 type;
 };
 
-
 int main()
 {
    using namespace boost::multiprecision;
