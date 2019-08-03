@@ -75,7 +75,6 @@ endif()
 
 find_library(MPIR_LIBRARIES gmp PATHS $ENV{MPIRDIR} ${LIB_INSTALL_DIR})
 
-include(${CMAKE_CURRENT_LIST_DIR}/FindPackageHandleStandardArgs.cmake)
 find_package_handle_standard_args(MPIR DEFAULT_MSG
                                   MPIR_INCLUDES MPIR_LIBRARIES MPIR_VERSION_OK)
 if(MPIR_FOUND)

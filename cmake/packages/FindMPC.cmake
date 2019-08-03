@@ -70,7 +70,6 @@ endif(MPC_INCLUDE_DIRS)
 find_library(MPC_LIBRARIES mpc
              PATHS $ENV{GMPDIR} $ENV{MPFRDIR} $ENV{MPCDIR} ${LIB_INSTALL_DIR})
 
-include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(MPC DEFAULT_MSG
                                   MPC_INCLUDE_DIRS MPC_LIBRARIES MPC_VERSION_OK)
 mark_as_advanced(MPC_INCLUDE_DIRS MPC_LIBRARIES)
