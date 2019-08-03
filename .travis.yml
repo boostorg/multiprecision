@@ -2326,7 +2326,7 @@ script:
       #  elif [[ $TRAVIS_OS_NAME == osx ]]; then
       #    cmake --build . --target multiprecision_test_suite_$TEST_SUITE -- -j$(($(sysctl -n hw.ncpu) + 1));
       #  fi
-      fi
+      #fi
     fi
 
 notifications:
