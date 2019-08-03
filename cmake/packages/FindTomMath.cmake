@@ -19,6 +19,7 @@ find_library(TomMath_LIBRARY NAMES ${TomMath_NAMES})
 
 # handle the QUIETLY and REQUIRED arguments and set TIFF_FOUND to TRUE if 
 # all listed variables are TRUE
+include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(TomMath DEFAULT_MSG TomMath_LIBRARY TomMath_INCLUDE_DIR)
 
 if(TOMMATH_FOUND)

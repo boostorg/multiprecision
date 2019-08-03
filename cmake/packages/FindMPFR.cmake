@@ -70,6 +70,7 @@ endif()
 find_library(MPFR_LIBRARIES mpfr
              PATHS $ENV{GMPDIR} $ENV{MPFRDIR} ${LIB_INSTALL_DIR})
 
+include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(MPFR DEFAULT_MSG
                                   MPFR_INCLUDE_DIRS MPFR_LIBRARIES MPFR_VERSION_OK)
 mark_as_advanced(MPFR_INCLUDE_DIRS MPFR_LIBRARIES)

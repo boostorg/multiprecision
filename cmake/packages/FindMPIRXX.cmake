@@ -32,6 +32,6 @@ if(MPIR_FOUND)
                  DOC "Path to the MPIRXX library"
                  )
 
-
+    include(FindPackageHandleStandardArgs)
     find_package_handle_standard_args(MPIRXX "DEFAULT_MSG" MPIRXX_LIBRARIES MPIRXX_INCLUDE_DIRS)
 endif()
