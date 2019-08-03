@@ -2329,9 +2329,9 @@ script:
       fi
     elif [[ $CMAKE_BUILD == true ]]; then
       if [[ $TRAVIS_OS_NAME == linux ]]; then
-        sudo ./b2 -j$(nproc) install --with-random;
+        sudo ./b2 -j$(nproc) install;
       elif [[ $TRAVIS_OS_NAME == osx ]]; then
-        sudo ./b2 -j$(sysctl -n hw.ncpu) install --with-random;
+        sudo ./b2 -j$(sysctl -n hw.ncpu) install;
       fi;
       cd libs/multiprecision && mkdir cmake-build && cd cmake-build;
       if [[ $(echo $CXXSTD | sed 's/[^0-9]*//g') == 03 ]]; then
