@@ -1,5 +1,13 @@
-# Custom properties from Niall Douglas
-
+#---------------------------------------------------------------------------#
+# Copyright (c) 2017 Niall Douglas
+# Copyright (c) 2018-2019 Nil Foundation AG
+# Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+#
+# Distributed under the Boost Software License, Version 1.0
+# See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt
+#---------------------------------------------------------------------------#
+#
 # On MSVC very annoyingly cmake puts /EHsc and /MD(d) into the global flags which means you
 # get a warning when you try to disable exceptions or use the static CRT. I hate to use this
 # globally imposed solution, but we are going to hack the global flags to use properties to
