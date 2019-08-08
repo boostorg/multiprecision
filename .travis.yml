@@ -47,6 +47,7 @@ branches:
     - develop
     - cmake-develop
     - cmake-master
+    - 17-refactor-travisCI
 
 env:
   matrix:
