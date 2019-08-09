@@ -1269,8 +1269,6 @@ install:
   - python tools/boostdep/depinst/depinst.py multiprecision
   - ./bootstrap.sh
   - ./b2 headers
-  - pwd;
-  - echo $TRAVIS_BUILD_DIR
 
 script:
   - |-
@@ -1287,8 +1285,6 @@ script:
   - if [[ $(echo $CXXSTD | sed 's/[^0-9]*//g') == 03 ]]; then
       CXXSTD=c++98;
     fi;
-  - pwd;
-  - ls;
   - if [[ $CXXSTD == c++1z ]]; then
       CXXSTD=c++17;
     fi;
