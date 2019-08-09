@@ -1270,6 +1270,7 @@ install:
   - ./bootstrap.sh
   - ./b2 headers
   - pwd;
+  - echo $TRAVIS_BUILD_DIR
 
 script:
   - |-
@@ -1282,7 +1283,7 @@ script:
   - (cd libs/config/test && ../../../b2 config_info_travis_install toolset=$TOOLSET && ./config_info_travis);
   - (cd libs/multiprecision/test && ../../../b2 -j$proc toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER);
   - sudo ./b2 -j$proc install;
-  - cd .. && mkdir cmake-build && cd cmake-build;
+  - cd $TRAVIS_BUILD_DIR && mkdir cmake-build && cd cmake-build;
   - if [[ $(echo $CXXSTD | sed 's/[^0-9]*//g') == 03 ]]; then
       CXXSTD=c++98;
     fi;
