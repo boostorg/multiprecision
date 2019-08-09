@@ -385,7 +385,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE="compile_fail"
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE="examples compile_fail"
       addons:
         apt:
           packages:
@@ -399,49 +399,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE="examples"
-      addons:
-        apt:
-          packages:
-            - g++-6
-            - cmake
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE="compile_fail"
-      addons:
-        apt:
-          packages:
-            - g++-6
-            - cmake
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE="examples"
-      addons:
-        apt:
-          packages:
-            - g++-6
-            - cmake
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE="compile_fail"
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE="examples compile_fail"
       addons:
         apt:
           packages:
@@ -469,21 +427,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE="compile_fail"
-      addons:
-        apt:
-          packages:
-            - g++-6
-            - cmake
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE="examples"
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE="compile_fail examples"
       addons:
         apt:
           packages:
@@ -623,21 +567,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE="compile_fail"
-      addons:
-        apt:
-          packages:
-            - g++-5
-            - cmake
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE="examples"
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE="compile_fail examples"
       addons:
         apt:
           packages:
@@ -987,7 +917,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE="compile_fail"
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE="compile_fail examples"
       addons:
         apt:
           packages:
@@ -1001,7 +931,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE="examples"
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE="compile_fail examples"
       addons:
         apt:
           packages:
@@ -1015,7 +945,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE="compile_fail"
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE="compile_fail examples"
       addons:
         apt:
           packages:
@@ -1029,63 +959,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE="examples"
-      addons:
-        apt:
-          packages:
-            - g++-8
-            - cmake
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE="compile_fail"
-      addons:
-        apt:
-          packages:
-            - g++-8
-            - cmake
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE="examples"
-      addons:
-        apt:
-          packages:
-            - g++-8
-            - cmake
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE="compile_fail"
-      addons:
-        apt:
-          packages:
-            - g++-8
-            - cmake
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE="examples"
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE="compile_fail examples"
       addons:
         apt:
           packages:
@@ -1175,11 +1049,7 @@ matrix:
       osx_image: xcode9.3
 
     - os: osx
-      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="compile_fail"
-      osx_image: xcode9.3
-
-    - os: osx
-      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="examples"
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="compile_fail examples"
       osx_image: xcode9.3
 
     - os: osx
@@ -1207,11 +1077,7 @@ matrix:
       osx_image: xcode8.3
 
     - os: osx
-      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="compile_fail"
-      osx_image: xcode8.3
-
-    - os: osx
-      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="examples"
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="compile_fail examples"
       osx_image: xcode8.3
 
     - os: osx
@@ -1239,11 +1105,7 @@ matrix:
       osx_image: xcode7.3
 
     - os: osx
-      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="compile_fail"
-      osx_image: xcode7.3
-
-    - os: osx
-      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="examples"
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="compile_fail examples"
       osx_image: xcode7.3
 
     - os: osx
@@ -1288,8 +1150,8 @@ script:
   - if [[ $CXXSTD == c++1z ]]; then
       CXXSTD=c++17;
     fi;
-  - cmake -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9]*//g') -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE ..;
+  - cmake --target $TEST_SUITE -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9]*//g') -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE ..;
 
 notifications:
   email:
-    on_success: always
+    on_success: always-
