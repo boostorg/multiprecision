@@ -1253,11 +1253,11 @@ matrix:
 install:
   - cd ..
   - if [[ $TRAVIS_BRANCH == master || $TRAVIS_BRANCH == cmake-master ]]; then
-    git clone -b master --depth 1 https://github.com/boostorg/boost.git boost-root;
+      git clone -b master --depth 1 https://github.com/boostorg/boost.git boost-root;
     elif [[ $TRAVIS_BRANCH == develop || $TRAVIS_BRANCH == cmake-develop ]]; then
-    git clone -b develop --depth 1 https://github.com/boostorg/boost.git boost-root;
+      git clone -b develop --depth 1 https://github.com/boostorg/boost.git boost-root;
     else
-    git clone -b develop --depth 1 https://github.com/boostorg/boost.git boost-root;
+      git clone -b develop --depth 1 https://github.com/boostorg/boost.git boost-root;
     fi
   - cd boost-root
   - git submodule update --init tools/build
@@ -1273,14 +1273,14 @@ install:
 script:
   - |-
     echo "using $TOOLSET : : $COMPILER : <cxxflags>-std=$CXXSTD ;" > ~/user-config.jam
-  - cd libs/config/test && ../../../b2 config_info_travis_install toolset=$TOOLSET && ./config_info_travis;
-    if [[ $TRAVIS_OS_NAME == linux ]]; then
-      (cd libs/multiprecision/test && ../../../b2 -j$(($(nproc) + 1)) toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER);
-      sudo ./b2 -j$(nproc) install;
+  - if [[ $TRAVIS_OS_NAME == linux ]]; then
+      proc=$(($(nproc) + 1))
     elif [[ $TRAVIS_OS_NAME == osx ]]; then
-      (cd libs/multiprecision/test && ../../../b2 -j$(($(sysctl -n hw.ncpu) + 1)) toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER);
-      sudo ./b2 -j$(sysctl -n hw.ncpu) install;
-    fi;
+      proc=$(($(sysctl -n hw.ncpu) + 1))
+    fi
+  - cd libs/config/test && ../../../b2 config_info_travis_install toolset=$TOOLSET && ./config_info_travis;
+  - cd libs/multiprecision/test && ../../../b2 -j$(($(sysctl -n hw.ncpu) + 1)) toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER);
+  - sudo ./b2 -j$(sysctl -n hw.ncpu) install;
   - cd libs/multiprecision && mkdir cmake-build && cd cmake-build;
   - if [[ $(echo $CXXSTD | sed 's/[^0-9]*//g') == 03 ]]; then
       CXXSTD=c++98;
@@ -1288,5 +1288,8 @@ script:
   - if [[ $CXXSTD == c++1z ]]; then
       CXXSTD=c++17;
     fi;
-    cmake -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9]*//g') -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE ..;
+  - cmake -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9]*//g') -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE ..;
 
+notifications:
+  email:
+    on_success: always
