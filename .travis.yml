@@ -1269,6 +1269,7 @@ install:
   - python tools/boostdep/depinst/depinst.py multiprecision
   - ./bootstrap.sh
   - ./b2 headers
+  - pwd;
 
 script:
   - |-
