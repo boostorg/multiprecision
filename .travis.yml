@@ -2324,8 +2324,8 @@ script:
   - |-
     echo "using $TOOLSET : : $COMPILER : <cxxflags>-std=$CXXSTD ;" > ~/user-config.jam
   - if [[ $CMAKE_BUILD == false ]]; then
-      (c);
-      if [[ $TRAVIS_OS_NAME == linux ]]; then
+    (cd libs/config/test && ../../../b2 config_info_travis_install toolset=$TOOLSET && ./config_info_travis);
+    if [[ $TRAVIS_OS_NAME == linux ]]; then
         (cd libs/multiprecision/test && ../../../b2 -j$(($(nproc) + 1)) toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER);
         sudo ./b2 -j$(nproc) install;
       elif [[ $TRAVIS_OS_NAME == osx ]]; then
