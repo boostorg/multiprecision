@@ -1274,10 +1274,10 @@ script:
   - |-
     echo "using $TOOLSET : : $COMPILER : <cxxflags>-std=$CXXSTD ;" > ~/user-config.jam
   - if [[ $TRAVIS_OS_NAME == linux ]]; then
-      proc=$(($(nproc) + 1))
+      proc=$(($(nproc) + 1));
     elif [[ $TRAVIS_OS_NAME == osx ]]; then
-      proc=$(($(sysctl -n hw.ncpu) + 1))
-    fi
+      proc=$(($(sysctl -n hw.ncpu) + 1));
+    fi;
   - cd libs/config/test && ../../../b2 config_info_travis_install toolset=$TOOLSET && ./config_info_travis;
   - cd libs/multiprecision/test && ../../../b2 -j$(($(sysctl -n hw.ncpu) + 1)) toolset=$TOOLSET $TEST_SUITE define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER);
   - sudo ./b2 -j$(sysctl -n hw.ncpu) install;
