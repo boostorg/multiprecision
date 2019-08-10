@@ -1,82 +1,60 @@
-# Originally copied from the KDE project repository:
-# http://websvn.kde.org/trunk/KDE/kdeutils/cmake/modules/FindGMP.cmake?view=markup&pathrev=675218
-
-# Copyright (c) 2006, Laurent Montel, <montel@kde.org>
-# Copyright (c) 2008-2019 Francesco Biscani, <bluescarni@gmail.com>
-
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
+#---------------------------------------------------------------------------#
+# Copyright (c) 2018-2019 Nil Foundation AG
+# Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
 #
-# 1. Redistributions of source code must retain the copyright
-#    notice, this list of conditions and the following disclaimer.
-# 2. Redistributions in binary form must reproduce the copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
-# 3. The name of the author may not be used to endorse or promote products
-#    derived from this software without specific prior written permission.
+# Distributed under the Boost Software License, Version 1.0
+# See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt
+#---------------------------------------------------------------------------#
 #
-# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-# IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-# NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# ------------------------------------------------------------------------------------------
+# Once done this will define
+# QUADMATH_FOUND - system has Quadmath lib
+# QUADMATH_INCLUDE_DIRS - the Quadmath include directory
+# QUADMATH_LIBRARIES - Libraries needed to use Quadmath
 
 include(FindPackageHandleStandardArgs)
 include(CMakePushCheckState)
 include(CheckCXXSourceCompiles)
 
-if(Quadmath_INCLUDE_DIR AND Quadmath_LIBRARY)
-    # Already in cache, be silent
-    set(Quadmath_FIND_QUIETLY TRUE)
+if(QUADMATH_FOUND)
+    find_path(QUADMATH_INCLUDE_DIRS NAMES quadmath.h PATHS /usr/local/lib /usr/local/include /usr/include
+              /opt/loca/include)
+    find_library(QUADMATH_LIBRARY NAMES libquadmath.a PATHS /usr/local/lib/gcc/8/ /opt/local/lib /usr/local/lib/)
+else()
+    find_path(QUADMATH_INCLUDE_DIRS NAMES quadmath.h PATHS /usr/local/lib /usr/local/include /usr/include
+              /opt/loca/include)
+    find_library(QUADMATH_LIBRARY NAMES libquadmath.a PATHS /usr/local/lib/gcc/8/ /opt/local/lib /usr/local/lib/)
 endif()
 
-find_path(Quadmath_INCLUDE_DIR NAMES quadmath.h PATHS /usr/local/lib)
-find_library(Quadmath_LIBRARY NAMES libquadmath.a PATHS /usr/local/lib/gcc/8/)
-
-message(--- ${Quadmath_INCLUDE_DIR})
-message(--- ${Quadmath_LIBRARY})
-
-if(NOT Quadmath_INCLUDE_DIR OR NOT Quadmath_LIBRARY)
+if(NOT QUADMATH_INCLUDE_DIRS OR NOT QUADMATH_LIBRARY)
     cmake_push_check_state(RESET)
     list(APPEND CMAKE_REQUIRED_LIBRARIES "quadmath")
     check_cxx_source_compiles("
         #include <quadmath.h>
         int main(void){
-            __float128 foo = ::sqrtq(123.456);
+            _float128 foo = ::sqrtq(123.456);
         }"
-                              Quadmath_USE_DIRECTLY)
+                              QUADMATH_USE_DIRECTLY)
     cmake_pop_check_state()
-    if(Quadmath_USE_DIRECTLY)
-        set(Quadmath_INCLUDE_DIR "unused" CACHE PATH "" FORCE)
-        set(Quadmath_LIBRARY "quadmath" CACHE FILEPATH "" FORCE)
+    if(QUADMATH_USE_DIRECTLY)
+        set(QUADMATH_INCLUDE_DIRS "unused" CACHE PATH "" FORCE)
+        set(QUADMATH_LIBRARY "quadmath" CACHE FILEPATH "" FORCE)
     endif()
 endif()
 
-find_package_handle_standard_args(Quadmath DEFAULT_MSG Quadmath_LIBRARY Quadmath_INCLUDE_DIR)
+find_package_handle_standard_args(QUADMATH_ DEFAULT_MSG QUADMATH_LIBRARY QUADMATH_INCLUDE_DIRS)
 
-mark_as_advanced(Quadmath_INCLUDE_DIR Quadmath_LIBRARY)
+mark_as_advanced(QUADMATH_INCLUDE_DIRS QUADMATH_LIBRARY)
 
-# NOTE: this has been adapted from CMake's FindPNG.cmake.
-if(Quadmath_FOUND AND NOT TARGET Quadmath::quadmath)
-    message(STATUS "Creating the 'Quadmath::quadmath' imported target.")
-    if(Quadmath_USE_DIRECTLY)
+if(QUADMATH_FOUND AND NOT TARGET QUADMATH_::quadmath)
+    if(QUADMATH_USE_DIRECTLY)
         message(STATUS "libquadmath will be included and linked directly.")
-        # If we are using it directly, we must define an interface library,
-        # as we do not have the full path to the shared library.
-        add_library(Quadmath::quadmath INTERFACE IMPORTED)
-        set_target_properties(Quadmath::quadmath PROPERTIES INTERFACE_LINK_LIBRARIES "${Quadmath_LIBRARY}")
+        add_library(QUADMATH_::quadmath INTERFACE IMPORTED)
+        set_target_properties(QUADMATH_::quadmath PROPERTIES INTERFACE_LINK_LIBRARIES "${QUADMATH_LIBRARY}")
     else()
-        # Otherwise, we proceed as usual.
-        add_library(Quadmath::quadmath UNKNOWN IMPORTED)
-        set_target_properties(Quadmath::quadmath PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${Quadmath_INCLUDE_DIR}"
+        add_library(QUADMATH_::quadmath UNKNOWN IMPORTED)
+        set_target_properties(QUADMATH_::quadmath PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${QUADMATH_INCLUDE_DIRS}"
                               IMPORTED_LINK_INTERFACE_LANGUAGES "C"
-                              IMPORTED_LOCATION "${Quadmath_LIBRARY}")
+                              IMPORTED_LOCATION "${QUADMATH_LIBRARY}")
     endif()
 endif()
