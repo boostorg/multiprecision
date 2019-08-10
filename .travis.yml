@@ -47,7 +47,6 @@ branches:
     - develop
     - cmake-develop
     - cmake-master
-    - 17-refactor-travisCI
 
 env:
   matrix:
@@ -1154,4 +1153,4 @@ script:
 
 notifications:
   email:
-    on_success: always-
+    on_success: always
