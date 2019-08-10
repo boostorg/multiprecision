@@ -261,7 +261,11 @@ namespace default_ops {
 // Within powm, we need a type with twice as many digits as the argument type,
 // define a traits class to obtain that type:
 //
-template <class Backend> struct double_precision_type { typedef Backend type; };
+template <class Backend>
+struct double_precision_type
+{
+   typedef Backend type;
+};
 
 //
 // If the exponent is a signed integer type, then we need to

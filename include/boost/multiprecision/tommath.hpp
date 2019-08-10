@@ -36,8 +36,8 @@ inline void check_tommath_result(unsigned v)
 
 struct tommath_int;
 
-void eval_multiply(tommath_int &t, const tommath_int &o);
-void eval_add(tommath_int &t, const tommath_int &o);
+void eval_multiply(tommath_int& t, const tommath_int& o);
+void eval_add(tommath_int& t, const tommath_int& o);
 
 struct tommath_int
 {
@@ -45,11 +45,12 @@ struct tommath_int
    typedef mpl::list<boost::uint32_t, boost::ulong_long_type> unsigned_types;
    typedef mpl::list<long double>                             float_types;
 
-  tommath_int() { detail::check_tommath_result(mp_init(&m_data)); }
-  tommath_int(const tommath_int &o) {
-    detail::check_tommath_result(
-        mp_init_copy(&m_data, const_cast<::mp_int *>(&o.m_data)));
-  }
+   tommath_int() { detail::check_tommath_result(mp_init(&m_data)); }
+   tommath_int(const tommath_int& o)
+   {
+      detail::check_tommath_result(
+          mp_init_copy(&m_data, const_cast< ::mp_int*>(&o.m_data)));
+   }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    tommath_int(tommath_int&& o) BOOST_NOEXCEPT
    {
@@ -561,11 +562,13 @@ std::numeric_limits<mp_digit>::digits;
    add(result, mask);
 }
 */
-inline bool eval_is_zero(const tommath_int &val) {
-  return mp_iszero(&val.data());
+inline bool eval_is_zero(const tommath_int& val)
+{
+   return mp_iszero(&val.data());
 }
-inline int eval_get_sign(const tommath_int &val) {
-  return mp_iszero(&val.data()) ? 0 : SIGN(&val.data()) ? -1 : 1;
+inline int eval_get_sign(const tommath_int& val)
+{
+   return mp_iszero(&val.data()) ? 0 : SIGN(&val.data()) ? -1 : 1;
 }
 /*
 template <class A>
@@ -661,9 +664,10 @@ inline typename enable_if<is_unsigned<Integer>, Integer>::type eval_integer_modu
 }
 template <class Integer>
 inline typename enable_if<is_signed<Integer>, Integer>::type
-eval_integer_modulus(const tommath_int &x, Integer val) {
-  return eval_integer_modulus(x,
-                              boost::multiprecision::detail::unsigned_abs(val));
+eval_integer_modulus(const tommath_int& x, Integer val)
+{
+   return eval_integer_modulus(x,
+                               boost::multiprecision::detail::unsigned_abs(val));
 }
 
 inline std::size_t hash_value(const tommath_int& val)
@@ -746,73 +750,73 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::tommat
 
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::digits;
+    boost::multiprecision::tommath_int, ExpressionTemplates> >::digits;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::digits10;
+    boost::multiprecision::tommath_int, ExpressionTemplates> >::digits10;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::max_digits10;
+    boost::multiprecision::tommath_int, ExpressionTemplates> >::max_digits10;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::is_signed;
+    boost::multiprecision::tommath_int, ExpressionTemplates> >::is_signed;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::is_integer;
+    boost::multiprecision::tommath_int, ExpressionTemplates> >::is_integer;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::is_exact;
+    boost::multiprecision::tommath_int, ExpressionTemplates> >::is_exact;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::radix;
+    boost::multiprecision::tommath_int, ExpressionTemplates> >::radix;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::min_exponent;
+    boost::multiprecision::tommath_int, ExpressionTemplates> >::min_exponent;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::min_exponent10;
+    boost::multiprecision::tommath_int, ExpressionTemplates> >::min_exponent10;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::max_exponent;
+    boost::multiprecision::tommath_int, ExpressionTemplates> >::max_exponent;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::max_exponent10;
+    boost::multiprecision::tommath_int, ExpressionTemplates> >::max_exponent10;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::has_infinity;
+    boost::multiprecision::tommath_int, ExpressionTemplates> >::has_infinity;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::has_quiet_NaN;
+    boost::multiprecision::tommath_int, ExpressionTemplates> >::has_quiet_NaN;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<
     boost::multiprecision::number<boost::multiprecision::tommath_int,
-                                  ExpressionTemplates>>::has_signaling_NaN;
+                                  ExpressionTemplates> >::has_signaling_NaN;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST float_denorm_style
     numeric_limits<boost::multiprecision::number<
-        boost::multiprecision::tommath_int, ExpressionTemplates>>::has_denorm;
+        boost::multiprecision::tommath_int, ExpressionTemplates> >::has_denorm;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::has_denorm_loss;
+    boost::multiprecision::tommath_int, ExpressionTemplates> >::has_denorm_loss;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::is_iec559;
+    boost::multiprecision::tommath_int, ExpressionTemplates> >::is_iec559;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::is_bounded;
+    boost::multiprecision::tommath_int, ExpressionTemplates> >::is_bounded;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::is_modulo;
+    boost::multiprecision::tommath_int, ExpressionTemplates> >::is_modulo;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::traps;
+    boost::multiprecision::tommath_int, ExpressionTemplates> >::traps;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::tinyness_before;
+    boost::multiprecision::tommath_int, ExpressionTemplates> >::tinyness_before;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST float_round_style
     numeric_limits<boost::multiprecision::number<
-        boost::multiprecision::tommath_int, ExpressionTemplates>>::round_style;
+        boost::multiprecision::tommath_int, ExpressionTemplates> >::round_style;
 
 #endif
 } // namespace std

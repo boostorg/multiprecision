@@ -853,16 +853,16 @@ class number
 #if BOOST_WORKAROUND(BOOST_MSVC, < 1900) || (defined(__APPLE_CC__) && BOOST_WORKAROUND(__clang_major__, < 9))
    template <class T>
 #else
-#if BOOST_WORKAROUND(BOOST_MSVC, < 1900) ||                                    \
+#if BOOST_WORKAROUND(BOOST_MSVC, < 1900) || \
     (defined(__APPLE_CC__) && BOOST_WORKAROUND(__clang_major__, < 9))
-  template <class T>
+   template <class T>
 #else
-  template <class T, class = typename boost::disable_if_c<
-                         boost::is_constructible<T, self_type const &>::value ||
-                             !boost::is_default_constructible<T>::value ||
-                             (!boost::is_arithmetic<T>::value &&
-                              !boost::is_complex<T>::value),
-                         T>::type>
+   template <class T, class = typename boost::disable_if_c<
+                          boost::is_constructible<T, self_type const&>::value ||
+                              !boost::is_default_constructible<T>::value ||
+                              (!boost::is_arithmetic<T>::value &&
+                               !boost::is_complex<T>::value),
+                          T>::type>
 #endif
    explicit operator T() const
    {
@@ -1583,10 +1583,12 @@ class number
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
       do_add(e.left(), typename left_type::tag_type());
-    } else if (!br &&
-               (bl || (left_depth >=
-                       right_depth))) { // br is always false, but if bl is true
-                                        // we must take the this branch:
+   }
+   else if (!br &&
+            (bl || (left_depth >=
+                    right_depth)))
+   {  // br is always false, but if bl is true
+      // we must take the this branch:
       do_assign(e.left(), typename left_type::tag_type());
       do_add(e.right(), typename right_type::tag_type());
    }
@@ -1597,14 +1599,15 @@ class number
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
       do_add(e.left(), typename left_type::tag_type());
-    }
-  }
-  template <class Exp> void do_assign(const Exp &e, const detail::minus &) {
-    typedef typename Exp::left_type left_type;
-    typedef typename Exp::right_type right_type;
+   }
+} template <class Exp>
+void do_assign(const Exp& e, const detail::minus&)
+{
+   typedef typename Exp::left_type  left_type;
+   typedef typename Exp::right_type right_type;
 
-    static int const left_depth = left_type::depth;
-    static int const right_depth = right_type::depth;
+   static int const left_depth  = left_type::depth;
+   static int const right_depth = right_type::depth;
 
    template <class Exp>
    void do_subtract(const Exp& e, const detail::plus&)
@@ -1613,10 +1616,12 @@ class number
       typedef typename Exp::right_type right_type;
       do_subtract(e.left(), typename left_type::tag_type());
       m_backend.negate();
-    } else if (!br &&
-               (bl || (left_depth >=
-                       right_depth))) { // br is always false, but if bl is true
-                                        // we must take the this branch:
+   }
+   else if (!br &&
+            (bl || (left_depth >=
+                    right_depth)))
+   {  // br is always false, but if bl is true
+      // we must take the this branch:
       do_assign(e.left(), typename left_type::tag_type());
       do_subtract(e.right(), typename right_type::tag_type());
    }
@@ -1628,18 +1633,19 @@ class number
       typedef typename Exp::right_type right_type;
       do_subtract(e.left(), typename left_type::tag_type());
       m_backend.negate();
-    }
-  }
-  template <class Exp>
-  void do_assign(const Exp &e, const detail::multiplies &) {
-    typedef typename Exp::left_type left_type;
-    typedef typename Exp::right_type right_type;
+   }
+}
+template <class Exp>
+void do_assign(const Exp& e, const detail::multiplies&)
+{
+   typedef typename Exp::left_type  left_type;
+   typedef typename Exp::right_type right_type;
 
-    static int const left_depth = left_type::depth;
-    static int const right_depth = right_type::depth;
+   static int const left_depth  = left_type::depth;
+   static int const right_depth = right_type::depth;
 
-    bool bl = contains_self(e.left());
-    bool br = contains_self(e.right());
+   bool bl = contains_self(e.left());
+   bool br = contains_self(e.right());
 
    template <class Exp>
    void do_multiplies(const Exp& e, const detail::multiplies&)
@@ -1647,10 +1653,12 @@ class number
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
       do_multiplies(e.left(), typename left_type::tag_type());
-    } else if (!br &&
-               (bl || (left_depth >=
-                       right_depth))) { // br is always false, but if bl is true
-                                        // we must take the this branch:
+   }
+   else if (!br &&
+            (bl || (left_depth >=
+                    right_depth)))
+   {  // br is always false, but if bl is true
+      // we must take the this branch:
       do_assign(e.left(), typename left_type::tag_type());
       do_multiplies(e.right(), typename right_type::tag_type());
    }
@@ -1665,16 +1673,19 @@ class number
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
       do_multiplies(e.left(), typename left_type::tag_type());
-    }
-  }
-  template <class Exp> void do_assign(const Exp &e, const detail::divides &) {
-    typedef typename Exp::left_type left_type;
-    typedef typename Exp::right_type right_type;
+   }
+}
+template <class Exp>
+void do_assign(const Exp& e, const detail::divides&)
+{
+   typedef typename Exp::left_type  left_type;
+   typedef typename Exp::right_type right_type;
 
-    bool bl = contains_self(e.left());
-    bool br = contains_self(e.right());
+   bool bl = contains_self(e.left());
+   bool br = contains_self(e.right());
 
-    if (bl && is_self(e.left())) {
+   if (bl && is_self(e.left()))
+   {
       // Ignore the left node, it's *this, just add the right:
       do_divide(e.right(), typename right_type::tag_type());
    }
@@ -1821,7 +1832,9 @@ class number
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
       do_bitwise_and(e.left(), typename left_type::tag_type());
-    } else if (!br && (bl || (left_depth >= right_depth))) {
+   }
+   else if (!br && (bl || (left_depth >= right_depth)))
+   {
       do_assign(e.left(), typename left_type::tag_type());
       do_bitwise_and(e.right(), typename right_type::tag_type());
    }
@@ -1848,7 +1861,9 @@ class number
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
       do_bitwise_or(e.left(), typename left_type::tag_type());
-    } else if (!br && (bl || (left_depth >= right_depth))) {
+   }
+   else if (!br && (bl || (left_depth >= right_depth)))
+   {
       do_assign(e.left(), typename left_type::tag_type());
       do_bitwise_or(e.right(), typename right_type::tag_type());
    }
@@ -1875,7 +1890,9 @@ class number
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
       do_bitwise_xor(e.left(), typename left_type::tag_type());
-    } else if (!br && (bl || (left_depth >= right_depth))) {
+   }
+   else if (!br && (bl || (left_depth >= right_depth)))
+   {
       do_assign(e.left(), typename left_type::tag_type());
       do_bitwise_xor(e.right(), typename right_type::tag_type());
    }
@@ -2087,8 +2104,9 @@ BOOST_MP_FORCEINLINE void swap(number<Backend, ExpressionTemplates>& a, number<B
 // not be supported:
 //
 template <class Backend, expression_template_option ExpressionTemplates>
-inline std::size_t hash_value(const number<Backend, ExpressionTemplates> &val) {
-  return hash_value(val.backend());
+inline std::size_t hash_value(const number<Backend, ExpressionTemplates>& val)
+{
+   return hash_value(val.backend());
 }
 
 } // namespace multiprecision
@@ -2144,30 +2162,35 @@ inline std::istream& operator>>(std::istream& is, rational<multiprecision::numbe
 template <class T,
           multiprecision::expression_template_option ExpressionTemplates>
 inline multiprecision::number<T, ExpressionTemplates>
-numerator(const rational<multiprecision::number<T, ExpressionTemplates>> &a) {
-  return a.numerator();
+numerator(const rational<multiprecision::number<T, ExpressionTemplates> >& a)
+{
+   return a.numerator();
 }
 
 template <class T,
           multiprecision::expression_template_option ExpressionTemplates>
 inline multiprecision::number<T, ExpressionTemplates>
-denominator(const rational<multiprecision::number<T, ExpressionTemplates>> &a) {
-  return a.denominator();
+denominator(const rational<multiprecision::number<T, ExpressionTemplates> >& a)
+{
+   return a.denominator();
 }
 
 template <class T,
           multiprecision::expression_template_option ExpressionTemplates>
 inline std::size_t hash_value(
-    const rational<multiprecision::number<T, ExpressionTemplates>> &val) {
-  std::size_t result = hash_value(val.numerator());
-  boost::hash_combine(result, hash_value(val.denominator()));
-  return result;
+    const rational<multiprecision::number<T, ExpressionTemplates> >& val)
+{
+   std::size_t result = hash_value(val.numerator());
+   boost::hash_combine(result, hash_value(val.denominator()));
+   return result;
 }
 
 namespace multiprecision {
 
-template <class I> struct component_type<boost::rational<I>> {
-  typedef I type;
+template <class I>
+struct component_type<boost::rational<I> >
+{
+   typedef I type;
 };
 
 } // namespace multiprecision

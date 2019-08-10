@@ -304,8 +304,9 @@ using boost::multiprecision::backends::rational_adaptor;
 
 template <class Backend, expression_template_option ExpressionTemplates>
 struct component_type<
-    number<backends::rational_adaptor<Backend>, ExpressionTemplates>> {
-  typedef number<Backend, ExpressionTemplates> type;
+    number<backends::rational_adaptor<Backend>, ExpressionTemplates> >
+{
+   typedef number<Backend, ExpressionTemplates> type;
 };
 
 template <class IntBackend, expression_template_option ET>
@@ -361,12 +362,12 @@ template <class IntBackend,
           boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
     boost::multiprecision::rational_adaptor<IntBackend>,
-    ExpressionTemplates>>::is_integer;
+    ExpressionTemplates> >::is_integer;
 template <class IntBackend,
           boost::multiprecision::expression_template_option ExpressionTemplates>
 BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
     boost::multiprecision::rational_adaptor<IntBackend>,
-    ExpressionTemplates>>::is_exact;
+    ExpressionTemplates> >::is_exact;
 
 #endif
 

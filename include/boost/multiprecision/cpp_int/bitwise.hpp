@@ -13,7 +13,8 @@
 #pragma warning(disable : 4319)
 #endif
 
-namespace boost { namespace multiprecision { namespace backends {
+namespace boost { namespace multiprecision {
+namespace backends {
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
 void is_valid_bitwise_op(
@@ -188,29 +189,33 @@ void bitwise_op(
       o_carry += static_cast<double_limb_type>(~limb_type(0));
       next_limb =
           op(static_cast<limb_type>(r_carry), static_cast<limb_type>(o_carry));
-    }
-  }
-  //
-  // See if the result is negative or not:
-  //
-  if (static_cast<signed_limb_type>(next_limb) < 0) {
-    double_limb_type carry = 1;
-    for (unsigned i = 0; i < x; ++i) {
+   }
+}
+//
+// See if the result is negative or not:
+//
+if (static_cast<signed_limb_type>(next_limb) < 0)
+{
+   double_limb_type carry = 1;
+   for (unsigned i = 0; i < x; ++i)
+   {
       carry += static_cast<double_limb_type>(~pr[i]);
       pr[i] = static_cast<limb_type>(carry);
       carry >>= CppInt1::limb_bits;
-    }
-    if (carry) {
+   }
+   if (carry)
+   {
       result.resize(x + 1, x);
       if (result.size() > x)
-        result.limbs()[x] = static_cast<limb_type>(carry);
-    }
-    result.sign(true);
-  } else
-    result.sign(false);
-
-  result.normalize();
+         result.limbs()[x] = static_cast<limb_type>(carry);
+   }
+   result.sign(true);
 }
+else
+   result.sign(false);
+
+result.normalize();
+} // namespace backends
 
 template <class CppInt1, class CppInt2, class Op>
 void bitwise_op(
@@ -495,13 +500,14 @@ eval_left_shift(
       left_shift_limb(result, s);
    }
 #endif
-  else {
-    left_shift_generic(result, s);
-  }
-  //
-  // We may have shifted off the end and have leading zeros:
-  //
-  result.normalize();
+   else
+   {
+      left_shift_generic(result, s);
+   }
+   //
+   // We may have shifted off the end and have leading zeros:
+   //
+   result.normalize();
 }
 
 template <class Int>
@@ -613,8 +619,8 @@ eval_right_shift(
    if ((s & limb_shift_mask) == 0)
       right_shift_limb(result, s);
 #endif
-  else
-    right_shift_generic(result, s);
+   else
+      right_shift_generic(result, s);
 }
 template <unsigned MinBits1, unsigned MaxBits1, cpp_int_check_type Checked1, class Allocator1>
 inline typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, signed_magnitude, Checked1, Allocator1> >::value>::type
@@ -864,7 +870,8 @@ eval_bitwise_xor(
    }
 }
 
-}}} // namespace boost::multiprecision::backends
+}} // namespace boost::multiprecision
+} // namespace boost::multiprecision::backends
 
 #ifdef _MSC_VER
 #pragma warning(pop)

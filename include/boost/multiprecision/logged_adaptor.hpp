@@ -13,23 +13,23 @@ namespace boost {
 namespace multiprecision {
 
 template <class Backend>
-inline void log_postfix_event(const Backend &,
-                              const char * /*event_description*/) {}
+inline void log_postfix_event(const Backend&,
+                              const char* /*event_description*/) {}
 template <class Backend, class T>
-inline void log_postfix_event(const Backend &, const T &,
-                              const char * /*event_description*/) {}
+inline void log_postfix_event(const Backend&, const T&,
+                              const char* /*event_description*/) {}
 template <class Backend>
-inline void log_prefix_event(const Backend &,
-                             const char * /*event_description*/) {}
+inline void log_prefix_event(const Backend&,
+                             const char* /*event_description*/) {}
 template <class Backend, class T>
-inline void log_prefix_event(const Backend &, const T &,
-                             const char * /*event_description*/) {}
+inline void log_prefix_event(const Backend&, const T&,
+                             const char* /*event_description*/) {}
 template <class Backend, class T, class U>
-inline void log_prefix_event(const Backend &, const T &, const U &,
-                             const char * /*event_description*/) {}
+inline void log_prefix_event(const Backend&, const T&, const U&,
+                             const char* /*event_description*/) {}
 template <class Backend, class T, class U, class V>
-inline void log_prefix_event(const Backend &, const T &, const U &, const V &,
-                             const char * /*event_description*/) {}
+inline void log_prefix_event(const Backend&, const T&, const U&, const V&,
+                             const char* /*event_description*/) {}
 
 namespace backends {
 
@@ -172,7 +172,8 @@ struct logged_adaptor
    }
 };
 
-template <class T> inline const T &unwrap_logged_type(const T &a) { return a; }
+template <class T>
+inline const T& unwrap_logged_type(const T& a) { return a; }
 template <class Backend>
 inline const Backend& unwrap_logged_type(const logged_adaptor<Backend>& a) { return a.value(); }
 
@@ -307,44 +308,49 @@ NON_MEMBER_OP2(multiply, "*=")
 NON_MEMBER_OP2(divide, "/=")
 
 template <class Backend, class R>
-inline void eval_convert_to(R *result, const logged_adaptor<Backend> &val) {
-  using default_ops::eval_convert_to;
-  log_prefix_event(val.value(), "convert_to");
-  eval_convert_to(result, val.value());
-  log_postfix_event(val.value(), *result, "convert_to");
+inline void eval_convert_to(R* result, const logged_adaptor<Backend>& val)
+{
+   using default_ops::eval_convert_to;
+   log_prefix_event(val.value(), "convert_to");
+   eval_convert_to(result, val.value());
+   log_postfix_event(val.value(), *result, "convert_to");
 }
 
 template <class Backend, class Exp>
-inline void eval_frexp(logged_adaptor<Backend> &result,
-                       const logged_adaptor<Backend> &arg, Exp *exp) {
-  log_prefix_event(arg.value(), "frexp");
-  eval_frexp(result.value(), arg.value(), exp);
-  log_postfix_event(result.value(), *exp, "frexp");
+inline void eval_frexp(logged_adaptor<Backend>&       result,
+                       const logged_adaptor<Backend>& arg, Exp* exp)
+{
+   log_prefix_event(arg.value(), "frexp");
+   eval_frexp(result.value(), arg.value(), exp);
+   log_postfix_event(result.value(), *exp, "frexp");
 }
 
 template <class Backend, class Exp>
-inline void eval_ldexp(logged_adaptor<Backend> &result,
-                       const logged_adaptor<Backend> &arg, Exp exp) {
-  log_prefix_event(arg.value(), "ldexp");
-  eval_ldexp(result.value(), arg.value(), exp);
-  log_postfix_event(result.value(), exp, "ldexp");
+inline void eval_ldexp(logged_adaptor<Backend>&       result,
+                       const logged_adaptor<Backend>& arg, Exp exp)
+{
+   log_prefix_event(arg.value(), "ldexp");
+   eval_ldexp(result.value(), arg.value(), exp);
+   log_postfix_event(result.value(), exp, "ldexp");
 }
 
 template <class Backend, class Exp>
-inline void eval_scalbn(logged_adaptor<Backend> &result,
-                        const logged_adaptor<Backend> &arg, Exp exp) {
-  log_prefix_event(arg.value(), "scalbn");
-  eval_scalbn(result.value(), arg.value(), exp);
-  log_postfix_event(result.value(), exp, "scalbn");
+inline void eval_scalbn(logged_adaptor<Backend>&       result,
+                        const logged_adaptor<Backend>& arg, Exp exp)
+{
+   log_prefix_event(arg.value(), "scalbn");
+   eval_scalbn(result.value(), arg.value(), exp);
+   log_postfix_event(result.value(), exp, "scalbn");
 }
 
 template <class Backend>
 inline typename Backend::exponent_type
-eval_ilogb(const logged_adaptor<Backend> &arg) {
-  log_prefix_event(arg.value(), "ilogb");
-  typename Backend::exponent_type r = eval_ilogb(arg.value());
-  log_postfix_event(arg.value(), "ilogb");
-  return r;
+eval_ilogb(const logged_adaptor<Backend>& arg)
+{
+   log_prefix_event(arg.value(), "ilogb");
+   typename Backend::exponent_type r = eval_ilogb(arg.value());
+   log_postfix_event(arg.value(), "ilogb");
+   return r;
 }
 
 NON_MEMBER_OP2(floor, "floor")
@@ -352,12 +358,13 @@ NON_MEMBER_OP2(ceil, "ceil")
 NON_MEMBER_OP2(sqrt, "sqrt")
 
 template <class Backend>
-inline int eval_fpclassify(const logged_adaptor<Backend> &arg) {
-  using default_ops::eval_fpclassify;
-  log_prefix_event(arg.value(), "fpclassify");
-  int r = eval_fpclassify(arg.value());
-  log_postfix_event(arg.value(), r, "fpclassify");
-  return r;
+inline int eval_fpclassify(const logged_adaptor<Backend>& arg)
+{
+   using default_ops::eval_fpclassify;
+   log_prefix_event(arg.value(), "fpclassify");
+   int r = eval_fpclassify(arg.value());
+   log_postfix_event(arg.value(), r, "fpclassify");
+   return r;
 }
 
 /*********************************************************************
@@ -396,93 +403,104 @@ NON_MEMBER_OP4(qr, "quotient-and-remainder")
 NON_MEMBER_OP2(complement, "~")
 
 template <class Backend>
-inline void eval_left_shift(logged_adaptor<Backend> &arg, std::size_t a) {
-  using default_ops::eval_left_shift;
-  log_prefix_event(arg.value(), a, "<<=");
-  eval_left_shift(arg.value(), a);
-  log_postfix_event(arg.value(), "<<=");
+inline void eval_left_shift(logged_adaptor<Backend>& arg, std::size_t a)
+{
+   using default_ops::eval_left_shift;
+   log_prefix_event(arg.value(), a, "<<=");
+   eval_left_shift(arg.value(), a);
+   log_postfix_event(arg.value(), "<<=");
 }
 template <class Backend>
-inline void eval_left_shift(logged_adaptor<Backend> &arg,
-                            const logged_adaptor<Backend> &a, std::size_t b) {
-  using default_ops::eval_left_shift;
-  log_prefix_event(arg.value(), a, b, "<<");
-  eval_left_shift(arg.value(), a.value(), b);
-  log_postfix_event(arg.value(), "<<");
+inline void eval_left_shift(logged_adaptor<Backend>&       arg,
+                            const logged_adaptor<Backend>& a, std::size_t b)
+{
+   using default_ops::eval_left_shift;
+   log_prefix_event(arg.value(), a, b, "<<");
+   eval_left_shift(arg.value(), a.value(), b);
+   log_postfix_event(arg.value(), "<<");
 }
 template <class Backend>
-inline void eval_right_shift(logged_adaptor<Backend> &arg, std::size_t a) {
-  using default_ops::eval_right_shift;
-  log_prefix_event(arg.value(), a, ">>=");
-  eval_right_shift(arg.value(), a);
-  log_postfix_event(arg.value(), ">>=");
+inline void eval_right_shift(logged_adaptor<Backend>& arg, std::size_t a)
+{
+   using default_ops::eval_right_shift;
+   log_prefix_event(arg.value(), a, ">>=");
+   eval_right_shift(arg.value(), a);
+   log_postfix_event(arg.value(), ">>=");
 }
 template <class Backend>
-inline void eval_right_shift(logged_adaptor<Backend> &arg,
-                             const logged_adaptor<Backend> &a, std::size_t b) {
-  using default_ops::eval_right_shift;
-  log_prefix_event(arg.value(), a, b, ">>");
-  eval_right_shift(arg.value(), a.value(), b);
-  log_postfix_event(arg.value(), ">>");
+inline void eval_right_shift(logged_adaptor<Backend>&       arg,
+                             const logged_adaptor<Backend>& a, std::size_t b)
+{
+   using default_ops::eval_right_shift;
+   log_prefix_event(arg.value(), a, b, ">>");
+   eval_right_shift(arg.value(), a.value(), b);
+   log_postfix_event(arg.value(), ">>");
 }
 
 template <class Backend, class T>
-inline unsigned eval_integer_modulus(const logged_adaptor<Backend> &arg,
-                                     const T &a) {
-  using default_ops::eval_integer_modulus;
-  log_prefix_event(arg.value(), a, "integer-modulus");
-  unsigned r = eval_integer_modulus(arg.value(), a);
-  log_postfix_event(arg.value(), r, "integer-modulus");
-  return r;
+inline unsigned eval_integer_modulus(const logged_adaptor<Backend>& arg,
+                                     const T&                       a)
+{
+   using default_ops::eval_integer_modulus;
+   log_prefix_event(arg.value(), a, "integer-modulus");
+   unsigned r = eval_integer_modulus(arg.value(), a);
+   log_postfix_event(arg.value(), r, "integer-modulus");
+   return r;
 }
 
 template <class Backend>
-inline unsigned eval_lsb(const logged_adaptor<Backend> &arg) {
-  using default_ops::eval_lsb;
-  log_prefix_event(arg.value(), "least-significant-bit");
-  unsigned r = eval_lsb(arg.value());
-  log_postfix_event(arg.value(), r, "least-significant-bit");
-  return r;
+inline unsigned eval_lsb(const logged_adaptor<Backend>& arg)
+{
+   using default_ops::eval_lsb;
+   log_prefix_event(arg.value(), "least-significant-bit");
+   unsigned r = eval_lsb(arg.value());
+   log_postfix_event(arg.value(), r, "least-significant-bit");
+   return r;
 }
 
 template <class Backend>
-inline unsigned eval_msb(const logged_adaptor<Backend> &arg) {
-  using default_ops::eval_msb;
-  log_prefix_event(arg.value(), "most-significant-bit");
-  unsigned r = eval_msb(arg.value());
-  log_postfix_event(arg.value(), r, "most-significant-bit");
-  return r;
+inline unsigned eval_msb(const logged_adaptor<Backend>& arg)
+{
+   using default_ops::eval_msb;
+   log_prefix_event(arg.value(), "most-significant-bit");
+   unsigned r = eval_msb(arg.value());
+   log_postfix_event(arg.value(), r, "most-significant-bit");
+   return r;
 }
 
 template <class Backend>
-inline bool eval_bit_test(const logged_adaptor<Backend> &arg, unsigned a) {
-  using default_ops::eval_bit_test;
-  log_prefix_event(arg.value(), a, "bit-test");
-  bool r = eval_bit_test(arg.value(), a);
-  log_postfix_event(arg.value(), r, "bit-test");
-  return r;
+inline bool eval_bit_test(const logged_adaptor<Backend>& arg, unsigned a)
+{
+   using default_ops::eval_bit_test;
+   log_prefix_event(arg.value(), a, "bit-test");
+   bool r = eval_bit_test(arg.value(), a);
+   log_postfix_event(arg.value(), r, "bit-test");
+   return r;
 }
 
 template <class Backend>
-inline void eval_bit_set(const logged_adaptor<Backend> &arg, unsigned a) {
-  using default_ops::eval_bit_set;
-  log_prefix_event(arg.value(), a, "bit-set");
-  eval_bit_set(arg.value(), a);
-  log_postfix_event(arg.value(), arg, "bit-set");
+inline void eval_bit_set(const logged_adaptor<Backend>& arg, unsigned a)
+{
+   using default_ops::eval_bit_set;
+   log_prefix_event(arg.value(), a, "bit-set");
+   eval_bit_set(arg.value(), a);
+   log_postfix_event(arg.value(), arg, "bit-set");
 }
 template <class Backend>
-inline void eval_bit_unset(const logged_adaptor<Backend> &arg, unsigned a) {
-  using default_ops::eval_bit_unset;
-  log_prefix_event(arg.value(), a, "bit-unset");
-  eval_bit_unset(arg.value(), a);
-  log_postfix_event(arg.value(), arg, "bit-unset");
+inline void eval_bit_unset(const logged_adaptor<Backend>& arg, unsigned a)
+{
+   using default_ops::eval_bit_unset;
+   log_prefix_event(arg.value(), a, "bit-unset");
+   eval_bit_unset(arg.value(), a);
+   log_postfix_event(arg.value(), arg, "bit-unset");
 }
 template <class Backend>
-inline void eval_bit_flip(const logged_adaptor<Backend> &arg, unsigned a) {
-  using default_ops::eval_bit_flip;
-  log_prefix_event(arg.value(), a, "bit-flip");
-  eval_bit_flip(arg.value(), a);
-  log_postfix_event(arg.value(), arg, "bit-flip");
+inline void eval_bit_flip(const logged_adaptor<Backend>& arg, unsigned a)
+{
+   using default_ops::eval_bit_flip;
+   log_prefix_event(arg.value(), a, "bit-flip");
+   eval_bit_flip(arg.value(), a);
+   log_postfix_event(arg.value(), arg, "bit-flip");
 }
 
 NON_MEMBER_OP3(gcd, "gcd")
@@ -523,14 +541,17 @@ NON_MEMBER_OP3(fmod, "fmod")
 NON_MEMBER_OP3(pow, "pow")
 NON_MEMBER_OP3(atan2, "atan2")
 
-template <class Backend> int eval_signbit(const logged_adaptor<Backend> &val) {
-  using default_ops::eval_signbit;
-  return eval_signbit(val.value());
+template <class Backend>
+int eval_signbit(const logged_adaptor<Backend>& val)
+{
+   using default_ops::eval_signbit;
+   return eval_signbit(val.value());
 }
 
 template <class Backend>
-std::size_t hash_value(const logged_adaptor<Backend> &val) {
-  return hash_value(val.value());
+std::size_t hash_value(const logged_adaptor<Backend>& val)
+{
+   return hash_value(val.value());
 }
 
 #define NON_MEMBER_COMPLEX_TO_REAL(name, str)                                                    \
@@ -557,9 +578,10 @@ NON_MEMBER_COMPLEX_TO_REAL(real, "real")
 NON_MEMBER_COMPLEX_TO_REAL(imag, "imag")
 
 template <class T, class V, class U>
-inline void assign_components(logged_adaptor<T> &result, const V &v1,
-                              const U &v2) {
-  assign_components(result.value(), v1, v2);
+inline void assign_components(logged_adaptor<T>& result, const V& v1,
+                              const U& v2)
+{
+   assign_components(result.value(), v1, v2);
 }
 
 } // namespace backends

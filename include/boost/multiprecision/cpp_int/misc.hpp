@@ -41,18 +41,20 @@ void check_in_range(const CppInt& val, const mpl::int_<checked>&)
    }
 }
 template <class R, class CppInt>
-inline void check_in_range(const CppInt & /*val*/,
-                           const mpl::int_<unchecked> &) BOOST_NOEXCEPT {}
+inline void check_in_range(const CppInt& /*val*/,
+                           const mpl::int_<unchecked>&) BOOST_NOEXCEPT {}
 
-inline void check_is_negative(const mpl::true_ &) BOOST_NOEXCEPT {}
-inline void check_is_negative(const mpl::false_ &) {
-  BOOST_THROW_EXCEPTION(std::range_error(
-      "Attempt to assign a negative value to an unsigned type."));
+inline void check_is_negative(const mpl::true_&) BOOST_NOEXCEPT {}
+inline void check_is_negative(const mpl::false_&)
+{
+   BOOST_THROW_EXCEPTION(std::range_error(
+       "Attempt to assign a negative value to an unsigned type."));
 }
 
 template <class Integer>
-inline Integer negate_integer(Integer i, const mpl::true_ &) BOOST_NOEXCEPT {
-  return -i;
+inline Integer negate_integer(Integer i, const mpl::true_&) BOOST_NOEXCEPT
+{
+   return -i;
 }
 template <class Integer>
 inline Integer negate_integer(Integer i, const mpl::false_&) BOOST_NOEXCEPT
@@ -565,8 +567,8 @@ eval_gcd(
       eval_right_shift(v, vs);
    } while (true);
 
-  result = u;
-  eval_left_shift(result, shift);
+   result = u;
+   eval_left_shift(result, shift);
 }
 //
 // Now again for trivial backends:

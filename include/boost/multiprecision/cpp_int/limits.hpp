@@ -115,7 +115,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_in
       void do_nothing() const {}
    };
 
-  static const inititializer init;
+   static const inititializer init;
 
  public:
    BOOST_STATIC_CONSTEXPR bool is_specialized = true;
@@ -165,17 +165,17 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_in
 };
 
 template <unsigned MinBits, unsigned MaxBits,
-          boost::multiprecision::cpp_integer_type SignType,
-          boost::multiprecision::cpp_int_check_type Checked, class Allocator,
+          boost::multiprecision::cpp_integer_type           SignType,
+          boost::multiprecision::cpp_int_check_type         Checked, class Allocator,
           boost::multiprecision::expression_template_option ExpressionTemplates>
 const typename numeric_limits<boost::multiprecision::number<
     boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked,
                                            Allocator>,
-    ExpressionTemplates>>::inititializer
+    ExpressionTemplates> >::inititializer
     numeric_limits<boost::multiprecision::number<
         boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType,
                                                Checked, Allocator>,
-        ExpressionTemplates>>::init;
+        ExpressionTemplates> >::init;
 
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
 

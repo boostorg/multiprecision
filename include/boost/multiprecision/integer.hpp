@@ -33,15 +33,17 @@ subtract(Integer& result, const I2& a, const I2& b)
 
 template <class Integer>
 typename enable_if_c<is_integral<Integer>::value>::type
-divide_qr(const Integer &x, const Integer &y, Integer &q, Integer &r) {
-  q = x / y;
-  r = x % y;
+divide_qr(const Integer& x, const Integer& y, Integer& q, Integer& r)
+{
+   q = x / y;
+   r = x % y;
 }
 
 template <class I1, class I2>
 typename enable_if_c<is_integral<I1>::value && is_integral<I2>::value, I2>::type
-integer_modulus(const I1 &x, I2 val) {
-  return static_cast<I2>(x % val);
+integer_modulus(const I1& x, I2 val)
+{
+   return static_cast<I2>(x % val);
 }
 
 namespace detail {
@@ -236,9 +238,10 @@ typename enable_if_c<is_integral<Integer>::value, Integer>::type sqrt(const Inte
 
 template <class Integer>
 typename enable_if_c<is_integral<Integer>::value, Integer>::type
-sqrt(const Integer &x) {
-  Integer r;
-  return sqrt(x, r);
+sqrt(const Integer& x)
+{
+   Integer r;
+   return sqrt(x, r);
 }
 
 }} // namespace boost::multiprecision
