@@ -6,16 +6,16 @@
 #ifndef BOOST_MATH_BIG_NUM_DEF_OPS
 #define BOOST_MATH_BIG_NUM_DEF_OPS
 
-#include <boost/cstdint.hpp>
 #include <boost/math/policies/error_handling.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
-#include <boost/math/special_functions/hypot.hpp>
-#include <boost/math/special_functions/next.hpp>
-#include <boost/mpl/fold.hpp>
-#include <boost/mpl/front.hpp>
 #include <boost/multiprecision/detail/number_base.hpp>
-#include <boost/type_traits/make_unsigned.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <boost/math/special_functions/next.hpp>
+#include <boost/math/special_functions/hypot.hpp>
 #include <boost/utility/enable_if.hpp>
+#include <boost/mpl/front.hpp>
+#include <boost/mpl/fold.hpp>
+#include <boost/cstdint.hpp>
+#include <boost/type_traits/make_unsigned.hpp>
 #ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
 #include <string_view>
 #endif
@@ -54,22 +54,20 @@ namespace default_ops {
 
 #ifdef BOOST_MSVC
 // warning C4127: conditional expression is constant
-// warning C4146: unary minus operator applied to unsigned type, result still
-// unsigned
+// warning C4146: unary minus operator applied to unsigned type, result still unsigned
 #pragma warning(push)
 #pragma warning(disable : 4127 4146)
 #endif
 //
 // Default versions of mixed arithmetic, these just construct a temporary
 // from the arithmetic value and then do the arithmetic on that, two versions
-// of each depending on whether the backend can be directly constructed from
-// type V.
+// of each depending on whether the backend can be directly constructed from type V.
 //
-// Note that we have to provide *all* the template parameters to class number
-// when used in enable_if as MSVC-10 won't compile the code if we rely on a
-// computed-default parameter. Since the result of the test doesn't depend on
-// whether expression templates are on or off we just use et_on everywhere.  We
-// could use a BOOST_WORKAROUND but that just obfuscates the code even more....
+// Note that we have to provide *all* the template parameters to class number when used in
+// enable_if as MSVC-10 won't compile the code if we rely on a computed-default parameter.
+// Since the result of the test doesn't depend on whether expression templates are on or off
+// we just use et_on everywhere.  We could use a BOOST_WORKAROUND but that just obfuscates the
+// code even more....
 //
 template <class T, class V>
 inline typename disable_if_c<is_convertible<V, T>::value>::type
@@ -121,32 +119,26 @@ template <class T, class U, class V>
 void eval_multiply(T& t, const U& u, const V& v);
 
 template <class T, class U, class V>
-inline
-    typename disable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type
-    eval_multiply_add(T& t, const U& u, const V& v)
+inline typename disable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_add(T& t, const U& u, const V& v)
 {
    T z;
    eval_multiply(z, u, v);
    eval_add(t, z);
 }
 template <class T, class U, class V>
-inline typename enable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type
-eval_multiply_add(T& t, const U& u, const V& v)
+inline typename enable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_add(T& t, const U& u, const V& v)
 {
    eval_multiply_add(t, v, u);
 }
 template <class T, class U, class V>
-inline
-    typename disable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type
-    eval_multiply_subtract(T& t, const U& u, const V& v)
+inline typename disable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_subtract(T& t, const U& u, const V& v)
 {
    T z;
    eval_multiply(z, u, v);
    eval_subtract(t, z);
 }
 template <class T, class U, class V>
-inline typename enable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type
-eval_multiply_subtract(T& t, const U& u, const V& v)
+inline typename enable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_subtract(T& t, const U& u, const V& v)
 {
    eval_multiply_subtract(t, v, u);
 }
@@ -243,8 +235,7 @@ eval_complement(T& result, V const& v)
 }
 
 //
-// Default versions of 3-arg arithmetic functions, these mostly just forward to
-// the 2 arg versions:
+// Default versions of 3-arg arithmetic functions, these mostly just forward to the 2 arg versions:
 //
 template <class T, class U, class V>
 void eval_add(T& t, const U& u, const V& v);
@@ -267,25 +258,20 @@ inline void eval_add_default(T& t, const T& u, const T& v)
    }
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value &&
-                            !is_convertible<U, T>::value>::type
-eval_add_default(T& t, const T& u, const U& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_add_default(T& t, const T& u, const U& v)
 {
    T vv;
    vv = v;
    eval_add(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value &&
-                            is_convertible<U, T>::value>::type
-eval_add_default(T& t, const T& u, const U& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_add_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_add(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type
-eval_add_default(T& t, const U& u, const T& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type eval_add_default(T& t, const U& u, const T& v)
 {
    eval_add(t, v, u);
 }
@@ -330,45 +316,33 @@ inline void eval_subtract_default(T& t, const T& u, const T& v)
    }
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value &&
-                            !is_convertible<U, T>::value>::type
-eval_subtract_default(T& t, const T& u, const U& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_subtract_default(T& t, const T& u, const U& v)
 {
    T vv;
    vv = v;
    eval_subtract(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value &&
-                            is_convertible<U, T>::value>::type
-eval_subtract_default(T& t, const T& u, const U& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_subtract_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_subtract(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value &&
-                            is_signed_number<T>::value>::type
-eval_subtract_default(T& t, const U& u, const T& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_signed_number<T>::value>::type eval_subtract_default(T& t, const U& u, const T& v)
 {
    eval_subtract(t, v, u);
    t.negate();
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value &&
-                            !is_convertible<U, T>::value &&
-                            is_unsigned_number<T>::value>::type
-eval_subtract_default(T& t, const U& u, const T& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value && is_unsigned_number<T>::value>::type eval_subtract_default(T& t, const U& u, const T& v)
 {
    T temp;
    temp = u;
    eval_subtract(t, temp, v);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value &&
-                            is_convertible<U, T>::value &&
-                            is_unsigned_number<T>::value>::type
-eval_subtract_default(T& t, const U& u, const T& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value && is_unsigned_number<T>::value>::type eval_subtract_default(T& t, const U& u, const T& v)
 {
    T temp(u);
    eval_subtract(t, temp, v);
@@ -412,25 +386,20 @@ inline void eval_multiply_default(T& t, const T& u, const T& v)
 }
 #if !BOOST_WORKAROUND(BOOST_MSVC, < 1900)
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value &&
-                            !is_convertible<U, T>::value>::type
-eval_multiply_default(T& t, const T& u, const U& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_multiply_default(T& t, const T& u, const U& v)
 {
    T vv;
    vv = v;
    eval_multiply(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value &&
-                            is_convertible<U, T>::value>::type
-eval_multiply_default(T& t, const T& u, const U& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_multiply_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_multiply(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type
-eval_multiply_default(T& t, const U& u, const T& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type eval_multiply_default(T& t, const U& u, const T& v)
 {
    eval_multiply(t, v, u);
 }
@@ -471,26 +440,25 @@ inline void eval_multiply_add(T& t, const T& u, const T& v, const T& x)
 }
 
 template <class T, class U>
-inline typename boost::disable_if_c<boost::is_same<T, U>::value, T>::type
-make_T(const U& u)
+inline typename boost::disable_if_c<boost::is_same<T, U>::value, T>::type make_T(const U& u)
 {
    T t;
    t = number<T>::canonical_value(u);
    return BOOST_MP_MOVE(t);
 }
 template <class T>
-inline const T& make_T(const T& t) { return t; }
+inline const T& make_T(const T& t)
+{
+   return t;
+}
 
 template <class T, class U, class V, class X>
-inline
-    typename disable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type
-    eval_multiply_add(T& t, const U& u, const V& v, const X& x)
+inline typename disable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_add(T& t, const U& u, const V& v, const X& x)
 {
    eval_multiply_add(t, make_T<T>(u), make_T<T>(v), make_T<T>(x));
 }
 template <class T, class U, class V, class X>
-inline typename enable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type
-eval_multiply_add(T& t, const U& u, const V& v, const X& x)
+inline typename enable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_add(T& t, const U& u, const V& v, const X& x)
 {
    eval_multiply_add(t, v, u, x);
 }
@@ -510,8 +478,7 @@ inline typename disable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::typ
    }
 }
 template <class T, class U, class V, class X>
-inline typename enable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type
-eval_multiply_subtract(T& t, const U& u, const V& v, const X& x)
+inline typename enable_if_c<!is_same<T, U>::value && is_same<T, V>::value>::type eval_multiply_subtract(T& t, const U& u, const V& v, const X& x)
 {
    eval_multiply_subtract(t, v, u, x);
 }
@@ -538,35 +505,27 @@ inline void eval_divide_default(T& t, const T& u, const T& v)
 }
 #if !BOOST_WORKAROUND(BOOST_MSVC, < 1900)
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value &&
-                            !is_convertible<U, T>::value>::type
-eval_divide_default(T& t, const T& u, const U& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_divide_default(T& t, const T& u, const U& v)
 {
    T vv;
    vv = v;
    eval_divide(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value &&
-                            is_convertible<U, T>::value>::type
-eval_divide_default(T& t, const T& u, const U& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_divide_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_divide(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value &&
-                            !is_convertible<U, T>::value>::type
-eval_divide_default(T& t, const U& u, const T& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_divide_default(T& t, const U& u, const T& v)
 {
    T uu;
    uu = u;
    eval_divide(t, uu, v);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value &&
-                            is_convertible<U, T>::value>::type
-eval_divide_default(T& t, const U& u, const T& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_divide_default(T& t, const U& u, const T& v)
 {
    T uu(u);
    eval_divide(t, uu, v);
@@ -615,35 +574,27 @@ inline void eval_modulus_default(T& t, const T& u, const T& v)
    }
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value &&
-                            !is_convertible<U, T>::value>::type
-eval_modulus_default(T& t, const T& u, const U& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_modulus_default(T& t, const T& u, const U& v)
 {
    T vv;
    vv = v;
    eval_modulus(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value &&
-                            is_convertible<U, T>::value>::type
-eval_modulus_default(T& t, const T& u, const U& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_modulus_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_modulus(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value &&
-                            !is_convertible<U, T>::value>::type
-eval_modulus_default(T& t, const U& u, const T& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_modulus_default(T& t, const U& u, const T& v)
 {
    T uu;
    uu = u;
    eval_modulus(t, uu, v);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value &&
-                            is_convertible<U, T>::value>::type
-eval_modulus_default(T& t, const U& u, const T& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_modulus_default(T& t, const U& u, const T& v)
 {
    T uu(u);
    eval_modulus(t, uu, v);
@@ -690,29 +641,25 @@ inline void eval_bitwise_and_default(T& t, const T& u, const T& v)
    }
 }
 template <class T, class U>
-inline typename disable_if_c<is_convertible<U, T>::value>::type
-eval_bitwise_and_default(T& t, const T& u, const U& v)
+inline typename disable_if_c<is_convertible<U, T>::value>::type eval_bitwise_and_default(T& t, const T& u, const U& v)
 {
    T vv;
    vv = v;
    eval_bitwise_and(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, T>::value>::type
-eval_bitwise_and_default(T& t, const T& u, const U& v)
+inline typename enable_if_c<is_convertible<U, T>::value>::type eval_bitwise_and_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_bitwise_and(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type
-eval_bitwise_and_default(T& t, const U& u, const T& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type eval_bitwise_and_default(T& t, const U& u, const T& v)
 {
    eval_bitwise_and(t, v, u);
 }
 template <class T, class U, class V>
-inline typename disable_if_c<is_same<T, U>::value || is_same<T, V>::value>::type
-eval_bitwise_and_default(T& t, const U& u, const V& v)
+inline typename disable_if_c<is_same<T, U>::value || is_same<T, V>::value>::type eval_bitwise_and_default(T& t, const U& u, const V& v)
 {
    t = u;
    eval_bitwise_and(t, v);
@@ -744,25 +691,20 @@ inline void eval_bitwise_or_default(T& t, const T& u, const T& v)
    }
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value &&
-                            !is_convertible<U, T>::value>::type
-eval_bitwise_or_default(T& t, const T& u, const U& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_bitwise_or_default(T& t, const T& u, const U& v)
 {
    T vv;
    vv = v;
    eval_bitwise_or(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value &&
-                            is_convertible<U, T>::value>::type
-eval_bitwise_or_default(T& t, const T& u, const U& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_bitwise_or_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_bitwise_or(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type
-eval_bitwise_or_default(T& t, const U& u, const T& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type eval_bitwise_or_default(T& t, const U& u, const T& v)
 {
    eval_bitwise_or(t, v, u);
 }
@@ -806,25 +748,20 @@ inline void eval_bitwise_xor_default(T& t, const T& u, const T& v)
    }
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value &&
-                            !is_convertible<U, T>::value>::type
-eval_bitwise_xor_default(T& t, const T& u, const U& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && !is_convertible<U, T>::value>::type eval_bitwise_xor_default(T& t, const T& u, const U& v)
 {
    T vv;
    vv = v;
    eval_bitwise_xor(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value &&
-                            is_convertible<U, T>::value>::type
-eval_bitwise_xor_default(T& t, const T& u, const U& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value && is_convertible<U, T>::value>::type eval_bitwise_xor_default(T& t, const T& u, const U& v)
 {
    T vv(v);
    eval_bitwise_xor(t, u, vv);
 }
 template <class T, class U>
-inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type
-eval_bitwise_xor_default(T& t, const U& u, const T& v)
+inline typename enable_if_c<is_convertible<U, number<T, et_on> >::value>::type eval_bitwise_xor_default(T& t, const U& u, const T& v)
 {
    eval_bitwise_xor(t, v, u);
 }
@@ -887,19 +824,8 @@ inline int eval_get_sign(const T& val)
    return val.compare(static_cast<ui_type>(0));
 }
 
-template <class U, class T>
-inline void assign_components_imp(T& result, const long long& v1, const U& v2,
-                                  const mpl::int_<number_kind_modulus>&)
-{
-   result.m_params = v2;
-   result          = v1;
-   eval_multiply(result, v2.R2().backend());
-   // eval_multiply(result, v1);
-}
-
 template <class T, class V, class U>
-inline void assign_components_imp(T& result, const V& v1, const U& v2,
-                                  const mpl::int_<number_kind_rational>&)
+inline void assign_components_imp(T& result, const V& v1, const U& v2, const mpl::int_<number_kind_rational>&)
 {
    result = v1;
    T t;
@@ -908,25 +834,22 @@ inline void assign_components_imp(T& result, const V& v1, const U& v2,
 }
 
 template <class T, class V, class U, int N>
-inline void assign_components_imp(T& result, const V& v1, const U& v2,
-                                  const mpl::int_<N>&)
+inline void assign_components_imp(T& result, const V& v1, const U& v2, const mpl::int_<N>&)
 {
    typedef typename component_type<number<T> >::type component_number_type;
-   component_number_type                             x(v1), y(v2);
+
+   component_number_type x(v1), y(v2);
    assign_components(result, x.backend(), y.backend());
 }
 
 template <class T, class V, class U>
 inline void assign_components(T& result, const V& v1, const U& v2)
 {
-   return assign_components_imp(result, v1, v2,
-                                typename number_category<T>::type());
+   return assign_components_imp(result, v1, v2, typename number_category<T>::type());
 }
 #ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
 template <class Result, class Traits>
-inline void
-assign_from_string_view(Result&                                     result,
-                        const std::basic_string_view<char, Traits>& view)
+inline void assign_from_string_view(Result& result, const std::basic_string_view<char, Traits>& view)
 {
    // since most (all?) backends require a const char* to construct from, we just
    // convert to that:
@@ -934,10 +857,7 @@ assign_from_string_view(Result&                                     result,
    result = s.c_str();
 }
 template <class Result, class Traits>
-inline void
-assign_from_string_view(Result&                                     result,
-                        const std::basic_string_view<char, Traits>& view_x,
-                        const std::basic_string_view<char, Traits>& view_y)
+inline void assign_from_string_view(Result& result, const std::basic_string_view<char, Traits>& view_x, const std::basic_string_view<char, Traits>& view_y)
 {
    // since most (all?) backends require a const char* to construct from, we just
    // convert to that:
@@ -1095,23 +1015,18 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
 template <class R, class B>
 inline void eval_convert_to(terminal<R>* result, const B& backend)
 {
-   typedef mpl::bool_<boost::is_unsigned<R>::value &&
-                      number_category<B>::value == number_kind_integer>
-       tag_type;
+   typedef mpl::bool_<boost::is_unsigned<R>::value && number_category<B>::value == number_kind_integer> tag_type;
    last_chance_eval_convert_to(result, backend, tag_type());
 }
 
 template <class B1, class B2, expression_template_option et>
-inline void eval_convert_to(terminal<number<B1, et> >* result,
-                            const B2&                  backend)
+inline void eval_convert_to(terminal<number<B1, et> >* result, const B2& backend)
 {
    //
    // We ran out of types to try for the conversion, try
    // a generic conversion and hope for the best:
    //
-   boost::multiprecision::detail::generic_interconvert(
-       result->value.backend(), backend, number_category<B1>(),
-       number_category<B2>());
+   boost::multiprecision::detail::generic_interconvert(result->value.backend(), backend, number_category<B1>(), number_category<B2>());
 }
 
 template <class B>
@@ -1474,28 +1389,23 @@ template <class B>
 void eval_gcd(B& result, const B& a, const B& b);
 
 template <class T, class Arithmetic>
-inline typename enable_if<is_integral<Arithmetic> >::type
-eval_gcd(T& result, const T& a, const Arithmetic& b)
+inline typename enable_if<is_integral<Arithmetic> >::type eval_gcd(T& result, const T& a, const Arithmetic& b)
 {
-   typedef typename boost::multiprecision::detail::canonical<Arithmetic, T>::type
-       si_type;
+   typedef typename boost::multiprecision::detail::canonical<Arithmetic, T>::type si_type;
    using default_ops::eval_gcd;
    T t;
    t = static_cast<si_type>(b);
    eval_gcd(result, a, t);
 }
 template <class T, class Arithmetic>
-inline typename enable_if<is_integral<Arithmetic> >::type
-eval_gcd(T& result, const Arithmetic& a, const T& b)
+inline typename enable_if<is_integral<Arithmetic> >::type eval_gcd(T& result, const Arithmetic& a, const T& b)
 {
    eval_gcd(result, b, a);
 }
 template <class T, class Arithmetic>
-inline typename enable_if<is_integral<Arithmetic> >::type
-eval_lcm(T& result, const T& a, const Arithmetic& b)
+inline typename enable_if<is_integral<Arithmetic> >::type eval_lcm(T& result, const T& a, const Arithmetic& b)
 {
-   typedef typename boost::multiprecision::detail::canonical<Arithmetic, T>::type
-       si_type;
+   typedef typename boost::multiprecision::detail::canonical<Arithmetic, T>::type si_type;
    using default_ops::eval_lcm;
    T t;
    t = static_cast<si_type>(b);
@@ -1676,8 +1586,7 @@ inline void eval_proj(B& result, const B& val)
 }
 
 //
-// These have to implemented by the backend, declared here so that our macro
-// generated code compiles OK.
+// These have to implemented by the backend, declared here so that our macro generated code compiles OK.
 //
 template <class T>
 typename enable_if_c<sizeof(T) == 0>::type eval_floor();
@@ -1712,9 +1621,7 @@ inline typename B::exponent_type eval_ilogb(const B& val)
    {
    case FP_NAN:
 #ifdef FP_ILOGBNAN
-      return FP_ILOGBNAN > 0
-                 ? (std::numeric_limits<typename B::exponent_type>::max)()
-                 : (std::numeric_limits<typename B::exponent_type>::min)();
+      return FP_ILOGBNAN > 0 ? (std::numeric_limits<typename B::exponent_type>::max)() : (std::numeric_limits<typename B::exponent_type>::min)();
 #else
       return (std::numeric_limits<typename B::exponent_type>::max)();
 #endif
@@ -1757,10 +1664,7 @@ inline void eval_logb(B& result, const B& val)
 template <class B, class A>
 inline void eval_scalbn(B& result, const B& val, A e)
 {
-   BOOST_STATIC_ASSERT_MSG(
-       !std::numeric_limits<number<B> >::is_specialized ||
-           (std::numeric_limits<number<B> >::radix == 2),
-       "The default implementation of scalbn requires a base 2 number type");
+   BOOST_STATIC_ASSERT_MSG(!std::numeric_limits<number<B> >::is_specialized || (std::numeric_limits<number<B> >::radix == 2), "The default implementation of scalbn requires a base 2 number type");
    eval_ldexp(result, val, static_cast<typename B::exponent_type>(e));
 }
 template <class B, class A>
@@ -1788,9 +1692,7 @@ inline bool is_arg_nan(const T&, mpl::false_ const&, const mpl::false_&)
 template <class T>
 inline bool is_arg_nan(const T& val)
 {
-   return is_arg_nan(
-       val, mpl::bool_<boost::multiprecision::detail::is_backend<T>::value>(),
-       is_floating_point<T>());
+   return is_arg_nan(val, mpl::bool_<boost::multiprecision::detail::is_backend<T>::value>(), is_floating_point<T>());
 }
 
 template <class T, class U, class V>
@@ -1938,16 +1840,12 @@ inline void eval_set_imag_imp(To& to, const From& from)
 namespace default_ops {
 
 template <class To, class From>
-inline typename enable_if_c<number_category<To>::value ==
-                            number_kind_complex>::type
-eval_set_real(To& to, const From& from)
+inline typename enable_if_c<number_category<To>::value == number_kind_complex>::type eval_set_real(To& to, const From& from)
 {
    default_ops_adl::eval_set_real_imp(to, from);
 }
 template <class To, class From>
-inline typename disable_if_c<number_category<To>::value ==
-                             number_kind_complex>::type
-eval_set_real(To& to, const From& from)
+inline typename disable_if_c<number_category<To>::value == number_kind_complex>::type eval_set_real(To& to, const From& from)
 {
    to = from;
 }
@@ -1966,9 +1864,7 @@ inline void eval_set_real(T& to, const T& from)
 template <class T>
 void eval_set_imag(T&, const T&)
 {
-   BOOST_STATIC_ASSERT_MSG(
-       sizeof(T) == INT_MAX,
-       "eval_set_imag needs to be specialised for each specific backend");
+   BOOST_STATIC_ASSERT_MSG(sizeof(T) == INT_MAX, "eval_set_imag needs to be specialised for each specific backend");
 }
 
 //
@@ -1984,10 +1880,8 @@ void eval_set_imag(T&, const T&)
 //
 // Default versions of floating point classification routines:
 //
-template <class Backend,
-          multiprecision::expression_template_option ExpressionTemplates>
-inline int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(
-    const multiprecision::number<Backend, ExpressionTemplates>& arg)
+template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+inline int fpclassify BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
 {
    using multiprecision::default_ops::eval_fpclassify;
    return eval_fpclassify(arg.backend());
@@ -2044,14 +1938,11 @@ inline bool isnormal BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::deta
    return isnormal                                                                       BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
 }
 
-// Default versions of sign manipulation functions, if individual backends can
-// do better than this (for example with signed zero), then they should overload
-// these functions further:
+// Default versions of sign manipulation functions, if individual backends can do better than this
+// (for example with signed zero), then they should overload these functions further:
 
-template <class Backend,
-          multiprecision::expression_template_option ExpressionTemplates>
-inline int sign BOOST_PREVENT_MACRO_SUBSTITUTION(
-    const multiprecision::number<Backend, ExpressionTemplates>& arg)
+template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+inline int sign BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
 {
    return arg.sign();
 }
@@ -2062,10 +1953,8 @@ inline int sign BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::detail::e
    return sign                                                                           BOOST_PREVENT_MACRO_SUBSTITUTION(value_type(arg));
 }
 
-template <class Backend,
-          multiprecision::expression_template_option ExpressionTemplates>
-inline int signbit BOOST_PREVENT_MACRO_SUBSTITUTION(
-    const multiprecision::number<Backend, ExpressionTemplates>& arg)
+template <class Backend, multiprecision::expression_template_option ExpressionTemplates>
+inline int signbit BOOST_PREVENT_MACRO_SUBSTITUTION(const multiprecision::number<Backend, ExpressionTemplates>& arg)
 {
    using default_ops::eval_signbit;
    return eval_signbit(arg.backend());
@@ -2153,9 +2042,8 @@ imag(const multiprecision::detail::expression<tag, A1, A2, A3, A4>& arg)
 }
 
 //
-// Complex number functions, these are overloaded at the Backend level, we just
-// provide the expression template versions here, plus overloads for non-complex
-// types:
+// Complex number functions, these are overloaded at the Backend level, we just provide the
+// expression template versions here, plus overloads for non-complex types:
 //
 template <class T, expression_template_option ExpressionTemplates>
 inline typename boost::lazy_enable_if_c<number_category<T>::value == number_kind_complex, component_type<number<T, ExpressionTemplates> > >::type
@@ -2172,45 +2060,30 @@ abs(const detail::expression<tag, A1, A2, A3, A4>& v)
 }
 
 template <class T, expression_template_option ExpressionTemplates>
-inline typename enable_if_c<number_category<T>::value == number_kind_complex,
-                            typename scalar_result_from_possible_complex<
-                                number<T, ExpressionTemplates> >::type>::type
+inline typename enable_if_c<number_category<T>::value == number_kind_complex, typename scalar_result_from_possible_complex<number<T, ExpressionTemplates> >::type>::type
 arg(const number<T, ExpressionTemplates>& v)
 {
    return BOOST_MP_MOVE(atan2(imag(v), real(v)));
 }
 template <class T, expression_template_option ExpressionTemplates>
-inline typename enable_if_c<number_category<T>::value ==
-                                number_kind_floating_point,
-                            typename scalar_result_from_possible_complex<
-                                number<T, ExpressionTemplates> >::type>::type
+inline typename enable_if_c<number_category<T>::value == number_kind_floating_point, typename scalar_result_from_possible_complex<number<T, ExpressionTemplates> >::type>::type
 arg(const number<T, ExpressionTemplates>&)
 {
    return 0;
 }
 template <class tag, class A1, class A2, class A3, class A4>
-inline typename enable_if_c<
-    number_category<typename detail::expression<
-        tag, A1, A2, A3, A4>::result_type>::value == number_kind_complex ||
-        number_category<typename detail::expression<tag, A1, A2, A3, A4>::
-                            result_type>::value == number_kind_floating_point,
-    typename scalar_result_from_possible_complex<typename detail::expression<
-        tag, A1, A2, A3, A4>::result_type>::type>::type
+inline typename enable_if_c<number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_complex || number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_floating_point, typename scalar_result_from_possible_complex<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type>::type
 arg(const detail::expression<tag, A1, A2, A3, A4>& v)
 {
-   typedef
-       typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
+   typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
    return BOOST_MP_MOVE(arg(static_cast<number_type>(v)));
 }
 
 template <class T, expression_template_option ExpressionTemplates>
-inline typename boost::lazy_enable_if_c<
-    number_category<T>::value == number_kind_complex,
-    component_type<number<T, ExpressionTemplates> > >::type
+inline typename boost::lazy_enable_if_c<number_category<T>::value == number_kind_complex, component_type<number<T, ExpressionTemplates> > >::type
 norm(const number<T, ExpressionTemplates>& v)
 {
-   typename component_type<number<T, ExpressionTemplates> >::type a(real(v)),
-       b(imag(v));
+   typename component_type<number<T, ExpressionTemplates> >::type a(real(v)), b(imag(v));
    return BOOST_MP_MOVE(a * a + b * b);
 }
 template <class T, expression_template_option ExpressionTemplates>
@@ -2220,12 +2093,10 @@ norm(const number<T, ExpressionTemplates>& v)
    return v * v;
 }
 template <class tag, class A1, class A2, class A3, class A4>
-inline typename scalar_result_from_possible_complex<
-    typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
+inline typename scalar_result_from_possible_complex<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
 norm(const detail::expression<tag, A1, A2, A3, A4>& v)
 {
-   typedef
-       typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
+   typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
    return BOOST_MP_MOVE(norm(static_cast<number_type>(v)));
 }
 
@@ -2260,8 +2131,7 @@ polar(detail::expression<tag, A1, A2, A3, A4> const& r, detail::expression<tagb,
    return typename complex_result_from_scalar<scalar_type>::type(scalar_type(r * cos(theta)), scalar_type(r * sin(theta)));
 }
 //
-// We also allow the first argument to polar to be an arithmetic type (probably
-// a literal):
+// We also allow the first argument to polar to be an arithmetic type (probably a literal):
 //
 template <class Scalar, class Backend, expression_template_option ExpressionTemplates>
 typename boost::enable_if_c<boost::is_arithmetic<Scalar>::value, typename complex_result_from_scalar<number<Backend, ExpressionTemplates> >::type>::type
@@ -2282,11 +2152,9 @@ polar(Scalar const& r, detail::expression<tag, A1, A2, A3, A4> const& theta)
 // Single argument overloads:
 //
 template <class Backend, expression_template_option ExpressionTemplates>
-typename complex_result_from_scalar<number<Backend, ExpressionTemplates> >::type
-polar(number<Backend, ExpressionTemplates> const& r)
+typename complex_result_from_scalar<number<Backend, ExpressionTemplates> >::type polar(number<Backend, ExpressionTemplates> const& r)
 {
-   return typename complex_result_from_scalar<
-       number<Backend, ExpressionTemplates> >::type(r);
+   return typename complex_result_from_scalar<number<Backend, ExpressionTemplates> >::type(r);
 }
 
 template <class tag, class A1, class A2, class A3, class A4>
@@ -2696,8 +2564,7 @@ inline boost::long_long_type lltrunc(const detail::expression<tag, A1, A2, A3, A
    return r.template convert_to<boost::long_long_type>();
 }
 template <class tag, class A1, class A2, class A3, class A4>
-inline boost::long_long_type
-lltrunc(const detail::expression<tag, A1, A2, A3, A4>& v)
+inline boost::long_long_type lltrunc(const detail::expression<tag, A1, A2, A3, A4>& v)
 {
    return lltrunc(v, boost::math::policies::policy<>());
 }
@@ -2716,11 +2583,9 @@ inline boost::long_long_type lltrunc(const number<T, ExpressionTemplates>& v)
 }
 #endif
 template <class tag, class A1, class A2, class A3, class A4, class Policy>
-inline typename detail::expression<tag, A1, A2, A3, A4>::result_type
-round(const detail::expression<tag, A1, A2, A3, A4>& v, const Policy& pol)
+inline typename detail::expression<tag, A1, A2, A3, A4>::result_type round(const detail::expression<tag, A1, A2, A3, A4>& v, const Policy& pol)
 {
-   typedef
-       typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
+   typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
    return BOOST_MP_MOVE(round(static_cast<number_type>(v), pol));
 }
 template <class T, expression_template_option ExpressionTemplates, class Policy>
@@ -2798,8 +2663,7 @@ inline boost::long_long_type llround(const detail::expression<tag, A1, A2, A3, A
    return r.template convert_to<boost::long_long_type>();
 }
 template <class tag, class A1, class A2, class A3, class A4>
-inline boost::long_long_type
-llround(const detail::expression<tag, A1, A2, A3, A4>& v)
+inline boost::long_long_type llround(const detail::expression<tag, A1, A2, A3, A4>& v)
 {
    return llround(v, boost::math::policies::policy<>());
 }
@@ -2848,14 +2712,10 @@ inline typename enable_if_c<number_category<T>::value == number_kind_floating_po
    return BOOST_MP_MOVE(result);
 }
 template <class tag, class A1, class A2, class A3, class A4>
-inline typename enable_if_c<
-    number_category<typename detail::expression<
-        tag, A1, A2, A3, A4>::result_type>::value == number_kind_floating_point,
-    typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
+inline typename enable_if_c<number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_floating_point, typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
 frexp(const detail::expression<tag, A1, A2, A3, A4>& v, int* pint)
 {
-   typedef
-       typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
+   typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
    return BOOST_MP_MOVE(frexp(static_cast<number_type>(v), pint));
 }
 template <class T, expression_template_option ExpressionTemplates>
@@ -2868,14 +2728,10 @@ inline typename enable_if_c<number_category<T>::value == number_kind_floating_po
    return BOOST_MP_MOVE(result);
 }
 template <class tag, class A1, class A2, class A3, class A4>
-inline typename enable_if_c<
-    number_category<typename detail::expression<
-        tag, A1, A2, A3, A4>::result_type>::value == number_kind_floating_point,
-    typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
+inline typename enable_if_c<number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_floating_point, typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
 frexp(const detail::expression<tag, A1, A2, A3, A4>& v, long* pint)
 {
-   typedef
-       typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
+   typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
    return BOOST_MP_MOVE(frexp(static_cast<number_type>(v), pint));
 }
 template <class T, expression_template_option ExpressionTemplates>
@@ -2888,15 +2744,10 @@ inline typename enable_if_c<number_category<T>::value == number_kind_floating_po
    return BOOST_MP_MOVE(result);
 }
 template <class tag, class A1, class A2, class A3, class A4>
-inline typename enable_if_c<
-    number_category<typename detail::expression<
-        tag, A1, A2, A3, A4>::result_type>::value == number_kind_floating_point,
-    typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
-frexp(const detail::expression<tag, A1, A2, A3, A4>& v,
-      boost::long_long_type*                         pint)
+inline typename enable_if_c<number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_floating_point, typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
+frexp(const detail::expression<tag, A1, A2, A3, A4>& v, boost::long_long_type* pint)
 {
-   typedef
-       typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
+   typedef typename detail::expression<tag, A1, A2, A3, A4>::result_type number_type;
    return BOOST_MP_MOVE(frexp(static_cast<number_type>(v), pint));
 }
 //
@@ -2971,8 +2822,7 @@ fma(const number<Backend, et_on>& a, const U& b, const V& c)
        default_ops::fma_func(), a, b, c);
 }
 
-template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class U,
-          class V>
+template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class U, class V>
 inline typename enable_if<
     mpl::and_<
         mpl::bool_<number_category<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value == number_kind_floating_point>,
@@ -3645,15 +3495,13 @@ UNARY_OP_FUNCTOR(nearbyint, number_kind_floating_point)
 UNARY_OP_FUNCTOR(rint, number_kind_floating_point)
 
 HETERO_BINARY_OP_FUNCTOR(ldexp, short, number_kind_floating_point)
-// HETERO_BINARY_OP_FUNCTOR(frexp, short*, number_kind_floating_point)
+//HETERO_BINARY_OP_FUNCTOR(frexp, short*, number_kind_floating_point)
 HETERO_BINARY_OP_FUNCTOR_B(ldexp, int, number_kind_floating_point)
-// HETERO_BINARY_OP_FUNCTOR_B(frexp, int*, number_kind_floating_point)
+//HETERO_BINARY_OP_FUNCTOR_B(frexp, int*, number_kind_floating_point)
 HETERO_BINARY_OP_FUNCTOR_B(ldexp, long, number_kind_floating_point)
-// HETERO_BINARY_OP_FUNCTOR_B(frexp, long*, number_kind_floating_point)
-HETERO_BINARY_OP_FUNCTOR_B(ldexp, boost::long_long_type,
-                           number_kind_floating_point)
-// HETERO_BINARY_OP_FUNCTOR_B(frexp, boost::long_long_type*,
-// number_kind_floating_point)
+//HETERO_BINARY_OP_FUNCTOR_B(frexp, long*, number_kind_floating_point)
+HETERO_BINARY_OP_FUNCTOR_B(ldexp, boost::long_long_type, number_kind_floating_point)
+//HETERO_BINARY_OP_FUNCTOR_B(frexp, boost::long_long_type*, number_kind_floating_point)
 BINARY_OP_FUNCTOR(pow, number_kind_floating_point)
 BINARY_OP_FUNCTOR(fmod, number_kind_floating_point)
 BINARY_OP_FUNCTOR(fmax, number_kind_floating_point)
@@ -3670,10 +3518,8 @@ HETERO_BINARY_OP_FUNCTOR_B(scalbn, int, number_kind_floating_point)
 HETERO_BINARY_OP_FUNCTOR_B(scalbln, int, number_kind_floating_point)
 HETERO_BINARY_OP_FUNCTOR_B(scalbn, long, number_kind_floating_point)
 HETERO_BINARY_OP_FUNCTOR_B(scalbln, long, number_kind_floating_point)
-HETERO_BINARY_OP_FUNCTOR_B(scalbn, boost::long_long_type,
-                           number_kind_floating_point)
-HETERO_BINARY_OP_FUNCTOR_B(scalbln, boost::long_long_type,
-                           number_kind_floating_point)
+HETERO_BINARY_OP_FUNCTOR_B(scalbn, boost::long_long_type, number_kind_floating_point)
+HETERO_BINARY_OP_FUNCTOR_B(scalbln, boost::long_long_type, number_kind_floating_point)
 
 //
 // Complex functions:
@@ -3718,25 +3564,19 @@ ilogb(const multiprecision::number<Backend, ExpressionTemplates>& val)
 }
 
 template <class tag, class A1, class A2, class A3, class A4>
-inline typename enable_if_c<
-    number_category<detail::expression<tag, A1, A2, A3, A4> >::value ==
-        number_kind_floating_point,
-    typename multiprecision::detail::expression<
-        tag, A1, A2, A3, A4>::result_type::backend_type::exponent_type>::type
+inline typename enable_if_c<number_category<detail::expression<tag, A1, A2, A3, A4> >::value == number_kind_floating_point, typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type::backend_type::exponent_type>::type
 ilogb(const detail::expression<tag, A1, A2, A3, A4>& val)
 {
    using default_ops::eval_ilogb;
-   typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type
-       arg(val);
+   typename multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type arg(val);
    return eval_ilogb(arg.backend());
 }
 
-} // namespace multiprecision
+} //namespace multiprecision
 
 namespace math {
 //
-// Overload of Boost.Math functions that find the wrong overload when used with
-// number:
+// Overload of Boost.Math functions that find the wrong overload when used with number:
 //
 namespace detail {
 template <class T>
@@ -3792,8 +3632,8 @@ using boost::multiprecision::lcm;
 //
 // This has to come last of all:
 //
-#include <boost/multiprecision/detail/et_ops.hpp>
 #include <boost/multiprecision/detail/no_et_ops.hpp>
+#include <boost/multiprecision/detail/et_ops.hpp>
 //
 // min/max overloads:
 //

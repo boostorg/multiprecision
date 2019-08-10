@@ -276,32 +276,19 @@ cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& cpp_bin_float
    static const unsigned limb_bits = sizeof(limb_type) * CHAR_BIT;
    //
    // Set our working precision - this is heuristic based, we want
-   // a value as small as possible > cpp_bin_float<Digits, DigitBase, Allocator,
-   // Exponent, MinE, MaxE>::bit_count to avoid large computations and excessive
-   // memory usage, but we also want to avoid having to up the computation and
-   // start again at a higher precision. So we round cpp_bin_float<Digits,
-   // DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count up to the nearest
-   // whole number of limbs, and add one limb for good measure.  This works very
-   // well for small exponents, but for larger exponents we may may need to
-   // restart, we could add some extra precision right from the start for larger
-   // exponents, but this seems to be slightly slower in the *average* case:
+   // a value as small as possible > cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count to avoid large computations
+   // and excessive memory usage, but we also want to avoid having to
+   // up the computation and start again at a higher precision.
+   // So we round cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count up to the nearest whole number of limbs, and add
+   // one limb for good measure.  This works very well for small exponents,
+   // but for larger exponents we may may need to restart, we could add some
+   // extra precision right from the start for larger exponents, but this
+   // seems to be slightly slower in the *average* case:
    //
 #ifdef BOOST_MP_STRESS_IO
-   boost::intmax_t max_bits = cpp_bin_float<Digits, DigitBase, Allocator,
-                                            Exponent, MinE, MaxE>::bit_count +
-                              32;
+   boost::intmax_t max_bits = cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + 32;
 #else
-   boost::intmax_t max_bits =
-       cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE,
-                     MaxE>::bit_count +
-       ((cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE,
-                       MaxE>::bit_count %
-         limb_bits)
-            ? (limb_bits - cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
-                                         MinE, MaxE>::bit_count %
-                               limb_bits)
-            : 0) +
-       limb_bits;
+   boost::intmax_t max_bits = cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + ((cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count % limb_bits) ? (limb_bits - cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count % limb_bits) : 0) + limb_bits;
 #endif
    boost::int64_t  error          = 0;
    boost::intmax_t calc_exp       = 0;
@@ -540,9 +527,7 @@ std::string cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::s
       // but for larger exponents we add a few extra limbs to max_bits:
       //
 #ifdef BOOST_MP_STRESS_IO
-      boost::intmax_t max_bits = cpp_bin_float<Digits, DigitBase, Allocator,
-                                               Exponent, MinE, MaxE>::bit_count +
-                                 32;
+      boost::intmax_t max_bits = cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + 32;
 #else
       boost::intmax_t max_bits = cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + ((cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count % limb_bits) ? (limb_bits - cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count % limb_bits) : 0) + limb_bits;
       if (power10)
@@ -668,9 +653,10 @@ std::string cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::s
             break;
       } while (true);
       //
-      // Check if we got the right number of digits, this
-      // is really a test of whether we calculated the
-      // decimal exponent correctly:
+      // Check whether we need to round up: note that we could equally round up
+      // the integer /i/ above, but since we need to perform the rounding *after*
+      // the conversion to a string and the digit count check, we might as well
+      // do it here:
       //
       if ((roundup == 2) || ((roundup == 1) && ((s[s.size() - 1] - '0') & 1)))
       {

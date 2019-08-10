@@ -6,17 +6,17 @@
 #ifndef BOOST_MULTIPRECISION_MPC_HPP
 #define BOOST_MULTIPRECISION_MPC_HPP
 
-#include <algorithm>
-#include <boost/cstdint.hpp>
-#include <boost/functional/hash_fwd.hpp>
-#include <boost/multiprecision/detail/digits.hpp>
-#include <boost/multiprecision/logged_adaptor.hpp>
-#include <boost/multiprecision/mpfr.hpp>
 #include <boost/multiprecision/number.hpp>
+#include <boost/cstdint.hpp>
+#include <boost/multiprecision/detail/digits.hpp>
 #include <boost/multiprecision/traits/is_variable_precision.hpp>
-#include <cmath>
-#include <complex>
+#include <boost/multiprecision/mpfr.hpp>
+#include <boost/multiprecision/logged_adaptor.hpp>
+#include <boost/functional/hash_fwd.hpp>
 #include <mpc.h>
+#include <cmath>
+#include <algorithm>
+#include <complex>
 
 #ifndef BOOST_MULTIPRECISION_MPFI_DEFAULT_PRECISION
 #define BOOST_MULTIPRECISION_MPFI_DEFAULT_PRECISION 20
@@ -301,7 +301,7 @@ struct mpc_complex_imp
    int compare(const V& v) const BOOST_NOEXCEPT
    {
       mpc_complex_imp d(mpc_get_prec(m_data));
-      d = i;
+      d = v;
       return compare(d);
    }
    mpc_t& data() BOOST_NOEXCEPT
@@ -330,41 +330,37 @@ template <unsigned digits10>
 struct mpc_complex_backend : public detail::mpc_complex_imp<digits10>
 {
    mpc_complex_backend() : detail::mpc_complex_imp<digits10>() {}
-   mpc_complex_backend(const mpc_complex_backend& o)
-       : detail::mpc_complex_imp<digits10>(o) {}
+   mpc_complex_backend(const mpc_complex_backend& o) : detail::mpc_complex_imp<digits10>(o) {}
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    mpc_complex_backend(mpc_complex_backend&& o) : detail::mpc_complex_imp<digits10>(static_cast<detail::mpc_complex_imp<digits10>&&>(o))
    {}
 #endif
    template <unsigned D>
-   mpc_complex_backend(const mpc_complex_backend<D>& val,
-                       typename enable_if_c<D <= digits10>::type* = 0)
+   mpc_complex_backend(const mpc_complex_backend<D>& val, typename enable_if_c<D <= digits10>::type* = 0)
        : detail::mpc_complex_imp<digits10>()
    {
       mpc_set(this->m_data, val.data(), GMP_RNDN);
    }
    template <unsigned D>
-   explicit mpc_complex_backend(const mpc_complex_backend<D>& val,
-                                typename disable_if_c<D <= digits10>::type* = 0)
+   explicit mpc_complex_backend(const mpc_complex_backend<D>& val, typename disable_if_c<D <= digits10>::type* = 0)
        : detail::mpc_complex_imp<digits10>()
    {
       mpc_set(this->m_data, val.data(), GMP_RNDN);
    }
    template <unsigned D>
-   mpc_complex_backend(const mpfr_float_backend<D>& val,
-                       typename enable_if_c<D <= digits10>::type* = 0)
+   mpc_complex_backend(const mpfr_float_backend<D>& val, typename enable_if_c<D <= digits10>::type* = 0)
        : detail::mpc_complex_imp<digits10>()
    {
       mpc_set_fr(this->m_data, val.data(), GMP_RNDN);
    }
    template <unsigned D>
-   explicit mpc_complex_backend(const mpfr_float_backend<D>& val,
-                                typename disable_if_c<D <= digits10>::type* = 0)
+   explicit mpc_complex_backend(const mpfr_float_backend<D>& val, typename disable_if_c<D <= digits10>::type* = 0)
        : detail::mpc_complex_imp<digits10>()
    {
       mpc_set(this->m_data, val.data(), GMP_RNDN);
    }
-   mpc_complex_backend(const mpc_t val) : detail::mpc_complex_imp<digits10>()
+   mpc_complex_backend(const mpc_t val)
+       : detail::mpc_complex_imp<digits10>()
    {
       mpc_set(this->m_data, val, GMP_RNDN);
    }
@@ -392,8 +388,7 @@ struct mpc_complex_backend : public detail::mpc_complex_imp<digits10>
       mpc_set_z(this->m_data, val, GMP_RNDN);
       return *this;
    }
-   mpc_complex_backend(gmp_int const& val)
-       : detail::mpc_complex_imp<digits10>()
+   mpc_complex_backend(gmp_int const& val) : detail::mpc_complex_imp<digits10>()
    {
       mpc_set_z(this->m_data, val.data(), GMP_RNDN);
    }
@@ -412,8 +407,7 @@ struct mpc_complex_backend : public detail::mpc_complex_imp<digits10>
       return *this;
    }
    template <unsigned D10>
-   mpc_complex_backend(gmp_float<D10> const& val)
-       : detail::mpc_complex_imp<digits10>()
+   mpc_complex_backend(gmp_float<D10> const& val) : detail::mpc_complex_imp<digits10>()
    {
       mpc_set_f(this->m_data, val.data(), GMP_RNDN);
    }
@@ -432,8 +426,7 @@ struct mpc_complex_backend : public detail::mpc_complex_imp<digits10>
       mpc_set_q(this->m_data, val, GMP_RNDN);
       return *this;
    }
-   mpc_complex_backend(gmp_rational const& val)
-       : detail::mpc_complex_imp<digits10>()
+   mpc_complex_backend(gmp_rational const& val) : detail::mpc_complex_imp<digits10>()
    {
       mpc_set_q(this->m_data, val.data(), GMP_RNDN);
    }
@@ -452,29 +445,25 @@ struct mpc_complex_backend : public detail::mpc_complex_imp<digits10>
       return *this;
    }
    template <unsigned D10, mpfr_allocation_type AllocationType>
-   mpc_complex_backend(mpfr_float_backend<D10, AllocationType> const& val)
-       : detail::mpc_complex_imp<digits10>()
+   mpc_complex_backend(mpfr_float_backend<D10, AllocationType> const& val) : detail::mpc_complex_imp<digits10>()
    {
       mpc_set_fr(this->m_data, val.data(), GMP_RNDN);
    }
    template <unsigned D10, mpfr_allocation_type AllocationType>
-   mpc_complex_backend&
-   operator=(mpfr_float_backend<D10, AllocationType> const& val)
+   mpc_complex_backend& operator=(mpfr_float_backend<D10, AllocationType> const& val)
    {
       mpc_set_fr(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
    mpc_complex_backend& operator=(const mpc_complex_backend& o)
    {
-      *static_cast<detail::mpc_complex_imp<digits10>*>(this) =
-          static_cast<detail::mpc_complex_imp<digits10> const&>(o);
+      *static_cast<detail::mpc_complex_imp<digits10>*>(this) = static_cast<detail::mpc_complex_imp<digits10> const&>(o);
       return *this;
    }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    mpc_complex_backend& operator=(mpc_complex_backend&& o) BOOST_NOEXCEPT
    {
-      *static_cast<detail::mpc_complex_imp<digits10>*>(this) =
-          static_cast<detail::mpc_complex_imp<digits10>&&>(o);
+      *static_cast<detail::mpc_complex_imp<digits10>*>(this) = static_cast<detail::mpc_complex_imp<digits10>&&>(o);
       return *this;
    }
 #endif
@@ -581,6 +570,17 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
    mpc_complex_backend(gmp_float<digits10> const& val) : detail::mpc_complex_imp<0>((unsigned)mpf_get_prec(val.data()))
    {
       mpc_set_f(this->m_data, val.data(), GMP_RNDN);
+   }
+   template <unsigned digits10>
+   mpc_complex_backend& operator=(gmp_float<digits10> const& val)
+   {
+      if (mpc_get_prec(data()) != mpf_get_prec(val.data()))
+      {
+         mpc_complex_backend t(val);
+         t.swap(*this);
+      }
+      else
+         mpc_set_f(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
    mpc_complex_backend(mpq_srcptr val) : detail::mpc_complex_imp<0>()
@@ -601,20 +601,9 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
       mpc_set_q(this->m_data, val.data(), GMP_RNDN);
       return *this;
    }
-   mpc_complex_backend(mpfr_srcptr val)
-       : detail::mpc_complex_imp<0>(mpfr_get_prec(val))
+   mpc_complex_backend(mpfr_srcptr val) : detail::mpc_complex_imp<0>(mpfr_get_prec(val))
    {
       mpc_set_fr(this->m_data, val, GMP_RNDN);
-   }
-   mpc_complex_backend& operator=(mpfr_srcptr val)
-   {
-      if (mpc_get_prec(data()) != mpfr_get_prec(val))
-      {
-         mpc_complex_backend t(val);
-         t.swap(*this);
-      }
-      else
-         mpc_set_fr(this->m_data, val, GMP_RNDN);
    }
    mpc_complex_backend& operator=(mpfr_srcptr val)
    {
@@ -736,45 +725,38 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
 };
 
 template <unsigned digits10, class T>
-inline typename enable_if<is_arithmetic<T>, bool>::type
-eval_eq(const mpc_complex_backend<digits10>& a, const T& b) BOOST_NOEXCEPT
+inline typename enable_if<is_arithmetic<T>, bool>::type eval_eq(const mpc_complex_backend<digits10>& a, const T& b) BOOST_NOEXCEPT
 {
    return a.compare(b) == 0;
 }
 template <unsigned digits10, class T>
-inline typename enable_if<is_arithmetic<T>, bool>::type
-eval_lt(const mpc_complex_backend<digits10>& a, const T& b) BOOST_NOEXCEPT
+inline typename enable_if<is_arithmetic<T>, bool>::type eval_lt(const mpc_complex_backend<digits10>& a, const T& b) BOOST_NOEXCEPT
 {
    return a.compare(b) < 0;
 }
 template <unsigned digits10, class T>
-inline typename enable_if<is_arithmetic<T>, bool>::type
-eval_gt(const mpc_complex_backend<digits10>& a, const T& b) BOOST_NOEXCEPT
+inline typename enable_if<is_arithmetic<T>, bool>::type eval_gt(const mpc_complex_backend<digits10>& a, const T& b) BOOST_NOEXCEPT
 {
    return a.compare(b) > 0;
 }
 
 template <unsigned D1, unsigned D2>
-inline void eval_add(mpc_complex_backend<D1>&       result,
-                     const mpc_complex_backend<D2>& o)
+inline void eval_add(mpc_complex_backend<D1>& result, const mpc_complex_backend<D2>& o)
 {
    mpc_add(result.data(), result.data(), o.data(), GMP_RNDD);
 }
 template <unsigned D1, unsigned D2>
-inline void eval_add(mpc_complex_backend<D1>&      result,
-                     const mpfr_float_backend<D2>& o)
+inline void eval_add(mpc_complex_backend<D1>& result, const mpfr_float_backend<D2>& o)
 {
    mpc_add_fr(result.data(), result.data(), o.data(), GMP_RNDD);
 }
 template <unsigned D1, unsigned D2>
-inline void eval_subtract(mpc_complex_backend<D1>&       result,
-                          const mpc_complex_backend<D2>& o)
+inline void eval_subtract(mpc_complex_backend<D1>& result, const mpc_complex_backend<D2>& o)
 {
    mpc_sub(result.data(), result.data(), o.data(), GMP_RNDD);
 }
 template <unsigned D1, unsigned D2>
-inline void eval_subtract(mpc_complex_backend<D1>&      result,
-                          const mpfr_float_backend<D2>& o)
+inline void eval_subtract(mpc_complex_backend<D1>& result, const mpfr_float_backend<D2>& o)
 {
    mpc_sub_fr(result.data(), result.data(), o.data(), GMP_RNDD);
 }
@@ -787,20 +769,17 @@ inline void eval_multiply(mpc_complex_backend<D1>& result, const mpc_complex_bac
       mpc_mul(result.data(), result.data(), o.data(), GMP_RNDN);
 }
 template <unsigned D1, unsigned D2>
-inline void eval_multiply(mpc_complex_backend<D1>&      result,
-                          const mpfr_float_backend<D2>& o)
+inline void eval_multiply(mpc_complex_backend<D1>& result, const mpfr_float_backend<D2>& o)
 {
    mpc_mul_fr(result.data(), result.data(), o.data(), GMP_RNDN);
 }
 template <unsigned D1, unsigned D2>
-inline void eval_divide(mpc_complex_backend<D1>&       result,
-                        const mpc_complex_backend<D2>& o)
+inline void eval_divide(mpc_complex_backend<D1>& result, const mpc_complex_backend<D2>& o)
 {
    mpc_div(result.data(), result.data(), o.data(), GMP_RNDD);
 }
 template <unsigned D1, unsigned D2>
-inline void eval_divide(mpc_complex_backend<D1>&      result,
-                        const mpfr_float_backend<D2>& o)
+inline void eval_divide(mpc_complex_backend<D1>& result, const mpfr_float_backend<D2>& o)
 {
    mpc_div_fr(result.data(), result.data(), o.data(), GMP_RNDD);
 }
@@ -810,20 +789,17 @@ inline void eval_add(mpc_complex_backend<digits10>& result, unsigned long i)
    mpc_add_ui(result.data(), result.data(), i, GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_subtract(mpc_complex_backend<digits10>& result,
-                          unsigned long                  i)
+inline void eval_subtract(mpc_complex_backend<digits10>& result, unsigned long i)
 {
    mpc_sub_ui(result.data(), result.data(), i, GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_multiply(mpc_complex_backend<digits10>& result,
-                          unsigned long                  i)
+inline void eval_multiply(mpc_complex_backend<digits10>& result, unsigned long i)
 {
    mpc_mul_ui(result.data(), result.data(), i, GMP_RNDN);
 }
 template <unsigned digits10>
-inline void eval_divide(mpc_complex_backend<digits10>& result,
-                        unsigned long                  i)
+inline void eval_divide(mpc_complex_backend<digits10>& result, unsigned long i)
 {
    mpc_div_ui(result.data(), result.data(), i, GMP_RNDN);
 }
@@ -861,29 +837,22 @@ inline void eval_divide(mpc_complex_backend<digits10>& result, long i)
 // Specialised 3 arg versions of the basic operators:
 //
 template <unsigned D1, unsigned D2, unsigned D3>
-inline void eval_add(mpc_complex_backend<D1>&       a,
-                     const mpc_complex_backend<D2>& x,
-                     const mpc_complex_backend<D3>& y)
+inline void eval_add(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, const mpc_complex_backend<D3>& y)
 {
    mpc_add(a.data(), x.data(), y.data(), GMP_RNDD);
 }
 template <unsigned D1, unsigned D2, unsigned D3>
-inline void eval_add(mpc_complex_backend<D1>&       a,
-                     const mpc_complex_backend<D2>& x,
-                     const mpfr_float_backend<D3>&  y)
+inline void eval_add(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, const mpfr_float_backend<D3>& y)
 {
    mpc_add_fr(a.data(), x.data(), y.data(), GMP_RNDD);
 }
 template <unsigned D1, unsigned D2, unsigned D3>
-inline void eval_add(mpc_complex_backend<D1>&       a,
-                     const mpfr_float_backend<D2>&  x,
-                     const mpc_complex_backend<D3>& y)
+inline void eval_add(mpc_complex_backend<D1>& a, const mpfr_float_backend<D2>& x, const mpc_complex_backend<D3>& y)
 {
    mpc_add_fr(a.data(), y.data(), x.data(), GMP_RNDD);
 }
 template <unsigned D1, unsigned D2>
-inline void eval_add(mpc_complex_backend<D1>&       a,
-                     const mpc_complex_backend<D2>& x, unsigned long y)
+inline void eval_add(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, unsigned long y)
 {
    mpc_add_ui(a.data(), x.data(), y, GMP_RNDD);
 }
@@ -896,8 +865,7 @@ inline void eval_add(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& 
       mpc_add_ui(a.data(), x.data(), y, GMP_RNDD);
 }
 template <unsigned D1, unsigned D2>
-inline void eval_add(mpc_complex_backend<D1>& a, unsigned long x,
-                     const mpc_complex_backend<D2>& y)
+inline void eval_add(mpc_complex_backend<D1>& a, unsigned long x, const mpc_complex_backend<D2>& y)
 {
    mpc_add_ui(a.data(), y.data(), x, GMP_RNDD);
 }
@@ -913,29 +881,22 @@ inline void eval_add(mpc_complex_backend<D1>& a, long x, const mpc_complex_backe
       mpc_add_ui(a.data(), y.data(), x, GMP_RNDD);
 }
 template <unsigned D1, unsigned D2, unsigned D3>
-inline void eval_subtract(mpc_complex_backend<D1>&       a,
-                          const mpc_complex_backend<D2>& x,
-                          const mpc_complex_backend<D3>& y)
+inline void eval_subtract(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, const mpc_complex_backend<D3>& y)
 {
    mpc_sub(a.data(), x.data(), y.data(), GMP_RNDD);
 }
 template <unsigned D1, unsigned D2, unsigned D3>
-inline void eval_subtract(mpc_complex_backend<D1>&       a,
-                          const mpc_complex_backend<D2>& x,
-                          const mpfr_float_backend<D3>&  y)
+inline void eval_subtract(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, const mpfr_float_backend<D3>& y)
 {
    mpc_sub_fr(a.data(), x.data(), y.data(), GMP_RNDD);
 }
 template <unsigned D1, unsigned D2, unsigned D3>
-inline void eval_subtract(mpc_complex_backend<D1>&       a,
-                          const mpfr_float_backend<D2>&  x,
-                          const mpc_complex_backend<D3>& y)
+inline void eval_subtract(mpc_complex_backend<D1>& a, const mpfr_float_backend<D2>& x, const mpc_complex_backend<D3>& y)
 {
    mpc_fr_sub(a.data(), x.data(), y.data(), GMP_RNDD);
 }
 template <unsigned D1, unsigned D2>
-inline void eval_subtract(mpc_complex_backend<D1>&       a,
-                          const mpc_complex_backend<D2>& x, unsigned long y)
+inline void eval_subtract(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, unsigned long y)
 {
    mpc_sub_ui(a.data(), x.data(), y, GMP_RNDD);
 }
@@ -948,8 +909,7 @@ inline void eval_subtract(mpc_complex_backend<D1>& a, const mpc_complex_backend<
       mpc_sub_ui(a.data(), x.data(), y, GMP_RNDD);
 }
 template <unsigned D1, unsigned D2>
-inline void eval_subtract(mpc_complex_backend<D1>& a, unsigned long x,
-                          const mpc_complex_backend<D2>& y)
+inline void eval_subtract(mpc_complex_backend<D1>& a, unsigned long x, const mpc_complex_backend<D2>& y)
 {
    mpc_ui_sub(a.data(), x, y.data(), GMP_RNDN);
 }
@@ -974,22 +934,17 @@ inline void eval_multiply(mpc_complex_backend<D1>& a, const mpc_complex_backend<
       mpc_mul(a.data(), x.data(), y.data(), GMP_RNDD);
 }
 template <unsigned D1, unsigned D2, unsigned D3>
-inline void eval_multiply(mpc_complex_backend<D1>&       a,
-                          const mpc_complex_backend<D2>& x,
-                          const mpfr_float_backend<D3>&  y)
+inline void eval_multiply(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, const mpfr_float_backend<D3>& y)
 {
    mpc_mul_fr(a.data(), x.data(), y.data(), GMP_RNDD);
 }
 template <unsigned D1, unsigned D2, unsigned D3>
-inline void eval_multiply(mpc_complex_backend<D1>&       a,
-                          const mpfr_float_backend<D2>&  x,
-                          const mpc_complex_backend<D3>& y)
+inline void eval_multiply(mpc_complex_backend<D1>& a, const mpfr_float_backend<D2>& x, const mpc_complex_backend<D3>& y)
 {
    mpc_mul_fr(a.data(), y.data(), x.data(), GMP_RNDD);
 }
 template <unsigned D1, unsigned D2>
-inline void eval_multiply(mpc_complex_backend<D1>&       a,
-                          const mpc_complex_backend<D2>& x, unsigned long y)
+inline void eval_multiply(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, unsigned long y)
 {
    mpc_mul_ui(a.data(), x.data(), y, GMP_RNDD);
 }
@@ -1005,8 +960,7 @@ inline void eval_multiply(mpc_complex_backend<D1>& a, const mpc_complex_backend<
       mpc_mul_ui(a.data(), x.data(), y, GMP_RNDD);
 }
 template <unsigned D1, unsigned D2>
-inline void eval_multiply(mpc_complex_backend<D1>& a, unsigned long x,
-                          const mpc_complex_backend<D2>& y)
+inline void eval_multiply(mpc_complex_backend<D1>& a, unsigned long x, const mpc_complex_backend<D2>& y)
 {
    mpc_mul_ui(a.data(), y.data(), x, GMP_RNDD);
 }
@@ -1023,29 +977,22 @@ inline void eval_multiply(mpc_complex_backend<D1>& a, long x, const mpc_complex_
 }
 
 template <unsigned D1, unsigned D2, unsigned D3>
-inline void eval_divide(mpc_complex_backend<D1>&       a,
-                        const mpc_complex_backend<D2>& x,
-                        const mpc_complex_backend<D3>& y)
+inline void eval_divide(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, const mpc_complex_backend<D3>& y)
 {
    mpc_div(a.data(), x.data(), y.data(), GMP_RNDD);
 }
 template <unsigned D1, unsigned D2, unsigned D3>
-inline void eval_divide(mpc_complex_backend<D1>&       a,
-                        const mpc_complex_backend<D2>& x,
-                        const mpfr_float_backend<D3>&  y)
+inline void eval_divide(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, const mpfr_float_backend<D3>& y)
 {
    mpc_div_fr(a.data(), x.data(), y.data(), GMP_RNDD);
 }
 template <unsigned D1, unsigned D2, unsigned D3>
-inline void eval_divide(mpc_complex_backend<D1>&       a,
-                        const mpfr_float_backend<D2>&  x,
-                        const mpc_complex_backend<D3>& y)
+inline void eval_divide(mpc_complex_backend<D1>& a, const mpfr_float_backend<D2>& x, const mpc_complex_backend<D3>& y)
 {
    mpc_fr_div(a.data(), x.data(), y.data(), GMP_RNDD);
 }
 template <unsigned D1, unsigned D2>
-inline void eval_divide(mpc_complex_backend<D1>&       a,
-                        const mpc_complex_backend<D2>& x, unsigned long y)
+inline void eval_divide(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2>& x, unsigned long y)
 {
    mpc_div_ui(a.data(), x.data(), y, GMP_RNDD);
 }
@@ -1061,8 +1008,7 @@ inline void eval_divide(mpc_complex_backend<D1>& a, const mpc_complex_backend<D2
       mpc_div_ui(a.data(), x.data(), y, GMP_RNDD);
 }
 template <unsigned D1, unsigned D2>
-inline void eval_divide(mpc_complex_backend<D1>& a, unsigned long x,
-                        const mpc_complex_backend<D2>& y)
+inline void eval_divide(mpc_complex_backend<D1>& a, unsigned long x, const mpc_complex_backend<D2>& y)
 {
    mpc_ui_div(a.data(), x, y.data(), GMP_RNDD);
 }
@@ -1079,42 +1025,34 @@ inline void eval_divide(mpc_complex_backend<D1>& a, long x, const mpc_complex_ba
 }
 
 template <unsigned digits10>
-inline bool
-eval_is_zero(const mpc_complex_backend<digits10>& val) BOOST_NOEXCEPT
+inline bool eval_is_zero(const mpc_complex_backend<digits10>& val) BOOST_NOEXCEPT
 {
-   return (0 != mpfr_zero_p(mpc_realref(val.data()))) &&
-          (0 != mpfr_zero_p(mpc_imagref(val.data())));
+   return (0 != mpfr_zero_p(mpc_realref(val.data()))) && (0 != mpfr_zero_p(mpc_imagref(val.data())));
 }
 template <unsigned digits10>
 inline int eval_get_sign(const mpc_complex_backend<digits10>&)
 {
-   BOOST_STATIC_ASSERT_MSG(
-       digits10 == UINT_MAX,
-       "Complex numbers have no sign bit."); // designed to always fail
+   BOOST_STATIC_ASSERT_MSG(digits10 == UINT_MAX, "Complex numbers have no sign bit."); // designed to always fail
    return 0;
 }
 
 template <unsigned digits10>
-inline void eval_convert_to(unsigned long*                       result,
-                            const mpc_complex_backend<digits10>& val)
+inline void eval_convert_to(unsigned long* result, const mpc_complex_backend<digits10>& val)
 {
    if (0 == mpfr_zero_p(mpc_imagref(val.data())))
    {
-      BOOST_THROW_EXCEPTION(
-          std::runtime_error("Could not convert imaginary number to scalar."));
+      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
    }
    mpfr_float_backend<digits10> t;
    mpc_real(t.data(), val.data(), GMP_RNDN);
    eval_convert_to(result, t);
 }
 template <unsigned digits10>
-inline void eval_convert_to(long*                                result,
-                            const mpc_complex_backend<digits10>& val)
+inline void eval_convert_to(long* result, const mpc_complex_backend<digits10>& val)
 {
    if (0 == mpfr_zero_p(mpc_imagref(val.data())))
    {
-      BOOST_THROW_EXCEPTION(
-          std::runtime_error("Could not convert imaginary number to scalar."));
+      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
    }
    mpfr_float_backend<digits10> t;
    mpc_real(t.data(), val.data(), GMP_RNDN);
@@ -1122,26 +1060,22 @@ inline void eval_convert_to(long*                                result,
 }
 #ifdef _MPFR_H_HAVE_INTMAX_T
 template <unsigned digits10>
-inline void eval_convert_to(boost::ulong_long_type*              result,
-                            const mpc_complex_backend<digits10>& val)
+inline void eval_convert_to(boost::ulong_long_type* result, const mpc_complex_backend<digits10>& val)
 {
    if (0 == mpfr_zero_p(mpc_imagref(val.data())))
    {
-      BOOST_THROW_EXCEPTION(
-          std::runtime_error("Could not convert imaginary number to scalar."));
+      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
    }
    mpfr_float_backend<digits10> t;
    mpc_real(t.data(), val.data(), GMP_RNDN);
    eval_convert_to(result, t);
 }
 template <unsigned digits10>
-inline void eval_convert_to(boost::long_long_type*               result,
-                            const mpc_complex_backend<digits10>& val)
+inline void eval_convert_to(boost::long_long_type* result, const mpc_complex_backend<digits10>& val)
 {
    if (0 == mpfr_zero_p(mpc_imagref(val.data())))
    {
-      BOOST_THROW_EXCEPTION(
-          std::runtime_error("Could not convert imaginary number to scalar."));
+      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
    }
    mpfr_float_backend<digits10> t;
    mpc_real(t.data(), val.data(), GMP_RNDN);
@@ -1149,28 +1083,22 @@ inline void eval_convert_to(boost::long_long_type*               result,
 }
 #endif
 template <unsigned digits10>
-inline void
-eval_convert_to(double*                              result,
-                const mpc_complex_backend<digits10>& val) BOOST_NOEXCEPT
+inline void eval_convert_to(double* result, const mpc_complex_backend<digits10>& val) BOOST_NOEXCEPT
 {
    if (0 == mpfr_zero_p(mpc_imagref(val.data())))
    {
-      BOOST_THROW_EXCEPTION(
-          std::runtime_error("Could not convert imaginary number to scalar."));
+      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
    }
    mpfr_float_backend<digits10> t;
    mpc_real(t.data(), val.data(), GMP_RNDN);
    eval_convert_to(result, t);
 }
 template <unsigned digits10>
-inline void
-eval_convert_to(long double*                         result,
-                const mpc_complex_backend<digits10>& val) BOOST_NOEXCEPT
+inline void eval_convert_to(long double* result, const mpc_complex_backend<digits10>& val) BOOST_NOEXCEPT
 {
    if (0 == mpfr_zero_p(mpc_imagref(val.data())))
    {
-      BOOST_THROW_EXCEPTION(
-          std::runtime_error("Could not convert imaginary number to scalar."));
+      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
    }
    mpfr_float_backend<digits10> t;
    mpc_real(t.data(), val.data(), GMP_RNDN);
@@ -1205,8 +1133,7 @@ inline void assign_components(mpc_complex_backend<D1>& result, const mpfr_float_
 }
 
 template <unsigned D1, unsigned D2, mpfr_allocation_type AllocationType>
-inline void assign_components(mpc_complex_backend<D1>& result, unsigned long a,
-                              unsigned long b)
+inline void assign_components(mpc_complex_backend<D1>& result, unsigned long a, unsigned long b)
 {
    mpc_set_ui_ui(result.data(), a, b, GMP_RNDN);
 }
@@ -1219,23 +1146,20 @@ inline void assign_components(mpc_complex_backend<D1>& result, long a, long b)
 
 #if defined(BOOST_HAS_LONG_LONG) && defined(_MPFR_H_HAVE_INTMAX_T)
 template <unsigned D1, unsigned D2, mpfr_allocation_type AllocationType>
-inline void assign_components(mpc_complex_backend<D1>& result,
-                              unsigned long long a, unsigned long long b)
+inline void assign_components(mpc_complex_backend<D1>& result, unsigned long long a, unsigned long long b)
 {
    mpc_set_uj_uj(result.data(), a, b, GMP_RNDN);
 }
 
 template <unsigned D1, unsigned D2, mpfr_allocation_type AllocationType>
-inline void assign_components(mpc_complex_backend<D1>& result, long long a,
-                              long long b)
+inline void assign_components(mpc_complex_backend<D1>& result, long long a, long long b)
 {
    mpc_set_sj_sj(result.data(), a, b, GMP_RNDN);
 }
 #endif
 
 template <unsigned D1, unsigned D2, mpfr_allocation_type AllocationType>
-inline void assign_components(mpc_complex_backend<D1>& result, double a,
-                              double b)
+inline void assign_components(mpc_complex_backend<D1>& result, double a, double b)
 {
    if ((boost::math::isnan)(a))
    {
@@ -1252,8 +1176,7 @@ inline void assign_components(mpc_complex_backend<D1>& result, double a,
 }
 
 template <unsigned D1, unsigned D2, mpfr_allocation_type AllocationType>
-inline void assign_components(mpc_complex_backend<D1>& result, long double a,
-                              long double b)
+inline void assign_components(mpc_complex_backend<D1>& result, long double a, long double b)
 {
    if ((boost::math::isnan)(a))
    {
@@ -1273,300 +1196,254 @@ inline void assign_components(mpc_complex_backend<D1>& result, long double a,
 // Native non-member operations:
 //
 template <unsigned Digits10>
-inline void eval_sqrt(mpc_complex_backend<Digits10>&       result,
-                      const mpc_complex_backend<Digits10>& val)
+inline void eval_sqrt(mpc_complex_backend<Digits10>& result, const mpc_complex_backend<Digits10>& val)
 {
    mpc_sqrt(result.data(), val.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_pow(mpc_complex_backend<Digits10>&       result,
-                     const mpc_complex_backend<Digits10>& b,
-                     const mpc_complex_backend<Digits10>& e)
+inline void eval_pow(mpc_complex_backend<Digits10>& result, const mpc_complex_backend<Digits10>& b, const mpc_complex_backend<Digits10>& e)
 {
    mpc_pow(result.data(), b.data(), e.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_exp(mpc_complex_backend<Digits10>&       result,
-                     const mpc_complex_backend<Digits10>& arg)
+inline void eval_exp(mpc_complex_backend<Digits10>& result, const mpc_complex_backend<Digits10>& arg)
 {
    mpc_exp(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_log(mpc_complex_backend<Digits10>&       result,
-                     const mpc_complex_backend<Digits10>& arg)
+inline void eval_log(mpc_complex_backend<Digits10>& result, const mpc_complex_backend<Digits10>& arg)
 {
    mpc_log(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_log10(mpc_complex_backend<Digits10>&       result,
-                       const mpc_complex_backend<Digits10>& arg)
+inline void eval_log10(mpc_complex_backend<Digits10>& result, const mpc_complex_backend<Digits10>& arg)
 {
    mpc_log10(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_sin(mpc_complex_backend<Digits10>&       result,
-                     const mpc_complex_backend<Digits10>& arg)
+inline void eval_sin(mpc_complex_backend<Digits10>& result, const mpc_complex_backend<Digits10>& arg)
 {
    mpc_sin(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_cos(mpc_complex_backend<Digits10>&       result,
-                     const mpc_complex_backend<Digits10>& arg)
+inline void eval_cos(mpc_complex_backend<Digits10>& result, const mpc_complex_backend<Digits10>& arg)
 {
    mpc_cos(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_tan(mpc_complex_backend<Digits10>&       result,
-                     const mpc_complex_backend<Digits10>& arg)
+inline void eval_tan(mpc_complex_backend<Digits10>& result, const mpc_complex_backend<Digits10>& arg)
 {
    mpc_tan(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_asin(mpc_complex_backend<Digits10>&       result,
-                      const mpc_complex_backend<Digits10>& arg)
+inline void eval_asin(mpc_complex_backend<Digits10>& result, const mpc_complex_backend<Digits10>& arg)
 {
    mpc_asin(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_acos(mpc_complex_backend<Digits10>&       result,
-                      const mpc_complex_backend<Digits10>& arg)
+inline void eval_acos(mpc_complex_backend<Digits10>& result, const mpc_complex_backend<Digits10>& arg)
 {
    mpc_acos(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_atan(mpc_complex_backend<Digits10>&       result,
-                      const mpc_complex_backend<Digits10>& arg)
+inline void eval_atan(mpc_complex_backend<Digits10>& result, const mpc_complex_backend<Digits10>& arg)
 {
    mpc_atan(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_sinh(mpc_complex_backend<Digits10>&       result,
-                      const mpc_complex_backend<Digits10>& arg)
+inline void eval_sinh(mpc_complex_backend<Digits10>& result, const mpc_complex_backend<Digits10>& arg)
 {
    mpc_sinh(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_cosh(mpc_complex_backend<Digits10>&       result,
-                      const mpc_complex_backend<Digits10>& arg)
+inline void eval_cosh(mpc_complex_backend<Digits10>& result, const mpc_complex_backend<Digits10>& arg)
 {
    mpc_cosh(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_tanh(mpc_complex_backend<Digits10>&       result,
-                      const mpc_complex_backend<Digits10>& arg)
+inline void eval_tanh(mpc_complex_backend<Digits10>& result, const mpc_complex_backend<Digits10>& arg)
 {
    mpc_tanh(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_asinh(mpc_complex_backend<Digits10>&       result,
-                       const mpc_complex_backend<Digits10>& arg)
+inline void eval_asinh(mpc_complex_backend<Digits10>& result, const mpc_complex_backend<Digits10>& arg)
 {
    mpc_asinh(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_acosh(mpc_complex_backend<Digits10>&       result,
-                       const mpc_complex_backend<Digits10>& arg)
+inline void eval_acosh(mpc_complex_backend<Digits10>& result, const mpc_complex_backend<Digits10>& arg)
 {
    mpc_acosh(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_atanh(mpc_complex_backend<Digits10>&       result,
-                       const mpc_complex_backend<Digits10>& arg)
+inline void eval_atanh(mpc_complex_backend<Digits10>& result, const mpc_complex_backend<Digits10>& arg)
 {
    mpc_atanh(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_conj(mpc_complex_backend<Digits10>&       result,
-                      const mpc_complex_backend<Digits10>& arg)
+inline void eval_conj(mpc_complex_backend<Digits10>& result, const mpc_complex_backend<Digits10>& arg)
 {
    mpc_conj(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_proj(mpc_complex_backend<Digits10>&       result,
-                      const mpc_complex_backend<Digits10>& arg)
+inline void eval_proj(mpc_complex_backend<Digits10>& result, const mpc_complex_backend<Digits10>& arg)
 {
    mpc_proj(result.data(), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_real(mpfr_float_backend<Digits10>&        result,
-                      const mpc_complex_backend<Digits10>& arg)
+inline void eval_real(mpfr_float_backend<Digits10>& result, const mpc_complex_backend<Digits10>& arg)
 {
    mpfr_set_prec(result.data(), mpfr_get_prec(mpc_realref(arg.data())));
    mpfr_set(result.data(), mpc_realref(arg.data()), GMP_RNDN);
 }
 template <unsigned Digits10>
-inline void eval_imag(mpfr_float_backend<Digits10>&        result,
-                      const mpc_complex_backend<Digits10>& arg)
+inline void eval_imag(mpfr_float_backend<Digits10>& result, const mpc_complex_backend<Digits10>& arg)
 {
    mpfr_set_prec(result.data(), mpfr_get_prec(mpc_imagref(arg.data())));
    mpfr_set(result.data(), mpc_imagref(arg.data()), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_set_imag(mpc_complex_backend<Digits10>&      result,
-                          const mpfr_float_backend<Digits10>& arg)
+inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg)
 {
    mpfr_set(mpc_imagref(result.data()), arg.data(), GMP_RNDN);
 }
 
 template <unsigned Digits10>
-inline void eval_set_real(mpc_complex_backend<Digits10>&      result,
-                          const mpfr_float_backend<Digits10>& arg)
+inline void eval_set_real(mpc_complex_backend<Digits10>& result, const mpfr_float_backend<Digits10>& arg)
 {
    mpfr_set(mpc_realref(result.data()), arg.data(), GMP_RNDN);
 }
 template <unsigned Digits10>
-inline void eval_set_real(mpc_complex_backend<Digits10>& result,
-                          const gmp_int&                 arg)
+inline void eval_set_real(mpc_complex_backend<Digits10>& result, const gmp_int& arg)
 {
    mpfr_set_z(mpc_realref(result.data()), arg.data(), GMP_RNDN);
 }
 template <unsigned Digits10>
-inline void eval_set_real(mpc_complex_backend<Digits10>& result,
-                          const gmp_rational&            arg)
+inline void eval_set_real(mpc_complex_backend<Digits10>& result, const gmp_rational& arg)
 {
    mpfr_set_q(mpc_realref(result.data()), arg.data(), GMP_RNDN);
 }
 template <unsigned Digits10>
-inline void eval_set_real(mpc_complex_backend<Digits10>& result,
-                          const unsigned&                arg)
+inline void eval_set_real(mpc_complex_backend<Digits10>& result, const unsigned& arg)
 {
    mpfr_set_ui(mpc_realref(result.data()), arg, GMP_RNDN);
 }
 template <unsigned Digits10>
-inline void eval_set_real(mpc_complex_backend<Digits10>& result,
-                          const unsigned long&           arg)
+inline void eval_set_real(mpc_complex_backend<Digits10>& result, const unsigned long& arg)
 {
    mpfr_set_ui(mpc_realref(result.data()), arg, GMP_RNDN);
 }
 template <unsigned Digits10>
-inline void eval_set_real(mpc_complex_backend<Digits10>& result,
-                          const int&                     arg)
+inline void eval_set_real(mpc_complex_backend<Digits10>& result, const int& arg)
 {
    mpfr_set_si(mpc_realref(result.data()), arg, GMP_RNDN);
 }
 template <unsigned Digits10>
-inline void eval_set_real(mpc_complex_backend<Digits10>& result,
-                          const long&                    arg)
+inline void eval_set_real(mpc_complex_backend<Digits10>& result, const long& arg)
 {
    mpfr_set_si(mpc_realref(result.data()), arg, GMP_RNDN);
 }
 template <unsigned Digits10>
-inline void eval_set_real(mpc_complex_backend<Digits10>& result,
-                          const float&                   arg)
+inline void eval_set_real(mpc_complex_backend<Digits10>& result, const float& arg)
 {
    mpfr_set_flt(mpc_realref(result.data()), arg, GMP_RNDN);
 }
 template <unsigned Digits10>
-inline void eval_set_real(mpc_complex_backend<Digits10>& result,
-                          const double&                  arg)
+inline void eval_set_real(mpc_complex_backend<Digits10>& result, const double& arg)
 {
    mpfr_set_d(mpc_realref(result.data()), arg, GMP_RNDN);
 }
 template <unsigned Digits10>
-inline void eval_set_real(mpc_complex_backend<Digits10>& result,
-                          const long double&             arg)
+inline void eval_set_real(mpc_complex_backend<Digits10>& result, const long double& arg)
 {
    mpfr_set_ld(mpc_realref(result.data()), arg, GMP_RNDN);
 }
 #if defined(BOOST_HAS_LONG_LONG) && defined(_MPFR_H_HAVE_INTMAX_T)
 template <unsigned Digits10>
-inline void eval_set_real(mpc_complex_backend<Digits10>& result,
-                          const unsigned long long&      arg)
+inline void eval_set_real(mpc_complex_backend<Digits10>& result, const unsigned long long& arg)
 {
    mpfr_set_uj(mpc_realref(result.data()), arg, GMP_RNDN);
 }
 template <unsigned Digits10>
-inline void eval_set_real(mpc_complex_backend<Digits10>& result,
-                          const long long&               arg)
+inline void eval_set_real(mpc_complex_backend<Digits10>& result, const long long& arg)
 {
    mpfr_set_sj(mpc_realref(result.data()), arg, GMP_RNDN);
 }
 #endif
 
 template <unsigned Digits10>
-inline void eval_set_imag(mpc_complex_backend<Digits10>& result,
-                          const gmp_int&                 arg)
+inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const gmp_int& arg)
 {
    mpfr_set_z(mpc_imagref(result.data()), arg.data(), GMP_RNDN);
 }
 template <unsigned Digits10>
-inline void eval_set_imag(mpc_complex_backend<Digits10>& result,
-                          const gmp_rational&            arg)
+inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const gmp_rational& arg)
 {
    mpfr_set_q(mpc_imagref(result.data()), arg.data(), GMP_RNDN);
 }
 template <unsigned Digits10>
-inline void eval_set_imag(mpc_complex_backend<Digits10>& result,
-                          const unsigned&                arg)
+inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const unsigned& arg)
 {
    mpfr_set_ui(mpc_imagref(result.data()), arg, GMP_RNDN);
 }
 template <unsigned Digits10>
-inline void eval_set_imag(mpc_complex_backend<Digits10>& result,
-                          const unsigned long&           arg)
+inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const unsigned long& arg)
 {
    mpfr_set_ui(mpc_imagref(result.data()), arg, GMP_RNDN);
 }
 template <unsigned Digits10>
-inline void eval_set_imag(mpc_complex_backend<Digits10>& result,
-                          const int&                     arg)
+inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const int& arg)
 {
    mpfr_set_si(mpc_imagref(result.data()), arg, GMP_RNDN);
 }
 template <unsigned Digits10>
-inline void eval_set_imag(mpc_complex_backend<Digits10>& result,
-                          const long&                    arg)
+inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const long& arg)
 {
    mpfr_set_si(mpc_imagref(result.data()), arg, GMP_RNDN);
 }
 template <unsigned Digits10>
-inline void eval_set_imag(mpc_complex_backend<Digits10>& result,
-                          const float&                   arg)
+inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const float& arg)
 {
    mpfr_set_flt(mpc_imagref(result.data()), arg, GMP_RNDN);
 }
 template <unsigned Digits10>
-inline void eval_set_imag(mpc_complex_backend<Digits10>& result,
-                          const double&                  arg)
+inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const double& arg)
 {
    mpfr_set_d(mpc_imagref(result.data()), arg, GMP_RNDN);
 }
 template <unsigned Digits10>
-inline void eval_set_imag(mpc_complex_backend<Digits10>& result,
-                          const long double&             arg)
+inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const long double& arg)
 {
    mpfr_set_ld(mpc_imagref(result.data()), arg, GMP_RNDN);
 }
 #if defined(BOOST_HAS_LONG_LONG) && defined(_MPFR_H_HAVE_INTMAX_T)
 template <unsigned Digits10>
-inline void eval_set_imag(mpc_complex_backend<Digits10>& result,
-                          const unsigned long long&      arg)
+inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const unsigned long long& arg)
 {
    mpfr_set_uj(mpc_imagref(result.data()), arg, GMP_RNDN);
 }
 template <unsigned Digits10>
-inline void eval_set_imag(mpc_complex_backend<Digits10>& result,
-                          const long long&               arg)
+inline void eval_set_imag(mpc_complex_backend<Digits10>& result, const long long& arg)
 {
    mpfr_set_sj(mpc_imagref(result.data()), arg, GMP_RNDN);
 }
@@ -1626,22 +1503,19 @@ typedef number<mpc_complex_backend<1000> > mpc_complex_1000;
 typedef number<mpc_complex_backend<0> >    mpc_complex;
 
 template <unsigned Digits10, expression_template_option ExpressionTemplates>
-struct component_type<
-    number<mpc_complex_backend<Digits10>, ExpressionTemplates> >
+struct component_type<number<mpc_complex_backend<Digits10>, ExpressionTemplates> >
 {
    typedef number<mpfr_float_backend<Digits10>, ExpressionTemplates> type;
 };
 
 template <unsigned Digits10, expression_template_option ExpressionTemplates>
-struct component_type<number<logged_adaptor<mpc_complex_backend<Digits10> >,
-                             ExpressionTemplates> >
+struct component_type<number<logged_adaptor<mpc_complex_backend<Digits10> >, ExpressionTemplates> >
 {
    typedef number<mpfr_float_backend<Digits10>, ExpressionTemplates> type;
 };
 
 template <unsigned Digits10, expression_template_option ExpressionTemplates>
-struct complex_result_from_scalar<
-    number<mpfr_float_backend<Digits10>, ExpressionTemplates> >
+struct complex_result_from_scalar<number<mpfr_float_backend<Digits10>, ExpressionTemplates> >
 {
    typedef number<mpc_complex_backend<Digits10>, ExpressionTemplates> type;
 };

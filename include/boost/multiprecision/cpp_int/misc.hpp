@@ -11,8 +11,6 @@
 #include <boost/multiprecision/detail/bitscan.hpp> // lsb etc
 #include <boost/integer/common_factor_rt.hpp>      // gcd/lcm
 #include <boost/functional/hash_fwd.hpp>
-#include <boost/integer/common_factor_rt.hpp>      // gcd/lcm
-#include <boost/multiprecision/detail/bitscan.hpp> // lsb etc
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -41,14 +39,12 @@ void check_in_range(const CppInt& val, const mpl::int_<checked>&)
    }
 }
 template <class R, class CppInt>
-inline void check_in_range(const CppInt& /*val*/,
-                           const mpl::int_<unchecked>&) BOOST_NOEXCEPT {}
+inline void check_in_range(const CppInt& /*val*/, const mpl::int_<unchecked>&) BOOST_NOEXCEPT {}
 
 inline void check_is_negative(const mpl::true_&) BOOST_NOEXCEPT {}
 inline void check_is_negative(const mpl::false_&)
 {
-   BOOST_THROW_EXCEPTION(std::range_error(
-       "Attempt to assign a negative value to an unsigned type."));
+   BOOST_THROW_EXCEPTION(std::range_error("Attempt to assign a negative value to an unsigned type."));
 }
 
 template <class Integer>

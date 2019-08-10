@@ -1,3 +1,1 @@
-[submodule "cmake/modules"]
-	path = cmake/modules
-	url = https://github.com/BoostCMake/cmake_modules.git
+

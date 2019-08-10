@@ -32,16 +32,14 @@ subtract(Integer& result, const I2& a, const I2& b)
 }
 
 template <class Integer>
-typename enable_if_c<is_integral<Integer>::value>::type
-divide_qr(const Integer& x, const Integer& y, Integer& q, Integer& r)
+typename enable_if_c<is_integral<Integer>::value>::type divide_qr(const Integer& x, const Integer& y, Integer& q, Integer& r)
 {
    q = x / y;
    r = x % y;
 }
 
 template <class I1, class I2>
-typename enable_if_c<is_integral<I1>::value && is_integral<I2>::value, I2>::type
-integer_modulus(const I1& x, I2 val)
+typename enable_if_c<is_integral<I1>::value && is_integral<I2>::value, I2>::type integer_modulus(const I1& x, I2 val)
 {
    return static_cast<I2>(x % val);
 }
@@ -50,8 +48,8 @@ namespace detail {
 //
 // Figure out the kind of integer that has twice as many bits as some builtin
 // integer type I.  Use a native type if we can (including types which may not
-// be recognised by boost::int_t because they're larger than
-// boost::long_long_type), otherwise synthesize a cpp_int to do the job.
+// be recognised by boost::int_t because they're larger than boost::long_long_type),
+// otherwise synthesize a cpp_int to do the job.
 //
 template <class I>
 struct double_integer
@@ -237,8 +235,7 @@ typename enable_if_c<is_integral<Integer>::value, Integer>::type sqrt(const Inte
 }
 
 template <class Integer>
-typename enable_if_c<is_integral<Integer>::value, Integer>::type
-sqrt(const Integer& x)
+typename enable_if_c<is_integral<Integer>::value, Integer>::type sqrt(const Integer& x)
 {
    Integer r;
    return sqrt(x, r);

@@ -1,8 +1,36 @@
 # Copyright 2016, 2017 Peter Dimov
 # Copyright 2019 Nil Foundation AG
-# Copyright 2019 Mikhail Komarov <nemo@nilfoundation.org>
+# Copyright 2019 Mikhail Komarov <nemo@nil.foundation>
+#
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
+#
+# This file should be used in couple of configurations:
+#
+# 1. Configuration for building at boostorg/multiprecision TravisCI.
+# This means no actual build with CMake should be performed, only configuration.
+#
+# 2. Configuration for building with less CI-loaded projects.
+# This means not only configuration with CMake should be performed, but also
+#  build and test should be executed.
+# To make this script be fine for building and testing with CMake, uncommend
+#  copy and paste following lines before the last 'fi' at 'script' section:
+#
+#------------------------------------------------------------------------------#
+#if [[ $TEST_SUITE == compile_fail ]]; then
+#  if [[ $TRAVIS_OS_NAME == linux ]]; then
+#    ctest --build-and-test .. . --build-generator "Unix Makefiles" --tests-regex "multiprecision_test_compile_fail_*" -j $(($(nproc) + 1));
+#  elif [[ $TRAVIS_OS_NAME == osx ]]; then
+#    ctest --build-and-test .. . --build-generator "Unix Makefiles" --tests-regex "multiprecision_test_compile_fail_*" -j $(($(sysctl -n hw.ncpu) + 1));
+#  fi
+#else
+#  if [[ $TRAVIS_OS_NAME == linux ]]; then
+#    cmake --build . --target multiprecision_test_suite_$TEST_SUITE -- -j$(($(nproc) + 1));
+#  elif [[ $TRAVIS_OS_NAME == osx ]]; then
+#    cmake --build . --target multiprecision_test_suite_$TEST_SUITE -- -j$(($(sysctl -n hw.ncpu) + 1));
+#  fi
+#fi
+#------------------------------------------------------------------------------#
 
 language: cpp
 

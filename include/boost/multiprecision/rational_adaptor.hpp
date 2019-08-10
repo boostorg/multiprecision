@@ -303,8 +303,7 @@ struct number_category<backends::rational_adaptor<IntBackend> > : public mpl::in
 using boost::multiprecision::backends::rational_adaptor;
 
 template <class Backend, expression_template_option ExpressionTemplates>
-struct component_type<
-    number<backends::rational_adaptor<Backend>, ExpressionTemplates> >
+struct component_type<number<backends::rational_adaptor<Backend>, ExpressionTemplates> >
 {
    typedef number<Backend, ExpressionTemplates> type;
 };
@@ -358,16 +357,10 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::ration
 
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
 
-template <class IntBackend,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::rational_adaptor<IntBackend>,
-    ExpressionTemplates> >::is_integer;
-template <class IntBackend,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::rational_adaptor<IntBackend>,
-    ExpressionTemplates> >::is_exact;
+template <class IntBackend, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adaptor<IntBackend>, ExpressionTemplates> >::is_integer;
+template <class IntBackend, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adaptor<IntBackend>, ExpressionTemplates> >::is_exact;
 
 #endif
 

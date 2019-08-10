@@ -1,10 +1,20 @@
+#---------------------------------------------------------------------------#
+# Copyright (c) 2018-2019 Nil Foundation AG
+# Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+# Copyright (c) 2018-2019 Alexey Moskvin
+#
+# Distributed under the Boost Software License, Version 1.0
+# See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt
+#---------------------------------------------------------------------------#
+
 cmake_minimum_required(VERSION 3.5)
 
 set(BOOST_CMAKE FALSE)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake"
-        "${CMAKE_CURRENT_LIST_DIR}/cmake/packages"
-        "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/share/modules/cmake")
+     "${CMAKE_CURRENT_LIST_DIR}/cmake/packages"
+     "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/share/modules/cmake")
 
 include(CMDeploy)
 include(CMConfig)
@@ -18,7 +28,7 @@ if(BUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS)
     add_definitions(-DCI_SUPPRESS_KNOWN_ISSUES)
 endif()
 
-if ("${CMAKE_WORKSPACE_NAME}" STREQUAL boost)
+if("${CMAKE_WORKSPACE_NAME}" STREQUAL boost)
     set(BOOST_CMAKE TRUE)
 
     cm_project(multiprecision WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})

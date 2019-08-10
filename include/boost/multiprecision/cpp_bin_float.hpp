@@ -12,8 +12,7 @@
 #include <boost/multiprecision/detail/float_string_cvt.hpp>
 
 //
-// Some includes we need from Boost.Math, since we rely on that library to
-// provide these functions:
+// Some includes we need from Boost.Math, since we rely on that library to provide these functions:
 //
 #include <boost/math/special_functions/asinh.hpp>
 #include <boost/math/special_functions/acosh.hpp>
@@ -44,16 +43,9 @@ enum digit_base_type
 namespace detail {
 
 template <class U>
-inline typename enable_if_c<is_unsigned<U>::value, bool>::type is_negative(U)
-{
-   return false;
-}
+inline typename enable_if_c<is_unsigned<U>::value, bool>::type is_negative(U) { return false; }
 template <class S>
-inline typename disable_if_c<is_unsigned<S>::value, bool>::type
-is_negative(S s)
-{
-   return s < 0;
-}
+inline typename disable_if_c<is_unsigned<S>::value, bool>::type is_negative(S s) { return s < 0; }
 
 template <class Float, int, bool = number_category<Float>::value == number_kind_floating_point>
 struct is_cpp_bin_float_implicitly_constructible_from_type
@@ -286,118 +278,68 @@ class cpp_bin_float
       m_exponent += static_cast<Exponent>(e);
       return *this;
    }
-
-   typedef typename mpl::front<unsigned_types>::type ui_type;
-   m_data     = static_cast<ui_type>(0u);
-   m_sign     = false;
-   m_exponent = 0;
-
-   static const int bits = sizeof(int) * CHAR_BIT - 1;
-   int              e;
-   f = frexpq(f, &e);
-   while (f)
-   {
-      f = ldexpq(f, bits);
-      e -= bits;
-      int ipart = (int)truncq(f);
-      f -= ipart;
-      m_exponent += bits;
-      cpp_bin_float t;
-      t = static_cast<bf_int_type>(ipart);
-      eval_add(*this, t);
-   }
-   m_exponent += static_cast<Exponent>(e);
-   return *this;
-}
 #endif
 #ifdef BOOST_HAS_FLOAT128
-template <class Float>
-typename boost::enable_if_c<is_floating_point<Float>::value && !is_same<Float, __float128>::value, cpp_bin_float&>::type assign_float(Float f)
+   template <class Float>
+   typename boost::enable_if_c<is_floating_point<Float>::value && !is_same<Float, __float128>::value, cpp_bin_float&>::type assign_float(Float f)
 #else
    template <class Float>
    typename boost::enable_if_c<is_floating_point<Float>::value, cpp_bin_float&>::type assign_float(Float f)
 #endif
-{
-   BOOST_MATH_STD_USING
-   using default_ops::eval_add;
-   typedef typename boost::multiprecision::detail::canonical<int, cpp_bin_float>::type bf_int_type;
-
-   switch ((boost::math::fpclassify)(f))
    {
-   case FP_ZERO:
-      m_data     = limb_type(0);
-      m_sign     = ((boost::math::signbit)(f) > 0);
-      m_exponent = exponent_zero;
-      return *this;
-   case FP_NAN:
-      m_data     = limb_type(0);
+      BOOST_MATH_STD_USING
+      using default_ops::eval_add;
+      typedef typename boost::multiprecision::detail::canonical<int, cpp_bin_float>::type bf_int_type;
+
+      switch ((boost::math::fpclassify)(f))
+      {
+      case FP_ZERO:
+         m_data     = limb_type(0);
+         m_sign     = ((boost::math::signbit)(f) > 0);
+         m_exponent = exponent_zero;
+         return *this;
+      case FP_NAN:
+         m_data     = limb_type(0);
+         m_sign     = false;
+         m_exponent = exponent_nan;
+         return *this;
+      case FP_INFINITE:
+         m_data     = limb_type(0);
+         m_sign     = (f < 0);
+         m_exponent = exponent_infinity;
+         return *this;
+      }
+      if (f < 0)
+      {
+         *this = -f;
+         this->negate();
+         return *this;
+      }
+
+      typedef typename mpl::front<unsigned_types>::type ui_type;
+      m_data     = static_cast<ui_type>(0u);
       m_sign     = false;
-      m_exponent = exponent_nan;
-      return *this;
-   case FP_INFINITE:
-      m_data     = limb_type(0);
-      m_sign     = (f < 0);
-      m_exponent = exponent_infinity;
-      return *this;
-   }
-   if (f < 0)
-   {
-      *this = -f;
-      this->negate();
-      return *this;
-   }
+      m_exponent = 0;
 
-   typedef typename mpl::front<unsigned_types>::type ui_type;
-   m_data     = static_cast<ui_type>(0u);
-   m_sign     = false;
-   m_exponent = 0;
-
-   static const int bits = sizeof(int) * CHAR_BIT - 1;
-   int              e;
-   f = frexp(f, &e);
-   while (f)
-   {
-      f = ldexp(f, bits);
-      e -= bits;
+      static const int bits = sizeof(int) * CHAR_BIT - 1;
+      int              e;
+      f = frexp(f, &e);
+      while (f)
+      {
+         f = ldexp(f, bits);
+         e -= bits;
 #ifndef BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
-      int ipart = itrunc(f);
+         int ipart = itrunc(f);
 #else
          int ipart = static_cast<int>(f);
 #endif
-      f -= ipart;
-      m_exponent += bits;
-      cpp_bin_float t;
-      t = static_cast<bf_int_type>(ipart);
-      eval_add(*this, t);
-   }
-   m_exponent += static_cast<Exponent>(e);
-   return *this;
-}
-
-template <class Float>
-typename boost::enable_if_c<
-    (number_category<Float>::value == number_kind_floating_point) &&
-        !boost::is_floating_point<Float>::value && is_number<Float>::value,
-    cpp_bin_float&>::type
-assign_float(Float f)
-{
-   BOOST_MATH_STD_USING
-   using default_ops::eval_add;
-   using default_ops::eval_convert_to;
-   using default_ops::eval_get_sign;
-   using default_ops::eval_subtract;
-
-   typedef typename boost::multiprecision::detail::canonical<int, Float>::type
-       f_int_type;
-   typedef typename boost::multiprecision::detail::canonical<
-       int, cpp_bin_float>::type bf_int_type;
-
-   switch (eval_fpclassify(f))
-   {
-   case FP_ZERO:
-      m_data     = limb_type(0);
-      m_sign     = ((boost::math::signbit)(f) > 0);
-      m_exponent = exponent_zero;
+         f -= ipart;
+         m_exponent += bits;
+         cpp_bin_float t;
+         t = static_cast<bf_int_type>(ipart);
+         eval_add(*this, t);
+      }
+      m_exponent += static_cast<Exponent>(e);
       return *this;
    }
 
@@ -512,7 +454,7 @@ assign_float(Float f)
 
    cpp_bin_float& operator=(const char* s);
 
-   void swap(cpp_bin_float & o) BOOST_NOEXCEPT
+   void swap(cpp_bin_float& o) BOOST_NOEXCEPT
    {
       m_data.swap(o.m_data);
       std::swap(m_exponent, o.m_exponent);
@@ -571,44 +513,6 @@ assign_float(Float f)
       {
          BOOST_ASSERT(eval_bit_test(m_data, bit_count - 1));
       }
-      BOOST_ASSERT(eval_bit_test(m_data, bit_count - 1));
-      m_sign = detail::is_negative(i);
-   }
-   return *this;
-}
-
-cpp_bin_float& operator=(const char* s);
-
-void swap(cpp_bin_float& o) BOOST_NOEXCEPT
-{
-   m_data.swap(o.m_data);
-   std::swap(m_exponent, o.m_exponent);
-   std::swap(m_sign, o.m_sign);
-}
-
-std::string str(std::streamsize dig, std::ios_base::fmtflags f) const;
-
-void negate()
-{
-   if (m_exponent != exponent_nan)
-      m_sign = !m_sign;
-}
-
-int compare(const cpp_bin_float& o) const BOOST_NOEXCEPT
-{
-   if (m_sign != o.m_sign)
-      return (m_exponent == exponent_zero) && (m_exponent == o.m_exponent)
-                 ? 0
-                 : m_sign ? -1 : 1;
-   int result;
-   if (m_exponent == exponent_nan)
-      return -1;
-   else if (m_exponent != o.m_exponent)
-   {
-      if (m_exponent == exponent_zero)
-         result = -1;
-      else if (o.m_exponent == exponent_zero)
-         result = 1;
       else
       {
          BOOST_ASSERT(m_exponent > max_exponent);
@@ -617,7 +521,7 @@ int compare(const cpp_bin_float& o) const BOOST_NOEXCEPT
       }
    }
    template <class Archive>
-   void serialize(Archive & ar, const unsigned int /*version*/)
+   void serialize(Archive& ar, const unsigned int /*version*/)
    {
       ar& boost::serialization::make_nvp("data", m_data);
       ar& boost::serialization::make_nvp("exponent", m_exponent);
@@ -805,41 +709,7 @@ inline void do_eval_add(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Mi
    res.check_invariants();
    if (res.sign() != s)
       res.negate();
-   return; // result is infinite.
-case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE,
-                   MaxE>::exponent_nan:
-   res = b;
-   return; // result is a NaN.
 }
-
-BOOST_STATIC_ASSERT(boost::integer_traits<exponent_type>::const_max -
-                        cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
-                                      MinE, MaxE>::bit_count >
-                    cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
-                                  MinE, MaxE>::max_exponent);
-
-bool s = a.sign();
-dt     = a.bits();
-if (a.exponent() > (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
-                                      MinE, MaxE>::bit_count +
-                       b.exponent())
-{
-   res.exponent() = a.exponent();
-}
-else
-{
-   exponent_type e_diff = a.exponent() - b.exponent();
-   BOOST_ASSERT(e_diff >= 0);
-   eval_left_shift(dt, e_diff);
-   res.exponent() = a.exponent() - e_diff;
-   eval_add(dt, b.bits());
-}
-
-copy_and_round(res, dt);
-res.check_invariants();
-if (res.sign() != s)
-   res.negate();
-} // namespace backends
 
 template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
 inline void do_eval_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& a, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& b)
@@ -1028,35 +898,6 @@ inline void eval_multiply(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, 
       bool s     = a.sign() != b.sign();
       res        = b;
       res.sign() = s;
-      break;
-   }
-   return;
-case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE,
-                   MaxE>::exponent_nan:
-   res = a;
-   return;
-}
-if (b.exponent() > cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE,
-                                 MaxE>::max_exponent)
-{
-   bool s     = a.sign() != b.sign();
-   res        = b;
-   res.sign() = s;
-   return;
-}
-if ((a.exponent() > 0) && (b.exponent() > 0))
-{
-   if (cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE,
-                     MaxE>::max_exponent +
-           2 - a.exponent() <
-       b.exponent())
-   {
-      // We will certainly overflow:
-      bool s         = a.sign() != b.sign();
-      res.exponent() = cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
-                                     MinE, MaxE>::exponent_infinity;
-      res.sign()     = s;
-      res.bits()     = static_cast<limb_type>(0u);
       return;
    }
    if ((a.exponent() > 0) && (b.exponent() > 0))
@@ -1218,21 +1059,8 @@ inline void eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Mi
       res.bits()     = limb_type(0);
       res.sign()     = u.sign() != v.sign();
       return;
-   }
-}
-else if ((v.exponent() > 0) && (u.exponent() < 0))
-{
-   // Check for underflow:
-   if (cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE,
-                     MaxE>::min_exponent +
-           v.exponent() >
-       u.exponent())
-   {
-      // We will certainly underflow:
-      res.exponent() = cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
-                                     MinE, MaxE>::exponent_zero;
-      res.sign()     = u.sign() != v.sign();
-      res.bits()     = static_cast<limb_type>(0u);
+   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
+      res = std::numeric_limits<number<cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> > >::quiet_NaN().backend();
       return;
    }
 
@@ -1587,12 +1415,9 @@ inline void eval_convert_to(boost::ulong_long_type* res, const cpp_bin_float<Dig
       *res = (std::numeric_limits<boost::ulong_long_type>::max)();
       return;
    }
-   *res = (std::numeric_limits<boost::ulong_long_type>::max)();
-   return;
+   eval_right_shift(man, shift);
+   eval_convert_to(res, man);
 }
-eval_right_shift(man, shift);
-eval_convert_to(res, man);
-} // namespace multiprecision
 
 template <class Float, unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
 inline typename boost::enable_if_c<boost::is_float<Float>::value>::type eval_convert_to(Float* res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& original_arg)
@@ -1668,43 +1493,7 @@ inline typename boost::enable_if_c<boost::is_float<Float>::value>::type eval_con
    }
    if (original_arg.sign())
       *res = -*res;
-   return;
 }
-//
-// Perform rounding first, then afterwards extract the digits:
-//
-cpp_bin_float<std::numeric_limits<Float>::digits, digit_base_2, Allocator,
-              Exponent, MinE, MaxE>
-    arg;
-typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE,
-                       MaxE>::rep_type bits(original_arg.bits());
-arg.exponent() = original_arg.exponent();
-copy_and_round(arg, bits, (int)digits_to_round_to);
-common_exp_type e = arg.exponent();
-e -= cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE,
-                   MaxE>::bit_count -
-     1;
-static const unsigned limbs_needed =
-    std::numeric_limits<Float>::digits /
-        (sizeof(*arg.bits().limbs()) * CHAR_BIT) +
-    (std::numeric_limits<Float>::digits %
-             (sizeof(*arg.bits().limbs()) * CHAR_BIT)
-         ? 1
-         : 0);
-unsigned first_limb_needed = arg.bits().size() - limbs_needed;
-*res                       = 0;
-e += first_limb_needed * sizeof(*arg.bits().limbs()) * CHAR_BIT;
-while (first_limb_needed < arg.bits().size())
-{
-   *res +=
-       std::ldexp(static_cast<Float>(arg.bits().limbs()[first_limb_needed]),
-                  static_cast<int>(e));
-   ++first_limb_needed;
-   e += sizeof(*arg.bits().limbs()) * CHAR_BIT;
-}
-if (original_arg.sign())
-   *res = -*res;
-} // namespace boost
 
 template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
 inline void eval_frexp(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& arg, Exponent* e)
@@ -1830,44 +1619,45 @@ inline void eval_sqrt(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE
    {
    case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
       errno = EDOM;
+      // fallthrough...
+   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero:
+      res = arg;
+      return;
+   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
+      if (arg.sign())
+      {
+         res   = std::numeric_limits<number<cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> > >::quiet_NaN().backend();
+         errno = EDOM;
+      }
+      else
+         res = arg;
+      return;
    }
-   else res = arg;
-   return;
-case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
    if (arg.sign())
    {
       res   = std::numeric_limits<number<cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> > >::quiet_NaN().backend();
       errno = EDOM;
+      return;
    }
-   else
-      res = arg;
-   return;
-}
-if (arg.sign())
-{
-   res   = std::numeric_limits<number<cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> > >::quiet_NaN().backend();
-   errno = EDOM;
-   return;
-}
 
-typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::double_rep_type t(arg.bits()), r, s;
-eval_left_shift(t, arg.exponent() & 1 ? cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count : cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1);
-eval_integer_sqrt(s, r, t);
+   typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::double_rep_type t(arg.bits()), r, s;
+   eval_left_shift(t, arg.exponent() & 1 ? cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count : cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1);
+   eval_integer_sqrt(s, r, t);
 
-if (!eval_bit_test(s, cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count))
-{
-   // We have exactly the right number of cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count in the result, round as required:
-   if (s.compare(r) < 0)
+   if (!eval_bit_test(s, cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count))
    {
-      eval_increment(s);
+      // We have exactly the right number of cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count in the result, round as required:
+      if (s.compare(r) < 0)
+      {
+         eval_increment(s);
+      }
    }
+   typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type ae = arg.exponent();
+   res.exponent()                                                                               = ae / 2;
+   if ((ae & 1) && (ae < 0))
+      --res.exponent();
+   copy_and_round(res, s);
 }
-typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type ae = arg.exponent();
-res.exponent()                                                                               = ae / 2;
-if ((ae & 1) && (ae < 0))
-   --res.exponent();
-copy_and_round(res, s);
-} // namespace boost
 
 template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
 inline void eval_floor(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& arg)
@@ -2040,8 +1830,7 @@ using boost::multiprecision::signbit;
 namespace std {
 
 //
-// numeric_limits [partial] specializations for the types declared in this
-// header:
+// numeric_limits [partial] specializations for the types declared in this header:
 //
 template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
 class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >
@@ -2200,192 +1989,50 @@ const typename numeric_limits<boost::multiprecision::number<boost::multiprecisio
 
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
 
-template <unsigned                                         Digits,
-          boost::multiprecision::backends::digit_base_type DigitBase,
-          class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
-                                         MinE, MaxE>,
-    ExpressionTemplates> >::digits;
-template <unsigned                                         Digits,
-          boost::multiprecision::backends::digit_base_type DigitBase,
-          class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
-                                         MinE, MaxE>,
-    ExpressionTemplates> >::digits10;
-template <unsigned                                         Digits,
-          boost::multiprecision::backends::digit_base_type DigitBase,
-          class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
-                                         MinE, MaxE>,
-    ExpressionTemplates> >::max_digits10;
-template <unsigned                                         Digits,
-          boost::multiprecision::backends::digit_base_type DigitBase,
-          class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
-                                         MinE, MaxE>,
-    ExpressionTemplates> >::is_signed;
-template <unsigned                                         Digits,
-          boost::multiprecision::backends::digit_base_type DigitBase,
-          class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
-                                         MinE, MaxE>,
-    ExpressionTemplates> >::is_integer;
-template <unsigned                                         Digits,
-          boost::multiprecision::backends::digit_base_type DigitBase,
-          class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
-                                         MinE, MaxE>,
-    ExpressionTemplates> >::is_exact;
-template <unsigned                                         Digits,
-          boost::multiprecision::backends::digit_base_type DigitBase,
-          class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
-                                         MinE, MaxE>,
-    ExpressionTemplates> >::radix;
-template <unsigned                                         Digits,
-          boost::multiprecision::backends::digit_base_type DigitBase,
-          class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST typename boost::multiprecision::cpp_bin_float<
-    Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type
-    numeric_limits<boost::multiprecision::number<
-        boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator,
-                                             Exponent, MinE, MaxE>,
-        ExpressionTemplates> >::min_exponent;
-template <unsigned                                         Digits,
-          boost::multiprecision::backends::digit_base_type DigitBase,
-          class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST typename boost::multiprecision::cpp_bin_float<
-    Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type
-    numeric_limits<boost::multiprecision::number<
-        boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator,
-                                             Exponent, MinE, MaxE>,
-        ExpressionTemplates> >::min_exponent10;
-template <unsigned                                         Digits,
-          boost::multiprecision::backends::digit_base_type DigitBase,
-          class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST typename boost::multiprecision::cpp_bin_float<
-    Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type
-    numeric_limits<boost::multiprecision::number<
-        boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator,
-                                             Exponent, MinE, MaxE>,
-        ExpressionTemplates> >::max_exponent;
-template <unsigned                                         Digits,
-          boost::multiprecision::backends::digit_base_type DigitBase,
-          class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST typename boost::multiprecision::cpp_bin_float<
-    Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type
-    numeric_limits<boost::multiprecision::number<
-        boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator,
-                                             Exponent, MinE, MaxE>,
-        ExpressionTemplates> >::max_exponent10;
-template <unsigned                                         Digits,
-          boost::multiprecision::backends::digit_base_type DigitBase,
-          class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
-                                         MinE, MaxE>,
-    ExpressionTemplates> >::has_infinity;
-template <unsigned                                         Digits,
-          boost::multiprecision::backends::digit_base_type DigitBase,
-          class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
-                                         MinE, MaxE>,
-    ExpressionTemplates> >::has_quiet_NaN;
-template <unsigned                                         Digits,
-          boost::multiprecision::backends::digit_base_type DigitBase,
-          class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
-                                         MinE, MaxE>,
-    ExpressionTemplates> >::has_signaling_NaN;
-template <unsigned                                         Digits,
-          boost::multiprecision::backends::digit_base_type DigitBase,
-          class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST float_denorm_style
-    numeric_limits<boost::multiprecision::number<
-        boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator,
-                                             Exponent, MinE, MaxE>,
-        ExpressionTemplates> >::has_denorm;
-template <unsigned                                         Digits,
-          boost::multiprecision::backends::digit_base_type DigitBase,
-          class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
-                                         MinE, MaxE>,
-    ExpressionTemplates> >::has_denorm_loss;
-template <unsigned                                         Digits,
-          boost::multiprecision::backends::digit_base_type DigitBase,
-          class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
-                                         MinE, MaxE>,
-    ExpressionTemplates> >::is_iec559;
-template <unsigned                                         Digits,
-          boost::multiprecision::backends::digit_base_type DigitBase,
-          class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
-                                         MinE, MaxE>,
-    ExpressionTemplates> >::is_bounded;
-template <unsigned                                         Digits,
-          boost::multiprecision::backends::digit_base_type DigitBase,
-          class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
-                                         MinE, MaxE>,
-    ExpressionTemplates> >::is_modulo;
-template <unsigned                                         Digits,
-          boost::multiprecision::backends::digit_base_type DigitBase,
-          class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
-                                         MinE, MaxE>,
-    ExpressionTemplates> >::traps;
-template <unsigned                                         Digits,
-          boost::multiprecision::backends::digit_base_type DigitBase,
-          class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
-                                         MinE, MaxE>,
-    ExpressionTemplates> >::tinyness_before;
-template <unsigned                                         Digits,
-          boost::multiprecision::backends::digit_base_type DigitBase,
-          class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST float_round_style
-    numeric_limits<boost::multiprecision::number<
-        boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator,
-                                             Exponent, MinE, MaxE>,
-        ExpressionTemplates> >::round_style;
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::digits;
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::digits10;
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::max_digits10;
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::is_signed;
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::is_integer;
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::is_exact;
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::radix;
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST typename boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::min_exponent;
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST typename boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::min_exponent10;
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST typename boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::max_exponent;
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST typename boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::max_exponent10;
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::has_infinity;
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::has_quiet_NaN;
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::has_signaling_NaN;
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST float_denorm_style numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::has_denorm;
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::has_denorm_loss;
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::is_iec559;
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::is_bounded;
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::is_modulo;
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::traps;
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::tinyness_before;
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST float_round_style numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates> >::round_style;
 
 #endif
 

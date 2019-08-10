@@ -6,30 +6,36 @@
 #ifndef BOOST_MATH_LOGGED_ADAPTER_HPP
 #define BOOST_MATH_LOGGED_ADAPTER_HPP
 
-#include <boost/multiprecision/detail/integer_ops.hpp>
 #include <boost/multiprecision/traits/extract_exponent_type.hpp>
+#include <boost/multiprecision/detail/integer_ops.hpp>
 
 namespace boost {
 namespace multiprecision {
 
 template <class Backend>
-inline void log_postfix_event(const Backend&,
-                              const char* /*event_description*/) {}
+inline void log_postfix_event(const Backend&, const char* /*event_description*/)
+{
+}
 template <class Backend, class T>
-inline void log_postfix_event(const Backend&, const T&,
-                              const char* /*event_description*/) {}
+inline void log_postfix_event(const Backend&, const T&, const char* /*event_description*/)
+{
+}
 template <class Backend>
-inline void log_prefix_event(const Backend&,
-                             const char* /*event_description*/) {}
+inline void log_prefix_event(const Backend&, const char* /*event_description*/)
+{
+}
 template <class Backend, class T>
-inline void log_prefix_event(const Backend&, const T&,
-                             const char* /*event_description*/) {}
+inline void log_prefix_event(const Backend&, const T&, const char* /*event_description*/)
+{
+}
 template <class Backend, class T, class U>
-inline void log_prefix_event(const Backend&, const T&, const U&,
-                             const char* /*event_description*/) {}
+inline void log_prefix_event(const Backend&, const T&, const U&, const char* /*event_description*/)
+{
+}
 template <class Backend, class T, class U, class V>
-inline void log_prefix_event(const Backend&, const T&, const U&, const V&,
-                             const char* /*event_description*/) {}
+inline void log_prefix_event(const Backend&, const T&, const U&, const V&, const char* /*event_description*/)
+{
+}
 
 namespace backends {
 
@@ -317,8 +323,7 @@ inline void eval_convert_to(R* result, const logged_adaptor<Backend>& val)
 }
 
 template <class Backend, class Exp>
-inline void eval_frexp(logged_adaptor<Backend>&       result,
-                       const logged_adaptor<Backend>& arg, Exp* exp)
+inline void eval_frexp(logged_adaptor<Backend>& result, const logged_adaptor<Backend>& arg, Exp* exp)
 {
    log_prefix_event(arg.value(), "frexp");
    eval_frexp(result.value(), arg.value(), exp);
@@ -326,8 +331,7 @@ inline void eval_frexp(logged_adaptor<Backend>&       result,
 }
 
 template <class Backend, class Exp>
-inline void eval_ldexp(logged_adaptor<Backend>&       result,
-                       const logged_adaptor<Backend>& arg, Exp exp)
+inline void eval_ldexp(logged_adaptor<Backend>& result, const logged_adaptor<Backend>& arg, Exp exp)
 {
    log_prefix_event(arg.value(), "ldexp");
    eval_ldexp(result.value(), arg.value(), exp);
@@ -335,8 +339,7 @@ inline void eval_ldexp(logged_adaptor<Backend>&       result,
 }
 
 template <class Backend, class Exp>
-inline void eval_scalbn(logged_adaptor<Backend>&       result,
-                        const logged_adaptor<Backend>& arg, Exp exp)
+inline void eval_scalbn(logged_adaptor<Backend>& result, const logged_adaptor<Backend>& arg, Exp exp)
 {
    log_prefix_event(arg.value(), "scalbn");
    eval_scalbn(result.value(), arg.value(), exp);
@@ -344,8 +347,7 @@ inline void eval_scalbn(logged_adaptor<Backend>&       result,
 }
 
 template <class Backend>
-inline typename Backend::exponent_type
-eval_ilogb(const logged_adaptor<Backend>& arg)
+inline typename Backend::exponent_type eval_ilogb(const logged_adaptor<Backend>& arg)
 {
    log_prefix_event(arg.value(), "ilogb");
    typename Backend::exponent_type r = eval_ilogb(arg.value());
@@ -368,10 +370,10 @@ inline int eval_fpclassify(const logged_adaptor<Backend>& arg)
 }
 
 /*********************************************************************
- *
- * Optional arithmetic operations come next:
- *
- *********************************************************************/
+*
+* Optional arithmetic operations come next:
+*
+*********************************************************************/
 
 NON_MEMBER_OP3(add, "+")
 NON_MEMBER_OP3(subtract, "-")
@@ -386,10 +388,10 @@ NON_MEMBER_OP1(increment, "increment")
 NON_MEMBER_OP1(decrement, "decrement")
 
 /*********************************************************************
- *
- * Optional integer operations come next:
- *
- *********************************************************************/
+*
+* Optional integer operations come next:
+*
+*********************************************************************/
 
 NON_MEMBER_OP2(modulus, "%=")
 NON_MEMBER_OP3(modulus, "%")
@@ -411,8 +413,7 @@ inline void eval_left_shift(logged_adaptor<Backend>& arg, std::size_t a)
    log_postfix_event(arg.value(), "<<=");
 }
 template <class Backend>
-inline void eval_left_shift(logged_adaptor<Backend>&       arg,
-                            const logged_adaptor<Backend>& a, std::size_t b)
+inline void eval_left_shift(logged_adaptor<Backend>& arg, const logged_adaptor<Backend>& a, std::size_t b)
 {
    using default_ops::eval_left_shift;
    log_prefix_event(arg.value(), a, b, "<<");
@@ -428,8 +429,7 @@ inline void eval_right_shift(logged_adaptor<Backend>& arg, std::size_t a)
    log_postfix_event(arg.value(), ">>=");
 }
 template <class Backend>
-inline void eval_right_shift(logged_adaptor<Backend>&       arg,
-                             const logged_adaptor<Backend>& a, std::size_t b)
+inline void eval_right_shift(logged_adaptor<Backend>& arg, const logged_adaptor<Backend>& a, std::size_t b)
 {
    using default_ops::eval_right_shift;
    log_prefix_event(arg.value(), a, b, ">>");
@@ -438,8 +438,7 @@ inline void eval_right_shift(logged_adaptor<Backend>&       arg,
 }
 
 template <class Backend, class T>
-inline unsigned eval_integer_modulus(const logged_adaptor<Backend>& arg,
-                                     const T&                       a)
+inline unsigned eval_integer_modulus(const logged_adaptor<Backend>& arg, const T& a)
 {
    using default_ops::eval_integer_modulus;
    log_prefix_event(arg.value(), a, "integer-modulus");
@@ -508,19 +507,19 @@ NON_MEMBER_OP3(lcm, "lcm")
 NON_MEMBER_OP4(powm, "powm")
 
 /*********************************************************************
- *
- * abs/fabs:
- *
- *********************************************************************/
+*
+* abs/fabs:
+*
+*********************************************************************/
 
 NON_MEMBER_OP2(abs, "abs")
 NON_MEMBER_OP2(fabs, "fabs")
 
 /*********************************************************************
- *
- * Floating point functions:
- *
- *********************************************************************/
+*
+* Floating point functions:
+*
+*********************************************************************/
 
 NON_MEMBER_OP2(trunc, "trunc")
 NON_MEMBER_OP2(round, "round")
@@ -578,8 +577,7 @@ NON_MEMBER_COMPLEX_TO_REAL(real, "real")
 NON_MEMBER_COMPLEX_TO_REAL(imag, "imag")
 
 template <class T, class V, class U>
-inline void assign_components(logged_adaptor<T>& result, const V& v1,
-                              const U& v2)
+inline void assign_components(logged_adaptor<T>& result, const V& v1, const U& v2)
 {
    assign_components(result.value(), v1, v2);
 }

@@ -13,13 +13,12 @@ namespace boost { namespace multiprecision {
 //
 // Unary operators first.
 // Note that these *must* return by value, even though that's somewhat against
-// existing practice.  The issue is that in C++11 land one could easily and
-// legitimately write:
+// existing practice.  The issue is that in C++11 land one could easily and legitimately
+// write:
 //    auto x = +1234_my_user_defined_suffix;
-// which would result in a dangling-reference-to-temporary if unary + returned a
-// reference to it's argument.  While return-by-value is obviously inefficient
-// in other situations the reality is that no one ever uses unary operator+
-// anyway...!
+// which would result in a dangling-reference-to-temporary if unary + returned a reference
+// to it's argument.  While return-by-value is obviously inefficient in other situations
+// the reality is that no one ever uses unary operator+ anyway...!
 //
 template <class B, expression_template_option ExpressionTemplates>
 inline BOOST_CONSTEXPR const number<B, ExpressionTemplates> operator+(const number<B, ExpressionTemplates>& v) { return v; }
@@ -155,18 +154,15 @@ operator-(const detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3
    return detail::expression<detail::multiply_subtract, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::left_type, typename detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>::right_type, number<B, ET> >(a.left(), a.right(), b);
 }
 //
-// Repeat operator for negated arguments: propagate the negation to the top
-// level to avoid temporaries:
+// Repeat operator for negated arguments: propagate the negation to the top level to avoid temporaries:
 //
-template <class B, expression_template_option ET, class Arg1, class Arg2,
-          class Arg3, class Arg4>
+template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
 inline detail::expression<detail::minus, number<B, ET>, Arg1>
 operator+(const number<B, ET>& a, const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& b)
 {
    return detail::expression<detail::minus, number<B, ET>, Arg1>(a, b.left_ref());
 }
-template <class Arg1, class Arg2, class Arg3, class Arg4, class B,
-          expression_template_option ET>
+template <class Arg1, class Arg2, class Arg3, class Arg4, class B, expression_template_option ET>
 inline detail::expression<detail::minus, number<B, ET>, Arg1>
 operator+(const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& a, const number<B, ET>& b)
 {
@@ -260,11 +256,9 @@ operator-(const V& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
    return detail::expression<detail::minus, V, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 //
-// Repeat operator for negated arguments: propagate the negation to the top
-// level to avoid temporaries:
+// Repeat operator for negated arguments: propagate the negation to the top level to avoid temporaries:
 //
-template <class B, expression_template_option ET, class Arg1, class Arg2,
-          class Arg3, class Arg4>
+template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
 inline detail::expression<detail::plus, number<B, ET>, Arg1>
 operator-(const number<B, ET>& a, const detail::expression<detail::negate, Arg1, Arg2, Arg3, Arg4>& b)
 {
@@ -366,8 +360,7 @@ operator*(const V& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
    return detail::expression<detail::multiplies, V, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 //
-// Repeat operator for negated arguments: propagate the negation to the top
-// level to avoid temporaries:
+// Repeat operator for negated arguments: propagate the negation to the top level to avoid temporaries:
 //
 template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
 inline detail::expression<detail::negate, detail::expression<detail::multiplies, number<B, ET>, Arg1> >
@@ -477,8 +470,7 @@ operator/(const V& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
    return detail::expression<detail::divides, V, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(a, b);
 }
 //
-// Repeat operator for negated arguments: propagate the negation to the top
-// level to avoid temporaries:
+// Repeat operator for negated arguments: propagate the negation to the top level to avoid temporaries:
 //
 template <class B, expression_template_option ET, class Arg1, class Arg2, class Arg3, class Arg4>
 inline detail::expression<detail::negate, detail::expression<detail::divides, number<B, ET>, Arg1> >

@@ -164,18 +164,8 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_in
    BOOST_STATIC_CONSTEXPR float_round_style round_style      = round_toward_zero;
 };
 
-template <unsigned MinBits, unsigned MaxBits,
-          boost::multiprecision::cpp_integer_type           SignType,
-          boost::multiprecision::cpp_int_check_type         Checked, class Allocator,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-const typename numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked,
-                                           Allocator>,
-    ExpressionTemplates> >::inititializer
-    numeric_limits<boost::multiprecision::number<
-        boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType,
-                                               Checked, Allocator>,
-        ExpressionTemplates> >::init;
+template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+const typename numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates> >::inititializer numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates> >::init;
 
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
 

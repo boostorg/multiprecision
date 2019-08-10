@@ -8,13 +8,22 @@
 
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/mpl/find_if.hpp>
 #include <boost/mpl/max.hpp>
-#include <boost/mpl/or.hpp>
 #include <boost/mpl/plus.hpp>
+#include <boost/mpl/or.hpp>
+#include <boost/mpl/find_if.hpp>
+#include <boost/assert.hpp>
+#include <boost/type_traits/remove_pointer.hpp>
+#include <boost/type_traits/is_signed.hpp>
+#include <boost/type_traits/is_unsigned.hpp>
+#include <boost/type_traits/is_floating_point.hpp>
+#include <boost/type_traits/is_integral.hpp>
+#include <boost/type_traits/is_complex.hpp>
+#include <boost/type_traits/make_unsigned.hpp>
+#include <boost/throw_exception.hpp>
+#include <boost/multiprecision/detail/precision.hpp>
 #include <boost/multiprecision/detail/generic_interconvert.hpp>
 #include <boost/multiprecision/detail/number_compare.hpp>
-#include <boost/multiprecision/detail/precision.hpp>
 #include <boost/multiprecision/traits/is_restricted_conversion.hpp>
 #include <boost/container_hash/hash.hpp>
 #include <istream> // stream operators
@@ -853,16 +862,7 @@ class number
 #if BOOST_WORKAROUND(BOOST_MSVC, < 1900) || (defined(__APPLE_CC__) && BOOST_WORKAROUND(__clang_major__, < 9))
    template <class T>
 #else
-#if BOOST_WORKAROUND(BOOST_MSVC, < 1900) || \
-    (defined(__APPLE_CC__) && BOOST_WORKAROUND(__clang_major__, < 9))
-   template <class T>
-#else
-   template <class T, class = typename boost::disable_if_c<
-                          boost::is_constructible<T, self_type const&>::value ||
-                              !boost::is_default_constructible<T>::value ||
-                              (!boost::is_arithmetic<T>::value &&
-                               !boost::is_complex<T>::value),
-                          T>::type>
+   template <class T, class = typename boost::disable_if_c<boost::is_constructible<T, self_type const&>::value || !boost::is_default_constructible<T>::value || (!boost::is_arithmetic<T>::value && !boost::is_complex<T>::value), T>::type>
 #endif
    explicit operator T() const
    {
@@ -1583,13 +1583,6 @@ class number
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
       do_add(e.left(), typename left_type::tag_type());
-   }
-   else if (!br &&
-            (bl || (left_depth >=
-                    right_depth)))
-   {  // br is always false, but if bl is true
-      // we must take the this branch:
-      do_assign(e.left(), typename left_type::tag_type());
       do_add(e.right(), typename right_type::tag_type());
    }
 
@@ -1599,15 +1592,47 @@ class number
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
       do_add(e.left(), typename left_type::tag_type());
+      do_subtract(e.right(), typename right_type::tag_type());
    }
-} template <class Exp>
-void do_assign(const Exp& e, const detail::minus&)
-{
-   typedef typename Exp::left_type  left_type;
-   typedef typename Exp::right_type right_type;
 
-   static int const left_depth  = left_type::depth;
-   static int const right_depth = right_type::depth;
+   template <class Exp, class unknown>
+   void do_add(const Exp& e, const unknown&)
+   {
+      self_type temp(e);
+      do_add(detail::expression<detail::terminal, self_type>(temp), detail::terminal());
+   }
+
+   template <class Exp>
+   void do_add(const Exp& e, const detail::add_immediates&)
+   {
+      using default_ops::eval_add;
+      boost::multiprecision::detail::maybe_promote_precision(this);
+      eval_add(m_backend, canonical_value(e.left().value()));
+      eval_add(m_backend, canonical_value(e.right().value()));
+   }
+   template <class Exp>
+   void do_add(const Exp& e, const detail::subtract_immediates&)
+   {
+      using default_ops::eval_add;
+      using default_ops::eval_subtract;
+      boost::multiprecision::detail::maybe_promote_precision(this);
+      eval_add(m_backend, canonical_value(e.left().value()));
+      eval_subtract(m_backend, canonical_value(e.right().value()));
+   }
+   template <class Exp>
+   void do_subtract(const Exp& e, const detail::terminal&)
+   {
+      using default_ops::eval_subtract;
+      boost::multiprecision::detail::maybe_promote_precision(this);
+      eval_subtract(m_backend, canonical_value(e.value()));
+   }
+
+   template <class Exp>
+   void do_subtract(const Exp& e, const detail::negate&)
+   {
+      typedef typename Exp::left_type left_type;
+      do_add(e.left(), typename left_type::tag_type());
+   }
 
    template <class Exp>
    void do_subtract(const Exp& e, const detail::plus&)
@@ -1615,14 +1640,6 @@ void do_assign(const Exp& e, const detail::minus&)
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
       do_subtract(e.left(), typename left_type::tag_type());
-      m_backend.negate();
-   }
-   else if (!br &&
-            (bl || (left_depth >=
-                    right_depth)))
-   {  // br is always false, but if bl is true
-      // we must take the this branch:
-      do_assign(e.left(), typename left_type::tag_type());
       do_subtract(e.right(), typename right_type::tag_type());
    }
 
@@ -1632,20 +1649,46 @@ void do_assign(const Exp& e, const detail::minus&)
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
       do_subtract(e.left(), typename left_type::tag_type());
+      do_add(e.right(), typename right_type::tag_type());
+   }
+   template <class Exp>
+   void do_subtract(const Exp& e, const detail::add_immediates&)
+   {
+      using default_ops::eval_subtract;
+      boost::multiprecision::detail::maybe_promote_precision(this);
+      eval_subtract(m_backend, canonical_value(e.left().value()));
+      eval_subtract(m_backend, canonical_value(e.right().value()));
+   }
+   template <class Exp>
+   void do_subtract(const Exp& e, const detail::subtract_immediates&)
+   {
+      using default_ops::eval_add;
+      using default_ops::eval_subtract;
+      eval_subtract(m_backend, canonical_value(e.left().value()));
+      eval_add(m_backend, canonical_value(e.right().value()));
+   }
+   template <class Exp, class unknown>
+   void do_subtract(const Exp& e, const unknown&)
+   {
+      self_type temp(e);
+      do_subtract(detail::expression<detail::terminal, self_type>(temp), detail::terminal());
+   }
+
+   template <class Exp>
+   void do_multiplies(const Exp& e, const detail::terminal&)
+   {
+      using default_ops::eval_multiply;
+      boost::multiprecision::detail::maybe_promote_precision(this);
+      eval_multiply(m_backend, canonical_value(e.value()));
+   }
+
+   template <class Exp>
+   void do_multiplies(const Exp& e, const detail::negate&)
+   {
+      typedef typename Exp::left_type left_type;
+      do_multiplies(e.left(), typename left_type::tag_type());
       m_backend.negate();
    }
-}
-template <class Exp>
-void do_assign(const Exp& e, const detail::multiplies&)
-{
-   typedef typename Exp::left_type  left_type;
-   typedef typename Exp::right_type right_type;
-
-   static int const left_depth  = left_type::depth;
-   static int const right_depth = right_type::depth;
-
-   bool bl = contains_self(e.left());
-   bool br = contains_self(e.right());
 
    template <class Exp>
    void do_multiplies(const Exp& e, const detail::multiplies&)
@@ -1653,13 +1696,6 @@ void do_assign(const Exp& e, const detail::multiplies&)
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
       do_multiplies(e.left(), typename left_type::tag_type());
-   }
-   else if (!br &&
-            (bl || (left_depth >=
-                    right_depth)))
-   {  // br is always false, but if bl is true
-      // we must take the this branch:
-      do_assign(e.left(), typename left_type::tag_type());
       do_multiplies(e.right(), typename right_type::tag_type());
    }
    //
@@ -1673,20 +1709,6 @@ void do_assign(const Exp& e, const detail::multiplies&)
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
       do_multiplies(e.left(), typename left_type::tag_type());
-   }
-}
-template <class Exp>
-void do_assign(const Exp& e, const detail::divides&)
-{
-   typedef typename Exp::left_type  left_type;
-   typedef typename Exp::right_type right_type;
-
-   bool bl = contains_self(e.left());
-   bool br = contains_self(e.right());
-
-   if (bl && is_self(e.left()))
-   {
-      // Ignore the left node, it's *this, just add the right:
       do_divide(e.right(), typename right_type::tag_type());
    }
 
@@ -1832,10 +1854,6 @@ void do_assign(const Exp& e, const detail::divides&)
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
       do_bitwise_and(e.left(), typename left_type::tag_type());
-   }
-   else if (!br && (bl || (left_depth >= right_depth)))
-   {
-      do_assign(e.left(), typename left_type::tag_type());
       do_bitwise_and(e.right(), typename right_type::tag_type());
    }
    template <class Exp, class unknown>
@@ -1861,10 +1879,6 @@ void do_assign(const Exp& e, const detail::divides&)
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
       do_bitwise_or(e.left(), typename left_type::tag_type());
-   }
-   else if (!br && (bl || (left_depth >= right_depth)))
-   {
-      do_assign(e.left(), typename left_type::tag_type());
       do_bitwise_or(e.right(), typename right_type::tag_type());
    }
    template <class Exp, class unknown>
@@ -1890,10 +1904,6 @@ void do_assign(const Exp& e, const detail::divides&)
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
       do_bitwise_xor(e.left(), typename left_type::tag_type());
-   }
-   else if (!br && (bl || (left_depth >= right_depth)))
-   {
-      do_assign(e.left(), typename left_type::tag_type());
       do_bitwise_xor(e.right(), typename right_type::tag_type());
    }
    template <class Exp, class unknown>
@@ -2014,12 +2024,12 @@ inline std::ostream& operator<<(std::ostream& os, const expression<tag, A1, A2, 
    return os << temp;
 }
 //
-// What follows is the input streaming code: this is not "proper" iostream code
-// at all but that's fiendishly hard to write when dealing with multiple
-// backends all with different requirements... yes we could deligate this to the
-// backend author... but we really want backends to be EASY to write! For now
-// just pull in all the characters that could possibly form the number and let
-// the backend's string parser make use of it.  This fixes most use cases
+// What follows is the input streaming code: this is not "proper" iostream code at all
+// but that's fiendishly hard to write when dealing with multiple backends all
+// with different requirements... yes we could deligate this to the backend author...
+// but we really want backends to be EASY to write!
+// For now just pull in all the characters that could possibly form the number
+// and let the backend's string parser make use of it.  This fixes most use cases
 // including CSV type formats such as those used by the Random lib.
 //
 inline std::string read_string_while(std::istream& is, std::string const& permitted_chars)
@@ -2100,8 +2110,7 @@ BOOST_MP_FORCEINLINE void swap(number<Backend, ExpressionTemplates>& a, number<B
    a.swap(b);
 }
 //
-// Boost.Hash support, just call hash_value for the backend, which may or may
-// not be supported:
+// Boost.Hash support, just call hash_value for the backend, which may or may not be supported:
 //
 template <class Backend, expression_template_option ExpressionTemplates>
 inline std::size_t hash_value(const number<Backend, ExpressionTemplates>& val)
@@ -2159,26 +2168,20 @@ inline std::istream& operator>>(std::istream& is, rational<multiprecision::numbe
    return is;
 }
 
-template <class T,
-          multiprecision::expression_template_option ExpressionTemplates>
-inline multiprecision::number<T, ExpressionTemplates>
-numerator(const rational<multiprecision::number<T, ExpressionTemplates> >& a)
+template <class T, multiprecision::expression_template_option ExpressionTemplates>
+inline multiprecision::number<T, ExpressionTemplates> numerator(const rational<multiprecision::number<T, ExpressionTemplates> >& a)
 {
    return a.numerator();
 }
 
-template <class T,
-          multiprecision::expression_template_option ExpressionTemplates>
-inline multiprecision::number<T, ExpressionTemplates>
-denominator(const rational<multiprecision::number<T, ExpressionTemplates> >& a)
+template <class T, multiprecision::expression_template_option ExpressionTemplates>
+inline multiprecision::number<T, ExpressionTemplates> denominator(const rational<multiprecision::number<T, ExpressionTemplates> >& a)
 {
    return a.denominator();
 }
 
-template <class T,
-          multiprecision::expression_template_option ExpressionTemplates>
-inline std::size_t hash_value(
-    const rational<multiprecision::number<T, ExpressionTemplates> >& val)
+template <class T, multiprecision::expression_template_option ExpressionTemplates>
+inline std::size_t hash_value(const rational<multiprecision::number<T, ExpressionTemplates> >& val)
 {
    std::size_t result = hash_value(val.numerator());
    boost::hash_combine(result, hash_value(val.denominator()));

@@ -13,8 +13,7 @@
 #pragma warning(disable : 4319)
 #endif
 
-namespace boost { namespace multiprecision {
-namespace backends {
+namespace boost { namespace multiprecision { namespace backends {
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
 void is_valid_bitwise_op(
@@ -25,16 +24,12 @@ void is_valid_bitwise_op(
       BOOST_THROW_EXCEPTION(std::range_error("Bitwise operations on negative values results in undefined behavior."));
 }
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1,
-          cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2,
-          unsigned MaxBits2, cpp_integer_type SignType2,
-          cpp_int_check_type Checked2, class Allocator2>
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
 void is_valid_bitwise_op(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&,
     const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>&, const mpl::int_<unchecked>&) {}
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_int_check_type Checked1,
-          class Allocator1>
+template <unsigned MinBits1, unsigned MaxBits1, cpp_int_check_type Checked1, class Allocator1>
 void is_valid_bitwise_op(
     const cpp_int_backend<MinBits1, MaxBits1, signed_magnitude, Checked1, Allocator1>& result, const mpl::int_<checked>&)
 {
@@ -42,13 +37,11 @@ void is_valid_bitwise_op(
       BOOST_THROW_EXCEPTION(std::range_error("Bitwise operations on negative values results in undefined behavior."));
 }
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_int_check_type Checked1,
-          class Allocator1>
+template <unsigned MinBits1, unsigned MaxBits1, cpp_int_check_type Checked1, class Allocator1>
 void is_valid_bitwise_op(
     const cpp_int_backend<MinBits1, MaxBits1, unsigned_magnitude, Checked1, Allocator1>&, const mpl::int_<checked>&) {}
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1,
-          cpp_int_check_type Checked1, class Allocator1>
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
 void is_valid_bitwise_op(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&, const mpl::int_<unchecked>&) {}
 
@@ -184,38 +177,13 @@ void bitwise_op(
          if (result.size() > x)
             result.limbs()[x] = static_cast<limb_type>(carry);
       }
-      // Set the overflow into the "extra" limb:
-      r_carry += static_cast<double_limb_type>(~limb_type(0));
-      o_carry += static_cast<double_limb_type>(~limb_type(0));
-      next_limb =
-          op(static_cast<limb_type>(r_carry), static_cast<limb_type>(o_carry));
+      result.sign(true);
    }
-}
-//
-// See if the result is negative or not:
-//
-if (static_cast<signed_limb_type>(next_limb) < 0)
-{
-   double_limb_type carry = 1;
-   for (unsigned i = 0; i < x; ++i)
-   {
-      carry += static_cast<double_limb_type>(~pr[i]);
-      pr[i] = static_cast<limb_type>(carry);
-      carry >>= CppInt1::limb_bits;
-   }
-   if (carry)
-   {
-      result.resize(x + 1, x);
-      if (result.size() > x)
-         result.limbs()[x] = static_cast<limb_type>(carry);
-   }
-   result.sign(true);
-}
-else
-   result.sign(false);
+   else
+      result.sign(false);
 
-result.normalize();
-} // namespace backends
+   result.normalize();
+}
 
 template <class CppInt1, class CppInt2, class Op>
 void bitwise_op(
@@ -681,10 +649,7 @@ eval_right_shift(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Alloca
       result = static_cast<signed_limb_type>(-1);
 }
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1,
-          cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2,
-          unsigned MaxBits2, cpp_integer_type SignType2,
-          cpp_int_check_type Checked2, class Allocator2>
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
 inline typename enable_if_c<
     is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value && (is_signed_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value || is_signed_number<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value)>::type
 eval_complement(
@@ -708,10 +673,7 @@ eval_complement(
    result.normalize();
 }
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1,
-          cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2,
-          unsigned MaxBits2, cpp_integer_type SignType2,
-          cpp_int_check_type Checked2, class Allocator2>
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
 inline typename enable_if_c<
     is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value && is_unsigned_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_unsigned_number<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>::type
 eval_complement(
@@ -722,10 +684,7 @@ eval_complement(
    result.normalize();
 }
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1,
-          cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2,
-          unsigned MaxBits2, cpp_integer_type SignType2,
-          cpp_int_check_type Checked2, class Allocator2>
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
 inline typename enable_if_c<
     is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value && is_unsigned_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_unsigned_number<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>::type
 eval_bitwise_and(
@@ -735,10 +694,7 @@ eval_bitwise_and(
    *result.limbs() &= *o.limbs();
 }
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1,
-          cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2,
-          unsigned MaxBits2, cpp_integer_type SignType2,
-          cpp_int_check_type Checked2, class Allocator2>
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
 inline typename enable_if_c<
     is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value && (is_signed_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value || is_signed_number<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value)>::type
 eval_bitwise_and(
@@ -771,10 +727,7 @@ eval_bitwise_and(
    }
 }
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1,
-          cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2,
-          unsigned MaxBits2, cpp_integer_type SignType2,
-          cpp_int_check_type Checked2, class Allocator2>
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
 inline typename enable_if_c<
     is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value && is_unsigned_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_unsigned_number<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>::type
 eval_bitwise_or(
@@ -784,10 +737,7 @@ eval_bitwise_or(
    *result.limbs() |= *o.limbs();
 }
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1,
-          cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2,
-          unsigned MaxBits2, cpp_integer_type SignType2,
-          cpp_int_check_type Checked2, class Allocator2>
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
 inline typename enable_if_c<
     is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value && (is_signed_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value || is_signed_number<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value)>::type
 eval_bitwise_or(
@@ -821,10 +771,7 @@ eval_bitwise_or(
    }
 }
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1,
-          cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2,
-          unsigned MaxBits2, cpp_integer_type SignType2,
-          cpp_int_check_type Checked2, class Allocator2>
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
 inline typename enable_if_c<
     is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value && is_unsigned_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_unsigned_number<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>::type
 eval_bitwise_xor(
@@ -834,10 +781,7 @@ eval_bitwise_xor(
    *result.limbs() ^= *o.limbs();
 }
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1,
-          cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2,
-          unsigned MaxBits2, cpp_integer_type SignType2,
-          cpp_int_check_type Checked2, class Allocator2>
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
 inline typename enable_if_c<
     is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value && (is_signed_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value || is_signed_number<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value)>::type
 eval_bitwise_xor(
@@ -870,8 +814,7 @@ eval_bitwise_xor(
    }
 }
 
-}} // namespace boost::multiprecision
-} // namespace boost::multiprecision::backends
+}}} // namespace boost::multiprecision::backends
 
 #ifdef _MSC_VER
 #pragma warning(pop)

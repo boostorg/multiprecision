@@ -258,8 +258,8 @@ bit_flip(number<Backend, ExpressionTemplates>& x, unsigned index)
 namespace default_ops {
 
 //
-// Within powm, we need a type with twice as many digits as the argument type,
-// define a traits class to obtain that type:
+// Within powm, we need a type with twice as many digits as the argument type, define
+// a traits class to obtain that type:
 //
 template <class Backend>
 struct double_precision_type
