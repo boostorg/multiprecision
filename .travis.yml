@@ -57,9 +57,6 @@ matrix:
   exclude:
     - env: BOGUS_JOB=true
 
-  allow_failures:
-    - env: TEST_SUITE=compile_fail
-
   include:
     - os: linux
       env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=arithmetic_tests
