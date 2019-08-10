@@ -42,13 +42,6 @@ os:
   - linux
   - osx
 
-branches:
-  only:
-    - master
-    - develop
-    - cmake-develop
-    - cmake-master
-
 env:
   matrix:
     - BOGUS_JOB=true
