@@ -2297,7 +2297,7 @@ install:
   - cd ..
   - if [[ $TRAVIS_BRANCH == master || $TRAVIS_BRANCH == cmake-master ]]; then
       git clone -b master --depth 1 https://github.com/boostorg/boost.git boost-root;
-    elif [[ $TRAVIS_BRANCH == develop || $TRAVIS_BRANCH == cmake-develop ]]; then
+    else
       git clone -b develop --depth 1 https://github.com/boostorg/boost.git boost-root;
     fi
   - cd boost-root
