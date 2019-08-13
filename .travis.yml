@@ -1146,8 +1146,7 @@ script:
   - if [[ $CXXSTD == c++1z ]]; then
       CXXSTD=c++17;
     fi;
-  - cmake -DBUILD_UNIT_TESTS=TRUE -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9]*//g') -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE
-    ..;
+  - cmake -DBUILD_UNIT_TESTS=TRUE -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9]*//g') -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE ..;
 
 notifications:
   email:
