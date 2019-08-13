@@ -78,8 +78,10 @@ add_custom_target(multiprecision_test_suite_compile_fail)
 
 # HACK: Workaround broken includes
 file(GLOB TEST_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/*.hpp ${CMAKE_CURRENT_SOURCE_DIR}/*.ipp)
+set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 foreach(HEADER ${TEST_HEADERS})
-    configure_file(${HEADER} ${CMAKE_CURRENT_BINARY_DIR}/include/libs/multiprecision/test/${HEADER} @ONLY)
+    configure_file(${HEADER} ${CMAKE_CURRENT_BINARY_DIR}/libs/multiprecision/test/${HEADER}
+                   @ONLY)
 endforeach()
 
 add_library(multiprecision_test_settings INTERFACE)
