@@ -952,7 +952,7 @@ endif()
 
 cm_test(NAME multiprecision_test_test_rational_io_cpp_int SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_rational_io.cpp)
 target_compile_definitions(multiprecision_test_test_rational_io_cpp_int PUBLIC -DTEST_CPP_INT)
-target_link_libraries(multiprecision_test_test_rational_io_cpp_int ${GMP_LIBRARIES} no_eh_support)
+target_link_libraries(multiprecision_test_test_rational_io_cpp_int no_eh_support)
 add_dependencies(multiprecision_test_suite_misc multiprecision_test_test_rational_io_cpp_int)
 
 if((GMP_COMPILED) AND (TOMMATH_COMPILED) AND (MPFR_COMPILED))
