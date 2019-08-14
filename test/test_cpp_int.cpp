@@ -636,7 +636,7 @@ struct tester
             BOOST_CHECK_EQUAL(n >> ~boost::uint64_t(0), n);
 
             // Test min value. This actually -(2^256-1), not -(2^255) as in C.
-            s256 h = std::numeric_limits<s256>::min();
+            s256 h = (std::numeric_limits<s256>::min)();
             BOOST_CHECK_LT(h, 0);
             BOOST_CHECK_EQUAL(h >> 0, h);
             BOOST_CHECK_EQUAL(h >> 256, -1);

@@ -2973,8 +2973,13 @@ To use these `#include <boost/math/tools/precision.hpp>`.
 
 [h5:FP_tolerance Tolerance for Floating-point Comparisons]
 
-`epsilon` is very useful to compute a tolerance when comparing floating-point values,
+[@https://en.wikipedia.org/wiki/Machine_epsilon Machine epsilon [epsilon]]
+is very useful to compute a tolerance when comparing floating-point values,
 a much more difficult task than is commonly imagined.
+
+The C++ standard specifies [@https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon  `std::numeric_limits<>::epsilon()`]
+and Boost.Multiprecision implements this (where possible) for its program-defined types analogous to the
+__fundamental floating-point types like `double` `float`.
 
 For more information than you probably want (but still need) see
 [@http://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html What Every Computer Scientist Should Know About Floating-Point Arithmetic]
@@ -3000,7 +3005,7 @@ See also:
 [tolerance_1]
 
 used thus:
-
+cd ./test
   BOOST_CHECK_CLOSE_FRACTION(expected, calculated, tolerance);
 
 (There is also a version BOOST_CHECK_CLOSE using tolerance as a [*percentage] rather than a fraction;

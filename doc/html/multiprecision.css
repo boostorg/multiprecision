@@ -1,7 +1,7 @@
 @import url('../../../../doc/src/boostbook.css');
-/* Contains the basic settings for BoostBook and used by Quickbook to docbook conversion.
-    location is BOOST_ROOT/doc/src/boostbook.css.
-*/
+/* Contains the basic settings for BoostBook and used by Quickbook to docbook conversion. */ 
+
+/* Note:this import link assumes called from doc/html, not from any backup copy in /doc. */
 
 /*=============================================================================
 Copyright (c) 2004 Joel de Guzman    http://spirit.sourceforge.net/
@@ -18,6 +18,10 @@ ing file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
     Visual Studio is recommended for editing this file 
     because it checks syntax, does layout and provides help on options.
+    
+    boost-no-inspect  to avoid error message from inspect.exe
+      doc\multiprecision.css: Unlinked file
+    (line 1) Broken link: ../../../../doc/src/boostbook.css
 
 /*=============================================================================
 Program listings
@@ -151,10 +155,10 @@ span.gray { color: #808080; } /* light gray */
 
 */
 span.serif_italic {
-  font-family: serif;
-  font-style: italic;
-  font-size: 125%;
-  font-stretch: expanded;
+    font-family: serif;
+    font-style: italic;
+    font-size: 125%;
+    font-stretch: expanded;
 }
 
 /* Custom indent of paragraphs to make equations look nicer, 2% to match that indent of code block above.
@@ -162,9 +166,9 @@ https://www.w3schools.com/tags/tag_blockquote.asp says
   "Most browsers will display the <blockquote> element with left and right margin 40px values: "
 */
 blockquote {
-  display: block;
-  margin-top: 1em;
-  margin-bottom: 1em;
-  margin-left: 2%;
-  margin-right: 2%;
+    display: block;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    margin-left: 2%;
+    margin-right: 2%;
 }

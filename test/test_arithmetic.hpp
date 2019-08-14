@@ -2623,34 +2623,36 @@ test_relationals(T a, T b)
    // min and max overloads:
    //
 #if !defined(min) && !defined(max)
-   using std::max;
-   using std::min;
+//   using std::max;
+//   using std::min;
+// This works, but still causes complaints from inspect.exe, so use brackets to prevent macrosubstitution,
+// and to explicitly specify type T seems necessary, for reasons unclear.
    a = 2;
    b = 5;
    c = 6;
-   BOOST_CHECK_EQUAL(min(a, b), a);
-   BOOST_CHECK_EQUAL(min(b, a), a);
-   BOOST_CHECK_EQUAL(max(a, b), b);
-   BOOST_CHECK_EQUAL(max(b, a), b);
-   BOOST_CHECK_EQUAL(min(a, b + c), a);
-   BOOST_CHECK_EQUAL(min(b + c, a), a);
-   BOOST_CHECK_EQUAL(min(a, c - b), 1);
-   BOOST_CHECK_EQUAL(min(c - b, a), 1);
-   BOOST_CHECK_EQUAL(max(a, b + c), 11);
-   BOOST_CHECK_EQUAL(max(b + c, a), 11);
-   BOOST_CHECK_EQUAL(max(a, c - b), a);
-   BOOST_CHECK_EQUAL(max(c - b, a), a);
-   BOOST_CHECK_EQUAL(min(a + b, b + c), 7);
-   BOOST_CHECK_EQUAL(min(b + c, a + b), 7);
-   BOOST_CHECK_EQUAL(max(a + b, b + c), 11);
-   BOOST_CHECK_EQUAL(max(b + c, a + b), 11);
-   BOOST_CHECK_EQUAL(min(a + b, c - a), 4);
-   BOOST_CHECK_EQUAL(min(c - a, a + b), 4);
-   BOOST_CHECK_EQUAL(max(a + b, c - a), 7);
-   BOOST_CHECK_EQUAL(max(c - a, a + b), 7);
+   BOOST_CHECK_EQUAL( (std::min<T>)(a, b),  a);
+   BOOST_CHECK_EQUAL( (std::min<T>)(b, a), a);
+   BOOST_CHECK_EQUAL( (std::max<T>)(a, b), b);
+   BOOST_CHECK_EQUAL( (std::max<T>)(b, a), b);
+   BOOST_CHECK_EQUAL( (std::min<T>)(a, b + c), a);
+   BOOST_CHECK_EQUAL( (std::min<T>)(b + c, a), a);
+   BOOST_CHECK_EQUAL( (std::min<T>)(a, c - b), 1);
+   BOOST_CHECK_EQUAL( (std::min<T>)(c - b, a), 1);
+   BOOST_CHECK_EQUAL( (std::max<T>)(a, b + c), 11);
+   BOOST_CHECK_EQUAL( (std::max<T>)(b + c, a), 11);
+   BOOST_CHECK_EQUAL( (std::max<T>)(a, c - b), a);
+   BOOST_CHECK_EQUAL( (std::max<T>)(c - b, a), a);
+   BOOST_CHECK_EQUAL( (std::min<T>)(a + b, b + c), 7);
+   BOOST_CHECK_EQUAL( (std::min<T>)(b + c, a + b), 7);
+   BOOST_CHECK_EQUAL( (std::max<T>)(a + b, b + c), 11);
+   BOOST_CHECK_EQUAL( (std::max<T>)(b + c, a + b), 11);
+   BOOST_CHECK_EQUAL( (std::min<T>)(a + b, c - a), 4);
+   BOOST_CHECK_EQUAL( (std::min<T>)(c - a, a + b), 4);
+   BOOST_CHECK_EQUAL( (std::max<T>)(a + b, c - a), 7);
+   BOOST_CHECK_EQUAL( (std::max<T>)(c - a, a + b), 7);
 
    long l1(2), l2(3), l3;
-   l3 = min(l1, l2) + max(l1, l2) + max<long>(l1, l2) + min<long>(l1, l2);
+   l3 = (std::min)(l1, l2) + (std::max)(l1, l2) + (std::max<long>)(l1, l2) + (std::min<long>)(l1, l2);
    BOOST_CHECK_EQUAL(l3, 10);
 
 #endif
@@ -2966,18 +2968,18 @@ void test()
    // string and string_view:
    //
    {
-      std::string s("2");
-      Real        x(s);
+      std::string s1("2");
+      Real        x(s1);
       BOOST_CHECK_EQUAL(x, 2);
-      s = "3";
-      x.assign(s);
+      s1 = "3";
+      x.assign(s1);
       BOOST_CHECK_EQUAL(x, 3);
 #ifndef BOOST_NO_CXX17_HDR_STRING_VIEW
-      s = "20";
-      std::string_view v(s.c_str(), 1);
+      s1 = "20";
+      std::string_view v(s1.c_str(), 1);
       Real             y(v);
       BOOST_CHECK_EQUAL(y, 2);
-      std::string_view v2(s.c_str(), 2);
+      std::string_view v2(s1.c_str(), 2);
       y.assign(v2);
       BOOST_CHECK_EQUAL(y, 20);
 #endif

@@ -1,5 +1,7 @@
 @import url('../../../../doc/src/boostbook.css');
-/* Contains the basic settings for BoostBook and used by Quickbook to docbook conversion. */
+/* Contains the basic settings for BoostBook and used by Quickbook to docbook conversion. */ 
+
+/* Note:this import link assumes called from doc/html, not from any backup copy in /doc. */
 
 /*=============================================================================
 Copyright (c) 2004 Joel de Guzman    http://spirit.sourceforge.net/
@@ -16,6 +18,10 @@ ing file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
     Visual Studio is recommended for editing this file 
     because it checks syntax, does layout and provides help on options.
+    
+    boost-no-inspect  to avoid error message from inspect.exe
+      doc\multiprecision.css: Unlinked file
+    (line 1) Broken link: ../../../../doc/src/boostbook.css
 
 /*=============================================================================
 Program listings

@@ -1114,7 +1114,7 @@ inline void assign_components(mpc_complex_backend<D1>& result, const mpfr_float_
    //
    if (!D1)
    {
-      unsigned long prec = std::max(mpfr_get_prec(a.data()), mpfr_get_prec(b.data()));
+      unsigned long prec = (std::max)(mpfr_get_prec(a.data()), mpfr_get_prec(b.data()));
       mpc_set_prec(result.data(), prec);
    }
    using default_ops::eval_fpclassify;
