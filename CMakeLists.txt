@@ -23,6 +23,7 @@ include(CMSetupVersion)
 cm_setup_version(VERSION 1.70.0)
 
 option(BUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS "Build for CI suppressing known issues" FALSE)
+option(BUILD_TESTS "Build tests" FALSE)
 
 if(BUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS)
     add_definitions(-DCI_SUPPRESS_KNOWN_ISSUES)
@@ -87,4 +88,6 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE ${CURRENT_SOURCES_DIR}/include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-add_subdirectory(test)
+if(BUILD_TESTS)
+    add_subdirectory(test)
+endif()
