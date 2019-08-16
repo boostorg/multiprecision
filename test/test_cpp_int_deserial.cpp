@@ -25,7 +25,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 
-boost::filesystem::path root("./serial_txts");
+boost::filesystem::path root;
 
 template <class T>
 void test64()
