@@ -54,7 +54,7 @@ class number
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR number() BOOST_MP_NOEXCEPT_IF(noexcept(Backend())) {}
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR number(const number& e) BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<Backend const&>()))) : m_backend(e.m_backend) {}
    template <class V>
-   BOOST_MP_FORCEINLINE number(const V& v, typename boost::enable_if_c<
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR number(const V& v, typename boost::enable_if_c<
                                                (boost::is_arithmetic<V>::value || is_same<std::string, V>::value || is_convertible<V, const char*>::value) && !is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value
 #ifdef BOOST_HAS_FLOAT128
                                                && !boost::is_same<V, __float128>::value
@@ -83,7 +83,7 @@ class number
        BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<Backend const&>(), std::declval<unsigned>())))
        : m_backend(e.m_backend, digits10) {}
    template <class V>
-   explicit BOOST_MP_FORCEINLINE number(const V& v, typename boost::enable_if_c<
+   explicit BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR number(const V& v, typename boost::enable_if_c<
                                                         (boost::is_arithmetic<V>::value || is_same<std::string, V>::value || is_convertible<V, const char*>::value) && !detail::is_explicitly_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value>::type* = 0)
        BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend&>() = std::declval<typename detail::canonical<V, Backend>::type const&>()))
    {
@@ -103,13 +103,13 @@ class number
        BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<Backend const&>()))) : m_backend(val.backend()) {}
 
    template <class Other, expression_template_option ET>
-   BOOST_MP_FORCEINLINE number(const number<Other, ET>& val,
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR number(const number<Other, ET>& val,
                                typename boost::enable_if_c<(boost::is_convertible<Other, Backend>::value && !detail::is_restricted_conversion<Other, Backend>::value)>::type* = 0)
        BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<Other const&>())))
        : m_backend(val.backend()) {}
 
    template <class Other, expression_template_option ET>
-   explicit number(const number<Other, ET>& val, typename boost::enable_if_c<
+   explicit BOOST_CXX14_CONSTEXPR number(const number<Other, ET>& val, typename boost::enable_if_c<
                                                      (!detail::is_explicitly_convertible<Other, Backend>::value)>::type* = 0)
    {
       //
@@ -121,12 +121,12 @@ class number
       generic_interconvert(backend(), val.backend(), number_category<Backend>(), number_category<Other>());
    }
    template <class Other, expression_template_option ET>
-   explicit BOOST_MP_FORCEINLINE number(const number<Other, ET>& val, typename boost::enable_if_c<
+   explicit BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR number(const number<Other, ET>& val, typename boost::enable_if_c<
                                                                           (detail::is_explicitly_convertible<Other, Backend>::value && (detail::is_restricted_conversion<Other, Backend>::value || !boost::is_convertible<Other, Backend>::value))>::type* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<Other const&>())))
        : m_backend(val.backend()) {}
 
    template <class V, class U>
-   BOOST_MP_FORCEINLINE number(const V& v1, const U& v2,
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR number(const V& v1, const U& v2,
                                typename boost::enable_if_c<(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value && !is_same<typename component_type<self_type>::type, self_type>::value)>::type* = 0)
    {
       using default_ops::assign_components;
@@ -134,7 +134,7 @@ class number
       assign_components(m_backend, canonical_value(detail::evaluate_if_expression(v1)), canonical_value(detail::evaluate_if_expression(v2)));
    }
    template <class V, class U>
-   BOOST_MP_FORCEINLINE explicit number(const V& v1, const U& v2,
+   BOOST_MP_FORCEINLINE explicit BOOST_CXX14_CONSTEXPR number(const V& v1, const U& v2,
                                         typename boost::enable_if_c<
                                             (is_constructible<value_type, V>::value || is_convertible<V, std::string>::value) && (is_constructible<value_type, U>::value || is_convertible<U, std::string>::value) && !is_same<typename component_type<self_type>::type, self_type>::value && !is_same<V, self_type>::value && !(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value)>::type* = 0)
    {
@@ -147,22 +147,22 @@ class number
    // Support for new types in C++17
    //
    template <class Traits>
-   explicit inline number(const std::basic_string_view<char, Traits>& view)
+   explicit inline BOOST_CXX14_CONSTEXPR number(const std::basic_string_view<char, Traits>& view)
    {
       using default_ops::assign_from_string_view;
       assign_from_string_view(this->backend(), view);
    }
    template <class Traits>
-   explicit inline number(const std::basic_string_view<char, Traits>& view_x, const std::basic_string_view<char, Traits>& view_y)
+   explicit inline BOOST_CXX14_CONSTEXPR number(const std::basic_string_view<char, Traits>& view_x, const std::basic_string_view<char, Traits>& view_y)
    {
       using default_ops::assign_from_string_view;
       assign_from_string_view(this->backend(), view_x, view_y);
    }
    template <class Traits>
-   explicit BOOST_MP_FORCEINLINE number(const std::basic_string_view<char, Traits>& v, unsigned digits10)
+   explicit BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR number(const std::basic_string_view<char, Traits>& v, unsigned digits10)
        : m_backend(canonical_value(v), digits10) {}
    template <class Traits>
-   number& assign(const std::basic_string_view<char, Traits>& view)
+   BOOST_CXX14_CONSTEXPR number& assign(const std::basic_string_view<char, Traits>& view)
    {
       using default_ops::assign_from_string_view;
       assign_from_string_view(this->backend(), view);
@@ -171,17 +171,17 @@ class number
 #endif
 
    template <class V, class U>
-   BOOST_MP_FORCEINLINE number(const V& v1, const U& v2, unsigned digits10,
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR number(const V& v1, const U& v2, unsigned digits10,
                                typename boost::enable_if_c<(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value && !is_same<typename component_type<self_type>::type, self_type>::value)>::type* = 0)
        : m_backend(canonical_value(detail::evaluate_if_expression(v1)), canonical_value(detail::evaluate_if_expression(v2)), digits10)
    {}
    template <class V, class U>
-   BOOST_MP_FORCEINLINE explicit number(const V& v1, const U& v2, unsigned digits10,
+   BOOST_MP_FORCEINLINE explicit BOOST_CXX14_CONSTEXPR number(const V& v1, const U& v2, unsigned digits10,
                                         typename boost::enable_if_c<((is_constructible<value_type, V>::value || is_convertible<V, std::string>::value) && (is_constructible<value_type, U>::value || is_convertible<U, std::string>::value) && !is_same<typename component_type<self_type>::type, self_type>::value) && !(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value)>::type* = 0)
        : m_backend(canonical_value(detail::evaluate_if_expression(v1)), canonical_value(detail::evaluate_if_expression(v2)), digits10) {}
 
    template <class Other, expression_template_option ET>
-   BOOST_MP_FORCEINLINE number(const number<Other, ET>& v1, const number<Other, ET>& v2, typename boost::enable_if<boost::is_convertible<Other, Backend> >::type* = 0)
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR number(const number<Other, ET>& v1, const number<Other, ET>& v2, typename boost::enable_if<boost::is_convertible<Other, Backend> >::type* = 0)
    {
       using default_ops::assign_components;
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(v1, v2);
@@ -189,7 +189,7 @@ class number
    }
 
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
+   BOOST_CXX14_CONSTEXPR typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       typedef typename is_same<number, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::type tag_type;
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> >                                       precision_guard(e);
@@ -212,7 +212,7 @@ class number
       return *this;
    }
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   number& assign(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
+   BOOST_CXX14_CONSTEXPR number& assign(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       typedef typename is_same<number, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::type tag_type;
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> >                                       precision_guard(e);
@@ -236,7 +236,7 @@ class number
       return *this;
    }
 
-   BOOST_MP_FORCEINLINE number& operator=(const number& e)
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR number& operator=(const number& e)
        BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend&>() = std::declval<Backend const&>()))
    {
       m_backend = e.m_backend;
@@ -244,7 +244,7 @@ class number
    }
 
    template <class V>
-   BOOST_MP_FORCEINLINE typename boost::enable_if<is_convertible<V, self_type>, number<Backend, ExpressionTemplates>&>::type
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR typename boost::enable_if<is_convertible<V, self_type>, number<Backend, ExpressionTemplates>&>::type
    operator=(const V& v)
        BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend&>() = std::declval<const typename detail::canonical<V, Backend>::type&>()))
    {
@@ -252,21 +252,21 @@ class number
       return *this;
    }
    template <class V>
-   BOOST_MP_FORCEINLINE number<Backend, ExpressionTemplates>& assign(const V& v)
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR number<Backend, ExpressionTemplates>& assign(const V& v)
        BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend&>() = std::declval<const typename detail::canonical<V, Backend>::type&>()))
    {
       m_backend = canonical_value(v);
       return *this;
    }
    template <class V>
-   BOOST_MP_FORCEINLINE number<Backend, ExpressionTemplates>& assign(const V& v, unsigned digits10)
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR number<Backend, ExpressionTemplates>& assign(const V& v, unsigned digits10)
        BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend&>() = std::declval<const typename detail::canonical<V, Backend>::type&>()))
    {
       number t(v, digits10);
       return *this = t;
    }
    template <class Other, expression_template_option ET>
-   typename boost::disable_if<boost::multiprecision::detail::is_explicitly_convertible<Other, Backend>, number<Backend, ExpressionTemplates>&>::type
+   BOOST_CXX14_CONSTEXPR typename boost::disable_if<boost::multiprecision::detail::is_explicitly_convertible<Other, Backend>, number<Backend, ExpressionTemplates>&>::type
    assign(const number<Other, ET>& v)
    {
       //
@@ -295,7 +295,7 @@ class number
    }
 
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   number(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e, typename boost::enable_if_c<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>::value>::type* = 0)
+   BOOST_CXX14_CONSTEXPR number(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e, typename boost::enable_if_c<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>::value>::type* = 0)
    {
       //
       // No preicsion guard here, we already have one in operator=
@@ -303,7 +303,7 @@ class number
       *this = e;
    }
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   explicit number(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e,
+   explicit BOOST_CXX14_CONSTEXPR number(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e,
                    typename boost::enable_if_c<!is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>::value && boost::multiprecision::detail::is_explicitly_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>::value>::type* = 0)
    {
       //
@@ -317,14 +317,14 @@ class number
        BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<Backend>())))
        : m_backend(static_cast<Backend&&>(r.m_backend))
    {}
-   BOOST_MP_FORCEINLINE number& operator=(number&& r) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend&>() = std::declval<Backend>()))
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR number& operator=(number&& r) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend&>() = std::declval<Backend>()))
    {
       m_backend = static_cast<Backend&&>(r.m_backend);
       return *this;
    }
 #endif
 
-   number& operator+=(const self_type& val)
+   BOOST_CXX14_CONSTEXPR number& operator+=(const self_type& val)
    {
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, val);
       //
@@ -347,7 +347,7 @@ class number
    }
 
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator+=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
+   BOOST_CXX14_CONSTEXPR typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator+=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, e);
       // Create a copy if e contains this, but not if we're just doing a
@@ -365,7 +365,7 @@ class number
    }
 
    template <class Arg1, class Arg2, class Arg3, class Arg4>
-   number& operator+=(const detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>& e)
+   BOOST_CXX14_CONSTEXPR number& operator+=(const detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>& e)
    {
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, e);
       //
@@ -393,14 +393,14 @@ class number
 
    template <class V>
    typename boost::enable_if<boost::is_convertible<V, self_type>, number<Backend, ExpressionTemplates>&>::type
-   operator+=(const V& v)
+      BOOST_CXX14_CONSTEXPR operator+=(const V& v)
    {
       using default_ops::eval_add;
       eval_add(m_backend, canonical_value(v));
       return *this;
    }
 
-   number& operator-=(const self_type& val)
+   BOOST_CXX14_CONSTEXPR number& operator-=(const self_type& val)
    {
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, val);
       //
@@ -423,7 +423,7 @@ class number
    }
 
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator-=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
+   BOOST_CXX14_CONSTEXPR typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator-=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, e);
       // Create a copy if e contains this:
@@ -440,7 +440,7 @@ class number
    }
 
    template <class V>
-   typename boost::enable_if<boost::is_convertible<V, self_type>, number<Backend, ExpressionTemplates>&>::type
+   BOOST_CXX14_CONSTEXPR typename boost::enable_if<boost::is_convertible<V, self_type>, number<Backend, ExpressionTemplates>&>::type
    operator-=(const V& v)
    {
       using default_ops::eval_subtract;
@@ -449,7 +449,7 @@ class number
    }
 
    template <class Arg1, class Arg2, class Arg3, class Arg4>
-   number& operator-=(const detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>& e)
+   BOOST_CXX14_CONSTEXPR number& operator-=(const detail::expression<detail::multiply_immediates, Arg1, Arg2, Arg3, Arg4>& e)
    {
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, e);
       //
@@ -475,7 +475,7 @@ class number
       return *this;
    }
 
-   number& operator*=(const self_type& e)
+   BOOST_CXX14_CONSTEXPR number& operator*=(const self_type& e)
    {
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, e);
       //
@@ -498,7 +498,7 @@ class number
    }
 
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator*=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
+   BOOST_CXX14_CONSTEXPR typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator*=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, e);
       // Create a temporary if the RHS references *this, but not
@@ -516,7 +516,7 @@ class number
    }
 
    template <class V>
-   typename boost::enable_if<boost::is_convertible<V, self_type>, number<Backend, ExpressionTemplates>&>::type
+   BOOST_CXX14_CONSTEXPR typename boost::enable_if<boost::is_convertible<V, self_type>, number<Backend, ExpressionTemplates>&>::type
    operator*=(const V& v)
    {
       using default_ops::eval_multiply;
@@ -524,7 +524,7 @@ class number
       return *this;
    }
 
-   number& operator%=(const self_type& e)
+   BOOST_CXX14_CONSTEXPR number& operator%=(const self_type& e)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, e);
@@ -547,7 +547,7 @@ class number
       return *this;
    }
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator%=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
+   BOOST_CXX14_CONSTEXPR typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator%=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, e);
@@ -564,7 +564,7 @@ class number
       return *this;
    }
    template <class V>
-   typename boost::enable_if<boost::is_convertible<V, self_type>, number<Backend, ExpressionTemplates>&>::type
+   BOOST_CXX14_CONSTEXPR typename boost::enable_if<boost::is_convertible<V, self_type>, number<Backend, ExpressionTemplates>&>::type
    operator%=(const V& v)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
@@ -581,21 +581,21 @@ class number
    // execute the increment/decrement on destruction, but
    // correct implementation will be tricky, so defered for now...
    //
-   BOOST_MP_FORCEINLINE number& operator++()
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR number& operator++()
    {
       using default_ops::eval_increment;
       eval_increment(m_backend);
       return *this;
    }
 
-   BOOST_MP_FORCEINLINE number& operator--()
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR number& operator--()
    {
       using default_ops::eval_decrement;
       eval_decrement(m_backend);
       return *this;
    }
 
-   inline number operator++(int)
+   inline BOOST_CXX14_CONSTEXPR number operator++(int)
    {
       using default_ops::eval_increment;
       self_type temp(*this);
@@ -603,7 +603,7 @@ class number
       return BOOST_MP_MOVE(temp);
    }
 
-   inline number operator--(int)
+   inline BOOST_CXX14_CONSTEXPR number operator--(int)
    {
       using default_ops::eval_decrement;
       self_type temp(*this);
@@ -612,7 +612,7 @@ class number
    }
 
    template <class V>
-   BOOST_MP_FORCEINLINE typename boost::enable_if<is_integral<V>, number&>::type operator<<=(V val)
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR typename boost::enable_if<is_integral<V>, number&>::type operator<<=(V val)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The left-shift operation is only valid for integer types");
       detail::check_shift_range(val, mpl::bool_<(sizeof(V) > sizeof(std::size_t))>(), is_signed<V>());
@@ -621,7 +621,7 @@ class number
    }
 
    template <class V>
-   BOOST_MP_FORCEINLINE typename boost::enable_if<is_integral<V>, number&>::type operator>>=(V val)
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR typename boost::enable_if<is_integral<V>, number&>::type operator>>=(V val)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The right-shift operation is only valid for integer types");
       detail::check_shift_range(val, mpl::bool_<(sizeof(V) > sizeof(std::size_t))>(), is_signed<V>());
@@ -629,7 +629,7 @@ class number
       return *this;
    }
 
-   BOOST_MP_FORCEINLINE number& operator/=(const self_type& e)
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR number& operator/=(const self_type& e)
    {
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, e);
       //
@@ -652,7 +652,7 @@ class number
    }
 
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator/=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
+   BOOST_CXX14_CONSTEXPR typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator/=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(*this, e);
       // Create a temporary if the RHS references *this:
@@ -669,7 +669,7 @@ class number
    }
 
    template <class V>
-   BOOST_MP_FORCEINLINE typename boost::enable_if<boost::is_convertible<V, self_type>, number<Backend, ExpressionTemplates>&>::type
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR typename boost::enable_if<boost::is_convertible<V, self_type>, number<Backend, ExpressionTemplates>&>::type
    operator/=(const V& v)
    {
       using default_ops::eval_divide;
@@ -677,7 +677,7 @@ class number
       return *this;
    }
 
-   BOOST_MP_FORCEINLINE number& operator&=(const self_type& e)
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR number& operator&=(const self_type& e)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise & operation is only valid for integer types");
       do_bitwise_and(detail::expression<detail::terminal, self_type>(e), detail::terminal());
@@ -685,7 +685,7 @@ class number
    }
 
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator&=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
+   BOOST_CXX14_CONSTEXPR typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator&=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise & operation is only valid for integer types");
       // Create a temporary if the RHS references *this, but not
@@ -703,7 +703,7 @@ class number
    }
 
    template <class V>
-   BOOST_MP_FORCEINLINE typename boost::enable_if<boost::is_convertible<V, self_type>, number<Backend, ExpressionTemplates>&>::type
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR typename boost::enable_if<boost::is_convertible<V, self_type>, number<Backend, ExpressionTemplates>&>::type
    operator&=(const V& v)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise & operation is only valid for integer types");
@@ -712,7 +712,7 @@ class number
       return *this;
    }
 
-   BOOST_MP_FORCEINLINE number& operator|=(const self_type& e)
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR number& operator|=(const self_type& e)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise | operation is only valid for integer types");
       do_bitwise_or(detail::expression<detail::terminal, self_type>(e), detail::terminal());
@@ -720,7 +720,7 @@ class number
    }
 
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator|=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
+   BOOST_CXX14_CONSTEXPR typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator|=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise | operation is only valid for integer types");
       // Create a temporary if the RHS references *this, but not
@@ -738,7 +738,7 @@ class number
    }
 
    template <class V>
-   BOOST_MP_FORCEINLINE typename boost::enable_if<boost::is_convertible<V, self_type>, number<Backend, ExpressionTemplates>&>::type
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR typename boost::enable_if<boost::is_convertible<V, self_type>, number<Backend, ExpressionTemplates>&>::type
    operator|=(const V& v)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise | operation is only valid for integer types");
@@ -747,7 +747,7 @@ class number
       return *this;
    }
 
-   BOOST_MP_FORCEINLINE number& operator^=(const self_type& e)
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR number& operator^=(const self_type& e)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise ^ operation is only valid for integer types");
       do_bitwise_xor(detail::expression<detail::terminal, self_type>(e), detail::terminal());
@@ -755,7 +755,7 @@ class number
    }
 
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator^=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
+   BOOST_CXX14_CONSTEXPR typename boost::enable_if<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>, number&>::type operator^=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise ^ operation is only valid for integer types");
       if (contains_self(e))
@@ -771,7 +771,7 @@ class number
    }
 
    template <class V>
-   BOOST_MP_FORCEINLINE typename boost::enable_if<boost::is_convertible<V, self_type>, number<Backend, ExpressionTemplates>&>::type
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR typename boost::enable_if<boost::is_convertible<V, self_type>, number<Backend, ExpressionTemplates>&>::type
    operator^=(const V& v)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise ^ operation is only valid for integer types");
@@ -782,19 +782,19 @@ class number
    //
    // swap:
    //
-   BOOST_MP_FORCEINLINE void swap(self_type& other) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend>().swap(std::declval<Backend&>())))
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR void swap(self_type& other) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend>().swap(std::declval<Backend&>())))
    {
       m_backend.swap(other.backend());
    }
    //
    // Zero and sign:
    //
-   BOOST_MP_FORCEINLINE bool is_zero() const
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR bool is_zero() const
    {
       using default_ops::eval_is_zero;
       return eval_is_zero(m_backend);
    }
-   BOOST_MP_FORCEINLINE int sign() const
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR int sign() const
    {
       using default_ops::eval_get_sign;
       return eval_get_sign(m_backend);
@@ -814,24 +814,24 @@ class number
 
  private:
    template <class T>
-   void convert_to_imp(T* result) const
+   BOOST_CXX14_CONSTEXPR void convert_to_imp(T* result) const
    {
       using default_ops::eval_convert_to;
       eval_convert_to(result, m_backend);
    }
    template <class B2, expression_template_option ET>
-   void convert_to_imp(number<B2, ET>* result) const
+   BOOST_CXX14_CONSTEXPR void convert_to_imp(number<B2, ET>* result) const
    {
       result->assign(*this);
    }
-   void convert_to_imp(std::string* result) const
+   BOOST_CXX14_CONSTEXPR void convert_to_imp(std::string* result) const
    {
       *result = this->str();
    }
 
  public:
    template <class T>
-   T convert_to() const
+   BOOST_CXX14_CONSTEXPR T convert_to() const
    {
       T result;
       convert_to_imp(&result);
@@ -864,11 +864,11 @@ class number
 #else
    template <class T, class = typename boost::disable_if_c<boost::is_constructible<T, self_type const&>::value || !boost::is_default_constructible<T>::value || (!boost::is_arithmetic<T>::value && !boost::is_complex<T>::value), T>::type>
 #endif
-   explicit operator T() const
+   explicit BOOST_CXX14_CONSTEXPR operator T() const
    {
       return this->template convert_to<T>();
    }
-   BOOST_MP_FORCEINLINE explicit operator bool() const
+   BOOST_MP_FORCEINLINE explicit BOOST_CXX14_CONSTEXPR operator bool() const
    {
       return !is_zero();
    }
@@ -888,32 +888,32 @@ class number
    //
    // Default precision:
    //
-   static unsigned default_precision() BOOST_NOEXCEPT
+   static BOOST_CXX14_CONSTEXPR unsigned default_precision() BOOST_NOEXCEPT
    {
       return Backend::default_precision();
    }
-   static void default_precision(unsigned digits10)
+   static BOOST_CXX14_CONSTEXPR void default_precision(unsigned digits10)
    {
       Backend::default_precision(digits10);
    }
-   unsigned precision() const BOOST_NOEXCEPT
+   BOOST_CXX14_CONSTEXPR unsigned precision() const BOOST_NOEXCEPT
    {
       return m_backend.precision();
    }
-   void precision(unsigned digits10)
+   BOOST_CXX14_CONSTEXPR void precision(unsigned digits10)
    {
       m_backend.precision(digits10);
    }
    //
    // Comparison:
    //
-   BOOST_MP_FORCEINLINE int compare(const number<Backend, ExpressionTemplates>& o) const
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR int compare(const number<Backend, ExpressionTemplates>& o) const
        BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend>().compare(std::declval<Backend>())))
    {
       return m_backend.compare(o.m_backend);
    }
    template <class V>
-   BOOST_MP_FORCEINLINE typename boost::enable_if_c<is_arithmetic<V>::value && (number_category<Backend>::value != number_kind_complex), int>::type compare(const V& o) const
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR typename boost::enable_if_c<is_arithmetic<V>::value && (number_category<Backend>::value != number_kind_complex), int>::type compare(const V& o) const
    {
       using default_ops::eval_get_sign;
       if (o == 0)
@@ -921,7 +921,7 @@ class number
       return m_backend.compare(canonical_value(o));
    }
    template <class V>
-   BOOST_MP_FORCEINLINE typename boost::enable_if_c<is_arithmetic<V>::value && (number_category<Backend>::value == number_kind_complex), int>::type compare(const V& o) const
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR typename boost::enable_if_c<is_arithmetic<V>::value && (number_category<Backend>::value == number_kind_complex), int>::type compare(const V& o) const
    {
       using default_ops::eval_get_sign;
       return m_backend.compare(canonical_value(o));
@@ -930,15 +930,15 @@ class number
    // Direct access to the underlying backend:
    //
 #if !(defined(BOOST_NO_CXX11_RVALUE_REFERENCES) || defined(BOOST_NO_CXX11_REF_QUALIFIERS) || BOOST_WORKAROUND(BOOST_GCC, < 50000))
-   BOOST_MP_FORCEINLINE Backend& backend() & BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR Backend& backend() & BOOST_NOEXCEPT
    {
       return m_backend;
    }
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const Backend& backend() const& BOOST_NOEXCEPT { return m_backend; }
-   BOOST_MP_FORCEINLINE Backend&& backend() && BOOST_NOEXCEPT { return static_cast<Backend&&>(m_backend); }
-   BOOST_MP_FORCEINLINE Backend const&& backend() const&& BOOST_NOEXCEPT { return static_cast<Backend const&&>(m_backend); }
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR Backend&& backend() && BOOST_NOEXCEPT { return static_cast<Backend&&>(m_backend); }
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR Backend const&& backend() const&& BOOST_NOEXCEPT { return static_cast<Backend const&&>(m_backend); }
 #else
-   BOOST_MP_FORCEINLINE Backend& backend() BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR Backend& backend() BOOST_NOEXCEPT
    {
       return m_backend;
    }
@@ -947,7 +947,7 @@ class number
    //
    // Complex number real and imag:
    //
-   typename scalar_result_from_possible_complex<number<Backend, ExpressionTemplates> >::type
+   BOOST_CXX14_CONSTEXPR typename scalar_result_from_possible_complex<number<Backend, ExpressionTemplates> >::type
    real() const
    {
       using default_ops::eval_real;
@@ -956,7 +956,7 @@ class number
       eval_real(result.backend(), backend());
       return result;
    }
-   typename scalar_result_from_possible_complex<number<Backend, ExpressionTemplates> >::type
+   BOOST_CXX14_CONSTEXPR typename scalar_result_from_possible_complex<number<Backend, ExpressionTemplates> >::type
    imag() const
    {
       using default_ops::eval_imag;
@@ -966,14 +966,14 @@ class number
       return result;
    }
    template <class T>
-   inline typename enable_if_c<boost::is_convertible<T, self_type>::value, self_type&>::type real(const T& val)
+   inline BOOST_CXX14_CONSTEXPR typename enable_if_c<boost::is_convertible<T, self_type>::value, self_type&>::type real(const T& val)
    {
       using default_ops::eval_set_real;
       eval_set_real(backend(), canonical_value(val));
       return *this;
    }
    template <class T>
-   inline typename enable_if_c<boost::is_convertible<T, self_type>::value && number_category<self_type>::value == number_kind_complex, self_type&>::type imag(const T& val)
+   inline BOOST_CXX14_CONSTEXPR typename enable_if_c<boost::is_convertible<T, self_type>::value && number_category<self_type>::value == number_kind_complex, self_type&>::type imag(const T& val)
    {
       using default_ops::eval_set_imag;
       eval_set_imag(backend(), canonical_value(val));
@@ -982,12 +982,12 @@ class number
 
  private:
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   void do_assign(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e, const mpl::true_&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e, const mpl::true_&)
    {
       do_assign(e, tag());
    }
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   void do_assign(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e, const mpl::false_&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e, const mpl::false_&)
    {
       // The result of the expression isn't the same type as this -
       // create a temporary result and assign it to *this:
@@ -997,35 +997,35 @@ class number
    }
 
    template <class Exp>
-   void do_assign(const Exp& e, const detail::add_immediates&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::add_immediates&)
    {
       using default_ops::eval_add;
       boost::multiprecision::detail::maybe_promote_precision(this);
       eval_add(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
    template <class Exp>
-   void do_assign(const Exp& e, const detail::subtract_immediates&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::subtract_immediates&)
    {
       using default_ops::eval_subtract;
       boost::multiprecision::detail::maybe_promote_precision(this);
       eval_subtract(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
    template <class Exp>
-   void do_assign(const Exp& e, const detail::multiply_immediates&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::multiply_immediates&)
    {
       using default_ops::eval_multiply;
       boost::multiprecision::detail::maybe_promote_precision(this);
       eval_multiply(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
    template <class Exp>
-   void do_assign(const Exp& e, const detail::multiply_add&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::multiply_add&)
    {
       using default_ops::eval_multiply_add;
       boost::multiprecision::detail::maybe_promote_precision(this);
       eval_multiply_add(m_backend, canonical_value(e.left().value()), canonical_value(e.middle().value()), canonical_value(e.right().value()));
    }
    template <class Exp>
-   void do_assign(const Exp& e, const detail::multiply_subtract&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::multiply_subtract&)
    {
       using default_ops::eval_multiply_subtract;
       boost::multiprecision::detail::maybe_promote_precision(this);
@@ -1033,7 +1033,7 @@ class number
    }
 
    template <class Exp>
-   void do_assign(const Exp& e, const detail::divide_immediates&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::divide_immediates&)
    {
       using default_ops::eval_divide;
       boost::multiprecision::detail::maybe_promote_precision(this);
@@ -1041,20 +1041,20 @@ class number
    }
 
    template <class Exp>
-   void do_assign(const Exp& e, const detail::negate&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::negate&)
    {
       typedef typename Exp::left_type left_type;
       do_assign(e.left(), typename left_type::tag_type());
       m_backend.negate();
    }
    template <class Exp>
-   void do_assign(const Exp& e, const detail::plus&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::plus&)
    {
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
 
-      static int const left_depth  = left_type::depth;
-      static int const right_depth = right_type::depth;
+      BOOST_CONSTEXPR int const left_depth  = left_type::depth;
+      BOOST_CONSTEXPR int const right_depth = right_type::depth;
 
       bool bl = contains_self(e.left());
       bool br = contains_self(e.right());
@@ -1086,13 +1086,13 @@ class number
       }
    }
    template <class Exp>
-   void do_assign(const Exp& e, const detail::minus&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::minus&)
    {
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
 
-      static int const left_depth  = left_type::depth;
-      static int const right_depth = right_type::depth;
+      BOOST_CONSTEXPR int const left_depth  = left_type::depth;
+      BOOST_CONSTEXPR int const right_depth = right_type::depth;
 
       bool bl = contains_self(e.left());
       bool br = contains_self(e.right());
@@ -1126,13 +1126,13 @@ class number
       }
    }
    template <class Exp>
-   void do_assign(const Exp& e, const detail::multiplies&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::multiplies&)
    {
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
 
-      static int const left_depth  = left_type::depth;
-      static int const right_depth = right_type::depth;
+      BOOST_CONSTEXPR int const left_depth  = left_type::depth;
+      BOOST_CONSTEXPR int const right_depth = right_type::depth;
 
       bool bl = contains_self(e.left());
       bool br = contains_self(e.right());
@@ -1164,7 +1164,7 @@ class number
       }
    }
    template <class Exp>
-   void do_assign(const Exp& e, const detail::divides&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::divides&)
    {
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
@@ -1189,7 +1189,7 @@ class number
       }
    }
    template <class Exp>
-   void do_assign(const Exp& e, const detail::modulus&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::modulus&)
    {
       //
       // This operation is only valid for integer backends:
@@ -1219,7 +1219,7 @@ class number
       }
    }
    template <class Exp>
-   void do_assign(const Exp& e, const detail::modulus_immediates&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::modulus_immediates&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
       using default_ops::eval_modulus;
@@ -1228,7 +1228,7 @@ class number
    }
 
    template <class Exp>
-   void do_assign(const Exp& e, const detail::bitwise_and&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::bitwise_and&)
    {
       //
       // This operation is only valid for integer backends:
@@ -1238,8 +1238,8 @@ class number
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
 
-      static int const left_depth  = left_type::depth;
-      static int const right_depth = right_type::depth;
+      BOOST_CONSTEXPR int const left_depth  = left_type::depth;
+      BOOST_CONSTEXPR int const right_depth = right_type::depth;
 
       bool bl = contains_self(e.left());
       bool br = contains_self(e.right());
@@ -1265,7 +1265,7 @@ class number
       }
    }
    template <class Exp>
-   void do_assign(const Exp& e, const detail::bitwise_and_immediates&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::bitwise_and_immediates&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "Bitwise operations are only valid for integer types");
       using default_ops::eval_bitwise_and;
@@ -1273,7 +1273,7 @@ class number
    }
 
    template <class Exp>
-   void do_assign(const Exp& e, const detail::bitwise_or&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::bitwise_or&)
    {
       //
       // This operation is only valid for integer backends:
@@ -1283,8 +1283,8 @@ class number
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
 
-      static int const left_depth  = left_type::depth;
-      static int const right_depth = right_type::depth;
+      BOOST_CONSTEXPR int const left_depth  = left_type::depth;
+      BOOST_CONSTEXPR int const right_depth = right_type::depth;
 
       bool bl = contains_self(e.left());
       bool br = contains_self(e.right());
@@ -1310,7 +1310,7 @@ class number
       }
    }
    template <class Exp>
-   void do_assign(const Exp& e, const detail::bitwise_or_immediates&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::bitwise_or_immediates&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "Bitwise operations are only valid for integer types");
       using default_ops::eval_bitwise_or;
@@ -1318,7 +1318,7 @@ class number
    }
 
    template <class Exp>
-   void do_assign(const Exp& e, const detail::bitwise_xor&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::bitwise_xor&)
    {
       //
       // This operation is only valid for integer backends:
@@ -1328,8 +1328,8 @@ class number
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
 
-      static int const left_depth  = left_type::depth;
-      static int const right_depth = right_type::depth;
+      BOOST_CONSTEXPR int const left_depth  = left_type::depth;
+      BOOST_CONSTEXPR int const right_depth = right_type::depth;
 
       bool bl = contains_self(e.left());
       bool br = contains_self(e.right());
@@ -1355,14 +1355,14 @@ class number
       }
    }
    template <class Exp>
-   void do_assign(const Exp& e, const detail::bitwise_xor_immediates&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::bitwise_xor_immediates&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "Bitwise operations are only valid for integer types");
       using default_ops::eval_bitwise_xor;
       eval_bitwise_xor(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));
    }
    template <class Exp>
-   void do_assign(const Exp& e, const detail::terminal&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::terminal&)
    {
       if (!is_self(e))
       {
@@ -1370,14 +1370,14 @@ class number
       }
    }
    template <class Exp>
-   void do_assign(const Exp& e, const detail::function&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::function&)
    {
       typedef typename Exp::arity tag_type;
       boost::multiprecision::detail::maybe_promote_precision(this);
       do_assign_function(e, tag_type());
    }
    template <class Exp>
-   void do_assign(const Exp& e, const detail::shift_left&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::shift_left&)
    {
       // We can only shift by an integer value, not an arbitrary expression:
       typedef typename Exp::left_type    left_type;
@@ -1391,7 +1391,7 @@ class number
    }
 
    template <class Exp>
-   void do_assign(const Exp& e, const detail::shift_right&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::shift_right&)
    {
       // We can only shift by an integer value, not an arbitrary expression:
       typedef typename Exp::left_type    left_type;
@@ -1405,7 +1405,7 @@ class number
    }
 
    template <class Exp>
-   void do_assign(const Exp& e, const detail::bitwise_complement&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::bitwise_complement&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise ~ operation is only valid for integer types");
       using default_ops::eval_complement;
@@ -1414,7 +1414,7 @@ class number
    }
 
    template <class Exp>
-   void do_assign(const Exp& e, const detail::complement_immediates&)
+   BOOST_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::complement_immediates&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise ~ operation is only valid for integer types");
       using default_ops::eval_complement;
@@ -1422,7 +1422,7 @@ class number
    }
 
    template <class Exp, class Val>
-   void do_assign_right_shift(const Exp& e, const Val& val, const detail::terminal&)
+   BOOST_CXX14_CONSTEXPR void do_assign_right_shift(const Exp& e, const Val& val, const detail::terminal&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The right shift operation is only valid for integer types");
       using default_ops::eval_right_shift;
@@ -1431,7 +1431,7 @@ class number
    }
 
    template <class Exp, class Val>
-   void do_assign_left_shift(const Exp& e, const Val& val, const detail::terminal&)
+   BOOST_CXX14_CONSTEXPR void do_assign_left_shift(const Exp& e, const Val& val, const detail::terminal&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The left shift operation is only valid for integer types");
       using default_ops::eval_left_shift;
@@ -1440,7 +1440,7 @@ class number
    }
 
    template <class Exp, class Val, class Tag>
-   void do_assign_right_shift(const Exp& e, const Val& val, const Tag&)
+   BOOST_CXX14_CONSTEXPR void do_assign_right_shift(const Exp& e, const Val& val, const Tag&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The right shift operation is only valid for integer types");
       using default_ops::eval_right_shift;
@@ -1450,7 +1450,7 @@ class number
    }
 
    template <class Exp, class Val, class Tag>
-   void do_assign_left_shift(const Exp& e, const Val& val, const Tag&)
+   BOOST_CXX14_CONSTEXPR void do_assign_left_shift(const Exp& e, const Val& val, const Tag&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The left shift operation is only valid for integer types");
       using default_ops::eval_left_shift;
@@ -1460,30 +1460,30 @@ class number
    }
 
    template <class Exp>
-   void do_assign_function(const Exp& e, const mpl::int_<1>&)
+   BOOST_CXX14_CONSTEXPR void do_assign_function(const Exp& e, const mpl::int_<1>&)
    {
       e.left().value()(&m_backend);
    }
    template <class Exp>
-   void do_assign_function(const Exp& e, const mpl::int_<2>&)
+   BOOST_CXX14_CONSTEXPR void do_assign_function(const Exp& e, const mpl::int_<2>&)
    {
       typedef typename Exp::right_type      right_type;
       typedef typename right_type::tag_type tag_type;
       do_assign_function_1(e.left().value(), e.right_ref(), tag_type());
    }
    template <class F, class Exp>
-   void do_assign_function_1(const F& f, const Exp& val, const detail::terminal&)
+   BOOST_CXX14_CONSTEXPR void do_assign_function_1(const F& f, const Exp& val, const detail::terminal&)
    {
       f(m_backend, function_arg_value(val));
    }
    template <class F, class Exp, class Tag>
-   void do_assign_function_1(const F& f, const Exp& val, const Tag&)
+   BOOST_CXX14_CONSTEXPR void do_assign_function_1(const F& f, const Exp& val, const Tag&)
    {
       typename Exp::result_type t(val);
       f(m_backend, t.backend());
    }
    template <class Exp>
-   void do_assign_function(const Exp& e, const mpl::int_<3>&)
+   BOOST_CXX14_CONSTEXPR void do_assign_function(const Exp& e, const mpl::int_<3>&)
    {
       typedef typename Exp::middle_type      middle_type;
       typedef typename middle_type::tag_type tag_type;
@@ -1492,24 +1492,24 @@ class number
       do_assign_function_2(e.left().value(), e.middle_ref(), e.right_ref(), tag_type(), end_tag());
    }
    template <class F, class Exp1, class Exp2>
-   void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const detail::terminal&, const detail::terminal&)
+   BOOST_CXX14_CONSTEXPR void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const detail::terminal&, const detail::terminal&)
    {
       f(m_backend, function_arg_value(val1), function_arg_value(val2));
    }
    template <class F, class Exp1, class Exp2, class Tag1>
-   void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const Tag1&, const detail::terminal&)
+   BOOST_CXX14_CONSTEXPR void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const Tag1&, const detail::terminal&)
    {
       typename Exp1::result_type temp1(val1);
       f(m_backend, BOOST_MP_MOVE(temp1.backend()), function_arg_value(val2));
    }
    template <class F, class Exp1, class Exp2, class Tag2>
-   void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const detail::terminal&, const Tag2&)
+   BOOST_CXX14_CONSTEXPR void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const detail::terminal&, const Tag2&)
    {
       typename Exp2::result_type temp2(val2);
       f(m_backend, function_arg_value(val1), BOOST_MP_MOVE(temp2.backend()));
    }
    template <class F, class Exp1, class Exp2, class Tag1, class Tag2>
-   void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const Tag1&, const Tag2&)
+   BOOST_CXX14_CONSTEXPR void do_assign_function_2(const F& f, const Exp1& val1, const Exp2& val2, const Tag1&, const Tag2&)
    {
       typename Exp1::result_type temp1(val1);
       typename Exp2::result_type temp2(val2);
@@ -1517,7 +1517,7 @@ class number
    }
 
    template <class Exp>
-   void do_assign_function(const Exp& e, const mpl::int_<4>&)
+   BOOST_CXX14_CONSTEXPR void do_assign_function(const Exp& e, const mpl::int_<4>&)
    {
       typedef typename Exp::left_middle_type  left_type;
       typedef typename left_type::tag_type    left_tag_type;
@@ -1528,41 +1528,41 @@ class number
       do_assign_function_3a(e.left().value(), e.left_middle_ref(), e.right_middle_ref(), e.right_ref(), left_tag_type(), middle_tag_type(), right_tag_type());
    }
    template <class F, class Exp1, class Exp2, class Exp3, class Tag2, class Tag3>
-   void do_assign_function_3a(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const detail::terminal&, const Tag2& t2, const Tag3& t3)
+   BOOST_CXX14_CONSTEXPR void do_assign_function_3a(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const detail::terminal&, const Tag2& t2, const Tag3& t3)
    {
       do_assign_function_3b(f, val1, val2, val3, t2, t3);
    }
    template <class F, class Exp1, class Exp2, class Exp3, class Tag1, class Tag2, class Tag3>
-   void do_assign_function_3a(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const Tag1&, const Tag2& t2, const Tag3& t3)
+   BOOST_CXX14_CONSTEXPR void do_assign_function_3a(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const Tag1&, const Tag2& t2, const Tag3& t3)
    {
       typename Exp1::result_type t(val1);
       do_assign_function_3b(f, BOOST_MP_MOVE(t), val2, val3, t2, t3);
    }
    template <class F, class Exp1, class Exp2, class Exp3, class Tag3>
-   void do_assign_function_3b(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const detail::terminal&, const Tag3& t3)
+   BOOST_CXX14_CONSTEXPR void do_assign_function_3b(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const detail::terminal&, const Tag3& t3)
    {
       do_assign_function_3c(f, val1, val2, val3, t3);
    }
    template <class F, class Exp1, class Exp2, class Exp3, class Tag2, class Tag3>
-   void do_assign_function_3b(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const Tag2& /*t2*/, const Tag3& t3)
+   BOOST_CXX14_CONSTEXPR void do_assign_function_3b(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const Tag2& /*t2*/, const Tag3& t3)
    {
       typename Exp2::result_type t(val2);
       do_assign_function_3c(f, val1, BOOST_MP_MOVE(t), val3, t3);
    }
    template <class F, class Exp1, class Exp2, class Exp3>
-   void do_assign_function_3c(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const detail::terminal&)
+   BOOST_CXX14_CONSTEXPR void do_assign_function_3c(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const detail::terminal&)
    {
       f(m_backend, function_arg_value(val1), function_arg_value(val2), function_arg_value(val3));
    }
    template <class F, class Exp1, class Exp2, class Exp3, class Tag3>
-   void do_assign_function_3c(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const Tag3& /*t3*/)
+   BOOST_CXX14_CONSTEXPR void do_assign_function_3c(const F& f, const Exp1& val1, const Exp2& val2, const Exp3& val3, const Tag3& /*t3*/)
    {
       typename Exp3::result_type t(val3);
       do_assign_function_3c(f, val1, val2, BOOST_MP_MOVE(t), detail::terminal());
    }
 
    template <class Exp>
-   void do_add(const Exp& e, const detail::terminal&)
+   BOOST_CXX14_CONSTEXPR void do_add(const Exp& e, const detail::terminal&)
    {
       using default_ops::eval_add;
       boost::multiprecision::detail::maybe_promote_precision(this);
@@ -1570,7 +1570,7 @@ class number
    }
 
    template <class Exp>
-   void do_add(const Exp& e, const detail::negate&)
+   BOOST_CXX14_CONSTEXPR void do_add(const Exp& e, const detail::negate&)
    {
       typedef typename Exp::left_type left_type;
       boost::multiprecision::detail::maybe_promote_precision(this);
@@ -1578,7 +1578,7 @@ class number
    }
 
    template <class Exp>
-   void do_add(const Exp& e, const detail::plus&)
+   BOOST_CXX14_CONSTEXPR void do_add(const Exp& e, const detail::plus&)
    {
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
@@ -1587,7 +1587,7 @@ class number
    }
 
    template <class Exp>
-   void do_add(const Exp& e, const detail::minus&)
+   BOOST_CXX14_CONSTEXPR void do_add(const Exp& e, const detail::minus&)
    {
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
@@ -1596,14 +1596,14 @@ class number
    }
 
    template <class Exp, class unknown>
-   void do_add(const Exp& e, const unknown&)
+   BOOST_CXX14_CONSTEXPR void do_add(const Exp& e, const unknown&)
    {
       self_type temp(e);
       do_add(detail::expression<detail::terminal, self_type>(temp), detail::terminal());
    }
 
    template <class Exp>
-   void do_add(const Exp& e, const detail::add_immediates&)
+   BOOST_CXX14_CONSTEXPR void do_add(const Exp& e, const detail::add_immediates&)
    {
       using default_ops::eval_add;
       boost::multiprecision::detail::maybe_promote_precision(this);
@@ -1611,7 +1611,7 @@ class number
       eval_add(m_backend, canonical_value(e.right().value()));
    }
    template <class Exp>
-   void do_add(const Exp& e, const detail::subtract_immediates&)
+   BOOST_CXX14_CONSTEXPR void do_add(const Exp& e, const detail::subtract_immediates&)
    {
       using default_ops::eval_add;
       using default_ops::eval_subtract;
@@ -1620,7 +1620,7 @@ class number
       eval_subtract(m_backend, canonical_value(e.right().value()));
    }
    template <class Exp>
-   void do_subtract(const Exp& e, const detail::terminal&)
+   BOOST_CXX14_CONSTEXPR void do_subtract(const Exp& e, const detail::terminal&)
    {
       using default_ops::eval_subtract;
       boost::multiprecision::detail::maybe_promote_precision(this);
@@ -1628,14 +1628,14 @@ class number
    }
 
    template <class Exp>
-   void do_subtract(const Exp& e, const detail::negate&)
+   BOOST_CXX14_CONSTEXPR void do_subtract(const Exp& e, const detail::negate&)
    {
       typedef typename Exp::left_type left_type;
       do_add(e.left(), typename left_type::tag_type());
    }
 
    template <class Exp>
-   void do_subtract(const Exp& e, const detail::plus&)
+   BOOST_CXX14_CONSTEXPR void do_subtract(const Exp& e, const detail::plus&)
    {
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
@@ -1644,7 +1644,7 @@ class number
    }
 
    template <class Exp>
-   void do_subtract(const Exp& e, const detail::minus&)
+   BOOST_CXX14_CONSTEXPR void do_subtract(const Exp& e, const detail::minus&)
    {
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
@@ -1652,7 +1652,7 @@ class number
       do_add(e.right(), typename right_type::tag_type());
    }
    template <class Exp>
-   void do_subtract(const Exp& e, const detail::add_immediates&)
+   BOOST_CXX14_CONSTEXPR void do_subtract(const Exp& e, const detail::add_immediates&)
    {
       using default_ops::eval_subtract;
       boost::multiprecision::detail::maybe_promote_precision(this);
@@ -1660,7 +1660,7 @@ class number
       eval_subtract(m_backend, canonical_value(e.right().value()));
    }
    template <class Exp>
-   void do_subtract(const Exp& e, const detail::subtract_immediates&)
+   BOOST_CXX14_CONSTEXPR void do_subtract(const Exp& e, const detail::subtract_immediates&)
    {
       using default_ops::eval_add;
       using default_ops::eval_subtract;
@@ -1668,14 +1668,14 @@ class number
       eval_add(m_backend, canonical_value(e.right().value()));
    }
    template <class Exp, class unknown>
-   void do_subtract(const Exp& e, const unknown&)
+   BOOST_CXX14_CONSTEXPR void do_subtract(const Exp& e, const unknown&)
    {
       self_type temp(e);
       do_subtract(detail::expression<detail::terminal, self_type>(temp), detail::terminal());
    }
 
    template <class Exp>
-   void do_multiplies(const Exp& e, const detail::terminal&)
+   BOOST_CXX14_CONSTEXPR void do_multiplies(const Exp& e, const detail::terminal&)
    {
       using default_ops::eval_multiply;
       boost::multiprecision::detail::maybe_promote_precision(this);
@@ -1683,7 +1683,7 @@ class number
    }
 
    template <class Exp>
-   void do_multiplies(const Exp& e, const detail::negate&)
+   BOOST_CXX14_CONSTEXPR void do_multiplies(const Exp& e, const detail::negate&)
    {
       typedef typename Exp::left_type left_type;
       do_multiplies(e.left(), typename left_type::tag_type());
@@ -1691,7 +1691,7 @@ class number
    }
 
    template <class Exp>
-   void do_multiplies(const Exp& e, const detail::multiplies&)
+   BOOST_CXX14_CONSTEXPR void do_multiplies(const Exp& e, const detail::multiplies&)
    {
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
@@ -1703,7 +1703,7 @@ class number
    // the disable_if dependent on the template argument (the size of 1 can never occur in practice).
    //
    template <class Exp>
-   typename boost::disable_if_c<boost::multiprecision::number_category<self_type>::value == boost::multiprecision::number_kind_integer || sizeof(Exp) == 1>::type
+   BOOST_CXX14_CONSTEXPR typename boost::disable_if_c<boost::multiprecision::number_category<self_type>::value == boost::multiprecision::number_kind_integer || sizeof(Exp) == 1>::type
    do_multiplies(const Exp& e, const detail::divides&)
    {
       typedef typename Exp::left_type  left_type;
@@ -1713,7 +1713,7 @@ class number
    }
 
    template <class Exp>
-   void do_multiplies(const Exp& e, const detail::multiply_immediates&)
+   BOOST_CXX14_CONSTEXPR void do_multiplies(const Exp& e, const detail::multiply_immediates&)
    {
       using default_ops::eval_multiply;
       boost::multiprecision::detail::maybe_promote_precision(this);
@@ -1725,7 +1725,7 @@ class number
    // the disable_if dependent on the template argument (the size of 1 can never occur in practice).
    //
    template <class Exp>
-   typename boost::disable_if_c<boost::multiprecision::number_category<self_type>::value == boost::multiprecision::number_kind_integer || sizeof(Exp) == 1>::type
+   BOOST_CXX14_CONSTEXPR typename boost::disable_if_c<boost::multiprecision::number_category<self_type>::value == boost::multiprecision::number_kind_integer || sizeof(Exp) == 1>::type
    do_multiplies(const Exp& e, const detail::divide_immediates&)
    {
       using default_ops::eval_divide;
@@ -1735,7 +1735,7 @@ class number
       eval_divide(m_backend, canonical_value(e.right().value()));
    }
    template <class Exp, class unknown>
-   void do_multiplies(const Exp& e, const unknown&)
+   BOOST_CXX14_CONSTEXPR void do_multiplies(const Exp& e, const unknown&)
    {
       using default_ops::eval_multiply;
       boost::multiprecision::detail::maybe_promote_precision(this);
@@ -1744,7 +1744,7 @@ class number
    }
 
    template <class Exp>
-   void do_divide(const Exp& e, const detail::terminal&)
+   BOOST_CXX14_CONSTEXPR void do_divide(const Exp& e, const detail::terminal&)
    {
       using default_ops::eval_divide;
       boost::multiprecision::detail::maybe_promote_precision(this);
@@ -1752,7 +1752,7 @@ class number
    }
 
    template <class Exp>
-   void do_divide(const Exp& e, const detail::negate&)
+   BOOST_CXX14_CONSTEXPR void do_divide(const Exp& e, const detail::negate&)
    {
       typedef typename Exp::left_type left_type;
       do_divide(e.left(), typename left_type::tag_type());
@@ -1763,7 +1763,7 @@ class number
    // the disable_if dependent on the template argument (the size of 1 can never occur in practice).
    //
    template <class Exp>
-   typename boost::disable_if_c<boost::multiprecision::number_category<self_type>::value == boost::multiprecision::number_kind_integer || sizeof(Exp) == 1>::type
+   BOOST_CXX14_CONSTEXPR typename boost::disable_if_c<boost::multiprecision::number_category<self_type>::value == boost::multiprecision::number_kind_integer || sizeof(Exp) == 1>::type
    do_divide(const Exp& e, const detail::multiplies&)
    {
       typedef typename Exp::left_type  left_type;
@@ -1776,7 +1776,7 @@ class number
    // the disable_if dependent on the template argument (the size of 1 can never occur in practice).
    //
    template <class Exp>
-   typename boost::disable_if_c<boost::multiprecision::number_category<self_type>::value == boost::multiprecision::number_kind_integer || sizeof(Exp) == 1>::type
+   BOOST_CXX14_CONSTEXPR typename boost::disable_if_c<boost::multiprecision::number_category<self_type>::value == boost::multiprecision::number_kind_integer || sizeof(Exp) == 1>::type
    do_divide(const Exp& e, const detail::divides&)
    {
       typedef typename Exp::left_type  left_type;
@@ -1789,7 +1789,7 @@ class number
    // the disable_if dependent on the template argument (the size of 1 can never occur in practice).
    //
    template <class Exp>
-   typename boost::disable_if_c<boost::multiprecision::number_category<self_type>::value == boost::multiprecision::number_kind_integer || sizeof(Exp) == 1>::type
+   BOOST_CXX14_CONSTEXPR typename boost::disable_if_c<boost::multiprecision::number_category<self_type>::value == boost::multiprecision::number_kind_integer || sizeof(Exp) == 1>::type
    do_divides(const Exp& e, const detail::multiply_immediates&)
    {
       using default_ops::eval_divide;
@@ -1802,7 +1802,7 @@ class number
    // the disable_if dependent on the template argument (the size of 1 can never occur in practice).
    //
    template <class Exp>
-   typename boost::disable_if_c<boost::multiprecision::number_category<self_type>::value == boost::multiprecision::number_kind_integer || sizeof(Exp) == 1>::type
+   BOOST_CXX14_CONSTEXPR typename boost::disable_if_c<boost::multiprecision::number_category<self_type>::value == boost::multiprecision::number_kind_integer || sizeof(Exp) == 1>::type
    do_divides(const Exp& e, const detail::divide_immediates&)
    {
       using default_ops::eval_divide;
@@ -1813,7 +1813,7 @@ class number
    }
 
    template <class Exp, class unknown>
-   void do_divide(const Exp& e, const unknown&)
+   BOOST_CXX14_CONSTEXPR void do_divide(const Exp& e, const unknown&)
    {
       using default_ops::eval_multiply;
       boost::multiprecision::detail::maybe_promote_precision(this);
@@ -1822,7 +1822,7 @@ class number
    }
 
    template <class Exp>
-   void do_modulus(const Exp& e, const detail::terminal&)
+   BOOST_CXX14_CONSTEXPR void do_modulus(const Exp& e, const detail::terminal&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
       using default_ops::eval_modulus;
@@ -1831,7 +1831,7 @@ class number
    }
 
    template <class Exp, class Unknown>
-   void do_modulus(const Exp& e, const Unknown&)
+   BOOST_CXX14_CONSTEXPR void do_modulus(const Exp& e, const Unknown&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
       using default_ops::eval_modulus;
@@ -1841,14 +1841,14 @@ class number
    }
 
    template <class Exp>
-   void do_bitwise_and(const Exp& e, const detail::terminal&)
+   BOOST_CXX14_CONSTEXPR void do_bitwise_and(const Exp& e, const detail::terminal&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise & operation is only valid for integer types");
       using default_ops::eval_bitwise_and;
       eval_bitwise_and(m_backend, canonical_value(e.value()));
    }
    template <class Exp>
-   void do_bitwise_and(const Exp& e, const detail::bitwise_and&)
+   BOOST_CXX14_CONSTEXPR void do_bitwise_and(const Exp& e, const detail::bitwise_and&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise & operation is only valid for integer types");
       typedef typename Exp::left_type  left_type;
@@ -1857,7 +1857,7 @@ class number
       do_bitwise_and(e.right(), typename right_type::tag_type());
    }
    template <class Exp, class unknown>
-   void do_bitwise_and(const Exp& e, const unknown&)
+   BOOST_CXX14_CONSTEXPR void do_bitwise_and(const Exp& e, const unknown&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise & operation is only valid for integer types");
       using default_ops::eval_bitwise_and;
@@ -1866,14 +1866,14 @@ class number
    }
 
    template <class Exp>
-   void do_bitwise_or(const Exp& e, const detail::terminal&)
+   BOOST_CXX14_CONSTEXPR void do_bitwise_or(const Exp& e, const detail::terminal&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise | operation is only valid for integer types");
       using default_ops::eval_bitwise_or;
       eval_bitwise_or(m_backend, canonical_value(e.value()));
    }
    template <class Exp>
-   void do_bitwise_or(const Exp& e, const detail::bitwise_or&)
+   BOOST_CXX14_CONSTEXPR void do_bitwise_or(const Exp& e, const detail::bitwise_or&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise | operation is only valid for integer types");
       typedef typename Exp::left_type  left_type;
@@ -1882,7 +1882,7 @@ class number
       do_bitwise_or(e.right(), typename right_type::tag_type());
    }
    template <class Exp, class unknown>
-   void do_bitwise_or(const Exp& e, const unknown&)
+   BOOST_CXX14_CONSTEXPR void do_bitwise_or(const Exp& e, const unknown&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise | operation is only valid for integer types");
       using default_ops::eval_bitwise_or;
@@ -1891,14 +1891,14 @@ class number
    }
 
    template <class Exp>
-   void do_bitwise_xor(const Exp& e, const detail::terminal&)
+   BOOST_CXX14_CONSTEXPR void do_bitwise_xor(const Exp& e, const detail::terminal&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise ^ operation is only valid for integer types");
       using default_ops::eval_bitwise_xor;
       eval_bitwise_xor(m_backend, canonical_value(e.value()));
    }
    template <class Exp>
-   void do_bitwise_xor(const Exp& e, const detail::bitwise_xor&)
+   BOOST_CXX14_CONSTEXPR void do_bitwise_xor(const Exp& e, const detail::bitwise_xor&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise ^ operation is only valid for integer types");
       typedef typename Exp::left_type  left_type;
@@ -1907,7 +1907,7 @@ class number
       do_bitwise_xor(e.right(), typename right_type::tag_type());
    }
    template <class Exp, class unknown>
-   void do_bitwise_xor(const Exp& e, const unknown&)
+   BOOST_CXX14_CONSTEXPR void do_bitwise_xor(const Exp& e, const unknown&)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The bitwise ^ operation is only valid for integer types");
       using default_ops::eval_bitwise_xor;
@@ -1917,30 +1917,30 @@ class number
 
    // Tests if the expression contains a reference to *this:
    template <class Exp>
-   BOOST_MP_FORCEINLINE bool contains_self(const Exp& e) const BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR bool contains_self(const Exp& e) const BOOST_NOEXCEPT
    {
       return contains_self(e, typename Exp::arity());
    }
    template <class Exp>
-   BOOST_MP_FORCEINLINE bool contains_self(const Exp& e, mpl::int_<0> const&) const BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR bool contains_self(const Exp& e, mpl::int_<0> const&) const BOOST_NOEXCEPT
    {
       return is_realy_self(e.value());
    }
    template <class Exp>
-   BOOST_MP_FORCEINLINE bool contains_self(const Exp& e, mpl::int_<1> const&) const BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR bool contains_self(const Exp& e, mpl::int_<1> const&) const BOOST_NOEXCEPT
    {
       typedef typename Exp::left_type child_type;
       return contains_self(e.left(), typename child_type::arity());
    }
    template <class Exp>
-   BOOST_MP_FORCEINLINE bool contains_self(const Exp& e, mpl::int_<2> const&) const BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR bool contains_self(const Exp& e, mpl::int_<2> const&) const BOOST_NOEXCEPT
    {
       typedef typename Exp::left_type  child0_type;
       typedef typename Exp::right_type child1_type;
       return contains_self(e.left(), typename child0_type::arity()) || contains_self(e.right(), typename child1_type::arity());
    }
    template <class Exp>
-   BOOST_MP_FORCEINLINE bool contains_self(const Exp& e, mpl::int_<3> const&) const BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR bool contains_self(const Exp& e, mpl::int_<3> const&) const BOOST_NOEXCEPT
    {
       typedef typename Exp::left_type   child0_type;
       typedef typename Exp::middle_type child1_type;
@@ -1975,7 +1975,7 @@ class number
    template <class V>
    static BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const V& function_arg_value(const V& v) BOOST_NOEXCEPT { return v; }
    template <class A1, class A2, class A3, class A4>
-   static BOOST_MP_FORCEINLINE const A1& function_arg_value(const detail::expression<detail::terminal, A1, A2, A3, A4>& exp) BOOST_NOEXCEPT { return exp.value(); }
+   static BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR const A1& function_arg_value(const detail::expression<detail::terminal, A1, A2, A3, A4>& exp) BOOST_NOEXCEPT { return exp.value(); }
    template <class A2, class A3, class A4>
    static BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const Backend& function_arg_value(const detail::expression<detail::terminal, number<Backend>, A2, A3, A4>& exp) BOOST_NOEXCEPT { return exp.value().backend(); }
    Backend                                                    m_backend;
@@ -2104,7 +2104,7 @@ inline std::istream& operator>>(std::istream& is, number<Backend, ExpressionTemp
 }
 
 template <class Backend, expression_template_option ExpressionTemplates>
-BOOST_MP_FORCEINLINE void swap(number<Backend, ExpressionTemplates>& a, number<Backend, ExpressionTemplates>& b)
+BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR void swap(number<Backend, ExpressionTemplates>& a, number<Backend, ExpressionTemplates>& b)
     BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<number<Backend, ExpressionTemplates>&>() = std::declval<number<Backend, ExpressionTemplates>&>()))
 {
    a.swap(b);
@@ -2113,7 +2113,7 @@ BOOST_MP_FORCEINLINE void swap(number<Backend, ExpressionTemplates>& a, number<B
 // Boost.Hash support, just call hash_value for the backend, which may or may not be supported:
 //
 template <class Backend, expression_template_option ExpressionTemplates>
-inline std::size_t hash_value(const number<Backend, ExpressionTemplates>& val)
+inline BOOST_CXX14_CONSTEXPR std::size_t hash_value(const number<Backend, ExpressionTemplates>& val)
 {
    return hash_value(val.backend());
 }
@@ -2169,19 +2169,19 @@ inline std::istream& operator>>(std::istream& is, rational<multiprecision::numbe
 }
 
 template <class T, multiprecision::expression_template_option ExpressionTemplates>
-inline multiprecision::number<T, ExpressionTemplates> numerator(const rational<multiprecision::number<T, ExpressionTemplates> >& a)
+inline BOOST_CXX14_CONSTEXPR multiprecision::number<T, ExpressionTemplates> numerator(const rational<multiprecision::number<T, ExpressionTemplates> >& a)
 {
    return a.numerator();
 }
 
 template <class T, multiprecision::expression_template_option ExpressionTemplates>
-inline multiprecision::number<T, ExpressionTemplates> denominator(const rational<multiprecision::number<T, ExpressionTemplates> >& a)
+inline BOOST_CXX14_CONSTEXPR multiprecision::number<T, ExpressionTemplates> denominator(const rational<multiprecision::number<T, ExpressionTemplates> >& a)
 {
    return a.denominator();
 }
 
 template <class T, multiprecision::expression_template_option ExpressionTemplates>
-inline std::size_t hash_value(const rational<multiprecision::number<T, ExpressionTemplates> >& val)
+inline BOOST_CXX14_CONSTEXPR std::size_t hash_value(const rational<multiprecision::number<T, ExpressionTemplates> >& val)
 {
    std::size_t result = hash_value(val.numerator());
    boost::hash_combine(result, hash_value(val.denominator()));
@@ -2213,12 +2213,12 @@ namespace std {
 template <class Backend, boost::multiprecision::expression_template_option ExpressionTemplates>
 struct hash<boost::multiprecision::number<Backend, ExpressionTemplates> >
 {
-   std::size_t operator()(const boost::multiprecision::number<Backend, ExpressionTemplates>& val) const { return hash_value(val); }
+   BOOST_CXX14_CONSTEXPR std::size_t operator()(const boost::multiprecision::number<Backend, ExpressionTemplates>& val) const { return hash_value(val); }
 };
 template <class Backend, boost::multiprecision::expression_template_option ExpressionTemplates>
 struct hash<boost::rational<boost::multiprecision::number<Backend, ExpressionTemplates> > >
 {
-   std::size_t operator()(const boost::rational<boost::multiprecision::number<Backend, ExpressionTemplates> >& val) const
+   BOOST_CXX14_CONSTEXPR std::size_t operator()(const boost::rational<boost::multiprecision::number<Backend, ExpressionTemplates> >& val) const
    {
       std::size_t result = hash_value(val.numerator());
       boost::hash_combine(result, hash_value(val.denominator()));
