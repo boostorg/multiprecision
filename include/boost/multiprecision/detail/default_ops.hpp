@@ -1204,13 +1204,13 @@ inline BOOST_CXX14_CONSTEXPR void eval_remainder(T& result, const U& a, const V&
 }
 
 template <class B>
-bool eval_gt(const B& a, const B& b);
+BOOST_CXX14_CONSTEXPR bool eval_gt(const B& a, const B& b);
 template <class T, class U>
-bool eval_gt(const T& a, const U& b);
+BOOST_CXX14_CONSTEXPR bool eval_gt(const T& a, const U& b);
 template <class B>
-bool eval_lt(const B& a, const B& b);
+BOOST_CXX14_CONSTEXPR bool eval_lt(const B& a, const B& b);
 template <class T, class U>
-bool eval_lt(const T& a, const U& b);
+BOOST_CXX14_CONSTEXPR bool eval_lt(const T& a, const U& b);
 
 template <class T>
 inline BOOST_CXX14_CONSTEXPR void eval_fdim(T& result, const T& a, const T& b)
