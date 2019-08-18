@@ -933,7 +933,7 @@ template <class R, class B>
 inline BOOST_CXX14_CONSTEXPR typename boost::enable_if_c<boost::is_integral<R>::value>::type eval_convert_to(R* result, const B& backend)
 {
    typedef typename calculate_next_larger_type<R, B>::type next_type;
-   next_type                                               n;
+   next_type                                               n = next_type();
    eval_convert_to(&n, backend);
    if (!boost::is_unsigned<R>::value && std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::is_bounded && (n > (next_type)(std::numeric_limits<R>::max)()))
    {
@@ -951,7 +951,7 @@ template <class R, class B>
 inline BOOST_CXX14_CONSTEXPR typename boost::disable_if_c<boost::is_integral<R>::value>::type eval_convert_to(R* result, const B& backend)
 {
    typedef typename calculate_next_larger_type<R, B>::type next_type;
-   next_type                                               n;
+   next_type                                               n = next_type();
    eval_convert_to(&n, backend);
    if (std::numeric_limits<R>::is_specialized && std::numeric_limits<R>::is_bounded && ((n > (next_type)(std::numeric_limits<R>::max)() || (n < (next_type) - (std::numeric_limits<R>::max)()))))
    {
@@ -1183,7 +1183,7 @@ inline BOOST_CXX14_CONSTEXPR typename enable_if<is_arithmetic<A>, void>::type ev
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type          canonical_type;
    typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
-   cast_type                                                                      c;
+   cast_type                                                                      c = cast_type();
    c = a;
    eval_remquo(result, x, c, pi);
 }
@@ -1192,14 +1192,14 @@ inline BOOST_CXX14_CONSTEXPR typename enable_if<is_arithmetic<A>, void>::type ev
 {
    typedef typename boost::multiprecision::detail::canonical<A, T>::type          canonical_type;
    typedef typename mpl::if_<is_same<A, canonical_type>, T, canonical_type>::type cast_type;
-   cast_type                                                                      c;
+   cast_type                                                                      c = cast_type();
    c = x;
    eval_remquo(result, c, a, pi);
 }
 template <class T, class U, class V>
 inline BOOST_CXX14_CONSTEXPR void eval_remainder(T& result, const U& a, const V& b)
 {
-   int i;
+   int i(0);
    eval_remquo(result, a, b, &i);
 }
 
@@ -1616,7 +1616,7 @@ template <class B>
 inline BOOST_CXX14_CONSTEXPR typename B::exponent_type eval_ilogb(const B& val)
 {
    BOOST_STATIC_ASSERT_MSG(!std::numeric_limits<number<B> >::is_specialized || (std::numeric_limits<number<B> >::radix == 2), "The default implementation of ilogb requires a base 2 number type");
-   typename B::exponent_type e;
+   typename B::exponent_type e(0);
    switch (eval_fpclassify(val))
    {
    case FP_NAN:

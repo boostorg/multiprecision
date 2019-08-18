@@ -833,7 +833,7 @@ class number
    template <class T>
    BOOST_CXX14_CONSTEXPR T convert_to() const
    {
-      T result;
+      T result = T();
       convert_to_imp(&result);
       return result;
    }
