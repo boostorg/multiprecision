@@ -20,6 +20,7 @@
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_complex.hpp>
 #include <boost/type_traits/make_unsigned.hpp>
+#include <boost/type_traits/is_convertible.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/multiprecision/detail/precision.hpp>
 #include <boost/multiprecision/detail/generic_interconvert.hpp>
