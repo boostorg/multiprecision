@@ -77,7 +77,7 @@ struct arithmetic_backend
    {
       std::swap(m_value, o.m_value);
    }
-   BOOST_CXX14_CONSTEXPR std::string str(std::streamsize digits, std::ios_base::fmtflags f) const
+   std::string str(std::streamsize digits, std::ios_base::fmtflags f) const
    {
       std::stringstream ss;
       ss.flags(f);
