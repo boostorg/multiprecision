@@ -169,7 +169,7 @@ struct float128_backend
  public:
    BOOST_CONSTEXPR   float128_backend() BOOST_NOEXCEPT : m_value(0) {}
    BOOST_CONSTEXPR   float128_backend(const float128_backend& o) BOOST_NOEXCEPT : m_value(o.m_value) {}
-   float128_backend& operator=(const float128_backend& o) BOOST_NOEXCEPT
+   BOOST_CXX14_CONSTEXPR float128_backend& operator=(const float128_backend& o) BOOST_NOEXCEPT
    {
       m_value = o.m_value;
       return *this;
@@ -178,7 +178,7 @@ struct float128_backend
    BOOST_CONSTEXPR float128_backend(const T& i, const typename enable_if_c<is_convertible<T, float128_type>::value>::type* = 0) BOOST_NOEXCEPT_IF(noexcept(std::declval<float128_type&>() = std::declval<const T&>()))
        : m_value(i) {}
    template <class T>
-   typename enable_if_c<is_arithmetic<T>::value || is_convertible<T, float128_type>::value, float128_backend&>::type operator=(const T& i) BOOST_NOEXCEPT_IF(noexcept(std::declval<float128_type&>() = std::declval<const T&>()))
+   BOOST_CXX14_CONSTEXPR typename enable_if_c<is_arithmetic<T>::value || is_convertible<T, float128_type>::value, float128_backend&>::type operator=(const T& i) BOOST_NOEXCEPT_IF(noexcept(std::declval<float128_type&>() = std::declval<const T&>()))
    {
       m_value = i;
       return *this;
@@ -214,9 +214,12 @@ struct float128_backend
 #endif
       return *this;
    }
-   void swap(float128_backend& o) BOOST_NOEXCEPT
+   BOOST_CXX14_CONSTEXPR void swap(float128_backend& o) BOOST_NOEXCEPT
    {
-      std::swap(m_value, o.value());
+      // We don't call std::swap here because it's no constexpr (yet):
+      float128_type t(o.value());
+      o.value() = m_value;
+      m_value = t;
    }
    std::string str(std::streamsize digits, std::ios_base::fmtflags f) const
    {
@@ -266,105 +269,105 @@ struct float128_backend
       return boost::multiprecision::detail::convert_to_string(*this, digits ? digits : 37, f);
 #endif
    }
-   void negate() BOOST_NOEXCEPT
+   BOOST_CXX14_CONSTEXPR void negate() BOOST_NOEXCEPT
    {
       m_value = -m_value;
    }
-   int compare(const float128_backend& o) const
+   BOOST_CXX14_CONSTEXPR int compare(const float128_backend& o) const
    {
       return m_value == o.m_value ? 0 : m_value < o.m_value ? -1 : 1;
    }
    template <class T>
-   int compare(const T& i) const
+   BOOST_CXX14_CONSTEXPR int compare(const T& i) const
    {
       return m_value == i ? 0 : m_value < i ? -1 : 1;
    }
-   float128_type& value()
+   BOOST_CXX14_CONSTEXPR float128_type& value()
    {
       return m_value;
    }
-   const float128_type& value() const
+   BOOST_CXX14_CONSTEXPR const float128_type& value() const
    {
       return m_value;
    }
 };
 
-inline void eval_add(float128_backend& result, const float128_backend& a)
+inline BOOST_CXX14_CONSTEXPR void eval_add(float128_backend& result, const float128_backend& a)
 {
    result.value() += a.value();
 }
 template <class A>
-inline void eval_add(float128_backend& result, const A& a)
+inline BOOST_CXX14_CONSTEXPR void eval_add(float128_backend& result, const A& a)
 {
    result.value() += a;
 }
-inline void eval_subtract(float128_backend& result, const float128_backend& a)
+inline BOOST_CXX14_CONSTEXPR void eval_subtract(float128_backend& result, const float128_backend& a)
 {
    result.value() -= a.value();
 }
 template <class A>
-inline void eval_subtract(float128_backend& result, const A& a)
+inline BOOST_CXX14_CONSTEXPR void eval_subtract(float128_backend& result, const A& a)
 {
    result.value() -= a;
 }
-inline void eval_multiply(float128_backend& result, const float128_backend& a)
+inline BOOST_CXX14_CONSTEXPR void eval_multiply(float128_backend& result, const float128_backend& a)
 {
    result.value() *= a.value();
 }
 template <class A>
-inline void eval_multiply(float128_backend& result, const A& a)
+inline BOOST_CXX14_CONSTEXPR void eval_multiply(float128_backend& result, const A& a)
 {
    result.value() *= a;
 }
-inline void eval_divide(float128_backend& result, const float128_backend& a)
+inline BOOST_CXX14_CONSTEXPR void eval_divide(float128_backend& result, const float128_backend& a)
 {
    result.value() /= a.value();
 }
 template <class A>
-inline void eval_divide(float128_backend& result, const A& a)
+inline BOOST_CXX14_CONSTEXPR void eval_divide(float128_backend& result, const A& a)
 {
    result.value() /= a;
 }
 
-inline void eval_add(float128_backend& result, const float128_backend& a, const float128_backend& b)
+inline BOOST_CXX14_CONSTEXPR void eval_add(float128_backend& result, const float128_backend& a, const float128_backend& b)
 {
    result.value() = a.value() + b.value();
 }
 template <class A>
-inline void eval_add(float128_backend& result, const float128_backend& a, const A& b)
+inline BOOST_CXX14_CONSTEXPR void eval_add(float128_backend& result, const float128_backend& a, const A& b)
 {
    result.value() = a.value() + b;
 }
-inline void eval_subtract(float128_backend& result, const float128_backend& a, const float128_backend& b)
+inline BOOST_CXX14_CONSTEXPR void eval_subtract(float128_backend& result, const float128_backend& a, const float128_backend& b)
 {
    result.value() = a.value() - b.value();
 }
 template <class A>
-inline void eval_subtract(float128_backend& result, const float128_backend& a, const A& b)
+inline BOOST_CXX14_CONSTEXPR void eval_subtract(float128_backend& result, const float128_backend& a, const A& b)
 {
    result.value() = a.value() - b;
 }
 template <class A>
-inline void eval_subtract(float128_backend& result, const A& a, const float128_backend& b)
+inline BOOST_CXX14_CONSTEXPR void eval_subtract(float128_backend& result, const A& a, const float128_backend& b)
 {
    result.value() = a - b.value();
 }
-inline void eval_multiply(float128_backend& result, const float128_backend& a, const float128_backend& b)
+inline BOOST_CXX14_CONSTEXPR void eval_multiply(float128_backend& result, const float128_backend& a, const float128_backend& b)
 {
    result.value() = a.value() * b.value();
 }
 template <class A>
-inline void eval_multiply(float128_backend& result, const float128_backend& a, const A& b)
+inline BOOST_CXX14_CONSTEXPR void eval_multiply(float128_backend& result, const float128_backend& a, const A& b)
 {
    result.value() = a.value() * b;
 }
-inline void eval_divide(float128_backend& result, const float128_backend& a, const float128_backend& b)
+inline BOOST_CXX14_CONSTEXPR void eval_divide(float128_backend& result, const float128_backend& a, const float128_backend& b)
 {
    result.value() = a.value() / b.value();
 }
 
 template <class R>
-inline void eval_convert_to(R* result, const float128_backend& val)
+inline BOOST_CXX14_CONSTEXPR void eval_convert_to(R* result, const float128_backend& val)
 {
    *result = static_cast<R>(val.value());
 }
@@ -408,11 +411,11 @@ inline int eval_fpclassify(const float128_backend& arg)
    return FP_NORMAL;
 }
 
-inline void eval_increment(float128_backend& arg)
+inline BOOST_CXX14_CONSTEXPR void eval_increment(float128_backend& arg)
 {
    ++arg.value();
 }
-inline void eval_decrement(float128_backend& arg)
+inline BOOST_CXX14_CONSTEXPR void eval_decrement(float128_backend& arg)
 {
    --arg.value();
 }
