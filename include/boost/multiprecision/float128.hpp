@@ -183,19 +183,15 @@ struct float128_backend
       m_value = i;
       return *this;
    }
-   float128_backend(long double const& f)
+   BOOST_CXX14_CONSTEXPR float128_backend(long double const& f) : m_value(f)
    {
-      BOOST_STATIC_CONSTEXPR __float128 inf_val = static_cast<__float128>(HUGE_VAL);
-      if (boost::math::isinf(f))
-         m_value = (f < 0) ? -inf_val : inf_val;
-      else
-         m_value = f;
+      if (::fabsl(f) > LDBL_MAX)
+         m_value = (f < 0) ? -static_cast<__float128>(HUGE_VAL) : static_cast<__float128>(HUGE_VAL);
    }
-   float128_backend& operator=(long double const& f)
+   BOOST_CXX14_CONSTEXPR float128_backend& operator=(long double const& f)
    {
-      BOOST_STATIC_CONSTEXPR __float128 inf_val = static_cast<__float128>(HUGE_VAL);
-      if (boost::math::isinf(f))
-         m_value = (f < 0) ? -inf_val : inf_val;
+      if (::fabsl(f) > LDBL_MAX)
+         m_value = (f < 0) ? -static_cast<__float128>(HUGE_VAL) : static_cast<__float128>(HUGE_VAL);
       else
          m_value = f;
       return *this;
@@ -394,21 +390,42 @@ inline void eval_sqrt(float128_backend& result, const float128_backend& arg)
 {
    result.value() = sqrtq(arg.value());
 }
-inline int eval_fpclassify(const float128_backend& arg)
+inline BOOST_CXX14_CONSTEXPR int eval_fpclassify(const float128_backend& arg)
 {
-   if (isnanq(arg.value()))
-      return FP_NAN;
-   else if (isinfq(arg.value()))
-      return FP_INFINITE;
-   else if (arg.value() == 0)
-      return FP_ZERO;
+   float128_type v = arg.value();
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+   if (BOOST_MP_IS_CONST_EVALUATED(v))
+   {
+      if (v != v)
+         return FP_NAN;
+      if (v == 0)
+         return FP_ZERO;
+      float128_type t(v);
+      if (t < 0)
+         t = -t;
+      if (t > BOOST_MP_QUAD_MAX)
+         return FP_INFINITE;
+      if (t < BOOST_MP_QUAD_MIN)
+         return FP_SUBNORMAL;
+      return FP_NORMAL;
+   }
+   else
+#endif
+   {
+      if (isnanq(v))
+         return FP_NAN;
+      else if (isinfq(v))
+         return FP_INFINITE;
+      else if (v == 0)
+         return FP_ZERO;
 
-   float128_backend t(arg);
-   if (t.value() < 0)
-      t.negate();
-   if (t.value() < BOOST_MP_QUAD_MIN)
-      return FP_SUBNORMAL;
-   return FP_NORMAL;
+      float128_backend t(arg);
+      if (t.value() < 0)
+         t.negate();
+      if (t.value() < BOOST_MP_QUAD_MIN)
+         return FP_SUBNORMAL;
+      return FP_NORMAL;
+   }
 }
 
 inline BOOST_CXX14_CONSTEXPR void eval_increment(float128_backend& arg)
@@ -426,13 +443,33 @@ inline BOOST_CXX14_CONSTEXPR void eval_decrement(float128_backend& arg)
 *
 *********************************************************************/
 
-inline void eval_abs(float128_backend& result, const float128_backend& arg)
+inline BOOST_CXX14_CONSTEXPR void eval_abs(float128_backend& result, const float128_backend& arg)
 {
-   result.value() = fabsq(arg.value());
+   float128_type v(arg.value());
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+   if (BOOST_MP_IS_CONST_EVALUATED(v))
+   {
+      result.value() = v < 0 ? -v : v;
+   }
+   else
+#endif
+   {
+      result.value() = fabsq(arg.value());
+   }
 }
-inline void eval_fabs(float128_backend& result, const float128_backend& arg)
+inline BOOST_CXX14_CONSTEXPR void eval_fabs(float128_backend& result, const float128_backend& arg)
 {
-   result.value() = fabsq(arg.value());
+   float128_type v(arg.value());
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+   if (BOOST_MP_IS_CONST_EVALUATED(v))
+   {
+      result.value() = v < 0 ? -v : v;
+   }
+   else
+#endif
+   {
+      result.value() = fabsq(arg.value());
+   }
 }
 
 /*********************************************************************
@@ -689,9 +726,9 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::backen
 
  public:
    BOOST_STATIC_CONSTEXPR bool is_specialized = true;
-   static number_type(min)() BOOST_NOEXCEPT { return BOOST_MP_QUAD_MIN; }
-   static number_type(max)() BOOST_NOEXCEPT { return BOOST_MP_QUAD_MAX; }
-   static number_type          lowest() BOOST_NOEXCEPT { return -(max)(); }
+   static BOOST_CXX14_CONSTEXPR number_type(min)() BOOST_NOEXCEPT { return BOOST_MP_QUAD_MIN; }
+   static BOOST_CXX14_CONSTEXPR number_type(max)() BOOST_NOEXCEPT { return BOOST_MP_QUAD_MAX; }
+   static BOOST_CXX14_CONSTEXPR number_type          lowest() BOOST_NOEXCEPT { return -(max)(); }
    BOOST_STATIC_CONSTEXPR int  digits       = 113;
    BOOST_STATIC_CONSTEXPR int  digits10     = 33;
    BOOST_STATIC_CONSTEXPR int  max_digits10 = 36;
@@ -699,8 +736,8 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::backen
    BOOST_STATIC_CONSTEXPR bool is_integer   = false;
    BOOST_STATIC_CONSTEXPR bool is_exact     = false;
    BOOST_STATIC_CONSTEXPR int  radix        = 2;
-   static number_type          epsilon() { return 1.92592994438723585305597794258492732e-34; /* this double value has only one bit set and so is exact */ }
-   static number_type          round_error() { return 0.5; }
+   static BOOST_CXX14_CONSTEXPR number_type          epsilon() { return 1.92592994438723585305597794258492732e-34; /* this double value has only one bit set and so is exact */ }
+   static BOOST_CXX14_CONSTEXPR number_type          round_error() { return 0.5; }
    BOOST_STATIC_CONSTEXPR int  min_exponent                  = -16381;
    BOOST_STATIC_CONSTEXPR int  min_exponent10                = min_exponent * 301L / 1000L;
    BOOST_STATIC_CONSTEXPR int  max_exponent                  = 16384;
@@ -710,10 +747,10 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::backen
    BOOST_STATIC_CONSTEXPR bool has_signaling_NaN             = false;
    BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm      = denorm_present;
    BOOST_STATIC_CONSTEXPR bool               has_denorm_loss = true;
-   static number_type                        infinity() { return HUGE_VAL; /* conversion from double infinity OK */ }
-   static number_type                        quiet_NaN() { return number_type("nan"); }
-   static number_type                        signaling_NaN() { return 0; }
-   static number_type                        denorm_min() { return BOOST_MP_QUAD_DENORM_MIN; }
+   static BOOST_CXX14_CONSTEXPR number_type                        infinity() { return HUGE_VAL; /* conversion from double infinity OK */ }
+   static BOOST_CXX14_CONSTEXPR number_type                        quiet_NaN() { return number_type("nan"); }
+   static BOOST_CXX14_CONSTEXPR number_type                        signaling_NaN() { return 0; }
+   static BOOST_CXX14_CONSTEXPR number_type                        denorm_min() { return BOOST_MP_QUAD_DENORM_MIN; }
    BOOST_STATIC_CONSTEXPR bool               is_iec559       = true;
    BOOST_STATIC_CONSTEXPR bool               is_bounded      = false;
    BOOST_STATIC_CONSTEXPR bool               is_modulo       = false;

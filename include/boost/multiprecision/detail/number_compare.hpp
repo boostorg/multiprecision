@@ -142,9 +142,18 @@ inline BOOST_CONSTEXPR typename boost::enable_if_c<number_category<Arithmetic>::
    return false;
 }
 template <class Arithmetic>
-inline BOOST_CONSTEXPR typename boost::enable_if_c<number_category<Arithmetic>::value == number_kind_floating_point, bool>::type is_unordered_value(const Arithmetic& a)
+inline BOOST_CXX14_CONSTEXPR typename boost::enable_if_c<number_category<Arithmetic>::value == number_kind_floating_point, bool>::type is_unordered_value(const Arithmetic& a)
 {
-   return (boost::math::isnan)(a);
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+   if (BOOST_MP_IS_CONST_EVALUATED(a))
+   {
+      return a != a;
+   }
+   else
+#endif
+   {
+      return (boost::math::isnan)(a);
+   }
 }
 
 template <class T, class U>

@@ -54,6 +54,16 @@ BOOST_CXX14_CONSTEXPR T test_constexpr_add_subtract(T a)
    a += do_test_constexpr_add_subtract(a, static_cast<long long>(2));
    a += do_test_constexpr_add_subtract(a, static_cast<unsigned long long>(2));
 
+   if constexpr (boost::multiprecision::number_category<T>::value == boost::multiprecision::number_kind_floating_point)
+   {
+      a += do_test_constexpr_add_subtract(a, static_cast<float>(2));
+      a += do_test_constexpr_add_subtract(a, static_cast<double>(2));
+      a += do_test_constexpr_add_subtract(a, static_cast<long double>(2));
+#ifdef BOOST_HAS_FLOAT128
+      a += do_test_constexpr_add_subtract(a, static_cast<__float128>(2));
+#endif
+   }
+
    return a;
 }
 
@@ -98,6 +108,15 @@ BOOST_CXX14_CONSTEXPR T test_constexpr_mul_divide(T a)
    a += do_test_constexpr_mul_divide(a, static_cast<long long>(2));
    a += do_test_constexpr_mul_divide(a, static_cast<unsigned long long>(2));
 
+   if constexpr (boost::multiprecision::number_category<T>::value == boost::multiprecision::number_kind_floating_point)
+   {
+      a += do_test_constexpr_mul_divide(a, static_cast<float>(2));
+      a += do_test_constexpr_mul_divide(a, static_cast<double>(2));
+      a += do_test_constexpr_mul_divide(a, static_cast<long double>(2));
+#ifdef BOOST_HAS_FLOAT128
+      a += do_test_constexpr_mul_divide(a, static_cast<__float128>(2));
+#endif
+    }
    return a;
 }
 
@@ -188,6 +207,15 @@ BOOST_CXX14_CONSTEXPR T test_constexpr_compare(T a)
    a += do_test_constexpr_compare(a, static_cast<long long>(2));
    a += do_test_constexpr_compare(a, static_cast<unsigned long long>(2));
 
+   if constexpr (boost::multiprecision::number_category<T>::value == boost::multiprecision::number_kind_floating_point)
+   {
+      a += do_test_constexpr_compare(a, static_cast<float>(2));
+      a += do_test_constexpr_compare(a, static_cast<double>(2));
+      a += do_test_constexpr_compare(a, static_cast<long double>(2));
+#ifdef BOOST_HAS_FLOAT128
+      a += do_test_constexpr_compare(a, static_cast<__float128>(2));
+#endif
+    }
    return a;
 }
 

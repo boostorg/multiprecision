@@ -47,6 +47,24 @@
 #define BOOST_MP_THREAD_LOCAL
 #endif
 
+#ifdef __has_include
+# if __has_include(<version>)
+#  include <version>
+#  ifdef __cpp_lib_is_constant_evaluated
+#   include <type_traits>
+#   define BOOST_MP_HAS_IS_CONSTANT_EVALUATED
+#  endif
+# endif
+#endif
+
+#ifdef BOOST_MP_HAS_IS_CONSTANT_EVALUATED
+#  define BOOST_MP_IS_CONST_EVALUATED(x) std::is_constant_evaluated()
+#elif !defined(BOOST_MP_NO_CXX14_CONSTEXPR) && defined(BOOST_GCC) && (__GNUC__ >= 7)
+#  define BOOST_MP_IS_CONST_EVALUATED(x) __builtin_constant_p(x)
+#else
+#  define BOOST_MP_NO_CONSTEXPR_DETECTION
+#endif
+
 #ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable : 6326)
