@@ -390,7 +390,12 @@ inline void eval_sqrt(float128_backend& result, const float128_backend& arg)
 {
    result.value() = sqrtq(arg.value());
 }
-inline BOOST_CXX14_CONSTEXPR int eval_fpclassify(const float128_backend& arg)
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+inline BOOST_CXX14_CONSTEXPR 
+#else
+inline
+#endif
+int eval_fpclassify(const float128_backend& arg)
 {
    float128_type v = arg.value();
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
@@ -443,7 +448,11 @@ inline BOOST_CXX14_CONSTEXPR void eval_decrement(float128_backend& arg)
 *
 *********************************************************************/
 
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
 inline BOOST_CXX14_CONSTEXPR void eval_abs(float128_backend& result, const float128_backend& arg)
+#else
+inline void eval_abs(float128_backend& result, const float128_backend& arg)
+#endif
 {
    float128_type v(arg.value());
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
@@ -457,7 +466,11 @@ inline BOOST_CXX14_CONSTEXPR void eval_abs(float128_backend& result, const float
       result.value() = fabsq(arg.value());
    }
 }
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
 inline BOOST_CXX14_CONSTEXPR void eval_fabs(float128_backend& result, const float128_backend& arg)
+#else
+inline void eval_fabs(float128_backend& result, const float128_backend& arg)
+#endif
 {
    float128_type v(arg.value());
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION

@@ -59,7 +59,7 @@
 
 #ifdef BOOST_MP_HAS_IS_CONSTANT_EVALUATED
 #  define BOOST_MP_IS_CONST_EVALUATED(x) std::is_constant_evaluated()
-#elif !defined(BOOST_MP_NO_CXX14_CONSTEXPR) && defined(BOOST_GCC) && (__GNUC__ >= 7)
+#elif !defined(BOOST_MP_NO_CXX14_CONSTEXPR) && defined(BOOST_GCC)
 #  define BOOST_MP_IS_CONST_EVALUATED(x) __builtin_constant_p(x)
 #else
 #  define BOOST_MP_NO_CONSTEXPR_DETECTION
