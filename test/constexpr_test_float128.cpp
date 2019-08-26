@@ -45,9 +45,9 @@ int main()
       static_assert(fabs(c) >= 0);
       constexpr float128 d(std::numeric_limits<float128>::epsilon());
       static_assert(fpclassify(c) == FP_NORMAL);
-      constexpr float128 e(std::numeric_limits<float128>::min());
+      constexpr float128 e((std::numeric_limits<float128>::min)());
       static_assert(fpclassify(e) == FP_NORMAL);
-      constexpr float128 f(std::numeric_limits<float128>::max());
+      constexpr float128 f((std::numeric_limits<float128>::max)());
       static_assert(fpclassify(f) == FP_NORMAL);
       constexpr float128 g(std::numeric_limits<float128>::lowest());
       static_assert(fpclassify(g) == FP_NORMAL);
