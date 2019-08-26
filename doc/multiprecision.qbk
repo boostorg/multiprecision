@@ -44,6 +44,7 @@
 [import ../example/complex128_examples.cpp]
 [import ../example/eigen_example.cpp]
 [import ../example/mpfr_precision.cpp]
+[import ../example/constexpr_float_arithmetic_examples.cpp]
 
 [template mpfr[] [@http://www.mpfr.org MPFR]]
 [template mpc[] [@http://www.multiprecision.org MPC]]
@@ -1019,6 +1020,9 @@ Things you should know when using this type:
 
 * Default constructed `float128`s have the value zero.
 * This backend supports rvalue-references and is move-aware, making instantiations of `number` on this backend move aware.
+* This type is fully `constexpr` aware - basic constexpr arithmetic is supported from C++14 and onwards, comparisons,
+plus the functions `fabs`, `abs`, `fpclassify`, `isnormal`, `isfinite`, `isinf` and `isnan` are also supported if either
+the compiler implements C++20's `std::is_constant_evaluated()`, or if the compiler is GCC.
 * It is not possible to round-trip objects of this type to and from a string and get back
 exactly the same value when compiled with Intel's C++ compiler and using `_Quad` as the underlying type: this is a current limitation of
 our code.  Round tripping when using `__float128` as the underlying type is possible (both for GCC and Intel).
@@ -1984,24 +1988,25 @@ The following example searches for a prime `p` for which `(p-1)/2` is also proba
 
 [section:lits Literal Types and `constexpr` Support]
 
-[note The features described in this section make heavy use of C++11 language features, currently
-(as of May 2013) only
-GCC-4.7 and later, and Clang 3.3 and later have the support required to make these features work.]
+There are two kinds of `constexpr` support in this library:
 
-There is limited support for `constexpr` and user-defined literals in the library, currently the
-`number` front end supports `constexpr`
-on default construction and all forwarding constructors, but not on any of the non-member operators.  So if
-some type `B` is a literal type, then `number<B>` is also a literal type, and you will be able to
-compile-time-construct such a type from any literal that `B` is compile-time-constructible from.
-However, you will not be able to perform compile-time arithmetic on such types.
+* The more basic version requires only C++11 and allow the construction of some number types as literals.
+* The more advanced support permits constexpr arithmetic and requires at least C++14 
+constexpr support, and for many operations C++2a support
 
-Currently the only backend type provided by the library that is also a literal type are instantiations
-of `cpp_int_backend` where the Allocator parameter is type `void`, and the Checked parameter is
-`boost::multiprecision::unchecked`.
+[h4 Declaring numeric literals]
+
+There are two backend types which are literals:
+
+* __float128 (which requires GCC), and
+* Instantiations of `cpp_int_backend` where the Allocator parameter is type `void`, 
+and the Checked parameter is `boost::multiprecision::unchecked`.
 
 For example:
 
    using namespace boost::multiprecision;
+
+   constexpr float128            f = 0.1Q   // OK, float128's are always literals in C++11
 
    constexpr int128_t            i = 0;     // OK, fixed precision int128_t has no allocator.
    constexpr uint1024_t          j = 0xFFFFFFFF00000000uLL;  // OK, fixed precision uint1024_t has no allocator.
@@ -2009,7 +2014,7 @@ For example:
    constexpr checked_uint128_t   k = -1; // Error, checked type is not a literal type as we need runtime error checking.
    constexpr cpp_int             l = 2;  // Error, type is not a literal as it performs memory management.
 
-There is also limited support for user defined-literals - these are limited to unchecked, fixed precision `cpp_int`'s
+There is also limited support for user defined-literals with __cpp_int - these are limited to unchecked, fixed precision `cpp_int`'s
 which are specified in hexadecimal notation.  The suffixes supported are:
 
 [table
@@ -2069,6 +2074,46 @@ Examples:
    //
    // Which means this also works:
    constexpr int1024_t j = -g;   // OK: unary minus operator is constexpr.
+
+[h4 constexpr arithmetic]
+
+The front end of the library is all `constexpr` from C++14 and later.  Currently there is only one
+back end type that is `constexpr` aware, and that is __float128.  More backends will follow at a later date.
+
+Provided the compiler is GCC, type __float128 support `constexpr` operations on all arithmetic operations from C++14, comparisons,
+`abs`, `fabs`, `fpclassify`, `isnan`, `isinf`, `isfinite` and `isnormal` are also fully supported, but the transcendental functions are not.
+
+For example given:
+
+[constexpr_circle]
+
+We can now calculate areas and circumferences using all constexpr arithmetic:
+
+[constexpr_circle_usage]
+
+Note that these make use of the numeric constants from the Math library, which also happen to be `constexpr`.
+
+For a more interesting example, in [@../../example/constexpr_float_arithmetic_examples.cpp constexpr_float_arithmetic_examples.cpp]
+we define a simple class for `constexpr` polynomial arithmetic:
+
+   template <class T, unsigned Order>
+   struct const_polynomial;
+
+Given this, we can use recurrence relations to calculate the coefficients for various orthogonal
+polynomials - in the example we use the Hermite polynomials, only the constructor does any work - 
+it uses the recurrence relations to calculate the coefficient array:
+
+[hermite_example]
+
+Now we just need to define H[sub 0] and H[sub 1] as termination conditions for the recurrence:
+
+[hermite_example2]
+
+We can now declare H[sub 9] as a constexpr object, access the coefficients, and evaluate
+at an abscissa value, all using `constexpr` arithmetic:
+
+[hermite_example3]
+
 
 [endsect]
 
