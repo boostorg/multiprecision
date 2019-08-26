@@ -1,6 +1,6 @@
 [/
   Copyright 2011, 2013 John Maddock.
-  Copyright 2013 Paul A. Bristow.
+  Copyright 2013 - 2019 Paul A. Bristow.
   Copyright 2013 Christopher Kormanyos.
 
   Distributed under the Boost Software License, Version 1.0.
@@ -21,7 +21,7 @@
     [/last-revision $Date: 2011-07-08 18:51:46 +0100 (Fri, 08 Jul 2011) $]
 ]
 
-[import html4_symbols.qbk]
+[import html4_symbols.qbk] [/Ideally this should be the same as Boost.Math I:\boost\libs\math\doc]
 
 [import ../example/gmp_snips.cpp]
 [import ../example/mpfr_snips.cpp]
@@ -46,6 +46,7 @@
 [import ../example/mpfr_precision.cpp]
 [import ../example/constexpr_float_arithmetic_examples.cpp]
 
+[/External links as templates (see also some defs below)]
 [template mpfr[] [@http://www.mpfr.org MPFR]]
 [template mpc[] [@http://www.multiprecision.org MPC]]
 [template mpfi[] [@http://perso.ens-lyon.fr/nathalie.revol/software.html MPFI]]
@@ -60,6 +61,10 @@
 [template super[x]'''<superscript>'''[x]'''</superscript>''']
 [template sub[x]'''<subscript>'''[x]'''</subscript>''']
 
+
+[/insert Equation as a PNG or SVG image, previous generated with an external tool like Latex.]
+[/Used thus [equation ellint6]  - without the file type suffix which will chosen automatically.]
+
 [template equation[name]  '''<inlinemediaobject>
 <imageobject role="html">
 <imagedata fileref="../'''[name]'''.png"></imagedata>
@@ -69,6 +74,20 @@
 </imageobject>
 </inlinemediaobject>''']
 
+[/insert Indented one-line expression italic and serif font probably using Unicode symbols for Greek and symbols.]
+[/Example: [expression [sub 1]F[sub 0](a, z) = (1-z)[super -a]]]
+[template expression[equation] 
+[:
+[role serif_italic [equation]]
+]
+[/ Hint you may need to enclose equation in brackets if it contains comma(s) to avoid "error invalid number of arguments"]
+]
+
+[def __tick [role aligncenter [role green \u2714]]] [/ u2714 is a HEAVY CHECK MARK tick (2713 check mark)]
+[def __cross [role aligncenter [role red \u2718]]] [/ u2718 is a heavy cross]
+[def __star [role aligncenter [role red \u2736]]] [/ 6-point star]
+
+[/Boost.Multiprecision internals links]
 [def __cpp_int [link boost_multiprecision.tut.ints.cpp_int cpp_int]]
 [def __gmp_int [link boost_multiprecision.tut.ints.gmp_int gmp_int]]
 [def __tom_int [link boost_multiprecision.tut.ints.tom_int tom_int]]
@@ -92,6 +111,11 @@
 [def __complex128 [link boost_multiprecision.tut.complex.complex128 complex128]]
 [def __complex_adaptor [link boost_multiprecision.tut.complex.complex_adaptor complex_adaptor]]
 
+[/External links as macro definitions.]
+[def __expression_template [@https://en.wikipedia.org/wiki/Expression_templates expression template]]
+[def __UDT [@http://eel.is/c++draft/definitions#defns.prog.def.type program-defined type]]
+[def __fundamental_type [@https://en.cppreference.com/w/cpp/language/types fundamental (built-in) type]]
+
 [section:intro Introduction]
 
 The Multiprecision Library provides [link boost_multiprecision.tut.ints integer],
@@ -103,7 +127,7 @@ The big number types in Multiprecision can be used with a wide
 selection of basic mathematical operations, elementary transcendental
 functions as well as the functions in Boost.Math.
 The Multiprecision types can also interoperate with the
-built-in types in C++ using clearly defined conversion rules.
+__fundamental types in C++ using clearly defined conversion rules.
 This allows Boost.Multiprecision to be used for all
 kinds of mathematical calculations involving integer,
 rational and floating-point types requiring extended
@@ -124,7 +148,7 @@ provided the class implementation adheres to the necessary
 Depending upon the number type, precision may be arbitrarily large
 (limited only by available memory), fixed at compile time
 (for example 50 or 100 decimal digits), or a variable controlled at run-time
-by member functions. The types are expression-template-enabled for
+by member functions. The types are __expression_template -enabled for
 better performance than naive user-defined types.
 
 The Multiprecision library comes in two distinct parts:
@@ -234,7 +258,7 @@ a programming error and all of our backends will trigger an assertion if any oth
 allows for optimal performance on move-construction (i.e. no allocation required, we just take ownership of the existing
 object's internal state), while maintaining usability in the standard library containers.
 
-[h4 Expression Templates]
+[h4:expression_templates Expression Templates]
 
 Class `number` is expression-template-enabled: that means that rather than having a multiplication
 operator that looks like this:
@@ -579,7 +603,7 @@ too large to fit into any built in number type.
 * You can import/export the raw bits of a __cpp_int to and from external storage via the `import_bits` and `export_bits`
 functions.  More information is in the [link boost_multiprecision.tut.import_export section on import/export].
 
-[h5 Example:]
+[h5:cpp_int_eg Example:]
 
 [cpp_int_eg]
 
@@ -626,7 +650,7 @@ is recommended on Win32.
 
 [mpz_eg]
 
-[endsect]
+[endsect] [/section:gmp_int gmp_int]
 
 [section:tom_int tom_int]
 
@@ -2733,6 +2757,11 @@ algorithm, claimed to be both exact and fast for 32 and 64-bit floating-point nu
 `std::numeric_limits<float>::max_digits10` is implemented on any platform.
 ] [/note]
 
+[note ['requires cxx11_numeric_limits] is a suitable test for use of `std::numeric_limits<float>::max_digits10`
+to control if a target in a jamfile used by a Boost B2/bjam program is built, or not.
+] [/note]
+
+
 If `max_digits10` is not available, you should use the
 [@http://www.cs.berkeley.edu/~wkahan/ieee754status/IEEE754.PDF Kahan formula for floating-point type T].
 
@@ -2852,7 +2881,7 @@ resulted in the loss of precision, such implementation detects ['denorm loss].
 
 [h4 max function]
 
-Function `std::numeric_limits<T>::max()` returns the largest finite value
+Function `(std::numeric_limits<T>::max)()` returns the largest finite value
 that can be represented by the type T.  If there is no such value (and
 `numeric_limits<T>::bounded` is `false`) then returns `T()`.
 
@@ -2870,7 +2899,7 @@ packaged versions of this (and other functions) are provided using
 
   T = boost::math::tools::max_value<T>();
 
-Of course, these simply use `std::numeric_limits<T>::max()` if available,
+Of course, these simply use `(std::numeric_limits<T>::max)()` if available,
 but otherwise 'do something sensible'.
 
 [h4 lowest function]
@@ -2885,7 +2914,7 @@ Since C++11: `std::numeric_limits<T>::lowest()` is
 
 [h4 min function]
 
-Function `std::numeric_limits<T>::min()` returns the minimum finite value
+Function `(std::numeric_limits<T>::min)()` returns the minimum finite value
 that can be represented by the type T.
 
 For built-in types there is usually a corresponding MACRO value TYPE_MIN,
@@ -2956,7 +2985,7 @@ for example, caused by
 [@http://en.wikipedia.org/wiki/Loss_of_significance Loss of significance or cancellation error]
 or very many iterations.
 
-[h4 epsilon]
+[h4:epsilon epsilon]
 
 Function `std::numeric_limits<T>::epsilon()` is meaningful only for non-integral types.
 
@@ -2987,10 +3016,15 @@ To use these `#include <boost/math/tools/precision.hpp>`.
 
 [epsilon_4]
 
-[h5 Tolerance for Floating-point Comparisons]
+[h5:FP_tolerance Tolerance for Floating-point Comparisons]
 
-`epsilon` is very useful to compute a tolerance when comparing floating-point values,
+[@https://en.wikipedia.org/wiki/Machine_epsilon Machine epsilon [epsilon]]
+is very useful to compute a tolerance when comparing floating-point values,
 a much more difficult task than is commonly imagined.
+
+The C++ standard specifies [@https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon  `std::numeric_limits<>::epsilon()`]
+and Boost.Multiprecision implements this (where possible) for its program-defined types analogous to the
+__fundamental floating-point types like `double` `float`.
 
 For more information than you probably want (but still need) see
 [@http://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html What Every Computer Scientist Should Know About Floating-Point Arithmetic]
@@ -3011,19 +3045,20 @@ See also:
 
 [@http://adtmag.com/articles/2000/03/16/comparing-floats-how-to-determine-if-floating-quantities-are-close-enough-once-a-tolerance-has-been.aspx Alberto Squassia, Comparing floats code]
 
-[@boost:/libs/test/doc/html/utf/testing-tools/floating_point_comparison.html floating-point comparison].
+[@https://www.boost.org/doc/libs/release/libs/test/doc/html/boost_test/testing_tools/extended_comparison/floating_point.html Boost.Test Floating-Point_Comparison]
 
 [tolerance_1]
 
 used thus:
-
+cd ./test
   BOOST_CHECK_CLOSE_FRACTION(expected, calculated, tolerance);
 
-(There is also a version using tolerance as a percentage rather than a fraction).
+(There is also a version BOOST_CHECK_CLOSE using tolerance as a [*percentage] rather than a fraction;
+usually the fraction version is simpler to use).
 
 [tolerance_2]
 
-[h4 Infinity - positive and negative]
+[h4:infinity Infinity - positive and negative]
 
 For floating-point types only, for which
 `std::numeric_limits<T>::has_infinity == true`,

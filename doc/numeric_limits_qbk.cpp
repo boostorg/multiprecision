@@ -41,8 +41,8 @@ this language binding.
 
 #include <typeinfo>
 
-#include <boost/version.hpp> 
-#include <boost/config.hpp> 
+#include <boost/version.hpp>
+#include <boost/config.hpp>
 
 // May need extra includes for other types, for example:
 #include <boost/multiprecision/cpp_dec_float.hpp> // is decimal.
@@ -71,9 +71,9 @@ std::array<std::string, 16> integer_type_names =
 "char32_t",
 "short",
 "unsigned short",
-"int", 
-"unsigned int", 
-"long", 
+"int",
+"unsigned int",
+"long",
 "unsigned long",
 "long long",
 "unsigned long long",
@@ -92,7 +92,7 @@ std::array<std::string, 6> float_type_names =
 {
   "function", "float", "double", "long double", "cpp_dec_50", "cpp_bin_128"
 };
- 
+
 // Table headings for integer constants.
 std::array<std::string, 8> integer_constant_heads =
 {
@@ -184,7 +184,7 @@ void integer_constants(std::string type_name, std::ostream& os)
     os << "[" << std::numeric_limits<T>::digits << "]" ;
     os << "[" << std::numeric_limits<T>::digits10 << "]" ;
     // Undefined for integers, so removed:
-   // os << "[" << std::numeric_limits<T>::max_digits10 << "]" 
+   // os << "[" << std::numeric_limits<T>::max_digits10 << "]"
      os << "]";
 } // void integer_constants
 
@@ -202,7 +202,7 @@ void float_constants(std::string type_name, std::ostream& os)
     os << "[" << std::numeric_limits<T>::radix << "]" ;
     os << "[" << std::numeric_limits<T>::digits << "]" ;
     os << "[" << std::numeric_limits<T>::digits10 << "]" ;
-    os << "[" << std::numeric_limits<T>::max_digits10 << "]"; 
+    os << "[" << std::numeric_limits<T>::max_digits10 << "]";
     os << "[" << std::numeric_limits<T>::min_exponent << "]" ;
     os << "[" << std::numeric_limits<T>::min_exponent10 << "]" ;
     os << "[" << std::numeric_limits<T>::max_exponent << "]" ;
@@ -222,7 +222,7 @@ void integer_functions(std::string type_name, std::ostream& os)
     os << "[" << std::numeric_limits<T>::max() << "]" ;
     //os << "[" << std::numeric_limits<T>::lowest() << "]" ;  always == min for integer types,
     // so removed to save space.
-    os << "[" << std::numeric_limits<T>::min() << "]" 
+    os << "[" << std::numeric_limits<T>::min() << "]"
       "]";
 } // void integer_functions
 
@@ -234,9 +234,9 @@ void integer_functions(std::string type_name, std::ostream& os)
 { //! Output a line of table integer function values to `ostream` os.
     os << "\n[" // start of row.
           "[" << type_name << "]" ;
-    os << "[" << std::numeric_limits<T>::max() << "]" ;
+    os << "[" << (std::numeric_limits<T>::max)() << "]" ;
    // os << "[" << std::numeric_limits<T>::lowest() << "]" ;
-    os << "[" << std::numeric_limits<T>::min() << "]" ;
+    os << "[" << (std::numeric_limits<T>::min)() << "]" ;
     os <<  "]"; // end of row.
 } // void integer_functions
 
@@ -246,15 +246,15 @@ void float_functions(std::string type_name, std::ostream& os)
 { //! Output a line of table float-point function values to `ostream` os.
     os << "\n[" // start of row.
           "[" << type_name << "]" ;
-    os << "[" << std::numeric_limits<T>::max() << "]" ;
-    os << "[" << std::numeric_limits<T>::lowest() << "]" ;
-    os << "[" << std::numeric_limits<T>::min() << "]" 
-    os << "[" << std::numeric_limits<T>::epsilon() << "]" 
-    os << "[" << std::numeric_limits<T>::round_error() << "]" 
-    os << "[" << std::numeric_limits<T>::infinity() << "]" 
-    os << "[" << std::numeric_limits<T>::quiet_NaN() << "]" 
-    os << "[" << std::numeric_limits<T>::signaling_NaN() << "]" 
-    os << "[" << std::numeric_limits<T>::denorm_min() << "]" 
+    os << "[" << (std::numeric_limits<T>::max)() << "]" ;
+    os << "[" << (std::numeric_limits<T>::lowest)() << "]" ;
+    os << "[" << (std::numeric_limits<T>::min)() << "]"
+    os << "[" << std::numeric_limits<T>::epsilon() << "]"
+    os << "[" << std::numeric_limits<T>::round_error() << "]"
+    os << "[" << std::numeric_limits<T>::infinity() << "]"
+    os << "[" << std::numeric_limits<T>::quiet_NaN() << "]"
+    os << "[" << std::numeric_limits<T>::signaling_NaN() << "]"
+    os << "[" << std::numeric_limits<T>::denorm_min() << "]"
       "]"; // end of row.
 } // void float_functions
 
@@ -305,7 +305,7 @@ int numeric_limits_list(std::string description)
 
     std::cout << (std::numeric_limits<T>::has_denorm_loss ? "has denorm loss." : "no denorm loss.")  << std::endl;
     // true if a loss of accuracy is detected as a denormalization loss, rather than an inexact result.
-      
+
     std::cout << "Round style is ";
     if (std::numeric_limits<T>::round_style == std::round_indeterminate)
     {
@@ -358,7 +358,7 @@ int numeric_limits_list(std::string description)
   // (assumes operator<< for type T is available).
   // If floating-point then hex format may not be available.
 
-  std::cout << "max = " << std::numeric_limits<T>::max() << std::endl;
+  std::cout << "max = " << (std::numeric_limits<T>::max)() << std::endl;
   //if (std::numeric_limits<T>::is_integer)
   //{
   //  std::cout << "    = " << std::hex << std::numeric_limits<T>::max() << std::endl;
@@ -370,7 +370,7 @@ int numeric_limits_list(std::string description)
   //   std::cout << "       = " << std::hex << std::numeric_limits<T>::lowest() << std::endl;
   //}
 
-  std::cout << "min = " << std::dec << std::numeric_limits<T>::min() << std::endl;
+  std::cout << "min = " << (std::dec << std::numeric_limits<T>::min)() << std::endl;
   //if (std::numeric_limits<T>::is_integer)
   //{
   //  std::cout << "    = " << std::hex << std::numeric_limits<T>::min() << std::endl;
@@ -406,14 +406,14 @@ int main()
 {
 
 
-    
+
   try
   {
     using namespace boost::multiprecision;
 
     std::cout << versions() << std::endl;
 
-    std::ofstream fout(filename, std::ios_base::out);  
+    std::ofstream fout(filename, std::ios_base::out);
     if (!fout.is_open())
     {
       std::cout << "Unable to open file " << filename << " for output.\n" << std::endl;
@@ -434,7 +434,7 @@ int main()
     // Output platform version info (32 or 64).
     fout << "These tables were generated using the following program and options:\n\n"
       "[pre""\n"
-      << versions() 
+      << versions()
       << "]""\n"
       << std::endl;
 
@@ -489,16 +489,16 @@ int main()
     //integer_functions<char>("char", fout); // Need int value not char.
     fout << "\n[" // start of row.
        "[" << "char"<< "]" ;
-    fout << "[" << static_cast<int>((std::numeric_limits<char>::max)()) << "]" ;
+    fout << "[" << static_cast<int>(std::numeric_limits<char>::max)() << "]" ;
    // fout << "[" << (std::numeric_limits<T>::lowest)() << "]" ;
-    fout << "[" << static_cast<int>((std::numeric_limits<char>::min)()) << "]" ;
+    fout << "[" << static_cast<int>(std::numeric_limits<char>::min)() << "]" ;
     fout <<  "]"; // end of row.
     //integer_functions<unsigned char>("unsigned char", fout); // Need int value not char.
     fout << "\n[" // start of row.
        "[" << "unsigned char"<< "]" ;
-    fout << "[" << static_cast<int>((std::numeric_limits<unsigned char>::max)()) << "]" ;
+    fout << "[" << static_cast<int>(std::numeric_limits<unsigned char>::max)() << "]" ;
    // fout << "[" << std::numeric_limits<unsigned char>::lowest() << "]" ;
-    fout << "[" << static_cast<int>(std::numeric_limits<unsigned char>::min()) << "]" ;
+    fout << "[" << static_cast<int>(std::numeric_limits<unsigned char>::min)() << "]" ;
     fout <<  "]"; // end of row.
 
     integer_functions<char16_t>("char16_t", fout);
@@ -517,23 +517,23 @@ int main()
     fout << "]" "\n";  // end of table;
 
 
-    //fout << "[[max]" 
-    //  << "[" << std::numeric_limits<bool>::max() << "]" 
-    //  << "[" << static_cast<int>(std::numeric_limits<char>::max()) << "]" 
-    //  << "[" << static_cast<int>(std::numeric_limits<unsigned char>::max()) << "]" 
-    //  << "[" << static_cast<int>(std::numeric_limits<char16_t>::max()) << "]" 
-    //  << "[" << static_cast<int>(std::numeric_limits<char32_t>::max()) << "]" 
-    //  << "[" << std::numeric_limits<short>::max() << "]" 
-    //  << "[" << std::numeric_limits<unsigned short>::max() << "]" 
-    //  << "[" << std::numeric_limits<int>::max() << "]" 
-    //  << "[" << std::numeric_limits<unsigned int>::max() << "]" 
-    //  << "[" << std::numeric_limits<long>::max() << "]" 
-    //  << "[" << std::numeric_limits<unsigned long>::max() << "]" 
-    //  << "[" << std::numeric_limits<long long>::max() << "]" 
-    //  << "[" << std::numeric_limits<unsigned long long>::max() << "]" 
-    //  << "[" << std::numeric_limits<int32_t>::max() << "]" 
-    //  << "[" << std::numeric_limits<int64_t>::max() << "]" 
-    //  << "[" << std::numeric_limits<int128_t>::max() << "]" 
+    //fout << "[[max]"
+    //  << "[" << std::numeric_limits<bool>::max() << "]"
+    //  << "[" << static_cast<int>(std::numeric_limits<char>::max()) << "]"
+    //  << "[" << static_cast<int>(std::numeric_limits<unsigned char>::max()) << "]"
+    //  << "[" << static_cast<int>(std::numeric_limits<char16_t>::max()) << "]"
+    //  << "[" << static_cast<int>(std::numeric_limits<char32_t>::max()) << "]"
+    //  << "[" << std::numeric_limits<short>::max() << "]"
+    //  << "[" << std::numeric_limits<unsigned short>::max() << "]"
+    //  << "[" << std::numeric_limits<int>::max() << "]"
+    //  << "[" << std::numeric_limits<unsigned int>::max() << "]"
+    //  << "[" << std::numeric_limits<long>::max() << "]"
+    //  << "[" << std::numeric_limits<unsigned long>::max() << "]"
+    //  << "[" << std::numeric_limits<long long>::max() << "]"
+    //  << "[" << std::numeric_limits<unsigned long long>::max() << "]"
+    //  << "[" << std::numeric_limits<int32_t>::max() << "]"
+    //  << "[" << std::numeric_limits<int64_t>::max() << "]"
+    //  << "[" << std::numeric_limits<int128_t>::max() << "]"
     //  //<< "[" << std::numeric_limits<int256_t>::max() << "]"  // too big?
     //  //<< "[" << std::numeric_limits<int512_t>::max() << "]" // too big?
     //  << "]" "\n";
@@ -541,30 +541,30 @@ int main()
     // */
 
     //fout << "[[min]"
-    //  << "[" << std::numeric_limits<bool>::min() << "]" 
-    //  << "[" << static_cast<int>(std::numeric_limits<char>::min()) << "]" 
-    //  << "[" << static_cast<int>(std::numeric_limits<unsigned char>::min()) << "]" 
-    //  << "[" << static_cast<int>(std::numeric_limits<char16_t>::min()) << "]" 
-    //  << "[" << static_cast<int>(std::numeric_limits<char32_t>::min()) << "]" 
-    //  << "[" << std::numeric_limits<short>::min() << "]" 
-    //  << "[" << std::numeric_limits<unsigned short>::min() << "]" 
-    //  << "[" << std::numeric_limits<int>::min() << "]" 
-    //  << "[" << std::numeric_limits<unsigned int>::min() << "]" 
-    //  << "[" << std::numeric_limits<long>::min() << "]" 
-    //  << "[" << std::numeric_limits<unsigned long>::min() << "]" 
-    //  << "[" << std::numeric_limits<long long>::min() << "]" 
-    //  << "[" << std::numeric_limits<unsigned long long>::min() << "]" 
-    //  << "[" << std::numeric_limits<int32_t>::min() << "]" 
-    //  << "[" << std::numeric_limits<int64_t>::min() << "]" 
-    //  << "[" << std::numeric_limits<int128_t>::min() << "]" 
+    //  << "[" << std::numeric_limits<bool>::min() << "]"
+    //  << "[" << static_cast<int>(std::numeric_limits<char>::min()) << "]"
+    //  << "[" << static_cast<int>(std::numeric_limits<unsigned char>::min()) << "]"
+    //  << "[" << static_cast<int>(std::numeric_limits<char16_t>::min()) << "]"
+    //  << "[" << static_cast<int>(std::numeric_limits<char32_t>::min()) << "]"
+    //  << "[" << std::numeric_limits<short>::min() << "]"
+    //  << "[" << std::numeric_limits<unsigned short>::min() << "]"
+    //  << "[" << std::numeric_limits<int>::min() << "]"
+    //  << "[" << std::numeric_limits<unsigned int>::min() << "]"
+    //  << "[" << std::numeric_limits<long>::min() << "]"
+    //  << "[" << std::numeric_limits<unsigned long>::min() << "]"
+    //  << "[" << std::numeric_limits<long long>::min() << "]"
+    //  << "[" << std::numeric_limits<unsigned long long>::min() << "]"
+    //  << "[" << std::numeric_limits<int32_t>::min() << "]"
+    //  << "[" << std::numeric_limits<int64_t>::min() << "]"
+    //  << "[" << std::numeric_limits<int128_t>::min() << "]"
     //  // << "[" << std::numeric_limits<int256_t>::min() << "]"  // too big?
     //  // << "[" << std::numeric_limits<int512_t>::min() << "]"  // too big?
     //  << "]""\n";
 
 
-    
+
   // Floating-point
-    
+
     typedef number<cpp_dec_float<50> > cpp_dec_float_50; // 50 decimal digits.
     typedef number<cpp_bin_float<113> > bin_128bit_double_type; // == Binary rare long double.
 
@@ -595,92 +595,92 @@ int main()
     }
     fout << "]"; // end of headings.
 
-    fout << "[[max]" 
-      << "[" << std::numeric_limits<float>::max() << "]" 
-      << "[" << std::numeric_limits<double>::max() << "]" 
+    fout << "[[max]"
+      << "[" << (std::numeric_limits<float>::max)() << "]"
+      << "[" << (std::numeric_limits<double>::max)() << "]"
 //#if LDBL_MANT_DIG > DBL_MANT_DIG
     // Perhaps to test Long double is not just a duplication of double (but need change is headings too).
-      << "[" << std::numeric_limits<long double>::max() << "]" 
+      << "[" << (std::numeric_limits<long double>::max)() << "]"
 //#endif
-      << "[" << std::numeric_limits<cpp_dec_float_50>::max() << "]" 
-      << "[" << std::numeric_limits<bin_128bit_double_type >::max() << "]" 
+      << "[" << (std::numeric_limits<cpp_dec_float_50>::max)() << "]"
+      << "[" << (std::numeric_limits<bin_128bit_double_type >::max)() << "]"
       << "]" "\n"; // end of row.
 
-    fout << "[[min]" 
-      << "[" << std::numeric_limits<float>::min() << "]" 
-      << "[" << std::numeric_limits<double>::min() << "]" 
+    fout << "[[min]"
+      << "[" << (std::numeric_limits<float>::min)() << "]"
+      << "[" << (std::numeric_limits<double>::min)() << "]"
 //#if LDBL_MANT_DIG > DBL_MANT_DIG
     // Long double is not just a duplication of double.
-      << "[" << std::numeric_limits<long double>::min() << "]" 
+      << "[" << (std::numeric_limits<long double>::min)() << "]"
 //#endif
-      << "[" << std::numeric_limits<cpp_dec_float_50 >::min() << "]" 
-      << "[" << std::numeric_limits<bin_128bit_double_type >::min() << "]" 
+      << "[" << (std::numeric_limits<cpp_dec_float_50 >::min)() << "]"
+      << "[" << (std::numeric_limits<bin_128bit_double_type >::min)() << "]"
       << "]" "\n"; // end of row.
 
-    fout << "[[epsilon]" 
-      << "[" << std::numeric_limits<float>::epsilon() << "]" 
-      << "[" << std::numeric_limits<double>::epsilon() << "]" 
+    fout << "[[epsilon]"
+      << "[" << std::numeric_limits<float>::epsilon() << "]"
+      << "[" << std::numeric_limits<double>::epsilon() << "]"
 //#if LDBL_MANT_DIG > DBL_MANT_DIG
     // Long double is not just a duplication of double.
-      << "[" << std::numeric_limits<long double>::epsilon() << "]" 
+      << "[" << std::numeric_limits<long double>::epsilon() << "]"
 //#endif
-      << "[" << std::numeric_limits<cpp_dec_float_50 >::epsilon() << "]" 
-      << "[" << std::numeric_limits<bin_128bit_double_type >::epsilon() << "]" 
+      << "[" << std::numeric_limits<cpp_dec_float_50 >::epsilon() << "]"
+      << "[" << std::numeric_limits<bin_128bit_double_type >::epsilon() << "]"
       << "]" "\n"; // end of row.
 
-    fout << "[[round_error]" 
-      << "[" << std::numeric_limits<float>::round_error() << "]" 
-      << "[" << std::numeric_limits<double>::round_error() << "]" 
+    fout << "[[round_error]"
+      << "[" << std::numeric_limits<float>::round_error() << "]"
+      << "[" << std::numeric_limits<double>::round_error() << "]"
 //#if LDBL_MANT_DIG > DBL_MANT_DIG
     // Long double is not just a duplication of double.
-      << "[" << std::numeric_limits<long double>::round_error() << "]" 
+      << "[" << std::numeric_limits<long double>::round_error() << "]"
 //#endif
-      << "[" << std::numeric_limits<cpp_dec_float_50 >::round_error() << "]" 
-      << "[" << std::numeric_limits<bin_128bit_double_type >::round_error() << "]" 
+      << "[" << std::numeric_limits<cpp_dec_float_50 >::round_error() << "]"
+      << "[" << std::numeric_limits<bin_128bit_double_type >::round_error() << "]"
       << "]" "\n"; // end of row.
 
-    fout << "[[infinity]" 
-      << "[" << std::numeric_limits<float>::infinity() << "]" 
-      << "[" << std::numeric_limits<double>::infinity() << "]" 
+    fout << "[[infinity]"
+      << "[" << std::numeric_limits<float>::infinity() << "]"
+      << "[" << std::numeric_limits<double>::infinity() << "]"
 //#if LDBL_MANT_DIG > DBL_MANT_DIG
     // Long double is not just a duplication of double.
-      << "[" << std::numeric_limits<long double>::infinity() << "]" 
+      << "[" << std::numeric_limits<long double>::infinity() << "]"
 //#endif
-      << "[" << std::numeric_limits<cpp_dec_float_50 >::infinity() << "]" 
-      << "[" << std::numeric_limits<bin_128bit_double_type >::infinity() << "]" 
+      << "[" << std::numeric_limits<cpp_dec_float_50 >::infinity() << "]"
+      << "[" << std::numeric_limits<bin_128bit_double_type >::infinity() << "]"
       << "]" "\n"; // end of row.
 
-    fout << "[[quiet_NaN]" 
-      << "[" << std::numeric_limits<float>::quiet_NaN() << "]" 
-      << "[" << std::numeric_limits<double>::quiet_NaN() << "]" 
+    fout << "[[quiet_NaN]"
+      << "[" << std::numeric_limits<float>::quiet_NaN() << "]"
+      << "[" << std::numeric_limits<double>::quiet_NaN() << "]"
 //#if LDBL_MANT_DIG > DBL_MANT_DIG
     // Long double is not just a duplication of double.
-      << "[" << std::numeric_limits<long double>::quiet_NaN() << "]" 
+      << "[" << std::numeric_limits<long double>::quiet_NaN() << "]"
 //#endif
-      << "[" << std::numeric_limits<cpp_dec_float_50 >::quiet_NaN() << "]" 
-      << "[" << std::numeric_limits<bin_128bit_double_type >::quiet_NaN() << "]" 
+      << "[" << std::numeric_limits<cpp_dec_float_50 >::quiet_NaN() << "]"
+      << "[" << std::numeric_limits<bin_128bit_double_type >::quiet_NaN() << "]"
       << "]" "\n"; // end of row.
 
-    fout << "[[signaling_NaN]" 
-      << "[" << std::numeric_limits<float>::signaling_NaN() << "]" 
-      << "[" << std::numeric_limits<double>::signaling_NaN() << "]" 
+    fout << "[[signaling_NaN]"
+      << "[" << std::numeric_limits<float>::signaling_NaN() << "]"
+      << "[" << std::numeric_limits<double>::signaling_NaN() << "]"
 //#if LDBL_MANT_DIG > DBL_MANT_DIG
     // Long double is not just a duplication of double.
-      << "[" << std::numeric_limits<long double>::signaling_NaN() << "]" 
+      << "[" << std::numeric_limits<long double>::signaling_NaN() << "]"
 //#endif
-      << "[" << std::numeric_limits<cpp_dec_float_50 >::signaling_NaN() << "]" 
-      << "[" << std::numeric_limits<bin_128bit_double_type >::signaling_NaN() << "]" 
+      << "[" << std::numeric_limits<cpp_dec_float_50 >::signaling_NaN() << "]"
+      << "[" << std::numeric_limits<bin_128bit_double_type >::signaling_NaN() << "]"
       << "]" "\n"; // end of row.
 
-    fout << "[[denorm_min]" 
-      << "[" << std::numeric_limits<float>::denorm_min() << "]" 
-      << "[" << std::numeric_limits<double>::denorm_min() << "]" 
+    fout << "[[denorm_min]"
+      << "[" << std::numeric_limits<float>::denorm_min() << "]"
+      << "[" << std::numeric_limits<double>::denorm_min() << "]"
 //#if LDBL_MANT_DIG > DBL_MANT_DIG
     // Long double is not just a duplication of double.
-      << "[" << std::numeric_limits<long double>::denorm_min() << "]" 
+      << "[" << std::numeric_limits<long double>::denorm_min() << "]"
 //#endif
-      << "[" << std::numeric_limits<cpp_dec_float_50 >::denorm_min() << "]" 
-      << "[" << std::numeric_limits<bin_128bit_double_type >::denorm_min() << "]" 
+      << "[" << std::numeric_limits<cpp_dec_float_50 >::denorm_min() << "]"
+      << "[" << std::numeric_limits<bin_128bit_double_type >::denorm_min() << "]"
       << "]" "\n"; // end of row.
 
 
@@ -704,8 +704,8 @@ int main()
 } // int main()
 
 /*
-  Description: Autorun "J:\Cpp\Misc\Debug\numeric_limits_qbk.exe" 
-  
+  Description: Autorun "J:\Cpp\Misc\Debug\numeric_limits_qbk.exe"
+
   Program: I:\boost-sandbox\multiprecision.cpp_bin_float\libs\multiprecision\doc\numeric_limits_qbk.cpp
   Wed Aug 28 14:17:21 2013
   BuildInfo:

@@ -21,16 +21,18 @@ local tommath_path = [ modules.peek : TOMMATH_PATH ] ;
 
 project
     : requirements
-	   <include>$(gmp_path)
-	   <include>$(gmp_path)/mpfr
-	   <include>$(gmp_path)/gmpfrxx
-	   <include>$(mpfr_path)
-	   <include>$(mpfi_path)
-	   <include>$(mpfi_path)/src
-	   <include>$(tommath_path)
-	   <include>../include
-	   <include>../../..
+     <include>$(gmp_path)
+     <include>$(gmp_path)/mpfr
+     <include>$(gmp_path)/gmpfrxx
+     <include>$(mpfr_path)
+     <include>$(mpfi_path)
+     <include>$(mpfi_path)/src
+     <include>$(tommath_path)
+     <include>../include
+     <include>../../..
       <toolset>gcc:<cxxflags>-Wno-missing-braces
+      <toolset>gcc-mingw:<cxxflags>-Wa,-mbig-obj
+      # https://digitalkarabela.com/mingw-w64-how-to-fix-file-too-big-too-many-sections/
       <toolset>darwin:<cxxflags>-Wno-missing-braces
       <toolset>acc:<cxxflags>+W2068,2461,2236,4070
       <toolset>intel:<cxxflags>-Qwd264,239

@@ -112,13 +112,13 @@ void test_specific(const boost::mpl::int_<boost::multiprecision::number_kind_flo
       if (std::numeric_limits<Number>::has_denorm == std::denorm_present)
       {
          BOOST_TEST(FP_SUBNORMAL == (boost::math::fpclassify)(std::numeric_limits<Number>::denorm_min()));
-         BOOST_TEST(FP_SUBNORMAL == (boost::math::fpclassify)(std::numeric_limits<Number>::min() / 2));
+         BOOST_TEST(FP_SUBNORMAL == (boost::math::fpclassify)((std::numeric_limits<Number>::min)() / 2));
          BOOST_TEST((boost::math::isfinite)(std::numeric_limits<Number>::denorm_min()));
          BOOST_TEST(!(boost::math::isnormal)(std::numeric_limits<Number>::denorm_min()));
          BOOST_TEST(!(boost::math::isinf)(std::numeric_limits<Number>::denorm_min()));
          BOOST_TEST(!(boost::math::isnan)(std::numeric_limits<Number>::denorm_min()));
          BOOST_TEST(0 == std::numeric_limits<Number>::denorm_min() / 2);
-         BOOST_TEST(0 != std::numeric_limits<Number>::min() / 2);
+         BOOST_TEST(0 != (std::numeric_limits<Number>::min)() / 2);
          BOOST_TEST(0 != std::numeric_limits<Number>::denorm_min());
       }
    }
