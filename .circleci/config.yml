@@ -50,7 +50,7 @@ jobs:
       - run:
           name: Building docs
           command: |
-            cd $BOOST_REMOVE/doc && rm -rf html && ../../../b2 -j2 address-model=64 architecture=x86 toolset=gcc cxxflags="-std=gnu++14" release
+            cd $BOOST_REMOVE/doc && rm -rf html/boost_multiprecision && ../../../b2 -j2 address-model=64 architecture=x86 toolset=gcc cxxflags="-std=gnu++14" release
       - run:
           name: Running Inspect
           command: |
