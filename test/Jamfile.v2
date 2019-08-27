@@ -751,6 +751,11 @@ test-suite misc :
          [ check-target-builds ../config//has_intel_quad : <cxxflags>-Qoption,cpp,--extended_float_type <define>HAVE_FLOAT128 : ] 
          [ requires cxx11_constexpr cxx11_user_defined_literals ] ]
 
+      [ compile constexpr_test_arithmetic_backend.cpp : 
+         [ requires cxx14_constexpr cxx17_if_constexpr ] ]
+      [ compile constexpr_test_float128.cpp : 
+         [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_float128 : <source>quadmath : <build>no ] ]
+
       [ compile test_nothrow_cpp_int.cpp ]
       [ compile test_nothrow_cpp_rational.cpp ]
       [ compile test_nothrow_cpp_bin_float.cpp ]

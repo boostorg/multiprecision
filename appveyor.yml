@@ -44,37 +44,30 @@ environment:
       TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
     - ARGS: --toolset=msvc-14.0 address-model=64 
       TARGETS: conversions misc compile_fail examples concepts
-    #- ARGS: --toolset=msvc-14.0 address-model=64 cxxflags=-std:c++latest
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      ARGS: --toolset=msvc-14.1 address-model=64 
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      ARGS: --toolset=msvc-14.2 address-model=64 cxxstd=17
       TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      ARGS: --toolset=msvc-14.1 address-model=64 
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      ARGS: --toolset=msvc-14.2 address-model=64 cxxstd=17 
       TARGETS: conversions misc compile_fail examples concepts
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      ARGS: --toolset=msvc-14.1 address-model=32 
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      ARGS: --toolset=msvc-14.2 address-model=32  cxxstd=17
       TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      ARGS: --toolset=msvc-14.1 address-model=32 
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      ARGS: --toolset=msvc-14.2 address-model=32  cxxstd=17
       TARGETS: conversions misc compile_fail examples concepts
-    #- APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-    #  ARGS: --toolset=msvc-14.1 address-model=64 cxxflags=-std:c++latest
     - ARGS: --toolset=gcc address-model=64 
       TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
-      PATH: C:\mingw-w64\x86_64-6.3.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH%
+      PATH: C:\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin;%PATH%
     - ARGS: --toolset=gcc address-model=64 
       TARGETS: conversions misc compile_fail examples concepts
-      PATH: C:\mingw-w64\x86_64-6.3.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH%
-    - ARGS: --toolset=gcc address-model=64 cxxflags=-std=gnu++1z 
+      PATH: C:\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin;%PATH%
+    - ARGS: --toolset=gcc address-model=64 cxxstd=2a cxxstd-dialect=gnu 
       TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
-      PATH: C:\mingw-w64\x86_64-6.3.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH%
-    - ARGS: --toolset=gcc address-model=64 cxxflags=-std=gnu++1z 
+      PATH: C:\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin;%PATH%
+    - ARGS: --toolset=gcc address-model=64 cxxstd=2a cxxstd-dialect=gnu 
       TARGETS: conversions misc compile_fail examples concepts
-      PATH: C:\mingw-w64\x86_64-6.3.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH%
-    - ARGS: --toolset=gcc address-model=32
-      PATH: C:\mingw-w64\i686-5.3.0-posix-dwarf-rt_v4-rev0\mingw32\bin;%PATH%
-    - ARGS: --toolset=gcc address-model=32 linkflags=-Wl,-allow-multiple-definition
-      PATH: C:\MinGW\bin;%PATH%
+      PATH: C:\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin;%PATH%
 
 
 install:
