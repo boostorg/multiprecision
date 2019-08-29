@@ -292,7 +292,7 @@ operator<<(const number<B, et_off>& a, const I& b)
 {
    number<B, et_off> result(a);
    using default_ops::eval_left_shift;
-   detail::check_shift_range(b, mpl::bool_<(sizeof(I) > sizeof(std::size_t))>(), is_signed<I>());
+   detail::check_shift_range(b, mpl::bool_<(sizeof(I) > sizeof(std::size_t))>(), mpl::bool_<is_signed<I>::value>());
    eval_left_shift(result.backend(), b);
    return result;
 }
@@ -302,7 +302,7 @@ operator>>(const number<B, et_off>& a, const I& b)
 {
    number<B, et_off> result(a);
    using default_ops::eval_right_shift;
-   detail::check_shift_range(b, mpl::bool_<(sizeof(I) > sizeof(std::size_t))>(), is_signed<I>());
+   detail::check_shift_range(b, mpl::bool_<(sizeof(I) > sizeof(std::size_t))>(), mpl::bool_<is_signed<I>::value>());
    eval_right_shift(result.backend(), b);
    return result;
 }

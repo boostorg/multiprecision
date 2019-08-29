@@ -616,7 +616,7 @@ class number
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<is_integral<V>::value, number&>::type operator<<=(V val)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The left-shift operation is only valid for integer types");
-      detail::check_shift_range(val, mpl::bool_<(sizeof(V) > sizeof(std::size_t))>(), is_signed<V>());
+      detail::check_shift_range(val, mpl::bool_<(sizeof(V) > sizeof(std::size_t))>(), mpl::bool_<is_signed<V>::value>());
       eval_left_shift(m_backend, static_cast<std::size_t>(canonical_value(val)));
       return *this;
    }
@@ -625,7 +625,7 @@ class number
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<is_integral<V>::value, number&>::type operator>>=(V val)
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The right-shift operation is only valid for integer types");
-      detail::check_shift_range(val, mpl::bool_<(sizeof(V) > sizeof(std::size_t))>(), is_signed<V>());
+      detail::check_shift_range(val, mpl::bool_<(sizeof(V) > sizeof(std::size_t))>(), mpl::bool_<is_signed<V>::value>());
       eval_right_shift(m_backend, static_cast<std::size_t>(canonical_value(val)));
       return *this;
    }
@@ -1427,7 +1427,7 @@ class number
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The right shift operation is only valid for integer types");
       using default_ops::eval_right_shift;
-      detail::check_shift_range(val, mpl::bool_<(sizeof(Val) > sizeof(std::size_t))>(), is_signed<Val>());
+      detail::check_shift_range(val, mpl::bool_<(sizeof(Val) > sizeof(std::size_t))>(), mpl::bool_<is_signed<Val>::value>());
       eval_right_shift(m_backend, canonical_value(e.value()), static_cast<std::size_t>(val));
    }
 
@@ -1436,7 +1436,7 @@ class number
    {
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The left shift operation is only valid for integer types");
       using default_ops::eval_left_shift;
-      detail::check_shift_range(val, mpl::bool_<(sizeof(Val) > sizeof(std::size_t))>(), is_signed<Val>());
+      detail::check_shift_range(val, mpl::bool_<(sizeof(Val) > sizeof(std::size_t))>(), mpl::bool_<is_signed<Val>::value>());
       eval_left_shift(m_backend, canonical_value(e.value()), static_cast<std::size_t>(val));
    }
 
@@ -1446,7 +1446,7 @@ class number
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The right shift operation is only valid for integer types");
       using default_ops::eval_right_shift;
       self_type temp(e);
-      detail::check_shift_range(val, mpl::bool_<(sizeof(Val) > sizeof(std::size_t))>(), is_signed<Val>());
+      detail::check_shift_range(val, mpl::bool_<(sizeof(Val) > sizeof(std::size_t))>(), mpl::bool_<is_signed<Val>::value>());
       eval_right_shift(m_backend, temp.backend(), static_cast<std::size_t>(val));
    }
 
@@ -1456,7 +1456,7 @@ class number
       BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The left shift operation is only valid for integer types");
       using default_ops::eval_left_shift;
       self_type temp(e);
-      detail::check_shift_range(val, mpl::bool_<(sizeof(Val) > sizeof(std::size_t))>(), is_signed<Val>());
+      detail::check_shift_range(val, mpl::bool_<(sizeof(Val) > sizeof(std::size_t))>(), mpl::bool_<is_signed<Val>::value>());
       eval_left_shift(m_backend, temp.backend(), static_cast<std::size_t>(val));
    }
 

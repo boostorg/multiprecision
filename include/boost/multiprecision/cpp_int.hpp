@@ -151,22 +151,22 @@ struct is_fixed_precision<cpp_int_backend<MinBits, MaxBits, SignType, Checked, A
 
 namespace detail {
 
-inline void verify_new_size(unsigned new_size, unsigned min_size, const mpl::int_<checked>&)
+inline BOOST_MP_CXX14_CONSTEXPR void verify_new_size(unsigned new_size, unsigned min_size, const mpl::int_<checked>&)
 {
    if (new_size < min_size)
       BOOST_THROW_EXCEPTION(std::overflow_error("Unable to allocate sufficient storage for the value of the result: value overflows the maximum allowable magnitude."));
 }
-inline void verify_new_size(unsigned /*new_size*/, unsigned /*min_size*/, const mpl::int_<unchecked>&) {}
+inline BOOST_CONSTEXPR void verify_new_size(unsigned /*new_size*/, unsigned /*min_size*/, const mpl::int_<unchecked>&) {}
 
 template <class U>
-inline void verify_limb_mask(bool b, U limb, U mask, const mpl::int_<checked>&)
+inline BOOST_MP_CXX14_CONSTEXPR void verify_limb_mask(bool b, U limb, U mask, const mpl::int_<checked>&)
 {
    // When we mask out "limb" with "mask", do we loose bits?  If so it's an overflow error:
    if (b && (limb & ~mask))
       BOOST_THROW_EXCEPTION(std::overflow_error("Overflow in cpp_int arithmetic: there is insufficient precision in the target type to hold all of the bits of the result."));
 }
 template <class U>
-inline void verify_limb_mask(bool /*b*/, U /*limb*/, U /*mask*/, const mpl::int_<unchecked>&) {}
+inline BOOST_CONSTEXPR void verify_limb_mask(bool /*b*/, U /*limb*/, U /*mask*/, const mpl::int_<unchecked>&) {}
 
 } // namespace detail
 
@@ -457,9 +457,28 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
       limb_type        m_first_limb;
       double_limb_type m_double_first_limb;
 
-      BOOST_CONSTEXPR data_type() : m_first_limb(0) {}
-      BOOST_CONSTEXPR data_type(limb_type i) : m_first_limb(i) {}
-      BOOST_CONSTEXPR data_type(double_limb_type i) : m_double_first_limb(i) {}
+      BOOST_CONSTEXPR data_type() 
+#ifdef BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX
+         : m_first_limb(0) {}
+#else
+         : m_data{ 0 } {}
+#endif
+      BOOST_CONSTEXPR data_type(limb_type i) 
+#ifdef BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX
+         : m_first_limb(i) {}
+#else
+         : m_data{ i } {}
+#endif
+      BOOST_CONSTEXPR data_type(double_limb_type i) : m_double_first_limb(i)
+      {
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+         if (BOOST_MP_IS_CONST_EVALUATED(m_double_first_limb))
+         {
+            m_data[0] = i & max_limb_value;
+            m_data[1] = i >> limb_bits;
+         }
+#endif
+      }
 #if defined(BOOST_MP_USER_DEFINED_LITERALS)
       template <limb_type... VALUES>
       BOOST_CONSTEXPR data_type(literals::detail::value_pack<VALUES...>) : m_data{VALUES...}
@@ -505,11 +524,11 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
-   BOOST_MP_FORCEINLINE unsigned size() const BOOST_NOEXCEPT { return m_limbs; }
-   BOOST_MP_FORCEINLINE limb_pointer limbs() BOOST_NOEXCEPT { return m_wrapper.m_data; }
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR unsigned size() const BOOST_NOEXCEPT { return m_limbs; }
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR limb_pointer limbs() BOOST_NOEXCEPT { return m_wrapper.m_data; }
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const_limb_pointer limbs() const BOOST_NOEXCEPT { return m_wrapper.m_data; }
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR bool sign() const BOOST_NOEXCEPT { return m_sign; }
-   BOOST_MP_FORCEINLINE void                 sign(bool b) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void sign(bool b) BOOST_NOEXCEPT
    {
       m_sign = b;
       // Check for zero value:
@@ -519,12 +538,12 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
             m_sign = false;
       }
    }
-   BOOST_MP_FORCEINLINE void resize(unsigned new_size, unsigned min_size) BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void resize(unsigned new_size, unsigned min_size) BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
    {
       m_limbs = static_cast<boost::uint16_t>((std::min)(new_size, internal_limb_count));
       detail::verify_new_size(m_limbs, min_size, checked_type());
    }
-   BOOST_MP_FORCEINLINE void normalize() BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void normalize() BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
    {
       limb_pointer p = limbs();
       detail::verify_limb_mask(m_limbs == internal_limb_count, p[internal_limb_count - 1], upper_limb_mask, checked_type());
@@ -544,16 +563,24 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
    // Defaulted functions:
    //~cpp_int_base() BOOST_NOEXCEPT {}
 
-   void assign(const cpp_int_base& o) BOOST_NOEXCEPT
+   void BOOST_MP_CXX14_CONSTEXPR assign(const cpp_int_base& o) BOOST_NOEXCEPT
    {
       if (this != &o)
       {
          m_limbs = o.m_limbs;
-         std::memcpy(limbs(), o.limbs(), o.size() * sizeof(o.limbs()[0]));
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+         if (BOOST_MP_IS_CONST_EVALUATED(m_limbs))
+         {
+            for (unsigned i = 0; i < m_limbs; ++i)
+               limbs()[i] = o.limbs()[i];
+         }
+         else
+#endif
+            std::memcpy(limbs(), o.limbs(), o.size() * sizeof(o.limbs()[0]));
          m_sign = o.m_sign;
       }
    }
-   BOOST_MP_FORCEINLINE void negate() BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void negate() BOOST_NOEXCEPT
    {
       m_sign = !m_sign;
       // Check for zero value:
@@ -563,11 +590,11 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
             m_sign = false;
       }
    }
-   BOOST_MP_FORCEINLINE bool isneg() const BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR bool isneg() const BOOST_NOEXCEPT
    {
       return m_sign;
    }
-   BOOST_MP_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
       for (unsigned i = 0; i < (std::max)(size(), o.size()); ++i)
          std::swap(m_wrapper.m_data[i], o.m_wrapper.m_data[i]);
@@ -577,7 +604,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
 
  protected:
    template <class A>
-   void check_in_range(const A&) BOOST_NOEXCEPT {}
+   BOOST_MP_CXX14_CONSTEXPR void check_in_range(const A&) BOOST_NOEXCEPT {}
 };
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
 
@@ -624,9 +651,28 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
       limb_type        m_first_limb;
       double_limb_type m_double_first_limb;
 
-      BOOST_CONSTEXPR data_type() : m_first_limb(0) {}
-      BOOST_CONSTEXPR data_type(limb_type i) : m_first_limb(i) {}
-      BOOST_CONSTEXPR data_type(double_limb_type i) : m_double_first_limb(i) {}
+      BOOST_CONSTEXPR data_type() 
+#ifdef BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX
+         : m_first_limb(0) {}
+#else
+         : m_data{ 0 } {}
+#endif
+      BOOST_CONSTEXPR data_type(limb_type i) 
+#ifdef BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX
+         : m_first_limb(i) {}
+#else
+         : m_data{ i } {}
+#endif
+      BOOST_CONSTEXPR data_type(double_limb_type i) : m_double_first_limb(i) 
+      {
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+         if (BOOST_MP_IS_CONST_EVALUATED(m_double_first_limb))
+         {
+            m_data[0] = i & max_limb_value;
+            m_data[1] = i >> limb_bits;
+         }
+#endif
+      }
 #if defined(BOOST_MP_USER_DEFINED_LITERALS)
       template <limb_type... VALUES>
       BOOST_CONSTEXPR data_type(literals::detail::value_pack<VALUES...>) : m_data{VALUES...}
@@ -642,7 +688,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(limb_type i) BOOST_NOEXCEPT
        : m_wrapper(i),
          m_limbs(1) {}
-   BOOST_MP_FORCEINLINE cpp_int_base(signed_limb_type i) BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_base(signed_limb_type i) BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
        : m_wrapper(limb_type(i < 0 ? static_cast<limb_type>(-static_cast<signed_double_limb_type>(i)) : i)), m_limbs(1)
    {
       if (i < 0)
@@ -653,7 +699,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
        : m_wrapper(i),
          m_limbs(i > max_limb_value ? 2 : 1)
    {}
-   BOOST_MP_FORCEINLINE cpp_int_base(signed_double_limb_type i) BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_base(signed_double_limb_type i) BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
        : m_wrapper(double_limb_type(i < 0 ? static_cast<double_limb_type>(boost::multiprecision::detail::unsigned_abs(i)) : i)),
          m_limbs(i < 0 ? (static_cast<double_limb_type>(boost::multiprecision::detail::unsigned_abs(i)) > max_limb_value ? 2 : 1) : (i > max_limb_value ? 2 : 1))
    {
@@ -672,21 +718,21 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
-   BOOST_MP_FORCEINLINE unsigned size() const BOOST_NOEXCEPT { return m_limbs; }
-   BOOST_MP_FORCEINLINE limb_pointer limbs() BOOST_NOEXCEPT { return m_wrapper.m_data; }
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR unsigned size() const BOOST_NOEXCEPT { return m_limbs; }
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR limb_pointer limbs() BOOST_NOEXCEPT { return m_wrapper.m_data; }
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const_limb_pointer limbs() const BOOST_NOEXCEPT { return m_wrapper.m_data; }
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR bool sign() const BOOST_NOEXCEPT { return false; }
-   BOOST_MP_FORCEINLINE void                 sign(bool b) BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void sign(bool b) BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
    {
       if (b)
          negate();
    }
-   BOOST_MP_FORCEINLINE void resize(unsigned new_size, unsigned min_size) BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void resize(unsigned new_size, unsigned min_size) BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
    {
       m_limbs = (std::min)(new_size, internal_limb_count);
       detail::verify_new_size(m_limbs, min_size, checked_type());
    }
-   BOOST_MP_FORCEINLINE void normalize() BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void normalize() BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
    {
       limb_pointer p = limbs();
       detail::verify_limb_mask(m_limbs == internal_limb_count, p[internal_limb_count - 1], upper_limb_mask, checked_type());
@@ -704,12 +750,20 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
    // Defaulted functions:
    //~cpp_int_base() BOOST_NOEXCEPT {}
 
-   BOOST_MP_FORCEINLINE void assign(const cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void assign(const cpp_int_base& o) BOOST_NOEXCEPT
    {
       if (this != &o)
       {
          m_limbs = o.m_limbs;
-         std::memcpy(limbs(), o.limbs(), o.size() * sizeof(limbs()[0]));
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+         if (BOOST_MP_IS_CONST_EVALUATED(m_limbs))
+         {
+            for (unsigned i = 0; i < m_limbs; ++i)
+               limbs()[i] = o.limbs()[i];
+         }
+         else
+#endif
+            std::memcpy(limbs(), o.limbs(), o.size() * sizeof(limbs()[0]));
       }
    }
 
@@ -718,18 +772,18 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
    {
       BOOST_THROW_EXCEPTION(std::range_error("Attempt to negate an unsigned number."));
    }
-   void check_negate(const mpl::int_<unchecked>&) {}
+   BOOST_MP_CXX14_CONSTEXPR void check_negate(const mpl::int_<unchecked>&) {}
 
  public:
-   void negate() BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_CXX14_CONSTEXPR void negate() BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
    {
       // Not so much a negate as a complement - this gets called when subtraction
       // would result in a "negative" number:
-      unsigned i;
       if ((m_limbs == 1) && (m_wrapper.m_data[0] == 0))
          return; // negating zero is always zero, and always OK.
       check_negate(checked_type());
-      for (i = m_limbs; i < internal_limb_count; ++i)
+      unsigned i = m_limbs;
+      for (; i < internal_limb_count; ++i)
          m_wrapper.m_data[i] = 0;
       m_limbs = internal_limb_count;
       for (i = 0; i < internal_limb_count; ++i)
@@ -741,7 +795,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
    {
       return false;
    }
-   BOOST_MP_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
       for (unsigned i = 0; i < (std::max)(size(), o.size()); ++i)
          std::swap(m_wrapper.m_data[i], o.m_wrapper.m_data[i]);
@@ -750,7 +804,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
 
  protected:
    template <class A>
-   void check_in_range(const A&) BOOST_NOEXCEPT {}
+   BOOST_MP_CXX14_CONSTEXPR void check_in_range(const A&) BOOST_NOEXCEPT {}
 };
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
 
@@ -811,7 +865,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
 
  protected:
    template <class T>
-   typename boost::disable_if_c<!boost::is_integral<T>::value || (std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= (int)MinBits))>::type
+   BOOST_MP_CXX14_CONSTEXPR typename boost::disable_if_c<!boost::is_integral<T>::value || (std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= (int)MinBits))>::type
    check_in_range(T val, const mpl::int_<checked>&)
    {
       typedef typename common_type<typename make_unsigned<T>::type, local_limb_type>::type common_type;
@@ -820,7 +874,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
          BOOST_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
    }
    template <class T>
-   typename boost::disable_if_c<boost::is_integral<T>::value || (std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= (int)MinBits))>::type
+   BOOST_MP_CXX14_CONSTEXPR typename boost::disable_if_c<boost::is_integral<T>::value || (std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= (int)MinBits))>::type
    check_in_range(T val, const mpl::int_<checked>&)
    {
       using std::abs;
@@ -830,10 +884,10 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
          BOOST_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
    }
    template <class T, int C>
-   void check_in_range(T, const mpl::int_<C>&) BOOST_NOEXCEPT {}
+   BOOST_MP_CXX14_CONSTEXPR void check_in_range(T, const mpl::int_<C>&) BOOST_NOEXCEPT {}
 
    template <class T>
-   void check_in_range(T val) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_base>().check_in_range(std::declval<T>(), checked_type())))
+   BOOST_MP_CXX14_CONSTEXPR void check_in_range(T val) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_base>().check_in_range(std::declval<T>(), checked_type())))
    {
       check_in_range(val, checked_type());
    }
@@ -846,7 +900,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(SI i, typename boost::enable_if_c<is_signed<SI>::value && (Checked == unchecked)>::type const* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_base>().check_in_range(std::declval<SI>())))
        : m_data(i < 0 ? static_cast<local_limb_type>(static_cast<typename make_unsigned<SI>::type>(boost::multiprecision::detail::unsigned_abs(i)) & limb_mask) : static_cast<local_limb_type>(i & limb_mask)), m_sign(i < 0) {}
    template <class SI>
-   BOOST_MP_FORCEINLINE cpp_int_base(SI i, typename boost::enable_if_c<is_signed<SI>::value && (Checked == checked)>::type const* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_base>().check_in_range(std::declval<SI>())))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_base(SI i, typename boost::enable_if_c<is_signed<SI>::value && (Checked == checked)>::type const* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_base>().check_in_range(std::declval<SI>())))
        : m_data(i < 0 ? (static_cast<local_limb_type>(static_cast<typename make_unsigned<SI>::type>(boost::multiprecision::detail::unsigned_abs(i)) & limb_mask)) : static_cast<local_limb_type>(i & limb_mask)), m_sign(i < 0)
    {
       check_in_range(i);
@@ -856,14 +910,14 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
        : m_data(static_cast<local_limb_type>(i) & limb_mask),
          m_sign(false) {}
    template <class UI>
-   BOOST_MP_FORCEINLINE cpp_int_base(UI i, typename boost::enable_if_c<is_unsigned<UI>::value && (Checked == checked)>::type const* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_base>().check_in_range(std::declval<UI>())))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_base(UI i, typename boost::enable_if_c<is_unsigned<UI>::value && (Checked == checked)>::type const* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_base>().check_in_range(std::declval<UI>())))
        : m_data(static_cast<local_limb_type>(i) & limb_mask), m_sign(false) { check_in_range(i); }
    template <class F>
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(F i, typename boost::enable_if_c<is_floating_point<F>::value && (Checked == unchecked)>::type const* = 0) BOOST_NOEXCEPT
        : m_data(static_cast<local_limb_type>(std::fabs(i)) & limb_mask),
          m_sign(i < 0) {}
    template <class F>
-   BOOST_MP_FORCEINLINE cpp_int_base(F i, typename boost::enable_if_c<is_floating_point<F>::value && (Checked == checked)>::type const* = 0)
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_base(F i, typename boost::enable_if_c<is_floating_point<F>::value && (Checked == checked)>::type const* = 0)
        : m_data(static_cast<local_limb_type>(std::fabs(i)) & limb_mask), m_sign(i < 0) { check_in_range(i); }
 #if defined(BOOST_MP_USER_DEFINED_LITERALS)
    BOOST_CONSTEXPR cpp_int_base(literals::detail::value_pack<>) BOOST_NOEXCEPT
@@ -886,10 +940,10 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
    // Helper functions for getting at our internal data, and manipulating storage:
    //
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR unsigned size() const BOOST_NOEXCEPT { return 1; }
-   BOOST_MP_FORCEINLINE limb_pointer limbs() BOOST_NOEXCEPT { return &m_data; }
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_pointer limbs() BOOST_NOEXCEPT { return &m_data; }
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const_limb_pointer limbs() const BOOST_NOEXCEPT { return &m_data; }
-   BOOST_MP_FORCEINLINE bool                               sign() const BOOST_NOEXCEPT { return m_sign; }
-   BOOST_MP_FORCEINLINE void                               sign(bool b) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR bool sign() const BOOST_NOEXCEPT { return m_sign; }
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void sign(bool b) BOOST_NOEXCEPT
    {
       m_sign = b;
       // Check for zero value:
@@ -898,11 +952,11 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
          m_sign = false;
       }
    }
-   BOOST_MP_FORCEINLINE void resize(unsigned /* new_size */, unsigned min_size)
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void resize(unsigned /* new_size */, unsigned min_size)
    {
       detail::verify_new_size(2, min_size, checked_type());
    }
-   BOOST_MP_FORCEINLINE void normalize() BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void normalize() BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
    {
       if (!m_data)
          m_sign = false; // zero is always unsigned
@@ -915,12 +969,12 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
        : m_data(o.m_data),
          m_sign(o.m_sign) {}
    //~cpp_int_base() BOOST_NOEXCEPT {}
-   BOOST_MP_FORCEINLINE void assign(const cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void assign(const cpp_int_base& o) BOOST_NOEXCEPT
    {
       m_data = o.m_data;
       m_sign = o.m_sign;
    }
-   BOOST_MP_FORCEINLINE void negate() BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void negate() BOOST_NOEXCEPT
    {
       m_sign = !m_sign;
       // Check for zero value:
@@ -929,11 +983,11 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
          m_sign = false;
       }
    }
-   BOOST_MP_FORCEINLINE bool isneg() const BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR bool isneg() const BOOST_NOEXCEPT
    {
       return m_sign;
    }
-   BOOST_MP_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
       std::swap(m_sign, o.m_sign);
       std::swap(m_data, o.m_data);
@@ -965,7 +1019,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
 
  protected:
    template <class T>
-   typename boost::disable_if_c<std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= (int)MinBits)>::type
+   BOOST_MP_CXX14_CONSTEXPR typename boost::disable_if_c<std::numeric_limits<T>::is_specialized && (std::numeric_limits<T>::digits <= (int)MinBits)>::type
    check_in_range(T val, const mpl::int_<checked>&, const boost::false_type&)
    {
       typedef typename common_type<T, local_limb_type>::type common_type;
@@ -974,7 +1028,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
          BOOST_THROW_EXCEPTION(std::range_error("The argument to a cpp_int constructor exceeded the largest value it can represent."));
    }
    template <class T>
-   void check_in_range(T val, const mpl::int_<checked>&, const boost::true_type&)
+   BOOST_MP_CXX14_CONSTEXPR void check_in_range(T val, const mpl::int_<checked>&, const boost::true_type&)
    {
       typedef typename common_type<T, local_limb_type>::type common_type;
 
@@ -984,10 +1038,10 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
          BOOST_THROW_EXCEPTION(std::range_error("The argument to an unsigned cpp_int constructor was negative."));
    }
    template <class T, int C, bool B>
-   BOOST_MP_FORCEINLINE void check_in_range(T, const mpl::int_<C>&, const boost::integral_constant<bool, B>&) BOOST_NOEXCEPT {}
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void check_in_range(T, const mpl::int_<C>&, const boost::integral_constant<bool, B>&) BOOST_NOEXCEPT {}
 
    template <class T>
-   BOOST_MP_FORCEINLINE void check_in_range(T val) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_base>().check_in_range(std::declval<T>(), checked_type(), is_signed<T>())))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void check_in_range(T val) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_base>().check_in_range(std::declval<T>(), checked_type(), is_signed<T>())))
    {
       check_in_range(val, checked_type(), is_signed<T>());
    }
@@ -1002,13 +1056,13 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
        : m_data(i < 0 ? (1 + ~static_cast<local_limb_type>(-i & limb_mask)) & limb_mask : static_cast<local_limb_type>(i & limb_mask))
    {}
    template <class SI>
-   BOOST_MP_FORCEINLINE cpp_int_base(SI i, typename boost::enable_if_c<is_signed<SI>::value && (Checked == checked)>::type const* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_base>().check_in_range(std::declval<SI>())))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_base(SI i, typename boost::enable_if_c<is_signed<SI>::value && (Checked == checked)>::type const* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_base>().check_in_range(std::declval<SI>())))
        : m_data(i < 0 ? 1 + ~static_cast<local_limb_type>(-i & limb_mask) : static_cast<local_limb_type>(i & limb_mask)) { check_in_range(i); }
    template <class UI>
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(UI i, typename boost::enable_if_c<is_unsigned<UI>::value && (Checked == unchecked)>::type const* = 0) BOOST_NOEXCEPT
        : m_data(static_cast<local_limb_type>(i& limb_mask)) {}
    template <class UI>
-   BOOST_MP_FORCEINLINE cpp_int_base(UI i, typename boost::enable_if_c<is_unsigned<UI>::value && (Checked == checked)>::type const* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_base>().check_in_range(std::declval<UI>())))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_base(UI i, typename boost::enable_if_c<is_unsigned<UI>::value && (Checked == checked)>::type const* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_base>().check_in_range(std::declval<UI>())))
        : m_data(static_cast<local_limb_type>(i & limb_mask)) { check_in_range(i); }
 #else
    template <class SI>
@@ -1016,17 +1070,17 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
        : m_data(i < 0 ? (1 + ~static_cast<local_limb_type>(-i)) & limb_mask : static_cast<local_limb_type>(i) & limb_mask)
    {}
    template <class SI>
-   BOOST_MP_FORCEINLINE cpp_int_base(SI i, typename boost::enable_if_c<is_signed<SI>::value && (Checked == checked)>::type const* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_base>().check_in_range(std::declval<SI>())))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_base(SI i, typename boost::enable_if_c<is_signed<SI>::value && (Checked == checked)>::type const* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_base>().check_in_range(std::declval<SI>())))
        : m_data(i < 0 ? 1 + ~static_cast<local_limb_type>(-i) : static_cast<local_limb_type>(i)) { check_in_range(i); }
    template <class UI>
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(UI i, typename boost::enable_if_c<is_unsigned<UI>::value && (Checked == unchecked)>::type const* = 0) BOOST_NOEXCEPT
        : m_data(static_cast<local_limb_type>(i) & limb_mask) {}
    template <class UI>
-   BOOST_MP_FORCEINLINE cpp_int_base(UI i, typename boost::enable_if_c<is_unsigned<UI>::value && (Checked == checked)>::type const* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_base>().check_in_range(std::declval<UI>())))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_base(UI i, typename boost::enable_if_c<is_unsigned<UI>::value && (Checked == checked)>::type const* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_base>().check_in_range(std::declval<UI>())))
        : m_data(static_cast<local_limb_type>(i)) { check_in_range(i); }
 #endif
    template <class F>
-   BOOST_MP_FORCEINLINE cpp_int_base(F i, typename boost::enable_if<is_floating_point<F> >::type const* = 0) BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_base(F i, typename boost::enable_if<is_floating_point<F> >::type const* = 0) BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
        : m_data(static_cast<local_limb_type>(std::fabs(i)) & limb_mask)
    {
       check_in_range(i);
@@ -1048,19 +1102,19 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
    // Helper functions for getting at our internal data, and manipulating storage:
    //
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR unsigned size() const BOOST_NOEXCEPT { return 1; }
-   BOOST_MP_FORCEINLINE limb_pointer limbs() BOOST_NOEXCEPT { return &m_data; }
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_pointer limbs() BOOST_NOEXCEPT { return &m_data; }
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const_limb_pointer limbs() const BOOST_NOEXCEPT { return &m_data; }
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR bool sign() const BOOST_NOEXCEPT { return false; }
-   BOOST_MP_FORCEINLINE void                 sign(bool b) BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void sign(bool b) BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
    {
       if (b)
          negate();
    }
-   BOOST_MP_FORCEINLINE void resize(unsigned, unsigned min_size)
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void resize(unsigned, unsigned min_size)
    {
       detail::verify_new_size(2, min_size, checked_type());
    }
-   BOOST_MP_FORCEINLINE void normalize() BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void normalize() BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
    {
       detail::verify_limb_mask(true, m_data, limb_mask, checked_type());
       m_data &= limb_mask;
@@ -1070,11 +1124,11 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(const cpp_int_base& o) BOOST_NOEXCEPT
        : m_data(o.m_data) {}
    //~cpp_int_base() BOOST_NOEXCEPT {}
-   BOOST_MP_FORCEINLINE void assign(const cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void assign(const cpp_int_base& o) BOOST_NOEXCEPT
    {
       m_data = o.m_data;
    }
-   BOOST_MP_FORCEINLINE void negate() BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void negate() BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
    {
       if (Checked == checked)
       {
@@ -1087,7 +1141,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
    {
       return false;
    }
-   BOOST_MP_FORCEINLINE void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
       std::swap(m_data, o.m_data);
    }
@@ -1167,7 +1221,7 @@ struct cpp_int_backend
 
  private:
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-   void do_assign(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other, mpl::true_ const&, mpl::true_ const&)
+   BOOST_MP_CXX14_CONSTEXPR void do_assign(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other, mpl::true_ const&, mpl::true_ const&)
    {
       // Assigning trivial type to trivial type:
       this->check_in_range(*other.limbs());
@@ -1176,7 +1230,7 @@ struct cpp_int_backend
       this->normalize();
    }
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-   void do_assign(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other, mpl::true_ const&, mpl::false_ const&)
+   BOOST_MP_CXX14_CONSTEXPR void do_assign(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other, mpl::true_ const&, mpl::false_ const&)
    {
       // non-trivial to trivial narrowing conversion:
       double_limb_type v = *other.limbs();
@@ -1193,7 +1247,7 @@ struct cpp_int_backend
       this->normalize();
    }
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-   void do_assign(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other, mpl::false_ const&, mpl::true_ const&)
+   BOOST_MP_CXX14_CONSTEXPR void do_assign(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other, mpl::false_ const&, mpl::true_ const&)
    {
       // trivial to non-trivial, treat the trivial argument as if it were an unsigned arithmetic type, then set the sign afterwards:
       *this = static_cast<
@@ -1203,18 +1257,23 @@ struct cpp_int_backend
       this->sign(other.sign());
    }
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-   void do_assign(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other, mpl::false_ const&, mpl::false_ const&)
+   BOOST_MP_CXX14_CONSTEXPR void do_assign(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other, mpl::false_ const&, mpl::false_ const&)
    {
       // regular non-trivial to non-trivial assign:
       this->resize(other.size(), other.size());
-      std::memcpy(this->limbs(), other.limbs(), (std::min)(other.size(), this->size()) * sizeof(this->limbs()[0]));
+
+      unsigned count = (std::min)(other.size(), this->size());
+      for (unsigned i = 0; i < count; ++i)
+         this->limbs()[i] = other.limbs()[i];
+         //std::memcpy(this->limbs(), other.limbs(), (std::min)(other.size(), this->size()) * sizeof(this->limbs()[0]));
+
       this->sign(other.sign());
       this->normalize();
    }
 
  public:
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-   cpp_int_backend(
+   BOOST_MP_CXX14_CONSTEXPR cpp_int_backend(
        const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other,
        typename boost::enable_if_c<is_implicit_cpp_int_conversion<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>, self_type>::value>::type* = 0)
        : base_type()
@@ -1225,7 +1284,7 @@ struct cpp_int_backend
           mpl::bool_<is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>());
    }
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-   explicit cpp_int_backend(
+   explicit BOOST_MP_CXX14_CONSTEXPR cpp_int_backend(
        const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other,
        typename boost::disable_if_c<is_implicit_cpp_int_conversion<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>, self_type>::value>::type* = 0)
        : base_type()
@@ -1236,7 +1295,7 @@ struct cpp_int_backend
           mpl::bool_<is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>());
    }
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-   cpp_int_backend& operator=(
+   BOOST_MP_CXX14_CONSTEXPR cpp_int_backend& operator=(
        const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& other)
    {
       do_assign(
@@ -1251,13 +1310,13 @@ struct cpp_int_backend
    {}
 #endif
 
-   BOOST_MP_FORCEINLINE cpp_int_backend& operator=(const cpp_int_backend& o) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_backend>().assign(std::declval<const cpp_int_backend&>())))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_backend& operator=(const cpp_int_backend& o) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_backend>().assign(std::declval<const cpp_int_backend&>())))
    {
       this->assign(o);
       return *this;
    }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-   BOOST_MP_FORCEINLINE cpp_int_backend& operator=(cpp_int_backend&& o) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<base_type&>() = std::declval<base_type>()))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_backend& operator=(cpp_int_backend&& o) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<base_type&>() = std::declval<base_type>()))
    {
       *static_cast<base_type*>(this) = static_cast<base_type&&>(o);
       return *this;
@@ -1265,7 +1324,7 @@ struct cpp_int_backend
 #endif
  private:
    template <class A>
-   typename boost::enable_if<is_unsigned<A> >::type do_assign_arithmetic(A val, const mpl::true_&)
+   BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<is_unsigned<A> >::type do_assign_arithmetic(A val, const mpl::true_&)
        BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_backend>().check_in_range(std::declval<A>())))
    {
       this->check_in_range(val);
@@ -1274,7 +1333,7 @@ struct cpp_int_backend
       this->normalize();
    }
    template <class A>
-   typename boost::disable_if_c<is_unsigned<A>::value || !is_integral<A>::value>::type do_assign_arithmetic(A val, const mpl::true_&)
+   BOOST_MP_CXX14_CONSTEXPR typename boost::disable_if_c<is_unsigned<A>::value || !is_integral<A>::value>::type do_assign_arithmetic(A val, const mpl::true_&)
        BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_backend>().check_in_range(std::declval<A>())) && noexcept(std::declval<cpp_int_backend>().sign(true)))
    {
       this->check_in_range(val);
@@ -1283,26 +1342,26 @@ struct cpp_int_backend
       this->normalize();
    }
    template <class A>
-   typename boost::enable_if_c<!is_integral<A>::value>::type do_assign_arithmetic(A val, const mpl::true_&)
+   BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<!is_integral<A>::value>::type do_assign_arithmetic(A val, const mpl::true_&)
    {
       this->check_in_range(val);
       *this->limbs() = (val < 0) ? static_cast<typename self_type::local_limb_type>(boost::multiprecision::detail::abs(val)) : static_cast<typename self_type::local_limb_type>(val);
       this->sign(val < 0);
       this->normalize();
    }
-   BOOST_MP_FORCEINLINE void do_assign_arithmetic(limb_type i, const mpl::false_&) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void do_assign_arithmetic(limb_type i, const mpl::false_&) BOOST_NOEXCEPT
    {
       this->resize(1, 1);
       *this->limbs() = i;
       this->sign(false);
    }
-   BOOST_MP_FORCEINLINE void do_assign_arithmetic(signed_limb_type i, const mpl::false_&) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_backend>().sign(true)))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void do_assign_arithmetic(signed_limb_type i, const mpl::false_&) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_backend>().sign(true)))
    {
       this->resize(1, 1);
       *this->limbs() = static_cast<limb_type>(boost::multiprecision::detail::unsigned_abs(i));
       this->sign(i < 0);
    }
-   void do_assign_arithmetic(double_limb_type i, const mpl::false_&) BOOST_NOEXCEPT
+   BOOST_MP_CXX14_CONSTEXPR void do_assign_arithmetic(double_limb_type i, const mpl::false_&) BOOST_NOEXCEPT
    {
       BOOST_STATIC_ASSERT(sizeof(i) == 2 * sizeof(limb_type));
       BOOST_STATIC_ASSERT(base_type::internal_limb_count >= 2);
@@ -1316,15 +1375,14 @@ struct cpp_int_backend
       this->resize(p[1] ? 2 : 1, p[1] ? 2 : 1);
       this->sign(false);
    }
-   void do_assign_arithmetic(signed_double_limb_type i, const mpl::false_&) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_backend>().sign(true)))
+   BOOST_MP_CXX14_CONSTEXPR void do_assign_arithmetic(signed_double_limb_type i, const mpl::false_&) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_backend>().sign(true)))
    {
       BOOST_STATIC_ASSERT(sizeof(i) == 2 * sizeof(limb_type));
       BOOST_STATIC_ASSERT(base_type::internal_limb_count >= 2);
       bool             s = false;
-      double_limb_type ui;
       if (i < 0)
          s = true;
-      ui                                 = static_cast<double_limb_type>(boost::multiprecision::detail::unsigned_abs(i));
+      double_limb_type ui = static_cast<double_limb_type>(boost::multiprecision::detail::unsigned_abs(i));
       typename base_type::limb_pointer p = this->limbs();
 #ifdef __MSVC_RUNTIME_CHECKS
       *p = static_cast<limb_type>(ui & ~static_cast<limb_type>(0));
@@ -1336,7 +1394,7 @@ struct cpp_int_backend
       this->sign(s);
    }
 
-   void do_assign_arithmetic(long double a, const mpl::false_&)
+   BOOST_MP_CXX14_CONSTEXPR void do_assign_arithmetic(long double a, const mpl::false_&)
    {
       using default_ops::eval_add;
       using default_ops::eval_subtract;
@@ -1372,7 +1430,11 @@ struct cpp_int_backend
 
       f = frexp(a, &e);
 
+#ifdef BOOST_NO_CXX11_CONSTEXPR
       static const limb_type shift = std::numeric_limits<limb_type>::digits;
+#else
+      constexpr limb_type shift = std::numeric_limits<limb_type>::digits;
+#endif
 
       while (f)
       {
@@ -1395,7 +1457,7 @@ struct cpp_int_backend
 
  public:
    template <class Arithmetic>
-   BOOST_MP_FORCEINLINE typename boost::enable_if_c<!boost::multiprecision::detail::is_byte_container<Arithmetic>::value, cpp_int_backend&>::type operator=(Arithmetic val) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_backend>().do_assign_arithmetic(std::declval<Arithmetic>(), trivial_tag())))
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<!boost::multiprecision::detail::is_byte_container<Arithmetic>::value, cpp_int_backend&>::type operator=(Arithmetic val) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<cpp_int_backend>().do_assign_arithmetic(std::declval<Arithmetic>(), trivial_tag())))
    {
       do_assign_arithmetic(val, trivial_tag());
       return *this;
@@ -1614,7 +1676,7 @@ struct cpp_int_backend
       do_assign_string(s, trivial_tag());
       return *this;
    }
-   BOOST_MP_FORCEINLINE void swap(cpp_int_backend& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void swap(cpp_int_backend& o) BOOST_NOEXCEPT
    {
       this->do_swap(o);
    }
@@ -1857,7 +1919,7 @@ struct cpp_int_backend
       }
    }
    template <class Container>
-   void construct_from_container(const Container& c, const mpl::true_&)
+   BOOST_MP_CXX14_CONSTEXPR void construct_from_container(const Container& c, const mpl::true_&)
    {
       //
       // We assume that c is a sequence of (unsigned) bytes with the most significant byte first:
@@ -1882,7 +1944,7 @@ struct cpp_int_backend
 
  public:
    template <class Container>
-   cpp_int_backend(const Container& c, typename boost::enable_if_c<boost::multiprecision::detail::is_byte_container<Container>::value>::type const* = 0)
+   BOOST_MP_CXX14_CONSTEXPR cpp_int_backend(const Container& c, typename boost::enable_if_c<boost::multiprecision::detail::is_byte_container<Container>::value>::type const* = 0)
    {
       //
       // We assume that c is a sequence of (unsigned) bytes with the most significant byte first:
@@ -1890,7 +1952,7 @@ struct cpp_int_backend
       construct_from_container(c, trivial_tag());
    }
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-   int compare_imp(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o, const mpl::false_&, const mpl::false_&) const BOOST_NOEXCEPT
+   BOOST_MP_CXX14_CONSTEXPR int compare_imp(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o, const mpl::false_&, const mpl::false_&) const BOOST_NOEXCEPT
    {
       if (this->sign() != o.sign())
          return this->sign() ? -1 : 1;
@@ -1903,19 +1965,19 @@ struct cpp_int_backend
       return result;
    }
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-   int compare_imp(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o, const mpl::true_&, const mpl::false_&) const
+   BOOST_MP_CXX14_CONSTEXPR int compare_imp(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o, const mpl::true_&, const mpl::false_&) const
    {
       cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> t(*this);
       return t.compare(o);
    }
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-   int compare_imp(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o, const mpl::false_&, const mpl::true_&) const
+   BOOST_MP_CXX14_CONSTEXPR int compare_imp(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o, const mpl::false_&, const mpl::true_&) const
    {
       cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> t(o);
       return compare(t);
    }
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-   int compare_imp(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o, const mpl::true_&, const mpl::true_&) const BOOST_NOEXCEPT
+   BOOST_MP_CXX14_CONSTEXPR int compare_imp(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o, const mpl::true_&, const mpl::true_&) const BOOST_NOEXCEPT
    {
       if (this->sign())
       {
@@ -1934,14 +1996,14 @@ struct cpp_int_backend
       }
    }
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-   int compare(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o) const BOOST_NOEXCEPT
+   BOOST_MP_CXX14_CONSTEXPR int compare(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o) const BOOST_NOEXCEPT
    {
       typedef mpl::bool_<is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value>      t1;
       typedef mpl::bool_<is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value> t2;
       return compare_imp(o, t1(), t2());
    }
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-   int compare_unsigned(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o) const BOOST_NOEXCEPT
+   BOOST_MP_CXX14_CONSTEXPR int compare_unsigned(const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& o) const BOOST_NOEXCEPT
    {
       if (this->size() != o.size())
       {
@@ -1957,7 +2019,7 @@ struct cpp_int_backend
       return 0;
    }
    template <class Arithmetic>
-   BOOST_MP_FORCEINLINE typename boost::enable_if<is_arithmetic<Arithmetic>, int>::type compare(Arithmetic i) const
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if<is_arithmetic<Arithmetic>, int>::type compare(Arithmetic i) const
    {
       // braindead version:
       cpp_int_backend t;

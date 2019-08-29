@@ -78,6 +78,12 @@
 #define BOOST_MP_CXX14_CONSTEXPR
 #endif
 
+#ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
+#  define BOOST_CXX14_CONSTEXPR_IF_DETECTION
+#else
+#  define BOOST_CXX14_CONSTEXPR_IF_DETECTION
+#endif
+
 #ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable : 6326)
