@@ -38,8 +38,13 @@ int main()
       constexpr unsigned_backend c(22);
       constexpr int_backend b      = test_constexpr_bitwise(a);
       constexpr unsigned_backend d = test_constexpr_bitwise(c);
+#ifdef BOOST_HAS_INT128
+      static_assert(b == 230);
+      static_assert(d == 120);
+#else
       static_assert(b == 210);
       static_assert(d == 106);
+#endif
    }
    {
       constexpr int_backend a(22);

@@ -495,7 +495,6 @@ template <class Int>
 inline BOOST_MP_CXX14_CONSTEXPR void right_shift_byte(Int& result, double_limb_type s)
 {
    limb_type offset = static_cast<limb_type>(s / Int::limb_bits);
-   limb_type shift;
    BOOST_ASSERT((s % CHAR_BIT) == 0);
    unsigned ors = result.size();
    unsigned rs  = ors;
@@ -507,7 +506,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void right_shift_byte(Int& result, double_limb_t
    rs -= offset;
    typename Int::limb_pointer pr = result.limbs();
    unsigned char*             pc = reinterpret_cast<unsigned char*>(pr);
-   shift                         = static_cast<limb_type>(s / CHAR_BIT);
+   limb_type                  shift = static_cast<limb_type>(s / CHAR_BIT);
    std::memmove(pc, pc + shift, ors * sizeof(pr[0]) - shift);
    shift = (sizeof(limb_type) - shift % sizeof(limb_type)) * CHAR_BIT;
    if (shift < Int::limb_bits)

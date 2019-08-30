@@ -1424,8 +1424,8 @@ struct cpp_int_backend
          BOOST_THROW_EXCEPTION(std::runtime_error("Cannot convert a non-finite number to an integer."));
       }
 
-      int         e;
-      long double f, term;
+      int         e = 0;
+      long double f(0), term(0);
       *this = static_cast<limb_type>(0u);
 
       f = frexp(a, &e);

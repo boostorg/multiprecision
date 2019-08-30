@@ -403,8 +403,6 @@ eval_gcd(
    using default_ops::eval_is_zero;
    using default_ops::eval_lsb;
 
-   int shift;
-
    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> u(a);
 
    int s = eval_get_sign(u);
@@ -430,7 +428,7 @@ eval_gcd(
 
    unsigned us = eval_lsb(u);
    unsigned vs = boost::multiprecision::detail::find_lsb(v);
-   shift       = (std::min)(us, vs);
+   int shift   = (std::min)(us, vs);
    eval_right_shift(u, us);
    if (vs)
       v >>= vs;
@@ -445,8 +443,7 @@ eval_gcd(
             v = integer_gcd_reduce(*u.limbs(), v);
          else
          {
-            double_limb_type i;
-            i = u.limbs()[0] | (static_cast<double_limb_type>(u.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
+            double_limb_type i = u.limbs()[0] | (static_cast<double_limb_type>(u.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
             v = static_cast<limb_type>(integer_gcd_reduce(i, static_cast<double_limb_type>(v)));
          }
          break;
@@ -500,8 +497,6 @@ eval_gcd(
       return;
    }
 
-   int shift;
-
    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> u(a), v(b);
 
    int s = eval_get_sign(u);
@@ -532,7 +527,7 @@ eval_gcd(
 
    unsigned us = eval_lsb(u);
    unsigned vs = eval_lsb(v);
-   shift       = (std::min)(us, vs);
+   int shift   = (std::min)(us, vs);
    eval_right_shift(u, us);
    eval_right_shift(v, vs);
 
@@ -551,9 +546,8 @@ eval_gcd(
             u = integer_gcd_reduce(*v.limbs(), *u.limbs());
          else
          {
-            double_limb_type i, j;
-            i = v.limbs()[0] | (static_cast<double_limb_type>(v.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
-            j = (u.size() == 1) ? *u.limbs() : u.limbs()[0] | (static_cast<double_limb_type>(u.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
+            double_limb_type i = v.limbs()[0] | (static_cast<double_limb_type>(v.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
+            double_limb_type j = (u.size() == 1) ? *u.limbs() : u.limbs()[0] | (static_cast<double_limb_type>(u.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
             u = integer_gcd_reduce(i, j);
          }
          break;

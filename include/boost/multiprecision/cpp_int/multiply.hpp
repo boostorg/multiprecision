@@ -411,11 +411,10 @@ eval_multiply(
    constexpr const unsigned limb_bits = sizeof(limb_type) * CHAR_BIT;
 #endif
 
-   double_limb_type w, x, y, z;
-   w = a & mask;
-   x = a >> limb_bits;
-   y = b & mask;
-   z = b >> limb_bits;
+   double_limb_type w = a & mask;
+   double_limb_type x = a >> limb_bits;
+   double_limb_type y = b & mask;
+   double_limb_type z = b >> limb_bits;
 
    result.resize(4, 4);
    limb_type* pr = result.limbs();
