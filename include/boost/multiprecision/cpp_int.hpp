@@ -526,7 +526,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
    //
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR unsigned size() const BOOST_NOEXCEPT { return m_limbs; }
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_pointer limbs() BOOST_NOEXCEPT { return m_wrapper.m_data; }
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR const_limb_pointer limbs() const BOOST_NOEXCEPT { return m_wrapper.m_data; }
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const_limb_pointer limbs() const BOOST_NOEXCEPT { return m_wrapper.m_data; }
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR bool sign() const BOOST_NOEXCEPT { return m_sign; }
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void sign(bool b) BOOST_NOEXCEPT
    {
@@ -720,7 +720,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
    //
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR unsigned size() const BOOST_NOEXCEPT { return m_limbs; }
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_pointer limbs() BOOST_NOEXCEPT { return m_wrapper.m_data; }
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR const_limb_pointer limbs() const BOOST_NOEXCEPT { return m_wrapper.m_data; }
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const_limb_pointer limbs() const BOOST_NOEXCEPT { return m_wrapper.m_data; }
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR bool sign() const BOOST_NOEXCEPT { return false; }
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void sign(bool b) BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
    {
