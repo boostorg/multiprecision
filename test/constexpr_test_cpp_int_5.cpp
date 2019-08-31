@@ -53,6 +53,36 @@ constexpr U div_qr_d(const U& a, const U& b)
    divide_qr(a, b, result, r);
    return result;
 }
+template <class U>
+constexpr U div_qr_r(const U& a, const U& b)
+{
+   using boost::multiprecision::divide_qr;
+   U result = U();
+   U r      = U();
+   divide_qr(a, b, result, r);
+   return r;
+}
+template <class T>
+constexpr T do_bit_set(T val, unsigned pos)
+{
+   using boost::multiprecision::bit_set;
+   bit_set(val, pos);
+   return val;
+}
+template <class T>
+constexpr T do_bit_unset(T val, unsigned pos)
+{
+   using boost::multiprecision::bit_unset;
+   bit_unset(val, pos);
+   return val;
+}
+template <class T>
+constexpr T do_bit_flip(T val, unsigned pos)
+{
+   using boost::multiprecision::bit_flip;
+   bit_flip(val, pos);
+   return val;
+}
 
 int main()
 {
@@ -122,17 +152,29 @@ int main()
       boost::multiprecision::divide_qr(i, j, ii, ij);
       BOOST_CHECK_EQUAL(ii, k);
    }
+   // divide_qr:
+   {
+      constexpr small_int_backend i1 = div_qr_r(si1, si2);
+      small_int_backend           nc, nc2;
+      divide_qr(si1, si2, nc, nc2);
+      BOOST_CHECK_EQUAL(nc2, i1);
+
+      constexpr std::int64_t k = div_qr_r(i, j);
+      std::int32_t           ii, ij;
+      boost::multiprecision::divide_qr(i, j, ii, ij);
+      BOOST_CHECK_EQUAL(ij, k);
+   }
    // integer_modulus:
    {
-      constexpr int i1 = integer_modulus(si1, 67);
-      small_int_backend           nc(si1);
-      int r = integer_modulus(nc, 67);
-      BOOST_CHECK_EQUAL(nc, i1);
+      constexpr int     i1 = integer_modulus(si1, 67);
+      small_int_backend nc(si1);
+      int               r = integer_modulus(nc, 67);
+      BOOST_CHECK_EQUAL(r, i1);
 
       constexpr std::int32_t k = boost::multiprecision::integer_modulus(i, j);
       std::int32_t           ii(i);
-      boost::multiprecision::integer_modulus(ii, j);
-      BOOST_CHECK_EQUAL(ii, k);
+      r = boost::multiprecision::integer_modulus(ii, j);
+      BOOST_CHECK_EQUAL(r, k);
    }
    // powm:
    {
@@ -145,6 +187,64 @@ int main()
       std::int32_t           ii(i);
       ii = boost::multiprecision::powm(ii, j, j);
       BOOST_CHECK_EQUAL(ii, k);
+   }
+   // lsb:
+   {
+      constexpr int     i1 = lsb(si1);
+      small_int_backend nc(si1);
+      int               nci = lsb(nc);
+      BOOST_CHECK_EQUAL(nci, i1);
+
+      constexpr std::int32_t k = boost::multiprecision::lsb(i);
+      std::int32_t           ii(i);
+      ii = boost::multiprecision::lsb(ii);
+      BOOST_CHECK_EQUAL(ii, k);
+   }
+   // msb:
+   {
+      constexpr int     i1 = msb(si1);
+      small_int_backend nc(si1);
+      int               nci = msb(nc);
+      BOOST_CHECK_EQUAL(nci, i1);
+
+      constexpr std::int32_t k = boost::multiprecision::msb(i);
+      std::int32_t           ii(i);
+      ii = boost::multiprecision::msb(ii);
+      BOOST_CHECK_EQUAL(ii, k);
+   }
+   // bit_test:
+   {
+      constexpr bool b = bit_test(si1, 1);
+      static_assert(b);
+
+      constexpr bool k = boost::multiprecision::bit_test(i, 1);
+      static_assert(k);
+   }
+   // bit_set:
+   {
+      constexpr int_backend i(0);
+      constexpr int_backend j = do_bit_set(i, 20);
+      static_assert(bit_test(j, 20));
+
+      constexpr int ii(0);
+      constexpr int jj = do_bit_set(ii, 20);
+      static_assert(boost::multiprecision::bit_test(jj, 20));
+   }
+   // bit_unset:
+   {
+      constexpr int_backend r = do_bit_unset(si1, 20);
+      static_assert(bit_test(r, 20) == false);
+
+      constexpr int jj = do_bit_unset(i, 20);
+      static_assert(boost::multiprecision::bit_test(jj, 20) == false);
+   }
+   // bit_unset:
+   {
+      constexpr int_backend r = do_bit_flip(si1, 20);
+      static_assert(bit_test(r, 20) == false);
+
+      constexpr int jj = do_bit_flip(i, 20);
+      static_assert(boost::multiprecision::bit_test(jj, 20) == false);
    }
    return boost::report_errors();
 }

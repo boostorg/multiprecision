@@ -109,7 +109,7 @@ powm(const I1& a, I2 b, I3 c)
 }
 
 template <class Integer>
-typename enable_if_c<is_integral<Integer>::value, unsigned>::type lsb(const Integer& val)
+BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value, unsigned>::type lsb(const Integer& val)
 {
    if (val <= 0)
    {
@@ -126,7 +126,7 @@ typename enable_if_c<is_integral<Integer>::value, unsigned>::type lsb(const Inte
 }
 
 template <class Integer>
-typename enable_if_c<is_integral<Integer>::value, unsigned>::type msb(Integer val)
+BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value, unsigned>::type msb(Integer val)
 {
    if (val <= 0)
    {
@@ -143,7 +143,7 @@ typename enable_if_c<is_integral<Integer>::value, unsigned>::type msb(Integer va
 }
 
 template <class Integer>
-typename enable_if_c<is_integral<Integer>::value, bool>::type bit_test(const Integer& val, unsigned index)
+BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value, bool>::type bit_test(const Integer& val, unsigned index)
 {
    Integer mask = 1;
    if (index >= sizeof(Integer) * CHAR_BIT)
@@ -154,7 +154,7 @@ typename enable_if_c<is_integral<Integer>::value, bool>::type bit_test(const Int
 }
 
 template <class Integer>
-typename enable_if_c<is_integral<Integer>::value, Integer&>::type bit_set(Integer& val, unsigned index)
+BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value, Integer&>::type bit_set(Integer& val, unsigned index)
 {
    Integer mask = 1;
    if (index >= sizeof(Integer) * CHAR_BIT)
@@ -166,7 +166,7 @@ typename enable_if_c<is_integral<Integer>::value, Integer&>::type bit_set(Intege
 }
 
 template <class Integer>
-typename enable_if_c<is_integral<Integer>::value, Integer&>::type bit_unset(Integer& val, unsigned index)
+BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value, Integer&>::type bit_unset(Integer& val, unsigned index)
 {
    Integer mask = 1;
    if (index >= sizeof(Integer) * CHAR_BIT)
@@ -178,7 +178,7 @@ typename enable_if_c<is_integral<Integer>::value, Integer&>::type bit_unset(Inte
 }
 
 template <class Integer>
-typename enable_if_c<is_integral<Integer>::value, Integer&>::type bit_flip(Integer& val, unsigned index)
+BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value, Integer&>::type bit_flip(Integer& val, unsigned index)
 {
    Integer mask = 1;
    if (index >= sizeof(Integer) * CHAR_BIT)

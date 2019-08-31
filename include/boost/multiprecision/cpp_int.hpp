@@ -156,7 +156,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void verify_new_size(unsigned new_size, unsigned
    if (new_size < min_size)
       BOOST_THROW_EXCEPTION(std::overflow_error("Unable to allocate sufficient storage for the value of the result: value overflows the maximum allowable magnitude."));
 }
-inline BOOST_CONSTEXPR void verify_new_size(unsigned /*new_size*/, unsigned /*min_size*/, const mpl::int_<unchecked>&) {}
+inline BOOST_MP_CXX14_CONSTEXPR void verify_new_size(unsigned /*new_size*/, unsigned /*min_size*/, const mpl::int_<unchecked>&) {}
 
 template <class U>
 inline BOOST_MP_CXX14_CONSTEXPR void verify_limb_mask(bool b, U limb, U mask, const mpl::int_<checked>&)
@@ -166,7 +166,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void verify_limb_mask(bool b, U limb, U mask, co
       BOOST_THROW_EXCEPTION(std::overflow_error("Overflow in cpp_int arithmetic: there is insufficient precision in the target type to hold all of the bits of the result."));
 }
 template <class U>
-inline BOOST_CONSTEXPR void verify_limb_mask(bool /*b*/, U /*limb*/, U /*mask*/, const mpl::int_<unchecked>&) {}
+inline BOOST_MP_CXX14_CONSTEXPR void verify_limb_mask(bool /*b*/, U /*limb*/, U /*mask*/, const mpl::int_<unchecked>&) {}
 
 } // namespace detail
 
