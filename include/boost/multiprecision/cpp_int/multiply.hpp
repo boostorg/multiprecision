@@ -136,6 +136,14 @@ eval_multiply(
    BOOST_STATIC_ASSERT(double_limb_max - 2 * limb_max >= limb_max * limb_max);
 
    double_limb_type carry = 0;
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+   if (BOOST_MP_IS_CONST_EVALUATED(as))
+   {
+      for (unsigned i = 0; i < result.size(); ++i)
+         pr[i] = 0;
+   }
+   else
+#endif
    std::memset(pr, 0, result.size() * sizeof(limb_type));
    for (unsigned i = 0; i < as; ++i)
    {

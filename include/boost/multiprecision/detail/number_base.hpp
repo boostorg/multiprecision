@@ -57,9 +57,11 @@
 # endif
 #endif
 
-#ifdef BOOST_MP_HAS_IS_CONSTANT_EVALUATED
+#if defined(BOOST_MP_HAS_IS_CONSTANT_EVALUATED) && !defined(BOOST_NO_CXX14_CONSTEXPR)
 #  define BOOST_MP_IS_CONST_EVALUATED(x) std::is_constant_evaluated()
-#elif !defined(BOOST_MP_NO_CXX14_CONSTEXPR) && defined(BOOST_GCC)
+#elif defined(BOOST_GCC) && !defined(BOOST_NO_CXX14_CONSTEXPR) && (__GNUC__ >= 9)
+#  define BOOST_MP_IS_CONST_EVALUATED(x) __builtin_is_constant_evaluated()
+#elif !defined(BOOST_NO_CXX14_CONSTEXPR) && defined(BOOST_GCC)
 #  define BOOST_MP_IS_CONST_EVALUATED(x) __builtin_constant_p(x)
 #else
 #  define BOOST_MP_NO_CONSTEXPR_DETECTION
@@ -81,7 +83,7 @@
 #ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
 #  define BOOST_CXX14_CONSTEXPR_IF_DETECTION
 #else
-#  define BOOST_CXX14_CONSTEXPR_IF_DETECTION
+#  define BOOST_CXX14_CONSTEXPR_IF_DETECTION constexpr
 #endif
 
 #ifdef BOOST_MSVC

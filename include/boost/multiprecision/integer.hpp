@@ -13,33 +13,33 @@ namespace boost {
 namespace multiprecision {
 
 template <class Integer, class I2>
-typename enable_if_c<is_integral<Integer>::value && is_integral<I2>::value, Integer&>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value && is_integral<I2>::value, Integer&>::type
 multiply(Integer& result, const I2& a, const I2& b)
 {
    return result = static_cast<Integer>(a) * static_cast<Integer>(b);
 }
 template <class Integer, class I2>
-typename enable_if_c<is_integral<Integer>::value && is_integral<I2>::value, Integer&>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value && is_integral<I2>::value, Integer&>::type
 add(Integer& result, const I2& a, const I2& b)
 {
    return result = static_cast<Integer>(a) + static_cast<Integer>(b);
 }
 template <class Integer, class I2>
-typename enable_if_c<is_integral<Integer>::value && is_integral<I2>::value, Integer&>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value && is_integral<I2>::value, Integer&>::type
 subtract(Integer& result, const I2& a, const I2& b)
 {
    return result = static_cast<Integer>(a) - static_cast<Integer>(b);
 }
 
 template <class Integer>
-typename enable_if_c<is_integral<Integer>::value>::type divide_qr(const Integer& x, const Integer& y, Integer& q, Integer& r)
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value>::type divide_qr(const Integer& x, const Integer& y, Integer& q, Integer& r)
 {
    q = x / y;
    r = x % y;
 }
 
 template <class I1, class I2>
-typename enable_if_c<is_integral<I1>::value && is_integral<I2>::value, I2>::type integer_modulus(const I1& x, I2 val)
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<I1>::value && is_integral<I2>::value, I2>::type integer_modulus(const I1& x, I2 val)
 {
    return static_cast<I2>(x % val);
 }
@@ -75,13 +75,13 @@ struct double_integer
 } // namespace detail
 
 template <class I1, class I2, class I3>
-typename enable_if_c<is_integral<I1>::value && is_unsigned<I2>::value && is_integral<I3>::value, I1>::type
+BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<I1>::value && is_unsigned<I2>::value && is_integral<I3>::value, I1>::type
 powm(const I1& a, I2 b, I3 c)
 {
    typedef typename detail::double_integer<I1>::type double_type;
 
    I1          x(1), y(a);
-   double_type result;
+   double_type result(0);
 
    while (b > 0)
    {
@@ -98,7 +98,7 @@ powm(const I1& a, I2 b, I3 c)
 }
 
 template <class I1, class I2, class I3>
-inline typename enable_if_c<is_integral<I1>::value && is_signed<I2>::value && is_integral<I3>::value, I1>::type
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<I1>::value && is_signed<I2>::value && is_integral<I3>::value, I1>::type
 powm(const I1& a, I2 b, I3 c)
 {
    if (b < 0)
