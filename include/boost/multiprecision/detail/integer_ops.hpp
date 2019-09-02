@@ -28,7 +28,7 @@ inline BOOST_MP_CXX14_CONSTEXPR Integer eval_integer_modulus(const Backend& x, I
    typedef typename boost::multiprecision::detail::canonical<Integer, Backend>::type int_type;
    Backend                                                                           t;
    eval_modulus(t, x, static_cast<int_type>(val));
-   Integer result;
+   Integer result(0);
    eval_convert_to(&result, t);
    return abs(result);
 }
