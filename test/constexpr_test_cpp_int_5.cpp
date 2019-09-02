@@ -246,5 +246,17 @@ int main()
       constexpr int jj = do_bit_flip(i, 20);
       static_assert(boost::multiprecision::bit_test(jj, 20) == false);
    }
+   // sqrt:
+   {
+      constexpr int_backend r = sqrt(si1);
+      small_int_backend     nc(si1);
+      nc = sqrt(nc);
+      BOOST_CHECK_EQUAL(nc, r);
+
+      constexpr int jj = boost::multiprecision::sqrt(i);
+      int           k  = i;
+      k                = boost::multiprecision::sqrt(k);
+      BOOST_CHECK_EQUAL(jj, k);
+   }
    return boost::report_errors();
 }

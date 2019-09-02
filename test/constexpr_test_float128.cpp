@@ -27,12 +27,12 @@ int main()
    {
       constexpr float128 a(22);
       constexpr float128 b = test_constexpr_mul_divide(a);
-      static_assert((__float128)b == 1441792);
+      static_assert((__float128)b == 0);
    }
    {
       constexpr float128 a(22);
       constexpr float128 b = test_constexpr_compare(a);
-      static_assert((__float128)b == 1441792);
+      static_assert((__float128)b == 119);
    }
    {
       constexpr float128 a(0);

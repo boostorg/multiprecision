@@ -190,7 +190,7 @@ BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value, Integ
 }
 
 template <class Integer>
-typename enable_if_c<is_integral<Integer>::value, Integer>::type sqrt(const Integer& x, Integer& r)
+BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value, Integer>::type sqrt(const Integer& x, Integer& r)
 {
    //
    // This is slow bit-by-bit integer square root, see for example
@@ -235,9 +235,9 @@ typename enable_if_c<is_integral<Integer>::value, Integer>::type sqrt(const Inte
 }
 
 template <class Integer>
-typename enable_if_c<is_integral<Integer>::value, Integer>::type sqrt(const Integer& x)
+BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value, Integer>::type sqrt(const Integer& x)
 {
-   Integer r;
+   Integer r(0);
    return sqrt(x, r);
 }
 
