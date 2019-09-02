@@ -42,18 +42,18 @@ if(NOT QUADMATH_INCLUDE_DIRS OR NOT QUADMATH_LIBRARY)
     endif()
 endif()
 
-find_package_handle_standard_args(QUADMATH_ DEFAULT_MSG QUADMATH_LIBRARY QUADMATH_INCLUDE_DIRS)
+find_package_handle_standard_args(Quadmath DEFAULT_MSG QUADMATH_LIBRARY QUADMATH_INCLUDE_DIRS)
 
 mark_as_advanced(QUADMATH_INCLUDE_DIRS QUADMATH_LIBRARY)
 
-if(QUADMATH_FOUND AND NOT TARGET QUADMATH_::quadmath)
+if(QUADMATH_FOUND AND NOT TARGET Quadmath::quadmath)
     if(QUADMATH_USE_DIRECTLY)
         message(STATUS "libquadmath will be included and linked directly.")
-        add_library(QUADMATH_::quadmath INTERFACE IMPORTED)
-        set_target_properties(QUADMATH_::quadmath PROPERTIES INTERFACE_LINK_LIBRARIES "${QUADMATH_LIBRARY}")
+        add_library(Quadmath::quadmath INTERFACE IMPORTED)
+        set_target_properties(Quadmath::quadmath PROPERTIES INTERFACE_LINK_LIBRARIES "${QUADMATH_LIBRARY}")
     else()
-        add_library(QUADMATH_::quadmath UNKNOWN IMPORTED)
-        set_target_properties(QUADMATH_::quadmath PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${QUADMATH_INCLUDE_DIRS}"
+        add_library(Quadmath::quadmath UNKNOWN IMPORTED)
+        set_target_properties(Quadmath::quadmath PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${QUADMATH_INCLUDE_DIRS}"
                               IMPORTED_LINK_INTERFACE_LANGUAGES "C"
                               IMPORTED_LOCATION "${QUADMATH_LIBRARY}")
     endif()
