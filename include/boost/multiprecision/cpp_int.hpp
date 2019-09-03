@@ -24,6 +24,7 @@
 #include <boost/type_traits/common_type.hpp>
 #include <boost/type_traits/make_signed.hpp>
 #include <boost/multiprecision/cpp_int/checked.hpp>
+#include <boost/multiprecision/detail/constexpr.hpp>
 #ifdef BOOST_MP_USER_DEFINED_LITERALS
 #include <boost/multiprecision/cpp_int/value_pack.hpp>
 #endif
@@ -597,9 +598,9 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
       for (unsigned i = 0; i < (std::max)(size(), o.size()); ++i)
-         std::swap(m_wrapper.m_data[i], o.m_wrapper.m_data[i]);
-      std::swap(m_sign, o.m_sign);
-      std::swap(m_limbs, o.m_limbs);
+         std_constexpr::swap(m_wrapper.m_data[i], o.m_wrapper.m_data[i]);
+      std_constexpr::swap(m_sign, o.m_sign);
+      std_constexpr::swap(m_limbs, o.m_limbs);
    }
 
  protected:
@@ -798,8 +799,8 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
       for (unsigned i = 0; i < (std::max)(size(), o.size()); ++i)
-         std::swap(m_wrapper.m_data[i], o.m_wrapper.m_data[i]);
-      std::swap(m_limbs, o.m_limbs);
+         std_constexpr::swap(m_wrapper.m_data[i], o.m_wrapper.m_data[i]);
+      std_constexpr::swap(m_limbs, o.m_limbs);
    }
 
  protected:
@@ -989,8 +990,8 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
    }
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
-      std::swap(m_sign, o.m_sign);
-      std::swap(m_data, o.m_data);
+      std_constexpr::swap(m_sign, o.m_sign);
+      std_constexpr::swap(m_data, o.m_data);
    }
 };
 //
@@ -1143,7 +1144,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
    }
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void do_swap(cpp_int_base& o) BOOST_NOEXCEPT
    {
-      std::swap(m_data, o.m_data);
+      std_constexpr::swap(m_data, o.m_data);
    }
 };
 //

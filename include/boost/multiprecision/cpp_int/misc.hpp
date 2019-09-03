@@ -8,6 +8,7 @@
 #ifndef BOOST_MP_CPP_INT_MISC_HPP
 #define BOOST_MP_CPP_INT_MISC_HPP
 
+#include <boost/multiprecision/detail/constexpr.hpp>
 #include <boost/multiprecision/detail/bitscan.hpp> // lsb etc
 #include <boost/integer/common_factor_rt.hpp>      // gcd/lcm
 #include <boost/functional/hash_fwd.hpp>
@@ -359,7 +360,7 @@ inline BOOST_MP_CXX14_CONSTEXPR limb_type integer_gcd_reduce(limb_type u, limb_t
    do
    {
       if (u > v)
-         std::swap(u, v);
+         std_constexpr::swap(u, v);
       if (u == v)
          break;
       v -= u;
@@ -373,7 +374,7 @@ inline BOOST_MP_CXX14_CONSTEXPR double_limb_type integer_gcd_reduce(double_limb_
    do
    {
       if (u > v)
-         std::swap(u, v);
+         std_constexpr::swap(u, v);
       if (u == v)
          break;
       if (v <= ~static_cast<limb_type>(0))

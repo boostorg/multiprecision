@@ -19,9 +19,9 @@ namespace detail {
 
 template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
 inline BOOST_CXX14_CONSTEXPR_IF_DETECTION boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>
-get_min(const boost::mpl::true_&, const boost::mpl::true_&)
+get_min(const boost::mpl::true_&, const boost::mpl::true_&, const boost::mpl::true_&)
 {
-   // Bounded and signed.
+   // Bounded, signed, and no allocator.
    typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>                                                result_type;
    typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MaxBits, MaxBits, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked>, ExpressionTemplates> ui_type;
 #ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
@@ -34,10 +34,21 @@ get_min(const boost::mpl::true_&, const boost::mpl::true_&)
 }
 
 template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-inline BOOST_CXX14_CONSTEXPR_IF_DETECTION boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>
-get_min(const boost::mpl::true_&, const boost::mpl::false_&)
+inline boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>
+get_min(const boost::mpl::true_&, const boost::mpl::true_&, const boost::mpl::false_&)
 {
-   // Bounded and unsigned:
+   // Bounded, signed, and an allocator (can't be constexpr).
+   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>                                                result_type;
+   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MaxBits, MaxBits, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked>, ExpressionTemplates> ui_type;
+   static const result_type                                                                                                                                                                          val = -result_type(~ui_type(0));
+   return val;
+}
+
+template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+inline BOOST_CXX14_CONSTEXPR_IF_DETECTION boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>
+get_min(const boost::mpl::true_&, const boost::mpl::false_&, const boost::mpl::true_&)
+{
+   // Bounded, unsigned, no allocator (can be constexpr):
 #ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
    static
 #else
@@ -49,33 +60,37 @@ get_min(const boost::mpl::true_&, const boost::mpl::false_&)
 
 template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
 inline boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>
-get_min(const boost::mpl::false_&, const boost::mpl::true_&)
+get_min(const boost::mpl::true_&, const boost::mpl::false_&, const boost::mpl::false_&)
 {
-   // Unbounded and signed.
+   // Bounded and unsigned with allocator (no constexpr):
+   static const boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates> val(0u);
+   return val;
+}
+
+template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates, bool has_allocator>
+inline boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>
+get_min(const boost::mpl::false_&, const boost::mpl::true_&, const boost::mpl::bool_<has_allocator>&)
+{
+   // Unbounded and signed, never constexpr because there must be an allocator.
    // There is no minimum value, just return 0:
+   static const boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates> val(0u);
+   return val;
+}
+
+template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates, bool has_allocator>
+inline boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>
+get_min(const boost::mpl::false_&, const boost::mpl::false_&, const boost::mpl::bool_<has_allocator>&)
+{
+   // Unbound and unsigned, never constexpr because there must be an allocator.
    static const boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates> val(0u);
    return val;
 }
 
 template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
 inline BOOST_CXX14_CONSTEXPR_IF_DETECTION boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>
-get_min(const boost::mpl::false_&, const boost::mpl::false_&)
+get_max(const boost::mpl::true_&, const boost::mpl::true_&, const boost::mpl::true_&)
 {
-   // Unbound and unsigned:
-#ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
-   static
-#else
-   constexpr
-#endif
-   const boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates> val(0u);
-   return val;
-}
-
-template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-inline BOOST_CXX14_CONSTEXPR_IF_DETECTION boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>
-get_max(const boost::mpl::true_&, const boost::mpl::true_&)
-{
-   // Bounded and signed.
+   // Bounded and signed, no allocator, can be constexpr.
    typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>                                                result_type;
    typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MaxBits, MaxBits, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked>, ExpressionTemplates> ui_type;
 #ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
@@ -88,10 +103,21 @@ get_max(const boost::mpl::true_&, const boost::mpl::true_&)
 }
 
 template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-inline BOOST_CXX14_CONSTEXPR_IF_DETECTION boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>
-get_max(const boost::mpl::true_&, const boost::mpl::false_&)
+inline boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>
+get_max(const boost::mpl::true_&, const boost::mpl::true_&, const boost::mpl::false_&)
 {
-   // Bound and unsigned:
+   // Bounded and signed, has an allocator, never constexpr.
+   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>                                                result_type;
+   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MaxBits, MaxBits, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked>, ExpressionTemplates> ui_type;
+   static const result_type                                                                                                                                                                          val = ~ui_type(0);
+   return val;
+}
+
+template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+inline BOOST_CXX14_CONSTEXPR_IF_DETECTION boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>
+get_max(const boost::mpl::true_&, const boost::mpl::false_&, const boost::mpl::true_&)
+{
+   // Bound and unsigned, no allocator so can be constexpr:
    typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>                                                           result_type;
    typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, Allocator>, ExpressionTemplates> ui_type;
 #ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
@@ -105,7 +131,18 @@ get_max(const boost::mpl::true_&, const boost::mpl::false_&)
 
 template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
 inline boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>
-get_max(const boost::mpl::false_&, const boost::mpl::true_&)
+get_max(const boost::mpl::true_&, const boost::mpl::false_&, const boost::mpl::false_&)
+{
+   // Bound and unsigned, has an allocator so can never be constexpr:
+   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>                                                           result_type;
+   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, Allocator>, ExpressionTemplates> ui_type;
+   static const result_type                                                                                                                                                                                     val = ~ui_type(0);
+   return val;
+}
+
+template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates, bool has_allocator>
+inline boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>
+get_max(const boost::mpl::false_&, const boost::mpl::true_&, const boost::mpl::bool_<has_allocator>&)
 {
    // Unbounded and signed.
    // There is no maximum value, just return 0:
@@ -113,17 +150,12 @@ get_max(const boost::mpl::false_&, const boost::mpl::true_&)
    return val;
 }
 
-template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
-inline BOOST_CXX14_CONSTEXPR_IF_DETECTION boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>
-get_max(const boost::mpl::false_&, const boost::mpl::false_&)
+template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, boost::multiprecision::cpp_int_check_type Checked, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates, bool has_allocator>
+inline boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>
+get_max(const boost::mpl::false_&, const boost::mpl::false_&, const boost::mpl::bool_<has_allocator>&)
 {
    // Unbound and unsigned:
-#ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
-   static
-#else
-   constexpr
-#endif
-   const boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates> val(0u);
+   static const boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates> val(0u);
    return val;
 }
 
@@ -156,12 +188,12 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_in
    static BOOST_CXX14_CONSTEXPR_IF_DETECTION number_type(min)()
    {
       init.do_nothing();
-      return detail::get_min<MinBits, MaxBits, SignType, Checked, Allocator, ExpressionTemplates>(boost::multiprecision::backends::is_fixed_precision<backend_type>(), boost::multiprecision::is_signed_number<backend_type>());
+      return detail::get_min<MinBits, MaxBits, SignType, Checked, Allocator, ExpressionTemplates>(boost::multiprecision::backends::is_fixed_precision<backend_type>(), boost::multiprecision::is_signed_number<backend_type>(), boost::mpl::bool_<boost::is_void<Allocator>::value>());
    }
    static BOOST_CXX14_CONSTEXPR_IF_DETECTION number_type(max)()
    {
       init.do_nothing();
-      return detail::get_max<MinBits, MaxBits, SignType, Checked, Allocator, ExpressionTemplates>(boost::multiprecision::backends::is_fixed_precision<backend_type>(), boost::multiprecision::is_signed_number<backend_type>());
+      return detail::get_max<MinBits, MaxBits, SignType, Checked, Allocator, ExpressionTemplates>(boost::multiprecision::backends::is_fixed_precision<backend_type>(), boost::multiprecision::is_signed_number<backend_type>(), boost::mpl::bool_<boost::is_void<Allocator>::value>());
    }
    static BOOST_CXX14_CONSTEXPR_IF_DETECTION number_type          lowest() { return (min)(); }
    BOOST_STATIC_CONSTEXPR int  digits       = boost::multiprecision::backends::max_precision<backend_type>::value == UINT_MAX ? INT_MAX : boost::multiprecision::backends::max_precision<backend_type>::value;
