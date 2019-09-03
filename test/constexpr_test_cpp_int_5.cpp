@@ -83,6 +83,13 @@ constexpr T do_bit_flip(T val, unsigned pos)
    bit_flip(val, pos);
    return val;
 }
+template <class T>
+constexpr T test_swap(T a, T b)
+{
+   swap(a, b);
+   a.swap(b);
+   return a;
+}
 
 int main()
 {
@@ -257,6 +264,29 @@ int main()
       int           k  = i;
       k                = boost::multiprecision::sqrt(k);
       BOOST_CHECK_EQUAL(jj, k);
+   }
+   {
+      // swap:
+      constexpr small_int_backend r = test_swap(si1, si2);
+      static_assert(si1 == r);
+   }
+   {
+      // gcd:
+      constexpr int_backend i(si1), j(si1 / 3);
+      constexpr int_backend k = gcd(i, j);
+
+      int_backend ii(i), jj(j);
+      BOOST_CHECK_EQUAL(k, gcd(ii, jj));
+
+      constexpr unsigned_backend ui(i), uj(j);
+      constexpr unsigned_backend uk = gcd(ui, uj);
+      unsigned_backend           uii(ui), ujj(uj);
+      BOOST_CHECK_EQUAL(uk, gcd(uii, ujj));
+
+      constexpr int_backend l = lcm(i, j);
+      BOOST_CHECK_EQUAL(l, lcm(ii, jj));
+      constexpr unsigned_backend ul = lcm(ui, uj);
+      BOOST_CHECK_EQUAL(ul, lcm(uii, ujj));
    }
    return boost::report_errors();
 }
