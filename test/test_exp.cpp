@@ -195,7 +195,7 @@ void test()
          }
          else
          {
-            BOOST_CHECK_LE(exp(bug_case), std::numeric_limits<T>::min());
+            BOOST_CHECK_LE(exp(bug_case), (std::numeric_limits<T>::min)());
          }
       }
       bug_case = log((std::numeric_limits<T>::max)()) / -1.0005;

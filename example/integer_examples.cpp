@@ -8,6 +8,8 @@
 #include <iomanip>
 #include <vector>
 
+// Includes Quickbook code snippets as comments.
+
 //[FAC1
 
 /*`
@@ -28,13 +30,13 @@ void print_factorials()
    //
    // Print all the factorials that will fit inside a 128-bit integer.
    //
-   // Begin by building a big table of factorials, once we know just how 
+   // Begin by building a big table of factorials, once we know just how
    // large the largest is, we'll be able to "pretty format" the results.
    //
    // Calculate the largest number that will fit inside 128 bits, we could
    // also have used numeric_limits<int128_t>::max() for this value:
    cpp_int limit = (cpp_int(1) << 128) - 1;
-   // 
+   //
    // Our table of values:
    std::vector<cpp_int> results;
    //
@@ -56,7 +58,7 @@ void print_factorials()
    // Now print them out, using right justification, while we're at it
    // we'll indicate the limit of each integer type, so begin by defining
    // the limits for 16, 32, 64 etc bit integers:
-   cpp_int limits[] = { 
+   cpp_int limits[] = {
       (cpp_int(1) << 16) - 1,
       (cpp_int(1) << 32) - 1,
       (cpp_int(1) << 64) - 1,
@@ -115,7 +117,7 @@ The output from this routine is:
       8222838654177922817725562880000000
     263130836933693530167218012160000000
    8683317618811886495518194401280000000
- 295232799039604140847618609643520000000 
+ 295232799039604140847618609643520000000
 ]
 */
 
@@ -123,8 +125,8 @@ The output from this routine is:
 
 //[BITOPS
 
-/*` 
-In this example we'll show how individual bits within an integer may be manipulated, 
+/*`
+In this example we'll show how individual bits within an integer may be manipulated,
 we'll start with an often needed calculation of ['2[super n] - 1], which we could obviously
 implement like this:
 */
@@ -162,12 +164,12 @@ which we can then simply decrement.  The result from a call to `b2` is the same 
 We can equally test bits, so for example the n'th bit of the result returned from `b2` shouldn't be set
 unless we increment it first:
 
-   assert(!bit_test(b1(200), 200));     // OK
-   assert(bit_test(++b1(200), 200));    // OK
+   BOOST_ASSERT(!bit_test(b1(200), 200));     // OK
+   BOOST_ASSERT(bit_test(++b1(200), 200));    // OK
 
 And of course if we flip the n'th bit after increment, then we should get back to zero:
 
-   assert(!bit_flip(++b1(200), 200));   // OK
+   BOOST_ASSERT(!bit_flip(++b1(200), 200));   // OK
 */
 
 //]
@@ -178,9 +180,9 @@ int main()
 
    std::cout << std::hex << std::showbase << b1(200) << std::endl;
    std::cout << std::hex << std::showbase << b2(200) << std::endl;
-   assert(!bit_test(b1(200), 200));  // OK
-   assert(bit_test(++b1(200), 200));    // OK
-   assert(!bit_flip(++b1(200), 200));   // OK
+   BOOST_ASSERT(!bit_test(b1(200), 200));  // OK
+   BOOST_ASSERT(bit_test(++b1(200), 200));    // OK
+   BOOST_ASSERT(!bit_flip(++b1(200), 200));   // OK
    return 0;
 }
 
@@ -224,7 +226,7 @@ Program output:
       8222838654177922817725562880000000
     263130836933693530167218012160000000
    8683317618811886495518194401280000000
- 295232799039604140847618609643520000000 
+ 295232799039604140847618609643520000000
  0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
  0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
  */
