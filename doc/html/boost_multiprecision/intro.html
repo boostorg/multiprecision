@@ -2,8 +2,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
 <title>Introduction</title>
-<link rel="stylesheet" href="../../../../../doc/src/boostbook.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<link rel="stylesheet" href="../multiprecision.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.77.1">
 <link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
 <link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
 <link rel="prev" href="../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
@@ -34,8 +34,8 @@
       The big number types in Multiprecision can be used with a wide selection of
       basic mathematical operations, elementary transcendental functions as well
       as the functions in Boost.Math. The Multiprecision types can also interoperate
-      with the built-in types in C++ using clearly defined conversion rules. This
-      allows Boost.Multiprecision to be used for all kinds of mathematical calculations
+      with the __fundamental types in C++ using clearly defined conversion rules.
+      This allows Boost.Multiprecision to be used for all kinds of mathematical calculations
       involving integer, rational and floating-point types requiring extended range
       and precision.
     </p>
@@ -53,8 +53,8 @@
       Depending upon the number type, precision may be arbitrarily large (limited
       only by available memory), fixed at compile time (for example 50 or 100 decimal
       digits), or a variable controlled at run-time by member functions. The types
-      are expression-template-enabled for better performance than naive user-defined
-      types.
+      are <a href="https://en.wikipedia.org/wiki/Expression_templates" target="_top">expression
+      template</a> -enabled for better performance than naive user-defined types.
     </p>
 <p>
       The Multiprecision library comes in two distinct parts:
@@ -259,7 +259,7 @@
       to pretty much zero). Note that if we compile with expression templates disabled
       and rvalue-reference support on, then actually still have no wasted memory
       allocations as even though temporaries are created, their contents are moved
-      rather than copied. <a href="#ftn.boost_multiprecision.intro.f0" class="footnote" name="boost_multiprecision.intro.f0"><sup class="footnote">[1]</sup></a>
+      rather than copied. <a href="#ftn.boost_multiprecision.intro.f0" class="footnote"><sup class="footnote"><a name="boost_multiprecision.intro.f0"></a>[1]</sup></a>
     </p>
 <div class="important"><table border="0" summary="Important">
 <tr>
@@ -716,7 +716,7 @@
       optimizations on (/Ox), with MPFR 3.0 and MPIR 2.3.0.
     </p>
 <div class="footnotes">
-<br><hr style="width:100; text-align:left;margin-left: 0">
+<br><hr style="width:100; align:left;">
 <div id="ftn.boost_multiprecision.intro.f0" class="footnote"><p><a href="#boost_multiprecision.intro.f0" class="para"><sup class="para">[1] </sup></a>
         The actual number generated will depend on the compiler, how well it optimizes
         the code, and whether it supports rvalue references. The number of 11 temporaries

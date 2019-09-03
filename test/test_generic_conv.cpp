@@ -144,8 +144,8 @@ int main()
       //
       // Float to rational:
       //
-      static const int                                       max_range = std::numeric_limits<double>::digits >= std::numeric_limits<int>::digits ? std::numeric_limits<int>::max() : (1 << (std::numeric_limits<double>::digits - 1)) - 1;
-      static const int                                       min_range = std::numeric_limits<double>::digits >= std::numeric_limits<int>::digits ? std::numeric_limits<int>::min() : -(1 << (std::numeric_limits<double>::digits - 1)) + 1;
+      static const int                                       max_range = std::numeric_limits<double>::digits >= std::numeric_limits<int>::digits ? (std::numeric_limits<int>::max)() : (1 << (std::numeric_limits<double>::digits - 1)) - 1;
+      static const int                                       min_range = std::numeric_limits<double>::digits >= std::numeric_limits<int>::digits ? (std::numeric_limits<int>::min)() : -(1 << (std::numeric_limits<double>::digits - 1)) + 1;
       static const boost::random::uniform_int_distribution<> i_val_dist(min_range, max_range);
       static const boost::random::uniform_int_distribution<> i_exp_dist(std::numeric_limits<double>::min_exponent, std::numeric_limits<double>::max_exponent - 2 - std::numeric_limits<int>::digits);
       int                                                    iv   = i_val_dist(small_gen);

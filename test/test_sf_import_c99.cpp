@@ -583,8 +583,8 @@ void test_poison()
    result += log2(a);
    result += remainder(a, b);
    result += trunc(b);
-   result += min(a, b);
-   result += max(a, b);
+   result += (min)(a, b);
+   result += (max)(a, b);
 
 #if !BOOST_WORKAROUND(BOOST_LIBSTDCXX_VERSION, < 60000)
 

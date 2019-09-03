@@ -27,7 +27,7 @@ typedef number<cpp_bin_float<std::numeric_limits<good_type>::digits, digit_base_
 
 int main()
 {
-   float f = std::numeric_limits<float>::max();
+   float f = (std::numeric_limits<float>::max)();
 
    do
    {

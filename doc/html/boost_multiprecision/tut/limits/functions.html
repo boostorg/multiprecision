@@ -2,8 +2,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
 <title>std::numeric_limits&lt;&gt; functions</title>
-<link rel="stylesheet" href="../../../../../../../doc/src/boostbook.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<link rel="stylesheet" href="../../../multiprecision.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.77.1">
 <link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
 <link rel="up" href="../limits.html" title="Numeric Limits">
 <link rel="prev" href="constants.html" title="std::numeric_limits&lt;&gt; constants">
@@ -32,10 +32,9 @@
           <span class="phrase"><a name="boost_multiprecision.tut.limits.functions.max_function"></a></span><a class="link" href="functions.html#boost_multiprecision.tut.limits.functions.max_function">max function</a>
         </h5>
 <p>
-          Function <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">max</span><span class="special">()</span></code>
-          returns the largest finite value that can be represented by the type T.
-          If there is no such value (and <code class="computeroutput"><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">bounded</span></code>
-          is <code class="computeroutput"><span class="keyword">false</span></code>) then returns <code class="computeroutput"><span class="identifier">T</span><span class="special">()</span></code>.
+          Function <code class="computeroutput"><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">max</span><span class="special">)()</span></code> returns the largest finite value that
+          can be represented by the type T. If there is no such value (and <code class="computeroutput"><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">bounded</span></code> is <code class="computeroutput"><span class="keyword">false</span></code>)
+          then returns <code class="computeroutput"><span class="identifier">T</span><span class="special">()</span></code>.
         </p>
 <p>
           For built-in types there is usually a corresponding MACRO value TYPE_MAX,
@@ -56,8 +55,8 @@
 <span class="identifier">T</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">math</span><span class="special">::</span><span class="identifier">tools</span><span class="special">::</span><span class="identifier">max_value</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;();</span>
 </pre>
 <p>
-          Of course, these simply use <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">max</span><span class="special">()</span></code> if available, but otherwise 'do something
-          sensible'.
+          Of course, these simply use <code class="computeroutput"><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">max</span><span class="special">)()</span></code>
+          if available, but otherwise 'do something sensible'.
         </p>
 <h5>
 <a name="boost_multiprecision.tut.limits.functions.h1"></a>
@@ -83,8 +82,8 @@
           <span class="phrase"><a name="boost_multiprecision.tut.limits.functions.min_function"></a></span><a class="link" href="functions.html#boost_multiprecision.tut.limits.functions.min_function">min function</a>
         </h5>
 <p>
-          Function <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">min</span><span class="special">()</span></code>
-          returns the minimum finite value that can be represented by the type T.
+          Function <code class="computeroutput"><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">min</span><span class="special">)()</span></code> returns the minimum finite value that
+          can be represented by the type T.
         </p>
 <p>
           For built-in types there is usually a corresponding MACRO value TYPE_MIN,
@@ -265,7 +264,7 @@
 </pre>
 <h6>
 <a name="boost_multiprecision.tut.limits.functions.h6"></a>
-          <span class="phrase"><a name="boost_multiprecision.tut.limits.functions.tolerance_for_floating_point_com"></a></span><a class="link" href="functions.html#boost_multiprecision.tut.limits.functions.tolerance_for_floating_point_com">Tolerance
+          <span class="phrase"><a name="boost_multiprecision.tut.limits.functions.FP_tolerance"></a></span><a class="link" href="functions.html#boost_multiprecision.tut.limits.functions.FP_tolerance">Tolerance
           for Floating-point Comparisons</a>
         </h6>
 <p>
@@ -303,8 +302,8 @@
           Squassia, Comparing floats code</a>
         </p>
 <p>
-          <a href="../../../../../../../libs/test/doc/html/utf/testing-tools/floating_point_comparison.html" target="_top">floating-point
-          comparison</a>.
+          <a href="https://www.boost.org/doc/libs/release/libs/test/doc/html/boost_test/testing_tools/extended_comparison/floating_point.html" target="_top">Boost.Test
+          Floating-Point_Comparison</a>
         </p>
 <p>
           For example, if we want a tolerance that might suit about 9 arithmetical
@@ -327,8 +326,8 @@
 <pre class="programlisting"><span class="identifier">BOOST_CHECK_CLOSE_FRACTION</span><span class="special">(</span><span class="identifier">expected</span><span class="special">,</span> <span class="identifier">calculated</span><span class="special">,</span> <span class="identifier">tolerance</span><span class="special">);</span>
 </pre>
 <p>
-          (There is also a version using tolerance as a percentage rather than a
-          fraction).
+          (There is also a version BOOST_CHECK_CLOSE using tolerance as a <span class="bold"><strong>percentage</strong></span> rather than a fraction; usually the fraction
+          version is simpler to use).
         </p>
 <pre class="programlisting"><span class="keyword">using</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">number</span><span class="special">;</span>
 <span class="keyword">using</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">cpp_dec_float</span><span class="special">;</span>
@@ -355,8 +354,8 @@
 </pre>
 <h5>
 <a name="boost_multiprecision.tut.limits.functions.h7"></a>
-          <span class="phrase"><a name="boost_multiprecision.tut.limits.functions.infinity_positive_and_negative"></a></span><a class="link" href="functions.html#boost_multiprecision.tut.limits.functions.infinity_positive_and_negative">Infinity
-          - positive and negative</a>
+          <span class="phrase"><a name="boost_multiprecision.tut.limits.functions.infinity"></a></span><a class="link" href="functions.html#boost_multiprecision.tut.limits.functions.infinity">Infinity -
+          positive and negative</a>
         </h5>
 <p>
           For floating-point types only, for which <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">has_infinity</span>

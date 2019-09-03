@@ -818,7 +818,7 @@ void test()
          }
          else
          {
-            BOOST_CHECK_LE(pow(T(1.01), bug_case), std::numeric_limits<T>::min());
+            BOOST_CHECK_LE(pow(T(1.01), bug_case), (std::numeric_limits<T>::min)());
          }
       }
    }
