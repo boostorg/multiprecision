@@ -45,7 +45,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_gcd(B& result, const B& a, const B& b)
    using default_ops::eval_is_zero;
    using default_ops::eval_lsb;
 
-   int shift;
+   int shift(0);
 
    B u(a), v(b);
 
