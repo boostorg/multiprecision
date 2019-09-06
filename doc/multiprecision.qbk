@@ -45,6 +45,7 @@
 [import ../example/eigen_example.cpp]
 [import ../example/mpfr_precision.cpp]
 [import ../example/constexpr_float_arithmetic_examples.cpp]
+[import ../test/constexpr_test_cpp_int_5.cpp]
 
 [/External links as templates (see also some defs below)]
 [template mpfr[] [@http://www.mpfr.org MPFR]]
@@ -600,6 +601,13 @@ there is no step change in behavior as a cpp_int grows in size.
 [link boost_multiprecision.tut.lits here] for the full description.  For example `0xfffff_cppi1024`
 specifies a 1024-bit integer with the value 0xffff.  This can be used to generate compile time constants that are
 too large to fit into any built in number type.
+* The __cpp_int types support constexpr arithmetic, provided it is a fixed precision type with no allocator.  It may also
+be a checked integer: in which case a compiler error will be generated on overflow or undefined behaviour.  In addition
+the free functions `abs`, `swap`, `multiply`, `add`, `subtract`, `divide_qr`, `integer_modulus`, `powm`, `lsb`, `msb`, 
+`bit_test`, `bit_set`, `bit_unset`, `bit_flip`, `sqrt`, `gcd`, `lcm` are all supported.  Use of __cpp_int in this way
+requires either a C++2a compiler (one which supports `std::is_constant_evaluated()`), or GCC-6 or later in C++14 mode.
+Compilers other than GCC and without `std::is_constant_evaluated()` will support a very limited set of operations:
+expect to hit roadblocks rather easily.
 * You can import/export the raw bits of a __cpp_int to and from external storage via the `import_bits` and `export_bits`
 functions.  More information is in the [link boost_multiprecision.tut.import_export section on import/export].
 
@@ -1054,6 +1062,8 @@ our code.  Round tripping when using `__float128` as the underlying type is poss
 as a valid floating-point number.
 * Division by zero results in an infinity being produced.
 * Type `float128` can be used as a literal type (constexpr support).
+* Type `float128` can be used for full `constexpr` arithmetic from C++14 and later with GCC.  The functions `abs`, `fabs`, 
+`fpclassify`, `isnan`, `isinf`, `isfinite` and `isnormal` are also `constexpr`, but the transcendental functions are not.
 * When using the Intel compiler, the underlying type defaults to `__float128` if it's available and `_Quad` if not.  You can override
 the default by defining either `BOOST_MP_USE_FLOAT128` or `BOOST_MP_USE_QUAD`.
 * When the underlying type is Intel's `_Quad` type, the code must be compiled with the compiler option `-Qoption,cpp,--extended_float_type`.
@@ -2023,8 +2033,8 @@ constexpr support, and for many operations C++2a support
 There are two backend types which are literals:
 
 * __float128 (which requires GCC), and
-* Instantiations of `cpp_int_backend` where the Allocator parameter is type `void`, 
-and the Checked parameter is `boost::multiprecision::unchecked`.
+* Instantiations of `cpp_int_backend` where the Allocator parameter is type `void`.
+In addition, prior to C++14 the Checked parameter must be `boost::multiprecision::unchecked`.
 
 For example:
 
@@ -2035,10 +2045,11 @@ For example:
    constexpr int128_t            i = 0;     // OK, fixed precision int128_t has no allocator.
    constexpr uint1024_t          j = 0xFFFFFFFF00000000uLL;  // OK, fixed precision uint1024_t has no allocator.
 
-   constexpr checked_uint128_t   k = -1; // Error, checked type is not a literal type as we need runtime error checking.
+   constexpr checked_uint128_t   k = 1; // OK from C++14 and later, not supported for C++11.
+   constexpr checked_uint128_t   k = -1; // Error, as this would normally lead to a runtime failure (exception).
    constexpr cpp_int             l = 2;  // Error, type is not a literal as it performs memory management.
 
-There is also limited support for user defined-literals with __cpp_int - these are limited to unchecked, fixed precision `cpp_int`'s
+There is also support for user defined-literals with __cpp_int - these are limited to unchecked, fixed precision `cpp_int`'s
 which are specified in hexadecimal notation.  The suffixes supported are:
 
 [table
@@ -2072,8 +2083,8 @@ Examples:
    // Smaller values can be assigned to larger values:
    int256_t c = 0x1234_cppi; // OK
    //
-   // However, this does not currently work in constexpr contexts:
-   constexpr int256_t d = 0x1_cppi; // Compiler error
+   // However, this only works in constexpr contexts from C++14 onwards:
+   constexpr int256_t d = 0x1_cppi; // Compiler error in C++11, requires C++14
    //
    // Constants can be padded out with leading zeros to generate wider types:
    constexpr uint256_t e = 0x0000000000000000000000000000000000000000000FFFFFFFFFFFFFFFFFFFFF_cppui; // OK
@@ -2101,11 +2112,19 @@ Examples:
 
 [h4 constexpr arithmetic]
 
-The front end of the library is all `constexpr` from C++14 and later.  Currently there is only one
-back end type that is `constexpr` aware, and that is __float128.  More backends will follow at a later date.
+The front end of the library is all `constexpr` from C++14 and later.  Currently there are only two
+back end types that are `constexpr` aware: __float128 and __cpp_int.  More backends will follow at a later date.
 
 Provided the compiler is GCC, type __float128 support `constexpr` operations on all arithmetic operations from C++14, comparisons,
 `abs`, `fabs`, `fpclassify`, `isnan`, `isinf`, `isfinite` and `isnormal` are also fully supported, but the transcendental functions are not.
+
+The __cpp_int types support constexpr arithmetic, provided it is a fixed precision type with no allocator.  It may also
+be a checked integer: in which case a compiler error will be generated on overflow or undefined behaviour.  In addition
+the free functions `abs`, `swap`, `multiply`, `add`, `subtract`, `divide_qr`, `integer_modulus`, `powm`, `lsb`, `msb`, 
+`bit_test`, `bit_set`, `bit_unset`, `bit_flip`, `sqrt`, `gcd`, `lcm` are all supported.  Use of __cpp_int in this way
+requires either a C++2a compiler (one which supports `std::is_constant_evaluated()`), or GCC-6 or later in C++14 mode.
+Compilers other than GCC and without `std::is_constant_evaluated()` will support a very limited set of operations:
+expect to hit roadblocks rather easily.
 
 For example given:
 
@@ -2137,6 +2156,19 @@ We can now declare H[sub 9] as a constexpr object, access the coefficients, and 
 at an abscissa value, all using `constexpr` arithmetic:
 
 [hermite_example3]
+
+Also since the coefficients to the Hermite polynomials are integers, we can also generate the Hermite
+coefficients using (fixed precision) cpp_int's: see [@../../test/constexpr_test_cpp_int_6.cpp constexpr_test_cpp_int_6.cpp].
+
+We can also generate factorials (and validate the result) like so:
+
+[factorial_decl]
+
+   constexpr uint1024_t f1 = factorial(uint1024_t(31));
+   static_assert(f1 == 0x1956ad0aae33a4560c5cd2c000000_cppi);
+
+Another example in [@../../test/constexpr_test_cpp_int_7.cpp constexpr_test_cpp_int_7.cpp] generates
+a fresh multiprecision random number each time the file is compiled.
 
 
 [endsect]

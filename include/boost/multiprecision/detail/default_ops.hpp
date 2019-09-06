@@ -1384,9 +1384,9 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_round(T& result, const T& a)
 }
 
 template <class B>
-void eval_lcm(B& result, const B& a, const B& b);
+BOOST_MP_CXX14_CONSTEXPR void eval_lcm(B& result, const B& a, const B& b);
 template <class B>
-void eval_gcd(B& result, const B& a, const B& b);
+BOOST_MP_CXX14_CONSTEXPR void eval_gcd(B& result, const B& a, const B& b);
 
 template <class T, class Arithmetic>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_integral<Arithmetic> >::type eval_gcd(T& result, const T& a, const Arithmetic& b)

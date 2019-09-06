@@ -756,6 +756,14 @@ test-suite misc :
       [ compile constexpr_test_float128.cpp : 
          [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_float128 : <source>quadmath : <build>no ] ]
 
+      [ run constexpr_test_cpp_int.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] ]
+      [ run constexpr_test_cpp_int_2.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] ]
+      [ run constexpr_test_cpp_int_3.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] ]
+      [ run constexpr_test_cpp_int_4.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] ]
+      [ run constexpr_test_cpp_int_5.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] ]
+      [ run constexpr_test_cpp_int_6.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] ]
+      [ run constexpr_test_cpp_int_7.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] ]
+
       [ compile test_nothrow_cpp_int.cpp ]
       [ compile test_nothrow_cpp_rational.cpp ]
       [ compile test_nothrow_cpp_bin_float.cpp ]
