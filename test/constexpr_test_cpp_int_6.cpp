@@ -167,7 +167,6 @@ inline constexpr const_polynomial<T, Order> operator/(const const_polynomial<T, 
    return result;
 }
 
-//[hermite_example
 template <class T, unsigned Order>
 class hermite_polynomial
 {

@@ -14,11 +14,13 @@ decltype(std::declval<F>()(std::declval<V>())) non_constexpr_invoke(F f, V v)
    return f(v);
 }
 
+//[factorial_decl
 template <class T>
 constexpr T factorial(const T& a)
 {
    return a ? a * factorial(a - 1) : 1;
 }
+//]
 
 template <class T, class U>
 constexpr T big_mul(const U& a, const U& b)
