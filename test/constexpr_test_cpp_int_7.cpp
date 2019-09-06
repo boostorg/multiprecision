@@ -3,8 +3,7 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_
 
-#include <boost\multiprecision\cpp_int.hpp>
-#include <boost\multiprecision\miller_rabin.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
 #include <iostream>
 
 struct kiss_rand
