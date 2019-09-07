@@ -486,6 +486,7 @@ struct expression<tag, Arg1, void, void, void>
    typedef tag                             tag_type;
 
    explicit BOOST_MP_CXX14_CONSTEXPR expression(const Arg1& a) : arg(a) {}
+   BOOST_MP_CXX14_CONSTEXPR expression(const expression& e) : arg(e.arg) {}
 
 #ifndef BOOST_NO_CXX11_STATIC_ASSERT
    //
@@ -625,7 +626,7 @@ struct expression<tag, Arg1, void, void, void>
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value, int>::type = 0
+             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value, int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
@@ -670,6 +671,7 @@ struct expression<terminal, Arg1, void, void, void>
    typedef terminal     tag_type;
 
    explicit BOOST_MP_CXX14_CONSTEXPR expression(const Arg1& a) : arg(a) {}
+   BOOST_MP_CXX14_CONSTEXPR expression(const expression& e) : arg(e.arg) {}
 
 #ifndef BOOST_NO_CXX11_STATIC_ASSERT
    //
@@ -808,7 +810,7 @@ struct expression<terminal, Arg1, void, void, void>
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value, int>::type = 0
+             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value, int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
@@ -856,6 +858,7 @@ struct expression<tag, Arg1, Arg2, void, void>
    typedef tag                                                                    tag_type;
 
    BOOST_MP_CXX14_CONSTEXPR expression(const Arg1& a1, const Arg2& a2) : arg1(a1), arg2(a2) {}
+   BOOST_MP_CXX14_CONSTEXPR expression(const expression& e) : arg1(e.arg1), arg2(e.arg2) {}
 
 #ifndef BOOST_NO_CXX11_STATIC_ASSERT
    //
@@ -995,7 +998,7 @@ struct expression<tag, Arg1, Arg2, void, void>
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value, int>::type = 0
+             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value, int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
@@ -1052,6 +1055,7 @@ struct expression<tag, Arg1, Arg2, Arg3, void>
    typedef tag                                                                         tag_type;
 
    BOOST_MP_CXX14_CONSTEXPR expression(const Arg1& a1, const Arg2& a2, const Arg3& a3) : arg1(a1), arg2(a2), arg3(a3) {}
+   BOOST_MP_CXX14_CONSTEXPR expression(const expression& e) : arg1(e.arg1), arg2(e.arg2), arg3(e.arg3) {}
 
 #ifndef BOOST_NO_CXX11_STATIC_ASSERT
    //
@@ -1193,7 +1197,7 @@ struct expression<tag, Arg1, Arg2, Arg3, void>
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value, int>::type = 0
+             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value, int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
@@ -1256,6 +1260,7 @@ struct expression
    typedef tag                                                                                          tag_type;
 
    BOOST_MP_CXX14_CONSTEXPR expression(const Arg1& a1, const Arg2& a2, const Arg3& a3, const Arg4& a4) : arg1(a1), arg2(a2), arg3(a3), arg4(a4) {}
+   BOOST_MP_CXX14_CONSTEXPR expression(const expression& e) : arg1(e.arg1), arg2(e.arg2), arg3(e.arg3), arg4(e.arg4) {}
 
 #ifndef BOOST_NO_CXX11_STATIC_ASSERT
    //
@@ -1399,7 +1404,7 @@ struct expression
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value, int>::type = 0
+             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value, int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const

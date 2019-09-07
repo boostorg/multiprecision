@@ -345,7 +345,7 @@ class cpp_bin_float
 
    template <class Float>
    typename boost::enable_if_c<
-       (number_category<Float>::value == number_kind_floating_point) && !boost::is_floating_point<Float>::value && is_number<Float>::value,
+       (number_category<Float>::value == number_kind_floating_point) && !boost::is_floating_point<Float>::value && (number_category<Float>::value == number_kind_floating_point),
        cpp_bin_float&>::type
    assign_float(Float f)
    {
@@ -362,7 +362,7 @@ class cpp_bin_float
       {
       case FP_ZERO:
          m_data     = limb_type(0);
-         m_sign     = ((boost::math::signbit)(f) > 0);
+         m_sign     = (eval_get_sign(f) > 0);
          m_exponent = exponent_zero;
          return *this;
       case FP_NAN:
@@ -372,7 +372,7 @@ class cpp_bin_float
          return *this;
       case FP_INFINITE:
          m_data     = limb_type(0);
-         m_sign     = (f < 0);
+         m_sign     = eval_get_sign(f) < 0;
          m_exponent = exponent_infinity;
          return *this;
       }
@@ -409,16 +409,21 @@ class cpp_bin_float
       {
          m_data     = limb_type(0u);
          m_exponent = exponent_zero;
-         m_sign     = ((boost::math::signbit)(f) > 0);
+         m_sign     = (eval_get_sign(f) > 0);
       }
       else if (eval_get_sign(m_data) == 0)
       {
          m_exponent = exponent_zero;
-         m_sign     = ((boost::math::signbit)(f) > 0);
+         m_sign     = (eval_get_sign(f) > 0);
       }
       return *this;
    }
-
+   template <class B, expression_template_option et>
+   cpp_bin_float& assign_float(const number<B, et>& f)
+   {
+      return assign_float(f.backend());
+   }
+   
    template <class I>
    typename boost::enable_if<is_integral<I>, cpp_bin_float&>::type operator=(const I& i)
    {
