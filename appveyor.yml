@@ -21,7 +21,7 @@ environment:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       ARGS: --toolset=msvc-14.2 address-model=64 cxxstd=17
       TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
-      APPVEYOR_RDP_PASSWORD: rdppassword
+      APPVEYOR_RDP_PASSWORD: Rdppassword0!
 
 init:
   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
