@@ -1,4 +1,5 @@
 # Copyright 2016 Peter Dimov
+# Copyright 2019 Moskvin Aleksey <zerg1996@yandex.ru>
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
@@ -21,6 +22,9 @@ environment:
       ARGS: --toolset=msvc-14.2 address-model=64 cxxstd=17
       TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
 
+init:
+  - cmd: cmake --version
+
 install:
   - cd ..
   - git clone -b master --depth 1 https://github.com/boostorg/boost.git boost-root
@@ -39,4 +43,7 @@ install:
 build: off
 
 test_script:
-  - cd %APPVEYOR_BUILD_FOLDER% && mkdir cmake-build && cd cmake-build;
+  - cmd: cd %APPVEYOR_BUILD_FOLDER%
+  - cmd: mkdir cmake-build
+  - cmd: cd cmake-build
+  - cmd: cmake -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=14 -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE ..;
