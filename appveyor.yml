@@ -36,5 +36,7 @@ install:
   - b2 headers
   - b2 install
 
+build: off
+
 test_script:
   - cd $TRAVIS_BUILD_DIR && mkdir cmake-build && cd cmake-build;
