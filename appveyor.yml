@@ -10,6 +10,7 @@ branches:
   only:
     - master
     - develop
+    - 22-implement-AppVeyorCI
 
 platform:
   - x64
@@ -83,12 +84,7 @@ install:
   - python tools/boostdep/depinst/depinst.py multiprecision
   - bootstrap
   - b2 headers
-
-build: off
+  - b2 install
 
 test_script:
-  - cd libs\config\test
-  - ..\..\..\b2 config_info_travis_install %ARGS%
-  - config_info_travis
-  - cd ..\..\multiprecision\test
-  - ..\..\..\b2 --hash -j3 %ARGS% %TARGETS% define=CI_SUPPRESS_KNOWN_ISSUES
+  - cd $TRAVIS_BUILD_DIR && mkdir cmake-build && cd cmake-build;
