@@ -21,8 +21,10 @@ environment:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       ARGS: --toolset=msvc-14.2 address-model=64 cxxstd=17
       TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
+      APPVEYOR_RDP_PASSWORD: rdppassword
 
 init:
+  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
   - cmd: cmake --version
 
 install:
@@ -46,4 +48,4 @@ test_script:
   - cmd: cd %APPVEYOR_BUILD_FOLDER%
   - cmd: mkdir cmake-build
   - cmd: cd cmake-build
-  - cmd: cmake -DBOOST_ROOT=C:\Libraries\boost_1_69_0 -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=14 -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE --build %APPVEYOR_BUILD_FOLDER%
+  - cmd: cmake -DBOOST_LIBRARYDIR=C:\Libraries\boost_1_69_0 -DBOOST_ROOT=C:\Libraries\boost_1_69_0 -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=14 -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE --build %APPVEYOR_BUILD_FOLDER%
