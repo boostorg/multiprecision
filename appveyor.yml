@@ -17,59 +17,9 @@ platform:
 
 environment:
   matrix:
-    - ARGS: --toolset=msvc-9.0  address-model=32 
-      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
-    - ARGS: --toolset=msvc-9.0  address-model=32 
-      TARGETS: conversions misc compile_fail examples concepts
-    - ARGS: --toolset=msvc-10.0 address-model=32 
-      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
-    - ARGS: --toolset=msvc-10.0 address-model=32 
-      TARGETS: conversions misc compile_fail examples concepts
-    - ARGS: --toolset=msvc-11.0 address-model=32 
-      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
-    - ARGS: --toolset=msvc-11.0 address-model=32 
-      TARGETS: conversions misc compile_fail examples concepts
-    - ARGS: --toolset=msvc-12.0 address-model=32 
-      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
-    - ARGS: --toolset=msvc-12.0 address-model=32 
-      TARGETS: conversions misc compile_fail examples concepts
-    - ARGS: --toolset=msvc-14.0 address-model=32 
-      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
-    - ARGS: --toolset=msvc-14.0 address-model=32 
-      TARGETS: conversions misc compile_fail examples concepts
-    - ARGS: --toolset=msvc-12.0 address-model=64 
-      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
-    - ARGS: --toolset=msvc-12.0 address-model=64 
-      TARGETS: conversions misc compile_fail examples concepts
-    - ARGS: --toolset=msvc-14.0 address-model=64 
-      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
-    - ARGS: --toolset=msvc-14.0 address-model=64 
-      TARGETS: conversions misc compile_fail examples concepts
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       ARGS: --toolset=msvc-14.2 address-model=64 cxxstd=17
       TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-      ARGS: --toolset=msvc-14.2 address-model=64 cxxstd=17 
-      TARGETS: conversions misc compile_fail examples concepts
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-      ARGS: --toolset=msvc-14.2 address-model=32  cxxstd=17
-      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-      ARGS: --toolset=msvc-14.2 address-model=32  cxxstd=17
-      TARGETS: conversions misc compile_fail examples concepts
-    - ARGS: --toolset=gcc address-model=64 
-      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
-      PATH: C:\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin;%PATH%
-    - ARGS: --toolset=gcc address-model=64 
-      TARGETS: conversions misc compile_fail examples concepts
-      PATH: C:\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin;%PATH%
-    - ARGS: --toolset=gcc address-model=64 cxxstd=2a cxxstd-dialect=gnu 
-      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
-      PATH: C:\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin;%PATH%
-    - ARGS: --toolset=gcc address-model=64 cxxstd=2a cxxstd-dialect=gnu 
-      TARGETS: conversions misc compile_fail examples concepts
-      PATH: C:\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin;%PATH%
-
 
 install:
   - cd ..
