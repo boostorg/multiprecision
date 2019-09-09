@@ -601,7 +601,7 @@ class number
       using default_ops::eval_increment;
       self_type temp(*this);
       eval_increment(m_backend);
-      return BOOST_MP_MOVE(temp);
+      return temp;
    }
 
    inline BOOST_MP_CXX14_CONSTEXPR number operator--(int)
@@ -609,7 +609,7 @@ class number
       using default_ops::eval_decrement;
       self_type temp(*this);
       eval_decrement(m_backend);
-      return BOOST_MP_MOVE(temp);
+      return temp;
    }
 
    template <class V>

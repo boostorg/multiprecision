@@ -9,6 +9,13 @@
 #include "boost/multiprecision/cpp_int.hpp"
 #include "test.hpp"
 
+#if defined(BOOST_GCC) && (__GNUC__ == 9) && (__cplusplus < 201704)
+// GCC9 in C++17 mode fails to compile this, but is fine in C++20 mode.
+#define DISABLE_TESTS
+#endif
+
+#if !defined(BOOST_MP_NO_CONSTEXPR_DETECTION) && !defined(DISABLE_TESTS)
+
 template <class F, class V>
 decltype(std::declval<F>()(std::declval<V>())) non_constexpr_invoke(F f, V v)
 {
@@ -93,4 +100,7 @@ int main()
    }
    return boost::report_errors();
 }
+#else
+int main(){}
+#endif
 

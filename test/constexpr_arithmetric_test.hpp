@@ -21,8 +21,9 @@ BOOST_CXX14_CONSTEXPR T do_test_constexpr_add_subtract(T a, U b)
    a -= a;
    ++a;
    --a;
-   a += b++;
-   a += b--;
+   T bb(b);
+   a += bb++;
+   a += bb--;
    a = a + b;
    a += a - b;
    if constexpr(std::numeric_limits<U>::is_signed && std::numeric_limits<T>::is_signed)
