@@ -39,4 +39,4 @@ install:
 build: off
 
 test_script:
-  - cd $TRAVIS_BUILD_DIR && mkdir cmake-build && cd cmake-build;
+  - cd %APPVEYOR_BUILD_FOLDER% && mkdir cmake-build && cd cmake-build;
