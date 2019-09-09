@@ -27,18 +27,18 @@ init:
 
 install:
   - cd ..
-  - git clone -b master --depth 1 https://github.com/boostorg/boost.git boost-root
-  - cd boost-root
-  - git submodule update --init tools/build
-  - git submodule update --init tools/boost_install
-  - git submodule update --init libs/headers
-  - git submodule update --init libs/config
-  - xcopy /s /e /q %APPVEYOR_BUILD_FOLDER% libs\multiprecision
-  - git submodule update --init tools/boostdep
-  - python tools/boostdep/depinst/depinst.py multiprecision
-  - bootstrap
-  - b2 headers
-  - b2 install
+#  - git clone -b master --depth 1 https://github.com/boostorg/boost.git boost-root
+#  - cd boost-root
+#  - git submodule update --init tools/build
+#  - git submodule update --init tools/boost_install
+#  - git submodule update --init libs/headers
+#  - git submodule update --init libs/config
+#  - xcopy /s /e /q %APPVEYOR_BUILD_FOLDER% libs\multiprecision
+#  - git submodule update --init tools/boostdep
+#  - python tools/boostdep/depinst/depinst.py multiprecision
+#  - bootstrap
+#  - b2 headers
+#  - b2 install
 
 build: off
 
@@ -46,4 +46,4 @@ test_script:
   - cmd: cd %APPVEYOR_BUILD_FOLDER%
   - cmd: mkdir cmake-build
   - cmd: cd cmake-build
-  - cmd: cmake -DBOOST_ROOT=C:\Boost -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=14 -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE --build %APPVEYOR_BUILD_FOLDER%
+  - cmd: cmake -DBOOST_ROOT=C:\Libraries\boost_1_69_0 -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=14 -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE --build %APPVEYOR_BUILD_FOLDER%
