@@ -434,7 +434,17 @@ int eval_fpclassify(const float128_backend& arg)
       return FP_NORMAL;
    }
 }
-
+#if defined(BOOST_GCC) && (__GNUC__ == 9)
+// See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=91705
+inline BOOST_MP_CXX14_CONSTEXPR void eval_increment(float128_backend& arg)
+{
+   arg.value() = 1 + arg.value();
+}
+inline BOOST_MP_CXX14_CONSTEXPR void eval_decrement(float128_backend& arg)
+{
+   arg.value() = arg.value() - 1;
+}
+#else
 inline BOOST_MP_CXX14_CONSTEXPR void eval_increment(float128_backend& arg)
 {
    ++arg.value();
@@ -443,6 +453,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_decrement(float128_backend& arg)
 {
    --arg.value();
 }
+#endif
 
 /*********************************************************************
 *

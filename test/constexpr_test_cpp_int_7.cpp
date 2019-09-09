@@ -76,11 +76,11 @@ struct multiprecision_generator
    constexpr               multiprecision_generator(std::uint64_t seed1, std::uint64_t seed2) : m_gen64(seed1, seed2) {}
    constexpr               multiprecision_generator(std::uint64_t seed1, std::uint64_t seed2, std::uint64_t seed3) : m_gen64(seed1, seed2, seed3) {}
 
-   static constexpr result_type min()
+   static constexpr result_type (min)()
    {
       return 0u;
    }
-   static constexpr result_type max()
+   static constexpr result_type (max)()
    {
       return ~result_type(0u);
    }

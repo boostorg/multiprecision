@@ -522,6 +522,12 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
    BOOST_CONSTEXPR cpp_int_base(const cpp_int_base& a, const literals::detail::negate_tag&)
        : m_wrapper(a.m_wrapper), m_limbs(a.m_limbs), m_sign((a.m_limbs == 1) && (*a.limbs() == 0) ? false : !a.m_sign) {}
 #endif
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+   //
+   // These are deprecated in C++20 unless we make them explicit:
+   //
+   constexpr cpp_int_base& operator=(const cpp_int_base&) = default;
+#endif
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
@@ -750,6 +756,12 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
          m_limbs(o.m_limbs) {}
    // Defaulted functions:
    //~cpp_int_base() BOOST_NOEXCEPT {}
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+   //
+   // These are deprecated in C++20 unless we make them explicit:
+   //
+   constexpr cpp_int_base& operator=(const cpp_int_base&) = default;
+#endif
 
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void assign(const cpp_int_base& o) BOOST_NOEXCEPT
    {
@@ -937,6 +949,12 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
        : m_data(a.m_data),
          m_sign(a.m_data ? !a.m_sign : false) {}
 #endif
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+   //
+   // These are deprecated in C++20 unless we make them explicit:
+   //
+   constexpr cpp_int_base& operator=(const cpp_int_base&) = default;
+#endif
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
@@ -1098,6 +1116,12 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
    template <limb_type a, limb_type b>
    BOOST_CONSTEXPR cpp_int_base(literals::detail::value_pack<a, b>) BOOST_NOEXCEPT
        : m_data(static_cast<local_limb_type>(a) | (static_cast<local_limb_type>(b) << bits_per_limb)) {}
+#endif
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+   //
+   // These are deprecated in C++20 unless we make them explicit:
+   //
+   constexpr cpp_int_base& operator=(const cpp_int_base&) = default;
 #endif
    //
    // Helper functions for getting at our internal data, and manipulating storage:

@@ -1262,7 +1262,7 @@ inline boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<D
 
    boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> result;
    mpfi_asinh(result.backend().data(), arg.backend().data());
-   return BOOST_MP_MOVE(result);
+   return result;
 }
 template <unsigned Digits10, expression_template_option ExpressionTemplates>
 inline boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> acosh BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>& arg)
@@ -1271,7 +1271,7 @@ inline boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<D
 
    boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> result;
    mpfi_acosh(result.backend().data(), arg.backend().data());
-   return BOOST_MP_MOVE(result);
+   return result;
 }
 template <unsigned Digits10, expression_template_option ExpressionTemplates>
 inline boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> atanh BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>& arg)
@@ -1280,7 +1280,7 @@ inline boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<D
 
    boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> result;
    mpfi_atanh(result.backend().data(), arg.backend().data());
-   return BOOST_MP_MOVE(result);
+   return result;
 }
 template <unsigned Digits10, expression_template_option ExpressionTemplates>
 inline boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> cbrt BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>& arg)
@@ -1289,7 +1289,7 @@ inline boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<D
 
    boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> result;
    mpfi_cbrt(result.backend().data(), arg.backend().data());
-   return BOOST_MP_MOVE(result);
+   return result;
 }
 template <unsigned Digits10, expression_template_option ExpressionTemplates>
 inline boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> expm1 BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>& arg)
@@ -1298,7 +1298,7 @@ inline boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<D
 
    boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> result;
    mpfi_expm1(result.backend().data(), arg.backend().data());
-   return BOOST_MP_MOVE(result);
+   return result;
 }
 template <unsigned Digits10, expression_template_option ExpressionTemplates>
 inline boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> log1p BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates>& arg)
@@ -1307,7 +1307,7 @@ inline boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<D
 
    boost::multiprecision::number<boost::multiprecision::mpfi_float_backend<Digits10>, ExpressionTemplates> result;
    mpfi_log1p(result.backend().data(), arg.backend().data());
-   return BOOST_MP_MOVE(result);
+   return result;
 }
 
 } // namespace multiprecision
