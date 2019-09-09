@@ -11,6 +11,7 @@
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/type_traits/is_constructible.hpp>
 #include <boost/type_traits/decay.hpp>
+#include <boost/math/tools/complex.hpp>
 #ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable : 4307)
@@ -1719,29 +1720,32 @@ struct is_interval_number<number<Backend, ExpressionTemplates> > : public is_int
 } // namespace boost
 
 namespace boost { namespace math {
-namespace tools {
+   namespace tools {
 
-template <class T>
-struct promote_arg;
+      template <class T>
+      struct promote_arg;
 
-template <class tag, class A1, class A2, class A3, class A4>
-struct promote_arg<boost::multiprecision::detail::expression<tag, A1, A2, A3, A4> >
-{
-   typedef typename boost::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type type;
-};
+      template <class tag, class A1, class A2, class A3, class A4>
+      struct promote_arg<boost::multiprecision::detail::expression<tag, A1, A2, A3, A4> >
+      {
+         typedef typename boost::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type type;
+      };
 
-template <class R, class B, boost::multiprecision::expression_template_option ET>
-inline R real_cast(const boost::multiprecision::number<B, ET>& val)
-{
-   return val.template convert_to<R>();
-}
+      template <class R, class B, boost::multiprecision::expression_template_option ET>
+      inline R real_cast(const boost::multiprecision::number<B, ET>& val)
+      {
+         return val.template convert_to<R>();
+      }
 
-template <class R, class tag, class A1, class A2, class A3, class A4>
-inline R real_cast(const boost::multiprecision::detail::expression<tag, A1, A2, A3, A4>& val)
-{
-   typedef typename boost::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type val_type;
-   return val_type(val).template convert_to<R>();
-}
+      template <class R, class tag, class A1, class A2, class A3, class A4>
+      inline R real_cast(const boost::multiprecision::detail::expression<tag, A1, A2, A3, A4>& val)
+      {
+         typedef typename boost::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type val_type;
+         return val_type(val).template convert_to<R>();
+      }
+
+      template <class B, boost::multiprecision::expression_template_option ET>
+      struct is_complex_type<boost::multiprecision::number<B, ET> > : public boost::mpl::bool_<boost::multiprecision::number_category<B>::value == boost::multiprecision::number_kind_complex> {};
 
 } // namespace tools
 
