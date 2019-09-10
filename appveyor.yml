@@ -16,6 +16,8 @@ branches:
 platform:
   - x64
 
+os: unstable
+
 environment:
   matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
@@ -40,7 +42,7 @@ install:
   - python tools/boostdep/depinst/depinst.py multiprecision
   - bootstrap
   - b2 headers
-  - b2 install
+  - b2 --prefix=C:/boost install
 
 build: off
 
