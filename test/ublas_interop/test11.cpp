@@ -8,6 +8,10 @@
 //  The authors gratefully acknowledge the support of
 //  GeNeSys mbH & Co. KG in producing this work.
 
+#if defined(__GNUC__) && (__GNUC__ >= 9)
+##pragma GCC diagnostic ignored "-Wdeprecated-copy"
+#endif
+
 #include "test1.hpp"
 
 // Test vector expression templates
