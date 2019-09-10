@@ -42,7 +42,6 @@ install:
   - python tools/boostdep/depinst/depinst.py multiprecision
   - bootstrap.bat
   - b2 headers
-  - mkdir C:/local
   - b2 --prefix=C:/local install
 
 build: off
