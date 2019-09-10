@@ -18,16 +18,26 @@ platform:
 
 os: unstable
 
-environment:
-  matrix:
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-      ARGS: --toolset=msvc-14.2 address-model=64 cxxstd=17
-      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
-      APPVEYOR_RDP_PASSWORD: Rdppassword0!
+#environment:
+#  matrix:
+#    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+#      ARGS: --toolset=msvc-14.2 address-model=64 cxxstd=17
+#      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
+#      APPVEYOR_RDP_PASSWORD: Rdppassword0!
 
 init:
   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
   - cmd: cmake --version
+
+environment:
+  GENERATOR: "Visual Studio 14 2015 Win64"
+  CONFIG: Debug
+  PATH: "%BOOST_LIBRARYDIR%;%PATH%"
+  matrix:
+    - BOOST_ROOT: "C:\\Libraries\\boost_1_60_0"
+      BOOST_LIBRARYDIR: "C:\\Libraries\\boost_1_60_0\\lib64-msvc-14.0"
+    - BOOST_ROOT: "C:\\Libraries\\boost_1_62_0"
+      BOOST_LIBRARYDIR: "C:\\Libraries\\boost_1_62_0\\lib64-msvc-14.0"
 
 install:
   - cd ..
@@ -50,6 +60,7 @@ test_script:
   - cmd: cd %APPVEYOR_BUILD_FOLDER%
   - cmd: mkdir cmake-build
   - cmd: cd cmake-build
+  - cmd: cmake -G "%GENERATOR%" -DCMAKE_BUILD_TYPE="%CONFIG%" -DBOOST_ROOT="%BOOST_ROOT%" -DBOOST_LIBRARYDIR="%BOOST_LIBRARYDIR%" ..
   - cmd: cmake -DBOOST_ROOT=C:\Boost -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=14 -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE --build %APPVEYOR_BUILD_FOLDER%
 
 on_finish:
