@@ -440,6 +440,9 @@ if (NOT Boost_NO_BOOST_CMAKE)
     # Do the same find_package call but look specifically for the CMake version.
     # Note that args are passed in the Boost_FIND_xxxxx variables, so there is no
     # need to delegate them to this find_package call.
+    message(FIND_BOOST_DIR=${Boost_DIR})
+    message(FIND_INCLUDE_DIRS=${Boost_INCLUDE_DIRS})
+    message(FIND_LIBDYR=${Boost_LIBRARY_DIRS})
     find_package(Boost QUIET NO_MODULE)
     mark_as_advanced(Boost_DIR)
 
