@@ -31,19 +31,18 @@ init:
 
 install:
   - cd ..
-#  - git clone -b boost-1.69.0 --depth 1 https://github.com/boostorg/boost.git boost-root
-  - git clone -b boost-1.69.0 --recursive-submodules --depth 1 https://github.com/boostorg/boost.git boost-root
+  - git clone -b master --depth 1 https://github.com/boostorg/boost.git boost-root
   - cd boost-root
-  #- git submodule update --init tools/build
-  #- git submodule update --init tools/boost_install
-  #- git submodule update --init libs/headers
-  #- git submodule update --init libs/config
+  - git submodule update --init tools/build
+  - git submodule update --init tools/boost_install
+  - git submodule update --init libs/headers
+  - git submodule update --init libs/config
   - xcopy /s /e /q %APPVEYOR_BUILD_FOLDER% libs\multiprecision
-  #- git submodule update --init tools/boostdep
-  #- python tools/boostdep/depinst/depinst.py multiprecision
-  - bootstrap
+  - git submodule update --init tools/boostdep
+  - python tools/boostdep/depinst/depinst.py multiprecision
+  - bootstrap.bat
   - b2 headers
-  - b2 --with-random --prefix=C:/boost install
+  - b2 install
 
 build: off
 
