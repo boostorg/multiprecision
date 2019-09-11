@@ -42,7 +42,7 @@ install:
   - python tools/boostdep/depinst/depinst.py multiprecision
   - bootstrap.bat
   - b2 headers
-  - b2 --prefix=C:/local install
+  - b2 install
 
 build: off
 
@@ -52,6 +52,6 @@ test_script:
   - cmd: mkdir cmake-build
   - cmd: cd cmake-build
   - cmd: cmake -DBoost_DIR=C:/Boost/lib/cmake/boost-1.72.0 -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=14 -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE --build ..
-
+  - cmd: cmake --build C:\projects\boost-root\libs\multiprecision\cmake-build --target tests
 on_finish:
   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
