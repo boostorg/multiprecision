@@ -778,7 +778,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::backen
    static BOOST_MP_CXX14_CONSTEXPR number_type                        signaling_NaN() { return 0; }
    static BOOST_MP_CXX14_CONSTEXPR number_type                        denorm_min() { return BOOST_MP_QUAD_DENORM_MIN; }
    BOOST_STATIC_CONSTEXPR bool               is_iec559       = true;
-   BOOST_STATIC_CONSTEXPR bool               is_bounded      = false;
+   BOOST_STATIC_CONSTEXPR bool               is_bounded      = true;
    BOOST_STATIC_CONSTEXPR bool               is_modulo       = false;
    BOOST_STATIC_CONSTEXPR bool               traps           = false;
    BOOST_STATIC_CONSTEXPR bool               tinyness_before = false;
