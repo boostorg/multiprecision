@@ -51,7 +51,8 @@ test_script:
   - cmd: cd libs\multiprecision
   - cmd: mkdir cmake-build
   - cmd: cd cmake-build
-  - cmd: cmake -DBoost_DIR=C:/Boost/lib/cmake/boost-1.72.0 -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=14 -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE --build ..
+  - cmd: cmake -DBoost_DIR=C:/Boost/lib/cmake/boost-1.72.0 -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=14 -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE --build ..
   - cmd: cmake --build C:\projects\boost-root\libs\multiprecision\cmake-build --target tests
+
 on_finish:
   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
