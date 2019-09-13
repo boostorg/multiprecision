@@ -23,11 +23,6 @@ environment:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       ARGS: --toolset=msvc-14.2 address-model=64 cxxstd=17
       TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
-      APPVEYOR_RDP_PASSWORD: Rdppassword0!
-
-init:
-  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-  - cmd: cmake --version
 
 install:
   - cd ..
@@ -47,12 +42,8 @@ install:
 build: off
 
 test_script:
-  #- cmd: cd %APPVEYOR_BUILD_FOLDER%
   - cmd: cd libs\multiprecision
   - cmd: mkdir cmake-build
   - cmd: cd cmake-build
   - cmd: cmake -DBoost_DIR=C:/Boost/lib/cmake/boost-1.72.0 -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=14 -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE --build ..
-  - cmd: cmake --build C:\projects\boost-root\libs\multiprecision\cmake-build --target tests
-
-on_finish:
-  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+  - cmd: cmake --build C:/projects/boost-root/libs/multiprecision/cmake-build --target arithmetic_tests
