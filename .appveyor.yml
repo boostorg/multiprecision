@@ -23,6 +23,7 @@ environment:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       ARGS: --toolset=msvc-14.2 address-model=64 cxxstd=17
       TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
+      TARGETS_CMAKE: multiprecision_test_suite_arithmetic_tests multiprecision_test_suite_cpp_int_tests multiprecision_test_suite_functions_and_limits
 
 install:
   - cd ..
@@ -46,4 +47,4 @@ test_script:
   - cmd: mkdir cmake-build
   - cmd: cd cmake-build
   - cmd: cmake -DBoost_DIR=C:/Boost/lib/cmake/boost-1.72.0 -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=14 -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE --build ..
-  - cmd: cmake --build C:/projects/boost-root/libs/multiprecision/cmake-build --target arithmetic_tests
+  - cmd: cmake --build C:/projects/boost-root/libs/multiprecision/cmake-build --target %TARGETS_CMAKE%
