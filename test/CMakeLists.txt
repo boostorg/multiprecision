@@ -71,9 +71,6 @@ add_custom_target(multiprecision_test_suite_concepts)
 add_custom_target(multiprecision_test_suite_examples)
 add_custom_target(multiprecision_test_suite_compile_fail)
 
-if(MSVC)
-    add_compile_options(/bigobj)
-endif()
 # copyright John Maddock 2011
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at
@@ -254,6 +251,9 @@ endif()
 
 cm_test(NAME multiprecision_test_test_arithmetic_cpp_int_1 SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_arithmetic_cpp_int_1.cpp)
 target_link_libraries(multiprecision_test_test_arithmetic_cpp_int_1 no_eh_support)
+if(MSVC)
+    target_compile_options(multiprecision_test_test_arithmetic_cpp_int_1 PRIVATE /bigobj)
+endif()
 add_dependencies(multiprecision_test_suite_arithmetic_tests multiprecision_test_test_arithmetic_cpp_int_1)
 
 cm_test(NAME multiprecision_test_test_arithmetic_cpp_int_2 SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_arithmetic_cpp_int_2.cpp)
