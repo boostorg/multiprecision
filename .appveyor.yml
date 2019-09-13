@@ -18,6 +18,9 @@ platform:
 
 os: unstable
 
+cache:
+  - C:\Boost -> appveyor.yml
+
 environment:
   matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
@@ -25,7 +28,12 @@ environment:
       TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
       TARGETS_CMAKE: multiprecision_test_suite_arithmetic_tests multiprecision_test_suite_cpp_int_tests multiprecision_test_suite_functions_and_limits
 
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      ARGS: --toolset=msvc-14.2 address-model=64 cxxstd=17
+      TARGETS_CMAKE: multiprecision_test_suite_functions_and_limits
+
 install:
+  - SET boost_install=false
   - cd ..
   - git clone -b master --depth 1 https://github.com/boostorg/boost.git boost-root
   - cd boost-root
@@ -38,7 +46,8 @@ install:
   - python tools/boostdep/depinst/depinst.py multiprecision
   - bootstrap.bat
   - b2 headers
-  - b2 install
+  - IF EXIST "C:\boost" (SET boost_install=true)
+  - if not boost_install (b2 install)
 
 build: off
 
