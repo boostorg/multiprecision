@@ -46,8 +46,7 @@ install:
   - python tools/boostdep/depinst/depinst.py multiprecision
   - bootstrap.bat
   - b2 headers
-  - IF EXIST "C:\boost" (SET boost_install=true)
-  - if not boost_install (b2 install)
+  - b2 install
 
 build: off
 

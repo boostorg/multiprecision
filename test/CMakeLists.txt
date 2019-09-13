@@ -72,7 +72,7 @@ add_custom_target(multiprecision_test_suite_examples)
 add_custom_target(multiprecision_test_suite_compile_fail)
 
 if(MSVC)
-    add_compile_definitions(/bigobj)
+    add_compile_options(/bigobj)
 endif()
 # copyright John Maddock 2011
 # Distributed under the Boost Software License, Version 1.0.
