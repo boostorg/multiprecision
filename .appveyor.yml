@@ -105,7 +105,7 @@ test_script:
   - cd ..\..\multiprecision\test
   - ..\..\..\b2 --hash -j3 %ARGS% %TARGETS% define=CI_SUPPRESS_KNOWN_ISSUES
 
-  - cd libs\multiprecision
+  - cd ..
   - mkdir cmake-build
   - cd cmake-build
   - cmake -DBoost_DIR=C:/Boost/lib/cmake/boost-1.72.0 -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=14 -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE --build ..
