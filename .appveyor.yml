@@ -111,6 +111,7 @@ environment:
 
 
 install:
+  - for /f %a in ('dir /b C:\Boost\include\boost*') do (set boost_dir=C:\Boost\include\%a)
   - cd ..
   - git clone -b master --depth 1 https://github.com/boostorg/boost.git boost-root
   - cd boost-root
