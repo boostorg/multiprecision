@@ -24,7 +24,6 @@ environment:
       ARGS: --toolset=msvc-14.2 address-model=64 cxxstd=17
       TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
       TARGETS_CMAKE: multiprecision_test_suite_arithmetic_tests multiprecision_test_suite_cpp_int_tests multiprecision_test_suite_functions_and_limits
-
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       ARGS: --toolset=msvc-14.2 address-model=64 cxxstd=17
       TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
@@ -34,7 +33,6 @@ environment:
       ARGS: --toolset=msvc-14.1 address-model=64 cxxstd=17
       TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
       TARGETS_CMAKE: multiprecision_test_suite_arithmetic_tests multiprecision_test_suite_cpp_int_tests multiprecision_test_suite_functions_and_limits
-
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       ARGS: --toolset=msvc-14.1 address-model=64 cxxstd=17
       TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
@@ -44,20 +42,51 @@ environment:
       ARGS: --toolset=msvc-14.0 address-model=64 cxxstd=17
       TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
       TARGETS_CMAKE: multiprecision_test_suite_arithmetic_tests multiprecision_test_suite_cpp_int_tests multiprecision_test_suite_functions_and_limits
-
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       ARGS: --toolset=msvc-14.0 address-model=64 cxxstd=17
       TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
       TARGETS_CMAKE: multiprecision_test_suite_conversions multiprecision_test_suite_misc multiprecision_test_suite_compile_fail multiprecision_test_suite_examples multiprecision_test_suite_concepts
 
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
-      ARGS: --toolset=msvc-12.0 address-model=64 cxxstd=17
+    - ARGS: --toolset=msvc-10.0 address-model=32
       TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
       TARGETS_CMAKE: multiprecision_test_suite_arithmetic_tests multiprecision_test_suite_cpp_int_tests multiprecision_test_suite_functions_and_limits
+    - ARGS: --toolset=msvc-10.0 address-model=32
+      TARGETS: conversions misc compile_fail examples concepts
+      TARGETS_CMAKE: multiprecision_test_suite_conversions multiprecision_test_suite_misc multiprecision_test_suite_compile_fail multiprecision_test_suite_examples multiprecision_test_suite_concepts
 
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
-      ARGS: --toolset=msvc-12.0 address-model=64 cxxstd=17
+    - ARGS: --toolset=msvc-11.0 address-model=32
       TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
+      TARGETS_CMAKE: multiprecision_test_suite_arithmetic_tests multiprecision_test_suite_cpp_int_tests multiprecision_test_suite_functions_and_limits
+    - ARGS: --toolset=msvc-11.0 address-model=32
+      TARGETS: conversions misc compile_fail examples concepts
+      TARGETS_CMAKE: multiprecision_test_suite_conversions multiprecision_test_suite_misc multiprecision_test_suite_compile_fail multiprecision_test_suite_examples multiprecision_test_suite_concepts
+
+    - ARGS: --toolset=msvc-12.0 address-model=32
+      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
+      TARGETS_CMAKE: multiprecision_test_suite_arithmetic_tests multiprecision_test_suite_cpp_int_tests multiprecision_test_suite_functions_and_limits
+    - ARGS: --toolset=msvc-12.0 address-model=32
+      TARGETS: conversions misc compile_fail examples concepts
+      TARGETS_CMAKE: multiprecision_test_suite_conversions multiprecision_test_suite_misc multiprecision_test_suite_compile_fail multiprecision_test_suite_examples multiprecision_test_suite_concepts
+
+    - ARGS: --toolset=msvc-14.0 address-model=32
+      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
+      TARGETS_CMAKE: multiprecision_test_suite_arithmetic_tests multiprecision_test_suite_cpp_int_tests multiprecision_test_suite_functions_and_limits
+    - ARGS: --toolset=msvc-14.0 address-model=32
+      TARGETS: conversions misc compile_fail examples concepts
+      TARGETS_CMAKE: multiprecision_test_suite_conversions multiprecision_test_suite_misc multiprecision_test_suite_compile_fail multiprecision_test_suite_examples multiprecision_test_suite_concepts
+
+    - ARGS: --toolset=msvc-12.0 address-model=64
+      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
+      TARGETS_CMAKE: multiprecision_test_suite_arithmetic_tests multiprecision_test_suite_cpp_int_tests multiprecision_test_suite_functions_and_limits
+    - ARGS: --toolset=msvc-12.0 address-model=64
+      TARGETS: conversions misc compile_fail examples concepts
+      TARGETS_CMAKE: multiprecision_test_suite_conversions multiprecision_test_suite_misc multiprecision_test_suite_compile_fail multiprecision_test_suite_examples multiprecision_test_suite_concepts
+
+    - ARGS: --toolset=msvc-14.0 address-model=64
+      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
+      TARGETS_CMAKE: multiprecision_test_suite_arithmetic_tests multiprecision_test_suite_cpp_int_tests multiprecision_test_suite_functions_and_limits
+    - ARGS: --toolset=msvc-14.0 address-model=64
+      TARGETS: conversions misc compile_fail examples concepts
       TARGETS_CMAKE: multiprecision_test_suite_conversions multiprecision_test_suite_misc multiprecision_test_suite_compile_fail multiprecision_test_suite_examples multiprecision_test_suite_concepts
 
     - ARGS: --toolset=gcc address-model=64
@@ -106,7 +135,8 @@ test_script:
   - ..\..\..\b2 --hash -j3 %ARGS% %TARGETS% define=CI_SUPPRESS_KNOWN_ISSUES
 
   - cd ..
+  - for /f %a in ('dir /b C:\Boost\include\boost*') do set boost_dir=C:\Boost\include\%a
   - mkdir cmake-build
   - cd cmake-build
-  - cmake -DBoost_DIR=C:/Boost/lib/cmake/boost-1.72.0 -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=14 -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE --build ..
-  - cmake --build C:/projects/boost-root/libs/multiprecision/cmake-build --target %TARGETS_CMAKE%
+  - cmake -DBoost_DIR=%boost_dir% -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=14 -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE --build ..
+#  - cmake --build C:/projects/boost-root/libs/multiprecision/cmake-build --target %TARGETS_CMAKE%
