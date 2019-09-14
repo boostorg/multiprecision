@@ -135,7 +135,7 @@ test_script:
   - ..\..\..\b2 --hash -j3 %ARGS% %TARGETS% define=CI_SUPPRESS_KNOWN_ISSUES
 
   - cd ..
-  - for /f %%a in ('dir /b C:\Boost\lib\cmake\boost*') do (set boost_dir=C:\Boost\lib\cmake\%%a)
+  - for /f %%a in ('dir /b C:\Boost\lib\cmake\Boost-*') do (set boost_dir=C:\Boost\lib\cmake\%%a)
   - mkdir cmake-build
   - cd cmake-build
   - cmake -DBoost_DIR=%boost_dir% -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=14 -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE --build ..
