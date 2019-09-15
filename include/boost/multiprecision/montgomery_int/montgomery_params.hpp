@@ -16,8 +16,8 @@
 
 using namespace boost::multiprecision;
 
-namespace nil {
-namespace crypto3 {
+namespace boost {
+namespace multiprecision {
 
 class modular_reducer;
 

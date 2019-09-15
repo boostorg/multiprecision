@@ -12,12 +12,9 @@
 #ifndef BOOST_MULTIPRECISION_MODULAR_ADAPTOR_HPP
 #define BOOST_MULTIPRECISION_MODULAR_ADAPTOR_HPP
 
-#include <boost/cstdint.hpp>
-#include <boost/functional/hash_fwd.hpp>
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/multiprecision/montgomery_params.hpp>
 #include <boost/multiprecision/number.hpp>
-#include <boost/type_traits/is_complex.hpp>
 
 #include <algorithm>
 #include <cmath>
