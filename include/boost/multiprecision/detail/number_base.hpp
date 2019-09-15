@@ -11,6 +11,7 @@
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/type_traits/is_constructible.hpp>
 #include <boost/type_traits/decay.hpp>
+#include <boost/math/tools/complex.hpp>
 #ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable : 4307)
@@ -57,9 +58,11 @@
 # endif
 #endif
 
-#ifdef BOOST_MP_HAS_IS_CONSTANT_EVALUATED
+#if defined(BOOST_MP_HAS_IS_CONSTANT_EVALUATED) && !defined(BOOST_NO_CXX14_CONSTEXPR)
 #  define BOOST_MP_IS_CONST_EVALUATED(x) std::is_constant_evaluated()
-#elif !defined(BOOST_MP_NO_CXX14_CONSTEXPR) && defined(BOOST_GCC)
+#elif defined(BOOST_GCC) && !defined(BOOST_NO_CXX14_CONSTEXPR) && (__GNUC__ >= 9)
+#  define BOOST_MP_IS_CONST_EVALUATED(x) __builtin_is_constant_evaluated()
+#elif !defined(BOOST_NO_CXX14_CONSTEXPR) && defined(BOOST_GCC) && (__GNUC__ >= 6)
 #  define BOOST_MP_IS_CONST_EVALUATED(x) __builtin_constant_p(x)
 #else
 #  define BOOST_MP_NO_CONSTEXPR_DETECTION
@@ -67,7 +70,7 @@
 
 #define BOOST_MP_CXX14_CONSTEXPR BOOST_CXX14_CONSTEXPR
 //
-// Early clang versions trip over the constexpr code:
+// Early compiler versions trip over the constexpr code:
 //
 #if defined(__clang__) && (__clang_major__ < 5)
 #undef BOOST_MP_CXX14_CONSTEXPR
@@ -76,6 +79,16 @@
 #if defined(__apple_build_version__) && (__clang_major__ < 9)
 #undef BOOST_MP_CXX14_CONSTEXPR
 #define BOOST_MP_CXX14_CONSTEXPR
+#endif
+#if defined(BOOST_GCC) && (__GNUC__ < 6)
+#undef BOOST_MP_CXX14_CONSTEXPR
+#define BOOST_MP_CXX14_CONSTEXPR
+#endif
+
+#ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
+#  define BOOST_CXX14_CONSTEXPR_IF_DETECTION
+#else
+#  define BOOST_CXX14_CONSTEXPR_IF_DETECTION constexpr
 #endif
 
 #ifdef BOOST_MSVC
@@ -474,6 +487,7 @@ struct expression<tag, Arg1, void, void, void>
    typedef tag                             tag_type;
 
    explicit BOOST_MP_CXX14_CONSTEXPR expression(const Arg1& a) : arg(a) {}
+   BOOST_MP_CXX14_CONSTEXPR expression(const expression& e) : arg(e.arg) {}
 
 #ifndef BOOST_NO_CXX11_STATIC_ASSERT
    //
@@ -613,7 +627,7 @@ struct expression<tag, Arg1, void, void, void>
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value, int>::type = 0
+             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value, int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
@@ -658,6 +672,7 @@ struct expression<terminal, Arg1, void, void, void>
    typedef terminal     tag_type;
 
    explicit BOOST_MP_CXX14_CONSTEXPR expression(const Arg1& a) : arg(a) {}
+   BOOST_MP_CXX14_CONSTEXPR expression(const expression& e) : arg(e.arg) {}
 
 #ifndef BOOST_NO_CXX11_STATIC_ASSERT
    //
@@ -796,7 +811,7 @@ struct expression<terminal, Arg1, void, void, void>
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value, int>::type = 0
+             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value, int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
@@ -844,6 +859,7 @@ struct expression<tag, Arg1, Arg2, void, void>
    typedef tag                                                                    tag_type;
 
    BOOST_MP_CXX14_CONSTEXPR expression(const Arg1& a1, const Arg2& a2) : arg1(a1), arg2(a2) {}
+   BOOST_MP_CXX14_CONSTEXPR expression(const expression& e) : arg1(e.arg1), arg2(e.arg2) {}
 
 #ifndef BOOST_NO_CXX11_STATIC_ASSERT
    //
@@ -983,7 +999,7 @@ struct expression<tag, Arg1, Arg2, void, void>
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value, int>::type = 0
+             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value, int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
@@ -1040,6 +1056,7 @@ struct expression<tag, Arg1, Arg2, Arg3, void>
    typedef tag                                                                         tag_type;
 
    BOOST_MP_CXX14_CONSTEXPR expression(const Arg1& a1, const Arg2& a2, const Arg3& a3) : arg1(a1), arg2(a2), arg3(a3) {}
+   BOOST_MP_CXX14_CONSTEXPR expression(const expression& e) : arg1(e.arg1), arg2(e.arg2), arg3(e.arg3) {}
 
 #ifndef BOOST_NO_CXX11_STATIC_ASSERT
    //
@@ -1181,7 +1198,7 @@ struct expression<tag, Arg1, Arg2, Arg3, void>
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value, int>::type = 0
+             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value, int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
@@ -1244,6 +1261,7 @@ struct expression
    typedef tag                                                                                          tag_type;
 
    BOOST_MP_CXX14_CONSTEXPR expression(const Arg1& a1, const Arg2& a2, const Arg3& a3, const Arg4& a4) : arg1(a1), arg2(a2), arg3(a3), arg4(a4) {}
+   BOOST_MP_CXX14_CONSTEXPR expression(const expression& e) : arg1(e.arg1), arg2(e.arg2), arg3(e.arg3), arg4(e.arg4) {}
 
 #ifndef BOOST_NO_CXX11_STATIC_ASSERT
    //
@@ -1387,7 +1405,7 @@ struct expression
    template <class T
 #ifndef __SUNPRO_CC
              ,
-             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value, int>::type = 0
+             typename boost::disable_if_c<is_number<T>::value || is_constructible<T const&, result_type>::value || !is_constructible<T, result_type>::value, int>::type = 0
 #endif
              >
    explicit BOOST_MP_CXX14_CONSTEXPR operator T() const
@@ -1702,29 +1720,32 @@ struct is_interval_number<number<Backend, ExpressionTemplates> > : public is_int
 } // namespace boost
 
 namespace boost { namespace math {
-namespace tools {
+   namespace tools {
 
-template <class T>
-struct promote_arg;
+      template <class T>
+      struct promote_arg;
 
-template <class tag, class A1, class A2, class A3, class A4>
-struct promote_arg<boost::multiprecision::detail::expression<tag, A1, A2, A3, A4> >
-{
-   typedef typename boost::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type type;
-};
+      template <class tag, class A1, class A2, class A3, class A4>
+      struct promote_arg<boost::multiprecision::detail::expression<tag, A1, A2, A3, A4> >
+      {
+         typedef typename boost::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type type;
+      };
 
-template <class R, class B, boost::multiprecision::expression_template_option ET>
-inline R real_cast(const boost::multiprecision::number<B, ET>& val)
-{
-   return val.template convert_to<R>();
-}
+      template <class R, class B, boost::multiprecision::expression_template_option ET>
+      inline R real_cast(const boost::multiprecision::number<B, ET>& val)
+      {
+         return val.template convert_to<R>();
+      }
 
-template <class R, class tag, class A1, class A2, class A3, class A4>
-inline R real_cast(const boost::multiprecision::detail::expression<tag, A1, A2, A3, A4>& val)
-{
-   typedef typename boost::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type val_type;
-   return val_type(val).template convert_to<R>();
-}
+      template <class R, class tag, class A1, class A2, class A3, class A4>
+      inline R real_cast(const boost::multiprecision::detail::expression<tag, A1, A2, A3, A4>& val)
+      {
+         typedef typename boost::multiprecision::detail::expression<tag, A1, A2, A3, A4>::result_type val_type;
+         return val_type(val).template convert_to<R>();
+      }
+
+      template <class B, boost::multiprecision::expression_template_option ET>
+      struct is_complex_type<boost::multiprecision::number<B, ET> > : public boost::mpl::bool_<boost::multiprecision::number_category<B>::value == boost::multiprecision::number_kind_complex> {};
 
 } // namespace tools
 

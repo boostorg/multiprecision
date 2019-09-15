@@ -1,6 +1,11 @@
-# Distributed under the OSI-approved BSD 3-Clause License.  See accompanying
-# file Copyright.txt or https://cmake.org/licensing for details.
-
+#---------------------------------------------------------------------------#
+# Copyright (c) 2018-2019 Nil Foundation AG
+# Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+#
+# Distributed under the Boost Software License, Version 1.0
+# See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt
+#---------------------------------------------------------------------------#
 #[=======================================================================[.rst:
 FindBoost
 ---------
@@ -440,9 +445,6 @@ if (NOT Boost_NO_BOOST_CMAKE)
     # Do the same find_package call but look specifically for the CMake version.
     # Note that args are passed in the Boost_FIND_xxxxx variables, so there is no
     # need to delegate them to this find_package call.
-    message(FIND_BOOST_DIR=${Boost_DIR})
-    message(FIND_INCLUDE_DIRS=${Boost_INCLUDE_DIRS})
-    message(FIND_LIBDYR=${Boost_LIBRARY_DIRS})
     find_package(Boost QUIET NO_MODULE)
     mark_as_advanced(Boost_DIR)
 
