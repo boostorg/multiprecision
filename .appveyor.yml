@@ -11,7 +11,7 @@ branches:
   only:
     - master
     - develop
-    - 22-implement-AppVeyorCI
+    - cmake-develop
 
 platform:
   - x64
