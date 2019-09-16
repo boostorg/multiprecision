@@ -56,7 +56,7 @@ else()
                            ${Boost_LIBRARIES})
 
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../include"
-                        "${CMAKE_BINARY_DIR}/include"
+                        "${CMAKE_CURRENT_BINARY_DIR}/include"
 
                         ${Boost_INCLUDE_DIRS})
 endif()
@@ -251,6 +251,9 @@ endif()
 
 cm_test(NAME multiprecision_test_test_arithmetic_cpp_int_1 SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_arithmetic_cpp_int_1.cpp)
 target_link_libraries(multiprecision_test_test_arithmetic_cpp_int_1 no_eh_support)
+if(MSVC)
+    target_compile_options(multiprecision_test_test_arithmetic_cpp_int_1 PRIVATE /bigobj)
+endif()
 add_dependencies(multiprecision_test_suite_arithmetic_tests multiprecision_test_test_arithmetic_cpp_int_1)
 
 cm_test(NAME multiprecision_test_test_arithmetic_cpp_int_2 SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_arithmetic_cpp_int_2.cpp)
@@ -952,7 +955,7 @@ endif()
 
 cm_test(NAME multiprecision_test_test_rational_io_cpp_int SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_rational_io.cpp)
 target_compile_definitions(multiprecision_test_test_rational_io_cpp_int PUBLIC -DTEST_CPP_INT)
-target_link_libraries(multiprecision_test_test_rational_io_cpp_int ${GMP_LIBRARIES} no_eh_support)
+target_link_libraries(multiprecision_test_test_rational_io_cpp_int no_eh_support)
 add_dependencies(multiprecision_test_suite_misc multiprecision_test_test_rational_io_cpp_int)
 
 if((GMP_COMPILED) AND (TOMMATH_COMPILED) AND (MPFR_COMPILED))

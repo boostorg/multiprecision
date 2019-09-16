@@ -67,9 +67,14 @@ typedef boost::int128_type                      signed_double_limb_type;
 static const limb_type                          max_block_10        = 1000000000000000000uLL;
 static const limb_type                          digits_per_block_10 = 18;
 
-inline limb_type block_multiplier(unsigned count)
+inline BOOST_MP_CXX14_CONSTEXPR limb_type block_multiplier(unsigned count)
 {
-   static const limb_type values[digits_per_block_10] = {10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000, 10000000000, 100000000000, 1000000000000, 10000000000000, 100000000000000, 1000000000000000, 10000000000000000, 100000000000000000, 1000000000000000000};
+#ifdef BOOST_NO_CXX14_CONSTEXPR
+   static
+#else
+   constexpr
+#endif
+   const limb_type values[digits_per_block_10] = {10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000, 10000000000, 100000000000, 1000000000000, 10000000000000, 100000000000000, 1000000000000000, 10000000000000000, 100000000000000000, 1000000000000000000};
    BOOST_ASSERT(count < digits_per_block_10);
    return values[count];
 }
@@ -104,7 +109,12 @@ static const limb_type                          digits_per_block_10 = 9;
 
 inline limb_type block_multiplier(unsigned count)
 {
-   static const limb_type values[digits_per_block_10] = {10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
+#ifdef BOOST_NO_CXX14_CONSTEXPR
+   static
+#else
+   constexpr
+#endif
+   const limb_type values[digits_per_block_10] = {10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
    BOOST_ASSERT(count < digits_per_block_10);
    return values[count];
 }
@@ -114,7 +124,7 @@ inline limb_type block_multiplier(unsigned count)
 static const unsigned bits_per_limb = sizeof(limb_type) * CHAR_BIT;
 
 template <class T>
-inline void minmax(const T& a, const T& b, T& aa, T& bb)
+inline BOOST_MP_CXX14_CONSTEXPR void minmax(const T& a, const T& b, T& aa, T& bb)
 {
    if (a < b)
    {

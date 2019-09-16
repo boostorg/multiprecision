@@ -23,13 +23,13 @@ include(CMSetupVersion)
 cm_setup_version(VERSION 1.70.0)
 
 option(BUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS "Build for CI suppressing known issues" FALSE)
-option(BUILD_TESTS "Build tests" FALSE)
+option(BUILD_TESTS "Build unit tests" FALSE)
 
 if(BUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS)
     add_definitions(-DCI_SUPPRESS_KNOWN_ISSUES)
 endif()
 
-if("${CMAKE_WORKSPACE_NAME}" STREQUAL boost)
+if("${CMAKE_WORKSPACE_NAME}" STREQUAL "boost")
     set(BOOST_CMAKE TRUE)
 
     cm_project(multiprecision WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
