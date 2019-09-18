@@ -17,11 +17,11 @@
 # Once done this will define
 #
 #  MPIR_FOUND - system has MPIR lib with correct version
-#  MPIR_INCLUDES - the MPIR include directory
+#  MPIR_INCLUDE_DIRS - the MPIR include directory
 #  MPIR_LIBRARIES - the MPIR library
 #  MPIR_VERSION - MPIR version
 
-find_path(MPIR_INCLUDES NAMES gmp.h PATHS $ENV{MPIRDIR} ${INCLUDE_INSTALL_DIR})
+find_path(MPIR_INCLUDE_DIRS NAMES gmp.h PATHS $ENV{MPIRDIR} ${INCLUDE_INSTALL_DIR})
 
 # Set MPIR_FIND_VERSION to 5.1.0 if no minimum version is specified
 if(NOT MPIR_FIND_VERSION)
@@ -38,10 +38,10 @@ if(NOT MPIR_FIND_VERSION)
         "${MPIR_FIND_VERSION_MAJOR}.${MPIR_FIND_VERSION_MINOR}.${MPIR_FIND_VERSION_PATCH}")
 endif()
 
-if(MPIR_INCLUDES)
+if(MPIR_INCLUDE_DIRS)
     # Since the MPIR version macros may be in a file included by gmp.h of the form
     # gmp-.*[_]?.*.h (e.g., gmp-x86_64.h), we search each of them.
-    file(GLOB MPIR_HEADERS "${MPIR_INCLUDES}/gmp.h" "${MPIR_INCLUDES}/gmp-*.h")
+    file(GLOB MPIR_HEADERS "${MPIR_INCLUDE_DIRS}/gmp.h" "${MPIR_INCLUDE_DIRS}/gmp-*.h")
     foreach(gmp_header_filename ${MPIR_HEADERS})
         file(READ "${gmp_header_filename}" _gmp_version_header)
         string(REGEX MATCH
@@ -66,7 +66,7 @@ if(MPIR_INCLUDES)
         message(STATUS "MPIR version was not detected")
     elseif(${MPIR_VERSION} VERSION_LESS ${MPIR_FIND_VERSION})
         set(MPIR_VERSION_OK FALSE)
-        message(STATUS "MPIR version ${MPIR_VERSION} found in ${MPIR_INCLUDES}, "
+        message(STATUS "MPIR version ${MPIR_VERSION} found in ${MPIR_INCLUDE_DIRS}, "
                 "but at least version ${MPIR_FIND_VERSION} is required")
     else()
         set(MPIR_VERSION_OK TRUE)
@@ -77,9 +77,9 @@ find_library(MPIR_LIBRARIES gmp PATHS $ENV{MPIRDIR} ${LIB_INSTALL_DIR})
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(MPIR DEFAULT_MSG
-                                  MPIR_INCLUDES MPIR_LIBRARIES MPIR_VERSION_OK)
+                                  MPIR_INCLUDE_DIRS MPIR_LIBRARIES MPIR_VERSION_OK)
 if(MPIR_FOUND)
     set(HAVE_MPIR "${MPIR_FOUND}")
 endif()
 
-mark_as_advanced(MPIR_INCLUDES MPIR_LIBRARIES)
+mark_as_advanced(MPIR_INCLUDE_DIRS MPIR_LIBRARIES)

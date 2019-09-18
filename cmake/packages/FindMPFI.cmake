@@ -21,19 +21,19 @@ else()
 endif()
 
 if(GMP_FOUND AND MPFR_FOUND)
-    if(MPFI_INCLUDES AND MPFI_LIBRARIES)
+    if(MPFI_INCLUDE_DIRS AND MPFI_LIBRARIES)
         set(MPFI_FOUND TRUE)
-    endif(MPFI_INCLUDES AND MPFI_LIBRARIES)
+    endif(MPFI_INCLUDE_DIRS AND MPFI_LIBRARIES)
 
-    find_path(MPFI_INCLUDES NAMES mpfi.h
+    find_path(MPFI_INCLUDE_DIRS NAMES mpfi.h
               HINTS ENV MPFI_INC_DIR
               ENV MPFI_DIR
               PATHS ${GMP_INCLUDE_DIR_SEARCH}
               PATH_SUFFIXES include
               DOC "The directory containing the MPFI header files"
               )
-    if(MPFI_INCLUDES)
-        file(READ "${MPFI_INCLUDES}/mpfi.h" _mpfr_version_header)
+    if(MPFI_INCLUDE_DIRS)
+        file(READ "${MPFI_INCLUDE_DIRS}/mpfi.h" _mpfr_version_header)
 
         string(REGEX MATCH "define[ \t]+MPFI_VERSION_MAJOR[ \t]+([0-9]+)"
                _mpfr_major_version_match "${_mpfr_version_header}")
@@ -62,16 +62,16 @@ if(GMP_FOUND AND MPFR_FOUND)
         get_filename_component(MPFI_LIBRARIES_DIR ${MPFI_LIBRARIES} PATH CACHE)
     endif(MPFI_LIBRARIES)
 
-    if(NOT MPFI_INCLUDES OR NOT MPFI_LIBRARIES_DIR)
+    if(NOT MPFI_INCLUDE_DIRS OR NOT MPFI_LIBRARIES_DIR)
         include(MPFIConfig OPTIONAL)
-    endif(NOT MPFI_INCLUDES OR NOT MPFI_LIBRARIES_DIR)
+    endif(NOT MPFI_INCLUDE_DIRS OR NOT MPFI_LIBRARIES_DIR)
 
     include(FindPackageHandleStandardArgs)
 
     find_package_handle_standard_args(MPFI
                                       "DEFAULT_MSG"
                                       MPFI_LIBRARIES
-                                      MPFI_INCLUDES)
+                                      MPFI_INCLUDE_DIRS)
 
 else(GMP_FOUND AND MPFR_FOUND)
 
