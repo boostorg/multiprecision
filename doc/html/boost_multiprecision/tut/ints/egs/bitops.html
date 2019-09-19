@@ -69,14 +69,14 @@
             from <code class="computeroutput"><span class="identifier">b2</span></code> shouldn't be
             set unless we increment it first:
           </p>
-<pre class="programlisting"><span class="identifier">assert</span><span class="special">(!</span><span class="identifier">bit_test</span><span class="special">(</span><span class="identifier">b1</span><span class="special">(</span><span class="number">200</span><span class="special">),</span> <span class="number">200</span><span class="special">));</span>     <span class="comment">// OK</span>
-<span class="identifier">assert</span><span class="special">(</span><span class="identifier">bit_test</span><span class="special">(++</span><span class="identifier">b1</span><span class="special">(</span><span class="number">200</span><span class="special">),</span> <span class="number">200</span><span class="special">));</span>    <span class="comment">// OK</span>
+<pre class="programlisting"><span class="identifier">BOOST_ASSERT</span><span class="special">(!</span><span class="identifier">bit_test</span><span class="special">(</span><span class="identifier">b1</span><span class="special">(</span><span class="number">200</span><span class="special">),</span> <span class="number">200</span><span class="special">));</span>     <span class="comment">// OK</span>
+<span class="identifier">BOOST_ASSERT</span><span class="special">(</span><span class="identifier">bit_test</span><span class="special">(++</span><span class="identifier">b1</span><span class="special">(</span><span class="number">200</span><span class="special">),</span> <span class="number">200</span><span class="special">));</span>    <span class="comment">// OK</span>
 </pre>
 <p>
             And of course if we flip the n'th bit after increment, then we should
             get back to zero:
           </p>
-<pre class="programlisting"><span class="identifier">assert</span><span class="special">(!</span><span class="identifier">bit_flip</span><span class="special">(++</span><span class="identifier">b1</span><span class="special">(</span><span class="number">200</span><span class="special">),</span> <span class="number">200</span><span class="special">));</span>   <span class="comment">// OK</span>
+<pre class="programlisting"><span class="identifier">BOOST_ASSERT</span><span class="special">(!</span><span class="identifier">bit_flip</span><span class="special">(++</span><span class="identifier">b1</span><span class="special">(</span><span class="number">200</span><span class="special">),</span> <span class="number">200</span><span class="special">));</span>   <span class="comment">// OK</span>
 </pre>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>

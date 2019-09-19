@@ -34,27 +34,29 @@
       The big number types in Multiprecision can be used with a wide selection of
       basic mathematical operations, elementary transcendental functions as well
       as the functions in Boost.Math. The Multiprecision types can also interoperate
-      with the __fundamental types in C++ using clearly defined conversion rules.
-      This allows Boost.Multiprecision to be used for all kinds of mathematical calculations
+      with any <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+      (built-in) type</a> in C++ using clearly defined conversion rules. This
+      allows Boost.Multiprecision to be used for all kinds of mathematical calculations
       involving integer, rational and floating-point types requiring extended range
       and precision.
     </p>
 <p>
       Multiprecision consists of a generic interface to the mathematics of large
-      numbers as well as a selection of big number back ends, with support for integer,
+      numbers as well as a selection of big number back-ends, with support for integer,
       rational, floating-point, and complex types. Boost.Multiprecision provides
-      a selection of back ends provided off-the-rack in including interfaces to GMP,
+      a selection of back-ends provided off-the-rack in including interfaces to GMP,
       MPFR, MPIR, MPC, TomMath as well as its own collection of Boost-licensed, header-only
-      back ends for integers, rationals and floats. In addition, user-defined back
-      ends can be created and used with the interface of Multiprecision, provided
-      the class implementation adheres to the necessary <a class="link" href="ref/backendconc.html" title="Backend Requirements">concepts</a>.
+      back-ends for integers, rationals and floats. In addition, user-defined back-ends
+      can be created and used with the interface of Multiprecision, provided the
+      class implementation adheres to the necessary <a class="link" href="ref/backendconc.html" title="Backend Requirements">concepts</a>.
     </p>
 <p>
       Depending upon the number type, precision may be arbitrarily large (limited
-      only by available memory), fixed at compile time (for example 50 or 100 decimal
+      only by available memory), fixed at compile time (for example, 50 or 100 decimal
       digits), or a variable controlled at run-time by member functions. The types
       are <a href="https://en.wikipedia.org/wiki/Expression_templates" target="_top">expression
-      template</a> -enabled for better performance than naive user-defined types.
+      templates</a> - enabled for better performance than naive user-defined
+      types.
     </p>
 <p>
       The Multiprecision library comes in two distinct parts:
@@ -232,7 +234,7 @@
     </p>
 <p>
       The great advantage of this method is the <span class="emphasis"><em>elimination of temporaries</em></span>:
-      for example the "naive" implementation of <code class="computeroutput"><span class="keyword">operator</span><span class="special">*</span></code> above, requires one temporary for computing
+      for example, the "naive" implementation of <code class="computeroutput"><span class="keyword">operator</span><span class="special">*</span></code> above, requires one temporary for computing
       the result, and at least another one to return it. It's true that sometimes
       this overhead can be reduced by using move-semantics, but it can't be eliminated
       completely. For example, lets suppose we're evaluating a polynomial via Horner's
@@ -374,28 +376,29 @@
       </p>
 <p>
         In fact it is particularly easy to create dangling references by mixing expression
-        templates with the auto keyword, for example:
+        templates with the <code class="computeroutput"><span class="keyword">auto</span></code> keyword,
+        for example:
       </p>
 <p>
         <code class="computeroutput"><span class="keyword">auto</span> <span class="identifier">val</span>
         <span class="special">=</span> <span class="identifier">cpp_dec_float_50</span><span class="special">(</span><span class="string">"23.1"</span><span class="special">)</span> <span class="special">*</span> <span class="number">100</span><span class="special">;</span></code>
       </p>
 <p>
-        In this situation the integer literal is stored directly in the expression
-        template - so its use is OK here - but the cpp_dec_float_50 temporary is
-        stored by reference and then destructed when the statement completes leaving
-        a dangling reference.
+        In this situation, the integer literal is stored directly in the expression
+        template - so its use is OK here - but the <code class="computeroutput"><span class="identifier">cpp_dec_float_50</span></code>
+        temporary is stored by reference and then destructed when the statement completes,
+        leaving a dangling reference.
       </p>
 <p>
         <span class="bold"><strong><span class="emphasis"><em>If in doubt, do not ever mix expression templates
-        with the auto keyword.</em></span></strong></span>
+        with the <code class="computeroutput"><span class="keyword">auto</span></code> keyword.</em></span></strong></span>
       </p>
 </td></tr>
 </table></div>
 <p>
       And finally... the performance improvements from an expression template library
       like this are often not as dramatic as the reduction in number of temporaries
-      would suggest. For example if we compare this library with <a href="http://math.berkeley.edu/~wilken/code/gmpfrxx/" target="_top">mpfr_class</a>
+      would suggest. For example, if we compare this library with <a href="http://math.berkeley.edu/~wilken/code/gmpfrxx/" target="_top">mpfr_class</a>
       and <a href="http://www.holoborodko.com/pavel/mpfr/" target="_top">mpreal</a>, with
       all three using the underlying <a href="http://www.mpfr.org" target="_top">MPFR</a>
       library at 50 decimal digits precision then we see the following typical results
@@ -720,7 +723,7 @@
 <div id="ftn.boost_multiprecision.intro.f0" class="footnote"><p><a href="#boost_multiprecision.intro.f0" class="para"><sup class="para">[1] </sup></a>
         The actual number generated will depend on the compiler, how well it optimizes
         the code, and whether it supports rvalue references. The number of 11 temporaries
-        was generated with Visual C++ 10
+        was generated with Visual C++ 2010.
       </p></div>
 </div>
 </div>

@@ -25,11 +25,12 @@
 <div class="section">
 <div class="titlepage"><div><div><h3 class="title">
 <a name="boost_multiprecision.tut.import_export"></a><a class="link" href="import_export.html" title="Importing and Exporting Data to and from cpp_int and cpp_bin_float">Importing and
-      Exporting Data to and from cpp_int and cpp_bin_float</a>
+      Exporting Data to and from <code class="computeroutput"><span class="identifier">cpp_int</span></code>
+      and <code class="computeroutput"><span class="identifier">cpp_bin_float</span></code></a>
 </h3></div></div></div>
 <p>
         Any integer number type that uses <code class="computeroutput"><span class="identifier">cpp_int_backend</span></code>
-        as it's implementation layer can import or export it's bits via two non-member
+        as it's implementation layer can import or export its bits via two non-member
         functions:
       </p>
 <pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">unsigned</span> <span class="identifier">MinBits</span><span class="special">,</span> <span class="keyword">unsigned</span> <span class="identifier">MaxBits</span><span class="special">,</span> <span class="identifier">cpp_integer_type</span> <span class="identifier">SignType</span><span class="special">,</span> <span class="identifier">cpp_int_check_type</span> <span class="identifier">Checked</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">Allocator</span><span class="special">,</span>
@@ -54,7 +55,7 @@
         These functions are designed for data-interchange with other storage formats,
         and since <a class="link" href="floats/cpp_bin_float.html" title="cpp_bin_float">cpp_bin_float</a>
         uses <a class="link" href="ints/cpp_int.html" title="cpp_int">cpp_int</a>
-        internally, by extension they can be used for floating point numbers based
+        internally, by extension they can be used for floating-point numbers based
         on that backend as well (see example below). Parameters and use are as follows:
       </p>
 <pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">unsigned</span> <span class="identifier">MinBits</span><span class="special">,</span> <span class="keyword">unsigned</span> <span class="identifier">MaxBits</span><span class="special">,</span> <span class="identifier">cpp_integer_type</span> <span class="identifier">SignType</span><span class="special">,</span> <span class="identifier">cpp_int_check_type</span> <span class="identifier">Checked</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">Allocator</span><span class="special">,</span>
@@ -134,8 +135,9 @@
 </tr>
 <tr><td align="left" valign="top"><p>
           Note that this function is optimized for the case where the data can be
-          memcpy'ed from the source to the integer - in this case both iterators
-          much be pointers, and everything must be little-endian.
+          <code class="computeroutput"><span class="identifier">memcpy</span></code>ed from the source
+          to the integer - in this case both iterators much be pointers, and everything
+          must be little-endian.
         </p></td></tr>
 </table></div>
 <h5>
@@ -167,7 +169,7 @@
    <span class="comment">// import back again, and check for equality:</span>
    <span class="identifier">cpp_int</span> <span class="identifier">j</span><span class="special">;</span>
    <span class="identifier">import_bits</span><span class="special">(</span><span class="identifier">j</span><span class="special">,</span> <span class="identifier">v</span><span class="special">.</span><span class="identifier">begin</span><span class="special">(),</span> <span class="identifier">v</span><span class="special">.</span><span class="identifier">end</span><span class="special">());</span>
-   <span class="identifier">assert</span><span class="special">(</span><span class="identifier">i</span> <span class="special">==</span> <span class="identifier">j</span><span class="special">);</span>
+   <span class="identifier">BOOST_ASSERT</span><span class="special">(</span><span class="identifier">i</span> <span class="special">==</span> <span class="identifier">j</span><span class="special">);</span>
 <span class="special">}</span>
 </pre>
 <p>
@@ -199,7 +201,7 @@
    <span class="identifier">import_bits</span><span class="special">(</span><span class="identifier">i</span><span class="special">,</span> <span class="identifier">v</span><span class="special">.</span><span class="identifier">begin</span><span class="special">(),</span> <span class="identifier">v</span><span class="special">.</span><span class="identifier">end</span><span class="special">());</span>
    <span class="identifier">cpp_bin_float_100</span> <span class="identifier">g</span><span class="special">(</span><span class="identifier">i</span><span class="special">);</span>
    <span class="identifier">g</span><span class="special">.</span><span class="identifier">backend</span><span class="special">().</span><span class="identifier">exponent</span><span class="special">()</span> <span class="special">=</span> <span class="identifier">e</span><span class="special">;</span>
-   <span class="identifier">assert</span><span class="special">(</span><span class="identifier">f</span> <span class="special">==</span> <span class="identifier">g</span><span class="special">);</span>
+   <span class="identifier">BOOST_ASSERT</span><span class="special">(</span><span class="identifier">f</span> <span class="special">==</span> <span class="identifier">g</span><span class="special">);</span>
 <span class="special">}</span>
 </pre>
 </div>

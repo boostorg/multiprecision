@@ -266,6 +266,7 @@ BOOST_AUTO_TEST_CASE(test_numeric_limits_snips)
 //[digits10_5
     -(std::numeric_limits<double>::max)() == std::numeric_limits<double>::lowest();
 //] [/digits10_5]
+//  warning C4553: '==': result of expression not used; did you intend '='? is spurious.
   }
 
   {

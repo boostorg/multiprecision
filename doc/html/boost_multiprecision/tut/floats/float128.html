@@ -78,6 +78,15 @@
               move aware.
             </li>
 <li class="listitem">
+              This type is fully <code class="computeroutput"><span class="keyword">constexpr</span></code>
+              aware - basic constexpr arithmetic is supported from C++14 and onwards,
+              comparisons, plus the functions <code class="computeroutput"><span class="identifier">fabs</span></code>,
+              <code class="computeroutput"><span class="identifier">abs</span></code>, <code class="computeroutput"><span class="identifier">fpclassify</span></code>, <code class="computeroutput"><span class="identifier">isnormal</span></code>,
+              <code class="computeroutput"><span class="identifier">isfinite</span></code>, <code class="computeroutput"><span class="identifier">isinf</span></code> and <code class="computeroutput"><span class="identifier">isnan</span></code>
+              are also supported if either the compiler implements C++20's <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">is_constant_evaluated</span><span class="special">()</span></code>,
+              or if the compiler is GCC.
+            </li>
+<li class="listitem">
               It is not possible to round-trip objects of this type to and from a
               string and get back exactly the same value when compiled with Intel's
               C++ compiler and using <code class="computeroutput"><span class="identifier">_Quad</span></code>

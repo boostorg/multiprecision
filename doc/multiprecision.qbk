@@ -83,9 +83,9 @@
 [/ Hint you may need to enclose equation in brackets if it contains comma(s) to avoid "error invalid number of arguments"]
 ]
 
-[def __tick [role aligncenter [role green \u2714]]] [/ u2714 is a HEAVY CHECK MARK tick (2713 check mark)]
-[def __cross [role aligncenter [role red \u2718]]] [/ u2718 is a heavy cross]
-[def __star [role aligncenter [role red \u2736]]] [/ 6-point star]
+[def __tick [role aligncenter [role green \u2714]]] [/ u2714 is a HEAVY CHECK MARK tick (2713 check mark), green]
+[def __cross [role aligncenter [role red \u2718]]] [/ u2718 is a heavy cross, red]
+[def __star [role aligncenter [role red \u2736]]] [/ 6-point star red ]
 
 [/Boost.Multiprecision internals links]
 [def __cpp_int [link boost_multiprecision.tut.ints.cpp_int cpp_int]]
@@ -113,6 +113,7 @@
 
 [/External links as macro definitions.]
 [def __expression_template [@https://en.wikipedia.org/wiki/Expression_templates expression template]]
+[def __expression_templates [@https://en.wikipedia.org/wiki/Expression_templates expression templates]] [/plural version]
 [def __UDT [@http://eel.is/c++draft/definitions#defns.prog.def.type program-defined type]]
 [def __fundamental_type [@https://en.cppreference.com/w/cpp/language/types fundamental (built-in) type]]
 
@@ -126,8 +127,8 @@ range and precision than C++'s ordinary built-in types.
 The big number types in Multiprecision can be used with a wide
 selection of basic mathematical operations, elementary transcendental
 functions as well as the functions in Boost.Math.
-The Multiprecision types can also interoperate with the
-__fundamental types in C++ using clearly defined conversion rules.
+The Multiprecision types can also interoperate with any
+__fundamental_type in C++ using clearly defined conversion rules.
 This allows Boost.Multiprecision to be used for all
 kinds of mathematical calculations involving integer,
 rational and floating-point types requiring extended
@@ -135,20 +136,20 @@ range and precision.
 
 Multiprecision consists of a generic interface to the
 mathematics of large numbers as well as a selection of
-big number back ends, with support for integer, rational,
+big number back-ends, with support for integer, rational,
 floating-point, and complex types. Boost.Multiprecision provides a selection
-of back ends provided off-the-rack in including
+of back-ends provided off-the-rack in including
 interfaces to GMP, MPFR, MPIR, MPC, TomMath as well as
-its own collection of Boost-licensed, header-only back ends for
-integers, rationals and floats. In addition, user-defined back ends
+its own collection of Boost-licensed, header-only back-ends for
+integers, rationals and floats. In addition, user-defined back-ends
 can be created and used with the interface of Multiprecision,
 provided the class implementation adheres to the necessary
 [link boost_multiprecision.ref.backendconc concepts].
 
 Depending upon the number type, precision may be arbitrarily large
 (limited only by available memory), fixed at compile time
-(for example 50 or 100 decimal digits), or a variable controlled at run-time
-by member functions. The types are __expression_template -enabled for
+(for example, 50 or 100 decimal digits), or a variable controlled at run-time
+by member functions. The types are __expression_templates - enabled for
 better performance than naive user-defined types.
 
 The Multiprecision library comes in two distinct parts:
@@ -281,7 +282,7 @@ of the multiplication, contains instructions on how to compute the result.  In e
 of references to the arguments of the function, plus some compile-time information that stores what the operation
 is.
 
-The great advantage of this method is the ['elimination of temporaries]: for example the "naive" implementation
+The great advantage of this method is the ['elimination of temporaries]: for example, the "naive" implementation
 of `operator*` above, requires one temporary for computing the result, and at least another one to return it.  It's true
 that sometimes this overhead can be reduced by using move-semantics, but it can't be eliminated completely.  For example,
 lets suppose we're evaluating a polynomial via Horner's method, something like this:
@@ -300,7 +301,7 @@ temporaries to pretty much zero).  Note that if we compile with expression templ
 on, then actually still have no wasted memory allocations as even though temporaries are created, their contents are moved
 rather than copied.
 [footnote The actual number generated will depend on the compiler, how well it optimizes the code, and whether it supports
-rvalue references.  The number of 11 temporaries was generated with Visual C++ 10]
+rvalue references.  The number of 11 temporaries was generated with Visual C++ 2010.]
 
 [important
 Expression templates can radically reorder the operations in an expression, for example:
@@ -368,20 +369,20 @@ internally by the Boost.Math library.
 
 unless you're absolutely sure that the lifetimes of `a`, `b` and `c` will outlive that of `my_expression`.
 
-In fact it is particularly easy to create dangling references by mixing expression templates with the auto
+In fact it is particularly easy to create dangling references by mixing expression templates with the `auto`
 keyword, for example:
 
 `auto val = cpp_dec_float_50("23.1") * 100;`
 
-In this situation the integer literal is stored directly in the expression template - so its use is OK here -
-but the cpp_dec_float_50 temporary is stored by reference and then destructed when the statement completes
+In this situation, the integer literal is stored directly in the expression template - so its use is OK here -
+but the `cpp_dec_float_50` temporary is stored by reference and then destructed when the statement completes,
 leaving a dangling reference.
 
-[*['If in doubt, do not ever mix expression templates with the auto keyword.]]
+[*['If in doubt, do not ever mix expression templates with the `auto` keyword.]]
 ]
 
 And finally... the performance improvements from an expression template library like this are often not as
-dramatic as the reduction in number of temporaries would suggest.  For example if we compare this library with
+dramatic as the reduction in number of temporaries would suggest.  For example, if we compare this library with
 [mpfr_class] and [mpreal], with all three using the underlying [mpfr] library at 50 decimal digits precision then
 we see the following typical results for polynomial execution:
 
@@ -1141,9 +1142,9 @@ to provide an real-number type that is a drop-in replacement for the native C++ 
 much greater precision and implementing interval arithmetic.
 
 Type `mpfi_float_backend` can be used at fixed precision by specifying a non-zero `Digits10` template parameter, or
-at variable precision by setting the template argument to zero.  The typedefs mpfi_float_50, mpfi_float_100,
-mpfi_float_500, mpfi_float_1000 provide arithmetic types at 50, 100, 500 and 1000 decimal digits precision
-respectively.  The typedef mpfi_float provides a variable precision type whose precision can be controlled via the
+at variable precision by setting the template argument to zero.  The `typedef`s `mpfi_float_50`, `mpfi_float_100`,
+`mpfi_float_500`, `mpfi_float_1000` provide arithmetic types at 50, 100, 500 and 1000 decimal digits precision
+respectively.  The `typedef mpfi_float` provides a variable precision type whose precision can be controlled via the
 `number`s member functions.
 
 [note This type only provides `numeric_limits` support when the precision is fixed at compile time.]
@@ -2102,7 +2103,7 @@ Examples:
 [h4 constexpr arithmetic]
 
 The front end of the library is all `constexpr` from C++14 and later.  Currently there is only one
-back end type that is `constexpr` aware, and that is __float128.  More backends will follow at a later date.
+back-end type that is `constexpr` aware, and that is __float128.  More backends will follow at a later date.
 
 Provided the compiler is GCC, type __float128 support `constexpr` operations on all arithmetic operations from C++14, comparisons,
 `abs`, `fabs`, `fpclassify`, `isnan`, `isinf`, `isfinite` and `isnormal` are also fully supported, but the transcendental functions are not.
@@ -2141,9 +2142,9 @@ at an abscissa value, all using `constexpr` arithmetic:
 
 [endsect]
 
-[section:import_export Importing and Exporting Data to and from cpp_int and cpp_bin_float]
+[section:import_export Importing and Exporting Data to and from `cpp_int` and `cpp_bin_float`]
 
-Any integer number type that uses `cpp_int_backend` as it's implementation layer can import or export it's bits via two non-member functions:
+Any integer number type that uses `cpp_int_backend` as it's implementation layer can import or export its bits via two non-member functions:
 
       template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator,
                 expression_template_option ExpressionTemplates, class OutputIterator>
@@ -2164,7 +2165,8 @@ Any integer number type that uses `cpp_int_backend` as it's implementation layer
             bool msv_first = true);
 
 These functions are designed for data-interchange with other storage formats, and since __cpp_bin_float uses __cpp_int internally,
-by extension they can be used for floating point numbers based on that backend as well (see example below).  Parameters and use are as follows:
+by extension they can be used for floating-point numbers based on that backend as well (see example below). 
+Parameters and use are as follows:
 
       template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator,
                 expression_template_option ExpressionTemplates, class OutputIterator>
@@ -2184,9 +2186,8 @@ within each `chunk_size` block is always in the machines native format.  Further
 has to be specified manually.  It may also result in compiler warnings about the value being narrowed.]
 
 [tip If you're exporting to non-native byte layout, then use
-[@http://www.boost.org/doc/libs/release/libs/endian/doc/index.html
-Boost.Endian] to create a custom OutputIterator that
-reverses the byte order of each chunk prior to actually storing the result.]
+[@http://www.boost.org/doc/libs/release/libs/endian/doc/index.html  Boost.Endian]
+to create a custom OutputIterator that reverses the byte order of each chunk prior to actually storing the result.]
 
       template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator,
                 expression_template_option ExpressionTemplates, class ForwardIterator>
@@ -2209,7 +2210,7 @@ As with exporting, if the external data is to be in a non-native byte order (wit
 that presents it in native order (see [@http://www.boost.org/doc/libs/release/libs/endian/doc/index.html Boost.Endian]).
 
 [note
-Note that this function is optimized for the case where the data can be memcpy'ed from the source to the integer - in this case both
+Note that this function is optimized for the case where the data can be `memcpy`ed from the source to the integer - in this case both
 iterators much be pointers, and everything must be little-endian.]
 
 [h4 Examples]
@@ -2218,7 +2219,7 @@ iterators much be pointers, and everything must be little-endian.]
 
 [IE2]
 
-[endsect]
+[endsect] [/section:import_export Importing and Exporting Data to and from `cpp_int` and `cpp_bin_float`]
 
 [section:rounding Rounding Rules for Conversions]
 
@@ -2243,7 +2244,7 @@ The following table summarises the situation for conversions from native types:
 [[__tommath_rational][See __tom_int]]
 ]
 
-[endsect]
+[endsect] [/section:rounding Rounding Rules for Conversions]
 
 [section:mixed Mixed Precision Arithmetic]
 
@@ -2317,18 +2318,17 @@ than it is to explicitly cast the operands to the result type:
 
 __mpfr_float_backend, __mpf_float, __cpp_int.
 
-[endsect]
+[endsect] [/section:mixed Mixed Precision Arithmetic]
 
 [section:gen_int Generic Integer Operations]
 
 All of the [link boost_multiprecision.ref.number.integer_functions non-member integer operations] are overloaded for the
 built in integer types in
 `<boost/multiprecision/integer.hpp>`.
-Where these operations require a temporary increase in precision (such as for powm), then
+Where these operations require a temporary increase in precision (such as for `powm`), then
 if no built in type is available, a __cpp_int of appropriate precision will be used.
 
-Some of these functions are trivial, others use compiler intrinsics (where available) to ensure optimal
-evaluation.
+Some of these functions are trivial, others use compiler intrinsics (where available) to ensure optimal evaluation.
 
 The overloaded functions are:
 
@@ -2414,9 +2414,9 @@ Returns the integer square root `s` of x and sets `r` to the remainder ['x - s[s
    bool miller_rabin_test(const number-or-expression-template-type& n, unsigned trials);
 
 The regular Miller-Rabin functions in `<boost/multiprecision/miller_rabin.hpp>` are defined in terms of the above
-generic operations, and so function equally well for built in and multiprecision types.
+generic operations, and so function equally well for built-in or __fundamental_types and multiprecision types.
 
-[endsect]
+[endsect] [/section:gen_int Generic Integer Operations]
 
 [section:serial Boost.Serialization Support]
 
@@ -2431,8 +2431,7 @@ support which requires the underlying backend to be serializable.
 [section:limits Numeric Limits]
 
 Boost.Multiprecision tries hard to implement `std::numeric_limits` for all types
-as far as possible and meaningful because experience with Boost.Math
-has shown that this aids portability.
+as far as possible and meaningful because experience with Boost.Math has shown that this aids portability.
 
 The [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3690.pdf C++ standard library]
 defines `std::numeric_limits` in section 18.3.2.
@@ -2877,9 +2876,9 @@ resulted in the loss of precision, such implementation detects ['denorm loss].
 
 [endsect] [/section:constants std::numeric_limits<> Constants]
 
-[section:functions std::numeric_limits<> functions]
+[section:functions `std::numeric_limits<>` functions]
 
-[h4 max function]
+[h4:max_function `max` function]
 
 Function `(std::numeric_limits<T>::max)()` returns the largest finite value
 that can be represented by the type T.  If there is no such value (and
@@ -2912,16 +2911,16 @@ Since C++11: `std::numeric_limits<T>::lowest()` is
 
 [digits10_5]
 
-[h4 min function]
+[h4min_function `min` function]
 
 Function `(std::numeric_limits<T>::min)()` returns the minimum finite value
 that can be represented by the type T.
 
-For built-in types there is usually a corresponding MACRO value TYPE_MIN,
+For built-in types, there is usually a corresponding MACRO value TYPE_MIN,
 where TYPE is CHAR, INT, FLOAT etc.
 
-Other types, including those provided by a typedef,
-for example `INT64_T_MIN` for `int64_t`, may provide a macro definition.
+Other types, including those provided by a `typedef`,
+for example, `INT64_T_MIN` for `int64_t`, may provide a macro definition.
 
 For floating-point types,
 it is more fully defined as the ['minimum positive normalized value].
@@ -2929,7 +2928,6 @@ it is more fully defined as the ['minimum positive normalized value].
 See `std::numeric_limits<T>::denorm_min()` for the smallest denormalized value, provided
 
   std::numeric_limits<T>::has_denorm == std::denorm_present
-
 
 To cater for situations where no `numeric_limits` specialization is available
 (for example because the precision of the type varies at runtime),
@@ -3215,12 +3213,10 @@ inspect `std::numeric_limits<typename T::value_type>`.
 
 [endsect] [/section:how_to_tell How to Determine the Kind of a Number From `std::numeric_limits`]
 
-
 [endsect] [/section:limits Numeric Limits]
 
 
 [section:input_output  Input Output]
-
 
 [h4  Loopback testing]
 
@@ -6087,7 +6083,7 @@ Open question - what should be the default - int32_t or int64_t?  (done 2012/09/
 [[Why not abstract out addition/multiplication algorithms?]
    [This was deemed not to be practical: these algorithms are intimately
    tied to the actual data representation used.]]
- [[How do I choose between Boost.Multiprecision cpp_bin_50 and cpp_dec_50?]
+ [[How do I choose between Boost.Multiprecision `cpp_bin_50` and `cpp_dec_50`?]
    [Unless you have a specific reason to choose `cpp_dec_`, then the default choice should be `cpp_bin_`, 
    for example using the convenience `typedefs` like `boost::multiprecision::cpp_bin_50` or `boost::multiprecision::cpp_bin_100`.
 
