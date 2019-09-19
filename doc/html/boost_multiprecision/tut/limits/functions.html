@@ -76,9 +76,10 @@
 </ul></div>
 <pre class="programlisting"><span class="special">-(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="keyword">double</span><span class="special">&gt;::</span><span class="identifier">max</span><span class="special">)()</span> <span class="special">==</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="keyword">double</span><span class="special">&gt;::</span><span class="identifier">lowest</span><span class="special">();</span>
 </pre>
-<p>
-          [h4min_function <code class="computeroutput"><span class="identifier">min</span></code> function]
-        </p>
+<h5>
+<a name="boost_multiprecision.tut.limits.functions.h2"></a>
+          <span class="phrase"><a name="boost_multiprecision.tut.limits.functions.min_function"></a></span><a class="link" href="functions.html#boost_multiprecision.tut.limits.functions.min_function"><code class="computeroutput"><span class="identifier">min</span></code> function</a>
+        </h5>
 <p>
           Function <code class="computeroutput"><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">min</span><span class="special">)()</span></code> returns the minimum finite value that
           can be represented by the type T.
@@ -117,7 +118,7 @@
           Of course, these simply use <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">min</span><span class="special">()</span></code> if available.
         </p>
 <h5>
-<a name="boost_multiprecision.tut.limits.functions.h2"></a>
+<a name="boost_multiprecision.tut.limits.functions.h3"></a>
           <span class="phrase"><a name="boost_multiprecision.tut.limits.functions.denorm_min_function"></a></span><a class="link" href="functions.html#boost_multiprecision.tut.limits.functions.denorm_min_function">denorm_min
           function</a>
         </h5>
@@ -152,7 +153,7 @@
           precision until the significand reaches zero).
         </p>
 <h5>
-<a name="boost_multiprecision.tut.limits.functions.h3"></a>
+<a name="boost_multiprecision.tut.limits.functions.h4"></a>
           <span class="phrase"><a name="boost_multiprecision.tut.limits.functions.round_error"></a></span><a class="link" href="functions.html#boost_multiprecision.tut.limits.functions.round_error">round_error</a>
         </h5>
 <p>
@@ -195,7 +196,7 @@
           of significance or cancellation error</a> or very many iterations.
         </p>
 <h5>
-<a name="boost_multiprecision.tut.limits.functions.h4"></a>
+<a name="boost_multiprecision.tut.limits.functions.h5"></a>
           <span class="phrase"><a name="boost_multiprecision.tut.limits.functions.epsilon"></a></span><a class="link" href="functions.html#boost_multiprecision.tut.limits.functions.epsilon">epsilon</a>
         </h5>
 <p>
@@ -263,7 +264,7 @@
 <pre class="programlisting"><span class="identifier">RealType</span> <span class="identifier">tolerance</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">math</span><span class="special">::</span><span class="identifier">tools</span><span class="special">::</span><span class="identifier">epsilon</span><span class="special">&lt;</span><span class="identifier">RealType</span><span class="special">&gt;()</span> <span class="special">*</span> <span class="number">2</span><span class="special">;</span>
 </pre>
 <h6>
-<a name="boost_multiprecision.tut.limits.functions.h5"></a>
+<a name="boost_multiprecision.tut.limits.functions.h6"></a>
           <span class="phrase"><a name="boost_multiprecision.tut.limits.functions.FP_tolerance"></a></span><a class="link" href="functions.html#boost_multiprecision.tut.limits.functions.FP_tolerance">Tolerance
           for Floating-point Comparisons</a>
         </h6>
@@ -293,7 +294,12 @@
 <p>
           See Donald. E. Knuth. The art of computer programming (vol II). Copyright
           1998 Addison-Wesley Longman, Inc., 0-201-89684-2. Addison-Wesley Professional;
-          3rd edition.
+          3rd edition. (The relevant equations are in paragraph 4.2.2, Eq. 36 and
+          37.)
+        </p>
+<p>
+          See <a href="https://www.boost.org/doc/libs/release/libs/test/doc/html/boost_test/testing_tools/extended_comparison/floating_point/floating_points_comparison_theory.html" target="_top">Boost.Math
+          floating_point comparison</a> for more details.
         </p>
 <p>
           See also:
@@ -326,8 +332,11 @@
 <span class="identifier">BOOST_CHECK_CLOSE_FRACTION</span><span class="special">(</span><span class="identifier">expected</span><span class="special">,</span> <span class="identifier">calculated</span><span class="special">,</span> <span class="identifier">tolerance</span><span class="special">);</span>
 </pre>
 <p>
-          used thus: cd ./test BOOST_CHECK_CLOSE_FRACTION(expected, calculated, tolerance);
+          used thus:
         </p>
+<pre class="programlisting"><span class="identifier">cd</span> <span class="special">./</span><span class="identifier">test</span>
+<span class="identifier">BOOST_CHECK_CLOSE_FRACTION</span><span class="special">(</span><span class="identifier">expected</span><span class="special">,</span> <span class="identifier">calculated</span><span class="special">,</span> <span class="identifier">tolerance</span><span class="special">);</span>
+</pre>
 <p>
           (There is also a version BOOST_CHECK_CLOSE using tolerance as a <span class="bold"><strong>percentage</strong></span> rather than a fraction; usually the fraction
           version is simpler to use).
@@ -356,7 +365,7 @@
 <span class="identifier">BOOST_CHECK_CLOSE_FRACTION</span><span class="special">(</span><span class="identifier">expected</span><span class="special">,</span> <span class="identifier">calculated</span><span class="special">,</span> <span class="identifier">tolerance</span><span class="special">);</span>
 </pre>
 <h5>
-<a name="boost_multiprecision.tut.limits.functions.h6"></a>
+<a name="boost_multiprecision.tut.limits.functions.h7"></a>
           <span class="phrase"><a name="boost_multiprecision.tut.limits.functions.infinity"></a></span><a class="link" href="functions.html#boost_multiprecision.tut.limits.functions.infinity">Infinity -
           positive and negative</a>
         </h5>
@@ -393,12 +402,12 @@
           useful features portably and including Boost.Serialization.
         </p>
 <h5>
-<a name="boost_multiprecision.tut.limits.functions.h7"></a>
+<a name="boost_multiprecision.tut.limits.functions.h8"></a>
           <span class="phrase"><a name="boost_multiprecision.tut.limits.functions.not_a_number_nan"></a></span><a class="link" href="functions.html#boost_multiprecision.tut.limits.functions.not_a_number_nan">Not-A-Number
           NaN</a>
         </h5>
 <h6>
-<a name="boost_multiprecision.tut.limits.functions.h8"></a>
+<a name="boost_multiprecision.tut.limits.functions.h9"></a>
           <span class="phrase"><a name="boost_multiprecision.tut.limits.functions.quiet_nan"></a></span><a class="link" href="functions.html#boost_multiprecision.tut.limits.functions.quiet_nan">Quiet_NaN</a>
         </h6>
 <p>
@@ -484,7 +493,8 @@
 <span class="identifier">infinity</span> <span class="identifier">input</span> <span class="identifier">was</span> <span class="identifier">inf</span>
 </pre>
 <p>
-          Similarly we can do the same with NaN (except that we cannot use <code class="computeroutput"><span class="identifier">assert</span></code>)
+          Similarly we can do the same with NaN (except that we cannot use <code class="computeroutput"><span class="identifier">assert</span></code> (because any comparisons with
+          NaN always return false).
         </p>
 <pre class="programlisting"><span class="special">{</span>
   <span class="identifier">std</span><span class="special">::</span><span class="identifier">locale</span> <span class="identifier">old_locale</span><span class="special">;</span>
@@ -501,11 +511,11 @@
   <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"NaN input was "</span> <span class="special">&lt;&lt;</span> <span class="identifier">n</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
 <span class="special">}</span>
 </pre>
-<p>
-          NaN output was nan NaN input was nan
-        </p>
+<pre class="programlisting"><span class="identifier">NaN</span> <span class="identifier">output</span> <span class="identifier">was</span> <span class="identifier">nan</span>
+<span class="identifier">NaN</span> <span class="identifier">input</span> <span class="identifier">was</span> <span class="identifier">nan</span>
+</pre>
 <h6>
-<a name="boost_multiprecision.tut.limits.functions.h9"></a>
+<a name="boost_multiprecision.tut.limits.functions.h10"></a>
           <span class="phrase"><a name="boost_multiprecision.tut.limits.functions.signaling_nan"></a></span><a class="link" href="functions.html#boost_multiprecision.tut.limits.functions.signaling_nan">Signaling
           NaN</a>
         </h6>

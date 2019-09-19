@@ -166,36 +166,57 @@ unconstrained license.
 Which is to say some back-ends rely on 3rd party libraries,
 but a header-only Boost license version is always available (if somewhat slower).
 
-Should you just wish to cut to the chase and use a fully Boost-licensed number type, then skip to
-__cpp_int for multiprecision integers, __cpp_rational for rational types,
-__cpp_dec_float for multiprecision floating-point types
-and __cpp_complex for complex types.
+[h5:getting_started Getting started with Boost.Multiprecision]
 
-The library is often used via one of the predefined typedefs: for example if you wanted an
+Should you just wish to 'cut to the chase' just to get bigger integers and/or bigger and more precise reals as simply and portably as possible,
+close to 'drop-in' replacements for the __fundamental_type analogs,
+then use a fully Boost-licensed number type, and skip to one of more of :
+
+* __cpp_int for multiprecision integers, 
+* __cpp_rational for rational types,
+* __cpp_bin_float and __cpp_dec_float for multiprecision floating-point types,  
+* __cpp_complex for complex types.
+
+The library is very often used via one of the predefined convenience `typedef`s 
+like `boost::multiprecision::int128_t` or `boost::multiprecision::cpp_bin_float_quad`.
+
+For example, if you want a signed, 128-bit fixed size integer:
+
+   #include <boost/multiprecision/cpp_int.hpp>  //  Integer types.
+   
+   boost::multiprecision::int128_t my_128_bit_int;
+
+Alternatively, and more adventurously, if you wanted an
 [@http://en.wikipedia.org/wiki/Arbitrary-precision_arithmetic arbitrary precision]
 integer type using [gmp] as the underlying implementation then you could use:
 
    #include <boost/multiprecision/gmp.hpp>  // Defines the wrappers around the GMP library's types
 
    boost::multiprecision::mpz_int myint;    // Arbitrary precision integer type.
+   
+Or for a simple, portable 128-bit floating-point close to a drop-in for a __fundamental_type like `double`, usually 64-bit   
 
-Alternatively, you can compose your own multiprecision type, by combining `number` with one of the
+   #include <boost/multiprecision/cpp_bin_float.hpp>
+   
+   boost::multiprecision::cpp_bin_float_quad my_quad_real;  
+
+Alternatively, you can compose your own 'custom' multiprecision type, by combining `number` with one of the
 predefined back-end types.  For example, suppose you wanted a 300 decimal digit floating-point type
-based on the [mpfr] library. In this case, there's no predefined typedef with that level of precision,
+based on the [mpfr] library. In this case, there's no predefined `typedef` with that level of precision,
 so instead we compose our own:
 
-   #include <boost/multiprecision/mpfr.hpp>  // Defines the Backend type that wraps MPFR
+   #include <boost/multiprecision/mpfr.hpp>  // Defines the Backend type that wraps MPFR.
 
    namespace mp = boost::multiprecision;     // Reduce the typing a bit later...
 
    typedef mp::number<mp::mpfr_float_backend<300> >  my_float;
 
-   my_float a, b, c; // These variables have 300 decimal digits precision
+   my_float a, b, c; // These variables have 300 decimal digits precision.
 
 We can repeat the above example, but with the expression templates disabled (for faster compile times, but slower runtimes)
 by passing a second template argument to `number`:
 
-   #include <boost/multiprecision/mpfr.hpp>  // Defines the Backend type that wraps MPFR
+   #include <boost/multiprecision/mpfr.hpp>  // Defines the Backend type that wraps MPFR.
 
    namespace mp = boost::multiprecision;     // Reduce the typing a bit later...
 
@@ -278,7 +299,7 @@ Instead the operator looks more like this:
    template <class Backend>
    ``['unmentionable-type]`` operator * (const number<Backend>& a, const number<Backend>& b);
 
-Where the "unmentionable" return type is an implementation detail that, rather than containing the result
+Where the '['unmentionable]' return type is an implementation detail that, rather than containing the result
 of the multiplication, contains instructions on how to compute the result.  In effect it's just a pair
 of references to the arguments of the function, plus some compile-time information that stores what the operation
 is.
@@ -370,7 +391,7 @@ internally by the Boost.Math library.
 
 unless you're absolutely sure that the lifetimes of `a`, `b` and `c` will outlive that of `my_expression`.
 
-In fact it is particularly easy to create dangling references by mixing expression templates with the `auto`
+In fact, it is particularly easy to create dangling references by mixing expression templates with the `auto`
 keyword, for example:
 
 `auto val = cpp_dec_float_50("23.1") * 100;`
@@ -3067,7 +3088,10 @@ for reliably checking if floating-point values are close enough.
 
 See Donald. E. Knuth. The art of computer programming (vol II).
 Copyright 1998 Addison-Wesley Longman, Inc., 0-201-89684-2.
-Addison-Wesley Professional; 3rd edition.
+Addison-Wesley Professional; 3rd edition. (The relevant equations are in paragraph 4.2.2, Eq. 36 and 37.)
+
+See [@https://www.boost.org/doc/libs/release/libs/test/doc/html/boost_test/testing_tools/extended_comparison/floating_point/floating_points_comparison_theory.html Boost.Math floating_point comparison]
+for more details.
 
 See also:
 
@@ -3080,7 +3104,8 @@ See also:
 [tolerance_1]
 
 used thus:
-cd ./test
+
+  cd ./test
   BOOST_CHECK_CLOSE_FRACTION(expected, calculated, tolerance);
 
 (There is also a version BOOST_CHECK_CLOSE using tolerance as a [*percentage] rather than a fraction;
