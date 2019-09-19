@@ -434,7 +434,17 @@ int eval_fpclassify(const float128_backend& arg)
       return FP_NORMAL;
    }
 }
-
+#if defined(BOOST_GCC) && (__GNUC__ == 9)
+// See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=91705
+inline BOOST_MP_CXX14_CONSTEXPR void eval_increment(float128_backend& arg)
+{
+   arg.value() = 1 + arg.value();
+}
+inline BOOST_MP_CXX14_CONSTEXPR void eval_decrement(float128_backend& arg)
+{
+   arg.value() = arg.value() - 1;
+}
+#else
 inline BOOST_MP_CXX14_CONSTEXPR void eval_increment(float128_backend& arg)
 {
    ++arg.value();
@@ -443,6 +453,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_decrement(float128_backend& arg)
 {
    --arg.value();
 }
+#endif
 
 /*********************************************************************
 *
@@ -767,7 +778,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::backen
    static BOOST_MP_CXX14_CONSTEXPR number_type                        signaling_NaN() { return 0; }
    static BOOST_MP_CXX14_CONSTEXPR number_type                        denorm_min() { return BOOST_MP_QUAD_DENORM_MIN; }
    BOOST_STATIC_CONSTEXPR bool               is_iec559       = true;
-   BOOST_STATIC_CONSTEXPR bool               is_bounded      = false;
+   BOOST_STATIC_CONSTEXPR bool               is_bounded      = true;
    BOOST_STATIC_CONSTEXPR bool               is_modulo       = false;
    BOOST_STATIC_CONSTEXPR bool               traps           = false;
    BOOST_STATIC_CONSTEXPR bool               tinyness_before = false;

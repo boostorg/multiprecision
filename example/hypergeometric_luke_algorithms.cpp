@@ -219,7 +219,7 @@ namespace examples
         const T scale = std::accumulate(C.begin(),
                                         C.end(),
                                         T(0),
-                                        [&b_neg](T& scale_sum, const T& ck) -> T
+                                        [&b_neg](T scale_sum, const T& ck) -> T
                                         {
                                           ((!b_neg) ? (scale_sum += ck) : (scale_sum -= ck));
                                           b_neg = (!b_neg);

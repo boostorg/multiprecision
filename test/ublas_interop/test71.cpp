@@ -13,6 +13,10 @@
 // This file fails to compile - appears to be a known uBlas issue :-(
 //
 
+#if defined(__GNUC__) && (__GNUC__ >= 9)
+#pragma GCC diagnostic ignored "-Wdeprecated-copy"
+#endif
+
 #include "test7.hpp"
 
 // Test vector expression templates

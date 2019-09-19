@@ -444,7 +444,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename boost::disable_if_c<boost::is_same<T, U
 {
    T t;
    t = number<T>::canonical_value(u);
-   return BOOST_MP_MOVE(t);
+   return t;
 }
 template <class T>
 inline BOOST_MP_CXX14_CONSTEXPR const T& make_T(const T& t)
@@ -1384,9 +1384,9 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_round(T& result, const T& a)
 }
 
 template <class B>
-void eval_lcm(B& result, const B& a, const B& b);
+BOOST_MP_CXX14_CONSTEXPR void eval_lcm(B& result, const B& a, const B& b);
 template <class B>
-void eval_gcd(B& result, const B& a, const B& b);
+BOOST_MP_CXX14_CONSTEXPR void eval_gcd(B& result, const B& a, const B& b);
 
 template <class T, class Arithmetic>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_integral<Arithmetic> >::type eval_gcd(T& result, const T& a, const Arithmetic& b)
@@ -2496,7 +2496,7 @@ inline BOOST_MP_CXX14_CONSTEXPR number<Backend, ExpressionTemplates> trunc(const
    detail::scoped_default_precision<multiprecision::number<Backend, ExpressionTemplates> > precision_guard(v);
    number<Backend, ExpressionTemplates>                                                    result;
    eval_trunc(result.backend(), v.backend());
-   return BOOST_MP_MOVE(result);
+   return result;
 }
 
 template <class tag, class A1, class A2, class A3, class A4, class Policy>
@@ -2595,7 +2595,7 @@ inline BOOST_MP_CXX14_CONSTEXPR number<T, ExpressionTemplates> round(const numbe
    detail::scoped_default_precision<multiprecision::number<T, ExpressionTemplates> > precision_guard(v);
    number<T, ExpressionTemplates>                                                    result;
    eval_round(result.backend(), v.backend());
-   return BOOST_MP_MOVE(result);
+   return result;
 }
 
 template <class tag, class A1, class A2, class A3, class A4, class Policy>
@@ -2693,7 +2693,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<T>::value =
    detail::scoped_default_precision<multiprecision::number<T, ExpressionTemplates> > precision_guard(v);
    number<T, ExpressionTemplates>                                                    result;
    eval_frexp(result.backend(), v.backend(), pint);
-   return BOOST_MP_MOVE(result);
+   return result;
 }
 template <class tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_floating_point, typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
@@ -2709,7 +2709,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<T>::value =
    detail::scoped_default_precision<multiprecision::number<T, ExpressionTemplates> > precision_guard(v);
    number<T, ExpressionTemplates>                                                    result;
    eval_frexp(result.backend(), v.backend(), pint);
-   return BOOST_MP_MOVE(result);
+   return result;
 }
 template <class tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_floating_point, typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
@@ -2725,7 +2725,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<T>::value =
    detail::scoped_default_precision<multiprecision::number<T, ExpressionTemplates> > precision_guard(v);
    number<T, ExpressionTemplates>                                                    result;
    eval_frexp(result.backend(), v.backend(), pint);
-   return BOOST_MP_MOVE(result);
+   return result;
 }
 template <class tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_floating_point, typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
@@ -2741,7 +2741,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<T>::value =
    detail::scoped_default_precision<multiprecision::number<T, ExpressionTemplates> > precision_guard(v);
    number<T, ExpressionTemplates>                                                    result;
    eval_frexp(result.backend(), v.backend(), pint);
-   return BOOST_MP_MOVE(result);
+   return result;
 }
 template <class tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<typename detail::expression<tag, A1, A2, A3, A4>::result_type>::value == number_kind_floating_point, typename detail::expression<tag, A1, A2, A3, A4>::result_type>::type
@@ -2762,7 +2762,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<T>::value =
    detail::scoped_default_precision<multiprecision::number<T, ExpressionTemplates> > precision_guard(v);
    number<T, ExpressionTemplates>                                                    result;
    eval_modf(result.backend(), v.backend(), pipart ? &pipart->backend() : 0);
-   return BOOST_MP_MOVE(result);
+   return result;
 }
 template <class T, expression_template_option ExpressionTemplates, class tag, class A1, class A2, class A3, class A4>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<T>::value == number_kind_floating_point, number<T, ExpressionTemplates> >::type modf(const detail::expression<tag, A1, A2, A3, A4>& v, number<T, ExpressionTemplates>* pipart)
@@ -2771,7 +2771,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<T>::value =
    detail::scoped_default_precision<multiprecision::number<T, ExpressionTemplates> > precision_guard(v);
    number<T, ExpressionTemplates>                                                    result, arg(v);
    eval_modf(result.backend(), arg.backend(), pipart ? &pipart->backend() : 0);
-   return BOOST_MP_MOVE(result);
+   return result;
 }
 
 //
@@ -2860,7 +2860,7 @@ fma(const number<Backend, et_off>& a, const U& b, const V& c)
    detail::scoped_default_precision<multiprecision::number<Backend, et_off> > precision_guard(a, b, c);
    number<Backend, et_off>                                                    result;
    eval_multiply_add(result.backend(), number<Backend, et_off>::canonical_value(a), number<Backend, et_off>::canonical_value(b), number<Backend, et_off>::canonical_value(c));
-   return BOOST_MP_MOVE(result);
+   return result;
 }
 
 template <class U, class Backend, class V>
@@ -2911,7 +2911,7 @@ fma(const U& a, const number<Backend, et_off>& b, const V& c)
    detail::scoped_default_precision<multiprecision::number<Backend, et_off> > precision_guard(a, b, c);
    number<Backend, et_off>                                                    result;
    eval_multiply_add(result.backend(), number<Backend, et_off>::canonical_value(a), number<Backend, et_off>::canonical_value(b), number<Backend, et_off>::canonical_value(c));
-   return BOOST_MP_MOVE(result);
+   return result;
 }
 
 template <class U, class V, class Backend>
@@ -2953,7 +2953,7 @@ fma(const U& a, const V& b, const number<Backend, et_off>& c)
    detail::scoped_default_precision<multiprecision::number<Backend, et_off> > precision_guard(a, b, c);
    number<Backend, et_off>                                                    result;
    eval_multiply_add(result.backend(), number<Backend, et_off>::canonical_value(a), number<Backend, et_off>::canonical_value(b), number<Backend, et_off>::canonical_value(c));
-   return BOOST_MP_MOVE(result);
+   return result;
 }
 
 namespace default_ops {
@@ -3019,7 +3019,7 @@ remquo(const number<Backend, et_off>& a, const U& b, int* pi)
    detail::scoped_default_precision<multiprecision::number<Backend, et_off> > precision_guard(a, b);
    number<Backend, et_off>                                                    result;
    eval_remquo(result.backend(), a.backend(), number<Backend, et_off>::canonical_value(b), pi);
-   return BOOST_MP_MOVE(result);
+   return result;
 }
 template <class U, class Backend>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<
@@ -3031,7 +3031,7 @@ remquo(const U& a, const number<Backend, et_off>& b, int* pi)
    detail::scoped_default_precision<multiprecision::number<Backend, et_off> > precision_guard(a, b);
    number<Backend, et_off>                                                    result;
    eval_remquo(result.backend(), number<Backend, et_off>::canonical_value(a), b.backend(), pi);
-   return BOOST_MP_MOVE(result);
+   return result;
 }
 
 template <class B, expression_template_option ExpressionTemplates>
@@ -3102,7 +3102,7 @@ sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
       using default_ops::BOOST_JOIN(eval_, func);                                                                                                                                                         \
       BOOST_JOIN(eval_, func)                                                                                                                                                                             \
       (result.backend(), arg.backend());                                                                                                                                                                  \
-      return BOOST_MP_MOVE(result);                                                                                                                                                                       \
+      return result;                                                                                                                                                                       \
    }
 
 #define BINARY_OP_FUNCTOR(func, category)                                                                                                                                                                                                                  \
@@ -3264,7 +3264,7 @@ sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
       using default_ops::BOOST_JOIN(eval_, func);                                                                                                                                                                                                          \
       BOOST_JOIN(eval_, func)                                                                                                                                                                                                                              \
       (result.backend(), arg.backend(), a.backend());                                                                                                                                                                                                      \
-      return BOOST_MP_MOVE(result);                                                                                                                                                                                                                        \
+      return result;                                                                                                                                                                                                                        \
    }                                                                                                                                                                                                                                                       \
    template <class Backend, class Arithmetic>                                                                                                                                                                                                              \
    inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<                                                                                                                                                                                                                            \
@@ -3277,7 +3277,7 @@ sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
       using default_ops::BOOST_JOIN(eval_, func);                                                                                                                                                                                                          \
       BOOST_JOIN(eval_, func)                                                                                                                                                                                                                              \
       (result.backend(), arg.backend(), number<Backend, et_off>::canonical_value(a));                                                                                                                                                                      \
-      return BOOST_MP_MOVE(result);                                                                                                                                                                                                                        \
+      return result;                                                                                                                                                                                                                        \
    }                                                                                                                                                                                                                                                       \
    template <class Backend, class Arithmetic>                                                                                                                                                                                                              \
    inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<                                                                                                                                                                                                                            \
@@ -3290,7 +3290,7 @@ sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
       using default_ops::BOOST_JOIN(eval_, func);                                                                                                                                                                                                          \
       BOOST_JOIN(eval_, func)                                                                                                                                                                                                                              \
       (result.backend(), number<Backend, et_off>::canonical_value(a), arg.backend());                                                                                                                                                                      \
-      return BOOST_MP_MOVE(result);                                                                                                                                                                                                                        \
+      return result;                                                                                                                                                                                                                        \
    }
 
 #define HETERO_BINARY_OP_FUNCTOR_B(func, Arg2, category)                                                                                                                                                            \
@@ -3329,7 +3329,7 @@ sqrt(const number<B, ExpressionTemplates>& x, number<B, ExpressionTemplates>& r)
       using default_ops::BOOST_JOIN(eval_, func);                                                                                                                                                                   \
       BOOST_JOIN(eval_, func)                                                                                                                                                                                       \
       (result.backend(), arg.backend(), a);                                                                                                                                                                         \
-      return BOOST_MP_MOVE(result);                                                                                                                                                                                 \
+      return result;                                                                                                                                                                                 \
    }
 
 #define HETERO_BINARY_OP_FUNCTOR(func, Arg2, category)                  \
@@ -3410,7 +3410,7 @@ abs(const number<Backend, et_off>& arg)
    number<Backend, et_off>                                                    result;
    using default_ops::eval_abs;
    eval_abs(result.backend(), arg.backend());
-   return BOOST_MP_MOVE(result);
+   return result;
 }
 
 template <class tag, class A1, class A2, class A3, class A4>
@@ -3439,7 +3439,7 @@ conj(const number<Backend, et_off>& arg)
    number<Backend, et_off>                                                    result;
    using default_ops::eval_conj;
    eval_conj(result.backend(), arg.backend());
-   return BOOST_MP_MOVE(result);
+   return result;
 }
 
 template <class tag, class A1, class A2, class A3, class A4>
@@ -3468,7 +3468,7 @@ proj(const number<Backend, et_off>& arg)
    number<Backend, et_off>                                                    result;
    using default_ops::eval_proj;
    eval_proj(result.backend(), arg.backend());
-   return BOOST_MP_MOVE(result);
+   return result;
 }
 
 UNARY_OP_FUNCTOR(fabs, number_kind_floating_point)

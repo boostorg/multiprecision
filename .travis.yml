@@ -8,6 +8,8 @@ sudo: false
 
 python: "2.7"
 
+dist : xenial
+
 os:
   - linux
   - osx
@@ -28,7 +30,7 @@ matrix:
 
   include:
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=arithmetic_tests
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++03 TEST_SUITE=arithmetic_tests
       addons:
         apt:
           packages:
@@ -41,7 +43,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=arithmetic_tests
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++11 TEST_SUITE=arithmetic_tests
       addons:
         apt:
           packages:
@@ -54,7 +56,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=arithmetic_tests
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE=arithmetic_tests
       addons:
         apt:
           packages:
@@ -67,7 +69,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=arithmetic_tests
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++03 TEST_SUITE=cpp_int_tests
       addons:
         apt:
           packages:
@@ -80,7 +82,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=cpp_int_tests
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++11 TEST_SUITE=cpp_int_tests
       addons:
         apt:
           packages:
@@ -93,7 +95,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=cpp_int_tests
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE=cpp_int_tests
       addons:
         apt:
           packages:
@@ -106,7 +108,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=cpp_int_tests
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++03 TEST_SUITE=functions_and_limits
       addons:
         apt:
           packages:
@@ -119,46 +121,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=cpp_int_tests
-      addons:
-        apt:
-          packages:
-            - g++-6
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=functions_and_limits
-      addons:
-        apt:
-          packages:
-            - g++-6
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=functions_and_limits
-      addons:
-        apt:
-          packages:
-            - g++-6
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=functions_and_limits
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++11 TEST_SUITE=functions_and_limits
       addons:
         apt:
           packages:
@@ -184,7 +147,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=functions_and_limits
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++03 TEST_SUITE=conversions
       addons:
         apt:
           packages:
@@ -197,33 +160,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=conversions
-      addons:
-        apt:
-          packages:
-            - g++-6
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=conversions
-      addons:
-        apt:
-          packages:
-            - g++-6
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=conversions
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++11 TEST_SUITE=conversions
       addons:
         apt:
           packages:
@@ -249,7 +186,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=conversions
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++03 TEST_SUITE=misc
       addons:
         apt:
           packages:
@@ -262,33 +199,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=misc
-      addons:
-        apt:
-          packages:
-            - g++-6
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=misc
-      addons:
-        apt:
-          packages:
-            - g++-6
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=misc
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++11 TEST_SUITE=misc
       addons:
         apt:
           packages:
@@ -314,7 +225,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=misc
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++03 TEST_SUITE="compile_fail examples"
       addons:
         apt:
           packages:
@@ -327,7 +238,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE="compile_fail examples"
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++11 TEST_SUITE="compile_fail examples"
       addons:
         apt:
           packages:
@@ -340,7 +251,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE="compile_fail examples"
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE="compile_fail examples"
       addons:
         apt:
           packages:
@@ -353,7 +264,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE="compile_fail examples"
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++03 TEST_SUITE=concepts
       addons:
         apt:
           packages:
@@ -366,19 +277,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE="compile_fail examples"
-      addons:
-        apt:
-          packages:
-            - g++-6
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=concepts
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++11 TEST_SUITE=concepts
       addons:
         apt:
           packages:
@@ -391,33 +290,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=concepts
-      addons:
-        apt:
-          packages:
-            - g++-6
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=concepts
-      addons:
-        apt:
-          packages:
-            - g++-6
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=concepts
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE=concepts
       addons:
         apt:
           packages:
@@ -521,7 +394,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=arithmetic_tests
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++17 TEST_SUITE=arithmetic_tests
       addons:
         apt:
           packages:
@@ -534,7 +407,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=arithmetic_tests
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++17 TEST_SUITE=cpp_int_tests
       addons:
         apt:
           packages:
@@ -547,7 +420,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=arithmetic_tests
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++17 TEST_SUITE=functions_and_limits
       addons:
         apt:
           packages:
@@ -560,7 +433,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=arithmetic_tests
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++17 TEST_SUITE=conversions
       addons:
         apt:
           packages:
@@ -573,7 +446,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=cpp_int_tests
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++17 TEST_SUITE=misc
       addons:
         apt:
           packages:
@@ -586,7 +459,20 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=cpp_int_tests
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++17 TEST_SUITE="compile_fail examples"
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+    
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++17 TEST_SUITE=concepts
       addons:
         apt:
           packages:
@@ -599,11 +485,11 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=cpp_int_tests
+      env: TOOLSET=gcc COMPILER=g++-9 CXXSTD=gnu++17 TEST_SUITE=arithmetic_tests
       addons:
         apt:
           packages:
-            - g++-8
+            - g++-9
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -612,11 +498,11 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=cpp_int_tests
+      env: TOOLSET=gcc COMPILER=g++-9 CXXSTD=gnu++17 TEST_SUITE=cpp_int_tests
       addons:
         apt:
           packages:
-            - g++-8
+            - g++-9
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -625,11 +511,11 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=functions_and_limits
+      env: TOOLSET=gcc COMPILER=g++-9 CXXSTD=gnu++17 TEST_SUITE=functions_and_limits
       addons:
         apt:
           packages:
-            - g++-8
+            - g++-9
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -638,11 +524,11 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=functions_and_limits
+      env: TOOLSET=gcc COMPILER=g++-9 CXXSTD=gnu++17 TEST_SUITE=conversions
       addons:
         apt:
           packages:
-            - g++-8
+            - g++-9
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -651,11 +537,11 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=functions_and_limits
+      env: TOOLSET=gcc COMPILER=g++-9 CXXSTD=gnu++17 TEST_SUITE=misc
       addons:
         apt:
           packages:
-            - g++-8
+            - g++-9
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -664,11 +550,24 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++14 TEST_SUITE=functions_and_limits
+      env: TOOLSET=gcc COMPILER=g++-9 CXXSTD=gnu++17 TEST_SUITE="compile_fail examples"
       addons:
         apt:
           packages:
-            - g++-8
+            - g++-9
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+    
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-9 CXXSTD=gnu++17 TEST_SUITE=concepts
+      addons:
+        apt:
+          packages:
+            - g++-9
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -677,252 +576,102 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=functions_and_limits
+      env: TOOLSET=clang COMPILER=clang++-8 CXXSTD=c++17 TEST_SUITE=arithmetic_tests
       addons:
         apt:
           packages:
-            - g++-8
+            - clang-8
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=conversions
+      env: TOOLSET=clang COMPILER=clang++-8 CXXSTD=c++17 TEST_SUITE=cpp_int_tests
       addons:
         apt:
           packages:
-            - g++-8
+            - clang-8
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=conversions
+      env: TOOLSET=clang COMPILER=clang++-8 CXXSTD=c++17 TEST_SUITE=functions_and_limits
       addons:
         apt:
           packages:
-            - g++-8
+            - clang++-8
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=conversions
+      env: TOOLSET=clang COMPILER=clang++-8 CXXSTD=c++17 TEST_SUITE=conversions
       addons:
         apt:
           packages:
-            - g++-8
+            - clang-8
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++14 TEST_SUITE=conversions
+      env: TOOLSET=clang COMPILER=clang++-8 CXXSTD=c++17 TEST_SUITE=misc
       addons:
         apt:
           packages:
-            - g++-8
+            - clang-8
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=conversions
+      env: TOOLSET=clang COMPILER=clang++-8 CXXSTD=c++17 TEST_SUITE="compile_fail examples"
       addons:
         apt:
           packages:
-            - g++-8
+            - clang-8
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
-
+            - llvm-toolchain-xenial-8
+    
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=misc
+      env: TOOLSET=clang COMPILER=clang++-8 CXXSTD=c++17 TEST_SUITE=concepts
       addons:
         apt:
           packages:
-            - g++-8
+            - clang-8
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=misc
-      addons:
-        apt:
-          packages:
-            - g++-8
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=misc
-      addons:
-        apt:
-          packages:
-            - g++-8
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++14 TEST_SUITE=misc
-      addons:
-        apt:
-          packages:
-            - g++-8
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=misc
-      addons:
-        apt:
-          packages:
-            - g++-8
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE="compile_fail examples"
-      addons:
-        apt:
-          packages:
-            - g++-8
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE="compile_fail examples"
-      addons:
-        apt:
-          packages:
-            - g++-8
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE="compile_fail examples"
-      addons:
-        apt:
-          packages:
-            - g++-8
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE="compile_fail examples"
-      addons:
-        apt:
-          packages:
-            - g++-8
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=concepts
-      addons:
-        apt:
-          packages:
-            - g++-8
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=concepts
-      addons:
-        apt:
-          packages:
-            - g++-8
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=concepts
-      addons:
-        apt:
-          packages:
-            - g++-8
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=concepts
-      addons:
-        apt:
-          packages:
-            - g++-8
-            - libgmp-dev
-            - libmpfr-dev
-            - libmpc-dev
-            - libmpfi-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-
+            - llvm-toolchain-xenial-8
 
     - os: osx
       env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests
@@ -1031,3 +780,4 @@ script:
 notifications:
   email:
     on_success: always
+
