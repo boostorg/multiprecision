@@ -266,6 +266,7 @@ BOOST_AUTO_TEST_CASE(test_numeric_limits_snips)
 //[digits10_5
     -(std::numeric_limits<double>::max)() == std::numeric_limits<double>::lowest();
 //] [/digits10_5]
+//  warning C4553: '==': result of expression not used; did you intend '='? is spurious.
   }
 
   {
@@ -396,7 +397,7 @@ so the default expression template parameter has been replaced by `et_off`.]
     std::cout << "Type " << typeid(cpp_bin_float_quad).name() << " does not have NaNs!" << std::endl;
   }
 
-//] [/nan_1]
+//]  [/nan_1]
   }
 
   {
@@ -434,10 +435,11 @@ Then we can equally well use a multiprecision type cpp_bin_float_quad:
   }
 
 /*`
+``
   infinity output was inf
   infinity input was inf
-
-Similarly we can do the same with NaN (except that we cannot use `assert`)
+``
+Similarly we can do the same with NaN (except that we cannot use `assert` (because any comparisons with NaN always return false).
 */
   {
     std::locale old_locale;
@@ -454,11 +456,12 @@ Similarly we can do the same with NaN (except that we cannot use `assert`)
     std::cout << "NaN input was " << n << std::endl;
   }
 /*`
+``
   NaN output was nan
   NaN input was nan
-
+``
 */
-//] [/facet_1]
+//]  [/facet_1]
   }
 
 #endif

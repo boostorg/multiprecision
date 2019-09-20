@@ -31,7 +31,8 @@
         integer operations</a> are overloaded for the built in integer types in
         <code class="computeroutput"><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">integer</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span></code>.
         Where these operations require a temporary increase in precision (such as
-        for powm), then if no built in type is available, a <a class="link" href="ints/cpp_int.html" title="cpp_int">cpp_int</a>
+        for <code class="computeroutput"><span class="identifier">powm</span></code>), then if no built
+        in type is available, a <a class="link" href="ints/cpp_int.html" title="cpp_int">cpp_int</a>
         of appropriate precision will be used.
       </p>
 <p>
@@ -161,7 +162,7 @@
 <p>
         The regular Miller-Rabin functions in <code class="computeroutput"><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">miller_rabin</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span></code>
         are defined in terms of the above generic operations, and so function equally
-        well for built in and multiprecision types.
+        well for built-in or __fundamental_types and multiprecision types.
       </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
