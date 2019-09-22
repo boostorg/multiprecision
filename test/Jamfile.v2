@@ -59,6 +59,15 @@ project : requirements
    <toolset>intel-win:<runtime-link>static
    <toolset>intel-win:<link>static
    <toolset>clang-win:<link>static
+   
+   # Assembler error "File too big" caused by lots of C++ templates, for example, math/floating_point_examples.cpp.
+   # Some projects on some toolsets may require
+   #   <toolset>gcc-mingw:<cxxflags>\"-Wa,-mbig-obj\"
+   # See https://digitalkarabela.com/mingw-w64-how-to-fix-file-too-big-too-many-sections/
+   # <toolset>gcc-mingw:<cxxflags>-Wa,-mbig-obj # Some projects may overflow assembler and require equivalent of MSVC /bigobj.
+   # Requires version 2.30 of GNU binutils.
+   # Best applied only to projects that require this, see multiprecision/example  run math/floating_point_examples.cpp.
+   
    # Speed up compiles:
    <toolset>msvc:<debug-symbols>off
    <toolset>intel:<debug-symbols>off

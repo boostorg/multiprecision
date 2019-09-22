@@ -344,6 +344,25 @@
               that are too large to fit into any built in number type.
             </li>
 <li class="listitem">
+              The <a class="link" href="cpp_int.html" title="cpp_int">cpp_int</a>
+              types support constexpr arithmetic, provided it is a fixed precision
+              type with no allocator. It may also be a checked integer: in which
+              case a compiler error will be generated on overflow or undefined behaviour.
+              In addition the free functions <code class="computeroutput"><span class="identifier">abs</span></code>,
+              <code class="computeroutput"><span class="identifier">swap</span></code>, <code class="computeroutput"><span class="identifier">multiply</span></code>, <code class="computeroutput"><span class="identifier">add</span></code>,
+              <code class="computeroutput"><span class="identifier">subtract</span></code>, <code class="computeroutput"><span class="identifier">divide_qr</span></code>, <code class="computeroutput"><span class="identifier">integer_modulus</span></code>,
+              <code class="computeroutput"><span class="identifier">powm</span></code>, <code class="computeroutput"><span class="identifier">lsb</span></code>, <code class="computeroutput"><span class="identifier">msb</span></code>,
+              <code class="computeroutput"><span class="identifier">bit_test</span></code>, <code class="computeroutput"><span class="identifier">bit_set</span></code>, <code class="computeroutput"><span class="identifier">bit_unset</span></code>,
+              <code class="computeroutput"><span class="identifier">bit_flip</span></code>, <code class="computeroutput"><span class="identifier">sqrt</span></code>, <code class="computeroutput"><span class="identifier">gcd</span></code>,
+              <code class="computeroutput"><span class="identifier">lcm</span></code> are all supported.
+              Use of <a class="link" href="cpp_int.html" title="cpp_int">cpp_int</a>
+              in this way requires either a C++2a compiler (one which supports <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">is_constant_evaluated</span><span class="special">()</span></code>),
+              or GCC-6 or later in C++14 mode. Compilers other than GCC and without
+              <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">is_constant_evaluated</span><span class="special">()</span></code>
+              will support a very limited set of operations: expect to hit roadblocks
+              rather easily.
+            </li>
+<li class="listitem">
               You can import/export the raw bits of a <a class="link" href="cpp_int.html" title="cpp_int">cpp_int</a>
               to and from external storage via the <code class="computeroutput"><span class="identifier">import_bits</span></code>
               and <code class="computeroutput"><span class="identifier">export_bits</span></code> functions.

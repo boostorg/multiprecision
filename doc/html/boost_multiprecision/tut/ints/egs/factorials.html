@@ -43,13 +43,13 @@
    <span class="comment">//</span>
    <span class="comment">// Print all the factorials that will fit inside a 128-bit integer.</span>
    <span class="comment">//</span>
-   <span class="comment">// Begin by building a big table of factorials, once we know just how </span>
+   <span class="comment">// Begin by building a big table of factorials, once we know just how</span>
    <span class="comment">// large the largest is, we'll be able to "pretty format" the results.</span>
    <span class="comment">//</span>
    <span class="comment">// Calculate the largest number that will fit inside 128 bits, we could</span>
    <span class="comment">// also have used numeric_limits&lt;int128_t&gt;::max() for this value:</span>
    <span class="identifier">cpp_int</span> <span class="identifier">limit</span> <span class="special">=</span> <span class="special">(</span><span class="identifier">cpp_int</span><span class="special">(</span><span class="number">1</span><span class="special">)</span> <span class="special">&lt;&lt;</span> <span class="number">128</span><span class="special">)</span> <span class="special">-</span> <span class="number">1</span><span class="special">;</span>
-   <span class="comment">// </span>
+   <span class="comment">//</span>
    <span class="comment">// Our table of values:</span>
    <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">cpp_int</span><span class="special">&gt;</span> <span class="identifier">results</span><span class="special">;</span>
    <span class="comment">//</span>
