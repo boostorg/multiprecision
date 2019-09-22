@@ -14,19 +14,19 @@
 namespace boost {
 namespace multiprecision {
 
-template <typename Backend>
-void eval_reduce_below(Backend& val, const Backend& mod)
+template <typename Backend, expression_template_option ExpressionTemplates>
+void eval_reduce_below(number<Backend, ExpressionTemplates>& val, const  number<Backend, ExpressionTemplates>& mod)
 {
    using default_ops::eval_lt;
 
-   if (eval_lt(mod, 0))
+   if (mod < 0)
    {
       BOOST_THROW_EXCEPTION(std::invalid_argument("reduce_below modulus must be positive"));
    }
 
-   while (eval_lt(mod, val))
+   while (mod < val)
    {
-      eval_subtract(val, mod);
+      val -= mod;
    }
 }
 
@@ -36,6 +36,7 @@ number<Backend, ExpressionTemplates> reduce_below(number<Backend, ExpressionTemp
 {
    return number<Backend, ExpressionTemplates>(eval_reduce_below(val.backend(), mod.backend()));
 }
+
 }
 } // namespace boost::multiprecision
 

@@ -14,96 +14,32 @@
 #include <boost/multiprecision/montgomery/inverse.hpp>
 #include <boost/multiprecision/montgomery/modular_reduce.hpp>
 
+#include <boost/type_traits/is_integral.hpp>
+
+#include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
+
 namespace boost {
 namespace multiprecision {
+
 /**
  * Parameters for Montgomery Reduction
  */
-template <typename NumberType>
+template <typename Backend>
 class montgomery_params
 {
+   //typedef typename std::enable_if<is_number<NumberType>::value>::type number_type;
+   typedef number<Backend> number_type;
  public:
-   typedef NumberType number_type;
 
+   montgomery_params() {}
    /**
    * Initialize a set of Montgomery reduction parameters. These values
    * can be shared by all values in a specific Montgomery domain.
    */
-
-   // work_only_with_cpp_int
-   template <typename Backend, expression_template_option ExpressionTemplates>
-   explicit montgomery_params(
-       const number<Backend, ExpressionTemplates>& p,
-       const number<Backend, ExpressionTemplates>& redc_module)
-   {
-
-      if (p < 0 || !(p % 2))
-      {
-         throw std::invalid_argument("montgomery_params invalid modulus");
-      }
-
-      m_p = p;
-
-      m_mod = redc_module;
-
-      m_p_words = m_p.backend().size();
-
-      m_p_dash = monty_inverse(m_p.backend().limbs()[0]);
-
-      number_type r;
-
-      boost::multiprecision::backends::eval_bit_set(
-          r.backend(), m_p_words * CRYPTO3_MP_WORD_BITS);
-
-      m_r1 = r;
-      mod_redc(m_r1.backend(), redc_module.backend());
-      m_r2 = m_r1;
-      eval_multiply(m_r2.backend(), m_r1.backend());
-      mod_redc(m_r2.backend(), redc_module.backend());
-      m_r3 = m_r2;
-      eval_multiply(m_r3.backend(), m_r1.backend());
-      mod_redc(m_r3.backend(), redc_module.backend());
-   }
-
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR montgomery_params() BOOST_NOEXCEPT {}
-
-   template <typename Backend, expression_template_option ExpressionTemplates>
-   explicit montgomery_params() {}
-
-   /**
-   * Initialize a set of Montgomery reduction parameters. These values
-   * can be shared by all values in a specific Montgomery domain.
-   */
-   template <typename Backend, expression_template_option ExpressionTemplates>
-   explicit montgomery_params(const number<Backend, ExpressionTemplates>& p)
-   {
-
-      if (p < 0 || !(p % 2))
-      {
-         throw std::invalid_argument("montgomery_params invalid modulus");
-      }
-
-      m_p = p;
-
-      m_mod = p;
-
-      m_p_words = m_p.backend().size();
-
-      m_p_dash = monty_inverse(m_p.backend().limbs()[0]);
-
-      number_type r;
-
-      boost::multiprecision::backends::eval_bit_set(
-          r.backend(), m_p_words * CRYPTO3_MP_WORD_BITS);
-
-      m_r1 = r;
-      mod_redc(m_r1.backend(), p.backend());
-      m_r2 = m_r1;
-      eval_multiply(m_r2.backend(), m_r1.backend());
-      mod_redc(m_r2.backend(), p.backend());
-      m_r3 = m_r2;
-      eval_multiply(m_r3.backend(), m_r1.backend());
-      mod_redc(m_r3.backend(), p.backend());
+   template <typename Number,
+             typename = typename boost::enable_if_c<is_number<Number>::value || is_integral<Number>::value>::type >
+   explicit montgomery_params(const Number& p) {
+      find_const_variables(p);
    }
 
    const number_type& mod() const { return m_mod; }
@@ -120,33 +56,58 @@ class montgomery_params
 
    size_t p_words() const { return m_p_words; }
 
-   /*
-  operator number_type() {
-      return m_p;
-  };
-  */
-
-   template <typename Backend, expression_template_option ExpressionTemplates>
-   operator number<Backend, ExpressionTemplates>()
+   template <class V>
+   montgomery_params& operator=(const V& v)
    {
-      number<Backend, ExpressionTemplates> x = 0;
-      return x;
+      find_const_variables(v);
+      return *this;
+   }
+
+   template <typename BackendT, expression_template_option ExpressionTemplates>
+   operator number<BackendT, ExpressionTemplates>()
+   {
+      return p();
    };
 
+
  private:
-   NumberType m_p;
-   NumberType m_r1;
-   NumberType m_r2;
-   NumberType m_r3;
-   limb_type  m_p_dash;
-   size_t     m_p_words;
-   NumberType m_mod;
+   template <typename T>
+   void find_const_variables(const T& p) {
+      if (p < 0 || !(p % 2))
+      {
+         throw std::invalid_argument("montgomery_params invalid modulus");
+      }
+
+      m_p = p;
+
+      m_mod = p;
+
+      m_p_words = m_p.backend().size();
+
+      m_p_dash = monty_inverse(m_p.backend().limbs()[0]);
+
+      number_type r;
+
+      boost::multiprecision::backends::eval_bit_set(r.backend(), m_p_words * CRYPTO3_MP_WORD_BITS);
+
+      m_r1 = r;
+      mod_redc(m_r1, m_p);
+      m_r2 = m_r1 * m_r1;
+      mod_redc(m_r2, m_p);
+      m_r3 = m_r2 * m_r1;
+      mod_redc(m_r3, m_p);
+   }
+
+   number_type m_p;
+   number_type m_r1;
+   number_type m_r2;
+   number_type m_r3;
+   limb_type   m_p_dash;
+   size_t      m_p_words;
+   number_type m_mod;
 };
+
 }
 } // namespace boost::multiprecision
-
-/**
- * The Montgomery representation of an integer
- */
 
 #endif

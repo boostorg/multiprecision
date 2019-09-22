@@ -11,14 +11,18 @@
 #ifndef BOOST_MULTIPRECISION_MONTGOMERY_INT_REDC_HPP
 #define BOOST_MULTIPRECISION_MONTGOMERY_INT_REDC_HPP
 
-#include <nil/crypto3/utilities/ct_utils.hpp>
+//#include <nil/crypto3/utilities/ct_utils.hpp>
 
 #include <boost/container/vector.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
-#include <boost/multiprecision/cpp_int/misc.hpp>
+#include <boost/multiprecision/gmp.hpp>
+#include <boost/multiprecision/montgomery_params.hpp>
+#include <gmp.h>
+#include <boost/multiprecision/tommath.hpp>
+//#include <boost/multiprecision/cpp_int.hpp>
+//#include <boost/multiprecision/cpp_int/misc.hpp>
 
-#include <nil/crypto3/multiprecision/montgomery_int/comparison.hpp>
-#include <nil/crypto3/multiprecision/montgomery_int/misc.hpp>
+//#include <nil/crypto3/multiprecision/montgomery_int/comparison.hpp>
+//#include <nil/crypto3/multiprecision/montgomery_int/misc.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -28,26 +32,32 @@ namespace multiprecision {
 #pragma warning(disable : 4127) // conditional expression is constant
 #endif
 
-template <typename MontgomeryBackend>
-inline void redc(MontgomeryBackend& result)
+template<typename Backend, expression_template_option ExpressionTemplates>
+void eval_redc(tommath_int &result, const Backend &mod) {
+   eval_mod(result, mod);
+}
 
-    BOOST_MP_NOEXCEPT_IF(
-        is_non_throwing_montgomery_int<MontgomeryBackend>::value)
+inline void eval_redc(gmp_int &result, const gmp_int &mod) {
+   mpz_mod(result.data(), result.data(), mod.data());
+}
+
+
+template <typename Backend>
+inline void eval_redc(Backend &result, const montgomery_params<Backend> &mod)
 {
-
    using default_ops::eval_lt;
    using default_ops::eval_multiply_add;
 
-   typedef cpp_int_backend<MontgomeryBackend::limb_bits * 3, MontgomeryBackend::limb_bits * 3, unsigned_magnitude, unchecked, void> cpp_three_int_backend;
-   typename MontgomeryBackend::allocator_type                                                                                       alloc;
+   typedef cpp_int_backend<Backend::limb_bits * 3, Backend::limb_bits * 3, unsigned_magnitude, unchecked, void> cpp_three_int_backend;
+   typename Backend::allocator_type                                                                                       alloc;
 
-   const size_t    p_size = result.m_params.p_words();
-   const limb_type p_dash = result.m_params.p_dash();
-   const size_t    z_size = 2 * (result.m_params.p_words() + 1);
+   const size_t    p_size = mod.p_words();
+   const limb_type p_dash = mod.p_dash();
+   const size_t    z_size = 2 * (mod.p_words() + 1);
 
-   container::vector<limb_type, typename MontgomeryBackend::allocator_type> z(result.size(), 0);
+   container::vector<limb_type, typename Backend::allocator_type> z(result.size(), 0);
 
-   eval_export_bits(result, z.rbegin(), MontgomeryBackend::limb_bits);
+   eval_export_bits(result, z.rbegin(), Backend::limb_bits);
 
    z.resize(z_size, 0);
 
@@ -60,23 +70,23 @@ inline void redc(MontgomeryBackend& result)
 
    result.limbs()[0] = w.limbs()[0] * p_dash;
 
-   eval_multiply_add(w, result.limbs()[0], result.m_params.p().backend().limbs()[0]);
-   eval_right_shift(w, MontgomeryBackend::limb_bits);
+   eval_multiply_add(w, result.limbs()[0], mod.p().backend().limbs()[0]);
+   eval_right_shift(w, Backend::limb_bits);
 
    for (size_t i = 1; i != p_size; ++i)
    {
       for (size_t j = 0; j < i; ++j)
       {
-         eval_multiply_add(w, result.limbs()[j], result.m_params.p().backend().limbs()[i - j]);
+         eval_multiply_add(w, result.limbs()[j], mod.p().backend().limbs()[i - j]);
       }
 
       eval_add(w, z[i]);
 
       result.limbs()[i] = w.limbs()[0] * p_dash;
 
-      eval_multiply_add(w, result.limbs()[i], result.m_params.p().backend().limbs()[0]);
+      eval_multiply_add(w, result.limbs()[i], mod.p().backend().limbs()[0]);
 
-      eval_right_shift(w, MontgomeryBackend::limb_bits);
+      eval_right_shift(w, Backend::limb_bits);
    }
 
    for (size_t i = 0; i != p_size; ++i)
@@ -84,14 +94,14 @@ inline void redc(MontgomeryBackend& result)
       for (size_t j = i + 1; j != p_size; ++j)
       {
          eval_multiply_add(w, result.limbs()[j],
-                           result.m_params.p().backend().limbs()[p_size + i - j]);
+                           mod.p().backend().limbs()[p_size + i - j]);
       }
 
       eval_add(w, z[p_size + i]);
 
       result.limbs()[i] = w.limbs()[0];
 
-      eval_right_shift(w, MontgomeryBackend::limb_bits);
+      eval_right_shift(w, Backend::limb_bits);
    }
 
    eval_add(w, z[z_size - 1]);
@@ -104,7 +114,7 @@ inline void redc(MontgomeryBackend& result)
       result.resize(p_size + 1, p_size + 1);
    }
    result.normalize();
-
+   //-----
    //if (!eval_lt(result, result.m_params.p().backend())) {
    //eval_subtract(result, result.m_params.p().backend());
    //}

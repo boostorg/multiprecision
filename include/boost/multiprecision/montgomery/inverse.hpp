@@ -11,7 +11,14 @@
 #ifndef BOOST_MULTIPRECISION_INVERSE_HPP
 #define BOOST_MULTIPRECISION_INVERSE_HPP
 
+#include <boost/integer.hpp>
+#include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
+
+#if defined(BOOST_HAS_INT128)
 #define CRYPTO3_MP_WORD_BITS 64
+#else
+#define CRYPTO3_MP_WORD_BITS 32
+#endif
 
 namespace boost {
 namespace multiprecision {

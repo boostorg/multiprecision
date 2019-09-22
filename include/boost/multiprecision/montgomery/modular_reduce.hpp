@@ -11,8 +11,6 @@
 #ifndef BOOST_MULTIPRECISION_MONTGOMERY_INT_MOD_REDC_HPP
 #define BOOST_MULTIPRECISION_MONTGOMERY_INT_MOD_REDC_HPP
 
-//#include <boost/multiprecision/cpp_int/import_export.hpp>
-
 #include <boost/multiprecision/montgomery/mask_bits.hpp>
 #include <boost/multiprecision/montgomery/reduce_below.hpp>
 
@@ -26,10 +24,7 @@ namespace backends {
 #endif
 
 template <typename Backend>
-inline void mod_redc(Backend& result, const Backend& mod)
-
-    BOOST_MP_NOEXCEPT_IF(
-        is_non_throwing_cpp_int<Backend>::value)
+inline void mod_redc( number<Backend>& result, const  number<Backend>& mod)
 {
 
    using default_ops::eval_add;
@@ -38,54 +33,53 @@ inline void mod_redc(Backend& result, const Backend& mod)
    using default_ops::eval_lt;
    using default_ops::eval_multiply;
 
-   const size_t x_sw = result.size();
+   const size_t x_sw = result.backend().size();
 
-   Backend mod2 = mod;
-   eval_add(mod2, mod);
-
-   if (result.size() < mod.size() || eval_lt(result, mod))
+   number<Backend> mod2 = mod;
+   mod2 += mod;
+   if (result.backend().size() < mod.backend().size() || (result < mod))
    {
-      if (eval_lt(result, 0))
+      if (result < 0)
       {
-         eval_add(result, mod);
+         result += mod;
          return;
       } // make positive
       return;
    }
-   else if (eval_lt(result, mod2))
+   else if (result < mod2)
    {
-      //secure_vector<word> ws;
-      Backend t1;
+      number<Backend> t1 = result;
 
-      eval_import_bits(t1, result.limbs() + mod.size() - 1, result.limbs() + x_sw);
+
+      eval_right_shift(t1.backend(), (Backend::limb_bits * (mod.backend().size() - 1)));
+      //import_bits(t1, result.backend().limbs() + mod.backend().size() - 1, result.backend().limbs() + x_sw);
       {
-         Backend p2;
-         eval_bit_set(p2, 2 * Backend::limb_bits * mod.size());
-         eval_divide(p2, mod);
-         eval_multiply(t1, p2);
+         // Compute mu = floor(2^{2k} / m)
+         number<Backend> p2;
+         eval_bit_set(p2.backend(), 2 * Backend::limb_bits * mod.backend().size());
+         p2 /= mod;
+         t1 *= p2;
       }
-      eval_right_shift(t1, (Backend::limb_bits * (mod.size() + 1)));
+      eval_right_shift(t1.backend(), (Backend::limb_bits * (mod.backend().size() + 1)));
 
-      eval_multiply(t1, mod);
+      t1 *= mod;
 
-      eval_mask_bits(t1, Backend::limb_bits * (mod.size() + 1));
+      eval_mask_bits(t1.backend(), Backend::limb_bits * (mod.backend().size() + 1));
 
-      eval_subtract(t1, result, t1);
+      t1 = abs(t1 - result);
 
-      //                t1.rev_sub(result.data(), std::min(x_sw, mod.size() + 1), ws);
-
-      if (eval_lt(t1, 0))
+      if (t1 < 0)
       {
-         Backend p2;
-         eval_bit_set(p2, Backend::limb_bits * (mod.size() + 1));
-         eval_add(t1, p2);
+         number<Backend> p2;
+         eval_bit_set(p2.backend(), Backend::limb_bits * (mod.backend().size() + 1));
+         t1 += p2;
       }
 
       eval_reduce_below(t1, mod);
 
-      if (eval_lt(result, 0))
+      if (result < 0)
       {
-         eval_subtract(t1, mod, t1);
+         t1 -= mod;
       }
 
       result = t1;
@@ -94,9 +88,8 @@ inline void mod_redc(Backend& result, const Backend& mod)
    else
    {
       // too big, fall back to normal division
-      Backend t2;
-      divide_unsigned_helper(&result, result, mod, t2);
-      result = t2;
+      //divide_unsigned_helper(&result, result, mod, t2);
+      result %= mod;
       return;
    }
 }

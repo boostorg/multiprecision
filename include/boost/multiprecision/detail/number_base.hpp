@@ -263,6 +263,7 @@ struct canonical_imp<number<B, et_off>, Backend, mpl::int_<3> >
    typedef B type;
 };
 #endif
+
 template <class Val, class Backend>
 struct canonical_imp<Val, Backend, mpl::int_<0> >
 {

@@ -12,9 +12,17 @@
 #ifndef BOOST_MULTIPRECISION_MODULAR_ADAPTOR_HPP
 #define BOOST_MULTIPRECISION_MODULAR_ADAPTOR_HPP
 
-#include <boost/multiprecision/detail/digits.hpp>
-#include <boost/multiprecision/montgomery_params.hpp>
 #include <boost/multiprecision/number.hpp>
+#include <boost/cstdint.hpp>
+#include <boost/multiprecision/detail/digits.hpp>
+#include <boost/functional/hash_fwd.hpp>
+#include <boost/type_traits/is_complex.hpp>
+
+#include <boost/multiprecision/detail/digits.hpp>
+#include <boost/multiprecision/number.hpp>
+
+#include <boost/multiprecision/montgomery/reduce.hpp>
+#include <boost/multiprecision/montgomery_params.hpp>
 
 #include <algorithm>
 #include <cmath>
@@ -24,54 +32,78 @@ namespace boost {
 namespace multiprecision {
 namespace backends {
 
-template <class BackendBase, class BackendMod>
-struct modular_adaptor
-{
+template <typename Backend>
+class modular_adapter_base {
  protected:
-   BackendBase                   m_base;
-   montgomery_params<BackendMod> m_mod;
+   Backend m_base;
+   montgomery_params<Backend> m_mod;
 
  public:
-   BackendBase& base_data() { return m_base; }
+   montgomery_params<Backend>& mod_data() { return m_mod; }
 
-   const BackendBase& base_data() const { return m_base; }
+   const montgomery_params<Backend>& mod_data() const { return m_mod; }
 
-   montgomery_params<BackendMod>& mod_data() { return m_mod; }
+};
 
-   const montgomery_params<BackendMod>& mod_data() const { return m_mod; }
+template <>
+class modular_adapter_base<gmp_int> {
+ protected:
+   gmp_int m_base, m_mod;
+ public:
+   gmp_int& mod_data() { return m_mod; }
 
-   // typedef typename Backend::signed_types     signed_types;
-   // typedef typename Backend::unsigned_types   unsigned_types;
-   // typedef typename Backend::float_types      float_types;
-   // typedef typename Backend::exponent_type    exponent_type;
+   const gmp_int& mod_data() const { return m_mod; }
+};
 
-   modular_adaptor() {}
+template <typename Backend, template <typename> class base = modular_adapter_base>
+class modular_adaptor : public base<Backend> {
+
+ public:
+
+   Backend& base_data() { return this->m_base; }
+
+   const Backend& base_data() const { return this->m_base; }
+
+   typedef typename Backend::signed_types   signed_types;
+   typedef typename Backend::unsigned_types unsigned_types;
+   //typedef typename Backend::exponent_type  exponent_type;
+
+   modular_adaptor() {
+
+   }
 
    modular_adaptor(const modular_adaptor& o)
-       : m_base(o.base_data()), m_mod(o.mod_data()) {}
+       : base<Backend>::m_base(o.base_data()), base<Backend>::m_mod(o.mod_data()) {}
 
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
 
    modular_adaptor(modular_adaptor&& o)
-       : m_base(std::move(o.base_data())), m_mod(std::move(o.mod_data()))
+       : base<Backend>::m_base(std::move(o.base_data())), base<Backend>::m_mod(std::move(o.mod_data()))
    {}
 
 #endif
+   modular_adaptor(const Backend& val,
+                           const montgomery_params<Backend>& mod)
+       : base<Backend>::m_base(val), base<Backend>::m_mod(mod) {
+      eval_multiply(this->m_base, mod.R2());
+      eval_reduce(this->m_base, mod);
+   }
 
-   modular_adaptor(const BackendBase& val) : m_base(val)
-   {}
+   modular_adaptor(const Backend& val,
+                   const Backend& mod)
+       : base<Backend>::m_base(val), base<Backend>::m_mod(mod) {}
 
-   modular_adaptor(const BackendBase&                   val,
-                   const montgomery_params<BackendMod>& mod)
-       : m_base(val), m_mod(mod) {}
+   modular_adaptor(Backend& val,
+                   Backend& mod)
+       : base<Backend>::m_base(val), base<Backend>::m_mod(mod) {}
 
-   modular_adaptor(const montgomery_params<BackendMod>& mod)
-       : m_base(0), m_mod(mod) {}
+   modular_adaptor(const Backend& mod)
+       : base<Backend>::m_base(0), base<Backend>::m_mod(mod) {}
 
    modular_adaptor& operator=(const modular_adaptor& o)
    {
-      m_base = o.base_data();
-      m_mod  = o.mod_data();
+      this->m_base = o.base_data();
+      this->m_mod  = o.mod_data();
       return *this;
    }
 
@@ -81,17 +113,34 @@ struct modular_adaptor
 
        BOOST_NOEXCEPT
    {
-      m_base = std::move(o.base_data());
-      m_mod  = std::move(o.mod_data());
+      this->m_base = std::move(o.base_data());
+      this->m_mod  = std::move(o.mod_data());
       return *this;
    }
 #endif
+   template <class V>
+   modular_adaptor& operator=(const V& v)
+   {
+      // TODO: strange operator
+      this->m_base = v;
+      this->m_mod = 1;
+
+      return *this;
+   }
+
+   modular_adaptor& operator=(const char* s)
+   {
+      // TODO: strange operator
+      this->m_base = 1;
+      this->m_mod = 1;
+      return *this;
+   }
 
    int compare(const modular_adaptor& o) const
    {
       // They are either equal or not:
-      return (m_base.compare(o.base_data()) == 0) &&
-                     (m_mod.compare(o.mod_data()) == 0)
+      return (base<Backend>::m_base.compare(o.base_data()) == 0) &&
+                     (base<Backend>::m_mod.compare(o.mod_data()) == 0)
                  ? 0
                  : 1;
    }
@@ -100,27 +149,30 @@ struct modular_adaptor
    int compare(const T& val) const
    {
       using default_ops::eval_lt;
-      return (m_base.compare(val) == 0) && eval_lt(m_mod, val) ? 0 : 1;
+      return (base<Backend>::m_base.compare(val) == 0) && eval_lt(base<Backend>::m_mod, val) ? 0 : 1;
    }
 
    void swap(modular_adaptor& o)
    {
-      base_data().swap(o.base_data());
-      mod_data().swap(o.mod_data());
+      this->base_data().swap(o.base_data());
+      this->mod_data().swap(o.mod_data());
    }
 
    std::string str(std::streamsize dig, std::ios_base::fmtflags f) const
    {
-      modular_adaptor<BackendBase, montgomery_params<BackendMod> > tmp = this;
-      redc(tmp);
-      return str(tmp.base_data());
+      auto t = this->base_data(); // TODO: REMOVE IT!!!
+      const auto tt = base<Backend>::mod_data();
+      eval_redc(t, tt);
+      //return base_data().str(dig, f);
+      return t.str(dig, f);
    }
+
 };
 
-template <class BackendBase, class BackendMod, class T>
+template <class Backend, class T>
 inline typename enable_if<is_arithmetic<T>, bool>
 
-    ::type eval_eq(const modular_adaptor<BackendBase, BackendMod>& a,
+    ::type eval_eq(const modular_adaptor<Backend>& a,
                    const T&                                        b)
 
         BOOST_NOEXCEPT
@@ -128,19 +180,21 @@ inline typename enable_if<is_arithmetic<T>, bool>
    return a.compare(b) == 0;
 }
 
-template <class BackendBase, class BackendMod>
-inline void eval_add(modular_adaptor<BackendBase, BackendMod>&       result,
-                     const modular_adaptor<BackendBase, BackendMod>& o)
+template <class Backend>
+inline void eval_add(modular_adaptor<Backend>&       result,
+                     const modular_adaptor<Backend>& o)
 {
    eval_add(result.base_data(), o.base_data());
-   redc(result);
+   if (default_ops::eval_gt(result.base_data(), result.mod_data().p())) {
+        eval_modulus(result.base_data(), result.base_data(), result.mod_data().p().backend());
+     }
 }
 
-template <class BackendBase, class BackendMod>
-inline void eval_subtract(modular_adaptor<BackendBase, BackendMod>&       result,
-                          const modular_adaptor<BackendBase, BackendMod>& o)
+template <class Backend>
+inline void eval_subtract(modular_adaptor<Backend>&       result,
+                          const modular_adaptor<Backend>& o)
 {
-   BackendBase tmp = result.base_data();
+   Backend tmp = result.base_data();
    eval_subtract(tmp, o.base_data());
    if (eval_lt(tmp, 0))
    {
@@ -149,23 +203,23 @@ inline void eval_subtract(modular_adaptor<BackendBase, BackendMod>&       result
    result.base_data() = tmp;
 }
 
-template <class BackendBase, class BackendMod>
-inline void eval_multiply(modular_adaptor<BackendBase, BackendMod>&       result,
-                          const modular_adaptor<BackendBase, BackendMod>& o)
+template <class Backend>
+inline void eval_multiply(modular_adaptor<Backend>&       result,
+                          const modular_adaptor<Backend>& o)
 {
    eval_multiply(result.base_data(), o.base_data());
-   redc(result);
+   eval_redc(result.base_data(), result.mod_data());
 }
 
-template <class BackendBase, class BackendMod>
-inline void eval_divide(modular_adaptor<BackendBase, BackendMod>&       result,
-                        const modular_adaptor<BackendBase, BackendMod>& o)
+template <class Backend>
+inline void eval_divide(modular_adaptor<Backend>&       result,
+                        const modular_adaptor<Backend>& o)
 {
    eval_divide(result.base_data(), o.base_data());
 }
 
-template <class BackendBase, class BackendMod>
-inline bool eval_is_zero(const modular_adaptor<BackendBase, BackendMod>& val)
+template <class Backend>
+inline bool eval_is_zero(const modular_adaptor<Backend>& val)
 
     BOOST_NOEXCEPT
 {
@@ -177,16 +231,17 @@ inline bool eval_is_zero(const modular_adaptor<BackendBase, BackendMod>& val)
    );
 }
 
-template <class BackendBase, class BackendMod>
-inline int eval_get_sign(const modular_adaptor<BackendBase, BackendMod>&)
+template <class Backend>
+inline int eval_get_sign(const modular_adaptor<Backend>&)
 {
    return 1;
 }
 
-template <class Result, class BackendBase, class BackendMod>
+// TODO: change this func
+template <class Result, class Backend>
 inline typename disable_if_c<boost::is_complex<Result>::value>::type
 eval_convert_to(Result*                                         result,
-                const modular_adaptor<BackendBase, BackendMod>& val)
+                const modular_adaptor<Backend>& val)
 {
    using default_ops::eval_convert_to;
    using default_ops::eval_is_zero;
@@ -198,66 +253,90 @@ eval_convert_to(Result*                                         result,
    eval_convert_to(result, val.real_data());
 }
 
-template <class BackendBase, class BackendMod, class T, class V>
-inline void assign_components(modular_adaptor<BackendBase, BackendMod>& result,
-                              const T& a, const montgomery_params<V>& b)
+template <class Backend, class T, class V>
+inline void assign_components(modular_adaptor<Backend>& result,
+                              const T& a, const V& b)
 {
    result.base_data() = a;
    result.mod_data()  = b;
 }
 
-template <class BackendBase, class BackendMod>
-inline void eval_sqrt(modular_adaptor<BackendBase, BackendMod>&       result,
-                      const modular_adaptor<BackendBase, BackendMod>& val)
+template <class Backend, class T>
+inline void assign_components(modular_adaptor<Backend>& result,
+                              const T& a, const montgomery_params<Backend>& b)
+{
+   result.base_data() = a;
+   result.mod_data()  = b;
+   eval_multiply(result.base_data(), result.mod_data().R2().backend());
+   eval_redc(result.base_data(), result.mod_data());
+}
+
+template <class Backend>
+inline void eval_sqrt(modular_adaptor<Backend>&       result,
+                      const modular_adaptor<Backend>& val)
 {
    eval_sqrt(result.base_data(), val.base_data());
 }
 
-template <class BackendBase, class BackendMod>
-inline void eval_abs(modular_adaptor<BackendBase, BackendMod>&       result,
-                     const modular_adaptor<BackendBase, BackendMod>& val)
+template <class Backend>
+inline void eval_abs(modular_adaptor<Backend>&       result,
+                     const modular_adaptor<Backend>& val)
 {
    result = val;
 }
 
-template <class BackendBase, class BackendMod>
-inline void eval_pow(modular_adaptor<BackendBase, BackendMod>&       result,
-                     const modular_adaptor<BackendBase, BackendMod>& b,
-                     const modular_adaptor<BackendBase, BackendMod>& e)
+template <class Backend>
+inline void eval_pow(modular_adaptor<Backend>&       result,
+                     const modular_adaptor<Backend>& b,
+                     const modular_adaptor<Backend>& e)
 {
    using default_ops::eval_acos;
    using default_ops::eval_exp;
-   modular_adaptor<BackendBase, BackendMod> t;
+   modular_adaptor<Backend> t;
    eval_log(t, b);
    eval_multiply(t, e);
    eval_exp(result, t);
-   redc(result);
+   eval_redc(result.base_data(), result.mod_data());
 }
 
-template <class BackendBase, class BackendMod>
-inline void eval_exp(modular_adaptor<BackendBase, BackendMod>&       result,
-                     const modular_adaptor<BackendBase, BackendMod>& arg)
+template <class Backend>
+inline void eval_exp(modular_adaptor<Backend>&       result,
+                     const modular_adaptor<Backend>& arg)
 {
    using default_ops::eval_exp;
 
    eval_exp(result.base_data(), arg.base_data());
    result.mod_data() = arg.mod_data();
-   redc(result);
+   eval_redc(result.base_data(), result.mod_data());
 }
 
-template <class BackendBase, class BackendMod>
-inline void eval_log(modular_adaptor<BackendBase, BackendMod>&       result,
-                     const modular_adaptor<BackendBase, BackendMod>& arg)
+template <class Backend>
+inline void eval_log(modular_adaptor<Backend>&       result,
+                     const modular_adaptor<Backend>& arg)
 {
    using default_ops::eval_log;
 
    eval_log(result.base_data(), arg.base_data());
    result.mod_data() = arg.mod_data();
-   redc(result);
+   eval_redc(result.base_data(), result.mod_data());
 }
 
 }
 
-} // namespace multiprecision::backends
+using boost::multiprecision::backends::modular_adaptor;
+
+template <class Backend>
+struct number_category<modular_adaptor<Backend> > : public boost::mpl::int_<boost::multiprecision::number_kind_complex> // TOOD: change to number_kind_modular
+{};
+
+template <class Backend, expression_template_option ExpressionTemplates>
+struct component_type<number<modular_adaptor<Backend>, ExpressionTemplates> >
+{
+   typedef number<Backend, ExpressionTemplates> type;
+};
+
+}
+
+}
 
 #endif
