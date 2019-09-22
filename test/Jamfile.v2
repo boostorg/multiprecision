@@ -761,8 +761,8 @@ test-suite misc :
       [ run constexpr_test_cpp_int_3.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] ]
       [ run constexpr_test_cpp_int_4.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] ]
       [ run constexpr_test_cpp_int_5.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] ]
-      [ run constexpr_test_cpp_int_6.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] [ check-target-builds ../config//has_constexpr_limits : <cxxflags>-fconstexpr-ops-limit=268435456 ] ]
-      [ run constexpr_test_cpp_int_7.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] ]
+      [ run constexpr_test_cpp_int_6.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : <toolset>clang:<cxxflags>-fconstexpr-steps=268435456 : <build>no ] [ check-target-builds ../config//has_constexpr_limits : <cxxflags>-fconstexpr-ops-limit=268435456 ] ]
+      [ run constexpr_test_cpp_int_7.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : <toolset>clang:<cxxflags>-fconstexpr-steps=268435456 : <build>no ] ]
 
       [ compile test_nothrow_cpp_int.cpp ]
       [ compile test_nothrow_cpp_rational.cpp ]
