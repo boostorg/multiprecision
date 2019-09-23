@@ -286,20 +286,6 @@ inline void assign_components(modular_adaptor<gmp_int>& result,
    eval_redc(result.base_data(), result.mod_data());
 }
 
-//
-template <class Backend, class T>
-inline void assign_components(modular_adaptor<Backend>& result,
-                              const T& a, const montgomery_params<Backend>& b)
-{
-   result.base_data() = a;
-   result.mod_data()  = b;
-   if (default_ops::eval_gt(result.base_data(), result.mod_data().p().backend())) {
-      eval_mod_redc(result.base_data(), result.mod_data().p().backend());
-   }
-   eval_multiply(result.base_data(), result.mod_data().R2().backend());
-   eval_redc(result.base_data(), result.mod_data());
-}
-
 template <class Backend>
 inline void eval_sqrt(modular_adaptor<Backend>&       result,
                       const modular_adaptor<Backend>& val)
@@ -338,7 +324,7 @@ inline void eval_exp(modular_adaptor<Backend>&       result,
 using boost::multiprecision::backends::modular_adaptor;
 
 template <class Backend>
-struct number_category<modular_adaptor<Backend> > : public boost::mpl::int_<boost::multiprecision::number_kind_complex> // TOOD: change to number_kind_modular
+struct number_category<modular_adaptor<Backend> > : public boost::mpl::int_<boost::multiprecision::number_kind_modular>
 {};
 
 template <class Backend, expression_template_option ExpressionTemplates>

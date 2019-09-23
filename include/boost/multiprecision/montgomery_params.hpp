@@ -36,6 +36,7 @@ class montgomery_params
    * Initialize a set of Montgomery reduction parameters. These values
    * can be shared by all values in a specific Montgomery domain.
    */
+   //TODO: only with cpp_int (or another backends)
    template <typename Number,
              typename = typename boost::enable_if_c<is_number<Number>::value || is_integral<Number>::value>::type >
    explicit montgomery_params(const Number& p) {

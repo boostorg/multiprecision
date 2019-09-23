@@ -11,9 +11,6 @@
 #ifndef BOOST_MULTIPRECISION_INVERSE_HPP
 #define BOOST_MULTIPRECISION_INVERSE_HPP
 
-#include <boost/integer.hpp>
-#include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
-
 #if defined(BOOST_HAS_INT128)
 #define CRYPTO3_MP_WORD_BITS 64
 #else
@@ -23,9 +20,10 @@
 namespace boost {
 namespace multiprecision {
 
-limb_type monty_inverse(limb_type a)
+template <typename Limb>
+Limb monty_inverse(Limb a)
 {
-   const limb_type MP_WORD_MAX = ~static_cast<limb_type>(0);
+   const Limb MP_WORD_MAX = ~static_cast<Limb>(0);
 
    if (a % 2 == 0)
    {
@@ -37,12 +35,12 @@ limb_type monty_inverse(limb_type a)
             * https://eprint.iacr.org/2017/411.pdf sections 5 and 7.
             */
 
-   limb_type b = 1;
-   limb_type r = 0;
+   Limb b = 1;
+   Limb r = 0;
 
    for (size_t i = 0; i != CRYPTO3_MP_WORD_BITS; ++i)
    {
-      const limb_type bi = b % 2;
+      const Limb bi = b % 2;
       r >>= 1;
       r += bi << (CRYPTO3_MP_WORD_BITS - 1);
 
