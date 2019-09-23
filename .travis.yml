@@ -587,7 +587,8 @@ matrix:
             - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-xenial-9
+            - sourceline: 'deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
+              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
 
     - os: linux
       env: TOOLSET=clang COMPILER=clang++-9 CXXSTD=c++17 TEST_SUITE=cpp_int_tests
@@ -601,7 +602,8 @@ matrix:
             - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-xenial-9
+            - sourceline: 'deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
+              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
 
     - os: linux
       env: TOOLSET=clang COMPILER=clang++-9 CXXSTD=c++17 TEST_SUITE=functions_and_limits
@@ -615,7 +617,8 @@ matrix:
             - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-xenial-9
+            - sourceline: 'deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
+              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
 
     - os: linux
       env: TOOLSET=clang COMPILER=clang++-9 CXXSTD=c++17 TEST_SUITE=conversions
@@ -629,7 +632,8 @@ matrix:
             - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-xenial-9
+            - sourceline: 'deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
+              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
 
     - os: linux
       env: TOOLSET=clang COMPILER=clang++-9 CXXSTD=c++17 TEST_SUITE=misc
@@ -643,7 +647,8 @@ matrix:
             - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-xenial-9
+            - sourceline: 'deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
+              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
 
     - os: linux
       env: TOOLSET=clang COMPILER=clang++-9 CXXSTD=c++17 TEST_SUITE="compile_fail examples"
@@ -657,7 +662,8 @@ matrix:
             - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-xenial-9
+            - sourceline: 'deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
+              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
     
     - os: linux
       env: TOOLSET=clang COMPILER=clang++-9 CXXSTD=c++17 TEST_SUITE=concepts
@@ -671,7 +677,8 @@ matrix:
             - libmpfi-dev
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-xenial-9
+            - sourceline: 'deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
+              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
 
     - os: osx
       env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests
