@@ -91,11 +91,11 @@ class montgomery_params
       boost::multiprecision::backends::eval_bit_set(r.backend(), m_p_words * CRYPTO3_MP_WORD_BITS);
 
       m_r1 = r;
-      mod_redc(m_r1, m_p);
+      eval_mod_redc(m_r1.backend(), m_p.backend());
       m_r2 = m_r1 * m_r1;
-      mod_redc(m_r2, m_p);
+      eval_mod_redc(m_r2.backend(), m_p.backend());
       m_r3 = m_r2 * m_r1;
-      mod_redc(m_r3, m_p);
+      eval_mod_redc(m_r3.backend(), m_p.backend());
    }
 
    number_type m_p;

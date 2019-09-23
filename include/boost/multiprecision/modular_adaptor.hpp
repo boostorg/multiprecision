@@ -62,14 +62,16 @@ class modular_adaptor : public base<Backend> {
 
    Backend& base_data() { return this->m_base; }
 
-   const Backend& base_data() const { return this->m_base; }
+   Backend const & base_data() const { return this->m_base; }
 
    typedef typename Backend::signed_types   signed_types;
    typedef typename Backend::unsigned_types unsigned_types;
    //typedef typename Backend::exponent_type  exponent_type;
 
-   modular_adaptor() {
+   modular_adaptor() { }
 
+   modular_adaptor(const int c) { // TODO: resolve type?
+      std::cout << "C=" << c << std::endl;
    }
 
    modular_adaptor(const modular_adaptor& o)
@@ -82,19 +84,21 @@ class modular_adaptor : public base<Backend> {
    {}
 
 #endif
-   modular_adaptor(const Backend& val,
-                           const montgomery_params<Backend>& mod)
-       : base<Backend>::m_base(val), base<Backend>::m_mod(mod) {
+   modular_adaptor(const Backend& val, const montgomery_params<Backend>& mod) {
+      this->m_base = val;
+      this->m_mod = mod;
+      if (default_ops::eval_gt(this->m_base, mod.p().backend())) {
+         eval_mod_redc(this->m_base, mod.p().backend());
+      }
       eval_multiply(this->m_base, mod.R2());
       eval_reduce(this->m_base, mod);
    }
 
-   modular_adaptor(const Backend& val,
-                   const Backend& mod)
-       : base<Backend>::m_base(val), base<Backend>::m_mod(mod) {}
+   modular_adaptor(const Backend& val, const Backend& mod)
+       : base<Backend>::m_base(val), base<Backend>::m_mod(mod) {
+   }
 
-   modular_adaptor(Backend& val,
-                   Backend& mod)
+   modular_adaptor(Backend& val, Backend& mod)
        : base<Backend>::m_base(val), base<Backend>::m_mod(mod) {}
 
    modular_adaptor(const Backend& mod)
@@ -130,7 +134,7 @@ class modular_adaptor : public base<Backend> {
 
    modular_adaptor& operator=(const char* s)
    {
-      // TODO: strange operator
+      // TODO: Think how create mod_adapter from string
       this->m_base = 1;
       this->m_mod = 1;
       return *this;
@@ -160,11 +164,9 @@ class modular_adaptor : public base<Backend> {
 
    std::string str(std::streamsize dig, std::ios_base::fmtflags f) const
    {
-      auto t = this->base_data(); // TODO: REMOVE IT!!!
-      const auto tt = base<Backend>::mod_data();
-      eval_redc(t, tt);
-      //return base_data().str(dig, f);
-      return t.str(dig, f);
+      //TODO: copy
+      eval_redc(this->base_data(), this->mod_data());
+      return this->base_data().str(dig, f);
    }
 
 };
@@ -185,35 +187,27 @@ inline void eval_add(modular_adaptor<Backend>&       result,
                      const modular_adaptor<Backend>& o)
 {
    eval_add(result.base_data(), o.base_data());
-   if (default_ops::eval_gt(result.base_data(), result.mod_data().p())) {
-        eval_modulus(result.base_data(), result.base_data(), result.mod_data().p().backend());
-     }
 }
 
 template <class Backend>
-inline void eval_subtract(modular_adaptor<Backend>&       result,
-                          const modular_adaptor<Backend>& o)
+inline void eval_subtract(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)
 {
-   Backend tmp = result.base_data();
-   eval_subtract(tmp, o.base_data());
-   if (eval_lt(tmp, 0))
+   if (eval_lt(result.base_data(), o.base_data()))
    {
-      BOOST_THROW_EXCEPTION(std::range_error("Montgomery less than zero"));
+      BOOST_THROW_EXCEPTION(std::range_error("Modular less than zero"));
    }
-   result.base_data() = tmp;
+   eval_subtract(result.base_data(), o.base_data());
 }
 
 template <class Backend>
-inline void eval_multiply(modular_adaptor<Backend>&       result,
-                          const modular_adaptor<Backend>& o)
+inline void eval_multiply(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)
 {
    eval_multiply(result.base_data(), o.base_data());
    eval_redc(result.base_data(), result.mod_data());
 }
 
 template <class Backend>
-inline void eval_divide(modular_adaptor<Backend>&       result,
-                        const modular_adaptor<Backend>& o)
+inline void eval_divide(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)
 {
    eval_divide(result.base_data(), o.base_data());
 }
@@ -224,11 +218,7 @@ inline bool eval_is_zero(const modular_adaptor<Backend>& val)
     BOOST_NOEXCEPT
 {
    using default_ops::eval_is_zero;
-   return eval_is_zero(val.
-
-                       base_data()
-
-   );
+   return eval_is_zero(val.base_data());
 }
 
 template <class Backend>
@@ -237,20 +227,12 @@ inline int eval_get_sign(const modular_adaptor<Backend>&)
    return 1;
 }
 
-// TODO: change this func
 template <class Result, class Backend>
 inline typename disable_if_c<boost::is_complex<Result>::value>::type
-eval_convert_to(Result*                                         result,
-                const modular_adaptor<Backend>& val)
+eval_convert_to(Result* result, const modular_adaptor<Backend>& val)
 {
    using default_ops::eval_convert_to;
-   using default_ops::eval_is_zero;
-   if (!eval_is_zero(val.imag_data()))
-   {
-      BOOST_THROW_EXCEPTION(
-          std::runtime_error("Could not convert imaginary number to scalar."));
-   }
-   eval_convert_to(result, val.real_data());
+   eval_convert_to(result, val.base_data());
 }
 
 template <class Backend, class T, class V>
@@ -258,15 +240,33 @@ inline void assign_components(modular_adaptor<Backend>& result,
                               const T& a, const V& b)
 {
    result.base_data() = a;
-   result.mod_data()  = b;
+   result.mod_data() = b;
+   if (default_ops::eval_gt(result.base_data(), result.mod_data().p().backend())) {
+      eval_mod_redc(result.base_data(), result.mod_data().p().backend());
+   }
+   eval_multiply(result.base_data(), result.mod_data().R2().backend());
+   eval_redc(result.base_data(), result.mod_data());
 }
 
+template <class T, class V>
+inline void assign_components(modular_adaptor<gmp_int>& result,
+                              const T& a, const V& b)
+{
+   result.base_data() = a;
+   result.mod_data() = b;
+   eval_redc(result.base_data(), result.mod_data());
+}
+
+//
 template <class Backend, class T>
 inline void assign_components(modular_adaptor<Backend>& result,
                               const T& a, const montgomery_params<Backend>& b)
 {
    result.base_data() = a;
    result.mod_data()  = b;
+   if (default_ops::eval_gt(result.base_data(), result.mod_data().p().backend())) {
+      eval_mod_redc(result.base_data(), result.mod_data().p().backend());
+   }
    eval_multiply(result.base_data(), result.mod_data().R2().backend());
    eval_redc(result.base_data(), result.mod_data());
 }
@@ -279,8 +279,7 @@ inline void eval_sqrt(modular_adaptor<Backend>&       result,
 }
 
 template <class Backend>
-inline void eval_abs(modular_adaptor<Backend>&       result,
-                     const modular_adaptor<Backend>& val)
+inline void eval_abs(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& val)
 {
    result = val;
 }
@@ -290,36 +289,20 @@ inline void eval_pow(modular_adaptor<Backend>&       result,
                      const modular_adaptor<Backend>& b,
                      const modular_adaptor<Backend>& e)
 {
-   using default_ops::eval_acos;
-   using default_ops::eval_exp;
-   modular_adaptor<Backend> t;
-   eval_log(t, b);
-   eval_multiply(t, e);
-   eval_exp(result, t);
-   eval_redc(result.base_data(), result.mod_data());
+   //TODO: Implement this
 }
 
 template <class Backend>
 inline void eval_exp(modular_adaptor<Backend>&       result,
                      const modular_adaptor<Backend>& arg)
 {
-   using default_ops::eval_exp;
-
-   eval_exp(result.base_data(), arg.base_data());
-   result.mod_data() = arg.mod_data();
-   eval_redc(result.base_data(), result.mod_data());
+//TODO: Implement this
+//   using default_ops::eval_exp;
+//
+//   eval_exp(result.base_data(), arg.base_data());
+//   eval_redc(result.base_data(), result.mod_data());
 }
 
-template <class Backend>
-inline void eval_log(modular_adaptor<Backend>&       result,
-                     const modular_adaptor<Backend>& arg)
-{
-   using default_ops::eval_log;
-
-   eval_log(result.base_data(), arg.base_data());
-   result.mod_data() = arg.mod_data();
-   eval_redc(result.base_data(), result.mod_data());
-}
 
 }
 
