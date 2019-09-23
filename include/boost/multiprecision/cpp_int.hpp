@@ -470,13 +470,16 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
 #else
          : m_data{ i } {}
 #endif
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+      BOOST_CONSTEXPR data_type(limb_type i, limb_type j) : m_data{ i, j } {} 
+#endif
       BOOST_CONSTEXPR data_type(double_limb_type i) : m_double_first_limb(i)
       {
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
          if (BOOST_MP_IS_CONST_EVALUATED(m_double_first_limb))
          {
-            m_data[0] = i & max_limb_value;
-            m_data[1] = i >> limb_bits;
+            data_type t(static_cast<limb_type>(i & max_limb_value), static_cast<limb_type>(i >> limb_bits));
+            *this = t;
          }
 #endif
       }
@@ -670,13 +673,16 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
 #else
          : m_data{ i } {}
 #endif
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+      BOOST_CONSTEXPR data_type(limb_type i, limb_type j) : m_data { i, j } {}
+#endif
       BOOST_CONSTEXPR data_type(double_limb_type i) : m_double_first_limb(i) 
       {
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
          if (BOOST_MP_IS_CONST_EVALUATED(m_double_first_limb))
          {
-            m_data[0] = i & max_limb_value;
-            m_data[1] = i >> limb_bits;
+            data_type t(static_cast<limb_type>(i & max_limb_value), static_cast<limb_type>(i >> limb_bits));
+            *this = t;
          }
 #endif
       }
