@@ -1,7 +1,4 @@
 ///////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019 Nil Foundation AG
-// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
-// Copyright (c) 2018-2019 Alexey Moskvin
 //  Copyright 2015 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
@@ -155,48 +152,6 @@ import_bits_fast(
    result.normalize(); // In case data has leading zeros.
    return val;
 }
-
-template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked,
-    class Allocator, class Iterator>
-cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>& eval_import_bits_generic(cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>& val, Iterator i, Iterator j, unsigned chunk_size = 0,
-                                                                                                                bool msv_first = true)
-{
-   cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> newval;
-
-   typedef typename std::iterator_traits<Iterator>::value_type                                                         value_type;
-   typedef typename boost::make_unsigned<value_type>::type                                                             unsigned_value_type;
-   typedef typename std::iterator_traits<Iterator>::difference_type                                                    difference_type;
-   typedef typename boost::make_unsigned<difference_type>::type                                                        size_type;
-   typedef typename cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>::trivial_tag tag_type;
-
-   if (!chunk_size)
-   {
-      chunk_size = std::numeric_limits<value_type>::digits;
-   }
-
-   size_type limbs = std::distance(i, j);
-   size_type bits  = limbs * chunk_size;
-
-   detail::resize_to_bit_size(newval, static_cast<unsigned>(bits), tag_type());
-
-   difference_type bit_location        = msv_first ? bits - chunk_size : 0;
-   difference_type bit_location_change = msv_first ? -static_cast<difference_type>(chunk_size)
-                                                   : chunk_size;
-
-   while (i != j)
-   {
-      detail::assign_bits(newval, static_cast<unsigned_value_type>(*i),
-                          static_cast<unsigned>(bit_location), chunk_size, tag_type());
-      ++i;
-      bit_location += bit_location_change;
-   }
-
-   newval.normalize();
-
-   val.swap(newval);
-   return val;
-}
-
 } // namespace detail
 
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator, expression_template_option ExpressionTemplates, class Iterator>
@@ -253,7 +208,7 @@ OutputIterator export_bits(
     const number<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>& val, OutputIterator out, unsigned chunk_size, bool msv_first = true)
 {
 #ifdef _MSC_VER
-#pragma warning(push)
+   #pragma warning(push)
 #pragma warning(disable : 4244)
 #endif
    typedef typename cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>::trivial_tag tag_type;
@@ -286,213 +241,7 @@ OutputIterator export_bits(
 #endif
 }
 
-template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked,
-    class Allocator, typename T>
-inline typename boost::disable_if_c<backends::is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value,
-cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>&>::type
-eval_import_bits_fast(cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>& val, T* i, T* j, unsigned chunk_size = 0)
-{
-   std::size_t byte_len = (j - i) * (chunk_size ? chunk_size / CHAR_BIT : sizeof(*i));
-   std::size_t limb_len = byte_len / sizeof(limb_type);
-   if (byte_len % sizeof(limb_type))
-   {
-      ++limb_len;
-   }
-   val.resize(static_cast<unsigned>(limb_len),
-              static_cast<unsigned>(limb_len)); // checked types may throw here if they're not large enough to hold the data!
-   val.limbs()[val.size() - 1] = 0u;
-   std::memcpy(val.limbs(), i, (std::min)(byte_len, val.size() * sizeof(limb_type)));
-   val.normalize(); // In case data has leading zeros.
-   return val;
-}
-
-template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked,
-    class Allocator, class T>
-inline typename boost::enable_if_c<backends::is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value,
-cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>&>::type
-eval_import_bits_fast(cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>& val, T* i, T* j, unsigned chunk_size = 0)
-{
-   std::size_t byte_len = (j - i) * (chunk_size ? chunk_size / CHAR_BIT : sizeof(*i));
-   std::size_t limb_len = byte_len / sizeof(val.limbs()[0]);
-   if (byte_len % sizeof(val.limbs()[0]))
-   {
-      ++limb_len;
-   }
-   val.limbs()[0] = 0u;
-   val.resize(static_cast<unsigned>(limb_len),
-              static_cast<unsigned>(limb_len)); // checked types may throw here if they're not large enough to hold the data!
-   std::memcpy(val.limbs(), i, (std::min)(byte_len, val.size() * sizeof(val.limbs()[0])));
-   val.normalize(); // In case data has leading zeros.
-   return val;
-}
-
-template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked,
-    class Allocator, expression_template_option ExpressionTemplates, class Iterator>
-number<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>,
-ExpressionTemplates>&
-import_bits_generic(
-    number<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>,
-    ExpressionTemplates>& val,
-    Iterator i, Iterator j, unsigned chunk_size = 0,
-    bool msv_first = true)
-{
-   typename number<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>,
-       ExpressionTemplates>::backend_type newval;
-
-   typedef typename std::iterator_traits<Iterator>::value_type      value_type;
-   typedef typename boost::make_unsigned<value_type>::type          unsigned_value_type;
-   typedef typename std::iterator_traits<Iterator>::difference_type difference_type;
-   typedef typename boost::make_unsigned<difference_type>::type     size_type;
-   typedef typename cpp_int_backend<MinBits, MaxBits, SignType, Checked,
-       Allocator>::trivial_tag  tag_type;
-
-   if (!chunk_size)
-   {
-      chunk_size = std::numeric_limits<value_type>::digits;
-   }
-
-   size_type limbs = std::distance(i, j);
-   size_type bits  = limbs * chunk_size;
-
-   detail::resize_to_bit_size(newval, static_cast<unsigned>(bits), tag_type());
-
-   difference_type bit_location        = msv_first ? bits - chunk_size : 0;
-   difference_type bit_location_change = msv_first ? -static_cast<difference_type>(chunk_size)
-                                                   : chunk_size;
-
-   while (i != j)
-   {
-      detail::assign_bits(newval, static_cast<unsigned_value_type>(*i),
-                          static_cast<unsigned>(bit_location), chunk_size, tag_type());
-      ++i;
-      bit_location += bit_location_change;
-   }
-
-   newval.normalize();
-
-   val.backend().swap(newval);
-   return val;
-}
-
-template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked,
-    class Allocator, expression_template_option ExpressionTemplates, class T>
-inline typename boost::disable_if_c<boost::multiprecision::backends::is_trivial_cpp_int<
-    cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value,
-number<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>,
-ExpressionTemplates>&>
-
-::type import_bits_fast(number<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>,
-                        ExpressionTemplates>& val,
-                        T* i, T* j, unsigned chunk_size = 0)
-{
-   std::size_t byte_len = (j - i) * (chunk_size ? chunk_size / CHAR_BIT : sizeof(*i));
-   std::size_t limb_len = byte_len / sizeof(limb_type);
-   if (byte_len % sizeof(limb_type))
-   {
-      ++limb_len;
-   }
-   cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>& result = val.backend();
-   result.resize(static_cast<unsigned>(limb_len),
-                 static_cast<unsigned>(limb_len)); // checked types may throw here if they're not large enough to hold the data!
-   result.limbs()[result.size() - 1] = 0u;
-   std::memcpy(result.limbs(), i, (std::min)(byte_len, result.size() * sizeof(limb_type)));
-   result.normalize(); // In case data has leading zeros.
-   return val;
-}
-
-template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked,
-    class Allocator, expression_template_option ExpressionTemplates, class T>
-inline typename boost::enable_if_c<boost::multiprecision::backends::is_trivial_cpp_int<
-    cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> >::value,
-number<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>,
-ExpressionTemplates>&>
-
-::type import_bits_fast(number<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>,
-                        ExpressionTemplates>& val,
-                        T* i, T* j, unsigned chunk_size = 0)
-{
-   cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>& result   = val.backend();
-   std::size_t                                                                            byte_len = (j - i) * (chunk_size ? chunk_size / CHAR_BIT : sizeof(*i));
-   std::size_t                                                                            limb_len = byte_len / sizeof(result.limbs()[0]);
-   if (byte_len % sizeof(result.limbs()[0]))
-   {
-      ++limb_len;
-   }
-   result.limbs()[0] = 0u;
-   result.resize(static_cast<unsigned>(limb_len),
-                 static_cast<unsigned>(limb_len)); // checked types may throw here if they're not large enough to hold the data!
-   std::memcpy(result.limbs(), i, (std::min)(byte_len, result.size() * sizeof(result.limbs()[0])));
-   result.normalize(); // In case data has leading zeros.
-   return val;
-}
-
-template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked,
-    class Allocator, class Iterator>
-inline cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>& eval_import_bits(cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>& val, Iterator i, Iterator j, unsigned chunk_size = 0,
-                                                                                                               bool msv_first = true)
-{
-   return detail::eval_import_bits_generic(val, i, j, chunk_size, msv_first);
-}
-
-template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked,
-    class Allocator, class T>
-inline cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>& eval_import_bits(cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>& val, T* i, T* j, unsigned chunk_size = 0, bool msv_first = true)
-{
-#ifdef BOOST_LITTLE_ENDIAN
-   if (((chunk_size % CHAR_BIT) == 0) && !msv_first)
-   {
-      return detail::eval_import_bits_fast(val, i, j, chunk_size);
-   }
-#endif
-   return detail::eval_import_bits_generic(val, i, j, chunk_size, msv_first);
-}
-
-template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked,
-    class Allocator, class OutputIterator>
-OutputIterator eval_export_bits(const cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>& val, OutputIterator out, unsigned chunk_size,
-                                bool msv_first = true)
-{
-#ifdef _MSC_VER
-   #pragma warning(push)
-#pragma warning(disable : 4244)
-#endif
-
-   typedef typename cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>::trivial_tag tag_type;
-   if (eval_is_zero(val))
-   {
-      *out = 0;
-      ++out;
-      return out;
-   }
-   unsigned bitcount = backends::eval_msb_imp(val) + 1;
-   unsigned chunks   = bitcount / chunk_size;
-   if (bitcount % chunk_size)
-   {
-      ++chunks;
-   }
-
-   int bit_location = msv_first ? bitcount - chunk_size : 0;
-   int bit_step     = msv_first ? -static_cast<int>(chunk_size) : chunk_size;
-   while (bit_location % bit_step)
-   {
-      ++bit_location;
-   }
-
-   do
-   {
-      *out = detail::extract_bits(val, bit_location, chunk_size, tag_type());
-      ++out;
-      bit_location += bit_step;
-   } while ((bit_location >= 0) && (bit_location < (int)bitcount));
-
-   return out;
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-}
-
 }
 } // namespace boost::multiprecision
-
 
 #endif // BOOST_MP_CPP_INT_IMPORT_EXPORT_HPP

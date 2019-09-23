@@ -29,11 +29,8 @@ inline void eval_mod_redc(Backend& result, const  Backend& mod)
 
    using default_ops::eval_add;
    using default_ops::eval_bit_set;
-   using default_ops::eval_gt;
    using default_ops::eval_lt;
    using default_ops::eval_multiply;
-
-   const size_t x_sw = result.size();
 
    Backend mod2 = mod;
    eval_add(mod2, mod);
@@ -44,15 +41,14 @@ inline void eval_mod_redc(Backend& result, const  Backend& mod)
       {
          eval_add(result, mod);
          return;
-      } // make positive
+      }
       return;
    }
    else if (eval_lt(result, mod2))
    {
-      //secure_vector<word> ws;
-      Backend t1;
+      Backend t1(result);
 
-      eval_import_bits(t1, result.limbs() + mod.size() - 1, result.limbs() + x_sw); // TODO: memcpy
+      eval_right_shift(t1, (Backend::limb_bits * (mod.size() - 1)));
       {
          Backend p2;
          eval_bit_set(p2, 2 * Backend::limb_bits * mod.size());
@@ -66,8 +62,6 @@ inline void eval_mod_redc(Backend& result, const  Backend& mod)
       eval_mask_bits(t1, Backend::limb_bits * (mod.size() + 1));
 
       eval_subtract(t1, result, t1);
-
-      //                t1.rev_sub(result.data(), std::min(x_sw, mod.size() + 1), ws);
 
       if (eval_lt(t1, 0))
       {

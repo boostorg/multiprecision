@@ -70,10 +70,6 @@ class modular_adaptor : public base<Backend> {
 
    modular_adaptor() { }
 
-   modular_adaptor(const int c) { // TODO: resolve type?
-      std::cout << "C=" << c << std::endl;
-   }
-
    modular_adaptor(const modular_adaptor& o)
        : base<Backend>::m_base(o.base_data()), base<Backend>::m_mod(o.mod_data()) {}
 
@@ -134,9 +130,42 @@ class modular_adaptor : public base<Backend> {
 
    modular_adaptor& operator=(const char* s)
    {
-      // TODO: Think how create mod_adapter from string
-      this->m_base = 1;
-      this->m_mod = 1;
+      typedef typename mpl::front<unsigned_types>::type ui_type;
+      ui_type                                           zero = 0u;
+
+      using default_ops::eval_fpclassify;
+
+      if (s && (*s == '('))
+      {
+         std::string part;
+         const char* p = ++s;
+         while (*p && (*p != ',') && (*p != ')'))
+            ++p;
+         part.assign(s, p);
+         if (part.size())
+            this->m_base() = part.c_str();
+         else
+            this->m_base() = zero;
+         s = p;
+         if (*p && (*p != ')'))
+         {
+            ++p;
+            while (*p && (*p != ')'))
+               ++p;
+            part.assign(s + 1, p);
+         }
+         else
+            part.erase();
+         if (part.size())
+            this->m_mod() = part.c_str();
+         else
+            this->m_mod() = zero;
+      }
+      else
+      {
+         this->base_data() = s;
+         this->m_mod() = zero;
+      }
       return *this;
    }
 
@@ -164,9 +193,9 @@ class modular_adaptor : public base<Backend> {
 
    std::string str(std::streamsize dig, std::ios_base::fmtflags f) const
    {
-      //TODO: copy
-      eval_redc(this->base_data(), this->mod_data());
-      return this->base_data().str(dig, f);
+      Backend tmp(this->base_data());
+      eval_redc(tmp, this->mod_data());
+      return tmp.str(dig, f);
    }
 
 };

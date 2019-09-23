@@ -11,18 +11,11 @@
 #ifndef BOOST_MULTIPRECISION_MONTGOMERY_INT_REDC_HPP
 #define BOOST_MULTIPRECISION_MONTGOMERY_INT_REDC_HPP
 
-//#include <nil/crypto3/utilities/ct_utils.hpp>
-
 #include <boost/container/vector.hpp>
 #include <boost/multiprecision/gmp.hpp>
 #include <boost/multiprecision/montgomery_params.hpp>
 #include <gmp.h>
 #include <boost/multiprecision/tommath.hpp>
-//#include <boost/multiprecision/cpp_int.hpp>
-//#include <boost/multiprecision/cpp_int/misc.hpp>
-
-//#include <nil/crypto3/multiprecision/montgomery_int/comparison.hpp>
-//#include <nil/crypto3/multiprecision/montgomery_int/misc.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -49,21 +42,22 @@ inline void eval_redc(Backend &result, const montgomery_params<Backend> &mod)
    using default_ops::eval_multiply_add;
 
    typedef cpp_int_backend<Backend::limb_bits * 3, Backend::limb_bits * 3, unsigned_magnitude, unchecked, void> cpp_three_int_backend;
-   typename Backend::allocator_type                                                                                       alloc;
+   typedef typename Backend::allocator_type alloc;
 
    const size_t    p_size = mod.p_words();
    const limb_type p_dash = mod.p_dash();
    const size_t    z_size = 2 * (mod.p_words() + 1);
 
-   container::vector<limb_type, typename Backend::allocator_type> z(result.size(), 0);
-
-   eval_export_bits(result, z.rbegin(), Backend::limb_bits);
-
-   z.resize(z_size, 0);
+   container::vector<limb_type, alloc> z(result.size(), 0);
+   for (size_t i = 0; i < result.size(); ++i)
+   {
+      z[i] = result.limbs()[i];
+   }
 
    if (result.size() < z_size)
    {
       result.resize(z_size, z_size);
+      z.resize(z_size, 0);
    }
 
    cpp_three_int_backend w(z[0]);
@@ -93,8 +87,7 @@ inline void eval_redc(Backend &result, const montgomery_params<Backend> &mod)
    {
       for (size_t j = i + 1; j != p_size; ++j)
       {
-         eval_multiply_add(w, result.limbs()[j],
-                           mod.p().backend().limbs()[p_size + i - j]);
+         eval_multiply_add(w, result.limbs()[j], mod.p().backend().limbs()[p_size + i - j]);
       }
 
       eval_add(w, z[p_size + i]);
@@ -106,7 +99,7 @@ inline void eval_redc(Backend &result, const montgomery_params<Backend> &mod)
 
    eval_add(w, z[z_size - 1]);
 
-   result.limbs()[p_size]     = w.limbs()[0];
+   result.limbs()[p_size] = w.limbs()[0];
    result.limbs()[p_size + 1] = w.limbs()[1];
 
    if (result.size() != p_size + 1)
