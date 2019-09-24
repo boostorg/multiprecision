@@ -21,7 +21,6 @@ namespace multiprecision {
 template <typename Backend, typename Integer>
 void eval_mask_bits(Backend& val, Integer n)
 {
-   typedef typename boost::multiprecision::limb_type limb_type;
 
    typedef typename boost::multiprecision::detail::canonical<unsigned, Backend>::type ui_type;
    static const ui_type                                                               zero = 0u;
@@ -37,10 +36,9 @@ void eval_mask_bits(Backend& val, Integer n)
 
    if (top_word < val.size())
    {
-      const size_t len = val.size() - (top_word + 1);
-      if (len > 0)
+      for (size_t i = top_word + 1; i < val.size(); ++i)
       {
-         //clear_mem(&val.limbs()[top_word + 1], len); #TODO return this
+         val.limbs()[i] = 0;
       }
       val.limbs()[top_word] &= mask;
    }

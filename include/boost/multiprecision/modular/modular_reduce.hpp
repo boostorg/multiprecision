@@ -11,8 +11,8 @@
 #ifndef BOOST_MULTIPRECISION_MONTGOMERY_INT_MOD_REDC_HPP
 #define BOOST_MULTIPRECISION_MONTGOMERY_INT_MOD_REDC_HPP
 
-#include <boost/multiprecision/montgomery/mask_bits.hpp>
-#include <boost/multiprecision/montgomery/reduce_below.hpp>
+#include <boost/multiprecision/modular/mask_bits.hpp>
+#include <boost/multiprecision/modular/reduce_below.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -82,7 +82,6 @@ inline void eval_mod_redc(Backend& result, const  Backend& mod)
    }
    else
    {
-      // too big, fall back to normal division
       Backend t2;
       divide_unsigned_helper(&result, result, mod, t2);
       result = t2;

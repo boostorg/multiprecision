@@ -1524,7 +1524,7 @@ if(TOMMATH_COMPILED)
 endif()
 
 cm_test(NAME multiprecision_test_test_modular_adapter SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_modular_adapter.cpp)
-target_link_libraries(multiprecision_test_test_modular_adapter ${GMP_LIBRARIES})
+target_link_libraries(multiprecision_test_test_modular_adapter ${GMP_LIBRARIES} ${TomMath_LIBRARIES})
 target_include_directories(multiprecision_test_test_modular_adapter PRIVATE ${GMP_INCLUDE_DIRS})
 target_include_directories(multiprecision_test_test_modular_adapter PRIVATE ${TomMath_INCLUDE_DIRS})
 

@@ -21,16 +21,19 @@
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/multiprecision/number.hpp>
 
-#include <boost/multiprecision/montgomery/reduce.hpp>
-#include <boost/multiprecision/montgomery_params.hpp>
+#include <boost/multiprecision/modular/reduce.hpp>
+#include <boost/multiprecision/cpp_int/montgomery_params.hpp>
 
 #include <algorithm>
 #include <cmath>
 #include <complex>
 
+#include <boost/multiprecision/tommath.hpp>
+
 namespace boost {
 namespace multiprecision {
 namespace backends {
+
 
 template <typename Backend>
 class modular_adapter_base {
@@ -45,15 +48,17 @@ class modular_adapter_base {
 
 };
 
-template <>
-class modular_adapter_base<gmp_int> {
- protected:
-   gmp_int m_base, m_mod;
- public:
-   gmp_int& mod_data() { return m_mod; }
-
-   const gmp_int& mod_data() const { return m_mod; }
-};
+//template <>
+//class modular_adapter_base<tom_int> {
+// protected:
+//   tom_int m_base, m_mod;
+//
+// public:
+//   tom_int& mod_data() { return m_mod; }
+//
+//   const tom_int& mod_data() const { return m_mod; }
+//
+//};
 
 template <typename Backend, template <typename> class base = modular_adapter_base>
 class modular_adaptor : public base<Backend> {
@@ -66,7 +71,6 @@ class modular_adaptor : public base<Backend> {
 
    typedef typename Backend::signed_types   signed_types;
    typedef typename Backend::unsigned_types unsigned_types;
-   //typedef typename Backend::exponent_type  exponent_type;
 
    modular_adaptor() { }
 
@@ -277,8 +281,9 @@ inline void assign_components(modular_adaptor<Backend>& result,
    eval_redc(result.base_data(), result.mod_data());
 }
 
+
 template <class T, class V>
-inline void assign_components(modular_adaptor<gmp_int>& result,
+inline void assign_components(modular_adaptor<tommath_int>& result,
                               const T& a, const V& b)
 {
    result.base_data() = a;

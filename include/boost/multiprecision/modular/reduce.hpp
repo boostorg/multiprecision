@@ -12,9 +12,7 @@
 #define BOOST_MULTIPRECISION_MONTGOMERY_INT_REDC_HPP
 
 #include <boost/container/vector.hpp>
-#include <boost/multiprecision/gmp.hpp>
-#include <boost/multiprecision/montgomery_params.hpp>
-#include <gmp.h>
+#include <boost/multiprecision/cpp_int/montgomery_params.hpp>
 #include <boost/multiprecision/tommath.hpp>
 
 namespace boost {
@@ -25,15 +23,9 @@ namespace multiprecision {
 #pragma warning(disable : 4127) // conditional expression is constant
 #endif
 
-template<typename Backend, expression_template_option ExpressionTemplates>
-void eval_redc(tommath_int &result, const Backend &mod) {
-   eval_mod(result, mod);
+void eval_redc(tommath_int &result, const montgomery_params<tommath_int> &mod) {
+   mp_montgomery_reduce(&result.data(), const_cast< ::mp_int*>(&mod.mod().backend().data()), mod.tho());
 }
-
-inline void eval_redc(gmp_int &result, const gmp_int &mod) {
-   mpz_mod(result.data(), result.data(), mod.data());
-}
-
 
 template <typename Backend>
 inline void eval_redc(Backend &result, const montgomery_params<Backend> &mod)
@@ -107,16 +99,6 @@ inline void eval_redc(Backend &result, const montgomery_params<Backend> &mod)
       result.resize(p_size + 1, p_size + 1);
    }
    result.normalize();
-   //-----
-   //if (!eval_lt(result, result.m_params.p().backend())) {
-   //eval_subtract(result, result.m_params.p().backend());
-   //}
-
-   //nil::crypto3::ct::conditional_copy_mem(borrow, result.limbs(), ws.begin(), ws.begin() + (result.m_params.p_words() + 1), (result.m_params.p_words() + 1));
-   //clear_mem(result.m_params.limbs() + result.m_params.p_words(), z_size - result.m_params.p_words() - 2);
-
-   // This check comes after we've used it but that's ok here
-   //nil::crypto3::ct::unpoison(&borrow, 1);
 }
 
 #ifdef _MSC_VER
