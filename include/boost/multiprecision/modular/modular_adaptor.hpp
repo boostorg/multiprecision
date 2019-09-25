@@ -28,8 +28,6 @@
 #include <cmath>
 #include <complex>
 
-#include <boost/multiprecision/tommath.hpp>
-
 namespace boost {
 namespace multiprecision {
 namespace backends {
@@ -48,18 +46,6 @@ class modular_adapter_base {
 
 };
 
-//template <>
-//class modular_adapter_base<tom_int> {
-// protected:
-//   tom_int m_base, m_mod;
-//
-// public:
-//   tom_int& mod_data() { return m_mod; }
-//
-//   const tom_int& mod_data() const { return m_mod; }
-//
-//};
-
 template <typename Backend, template <typename> class base = modular_adapter_base>
 class modular_adaptor : public base<Backend> {
 
@@ -74,8 +60,10 @@ class modular_adaptor : public base<Backend> {
 
    modular_adaptor() { }
 
-   modular_adaptor(const modular_adaptor& o)
-       : base<Backend>::m_base(o.base_data()), base<Backend>::m_mod(o.mod_data()) {}
+   modular_adaptor(const modular_adaptor& o) {
+      this->base_data() = o.base_data();
+      this->mod_data() = o.mod_data();
+   }
 
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
 
@@ -127,7 +115,6 @@ class modular_adaptor : public base<Backend> {
    {
       // TODO: strange operator
       this->m_base = v;
-      this->m_mod = 1;
 
       return *this;
    }
@@ -282,15 +269,6 @@ inline void assign_components(modular_adaptor<Backend>& result,
 }
 
 
-template <class T, class V>
-inline void assign_components(modular_adaptor<tommath_int>& result,
-                              const T& a, const V& b)
-{
-   result.base_data() = a;
-   result.mod_data() = b;
-   eval_redc(result.base_data(), result.mod_data());
-}
-
 template <class Backend>
 inline void eval_sqrt(modular_adaptor<Backend>&       result,
                       const modular_adaptor<Backend>& val)
@@ -321,6 +299,45 @@ inline void eval_exp(modular_adaptor<Backend>&       result,
 //
 //   eval_exp(result.base_data(), arg.base_data());
 //   eval_redc(result.base_data(), result.mod_data());
+}
+
+template <class Backend, class UI>
+inline void eval_left_shift(modular_adaptor<Backend>& t, UI i)
+{
+   eval_left_shift(t.base_data());
+}
+template <class Backend, class UI>
+inline void eval_right_shift(modular_adaptor<Backend>& t, UI i)
+{
+   eval_right_shift(t.base_data());
+}
+template <class Backend, class UI>
+inline void eval_left_shift(modular_adaptor<Backend>& t, const modular_adaptor<Backend>& v, UI i)
+{
+   eval_left_shift(t.base_data(), v.base_data(), static_cast<unsigned long>(i));
+}
+template <class Backend, class UI>
+inline void eval_right_shift(modular_adaptor<Backend>& t, const modular_adaptor<Backend>& v, UI i)
+{
+   eval_right_shift(t.base_data(), v.base_data(), static_cast<unsigned long>(i));
+}
+
+template <class Backend>
+inline void eval_bitwise_and(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)
+{
+   eval_bitwise_and(result.base_data(), result.base_data(), v.base_data());
+}
+
+template <class Backend>
+inline void eval_bitwise_or(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)
+{
+   eval_bitwise_or(result.base_data(), result.base_data(), v.base_data());
+}
+
+template <class Backend>
+inline void eval_bitwise_xor(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)
+{
+   eval_bitwise_xor(result.base_data(), result.base_data(), v.base_data());
 }
 
 

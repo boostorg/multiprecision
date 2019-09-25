@@ -1,5 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2011 John Maddock. Distributed under the Boost
+//  Copyright (c) 2018-2019 Nil Foundation AG
+//  Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
+//  Copyright (c) 2018-2019 Alexey Moskvin
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -624,7 +627,7 @@ operator>>(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const I& b)
 // Bitwise AND:
 //
 template <class B>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer,
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular,
                             detail::expression<detail::bitwise_and_immediates, number<B, et_on>, number<B, et_on> > >::type
 operator&(const number<B, et_on>& a, const number<B, et_on>& b)
 {

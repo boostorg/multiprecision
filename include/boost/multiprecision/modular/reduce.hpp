@@ -13,7 +13,6 @@
 
 #include <boost/container/vector.hpp>
 #include <boost/multiprecision/cpp_int/montgomery_params.hpp>
-#include <boost/multiprecision/tommath.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -23,9 +22,6 @@ namespace multiprecision {
 #pragma warning(disable : 4127) // conditional expression is constant
 #endif
 
-void eval_redc(tommath_int &result, const montgomery_params<tommath_int> &mod) {
-   mp_montgomery_reduce(&result.data(), const_cast< ::mp_int*>(&mod.mod().backend().data()), mod.tho());
-}
 
 template <typename Backend>
 inline void eval_redc(Backend &result, const montgomery_params<Backend> &mod)

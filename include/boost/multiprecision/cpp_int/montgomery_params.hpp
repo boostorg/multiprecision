@@ -14,7 +14,6 @@
 #include <boost/multiprecision/modular/modular_reduce.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
-#include <boost/multiprecision/tommath.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -122,60 +121,6 @@ class montgomery_params
    number_type m_r3;
    limb_type   m_p_dash;
    size_t      m_p_words;
-   number_type m_mod;
-};
-
-
-/**
- * Parameters for Montgomery Reduction for tommath
- */
-template <>
-class montgomery_params<tommath_int>
-{
-   typedef number<tommath_int> number_type;
- public:
-
-   montgomery_params() {}
-   /**
-   * Initialize a set of Montgomery reduction parameters. These values
-   * can be shared by all values in a specific Montgomery domain.
-   */
-   //TODO: only with cpp_int (or another backends)
-   template <typename Number>
-   explicit montgomery_params(const Number & p) {
-      find_const_variables(p);
-   }
-
-   const number_type& mod() const { return m_mod; }
-
-   const number_type& r1() const { return m_r1; }
-
-   const ::mp_digit& tho() const { return m_tho; }
-
-   template <typename T>
-   typename boost::enable_if_c<is_number<T>::value || is_integral<T>::value, void>::type find_const_variables(const T& p)
-   {
-      m_mod = p;
-      mp_montgomery_setup(const_cast< ::mp_int*>(&m_mod.backend().data()), &m_tho);
-   }
-
-   template <class V>
-   montgomery_params& operator=(const V& v)
-   {
-      find_const_variables(v);
-      return *this;
-   }
-
-   template <typename BackendT, expression_template_option ExpressionTemplates>
-   operator number<BackendT, ExpressionTemplates>()
-   {
-      return mod();
-   };
-
-
- private:
-   number_type m_r1;
-   ::mp_digit m_tho;
    number_type m_mod;
 };
 

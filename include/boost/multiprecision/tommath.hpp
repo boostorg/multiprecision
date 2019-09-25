@@ -1,5 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2011 John Maddock. Distributed under the Boost
+//  Copyright (c) 2018-2019 Nil Foundation AG
+//  Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
+//  Copyright (c) 2018-2019 Alexey Moskvin
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -416,6 +419,7 @@ inline void eval_modulus(tommath_int& t, const tommath_int& o)
       mp_zero(&t.data());
    }
 }
+
 template <class UI>
 inline void eval_left_shift(tommath_int& t, UI i)
 {
@@ -786,5 +790,84 @@ BOOST_CONSTEXPR_OR_CONST float_round_style numeric_limits<boost::multiprecision:
 
 #endif
 } // namespace std
+
+namespace boost {
+namespace multiprecision {
+
+template <typename T> class montgomery_params;
+/**
+ * Parameters for Montgomery Reduction for tommath
+ */
+template <>
+class montgomery_params<tommath_int>
+{
+   typedef number<tommath_int> number_type;
+ public:
+
+   montgomery_params() {}
+   /**
+   * Initialize a set of Montgomery reduction parameters. These values
+   * can be shared by all values in a specific Montgomery domain.
+   */
+   //TODO: only with cpp_int (or another backends)
+   template <typename Number>
+   explicit montgomery_params(const Number & p) {
+      find_const_variables(p);
+   }
+
+   const number_type& mod() const { return m_mod; }
+
+   const number_type& r1() const { return m_r1; }
+
+   const ::mp_digit& tho() const { return m_tho; }
+
+   template <typename T>
+   typename boost::enable_if_c<is_number<T>::value || is_integral<T>::value, void>::type find_const_variables(const T& p)
+   {
+      m_mod = p;
+      mp_montgomery_setup(const_cast< ::mp_int*>(&m_mod.backend().data()), &m_tho);
+   }
+
+   template <class V>
+   montgomery_params& operator=(const V& v)
+   {
+      find_const_variables(v);
+      return *this;
+   }
+
+   template <typename BackendT, expression_template_option ExpressionTemplates>
+   operator number<BackendT, ExpressionTemplates>()
+   {
+      return mod();
+   };
+
+
+ private:
+   number_type m_r1;
+   ::mp_digit m_tho;
+   number_type m_mod;
+};
+
+namespace backends {
+
+
+void eval_redc(tommath_int &result, const montgomery_params<tommath_int> &mod) {
+   mp_montgomery_reduce(&result.data(), const_cast< ::mp_int*>(&mod.mod().backend().data()), mod.tho());
+}
+
+#include <boost/multiprecision/modular/modular_adaptor.hpp>
+template <class T, class V>
+inline void assign_components(modular_adaptor<tommath_int>& result,
+                              const T& a, const V& b)
+{
+   result.base_data() = a;
+   result.mod_data() = b;
+   eval_redc(result.base_data(), result.mod_data());
+}
+
+}
+}
+}
+
 
 #endif
