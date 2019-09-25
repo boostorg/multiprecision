@@ -1,5 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2011 John Maddock. Distributed under the Boost
+//  Copyright (c) 2018-2019 Nil Foundation AG
+//  Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
+//  Copyright (c) 2018-2019 Alexey Moskvin
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -928,21 +931,9 @@ class number
       return m_backend.compare(canonical_value(o));
    }
 
-   // TODO: fix it
-   template <class V>
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<is_arithmetic<V>::value && (number_category<Backend>::value != number_kind_modular), int>::type compare(const V& o) const
-   {
-      std::cout << "Strange compare for number_kind_modular" << std::endl;
-      using default_ops::eval_get_sign;
-      if (o == 0)
-         return eval_get_sign(m_backend);
-      return m_backend.compare(canonical_value(o));
-   }
-   // TODO: fix it
    template <class V>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<is_arithmetic<V>::value && (number_category<Backend>::value == number_kind_modular), int>::type compare(const V& o) const
    {
-      std::cout << "Strange compare for number_kind_modular" << std::endl;
       using default_ops::eval_get_sign;
       return m_backend.compare(canonical_value(o));
    }
