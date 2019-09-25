@@ -141,9 +141,6 @@ if(EIGEN_FOUND)
                 CMAKE_FLAGS "-DCMAKE_CXX_LINK_EXECUTABLE='echo not linking now...'" "-DINCLUDE_DIRECTORIES=${EIGEN3_INCLUDE_DIRS}")
 endif()
 
-message(${TOMMATH_FOUND})
-message(${TomMath_INCLUDE_DIRS})
-
 #cm_test(NAME GMP_MY SOURCES ${CURRENT_TEST_SOURCES_DIR}/../config/has_float128.cpp)
 #target_link_libraries(GMP_MY ${Quadmath_LIBRARY})
 #target_include_directories(GMP_MY PRIVATE ${Quadmath_INCLUDE_DIR})
