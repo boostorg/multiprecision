@@ -1,7 +1,11 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation AG
-// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
-// Copyright (c) 2018-2019 Alexey Moskvin
+// Copyright (c) 2019 Nil Foundation AG
+// Copyright (c) 2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2019 Alexey Moskvin
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
 #include <iostream>
@@ -13,6 +17,7 @@
 #include <boost/multiprecision/gmp.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <type_traits>
+
 #include <gmp.h>
 
 using namespace boost::multiprecision;
@@ -29,5 +34,5 @@ int main()
    std::cout << x << std::endl;
    std::cout << t << std::endl;
 
-   exit(0);
+   return 0;
 }
