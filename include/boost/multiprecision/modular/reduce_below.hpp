@@ -15,7 +15,7 @@ namespace boost {
 namespace multiprecision {
 
 template <typename Backend>
-void eval_reduce_below(Backend& val, const  Backend& mod)
+void eval_reduce_below(Backend& val, const Backend& mod)
 {
    using default_ops::eval_lt;
 

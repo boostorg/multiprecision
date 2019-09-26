@@ -22,15 +22,14 @@ namespace multiprecision {
 #pragma warning(disable : 4127) // conditional expression is constant
 #endif
 
-
 template <typename Backend>
-inline void eval_redc(Backend &result, const montgomery_params<Backend> &mod)
+inline void eval_redc(Backend& result, const montgomery_params<Backend>& mod)
 {
    using default_ops::eval_lt;
    using default_ops::eval_multiply_add;
 
    typedef cpp_int_backend<Backend::limb_bits * 3, Backend::limb_bits * 3, unsigned_magnitude, unchecked, void> cpp_three_int_backend;
-   typedef typename Backend::allocator_type alloc;
+   typedef typename Backend::allocator_type                                                                     alloc;
 
    const size_t    p_size = mod.p_words();
    const limb_type p_dash = mod.p_dash();
@@ -87,7 +86,7 @@ inline void eval_redc(Backend &result, const montgomery_params<Backend> &mod)
 
    eval_add(w, z[z_size - 1]);
 
-   result.limbs()[p_size] = w.limbs()[0];
+   result.limbs()[p_size]     = w.limbs()[0];
    result.limbs()[p_size + 1] = w.limbs()[1];
 
    if (result.size() != p_size + 1)

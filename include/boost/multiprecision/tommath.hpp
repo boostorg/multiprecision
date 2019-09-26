@@ -794,7 +794,8 @@ BOOST_CONSTEXPR_OR_CONST float_round_style numeric_limits<boost::multiprecision:
 namespace boost {
 namespace multiprecision {
 
-template <typename T> class montgomery_params;
+template <typename T>
+class montgomery_params;
 /**
  * Parameters for Montgomery Reduction for tommath
  */
@@ -802,8 +803,8 @@ template <>
 class montgomery_params<tommath_int>
 {
    typedef number<tommath_int> number_type;
- public:
 
+ public:
    montgomery_params() {}
    /**
    * Initialize a set of Montgomery reduction parameters. These values
@@ -811,7 +812,8 @@ class montgomery_params<tommath_int>
    */
    //TODO: only with cpp_int (or another backends)
    template <typename Number>
-   explicit montgomery_params(const Number & p) {
+   explicit montgomery_params(const Number& p)
+   {
       find_const_variables(p);
    }
 
@@ -841,17 +843,16 @@ class montgomery_params<tommath_int>
       return mod();
    };
 
-
  private:
    number_type m_r1;
-   ::mp_digit m_tho;
+   ::mp_digit  m_tho;
    number_type m_mod;
 };
 
 namespace backends {
 
-
-void eval_redc(tommath_int &result, const montgomery_params<tommath_int> &mod) {
+void eval_redc(tommath_int& result, const montgomery_params<tommath_int>& mod)
+{
    mp_montgomery_reduce(&result.data(), const_cast< ::mp_int*>(&mod.mod().backend().data()), mod.tho());
 }
 
@@ -861,13 +862,12 @@ inline void assign_components(modular_adaptor<tommath_int>& result,
                               const T& a, const V& b)
 {
    result.base_data() = a;
-   result.mod_data() = b;
+   result.mod_data()  = b;
    eval_redc(result.base_data(), result.mod_data());
 }
 
+} // namespace backends
 }
-}
-}
-
+} // namespace boost::multiprecision
 
 #endif

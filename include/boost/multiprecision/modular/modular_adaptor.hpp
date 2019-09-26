@@ -32,37 +32,37 @@ namespace boost {
 namespace multiprecision {
 namespace backends {
 
-
 template <typename Backend>
-class modular_adapter_base {
+class modular_adapter_base
+{
  protected:
-   Backend m_base;
+   Backend                    m_base;
    montgomery_params<Backend> m_mod;
 
  public:
    montgomery_params<Backend>& mod_data() { return m_mod; }
 
    const montgomery_params<Backend>& mod_data() const { return m_mod; }
-
 };
 
 template <typename Backend, template <typename> class base = modular_adapter_base>
-class modular_adaptor : public base<Backend> {
+class modular_adaptor : public base<Backend>
+{
 
  public:
-
    Backend& base_data() { return this->m_base; }
 
-   Backend const & base_data() const { return this->m_base; }
+   Backend const& base_data() const { return this->m_base; }
 
    typedef typename Backend::signed_types   signed_types;
    typedef typename Backend::unsigned_types unsigned_types;
 
-   modular_adaptor() { }
+   modular_adaptor() {}
 
-   modular_adaptor(const modular_adaptor& o) {
+   modular_adaptor(const modular_adaptor& o)
+   {
       this->base_data() = o.base_data();
-      this->mod_data() = o.mod_data();
+      this->mod_data()  = o.mod_data();
    }
 
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
@@ -72,10 +72,12 @@ class modular_adaptor : public base<Backend> {
    {}
 
 #endif
-   modular_adaptor(const Backend& val, const montgomery_params<Backend>& mod) {
+   modular_adaptor(const Backend& val, const montgomery_params<Backend>& mod)
+   {
       this->m_base = val;
-      this->m_mod = mod;
-      if (default_ops::eval_gt(this->m_base, mod.p().backend())) {
+      this->m_mod  = mod;
+      if (default_ops::eval_gt(this->m_base, mod.p().backend()))
+      {
          eval_mod_redc(this->m_base, mod.p().backend());
       }
       eval_multiply(this->m_base, mod.R2());
@@ -83,7 +85,8 @@ class modular_adaptor : public base<Backend> {
    }
 
    modular_adaptor(const Backend& val, const Backend& mod)
-       : base<Backend>::m_base(val), base<Backend>::m_mod(mod) {
+       : base<Backend>::m_base(val), base<Backend>::m_mod(mod)
+   {
    }
 
    modular_adaptor(Backend& val, Backend& mod)
@@ -155,7 +158,7 @@ class modular_adaptor : public base<Backend> {
       else
       {
          this->base_data() = s;
-         this->m_mod() = zero;
+         this->m_mod()     = zero;
       }
       return *this;
    }
@@ -188,14 +191,13 @@ class modular_adaptor : public base<Backend> {
       eval_redc(tmp, this->mod_data());
       return tmp.str(dig, f);
    }
-
 };
 
 template <class Backend, class T>
 inline typename enable_if<is_arithmetic<T>, bool>
 
     ::type eval_eq(const modular_adaptor<Backend>& a,
-                   const T&                                        b)
+                   const T&                        b)
 
         BOOST_NOEXCEPT
 {
@@ -260,14 +262,14 @@ inline void assign_components(modular_adaptor<Backend>& result,
                               const T& a, const V& b)
 {
    result.base_data() = a;
-   result.mod_data() = b;
-   if (default_ops::eval_gt(result.base_data(), result.mod_data().p().backend())) {
+   result.mod_data()  = b;
+   if (default_ops::eval_gt(result.base_data(), result.mod_data().p().backend()))
+   {
       eval_mod_redc(result.base_data(), result.mod_data().p().backend());
    }
    eval_multiply(result.base_data(), result.mod_data().R2().backend());
    eval_redc(result.base_data(), result.mod_data());
 }
-
 
 template <class Backend>
 inline void eval_sqrt(modular_adaptor<Backend>&       result,
@@ -294,11 +296,11 @@ template <class Backend>
 inline void eval_exp(modular_adaptor<Backend>&       result,
                      const modular_adaptor<Backend>& arg)
 {
-//TODO: Implement this
-//   using default_ops::eval_exp;
-//
-//   eval_exp(result.base_data(), arg.base_data());
-//   eval_redc(result.base_data(), result.mod_data());
+   //TODO: Implement this
+   //   using default_ops::eval_exp;
+   //
+   //   eval_exp(result.base_data(), arg.base_data());
+   //   eval_redc(result.base_data(), result.mod_data());
 }
 
 template <class Backend, class UI>
@@ -340,8 +342,7 @@ inline void eval_bitwise_xor(modular_adaptor<Backend>& result, const modular_ada
    eval_bitwise_xor(result.base_data(), result.base_data(), v.base_data());
 }
 
-
-}
+} // namespace backends
 
 using boost::multiprecision::backends::modular_adaptor;
 
@@ -357,6 +358,6 @@ struct component_type<number<modular_adaptor<Backend>, ExpressionTemplates> >
 
 }
 
-}
+} // namespace boost::multiprecision
 
 #endif

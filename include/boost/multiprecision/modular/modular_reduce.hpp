@@ -24,7 +24,7 @@ namespace backends {
 #endif
 
 template <typename Backend>
-inline void eval_mod_redc(Backend& result, const  Backend& mod)
+inline void eval_mod_redc(Backend& result, const Backend& mod)
 {
 
    using default_ops::eval_add;

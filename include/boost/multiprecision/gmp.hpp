@@ -9,12 +9,15 @@
 #ifndef BOOST_MATH_ER_GMP_BACKEND_HPP
 #define BOOST_MATH_ER_GMP_BACKEND_HPP
 
-#include <boost/multiprecision/modular/modular_adaptor.hpp>
 #include <boost/multiprecision/number.hpp>
+
 #include <boost/multiprecision/debug_adaptor.hpp>
+#include <boost/multiprecision/modular/modular_adaptor.hpp>
+
 #include <boost/multiprecision/detail/integer_ops.hpp>
 #include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <boost/multiprecision/detail/digits.hpp>
+
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/functional/hash_fwd.hpp>
@@ -2195,7 +2198,8 @@ inline void eval_abs(gmp_rational& result, const gmp_rational& val)
    mpq_abs(result.data(), val.data());
 }
 
-inline void eval_redc(gmp_int &result, const gmp_int &mod) {
+inline void eval_redc(gmp_int& result, const gmp_int& mod)
+{
    mpz_mod(result.data(), result.data(), mod.data());
 }
 
@@ -2216,12 +2220,15 @@ inline void assign_components(gmp_rational& result, gmp_int const& v1, gmp_int c
    mpq_canonicalize(result.data());
 }
 
-template<typename T> class modular_adapter_base;
+template <typename T>
+class modular_adapter_base;
 
 template <>
-class modular_adapter_base<gmp_int> {
+class modular_adapter_base<gmp_int>
+{
  protected:
    gmp_int m_base, m_mod;
+
  public:
    gmp_int& mod_data() { return m_mod; }
 
@@ -2233,7 +2240,7 @@ template <class T, class V>
 inline void assign_components(modular_adaptor<gmp_int>& result, const T& a, const V& b)
 {
    result.base_data() = a;
-   result.mod_data() = b;
+   result.mod_data()  = b;
    eval_redc(result.base_data(), result.mod_data());
 }
 
@@ -2442,14 +2449,14 @@ struct is_variable_precision<backends::gmp_float<0> > : public true_type
 {};
 } // namespace detail
 
-typedef number<gmp_float<50> >   mpf_float_50;
-typedef number<gmp_float<100> >  mpf_float_100;
-typedef number<gmp_float<500> >  mpf_float_500;
-typedef number<gmp_float<1000> > mpf_float_1000;
-typedef number<gmp_float<0> >    mpf_float;
-typedef number<gmp_int>          mpz_int;
-typedef number<modular_adaptor<gmp_int> >   mpz_int_mod;
-typedef number<gmp_rational>     mpq_rational;
+typedef number<gmp_float<50> >            mpf_float_50;
+typedef number<gmp_float<100> >           mpf_float_100;
+typedef number<gmp_float<500> >           mpf_float_500;
+typedef number<gmp_float<1000> >          mpf_float_1000;
+typedef number<gmp_float<0> >             mpf_float;
+typedef number<gmp_int>                   mpz_int;
+typedef number<modular_adaptor<gmp_int> > mpz_int_mod;
+typedef number<gmp_rational>              mpq_rational;
 
 } // namespace multiprecision
 
