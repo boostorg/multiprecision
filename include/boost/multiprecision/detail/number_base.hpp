@@ -8,6 +8,7 @@
 
 #include <limits>
 #include <boost/utility/enable_if.hpp>
+#include <boost/core/nvp.hpp>
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/type_traits/is_constructible.hpp>
 #include <boost/type_traits/decay.hpp>
@@ -103,14 +104,6 @@
 #endif
 
 namespace boost {
-
-namespace serialization {
-template <class T>
-struct nvp;
-template <class T>
-const nvp<T> make_nvp(const char* name, T& t);
-} // namespace serialization
-
 namespace multiprecision {
 
 enum expression_template_option
