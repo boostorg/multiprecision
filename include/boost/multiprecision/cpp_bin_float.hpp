@@ -528,9 +528,9 @@ class cpp_bin_float
    template <class Archive>
    void serialize(Archive& ar, const unsigned int /*version*/)
    {
-      ar& boost::serialization::make_nvp("data", m_data);
-      ar& boost::serialization::make_nvp("exponent", m_exponent);
-      ar& boost::serialization::make_nvp("sign", m_sign);
+      ar& boost::make_nvp("data", m_data);
+      ar& boost::make_nvp("exponent", m_exponent);
+      ar& boost::make_nvp("sign", m_sign);
    }
 };
 
