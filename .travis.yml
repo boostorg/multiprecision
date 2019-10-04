@@ -1220,5 +1220,6 @@ script:
   - cmake -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9]*//g') -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE ..;
 
 notifications:
-  email:
     on_success: always
+    email:
+        on_success: always

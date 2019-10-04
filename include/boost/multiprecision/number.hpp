@@ -813,7 +813,7 @@ class number
    template <class Archive>
    void serialize(Archive& ar, const unsigned int /*version*/)
    {
-      ar& boost::serialization::make_nvp("backend", m_backend);
+      ar& boost::make_nvp("backend", m_backend);
    }
 
  private:

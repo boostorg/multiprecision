@@ -59,6 +59,15 @@ project : requirements
    <toolset>intel-win:<runtime-link>static
    <toolset>intel-win:<link>static
    <toolset>clang-win:<link>static
+   
+   # Assembler error "File too big" caused by lots of C++ templates, for example, math/floating_point_examples.cpp.
+   # Some projects on some toolsets may require
+   #   <toolset>gcc-mingw:<cxxflags>\"-Wa,-mbig-obj\"
+   # See https://digitalkarabela.com/mingw-w64-how-to-fix-file-too-big-too-many-sections/
+   # <toolset>gcc-mingw:<cxxflags>-Wa,-mbig-obj # Some projects may overflow assembler and require equivalent of MSVC /bigobj.
+   # Requires version 2.30 of GNU binutils.
+   # Best applied only to projects that require this, see multiprecision/example  run math/floating_point_examples.cpp.
+   
    # Speed up compiles:
    <toolset>msvc:<debug-symbols>off
    <toolset>intel:<debug-symbols>off
@@ -761,8 +770,8 @@ test-suite misc :
       [ run constexpr_test_cpp_int_3.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] ]
       [ run constexpr_test_cpp_int_4.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] ]
       [ run constexpr_test_cpp_int_5.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] ]
-      [ run constexpr_test_cpp_int_6.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] [ check-target-builds ../config//has_constexpr_limits : <cxxflags>-fconstexpr-ops-limit=268435456 ] ]
-      [ run constexpr_test_cpp_int_7.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] ]
+      [ run constexpr_test_cpp_int_6.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : <toolset>clang:<cxxflags>-fconstexpr-steps=268435456 : <build>no ] [ check-target-builds ../config//has_constexpr_limits : <cxxflags>-fconstexpr-ops-limit=268435456 ] ]
+      [ run constexpr_test_cpp_int_7.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : <toolset>clang:<cxxflags>-fconstexpr-steps=268435456 : <build>no ] ]
 
       [ compile test_nothrow_cpp_int.cpp ]
       [ compile test_nothrow_cpp_rational.cpp ]
