@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2011 John Maddock. Distributed under the Boost
-// Copyright (c) 2018-2019 Nil Foundation AG
-// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
-// Copyright (c) 2018-2019 Alexey Moskvin
+// Copyright (c) 2019 Nil Foundation AG
+// Copyright (c) 2019 Mikhail Komarov <nemo@nilfoundation.org>
+// Copyright (c) 2019 Alexey Moskvin
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -12,7 +12,6 @@
 #include <boost/multiprecision/number.hpp>
 
 #include <boost/multiprecision/debug_adaptor.hpp>
-#include <boost/multiprecision/modular/modular_adaptor.hpp>
 
 #include <boost/multiprecision/detail/integer_ops.hpp>
 #include <boost/multiprecision/detail/big_lanczos.hpp>
@@ -2198,50 +2197,23 @@ inline void eval_abs(gmp_rational& result, const gmp_rational& val)
    mpq_abs(result.data(), val.data());
 }
 
-inline void eval_redc(gmp_int& result, const gmp_int& mod)
-{
-   mpz_mod(result.data(), result.data(), mod.data());
-}
-
 inline void assign_components(gmp_rational& result, unsigned long v1, unsigned long v2)
 {
    mpq_set_ui(result.data(), v1, v2);
    mpq_canonicalize(result.data());
 }
+
 inline void assign_components(gmp_rational& result, long v1, long v2)
 {
    mpq_set_si(result.data(), v1, v2);
    mpq_canonicalize(result.data());
 }
+
 inline void assign_components(gmp_rational& result, gmp_int const& v1, gmp_int const& v2)
 {
    mpz_set(mpq_numref(result.data()), v1.data());
    mpz_set(mpq_denref(result.data()), v2.data());
    mpq_canonicalize(result.data());
-}
-
-template <typename T>
-class modular_adapter_base;
-
-template <>
-class modular_adapter_base<gmp_int>
-{
- protected:
-   gmp_int m_base, m_mod;
-
- public:
-   gmp_int& mod_data() { return m_mod; }
-
-   const gmp_int& mod_data() const { return m_mod; }
-};
-#include <boost/multiprecision/modular/modular_adaptor.hpp>
-
-template <class T, class V>
-inline void assign_components(modular_adaptor<gmp_int>& result, const T& a, const V& b)
-{
-   result.base_data() = a;
-   result.mod_data()  = b;
-   eval_redc(result.base_data(), result.mod_data());
 }
 
 inline std::size_t hash_value(const gmp_rational& val)
@@ -2455,7 +2427,6 @@ typedef number<gmp_float<500> >           mpf_float_500;
 typedef number<gmp_float<1000> >          mpf_float_1000;
 typedef number<gmp_float<0> >             mpf_float;
 typedef number<gmp_int>                   mpz_int;
-typedef number<modular_adaptor<gmp_int> > mpz_int_mod;
 typedef number<gmp_rational>              mpq_rational;
 
 } // namespace multiprecision

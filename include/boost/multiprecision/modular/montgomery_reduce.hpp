@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation AG
-// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
-// Copyright (c) 2018-2019 Alexey Moskvin
+// Copyright (c) 2019 Nil Foundation AG
+// Copyright (c) 2019 Mikhail Komarov <nemo@nilfoundation.org>
+// Copyright (c) 2019 Alexey Moskvin
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -12,7 +12,7 @@
 #define BOOST_MULTIPRECISION_MONTGOMERY_INT_REDC_HPP
 
 #include <boost/container/vector.hpp>
-#include <boost/multiprecision/cpp_int/montgomery_params.hpp>
+#include <boost/multiprecision/modular/modular_params.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -51,21 +51,21 @@ inline void eval_redc(Backend& result, const montgomery_params<Backend>& mod)
 
    result.limbs()[0] = w.limbs()[0] * p_dash;
 
-   eval_multiply_add(w, result.limbs()[0], mod.p().backend().limbs()[0]);
+   eval_multiply_add(w, result.limbs()[0], mod.mod().backend().limbs()[0]);
    eval_right_shift(w, Backend::limb_bits);
 
    for (size_t i = 1; i != p_size; ++i)
    {
       for (size_t j = 0; j < i; ++j)
       {
-         eval_multiply_add(w, result.limbs()[j], mod.p().backend().limbs()[i - j]);
+         eval_multiply_add(w, result.limbs()[j], mod.mod().backend().limbs()[i - j]);
       }
 
       eval_add(w, z[i]);
 
       result.limbs()[i] = w.limbs()[0] * p_dash;
 
-      eval_multiply_add(w, result.limbs()[i], mod.p().backend().limbs()[0]);
+      eval_multiply_add(w, result.limbs()[i], mod.mod().backend().limbs()[0]);
 
       eval_right_shift(w, Backend::limb_bits);
    }
@@ -74,7 +74,7 @@ inline void eval_redc(Backend& result, const montgomery_params<Backend>& mod)
    {
       for (size_t j = i + 1; j != p_size; ++j)
       {
-         eval_multiply_add(w, result.limbs()[j], mod.p().backend().limbs()[p_size + i - j]);
+         eval_multiply_add(w, result.limbs()[j], mod.mod().backend().limbs()[p_size + i - j]);
       }
 
       eval_add(w, z[p_size + i]);

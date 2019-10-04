@@ -102,7 +102,7 @@ cm_test_link_libraries(multiprecision_test_settings)
 if(GMP_FOUND)
     try_compile(GMP_COMPILED ${CMAKE_BINARY_DIR} ${CURRENT_TEST_SOURCES_DIR}/../config/has_gmp.cpp
                 LINK_LIBRARIES ${GMP_LIBRARIES}
-                CMAKE_FLAGS "-DCMAKE_CXX_LINK_EXECUTABLE='echo not linking now...'" "-DINCLUDE_DIRECTORIES=${GMP_INCLUDE_DIRS}")
+                CMAKE_FLAGS "-DCMAKE_CXX_LINK_EXECUTABLE='echo not linking now...'" "-DINCLUDE_DIRECTORIES=${GMP_INCLUDE_DIRS};${Boost_INCLUDE_DIRS}" OUTPUT_VARIABLE OUTP)
 endif()
 
 if(MPFR_FOUND)
@@ -1521,7 +1521,7 @@ if(TOMMATH_COMPILED)
 endif()
 
 if(GMP_COMPILED AND TOMMATH_COMPILED)
-    cm_test(NAME multiprecision_test_test_modular_adapter SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_modular_adapter.cpp)
+    cm_test(NAME multiprecision_test_test_modular_adapter SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_modular_adaptor.cpp)
     target_link_libraries(multiprecision_test_test_modular_adapter ${GMP_LIBRARIES} ${TomMath_LIBRARIES})
     target_include_directories(multiprecision_test_test_modular_adapter PRIVATE ${GMP_INCLUDE_DIRS})
     target_include_directories(multiprecision_test_test_modular_adapter PRIVATE ${TomMath_INCLUDE_DIRS})
