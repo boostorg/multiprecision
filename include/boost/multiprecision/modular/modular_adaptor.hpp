@@ -17,7 +17,7 @@
 #include <boost/multiprecision/number.hpp>
 
 #include <boost/multiprecision/modular/modular_params.hpp>
-#include <boost/multiprecision/modular/mask_bits.hpp>
+#include <boost/container/small_vector.hpp>
 
 #include <algorithm>
 #include <cmath>
@@ -150,24 +150,34 @@ class modular_adaptor
 
    int compare(const modular_adaptor& o) const
    {
-      // They are either equal or not:
-      return (m_base.compare(o.base_data()) == 0) &&
-                     (m_mod.compare(o.mod_data()) == 0)
-                 ? 0
-                 : 1;
+      // They are either equal or not:<
+      if (m_mod.compare(o.mod_data()) != 0)
+      {
+         BOOST_THROW_EXCEPTION(std::runtime_error("Could not compare modular number with different mod."));
+      }
+      Backend tmp1, tmp2;
+      mod_data().adjust_regular(tmp1, base_data());
+      mod_data().adjust_regular(tmp2, o.base_data());
+      return tmp1.compare(tmp2);
    }
 
    template <class T>
    int compare(const T& val) const
    {
       using default_ops::eval_lt;
-      return (m_base.compare(val) == 0) && eval_lt(m_mod, val) ? 0 : 1;
+      if (!eval_lt(m_mod, val))
+      {
+         BOOST_THROW_EXCEPTION(std::runtime_error("Could not compare modular number with mod bigger than compared number."));
+      }
+      Backend tmp;
+      mod_data().adjust_regular(tmp, base_data());
+      return tmp.compare(val);
    }
 
    void swap(modular_adaptor& o)
    {
       base_data().swap(o.base_data());
-      mod_data().swap(o.mod_data());
+      std::swap(mod_data(), o.mod_data());
    }
 
    std::string str(std::streamsize dig, std::ios_base::fmtflags f) const
@@ -176,7 +186,26 @@ class modular_adaptor
       mod_data().adjust_regular(tmp, base_data());
       return tmp.str(dig, f);
    }
+
+   void negate()
+   {
+      base_data().negate();
+      eval_add(base_data(), mod_data().get_mod().backend());
+   }
+
+   template <typename BackendT, expression_template_option ExpressionTemplates>
+   operator number<BackendT, ExpressionTemplates>()
+   {
+      return base_data();
+   };
 };
+
+template <class Result, class Backend>
+inline void eval_convert_to(Result* result, const modular_adaptor<Backend>& val)
+{
+   using default_ops::eval_convert_to;
+   eval_convert_to(result, val.base_data());
+}
 
 template <class Backend, class T>
 inline typename enable_if<is_arithmetic<T>, bool>
@@ -199,22 +228,32 @@ template <class Backend>
 inline void eval_add(modular_adaptor<Backend>&       result,
                      const modular_adaptor<Backend>& o)
 {
+   BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
+   using default_ops::eval_gt;
    eval_add(result.base_data(), o.base_data());
+   if (eval_gt(result.base_data(), result.mod_data().get_mod().backend()))
+   {
+      eval_subtract(result.base_data(), result.mod_data().get_mod().backend());
+   }
 }
 
 template <class Backend>
 inline void eval_subtract(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)
 {
-   if (eval_lt(result.base_data(), o.base_data()))
-   {
-      BOOST_THROW_EXCEPTION(std::range_error("Modular less than zero"));
-   }
+   BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
+   typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
+   using default_ops::eval_lt;
    eval_subtract(result.base_data(), o.base_data());
+   if (eval_lt(result.base_data(), ui_type(0u)))
+   {
+      eval_add(result.base_data(), result.mod_data().get_mod().backend());
+   }
 }
 
 template <class Backend>
 inline void eval_multiply(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)
 {
+   BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
    eval_multiply(result.base_data(), o.base_data());
    eval_redc(result.base_data(), result.mod_data());
 }
@@ -222,7 +261,27 @@ inline void eval_multiply(modular_adaptor<Backend>& result, const modular_adapto
 template <class Backend>
 inline void eval_divide(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)
 {
-   eval_divide(result.base_data(), o.base_data());
+   BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
+   Backend tmp1, tmp2;
+   result.mod_data().adjust_regular(tmp1, result.base_data());
+   result.mod_data().adjust_regular(tmp2, o.base_data());
+   eval_divide(tmp1, tmp2);
+   result.base_data() = tmp1;
+   result.mod_data().adjust_modular(result.base_data());
+   result.mod_data().adjust_regular(tmp2, result.base_data());
+}
+
+template <class Backend>
+inline void eval_modulus(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)
+{
+   BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
+   Backend tmp1, tmp2;
+   result.mod_data().adjust_regular(tmp1, result.base_data());
+   result.mod_data().adjust_regular(tmp2, o.base_data());
+   eval_modulus(tmp1, tmp2);
+   result.base_data() = tmp1;
+   result.mod_data().adjust_modular(result.base_data());
+   result.mod_data().adjust_regular(tmp2, result.base_data());
 }
 
 template <class Backend>
@@ -283,39 +342,80 @@ size_t window_bits(size_t exp_bits)
 
    size_t window_bits = 1;
 
-   size_t j = 0;
-   while (wsize[j][0] < exp_bits && j < wsize_count)
+   size_t j = wsize_count;
+   while ((wsize[j][0] < exp_bits) && (j >= 0))
    {
-      ++j;
+      --j;
    }
    window_bits += wsize[j][1];
 
    return window_bits;
 };
 
-
 template <class Backend>
-inline void find_modular_pow(modular_adaptor<Backend>& result,
+inline void find_modular_pow(modular_adaptor<Backend>&       result,
                              const modular_adaptor<Backend>& b,
-                             Backend& exp)
+                             Backend&                        exp)
 {
-   typedef number<modular_adaptor<Backend> > modular_type;
+   //   using default_ops::eval_bit_test;
+   //   using default_ops::eval_gt;
+   //   typedef typename boost::multiprecision::detail::canonical<unsigned char, Backend>::type ui_type;
+   //   typedef number<modular_adaptor<Backend> > modular_type;
+   //   modular_params<Backend>  mod = b.mod_data();
+   //   modular_type x(1, mod);
+   //   modular_type y = b;
+   //   while (eval_gt(exp, ui_type(0u)))
+   //   {
+   //      if (eval_bit_test(exp, ui_type(0u)))
+   //      {
+   //         x = x * y;
+   //      }
+   //      y = y * y;
+   //      eval_right_shift(exp, ui_type(1u));
+   //   }
+   //   result = x.backend();
 
-   modular_params<Backend>   mod = b.mod_data();
-   size_t                    m_window_bits;
-   std::vector<modular_type> m_g;
-   uint32_t                  exp_index;
-   m_window_bits = window_bits(eval_msb(exp) + 1);
-   modular_type x(1, mod);
-   m_g.push_back(x);
-   m_g.push_back(b);
-   for (size_t i = 2; i != 1 << m_window_bits; ++i)
+   using default_ops::eval_bit_set;
+   using default_ops::eval_decrement;
+
+   typedef number<modular_adaptor<Backend> > modular_type;
+   modular_params<Backend>                   mod = b.mod_data();
+   size_t                                    m_window_bits;
+   unsigned long                             cur_exp_index;
+   size_t                                    exp_bits = eval_msb(exp);
+   m_window_bits                                      = window_bits(exp_bits + 1);
+
+   std::vector<modular_type> m_g(1U << m_window_bits);
+   modular_type*             p_g = m_g.data();
+   modular_type              x(1, mod);
+
+   Backend nibble = exp;
+   Backend mask;
+   eval_bit_set(mask, m_window_bits);
+   eval_decrement(mask);
+   *p_g = x;
+   ++p_g;
+   *p_g = b;
+   ++p_g;
+   for (size_t i = 2; i < (1U << m_window_bits); i++)
    {
-      m_g.push_back(m_g[i - 1] * m_g[1]);
+      *p_g = m_g[i - 1] * b;
+      ++p_g;
+   }
+   const size_t exp_nibbles = (exp_bits + 1 + m_window_bits - 1) / m_window_bits;
+   size_t       exp_index[exp_nibbles];
+
+   for (size_t i = 0; i < exp_nibbles; ++i)
+   {
+      Backend tmp = nibble;
+      eval_bitwise_and(tmp, mask);
+      eval_convert_to(&cur_exp_index, tmp);
+      eval_right_shift(nibble, m_window_bits);
+      exp_index[i] = cur_exp_index;
    }
 
-   const size_t exp_nibbles = (eval_msb(exp) + 1 + m_window_bits - 1) / m_window_bits;
-   for (size_t i = exp_nibbles; i > 0; --i)
+   x = x * m_g[exp_index[exp_nibbles - 1]];
+   for (size_t i = exp_nibbles - 1; i > 0; --i)
    {
 
       for (size_t j = 0; j != m_window_bits; ++j)
@@ -323,11 +423,7 @@ inline void find_modular_pow(modular_adaptor<Backend>& result,
          x = x * x;
       }
 
-      Backend nibble = exp;
-      eval_right_shift(nibble, m_window_bits * (i - 1));
-      eval_mask_bits(nibble, m_window_bits);
-      eval_convert_to(&exp_index, nibble);
-      x = x * m_g[exp_index];
+      x = x * m_g[exp_index[i - 1]];
    }
    result = x.backend();
 }
@@ -345,7 +441,7 @@ inline void eval_pow(modular_adaptor<Backend>&       result,
 template <class Backend>
 inline void eval_pow(modular_adaptor<Backend>&       result,
                      const modular_adaptor<Backend>& b,
-                     const Backend& e)
+                     const Backend&                  e)
 {
    Backend exp = e;
    find_modular_pow(result, b, exp);
@@ -354,44 +450,80 @@ inline void eval_pow(modular_adaptor<Backend>&       result,
 template <class Backend, class UI>
 inline void eval_left_shift(modular_adaptor<Backend>& t, UI i)
 {
-   eval_left_shift(t.base_data());
+   using default_ops::eval_left_shift;
+   Backend tmp;
+   t.mod_data().adjust_regular(tmp, t.base_data());
+   eval_left_shift(tmp);
+   t.base_data() = tmp;
+   t.mod_data().adjust_modular(t.base_data());
 }
 template <class Backend, class UI>
 inline void eval_right_shift(modular_adaptor<Backend>& t, UI i)
 {
-   eval_right_shift(t.base_data());
-   eval_redc(t.base_data(), t.mod_data());
+   using default_ops::eval_right_shift;
+   Backend tmp;
+   t.mod_data().adjust_regular(tmp, t.base_data());
+   eval_right_shift(tmp);
+   t.base_data() = tmp;
+   t.mod_data().adjust_modular(t.base_data());
 }
 template <class Backend, class UI>
 inline void eval_left_shift(modular_adaptor<Backend>& t, const modular_adaptor<Backend>& v, UI i)
 {
-   eval_left_shift(t.base_data(), v.base_data(), static_cast<unsigned long>(i));
+   using default_ops::eval_left_shift;
+   Backend tmp1, tmp2;
+   t.mod_data().adjust_regular(tmp1, t.base_data());
+   t.mod_data().adjust_regular(tmp2, v.base_data());
+   eval_left_shift(tmp1, tmp2, static_cast<unsigned long>(i));
+   t.base_data() = tmp1;
+   t.mod_data().adjust_modular(t.base_data());
 }
 template <class Backend, class UI>
 inline void eval_right_shift(modular_adaptor<Backend>& t, const modular_adaptor<Backend>& v, UI i)
 {
-   eval_right_shift(t.base_data(), v.base_data(), static_cast<unsigned long>(i));
-   eval_redc(t.base_data(), t.mod_data());
+   using default_ops::eval_right_shift;
+   Backend tmp1, tmp2;
+   t.mod_data().adjust_regular(tmp1, t.base_data());
+   t.mod_data().adjust_regular(tmp2, v.base_data());
+   eval_right_shift(tmp1, tmp2, static_cast<unsigned long>(i));
+   t.base_data() = tmp1;
+   t.mod_data().adjust_modular(t.base_data());
 }
 
 template <class Backend>
 inline void eval_bitwise_and(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)
 {
-   eval_bitwise_and(result.base_data(), result.base_data(), v.base_data());
-   eval_redc(result.base_data(), result.mod_data());
+   using default_ops::eval_bitwise_and;
+   Backend tmp1, tmp2;
+   result.mod_data().adjust_regular(tmp1, result.base_data());
+   result.mod_data().adjust_regular(tmp2, v.base_data());
+   eval_bitwise_and(tmp1, tmp1, tmp2);
+   result.base_data() = tmp1;
+   result.mod_data().adjust_modular(result.base_data());
 }
 
 template <class Backend>
 inline void eval_bitwise_or(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)
 {
-   eval_bitwise_or(result.base_data(), result.base_data(), v.base_data());
+   using default_ops::eval_bitwise_or;
+   Backend tmp1, tmp2;
+   result.mod_data().adjust_regular(tmp1, result.base_data());
+   result.mod_data().adjust_regular(tmp2, v.base_data());
+   eval_bitwise_or(tmp1, tmp1, tmp2);
+   result.base_data() = tmp1;
+   result.mod_data().adjust_modular(result.base_data());
 }
 
 template <class Backend>
 inline void eval_bitwise_xor(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)
 {
-   eval_bitwise_xor(result.base_data(), result.base_data(), v.base_data());
-   eval_redc(result.base_data(), result.mod_data());
+   using default_ops::eval_bitwise_xor;
+   Backend tmp1, tmp2;
+   result.mod_data().adjust_regular(tmp1, result.base_data());
+   result.mod_data().adjust_regular(tmp2, v.base_data());
+   eval_bitwise_xor(tmp1, tmp1, tmp2);
+   result.base_data() = tmp1;
+   result.mod_data().adjust_modular(result.base_data());
 }
 
 } // namespace backends

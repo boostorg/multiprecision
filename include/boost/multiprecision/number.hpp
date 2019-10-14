@@ -59,11 +59,11 @@ class number
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR number(const number& e) BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<Backend const&>()))) : m_backend(e.m_backend) {}
    template <class V>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number(const V& v, typename boost::enable_if_c<
-                                               (boost::is_arithmetic<V>::value || is_same<std::string, V>::value || is_convertible<V, const char*>::value) && !is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value
+                                                                        (boost::is_arithmetic<V>::value || is_same<std::string, V>::value || is_convertible<V, const char*>::value) && !is_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && !detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value
 #ifdef BOOST_HAS_FLOAT128
-                                               && !boost::is_same<V, __float128>::value
+                                                                        && !boost::is_same<V, __float128>::value
 #endif
-                                               >::type* = 0)
+                                                                        >::type* = 0)
    {
       m_backend = canonical_value(v);
    }
@@ -88,7 +88,7 @@ class number
        : m_backend(e.m_backend, digits10) {}
    template <class V>
    explicit BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number(const V& v, typename boost::enable_if_c<
-                                                        (boost::is_arithmetic<V>::value || is_same<std::string, V>::value || is_convertible<V, const char*>::value) && !detail::is_explicitly_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value>::type* = 0)
+                                                                                 (boost::is_arithmetic<V>::value || is_same<std::string, V>::value || is_convertible<V, const char*>::value) && !detail::is_explicitly_convertible<typename detail::canonical<V, Backend>::type, Backend>::value && detail::is_restricted_conversion<typename detail::canonical<V, Backend>::type, Backend>::value>::type* = 0)
        BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend&>() = std::declval<typename detail::canonical<V, Backend>::type const&>()))
    {
       m_backend = canonical_value(v);
@@ -108,13 +108,13 @@ class number
 
    template <class Other, expression_template_option ET>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number(const number<Other, ET>& val,
-                               typename boost::enable_if_c<(boost::is_convertible<Other, Backend>::value && !detail::is_restricted_conversion<Other, Backend>::value)>::type* = 0)
+                                                        typename boost::enable_if_c<(boost::is_convertible<Other, Backend>::value && !detail::is_restricted_conversion<Other, Backend>::value)>::type* = 0)
        BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<Other const&>())))
        : m_backend(val.backend()) {}
 
    template <class Other, expression_template_option ET>
    explicit BOOST_MP_CXX14_CONSTEXPR number(const number<Other, ET>& val, typename boost::enable_if_c<
-                                                     (!detail::is_explicitly_convertible<Other, Backend>::value)>::type* = 0)
+                                                                              (!detail::is_explicitly_convertible<Other, Backend>::value)>::type* = 0)
    {
       //
       // Attempt a generic interconvertion:
@@ -126,12 +126,12 @@ class number
    }
    template <class Other, expression_template_option ET>
    explicit BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number(const number<Other, ET>& val, typename boost::enable_if_c<
-                                                                          (detail::is_explicitly_convertible<Other, Backend>::value && (detail::is_restricted_conversion<Other, Backend>::value || !boost::is_convertible<Other, Backend>::value))>::type* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<Other const&>())))
+                                                                                                   (detail::is_explicitly_convertible<Other, Backend>::value && (detail::is_restricted_conversion<Other, Backend>::value || !boost::is_convertible<Other, Backend>::value))>::type* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<Other const&>())))
        : m_backend(val.backend()) {}
 
    template <class V, class U>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number(const V& v1, const U& v2,
-                               typename boost::enable_if_c<(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value && !is_same<typename component_type<self_type>::type, self_type>::value)>::type* = 0)
+                                                        typename boost::enable_if_c<(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value && !is_same<typename component_type<self_type>::type, self_type>::value)>::type* = 0)
    {
       using default_ops::assign_components;
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(v1, v2);
@@ -139,8 +139,8 @@ class number
    }
    template <class V, class U>
    BOOST_MP_FORCEINLINE explicit BOOST_MP_CXX14_CONSTEXPR number(const V& v1, const U& v2,
-                                        typename boost::enable_if_c<
-                                            (is_constructible<value_type, V>::value || is_convertible<V, std::string>::value) && (is_constructible<value_type, U>::value || is_convertible<U, std::string>::value) && !is_same<typename component_type<self_type>::type, self_type>::value && !is_same<V, self_type>::value && !(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value)>::type* = 0)//(is_constructible<value_type, V>::value || is_convertible<V, std::string>::value) && (is_constructible<value_type, U>::value || is_convertible<U, std::string>::value) && !is_same<typename component_type<self_type>::type, self_type>::value && !is_same<V, self_type>::value && !(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value)>::type* = 0)
+                                                                 typename boost::enable_if_c<
+                                                                     (is_constructible<value_type, V>::value || is_convertible<V, std::string>::value) && (is_constructible<value_type, U>::value || is_convertible<U, std::string>::value) && !is_same<typename component_type<self_type>::type, self_type>::value && !is_same<V, self_type>::value && !(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value)>::type* = 0) //(is_constructible<value_type, V>::value || is_convertible<V, std::string>::value) && (is_constructible<value_type, U>::value || is_convertible<U, std::string>::value) && !is_same<typename component_type<self_type>::type, self_type>::value && !is_same<V, self_type>::value && !(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value)>::type* = 0)
    {
       using default_ops::assign_components;
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> > precision_guard(v1, v2);
@@ -176,12 +176,12 @@ class number
 
    template <class V, class U>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number(const V& v1, const U& v2, unsigned digits10,
-                               typename boost::enable_if_c<(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value && !is_same<typename component_type<self_type>::type, self_type>::value)>::type* = 0)
+                                                        typename boost::enable_if_c<(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value && !is_same<typename component_type<self_type>::type, self_type>::value)>::type* = 0)
        : m_backend(canonical_value(detail::evaluate_if_expression(v1)), canonical_value(detail::evaluate_if_expression(v2)), digits10)
    {}
    template <class V, class U>
    BOOST_MP_FORCEINLINE explicit BOOST_MP_CXX14_CONSTEXPR number(const V& v1, const U& v2, unsigned digits10,
-                                        typename boost::enable_if_c<((is_constructible<value_type, V>::value || is_convertible<V, std::string>::value) && (is_constructible<value_type, U>::value || is_convertible<U, std::string>::value) && !is_same<typename component_type<self_type>::type, self_type>::value) && !(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value)>::type* = 0)
+                                                                 typename boost::enable_if_c<((is_constructible<value_type, V>::value || is_convertible<V, std::string>::value) && (is_constructible<value_type, U>::value || is_convertible<U, std::string>::value) && !is_same<typename component_type<self_type>::type, self_type>::value) && !(is_convertible<V, value_type>::value && is_convertible<U, value_type>::value)>::type* = 0)
        : m_backend(canonical_value(detail::evaluate_if_expression(v1)), canonical_value(detail::evaluate_if_expression(v2)), digits10) {}
 
    template <class Other, expression_template_option ET>
@@ -196,7 +196,7 @@ class number
    BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>::value, number&>::type operator=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       typedef mpl::bool_<is_same<number, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value> tag_type;
-      detail::scoped_default_precision<number<Backend, ExpressionTemplates> >                                       precision_guard(e);
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> >                                           precision_guard(e);
       //
       // If the current precision of *this differs from that of expression e, then we
       // create a temporary (which will have the correct precision thanks to precision_guard)
@@ -219,7 +219,7 @@ class number
    BOOST_MP_CXX14_CONSTEXPR number& assign(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
       typedef mpl::bool_<is_same<number, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value> tag_type;
-      detail::scoped_default_precision<number<Backend, ExpressionTemplates> >                                       precision_guard(e);
+      detail::scoped_default_precision<number<Backend, ExpressionTemplates> >                                           precision_guard(e);
       //
       // If the current precision of *this differs from that of expression e, then we
       // create a temporary (which will have the correct precision thanks to precision_guard)
@@ -308,7 +308,7 @@ class number
    }
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
    explicit BOOST_MP_CXX14_CONSTEXPR number(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e,
-                   typename boost::enable_if_c<!is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>::value && boost::multiprecision::detail::is_explicitly_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>::value>::type* = 0)
+                                            typename boost::enable_if_c<!is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>::value && boost::multiprecision::detail::is_explicitly_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>::value>::type* = 0)
    {
       //
       // No precision guard as assign has one already:
@@ -397,7 +397,8 @@ class number
 
    template <class V>
    typename boost::enable_if_c<boost::is_convertible<V, self_type>::value, number<Backend, ExpressionTemplates>&>::type
-      BOOST_MP_CXX14_CONSTEXPR operator+=(const V& v)
+       BOOST_MP_CXX14_CONSTEXPR
+       operator+=(const V& v)
    {
       using default_ops::eval_add;
       eval_add(m_backend, canonical_value(v));
@@ -1205,7 +1206,7 @@ class number
       //
       // This operation is only valid for integer backends:
       //
-      BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
+      BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer || number_category<Backend>::value == number_kind_modular, "The modulus operation is only valid for integer and modular types");
 
       typedef typename Exp::left_type  left_type;
       typedef typename Exp::right_type right_type;
@@ -1232,7 +1233,7 @@ class number
    template <class Exp>
    BOOST_MP_CXX14_CONSTEXPR void do_assign(const Exp& e, const detail::modulus_immediates&)
    {
-      BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer, "The modulus operation is only valid for integer types");
+      BOOST_STATIC_ASSERT_MSG(number_category<Backend>::value == number_kind_integer || number_category<Backend>::value == number_kind_modular, "The modulus operation is only valid for integer and modular types");
       using default_ops::eval_modulus;
       boost::multiprecision::detail::maybe_promote_precision(this);
       eval_modulus(m_backend, canonical_value(e.left().value()), canonical_value(e.right().value()));

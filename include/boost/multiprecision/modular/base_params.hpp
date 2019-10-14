@@ -13,22 +13,35 @@
 
 namespace boost {
 namespace multiprecision {
+namespace backends {
 
-   template <typename Backend>
-   class base_params {
-      typedef number<Backend> number_type;
-    public:
+template <typename Backend>
+class base_params
+{
+   typedef number<Backend> number_type;
 
-      template <typename Number>
-      void initialize_base_params(const Number& mod) {
-         m_mod = mod;
-      }
+ protected:
+   template <typename Number>
+   void initialize_base_params(const Number& mod)
+   {
+      m_mod = mod;
+   }
 
-      const number_type& mod() const { return m_mod; }
+ public:
+   base_params() {}
 
-      number_type m_mod;
-   };
+   template <typename Number>
+   explicit base_params(const Number& p)
+   {
+      initialize_base_params(p);
+   }
 
+   const number_type& mod() const { return m_mod; }
+
+ protected:
+   number_type m_mod;
+};
 }
 }
+} // namespace boost::multiprecision::backends
 #endif //BOOST_MULTIPRECISION_BASE_PARAMS_HPP

@@ -15,13 +15,14 @@
 
 #include <boost/type_traits/is_integral.hpp>
 
-#include <boost/multiprecision/modular/barrett_params.hpp>
 #include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/modular/base_params.hpp>
+#include <boost/multiprecision/modular/barrett_params.hpp>
 
 namespace boost {
 namespace multiprecision {
-
+namespace backends {
 /**
  * Parameters for Montgomery Reduction
  */
@@ -29,13 +30,7 @@ template <typename Backend>
 class montgomery_params : public base_params<Backend>
 {
    typedef number<Backend> number_type;
-
- public:
-   montgomery_params() : base_params<Backend>() {}
-   /**
-   * Initialize a set of Montgomery reduction parameters. These values
-   * can be shared by all values in a specific Montgomery domain.
-   */
+ protected:
    template <typename Number>
    void initialize_montgomery_params(const Number& p)
    {
@@ -43,8 +38,65 @@ class montgomery_params : public base_params<Backend>
       find_const_variables(p);
    }
 
+   void initialize_montgomery_params(const montgomery_params<Backend>& p)
+   {
+      this->initialize_base_params(p);
+      find_const_variables(p);
+   }
+
+   limb_type monty_inverse(limb_type a)
+   {
+      if (a % 2 == 0)
+      {
+         throw std::invalid_argument("Monty_inverse only valid for odd integers");
+      }
+
+      limb_type b = 1;
+      limb_type r = 0;
+
+      for (size_t i = 0; i != sizeof(limb_type) * CHAR_BIT; ++i)
+      {
+         const limb_type bi = b % 2;
+         r >>= 1;
+         r += bi << (sizeof(limb_type) * CHAR_BIT - 1);
+
+         b -= a * bi;
+         b >>= 1;
+      }
+
+      // Now invert in addition space
+      r = (~static_cast<limb_type>(0) - r) + 1;
+
+      return r;
+   }
+
+   template <typename T>
+   void find_const_variables(const T& pp)
+   {
+      number_type p = pp;
+      if (p <= 0 || !(p % 2))
+      {
+         return;
+      }
+
+      m_p_words = this->m_mod.backend().size();
+
+      m_p_dash = monty_inverse(this->m_mod.backend().limbs()[0]);
+
+      number_type r;
+
+      default_ops::eval_bit_set(r.backend(), m_p_words * sizeof(limb_type) * CHAR_BIT);
+
+      m_r2 = r * r;
+      barrett_params<Backend> barrettParams(this->m_mod);
+      barrettParams.eval_barret_reduce(m_r2.backend());
+   }
+
+ public:
+   montgomery_params() : base_params<Backend>() {}
+
    template <typename Number>
-   explicit montgomery_params(const Number& p)
+   explicit montgomery_params(const Number& p): base_params<Backend>(p)
    {
       initialize_montgomery_params(p);
    }
@@ -62,68 +114,18 @@ class montgomery_params : public base_params<Backend>
       return *this;
    }
 
-   limb_type monty_inverse(limb_type a)
-   {
-      if (a % 2 == 0)
-      {
-         throw std::invalid_argument("Monty_inverse only valid for odd integers");
-      }
-
-      limb_type b = 1;
-      limb_type r = 0;
-
-      for (size_t i = 0; i != Backend::limb_bits; ++i)
-      {
-         const limb_type bi = b % 2;
-         r >>= 1;
-         r += bi << (Backend::limb_bits - 1);
-
-         b -= a * bi;
-         b >>= 1;
-      }
-
-      // Now invert in addition space
-      r = (~static_cast<limb_type>(0) - r) + 1;
-
-      return r;
-   }
-
-   template <typename T>
-   //typename boost::enable_if_c<is_number<T>::value || is_integral<T>::value, void>::type
-   void find_const_variables(const T& pp)
-   {
-      number_type p = pp;
-      if (p <= 0 || !(p % 2))
-      {
-         return; //throw std::invalid_argument("montgomery_params invalid modulus");
-      }
-
-      m_p_words = this->m_mod.backend().size();
-
-      m_p_dash = monty_inverse(this->m_mod.backend().limbs()[0]);
-
-      number_type r;
-
-      default_ops::eval_bit_set(r.backend(), m_p_words * Backend::limb_bits);
-
-      m_r2 = r * r;
-      barrett_params<Backend> barrettParams(this->m_mod.backend());
-      barrettParams.eval_barret_reduce(m_r2.backend());
-   }
-
    inline void eval_montgomery_reduce(Backend& result) const
    {
       using default_ops::eval_lt;
       using default_ops::eval_multiply_add;
 
-      typedef cpp_int_backend<Backend::limb_bits * 3, Backend::limb_bits * 3, unsigned_magnitude, unchecked, void> cpp_three_int_backend;
-      typedef typename Backend::allocator_type                                                                     alloc;
+      typedef cpp_int_backend<sizeof(limb_type) * CHAR_BIT * 3, sizeof(limb_type) * CHAR_BIT * 3, unsigned_magnitude, unchecked, void> cpp_three_int_backend;
 
       const size_t    p_size = m_p_words;
       const limb_type p_dash = m_p_dash;
       const size_t    z_size = 2 * (p_words() + 1);
 
-      container::vector<limb_type, alloc> z(result.size(), 0);
+      container::vector<limb_type> z(result.size(), 0); //container::vector<limb_type, alloc> z(result.size(), 0);
       for (size_t i = 0; i < result.size(); ++i)
       {
          z[i] = result.limbs()[i];
@@ -140,7 +142,7 @@ class montgomery_params : public base_params<Backend>
       result.limbs()[0] = w.limbs()[0] * p_dash;
 
       eval_multiply_add(w, result.limbs()[0], this->m_mod.backend().limbs()[0]);
-      eval_right_shift(w, Backend::limb_bits);
+      eval_right_shift(w, sizeof(limb_type) * CHAR_BIT);
 
       for (size_t i = 1; i != p_size; ++i)
       {
@@ -155,7 +157,7 @@ class montgomery_params : public base_params<Backend>
 
          eval_multiply_add(w, result.limbs()[i], this->m_mod.backend().limbs()[0]);
 
-         eval_right_shift(w, Backend::limb_bits);
+         eval_right_shift(w, sizeof(limb_type) * CHAR_BIT);
       }
 
       for (size_t i = 0; i != p_size; ++i)
@@ -169,7 +171,7 @@ class montgomery_params : public base_params<Backend>
 
          result.limbs()[i] = w.limbs()[0];
 
-         eval_right_shift(w, Backend::limb_bits);
+         eval_right_shift(w, sizeof(limb_type) * CHAR_BIT);
       }
 
       eval_add(w, z[z_size - 1]);
@@ -184,12 +186,13 @@ class montgomery_params : public base_params<Backend>
       result.normalize();
    }
 
+ protected:
    number_type m_r2;
    limb_type   m_p_dash;
    size_t      m_p_words;
 };
-
 }
-} // namespace boost::multiprecision
+}
+} // namespace boost::multiprecision::backends
 
 #endif

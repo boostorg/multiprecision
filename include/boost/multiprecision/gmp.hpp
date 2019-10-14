@@ -1645,6 +1645,11 @@ inline void eval_divide(gmp_int& t, const gmp_int& p, long i)
       mpz_neg(t.data(), t.data());
 }
 
+inline void eval_decrement(gmp_int& result)
+{
+   mpz_sub_ui(result.data(), result.data(), static_cast<unsigned long>(1u));
+}
+
 inline void eval_bitwise_and(gmp_int& result, const gmp_int& u, const gmp_int& v)
 {
    mpz_and(result.data(), u.data(), v.data());

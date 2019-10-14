@@ -12,11 +12,11 @@
 #define BOOST_MULTIPRECISION_BARRETT_PARAMS_HPP
 
 #include <boost/multiprecision/modular/base_params.hpp>
-#include <boost/multiprecision/modular/mask_bits.hpp>
+#include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
 
 namespace boost {
 namespace multiprecision {
-
+namespace backends {
 /**
  * Parameters for Montgomery Reduction
  */
@@ -25,21 +25,26 @@ class barrett_params : public base_params<Backend>
 {
    typedef number<Backend> number_type;
 
+ protected:
+   template <typename Number>
+   void initialize_barrett_params(const Number& p)
+   {
+      using default_ops::eval_bit_set;
+      using default_ops::eval_divide;
+
+      this->initialize_base_params(p);
+
+      m_mu = 0;
+
+      eval_bit_set(m_mu.backend(), 2 * sizeof(limb_type) * CHAR_BIT * p.backend().size());
+      eval_divide(m_mu.backend(), this->m_mod.backend());
+   }
+
  public:
    barrett_params() : base_params<Backend>() {}
 
    template <typename Number>
-   void initialize_barrett_params(const Number& p)
-   {
-      this->initialize_base_params(p);
-      m_mu = 0;
-
-      eval_bit_set(m_mu.backend(), 2 * Backend::limb_bits * m_mu.backend().size());
-      eval_divide(m_mu.backend(), this->m_mod.backend());
-   }
-
-   template <typename Number>
-   explicit barrett_params(const Number& p)
+   explicit barrett_params(const Number& p) : base_params<Backend>(p)
    {
       initialize_barrett_params(p);
    }
@@ -59,6 +64,8 @@ class barrett_params : public base_params<Backend>
       using default_ops::eval_bit_set;
       using default_ops::eval_lt;
       using default_ops::eval_multiply;
+      using default_ops::eval_decrement;
+      using default_ops::eval_subtract;
 
       if (result.size() < this->m_mod.backend().size() || eval_lt(result, this->m_mod.backend()))
       {
@@ -71,26 +78,31 @@ class barrett_params : public base_params<Backend>
       }
       else if (result.size() < 2 * this->m_mod.backend().size())
       {
-
          Backend t1(result);
 
          eval_multiply(t1, m_mu.backend());
-         eval_right_shift(t1, (2 * Backend::limb_bits * (this->m_mod.backend().size())));
+         eval_right_shift(t1, (2 * sizeof(limb_type) * CHAR_BIT * (this->m_mod.backend().size())));
 
          eval_multiply(t1, this->m_mod.backend());
 
-         eval_mask_bits(t1, Backend::limb_bits * (this->m_mod.backend().size() + 1));
+         {
+            Backend tmp;
+            eval_bit_set(tmp, sizeof(limb_type) * CHAR_BIT * (this->m_mod.backend().size() + 1));
+            eval_decrement(tmp);
+            eval_bitwise_and(t1, tmp);
+         }
+         //eval_mask_bits(t1, Backend::limb_bits * (this->m_mod.backend().size() + 1));
 
          eval_subtract(t1, result, t1);
 
          if (eval_lt(t1, 0))
          {
             Backend p2;
-            eval_bit_set(p2, Backend::limb_bits * (this->m_mod.backend().size() + 1));
+            eval_bit_set(p2, sizeof(limb_type) * CHAR_BIT * (this->m_mod.backend().size() + 1));
             eval_add(t1, p2);
          }
 
-         while (eval_lt(this->m_mod.backend(), t1))
+         while (eval_lt(this->m_mod.backend(), t1) || (t1.compare(this->m_mod.backend()) == 0))
          {
             eval_subtract(t1, this->m_mod.backend());
          }
@@ -105,16 +117,16 @@ class barrett_params : public base_params<Backend>
       }
       else
       {
-         Backend t2;
-         divide_unsigned_helper(&result, result, this->m_mod.backend(), t2);
-         result = t2;
+         eval_modulus(result, this->m_mod.backend());
          return;
       }
    }
 
-   number_type m_mu;
+ protected:
+   cpp_int m_mu; //number_type m_mu;
 };
 }
-} // namespace boost::multiprecision
+}
+} // namespace boost::multiprecision::backends
 
 #endif //_MULTIPRECISION_BARRETT_PARAMS_HPP

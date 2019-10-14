@@ -1,5 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2011 John Maddock. Distributed under the Boost
+//  Copyright (c) 2019 Nil Foundation AG
+//  Copyright (c) 2019 Mikhail Komarov <nemo@nilfoundation.org>
+//  Copyright (c) 2019 Alexey Moskvin
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -587,6 +590,12 @@ void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_
 
    generic_interconvert_complex_to_scalar(to, from, mpl::bool_<boost::is_same<component_backend, To>::value>(), mpl::bool_<boost::is_constructible<To, const component_backend&>::value>());
 }
+template <class To, class From>
+void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_integer>& /*to_type*/, const mpl::int_<number_kind_modular>& /*from_type*/)
+{
+   from.mod_data().adjust_regular(to, from.base_data());
+}
+
 
 }
 }

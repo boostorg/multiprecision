@@ -16,24 +16,28 @@
 
 namespace boost {
 namespace multiprecision {
+
 template <typename Backend>
-class modular_params : public montgomery_params<Backend>, public barrett_params<Backend>
+class modular_params : public backends::montgomery_params<Backend>, public backends::barrett_params<Backend>
 {
    typedef number<Backend> number_type;
 
  public:
-   modular_params() : montgomery_params<Backend>(), barrett_params<Backend>() {}
+   modular_params() : backends::montgomery_params<Backend>(), backends::barrett_params<Backend>() {}
 
    template <typename Number>
-   explicit modular_params(const Number& p) : montgomery_params<Backend>(p), barrett_params<Backend>(p)
+   explicit modular_params(const Number& p) : backends::montgomery_params<Backend>(number_type(p)), backends::barrett_params<Backend>(number_type(p))
    {
    }
 
-   template <class V>
-   modular_params& operator=(const V& v)
+   modular_params& operator=(const modular_params<Backend>& v) = default;
+
+   template <class Number>
+   modular_params& operator=(const Number& v)
    {
-      this->initialize_barrett_params(v);
-      this->initialize_montgomery_params(v);
+      number_type tmp(v);
+      this->initialize_barrett_params(tmp);
+      this->initialize_montgomery_params(tmp);
       return *this;
    }
 
@@ -70,14 +74,26 @@ class modular_params : public montgomery_params<Backend>, public barrett_params<
 
    number_type get_mod() const
    {
-      return montgomery_params<Backend>::mod() | barrett_params<Backend>::mod();
+      return backends::montgomery_params<Backend>::mod() | backends::barrett_params<Backend>::mod();
    }
 
    template <typename BackendT, expression_template_option ExpressionTemplates>
    operator number<BackendT, ExpressionTemplates>()
    {
-      return this->m_mod;
+      return get_mod();
    };
+
+   int compare(const modular_params<Backend>& o) const
+   {
+      // They are either equal or not:
+      return (get_mod().compare(o.get_mod()));
+   }
+
+   friend std::ostream& operator<<(std::ostream& o, modular_params<Backend> const& a)
+   {
+      o << a.get_mod();
+      return o;
+   }
 };
 }
 } // namespace boost::multiprecision

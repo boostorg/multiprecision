@@ -1520,12 +1520,25 @@ if(TOMMATH_COMPILED)
     add_dependencies(multiprecision_test_suite_examples multiprecision_test_tommath_snips)
 endif()
 
-if(GMP_COMPILED AND TOMMATH_COMPILED)
-    cm_test(NAME multiprecision_test_test_modular_adapter SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_modular_adaptor.cpp)
-    target_link_libraries(multiprecision_test_test_modular_adapter ${GMP_LIBRARIES} ${TomMath_LIBRARIES})
-    target_include_directories(multiprecision_test_test_modular_adapter PRIVATE ${GMP_INCLUDE_DIRS})
-    target_include_directories(multiprecision_test_test_modular_adapter PRIVATE ${TomMath_INCLUDE_DIRS})
+
+cm_test(NAME multiprecision_test_test_modular_adapter_cpp_int SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_modular_adaptor.cpp)
+target_compile_definitions(multiprecision_test_test_modular_adapter_cpp_int PUBLIC -DTEST_CPP_INT)
+target_link_libraries(multiprecision_test_test_modular_adapter_cpp_int no_eh_support)
+
+if(GMP_COMPILED)
+    cm_test(NAME multiprecision_test_test_modular_adapter_gmp SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_modular_adaptor.cpp)
+    target_link_libraries(multiprecision_test_test_modular_adapter_gmp ${GMP_LIBRARIES})
+    target_include_directories(multiprecision_test_test_modular_adapter_gmp PRIVATE ${GMP_INCLUDE_DIRS})
+    target_compile_definitions(multiprecision_test_test_modular_adapter_gmp PUBLIC -DTEST_GMP)
 endif()
+
+if(TOMMATH_COMPILED)
+    cm_test(NAME multiprecision_test_test_modular_adapter_tommath SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_modular_adaptor.cpp)
+    target_link_libraries(multiprecision_test_test_modular_adapter_tommath ${TomMath_LIBRARIES})
+    target_include_directories(multiprecision_test_test_modular_adapter_tommath PRIVATE ${TomMath_INCLUDE_DIRS})
+    target_compile_definitions(multiprecision_test_test_modular_adapter_tommath PUBLIC -DTEST_TOMMATH)
+endif()
+
 
 include_directories(${CMAKE_WORKSPACE_SOURCES_DIR})
 
