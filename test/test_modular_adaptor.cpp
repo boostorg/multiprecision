@@ -8,6 +8,9 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
+//#include <boost/test/unit_test.hpp>
+//#include <boost/test/data/test_case.hpp>
+
 #include <iostream>
 #include <vector>
 
@@ -137,7 +140,6 @@ void bitwise_operators() {
          else
             mod_string = even_mod[current_number_size];
 
-
          standart_number a_s(a_string), b_s(b_string), mod_s(mod_string), result_s(0);
          params_number mod(mod_s);
          modular_number a(a_s, mod), b(b_s, mod), result(0, mod);
@@ -185,7 +187,7 @@ void run_tests()
 
 int main() {
 #ifdef TEST_CPP_INT
-   run_tests<cpp_int_backend<> >();
+     run_tests<cpp_int_backend<> >();
 #endif
 
 #ifdef TEST_GMP

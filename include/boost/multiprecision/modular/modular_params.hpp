@@ -28,9 +28,22 @@ class modular_params : public backends::montgomery_params<Backend>, public backe
    template <typename Number>
    explicit modular_params(const Number& p) : backends::montgomery_params<Backend>(number_type(p)), backends::barrett_params<Backend>(number_type(p))
    {
+
    }
 
-   modular_params& operator=(const modular_params<Backend>& v) = default;
+   modular_params& operator=(const modular_params<Backend>& v)
+   {
+      backends::montgomery_params<Backend>::m_mod = v.get_mod();
+      backends::barrett_params<Backend>::m_mod = v.get_mod();
+
+      this->m_mu = v.mu();
+
+      this->m_r2 = v.r2();
+      this->m_p_dash = v.p_dash();
+      this->m_p_words = v.p_words();
+
+      return *this;
+   }
 
    template <class Number>
    modular_params& operator=(const Number& v)
