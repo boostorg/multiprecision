@@ -98,6 +98,7 @@ test-suite examples :
       [ run hypergeometric_luke_algorithms.cpp no_eh_eg_support ../../chrono/build//boost_chrono ../../system/build//boost_system : : : [ requires cxx11_nullptr ]  ]
       [ run integer_examples.cpp no_eh_eg_support ]
       [ run logged_adaptor.cpp no_eh_eg_support mpfi mpfr gmp :  :  : [ check-target-builds ../config//has_mpfi : : <build>no ] ]
+      [ run modular_examples.cpp no_eh_eg_support ]
       [ run mixed_integer_arithmetic.cpp no_eh_eg_support ]
       [ run numeric_limits_snips.cpp no_eh_eg_support /boost//test_exec_monitor : : : [ requires cxx11_numeric_limits ]  [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
       [ run random_snips.cpp gmp no_eh_eg_support : : : [ requires cxx11_explicit_conversion_operators ] [ check-target-builds ../config//has_gmp : : <build>no ] ]

@@ -15,8 +15,8 @@
 
 #include <boost/type_traits/is_integral.hpp>
 
-#include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
 #include <boost/multiprecision/modular/base_params.hpp>
 #include <boost/multiprecision/modular/barrett_params.hpp>
 
