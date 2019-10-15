@@ -47,33 +47,33 @@ class modular_params<gmp_int> : public backends::base_params<gmp_int>
       return *this;
    }
 
-   void reduce(gmp_int& result) const
+   inline void reduce(gmp_int& result) const
    {
       mpz_mod(result.data(), result.data(), get_mod().backend().data());
    }
 
-   void adjust_modular(gmp_int& result)
+   inline void adjust_modular(gmp_int& result)
    {
       mpz_mod(result.data(), result.data(), get_mod().backend().data());
    }
 
-   void adjust_regular(gmp_int& result, const gmp_int& input) const
+   inline void adjust_regular(gmp_int& result, const gmp_int& input) const
    {
       result = input;
    }
 
-   number_type get_mod() const
+   inline number_type get_mod() const
    {
       return base_params<gmp_int>::mod();
    }
 
-   template <typename BackendT, expression_template_option ExpressionTemplates>
-   operator number<BackendT, ExpressionTemplates>()
+   template <typename BackendType, expression_template_option ExpressionTemplates>
+   inline operator number<BackendType, ExpressionTemplates>()
    {
       return this->m_mod;
    };
 
-   int compare(const modular_params<gmp_int>& o) const
+   inline int compare(const modular_params<gmp_int>& o) const
    {
       // They are either equal or not:
       return (get_mod().compare(o.mod()));

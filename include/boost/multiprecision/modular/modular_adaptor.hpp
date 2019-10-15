@@ -34,13 +34,13 @@ class modular_adaptor
    modular_params<Backend> m_mod;
 
  public:
-   Backend& base_data() { return m_base; }
+   inline Backend& base_data() { return m_base; }
 
-   Backend const& base_data() const { return m_base; }
+   inline Backend const& base_data() const { return m_base; }
 
-   modular_params<Backend>& mod_data() { return m_mod; }
+   inline modular_params<Backend>& mod_data() { return m_mod; }
 
-   const modular_params<Backend>& mod_data() const { return m_mod; }
+   inline const modular_params<Backend>& mod_data() const { return m_mod; }
 
    typedef typename Backend::signed_types   signed_types;
    typedef typename Backend::unsigned_types unsigned_types;
@@ -174,20 +174,20 @@ class modular_adaptor
       return tmp.compare(val);
    }
 
-   void swap(modular_adaptor& o)
+   inline void swap(modular_adaptor& o)
    {
       base_data().swap(o.base_data());
       std::swap(mod_data(), o.mod_data());
    }
 
-   std::string str(std::streamsize dig, std::ios_base::fmtflags f) const
+   inline std::string str(std::streamsize dig, std::ios_base::fmtflags f) const
    {
       Backend tmp;
       mod_data().adjust_regular(tmp, base_data());
       return tmp.str(dig, f);
    }
 
-   void negate()
+   inline void negate()
    {
       base_data().negate();
       eval_add(base_data(), mod_data().get_mod().backend());
