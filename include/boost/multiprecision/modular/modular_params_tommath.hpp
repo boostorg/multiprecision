@@ -44,22 +44,22 @@ class modular_params<tommath_int> : public backends::base_params<tommath_int>
       return *this;
    }
 
-   void reduce(tommath_int& result) const
+   inline void reduce(tommath_int& result) const
    {
       backends::detail::check_tommath_result(mp_mod(const_cast< ::mp_int*>(&result.data()), const_cast< ::mp_int*>(&get_mod().backend().data()), &result.data()));
    }
 
-   void adjust_modular(tommath_int& result)
+   inline void adjust_modular(tommath_int& result)
    {
       backends::detail::check_tommath_result(mp_mod(const_cast< ::mp_int*>(&result.data()), const_cast< ::mp_int*>(&get_mod().backend().data()), &result.data()));
    }
 
-   void adjust_regular(tommath_int& result, const tommath_int& input) const
+   inline void adjust_regular(tommath_int& result, const tommath_int& input) const
    {
       result = input;
    }
 
-   number_type get_mod() const
+   inline number_type get_mod() const
    {
       return base_params<tommath_int>::mod();
    }
@@ -70,7 +70,7 @@ class modular_params<tommath_int> : public backends::base_params<tommath_int>
       return this->m_mod;
    };
 
-   int compare(const modular_params<tommath_int>& o) const
+   inline int compare(const modular_params<tommath_int>& o) const
    {
       // They are either equal or not:
       return (get_mod().compare(o.mod()));

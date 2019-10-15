@@ -27,7 +27,7 @@ class barrett_params : public base_params<Backend>
 
  protected:
    template <typename Number>
-   void initialize_barrett_params(const Number& p)
+   inline void initialize_barrett_params(const Number& p)
    {
       using default_ops::eval_bit_set;
       using default_ops::eval_divide;
@@ -49,7 +49,7 @@ class barrett_params : public base_params<Backend>
       initialize_barrett_params(p);
    }
 
-   const number_type& mu() const { return m_mu; }
+   inline const number_type& mu() const { return m_mu; }
 
    template <class V>
    barrett_params& operator=(const V& v)
@@ -62,9 +62,9 @@ class barrett_params : public base_params<Backend>
    {
       using default_ops::eval_add;
       using default_ops::eval_bit_set;
+      using default_ops::eval_decrement;
       using default_ops::eval_lt;
       using default_ops::eval_multiply;
-      using default_ops::eval_decrement;
       using default_ops::eval_subtract;
 
       if (result.size() < this->m_mod.backend().size() || eval_lt(result, this->m_mod.backend()))

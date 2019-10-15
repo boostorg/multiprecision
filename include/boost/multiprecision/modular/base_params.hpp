@@ -22,7 +22,7 @@ class base_params
 
  protected:
    template <typename Number>
-   void initialize_base_params(const Number& mod)
+   inline void initialize_base_params(const Number& mod)
    {
       m_mod = mod;
    }
@@ -36,7 +36,7 @@ class base_params
       initialize_base_params(p);
    }
 
-   const number_type& mod() const { return m_mod; }
+   inline const number_type& mod() const { return m_mod; }
 
  protected:
    number_type m_mod;

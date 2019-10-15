@@ -30,15 +30,16 @@ template <typename Backend>
 class montgomery_params : public base_params<Backend>
 {
    typedef number<Backend> number_type;
+
  protected:
    template <typename Number>
-   void initialize_montgomery_params(const Number& p)
+   inline void initialize_montgomery_params(const Number& p)
    {
       this->initialize_base_params(p);
       find_const_variables(p);
    }
 
-   void initialize_montgomery_params(const montgomery_params<Backend>& p)
+   inline void initialize_montgomery_params(const montgomery_params<Backend>& p)
    {
       this->initialize_base_params(p);
       find_const_variables(p);
@@ -96,16 +97,16 @@ class montgomery_params : public base_params<Backend>
    montgomery_params() : base_params<Backend>() {}
 
    template <typename Number>
-   explicit montgomery_params(const Number& p): base_params<Backend>(p)
+   explicit montgomery_params(const Number& p) : base_params<Backend>(p)
    {
       initialize_montgomery_params(p);
    }
 
-   const number_type& r2() const { return m_r2; }
+   inline const number_type& r2() const { return m_r2; }
 
-   limb_type p_dash() const { return m_p_dash; }
+   inline limb_type p_dash() const { return m_p_dash; }
 
-   size_t p_words() const { return m_p_words; }
+   inline size_t p_words() const { return m_p_words; }
 
    template <class V>
    montgomery_params& operator=(const V& v)
