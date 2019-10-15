@@ -34,7 +34,10 @@ class modular_params<tommath_int> : public backends::base_params<tommath_int>
    {
    }
 
-   modular_params& operator=(const modular_params<tommath_int>& v) = default;
+   modular_params& operator=(const modular_params<tommath_int>& v) {
+      backends::base_params<tommath_int>::m_mod = v.get_mod();
+      return *this;
+   }
 
    template <class Number>
    modular_params& operator=(const Number& v)
