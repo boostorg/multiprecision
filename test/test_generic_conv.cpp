@@ -5,7 +5,7 @@
 //
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
 #include <boost/detail/lightweight_test.hpp>
@@ -33,9 +33,9 @@ int main()
    using namespace boost::random;
 
    independent_bits_engine<mt11213b, 1024, cpp_int> gen;
-   mt11213b small_gen;
+   mt11213b                                         small_gen;
 
-   for(unsigned i = 0; i < 100; ++i)
+   for (unsigned i = 0; i < 100; ++i)
    {
       cpp_int c = gen();
       //
@@ -61,16 +61,16 @@ int main()
       // Now integer to float:
       //
       typedef number<cpp_dec_float<500> > dec_float_500;
-      dec_float_500 df(c);
-      dec_float_500 df2(c.str());
+      dec_float_500                       df(c);
+      dec_float_500                       df2(c.str());
       BOOST_CHECK_EQUAL(df, df2);
       df.assign(-c);
       df2 = -df2;
       BOOST_CHECK_EQUAL(df, df2);
 #ifdef TEST_GMP
       typedef number<gmp_float<500> > mpf_type;
-      mpf_type mpf(c);
-      mpf_type mpf2(c.str());
+      mpf_type                        mpf(c);
+      mpf_type                        mpf2(c.str());
       BOOST_CHECK_EQUAL(mpf, mpf2);
       mpf.assign(-c);
       mpf2 = -mpf2;
@@ -78,8 +78,8 @@ int main()
 #endif
 #ifdef TEST_MPFR
       typedef number<mpfr_float_backend<500> > mpfr_type;
-      mpfr_type mpfr(c);
-      mpfr_type mpfr2(c.str());
+      mpfr_type                                mpfr(c);
+      mpfr_type                                mpfr2(c.str());
       BOOST_CHECK_EQUAL(mpfr, mpfr2);
       mpfr.assign(-c);
       mpfr2 = -mpfr2;
@@ -144,19 +144,19 @@ int main()
       //
       // Float to rational:
       //
-      static const int max_range = std::numeric_limits<double>::digits >= std::numeric_limits<int>::digits ? std::numeric_limits<int>::max() : (1 << (std::numeric_limits<double>::digits - 1)) - 1;
-      static const int min_range = std::numeric_limits<double>::digits >= std::numeric_limits<int>::digits ? std::numeric_limits<int>::min() : -(1 << (std::numeric_limits<double>::digits - 1)) + 1;
+      static const int                                       max_range = std::numeric_limits<double>::digits >= std::numeric_limits<int>::digits ? (std::numeric_limits<int>::max)() : (1 << (std::numeric_limits<double>::digits - 1)) - 1;
+      static const int                                       min_range = std::numeric_limits<double>::digits >= std::numeric_limits<int>::digits ? (std::numeric_limits<int>::min)() : -(1 << (std::numeric_limits<double>::digits - 1)) + 1;
       static const boost::random::uniform_int_distribution<> i_val_dist(min_range, max_range);
       static const boost::random::uniform_int_distribution<> i_exp_dist(std::numeric_limits<double>::min_exponent, std::numeric_limits<double>::max_exponent - 2 - std::numeric_limits<int>::digits);
-      int iv = i_val_dist(small_gen);
-      int eval = i_exp_dist(small_gen);
-      double dv = iv;
-      dv = ldexp(dv, eval);
-      cppr = dv;
-      cppr2 = iv;
-      cpp_int cppi = 1;
+      int                                                    iv   = i_val_dist(small_gen);
+      int                                                    eval = i_exp_dist(small_gen);
+      double                                                 dv   = iv;
+      dv                                                          = ldexp(dv, eval);
+      cppr                                                        = dv;
+      cppr2                                                       = iv;
+      cpp_int cppi                                                = 1;
       cppi <<= abs(eval);
-      if(eval < 0)
+      if (eval < 0)
          cppr2 /= cppi;
       else
          cppr2 *= cppi;
@@ -164,12 +164,12 @@ int main()
       //
       // Again but with bigger numbers:
       //
-      cpp_int cppi2 = gen();
+      cpp_int                      cppi2 = gen();
       number<cpp_bin_float<1030> > cppbf(cppi2);
       cppbf = ldexp(cppbf, eval);
       cppr.assign(cppbf);
       cppr2 = cppi2;
-      if(eval < 0)
+      if (eval < 0)
          cppr2 /= cppi;
       else
          cppr2 *= cppi;
@@ -190,9 +190,9 @@ int main()
       cppdec2 = scalbn(cppdec2, eval);
       cppr.assign(cppdec2);
       cppr2 = cppi2;
-      cppi = 10;
-      cppi = pow(cppi, abs(eval));
-      if(eval < 0)
+      cppi  = 10;
+      cppi  = pow(cppi, abs(eval));
+      if (eval < 0)
          cppr2 /= cppi;
       else
          cppr2 *= cppi;
@@ -202,6 +202,3 @@ int main()
 
    return boost::report_errors();
 }
-
-
-

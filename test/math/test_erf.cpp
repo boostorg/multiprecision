@@ -17,62 +17,62 @@ void expected_results()
    // various compilers and platforms.
    //
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*gmp_float<18>.*",           // test type(s)
-      "Erf Function:.*",             // test data group
-      "erfc?", 2200, 1500);// test function
+       ".*",                 // compiler
+       ".*",                 // stdlib
+       ".*",                 // platform
+       ".*gmp_float<18>.*",  // test type(s)
+       "Erf Function:.*",    // test data group
+       "erfc?", 2200, 1500); // test function
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*gmp_float<18>.*",           // test type(s)
-      "Inverse Erf.*",               // test data group
-      "erfc?_inv", 2200, 1500);  // test function
+       ".*",                     // compiler
+       ".*",                     // stdlib
+       ".*",                     // platform
+       ".*gmp_float<18>.*",      // test type(s)
+       "Inverse Erf.*",          // test data group
+       "erfc?_inv", 2200, 1500); // test function
 #ifdef BOOST_INTEL
-      add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      "float128",                          // test type(s)
-      "Erf Function:.*",             // test data group
-      "erfc?", 15000, 1000); // test function
+   add_expected_result(
+       ".*",                  // compiler
+       ".*",                  // stdlib
+       ".*",                  // platform
+       "float128",            // test type(s)
+       "Erf Function:.*",     // test data group
+       "erfc?", 15000, 1000); // test function
 #endif
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*cpp_bin_float.*",           // test type(s)
-      "Erf Function:.*",             // test data group
-      "erfc?", 3000, 1000); // test function
+       ".*",                 // compiler
+       ".*",                 // stdlib
+       ".*",                 // platform
+       ".*cpp_bin_float.*",  // test type(s)
+       "Erf Function:.*",    // test data group
+       "erfc?", 3000, 1000); // test function
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*mpfr_float_backend<0>.*",   // test type(s)
-      ".*",                          // test data group
-      ".*", 600, 100);                // test function
+       ".*",                        // compiler
+       ".*",                        // stdlib
+       ".*",                        // platform
+       ".*mpfr_float_backend<0>.*", // test type(s)
+       ".*",                        // test data group
+       ".*", 600, 100);             // test function
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*",                          // test type(s)
-      "Erf Function:.*",             // test data group
-      "erfc?", 300, 200); // test function
+       ".*",               // compiler
+       ".*",               // stdlib
+       ".*",               // platform
+       ".*",               // test type(s)
+       "Erf Function:.*",  // test data group
+       "erfc?", 300, 200); // test function
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*",                          // test type(s)
-      "Inverse Erf.*",               // test data group
-      "erfc?_inv", 60, 20);  // test function
+       ".*",                 // compiler
+       ".*",                 // stdlib
+       ".*",                 // platform
+       ".*",                 // test type(s)
+       "Inverse Erf.*",      // test data group
+       "erfc?_inv", 60, 20); // test function
    //
    // Finish off by printing out the compiler/stdlib/platform names,
    // we do this to make it easier to mark up expected error rates.
    //
    std::cout << "Tests run with " << BOOST_COMPILER << ", "
-      << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
+             << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
 }
 
 template <class T>
@@ -81,8 +81,7 @@ void test(T t, const char* p)
    test_erf(t, p);
 }
 
-
-BOOST_AUTO_TEST_CASE( test_main )
+BOOST_AUTO_TEST_CASE(test_main)
 {
    using namespace boost::multiprecision;
    expected_results();
@@ -94,4 +93,3 @@ BOOST_AUTO_TEST_CASE( test_main )
    //
    ALL_TESTS
 }
-

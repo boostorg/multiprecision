@@ -1,6 +1,6 @@
 [/
   Copyright 2011, 2013 John Maddock.
-  Copyright 2013 Paul A. Bristow.
+  Copyright 2013 - 2019 Paul A. Bristow.
   Copyright 2013 Christopher Kormanyos.
 
   Distributed under the Boost Software License, Version 1.0.
@@ -21,7 +21,7 @@
     [/last-revision $Date: 2011-07-08 18:51:46 +0100 (Fri, 08 Jul 2011) $]
 ]
 
-[import html4_symbols.qbk]
+[import html4_symbols.qbk] [/Ideally this should be the same as Boost.Math I:\boost\libs\math\doc]
 
 [import ../example/gmp_snips.cpp]
 [import ../example/mpfr_snips.cpp]
@@ -44,7 +44,10 @@
 [import ../example/complex128_examples.cpp]
 [import ../example/eigen_example.cpp]
 [import ../example/mpfr_precision.cpp]
+[import ../example/constexpr_float_arithmetic_examples.cpp]
+[import ../test/constexpr_test_cpp_int_5.cpp]
 
+[/External links as templates (see also some defs below)]
 [template mpfr[] [@http://www.mpfr.org MPFR]]
 [template mpc[] [@http://www.multiprecision.org MPC]]
 [template mpfi[] [@http://perso.ens-lyon.fr/nathalie.revol/software.html MPFI]]
@@ -59,6 +62,10 @@
 [template super[x]'''<superscript>'''[x]'''</superscript>''']
 [template sub[x]'''<subscript>'''[x]'''</subscript>''']
 
+
+[/insert Equation as a PNG or SVG image, previous generated with an external tool like Latex.]
+[/Used thus [equation ellint6]  - without the file type suffix which will chosen automatically.]
+
 [template equation[name]  '''<inlinemediaobject>
 <imageobject role="html">
 <imagedata fileref="../'''[name]'''.png"></imagedata>
@@ -68,6 +75,20 @@
 </imageobject>
 </inlinemediaobject>''']
 
+[/insert Indented one-line expression italic and serif font probably using Unicode symbols for Greek and symbols.]
+[/Example: [expression [sub 1]F[sub 0](a, z) = (1-z)[super -a]]]
+[template expression[equation] 
+[:
+[role serif_italic [equation]]
+]
+[/ Hint you may need to enclose equation in brackets if it contains comma(s) to avoid "error invalid number of arguments"]
+]
+
+[def __tick [role aligncenter [role green \u2714]]] [/ u2714 is a HEAVY CHECK MARK tick (2713 check mark), green]
+[def __cross [role aligncenter [role red \u2718]]] [/ u2718 is a heavy cross, red]
+[def __star [role aligncenter [role red \u2736]]] [/ 6-point star red ]
+
+[/Boost.Multiprecision internals links]
 [def __cpp_int [link boost_multiprecision.tut.ints.cpp_int cpp_int]]
 [def __gmp_int [link boost_multiprecision.tut.ints.gmp_int gmp_int]]
 [def __tom_int [link boost_multiprecision.tut.ints.tom_int tom_int]]
@@ -91,6 +112,12 @@
 [def __complex128 [link boost_multiprecision.tut.complex.complex128 complex128]]
 [def __complex_adaptor [link boost_multiprecision.tut.complex.complex_adaptor complex_adaptor]]
 
+[/External links as macro definitions.]
+[def __expression_template [@https://en.wikipedia.org/wiki/Expression_templates expression template]]
+[def __expression_templates [@https://en.wikipedia.org/wiki/Expression_templates expression templates]] [/plural version]
+[def __UDT [@http://eel.is/c++draft/definitions#defns.prog.def.type program-defined type]]
+[def __fundamental_type [@https://en.cppreference.com/w/cpp/language/types fundamental (built-in) type]]
+
 [section:intro Introduction]
 
 The Multiprecision Library provides [link boost_multiprecision.tut.ints integer],
@@ -101,8 +128,8 @@ range and precision than C++'s ordinary built-in types.
 The big number types in Multiprecision can be used with a wide
 selection of basic mathematical operations, elementary transcendental
 functions as well as the functions in Boost.Math.
-The Multiprecision types can also interoperate with the
-built-in types in C++ using clearly defined conversion rules.
+The Multiprecision types can also interoperate with any
+__fundamental_type in C++ using clearly defined conversion rules.
 This allows Boost.Multiprecision to be used for all
 kinds of mathematical calculations involving integer,
 rational and floating-point types requiring extended
@@ -110,20 +137,20 @@ range and precision.
 
 Multiprecision consists of a generic interface to the
 mathematics of large numbers as well as a selection of
-big number back ends, with support for integer, rational,
+big number back-ends, with support for integer, rational,
 floating-point, and complex types. Boost.Multiprecision provides a selection
-of back ends provided off-the-rack in including
+of back-ends provided off-the-rack in including
 interfaces to GMP, MPFR, MPIR, MPC, TomMath as well as
-its own collection of Boost-licensed, header-only back ends for
-integers, rationals and floats. In addition, user-defined back ends
+its own collection of Boost-licensed, header-only back-ends for
+integers, rationals and floats. In addition, user-defined back-ends
 can be created and used with the interface of Multiprecision,
 provided the class implementation adheres to the necessary
 [link boost_multiprecision.ref.backendconc concepts].
 
 Depending upon the number type, precision may be arbitrarily large
 (limited only by available memory), fixed at compile time
-(for example 50 or 100 decimal digits), or a variable controlled at run-time
-by member functions. The types are expression-template-enabled for
+(for example, 50 or 100 decimal digits), or a variable controlled at run-time
+by member functions. The types are __expression_templates - enabled for
 better performance than naive user-defined types.
 
 The Multiprecision library comes in two distinct parts:
@@ -139,36 +166,57 @@ unconstrained license.
 Which is to say some back-ends rely on 3rd party libraries,
 but a header-only Boost license version is always available (if somewhat slower).
 
-Should you just wish to cut to the chase and use a fully Boost-licensed number type, then skip to
-__cpp_int for multiprecision integers, __cpp_rational for rational types,
-__cpp_dec_float for multiprecision floating-point types
-and __cpp_complex for complex types.
+[h5:getting_started Getting started with Boost.Multiprecision]
 
-The library is often used via one of the predefined typedefs: for example if you wanted an
+Should you just wish to 'cut to the chase' just to get bigger integers and/or bigger and more precise reals as simply and portably as possible,
+close to 'drop-in' replacements for the __fundamental_type analogs,
+then use a fully Boost-licensed number type, and skip to one of more of :
+
+* __cpp_int for multiprecision integers, 
+* __cpp_rational for rational types,
+* __cpp_bin_float and __cpp_dec_float for multiprecision floating-point types,  
+* __cpp_complex for complex types.
+
+The library is very often used via one of the predefined convenience `typedef`s 
+like `boost::multiprecision::int128_t` or `boost::multiprecision::cpp_bin_float_quad`.
+
+For example, if you want a signed, 128-bit fixed size integer:
+
+   #include <boost/multiprecision/cpp_int.hpp>  //  Integer types.
+   
+   boost::multiprecision::int128_t my_128_bit_int;
+
+Alternatively, and more adventurously, if you wanted an
 [@http://en.wikipedia.org/wiki/Arbitrary-precision_arithmetic arbitrary precision]
 integer type using [gmp] as the underlying implementation then you could use:
 
    #include <boost/multiprecision/gmp.hpp>  // Defines the wrappers around the GMP library's types
 
    boost::multiprecision::mpz_int myint;    // Arbitrary precision integer type.
+   
+Or for a simple, portable 128-bit floating-point close to a drop-in for a __fundamental_type like `double`, usually 64-bit   
 
-Alternatively, you can compose your own multiprecision type, by combining `number` with one of the
+   #include <boost/multiprecision/cpp_bin_float.hpp>
+   
+   boost::multiprecision::cpp_bin_float_quad my_quad_real;  
+
+Alternatively, you can compose your own 'custom' multiprecision type, by combining `number` with one of the
 predefined back-end types.  For example, suppose you wanted a 300 decimal digit floating-point type
-based on the [mpfr] library. In this case, there's no predefined typedef with that level of precision,
+based on the [mpfr] library. In this case, there's no predefined `typedef` with that level of precision,
 so instead we compose our own:
 
-   #include <boost/multiprecision/mpfr.hpp>  // Defines the Backend type that wraps MPFR
+   #include <boost/multiprecision/mpfr.hpp>  // Defines the Backend type that wraps MPFR.
 
    namespace mp = boost::multiprecision;     // Reduce the typing a bit later...
 
    typedef mp::number<mp::mpfr_float_backend<300> >  my_float;
 
-   my_float a, b, c; // These variables have 300 decimal digits precision
+   my_float a, b, c; // These variables have 300 decimal digits precision.
 
 We can repeat the above example, but with the expression templates disabled (for faster compile times, but slower runtimes)
 by passing a second template argument to `number`:
 
-   #include <boost/multiprecision/mpfr.hpp>  // Defines the Backend type that wraps MPFR
+   #include <boost/multiprecision/mpfr.hpp>  // Defines the Backend type that wraps MPFR.
 
    namespace mp = boost::multiprecision;     // Reduce the typing a bit later...
 
@@ -233,7 +281,7 @@ a programming error and all of our backends will trigger an assertion if any oth
 allows for optimal performance on move-construction (i.e. no allocation required, we just take ownership of the existing
 object's internal state), while maintaining usability in the standard library containers.
 
-[h4 Expression Templates]
+[h4:expression_templates Expression Templates]
 
 Class `number` is expression-template-enabled: that means that rather than having a multiplication
 operator that looks like this:
@@ -251,12 +299,12 @@ Instead the operator looks more like this:
    template <class Backend>
    ``['unmentionable-type]`` operator * (const number<Backend>& a, const number<Backend>& b);
 
-Where the "unmentionable" return type is an implementation detail that, rather than containing the result
+Where the '['unmentionable]' return type is an implementation detail that, rather than containing the result
 of the multiplication, contains instructions on how to compute the result.  In effect it's just a pair
 of references to the arguments of the function, plus some compile-time information that stores what the operation
 is.
 
-The great advantage of this method is the ['elimination of temporaries]: for example the "naive" implementation
+The great advantage of this method is the ['elimination of temporaries]: for example, the "naive" implementation
 of `operator*` above, requires one temporary for computing the result, and at least another one to return it.  It's true
 that sometimes this overhead can be reduced by using move-semantics, but it can't be eliminated completely.  For example,
 lets suppose we're evaluating a polynomial via Horner's method, something like this:
@@ -275,7 +323,7 @@ temporaries to pretty much zero).  Note that if we compile with expression templ
 on, then actually still have no wasted memory allocations as even though temporaries are created, their contents are moved
 rather than copied.
 [footnote The actual number generated will depend on the compiler, how well it optimizes the code, and whether it supports
-rvalue references.  The number of 11 temporaries was generated with Visual C++ 10]
+rvalue references.  The number of 11 temporaries was generated with Visual C++ 2010.]
 
 [important
 Expression templates can radically reorder the operations in an expression, for example:
@@ -343,20 +391,20 @@ internally by the Boost.Math library.
 
 unless you're absolutely sure that the lifetimes of `a`, `b` and `c` will outlive that of `my_expression`.
 
-In fact it is particularly easy to create dangling references by mixing expression templates with the auto
+In fact, it is particularly easy to create dangling references by mixing expression templates with the `auto`
 keyword, for example:
 
 `auto val = cpp_dec_float_50("23.1") * 100;`
 
-In this situation the integer literal is stored directly in the expression template - so its use is OK here -
-but the cpp_dec_float_50 temporary is stored by reference and then destructed when the statement completes
+In this situation, the integer literal is stored directly in the expression template - so its use is OK here -
+but the `cpp_dec_float_50` temporary is stored by reference and then destructed when the statement completes,
 leaving a dangling reference.
 
-[*['If in doubt, do not ever mix expression templates with the auto keyword.]]
+[*['If in doubt, do not ever mix expression templates with the `auto` keyword.]]
 ]
 
 And finally... the performance improvements from an expression template library like this are often not as
-dramatic as the reduction in number of temporaries would suggest.  For example if we compare this library with
+dramatic as the reduction in number of temporaries would suggest.  For example, if we compare this library with
 [mpfr_class] and [mpreal], with all three using the underlying [mpfr] library at 50 decimal digits precision then
 we see the following typical results for polynomial execution:
 
@@ -575,10 +623,17 @@ there is no step change in behavior as a cpp_int grows in size.
 [link boost_multiprecision.tut.lits here] for the full description.  For example `0xfffff_cppi1024`
 specifies a 1024-bit integer with the value 0xffff.  This can be used to generate compile time constants that are
 too large to fit into any built in number type.
+* The __cpp_int types support constexpr arithmetic, provided it is a fixed precision type with no allocator.  It may also
+be a checked integer: in which case a compiler error will be generated on overflow or undefined behaviour.  In addition
+the free functions `abs`, `swap`, `multiply`, `add`, `subtract`, `divide_qr`, `integer_modulus`, `powm`, `lsb`, `msb`, 
+`bit_test`, `bit_set`, `bit_unset`, `bit_flip`, `sqrt`, `gcd`, `lcm` are all supported.  Use of __cpp_int in this way
+requires either a C++2a compiler (one which supports `std::is_constant_evaluated()`), or GCC-6 or later in C++14 mode.
+Compilers other than GCC and without `std::is_constant_evaluated()` will support a very limited set of operations:
+expect to hit roadblocks rather easily.
 * You can import/export the raw bits of a __cpp_int to and from external storage via the `import_bits` and `export_bits`
 functions.  More information is in the [link boost_multiprecision.tut.import_export section on import/export].
 
-[h5 Example:]
+[h5:cpp_int_eg Example:]
 
 [cpp_int_eg]
 
@@ -625,7 +680,7 @@ is recommended on Win32.
 
 [mpz_eg]
 
-[endsect]
+[endsect] [/section:gmp_int gmp_int]
 
 [section:tom_int tom_int]
 
@@ -1019,6 +1074,9 @@ Things you should know when using this type:
 
 * Default constructed `float128`s have the value zero.
 * This backend supports rvalue-references and is move-aware, making instantiations of `number` on this backend move aware.
+* This type is fully `constexpr` aware - basic constexpr arithmetic is supported from C++14 and onwards, comparisons,
+plus the functions `fabs`, `abs`, `fpclassify`, `isnormal`, `isfinite`, `isinf` and `isnan` are also supported if either
+the compiler implements C++20's `std::is_constant_evaluated()`, or if the compiler is GCC.
 * It is not possible to round-trip objects of this type to and from a string and get back
 exactly the same value when compiled with Intel's C++ compiler and using `_Quad` as the underlying type: this is a current limitation of
 our code.  Round tripping when using `__float128` as the underlying type is possible (both for GCC and Intel).
@@ -1026,10 +1084,13 @@ our code.  Round tripping when using `__float128` as the underlying type is poss
 as a valid floating-point number.
 * Division by zero results in an infinity being produced.
 * Type `float128` can be used as a literal type (constexpr support).
+* Type `float128` can be used for full `constexpr` arithmetic from C++14 and later with GCC.  The functions `abs`, `fabs`, 
+`fpclassify`, `isnan`, `isinf`, `isfinite` and `isnormal` are also `constexpr`, but the transcendental functions are not.
 * When using the Intel compiler, the underlying type defaults to `__float128` if it's available and `_Quad` if not.  You can override
 the default by defining either `BOOST_MP_USE_FLOAT128` or `BOOST_MP_USE_QUAD`.
 * When the underlying type is Intel's `_Quad` type, the code must be compiled with the compiler option `-Qoption,cpp,--extended_float_type`.
-* When compiling with `gcc`, you need to use the flag `--std=gnu++11/14/17`, as the numeric literal operator 'operator""Q' is a GNU extension. Compilation fails with the flag `--std=c++11/14/17`.
+* When compiling with `gcc`, you need to use the flag `--std=gnu++11/14/17`, as the suffix 'Q' is a GNU extension. Compilation fails with the flag `--std=c++11/14/17`
+unless you also use `-fext-numeric-literals`.
 
 [h5 float128 example:]
 
@@ -1112,9 +1173,9 @@ to provide an real-number type that is a drop-in replacement for the native C++ 
 much greater precision and implementing interval arithmetic.
 
 Type `mpfi_float_backend` can be used at fixed precision by specifying a non-zero `Digits10` template parameter, or
-at variable precision by setting the template argument to zero.  The typedefs mpfi_float_50, mpfi_float_100,
-mpfi_float_500, mpfi_float_1000 provide arithmetic types at 50, 100, 500 and 1000 decimal digits precision
-respectively.  The typedef mpfi_float provides a variable precision type whose precision can be controlled via the
+at variable precision by setting the template argument to zero.  The `typedef`s `mpfi_float_50`, `mpfi_float_100`,
+`mpfi_float_500`, `mpfi_float_1000` provide arithmetic types at 50, 100, 500 and 1000 decimal digits precision
+respectively.  The `typedef mpfi_float` provides a variable precision type whose precision can be controlled via the
 `number`s member functions.
 
 [note This type only provides `numeric_limits` support when the precision is fixed at compile time.]
@@ -1983,32 +2044,34 @@ The following example searches for a prime `p` for which `(p-1)/2` is also proba
 
 [section:lits Literal Types and `constexpr` Support]
 
-[note The features described in this section make heavy use of C++11 language features, currently
-(as of May 2013) only
-GCC-4.7 and later, and Clang 3.3 and later have the support required to make these features work.]
+There are two kinds of `constexpr` support in this library:
 
-There is limited support for `constexpr` and user-defined literals in the library, currently the
-`number` front end supports `constexpr`
-on default construction and all forwarding constructors, but not on any of the non-member operators.  So if
-some type `B` is a literal type, then `number<B>` is also a literal type, and you will be able to
-compile-time-construct such a type from any literal that `B` is compile-time-constructible from.
-However, you will not be able to perform compile-time arithmetic on such types.
+* The more basic version requires only C++11 and allow the construction of some number types as literals.
+* The more advanced support permits constexpr arithmetic and requires at least C++14 
+constexpr support, and for many operations C++2a support
 
-Currently the only backend type provided by the library that is also a literal type are instantiations
-of `cpp_int_backend` where the Allocator parameter is type `void`, and the Checked parameter is
-`boost::multiprecision::unchecked`.
+[h4 Declaring numeric literals]
+
+There are two backend types which are literals:
+
+* __float128 (which requires GCC), and
+* Instantiations of `cpp_int_backend` where the Allocator parameter is type `void`.
+In addition, prior to C++14 the Checked parameter must be `boost::multiprecision::unchecked`.
 
 For example:
 
    using namespace boost::multiprecision;
 
+   constexpr float128            f = 0.1Q   // OK, float128's are always literals in C++11
+
    constexpr int128_t            i = 0;     // OK, fixed precision int128_t has no allocator.
    constexpr uint1024_t          j = 0xFFFFFFFF00000000uLL;  // OK, fixed precision uint1024_t has no allocator.
 
-   constexpr checked_uint128_t   k = -1; // Error, checked type is not a literal type as we need runtime error checking.
+   constexpr checked_uint128_t   k = 1; // OK from C++14 and later, not supported for C++11.
+   constexpr checked_uint128_t   k = -1; // Error, as this would normally lead to a runtime failure (exception).
    constexpr cpp_int             l = 2;  // Error, type is not a literal as it performs memory management.
 
-There is also limited support for user defined-literals - these are limited to unchecked, fixed precision `cpp_int`'s
+There is also support for user defined-literals with __cpp_int - these are limited to unchecked, fixed precision `cpp_int`'s
 which are specified in hexadecimal notation.  The suffixes supported are:
 
 [table
@@ -2042,8 +2105,8 @@ Examples:
    // Smaller values can be assigned to larger values:
    int256_t c = 0x1234_cppi; // OK
    //
-   // However, this does not currently work in constexpr contexts:
-   constexpr int256_t d = 0x1_cppi; // Compiler error
+   // However, this only works in constexpr contexts from C++14 onwards:
+   constexpr int256_t d = 0x1_cppi; // Compiler error in C++11, requires C++14
    //
    // Constants can be padded out with leading zeros to generate wider types:
    constexpr uint256_t e = 0x0000000000000000000000000000000000000000000FFFFFFFFFFFFFFFFFFFFF_cppui; // OK
@@ -2069,11 +2132,72 @@ Examples:
    // Which means this also works:
    constexpr int1024_t j = -g;   // OK: unary minus operator is constexpr.
 
+[h4 constexpr arithmetic]
+
+The front end of the library is all `constexpr` from C++14 and later.  Currently there are only two
+back end types that are `constexpr` aware: __float128 and __cpp_int.  More backends will follow at a later date.
+
+Provided the compiler is GCC, type __float128 support `constexpr` operations on all arithmetic operations from C++14, comparisons,
+`abs`, `fabs`, `fpclassify`, `isnan`, `isinf`, `isfinite` and `isnormal` are also fully supported, but the transcendental functions are not.
+
+The __cpp_int types support constexpr arithmetic, provided it is a fixed precision type with no allocator.  It may also
+be a checked integer: in which case a compiler error will be generated on overflow or undefined behaviour.  In addition
+the free functions `abs`, `swap`, `multiply`, `add`, `subtract`, `divide_qr`, `integer_modulus`, `powm`, `lsb`, `msb`, 
+`bit_test`, `bit_set`, `bit_unset`, `bit_flip`, `sqrt`, `gcd`, `lcm` are all supported.  Use of __cpp_int in this way
+requires either a C++2a compiler (one which supports `std::is_constant_evaluated()`), or GCC-6 or later in C++14 mode.
+Compilers other than GCC and without `std::is_constant_evaluated()` will support a very limited set of operations:
+expect to hit roadblocks rather easily.
+
+For example given:
+
+[constexpr_circle]
+
+We can now calculate areas and circumferences using all constexpr arithmetic:
+
+[constexpr_circle_usage]
+
+Note that these make use of the numeric constants from the Math library, which also happen to be `constexpr`.
+
+For a more interesting example, in [@../../example/constexpr_float_arithmetic_examples.cpp constexpr_float_arithmetic_examples.cpp]
+we define a simple class for `constexpr` polynomial arithmetic:
+
+   template <class T, unsigned Order>
+   struct const_polynomial;
+
+Given this, we can use recurrence relations to calculate the coefficients for various orthogonal
+polynomials - in the example we use the Hermite polynomials, only the constructor does any work - 
+it uses the recurrence relations to calculate the coefficient array:
+
+[hermite_example]
+
+Now we just need to define H[sub 0] and H[sub 1] as termination conditions for the recurrence:
+
+[hermite_example2]
+
+We can now declare H[sub 9] as a constexpr object, access the coefficients, and evaluate
+at an abscissa value, all using `constexpr` arithmetic:
+
+[hermite_example3]
+
+Also since the coefficients to the Hermite polynomials are integers, we can also generate the Hermite
+coefficients using (fixed precision) cpp_int's: see [@../../test/constexpr_test_cpp_int_6.cpp constexpr_test_cpp_int_6.cpp].
+
+We can also generate factorials (and validate the result) like so:
+
+[factorial_decl]
+
+   constexpr uint1024_t f1 = factorial(uint1024_t(31));
+   static_assert(f1 == 0x1956ad0aae33a4560c5cd2c000000_cppi);
+
+Another example in [@../../test/constexpr_test_cpp_int_7.cpp constexpr_test_cpp_int_7.cpp] generates
+a fresh multiprecision random number each time the file is compiled.
+
+
 [endsect]
 
-[section:import_export Importing and Exporting Data to and from cpp_int and cpp_bin_float]
+[section:import_export Importing and Exporting Data to and from `cpp_int` and `cpp_bin_float`]
 
-Any integer number type that uses `cpp_int_backend` as it's implementation layer can import or export it's bits via two non-member functions:
+Any integer number type that uses `cpp_int_backend` as it's implementation layer can import or export its bits via two non-member functions:
 
       template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator,
                 expression_template_option ExpressionTemplates, class OutputIterator>
@@ -2094,7 +2218,8 @@ Any integer number type that uses `cpp_int_backend` as it's implementation layer
             bool msv_first = true);
 
 These functions are designed for data-interchange with other storage formats, and since __cpp_bin_float uses __cpp_int internally,
-by extension they can be used for floating point numbers based on that backend as well (see example below).  Parameters and use are as follows:
+by extension they can be used for floating-point numbers based on that backend as well (see example below). 
+Parameters and use are as follows:
 
       template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator,
                 expression_template_option ExpressionTemplates, class OutputIterator>
@@ -2114,9 +2239,8 @@ within each `chunk_size` block is always in the machines native format.  Further
 has to be specified manually.  It may also result in compiler warnings about the value being narrowed.]
 
 [tip If you're exporting to non-native byte layout, then use
-[@http://www.boost.org/doc/libs/release/libs/endian/doc/index.html
-Boost.Endian] to create a custom OutputIterator that
-reverses the byte order of each chunk prior to actually storing the result.]
+[@http://www.boost.org/doc/libs/release/libs/endian/doc/index.html  Boost.Endian]
+to create a custom OutputIterator that reverses the byte order of each chunk prior to actually storing the result.]
 
       template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator,
                 expression_template_option ExpressionTemplates, class ForwardIterator>
@@ -2139,7 +2263,7 @@ As with exporting, if the external data is to be in a non-native byte order (wit
 that presents it in native order (see [@http://www.boost.org/doc/libs/release/libs/endian/doc/index.html Boost.Endian]).
 
 [note
-Note that this function is optimized for the case where the data can be memcpy'ed from the source to the integer - in this case both
+Note that this function is optimized for the case where the data can be `memcpy`ed from the source to the integer - in this case both
 iterators much be pointers, and everything must be little-endian.]
 
 [h4 Examples]
@@ -2148,7 +2272,7 @@ iterators much be pointers, and everything must be little-endian.]
 
 [IE2]
 
-[endsect]
+[endsect] [/section:import_export Importing and Exporting Data to and from `cpp_int` and `cpp_bin_float`]
 
 [section:rounding Rounding Rules for Conversions]
 
@@ -2173,7 +2297,7 @@ The following table summarises the situation for conversions from native types:
 [[__tommath_rational][See __tom_int]]
 ]
 
-[endsect]
+[endsect] [/section:rounding Rounding Rules for Conversions]
 
 [section:mixed Mixed Precision Arithmetic]
 
@@ -2247,18 +2371,17 @@ than it is to explicitly cast the operands to the result type:
 
 __mpfr_float_backend, __mpf_float, __cpp_int.
 
-[endsect]
+[endsect] [/section:mixed Mixed Precision Arithmetic]
 
 [section:gen_int Generic Integer Operations]
 
 All of the [link boost_multiprecision.ref.number.integer_functions non-member integer operations] are overloaded for the
 built in integer types in
 `<boost/multiprecision/integer.hpp>`.
-Where these operations require a temporary increase in precision (such as for powm), then
+Where these operations require a temporary increase in precision (such as for `powm`), then
 if no built in type is available, a __cpp_int of appropriate precision will be used.
 
-Some of these functions are trivial, others use compiler intrinsics (where available) to ensure optimal
-evaluation.
+Some of these functions are trivial, others use compiler intrinsics (where available) to ensure optimal evaluation.
 
 The overloaded functions are:
 
@@ -2344,9 +2467,9 @@ Returns the integer square root `s` of x and sets `r` to the remainder ['x - s[s
    bool miller_rabin_test(const number-or-expression-template-type& n, unsigned trials);
 
 The regular Miller-Rabin functions in `<boost/multiprecision/miller_rabin.hpp>` are defined in terms of the above
-generic operations, and so function equally well for built in and multiprecision types.
+generic operations, and so function equally well for built-in or __fundamental_types and multiprecision types.
 
-[endsect]
+[endsect] [/section:gen_int Generic Integer Operations]
 
 [section:serial Boost.Serialization Support]
 
@@ -2361,8 +2484,7 @@ support which requires the underlying backend to be serializable.
 [section:limits Numeric Limits]
 
 Boost.Multiprecision tries hard to implement `std::numeric_limits` for all types
-as far as possible and meaningful because experience with Boost.Math
-has shown that this aids portability.
+as far as possible and meaningful because experience with Boost.Math has shown that this aids portability.
 
 The [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3690.pdf C++ standard library]
 defines `std::numeric_limits` in section 18.3.2.
@@ -2687,6 +2809,11 @@ algorithm, claimed to be both exact and fast for 32 and 64-bit floating-point nu
 `std::numeric_limits<float>::max_digits10` is implemented on any platform.
 ] [/note]
 
+[note ['requires cxx11_numeric_limits] is a suitable test for use of `std::numeric_limits<float>::max_digits10`
+to control if a target in a jamfile used by a Boost B2/bjam program is built, or not.
+] [/note]
+
+
 If `max_digits10` is not available, you should use the
 [@http://www.cs.berkeley.edu/~wkahan/ieee754status/IEEE754.PDF Kahan formula for floating-point type T].
 
@@ -2802,11 +2929,11 @@ resulted in the loss of precision, such implementation detects ['denorm loss].
 
 [endsect] [/section:constants std::numeric_limits<> Constants]
 
-[section:functions std::numeric_limits<> functions]
+[section:functions `std::numeric_limits<>` functions]
 
-[h4 max function]
+[h4:max_function `max` function]
 
-Function `std::numeric_limits<T>::max()` returns the largest finite value
+Function `(std::numeric_limits<T>::max)()` returns the largest finite value
 that can be represented by the type T.  If there is no such value (and
 `numeric_limits<T>::bounded` is `false`) then returns `T()`.
 
@@ -2824,7 +2951,7 @@ packaged versions of this (and other functions) are provided using
 
   T = boost::math::tools::max_value<T>();
 
-Of course, these simply use `std::numeric_limits<T>::max()` if available,
+Of course, these simply use `(std::numeric_limits<T>::max)()` if available,
 but otherwise 'do something sensible'.
 
 [h4 lowest function]
@@ -2837,16 +2964,16 @@ Since C++11: `std::numeric_limits<T>::lowest()` is
 
 [digits10_5]
 
-[h4 min function]
+[h4:min_function `min` function]
 
-Function `std::numeric_limits<T>::min()` returns the minimum finite value
+Function `(std::numeric_limits<T>::min)()` returns the minimum finite value
 that can be represented by the type T.
 
-For built-in types there is usually a corresponding MACRO value TYPE_MIN,
+For built-in types, there is usually a corresponding MACRO value TYPE_MIN,
 where TYPE is CHAR, INT, FLOAT etc.
 
-Other types, including those provided by a typedef,
-for example `INT64_T_MIN` for `int64_t`, may provide a macro definition.
+Other types, including those provided by a `typedef`,
+for example, `INT64_T_MIN` for `int64_t`, may provide a macro definition.
 
 For floating-point types,
 it is more fully defined as the ['minimum positive normalized value].
@@ -2854,7 +2981,6 @@ it is more fully defined as the ['minimum positive normalized value].
 See `std::numeric_limits<T>::denorm_min()` for the smallest denormalized value, provided
 
   std::numeric_limits<T>::has_denorm == std::denorm_present
-
 
 To cater for situations where no `numeric_limits` specialization is available
 (for example because the precision of the type varies at runtime),
@@ -2910,7 +3036,7 @@ for example, caused by
 [@http://en.wikipedia.org/wiki/Loss_of_significance Loss of significance or cancellation error]
 or very many iterations.
 
-[h4 epsilon]
+[h4:epsilon epsilon]
 
 Function `std::numeric_limits<T>::epsilon()` is meaningful only for non-integral types.
 
@@ -2941,10 +3067,15 @@ To use these `#include <boost/math/tools/precision.hpp>`.
 
 [epsilon_4]
 
-[h5 Tolerance for Floating-point Comparisons]
+[h5:FP_tolerance Tolerance for Floating-point Comparisons]
 
-`epsilon` is very useful to compute a tolerance when comparing floating-point values,
+[@https://en.wikipedia.org/wiki/Machine_epsilon Machine epsilon [epsilon]]
+is very useful to compute a tolerance when comparing floating-point values,
 a much more difficult task than is commonly imagined.
+
+The C++ standard specifies [@https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon  `std::numeric_limits<>::epsilon()`]
+and Boost.Multiprecision implements this (where possible) for its program-defined types analogous to the
+__fundamental floating-point types like `double` `float`.
 
 For more information than you probably want (but still need) see
 [@http://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html What Every Computer Scientist Should Know About Floating-Point Arithmetic]
@@ -2957,7 +3088,10 @@ for reliably checking if floating-point values are close enough.
 
 See Donald. E. Knuth. The art of computer programming (vol II).
 Copyright 1998 Addison-Wesley Longman, Inc., 0-201-89684-2.
-Addison-Wesley Professional; 3rd edition.
+Addison-Wesley Professional; 3rd edition. (The relevant equations are in paragraph 4.2.2, Eq. 36 and 37.)
+
+See [@https://www.boost.org/doc/libs/release/libs/test/doc/html/boost_test/testing_tools/extended_comparison/floating_point/floating_points_comparison_theory.html Boost.Math floating_point comparison]
+for more details.
 
 See also:
 
@@ -2965,19 +3099,21 @@ See also:
 
 [@http://adtmag.com/articles/2000/03/16/comparing-floats-how-to-determine-if-floating-quantities-are-close-enough-once-a-tolerance-has-been.aspx Alberto Squassia, Comparing floats code]
 
-[@boost:/libs/test/doc/html/utf/testing-tools/floating_point_comparison.html floating-point comparison].
+[@https://www.boost.org/doc/libs/release/libs/test/doc/html/boost_test/testing_tools/extended_comparison/floating_point.html Boost.Test Floating-Point_Comparison]
 
 [tolerance_1]
 
 used thus:
 
+  cd ./test
   BOOST_CHECK_CLOSE_FRACTION(expected, calculated, tolerance);
 
-(There is also a version using tolerance as a percentage rather than a fraction).
+(There is also a version BOOST_CHECK_CLOSE using tolerance as a [*percentage] rather than a fraction;
+usually the fraction version is simpler to use).
 
 [tolerance_2]
 
-[h4 Infinity - positive and negative]
+[h4:infinity Infinity - positive and negative]
 
 For floating-point types only, for which
 `std::numeric_limits<T>::has_infinity == true`,
@@ -3134,12 +3270,10 @@ inspect `std::numeric_limits<typename T::value_type>`.
 
 [endsect] [/section:how_to_tell How to Determine the Kind of a Number From `std::numeric_limits`]
 
-
 [endsect] [/section:limits Numeric Limits]
 
 
 [section:input_output  Input Output]
-
 
 [h4  Loopback testing]
 
@@ -6006,7 +6140,7 @@ Open question - what should be the default - int32_t or int64_t?  (done 2012/09/
 [[Why not abstract out addition/multiplication algorithms?]
    [This was deemed not to be practical: these algorithms are intimately
    tied to the actual data representation used.]]
- [[How do I choose between Boost.Multiprecision cpp_bin_50 and cpp_dec_50?]
+ [[How do I choose between Boost.Multiprecision `cpp_bin_50` and `cpp_dec_50`?]
    [Unless you have a specific reason to choose `cpp_dec_`, then the default choice should be `cpp_bin_`, 
    for example using the convenience `typedefs` like `boost::multiprecision::cpp_bin_50` or `boost::multiprecision::cpp_bin_100`.
 

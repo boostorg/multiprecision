@@ -4,7 +4,7 @@
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
 #include <boost/multiprecision/gmp.hpp>
@@ -12,12 +12,12 @@
 #include "test_arithmetic.hpp"
 
 template <unsigned D>
-struct related_type<boost::multiprecision::number< boost::multiprecision::gmp_float<D> > >
+struct related_type<boost::multiprecision::number<boost::multiprecision::gmp_float<D> > >
 {
-   typedef boost::multiprecision::number< boost::multiprecision::gmp_float<D/2> > type;
+   typedef boost::multiprecision::number<boost::multiprecision::gmp_float<D / 2> > type;
 };
 template <>
-struct related_type<boost::multiprecision::mpf_float >
+struct related_type<boost::multiprecision::mpf_float>
 {
    typedef boost::multiprecision::mpz_int type;
 };
@@ -25,8 +25,7 @@ struct related_type<boost::multiprecision::mpf_float >
 int main()
 {
    boost::multiprecision::mpf_float::default_precision(1000);
-   BOOST_CHECK_EQUAL(boost::multiprecision::mpf_float::default_precision() ,  1000);
+   BOOST_CHECK_EQUAL(boost::multiprecision::mpf_float::default_precision(), 1000);
    test<boost::multiprecision::mpf_float>();
    return boost::report_errors();
 }
-

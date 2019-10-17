@@ -2,8 +2,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
 <title>float128</title>
-<link rel="stylesheet" href="../../../../../../../doc/src/boostbook.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<link rel="stylesheet" href="../../../multiprecision.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.77.1">
 <link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
 <link rel="up" href="../floats.html" title="floating-point Numbers">
 <link rel="prev" href="mpfr_float.html" title="mpfr_float">
@@ -49,7 +49,7 @@
           All the usual standard library and <code class="computeroutput"><span class="identifier">numeric_limits</span></code>
           support are available, performance should be equivalent to the underlying
           native types: for example the LINPACK benchmarks for GCC's <code class="computeroutput"><a class="link" href="float128.html" title="float128">float128</a></code>
-          and <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">float128</span></code> both achieved 5.6 MFLOPS<a href="#ftn.boost_multiprecision.tut.floats.float128.f0" class="footnote" name="boost_multiprecision.tut.floats.float128.f0"><sup class="footnote">[3]</sup></a>.
+          and <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">float128</span></code> both achieved 5.6 MFLOPS<a href="#ftn.boost_multiprecision.tut.floats.float128.f0" class="footnote"><sup class="footnote"><a name="boost_multiprecision.tut.floats.float128.f0"></a>[3]</sup></a>.
         </p>
 <p>
           As well as the usual conversions from arithmetic and string types, instances
@@ -78,6 +78,15 @@
               move aware.
             </li>
 <li class="listitem">
+              This type is fully <code class="computeroutput"><span class="keyword">constexpr</span></code>
+              aware - basic constexpr arithmetic is supported from C++14 and onwards,
+              comparisons, plus the functions <code class="computeroutput"><span class="identifier">fabs</span></code>,
+              <code class="computeroutput"><span class="identifier">abs</span></code>, <code class="computeroutput"><span class="identifier">fpclassify</span></code>, <code class="computeroutput"><span class="identifier">isnormal</span></code>,
+              <code class="computeroutput"><span class="identifier">isfinite</span></code>, <code class="computeroutput"><span class="identifier">isinf</span></code> and <code class="computeroutput"><span class="identifier">isnan</span></code>
+              are also supported if either the compiler implements C++20's <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">is_constant_evaluated</span><span class="special">()</span></code>,
+              or if the compiler is GCC.
+            </li>
+<li class="listitem">
               It is not possible to round-trip objects of this type to and from a
               string and get back exactly the same value when compiled with Intel's
               C++ compiler and using <code class="computeroutput"><span class="identifier">_Quad</span></code>
@@ -98,6 +107,14 @@
               used as a literal type (constexpr support).
             </li>
 <li class="listitem">
+              Type <code class="computeroutput"><span class="identifier">float128</span></code> can be
+              used for full <code class="computeroutput"><span class="keyword">constexpr</span></code>
+              arithmetic from C++14 and later with GCC. The functions <code class="computeroutput"><span class="identifier">abs</span></code>, <code class="computeroutput"><span class="identifier">fabs</span></code>,
+              <code class="computeroutput"><span class="identifier">fpclassify</span></code>, <code class="computeroutput"><span class="identifier">isnan</span></code>, <code class="computeroutput"><span class="identifier">isinf</span></code>,
+              <code class="computeroutput"><span class="identifier">isfinite</span></code> and <code class="computeroutput"><span class="identifier">isnormal</span></code> are also <code class="computeroutput"><span class="keyword">constexpr</span></code>,
+              but the transcendental functions are not.
+            </li>
+<li class="listitem">
               When using the Intel compiler, the underlying type defaults to <code class="computeroutput"><a class="link" href="float128.html" title="float128">float128</a></code>
               if it's available and <code class="computeroutput"><span class="identifier">_Quad</span></code>
               if not. You can override the default by defining either <code class="computeroutput"><span class="identifier">BOOST_MP_USE_FLOAT128</span></code> or <code class="computeroutput"><span class="identifier">BOOST_MP_USE_QUAD</span></code>.
@@ -109,8 +126,8 @@
 <li class="listitem">
               When compiling with <code class="computeroutput"><span class="identifier">gcc</span></code>,
               you need to use the flag <code class="computeroutput"><span class="special">--</span><span class="identifier">std</span><span class="special">=</span><span class="identifier">gnu</span><span class="special">++</span><span class="number">11</span><span class="special">/</span><span class="number">14</span><span class="special">/</span><span class="number">17</span></code>,
-              as the numeric literal operator 'operator""Q' is a GNU extension.
-              Compilation fails with the flag <code class="computeroutput"><span class="special">--</span><span class="identifier">std</span><span class="special">=</span><span class="identifier">c</span><span class="special">++</span><span class="number">11</span><span class="special">/</span><span class="number">14</span><span class="special">/</span><span class="number">17</span></code>.
+              as the suffix 'Q' is a GNU extension. Compilation fails with the flag
+              <code class="computeroutput"><span class="special">--</span><span class="identifier">std</span><span class="special">=</span><span class="identifier">c</span><span class="special">++</span><span class="number">11</span><span class="special">/</span><span class="number">14</span><span class="special">/</span><span class="number">17</span></code> unless you also use <code class="computeroutput"><span class="special">-</span><span class="identifier">fext</span><span class="special">-</span><span class="identifier">numeric</span><span class="special">-</span><span class="identifier">literals</span></code>.
             </li>
 </ul></div>
 <h6>
@@ -150,7 +167,7 @@
 <span class="special">}</span>
 </pre>
 <div class="footnotes">
-<br><hr style="width:100; text-align:left;margin-left: 0">
+<br><hr style="width:100; align:left;">
 <div id="ftn.boost_multiprecision.tut.floats.float128.f0" class="footnote"><p><a href="#boost_multiprecision.tut.floats.float128.f0" class="para"><sup class="para">[3] </sup></a>
             On 64-bit Ubuntu 11.10, GCC-4.8.0, Intel Core 2 Duo T5800.
           </p></div>

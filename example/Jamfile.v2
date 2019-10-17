@@ -21,16 +21,26 @@ local tommath_path = [ modules.peek : TOMMATH_PATH ] ;
 
 project
     : requirements
-	   <include>$(gmp_path)
-	   <include>$(gmp_path)/mpfr
-	   <include>$(gmp_path)/gmpfrxx
-	   <include>$(mpfr_path)
-	   <include>$(mpfi_path)
-	   <include>$(mpfi_path)/src
-	   <include>$(tommath_path)
-	   <include>../include
-	   <include>../../..
-      <toolset>gcc:<cxxflags>-Wno-missing-braces
+     <include>$(gmp_path)
+     <include>$(gmp_path)/mpfr
+     <include>$(gmp_path)/gmpfrxx
+     <include>$(mpfr_path)
+     <include>$(mpfi_path)
+     <include>$(mpfi_path)/src
+     <include>$(tommath_path)
+     <include>../include
+     <include>../../..
+     
+     <toolset>gcc:<cxxflags>-Wno-missing-braces
+      
+      # Assembler error "File too big" caused by lots of C++ templates, for example, math/floating_point_examples.cpp.
+      # Some projects on some toolsets may require
+      #   <toolset>gcc-mingw:<cxxflags>\"-Wa,-mbig-obj\"
+      # See https://digitalkarabela.com/mingw-w64-how-to-fix-file-too-big-too-many-sections/
+      # <toolset>gcc-mingw:<cxxflags>-Wa,-mbig-obj # Some projects may overflow assembler and require equivalent of MSVC /bigobj.
+      # Requires version 2.30 of GNU binutils.
+      # Best applied only to projects that require this, see run math/floating_point_examples.cpp below.
+
       <toolset>darwin:<cxxflags>-Wno-missing-braces
       <toolset>acc:<cxxflags>+W2068,2461,2236,4070
       <toolset>intel:<cxxflags>-Qwd264,239
@@ -82,7 +92,8 @@ test-suite examples :
 
       [ run debug_adaptor_snips.cpp no_eh_eg_support ]
       [ run float128_snips.cpp quadmath no_eh_eg_support : : : [ check-target-builds ../config//has_float128 : : <build>no ] ]
-      [ run floating_point_examples.cpp no_eh_eg_support ]
+
+      [ run floating_point_examples.cpp no_eh_eg_support : : : <toolset>gcc-mingw:<cxxflags>-Wa,-mbig-obj ] # See note above.
       [ run gauss_laguerre_quadrature.cpp no_eh_eg_support : : : release [ requires cxx11_lambdas ] ]
       [ run hypergeometric_luke_algorithms.cpp no_eh_eg_support ../../chrono/build//boost_chrono ../../system/build//boost_system : : : [ requires cxx11_nullptr ]  ]
       [ run integer_examples.cpp no_eh_eg_support ]
@@ -96,5 +107,6 @@ test-suite examples :
       [ run mpfi_snips.cpp mpfi mpfr gmp no_eh_eg_support :  :  : [ check-target-builds ../config//has_mpfi : : <build>no ] ]
       [ run mpfr_snips.cpp mpfr gmp no_eh_eg_support : : : [ check-target-builds ../config//has_mpfr : : <build>no ] ]
       [ run tommath_snips.cpp $(TOMMATH) no_eh_eg_support : : : [ check-target-builds ../config//has_tommath : : <build>no ] ]
+      [ compile constexpr_float_arithmetic_examples.cpp : [ requires cxx14_constexpr cxx17_if_constexpr ] ]
 
 ;

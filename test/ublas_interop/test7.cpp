@@ -10,6 +10,10 @@
 //  GeNeSys mbH & Co. KG in producing this work.
 //
 
+#if defined(__GNUC__) && (__GNUC__ >= 9)
+#pragma GCC diagnostic ignored "-Wdeprecated-copy"
+#endif
+
 #include <iostream>
 
 #include <boost/numeric/interval.hpp>
@@ -21,11 +25,12 @@
 
 #include "test7.hpp"
 
-// this testcase requires fix of task #2473 
+// this testcase requires fix of task #2473
 
-int main () {
-    test_vector ();
-    test_matrix_vector ();
-    test_matrix ();
-    return 0;
+int main()
+{
+   test_vector();
+   test_matrix_vector();
+   test_matrix();
+   return 0;
 }

@@ -10,5 +10,5 @@ using namespace boost::multiprecision;
 int main()
 {
    cpp_int i = 2;
-   i = 2.3;
+   i         = 2.3;
 }

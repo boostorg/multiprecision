@@ -2,8 +2,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
 <title>std::numeric_limits&lt;&gt; functions</title>
-<link rel="stylesheet" href="../../../../../../../doc/src/boostbook.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<link rel="stylesheet" href="../../../multiprecision.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.77.1">
 <link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
 <link rel="up" href="../limits.html" title="Numeric Limits">
 <link rel="prev" href="constants.html" title="std::numeric_limits&lt;&gt; constants">
@@ -24,18 +24,16 @@
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h4 class="title">
-<a name="boost_multiprecision.tut.limits.functions"></a><a class="link" href="functions.html" title="std::numeric_limits&lt;&gt; functions">std::numeric_limits&lt;&gt;
-        functions</a>
+<a name="boost_multiprecision.tut.limits.functions"></a><a class="link" href="functions.html" title="std::numeric_limits&lt;&gt; functions"><code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;&gt;</span></code> functions</a>
 </h4></div></div></div>
 <h5>
 <a name="boost_multiprecision.tut.limits.functions.h0"></a>
-          <span class="phrase"><a name="boost_multiprecision.tut.limits.functions.max_function"></a></span><a class="link" href="functions.html#boost_multiprecision.tut.limits.functions.max_function">max function</a>
+          <span class="phrase"><a name="boost_multiprecision.tut.limits.functions.max_function"></a></span><a class="link" href="functions.html#boost_multiprecision.tut.limits.functions.max_function"><code class="computeroutput"><span class="identifier">max</span></code> function</a>
         </h5>
 <p>
-          Function <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">max</span><span class="special">()</span></code>
-          returns the largest finite value that can be represented by the type T.
-          If there is no such value (and <code class="computeroutput"><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">bounded</span></code>
-          is <code class="computeroutput"><span class="keyword">false</span></code>) then returns <code class="computeroutput"><span class="identifier">T</span><span class="special">()</span></code>.
+          Function <code class="computeroutput"><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">max</span><span class="special">)()</span></code> returns the largest finite value that
+          can be represented by the type T. If there is no such value (and <code class="computeroutput"><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">bounded</span></code> is <code class="computeroutput"><span class="keyword">false</span></code>)
+          then returns <code class="computeroutput"><span class="identifier">T</span><span class="special">()</span></code>.
         </p>
 <p>
           For built-in types there is usually a corresponding MACRO value TYPE_MAX,
@@ -56,8 +54,8 @@
 <span class="identifier">T</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">math</span><span class="special">::</span><span class="identifier">tools</span><span class="special">::</span><span class="identifier">max_value</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;();</span>
 </pre>
 <p>
-          Of course, these simply use <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">max</span><span class="special">()</span></code> if available, but otherwise 'do something
-          sensible'.
+          Of course, these simply use <code class="computeroutput"><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">max</span><span class="special">)()</span></code>
+          if available, but otherwise 'do something sensible'.
         </p>
 <h5>
 <a name="boost_multiprecision.tut.limits.functions.h1"></a>
@@ -80,19 +78,21 @@
 </pre>
 <h5>
 <a name="boost_multiprecision.tut.limits.functions.h2"></a>
-          <span class="phrase"><a name="boost_multiprecision.tut.limits.functions.min_function"></a></span><a class="link" href="functions.html#boost_multiprecision.tut.limits.functions.min_function">min function</a>
+          <span class="phrase"><a name="boost_multiprecision.tut.limits.functions.min_function"></a></span><a class="link" href="functions.html#boost_multiprecision.tut.limits.functions.min_function"><code class="computeroutput"><span class="identifier">min</span></code> function</a>
         </h5>
 <p>
-          Function <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">min</span><span class="special">()</span></code>
-          returns the minimum finite value that can be represented by the type T.
+          Function <code class="computeroutput"><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">min</span><span class="special">)()</span></code> returns the minimum finite value that
+          can be represented by the type T.
         </p>
 <p>
-          For built-in types there is usually a corresponding MACRO value TYPE_MIN,
+          For built-in types, there is usually a corresponding MACRO value TYPE_MIN,
           where TYPE is CHAR, INT, FLOAT etc.
         </p>
 <p>
-          Other types, including those provided by a typedef, for example <code class="computeroutput"><span class="identifier">INT64_T_MIN</span></code> for <code class="computeroutput"><span class="identifier">int64_t</span></code>,
-          may provide a macro definition.
+          Other types, including those provided by a <code class="computeroutput"><span class="keyword">typedef</span></code>,
+          for example, <code class="computeroutput"><span class="identifier">INT64_T_MIN</span></code>
+          for <code class="computeroutput"><span class="identifier">int64_t</span></code>, may provide
+          a macro definition.
         </p>
 <p>
           For floating-point types, it is more fully defined as the <span class="emphasis"><em>minimum
@@ -265,13 +265,18 @@
 </pre>
 <h6>
 <a name="boost_multiprecision.tut.limits.functions.h6"></a>
-          <span class="phrase"><a name="boost_multiprecision.tut.limits.functions.tolerance_for_floating_point_com"></a></span><a class="link" href="functions.html#boost_multiprecision.tut.limits.functions.tolerance_for_floating_point_com">Tolerance
+          <span class="phrase"><a name="boost_multiprecision.tut.limits.functions.FP_tolerance"></a></span><a class="link" href="functions.html#boost_multiprecision.tut.limits.functions.FP_tolerance">Tolerance
           for Floating-point Comparisons</a>
         </h6>
 <p>
-          <code class="computeroutput"><span class="identifier">epsilon</span></code> is very useful
-          to compute a tolerance when comparing floating-point values, a much more
-          difficult task than is commonly imagined.
+          <a href="https://en.wikipedia.org/wiki/Machine_epsilon" target="_top">Machine epsilon
+          &#949;</a> is very useful to compute a tolerance when comparing floating-point
+          values, a much more difficult task than is commonly imagined.
+        </p>
+<p>
+          The C++ standard specifies <a href="https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon" target="_top"><code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;&gt;::</span><span class="identifier">epsilon</span><span class="special">()</span></code></a>
+          and Boost.Multiprecision implements this (where possible) for its program-defined
+          types analogous to the __fundamental floating-point types like <code class="computeroutput"><span class="keyword">double</span></code> <code class="computeroutput"><span class="keyword">float</span></code>.
         </p>
 <p>
           For more information than you probably want (but still need) see <a href="http://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html" target="_top">What
@@ -289,7 +294,12 @@
 <p>
           See Donald. E. Knuth. The art of computer programming (vol II). Copyright
           1998 Addison-Wesley Longman, Inc., 0-201-89684-2. Addison-Wesley Professional;
-          3rd edition.
+          3rd edition. (The relevant equations are in paragraph 4.2.2, Eq. 36 and
+          37.)
+        </p>
+<p>
+          See <a href="https://www.boost.org/doc/libs/release/libs/test/doc/html/boost_test/testing_tools/extended_comparison/floating_point/floating_points_comparison_theory.html" target="_top">Boost.Math
+          floating_point comparison</a> for more details.
         </p>
 <p>
           See also:
@@ -303,8 +313,8 @@
           Squassia, Comparing floats code</a>
         </p>
 <p>
-          <a href="../../../../../../../libs/test/doc/html/utf/testing-tools/floating_point_comparison.html" target="_top">floating-point
-          comparison</a>.
+          <a href="https://www.boost.org/doc/libs/release/libs/test/doc/html/boost_test/testing_tools/extended_comparison/floating_point.html" target="_top">Boost.Test
+          Floating-Point_Comparison</a>
         </p>
 <p>
           For example, if we want a tolerance that might suit about 9 arithmetical
@@ -324,11 +334,12 @@
 <p>
           used thus:
         </p>
-<pre class="programlisting"><span class="identifier">BOOST_CHECK_CLOSE_FRACTION</span><span class="special">(</span><span class="identifier">expected</span><span class="special">,</span> <span class="identifier">calculated</span><span class="special">,</span> <span class="identifier">tolerance</span><span class="special">);</span>
+<pre class="programlisting"><span class="identifier">cd</span> <span class="special">./</span><span class="identifier">test</span>
+<span class="identifier">BOOST_CHECK_CLOSE_FRACTION</span><span class="special">(</span><span class="identifier">expected</span><span class="special">,</span> <span class="identifier">calculated</span><span class="special">,</span> <span class="identifier">tolerance</span><span class="special">);</span>
 </pre>
 <p>
-          (There is also a version using tolerance as a percentage rather than a
-          fraction).
+          (There is also a version BOOST_CHECK_CLOSE using tolerance as a <span class="bold"><strong>percentage</strong></span> rather than a fraction; usually the fraction
+          version is simpler to use).
         </p>
 <pre class="programlisting"><span class="keyword">using</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">number</span><span class="special">;</span>
 <span class="keyword">using</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">cpp_dec_float</span><span class="special">;</span>
@@ -355,8 +366,8 @@
 </pre>
 <h5>
 <a name="boost_multiprecision.tut.limits.functions.h7"></a>
-          <span class="phrase"><a name="boost_multiprecision.tut.limits.functions.infinity_positive_and_negative"></a></span><a class="link" href="functions.html#boost_multiprecision.tut.limits.functions.infinity_positive_and_negative">Infinity
-          - positive and negative</a>
+          <span class="phrase"><a name="boost_multiprecision.tut.limits.functions.infinity"></a></span><a class="link" href="functions.html#boost_multiprecision.tut.limits.functions.infinity">Infinity -
+          positive and negative</a>
         </h5>
 <p>
           For floating-point types only, for which <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">has_infinity</span>
@@ -470,10 +481,10 @@
   <span class="identifier">ss</span><span class="special">.</span><span class="identifier">imbue</span><span class="special">(</span><span class="identifier">new_locale</span><span class="special">);</span>
   <span class="identifier">T</span> <span class="identifier">inf</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">infinity</span><span class="special">();</span>
   <span class="identifier">ss</span> <span class="special">&lt;&lt;</span> <span class="identifier">inf</span><span class="special">;</span> <span class="comment">// Write out.</span>
-  <span class="identifier">assert</span><span class="special">(</span><span class="identifier">ss</span><span class="special">.</span><span class="identifier">str</span><span class="special">()</span> <span class="special">==</span> <span class="string">"inf"</span><span class="special">);</span>
+ <span class="identifier">BOOST_ASSERT</span><span class="special">(</span><span class="identifier">ss</span><span class="special">.</span><span class="identifier">str</span><span class="special">()</span> <span class="special">==</span> <span class="string">"inf"</span><span class="special">);</span>
   <span class="identifier">T</span> <span class="identifier">r</span><span class="special">;</span>
   <span class="identifier">ss</span> <span class="special">&gt;&gt;</span> <span class="identifier">r</span><span class="special">;</span> <span class="comment">// Read back in.</span>
-  <span class="identifier">assert</span><span class="special">(</span><span class="identifier">inf</span> <span class="special">==</span> <span class="identifier">r</span><span class="special">);</span> <span class="comment">// Confirms that the floating-point values really are identical.</span>
+  <span class="identifier">BOOST_ASSERT</span><span class="special">(</span><span class="identifier">inf</span> <span class="special">==</span> <span class="identifier">r</span><span class="special">);</span> <span class="comment">// Confirms that the floating-point values really are identical.</span>
   <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"infinity output was "</span> <span class="special">&lt;&lt;</span> <span class="identifier">ss</span><span class="special">.</span><span class="identifier">str</span><span class="special">()</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
   <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"infinity input was "</span> <span class="special">&lt;&lt;</span> <span class="identifier">r</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
 <span class="special">}</span>
@@ -482,7 +493,8 @@
 <span class="identifier">infinity</span> <span class="identifier">input</span> <span class="identifier">was</span> <span class="identifier">inf</span>
 </pre>
 <p>
-          Similarly we can do the same with NaN (except that we cannot use <code class="computeroutput"><span class="identifier">assert</span></code>)
+          Similarly we can do the same with NaN (except that we cannot use <code class="computeroutput"><span class="identifier">assert</span></code> (because any comparisons with
+          NaN always return false).
         </p>
 <pre class="programlisting"><span class="special">{</span>
   <span class="identifier">std</span><span class="special">::</span><span class="identifier">locale</span> <span class="identifier">old_locale</span><span class="special">;</span>
@@ -493,15 +505,15 @@
   <span class="identifier">T</span> <span class="identifier">n</span><span class="special">;</span>
   <span class="identifier">T</span> <span class="identifier">NaN</span> <span class="special">=</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">quiet_NaN</span><span class="special">();</span>
   <span class="identifier">ss</span> <span class="special">&lt;&lt;</span> <span class="identifier">NaN</span><span class="special">;</span> <span class="comment">// Write out.</span>
-  <span class="identifier">assert</span><span class="special">(</span><span class="identifier">ss</span><span class="special">.</span><span class="identifier">str</span><span class="special">()</span> <span class="special">==</span> <span class="string">"nan"</span><span class="special">);</span>
+  <span class="identifier">BOOST_ASSERT</span><span class="special">(</span><span class="identifier">ss</span><span class="special">.</span><span class="identifier">str</span><span class="special">()</span> <span class="special">==</span> <span class="string">"nan"</span><span class="special">);</span>
   <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"NaN output was "</span> <span class="special">&lt;&lt;</span> <span class="identifier">ss</span><span class="special">.</span><span class="identifier">str</span><span class="special">()</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
   <span class="identifier">ss</span> <span class="special">&gt;&gt;</span> <span class="identifier">n</span><span class="special">;</span> <span class="comment">// Read back in.</span>
   <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"NaN input was "</span> <span class="special">&lt;&lt;</span> <span class="identifier">n</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
 <span class="special">}</span>
 </pre>
-<p>
-          NaN output was nan NaN input was nan
-        </p>
+<pre class="programlisting"><span class="identifier">NaN</span> <span class="identifier">output</span> <span class="identifier">was</span> <span class="identifier">nan</span>
+<span class="identifier">NaN</span> <span class="identifier">input</span> <span class="identifier">was</span> <span class="identifier">nan</span>
+</pre>
 <h6>
 <a name="boost_multiprecision.tut.limits.functions.h10"></a>
           <span class="phrase"><a name="boost_multiprecision.tut.limits.functions.signaling_nan"></a></span><a class="link" href="functions.html#boost_multiprecision.tut.limits.functions.signaling_nan">Signaling

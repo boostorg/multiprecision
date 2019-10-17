@@ -10,10 +10,15 @@
 //  GeNeSys mbH & Co. KG in producing this work.
 //
 
+#if defined(__GNUC__) && (__GNUC__ >= 9)
+#pragma GCC diagnostic ignored "-Wdeprecated-copy"
+#endif
+
 #include "test4.hpp"
 
-int main () {
-    test_matrix_vector ();
-    test_matrix ();
-    return 0;
+int main()
+{
+   test_matrix_vector();
+   test_matrix();
+   return 0;
 }

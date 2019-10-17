@@ -65,7 +65,7 @@ BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::float128&>() = 
 struct any_convert
 {
    template <class T>
-   operator T ()const;   // Can throw!
+   operator T() const; // Can throw!
 };
 
 BOOST_STATIC_ASSERT(!noexcept(boost::multiprecision::float128(std::declval<const any_convert&>())));
@@ -74,5 +74,3 @@ BOOST_STATIC_ASSERT(!noexcept(std::declval<boost::multiprecision::float128&>() =
 BOOST_STATIC_ASSERT(!noexcept(std::declval<boost::multiprecision::float128&>() = std::declval<any_convert>()));
 
 #endif // noexcept
-
-

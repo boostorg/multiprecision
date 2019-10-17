@@ -31,7 +31,7 @@
 
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp> // Boost.Test
-#include <boost/test/floating_point_comparison.hpp> 
+#include <boost/test/floating_point_comparison.hpp>
 
 static long double const log10Two = 0.30102999566398119521373889472449L; // log10(2.)
 
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(test_numeric_limits_snips)
    // No max_digits10 implemented.
     std::cout.precision(max_digits10<T>());
 #else
-  #if(_MSC_VER <= 1600) 
+  #if(_MSC_VER <= 1600)
    //  Wrong value for std::numeric_limits<float>::max_digits10.
     std::cout.precision(max_digits10<T>());
   #else // Use the C++11 max_digits10.
@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE(test_numeric_limits_snips)
 
   typedef double T;
 
-  bool denorm = std::numeric_limits<T>::denorm_min() < std::numeric_limits<T>::min();
+  bool denorm = std::numeric_limits<T>::denorm_min() < (std::numeric_limits<T>::min)();
   BOOST_ASSERT(denorm);
 
 //] [/max_digits10_6]
@@ -266,6 +266,7 @@ BOOST_AUTO_TEST_CASE(test_numeric_limits_snips)
 //[digits10_5
     -(std::numeric_limits<double>::max)() == std::numeric_limits<double>::lowest();
 //] [/digits10_5]
+//  warning C4553: '==': result of expression not used; did you intend '='? is spurious.
   }
 
   {
@@ -396,7 +397,7 @@ so the default expression template parameter has been replaced by `et_off`.]
     std::cout << "Type " << typeid(cpp_bin_float_quad).name() << " does not have NaNs!" << std::endl;
   }
 
-//] [/nan_1]
+//]  [/nan_1]
   }
 
   {
@@ -425,19 +426,20 @@ Then we can equally well use a multiprecision type cpp_bin_float_quad:
     ss.imbue(new_locale);
     T inf = std::numeric_limits<T>::infinity();
     ss << inf; // Write out.
-    assert(ss.str() == "inf");
+   BOOST_ASSERT(ss.str() == "inf");
     T r;
     ss >> r; // Read back in.
-    assert(inf == r); // Confirms that the floating-point values really are identical.
+    BOOST_ASSERT(inf == r); // Confirms that the floating-point values really are identical.
     std::cout << "infinity output was " << ss.str() << std::endl;
     std::cout << "infinity input was " << r << std::endl;
   }
 
 /*`
+``
   infinity output was inf
   infinity input was inf
-
-Similarly we can do the same with NaN (except that we cannot use `assert`)
+``
+Similarly we can do the same with NaN (except that we cannot use `assert` (because any comparisons with NaN always return false).
 */
   {
     std::locale old_locale;
@@ -448,17 +450,18 @@ Similarly we can do the same with NaN (except that we cannot use `assert`)
     T n;
     T NaN = std::numeric_limits<T>::quiet_NaN();
     ss << NaN; // Write out.
-    assert(ss.str() == "nan");
+    BOOST_ASSERT(ss.str() == "nan");
     std::cout << "NaN output was " << ss.str() << std::endl;
     ss >> n; // Read back in.
     std::cout << "NaN input was " << n << std::endl;
   }
 /*`
+``
   NaN output was nan
   NaN input was nan
-
+``
 */
-//] [/facet_1]
+//]  [/facet_1]
   }
 
 #endif

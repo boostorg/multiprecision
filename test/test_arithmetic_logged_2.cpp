@@ -4,7 +4,7 @@
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
 #ifdef _MSC_VER
-#  define _SCL_SECURE_NO_WARNINGS
+#define _SCL_SECURE_NO_WARNINGS
 #endif
 
 #include <boost/multiprecision/logged_adaptor.hpp>
@@ -16,4 +16,3 @@ int main()
    test<boost::multiprecision::number<boost::multiprecision::logged_adaptor<boost::multiprecision::cpp_int_backend<> > > >();
    return boost::report_errors();
 }
-

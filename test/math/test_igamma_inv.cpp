@@ -17,39 +17,39 @@ void expected_results()
    // various compilers and platforms.
    //
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*gmp_float<18>.*",           // test type(s)
-      ".*small.*",                   // test data group
-      ".*", 2000000000L, 300000000L);    // test function
+       ".*",                           // compiler
+       ".*",                           // stdlib
+       ".*",                           // platform
+       ".*gmp_float<18>.*",            // test type(s)
+       ".*small.*",                    // test data group
+       ".*", 2000000000L, 300000000L); // test function
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*mpfr_float_backend<18>.*",  // test type(s)
-      ".*small.*",                   // test data group
-      ".*", 30000000L, 20000000L);    // test function
+       ".*",                         // compiler
+       ".*",                         // stdlib
+       ".*",                         // platform
+       ".*mpfr_float_backend<18>.*", // test type(s)
+       ".*small.*",                  // test data group
+       ".*", 30000000L, 20000000L);  // test function
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*",                          // test type(s)
-      ".*small.*",                   // test data group
-      ".*", 10000000L, 2500000L);    // test function
+       ".*",                       // compiler
+       ".*",                       // stdlib
+       ".*",                       // platform
+       ".*",                       // test type(s)
+       ".*small.*",                // test data group
+       ".*", 10000000L, 2500000L); // test function
    add_expected_result(
-      ".*",                          // compiler
-      ".*",                          // stdlib
-      ".*",                          // platform
-      ".*",                          // test type(s)
-      ".*",                          // test data group
-      ".*", 7000, 2000);             // test function
+       ".*",              // compiler
+       ".*",              // stdlib
+       ".*",              // platform
+       ".*",              // test type(s)
+       ".*",              // test data group
+       ".*", 7000, 2000); // test function
    //
    // Finish off by printing out the compiler/stdlib/platform names,
    // we do this to make it easier to mark up expected error rates.
    //
    std::cout << "Tests run with " << BOOST_COMPILER << ", "
-      << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
+             << BOOST_STDLIB << ", " << BOOST_PLATFORM << std::endl;
 }
 
 template <class T>
@@ -58,7 +58,7 @@ void test(T t, const char* p)
    test_gamma(t, p);
 }
 
-BOOST_AUTO_TEST_CASE( test_main )
+BOOST_AUTO_TEST_CASE(test_main)
 {
    using namespace boost::multiprecision;
    expected_results();
@@ -70,4 +70,3 @@ BOOST_AUTO_TEST_CASE( test_main )
    //
    ALL_TESTS
 }
-

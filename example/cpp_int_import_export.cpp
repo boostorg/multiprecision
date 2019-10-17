@@ -12,7 +12,7 @@
 //[IE1
 
 /*`
-In this simple example, we'll import/export the bits of a cpp_int 
+In this simple example, we'll import/export the bits of a cpp_int
 to a vector of 8-bit unsigned values:
 */
 /*=
@@ -37,7 +37,7 @@ int main()
    // import back again, and check for equality:
    cpp_int j;
    import_bits(j, v.begin(), v.end());
-   assert(i == j);
+   BOOST_ASSERT(i == j);
 }
 
 //]
