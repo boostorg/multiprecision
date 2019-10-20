@@ -1,15 +1,11 @@
-Nil Foundation's Multiprecision Library
-=======================================
+Boost Multiprecision Library
+============================
 
-This library is a fork of fine Boost.Multiprecision library intended to be made usable for cryptography purposes.
-
-Mostly this library tries to be in sync with Boost.Multiprecision and upstream changes, but sometimes PR's to Boost.Multiprecision gets stuck, so this library could be a temporary alternative until they pass.
-
-The Multiprecision Library provides integer, rational, floating-point, complex and interval number types in C++ that have more range and 
-precision than C++'s ordinary built-in types. The big number types in Multiprecision can be used with a wide selection of basic 
-mathematical operations, elementary transcendental functions as well as the functions in Boost.Math. The Multiprecision types can 
-also interoperate with the built-in types in C++ using clearly defined conversion rules. This allows Boost.Multiprecision to be 
-used for all kinds of mathematical calculations involving integer, rational and floating-point types requiring extended range and precision.
+ The Multiprecision Library provides integer, rational, floating-point, complex and interval number types in C++ that have more range and 
+ precision than C++'s ordinary built-in types. The big number types in Multiprecision can be used with a wide selection of basic 
+ mathematical operations, elementary transcendental functions as well as the functions in Boost.Math. The Multiprecision types can 
+ also interoperate with the built-in types in C++ using clearly defined conversion rules. This allows Boost.Multiprecision to be 
+ used for all kinds of mathematical calculations involving integer, rational and floating-point types requiring extended range and precision.
 
 Multiprecision consists of a generic interface to the mathematics of large numbers as well as a selection of big number back ends, with 
 support for integer, rational and floating-point types. Boost.Multiprecision provides a selection of back ends provided off-the-rack in 
@@ -25,11 +21,14 @@ The full documentation is available on [boost.org](http://www.boost.org/doc/libs
 
 ## Support, bugs and feature requests ##
 
-Bugs and feature requests can be reported through the [Gitub issue tracker](https://github.com/nilfoundation/multiprecision/issues)
-(see [open issues](https://github.com/nilfoundation/multiprecision/issues) and
-[closed issues](https://github.com/nilfoundation/multiprecision/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aclosed)).
+Bugs and feature requests can be reported through the [Gitub issue tracker](https://github.com/boostorg/multiprecision/issues)
+(see [open issues](https://github.com/boostorg/multiprecision/issues) and
+[closed issues](https://github.com/boostorg/multiprecision/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aclosed)).
 
-You can submit your changes through a [pull request](https://github.com/nilfoundation/multiprecision/pulls).
+You can submit your changes through a [pull request](https://github.com/boostorg/multiprecision/pulls).
+
+There is no mailing-list specific to Boost Multiprecision, although you can use the general-purpose Boost [mailing-list](http://lists.boost.org/mailman/listinfo.cgi/boost-users) using the tag [multiprecision].
+
 
 ## Development ##
 
@@ -39,7 +38,7 @@ Clone the whole boost project, which includes the individual Boost projects as s
     cd boost
     git submodule update --init
 
-The Boost Multiprecision Library is located in `libs/multiprecision/`.
+The Boost Multiprecision Library is located in `libs/multiprecision/`. 
 
 ### Running tests ###
 First, make sure you are in `libs/multiprecision/test`. 
@@ -47,4 +46,3 @@ You can either run all the tests listed in `Jamfile.v2` or run a single test:
 
     ../../../b2                        <- run all tests
     ../../../b2 test_complex           <- single test
-
