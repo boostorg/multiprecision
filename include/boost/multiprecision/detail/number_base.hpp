@@ -60,7 +60,7 @@
 #endif
 
 #ifdef __has_builtin
-#if __has_builtin(__builtin_is_constant_evaluated)
+#if __has_builtin(__builtin_is_constant_evaluated) && !defined(BOOST_NO_CXX14_CONSTEXPR) && !defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX)
 #define BOOST_MP_CLANG_CD
 #endif
 #endif

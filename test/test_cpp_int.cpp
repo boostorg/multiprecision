@@ -561,7 +561,7 @@ struct tester
             u256            b      = a << amount;
             BOOST_CHECK_EQUAL(b, 2);
 
-            u256 high_bit = u256{0};
+            u256 high_bit = u256(0);
             bit_set(high_bit, 255);
             BOOST_CHECK_EQUAL(a << 255, high_bit);
             BOOST_CHECK_EQUAL(a << boost::uint64_t(256), 0);
