@@ -49,6 +49,7 @@ branches:
     - develop
     - cmake-develop
     - cmake-master
+    - 2-modular-adaptor
 
 env:
   matrix:
