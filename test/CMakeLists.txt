@@ -962,7 +962,7 @@ if((GMP_COMPILED) AND (TOMMATH_COMPILED) AND (MPFR_COMPILED))
     cm_test(NAME multiprecision_test_test_generic_conv SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_generic_conv.cpp)
     target_compile_definitions(multiprecision_test_test_generic_conv PUBLIC -DTEST_GMP -DTEST_TOMMATH -DTEST_MPFR)
     target_link_libraries(multiprecision_test_test_generic_conv ${TomMath_LIBRARIES} ${MPFR_LIBRARIES} ${GMP_LIBRARIES} no_eh_support)
-    target_include_directories(multiprecision_test_test_generic_conv PRIVATE ${GMP_INCLUDE_DIRS})
+    target_include_directories(multiprecision_test_test_generic_conv PRIVATE ${GMP_INCLUDE_DIRS} ${TomMath_INCLUDE_DIRS})
     add_dependencies(multiprecision_test_suite_misc multiprecision_test_test_generic_conv)
 endif()
 

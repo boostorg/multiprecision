@@ -181,7 +181,7 @@ test-suite arithmetic_tests :
 
    [ run test_modular_adaptor.cpp : : : [ check-target-builds ../config//has_gmp : <define>TEST_GMP <source>gmp ] ]
    [ run test_modular_adaptor.cpp : : : [ check-target-builds ../config//has_tommath : <define>TEST_TOMMATH <source>tommath] ]
-   [ run test_modular_adaptor.cpp : : : [ <define>TEST_CPP_INT] ]
+   [ run test_modular_adaptor.cpp : : : <define>TEST_CPP_INT ]
 
 ;
 
