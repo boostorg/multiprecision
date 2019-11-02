@@ -596,10 +596,10 @@ class cpp_dec_float
    {
       for (unsigned i = 0; i < data.size(); ++i)
          ar& boost::make_nvp("digit", data[i]);
-         ar& boost::make_nvp("exponent", exp);
-         ar& boost::make_nvp("sign", neg);
-         ar& boost::make_nvp("class-type", fpclass);
-         ar& boost::make_nvp("precision", prec_elem);
+      ar& boost::make_nvp("exponent", exp);
+      ar& boost::make_nvp("sign", neg);
+      ar& boost::make_nvp("class-type", fpclass);
+      ar& boost::make_nvp("precision", prec_elem);
    }
 
  private:

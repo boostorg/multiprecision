@@ -864,7 +864,7 @@ class number
       return this->template convert_to<T>();
    }
 #else
-#if BOOST_WORKAROUND(BOOST_MSVC, < 1900) || (defined(__APPLE_CC__) && BOOST_WORKAROUND(__clang_major__, < 9))
+#if BOOST_WORKAROUND(BOOST_MSVC, < 1900) || (defined(__apple_build_version__) && BOOST_WORKAROUND(__clang_major__, < 9))
    template <class T>
 #else
    template <class T, class = typename boost::disable_if_c<boost::is_constructible<T, self_type const&>::value || !boost::is_default_constructible<T>::value || (!boost::is_arithmetic<T>::value && !boost::is_complex<T>::value), T>::type>
