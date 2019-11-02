@@ -574,7 +574,7 @@ struct mpc_complex_backend<0> : public detail::mpc_complex_imp<0>
    template <unsigned digits10>
    mpc_complex_backend& operator=(gmp_float<digits10> const& val)
    {
-      if (mpc_get_prec(data()) != mpf_get_prec(val.data()))
+      if (mpc_get_prec(data()) != (mpfr_prec_t)mpf_get_prec(val.data()))
       {
          mpc_complex_backend t(val);
          t.swap(*this);
