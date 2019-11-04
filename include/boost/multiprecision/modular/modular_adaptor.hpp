@@ -342,8 +342,8 @@ size_t window_bits(size_t exp_bits)
 
    size_t window_bits = 1;
 
-   size_t j = wsize_count;
-   while ((wsize[j][0] < exp_bits) && (j >= 0))
+   size_t j = wsize_count - 1;
+   while ((wsize[j][0] > exp_bits) && (j >= 0))
    {
       --j;
    }
