@@ -1224,7 +1224,7 @@ void test_float_ops(const boost::mpl::int_<boost::multiprecision::number_kind_fl
       }
       else
       {
-         BOOST_CHECK_THROW(Real(Real(20) / 0u), std::overflow_error);
+         BOOST_CHECK_THROW(r = Real(Real(20) / 0u), std::overflow_error);
       }
    }
 #endif
@@ -2658,6 +2658,9 @@ test_relationals(T a, T b)
 #endif
 }
 
+template <class T>
+const T& self(const T& a) { return a; }
+
 template <class Real>
 void test()
 {
@@ -2989,7 +2992,7 @@ void test()
    // Bug cases, self assignment first:
    //
    a = 20;
-   a = a;
+   a = self(a);
    BOOST_CHECK_EQUAL(a, 20);
 
    a = 2;

@@ -131,7 +131,7 @@ test-suite arithmetic_tests :
    [ run test_arithmetic_tommath_rat.cpp $(TOMMATH) no_eh_support : : : [ check-target-builds ../config//has_tommath : : <build>no ] ]
    [ run test_arithmetic_tommath_br.cpp $(TOMMATH) no_eh_support : : : [ check-target-builds ../config//has_tommath : : <build>no ] ]
 
-   [ run test_arithmetic_cpp_int_1.cpp no_eh_support ]
+   [ run test_arithmetic_cpp_int_1.cpp no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj ]
    [ run test_arithmetic_cpp_int_2.cpp no_eh_support ]
    [ run test_arithmetic_cpp_int_3.cpp no_eh_support ]
    [ run test_arithmetic_cpp_int_4.cpp no_eh_support ]
@@ -179,9 +179,9 @@ test-suite arithmetic_tests :
    [ run test_arithmetic_complex_adaptor_2.cpp ]
    [ run test_arithmetic_complex128.cpp : : : [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
 
-   [ run test_modular_adaptor.cpp : : : [ check-target-builds ../config//has_gmp : <define>TEST_GMP <source>gmp ] ]
-   [ run test_modular_adaptor.cpp : : : [ check-target-builds ../config//has_tommath : <define>TEST_TOMMATH <source>tommath ] ]
-   [ run test_modular_adaptor.cpp : : : [ <define>TEST_CPP_INT ] ]
+   [ run test_modular_adaptor.cpp : : : [ check-target-builds ../config//has_gmp : <define>TEST_GMP <source>gmp : ] ]
+   [ run test_modular_adaptor.cpp : : : [ check-target-builds ../config//has_tommath : <define>TEST_TOMMATH <source>tommath : ] ]
+   [ run test_modular_adaptor.cpp : : : <define>TEST_CPP_INT ]
 
 ;
 

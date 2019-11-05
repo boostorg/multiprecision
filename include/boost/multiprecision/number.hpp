@@ -918,7 +918,7 @@ class number
       return m_backend.compare(o.m_backend);
    }
    template <class V>
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<is_arithmetic<V>::value && (number_category<Backend>::value != number_kind_complex), int>::type compare(const V& o) const
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<is_arithmetic<V>::value && (number_category<Backend>::value != number_kind_complex && number_category<Backend>::value != number_kind_modular), int>::type compare(const V& o) const
    {
       using default_ops::eval_get_sign;
       if (o == 0)
@@ -926,18 +926,12 @@ class number
       return m_backend.compare(canonical_value(o));
    }
    template <class V>
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<is_arithmetic<V>::value && (number_category<Backend>::value == number_kind_complex), int>::type compare(const V& o) const
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<is_arithmetic<V>::value && (number_category<Backend>::value == number_kind_complex || number_category<Backend>::value == number_kind_modular), int>::type compare(const V& o) const
    {
       using default_ops::eval_get_sign;
       return m_backend.compare(canonical_value(o));
    }
 
-   template <class V>
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<is_arithmetic<V>::value && (number_category<Backend>::value == number_kind_modular), int>::type compare(const V& o) const
-   {
-      using default_ops::eval_get_sign;
-      return m_backend.compare(canonical_value(o));
-   }
    //
    // Direct access to the underlying backend:
    //

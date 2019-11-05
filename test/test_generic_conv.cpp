@@ -15,7 +15,7 @@
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
-#include <boost/multiprecision/random.hpp>
+#include <boost/random.hpp>
 
 #ifdef TEST_GMP
 #include <boost/multiprecision/gmp.hpp>
