@@ -14,7 +14,7 @@ branches:
     - master
     - develop
     - cmake-develop
-    - 22-implement-AppVeyorCI
+    - 2-modular-adaptor
 
 platform:
   - x64
