@@ -377,6 +377,7 @@ inline void find_modular_pow(modular_adaptor<Backend>&       result,
 
    using default_ops::eval_bit_set;
    using default_ops::eval_decrement;
+   using default_ops::eval_multiply;
 
    typedef number<modular_adaptor<Backend> > modular_type;
    modular_params<Backend>                   mod = b.mod_data();
@@ -399,7 +400,8 @@ inline void find_modular_pow(modular_adaptor<Backend>&       result,
    ++p_g;
    for (size_t i = 2; i < (1U << m_window_bits); i++)
    {
-      *p_g = m_g[i - 1] * b;
+      eval_multiply((*p_g).backend(), m_g[i - 1].backend(), b);
+      //*p_g = m_g[i - 1] * b;
       ++p_g;
    }
    const size_t exp_nibbles = (exp_bits + 1 + m_window_bits - 1) / m_window_bits;
