@@ -1520,6 +1520,8 @@ if(TOMMATH_COMPILED)
     add_dependencies(multiprecision_test_suite_examples multiprecision_test_tommath_snips)
 endif()
 
+cm_test(NAME multiprecision_test_modular_examples SOURCES ${CURRENT_TEST_SOURCES_DIR}/../example/modular_examples.cpp)
+target_link_libraries(multiprecision_test_modular_examples no_eh_support)
 
 cm_test(NAME multiprecision_test_test_modular_adapter_cpp_int SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_modular_adaptor.cpp)
 target_compile_definitions(multiprecision_test_test_modular_adapter_cpp_int PUBLIC -DTEST_CPP_INT)
