@@ -669,6 +669,11 @@ public:
       requested_precision = digits10;
       mpf_set_prec(this->m_data, multiprecision::detail::digits10_2_2(requested_precision));
    }
+   void swap(gmp_float& o)
+   {
+      std::swap(requested_precision, o.requested_precision);
+      gmp_float_imp<0>::swap(o);
+   }
 };
 
 template <unsigned digits10, class T>
