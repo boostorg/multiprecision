@@ -553,7 +553,7 @@ public:
    {
       mpf_init2(this->m_data, mpf_get_prec(o.data()));
       mpf_set(this->m_data, o.data());
-      requested_precision = multiprecision::detail::digits2_2_10(static_cast<unsigned long>(mpf_get_prec(this->m_data)));
+      requested_precision = D;
    }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    gmp_float(gmp_float&& o) BOOST_NOEXCEPT : detail::gmp_float_imp<0>(static_cast<detail::gmp_float_imp<0>&&>(o)), requested_precision(o.requested_precision)
@@ -611,7 +611,7 @@ public:
          mpf_set_prec(this->m_data, mpf_get_prec(o.data()));
       }
       mpf_set(this->m_data, o.data());
-      requested_precision = o.requested_precision;
+      requested_precision = D;
       return *this;
    }
    gmp_float& operator=(const gmp_int& o);
