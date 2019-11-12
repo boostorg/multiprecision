@@ -21,6 +21,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <vector>
 
 namespace boost {
 namespace multiprecision {
@@ -404,8 +405,8 @@ inline void find_modular_pow(modular_adaptor<Backend>&       result,
       //*p_g = m_g[i - 1] * b;
       ++p_g;
    }
-   const size_t exp_nibbles = (exp_bits + 1 + m_window_bits - 1) / m_window_bits;
-   size_t       exp_index[exp_nibbles];
+   size_t exp_nibbles = (exp_bits + 1 + m_window_bits - 1) / m_window_bits;
+   std::vector<size_t> exp_index;
 
    for (size_t i = 0; i < exp_nibbles; ++i)
    {
@@ -413,7 +414,7 @@ inline void find_modular_pow(modular_adaptor<Backend>&       result,
       eval_bitwise_and(tmp, mask);
       eval_convert_to(&cur_exp_index, tmp);
       eval_right_shift(nibble, m_window_bits);
-      exp_index[i] = cur_exp_index;
+      exp_index.push_back(cur_exp_index);
    }
 
    x = x * m_g[exp_index[exp_nibbles - 1]];
