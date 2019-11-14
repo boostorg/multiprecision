@@ -48,10 +48,8 @@ class modular_adaptor
 
    modular_adaptor() {}
 
-   modular_adaptor(const modular_adaptor& o)
+   modular_adaptor(const modular_adaptor& o) : m_base(o.base_data()), m_mod(o.mod_data())
    {
-      m_base = o.base_data();
-      m_mod  = o.mod_data();
    }
 
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
@@ -61,10 +59,9 @@ class modular_adaptor
    {}
 
 #endif
-   modular_adaptor(const Backend& val, const montgomery_params<Backend>& mod)
+   modular_adaptor(const Backend& val, const modular_params<Backend>& mod) : m_mod(mod), m_base(mod.create_internal_representation(val))
    {
-      m_mod  = mod;
-      m_base = mod.create_internal_representation(val);
+
    }
 
    modular_adaptor(const Backend& val, const Backend& mod)
@@ -75,24 +72,18 @@ class modular_adaptor
    modular_adaptor(Backend& val, Backend& mod)
        : m_base(val), m_mod(mod) {}
 
-   modular_adaptor(const Backend& val)
+   modular_adaptor(const Backend& val) : m_base(val), m_mod(typename mpl::front<unsigned_types>::type(0u))
    {
-      typedef typename mpl::front<unsigned_types>::type ui_type;
-      m_base = val;
-      m_mod  = ui_type(0u);
    }
 
-   modular_adaptor(const modular_params<Backend>& mod)
+   modular_adaptor(const modular_params<Backend>& mod) : m_base(typename mpl::front<unsigned_types>::type(0u)), m_mod(mod)
    {
-      typedef typename mpl::front<unsigned_types>::type ui_type;
-      m_base = ui_type(0u);
-      m_mod  = mod;
    }
 
    modular_adaptor& operator=(const modular_adaptor& o)
    {
       m_base = o.base_data();
-      m_mod  = o.mod_data();
+      m_mod = o.mod_data();
       return *this;
    }
 
@@ -122,7 +113,7 @@ class modular_adaptor
          while (*p && (*p != ',') && (*p != ')'))
             ++p;
          part.assign(s, p);
-         if (part.size())
+         if (!part.empty())
             m_base() = part.c_str();
          else
             m_base() = zero;
@@ -136,7 +127,7 @@ class modular_adaptor
          }
          else
             part.erase();
-         if (part.size())
+         if (!part.empty())
             m_mod() = part.c_str();
          else
             m_mod() = zero;
@@ -386,24 +377,18 @@ inline void find_modular_pow(modular_adaptor<Backend>&       result,
    unsigned long                             cur_exp_index;
    size_t                                    exp_bits = eval_msb(exp);
    m_window_bits                                      = window_bits(exp_bits + 1);
-
-   std::vector<modular_type> m_g(1U << m_window_bits);
-   modular_type*             p_g = m_g.data();
+   modular_type* m_g = (modular_type*)std::malloc((1U << m_window_bits) * sizeof(modular_type));
    modular_type              x(1, mod);
 
    Backend nibble = exp;
    Backend mask;
    eval_bit_set(mask, m_window_bits);
    eval_decrement(mask);
-   *p_g = x;
-   ++p_g;
-   *p_g = b;
-   ++p_g;
+   m_g[0] = x;
+   m_g[1] = b;
    for (size_t i = 2; i < (1U << m_window_bits); i++)
    {
-      eval_multiply((*p_g).backend(), m_g[i - 1].backend(), b);
-      //*p_g = m_g[i - 1] * b;
-      ++p_g;
+      eval_multiply(m_g[i].backend(), m_g[i - 1].backend(), b);
    }
    size_t exp_nibbles = (exp_bits + 1 + m_window_bits - 1) / m_window_bits;
    std::vector<size_t> exp_index;
@@ -429,6 +414,7 @@ inline void find_modular_pow(modular_adaptor<Backend>&       result,
       x = x * m_g[exp_index[i - 1]];
    }
    result = x.backend();
+   std::free(m_g);
 }
 
 template <class Backend>

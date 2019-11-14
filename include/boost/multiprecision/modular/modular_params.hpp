@@ -28,25 +28,31 @@ class modular_params : public backends::montgomery_params<Backend>, public backe
    template <typename Number>
    explicit modular_params(const Number& p) : backends::montgomery_params<Backend>(number_type(p)), backends::barrett_params<Backend>(number_type(p))
    {
-
    }
 
    modular_params& operator=(const modular_params<Backend>& v)
    {
       backends::montgomery_params<Backend>::m_mod = v.get_mod();
-      backends::barrett_params<Backend>::m_mod = v.get_mod();
+      backends::barrett_params<Backend>::m_mod    = v.get_mod();
 
       this->m_mu = v.mu();
 
-      this->m_r2 = v.r2();
-      this->m_p_dash = v.p_dash();
+      this->m_r2      = v.r2();
+      this->m_p_dash  = v.p_dash();
       this->m_p_words = v.p_words();
 
       return *this;
    }
 
+   modular_params& operator=(const number_type& v)
+   {
+      this->initialize_barrett_params(v);
+      this->initialize_montgomery_params(v);
+      return *this;
+   }
+
    template <class Number>
-   modular_params& operator=(const Number& v)
+   modular_params& operator=(const typename std::enable_if<!std::is_same<number_type, Number>::value, Number>::type& v)
    {
       number_type tmp(v);
       this->initialize_barrett_params(tmp);
