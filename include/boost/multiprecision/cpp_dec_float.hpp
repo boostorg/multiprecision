@@ -1771,7 +1771,6 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(boost::intmax_
       return "nan";
    }
 
-   std::string     str;
    boost::intmax_t org_digits(number_of_digits);
    ExponentType    my_exp = order();
 
@@ -1788,18 +1787,28 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(boost::intmax_
    const std::size_t number_of_elements = (std::min)(static_cast<std::size_t>((number_of_digits / static_cast<std::size_t>(cpp_dec_float_elem_digits10)) + 2u),
                                                      static_cast<std::size_t>(cpp_dec_float_elem_number));
 
-   // Extract the remaining digits from cpp_dec_float<Digits10, ExponentType, Allocator> after the decimal point.
-   str = boost::lexical_cast<std::string>(data[0]);
-
    std::stringstream ss;
+   ss.imbue(std::locale::classic());
+
+   // Extract the remaining digits from cpp_dec_float<Digits10, ExponentType, Allocator> after the decimal point.
+   ss << data[0];
+
    // Extract all of the digits from cpp_dec_float<Digits10, ExponentType, Allocator>, beginning with the first data element.
+   static const char cpp_dec_float_elem_zero[] = "00000000";
    for (std::size_t i = static_cast<std::size_t>(1u); i < number_of_elements; i++)
    {
-      ss << std::setw(static_cast<std::streamsize>(cpp_dec_float_elem_digits10))
-         << std::setfill(static_cast<char>('0'))
-         << data[i];
+      if (data[i])
+      {
+         ss << std::setw(static_cast<std::streamsize>(cpp_dec_float_elem_digits10))
+            << std::setfill(static_cast<char>('0'))
+            << data[i];
+      }
+      else
+      {
+         ss << cpp_dec_float_elem_zero;
+      }
    }
-   str += ss.str();
+   std::string str = ss.str();
 
    bool have_leading_zeros = false;
 
