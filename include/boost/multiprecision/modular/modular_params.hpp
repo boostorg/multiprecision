@@ -44,7 +44,8 @@ class modular_params : public backends::montgomery_params<Backend>, public backe
       return *this;
    }
 
-   modular_params& operator=(const number_type& v)
+   template <class Number>
+   modular_params& operator=(const typename std::enable_if<std::is_same<number_type, Number>::value, Number>::type& v)
    {
       this->initialize_barrett_params(v);
       this->initialize_montgomery_params(v);
