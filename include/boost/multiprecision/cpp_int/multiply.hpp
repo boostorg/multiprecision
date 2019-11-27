@@ -78,7 +78,7 @@ eval_multiply(
     const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>& b) BOOST_MP_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
 {
    // Uses simple (O(n^2)) multiplication when the limbs are less
-   // otherwise switches to karatsuba algorithm based on experimental value (~10 limbs)
+   // otherwise switches to karatsuba algorithm based on experimental value (~100 limbs)
    //
    // Trivial cases first:
    //
@@ -124,15 +124,15 @@ eval_multiply(
    }
 
 #ifdef BOOST_NO_CXX14_CONSTEXPR
-   static const double_limb_type limb_max        = ~static_cast<limb_type>(0u);
+   static const double_limb_type limb_max = ~static_cast<limb_type>(0u);
    static const double_limb_type double_limb_max = ~static_cast<double_limb_type>(0u);
-   static const size_t karatsuba_cutoff			 = 100;
-   static const unsigned limb_bits 				 = sizeof(limb_type) * CHAR_BIT;
+   static const size_t karatsuba_cutoff	= 100;
+   static const unsigned limb_bits = sizeof(limb_type) * CHAR_BIT;
 #else
-   constexpr const double_limb_type limb_max 		= ~static_cast<limb_type>(0u);
+   constexpr const double_limb_type limb_max = ~static_cast<limb_type>(0u);
    constexpr const double_limb_type double_limb_max = ~static_cast<double_limb_type>(0u);
-   constexpr const size_t karatsuba_cutoff			= 100;
-   constexpr const unsigned limb_bits 				= sizeof(limb_type) * CHAR_BIT;
+   constexpr const size_t karatsuba_cutoff = 100;
+   constexpr const unsigned limb_bits = sizeof(limb_type) * CHAR_BIT;
 #endif
    result.resize(as + bs, as + bs - 1);
    typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_pointer pr = result.limbs();
