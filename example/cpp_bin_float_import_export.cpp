@@ -14,7 +14,7 @@
 //[IE2
 
 /*`
-Importing or exporting cpp_bin_float is similar, but we must procede via an intermediate integer:
+Importing or exporting cpp_bin_float is similar, but we must proceed via an intermediate integer:
 */
 /*=
 #include <boost/multiprecision/cpp_bin_float.hpp>
@@ -36,7 +36,7 @@ int main()
    export_bits(cpp_int(f.backend().bits()), std::back_inserter(v), 8);
    // Grab the exponent as well:
    int e = f.backend().exponent();
-   // Import back again, and check for equality, we have to procede via
+   // Import back again, and check for equality, we have to proceed via
    // an intermediate integer:
    cpp_int i;
    import_bits(i, v.begin(), v.end());
