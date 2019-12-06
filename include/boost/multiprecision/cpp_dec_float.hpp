@@ -29,6 +29,7 @@
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <boost/multiprecision/detail/dynamic_array.hpp>
+#include <boost/multiprecision/detail/itos.hpp>
 
 //
 // Headers required for Boost.Math integration:
@@ -288,14 +289,14 @@ class cpp_dec_float
    static const cpp_dec_float&(max)()
    {
       init.do_nothing();
-      static cpp_dec_float val_max = std::string("1.0e" + boost::lexical_cast<std::string>(cpp_dec_float_max_exp10)).c_str();
+      static cpp_dec_float val_max = std::string("1.0e" + boost::multiprecision::detail::itos(cpp_dec_float_max_exp10)).c_str();
       return val_max;
    }
 
    static const cpp_dec_float&(min)()
    {
       init.do_nothing();
-      static cpp_dec_float val_min = std::string("1.0e" + boost::lexical_cast<std::string>(cpp_dec_float_min_exp10)).c_str();
+      static cpp_dec_float val_min = std::string("1.0e" + boost::multiprecision::detail::itos(cpp_dec_float_min_exp10)).c_str();
       return val_min;
    }
 
@@ -1789,9 +1790,9 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(boost::intmax_
                                                      static_cast<std::size_t>(cpp_dec_float_elem_number));
 
    // Extract the remaining digits from cpp_dec_float<Digits10, ExponentType, Allocator> after the decimal point.
-   str = boost::lexical_cast<std::string>(data[0]);
-
    std::stringstream ss;
+   ss.imbue(std::locale::classic());
+   ss << data[0];
    // Extract all of the digits from cpp_dec_float<Digits10, ExponentType, Allocator>, beginning with the first data element.
    for (std::size_t i = static_cast<std::size_t>(1u); i < number_of_elements; i++)
    {
