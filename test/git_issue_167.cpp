@@ -8,11 +8,14 @@
 
 int main()
 {
-   std::locale::global(std::locale("en-US"));
-   boost::multiprecision::cpp_dec_float_50 d{"1234.56"};
-   std::string s = d.str();
+   try{
+      std::locale::global(std::locale("en-US"));
+      boost::multiprecision::cpp_dec_float_50 d{"1234.56"};
+      std::string s = d.str();
 
-   BOOST_CHECK_EQUAL(s, "1234.56");
+      BOOST_CHECK_EQUAL(s, "1234.56");
+   }
+   catch(const std::runtime_error&){}  // No en-US locale
 
    return boost::report_errors();
 }
