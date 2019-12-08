@@ -44,13 +44,15 @@ else
    TOMMATH = tommath ;
 }
 
-exe performance_test : performance_test.cpp /boost/system//boost_system
+exe performance_test : performance_test.cpp /boost/system//boost_system [ GLOB performance_test : *.cpp ]
           : release
-          [ check-target-builds ../config//has_gmp : <define>TEST_MPF <define>TEST_MPZ <source>gmp : ]
+          [ check-target-builds ../config//has_gmp : <define>TEST_MPF <define>TEST_MPZ <define>TEST_MPQ <source>gmp : ]
           [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>mpfr : ]
           [ check-target-builds ../config//has_tommath : <define>TEST_TOMMATH <source>$(TOMMATH) : ]
           <define>TEST_CPP_DEC_FLOAT
+          <define>TEST_CPP_BIN_FLOAT
           <define>TEST_CPP_INT
+          <define>TEST_CPP_INT_RATIONAL
           ;
 
 exe miller_rabin_performance : miller_rabin_performance.cpp /boost/system//boost_system /boost/chrono//boost_chrono 
@@ -110,12 +112,12 @@ obj obj_linpack_benchmark_float128 : linpack-benchmark.cpp
           <define>TEST_FLOAT128
           ;
 
-obj obj_linpack_benchmark_cpp_float_quad : linpack-benchmark.cpp
+obj obj_linpack_benchmark_cpp_quad_float : linpack-benchmark.cpp
           : release
           <define>TEST_CPP_BIN_FLOAT_QUAD
           ;
 
-obj obj_linpack_benchmark_cpp_float_oct : linpack-benchmark.cpp
+obj obj_linpack_benchmark_cpp_oct_float : linpack-benchmark.cpp
           : release
           <define>TEST_CPP_BIN_FLOAT_OCT
           ;
@@ -162,7 +164,7 @@ exe linpack_benchmark_cpp_oct_float : obj_linpack_benchmark_cpp_oct_float  f2c
 install miller_rabin_install : miller_rabin_performance : <location>. ;
 install performance_test_install : performance_test  : <location>. ;
 install sf_performance_install : sf_performance   : <location>. ;
-install . : linpack_benchmark_double linpack_benchmark_cpp_float linpack_benchmark_mpf linpack_benchmark_mpfr ;
+install . : linpack_benchmark_double linpack_benchmark_cpp_float linpack_benchmark_mpf linpack_benchmark_mpfr linpack_benchmark_native_float128 linpack_benchmark_float128 linpack_benchmark_cpp_quad_float linpack_benchmark_cpp_oct_float ;
 install delaunay_install : delaunay_test : <location>. ;
 
 
