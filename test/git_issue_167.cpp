@@ -10,7 +10,7 @@ int main()
 {
    try{
       std::locale::global(std::locale("en-US"));
-      boost::multiprecision::cpp_dec_float_50 d{"1234.56"};
+      boost::multiprecision::cpp_dec_float_50 d("1234.56");
       std::string s = d.str();
 
       BOOST_CHECK_EQUAL(s, "1234.56");
