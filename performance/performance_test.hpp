@@ -400,13 +400,11 @@ struct tester
    double test_inplace_multiply_hetero()
    {
       static const U val = get_hetero_test_value<U>();
-      for (unsigned i = 0; i < b.size(); ++i)
-         a[i] = b[i];
       stopwatch<boost::chrono::high_resolution_clock> w;
       for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
-            a[j] *= val;
+            a[j] = b[j], a[j] *= val;
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
@@ -426,13 +424,11 @@ struct tester
    double test_inplace_add_hetero()
    {
       static const U val = get_hetero_test_value<U>();
-      for (unsigned i = 0; i < b.size(); ++i)
-         a[i] = b[i];
       stopwatch<boost::chrono::high_resolution_clock> w;
       for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
-            a[j] += val;
+            a[j] = b[j], a[j] += val;
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
@@ -452,13 +448,11 @@ struct tester
    double test_inplace_subtract_hetero()
    {
       static const U val = get_hetero_test_value<U>();
-      for (unsigned i = 0; i < b.size(); ++i)
-         a[i] = b[i];
       stopwatch<boost::chrono::high_resolution_clock> w;
       for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
-            a[j] -= val;
+            a[j] = b[j], a[j] -= val;
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
@@ -478,13 +472,11 @@ struct tester
    double test_inplace_divide_hetero()
    {
       static const U val = get_hetero_test_value<U>();
-      for (unsigned i = 0; i < b.size(); ++i)
-         a[i] = b[i];
       stopwatch<boost::chrono::high_resolution_clock> w;
       for (unsigned i = 0; i < 1000; ++i)
       {
          for (unsigned j = 0; j < b.size(); ++j)
-            a[j] /= val;
+            a[j] = b[j], a[j] /= val;
       }
       return boost::chrono::duration_cast<boost::chrono::duration<double> >(w.elapsed()).count();
    }
