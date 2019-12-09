@@ -65,17 +65,15 @@ exe miller_rabin_performance : miller_rabin_performance.cpp [ GLOB miller_rabin_
           ;
 
 exe sf_performance : sf_performance.cpp sf_performance_basic.cpp sf_performance_bessel.cpp 
-                     sf_performance_bessel1.cpp sf_performance_bessel2.cpp sf_performance_bessel3.cpp
-                     sf_performance_bessel4.cpp sf_performance_bessel5.cpp sf_performance_bessel6.cpp
-                     sf_performance_nct.cpp sf_performance_nct1.cpp 
-                     sf_performance_nct2.cpp sf_performance_nct3.cpp sf_performance_nct4.cpp
-                     sf_performance_nct5.cpp sf_performance_nct6.cpp
-                     sf_performance_poly.cpp 
+                     sf_performance_nct.cpp sf_performance_poly.cpp
+                     [ GLOB sf_performance_files : *.cpp ]
                      /boost/system//boost_system /boost/chrono//boost_chrono /boost/thread//boost_thread
           : release
           [ check-target-builds ../config//has_gmp : <define>TEST_MPF <define>TEST_MPZ <source>gmp : ]
           [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>mpfr : ]
           <define>TEST_CPP_DEC_FLOAT
+          <define>TEST_CPP_BIN_FLOAT
+          <define>TEST_FLOAT
           <toolset>msvc:<cxxflags>-bigobj
           ;
           
