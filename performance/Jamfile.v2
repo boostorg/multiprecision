@@ -44,7 +44,7 @@ else
    TOMMATH = tommath ;
 }
 
-exe performance_test : performance_test.cpp /boost/system//boost_system [ GLOB performance_test : *.cpp ]
+exe performance_test : performance_test.cpp /boost/system//boost_system [ GLOB performance_test_files : *.cpp ]
           : release
           [ check-target-builds ../config//has_gmp : <define>TEST_MPF <define>TEST_MPZ <define>TEST_MPQ <source>gmp : ]
           [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>mpfr : ]
@@ -55,11 +55,11 @@ exe performance_test : performance_test.cpp /boost/system//boost_system [ GLOB p
           <define>TEST_CPP_INT_RATIONAL
           ;
 
-exe miller_rabin_performance : miller_rabin_performance.cpp /boost/system//boost_system /boost/chrono//boost_chrono 
+exe miller_rabin_performance : miller_rabin_performance.cpp [ GLOB miller_rabin_performance_files : *.cpp ] /boost/system//boost_system /boost/chrono//boost_chrono 
           : release
           [ check-target-builds ../config//has_gmp : <define>TEST_MPF <define>TEST_MPZ <source>gmp : ]
           [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>mpfr : ]
-          #[ check-target-builds ../config//has_tommath : <define>TEST_TOMMATH <source>$(TOMMATH) : ]
+          [ check-target-builds ../config//has_tommath : <define>TEST_TOMMATH <source>$(TOMMATH) : ]
           <define>TEST_CPP_DEC_FLOAT
           <define>TEST_CPP_INT
           ;
