@@ -81,6 +81,8 @@ boost::chrono::duration<double> test_miller_rabin(const char* name)
    return t;
 }
 
+boost::chrono::duration<double> test_miller_rabin_gmp();
+
 void test01();
 void test02();
 void test03();

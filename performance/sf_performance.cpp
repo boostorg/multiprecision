@@ -5,7 +5,7 @@
 
 #include "sf_performance.hpp"
 
-boost::atomic<unsigned>                                                     allocation_count = 0;
+boost::atomic<unsigned>                                                     allocation_count(0);
 std::map<std::string, std::map<std::string, std::pair<double, unsigned> > > result_table;
 
 void* (*alloc_func_ptr)(size_t);

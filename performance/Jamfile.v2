@@ -33,6 +33,7 @@ project : requirements
 
 lib gmp ;
 lib mpfr ;
+lib quadmath ;
 
 if $(tommath_path)
 {
@@ -71,6 +72,7 @@ exe sf_performance : sf_performance.cpp sf_performance_basic.cpp sf_performance_
           : release
           [ check-target-builds ../config//has_gmp : <define>TEST_MPF <define>TEST_MPZ <source>gmp : ]
           [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>mpfr : ]
+          [ check-target-builds ../config//has_float128 : <source>quadmath : ]
           <define>TEST_CPP_DEC_FLOAT
           <define>TEST_CPP_BIN_FLOAT
           <define>TEST_FLOAT

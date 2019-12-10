@@ -121,7 +121,7 @@ void quickbook_platform_details()
 #endif
    std::cout << "[[Compiler][" << BOOST_COMPILER << "]]\n";
 #ifdef TEST_MPZ
-   std::cout << "[[GMP][" << GMP_VERSION << "]]\n";
+   std::cout << "[[GMP][" << gmp_version << "]]\n";
 #endif
 #ifdef TEST_MPFR
    std::cout << "[[MPFR][" << MPFR_VERSION << "]]\n";
