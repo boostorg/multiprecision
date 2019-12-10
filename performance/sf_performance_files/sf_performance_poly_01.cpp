@@ -8,6 +8,6 @@
 void poly_tests_01()
 {
 #ifdef TEST_MPFR
-   time_proc("mpfr_float_50", test_polynomial<mpfr_float_50>);
+   time_proc("Polynomial Evaluation (50 digit precision)", "mpfr_float_50", test_polynomial<mpfr_float_50>);
 #endif
 }

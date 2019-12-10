@@ -8,6 +8,6 @@
 void bessel_tests_17()
 {
 #ifdef TEST_CPP_BIN_FLOAT
-   time_proc("cpp_bin_float_100", test_bessel<cpp_bin_float_100>);
+   time_proc("Bessel Functions (100 digit precision)", "cpp_bin_float_100", test_bessel<cpp_bin_float_100>);
 #endif
 }

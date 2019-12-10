@@ -19,7 +19,7 @@
 #if defined(TEST_MPFR) && !defined(TEST_MPFR_CLASS)
 #if defined(__has_include)
 #if __has_include(<gmpfrxx.h>)
-#  define TEST_MPFR_CLASS
+#define TEST_MPFR_CLASS
 #endif
 #endif
 #endif
@@ -52,6 +52,7 @@
 #include <boost/chrono.hpp>
 #include <boost/array.hpp>
 #include <boost/thread.hpp>
+#include <boost/atomic.hpp>
 
 template <class Real>
 Real test_bessel();
@@ -163,7 +164,8 @@ Real test_nct()
    return result;
 }
 
-extern unsigned allocation_count;
+extern boost::atomic<unsigned>                                                     allocation_count;
+extern std::map<std::string, std::map<std::string, std::pair<double, unsigned> > > result_table;
 
 template <class Real>
 void basic_allocation_test(const char* name, Real x)
@@ -184,7 +186,7 @@ void poly_allocation_test(const char* name, Real x)
 }
 
 template <class Real>
-void time_proc(const char* name, Real (*proc)(), unsigned threads = 1)
+void time_proc(const char* tablename, const char* name, Real (*proc)(), unsigned threads = 1)
 {
    try
    {
@@ -197,16 +199,22 @@ void time_proc(const char* name, Real (*proc)(), unsigned threads = 1)
       std::cout << "Time for " << name << " = " << time << std::endl;
       std::cout << "Total allocations for " << name << " = " << allocation_count << std::endl;
 
-      for (unsigned thread_count = 1; thread_count < threads; ++thread_count)
+      result_table[tablename][name] = std::make_pair(time.count(), (unsigned)allocation_count);
+
+      if (threads > 1)
       {
          c.reset();
          boost::thread_group g;
-         for (unsigned i = 0; i <= thread_count; ++i)
+         for (unsigned i = 0; i < threads; ++i)
             g.create_thread(proc);
          g.join_all();
          time = c.elapsed();
-         std::cout << "Time for " << name << " (" << (thread_count + 1) << " theads) = " << time << std::endl;
+         std::cout << "Time for " << name << " (" << (threads) << " theads) = " << time << std::endl;
          std::cout << "Total allocations for " << name << " = " << allocation_count << std::endl;
+
+         std::ostringstream ss;
+         ss << name << " (" << threads << " concurrent threads)";
+         result_table[tablename][ss.str()] = std::make_pair(time.count(), (unsigned)allocation_count);
       }
    }
    catch (const std::exception& e)

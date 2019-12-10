@@ -8,6 +8,6 @@
 void poly_tests_18()
 {
 #ifdef TEST_MPREAL
-   time_proc("mpfr::mpreal", test_polynomial<mpfr::mpreal>);
+   time_proc("Polynomial Evaluation (100 digit precision)", "mpfr::mpreal", test_polynomial<mpfr::mpreal>);
 #endif
 }

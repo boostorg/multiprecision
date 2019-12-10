@@ -8,6 +8,6 @@
 void nct_tests_08()
 {
 #ifdef TEST_CPP_BIN_FLOAT
-   time_proc("cpp_bin_float_50", test_nct<cpp_bin_float_50>, 3);
+   time_proc("Non-central T Distribution (50 digit precision)", "cpp_bin_float_50", test_nct<cpp_bin_float_50>, 3);
 #endif
 }

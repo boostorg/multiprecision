@@ -8,6 +8,6 @@
 void poly_tests_15()
 {
 #ifdef TEST_CPP_DEC_FLOAT
-   time_proc("cpp_dec_float_100", test_polynomial<cpp_dec_float_100>);
+   time_proc("Polynomial Evaluation (100 digit precision)", "cpp_dec_float_100", test_polynomial<cpp_dec_float_100>);
 #endif
 }

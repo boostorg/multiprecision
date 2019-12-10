@@ -9,9 +9,9 @@ void bessel_tests_01()
 {
 #ifdef TEST_MPFR
 #if MPFR_VERSION < MPFR_VERSION_NUM(3, 0, 0)
-   time_proc("mpfr_float_50", test_bessel<boost::multiprecision::mpfr_float_50>, 1);
+   time_proc("Bessel Functions (50 digit precision)", "mpfr_float_50", test_bessel<boost::multiprecision::mpfr_float_50>, 1);
 #else
-   time_proc("mpfr_float_50", test_bessel<boost::multiprecision::mpfr_float_50>, mpfr_buildopt_tls_p() ? 3 : 1);
+   time_proc("Bessel Functions (50 digit precision)", "mpfr_float_50", test_bessel<boost::multiprecision::mpfr_float_50>, mpfr_buildopt_tls_p() ? 3 : 1);
 #endif
 #endif
 }

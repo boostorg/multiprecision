@@ -8,6 +8,6 @@
 void nct_tests_05()
 {
 #ifdef TEST_MPF
-   time_proc("mpf_float_50 (no expression templates", test_nct<number<gmp_float<50>, et_off> >);
+   time_proc("Non-central T Distribution (50 digit precision)", "mpf_float_50 (no expression templates", test_nct<number<gmp_float<50>, et_off> >);
 #endif
 }

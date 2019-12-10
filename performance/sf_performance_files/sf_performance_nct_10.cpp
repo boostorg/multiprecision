@@ -8,6 +8,6 @@
 void nct_tests_10()
 {
 #ifdef TEST_MPREAL
-   time_proc("mpfr::mpreal", test_nct<mpfr::mpreal>);
+   time_proc("Non-central T Distribution (50 digit precision)", "mpfr::mpreal", test_nct<mpfr::mpreal>);
 #endif
 }

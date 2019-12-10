@@ -8,6 +8,6 @@
 void bessel_tests_05()
 {
 #ifdef TEST_MPF
-   time_proc("mpf_float_50", test_bessel<mpf_float_50>, 3);
+   time_proc("Bessel Functions (50 digit precision)", "mpf_float_50", test_bessel<mpf_float_50>, 3);
 #endif
 }

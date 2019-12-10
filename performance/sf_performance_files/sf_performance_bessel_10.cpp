@@ -8,6 +8,6 @@
 void bessel_tests_10()
 {
 #ifdef TEST_MPREAL
-   time_proc("mpfr::mpreal", test_bessel<mpfr::mpreal>, mpfr_buildopt_tls_p() ? 3 : 1);
+   time_proc("Bessel Functions (50 digit precision)", "mpfr::mpreal", test_bessel<mpfr::mpreal>, mpfr_buildopt_tls_p() ? 3 : 1);
 #endif
 }

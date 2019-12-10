@@ -8,6 +8,6 @@
 void nct_tests_01()
 {
 #ifdef TEST_MPFR
-   time_proc("mpfr_float_50", test_nct<mpfr_float_50>);
+   time_proc("Non-central T Distribution (50 digit precision)", "mpfr_float_50", test_nct<mpfr_float_50>);
 #endif
 }

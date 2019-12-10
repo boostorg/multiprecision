@@ -8,6 +8,6 @@
 void bessel_tests_18()
 {
 #ifdef TEST_MPFR_CLASS
-   time_proc("mpfr_class", test_bessel<mpfr_class>);
+   time_proc("Bessel Functions (100 digit precision)", "mpfr_class", test_bessel<mpfr_class>);
 #endif
 }
