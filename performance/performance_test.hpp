@@ -717,4 +717,9 @@ void test36();
 void test37();
 void test38();
 void test39();
+void test40();
+void test41();
+void test42();
+void test43();
+void test44();
 

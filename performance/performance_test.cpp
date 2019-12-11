@@ -172,6 +172,13 @@ int main()
    test35();
    test36();
    test37();
+   test38();
+   test39();
+   test40();
+   test41();
+   test42();
+   test43();
+   test44();
 
    quickbook_results();
    return 0;

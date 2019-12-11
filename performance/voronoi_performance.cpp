@@ -9,7 +9,7 @@
 
 #include <boost/polygon/detail/voronoi_predicates.hpp>
 #include <boost/polygon/detail/voronoi_structures.hpp>
-#include <boost/polygon/detail/skeleton_predicates.hpp>
+#include <boost/polygon/detail/voronoi_ctypes.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
 #include <vector>
