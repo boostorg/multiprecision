@@ -329,6 +329,11 @@ struct tommath_int
       }
       if ((f & std::ios_base::showpos) && (result[0] != '-'))
          result.insert(static_cast<std::string::size_type>(0), 1, '+');
+      if(((f & std::ios_base::uppercase) == 0) && (base == 16))
+      {
+         for(std::size_t i = 0; i < result.size(); ++i)
+            result[i] = std::tolower(result[i]);
+      }
       return result;
    }
    ~tommath_int()
