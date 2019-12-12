@@ -176,6 +176,7 @@ install performance_test_install : performance_test  : <location>. ;
 install sf_performance_install : sf_performance   : <location>. ;
 install . : linpack_benchmark_double linpack_benchmark_cpp_float linpack_benchmark_mpf linpack_benchmark_mpfr linpack_benchmark_native_float128 linpack_benchmark_float128 linpack_benchmark_cpp_quad_float linpack_benchmark_cpp_oct_float ;
 install delaunay_install : delaunay_test : <location>. ;
+install voronoi_install : voronoi_performance : <location>. ;
 
 
 

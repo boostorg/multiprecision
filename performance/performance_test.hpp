@@ -630,7 +630,8 @@ void test_int_ops(tester<Number, N>& t, const char* type, unsigned precision, co
    report_result(cat, type, "&(int)", precision, t.test_and_int());
    report_result(cat, type, "^(int)", precision, t.test_xor_int());
    report_result(cat, type, "gcd", precision, t.test_gcd());
-   report_result(cat, type, "powm", precision, t.test_powm());
+   if(precision <= 1024)
+      report_result(cat, type, "powm", precision, t.test_powm());
 }
 template <class Number, int N, class U>
 void test_int_ops(tester<Number, N>&, const char*, unsigned, const U&)

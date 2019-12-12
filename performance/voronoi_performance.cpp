@@ -97,7 +97,7 @@ struct cpp_int_voronoi_traits
          return efpt_type(val, 0);
       }
       template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-      double operator()(const boost::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
+      efpt_type operator()(const boost::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
       {
          typedef typename boost::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type r_t;
          r_t                                                                                                  r(e);
