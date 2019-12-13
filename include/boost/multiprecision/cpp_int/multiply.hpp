@@ -70,6 +70,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void resize_for_carry(cpp_int_backend<MinBits1, 
    if (result.size() < required)
       result.resize(required, required);
 }
+const size_t karatsuba_cutoff = 100;
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3, class Allocator3>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3> >::value>::type
 eval_multiply(
@@ -126,12 +127,10 @@ eval_multiply(
 #ifdef BOOST_NO_CXX14_CONSTEXPR
    static const double_limb_type limb_max = ~static_cast<limb_type>(0u);
    static const double_limb_type double_limb_max = ~static_cast<double_limb_type>(0u);
-   static const size_t karatsuba_cutoff	= 100;
    static const unsigned limb_bits = sizeof(limb_type) * CHAR_BIT;
 #else
    constexpr const double_limb_type limb_max = ~static_cast<limb_type>(0u);
    constexpr const double_limb_type double_limb_max = ~static_cast<double_limb_type>(0u);
-   constexpr const size_t karatsuba_cutoff = 100;
    constexpr const unsigned limb_bits = sizeof(limb_type) * CHAR_BIT;
 #endif
    result.resize(as + bs, as + bs - 1);
@@ -178,7 +177,7 @@ eval_multiply(
 	   // x = a_h * b_ h
 	   // y = a_l * b_l
 	   // z = (a_h + a_l)*(b_h + b_l) - x - y
-	   //  a * b = x * (2 ^ (2 * n))+ z * (2 ^ n) + y
+	   // a * b = x * (2 ^ (2 * n))+ z * (2 ^ n) + y
 	   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> t1, t2;
 	   // result = | a_h*b_h  | a_l*b_l |
 	   // (bits)              <-- 2*n -->
@@ -187,7 +186,10 @@ eval_multiply(
 	   resize_for_carry(result, t1.size());
 	   std::copy(t1.limbs(), t1.limbs() + t1.size(), result.limbs());
 	   resize_for_carry(result, 2 * n + t2.size());
-	   std::copy(t2.limbs(), t2.limbs() + t2.size(), result.limbs() + 2 * n);
+	   sz = (std::max<long long int>)(0, static_cast<long long int>((std::min)(result.size(), 2 * n + t2.size())) - static_cast<long long int>(2 * n));
+	   // for fixed precision arithmetic a_h and b_h cannot be non-zero
+	   // otherwise a_h * b_h cannot be placed in result.size() bits
+	   std::copy(t2.limbs(), t2.limbs() + sz, result.limbs() + 2 * n);
 
 	   eval_add(t1, t2);  // t1 = a_l*b_l + a_h*b_h
 	   eval_add(a_l, a_h);
