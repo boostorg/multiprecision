@@ -63,10 +63,13 @@ void quickbook_results()
          {
             for (type_iterator k = j->second.begin(); k != j->second.end(); ++k)
             {
-               precision_iterator l = k->second.begin();
-               std::advance(l, m);
-               if (best_times[m] > l->second)
-                  best_times[m] = l->second ? l->second : best_times[m];
+               if (m < k->second.size())
+               {
+                  precision_iterator l = k->second.begin();
+                  std::advance(l, m);
+                  if (best_times[m] > l->second)
+                     best_times[m] = l->second ? l->second : best_times[m];
+               }
             }
          }
 
