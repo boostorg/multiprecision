@@ -29,6 +29,7 @@
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <boost/multiprecision/detail/dynamic_array.hpp>
+#include <boost/multiprecision/detail/itos.hpp>
 
 //
 // Headers required for Boost.Math integration:
@@ -77,7 +78,7 @@ class cpp_dec_float
  public:
    typedef mpl::list<boost::long_long_type>  signed_types;
    typedef mpl::list<boost::ulong_long_type> unsigned_types;
-   typedef mpl::list<long double>            float_types;
+   typedef mpl::list<double, long double>    float_types;
    typedef ExponentType                      exponent_type;
 
    static const boost::int32_t cpp_dec_float_radix             = 10L;
@@ -161,8 +162,8 @@ class cpp_dec_float
          cpp_dec_float<Digits10, ExponentType, Allocator>::half();
          cpp_dec_float<Digits10, ExponentType, Allocator>::double_min();
          cpp_dec_float<Digits10, ExponentType, Allocator>::double_max();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::long_double_max();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::long_double_min();
+         //cpp_dec_float<Digits10, ExponentType, Allocator>::long_double_max();
+         //cpp_dec_float<Digits10, ExponentType, Allocator>::long_double_min();
          cpp_dec_float<Digits10, ExponentType, Allocator>::long_long_max();
          cpp_dec_float<Digits10, ExponentType, Allocator>::long_long_min();
          cpp_dec_float<Digits10, ExponentType, Allocator>::ulong_long_max();
@@ -173,6 +174,18 @@ class cpp_dec_float
    };
 
    static initializer init;
+
+   struct long_double_initializer
+   {
+      long_double_initializer()
+      {
+         cpp_dec_float<Digits10, ExponentType, Allocator>::long_double_max();
+         cpp_dec_float<Digits10, ExponentType, Allocator>::long_double_min();
+      }
+      void do_nothing() {}
+   };
+
+   static long_double_initializer linit;
 
  public:
    // Constructors
@@ -288,14 +301,14 @@ class cpp_dec_float
    static const cpp_dec_float&(max)()
    {
       init.do_nothing();
-      static cpp_dec_float val_max = std::string("1.0e" + boost::lexical_cast<std::string>(cpp_dec_float_max_exp10)).c_str();
+      static cpp_dec_float val_max = std::string("1.0e" + boost::multiprecision::detail::itos(cpp_dec_float_max_exp10)).c_str();
       return val_max;
    }
 
    static const cpp_dec_float&(min)()
    {
       init.do_nothing();
-      static cpp_dec_float val_min = std::string("1.0e" + boost::lexical_cast<std::string>(cpp_dec_float_min_exp10)).c_str();
+      static cpp_dec_float val_min = std::string("1.0e" + boost::multiprecision::detail::itos(cpp_dec_float_min_exp10)).c_str();
       return val_min;
    }
 
@@ -330,20 +343,20 @@ class cpp_dec_float
    static const cpp_dec_float& double_min()
    {
       init.do_nothing();
-      static cpp_dec_float val(static_cast<long double>((std::numeric_limits<double>::min)()));
+      static cpp_dec_float val((std::numeric_limits<double>::min)());
       return val;
    }
 
    static const cpp_dec_float& double_max()
    {
       init.do_nothing();
-      static cpp_dec_float val(static_cast<long double>((std::numeric_limits<double>::max)()));
+      static cpp_dec_float val((std::numeric_limits<double>::max)());
       return val;
    }
 
    static const cpp_dec_float& long_double_min()
    {
-      init.do_nothing();
+      linit.do_nothing();
 #ifdef BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
       static cpp_dec_float val(static_cast<long double>((std::numeric_limits<double>::min)()));
 #else
@@ -354,7 +367,7 @@ class cpp_dec_float
 
    static const cpp_dec_float& long_double_max()
    {
-      init.do_nothing();
+       linit.do_nothing();
 #ifdef BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
       static cpp_dec_float val(static_cast<long double>((std::numeric_limits<double>::max)()));
 #else
@@ -433,7 +446,8 @@ class cpp_dec_float
       return *this;
    }
 
-   cpp_dec_float& operator=(long double v);
+   template <class Float>
+   typename boost::enable_if_c<boost::is_floating_point<Float>::value, cpp_dec_float&>::type operator=(Float v);
 
    cpp_dec_float& operator=(const char* v)
    {
@@ -623,6 +637,8 @@ class cpp_dec_float
 
 template <unsigned Digits10, class ExponentType, class Allocator>
 typename cpp_dec_float<Digits10, ExponentType, Allocator>::initializer cpp_dec_float<Digits10, ExponentType, Allocator>::init;
+template <unsigned Digits10, class ExponentType, class Allocator>
+typename cpp_dec_float<Digits10, ExponentType, Allocator>::long_double_initializer cpp_dec_float<Digits10, ExponentType, Allocator>::linit;
 
 template <unsigned Digits10, class ExponentType, class Allocator>
 const boost::int32_t cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_radix;
@@ -1563,6 +1579,7 @@ double cpp_dec_float<Digits10, ExponentType, Allocator>::extract_double() const
    }
 
    std::stringstream ss;
+   ss.imbue(std::locale::classic());
 
    ss << str(std::numeric_limits<double>::digits10 + (2 + 1), std::ios_base::scientific);
 
@@ -1609,6 +1626,7 @@ long double cpp_dec_float<Digits10, ExponentType, Allocator>::extract_long_doubl
    }
 
    std::stringstream ss;
+   ss.imbue(std::locale::classic());
 
    ss << str(std::numeric_limits<long double>::digits10 + (2 + 1), std::ios_base::scientific);
 
@@ -1789,9 +1807,9 @@ std::string cpp_dec_float<Digits10, ExponentType, Allocator>::str(boost::intmax_
                                                      static_cast<std::size_t>(cpp_dec_float_elem_number));
 
    // Extract the remaining digits from cpp_dec_float<Digits10, ExponentType, Allocator> after the decimal point.
-   str = boost::lexical_cast<std::string>(data[0]);
-
    std::stringstream ss;
+   ss.imbue(std::locale::classic());
+   ss << data[0];
    // Extract all of the digits from cpp_dec_float<Digits10, ExponentType, Allocator>, beginning with the first data element.
    for (std::size_t i = static_cast<std::size_t>(1u); i < number_of_elements; i++)
    {
@@ -2248,7 +2266,8 @@ cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float(const double man
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
-cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, ExponentType, Allocator>::operator=(long double a)
+template <class Float>
+typename boost::enable_if_c<boost::is_floating_point<Float>::value, cpp_dec_float<Digits10, ExponentType, Allocator>&>::type cpp_dec_float<Digits10, ExponentType, Allocator>::operator=(Float a)
 {
    // Christopher Kormanyos's original code used a cast to boost::long_long_type here, but that fails
    // when long double has more digits than a boost::long_long_type.
@@ -2274,7 +2293,7 @@ cpp_dec_float<Digits10, ExponentType, Allocator>& cpp_dec_float<Digits10, Expone
       return *this = nan();
 
    int         e;
-   long double f, term;
+   Float f, term;
    *this = zero();
 
    f = frexp(a, &e);
@@ -2777,9 +2796,14 @@ inline void eval_convert_to(boost::long_long_type* result, const cpp_dec_float<D
    *result = val.extract_signed_long_long();
 }
 template <unsigned Digits10, class ExponentType, class Allocator>
-inline void eval_convert_to(long double* result, cpp_dec_float<Digits10, ExponentType, Allocator>& val)
+inline void eval_convert_to(long double* result, const cpp_dec_float<Digits10, ExponentType, Allocator>& val)
 {
    *result = val.extract_long_double();
+}
+template <unsigned Digits10, class ExponentType, class Allocator>
+inline void eval_convert_to(double* result, const cpp_dec_float<Digits10, ExponentType, Allocator>& val)
+{
+   *result = val.extract_double();
 }
 
 //
