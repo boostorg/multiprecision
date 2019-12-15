@@ -5,6 +5,7 @@
 
 import modules ;
 import path ;
+import ../../config/checks/config : requires ;
 
 local ntl-path = [ modules.peek : NTL_PATH ] ;
 local gmp_path = [ modules.peek : GMP_PATH ] ;
@@ -46,9 +47,13 @@ else
    TOMMATH = tommath ;
 }
 
+PTF = [ GLOB performance_test_files : *.cpp ] ;
+MRF = [ GLOB miller_rabin_performance_files : *.cpp ] ;
+SFF = [ GLOB sf_performance_files : *.cpp ] ;
+
 test-suite performance :
 
-[ exe performance_test : performance_test.cpp /boost/system//boost_system [ GLOB performance_test_files : *.cpp ]
+[ exe performance_test : performance_test.cpp $(PTF) /boost/system//boost_system
           : release
           [ check-target-builds ../config//has_gmp : <define>TEST_MPF <define>TEST_MPZ <define>TEST_MPQ <source>gmp : ]
           [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>mpfr : ]
@@ -57,9 +62,10 @@ test-suite performance :
           <define>TEST_CPP_BIN_FLOAT
           <define>TEST_CPP_INT
           <define>TEST_CPP_INT_RATIONAL
+          [ requires cxx11_auto_declarations cxx11_allocator ]
           ]
 
-[ exe miller_rabin_performance : miller_rabin_performance.cpp [ GLOB miller_rabin_performance_files : *.cpp ] /boost/system//boost_system /boost/chrono//boost_chrono 
+[ exe miller_rabin_performance : miller_rabin_performance.cpp $(MRF) /boost/system//boost_system /boost/chrono//boost_chrono 
           : release
           [ check-target-builds ../config//has_gmp : <define>TEST_MPF <define>TEST_MPZ <source>gmp : ]
           [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>mpfr : ]
@@ -70,7 +76,7 @@ test-suite performance :
 
 [ exe sf_performance : sf_performance.cpp sf_performance_basic.cpp sf_performance_bessel.cpp 
                      sf_performance_nct.cpp sf_performance_poly.cpp
-                     [ GLOB sf_performance_files : *.cpp ]
+                     $(SFF)
                      /boost/system//boost_system /boost/chrono//boost_chrono /boost/thread//boost_thread
           : release
           [ check-target-builds ../config//has_gmp : <define>TEST_MPF <define>TEST_MPZ <source>gmp : ]
@@ -80,6 +86,7 @@ test-suite performance :
           <define>TEST_CPP_BIN_FLOAT
           <define>TEST_FLOAT
           <toolset>msvc:<cxxflags>-bigobj
+          [ requires cxx11_auto_declarations cxx11_allocator ]
           ]
           
 [ exe delaunay_test : delaunay_test.cpp /boost/system//boost_system /boost/chrono//boost_chrono ]
