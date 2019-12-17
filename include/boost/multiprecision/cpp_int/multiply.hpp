@@ -70,7 +70,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void resize_for_carry(cpp_int_backend<MinBits1, 
    if (result.size() < required)
       result.resize(required, required);
 }
-
+const size_t karatsuba_cutoff = 100;
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3, class Allocator3>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3> >::value>::type
 eval_multiply(
@@ -78,10 +78,10 @@ eval_multiply(
     const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
     const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>& b) BOOST_MP_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
 {
-   // Very simple long multiplication, only usable for small numbers of limb_type's
-   // but that's the typical use case for this type anyway:
+   // Uses simple (O(n^2)) multiplication when the limbs are less
+   // otherwise switches to karatsuba algorithm based on experimental value (~100 limbs)
    //
-   // Special cases first:
+   // Trivial cases first:
    //
    unsigned                                                                                          as = a.size();
    unsigned                                                                                          bs = b.size();
@@ -124,27 +124,86 @@ eval_multiply(
       return;
    }
 
-   result.resize(as + bs, as + bs - 1);
-   typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_pointer pr = result.limbs();
 #ifdef BOOST_NO_CXX14_CONSTEXPR
-   static const double_limb_type limb_max        = ~static_cast<limb_type>(0u);
+   static const double_limb_type limb_max = ~static_cast<limb_type>(0u);
    static const double_limb_type double_limb_max = ~static_cast<double_limb_type>(0u);
+   static const unsigned limb_bits = sizeof(limb_type) * CHAR_BIT;
 #else
    constexpr const double_limb_type limb_max = ~static_cast<limb_type>(0u);
    constexpr const double_limb_type double_limb_max = ~static_cast<double_limb_type>(0u);
+   constexpr const unsigned limb_bits = sizeof(limb_type) * CHAR_BIT;
 #endif
+   result.resize(as + bs, as + bs - 1);
+   typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_pointer pr = result.limbs();
    BOOST_STATIC_ASSERT(double_limb_max - 2 * limb_max >= limb_max * limb_max);
 
+   std::fill(pr, pr + result.size(), 0);
    double_limb_type carry = 0;
-#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
-   if (BOOST_MP_IS_CONST_EVALUATED(as))
+
+   if(as >= karatsuba_cutoff && bs >= karatsuba_cutoff)
    {
-      for (unsigned i = 0; i < result.size(); ++i)
-         pr[i] = 0;
-   }
-   else
-#endif
-   std::memset(pr, 0, result.size() * sizeof(limb_type));
+	   unsigned n = (as > bs ? as : bs) / 2 + 1;
+	   // write a, b as a = a_h * 2^n + a_l, b = b_h * 2^n + b_l
+	   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> a_h, a_l, b_h, b_l;
+
+	   unsigned sz = (std::min)(as, n);
+	   a_l.resize(sz, sz);
+	   std::copy(a.limbs(), a.limbs() + sz, a_l.limbs());
+
+	   sz = (std::min)(bs, n);
+	   b_l.resize(sz, sz);
+	   std::copy(b.limbs(), b.limbs() + sz, b_l.limbs());
+
+	   if(as > n){
+		   a_h.resize(as - n, as - n);
+		   std::copy(a.limbs() + n, a.limbs() + as, a_h.limbs());
+	   }
+	   else
+	   {
+		   a_h.resize(1,1);
+		   a_h.limbs()[0] = 0;
+	   }
+	   if(bs > n)
+	   {
+		   b_h.resize(bs - n, bs - n);
+		   std::copy(b.limbs() + n, b.limbs() + bs, b_h.limbs());
+	   }
+	   else
+	   {
+		   b_h.resize(1,1);
+		   b_h.limbs()[0] = 0;
+	   }
+
+	   // x = a_h * b_ h
+	   // y = a_l * b_l
+	   // z = (a_h + a_l)*(b_h + b_l) - x - y
+	   // a * b = x * (2 ^ (2 * n))+ z * (2 ^ n) + y
+	   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> t1, t2;
+	   // result = | a_h*b_h  | a_l*b_l |
+	   // (bits)              <-- 2*n -->
+	   eval_multiply(t1, a_l, b_l);
+	   eval_multiply(t2, a_h, b_h);
+	   resize_for_carry(result, t1.size());
+	   std::copy(t1.limbs(), t1.limbs() + t1.size(), result.limbs());
+	   resize_for_carry(result, 2 * n + t2.size());
+	   sz = (std::max<long long int>)(0, static_cast<long long int>((std::min)(result.size(), 2 * n + t2.size())) - static_cast<long long int>(2 * n));
+	   // for fixed precision arithmetic a_h and b_h cannot be non-zero
+	   // otherwise a_h * b_h cannot be placed in result.size() bits
+	   std::copy(t2.limbs(), t2.limbs() + sz, result.limbs() + 2 * n);
+
+	   eval_add(t1, t2);  // t1 = a_l*b_l + a_h*b_h
+	   eval_add(a_l, a_h);
+	   eval_add(b_l, b_h);
+	   eval_multiply(t2, a_l, b_l); // t2 = (a_h+a_l)*(b_h+b_l)
+	   eval_subtract(t2, t1);
+	   eval_left_shift(t2, n * limb_bits); // t2 = 2^n * ( (a_h+a_l)*(b_h*b_l) - a_h*b_h - a_l*b_l)
+	   eval_add(result, t2);
+
+	   result.normalize();
+	   result.sign(a.sign() != b.sign());	
+	   return ;
+	}
+
    for (unsigned i = 0; i < as; ++i)
    {
       unsigned inner_limit = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::variable ? bs : (std::min)(result.size() - i, bs);
