@@ -1239,3 +1239,4 @@ rule get_concept_checks
 test-suite concepts : [ get_concept_checks ] ;
 
 test-suite examples : ../example//examples ;
+test-suite performance : ../performance//performance ;
