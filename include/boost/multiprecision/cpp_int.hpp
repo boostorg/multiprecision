@@ -599,7 +599,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
    //
    struct scoped_shared_storage
    {
-      BOOST_CONSTEXPR scoped_shared_storage(const cpp_int_base const&, unsigned) BOOST_NOEXCEPT {}
+      BOOST_CONSTEXPR scoped_shared_storage(const cpp_int_base&, unsigned) BOOST_NOEXCEPT {}
 #ifdef BOOST_NO_CXX11_NULLPTR
       limb_type* limbs() const BOOST_NOEXCEPT
       {
@@ -830,7 +830,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
    //
    struct scoped_shared_storage
    {
-      BOOST_CONSTEXPR scoped_shared_storage(const cpp_int_base const&, unsigned) BOOST_NOEXCEPT {}
+      BOOST_CONSTEXPR scoped_shared_storage(const cpp_int_base&, unsigned) BOOST_NOEXCEPT {}
 #ifndef BOOST_NO_CXX11_NULLPTR
       limb_type* limbs() const BOOST_NOEXCEPT
       {
