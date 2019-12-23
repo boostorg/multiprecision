@@ -280,7 +280,7 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
       allocator_type& allocator() BOOST_NOEXCEPT { return boost::empty_value<allocator_type>::get(); }
 
     public:
-      scoped_shared_storage(const cpp_int_base const& other, unsigned len)
+      scoped_shared_storage(const cpp_int_base& other, unsigned len)
           : boost::empty_value<allocator_type>(boost::empty_init_t(), other.allocator()), capacity(len)
       {
          data = allocator().allocate(len);
