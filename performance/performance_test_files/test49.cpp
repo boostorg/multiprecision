@@ -8,7 +8,7 @@
 #include <boost/multiprecision/tommath.hpp>
 #endif
 
-void test44()
+void test49()
 {
 #ifdef TEST_TOMMATH
    test<boost::multiprecision::tom_int>("tommath_int", 1024*16);

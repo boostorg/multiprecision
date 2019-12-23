@@ -8,7 +8,7 @@
 #include <boost/multiprecision/gmp.hpp>
 #endif
 
-void test40()
+void test51()
 {
 #ifdef TEST_MPZ
    test<boost::multiprecision::mpz_int>("gmp_int", 1024*16);

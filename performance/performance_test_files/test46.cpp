@@ -8,7 +8,7 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #endif
 
-void test42()
+void test46()
 {
 #ifdef TEST_CPP_INT
    test<boost::multiprecision::cpp_int>("cpp_int", 1024 * 8);

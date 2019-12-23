@@ -723,4 +723,11 @@ void test41();
 void test42();
 void test43();
 void test44();
+void test45();
+void test46();
+void test47();
+void test48();
+void test49();
+void test50();
+void test51();
 
