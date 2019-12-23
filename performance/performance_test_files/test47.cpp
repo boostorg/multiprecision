@@ -8,9 +8,9 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #endif
 
-void test41()
+void test42()
 {
 #ifdef TEST_CPP_INT
-   test<boost::multiprecision::cpp_int>("cpp_int", (boost::multiprecision::backends::karatsuba_cutoff + 2) * sizeof(boost::multiprecision::limb_type) * CHAR_BIT);
+   test<boost::multiprecision::cpp_int>("cpp_int", 1024 * 16);
 #endif
 }

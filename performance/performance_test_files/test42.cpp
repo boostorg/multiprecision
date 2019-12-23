@@ -11,6 +11,6 @@
 void test42()
 {
 #ifdef TEST_CPP_INT
-   test<boost::multiprecision::cpp_int>("cpp_int", 1024 * 10);
+   test<boost::multiprecision::cpp_int>("cpp_int", 1024 * 2);
 #endif
 }

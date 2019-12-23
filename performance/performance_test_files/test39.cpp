@@ -11,6 +11,6 @@
 void test39()
 {
 #ifdef TEST_MPZ
-   test<boost::multiprecision::mpz_int>("gmp_int", 1024*5);
+   test<boost::multiprecision::mpz_int>("gmp_int", 1024*2);
 #endif
 }

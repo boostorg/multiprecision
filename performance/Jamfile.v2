@@ -50,21 +50,23 @@ else
 test-suite performance :
 
 [ exe performance_test : performance_test.cpp 
-            performance_test_files/test01.cpp  performance_test_files/test16.cpp  performance_test_files/test31.cpp
-            performance_test_files/test02.cpp  performance_test_files/test17.cpp  performance_test_files/test32.cpp
-            performance_test_files/test03.cpp  performance_test_files/test18.cpp  performance_test_files/test33.cpp
-            performance_test_files/test04.cpp  performance_test_files/test19.cpp  performance_test_files/test34.cpp
-            performance_test_files/test05.cpp  performance_test_files/test20.cpp  performance_test_files/test35.cpp
-            performance_test_files/test06.cpp  performance_test_files/test21.cpp  performance_test_files/test36.cpp
-            performance_test_files/test07.cpp  performance_test_files/test22.cpp  performance_test_files/test37.cpp
-            performance_test_files/test08.cpp  performance_test_files/test23.cpp  performance_test_files/test38.cpp
-            performance_test_files/test09.cpp  performance_test_files/test24.cpp  performance_test_files/test39.cpp
-            performance_test_files/test10.cpp  performance_test_files/test25.cpp  performance_test_files/test40.cpp
-            performance_test_files/test11.cpp  performance_test_files/test26.cpp  performance_test_files/test41.cpp
-            performance_test_files/test12.cpp  performance_test_files/test27.cpp  performance_test_files/test42.cpp
-            performance_test_files/test13.cpp  performance_test_files/test28.cpp  performance_test_files/test43.cpp
-            performance_test_files/test14.cpp  performance_test_files/test29.cpp  performance_test_files/test44.cpp
-            performance_test_files/test15.cpp  performance_test_files/test30.cpp
+            performance_test_files/test01.cpp  performance_test_files/test18.cpp  performance_test_files/test35.cpp
+            performance_test_files/test02.cpp  performance_test_files/test19.cpp  performance_test_files/test36.cpp
+            performance_test_files/test03.cpp  performance_test_files/test20.cpp  performance_test_files/test37.cpp
+            performance_test_files/test04.cpp  performance_test_files/test21.cpp  performance_test_files/test38.cpp
+            performance_test_files/test05.cpp  performance_test_files/test22.cpp  performance_test_files/test39.cpp
+            performance_test_files/test06.cpp  performance_test_files/test23.cpp  performance_test_files/test40.cpp
+            performance_test_files/test07.cpp  performance_test_files/test24.cpp  performance_test_files/test41.cpp
+            performance_test_files/test08.cpp  performance_test_files/test25.cpp  performance_test_files/test42.cpp
+            performance_test_files/test09.cpp  performance_test_files/test26.cpp  performance_test_files/test43.cpp
+            performance_test_files/test10.cpp  performance_test_files/test27.cpp  performance_test_files/test44.cpp
+            performance_test_files/test11.cpp  performance_test_files/test28.cpp  performance_test_files/test45.cpp
+            performance_test_files/test12.cpp  performance_test_files/test29.cpp  performance_test_files/test46.cpp
+            performance_test_files/test13.cpp  performance_test_files/test30.cpp  performance_test_files/test47.cpp
+            performance_test_files/test14.cpp  performance_test_files/test31.cpp  performance_test_files/test48.cpp
+            performance_test_files/test15.cpp  performance_test_files/test32.cpp  performance_test_files/test49.cpp
+            performance_test_files/test16.cpp  performance_test_files/test33.cpp  performance_test_files/test50.cpp
+            performance_test_files/test17.cpp  performance_test_files/test34.cpp  performance_test_files/test51.cpp            
             /boost/system//boost_system
           : release
           [ check-target-builds ../config//has_gmp : <define>TEST_MPF <define>TEST_MPZ <define>TEST_MPQ <source>gmp : ]

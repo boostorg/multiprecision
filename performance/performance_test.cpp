@@ -99,8 +99,11 @@ void quickbook_results()
    }
 }
 
-#ifdef BOOST_HAS_UNISTD_H
+#if defined(__HAS_INCLUDE)
+#if __has_include(<sys/utsname.h>)
+#define HAS_UTSNAME
 #include <sys/utsname.h>
+#endif
 #endif
 #ifdef _WIN32
 #include <windows.h>
@@ -109,7 +112,7 @@ void quickbook_results()
 void quickbook_platform_details()
 {
    std::cout << "[table:platform Platform Details\n[[Platform][";
-#ifdef BOOST_HAS_UNISTD_H
+#ifdef HAS_UTSNAME
    utsname name;
    uname(&name);
    std::cout << name.sysname << " " << name.release << ", version " << name.version << ", " << name.machine << "]]\n";

@@ -4,13 +4,13 @@
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
 #include "../performance_test.hpp"
-#if defined(TEST_CPP_INT)
-#include <boost/multiprecision/cpp_int.hpp>
+#if defined(TEST_MPZ)
+#include <boost/multiprecision/gmp.hpp>
 #endif
 
-void test41()
+void test40()
 {
-#ifdef TEST_CPP_INT
-   test<boost::multiprecision::cpp_int>("cpp_int", (boost::multiprecision::backends::karatsuba_cutoff + 2) * sizeof(boost::multiprecision::limb_type) * CHAR_BIT);
+#ifdef TEST_MPZ
+   test<boost::multiprecision::mpz_int>("gmp_int", 1024*8);
 #endif
 }

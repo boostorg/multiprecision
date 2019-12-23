@@ -11,7 +11,7 @@
 void test44()
 {
 #ifdef TEST_TOMMATH
-   test<boost::multiprecision::tom_int>("tommath_int", 1024*4);
+   test<boost::multiprecision::tom_int>("tommath_int", 1024*8);
    /*
    //
    // These are actually too slow to test!!!
