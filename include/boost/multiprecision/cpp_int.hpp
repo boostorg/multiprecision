@@ -343,6 +343,8 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
       unsigned cap = capacity();
       if (new_size > cap)
       {
+         // We must not be an alias, memory allocation here defeats the whole point of aliasing:
+         BOOST_ASSERT(!m_alias);
          // Allocate a new buffer and copy everything over:
          cap             = (std::min)((std::max)(cap * 4, new_size), max_limbs);
          limb_pointer pl = allocator().allocate(cap);
