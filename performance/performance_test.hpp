@@ -653,9 +653,12 @@ void test(const char* type, unsigned precision)
    //
    // Now the actual tests:
    //
+#ifndef TEST_MUL_ONLY
    report_result(cat, type, "+", precision, t.test_add());
    report_result(cat, type, "-", precision, t.test_subtract());
+#endif
    report_result(cat, type, "*", precision, t.test_multiply());
+#ifndef TEST_MUL_ONLY
    report_result(cat, type, "/", precision, t.test_divide());
    report_result(cat, type, "str", precision, t.test_str());
    // integer ops:
@@ -677,6 +680,7 @@ void test(const char* type, unsigned precision)
    report_result(cat, type, "-=(unsigned long long)", precision, t.template test_inplace_subtract_hetero<unsigned long long>());
    report_result(cat, type, "*=(unsigned long long)", precision, t.template test_inplace_multiply_hetero<unsigned long long>());
    report_result(cat, type, "/=(unsigned long long)", precision, t.template test_inplace_divide_hetero<unsigned long long>());
+#endif
 }
 
 void test01();

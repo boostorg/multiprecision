@@ -173,8 +173,9 @@ eval_multiply(
       {
          eval_multiply(t1, a_l, b_l);
          eval_multiply(t2, a_h, b_h);
-         std::copy(t1.limbs(), t1.limbs() + t1.size(), result.limbs());
-         std::copy(t2.limbs(), t2.limbs() + t2.size(), result.limbs() + 2 * n);
+         std::copy(t1.limbs(), t1.limbs() + std::min(t1.size(), result.size()), result.limbs());
+         if(result.size() > 2 * n)
+            std::copy(t2.limbs(), t2.limbs() + std::min(t2.size(), result.size() - 2 * n), result.limbs() + 2 * n);
          eval_add(t1, t2);  // t1 = a_l*b_l + a_h*b_h
       }
 	   eval_add(t3, a_l, a_h);
