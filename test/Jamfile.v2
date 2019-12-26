@@ -741,6 +741,16 @@ test-suite cpp_int_tests :
             : test_cpp_int_5
             ]
 
+      [ run test_cpp_int.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST6
+            : test_cpp_int_6
+            ]
+
       [ run test_checked_cpp_int.cpp no_eh_support ]
       [ run test_unchecked_cpp_int.cpp no_eh_support : : : release ]
 
