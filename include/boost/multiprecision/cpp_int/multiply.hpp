@@ -141,13 +141,13 @@ eval_multiply_karatsuba(
    const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
    const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>& b) BOOST_MP_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
 {
-   cpp_int_backend<0, 0, SignType1, unchecked, std::allocator<limb_type> > t;
+   cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> > t;
    unsigned sz = a.size() + b.size();
    t.resize(sz, sz);
    //
    // Lets make a and b aliases purely to reduce the number of template instantations:
    //
-   cpp_int_backend<0, 0, SignType1, unchecked, std::allocator<limb_type> > a_t(a.limbs(), 0, a.size()), b_t(b.limbs(), 0, b.size());
+   cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> > a_t(a.limbs(), 0, a.size()), b_t(b.limbs(), 0, b.size());
    eval_multiply_karatsuba(t, a_t, b_t);
    result = t;
 }
