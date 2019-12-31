@@ -101,9 +101,9 @@ eval_multiply_karatsuba(
 
    limb_type                                                                  zero = 0;
    const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> a_h(as > n ? a.limbs() + n : &zero, 0, as > n ? as - n : 1);
-   BOOST_ASSERT(a_h.size() == as > n ? as - n : 1);
+   BOOST_ASSERT(a_h.size() == (as > n ? as - n : 1u));
    const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> b_h(bs > n ? b.limbs() + n : &zero, 0, bs > n ? bs - n : 1);
-   BOOST_ASSERT(b_h.size() == bs > n ? bs - n : 1);
+   BOOST_ASSERT(b_h.size() == (bs > n ? bs - n : 1u));
    static_assert(std::is_same<typename std::remove_cv<decltype(a_h)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
    static_assert(std::is_same<typename std::remove_cv<decltype(b_h)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
    // x = a_h * b_ h
@@ -111,15 +111,13 @@ eval_multiply_karatsuba(
    // z = (a_h + a_l)*(b_h + b_l) - x - y
    // a * b = x * (2 ^ (2 * n))+ z * (2 ^ n) + y
    const typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::scoped_shared_storage storage(result, 9 * n + 3);
-   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>                                       t1(storage, 0, 2 * n + 1), t2(storage, 2 * n + 1, 3 * n), t3(storage, 5 * n + 1, 2 * n + 1), t4(storage, 7 * n + 2, 2 * n + 1);
+   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>                                       t1(storage, 0, 2 * n + 1), t2(storage, 2 * n + 1, 2 * n + 1), t3(storage, 4 * n + 2, 2 * n + 1);
    BOOST_ASSERT(t1.size() == 2 * n + 1);
-   BOOST_ASSERT(t2.size() == 3 * n);
+   BOOST_ASSERT(t2.size() == 2 * n + 1);
    BOOST_ASSERT(t3.size() == 2 * n + 1);
-   BOOST_ASSERT(t4.size() == 2 * n + 1);
    static_assert(std::is_same<typename std::remove_cv<decltype(t1)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
    static_assert(std::is_same<typename std::remove_cv<decltype(t2)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
    static_assert(std::is_same<typename std::remove_cv<decltype(t3)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
-   static_assert(std::is_same<typename std::remove_cv<decltype(t4)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
    // result = | a_h*b_h  | a_l*b_l |
    // (bits)              <-- 2*n -->
    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> result_low(result.limbs(), 0, 2 * n);
@@ -132,14 +130,14 @@ eval_multiply_karatsuba(
    eval_multiply(result_high, a_h, b_h);
    for (unsigned i = result_high.size() + 2 * n; i < result.size(); ++i)
       result.limbs()[i] = 0;
-   add_unsigned(t1, result_low, result_high); // t1 = a_l*b_l + a_h*b_h
-   add_unsigned(t3, a_l, a_h);
-   add_unsigned(t4, b_l, b_h);
-   eval_multiply(t2, t3, t4); // t2 = (a_h+a_l)*(b_h+b_l)
-   subtract_unsigned(t2, t2, t1);
+   add_unsigned(t2, a_l, a_h);
+   add_unsigned(t3, b_l, b_h);
+   eval_multiply(t1, t2, t3); // t1 = (a_h+a_l)*(b_h+b_l)
+   add_unsigned(t2, result_low, result_high); // t2 = a_l*b_l + a_h*b_h
+   subtract_unsigned(t1, t1, t2);
    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> result_alias(result.limbs(), n, result.size() - n);
    BOOST_ASSERT(result_alias.size() == result.size() - n);
-   add_unsigned(result_alias, result_alias, t2);
+   add_unsigned(result_alias, result_alias, t1);
 
    result.normalize();
    result.sign(a.sign() != b.sign());
