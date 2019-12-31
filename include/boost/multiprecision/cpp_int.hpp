@@ -212,8 +212,6 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
                                        MinBits
                                            ? (MinBits / limb_bits + ((MinBits % limb_bits) ? 1 : 0))
                                            : (sizeof(limb_data) / sizeof(limb_type)) > 1 ? (sizeof(limb_data) / sizeof(limb_type)) : 2);
-   BOOST_STATIC_CONSTANT(bool, variable = true);
-
  private:
    union data_type
    {
@@ -471,8 +469,6 @@ template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class 
 const limb_type cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false>::sign_bit_mask;
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class Allocator>
 const unsigned cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false>::internal_limb_count;
-template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class Allocator>
-const bool cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false>::variable;
 
 #endif
 
@@ -506,7 +502,6 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
    BOOST_STATIC_CONSTANT(limb_type, max_limb_value = ~static_cast<limb_type>(0u));
    BOOST_STATIC_CONSTANT(limb_type, sign_bit_mask = static_cast<limb_type>(1u) << (limb_bits - 1));
    BOOST_STATIC_CONSTANT(unsigned, internal_limb_count = MinBits / limb_bits + ((MinBits % limb_bits) ? 1 : 0));
-   BOOST_STATIC_CONSTANT(bool, variable = false);
    BOOST_STATIC_CONSTANT(limb_type, upper_limb_mask = (MinBits % limb_bits) ? (limb_type(1) << (MinBits % limb_bits)) - 1 : (~limb_type(0)));
    BOOST_STATIC_ASSERT_MSG(internal_limb_count >= 2, "A fixed precision integer type must have at least 2 limbs");
 
@@ -719,8 +714,6 @@ template <unsigned MinBits, cpp_int_check_type Checked>
 const limb_type cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>::sign_bit_mask;
 template <unsigned MinBits, cpp_int_check_type Checked>
 const unsigned cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>::internal_limb_count;
-template <unsigned MinBits, cpp_int_check_type Checked>
-const bool cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>::variable;
 
 #endif
 //
@@ -743,7 +736,6 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
    BOOST_STATIC_CONSTANT(limb_type, max_limb_value = ~static_cast<limb_type>(0u));
    BOOST_STATIC_CONSTANT(limb_type, sign_bit_mask = static_cast<limb_type>(1u) << (limb_bits - 1));
    BOOST_STATIC_CONSTANT(unsigned, internal_limb_count = MinBits / limb_bits + ((MinBits % limb_bits) ? 1 : 0));
-   BOOST_STATIC_CONSTANT(bool, variable = false);
    BOOST_STATIC_CONSTANT(limb_type, upper_limb_mask = (MinBits % limb_bits) ? (limb_type(1) << (MinBits % limb_bits)) - 1 : (~limb_type(0)));
    BOOST_STATIC_ASSERT_MSG(internal_limb_count >= 2, "A fixed precision integer type must have at least 2 limbs");
 
@@ -963,8 +955,6 @@ template <unsigned MinBits, cpp_int_check_type Checked>
 const limb_type cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>::sign_bit_mask;
 template <unsigned MinBits, cpp_int_check_type Checked>
 const unsigned cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>::internal_limb_count;
-template <unsigned MinBits, cpp_int_check_type Checked>
-const bool cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>::variable;
 
 #endif
 //

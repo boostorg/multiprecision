@@ -210,7 +210,7 @@ int main()
    test(number<cpp_int_backend<8192, 8192, signed_magnitude, unchecked, std::allocator<char> > >());
 #endif
 #if (TEST == 4) || (TEST == 0)
-   test(number<cpp_int_backend<8192, 8192, unsigned_magnitude, checked> >());
+   test(number<cpp_int_backend<8192, 8192, unsigned_magnitude, unchecked> >());
 #endif
    return boost::report_errors();
 }

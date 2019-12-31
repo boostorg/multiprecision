@@ -52,7 +52,7 @@ eval_multiply(
          result.limbs()[i] = static_cast<limb_type>(carry);
    }
    result.sign(a.sign());
-   if (!cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::variable)
+   if (is_fixed_precision<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value)
       result.normalize();
 }
 
@@ -79,17 +79,17 @@ const size_t karatsuba_cutoff = 60;
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3, class Allocator3>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_fixed_precision<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
 eval_multiply_karatsuba(
-   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
-   const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
-   const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>& b) BOOST_MP_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
+    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
+    const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
+    const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>& b) BOOST_MP_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
 {
    unsigned as = a.size();
    unsigned bs = b.size();
-   unsigned n = (as > bs ? as : bs) / 2 + 1;
+   unsigned n  = (as > bs ? as : bs) / 2 + 1;
 
    // write a, b as a = a_h * 2^n + a_l, b = b_h * 2^n + b_l
 
-   unsigned sz = (std::min)(as, n);
+   unsigned                                                                   sz = (std::min)(as, n);
    const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> a_l(a.limbs(), 0, sz);
    static_assert(std::is_same<typename std::remove_cv<decltype(a_l)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
 
@@ -97,7 +97,7 @@ eval_multiply_karatsuba(
    const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> b_l(b.limbs(), 0, sz);
    static_assert(std::is_same<typename std::remove_cv<decltype(b_l)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
 
-   limb_type zero = 0;
+   limb_type                                                                  zero = 0;
    const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> a_h(as > n ? a.limbs() + n : &zero, 0, as > n ? as - n : 1);
    const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> b_h(bs > n ? b.limbs() + n : &zero, 0, bs > n ? bs - n : 1);
    static_assert(std::is_same<typename std::remove_cv<decltype(a_h)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
@@ -107,7 +107,7 @@ eval_multiply_karatsuba(
    // z = (a_h + a_l)*(b_h + b_l) - x - y
    // a * b = x * (2 ^ (2 * n))+ z * (2 ^ n) + y
    const typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::scoped_shared_storage storage(result, 9 * n + 3);
-   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> t1(storage, 0, 2 * n + 1), t2(storage, 2 * n + 1, 3 * n), t3(storage, 5 * n + 1, 2 * n + 1), t4(storage, 7 * n + 2, 2 * n + 1);
+   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>                                       t1(storage, 0, 2 * n + 1), t2(storage, 2 * n + 1, 3 * n), t3(storage, 5 * n + 1, 2 * n + 1), t4(storage, 7 * n + 2, 2 * n + 1);
    static_assert(std::is_same<typename std::remove_cv<decltype(t1)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
    static_assert(std::is_same<typename std::remove_cv<decltype(t2)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
    static_assert(std::is_same<typename std::remove_cv<decltype(t3)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
@@ -122,7 +122,7 @@ eval_multiply_karatsuba(
    eval_multiply(result_high, a_h, b_h);
    for (unsigned i = result_high.size() + 2 * n; i < result.size(); ++i)
       result.limbs()[i] = 0;
-   eval_add(t1, result_low, result_high);  // t1 = a_l*b_l + a_h*b_h
+   eval_add(t1, result_low, result_high); // t1 = a_l*b_l + a_h*b_h
    eval_add(t3, a_l, a_h);
    eval_add(t4, b_l, b_h);
    eval_multiply(t2, t3, t4); // t2 = (a_h+a_l)*(b_h+b_l)
@@ -137,12 +137,12 @@ eval_multiply_karatsuba(
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3, class Allocator3>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_fixed_precision<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
 eval_multiply_karatsuba(
-   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
-   const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
-   const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>& b) BOOST_MP_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
+    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
+    const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
+    const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>& b) BOOST_MP_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
 {
    cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> > t;
-   unsigned sz = a.size() + b.size();
+   unsigned                                                                       sz = a.size() + b.size();
    t.resize(sz, sz);
    //
    // Lets make a and b aliases purely to reduce the number of template instantations:
@@ -206,9 +206,9 @@ eval_multiply(
    }
 
 #ifdef BOOST_NO_CXX14_CONSTEXPR
-   static const double_limb_type limb_max = ~static_cast<limb_type>(0u);
+   static const double_limb_type limb_max        = ~static_cast<limb_type>(0u);
    static const double_limb_type double_limb_max = ~static_cast<double_limb_type>(0u);
-   static const unsigned limb_bits = sizeof(limb_type) * CHAR_BIT;
+   static const unsigned         limb_bits       = sizeof(limb_type) * CHAR_BIT;
 #else
    constexpr const double_limb_type limb_max = ~static_cast<limb_type>(0u);
    constexpr const double_limb_type double_limb_max = ~static_cast<double_limb_type>(0u);
@@ -216,11 +216,11 @@ eval_multiply(
 #endif
    result.resize(as + bs, as + bs - 1);
 #if 1
-   if(as >= karatsuba_cutoff && bs >= karatsuba_cutoff)
+   if (as >= karatsuba_cutoff && bs >= karatsuba_cutoff)
    {
       eval_multiply_karatsuba(result, a, b);
       return;
-	}
+   }
 #endif
    typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_pointer pr = result.limbs();
    BOOST_STATIC_ASSERT(double_limb_max - 2 * limb_max >= limb_max * limb_max);
@@ -230,10 +230,18 @@ eval_multiply(
 
    for (unsigned i = 0; i < as; ++i)
    {
-      unsigned inner_limit = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::variable ? bs : (std::min)(result.size() - i, bs);
-      unsigned j = 0;
+      BOOST_ASSERT(result.size() > i);
+      unsigned inner_limit = !is_fixed_precision<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value ? bs : (std::min)(result.size() - i, bs);
+      unsigned j           = 0;
       for (; j < inner_limit; ++j)
       {
+         if (i + j >= result.size())
+         {
+            std::cout << i << std::endl;
+            std::cout << j << std::endl;
+            std::cout << inner_limit << std::endl;
+            std::cout << result.size() << std::endl;
+         }
          BOOST_ASSERT(i + j < result.size());
 #if (!defined(__GLIBCXX__) && !defined(__GLIBCPP__)) || !BOOST_WORKAROUND(BOOST_GCC_VERSION, <= 50100)
          BOOST_ASSERT(!std::numeric_limits<double_limb_type>::is_specialized || ((std::numeric_limits<double_limb_type>::max)() - carry >
@@ -443,7 +451,7 @@ eval_multiply(
    constexpr const signed_double_limb_type mask = ~static_cast<limb_type>(0);
    constexpr const unsigned limb_bits = sizeof(limb_type) * CHAR_BIT;
 #endif
-   bool                                 s         = false;
+   bool s = false;
    if (a < 0)
    {
       a = -a;
