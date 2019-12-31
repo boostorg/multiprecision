@@ -91,15 +91,19 @@ eval_multiply_karatsuba(
 
    unsigned                                                                   sz = (std::min)(as, n);
    const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> a_l(a.limbs(), 0, sz);
+   BOOST_ASSERT(((a_l.size() == sz) && a.limbs()[sz - 1]) || ((a_l.size() < sz) && !a.limbs()[sz - 1]));
    static_assert(std::is_same<typename std::remove_cv<decltype(a_l)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
 
    sz = (std::min)(bs, n);
    const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> b_l(b.limbs(), 0, sz);
+   BOOST_ASSERT(((b_l.size() == sz) && b.limbs()[sz - 1]) || ((b_l.size() < sz) && !b.limbs()[sz - 1]));
    static_assert(std::is_same<typename std::remove_cv<decltype(b_l)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
 
    limb_type                                                                  zero = 0;
    const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> a_h(as > n ? a.limbs() + n : &zero, 0, as > n ? as - n : 1);
+   BOOST_ASSERT(a_h.size() == as > n ? as - n : 1);
    const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> b_h(bs > n ? b.limbs() + n : &zero, 0, bs > n ? bs - n : 1);
+   BOOST_ASSERT(b_h.size() == bs > n ? bs - n : 1);
    static_assert(std::is_same<typename std::remove_cv<decltype(a_h)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
    static_assert(std::is_same<typename std::remove_cv<decltype(b_h)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
    // x = a_h * b_ h
@@ -108,6 +112,10 @@ eval_multiply_karatsuba(
    // a * b = x * (2 ^ (2 * n))+ z * (2 ^ n) + y
    const typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::scoped_shared_storage storage(result, 9 * n + 3);
    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>                                       t1(storage, 0, 2 * n + 1), t2(storage, 2 * n + 1, 3 * n), t3(storage, 5 * n + 1, 2 * n + 1), t4(storage, 7 * n + 2, 2 * n + 1);
+   BOOST_ASSERT(t1.size() == 2 * n + 1);
+   BOOST_ASSERT(t2.size() == 3 * n);
+   BOOST_ASSERT(t3.size() == 2 * n + 1);
+   BOOST_ASSERT(t4.size() == 2 * n + 1);
    static_assert(std::is_same<typename std::remove_cv<decltype(t1)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
    static_assert(std::is_same<typename std::remove_cv<decltype(t2)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
    static_assert(std::is_same<typename std::remove_cv<decltype(t3)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
@@ -115,20 +123,23 @@ eval_multiply_karatsuba(
    // result = | a_h*b_h  | a_l*b_l |
    // (bits)              <-- 2*n -->
    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> result_low(result.limbs(), 0, 2 * n);
+   BOOST_ASSERT(result_low.size() == 2 * n);
    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> result_high(result.limbs(), 2 * n, result.size() - 2 * n);
+   BOOST_ASSERT(result_high.size() == result.size() - 2 * n);
    eval_multiply(result_low, a_l, b_l);
    for (unsigned i = result_low.size(); i < 2 * n; ++i)
       result.limbs()[i] = 0;
    eval_multiply(result_high, a_h, b_h);
    for (unsigned i = result_high.size() + 2 * n; i < result.size(); ++i)
       result.limbs()[i] = 0;
-   eval_add(t1, result_low, result_high); // t1 = a_l*b_l + a_h*b_h
-   eval_add(t3, a_l, a_h);
-   eval_add(t4, b_l, b_h);
+   add_unsigned(t1, result_low, result_high); // t1 = a_l*b_l + a_h*b_h
+   add_unsigned(t3, a_l, a_h);
+   add_unsigned(t4, b_l, b_h);
    eval_multiply(t2, t3, t4); // t2 = (a_h+a_l)*(b_h+b_l)
-   eval_subtract(t2, t1);
+   subtract_unsigned(t2, t2, t1);
    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> result_alias(result.limbs(), n, result.size() - n);
-   eval_add(result_alias, t2);
+   BOOST_ASSERT(result_alias.size() == result.size() - n);
+   add_unsigned(result_alias, result_alias, t2);
 
    result.normalize();
    result.sign(a.sign() != b.sign());
@@ -141,15 +152,28 @@ eval_multiply_karatsuba(
     const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
     const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>& b) BOOST_MP_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
 {
-   cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> > t;
-   unsigned                                                                       sz = a.size() + b.size();
-   t.resize(sz, sz);
    //
    // Lets make a and b aliases purely to reduce the number of template instantations:
    //
    cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> > a_t(a.limbs(), 0, a.size()), b_t(b.limbs(), 0, b.size());
-   eval_multiply_karatsuba(t, a_t, b_t);
-   result = t;
+   unsigned                                                                       sz = a.size() + b.size();
+
+   if (sz * sizeof(limb_type) * CHAR_BIT <= MaxBits1)
+   {
+      // Result is large enough for all the bits of the result, so we can use aliasing:
+      result.resize(sz, sz);
+      cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> > t(result.limbs(), 0, result.size());
+      BOOST_ASSERT(t.size() == result.size());
+      eval_multiply_karatsuba(t, a_t, b_t);
+   }
+   else
+   {
+      // We need a temporary for the result:
+      cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> > t;
+      t.resize(sz, sz);
+      eval_multiply_karatsuba(t, a_t, b_t);
+      result = t;
+   }
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3, class Allocator3>
@@ -235,13 +259,6 @@ eval_multiply(
       unsigned j           = 0;
       for (; j < inner_limit; ++j)
       {
-         if (i + j >= result.size())
-         {
-            std::cout << i << std::endl;
-            std::cout << j << std::endl;
-            std::cout << inner_limit << std::endl;
-            std::cout << result.size() << std::endl;
-         }
          BOOST_ASSERT(i + j < result.size());
 #if (!defined(__GLIBCXX__) && !defined(__GLIBCPP__)) || !BOOST_WORKAROUND(BOOST_GCC_VERSION, <= 50100)
          BOOST_ASSERT(!std::numeric_limits<double_limb_type>::is_specialized || ((std::numeric_limits<double_limb_type>::max)() - carry >

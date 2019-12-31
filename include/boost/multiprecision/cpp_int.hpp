@@ -1376,7 +1376,7 @@ struct cpp_int_backend
    // we have fixed precision and storage, in which case we copy the memory:
    //
    explicit BOOST_CONSTEXPR cpp_int_backend(limb_type* data, unsigned offset, unsigned len) BOOST_NOEXCEPT
-       : base_type(data, offset, len) { this->normalize(); }
+       : base_type(data, offset, len) {}
    explicit BOOST_CONSTEXPR cpp_int_backend(const limb_type* data, unsigned offset, unsigned len) BOOST_NOEXCEPT
        : base_type(data, offset, len) { this->normalize(); }
    explicit BOOST_CONSTEXPR cpp_int_backend(const typename base_type::scoped_shared_storage& data, unsigned offset, unsigned len) BOOST_NOEXCEPT
