@@ -111,10 +111,10 @@ eval_multiply_karatsuba(
    // z = (a_h + a_l)*(b_h + b_l) - x - y
    // a * b = x * (2 ^ (2 * n))+ z * (2 ^ n) + y
    const typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::scoped_shared_storage storage(result, 9 * n + 3);
-   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>                                       t1(storage, 0, 2 * n + 1), t2(storage, 2 * n + 1, 2 * n + 1), t3(storage, 4 * n + 2, 2 * n + 1);
+   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>                                       t1(storage, 0, 2 * n + 1), t2(storage, 2 * n + 1, n + 1), t3(storage, 3 * n + 2, n + 1);
    BOOST_ASSERT(t1.size() == 2 * n + 1);
-   BOOST_ASSERT(t2.size() == 2 * n + 1);
-   BOOST_ASSERT(t3.size() == 2 * n + 1);
+   BOOST_ASSERT(t2.size() == n + 1);
+   BOOST_ASSERT(t3.size() == n + 1);
    static_assert(std::is_same<typename std::remove_cv<decltype(t1)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
    static_assert(std::is_same<typename std::remove_cv<decltype(t2)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
    static_assert(std::is_same<typename std::remove_cv<decltype(t3)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
@@ -133,8 +133,8 @@ eval_multiply_karatsuba(
    add_unsigned(t2, a_l, a_h);
    add_unsigned(t3, b_l, b_h);
    eval_multiply(t1, t2, t3); // t1 = (a_h+a_l)*(b_h+b_l)
-   add_unsigned(t2, result_low, result_high); // t2 = a_l*b_l + a_h*b_h
-   subtract_unsigned(t1, t1, t2);
+   subtract_unsigned(t1, t1, result_high); // t2 = a_l*b_l + a_h*b_h
+   subtract_unsigned(t1, t1, result_low);
    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> result_alias(result.limbs(), n, result.size() - n);
    BOOST_ASSERT(result_alias.size() == result.size() - n);
    add_unsigned(result_alias, result_alias, t1);
