@@ -81,10 +81,17 @@ inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_fixed_precision<cpp_int
 eval_multiply_karatsuba(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
     const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
-    const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>& b) BOOST_MP_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
+    const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>& b,
+    typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::scoped_shared_storage& storage) BOOST_MP_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
 {
    unsigned as = a.size();
    unsigned bs = b.size();
+
+   if ((as < karatsuba_cutoff) || (bs < karatsuba_cutoff))
+   {
+      eval_multiply(result, a, b);
+      return;
+   }
    unsigned n  = (as > bs ? as : bs) / 2 + 1;
 
    // write a, b as a = a_h * 2^n + a_l, b = b_h * 2^n + b_l
@@ -110,11 +117,15 @@ eval_multiply_karatsuba(
    // y = a_l * b_l
    // z = (a_h + a_l)*(b_h + b_l) - x - y
    // a * b = x * (2 ^ (2 * n))+ z * (2 ^ n) + y
-   const typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::scoped_shared_storage storage(result, 9 * n + 3);
-   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>                                       t1(storage, 0, 2 * n + 1), t2(storage, 2 * n + 1, n + 1), t3(storage, 3 * n + 2, n + 1);
+   //typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::scoped_shared_storage storage(result, 4 * n + 3);
+   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>                                 t1(storage, 2 * n + 1);
+   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>                                 t2(storage, n + 1);
+   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>                                 t3(storage, n + 1);
    BOOST_ASSERT(t1.size() == 2 * n + 1);
    BOOST_ASSERT(t2.size() == n + 1);
    BOOST_ASSERT(t3.size() == n + 1);
+   BOOST_ASSERT(t1.limbs() + 2 * n + 1 == t2.limbs());
+   BOOST_ASSERT(t2.limbs() + n + 1 == t3.limbs());
    static_assert(std::is_same<typename std::remove_cv<decltype(t1)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
    static_assert(std::is_same<typename std::remove_cv<decltype(t2)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
    static_assert(std::is_same<typename std::remove_cv<decltype(t3)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
@@ -124,23 +135,39 @@ eval_multiply_karatsuba(
    BOOST_ASSERT(result_low.size() == 2 * n);
    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> result_high(result.limbs(), 2 * n, result.size() - 2 * n);
    BOOST_ASSERT(result_high.size() == result.size() - 2 * n);
-   eval_multiply(result_low, a_l, b_l);
+   eval_multiply_karatsuba(result_low, a_l, b_l, storage);
    for (unsigned i = result_low.size(); i < 2 * n; ++i)
       result.limbs()[i] = 0;
-   eval_multiply(result_high, a_h, b_h);
+   eval_multiply_karatsuba(result_high, a_h, b_h, storage);
    for (unsigned i = result_high.size() + 2 * n; i < result.size(); ++i)
       result.limbs()[i] = 0;
    add_unsigned(t2, a_l, a_h);
    add_unsigned(t3, b_l, b_h);
-   eval_multiply(t1, t2, t3); // t1 = (a_h+a_l)*(b_h+b_l)
+   eval_multiply_karatsuba(t1, t2, t3, storage); // t1 = (a_h+a_l)*(b_h+b_l)
    subtract_unsigned(t1, t1, result_high); // t2 = a_l*b_l + a_h*b_h
    subtract_unsigned(t1, t1, result_low);
    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> result_alias(result.limbs(), n, result.size() - n);
    BOOST_ASSERT(result_alias.size() == result.size() - n);
    add_unsigned(result_alias, result_alias, t1);
 
+   storage.deallocate(4 * n + 3);
+
    result.normalize();
    result.sign(a.sign() != b.sign());
+}
+
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3, class Allocator3>
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_fixed_precision<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
+eval_multiply_karatsuba(
+   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
+   const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
+   const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>& b) BOOST_MP_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
+{
+   unsigned as = a.size();
+   unsigned bs = b.size();
+   unsigned n = (as > bs ? as : bs) / 2 + 1;
+   typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::scoped_shared_storage storage(result, 2 * (4 * n + 3) - karatsuba_cutoff);
+   eval_multiply_karatsuba(result, a, b, storage);
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3, class Allocator3>
@@ -154,7 +181,10 @@ eval_multiply_karatsuba(
    // Lets make a and b aliases purely to reduce the number of template instantations:
    //
    cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> > a_t(a.limbs(), 0, a.size()), b_t(b.limbs(), 0, b.size());
-   unsigned                                                                       sz = a.size() + b.size();
+   unsigned as = a.size();
+   unsigned bs = b.size();
+   unsigned n  = (as > bs ? as : bs) / 2 + 1;
+   unsigned sz = as + bs;
 
    if (sz * sizeof(limb_type) * CHAR_BIT <= MaxBits1)
    {
@@ -162,14 +192,17 @@ eval_multiply_karatsuba(
       result.resize(sz, sz);
       cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> > t(result.limbs(), 0, result.size());
       BOOST_ASSERT(t.size() == result.size());
-      eval_multiply_karatsuba(t, a_t, b_t);
+      typename cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> >::scoped_shared_storage storage(t, 2 * (4 * n + 3) - karatsuba_cutoff);
+      eval_multiply_karatsuba(t, a_t, b_t, storage);
    }
    else
    {
-      // We need a temporary for the result:
       cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> > t;
-      t.resize(sz, sz);
-      eval_multiply_karatsuba(t, a_t, b_t);
+      typename cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> >::scoped_shared_storage storage(t, sz + 2 * (4 * n + 3) - karatsuba_cutoff);
+      t = cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> >(storage, sz);
+      // We need a temporary for the result:
+      //t.resize(sz, sz);
+      eval_multiply_karatsuba(t, a_t, b_t, storage);
       result = t;
    }
 }

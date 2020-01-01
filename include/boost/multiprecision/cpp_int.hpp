@@ -275,11 +275,12 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
     private:
       limb_type*      data;
       unsigned        capacity;
+      unsigned        allocated;
       allocator_type& allocator() BOOST_NOEXCEPT { return boost::empty_value<allocator_type>::get(); }
 
     public:
       scoped_shared_storage(const cpp_int_base& other, unsigned len)
-          : boost::empty_value<allocator_type>(boost::empty_init_t(), other.allocator()), capacity(len)
+          : boost::empty_value<allocator_type>(boost::empty_init_t(), other.allocator()), capacity(len), allocated(0)
       {
          data = allocator().allocate(len);
       }
@@ -287,7 +288,18 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
       {
          allocator().deallocate(data, capacity);
       }
-      limb_type* limbs() const BOOST_NOEXCEPT { return data; }
+      limb_type* allocate(unsigned n) BOOST_NOEXCEPT 
+      {
+         limb_type* result = data + allocated;
+         allocated += n;
+         BOOST_ASSERT(allocated <= capacity);
+         return result; 
+      }
+      void deallocate(unsigned n)
+      {
+         BOOST_ASSERT(n <= allocated);
+         allocated -= n;
+      }
    };
    explicit BOOST_CONSTEXPR cpp_int_base(limb_type* data, unsigned offset, unsigned len) BOOST_NOEXCEPT
        : m_data(data + offset, len),
@@ -304,8 +316,8 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
          m_sign(false),
          m_internal(false),
          m_alias(true) {}
-   explicit BOOST_CONSTEXPR cpp_int_base(const scoped_shared_storage& data, unsigned offset, unsigned len) BOOST_NOEXCEPT
-       : m_data(data.limbs() + offset, len),
+   explicit BOOST_CONSTEXPR cpp_int_base(scoped_shared_storage& data, unsigned len) BOOST_NOEXCEPT
+       : m_data(data.allocate(len), len),
          m_limbs(len),
          m_sign(false),
          m_internal(false),
@@ -492,6 +504,8 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
    typedef const limb_type*   const_limb_pointer;
    typedef mpl::int_<Checked> checked_type;
 
+   struct scoped_shared_storage {};
+
    //
    // Interface invariants:
    //
@@ -590,35 +604,6 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
    //
    constexpr cpp_int_base& operator=(const cpp_int_base&) = default;
 #endif
-   //
-   // Aliasing constructor, copies data:
-   //
-   struct scoped_shared_storage
-   {
-      BOOST_CONSTEXPR scoped_shared_storage(const cpp_int_base&, unsigned) BOOST_NOEXCEPT {}
-#ifdef BOOST_NO_CXX11_NULLPTR
-      limb_type* limbs() const BOOST_NOEXCEPT
-      {
-         return 0;
-      }
-#else
-      limb_type* limbs() const BOOST_NOEXCEPT
-      {
-         return nullptr;
-      }
-#endif
-   };
-   explicit BOOST_CONSTEXPR cpp_int_base(limb_type const* data, unsigned offset, unsigned len) BOOST_NOEXCEPT
-       : m_wrapper(data[offset]),
-         m_limbs(static_cast<boost::uint16_t>(len)),
-         m_sign(false)
-   {
-      BOOST_ASSERT(len > 0);
-      for (unsigned i = 1; i < len; ++i)
-         limbs()[i] = data[offset + i];
-   }
-   explicit BOOST_CONSTEXPR cpp_int_base(const scoped_shared_storage&, unsigned, unsigned) BOOST_NOEXCEPT
-       : cpp_int_base() {}
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
@@ -726,6 +711,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
    typedef const limb_type*   const_limb_pointer;
    typedef mpl::int_<Checked> checked_type;
 
+   struct scoped_shared_storage {};
    //
    // Interface invariants:
    //
@@ -818,36 +804,6 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
    BOOST_CONSTEXPR cpp_int_base(literals::detail::value_pack<>)
        : m_wrapper(static_cast<limb_type>(0u)), m_limbs(1) {}
 #endif
-   //
-   // Aliasing constructor copies data:
-   //
-   struct scoped_shared_storage
-   {
-      BOOST_CONSTEXPR scoped_shared_storage(const cpp_int_base&, unsigned) BOOST_NOEXCEPT {}
-#ifndef BOOST_NO_CXX11_NULLPTR
-      limb_type* limbs() const BOOST_NOEXCEPT
-      {
-         return 0;
-      }
-#else
-      limb_type* limbs() const BOOST_NOEXCEPT
-      {
-         return nullptr;
-      }
-#endif
-   };
-
-   explicit BOOST_CONSTEXPR cpp_int_base(limb_type const* data, unsigned offset, unsigned len) BOOST_NOEXCEPT
-       : m_wrapper(data[offset]),
-         m_limbs(len)
-   {
-      BOOST_ASSERT(len > 0);
-      for (unsigned i = 1; i < len; ++i)
-         limbs()[i] = data[offset + i];
-   }
-   explicit BOOST_CONSTEXPR cpp_int_base(const scoped_shared_storage&, unsigned, unsigned) BOOST_NOEXCEPT
-       : cpp_int_base() {}
-
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
@@ -987,9 +943,8 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
    typedef const local_limb_type*                    const_limb_pointer;
    typedef mpl::int_<Checked>                        checked_type;
 
-   struct scoped_shared_storage{};
-
- protected:
+   struct scoped_shared_storage {};
+protected:
    BOOST_STATIC_CONSTANT(unsigned, limb_bits = sizeof(local_limb_type) * CHAR_BIT);
    BOOST_STATIC_CONSTANT(local_limb_type, limb_mask = (MinBits < limb_bits) ? local_limb_type((local_limb_type(~local_limb_type(0))) >> (limb_bits - MinBits)) : local_limb_type(~local_limb_type(0)));
 
@@ -1148,9 +1103,8 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
    typedef local_limb_type*                          limb_pointer;
    typedef const local_limb_type*                    const_limb_pointer;
 
-   struct scoped_shared_storage{};
-
- private:
+   struct scoped_shared_storage {};
+private:
    BOOST_STATIC_CONSTANT(unsigned, limb_bits = sizeof(local_limb_type) * CHAR_BIT);
    BOOST_STATIC_CONSTANT(local_limb_type, limb_mask = limb_bits != MinBits ? static_cast<local_limb_type>(static_cast<local_limb_type>(~local_limb_type(0)) >> (limb_bits - MinBits))
                                                                            : static_cast<local_limb_type>(~local_limb_type(0)));
@@ -1379,8 +1333,8 @@ struct cpp_int_backend
        : base_type(data, offset, len) {}
    explicit BOOST_CONSTEXPR cpp_int_backend(const limb_type* data, unsigned offset, unsigned len) BOOST_NOEXCEPT
        : base_type(data, offset, len) { this->normalize(); }
-   explicit BOOST_CONSTEXPR cpp_int_backend(const typename base_type::scoped_shared_storage& data, unsigned offset, unsigned len) BOOST_NOEXCEPT
-       : base_type(data, offset, len) {}
+   explicit BOOST_CONSTEXPR cpp_int_backend(typename base_type::scoped_shared_storage& data, unsigned len) BOOST_NOEXCEPT
+       : base_type(data, len) {}
 
  private:
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
