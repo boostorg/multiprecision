@@ -110,9 +110,9 @@ eval_multiply_karatsuba(
    // y = a_l * b_l
    // z = (a_h + a_l)*(b_h + b_l) - x - y
    // a * b = x * (2 ^ (2 * n))+ z * (2 ^ n) + y
-   const typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::scoped_shared_storage storage(result, 9 * n + 3);
-   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>                                       t1(storage, 0, 2 * n + 1), t2(storage, 2 * n + 1, n + 1), t3(storage, 3 * n + 2, n + 1);
-   BOOST_ASSERT(t1.size() == 2 * n + 1);
+   const typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::scoped_shared_storage storage(result, 4 * n + 4);
+   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>                                       t1(storage, 0, 2 * n + 2), t2(storage, 2 * n + 2, n + 1), t3(storage, 3 * n + 3, n + 1);
+   BOOST_ASSERT(t1.size() == 2 * n + 2);
    BOOST_ASSERT(t2.size() == n + 1);
    BOOST_ASSERT(t3.size() == n + 1);
    static_assert(std::is_same<typename std::remove_cv<decltype(t1)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
