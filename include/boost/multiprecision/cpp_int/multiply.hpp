@@ -175,6 +175,36 @@ eval_multiply_karatsuba(
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3, class Allocator3>
+	inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3> >::value>::type
+eval_multiply_comba(
+		cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
+		const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
+		const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>& b) BOOST_MP_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
+{
+	// Comba Multiplier - based on
+	// Exponentiation cryptosystems on the IBM PC, 1990
+	int as = a.size(), bs = b.size(), rs = result.size();
+	auto pr = result.limbs();
+
+	uint128_type carry = 0;
+	for (int r = 0; r < rs - 1; ++r) 
+	{
+		int i = r >= as ? as - 1 : r,
+			j = r - i,
+			k = i <  bs - j ? i + 1 : bs - j; // min(i+1, bs-j);
+		auto pa = a.limbs() + i;
+		auto pb = b.limbs() + j;
+		while(k--){
+			carry += static_cast<double_limb_type>(*(pa--)) * static_cast<double_limb_type>(*(pb++));
+		}
+		*(pr++) = static_cast<limb_type>(carry);
+		carry >>= sizeof(limb_type) * CHAR_BIT;
+	}
+	*(pr++) = static_cast<limb_type>(carry);
+	result.normalize();
+	result.sign(a.sign() != b.sign());
+}
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3, class Allocator3>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3> >::value>::type
 eval_multiply(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
@@ -248,8 +278,13 @@ eval_multiply(
    BOOST_STATIC_ASSERT(double_limb_max - 2 * limb_max >= limb_max * limb_max);
 
    std::fill(pr, pr + result.size(), 0);
-   double_limb_type carry = 0;
 
+   if ( sizeof(uint128_type) > 2 * sizeof(limb_type) ){
+	   eval_multiply_comba(result, a, b);
+	   return ;
+   }
+
+   double_limb_type carry = 0;
    for (unsigned i = 0; i < as; ++i)
    {
       BOOST_ASSERT(result.size() > i);
