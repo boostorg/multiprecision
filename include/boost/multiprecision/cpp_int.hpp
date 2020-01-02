@@ -276,17 +276,20 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
       limb_type*      data;
       unsigned        capacity;
       unsigned        allocated;
+      bool            is_alias;
       allocator_type& allocator() BOOST_NOEXCEPT { return boost::empty_value<allocator_type>::get(); }
 
     public:
       scoped_shared_storage(const cpp_int_base& other, unsigned len)
-          : boost::empty_value<allocator_type>(boost::empty_init_t(), other.allocator()), capacity(len), allocated(0)
+          : boost::empty_value<allocator_type>(boost::empty_init_t(), other.allocator()), capacity(len), allocated(0), is_alias(false)
       {
          data = allocator().allocate(len);
       }
+      scoped_shared_storage(limb_type* limbs, unsigned n) : data(limbs), capacity(n), allocated(0), is_alias(true) {}
       ~scoped_shared_storage()
       {
-         allocator().deallocate(data, capacity);
+         if(!is_alias)
+            allocator().deallocate(data, capacity);
       }
       limb_type* allocate(unsigned n) BOOST_NOEXCEPT 
       {

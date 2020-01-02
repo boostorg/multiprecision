@@ -118,13 +118,13 @@ eval_multiply_karatsuba(
    // z = (a_h + a_l)*(b_h + b_l) - x - y
    // a * b = x * (2 ^ (2 * n))+ z * (2 ^ n) + y
    //typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::scoped_shared_storage storage(result, 4 * n + 3);
-   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>                                 t1(storage, 2 * n + 1);
+   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>                                 t1(storage, 2 * n + 2);
    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>                                 t2(storage, n + 1);
    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>                                 t3(storage, n + 1);
-   BOOST_ASSERT(t1.size() == 2 * n + 1);
+   BOOST_ASSERT(t1.size() == 2 * n + 2);
    BOOST_ASSERT(t2.size() == n + 1);
    BOOST_ASSERT(t3.size() == n + 1);
-   BOOST_ASSERT(t1.limbs() + 2 * n + 1 == t2.limbs());
+   BOOST_ASSERT(t1.limbs() + 2 * n + 2 == t2.limbs());
    BOOST_ASSERT(t2.limbs() + n + 1 == t3.limbs());
    static_assert(std::is_same<typename std::remove_cv<decltype(t1)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
    static_assert(std::is_same<typename std::remove_cv<decltype(t2)>::type, typename std::remove_cv<typename std::remove_reference<decltype(result)>::type>::type>::value, "Mismatched internal types");
@@ -166,8 +166,18 @@ eval_multiply_karatsuba(
    unsigned as = a.size();
    unsigned bs = b.size();
    unsigned n = (as > bs ? as : bs) / 2 + 1;
-   typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::scoped_shared_storage storage(result, 2 * (4 * n + 3) - karatsuba_cutoff);
-   eval_multiply_karatsuba(result, a, b, storage);
+   unsigned storage_size = 2 * (4 * n + 4) - karatsuba_cutoff;
+   if (storage_size < 300)
+   {
+      limb_type limbs[300];
+      typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::scoped_shared_storage storage(limbs, storage_size);
+      eval_multiply_karatsuba(result, a, b, storage);
+   }
+   else
+   {
+      typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::scoped_shared_storage storage(result, storage_size);
+      eval_multiply_karatsuba(result, a, b, storage);
+   }
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3, class Allocator3>

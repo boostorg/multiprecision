@@ -29,7 +29,7 @@
 #endif
 
 #ifndef TEST
-#  define TEST 0
+#define TEST 0
 #endif
 
 template <class T>
@@ -73,7 +73,6 @@ struct is_checked_cpp_int : public boost::mpl::false_
 template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, class Allocator, boost::multiprecision::expression_template_option ET>
 struct is_checked_cpp_int<boost::multiprecision::number<boost::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, boost::multiprecision::checked, Allocator>, ET> > : public boost::mpl::true_
 {};
-
 
 template <class N>
 typename boost::enable_if_c<boost::multiprecision::backends::is_fixed_precision<typename N::backend_type>::value && !is_checked_cpp_int<N>::value>::type test(const N&)
@@ -136,7 +135,7 @@ typename boost::enable_if_c<boost::multiprecision::backends::is_fixed_precision<
          std::cout << r << std::endl;
       }
 
-      #ifndef CI_SUPPRESS_KNOWN_ISSUES
+#ifndef CI_SUPPRESS_KNOWN_ISSUES
       if (tim.elapsed() > 200)
 #else
       if (tim.elapsed() > 25)
@@ -147,6 +146,42 @@ typename boost::enable_if_c<boost::multiprecision::backends::is_fixed_precision<
       }
 
    } while (true);
+   //
+   // Special cases:
+   //
+   mpz_int mask;
+   if (std::numeric_limits<N>::is_bounded)
+      mask = mpz_int((std::numeric_limits<N>::max)());
+   mpz_int a, b;
+   N       x, y;
+
+   unsigned upper_limit = std::numeric_limits<N>::is_bounded ? std::numeric_limits<N>::digits - 1 : 8192 * 2;
+   for (unsigned i = 1024; i < upper_limit; i *= 2)
+   {
+      a = 1;
+      a <<= i;
+      --a;
+      x = 1;
+      x <<= i;
+      --x;
+
+      b = a * a;
+      if (std::numeric_limits<N>::is_bounded)
+         b &= mask;
+      y = x * x;
+
+      BOOST_CHECK_EQUAL(y.str(), b.str());
+
+      if (last_error_count != (unsigned)boost::detail::test_errors())
+      {
+         last_error_count = boost::detail::test_errors();
+         std::cout << std::hex << std::showbase;
+         std::cout << a << std::endl;
+         std::cout << x << std::endl;
+         std::cout << b << std::endl;
+         std::cout << y << std::endl;
+      }
+   }
 }
 template <class N>
 typename boost::disable_if_c<boost::multiprecision::backends::is_fixed_precision<typename N::backend_type>::value && !is_checked_cpp_int<N>::value>::type test(const N&)
@@ -157,14 +192,19 @@ typename boost::disable_if_c<boost::multiprecision::backends::is_fixed_precision
 
    boost::timer tim;
 
+   mpz_int mask;
+   if (std::numeric_limits<N>::is_bounded)
+      mask = mpz_int((std::numeric_limits<N>::max)());
    do
    {
       // Test modular arithmetic by filling all the bits of our test type:
       static boost::random::mt19937             gen;
-      boost::random::uniform_int_distribution<> d(12, 10000);
+      boost::random::uniform_int_distribution<> d(12, std::numeric_limits<N>::is_bounded ? std::numeric_limits<N>::digits : 10000);
       mpz_int                                   f = generate_random<mpz_int>(d(gen));
       mpz_int                                   g = generate_random<mpz_int>(d(gen));
       mpz_int                                   r = f * g;
+      if (std::numeric_limits<N>::is_bounded)
+         r &= mask;
 
       N f1(f);
       N g1(g);
@@ -194,15 +234,48 @@ typename boost::disable_if_c<boost::multiprecision::backends::is_fixed_precision
       }
 
    } while (true);
+   //
+   // Special cases:
+   //
+   mpz_int a, b;
+   N       x, y;
+
+   unsigned upper_limit = std::numeric_limits<N>::is_bounded ? std::numeric_limits<N>::digits - 1 : 8192 * 2;
+   for (unsigned i = 1024; i < upper_limit; i *= 2)
+   {
+      a = 1;
+      a <<= i;
+      --a;
+      x = 1;
+      x <<= i;
+      --x;
+
+      b = a * a;
+      if (std::numeric_limits<N>::is_bounded)
+         b &= mask;
+      y = x * x;
+
+      BOOST_CHECK_EQUAL(y.str(), b.str());
+
+      if (last_error_count != (unsigned)boost::detail::test_errors())
+      {
+         last_error_count = boost::detail::test_errors();
+         std::cout << std::hex << std::showbase;
+         std::cout << a << std::endl;
+         std::cout << x << std::endl;
+         std::cout << b << std::endl;
+         std::cout << y << std::endl;
+      }
+   }
 }
 
 int main()
 {
    using namespace boost::multiprecision;
 
-   #if (TEST == 1) || (TEST == 0)
+#if (TEST == 1) || (TEST == 0)
    test(cpp_int());
-   #endif
+#endif
 #if (TEST == 2) || (TEST == 0)
    test(number<cpp_int_backend<8192, 8192, signed_magnitude, unchecked, void> >());
 #endif
