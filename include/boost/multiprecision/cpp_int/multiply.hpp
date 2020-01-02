@@ -166,6 +166,12 @@ eval_multiply_karatsuba(
    unsigned as = a.size();
    unsigned bs = b.size();
    unsigned n = (as > bs ? as : bs) / 2 + 1;
+   //
+   // This storage size isn't yet tight... in each recursion we use half
+   // as much memory as the one before, so we approach double the storage
+   // requirements of the first call.  The amount left over unused is dependent
+   // on the karatsuba_cutoff as this determines when the recursion ends.
+   //
    unsigned storage_size = 2 * (4 * n + 4) - karatsuba_cutoff;
    if (storage_size < 300)
    {
