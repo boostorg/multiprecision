@@ -199,7 +199,7 @@ typename boost::disable_if_c<boost::multiprecision::backends::is_fixed_precision
    {
       // Test modular arithmetic by filling all the bits of our test type:
       static boost::random::mt19937             gen;
-      boost::random::uniform_int_distribution<> d(12, std::numeric_limits<N>::is_bounded ? std::numeric_limits<N>::digits : 10000);
+      boost::random::uniform_int_distribution<> d(12, std::numeric_limits<N>::is_bounded ? std::numeric_limits<N>::digits : 100000);
       mpz_int                                   f = generate_random<mpz_int>(d(gen));
       mpz_int                                   g = generate_random<mpz_int>(d(gen));
       mpz_int                                   r = f * g;

@@ -8,6 +8,8 @@
 #ifndef BOOST_MP_CPP_INT_MUL_HPP
 #define BOOST_MP_CPP_INT_MUL_HPP
 
+#include <boost/multiprecision/integer.hpp>
+
 namespace boost { namespace multiprecision { namespace backends {
 
 #ifdef _MSC_VER
@@ -73,7 +75,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void resize_for_carry(cpp_int_backend<MinBits1, 
 #ifdef BOOST_MP_KARATSUBA_CUTOFF
 const size_t karatsuba_cutoff = BOOST_MP_KARATSUBA_CUTOFF;
 #else
-const size_t karatsuba_cutoff = 60;
+const size_t karatsuba_cutoff = 40;
 #endif
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3, class Allocator3>
@@ -156,6 +158,21 @@ eval_multiply_karatsuba(
    result.sign(a.sign() != b.sign());
 }
 
+inline unsigned karatsuba_storage_size(unsigned s)
+{
+   // 
+   // This estimates how much memory we will need based on
+   // s-limb multiplication.  In an ideal world the number of limbs
+   // would halve with each recursion, and our storage requirements
+   // would be 4s in the limit, and rather less in practice since
+   // we bail out long before we reach one limb.  In the real world
+   // we don't quite halve s in each recursion, so this is an heuristic
+   // which over-estimates how much we need.  We could compute an exact
+   // value, but it would be rather time consuming.
+   //
+   return 5 * s;
+}
+
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3, class Allocator3>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_fixed_precision<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
 eval_multiply_karatsuba(
@@ -165,14 +182,8 @@ eval_multiply_karatsuba(
 {
    unsigned as = a.size();
    unsigned bs = b.size();
-   unsigned n = (as > bs ? as : bs) / 2 + 1;
-   //
-   // This storage size isn't yet tight... in each recursion we use half
-   // as much memory as the one before, so we approach double the storage
-   // requirements of the first call.  The amount left over unused is dependent
-   // on the karatsuba_cutoff as this determines when the recursion ends.
-   //
-   unsigned storage_size = 2 * (4 * n + 4) - karatsuba_cutoff;
+   unsigned s = as > bs ? as : bs;
+   unsigned storage_size = karatsuba_storage_size(s);
    if (storage_size < 300)
    {
       limb_type limbs[300];
@@ -199,8 +210,9 @@ eval_multiply_karatsuba(
    cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> > a_t(a.limbs(), 0, a.size()), b_t(b.limbs(), 0, b.size());
    unsigned as = a.size();
    unsigned bs = b.size();
-   unsigned n  = (as > bs ? as : bs) / 2 + 1;
+   unsigned s = as > bs ? as : bs;
    unsigned sz = as + bs;
+   unsigned storage_size = karatsuba_storage_size(s);
 
    if (sz * sizeof(limb_type) * CHAR_BIT <= MaxBits1)
    {
@@ -208,16 +220,15 @@ eval_multiply_karatsuba(
       result.resize(sz, sz);
       cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> > t(result.limbs(), 0, result.size());
       BOOST_ASSERT(t.size() == result.size());
-      typename cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> >::scoped_shared_storage storage(t, 2 * (4 * n + 3) - karatsuba_cutoff);
+      typename cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> >::scoped_shared_storage storage(t, storage_size);
       eval_multiply_karatsuba(t, a_t, b_t, storage);
    }
    else
    {
       cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> > t;
-      typename cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> >::scoped_shared_storage storage(t, sz + 2 * (4 * n + 3) - karatsuba_cutoff);
+      typename cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> >::scoped_shared_storage storage(t, sz + storage_size);
       t = cpp_int_backend<0, 0, signed_magnitude, unchecked, std::allocator<limb_type> >(storage, sz);
       // We need a temporary for the result:
-      //t.resize(sz, sz);
       eval_multiply_karatsuba(t, a_t, b_t, storage);
       result = t;
    }
@@ -231,7 +242,7 @@ eval_multiply(
     const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>& b) BOOST_MP_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
 {
    // Uses simple (O(n^2)) multiplication when the limbs are less
-   // otherwise switches to karatsuba algorithm based on experimental value (~100 limbs)
+   // otherwise switches to karatsuba algorithm based on experimental value (~40 limbs)
    //
    // Trivial cases first:
    //
