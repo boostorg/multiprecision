@@ -246,7 +246,9 @@ eval_multiply_comba(
 	int as = a.size(), bs = b.size(), rs = result.size();
 	auto pr = result.limbs();
 
-	uint128_type carry = 0;
+	double_limb_type carry = 0;
+	limb_type overflow = 0;
+	unsigned limb_bits = sizeof(limb_type) * CHAR_BIT;
 	for (int r = 0; r < rs - 1; ++r) 
 	{
 		int i = r >= as ? as - 1 : r,
@@ -255,10 +257,12 @@ eval_multiply_comba(
 		auto pa = a.limbs() + i;
 		auto pb = b.limbs() + j;
 		while(k--){
+			auto temp = carry;
 			carry += static_cast<double_limb_type>(*(pa--)) * static_cast<double_limb_type>(*(pb++));
+			overflow += carry < temp;
 		}
 		*(pr++) = static_cast<limb_type>(carry);
-		carry >>= sizeof(limb_type) * CHAR_BIT;
+		carry = (static_cast<double_limb_type>(overflow) << limb_bits) | (carry >> limb_bits);
 	}
 	*(pr++) = static_cast<limb_type>(carry);
 	result.normalize();
@@ -339,10 +343,10 @@ eval_multiply(
 
    std::fill(pr, pr + result.size(), 0);
 
-   if ( sizeof(uint128_type) > 2 * sizeof(limb_type) ){
+   //if ( sizeof(uint128_type) > 2 * sizeof(limb_type) ){
 	   eval_multiply_comba(result, a, b);
 	   return ;
-   }
+   //}
 
    double_limb_type carry = 0;
    for (unsigned i = 0; i < as; ++i)
