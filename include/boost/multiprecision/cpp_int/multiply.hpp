@@ -206,6 +206,8 @@ inline void multiply_karatsuba(
    // Free up storage for use by sister branches to this one:
    //
    storage.deallocate(t1.capacity() + t2.capacity() + t3.capacity());
+
+   result.normalize();
 }
 
 inline unsigned karatsuba_storage_size(unsigned s)
