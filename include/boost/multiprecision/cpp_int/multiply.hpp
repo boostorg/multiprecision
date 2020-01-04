@@ -214,15 +214,26 @@ inline unsigned karatsuba_storage_size(unsigned s)
 {
    // 
    // This estimates how much memory we will need based on
-   // s-limb multiplication.  In an ideal world the number of limbs
-   // would halve with each recursion, and our storage requirements
-   // would be 4s in the limit, and rather less in practice since
-   // we bail out long before we reach one limb.  In the real world
-   // we don't quite halve s in each recursion, so this is an heuristic
-   // which over-estimates how much we need.  We could compute an exact
-   // value, but it would be rather time consuming.
+   // s-limb multiplication.  In the first recursion we use
+   // 4(s/2 + 1) + 4 = 2s + 8 limbs, which gives us the following
+   // sequence:
    //
-   return 5 * s;
+   // 2s + 8
+   // s + 10
+   // s / 2 + 11
+   // s / 4 + 12
+   // s / 8 + 13
+   //
+   // The s terms add up to 4s in the limit, assuming we
+   // have n recursions then the remaining terms add up to:
+   //
+   // (10 + n) * n
+   //
+   // And we can estimate n from the log-base-2 of s
+   // less the log-base-2 of the cutoff (where recursion ends).
+   //
+   unsigned limit = msb(s) - msb(karatsuba_cutoff) + 2;
+   return 4 * s + 8 + (10 * limit) * limit;
 }
 //
 // There are 2 entry point routines for Karatsuba multiplication:
