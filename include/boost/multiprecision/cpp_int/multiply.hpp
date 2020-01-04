@@ -379,11 +379,9 @@ eval_multiply(
 #ifdef BOOST_NO_CXX14_CONSTEXPR
    static const double_limb_type limb_max        = ~static_cast<limb_type>(0u);
    static const double_limb_type double_limb_max = ~static_cast<double_limb_type>(0u);
-   static const unsigned         limb_bits       = sizeof(limb_type) * CHAR_BIT;
 #else
    constexpr const double_limb_type limb_max = ~static_cast<limb_type>(0u);
    constexpr const double_limb_type double_limb_max = ~static_cast<double_limb_type>(0u);
-   constexpr const unsigned limb_bits = sizeof(limb_type) * CHAR_BIT;
 #endif
    result.resize(as + bs, as + bs - 1);
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
