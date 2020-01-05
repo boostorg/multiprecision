@@ -382,7 +382,7 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
          --m_limbs;
    }
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() BOOST_NOEXCEPT : m_data(), m_limbs(1), m_sign(false), m_internal(true), m_alias(false){}
-   BOOST_MP_FORCEINLINE                 cpp_int_base(const cpp_int_base& o) : base_type(o), m_limbs(o.m_alias ? o.m_limbs : 0), m_internal(o.m_alias ? false : true), m_sign(o.m_sign), m_alias(o.m_alias)
+   BOOST_MP_FORCEINLINE                 cpp_int_base(const cpp_int_base& o) : base_type(o), m_limbs(o.m_alias ? o.m_limbs : 0), m_sign(o.m_sign), m_internal(o.m_alias ? false : true), m_alias(o.m_alias)
    {
       if (m_alias)
       {
