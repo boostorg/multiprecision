@@ -201,7 +201,6 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
    {
       unsigned        capacity;
       limb_pointer    data;
-      BOOST_CONSTEXPR limb_data(limb_type* limbs, unsigned len) BOOST_NOEXCEPT : capacity(len), data(limbs) {}
    };
 
  public:
@@ -228,8 +227,16 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
       {}
       BOOST_CONSTEXPR data_type(signed_double_limb_type i) BOOST_NOEXCEPT : double_first(i < 0 ? static_cast<double_limb_type>(boost::multiprecision::detail::unsigned_abs(i)) : i) {}
 #endif
-      BOOST_CONSTEXPR data_type(limb_type* limbs, unsigned len) BOOST_NOEXCEPT : ld(limbs, len)
+#ifndef BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX
+      BOOST_CONSTEXPR data_type(limb_type* limbs, unsigned len) BOOST_NOEXCEPT : ld{ len, limbs }
       {}
+#else
+      BOOST_CONSTEXPR data_type(limb_type* limbs, unsigned len) BOOST_NOEXCEPT
+      {
+         ld.capacity = len;
+         ld.data = limbs;
+      }
+#endif
    };
 
    data_type m_data;
