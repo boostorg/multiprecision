@@ -439,7 +439,6 @@ eval_multiply(
 	   return ;
    //}
 
-   double_limb_type carry = 0;
    for (unsigned i = 0; i < as; ++i)
    {
       BOOST_ASSERT(result.size() > i);
