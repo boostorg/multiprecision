@@ -227,7 +227,7 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
       {}
       BOOST_CONSTEXPR data_type(signed_double_limb_type i) BOOST_NOEXCEPT : double_first(i < 0 ? static_cast<double_limb_type>(boost::multiprecision::detail::unsigned_abs(i)) : i) {}
 #endif
-#ifndef BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX
+#if !defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX) && !(defined(BOOST_MSVC) && (BOOST_MSVC < 1900))
       BOOST_CONSTEXPR data_type(limb_type* limbs, unsigned len) BOOST_NOEXCEPT : ld{ len, limbs }
       {}
 #else
@@ -1341,7 +1341,7 @@ struct cpp_int_backend
    //
    explicit BOOST_CONSTEXPR cpp_int_backend(limb_type* data, unsigned offset, unsigned len) BOOST_NOEXCEPT
        : base_type(data, offset, len) {}
-   explicit BOOST_CONSTEXPR cpp_int_backend(const limb_type* data, unsigned offset, unsigned len) BOOST_NOEXCEPT
+   explicit cpp_int_backend(const limb_type* data, unsigned offset, unsigned len) BOOST_NOEXCEPT
        : base_type(data, offset, len) { this->normalize(); }
    explicit BOOST_CONSTEXPR cpp_int_backend(typename base_type::scoped_shared_storage& data, unsigned len) BOOST_NOEXCEPT
        : base_type(data, len) {}
