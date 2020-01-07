@@ -741,6 +741,53 @@ test-suite cpp_int_tests :
             : test_cpp_int_5
             ]
 
+      [ run test_cpp_int.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST6
+            : test_cpp_int_6
+            ]
+
+      [ run test_cpp_int_karatsuba.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST=1
+            : test_cpp_int_karatsuba_1
+            ]
+      [ run test_cpp_int_karatsuba.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST=2
+            : test_cpp_int_karatsuba_2
+            ]
+      [ run test_cpp_int_karatsuba.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST=3
+            : test_cpp_int_karatsuba_3
+            ]
+      [ run test_cpp_int_karatsuba.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST=4
+            : test_cpp_int_karatsuba_4
+            ]
+
       [ run test_checked_cpp_int.cpp no_eh_support ]
       [ run test_unchecked_cpp_int.cpp no_eh_support : : : release ]
 
@@ -1239,3 +1286,4 @@ rule get_concept_checks
 test-suite concepts : [ get_concept_checks ] ;
 
 test-suite examples : ../example//examples ;
+test-suite performance : ../performance//performance ;

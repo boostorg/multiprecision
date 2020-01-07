@@ -78,6 +78,7 @@ install:
   - git submodule update --init tools/boost_install
   - git submodule update --init libs/headers
   - git submodule update --init libs/config
+  - git submodule update --init libs/polygon
   - xcopy /s /e /q %APPVEYOR_BUILD_FOLDER% libs\multiprecision
   - git submodule update --init tools/boostdep
   - python tools/boostdep/depinst/depinst.py multiprecision
