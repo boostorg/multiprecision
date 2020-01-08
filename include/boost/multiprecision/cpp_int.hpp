@@ -199,8 +199,8 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
 
    struct limb_data
    {
-      unsigned     capacity;
-      limb_pointer data;
+      unsigned        capacity;
+      limb_pointer    data;
    };
 
  public:
@@ -208,11 +208,9 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
    BOOST_STATIC_CONSTANT(limb_type, max_limb_value = ~static_cast<limb_type>(0u));
    BOOST_STATIC_CONSTANT(limb_type, sign_bit_mask = static_cast<limb_type>(1u) << (limb_bits - 1));
    BOOST_STATIC_CONSTANT(unsigned, internal_limb_count =
-      MinBits
-         ? (MinBits / limb_bits + ((MinBits % limb_bits) ? 1 : 0))
-         : (sizeof(limb_data) / sizeof(limb_type)) > 1 ? (sizeof(limb_data) / sizeof(limb_type)) : 2);
-   BOOST_STATIC_CONSTANT(bool, variable = true);
-
+                                       MinBits
+                                           ? (MinBits / limb_bits + ((MinBits % limb_bits) ? 1 : 0))
+                                           : (sizeof(limb_data) / sizeof(limb_type)) > 1 ? (sizeof(limb_data) / sizeof(limb_type)) : 2);
  private:
    union data_type
    {
@@ -221,19 +219,29 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
       limb_type        first;
       double_limb_type double_first;
 
-      BOOST_CONSTEXPR data_type() : first(0) {}
-      BOOST_CONSTEXPR data_type(limb_type i) : first(i) {}
-      BOOST_CONSTEXPR data_type(signed_limb_type i) : first(i < 0 ? static_cast<limb_type>(boost::multiprecision::detail::unsigned_abs(i)) : i) {}
+      BOOST_CONSTEXPR data_type() BOOST_NOEXCEPT : first(0) {}
+      BOOST_CONSTEXPR data_type(limb_type i) BOOST_NOEXCEPT : first(i) {}
+      BOOST_CONSTEXPR data_type(signed_limb_type i) BOOST_NOEXCEPT : first(i < 0 ? static_cast<limb_type>(boost::multiprecision::detail::unsigned_abs(i)) : i) {}
 #if BOOST_ENDIAN_LITTLE_BYTE
-      BOOST_CONSTEXPR data_type(double_limb_type i) : double_first(i)
+      BOOST_CONSTEXPR data_type(double_limb_type i) BOOST_NOEXCEPT : double_first(i)
       {}
-      BOOST_CONSTEXPR data_type(signed_double_limb_type i) : double_first(i < 0 ? static_cast<double_limb_type>(boost::multiprecision::detail::unsigned_abs(i)) : i) {}
+      BOOST_CONSTEXPR data_type(signed_double_limb_type i) BOOST_NOEXCEPT : double_first(i < 0 ? static_cast<double_limb_type>(boost::multiprecision::detail::unsigned_abs(i)) : i) {}
+#endif
+#if !defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX) && !(defined(BOOST_MSVC) && (BOOST_MSVC < 1900))
+      BOOST_CONSTEXPR data_type(limb_type* limbs, unsigned len) BOOST_NOEXCEPT : ld{ len, limbs }
+      {}
+#else
+      BOOST_CONSTEXPR data_type(limb_type* limbs, unsigned len) BOOST_NOEXCEPT
+      {
+         ld.capacity = len;
+         ld.data = limbs;
+      }
 #endif
    };
 
    data_type m_data;
    unsigned  m_limbs;
-   bool      m_sign, m_internal;
+   bool      m_sign, m_internal, m_alias;
 
  public:
    //
@@ -243,36 +251,98 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
        : m_data(i),
          m_limbs(1),
          m_sign(false),
-         m_internal(true) {}
+         m_internal(true),
+         m_alias(false) {}
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_limb_type i) BOOST_NOEXCEPT
        : m_data(i),
          m_limbs(1),
          m_sign(i < 0),
-         m_internal(true) {}
+         m_internal(true),
+         m_alias(false) {}
 #if BOOST_ENDIAN_LITTLE_BYTE && !defined(BOOST_MP_TEST_NO_LE)
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(double_limb_type i) BOOST_NOEXCEPT
        : m_data(i),
          m_limbs(i > max_limb_value ? 2 : 1),
          m_sign(false),
-         m_internal(true)
+         m_internal(true),
+         m_alias(false)
    {}
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base(signed_double_limb_type i) BOOST_NOEXCEPT
        : m_data(i),
          m_limbs(i < 0 ? (static_cast<double_limb_type>(boost::multiprecision::detail::unsigned_abs(i)) > static_cast<double_limb_type>(max_limb_value) ? 2 : 1) : (i > max_limb_value ? 2 : 1)),
          m_sign(i < 0),
-         m_internal(true) {}
+         m_internal(true),
+         m_alias(false) {}
 #endif
+   //
+   // Aliasing constructor aliases data:
+   //
+   struct scoped_shared_storage : private boost::empty_value<allocator_type>
+   {
+    private:
+      limb_type*      data;
+      unsigned        capacity;
+      unsigned        allocated;
+      bool            is_alias;
+      allocator_type& allocator() BOOST_NOEXCEPT { return boost::empty_value<allocator_type>::get(); }
+
+    public:
+      scoped_shared_storage(const allocator_type& a, unsigned len)
+          : boost::empty_value<allocator_type>(boost::empty_init_t(), a), capacity(len), allocated(0), is_alias(false)
+      {
+         data = allocator().allocate(len);
+      }
+      scoped_shared_storage(limb_type* limbs, unsigned n) : data(limbs), capacity(n), allocated(0), is_alias(true) {}
+      ~scoped_shared_storage()
+      {
+         if(!is_alias)
+            allocator().deallocate(data, capacity);
+      }
+      limb_type* allocate(unsigned n) BOOST_NOEXCEPT 
+      {
+         limb_type* result = data + allocated;
+         allocated += n;
+         BOOST_ASSERT(allocated <= capacity);
+         return result; 
+      }
+      void deallocate(unsigned n)
+      {
+         BOOST_ASSERT(n <= allocated);
+         allocated -= n;
+      }
+   };
+   explicit BOOST_CONSTEXPR cpp_int_base(limb_type* data, unsigned offset, unsigned len) BOOST_NOEXCEPT
+       : m_data(data + offset, len),
+         m_limbs(len),
+         m_sign(false),
+         m_internal(false),
+         m_alias(true) {}
+   // This next constructor is for constructing const objects from const limb_type*'s only.
+   // Unfortunately we appear to have no way to assert that within the language, and the const_cast
+   // is a side effect of that :(
+   explicit BOOST_CONSTEXPR cpp_int_base(const limb_type* data, unsigned offset, unsigned len) BOOST_NOEXCEPT
+       : m_data(const_cast<limb_type*>(data) + offset, len),
+         m_limbs(len),
+         m_sign(false),
+         m_internal(false),
+         m_alias(true) {}
+   explicit BOOST_CONSTEXPR cpp_int_base(scoped_shared_storage& data, unsigned len) BOOST_NOEXCEPT
+       : m_data(data.allocate(len), len),
+         m_limbs(len),
+         m_sign(false),
+         m_internal(false),
+         m_alias(true) {}
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
-   BOOST_MP_FORCEINLINE allocator_type& allocator() BOOST_NOEXCEPT { return base_type::get(); }
+   BOOST_MP_FORCEINLINE allocator_type&       allocator() BOOST_NOEXCEPT { return base_type::get(); }
    BOOST_MP_FORCEINLINE const allocator_type& allocator() const BOOST_NOEXCEPT { return base_type::get(); }
    BOOST_MP_FORCEINLINE unsigned              size() const BOOST_NOEXCEPT { return m_limbs; }
-   BOOST_MP_FORCEINLINE limb_pointer limbs() BOOST_NOEXCEPT { return m_internal ? m_data.la : m_data.ld.data; }
-   BOOST_MP_FORCEINLINE const_limb_pointer limbs() const BOOST_NOEXCEPT { return m_internal ? m_data.la : m_data.ld.data; }
-   BOOST_MP_FORCEINLINE unsigned           capacity() const BOOST_NOEXCEPT { return m_internal ? internal_limb_count : m_data.ld.capacity; }
-   BOOST_MP_FORCEINLINE bool               sign() const BOOST_NOEXCEPT { return m_sign; }
-   void                                    sign(bool b) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE limb_pointer          limbs() BOOST_NOEXCEPT { return m_internal ? m_data.la : m_data.ld.data; }
+   BOOST_MP_FORCEINLINE const_limb_pointer    limbs() const BOOST_NOEXCEPT { return m_internal ? m_data.la : m_data.ld.data; }
+   BOOST_MP_FORCEINLINE unsigned              capacity() const BOOST_NOEXCEPT { return m_internal ? internal_limb_count : m_data.ld.capacity; }
+   BOOST_MP_FORCEINLINE bool                  sign() const BOOST_NOEXCEPT { return m_sign; }
+   void                                       sign(bool b) BOOST_NOEXCEPT
    {
       m_sign = b;
       // Check for zero value:
@@ -293,11 +363,13 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
       unsigned cap = capacity();
       if (new_size > cap)
       {
+         // We must not be an alias, memory allocation here defeats the whole point of aliasing:
+         BOOST_ASSERT(!m_alias);
          // Allocate a new buffer and copy everything over:
          cap             = (std::min)((std::max)(cap * 4, new_size), max_limbs);
          limb_pointer pl = allocator().allocate(cap);
          std::memcpy(pl, limbs(), size() * sizeof(limbs()[0]));
-         if (!m_internal)
+         if (!m_internal && !m_alias)
             allocator().deallocate(limbs(), capacity());
          else
             m_internal = false;
@@ -316,16 +388,22 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
       while ((m_limbs - 1) && !p[m_limbs - 1])
          --m_limbs;
    }
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() BOOST_NOEXCEPT : m_data(), m_limbs(1), m_sign(false), m_internal(true) {}
-   BOOST_MP_FORCEINLINE                 cpp_int_base(const cpp_int_base& o) : base_type(o), m_limbs(0), m_internal(true)
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_base() BOOST_NOEXCEPT : m_data(), m_limbs(1), m_sign(false), m_internal(true), m_alias(false){}
+   BOOST_MP_FORCEINLINE                 cpp_int_base(const cpp_int_base& o) : base_type(o), m_limbs(o.m_alias ? o.m_limbs : 0), m_sign(o.m_sign), m_internal(o.m_alias ? false : true), m_alias(o.m_alias)
    {
-      resize(o.size(), o.size());
-      std::memcpy(limbs(), o.limbs(), o.size() * sizeof(limbs()[0]));
-      m_sign = o.m_sign;
+      if (m_alias)
+      {
+         m_data.ld = o.m_data.ld;
+      }
+      else
+      {
+         resize(o.size(), o.size());
+         std::memcpy(limbs(), o.limbs(), o.size() * sizeof(limbs()[0]));
+      }
    }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    cpp_int_base(cpp_int_base&& o)
-       : base_type(static_cast<base_type&&>(o)), m_limbs(o.m_limbs), m_sign(o.m_sign), m_internal(o.m_internal)
+       : base_type(static_cast<base_type&&>(o)), m_limbs(o.m_limbs), m_sign(o.m_sign), m_internal(o.m_internal), m_alias(o.m_alias)
    {
       if (m_internal)
       {
@@ -340,12 +418,13 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
    }
    cpp_int_base& operator=(cpp_int_base&& o) BOOST_NOEXCEPT
    {
-      if (!m_internal)
+      if (!m_internal && !m_alias)
          allocator().deallocate(m_data.ld.data, m_data.ld.capacity);
       *static_cast<base_type*>(this) = static_cast<base_type&&>(o);
       m_limbs                        = o.m_limbs;
       m_sign                         = o.m_sign;
       m_internal                     = o.m_internal;
+      m_alias                        = o.m_alias;
       if (m_internal)
       {
          std::memcpy(limbs(), o.limbs(), o.size() * sizeof(limbs()[0]));
@@ -361,7 +440,7 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
 #endif
    BOOST_MP_FORCEINLINE ~cpp_int_base() BOOST_NOEXCEPT
    {
-      if (!m_internal)
+      if (!m_internal && !m_alias)
          allocator().deallocate(limbs(), capacity());
    }
    void assign(const cpp_int_base& o)
@@ -412,8 +491,6 @@ template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class 
 const limb_type cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false>::sign_bit_mask;
 template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class Allocator>
 const unsigned cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false>::internal_limb_count;
-template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class Allocator>
-const bool cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false>::variable;
 
 #endif
 
@@ -437,6 +514,8 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
    typedef const limb_type*   const_limb_pointer;
    typedef mpl::int_<Checked> checked_type;
 
+   struct scoped_shared_storage {};
+
    //
    // Interface invariants:
    //
@@ -447,7 +526,6 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
    BOOST_STATIC_CONSTANT(limb_type, max_limb_value = ~static_cast<limb_type>(0u));
    BOOST_STATIC_CONSTANT(limb_type, sign_bit_mask = static_cast<limb_type>(1u) << (limb_bits - 1));
    BOOST_STATIC_CONSTANT(unsigned, internal_limb_count = MinBits / limb_bits + ((MinBits % limb_bits) ? 1 : 0));
-   BOOST_STATIC_CONSTANT(bool, variable = false);
    BOOST_STATIC_CONSTANT(limb_type, upper_limb_mask = (MinBits % limb_bits) ? (limb_type(1) << (MinBits % limb_bits)) - 1 : (~limb_type(0)));
    BOOST_STATIC_ASSERT_MSG(internal_limb_count >= 2, "A fixed precision integer type must have at least 2 limbs");
 
@@ -458,20 +536,25 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
       limb_type        m_first_limb;
       double_limb_type m_double_first_limb;
 
-      BOOST_CONSTEXPR data_type() 
+      BOOST_CONSTEXPR data_type()
 #if defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX) || defined(BOOST_NO_CXX14_CONSTEXPR)
-         : m_first_limb(0) {}
+          : m_first_limb(0)
+      {}
 #else
-         : m_data{ 0 } {}
+          : m_data{0}
+      {}
 #endif
-      BOOST_CONSTEXPR data_type(limb_type i) 
+      BOOST_CONSTEXPR data_type(limb_type i)
 #if defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX) || defined(BOOST_NO_CXX14_CONSTEXPR)
-         : m_first_limb(i) {}
+          : m_first_limb(i)
+      {}
 #else
-         : m_data{ i } {}
+          : m_data{i}
+      {}
 #endif
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
-      BOOST_CONSTEXPR data_type(limb_type i, limb_type j) : m_data{ i, j } {} 
+      BOOST_CONSTEXPR data_type(limb_type i, limb_type j) : m_data{i, j}
+      {}
 #endif
       BOOST_CONSTEXPR data_type(double_limb_type i) : m_double_first_limb(i)
       {
@@ -534,11 +617,11 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR unsigned size() const BOOST_NOEXCEPT { return m_limbs; }
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR unsigned              size() const BOOST_NOEXCEPT { return m_limbs; }
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_pointer limbs() BOOST_NOEXCEPT { return m_wrapper.m_data; }
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const_limb_pointer limbs() const BOOST_NOEXCEPT { return m_wrapper.m_data; }
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR bool sign() const BOOST_NOEXCEPT { return m_sign; }
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void sign(bool b) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const_limb_pointer    limbs() const BOOST_NOEXCEPT { return m_wrapper.m_data; }
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR bool                  sign() const BOOST_NOEXCEPT { return m_sign; }
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void         sign(bool b) BOOST_NOEXCEPT
    {
       m_sign = b;
       // Check for zero value:
@@ -626,8 +709,6 @@ template <unsigned MinBits, cpp_int_check_type Checked>
 const limb_type cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>::sign_bit_mask;
 template <unsigned MinBits, cpp_int_check_type Checked>
 const unsigned cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>::internal_limb_count;
-template <unsigned MinBits, cpp_int_check_type Checked>
-const bool cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>::variable;
 
 #endif
 //
@@ -640,6 +721,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
    typedef const limb_type*   const_limb_pointer;
    typedef mpl::int_<Checked> checked_type;
 
+   struct scoped_shared_storage {};
    //
    // Interface invariants:
    //
@@ -650,7 +732,6 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
    BOOST_STATIC_CONSTANT(limb_type, max_limb_value = ~static_cast<limb_type>(0u));
    BOOST_STATIC_CONSTANT(limb_type, sign_bit_mask = static_cast<limb_type>(1u) << (limb_bits - 1));
    BOOST_STATIC_CONSTANT(unsigned, internal_limb_count = MinBits / limb_bits + ((MinBits % limb_bits) ? 1 : 0));
-   BOOST_STATIC_CONSTANT(bool, variable = false);
    BOOST_STATIC_CONSTANT(limb_type, upper_limb_mask = (MinBits % limb_bits) ? (limb_type(1) << (MinBits % limb_bits)) - 1 : (~limb_type(0)));
    BOOST_STATIC_ASSERT_MSG(internal_limb_count >= 2, "A fixed precision integer type must have at least 2 limbs");
 
@@ -661,22 +742,27 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
       limb_type        m_first_limb;
       double_limb_type m_double_first_limb;
 
-      BOOST_CONSTEXPR data_type() 
+      BOOST_CONSTEXPR data_type()
 #if defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX) || defined(BOOST_NO_CXX14_CONSTEXPR)
-         : m_first_limb(0) {}
+          : m_first_limb(0)
+      {}
 #else
-         : m_data{ 0 } {}
+          : m_data{0}
+      {}
 #endif
-      BOOST_CONSTEXPR data_type(limb_type i) 
+      BOOST_CONSTEXPR data_type(limb_type i)
 #if defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX) || defined(BOOST_NO_CXX14_CONSTEXPR)
-         : m_first_limb(i) {}
+          : m_first_limb(i)
+      {}
 #else
-         : m_data{ i } {}
+          : m_data{i}
+      {}
 #endif
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
-      BOOST_CONSTEXPR data_type(limb_type i, limb_type j) : m_data { i, j } {}
+      BOOST_CONSTEXPR data_type(limb_type i, limb_type j) : m_data{i, j}
+      {}
 #endif
-      BOOST_CONSTEXPR data_type(double_limb_type i) : m_double_first_limb(i) 
+      BOOST_CONSTEXPR data_type(double_limb_type i) : m_double_first_limb(i)
       {
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
          if (BOOST_MP_IS_CONST_EVALUATED(m_double_first_limb))
@@ -731,11 +817,11 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR unsigned size() const BOOST_NOEXCEPT { return m_limbs; }
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR unsigned              size() const BOOST_NOEXCEPT { return m_limbs; }
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_pointer limbs() BOOST_NOEXCEPT { return m_wrapper.m_data; }
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const_limb_pointer limbs() const BOOST_NOEXCEPT { return m_wrapper.m_data; }
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR bool sign() const BOOST_NOEXCEPT { return false; }
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void sign(bool b) BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const_limb_pointer    limbs() const BOOST_NOEXCEPT { return m_wrapper.m_data; }
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR bool                  sign() const BOOST_NOEXCEPT { return false; }
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void         sign(bool b) BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
    {
       if (b)
          negate();
@@ -835,8 +921,6 @@ template <unsigned MinBits, cpp_int_check_type Checked>
 const limb_type cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>::sign_bit_mask;
 template <unsigned MinBits, cpp_int_check_type Checked>
 const unsigned cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>::internal_limb_count;
-template <unsigned MinBits, cpp_int_check_type Checked>
-const bool cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>::variable;
 
 #endif
 //
@@ -869,7 +953,8 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
    typedef const local_limb_type*                    const_limb_pointer;
    typedef mpl::int_<Checked>                        checked_type;
 
- protected:
+   struct scoped_shared_storage {};
+protected:
    BOOST_STATIC_CONSTANT(unsigned, limb_bits = sizeof(local_limb_type) * CHAR_BIT);
    BOOST_STATIC_CONSTANT(local_limb_type, limb_mask = (MinBits < limb_bits) ? local_limb_type((local_limb_type(~local_limb_type(0))) >> (limb_bits - MinBits)) : local_limb_type(~local_limb_type(0)));
 
@@ -964,11 +1049,11 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR unsigned size() const BOOST_NOEXCEPT { return 1; }
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR unsigned              size() const BOOST_NOEXCEPT { return 1; }
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_pointer limbs() BOOST_NOEXCEPT { return &m_data; }
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const_limb_pointer limbs() const BOOST_NOEXCEPT { return &m_data; }
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR bool sign() const BOOST_NOEXCEPT { return m_sign; }
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void sign(bool b) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const_limb_pointer    limbs() const BOOST_NOEXCEPT { return &m_data; }
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR bool         sign() const BOOST_NOEXCEPT { return m_sign; }
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void         sign(bool b) BOOST_NOEXCEPT
    {
       m_sign = b;
       // Check for zero value:
@@ -1028,7 +1113,8 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
    typedef local_limb_type*                          limb_pointer;
    typedef const local_limb_type*                    const_limb_pointer;
 
- private:
+   struct scoped_shared_storage {};
+private:
    BOOST_STATIC_CONSTANT(unsigned, limb_bits = sizeof(local_limb_type) * CHAR_BIT);
    BOOST_STATIC_CONSTANT(local_limb_type, limb_mask = limb_bits != MinBits ? static_cast<local_limb_type>(static_cast<local_limb_type>(~local_limb_type(0)) >> (limb_bits - MinBits))
                                                                            : static_cast<local_limb_type>(~local_limb_type(0)));
@@ -1132,11 +1218,11 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
    //
    // Helper functions for getting at our internal data, and manipulating storage:
    //
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR unsigned size() const BOOST_NOEXCEPT { return 1; }
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR unsigned              size() const BOOST_NOEXCEPT { return 1; }
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_pointer limbs() BOOST_NOEXCEPT { return &m_data; }
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const_limb_pointer limbs() const BOOST_NOEXCEPT { return &m_data; }
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR bool sign() const BOOST_NOEXCEPT { return false; }
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void sign(bool b) BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const_limb_pointer    limbs() const BOOST_NOEXCEPT { return &m_data; }
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR bool                  sign() const BOOST_NOEXCEPT { return false; }
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void         sign(bool b) BOOST_MP_NOEXCEPT_IF((Checked == unchecked))
    {
       if (b)
          negate();
@@ -1249,6 +1335,16 @@ struct cpp_int_backend
    template <class Arg>
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(Arg i, typename boost::enable_if_c<is_allowed_cpp_int_base_conversion<Arg, base_type>::value>::type const* = 0) BOOST_MP_NOEXCEPT_IF(noexcept(base_type(std::declval<Arg>())))
        : base_type(i) {}
+   //
+   // Aliasing constructor: the result will alias the memory referenced, unless
+   // we have fixed precision and storage, in which case we copy the memory:
+   //
+   explicit BOOST_CONSTEXPR cpp_int_backend(limb_type* data, unsigned offset, unsigned len) BOOST_NOEXCEPT
+       : base_type(data, offset, len) {}
+   explicit cpp_int_backend(const limb_type* data, unsigned offset, unsigned len) BOOST_NOEXCEPT
+       : base_type(data, offset, len) { this->normalize(); }
+   explicit BOOST_CONSTEXPR cpp_int_backend(typename base_type::scoped_shared_storage& data, unsigned len) BOOST_NOEXCEPT
+       : base_type(data, len) {}
 
  private:
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
@@ -1296,7 +1392,7 @@ struct cpp_int_backend
       unsigned count = (std::min)(other.size(), this->size());
       for (unsigned i = 0; i < count; ++i)
          this->limbs()[i] = other.limbs()[i];
-         //std::memcpy(this->limbs(), other.limbs(), (std::min)(other.size(), this->size()) * sizeof(this->limbs()[0]));
+      //std::memcpy(this->limbs(), other.limbs(), (std::min)(other.size(), this->size()) * sizeof(this->limbs()[0]));
 
       this->sign(other.sign());
       this->normalize();
@@ -1400,7 +1496,7 @@ struct cpp_int_backend
 #ifdef __MSVC_RUNTIME_CHECKS
       *p = static_cast<limb_type>(i & ~static_cast<limb_type>(0));
 #else
-      *p = static_cast<limb_type>(i);
+      *p                        = static_cast<limb_type>(i);
 #endif
       p[1] = static_cast<limb_type>(i >> base_type::limb_bits);
       this->resize(p[1] ? 2 : 1, p[1] ? 2 : 1);
@@ -1410,15 +1506,15 @@ struct cpp_int_backend
    {
       BOOST_STATIC_ASSERT(sizeof(i) == 2 * sizeof(limb_type));
       BOOST_STATIC_ASSERT(base_type::internal_limb_count >= 2);
-      bool             s = false;
+      bool s = false;
       if (i < 0)
          s = true;
-      double_limb_type ui = static_cast<double_limb_type>(boost::multiprecision::detail::unsigned_abs(i));
-      typename base_type::limb_pointer p = this->limbs();
+      double_limb_type                 ui = static_cast<double_limb_type>(boost::multiprecision::detail::unsigned_abs(i));
+      typename base_type::limb_pointer p  = this->limbs();
 #ifdef __MSVC_RUNTIME_CHECKS
       *p = static_cast<limb_type>(ui & ~static_cast<limb_type>(0));
 #else
-      *p = static_cast<limb_type>(ui);
+      *p                        = static_cast<limb_type>(ui);
 #endif
       p[1] = static_cast<limb_type>(ui >> base_type::limb_bits);
       this->resize(p[1] ? 2 : 1, p[1] ? 2 : 1);
