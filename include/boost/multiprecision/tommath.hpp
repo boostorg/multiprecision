@@ -432,12 +432,6 @@ inline void eval_decrement(tommath_int& t)
 }
 
 template <class UI>
-inline void eval_bit_set(tommath_int& t, UI i)
-{
-   detail::check_tommath_result(mp_2expt(&t.data(), static_cast<unsigned>(i)));
-}
-
-template <class UI>
 inline void eval_left_shift(tommath_int& t, UI i)
 {
    detail::check_tommath_result(mp_mul_2d(&t.data(), static_cast<unsigned>(i), &t.data()));
