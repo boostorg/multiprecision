@@ -84,7 +84,7 @@ struct tommath_int
       mp_zero(&m_data);
       while (i)
       {
-         detail::check_tommath_result(mp_set_int(&t, static_cast<unsigned>(i & mask)));
+         detail::check_tommath_result(mp_set_u32(&t, static_cast<unsigned>(i & mask)));
          if (shift)
             detail::check_tommath_result(mp_mul_2d(&t, shift, &t));
          detail::check_tommath_result((mp_add(&m_data, &t, &m_data)));
@@ -113,7 +113,7 @@ struct tommath_int
    {
       if (m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
-      detail::check_tommath_result((mp_set_int(&m_data, i)));
+      detail::check_tommath_result((mp_set_u32(&m_data, i)));
       return *this;
    }
    tommath_int& operator=(boost::int32_t i)
@@ -137,13 +137,13 @@ struct tommath_int
 
       if (a == 0)
       {
-         detail::check_tommath_result(mp_set_int(&m_data, 0));
+         detail::check_tommath_result(mp_set_i32(&m_data, 0));
          return *this;
       }
 
       if (a == 1)
       {
-         detail::check_tommath_result(mp_set_int(&m_data, 1));
+         detail::check_tommath_result(mp_set_i32(&m_data, 1));
          return *this;
       }
 
@@ -152,7 +152,7 @@ struct tommath_int
 
       int         e;
       long double f, term;
-      detail::check_tommath_result(mp_set_int(&m_data, 0u));
+      detail::check_tommath_result(mp_set_u32(&m_data, 0u));
       ::mp_int t;
       detail::check_tommath_result(mp_init(&t));
 
@@ -169,12 +169,12 @@ struct tommath_int
          detail::check_tommath_result(mp_mul_2d(&m_data, shift, &m_data));
          if (term > 0)
          {
-            detail::check_tommath_result(mp_set_int(&t, static_cast<int>(term)));
+            detail::check_tommath_result(mp_set_i32(&t, static_cast<int>(term)));
             detail::check_tommath_result(mp_add(&m_data, &t, &m_data));
          }
          else
          {
-            detail::check_tommath_result(mp_set_int(&t, static_cast<int>(-term)));
+            detail::check_tommath_result(mp_set_i32(&t, static_cast<int>(-term)));
             detail::check_tommath_result(mp_sub(&m_data, &t, &m_data));
          }
          f -= term;
@@ -225,7 +225,7 @@ struct tommath_int
          if (radix == 8 || radix == 16)
          {
             unsigned               shift       = radix == 8 ? 3 : 4;
-            unsigned               block_count = DIGIT_BIT / shift;
+            unsigned               block_count = MP_DIGIT_BIT / shift;
             unsigned               block_shift = shift * block_count;
             boost::ulong_long_type val, block;
             while (*s)
@@ -377,7 +377,7 @@ struct tommath_int
 };
 
 #define BOOST_MP_TOMMATH_BIT_OP_CHECK(x) \
-   if (SIGN(&x.data()))                  \
+   if (x.data().sign)                    \
    BOOST_THROW_EXCEPTION(std::runtime_error("Bitwise operations on libtommath negative valued integers are disabled as they produce unpredictable results"))
 
 int eval_get_sign(const tommath_int& val);
@@ -569,7 +569,7 @@ inline bool eval_is_zero(const tommath_int& val)
 }
 inline int eval_get_sign(const tommath_int& val)
 {
-   return mp_iszero(&val.data()) ? 0 : SIGN(&val.data()) ? -1 : 1;
+   return mp_iszero(&val.data()) ? 0 : val.data().sign ? -1 : 1;
 }
 /*
 template <class A>
@@ -648,7 +648,7 @@ inline unsigned eval_msb(const tommath_int& val)
 template <class Integer>
 inline typename enable_if<is_unsigned<Integer>, Integer>::type eval_integer_modulus(const tommath_int& x, Integer val)
 {
-   static const mp_digit m = (static_cast<mp_digit>(1) << DIGIT_BIT) - 1;
+   static const mp_digit m = (static_cast<mp_digit>(1) << MP_DIGIT_BIT) - 1;
    if (val <= m)
    {
       mp_digit d;
