@@ -434,10 +434,14 @@ eval_multiply(
    std::memset(pr, 0, result.size() * sizeof(limb_type));   
    double_limb_type carry = 0;
 
-   //if ( sizeof(uint128_type) > 2 * sizeof(limb_type) ){
+   if (0){
+	   // Comba Multiplier might not be efficient because of less efficient assembly
+	   // by the compiler as of 09/01/2020 (DD/MM/YY). Hopefully this will be resolved when
+	   // GCC BUG #93141 and CLANG BUG #44430 are fixed. 
+	   // Till then this will lay dormant :(
 	   eval_multiply_comba(result, a, b);
 	   return ;
-   //}
+   }
 
    for (unsigned i = 0; i < as; ++i)
    {
