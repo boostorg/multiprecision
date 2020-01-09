@@ -7,6 +7,7 @@
 #pragma warning(disable : 4244)
 #endif
 
+#include <cstdlib>
 #include <boost/polygon/detail/voronoi_predicates.hpp>
 #include <boost/polygon/detail/voronoi_structures.hpp>
 #include <boost/polygon/detail/voronoi_ctypes.hpp>
