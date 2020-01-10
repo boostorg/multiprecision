@@ -99,7 +99,7 @@ void base_operators()
 }
 
 template <typename Backend>
-void сomparison_operators()
+void comparsion_operators()
 {
    typedef number<modular_adaptor<Backend> > modular_number;
    typedef modular_params<Backend>           params_number;
@@ -183,7 +183,6 @@ void pow_test()
          standard_number a_s(a_string), b_s(b_string), mod_s(mod_string), result_s(0);
          params_number   mod(mod_s);
          modular_number  a(a_s, mod), b(b_s, mod), result(0, mod);
-
          BOOST_CHECK_EQUAL(pow(a, b).template convert_to<standard_number>(), powm(a_s % mod_s, b_s % mod_s, mod_s));
       }
    }
@@ -193,7 +192,7 @@ template <typename Backend>
 void run_tests()
 {
    base_operators<Backend>();
-   сomparison_operators<Backend>();
+   comparsion_operators<Backend>();
    bitwise_operators<Backend>();
    pow_test<Backend>();
 }

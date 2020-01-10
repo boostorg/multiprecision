@@ -335,7 +335,7 @@ size_t window_bits(size_t exp_bits)
    size_t window_bits = 1;
 
    size_t j = wsize_count - 1;
-   while ((wsize[j][0] > exp_bits) && (j >= 0))
+   while (wsize[j][0] > exp_bits)
    {
       --j;
    }
@@ -377,18 +377,22 @@ inline void find_modular_pow(modular_adaptor<Backend>&       result,
    unsigned long                             cur_exp_index;
    size_t                                    exp_bits = eval_msb(exp);
    m_window_bits                                      = window_bits(exp_bits + 1);
-   modular_type* m_g = (modular_type*)std::malloc((1U << m_window_bits) * sizeof(modular_type));
-   modular_type              x(1, mod);
 
+   std::vector<modular_type> m_g(1U << m_window_bits);
+   modular_type*             p_g = m_g.data();
+   modular_type              x(1, mod);
    Backend nibble = exp;
    Backend mask;
    eval_bit_set(mask, m_window_bits);
    eval_decrement(mask);
-   m_g[0] = x;
-   m_g[1] = b;
+   *p_g = x;
+   ++p_g;
+   *p_g = b;
+   ++p_g;
    for (size_t i = 2; i < (1U << m_window_bits); i++)
    {
-      eval_multiply(m_g[i].backend(), m_g[i - 1].backend(), b);
+      eval_multiply((*p_g).backend(), m_g[i - 1].backend(), b);
+      ++p_g;
    }
    size_t exp_nibbles = (exp_bits + 1 + m_window_bits - 1) / m_window_bits;
    std::vector<size_t> exp_index;
@@ -414,7 +418,6 @@ inline void find_modular_pow(modular_adaptor<Backend>&       result,
       x = x * m_g[exp_index[i - 1]];
    }
    result = x.backend();
-   std::free(m_g);
 }
 
 template <class Backend>
