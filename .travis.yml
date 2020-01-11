@@ -200,6 +200,7 @@ matrix:
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
+            - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-xenial-8
@@ -215,6 +216,7 @@ matrix:
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
+            - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-xenial-8
@@ -230,6 +232,7 @@ matrix:
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
+            - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-xenial-8
@@ -245,6 +248,7 @@ matrix:
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
+            - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-xenial-8
@@ -260,6 +264,7 @@ matrix:
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
+            - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-xenial-8
@@ -371,6 +376,7 @@ matrix:
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
+            - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-xenial-8
@@ -386,6 +392,7 @@ matrix:
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
+            - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-xenial-8
@@ -401,6 +408,7 @@ matrix:
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
+            - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-xenial-8
@@ -416,6 +424,7 @@ matrix:
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
+            - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-xenial-8
@@ -431,6 +440,7 @@ matrix:
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
+            - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-xenial-8
@@ -654,6 +664,7 @@ matrix:
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
+            - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-xenial-8
@@ -989,6 +1000,7 @@ matrix:
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
+            - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-xenial-8
@@ -1036,6 +1048,7 @@ matrix:
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
+            - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-xenial-8
@@ -1051,6 +1064,7 @@ matrix:
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
+            - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-xenial-8
@@ -1066,6 +1080,7 @@ matrix:
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
+            - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-xenial-8
@@ -1081,6 +1096,7 @@ matrix:
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
+            - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-xenial-8
@@ -1096,6 +1112,7 @@ matrix:
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
+            - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-xenial-8
@@ -1111,6 +1128,7 @@ matrix:
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
+            - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-xenial-8
@@ -1126,6 +1144,7 @@ matrix:
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
+            - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-xenial-8
@@ -1141,6 +1160,7 @@ matrix:
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
+            - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-xenial-8
@@ -1270,6 +1290,5 @@ script:
   - cmake -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9]*//g') -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE ..;
 
 notifications:
-    on_success: always
     email:
         on_success: always
