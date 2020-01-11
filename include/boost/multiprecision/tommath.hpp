@@ -84,7 +84,7 @@ struct tommath_int
       mp_zero(&m_data);
       while (i)
       {
-         detail::check_tommath_result(mp_set_u32(&t, static_cast<unsigned>(i & mask)));
+         mp_set_u32(&t, static_cast<unsigned>(i & mask));
          if (shift)
             detail::check_tommath_result(mp_mul_2d(&t, shift, &t));
          detail::check_tommath_result((mp_add(&m_data, &t, &m_data)));
@@ -113,7 +113,7 @@ struct tommath_int
    {
       if (m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
-      detail::check_tommath_result((mp_set_u32(&m_data, i)));
+      mp_set_u32(&m_data, i);
       return *this;
    }
    tommath_int& operator=(boost::int32_t i)
@@ -137,13 +137,13 @@ struct tommath_int
 
       if (a == 0)
       {
-         detail::check_tommath_result(mp_set_i32(&m_data, 0));
+         mp_set_i32(&m_data, 0);
          return *this;
       }
 
       if (a == 1)
       {
-         detail::check_tommath_result(mp_set_i32(&m_data, 1));
+         mp_set_i32(&m_data, 1);
          return *this;
       }
 
@@ -152,7 +152,7 @@ struct tommath_int
 
       int         e;
       long double f, term;
-      detail::check_tommath_result(mp_set_u32(&m_data, 0u));
+      mp_set_u32(&m_data, 0u);
       ::mp_int t;
       detail::check_tommath_result(mp_init(&t));
 
@@ -169,12 +169,12 @@ struct tommath_int
          detail::check_tommath_result(mp_mul_2d(&m_data, shift, &m_data));
          if (term > 0)
          {
-            detail::check_tommath_result(mp_set_i32(&t, static_cast<int>(term)));
+            mp_set_i32(&t, static_cast<int>(term));
             detail::check_tommath_result(mp_add(&m_data, &t, &m_data));
          }
          else
          {
-            detail::check_tommath_result(mp_set_i32(&t, static_cast<int>(-term)));
+            mp_set_i32(&t, static_cast<int>(-term));
             detail::check_tommath_result(mp_sub(&m_data, &t, &m_data));
          }
          f -= term;
@@ -341,7 +341,7 @@ struct tommath_int
    void negate()
    {
       BOOST_ASSERT(m_data.dp);
-      mp_neg(&m_data, &m_data);
+      detail::check_tommath_result(mp_neg(&m_data, &m_data));
    }
    int compare(const tommath_int& o) const
    {
