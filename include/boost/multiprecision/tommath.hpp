@@ -425,11 +425,11 @@ inline void eval_modulus(tommath_int& t, const tommath_int& o)
    }
 }
 
-inline void eval_decrement(tommath_int& t)
-{
-   static const mp_digit m = static_cast<mp_digit>(1);
-   detail::check_tommath_result(mp_sub_d(const_cast< ::mp_int*>(&t.data()), m, &t.data()));
-}
+//inline void eval_decrement(tommath_int& t)
+//{
+//   static const mp_digit m = static_cast<mp_digit>(1);
+//   detail::check_tommath_result(mp_sub_d(const_cast< ::mp_int*>(&t.data()), m, &t.data()));
+//}
 
 template <class UI>
 inline void eval_left_shift(tommath_int& t, UI i)
