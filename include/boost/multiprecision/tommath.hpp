@@ -1,8 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2011 John Maddock. Distributed under the Boost
-//  Copyright (c) 2019 Nil Foundation AG
-//  Copyright (c) 2019 Mikhail Komarov <nemo@nilfoundation.org>
-//  Copyright (c) 2019 Alexey Moskvin
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -424,19 +421,11 @@ inline void eval_modulus(tommath_int& t, const tommath_int& o)
       mp_zero(&t.data());
    }
 }
-
-//inline void eval_decrement(tommath_int& t)
-//{
-//   static const mp_digit m = static_cast<mp_digit>(1);
-//   detail::check_tommath_result(mp_sub_d(const_cast< ::mp_int*>(&t.data()), m, &t.data()));
-//}
-
 template <class UI>
 inline void eval_left_shift(tommath_int& t, UI i)
 {
    detail::check_tommath_result(mp_mul_2d(&t.data(), static_cast<unsigned>(i), &t.data()));
 }
-
 template <class UI>
 inline void eval_right_shift(tommath_int& t, UI i)
 {
@@ -582,13 +571,12 @@ inline int eval_get_sign(const tommath_int& val)
 {
    return mp_iszero(&val.data()) ? 0 : SIGN(&val.data()) ? -1 : 1;
 }
-
+/*
 template <class A>
 inline void eval_convert_to(A* result, const tommath_int& val)
 {
    *result = boost::lexical_cast<A>(val.str(0, std::ios_base::fmtflags(0)));
 }
-/*
 inline void eval_convert_to(char* result, const tommath_int& val)
 {
    *result = static_cast<char>(boost::lexical_cast<int>(val.str(0, std::ios_base::fmtflags(0))));
