@@ -370,6 +370,7 @@ inline void find_modular_pow(modular_adaptor<Backend>&       result,
    using default_ops::eval_bit_set;
    using default_ops::eval_decrement;
    using default_ops::eval_multiply;
+   using default_ops::eval_convert_to;
 
    typedef number<modular_adaptor<Backend> > modular_type;
    modular_params<Backend>                   mod = b.mod_data();
