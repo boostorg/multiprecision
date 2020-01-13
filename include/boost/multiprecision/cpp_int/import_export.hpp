@@ -208,7 +208,7 @@ OutputIterator export_bits(
     const number<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ExpressionTemplates>& val, OutputIterator out, unsigned chunk_size, bool msv_first = true)
 {
 #ifdef _MSC_VER
-   #pragma warning(push)
+#pragma warning(push)
 #pragma warning(disable : 4244)
 #endif
    typedef typename cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>::trivial_tag tag_type;

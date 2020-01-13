@@ -1,8 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2011 John Maddock. Distributed under the Boost
-// Copyright (c) 2019 Nil Foundation AG
-// Copyright (c) 2019 Mikhail Komarov <nemo@nilfoundation.org>
-// Copyright (c) 2019 Alexey Moskvin
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,13 +7,10 @@
 #define BOOST_MATH_ER_GMP_BACKEND_HPP
 
 #include <boost/multiprecision/number.hpp>
-
 #include <boost/multiprecision/debug_adaptor.hpp>
-
 #include <boost/multiprecision/detail/integer_ops.hpp>
 #include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <boost/multiprecision/detail/digits.hpp>
-
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/functional/hash_fwd.hpp>
@@ -1677,11 +1671,6 @@ inline void eval_divide(gmp_int& t, const gmp_int& p, long i)
       mpz_neg(t.data(), t.data());
 }
 
-inline void eval_decrement(gmp_int& result)
-{
-   mpz_sub_ui(result.data(), result.data(), static_cast<unsigned long>(1u));
-}
-
 inline void eval_bitwise_and(gmp_int& result, const gmp_int& u, const gmp_int& v)
 {
    mpz_and(result.data(), u.data(), v.data());
@@ -2239,13 +2228,11 @@ inline void assign_components(gmp_rational& result, unsigned long v1, unsigned l
    mpq_set_ui(result.data(), v1, v2);
    mpq_canonicalize(result.data());
 }
-
 inline void assign_components(gmp_rational& result, long v1, long v2)
 {
    mpq_set_si(result.data(), v1, v2);
    mpq_canonicalize(result.data());
 }
-
 inline void assign_components(gmp_rational& result, gmp_int const& v1, gmp_int const& v2)
 {
    mpz_set(mpq_numref(result.data()), v1.data());
@@ -2464,13 +2451,13 @@ struct is_variable_precision<backends::gmp_float<0> > : public true_type
 {};
 } // namespace detail
 
-typedef number<gmp_float<50> >            mpf_float_50;
-typedef number<gmp_float<100> >           mpf_float_100;
-typedef number<gmp_float<500> >           mpf_float_500;
-typedef number<gmp_float<1000> >          mpf_float_1000;
-typedef number<gmp_float<0> >             mpf_float;
-typedef number<gmp_int>                   mpz_int;
-typedef number<gmp_rational>              mpq_rational;
+typedef number<gmp_float<50> >   mpf_float_50;
+typedef number<gmp_float<100> >  mpf_float_100;
+typedef number<gmp_float<500> >  mpf_float_500;
+typedef number<gmp_float<1000> > mpf_float_1000;
+typedef number<gmp_float<0> >    mpf_float;
+typedef number<gmp_int>          mpz_int;
+typedef number<gmp_rational>     mpq_rational;
 
 } // namespace multiprecision
 
