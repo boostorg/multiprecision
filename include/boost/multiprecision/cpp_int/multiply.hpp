@@ -318,7 +318,7 @@ eval_multiply_comba(
    // Comba Multiplier - based on
    // Exponentiation cryptosystems on the IBM PC, 1990
    int  as = a.size(), bs = b.size(), rs = result.size();
-   auto pr = result.limbs();
+   typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_pointer pr = result.limbs();
 
    double_limb_type carry     = 0;
    limb_type        overflow  = 0;
@@ -328,11 +328,11 @@ eval_multiply_comba(
       int i   = r >= as ? as - 1 : r,
           j   = r - i,
           k   = i < bs - j ? i + 1 : bs - j; // min(i+1, bs-j);
-      auto pa = a.limbs() + i;
-      auto pb = b.limbs() + j;
+      typename cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>::limb_pointer pa = a.limbs() + i;
+      typename cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>::limb_pointer pb = b.limbs() + j;
       while (k--)
       {
-         auto temp = carry;
+         double_limb_type temp = carry;
          carry += static_cast<double_limb_type>(*(pa--)) * static_cast<double_limb_type>(*(pb++));
          overflow += carry < temp;
       }
