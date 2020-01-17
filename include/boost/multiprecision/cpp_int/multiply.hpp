@@ -322,8 +322,8 @@ eval_multiply_comba(
 
    double_limb_type carry      = 0;
    limb_type        overflow   = 0;
-   unsigned         limb_bits  = sizeof(limb_type) * CHAR_BIT;
-   bool             must_throw = rs < as + bs - 1;
+   const unsigned   limb_bits  = sizeof(limb_type) * CHAR_BIT;
+   const bool       must_throw = rs < as + bs - 1;
    for (int r = 0, lim = (std::min)(rs, as + bs - 1); r < lim; ++r, overflow = 0)
    {
       int i   = r >= as ? as - 1 : r,
@@ -343,7 +343,8 @@ eval_multiply_comba(
    if (carry || must_throw)
    {
       resize_for_carry(result, as + bs);
-      *(pr++) = static_cast<limb_type>(carry);
+      if ((int)result.size() >= as + bs)
+         *pr = static_cast<limb_type>(carry);
    }
    result.normalize();
    result.sign(a.sign() != b.sign());
