@@ -320,10 +320,11 @@ eval_multiply_comba(
    int  as = a.size(), bs = b.size(), rs = result.size();
    typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_pointer pr = result.limbs();
 
-   double_limb_type carry     = 0;
-   limb_type        overflow  = 0;
-   unsigned         limb_bits = sizeof(limb_type) * CHAR_BIT;
-   for (int r = 0; r < rs - 1; ++r, overflow = 0)
+   double_limb_type carry      = 0;
+   limb_type        overflow   = 0;
+   unsigned         limb_bits  = sizeof(limb_type) * CHAR_BIT;
+   bool             must_throw = rs < as + bs - 1;
+   for (int r = 0, lim = (std::min)(rs, as + bs - 1); r < lim; ++r, overflow = 0)
    {
       int i   = r >= as ? as - 1 : r,
           j   = r - i,
@@ -339,7 +340,11 @@ eval_multiply_comba(
       *(pr++) = static_cast<limb_type>(carry);
       carry   = (static_cast<double_limb_type>(overflow) << limb_bits) | (carry >> limb_bits);
    }
-   *(pr++) = static_cast<limb_type>(carry);
+   if (carry || must_throw)
+   {
+      resize_for_carry(result, as + bs);
+      *(pr++) = static_cast<limb_type>(carry);
+   }
    result.normalize();
    result.sign(a.sign() != b.sign());
 }
