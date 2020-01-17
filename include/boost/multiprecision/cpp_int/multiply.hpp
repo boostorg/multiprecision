@@ -328,8 +328,8 @@ eval_multiply_comba(
       int i   = r >= as ? as - 1 : r,
           j   = r - i,
           k   = i < bs - j ? i + 1 : bs - j; // min(i+1, bs-j);
-      typename cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>::limb_pointer pa = a.limbs() + i;
-      typename cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>::limb_pointer pb = b.limbs() + j;
+      typename cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>::const_limb_pointer pa = a.limbs() + i;
+      typename cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>::const_limb_pointer pb = b.limbs() + j;
       while (k--)
       {
          double_limb_type temp = carry;
