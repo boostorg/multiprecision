@@ -215,7 +215,7 @@ void do_round_trip(const T& val)
    if (error_count != boost::detail::test_errors())
    {
       error_count = boost::detail::test_errors();
-      std::cout << "Errors occured while testing value....";
+      std::cout << "Errors occurred while testing value....";
       if (val.backend().sign())
          std::cout << "-";
       std::cout << boost::multiprecision::cpp_int(val.backend().bits()) << "e" << val.backend().exponent() << std::endl;
