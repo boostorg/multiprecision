@@ -2075,10 +2075,11 @@ void test_c99_appendix_F()
 
 template <class T>
 void test_c99_appendix_F_tgammaq_addon_for_float128()
-// Special tests of tgamma for positive and negative
-// real values in the neighborhood of the origin.
 {
 #if defined(TEST_FLOAT128)
+  // Special tests of tgamma for positive and negative
+  // real values in the neighborhood of the origin.
+
    // At Wolfram Alpha: N[Gamma[1/3], 201]
    const T tgamma_third
    (
