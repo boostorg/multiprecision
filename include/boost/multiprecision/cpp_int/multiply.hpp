@@ -334,7 +334,7 @@ eval_multiply_comba(
       while (k--)
       {
          double_limb_type temp = carry;
-         carry += static_cast<double_limb_type>(*(pa--)) * static_cast<double_limb_type>(*(pb++));
+         carry += static_cast<double_limb_type>(*(pa--)) * (*(pb++));
          overflow += carry < temp;
       }
       *(pr++) = static_cast<limb_type>(carry);
