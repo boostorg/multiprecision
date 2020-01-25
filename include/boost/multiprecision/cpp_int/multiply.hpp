@@ -309,7 +309,7 @@ setup_karatsuba(
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3, class Allocator3>
-inline void
+inline BOOST_MP_CXX14_CONSTEXPR void
 eval_multiply_comba(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
     const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
@@ -322,10 +322,11 @@ eval_multiply_comba(
        rs                                                                                         = result.size();
    typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_pointer pr = result.limbs();
 
-   double_limb_type carry      = 0;
-   limb_type        overflow   = 0;
-   const unsigned   limb_bits  = sizeof(limb_type) * CHAR_BIT;
-   const bool       must_throw = rs < as + bs - 1;
+   double_limb_type carry    = 0,
+                    temp     = 0;
+   limb_type      overflow   = 0;
+   const unsigned limb_bits  = sizeof(limb_type) * CHAR_BIT;
+   const bool     must_throw = rs < as + bs - 1;
    for (int r = 0, lim = (std::min)(rs, as + bs - 1); r < lim; ++r, overflow = 0)
    {
       int i = r >= as ? as - 1 : r,
@@ -335,10 +336,13 @@ eval_multiply_comba(
       typename cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>::const_limb_pointer pa = a.limbs() + i;
       typename cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>::const_limb_pointer pb = b.limbs() + j;
 
-      while (k--)
+      temp = carry;
+      carry += static_cast<double_limb_type>(*(pa)) * (*(pb));
+      overflow += carry < temp;
+      for (--k; k; k--)
       {
-         double_limb_type temp = carry;
-         carry += static_cast<double_limb_type>(*(pa--)) * (*(pb++));
+         temp = carry;
+         carry += static_cast<double_limb_type>(*(--pa)) * (*(++pb));
          overflow += carry < temp;
       }
       *(pr++) = static_cast<limb_type>(carry);
