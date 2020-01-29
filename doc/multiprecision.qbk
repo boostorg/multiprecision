@@ -1132,7 +1132,8 @@ Values for `std::numeric_limits<float128>` are:
 [AOS2]
 [AOS3]
 
-[endsect]
+[endsect] [/section:aos Area of Circle]
+
 
 [section:caveats Drop-in Caveats]
 [import ../example/big_seventh.cpp]
@@ -1148,7 +1149,8 @@ Values for `std::numeric_limits<float128>` are:
 
 [JEL]
 
-[endsect]
+[endsect] [/section:jel Defining a Special Function.]
+
 
 [section:nd Calculating a Derivative]
 
@@ -1156,14 +1158,16 @@ Values for `std::numeric_limits<float128>` are:
 [ND2]
 [ND3]
 
-[endsect]
+[endsect] [/section:nd Calculating a Derivative]
+
 
 [section:gi Calculating an Integral]
 
 [GI1]
 [GI2]
 
-[endsect]
+[endsect] [section:gi Calculating an Integral]
+
 
 [section:poly_eg Polynomial Evaluation]
 
@@ -1175,7 +1179,8 @@ Values for `std::numeric_limits<float128>` are:
 
 [mpfr_variable]
 
-[endsect]
+[endsect] [/section:variable_precision Variable-Precision Newton Evaluation]
+
 
 [endsect] [/section:fp_eg Examples]
 
@@ -2225,7 +2230,7 @@ coefficients using (fixed precision) `cpp_int`s: see [@../../test/constexpr_test
 
 [h5:factorial_constexpr `constexpr` Factorials]
 
-We can also generate integer factorials in [@./../test/constexpr_test_cpp_int_5.cpp constexpr_test_cpp_int_5.cpp] like so:
+We can also generate integer factorials in [@../../test/constexpr_test_cpp_int_5.cpp constexpr_test_cpp_int_5.cpp] like so:
 
 [factorial_decl]
 
