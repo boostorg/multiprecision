@@ -1141,6 +1141,7 @@ Values for `std::numeric_limits<float128>` are:
 [big_seventh_example_1]
 [big_seventh_example_2]
 [big_seventh_example_3]
+[big_seventh_example_constexpr]  [/ Hopefully a temporary restriction.]
 [big_seventh_example_output]
 
 [endsect] [/section:caveats Caveats]
