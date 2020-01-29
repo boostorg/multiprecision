@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
 <title>Literal Types and constexpr Support</title>
 <link rel="stylesheet" href="../../multiprecision.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.77.1">
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
 <link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
 <link rel="up" href="../tut.html" title="Tutorial">
 <link rel="prev" href="primetest.html" title="Primality Testing">
@@ -234,8 +234,8 @@
         <code class="computeroutput"><span class="identifier">bit_unset</span></code>, <code class="computeroutput"><span class="identifier">bit_flip</span></code>, <code class="computeroutput"><span class="identifier">sqrt</span></code>,
         <code class="computeroutput"><span class="identifier">gcd</span></code>, <code class="computeroutput"><span class="identifier">lcm</span></code>
         are all supported. Use of <a class="link" href="ints/cpp_int.html" title="cpp_int">cpp_int</a>
-        in this way requires either a C++2a compiler (one which supports <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">is_constant_evaluated</span><span class="special">()</span></code>), or GCC-6 or later in C++14 mode. Compilers
-        other than GCC and without <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">is_constant_evaluated</span><span class="special">()</span></code> will support a very limited set of operations:
+        in this way requires either a C++2a compiler (one which supports <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">is_constant_evaluated</span><span class="special">()</span></code> - currently only gcc-9 or clang-9 or later),
+        or GCC-6 or later in C++14 mode. Compilers other than GCC and without <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">is_constant_evaluated</span><span class="special">()</span></code> will support a very limited set of operations:
         expect to hit roadblocks rather easily.
       </p>
 <p>

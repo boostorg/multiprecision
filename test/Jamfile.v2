@@ -131,7 +131,7 @@ test-suite arithmetic_tests :
    [ run test_arithmetic_tommath_rat.cpp $(TOMMATH) no_eh_support : : : [ check-target-builds ../config//has_tommath : : <build>no ] ]
    [ run test_arithmetic_tommath_br.cpp $(TOMMATH) no_eh_support : : : [ check-target-builds ../config//has_tommath : : <build>no ] ]
 
-   [ run test_arithmetic_cpp_int_1.cpp no_eh_support ]
+   [ run test_arithmetic_cpp_int_1.cpp no_eh_support : : : <toolset>msvc:<cxxflags>-bigobj ]
    [ run test_arithmetic_cpp_int_2.cpp no_eh_support ]
    [ run test_arithmetic_cpp_int_3.cpp no_eh_support ]
    [ run test_arithmetic_cpp_int_4.cpp no_eh_support ]
@@ -741,6 +741,53 @@ test-suite cpp_int_tests :
             : test_cpp_int_5
             ]
 
+      [ run test_cpp_int.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST6
+            : test_cpp_int_6
+            ]
+
+      [ run test_cpp_int_karatsuba.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST=1
+            : test_cpp_int_karatsuba_1
+            ]
+      [ run test_cpp_int_karatsuba.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST=2
+            : test_cpp_int_karatsuba_2
+            ]
+      [ run test_cpp_int_karatsuba.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST=3
+            : test_cpp_int_karatsuba_3
+            ]
+      [ run test_cpp_int_karatsuba.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST=4
+            : test_cpp_int_karatsuba_4
+            ]
+
       [ run test_checked_cpp_int.cpp no_eh_support ]
       [ run test_unchecked_cpp_int.cpp no_eh_support : : : release ]
 
@@ -770,8 +817,8 @@ test-suite misc :
       [ run constexpr_test_cpp_int_3.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] ]
       [ run constexpr_test_cpp_int_4.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] ]
       [ run constexpr_test_cpp_int_5.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] ]
-      [ run constexpr_test_cpp_int_6.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] [ check-target-builds ../config//has_constexpr_limits : <cxxflags>-fconstexpr-ops-limit=268435456 ] ]
-      [ run constexpr_test_cpp_int_7.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : : <build>no ] ]
+      [ run constexpr_test_cpp_int_6.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : <toolset>clang:<cxxflags>-fconstexpr-steps=268435456 : <build>no ] [ check-target-builds ../config//has_constexpr_limits : <cxxflags>-fconstexpr-ops-limit=268435456 ] ]
+      [ run constexpr_test_cpp_int_7.cpp : : : [ requires cxx14_constexpr cxx17_if_constexpr ] [ check-target-builds ../config//has_is_constant_evaluated : <toolset>clang:<cxxflags>-fconstexpr-steps=268435456 : <build>no ] ]
 
       [ compile test_nothrow_cpp_int.cpp ]
       [ compile test_nothrow_cpp_rational.cpp ]
@@ -961,6 +1008,7 @@ test-suite misc :
       [ compile bug11922.cpp ]
       [ run bug12039.cpp no_eh_support ]
       [ compile git_issue_30.cpp ]
+      [ run git_issue_167.cpp ]
       [ compile git_issue_98.cpp : 
          [ check-target-builds ../config//has_float128 : <define>TEST_FLOAT128 <source>quadmath : ]
          [ check-target-builds ../config//has_gmp : <define>TEST_GMP <source>gmp : ]
@@ -1238,3 +1286,4 @@ rule get_concept_checks
 test-suite concepts : [ get_concept_checks ] ;
 
 test-suite examples : ../example//examples ;
+test-suite performance : ../performance//performance ;

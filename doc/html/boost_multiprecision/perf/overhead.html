@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
 <title>The Overhead in the Number Class Wrapper</title>
 <link rel="stylesheet" href="../../multiprecision.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.77.1">
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
 <link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
 <link rel="up" href="../perf.html" title="Performance Comparison">
 <link rel="prev" href="../perf.html" title="Performance Comparison">
@@ -36,9 +36,10 @@
         and a <code class="computeroutput"><span class="keyword">double</span></code> wrapped inside
         class <code class="computeroutput"><span class="identifier">number</span></code>:
       </p>
-<div class="informaltable"><table class="table">
+<div class="table">
+<a name="boost_multiprecision.perf.overhead.bessel_functions_16_digit_precis"></a><p class="title"><b>Table&#160;1.12.&#160;Bessel Functions (16 digit precision)</b></p>
+<div class="table-contents"><table class="table" summary="Bessel Functions (16 digit precision)">
 <colgroup>
-<col>
 <col>
 <col>
 </colgroup>
@@ -50,12 +51,7 @@
               </th>
 <th>
                 <p>
-                  Bessel Function Evaluation
-                </p>
-              </th>
-<th>
-                <p>
-                  Non-Central T Evaluation
+                  Time
                 </p>
               </th>
 </tr></thead>
@@ -63,59 +59,43 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="keyword">double</span></code>
+                  arithmetic_backend&lt;double&gt;
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1.0 (0.016s)</strong></span>
-                </p>
-              </td>
-<td>
-                <p>
-                  <span class="bold"><strong>1.0</strong></span> (0.46s)
+                  2.09301 (0.00133409s)
                 </p>
               </td>
 </tr>
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">arithmetic_backend</span><span class="special">&lt;</span><span class="keyword">double</span><span class="special">&gt;,</span>
-                  <span class="identifier">et_off</span><span class="special">&gt;</span></code>
+                  arithmetic_backend&lt;double&gt; - no expression templates
                 </p>
               </td>
 <td>
                 <p>
-                  1.2 (0.019s)
-                </p>
-              </td>
-<td>
-                <p>
-                  <span class="bold"><strong>1.0</strong></span>(0.46s)
+                  1 (0.000637403s)
                 </p>
               </td>
 </tr>
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">arithmetic_backend</span><span class="special">&lt;</span><span class="keyword">double</span><span class="special">&gt;,</span>
-                  <span class="identifier">et_on</span><span class="special">&gt;</span></code>
+                  double
                 </p>
               </td>
 <td>
                 <p>
-                  1.2 (0.019s)
-                </p>
-              </td>
-<td>
-                <p>
-                  1.7 (0.79s)
+                  1.07956 (0.000688113s)
                 </p>
               </td>
 </tr>
 </tbody>
 </table></div>
-<p>
+</div>
+<br class="table-break"><p>
         As you can see whether or not there is an overhead, and how large it is depends
         on the actual situation, but the overhead is in any cases small. Expression
         templates generally add a greater overhead the more complex the expression
@@ -150,24 +130,25 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="keyword">long</span> <span class="keyword">long</span></code>
+                  <code class="computeroutput"><span class="identifier">int64_t</span></code>
                 </p>
               </td>
 <td>
                 <p>
-                  <span class="bold"><strong>1.0</strong></span>(0.0823s)
+                  <span class="bold"><strong>1.0</strong></span>(0.0128646s)
                 </p>
               </td>
 </tr>
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">arithmetic_backend</span><span class="special">&lt;</span><span class="keyword">long</span> <span class="keyword">long</span><span class="special">&gt;,</span> <span class="identifier">et_off</span><span class="special">&gt;</span></code>
+                  <code class="computeroutput"><span class="identifier">number</span><span class="special">&lt;</span><span class="identifier">arithmetic_backend</span><span class="special">&lt;</span><span class="identifier">int64_t</span><span class="special">&gt;,</span>
+                  <span class="identifier">et_off</span><span class="special">&gt;</span></code>
                 </p>
               </td>
 <td>
                 <p>
-                  1.05 (0.0875s)
+                  1.005 (0.0129255s)
                 </p>
               </td>
 </tr>
@@ -178,11 +159,67 @@
         small amount of arithmetic on them, with very little difference in performance
         between the native and "wrapped" types.
       </p>
-<p>
-        The test code was compiled with Microsoft Visual Studio 2010 with all optimisations
-        turned on (/Ox), and used MPIR-2.3.0 and <a href="http://libtom.net" target="_top">libtommath</a>-0.42.0.
-        The tests were run on 32-bit Windows Vista machine.
-      </p>
+<div class="table">
+<a name="boost_multiprecision.perf.overhead.platform"></a><p class="title"><b>Table&#160;1.13.&#160;Platform Details</b></p>
+<div class="table-contents"><table class="table" summary="Platform Details">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Platform
+                </p>
+              </th>
+<th>
+                <p>
+                  Linux 5.3.0-24-generic, version #26-Ubuntu SMP Thu Nov 14 01:33:18
+                  UTC 2019, x86_64
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  Compiler
+                </p>
+              </td>
+<td>
+                <p>
+                  GNU C++ version 9.2.1 20191008
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  Boost
+                </p>
+              </td>
+<td>
+                <p>
+                  1.72.0
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  Run date
+                </p>
+              </td>
+<td>
+                <p>
+                  Dec 13 2019
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break">
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>

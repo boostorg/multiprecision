@@ -28,10 +28,13 @@
 #pragma warning(disable : 4127) //  Conditional expression is constant
 #endif
 
-#if !defined(TEST1) && !defined(TEST2) && !defined(TEST3)
+#if !defined(TEST1) && !defined(TEST2) && !defined(TEST3) && !defined(TEST4) && !defined(TEST5) && !defined(TEST6)
 #define TEST1
 #define TEST2
 #define TEST3
+#define TEST4
+#define TEST5
+#define TEST6
 #endif
 
 template <class T>
@@ -504,7 +507,7 @@ struct tester
       a = 1;
       a = 0 % test_type(25);
       BOOST_CHECK_EQUAL(a, 0);
-#ifndef TEST2
+#if !defined(TEST2) && !defined(TEST6)
       // https://svn.boost.org/trac/boost/ticket/11364
       a           = 0xfffffffeu;
       b           = -2;
@@ -512,7 +515,7 @@ struct tester
       test_type d = ~(a ^ ~b);
       BOOST_CHECK_EQUAL(c, d);
 #endif
-#if defined(TEST2) || defined(TEST3)
+#if defined(TEST2) || defined(TEST3) || defined(TEST6)
       // https://svn.boost.org/trac/boost/ticket/11648
       a = (std::numeric_limits<test_type>::max)() - 69;
       b = a / 139;
@@ -561,7 +564,7 @@ struct tester
             u256            b      = a << amount;
             BOOST_CHECK_EQUAL(b, 2);
 
-            u256 high_bit = u256{0};
+            u256 high_bit = u256(0);
             bit_set(high_bit, 255);
             BOOST_CHECK_EQUAL(a << 255, high_bit);
             BOOST_CHECK_EQUAL(a << boost::uint64_t(256), 0);
@@ -794,6 +797,10 @@ int main()
 #ifdef TEST5
    tester<number<cpp_int_backend<0, 2048, signed_magnitude, unchecked> > > t5;
    t5.test();
+#endif
+#ifdef TEST6
+   tester<number<cpp_int_backend<2048, 2048, signed_magnitude, checked, void> > > t6;
+   t6.test();
 #endif
    return boost::report_errors();
 }

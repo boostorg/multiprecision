@@ -121,7 +121,7 @@ struct debug_adaptor
    template <class Archive>
    void serialize(Archive& ar, const unsigned int /*version*/)
    {
-      ar&                                  boost::serialization::make_nvp("value", m_value);
+      ar & boost::make_nvp("value", m_value);
       typedef typename Archive::is_loading tag;
       if (tag::value)
          update_view();

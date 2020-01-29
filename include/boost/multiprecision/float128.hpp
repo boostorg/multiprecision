@@ -648,7 +648,18 @@ inline boost::multiprecision::number<float128_backend, ExpressionTemplates> lgam
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 inline boost::multiprecision::number<float128_backend, ExpressionTemplates> tgamma BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
 {
-   return tgammaq(arg.backend().value());
+   if(eval_signbit(arg.backend()) != 0)
+   {
+      const bool result_is_neg = ((static_cast<unsigned long long>(floorq(-arg.backend().value())) % 2U) == 0U);
+
+      const boost::multiprecision::number<float128_backend, ExpressionTemplates> result_of_tgammaq = fabsq(tgammaq(arg.backend().value()));
+
+      return ((result_is_neg == false) ? result_of_tgammaq : -result_of_tgammaq);
+   }
+   else
+   {
+      return tgammaq(arg.backend().value());
+   }
 }
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 inline boost::multiprecision::number<float128_backend, ExpressionTemplates> log1p BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
@@ -701,7 +712,7 @@ void do_serialize(Archive& ar, boost::multiprecision::backends::float128_backend
    // saving
    // non-binary
    std::string s(val.str(0, std::ios_base::scientific));
-   ar&         boost::serialization::make_nvp("value", s);
+   ar&         boost::make_nvp("value", s);
 }
 template <class Archive>
 void do_serialize(Archive& ar, boost::multiprecision::backends::float128_backend& val, const mpl::true_&, const mpl::false_&)
@@ -709,7 +720,7 @@ void do_serialize(Archive& ar, boost::multiprecision::backends::float128_backend
    // loading
    // non-binary
    std::string s;
-   ar&         boost::serialization::make_nvp("value", s);
+   ar&         boost::make_nvp("value", s);
    val = s.c_str();
 }
 

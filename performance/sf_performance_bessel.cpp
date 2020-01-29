@@ -5,12 +5,25 @@
 
 #include "sf_performance.hpp"
 
-void bessel_tests_1();
-void bessel_tests_2();
-void bessel_tests_3();
-void bessel_tests_4();
-void bessel_tests_5();
-void bessel_tests_6();
+void bessel_tests_01();
+void bessel_tests_02();
+void bessel_tests_03();
+void bessel_tests_04();
+void bessel_tests_05();
+void bessel_tests_06();
+void bessel_tests_07();
+void bessel_tests_08();
+void bessel_tests_09();
+void bessel_tests_10();
+void bessel_tests_11();
+void bessel_tests_12();
+void bessel_tests_13();
+void bessel_tests_14();
+void bessel_tests_15();
+void bessel_tests_16();
+void bessel_tests_17();
+void bessel_tests_18();
+void bessel_tests_19();
 
 void bessel_tests()
 {
@@ -25,9 +38,16 @@ void bessel_tests()
    mpfr::mpreal::set_default_prec(50 * 1000L / 301L);
 #endif
 
-   bessel_tests_1();
-   bessel_tests_2();
-   bessel_tests_3();
+   bessel_tests_01();
+   bessel_tests_02();
+   bessel_tests_03();
+   bessel_tests_04();
+   bessel_tests_05();
+   bessel_tests_06();
+   bessel_tests_07();
+   bessel_tests_08();
+   bessel_tests_09();
+   bessel_tests_10();
 
    //
    // Then 100 digits:
@@ -36,7 +56,13 @@ void bessel_tests()
 #if defined(TEST_MPFR) || defined(TEST_MPFR_CLASS)
    mpfr_set_default_prec(100 * 1000L / 301L);
 #endif
-   bessel_tests_4();
-   bessel_tests_5();
-   bessel_tests_6();
+   bessel_tests_11();
+   bessel_tests_12();
+   bessel_tests_13();
+   bessel_tests_14();
+   bessel_tests_15();
+   bessel_tests_16();
+   bessel_tests_17();
+   bessel_tests_18();
+   bessel_tests_19();
 }

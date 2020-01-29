@@ -316,7 +316,7 @@ eval_complement(
 }
 
 template <class Int>
-inline BOOST_MP_CXX14_CONSTEXPR void left_shift_byte(Int& result, double_limb_type s)
+inline void left_shift_byte(Int& result, double_limb_type s)
 {
    limb_type offset = static_cast<limb_type>(s / Int::limb_bits);
    limb_type shift  = static_cast<limb_type>(s % Int::limb_bits);
@@ -503,7 +503,7 @@ eval_left_shift(
 }
 
 template <class Int>
-inline BOOST_MP_CXX14_CONSTEXPR void right_shift_byte(Int& result, double_limb_type s)
+inline void right_shift_byte(Int& result, double_limb_type s)
 {
    limb_type offset = static_cast<limb_type>(s / Int::limb_bits);
    BOOST_ASSERT((s % CHAR_BIT) == 0);
