@@ -8,7 +8,6 @@
 
 #include <limits>
 #include <boost/utility/enable_if.hpp>
-#include <boost/core/nvp.hpp>
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/type_traits/is_constructible.hpp>
 #include <boost/type_traits/decay.hpp>
@@ -49,6 +48,7 @@
 #define BOOST_MP_THREAD_LOCAL
 #endif
 
+// Test if the std library provides std::is_constant_evaluated() and signal by defining BOOST_MP_HAS_IS_CONSTANT_EVALUATED
 #ifdef __has_include
 # if __has_include(<version>)
 #  include <version>
@@ -59,18 +59,23 @@
 # endif
 #endif
 
-#ifdef __has_builtin
-#if __has_builtin(__builtin_is_constant_evaluated) && !defined(BOOST_NO_CXX14_CONSTEXPR) && !defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX)
-#define BOOST_MP_CLANG_CD
-#endif
-#endif
-
+// BOOST_MP_HAS_IS_CONSTANT_EVALUATED(x) controls how to do std::is_constant_evaluated() or equivalents.
+// Use the real std::is_constant_evaluated() if the std library provides it.
 #if defined(BOOST_MP_HAS_IS_CONSTANT_EVALUATED) && !defined(BOOST_NO_CXX14_CONSTEXPR)
 #  define BOOST_MP_IS_CONST_EVALUATED(x) std::is_constant_evaluated()
-#elif (defined(BOOST_GCC) && !defined(BOOST_NO_CXX14_CONSTEXPR) && (__GNUC__ >= 9)) || defined(BOOST_MP_CLANG_CD)
+
+// if not look for an equivalent builtin function (Clang and GCC)
+// Might check first for #ifdef __has_builtin although we know that Clang >= 9 has this anyway?
+#elif defined(BOOST_GCC) && !defined(BOOST_NO_CXX14_CONSTEXPR) && (__GNUC__ >= 9)
 #  define BOOST_MP_IS_CONST_EVALUATED(x) __builtin_is_constant_evaluated()
+
+#elif defined(BOOST_CLANG) && !defined(BOOST_NO_CXX14_CONSTEXPR) && (__clang_major__ >= 9)
+#  define BOOST_MP_IS_CONST_EVALUATED(x) __builtin_is_constant_evaluated()
+
+// Older GCC
 #elif !defined(BOOST_NO_CXX14_CONSTEXPR) && defined(BOOST_GCC) && (__GNUC__ >= 6)
 #  define BOOST_MP_IS_CONST_EVALUATED(x) __builtin_constant_p(x)
+
 #else
 #  define BOOST_MP_NO_CONSTEXPR_DETECTION
 #endif
@@ -104,6 +109,14 @@
 #endif
 
 namespace boost {
+
+namespace serialization {
+template <class T>
+struct nvp;
+template <class T>
+const nvp<T> make_nvp(const char* name, T& t);
+} // namespace serialization
+
 namespace multiprecision {
 
 enum expression_template_option

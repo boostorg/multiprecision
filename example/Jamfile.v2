@@ -1,4 +1,4 @@
-# \libs\math\example\jamfile.v2
+# \libs\multiprecision\example\jamfile.v2
 # Runs multiprecision examples.
 # Copyright 2014 John Maddock
 # Copyright Paul A. Bristow 2014.
@@ -7,7 +7,7 @@
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# bring in the rules for testing
+# Bring in the rules for testing.
 import testing ;
 import modules ;
 import path ;
@@ -60,7 +60,19 @@ project
       <toolset>msvc:<cxxflags>/wd4701
       <toolset>msvc:<cxxflags>/wd4127
       <toolset>msvc:<cxxflags>/wd4305
-    ;
+      <toolset>clang-win:<link>static  # Clang-win does not generate .dlls.
+      <toolset>clang:<link>static # Clang-linux does not generate .dlls.
+      <toolset>clang:<cxxflags>-Wno-unused-variable  # warning: unused variable 'tolerance' [-Wunused-variable]
+      <toolset>clang:<cxxflags>-Wno-delete-non-abstract-non-virtual-dtor  # delete called on non-final that has virtual functions but non-virtual destructor.
+      #  This does not seem to suppress the warning in boost exception
+      <toolset>clang:<cxxflags>-Wno-unused-comparison # warning: equality comparison result unused.
+      <toolset>clang:<cxxflags>-Wno-unused-variable # unused variable 'd'.
+      <toolset>clang:<cxxflags>-Wno-unused-value # warning: expression result unused.
+      <toolset>clang:<cxxflags>-Wno-unused-const-variable
+      <toolset>clang:<cxxflags>-Wno-unused-local-typedef
+      <toolset>clang:<cxxflags>-Wno-self-assign-overloaded # explicitly assigning value of variable of type 'Real' to itself.
+      # <toolset>clang:<cxxflags>-v
+    ; # project
 
 lib gmp : : <search>$(gmp_path) ;
 lib mpfr : : <search>$(gmp_path) <search>$(mpfr_path) <search>$(mpfr_path)/build.vc10/lib/Win32/Debug ;
