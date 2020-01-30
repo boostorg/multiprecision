@@ -20,10 +20,10 @@
 
 //[big_seventh_example_1
 
-/*`[h5 Using Boost.Multiprecision `cpp_float` types for numerical calculations with higher precision than built-in `long double`.]
+/*`[h5 Using Boost.Multiprecision `cpp_float` types for numerical calculations with higher precision than __fundamental `long double`.]
 
 The Boost.Multiprecision library can be used for computations requiring precision
-exceeding that of standard built-in types such as `float`, `double`
+exceeding that of standard __fundamental types such as `float`, `double`
 and `long double`. For extended-precision calculations, Boost.Multiprecision
 supplies several template data types called `cpp_bin_float_`.
 
@@ -55,7 +55,7 @@ int main()
 
 //[big_seventh_example_2
 /*`Using `typedef cpp_bin_float_50` hides the complexity of multiprecision,
-allows us to define variables with 50 decimal digit precision just like built-in `double`.
+allows us to define variables with 50 decimal digit precision just like __fundamental `double`.
 */
   using boost::multiprecision::cpp_bin_float_50;
 

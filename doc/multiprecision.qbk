@@ -140,7 +140,7 @@ The Multiprecision Library provides [link boost_multiprecision.tut.ints integer]
 [link boost_multiprecision.tut.rational rational],
 [link boost_multiprecision.tut.floats floating-point],
 and [link boost_multiprecision.tut.complex complex] types in C++ that have more
-range and precision than C++'s ordinary built-in types.
+range and precision than C++'s ordinary __fundamental types.
 The big number types in Multiprecision can be used with a wide
 selection of basic mathematical operations, elementary transcendental
 functions as well as the functions in Boost.Math.
@@ -613,7 +613,7 @@ difference to the performance of these types either way - so we may as well have
 the feature off.
 * Unsigned types support subtraction - the result is "as if" a 2's complement operation had been performed as long as they are not
  ['checked-integers] (see above).
- In other words they behave pretty much as a built in integer type would in this situation.  So for example if we were using
+ In other words they behave pretty much as a __fundamental integer type would in this situation.  So for example if we were using
  `uint128_t` then `uint128_t(1)-4` would result in the value `0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD`
  of type `uint128_t`.  However, had this operation been performed on `checked_uint128_t` then a `std::range_error` would have
  been thrown.
@@ -638,7 +638,7 @@ there is no step change in behavior as a cpp_int grows in size.
 * Fixed precision `cpp_int`'s have some support for `constexpr` values and user-defined literals, see
 [link boost_multiprecision.tut.lits here] for the full description.  For example `0xfffff_cppi1024`
 specifies a 1024-bit integer with the value 0xffff.  This can be used to generate compile-time constants that are
-too large to fit into any built in number type.
+too large to fit into any __fundamental number type.
 * The __cpp_int types support constexpr arithmetic, provided it is a fixed-precision type with no allocator.  It may also
 be a checked integer: in which case a compiler error will be generated on overflow or undefined behaviour.  In addition
 the free functions `abs`, `swap`, `multiply`, `add`, `subtract`, `divide_qr`, `integer_modulus`, `powm`, `lsb`, `msb`, 
@@ -716,7 +716,7 @@ to provide an integer type that is a drop-in replacement for the native C++ inte
 Things you should know when using this type:
 
 * Default constructed objects have the value zero (this is [tommath]'s default behavior).
-* Although `tom_int` is mostly a drop in replacement for the builtin integer types, it should be noted that it is a
+* Although `tom_int` is mostly a drop in replacement for the integer __fundamental_types, it should be noted that it is a
 rather strange beast as it's a signed type that is not a 2's complement type.  As a result the bitwise operations
 `| & ^` will throw a `std::runtime_error` exception if either of the arguments is negative.  Similarly the complement
 operator`~` is deliberately not implemented for this type.
@@ -869,7 +869,7 @@ Type `cpp_dec_float` can be used at fixed precision by specifying a non-zero `Di
 The typedefs `cpp_dec_float_50` and `cpp_dec_float_100` provide arithmetic types at 50 and 100 decimal digits precision
 respectively.  Optionally, you can specify an integer type to use for the exponent, this defaults to a 32-bit integer type
 which is more than large enough for the vast majority of use cases, but larger types such as `long long` can also be specified
-if you need a truly huge exponent range.  In any case the ExponentType must be a built in signed integer type at least 2 bytes
+if you need a truly huge exponent range.  In any case the ExponentType must be a __fundamental signed integer type at least 2 bytes
 and 16-bits wide.
 
 Normally `cpp_dec_float` allocates no memory: all of the space required for its digits are allocated
@@ -1814,7 +1814,7 @@ The down side of this approach is that runtimes are much slower when using this 
 debugging very much easier, certainly much easier than sprinkling code with `printf` statements.
 
 When used in conjunction with the Visual C++ debugger visualisers, the value of a multiprecision type that uses this
-backend is displayed in the debugger just a builtin value would be, here we're inspecting a value of type
+backend is displayed in the debugger just a __fundamental value would be, here we're inspecting a value of type
 `number<debug_adaptor<cpp_dec_float<50> > >`:
 
 [$../debugger1.png]
@@ -1876,7 +1876,7 @@ when you expand the view.  As before the `~raw` child gives you access to the ac
 All of the number types that are based on `number` have certain conversion rules in common.
 In particular:
 
-* Any number type can be constructed (or assigned) from any builtin arithmetic type, as long
+* Any number type can be constructed (or assigned) from any __fundamental arithmetic type, as long
   as the conversion isn't lossy (for example float to int conversion):
 
    cpp_dec_float_50 df(0.5);   // OK construction from double
@@ -1891,7 +1891,7 @@ In particular:
    i = 3.14;                       // Error, no implicit assignment operator for lossy conversion.
    cpp_int          j = 3.14;      // Error, no implicit constructor for lossy conversion.
 
-* A `number` can be converted to any built in type, via the `convert_to` member function:
+* A `number` can be converted to any __fundamental type, via the `convert_to` member function:
 
    mpz_int z(2);
    int i = z.convert_to<int>(); // sets i to 2
@@ -1900,7 +1900,7 @@ In particular:
 as long as the rational number uses an unbounded integer type.  Please be aware that constructing a rational
 number from an extended precision floating-point type with a large exponent range can effectively run the system
 out of memory, as in the extreme case ['2[super max_exponent] / CHAR_BITS] bytes of storage may be required.  This
-does not represent a problem for built in floating-point types however, as the exponent range for these is rather
+does not represent a problem for __fundamental floating-point types however, as the exponent range for these is rather
 limited.
 
 * Conversions to floating-point numbers from rational ones are rounded to nearest (less than 0.5 __ULP error)
@@ -1908,7 +1908,7 @@ as long as the floating-point number is binary, and the integer type used by the
 
 Additional conversions may be supported by particular backends.
 
-* A `number` can be converted to any built in type, via an explicit conversion operator:
+* A `number` can be converted to any __fundamental type, via an explicit conversion operator:
 this functionality is only available on compilers supporting C++11's explicit conversion syntax.
 
    mpz_int z(2);
@@ -1928,7 +1928,7 @@ this functionality is only available on compilers supporting C++11's explicit co
    // assign member function, avoids having to create a temporary via a static_cast:
    i.assign("23");  // OK
 
-* Any number type will interoperate with the builtin types in arithmetic expressions as long as the conversions
+* Any number type will interoperate with the __fundamental types in arithmetic expressions as long as the conversions
 are not lossy:
 
    // pi to 50 places from a string:
@@ -2434,10 +2434,10 @@ __mpfr_float_backend, __mpf_float, __cpp_int.
 [section:gen_int Generic Integer Operations]
 
 All of the [link boost_multiprecision.ref.number.integer_functions non-member integer operations] are overloaded for the
-built in integer types in
+__fundamental integer types in
 `<boost/multiprecision/integer.hpp>`.
 Where these operations require a temporary increase in precision (such as for `powm`), then
-if no built in type is available, a __cpp_int of appropriate precision will be used.
+if no __fundamental type is available, a __cpp_int of appropriate precision will be used.
 
 Some of these functions are trivial, others use compiler intrinsics (where available) to ensure optimal evaluation.
 
@@ -2693,7 +2693,7 @@ because as an __arbitrary_precision types,
 it expands to hold any value that the machine resources permit.
 
 However fixed precision __cpp_int's may be modulo if they are unchecked
-(i.e. they behave just like built in integers), but not if they are checked
+(i.e. they behave just like __fundamental integers), but not if they are checked
 (overflow causes an exception to be raised).
 
 __fundamental and multi-precision floating-point types are normally not modulo.
@@ -2703,7 +2703,7 @@ provided `std::numeric_limits<>::has_infinity == true`.
 
 [h4 radix]
 
-Constant `std::numeric_limits<T>::radix` returns either 2 (for built-in and binary types)
+Constant `std::numeric_limits<T>::radix` returns either 2 (for __fundamental and binary types)
 or 10 (for decimal types).
 
 [h4 digits]
@@ -3233,7 +3233,7 @@ by using the value returned.
 
 [endsect] [/section:functions std::numeric_limits<>  functions]
 
-[/ Tables of values for numeric_limits for various built-in and cpp_bin_float types]
+[/ Tables of values for numeric_limits for various __fundamental and cpp_bin_float types]
 [include numeric_limits_32_tables.qbk]
 [/include numeric_limits_64_tables.qbk]
 
@@ -3349,7 +3349,7 @@ and confirming that the two values are identical.  A trivial example using `floa
   BOOST_CHECK_EQUAL(write, read); // Should be the same.
 
 and this can be run in a loop for all possible values of a 32-bit float.
-For other floating-point types `T`, including built-in `double`,
+For other floating-point types `T`, including __fundamental `double`,
 it takes far too long to test all values,
 so a reasonable test strategy is to use a large number of random values.
 
@@ -3376,7 +3376,7 @@ allows any floating-point type to be ['round_tripped] using a wide range of fair
 It also includes tests compared a collection of
 [@../../test/string_data.ipp stringdata] test cases in a file.
 
-[h4 Comparing with output using Built-in types]
+[h4 Comparing with output using __fundamental types]
 
 One can make some comparisons with the output of
 
@@ -3425,7 +3425,7 @@ So to conform to the C99 standard (incorporated by C++)
 Confusingly, Microsoft (and MinGW) do not conform to this standard and provide
 [*at least three digits], for example `1e+001`.
 So if you want the output to match that from
-built-in floating-point types on compilers that use Microsofts runtime then use:
+__fundamental floating-point types on compilers that use Microsofts runtime then use:
 
   #define BOOST_MP_MIN_EXPONENT_DIGITS 3
 
@@ -3782,7 +3782,7 @@ Type `number` is default constructible, and both copy constructible and assignab
 
 * Itself.
 * An expression template which is the result of one of the arithmetic operators.
-* Any builtin arithmetic type, as long as the result would not be lossy (for example float to integer conversion).
+* Any __fundamental arithmetic type, as long as the result would not be lossy (for example float to integer conversion).
 * Any type that the Backend is implicitly constructible or assignable from.
 * An rvalue reference to another `number`.  Move-semantics are used for construction if the backend also
 supports rvalue reference construction.  In the case of assignment, move semantics are always supported
@@ -3849,7 +3849,7 @@ The arguments to these operators is either:
 * An expression template derived from `number<Backend>`.
 * Any type implicitly convertible to `number<Backend, ExpressionTemplates>`, including some other instance of class `number`.
 
-For the left and right shift operations, the argument must be a builtin
+For the left and right shift operations, the argument must be a __fundamental
 integer type with a positive value (negative values result in a `std::runtime_error` being thrown).
 
       operator ``['convertible-to-bool-type]``()const;
@@ -3956,7 +3956,7 @@ The arguments to these functions must contain at least one of the following:
 
 * A `number`.
 * An expression template type derived from `number`.
-* Any type for which `number` has an implicit constructor - for example a builtin arithmetic type.
+* Any type for which `number` has an implicit constructor - for example a __fundamental arithmetic type.
 
 The return type of these operators is either:
 
@@ -3964,7 +3964,7 @@ The return type of these operators is either:
 * Type `number<Backend, et_off>` when `ExpressionTemplates` is `false`.
 * Type `bool` if the operator is a comparison operator.
 
-Finally note that the second argument to the left and right shift operations must be a builtin integer type,
+Finally note that the second argument to the left and right shift operations must be a __fundamental integer type,
 and that the argument must be positive (negative arguments result in a `std::runtime_error` being thrown).
 
 [h4 swap]
@@ -4163,7 +4163,7 @@ If this is a type with multiple components (for example rational or complex type
 A traits class that inherits from `mpl::int_<N>` where `N` is one of the enumerated values `number_kind_integer`, `number_kind_floating_point`,
 `number_kind_rational`, `number_kind_fixed_point`, or `number_kind_unknown`.  This traits class is specialized for any type that has
 `std::numeric_limits` support as well as for classes in this library: which means it can be used for generic code that must work
-with built in arithmetic types as well as multiprecision ones.
+with __fundamental arithmetic types as well as multiprecision ones.
 
    template <class T>
    struct is_number;
@@ -4176,13 +4176,12 @@ A traits class that inherits from `mpl::true_` if T is an instance of `number<>`
 A traits class that inherits from `mpl::true_` if T is an expression template type derived from `number<>`, otherwise from `mpl::false_`.
 
 
-
 [h4 Integer functions]
 
-In addition to functioning with types from this library, these functions are also overloaded for built in integer
+In addition to functioning with types from this library, these functions are also overloaded for __fundamental integer
 types if you include `<boost/multiprecision/integer.hpp>`.  Further, when used with fixed precision types (whether
-built in integers or multiprecision ones), the functions will promote to a wider type internally when the algorithm
-requires it.  Versions overloaded for built in integer types return that integer type rather than an expression
+__fundamental integers or multiprecision ones), the functions will promote to a wider type internally when the algorithm
+requires it.  Versions overloaded for __fundamental integer types return that integer type rather than an expression
 template.
 
    ``['unmentionable-expression-template-type]``    gcd(const ``['number-or-expression-template-type]``& a, const ``['number-or-expression-template-type]``& b);
@@ -4197,7 +4196,7 @@ Returns the smallest integer `x` that is divisible by both `a` and `b`.
 
 Returns ['b[super p]] as an expression template.  Note that this function should be used with extreme care as the result can grow so
 large as to take "effectively forever" to compute, or else simply run the host machine out of memory.  This is the one function in
-this category that is not overloaded for built in integer types, further, it's probably not a good idea to use it with
+this category that is not overloaded for __fundamental integer types, further, it's probably not a good idea to use it with
 fixed precision `cpp_int`'s either.
 
    ``['unmentionable-expression-template-type]``    powm(const ``['number-or-expression-template-type]``& b, const ``['number-or-expression-template-type]``& p, const ``['number-or-expression-template-type]``& m);
@@ -5184,7 +5183,7 @@ The full list of these functions is:
 
 [section:overhead The Overhead in the Number Class Wrapper]
 
-Using a simple [@../../performance/arithmetic_backend.hpp backend class] that wraps any built in arithmetic type
+Using a simple [@../../performance/arithmetic_backend.hpp backend class] that wraps any __fundamental arithmetic type
 we can measure the overhead involved in wrapping a type inside the `number` frontend, and the effect that turning
 on expression templates has.  The following table compares the performance between `double` and a `double` wrapped
 inside class `number`:
@@ -5929,10 +5928,10 @@ an integer that is wider than we are.
 fit in the smaller type, then the result is either the maximum (or minimum) value of the target type.  This was always the intended
 behaviour, but was somewhat haphazardly enforced before.  If you really do want just the low order N bits of a value, then you will
 need to mask these out prior to the case, for example: `static_cast<unsigned>(~static_cast<unsigned>(0) & my_value)`.  Note that
-technically (to avoid undefined behaviour) you should do the same thing with built in integer types too.
+technically (to avoid undefined behaviour) you should do the same thing with __fundamental integer types too.
 See [@https://svn.boost.org/trac/boost/ticket/13109 #13109].
 * Fix bug in conversion of decimal to rational types (zero needs special handling), see [@https://svn.boost.org/trac/boost/ticket/13148 #13148].
-* Fix conversion from cpp_bin_float to a wider built in integer type, see [@https://svn.boost.org/trac/boost/ticket/13301 #13301].
+* Fix conversion from cpp_bin_float to a wider __fundamental integer type, see [@https://svn.boost.org/trac/boost/ticket/13301 #13301].
 * Improve performance heurists used in cpp_bin_float exp function.
 * Fix bug in floor/ceil and cpp_bin_float when the exponent type is wider than an int, see [@https://svn.boost.org/trac/boost/ticket/13264 #13264].
 * Disable explicit conversion operator when the target type is already constructible from this type, see  [@https://github.com/boostorg/multiprecision/issues/30 #30].
@@ -6123,7 +6122,7 @@ in the last limb: [@https://svn.boost.org/trac/boost/ticket/8133 8133].
 * Added additional template parameter to `mpfr_float_backend` to allow stack-based allocation.
 * Added section on mixed precision arithmetic, and added support for operations yielding a higher precision result
 than either of the arguments.
-* Added overloads of integer-specific functions for built in integer types.
+* Added overloads of integer-specific functions for __fundamental integer types.
 
 [h4 Pre-review history]
 
