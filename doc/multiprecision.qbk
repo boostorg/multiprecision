@@ -129,7 +129,8 @@
 [def __is_constant_evaluated [@https://en.cppreference.com/w/cpp/types/is_constant_evaluated `std::is_constant_evaluated`]]
 [def __compiler_support [@https://en.cppreference.com/w/cpp/compiler_support compiler support]]
 [def __ULP [@http://en.wikipedia.org/wiki/Unit_in_the_last_place  Unit in the last place (ULP)]]
-
+[def __Mathematica [@http://www.wolfram.com/products/mathematica/index.html Wolfram Mathematica]]
+[def __WolframAlpha [@http://www.wolframalpha.com/ Wolfram Alpha]]
 [def __Boost_Serialization [@https://www.boost.org/doc/libs/release/libs/serialization/doc/index.html Boost.Serialization]]
 [def __Boost_Math [@https://www.boost.org/doc/libs/release/libs/math/doc/index.html Boost.Math]]
 [def __Boost_Multiprecision [@https://www.boost.org/doc/libs/release/libs/multiprecision/doc/index.html Boost.Multiprecision]]
@@ -1142,6 +1143,9 @@ Values for `std::numeric_limits<float128>` are:
 [big_seventh_example_2]
 [big_seventh_example_3]
 [big_seventh_example_constexpr]  [/ Hopefully a temporary restriction.]
+[big_seventh_example_4]
+
+Typical output is:
 [big_seventh_example_output]
 
 [endsect] [/section:caveats Caveats]

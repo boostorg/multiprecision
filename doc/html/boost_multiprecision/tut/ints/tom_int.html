@@ -55,12 +55,14 @@
             </li>
 <li class="listitem">
               Although <code class="computeroutput"><span class="identifier">tom_int</span></code> is
-              mostly a drop in replacement for the builtin integer types, it should
-              be noted that it is a rather strange beast as it's a signed type that
-              is not a 2's complement type. As a result the bitwise operations <code class="computeroutput"><span class="special">|</span> <span class="special">&amp;</span> <span class="special">^</span></code> will throw a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code>
-              exception if either of the arguments is negative. Similarly the complement
-              operator<code class="computeroutput"><span class="special">~</span></code> is deliberately
-              not implemented for this type.
+              mostly a drop in replacement for the integer <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+              (built-in) types</a>, it should be noted that it is a rather strange
+              beast as it's a signed type that is not a 2's complement type. As a
+              result the bitwise operations <code class="computeroutput"><span class="special">|</span>
+              <span class="special">&amp;</span> <span class="special">^</span></code>
+              will throw a <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">runtime_error</span></code> exception if either
+              of the arguments is negative. Similarly the complement operator<code class="computeroutput"><span class="special">~</span></code> is deliberately not implemented for
+              this type.
             </li>
 <li class="listitem">
               Formatted IO for this type does not support octal or hexadecimal notation
