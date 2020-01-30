@@ -61,13 +61,25 @@
 
 #ifdef __has_builtin
 #if __has_builtin(__builtin_is_constant_evaluated) && !defined(BOOST_NO_CXX14_CONSTEXPR) && !defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX)
-#define BOOST_MP_CLANG_CD
+#define BOOST_MP_HAS_BUILTIN_IS_CONSTANT_EVALUATED
 #endif
+#endif
+//
+// MSVC also supports __builtin_is_constant_evaluated if it's recent enough:
+//
+#if defined(_MSC_FULL_VER) && (_MSC_FULL_VER >= 192528326)
+#  define BOOST_MP_HAS_BUILTIN_IS_CONSTANT_EVALUATED
+#endif
+//
+// As does GCC-9:
+//
+#if defined(BOOST_GCC) && !defined(BOOST_NO_CXX14_CONSTEXPR) && (__GNUC__ >= 9) && !defined(BOOST_MP_HAS_BUILTIN_IS_CONSTANT_EVALUATED)
+#  define BOOST_MP_HAS_BUILTIN_IS_CONSTANT_EVALUATED
 #endif
 
 #if defined(BOOST_MP_HAS_IS_CONSTANT_EVALUATED) && !defined(BOOST_NO_CXX14_CONSTEXPR)
 #  define BOOST_MP_IS_CONST_EVALUATED(x) std::is_constant_evaluated()
-#elif (defined(BOOST_GCC) && !defined(BOOST_NO_CXX14_CONSTEXPR) && (__GNUC__ >= 9)) || defined(BOOST_MP_CLANG_CD)
+#elif defined(BOOST_MP_HAS_BUILTIN_IS_CONSTANT_EVALUATED)
 #  define BOOST_MP_IS_CONST_EVALUATED(x) __builtin_is_constant_evaluated()
 #elif !defined(BOOST_NO_CXX14_CONSTEXPR) && defined(BOOST_GCC) && (__GNUC__ >= 6)
 #  define BOOST_MP_IS_CONST_EVALUATED(x) __builtin_constant_p(x)
