@@ -16,6 +16,7 @@
 #include <boost/type_traits/common_type.hpp>
 #include <boost/math/special_functions/trunc.hpp>
 #include <boost/math/special_functions/round.hpp>
+#include <boost/math/special_functions/cbrt.hpp>
 #include <qd/qd_real.h>
 
 namespace boost {
@@ -78,14 +79,17 @@ struct quad_double_backend
    }
    quad_double_backend& operator=(unsigned long long i)
    {
-      m_value[0] = static_cast<double>(i);
+      static const unsigned long long mask = (2uLL << 50) - 1;
+
+      m_value[0]                           = static_cast<double>(i & mask);
       m_value[1] = m_value[2] = m_value[3] = 0;
-      i -= static_cast<unsigned long long>(m_value[0]);
+      i >>= 50;
+      int shift = 50;
       while (i)
       {
-         double d = static_cast<double>(i);
-         m_value += i;
-         i -= static_cast<unsigned long long>(d);
+         m_value += std::ldexp(static_cast<double>(i & mask), shift);
+         i >>= 50;
+         shift += 50;
       }
       return *this;
    }
@@ -132,7 +136,7 @@ struct quad_double_backend
    }
    quad_double_backend& operator=(const char* s)
    {
-      detail::convert_from_string(*this, s);
+      boost::multiprecision::detail::convert_from_string(*this, s);
       return *this;
    }
    void swap(quad_double_backend& o)
@@ -473,13 +477,40 @@ inline int eval_fpclassify(const quad_double_backend& o)
 
 inline void eval_trunc(quad_double_backend& result, const quad_double_backend& o)
 {
-   result.data() = boost::math::trunc(o.data());
+   if (o.data()[0] < 0)
+      result.data() = ceil(o.data());
+   else
+      result.data() = floor(o.data());
 }
 
 
 inline void eval_round(quad_double_backend& result, const quad_double_backend& o)
 {
-   result.data() = boost::math::round(o.data());
+   qd_real const& v = o.data();
+   //
+   // The logic here is rather convoluted, but avoids a number of traps,
+   // see discussion here https://github.com/boostorg/math/pull/8
+   //
+   if (-0.5 < v && v < 0.5)
+   {
+      // special case to avoid rounding error on the direct
+      // predecessor of +0.5 resp. the direct successor of -0.5 in
+      // IEEE floating point types
+      result = 0uLL;
+   }
+   else if (v > 0)
+   {
+      // subtract v from ceil(v) first in order to avoid rounding
+      // errors on largest representable integer numbers
+      qd_real c(ceil(v));
+      result = 0.5 < c - v ? c - 1 : c;
+   }
+   else
+   {
+      // see former branch
+      qd_real f(floor(v));
+      result = 0.5 < v - f ? f + 1 : f;
+   }
 }
 
 
@@ -611,23 +642,21 @@ template<>
 struct number_category<quad_double_backend > : public mpl::int_<number_kind_floating_point>
 {};
 
-namespace detail {
-#if 0
-template <class Backend>
-struct double_precision_type;
-
-template <boost::multiprecision::expression_template_option ET>
-struct double_precision_type<number<quad_double_backend, ET> >
+template <boost::multiprecision::expression_template_option ExpressionTemplates>
+inline boost::multiprecision::number<quad_double_backend, ExpressionTemplates> asinh BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<quad_double_backend, ExpressionTemplates>& arg)
 {
-   typedef number<quad_double_backend<typename double_precision_type<qd_real>::type>, ET> type;
-};
-template <>
-struct double_precision_type<quad_double_backend<boost::int32_t> >
+   return asinh(arg.backend().data());
+}
+template <boost::multiprecision::expression_template_option ExpressionTemplates>
+inline boost::multiprecision::number<quad_double_backend, ExpressionTemplates> acosh BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<quad_double_backend, ExpressionTemplates>& arg)
 {
-   typedef quad_double_backend<boost::int64_t> type;
-};
-#endif
-} // namespace detail
+   return acosh(arg.backend().data());
+}
+template <boost::multiprecision::expression_template_option ExpressionTemplates>
+inline boost::multiprecision::number<quad_double_backend, ExpressionTemplates> atanh BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<quad_double_backend, ExpressionTemplates>& arg)
+{
+   return atanh(arg.backend().data());
+}
 
 }} // namespace boost::multiprecision
 
@@ -641,15 +670,23 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::quad_d
 
  public:
    BOOST_STATIC_CONSTEXPR int  max_digits10 = digits10 + 3;
-   BOOST_STATIC_CONSTEXPR number_type(min)() BOOST_NOEXCEPT { return (base_type::min)(); }
-   BOOST_STATIC_CONSTEXPR number_type(max)() BOOST_NOEXCEPT { return (base_type::max)(); }
+   BOOST_STATIC_CONSTEXPR number_type(min)() BOOST_NOEXCEPT 
+   { 
+      static const qd_real value = { 1.6259745436952323e-260 };
+      return (base_type::min)(); 
+   }
+   BOOST_STATIC_CONSTEXPR number_type(max)() BOOST_NOEXCEPT 
+   {
+      static const qd_real value = { 1.79769313486231570815e+308, 9.97920154767359795037e+291, 5.53956966280111259858e+275, 3.07507889307840487279e+259 };
+      return value; 
+   }
    BOOST_STATIC_CONSTEXPR number_type lowest() BOOST_NOEXCEPT { return -(max)(); }
-   BOOST_STATIC_CONSTEXPR number_type epsilon() BOOST_NOEXCEPT { return base_type::epsilon(); }
+   BOOST_STATIC_CONSTEXPR number_type epsilon() BOOST_NOEXCEPT { return 1.21543267145725e-63; }
    BOOST_STATIC_CONSTEXPR number_type round_error() BOOST_NOEXCEPT { return epsilon() / 2; }
-   BOOST_STATIC_CONSTEXPR number_type infinity() BOOST_NOEXCEPT { return base_type::infinity(); }
-   BOOST_STATIC_CONSTEXPR number_type quiet_NaN() BOOST_NOEXCEPT { return base_type::quiet_NaN(); }
-   BOOST_STATIC_CONSTEXPR number_type signaling_NaN() BOOST_NOEXCEPT { return base_type::signaling_NaN(); }
-   BOOST_STATIC_CONSTEXPR number_type denorm_min() BOOST_NOEXCEPT { return base_type::denorm_min(); }
+   BOOST_STATIC_CONSTEXPR number_type infinity() BOOST_NOEXCEPT { return std::numeric_limits<double>::infinity(); }
+   BOOST_STATIC_CONSTEXPR number_type quiet_NaN() BOOST_NOEXCEPT { return std::numeric_limits<double>::quiet_NaN(); }
+   BOOST_STATIC_CONSTEXPR number_type signaling_NaN() BOOST_NOEXCEPT { return std::numeric_limits<double>::signaling_NaN(); }
+   BOOST_STATIC_CONSTEXPR number_type denorm_min() BOOST_NOEXCEPT { return std::numeric_limits<double>::denorm_min(); }
 };
 
 template <boost::multiprecision::expression_template_option ExpressionTemplates>

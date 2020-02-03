@@ -7,7 +7,7 @@
 #pragma warning(disable : 4127) // conditional expression is constant
 #endif
 
-#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DEC_FLOAT_2) && !defined(TEST_CPP_DEC_FLOAT_3) && !defined(TEST_CPP_DEC_FLOAT_4) && !defined(TEST_CPP_DEC_FLOAT_5) && !defined(TEST_CPP_DEC_FLOAT_6) && !defined(TEST_CPP_BIN_FLOAT_2) && !defined(TEST_CPP_BIN_FLOAT_3)
+#if !defined(TEST_MPF_50) && !defined(TEST_MPF) && !defined(TEST_BACKEND) && !defined(TEST_CPP_DEC_FLOAT) && !defined(TEST_MPFR) && !defined(TEST_MPFR_50) && !defined(TEST_MPFI_50) && !defined(TEST_FLOAT128) && !defined(TEST_CPP_BIN_FLOAT) && !defined(TEST_CPP_DEC_FLOAT_2) && !defined(TEST_CPP_DEC_FLOAT_3) && !defined(TEST_CPP_DEC_FLOAT_4) && !defined(TEST_CPP_DEC_FLOAT_5) && !defined(TEST_CPP_DEC_FLOAT_6) && !defined(TEST_CPP_BIN_FLOAT_2) && !defined(TEST_CPP_BIN_FLOAT_3) && !defined(TEST_QUAD_DOUBLE)
 #define TEST_MPF_50
 #define TEST_MPFR_50
 #define TEST_MPFI_50
@@ -21,6 +21,7 @@
 #define TEST_CPP_BIN_FLOAT
 #define TEST_CPP_BIN_FLOAT_2
 #define TEST_CPP_BIN_FLOAT_3
+#define TEST_QUAD_DOUBLE
 
 #ifdef _MSC_VER
 #pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
@@ -49,6 +50,9 @@
 #endif
 #ifdef TEST_FLOAT128
 #include <boost/multiprecision/float128.hpp>
+#endif
+#ifdef TEST_QUAD_DOUBLE
+#include <boost/multiprecision/quad_double.hpp>
 #endif
 
 #include <boost/math/constants/constants.hpp>
@@ -2197,6 +2201,10 @@ int main()
    test<boost::multiprecision::float128>();
    test_c99_appendix_F<boost::multiprecision::float128>();
    test_c99_appendix_F_tgammaq_addon_for_float128<boost::multiprecision::float128>();
+#endif
+#ifdef TEST_QUAD_DOUBLE
+   test<boost::multiprecision::quad_double>();
+   //test_c99_appendix_F<boost::multiprecision::quad_double>();
 #endif
 
    return boost::report_errors();
