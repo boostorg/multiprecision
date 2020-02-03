@@ -831,7 +831,7 @@ Things you should know when using this type:
 
 * Default constructed `cpp_bin_float`s have a value of zero.
 * The radix of this type is 2, even when the precision is specified as decimal digits.
-* The type supports both infinities and NaN's.  An infinity is generated whenever the result would overflow,
+* The type supports both infinities and NaNs.  An infinity is generated whenever the result would overflow,
 and a NaN is generated for any mathematically undefined operation.
 * There is a `std::numeric_limits` specialisation for this type.
 * Any `number` instantiated on this type, is convertible to any other `number` instantiated on this type -
@@ -889,7 +889,7 @@ Things you should know when using this type:
 * The radix of this type is 10.  As a result it can behave subtly differently from base-2 types.
 * The type has a number of internal guard digits over and above those specified in the template argument.
 Normally these should not be visible to the user.
-* The type supports both infinities and NaN's.  An infinity is generated whenever the result would overflow,
+* The type supports both infinities and NaNs.  An infinity is generated whenever the result would overflow,
 and a NaN is generated for any mathematically undefined operation.
 * There is a `std::numeric_limits` specialisation for this type.
 * Any `number` instantiated on this type, is convertible to any other `number` instantiated on this type -
@@ -900,7 +900,7 @@ as a valid floating-point number.
 * The actual precision of a `cpp_dec_float` is always slightly higher than the number of digits specified in
 the template parameter, actually how much higher is an implementation detail but is always at least 8 decimal
 digits.
-* Operations involving `cpp_dec_float` are always truncating.  However, note that since their are guard digits
+* Operations involving `cpp_dec_float` are always truncating.  However, note that since there are guard digits
 in effect, in practice this has no real impact on accuracy for most use cases.
 
 [h5 cpp_dec_float example:]
@@ -954,7 +954,7 @@ existing [gmp] code.
 * This backend supports rvalue-references and is move-aware, making instantiations of `number` on this backend move aware.
 * It is not possible to round-trip objects of this type to and from a string and get back
 exactly the same value.  This appears to be a limitation of [gmp].
-* Since the underlying [gmp] types have no notion of infinities or NaN's, care should be taken
+* Since the underlying [gmp] types have no notion of infinities or NaNs, care should be taken
 to avoid numeric overflow or division by zero.  That latter will result in a std::overflow_error being thrown,
 while generating excessively large exponents may result in instability of the underlying [gmp]
 library (in testing, converting a number with an excessively large or small exponent
@@ -1409,7 +1409,7 @@ Things you should know when using this type:
 
 * Default constructed `cpp_complex`s have a value of zero.
 * The radix of this type is 2, even when the precision is specified as decimal digits.
-* The type supports both infinities and NaN's.  An infinity is generated whenever the result would overflow,
+* The type supports both infinities and NaNs.  An infinity is generated whenever the result would overflow,
 and a NaN is generated for any mathematically undefined operation.
 * There is no `std::numeric_limits` specialisation for this type: this is the same behaviour as `std::complex`.  If you need
 `std::numeric_limits` support you need to look at `std::numeric_limits<my_complex_number_type::value_type>`.
@@ -6008,9 +6008,9 @@ should now respect signed-zeros correctly.
 * Use memcpy for data import into cpp_int where possible, see [@https://svn.boost.org/trac/boost/ticket/9235 #9235].
 * Changed `cpp_bin_float.convert_to<double>()` to a function template rather than proceding via `long double` to avoid
 double-rounding bug, see [@https://svn.boost.org/trac/boost/ticket/12039 #12039].
-* Fixed conversions from NaN's and Infinities, see [@https://svn.boost.org/trac/boost/ticket/12112 #12112].
+* Fixed conversions from NaNs and Infinities, see [@https://svn.boost.org/trac/boost/ticket/12112 #12112].
 * Enabled better support for Clang on Windows.
-* Fixed handling of NaN's and Infinities in basic arithmetic for cpp_dec_float and cpp_bin_float, see [@https://svn.boost.org/trac/boost/ticket/12090 #12090].
+* Fixed handling of NaNs and Infinities in basic arithmetic for cpp_dec_float and cpp_bin_float, see [@https://svn.boost.org/trac/boost/ticket/12090 #12090].
 * Fixed fencepost error in cpp_bin_float subtraction.
 * Fixed double-rounding in conversion to float routines for cpp_bin_float, see [@https://svn.boost.org/trac/boost/ticket/12039 #12039].
 * Make float128 denorm aware, see [@https://svn.boost.org/trac/boost/ticket/12075 #12075].
