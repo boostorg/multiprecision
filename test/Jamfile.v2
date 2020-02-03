@@ -105,6 +105,7 @@ lib no_eh_support : no_eh_test_support.cpp ;
 test-suite arithmetic_tests :
 
    [ run test_arithmetic_backend_concept.cpp no_eh_support ]
+   [ compile test_arithmetic_skeleton.cpp ]
 
    [ run test_arithmetic_cpp_dec_float_1.cpp no_eh_support ]
    [ run test_arithmetic_cpp_dec_float_2.cpp no_eh_support ]
