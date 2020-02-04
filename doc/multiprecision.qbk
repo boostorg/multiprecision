@@ -1796,8 +1796,7 @@ When we examine program output we can clearly see that the diameter of the inter
 
 [logged_adaptor_output]
 
-[endsect] [section:logged_adaptor logged_adaptor]
- [/section:misc Miscellaneous Number Types.]
+[endsect] [/section:logged_adaptor logged_adaptor]
 
 [section:debug_adaptor debug_adaptor]
 
