@@ -752,7 +752,7 @@ as a valid integer.
 
 [endsect]
 
-[section:floats floating-point Numbers]
+[section:floats Floating-point Types]
 
 The following back-ends provide floating-point arithmetic:
 
@@ -1129,6 +1129,7 @@ Values for `std::numeric_limits<float128>` are:
 
 [section:aos Area of Circle]
 
+[/I:\boost\libs\multiprecision\example\floating_point_examples.cpp]
 [AOS1]
 [AOS2]
 [AOS3]
@@ -1171,7 +1172,7 @@ Typical output is:
 [GI1]
 [GI2]
 
-[endsect] [section:gi Calculating an Integral]
+[endsect] [/section:gi Calculating an Integral]
 
 
 [section:poly_eg Polynomial Evaluation]
@@ -1324,9 +1325,9 @@ Returns `true` if `lower(a) == upper(a)`.
 
 [mpfi_eg]
 
-[endsect]
+[endsect] [ section:mpfi mpfi_float]
 
-[endsect]
+[endsect] [/section:interval Interval Number Types]
 
 [section:complex Complex Number Types]
 
@@ -1427,7 +1428,7 @@ Which produces the output (for the multiprecision type):
 
 [cpp_complex_out]
 
-[endsect]
+[endsect] [/section:complex Complex Number Types]
 
 [section:mpc_complex mpc_complex]
 
@@ -1498,7 +1499,7 @@ Which produces the output (for the multiprecision type):
 
 [mpc_out]
 
-[endsect]
+[endsect] [/section:mpc_complex mpc_complex]
 
 [section:complex128 complex128]
 
@@ -1544,7 +1545,8 @@ Which results in the output:
 
 [complex128_out]
 
-[endsect]
+[endsect] [/section:complex128 complex128]
+
 
 [section:complex_adaptor complex_adaptor]
 
@@ -1560,9 +1562,9 @@ in order to create a new complex number type.
 
 It is the means by which we implement __cpp_complex and __complex128.
 
-[endsect]
+[endsect] [/section:complex_adaptor complex_adaptor]
 
-[endsect]
+[endsect] [/section:complex Complex Number Types]
 
 [section:rational Rational Number Types]
 
@@ -1615,7 +1617,7 @@ interpreted as a valid rational number.
 
 [cpp_rational_eg]
 
-[endsect]
+[endsect] [/section:rational Rational Number Types]
 
 [section:gmp_rational gmp_rational]
 
@@ -1663,7 +1665,7 @@ interpreted as a valid rational number.
 
 [mpq_eg]
 
-[endsect]
+[endsect] [/section:gmp_rational gmp_rational]
 
 [section:tommath_rational tommath_rational]
 
@@ -1704,7 +1706,7 @@ needs some improvement in this area.
 
 [mp_rat_eg]
 
-[endsect]
+[endsect] [/section:tommath_rational tommath_rational]
 
 [section:br Use With Boost.Rational]
 
@@ -1712,7 +1714,7 @@ All of the integer types in this library can be used as template arguments to `b
 
 Note that using the library in this way largely negates the effect of the expression templates in `number`.
 
-[endsect]
+[endsect] [/section:br Use With Boost.Rational]
 
 [section:rational_adaptor rational_adaptor]
 
@@ -1736,9 +1738,9 @@ So for example, given an integer back-end type `MyIntegerBackend`, the use would
    MyInt i = numerator(r);
    assert(i == 2);
 
-[endsect]
+[endsect] [/section:rational_adaptor rational_adaptor]
 
-[endsect]
+[endsect] [/section:rational Rational Number Types]
 
 [section:misc Miscellaneous Number Types.]
 
@@ -1794,7 +1796,8 @@ When we examine program output we can clearly see that the diameter of the inter
 
 [logged_adaptor_output]
 
-[endsect]
+[endsect] [section:logged_adaptor logged_adaptor]
+ [/section:misc Miscellaneous Number Types.]
 
 [section:debug_adaptor debug_adaptor]
 
@@ -1832,7 +1835,7 @@ It works for all the backend types equally too, here it is inspecting a `number<
 [$../debugger3.png]
 
 
-[endsect]
+[endsect] [/section:debug_adaptor debug_adaptor]
 
 [section:visualizers Visual C++ Debugger Visualizers]
 
@@ -1871,9 +1874,9 @@ when you expand the view.  As before the `~raw` child gives you access to the ac
 
 [$../debugger7.png]
 
-[endsect]
+[endsect] [/section:visualizers Visual C++ Debugger Visualizers]
 
-[endsect]
+[endsect]  [/section:misc Miscellaneous Number Types.]
 
 [section:conversions Constructing and Interconverting Between Number Types]
 
@@ -1995,7 +1998,7 @@ More information on what additional types a backend supports conversions from ar
 The converting constructor will be implicit if the backend's converting constructor is also implicit, and explicit if the
 backends converting constructor is also explicit.
 
-[endsect]
+[endsect] [/section:conversions Constructing and Interconverting Between Number Types]
 
 [section:random Generating Random Numbers]
 
@@ -2853,7 +2856,7 @@ for probably every third value of the significand.
 
 A workaround is using the scientific or exponential format `std::scientific`.
 
-Other compilers also fail to implement round-tripping entirely fault-free, for example, see
+Other older compilers also fail to implement round-tripping entirely fault-free, for example, see
 [@https://www.exploringbinary.com/incorrectly-rounded-conversions-in-gcc-and-glibc/  Incorrectly Rounded Conversions in GCC and GLIBC].
 
 For more details see
@@ -3334,7 +3337,6 @@ inspect `std::numeric_limits<typename T::value_type>`.
 
 [endsect] [/section:limits Numeric Limits]
 
-
 [section:input_output  Input Output]
 
 [h4  Loopback testing]
@@ -3455,7 +3457,7 @@ which may be useful to ensure that columns line up.
 
 [hash4]
 
-[endsect][/hash]
+[endsect] [/section:hash Hash Function Support]
 
 [section:eigen Eigen Interoperability]
 
@@ -3473,16 +3475,16 @@ Which produces the following output:
 
 [eigen_out]
 
-[endsect]
+[endsect] [/section:eigen Eigen Interoperability]
 
 [section:new_backend Writing a New Backend]
 
 The formal requirements for a backend to class `number` are given in the reference, but to help
 speed and simplify the process there is a header [@../../test/skeleton_backend.hpp skeleton_backend.hpp]
 where all the methods needed to be written are declared but nothing is implemented.  The process of
-writing a new backend then simlifies to:
+writing a new backend then simplifies to:
 
-* Save skeleton_backend.hpp under a new name and change it's #include guards to match.
+* Save skeleton_backend.hpp under a new name and change its #include guards to match.
 * Search and replace `skeleton_backend` to the name of the new backend type.
 * Fill in the blanks in the class definition and for the compulsary non-members.
 * Don't forget to mark the functions as `inline`, `constexpr` and `noexcept` as required.
@@ -3503,7 +3505,7 @@ that looks something like:
       return boost::report_errors();
    }
 
-This will basically "instantiate everything", and performa few runtime sanity checks, it is a very good test that you have written legal code!
+This will basically "instantiate everything", and perform a few runtime sanity checks; it is a very good test that you have written legal code!
 
 You should also create a "header include test" that verifies that the new header includes everything it should, see 
 [@../../test/include_test/mpfr_include_test.cpp mpfr_include_test.cpp] for an example.
@@ -3548,9 +3550,9 @@ For floating point types, you should add the new type to at least the following 
 * concepts/sf_concept_check_gamma.cpp
 * concepts/sf_concept_check_poly.cpp
 
-[endsect]
+[endsect] [/section:new_backend Writing a New Backend]
 
-[endsect]
+[endsect] [/section:tut Tutorial]
 
 [section:ref Reference]
 
@@ -3744,7 +3746,7 @@ For floating point types, you should add the new type to at least the following 
    bool                                      isgreater  (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
    bool                                      isgreaterequal(const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
    bool                                      isless     (const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
-   bool                                      islessequal(const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
+   bool                                      islessequal(const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-typearea]``&);
    bool                                      islessgreater(const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
    bool                                      isunordered(const ``['number-or-expression-template-type]``&, const ``['number-or-expression-template-type]``&);
    // Complex number functions:

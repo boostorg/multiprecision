@@ -175,7 +175,7 @@ private:
   {
     using std::abs;
 
-    std::cout << "finding approximate roots..." << std::endl;
+    std::cout << "Finding approximate roots..." << std::endl;
 
     std::vector<boost::math::tuple<T, T> > root_estimates;
 
@@ -225,7 +225,7 @@ private:
         // bisection steps in order to tighten up the root bracket.
         boost::uintmax_t a_couple_of_iterations = 3U;
         const std::pair<T, T>
-          first_laguerre_root = boost::math::tools::bisect(laguerre_object,
+          first_laguerre_roots = boost::math::tools::bisect(laguerre_object,
                                                            step - step_size,
                                                            step,
                                                            laguerre_function_object<T>::root_tolerance,
@@ -513,9 +513,16 @@ int main()
   // 78871305322190941528281744734605934497977375094921646511687434038062987482900167
   // 45127557400365419545e-22
 
+  // 611 digits.
+  // 3.899042098230327501327611462664070517014507082431797677146153303523108862015228
+  // 86413605194293314264788265460938200890998546786740097437064263800719644346113699
+  // 77010905030516409847054404055843899790277083960877617919088116211775232728792242
+  // 9346416823281460245814808276654088201413901972239996130752528e-22
+
   // Mathematica(R) or Wolfram's Alpha:
   // N[AiryAi[120 / 7], 300]
-  std::cout << std::setprecision(digits_characteristics::digits10)
+  std::cout << "Airy_ai[120/7]=\n"
+            << std::setprecision(digits_characteristics::digits10)
             << gauss_laguerre_airy_ai(mp_type(120) / 7)
             << std::endl;
 }
