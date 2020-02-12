@@ -143,12 +143,12 @@ will reveal differences whose cause may be perplexing.
 To get as precise-as-possible decimal fractions like 1.234, we can write
 */
 
-  const cpp_bin_float_50 f1(cpp_bin_float_50(1234) / 100);  // Construct from a fraction.
-  std::cout << "cpp_bin_float_50 f1(cpp_bin_float_50(1234) / 100) = " << f1 << std::endl; // 12.340000000000000000000000000000000000000000000000
+  const cpp_bin_float_50 f1(cpp_bin_float_50(1234) / 1000);  // Construct from a fraction.
+  std::cout << "cpp_bin_float_50 f1(cpp_bin_float_50(1234) / 1000) = " << f1 << std::endl; // cpp_bin_float_50 f1(cpp_bin_float_50(1234) / 1000) = 1.2340000000000000000000000000000000000000000000000
 /*`or
 */
   const cpp_bin_float_50 f2("1.234");  // Construct from decimal digit string.
-  std::cout << "cpp_bin_float_50 f2(\"1.234\") = " << f2 << std::endl; // 12.340000000000000000000000000000000000000000000000
+  std::cout << "cpp_bin_float_50 f2(\"1.234\") = " << f2 << std::endl; // cpp_bin_float_50 f2("1.234") = 1.2340000000000000000000000000000000000000000000000
 
 /*`that are different from constructing from a `double` with value 1.234
 */

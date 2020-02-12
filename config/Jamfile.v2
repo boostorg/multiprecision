@@ -3,13 +3,6 @@
 # (See accompanying file LICENSE_1_0.txt or copy at 
 # http://www.boost.org/LICENSE_1_0.txt.
 
-# Several tests to check configuration of multiprecision configuration.
-# Note all are explicit, so much each or all be specified to actually check a specific configuration.
-# Examples:
-# \boost\libs\multiprecision\config>b2 toolset=clang-win-9.0.0 cxxstd=2a release address-model=64 has_float128 has_constexpr_limits has_is_constant_evaluated > MP_config_clangwin900.log
-# \boost\libs\multiprecision\config>b2 -a --debug-configuration toolset=gcc-8.1.0 cxxstd=2a release address-model=64 has_float128 has_constexpr_limits has_is_constant_evaluated >MP_config_gcc810.log
-# \boost\libs\multiprecision\config>b2 toolset=msvc-14.2 cxxstd=latest release address-model=64 has_float128 has_constexpr_limits has_is_constant_evaluated >MP_config_msvc142.log
-
 import modules ;
 import path ;
 
@@ -41,7 +34,6 @@ project : requirements
    <toolset>msvc:<warnings>all
    <toolset>gcc:<cxxflags>-Wall
    <toolset>gcc:<cxxflags>-Wextra
-   <toolset>gcc:<cxxflags>-fext-numeric-literals  # enable suffix Q for float128.
    ;
 
 lib gmp ;
@@ -82,8 +74,6 @@ exe has_eigen : has_eigen.cpp ;
 exe has_f2c : has_f2c.cpp f2c ;
 obj has_is_constant_evaluated : has_is_constant_evaluated.cpp ;
 obj has_constexpr_limits : has_constexpr_limits_cmd.cpp : <cxxflags>-fconstexpr-ops-limit=268435456 ;
-# gcc8.1 g++.exe: error: unrecognized command line option '-fconstexpr-ops-limit=268435456'; did you mean '-fconstexpr-loop-limit='?
-
 
 explicit has_gmp ;
 explicit has_mpfr ;

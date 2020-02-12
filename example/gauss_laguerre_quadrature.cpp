@@ -1,40 +1,43 @@
-// Copyright Nick Thompson, 2017
+// Copyright Christopher Kormanyos
 // Copyright John Maddock 2017
 // Use, modification and distribution are subject to the
 // Boost Software License, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <cmath>
-#include <cstdint>
-#include <functional>
-#include <iomanip>
-#include <iostream>
-#include <numeric>
+// Contains Quickbook snippets within comments.
+
+//! Example of computing [@https://en.wikipedia.org/wiki/Gauss–Laguerre_quadrature Gauss–Laguerre quadrature].
+
+
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions/cbrt.hpp>
 #include <boost/math/special_functions/factorials.hpp>
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/tools/roots.hpp>
 #include <boost/noncopyable.hpp>
-
+ 
+// Make it easy to test with som multiprecision types with precision chosen below in struct digits_characteristics.
 #define CPP_BIN_FLOAT  1
 #define CPP_DEC_FLOAT  2
 #define CPP_MPFR_FLOAT 3
 
-//#define MP_TYPE CPP_BIN_FLOAT
-#define MP_TYPE CPP_DEC_FLOAT
-//#define MP_TYPE CPP_MPFR_FLOAT
+// #define MP_TYPE CPP_BIN_FLOAT // A boost::multiprecision::cpp_float_bin_ type.
+#define MP_TYPE CPP_DEC_FLOAT // A boost::multiprecision::cpp_float_dec_ type
+//#define MP_TYPE CPP_MPFR_FLOAT // A boost::multiprecision::cpp_float_mpfr_ type
 
 namespace
 {
   struct digits_characteristics
-  {
+  { // Choose precision in decimal digits.
     static const int digits10     = 300;
     static const int guard_digits =   6;
+    // This determines the size of the table of abscissas and weights,
+    // indexing twice total digits10 + guard_digits (if any),
   };
 }
 
+// Include a multiprecision type and define the full number type.
 #if (MP_TYPE == CPP_BIN_FLOAT)
   #include <boost/multiprecision/cpp_bin_float.hpp>
   namespace mp = boost::multiprecision;
@@ -51,6 +54,14 @@ namespace
 #error MP_TYPE is undefined
 #endif
 
+#include <cmath>
+#include <cstdint>
+#include <functional>
+#include <iomanip>
+#include <iostream>
+#include <numeric>
+
+//! Define a laguerre functor.
 template<typename T>
 class laguerre_function_object
 {
@@ -132,13 +143,21 @@ private:
   laguerre_function_object();
 
   const laguerre_function_object& operator=(const laguerre_function_object&);
-};
+}; // class laguerre_function_object
+
+
+//! Compute a static table of approximate roots abscissas and weights.
+//! \param xi vector containing x values of crossing y-axis.
+//! \param wi vector contain weights.
+//! \param order order of the Laguerre function (must not exceed -20).
+//! \param alpha 
+//! \param valid true if table has been created.
 
 template<typename T>
-class guass_laguerre_abscissas_and_weights : private boost::noncopyable
+class gauss_laguerre_abscissas_and_weights : private boost::noncopyable
 {
 public:
-  guass_laguerre_abscissas_and_weights(const int n, const T a) : order(n),
+  gauss_laguerre_abscissas_and_weights(const int n, const T a) : order(n),
                                                                  alpha(a),
                                                                  valid(true),
                                                                  xi   (),
@@ -148,7 +167,7 @@ public:
     {
       // TBD: If we ever boostify this, throw a range error here.
       // If so, then also document it in the docs.
-      std::cout << "Range error: the order of the Laguerre function must exceed -20.0." << std::endl;
+      std::cout << "Range error: the order of the Laguerre function must exceed -20.0!" << std::endl;
     }
     else
     {
@@ -156,7 +175,7 @@ public:
     }
   }
 
-  virtual ~guass_laguerre_abscissas_and_weights() { }
+  virtual ~gauss_laguerre_abscissas_and_weights() { }
 
   const std::vector<T>& abscissas() const { return xi; }
   const std::vector<T>& weights  () const { return wi; }
@@ -168,7 +187,7 @@ private:
   const T   alpha;
   bool      valid;
 
-  std::vector<T> xi;
+  std::vector<T> xi; 
   std::vector<T> wi;
 
   void calculate()
@@ -353,7 +372,7 @@ private:
       // Calculate the abscissas and weights to full precision.
       for(std::size_t i = static_cast<std::size_t>(0U); i < root_estimates.size(); ++i)
       {
-        std::cout << "calculating abscissa and weight for index: " << i << std::endl;
+        std::cout << "Calculating abscissa and weight for index: " << i << std::endl;
 
         // Calculate the abscissas using iterative root-finding.
 
@@ -375,7 +394,7 @@ private:
                                                                     number_of_iterations_used);
 
         // Based on the result of *each* root-finding operation, re-assess
-        // the validity of the Guass-Laguerre abscissas and weights object.
+        // the validity of the gauss-Laguerre abscissas and weights object.
         valid &= (number_of_iterations_used < number_of_iterations_allowed);
 
         // Compute the Laguerre root as the average of the values from
@@ -395,7 +414,7 @@ private:
       }
     }
   }
-};
+}; // class gauss_laguerre_abscissas_and_weights
 
 namespace
 {
@@ -447,7 +466,7 @@ namespace
     static const float digits_factor  = static_cast<float>(std::numeric_limits<mp_type>::digits10) / 300.0F;
     static const int   laguerre_order = static_cast<int>(600.0F * digits_factor);
 
-    static const guass_laguerre_abscissas_and_weights<T> abscissas_and_weights(laguerre_order, -T(1) / 6);
+    static const gauss_laguerre_abscissas_and_weights<T> abscissas_and_weights(laguerre_order, -T(1) / 6);
 
     T airy_ai_result;
 
@@ -468,13 +487,13 @@ namespace
     }
     else
     {
-      // TBD: Consider an error message.
+      std::cout << "No valid abscissas_and_weights!" << std::endl;
       airy_ai_result = T(0);
     }
 
     return airy_ai_result;
-  }
-}
+  } // gauss_laguerre_airy_ai
+} // namespace
 
 int main()
 {
@@ -521,8 +540,38 @@ int main()
 
   // Mathematica(R) or Wolfram's Alpha:
   // N[AiryAi[120 / 7], 300]
+  // https://www.wolframalpha.com/input/?i=N%5BAiryAi%5B120+%2F+7%5D%2C+300%5D
+  // 3.899042098230327501327611462664070517014507082431797677146153303523108862015228
+  // 86413605194293314264788265460938200890998546786740097437064263800719644346113699
+  // 77010905030516409847054404055843899790277083960877617919088116211775232728792242
+  // 9346416823281460245814808276654088201413901972239996130752528×10^-22
+
+  // Agrees exactly with WolframAlpha.
+
+  // N[AiryAi[1/ 10], 300]
+  // 0.329203129943538100170199085016430844536476730597544642815477703976493475237515808693095638100575951182527654537484244471409474203135771561202456410206620147589032033387755134578787712439479639654377406851556312354151562284662626461464746132526738582694157114218140891761302188140083085034460467229889
+  // 
+  // 0.329203129935604639291939334231568761918581881613362555725337874660788846322714275027241530894092838093235689300470543425832861218511616582808376169161534490388178933798169026527485191482625248693747471705273063591606787099819657181351283479723817003434354167763174315509380717762950445747705359552525
+  // 
+
+  
+  // N[AiryAi[100/ 7], 300]
+
+  // N[AiryAi[10/7], 300]
+  // 0.0789843815328302634766571099192586677765606222119605023528631703217150659831762747375166388288807621485599901850308911502783472782012305870215650915698545824017353521662412307832942731808689534273082918192060271727434618410938598698983836749367384068959827965440617344745274010840619904303929007866781
+  // Airy_ai[10/7]
+  // Airy_ai[10 / 7] =
+  // 0.0789843815328302634766571099192586677765606222119605023528631703211145656873128286590434476743388982530744824065670681308493466449022942723313037950425610483731304083611936896951385031692566685674427518183720717437833628278336117932632941861331357328374973731377960286945373872012455336932933702223702 
+  //                                                                     ^ differs at digit 70
+
   std::cout << "Airy_ai[120/7]=\n"
             << std::setprecision(digits_characteristics::digits10)
-            << gauss_laguerre_airy_ai(mp_type(120) / 7)
+            << gauss_laguerre_airy_ai(mp_type(120) / 7) // 120/7 = 1.714285714...
             << std::endl;
+
+  std::cout <<  "Airy_ai[10/7]=\n"  
+            << gauss_laguerre_airy_ai(mp_type(10) / 7) // 1.428571429...
+            << std::endl;
+
+
 }
