@@ -434,7 +434,7 @@ namespace
 {
   struct digits_characteristics
   {
-    static constexpr unsigned int my_digits10       = 500U;
+    static constexpr unsigned int my_digits10       = 300U;
     static constexpr unsigned int my_guard_digits10 =   6U;
     static constexpr unsigned int my_total_digits10 = my_digits10 + my_guard_digits10;
   };
