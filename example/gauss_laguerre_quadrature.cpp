@@ -164,7 +164,7 @@ namespace detail
     {
       using std::abs;
 
-      std::cout << "finding the approximate roots..." << std::endl;
+      std::cout << "Finding the approximate roots..." << std::endl;
 
       std::vector<std::tuple<T, T>> root_estimates;
 
@@ -322,7 +322,7 @@ namespace detail
       // Calculate the abscissas and weights to full precision.
       for(std::size_t i = static_cast<std::size_t>(0U); i < root_estimates.size(); ++i)
       {
-        std::cout << "calculating abscissa and weight for index: " << i << std::endl;
+        std::cout << "Calculating abscissa and weight for index: " << i << std::endl;
 
         // Calculate the abscissas using iterative root-finding.
 
