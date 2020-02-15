@@ -1,9 +1,9 @@
-// Copyright Nick Thompson, 2017
-// Copyright John Maddock 2017
-// Use, modification and distribution are subject to the
-// Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+///////////////////////////////////////////////////////////////////////////////
+//      Copyright Christopher Kormanyos 2012 - 2015, 2020.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE_1_0.txt or copy at
+//          http://www.boost.org/LICENSE_1_0.txt)
+//
 
 #include <cmath>
 #include <cstdint>
@@ -11,6 +11,10 @@
 #include <iomanip>
 #include <iostream>
 #include <numeric>
+#include <tuple>
+#include <vector>
+
+#include <boost/cstdfloat.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions/cbrt.hpp>
 #include <boost/math/special_functions/factorials.hpp>
@@ -22,262 +26,226 @@
 #define CPP_DEC_FLOAT  2
 #define CPP_MPFR_FLOAT 3
 
-//#define MP_TYPE CPP_BIN_FLOAT
-#define MP_TYPE CPP_DEC_FLOAT
+#define MP_TYPE CPP_BIN_FLOAT
+//#define MP_TYPE CPP_DEC_FLOAT
 //#define MP_TYPE CPP_MPFR_FLOAT
-
-namespace
-{
-  struct digits_characteristics
-  {
-    static const int digits10     = 300;
-    static const int guard_digits =   6;
-  };
-}
 
 #if (MP_TYPE == CPP_BIN_FLOAT)
   #include <boost/multiprecision/cpp_bin_float.hpp>
-  namespace mp = boost::multiprecision;
-  typedef mp::number<mp::cpp_bin_float<digits_characteristics::digits10 + digits_characteristics::guard_digits>, mp::et_off> mp_type;
 #elif (MP_TYPE == CPP_DEC_FLOAT)
   #include <boost/multiprecision/cpp_dec_float.hpp>
-  namespace mp = boost::multiprecision;
-  typedef mp::number<mp::cpp_dec_float<digits_characteristics::digits10 + digits_characteristics::guard_digits>, mp::et_off> mp_type;
 #elif (MP_TYPE == CPP_MPFR_FLOAT)
   #include <boost/multiprecision/mpfr.hpp>
-  namespace mp = boost::multiprecision;
-  typedef mp::number<mp::mpfr_float_backend<digits_characteristics::digits10 + digits_characteristics::guard_digits>, mp::et_off> mp_type;
 #else
-#error MP_TYPE is undefined
+  #error MP_TYPE is undefined
 #endif
 
-template<typename T>
-class laguerre_function_object
+namespace gauss { namespace laguerre {
+namespace detail
 {
-public:
-  laguerre_function_object(const int n, const T a) : order(n),
-                                                     alpha(a),
-                                                     p1   (0),
-                                                     d2   (0) { }
-
-  laguerre_function_object(const laguerre_function_object& other) : order(other.order),
-                                                                    alpha(other.alpha),
-                                                                    p1   (other.p1),
-                                                                    d2   (other.d2) { }
-
-  ~laguerre_function_object() { }
-
-  T operator()(const T& x) const
+  template<typename T>
+  class laguerre_l_object final
   {
-    // Calculate (via forward recursion):
-    // * the value of the Laguerre function L(n, alpha, x), called (p2),
-    // * the value of the derivative of the Laguerre function (d2),
-    // * and the value of the corresponding Laguerre function of
-    //   previous order (p1).
+  public:
+    laguerre_l_object(const int n, const T a) noexcept
+      : order(n),
+        alpha(a),
+        p1   (0),
+        d2   (0) { }
 
-    // Return the value of the function (p2) in order to be used as a
-    // function object with Boost.Math root-finding. Store the values
-    // of the Laguerre function derivative (d2) and the Laguerre function
-    // of previous order (p1) in class members for later use.
-
-      p1 = T(0);
-    T p2 = T(1);
-      d2 = T(0);
-
-    T j_plus_alpha(alpha);
-    T two_j_plus_one_plus_alpha_minus_x(1 + alpha - x);
-
-    int j;
-
-    const T my_two(2);
-
-    for(j = 0; j < order; ++j)
+    laguerre_l_object& operator=(const laguerre_l_object& other)
     {
-      const T p0(p1);
-
-      // Set the value of the previous Laguerre function.
-      p1 = p2;
-
-      // Use a recurrence relation to compute the value of the Laguerre function.
-      p2 = ((two_j_plus_one_plus_alpha_minus_x * p1) - (j_plus_alpha * p0)) / (j + 1);
-
-      ++j_plus_alpha;
-      two_j_plus_one_plus_alpha_minus_x += my_two;
-    }
-
-    // Set the value of the derivative of the Laguerre function.
-    d2 = ((p2 * j) - (j_plus_alpha * p1)) / x;
-
-    // Return the value of the Laguerre function.
-    return p2;
-  }
-
-  const T& previous  () const { return p1; }
-  const T& derivative() const { return d2; }
-
-  static bool root_tolerance(const T& a, const T& b)
-  {
-    using std::abs;
-
-    // The relative tolerance here is: ((a - b) * 2) / (a + b).
-    return (abs((a - b) * 2) < ((a + b) * boost::math::tools::epsilon<T>()));
-  }
-
-private:
-  const int order;
-  const T   alpha;
-  mutable T p1;
-  mutable T d2;
-
-  laguerre_function_object();
-
-  const laguerre_function_object& operator=(const laguerre_function_object&);
-};
-
-template<typename T>
-class guass_laguerre_abscissas_and_weights : private boost::noncopyable
-{
-public:
-  guass_laguerre_abscissas_and_weights(const int n, const T a) : order(n),
-                                                                 alpha(a),
-                                                                 valid(true),
-                                                                 xi   (),
-                                                                 wi   ()
-  {
-    if(alpha < -20.0F)
-    {
-      // TBD: If we ever boostify this, throw a range error here.
-      // If so, then also document it in the docs.
-      std::cout << "Range error: the order of the Laguerre function must exceed -20.0." << std::endl;
-    }
-    else
-    {
-      calculate();
-    }
-  }
-
-  virtual ~guass_laguerre_abscissas_and_weights() { }
-
-  const std::vector<T>& abscissas() const { return xi; }
-  const std::vector<T>& weights  () const { return wi; }
-
-  bool get_valid() const { return valid; }
-
-private:
-  const int order;
-  const T   alpha;
-  bool      valid;
-
-  std::vector<T> xi;
-  std::vector<T> wi;
-
-  void calculate()
-  {
-    using std::abs;
-
-    std::cout << "finding approximate roots..." << std::endl;
-
-    std::vector<boost::math::tuple<T, T> > root_estimates;
-
-    root_estimates.reserve(static_cast<typename std::vector<boost::math::tuple<T, T> >::size_type>(order));
-
-    const laguerre_function_object<T> laguerre_object(order, alpha);
-
-    // Set the initial values of the step size and the running step
-    // to be used for finding the estimate of the first root.
-    T step_size  = 0.01F;
-    T step       = step_size;
-
-    T first_laguerre_root = 0.0F;
-
-    bool first_laguerre_root_has_been_found = true;
-
-    if(alpha < -1.0F)
-    {
-      // Iteratively step through the Laguerre function using a
-      // small step-size in order to find a rough estimate of
-      // the first zero.
-
-      bool this_laguerre_value_is_negative = (laguerre_object(mp_type(0)) < 0);
-
-      static const int j_max = 10000;
-
-      int j;
-
-      for(j = 0; (j < j_max) && (this_laguerre_value_is_negative != (laguerre_object(step) < 0)); ++j)
+      if(this != other)
       {
-        // Increment the step size until the sign of the Laguerre function
-        // switches. This indicates a zero-crossing, signalling the next root.
-        step += step_size;
+        order = other.order;
+        alpha = other.alpha;
+        p1    = other.p1;
+        d2    = other.d2;
       }
 
-      if(j >= j_max)
+      return *this;
+    }
+
+    T operator()(const T& x) const noexcept
+    {
+      // Calculate (via forward recursion):
+      // * the value of the Laguerre function L(n, alpha, x), called (p2),
+      // * the value of the derivative of the Laguerre function (d2),
+      // * and the value of the corresponding Laguerre function of
+      //   previous order (p1).
+
+      // Return the value of the function (p2) in order to be used as a
+      // function object with Boost.Math root-finding. Store the values
+      // of the Laguerre function derivative (d2) and the Laguerre function
+      // of previous order (p1) in class members for later use.
+
+        p1 = T(0);
+      T p2 = T(1);
+        d2 = T(0);
+
+      T j_plus_alpha(alpha);
+      T two_j_plus_one_plus_alpha_minus_x((1 + alpha) - x);
+
+      const T my_two = 2;
+
+      for(int j = 0; j < order; ++j)
       {
-        first_laguerre_root_has_been_found = false;
+        const T p0(p1);
+
+        // Set the value of the previous Laguerre function.
+        p1 = p2;
+
+        // Use a recurrence relation to compute the value of the Laguerre function.
+        p2 = ((two_j_plus_one_plus_alpha_minus_x * p1) - (j_plus_alpha * p0)) / (j + 1);
+
+        ++j_plus_alpha;
+        two_j_plus_one_plus_alpha_minus_x += my_two;
+      }
+
+      // Set the value of the derivative of the Laguerre function.
+      d2 = ((p2 * order) - (j_plus_alpha * p1)) / x;
+
+      // Return the value of the Laguerre function.
+      return p2;
+    }
+
+    const T previous  () const noexcept { return p1; }
+    const T derivative() const noexcept { return d2; }
+
+    static bool root_tolerance(const T& a, const T& b)
+    {
+      using std::fabs;
+
+      // The relative tolerance here is: ((a - b) * 2) / (a + b).
+      return ((fabs(a - b) * 2) < (fabs(a + b) * std::numeric_limits<T>::epsilon()));
+    }
+
+  private:
+    const   int order;
+    const   T   alpha;
+    mutable T   p1;
+    mutable T   d2;
+  };
+
+  template<typename T>
+  class abscissas_and_weights : private boost::noncopyable
+  {
+  public:
+    abscissas_and_weights(const int n, const T a) : order(n),
+                                                    alpha(a),
+                                                    xi   (),
+                                                    wi   ()
+    {
+      if(alpha < -20.0F)
+      {
+        // If we boostify this, one could throw a range error here.
+        // If so, then also document it in the docs.
+        std::cout << "Range error: the order of the Laguerre function must exceed -20.0." << std::endl;
       }
       else
       {
-        // We have found the first zero-crossing. Put a loose bracket around
-        // the root using a window. Here, we know that the first root lies
-        // between (x - step_size) < root < x.
-
-        // Before storing the approximate root, perform a couple of
-        // bisection steps in order to tighten up the root bracket.
-        boost::uintmax_t a_couple_of_iterations = 3U;
-        const std::pair<T, T>
-          first_laguerre_root = boost::math::tools::bisect(laguerre_object,
-                                                           step - step_size,
-                                                           step,
-                                                           laguerre_function_object<T>::root_tolerance,
-                                                           a_couple_of_iterations);
-
-        static_cast<void>(a_couple_of_iterations);
+        calculate();
       }
     }
-    else
+
+    const std::vector<T>& abscissa_n() const noexcept { return xi; }
+    const std::vector<T>& weight_n  () const noexcept { return wi; }
+
+  private:
+    const int order;
+    const T   alpha;
+
+    std::vector<T> xi;
+    std::vector<T> wi;
+
+    abscissas_and_weights() = default;
+
+    void calculate()
     {
-      // Calculate an estimate of the 1st root of a generalized Laguerre
-      // function using either a Taylor series or an expansion in Bessel
-      // function zeros. The Bessel function zeros expansion is from Tricomi.
+      using std::abs;
 
-      // Here, we obtain an estimate of the first zero of J_alpha(x).
+      std::cout << "finding the approximate roots..." << std::endl;
 
-      T j_alpha_m1;
+      std::vector<std::tuple<T, T>> root_estimates;
 
-      if(alpha < 1.4F)
+      root_estimates.reserve(static_cast<typename std::vector<std::tuple<T, T>>::size_type>(order));
+
+      const laguerre_l_object<T> laguerre_root_object(order, alpha);
+
+      // Set the initial values of the step size and the running step
+      // to be used for finding the estimate of the first root.
+      T step_size  = 0.01F;
+      T step       = step_size;
+
+      T first_laguerre_root = 0.0F;
+
+      if(alpha < -1.0F)
       {
-        // For small alpha, use a short series obtained from Mathematica(R).
-        // Series[BesselJZero[v, 1], {v, 0, 3}]
-        // N[%, 12]
-        j_alpha_m1 = (((          0.09748661784476F
-                        * alpha - 0.17549359276115F)
-                        * alpha + 1.54288974259931F)
-                        * alpha + 2.40482555769577F);
+        // Iteratively step through the Laguerre function using a
+        // small step-size in order to find a rough estimate of
+        // the first zero.
+
+        const bool this_laguerre_value_is_negative = (laguerre_root_object(T(0)) < 0);
+
+        constexpr int j_max = 10000;
+
+        int j = 0;
+
+        while((j < j_max) && (this_laguerre_value_is_negative != (laguerre_root_object(step) < 0)))
+        {
+          // Increment the step size until the sign of the Laguerre function
+          // switches. This indicates a zero-crossing, signalling the next root.
+          step += step_size;
+
+          ++j;
+        }
       }
       else
       {
-        // For larger alpha, use the first line of Eqs. 10.21.40 in the NIST Handbook.
-        const T alpha_pow_third(boost::math::cbrt(alpha));
-        const T alpha_pow_minus_two_thirds(T(1) / (alpha_pow_third * alpha_pow_third));
+        // Calculate an estimate of the 1st root of a generalized Laguerre
+        // function using either a Taylor series or an expansion in Bessel
+        // function zeros. The Bessel function zeros expansion is from Tricomi.
 
-        j_alpha_m1 = alpha * (((((                             + 0.043F
-                                  * alpha_pow_minus_two_thirds - 0.0908F)
-                                  * alpha_pow_minus_two_thirds - 0.00397F)
-                                  * alpha_pow_minus_two_thirds + 1.033150F)
-                                  * alpha_pow_minus_two_thirds + 1.8557571F)
-                                  * alpha_pow_minus_two_thirds + 1.0F);
+        // Here, we obtain an estimate of the first zero of cyl_bessel_j(alpha, x).
+
+        T j_alpha_m1;
+
+        if(alpha < 1.4F)
+        {
+          // For small alpha, use a short series obtained from Mathematica(R).
+          // Series[BesselJZero[v, 1], {v, 0, 3}]
+          // N[%, 12]
+          j_alpha_m1 = (((          T(0.09748661784476F)
+                          * alpha - T(0.17549359276115F))
+                          * alpha + T(1.54288974259931F))
+                          * alpha + T(2.40482555769577F));
+        }
+        else
+        {
+          // For larger alpha, use the first line of Eqs. 10.21.40 in the NIST Handbook.
+          const T alpha_pow_third(boost::math::cbrt(alpha));
+          const T alpha_pow_minus_two_thirds(T(1) / (alpha_pow_third * alpha_pow_third));
+
+          j_alpha_m1 = alpha * (((((                             + T(0.043F)
+                                    * alpha_pow_minus_two_thirds - T(0.0908F))
+                                    * alpha_pow_minus_two_thirds - T(0.00397F))
+                                    * alpha_pow_minus_two_thirds + T(1.033150F))
+                                    * alpha_pow_minus_two_thirds + T(1.8557571F))
+                                    * alpha_pow_minus_two_thirds + T(1.0F));
+        }
+
+        const T vf             = (  T(order * 4U)
+                                  + T(alpha * 2U)
+                                  + T(2U));
+        const T vf2            = vf * vf;
+        const T j_alpha_m1_sqr = j_alpha_m1 * j_alpha_m1;
+
+        first_laguerre_root = (j_alpha_m1_sqr * (   -T(0.6666666666667F)
+                                                 + ((T(0.6666666666667F) * alpha) * alpha)
+                                                 +  (T(0.3333333333333F) * j_alpha_m1_sqr) + vf2)) / (vf2 * vf);
       }
 
-      const T vf             = ((order * 4.0F) + (alpha * 2.0F) + 2.0F);
-      const T vf2            = vf * vf;
-      const T j_alpha_m1_sqr = j_alpha_m1 * j_alpha_m1;
-
-      first_laguerre_root = (j_alpha_m1_sqr * (-0.6666666666667F + ((0.6666666666667F * alpha) * alpha) + (0.3333333333333F * j_alpha_m1_sqr) + vf2)) / (vf2 * vf);
-    }
-
-    if(first_laguerre_root_has_been_found)
-    {
-      bool this_laguerre_value_is_negative = (laguerre_object(mp_type(0)) < 0);
+      bool this_laguerre_value_is_negative = (laguerre_root_object(T(0)) < 0);
 
       // Re-set the initial value of the step-size based on the
       // estimate of the first root.
@@ -290,13 +258,13 @@ private:
       // of the roots. Refine the brackets with a few bisection
       // steps, and store the results as bracketed root estimates.
 
-      while(static_cast<int>(root_estimates.size()) < order)
+      while(root_estimates.size() < static_cast<std::size_t>(order))
       {
         // Increment the step size until the sign of the Laguerre function
         // switches. This indicates a zero-crossing, signalling the next root.
         step += step_size;
 
-        if(this_laguerre_value_is_negative != (laguerre_object(step) < 0))
+        if(this_laguerre_value_is_negative != (laguerre_root_object(step) < 0))
         {
           // We have found the next zero-crossing.
 
@@ -309,19 +277,20 @@ private:
 
           // Before storing the approximate root, perform a couple of
           // bisection steps in order to tighten up the root bracket.
-          boost::uintmax_t a_couple_of_iterations = 3U;
+          boost::uintmax_t a_couple_of_iterations = 4U;
+
           const std::pair<T, T>
-            root_estimate_bracket = boost::math::tools::bisect(laguerre_object,
+            root_estimate_bracket = boost::math::tools::bisect(laguerre_root_object,
                                                                step - step_size,
                                                                step,
-                                                               laguerre_function_object<T>::root_tolerance,
+                                                               laguerre_l_object<T>::root_tolerance,
                                                                a_couple_of_iterations);
 
           static_cast<void>(a_couple_of_iterations);
 
           // Store the refined root estimate as a bracketed range in a tuple.
-          root_estimates.push_back(boost::math::tuple<T, T>(root_estimate_bracket.first,
-                                                            root_estimate_bracket.second));
+          root_estimates.push_back(std::tuple<T, T>(std::get<0>(root_estimate_bracket),
+                                                    std::get<1>(root_estimate_bracket)));
 
           if(root_estimates.size() >= static_cast<std::size_t>(2U))
           {
@@ -330,11 +299,11 @@ private:
             // are computed by taking the average of the lower and upper range of
             // the root-estimate bracket.
 
-            const T r0 = (  boost::math::get<0>(*(root_estimates.rbegin() + 1U))
-                          + boost::math::get<1>(*(root_estimates.rbegin() + 1U))) / 2;
+            const T r0 = (  std::get<0>(*(root_estimates.rbegin() + 1U))
+                          + std::get<1>(*(root_estimates.rbegin() + 1U))) / 2;
 
-            const T r1 = (  boost::math::get<0>(*root_estimates.rbegin())
-                          + boost::math::get<1>(*root_estimates.rbegin())) / 2;
+            const T r1 = (  std::get<0>(*root_estimates.rbegin())
+                          + std::get<1>(*root_estimates.rbegin())) / 2;
 
             const T distance_between_previous_roots = r1 - r0;
 
@@ -361,63 +330,56 @@ private:
         // The determination of the maximum allowed iterations is
         // based on the number of decimal digits in the numerical
         // type T.
-        const int my_digits10 = static_cast<int>(static_cast<float>(boost::math::tools::digits<T>()) * 0.301F);
+        constexpr int my_digits10 = static_cast<int>(static_cast<boost::float_least32_t>(boost::math::tools::digits<T>()) * BOOST_FLOAT32_C(0.301));
         const boost::uintmax_t number_of_iterations_allowed = (std::max)(20, my_digits10 / 2);
 
         boost::uintmax_t number_of_iterations_used = number_of_iterations_allowed;
 
         // Perform the root-finding using ACM TOMS 748 from Boost.Math.
         const std::pair<T, T>
-          laguerre_root_bracket = boost::math::tools::toms748_solve(laguerre_object,
-                                                                    boost::math::get<0>(root_estimates[i]),
-                                                                    boost::math::get<1>(root_estimates[i]),
-                                                                    laguerre_function_object<T>::root_tolerance,
+          laguerre_root_bracket = boost::math::tools::toms748_solve(laguerre_root_object,
+                                                                    std::get<0>(root_estimates.at(i)),
+                                                                    std::get<1>(root_estimates.at(i)),
+                                                                    laguerre_l_object<T>::root_tolerance,
                                                                     number_of_iterations_used);
 
-        // Based on the result of *each* root-finding operation, re-assess
-        // the validity of the Guass-Laguerre abscissas and weights object.
-        valid &= (number_of_iterations_used < number_of_iterations_allowed);
+        static_cast<void>(number_of_iterations_used);
 
         // Compute the Laguerre root as the average of the values from
         // the solved root bracket.
-        const T laguerre_root = (  laguerre_root_bracket.first
-                                 + laguerre_root_bracket.second) / 2;
+        const T laguerre_root = (  std::get<0>(laguerre_root_bracket)
+                                 + std::get<1>(laguerre_root_bracket)) / 2;
 
         // Calculate the weight for this Laguerre root. Here, we calculate
         // the derivative of the Laguerre function and the value of the
         // previous Laguerre function on the x-axis at the value of this
         // Laguerre root.
-        static_cast<void>(laguerre_object(laguerre_root));
+        static_cast<void>(laguerre_root_object(laguerre_root));
 
         // Store the abscissa and weight for this index.
         xi.push_back(laguerre_root);
-        wi.push_back(norm_g / ((laguerre_object.derivative() * order) * laguerre_object.previous()));
+        wi.push_back(norm_g / ((laguerre_root_object.derivative() * order) * laguerre_root_object.previous()));
       }
     }
-  }
-};
+  };
 
-namespace
-{
   template<typename T>
-  struct gauss_laguerre_ai
+  struct airy_ai_object final
   {
   public:
-    gauss_laguerre_ai(const T X) : x(X)
+    airy_ai_object(const T x) : my_x  (x),
+                                zeta  (),
+                                factor()
     {
       using std::exp;
       using std::sqrt;
 
-      zeta = ((sqrt(x) * x) * 2) / 3;
+      zeta = ((sqrt(my_x) * my_x) * 2) / 3;
 
       const T zeta_times_48_pow_sixth = sqrt(boost::math::cbrt(zeta * 48));
 
       factor = 1 / ((sqrt(boost::math::constants::pi<T>()) * zeta_times_48_pow_sixth) * (exp(zeta) * gamma_of_five_sixths()));
     }
-
-    gauss_laguerre_ai(const gauss_laguerre_ai& other) : x     (other.x),
-                                                        zeta  (other.zeta),
-                                                        factor(other.factor) { }
 
     T operator()(const T& t) const
     {
@@ -427,9 +389,11 @@ namespace
     }
 
   private:
-    const T x;
-    T zeta;
-    T factor;
+    const T my_x;
+          T zeta;
+          T factor;
+
+    airy_ai_object() = default;
 
     static const T& gamma_of_five_sixths()
     {
@@ -437,85 +401,93 @@ namespace
 
       return value;
     }
+  };
+} // namespace detail
 
-    const gauss_laguerre_ai& operator=(const gauss_laguerre_ai&);
+template<typename T>
+T airy_ai(const T x)
+{
+  constexpr boost::float_least32_t digits_factor = 2.8F;
+
+  constexpr int laguerre_order = static_cast<int>(static_cast<boost::float_least32_t>(std::numeric_limits<T>::digits10) * digits_factor);
+
+  const detail::abscissas_and_weights<T> the_abscissas_and_weights(laguerre_order, -T(1) / 6);
+
+  const detail::airy_ai_object<T> this_gauss_laguerre_ai(x);
+
+  const T airy_ai_result =
+    std::inner_product(the_abscissas_and_weights.abscissa_n().begin(),
+                       the_abscissas_and_weights.abscissa_n().end(),
+                       the_abscissas_and_weights.weight_n().begin(),
+                       T(0),
+                       std::plus<T>(),
+                       [&this_gauss_laguerre_ai](const T& this_abscissa, const T& this_weight) -> T
+                       {
+                         return this_gauss_laguerre_ai(this_abscissa) * this_weight;
+                       });
+
+  return airy_ai_result;
+}
+} } // namespace gauss::laguerre
+
+namespace
+{
+  struct digits_characteristics
+  {
+    static constexpr unsigned int my_digits10       = 500U;
+    static constexpr unsigned int my_guard_digits10 =   6U;
+    static constexpr unsigned int my_total_digits10 = my_digits10 + my_guard_digits10;
   };
 
-  template<typename T>
-  T gauss_laguerre_airy_ai(const T x)
-  {
-    static const float digits_factor  = static_cast<float>(std::numeric_limits<mp_type>::digits10) / 300.0F;
-    static const int   laguerre_order = static_cast<int>(600.0F * digits_factor);
-
-    static const guass_laguerre_abscissas_and_weights<T> abscissas_and_weights(laguerre_order, -T(1) / 6);
-
-    T airy_ai_result;
-
-    if(abscissas_and_weights.get_valid())
-    {
-      const gauss_laguerre_ai<T> this_gauss_laguerre_ai(x);
-
-      airy_ai_result =
-        std::inner_product(abscissas_and_weights.abscissas().begin(),
-                           abscissas_and_weights.abscissas().end(),
-                           abscissas_and_weights.weights().begin(),
-                           T(0),
-                           std::plus<T>(),
-                           [&this_gauss_laguerre_ai](const T& this_abscissa, const T& this_weight) -> T
-                           {
-                             return this_gauss_laguerre_ai(this_abscissa) * this_weight;
-                           });
-    }
-    else
-    {
-      // TBD: Consider an error message.
-      airy_ai_result = T(0);
-    }
-
-    return airy_ai_result;
-  }
+  #if (MP_TYPE == CPP_BIN_FLOAT)
+    typedef boost::multiprecision::number<boost::multiprecision::cpp_bin_float<digits_characteristics::my_total_digits10>,
+                                          boost::multiprecision::et_off> float_type;
+  #elif (MP_TYPE == CPP_DEC_FLOAT)
+    typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<digits_characteristics::my_total_digits10>,
+                                          boost::multiprecision::et_off> float_type;
+  #elif (MP_TYPE == CPP_MPFR_FLOAT)
+    typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<digits_characteristics::my_total_digits10>,
+                                          boost::multiprecision::et_off> float_type;
+  #else
+    #error MP_TYPE is undefined
+  #endif
 }
 
 int main()
 {
   // Use Gauss-Laguerre integration to compute airy_ai(120 / 7).
 
-  // 9 digits
-  // 3.89904210e-22
-
-  // 10 digits
-  // 3.899042098e-22
-
-  // 50 digits.
-  // 3.8990420982303275013276114626640705170145070824318e-22
-
-  // 100 digits.
-  // 3.899042098230327501327611462664070517014507082431797677146153303523108862015228
-  // 864136051942933142648e-22
-
-  // 200 digits.
-  // 3.899042098230327501327611462664070517014507082431797677146153303523108862015228
-  // 86413605194293314264788265460938200890998546786740097437064263800719644346113699
-  // 77010905030516409847054404055843899790277e-22
-
-  // 300 digits.
-  // 3.899042098230327501327611462664070517014507082431797677146153303523108862015228
-  // 86413605194293314264788265460938200890998546786740097437064263800719644346113699
-  // 77010905030516409847054404055843899790277083960877617919088116211775232728792242
-  // 9346416823281460245814808276654088201413901972239996130752528e-22
-
-  // 500 digits.
-  // 3.899042098230327501327611462664070517014507082431797677146153303523108862015228
-  // 86413605194293314264788265460938200890998546786740097437064263800719644346113699
-  // 77010905030516409847054404055843899790277083960877617919088116211775232728792242
-  // 93464168232814602458148082766540882014139019722399961307525276722937464859521685
-  // 42826483602153339361960948844649799257455597165900957281659632186012043089610827
-  // 78871305322190941528281744734605934497977375094921646511687434038062987482900167
-  // 45127557400365419545e-22
-
-  // Mathematica(R) or Wolfram's Alpha:
+  // Obtain 1,001 digits of aira_ai(120 / 7).
+  // Use, for instance, Mathematica(R) or Wolfram's Alpha:
   // N[AiryAi[120 / 7], 300]
-  std::cout << std::setprecision(digits_characteristics::digits10)
-            << gauss_laguerre_airy_ai(mp_type(120) / 7)
+  const float_type airy_ai_control
+  {
+    "3."
+    "8990420982303275013276114626640705170145070824317976771461533035231088620152288641360519429331426478"
+    "8265460938200890998546786740097437064263800719644346113699770109050305164098470544040558438997902770"
+    "8396087761791908811621177523272879224293464168232814602458148082766540882014139019722399961307525276"
+    "7229374648595216854282648360215333936196094884464979925745559716590095728165963218601204308961082778"
+    "8713053221909415282817447346059344979773750949216465116874340380629874829001674512755740036541954532"
+    "2256615803872032101769054914947886357949379945386870637697677000009896591808925057965254145703110637"
+    "9097168385223085925889816838597739255024648447300525162267820088336617970351513476429221203594537605"
+    "1994770328228307535297092480809798446861034190267728545558396402939560718252171981378639773603294936"
+    "5510575307967101112928701761604442660628958840367869218567593208968871574577829026960397753936567618"
+    "7801952562794083197585254826354735960836951081351992438127856500879162680906281790214203100635235850"
+    "e-22"
+  };
+
+  const float_type airy_ai_value = gauss::laguerre::airy_ai(float_type(120) / 7);
+
+  std::cout << std::setprecision(digits_characteristics::my_digits10)
+            << airy_ai_value
             << std::endl;
+
+  const float_type delta = fabs(1.0 - fabs(airy_ai_control / airy_ai_value));
+
+  const float_type tol   =   std::numeric_limits<float_type>::epsilon()
+                           * float_type("1" + std::string(digits_characteristics::my_guard_digits10 + 5U, '0'));
+
+  const bool result_is_ok = (delta < tol);
+
+  std::cout << "result_is_ok: " << std::boolalpha << result_is_ok << std::endl;
 }
