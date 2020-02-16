@@ -26,8 +26,8 @@
 #define CPP_DEC_FLOAT  2
 #define CPP_MPFR_FLOAT 3
 
-#define MP_TYPE CPP_BIN_FLOAT
-//#define MP_TYPE CPP_DEC_FLOAT
+//#define MP_TYPE CPP_BIN_FLOAT
+#define MP_TYPE CPP_DEC_FLOAT
 //#define MP_TYPE CPP_MPFR_FLOAT
 
 #if (MP_TYPE == CPP_BIN_FLOAT)
@@ -187,7 +187,7 @@ namespace detail
 
         const bool this_laguerre_value_is_negative = (laguerre_root_object(T(0)) < 0);
 
-        constexpr int j_max = 10000;
+        BOOST_CONSTEXPR_OR_CONST int j_max = 10000;
 
         int j = 0;
 
@@ -330,7 +330,9 @@ namespace detail
         // The determination of the maximum allowed iterations is
         // based on the number of decimal digits in the numerical
         // type T.
-        constexpr int my_digits10 = static_cast<int>(static_cast<boost::float_least32_t>(boost::math::tools::digits<T>()) * BOOST_FLOAT32_C(0.301));
+        BOOST_CONSTEXPR_OR_CONST int my_digits10 =
+          static_cast<int>(static_cast<boost::float_least32_t>(boost::math::tools::digits<T>()) * BOOST_FLOAT32_C(0.301));
+
         const boost::uintmax_t number_of_iterations_allowed = (std::max)(20, my_digits10 / 2);
 
         boost::uintmax_t number_of_iterations_used = number_of_iterations_allowed;
@@ -407,18 +409,36 @@ namespace detail
 template<typename T>
 T airy_ai(const T x)
 {
-  constexpr boost::float_least32_t digits_factor = 2.8F;
+  // We empirically find factors to relate the number of Gauss-Laguerre
+  // coefficients needed for convergence when using varying base-10 digits.
 
-  constexpr int laguerre_order = static_cast<int>(static_cast<boost::float_least32_t>(std::numeric_limits<T>::digits10) * digits_factor);
+  // Empirical data:
+  //    d       laguerre_order_factor
+  //    50             0.4
+  //   100             0.6
+  //   300             1.3
+  //   500             2.0
+  //  1000             3.6
+
+  // Fit[{{50.0,0.4}, {100.0,0.6}, {300.0,1.3}, {500.0,2.0}, {1000.0,3.8}, {1200.0,4.6}}, {1, d, d^2}, d]
+  // 0.247299 + (0.0034126 + 1.67064*10^-7 d) d
+
+  BOOST_CONSTEXPR_OR_CONST boost::float_least32_t d = static_cast<boost::float_least32_t>(std::numeric_limits<T>::digits10);
+
+  BOOST_CONSTEXPR_OR_CONST boost::float_least32_t laguerre_order_factor = 0.247299F + ((0.0034126F + (1.67064E-7F * d)) * d);
+
+  BOOST_CONSTEXPR_OR_CONST int laguerre_order = static_cast<int>(laguerre_order_factor * d);
+
+  std::cout << "laguerre_order: " << laguerre_order << std::endl;
 
   const detail::abscissas_and_weights<T> the_abscissas_and_weights(laguerre_order, -T(1) / 6);
 
   const detail::airy_ai_object<T> this_gauss_laguerre_ai(x);
 
   const T airy_ai_result =
-    std::inner_product(the_abscissas_and_weights.abscissa_n().begin(),
-                       the_abscissas_and_weights.abscissa_n().end(),
-                       the_abscissas_and_weights.weight_n().begin(),
+    std::inner_product(the_abscissas_and_weights.abscissa_n().cbegin(),
+                       the_abscissas_and_weights.abscissa_n().cend(),
+                       the_abscissas_and_weights.weight_n().cbegin(),
                        T(0),
                        std::plus<T>(),
                        [&this_gauss_laguerre_ai](const T& this_abscissa, const T& this_weight) -> T
@@ -430,24 +450,27 @@ T airy_ai(const T x)
 }
 } } // namespace gauss::laguerre
 
-namespace
+namespace local
 {
   struct digits_characteristics
   {
-    static constexpr unsigned int my_digits10       = 300U;
-    static constexpr unsigned int my_guard_digits10 =   6U;
-    static constexpr unsigned int my_total_digits10 = my_digits10 + my_guard_digits10;
+    BOOST_STATIC_CONSTEXPR unsigned int my_digits10       = 300U;
+    BOOST_STATIC_CONSTEXPR unsigned int my_guard_digits10 =   6U;
+    BOOST_STATIC_CONSTEXPR unsigned int my_total_digits10 = my_digits10 + my_guard_digits10;
   };
 
   #if (MP_TYPE == CPP_BIN_FLOAT)
-    typedef boost::multiprecision::number<boost::multiprecision::cpp_bin_float<digits_characteristics::my_total_digits10>,
-                                          boost::multiprecision::et_off> float_type;
+    using float_type =
+      boost::multiprecision::number<boost::multiprecision::cpp_bin_float<digits_characteristics::my_total_digits10>,
+                                    boost::multiprecision::et_off>;
   #elif (MP_TYPE == CPP_DEC_FLOAT)
-    typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<digits_characteristics::my_total_digits10>,
-                                          boost::multiprecision::et_off> float_type;
+    using float_type =
+      boost::multiprecision::number<boost::multiprecision::cpp_dec_float<digits_characteristics::my_total_digits10>,
+                                    boost::multiprecision::et_off>;
   #elif (MP_TYPE == CPP_MPFR_FLOAT)
-    typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<digits_characteristics::my_total_digits10>,
-                                          boost::multiprecision::et_off> float_type;
+    using float_type =
+    boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<digits_characteristics::my_total_digits10>,
+                                  boost::multiprecision::et_off>;
   #else
     #error MP_TYPE is undefined
   #endif
@@ -457,10 +480,10 @@ int main()
 {
   // Use Gauss-Laguerre integration to compute airy_ai(120 / 7).
 
-  // Obtain 1,001 digits of aira_ai(120 / 7).
+  // Obtain 2,001 digits of aira_ai(120 / 7).
   // Use, for instance, Mathematica(R) or Wolfram's Alpha:
-  // N[AiryAi[120 / 7], 300]
-  const float_type airy_ai_control
+  // N[AiryAi[120 / 7], 2001]
+  const local::float_type airy_ai_control
   {
     "3."
     "8990420982303275013276114626640705170145070824317976771461533035231088620152288641360519429331426478"
@@ -472,20 +495,30 @@ int main()
     "9097168385223085925889816838597739255024648447300525162267820088336617970351513476429221203594537605"
     "1994770328228307535297092480809798446861034190267728545558396402939560718252171981378639773603294936"
     "5510575307967101112928701761604442660628958840367869218567593208968871574577829026960397753936567618"
-    "7801952562794083197585254826354735960836951081351992438127856500879162680906281790214203100635235850"
+    "7801952562794083197585254826354735960836951081351992438127856500879162680906281790214203100635235849"
+    "5716149936537288569290122840488163212281922495972273637992603791605065840389103820626609337482339477"
+    "5743233088824835648901278549258030774548588681265115265161304285483075220095045387603177469518614523"
+    "4930054304413349435020615115916521791875528412564657066641222578712867503082764224677795212110851003"
+    "8814315912172530068706267743835980342105443689048114517123418583228176539429952046468152628650971687"
+    "8557641978246675359278081545680424397849650795758580954617721505523081211810239396513010652958801003"
+    "0594121433038468594651017439283757016729485609324845346796755020096380110911953230811376947082323387"
+    "6988857379199477490191065186329720165982969747746971854649925761459250208506074075679142489732348841"
+    "5223546913560011224743906777561623712018618111944144927592718022646975744890979986110509019030518440"
+    "0996652146383867527850555233790812109838653434340779600096630152973740668236953909318226025392898590"
+    "0373620829917234884212777160402478158072185448846150661920610474905152773944889903534583345262928928"
     "e-22"
   };
 
-  const float_type airy_ai_value = gauss::laguerre::airy_ai(float_type(120) / 7);
+  const local::float_type airy_ai_value = gauss::laguerre::airy_ai(local::float_type(120) / 7);
 
-  std::cout << std::setprecision(digits_characteristics::my_digits10)
+  std::cout << std::setprecision(local::digits_characteristics::my_digits10)
             << airy_ai_value
             << std::endl;
 
-  const float_type delta = fabs(1.0 - fabs(airy_ai_control / airy_ai_value));
+  const local::float_type delta = fabs(1.0 - fabs(airy_ai_control / airy_ai_value));
 
-  const float_type tol   =   std::numeric_limits<float_type>::epsilon()
-                           * float_type("1" + std::string(digits_characteristics::my_guard_digits10 + 5U, '0'));
+  const local::float_type tol   =   std::numeric_limits<local::float_type>::epsilon()
+                                  * local::float_type("1" + std::string(local::digits_characteristics::my_guard_digits10 + 5U, '0'));
 
   const bool result_is_ok = (delta < tol);
 
