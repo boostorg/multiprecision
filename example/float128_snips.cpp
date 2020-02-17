@@ -3,7 +3,9 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
-// Demonstrations of using Boost.Multiprecision float128 type.
+// Demonstrations of using Boost.Multiprecision float128 quad type.
+// (Only available using GCC compiler).
+
 // Contains Quickbook markup in comments.
 
 //[float128_eg
@@ -40,7 +42,10 @@ and have full `std::numeric_limits` support:
    /*<-*/
 #ifndef BOOST_NO_CXX11_CONSTEXPR
    /*->*/
-   constexpr float128 pi = 3.14159265358979323846264338327950Q;
+   // std::numeric_limits<float128>::max_digits10 = 36
+   constexpr float128 pi = 3.14159265358979323846264338327950288Q;
+   std::cout.precision(std::numeric_limits<float128>::max_digits10);
+   std::cout << "pi = " << pi << std::endl; //pi = 3.14159265358979323846264338327950280
    /*<-*/
 #endif
    /*->*/
