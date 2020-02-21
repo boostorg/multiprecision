@@ -30,6 +30,9 @@
 #ifdef TEST_TOMMATH
 #include <boost/multiprecision/tommath.hpp>
 #endif
+#ifdef TEST_QD
+#include <boost/multiprecision/quad_double.hpp>
+#endif
 
 #include <boost/functional/hash.hpp>
 
@@ -92,6 +95,9 @@ int main()
 #ifdef TEST_TOMMATH
    test<boost::multiprecision::tom_int>();
    test<boost::multiprecision::tom_rational>();
+#endif
+#ifdef TEST_QD
+   test<boost::multiprecision::quad_double>();
 #endif
 
    return boost::report_errors();

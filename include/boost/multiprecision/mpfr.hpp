@@ -2381,13 +2381,13 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_f
    // What value should this be????
    static number_type round_error()
    {
-      // returns epsilon/2
+      // returns 0.5 (round-to-nearest)
       initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)
       {
          value.first  = true;
-         value.second = 1;
+         value.second = 0.5;
          mpfr_div_2exp(value.second.backend().data(), value.second.backend().data(), 1, GMP_RNDN);
       }
       return value.second;
@@ -2576,7 +2576,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_f
    BOOST_STATIC_CONSTEXPR bool is_modulo                = false;
    BOOST_STATIC_CONSTEXPR bool traps                    = false;
    BOOST_STATIC_CONSTEXPR bool tinyness_before          = false;
-   BOOST_STATIC_CONSTEXPR float_round_style round_style = round_toward_zero;
+   BOOST_STATIC_CONSTEXPR float_round_style round_style = round_to_nearest;
 };
 
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION

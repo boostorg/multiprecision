@@ -348,7 +348,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::ration
    BOOST_STATIC_CONSTEXPR      number_type(max)() { return (base_type::max)(); }
    BOOST_STATIC_CONSTEXPR number_type lowest() { return -(max)(); }
    BOOST_STATIC_CONSTEXPR number_type epsilon() { return base_type::epsilon(); }
-   BOOST_STATIC_CONSTEXPR number_type round_error() { return epsilon() / 2; }
+   BOOST_STATIC_CONSTEXPR number_type round_error() { return 0; }
    BOOST_STATIC_CONSTEXPR number_type infinity() { return base_type::infinity(); }
    BOOST_STATIC_CONSTEXPR number_type quiet_NaN() { return base_type::quiet_NaN(); }
    BOOST_STATIC_CONSTEXPR number_type signaling_NaN() { return base_type::signaling_NaN(); }

@@ -2633,7 +2633,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::gmp_fl
    // What value should this be????
    static number_type round_error()
    {
-      // returns epsilon/2
+      // returns 1
       initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)

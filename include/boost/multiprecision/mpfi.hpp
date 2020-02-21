@@ -1638,13 +1638,13 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfi_f
    // What value should this be????
    static number_type round_error()
    {
-      // returns epsilon/2
+      // returns 0.5
       initializer.do_nothing();
       static std::pair<bool, number_type> value;
       if (!value.first)
       {
          value.first  = true;
-         value.second = 1;
+         value.second = 0.5;
          mpfi_div_2exp(value.second.backend().data(), value.second.backend().data(), 1);
       }
       return value.second;

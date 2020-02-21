@@ -530,6 +530,7 @@ matrix:
             - libmpc-dev
             - libmpfi-dev
             - libtommath-dev
+            - libqd-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -544,6 +545,7 @@ matrix:
             - libmpc-dev
             - libmpfi-dev
             - libtommath-dev
+            - libqd-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -558,6 +560,7 @@ matrix:
             - libmpc-dev
             - libmpfi-dev
             - libtommath-dev
+            - libqd-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -572,6 +575,7 @@ matrix:
             - libmpc-dev
             - libmpfi-dev
             - libtommath-dev
+            - libqd-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -586,6 +590,7 @@ matrix:
             - libmpc-dev
             - libmpfi-dev
             - libtommath-dev
+            - libqd-dev
           sources:
             - ubuntu-toolchain-r-test
 
@@ -600,6 +605,7 @@ matrix:
             - libmpc-dev
             - libmpfi-dev
             - libtommath-dev
+            - libqd-dev
           sources:
             - ubuntu-toolchain-r-test
     
@@ -614,6 +620,7 @@ matrix:
             - libmpc-dev
             - libmpfi-dev
             - libtommath-dev
+            - libqd-dev
           sources:
             - ubuntu-toolchain-r-test
 

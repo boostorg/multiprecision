@@ -88,6 +88,7 @@ lib mpfr : : <search>$(gmp_path) <search>$(mpfr_path) <search>$(mpfr_path)/build
 lib mpfi : : <search>$(gmp_path) <search>$(mpfr_path) <search>$(mpfr_path)/build.vc10/lib/Win32/Debug <search>$(mpfi_path) <search>$(mpfi_path)/src ;
 lib quadmath ;
 lib mpc ;
+lib qd ;
 
 if $(tommath_path)
 {
@@ -178,6 +179,7 @@ test-suite arithmetic_tests :
    [ run test_arithmetic_complex_adaptor.cpp ]
    [ run test_arithmetic_complex_adaptor_2.cpp ]
    [ run test_arithmetic_complex128.cpp : : : [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
+   [ run test_arithmetic_qd.cpp : : : [ check-target-builds ../config//has_qd : <source>qd : <build>no ] ]
 
 ;
 
@@ -233,6 +235,13 @@ rule get_function_tests
                [ check-target-builds ../config//has_intel_quad : <cxxflags>-Qoption,cpp,--extended_float_type : <build>no ] [ check-target-builds ../config//has_float128 : <source>quadmath ]
                <define>TEST_FLOAT128
               : $(source:B)_intel_quad ] ;
+         result += [ run $(source) no_eh_support
+              : # command line
+              : # input files
+              : # requirements
+               [ check-target-builds ../config//has_qd : <source>qd : <build>no ]
+               <define>TEST_QD
+              : $(source:B)_qd ] ;
    }
    return $(result) ;
 }
@@ -346,6 +355,13 @@ test-suite functions_and_limits :
               <define>TEST_FLOAT128
                [ check-target-builds ../config//has_intel_quad : <cxxflags>-Qoption,cpp,--extended_float_type : <build>no ] [ check-target-builds ../config//has_float128 : <source>quadmath ]
               : test_numeric_limits_intel_quad ]
+      [ run test_numeric_limits.cpp no_eh_support
+              : # command line
+              : # input files
+              : # requirements
+              <define>TEST_QD
+               [ check-target-builds ../config//has_qd : <source>qd  : <build>no ]
+              : test_numeric_limits_qd ]
 
       [ run test_sf_import_c99.cpp : : : <define>TEST_CPP_DEC_FLOAT_2 : test_sf_import_c99_cpp_dec_float_2 ]
       [ run test_sf_import_c99.cpp : : : <define>TEST_CPP_DEC_FLOAT_3 : test_sf_import_c99_cpp_dec_float_3 ]
@@ -1279,6 +1295,13 @@ rule get_concept_checks
                <debug-symbols>off
                <optimization>space
               : $(source:B)_logged_adaptor ] ;
+      result += [ compile $(source)
+              : # requirements
+              <define>TEST_QD
+              [ check-target-builds ../config//has_qd : : <build>no ]
+               <debug-symbols>off
+               <optimization>space
+              : $(source:B)_qd ] ;
    }
    return $(result) ;
 }
