@@ -580,7 +580,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-9 CXXSTD=gnu++17 TEST_SUITE=misc
+      env: TOOLSET=gcc COMPILER=g++-9 CXXSTD=gnu++17 TEST_SUITE="misc include=/usr/include/eigen3"
       addons:
         apt:
           packages:
@@ -591,6 +591,7 @@ matrix:
             - libmpfi-dev
             - libtommath-dev
             - libqd-dev
+            - libeigen3-dev
           sources:
             - ubuntu-toolchain-r-test
 
