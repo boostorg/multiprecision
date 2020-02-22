@@ -17,6 +17,7 @@
 #include <boost/cstdfloat.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions/cbrt.hpp>
+#include <boost/math/special_functions/bessel.hpp>
 #include <boost/math/special_functions/factorials.hpp>
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/tools/roots.hpp>
@@ -369,19 +370,9 @@ namespace detail
   struct airy_ai_object final
   {
   public:
-    airy_ai_object(const T x) : my_x  (x),
-                                zeta  (),
-                                factor()
-    {
-      using std::exp;
-      using std::sqrt;
-
-      zeta = ((sqrt(my_x) * my_x) * 2) / 3;
-
-      const T zeta_times_48_pow_sixth = sqrt(boost::math::cbrt(zeta * 48));
-
-      factor = 1 / ((sqrt(boost::math::constants::pi<T>()) * zeta_times_48_pow_sixth) * (exp(zeta) * gamma_of_five_sixths()));
-    }
+    airy_ai_object(const T& x) : my_x  (x),
+                                 zeta  (make_zeta()),
+                                 factor(make_factor()) { }
 
     T operator()(const T& t) const
     {
@@ -392,69 +383,37 @@ namespace detail
 
   private:
     const T my_x;
-          T zeta;
-          T factor;
+    const T zeta;
+    const T factor;
 
     airy_ai_object() = default;
 
-    static const T& gamma_of_five_sixths()
+    T make_zeta()
     {
-      static const T value = boost::math::tgamma(T(5) / 6);
+      using std::sqrt;
 
-      return value;
+      return ((sqrt(my_x) * my_x) * 2) / 3;
+    }
+
+    T make_factor()
+    {
+      using std::exp;
+      using std::sqrt;
+
+      const T zeta_times_48_pow_sixth = sqrt(boost::math::cbrt(zeta * 48));
+
+      return 1 / ((sqrt(boost::math::constants::pi<T>()) * zeta_times_48_pow_sixth) * (exp(zeta) * boost::math::tgamma(T(5) / 6)));
     }
   };
 } // namespace detail
 
-template<typename T>
-T airy_ai(const T x)
-{
-  // We empirically find factors to relate the number of Gauss-Laguerre
-  // coefficients needed for convergence when using varying base-10 digits.
-
-  // Empirical data:
-  //    d       laguerre_order_factor
-  //    50             0.4
-  //   100             0.6
-  //   300             1.3
-  //   500             2.0
-  //  1000             3.6
-
-  // Fit[{{50.0,0.4}, {100.0,0.6}, {300.0,1.3}, {500.0,2.0}, {1000.0,3.8}, {1200.0,4.6}}, {1, d, d^2}, d]
-  // 0.247299 + (0.0034126 + 1.67064*10^-7 d) d
-
-  BOOST_CONSTEXPR_OR_CONST boost::float_least32_t d = static_cast<boost::float_least32_t>(std::numeric_limits<T>::digits10);
-
-  BOOST_CONSTEXPR_OR_CONST boost::float_least32_t laguerre_order_factor = 0.247299F + ((0.0034126F + (1.67064E-7F * d)) * d);
-
-  BOOST_CONSTEXPR_OR_CONST int laguerre_order = static_cast<int>(laguerre_order_factor * d);
-
-  std::cout << "laguerre_order: " << laguerre_order << std::endl;
-
-  const detail::abscissas_and_weights<T> the_abscissas_and_weights(laguerre_order, -T(1) / 6);
-
-  const detail::airy_ai_object<T> this_gauss_laguerre_ai(x);
-
-  const T airy_ai_result =
-    std::inner_product(the_abscissas_and_weights.abscissa_n().cbegin(),
-                       the_abscissas_and_weights.abscissa_n().cend(),
-                       the_abscissas_and_weights.weight_n().cbegin(),
-                       T(0),
-                       std::plus<T>(),
-                       [&this_gauss_laguerre_ai](const T& this_abscissa, const T& this_weight) -> T
-                       {
-                         return this_gauss_laguerre_ai(this_abscissa) * this_weight;
-                       });
-
-  return airy_ai_result;
-}
 } } // namespace gauss::laguerre
 
 namespace local
 {
   struct digits_characteristics
   {
-    BOOST_STATIC_CONSTEXPR unsigned int my_digits10       = 300U;
+    BOOST_STATIC_CONSTEXPR unsigned int my_digits10       = 100U;
     BOOST_STATIC_CONSTEXPR unsigned int my_guard_digits10 =   6U;
     BOOST_STATIC_CONSTEXPR unsigned int my_total_digits10 = my_digits10 + my_guard_digits10;
   };
@@ -479,48 +438,89 @@ namespace local
 int main()
 {
   // Use Gauss-Laguerre integration to compute airy_ai(120 / 7).
+  // We empirically find factors to relate the number of Gauss-Laguerre
+  // coefficients needed for convergence when using varying base-10 digits.
 
-  // Obtain 2,001 digits of aira_ai(120 / 7).
-  // Use, for instance, Mathematica(R) or Wolfram's Alpha:
-  // N[AiryAi[120 / 7], 2001]
-  const local::float_type airy_ai_control
+  // Empirical data:
+  //    d       laguerre_order_factor
+  //    50             0.4
+  //   100             0.6
+  //   300             1.3
+  //   500             2.0
+  //  1000             3.6
+
+  // Calibrate the number of coefficients needed at the point x = 120/7.
+  // This leads to:
+  // Fit[{{50.0,0.4}, {100.0,0.6}, {300.0,1.3}, {500.0,2.0}, {1000.0,3.8}, {1200.0,4.6}}, {1, d, d^2}, d]
+  // 0.247299 + (0.0034126 + 1.67064*10^-7 d) d
+
+  // Subsequently use a factor of 40.0 when computing smaller Airy function values as low as x >= 1.
+  // We need significantly more coefficients at smaller values because the derivative of airy_ai(x)
+  // is steeper as x approaches zero.
+
+  // Basically then, this Gauss-Laguerre quadrature is designed for airy_ai(x) with x >= 1.
+
+  BOOST_CONSTEXPR_OR_CONST boost::float_least32_t d = static_cast<boost::float_least32_t>(std::numeric_limits<local::float_type>::digits10);
+
+  BOOST_CONSTEXPR_OR_CONST boost::float_least32_t laguerre_order_factor_raw = 0.247299F + ((0.0034126F + (1.67064E-7F * d)) * d);
+
+  BOOST_CONSTEXPR_OR_CONST boost::float_least32_t laguerre_order_factor = laguerre_order_factor_raw * 40.0F;
+
+  BOOST_CONSTEXPR_OR_CONST int laguerre_order = static_cast<int>(laguerre_order_factor * d);
+
+  std::cout << "laguerre_order: " << laguerre_order << std::endl;
+
+  const gauss::laguerre::detail::abscissas_and_weights<local::float_type> the_abscissas_and_weights(laguerre_order, -1.0F / local::float_type(6U));
+
+  bool result_is_ok = true;
+
+  for(std::uint32_t u = 7U; u < 121U; ++u)
   {
-    "3."
-    "8990420982303275013276114626640705170145070824317976771461533035231088620152288641360519429331426478"
-    "8265460938200890998546786740097437064263800719644346113699770109050305164098470544040558438997902770"
-    "8396087761791908811621177523272879224293464168232814602458148082766540882014139019722399961307525276"
-    "7229374648595216854282648360215333936196094884464979925745559716590095728165963218601204308961082778"
-    "8713053221909415282817447346059344979773750949216465116874340380629874829001674512755740036541954532"
-    "2256615803872032101769054914947886357949379945386870637697677000009896591808925057965254145703110637"
-    "9097168385223085925889816838597739255024648447300525162267820088336617970351513476429221203594537605"
-    "1994770328228307535297092480809798446861034190267728545558396402939560718252171981378639773603294936"
-    "5510575307967101112928701761604442660628958840367869218567593208968871574577829026960397753936567618"
-    "7801952562794083197585254826354735960836951081351992438127856500879162680906281790214203100635235849"
-    "5716149936537288569290122840488163212281922495972273637992603791605065840389103820626609337482339477"
-    "5743233088824835648901278549258030774548588681265115265161304285483075220095045387603177469518614523"
-    "4930054304413349435020615115916521791875528412564657066641222578712867503082764224677795212110851003"
-    "8814315912172530068706267743835980342105443689048114517123418583228176539429952046468152628650971687"
-    "8557641978246675359278081545680424397849650795758580954617721505523081211810239396513010652958801003"
-    "0594121433038468594651017439283757016729485609324845346796755020096380110911953230811376947082323387"
-    "6988857379199477490191065186329720165982969747746971854649925761459250208506074075679142489732348841"
-    "5223546913560011224743906777561623712018618111944144927592718022646975744890979986110509019030518440"
-    "0996652146383867527850555233790812109838653434340779600096630152973740668236953909318226025392898590"
-    "0373620829917234884212777160402478158072185448846150661920610474905152773944889903534583345262928928"
-    "e-22"
-  };
+    const local::float_type x = local::float_type(u) / 7;
 
-  const local::float_type airy_ai_value = gauss::laguerre::airy_ai(local::float_type(120) / 7);
+    const gauss::laguerre::detail::airy_ai_object<local::float_type> this_gauss_laguerre_ai(x);
 
-  std::cout << std::setprecision(local::digits_characteristics::my_digits10)
-            << airy_ai_value
-            << std::endl;
+    const local::float_type airy_ai_value =
+      std::inner_product(the_abscissas_and_weights.abscissa_n().cbegin(),
+                         the_abscissas_and_weights.abscissa_n().cend(),
+                         the_abscissas_and_weights.weight_n().cbegin(),
+                         local::float_type(0U),
+                         std::plus<local::float_type>(),
+                         [&this_gauss_laguerre_ai](const local::float_type& this_abscissa,
+                                                   const local::float_type& this_weight) -> local::float_type
+                         {
+                           return this_gauss_laguerre_ai(this_abscissa) * this_weight;
+                         });
 
-  const local::float_type delta = fabs(1.0 - fabs(airy_ai_control / airy_ai_value));
+    static const local::float_type one_third = 1.0F / local::float_type(3U);
 
-  const local::float_type tol   =   std::numeric_limits<local::float_type>::epsilon()
-                                  * local::float_type("1" + std::string(local::digits_characteristics::my_guard_digits10 + 5U, '0'));
+    static const local::float_type one_over_pi_times_one_over_sqrt_three =
+      sqrt(one_third) * boost::math::constants::one_div_pi<local::float_type>();
 
-  const bool result_is_ok = (delta < tol);
+    const local::float_type sqrt_x = sqrt(x);
+
+    const local::float_type airy_ai_control =
+       (sqrt_x * one_over_pi_times_one_over_sqrt_three)
+      * boost::math::cyl_bessel_k(one_third, ((2.0F * x) * sqrt_x) * one_third);
+
+    std::cout << std::setprecision(local::digits_characteristics::my_digits10)
+              << "airy_ai_value  : "
+              << airy_ai_value
+              << std::endl;
+
+    std::cout << std::setprecision(local::digits_characteristics::my_digits10)
+              << "airy_ai_control: "
+              << airy_ai_control
+              << std::endl;
+
+    const local::float_type delta = fabs(1.0F - (airy_ai_control / airy_ai_value));
+
+    static const local::float_type tol =
+        std::numeric_limits<local::float_type>::epsilon()
+      * local::float_type("1" + std::string(local::digits_characteristics::my_guard_digits10 + 5U, '0'));
+
+    result_is_ok &= (delta < tol);
+  }
 
   std::cout << "result_is_ok: " << std::boolalpha << result_is_ok << std::endl;
 }
