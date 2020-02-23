@@ -30,6 +30,8 @@ namespace gauss { namespace laguerre {
 
 namespace util {
 
+void progress_bar(std::ostream& os, const float percent);
+
 void progress_bar(std::ostream& os, const float percent)
 {
   std::stringstream strstrm;
@@ -298,7 +300,7 @@ namespace detail
 
           if(    (root_estimates.size() == 1U)
              || ((root_estimates.size() % 8U) == 0U)
-             ||  (root_estimates.size() == order))
+             ||  (root_estimates.size() == static_cast<std::size_t>(order)))
           {
             const float progress = (100.0F * static_cast<float>(root_estimates.size())) / static_cast<float>(order);
 
@@ -440,7 +442,7 @@ namespace local
 {
   struct digits_characteristics
   {
-    BOOST_STATIC_CONSTEXPR unsigned int my_digits10       =  101U;
+    BOOST_STATIC_CONSTEXPR unsigned int my_digits10       =  121U;
     BOOST_STATIC_CONSTEXPR unsigned int my_guard_digits10 =    6U;
     BOOST_STATIC_CONSTEXPR unsigned int my_total_digits10 = my_digits10 + my_guard_digits10;
   };
@@ -456,36 +458,29 @@ int main()
   // We empirically find factors to relate the number of Gauss-Laguerre
   // coefficients needed for convergence when using varying base-10 digits.
 
-  // Empirical data:
-  //    d       laguerre_order_factor
-  //    50             0.4
-  //   100             0.6
-  //   300             1.3
-  //   500             2.0
-  //  1000             3.6
+  // Calibrate the number of coefficients needed at the point x = 1.
+  // Empirical data lead to:
+  // Fit[{{21.0, 3.5}, {51.0, 11.1}, {101.0, 22.5}, {201.0, 46.8}}, {1, d, d^2}, d]
+  // FullSimplify[%]
+  // -1.28301 + (0.235487 + 0.0000178915 d) d
 
-  // Calibrate the number of coefficients needed at the point x = 120/7.
-  // This leads to:
-  // Fit[{{50.0,0.4}, {100.0,0.6}, {300.0,1.3}, {500.0,2.0}, {1000.0,3.8}, {1200.0,4.6}}, {1, d, d^2}, d]
-  // 0.247299 + (0.0034126 + 1.67064*10^-7 d) d
+  // We need significantly more coefficients at smaller real values than are needed
+  // at larger real values because the slope derivative of airy_ai(x) gets more
+  // steep as x approaches zero.
 
-  // Subsequently use a factor of 40.0 when computing smaller Airy function values as low as x >= 1.
-  // We need significantly more coefficients at smaller values because the derivative of airy_ai(x)
-  // is steeper as x approaches zero.
-
-  // Basically then, this Gauss-Laguerre quadrature is designed for airy_ai(x) with real-valued x >= 1.
+  // This Gauss-Laguerre quadrature is designed for airy_ai(x) with real-valued x >= 1.
 
   BOOST_CONSTEXPR_OR_CONST boost::float_least32_t d = static_cast<boost::float_least32_t>(std::numeric_limits<local::float_type>::digits10);
 
-  BOOST_CONSTEXPR_OR_CONST boost::float_least32_t laguerre_order_factor_raw = 0.247299F + ((0.0034126F + (1.67064E-7F * d)) * d);
-
-  BOOST_CONSTEXPR_OR_CONST boost::float_least32_t laguerre_order_factor = laguerre_order_factor_raw * 40.0F;
+  BOOST_CONSTEXPR_OR_CONST boost::float_least32_t laguerre_order_factor = -1.28301F + ((0.235487F + (0.0000178915F * d)) * d);
 
   BOOST_CONSTEXPR_OR_CONST int laguerre_order = static_cast<int>(laguerre_order_factor * d);
 
   std::cout << "laguerre_order: " << laguerre_order << std::endl;
 
-  const gauss::laguerre::detail::abscissas_and_weights<local::float_type> the_abscissas_and_weights(laguerre_order, -1.0F / local::float_type(6U));
+  using abscissas_and_weights_type = gauss::laguerre::detail::abscissas_and_weights<local::float_type>;
+
+  const abscissas_and_weights_type the_abscissas_and_weights(laguerre_order, local::float_type(-1) / 6);
 
   bool result_is_ok = true;
 
