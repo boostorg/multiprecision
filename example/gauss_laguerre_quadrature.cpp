@@ -5,12 +5,14 @@
 //          http://www.boost.org/LICENSE_1_0.txt)
 //
 
+#include <chrono>
 #include <cmath>
 #include <cstdint>
 #include <functional>
 #include <iomanip>
 #include <iostream>
 #include <numeric>
+#include <sstream>
 #include <tuple>
 #include <vector>
 
@@ -21,27 +23,28 @@
 #include <boost/math/special_functions/factorials.hpp>
 #include <boost/math/special_functions/gamma.hpp>
 #include <boost/math/tools/roots.hpp>
+#include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/noncopyable.hpp>
 
-#define CPP_BIN_FLOAT  1
-#define CPP_DEC_FLOAT  2
-#define CPP_MPFR_FLOAT 3
-
-//#define MP_TYPE CPP_BIN_FLOAT
-#define MP_TYPE CPP_DEC_FLOAT
-//#define MP_TYPE CPP_MPFR_FLOAT
-
-#if (MP_TYPE == CPP_BIN_FLOAT)
-  #include <boost/multiprecision/cpp_bin_float.hpp>
-#elif (MP_TYPE == CPP_DEC_FLOAT)
-  #include <boost/multiprecision/cpp_dec_float.hpp>
-#elif (MP_TYPE == CPP_MPFR_FLOAT)
-  #include <boost/multiprecision/mpfr.hpp>
-#else
-  #error MP_TYPE is undefined
-#endif
-
 namespace gauss { namespace laguerre {
+
+namespace util {
+
+void progress_bar(std::ostream& os, const float percent)
+{
+  std::stringstream strstrm;
+
+  strstrm.precision(1);
+
+  strstrm << std::fixed << percent << "%";
+
+  os << strstrm.str() << "\r";
+
+  os.flush();
+}
+
+}
+
 namespace detail
 {
   template<typename T>
@@ -113,7 +116,7 @@ namespace detail
     const T previous  () const noexcept { return p1; }
     const T derivative() const noexcept { return d2; }
 
-    static bool root_tolerance(const T& a, const T& b)
+    static bool root_tolerance(const T& a, const T& b) noexcept
     {
       using std::fabs;
 
@@ -293,6 +296,20 @@ namespace detail
           root_estimates.push_back(std::tuple<T, T>(std::get<0>(root_estimate_bracket),
                                                     std::get<1>(root_estimate_bracket)));
 
+          if(    (root_estimates.size() == 1U)
+             || ((root_estimates.size() % 8U) == 0U)
+             ||  (root_estimates.size() == order))
+          {
+            const float progress = (100.0F * static_cast<float>(root_estimates.size())) / static_cast<float>(order);
+
+            std::cout << "root_estimates.size(): "
+                      << root_estimates.size()
+                      << ", "
+                      ;
+
+            util::progress_bar(std::cout, progress);
+          }
+
           if(root_estimates.size() >= static_cast<std::size_t>(2U))
           {
             // Determine the next step size. This is based on the distance between
@@ -300,11 +317,11 @@ namespace detail
             // are computed by taking the average of the lower and upper range of
             // the root-estimate bracket.
 
-            const T r0 = (  std::get<0>(*(root_estimates.rbegin() + 1U))
-                          + std::get<1>(*(root_estimates.rbegin() + 1U))) / 2;
+            const T r0 = (  std::get<0>(*(root_estimates.crbegin() + 1U))
+                          + std::get<1>(*(root_estimates.crbegin() + 1U))) / 2;
 
-            const T r1 = (  std::get<0>(*root_estimates.rbegin())
-                          + std::get<1>(*root_estimates.rbegin())) / 2;
+            const T r1 = (  std::get<0>(*root_estimates.crbegin())
+                          + std::get<1>(*root_estimates.crbegin())) / 2;
 
             const T distance_between_previous_roots = r1 - r0;
 
@@ -320,10 +337,23 @@ namespace detail
       xi.reserve(root_estimates.size());
       wi.reserve(root_estimates.size());
 
+      std::cout << std::endl;
+
       // Calculate the abscissas and weights to full precision.
       for(std::size_t i = static_cast<std::size_t>(0U); i < root_estimates.size(); ++i)
       {
-        std::cout << "Calculating abscissa and weight for index: " << i << std::endl;
+        if(   ((i % 8U) == 0U)
+           || ( i == root_estimates.size() - 1U))
+        {
+          const float progress = (100.0F * static_cast<float>(i)) / static_cast<float>(root_estimates.size());
+
+          std::cout << "Calculating abscissa and weight for index: "
+                    << i
+                    << ", "
+                    ;
+
+          util::progress_bar(std::cout, progress);
+        }
 
         // Calculate the abscissas using iterative root-finding.
 
@@ -363,6 +393,8 @@ namespace detail
         xi.push_back(laguerre_root);
         wi.push_back(norm_g / ((laguerre_root_object.derivative() * order) * laguerre_root_object.previous()));
       }
+
+      std::cout << std::endl;
     }
   };
 
@@ -370,39 +402,34 @@ namespace detail
   struct airy_ai_object final
   {
   public:
-    airy_ai_object(const T& x) : my_x  (x),
-                                 zeta  (make_zeta()),
-                                 factor(make_factor()) { }
+    airy_ai_object(const T& x) noexcept
+      : my_x  (x),
+        my_zeta  (((sqrt(x) * x) * 2) / 3),
+        my_factor(make_factor(my_zeta)) { }
 
-    T operator()(const T& t) const
+    T operator()(const T& t) const noexcept
     {
+      using std::cbrt;
       using std::sqrt;
 
-      return factor / sqrt(boost::math::cbrt(2 + (t / zeta)));
+      return my_factor / sqrt(cbrt(2 + (t / my_zeta)));
     }
 
   private:
     const T my_x;
-    const T zeta;
-    const T factor;
+    const T my_zeta;
+    const T my_factor;
 
     airy_ai_object() = default;
 
-    T make_zeta()
+    static T make_factor(const T& z) noexcept
     {
-      using std::sqrt;
-
-      return ((sqrt(my_x) * my_x) * 2) / 3;
-    }
-
-    T make_factor()
-    {
+      using std::cbrt;
       using std::exp;
       using std::sqrt;
+      using std::tgamma;
 
-      const T zeta_times_48_pow_sixth = sqrt(boost::math::cbrt(zeta * 48));
-
-      return 1 / ((sqrt(boost::math::constants::pi<T>()) * zeta_times_48_pow_sixth) * (exp(zeta) * boost::math::tgamma(T(5) / 6)));
+      return 1 / ((sqrt(boost::math::constants::pi<T>()) * sqrt(cbrt(z * 48))) * (exp(z) * tgamma(T(5) / 6)));
     }
   };
 } // namespace detail
@@ -413,26 +440,14 @@ namespace local
 {
   struct digits_characteristics
   {
-    BOOST_STATIC_CONSTEXPR unsigned int my_digits10       = 100U;
-    BOOST_STATIC_CONSTEXPR unsigned int my_guard_digits10 =   6U;
+    BOOST_STATIC_CONSTEXPR unsigned int my_digits10       =  101U;
+    BOOST_STATIC_CONSTEXPR unsigned int my_guard_digits10 =    6U;
     BOOST_STATIC_CONSTEXPR unsigned int my_total_digits10 = my_digits10 + my_guard_digits10;
   };
 
-  #if (MP_TYPE == CPP_BIN_FLOAT)
-    using float_type =
-      boost::multiprecision::number<boost::multiprecision::cpp_bin_float<digits_characteristics::my_total_digits10>,
-                                    boost::multiprecision::et_off>;
-  #elif (MP_TYPE == CPP_DEC_FLOAT)
-    using float_type =
-      boost::multiprecision::number<boost::multiprecision::cpp_dec_float<digits_characteristics::my_total_digits10>,
-                                    boost::multiprecision::et_off>;
-  #elif (MP_TYPE == CPP_MPFR_FLOAT)
-    using float_type =
-    boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<digits_characteristics::my_total_digits10>,
+  using float_type =
+    boost::multiprecision::number<boost::multiprecision::cpp_dec_float<digits_characteristics::my_total_digits10>,
                                   boost::multiprecision::et_off>;
-  #else
-    #error MP_TYPE is undefined
-  #endif
 }
 
 int main()
@@ -458,7 +473,7 @@ int main()
   // We need significantly more coefficients at smaller values because the derivative of airy_ai(x)
   // is steeper as x approaches zero.
 
-  // Basically then, this Gauss-Laguerre quadrature is designed for airy_ai(x) with x >= 1.
+  // Basically then, this Gauss-Laguerre quadrature is designed for airy_ai(x) with real-valued x >= 1.
 
   BOOST_CONSTEXPR_OR_CONST boost::float_least32_t d = static_cast<boost::float_least32_t>(std::numeric_limits<local::float_type>::digits10);
 
@@ -487,7 +502,7 @@ int main()
                          local::float_type(0U),
                          std::plus<local::float_type>(),
                          [&this_gauss_laguerre_ai](const local::float_type& this_abscissa,
-                                                   const local::float_type& this_weight) -> local::float_type
+                                                   const local::float_type& this_weight) noexcept -> local::float_type
                          {
                            return this_gauss_laguerre_ai(this_abscissa) * this_weight;
                          });
@@ -515,12 +530,14 @@ int main()
 
     const local::float_type delta = fabs(1.0F - (airy_ai_control / airy_ai_value));
 
-    static const local::float_type tol =
-        std::numeric_limits<local::float_type>::epsilon()
-      * local::float_type("1" + std::string(local::digits_characteristics::my_guard_digits10 + 5U, '0'));
+    static const local::float_type tol("1E-" + boost::lexical_cast<std::string>(local::digits_characteristics::my_digits10 - 4U));
 
     result_is_ok &= (delta < tol);
   }
 
-  std::cout << "result_is_ok: " << std::boolalpha << result_is_ok << std::endl;
+  std::cout << std::endl 
+            << "Total... result_is_ok: "
+            << std::boolalpha
+            << result_is_ok
+            << std::endl;
 }
