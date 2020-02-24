@@ -5,6 +5,31 @@
 //          http://www.boost.org/LICENSE_1_0.txt)
 //
 
+// This example uses Boost.Multiprecision to implement
+// a high-precision Gauss-Laguerre quadrature integration.
+// The quadrature is used to calculate the airy_ai(x) function
+// for real-valued x on the positive axis with x.ge.1.
+
+// In this way, the integral representation could be seen
+// as part of a scheme to calculate real-valued Airy functions
+// on the real axis for medium to large argument, whereby
+// a Taylor series or hypergeometric function could be used
+// for smaller arguments.
+
+// This example has been tested with decimal digits counts
+// ranging from 21...201, via the parameter local::my_digits10.
+
+// The quadrature integral representaion of airy_ai(x) used in
+// this example can be found in:
+
+// A. Gil, J. Segura, N.M. Temme, "Numerical Methods for Special
+// Functions" (SIAM Press 2007), Sect. 5.3.3, in particular Eq. 5.110,
+// page 145.
+
+// This book cites the another work:
+// W. Gautschi, "Computation of Bessel and Airy functions and of
+// related Gaussian quadrature formulae", BIT, 42 (2002), pp. 110-118.
+
 #include <cmath>
 #include <cstdint>
 #include <functional>
@@ -88,8 +113,8 @@ namespace detail
       T p2 = T(1);
         d2 = T(0);
 
-      T j_plus_alpha(alpha);
-      T two_j_plus_one_plus_alpha_minus_x((1 + alpha) - x);
+      T j_plus_alpha = alpha;
+      T two_j_plus_one_plus_alpha_minus_x = (1 + alpha) - x;
 
       const T my_two = 2;
 
@@ -143,9 +168,9 @@ namespace detail
     {
       if(alpha < -20.0F)
       {
-        // If we boostify this, one could throw a range error here.
-        // If so, then also document it in the docs.
-        std::cout << "Range error: the order of the Laguerre function must exceed -20.0." << std::endl;
+        // Users can decide to perform different range checking.
+        std::cout << "Range error: the order of the Laguerre function must exceed -20.0."
+                  << std::endl;
       }
       else
       {
@@ -365,10 +390,10 @@ namespace detail
         // The determination of the maximum allowed iterations is
         // based on the number of decimal digits in the numerical
         // type T.
-        BOOST_CONSTEXPR_OR_CONST int my_digits10 =
+        BOOST_CONSTEXPR_OR_CONST int local_math_tools_digits10 =
           static_cast<int>(static_cast<boost::float_least32_t>(boost::math::tools::digits<T>()) * BOOST_FLOAT32_C(0.301));
 
-        const boost::uintmax_t number_of_iterations_allowed = (std::max)(20, my_digits10 / 2);
+        const boost::uintmax_t number_of_iterations_allowed = (std::max)(20, local_math_tools_digits10 / 2);
 
         boost::uintmax_t number_of_iterations_used = number_of_iterations_allowed;
 
@@ -444,17 +469,14 @@ namespace detail
 
 namespace local
 {
-  struct digits_characteristics
-  {
-    BOOST_STATIC_CONSTEXPR unsigned int my_digits10       =  101U;
-    BOOST_STATIC_CONSTEXPR unsigned int my_guard_digits10 =    6U;
-    BOOST_STATIC_CONSTEXPR unsigned int my_total_digits10 = my_digits10 + my_guard_digits10;
-  };
+  BOOST_CONSTEXPR unsigned int my_digits10 = 101U;
 
   using float_type =
-    boost::multiprecision::number<boost::multiprecision::cpp_dec_float<digits_characteristics::my_total_digits10>,
+    boost::multiprecision::number<boost::multiprecision::cpp_dec_float<local::my_digits10>,
                                   boost::multiprecision::et_off>;
 }
+
+BOOST_STATIC_ASSERT_MSG(local::my_digits10 > 20U, "Error: This example is intended to have more than 20 decimal digits");
 
 int main()
 {
@@ -480,7 +502,7 @@ int main()
 
   BOOST_CONSTEXPR_OR_CONST int laguerre_order = static_cast<int>(laguerre_order_factor * d);
 
-  std::cout << "my_digits10: " << local::digits_characteristics::my_digits10 << std::endl;
+  std::cout << "std::numeric_limits<local::float_type>::digits10: " << std::numeric_limits<local::float_type>::digits10 << std::endl;
 
   std::cout << "laguerre_order: " << laguerre_order << std::endl;
 
@@ -519,19 +541,19 @@ int main()
        (sqrt_x * one_over_pi_times_one_over_sqrt_three)
       * boost::math::cyl_bessel_k(one_third, ((2.0F * x) * sqrt_x) * one_third);
 
-    std::cout << std::setprecision(local::digits_characteristics::my_digits10)
+    std::cout << std::setprecision(std::numeric_limits<local::float_type>::digits10)
               << "airy_ai_value  : "
               << airy_ai_value
               << std::endl;
 
-    std::cout << std::setprecision(local::digits_characteristics::my_digits10)
+    std::cout << std::setprecision(std::numeric_limits<local::float_type>::digits10)
               << "airy_ai_control: "
               << airy_ai_control
               << std::endl;
 
     const local::float_type delta = fabs(1.0F - (airy_ai_control / airy_ai_value));
 
-    static const local::float_type tol("1E-" + boost::lexical_cast<std::string>(local::digits_characteristics::my_digits10 - 4U));
+    static const local::float_type tol("1E-" + boost::lexical_cast<std::string>(std::numeric_limits<local::float_type>::digits10 - 7U));
 
     result_is_ok &= (delta < tol);
   }
