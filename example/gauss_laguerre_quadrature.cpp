@@ -5,7 +5,6 @@
 //          http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include <chrono>
 #include <cmath>
 #include <cstdint>
 #include <functional>
@@ -53,7 +52,7 @@ namespace detail
   class laguerre_l_object final
   {
   public:
-    laguerre_l_object(const int n, const T a) noexcept
+    laguerre_l_object(const int n, const T a) BOOST_NOEXCEPT
       : order(n),
         alpha(a),
         p1   (0),
@@ -72,7 +71,7 @@ namespace detail
       return *this;
     }
 
-    T operator()(const T& x) const noexcept
+    T operator()(const T& x) const BOOST_NOEXCEPT
     {
       // Calculate (via forward recursion):
       // * the value of the Laguerre function L(n, alpha, x), called (p2),
@@ -115,10 +114,10 @@ namespace detail
       return p2;
     }
 
-    const T previous  () const noexcept { return p1; }
-    const T derivative() const noexcept { return d2; }
+    const T previous  () const BOOST_NOEXCEPT { return p1; }
+    const T derivative() const BOOST_NOEXCEPT { return d2; }
 
-    static bool root_tolerance(const T& a, const T& b) noexcept
+    static bool root_tolerance(const T& a, const T& b) BOOST_NOEXCEPT
     {
       using std::fabs;
 
@@ -154,8 +153,8 @@ namespace detail
       }
     }
 
-    const std::vector<T>& abscissa_n() const noexcept { return xi; }
-    const std::vector<T>& weight_n  () const noexcept { return wi; }
+    const std::vector<T>& abscissa_n() const BOOST_NOEXCEPT { return xi; }
+    const std::vector<T>& weight_n  () const BOOST_NOEXCEPT { return wi; }
 
   private:
     const int order;
@@ -164,7 +163,10 @@ namespace detail
     std::vector<T> xi;
     std::vector<T> wi;
 
-    abscissas_and_weights() = default;
+    abscissas_and_weights() : order(),
+                              alpha(),
+                              xi   (),
+                              wi   () { }
 
     void calculate()
     {
@@ -404,12 +406,12 @@ namespace detail
   struct airy_ai_object final
   {
   public:
-    airy_ai_object(const T& x) noexcept
+    airy_ai_object(const T& x) BOOST_NOEXCEPT
       : my_x  (x),
         my_zeta  (((sqrt(x) * x) * 2) / 3),
         my_factor(make_factor(my_zeta)) { }
 
-    T operator()(const T& t) const noexcept
+    T operator()(const T& t) const BOOST_NOEXCEPT
     {
       using std::cbrt;
       using std::sqrt;
@@ -422,9 +424,11 @@ namespace detail
     const T my_zeta;
     const T my_factor;
 
-    airy_ai_object() = default;
+    airy_ai_object() : my_x     (),
+                       my_zeta  (),
+                       my_factor() { }
 
-    static T make_factor(const T& z) noexcept
+    static T make_factor(const T& z) BOOST_NOEXCEPT
     {
       using std::cbrt;
       using std::exp;
@@ -497,7 +501,7 @@ int main()
                          local::float_type(0U),
                          std::plus<local::float_type>(),
                          [&this_gauss_laguerre_ai](const local::float_type& this_abscissa,
-                                                   const local::float_type& this_weight) noexcept -> local::float_type
+                                                   const local::float_type& this_weight) BOOST_NOEXCEPT -> local::float_type
                          {
                            return this_gauss_laguerre_ai(this_abscissa) * this_weight;
                          });
