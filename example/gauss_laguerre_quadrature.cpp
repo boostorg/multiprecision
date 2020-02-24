@@ -349,10 +349,10 @@ namespace detail
         if(   ((i % 8U) == 0U)
            || ( i == root_estimates.size() - 1U))
         {
-          const float progress = (100.0F * static_cast<float>(i)) / static_cast<float>(root_estimates.size());
+          const float progress = (100.0F * static_cast<float>(i + 1U)) / static_cast<float>(root_estimates.size());
 
-          std::cout << "Calculating abscissa and weight for index: "
-                    << i
+          std::cout << "Calculating abscissas and weights. Processed "
+                    << (i + 1U)
                     << ", "
                     ;
 
@@ -407,7 +407,7 @@ namespace detail
   {
   public:
     airy_ai_object(const T& x) BOOST_NOEXCEPT
-      : my_x  (x),
+      : my_x     (x),
         my_zeta  (((sqrt(x) * x) * 2) / 3),
         my_factor(make_factor(my_zeta)) { }
 
@@ -446,7 +446,7 @@ namespace local
 {
   struct digits_characteristics
   {
-    BOOST_STATIC_CONSTEXPR unsigned int my_digits10       =  121U;
+    BOOST_STATIC_CONSTEXPR unsigned int my_digits10       =  101U;
     BOOST_STATIC_CONSTEXPR unsigned int my_guard_digits10 =    6U;
     BOOST_STATIC_CONSTEXPR unsigned int my_total_digits10 = my_digits10 + my_guard_digits10;
   };
@@ -479,6 +479,8 @@ int main()
   BOOST_CONSTEXPR_OR_CONST boost::float_least32_t laguerre_order_factor = -1.28301F + ((0.235487F + (0.0000178915F * d)) * d);
 
   BOOST_CONSTEXPR_OR_CONST int laguerre_order = static_cast<int>(laguerre_order_factor * d);
+
+  std::cout << "my_digits10: " << local::digits_characteristics::my_digits10 << std::endl;
 
   std::cout << "laguerre_order: " << laguerre_order << std::endl;
 
