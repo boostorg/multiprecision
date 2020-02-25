@@ -467,16 +467,17 @@ namespace detail
 
 } } // namespace gauss::laguerre
 
-namespace local
+struct local
 {
-  BOOST_CONSTEXPR unsigned int my_digits10 = 101U;
+  BOOST_STATIC_CONSTEXPR unsigned int my_digits10 = 101U;
 
-  using float_type =
-    boost::multiprecision::number<boost::multiprecision::cpp_dec_float<local::my_digits10>,
-                                  boost::multiprecision::et_off>;
-}
+  typedef boost::multiprecision::number<boost::multiprecision::cpp_dec_float<my_digits10>,
+                                        boost::multiprecision::et_off>
+  float_type;
+};
 
-BOOST_STATIC_ASSERT_MSG(local::my_digits10 > 20U, "Error: This example is intended to have more than 20 decimal digits");
+BOOST_STATIC_ASSERT_MSG(local::my_digits10 > 20U,
+                        "Error: This example is intended to have more than 20 decimal digits");
 
 int main()
 {
@@ -506,7 +507,7 @@ int main()
 
   std::cout << "laguerre_order: " << laguerre_order << std::endl;
 
-  using abscissas_and_weights_type = gauss::laguerre::detail::abscissas_and_weights<local::float_type>;
+  typedef gauss::laguerre::detail::abscissas_and_weights<local::float_type> abscissas_and_weights_type;
 
   const abscissas_and_weights_type the_abscissas_and_weights(laguerre_order, local::float_type(-1) / 6);
 
