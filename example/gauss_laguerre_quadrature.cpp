@@ -431,12 +431,12 @@ namespace detail
   struct airy_ai_object BOOST_FINAL
   {
   public:
-    airy_ai_object(const T& x) BOOST_NOEXCEPT
+    airy_ai_object(const T& x)
       : my_x     (x),
         my_zeta  (((sqrt(x) * x) * 2) / 3),
         my_factor(make_factor(my_zeta)) { }
 
-    T operator()(const T& t) const BOOST_NOEXCEPT
+    T operator()(const T& t) const
     {
       using std::sqrt;
 
@@ -452,7 +452,7 @@ namespace detail
                        my_zeta  (),
                        my_factor() { }
 
-    static T make_factor(const T& z) BOOST_NOEXCEPT
+    static T make_factor(const T& z)
     {
       using std::exp;
       using std::sqrt;
