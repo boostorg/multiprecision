@@ -438,10 +438,9 @@ namespace detail
 
     T operator()(const T& t) const BOOST_NOEXCEPT
     {
-      using std::cbrt;
       using std::sqrt;
 
-      return my_factor / sqrt(cbrt(2 + (t / my_zeta)));
+      return my_factor / sqrt(boost::math::cbrt(2 + (t / my_zeta)));
     }
 
   private:
@@ -455,12 +454,10 @@ namespace detail
 
     static T make_factor(const T& z) BOOST_NOEXCEPT
     {
-      using std::cbrt;
       using std::exp;
       using std::sqrt;
-      using std::tgamma;
 
-      return 1 / ((sqrt(boost::math::constants::pi<T>()) * sqrt(cbrt(z * 48))) * (exp(z) * tgamma(T(5) / 6)));
+      return 1 / ((sqrt(boost::math::constants::pi<T>()) * sqrt(boost::math::cbrt(z * 48))) * (exp(z) * boost::math::tgamma(T(5) / 6)));
     }
   };
 } // namespace detail
