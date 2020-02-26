@@ -74,7 +74,7 @@ void progress_bar(std::ostream& os, const float percent)
 namespace detail
 {
   template<typename T>
-  class laguerre_l_object final
+  class laguerre_l_object BOOST_FINAL
   {
   public:
     laguerre_l_object(const int n, const T a) BOOST_NOEXCEPT
@@ -428,7 +428,7 @@ namespace detail
   };
 
   template<typename T>
-  struct airy_ai_object final
+  struct airy_ai_object BOOST_FINAL
   {
   public:
     airy_ai_object(const T& x) BOOST_NOEXCEPT
