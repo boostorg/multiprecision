@@ -517,7 +517,9 @@ int main()
   {
     const local::float_type x = local::float_type(u) / 7;
 
-    const gauss::laguerre::detail::airy_ai_object<local::float_type> this_gauss_laguerre_ai(x);
+    typedef gauss::laguerre::detail::airy_ai_object<local::float_type> airy_ai_object_type;
+
+    const airy_ai_object_type the_airy_ai_object(x);
 
     const local::float_type airy_ai_value =
       std::inner_product(the_abscissas_and_weights.abscissa_n().cbegin(),
@@ -525,10 +527,10 @@ int main()
                          the_abscissas_and_weights.weight_n().cbegin(),
                          local::float_type(0U),
                          std::plus<local::float_type>(),
-                         [&this_gauss_laguerre_ai](const local::float_type& this_abscissa,
-                                                   const local::float_type& this_weight) BOOST_NOEXCEPT -> local::float_type
+                         [&the_airy_ai_object](const local::float_type& this_abscissa,
+                                               const local::float_type& this_weight) BOOST_NOEXCEPT -> local::float_type
                          {
-                           return this_gauss_laguerre_ai(this_abscissa) * this_weight;
+                           return the_airy_ai_object(this_abscissa) * this_weight;
                          });
 
     static const local::float_type one_third = 1.0F / local::float_type(3U);
