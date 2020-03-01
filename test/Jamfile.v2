@@ -73,7 +73,7 @@ project : requirements
    <toolset>intel:<debug-symbols>off
    <toolset>gcc:<cxxflags>-Wall
    <toolset>gcc:<cxxflags>-Wextra
-   <toolset>intel:<define>SLOW_COMPILER
+   #<toolset>intel:<define>SLOW_COMPILER
    <toolset>msvc,<optimization>off:<cxxflags>-RTC1
    # We can't yet enable this - it breaks the STL in some tests...
    #<toolset>msvc,<optimization>off:<cxxflags>-RTCc
@@ -105,6 +105,7 @@ lib no_eh_support : no_eh_test_support.cpp ;
 test-suite arithmetic_tests :
 
    [ run test_arithmetic_backend_concept.cpp no_eh_support ]
+   [ compile test_arithmetic_skeleton.cpp ]
 
    [ run test_arithmetic_cpp_dec_float_1.cpp no_eh_support ]
    [ run test_arithmetic_cpp_dec_float_2.cpp no_eh_support ]
@@ -741,6 +742,53 @@ test-suite cpp_int_tests :
             : test_cpp_int_5
             ]
 
+      [ run test_cpp_int.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST6
+            : test_cpp_int_6
+            ]
+
+      [ run test_cpp_int_karatsuba.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST=1
+            : test_cpp_int_karatsuba_1
+            ]
+      [ run test_cpp_int_karatsuba.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST=2
+            : test_cpp_int_karatsuba_2
+            ]
+      [ run test_cpp_int_karatsuba.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST=3
+            : test_cpp_int_karatsuba_3
+            ]
+      [ run test_cpp_int_karatsuba.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST=4
+            : test_cpp_int_karatsuba_4
+            ]
+
       [ run test_checked_cpp_int.cpp no_eh_support ]
       [ run test_unchecked_cpp_int.cpp no_eh_support : : : release ]
 
@@ -1239,3 +1287,4 @@ rule get_concept_checks
 test-suite concepts : [ get_concept_checks ] ;
 
 test-suite examples : ../example//examples ;
+test-suite performance : ../performance//performance ;

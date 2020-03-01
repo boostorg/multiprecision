@@ -60,6 +60,8 @@ project
       <toolset>msvc:<cxxflags>/wd4701
       <toolset>msvc:<cxxflags>/wd4127
       <toolset>msvc:<cxxflags>/wd4305
+      <toolset>clang:<link>static
+     
     ;
 
 lib gmp : : <search>$(gmp_path) ;

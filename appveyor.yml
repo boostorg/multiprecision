@@ -1,0 +1,149 @@
+# Copyright 2016 Peter Dimov
+# Copyright 2019 Aleksey Moskvin <zerg1996@yandex.ru>
+# Copyright 2019 Mikhail Komarov <nemo@nil.foundation>
+# Copyright 2019 Nil Foundation AG
+# Distributed under the Boost Software License, Version 1.0.
+# (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
+
+version: 1.0.{build}-{branch}
+
+shallow_clone: true
+
+branches:
+  only:
+    - master
+    - develop
+    - cmake-develop
+    - 2-modular-adaptor
+
+platform:
+  - x64
+
+os: unstable
+
+environment:
+  matrix:
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      ARGS: --toolset=msvc-14.2 address-model=64 cxxstd=17
+      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
+      TARGETS_CMAKE: multiprecision_test_suite_arithmetic_tests multiprecision_test_suite_cpp_int_tests multiprecision_test_suite_functions_and_limits
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      ARGS: --toolset=msvc-14.2 address-model=64 cxxstd=17
+      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
+      TARGETS_CMAKE: multiprecision_test_suite_conversions multiprecision_test_suite_misc multiprecision_test_suite_compile_fail multiprecision_test_suite_examples multiprecision_test_suite_concepts
+
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      ARGS: --toolset=msvc-14.1 address-model=64 cxxstd=17
+      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
+      TARGETS_CMAKE: multiprecision_test_suite_arithmetic_tests multiprecision_test_suite_cpp_int_tests multiprecision_test_suite_functions_and_limits
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      ARGS: --toolset=msvc-14.1 address-model=64 cxxstd=17
+      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
+      TARGETS_CMAKE: multiprecision_test_suite_conversions multiprecision_test_suite_misc multiprecision_test_suite_compile_fail multiprecision_test_suite_examples multiprecision_test_suite_concepts
+
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      ARGS: --toolset=msvc-14.0 address-model=64 cxxstd=17
+      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
+      TARGETS_CMAKE: multiprecision_test_suite_arithmetic_tests multiprecision_test_suite_cpp_int_tests multiprecision_test_suite_functions_and_limits
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      ARGS: --toolset=msvc-14.0 address-model=64 cxxstd=17
+      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
+      TARGETS_CMAKE: multiprecision_test_suite_conversions multiprecision_test_suite_misc multiprecision_test_suite_compile_fail multiprecision_test_suite_examples multiprecision_test_suite_concepts
+
+    - ARGS: --toolset=msvc-10.0 address-model=32
+      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
+      TARGETS_CMAKE: multiprecision_test_suite_arithmetic_tests multiprecision_test_suite_cpp_int_tests multiprecision_test_suite_functions_and_limits
+    - ARGS: --toolset=msvc-10.0 address-model=32
+      TARGETS: conversions misc compile_fail examples concepts
+      TARGETS_CMAKE: multiprecision_test_suite_conversions multiprecision_test_suite_misc multiprecision_test_suite_compile_fail multiprecision_test_suite_examples multiprecision_test_suite_concepts
+
+    - ARGS: --toolset=msvc-11.0 address-model=32
+      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
+      TARGETS_CMAKE: multiprecision_test_suite_arithmetic_tests multiprecision_test_suite_cpp_int_tests multiprecision_test_suite_functions_and_limits
+    - ARGS: --toolset=msvc-11.0 address-model=32
+      TARGETS: conversions misc compile_fail examples concepts
+      TARGETS_CMAKE: multiprecision_test_suite_conversions multiprecision_test_suite_misc multiprecision_test_suite_compile_fail multiprecision_test_suite_examples multiprecision_test_suite_concepts
+
+    - ARGS: --toolset=msvc-12.0 address-model=32
+      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
+      TARGETS_CMAKE: multiprecision_test_suite_arithmetic_tests multiprecision_test_suite_cpp_int_tests multiprecision_test_suite_functions_and_limits
+    - ARGS: --toolset=msvc-12.0 address-model=32
+      TARGETS: conversions misc compile_fail examples concepts
+      TARGETS_CMAKE: multiprecision_test_suite_conversions multiprecision_test_suite_misc multiprecision_test_suite_compile_fail multiprecision_test_suite_examples multiprecision_test_suite_concepts
+
+    - ARGS: --toolset=msvc-14.0 address-model=32
+      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
+      TARGETS_CMAKE: multiprecision_test_suite_arithmetic_tests multiprecision_test_suite_cpp_int_tests multiprecision_test_suite_functions_and_limits
+    - ARGS: --toolset=msvc-14.0 address-model=32
+      TARGETS: conversions misc compile_fail examples concepts
+      TARGETS_CMAKE: multiprecision_test_suite_conversions multiprecision_test_suite_misc multiprecision_test_suite_compile_fail multiprecision_test_suite_examples multiprecision_test_suite_concepts
+
+    - ARGS: --toolset=msvc-12.0 address-model=64
+      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
+      TARGETS_CMAKE: multiprecision_test_suite_arithmetic_tests multiprecision_test_suite_cpp_int_tests multiprecision_test_suite_functions_and_limits
+    - ARGS: --toolset=msvc-12.0 address-model=64
+      TARGETS: conversions misc compile_fail examples concepts
+      TARGETS_CMAKE: multiprecision_test_suite_conversions multiprecision_test_suite_misc multiprecision_test_suite_compile_fail multiprecision_test_suite_examples multiprecision_test_suite_concepts
+
+    - ARGS: --toolset=msvc-14.0 address-model=64
+      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
+      TARGETS_CMAKE: multiprecision_test_suite_arithmetic_tests multiprecision_test_suite_cpp_int_tests multiprecision_test_suite_functions_and_limits
+    - ARGS: --toolset=msvc-14.0 address-model=64
+      TARGETS: conversions misc compile_fail examples concepts
+      TARGETS_CMAKE: multiprecision_test_suite_conversions multiprecision_test_suite_misc multiprecision_test_suite_compile_fail multiprecision_test_suite_examples multiprecision_test_suite_concepts
+
+    - ARGS: --toolset=gcc address-model=64
+      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
+      PATH: C:\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin;%PATH%
+      TARGETS_CMAKE: multiprecision_test_suite_arithmetic_tests multiprecision_test_suite_cpp_int_tests multiprecision_test_suite_functions_and_limits
+
+    - ARGS: --toolset=gcc address-model=64
+      TARGETS: conversions misc compile_fail examples concepts
+      PATH: C:\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin;%PATH%
+      TARGETS_CMAKE: multiprecision_test_suite_conversions multiprecision_test_suite_misc multiprecision_test_suite_compile_fail multiprecision_test_suite_examples multiprecision_test_suite_concepts
+
+    - ARGS: --toolset=gcc address-model=64 cxxstd=2a cxxstd-dialect=gnu
+      TARGETS: arithmetic_tests cpp_int_tests functions_and_limits
+      PATH: C:\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin;%PATH%
+      TARGETS_CMAKE: multiprecision_test_suite_arithmetic_tests multiprecision_test_suite_cpp_int_tests multiprecision_test_suite_functions_and_limits
+
+    - ARGS: --toolset=gcc address-model=64 cxxstd=2a cxxstd-dialect=gnu
+      TARGETS: conversions misc compile_fail examples concepts
+      PATH: C:\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin;%PATH%
+      TARGETS_CMAKE: multiprecision_test_suite_conversions multiprecision_test_suite_misc multiprecision_test_suite_compile_fail multiprecision_test_suite_examples multiprecision_test_suite_concepts
+
+
+install:
+  - cd ..
+  - if not %APPVEYOR_REPO_BRANCH% == "master" if not %APPVEYOR_REPO_BRANCH% == "develop" (
+    git clone -b develop --depth 1 https://github.com/boostorg/boost.git boost-root
+    ) Else (
+    git clone -b %APPVEYOR_REPO_BRANCH% --depth 1 https://github.com/boostorg/boost.git boost-root
+    )
+  - cd boost-root
+  - git submodule update --init tools/build
+  - git submodule update --init tools/boost_install
+  - git submodule update --init libs/headers
+  - git submodule update --init libs/config
+  - xcopy /s /e /q %APPVEYOR_BUILD_FOLDER% libs\multiprecision
+  - git submodule update --init tools/boostdep
+  - python tools/boostdep/depinst/depinst.py multiprecision
+  - bootstrap.bat
+  - b2 headers
+  - b2 install
+
+build: off
+
+test_script:
+  - cd libs\config\test
+  - ..\..\..\b2 config_info_travis_install %ARGS%
+  - config_info_travis
+  - cd ..\..\multiprecision\test
+  - ..\..\..\b2 --hash -j3 %ARGS% %TARGETS% define=CI_SUPPRESS_KNOWN_ISSUES
+
+  - cd ..
+  - for /f %%a in ('dir /b C:\Boost\lib\cmake\Boost-*') do (set boost_dir=C:\Boost\lib\cmake\%%a)
+  - mkdir cmake-build
+  - cd cmake-build
+  - cmake -DBoost_DIR=%boost_dir% -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=14 -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE --build ..
+#  - cmake --build C:/projects/boost-root/libs/multiprecision/cmake-build --target %TARGETS_CMAKE%
