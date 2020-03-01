@@ -33,11 +33,11 @@
 
 language: cpp
 
-sudo: false
+sudo: true
 
 python: "2.7"
 
-dist : xenial
+dist: xenial
 
 os:
   - linux
@@ -47,6 +47,8 @@ branches:
   only:
     - master
     - develop
+    - cmake-develop
+    - cmake-master
 
 env:
   matrix:
@@ -59,11 +61,12 @@ matrix:
 
   include:
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++03 TEST_SUITE=arithmetic_tests
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=arithmetic_tests
       addons:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -71,13 +74,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++11 TEST_SUITE=arithmetic_tests
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=arithmetic_tests
       addons:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -85,13 +90,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE=arithmetic_tests
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=arithmetic_tests
       addons:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -99,13 +106,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++03 TEST_SUITE=cpp_int_tests
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=arithmetic_tests
       addons:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -113,13 +122,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++11 TEST_SUITE=cpp_int_tests
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=cpp_int_tests
       addons:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -127,13 +138,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE=cpp_int_tests
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=cpp_int_tests
       addons:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -141,13 +154,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++03 TEST_SUITE=functions_and_limits
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=cpp_int_tests
       addons:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -155,13 +170,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++11 TEST_SUITE=functions_and_limits
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=cpp_int_tests
       addons:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -169,6 +186,55 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=functions_and_limits
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+            - libtommath-dev
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=functions_and_limits
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+            - libtommath-dev
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=functions_and_limits
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+            - libtommath-dev
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
       env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE=functions_and_limits
@@ -176,6 +242,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -183,13 +250,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++03 TEST_SUITE="conversions performance"
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=functions_and_limits
       addons:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -197,13 +266,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++11 TEST_SUITE="conversions performance"
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=conversions
       addons:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -211,13 +282,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE="conversions performance"
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=conversions
       addons:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -225,13 +298,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++03 TEST_SUITE=misc
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=conversions
       addons:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -239,13 +314,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++11 TEST_SUITE=misc
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE=conversions
       addons:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -253,6 +330,71 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=conversions
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+            - libtommath-dev
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=misc
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+            - libtommath-dev
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=misc
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+            - libtommath-dev
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=misc
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+            - libtommath-dev
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
       env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE=misc
@@ -260,6 +402,7 @@ matrix:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -267,13 +410,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++03 TEST_SUITE="compile_fail examples"
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=misc
       addons:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -281,13 +426,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++11 TEST_SUITE="compile_fail examples"
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE="examples compile_fail"
       addons:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -295,13 +442,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE="compile_fail examples"
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE="examples compile_fail"
       addons:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -309,13 +458,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++03 TEST_SUITE=concepts
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE="examples compile_fail"
       addons:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -323,13 +474,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++11 TEST_SUITE=concepts
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE="examples compile_fail"
       addons:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -337,13 +490,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=gnu++14 TEST_SUITE=concepts
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=concepts
       addons:
         apt:
           packages:
             - g++-6
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -351,6 +506,55 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=concepts
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+            - libtommath-dev
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=concepts
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+            - libtommath-dev
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=concepts
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+            - libtommath-dev
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
       env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=arithmetic_tests
@@ -358,6 +562,7 @@ matrix:
         apt:
           packages:
             - g++-5
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -365,6 +570,7 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
       env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=cpp_int_tests
@@ -372,6 +578,7 @@ matrix:
         apt:
           packages:
             - g++-5
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -379,6 +586,7 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
       env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=functions_and_limits
@@ -386,6 +594,7 @@ matrix:
         apt:
           packages:
             - g++-5
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -393,13 +602,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE="conversions performance"
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=conversions
       addons:
         apt:
           packages:
             - g++-5
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -407,6 +618,7 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
       env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=misc
@@ -414,6 +626,7 @@ matrix:
         apt:
           packages:
             - g++-5
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -421,6 +634,7 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
       env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE="compile_fail examples"
@@ -428,6 +642,7 @@ matrix:
         apt:
           packages:
             - g++-5
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -435,6 +650,7 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
       env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=concepts
@@ -442,6 +658,7 @@ matrix:
         apt:
           packages:
             - g++-5
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -449,13 +666,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++17 TEST_SUITE=arithmetic_tests
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=arithmetic_tests
       addons:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -463,13 +682,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++17 TEST_SUITE=cpp_int_tests
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=arithmetic_tests
       addons:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -477,13 +698,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++17 TEST_SUITE=functions_and_limits
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=arithmetic_tests
       addons:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -491,13 +714,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++17 TEST_SUITE="conversions performance"
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=arithmetic_tests
       addons:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -505,13 +730,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++17 TEST_SUITE=misc
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=cpp_int_tests
       addons:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -519,13 +746,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++17 TEST_SUITE="compile_fail examples"
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=cpp_int_tests
       addons:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -533,13 +762,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++17 TEST_SUITE=concepts
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=cpp_int_tests
       addons:
         apt:
           packages:
             - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -547,13 +778,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-9 CXXSTD=gnu++17 TEST_SUITE=arithmetic_tests
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=cpp_int_tests
       addons:
         apt:
           packages:
-            - g++-9
+            - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -561,13 +794,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-9 CXXSTD=gnu++17 TEST_SUITE=cpp_int_tests
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=functions_and_limits
       addons:
         apt:
           packages:
-            - g++-9
+            - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -575,13 +810,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-9 CXXSTD=gnu++17 TEST_SUITE=functions_and_limits
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=functions_and_limits
       addons:
         apt:
           packages:
-            - g++-9
+            - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -589,13 +826,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-9 CXXSTD=gnu++17 TEST_SUITE="conversions performance"
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=functions_and_limits
       addons:
         apt:
           packages:
-            - g++-9
+            - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -603,28 +842,31 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-9 CXXSTD=gnu++17 TEST_SUITE="misc include=/usr/include/eigen3"
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++14 TEST_SUITE=functions_and_limits
       addons:
         apt:
           packages:
-            - g++-9
+            - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
             - libmpfi-dev
             - libtommath-dev
-            - libeigen3-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-9 CXXSTD=gnu++17 TEST_SUITE="compile_fail examples"
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=functions_and_limits
       addons:
         apt:
           packages:
-            - g++-9
+            - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -632,13 +874,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=gcc COMPILER=g++-9 CXXSTD=gnu++17 TEST_SUITE=concepts
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=conversions
       addons:
         apt:
           packages:
-            - g++-9
+            - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -646,13 +890,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=clang COMPILER=clang++-9 CXXSTD=c++17 TEST_SUITE=arithmetic_tests
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=conversions
       addons:
         apt:
           packages:
-            - clang-9
+            - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -660,15 +906,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
-            - sourceline: 'deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
-              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=clang COMPILER=clang++-9 CXXSTD=c++17 TEST_SUITE=cpp_int_tests
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=conversions
       addons:
         apt:
           packages:
-            - clang-9
+            - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -676,15 +922,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
-            - sourceline: 'deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
-              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=clang COMPILER=clang++-9 CXXSTD=c++17 TEST_SUITE=functions_and_limits
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++14 TEST_SUITE=conversions
       addons:
         apt:
           packages:
-            - clang++-9
+            - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -692,15 +938,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
-            - sourceline: 'deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
-              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=clang COMPILER=clang++-9 CXXSTD=c++17 TEST_SUITE="conversions performance"
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=conversions
       addons:
         apt:
           packages:
-            - clang-9
+            - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -708,15 +954,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
-            - sourceline: 'deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
-              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=clang COMPILER=clang++-9 CXXSTD=c++17 TEST_SUITE=misc
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=misc
       addons:
         apt:
           packages:
-            - clang-9
+            - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -724,15 +970,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
-            - sourceline: 'deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
-              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=clang COMPILER=clang++-9 CXXSTD=c++17 TEST_SUITE="compile_fail examples"
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=misc
       addons:
         apt:
           packages:
-            - clang-9
+            - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -740,15 +986,15 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
-            - sourceline: 'deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
-              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
+            - llvm-toolchain-xenial-8
 
     - os: linux
-      env: TOOLSET=clang COMPILER=clang++-9 CXXSTD=c++17 TEST_SUITE=concepts
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=misc
       addons:
         apt:
           packages:
-            - clang-9
+            - g++-8
+            - cmake
             - libgmp-dev
             - libmpfr-dev
             - libmpc-dev
@@ -756,8 +1002,167 @@ matrix:
             - libtommath-dev
           sources:
             - ubuntu-toolchain-r-test
-            - sourceline: 'deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'
-              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
+            - llvm-toolchain-xenial-8
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=gnu++14 TEST_SUITE=misc
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+            - libtommath-dev
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=misc
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+            - libtommath-dev
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE="compile_fail examples"
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+            - libtommath-dev
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE="compile_fail examples"
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+            - libtommath-dev
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE="compile_fail examples"
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+            - libtommath-dev
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE="compile_fail examples"
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+            - libtommath-dev
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=concepts
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+            - libtommath-dev
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=concepts
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+            - libtommath-dev
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=concepts
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+            - libtommath-dev
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=concepts
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+            - libtommath-dev
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-xenial-8
 
     - os: osx
       env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=arithmetic_tests
@@ -772,7 +1177,7 @@ matrix:
       osx_image: xcode9.3
 
     - os: osx
-      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="conversions performance"
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=conversions
       osx_image: xcode9.3
 
     - os: osx
@@ -800,7 +1205,7 @@ matrix:
       osx_image: xcode8.3
 
     - os: osx
-      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="conversions performance"
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=conversions
       osx_image: xcode8.3
 
     - os: osx
@@ -828,7 +1233,7 @@ matrix:
       osx_image: xcode7.3
 
     - os: osx
-      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE="conversions performance"
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=conversions
       osx_image: xcode7.3
 
     - os: osx
@@ -855,7 +1260,6 @@ install:
   - cd boost-root
   - git submodule update --init tools/build
   - git submodule update --init libs/config
-  - git submodule update --init libs/polygon
   - git submodule update --init tools/boost_install
   - git submodule update --init libs/headers
   - git submodule update --init tools/boostdep
@@ -882,8 +1286,8 @@ script:
   - if [[ $CXXSTD == c++1z ]]; then
     CXXSTD=c++17;
     fi;
-#  - cmake -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9]*//g') -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE ..;
+  - cmake -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9]*//g') -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE ..;
 
 notifications:
-    email:
-        on_success: always
+  email:
+    on_success: always
