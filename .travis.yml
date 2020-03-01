@@ -49,16 +49,9 @@ branches:
     - develop
     - cmake-develop
     - cmake-master
-
-env:
-  matrix:
-    - BOGUS_JOB=true
+    - 2-modular-adaptor
 
 matrix:
-
-  exclude:
-    - env: BOGUS_JOB=true
-
   include:
     - os: linux
       env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=arithmetic_tests
