@@ -109,6 +109,21 @@ inline _Quad isinfq(_Quad v)
 
 namespace boost {
 namespace multiprecision {
+
+#ifndef BOOST_MP_BITS_OF_FLOAT128_DEFINED
+
+namespace detail {
+
+template <>
+struct bits_of<float128_type>
+{
+   static const unsigned value = 113;
+};
+
+}
+
+#endif
+
 namespace backends {
 
 struct float128_backend;
