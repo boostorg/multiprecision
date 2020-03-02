@@ -2388,7 +2388,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_f
       {
          value.first  = true;
          value.second = 0.5;
-         mpfr_div_2exp(value.second.backend().data(), value.second.backend().data(), 1, GMP_RNDN);
       }
       return value.second;
    }

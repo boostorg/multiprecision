@@ -1645,7 +1645,6 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfi_f
       {
          value.first  = true;
          value.second = 0.5;
-         mpfi_div_2exp(value.second.backend().data(), value.second.backend().data(), 1);
       }
       return value.second;
    }
