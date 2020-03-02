@@ -73,7 +73,7 @@ project : requirements
    <toolset>intel:<debug-symbols>off
    <toolset>gcc:<cxxflags>-Wall
    <toolset>gcc:<cxxflags>-Wextra
-   <toolset>intel:<define>SLOW_COMPILER
+   #<toolset>intel:<define>SLOW_COMPILER
    <toolset>msvc,<optimization>off:<cxxflags>-RTC1
    # We can't yet enable this - it breaks the STL in some tests...
    #<toolset>msvc,<optimization>off:<cxxflags>-RTCc

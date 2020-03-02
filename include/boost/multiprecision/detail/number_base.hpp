@@ -103,6 +103,11 @@
 #undef BOOST_MP_CXX14_CONSTEXPR
 #define BOOST_MP_CXX14_CONSTEXPR
 #endif
+#if defined(BOOST_INTEL)
+#undef BOOST_MP_CXX14_CONSTEXPR
+#define BOOST_MP_CXX14_CONSTEXPR
+#define BOOST_MP_NO_CONSTEXPR_DETECTION
+#endif
 
 #ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
 #  define BOOST_CXX14_CONSTEXPR_IF_DETECTION
@@ -232,6 +237,7 @@ struct bits_of
 };
 
 #if defined(_GLIBCXX_USE_FLOAT128) && defined(BOOST_GCC) && !defined(__STRICT_ANSI__)
+#define BOOST_MP_BITS_OF_FLOAT128_DEFINED
 template <>
 struct bits_of<__float128>
 {
