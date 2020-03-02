@@ -26,9 +26,14 @@ project : requirements
    <search>$(mpfr_path) 
    <search>$(mpfr_path)/build.vc10/lib/Win32/Debug
    <search>$(tommath_path) 
-   <link>static
+   # We set these to make it easier to set up and test GMP and MPFR under Win32:
+   <toolset>msvc:<runtime-link>static
+   <toolset>msvc:<link>static
+   <toolset>intel-win:<runtime-link>static
+   <toolset>intel-win:<link>static
    <define>BOOST_ALL_NO_LIB
    <debug-symbols>off
+   <define>NDEBUG=1
    ;
 
 
