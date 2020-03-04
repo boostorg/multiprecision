@@ -315,8 +315,11 @@ eval_multiply_comba(
     const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
     const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>& b) BOOST_MP_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
 {
+   // 
+   // see PR #182
    // Comba Multiplier - based on Paul Comba's
    // Exponentiation cryptosystems on the IBM PC, 1990
+   //
    int as                                                                                         = a.size(),
        bs                                                                                         = b.size(),
        rs                                                                                         = result.size();
@@ -449,11 +452,12 @@ eval_multiply(
    std::memset(pr, 0, result.size() * sizeof(limb_type));   
    double_limb_type carry = 0;
 
-#ifdef BOOST_MP_COMBA 
+#if defined(BOOST_MP_COMBA) || __GNUC__ >= 10
+       // 
 	   // Comba Multiplier might not be efficient because of less efficient assembly
-	   // by the compiler as of 09/01/2020 (DD/MM/YY). Hopefully this will be resolved when
-	   // GCC BUG #93141 and CLANG BUG #44430 are fixed. 
+	   // by the compiler as of 09/01/2020 (DD/MM/YY). See PR #182
 	   // Till then this will lay dormant :(
+	   //
 	   eval_multiply_comba(result, a, b);
 	   return ;
 #endif
