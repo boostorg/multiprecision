@@ -173,7 +173,7 @@
 <span class="special">}</span>
 </pre>
 <p>
-        Importing or exporting cpp_bin_float is similar, but we must procede via
+        Importing or exporting cpp_bin_float is similar, but we must proceed via
         an intermediate integer:
       </p>
 <pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">cpp_bin_float</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
@@ -195,7 +195,7 @@
    <span class="identifier">export_bits</span><span class="special">(</span><span class="identifier">cpp_int</span><span class="special">(</span><span class="identifier">f</span><span class="special">.</span><span class="identifier">backend</span><span class="special">().</span><span class="identifier">bits</span><span class="special">()),</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">back_inserter</span><span class="special">(</span><span class="identifier">v</span><span class="special">),</span> <span class="number">8</span><span class="special">);</span>
    <span class="comment">// Grab the exponent as well:</span>
    <span class="keyword">int</span> <span class="identifier">e</span> <span class="special">=</span> <span class="identifier">f</span><span class="special">.</span><span class="identifier">backend</span><span class="special">().</span><span class="identifier">exponent</span><span class="special">();</span>
-   <span class="comment">// Import back again, and check for equality, we have to procede via</span>
+   <span class="comment">// Import back again, and check for equality, we have to proceed via</span>
    <span class="comment">// an intermediate integer:</span>
    <span class="identifier">cpp_int</span> <span class="identifier">i</span><span class="special">;</span>
    <span class="identifier">import_bits</span><span class="special">(</span><span class="identifier">i</span><span class="special">,</span> <span class="identifier">v</span><span class="special">.</span><span class="identifier">begin</span><span class="special">(),</span> <span class="identifier">v</span><span class="special">.</span><span class="identifier">end</span><span class="special">());</span>

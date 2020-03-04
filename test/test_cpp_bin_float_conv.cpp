@@ -209,7 +209,7 @@ int main()
    r1 = -r1;
    check_round(r1);
    //
-   // Check convertion to signed zero works OK:
+   // Check conversion to signed zero works OK:
    //
    r1 = -ldexp(cpp_bin_float_50(1), -3000);
    check_round(r1);

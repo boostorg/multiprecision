@@ -2073,6 +2073,65 @@ void test_c99_appendix_F()
    BOOST_CHECK_EQUAL(sign, 1);
 }
 
+template <class T>
+void test_c99_appendix_F_tgammaq_addon_for_float128()
+{
+#if defined(TEST_FLOAT128)
+  // Special tests of tgamma for positive and negative
+  // real values in the neighborhood of the origin.
+
+   // At Wolfram Alpha: N[Gamma[1/3], 201]
+   const T tgamma_third
+   (
+     "2."
+     "67893853470774763365569294097467764412868937795730"
+     "11009504283275904176101677438195409828890411887894"
+     "19159049200072263335719084569504472259977713367708"
+     "46976816728982305000321834255032224715694181755545"
+   );
+
+   // Create a string such as "1e-84", where 84 exemplifies (digits10*5 + 5)/6
+   // and the exponent varies depending on the value of digits10 for the type.
+   // Consider, for instance digits10=100. In this case n_exp=(100*5 + 5)/6 = 84.
+
+   const int n_exp =(std::max)(((std::numeric_limits<T>::digits10 * 5) + 5) / 6, 1);
+
+   const T tgamma_tol("1e-" + boost::lexical_cast<std::string>(n_exp));
+
+   // Check tgamma(1/3 - n) for n in 0...24.
+   for(int n = 0; n < 25; ++n)
+   {
+      const T tgamma_val = tgamma(T((T(1) / T(3)) - T(n)));
+
+      T tgamma_control(tgamma_third);
+
+      for(unsigned int k = 0U; k < static_cast<unsigned int>(n); ++k)
+      {
+         tgamma_control *= -3;
+         tgamma_control /= ((3U * (k + 1U)) - 1U);
+      }
+
+      BOOST_CHECK_CLOSE_FRACTION(tgamma_val, tgamma_control, tgamma_tol);
+   }
+
+   // Check tgamma(1/3 + n) for n in 0...24.
+   for(unsigned int n = 0U; n < 25U; ++n)
+   {
+      const T tgamma_val = tgamma(T((T(1) / T(3)) + T(n)));
+
+      T tgamma_control(tgamma_third);
+
+      for(unsigned int k = 0U; k < n; ++k)
+      {
+         tgamma_control /= 3;
+         tgamma_control *= ((3U * (k + 1U)) - 2U);
+      }
+
+      BOOST_CHECK_CLOSE_FRACTION(tgamma_val, tgamma_control, tgamma_tol);
+   }
+#endif
+}
+
 int main()
 {
    test_poison<float>();
@@ -2137,6 +2196,7 @@ int main()
 #ifdef TEST_FLOAT128
    test<boost::multiprecision::float128>();
    test_c99_appendix_F<boost::multiprecision::float128>();
+   test_c99_appendix_F_tgammaq_addon_for_float128<boost::multiprecision::float128>();
 #endif
 
    return boost::report_errors();

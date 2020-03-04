@@ -109,6 +109,21 @@ inline _Quad isinfq(_Quad v)
 
 namespace boost {
 namespace multiprecision {
+
+#ifndef BOOST_MP_BITS_OF_FLOAT128_DEFINED
+
+namespace detail {
+
+template <>
+struct bits_of<float128_type>
+{
+   static const unsigned value = 113;
+};
+
+}
+
+#endif
+
 namespace backends {
 
 struct float128_backend;
@@ -648,7 +663,18 @@ inline boost::multiprecision::number<float128_backend, ExpressionTemplates> lgam
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 inline boost::multiprecision::number<float128_backend, ExpressionTemplates> tgamma BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
 {
-   return tgammaq(arg.backend().value());
+   if(eval_signbit(arg.backend()) != 0)
+   {
+      const bool result_is_neg = ((static_cast<unsigned long long>(floorq(-arg.backend().value())) % 2U) == 0U);
+
+      const boost::multiprecision::number<float128_backend, ExpressionTemplates> result_of_tgammaq = fabsq(tgammaq(arg.backend().value()));
+
+      return ((result_is_neg == false) ? result_of_tgammaq : -result_of_tgammaq);
+   }
+   else
+   {
+      return tgammaq(arg.backend().value());
+   }
 }
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
 inline boost::multiprecision::number<float128_backend, ExpressionTemplates> log1p BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
