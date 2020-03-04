@@ -452,7 +452,7 @@ eval_multiply(
    std::memset(pr, 0, result.size() * sizeof(limb_type));   
    double_limb_type carry = 0;
 
-#if true // For testing purposes only, other replace this with : defined(BOOST_MP_COMBA) || __GNUC__ >= 10
+#if 1 // For testing purposes only, other replace this with : defined(BOOST_MP_COMBA) || __GNUC__ >= 10
        // 
 	   // Comba Multiplier might not be efficient because of less efficient assembly
 	   // by the compiler as of 09/01/2020 (DD/MM/YY). See PR #182
