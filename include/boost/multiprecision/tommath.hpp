@@ -194,9 +194,9 @@ struct tommath_int
 
 #ifdef DIGIT_BIT
       static const int shift = std::numeric_limits<int>::digits - 1;
-      typedef int part_type;
+      typedef int      part_type;
 #else
-      static const int shift = std::numeric_limits<boost::int64_t>::digits - 1;
+      static const int       shift = std::numeric_limits<boost::int64_t>::digits - 1;
       typedef boost::int64_t part_type;
 #endif
 
@@ -272,11 +272,11 @@ struct tommath_int
       {
          if (radix == 8 || radix == 16)
          {
-            unsigned               shift       = radix == 8 ? 3 : 4;
+            unsigned shift = radix == 8 ? 3 : 4;
 #ifdef DIGIT_BIT
-            unsigned               block_count = DIGIT_BIT / shift;
+            unsigned block_count = DIGIT_BIT / shift;
 #else
-            unsigned               block_count = MP_DIGIT_BIT / shift;
+            unsigned block_count = MP_DIGIT_BIT / shift;
 #endif
             unsigned               block_shift = shift * block_count;
             boost::ulong_long_type val, block;
@@ -438,9 +438,15 @@ struct tommath_int
    ::mp_int m_data;
 };
 
+#ifdef SIGN
 #define BOOST_MP_TOMMATH_BIT_OP_CHECK(x) \
-   if (mp_isneg(&x.data()))                  \
+   if (SIGN(&x.data()))                  \
    BOOST_THROW_EXCEPTION(std::runtime_error("Bitwise operations on libtommath negative valued integers are disabled as they produce unpredictable results"))
+#else
+#define BOOST_MP_TOMMATH_BIT_OP_CHECK(x) \
+   if (mp_isneg(&x.data()))              \
+   BOOST_THROW_EXCEPTION(std::runtime_error("Bitwise operations on libtommath negative valued integers are disabled as they produce unpredictable results"))
+#endif
 
 int eval_get_sign(const tommath_int& val);
 
@@ -631,7 +637,11 @@ inline bool eval_is_zero(const tommath_int& val)
 }
 inline int eval_get_sign(const tommath_int& val)
 {
+#ifdef SIGN
+   return mp_iszero(&val.data()) ? 0 : SIGN(&val.data()) ? -1 : 1;
+#else
    return mp_iszero(&val.data()) ? 0 : mp_isneg(&val.data()) ? -1 : 1;
+#endif
 }
 /*
 template <class A>
