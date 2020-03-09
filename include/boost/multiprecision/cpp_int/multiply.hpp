@@ -459,8 +459,7 @@ eval_multiply(
 	   // Till then this will lay dormant :(
 	   //
 	   eval_multiply_comba(result, a, b);
-	   return ;
-#endif
+#else
 
    for (unsigned i = 0; i < as; ++i)
    {
@@ -502,6 +501,7 @@ eval_multiply(
    // Set the sign of the result:
    //
    result.sign(a.sign() != b.sign());
+#endif
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
