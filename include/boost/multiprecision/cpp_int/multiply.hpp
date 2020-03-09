@@ -454,11 +454,11 @@ eval_multiply(
 
 #if defined(BOOST_MP_COMBA) || __GNUC__ >= 10
        // 
-	   // Comba Multiplier might not be efficient because of less efficient assembly
-	   // by the compiler as of 09/01/2020 (DD/MM/YY). See PR #182
-	   // Till then this will lay dormant :(
-	   //
-	   eval_multiply_comba(result, a, b);
+       // Comba Multiplier might not be efficient because of less efficient assembly
+       // by the compiler as of 09/01/2020 (DD/MM/YY). See PR #182
+       // Till then this will lay dormant :(
+       //
+       eval_multiply_comba(result, a, b);
 #else
 
    for (unsigned i = 0; i < as; ++i)
