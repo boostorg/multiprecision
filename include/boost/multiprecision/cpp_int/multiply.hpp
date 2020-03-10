@@ -309,6 +309,58 @@ setup_karatsuba(
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3, class Allocator3>
+inline BOOST_MP_CXX14_CONSTEXPR void
+eval_multiply_comba(
+    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
+    const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
+    const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>& b) BOOST_MP_NOEXCEPT_IF((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value))
+{
+   // 
+   // see PR #182
+   // Comba Multiplier - based on Paul Comba's
+   // Exponentiation cryptosystems on the IBM PC, 1990
+   //
+   int as                                                                                         = a.size(),
+       bs                                                                                         = b.size(),
+       rs                                                                                         = result.size();
+   typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_pointer pr = result.limbs();
+
+   double_limb_type carry    = 0,
+                    temp     = 0;
+   limb_type      overflow   = 0;
+   const unsigned limb_bits  = sizeof(limb_type) * CHAR_BIT;
+   const bool     must_throw = rs < as + bs - 1;
+   for (int r = 0, lim = (std::min)(rs, as + bs - 1); r < lim; ++r, overflow = 0)
+   {
+      int i = r >= as ? as - 1 : r,
+          j = r - i,
+          k = i < bs - j ? i + 1 : bs - j; // min(i+1, bs-j);
+
+      typename cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>::const_limb_pointer pa = a.limbs() + i;
+      typename cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>::const_limb_pointer pb = b.limbs() + j;
+
+      temp = carry;
+      carry += static_cast<double_limb_type>(*(pa)) * (*(pb));
+      overflow += carry < temp;
+      for (--k; k; k--)
+      {
+         temp = carry;
+         carry += static_cast<double_limb_type>(*(--pa)) * (*(++pb));
+         overflow += carry < temp;
+      }
+      *(pr++) = static_cast<limb_type>(carry);
+      carry   = (static_cast<double_limb_type>(overflow) << limb_bits) | (carry >> limb_bits);
+   }
+   if (carry || must_throw)
+   {
+      resize_for_carry(result, as + bs);
+      if ((int)result.size() >= as + bs)
+         *pr = static_cast<limb_type>(carry);
+   }
+   result.normalize();
+   result.sign(a.sign() != b.sign());
+}
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3, class Allocator3>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3> >::value>::type
 eval_multiply(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
@@ -400,6 +452,15 @@ eval_multiply(
    std::memset(pr, 0, result.size() * sizeof(limb_type));   
    double_limb_type carry = 0;
 
+#if defined(BOOST_MP_COMBA) || __GNUC__ >= 10
+       // 
+       // Comba Multiplier might not be efficient because of less efficient assembly
+       // by the compiler as of 09/01/2020 (DD/MM/YY). See PR #182
+       // Till then this will lay dormant :(
+       //
+       eval_multiply_comba(result, a, b);
+#else
+
    for (unsigned i = 0; i < as; ++i)
    {
       BOOST_ASSERT(result.size() > i);
@@ -440,6 +501,7 @@ eval_multiply(
    // Set the sign of the result:
    //
    result.sign(a.sign() != b.sign());
+#endif
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
