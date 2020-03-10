@@ -75,27 +75,48 @@ struct tommath_int
          detail::check_tommath_result(mp_copy(const_cast< ::mp_int*>(&o.m_data), &m_data));
       return *this;
    }
-#if defined(DIGIT_BIT) || !defined(ULLONG_MAX) || (ULLONG_MAX != 18446744073709551615uLL)
+#if defined(DIGIT_BIT)
+   // Pick off 32 bit chunks for mp_set_int:
    tommath_int& operator=(boost::ulong_long_type i)
    {
       if (m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
-#ifdef DIGIT_BIT
-      boost::ulong_long_type mask = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
-#else
-      boost::ulong_long_type mask = ((1uLL << 64) - 1);
-#endif
+      boost::ulong_long_type mask = ((1uLL << 32) - 1);
       unsigned shift = 0;
       ::mp_int t;
       detail::check_tommath_result(mp_init(&t));
       mp_zero(&m_data);
       while (i)
       {
-#ifdef DIGIT_BIT
          detail::check_tommath_result(mp_set_int(&t, static_cast<unsigned>(i & mask)));
-#else
+         if (shift)
+            detail::check_tommath_result(mp_mul_2d(&t, shift, &t));
+         detail::check_tommath_result((mp_add(&m_data, &t, &m_data)));
+         shift += 32;
+         i >>= 32;
+      }
+      mp_clear(&t);
+      return *this;
+   }
+#elif !defined(ULLONG_MAX) || (ULLONG_MAX != 18446744073709551615uLL)
+   // Pick off 64 bit chunks for mp_set_i64:
+   tommath_int& operator=(boost::ulong_long_type i)
+   {
+      if (m_data.dp == 0)
+         detail::check_tommath_result(mp_init(&m_data));
+      if(sizeof(boost::ulong_long_type) * CHAR_BIT == 64)
+      {
+         mp_set_u64(&m_data, i);
+         return *this;
+      }
+      boost::ulong_long_type mask = ((1uLL << 64) - 1);
+      unsigned shift = 0;
+      ::mp_int t;
+      detail::check_tommath_result(mp_init(&t));
+      mp_zero(&m_data);
+      while (i)
+      {
          detail::check_tommath_result(mp_set_i64(&t, static_cast<boost::uint64_t>(i & mask)));
-#endif
          if (shift)
             detail::check_tommath_result(mp_mul_2d(&t, shift, &t));
          detail::check_tommath_result((mp_add(&m_data, &t, &m_data)));
@@ -108,6 +129,8 @@ struct tommath_int
 #else
    tommath_int& operator=(boost::ulong_long_type i)
    {
+      if (m_data.dp == 0)
+         detail::check_tommath_result(mp_init(&m_data));
       mp_set_u64(&m_data, i);
       return *this;
    }
@@ -210,7 +233,7 @@ struct tommath_int
          if (term > 0)
          {
 #ifdef DIGIT_BIT
-            detail::check_tommath_result(mp_set_int(&t, static_cast<int>(term)));
+            detail::check_tommath_result(mp_set_int(&t, static_cast<part_type>(term)));
 #else
             mp_set_i64(&t, static_cast<part_type>(term));
 #endif
@@ -219,7 +242,7 @@ struct tommath_int
          else
          {
 #ifdef DIGIT_BIT
-            detail::check_tommath_result(mp_set_int(&t, static_cast<int>(-term)));
+            detail::check_tommath_result(mp_set_int(&t, static_cast<part_type>(-term)));
 #else
             mp_set_i64(&t, static_cast<part_type>(-term));
 #endif
