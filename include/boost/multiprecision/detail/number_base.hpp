@@ -22,6 +22,23 @@
 #pragma warning(pop)
 #endif
 
+#if defined(BOOST_NO_CXX11_RVALUE_REFERENCES) || defined(BOOST_NO_CXX11_TEMPLATE_ALIASES) || defined(BOOST_NO_CXX11_HDR_ARRAY)\
+      || defined(BOOST_NO_CXX11_ALLOCATOR) || defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX) || defined(BOOST_NO_CXX11_CONSTEXPR)\
+      || defined(BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS) || defined(BOOST_NO_CXX11_REF_QUALIFIERS) || defined(BOOST_NO_CXX11_HDR_FUNCTIONAL)\
+      || defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) || defined(BOOST_NO_CXX11_USER_DEFINED_LITERALS) || defined(BOOST_NO_CXX11_THREAD_LOCAL)\
+      || defined(BOOST_NO_CXX11_DECLTYPE) || defined(BOOST_NO_CXX11_STATIC_ASSERT) || defined(BOOST_NO_CXX11_DEFAULTED_FUNCTIONS)\
+      || defined(BOOST_NO_CXX11_NOEXCEPT) || defined(BOOST_NO_CXX11_REF_QUALIFIERS)
+//
+// The above list includes everything we use, plus a few we're likely to use soon.
+// As from March 2020, C++03 support is deprecated, and as from March 2021 will be removed,
+// so mark up as such:
+//
+#if defined(_MSC_VER) || defined(__GNUC__)
+#pragma message("CAUTION: One or more C++11 features were found to be unavailable")
+#pragma message("CAUTION: Compiling Boost.Multiprecision in non-C++11 or later conformance modes is now deprecated and will be removed from March 2021.")
+#endif
+#endif
+
 #if defined(NDEBUG) && !defined(_DEBUG)
 #define BOOST_MP_FORCEINLINE BOOST_FORCEINLINE
 #else
