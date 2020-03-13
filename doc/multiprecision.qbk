@@ -101,7 +101,7 @@
 [def __cpp_rational [link boost_multiprecision.tut.rational.cpp_rational cpp_rational]]
 [def __tommath_rational [link boost_multiprecision.tut.rational.tommath_rational tommath_rational]]
 [def __number [link boost_multiprecision.ref.number number]]
-[def __float128 [link boost_multiprecision.tut.floats.float128 float128]]
+[def __float128__ [link boost_multiprecision.tut.floats.float128 float128]]
 [def __cpp_complex [link boost_multiprecision.tut.complex.cpp_complex cpp_complex]]
 [def __mpc_complex [link boost_multiprecision.tut.complex.mpc_complex mpc_complex]]
 [def __debug_adaptor [link boost_multiprecision.tut.misc.debug_adaptor debug_adaptor]]
@@ -2054,7 +2054,7 @@ constexpr support, and for many operations C++2a support
 
 There are two backend types which are literals:
 
-* __float128 (which requires GCC), and
+* __float128__ (which requires GCC), and
 * Instantiations of `cpp_int_backend` where the Allocator parameter is type `void`.
 In addition, prior to C++14 the Checked parameter must be `boost::multiprecision::unchecked`.
 
@@ -2135,9 +2135,9 @@ Examples:
 [h4 constexpr arithmetic]
 
 The front end of the library is all `constexpr` from C++14 and later.  Currently there are only two
-back end types that are `constexpr` aware: __float128 and __cpp_int.  More backends will follow at a later date.
+back end types that are `constexpr` aware: __float128__ and __cpp_int.  More backends will follow at a later date.
 
-Provided the compiler is GCC, type __float128 support `constexpr` operations on all arithmetic operations from C++14, comparisons,
+Provided the compiler is GCC, type __float128__ support `constexpr` operations on all arithmetic operations from C++14, comparisons,
 `abs`, `fabs`, `fpclassify`, `isnan`, `isinf`, `isfinite` and `isnormal` are also fully supported, but the transcendental functions are not.
 
 The __cpp_int types support constexpr arithmetic, provided it is a fixed precision type with no allocator.  It may also
@@ -2478,7 +2478,7 @@ Support for serialization comes in two forms:
 
 * Classes __number, __debug_adaptor, __logged_adaptor and __rational_adaptor have "pass through" serialization
 support which requires the underlying backend to be serializable.
-* Backends __cpp_int, __cpp_bin_float, __cpp_dec_float and __float128 have full support for Boost.Serialization.
+* Backends __cpp_int, __cpp_bin_float, __cpp_dec_float and __float128__ have full support for Boost.Serialization.
 
 [endsect] [/section:serialization Boost Serialization]
 
@@ -5889,9 +5889,18 @@ operations.
 
 [section:hist History]
 
+[h4 Multiprecision-3.2.4 (Boost-1.73)]
+
+* IMPORTANT: Mark C++03 support as deprecated and due for removal in 2021.
+* Big update to __cpp_int adds faster Karatsuba and Coomba multiplication routines.
+* Fix conversion of __gmp_rational to `long double` and `__float128`, fixes [@https://github.com/boostorg/multiprecision/issues/178 #178].
+* Fix up libtommath support to function with the latest libtom releases.
+* Fix up some incompatibilities with the latest Intel C++ compiler.
+* Fix up `constexpr` arithmetic support for forthcoming MSVC release.
+
 [h4 Multiprecision-3.2.3 (Boost-1.72)]
 
-* Big `constexpr` update allows __cpp_int and __float128 arithmetic to be fully `constexpr` with gcc and clang 9 or later,
+* Big `constexpr` update allows __cpp_int and __float128__ arithmetic to be fully `constexpr` with gcc and clang 9 or later,
 or any compiler supporting `std::is_constant_evaluated()`.
 
 [h4 Multiprecision-3.1.3 (Boost-1.71)]
@@ -5974,7 +5983,7 @@ See [@https://svn.boost.org/trac/boost/ticket/13109 #13109].
 * Bring error handling into line with C99 Annex F.  See [@https://svn.boost.org/trac/boost/ticket/12581 #12581].
 * Fix bitwise export of trivial `cpp_int`'s, see [@https://svn.boost.org/trac/boost/ticket/12627 #12627].
 * Fix `ilogb` (and code that uses it) to consistently return the smallest value of the exponent type when the argument is zero, see [@https://svn.boost.org/trac/boost/ticket/12625 #12625].
-* Allow conversion from `__float128` to `cpp_bin_float`.
+* Allow conversion from `__float128__` to `cpp_bin_float`.
 * Fix bug in left shift of `cpp_int` which would result in bit-loss, see [@https://svn.boost.org/trac/boost/ticket/12790 #12790].
 * Fixed bugs in bounded but variable precision `cpp_int`'s caused by over-aggressive constexpr optimization, see [@https://svn.boost.org/trac/boost/ticket/12798 #12798].
 
