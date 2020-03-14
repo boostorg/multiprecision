@@ -128,6 +128,18 @@ int main()
    BOOST_TEST(iz == 2);
    iz = denominator(rat);
    BOOST_TEST(iz == 1);
+   //
+   // Conversion to floating point types
+   // see https://github.com/boostorg/multiprecision/issues/178
+   //
+   rat = 3;
+   rat /= 4;
+   BOOST_TEST(rat.convert_to<float>() == 0.75);
+   BOOST_TEST(rat.convert_to<double>() == 0.75);
+   BOOST_TEST(rat.convert_to<long double>() == 0.75);
+#ifdef BOOST_HAS_FLOAT128
+   BOOST_TEST(rat.convert_to<__float128>() == 0.75);
+#endif
 
    //
    // Conversions involving precision only,
