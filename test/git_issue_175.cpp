@@ -23,8 +23,9 @@ void check_type_is_number(const T&, U)
 
 int main()
 {
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    cpp_dec_float_50 a(1), b(2), c(3);
-
+   check_type_is_number(-cpp_dec_float_50(3), -3);
    check_type_is_number(a + cpp_dec_float_50(3), 4);
    check_type_is_number(a - cpp_dec_float_50(3), -2);
    check_type_is_number(a * cpp_dec_float_50(3), 3);
@@ -64,6 +65,6 @@ int main()
    check_type_is_number(pow(2, cpp_dec_float_50(2)), 4);
    check_type_is_number(pow(b, cpp_dec_float_50(2)), 4);
    check_type_is_number(pow(cpp_dec_float_50(2), cpp_dec_float_50(2)), 4);
-
+#endif
    return boost::report_errors();
 }
