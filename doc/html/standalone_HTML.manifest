@@ -22,6 +22,7 @@ boost_multiprecision/tut/floats/fp_eg/nd.html
 boost_multiprecision/tut/floats/fp_eg/gi.html
 boost_multiprecision/tut/floats/fp_eg/poly_eg.html
 boost_multiprecision/tut/floats/fp_eg/variable_precision.html
+boost_multiprecision/tut/floats/fp_eg/gauss_lagerre_quadrature.html
 boost_multiprecision/tut/interval.html
 boost_multiprecision/tut/interval/mpfi.html
 boost_multiprecision/tut/complex.html

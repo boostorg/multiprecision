@@ -463,6 +463,8 @@ namespace detail
 
 } } // namespace gauss::laguerre
 
+
+// A float_type is created to handle the desired number of decimal digits from `cpp_dec_float` without using __expression_templates.
 struct local
 {
   BOOST_STATIC_CONSTEXPR unsigned int my_digits10 = 101U;
@@ -480,9 +482,9 @@ int main()
   // Use Gauss-Laguerre quadrature integration to compute airy_ai(x / 7)
   // with 7 <= x <= 120 and where x is incremented in steps of 1.
 
-  // During development of this example, we have empirically found 
+  // During development of this example, we have empirically found
   // the numbers of Gauss-Laguerre coefficients needed for convergence
-  // when using varyious counts of base-10 digits.
+  // when using various counts of base-10 digits.
 
   // Let's calibrate, for instance, the number of coefficients needed
   // at the point x = 1.
@@ -505,7 +507,6 @@ int main()
   BOOST_CONSTEXPR_OR_CONST int laguerre_order = static_cast<int>(laguerre_order_factor * d);
 
   std::cout << "std::numeric_limits<local::float_type>::digits10: " << std::numeric_limits<local::float_type>::digits10 << std::endl;
-
   std::cout << "laguerre_order: " << laguerre_order << std::endl;
 
   typedef gauss::laguerre::detail::abscissas_and_weights<local::float_type> abscissas_and_weights_type;
@@ -562,9 +563,52 @@ int main()
     result_is_ok &= (delta < tol);
   }
 
-  std::cout << std::endl 
+  std::cout << std::endl
             << "Total... result_is_ok: "
             << std::boolalpha
             << result_is_ok
             << std::endl;
-}
+} // int main()
+
+/*
+
+
+Partial output:
+
+//[gauss_laguerre_quadrature_output_1
+
+std::numeric_limits<local::float_type>::digits10: 101
+laguerre_order: 2291
+
+Finding the approximate roots...
+root_estimates.size(): 1, 0.0%
+root_estimates.size(): 8, 0.3%
+root_estimates.size(): 16, 0.7%
+...
+root_estimates.size(): 2288, 99.9%
+root_estimates.size(): 2291, 100.0%
+
+
+Calculating abscissas and weights. Processed 1, 0.0%
+Calculating abscissas and weights. Processed 9, 0.4%
+...
+Calculating abscissas and weights. Processed 2289, 99.9%
+Calculating abscissas and weights. Processed 2291, 100.0%
+//] [/gauss_laguerre_quadrature_output_1]
+
+//[gauss_laguerre_quadrature_output_2
+
+airy_ai_value  : 0.13529241631288141552414742351546630617494414298833070600910205475763353480226572366348710990874867334
+airy_ai_control: 0.13529241631288141552414742351546630617494414298833070600910205475763353480226572366348710990874868323
+airy_ai_value  : 0.11392302126009621102904231059693500086750049240884734708541630001378825889924647699516200868335286103
+airy_ai_control: 0.1139230212600962110290423105969350008675004924088473470854163000137882588992464769951620086833528582
+...
+airy_ai_value  : 3.8990420982303275013276114626640705170145070824317976771461533035231088620152288641360519429331427451e-22
+airy_ai_control: 3.8990420982303275013276114626640705170145070824317976771461533035231088620152288641360519429331426481e-22
+
+Total... result_is_ok: true
+
+//] [/gauss_laguerre_quadrature_output_2]
+
+
+*/

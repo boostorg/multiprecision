@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
 <title>Drop-in Caveats</title>
 <link rel="stylesheet" href="../../../../multiprecision.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.77.1">
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
 <link rel="home" href="../../../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
 <link rel="up" href="../fp_eg.html" title="Examples">
 <link rel="prev" href="aos.html" title="Area of Circle">
@@ -168,14 +168,14 @@
 <p>
             To get as precise-as-possible decimal fractions like 1.234, we can write
           </p>
-<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">cpp_bin_float_50</span> <span class="identifier">f1</span><span class="special">(</span><span class="identifier">cpp_bin_float_50</span><span class="special">(</span><span class="number">1234</span><span class="special">)</span> <span class="special">/</span> <span class="number">100</span><span class="special">);</span>  <span class="comment">// Construct from a fraction.</span>
-<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"cpp_bin_float_50 f1(cpp_bin_float_50(1234) / 100) = "</span> <span class="special">&lt;&lt;</span> <span class="identifier">f1</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span> <span class="comment">// 12.340000000000000000000000000000000000000000000000</span>
+<pre class="programlisting"><span class="keyword">const</span> <span class="identifier">cpp_bin_float_50</span> <span class="identifier">f1</span><span class="special">(</span><span class="identifier">cpp_bin_float_50</span><span class="special">(</span><span class="number">1234</span><span class="special">)</span> <span class="special">/</span> <span class="number">1000</span><span class="special">);</span>  <span class="comment">// Construct from a fraction.</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"cpp_bin_float_50 f1(cpp_bin_float_50(1234) / 1000) = "</span> <span class="special">&lt;&lt;</span> <span class="identifier">f1</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span> <span class="comment">// cpp_bin_float_50 f1(cpp_bin_float_50(1234) / 1000) = 1.2340000000000000000000000000000000000000000000000</span>
 </pre>
 <p>
             or
           </p>
 <pre class="programlisting"><span class="keyword">const</span> <span class="identifier">cpp_bin_float_50</span> <span class="identifier">f2</span><span class="special">(</span><span class="string">"1.234"</span><span class="special">);</span>  <span class="comment">// Construct from decimal digit string.</span>
-<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"cpp_bin_float_50 f2(\"1.234\") = "</span> <span class="special">&lt;&lt;</span> <span class="identifier">f2</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span> <span class="comment">// 12.340000000000000000000000000000000000000000000000</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"cpp_bin_float_50 f2(\"1.234\") = "</span> <span class="special">&lt;&lt;</span> <span class="identifier">f2</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span> <span class="comment">// cpp_bin_float_50 f2("1.234") = 1.2340000000000000000000000000000000000000000000000</span>
 </pre>
 <p>
             that are different from constructing from a <code class="computeroutput"><span class="keyword">double</span></code>

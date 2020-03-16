@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
 <title>float128</title>
 <link rel="stylesheet" href="../../../multiprecision.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.77.1">
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
 <link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
 <link rel="up" href="../floats.html" title="Floating-point Types">
 <link rel="prev" href="mpfr_float.html" title="mpfr_float">
@@ -49,7 +49,7 @@
           All the usual standard library and <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span></code>
           support are available, performance should be equivalent to the underlying
           native types: for example the LINPACK benchmarks for GCC's <code class="computeroutput"><a class="link" href="float128.html" title="float128">float128</a></code>
-          and <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">float128</span></code> both achieved 5.6 MFLOPS<a href="#ftn.boost_multiprecision.tut.floats.float128.f0" class="footnote"><sup class="footnote"><a name="boost_multiprecision.tut.floats.float128.f0"></a>[3]</sup></a>.
+          and <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">multiprecision</span><span class="special">::</span><span class="identifier">float128</span></code> both achieved 5.6 MFLOPS<a href="#ftn.boost_multiprecision.tut.floats.float128.f0" class="footnote" name="boost_multiprecision.tut.floats.float128.f0"><sup class="footnote">[3]</sup></a>.
         </p>
 <p>
           As well as the usual conversions from arithmetic and string types, instances
@@ -199,7 +199,10 @@
           with the Q suffix, and these can be declared <code class="computeroutput"><span class="keyword">constexpr</span></code>
           if required:
         </p>
-<pre class="programlisting"><span class="keyword">constexpr</span> <span class="identifier">float128</span> <span class="identifier">pi</span> <span class="special">=</span> <span class="number">3.14159265358979323846264338327950</span><span class="identifier">Q</span><span class="special">;</span>
+<pre class="programlisting"><span class="comment">// std::numeric_limits&lt;float128&gt;::max_digits10 = 36</span>
+<span class="keyword">constexpr</span> <span class="identifier">float128</span> <span class="identifier">pi</span> <span class="special">=</span> <span class="number">3.14159265358979323846264338327950288</span><span class="identifier">Q</span><span class="special">;</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span><span class="special">.</span><span class="identifier">precision</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">float128</span><span class="special">&gt;::</span><span class="identifier">max_digits10</span><span class="special">);</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"pi = "</span> <span class="special">&lt;&lt;</span> <span class="identifier">pi</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span> <span class="comment">//pi = 3.14159265358979323846264338327950280</span>
 </pre>
 <p>
           Values for <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">float128</span><span class="special">&gt;</span></code>
@@ -242,7 +245,7 @@
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">::&lt;&gt;</span><span class="identifier">infinity</span> <span class="special">=</span> <span class="identifier">inf</span>
 </pre>
 <div class="footnotes">
-<br><hr style="width:100; align:left;">
+<br><hr style="width:100; text-align:left;margin-left: 0">
 <div id="ftn.boost_multiprecision.tut.floats.float128.f0" class="footnote"><p><a href="#boost_multiprecision.tut.floats.float128.f0" class="para"><sup class="para">[3] </sup></a>
             On 64-bit Ubuntu 11.10, GCC-4.8.0, Intel Core 2 Duo T5800.
           </p></div>

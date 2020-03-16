@@ -137,8 +137,8 @@ which is different from the 'better' `cpp_bin_float_50` representation of the fr
 //[big_seventh_example_4
    /*`For some purposes, this difference in precision may be insignificant,
 but if one is implementing a formula involving a fraction from integers,
-including decimal fractions like 1/10, 1/100, then comparison with other computations like __WolframAlpha 
-will reveal differences whose cause may be perplexing. 
+including decimal fractions like 1/10, 1/100, then comparison with other computations like __WolframAlpha
+will reveal differences whose cause may be perplexing.
 
 To get as precise-as-possible decimal fractions like 1.234, we can write
 */
@@ -154,7 +154,7 @@ To get as precise-as-possible decimal fractions like 1.234, we can write
 */
   const cpp_bin_float_50 f3(cpp_bin_float_50(1.234));
   std::cout << "cpp_bin_float_50 f3(cpp_bin_float_50(1.234)) = " << f3 << std::endl; // 1.2339999999999999857891452847979962825775146484375
-   
+
 //]  [/big_seventh_example_4]
 
     return 0;
@@ -175,7 +175,7 @@ cpp_bin_float_50 f1(cpp_bin_float_50(1234) / 100) = 12.3400000000000000000000000
 cpp_bin_float_50 f2("1.234") = 1.2340000000000000000000000000000000000000000000000
 cpp_bin_float_50 f3(cpp_bin_float_50(1.234)) = 1.2339999999999999857891452847979962825775146484375
 
-//] //[big_seventh_example_output]
+//] //[/big_seventh_example_output]
 
 */
 
