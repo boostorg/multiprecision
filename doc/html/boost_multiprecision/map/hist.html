@@ -230,15 +230,16 @@
             the low order N bits of a value, then you will need to mask these out
             prior to the case, for example: <code class="computeroutput"><span class="keyword">static_cast</span><span class="special">&lt;</span><span class="keyword">unsigned</span><span class="special">&gt;(~</span><span class="keyword">static_cast</span><span class="special">&lt;</span><span class="keyword">unsigned</span><span class="special">&gt;(</span><span class="number">0</span><span class="special">)</span> <span class="special">&amp;</span> <span class="identifier">my_value</span><span class="special">)</span></code>.
             Note that technically (to avoid undefined behaviour) you should do the
-            same thing with built in integer types too. See <a href="https://svn.boost.org/trac/boost/ticket/13109" target="_top">#13109</a>.
+            same thing with <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+            (built-in)</a> integer types too. See <a href="https://svn.boost.org/trac/boost/ticket/13109" target="_top">#13109</a>.
           </li>
 <li class="listitem">
             Fix bug in conversion of decimal to rational types (zero needs special
             handling), see <a href="https://svn.boost.org/trac/boost/ticket/13148" target="_top">#13148</a>.
           </li>
 <li class="listitem">
-            Fix conversion from cpp_bin_float to a wider built in integer type, see
-            <a href="https://svn.boost.org/trac/boost/ticket/13301" target="_top">#13301</a>.
+            Fix conversion from cpp_bin_float to a wider <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+            (built-in)</a> integer type, see <a href="https://svn.boost.org/trac/boost/ticket/13301" target="_top">#13301</a>.
           </li>
 <li class="listitem">
             Improve performance heurists used in cpp_bin_float exp function.
@@ -476,13 +477,13 @@
             to avoid double-rounding bug, see <a href="https://svn.boost.org/trac/boost/ticket/12039" target="_top">#12039</a>.
           </li>
 <li class="listitem">
-            Fixed conversions from NaN's and Infinities, see <a href="https://svn.boost.org/trac/boost/ticket/12112" target="_top">#12112</a>.
+            Fixed conversions from NaNs and Infinities, see <a href="https://svn.boost.org/trac/boost/ticket/12112" target="_top">#12112</a>.
           </li>
 <li class="listitem">
             Enabled better support for Clang on Windows.
           </li>
 <li class="listitem">
-            Fixed handling of NaN's and Infinities in basic arithmetic for cpp_dec_float
+            Fixed handling of NaNs and Infinities in basic arithmetic for cpp_dec_float
             and cpp_bin_float, see <a href="https://svn.boost.org/trac/boost/ticket/12090" target="_top">#12090</a>.
           </li>
 <li class="listitem">
@@ -550,9 +551,10 @@
             updated random examples to match.
           </li>
 <li class="listitem">
-            Fixed a bug in cpp_int's right shift operator when shifting negative
-            values - semantics now gives the same values as shifting 2's compliment
-            integers, though not the same bit pattern.
+            Fixed a bug in <code class="computeroutput"><span class="identifier">cpp_int</span></code>
+            right shift operator when shifting negative values - semantics now gives
+            the same values as shifting 2's compliment integers, though not the same
+            bit pattern.
           </li>
 <li class="listitem">
             Fixed support for GCC-4.6.4 in C++0x mode by disabling conditional noexcept
@@ -811,7 +813,8 @@
             yielding a higher precision result than either of the arguments.
           </li>
 <li class="listitem">
-            Added overloads of integer-specific functions for built in integer types.
+            Added overloads of integer-specific functions for <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+            (built-in)</a> integer types.
           </li>
 </ul></div>
 <h5>
@@ -821,7 +824,7 @@
       </h5>
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
 <li class="listitem">
-            2011-2012, John Maddock adds an expression template enabled front end
+            2011-2012, John Maddock adds an expression template enabled front-end
             to Christopher's code, and adds support for other backends.
           </li>
 <li class="listitem">

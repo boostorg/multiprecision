@@ -12,21 +12,20 @@
 
 // In this way, the integral representation could be seen
 // as part of a scheme to calculate real-valued Airy functions
-// on the real axis for medium to large argument, whereby
-// a Taylor series or hypergeometric function could be used
-// for smaller arguments.
+// on the positive axis for medium to large argument.
+// A Taylor series or hypergeometric function (not part
+// of this example) could be used for smaller arguments.
 
 // This example has been tested with decimal digits counts
-// ranging from 21...201, via the parameter local::my_digits10.
+// ranging from 21...301, by adjusting the parameter
+// local::my_digits10 at compile time.
 
-// The quadrature integral representaion of airy_ai(x) used in
-// this example can be found in:
+// The quadrature integral representaion of airy_ai(x) used
+// in this example can be found in:
 
 // A. Gil, J. Segura, N.M. Temme, "Numerical Methods for Special
 // Functions" (SIAM Press 2007), Sect. 5.3.3, in particular Eq. 5.110,
-// page 145.
-
-// This book cites the another work:
+// page 145. Subsequently, Gil et al's book cites the another work:
 // W. Gautschi, "Computation of Bessel and Airy functions and of
 // related Gaussian quadrature formulae", BIT, 42 (2002), pp. 110-118.
 
@@ -464,6 +463,8 @@ namespace detail
 
 } } // namespace gauss::laguerre
 
+
+// A float_type is created to handle the desired number of decimal digits from `cpp_dec_float` without using __expression_templates.
 struct local
 {
   BOOST_STATIC_CONSTEXPR unsigned int my_digits10 = 101U;
@@ -478,11 +479,16 @@ BOOST_STATIC_ASSERT_MSG(local::my_digits10 > 20U,
 
 int main()
 {
-  // Use Gauss-Laguerre integration to compute airy_ai(120 / 7).
-  // We empirically find factors to relate the number of Gauss-Laguerre
-  // coefficients needed for convergence when using varying base-10 digits.
+  // Use Gauss-Laguerre quadrature integration to compute airy_ai(x / 7)
+  // with 7 <= x <= 120 and where x is incremented in steps of 1.
 
-  // Calibrate the number of coefficients needed at the point x = 1.
+  // During development of this example, we have empirically found
+  // the numbers of Gauss-Laguerre coefficients needed for convergence
+  // when using various counts of base-10 digits.
+
+  // Let's calibrate, for instance, the number of coefficients needed
+  // at the point x = 1.
+
   // Empirical data lead to:
   // Fit[{{21.0, 3.5}, {51.0, 11.1}, {101.0, 22.5}, {201.0, 46.8}}, {1, d, d^2}, d]
   // FullSimplify[%]
@@ -501,7 +507,6 @@ int main()
   BOOST_CONSTEXPR_OR_CONST int laguerre_order = static_cast<int>(laguerre_order_factor * d);
 
   std::cout << "std::numeric_limits<local::float_type>::digits10: " << std::numeric_limits<local::float_type>::digits10 << std::endl;
-
   std::cout << "laguerre_order: " << laguerre_order << std::endl;
 
   typedef gauss::laguerre::detail::abscissas_and_weights<local::float_type> abscissas_and_weights_type;
@@ -525,7 +530,7 @@ int main()
                          local::float_type(0U),
                          std::plus<local::float_type>(),
                          [&the_airy_ai_object](const local::float_type& this_abscissa,
-                                               const local::float_type& this_weight) BOOST_NOEXCEPT -> local::float_type
+                                               const local::float_type& this_weight) -> local::float_type
                          {
                            return the_airy_ai_object(this_abscissa) * this_weight;
                          });
@@ -558,9 +563,52 @@ int main()
     result_is_ok &= (delta < tol);
   }
 
-  std::cout << std::endl 
+  std::cout << std::endl
             << "Total... result_is_ok: "
             << std::boolalpha
             << result_is_ok
             << std::endl;
-}
+} // int main()
+
+/*
+
+
+Partial output:
+
+//[gauss_laguerre_quadrature_output_1
+
+std::numeric_limits<local::float_type>::digits10: 101
+laguerre_order: 2291
+
+Finding the approximate roots...
+root_estimates.size(): 1, 0.0%
+root_estimates.size(): 8, 0.3%
+root_estimates.size(): 16, 0.7%
+...
+root_estimates.size(): 2288, 99.9%
+root_estimates.size(): 2291, 100.0%
+
+
+Calculating abscissas and weights. Processed 1, 0.0%
+Calculating abscissas and weights. Processed 9, 0.4%
+...
+Calculating abscissas and weights. Processed 2289, 99.9%
+Calculating abscissas and weights. Processed 2291, 100.0%
+//] [/gauss_laguerre_quadrature_output_1]
+
+//[gauss_laguerre_quadrature_output_2
+
+airy_ai_value  : 0.13529241631288141552414742351546630617494414298833070600910205475763353480226572366348710990874867334
+airy_ai_control: 0.13529241631288141552414742351546630617494414298833070600910205475763353480226572366348710990874868323
+airy_ai_value  : 0.11392302126009621102904231059693500086750049240884734708541630001378825889924647699516200868335286103
+airy_ai_control: 0.1139230212600962110290423105969350008675004924088473470854163000137882588992464769951620086833528582
+...
+airy_ai_value  : 3.8990420982303275013276114626640705170145070824317976771461533035231088620152288641360519429331427451e-22
+airy_ai_control: 3.8990420982303275013276114626640705170145070824317976771461533035231088620152288641360519429331426481e-22
+
+Total... result_is_ok: true
+
+//] [/gauss_laguerre_quadrature_output_2]
+
+
+*/
