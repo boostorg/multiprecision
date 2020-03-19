@@ -30,7 +30,7 @@ local tommath_path = [ modules.peek : TOMMATH_PATH ] ;
 #        concepts
 #        examples
 #        
-#        You can run an individual suite by passing it's name to b2 on the command line.
+#        You can run an individual suite by passing its name to b2 on the command line.
 #        Or you can run all except the "specfun" tests (which are very slow) by not specifying anything.
 #
 #        Please make sure that any new tests are added to one of the test suites, and that the
@@ -58,8 +58,11 @@ project : requirements
    <toolset>msvc:<cxxflags>/fp\:precise
    <toolset>intel-win:<runtime-link>static
    <toolset>intel-win:<link>static
-   <toolset>clang-win:<link>static
-   
+   <toolset>clang-win:<link>static  # Clang-win does not generate .dlls.
+   <toolset>clang:<link>static # Clang-linux does not generate .dlls.
+   <toolset>clang:<cxxflags>-Wno-unused-variable  # warning: unused variable 'tolerance' [-Wunused-variable]
+   <toolset>clang:<cxxflags>-v
+  
    # Assembler error "File too big" caused by lots of C++ templates, for example, math/floating_point_examples.cpp.
    # Some projects on some toolsets may require
    #   <toolset>gcc-mingw:<cxxflags>\"-Wa,-mbig-obj\"
@@ -331,7 +334,6 @@ test-suite functions_and_limits :
               <define>TEST_MPFI_50
                [ check-target-builds ../config//has_mpfi : : <build>no ]
               : test_numeric_limits_mpfi_50 ]
-
 
       [ run test_numeric_limits.cpp quadmath no_eh_support
               : # command line
