@@ -1204,11 +1204,11 @@ This example has been tested with decimal digits counts ranging from 21...301, b
 The quadrature integral representaion of `airy_ai(x)` used in this example can be found in:
 
 A. Gil, J. Segura, N.M. Temme, "Numerical Methods for Special Functions"
-(SIAM Press 2007), Sect. 5.3.3, in particular Eq. 5.110, page 145.
+(SIAM Press 2007), ISBN 9780898717822, Sect. 5.3.3, in particular Eq. 5.110, page 145.
 
 Subsequently, Gil et al's book cites the another work:
 W. Gautschi, "Computation of Bessel and Airy functions and of related Gaussian quadrature formulae",
-BIT, 42 (2002), pp. 110-118, that is available here
+BIT, 42 (2002), pp. 110-118, [@https://doi.org/10.1023/A:1021974203359] that is also available as
 [@https://www.cs.purdue.edu/homes/wxg/selected_works/section_02/169.pdf Gautschi_169.pdf].
 
 This Gauss-Laguerre quadrature is designed for `airy_ai(x)` with real-valued `x >= 1`.
