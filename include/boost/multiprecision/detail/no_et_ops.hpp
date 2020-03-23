@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2012 John Maddock. Distributed under the Boost
 //  Copyright (c) 2019 Nil Foundation AG
-//  Copyright (c) 2019 Mikhail Komarov <nemo@nilfoundation.org>
+//  Copyright (c) 2019 Mikhail Komarov <nemo@nil.foundation>
 //  Copyright (c) 2019 Alexey Moskvin
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
