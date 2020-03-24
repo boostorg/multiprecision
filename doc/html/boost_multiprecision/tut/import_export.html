@@ -30,7 +30,7 @@
 </h3></div></div></div>
 <p>
         Any integer number type that uses <code class="computeroutput"><span class="identifier">cpp_int_backend</span></code>
-        as it's implementation layer can import or export its bits via two non-member
+        as its implementation layer can import or export its bits via two non-member
         functions:
       </p>
 <pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">unsigned</span> <span class="identifier">MinBits</span><span class="special">,</span> <span class="keyword">unsigned</span> <span class="identifier">MaxBits</span><span class="special">,</span> <span class="identifier">cpp_integer_type</span> <span class="identifier">SignType</span><span class="special">,</span> <span class="identifier">cpp_int_check_type</span> <span class="identifier">Checked</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">Allocator</span><span class="special">,</span>
@@ -173,7 +173,7 @@
 <span class="special">}</span>
 </pre>
 <p>
-        Importing or exporting cpp_bin_float is similar, but we must procede via
+        Importing or exporting cpp_bin_float is similar, but we must proceed via
         an intermediate integer:
       </p>
 <pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">cpp_bin_float</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
@@ -195,7 +195,7 @@
    <span class="identifier">export_bits</span><span class="special">(</span><span class="identifier">cpp_int</span><span class="special">(</span><span class="identifier">f</span><span class="special">.</span><span class="identifier">backend</span><span class="special">().</span><span class="identifier">bits</span><span class="special">()),</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">back_inserter</span><span class="special">(</span><span class="identifier">v</span><span class="special">),</span> <span class="number">8</span><span class="special">);</span>
    <span class="comment">// Grab the exponent as well:</span>
    <span class="keyword">int</span> <span class="identifier">e</span> <span class="special">=</span> <span class="identifier">f</span><span class="special">.</span><span class="identifier">backend</span><span class="special">().</span><span class="identifier">exponent</span><span class="special">();</span>
-   <span class="comment">// Import back again, and check for equality, we have to procede via</span>
+   <span class="comment">// Import back again, and check for equality, we have to proceed via</span>
    <span class="comment">// an intermediate integer:</span>
    <span class="identifier">cpp_int</span> <span class="identifier">i</span><span class="special">;</span>
    <span class="identifier">import_bits</span><span class="special">(</span><span class="identifier">i</span><span class="special">,</span> <span class="identifier">v</span><span class="special">.</span><span class="identifier">begin</span><span class="special">(),</span> <span class="identifier">v</span><span class="special">.</span><span class="identifier">end</span><span class="special">());</span>
@@ -207,8 +207,8 @@
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2019 John Maddock
-      and Christopher Kormanyos<p>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2020 John
+      Maddock and Christopher Kormanyos<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

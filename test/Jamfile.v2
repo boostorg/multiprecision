@@ -30,7 +30,7 @@ local tommath_path = [ modules.peek : TOMMATH_PATH ] ;
 #        concepts
 #        examples
 #        
-#        You can run an individual suite by passing it's name to b2 on the command line.
+#        You can run an individual suite by passing its name to b2 on the command line.
 #        Or you can run all except the "specfun" tests (which are very slow) by not specifying anything.
 #
 #        Please make sure that any new tests are added to one of the test suites, and that the
@@ -58,8 +58,11 @@ project : requirements
    <toolset>msvc:<cxxflags>/fp\:precise
    <toolset>intel-win:<runtime-link>static
    <toolset>intel-win:<link>static
-   <toolset>clang-win:<link>static
-   
+   <toolset>clang-win:<link>static  # Clang-win does not generate .dlls.
+   <toolset>clang:<link>static # Clang-linux does not generate .dlls.
+   <toolset>clang:<cxxflags>-Wno-unused-variable  # warning: unused variable 'tolerance' [-Wunused-variable]
+   <toolset>clang:<cxxflags>-v
+  
    # Assembler error "File too big" caused by lots of C++ templates, for example, math/floating_point_examples.cpp.
    # Some projects on some toolsets may require
    #   <toolset>gcc-mingw:<cxxflags>\"-Wa,-mbig-obj\"
@@ -73,7 +76,7 @@ project : requirements
    <toolset>intel:<debug-symbols>off
    <toolset>gcc:<cxxflags>-Wall
    <toolset>gcc:<cxxflags>-Wextra
-   <toolset>intel:<define>SLOW_COMPILER
+   #<toolset>intel:<define>SLOW_COMPILER
    <toolset>msvc,<optimization>off:<cxxflags>-RTC1
    # We can't yet enable this - it breaks the STL in some tests...
    #<toolset>msvc,<optimization>off:<cxxflags>-RTCc
@@ -91,7 +94,7 @@ lib mpc ;
 
 if $(tommath_path)
 {
-   lib tommath : [ GLOB $(tommath_path) : *.c ] ;
+   lib tommath : [ GLOB $(tommath_path) : *.c ] : <visibility>global ;
    TOMMATH = tommath ;
 }
 else
@@ -105,6 +108,7 @@ lib no_eh_support : no_eh_test_support.cpp ;
 test-suite arithmetic_tests :
 
    [ run test_arithmetic_backend_concept.cpp no_eh_support ]
+   [ compile test_arithmetic_skeleton.cpp ]
 
    [ run test_arithmetic_cpp_dec_float_1.cpp no_eh_support ]
    [ run test_arithmetic_cpp_dec_float_2.cpp no_eh_support ]
@@ -330,7 +334,6 @@ test-suite functions_and_limits :
               <define>TEST_MPFI_50
                [ check-target-builds ../config//has_mpfi : : <build>no ]
               : test_numeric_limits_mpfi_50 ]
-
 
       [ run test_numeric_limits.cpp quadmath no_eh_support
               : # command line
@@ -741,6 +744,53 @@ test-suite cpp_int_tests :
             : test_cpp_int_5
             ]
 
+      [ run test_cpp_int.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST6
+            : test_cpp_int_6
+            ]
+
+      [ run test_cpp_int_karatsuba.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST=1
+            : test_cpp_int_karatsuba_1
+            ]
+      [ run test_cpp_int_karatsuba.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST=2
+            : test_cpp_int_karatsuba_2
+            ]
+      [ run test_cpp_int_karatsuba.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST=3
+            : test_cpp_int_karatsuba_3
+            ]
+      [ run test_cpp_int_karatsuba.cpp gmp no_eh_support
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            release  # otherwise    [ runtime is too slow!!
+            <define>TEST=4
+            : test_cpp_int_karatsuba_4
+            ]
+
       [ run test_checked_cpp_int.cpp no_eh_support ]
       [ run test_unchecked_cpp_int.cpp no_eh_support : : : release ]
 
@@ -961,6 +1011,7 @@ test-suite misc :
       [ compile bug11922.cpp ]
       [ run bug12039.cpp no_eh_support ]
       [ compile git_issue_30.cpp ]
+      [ run git_issue_167.cpp ]
       [ compile git_issue_98.cpp : 
          [ check-target-builds ../config//has_float128 : <define>TEST_FLOAT128 <source>quadmath : ]
          [ check-target-builds ../config//has_gmp : <define>TEST_GMP <source>gmp : ]
@@ -1238,3 +1289,4 @@ rule get_concept_checks
 test-suite concepts : [ get_concept_checks ] ;
 
 test-suite examples : ../example//examples ;
+test-suite performance : ../performance//performance ;

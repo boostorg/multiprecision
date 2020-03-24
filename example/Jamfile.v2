@@ -1,13 +1,13 @@
-# \libs\math\example\jamfile.v2
+# \libs\multiprecision\example\jamfile.v2
 # Runs multiprecision examples.
 # Copyright 2014 John Maddock
 # Copyright Paul A. Bristow 2014.
-# Copyright Christpher Kormanyos 2014
+# Copyright Christopher Kormanyos 2014
 
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# bring in the rules for testing
+# Bring in the rules for testing.
 import testing ;
 import modules ;
 import path ;
@@ -60,6 +60,8 @@ project
       <toolset>msvc:<cxxflags>/wd4701
       <toolset>msvc:<cxxflags>/wd4127
       <toolset>msvc:<cxxflags>/wd4305
+      <toolset>clang:<link>static
+     
     ;
 
 lib gmp : : <search>$(gmp_path) ;
@@ -69,7 +71,7 @@ lib quadmath ;
 
 if $(tommath_path)
 {
-   lib tommath : [ GLOB $(tommath_path) : *.c ] ;
+   lib tommath : [ GLOB $(tommath_path) : *.c ] : <visibility>global ;
    TOMMATH = tommath ;
 }
 else
@@ -108,5 +110,7 @@ test-suite examples :
       [ run mpfr_snips.cpp mpfr gmp no_eh_eg_support : : : [ check-target-builds ../config//has_mpfr : : <build>no ] ]
       [ run tommath_snips.cpp $(TOMMATH) no_eh_eg_support : : : [ check-target-builds ../config//has_tommath : : <build>no ] ]
       [ compile constexpr_float_arithmetic_examples.cpp : [ requires cxx14_constexpr cxx17_if_constexpr ] ]
+      
+      [ run big_seventh.cpp no_eh_eg_support ]
 
 ;
