@@ -6005,8 +6005,6 @@ operations.
 
 [section:map Roadmap]
 
-* Support for atomic loads and stores is not currently supported, but will become more important as a larger number of floating point algorithms become parallelized.
-
 [section:hist History]
 
 [h4 Multiprecision-3.2.4 (Boost-1.73)]
