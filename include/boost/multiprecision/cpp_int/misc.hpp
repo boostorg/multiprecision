@@ -12,6 +12,7 @@
 #include <boost/multiprecision/detail/bitscan.hpp> // lsb etc
 #include <boost/integer/common_factor_rt.hpp>      // gcd/lcm
 #include <boost/functional/hash_fwd.hpp>
+#include <numeric> // std::gcd
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -393,16 +394,45 @@ inline BOOST_MP_CXX14_CONSTEXPR double_limb_type integer_gcd_reduce(double_limb_
    return u;
 }
 
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_type eval_gcd(limb_type u, limb_type v)
+{
+	if (!u || !v)
+		return u | v;
+#if __cpp_lib_gcd_lcm >= 201606L
+   return std::gcd(u, v);
+#endif
+   unsigned shift = boost::multiprecision::detail::find_lsb(u | v);
+   u >>= boost::multiprecision::detail::find_lsb(u);
+   do
+   {
+	  v >>= boost::multiprecision::detail::find_lsb(v);
+	  if (u > v)
+		 std_constexpr::swap(u, v);
+	  v -= u;
+   } while (v);
+   return u << shift;
+}
+
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
 eval_gcd(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
     const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a,
-    limb_type                                                                   v)
+    limb_type                                                                   b)
 {
-	default_ops::eval_modulus(result, a, v);
-	*result.limbs() = integer_gcd_reduce(v, *result.limbs());
-	if(eval_get_sign(a) < 0) result.negate();
+   int                                                                  s = eval_get_sign(a);
+   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> temp(a);
+   if (s < 0)
+	  temp.negate();
+   if (!b || !s)
+   {
+	  *temp.limbs() |= b;
+	  result = temp;
+	  return;
+   }
+   default_ops::eval_modulus(result, temp, b);
+   limb_type& res = *result.limbs();
+   res = eval_gcd(res, b);
 }
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, class Integer>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_unsigned<Integer>::value && (sizeof(Integer) <= sizeof(limb_type)) && !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
