@@ -400,62 +400,9 @@ eval_gcd(
     const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a,
     limb_type                                                                   v)
 {
-   using default_ops::eval_get_sign;
-   using default_ops::eval_is_zero;
-   using default_ops::eval_lsb;
-
-   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> u(a);
-
-   int s = eval_get_sign(u);
-
-   /* GCD(0,x) := x */
-   if (s < 0)
-   {
-      u.negate();
-   }
-   else if (s == 0)
-   {
-      result = v;
-      return;
-   }
-   if (v == 0)
-   {
-      result = u;
-      return;
-   }
-
-   /* Let shift := lg K, where K is the greatest power of 2
-   dividing both u and v. */
-
-   unsigned us = eval_lsb(u);
-   unsigned vs = boost::multiprecision::detail::find_lsb(v);
-   int shift   = (std::min)(us, vs);
-   eval_right_shift(u, us);
-   if (vs)
-      v >>= vs;
-
-   do
-   {
-      /* Now u and v are both odd, so diff(u, v) is even.
-      Let u = min(u, v), v = diff(u, v)/2. */
-      if (u.size() <= 2)
-      {
-         if (u.size() == 1)
-            v = integer_gcd_reduce(*u.limbs(), v);
-         else
-         {
-            double_limb_type i = u.limbs()[0] | (static_cast<double_limb_type>(u.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
-            v = static_cast<limb_type>(integer_gcd_reduce(i, static_cast<double_limb_type>(v)));
-         }
-         break;
-      }
-      eval_subtract(u, v);
-      us = eval_lsb(u);
-      eval_right_shift(u, us);
-   } while (true);
-
-   result = v;
-   eval_left_shift(result, shift);
+	default_ops::eval_modulus(result, a, v);
+	*result.limbs() = integer_gcd_reduce(v, *result.limbs());
+	if(eval_get_sign(a) < 0) result.negate();
 }
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, class Integer>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_unsigned<Integer>::value && (sizeof(Integer) <= sizeof(limb_type)) && !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
