@@ -61,15 +61,26 @@ boostbook standalone
         <format>pdf:<xsl:param>paper.type=A4
         # Yes, we want graphics for admonishments:
         <xsl:param>admon.graphics=1
-        # Set this one for PDF generation *only*:
-        # default pnd graphics are awful in PDF form,
-        # better use SVG's instead:
+        # Set these for PDF generation *only*:
+        # default PNG graphics are awful in PDF form,
+        # better use SVGs instead:
         <format>pdf:<xsl:param>admon.graphics.extension=".svg"
         <format>pdf:<xsl:param>use.role.for.mediaobject=1 
         <format>pdf:<xsl:param>preferred.mediaobject.role=print
         <format>pdf:<xsl:param>img.src.path=$(images_location)/
         <format>pdf:<xsl:param>draft.mode="no"
+        # This is copied from math but doesn't look right for here?
         <format>pdf:<xsl:param>boost.url.prefix=http\://www.boost.org/doc/libs/release/libs/math/doc/sf_and_dist/html
+
+# Experimental - use SVG for html to improve image quality.
+#  .SVG files are roughly twice the .png size and so a bit gross.
+# This also changes the admonitions icons.
+#       <format>html:<xsl:param>admon.graphics.extension=".svg"
+        <format>html:<xsl:param>use.role.for.mediaobject=1 
+        <format>html:<xsl:param>preferred.mediaobject.role=print
+     #   <format>html:<xsl:param>img.src.path=$(images_location)/ isn't right for html.
+        <format>html:<xsl:param>draft.mode="no"
+        <format>html:<xsl:param>boost.url.prefix=http\://www.boost.org/doc/libs/release/libs/multiprecision/doc/html
         
         # Index generation:
         <auto-index>on
