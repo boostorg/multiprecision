@@ -260,6 +260,8 @@ struct gmp_float_imp
    {
       if (m_data[0]._mp_d == 0)
          mpf_init2(m_data, multiprecision::detail::digits10_2_2(digits10 ? digits10 : get_default_precision()));
+      if (s && (*s == '+'))
+         ++s;  // Leading "+" sign not supported by mpf_set_str:
       if (0 != mpf_set_str(m_data, s, 10))
          BOOST_THROW_EXCEPTION(std::runtime_error(std::string("The string \"") + s + std::string("\"could not be interpreted as a valid floating point number.")));
       return *this;
