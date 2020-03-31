@@ -52,6 +52,10 @@ struct test_my_matrix_vector
          std::cout << "prod (m1, v1) = " << v2 << std::endl;
          v2 = ublas::prod(v1, m1);
          std::cout << "prod (v1, m1) = " << v2 << std::endl;
+#else
+      (void)v1;  // warning suppression
+      (void)v2;  // warning suppression
+      (void)m1;  // warning suppression
 #endif
       }
    }
