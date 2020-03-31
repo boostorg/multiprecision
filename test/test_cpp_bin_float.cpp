@@ -683,7 +683,7 @@ int main()
       BOOST_CHECK_EQUAL(test_type(a / ui), ta / ui);
       BOOST_CHECK_EQUAL(test_type(-a / ui), -ta / ui);
       // Error reporting:
-      if (boost::detail::test_errors() != error_count)
+      if ((unsigned)boost::detail::test_errors() != error_count)
       {
          error_count = boost::detail::test_errors();
          std::cout << std::setprecision(std::numeric_limits<test_type>::max_digits10) << std::scientific;
