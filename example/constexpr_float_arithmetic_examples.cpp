@@ -7,6 +7,7 @@
 // section Literal Types and constexpr Support.
 
 #include <iostream>
+#include <boost/config.hpp>
 
 #ifdef BOOST_HAS_FLOAT128
 #include <boost/multiprecision/float128.hpp>

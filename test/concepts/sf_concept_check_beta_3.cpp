@@ -67,7 +67,6 @@ template <class T>
 void test_extra(T)
 {
    T   v1, v2, v3;
-   int i;
    boost::math::ibeta_inva(v1, v2, v3);
    boost::math::ibetac_inva(v1, v2, v3);
    boost::math::ibeta_invb(v1, v2, v3);
