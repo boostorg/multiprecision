@@ -11,6 +11,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <boost/multiprecision/detail/digits.hpp>
+#include <boost/multiprecision/detail/atomic.hpp>
 #include <boost/multiprecision/mpfr.hpp>
 #include <boost/multiprecision/logged_adaptor.hpp>
 #include <boost/math/constants/constants.hpp>
@@ -332,9 +333,9 @@ struct mpfi_float_imp
 
  protected:
    mpfi_t           m_data;
-   static unsigned& get_default_precision() BOOST_NOEXCEPT
+   static boost::multiprecision::detail::precision_type& get_default_precision() BOOST_NOEXCEPT
    {
-      static unsigned val = BOOST_MULTIPRECISION_MPFI_DEFAULT_PRECISION;
+      static boost::multiprecision::detail::precision_type val = BOOST_MULTIPRECISION_MPFI_DEFAULT_PRECISION;
       return val;
    }
 };
