@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\mpir">
+      <UniqueIdentifier>{ab346c3c-453d-4a99-b17a-e9c26146d6c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mpir\x64">
+      <UniqueIdentifier>{72c0ef98-b1f2-4c79-b9bd-a13f905b33f3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="exercise_threading_log_agm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="mpir\x64\gmp.h">
+      <Filter>Source Files\mpir\x64</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="mpir\x64\mpir.lib">
+      <Filter>Source Files\mpir\x64</Filter>
+    </Library>
+  </ItemGroup>
+</Project>
