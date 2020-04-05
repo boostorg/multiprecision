@@ -11,10 +11,14 @@
 
 #define BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_CPP_DEC_FLOAT       101
 #define BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_GMP_FLOAT           102
+#define BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_CPP_BIN_FLOAT       103
+#define BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_MPFR_FLOAT          104
 
 #if !defined(BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_TYPE)
-#define BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_TYPE BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_CPP_DEC_FLOAT
+//#define BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_TYPE BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_CPP_DEC_FLOAT
+#define BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_TYPE BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_CPP_BIN_FLOAT
 //#define BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_TYPE BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_GMP_FLOAT
+//#define BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_TYPE BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_MPFR_FLOAT
 #endif
 
 #if  (BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_TYPE == BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_CPP_DEC_FLOAT)
@@ -23,10 +27,22 @@
 using big_float_type = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<1001>,
                                                      boost::multiprecision::et_off>;
 
+#elif (BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_TYPE == BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_CPP_BIN_FLOAT)
+#include <boost/multiprecision/cpp_bin_float.hpp>
+
+using big_float_type = boost::multiprecision::number<boost::multiprecision::cpp_bin_float<1001>,
+                                                     boost::multiprecision::et_off>;
+
 #elif  (BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_TYPE == BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_GMP_FLOAT)
 #include <boost/multiprecision/gmp.hpp>
 
 using big_float_type = boost::multiprecision::number<boost::multiprecision::gmp_float<2501>,
+                                                     boost::multiprecision::et_off>;
+
+#elif  (BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_TYPE == BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_MPFR_FLOAT)
+#include <boost/multiprecision/mpfr.hpp>
+
+using big_float_type = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<2501>,
                                                      boost::multiprecision::et_off>;
 
 #else
@@ -53,6 +69,8 @@ void parallel_for(index_type             start,
 
   // Use only 3/4 of the available cores.
   static const unsigned int number_of_threads = number_of_threads_total - (number_of_threads_total / 8U);
+
+  std::cout << "Executing with " << number_of_threads << " threads" << std::endl;
 
   // Set the size of a slice for the range functions.
   index_type n = index_type(end - start) + index_type(1);
