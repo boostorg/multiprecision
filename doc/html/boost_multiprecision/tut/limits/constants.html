@@ -84,10 +84,16 @@
 <p>
           and using tests like this is strongly recommended to improve portability.
         </p>
-<p>
-          If the backend is switched to a type that does not support infinity then,
-          without checks like this, there will be trouble.
-        </p>
+<div class="warning"><table border="0" summary="Warning">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="../../../../../../../doc/src/images/warning.png"></td>
+<th align="left">Warning</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+            If the backend is switched to a type that does not support infinity (or
+            similarly NaNs) then, without checks like this, there will be trouble.
+          </p></td></tr>
+</table></div>
 <h5>
 <a name="boost_multiprecision.tut.limits.constants.h2"></a>
           <span class="phrase"><a name="boost_multiprecision.tut.limits.constants.is_signed"></a></span><a class="link" href="constants.html#boost_multiprecision.tut.limits.constants.is_signed">is_signed</a>
@@ -98,9 +104,11 @@
           is signed.
         </p>
 <p>
-          For built-in binary types, the sign is held in a single bit, but for other
-          types (cpp_dec_float and cpp_bin_float) it may be a separate storage element,
-          usually <code class="computeroutput"><span class="keyword">bool</span></code>.
+          For <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+          (built-in)</a> binary types, the sign is held in a single bit, but
+          for other types (<code class="computeroutput"><span class="identifier">cpp_dec_float</span></code>
+          and <code class="computeroutput"><span class="identifier">cpp_bin_float</span></code>) it may
+          be a separate storage element, usually <code class="computeroutput"><span class="keyword">bool</span></code>.
         </p>
 <h5>
 <a name="boost_multiprecision.tut.limits.constants.h3"></a>
@@ -169,8 +177,9 @@
           by the type <code class="computeroutput"><span class="identifier">T</span></code> is finite.
         </p>
 <p>
-          This is <code class="computeroutput"><span class="keyword">true</span></code> for all built-in
-          integer, fixed and floating-point types, and most multi-precision types.
+          This is <code class="computeroutput"><span class="keyword">true</span></code> for all <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental (built-in)
+          type</a> integer, fixed and floating-point types, and most multi-precision
+          types.
         </p>
 <p>
           It is only <code class="computeroutput"><span class="keyword">false</span></code> for a few
@@ -195,7 +204,8 @@
           value.
         </p>
 <p>
-          For most built-in integer types, <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;&gt;::</span><span class="identifier">is_modulo</span></code>
+          For most <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+          (built-in)</a> integer types, <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;&gt;::</span><span class="identifier">is_modulo</span></code>
           is <code class="computeroutput"><span class="keyword">true</span></code>.
         </p>
 <p>
@@ -216,12 +226,14 @@
         </p>
 <p>
           However fixed precision <a class="link" href="../ints/cpp_int.html" title="cpp_int">cpp_int</a>'s
-          may be modulo if they are unchecked (i.e. they behave just like built in
+          may be modulo if they are unchecked (i.e. they behave just like <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental (built-in)</a>
           integers), but not if they are checked (overflow causes an exception to
           be raised).
         </p>
 <p>
-          Built-in and multi-precision floating-point types are normally not modulo.
+          <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+          (built-in)</a> and multi-precision floating-point types are normally
+          not modulo.
         </p>
 <p>
           Where possible, overflow is to <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;&gt;::</span><span class="identifier">infinity</span><span class="special">()</span></code>, provided <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;&gt;::</span><span class="identifier">has_infinity</span>
@@ -232,8 +244,8 @@
           <span class="phrase"><a name="boost_multiprecision.tut.limits.constants.radix"></a></span><a class="link" href="constants.html#boost_multiprecision.tut.limits.constants.radix">radix</a>
         </h5>
 <p>
-          Constant <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">radix</span></code> returns either 2 (for built-in
-          and binary types) or 10 (for decimal types).
+          Constant <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">radix</span></code> returns either 2 (for <a href="https://en.cppreference.com/w/cpp/language/types" target="_top">fundamental
+          (built-in)</a> and binary types) or 10 (for decimal types).
         </p>
 <h5>
 <a name="boost_multiprecision.tut.limits.constants.h7"></a>
@@ -388,7 +400,8 @@
 <p>
           For most purposes, you will much more likely want <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;&gt;::</span><span class="identifier">max_digits10</span></code>,
           the number of decimal digits that ensure that a change of one least significant
-          bit (ULP) produces a different decimal digits string.
+          bit (<a href="http://en.wikipedia.org/wiki/Unit_in_the_last_place" target="_top">Unit
+          in the last place (ULP)</a>) produces a different decimal digits string.
         </p>
 <p>
           For the most common <code class="computeroutput"><span class="keyword">double</span></code>
@@ -497,8 +510,8 @@
             A workaround is using the scientific or exponential format <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">scientific</span></code>.
           </p>
 <p>
-            Other compilers also fail to implement round-tripping entirely fault-free,
-            for example, see <a href="https://www.exploringbinary.com/incorrectly-rounded-conversions-in-gcc-and-glibc/" target="_top">Incorrectly
+            Other older compilers also fail to implement round-tripping entirely
+            fault-free, for example, see <a href="https://www.exploringbinary.com/incorrectly-rounded-conversions-in-gcc-and-glibc/" target="_top">Incorrectly
             Rounded Conversions in GCC and GLIBC</a>.
           </p>
 <p>
@@ -596,10 +609,14 @@
     <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span><span class="special">.</span><span class="identifier">precision</span><span class="special">(</span><span class="identifier">max_digits10</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;());</span>
 <span class="preprocessor">#else</span>
   <span class="preprocessor">#if</span><span class="special">(</span><span class="identifier">_MSC_VER</span> <span class="special">&lt;=</span> <span class="number">1600</span><span class="special">)</span>
-   <span class="comment">//  Wrong value for std::numeric_limits&lt;float&gt;::max_digits10.</span>
+   <span class="comment">//  The MSVC 2010 version had the wrong value for std::numeric_limits&lt;float&gt;::max_digits10.</span>
     <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span><span class="special">.</span><span class="identifier">precision</span><span class="special">(</span><span class="identifier">max_digits10</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;());</span>
   <span class="preprocessor">#else</span> <span class="comment">// Use the C++11 max_digits10.</span>
      <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span><span class="special">.</span><span class="identifier">precision</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">max_digits10</span><span class="special">);</span>
+     <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span><span class="special">.</span><span class="identifier">precision</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">digits10</span><span class="special">);</span>
+     <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span><span class="special">.</span><span class="identifier">setf</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">ios_base</span><span class="special">::</span><span class="identifier">showpoint</span><span class="special">);</span> <span class="comment">// Append any trailing zeros,</span>
+     <span class="comment">// or more memorably</span>
+     <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">showpoint</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span> <span class="comment">// </span>
   <span class="preprocessor">#endif</span>
 <span class="preprocessor">#endif</span>
 
@@ -726,7 +743,7 @@
         </p>
 <p>
           Generally true for <code class="computeroutput"><span class="identifier">is_iec559</span></code>
-          floating-point built-in types, but false for integer types.
+          floating-point __fundamantal types, but false for integer types.
         </p>
 <p>
           Standard-compliant IEEE 754 floating-point implementations may detect the
@@ -752,8 +769,8 @@
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2019 John Maddock
-      and Christopher Kormanyos<p>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2020 John
+      Maddock and Christopher Kormanyos<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>
