@@ -867,6 +867,67 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    BOOST_CHECK_EQUAL(c, (20 ^ 7));
    c = 20 ^ (b + 0);
    BOOST_CHECK_EQUAL(c, (20 ^ 7));
+   //
+   // RValue ref tests:
+   //
+   c = Real(20) % b;
+   BOOST_CHECK_EQUAL(c, (20 % 7));
+   c = a % Real(7);
+   BOOST_CHECK_EQUAL(c, (20 % 7));
+   c = Real(20) % Real(7);
+   BOOST_CHECK_EQUAL(c, (20 % 7));
+   c = Real(20) % 7;
+   BOOST_CHECK_EQUAL(c, (20 % 7));
+   c = 20 % Real(7);
+   BOOST_CHECK_EQUAL(c, (20 % 7));
+   c = Real(20) % (b * 1);
+   BOOST_CHECK_EQUAL(c, (20 % 7));
+   c = (a * 1 + 0) % Real(7);
+   BOOST_CHECK_EQUAL(c, (20 % 7));
+   c = Real(20) >> 2;
+   BOOST_CHECK_EQUAL(c, (20 >> 2));
+   c = Real(20) & b;
+   BOOST_CHECK_EQUAL(c, (20 & 7));
+   c = a & Real(7);
+   BOOST_CHECK_EQUAL(c, (20 & 7));
+   c = Real(20) & Real(7);
+   BOOST_CHECK_EQUAL(c, (20 & 7));
+   c = Real(20) & 7;
+   BOOST_CHECK_EQUAL(c, (20 & 7));
+   c = 20 & Real(7);
+   BOOST_CHECK_EQUAL(c, (20 & 7));
+   c = Real(20) & (b * 1 + 0);
+   BOOST_CHECK_EQUAL(c, (20 & 7));
+   c = (a * 1 + 0) & Real(7);
+   BOOST_CHECK_EQUAL(c, (20 & 7));
+   c = Real(20) | b;
+   BOOST_CHECK_EQUAL(c, (20 | 7));
+   c = a | Real(7);
+   BOOST_CHECK_EQUAL(c, (20 | 7));
+   c = Real(20) | Real(7);
+   BOOST_CHECK_EQUAL(c, (20 | 7));
+   c = Real(20) | 7;
+   BOOST_CHECK_EQUAL(c, (20 | 7));
+   c = 20 | Real(7);
+   BOOST_CHECK_EQUAL(c, (20 | 7));
+   c = Real(20) | (b * 1 + 0);
+   BOOST_CHECK_EQUAL(c, (20 | 7));
+   c = (a * 1 + 0) | Real(7);
+   BOOST_CHECK_EQUAL(c, (20 | 7));
+   c = Real(20) ^ b;
+   BOOST_CHECK_EQUAL(c, (20 ^ 7));
+   c = a ^ Real(7);
+   BOOST_CHECK_EQUAL(c, (20 ^ 7));
+   c = Real(20) ^ Real(7);
+   BOOST_CHECK_EQUAL(c, (20 ^ 7));
+   c = Real(20) ^ 7;
+   BOOST_CHECK_EQUAL(c, (20 ^ 7));
+   c = 20 ^ Real(7);
+   BOOST_CHECK_EQUAL(c, (20 ^ 7));
+   c = Real(20) ^ (b * 1 + 0);
+   BOOST_CHECK_EQUAL(c, (20 ^ 7));
+   c = (a * 1 + 0) ^ Real(7);
+   BOOST_CHECK_EQUAL(c, (20 ^ 7));
 
    //
    // Round tripping of built in integers:
@@ -1702,6 +1763,28 @@ void test_negative_mixed(boost::mpl::true_ const&)
    // Conversion from min and max values:
    //
    test_negative_mixed_minmax<Real, Num>(boost::mpl::bool_ < std::numeric_limits<Real>::is_integer && std::numeric_limits<Num>::is_integer > ());
+   //
+   // RValue ref overloads:
+   //
+   a  = 2;
+   n1 = 3;
+   d  = -a + static_cast<cast_type>(n1);
+   BOOST_CHECK_EQUAL(d, 1);
+   d = static_cast<cast_type>(n1) + -a;
+   BOOST_CHECK_EQUAL(d, 1);
+   d = -a - static_cast<cast_type>(n1);
+   BOOST_CHECK_EQUAL(d, -5);
+   d = static_cast<cast_type>(n1) - -a;
+   BOOST_CHECK_EQUAL(d, 5);
+   d = -a * static_cast<cast_type>(n1);
+   BOOST_CHECK_EQUAL(d, -6);
+   d = static_cast<cast_type>(n1) * -a;
+   BOOST_CHECK_EQUAL(d, -6);
+   n1 = 4;
+   d  = -static_cast<cast_type>(n1) / a;
+   BOOST_CHECK_EQUAL(d, -2);
+   d = static_cast<cast_type>(n1) / -a;
+   BOOST_CHECK_EQUAL(d, -2);
 }
 
 template <class Real, class Num>
@@ -2464,6 +2547,68 @@ void test_signed_ops(const boost::mpl::true_&)
    ac = a + -+-b; // lots of unary operators!!
    BOOST_CHECK_EQUAL(ac, 72);
    test_conditional(Real(-a), -a);
+
+   //
+   // RValue ref tests:
+   //
+   a = 3;
+   b = 4;
+   c = Real(20) + -(a + b);
+   BOOST_CHECK_EQUAL(c, 13);
+   c = Real(20) + -a;
+   BOOST_CHECK_EQUAL(c, 17);
+   c = -a + Real(20);
+   BOOST_CHECK_EQUAL(c, 17);
+   c = -a + b;
+   BOOST_CHECK_EQUAL(c, 1);
+   c = b + -a;
+   BOOST_CHECK_EQUAL(c, 1);
+   a = 2;
+   b = 3;
+   c = Real(10) - a;
+   BOOST_CHECK_EQUAL(c, 8);
+   c = a - Real(2);
+   BOOST_CHECK_EQUAL(c, 0);
+   c = Real(3) - Real(2);
+   BOOST_CHECK_EQUAL(c, 1);
+   a = 20;
+   c = a - (a + b);
+   BOOST_CHECK_EQUAL(c, -3);
+   a = 2;
+   c = (a * b) - (a + b);
+   BOOST_CHECK_EQUAL(c, 1);
+   c = Real(20) - -(a + b);
+   BOOST_CHECK_EQUAL(c, 25);
+   c = Real(20) - (-a);
+   BOOST_CHECK_EQUAL(c, 22);
+   c = (-b) - Real(-5);
+   BOOST_CHECK_EQUAL(c, 2);
+   c = (-b) - a;
+   BOOST_CHECK_EQUAL(c, -5);
+   c = b - (-a);
+   BOOST_CHECK_EQUAL(c, 5);
+   c = Real(3) * -(a + b);
+   BOOST_CHECK_EQUAL(c, -15);
+   c = -(a + b) * Real(3);
+   BOOST_CHECK_EQUAL(c, -15);
+   c = Real(2) * -a;
+   BOOST_CHECK_EQUAL(c, -4);
+   c = -a * Real(2);
+   BOOST_CHECK_EQUAL(c, -4);
+   c = -a * b;
+   BOOST_CHECK_EQUAL(c, -6);
+   a = 2;
+   b = 4;
+   c = Real(4) / -a;
+   BOOST_CHECK_EQUAL(c, -2);
+   c = -b / Real(2);
+   BOOST_CHECK_EQUAL(c, -2);
+   c = Real(4) / -(2 * a);
+   BOOST_CHECK_EQUAL(c, -1);
+   c = b / -(2 * a);
+   BOOST_CHECK_EQUAL(c, -1);
+   c = -(2 * a) / Real(2);
+   BOOST_CHECK_EQUAL(c, -2);
 }
 template <class Real>
 void test_signed_ops(const boost::mpl::false_&)
@@ -2623,33 +2768,33 @@ test_relationals(T a, T b)
    // min and max overloads:
    //
 #if !defined(min) && !defined(max)
-//   using std::max;
-//   using std::min;
-// This works, but still causes complaints from inspect.exe, so use brackets to prevent macrosubstitution,
-// and to explicitly specify type T seems necessary, for reasons unclear.
+   //   using std::max;
+   //   using std::min;
+   // This works, but still causes complaints from inspect.exe, so use brackets to prevent macrosubstitution,
+   // and to explicitly specify type T seems necessary, for reasons unclear.
    a = 2;
    b = 5;
    c = 6;
-   BOOST_CHECK_EQUAL( (std::min<T>)(a, b),  a);
-   BOOST_CHECK_EQUAL( (std::min<T>)(b, a), a);
-   BOOST_CHECK_EQUAL( (std::max<T>)(a, b), b);
-   BOOST_CHECK_EQUAL( (std::max<T>)(b, a), b);
-   BOOST_CHECK_EQUAL( (std::min<T>)(a, b + c), a);
-   BOOST_CHECK_EQUAL( (std::min<T>)(b + c, a), a);
-   BOOST_CHECK_EQUAL( (std::min<T>)(a, c - b), 1);
-   BOOST_CHECK_EQUAL( (std::min<T>)(c - b, a), 1);
-   BOOST_CHECK_EQUAL( (std::max<T>)(a, b + c), 11);
-   BOOST_CHECK_EQUAL( (std::max<T>)(b + c, a), 11);
-   BOOST_CHECK_EQUAL( (std::max<T>)(a, c - b), a);
-   BOOST_CHECK_EQUAL( (std::max<T>)(c - b, a), a);
-   BOOST_CHECK_EQUAL( (std::min<T>)(a + b, b + c), 7);
-   BOOST_CHECK_EQUAL( (std::min<T>)(b + c, a + b), 7);
-   BOOST_CHECK_EQUAL( (std::max<T>)(a + b, b + c), 11);
-   BOOST_CHECK_EQUAL( (std::max<T>)(b + c, a + b), 11);
-   BOOST_CHECK_EQUAL( (std::min<T>)(a + b, c - a), 4);
-   BOOST_CHECK_EQUAL( (std::min<T>)(c - a, a + b), 4);
-   BOOST_CHECK_EQUAL( (std::max<T>)(a + b, c - a), 7);
-   BOOST_CHECK_EQUAL( (std::max<T>)(c - a, a + b), 7);
+   BOOST_CHECK_EQUAL((std::min<T>)(a, b), a);
+   BOOST_CHECK_EQUAL((std::min<T>)(b, a), a);
+   BOOST_CHECK_EQUAL((std::max<T>)(a, b), b);
+   BOOST_CHECK_EQUAL((std::max<T>)(b, a), b);
+   BOOST_CHECK_EQUAL((std::min<T>)(a, b + c), a);
+   BOOST_CHECK_EQUAL((std::min<T>)(b + c, a), a);
+   BOOST_CHECK_EQUAL((std::min<T>)(a, c - b), 1);
+   BOOST_CHECK_EQUAL((std::min<T>)(c - b, a), 1);
+   BOOST_CHECK_EQUAL((std::max<T>)(a, b + c), 11);
+   BOOST_CHECK_EQUAL((std::max<T>)(b + c, a), 11);
+   BOOST_CHECK_EQUAL((std::max<T>)(a, c - b), a);
+   BOOST_CHECK_EQUAL((std::max<T>)(c - b, a), a);
+   BOOST_CHECK_EQUAL((std::min<T>)(a + b, b + c), 7);
+   BOOST_CHECK_EQUAL((std::min<T>)(b + c, a + b), 7);
+   BOOST_CHECK_EQUAL((std::max<T>)(a + b, b + c), 11);
+   BOOST_CHECK_EQUAL((std::max<T>)(b + c, a + b), 11);
+   BOOST_CHECK_EQUAL((std::min<T>)(a + b, c - a), 4);
+   BOOST_CHECK_EQUAL((std::min<T>)(c - a, a + b), 4);
+   BOOST_CHECK_EQUAL((std::max<T>)(a + b, c - a), 7);
+   BOOST_CHECK_EQUAL((std::max<T>)(c - a, a + b), 7);
 
    long l1(2), l2(3), l3;
    l3 = (std::min)(l1, l2) + (std::max)(l1, l2) + (std::max<long>)(l1, l2) + (std::min<long>)(l1, l2);
@@ -2926,7 +3071,36 @@ void test()
    c = 10;
    c = a + b / c;
    BOOST_CHECK_EQUAL(c, 20 + 30 / 10);
-
+   //
+   // Additional tests for rvalue ref overloads:
+   //
+   a = 3;
+   b = 4;
+   c = Real(2) + a;
+   BOOST_CHECK_EQUAL(c, 5);
+   c = a + Real(2);
+   BOOST_CHECK_EQUAL(c, 5);
+   c = Real(3) + Real(2);
+   BOOST_CHECK_EQUAL(c, 5);
+   c = Real(2) + (a + b);
+   BOOST_CHECK_EQUAL(c, 9);
+   c = (a + b) + Real(2);
+   BOOST_CHECK_EQUAL(c, 9);
+   c = (a + b) + (a + b);
+   BOOST_CHECK_EQUAL(c, 14);
+   c = a * Real(4);
+   BOOST_CHECK_EQUAL(c, 12);
+   c = Real(3) * Real(4);
+   BOOST_CHECK_EQUAL(c, 12);
+   c = (a + b) * (a + b);
+   BOOST_CHECK_EQUAL(c, 49);
+   a = 2;
+   c = b / Real(2);
+   BOOST_CHECK_EQUAL(c, 2);
+   c = Real(4) / a;
+   BOOST_CHECK_EQUAL(c, 2);
+   c = Real(4) / Real(2);
+   BOOST_CHECK_EQUAL(c, 2);
    //
    // Test conditionals:
    //
