@@ -8,6 +8,7 @@
 #include <vector>
 
 #include <boost/math/constants/constants.hpp>
+#include <boost/math/special_functions/prime.hpp>
 
 #define BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_CPP_DEC_FLOAT       101
 #define BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_GMP_FLOAT           102
@@ -163,148 +164,20 @@ FloatingPointType pown(const FloatingPointType& b, const UnsignedIntegralType& p
   return result;
 }
 
-float log_integral_asymptotic_approximation(const float x)
-{
-  // Compute an asymptotic approximation
-  // of the log_integral function, li(x).
-
-  using std::log;
-
-  const float log_x = log(x);
-
-  float sum  = 1.0F;
-  float term = 1.0F;
-
-  float min_term = (std::numeric_limits<float>::max)();
-
-  // Perform the asymptotic expansion of li(x).
-  for(std::uint_fast8_t k = 1U; k <= 64U; ++k)
-  {
-    term *= k;
-    term /= log_x;
-
-    if((k > 3U) && (term > min_term))
-    {
-      // This asymptotic expansion is actually divergent.
-      // Good results can be obtained by stopping the
-      // expansion when the series begins to diverge.
-
-      break;
-    }
-
-    if(term < min_term)
-    {
-      min_term = term;
-    }
-
-    sum += term;
-  }
-
-  return (sum * x) / log_x;
-}
-
-template<typename unsigned_integral_type = std::uint32_t,
-         const unsigned_integral_type maximum_value = unsigned_integral_type(UINTMAX_C(10006722))>
-void compute_primes_via_sieve(std::vector<unsigned_integral_type>& primes)
-{
-  // Use a sieve algorithm to generate a table of primes.
-  // In this sieve, the logic is inverted. A value
-  // of true in the relevant index position means that
-  // the number is *not* prime, whereas a value of false
-  // indicates that the index position is prime.
-
-  // For the prime number 10,006,721 (which is the 664999th prime),
-  // see also D.N. Lehmer, "List of prime numbers from 1 to 10,006,721"
-  // (Carnegie Institution of Washington, Washington D.C. 1914).
-
-  // Some settings include the following.
-  //          30 calculates             29 (which is the            10th prime, and also all primes up to this)
-  //         542 calculates            541 (which is the           100th prime, and also all primes up to this)
-  //        3572 calculates          3,571 (which is the           500th prime, and also all primes up to this)
-  //        7920 calculates          7,919 (which is the         1,000th prime, and also all primes up to this)
-  //       17390 calculates         17,389 (which is the         2,000th prime, and also all primes up to this)
-  //       27450 calculates         27,449 (which is the         3,000th prime, and also all primes up to this)
-  //      104730 calculates        104,729 (which is the        10,000th prime, and also all primes up to this)
-  //     1299710 calculates      1,299,709 (which is the       100,000th prime, and also all primes up to this)
-  //    10006722 calculates     10,006,721 (which is the       664,999th prime, and also all primes up to this)
-  //    15485864 calculates     15,485,863 (which is the     1,000,000th prime, and also all primes up to this)
-  //   179424674 calculates    179,424,673 (which is the    10,000,000th prime, and also all primes up to this)
-  //  2038074744 calculates  2,038,074,743 (which is the   100,000,000th prime, and also all primes up to this)
-  // 22801763490 calculates 22,801,763,489 (which is the 1,000,000,000th prime, and also all primes up to this)
-
-  using std::floor;
-  using std::sqrt;
-
-  const unsigned_integral_type imax =
-    static_cast<unsigned_integral_type>(sqrt(static_cast<float>(maximum_value)));
-
-  // Create the sieve of primes.
-
-  // Use a custom bitset to contain the sieve.
-  // This saves a lot of storage space.
-  std::vector<bool> sieve(maximum_value, false);
-
-  // Use parallel processing in the loop to speed things up.
-
-  for(unsigned_integral_type outer_index_i = 2U; outer_index_i < imax; ++outer_index_i)
-  {
-    if(sieve[outer_index_i] == false)
-    {
-      const unsigned_integral_type i2 = unsigned_integral_type(outer_index_i * outer_index_i);
-
-      for(unsigned_integral_type inner_index_j = i2; inner_index_j < maximum_value; inner_index_j += outer_index_i)
-      {
-        sieve[inner_index_j] = true;
-      }
-    }
-  }
-
-  // Calculate the upper limit of the number of primes expected.
-  // Use an asymptotic expansion of the log_integral function li(x).
-
-  // See also the article "Prime-counting function" at:
-  // http://en.wikipedia.org/wiki/Prime-counting_function
-
-  const float log_intergal_of_max_val =
-    log_integral_asymptotic_approximation(static_cast<float>(maximum_value));
-
-  const unsigned_integral_type upper_limit_of_number_of_primes =
-    static_cast<unsigned_integral_type>(floor(log_intergal_of_max_val));
-
-  primes.resize(upper_limit_of_number_of_primes, 0U);
-
-  // Fill the prime numbers into the data table
-  // by extracting them from the sieve of primes.
-
-  unsigned_integral_type prime_counter  = 2U;
-  unsigned_integral_type running_number = 2U;
-
-  for(unsigned_integral_type i = 2U; i < sieve.size(); ++i)
-  {
-    if(sieve[i] == false)
-    {
-      primes[prime_counter] = running_number;
-
-      ++prime_counter;
-    }
-
-    ++running_number;
-  }
-}
-
 const std::vector<std::uint32_t>& primes()
 {
   static const std::vector<std::uint32_t> my_primes =
   []() -> std::vector<std::uint32_t>
   {
-    std::vector<std::uint32_t> local_primes;
+    std::vector<std::uint32_t> local_primes(10000U);
 
-    // Get at least 10,000 primes.
-    detail::compute_primes_via_sieve<std::uint32_t, std::uint32_t(104730)>(local_primes);
+    // Get exactly 10,000 primes.
+    for(auto i = 0U; i < local_primes.size(); ++i)
+    {
+      local_primes[i] = boost::math::prime(i);
+    }
 
-    // Get exactly 10,000 primes, remove the first 2 zero entries in the sieve.
-    return std::vector<std::uint32_t>(local_primes.cbegin() +  2U,
-                                      local_primes.cbegin() + (2U + 10000U));
+    return local_primes;
   }();
 
   return my_primes;
@@ -551,5 +424,4 @@ int main()
             << calculation_time_sequential
             << "s"
             << std::endl;
-
 }
