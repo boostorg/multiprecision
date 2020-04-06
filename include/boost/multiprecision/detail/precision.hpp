@@ -134,7 +134,8 @@ struct scoped_default_precision<R, true>
    }
    ~scoped_default_precision()
    {
-      R::default_precision(m_old_prec);
+      if(m_new_prec != m_old_prec)
+         R::default_precision(m_old_prec);
    }
    BOOST_MP_CXX14_CONSTEXPR unsigned precision() const
    {
@@ -145,7 +146,7 @@ struct scoped_default_precision<R, true>
    BOOST_MP_CXX14_CONSTEXPR void init(unsigned p)
    {
       m_old_prec = R::default_precision();
-      if (p)
+      if (p && (p != m_old_prec))
       {
          R::default_precision(p);
          m_new_prec = p;
