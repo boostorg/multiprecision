@@ -1,3 +1,43 @@
+///////////////////////////////////////////////////////////////////////////////
+//      Copyright Christopher Kormanyos 2020.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE_1_0.txt or copy at
+//          http://www.boost.org/LICENSE_1_0.txt)
+//
+
+// This example exercises Boost.Multiprecision in concurrent
+// multi-threaded environments. To do so a loop involving
+// non-trivial calculations of numerous function values
+// has been set up within both concurrent as well as
+// sequential running environments. In particular,
+// this example uses an AGM method to do a "from the ground up"
+// calculation of logarithms. The logarithm functions values
+// are compared with the values from Boost.Multiprecision's
+// specific log functions for the relevant backends.
+
+// This example has been initially motivated in part
+// by discussions in:
+// https://github.com/boostorg/multiprecision/pull/211
+
+// We find the following performance data here:
+// https://github.com/boostorg/multiprecision/pull/213
+//
+// cpp_dec_float:
+// result_is_ok_concurrent: true, calculation_time_concurrent: 18.1s
+// result_is_ok_sequential: true, calculation_time_sequential: 48.5s
+//
+// cpp_bin_float:
+// result_is_ok_concurrent: true, calculation_time_concurrent: 18.7s
+// result_is_ok_sequential: true, calculation_time_sequential: 50.4s
+//
+// gmp_float:
+// result_is_ok_concurrent: true, calculation_time_concurrent: 3.3s
+// result_is_ok_sequential: true, calculation_time_sequential: 12.4s
+//
+// mpfr_float:
+// result_is_ok_concurrent: true, calculation_time_concurrent: 0.6s
+// result_is_ok_sequential: true, calculation_time_sequential: 1.9s
+
 #include <array>
 #include <atomic>
 #include <cstddef>
@@ -21,12 +61,6 @@
 //#define BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_TYPE BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_GMP_FLOAT
 //#define BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_TYPE BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_MPFR_FLOAT
 #endif
-
-// 501 digits, 10,000 values, 7 threads
-// backend              calculation_time_concurrent      calculation_time_sequential
-// cpp_dec_float                   12.3s                            47.8s
-// cpp_bin_float                   14.8s                            58.5s
-// gmp_float                        1.1s                             4.4s
 
 #if  (BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_TYPE == BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_CPP_DEC_FLOAT)
 #include <boost/multiprecision/cpp_dec_float.hpp>
