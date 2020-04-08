@@ -552,19 +552,17 @@ BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_c
 eval_modulus(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
     const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
-	limb_type                                                                   mod)
+	const limb_type                                                             mod)
 {
-   bool             s         = a.sign();
-   int              n         = a.size();
-   double_limb_type two_n_mod = (1 + ~static_cast<limb_type>(0u) % mod) % mod;
+   const int              n               = a.size();
+   const double_limb_type two_n_mod_min_1 = ~static_cast<limb_type>(0u) % mod;
+   const double_limb_type two_n_mod       = two_n_mod_min_1 == mod - 1 ? 0 : two_n_mod_min_1 + 1;
 
    limb_type& res = *result.limbs();
    res            = a.limbs()[n - 1] % mod;
 
    for (int i = n - 2; i >= 0; --i)
 	  res = (res * two_n_mod + a.limbs()[i]) % mod;
-
-   result.sign(s);
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
