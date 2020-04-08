@@ -558,7 +558,6 @@ eval_modulus(
    int              n         = a.size();
    double_limb_type two_n_mod = (1 + ~static_cast<limb_type>(0u) % mod) % mod;
 
-   result.resize(1, 1);
    limb_type& res = *result.limbs();
    res            = a.limbs()[n - 1] % mod;
 
