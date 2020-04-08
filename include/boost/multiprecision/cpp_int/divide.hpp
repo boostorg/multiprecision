@@ -556,9 +556,7 @@ eval_modulus(
 {
    bool             s         = a.sign();
    int              n         = a.size();
-   double_limb_type two_n_mod = 1 + ~static_cast<limb_type>(0u) % mod;
-   if (two_n_mod >= mod)
-	  two_n_mod -= mod;
+   double_limb_type two_n_mod = (1 + ~static_cast<limb_type>(0u) % mod) % mod;
 
    result.resize(1, 1);
    limb_type& res = *result.limbs();
