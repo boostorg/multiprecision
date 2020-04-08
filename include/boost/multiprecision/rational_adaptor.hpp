@@ -318,6 +318,26 @@ inline number<IntBackend, ET> denominator(const number<rational_adaptor<IntBacke
 {
    return val.backend().data().denominator();
 }
+template <class IntBackend, expression_template_option ET>
+inline number<IntBackend, ET> floor(const number<rational_adaptor<IntBackend>, ET>& val)
+{
+    // Here we use the assumption that denominator is always positive
+    // and numerator has the sign
+    if (val >= 0)
+        return numerator(val) / denominator(val);
+    else
+        return (numerator(val) + 1) / denominator(val) - 1;
+}
+template <class IntBackend, expression_template_option ET>
+inline number<IntBackend, ET> ceil(const number<rational_adaptor<IntBackend>, ET>& val)
+{
+    // Here we use the assumption that denominator is always positive
+    // and numerator has the sign
+    if (val >= 0)
+        return (numerator(val) - 1) / denominator(val) + 1;
+    else
+        return numerator(val) / denominator(val);
+}
 
 #ifdef BOOST_NO_SFINAE_EXPR
 
