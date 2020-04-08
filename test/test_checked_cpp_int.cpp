@@ -60,7 +60,7 @@ void test_signed_overflow(Number a, Number b, const boost::mpl::true_&)
    BOOST_CHECK(Number(a * b) >= (std::numeric_limits<Number>::min)());
 }
 template <class Number>
-void test_signed_overflow(Number a, Number b, const boost::mpl::false_&)
+void test_signed_overflow(Number, Number, const boost::mpl::false_&)
 {
 }
 
