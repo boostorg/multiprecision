@@ -44,7 +44,7 @@ template <class R, class CppInt>
 inline BOOST_MP_CXX14_CONSTEXPR void check_in_range(const CppInt& /*val*/, const mpl::int_<unchecked>&) BOOST_NOEXCEPT {}
 
 inline BOOST_MP_CXX14_CONSTEXPR void check_is_negative(const mpl::true_&) BOOST_NOEXCEPT {}
-inline void check_is_negative(const mpl::false_&)
+inline void                          check_is_negative(const mpl::false_&)
 {
    BOOST_THROW_EXCEPTION(std::range_error("Attempt to assign a negative value to an unsigned type."));
 }
@@ -396,8 +396,9 @@ inline BOOST_MP_CXX14_CONSTEXPR double_limb_type integer_gcd_reduce(double_limb_
 
 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_type eval_gcd(limb_type u, limb_type v)
 {
-	if (!u || !v)
-		return u | v;
+   // boundary cases
+   if (!u || !v)
+	  return u | v;
 #if __cpp_lib_gcd_lcm >= 201606L
    return std::gcd(u, v);
 #endif
@@ -432,7 +433,7 @@ eval_gcd(
    }
    default_ops::eval_modulus(result, temp, b);
    limb_type& res = *result.limbs();
-   res = eval_gcd(res, b);
+   res            = eval_gcd(res, b);
 }
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, class Integer>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_unsigned<Integer>::value && (sizeof(Integer) <= sizeof(limb_type)) && !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
@@ -503,9 +504,9 @@ eval_gcd(
    /* Let shift := lg K, where K is the greatest power of 2
    dividing both u and v. */
 
-   unsigned us = eval_lsb(u);
-   unsigned vs = eval_lsb(v);
-   int shift   = (std::min)(us, vs);
+   unsigned us    = eval_lsb(u);
+   unsigned vs    = eval_lsb(v);
+   int      shift = (std::min)(us, vs);
    eval_right_shift(u, us);
    eval_right_shift(v, vs);
 
@@ -526,7 +527,7 @@ eval_gcd(
          {
             double_limb_type i = v.limbs()[0] | (static_cast<double_limb_type>(v.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
             double_limb_type j = (u.size() == 1) ? *u.limbs() : u.limbs()[0] | (static_cast<double_limb_type>(u.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
-            u = integer_gcd_reduce(i, j);
+			u                  = integer_gcd_reduce(i, j);
          }
          break;
       }
