@@ -22,15 +22,15 @@ typedef boost::multiprecision::cpp_int mp_int;
 class Int1
 {
  public:
-   Int1(const mp_int& i) {}
-   Int1(const Int1& i) {}
+   Int1(const mp_int& ) {}
+   Int1(const Int1& ) {}
 };
 
 class Int2
 {
  public:
-   Int2(const mp_int& i) {}
-   Int2(const Int2& i) = delete;
+   Int2(const mp_int& ) {}
+   Int2(const Int2& ) = delete;
 };
 
 int main()

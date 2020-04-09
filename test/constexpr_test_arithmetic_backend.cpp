@@ -23,6 +23,7 @@ int main()
       constexpr long long llv = (long long)b;
 
       static_assert(b == -108);
+      static_assert(llv == -108);
       static_assert(d == 554);
    }
    {

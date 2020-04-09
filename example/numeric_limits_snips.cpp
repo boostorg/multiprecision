@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE(test_numeric_limits_snips)
   }
 
   }
-  catch(std::exception ex)
+  catch(const std::exception& ex)
   {
     std::cout << "Caught Exception " << ex.what() << std::endl;
   }
@@ -277,13 +277,15 @@ BOOST_AUTO_TEST_CASE(test_numeric_limits_snips)
 */
     RealType tolerance = boost::math::tools::epsilon<RealType>() * 2;
 //] [epsilon_4]
+    (void)tolerance; // warning suppression
   }
 
   {
+    bool b = 
 //[digits10_5
     -(std::numeric_limits<double>::max)() == std::numeric_limits<double>::lowest();
 //] [/digits10_5]
-//  warning C4553: '==': result of expression not used; did you intend '='? is spurious.
+    (void)b;  // warning suppression
   }
 
   {
@@ -396,8 +398,6 @@ so the default expression template parameter has been replaced by `et_off`.]
 
   if (std::numeric_limits<cpp_bin_float_quad>::has_quiet_NaN == true)
   {
-    cpp_bin_float_quad tolerance =  3 * std::numeric_limits<cpp_bin_float_quad>::epsilon();
-
     cpp_bin_float_quad NaN =  std::numeric_limits<cpp_bin_float_quad>::quiet_NaN();
     std::cout << "cpp_bin_float_quad NaN is "  << NaN << std::endl; //   cpp_bin_float_quad NaN is nan
 
