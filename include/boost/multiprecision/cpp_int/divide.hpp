@@ -123,7 +123,7 @@ BOOST_MP_CXX14_CONSTEXPR void divide_unsigned_helper(
    {
       double_limb_type a = (static_cast<double_limb_type>(px[1]) << CppInt1::limb_bits) | px[0];
       double_limb_type b = y_order ? (static_cast<double_limb_type>(py[1]) << CppInt1::limb_bits) | py[0]
-								   : py[0];
+                           : py[0];
       if (result)
       {
          *result = a / b;
@@ -173,7 +173,7 @@ BOOST_MP_CXX14_CONSTEXPR void divide_unsigned_helper(
          double_limb_type a = (static_cast<double_limb_type>(prem[r_order]) << CppInt1::limb_bits) | prem[r_order - 1];
          double_limb_type b = (y_order > 0) ? (static_cast<double_limb_type>(py[y_order]) << CppInt1::limb_bits) | py[y_order - 1] : (static_cast<double_limb_type>(py[y_order]) << CppInt1::limb_bits);
          double_limb_type v = a / b;
-		 guess              = static_cast<limb_type>(v);
+         guess              = static_cast<limb_type>(v);
       }
       BOOST_ASSERT(guess); // If the guess ever gets to zero we go on forever....
       //
@@ -530,20 +530,9 @@ eval_modulus(
 {
    bool s = a.sign();
    if (b.size() == 1)
-	  eval_modulus(result, a, *b.limbs());
+     eval_modulus(result, a, *b.limbs());
    else
-	  divide_unsigned_helper(static_cast<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>*>(0), a, b, result);
-   result.sign(s);
-}
-
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>::type
-eval_modulus(
-    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
-	const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a, signed_limb_type b)
-{
-   bool s = a.sign();
-   divide_unsigned_helper(static_cast<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>*>(0), a, b, result);
+     divide_unsigned_helper(static_cast<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>*>(0), a, b, result);
    result.sign(s);
 }
 
@@ -552,17 +541,34 @@ BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_c
 eval_modulus(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
     const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
-	const limb_type                                                             mod)
+    const limb_type                                                             mod)
 {
    const int              n               = a.size();
    const double_limb_type two_n_mod_min_1 = ~static_cast<limb_type>(0u) % mod;
-   const double_limb_type two_n_mod       = two_n_mod_min_1 == mod - 1 ? 0 : two_n_mod_min_1 + 1;
+   const double_limb_type two_n_mod = two_n_mod_min_1 == mod - 1 ? 0 : two_n_mod_min_1 + 1;
 
-   limb_type& res = *result.limbs();
+   limb_type res;
    res            = a.limbs()[n - 1] % mod;
 
    for (int i = n - 2; i >= 0; --i)
-	  res = (res * two_n_mod + a.limbs()[i]) % mod;
+     res = (res * two_n_mod + a.limbs()[i]) % mod;
+   //
+   // We don't modify result until past this point in case result and a are the same object:
+   //
+   result.resize(1, 1);
+   result.limbs()[0] = res;
+   result.sign(a.sign());
+}
+
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>::type
+eval_modulus(
+    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
+    const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a, signed_limb_type b)
+{
+   bool s = a.sign();
+   eval_modulus(result, a, static_cast<limb_type>(b < 0 ? -b : b));
+   result.sign(s);
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
@@ -582,9 +588,7 @@ eval_modulus(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
     limb_type                                                             b)
 {
-   // There is no in place divide:
-   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> a(result);
-   eval_modulus(result, a, b);
+   eval_modulus(result, result, b);
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
@@ -593,9 +597,7 @@ eval_modulus(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
     signed_limb_type                                                      b)
 {
-   // There is no in place divide:
-   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> a(result);
-   eval_modulus(result, a, b);
+   eval_modulus(result, result, b);
 }
 
 //
