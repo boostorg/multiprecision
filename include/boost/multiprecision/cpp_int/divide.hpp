@@ -555,7 +555,7 @@ eval_modulus(
     const limb_type                                                             mod)
 {
    const int              n         = a.size();
-   const double_limb_type two_n_mod = (static_cast<limb_type>(1u) + ~static_cast<limb_type>(0u) - mod) % mod;
+   const double_limb_type two_n_mod = (static_cast<limb_type>(1u) + (~static_cast<limb_type>(0u) - mod)) % mod;
 
    limb_type& res = *result.limbs();
    res            = a.limbs()[n - 1] % mod;
