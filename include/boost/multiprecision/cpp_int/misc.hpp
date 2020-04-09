@@ -400,20 +400,21 @@ BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_type eval_gcd(limb_type u, li
 {
    // boundary cases
    if (!u || !v)
-	  return u | v;
+     return u | v;
 #if __cpp_lib_gcd_lcm >= 201606L
    return std::gcd(u, v);
-#endif
+#else
    unsigned shift = boost::multiprecision::detail::find_lsb(u | v);
    u >>= boost::multiprecision::detail::find_lsb(u);
    do
    {
-	  v >>= boost::multiprecision::detail::find_lsb(v);
-	  if (u > v)
-		 std_constexpr::swap(u, v);
-	  v -= u;
+     v >>= boost::multiprecision::detail::find_lsb(v);
+     if (u > v)
+       std_constexpr::swap(u, v);
+     v -= u;
    } while (v);
    return u << shift;
+#endif
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
@@ -424,16 +425,20 @@ eval_gcd(
     limb_type                                                                   b)
 {
    int                                                                  s = eval_get_sign(a);
-   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> temp(a);
    if (s < 0)
-	  temp.negate();
+   {
+      cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> temp(a);
+      temp.negate();
+      eval_gcd(result, temp, b);
+      return;
+   }
    if (!b || !s)
    {
-	  *temp.limbs() |= b;
-	  result = temp;
-	  return;
+      result = a;
+      *result.limbs() |= b;
+      return;
    }
-   default_ops::eval_modulus(result, temp, b);
+   eval_modulus(result, a, b);
    limb_type& res = *result.limbs();
    res            = eval_gcd(res, b);
 }
@@ -529,7 +534,7 @@ eval_gcd(
          {
             double_limb_type i = v.limbs()[0] | (static_cast<double_limb_type>(v.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
             double_limb_type j = (u.size() == 1) ? *u.limbs() : u.limbs()[0] | (static_cast<double_limb_type>(u.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
-			u                  = integer_gcd_reduce(i, j);
+            u                  = integer_gcd_reduce(i, j);
          }
          break;
       }
