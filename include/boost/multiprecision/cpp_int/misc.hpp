@@ -433,8 +433,7 @@ eval_gcd(
    eval_modulus(result, a, b);
    limb_type& res = *result.limbs();
    res            = eval_gcd(res, b);
-   if (s < 0)
-      result.negate();
+   result.sign(false);
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, class Integer>
