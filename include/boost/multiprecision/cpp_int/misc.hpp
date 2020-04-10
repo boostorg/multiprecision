@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////
 //  Copyright 2012-2020 John Maddock.
 //  Copyright 2020 Madhur Chauhan.
-//  Distributed under the Boost Software License, Version 1.0. 
-//  (See accompanying file LICENSE_1_0.txt or copy at 
+//  Distributed under the Boost Software License, Version 1.0.
+//  (See accompanying file LICENSE_1_0.txt or copy at
 //   https://www.boost.org/LICENSE_1_0.txt)
 //
 // Comparison operators for cpp_int_backend:
@@ -400,7 +400,7 @@ BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_type eval_gcd(limb_type u, li
 {
    // boundary cases
    if (!u || !v)
-	  return u | v;
+      return u | v;
 #if __cpp_lib_gcd_lcm >= 201606L
    return std::gcd(u, v);
 #endif
@@ -408,10 +408,10 @@ BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_type eval_gcd(limb_type u, li
    u >>= boost::multiprecision::detail::find_lsb(u);
    do
    {
-	  v >>= boost::multiprecision::detail::find_lsb(v);
-	  if (u > v)
-		 std_constexpr::swap(u, v);
-	  v -= u;
+      v >>= boost::multiprecision::detail::find_lsb(v);
+      if (u > v)
+         std_constexpr::swap(u, v);
+      v -= u;
    } while (v);
    return u << shift;
 }
@@ -423,20 +423,20 @@ eval_gcd(
     const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a,
     limb_type                                                                   b)
 {
-   int                                                                  s = eval_get_sign(a);
-   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> temp(a);
-   if (s < 0)
-	  temp.negate();
+   int s = eval_get_sign(a);
    if (!b || !s)
    {
-	  *temp.limbs() |= b;
-	  result = temp;
-	  return;
+      result = a;
+      *result.limbs() |= b;
+      return;
    }
-   default_ops::eval_modulus(result, temp, b);
+   eval_modulus(result, a, b);
    limb_type& res = *result.limbs();
    res            = eval_gcd(res, b);
+   if (s < 0)
+      result.negate();
 }
+
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, class Integer>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_unsigned<Integer>::value && (sizeof(Integer) <= sizeof(limb_type)) && !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
 eval_gcd(
@@ -529,7 +529,7 @@ eval_gcd(
          {
             double_limb_type i = v.limbs()[0] | (static_cast<double_limb_type>(v.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
             double_limb_type j = (u.size() == 1) ? *u.limbs() : u.limbs()[0] | (static_cast<double_limb_type>(u.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
-			u                  = integer_gcd_reduce(i, j);
+            u                  = integer_gcd_reduce(i, j);
          }
          break;
       }
