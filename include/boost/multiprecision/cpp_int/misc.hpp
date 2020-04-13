@@ -1,7 +1,9 @@
 ///////////////////////////////////////////////////////////////
-//  Copyright 2012 John Maddock. Distributed under the Boost
-//  Software License, Version 1.0. (See accompanying file
-//  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
+//  Copyright 2012-2020 John Maddock.
+//  Copyright 2020 Madhur Chauhan.
+//  Distributed under the Boost Software License, Version 1.0.
+//  (See accompanying file LICENSE_1_0.txt or copy at
+//   https://www.boost.org/LICENSE_1_0.txt)
 //
 // Comparison operators for cpp_int_backend:
 //
@@ -12,6 +14,7 @@
 #include <boost/multiprecision/detail/bitscan.hpp> // lsb etc
 #include <boost/integer/common_factor_rt.hpp>      // gcd/lcm
 #include <boost/functional/hash_fwd.hpp>
+#include <numeric> // std::gcd
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -43,7 +46,7 @@ template <class R, class CppInt>
 inline BOOST_MP_CXX14_CONSTEXPR void check_in_range(const CppInt& /*val*/, const mpl::int_<unchecked>&) BOOST_NOEXCEPT {}
 
 inline BOOST_MP_CXX14_CONSTEXPR void check_is_negative(const mpl::true_&) BOOST_NOEXCEPT {}
-inline void check_is_negative(const mpl::false_&)
+inline void                          check_is_negative(const mpl::false_&)
 {
    BOOST_THROW_EXCEPTION(std::range_error("Attempt to assign a negative value to an unsigned type."));
 }
@@ -393,70 +396,47 @@ inline BOOST_MP_CXX14_CONSTEXPR double_limb_type integer_gcd_reduce(double_limb_
    return u;
 }
 
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_type eval_gcd(limb_type u, limb_type v)
+{
+   // boundary cases
+   if (!u || !v)
+      return u | v;
+#if __cpp_lib_gcd_lcm >= 201606L
+   return std::gcd(u, v);
+#else
+   unsigned shift = boost::multiprecision::detail::find_lsb(u | v);
+   u >>= boost::multiprecision::detail::find_lsb(u);
+   do
+   {
+      v >>= boost::multiprecision::detail::find_lsb(v);
+      if (u > v)
+         std_constexpr::swap(u, v);
+      v -= u;
+   } while (v);
+   return u << shift;
+#endif
+}
+
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
 eval_gcd(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
     const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a,
-    limb_type                                                                   v)
+    limb_type                                                                   b)
 {
-   using default_ops::eval_get_sign;
-   using default_ops::eval_is_zero;
-   using default_ops::eval_lsb;
-
-   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> u(a);
-
-   int s = eval_get_sign(u);
-
-   /* GCD(0,x) := x */
-   if (s < 0)
+   int s = eval_get_sign(a);
+   if (!b || !s)
    {
-      u.negate();
-   }
-   else if (s == 0)
-   {
-      result = v;
+      result = a;
+      *result.limbs() |= b;
       return;
    }
-   if (v == 0)
-   {
-      result = u;
-      return;
-   }
-
-   /* Let shift := lg K, where K is the greatest power of 2
-   dividing both u and v. */
-
-   unsigned us = eval_lsb(u);
-   unsigned vs = boost::multiprecision::detail::find_lsb(v);
-   int shift   = (std::min)(us, vs);
-   eval_right_shift(u, us);
-   if (vs)
-      v >>= vs;
-
-   do
-   {
-      /* Now u and v are both odd, so diff(u, v) is even.
-      Let u = min(u, v), v = diff(u, v)/2. */
-      if (u.size() <= 2)
-      {
-         if (u.size() == 1)
-            v = integer_gcd_reduce(*u.limbs(), v);
-         else
-         {
-            double_limb_type i = u.limbs()[0] | (static_cast<double_limb_type>(u.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
-            v = static_cast<limb_type>(integer_gcd_reduce(i, static_cast<double_limb_type>(v)));
-         }
-         break;
-      }
-      eval_subtract(u, v);
-      us = eval_lsb(u);
-      eval_right_shift(u, us);
-   } while (true);
-
-   result = v;
-   eval_left_shift(result, shift);
+   eval_modulus(result, a, b);
+   limb_type& res = *result.limbs();
+   res            = eval_gcd(res, b);
+   result.sign(false);
 }
+
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, class Integer>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_unsigned<Integer>::value && (sizeof(Integer) <= sizeof(limb_type)) && !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
 eval_gcd(
@@ -526,9 +506,9 @@ eval_gcd(
    /* Let shift := lg K, where K is the greatest power of 2
    dividing both u and v. */
 
-   unsigned us = eval_lsb(u);
-   unsigned vs = eval_lsb(v);
-   int shift   = (std::min)(us, vs);
+   unsigned us    = eval_lsb(u);
+   unsigned vs    = eval_lsb(v);
+   int      shift = (std::min)(us, vs);
    eval_right_shift(u, us);
    eval_right_shift(v, vs);
 
@@ -549,7 +529,7 @@ eval_gcd(
          {
             double_limb_type i = v.limbs()[0] | (static_cast<double_limb_type>(v.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
             double_limb_type j = (u.size() == 1) ? *u.limbs() : u.limbs()[0] | (static_cast<double_limb_type>(u.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
-            u = integer_gcd_reduce(i, j);
+            u                  = integer_gcd_reduce(i, j);
          }
          break;
       }
