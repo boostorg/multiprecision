@@ -561,7 +561,10 @@ eval_modulus(
 
    for (int i = n - 2; i >= 0; --i)
       res = (res * two_n_mod + a.limbs()[i]) % mod;
-
+   //
+   // We must not modify result until here in case
+   // result and a are the same object:
+   //
    result.resize(1, 1);
    *result.limbs() = res;
    result.sign(a.sign());
