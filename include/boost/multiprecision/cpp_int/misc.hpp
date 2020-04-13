@@ -403,7 +403,7 @@ BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_type eval_gcd(limb_type u, li
       return u | v;
 #if __cpp_lib_gcd_lcm >= 201606L
    return std::gcd(u, v);
-#endif
+#else
    unsigned shift = boost::multiprecision::detail::find_lsb(u | v);
    u >>= boost::multiprecision::detail::find_lsb(u);
    do
@@ -414,6 +414,7 @@ BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_type eval_gcd(limb_type u, li
       v -= u;
    } while (v);
    return u << shift;
+#endif
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
