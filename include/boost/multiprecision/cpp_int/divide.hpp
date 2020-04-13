@@ -541,18 +541,6 @@ BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_c
 eval_modulus(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
     const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
-    signed_limb_type                                                            b)
-{
-   const limb_type t = b < 0 ? -b : b;
-   eval_modulus(result, a, t);
-   result.sign(a.sign());
-}
-
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>::type
-eval_modulus(
-    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
-    const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
     const limb_type                                                             mod)
 {
    const int              n         = a.size();
@@ -573,6 +561,18 @@ eval_modulus(
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>::type
 eval_modulus(
+   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
+   const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
+   signed_limb_type                                                            b)
+{
+   const limb_type t = b < 0 ? -b : b;
+   eval_modulus(result, a, t);
+   result.sign(a.sign());
+}
+
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>::type
+eval_modulus(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
     const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& b)
 {
@@ -587,9 +587,8 @@ eval_modulus(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
     limb_type                                                             b)
 {
-   // There is no in place divide:
-   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> a(result);
-   eval_modulus(result, a, b);
+   // Single limb modulus is in place:
+   eval_modulus(result, result, b);
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
@@ -598,9 +597,8 @@ eval_modulus(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
     signed_limb_type                                                      b)
 {
-   // There is no in place divide:
-   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> a(result);
-   eval_modulus(result, a, b);
+   // Single limb modulus is in place:
+   eval_modulus(result, result, b);
 }
 
 //
