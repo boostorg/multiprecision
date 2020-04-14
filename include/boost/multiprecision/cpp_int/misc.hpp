@@ -385,29 +385,19 @@ BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_type eval_gcd(limb_type u, li
 
 inline BOOST_MP_CXX14_CONSTEXPR double_limb_type eval_gcd(double_limb_type u, double_limb_type v)
 {
-#if __cpp_lib_gcd_lcm >= 201606L
+#if (__cpp_lib_gcd_lcm >= 201606L) && (!defined(BOOST_HAS_INT128) || !defined(__STRICT_ANSI__))
    return std::gcd(u, v);
 #else
+   unsigned shift = boost::multiprecision::detail::find_lsb(u | v);
+   u >>= boost::multiprecision::detail::find_lsb(u);
    do
    {
+      v >>= boost::multiprecision::detail::find_lsb(v);
       if (u > v)
          std_constexpr::swap(u, v);
-      if (u == v)
-         break;
-      if (v <= ~static_cast<limb_type>(0))
-      {
-         u = eval_gcd(static_cast<limb_type>(v), static_cast<limb_type>(u));
-         break;
-      }
       v -= u;
-#ifdef __MSVC_RUNTIME_CHECKS
-      while ((v & 1u) == 0)
-#else
-      while ((static_cast<unsigned>(v) & 1u) == 0)
-#endif
-         v >>= 1;
-   } while (true);
-   return u;
+   } while (v);
+   return u << shift;
 #endif
 }
 
