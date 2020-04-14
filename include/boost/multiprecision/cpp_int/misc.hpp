@@ -362,20 +362,6 @@ eval_integer_modulus(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checke
    return eval_integer_modulus(x, boost::multiprecision::detail::unsigned_abs(val));
 }
 
-inline BOOST_MP_CXX14_CONSTEXPR limb_type integer_gcd_reduce(limb_type u, limb_type v)
-{
-   do
-   {
-      if (u > v)
-         std_constexpr::swap(u, v);
-      if (u == v)
-         break;
-      v -= u;
-      v >>= boost::multiprecision::detail::find_lsb(v);
-   } while (true);
-   return u;
-}
-
 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_type eval_gcd(limb_type u, limb_type v)
 {
    // boundary cases
@@ -397,8 +383,11 @@ BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_type eval_gcd(limb_type u, li
 #endif
 }
 
-inline BOOST_MP_CXX14_CONSTEXPR double_limb_type integer_gcd_reduce(double_limb_type u, double_limb_type v)
+inline BOOST_MP_CXX14_CONSTEXPR double_limb_type eval_gcd(double_limb_type u, double_limb_type v)
 {
+#if __cpp_lib_gcd_lcm >= 201606L
+   return std::gcd(u, v);
+#else
    do
    {
       if (u > v)
@@ -419,6 +408,7 @@ inline BOOST_MP_CXX14_CONSTEXPR double_limb_type integer_gcd_reduce(double_limb_
          v >>= 1;
    } while (true);
    return u;
+#endif
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
@@ -555,7 +545,7 @@ eval_gcd(
          {
             double_limb_type i = v.limbs()[0] | (static_cast<double_limb_type>(v.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
             double_limb_type j = (u.size() == 1) ? *u.limbs() : u.limbs()[0] | (static_cast<double_limb_type>(u.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
-            u                  = integer_gcd_reduce(i, j);
+            u                  = eval_gcd(i, j);
          }
          break;
       }
