@@ -451,8 +451,10 @@ eval_gcd(
    int s = eval_get_sign(a);
    if (!b || !s)
    {
-      result = a;
-      *result.limbs() |= b;
+      if (!s)
+         result = b;
+      else
+         result = a;
       return;
    }
    double_limb_type res = eval_integer_modulus(a, b);
