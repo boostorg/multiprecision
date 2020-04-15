@@ -437,7 +437,15 @@ eval_gcd(
          result = a;
       return;
    }
-   double_limb_type res = eval_integer_modulus(a, b);
+   double_limb_type res = 0;
+   if(a.sign() == 0)
+      res = eval_integer_modulus(a, b);
+   else
+   {
+      cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> t(a);
+      t.negate();
+      res = eval_integer_modulus(t, b);
+   }
    res            = eval_gcd(res, b);
    result = res;
    result.sign(false);

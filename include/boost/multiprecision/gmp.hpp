@@ -1219,6 +1219,39 @@ struct gmp_int
       return *this;
    }
 #endif
+#ifdef BOOST_HAS_INT128
+   gmp_int& operator=(unsigned __int128 i)
+   {
+      if (m_data[0]._mp_d == 0)
+         mpz_init(this->m_data);
+      unsigned __int128 mask  = ((((1uLL << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1uLL);
+      unsigned               shift = 0;
+      mpz_t                  t;
+      mpz_set_ui(m_data, 0);
+      mpz_init_set_ui(t, 0);
+      while (i)
+      {
+         mpz_set_ui(t, static_cast<unsigned long>(i & mask));
+         if (shift)
+            mpz_mul_2exp(t, t, shift);
+         mpz_add(m_data, m_data, t);
+         shift += std::numeric_limits<unsigned long>::digits;
+         i >>= std::numeric_limits<unsigned long>::digits;
+      }
+      mpz_clear(t);
+      return *this;
+   }
+   gmp_int& operator=(__int128 i)
+   {
+      if (m_data[0]._mp_d == 0)
+         mpz_init(this->m_data);
+      bool neg = i < 0;
+      *this    = boost::multiprecision::detail::unsigned_abs(i);
+      if (neg)
+         mpz_neg(m_data, m_data);
+      return *this;
+   }
+#endif
    gmp_int& operator=(unsigned long i)
    {
       if (m_data[0]._mp_d == 0)
