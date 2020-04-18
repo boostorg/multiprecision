@@ -1754,7 +1754,120 @@ inline void eval_convert_to(double* result, const gmp_int& val)
 {
    *result = mpz_get_d(val.data());
 }
+#ifdef BOOST_HAS_LONG_LONG
+inline void eval_convert_to(boost::ulong_long_type* result, const gmp_int& val)
+{
+   if (mpz_sgn(val.data()) < 0)
+   {
+      BOOST_THROW_EXCEPTION(std::range_error("Conversion from negative integer to an unsigned type results in undefined behaviour"));
+   }
+   *result = 0;
+   gmp_int t(val);
+   unsigned parts = sizeof(boost::ulong_long_type) / sizeof(unsigned long);
 
+   for (unsigned i = 0; i < parts; ++i)
+   {
+      boost::ulong_long_type part = mpz_get_ui(t.data());
+      if (i)
+         *result |= part << (i * sizeof(unsigned long) * CHAR_BIT);
+      else
+         *result = part;
+      mpz_tdiv_q_2exp(t.data(), t.data(), sizeof(unsigned long) * CHAR_BIT);
+   }
+}
+inline void eval_convert_to(boost::long_long_type* result, const gmp_int& val)
+{
+   int s = mpz_sgn(val.data());
+   *result = 0;
+   gmp_int t(val);
+   unsigned parts = sizeof(boost::ulong_long_type) / sizeof(unsigned long);
+   boost::ulong_long_type unsigned_result = 0;
+
+   for (unsigned i = 0; i < parts; ++i)
+   {
+      boost::ulong_long_type part = mpz_get_ui(t.data());
+      if (i)
+         unsigned_result |= part << (i * sizeof(unsigned long) * CHAR_BIT);
+      else
+         unsigned_result = part;
+      mpz_tdiv_q_2exp(t.data(), t.data(), sizeof(unsigned long) * CHAR_BIT);
+   }
+   //
+   // Overflow check:
+   //
+   bool overflow = false;
+   if (mpz_sgn(t.data()))
+   {
+      overflow = true;
+   }
+   if ((s > 0) && (unsigned_result > static_cast<boost::ulong_long_type>(std::numeric_limits<boost::long_long_type>::max())))
+      overflow = true;
+   if((s < 0) && (unsigned_result > 1u - static_cast<boost::ulong_long_type>(std::numeric_limits<boost::long_long_type>::min() + 1)))
+      overflow = true;
+   if(overflow)
+      *result = s < 0 ? (std::numeric_limits<boost::long_long_type>::min)() : (std::numeric_limits<boost::long_long_type>::max)();
+   else
+      *result = s < 0 ? -boost::long_long_type(unsigned_result - 1) - 1 : unsigned_result;
+}
+#endif
+#ifdef BOOST_HAS_INT128
+inline void eval_convert_to(unsigned __int128* result, const gmp_int& val)
+{
+   if (mpz_sgn(val.data()) < 0)
+   {
+      BOOST_THROW_EXCEPTION(std::range_error("Conversion from negative integer to an unsigned type results in undefined behaviour"));
+   }
+   *result = 0;
+   gmp_int t(val);
+   unsigned parts = sizeof(unsigned __int128) / sizeof(unsigned long);
+
+   for (unsigned i = 0; i < parts; ++i)
+   {
+      unsigned __int128 part = mpz_get_ui(t.data());
+      if (i)
+         *result |= part << (i * sizeof(unsigned long) * CHAR_BIT);
+      else
+         *result = part;
+      mpz_tdiv_q_2exp(t.data(), t.data(), sizeof(unsigned long) * CHAR_BIT);
+   }
+}
+inline void eval_convert_to(__int128* result, const gmp_int& val)
+{
+   int s = mpz_sgn(val.data());
+   *result = 0;
+   gmp_int t(val);
+   unsigned parts = sizeof(unsigned __int128) / sizeof(unsigned long);
+   unsigned __int128 unsigned_result = 0;
+
+   for (unsigned i = 0; i < parts; ++i)
+   {
+      unsigned __int128 part = mpz_get_ui(t.data());
+      if (i)
+         unsigned_result |= part << (i * sizeof(unsigned long) * CHAR_BIT);
+      else
+         unsigned_result = part;
+      mpz_tdiv_q_2exp(t.data(), t.data(), sizeof(unsigned long) * CHAR_BIT);
+   }
+   //
+   // Overflow check:
+   //
+   static const __int128 int128_max = static_cast<__int128>((static_cast<unsigned __int128>(1u) << 127) - 1);
+   static const __int128 int128_min = (static_cast<unsigned __int128>(1u) << 127);
+   bool overflow = false;
+   if (mpz_sgn(t.data()))
+   {
+      overflow = true;
+   }
+   if ((s > 0) && (unsigned_result > static_cast<unsigned __int128>(int128_max)))
+      overflow = true;
+   if ((s < 0) && (unsigned_result > 1u - static_cast<unsigned __int128>(int128_min + 1)))
+      overflow = true;
+   if (overflow)
+      *result = s < 0 ? int128_min : int128_max;
+   else
+      *result = s < 0 ? -__int128(unsigned_result - 1) - 1 : unsigned_result;
+}
+#endif
 inline void eval_abs(gmp_int& result, const gmp_int& val)
 {
    mpz_abs(result.data(), val.data());
