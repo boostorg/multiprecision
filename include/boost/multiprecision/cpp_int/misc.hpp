@@ -547,8 +547,24 @@ eval_gcd(
          u.swap(v);
       if (s == 0)
          break;
+
+      while(((u.size() + 2 < v.size()) && (v.size() * 100 / u.size() > 105)) || ((u.size() <= 2) && (v.size() > 4)))
+      {
+         //
+         // Speical case: if u and v differ considerably in size, then a Euclid step
+         // is more efficient as we reduce v by several limbs in one go.
+         // Unfortunately it requires an expensive long division:
+         //
+         eval_modulus(v, v, u);
+         u.swap(v);
+      }
       if (v.size() <= 2)
       {
+         //
+         // Special case: if v has no more than 2 limbs
+         // then we can reduce u and v to a pair of integers and perform
+         // direct integer gcd:
+         //
          if (v.size() == 1)
             u = eval_gcd(*v.limbs(), *u.limbs());
          else
@@ -559,6 +575,9 @@ eval_gcd(
          }
          break;
       }
+      //
+      // Regular binary gcd case:
+      //
       eval_subtract(v, u);
       vs = eval_lsb(v);
       eval_right_shift(v, vs);
