@@ -21,7 +21,7 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
-#include <boost/timer.hpp>
+#include "timer.hpp"
 #include "test.hpp"
 
 #ifdef _MSC_VER
@@ -86,7 +86,7 @@ struct tester
    typedef typename test_type::backend_type::checked_type checked;
 
    unsigned     last_error_count;
-   boost::timer tim;
+   timer tim;
 
    boost::multiprecision::mpz_int a, b, c, d;
    int                            si;
