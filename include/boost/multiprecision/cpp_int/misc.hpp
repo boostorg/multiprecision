@@ -337,17 +337,21 @@ inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<U>::value>::typ
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, class Integer>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_unsigned<Integer>::value && !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value, Integer>::type
-eval_integer_modulus(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& x, Integer val)
+eval_integer_modulus(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a, Integer mod)
 {
-   if ((sizeof(Integer) <= sizeof(limb_type)) || (val <= (std::numeric_limits<limb_type>::max)()))
+   if ((sizeof(Integer) <= sizeof(limb_type)) || (mod <= (std::numeric_limits<limb_type>::max)()))
    {
-      cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> d;
-      divide_unsigned_helper(static_cast<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>*>(0), x, static_cast<limb_type>(val), d);
-      return d.limbs()[0];
+      const int              n = a.size();
+      const double_limb_type two_n_mod = static_cast<limb_type>(1u) + (~static_cast<limb_type>(0u) - mod) % mod;
+      limb_type              res = a.limbs()[n - 1] % mod;
+
+      for (int i = n - 2; i >= 0; --i)
+         res = (res * two_n_mod + a.limbs()[i]) % mod;
+      return res;
    }
    else
    {
-      return default_ops::eval_integer_modulus(x, val);
+      return default_ops::eval_integer_modulus(a, mod);
    }
 }
 
@@ -358,50 +362,30 @@ eval_integer_modulus(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checke
    return eval_integer_modulus(x, boost::multiprecision::detail::unsigned_abs(val));
 }
 
-inline BOOST_MP_CXX14_CONSTEXPR limb_type integer_gcd_reduce(limb_type u, limb_type v)
-{
-   do
-   {
-      if (u > v)
-         std_constexpr::swap(u, v);
-      if (u == v)
-         break;
-      v -= u;
-      v >>= boost::multiprecision::detail::find_lsb(v);
-   } while (true);
-   return u;
-}
-
-inline BOOST_MP_CXX14_CONSTEXPR double_limb_type integer_gcd_reduce(double_limb_type u, double_limb_type v)
-{
-   do
-   {
-      if (u > v)
-         std_constexpr::swap(u, v);
-      if (u == v)
-         break;
-      if (v <= ~static_cast<limb_type>(0))
-      {
-         u = integer_gcd_reduce(static_cast<limb_type>(v), static_cast<limb_type>(u));
-         break;
-      }
-      v -= u;
-#ifdef __MSVC_RUNTIME_CHECKS
-      while ((v & 1u) == 0)
-#else
-      while ((static_cast<unsigned>(v) & 1u) == 0)
-#endif
-         v >>= 1;
-   } while (true);
-   return u;
-}
-
 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR limb_type eval_gcd(limb_type u, limb_type v)
 {
    // boundary cases
    if (!u || !v)
       return u | v;
 #if __cpp_lib_gcd_lcm >= 201606L
+   return std::gcd(u, v);
+#else
+   unsigned shift = boost::multiprecision::detail::find_lsb(u | v);
+   u >>= boost::multiprecision::detail::find_lsb(u);
+   do
+   {
+      v >>= boost::multiprecision::detail::find_lsb(v);
+      if (u > v)
+         std_constexpr::swap(u, v);
+      v -= u;
+   } while (v);
+   return u << shift;
+#endif
+}
+
+inline BOOST_MP_CXX14_CONSTEXPR double_limb_type eval_gcd(double_limb_type u, double_limb_type v)
+{
+#if (__cpp_lib_gcd_lcm >= 201606L) && (!defined(BOOST_HAS_INT128) || !defined(__STRICT_ANSI__))
    return std::gcd(u, v);
 #else
    unsigned shift = boost::multiprecision::detail::find_lsb(u | v);
@@ -437,6 +421,47 @@ eval_gcd(
    result.sign(false);
 }
 
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
+eval_gcd(
+    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
+    const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a,
+    double_limb_type                                                            b)
+{
+   int s = eval_get_sign(a);
+   if (!b || !s)
+   {
+      if (!s)
+         result = b;
+      else
+         result = a;
+      return;
+   }
+   double_limb_type res = 0;
+   if(a.sign() == 0)
+      res = eval_integer_modulus(a, b);
+   else
+   {
+      cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> t(a);
+      t.negate();
+      res = eval_integer_modulus(t, b);
+   }
+   res            = eval_gcd(res, b);
+   result = res;
+   result.sign(false);
+}
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
+eval_gcd(
+   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
+   const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a,
+   signed_double_limb_type                                                     v)
+{
+   eval_gcd(result, a, static_cast<double_limb_type>(v < 0 ? -v : v));
+}
+//
+// These 2 overloads take care of gcd against an (unsigned) short etc:
+//
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, class Integer>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_unsigned<Integer>::value && (sizeof(Integer) <= sizeof(limb_type)) && !is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
 eval_gcd(
@@ -455,6 +480,7 @@ eval_gcd(
 {
    eval_gcd(result, a, static_cast<limb_type>(v < 0 ? -v : v));
 }
+
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
@@ -521,18 +547,37 @@ eval_gcd(
          u.swap(v);
       if (s == 0)
          break;
+
+      while(((u.size() + 2 < v.size()) && (v.size() * 100 / u.size() > 105)) || ((u.size() <= 2) && (v.size() > 4)))
+      {
+         //
+         // Speical case: if u and v differ considerably in size, then a Euclid step
+         // is more efficient as we reduce v by several limbs in one go.
+         // Unfortunately it requires an expensive long division:
+         //
+         eval_modulus(v, v, u);
+         u.swap(v);
+      }
       if (v.size() <= 2)
       {
+         //
+         // Special case: if v has no more than 2 limbs
+         // then we can reduce u and v to a pair of integers and perform
+         // direct integer gcd:
+         //
          if (v.size() == 1)
-            u = integer_gcd_reduce(*v.limbs(), *u.limbs());
+            u = eval_gcd(*v.limbs(), *u.limbs());
          else
          {
             double_limb_type i = v.limbs()[0] | (static_cast<double_limb_type>(v.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
             double_limb_type j = (u.size() == 1) ? *u.limbs() : u.limbs()[0] | (static_cast<double_limb_type>(u.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
-            u                  = integer_gcd_reduce(i, j);
+            u                  = eval_gcd(i, j);
          }
          break;
       }
+      //
+      // Regular binary gcd case:
+      //
       eval_subtract(v, u);
       vs = eval_lsb(v);
       eval_right_shift(v, vs);
