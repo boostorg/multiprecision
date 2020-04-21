@@ -74,6 +74,7 @@ exe has_eigen : has_eigen.cpp ;
 exe has_f2c : has_f2c.cpp f2c ;
 obj has_is_constant_evaluated : has_is_constant_evaluated.cpp ;
 obj has_constexpr_limits : has_constexpr_limits_cmd.cpp : <cxxflags>-fconstexpr-ops-limit=268435456 ;
+obj has_big_obj : has_big_obj.cpp : <cxxflags>-Wa,-mbig-obj ;
 
 explicit has_gmp ;
 explicit has_mpfr ;
@@ -85,5 +86,6 @@ explicit has_mpc ;
 explicit has_eigen ;
 explicit has_is_constant_evaluated ;
 explicit has_constexpr_limits ;
+explicit has_big_obj ;
 explicit has_f2c ;
 
