@@ -2517,7 +2517,7 @@ inline boost::multiprecision::mpf_float
 min_value<boost::multiprecision::mpf_float>()
 {
    boost::multiprecision::mpf_float result(0.5);
-   mpf_div_2exp(result.backend().data(), result.backend().data(), (std::numeric_limits<mp_exp_t>::min)() / 64 + 1);
+   mpf_div_2exp(result.backend().data(), result.backend().data(), (std::numeric_limits<mp_exp_t>::max)() / 64 + 1);
    return result;
 }
 
