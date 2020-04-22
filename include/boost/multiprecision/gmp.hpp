@@ -1800,9 +1800,9 @@ inline void eval_convert_to(boost::long_long_type* result, const gmp_int& val)
    {
       overflow = true;
    }
-   if ((s > 0) && (unsigned_result > static_cast<boost::ulong_long_type>(std::numeric_limits<boost::long_long_type>::max())))
+   if ((s > 0) && (unsigned_result > static_cast<boost::ulong_long_type>((std::numeric_limits<boost::long_long_type>::max)())))
       overflow = true;
-   if((s < 0) && (unsigned_result > 1u - static_cast<boost::ulong_long_type>(std::numeric_limits<boost::long_long_type>::min() + 1)))
+   if((s < 0) && (unsigned_result > 1u - static_cast<boost::ulong_long_type>((std::numeric_limits<boost::long_long_type>::min)() + 1)))
       overflow = true;
    if(overflow)
       *result = s < 0 ? (std::numeric_limits<boost::long_long_type>::min)() : (std::numeric_limits<boost::long_long_type>::max)();
