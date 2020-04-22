@@ -20,7 +20,7 @@ include(CMDeploy)
 include(CMConfig)
 include(CMSetupVersion)
 
-cm_setup_version(VERSION 1.70.0)
+cm_setup_version(VERSION 1.73.0)
 
 option(BUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS "Build for CI suppressing known issues" FALSE)
 option(BUILD_TESTS "Build unit tests" FALSE)
