@@ -1,6 +1,8 @@
 Boost Multiprecision Library
 ============================
 
+>ANNOUNCEMENT: Support for C++03 is now deprecated in this library and will be supported in existing features only until March 2021. New features will require at least C++11, as will existing features from next year.
+
  The Multiprecision Library provides integer, rational, floating-point, complex and interval number types in C++ that have more range and 
  precision than C++'s ordinary built-in types. The big number types in Multiprecision can be used with a wide selection of basic 
  mathematical operations, elementary transcendental functions as well as the functions in Boost.Math. The Multiprecision types can 
