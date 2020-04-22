@@ -5,7 +5,7 @@
 
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
-#include <boost/timer.hpp>
+#include "timer.hpp"
 #include "test.hpp"
 
 #include <iostream>
@@ -45,7 +45,7 @@ T generate_random(unsigned /*bits_wanted*/)
 template <class T>
 void test()
 {
-   boost::timer tim;
+   timer tim;
 
    while (true)
    {
