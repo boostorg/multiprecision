@@ -1,0 +1,94 @@
+# Copyright 2015-2019 Rene Rivera.
+# Copyright 2019 Mateusz Loskot <mateusz at loskot dot net>
+# Copyright 2020 Alexander Grund
+# Distributed under the Boost Software License, Version 1.0.
+# (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
+
+#
+# Generic Azure Pipelines build script for boostorg repositories
+# See: https://github.com/boostorg/boost-ci/
+#
+# Instructions for customizing this script for your library:
+#
+# 1. Customize the compilers and language levels you want.
+# 2. If you have more than include/, src/, test/, example/, examples/,
+#    benchmark/ or tools/ directories, set the environment variable DEPINST.
+#    For example if your build uses code in "bench/" and "fog/" directories:
+#      - DEPINST: --include bench --include fog
+# 3. Enable pull request builds in your boostorg/<library> account.
+#
+# That's it - the script will do everything else for you.
+
+trigger:
+  branches:
+    include:
+    - develop
+    - master
+    - bugfix/*
+    - feature/*
+    - fix/*
+    - pr/*
+
+pr:
+  branches:
+    include:
+    - develop
+
+variables:
+  B2_CI_VERSION: 1
+  B2_VARIANT: release,debug
+  B2_LINK: shared,static
+
+stages:
+
+- stage: Test
+  jobs:
+
+  - job: 'Windows'
+    strategy:
+      matrix:
+        VS_2019_cxx2a_strict:
+          B2_TOOLSET: msvc-14.2
+          B2_CXXSTD: latest # 2a
+          B2_CXXFLAGS: -permissive-
+          B2_ADDRESS_MODEL: 64
+          VM_IMAGE: 'windows-2019'
+        VS_2019_cxx17:
+          B2_TOOLSET: msvc-14.2
+          B2_CXXSTD: 17
+          B2_ADDRESS_MODEL: 64
+          VM_IMAGE: 'windows-2019'
+        VS_2019_cxx14:
+          B2_TOOLSET: msvc-14.2
+          B2_CXXSTD: 14
+          B2_ADDRESS_MODEL: 64
+          VM_IMAGE: 'windows-2019'
+        VS_2017_cxx2a_strict:
+          B2_TOOLSET: msvc-14.1
+          B2_CXXSTD: latest # 2a
+          B2_CXXFLAGS: -permissive-
+          B2_ADDRESS_MODEL: 64
+          VM_IMAGE: 'vs2017-win2016'
+        VS_2017_cxx17:
+          B2_TOOLSET: msvc-14.1
+          B2_CXXSTD: 17
+          B2_ADDRESS_MODEL: 64,32
+          VM_IMAGE: 'vs2017-win2016'
+        VS_2017_cxx14:
+          B2_TOOLSET: msvc-14.1
+          #B2_CXXSTD: 14 # default
+          B2_ADDRESS_MODEL: 64,32
+          VM_IMAGE: 'vs2017-win2016'
+
+    pool:
+      vmImage: $(VM_IMAGE)
+    steps:
+    - script: |
+        git clone --branch master https://github.com/boostorg/boost-ci.git boost-ci-cloned
+        xcopy /s /e /q /i /y boost-ci-cloned\ci .\ci
+        rmdir /s /q boost-ci-cloned
+        ci\azure-pipelines\install.bat
+      displayName: 'Install'
+    - script: ci\build.bat
+      displayName: 'Build'
+
