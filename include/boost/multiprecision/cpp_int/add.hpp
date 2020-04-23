@@ -9,6 +9,7 @@
 #define BOOST_MP_CPP_INT_ADD_HPP
 
 #include <boost/multiprecision/detail/constexpr.hpp>
+#include <immintrin.h>
 
 namespace boost { namespace multiprecision { namespace backends {
 
@@ -26,10 +27,9 @@ inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2
    using ::boost::multiprecision::std_constexpr::swap;
 
    // Nothing fancy, just let uintmax_t take the strain:
-   double_limb_type carry = 0;
-   unsigned         m(0), x(0);
-   unsigned         as = a.size();
-   unsigned         bs = b.size();
+   unsigned m(0), x(0);
+   unsigned as = a.size();
+   unsigned bs = b.size();
    minmax(as, bs, m, x);
    if (x == 1)
    {
@@ -39,52 +39,45 @@ inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2
       return;
    }
    result.resize(x, x);
-   typename CppInt2::const_limb_pointer pa     = a.limbs();
-   typename CppInt3::const_limb_pointer pb     = b.limbs();
-   typename CppInt1::limb_pointer       pr     = result.limbs();
-   typename CppInt1::limb_pointer       pr_end = pr + m;
+   typename CppInt2::const_limb_pointer pa = a.limbs();
+   typename CppInt3::const_limb_pointer pb = b.limbs();
+   typename CppInt1::limb_pointer       pr = result.limbs();
+   //typename CppInt1::limb_pointer       pr_end = pr + m;
 
    if (as < bs)
-      swap(pa, pb);
-
+	  swap(pa, pb);
    // First where a and b overlap:
-   while (pr != pr_end)
+   unsigned      i;
+   unsigned char carry = 0;
+#if __GNUC__ || __clang__
+   for (i = 0; i < m; ++i)
    {
-      carry += static_cast<double_limb_type>(*pa) + static_cast<double_limb_type>(*pb);
-#ifdef __MSVC_RUNTIME_CHECKS
-      *pr = static_cast<limb_type>(carry & ~static_cast<limb_type>(0));
-#else
-      *pr = static_cast<limb_type>(carry);
-#endif
-      carry >>= CppInt1::limb_bits;
-      ++pr, ++pa, ++pb;
+	  carry = _addcarry_u64(carry, pa[i], pb[i], &pr[i]);
    }
-   pr_end += x - m;
-   // Now where only a has digits:
-   while (pr != pr_end)
+   for (; i < x && carry; ++i)
    {
-      if (!carry)
-      {
-         if (pa != pr)
-            std_constexpr::copy(pa, pa + (pr_end - pr), pr);
-         break;
-      }
-      carry += static_cast<double_limb_type>(*pa);
-#ifdef __MSVC_RUNTIME_CHECKS
-      *pr = static_cast<limb_type>(carry & ~static_cast<limb_type>(0));
-#else
-      *pr   = static_cast<limb_type>(carry);
-#endif
-      carry >>= CppInt1::limb_bits;
-      ++pr, ++pa;
+	  carry = _addcarry_u64(carry, pa[i], 0, &pr[i]);
    }
-   if (carry)
+#else // for ICC
+   for (i = 0; i < m; ++i)
+   {
+	  carry = _addcarry_u64(carry, pa[i], pb[i], (unsigned long*)&pr[i]);
+   }
+   for (; i < x && carry; ++i)
+   {
+	  carry = _addcarry_u64(carry, pa[i], 0, (unsigned long*)&pr[i]);
+   }
+#endif
+   if (i == x && carry)
    {
       // We overflowed, need to add one more limb:
       result.resize(x + 1, x + 1);
       if (result.size() > x)
-         result.limbs()[x] = static_cast<limb_type>(carry);
+		 result.limbs()[x] = carry;
    }
+   else
+	  std_constexpr::copy(pa + i, pa + x, pr + i);
+   //std::cerr << std::hex << "A:\t" << abs(cpp_int{a}) << "\nB:\t" << abs(cpp_int{b}) << "\n\n";
    result.normalize();
    result.sign(a.sign());
 }
@@ -407,7 +400,7 @@ eval_increment(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocato
 #ifdef BOOST_NO_CXX14_CONSTEXPR
    static const limb_type one = 1;
 #else
-   constexpr const limb_type one = 1;
+   constexpr const limb_type  one    = 1;
 #endif
    if (!result.sign() && (result.limbs()[0] < cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::max_limb_value))
       ++result.limbs()[0];
@@ -427,7 +420,7 @@ eval_decrement(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocato
 #ifdef BOOST_NO_CXX14_CONSTEXPR
    static const limb_type one = 1;
 #else
-   constexpr const limb_type one = 1;
+   constexpr const limb_type  one    = 1;
 #endif
    if (!result.sign() && result.limbs()[0])
       --result.limbs()[0];
