@@ -1065,6 +1065,7 @@ rule get_specfun_tests_mpfr
            : # input files
            : # requirements
             [ check-target-builds ../config//has_mpfr : : <build>no ]
+            [ check-target-builds ../config//has_float128 : <source>quadmath ]
             <define>TEST_MPFR_50
             <optimization>speed
             <define>BOOST_ALL_NO_LIB
@@ -1091,6 +1092,7 @@ rule get_specfun_tests_mpfr
             <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
             <toolset>msvc:<cxxflags>-bigobj
             [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>gmp <source>mpfr :  ]
+            [ check-target-builds ../config//has_float128 : <source>quadmath ]
             <include>../../math/include_private
             release ] ;
    }
@@ -1110,6 +1112,7 @@ rule get_specfun_tests_gmp
            : # input files
            : # requirements
             [ check-target-builds ../config//has_gmp : : <build>no ]
+            [ check-target-builds ../config//has_float128 : <source>quadmath ]
             <optimization>speed
             <define>TEST_MPF_50
             <define>BOOST_ALL_NO_LIB
@@ -1133,6 +1136,7 @@ rule get_specfun_tests_cpp_dec_float
            : # command line
            : # input files
            : # requirements
+            [ check-target-builds ../config//has_float128 : <source>quadmath ]
             <define>TEST_CPP_DEC_FLOAT
             <define>BOOST_ALL_NO_LIB
             <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
@@ -1206,7 +1210,8 @@ rule get_specfun_tests_intel_quad
            : # command line
            : # input files
            : # requirements
-            [ check-target-builds ../config//has_intel_quad : <cxxflags>-Qoption,cpp,--extended_float_type : <build>no ] [ check-target-builds ../config//has_float128 : <source>quadmath ]
+            [ check-target-builds ../config//has_intel_quad : <cxxflags>-Qoption,cpp,--extended_float_type : <build>no ] 
+            [ check-target-builds ../config//has_float128 : <source>quadmath ]
             <optimization>speed
             <define>TEST_FLOAT128
             <define>BOOST_ALL_NO_LIB
