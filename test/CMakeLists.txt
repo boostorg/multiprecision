@@ -47,8 +47,8 @@ if(BOOST_CMAKE)
                            ${CMAKE_WORKSPACE_NAME}::math
                            ${CMAKE_WORKSPACE_NAME}::regexp)
 else()
-    find_package(Boost REQUIRED COMPONENTS chrono exception filesystem unit_test_framework serialization regex)
-    find_package(Boost COMPONENTS timer)
+    find_package(Boost REQUIRED COMPONENTS chrono filesystem unit_test_framework serialization regex)
+    find_package(Boost COMPONENTS timer exception)
 
     cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_multiprecision
                            ${Boost_LIBRARIES})
