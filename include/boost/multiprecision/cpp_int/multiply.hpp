@@ -357,8 +357,6 @@ eval_multiply_comba(
       if ((int)result.size() >= as + bs)
          *pr = static_cast<limb_type>(carry);
    }
-   result.normalize();
-   result.sign(a.sign() != b.sign());
 }
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3, class Allocator3>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3> >::value>::type
@@ -450,9 +448,8 @@ eval_multiply(
    else
 #endif
    std::memset(pr, 0, result.size() * sizeof(limb_type));   
-   double_limb_type carry = 0;
 
-#if defined(BOOST_MP_COMBA) || __GNUC__ >= 10
+#if defined(BOOST_MP_COMBA)
        // 
        // Comba Multiplier might not be efficient because of less efficient assembly
        // by the compiler as of 09/01/2020 (DD/MM/YY). See PR #182
@@ -461,6 +458,7 @@ eval_multiply(
        eval_multiply_comba(result, a, b);
 #else
 
+   double_limb_type carry = 0;
    for (unsigned i = 0; i < as; ++i)
    {
       BOOST_ASSERT(result.size() > i);
@@ -496,12 +494,13 @@ eval_multiply(
       }
       carry = 0;
    }
+#endif // ifdef(BOOST_MP_COMBA) ends
+
    result.normalize();
    //
    // Set the sign of the result:
    //
    result.sign(a.sign() != b.sign());
-#endif
 }
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>

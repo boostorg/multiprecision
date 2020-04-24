@@ -21,7 +21,7 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
-#include <boost/timer.hpp>
+#include "timer.hpp"
 #include "test.hpp"
 
 #ifdef _MSC_VER
@@ -86,11 +86,12 @@ struct tester
    typedef typename test_type::backend_type::checked_type checked;
 
    unsigned     last_error_count;
-   boost::timer tim;
+   timer tim;
 
    boost::multiprecision::mpz_int a, b, c, d;
    int                            si;
    unsigned                       ui;
+   boost::multiprecision::double_limb_type large_ui;
    test_type                      a1, b1, c1, d1;
 
    void t1()
@@ -360,6 +361,51 @@ struct tester
          BOOST_CHECK_EQUAL(t.str(), t1.str());
       }
    }
+   void t4_large()
+   {
+      using namespace boost::multiprecision;
+      // Now check operations involving unsigned integers:
+      BOOST_CHECK_EQUAL(mpz_int(a + large_ui).str(), test_type(a1 + large_ui).str());
+      BOOST_CHECK_EQUAL(mpz_int(-a + large_ui).str(), test_type(-a1 + large_ui).str());
+      BOOST_CHECK_EQUAL(mpz_int(large_ui + a).str(), test_type(large_ui + a1).str());
+      BOOST_CHECK_EQUAL((mpz_int(a) += large_ui).str(), (test_type(a1) += large_ui).str());
+      BOOST_CHECK_EQUAL((mpz_int(-a) += large_ui).str(), (test_type(-a1) += large_ui).str());
+      BOOST_CHECK_EQUAL(mpz_int(a - large_ui).str(), test_type(a1 - large_ui).str());
+      BOOST_CHECK_EQUAL(mpz_int(-a - large_ui).str(), test_type(-a1 - large_ui).str());
+      BOOST_CHECK_EQUAL(mpz_int(large_ui - a).str(), test_type(large_ui - a1).str());
+      BOOST_CHECK_EQUAL((mpz_int(a) -= large_ui).str(), (test_type(a1) -= large_ui).str());
+      BOOST_CHECK_EQUAL((mpz_int(-a) -= large_ui).str(), (test_type(-a1) -= large_ui).str());
+      BOOST_CHECK_EQUAL(mpz_int(b * large_ui).str(), test_type(b1 * large_ui).str());
+      BOOST_CHECK_EQUAL(mpz_int(-b * large_ui).str(), test_type(-b1 * large_ui).str());
+      BOOST_CHECK_EQUAL(mpz_int(large_ui * b).str(), test_type(large_ui * b1).str());
+      BOOST_CHECK_EQUAL((mpz_int(a) *= large_ui).str(), (test_type(a1) *= large_ui).str());
+      BOOST_CHECK_EQUAL((mpz_int(-a) *= large_ui).str(), (test_type(-a1) *= large_ui).str());
+      BOOST_CHECK_EQUAL(mpz_int(a / large_ui).str(), test_type(a1 / large_ui).str());
+      BOOST_CHECK_EQUAL(mpz_int(-a / large_ui).str(), test_type(-a1 / large_ui).str());
+      BOOST_CHECK_EQUAL((mpz_int(a) /= large_ui).str(), (test_type(a1) /= large_ui).str());
+      BOOST_CHECK_EQUAL((mpz_int(-a) /= large_ui).str(), (test_type(-a1) /= large_ui).str());
+      BOOST_CHECK_EQUAL(mpz_int(a % large_ui).str(), test_type(a1 % large_ui).str());
+      BOOST_CHECK_EQUAL(mpz_int(-a % large_ui).str(), test_type(-a1 % large_ui).str());
+      BOOST_CHECK_EQUAL((mpz_int(a) %= large_ui).str(), (test_type(a1) %= large_ui).str());
+      BOOST_CHECK_EQUAL((mpz_int(-a) %= large_ui).str(), (test_type(-a1) %= large_ui).str());
+      BOOST_CHECK_EQUAL(mpz_int(a | large_ui).str(), test_type(a1 | large_ui).str());
+      BOOST_CHECK_EQUAL((mpz_int(a) |= large_ui).str(), (test_type(a1) |= large_ui).str());
+      BOOST_CHECK_EQUAL(mpz_int(a & large_ui).str(), test_type(a1 & large_ui).str());
+      BOOST_CHECK_EQUAL((mpz_int(a) &= large_ui).str(), (test_type(a1) &= large_ui).str());
+      BOOST_CHECK_EQUAL(mpz_int(a ^ large_ui).str(), test_type(a1 ^ large_ui).str());
+      BOOST_CHECK_EQUAL((mpz_int(a) ^= large_ui).str(), (test_type(a1) ^= large_ui).str());
+      BOOST_CHECK_EQUAL(mpz_int(large_ui | a).str(), test_type(large_ui | a1).str());
+      BOOST_CHECK_EQUAL(mpz_int(large_ui & a).str(), test_type(large_ui & a1).str());
+      BOOST_CHECK_EQUAL(mpz_int(large_ui ^ a).str(), test_type(large_ui ^ a1).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(a, large_ui)).str(), test_type(gcd(a1, large_ui)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(large_ui, b)).str(), test_type(gcd(large_ui, b1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(c, large_ui)).str(), test_type(lcm(c1, large_ui)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(large_ui, d)).str(), test_type(lcm(large_ui, d1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(-a, large_ui)).str(), test_type(gcd(-a1, large_ui)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(-c, large_ui)).str(), test_type(lcm(-c1, large_ui)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(large_ui, -b)).str(), test_type(gcd(large_ui, -b1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(large_ui, -d)).str(), test_type(lcm(large_ui, -d1)).str());
+   }
 
    void t5()
    {
@@ -374,6 +420,8 @@ struct tester
       BOOST_CHECK_EQUAL(z1.str(), t1.str());
       BOOST_CHECK_EQUAL(z2.str(), t2.str());
       BOOST_CHECK_EQUAL(integer_modulus(a, si), integer_modulus(a1, si));
+      BOOST_CHECK_EQUAL(integer_modulus(a, ui), integer_modulus(a1, ui));
+      BOOST_CHECK_EQUAL(mpz_int(integer_modulus(a, large_ui)).str(), test_type(integer_modulus(a1, large_ui)).str());
       BOOST_CHECK_EQUAL(lsb(a), lsb(a1));
       BOOST_CHECK_EQUAL(msb(a), msb(a1));
 
@@ -543,14 +591,14 @@ struct tester
 
       {
          typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<> >                                                                                            bigint;
-         typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, 64, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> >   u64;
-         typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<128, 128, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> > u128;
+         //typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<64, 64, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> >   u64;
+         //typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<128, 128, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> > u128;
          typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<256, 256, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> > u256;
          typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<256, 256, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> >   s256;
-         typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<160, 160, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> > u160;
-         typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<160, 160, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> >   s160;
-         typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<512, 512, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> > u512;
-         typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<512, 512, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> >   s512;
+         //typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<160, 160, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> > u160;
+         //typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<160, 160, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> >   s160;
+         //typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<512, 512, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> > u512;
+         //typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<512, 512, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> >   s512;
 
          {
             u256   a = 14;
@@ -705,6 +753,7 @@ struct tester
 
          si = d.convert_to<int>();
          ui = si;
+         large_ui = c.convert_to<boost::multiprecision::double_limb_type>();
 
          a1 = static_cast<test_type>(a.str());
          b1 = static_cast<test_type>(b.str());
@@ -716,6 +765,7 @@ struct tester
 #ifndef SLOW_COMPILER
          t3();
          t4();
+         t4_large();
          t5();
 #endif
 

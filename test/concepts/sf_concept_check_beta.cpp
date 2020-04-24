@@ -67,7 +67,6 @@ template <class T>
 void test_extra(T)
 {
    T   v1, v2, v3;
-   int i;
    boost::math::beta(v1, v2);
    boost::math::beta(v1, v2, v3);
    boost::math::betac(v1, v2, v3);

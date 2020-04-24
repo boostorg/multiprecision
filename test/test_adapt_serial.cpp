@@ -16,7 +16,7 @@
 #include <boost/multiprecision/debug_adaptor.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
-#include <boost/timer.hpp>
+#include "timer.hpp"
 #include "test.hpp"
 
 #include <iostream>
@@ -124,7 +124,7 @@ void test()
 
    boost::random::mt19937 gen;
    boost::uniform_int<>   d(3, std::numeric_limits<T>::is_bounded ? std::numeric_limits<T>::digits : 3000);
-   boost::timer           tim;
+   timer                  tim;
 
    while (true)
    {
