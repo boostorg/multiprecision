@@ -25,7 +25,7 @@ IF DEFINED SCRIPT (
     cd libs/!SELF_S!/test
     set SELF_S=%SELF:\=/%
     REM Echo the complete build command to the build log
-    ECHO b2 --abbreviate-paths %B2_TOOLCXX% %B2_CXXSTD% %B2_CXXFLAGS% %B2_DEFINES% %B2_THREADING% %B2_ADDRESS_MODEL% %B2_LINK% %B2_VARIANT% %B2_TARGET%
+    ECHO ..\..\..\b2 --abbreviate-paths %B2_TOOLCXX% %B2_CXXSTD% %B2_CXXFLAGS% %B2_DEFINES% %B2_THREADING% %B2_ADDRESS_MODEL% %B2_LINK% %B2_VARIANT% %B2_TARGET%
     REM Now go build...
-         b2 --abbreviate-paths %B2_TOOLCXX% %B2_CXXSTD% %B2_CXXFLAGS% %B2_DEFINES% %B2_THREADING% %B2_ADDRESS_MODEL% %B2_LINK% %B2_VARIANT% %B2_TARGET%
+         ..\..\..\b2 --abbreviate-paths %B2_TOOLCXX% %B2_CXXSTD% %B2_CXXFLAGS% %B2_DEFINES% %B2_THREADING% %B2_ADDRESS_MODEL% %B2_LINK% %B2_VARIANT% %B2_TARGET%
 )
