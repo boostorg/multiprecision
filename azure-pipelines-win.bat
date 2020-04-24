@@ -22,9 +22,10 @@ cd %BOOST_ROOT%
 IF DEFINED SCRIPT (
     call libs\%SELF%\%SCRIPT%
 ) ELSE (
+    cd libs/!SELF_S!/test
     set SELF_S=%SELF:\=/%
-    # Echo the complete build command to the build log
-    ECHO b2 --abbreviate-paths libs/!SELF_S!/test %B2_TOOLCXX% %B2_CXXSTD% %B2_CXXFLAGS% %B2_DEFINES% %B2_THREADING% %B2_ADDRESS_MODEL% %B2_LINK% %B2_VARIANT% %B2_TARGET%
-    # Now go build...
-         b2 --abbreviate-paths libs/!SELF_S!/test %B2_TOOLCXX% %B2_CXXSTD% %B2_CXXFLAGS% %B2_DEFINES% %B2_THREADING% %B2_ADDRESS_MODEL% %B2_LINK% %B2_VARIANT% %B2_TARGET%
+    REM Echo the complete build command to the build log
+    ECHO b2 --abbreviate-paths %B2_TOOLCXX% %B2_CXXSTD% %B2_CXXFLAGS% %B2_DEFINES% %B2_THREADING% %B2_ADDRESS_MODEL% %B2_LINK% %B2_VARIANT% %B2_TARGET%
+    REM Now go build...
+         b2 --abbreviate-paths %B2_TOOLCXX% %B2_CXXSTD% %B2_CXXFLAGS% %B2_DEFINES% %B2_THREADING% %B2_ADDRESS_MODEL% %B2_LINK% %B2_VARIANT% %B2_TARGET%
 )
