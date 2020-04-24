@@ -52,33 +52,8 @@ stages:
           B2_CXXSTD: latest # 2a
           B2_CXXFLAGS: -permissive-
           B2_ADDRESS_MODEL: 64
+          B2_TARGET: arithmetic_tests
           VM_IMAGE: 'windows-2019'
-        VS_2019_cxx17:
-          B2_TOOLSET: msvc-14.2
-          B2_CXXSTD: 17
-          B2_ADDRESS_MODEL: 64
-          VM_IMAGE: 'windows-2019'
-        VS_2019_cxx14:
-          B2_TOOLSET: msvc-14.2
-          B2_CXXSTD: 14
-          B2_ADDRESS_MODEL: 64
-          VM_IMAGE: 'windows-2019'
-        VS_2017_cxx2a_strict:
-          B2_TOOLSET: msvc-14.1
-          B2_CXXSTD: latest # 2a
-          B2_CXXFLAGS: -permissive-
-          B2_ADDRESS_MODEL: 64
-          VM_IMAGE: 'vs2017-win2016'
-        VS_2017_cxx17:
-          B2_TOOLSET: msvc-14.1
-          B2_CXXSTD: 17
-          B2_ADDRESS_MODEL: 64,32
-          VM_IMAGE: 'vs2017-win2016'
-        VS_2017_cxx14:
-          B2_TOOLSET: msvc-14.1
-          #B2_CXXSTD: 14 # default
-          B2_ADDRESS_MODEL: 64,32
-          VM_IMAGE: 'vs2017-win2016'
 
     pool:
       vmImage: $(VM_IMAGE)
@@ -89,6 +64,6 @@ stages:
         rmdir /s /q boost-ci-cloned
         ci\azure-pipelines\install.bat
       displayName: 'Install'
-    - script: ci\build.bat
+    - script: azure-pipelines-win.bat
       displayName: 'Build'
 
