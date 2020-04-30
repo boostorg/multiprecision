@@ -2632,7 +2632,7 @@ typedef number<gmp_rational>     mpq_rational;
 
 namespace math { namespace tools {
 
-void set_output_precision(const boost::multiprecision::mpf_float& val, std::ostream& os)
+inline void set_output_precision(const boost::multiprecision::mpf_float& val, std::ostream& os)
 {
    os << std::setprecision(val.precision());
 }
