@@ -1645,6 +1645,11 @@ using boost::multiprecision::signbit;
 
 namespace tools {
 
+void set_output_precision(const boost::multiprecision::mpfr_float& val, std::ostream& os)
+{
+   os << std::setprecision(val.precision());
+}
+
 template <>
 inline int digits<boost::multiprecision::mpfr_float>()
 #ifdef BOOST_MATH_NOEXCEPT
