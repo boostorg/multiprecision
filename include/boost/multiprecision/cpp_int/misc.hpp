@@ -346,7 +346,7 @@ eval_integer_modulus(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checke
       limb_type              res = a.limbs()[n - 1] % mod;
 
       for (int i = n - 2; i >= 0; --i)
-         res = (res * two_n_mod + a.limbs()[i]) % mod;
+         res = static_cast<limb_type>((res * two_n_mod + a.limbs()[i]) % mod);
       return res;
    }
    else
@@ -413,11 +413,13 @@ eval_gcd(
    {
       result = a;
       *result.limbs() |= b;
-      return;
    }
-   eval_modulus(result, a, b);
-   limb_type& res = *result.limbs();
-   res            = eval_gcd(res, b);
+   else
+   {
+      eval_modulus(result, a, b);
+      limb_type& res = *result.limbs();
+      res = eval_gcd(res, b);
+   }
    result.sign(false);
 }
 

@@ -219,7 +219,13 @@ struct tester
       BOOST_CHECK_EQUAL(mpz_int(gcd(-a, -b)).str(), test_type(gcd(-a1, -b1)).str());
       BOOST_CHECK_EQUAL(mpz_int(lcm(-c, -d)).str(), test_type(lcm(-c1, -d1)).str());
       BOOST_CHECK_EQUAL(mpz_int(gcd(a, -b)).str(), test_type(gcd(a1, -b1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(-a, -b)).str(), test_type(gcd(-a1, -b1)).str());
       BOOST_CHECK_EQUAL(mpz_int(lcm(c, -d)).str(), test_type(lcm(c1, -d1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(lcm(-c, -d)).str(), test_type(lcm(-c1, -d1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(mpz_int(0), b)).str(), test_type(gcd(test_type(0), b1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(mpz_int(0), -b)).str(), test_type(gcd(test_type(0), -b1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(a, mpz_int(0))).str(), test_type(gcd(a1, test_type(0))).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(-a, mpz_int(0))).str(), test_type(gcd(a1, test_type(0))).str());
       // Integer sqrt:
       mpz_int   r;
       test_type r1;
