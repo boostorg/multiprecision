@@ -1,10 +1,10 @@
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>std::numeric_limits&lt;&gt; functions</title>
 <link rel="stylesheet" href="../../../multiprecision.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
-<link rel="home" href="../../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
+<link rel="home" href="../../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../limits.html" title="Numeric Limits">
 <link rel="prev" href="constants.html" title="std::numeric_limits&lt;&gt; constants">
 <link rel="next" href="limits32.html" title="Numeric limits for 32-bit platform">
@@ -273,7 +273,7 @@
         </h6>
 <p>
           <a href="https://en.wikipedia.org/wiki/Machine_epsilon" target="_top">Machine epsilon
-          &#949;</a> is very useful to compute a tolerance when comparing floating-point
+          ε</a> is very useful to compute a tolerance when comparing floating-point
           values, a much more difficult task than is commonly imagined.
         </p>
 <p>
@@ -378,7 +378,7 @@
           For floating-point types only, for which <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">has_infinity</span>
           <span class="special">==</span> <span class="keyword">true</span></code>,
           function <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">T</span><span class="special">&gt;::</span><span class="identifier">infinity</span><span class="special">()</span></code>
-          provides an implementation-defined representation for &#8734;.
+          provides an implementation-defined representation for ∞.
         </p>
 <p>
           The 'representation' is a particular bit pattern reserved for infinity.
@@ -443,8 +443,6 @@
 
 <span class="keyword">if</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">cpp_bin_float_quad</span><span class="special">&gt;::</span><span class="identifier">has_quiet_NaN</span> <span class="special">==</span> <span class="keyword">true</span><span class="special">)</span>
 <span class="special">{</span>
-  <span class="identifier">cpp_bin_float_quad</span> <span class="identifier">tolerance</span> <span class="special">=</span>  <span class="number">3</span> <span class="special">*</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">cpp_bin_float_quad</span><span class="special">&gt;::</span><span class="identifier">epsilon</span><span class="special">();</span>
-
   <span class="identifier">cpp_bin_float_quad</span> <span class="identifier">NaN</span> <span class="special">=</span>  <span class="identifier">std</span><span class="special">::</span><span class="identifier">numeric_limits</span><span class="special">&lt;</span><span class="identifier">cpp_bin_float_quad</span><span class="special">&gt;::</span><span class="identifier">quiet_NaN</span><span class="special">();</span>
   <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"cpp_bin_float_quad NaN is "</span>  <span class="special">&lt;&lt;</span> <span class="identifier">NaN</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span> <span class="comment">//   cpp_bin_float_quad NaN is nan</span>
 
@@ -539,7 +537,7 @@
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2020 John
+<td align="right"><div class="copyright-footer">Copyright © 2002-2020 John
       Maddock and Christopher Kormanyos<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
