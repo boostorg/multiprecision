@@ -536,7 +536,9 @@ void eval_asin(T& result, const T& x)
    // we've just added will finish the job...
 
    boost::intmax_t current_precision = eval_ilogb(result);
-   boost::intmax_t target_precision  = current_precision - 1 - (std::numeric_limits<number<T> >::digits * 2) / 3;
+   boost::intmax_t target_precision  = std::numeric_limits<number<T> >::is_specialized ? 
+      current_precision - 1 - (std::numeric_limits<number<T> >::digits * 2) / 3
+      : current_precision - 1 - (boost::multiprecision::detail::digits2<number<T> >::value() * 2) / 3;
 
    // Newton-Raphson iteration
    while (current_precision > target_precision)
@@ -687,7 +689,9 @@ void eval_atan(T& result, const T& x)
    // we've just added will finish the job...
 
    boost::intmax_t current_precision = eval_ilogb(result);
-   boost::intmax_t target_precision  = current_precision - 1 - (std::numeric_limits<number<T> >::digits * 2) / 3;
+   boost::intmax_t target_precision  = std::numeric_limits<number<T> >::is_specialized ?
+      current_precision - 1 - (std::numeric_limits<number<T> >::digits * 2) / 3
+      : current_precision - 1 - (boost::multiprecision::detail::digits2<number<T> >::value() * 2) / 3;
 
    T s, c, t;
    while (current_precision > target_precision)
