@@ -45,7 +45,7 @@ void expected_results()
        ".*",               // platform
        ".*gmp_float<0>.*", // test type(s)
        ".*RF.*",           // test data group
-       ".*", 12000, 700);  // test function
+       ".*", 20000, 800);  // test function
    add_expected_result(
        ".*",          // compiler
        ".*",          // stdlib
