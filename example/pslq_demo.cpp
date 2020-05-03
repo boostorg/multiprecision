@@ -8,10 +8,13 @@
 #include <boost/math/constants/constants.hpp>
 
 int main() {
-    std::map<std::string, double> m;
-    m.emplace("pi", boost::math::constants::pi<double>());
-    auto s = boost::multiprecision::pslq<double>(1.5, m);
-    if (s) {
-        std::cout << s.value() << "\n";
+    std::map<double, std::string> m;
+    m.emplace(boost::math::constants::pi<double>(), "π");
+    m.emplace(boost::math::constants::e<double>(), "e");
+    auto s = boost::multiprecision::pslq<double>(m);
+    if (s.size() > 0) {
+        std::cout << s << "\n";
+    } else {
+        std::cout << "No relations found.\n";
     }
 }
