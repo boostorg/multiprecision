@@ -13,8 +13,35 @@
 #include <sstream>
 #include <map>
 #include <cmath>
+#include <boost/math/constants/constants.hpp>
 
 namespace boost::multiprecision {
+
+template<typename Real>
+auto small_pslq_dictionary() {
+    using std::sqrt;
+    using namespace boost::math::constants;
+    std::map<double, std::string> m;
+    m.emplace(one_div_euler<Real>(), "1/γ");
+    m.emplace(root_pi<Real>(), "√π");
+    m.emplace(pi<Real>(), "π");
+    m.emplace(pi_sqr<Real>(), "π²");
+    m.emplace(pi_cubed<Real>(), "π³");
+    m.emplace(e<Real>(), "e");
+    m.emplace(root_two<Real>(), "√2");
+    m.emplace(root_three<Real>(), "√3");
+    m.emplace(sqrt(static_cast<Real>(5)), "√5");
+    m.emplace(sqrt(static_cast<Real>(7)), "√7");
+    m.emplace(sqrt(static_cast<Real>(11)), "√11");
+    m.emplace(ln_two<Real>(), "ln(2)");
+    m.emplace(euler<Real>(), "γ");
+    m.emplace(phi<Real>(), "φ");
+    m.emplace(catalan<Real>(), "G");
+    m.emplace(glaisher<Real>(), "A");
+    m.emplace(khinchin<Real>(), "K₀");
+    m.emplace(zeta_three<Real>(), "ζ(3)");
+    return m;
+}
 
 // The PSLQ algorithm; partial sum of squares, lower trapezoidal decomposition.
 // See: https://www.davidhbailey.com/dhbpapers/cpslq.pdf, section 3.
@@ -50,8 +77,12 @@ std::optional<std::vector<std::pair<int64_t, Real>>> pslq(std::vector<Real> cons
 
     std::vector<std::pair<int64_t, Real>> m;
     // stubbing it out . . .
-    m.push_back({-5, x[0]});
-    m.push_back({-7, x[1]});
+    //m.push_back({-5, x[0]});
+    //m.push_back({-7, x[1]});
+    for (auto t : x) {
+        m.push_back({-8, t});
+    }
+    //m.push_back({-7, x[4]});
     return m;
 }
 
@@ -65,18 +96,16 @@ template<typename Real>
 std::string pslq(std::map<Real, std::string> const & dictionary, Real gamma) {    
     std::vector<Real> values(dictionary.size());
     size_t i = 0;
-    for (auto it = dictionary.begin(); it != dictionary.end(); ++it)
-    {
+    for (auto it = dictionary.begin(); it != dictionary.end(); ++it) {
         values[i++] = it->first;
     }
 
     auto o = pslq(values, gamma);
     if (o) {
-        // do printing:
         std::ostringstream oss;
         auto const & m = o.value();
         auto const & symbol = dictionary.find(m[0].second)->second;
-        oss << m[0].first << "*" << symbol;
+        oss << m[0].first << "⋅" << symbol;
         for (size_t i = 1; i < m.size(); ++i)
         {
             if (m[i].first < 0) {
@@ -85,7 +114,7 @@ std::string pslq(std::map<Real, std::string> const & dictionary, Real gamma) {
                 oss << " + ";
             }
             auto const & symbol = dictionary.find(m[i].second)->second;
-            oss << abs(m[i].first) << "*" << symbol;
+            oss << abs(m[i].first) << "⋅" << symbol;
         }
         oss << " = 0.";
         return oss.str();
