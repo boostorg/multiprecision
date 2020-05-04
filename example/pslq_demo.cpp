@@ -5,12 +5,11 @@
  * LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
  */
 #include <boost/multiprecision/pslq.hpp>
-#include <boost/math/constants/constants.hpp>
 
 int main() {
     std::map<double, std::string> m = boost::multiprecision::small_pslq_dictionary<double>();
     auto s = boost::multiprecision::pslq<double>(m);
-    if (s.size() > 0)
+    if (!s.empty())
     {
         std::cout << s << "\n";
     }
