@@ -68,7 +68,7 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> const & x, Real gam
     Real tmp = 1/Real(4) + 1/(gamma*gamma);
     Real tau = 1/sqrt(tmp);
     if (tau <= 1 || tau >= 2) {
-        std::cerr << "τ in (1, 2) is required.\n";
+        std::cerr << "τ ∈ (1, 2) is required.\n";
         return m;
     }
 
@@ -119,11 +119,12 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> const & x, Real gam
     // but that's trival and verbose:
     //std::cout << "Hx = \n";
     //std::cout << Hx << "\n";
+
     // Validate the conditions of Lemma 1 in the referenced paper:
     // These tests should eventually be removed once we're confident that the code is correct.
     auto Hxnorm_sq = Hx.squaredNorm();
-    if (abs(Hxnorm_sq - (n-1)) > sqrt(std::numeric_limits<Real>::epsilon())) {
-        std::cerr << "The Frobenius norm of the matrix Hx is incorrect.\n";
+    if (abs(Hxnorm_sq/(n-1) - 1) > sqrt(std::numeric_limits<Real>::epsilon())) {
+        std::cerr << "‖Hₓ‖² ≠ n - 1. Hence Lemma 1.ii of the reference has numerically failed; this is a bug.\n";
         return m;
     }
 
@@ -132,9 +133,9 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> const & x, Real gam
         x_copy[i] = x[i];
     }
     auto v = x_copy.transpose()*Hx;
-    for (int64_t i = 0; i < n -1; ++i) {
-        if (abs(v[i]) > sqrt(std::numeric_limits<Real>::epsilon())) {
-            std::cerr << "x^T*H_x != 0; Lemma 1.ii of the reference cpslq has numerically failed; this is a bug.\n";
+    for (int64_t i = 0; i < n - 1; ++i) {
+        if (abs(v[i])/(n-1) > sqrt(std::numeric_limits<Real>::epsilon())) {
+            std::cerr << "xᵀHₓ ≠ 0; Lemma 1.iii of the reference cpslq has numerically failed; this is a bug.\n";
             return m;
         }
     }
@@ -167,7 +168,7 @@ std::string pslq(std::map<Real, std::string> const & dictionary, Real gamma) {
     if (m.size() > 0) {
         std::ostringstream oss;
         auto const & symbol = dictionary.find(m[0].second)->second;
-        oss << "As ";
+        oss << "As\n\t";
         Real sum = m[0].first*m[0].second;
         oss << m[0].first << "⋅" << m[0].second;
         for (size_t i = 1; i < m.size(); ++i)
@@ -180,7 +181,7 @@ std::string pslq(std::map<Real, std::string> const & dictionary, Real gamma) {
             oss << abs(m[i].first) << "⋅" << m[i].second;
             sum += m[i].first*m[i].second;
         }
-        oss << " = " << sum << ", it is likely that ";
+        oss << " = " << sum << ",\nit is likely that\n\t";
 
         oss << m[0].first << "⋅" << symbol;
         for (size_t i = 1; i < m.size(); ++i)
