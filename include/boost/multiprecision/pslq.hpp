@@ -22,7 +22,7 @@ template<typename Real>
 auto tiny_pslq_dictionary() {
     using std::sqrt;
     using namespace boost::math::constants;
-    std::map<double, std::string> m;
+    std::map<Real, std::string> m;
     m.emplace(pi<Real>(), "π");
     m.emplace(e<Real>(), "e");
     m.emplace(root_two<Real>(), "√2");
@@ -33,7 +33,7 @@ template<typename Real>
 auto small_pslq_dictionary() {
     using std::sqrt;
     using namespace boost::math::constants;
-    std::map<double, std::string> m;
+    std::map<Real, std::string> m;
     m.emplace(one_div_euler<Real>(), "1/γ");
     m.emplace(root_pi<Real>(), "√π");
     m.emplace(pi<Real>(), "π");
