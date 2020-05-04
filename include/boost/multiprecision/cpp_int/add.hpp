@@ -1,3 +1,4 @@
+
 ///////////////////////////////////////////////////////////////
 //  Copyright 2012 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
@@ -49,24 +50,30 @@ inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2
    // First where a and b overlap:
    unsigned      i;
    unsigned char carry = 0;
-#if __GNUC__ || __clang__
-   for (i = 0; i < m; ++i)
+#ifndef __INTEL_COMPILER
+   for (i = 0; i + 4 <= m; i += 4)
    {
+	  carry = _addcarry_u64(carry, pa[i + 0], pb[i + 0], &pr[i + 0]);
+	  carry = _addcarry_u64(carry, pa[i + 1], pb[i + 1], &pr[i + 1]);
+	  carry = _addcarry_u64(carry, pa[i + 2], pb[i + 2], &pr[i + 2]);
+	  carry = _addcarry_u64(carry, pa[i + 3], pb[i + 3], &pr[i + 3]);
+   }
+   for (; i < m; ++i)
 	  carry = _addcarry_u64(carry, pa[i], pb[i], &pr[i]);
-   }
    for (; i < x && carry; ++i)
-   {
 	  carry = _addcarry_u64(carry, pa[i], 0, &pr[i]);
-   }
-#else // for ICC
-   for (i = 0; i < m; ++i)
+#else
+   for (i = 0; i + 4 <= m; i += 4)
    {
+	  carry = _addcarry_u64(carry, pa[i + 0], pb[i + 0], (unsigned long*)&pr[i + 0]);
+	  carry = _addcarry_u64(carry, pa[i + 1], pb[i + 1], (unsigned long*)&pr[i + 1]);
+	  carry = _addcarry_u64(carry, pa[i + 2], pb[i + 2], (unsigned long*)&pr[i + 2]);
+	  carry = _addcarry_u64(carry, pa[i + 3], pb[i + 3], (unsigned long*)&pr[i + 3]);
+   }
+   for (; i < m; ++i)
 	  carry = _addcarry_u64(carry, pa[i], pb[i], (unsigned long*)&pr[i]);
-   }
    for (; i < x && carry; ++i)
-   {
 	  carry = _addcarry_u64(carry, pa[i], 0, (unsigned long*)&pr[i]);
-   }
 #endif
    if (i == x && carry)
    {
@@ -77,7 +84,6 @@ inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2
    }
    else
 	  std_constexpr::copy(pa + i, pa + x, pr + i);
-   //std::cerr << std::hex << "A:\t" << abs(cpp_int{a}) << "\nB:\t" << abs(cpp_int{b}) << "\n\n";
    result.normalize();
    result.sign(a.sign());
 }
