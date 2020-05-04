@@ -13,9 +13,22 @@
 #include <map>
 #include <cmath>
 #include <boost/math/constants/constants.hpp>
+#include <Eigen/Dense>
 
 namespace boost::multiprecision {
 
+// For debugging:
+template<typename Real>
+auto tiny_pslq_dictionary() {
+    using std::sqrt;
+    using namespace boost::math::constants;
+    std::map<double, std::string> m;
+    m.emplace(pi<Real>(), "π");
+    m.emplace(e<Real>(), "e");
+    m.emplace(root_two<Real>(), "√2");
+    m.emplace(ln_two<Real>(), "ln(2)");
+    return m;
+}
 template<typename Real>
 auto small_pslq_dictionary() {
     using std::sqrt;
@@ -75,6 +88,57 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> const & x, Real gam
         }
     }
 
+    // Are we computing too many square roots??? Should we use s instead?
+    std::vector<Real> s_sq(x.size());
+    s_sq.back() = x.back()*x.back();
+    int64_t n = x.size();
+    for (int64_t i = n - 2; i >= 0; --i) {
+        s_sq[i] = s_sq[i+1] + x[i]*x[i];
+    }
+    
+    Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic> Hx(n, n-1);
+    for (int64_t i = 0; i < n - 1; ++i) {
+        for (int64_t j = 0; j < n - 1; ++j) {
+            if (i < j) {
+                Hx(i,j) = 0;
+            }
+            else if (i == j) {
+                Hx(i,i) = sqrt(s_sq[i+1]/s_sq[i]);
+            }
+            else {
+                // i > j:
+                Hx(i,j) = -x[i]*x[j]/sqrt(s_sq[j]*s_sq[j+1]);
+            }
+        }
+    }
+    for (int64_t j = 0; j < n - 1; ++j) {
+        Hx(n-1, j) = -x[n-1]*x[j]/sqrt(s_sq[j]*s_sq[j+1]);
+    }
+
+    // This validates that Hx is indeed lower trapezoidal,
+    // but that's trival and verbose:
+    //std::cout << "Hx = \n";
+    //std::cout << Hx << "\n";
+    // Validate the conditions of Lemma 1 in the referenced paper:
+    // These tests should eventually be removed once we're confident that the code is correct.
+    auto Hxnorm_sq = Hx.squaredNorm();
+    if (abs(Hxnorm_sq - (n-1)) > sqrt(std::numeric_limits<Real>::epsilon())) {
+        std::cerr << "The Frobenius norm of the matrix Hx is incorrect.\n";
+        return m;
+    }
+
+    Eigen::Matrix<Real, Eigen::Dynamic, 1> x_copy(x.size());
+    for (int64_t i = 0; i < n; ++i) {
+        x_copy[i] = x[i];
+    }
+    auto v = x_copy.transpose()*Hx;
+    for (int64_t i = 0; i < n -1; ++i) {
+        if (abs(v[i]) > sqrt(std::numeric_limits<Real>::epsilon())) {
+            std::cerr << "x^T*H_x != 0; Lemma 1.ii of the reference cpslq has numerically failed; this is a bug.\n";
+            return m;
+        }
+    }
+    
     // stubbing it out . . .
     //m.push_back({-5, x[0]});
     //m.push_back({-7, x[1]});
@@ -129,7 +193,7 @@ std::string pslq(std::map<Real, std::string> const & dictionary, Real gamma) {
             auto const & symbol = dictionary.find(m[i].second)->second;
             oss << abs(m[i].first) << "⋅" << symbol;
         }
-        oss << " = 0.\n";
+        oss << " = 0.";
 
         return oss.str();
     }
