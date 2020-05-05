@@ -58,9 +58,14 @@ auto small_pslq_dictionary() {
 // The PSLQ algorithm; partial sum of squares, lower trapezoidal decomposition.
 // See: https://www.davidhbailey.com/dhbpapers/cpslq.pdf, section 3.
 template<typename Real>
-std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> const & x, Real gamma) {
-    using std::sqrt;
+std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real gamma) {
     std::vector<std::pair<int64_t, Real>> m;
+    //std::reverse(x.begin(), x.end());
+    if (!std::is_sorted(x.begin(), x.end())) {
+        std::cerr << "Elements must be sorted in increasing order.\n";
+        return m;
+    }
+    using std::sqrt;
     if (gamma <= 2/sqrt(3)) {
         std::cerr << "γ > 2/√3 is required\n";
         return m;
@@ -139,14 +144,34 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> const & x, Real gam
             return m;
         }
     }
+    //std::cout << "H, pre-reduction:\n" << Hx << "\n";
     
+    using std::round;
+    // Matrix D of Definition 4:
+    Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic> D = Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic>::Identity(n, n);
+    for (int64_t i = 1; i < n; ++i) {
+        for (int64_t j = i - 1; j >= 0; --j) {
+            Real q = round(Hx(i,j)/Hx(j,j));
+            // This happens a lot because x_0 < x_1 < ...!
+            // Sort them in decreasing order and it almost never happens.
+            if (q == 0) {
+                continue;
+            }
+            for (int64_t k = 0; k <= j; ++k)
+            {
+                Hx(i,k) = Hx(i,k) - q*Hx(j,k);
+            }
+            for (int64_t k = 0; k < n; ++k) {
+                D(i,k) = D(i,k) - q*D(j,k);
+            }
+        }
+    }
+    //std::cout << "D = \n" << D << "\n";
+    //std::cout << "H, post-reduction:\n" << Hx << "\n";
     // stubbing it out . . .
-    //m.push_back({-5, x[0]});
-    //m.push_back({-7, x[1]});
     for (auto t : x) {
         m.push_back({-8, t});
     }
-    //m.push_back({-7, x[4]});
     return m;
 }
 
