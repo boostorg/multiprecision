@@ -47,9 +47,9 @@ inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2
       if (as < bs)
          swap(pa, pb);
       // First where a and b overlap:
-      unsigned      i;
+      unsigned      i = 0;
       unsigned char carry = 0;
-      for (i = 0; i + 4 <= m; i += 4)
+      for (; i + 4 <= m; i += 4)
       {
          carry = _addcarry_u32(carry, pa[i + 0], pb[i + 0], (unsigned int*)&pr[i + 0]);
          carry = _addcarry_u32(carry, pa[i + 1], pb[i + 1], (unsigned int*)&pr[i + 1]);
