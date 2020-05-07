@@ -11,11 +11,22 @@
 #ifdef __has_include
 #if __has_include(<immintrin.h>)
 #define BOOST_MP_HAS_IMMINTRIN_H
-#include <immintrin.h>
 #endif
+#endif
+//
+// If this is GCC/clang, thne check that the actual intrinsic exists:
+//
+#if defined(__has_builtin) && defined(__GNUC__)
+#if !__has_builtin(__builtin_ia32_addcarryx_u64) && defined(BOOST_MP_HAS_IMMINTRIN_H)
+#undef BOOST_MP_HAS_IMMINTRIN_H
+#endif
+#elif defined(BOOST_MP_HAS_IMMINTRIN_H)
+#undef BOOST_MP_HAS_IMMINTRIN_H
 #endif
 
 #ifdef BOOST_MP_HAS_IMMINTRIN_H
+
+#include <immintrin.h>
 
 #if defined(__AVX__) && defined(BOOST_HAS_INT128) && (defined(BOOST_MSVC) || defined(BOOST_INTEL))
 #include <boost/multiprecision/cpp_int/addition/add_unsigned_adxc_64.hpp>
