@@ -20,7 +20,12 @@
 #if !__has_builtin(__builtin_ia32_addcarryx_u64) && defined(BOOST_MP_HAS_IMMINTRIN_H)
 #undef BOOST_MP_HAS_IMMINTRIN_H
 #endif
-#elif defined(BOOST_MP_HAS_IMMINTRIN_H)
+#elif defined(BOOST_MP_HAS_IMMINTRIN_H) && defined(__GNUC__)
+#undef BOOST_MP_HAS_IMMINTRIN_H
+#endif
+
+#if defined(__clang__) && (__clang__ < 9)
+// We appear to crash the compiler if we try to use these intrinsics?
 #undef BOOST_MP_HAS_IMMINTRIN_H
 #endif
 
@@ -34,6 +39,8 @@
 #include <boost/multiprecision/cpp_int/addition/add_unsigned_adxc_32.hpp>
 #elif defined(BOOST_HAS_INT128)
 #include <boost/multiprecision/cpp_int/addition/add_unsigned_addc_64.hpp>
+#elif defined(BOOST_MSVC) && defined(_M_X64)
+#include <boost/multiprecision/cpp_int/addition/add_unsigned_addc_32_64.hpp>
 #else
 #include <boost/multiprecision/cpp_int/addition/add_unsigned_addc_32.hpp>
 #endif
