@@ -3,8 +3,8 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
-#ifndef BOOST_MP_ADD_UNSIGNED_ADXC_64_HPP
-#define BOOST_MP_ADD_UNSIGNED_ADXC_64_HPP
+#ifndef BOOST_MP_ADD_UNSIGNED_ADDC_32_HPP
+#define BOOST_MP_ADD_UNSIGNED_ADDC_32_HPP
 
 #include <boost/multiprecision/cpp_int/addition/add_unsigned_constexpr.hpp>
 
@@ -13,10 +13,13 @@ namespace boost { namespace multiprecision { namespace backends {
 //
 // This is the key addition routine where all the argument types are non-trivial cpp_int's:
 //
+// In this file we must have 32 bit limbs, but 64-bit arithmetic operations, we'll process
+// 2 limbs at a time and unroll the loop x4 as well:
+//
 template <class CppInt1, class CppInt2, class CppInt3>
 inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2& a, const CppInt3& b) BOOST_MP_NOEXCEPT_IF(is_non_throwing_cpp_int<CppInt1>::value)
 {
-   BOOST_STATIC_ASSERT(sizeof(limb_type) * CHAR_BIT == 64);
+   BOOST_STATIC_ASSERT(sizeof(limb_type) * CHAR_BIT == 32);
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
    if (BOOST_MP_IS_CONST_EVALUATED(a.size()))
    {
@@ -25,12 +28,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2
    else
 #endif
    {
-#ifdef BOOST_INTEL
-      typedef unsigned __int64 cast_type;
-#else
-      typedef unsigned long long cast_type;
-#endif
-      using std::swap;
+      using ::boost::multiprecision::std_constexpr::swap;
 
       // Nothing fancy, just let uintmax_t take the strain:
       unsigned m(0), x(0);
@@ -55,17 +53,17 @@ inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2
       // First where a and b overlap:
       unsigned      i = 0;
       unsigned char carry = 0;
-      for (; i + 4 <= m; i += 4)
+      for (; i + 8 <= m; i += 8)
       {
-         carry = _addcarryx_u64(carry, pa[i + 0], pb[i + 0], (cast_type*)&pr[i + 0]);
-         carry = _addcarryx_u64(carry, pa[i + 1], pb[i + 1], (cast_type*)&pr[i + 1]);
-         carry = _addcarryx_u64(carry, pa[i + 2], pb[i + 2], (cast_type*)&pr[i + 2]);
-         carry = _addcarryx_u64(carry, pa[i + 3], pb[i + 3], (cast_type*)&pr[i + 3]);
+         carry = _addcarry_u64(carry, *(unsigned long long*)(pa + i), *(unsigned long long*)(pb + i), (unsigned long long*)(pr + i));
+         carry = _addcarry_u64(carry, *(unsigned long long*)(pa + i + 2), *(unsigned long long*)(pb + i + 2), (unsigned long long*)(pr + i + 2));
+         carry = _addcarry_u64(carry, *(unsigned long long*)(pa + i + 4), *(unsigned long long*)(pb + i + 4), (unsigned long long*)(pr + i + 4));
+         carry = _addcarry_u64(carry, *(unsigned long long*)(pa + i + 6), *(unsigned long long*)(pb + i + 6), (unsigned long long*)(pr + i + 6));
       }
       for (; i < m; ++i)
-         carry = _addcarryx_u64(carry, pa[i], pb[i], (cast_type*)&pr[i]);
+         carry = _addcarry_u32(carry, pa[i], pb[i], (unsigned int*)&pr[i]);
       for (; i < x && carry; ++i)
-         carry = _addcarryx_u64(carry, pa[i], 0, (cast_type*)&pr[i]);
+         carry = _addcarry_u32(carry, pa[i], 0, (unsigned int*)&pr[i]);
       if (i == x && carry)
       {
          // We overflowed, need to add one more limb:

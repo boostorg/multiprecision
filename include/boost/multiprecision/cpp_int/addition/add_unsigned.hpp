@@ -33,11 +33,7 @@
 
 #include <immintrin.h>
 
-#if defined(__AVX__) && defined(BOOST_HAS_INT128) && (defined(BOOST_MSVC) || defined(BOOST_INTEL))
-#include <boost/multiprecision/cpp_int/addition/add_unsigned_adxc_64.hpp>
-#elif defined(__AVX__) && (defined(BOOST_MSVC) || defined(BOOST_INTEL))
-#include <boost/multiprecision/cpp_int/addition/add_unsigned_adxc_32.hpp>
-#elif defined(BOOST_HAS_INT128)
+#if defined(BOOST_HAS_INT128)
 #include <boost/multiprecision/cpp_int/addition/add_unsigned_addc_64.hpp>
 #elif defined(BOOST_MSVC) && defined(_M_X64)
 #include <boost/multiprecision/cpp_int/addition/add_unsigned_addc_32_64.hpp>
