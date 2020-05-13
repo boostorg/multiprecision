@@ -464,7 +464,6 @@ template<typename FloatingPointType,
 
 template <class T>
 typename std::enable_if<should_use_log_agm<T>::value>::type eval_log(T& result_x, const T& x) {
-
   // Use an AGM method to compute the logarithm of x.
 
   // For values less than 1 invert the argument and
@@ -486,7 +485,7 @@ typename std::enable_if<should_use_log_agm<T>::value>::type eval_log(T& result_x
   T ak(1.0);
 
   const float n_times_factor = static_cast<float>(static_cast<float>(std::numeric_limits<T>::digits10) * 1.67F);
-  const float lgx_over_lg2 = 100.0; //  std::log(static_cast<float>(xx)) / std::log(2.0F); TODO: fix
+  const float lgx_over_lg2 = xx.exponent() / std::log(2.0F); // std::log(static_cast<float>(xx)) / std::log(2.0F)
 
   std::int32_t m = static_cast<std::int32_t>(n_times_factor - lgx_over_lg2);
 
@@ -506,14 +505,17 @@ typename std::enable_if<should_use_log_agm<T>::value>::type eval_log(T& result_x
   using std::sqrt;
 
   // Determine the requested precision of the upcoming iteration in units of digits10.
-  const T target_tolerance = 0.0000001; // eval_sqrt(std::numeric_limits<T>::epsilon()) / 100;
+  T eps = std::numeric_limits<number<T, et_on> >::epsilon().backend();
+  T target_tolerance;
+  eval_sqrt(eps, target_tolerance);
+  eval_divide(target_tolerance, 100.0);
 
   for (std::int32_t k = static_cast<std::int32_t>(0); k < static_cast<std::int32_t>(64); ++k) {
     using std::fabs;
 
     T cp_ak = ak;
     eval_divide(cp_ak, bk);
-    if (x.compare(1.0) < 0) {
+    if (x.compare(0.0) < 0) {
       cp_ak.negate();
     }
     T one(1.0);
@@ -529,14 +531,13 @@ typename std::enable_if<should_use_log_agm<T>::value>::type eval_log(T& result_x
       && (one.compare(target_tolerance) < 0.0));
 
     ak_tmp = ak;
-    eval_add(ak, bk); // ak += bk;
-    eval_divide(ak, 2.0); // ak /= 2;
+    eval_add(ak, bk);
+    eval_divide(ak, 2.0);
     if (break_after_this_iteration) {
       break;
     }
 
-    eval_multiply(bk, ak_tmp); // bk *= ak_tmp;
-    T half(0.5);
+    eval_multiply(bk, ak_tmp);
     T new_bk;
     eval_sqrt(new_bk, bk);
     bk = new_bk;
@@ -548,15 +549,13 @@ typename std::enable_if<should_use_log_agm<T>::value>::type eval_log(T& result_x
   // Note at this time that (ak = bk) = AGM(...)
 
   // Retrieve the value of pi, divide by (2 * a) and subtract (m * ln2).
-  T two(2.0);
-  eval_multiply(ak, two);
-  T p(3.14); // boost::math::constants::pi<T>();
+  
+  eval_multiply(ak, 2.0);
+  T p = get_constant_pi<T>();
   eval_divide(p, ak);
 
-  // boost::math::constants::ln_two<T>()* m
-  T ln_2(0.69314718056);
   T mm(0.0 + m);
-  eval_multiply(mm, ln_2);
+  eval_multiply(mm, get_constant_ln2<T>());
   eval_subtract(p, mm);
 
   if (b_negate) {
