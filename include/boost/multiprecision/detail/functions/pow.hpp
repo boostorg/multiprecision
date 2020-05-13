@@ -335,92 +335,234 @@ void eval_exp(T& result, const T& x)
       result = exp_series;
 }
 
+template <class Float>
+struct should_use_log_agm {
+  static const bool value = Float::bit_count > 200;
+};
+
+template <class Float>
+struct should_use_log_series {
+  static const bool value = !should_use_log_agm<Float>::value;
+};
+
 template <class T>
-void eval_log(T& result, const T& arg)
-{
-   BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The log function is only valid for floating point types.");
-   //
-   // We use a variation of http://dlmf.nist.gov/4.45#i
-   // using frexp to reduce the argument to x * 2^n,
-   // then let y = x - 1 and compute:
-   // log(x) = log(2) * n + log1p(1 + y)
-   //
-   typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
-   typedef typename T::exponent_type                                            exp_type;
-   typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
-   typedef typename mpl::front<typename T::float_types>::type                   fp_type;
-   int                                                                          s = eval_signbit(arg);
-   switch (eval_fpclassify(arg))
-   {
-   case FP_NAN:
-      result = arg;
-      errno  = EDOM;
-      return;
-   case FP_INFINITE:
-      if (s)
-         break;
-      result = arg;
-      return;
-   case FP_ZERO:
-      result = std::numeric_limits<number<T> >::has_infinity ? std::numeric_limits<number<T> >::infinity().backend() : (std::numeric_limits<number<T> >::max)().backend();
-      result.negate();
-      errno = ERANGE;
-      return;
-   }
-   if (s)
-   {
-      result = std::numeric_limits<number<T> >::quiet_NaN().backend();
-      errno  = EDOM;
-      return;
-   }
+typename std::enable_if<should_use_log_series<T>::value>::type eval_log(T& result, const T& arg) {
+  BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The log function is only valid for floating point types.");
+  //
+  // We use a variation of http://dlmf.nist.gov/4.45#i
+  // using frexp to reduce the argument to x * 2^n,
+  // then let y = x - 1 and compute:
+  // log(x) = log(2) * n + log1p(1 + y)
+  //
+  typedef typename boost::multiprecision::detail::canonical<unsigned, T>::type ui_type;
+  typedef typename T::exponent_type                                            exp_type;
+  typedef typename boost::multiprecision::detail::canonical<exp_type, T>::type canonical_exp_type;
+  typedef typename mpl::front<typename T::float_types>::type                   fp_type;
+  int                                                                          s = eval_signbit(arg);
+  switch (eval_fpclassify(arg)) {
+  case FP_NAN:
+    result = arg;
+    errno = EDOM;
+    return;
+  case FP_INFINITE:
+    if (s)
+      break;
+    result = arg;
+    return;
+  case FP_ZERO:
+    result = std::numeric_limits<number<T> >::has_infinity ? std::numeric_limits<number<T> >::infinity().backend() : (std::numeric_limits<number<T> >::max)().backend();
+    result.negate();
+    errno = ERANGE;
+    return;
+  }
+  if (s) {
+    result = std::numeric_limits<number<T> >::quiet_NaN().backend();
+    errno = EDOM;
+    return;
+  }
 
-   exp_type e;
-   T        t;
-   eval_frexp(t, arg, &e);
-   bool alternate = false;
+  exp_type e;
+  T        t;
+  eval_frexp(t, arg, &e);
+  bool alternate = false;
 
-   if (t.compare(fp_type(2) / fp_type(3)) <= 0)
-   {
-      alternate = true;
-      eval_ldexp(t, t, 1);
-      --e;
-   }
+  if (t.compare(fp_type(2) / fp_type(3)) <= 0) {
+    alternate = true;
+    eval_ldexp(t, t, 1);
+    --e;
+  }
 
-   eval_multiply(result, get_constant_ln2<T>(), canonical_exp_type(e));
-   INSTRUMENT_BACKEND(result);
-   eval_subtract(t, ui_type(1)); /* -0.3 <= t <= 0.3 */
-   if (!alternate)
-      t.negate(); /* 0 <= t <= 0.33333 */
-   T pow = t;
-   T lim;
-   T t2;
+  eval_multiply(result, get_constant_ln2<T>(), canonical_exp_type(e));
+  INSTRUMENT_BACKEND(result);
+  eval_subtract(t, ui_type(1)); /* -0.3 <= t <= 0.3 */
+  if (!alternate)
+    t.negate(); /* 0 <= t <= 0.33333 */
+  T pow = t;
+  T lim;
+  T t2;
 
-   if (alternate)
-      eval_add(result, t);
-   else
-      eval_subtract(result, t);
+  if (alternate)
+    eval_add(result, t);
+  else
+    eval_subtract(result, t);
 
-   if (std::numeric_limits<number<T, et_on> >::is_specialized)
-      eval_multiply(lim, result, std::numeric_limits<number<T, et_on> >::epsilon().backend());
-   else
-      eval_ldexp(lim, result, 1 - boost::multiprecision::detail::digits2<number<T, et_on> >::value());
-   if (eval_get_sign(lim) < 0)
-      lim.negate();
-   INSTRUMENT_BACKEND(lim);
+  if (std::numeric_limits<number<T, et_on> >::is_specialized)
+    eval_multiply(lim, result, std::numeric_limits<number<T, et_on> >::epsilon().backend());
+  else
+    eval_ldexp(lim, result, 1 - boost::multiprecision::detail::digits2<number<T, et_on> >::value());
+  if (eval_get_sign(lim) < 0)
+    lim.negate();
+  INSTRUMENT_BACKEND(lim);
 
-   ui_type k = 1;
-   do
-   {
-      ++k;
-      eval_multiply(pow, t);
-      eval_divide(t2, pow, k);
-      INSTRUMENT_BACKEND(t2);
-      if (alternate && ((k & 1) != 0))
-         eval_add(result, t2);
-      else
-         eval_subtract(result, t2);
-      INSTRUMENT_BACKEND(result);
-   } while (lim.compare(t2) < 0);
+  ui_type k = 1;
+  do {
+    ++k;
+    eval_multiply(pow, t);
+    eval_divide(t2, pow, k);
+    INSTRUMENT_BACKEND(t2);
+    if (alternate && ((k & 1) != 0))
+      eval_add(result, t2);
+    else
+      eval_subtract(result, t2);
+    INSTRUMENT_BACKEND(result);
+  } while (lim.compare(t2) < 0);
+}
+
+template<typename FloatingPointType,
+  typename UnsignedIntegralType>
+  FloatingPointType pown(const FloatingPointType& b, const UnsignedIntegralType& p) {
+  // Calculate (b ^ p).
+
+  using local_floating_point_type = FloatingPointType;
+  using local_unsigned_integral_type = UnsignedIntegralType;
+
+  local_floating_point_type result;
+
+  if (p == local_unsigned_integral_type(0U)) { 
+    result = local_floating_point_type(1.0); 
+  } else if (p == local_unsigned_integral_type(1U)) { 
+    result = b; 
+  } else if (p == local_unsigned_integral_type(2U)) { 
+    result = b; 
+    eval_multiply(result, b);
+  } else {
+    result = local_floating_point_type(1.0);
+
+    local_floating_point_type y(b);
+
+    for (local_unsigned_integral_type p_local(p); p_local != local_unsigned_integral_type(0U); p_local >>= 1U) {
+      if ((static_cast<unsigned>(p_local) & 1U) != 0U) {
+        eval_multiply(result, y); // result *= y;
+      }
+      local_floating_point_type cp_y = y;
+      eval_multiply(y, cp_y);
+    }
+  }
+
+  return result;
+}
+
+template <class T>
+typename std::enable_if<should_use_log_agm<T>::value>::type eval_log(T& result_x, const T& x) {
+
+  // Use an AGM method to compute the logarithm of x.
+
+  // For values less than 1 invert the argument and
+  // remember (in this case) to negate the result below.
+  const bool b_negate = (x.compare(1.0) < 0);
+
+
+  T xx;
+  if (!b_negate) {
+    xx = x;
+  } else {
+    xx = 1;
+    eval_divide(xx, x);
+  }
+
+  // Set a0 = 1
+  // Set b0 = 4 / (x * 2^m) = 1 / (x * 2^(m - 2))
+
+  T ak(1.0);
+
+  const float n_times_factor = static_cast<float>(static_cast<float>(std::numeric_limits<T>::digits10) * 1.67F);
+  const float lgx_over_lg2 = 100.0; //  std::log(static_cast<float>(xx)) / std::log(2.0F); TODO: fix
+
+  std::int32_t m = static_cast<std::int32_t>(n_times_factor - lgx_over_lg2);
+
+  // Ensure that the resulting power is non-negative.
+  // Also enforce that m >= 8.
+  m = (std::max)(m, static_cast<std::int32_t>(8));
+
+  T bk = pown(T(2.0), static_cast<std::uint32_t>(m));
+
+  eval_multiply(bk, xx);
+  T four = 4.0;
+  eval_divide(four, bk);
+  bk = four;
+
+  T ak_tmp(0.0);
+
+  using std::sqrt;
+
+  // Determine the requested precision of the upcoming iteration in units of digits10.
+  const T target_tolerance = 0.0000001; // eval_sqrt(std::numeric_limits<T>::epsilon()) / 100;
+
+  for (std::int32_t k = static_cast<std::int32_t>(0); k < static_cast<std::int32_t>(64); ++k) {
+    using std::fabs;
+
+    T cp_ak = ak;
+    eval_divide(cp_ak, bk);
+    if (x.compare(1.0) < 0) {
+      cp_ak.negate();
+    }
+    T one(1.0);
+    eval_subtract(one, cp_ak);
+    if (one.compare(1.0) < 0) {
+      one.negate();
+    }
+    // Check for the number of significant digits to be
+    // at least half of the requested digits. If at least
+    // half of the requested digits have been achieved,
+    // then break after the upcoming iteration.
+    const bool break_after_this_iteration = ((k > static_cast<std::int32_t>(4))
+      && (one.compare(target_tolerance) < 0.0));
+
+    ak_tmp = ak;
+    eval_add(ak, bk); // ak += bk;
+    eval_divide(ak, 2.0); // ak /= 2;
+    if (break_after_this_iteration) {
+      break;
+    }
+
+    eval_multiply(bk, ak_tmp); // bk *= ak_tmp;
+    T half(0.5);
+    T new_bk;
+    eval_sqrt(new_bk, bk);
+    bk = new_bk;
+  }
+
+  // We are now finished with the AGM iteration for log(x).
+
+  // Compute log(x) = {pi / [2 * AGM(1, 4 / 2^m)]} - (m * ln2)
+  // Note at this time that (ak = bk) = AGM(...)
+
+  // Retrieve the value of pi, divide by (2 * a) and subtract (m * ln2).
+  T two(2.0);
+  eval_multiply(ak, two);
+  T p(3.14); // boost::math::constants::pi<T>();
+  eval_divide(p, ak);
+
+  // boost::math::constants::ln_two<T>()* m
+  T ln_2(0.69314718056);
+  T mm(0.0 + m);
+  eval_multiply(mm, ln_2);
+  eval_subtract(p, mm);
+
+  if (b_negate) {
+    p.negate();
+  }
+  result_x = p;
 }
 
 template <class T>
