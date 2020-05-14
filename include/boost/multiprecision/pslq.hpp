@@ -32,11 +32,13 @@ auto tiny_pslq_dictionary() {
 template<typename Real>
 auto small_pslq_dictionary() {
     using std::sqrt;
+    using std::log;
     using namespace boost::math::constants;
     std::map<Real, std::string> m;
     m.emplace(one_div_euler<Real>(), "1/γ");
     m.emplace(root_pi<Real>(), "√π");
     m.emplace(pi<Real>(), "π");
+    m.emplace(log(pi<Real>()), "ln(π)");
     m.emplace(pi_sqr<Real>(), "π²");
     m.emplace(pi_cubed<Real>(), "π³");
     m.emplace(e<Real>(), "e");
@@ -45,13 +47,22 @@ auto small_pslq_dictionary() {
     m.emplace(sqrt(static_cast<Real>(5)), "√5");
     m.emplace(sqrt(static_cast<Real>(7)), "√7");
     m.emplace(sqrt(static_cast<Real>(11)), "√11");
-    m.emplace(ln_two<Real>(), "ln(2)");
     m.emplace(euler<Real>(), "γ");
-    m.emplace(phi<Real>(), "φ");
+    // φ is linearly dependent on √5; its logarithm is not.
+    m.emplace(log(phi<Real>()), "ln(φ)");
     m.emplace(catalan<Real>(), "G");
     m.emplace(glaisher<Real>(), "A");
     m.emplace(khinchin<Real>(), "K₀");
     m.emplace(zeta_three<Real>(), "ζ(3)");
+    // To recover multiplicative relations we need the logarithms of small primes.
+    m.emplace(log(static_cast<Real>(2)), "ln(2)");
+    m.emplace(log(static_cast<Real>(3)), "ln(3)");
+    m.emplace(log(static_cast<Real>(5)), "ln(5)");
+    m.emplace(log(static_cast<Real>(7)), "ln(7)");
+    m.emplace(log(static_cast<Real>(11)), "ln(11)");
+    m.emplace(log(static_cast<Real>(13)), "ln(13)");
+    m.emplace(log(static_cast<Real>(17)), "ln(17)");
+    m.emplace(log(static_cast<Real>(19)), "ln(19)");
     return m;
 }
 
