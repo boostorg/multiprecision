@@ -120,6 +120,15 @@ inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2
       // First where a and b overlap:
       unsigned      i = 0;
       unsigned char carry = 0;
+#if defined(BOOST_MSVC) && !defined(BOOST_HAS_INT128) && defined(_M_X64)
+      for (; i + 8 <= m; i += 8)
+      {
+         carry = _addcarry_u64(carry, *(unsigned long long*)(pa + i + 0), *(unsigned long long*)(pb + i + 0), (unsigned long long*)(pr + i));
+         carry = _addcarry_u64(carry, *(unsigned long long*)(pa + i + 2), *(unsigned long long*)(pb + i + 2), (unsigned long long*)(pr + i + 2));
+         carry = _addcarry_u64(carry, *(unsigned long long*)(pa + i + 4), *(unsigned long long*)(pb + i + 4), (unsigned long long*)(pr + i + 4));
+         carry = _addcarry_u64(carry, *(unsigned long long*)(pa + i + 6), *(unsigned long long*)(pb + i + 6), (unsigned long long*)(pr + i + 6));
+      }
+#else
       for (; i + 4 <= m; i += 4)
       {
          carry = ::boost::multiprecision::detail::addcarry_limb(carry, pa[i + 0], pb[i + 0], pr + i);
@@ -127,6 +136,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2
          carry = ::boost::multiprecision::detail::addcarry_limb(carry, pa[i + 2], pb[i + 2], pr + i + 2);
          carry = ::boost::multiprecision::detail::addcarry_limb(carry, pa[i + 3], pb[i + 3], pr + i + 3);
       }
+#endif
       for (; i < m; ++i)
          carry = ::boost::multiprecision::detail::addcarry_limb(carry, pa[i], pb[i], pr + i);
       for (; i < x && carry; ++i)
