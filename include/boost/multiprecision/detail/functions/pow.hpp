@@ -337,7 +337,7 @@ void eval_exp(T& result, const T& x)
 
 template <class Float>
 struct should_use_log_agm {
-  static const bool value = Float::bit_count > 200;
+  static const bool value = std::numeric_limits<number<Float> >::digits > 200;
 };
 
 template <class Float>
