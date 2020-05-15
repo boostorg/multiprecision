@@ -1800,9 +1800,9 @@ inline void eval_convert_to(boost::long_long_type* result, const gmp_int& val)
    {
       overflow = true;
    }
-   if ((s > 0) && (unsigned_result > static_cast<boost::ulong_long_type>(std::numeric_limits<boost::long_long_type>::max())))
+   if ((s > 0) && (unsigned_result > static_cast<boost::ulong_long_type>((std::numeric_limits<boost::long_long_type>::max)())))
       overflow = true;
-   if((s < 0) && (unsigned_result > 1u - static_cast<boost::ulong_long_type>(std::numeric_limits<boost::long_long_type>::min() + 1)))
+   if((s < 0) && (unsigned_result > 1u - static_cast<boost::ulong_long_type>((std::numeric_limits<boost::long_long_type>::min)() + 1)))
       overflow = true;
    if(overflow)
       *result = s < 0 ? (std::numeric_limits<boost::long_long_type>::min)() : (std::numeric_limits<boost::long_long_type>::max)();
@@ -2632,6 +2632,11 @@ typedef number<gmp_rational>     mpq_rational;
 
 namespace math { namespace tools {
 
+inline void set_output_precision(const boost::multiprecision::mpf_float& val, std::ostream& os)
+{
+   os << std::setprecision(val.precision());
+}
+
 template <>
 inline int digits<boost::multiprecision::mpf_float>()
 #ifdef BOOST_MATH_NOEXCEPT
@@ -2663,7 +2668,7 @@ inline boost::multiprecision::mpf_float
 min_value<boost::multiprecision::mpf_float>()
 {
    boost::multiprecision::mpf_float result(0.5);
-   mpf_div_2exp(result.backend().data(), result.backend().data(), (std::numeric_limits<mp_exp_t>::min)() / 64 + 1);
+   mpf_div_2exp(result.backend().data(), result.backend().data(), (std::numeric_limits<mp_exp_t>::max)() / 64 + 1);
    return result;
 }
 
