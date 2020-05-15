@@ -4,6 +4,33 @@
  * Boost Software License, Version 1.0. (See accompanying file
  * LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
  */
+
+// Mathematica has an implementation of PSLQ which has the following interface:
+// FindIntegerNullVector[{E, Pi}, 100000]
+// FindIntegerNullVector::norel: There is no integer null vector for {E,\[Pi]} with norm less than or equal to 100000.
+// Or:
+// FindIntegerNullVector[{E, \[Pi]}]
+// FindIntegerNullVector::rnfu: FindIntegerNullVector has not found an integer null vector for {E,\[Pi]}.
+// I don't like this, because it should default to telling us the norm, as it's coproduced by the computation.
+
+// Maple's Interface:
+// with(IntegerRelations)
+// v := [1.57079..., 1.4142135]
+// u := PSLQ(v)
+// u:= [-25474, 56589]
+// Maple's interface is in fact worse, because it gives the wrong answer, instead of recognizing the precision provided.
+
+// David Bailey's interface in tpslqm2.f90 in https://www.davidhbailey.com/dhbsoftware/  in  mpfun-fort-v19.tar.gz
+// subroutine pslqm2(idb, n nwds, rb, eps, x, iq, r)
+// idb is debug level
+// n is the length of input vector and output relation r.
+// nwds if the full precision level in words.
+// rb is the log10 os max size Euclidean norm of relation
+// eps tolerance for full precision relation detection.
+// x input vector
+// iq output flag: 0 (unsuccessful), 1 successful.
+// r output integer relation vector, if successful.
+
 #ifndef BOOST_MULTIPRECISION_PSLQ_HPP
 #define BOOST_MULTIPRECISION_PSLQ_HPP
 #include <iostream>
@@ -71,7 +98,6 @@ auto small_pslq_dictionary() {
 template<typename Real>
 std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real gamma) {
     std::vector<std::pair<int64_t, Real>> m;
-    //std::reverse(x.begin(), x.end());
     if (!std::is_sorted(x.begin(), x.end())) {
         std::cerr << "Elements must be sorted in increasing order.\n";
         return m;
