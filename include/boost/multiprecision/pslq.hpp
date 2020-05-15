@@ -269,6 +269,11 @@ std::string pslq(std::map<Real, std::string> const & dictionary) {
     return pslq(dictionary, gamma);
 }
 
+template<typename Real>
+bool is_algebraic(Real x, std::vector<int64_t>& m) {
+    // TODO: Figure out this interface.
+    return false;
+}
 
 }
 #endif
