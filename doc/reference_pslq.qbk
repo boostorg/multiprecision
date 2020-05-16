@@ -23,11 +23,10 @@
 
 The PSLQ algorithm takes a list /x/ ∈ℝⁿ of interesting constants, e.g., π, the Euler-Mascheroni constant γ, or the golden ration φ, and determines if there is an /integer relation/ between them.
 By this we mean a list of integers /m/ ∈ℤⁿ, not all zero, such that /m⋅x/ = 0.
-It is not at all obvious from this definition what the utility of this algorithm is, so let's give an example of an identity discovered by this method:
+It is not at all obvious from this definition what the utility of this algorithm is, so let's give an example of an [@https://www.davidhbailey.com/dhbpapers/pslq-cse.pdf identity discovered by this method:]
 
 [$../equations/pslq_success.svg]
 
-(See https://www.davidhbailey.com/dhbpapers/pslq-cse.pdf for more examples.)
 Let's use the Boost implementation to rediscover this relation:
 
     using Real = cpp_bin_float_100;
@@ -45,6 +44,45 @@ We agonized over how to properly communicate this result, and in the end decided
 Should you find a novel relation with `pslq`, it occupies the status of a major event-taking the time to read it should be perfectly acceptable.
 Of course, if this is to be used in unanticipated ways, there is a lower-level API which gives machine readable status codes.
 
+If PSLQ fails to find a relation in a given dictionary, this is not proof of non-existence.
+However, if a relation exists and PSLQ cannot find it, a lower bound on the 2-norm of /m/ is returned.
+In this way, PSLQ can allow us to make statements like "π/e is probably not a rational number, because if π/e=p/q, then PSLQ shows that p² + q² > 10^200."
+
+Conversely, if PSLQ finds an integer relation, that is not proof that the relation is real.
+In a large dictionary with each term computed to very low precision, it is fairly easy to produce spurious relations.
+This is why multiprecision is required:
+If the dictionary has length /n/ and we want to find relations whose entries have height at most /d/, then we must compute the entries in our dictionary to /nd/ digits of precision.
+/Try to make sure that every digit in the Real type you provide is correct!/
+If you only know the elements of the dictionary to double precision, do not upcast them to a multiprecision type.
+This breaks various invariants used internally and makes it more likely that you will recover spurious relations.
+
+Even though PSLQ does not produce proofs, pessimism is unwarranted: PSLQ is a tool for discovery, not proof.
+In addition, /verifying/ a suspected relation is much less computationally difficult than discovering it, so once a relation is found, we can compute the relevant terms of the dictionary to much higher precision to give additional evidence for the relation, and then search for a formal proof.
+
+Astute readers will notice that our example requires a very auspicious guess about the form the relation takes.
+If we didn't know that κ was somehow related to π⁶ and ζ(3)², we wouldn've never found this relation.
+This is a general property of the PSLQ algorithm: As its runtime scales cubically in the length of the dictionary, having a hunch about the form the relation will take is necessary.
+
+That said, simple modifications of the inputs allow us to recover different classes of relations.
+Let's use the Basel problem as an example:
+
+[$../equations/basel_problem.svg]
+
+As stated, PSLQ cannot recover this relation unless π² is in the dictionary, which is kinda cheating.
+However, we can take logarithms to obtain
+
+[$../equations/ln_basel_problem.svg]
+
+This shows how to recover multiplicative relations: Include the logarithms of small primes and logarithms of suspected terms in the dictionary.
+
+PSLQ can also determine if a number is algebraic.
+A number is algebraic iff it is the root of a polynomial with integer coefficients.
+If we suspect a number α is algebraic, we can apply PSLQ to the vector
+
+[$../equations/algebraic.svg]
+
+and if it is indeed algebraic with reasonable sized polynomial coefficients, then PSLQ will find it.
+Communicating this idea has a somewhat different format than vanilla `pslq`, and hence we have provided a wrapper `is_algebraic` for precisely this purpose.
 
 
 [endsect]
