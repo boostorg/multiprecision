@@ -46,7 +46,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2
    // Just copy any remaining digits:
    if (&a != &result)
    {
-      std_constexpr::copy(pa, pa + (result.size() - i), pr);
+      std_constexpr::copy(pa + i, pa + a.size(), pr + i);
    }
    if (carry)
    {
