@@ -40,7 +40,13 @@
 #include <map>
 #include <cmath>
 #include <boost/math/constants/constants.hpp>
-#include <Eigen/Dense>
+#if defined __has_include
+#  if __has_include (<Eigen/Dense>)
+#    include <Eigen/Dense>
+#  else
+   #error This file has a dependency on Eigen; you must have Eigen (http://eigen.tuxfamily.org/index.php?title=Main_Page) in your include paths.
+#  endif
+#endif
 
 namespace boost::multiprecision {
 
@@ -205,6 +211,9 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real gamma) {
     }
     //std::cout << "D = \n" << D << "\n";
     //std::cout << "H, post-reduction:\n" << Hx << "\n";
+
+    // It looks like this: https://www.davidhbailey.com/dhbpapers/pslq-cse.pdf
+    // gives a more explicit description of the algorithm.
     // stubbing it out . . .
     for (auto t : x) {
         m.push_back({-8, t});

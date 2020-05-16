@@ -1,0 +1,50 @@
+[/
+  Copyright Nick Thompson, 2020
+  Distributed under the Boost Software License, Version 1.0.
+  (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt).
+]
+
+[section:pslq PSLQ]
+
+   #include <boost/multiprecision/pslq.hpp>
+   namespace boost::multiprecision {
+
+    template<typename Real>
+    std::string pslq(std::map<Real, std::string> const & dictionary);
+
+    template<typename Real>
+    std::string is_algebraic(Real const & x);
+
+    template<typename Real>
+    bool is_algebraic(Real const & x);
+
+   }
+
+The PSLQ algorithm takes a list /x/ ∈ℝⁿ of interesting constants, e.g., π, the Euler-Mascheroni constant γ, or the golden ration φ, and determines if there is an /integer relation/ between them.
+By this we mean a list of integers /m/ ∈ℤⁿ, not all zero, such that /m⋅x/ = 0.
+It is not at all obvious from this definition what the utility of this algorithm is, so let's give an example of an identity discovered by this method:
+
+[$../equations/pslq_success.svg]
+
+(See https://www.davidhbailey.com/dhbpapers/pslq-cse.pdf for more examples.)
+Let's use the Boost implementation to rediscover this relation:
+
+    using Real = cpp_bin_float_100;
+    std::map<Real, std::string> m;
+    m.emplace_back("0.0965512", "κ");
+    auto pi = boost::math::constants::pi<Real>();
+    m.emplace_back(pow(pi,6), "π⁶");
+    auto z3 = boost::math::constants::zeta_three<Real>();
+    m.emplace_back(z3*z3, "ζ(3)²");
+    std::string msg = pslq(m);
+
+    std::cout << msg << "\n";
+
+We agonized over how to properly communicate this result, and in the end decided to just communicate the success or failure with a human-readable string.
+Should you find a novel relation with `pslq`, it occupies the status of a major event-taking the time to read it should be perfectly acceptable.
+Of course, if this is to be used in unanticipated ways, there is a lower-level API which gives machine readable status codes.
+
+
+
+[endsect]
