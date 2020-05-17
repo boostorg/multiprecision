@@ -149,107 +149,104 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real gamma) {
         s_sq[i] = s_sq[i+1] + x[i]*x[i];
     }
     
-    Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic> Hx(n, n-1);
+    Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic> H(n, n-1);
     for (int64_t i = 0; i < n - 1; ++i) {
         for (int64_t j = 0; j < n - 1; ++j) {
             if (i < j) {
-                Hx(i,j) = 0;
+                H(i,j) = 0;
             }
             else if (i == j) {
-                Hx(i,i) = sqrt(s_sq[i+1]/s_sq[i]);
+                H(i,i) = sqrt(s_sq[i+1]/s_sq[i]);
             }
             else {
                 // i > j:
-                Hx(i,j) = -x[i]*x[j]/sqrt(s_sq[j]*s_sq[j+1]);
+                H(i,j) = -x[i]*x[j]/sqrt(s_sq[j]*s_sq[j+1]);
             }
         }
     }
     for (int64_t j = 0; j < n - 1; ++j) {
-        Hx(n-1, j) = -x[n-1]*x[j]/sqrt(s_sq[j]*s_sq[j+1]);
+        H(n-1, j) = -x[n-1]*x[j]/sqrt(s_sq[j]*s_sq[j+1]);
     }
 
-    // This validates that Hx is indeed lower trapezoidal,
+    // This validates that H is indeed lower trapezoidal,
     // but that's trival and verbose:
-    //std::cout << "Hx = \n";
-    //std::cout << Hx << "\n";
+    //std::cout << "H = \n";
+    //std::cout << H << "\n";
 
     // Validate the conditions of Lemma 1 in the referenced paper:
     // These tests should eventually be removed once we're confident that the code is correct.
-    auto Hxnorm_sq = Hx.squaredNorm();
-    if (abs(Hxnorm_sq/(n-1) - 1) > sqrt(std::numeric_limits<Real>::epsilon())) {
+    auto Hnorm_sq = H.squaredNorm();
+    if (abs(Hnorm_sq/(n-1) - 1) > sqrt(std::numeric_limits<Real>::epsilon())) {
         std::cerr << "‖Hₓ‖² ≠ n - 1. Hence Lemma 1.ii of the reference has numerically failed; this is a bug.\n";
         return relation;
     }
 
+    // Notations now follows https://www.davidhbailey.com/dhbpapers/pslq-cse.pdf
     Eigen::Matrix<Real, Eigen::Dynamic, 1> y(x.size());
     for (int64_t i = 0; i < n; ++i) {
         y[i] = x[i]/sqrt(s_sq[0]);
     }
-    auto v = y.transpose()*Hx;
+    auto v = y.transpose()*H;
     for (int64_t i = 0; i < n - 1; ++i) {
         if (abs(v[i])/(n-1) > sqrt(std::numeric_limits<Real>::epsilon())) {
             std::cerr << "xᵀHₓ ≠ 0; Lemma 1.iii of the reference cpslq has numerically failed; this is a bug.\n";
             return relation;
         }
     }
-    //std::cout << "H, pre-reduction:\n" << Hx << "\n";
-    
     using std::round;
-    // Matrix D of Definition 4:
-    Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic> D = Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic>::Identity(n, n);
-    Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic> A = Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic>::Identity(n, n);
-    Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic> B = Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic>::Identity(n, n);
+
+    // Initialize:
+    // "1. Set the nxn matrices A and B to the identity."
+    Eigen::Matrix<int64_t, Eigen::Dynamic, Eigen::Dynamic> A = Eigen::Matrix<int64_t, Eigen::Dynamic, Eigen::Dynamic>::Identity(n, n);
+    Eigen::Matrix<int64_t, Eigen::Dynamic, Eigen::Dynamic> B = Eigen::Matrix<int64_t, Eigen::Dynamic, Eigen::Dynamic>::Identity(n, n);
     for (int64_t i = 1; i < n; ++i) {
         for (int64_t j = i - 1; j >= 0; --j) {
-            Real q = round(Hx(i,j)/Hx(j,j));
+            Real t = round(H(i,j)/H(j,j));
+            int64_t tint = static_cast<int64_t>(t);
             // This happens a lot because x_0 < x_1 < ...!
             // Sort them in decreasing order and it almost never happens.
-            if (q == 0) {
+            if (tint == 0)
+            {
                 continue;
             }
             for (int64_t k = 0; k <= j; ++k)
             {
-                Hx(i,k) = Hx(i,k) - q*Hx(j,k);
+                H(i,k) = H(i,k) - t*H(j,k);
             }
             for (int64_t k = 0; k < n; ++k) {
-                D(i,k) = D(i,k) - q*D(j,k);
-                A(i,k) = A(i,k) - q*A(j,k);
-                B(k,j) = B(k,j) + q*B(k,i);
+                A(i,k) = A(i,k) - tint*A(j,k);
+                B(k,j) = B(k,j) + tint*B(k,i);
             }
-            y[j] += q*y[i];
+            y[j] += t*y[i];
         }
     }
-    //std::cout << "D = \n" << D << "\n";
-    //std::cout << "H, post-reduction:\n" << Hx << "\n";
+    /*std::cout << "A, post-reduction = \n" << A << "\n";
+    std::cout << "B, post-reduction = \n" << B << "\n";
+    std::cout << "A*B, post-reduction = \n" << A*B << "\n";
+    std::cout << "H, post-reduction:\n" << H << "\n";
 
-    // It looks like this: https://www.davidhbailey.com/dhbpapers/pslq-cse.pdf
-    // gives a more explicit description of the algorithm.
-
-    std::cout << __LINE__ <<  ": Looking for max coeff:\n";
+    std::cout << "Hit enter.\n";
+    std::cin.get();*/
     Real max_coeff = 0;
     for (int64_t i = 0; i < n - 1; ++i) {
-        if (abs(Hx(i,i)) > max_coeff) {
-            max_coeff = abs(Hx(i,i));
+        if (abs(H(i,i)) > max_coeff) {
+            max_coeff = abs(H(i,i));
         }
     }
     Real norm_bound = 1/max_coeff;
     std::cout << "Norm bound: " << norm_bound << "\n";
-    Real max_acceptable_norm_bound = 10e10;
-    int64_t iteration = 0;
+    Real max_acceptable_norm_bound = 1e10;
+    //int64_t iteration = 0;
+    Real last_norm_bound = norm_bound;
     while (norm_bound < max_acceptable_norm_bound)
     {
-        std::cout << "Beginning iteration " << iteration++ << "\n";
-        std::cout << "Hx = \n" << Hx << "\n";
-        std::cout << "A = \n" << A << "\n";
-        std::cout << "B = \n" << B << "\n";
-        std::cout << "y = \n" << y << "\n";
-        // "1. Select m such that y^{i+1}|H_ii| is maximal when i = m":
+        // "1. Select m such that γ^{i+1}|H_ii| is maximal when i = m":
         // (note my C indexing translated from DHB's Fortran indexing)
         Real gammai = gamma;
         Real max_term = 0;
         int64_t m = -1;
         for (int i = 0; i < n - 1; ++i) {
-            Real term = gammai*abs(Hx(i,i));
+            Real term = gammai*abs(H(i,i));
             if (term > max_term) {
                 max_term = term;
                 m = i;
@@ -265,79 +262,106 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real gamma) {
             std::cerr << "OMG: m = - 1, swap gonna segfault.\n";
             return relation;
         }
-        std::cout << "Swapping\n";
         std::swap(y[m], y[m+1]);
         // Swap the corresponding rows of A and H:
         A.row(m).swap(A.row(m+1));
-        Hx.row(m).swap(Hx.row(m+1));
+        H.row(m).swap(H.row(m+1));
         // Swap the corresponding columns of B:
         B.col(m).swap(B.col(m+1));
 
+        //std::cout << "H, post-swap = \n" << H << "\n";
         // "3. Remove the corner on H diagonal:"
-        std::cout << "Removing corner:\n";
+        //std::cout << "Removing corner:\n";
         if (m < n - 2) {
-            std::cout << "Not yet in loop, m = " << m << ", n = " << n << "\n";
-            Real t0 = Hx(m,m)*Hx(m,m) + Hx(m, m+1)*Hx(m, m+1);
+            Real t0 = H(m,m)*H(m,m) + H(m, m+1)*H(m, m+1);
             t0 = sqrt(t0);
-            Real t1 = Hx(m,m)/t0;
-            Real t2 = Hx(m,m+1)/t0;
-            for (int64_t i = m; i < n - 1; ++i) {
-                std::cout << "i = " << i << "/ " << n << "\n";
-                Real t3 = Hx(i,m);
-                Real t4 = Hx(i, m+1);
-                Hx(i,m) = t1*t3 + t2*t4;
-                Hx(i,m+1) = -t2*t3 + t1*t4;
+            Real t1 = H(m,m)/t0;
+            Real t2 = H(m,m+1)/t0;
+            for (int64_t i = m; i < n; ++i) {
+                Real t3 = H(i,m);
+                Real t4 = H(i, m+1);
+                H(i,m) = t1*t3 + t2*t4;
+                H(i,m+1) = -t2*t3 + t1*t4;
             }
+            //std::cout << "H, post corner reduce = \n" << H << "\n";
+        }
+        else {
+            //std::cout << "m = " << m << ", so no corner reduction.\n";
         }
 
+        //std::cin.get();
         // "4. Reduce H:"
-        std::cout << "Reducing H:\n";
-        for (int64_t i = m+1; i < n - 1; ++i) {
-            std::cout << "i = " << i << ", n = " << n << "\n";
+        //std::cout << "Reducing H:\n";
+        for (int64_t i = m+1; i < n; ++i) {
             for (int64_t j = std::min(i-1, m+1); j >= 0; --j) {
-                std::cout << "j = " << j << ", n = " << n << "\n";
-                Real t = round(Hx(i,j)/Hx(j,j));
-                if (t == 0) {
+                Real t = round(H(i,j)/H(j,j));
+                int64_t tint = static_cast<int64_t>(t);
+                if (tint == 0)
+                {
                     continue;
                 }
-                std::cout << "Update y\n";
+                //std::cout << "Update y\n";
                 y[j] += t*y[i];
-                std::cout << "Updating H\n";
-                for (int64_t k = 0; k < j; ++k) {
-                    Hx(i,k) = Hx(i,k) - t*Hx(j,k);
+                //std::cout << "Updating H\n";
+                for (int64_t k = 0; k <= j; ++k) {
+                    H(i,k) = H(i,k) - t*H(j,k);
                 }
-                std::cout << "Updating A,B:\n";
+                //std::cout << "Updating A,B:\n";
                 for (int64_t k = 0; k < n; ++k) {
-                    A(i,k) = A(i,k) - t*A(j,k);
-                    B(k,j) = B(k,j) + t*B(k,i);
+                    A(i,k) = A(i,k) - tint*A(j,k);
+                    B(k,j) = B(k,j) + tint*B(k,i);
                 }
             }
         }
 
-        std::cout << "Looking for a solution\n";
+        //std::cout << "Looking for a solution\n";
         // Look for a solution:
         for (int64_t i = 0; i < n; ++i) {
             if (abs(y[i]) < sqrt(std::numeric_limits<Real>::epsilon())) {
-                std::cout << "We've found a solution!\n";
+                //std::cout << "We've found a solution!\n";
+                auto bcol = B.col(i);
+                //std::cout << "Column of B = \n" << bcol << "\n";
+                Real sum = 0;
+                for (int64_t j = 0; j < n; ++j) {
+                    sum += bcol[j]*x[j];
+                }
+                if (abs(sum) > 0.1) {
+                    std::cerr << __FILE__ << ":" << __LINE__ << "\n\tBug in PSLQ: Found a relation with a giant residual.\n";
+                    std::cerr << "\tResidual = " << abs(sum) << "\n";
+                }
+
+                for (int64_t j = 0; j < n; ++j)
+                {
+                    if (bcol[j] != 0)
+                    {
+                        relation.push_back({bcol[j], x[j]});
+                    }
+                }
                 return relation;
             }
         }
 
-        std::cout << "Computing the norm bound:\n";
+       // std::cout << "Computing the norm bound:\n";
         max_coeff = 0;
         for (int64_t i = 0; i < n - 1; ++i) {
-            if (abs(Hx(i,i)) > max_coeff) {
-                max_coeff = abs(Hx(i,i));
+            if (abs(H(i,i)) > max_coeff) {
+                max_coeff = abs(H(i,i));
             }
         }
         norm_bound = 1/max_coeff;
+        //std::cout << "H = \n" << H << "\n";
+        //std::cout << "A = \n" << A << "\n";
+        //std::cout << "B = \n" << B << "\n";
+
+        //std::cout << "A*B = \n" << A*B << "\n";
+        //std::cout << "y = \n" << y << "\n";
         std::cout << "Norm bound = " << norm_bound << "\n";
-        std::cout << "Hit enter to continue\n";
-        std::cin.get();
-    }
-    // stubbing it out . . .
-    for (auto t : x) {
-        relation.push_back({-8, t});
+        if (norm_bound < last_norm_bound) {
+            std::cerr << "Norm bound has decreased!\n";
+        }
+        last_norm_bound = norm_bound;
+        //std::cout << "Hit enter to continue\n";
+        //std::cin.get();
     }
     return relation;
 }
