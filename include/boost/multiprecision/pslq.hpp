@@ -103,36 +103,41 @@ auto small_pslq_dictionary() {
 // See: https://www.davidhbailey.com/dhbpapers/cpslq.pdf, section 3.
 template<typename Real>
 std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real gamma) {
-    std::vector<std::pair<int64_t, Real>> m;
+    std::vector<std::pair<int64_t, Real>> relation;
     if (!std::is_sorted(x.begin(), x.end())) {
         std::cerr << "Elements must be sorted in increasing order.\n";
-        return m;
+        return relation;
     }
     using std::sqrt;
     if (gamma <= 2/sqrt(3)) {
         std::cerr << "γ > 2/√3 is required\n";
-        return m;
+        return relation;
     }
     Real tmp = 1/Real(4) + 1/(gamma*gamma);
     Real tau = 1/sqrt(tmp);
     if (tau <= 1 || tau >= 2) {
         std::cerr << "τ ∈ (1, 2) is required.\n";
-        return m;
+        return relation;
     }
 
     if (x.size() < 2) {
         std::cerr << "At least two values are required to find an integer relation.\n";
-        return m;
+        return relation;
     }
 
     for (auto & t : x) {
         if (t == 0) {
             std::cerr << "Zero in the dictionary gives trivial relations.\n";
-            return m;
+            return relation;
         }
+        if (t < sqrt(std::numeric_limits<Real>::epsilon())) {
+            std::cerr << "Super small elements in the dictionary gives spurious relations; more precision is required.\n";
+            return relation;
+        }
+
         if (t < 0) {
             std::cerr << "The algorithm is reflection invariant, so negative values in the dictionary should be removed.\n";
-            return m;
+            return relation;
         }
     }
 
@@ -173,18 +178,18 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real gamma) {
     auto Hxnorm_sq = Hx.squaredNorm();
     if (abs(Hxnorm_sq/(n-1) - 1) > sqrt(std::numeric_limits<Real>::epsilon())) {
         std::cerr << "‖Hₓ‖² ≠ n - 1. Hence Lemma 1.ii of the reference has numerically failed; this is a bug.\n";
-        return m;
+        return relation;
     }
 
-    Eigen::Matrix<Real, Eigen::Dynamic, 1> x_copy(x.size());
+    Eigen::Matrix<Real, Eigen::Dynamic, 1> y(x.size());
     for (int64_t i = 0; i < n; ++i) {
-        x_copy[i] = x[i];
+        y[i] = x[i]/sqrt(s_sq[0]);
     }
-    auto v = x_copy.transpose()*Hx;
+    auto v = y.transpose()*Hx;
     for (int64_t i = 0; i < n - 1; ++i) {
         if (abs(v[i])/(n-1) > sqrt(std::numeric_limits<Real>::epsilon())) {
             std::cerr << "xᵀHₓ ≠ 0; Lemma 1.iii of the reference cpslq has numerically failed; this is a bug.\n";
-            return m;
+            return relation;
         }
     }
     //std::cout << "H, pre-reduction:\n" << Hx << "\n";
@@ -192,6 +197,8 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real gamma) {
     using std::round;
     // Matrix D of Definition 4:
     Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic> D = Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic>::Identity(n, n);
+    Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic> A = Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic>::Identity(n, n);
+    Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic> B = Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic>::Identity(n, n);
     for (int64_t i = 1; i < n; ++i) {
         for (int64_t j = i - 1; j >= 0; --j) {
             Real q = round(Hx(i,j)/Hx(j,j));
@@ -206,7 +213,10 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real gamma) {
             }
             for (int64_t k = 0; k < n; ++k) {
                 D(i,k) = D(i,k) - q*D(j,k);
+                A(i,k) = A(i,k) - q*A(j,k);
+                B(k,j) = B(k,j) + q*B(k,i);
             }
+            y[j] += q*y[i];
         }
     }
     //std::cout << "D = \n" << D << "\n";
@@ -214,11 +224,122 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real gamma) {
 
     // It looks like this: https://www.davidhbailey.com/dhbpapers/pslq-cse.pdf
     // gives a more explicit description of the algorithm.
+
+    std::cout << __LINE__ <<  ": Looking for max coeff:\n";
+    Real max_coeff = 0;
+    for (int64_t i = 0; i < n - 1; ++i) {
+        if (abs(Hx(i,i)) > max_coeff) {
+            max_coeff = abs(Hx(i,i));
+        }
+    }
+    Real norm_bound = 1/max_coeff;
+    std::cout << "Norm bound: " << norm_bound << "\n";
+    Real max_acceptable_norm_bound = 10e10;
+    int64_t iteration = 0;
+    while (norm_bound < max_acceptable_norm_bound)
+    {
+        std::cout << "Beginning iteration " << iteration++ << "\n";
+        std::cout << "Hx = \n" << Hx << "\n";
+        std::cout << "A = \n" << A << "\n";
+        std::cout << "B = \n" << B << "\n";
+        std::cout << "y = \n" << y << "\n";
+        // "1. Select m such that y^{i+1}|H_ii| is maximal when i = m":
+        // (note my C indexing translated from DHB's Fortran indexing)
+        Real gammai = gamma;
+        Real max_term = 0;
+        int64_t m = -1;
+        for (int i = 0; i < n - 1; ++i) {
+            Real term = gammai*abs(Hx(i,i));
+            if (term > max_term) {
+                max_term = term;
+                m = i;
+            }
+            gammai *= gamma;
+        }
+        // "2. Exchange the entries of y indexed m and m + 1"
+        if (m == n - 1) {
+            std::cerr << "OMG: m = n- 1, swap gonna segfault.\n";
+            return relation;
+        }
+        if (m < 0) {
+            std::cerr << "OMG: m = - 1, swap gonna segfault.\n";
+            return relation;
+        }
+        std::cout << "Swapping\n";
+        std::swap(y[m], y[m+1]);
+        // Swap the corresponding rows of A and H:
+        A.row(m).swap(A.row(m+1));
+        Hx.row(m).swap(Hx.row(m+1));
+        // Swap the corresponding columns of B:
+        B.col(m).swap(B.col(m+1));
+
+        // "3. Remove the corner on H diagonal:"
+        std::cout << "Removing corner:\n";
+        if (m < n - 2) {
+            std::cout << "Not yet in loop, m = " << m << ", n = " << n << "\n";
+            Real t0 = Hx(m,m)*Hx(m,m) + Hx(m, m+1)*Hx(m, m+1);
+            t0 = sqrt(t0);
+            Real t1 = Hx(m,m)/t0;
+            Real t2 = Hx(m,m+1)/t0;
+            for (int64_t i = m; i < n - 1; ++i) {
+                std::cout << "i = " << i << "/ " << n << "\n";
+                Real t3 = Hx(i,m);
+                Real t4 = Hx(i, m+1);
+                Hx(i,m) = t1*t3 + t2*t4;
+                Hx(i,m+1) = -t2*t3 + t1*t4;
+            }
+        }
+
+        // "4. Reduce H:"
+        std::cout << "Reducing H:\n";
+        for (int64_t i = m+1; i < n - 1; ++i) {
+            std::cout << "i = " << i << ", n = " << n << "\n";
+            for (int64_t j = std::min(i-1, m+1); j >= 0; --j) {
+                std::cout << "j = " << j << ", n = " << n << "\n";
+                Real t = round(Hx(i,j)/Hx(j,j));
+                if (t == 0) {
+                    continue;
+                }
+                std::cout << "Update y\n";
+                y[j] += t*y[i];
+                std::cout << "Updating H\n";
+                for (int64_t k = 0; k < j; ++k) {
+                    Hx(i,k) = Hx(i,k) - t*Hx(j,k);
+                }
+                std::cout << "Updating A,B:\n";
+                for (int64_t k = 0; k < n; ++k) {
+                    A(i,k) = A(i,k) - t*A(j,k);
+                    B(k,j) = B(k,j) + t*B(k,i);
+                }
+            }
+        }
+
+        std::cout << "Looking for a solution\n";
+        // Look for a solution:
+        for (int64_t i = 0; i < n; ++i) {
+            if (abs(y[i]) < sqrt(std::numeric_limits<Real>::epsilon())) {
+                std::cout << "We've found a solution!\n";
+                return relation;
+            }
+        }
+
+        std::cout << "Computing the norm bound:\n";
+        max_coeff = 0;
+        for (int64_t i = 0; i < n - 1; ++i) {
+            if (abs(Hx(i,i)) > max_coeff) {
+                max_coeff = abs(Hx(i,i));
+            }
+        }
+        norm_bound = 1/max_coeff;
+        std::cout << "Norm bound = " << norm_bound << "\n";
+        std::cout << "Hit enter to continue\n";
+        std::cin.get();
+    }
     // stubbing it out . . .
     for (auto t : x) {
-        m.push_back({-8, t});
+        relation.push_back({-8, t});
     }
-    return m;
+    return relation;
 }
 
 template<typename Real>

@@ -7,7 +7,7 @@
 #include <boost/multiprecision/pslq.hpp>
 
 int main() {
-    std::map<double, std::string> m = boost::multiprecision::small_pslq_dictionary<double>();
+    std::map<double, std::string> m = boost::multiprecision::tiny_pslq_dictionary<double>();
     auto s = boost::multiprecision::pslq<double>(m);
     if (!s.empty())
     {
