@@ -78,6 +78,86 @@ inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned_constexpr(CppInt1& result, con
    result.normalize();
    result.sign(a.sign());
 }
+//
+// Core subtraction routine for all non-trivial cpp_int's:
+//
+template <class CppInt1, class CppInt2, class CppInt3>
+inline BOOST_MP_CXX14_CONSTEXPR void subtract_unsigned_constexpr(CppInt1& result, const CppInt2& a, const CppInt3& b) BOOST_MP_NOEXCEPT_IF(is_non_throwing_cpp_int<CppInt1>::value)
+{
+   using ::boost::multiprecision::std_constexpr::swap;
+
+   // Nothing fancy, just let uintmax_t take the strain:
+   double_limb_type borrow = 0;
+   unsigned         m(0), x(0);
+   minmax(a.size(), b.size(), m, x);
+   //
+   // special cases for small limb counts:
+   //
+   if (x == 1)
+   {
+      bool      s  = a.sign();
+      limb_type al = *a.limbs();
+      limb_type bl = *b.limbs();
+      if (bl > al)
+      {
+         ::boost::multiprecision::std_constexpr::swap(al, bl);
+         s = !s;
+      }
+      result = al - bl;
+      result.sign(s);
+      return;
+   }
+   // This isn't used till later, but comparison has to occur before we resize the result,
+   // as that may also resize a or b if this is an inplace operation:
+   int c = a.compare_unsigned(b);
+   // Set up the result vector:
+   result.resize(x, x);
+   // Now that a, b, and result are stable, get pointers to their limbs:
+   typename CppInt2::const_limb_pointer pa      = a.limbs();
+   typename CppInt3::const_limb_pointer pb      = b.limbs();
+   typename CppInt1::limb_pointer       pr      = result.limbs();
+   bool                                 swapped = false;
+   if (c < 0)
+   {
+      swap(pa, pb);
+      swapped = true;
+   }
+   else if (c == 0)
+   {
+      result = static_cast<limb_type>(0);
+      return;
+   }
+
+   unsigned i = 0;
+   // First where a and b overlap:
+   while (i < m)
+   {
+      borrow = static_cast<double_limb_type>(pa[i]) - static_cast<double_limb_type>(pb[i]) - borrow;
+      pr[i]  = static_cast<limb_type>(borrow);
+      borrow = (borrow >> CppInt1::limb_bits) & 1u;
+      ++i;
+   }
+   // Now where only a has digits, only as long as we've borrowed:
+   while (borrow && (i < x))
+   {
+      borrow = static_cast<double_limb_type>(pa[i]) - borrow;
+      pr[i]  = static_cast<limb_type>(borrow);
+      borrow = (borrow >> CppInt1::limb_bits) & 1u;
+      ++i;
+   }
+   // Any remaining digits are the same as those in pa:
+   if ((x != i) && (pa != pr))
+      std_constexpr::copy(pa + i, pa + x, pr + i);
+   BOOST_ASSERT(0 == borrow);
+
+   //
+   // We may have lost digits, if so update limb usage count:
+   //
+   result.normalize();
+   result.sign(a.sign());
+   if (swapped)
+      result.negate();
+}
 
 
 #ifdef BOOST_MP_HAS_IMMINTRIN_H
@@ -95,7 +175,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2
    else
 #endif
    {
-      using ::boost::multiprecision::std_constexpr::swap;
+      using std::swap;
 
       // Nothing fancy, just let uintmax_t take the strain:
       unsigned m(0), x(0);
@@ -155,12 +235,106 @@ inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2
    }
 }
 
+template <class CppInt1, class CppInt2, class CppInt3>
+inline BOOST_MP_CXX14_CONSTEXPR void subtract_unsigned(CppInt1& result, const CppInt2& a, const CppInt3& b) BOOST_MP_NOEXCEPT_IF(is_non_throwing_cpp_int<CppInt1>::value)
+{
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+   if (1 || BOOST_MP_IS_CONST_EVALUATED(a.size()))
+   {
+      subtract_unsigned_constexpr(result, a, b);
+   }
+   else
+#endif
+   {
+      using std::swap;
+
+      // Nothing fancy, just let uintmax_t take the strain:
+      unsigned         m(0), x(0);
+      minmax(a.size(), b.size(), m, x);
+      //
+      // special cases for small limb counts:
+      //
+      if (x == 1)
+      {
+         bool      s = a.sign();
+         limb_type al = *a.limbs();
+         limb_type bl = *b.limbs();
+         if (bl > al)
+         {
+            ::boost::multiprecision::std_constexpr::swap(al, bl);
+            s = !s;
+         }
+         result = al - bl;
+         result.sign(s);
+         return;
+      }
+      // This isn't used till later, but comparison has to occur before we resize the result,
+      // as that may also resize a or b if this is an inplace operation:
+      int c = a.compare_unsigned(b);
+      // Set up the result vector:
+      result.resize(x, x);
+      // Now that a, b, and result are stable, get pointers to their limbs:
+      typename CppInt2::const_limb_pointer pa = a.limbs();
+      typename CppInt3::const_limb_pointer pb = b.limbs();
+      typename CppInt1::limb_pointer       pr = result.limbs();
+      bool                                 swapped = false;
+      if (c < 0)
+      {
+         swap(pa, pb);
+         swapped = true;
+      }
+      else if (c == 0)
+      {
+         result = static_cast<limb_type>(0);
+         return;
+      }
+
+      unsigned i = 0;
+      unsigned char borrow = 0;
+      // First where a and b overlap:
+      for(; i + 4 <= m; i += 4)
+      {
+         borrow = boost::multiprecision::detail::subborrow_limb(borrow, pa[i], pb[i], pr + i);
+         borrow = boost::multiprecision::detail::subborrow_limb(borrow, pa[i + 1], pb[i + 1], pr + i + 1);
+         borrow = boost::multiprecision::detail::subborrow_limb(borrow, pa[i + 2], pb[i + 2], pr + i + 2);
+         borrow = boost::multiprecision::detail::subborrow_limb(borrow, pa[i + 3], pb[i + 3], pr + i + 3);
+      }
+      for (; i < m; ++i)
+         borrow = boost::multiprecision::detail::subborrow_limb(borrow, pa[i], pb[i], pr + i);
+
+      // Now where only a has digits, only as long as we've borrowed:
+      while (borrow && (i < x))
+      {
+         borrow = boost::multiprecision::detail::subborrow_limb(borrow, pa[i], 0, pr + i);
+         ++i;
+      }
+      // Any remaining digits are the same as those in pa:
+      if ((x != i) && (pa != pr))
+         std_constexpr::copy(pa + i, pa + x, pr + i);
+      BOOST_ASSERT(0 == borrow);
+
+      //
+      // We may have lost digits, if so update limb usage count:
+      //
+      result.normalize();
+      result.sign(a.sign());
+      if (swapped)
+         result.negate();
+   }  // constepxr.
+}
+
 #else
 
 template <class CppInt1, class CppInt2, class CppInt3>
 inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2& a, const CppInt3& b) BOOST_MP_NOEXCEPT_IF(is_non_throwing_cpp_int<CppInt1>::value)
 {
    add_unsigned_constexpr(result, a, b);
+}
+
+template <class CppInt1, class CppInt2, class CppInt3>
+inline BOOST_MP_CXX14_CONSTEXPR void subtract_unsigned(CppInt1& result, const CppInt2& a, const CppInt3& b) BOOST_MP_NOEXCEPT_IF(is_non_throwing_cpp_int<CppInt1>::value)
+{
+   subtract_unsigned_constexpr(result, a, b);
 }
 
 #endif

@@ -47,6 +47,16 @@ BOOST_MP_FORCEINLINE unsigned char addcarry_limb(unsigned char carry, limb_type 
    return _addcarry_u64(carry, a, b, reinterpret_cast<cast_type*>(p_result));
 }
 
+BOOST_MP_FORCEINLINE unsigned char subborrow_limb(unsigned char carry, limb_type a, limb_type b, limb_type* p_result)
+{
+#ifdef BOOST_INTEL
+   typedef unsigned __int64 cast_type;
+#else
+   typedef unsigned long long cast_type;
+#endif
+   return _subborrow_u64(carry, a, b, reinterpret_cast<cast_type*>(p_result));
+}
+
 }}} // namespace boost::multiprecision::detail
 
 #else
@@ -56,6 +66,11 @@ namespace boost { namespace multiprecision { namespace detail {
 BOOST_MP_FORCEINLINE unsigned char addcarry_limb(unsigned char carry, limb_type a, limb_type b, limb_type* p_result)
 {
    return _addcarry_u32(carry, a, b, reinterpret_cast<unsigned int*>(p_result));
+}
+
+BOOST_MP_FORCEINLINE unsigned char subborrow_limb(unsigned char carry, limb_type a, limb_type b, limb_type* p_result)
+{
+   return _subborrow_u32(carry, a, b, reinterpret_cast<unsigned int*>(p_result));
 }
 
 }}} // namespace boost::multiprecision::detail
