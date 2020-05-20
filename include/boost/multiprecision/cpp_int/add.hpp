@@ -1,8 +1,8 @@
-
 ///////////////////////////////////////////////////////////////
-//  Copyright 2012 John Maddock. Distributed under the Boost
-//  Software License, Version 1.0. (See accompanying file
-//  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
+//  Copyright 2012-20 John Maddock, Madhur Chauhan. Distributed
+//  under the Boost Software License, Version 1.0. (See
+//  accompanying file LICENSE_1_0.txt or copy at
+//  https://www.boost.org/LICENSE_1_0.txt
 //
 // Comparison operators for cpp_int_backend:
 //
@@ -10,14 +10,61 @@
 #define BOOST_MP_CPP_INT_ADD_HPP
 
 #include <boost/multiprecision/detail/constexpr.hpp>
-#include <immintrin.h>
+#include <functional>
 
-namespace boost { namespace multiprecision { namespace backends {
+namespace boost {
+namespace multiprecision {
+namespace backends {
 
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4127) // conditional expression is constant
 #endif
+
+#if defined(__clang__) || defined(__GNUC__) || defined(__INTEL_COMPILER)
+
+#include <immintrin.h>
+namespace adc {
+#if defined(__INTEL_COMPILER)
+using T = unsigned long;
+#else
+using T = unsigned long long;
+#endif
+unsigned char (*adc)(unsigned char, T, T, T*) = &_addcarry_u64;
+} // namespace adc
+
+#elif defined(_MSC_VER)
+
+#include <intrin.h>
+namespace adc {
+using T                                       = unsigned int;
+unsigned char (*adc)(unsigned char, T, T, T*) = &_addcarry_u32;
+} // namespace adc
+
+#endif
+
+namespace adc {
+inline BOOST_MP_CXX14_CONSTEXPR bool add_unsigned_intrinsic(const T* pa, const T* pb, T* pr, size_t m, size_t x)
+{
+   unsigned      i     = 0;
+   unsigned char carry = 0;
+   for (i = 0; i + 4 <= m; i += 4)
+   {
+      carry = adc(carry, pa[i + 0], pb[i + 0], &pr[i + 0]);
+      carry = adc(carry, pa[i + 1], pb[i + 1], &pr[i + 1]);
+      carry = adc(carry, pa[i + 2], pb[i + 2], &pr[i + 2]);
+      carry = adc(carry, pa[i + 3], pb[i + 3], &pr[i + 3]);
+   }
+   for (; i < m; ++i)
+      carry = adc(carry, pa[i], pb[i], &pr[i]);
+   for (; i < x && carry; ++i)
+      carry = adc(carry, pa[i], 0, &pr[i]);
+   if (i == x && carry)
+      return true;
+   std_constexpr::copy(pa + i, pa + x, pr + i);
+   return false;
+}
+} // namespace adc
 
 //
 // This is the key addition routine where all the argument types are non-trivial cpp_int's:
@@ -43,50 +90,50 @@ inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2
    typename CppInt2::const_limb_pointer pa = a.limbs();
    typename CppInt3::const_limb_pointer pb = b.limbs();
    typename CppInt1::limb_pointer       pr = result.limbs();
-   //typename CppInt1::limb_pointer       pr_end = pr + m;
 
    if (as < bs)
-	  swap(pa, pb);
-   // First where a and b overlap:
-   unsigned      i;
-   unsigned char carry = 0;
-#ifndef __INTEL_COMPILER
-   for (i = 0; i + 4 <= m; i += 4)
-   {
-	  carry = _addcarry_u64(carry, pa[i + 0], pb[i + 0], &pr[i + 0]);
-	  carry = _addcarry_u64(carry, pa[i + 1], pb[i + 1], &pr[i + 1]);
-	  carry = _addcarry_u64(carry, pa[i + 2], pb[i + 2], &pr[i + 2]);
-	  carry = _addcarry_u64(carry, pa[i + 3], pb[i + 3], &pr[i + 3]);
-   }
-   for (; i < m; ++i)
-	  carry = _addcarry_u64(carry, pa[i], pb[i], &pr[i]);
-   for (; i < x && carry; ++i)
-	  carry = _addcarry_u64(carry, pa[i], 0, &pr[i]);
+      swap(pa, pb);
+   bool overflow = false;
+#if defined(__GNUC__) || defined(_MSC_VER) || defined(__INTEL_COMPILER) || defined(__clang__)
+   overflow = adc::add_unsigned_intrinsic(pa, pb, pr, m, x);
 #else
-   for (i = 0; i + 4 <= m; i += 4)
+   // generic version
+   typename CppInt1::limb_pointer pr_end = pr + m;
+   while (pr != pr_end)
    {
-	  carry = _addcarry_u64(carry, pa[i + 0], pb[i + 0], (unsigned long*)&pr[i + 0]);
-	  carry = _addcarry_u64(carry, pa[i + 1], pb[i + 1], (unsigned long*)&pr[i + 1]);
-	  carry = _addcarry_u64(carry, pa[i + 2], pb[i + 2], (unsigned long*)&pr[i + 2]);
-	  carry = _addcarry_u64(carry, pa[i + 3], pb[i + 3], (unsigned long*)&pr[i + 3]);
+      carry += static_cast<double_limb_type>(*pa) + static_cast<double_limb_type>(*pb);
+      *pr = static_cast<limb_type>(carry);
+      carry >>= CppInt1::limb_bits;
+      ++pr, ++pa, ++pb;
    }
-   for (; i < m; ++i)
-	  carry = _addcarry_u64(carry, pa[i], pb[i], (unsigned long*)&pr[i]);
-   for (; i < x && carry; ++i)
-	  carry = _addcarry_u64(carry, pa[i], 0, (unsigned long*)&pr[i]);
-#endif
-   if (i == x && carry)
+   pr_end += x - m;
+   // Now where only a has digits:
+   while (pr != pr_end)
    {
-      // We overflowed, need to add one more limb:
+      if (!carry)
+      {
+         if (pa != pr)
+            std_constexpr::copy(pa, pa + (pr_end - pr), pr);
+         break;
+      }
+      carry += static_cast<double_limb_type>(*pa);
+      *pr = static_cast<limb_type>(carry);
+      carry >>= CppInt1::limb_bits;
+      ++pr, ++pa;
+   }
+   overflow = carry > 0;
+#endif
+
+   // We overflowed, need to add one more limb:
+   if (overflow)
+   {
       result.resize(x + 1, x + 1);
       if (result.size() > x)
-		 result.limbs()[x] = carry;
+         result.limbs()[x] = 1u;
    }
-   else
-	  std_constexpr::copy(pa + i, pa + x, pr + i);
    result.normalize();
    result.sign(a.sign());
-}
+} // namespace boost
 //
 // As above, but for adding a single limb to a non-trivial cpp_int:
 //
@@ -531,7 +578,8 @@ eval_subtract(
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-
-}}} // namespace boost::multiprecision::backends
+}
+}
+} // namespace boost::multiprecision::backends
 
 #endif
