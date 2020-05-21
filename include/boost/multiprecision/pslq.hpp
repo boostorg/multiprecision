@@ -66,12 +66,32 @@ template<typename Real>
 auto small_pslq_dictionary() {
     using std::sqrt;
     using std::log;
+    using std::exp;
     using namespace boost::math::constants;
     std::map<Real, std::string> m;
-    m.emplace(one_div_euler<Real>(), "1/γ");
-    m.emplace(root_pi<Real>(), "√π");
-    m.emplace(pi<Real>(), "π");
-    m.emplace(log(pi<Real>()), "ln(π)");
+    Real euler_ = euler<Real>();
+    m.emplace(euler_, "γ");
+    m.emplace(euler_*euler_, "γ²");
+    m.emplace(euler_*euler_*euler_, "γ³");
+    m.emplace(1/euler_, "1/γ");
+    m.emplace(1/(euler_*euler_), "1/γ²");
+    m.emplace(1/(euler_*euler_*euler_), "1/γ³");
+    m.emplace(-log(euler_), "-ln(γ)");
+    m.emplace(exp(euler_), "exp(γ)");
+    Real zeta_three_ = zeta_three<Real>();
+    m.emplace(zeta_three_, "ζ(3)");
+    m.emplace(1/zeta_three_, "1/ζ(3)");
+    m.emplace(1/(zeta_three_*zeta_three_), "1/ζ(3)²");
+    m.emplace(1/(zeta_three_*zeta_three_*zeta_three_), "1/ζ(3)³");
+    m.emplace(log(zeta_three_), "ln(ζ(3))");
+    m.emplace(exp(zeta_three_), "exp(ζ(3))");
+    m.emplace(zeta_three_*zeta_three_, "ζ(3)²");
+    m.emplace(zeta_three_*zeta_three_*zeta_three_, "ζ(3)³");
+    
+    auto pi_ = pi<Real>();
+    m.emplace(pi_, "π");
+    m.emplace(sqrt(pi_), "√π");
+    m.emplace(log(pi_), "ln(π)");
     m.emplace(pi_sqr<Real>(), "π²");
     m.emplace(pi_cubed<Real>(), "π³");
     m.emplace(e<Real>(), "e");
@@ -80,13 +100,13 @@ auto small_pslq_dictionary() {
     m.emplace(sqrt(static_cast<Real>(5)), "√5");
     m.emplace(sqrt(static_cast<Real>(7)), "√7");
     m.emplace(sqrt(static_cast<Real>(11)), "√11");
-    m.emplace(euler<Real>(), "γ");
+
     // φ is linearly dependent on √5; its logarithm is not.
     m.emplace(log(phi<Real>()), "ln(φ)");
     m.emplace(catalan<Real>(), "G");
     m.emplace(glaisher<Real>(), "A");
     m.emplace(khinchin<Real>(), "K₀");
-    m.emplace(zeta_three<Real>(), "ζ(3)");
+    
     // To recover multiplicative relations we need the logarithms of small primes.
     m.emplace(log(static_cast<Real>(2)), "ln(2)");
     m.emplace(log(static_cast<Real>(3)), "ln(3)");
@@ -130,11 +150,6 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real gamma) {
             std::cerr << "Zero in the dictionary gives trivial relations.\n";
             return relation;
         }
-        if (t < sqrt(std::numeric_limits<Real>::epsilon())) {
-            std::cerr << "Super small elements in the dictionary gives spurious relations; more precision is required.\n";
-            return relation;
-        }
-
         if (t < 0) {
             std::cerr << "The algorithm is reflection invariant, so negative values in the dictionary should be removed.\n";
             return relation;
@@ -186,6 +201,22 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real gamma) {
     for (int64_t i = 0; i < n; ++i) {
         y[i] = x[i]/sqrt(s_sq[0]);
     }
+
+    // Now check y:
+    for (int64_t i = 0; i < n; ++i){
+        if (abs(y[i]) < std::numeric_limits<Real>::epsilon()) {
+            std::cerr << "Element y[" << i << "] = " << y[i] << " is too small; more precision is required.\n";
+            return relation;
+        }
+    }
+    for (int64_t i = 1; i < n; ++i){
+        // using the sorted assumption here:
+        if (abs(boost::math::float_distance(y[i], y[i-1])) <= 2) {
+            std::cerr << "Elements y[" << i << "] = " << y[i] << " and " << y << "[" << i + 1 << "] = " << y[i+1] << " are too close together.\n";
+            return relation;
+        }
+    }
+
     auto v = y.transpose()*H;
     for (int64_t i = 0; i < n - 1; ++i) {
         if (abs(v[i])/(n-1) > sqrt(std::numeric_limits<Real>::epsilon())) {
@@ -234,7 +265,6 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real gamma) {
         }
     }
     Real norm_bound = 1/max_coeff;
-    std::cout << "Norm bound: " << norm_bound << "\n";
     Real max_acceptable_norm_bound = 1e10;
     //int64_t iteration = 0;
     Real last_norm_bound = norm_bound;
@@ -325,7 +355,7 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real gamma) {
                 for (int64_t j = 0; j < n; ++j) {
                     sum += bcol[j]*x[j];
                 }
-                if (abs(sum) > 0.1) {
+                if (abs(sum) > 0.0001) {
                     std::cerr << __FILE__ << ":" << __LINE__ << "\n\tBug in PSLQ: Found a relation with a giant residual.\n";
                     std::cerr << "\tResidual = " << abs(sum) << "\n";
                 }
@@ -337,6 +367,7 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real gamma) {
                         relation.push_back({bcol[j], x[j]});
                     }
                 }
+                std::cout << std::endl;
                 return relation;
             }
         }
@@ -355,14 +386,13 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real gamma) {
 
         //std::cout << "A*B = \n" << A*B << "\n";
         //std::cout << "y = \n" << y << "\n";
-        std::cout << "Norm bound = " << norm_bound << "\n";
+        std::cout << "Norm bound = " << norm_bound  << "/" << max_acceptable_norm_bound << "\r";
         if (norm_bound < last_norm_bound) {
             std::cerr << "Norm bound has decreased!\n";
         }
         last_norm_bound = norm_bound;
-        //std::cout << "Hit enter to continue\n";
-        //std::cin.get();
     }
+    std::cout << std::endl;
     return relation;
 }
 
