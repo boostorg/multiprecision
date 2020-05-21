@@ -44,7 +44,7 @@ inline BOOST_CXX14_CONSTEXPR OutputIterator copy(InputIterator first, InputItera
 #endif
    {
 #ifndef BOOST_NO_CXX17_IF_CONSTEXPR
-      if constexpr (std::is_pointer<InputIterator>::value && std::is_pointer<OutputIterator>::value && std::is_pod<typename std::remove_reference<decltype(*first)>::type>::value)
+      if constexpr (std::is_pointer<InputIterator>::value && std::is_pointer<OutputIterator>::value && std::is_trivially_copyable<typename std::remove_reference<decltype(*first)>::type>::value)
       {
          // The normal runtime branch:
          std::memcpy(result, first, (last - first) * sizeof(*first));
