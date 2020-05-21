@@ -239,7 +239,7 @@ template <class CppInt1, class CppInt2, class CppInt3>
 inline BOOST_MP_CXX14_CONSTEXPR void subtract_unsigned(CppInt1& result, const CppInt2& a, const CppInt3& b) BOOST_MP_NOEXCEPT_IF(is_non_throwing_cpp_int<CppInt1>::value)
 {
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
-   if (1 || BOOST_MP_IS_CONST_EVALUATED(a.size()))
+   if (BOOST_MP_IS_CONST_EVALUATED(a.size()))
    {
       subtract_unsigned_constexpr(result, a, b);
    }
