@@ -17,7 +17,7 @@
 // If this is GCC/clang, then check that the actual intrinsic exists:
 //
 #if defined(__has_builtin) && defined(__GNUC__)
-#if !__has_builtin(__builtin_ia32_addcarryx_u64) && defined(BOOST_MP_HAS_IMMINTRIN_H)
+#if !__has_builtin(__builtin_ia32_addcarryx_u64) && defined(BOOST_MP_HAS_IMMINTRIN_H) && !(defined(BOOST_GCC) && (__GNUC__ >= 9))
 #undef BOOST_MP_HAS_IMMINTRIN_H
 #endif
 #elif defined(BOOST_MP_HAS_IMMINTRIN_H) && defined(__GNUC__) && !(defined(BOOST_GCC) && (__GNUC__ >= 9))
