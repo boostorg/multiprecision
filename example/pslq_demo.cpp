@@ -33,15 +33,16 @@ int main() {
     //ln2_plus_pi<Real>();
 
     std::cout << "Preparing standard dictionary. . . ";
-    std::map<Real, std::string> m = boost::multiprecision::standard_pslq_dictionary<Real>();
+    /*std::map<Real, std::string> m = boost::multiprecision::standard_pslq_dictionary<Real>();
     for (auto [x, s] : m) {
         std::cout << s << " = " << x << "\n";
     }
 
-    std::cout << "done.\n";
+    std::cout << "done.\n";*/
     auto start = std::chrono::steady_clock::now();
-    auto s = boost::multiprecision::pslq<Real>(m);
-    std::cout << std::endl;
+    Real max_acceptable_norm_bound = 1e9;
+    std::pair<Real, std::string> number{boost::math::lambert_w0(boost::math::constants::zeta_three<Real>()), "W(ζ(3))"};
+    std::string s = boost::multiprecision::identify<Real>(number, max_acceptable_norm_bound);
     if (!s.empty())
     {
         std::cout << s << "\n";

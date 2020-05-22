@@ -37,6 +37,7 @@
 #include <stdexcept>
 #include <vector>
 #include <sstream>
+#include <chrono>
 #include <map>
 #include <cmath>
 #include <optional>
@@ -51,11 +52,16 @@
 #  endif
 #endif
 
+#ifdef __APPLE__
+#include <sys/ioctl.h> //ioctl() and TIOCGWINSZ
+#include <unistd.h> // for STDOUT_FILENO
+#endif
+
 namespace boost::multiprecision {
 
-// For debugging:
+// For debugging and unit testing:
 template<typename Real>
-auto tiny_pslq_dictionary() {
+auto small_pslq_dictionary() {
     using std::sqrt;
     using namespace boost::math::constants;
     std::map<Real, std::string> m;
@@ -65,6 +71,7 @@ auto tiny_pslq_dictionary() {
     m.emplace(ln_two<Real>(), "ln(2)");
     return m;
 }
+
 template<typename Real>
 auto standard_pslq_dictionary() {
     using std::sqrt;
@@ -155,10 +162,48 @@ auto standard_pslq_dictionary() {
     return m;
 }
 
+// anonymous namespace:
+namespace {
+
+class progress {
+
+public:
+
+progress()
+{
+    start_ = std::chrono::steady_clock::now();
+}
+
+void display_progress(double progress)
+{
+    struct winsize size_;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &size_);
+    int barWidth = size_.ws_col;
+
+    std::cout << "\033[0;32m[";
+    int pos = barWidth * progress;
+    for (int i = 0; i < barWidth; ++i) {
+        if (i < pos) std::cout << "=";
+        else if (i == pos) std::cout << ">";
+        else std::cout << " ";
+    }
+    std::cout << "] "
+              << int(progress * 100.0)
+              << "%\r";
+    std::cout.flush();
+}
+
+private:
+
+    std::chrono::steady_clock::time_point start_;
+};
+
+}
+
 // The PSLQ algorithm; partial sum of squares, lower trapezoidal decomposition.
 // See: https://www.davidhbailey.com/dhbpapers/cpslq.pdf, section 3.
 template<typename Real>
-std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real gamma) {
+std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_acceptable_norm_bound, Real gamma) {
     std::vector<std::pair<int64_t, Real>> relation;
     if (!std::is_sorted(x.begin(), x.end())) {
         std::cerr << "Elements must be sorted in increasing order.\n";
@@ -301,7 +346,7 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real gamma) {
         }
     }
     Real norm_bound = 1/max_coeff;
-    Real max_acceptable_norm_bound = 1e10;
+   // Real max_acceptable_norm_bound = 1e10;
     //int64_t iteration = 0;
     Real last_norm_bound = norm_bound;
     while (norm_bound < max_acceptable_norm_bound)
@@ -432,21 +477,16 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real gamma) {
     return relation;
 }
 
-template<typename Real>
-std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> const & x) {
-    Real gamma = 2/sqrt(3) + 0.01;
-    return pslq(x, gamma);
-}
 
 template<typename Real>
-std::string pslq(std::map<Real, std::string> const & dictionary, Real gamma) {    
+std::string pslq(std::map<Real, std::string> const & dictionary, Real max_acceptable_norm_bound, Real gamma) {
     std::vector<Real> values(dictionary.size());
     size_t i = 0;
     for (auto it = dictionary.begin(); it != dictionary.end(); ++it) {
         values[i++] = it->first;
     }
 
-    auto m = pslq(values, gamma);
+    auto m = pslq(values, max_acceptable_norm_bound, gamma);
     if (m.size() > 0) {
         std::ostringstream oss;
         auto const & symbol = dictionary.find(m[0].second)->second;
@@ -484,15 +524,35 @@ std::string pslq(std::map<Real, std::string> const & dictionary, Real gamma) {
 }
 
 template<typename Real>
-std::string pslq(std::map<Real, std::string> const & dictionary) {
+std::string pslq(std::map<Real, std::string> const & dictionary, Real max_acceptable_norm) {
     Real gamma = 2/sqrt(3) + 0.01;
-    return pslq(dictionary, gamma);
+    return pslq(dictionary, max_acceptable_norm, gamma);
 }
 
-template<typename Real, typename Z = int64_t>
-std::optional<boost::math::tools::polynomial<Z>> is_algebraic(Real x, std::vector<int64_t>& m) {
+template<typename Real>
+std::string identify(std::pair<Real, std::string> value_symbol, Real max_acceptable_norm) {
+    auto dictionary = standard_pslq_dictionary<Real>();
+    Real gamma = 2/sqrt(3) + 0.01;
+
+    using std::log;
+    using std::exp;
+    dictionary.emplace(value_symbol.first, value_symbol.second);
+    Real log_ = log(value_symbol.first);
+    if (log_ < 0) {
+        dictionary.emplace(-log(value_symbol.first), "-ln(" + value_symbol.second + ")");
+    } else {
+        dictionary.emplace(log(value_symbol.first), "ln(" + value_symbol.second + ")");
+    }
+    dictionary.emplace(exp(value_symbol.first), "exp(" + value_symbol.second + ")");
+    dictionary.emplace(1/value_symbol.first, "1/" + value_symbol.second);
+    dictionary.emplace(value_symbol.first*value_symbol.first, value_symbol.second + "²");
+    return pslq(dictionary, max_acceptable_norm, gamma);
+}
+
+template<typename Real>
+std::string is_algebraic(std::pair<Real, std::string> x, Real max_acceptable_norm) {
     // TODO: Figure out this interface.
-    return false;
+    return "";
 }
 
 }
