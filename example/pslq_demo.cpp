@@ -29,11 +29,15 @@ void ln2_plus_pi()
 }
 
 int main() {
-    using Real = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<900> >;
+    using Real = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<1500> >;
     //ln2_plus_pi<Real>();
 
-    std::cout << "Preparing dictionary. . . ";
-    std::map<Real, std::string> m = boost::multiprecision::small_pslq_dictionary<Real>();
+    std::cout << "Preparing standard dictionary. . . ";
+    std::map<Real, std::string> m = boost::multiprecision::standard_pslq_dictionary<Real>();
+    for (auto [x, s] : m) {
+        std::cout << s << " = " << x << "\n";
+    }
+
     std::cout << "done.\n";
     auto start = std::chrono::steady_clock::now();
     auto s = boost::multiprecision::pslq<Real>(m);

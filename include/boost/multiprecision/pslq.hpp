@@ -39,7 +39,10 @@
 #include <sstream>
 #include <map>
 #include <cmath>
+#include <optional>
 #include <boost/math/constants/constants.hpp>
+#include <boost/math/special_functions/lambert_w.hpp>
+#include <boost/math/tools/polynomial.hpp>
 #if defined __has_include
 #  if __has_include (<Eigen/Dense>)
 #    include <Eigen/Dense>
@@ -63,10 +66,12 @@ auto tiny_pslq_dictionary() {
     return m;
 }
 template<typename Real>
-auto small_pslq_dictionary() {
+auto standard_pslq_dictionary() {
     using std::sqrt;
     using std::log;
     using std::exp;
+    using std::pow;
+    using std::cbrt;
     using namespace boost::math::constants;
     std::map<Real, std::string> m;
     Real euler_ = euler<Real>();
@@ -79,6 +84,7 @@ auto small_pslq_dictionary() {
     m.emplace(-log(euler_), "-ln(γ)");
     m.emplace(exp(euler_), "exp(γ)");
     Real zeta_three_ = zeta_three<Real>();
+    m.emplace(sqrt(zeta_three_), "√ζ(3)");
     m.emplace(zeta_three_, "ζ(3)");
     m.emplace(1/zeta_three_, "1/ζ(3)");
     m.emplace(1/(zeta_three_*zeta_three_), "1/ζ(3)²");
@@ -87,14 +93,21 @@ auto small_pslq_dictionary() {
     m.emplace(exp(zeta_three_), "exp(ζ(3))");
     m.emplace(zeta_three_*zeta_three_, "ζ(3)²");
     m.emplace(zeta_three_*zeta_three_*zeta_three_, "ζ(3)³");
+    m.emplace(pow(zeta_three_, 4), "ζ(3)⁴");
     
     auto pi_ = pi<Real>();
     m.emplace(pi_, "π");
+    m.emplace(1/pi_, "1/π");
+    m.emplace(1/(pi_*pi_), "1/π²");
     m.emplace(sqrt(pi_), "√π");
+    m.emplace(cbrt(pi_), "∛π");
     m.emplace(log(pi_), "ln(π)");
-    m.emplace(pi_sqr<Real>(), "π²");
-    m.emplace(pi_cubed<Real>(), "π³");
-    m.emplace(e<Real>(), "e");
+    m.emplace(pi_*pi_, "π²");
+    m.emplace(pi_*pi_*pi_, "π³");
+
+    Real e_ = e<Real>();
+    m.emplace(e_, "e");
+    m.emplace(sqrt(e_), "√e");
     m.emplace(root_two<Real>(), "√2");
     m.emplace(root_three<Real>(), "√3");
     m.emplace(sqrt(static_cast<Real>(5)), "√5");
@@ -103,12 +116,30 @@ auto small_pslq_dictionary() {
 
     // φ is linearly dependent on √5; its logarithm is not.
     m.emplace(log(phi<Real>()), "ln(φ)");
-    m.emplace(catalan<Real>(), "G");
-    m.emplace(glaisher<Real>(), "A");
-    m.emplace(khinchin<Real>(), "K₀");
-    
+    m.emplace(exp(phi<Real>()), "exp(φ)");
+    Real catalan_ = catalan<Real>();
+    m.emplace(catalan_, "G");
+    m.emplace(catalan_*catalan_, "G²");
+    m.emplace(1/catalan_, "1/G");
+    m.emplace(-log(catalan_), "-ln(G)");
+    m.emplace(exp(catalan_), "exp(G)");
+    m.emplace(sqrt(catalan_), "√G");
+
+    Real glaisher_ = glaisher<Real>();
+    m.emplace(glaisher_, "A");
+    m.emplace(glaisher_*glaisher_, "A²");
+    m.emplace(1/glaisher_, "1/A");
+    m.emplace(log(glaisher_), "ln(A)");
+    m.emplace(exp(glaisher_), "exp(A)");
+    Real khinchin_ = khinchin<Real>();
+    m.emplace(khinchin_, "K₀");
+    m.emplace(log(khinchin_), "ln(K₀)");
+    m.emplace(exp(khinchin_), "exp(K₀)");
+    m.emplace(1/khinchin_, "1/K₀");
+    m.emplace(khinchin_*khinchin_, "K₀²");
     // To recover multiplicative relations we need the logarithms of small primes.
     m.emplace(log(static_cast<Real>(2)), "ln(2)");
+    m.emplace(-log(log(static_cast<Real>(2))), "-ln(ln(2))");
     m.emplace(log(static_cast<Real>(3)), "ln(3)");
     m.emplace(log(static_cast<Real>(5)), "ln(5)");
     m.emplace(log(static_cast<Real>(7)), "ln(7)");
@@ -116,6 +147,11 @@ auto small_pslq_dictionary() {
     m.emplace(log(static_cast<Real>(13)), "ln(13)");
     m.emplace(log(static_cast<Real>(17)), "ln(17)");
     m.emplace(log(static_cast<Real>(19)), "ln(19)");
+    // Omega constant = Lambert-W function evaluated at 1:
+    Real Omega_ = boost::math::lambert_w0(static_cast<Real>(1));
+    m.emplace(Omega_, "Ω");
+    m.emplace(Omega_*Omega_, "Ω²");
+    m.emplace(1/Omega_, "1/Ω");
     return m;
 }
 
@@ -453,8 +489,8 @@ std::string pslq(std::map<Real, std::string> const & dictionary) {
     return pslq(dictionary, gamma);
 }
 
-template<typename Real>
-bool is_algebraic(Real x, std::vector<int64_t>& m) {
+template<typename Real, typename Z = int64_t>
+std::optional<boost::math::tools::polynomial<Z>> is_algebraic(Real x, std::vector<int64_t>& m) {
     // TODO: Figure out this interface.
     return false;
 }
