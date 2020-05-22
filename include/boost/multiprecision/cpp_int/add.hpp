@@ -10,7 +10,16 @@
 #define BOOST_MP_CPP_INT_ADD_HPP
 
 #include <boost/multiprecision/detail/constexpr.hpp>
-#include <functional>
+
+#if (defined(__x86_64__) || defined(__i386__)) && __cplusplus >= 201103L && defined(__has_include)
+#if ((defined(__clang__) || defined(__GNUC__) || defined(__INTEL_COMPILER))) && __has_include(<immintrin.h>)
+#include <immintrin.h>
+#define BOOST_MP_ADC_INTRINSICS
+#elif defined(_MSC_VER) && __has_include(<intrin.h>)
+#include <intrin.h>
+#define BOOST_MP_ADC_INTRINSICS
+#endif // compiler switch
+#endif // x86_64 / i386
 
 namespace boost {
 namespace multiprecision {
@@ -21,50 +30,49 @@ namespace backends {
 #pragma warning(disable : 4127) // conditional expression is constant
 #endif
 
-#if defined(__clang__) || defined(__GNUC__) || defined(__INTEL_COMPILER)
-
-#include <immintrin.h>
-namespace adc {
-#if defined(__INTEL_COMPILER)
-using T = unsigned long;
-#else
-using T = unsigned long long;
-#endif
-unsigned char (*adc)(unsigned char, T, T, T*) = &_addcarry_u64;
-} // namespace adc
-
-#elif defined(_MSC_VER)
-
-#include <intrin.h>
-namespace adc {
-using T                                       = unsigned int;
-unsigned char (*adc)(unsigned char, T, T, T*) = &_addcarry_u32;
-} // namespace adc
-
-#endif
-
-namespace adc {
-inline BOOST_MP_CXX14_CONSTEXPR bool add_unsigned_intrinsic(const T* pa, const T* pb, T* pr, size_t m, size_t x)
+#ifdef BOOST_MP_ADC_INTRINSICS
+inline BOOST_MP_CXX14_CONSTEXPR bool add_unsigned_adc(const unsigned long long* pa, const unsigned long long* pb, unsigned long long* pr, size_t m, size_t x)
 {
+   //
+   // This optimization is limited to: GCC, LLVM, ICC (Intel), MSVC for x86_64 and i386.
+   // If your architecture and compiler supports ADC intrinsic, please file a bug
+   //
+   // As of May, 2020 major compilers don't recognize carry chain though adc
+   // intrinsics are used to hint compilers to use ADC and still compilers don't
+   // unroll the loop efficiently (except LLVM) so manual unrolling is done
+   //
+   // Signature of ADC intrinsics and its header file depends upon the compiler used
+   //
    unsigned      i     = 0;
    unsigned char carry = 0;
+#if defined(__GNUC__) || defined(__clang__) || defined(__INTEL_COMPILER)
+#ifdef __INTEL_COMPILER
+   using T = unsigned __int64;
+#else
+   using T = unsigned long long;
+#endif
+   auto add_carry = &_addcarry_u64;
+#elif defined(_MSC_VER)
+   using T        = unsigned int;
+   auto add_carry = &_addcarry_u32;
+#endif
    for (i = 0; i + 4 <= m; i += 4)
    {
-      carry = adc(carry, pa[i + 0], pb[i + 0], &pr[i + 0]);
-      carry = adc(carry, pa[i + 1], pb[i + 1], &pr[i + 1]);
-      carry = adc(carry, pa[i + 2], pb[i + 2], &pr[i + 2]);
-      carry = adc(carry, pa[i + 3], pb[i + 3], &pr[i + 3]);
+      carry = add_carry(carry, pa[i + 0], pb[i + 0], (T*)&pr[i + 0]);
+      carry = add_carry(carry, pa[i + 1], pb[i + 1], (T*)&pr[i + 1]);
+      carry = add_carry(carry, pa[i + 2], pb[i + 2], (T*)&pr[i + 2]);
+      carry = add_carry(carry, pa[i + 3], pb[i + 3], (T*)&pr[i + 3]);
    }
    for (; i < m; ++i)
-      carry = adc(carry, pa[i], pb[i], &pr[i]);
+      carry = add_carry(carry, pa[i], pb[i], (T*)&pr[i]);
    for (; i < x && carry; ++i)
-      carry = adc(carry, pa[i], 0, &pr[i]);
+      carry = add_carry(carry, pa[i], 0, (T*)&pr[i]);
    if (i == x && carry)
       return true;
    std_constexpr::copy(pa + i, pa + x, pr + i);
    return false;
 }
-} // namespace adc
+#endif
 
 //
 // This is the key addition routine where all the argument types are non-trivial cpp_int's:
@@ -94,9 +102,10 @@ inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2
    if (as < bs)
       swap(pa, pb);
    bool overflow = false;
-#if defined(__GNUC__) || defined(_MSC_VER) || defined(__INTEL_COMPILER) || defined(__clang__)
-   overflow = adc::add_unsigned_intrinsic(pa, pb, pr, m, x);
+#ifdef BOOST_MP_ADC_INTRINSICS
+   overflow = add_unsigned_adc(pa, pb, pr, m, x);
 #else
+   double_limb_type carry = 0;
    // generic version
    typename CppInt1::limb_pointer pr_end = pr + m;
    while (pr != pr_end)
