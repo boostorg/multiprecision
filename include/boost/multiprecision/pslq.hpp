@@ -44,6 +44,7 @@
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions/lambert_w.hpp>
 #include <boost/math/tools/polynomial.hpp>
+#include <boost/core/demangle.hpp>
 #if defined __has_include
 #  if __has_include (<Eigen/Dense>)
 #    include <Eigen/Dense>
@@ -245,6 +246,13 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
         s_sq[i] = s_sq[i+1] + x[i]*x[i];
     }
     
+    using std::pow;
+    if (max_acceptable_norm_bound*max_acceptable_norm_bound*s_sq[0] > 1/std::numeric_limits<Real>::epsilon()) {
+        std::cerr << "The maximum acceptable norm bound " << max_acceptable_norm_bound << " is too large; spurious relations will be recovered.\n";
+        std::cerr << "Either reduce the norm bound, or increase the precision of the variables.\n";
+        std::cerr << "At this precision, your norm bound cannot exceed " << 1/sqrt(s_sq[0]*std::numeric_limits<Real>::epsilon()) << "\n";
+        return relation;
+    }
     Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic> H(n, n-1);
     for (int64_t i = 0; i < n - 1; ++i) {
         for (int64_t j = 0; j < n - 1; ++j) {
@@ -432,13 +440,18 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
                 //std::cout << "We've found a solution!\n";
                 auto bcol = B.col(i);
                 //std::cout << "Column of B = \n" << bcol << "\n";
-                Real sum = 0;
+                Real residual = 0;
+                Real absum = 0;
                 for (int64_t j = 0; j < n; ++j) {
-                    sum += bcol[j]*x[j];
+                    residual += bcol[j]*x[j];
+                    absum += abs(bcol[j]*x[j]);
                 }
-                if (abs(sum) > 0.0001) {
-                    std::cerr << __FILE__ << ":" << __LINE__ << "\n\tBug in PSLQ: Found a relation with a giant residual.\n";
-                    std::cerr << "\tResidual = " << abs(sum) << "\n";
+                Real tolerable_residual = 16*std::numeric_limits<Real>::epsilon()*absum;
+                if (abs(residual) > tolerable_residual)
+                {
+                    std::cerr << __FILE__ << ":" << __LINE__ << "\n\tBug in PSLQ: Found a relation with a large residual.\n";
+                    std::cerr << "\tThe residual " << abs(residual) << " is larger than the tolerable residual " << tolerable_residual << "\n";
+                    std::cerr << "\tThis is either a bug, or your constants are not specified to the full accuracy of the floating point type " << boost::core::demangle(typeid(Real).name()) << ".\n";
                 }
 
                 for (int64_t j = 0; j < n; ++j)
@@ -537,12 +550,12 @@ std::string identify(std::pair<Real, std::string> value_symbol, Real max_accepta
     using std::log;
     using std::exp;
     dictionary.emplace(value_symbol.first, value_symbol.second);
-    Real log_ = log(value_symbol.first);
+    /*Real log_ = log(value_symbol.first);
     if (log_ < 0) {
         dictionary.emplace(-log(value_symbol.first), "-ln(" + value_symbol.second + ")");
     } else {
         dictionary.emplace(log(value_symbol.first), "ln(" + value_symbol.second + ")");
-    }
+    }*/
     dictionary.emplace(exp(value_symbol.first), "exp(" + value_symbol.second + ")");
     dictionary.emplace(1/value_symbol.first, "1/" + value_symbol.second);
     dictionary.emplace(value_symbol.first*value_symbol.first, value_symbol.second + "²");
