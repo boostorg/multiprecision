@@ -176,10 +176,10 @@ progress()
     struct winsize size_;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &size_);
     bar_width_ = size_.ws_col;
-    bar_width_  -= 40;
+    bar_width_  -= 55;
 }
 
-void display_progress(int64_t iteration, int64_t max_iterations)
+void display_progress(int64_t iteration, int64_t max_iterations, double norm_bound)
 {
     double progress = iteration/double(max_iterations);
     auto now = std::chrono::steady_clock::now();
@@ -196,17 +196,18 @@ void display_progress(int64_t iteration, int64_t max_iterations)
     std::cout << "] "
               << int(iteration * 100.0/max_iterations)
               << "%," << iteration << "/" << max_iterations;
+    std::cout << ", ‖m‖₂≥" << norm_bound << ", ETA:";
     if (eta > 3600) {
         if (eta > 3600*24)
         {
-            std::cout << ", eta " << eta/(3600*24) << " days\r";
+            std::cout << eta/(3600*24) << " days\r";
         }
         else
         {
-            std::cout << ", eta " << eta/3600 << " hr\r";
+            std::cout << eta/3600 << " hr\r";
         }
     } else {
-        std::cout << ", eta " << eta << " s\r";
+        std::cout << eta << " s\r";
     }
     std::cout.flush();
 }
@@ -296,7 +297,7 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
 
     using std::ceil;
     int64_t expected_iterations = ceil(boost::math::binomial_coefficient<Real>(n, 2)*log(pow(gamma, n-1)*max_acceptable_norm_bound)/log(tau));
-    std::cout << "Expected number of iterations = " << expected_iterations << "\n";
+    //std::cout << "Expected number of iterations = " << expected_iterations << "\n";
     // This validates that H is indeed lower trapezoidal,
     // but that's trival and verbose:
     //std::cout << "H = \n";
@@ -512,7 +513,7 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
         last_norm_bound = norm_bound;
         ++iteration;
         if (iteration % 250 == 0) {
-            prog.display_progress(iteration, expected_iterations);
+            prog.display_progress(iteration, expected_iterations, static_cast<double>(norm_bound));
         }
     }
     return relation;
