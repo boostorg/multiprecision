@@ -53,9 +53,11 @@
 #  endif
 #endif
 
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__linux__)
 #include <sys/ioctl.h> //ioctl() and TIOCGWINSZ
 #include <unistd.h> // for STDOUT_FILENO
+#elif defined(_WIN32) || defined(__CYGWIN__)
+#include <windows.h>
 #endif
 
 namespace boost::multiprecision {
@@ -170,13 +172,22 @@ class progress {
 
 public:
 
-progress()
+progress(std::ostream & os) : os_{os}
 {
     start_ = std::chrono::steady_clock::now();
+#if defined(__APPLE__) || defined(__linux__)
     struct winsize size_;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &size_);
     bar_width_ = size_.ws_col;
-    bar_width_  -= 55;
+#elif defined(_WIN32)
+    // From: https://stackoverflow.com/a/23370070/904050
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+    bar_width_ = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+#else
+    bar_width_ = 90;
+#endif
+    bar_width_ -= 58;
 }
 
 void display_progress(int64_t iteration, int64_t max_iterations, double norm_bound)
@@ -187,39 +198,39 @@ void display_progress(int64_t iteration, int64_t max_iterations, double norm_bou
     // ETA:
     double eta = (1-progress)*elapsed_milliseconds.count()/(1000*progress);
     int pos = bar_width_ * progress;
-    std::cout << "\033[0;32m[";
+    os_ << "\033[0;32m[";
     for (int i = 0; i < bar_width_; ++i) {
-        if (i < pos) std::cout << "=";
-        else if (i == pos) std::cout << ">";
-        else std::cout << " ";
+        if (i < pos) os_ << "=";
+        else if (i == pos) os_ << ">";
+        else os_ << " ";
     }
-    std::cout << "] "
+    os_ << "] "
               << int(iteration * 100.0/max_iterations)
-              << "%," << iteration << "/" << max_iterations;
-    std::cout << ", ‖m‖₂≥" << norm_bound << ", ETA:";
+              << "%, iteration " << iteration << "/" << max_iterations;
+    os_ << ", ‖m‖₂≥" << norm_bound << ", ETA:";
     if (eta > 3600) {
         if (eta > 3600*24)
         {
-            std::cout << eta/(3600*24) << " days\r";
+            os_ << eta/(3600*24) << " days\r";
         }
         else
         {
-            std::cout << eta/3600 << " hr\r";
+            os_ << eta/3600 << " hr\r";
         }
     } else {
-        std::cout << eta << " s\r";
+        os_ << eta << " s\r";
     }
-    std::cout.flush();
+    os_.flush();
 }
 
 ~progress() {
-    std::cout << "\033[39m";
-    std::cout << std::endl;
+    os_ << "\033[39m\n";
 }
 
 private:
     std::chrono::steady_clock::time_point start_;
     int bar_width_;
+    std::ostream & os_;
 };
 
 }
@@ -366,13 +377,10 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
             y[j] += t*y[i];
         }
     }
-    /*std::cout << "A, post-reduction = \n" << A << "\n";
-    std::cout << "B, post-reduction = \n" << B << "\n";
-    std::cout << "A*B, post-reduction = \n" << A*B << "\n";
-    std::cout << "H, post-reduction:\n" << H << "\n";
-
-    std::cout << "Hit enter.\n";
-    std::cin.get();*/
+    //std::cout << "A, post-reduction = \n" << A << "\n";
+    //std::cout << "B, post-reduction = \n" << B << "\n";
+    //std::cout << "A*B, post-reduction = \n" << A*B << "\n";
+    //std::cout << "H, post-reduction:\n" << H << "\n";
     Real max_coeff = 0;
     for (int64_t i = 0; i < n - 1; ++i) {
         if (abs(H(i,i)) > max_coeff) {
@@ -382,7 +390,7 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
     Real norm_bound = 1/max_coeff;
     Real last_norm_bound = norm_bound;
     int64_t iteration = 0;
-    auto prog = progress();
+    auto prog = progress(std::cout);
     while (norm_bound < max_acceptable_norm_bound)
     {
         // "1. Select m such that γ^{i+1}|H_ii| is maximal when i = m":
@@ -416,7 +424,6 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
 
         //std::cout << "H, post-swap = \n" << H << "\n";
         // "3. Remove the corner on H diagonal:"
-        //std::cout << "Removing corner:\n";
         if (m < n - 2) {
             Real t0 = H(m,m)*H(m,m) + H(m, m+1)*H(m, m+1);
             t0 = sqrt(t0);
@@ -430,13 +437,8 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
             }
             //std::cout << "H, post corner reduce = \n" << H << "\n";
         }
-        else {
-            //std::cout << "m = " << m << ", so no corner reduction.\n";
-        }
 
-        //std::cin.get();
         // "4. Reduce H:"
-        //std::cout << "Reducing H:\n";
         for (int64_t i = m+1; i < n; ++i) {
             for (int64_t j = std::min(i-1, m+1); j >= 0; --j) {
                 Real t = round(H(i,j)/H(j,j));
@@ -445,13 +447,10 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
                 {
                     continue;
                 }
-                //std::cout << "Update y\n";
                 y[j] += t*y[i];
-                //std::cout << "Updating H\n";
                 for (int64_t k = 0; k <= j; ++k) {
                     H(i,k) = H(i,k) - t*H(j,k);
                 }
-                //std::cout << "Updating A,B:\n";
                 for (int64_t k = 0; k < n; ++k) {
                     A(i,k) = A(i,k) - tint*A(j,k);
                     B(k,j) = B(k,j) + tint*B(k,i);
@@ -462,9 +461,7 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
         // Look for a solution:
         for (int64_t i = 0; i < n; ++i) {
             if (abs(y[i]) < pow(std::numeric_limits<Real>::epsilon(), Real(15)/Real(16))) {
-                //std::cout << "We've found a solution!\n";
                 auto bcol = B.col(i);
-                //std::cout << "Column of B = \n" << bcol << "\n";
                 Real residual = 0;
                 Real absum = 0;
                 for (int64_t j = 0; j < n; ++j) {
@@ -492,7 +489,6 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
             }
         }
 
-       // std::cout << "Computing the norm bound:\n";
         max_coeff = 0;
         for (int64_t i = 0; i < n - 1; ++i) {
             if (abs(H(i,i)) > max_coeff) {
@@ -506,7 +502,6 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
 
         //std::cout << "A*B = \n" << A*B << "\n";
         //std::cout << "y = \n" << y << "\n";
-        //std::cout << "Norm bound = " << norm_bound  << "/" << max_acceptable_norm_bound << ", iteration " << iteration << "/" << expected_iterations << "\r";
         if (norm_bound < last_norm_bound) {
             std::cerr << "Norm bound has decreased!\n";
         }
@@ -579,12 +574,12 @@ std::string identify(std::pair<Real, std::string> value_symbol, Real max_accepta
     using std::log;
     using std::exp;
     dictionary.emplace(value_symbol.first, value_symbol.second);
-    /*Real log_ = log(value_symbol.first);
+    Real log_ = log(value_symbol.first);
     if (log_ < 0) {
         dictionary.emplace(-log(value_symbol.first), "-ln(" + value_symbol.second + ")");
     } else {
         dictionary.emplace(log(value_symbol.first), "ln(" + value_symbol.second + ")");
-    }*/
+    }
     dictionary.emplace(exp(value_symbol.first), "exp(" + value_symbol.second + ")");
     dictionary.emplace(1/value_symbol.first, "1/" + value_symbol.second);
     dictionary.emplace(value_symbol.first*value_symbol.first, value_symbol.second + "²");
