@@ -47,7 +47,7 @@ void pi_root_two()
 }
 
 int main() {
-    using Real = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<300> >;
+    using Real = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<1000> >;
     ln2_plus_pi<float>();
     ln2_plus_pi<double>();
     pi_root_two<float>();

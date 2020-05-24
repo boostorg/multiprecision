@@ -173,30 +173,52 @@ public:
 progress()
 {
     start_ = std::chrono::steady_clock::now();
-}
-
-void display_progress(double progress)
-{
     struct winsize size_;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &size_);
-    int barWidth = size_.ws_col;
+    bar_width_ = size_.ws_col;
+    bar_width_  -= 40;
+}
 
+void display_progress(int64_t iteration, int64_t max_iterations)
+{
+    double progress = iteration/double(max_iterations);
+    auto now = std::chrono::steady_clock::now();
+    std::chrono::duration<double, std::milli> elapsed_milliseconds = now - start_;
+    // ETA:
+    double eta = (1-progress)*elapsed_milliseconds.count()/(1000*progress);
+    int pos = bar_width_ * progress;
     std::cout << "\033[0;32m[";
-    int pos = barWidth * progress;
-    for (int i = 0; i < barWidth; ++i) {
+    for (int i = 0; i < bar_width_; ++i) {
         if (i < pos) std::cout << "=";
         else if (i == pos) std::cout << ">";
         else std::cout << " ";
     }
     std::cout << "] "
-              << int(progress * 100.0)
-              << "%\r";
+              << int(iteration * 100.0/max_iterations)
+              << "%," << iteration << "/" << max_iterations;
+    if (eta > 3600) {
+        if (eta > 3600*24)
+        {
+            std::cout << ", eta " << eta/(3600*24) << " days\r";
+        }
+        else
+        {
+            std::cout << ", eta " << eta/3600 << " hr\r";
+        }
+    } else {
+        std::cout << ", eta " << eta << " s\r";
+    }
     std::cout.flush();
 }
 
-private:
+~progress() {
+    std::cout << "\033[39m";
+    std::cout << std::endl;
+}
 
+private:
     std::chrono::steady_clock::time_point start_;
+    int bar_width_;
 };
 
 }
@@ -357,10 +379,9 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
         }
     }
     Real norm_bound = 1/max_coeff;
-   // Real max_acceptable_norm_bound = 1e10;
-    //int64_t iteration = 0;
     Real last_norm_bound = norm_bound;
     int64_t iteration = 0;
+    auto prog = progress();
     while (norm_bound < max_acceptable_norm_bound)
     {
         // "1. Select m such that γ^{i+1}|H_ii| is maximal when i = m":
@@ -437,7 +458,6 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
             }
         }
 
-        //std::cout << "Looking for a solution\n";
         // Look for a solution:
         for (int64_t i = 0; i < n; ++i) {
             if (abs(y[i]) < pow(std::numeric_limits<Real>::epsilon(), Real(15)/Real(16))) {
@@ -453,6 +473,8 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
                 Real tolerable_residual = 16*std::numeric_limits<Real>::epsilon()*absum;
                 if (abs(residual) > tolerable_residual)
                 {
+                    std::cout << std::endl;
+                    std::cerr << "\033[31m";
                     std::cerr << __FILE__ << ":" << __LINE__ << "\n\tBug in PSLQ: Found a relation with a large residual.\n";
                     std::cerr << "\tThe residual " << abs(residual) << " is larger than the tolerable residual " << tolerable_residual << "\n";
                     std::cerr << "\tThis is either a bug, or your constants are not specified to the full accuracy of the floating point type " << boost::core::demangle(typeid(Real).name()) << ".\n";
@@ -465,7 +487,6 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
                         relation.push_back({bcol[j], x[j]});
                     }
                 }
-                std::cout << std::endl;
                 return relation;
             }
         }
@@ -484,15 +505,16 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
 
         //std::cout << "A*B = \n" << A*B << "\n";
         //std::cout << "y = \n" << y << "\n";
-        std::cout << "Norm bound = " << norm_bound  << "/" << max_acceptable_norm_bound << ", iteration " << iteration << "/" << expected_iterations << "\r";
+        //std::cout << "Norm bound = " << norm_bound  << "/" << max_acceptable_norm_bound << ", iteration " << iteration << "/" << expected_iterations << "\r";
         if (norm_bound < last_norm_bound) {
             std::cerr << "Norm bound has decreased!\n";
         }
         last_norm_bound = norm_bound;
         ++iteration;
-
+        if (iteration % 250 == 0) {
+            prog.display_progress(iteration, expected_iterations);
+        }
     }
-    std::cout << std::endl;
     return relation;
 }
 
