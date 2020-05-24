@@ -7,19 +7,18 @@
 
 [section:pslq PSLQ]
 
-   #include <boost/multiprecision/pslq.hpp>
-   namespace boost::multiprecision {
+    #include <boost/multiprecision/pslq.hpp>
+    namespace boost::multiprecision {
 
     template<typename Real>
-    std::string pslq(std::map<Real, std::string> const & dictionary);
+    std::string pslq(std::map<Real, std::string> const & dictionary, Real max_acceptable_solution_norm);
 
     template<typename Real>
-    std::string is_algebraic(Real const & x);
+    bool is_algebraic(std::pair<Real, std::string> const & x, Real max_acceptable_solution_norm);
 
     template<typename Real>
-    bool is_algebraic(Real const & x);
-
-   }
+    std::string identify(std::pair<Real, std::string> const & x, Real max_acceptable_solution_norm);
+    }
 
 The PSLQ algorithm takes a list /x/ ∈ℝ[super n] of interesting constants, e.g., π, the Euler-Mascheroni constant γ, or the golden ration φ, and determines if there is an /integer relation/ between them.
 By this we mean a list of integers /m/ ∈ℤ[super n], not all zero, such that /m⋅x/ = 0.
@@ -36,7 +35,7 @@ Let's use the Boost implementation to rediscover this relation:
     m.emplace_back(pow(pi,6), "π⁶");
     auto z3 = boost::math::constants::zeta_three<Real>();
     m.emplace_back(z3*z3, "ζ(3)²");
-    std::string msg = pslq(m);
+    std::string msg = pslq(m, 1e10);
 
     std::cout << msg << "\n";
 
@@ -61,7 +60,7 @@ In addition, /verifying/ a suspected relation is much less computationally diffi
 
 Astute readers will notice that our example requires a very auspicious guess about the form the relation takes.
 If we didn't know that β was somehow related to π⁶ and ζ(3)², we would've never found this relation.
-This is a general property of the PSLQ algorithm: As its runtime scales cubically in the length of the dictionary, having a hunch about the form the relation will take is necessary.
+This is a general property of the PSLQ algorithm: As its runtime scales quartically in the length of the dictionary, having a hunch about the form the relation will take is necessary.
 
 That said, simple modifications of the inputs allow us to recover different classes of relations.
 Let's use the Basel problem as an example:
