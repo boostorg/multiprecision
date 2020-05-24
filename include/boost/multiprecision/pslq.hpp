@@ -272,6 +272,9 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
         H(n-1, j) = -x[n-1]*x[j]/sqrt(s_sq[j]*s_sq[j+1]);
     }
 
+    using std::ceil;
+    int64_t expected_iterations = ceil(boost::math::binomial_coefficient<Real>(n, 2)*log(pow(gamma, n-1)*max_acceptable_norm_bound)/log(tau));
+    std::cout << "Expected number of iterations = " << expected_iterations << "\n";
     // This validates that H is indeed lower trapezoidal,
     // but that's trival and verbose:
     //std::cout << "H = \n";
@@ -357,6 +360,7 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
    // Real max_acceptable_norm_bound = 1e10;
     //int64_t iteration = 0;
     Real last_norm_bound = norm_bound;
+    int64_t iteration = 0;
     while (norm_bound < max_acceptable_norm_bound)
     {
         // "1. Select m such that γ^{i+1}|H_ii| is maximal when i = m":
@@ -436,7 +440,7 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
         //std::cout << "Looking for a solution\n";
         // Look for a solution:
         for (int64_t i = 0; i < n; ++i) {
-            if (abs(y[i]) < sqrt(std::numeric_limits<Real>::epsilon())) {
+            if (abs(y[i]) < pow(std::numeric_limits<Real>::epsilon(), Real(15)/Real(16))) {
                 //std::cout << "We've found a solution!\n";
                 auto bcol = B.col(i);
                 //std::cout << "Column of B = \n" << bcol << "\n";
@@ -480,11 +484,13 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
 
         //std::cout << "A*B = \n" << A*B << "\n";
         //std::cout << "y = \n" << y << "\n";
-        std::cout << "Norm bound = " << norm_bound  << "/" << max_acceptable_norm_bound << "\r";
+        std::cout << "Norm bound = " << norm_bound  << "/" << max_acceptable_norm_bound << ", iteration " << iteration << "/" << expected_iterations << "\r";
         if (norm_bound < last_norm_bound) {
             std::cerr << "Norm bound has decreased!\n";
         }
         last_norm_bound = norm_bound;
+        ++iteration;
+
     }
     std::cout << std::endl;
     return relation;
