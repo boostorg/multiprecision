@@ -11,11 +11,11 @@
 
 #include <boost/multiprecision/detail/constexpr.hpp>
 
-#if (defined(__x86_64__) || defined(__i386__)) && __cplusplus >= 201103L && defined(__has_include)
-#if ((defined(__clang__) || defined(__GNUC__) || defined(__INTEL_COMPILER))) && __has_include(<immintrin.h>)
+#if (defined(__x86_64__) || defined(__i386__)) && defined(__has_include) && (__cplusplus >= 201402L)
+#if ((defined(__clang__) && __clang_major__ >= 9) || (__GNUC__ >= 9) || (__INTEL_COMPILER >= 1300L) && __has_include(<immintrin.h>)
 #include <immintrin.h>
 #define BOOST_MP_ADC_INTRINSICS
-#elif defined(_MSC_VER) && __has_include(<intrin.h>)
+#elif (_MSC_VER >= 1925L) && __has_include(<intrin.h>)
 #include <intrin.h>
 #define BOOST_MP_ADC_INTRINSICS
 #endif // compiler switch
@@ -50,7 +50,7 @@ inline BOOST_MP_CXX14_CONSTEXPR bool add_unsigned_adc(const unsigned long long* 
    using T = unsigned __int64;
 #else
    using T = unsigned long long;
-#endif
+#endif // GCC, LLVM, ICC
    auto add_carry = &_addcarry_u64;
 #elif defined(_MSC_VER)
    using T        = unsigned int;
