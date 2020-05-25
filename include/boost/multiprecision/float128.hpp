@@ -412,7 +412,7 @@ inline void eval_rsqrt(float128_backend& result, const float128_backend& arg)
    using std::sqrt;
    float128_backend xk = 1/sqrt(static_cast<long double>(arg.value()));
    // Single Newton iteration for f(x) = arg.value() - 1/x^2.
-   result.value() = xk + xk*(1-arg.value()*xk*xk)/2;
+   result.value() = xk.value() + xk.value()*(1-arg.value()*xk.value()*xk.value())/2;
 }
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
 inline BOOST_MP_CXX14_CONSTEXPR 
