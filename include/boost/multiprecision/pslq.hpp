@@ -54,8 +54,8 @@
 #endif
 
 #if defined(__APPLE__) || defined(__linux__)
-#include <sys/ioctl.h> //ioctl() and TIOCGWINSZ
-#include <unistd.h> // for STDOUT_FILENO
+#include <sys/ioctl.h>
+#include <unistd.h>
 #elif defined(_WIN32) || defined(__CYGWIN__)
 #include <windows.h>
 #endif
@@ -187,7 +187,8 @@ progress(std::ostream & os) : os_{os}
 #else
     bar_width_ = 90;
 #endif
-    bar_width_ -= 58;
+    bar_width_ -= 60;
+    os_ << std::setprecision(2);
 }
 
 void display_progress(int64_t iteration, int64_t max_iterations, double norm_bound)
@@ -205,20 +206,26 @@ void display_progress(int64_t iteration, int64_t max_iterations, double norm_bou
         else os_ << " ";
     }
     os_ << "] "
-              << int(iteration * 100.0/max_iterations)
+              << iteration * 100.0/max_iterations
               << "%, iteration " << iteration << "/" << max_iterations;
     os_ << ", ‖m‖₂≥" << norm_bound << ", ETA:";
-    if (eta > 3600) {
-        if (eta > 3600*24)
-        {
-            os_ << eta/(3600*24) << " days\r";
-        }
-        else
-        {
-            os_ << eta/3600 << " hr\r";
-        }
-    } else {
+    if (eta < 3600) {
         os_ << eta << " s\r";
+    }
+    else if (eta < 3600*24) {
+        os_ << eta/3600 << " hr\r";
+    }
+    else if (eta < 3600*24*7) {
+        os_ << eta/(3600*24) << " days\r";
+    }
+    else if (eta < 3600*24*7*4) {
+        os_ << eta/(3600*24*7) << " wks\r";
+    }
+    else if (eta < 3.154e+7) {
+        os_ << eta/(2.628e+6) << " months\r";
+    }
+    else {
+        os_ << eta/3.154e+7 << " years\r";
     }
     os_.flush();
 }
@@ -240,10 +247,12 @@ private:
 template<typename Real>
 std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_acceptable_norm_bound, Real gamma) {
     std::vector<std::pair<int64_t, Real>> relation;
-    if (!std::is_sorted(x.begin(), x.end())) {
+    /*if (!std::is_sorted(x.begin(), x.end())) {
         std::cerr << "Elements must be sorted in increasing order.\n";
         return relation;
-    }
+    }*/
+
+    std::sort(x.begin(), x.end());
     using std::sqrt;
     if (gamma <= 2/sqrt(3)) {
         std::cerr << "γ > 2/√3 is required\n";
@@ -562,6 +571,7 @@ std::string pslq(std::map<Real, std::string> const & dictionary, Real max_accept
 
 template<typename Real>
 std::string pslq(std::map<Real, std::string> const & dictionary, Real max_acceptable_norm) {
+    using std::sqrt;
     Real gamma = 2/sqrt(3) + 0.01;
     return pslq(dictionary, max_acceptable_norm, gamma);
 }
@@ -569,6 +579,7 @@ std::string pslq(std::map<Real, std::string> const & dictionary, Real max_accept
 template<typename Real>
 std::string identify(std::pair<Real, std::string> value_symbol, Real max_acceptable_norm) {
     auto dictionary = standard_pslq_dictionary<Real>();
+    using std::sqrt;
     Real gamma = 2/sqrt(3) + 0.01;
 
     using std::log;
@@ -587,8 +598,22 @@ std::string identify(std::pair<Real, std::string> value_symbol, Real max_accepta
 }
 
 template<typename Real>
-std::string is_algebraic(std::pair<Real, std::string> x, Real max_acceptable_norm) {
+std::string is_algebraic(std::pair<Real, std::string> p, Real max_acceptable_norm_bound) {
     // TODO: Figure out this interface.
+    std::vector<Real> x(80, Real(1));
+    for (size_t i = 1; i < x.size(); ++i) {
+        x[i] = x[i-1]*p.first;
+    }
+    using std::sqrt;
+    Real gamma = 2/sqrt(Real(3)) + 0.01;
+    std::vector<std::pair<int64_t, Real>> sol = pslq(x,  max_acceptable_norm_bound,  gamma);
+    if (sol.size() > 0) {
+        std::cout << "Solution has elements ";
+        for (auto [mi, xi] : sol) {
+            std::cout << mi << "\n";
+        }
+        return "Found a solution";
+    }
     return "";
 }
 
