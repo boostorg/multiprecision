@@ -5,6 +5,7 @@
  * LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
  */
 #include <chrono>
+#include <fstream>
 #include <boost/multiprecision/pslq.hpp>
 #include <boost/multiprecision/mpfr.hpp>
 
@@ -43,26 +44,36 @@ void pi_root_two()
     {
         std::cout << "No relations found.\n";
     }
+}
 
+template<typename Real>
+void test_standard()
+{
+    std::map<Real, std::string> m = boost::multiprecision::small_pslq_dictionary<Real>();
+    Real max_acceptable_norm_bound = 1e9;
+    std::ofstream ofs;
+    ofs.setstate(std::ios_base::badbit);
+    std::string s = boost::multiprecision::pslq(m, max_acceptable_norm_bound, ofs);
+    if (!s.empty()) {
+        std::cout << s << "\n";
+    } else {
+        std::cout << "No relations found.\n";
+    }
 }
 
 int main() {
     using Real = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<1000> >;
-    ln2_plus_pi<float>();
+    test_standard<Real>();
+    /*ln2_plus_pi<float>();
     ln2_plus_pi<double>();
     pi_root_two<float>();
     pi_root_two<double>();
 
-    //std::cout << "Preparing standard dictionary. . . ";
     std::map<Real, std::string> m = boost::multiprecision::standard_pslq_dictionary<Real>();
-    //for (auto [x, s] : m) {
-    //    std::cout << s << " = " << x << "\n";
-    //}
-
-    //std::cout << "done.\n";
-    auto start = std::chrono::steady_clock::now();
     Real max_acceptable_norm_bound = 1e9;
     std::pair<Real, std::string> number{boost::math::lambert_w0(boost::math::constants::zeta_three<Real>()), "W(ζ(3))"};
+    //std::ofstream ofs;
+    //ofs.setstate(std::ios_base::badbit);
     std::string s = boost::multiprecision::identify<Real>(number, max_acceptable_norm_bound);
     if (!s.empty())
     {
@@ -71,7 +82,5 @@ int main() {
     else
     {
         std::cout << "No relations found.\n";
-    }
-    auto end = std::chrono::steady_clock::now();
-    std::cout << "Elapsed time is " << std::chrono::duration_cast<std::chrono::seconds>(end - start).count() << " seconds.\n";
+    }*/
 }

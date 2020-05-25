@@ -72,6 +72,28 @@ auto small_pslq_dictionary() {
     m.emplace(e<Real>(), "e");
     m.emplace(root_two<Real>(), "√2");
     m.emplace(ln_two<Real>(), "ln(2)");
+    Real euler_ = euler<Real>();
+    m.emplace(euler_, "γ");
+    m.emplace(euler_*euler_, "γ²");
+    m.emplace(euler_*euler_*euler_, "γ³");
+    m.emplace(1/euler_, "1/γ");
+    m.emplace(1/(euler_*euler_), "1/γ²");
+    m.emplace(1/(euler_*euler_*euler_), "1/γ³");
+    m.emplace(-log(euler_), "-ln(γ)");
+    m.emplace(exp(euler_), "exp(γ)");
+    Real zeta_three_ = zeta_three<Real>();
+    m.emplace(sqrt(zeta_three_), "√ζ(3)");
+    m.emplace(zeta_three_, "ζ(3)");
+    m.emplace(1/zeta_three_, "1/ζ(3)");
+    m.emplace(1/(zeta_three_*zeta_three_), "1/ζ(3)²");
+    m.emplace(1/(zeta_three_*zeta_three_*zeta_three_), "1/ζ(3)³");
+    m.emplace(log(zeta_three_), "ln(ζ(3))");
+    m.emplace(exp(zeta_three_), "exp(ζ(3))");
+    m.emplace(zeta_three_*zeta_three_, "ζ(3)²");
+    m.emplace(zeta_three_*zeta_three_*zeta_three_, "ζ(3)³");
+    m.emplace(pow(zeta_three_, 4), "ζ(3)⁴");
+
+
     return m;
 }
 
@@ -245,7 +267,7 @@ private:
 // The PSLQ algorithm; partial sum of squares, lower trapezoidal decomposition.
 // See: https://www.davidhbailey.com/dhbpapers/cpslq.pdf, section 3.
 template<typename Real>
-std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_acceptable_norm_bound, Real gamma) {
+std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_acceptable_norm_bound, Real gamma, std::ostream& os = std::cout) {
     std::vector<std::pair<int64_t, Real>> relation;
     /*if (!std::is_sorted(x.begin(), x.end())) {
         std::cerr << "Elements must be sorted in increasing order.\n";
@@ -399,7 +421,7 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
     Real norm_bound = 1/max_coeff;
     Real last_norm_bound = norm_bound;
     int64_t iteration = 0;
-    auto prog = progress(std::cout);
+    auto prog = progress(os);
     while (norm_bound < max_acceptable_norm_bound)
     {
         // "1. Select m such that γ^{i+1}|H_ii| is maximal when i = m":
@@ -525,14 +547,14 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
 
 
 template<typename Real>
-std::string pslq(std::map<Real, std::string> const & dictionary, Real max_acceptable_norm_bound, Real gamma) {
+std::string pslq(std::map<Real, std::string> const & dictionary, Real max_acceptable_norm_bound, Real gamma, std::ostream& os = std::cout) {
     std::vector<Real> values(dictionary.size());
     size_t i = 0;
     for (auto it = dictionary.begin(); it != dictionary.end(); ++it) {
         values[i++] = it->first;
     }
 
-    auto m = pslq(values, max_acceptable_norm_bound, gamma);
+    auto m = pslq(values, max_acceptable_norm_bound, gamma, os);
     if (m.size() > 0) {
         std::ostringstream oss;
         auto const & symbol = dictionary.find(m[0].second)->second;
@@ -570,14 +592,13 @@ std::string pslq(std::map<Real, std::string> const & dictionary, Real max_accept
 }
 
 template<typename Real>
-std::string pslq(std::map<Real, std::string> const & dictionary, Real max_acceptable_norm) {
-    using std::sqrt;
+std::string pslq(std::map<Real, std::string> const & dictionary, Real max_acceptable_norm, std::ostream& os = std::cout) {
     Real gamma = 2/sqrt(3) + 0.01;
-    return pslq(dictionary, max_acceptable_norm, gamma);
+    return pslq(dictionary, max_acceptable_norm, gamma, std::cout);
 }
 
 template<typename Real>
-std::string identify(std::pair<Real, std::string> value_symbol, Real max_acceptable_norm) {
+std::string identify(std::pair<Real, std::string> value_symbol, Real max_acceptable_norm, std::ostream& os = std::cout) {
     auto dictionary = standard_pslq_dictionary<Real>();
     using std::sqrt;
     Real gamma = 2/sqrt(3) + 0.01;
@@ -594,7 +615,7 @@ std::string identify(std::pair<Real, std::string> value_symbol, Real max_accepta
     dictionary.emplace(exp(value_symbol.first), "exp(" + value_symbol.second + ")");
     dictionary.emplace(1/value_symbol.first, "1/" + value_symbol.second);
     dictionary.emplace(value_symbol.first*value_symbol.first, value_symbol.second + "²");
-    return pslq(dictionary, max_acceptable_norm, gamma);
+    return pslq(dictionary, max_acceptable_norm, gamma, os);
 }
 
 template<typename Real>

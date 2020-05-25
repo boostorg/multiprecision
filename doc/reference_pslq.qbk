@@ -7,19 +7,18 @@
 
 [section:pslq PSLQ]
 
-   #include <boost/multiprecision/pslq.hpp>
-   namespace boost::multiprecision {
+    #include <boost/multiprecision/pslq.hpp>
+    namespace boost::multiprecision {
 
     template<typename Real>
-    std::string pslq(std::map<Real, std::string> const & dictionary);
+    std::string pslq(std::map<Real, std::string> const & dictionary, Real max_acceptable_solution_norm, std::ostream& = std::cout);
 
     template<typename Real>
-    std::string is_algebraic(Real const & x);
+    bool is_algebraic(std::pair<Real, std::string> const & x, Real max_acceptable_solution_norm, std::ostream& = std::cout);
 
     template<typename Real>
-    bool is_algebraic(Real const & x);
-
-   }
+    std::string identify(std::pair<Real, std::string> const & x, Real max_acceptable_solution_norm, std::ostream& = std::cout);
+    }
 
 The PSLQ algorithm takes a list /x/ ∈ℝ[super n] of interesting constants, e.g., π, the Euler-Mascheroni constant γ, or the golden ration φ, and determines if there is an /integer relation/ between them.
 By this we mean a list of integers /m/ ∈ℤ[super n], not all zero, such that /m⋅x/ = 0.
@@ -36,7 +35,7 @@ Let's use the Boost implementation to rediscover this relation:
     m.emplace_back(pow(pi,6), "π⁶");
     auto z3 = boost::math::constants::zeta_three<Real>();
     m.emplace_back(z3*z3, "ζ(3)²");
-    std::string msg = pslq(m);
+    std::string msg = pslq(m, 1e10);
 
     std::cout << msg << "\n";
 
@@ -61,7 +60,7 @@ In addition, /verifying/ a suspected relation is much less computationally diffi
 
 Astute readers will notice that our example requires a very auspicious guess about the form the relation takes.
 If we didn't know that β was somehow related to π⁶ and ζ(3)², we would've never found this relation.
-This is a general property of the PSLQ algorithm: As its runtime scales cubically in the length of the dictionary, having a hunch about the form the relation will take is necessary.
+This is a general property of the PSLQ algorithm: As its runtime scales quartically in the length of the dictionary, having a hunch about the form the relation will take is necessary.
 
 That said, simple modifications of the inputs allow us to recover different classes of relations.
 Let's use the Basel problem as an example:
@@ -83,6 +82,29 @@ If we suspect a number α is algebraic, we can apply PSLQ to the vector
 
 and if it is indeed algebraic with reasonable sized polynomial coefficients, then PSLQ will find it.
 Communicating this idea has a somewhat different format than vanilla `pslq`, and hence we have provided a wrapper `is_algebraic` for precisely this purpose.
+
+Quartically scaling algorithms are rare, and users generally have little experience with them.
+It is easy to construct a PSLQ dictionary that would only complete after a few thousand years.
+Hence we have defaulted to printing a progress bar to the terminal.
+
+
+    [======>                                                                ] 10%, iteration 2000/20000, \u2016 m\u2016\u2082\u2265308, ETA:1.145 days
+
+
+The progress bar is to be read as follows: The algorithm will complete in 20000 iterations.
+At the time, it has proven that there are no integer relations with norm less that 308.
+Under the assumption there are no integer relations, the algorithm will complete the demonstration that there are no integer solutions with norm less that `max_acceptable_solution_norm` in 1.145 days.
+(If there are solutions, then they are found at essentially a random time.)
+If the ETA is unacceptably high, note that you don't need to cancel the job.
+You can stop it at any time and the 2-norm bound at the stop time still provides useful information.
+
+The progress bar is very useful, but in some cases it is not helpful (say, during unit tests).
+We can silence the progress bar via by passing a `std::ostream` with the badbit set:
+
+    std::ofstream ofs;
+    ofs.setstate(std::ios_base::badbit);
+    std::string s = boost::multiprecision::pslq(m, max_acceptable_norm_bound, ofs);
+
 
 
 [endsect]
