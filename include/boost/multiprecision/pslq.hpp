@@ -593,6 +593,7 @@ std::string pslq(std::map<Real, std::string> const & dictionary, Real max_accept
 
 template<typename Real>
 std::string pslq(std::map<Real, std::string> const & dictionary, Real max_acceptable_norm, std::ostream& os = std::cout) {
+    using std::sqrt;
     Real gamma = 2/sqrt(3) + 0.01;
     return pslq(dictionary, max_acceptable_norm, gamma, std::cout);
 }
