@@ -28,6 +28,17 @@
 // We appear to crash the compiler if we try to use these intrinsics?
 #undef BOOST_MP_HAS_IMMINTRIN_H
 #endif
+//
+// If the compiler supports the intrinsics used by GCC internally
+// inside <immintrin.h> then we'll use them directly.
+// This is a bit of defensive programming, mostly for a modern clang
+// sitting on top of an older GCC header install.
+//
+#if defined(__has_builtin)
+#if __has_builtin(__builtin_ia32_addcarryx_u64)
+#define BOOST_MP_USE_GCC_INTEL_INTRINSICS
+#endif
+#endif
 
 #ifdef BOOST_MP_HAS_IMMINTRIN_H
 
@@ -44,7 +55,11 @@ BOOST_MP_FORCEINLINE unsigned char addcarry_limb(unsigned char carry, limb_type 
 #else
    typedef unsigned long long cast_type;
 #endif
+#ifdef BOOST_MP_USE_GCC_INTEL_INTRINSICS
+   return __builtin_ia32_addcarryx_u64(carry, a, b, reinterpret_cast<cast_type*>(p_result));
+#else
    return _addcarry_u64(carry, a, b, reinterpret_cast<cast_type*>(p_result));
+#endif
 }
 
 BOOST_MP_FORCEINLINE unsigned char subborrow_limb(unsigned char carry, limb_type a, limb_type b, limb_type* p_result)
@@ -54,7 +69,11 @@ BOOST_MP_FORCEINLINE unsigned char subborrow_limb(unsigned char carry, limb_type
 #else
    typedef unsigned long long cast_type;
 #endif
+#ifdef BOOST_MP_USE_GCC_INTEL_INTRINSICS
+   return __builtin_ia32_subborrow_u64(carry, a, b, reinterpret_cast<cast_type*>(p_result));
+#else
    return _subborrow_u64(carry, a, b, reinterpret_cast<cast_type*>(p_result));
+#endif
 }
 
 }}} // namespace boost::multiprecision::detail
@@ -65,12 +84,20 @@ namespace boost { namespace multiprecision { namespace detail {
 
 BOOST_MP_FORCEINLINE unsigned char addcarry_limb(unsigned char carry, limb_type a, limb_type b, limb_type* p_result)
 {
+#ifdef BOOST_MP_USE_GCC_INTEL_INTRINSICS
+   return __builtin_ia32_addcarryx_u32(carry, a, b, reinterpret_cast<unsigned int*>(p_result));
+#else
    return _addcarry_u32(carry, a, b, reinterpret_cast<unsigned int*>(p_result));
+#endif
 }
 
 BOOST_MP_FORCEINLINE unsigned char subborrow_limb(unsigned char carry, limb_type a, limb_type b, limb_type* p_result)
 {
+#ifdef BOOST_MP_USE_GCC_INTEL_INTRINSICS
+   return __builtin_ia32_subborrow_u32(carry, a, b, reinterpret_cast<unsigned int*>(p_result));
+#else
    return _subborrow_u32(carry, a, b, reinterpret_cast<unsigned int*>(p_result));
+#endif
 }
 
 }}} // namespace boost::multiprecision::detail
