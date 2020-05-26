@@ -1,4 +1,5 @@
 ///////////////////////////////////////////////////////////////
+//  Copyright 2020 Madhur Chauhan. 
 //  Copyright 2020 John Maddock. Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
@@ -14,8 +15,11 @@ template <class CppInt1, class CppInt2, class CppInt3>
 inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned_constexpr(CppInt1& result, const CppInt2& a, const CppInt3& b) BOOST_MP_NOEXCEPT_IF(is_non_throwing_cpp_int<CppInt1>::value)
 {
    using ::boost::multiprecision::std_constexpr::swap;
-
+   //
+   // This is the generic, C++ only version of addition.
+   // It's also used for all constexpr branches, hence the name.
    // Nothing fancy, just let uintmax_t take the strain:
+   //
    double_limb_type carry = 0;
    unsigned         m(0), x(0);
    unsigned         as = a.size();
@@ -85,8 +89,11 @@ template <class CppInt1, class CppInt2, class CppInt3>
 inline BOOST_MP_CXX14_CONSTEXPR void subtract_unsigned_constexpr(CppInt1& result, const CppInt2& a, const CppInt3& b) BOOST_MP_NOEXCEPT_IF(is_non_throwing_cpp_int<CppInt1>::value)
 {
    using ::boost::multiprecision::std_constexpr::swap;
-
+   //
+   // This is the generic, C++ only version of subtraction.
+   // It's also used for all constexpr branches, hence the name.
    // Nothing fancy, just let uintmax_t take the strain:
+   //
    double_limb_type borrow = 0;
    unsigned         m(0), x(0);
    minmax(a.size(), b.size(), m, x);
@@ -164,6 +171,19 @@ inline BOOST_MP_CXX14_CONSTEXPR void subtract_unsigned_constexpr(CppInt1& result
 //
 // This is the key addition routine where all the argument types are non-trivial cpp_int's:
 //
+//
+// This optimization is limited to: GCC, LLVM, ICC (Intel), MSVC for x86_64 and i386.
+// If your architecture and compiler supports ADC intrinsic, please file a bug
+//
+// As of May, 2020 major compilers don't recognize carry chain though adc
+// intrinsics are used to hint compilers to use ADC and still compilers don't
+// unroll the loop efficiently (except LLVM) so manual unrolling is done.
+//
+// Also note that these intrinsics were only introduced by Intel as part of the
+// ADX processor extensions, even though the addc instruction has been available
+// for basically all x86 processors.  That means gcc-9, clang-9, msvc-14.2 and up
+// are required to support these intrinsics.
+//
 template <class CppInt1, class CppInt2, class CppInt3>
 inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2& a, const CppInt3& b) BOOST_MP_NOEXCEPT_IF(is_non_throwing_cpp_int<CppInt1>::value)
 {
@@ -201,6 +221,10 @@ inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2
       unsigned      i = 0;
       unsigned char carry = 0;
 #if defined(BOOST_MSVC) && !defined(BOOST_HAS_INT128) && defined(_M_X64)
+      //
+      // Special case for 32-bit limbs on 64-bit architecture - we can process
+      // 2 limbs with each instruction.
+      //
       for (; i + 8 <= m; i += 8)
       {
          carry = _addcarry_u64(carry, *(unsigned long long*)(pa + i + 0), *(unsigned long long*)(pb + i + 0), (unsigned long long*)(pr + i));
@@ -292,6 +316,19 @@ inline BOOST_MP_CXX14_CONSTEXPR void subtract_unsigned(CppInt1& result, const Cp
       unsigned i = 0;
       unsigned char borrow = 0;
       // First where a and b overlap:
+#if defined(BOOST_MSVC) && !defined(BOOST_HAS_INT128) && defined(_M_X64)
+      //
+      // Special case for 32-bit limbs on 64-bit architecture - we can process
+      // 2 limbs with each instruction.
+      //
+      for (; i + 8 <= m; i += 8)
+      {
+         borrow = _subborrow_u64(borrow, *reinterpret_cast<const unsigned long long*>(pa + i), *reinterpret_cast<const unsigned long long*>(pb + i), reinterpret_cast<unsigned long long*>(pr + i));
+         borrow = _subborrow_u64(borrow, *reinterpret_cast<const unsigned long long*>(pa + i + 2), *reinterpret_cast<const unsigned long long*>(pb + i + 2), reinterpret_cast<unsigned long long*>(pr + i + 2));
+         borrow = _subborrow_u64(borrow, *reinterpret_cast<const unsigned long long*>(pa + i + 4), *reinterpret_cast<const unsigned long long*>(pb + i + 4), reinterpret_cast<unsigned long long*>(pr + i + 4));
+         borrow = _subborrow_u64(borrow, *reinterpret_cast<const unsigned long long*>(pa + i + 6), *reinterpret_cast<const unsigned long long*>(pb + i + 6), reinterpret_cast<unsigned long long*>(pr + i + 6));
+      }
+#else
       for(; i + 4 <= m; i += 4)
       {
          borrow = boost::multiprecision::detail::subborrow_limb(borrow, pa[i], pb[i], pr + i);
@@ -299,6 +336,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void subtract_unsigned(CppInt1& result, const Cp
          borrow = boost::multiprecision::detail::subborrow_limb(borrow, pa[i + 2], pb[i + 2], pr + i + 2);
          borrow = boost::multiprecision::detail::subborrow_limb(borrow, pa[i + 3], pb[i + 3], pr + i + 3);
       }
+#endif
       for (; i < m; ++i)
          borrow = boost::multiprecision::detail::subborrow_limb(borrow, pa[i], pb[i], pr + i);
 
