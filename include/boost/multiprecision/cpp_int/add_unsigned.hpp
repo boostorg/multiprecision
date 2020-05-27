@@ -77,7 +77,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned_constexpr(CppInt1& result, con
       // We overflowed, need to add one more limb:
       result.resize(x + 1, x + 1);
       if (result.size() > x)
-         result.limbs()[x] = static_cast<limb_type>(carry);
+         result.limbs()[x] = static_cast<limb_type>(1u);
    }
    result.normalize();
    result.sign(a.sign());
@@ -213,7 +213,6 @@ inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2
       typename CppInt2::const_limb_pointer pa = a.limbs();
       typename CppInt3::const_limb_pointer pb = b.limbs();
       typename CppInt1::limb_pointer       pr = result.limbs();
-      //typename CppInt1::limb_pointer       pr_end = pr + m;
 
       if (as < bs)
          swap(pa, pb);
@@ -250,7 +249,7 @@ inline BOOST_MP_CXX14_CONSTEXPR void add_unsigned(CppInt1& result, const CppInt2
          // We overflowed, need to add one more limb:
          result.resize(x + 1, x + 1);
          if (result.size() > x)
-            result.limbs()[x] = carry;
+            result.limbs()[x] = static_cast<limb_type>(1u);
       }
       else
          std::copy(pa + i, pa + x, pr + i);

@@ -44,7 +44,14 @@
 
 #ifdef BOOST_MP_HAS_IMMINTRIN_H
 
+#ifdef BOOST_MSVC
+//
+// This is a subset of the full <immintrin.h> :
+//
+#include <intrin.h>
+#else
 #include <immintrin.h>
+#endif
 
 #if defined(BOOST_HAS_INT128)
 
