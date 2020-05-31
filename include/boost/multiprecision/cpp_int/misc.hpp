@@ -25,20 +25,33 @@
 
 namespace boost { namespace multiprecision { namespace backends {
 
+template <class T, bool has_limits = std::numeric_limits<T>::is_specialized>
+struct numeric_limits_workaround : public std::numeric_limits<T>
+{
+};
+template <class R>
+struct numeric_limits_workaround<R, false>
+{
+   BOOST_STATIC_CONSTEXPR unsigned digits = ~static_cast<R>(0) < 0 ? sizeof(R) * CHAR_BIT - 1 : sizeof(R) * CHAR_BIT;
+   static BOOST_CONSTEXPR R (min)(){ return (static_cast<R>(-1) < 0) ? static_cast<R>(1) << digits : 0; }
+   static BOOST_CONSTEXPR R (max)() { return (static_cast<R>(-1) < 0) ? ~(static_cast<R>(1) << digits) : ~static_cast<R>(0); }
+};
+
 template <class R, class CppInt>
 BOOST_MP_CXX14_CONSTEXPR void check_in_range(const CppInt& val, const mpl::int_<checked>&)
 {
    typedef typename boost::multiprecision::detail::canonical<R, CppInt>::type cast_type;
+
    if (val.sign())
    {
       if (boost::is_signed<R>::value == false)
          BOOST_THROW_EXCEPTION(std::range_error("Attempt to assign a negative value to an unsigned type."));
-      if (val.compare(static_cast<cast_type>((std::numeric_limits<R>::min)())) < 0)
+      if (val.compare(static_cast<cast_type>((numeric_limits_workaround<R>::min)())) < 0)
          BOOST_THROW_EXCEPTION(std::overflow_error("Could not convert to the target type - -value is out of range."));
    }
    else
    {
-      if (val.compare(static_cast<cast_type>((std::numeric_limits<R>::max)())) > 0)
+      if (val.compare(static_cast<cast_type>((numeric_limits_workaround<R>::max)())) > 0)
          BOOST_THROW_EXCEPTION(std::overflow_error("Could not convert to the target type - -value is out of range."));
    }
 }
@@ -69,16 +82,16 @@ eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, 
    typedef mpl::int_<Checked1> checked_type;
    check_in_range<R>(backend, checked_type());
 
-   if (std::numeric_limits<R>::digits < cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits)
+   BOOST_IF_CONSTEXPR(numeric_limits_workaround<R>::digits < cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits)
    {
       if ((backend.sign() && boost::is_signed<R>::value) && (1 + static_cast<boost::multiprecision::limb_type>((std::numeric_limits<R>::max)()) <= backend.limbs()[0]))
       {
-         *result = (std::numeric_limits<R>::min)();
+         *result = (numeric_limits_workaround<R>::min)();
          return;
       }
       else if (boost::is_signed<R>::value && !backend.sign() && static_cast<boost::multiprecision::limb_type>((std::numeric_limits<R>::max)()) <= backend.limbs()[0])
       {
-         *result = (std::numeric_limits<R>::max)();
+         *result = (numeric_limits_workaround<R>::max)();
          return;
       }
       else
@@ -88,9 +101,9 @@ eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, 
       *result = static_cast<R>(backend.limbs()[0]);
    unsigned shift = cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits;
    unsigned i     = 1;
-   if (std::numeric_limits<R>::digits > cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits)
+   BOOST_IF_CONSTEXPR(numeric_limits_workaround<R>::digits > cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits)
    {
-      while ((i < backend.size()) && (shift < static_cast<unsigned>(std::numeric_limits<R>::digits - cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits)))
+      while ((i < backend.size()) && (shift < static_cast<unsigned>(numeric_limits_workaround<R>::digits - cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits)))
       {
          *result += static_cast<R>(backend.limbs()[i]) << shift;
          shift += cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits;
@@ -101,7 +114,7 @@ eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, 
       //
       if (i < backend.size())
       {
-         const limb_type mask = std::numeric_limits<R>::digits - shift == cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits ? ~static_cast<limb_type>(0) : (static_cast<limb_type>(1u) << (std::numeric_limits<R>::digits - shift)) - 1;
+         const limb_type mask = numeric_limits_workaround<R>::digits - shift == cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_bits ? ~static_cast<limb_type>(0) : (static_cast<limb_type>(1u) << (numeric_limits_workaround<R>::digits - shift)) - 1;
          *result += (static_cast<R>(backend.limbs()[i]) & mask) << shift;
          if ((static_cast<R>(backend.limbs()[i]) & static_cast<limb_type>(~mask)) || (i + 1 < backend.size()))
          {
@@ -109,10 +122,10 @@ eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, 
             if (backend.sign())
             {
                check_is_negative(boost::is_signed<R>());
-               *result = (std::numeric_limits<R>::min)();
+               *result = (numeric_limits_workaround<R>::min)();
             }
             else if (boost::is_signed<R>::value)
-               *result = (std::numeric_limits<R>::max)();
+               *result = (numeric_limits_workaround<R>::max)();
             return;
          }
       }
@@ -123,10 +136,10 @@ eval_convert_to(R* result, const cpp_int_backend<MinBits1, MaxBits1, SignType1, 
       if (backend.sign())
       {
          check_is_negative(boost::is_signed<R>());
-         *result = (std::numeric_limits<R>::min)();
+         *result = (numeric_limits_workaround<R>::min)();
       }
       else if (boost::is_signed<R>::value)
-         *result = (std::numeric_limits<R>::max)();
+         *result = (numeric_limits_workaround<R>::max)();
       return;
    }
    if (backend.sign())
