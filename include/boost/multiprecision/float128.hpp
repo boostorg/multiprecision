@@ -410,7 +410,7 @@ inline void eval_sqrt(float128_backend& result, const float128_backend& arg)
 inline void eval_rsqrt(float128_backend& result, const float128_backend& arg)
 {
    using std::sqrt;
-   if (arg.value() < std::numeric_limits<long double>::denorm_min()) {
+   if (arg.value() < std::numeric_limits<long double>::denorm_min() || arg.value() > std::numeric_limits<long double>::max()) {
       result.value() = 1/sqrtq(arg.value());
       return;
    }
