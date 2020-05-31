@@ -44,6 +44,7 @@
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions/lambert_w.hpp>
 #include <boost/math/tools/polynomial.hpp>
+#include <boost/math/special_functions/rsqrt.hpp>
 #include <boost/core/demangle.hpp>
 #if defined __has_include
 #  if __has_include (<Eigen/Dense>)
@@ -457,9 +458,10 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
         // "3. Remove the corner on H diagonal:"
         if (m < n - 2) {
             Real t0 = H(m,m)*H(m,m) + H(m, m+1)*H(m, m+1);
-            t0 = sqrt(t0);
-            Real t1 = H(m,m)/t0;
-            Real t2 = H(m,m+1)/t0;
+            using boost::math::rsqrt;
+            t0 = rsqrt(t0);
+            Real t1 = H(m,m)*t0;
+            Real t2 = H(m,m+1)*t0;
             for (int64_t i = m; i < n; ++i) {
                 Real t3 = H(i,m);
                 Real t4 = H(i, m+1);
