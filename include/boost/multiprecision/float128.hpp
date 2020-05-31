@@ -5,7 +5,7 @@
 
 #ifndef BOOST_MP_FLOAT128_HPP
 #define BOOST_MP_FLOAT128_HPP
-#include <iostream>
+
 #include <boost/config.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/functional/hash.hpp>
@@ -410,6 +410,10 @@ inline void eval_sqrt(float128_backend& result, const float128_backend& arg)
 inline void eval_rsqrt(float128_backend& result, const float128_backend& arg)
 {
    using std::sqrt;
+   if (arg.value() < std::numeric_limits<long double>::denorm_min()) {
+      result.value() = 1/sqrtq(arg.value());
+      return;
+   }
    float128_backend xk = 1/sqrt(static_cast<long double>(arg.value()));
 
    // Newton iteration for f(x) = arg.value() - 1/x^2.
