@@ -36,17 +36,18 @@
 // This is a bit of defensive programming, mostly for a modern clang
 // sitting on top of an older GCC header install.
 //
-#if defined(__has_builtin)
-#if __has_builtin(__builtin_ia32_addcarryx_u64)
-#define BOOST_MP_ADDC __builtin_ia32_addcarryx_u
-#endif
-#endif
-#if defined(__has_builtin)
-#if __has_builtin(__builtin_ia32_subborrow_u64)
-#define BOOST_MP_SUBB __builtin_ia32_subborrow_u
-#elif __has_builtin(__builtin_ia32_sbb_u64)
-#define BOOST_MP_SUBB __builtin_ia32_sbb_u
-#endif
+#if defined(__has_builtin) && !defined(BOOST_INTEL)
+
+# if __has_builtin(__builtin_ia32_addcarryx_u64)
+#  define BOOST_MP_ADDC __builtin_ia32_addcarryx_u
+# endif
+
+# if __has_builtin(__builtin_ia32_subborrow_u64)
+#  define BOOST_MP_SUBB __builtin_ia32_subborrow_u
+# elif __has_builtin(__builtin_ia32_sbb_u64)
+#  define BOOST_MP_SUBB __builtin_ia32_sbb_u
+# endif
+
 #endif
 
 #ifndef BOOST_MP_ADDC
