@@ -2320,6 +2320,25 @@ inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<D
    return log1p(arg, policies::policy<>());
 }
 
+template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates, class Policy>
+inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> rsqrt BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>& arg, const Policy& pol)
+{
+   boost::multiprecision::detail::scoped_default_precision<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> > precision_guard(arg);
+
+   boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result;
+   mpfr_rec_sqrt(result.backend().data(), arg.backend().data(), GMP_RNDN);
+   if (mpfr_inf_p(result.backend().data()))
+      return policies::raise_overflow_error<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >("rsqrt<%1%>(%1%)", 0, pol);
+   if (mpfr_nan_p(result.backend().data()))
+      return policies::raise_evaluation_error("rsqrt<%1%>(%1%)", "Negative argument, result is a NaN", result, pol);
+   return result;
+}
+template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
+inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> rsqrt BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>& arg)
+{
+   return rsqrt(arg, policies::policy<>());
+}
+
 } // namespace math
 
 } // namespace boost
