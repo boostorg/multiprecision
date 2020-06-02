@@ -38,8 +38,22 @@
 //
 #if defined(__has_builtin)
 #if __has_builtin(__builtin_ia32_addcarryx_u64)
-#define BOOST_MP_USE_GCC_INTEL_INTRINSICS
+#define BOOST_MP_ADDC __builtin_ia32_addcarryx_u
 #endif
+#endif
+#if defined(__has_builtin)
+#if __has_builtin(__builtin_ia32_subborrow_u64)
+#define BOOST_MP_SUBB __builtin_ia32_subborrow_u
+#elif __has_builtin(__builtin_ia32_sbb_u64)
+#define BOOST_MP_SUBB __builtin_ia32_sbb_u
+#endif
+#endif
+
+#ifndef BOOST_MP_ADDC
+#define BOOST_MP_ADDC _addcarry_u
+#endif
+#ifndef BOOST_MP_SUBB
+#define BOOST_MP_SUBB _subborrow_u
 #endif
 
 #ifdef BOOST_MP_HAS_IMMINTRIN_H
@@ -64,11 +78,7 @@ BOOST_MP_FORCEINLINE unsigned char addcarry_limb(unsigned char carry, limb_type 
 #else
    typedef unsigned long long cast_type;
 #endif
-#ifdef BOOST_MP_USE_GCC_INTEL_INTRINSICS
-   return __builtin_ia32_addcarryx_u64(carry, a, b, reinterpret_cast<cast_type*>(p_result));
-#else
-   return _addcarry_u64(carry, a, b, reinterpret_cast<cast_type*>(p_result));
-#endif
+   return BOOST_JOIN(BOOST_MP_ADDC, 64)(carry, a, b, reinterpret_cast<cast_type*>(p_result));
 }
 
 BOOST_MP_FORCEINLINE unsigned char subborrow_limb(unsigned char carry, limb_type a, limb_type b, limb_type* p_result)
@@ -78,11 +88,7 @@ BOOST_MP_FORCEINLINE unsigned char subborrow_limb(unsigned char carry, limb_type
 #else
    typedef unsigned long long cast_type;
 #endif
-#ifdef BOOST_MP_USE_GCC_INTEL_INTRINSICS
-   return __builtin_ia32_subborrow_u64(carry, a, b, reinterpret_cast<cast_type*>(p_result));
-#else
-   return _subborrow_u64(carry, a, b, reinterpret_cast<cast_type*>(p_result));
-#endif
+   return BOOST_JOIN(BOOST_MP_SUBB, 64)(carry, a, b, reinterpret_cast<cast_type*>(p_result));
 }
 
 }}} // namespace boost::multiprecision::detail
@@ -93,20 +99,12 @@ namespace boost { namespace multiprecision { namespace detail {
 
 BOOST_MP_FORCEINLINE unsigned char addcarry_limb(unsigned char carry, limb_type a, limb_type b, limb_type* p_result)
 {
-#ifdef BOOST_MP_USE_GCC_INTEL_INTRINSICS
-   return __builtin_ia32_addcarryx_u32(carry, a, b, reinterpret_cast<unsigned int*>(p_result));
-#else
-   return _addcarry_u32(carry, a, b, reinterpret_cast<unsigned int*>(p_result));
-#endif
+   return BOOST_JOIN(BOOST_MP_ADDC, 32)(carry, a, b, reinterpret_cast<unsigned int*>(p_result));
 }
 
 BOOST_MP_FORCEINLINE unsigned char subborrow_limb(unsigned char carry, limb_type a, limb_type b, limb_type* p_result)
 {
-#ifdef BOOST_MP_USE_GCC_INTEL_INTRINSICS
-   return __builtin_ia32_subborrow_u32(carry, a, b, reinterpret_cast<unsigned int*>(p_result));
-#else
-   return _subborrow_u32(carry, a, b, reinterpret_cast<unsigned int*>(p_result));
-#endif
+   return BOOST_JOIN(BOOST_MP_SUBB, 32)(carry, a, b, reinterpret_cast<unsigned int*>(p_result));
 }
 
 }}} // namespace boost::multiprecision::detail
