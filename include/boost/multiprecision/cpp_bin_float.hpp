@@ -10,6 +10,7 @@
 #include <boost/multiprecision/integer.hpp>
 #include <boost/math/special_functions/trunc.hpp>
 #include <boost/multiprecision/detail/float_string_cvt.hpp>
+#include <boost/multiprecision/traits/max_digits10.hpp>
 
 //
 // Some includes we need from Boost.Math, since we rely on that library to provide these functions:
@@ -1894,7 +1895,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bi
    BOOST_STATIC_CONSTEXPR int digits   = boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count;
    BOOST_STATIC_CONSTEXPR int digits10 = (digits - 1) * 301 / 1000;
    // Is this really correct???
-   BOOST_STATIC_CONSTEXPR int  max_digits10 = (digits * 301 / 1000) + 3;
+   BOOST_STATIC_CONSTEXPR int  max_digits10 = boost::multiprecision::detail::calc_max_digits10<digits>::value;
    BOOST_STATIC_CONSTEXPR bool is_signed    = true;
    BOOST_STATIC_CONSTEXPR bool is_integer   = false;
    BOOST_STATIC_CONSTEXPR bool is_exact     = false;
