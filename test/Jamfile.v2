@@ -254,7 +254,7 @@ test-suite functions_and_limits :
               : # command line
               : # input files
               : # requirements
-              <define>TEST_MPF_50
+              <define>TEST_MPF_50 <define>PRINT_MAX_DIGITS10
                [ check-target-builds ../config//has_gmp : : <build>no ]
               : test_numeric_limits_mpf50 ]
 
@@ -262,7 +262,7 @@ test-suite functions_and_limits :
               : # command line
               : # input files
               : # requirements
-              <define>TEST_MPF
+              <define>TEST_MPF <define>PRINT_MAX_DIGITS10
                [ check-target-builds ../config//has_gmp : : <build>no ]
               : test_numeric_limits_mpf ]
 
@@ -286,7 +286,7 @@ test-suite functions_and_limits :
               : # command line
               : # input files
               : # requirements
-              <define>TEST_MPFR
+              <define>TEST_MPFR <define>PRINT_MAX_DIGITS10
                [ check-target-builds ../config//has_mpfr : : <build>no ]
               : test_numeric_limits_mpfr ]
 
@@ -294,7 +294,7 @@ test-suite functions_and_limits :
               : # command line
               : # input files
               : # requirements
-              <define>TEST_MPFR_50
+              <define>TEST_MPFR_50 <define>PRINT_MAX_DIGITS10
                [ check-target-builds ../config//has_mpfr : : <build>no ]
               : test_numeric_limits_mpfr_50 ]
 
@@ -309,7 +309,7 @@ test-suite functions_and_limits :
               : # command line
               : # input files
               : # requirements
-              <define>TEST_CPP_BIN_FLOAT
+              <define>TEST_CPP_BIN_FLOAT <define>PRINT_MAX_DIGITS10
               : test_numeric_limits_cpp_bin_float ]
 
       [ run test_numeric_limits.cpp $(TOMMATH) no_eh_support
