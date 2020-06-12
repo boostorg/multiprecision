@@ -29,7 +29,7 @@ namespace detail {
       // This version works up to about 15K binary digits, then starts sporadically failing
       // and giving values that are 1 too small.
       //
-      BOOST_STATIC_CONSTANT(unsigned, value = 2 + ((static_cast<unsigned long long>(digits) * 1292913986) >> 32));
+      BOOST_STATIC_CONSTANT(unsigned, value = 2 + ((static_cast<boost::uint64_t>(digits) * static_cast<boost::uint64_t>(1292913986)) >> 32));
 #endif
    };
 
