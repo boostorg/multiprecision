@@ -1013,6 +1013,7 @@ test-suite misc :
       [ compile git_issue_30.cpp ]
       [ run git_issue_167.cpp ]
       [ run git_issue_175.cpp ]
+      [ run git_issue_248.cpp ]
       [ compile git_issue_98.cpp : 
          [ check-target-builds ../config//has_float128 : <define>TEST_FLOAT128 <source>quadmath : ]
          [ check-target-builds ../config//has_gmp : <define>TEST_GMP <source>gmp : ]

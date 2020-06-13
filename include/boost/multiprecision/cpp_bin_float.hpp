@@ -1893,7 +1893,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bi
       return -(max)();
    }
    BOOST_STATIC_CONSTEXPR int digits   = boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count;
-   BOOST_STATIC_CONSTEXPR int digits10 = (digits - 1) * 301 / 1000;
+   BOOST_STATIC_CONSTEXPR int digits10 = boost::multiprecision::detail::calc_digits10<digits>::value;
    // Is this really correct???
    BOOST_STATIC_CONSTEXPR int  max_digits10 = boost::multiprecision::detail::calc_max_digits10<digits>::value;
    BOOST_STATIC_CONSTEXPR bool is_signed    = true;
