@@ -496,7 +496,198 @@ eval_gcd(
    eval_gcd(result, a, static_cast<limb_type>(v < 0 ? -v : v));
 }
 
+#ifndef TEST_ORIGINAL_GCD
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+void eval_gcd_lehmer(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& U, cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& V, unsigned lu)
+{
+   unsigned  h = lu % bits_per_limb;
+   limb_type u = U.limbs()[U.size() - 1];
+   limb_type v = V.size() < U.size() ? 0 : V.limbs()[V.size() - 1];
+   if (h)
+   {
+      u <<= bits_per_limb - h;
+      u |= U.limbs()[U.size() - 2] >> h;
+      v <<= bits_per_limb - h;
+      v |= V.limbs()[U.size() - 2] >> h;
+   }
 
+   signed_limb_type x[3] = {1, 0};
+   signed_limb_type y[3] = {0, 1};
+   unsigned         i    = 0;
+   bool             done = false;
+
+   while (true)
+   {
+      limb_type q  = u / v;
+      x[2]         = x[0] - q * x[1];
+      y[2]         = y[0] - q * y[1];
+      limb_type tu = u;
+      u            = v;
+      v            = tu - q * v;
+      ++i;
+      if ((i & 1u) == 0)
+      {
+         BOOST_ASSERT(u > v);
+         BOOST_ASSERT(x[2] <= 0);
+         BOOST_ASSERT(y[1] <= 0);
+         done = (v < static_cast<limb_type>(-x[2])) || ((u - v) < static_cast<limb_type>(y[2] - y[1]));
+      }
+      else
+      {
+         BOOST_ASSERT(u > v);
+         BOOST_ASSERT(y[2] < 0);
+         BOOST_ASSERT(x[1] <= 0);
+         done = (v < static_cast<limb_type>(-y[2])) || ((u - v) < static_cast<limb_type>(x[2] - x[1]));
+      }
+      if (done)
+      {
+         if (i == 1)
+         {
+            // No change to U and V we've stalled!
+            cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> t;
+            eval_modulus(t, U, V);
+            U.swap(V);
+            V.swap(t);
+            return;
+         }
+         cpp_int_backend<MinBits1, MaxBits1, SignType1, unchecked, Allocator1> t1, t2, TU;
+         BOOST_ASSERT(((x[0] < 0) != (y[0] < 0)) || (x[0] == 0) || (y[0] == 0));
+         BOOST_ASSERT(((x[1] < 0) != (y[1] < 0)) || (x[1] == 0) || (y[1] == 0));
+         eval_multiply(t1, U, std::abs(x[0]));
+         eval_multiply(t2, V, std::abs(y[0]));
+         if (x[0] <= 0)
+         {
+            if (x[0] == 0)
+               TU.swap(t2);
+            else
+            {
+               BOOST_ASSERT(t2.compare(t1) >= 0);
+               eval_subtract(TU, t2, t1);
+               BOOST_ASSERT(TU.sign() == false);
+            }
+         }
+         else
+         {
+            BOOST_ASSERT(t1.compare(t2) >= 0);
+            eval_subtract(TU, t1, t2);
+            BOOST_ASSERT(TU.sign() == false);
+         }
+         eval_multiply(t1, U, std::abs(x[1]));
+         eval_multiply(t2, V, std::abs(y[1]));
+         if (x[1] <= 0)
+         {
+            if (x[1] == 0)
+               V = t2;
+            else
+            {
+               BOOST_ASSERT(t2.compare(t1) >= 0);
+               eval_subtract(V, t2, t1);
+               BOOST_ASSERT(V.sign() == false);
+            }
+         }
+         else
+         {
+            BOOST_ASSERT(t1.compare(t2) >= 0);
+            eval_subtract(V, t1, t2);
+            BOOST_ASSERT(V.sign() == false);
+         }
+         eval_modulus(U, TU, V);
+         U.swap(V);
+         BOOST_ASSERT(lu > eval_msb(U));
+         return;
+      }
+      x[0] = x[1];
+      x[1] = x[2];
+      y[0] = y[1];
+      y[1] = y[2];
+   }
+}
+
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
+eval_gcd(
+    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
+    const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a,
+    const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& b)
+{
+   using default_ops::eval_get_sign;
+   using default_ops::eval_is_zero;
+   using default_ops::eval_lsb;
+
+   if (a.size() == 1)
+   {
+      eval_gcd(result, b, *a.limbs());
+      return;
+   }
+   if (b.size() == 1)
+   {
+      eval_gcd(result, a, *b.limbs());
+      return;
+   }
+
+   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> U(a), V(b);
+
+   int s = eval_get_sign(U);
+
+   /* GCD(0,x) := x */
+   if (s < 0)
+   {
+      U.negate();
+   }
+   else if (s == 0)
+   {
+      result = V;
+      return;
+   }
+   s = eval_get_sign(V);
+   if (s < 0)
+   {
+      V.negate();
+   }
+   else if (s == 0)
+   {
+      result = U;
+      return;
+   }
+
+   if (U.compare(V) < 0)
+      U.swap(V);
+
+   while (!eval_is_zero(V))
+   {
+      if (U.size() <= 2)
+      {
+         //
+         // Special case: if V has no more than 2 limbs
+         // then we can reduce U and V to a pair of integers and perform
+         // direct integer gcd:
+         //
+         if (U.size() == 1)
+            U = eval_gcd(*V.limbs(), *U.limbs());
+         else
+         {
+            double_limb_type i = U.limbs()[0] | (static_cast<double_limb_type>(U.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
+            double_limb_type j = (V.size() == 1) ? *V.limbs() : V.limbs()[0] | (static_cast<double_limb_type>(V.limbs()[1]) << sizeof(limb_type) * CHAR_BIT);
+            U                  = eval_gcd(i, j);
+         }
+         break;
+      }
+      unsigned lu = eval_msb(U) + 1;
+      unsigned lv = eval_msb(V) + 1;
+      if (lu - lv <= bits_per_limb / 2)
+      {
+         eval_gcd_lehmer(U, V, lu);
+      }
+      else
+      {
+         eval_modulus(result, U, V);
+         U.swap(V);
+         V.swap(result);
+      }
+   }
+   result.swap(U);
+}
+#else
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
 eval_gcd(
@@ -601,6 +792,7 @@ eval_gcd(
    result = u;
    eval_left_shift(result, shift);
 }
+#endif
 //
 // Now again for trivial backends:
 //
