@@ -31,6 +31,15 @@ std::ostream& operator<<(std::ostream& out, representations<Real>& rep)
 {
     out << std::setprecision(std::numeric_limits<Real>::max_digits10);
     out << rep.symbol_ << " = " << rep.x_ << "\n";
+    // TODO:
+    // Luroth and alternating Luroth representation.
+    // Bolyai-Renyi representation.
+    // Hexadecimal
+    // Is it Khinchin-regular?
+    // Are digits uniformly distributed?
+    // Continued fraction. Nearest integer continued fraction.
+    // Lehmer's continued cotangent representation.
+
     return out;
 }
 

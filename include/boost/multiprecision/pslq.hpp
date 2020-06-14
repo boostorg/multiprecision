@@ -185,6 +185,8 @@ auto standard_pslq_dictionary() {
     m.emplace(Omega_, "Ω");
     m.emplace(Omega_*Omega_, "Ω²");
     m.emplace(1/Omega_, "1/Ω");
+
+    // Should we add the Madelung constant?
     return m;
 }
 
@@ -210,7 +212,7 @@ progress(std::ostream & os) : os_{os}
 #else
     bar_width_ = 90;
 #endif
-    bar_width_ -= 60;
+    bar_width_ -= 70;
     os_ << std::setprecision(2);
 }
 
@@ -535,6 +537,8 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
 
         //std::cout << "A*B = \n" << A*B << "\n";
         //std::cout << "y = \n" << y << "\n";
+        // I've never observed this to happen;
+        // but I also haven't been able to find a proof that the norm is nondecreasing.
         if (norm_bound < last_norm_bound) {
             std::cerr << "Norm bound has decreased!\n";
         }
