@@ -649,6 +649,16 @@ eval_gcd(
       result = U;
       return;
    }
+   //
+   // Remove common factors of 2:
+   //
+   unsigned us = eval_lsb(U);
+   unsigned vs = eval_lsb(V);
+   int      shift = (std::min)(us, vs);
+   if (us)
+      eval_right_shift(U, us);
+   if (vs)
+      eval_right_shift(V, vs);
 
    if (U.compare(V) < 0)
       U.swap(V);
@@ -686,6 +696,8 @@ eval_gcd(
       }
    }
    result.swap(U);
+   if (shift)
+      eval_left_shift(result, shift);
 }
 #else
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
