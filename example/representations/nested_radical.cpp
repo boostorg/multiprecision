@@ -6,11 +6,13 @@
  */
 #include <boost/multiprecision/pslq.hpp>
 #include <boost/multiprecision/mpfr.hpp>
+#include <boost/multiprecision/representations.hpp>
 
 using std::abs;
 using boost::multiprecision::identify;
 using boost::multiprecision::is_algebraic;
 using boost::multiprecision::mpfr_float;
+using boost::multiprecision::representations;
 
 // This example comes from Steven R. Finch's book "Mathematical Constants", Section 1.2.1.
 // Ideally, we'd know how many terms to use just on the precision of the Real number.
@@ -37,7 +39,6 @@ int main()
     std::cout << std::setprecision(p);
     Real x2 = nested_123<Real>(n);
     std::string symbol = "√(1 + √(2 + √(3 +...)";
-    std::cout << "Attempting to identify " << symbol << " = " << x2 << "\n";
     Real delta = abs(x1 - x2);
     if (delta > 0) {
         std::cerr << std::scientific << "delta = " << abs(x2 - x1) << "\n";
@@ -45,8 +46,11 @@ int main()
         return 1;
     }
 
+
+    auto r = representations(x2, symbol);
+    std::cout << r << "\n";
     std::cout << "Is it algebraic?\n";
-    std::string s = is_algebraic(std::pair<Real, std::string>(x2, symbol), Real(1e10));
+    std::string s = is_algebraic(x2, symbol, Real(1e10));
     if (!s.empty()) {
         std::cout << s << "\n";
     }
@@ -55,7 +59,7 @@ int main()
     }
 
     std::cout << "Searching for closed forms.\n";
-    s = identify(std::pair<Real, std::string>(x2, symbol), Real(1e10));
+    s = identify(x2, symbol, Real(1e10));
     if (!s.empty()) {
         std::cout << s << "\n";
     }

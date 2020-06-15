@@ -605,32 +605,32 @@ std::string pslq(std::map<Real, std::string> const & dictionary, Real max_accept
 }
 
 template<typename Real>
-std::string identify(std::pair<Real, std::string> value_symbol, Real max_acceptable_norm, std::ostream& os = std::cout) {
+std::string identify(Real x, std::string symbol, Real max_acceptable_norm, std::ostream& os = std::cout) {
     auto dictionary = standard_pslq_dictionary<Real>();
     using std::sqrt;
     Real gamma = 2/sqrt(3) + 0.01;
 
     using std::log;
     using std::exp;
-    dictionary.emplace(value_symbol.first, value_symbol.second);
-    Real log_ = log(value_symbol.first);
+    dictionary.emplace(x, symbol);
+    Real log_ = log(x);
     if (log_ < 0) {
-        dictionary.emplace(-log(value_symbol.first), "-ln(" + value_symbol.second + ")");
+        dictionary.emplace(-log(x), "-ln(" + symbol + ")");
     } else {
-        dictionary.emplace(log(value_symbol.first), "ln(" + value_symbol.second + ")");
+        dictionary.emplace(log(x), "ln(" + symbol + ")");
     }
-    dictionary.emplace(exp(value_symbol.first), "exp(" + value_symbol.second + ")");
-    dictionary.emplace(1/value_symbol.first, "1/" + value_symbol.second);
-    dictionary.emplace(value_symbol.first*value_symbol.first, value_symbol.second + "²");
+    dictionary.emplace(exp(x), "exp(" + symbol + ")");
+    dictionary.emplace(1/x, "1/" + symbol);
+    dictionary.emplace(x*x, symbol + "²");
     return pslq(dictionary, max_acceptable_norm, gamma, os);
 }
 
 template<typename Real>
-std::string is_algebraic(std::pair<Real, std::string> p, Real max_acceptable_norm_bound) {
+std::string is_algebraic(Real alpha, std::string symbol, Real max_acceptable_norm_bound) {
     // TODO: Figure out this interface.
     std::vector<Real> x(80, Real(1));
     for (size_t i = 1; i < x.size(); ++i) {
-        x[i] = x[i-1]*p.first;
+        x[i] = x[i-1]*alpha;
     }
     using std::sqrt;
     Real gamma = 2/sqrt(Real(3)) + 0.01;
@@ -638,7 +638,7 @@ std::string is_algebraic(std::pair<Real, std::string> p, Real max_acceptable_nor
     if (sol.size() > 0) {
         std::cout << "Solution has elements ";
         for (auto [mi, xi] : sol) {
-            std::cout << mi << "\n";
+            std::cout << mi << ", ";
         }
         return "Found a solution";
     }
