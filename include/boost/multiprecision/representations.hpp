@@ -39,13 +39,16 @@ auto representations<Real>::simple_continued_fraction() {
     auto n = numerator(rat);
     auto d = denominator(rat);
     std::vector<decltype(n)> a;
+    // dummy values to get the type right:
     auto q = n;
     auto r = n;
 
-    divide_qr(n, d, q, r);
-    a.push_back(q);
-    std::cout << "quotient = " << q << "\n";
-    std::cout << "remainder = " << r << "\n";
+    while(r != 0) {
+        divide_qr(n, d, q, r);
+        a.push_back(q);
+        n = d;
+        d = r;
+    }
 
     return a;
 }
@@ -77,6 +80,15 @@ std::ostream& operator<<(std::ostream& out, representations<Real>& rep)
     out << whitespace << "= " << r << "\n";
 
     auto a = rep.simple_continued_fraction();
+    if (a.size() == 1) {
+        out << whitespace << "= [" << a[0] << "]\n";
+    } else {
+        out << "[" << a[0] << "; ";
+        for (size_t i = 1; i < a.size() -1; ++i) {
+            out << a[i] << ", ";
+        }
+        out << a.back() << "]\n";
+    }
 
     return out;
 }
