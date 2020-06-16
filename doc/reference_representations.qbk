@@ -1,0 +1,64 @@
+[/
+  Copyright Nick Thompson, 2020
+  Distributed under the Boost Software License, Version 1.0.
+  (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt).
+]
+
+[section:representations Representations]
+
+    #include <boost/multiprecision/representations.hpp>
+    namespace boost::multiprecision {
+
+    template<typename Real>
+    class representations {
+    public:
+        representations(Real const & x);
+        
+        auto simple_continued_fraction(bool exact = false) const;
+        
+        Real khinchin_geometric_mean() const;
+        
+        Real khinchin_harmonic_mean() const;
+        
+        auto centered_continued_fraction() const;
+        
+        
+        
+        template<typename T>
+        friend std::ostream& operator<<(std::ostream& out, representations<T>& rep);
+    };
+    }
+
+
+The `representations` class provided by Boost affords the ability to convert a floating point number into numerous different forms, such as simple continued fractions, centered continued fractions, Luroth representations, hexadecimal, and so on.
+In addition, we can answer a few questions about the number in question using these representations.
+
+Our first and most familiar representation is the simple continued fraction.
+
+    using boost::math::constants::pi;
+    boost::multiprecision::representations reps(pi<long double>());
+    // a is a std::vector whose value_type is an integer type large enough to hold the elements of the cfrac:
+    auto a = reps.simple_continued_fraction();
+    std::cout << "[" << a[0] << "; ";
+    for (size_t i = 1; i < a.size() - 1; ++i) {
+        std::cout << a[i] << ", ";
+    }
+    std::cout << a.back() << "]\n";
+
+The member function `simple_continued_fraction()` takes an optional boolean argument `exact`.
+This means that the floating point number is exactly converted to a rational number, and this exact rational is converted to a finite continued fraction.
+This is perfectly sensible behavior, but it is not the default.
+This is because when examining known values like π, it creates a large number of incorrect partial denominators, even if every bit of the binary representation is correct.
+Instead, we use the theorem that
+
+[$../equations/cfrac_accuracy.svg]
+
+where /h/[sub /n/] is the numerator of the /n/-th partial convergent and /k/[sub /n/] is the denominator.
+Use of the rounding model of floating point arithmetic on /x/ allows us to terminate the continued fraction expansion much earlier than we would by converting the binary number to its exact rational representation computing its cfrac.
+
+It may be the case the a few incorrect partial convergents is harmless, but we compute continued fractions because we would like to do something with them.
+One sensible thing to do it to ask whether the number is in some sense "random"; a question that can be partially answered by computing the Khinchin geometric mean and Khinchin harmonic mean.
+
+
+[endsect]
