@@ -27,7 +27,7 @@ public:
 
     auto centered_continued_fraction() const;
 
-    Real khinchin_approximation() const;
+    Real khinchin_geometric_mean() const;
 
 private:
     Real x_;
@@ -79,9 +79,10 @@ auto representations<Real>::centered_continued_fraction() const {
 }
 
 template<typename Real>
-Real representations<Real>::khinchin_approximation() const
+Real representations<Real>::khinchin_geometric_mean() const
 {
     auto a = this->simple_continued_fraction();
+    a.resize(23);
     using std::log;
     using std::exp;
     Real log_prod = 0;
@@ -129,7 +130,7 @@ std::ostream& operator<<(std::ostream& out, representations<Real>& rep)
         out << a.back() << "]\n";
     }
 
-    out << "(a₁a₂...a_n)^{1/n}         = " << rep.khinchin_approximation() << "\n";
+    out << "(a₁a₂...a_n)^{1/n}         = " << rep.khinchin_geometric_mean() << "\n";
     out << "The true Khinchin constant is 2.685452001065306445309714835481795693820382293994462953051152345557...\n";
     return out;
 }
