@@ -552,7 +552,7 @@ void eval_gcd_lehmer(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Al
             return;
          }
          unsigned ts = U.size() + 1;
-         cpp_int_backend<MinBits1, MaxBits1, SignType1, unchecked, Allocator1> t1(storage, ts), t2(storage, ts), TU(storage, ts);
+         cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> t1(storage, ts), t2(storage, ts), TU(storage, ts);
          eval_multiply(t1, U, x[0]);
          eval_multiply(t2, V, y[0]);
          if ((i & 1u) == 0)
@@ -626,7 +626,7 @@ eval_gcd(
       return;
    }
    unsigned temp_size = std::max(a.size(), b.size()) + 1;
-   typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::scoped_shared_storage storage(a.allocator(), temp_size * 6);
+   typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::scoped_shared_storage storage(a, temp_size * 6);
 
    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> U(storage, temp_size);
    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> V(storage, temp_size);
@@ -644,7 +644,6 @@ eval_gcd(
    else if (s == 0)
    {
       result = V;
-      BOOST_ASSERT(!result.is_alias());
       return;
    }
    s = eval_get_sign(V);
@@ -655,7 +654,6 @@ eval_gcd(
    else if (s == 0)
    {
       result = U;
-      BOOST_ASSERT(!result.is_alias());
       return;
    }
    //
