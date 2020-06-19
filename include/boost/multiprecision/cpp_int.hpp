@@ -474,6 +474,7 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
       std::swap(m_sign, o.m_sign);
       std::swap(m_internal, o.m_internal);
       std::swap(m_limbs, o.m_limbs);
+      std::swap(m_alias, o.m_alias);
    }
 
  protected:
