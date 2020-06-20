@@ -205,7 +205,7 @@ void test()
 #endif
    PRINT(digits);
    PRINT(digits10);
-#ifndef BOOST_NO_CXX11_NUMERIC_LIMITS
+#if !defined(BOOST_NO_CXX11_NUMERIC_LIMITS) || defined(PRINT_MAX_DIGITS10)
    PRINT(max_digits10);
 #endif
    PRINT(is_signed);
