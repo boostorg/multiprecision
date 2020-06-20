@@ -331,7 +331,7 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
          m_sign(false),
          m_internal(false),
          m_alias(true) {}
-   explicit BOOST_CONSTEXPR cpp_int_base(scoped_shared_storage& data, unsigned len) BOOST_NOEXCEPT
+   explicit cpp_int_base(scoped_shared_storage& data, unsigned len) BOOST_NOEXCEPT
        : m_data(data.allocate(len), len),
          m_limbs(len),
          m_sign(false),
@@ -522,8 +522,8 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
 
    struct scoped_shared_storage 
    {
-      scoped_shared_storage(const cpp_int_base&, unsigned) {}
-      void deallocate(unsigned) {}
+      BOOST_CONSTEXPR  scoped_shared_storage(const cpp_int_base&, unsigned) {}
+      BOOST_CONSTEXPR void deallocate(unsigned) {}
    };
 
    //
@@ -618,7 +618,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
    BOOST_CONSTEXPR cpp_int_base(const cpp_int_base& a, const literals::detail::negate_tag&)
        : m_wrapper(a.m_wrapper), m_limbs(a.m_limbs), m_sign((a.m_limbs == 1) && (*a.limbs() == 0) ? false : !a.m_sign) {}
 #endif
-   explicit BOOST_CONSTEXPR cpp_int_base(scoped_shared_storage&, unsigned) BOOST_NOEXCEPT
+   explicit BOOST_CONSTEXPR cpp_int_base(scoped_shared_storage&, unsigned) BOOST_NOEXCEPT : cpp_int_base() 
    {}
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
    //
@@ -735,8 +735,8 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
 
    struct scoped_shared_storage 
    {
-      scoped_shared_storage(const cpp_int_base&, unsigned) {}
-      void deallocate(unsigned) {}
+      BOOST_CONSTEXPR scoped_shared_storage(const cpp_int_base&, unsigned) {}
+      BOOST_CONSTEXPR void deallocate(unsigned) {}
    };
    //
    // Interface invariants:
@@ -830,7 +830,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
    BOOST_CONSTEXPR cpp_int_base(literals::detail::value_pack<>)
        : m_wrapper(static_cast<limb_type>(0u)), m_limbs(1) {}
 #endif
-   explicit BOOST_CONSTEXPR cpp_int_base(scoped_shared_storage&, unsigned) BOOST_NOEXCEPT
+   explicit BOOST_CONSTEXPR cpp_int_base(scoped_shared_storage&, unsigned) BOOST_NOEXCEPT : cpp_int_base()
    {}
        //
    // Helper functions for getting at our internal data, and manipulating storage:
@@ -973,8 +973,8 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
 
    struct scoped_shared_storage 
    {
-      scoped_shared_storage(const cpp_int_base&, unsigned) {}
-      void deallocate(unsigned) {}
+      BOOST_CONSTEXPR scoped_shared_storage(const cpp_int_base&, unsigned) {}
+      BOOST_CONSTEXPR void deallocate(unsigned) {}
    };
 
  protected:
@@ -1069,7 +1069,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
    //
    constexpr cpp_int_base& operator=(const cpp_int_base&) = default;
 #endif
-   explicit BOOST_CONSTEXPR cpp_int_base(scoped_shared_storage&, unsigned) BOOST_NOEXCEPT
+   explicit BOOST_CONSTEXPR cpp_int_base(scoped_shared_storage&, unsigned) BOOST_NOEXCEPT : cpp_int_base()
    {}
        //
    // Helper functions for getting at our internal data, and manipulating storage:
@@ -1140,8 +1140,8 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
 
    struct scoped_shared_storage 
    {
-      scoped_shared_storage(const cpp_int_base&, unsigned) {}
-      void deallocate(unsigned) {}
+      BOOST_CONSTEXPR scoped_shared_storage(const cpp_int_base&, unsigned) {}
+      BOOST_CONSTEXPR void deallocate(unsigned) {}
    };
 
  private:
@@ -1245,7 +1245,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
    //
    constexpr cpp_int_base& operator=(const cpp_int_base&) = default;
 #endif
-   explicit BOOST_CONSTEXPR cpp_int_base(scoped_shared_storage&, unsigned) BOOST_NOEXCEPT
+   explicit BOOST_CONSTEXPR cpp_int_base(scoped_shared_storage&, unsigned) BOOST_NOEXCEPT : cpp_int_base()
    {}
        //
    // Helper functions for getting at our internal data, and manipulating storage:

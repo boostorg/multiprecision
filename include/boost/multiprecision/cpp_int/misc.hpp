@@ -498,7 +498,7 @@ eval_gcd(
 
 #ifndef TEST_ORIGINAL_GCD
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, class Storage>
-void eval_gcd_lehmer(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& U, cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& V, unsigned lu, Storage& storage)
+BOOST_MP_CXX14_CONSTEXPR void eval_gcd_lehmer(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& U, cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& V, unsigned lu, Storage& storage)
 {
    unsigned  h = lu % bits_per_limb;
    limb_type u = U.limbs()[U.size() - 1];
