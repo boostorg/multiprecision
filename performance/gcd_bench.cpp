@@ -183,6 +183,7 @@ static void BM_gcd_old(benchmark::State& state)
       for (unsigned i = 0; i < a.size(); ++i)
          eval_gcd_old(c[i].backend(), a[i].backend(), b[i].backend());
    }
+   state.SetComplexityN(bits);
 }
 
 template <typename T>
@@ -199,15 +200,16 @@ static void BM_gcd_current(benchmark::State& state)
       for (unsigned i = 0; i < a.size(); ++i)
          eval_gcd(c[i].backend(), a[i].backend(), b[i].backend());
    }
+   state.SetComplexityN(bits);
 }
 
-constexpr unsigned lower_range = 1024;
+constexpr unsigned lower_range = 512;
 constexpr unsigned upper_range = 1 << 15;
 
-BENCHMARK_TEMPLATE(BM_gcd_old, cpp_int)->RangeMultiplier(2)->Range(lower_range, upper_range)->Unit(benchmark::kMillisecond);
-BENCHMARK_TEMPLATE(BM_gcd_current, cpp_int)->RangeMultiplier(2)->Range(lower_range, upper_range)->Unit(benchmark::kMillisecond);
-BENCHMARK_TEMPLATE(BM_gcd_old, cpp_int)->RangeMultiplier(2)->Range(lower_range, upper_range)->Unit(benchmark::kMillisecond);
-BENCHMARK_TEMPLATE(BM_gcd_current, mpz_int)->RangeMultiplier(2)->Range(lower_range, upper_range)->Unit(benchmark::kMillisecond);
-BENCHMARK_TEMPLATE(BM_gcd_current, mpz_int)->RangeMultiplier(2)->Range(lower_range, upper_range)->Unit(benchmark::kMillisecond);
+BENCHMARK_TEMPLATE(BM_gcd_old, cpp_int)->RangeMultiplier(2)->Range(lower_range, upper_range)->Unit(benchmark::kMillisecond)->Complexity();
+BENCHMARK_TEMPLATE(BM_gcd_current, cpp_int)->RangeMultiplier(2)->Range(lower_range, upper_range)->Unit(benchmark::kMillisecond)->Complexity();
+BENCHMARK_TEMPLATE(BM_gcd_old, cpp_int)->RangeMultiplier(2)->Range(lower_range, upper_range)->Unit(benchmark::kMillisecond)->Complexity();
+BENCHMARK_TEMPLATE(BM_gcd_current, mpz_int)->RangeMultiplier(2)->Range(lower_range, upper_range)->Unit(benchmark::kMillisecond)->Complexity();
+BENCHMARK_TEMPLATE(BM_gcd_current, mpz_int)->RangeMultiplier(2)->Range(lower_range, upper_range)->Unit(benchmark::kMillisecond)->Complexity();
 
 BENCHMARK_MAIN();
