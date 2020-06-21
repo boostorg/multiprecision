@@ -136,7 +136,7 @@ std::tuple<std::vector<T>, std::vector<T>, std::vector<T> >& get_test_vector(uns
       mt19937                     mt;
       uniform_int_distribution<T> ui(T(1) << (bits - 1), T(1) << bits);
 
-      std::vector<T>& a = std::get<0>(result); 
+      std::vector<T>& a = std::get<0>(result);
       std::vector<T>& b = std::get<1>(result);
       std::vector<T>& c = std::get<2>(result);
 
@@ -204,11 +204,10 @@ static void BM_gcd_current(benchmark::State& state)
 constexpr unsigned lower_range = 1024;
 constexpr unsigned upper_range = 1 << 15;
 
-BENCHMARK_TEMPLATE(BM_gcd_old, cpp_int)->RangeMultiplier(2)->Range(lower_range, upper_range);
-BENCHMARK_TEMPLATE(BM_gcd_current, cpp_int)->RangeMultiplier(2)->Range(lower_range, upper_range);
-BENCHMARK_TEMPLATE(BM_gcd_old, cpp_int)->RangeMultiplier(2)->Range(lower_range, upper_range);
-BENCHMARK_TEMPLATE(BM_gcd_current, mpz_int)->RangeMultiplier(2)->Range(lower_range, upper_range);
-BENCHMARK_TEMPLATE(BM_gcd_current, mpz_int)->RangeMultiplier(2)->Range(lower_range, upper_range);
+BENCHMARK_TEMPLATE(BM_gcd_old, cpp_int)->RangeMultiplier(2)->Range(lower_range, upper_range)->Unit(benchmark::kMillisecond);
+BENCHMARK_TEMPLATE(BM_gcd_current, cpp_int)->RangeMultiplier(2)->Range(lower_range, upper_range)->Unit(benchmark::kMillisecond);
+BENCHMARK_TEMPLATE(BM_gcd_old, cpp_int)->RangeMultiplier(2)->Range(lower_range, upper_range)->Unit(benchmark::kMillisecond);
+BENCHMARK_TEMPLATE(BM_gcd_current, mpz_int)->RangeMultiplier(2)->Range(lower_range, upper_range)->Unit(benchmark::kMillisecond);
+BENCHMARK_TEMPLATE(BM_gcd_current, mpz_int)->RangeMultiplier(2)->Range(lower_range, upper_range)->Unit(benchmark::kMillisecond);
 
 BENCHMARK_MAIN();
-
