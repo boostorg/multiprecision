@@ -780,7 +780,8 @@ inline void do_eval_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponen
       }
       else if (a.exponent() == (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + b.exponent() + 1)
       {
-         if (eval_lsb(b.bits()) != cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1)
+         if ((eval_lsb(b.bits()) != cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1)
+            && eval_lsb(a.bits()))
          {
             eval_left_shift(dt, 1);
             eval_decrement(dt);
@@ -804,7 +805,8 @@ inline void do_eval_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponen
       }
       else if (b.exponent() == (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + a.exponent() + 1)
       {
-         if (eval_lsb(a.bits()) != cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1)
+         if ((eval_lsb(a.bits()) != cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1)
+            && eval_lsb(b.bits()))
          {
             eval_left_shift(dt, 1);
             eval_decrement(dt);
