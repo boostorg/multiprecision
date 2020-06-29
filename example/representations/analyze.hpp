@@ -20,12 +20,15 @@ void analyze(Real x, std::string symbol)
     using boost::multiprecision::is_algebraic;
     using boost::math::tools::centered_continued_fraction;
     using boost::math::tools::simple_continued_fraction;
-
-    auto scf = simple_continued_fraction(x);
-    auto ccf = centered_continued_fraction(x);
-    std::cout << ccf << "\n";
+    constexpr int p = std::numeric_limits<Real>::max_digits10;
+    std::cout << std::setprecision(p);
+    if constexpr (p == 2147483647) {
+        std::cout << std::setprecision(x.backend().precision());
+    }
 
     std::cout << symbol << " ≈ " << x << "\n";
+    auto scf = simple_continued_fraction(x);
+    auto ccf = centered_continued_fraction(x);
     std::cout << " ≈ " << scf  << "\n";
     std::cout << " ≈ " << ccf  << "\n";
     std::cout << std::setprecision(11);
