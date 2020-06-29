@@ -14,6 +14,7 @@ using boost::math::tools::continued_fraction_a;
 // This example comes from Steven R. Finch's book "Mathematical Constants", Section 6.2.
 // "No one knows the outcome if we instead repeat each denominator in c_1,
 //  although numerically we find c_2 = 0.5851972651...."
+// Mathematica notation: FromContinuedFraction[{0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10}]
 template <typename T>
 class repeated_denom_generator
 {
