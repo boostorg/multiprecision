@@ -4,15 +4,9 @@
  * Boost Software License, Version 1.0. (See accompanying file
  * LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
  */
-#include <boost/multiprecision/pslq.hpp>
+#include "analyze.hpp"
 #include <boost/multiprecision/mpfr.hpp>
-#include <boost/multiprecision/representations.hpp>
-
-using std::abs;
-using boost::multiprecision::identify;
-using boost::multiprecision::is_algebraic;
 using boost::multiprecision::mpfr_float;
-using boost::multiprecision::representations;
 
 // This example comes from Steven R. Finch's book "Mathematical Constants", Section 1.2.1.
 // Ideally, we'd know how many terms to use just on the precision of the Real number.
@@ -34,7 +28,7 @@ int main()
     using Real = mpfr_float;
     int p = 1000;
     mpfr_float::default_precision(p);
-    int n = 10000;
+    int n = 30000;
     Real x1 = nested_123<Real>(n/2);
     std::cout << std::setprecision(p);
     Real x2 = nested_123<Real>(n);
@@ -45,26 +39,5 @@ int main()
         std::cerr << "n must be increased to get all the bits correct.\n";
         return 1;
     }
-
-
-    auto r = representations(x2, symbol);
-    std::cout << r << "\n";
-    std::cout << "Is it algebraic?\n";
-    std::string s = is_algebraic(x2, symbol, Real(1e10));
-    if (!s.empty()) {
-        std::cout << s << "\n";
-    }
-    else {
-        std::cout << "It is probably not algebraic.\n";
-    }
-
-    std::cout << "Searching for closed forms.\n";
-    s = identify(x2, symbol, Real(1e10));
-    if (!s.empty()) {
-        std::cout << s << "\n";
-    }
-    else {
-        std::cout << "No relations found.\n";
-    }
-
+    analyze(x2, symbol);
 }

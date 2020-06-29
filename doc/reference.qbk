@@ -19,7 +19,6 @@
 [include reference_cpp_bin_float.qbk]
 [include reference_cpp_dec_float.qbk]
 [include reference_pslq.qbk]
-[include reference_representations.qbk]
 [include reference_internal_support.qbk]
 [include reference_backend_requirements.qbk]
 [include reference_header_structure.qbk]
