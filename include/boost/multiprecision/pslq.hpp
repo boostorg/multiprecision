@@ -142,6 +142,8 @@ auto standard_pslq_dictionary() {
     m.emplace(e_, "e");
     m.emplace(sqrt(e_), "√e");
     m.emplace(root_two<Real>(), "√2");
+    m.emplace(cbrt(static_cast<Real>(2)), "∛2");
+    m.emplace(cbrt(static_cast<Real>(3)), "∛3");
     m.emplace(root_three<Real>(), "√3");
     m.emplace(sqrt(static_cast<Real>(5)), "√5");
     m.emplace(sqrt(static_cast<Real>(7)), "√7");
@@ -170,9 +172,11 @@ auto standard_pslq_dictionary() {
     m.emplace(exp(khinchin_), "exp(K₀)");
     m.emplace(1/khinchin_, "1/K₀");
     m.emplace(khinchin_*khinchin_, "K₀²");
+    m.emplace(log(static_cast<Real>(1) + sqrt(static_cast<Real>(2))), "ln(1+√2)");
     // To recover multiplicative relations we need the logarithms of small primes.
-    m.emplace(log(static_cast<Real>(2)), "ln(2)");
-    m.emplace(-log(log(static_cast<Real>(2))), "-ln(ln(2))");
+    Real ln2 = log(static_cast<Real>(2)); 
+    m.emplace(ln2, "ln(2)");
+    m.emplace(-log(ln2), "-ln(ln(2))");
     m.emplace(log(static_cast<Real>(3)), "ln(3)");
     m.emplace(log(static_cast<Real>(5)), "ln(5)");
     m.emplace(log(static_cast<Real>(7)), "ln(7)");
@@ -187,6 +191,17 @@ auto standard_pslq_dictionary() {
     m.emplace(1/Omega_, "1/Ω");
 
     // Should we add the Madelung constant?
+
+    // Now we add a few that will allow recovery of relations from 'Mathematical Constants' by Steven Finch.
+    // Is this a sensible way to go about this? How else should a standard dictionary be defined?
+
+    // Looking at Mathematical Constants, 1.5.2, we need these to recover the relations stated there:
+    m.emplace(ln2*sqrt(pi_), "ln(2)√π");
+    m.emplace(euler_*sqrt(pi_), "γ√π");
+    // Section 1.5.3:
+    m.emplace(root_three<Real>()*pi_, "π√3");
+    m.emplace(catalan_*pi_, "πG");
+
     return m;
 }
 
