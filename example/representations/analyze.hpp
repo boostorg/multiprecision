@@ -16,6 +16,8 @@ template<typename Real>
 void analyze(Real x, std::string symbol)
 {
     using std::abs;
+    using std::exp;
+    using std::log;
     using boost::multiprecision::identify;
     using boost::multiprecision::is_algebraic;
     using boost::math::tools::centered_continued_fraction;
@@ -38,6 +40,35 @@ void analyze(Real x, std::string symbol)
     std::cout << "Expected Khinchin harmonic mean if the value is 'random' : 1.74540566240.\n";
     std::cout << "Empirical Khinchin geometric mean from centered continued fraction: " << ccf.khinchin_geometric_mean() << "\n";
     std::cout << "Expected Khinchin geometric mean of ccf if the value is 'random'  : 5.454517244545585756966057724\n";
+
+    Real expx = exp(x);
+    auto scf_exp = simple_continued_fraction(expx);
+    auto ccf_exp = centered_continued_fraction(expx);
+    std::cout << "exp(" << symbol << ")";
+    std::cout << " ≈ " << scf_exp  << "\n";
+    std::cout << " ≈ " << ccf_exp  << "\n";
+    std::cout << std::setprecision(11);
+    std::cout << "Empirical Khinchin geometric mean of simple cfrac        : " << scf_exp.khinchin_geometric_mean() << "\n";
+    std::cout << "Expected Khinchin geometric mean if the value is 'random': 2.6854520010.\n";
+    std::cout << "Empirical Khinchin harmonic mean of simple cfrac         : " << scf_exp.khinchin_harmonic_mean() << "\n";
+    std::cout << "Expected Khinchin harmonic mean if the value is 'random' : 1.74540566240.\n";
+    std::cout << "Empirical Khinchin geometric mean from centered continued fraction: " << ccf_exp.khinchin_geometric_mean() << "\n";
+    std::cout << "Expected Khinchin geometric mean of ccf if the value is 'random'  : 5.454517244545585756966057724\n";
+
+    Real lnx = log(x);
+    auto scf_log = simple_continued_fraction(lnx);
+    auto ccf_log = centered_continued_fraction(lnx);
+    std::cout << "ln(" << symbol << ")";
+    std::cout << " ≈ " << scf_log  << "\n";
+    std::cout << " ≈ " << ccf_log  << "\n";
+    std::cout << std::setprecision(11);
+    std::cout << "Empirical Khinchin geometric mean of simple cfrac        : " << scf_log.khinchin_geometric_mean() << "\n";
+    std::cout << "Expected Khinchin geometric mean if the value is 'random': 2.6854520010.\n";
+    std::cout << "Empirical Khinchin harmonic mean of simple cfrac         : " << scf_log.khinchin_harmonic_mean() << "\n";
+    std::cout << "Expected Khinchin harmonic mean if the value is 'random' : 1.74540566240.\n";
+    std::cout << "Empirical Khinchin geometric mean from centered continued fraction: " << ccf_log.khinchin_geometric_mean() << "\n";
+    std::cout << "Expected Khinchin geometric mean of ccf if the value is 'random'  : 5.454517244545585756966057724\n";
+
     std::cout << "Is it algebraic?\n";
     std::string s = is_algebraic(x, symbol, Real(1e10));
     if (!s.empty())
