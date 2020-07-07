@@ -569,6 +569,7 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
 
 template<typename Real>
 std::string pslq(std::map<Real, std::string> const & dictionary, Real max_acceptable_norm_bound, Real gamma, std::ostream& os = std::cout) {
+    using std::abs;
     std::vector<Real> values(dictionary.size());
     size_t i = 0;
     for (auto it = dictionary.begin(); it != dictionary.end(); ++it) {
