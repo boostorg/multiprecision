@@ -497,6 +497,166 @@ eval_gcd(
 }
 
 #ifndef TEST_ORIGINAL_GCD
+
+#ifndef BOOST_HAS_INT128
+//
+// When double_limb_type is a native integer type then we should just use it and not worry about the consequences.
+// This can eliminate approximately a full limb with each call.
+//
+template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, class Storage>
+BOOST_MP_CXX14_CONSTEXPR void eval_gcd_lehmer(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& U, cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& V, unsigned lu, Storage& storage)
+{
+   unsigned         h = lu % bits_per_limb;
+   double_limb_type u = (static_cast<double_limb_type>((U.limbs()[U.size() - 1])) << bits_per_limb) | U.limbs()[U.size() - 2];
+   double_limb_type v = (static_cast<double_limb_type>((V.size() < U.size() ? 0 : V.limbs()[V.size() - 1])) << bits_per_limb) | V.limbs()[U.size() - 2];
+   if (h)
+   {
+      u <<= bits_per_limb - h;
+      u |= U.limbs()[U.size() - 3] >> h;
+      v <<= bits_per_limb - h;
+      v |= V.limbs()[U.size() - 3] >> h;
+   }
+   //
+   // x[i+0] is positive for even i.
+   // y[i+0] is positive for odd i.
+   //
+   // However we track only absolute values here:
+   //
+   double_limb_type x[3] = {1, 0};
+   double_limb_type y[3] = {0, 1};
+   unsigned         i    = 0;
+
+#ifdef BOOST_MP_GCD_DEBUG
+   cpp_int UU, VV;
+   UU = U;
+   VV = V;
+#endif
+
+   while (true)
+   {
+      double_limb_type q  = u / v;
+      x[2]                = x[0] + q * x[1];
+      y[2]                = y[0] + q * y[1];
+      double_limb_type tu = u;
+      u                   = v;
+      v                   = tu - q * v;
+      ++i;
+      //
+      // We must make sure that y[2] occupies a single limb otherwise
+      // the multiprecision multiplications below would be much more expensive.
+      // This can sometimes lose us one iteration, but is worth it for improved
+      // calculation efficiency.
+      //
+      if (y[2] >> bits_per_limb)
+         break;
+      if ((i & 1u) == 0)
+      {
+         BOOST_ASSERT(u > v);
+         if ((v < x[2]) || ((u - v) < (y[2] + y[1])))
+            break;
+      }
+      else
+      {
+         BOOST_ASSERT(u > v);
+         if ((v < y[2]) || ((u - v) < (x[2] + x[1])))
+            break;
+      }
+#ifdef BOOST_MP_GCD_DEBUG
+      BOOST_ASSERT(q == UU / VV);
+      UU %= VV;
+      UU.swap(VV);
+#endif
+      x[0] = x[1];
+      x[1] = x[2];
+      y[0] = y[1];
+      y[1] = y[2];
+   }
+   if (i == 1)
+   {
+      // No change to U and V we've stalled!
+      cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> t;
+      eval_modulus(t, U, V);
+      U.swap(V);
+      V.swap(t);
+      return;
+   }
+   unsigned                                                             ts = U.size() + 1;
+   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> t1(storage, ts), t2(storage, ts), t3(storage, ts);
+   eval_multiply(t1, U, static_cast<limb_type>(x[0]));
+   eval_multiply(t2, V, static_cast<limb_type>(y[0]));
+   eval_multiply(t3, U, static_cast<limb_type>(x[1]));
+   if ((i & 1u) == 0)
+   {
+      if (x[0] == 0)
+         U = t2;
+      else
+      {
+         BOOST_ASSERT(t2.compare(t1) >= 0);
+         eval_subtract(U, t2, t1);
+         BOOST_ASSERT(U.sign() == false);
+      }
+   }
+   else
+   {
+      BOOST_ASSERT(t1.compare(t2) >= 0);
+      eval_subtract(U, t1, t2);
+      BOOST_ASSERT(U.sign() == false);
+   }
+   eval_multiply(t2, V, static_cast<limb_type>(y[1]));
+   if (i & 1u)
+   {
+      if (x[1] == 0)
+         V = t2;
+      else
+      {
+         BOOST_ASSERT(t2.compare(t3) >= 0);
+         eval_subtract(V, t2, t3);
+         BOOST_ASSERT(V.sign() == false);
+      }
+   }
+   else
+   {
+      BOOST_ASSERT(t3.compare(t2) >= 0);
+      eval_subtract(V, t3, t2);
+      BOOST_ASSERT(V.sign() == false);
+   }
+   BOOST_ASSERT(U.compare(V) >= 0);
+   BOOST_ASSERT(lu > eval_msb(U));
+#ifdef BOOST_MP_GCD_DEBUG
+
+   BOOST_ASSERT(UU == U);
+   BOOST_ASSERT(VV == V);
+
+   //++calls;
+   //bits_saved += lu - eval_msb(U);
+   //cycles += i;
+#endif
+   if (lu < 2048)
+   {
+      //
+      // Since we have stripped all common powers of 2 from U and V at the start
+      // if either are even at this point, we can remove stray powers of 2 now.
+      // Note that it is not possible for *both* U and V to be even at this point.
+      //
+      // This has an adverse effect on performance for high bit counts, but has
+      // a significant positive effect for smaller counts.
+      //
+      if ((U.limbs()[0] & 1u) == 0)
+      {
+         eval_right_shift(U, eval_lsb(U));
+         if (U.compare(V) < 0)
+            U.swap(V);
+      }
+      else if ((V.limbs()[0] & 1u) == 0)
+      {
+         eval_right_shift(V, eval_lsb(V));
+      }
+   }
+   storage.deallocate(ts * 3);
+}
+
+#else
+
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, class Storage>
 BOOST_MP_CXX14_CONSTEXPR void eval_gcd_lehmer(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& U, cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& V, unsigned lu, Storage& storage)
 {
@@ -613,9 +773,9 @@ BOOST_MP_CXX14_CONSTEXPR void eval_gcd_lehmer(cpp_int_backend<MinBits1, MaxBits1
    BOOST_ASSERT(UU == U);
    BOOST_ASSERT(VV == V);
 
-   ++calls;
-   bits_saved += lu - eval_msb(U);
-   cycles += i;
+   //++calls;
+   //bits_saved += lu - eval_msb(U);
+   //cycles += i;
 #endif
    if (lu < 2048)
    {
@@ -640,6 +800,8 @@ BOOST_MP_CXX14_CONSTEXPR void eval_gcd_lehmer(cpp_int_backend<MinBits1, MaxBits1
    }
    storage.deallocate(ts * 3);
 }
+
+#endif
 
 template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
 inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
