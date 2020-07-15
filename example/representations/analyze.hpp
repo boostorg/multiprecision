@@ -11,6 +11,7 @@
 #include <boost/multiprecision/pslq.hpp>
 #include <boost/math/tools/simple_continued_fraction.hpp>
 #include <boost/math/tools/centered_continued_fraction.hpp>
+#include <boost/math/tools/luroth_expansion.hpp>
 
 template<typename Real>
 void analyze(Real x, std::string symbol)
@@ -22,6 +23,7 @@ void analyze(Real x, std::string symbol)
     using boost::multiprecision::is_algebraic;
     using boost::math::tools::centered_continued_fraction;
     using boost::math::tools::simple_continued_fraction;
+    using boost::math::tools::luroth_expansion;
     constexpr int p = std::numeric_limits<Real>::max_digits10;
     std::cout << std::setprecision(p);
     if constexpr (p == 2147483647) {
@@ -31,8 +33,10 @@ void analyze(Real x, std::string symbol)
     std::cout << symbol << " ≈ " << x << "\n";
     auto scf = simple_continued_fraction(x);
     auto ccf = centered_continued_fraction(x);
+    auto lur = luroth_expansion(x);
     std::cout << " ≈ " << scf  << "\n";
     std::cout << " ≈ " << ccf  << "\n";
+    std::cout << " ≈ " << lur  << "\n";
     std::cout << std::setprecision(11);
     std::cout << "Empirical Khinchin geometric mean of simple cfrac        : " << scf.khinchin_geometric_mean() << "\n";
     std::cout << "Expected Khinchin geometric mean if the value is 'random': 2.6854520010.\n";
@@ -40,13 +44,18 @@ void analyze(Real x, std::string symbol)
     std::cout << "Expected Khinchin harmonic mean if the value is 'random' : 1.74540566240.\n";
     std::cout << "Empirical Khinchin geometric mean from centered continued fraction: " << ccf.khinchin_geometric_mean() << "\n";
     std::cout << "Expected Khinchin geometric mean of ccf if the value is 'random'  : 5.454517244545585756966057724\n";
+    std::cout << "Empirical digit geometric mean of Luroth expansion     : " << lur.digit_geometric_mean() << "\n";
+    std::cout << "Expected digit geometric mean if the value is 'random' : 2.200161058\n";
+
 
     Real expx = exp(x);
     auto scf_exp = simple_continued_fraction(expx);
     auto ccf_exp = centered_continued_fraction(expx);
+    auto lur_exp = luroth_expansion(expx);
     std::cout << "exp(" << symbol << ")";
     std::cout << " ≈ " << scf_exp  << "\n";
     std::cout << " ≈ " << ccf_exp  << "\n";
+    std::cout << " ≈ " << lur_exp  << "\n";
     std::cout << std::setprecision(11);
     std::cout << "Empirical Khinchin geometric mean of simple cfrac        : " << scf_exp.khinchin_geometric_mean() << "\n";
     std::cout << "Expected Khinchin geometric mean if the value is 'random': 2.6854520010.\n";
@@ -54,13 +63,17 @@ void analyze(Real x, std::string symbol)
     std::cout << "Expected Khinchin harmonic mean if the value is 'random' : 1.74540566240.\n";
     std::cout << "Empirical Khinchin geometric mean from centered continued fraction: " << ccf_exp.khinchin_geometric_mean() << "\n";
     std::cout << "Expected Khinchin geometric mean of ccf if the value is 'random'  : 5.454517244545585756966057724\n";
+    std::cout << "Empirical digit geometric mean of Luroth expansion     : " << lur_exp.digit_geometric_mean() << "\n";
+    std::cout << "Expected digit geometric mean if the value is 'random' : 2.200161058\n";
 
     Real lnx = log(x);
     auto scf_log = simple_continued_fraction(lnx);
     auto ccf_log = centered_continued_fraction(lnx);
+    auto lur_log = luroth_expansion(lnx);
     std::cout << "ln(" << symbol << ")";
     std::cout << " ≈ " << scf_log  << "\n";
     std::cout << " ≈ " << ccf_log  << "\n";
+    std::cout << " ≈ " << lur_log  << "\n";
     std::cout << std::setprecision(11);
     std::cout << "Empirical Khinchin geometric mean of simple cfrac        : " << scf_log.khinchin_geometric_mean() << "\n";
     std::cout << "Expected Khinchin geometric mean if the value is 'random': 2.6854520010.\n";
@@ -68,6 +81,8 @@ void analyze(Real x, std::string symbol)
     std::cout << "Expected Khinchin harmonic mean if the value is 'random' : 1.74540566240.\n";
     std::cout << "Empirical Khinchin geometric mean from centered continued fraction: " << ccf_log.khinchin_geometric_mean() << "\n";
     std::cout << "Expected Khinchin geometric mean of ccf if the value is 'random'  : 5.454517244545585756966057724\n";
+    std::cout << "Empirical digit geometric mean of Luroth expansion     : " << lur_log.digit_geometric_mean() << "\n";
+    std::cout << "Expected digit geometric mean if the value is 'random' : 2.200161058\n";
 
     std::cout << "Is it algebraic?\n";
     std::string s = is_algebraic(x, symbol, Real(1e10));
