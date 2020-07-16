@@ -522,8 +522,8 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
 
    struct scoped_shared_storage 
    {
-      BOOST_CONSTEXPR  scoped_shared_storage(const cpp_int_base&, unsigned) {}
-      BOOST_CONSTEXPR void deallocate(unsigned) {}
+      BOOST_MP_CXX14_CONSTEXPR  scoped_shared_storage(const cpp_int_base&, unsigned) {}
+      BOOST_MP_CXX14_CONSTEXPR void deallocate(unsigned) {}
    };
 
    //
@@ -735,8 +735,8 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
 
    struct scoped_shared_storage 
    {
-      BOOST_CONSTEXPR scoped_shared_storage(const cpp_int_base&, unsigned) {}
-      BOOST_CONSTEXPR void deallocate(unsigned) {}
+      BOOST_MP_CXX14_CONSTEXPR scoped_shared_storage(const cpp_int_base&, unsigned) {}
+      BOOST_MP_CXX14_CONSTEXPR void deallocate(unsigned) {}
    };
    //
    // Interface invariants:
@@ -973,8 +973,8 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
 
    struct scoped_shared_storage 
    {
-      BOOST_CONSTEXPR scoped_shared_storage(const cpp_int_base&, unsigned) {}
-      BOOST_CONSTEXPR void deallocate(unsigned) {}
+      BOOST_MP_CXX14_CONSTEXPR scoped_shared_storage(const cpp_int_base&, unsigned) {}
+      BOOST_MP_CXX14_CONSTEXPR void deallocate(unsigned) {}
    };
 
  protected:
@@ -1140,8 +1140,8 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
 
    struct scoped_shared_storage 
    {
-      BOOST_CONSTEXPR scoped_shared_storage(const cpp_int_base&, unsigned) {}
-      BOOST_CONSTEXPR void deallocate(unsigned) {}
+      BOOST_MP_CXX14_CONSTEXPR scoped_shared_storage(const cpp_int_base&, unsigned) {}
+      BOOST_MP_CXX14_CONSTEXPR void deallocate(unsigned) {}
    };
 
  private:
