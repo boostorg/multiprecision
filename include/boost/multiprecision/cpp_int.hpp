@@ -618,7 +618,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, false>
    BOOST_CONSTEXPR cpp_int_base(const cpp_int_base& a, const literals::detail::negate_tag&)
        : m_wrapper(a.m_wrapper), m_limbs(a.m_limbs), m_sign((a.m_limbs == 1) && (*a.limbs() == 0) ? false : !a.m_sign) {}
 #endif
-   explicit BOOST_CONSTEXPR cpp_int_base(scoped_shared_storage&, unsigned) BOOST_NOEXCEPT : cpp_int_base() 
+   explicit BOOST_CONSTEXPR cpp_int_base(scoped_shared_storage&, unsigned) BOOST_NOEXCEPT : m_wrapper(), m_limbs(0), m_sign(false)
    {}
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
    //
@@ -830,7 +830,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, false>
    BOOST_CONSTEXPR cpp_int_base(literals::detail::value_pack<>)
        : m_wrapper(static_cast<limb_type>(0u)), m_limbs(1) {}
 #endif
-   explicit BOOST_CONSTEXPR cpp_int_base(scoped_shared_storage&, unsigned) BOOST_NOEXCEPT : cpp_int_base()
+   explicit BOOST_CONSTEXPR cpp_int_base(scoped_shared_storage&, unsigned) BOOST_NOEXCEPT : m_wrapper(), m_limbs(1)
    {}
        //
    // Helper functions for getting at our internal data, and manipulating storage:
@@ -1069,7 +1069,7 @@ struct cpp_int_base<MinBits, MinBits, signed_magnitude, Checked, void, true>
    //
    constexpr cpp_int_base& operator=(const cpp_int_base&) = default;
 #endif
-   explicit BOOST_CONSTEXPR cpp_int_base(scoped_shared_storage&, unsigned) BOOST_NOEXCEPT : cpp_int_base()
+   explicit BOOST_CONSTEXPR cpp_int_base(scoped_shared_storage&, unsigned) BOOST_NOEXCEPT : m_data(0), m_sign(false)
    {}
        //
    // Helper functions for getting at our internal data, and manipulating storage:
@@ -1245,7 +1245,7 @@ struct cpp_int_base<MinBits, MinBits, unsigned_magnitude, Checked, void, true>
    //
    constexpr cpp_int_base& operator=(const cpp_int_base&) = default;
 #endif
-   explicit BOOST_CONSTEXPR cpp_int_base(scoped_shared_storage&, unsigned) BOOST_NOEXCEPT : cpp_int_base()
+   explicit BOOST_CONSTEXPR cpp_int_base(scoped_shared_storage&, unsigned) BOOST_NOEXCEPT : m_data(0)
    {}
        //
    // Helper functions for getting at our internal data, and manipulating storage:
