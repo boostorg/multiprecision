@@ -995,7 +995,7 @@ eval_gcd(
       eval_gcd(result, a, *b.limbs());
       return;
    }
-   unsigned temp_size = std::max(a.size(), b.size()) + 1;
+   unsigned temp_size = (std::max)(a.size(), b.size()) + 1;
    typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::scoped_shared_storage storage(a, temp_size * 6);
 
    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> U(storage, temp_size);
