@@ -9,9 +9,12 @@
 #include <string>
 #include <iomanip>
 #include <boost/multiprecision/pslq.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
 #include <boost/math/tools/simple_continued_fraction.hpp>
 #include <boost/math/tools/centered_continued_fraction.hpp>
 #include <boost/math/tools/luroth_expansion.hpp>
+#include <boost/math/tools/engel_expansion.hpp>
+
 
 template<typename Real>
 void analyze(Real x, std::string symbol)
@@ -24,6 +27,8 @@ void analyze(Real x, std::string symbol)
     using boost::math::tools::centered_continued_fraction;
     using boost::math::tools::simple_continued_fraction;
     using boost::math::tools::luroth_expansion;
+    using boost::math::tools::engel_expansion;
+    usign boost::multiprecision::checked_int1024_t;
     constexpr int p = std::numeric_limits<Real>::max_digits10;
     std::cout << std::setprecision(p);
     if constexpr (p == 2147483647) {
@@ -32,11 +37,13 @@ void analyze(Real x, std::string symbol)
 
     std::cout << symbol << " ≈ " << x << "\n";
     auto scf = simple_continued_fraction(x);
-    auto ccf = centered_continued_fraction(x);
-    auto lur = luroth_expansion(x);
     std::cout << " ≈ " << scf  << "\n";
+    auto ccf = centered_continued_fraction(x);
     std::cout << " ≈ " << ccf  << "\n";
+    auto lur = luroth_expansion(x);
     std::cout << " ≈ " << lur  << "\n";
+    auto eng = engel_expansion<Real, checked_int1024_t>(x);
+    std::cout << " ≈ " << eng  << "\n";
     std::cout << std::setprecision(11);
     std::cout << "Empirical Khinchin geometric mean of simple cfrac        : " << scf.khinchin_geometric_mean() << "\n";
     std::cout << "Expected Khinchin geometric mean if the value is 'random': 2.6854520010.\n";
