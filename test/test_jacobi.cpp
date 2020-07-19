@@ -33,6 +33,8 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #endif
 
+#include <boost/multiprecision/jacobi.hpp>
+
 template <typename T>
 void test()
 {
@@ -47,6 +49,8 @@ void test()
 
 int main()
 {
+   using namespace boost::multiprecision;
+
 #ifdef TEST_CPP_INT
    test<cpp_int>();
 #endif
