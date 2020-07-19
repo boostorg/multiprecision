@@ -800,7 +800,7 @@ test-suite cpp_int_tests :
       [ run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST4 <toolset>gcc-mingw:<link>static : test_cpp_int_serial_4 ]
       [ run test_cpp_int_deserial.cpp ../../serialization/build//boost_serialization ../../filesystem/build//boost_filesystem : $(here)/serial_txts : : release <toolset>gcc-mingw:<link>static  ]
       [ run test_cpp_rat_serial.cpp ../../serialization/build//boost_serialization : : : release <toolset>gcc-mingw:<link>static  ]
-
+      [ run test_gcd.cpp : : : [ requires cxx11_hdr_random ] ]
 ;
 
 test-suite misc :
