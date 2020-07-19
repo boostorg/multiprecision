@@ -172,6 +172,7 @@ BOOST_MP_CXX14_CONSTEXPR void divide_unsigned_helper(
       {
          double_limb_type a = (static_cast<double_limb_type>(prem[r_order]) << CppInt1::limb_bits) | prem[r_order - 1];
          double_limb_type b = (y_order > 0) ? (static_cast<double_limb_type>(py[y_order]) << CppInt1::limb_bits) | py[y_order - 1] : (static_cast<double_limb_type>(py[y_order]) << CppInt1::limb_bits);
+         BOOST_ASSERT(b);
          double_limb_type v = a / b;
          guess              = static_cast<limb_type>(v);
       }
