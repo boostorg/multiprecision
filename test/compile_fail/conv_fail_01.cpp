@@ -7,7 +7,7 @@
 
 using namespace boost::multiprecision;
 
-void foo(cpp_int i)
+void foo(cpp_int)
 {
 }
 

@@ -47,7 +47,7 @@ void do_serialize(Archive& ar, Int& val, mpl::false_ const&, mpl::false_ const&,
    // Non-trivial.
    // Non binary.
 
-   using boost::serialization::make_nvp;
+   using boost::make_nvp;
    bool        s;
    ar&         make_nvp("sign", s);
    std::size_t limb_count;
@@ -78,7 +78,7 @@ void do_serialize(Archive& ar, Int& val, mpl::true_ const&, mpl::false_ const&, 
    // Non-trivial.
    // Non binary.
 
-   using boost::serialization::make_nvp;
+   using boost::make_nvp;
    bool        s = val.sign();
    ar&         make_nvp("sign", s);
    limb_type*  pl         = val.limbs();
@@ -102,7 +102,7 @@ void do_serialize(Archive& ar, Int& val, mpl::false_ const&, mpl::true_ const&, 
    // Load.
    // Trivial.
    // Non binary.
-   using boost::serialization::make_nvp;
+   using boost::make_nvp;
    bool                          s;
    typename Int::local_limb_type l = 0;
    ar&                           make_nvp("sign", s);
@@ -124,7 +124,7 @@ void do_serialize(Archive& ar, Int& val, mpl::true_ const&, mpl::true_ const&, m
    // Store.
    // Trivial.
    // Non binary.
-   using boost::serialization::make_nvp;
+   using boost::make_nvp;
    bool                          s = val.sign();
    typename Int::local_limb_type l = *val.limbs();
    ar&                           make_nvp("sign", s);

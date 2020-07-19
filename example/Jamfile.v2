@@ -1,13 +1,13 @@
-# \libs\math\example\jamfile.v2
+# \libs\multiprecision\example\jamfile.v2
 # Runs multiprecision examples.
 # Copyright 2014 John Maddock
 # Copyright Paul A. Bristow 2014.
-# Copyright Christpher Kormanyos 2014
+# Copyright Christopher Kormanyos 2014
 
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# bring in the rules for testing
+# Bring in the rules for testing.
 import testing ;
 import modules ;
 import path ;
@@ -21,15 +21,16 @@ local tommath_path = [ modules.peek : TOMMATH_PATH ] ;
 
 project
     : requirements
-	   <include>$(gmp_path)
-	   <include>$(gmp_path)/mpfr
-	   <include>$(gmp_path)/gmpfrxx
-	   <include>$(mpfr_path)
-	   <include>$(mpfi_path)
-	   <include>$(mpfi_path)/src
-	   <include>$(tommath_path)
-	   <include>../include
-	   <include>../../..
+     <include>$(gmp_path)
+     <include>$(gmp_path)/mpfr
+     <include>$(gmp_path)/gmpfrxx
+     <include>$(mpfr_path)
+     <include>$(mpfi_path)
+     <include>$(mpfi_path)/src
+     <include>$(tommath_path)
+     <include>../include
+     <include>../../..
+     
       <toolset>gcc:<cxxflags>-Wno-missing-braces
       <toolset>darwin:<cxxflags>-Wno-missing-braces
       <toolset>acc:<cxxflags>+W2068,2461,2236,4070
@@ -50,6 +51,8 @@ project
       <toolset>msvc:<cxxflags>/wd4701
       <toolset>msvc:<cxxflags>/wd4127
       <toolset>msvc:<cxxflags>/wd4305
+      <toolset>clang:<link>static
+     
     ;
 
 lib gmp : : <search>$(gmp_path) ;
@@ -59,7 +62,7 @@ lib quadmath ;
 
 if $(tommath_path)
 {
-   lib tommath : [ GLOB $(tommath_path) : *.c ] ;
+   lib tommath : [ GLOB $(tommath_path) : *.c ] : <visibility>global ;
    TOMMATH = tommath ;
 }
 else
@@ -82,7 +85,8 @@ test-suite examples :
 
       [ run debug_adaptor_snips.cpp no_eh_eg_support ]
       [ run float128_snips.cpp quadmath no_eh_eg_support : : : [ check-target-builds ../config//has_float128 : : <build>no ] ]
-      [ run floating_point_examples.cpp no_eh_eg_support ]
+
+      [ run floating_point_examples.cpp no_eh_eg_support : : : [ check-target-builds ../config//has_big_obj : <cxxflags>-Wa,-mbig-obj <debug-symbols>off ] ]
       [ run gauss_laguerre_quadrature.cpp no_eh_eg_support : : : release [ requires cxx11_lambdas ] ]
       [ run hypergeometric_luke_algorithms.cpp no_eh_eg_support ../../chrono/build//boost_chrono ../../system/build//boost_system : : : [ requires cxx11_nullptr ]  ]
       [ run integer_examples.cpp no_eh_eg_support ]
@@ -96,5 +100,8 @@ test-suite examples :
       [ run mpfi_snips.cpp mpfi mpfr gmp no_eh_eg_support :  :  : [ check-target-builds ../config//has_mpfi : : <build>no ] ]
       [ run mpfr_snips.cpp mpfr gmp no_eh_eg_support : : : [ check-target-builds ../config//has_mpfr : : <build>no ] ]
       [ run tommath_snips.cpp $(TOMMATH) no_eh_eg_support : : : [ check-target-builds ../config//has_tommath : : <build>no ] ]
+      [ compile constexpr_float_arithmetic_examples.cpp : [ requires cxx14_constexpr cxx17_if_constexpr ] ]
+      
+      [ run big_seventh.cpp no_eh_eg_support ]
 
 ;

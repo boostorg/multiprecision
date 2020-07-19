@@ -1,10 +1,10 @@
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Importing and Exporting Data to and from cpp_int and cpp_bin_float</title>
-<link rel="stylesheet" href="../../../../../../doc/src/boostbook.css" type="text/css">
+<link rel="stylesheet" href="../../multiprecision.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
-<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.Multiprecision">
+<link rel="home" href="../../index.html" title="Chapter 1. Boost.Multiprecision">
 <link rel="up" href="../tut.html" title="Tutorial">
 <link rel="prev" href="lits.html" title="Literal Types and constexpr Support">
 <link rel="next" href="rounding.html" title="Rounding Rules for Conversions">
@@ -25,11 +25,12 @@
 <div class="section">
 <div class="titlepage"><div><div><h3 class="title">
 <a name="boost_multiprecision.tut.import_export"></a><a class="link" href="import_export.html" title="Importing and Exporting Data to and from cpp_int and cpp_bin_float">Importing and
-      Exporting Data to and from cpp_int and cpp_bin_float</a>
+      Exporting Data to and from <code class="computeroutput"><span class="identifier">cpp_int</span></code>
+      and <code class="computeroutput"><span class="identifier">cpp_bin_float</span></code></a>
 </h3></div></div></div>
 <p>
         Any integer number type that uses <code class="computeroutput"><span class="identifier">cpp_int_backend</span></code>
-        as it's implementation layer can import or export it's bits via two non-member
+        as its implementation layer can import or export its bits via two non-member
         functions:
       </p>
 <pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">unsigned</span> <span class="identifier">MinBits</span><span class="special">,</span> <span class="keyword">unsigned</span> <span class="identifier">MaxBits</span><span class="special">,</span> <span class="identifier">cpp_integer_type</span> <span class="identifier">SignType</span><span class="special">,</span> <span class="identifier">cpp_int_check_type</span> <span class="identifier">Checked</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">Allocator</span><span class="special">,</span>
@@ -54,7 +55,7 @@
         These functions are designed for data-interchange with other storage formats,
         and since <a class="link" href="floats/cpp_bin_float.html" title="cpp_bin_float">cpp_bin_float</a>
         uses <a class="link" href="ints/cpp_int.html" title="cpp_int">cpp_int</a>
-        internally, by extension they can be used for floating point numbers based
+        internally, by extension they can be used for floating-point numbers based
         on that backend as well (see example below). Parameters and use are as follows:
       </p>
 <pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">unsigned</span> <span class="identifier">MinBits</span><span class="special">,</span> <span class="keyword">unsigned</span> <span class="identifier">MaxBits</span><span class="special">,</span> <span class="identifier">cpp_integer_type</span> <span class="identifier">SignType</span><span class="special">,</span> <span class="identifier">cpp_int_check_type</span> <span class="identifier">Checked</span><span class="special">,</span> <span class="keyword">class</span> <span class="identifier">Allocator</span><span class="special">,</span>
@@ -134,8 +135,9 @@
 </tr>
 <tr><td align="left" valign="top"><p>
           Note that this function is optimized for the case where the data can be
-          memcpy'ed from the source to the integer - in this case both iterators
-          much be pointers, and everything must be little-endian.
+          <code class="computeroutput"><span class="identifier">memcpy</span></code>ed from the source
+          to the integer - in this case both iterators much be pointers, and everything
+          must be little-endian.
         </p></td></tr>
 </table></div>
 <h5>
@@ -167,11 +169,11 @@
    <span class="comment">// import back again, and check for equality:</span>
    <span class="identifier">cpp_int</span> <span class="identifier">j</span><span class="special">;</span>
    <span class="identifier">import_bits</span><span class="special">(</span><span class="identifier">j</span><span class="special">,</span> <span class="identifier">v</span><span class="special">.</span><span class="identifier">begin</span><span class="special">(),</span> <span class="identifier">v</span><span class="special">.</span><span class="identifier">end</span><span class="special">());</span>
-   <span class="identifier">assert</span><span class="special">(</span><span class="identifier">i</span> <span class="special">==</span> <span class="identifier">j</span><span class="special">);</span>
+   <span class="identifier">BOOST_ASSERT</span><span class="special">(</span><span class="identifier">i</span> <span class="special">==</span> <span class="identifier">j</span><span class="special">);</span>
 <span class="special">}</span>
 </pre>
 <p>
-        Importing or exporting cpp_bin_float is similar, but we must procede via
+        Importing or exporting cpp_bin_float is similar, but we must proceed via
         an intermediate integer:
       </p>
 <pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">multiprecision</span><span class="special">/</span><span class="identifier">cpp_bin_float</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
@@ -193,20 +195,20 @@
    <span class="identifier">export_bits</span><span class="special">(</span><span class="identifier">cpp_int</span><span class="special">(</span><span class="identifier">f</span><span class="special">.</span><span class="identifier">backend</span><span class="special">().</span><span class="identifier">bits</span><span class="special">()),</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">back_inserter</span><span class="special">(</span><span class="identifier">v</span><span class="special">),</span> <span class="number">8</span><span class="special">);</span>
    <span class="comment">// Grab the exponent as well:</span>
    <span class="keyword">int</span> <span class="identifier">e</span> <span class="special">=</span> <span class="identifier">f</span><span class="special">.</span><span class="identifier">backend</span><span class="special">().</span><span class="identifier">exponent</span><span class="special">();</span>
-   <span class="comment">// Import back again, and check for equality, we have to procede via</span>
+   <span class="comment">// Import back again, and check for equality, we have to proceed via</span>
    <span class="comment">// an intermediate integer:</span>
    <span class="identifier">cpp_int</span> <span class="identifier">i</span><span class="special">;</span>
    <span class="identifier">import_bits</span><span class="special">(</span><span class="identifier">i</span><span class="special">,</span> <span class="identifier">v</span><span class="special">.</span><span class="identifier">begin</span><span class="special">(),</span> <span class="identifier">v</span><span class="special">.</span><span class="identifier">end</span><span class="special">());</span>
    <span class="identifier">cpp_bin_float_100</span> <span class="identifier">g</span><span class="special">(</span><span class="identifier">i</span><span class="special">);</span>
    <span class="identifier">g</span><span class="special">.</span><span class="identifier">backend</span><span class="special">().</span><span class="identifier">exponent</span><span class="special">()</span> <span class="special">=</span> <span class="identifier">e</span><span class="special">;</span>
-   <span class="identifier">assert</span><span class="special">(</span><span class="identifier">f</span> <span class="special">==</span> <span class="identifier">g</span><span class="special">);</span>
+   <span class="identifier">BOOST_ASSERT</span><span class="special">(</span><span class="identifier">f</span> <span class="special">==</span> <span class="identifier">g</span><span class="special">);</span>
 <span class="special">}</span>
 </pre>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2002-2019 John Maddock
-      and Christopher Kormanyos<p>
+<td align="right"><div class="copyright-footer">Copyright © 2002-2020 John
+      Maddock and Christopher Kormanyos<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

@@ -3,6 +3,10 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
+#ifdef TEST_MPF_50
+#define BOOST_MATH_MAX_ROOT_ITERATION_POLICY 250
+#endif
+
 #include "setup.hpp"
 #include "table_type.hpp"
 #define TEST_UDT

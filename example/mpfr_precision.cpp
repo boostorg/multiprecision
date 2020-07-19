@@ -5,13 +5,13 @@
 
 //[mpfr_variable
 
-/*` 
+/*`
 This example illustrates the use of variable-precision arithmetic with
 the `mpfr_float` number type.  We'll calculate the median of the
 beta distribution to an absurdly high precision and compare the
 accuracy and times taken for various methods.  That is, we want
 to calculate the value of `x` for which ['I[sub x](a, b) = 0.5].
- 
+
 Ultimately we'll use Newtons method and set the precision of
 mpfr_float to have just enough digits at each iteration.
 
@@ -110,7 +110,7 @@ full working precision of the arguments throughout.  Our reference function take
 
 We begin by setting the default working precision to that requested, and then, since we don't know where
 our arguments `a` and `b` have been or what precision they have, we make a copy of them - note that since
-copying also copies the precision as well as the value, we have to set the precision expicitly with a 
+copying also copies the precision as well as the value, we have to set the precision expicitly with a
 second argument to the copy.  Then we can simply return the result of `ibeta_inv`:
 */
 mpfr_float beta_distribution_median_method_1(mpfr_float const& a_, mpfr_float const& b_, unsigned digits10)
@@ -135,9 +135,9 @@ would be to calculate a first approximation to `double` precision and then to us
 Our function begins the same as before: set the new default precision and then make copies of our arguments
 at the correct precision.  We then call `ibeta_inv` with all double precision arguments, promote the result
 to an `mpfr_float` and perform Newton steps to obtain the result.  Note that our termination condition is somewhat
-cude: we simply assume that we have approximately 14 digits correct from the double-precision approximation and
+crude: we simply assume that we have approximately 14 digits correct from the double-precision approximation and
 that the precision doubles with each step.  We also cheat, and use an internal Boost.Math function that calculates
-['I[sub x](a, b)] and it's derivative in one go:
+['I[sub x](a, b)] and its derivative in one go:
 
 */
 mpfr_float beta_distribution_median_method_2(mpfr_float const& a_, mpfr_float const& b_, unsigned digits10)
@@ -156,7 +156,7 @@ mpfr_float beta_distribution_median_method_2(mpfr_float const& a_, mpfr_float co
    return guess;
 }
 /*`
-Before we refine the method further, it might be wise to take stock and see how method's 1 and 2 compare.
+Before we refine the method further, it might be wise to take stock and see how methods 1 and 2 compare.
 We'll ask them both for 1500 digit precision, and compare against the value produced by `ibeta_inv` at 1700 digits.
 Here's what the results look like:
 
@@ -167,9 +167,9 @@ Method 2 time = 0.646746
 Relative error: 7.55843e-1501
 ]
 
-Clearly they are both equally accurate, but Method 1 is actually faster and our plan for improved performance 
+Clearly they are both equally accurate, but Method 1 is actually faster and our plan for improved performance
 hasn't actually worked.  It turns out that we're not actually comparing like with like, because `ibeta_inv` uses
-Halley iteration internally which churns out more digits of precision rather more rapidly than Newton iteration.  
+Halley iteration internally which churns out more digits of precision rather more rapidly than Newton iteration.
 So the time we save by refining an initial `double` approximation, then loose it again by taking more iterations
 to get to the result.
 
@@ -188,7 +188,7 @@ mpfr_float beta_distribution_median_method_3(mpfr_float const& a_, mpfr_float co
    while (current_digits < digits10)
    {
       current_digits *= 2;
-      scoped_precision sp(std::min(current_digits, digits10));
+      scoped_precision sp((std::min)(current_digits, digits10));
       mpfr_float a(a_, mpfr_float::default_precision()), b(b_, mpfr_float::default_precision());
       guess.precision(mpfr_float::default_precision());
       f = boost::math::detail::ibeta_imp(a, b, guess, boost::math::policies::policy<>(), false, true, &f1) - 0.5f;
@@ -248,5 +248,5 @@ int main()
    }
    return 0;
 }
-//]
+//] //[/mpfr_variable]
 
