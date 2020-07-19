@@ -145,14 +145,6 @@ ressol(const number<Backend, ExpressionTemplates>& a,
        eval_ressol(a.backend(), p.backend()));
 }
 
-template <typename Backend, expression_template_option ExpressionTemplates>
-inline number<Backend, ExpressionTemplates>
-ressol(const number<modular_adaptor<Backend>, ExpressionTemplates>& a)
-{
-   return number<Backend, ExpressionTemplates>(
-       eval_ressol(a.backend(), p.backend()));
-}
-
 }
 } // namespace boost::multiprecision
 
