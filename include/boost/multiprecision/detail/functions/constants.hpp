@@ -53,7 +53,7 @@ void calc_log2(T& num, unsigned digits)
    next_term    = static_cast<ui_type>(120uL);
    si_type sign = -1;
 
-  ui_type limit = digits / 3 + 1;
+   ui_type limit = digits / 3 + 1;
 
    for (ui_type n = 6; n < limit; ++n)
    {
@@ -105,9 +105,9 @@ void calc_e(T& result, unsigned digits)
       return;
    }
 
-  T lim;
-  lim = ui_type(1);
-  eval_ldexp(lim, lim, digits);
+   T lim;
+   lim = ui_type(1);
+   eval_ldexp(lim, lim, digits);
 
    //
    // Standard evaluation from the definition of e: http://functions.wolfram.com/Constants/E/02/
@@ -155,39 +155,39 @@ void calc_pi(T& result, unsigned digits)
       return;
    }
 
-  T a;
-  a = ui_type(1);
-  T b;
-  T A(a);
-  T B;
-  B = real_type(0.5f);
-  T D;
-  D = real_type(0.25f);
+   T a;
+   a = ui_type(1);
+   T b;
+   T A(a);
+   T B;
+   B = real_type(0.5f);
+   T D;
+   D = real_type(0.25f);
 
-  T lim;
-  lim = ui_type(1);
-  eval_ldexp(lim, lim, -(int)digits);
+   T lim;
+   lim = ui_type(1);
+   eval_ldexp(lim, lim, -(int)digits);
 
-  //
-  // This algorithm is from:
-  // Schonhage, A., Grotefeld, A. F. W., and Vetter, E. Fast Algorithms: A
-  // Multitape Turing Machine Implementation. BI Wissenschaftverlag, 1994. Also
-  // described in MPFR's algorithm guide: http://www.mpfr.org/algorithms.pdf.
-  //
-  // Let:
-  // a[0] = A[0] = 1
-  // B[0] = 1/2
-  // D[0] = 1/4
-  // Then:
-  // S[k+1] = (A[k]+B[k]) / 4
-  // b[k] = sqrt(B[k])
-  // a[k+1] = a[k]^2
-  // B[k+1] = 2(A[k+1]-S[k+1])
-  // D[k+1] = D[k] - 2^k(A[k+1]-B[k+1])
-  // Stop when |A[k]-B[k]| <= 2^(k-p)
-  // and PI = B[k]/D[k]
+   //
+   // This algorithm is from:
+   // Schonhage, A., Grotefeld, A. F. W., and Vetter, E. Fast Algorithms: A Multitape Turing
+   // Machine Implementation. BI Wissenschaftverlag, 1994.
+   // Also described in MPFR's algorithm guide: http://www.mpfr.org/algorithms.pdf.
+   //
+   // Let:
+   // a[0] = A[0] = 1
+   // B[0] = 1/2
+   // D[0] = 1/4
+   // Then:
+   // S[k+1] = (A[k]+B[k]) / 4
+   // b[k] = sqrt(B[k])
+   // a[k+1] = a[k]^2
+   // B[k+1] = 2(A[k+1]-S[k+1])
+   // D[k+1] = D[k] - 2^k(A[k+1]-B[k+1])
+   // Stop when |A[k]-B[k]| <= 2^(k-p)
+   // and PI = B[k]/D[k]
 
-  unsigned k = 1;
+   unsigned k = 1;
 
    do
    {
@@ -213,7 +213,7 @@ void calc_pi(T& result, unsigned digits)
       eval_ldexp(lim, lim, 1);
    } while (true);
 
-  eval_divide(result, B, D);
+   eval_divide(result, B, D);
 }
 
 template <class T, const T& (*F)(void)>
@@ -236,9 +236,8 @@ struct constant_initializer
    static const initializer init;
 };
 
-template <class T, const T &(*F)(void)>
-typename constant_initializer<T, F>::initializer const
-    constant_initializer<T, F>::init;
+template <class T, const T& (*F)(void)>
+typename constant_initializer<T, F>::initializer const constant_initializer<T, F>::init;
 
 template <class T>
 const T& get_constant_ln2()
@@ -246,22 +245,21 @@ const T& get_constant_ln2()
    static BOOST_MP_THREAD_LOCAL T    result;
    static BOOST_MP_THREAD_LOCAL long digits = 0;
 #ifndef BOOST_MP_USING_THREAD_LOCAL
-  static BOOST_MP_THREAD_LOCAL bool b = false;
-  constant_initializer<T, &get_constant_ln2<T>>::do_nothing();
+   static BOOST_MP_THREAD_LOCAL bool b = false;
+   constant_initializer<T, &get_constant_ln2<T> >::do_nothing();
 
    if (!b || (digits != boost::multiprecision::detail::digits2<number<T> >::value()))
    {
       b = true;
 #else
-  if ((digits != boost::multiprecision::detail::digits2<number<T>>::value())) {
+   if ((digits != boost::multiprecision::detail::digits2<number<T> >::value()))
+   {
 #endif
-    calc_log2(
-        result,
-        boost::multiprecision::detail::digits2<number<T, et_on>>::value());
-    digits = boost::multiprecision::detail::digits2<number<T>>::value();
-  }
+      calc_log2(result, boost::multiprecision::detail::digits2<number<T, et_on> >::value());
+      digits = boost::multiprecision::detail::digits2<number<T> >::value();
+   }
 
-  return result;
+   return result;
 }
 
 template <class T>
@@ -270,21 +268,21 @@ const T& get_constant_e()
    static BOOST_MP_THREAD_LOCAL T    result;
    static BOOST_MP_THREAD_LOCAL long digits = 0;
 #ifndef BOOST_MP_USING_THREAD_LOCAL
-  static BOOST_MP_THREAD_LOCAL bool b = false;
-  constant_initializer<T, &get_constant_e<T>>::do_nothing();
+   static BOOST_MP_THREAD_LOCAL bool b = false;
+   constant_initializer<T, &get_constant_e<T> >::do_nothing();
 
-  if (!b ||
-      (digits != boost::multiprecision::detail::digits2<number<T>>::value())) {
-    b = true;
+   if (!b || (digits != boost::multiprecision::detail::digits2<number<T> >::value()))
+   {
+      b = true;
 #else
-  if ((digits != boost::multiprecision::detail::digits2<number<T>>::value())) {
+   if ((digits != boost::multiprecision::detail::digits2<number<T> >::value()))
+   {
 #endif
-    calc_e(result,
-           boost::multiprecision::detail::digits2<number<T, et_on>>::value());
-    digits = boost::multiprecision::detail::digits2<number<T>>::value();
-  }
+      calc_e(result, boost::multiprecision::detail::digits2<number<T, et_on> >::value());
+      digits = boost::multiprecision::detail::digits2<number<T> >::value();
+   }
 
-  return result;
+   return result;
 }
 
 template <class T>
@@ -293,21 +291,21 @@ const T& get_constant_pi()
    static BOOST_MP_THREAD_LOCAL T    result;
    static BOOST_MP_THREAD_LOCAL long digits = 0;
 #ifndef BOOST_MP_USING_THREAD_LOCAL
-  static BOOST_MP_THREAD_LOCAL bool b = false;
-  constant_initializer<T, &get_constant_pi<T>>::do_nothing();
+   static BOOST_MP_THREAD_LOCAL bool b = false;
+   constant_initializer<T, &get_constant_pi<T> >::do_nothing();
 
-  if (!b ||
-      (digits != boost::multiprecision::detail::digits2<number<T>>::value())) {
-    b = true;
+   if (!b || (digits != boost::multiprecision::detail::digits2<number<T> >::value()))
+   {
+      b = true;
 #else
-  if ((digits != boost::multiprecision::detail::digits2<number<T>>::value())) {
+   if ((digits != boost::multiprecision::detail::digits2<number<T> >::value()))
+   {
 #endif
-    calc_pi(result,
-            boost::multiprecision::detail::digits2<number<T, et_on>>::value());
-    digits = boost::multiprecision::detail::digits2<number<T>>::value();
-  }
+      calc_pi(result, boost::multiprecision::detail::digits2<number<T, et_on> >::value());
+      digits = boost::multiprecision::detail::digits2<number<T> >::value();
+   }
 
-  return result;
+   return result;
 }
 
 template <class T>
@@ -316,19 +314,24 @@ const T& get_constant_one_over_epsilon()
    static BOOST_MP_THREAD_LOCAL T    result;
    static BOOST_MP_THREAD_LOCAL long digits = 0;
 #ifndef BOOST_MP_USING_THREAD_LOCAL
-  static BOOST_MP_THREAD_LOCAL bool b = false;
-  constant_initializer<T, &get_constant_one_over_epsilon<T>>::do_nothing();
+   static BOOST_MP_THREAD_LOCAL bool b = false;
+   constant_initializer<T, &get_constant_one_over_epsilon<T> >::do_nothing();
 
-  if (!b ||
-      (digits != boost::multiprecision::detail::digits2<number<T>>::value())) {
-    b = true;
+   if (!b || (digits != boost::multiprecision::detail::digits2<number<T> >::value()))
+   {
+      b = true;
 #else
-  if ((digits != boost::multiprecision::detail::digits2<number<T>>::value())) {
+   if ((digits != boost::multiprecision::detail::digits2<number<T> >::value()))
+   {
 #endif
-    typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
-    result = static_cast<ui_type>(1u);
-    eval_divide(result, std::numeric_limits<number<T>>::epsilon().backend());
-  }
+      typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
+      result = static_cast<ui_type>(1u);
+      if(std::numeric_limits<number<T> >::is_specialized)
+         eval_divide(result, std::numeric_limits<number<T> >::epsilon().backend());
+      else
+         eval_ldexp(result, result, boost::multiprecision::detail::digits2<number<T> >::value() - 1);
+      digits = boost::multiprecision::detail::digits2<number<T> >::value();
+   }
 
-  return result;
+   return result;
 }

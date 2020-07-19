@@ -42,6 +42,7 @@ lib mpfi ;
 lib mpc ;
 lib quadmath ;
 lib tommath ;
+lib f2c ;
 
 actions mp_simple_run_action
 {
@@ -70,6 +71,10 @@ mp-run-simple has_tommath.cpp tommath : : :
 mp-run-simple has_float128.cpp quadmath : : : : has_float128 ;
 exe has_intel_quad : has_intel_quad.cpp : <cxxflags>-Qoption,cpp,--extended_float_type ;
 exe has_eigen : has_eigen.cpp ;
+exe has_f2c : has_f2c.cpp f2c ;
+obj has_is_constant_evaluated : has_is_constant_evaluated.cpp ;
+obj has_constexpr_limits : has_constexpr_limits_cmd.cpp : <cxxflags>-fconstexpr-ops-limit=268435456 ;
+obj has_big_obj : has_big_obj.cpp : <cxxflags>-Wa,-mbig-obj ;
 
 explicit has_gmp ;
 explicit has_mpfr ;
@@ -79,5 +84,8 @@ explicit has_float128 ;
 explicit has_intel_quad ;
 explicit has_mpc ;
 explicit has_eigen ;
-
+explicit has_is_constant_evaluated ;
+explicit has_constexpr_limits ;
+explicit has_big_obj ;
+explicit has_f2c ;
 

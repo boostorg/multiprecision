@@ -6,25 +6,27 @@
 #ifndef BOOST_MATH_MP_TOMMATH_BACKEND_HPP
 #define BOOST_MATH_MP_TOMMATH_BACKEND_HPP
 
-#include <boost/cstdint.hpp>
-#include <boost/functional/hash_fwd.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
-#include <boost/multiprecision/detail/integer_ops.hpp>
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/rational_adaptor.hpp>
+#include <boost/multiprecision/detail/integer_ops.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <boost/cstdint.hpp>
 #include <boost/scoped_array.hpp>
+#include <boost/functional/hash_fwd.hpp>
+#include <tommath.h>
 #include <cctype>
-#include <climits>
 #include <cmath>
 #include <limits>
-#include <tommath.h>
+#include <climits>
 
-namespace boost { namespace multiprecision {
+namespace boost {
+namespace multiprecision {
 namespace backends {
 
 namespace detail {
 
-inline void check_tommath_result(unsigned v)
+template <class ErrType>
+inline void check_tommath_result(ErrType v)
 {
    if (v != MP_OKAY)
    {
@@ -36,8 +38,8 @@ inline void check_tommath_result(unsigned v)
 
 struct tommath_int;
 
-void eval_multiply(tommath_int &t, const tommath_int &o);
-void eval_add(tommath_int &t, const tommath_int &o);
+void eval_multiply(tommath_int& t, const tommath_int& o);
+void eval_add(tommath_int& t, const tommath_int& o);
 
 struct tommath_int
 {
@@ -45,11 +47,14 @@ struct tommath_int
    typedef mpl::list<boost::uint32_t, boost::ulong_long_type> unsigned_types;
    typedef mpl::list<long double>                             float_types;
 
-  tommath_int() { detail::check_tommath_result(mp_init(&m_data)); }
-  tommath_int(const tommath_int &o) {
-    detail::check_tommath_result(
-        mp_init_copy(&m_data, const_cast<::mp_int *>(&o.m_data)));
-  }
+   tommath_int()
+   {
+      detail::check_tommath_result(mp_init(&m_data));
+   }
+   tommath_int(const tommath_int& o)
+   {
+      detail::check_tommath_result(mp_init_copy(&m_data, const_cast< ::mp_int*>(&o.m_data)));
+   }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    tommath_int(tommath_int&& o) BOOST_NOEXCEPT
    {
@@ -70,13 +75,15 @@ struct tommath_int
          detail::check_tommath_result(mp_copy(const_cast< ::mp_int*>(&o.m_data), &m_data));
       return *this;
    }
+#if defined(DIGIT_BIT)
+   // Pick off 32 bit chunks for mp_set_int:
    tommath_int& operator=(boost::ulong_long_type i)
    {
       if (m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
-      boost::ulong_long_type mask  = ((1uLL << std::numeric_limits<unsigned>::digits) - 1);
-      unsigned               shift = 0;
-      ::mp_int               t;
+      boost::ulong_long_type mask = ((1uLL << 32) - 1);
+      unsigned shift = 0;
+      ::mp_int t;
       detail::check_tommath_result(mp_init(&t));
       mp_zero(&m_data);
       while (i)
@@ -85,12 +92,49 @@ struct tommath_int
          if (shift)
             detail::check_tommath_result(mp_mul_2d(&t, shift, &t));
          detail::check_tommath_result((mp_add(&m_data, &t, &m_data)));
-         shift += std::numeric_limits<unsigned>::digits;
-         i >>= std::numeric_limits<unsigned>::digits;
+         shift += 32;
+         i >>= 32;
       }
       mp_clear(&t);
       return *this;
    }
+#elif !defined(ULLONG_MAX) || (ULLONG_MAX != 18446744073709551615uLL)
+   // Pick off 64 bit chunks for mp_set_i64:
+   tommath_int& operator=(boost::ulong_long_type i)
+   {
+      if (m_data.dp == 0)
+         detail::check_tommath_result(mp_init(&m_data));
+      if(sizeof(boost::ulong_long_type) * CHAR_BIT == 64)
+      {
+         mp_set_u64(&m_data, i);
+         return *this;
+      }
+      boost::ulong_long_type mask = ((1uLL << 64) - 1);
+      unsigned shift = 0;
+      ::mp_int t;
+      detail::check_tommath_result(mp_init(&t));
+      mp_zero(&m_data);
+      while (i)
+      {
+         detail::check_tommath_result(mp_set_i64(&t, static_cast<boost::uint64_t>(i & mask)));
+         if (shift)
+            detail::check_tommath_result(mp_mul_2d(&t, shift, &t));
+         detail::check_tommath_result((mp_add(&m_data, &t, &m_data)));
+         shift += 64;
+         i >>= 64;
+      }
+      mp_clear(&t);
+      return *this;
+   }
+#else
+   tommath_int& operator=(boost::ulong_long_type i)
+   {
+      if (m_data.dp == 0)
+         detail::check_tommath_result(mp_init(&m_data));
+      mp_set_u64(&m_data, i);
+      return *this;
+   }
+#endif
    tommath_int& operator=(boost::long_long_type i)
    {
       if (m_data.dp == 0)
@@ -110,7 +154,11 @@ struct tommath_int
    {
       if (m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
+#ifdef DIGIT_BIT
       detail::check_tommath_result((mp_set_int(&m_data, i)));
+#else
+      mp_set_u32(&m_data, i);
+#endif
       return *this;
    }
    tommath_int& operator=(boost::int32_t i)
@@ -134,13 +182,21 @@ struct tommath_int
 
       if (a == 0)
       {
+#ifdef DIGIT_BIT
          detail::check_tommath_result(mp_set_int(&m_data, 0));
+#else
+         mp_set_i32(&m_data, 0);
+#endif
          return *this;
       }
 
       if (a == 1)
       {
+#ifdef DIGIT_BIT
          detail::check_tommath_result(mp_set_int(&m_data, 1));
+#else
+         mp_set_i32(&m_data, 1);
+#endif
          return *this;
       }
 
@@ -149,13 +205,23 @@ struct tommath_int
 
       int         e;
       long double f, term;
+#ifdef DIGIT_BIT
       detail::check_tommath_result(mp_set_int(&m_data, 0u));
+#else
+      mp_set_i32(&m_data, 0);
+#endif
       ::mp_int t;
       detail::check_tommath_result(mp_init(&t));
 
       f = frexp(a, &e);
 
+#ifdef DIGIT_BIT
       static const int shift = std::numeric_limits<int>::digits - 1;
+      typedef int      part_type;
+#else
+      static const int       shift = std::numeric_limits<boost::int64_t>::digits - 1;
+      typedef boost::int64_t part_type;
+#endif
 
       while (f)
       {
@@ -166,12 +232,20 @@ struct tommath_int
          detail::check_tommath_result(mp_mul_2d(&m_data, shift, &m_data));
          if (term > 0)
          {
-            detail::check_tommath_result(mp_set_int(&t, static_cast<int>(term)));
+#ifdef DIGIT_BIT
+            detail::check_tommath_result(mp_set_int(&t, static_cast<part_type>(term)));
+#else
+            mp_set_i64(&t, static_cast<part_type>(term));
+#endif
             detail::check_tommath_result(mp_add(&m_data, &t, &m_data));
          }
          else
          {
-            detail::check_tommath_result(mp_set_int(&t, static_cast<int>(-term)));
+#ifdef DIGIT_BIT
+            detail::check_tommath_result(mp_set_int(&t, static_cast<part_type>(-term)));
+#else
+            mp_set_i64(&t, static_cast<part_type>(-term));
+#endif
             detail::check_tommath_result(mp_sub(&m_data, &t, &m_data));
          }
          f -= term;
@@ -221,8 +295,12 @@ struct tommath_int
       {
          if (radix == 8 || radix == 16)
          {
-            unsigned               shift       = radix == 8 ? 3 : 4;
-            unsigned               block_count = DIGIT_BIT / shift;
+            unsigned shift = radix == 8 ? 3 : 4;
+#ifdef DIGIT_BIT
+            unsigned block_count = DIGIT_BIT / shift;
+#else
+            unsigned block_count = MP_DIGIT_BIT / shift;
+#endif
             unsigned               block_shift = shift * block_count;
             boost::ulong_long_type val, block;
             while (*s)
@@ -307,10 +385,20 @@ struct tommath_int
       //
       if ((base != 10) && m_data.sign)
          BOOST_THROW_EXCEPTION(std::runtime_error("Formatted output in bases 8 or 16 is only available for positive numbers"));
+#ifdef DIGIT_BIT
       int s;
       detail::check_tommath_result(mp_radix_size(const_cast< ::mp_int*>(&m_data), base, &s));
+#else
+      std::size_t s;
+      detail::check_tommath_result(mp_radix_size(const_cast< ::mp_int*>(&m_data), base, &s));
+#endif
       boost::scoped_array<char> a(new char[s + 1]);
+#ifdef DIGIT_BIT
       detail::check_tommath_result(mp_toradix_n(const_cast< ::mp_int*>(&m_data), a.get(), base, s + 1));
+#else
+      std::size_t written;
+      detail::check_tommath_result(mp_to_radix(&m_data, a.get(), s + 1, &written, base));
+#endif
       std::string result = a.get();
       if (f & std::ios_base::uppercase)
          for (size_t i = 0; i < result.length(); ++i)
@@ -323,6 +411,11 @@ struct tommath_int
       }
       if ((f & std::ios_base::showpos) && (result[0] != '-'))
          result.insert(static_cast<std::string::size_type>(0), 1, '+');
+      if (((f & std::ios_base::uppercase) == 0) && (base == 16))
+      {
+         for (std::size_t i = 0; i < result.size(); ++i)
+            result[i] = std::tolower(result[i]);
+      }
       return result;
    }
    ~tommath_int()
@@ -333,7 +426,7 @@ struct tommath_int
    void negate()
    {
       BOOST_ASSERT(m_data.dp);
-      mp_neg(&m_data, &m_data);
+      detail::check_tommath_result(mp_neg(&m_data, &m_data));
    }
    int compare(const tommath_int& o) const
    {
@@ -368,9 +461,15 @@ struct tommath_int
    ::mp_int m_data;
 };
 
+#ifdef SIGN
 #define BOOST_MP_TOMMATH_BIT_OP_CHECK(x) \
    if (SIGN(&x.data()))                  \
    BOOST_THROW_EXCEPTION(std::runtime_error("Bitwise operations on libtommath negative valued integers are disabled as they produce unpredictable results"))
+#else
+#define BOOST_MP_TOMMATH_BIT_OP_CHECK(x) \
+   if (mp_isneg(&x.data()))              \
+   BOOST_THROW_EXCEPTION(std::runtime_error("Bitwise operations on libtommath negative valued integers are disabled as they produce unpredictable results"))
+#endif
 
 int eval_get_sign(const tommath_int& val);
 
@@ -441,8 +540,7 @@ template <class UI>
 inline void eval_right_shift(tommath_int& t, const tommath_int& v, UI i)
 {
    tommath_int d;
-   detail::check_tommath_result(mp_div_2d(const_cast< ::mp_int*>(&v.data()),
-static_cast<unsigned long>(i), &t.data(), &d.data()));
+   detail::check_tommath_result(mp_div_2d(const_cast< ::mp_int*>(&v.data()), static_cast<unsigned long>(i), &t.data(), &d.data()));
 }
 */
 inline void eval_bitwise_and(tommath_int& result, const tommath_int& v)
@@ -530,8 +628,7 @@ inline void eval_bitwise_xor(tommath_int& result, const tommath_int& u, const to
 inline void eval_complement(tommath_int& result, const tommath_int& u)
 {
    //
-   // Although this code works, it doesn't really do what the user might
-expect....
+   // Although this code works, it doesn't really do what the user might expect....
    // and it's hard to see how it ever could.  Disabled for now:
    //
    result = u;
@@ -540,19 +637,15 @@ expect....
       result.data().dp[i] = MP_MASK & ~(result.data().dp[i]);
    }
    //
-   // We now need to pad out the left of the value with 1's to round up to a
-whole number of
-   // CHAR_BIT * sizeof(mp_digit) units.  Otherwise we'll end up with a very
-strange number of
+   // We now need to pad out the left of the value with 1's to round up to a whole number of
+   // CHAR_BIT * sizeof(mp_digit) units.  Otherwise we'll end up with a very strange number of
    // bits set!
    //
-   unsigned shift = result.data().used * DIGIT_BIT;    // How many bits we're
-actually using
-   // How many bits we actually need, reduced by one to account for a mythical
-sign bit: int padding = result.data().used *
-std::numeric_limits<mp_digit>::digits - shift - 1; while(padding >=
-std::numeric_limits<mp_digit>::digits) padding -=
-std::numeric_limits<mp_digit>::digits;
+   unsigned shift = result.data().used * DIGIT_BIT;    // How many bits we're actually using
+   // How many bits we actually need, reduced by one to account for a mythical sign bit:
+   int padding = result.data().used * std::numeric_limits<mp_digit>::digits - shift - 1; 
+   while(padding >= std::numeric_limits<mp_digit>::digits) 
+      padding -= std::numeric_limits<mp_digit>::digits;
 
    // Create a mask providing the extra bits we need and add to result:
    tommath_int mask;
@@ -561,11 +654,17 @@ std::numeric_limits<mp_digit>::digits;
    add(result, mask);
 }
 */
-inline bool eval_is_zero(const tommath_int &val) {
-  return mp_iszero(&val.data());
+inline bool eval_is_zero(const tommath_int& val)
+{
+   return mp_iszero(&val.data());
 }
-inline int eval_get_sign(const tommath_int &val) {
-  return mp_iszero(&val.data()) ? 0 : SIGN(&val.data()) ? -1 : 1;
+inline int eval_get_sign(const tommath_int& val)
+{
+#ifdef SIGN
+   return mp_iszero(&val.data()) ? 0 : SIGN(&val.data()) ? -1 : 1;
+#else
+   return mp_iszero(&val.data()) ? 0 : mp_isneg(&val.data()) ? -1 : 1;
+#endif
 }
 /*
 template <class A>
@@ -575,18 +674,15 @@ inline void eval_convert_to(A* result, const tommath_int& val)
 }
 inline void eval_convert_to(char* result, const tommath_int& val)
 {
-   *result = static_cast<char>(boost::lexical_cast<int>(val.str(0,
-std::ios_base::fmtflags(0))));
+   *result = static_cast<char>(boost::lexical_cast<int>(val.str(0, std::ios_base::fmtflags(0))));
 }
 inline void eval_convert_to(unsigned char* result, const tommath_int& val)
 {
-   *result = static_cast<unsigned char>(boost::lexical_cast<unsigned>(val.str(0,
-std::ios_base::fmtflags(0))));
+   *result = static_cast<unsigned char>(boost::lexical_cast<unsigned>(val.str(0, std::ios_base::fmtflags(0))));
 }
 inline void eval_convert_to(signed char* result, const tommath_int& val)
 {
-   *result = static_cast<signed char>(boost::lexical_cast<int>(val.str(0,
-std::ios_base::fmtflags(0))));
+   *result = static_cast<signed char>(boost::lexical_cast<int>(val.str(0, std::ios_base::fmtflags(0))));
 }
 */
 inline void eval_abs(tommath_int& result, const tommath_int& val)
@@ -647,7 +743,11 @@ inline unsigned eval_msb(const tommath_int& val)
 template <class Integer>
 inline typename enable_if<is_unsigned<Integer>, Integer>::type eval_integer_modulus(const tommath_int& x, Integer val)
 {
+#ifdef DIGIT_BIT
    static const mp_digit m = (static_cast<mp_digit>(1) << DIGIT_BIT) - 1;
+#else
+   static const mp_digit m = (static_cast<mp_digit>(1) << MP_DIGIT_BIT) - 1;
+#endif
    if (val <= m)
    {
       mp_digit d;
@@ -660,10 +760,9 @@ inline typename enable_if<is_unsigned<Integer>, Integer>::type eval_integer_modu
    }
 }
 template <class Integer>
-inline typename enable_if<is_signed<Integer>, Integer>::type
-eval_integer_modulus(const tommath_int &x, Integer val) {
-  return eval_integer_modulus(x,
-                              boost::multiprecision::detail::unsigned_abs(val));
+inline typename enable_if<is_signed<Integer>, Integer>::type eval_integer_modulus(const tommath_int& x, Integer val)
+{
+   return eval_integer_modulus(x, boost::multiprecision::detail::unsigned_abs(val));
 }
 
 inline std::size_t hash_value(const tommath_int& val)
@@ -687,8 +786,8 @@ struct number_category<tommath_int> : public mpl::int_<number_kind_integer>
 typedef number<tommath_int>           tom_int;
 typedef rational_adaptor<tommath_int> tommath_rational;
 typedef number<tommath_rational>      tom_rational;
-
-}} // namespace boost::multiprecision
+}
+} // namespace boost::multiprecision
 
 namespace std {
 
@@ -711,25 +810,25 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::tommat
    {
       return number_type();
    }
-   static number_type          lowest() { return (min)(); }
-   BOOST_STATIC_CONSTEXPR int  digits       = INT_MAX;
-   BOOST_STATIC_CONSTEXPR int  digits10     = (INT_MAX / 1000) * 301L;
-   BOOST_STATIC_CONSTEXPR int  max_digits10 = digits10 + 3;
-   BOOST_STATIC_CONSTEXPR bool is_signed    = true;
-   BOOST_STATIC_CONSTEXPR bool is_integer   = true;
-   BOOST_STATIC_CONSTEXPR bool is_exact     = true;
-   BOOST_STATIC_CONSTEXPR int  radix        = 2;
-   static number_type          epsilon() { return number_type(); }
-   static number_type          round_error() { return number_type(); }
-   BOOST_STATIC_CONSTEXPR int  min_exponent                  = 0;
-   BOOST_STATIC_CONSTEXPR int  min_exponent10                = 0;
-   BOOST_STATIC_CONSTEXPR int  max_exponent                  = 0;
-   BOOST_STATIC_CONSTEXPR int  max_exponent10                = 0;
-   BOOST_STATIC_CONSTEXPR bool has_infinity                  = false;
-   BOOST_STATIC_CONSTEXPR bool has_quiet_NaN                 = false;
-   BOOST_STATIC_CONSTEXPR bool has_signaling_NaN             = false;
-   BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm      = denorm_absent;
-   BOOST_STATIC_CONSTEXPR bool               has_denorm_loss = false;
+   static number_type                        lowest() { return (min)(); }
+   BOOST_STATIC_CONSTEXPR int                digits       = INT_MAX;
+   BOOST_STATIC_CONSTEXPR int                digits10     = (INT_MAX / 1000) * 301L;
+   BOOST_STATIC_CONSTEXPR int                max_digits10 = digits10 + 3;
+   BOOST_STATIC_CONSTEXPR bool               is_signed    = true;
+   BOOST_STATIC_CONSTEXPR bool               is_integer   = true;
+   BOOST_STATIC_CONSTEXPR bool               is_exact     = true;
+   BOOST_STATIC_CONSTEXPR int                radix        = 2;
+   static number_type                        epsilon() { return number_type(); }
+   static number_type                        round_error() { return number_type(); }
+   BOOST_STATIC_CONSTEXPR int                min_exponent      = 0;
+   BOOST_STATIC_CONSTEXPR int                min_exponent10    = 0;
+   BOOST_STATIC_CONSTEXPR int                max_exponent      = 0;
+   BOOST_STATIC_CONSTEXPR int                max_exponent10    = 0;
+   BOOST_STATIC_CONSTEXPR bool               has_infinity      = false;
+   BOOST_STATIC_CONSTEXPR bool               has_quiet_NaN     = false;
+   BOOST_STATIC_CONSTEXPR bool               has_signaling_NaN = false;
+   BOOST_STATIC_CONSTEXPR float_denorm_style has_denorm        = denorm_absent;
+   BOOST_STATIC_CONSTEXPR bool               has_denorm_loss   = false;
    static number_type                        infinity() { return number_type(); }
    static number_type                        quiet_NaN() { return number_type(); }
    static number_type                        signaling_NaN() { return number_type(); }
@@ -739,80 +838,55 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::tommat
    BOOST_STATIC_CONSTEXPR bool               is_modulo       = false;
    BOOST_STATIC_CONSTEXPR bool               traps           = false;
    BOOST_STATIC_CONSTEXPR bool               tinyness_before = false;
-   BOOST_STATIC_CONSTEXPR float_round_style round_style      = round_toward_zero;
+   BOOST_STATIC_CONSTEXPR float_round_style  round_style     = round_toward_zero;
 };
 
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
 
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::digits;
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates> >::digits;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::digits10;
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates> >::digits10;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::max_digits10;
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates> >::max_digits10;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::is_signed;
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates> >::is_signed;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::is_integer;
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates> >::is_integer;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::is_exact;
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates> >::is_exact;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::radix;
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates> >::radix;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::min_exponent;
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates> >::min_exponent;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::min_exponent10;
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates> >::min_exponent10;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::max_exponent;
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates> >::max_exponent;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::max_exponent10;
+BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates> >::max_exponent10;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::has_infinity;
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates> >::has_infinity;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::has_quiet_NaN;
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates> >::has_quiet_NaN;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<
-    boost::multiprecision::number<boost::multiprecision::tommath_int,
-                                  ExpressionTemplates>>::has_signaling_NaN;
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates> >::has_signaling_NaN;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST float_denorm_style
-    numeric_limits<boost::multiprecision::number<
-        boost::multiprecision::tommath_int, ExpressionTemplates>>::has_denorm;
+BOOST_CONSTEXPR_OR_CONST float_denorm_style numeric_limits<boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates> >::has_denorm;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::has_denorm_loss;
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates> >::has_denorm_loss;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::is_iec559;
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates> >::is_iec559;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::is_bounded;
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates> >::is_bounded;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::is_modulo;
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates> >::is_modulo;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::traps;
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates> >::traps;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::tommath_int, ExpressionTemplates>>::tinyness_before;
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates> >::tinyness_before;
 template <boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST float_round_style
-    numeric_limits<boost::multiprecision::number<
-        boost::multiprecision::tommath_int, ExpressionTemplates>>::round_style;
+BOOST_CONSTEXPR_OR_CONST float_round_style numeric_limits<boost::multiprecision::number<boost::multiprecision::tommath_int, ExpressionTemplates> >::round_style;
 
 #endif
 } // namespace std

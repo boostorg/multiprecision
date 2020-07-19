@@ -18,7 +18,7 @@ inline BOOST_CONSTEXPR unsigned current_precision_of_last_chance_imp(const boost
    return std::numeric_limits<boost::multiprecision::number<B, ET> >::digits10;
 }
 template <class B, boost::multiprecision::expression_template_option ET>
-inline unsigned current_precision_of_last_chance_imp(const boost::multiprecision::number<B, ET>& val, const mpl::true_&)
+inline BOOST_MP_CXX14_CONSTEXPR unsigned current_precision_of_last_chance_imp(const boost::multiprecision::number<B, ET>& val, const mpl::true_&)
 {
    //
    // We have an arbitrary precision integer, take it's "precision" as the
@@ -30,7 +30,7 @@ inline unsigned current_precision_of_last_chance_imp(const boost::multiprecision
 }
 
 template <class B, boost::multiprecision::expression_template_option ET>
-inline unsigned current_precision_of_imp(const boost::multiprecision::number<B, ET>& n, const mpl::true_&)
+inline BOOST_MP_CXX14_CONSTEXPR unsigned current_precision_of_imp(const boost::multiprecision::number<B, ET>& n, const mpl::true_&)
 {
    return n.precision();
 }
@@ -118,34 +118,35 @@ template <class R>
 struct scoped_default_precision<R, true>
 {
    template <class T>
-   BOOST_CXX14_CONSTEXPR scoped_default_precision(const T& a)
+   BOOST_MP_CXX14_CONSTEXPR scoped_default_precision(const T& a)
    {
       init(current_precision_of(a));
    }
    template <class T, class U>
-   BOOST_CXX14_CONSTEXPR scoped_default_precision(const T& a, const U& b)
+   BOOST_MP_CXX14_CONSTEXPR scoped_default_precision(const T& a, const U& b)
    {
       init((std::max)(current_precision_of(a), current_precision_of(b)));
    }
    template <class T, class U, class V>
-   BOOST_CXX14_CONSTEXPR scoped_default_precision(const T& a, const U& b, const V& c)
+   BOOST_MP_CXX14_CONSTEXPR scoped_default_precision(const T& a, const U& b, const V& c)
    {
       init((std::max)((std::max)(current_precision_of(a), current_precision_of(b)), current_precision_of(c)));
    }
    ~scoped_default_precision()
    {
-      R::default_precision(m_old_prec);
+      if(m_new_prec != m_old_prec)
+         R::default_precision(m_old_prec);
    }
-   BOOST_CXX14_CONSTEXPR unsigned precision() const
+   BOOST_MP_CXX14_CONSTEXPR unsigned precision() const
    {
       return m_new_prec;
    }
 
  private:
-   BOOST_CXX14_CONSTEXPR void init(unsigned p)
+   BOOST_MP_CXX14_CONSTEXPR void init(unsigned p)
    {
       m_old_prec = R::default_precision();
-      if (p)
+      if (p && (p != m_old_prec))
       {
          R::default_precision(p);
          m_new_prec = p;
@@ -157,10 +158,10 @@ struct scoped_default_precision<R, true>
 };
 
 template <class T>
-inline void maybe_promote_precision(T*, const mpl::false_&) {}
+inline BOOST_MP_CXX14_CONSTEXPR void maybe_promote_precision(T*, const mpl::false_&) {}
 
 template <class T>
-inline void maybe_promote_precision(T* obj, const mpl::true_&)
+inline BOOST_MP_CXX14_CONSTEXPR void maybe_promote_precision(T* obj, const mpl::true_&)
 {
    if (obj->precision() != T::default_precision())
    {
@@ -169,9 +170,9 @@ inline void maybe_promote_precision(T* obj, const mpl::true_&)
 }
 
 template <class T>
-inline void maybe_promote_precision(T* obj)
+inline BOOST_MP_CXX14_CONSTEXPR void maybe_promote_precision(T* obj)
 {
-   maybe_promote_precision(obj, boost::multiprecision::detail::is_variable_precision<T>());
+   maybe_promote_precision(obj, mpl::bool_<boost::multiprecision::detail::is_variable_precision<T>::value>());
 }
 
 #ifndef BOOST_NO_CXX17_IF_CONSTEXPR

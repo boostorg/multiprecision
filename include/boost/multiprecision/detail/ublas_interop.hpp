@@ -6,9 +6,7 @@
 #ifndef BOOST_MP_UBLAS_HPP
 #define BOOST_MP_UBLAS_HPP
 
-namespace boost {
-namespace numeric {
-namespace ublas {
+namespace boost { namespace numeric { namespace ublas {
 
 template <class V>
 class sparse_vector_element;
@@ -33,23 +31,16 @@ struct promote_traits<boost::multiprecision::number<Backend1, ExpressionTemplate
        number2_t, number1_t>::type promote_type;
 };
 
-template <
-    class Backend1,
-    boost::multiprecision::expression_template_option ExpressionTemplates1,
-    class Arithmetic>
-struct promote_traits<
-    boost::multiprecision::number<Backend1, ExpressionTemplates1>, Arithmetic> {
-  typedef boost::multiprecision::number<Backend1, ExpressionTemplates1>
-      promote_type;
+template <class Backend1, boost::multiprecision::expression_template_option ExpressionTemplates1, class Arithmetic>
+struct promote_traits<boost::multiprecision::number<Backend1, ExpressionTemplates1>, Arithmetic>
+{
+   typedef boost::multiprecision::number<Backend1, ExpressionTemplates1> promote_type;
 };
 
-template <
-    class Arithmetic, class Backend1,
-    boost::multiprecision::expression_template_option ExpressionTemplates1>
-struct promote_traits<
-    Arithmetic, boost::multiprecision::number<Backend1, ExpressionTemplates1>> {
-  typedef boost::multiprecision::number<Backend1, ExpressionTemplates1>
-      promote_type;
+template <class Arithmetic, class Backend1, boost::multiprecision::expression_template_option ExpressionTemplates1>
+struct promote_traits<Arithmetic, boost::multiprecision::number<Backend1, ExpressionTemplates1> >
+{
+   typedef boost::multiprecision::number<Backend1, ExpressionTemplates1> promote_type;
 };
 
 template <class Backend1, boost::multiprecision::expression_template_option ExpressionTemplates1, class tag, class Arg1, class Arg2, class Arg3, class Arg4>

@@ -1,5 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2012 John Maddock. Distributed under the Boost
+//  Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
+//  Copyright (c) 2019 Alexey Moskvin
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -20,7 +22,7 @@ namespace multiprecision {
 // NOTE: these operators have to be defined after the methods in default_ops.hpp.
 //
 template <class B>
-BOOST_MP_FORCEINLINE number<B, et_off> operator-(const number<B, et_off>& v)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number<B, et_off> operator-(const number<B, et_off>& v)
 {
    BOOST_STATIC_ASSERT_MSG(is_signed_number<B>::value, "Negating an unsigned type results in ill-defined behavior.");
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(v);
@@ -29,7 +31,7 @@ BOOST_MP_FORCEINLINE number<B, et_off> operator-(const number<B, et_off>& v)
    return result;
 }
 template <class B>
-BOOST_MP_FORCEINLINE number<B, et_off> operator~(const number<B, et_off>& v)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number<B, et_off> operator~(const number<B, et_off>& v)
 {
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(v);
    number<B, et_off>                                                    result;
@@ -40,7 +42,7 @@ BOOST_MP_FORCEINLINE number<B, et_off> operator~(const number<B, et_off>& v)
 // Addition:
 //
 template <class B>
-BOOST_MP_FORCEINLINE number<B, et_off> operator+(const number<B, et_off>& a, const number<B, et_off>& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number<B, et_off> operator+(const number<B, et_off>& a, const number<B, et_off>& b)
 {
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a, b);
    number<B, et_off>                                                    result;
@@ -49,7 +51,7 @@ BOOST_MP_FORCEINLINE number<B, et_off> operator+(const number<B, et_off>& a, con
    return result;
 }
 template <class B, class V>
-BOOST_MP_FORCEINLINE typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
 operator+(const number<B, et_off>& a, const V& b)
 {
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a);
@@ -59,7 +61,7 @@ operator+(const number<B, et_off>& a, const V& b)
    return result;
 }
 template <class V, class B>
-BOOST_MP_FORCEINLINE typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
 operator+(const V& a, const number<B, et_off>& b)
 {
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(b);
@@ -72,7 +74,7 @@ operator+(const V& a, const number<B, et_off>& b)
 // Subtraction:
 //
 template <class B>
-BOOST_MP_FORCEINLINE number<B, et_off> operator-(const number<B, et_off>& a, const number<B, et_off>& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number<B, et_off> operator-(const number<B, et_off>& a, const number<B, et_off>& b)
 {
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a, b);
    number<B, et_off>                                                    result;
@@ -81,7 +83,7 @@ BOOST_MP_FORCEINLINE number<B, et_off> operator-(const number<B, et_off>& a, con
    return result;
 }
 template <class B, class V>
-BOOST_MP_FORCEINLINE typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
 operator-(const number<B, et_off>& a, const V& b)
 {
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a);
@@ -91,7 +93,7 @@ operator-(const number<B, et_off>& a, const V& b)
    return result;
 }
 template <class V, class B>
-BOOST_MP_FORCEINLINE typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
 operator-(const V& a, const number<B, et_off>& b)
 {
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(b);
@@ -104,7 +106,7 @@ operator-(const V& a, const number<B, et_off>& b)
 // Multiply:
 //
 template <class B>
-BOOST_MP_FORCEINLINE number<B, et_off> operator*(const number<B, et_off>& a, const number<B, et_off>& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number<B, et_off> operator*(const number<B, et_off>& a, const number<B, et_off>& b)
 {
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a, b);
    number<B, et_off>                                                    result;
@@ -113,7 +115,7 @@ BOOST_MP_FORCEINLINE number<B, et_off> operator*(const number<B, et_off>& a, con
    return result;
 }
 template <class B, class V>
-BOOST_MP_FORCEINLINE typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
 operator*(const number<B, et_off>& a, const V& b)
 {
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a);
@@ -123,7 +125,7 @@ operator*(const number<B, et_off>& a, const V& b)
    return result;
 }
 template <class V, class B>
-BOOST_MP_FORCEINLINE typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
 operator*(const V& a, const number<B, et_off>& b)
 {
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(b);
@@ -136,7 +138,7 @@ operator*(const V& a, const number<B, et_off>& b)
 // divide:
 //
 template <class B>
-BOOST_MP_FORCEINLINE number<B, et_off> operator/(const number<B, et_off>& a, const number<B, et_off>& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number<B, et_off> operator/(const number<B, et_off>& a, const number<B, et_off>& b)
 {
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a, b);
    number<B, et_off>                                                    result;
@@ -145,7 +147,7 @@ BOOST_MP_FORCEINLINE number<B, et_off> operator/(const number<B, et_off>& a, con
    return result;
 }
 template <class B, class V>
-BOOST_MP_FORCEINLINE typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
 operator/(const number<B, et_off>& a, const V& b)
 {
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a);
@@ -155,7 +157,7 @@ operator/(const number<B, et_off>& a, const V& b)
    return result;
 }
 template <class V, class B>
-BOOST_MP_FORCEINLINE typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
 operator/(const V& a, const number<B, et_off>& b)
 {
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(b);
@@ -168,7 +170,7 @@ operator/(const V& a, const number<B, et_off>& b)
 // modulus:
 //
 template <class B>
-BOOST_MP_FORCEINLINE typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, et_off> >::type operator%(const number<B, et_off>& a, const number<B, et_off>& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular, number<B, et_off> >::type operator%(const number<B, et_off>& a, const number<B, et_off>& b)
 {
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a, b);
    number<B, et_off>                                                    result;
@@ -177,7 +179,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<number_category<B>::value == number_ki
    return result;
 }
 template <class B, class V>
-BOOST_MP_FORCEINLINE typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular), number<B, et_off> >::type
 operator%(const number<B, et_off>& a, const V& b)
 {
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a);
@@ -187,7 +189,7 @@ operator%(const number<B, et_off>& a, const V& b)
    return result;
 }
 template <class V, class B>
-BOOST_MP_FORCEINLINE typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular), number<B, et_off> >::type
 operator%(const V& a, const number<B, et_off>& b)
 {
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(b);
@@ -200,7 +202,7 @@ operator%(const V& a, const number<B, et_off>& b)
 // Bitwise or:
 //
 template <class B>
-BOOST_MP_FORCEINLINE typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, et_off> >::type operator|(const number<B, et_off>& a, const number<B, et_off>& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular, number<B, et_off> >::type operator|(const number<B, et_off>& a, const number<B, et_off>& b)
 {
    number<B, et_off> result;
    using default_ops::eval_bitwise_or;
@@ -208,7 +210,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<number_category<B>::value == number_ki
    return result;
 }
 template <class B, class V>
-BOOST_MP_FORCEINLINE typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular), number<B, et_off> >::type
 operator|(const number<B, et_off>& a, const V& b)
 {
    number<B, et_off> result;
@@ -217,7 +219,7 @@ operator|(const number<B, et_off>& a, const V& b)
    return result;
 }
 template <class V, class B>
-BOOST_MP_FORCEINLINE typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular), number<B, et_off> >::type
 operator|(const V& a, const number<B, et_off>& b)
 {
    number<B, et_off> result;
@@ -229,7 +231,7 @@ operator|(const V& a, const number<B, et_off>& b)
 // Bitwise xor:
 //
 template <class B>
-BOOST_MP_FORCEINLINE typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, et_off> >::type operator^(const number<B, et_off>& a, const number<B, et_off>& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular, number<B, et_off> >::type operator^(const number<B, et_off>& a, const number<B, et_off>& b)
 {
    number<B, et_off> result;
    using default_ops::eval_bitwise_xor;
@@ -237,7 +239,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<number_category<B>::value == number_ki
    return result;
 }
 template <class B, class V>
-BOOST_MP_FORCEINLINE typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular), number<B, et_off> >::type
 operator^(const number<B, et_off>& a, const V& b)
 {
    number<B, et_off> result;
@@ -246,7 +248,7 @@ operator^(const number<B, et_off>& a, const V& b)
    return result;
 }
 template <class V, class B>
-BOOST_MP_FORCEINLINE typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular), number<B, et_off> >::type
 operator^(const V& a, const number<B, et_off>& b)
 {
    number<B, et_off> result;
@@ -258,7 +260,7 @@ operator^(const V& a, const number<B, et_off>& b)
 // Bitwise and:
 //
 template <class B>
-BOOST_MP_FORCEINLINE typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, et_off> >::type operator&(const number<B, et_off>& a, const number<B, et_off>& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular, number<B, et_off> >::type operator&(const number<B, et_off>& a, const number<B, et_off>& b)
 {
    number<B, et_off> result;
    using default_ops::eval_bitwise_and;
@@ -266,7 +268,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<number_category<B>::value == number_ki
    return result;
 }
 template <class B, class V>
-BOOST_MP_FORCEINLINE typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular), number<B, et_off> >::type
 operator&(const number<B, et_off>& a, const V& b)
 {
    number<B, et_off> result;
@@ -275,7 +277,7 @@ operator&(const number<B, et_off>& a, const V& b)
    return result;
 }
 template <class V, class B>
-BOOST_MP_FORCEINLINE typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular), number<B, et_off> >::type
 operator&(const V& a, const number<B, et_off>& b)
 {
    number<B, et_off> result;
@@ -287,22 +289,22 @@ operator&(const V& a, const number<B, et_off>& b)
 // shifts:
 //
 template <class B, class I>
-BOOST_MP_FORCEINLINE typename enable_if_c<is_integral<I>::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<I>::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular), number<B, et_off> >::type
 operator<<(const number<B, et_off>& a, const I& b)
 {
    number<B, et_off> result(a);
    using default_ops::eval_left_shift;
-   detail::check_shift_range(b, mpl::bool_<(sizeof(I) > sizeof(std::size_t))>(), is_signed<I>());
+   detail::check_shift_range(b, mpl::bool_<(sizeof(I) > sizeof(std::size_t))>(), mpl::bool_<is_signed<I>::value>());
    eval_left_shift(result.backend(), b);
    return result;
 }
 template <class B, class I>
-BOOST_MP_FORCEINLINE typename enable_if_c<is_integral<I>::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<I>::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular), number<B, et_off> >::type
 operator>>(const number<B, et_off>& a, const I& b)
 {
    number<B, et_off> result(a);
    using default_ops::eval_right_shift;
-   detail::check_shift_range(b, mpl::bool_<(sizeof(I) > sizeof(std::size_t))>(), is_signed<I>());
+   detail::check_shift_range(b, mpl::bool_<(sizeof(I) > sizeof(std::size_t))>(), mpl::bool_<is_signed<I>::value>());
    eval_right_shift(result.backend(), b);
    return result;
 }
@@ -320,14 +322,14 @@ operator>>(const number<B, et_off>& a, const I& b)
 // semantics help a great deal in return by value, so performance is still pretty good...
 //
 template <class B>
-BOOST_MP_FORCEINLINE number<B, et_off> operator-(number<B, et_off>&& v)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number<B, et_off> operator-(number<B, et_off>&& v)
 {
    BOOST_STATIC_ASSERT_MSG(is_signed_number<B>::value, "Negating an unsigned type results in ill-defined behavior.");
    v.backend().negate();
    return static_cast<number<B, et_off>&&>(v);
 }
 template <class B>
-BOOST_MP_FORCEINLINE typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, et_off> >::type operator~(number<B, et_off>&& v)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular, number<B, et_off> >::type operator~(number<B, et_off>&& v)
 {
    eval_complement(v.backend(), v.backend());
    return static_cast<number<B, et_off>&&>(v);
@@ -336,7 +338,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<number_category<B>::value == number_ki
 // Addition:
 //
 template <class B>
-BOOST_MP_FORCEINLINE number<B, et_off> operator+(number<B, et_off>&& a, const number<B, et_off>& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number<B, et_off> operator+(number<B, et_off>&& a, const number<B, et_off>& b)
 {
    using default_ops::eval_add;
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a, b);
@@ -344,7 +346,7 @@ BOOST_MP_FORCEINLINE number<B, et_off> operator+(number<B, et_off>&& a, const nu
    return static_cast<number<B, et_off>&&>(a);
 }
 template <class B>
-BOOST_MP_FORCEINLINE number<B, et_off> operator+(const number<B, et_off>& a, number<B, et_off>&& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number<B, et_off> operator+(const number<B, et_off>& a, number<B, et_off>&& b)
 {
    using default_ops::eval_add;
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a, b);
@@ -352,7 +354,7 @@ BOOST_MP_FORCEINLINE number<B, et_off> operator+(const number<B, et_off>& a, num
    return static_cast<number<B, et_off>&&>(b);
 }
 template <class B>
-BOOST_MP_FORCEINLINE number<B, et_off> operator+(number<B, et_off>&& a, number<B, et_off>&& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number<B, et_off> operator+(number<B, et_off>&& a, number<B, et_off>&& b)
 {
    using default_ops::eval_add;
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a, b);
@@ -360,7 +362,7 @@ BOOST_MP_FORCEINLINE number<B, et_off> operator+(number<B, et_off>&& a, number<B
    return static_cast<number<B, et_off>&&>(a);
 }
 template <class B, class V>
-BOOST_MP_FORCEINLINE typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
 operator+(number<B, et_off>&& a, const V& b)
 {
    using default_ops::eval_add;
@@ -369,7 +371,7 @@ operator+(number<B, et_off>&& a, const V& b)
    return static_cast<number<B, et_off>&&>(a);
 }
 template <class V, class B>
-BOOST_MP_FORCEINLINE typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
 operator+(const V& a, number<B, et_off>&& b)
 {
    using default_ops::eval_add;
@@ -381,7 +383,7 @@ operator+(const V& a, number<B, et_off>&& b)
 // Subtraction:
 //
 template <class B>
-BOOST_MP_FORCEINLINE number<B, et_off> operator-(number<B, et_off>&& a, const number<B, et_off>& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number<B, et_off> operator-(number<B, et_off>&& a, const number<B, et_off>& b)
 {
    using default_ops::eval_subtract;
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a, b);
@@ -389,7 +391,7 @@ BOOST_MP_FORCEINLINE number<B, et_off> operator-(number<B, et_off>&& a, const nu
    return static_cast<number<B, et_off>&&>(a);
 }
 template <class B>
-BOOST_MP_FORCEINLINE typename enable_if<is_signed_number<B>, number<B, et_off> >::type operator-(const number<B, et_off>& a, number<B, et_off>&& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_signed_number<B>, number<B, et_off> >::type operator-(const number<B, et_off>& a, number<B, et_off>&& b)
 {
    using default_ops::eval_subtract;
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a, b);
@@ -398,7 +400,7 @@ BOOST_MP_FORCEINLINE typename enable_if<is_signed_number<B>, number<B, et_off> >
    return static_cast<number<B, et_off>&&>(b);
 }
 template <class B>
-BOOST_MP_FORCEINLINE number<B, et_off> operator-(number<B, et_off>&& a, number<B, et_off>&& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number<B, et_off> operator-(number<B, et_off>&& a, number<B, et_off>&& b)
 {
    using default_ops::eval_subtract;
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a, b);
@@ -406,7 +408,7 @@ BOOST_MP_FORCEINLINE number<B, et_off> operator-(number<B, et_off>&& a, number<B
    return static_cast<number<B, et_off>&&>(a);
 }
 template <class B, class V>
-BOOST_MP_FORCEINLINE typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
 operator-(number<B, et_off>&& a, const V& b)
 {
    using default_ops::eval_subtract;
@@ -415,7 +417,7 @@ operator-(number<B, et_off>&& a, const V& b)
    return static_cast<number<B, et_off>&&>(a);
 }
 template <class V, class B>
-BOOST_MP_FORCEINLINE typename enable_if_c<(is_compatible_arithmetic_type<V, number<B, et_off> >::value && is_signed_number<B>::value), number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<(is_compatible_arithmetic_type<V, number<B, et_off> >::value && is_signed_number<B>::value), number<B, et_off> >::type
 operator-(const V& a, number<B, et_off>&& b)
 {
    using default_ops::eval_subtract;
@@ -428,7 +430,7 @@ operator-(const V& a, number<B, et_off>&& b)
 // Multiply:
 //
 template <class B>
-BOOST_MP_FORCEINLINE number<B, et_off> operator*(number<B, et_off>&& a, const number<B, et_off>& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number<B, et_off> operator*(number<B, et_off>&& a, const number<B, et_off>& b)
 {
    using default_ops::eval_multiply;
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a, b);
@@ -436,7 +438,7 @@ BOOST_MP_FORCEINLINE number<B, et_off> operator*(number<B, et_off>&& a, const nu
    return static_cast<number<B, et_off>&&>(a);
 }
 template <class B>
-BOOST_MP_FORCEINLINE number<B, et_off> operator*(const number<B, et_off>& a, number<B, et_off>&& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number<B, et_off> operator*(const number<B, et_off>& a, number<B, et_off>&& b)
 {
    using default_ops::eval_multiply;
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a, b);
@@ -444,7 +446,7 @@ BOOST_MP_FORCEINLINE number<B, et_off> operator*(const number<B, et_off>& a, num
    return static_cast<number<B, et_off>&&>(b);
 }
 template <class B>
-BOOST_MP_FORCEINLINE number<B, et_off> operator*(number<B, et_off>&& a, number<B, et_off>&& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number<B, et_off> operator*(number<B, et_off>&& a, number<B, et_off>&& b)
 {
    using default_ops::eval_multiply;
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a, b);
@@ -452,7 +454,7 @@ BOOST_MP_FORCEINLINE number<B, et_off> operator*(number<B, et_off>&& a, number<B
    return static_cast<number<B, et_off>&&>(a);
 }
 template <class B, class V>
-BOOST_MP_FORCEINLINE typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
 operator*(number<B, et_off>&& a, const V& b)
 {
    using default_ops::eval_multiply;
@@ -461,7 +463,7 @@ operator*(number<B, et_off>&& a, const V& b)
    return static_cast<number<B, et_off>&&>(a);
 }
 template <class V, class B>
-BOOST_MP_FORCEINLINE typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
 operator*(const V& a, number<B, et_off>&& b)
 {
    using default_ops::eval_multiply;
@@ -473,7 +475,7 @@ operator*(const V& a, number<B, et_off>&& b)
 // divide:
 //
 template <class B>
-BOOST_MP_FORCEINLINE number<B, et_off> operator/(number<B, et_off>&& a, const number<B, et_off>& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number<B, et_off> operator/(number<B, et_off>&& a, const number<B, et_off>& b)
 {
    using default_ops::eval_divide;
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a, b);
@@ -481,7 +483,7 @@ BOOST_MP_FORCEINLINE number<B, et_off> operator/(number<B, et_off>&& a, const nu
    return static_cast<number<B, et_off>&&>(a);
 }
 template <class B, class V>
-BOOST_MP_FORCEINLINE typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if<is_compatible_arithmetic_type<V, number<B, et_off> >, number<B, et_off> >::type
 operator/(number<B, et_off>&& a, const V& b)
 {
    using default_ops::eval_divide;
@@ -493,7 +495,7 @@ operator/(number<B, et_off>&& a, const V& b)
 // modulus:
 //
 template <class B>
-BOOST_MP_FORCEINLINE typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, et_off> >::type operator%(number<B, et_off>&& a, const number<B, et_off>& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular, number<B, et_off> >::type operator%(number<B, et_off>&& a, const number<B, et_off>& b)
 {
    using default_ops::eval_modulus;
    detail::scoped_default_precision<multiprecision::number<B, et_off> > precision_guard(a, b);
@@ -501,7 +503,7 @@ BOOST_MP_FORCEINLINE typename enable_if_c<number_category<B>::value == number_ki
    return static_cast<number<B, et_off>&&>(a);
 }
 template <class B, class V>
-BOOST_MP_FORCEINLINE typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular), number<B, et_off> >::type
 operator%(number<B, et_off>&& a, const V& b)
 {
    using default_ops::eval_modulus;
@@ -513,28 +515,28 @@ operator%(number<B, et_off>&& a, const V& b)
 // Bitwise or:
 //
 template <class B>
-BOOST_MP_FORCEINLINE typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, et_off> >::type operator|(number<B, et_off>&& a, const number<B, et_off>& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular, number<B, et_off> >::type operator|(number<B, et_off>&& a, const number<B, et_off>& b)
 {
    using default_ops::eval_bitwise_or;
    eval_bitwise_or(a.backend(), b.backend());
    return static_cast<number<B, et_off>&&>(a);
 }
 template <class B>
-BOOST_MP_FORCEINLINE typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, et_off> >::type operator|(const number<B, et_off>& a, number<B, et_off>&& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular, number<B, et_off> >::type operator|(const number<B, et_off>& a, number<B, et_off>&& b)
 {
    using default_ops::eval_bitwise_or;
    eval_bitwise_or(b.backend(), a.backend());
    return static_cast<number<B, et_off>&&>(b);
 }
 template <class B>
-BOOST_MP_FORCEINLINE typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, et_off> >::type operator|(number<B, et_off>&& a, number<B, et_off>&& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular, number<B, et_off> >::type operator|(number<B, et_off>&& a, number<B, et_off>&& b)
 {
    using default_ops::eval_bitwise_or;
    eval_bitwise_or(a.backend(), b.backend());
    return static_cast<number<B, et_off>&&>(a);
 }
 template <class B, class V>
-BOOST_MP_FORCEINLINE typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular), number<B, et_off> >::type
 operator|(number<B, et_off>&& a, const V& b)
 {
    using default_ops::eval_bitwise_or;
@@ -542,7 +544,7 @@ operator|(number<B, et_off>&& a, const V& b)
    return static_cast<number<B, et_off>&&>(a);
 }
 template <class V, class B>
-BOOST_MP_FORCEINLINE typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular), number<B, et_off> >::type
 operator|(const V& a, number<B, et_off>&& b)
 {
    using default_ops::eval_bitwise_or;
@@ -553,28 +555,28 @@ operator|(const V& a, number<B, et_off>&& b)
 // Bitwise xor:
 //
 template <class B>
-BOOST_MP_FORCEINLINE typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, et_off> >::type operator^(number<B, et_off>&& a, const number<B, et_off>& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular, number<B, et_off> >::type operator^(number<B, et_off>&& a, const number<B, et_off>& b)
 {
    using default_ops::eval_bitwise_xor;
    eval_bitwise_xor(a.backend(), b.backend());
    return static_cast<number<B, et_off>&&>(a);
 }
 template <class B>
-BOOST_MP_FORCEINLINE typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, et_off> >::type operator^(const number<B, et_off>& a, number<B, et_off>&& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular, number<B, et_off> >::type operator^(const number<B, et_off>& a, number<B, et_off>&& b)
 {
    using default_ops::eval_bitwise_xor;
    eval_bitwise_xor(b.backend(), a.backend());
    return static_cast<number<B, et_off>&&>(b);
 }
 template <class B>
-BOOST_MP_FORCEINLINE typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, et_off> >::type operator^(number<B, et_off>&& a, number<B, et_off>&& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular, number<B, et_off> >::type operator^(number<B, et_off>&& a, number<B, et_off>&& b)
 {
    using default_ops::eval_bitwise_xor;
    eval_bitwise_xor(a.backend(), b.backend());
    return static_cast<number<B, et_off>&&>(a);
 }
 template <class B, class V>
-BOOST_MP_FORCEINLINE typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular), number<B, et_off> >::type
 operator^(number<B, et_off>&& a, const V& b)
 {
    using default_ops::eval_bitwise_xor;
@@ -582,7 +584,7 @@ operator^(number<B, et_off>&& a, const V& b)
    return static_cast<number<B, et_off>&&>(a);
 }
 template <class V, class B>
-BOOST_MP_FORCEINLINE typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular), number<B, et_off> >::type
 operator^(const V& a, number<B, et_off>&& b)
 {
    using default_ops::eval_bitwise_xor;
@@ -593,28 +595,28 @@ operator^(const V& a, number<B, et_off>&& b)
 // Bitwise and:
 //
 template <class B>
-BOOST_MP_FORCEINLINE typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, et_off> >::type operator&(number<B, et_off>&& a, const number<B, et_off>& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular, number<B, et_off> >::type operator&(number<B, et_off>&& a, const number<B, et_off>& b)
 {
    using default_ops::eval_bitwise_and;
    eval_bitwise_and(a.backend(), b.backend());
    return static_cast<number<B, et_off>&&>(a);
 }
 template <class B>
-BOOST_MP_FORCEINLINE typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, et_off> >::type operator&(const number<B, et_off>& a, number<B, et_off>&& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular, number<B, et_off> >::type operator&(const number<B, et_off>& a, number<B, et_off>&& b)
 {
    using default_ops::eval_bitwise_and;
    eval_bitwise_and(b.backend(), a.backend());
    return static_cast<number<B, et_off>&&>(b);
 }
 template <class B>
-BOOST_MP_FORCEINLINE typename enable_if_c<number_category<B>::value == number_kind_integer, number<B, et_off> >::type operator&(number<B, et_off>&& a, number<B, et_off>&& b)
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular, number<B, et_off> >::type operator&(number<B, et_off>&& a, number<B, et_off>&& b)
 {
    using default_ops::eval_bitwise_and;
    eval_bitwise_and(a.backend(), b.backend());
    return static_cast<number<B, et_off>&&>(a);
 }
 template <class B, class V>
-BOOST_MP_FORCEINLINE typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular), number<B, et_off> >::type
 operator&(number<B, et_off>&& a, const V& b)
 {
    using default_ops::eval_bitwise_and;
@@ -622,7 +624,7 @@ operator&(number<B, et_off>&& a, const V& b)
    return static_cast<number<B, et_off>&&>(a);
 }
 template <class V, class B>
-BOOST_MP_FORCEINLINE typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_off> >::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular), number<B, et_off> >::type
 operator&(const V& a, number<B, et_off>&& b)
 {
    using default_ops::eval_bitwise_and;
@@ -633,7 +635,7 @@ operator&(const V& a, number<B, et_off>&& b)
 // shifts:
 //
 template <class B, class I>
-BOOST_MP_FORCEINLINE typename enable_if_c<is_integral<I>::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<I>::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular), number<B, et_off> >::type
 operator<<(number<B, et_off>&& a, const I& b)
 {
    using default_ops::eval_left_shift;
@@ -641,7 +643,7 @@ operator<<(number<B, et_off>&& a, const I& b)
    return static_cast<number<B, et_off>&&>(a);
 }
 template <class B, class I>
-BOOST_MP_FORCEINLINE typename enable_if_c<is_integral<I>::value && (number_category<B>::value == number_kind_integer), number<B, et_off> >::type
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<I>::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular), number<B, et_off> >::type
 operator>>(number<B, et_off>&& a, const I& b)
 {
    using default_ops::eval_right_shift;

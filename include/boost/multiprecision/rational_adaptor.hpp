@@ -186,16 +186,16 @@ struct rational_adaptor
    {
       // Saving
       integer_type n(m_value.numerator()), d(m_value.denominator());
-      ar&          boost::serialization::make_nvp("numerator", n);
-      ar&          boost::serialization::make_nvp("denominator", d);
+      ar&          boost::make_nvp("numerator", n);
+      ar&          boost::make_nvp("denominator", d);
    }
    template <class Archive>
    void serialize(Archive& ar, const mpl::false_&)
    {
       // Loading
       integer_type n, d;
-      ar&          boost::serialization::make_nvp("numerator", n);
-      ar&          boost::serialization::make_nvp("denominator", d);
+      ar&          boost::make_nvp("numerator", n);
+      ar&          boost::make_nvp("denominator", d);
       m_value.assign(n, d);
    }
    template <class Archive>
@@ -303,9 +303,9 @@ struct number_category<backends::rational_adaptor<IntBackend> > : public mpl::in
 using boost::multiprecision::backends::rational_adaptor;
 
 template <class Backend, expression_template_option ExpressionTemplates>
-struct component_type<
-    number<backends::rational_adaptor<Backend>, ExpressionTemplates>> {
-  typedef number<Backend, ExpressionTemplates> type;
+struct component_type<number<backends::rational_adaptor<Backend>, ExpressionTemplates> >
+{
+   typedef number<Backend, ExpressionTemplates> type;
 };
 
 template <class IntBackend, expression_template_option ET>
@@ -357,16 +357,10 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::ration
 
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
 
-template <class IntBackend,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::rational_adaptor<IntBackend>,
-    ExpressionTemplates>>::is_integer;
-template <class IntBackend,
-          boost::multiprecision::expression_template_option ExpressionTemplates>
-BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
-    boost::multiprecision::rational_adaptor<IntBackend>,
-    ExpressionTemplates>>::is_exact;
+template <class IntBackend, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adaptor<IntBackend>, ExpressionTemplates> >::is_integer;
+template <class IntBackend, boost::multiprecision::expression_template_option ExpressionTemplates>
+BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<boost::multiprecision::rational_adaptor<IntBackend>, ExpressionTemplates> >::is_exact;
 
 #endif
 

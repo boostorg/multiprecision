@@ -1,3 +1,12 @@
+#---------------------------------------------------------------------------#
+# Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+# Copyright (c) 2018-2020 Alexey Moskvin
+#
+# Distributed under the Boost Software License, Version 1.0
+# See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt
+#---------------------------------------------------------------------------#
+#
 # Try to find the MPFR library
 # See http://www.mpfr.org/
 #
@@ -8,17 +17,11 @@
 # Once done this will define
 #
 #  MPFR_FOUND - system has MPFR lib with correct version
-#  MPFR_INCLUDES - the MPFR include directory
+#  MPFR_INCLUDE_DIRS - the MPFR include directory
 #  MPFR_LIBRARIES - the MPFR library
 #  MPFR_VERSION - MPFR version
 
-# Copyright (c) 2006, 2007 Montel Laurent, <montel@kde.org>
-# Copyright (c) 2008, 2009 Gael Guennebaud, <g.gael@free.fr>
-# Copyright (c) 2010 Jitse Niesen, <jitse@maths.leeds.ac.uk>
-# Copyright (c) 2015 Jack Poulson, <jack.poulson@gmail.com>
-# Redistribution and use is allowed according to the terms of the BSD license.
-
-find_path(MPFR_INCLUDES NAMES mpfr.h PATHS $ENV{GMPDIR} $ENV{MPFRDIR}
+find_path(MPFR_INCLUDE_DIRS NAMES mpfr.h PATHS $ENV{GMPDIR} $ENV{MPFRDIR}
           ${INCLUDE_INSTALL_DIR})
 
 # Set MPFR_FIND_VERSION to 1.0.0 if no minimum version is specified
@@ -36,9 +39,9 @@ if(NOT MPFR_FIND_VERSION)
         "${MPFR_FIND_VERSION_MAJOR}.${MPFR_FIND_VERSION_MINOR}.${MPFR_FIND_VERSION_PATCH}")
 endif()
 
-if(MPFR_INCLUDES)
+if(MPFR_INCLUDE_DIRS)
     # Query MPFR_VERSION
-    file(READ "${MPFR_INCLUDES}/mpfr.h" _mpfr_version_header)
+    file(READ "${MPFR_INCLUDE_DIRS}/mpfr.h" _mpfr_version_header)
 
     string(REGEX MATCH "define[ \t]+MPFR_VERSION_MAJOR[ \t]+([0-9]+)"
            _mpfr_major_version_match "${_mpfr_version_header}")
@@ -56,7 +59,7 @@ if(MPFR_INCLUDES)
     # Check whether found version exceeds minimum required
     if(${MPFR_VERSION} VERSION_LESS ${MPFR_FIND_VERSION})
         set(MPFR_VERSION_OK FALSE)
-        message(STATUS "MPFR version ${MPFR_VERSION} found in ${MPFR_INCLUDES}, "
+        message(STATUS "MPFR version ${MPFR_VERSION} found in ${MPFR_INCLUDE_DIRS}, "
                 "but at least version ${MPFR_FIND_VERSION} is required")
     else()
         set(MPFR_VERSION_OK TRUE)
@@ -68,5 +71,5 @@ find_library(MPFR_LIBRARIES mpfr
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(MPFR DEFAULT_MSG
-                                  MPFR_INCLUDES MPFR_LIBRARIES MPFR_VERSION_OK)
-mark_as_advanced(MPFR_INCLUDES MPFR_LIBRARIES)
+                                  MPFR_INCLUDE_DIRS MPFR_LIBRARIES MPFR_VERSION_OK)
+mark_as_advanced(MPFR_INCLUDE_DIRS MPFR_LIBRARIES)
