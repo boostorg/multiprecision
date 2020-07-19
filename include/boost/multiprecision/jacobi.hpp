@@ -1,7 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation AG
-// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
-// Copyright (c) 2018-2019 Alexey Moskvin
+// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -11,13 +9,13 @@
 #ifndef BOOST_MULTIPRECISION_JACOBI_HPP
 #define BOOST_MULTIPRECISION_JACOBI_HPP
 
-#include <boost/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/detail/default_ops.hpp>
 
 namespace boost {
 namespace multiprecision {
 
 template <typename Backend>
-inline limb_type eval_jacobi(const Backend& a, const Backend& n)
+inline int eval_jacobi(const Backend& a, const Backend& n)
 {
    using default_ops::eval_get_sign;
    using default_ops::eval_gt;
@@ -64,7 +62,7 @@ inline limb_type eval_jacobi(const Backend& a, const Backend& n)
       eval_right_shift(x, shifts);
       if (eval_integer_modulus(shifts, 2))
       {
-         limb_type y_mod_8 = eval_integer_modulus(y, 8);
+         std::size_t y_mod_8 = eval_integer_modulus(y, 8);
          if (y_mod_8 == 3 || y_mod_8 == 5)
          {
             J = -J;
@@ -91,7 +89,7 @@ inline limb_type eval_jacobi(const Backend& a, const Backend& n)
  * @return (n / m)
  */
 template <typename Backend, expression_template_option ExpressionTemplates>
-inline typename std::enable_if<number_category<Backend>::value == number_kind_integer, limb_type>::type jacobi(
+inline typename std::enable_if<number_category<Backend>::value == number_kind_integer, int>::type jacobi(
     const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& n)
 {
    return number<Backend, ExpressionTemplates>(eval_jacobi(a.backend(), n.backend()));

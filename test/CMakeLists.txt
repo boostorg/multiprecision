@@ -423,7 +423,23 @@ if(FLOAT128_COMPILED)
     add_dependencies(multiprecision_test_suite_arithmetic_tests multiprecision_test_test_complex128)
 endif()
 
-set(LOCAL_SOURCES test_exp.cpp test_log.cpp test_pow.cpp test_sinh.cpp test_sqrt.cpp test_cosh.cpp test_tanh.cpp test_sin.cpp test_cos.cpp test_tan.cpp test_asin.cpp test_acos.cpp test_atan.cpp test_round.cpp test_fpclassify.cpp test_sf_import_c99.cpp)
+set(LOCAL_SOURCES
+    test_exp.cpp
+    test_log.cpp
+    test_pow.cpp
+    test_sinh.cpp
+    test_sqrt.cpp
+    test_cosh.cpp
+    test_tanh.cpp
+    test_sin.cpp
+    test_cos.cpp
+    test_tan.cpp
+    test_asin.cpp
+    test_acos.cpp
+    test_atan.cpp
+    test_round.cpp
+    test_fpclassify.cpp
+    test_sf_import_c99.cpp)
 foreach(FILE ${LOCAL_SOURCES})
     get_filename_component(NAME ${FILE} NAME_WE)
     if(GMP_COMPILED)
@@ -1539,6 +1555,23 @@ if(TOMMATH_COMPILED)
     target_compile_definitions(multiprecision_test_test_modular_adaptor_tommath PUBLIC -DTEST_TOMMATH)
 endif()
 
+cm_test(NAME multiprecision_test_test_jacobi_cpp_int SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_jacobi.cpp)
+target_compile_definitions(multiprecision_test_test_jacobi_cpp_int PUBLIC -DTEST_CPP_INT)
+target_link_libraries(multiprecision_test_test_jacobi_cpp_int no_eh_support)
+
+if(GMP_COMPILED)
+    cm_test(NAME multiprecision_test_test_jacobi_gmp SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_jacobi.cpp)
+    target_link_libraries(multiprecision_test_test_jacobi_gmp ${GMP_LIBRARIES})
+    target_include_directories(multiprecision_test_test_jacobi_gmp PRIVATE ${GMP_INCLUDE_DIRS})
+    target_compile_definitions(multiprecision_test_test_jacobi_gmp PUBLIC -DTEST_GMP)
+endif()
+
+if(TOMMATH_COMPILED)
+    cm_test(NAME multiprecision_test_test_jacobi_tommath SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_jacobi.cpp)
+    target_link_libraries(multiprecision_test_test_jacobi_tommath ${TomMath_LIBRARIES})
+    target_include_directories(multiprecision_test_test_jacobi_tommath PRIVATE ${TomMath_INCLUDE_DIRS})
+    target_compile_definitions(multiprecision_test_test_jacobi_tommath PUBLIC -DTEST_TOMMATH)
+endif()
 
 include_directories(${CMAKE_WORKSPACE_SOURCES_DIR})
 
