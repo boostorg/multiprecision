@@ -831,6 +831,8 @@ test-suite misc :
       [ compile test_nothrow_gmp.cpp : [ check-target-builds ../config//has_gmp : : <build>no ] ]
       [ compile test_nothrow_mpfr.cpp : [ check-target-builds ../config//has_mpfr : : <build>no ] ]
 
+      [ run roundtrip.cpp : : : [ check-target-builds ../config//has_float128 : <source>quadmath : ] ]
+
       [ run test_miller_rabin.cpp no_eh_support gmp
               : # command line
               : # input files
