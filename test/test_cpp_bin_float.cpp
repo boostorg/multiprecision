@@ -610,6 +610,185 @@ void test_special_cases()
    BOOST_CHECK_EQUAL(good_type(test_type(-b - -a)), good_type(-gb - -ga));
    BOOST_CHECK_EQUAL(good_type(test_type(-a + -b)), good_type(-ga + -gb));
    BOOST_CHECK_EQUAL(good_type(test_type(-b + -a)), good_type(-gb + -ga));
+
+   a = boost::math::float_next(test_type(1));
+   ga = boost::math::float_next(good_type(1));
+   b  = ldexp(boost::math::float_prior(test_type(1)), -std::numeric_limits<test_type>::digits);
+   gb = ldexp(boost::math::float_prior(good_type(1)), -std::numeric_limits<test_type>::digits);
+   BOOST_CHECK_EQUAL(good_type(test_type(a - b)), good_type(ga - gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b - a)), good_type(gb - ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(a + b)), good_type(ga + gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b + a)), good_type(gb + ga));
+
+   BOOST_CHECK_EQUAL(good_type(test_type(a - -b)), good_type(ga - -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b - -a)), good_type(gb - -ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(a + -b)), good_type(ga + -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b + -a)), good_type(gb + -ga));
+
+   BOOST_CHECK_EQUAL(good_type(test_type(-a - b)), good_type(-ga - gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b - a)), good_type(-gb - ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(-a + b)), good_type(-ga + gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b + a)), good_type(-gb + ga));
+
+   BOOST_CHECK_EQUAL(good_type(test_type(-a - -b)), good_type(-ga - -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b - -a)), good_type(-gb - -ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(-a + -b)), good_type(-ga + -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b + -a)), good_type(-gb + -ga));
+
+   b = ldexp(b, -1);
+   gb = ldexp(gb, -1);
+   BOOST_CHECK_EQUAL(good_type(test_type(a - b)), good_type(ga - gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b - a)), good_type(gb - ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(a + b)), good_type(ga + gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b + a)), good_type(gb + ga));
+
+   BOOST_CHECK_EQUAL(good_type(test_type(a - -b)), good_type(ga - -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b - -a)), good_type(gb - -ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(a + -b)), good_type(ga + -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b + -a)), good_type(gb + -ga));
+
+   BOOST_CHECK_EQUAL(good_type(test_type(-a - b)), good_type(-ga - gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b - a)), good_type(-gb - ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(-a + b)), good_type(-ga + gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b + a)), good_type(-gb + ga));
+
+   BOOST_CHECK_EQUAL(good_type(test_type(-a - -b)), good_type(-ga - -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b - -a)), good_type(-gb - -ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(-a + -b)), good_type(-ga + -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b + -a)), good_type(-gb + -ga));
+
+   a = 1.75;  // even mantissa, not a power of 2
+   ga = 1.75;
+   b  = ldexp(test_type(1), -std::numeric_limits<test_type>::digits);
+   gb = ldexp(good_type(1), -std::numeric_limits<test_type>::digits);
+   BOOST_CHECK_EQUAL(good_type(test_type(a - b)), good_type(ga - gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b - a)), good_type(gb - ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(a + b)), good_type(ga + gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b + a)), good_type(gb + ga));
+
+   BOOST_CHECK_EQUAL(good_type(test_type(a - -b)), good_type(ga - -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b - -a)), good_type(gb - -ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(a + -b)), good_type(ga + -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b + -a)), good_type(gb + -ga));
+
+   BOOST_CHECK_EQUAL(good_type(test_type(-a - b)), good_type(-ga - gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b - a)), good_type(-gb - ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(-a + b)), good_type(-ga + gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b + a)), good_type(-gb + ga));
+
+   BOOST_CHECK_EQUAL(good_type(test_type(-a - -b)), good_type(-ga - -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b - -a)), good_type(-gb - -ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(-a + -b)), good_type(-ga + -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b + -a)), good_type(-gb + -ga));
+   b = ldexp(b, -1);
+   gb = ldexp(gb, -1);
+   BOOST_CHECK_EQUAL(good_type(test_type(a - b)), good_type(ga - gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b - a)), good_type(gb - ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(a + b)), good_type(ga + gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b + a)), good_type(gb + ga));
+
+   BOOST_CHECK_EQUAL(good_type(test_type(a - -b)), good_type(ga - -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b - -a)), good_type(gb - -ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(a + -b)), good_type(ga + -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b + -a)), good_type(gb + -ga));
+
+   BOOST_CHECK_EQUAL(good_type(test_type(-a - b)), good_type(-ga - gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b - a)), good_type(-gb - ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(-a + b)), good_type(-ga + gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b + a)), good_type(-gb + ga));
+
+   BOOST_CHECK_EQUAL(good_type(test_type(-a - -b)), good_type(-ga - -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b - -a)), good_type(-gb - -ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(-a + -b)), good_type(-ga + -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b + -a)), good_type(-gb + -ga));
+
+   b  = ldexp(boost::math::float_prior(test_type(1)), -std::numeric_limits<test_type>::digits);
+   gb = ldexp(boost::math::float_prior(good_type(1)), -std::numeric_limits<test_type>::digits);
+   BOOST_CHECK_EQUAL(good_type(test_type(a - b)), good_type(ga - gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b - a)), good_type(gb - ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(a + b)), good_type(ga + gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b + a)), good_type(gb + ga));
+
+   BOOST_CHECK_EQUAL(good_type(test_type(a - -b)), good_type(ga - -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b - -a)), good_type(gb - -ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(a + -b)), good_type(ga + -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b + -a)), good_type(gb + -ga));
+
+   BOOST_CHECK_EQUAL(good_type(test_type(-a - b)), good_type(-ga - gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b - a)), good_type(-gb - ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(-a + b)), good_type(-ga + gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b + a)), good_type(-gb + ga));
+
+   BOOST_CHECK_EQUAL(good_type(test_type(-a - -b)), good_type(-ga - -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b - -a)), good_type(-gb - -ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(-a + -b)), good_type(-ga + -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b + -a)), good_type(-gb + -ga));
+
+   b  = ldexp(b, -1);
+   gb = ldexp(gb, -1);
+   BOOST_CHECK_EQUAL(good_type(test_type(a - b)), good_type(ga - gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b - a)), good_type(gb - ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(a + b)), good_type(ga + gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b + a)), good_type(gb + ga));
+
+   BOOST_CHECK_EQUAL(good_type(test_type(a - -b)), good_type(ga - -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b - -a)), good_type(gb - -ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(a + -b)), good_type(ga + -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b + -a)), good_type(gb + -ga));
+
+   BOOST_CHECK_EQUAL(good_type(test_type(-a - b)), good_type(-ga - gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b - a)), good_type(-gb - ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(-a + b)), good_type(-ga + gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b + a)), good_type(-gb + ga));
+
+   BOOST_CHECK_EQUAL(good_type(test_type(-a - -b)), good_type(-ga - -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b - -a)), good_type(-gb - -ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(-a + -b)), good_type(-ga + -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b + -a)), good_type(-gb + -ga));
+
+   b  = ldexp(test_type(0.75), -std::numeric_limits<test_type>::digits);  // even mantissa not a power of 2.
+   gb = ldexp(good_type(0.75), -std::numeric_limits<test_type>::digits);
+   BOOST_CHECK_EQUAL(good_type(test_type(a - b)), good_type(ga - gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b - a)), good_type(gb - ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(a + b)), good_type(ga + gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b + a)), good_type(gb + ga));
+
+   BOOST_CHECK_EQUAL(good_type(test_type(a - -b)), good_type(ga - -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b - -a)), good_type(gb - -ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(a + -b)), good_type(ga + -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b + -a)), good_type(gb + -ga));
+
+   BOOST_CHECK_EQUAL(good_type(test_type(-a - b)), good_type(-ga - gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b - a)), good_type(-gb - ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(-a + b)), good_type(-ga + gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b + a)), good_type(-gb + ga));
+
+   BOOST_CHECK_EQUAL(good_type(test_type(-a - -b)), good_type(-ga - -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b - -a)), good_type(-gb - -ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(-a + -b)), good_type(-ga + -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b + -a)), good_type(-gb + -ga));
+
+   b  = ldexp(b, -1);
+   gb = ldexp(gb, -1);
+   BOOST_CHECK_EQUAL(good_type(test_type(a - b)), good_type(ga - gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b - a)), good_type(gb - ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(a + b)), good_type(ga + gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b + a)), good_type(gb + ga));
+
+   BOOST_CHECK_EQUAL(good_type(test_type(a - -b)), good_type(ga - -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b - -a)), good_type(gb - -ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(a + -b)), good_type(ga + -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(b + -a)), good_type(gb + -ga));
+
+   BOOST_CHECK_EQUAL(good_type(test_type(-a - b)), good_type(-ga - gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b - a)), good_type(-gb - ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(-a + b)), good_type(-ga + gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b + a)), good_type(-gb + ga));
+
+   BOOST_CHECK_EQUAL(good_type(test_type(-a - -b)), good_type(-ga - -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b - -a)), good_type(-gb - -ga));
+   BOOST_CHECK_EQUAL(good_type(test_type(-a + -b)), good_type(-ga + -gb));
+   BOOST_CHECK_EQUAL(good_type(test_type(-b + -a)), good_type(-gb + -ga));
 }
 
 int main()
