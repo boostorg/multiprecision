@@ -405,6 +405,7 @@ struct tester
       BOOST_CHECK_EQUAL(mpz_int(large_ui ^ a).str(), test_type(large_ui ^ a1).str());
       BOOST_CHECK_EQUAL(mpz_int(gcd(a, large_ui)).str(), test_type(gcd(a1, large_ui)).str());
       BOOST_CHECK_EQUAL(mpz_int(gcd(large_ui, b)).str(), test_type(gcd(large_ui, b1)).str());
+      BOOST_CHECK_EQUAL(mpz_int(gcd(c, large_ui)).str(), test_type(gcd(c1, large_ui)).str());
       BOOST_CHECK_EQUAL(mpz_int(lcm(c, large_ui)).str(), test_type(lcm(c1, large_ui)).str());
       BOOST_CHECK_EQUAL(mpz_int(lcm(large_ui, d)).str(), test_type(lcm(large_ui, d1)).str());
       BOOST_CHECK_EQUAL(mpz_int(gcd(-a, large_ui)).str(), test_type(gcd(-a1, large_ui)).str());

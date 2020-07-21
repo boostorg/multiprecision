@@ -759,6 +759,16 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    BOOST_CHECK_EQUAL(gcd(400u, b), boost::integer::gcd(400, 45));
    BOOST_CHECK_EQUAL(lcm(400u, b), boost::integer::lcm(400, 45));
 
+   if (std::numeric_limits<Real>::is_bounded)
+   {
+      // Fixed precision integer:
+      a = (std::numeric_limits<Real>::max)() - 1;
+      b = (std::numeric_limits<Real>::max)() / 35;
+      Real div = gcd(a, b);
+      BOOST_CHECK_EQUAL(a % div, 0);
+      BOOST_CHECK_EQUAL(b % div, 0);
+   }
+
    //
    // Conditionals involving 2 arg functions:
    //
