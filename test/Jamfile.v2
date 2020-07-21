@@ -183,6 +183,31 @@ test-suite arithmetic_tests :
    [ run test_arithmetic_complex_adaptor_2.cpp : : : <toolset>msvc:<cxxflags>-bigobj ]
    [ run test_arithmetic_complex128.cpp : : : [ check-target-builds ../config//has_float128 : <source>quadmath ] ]
 
+   [ run test_modular_adaptor.cpp no_eh_support
+                    : # command line
+                    : # input files
+                    : # requirements
+                    <define>TEST_CPP_INT
+                    : test_modular_adaptor_cpp_int ]
+
+   [ run test_modular_adaptor.cpp no_eh_support $(TOMMATH)
+                 : # command line
+                 : # input files
+                 : # requirements
+                 <define>TEST_TOMMATH
+                  release # Otherwise [ runtime is slow
+                  [ check-target-builds ../config//has_tommath : : <build>no ]
+                 : test_modular_adaptor_tommath ]
+
+   [ run test_modular_adaptor.cpp no_eh_support gmp
+           : # command line
+           : # input files
+           : # requirements
+           <define>TEST_GMP
+            release # Otherwise [ runtime is slow
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+           : test_modular_adaptor_gmp ]
+
 ;
 
 rule get_function_tests
@@ -397,6 +422,31 @@ test-suite functions_and_limits :
               : # requirements
               <define>TEST_CPP_INT
               : test_move_cpp_int ]
+
+      [ run test_jacobi.cpp no_eh_support
+                          : # command line
+                          : # input files
+                          : # requirements
+                          <define>TEST_CPP_INT
+                          : test_jacobi_cpp_int ]
+
+      [ run test_jacobi.cpp no_eh_support $(TOMMATH)
+                    : # command line
+                    : # input files
+                    : # requirements
+                    <define>TEST_TOMMATH
+                     release # Otherwise [ runtime is slow
+                     [ check-target-builds ../config//has_tommath : : <build>no ]
+                    : test_jacobi_tommath ]
+
+      [ run test_jacobi.cpp no_eh_support gmp
+              : # command line
+              : # input files
+              : # requirements
+              <define>TEST_GMP
+               release # Otherwise [ runtime is slow
+               [ check-target-builds ../config//has_gmp : : <build>no ]
+              : test_jacobi_gmp ]
 
       [ get_function_tests ]
 ;
