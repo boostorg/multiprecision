@@ -423,6 +423,31 @@ test-suite functions_and_limits :
               <define>TEST_CPP_INT
               : test_move_cpp_int ]
 
+      [ run test_jacobi.cpp no_eh_support
+                          : # command line
+                          : # input files
+                          : # requirements
+                          <define>TEST_CPP_INT
+                          : test_jacobi_cpp_int ]
+
+      [ run test_jacobi.cpp no_eh_support $(TOMMATH)
+                    : # command line
+                    : # input files
+                    : # requirements
+                    <define>TEST_TOMMATH
+                     release # Otherwise [ runtime is slow
+                     [ check-target-builds ../config//has_tommath : : <build>no ]
+                    : test_jacobi_tommath ]
+
+      [ run test_jacobi.cpp no_eh_support gmp
+              : # command line
+              : # input files
+              : # requirements
+              <define>TEST_GMP
+               release # Otherwise [ runtime is slow
+               [ check-target-builds ../config//has_gmp : : <build>no ]
+              : test_jacobi_gmp ]
+
       [ get_function_tests ]
 ;
 
