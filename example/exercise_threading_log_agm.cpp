@@ -14,6 +14,9 @@
 // calculation of logarithms. The logarithm functions values
 // are compared with the values from Boost.Multiprecision's
 // specific log functions for the relevant backends.
+// The log GM here is not optimized or intended for
+// high-performance work, but can be taken as an
+// interesting example of an AGM iteration if helpful.
 
 // This example has been initially motivated in part
 // by discussions in:
