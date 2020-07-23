@@ -17,6 +17,7 @@ namespace multiprecision {
 template <typename Backend>
 inline int eval_jacobi(const Backend& a, const Backend& n)
 {
+   using default_ops::eval_divide;
    using default_ops::eval_get_sign;
    using default_ops::eval_gt;
    using default_ops::eval_integer_modulus;
@@ -35,17 +36,17 @@ inline int eval_jacobi(const Backend& a, const Backend& n)
       BOOST_THROW_EXCEPTION(std::invalid_argument("jacobi: second argument must be odd and > 1"));
    }
 
-   Backend   x = a, y = n;
-   limb_type J = 1;
+   Backend x = a, y = n;
+   int     J = 1;
 
    while (eval_gt(y, 1))
    {
       eval_modulus(x, y);
 
       Backend yd2 = y;
-      eval_divide(yd2, 2);
+      eval_right_shift(yd2, 1)
 
-      if (eval_gt(x, yd2))
+          if (eval_gt(x, yd2))
       {
          eval_subtract(x, y, x);
          if (eval_integer_modulus(y, 4) == 3)
@@ -60,7 +61,7 @@ inline int eval_jacobi(const Backend& a, const Backend& n)
 
       size_t shifts = eval_lsb(x);
       eval_right_shift(x, shifts);
-      if (eval_integer_modulus(shifts, 2))
+      if (shifts & 1)
       {
          std::size_t y_mod_8 = eval_integer_modulus(y, 8);
          if (y_mod_8 == 3 || y_mod_8 == 5)
@@ -92,7 +93,7 @@ template <typename Backend, expression_template_option ExpressionTemplates>
 inline typename std::enable_if<number_category<Backend>::value == number_kind_integer, int>::type jacobi(
     const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& n)
 {
-   return number<Backend, ExpressionTemplates>(eval_jacobi(a.backend(), n.backend()));
+   return eval_jacobi(a.backend(), n.backend());
 }
 }
 } // namespace boost::multiprecision
