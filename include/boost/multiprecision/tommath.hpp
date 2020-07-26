@@ -696,7 +696,7 @@ inline void eval_gcd(tommath_int& result, const tommath_int& a, const tommath_in
 inline int eval_jacobi(tommath_int& a, tommath_int& n)
 {
    int result = 0;
-   mp_jacobi(a.data(), n.data(), result);
+   mp_jacobi(const_cast< ::mp_int*>(&a.data()), const_cast< ::mp_int*>(&n.data()), &result);
    return result;
 }
 inline void eval_lcm(tommath_int& result, const tommath_int& a, const tommath_int& b)
