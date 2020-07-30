@@ -59,8 +59,9 @@ Even though PSLQ does not produce proofs, pessimism is unwarranted: PSLQ is a to
 In addition, /verifying/ a suspected relation is much less computationally difficult than discovering it, so once a relation is found, we can compute the relevant terms of the dictionary to much higher precision to give additional evidence for the relation, and then search for a formal proof.
 
 Astute readers will notice that our example requires a very auspicious guess about the form the relation takes.
-If we didn't know that β was somehow related to π⁶ and ζ(3)², we would've never found this relation.
-This is a general property of the PSLQ algorithm: As its runtime scales quartically in the length of the dictionary, having a hunch about the form the relation will take is necessary.
+If we didn't know that β was somehow related to π⁶ and ζ(3)², we would've never found it.
+This is a general property of the PSLQ algorithm:
+As its runtime scales quartically in the length of the dictionary, having a hunch about the form the relation will take is necessary.
 
 That said, simple modifications of the inputs allow us to recover different classes of relations.
 Let's use the Basel problem as an example:
@@ -84,7 +85,7 @@ and if it is indeed algebraic with reasonable sized polynomial coefficients, the
 Communicating this idea has a somewhat different format than vanilla `pslq`, and hence we have provided a wrapper `is_algebraic` for precisely this purpose.
 
 Quartically scaling algorithms are rare, and users generally have little experience with them.
-It is easy to construct a PSLQ dictionary that would only complete after a few thousand years.
+It is easy to construct a PSLQ dictionary that induces a computation lasting a few thousand years.
 Hence we have defaulted to printing a progress bar to the terminal.
 
 
@@ -104,6 +105,9 @@ We can silence the progress bar via by passing a `std::ostream` with the badbit 
     std::ofstream ofs;
     ofs.setstate(std::ios_base::badbit);
     std::string s = boost::multiprecision::pslq(m, max_acceptable_norm_bound, ofs);
+
+Communication of the result is done via strings both decimal strings and unicode characters.
+We have attempted to maintain standard notation for the constants provided in the standard PSLQ dictionary, but if you can't determine the notation, all the constants can be looked up in the Online Encyclopedia of Integer Sequences.
 
 
 

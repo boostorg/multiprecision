@@ -166,6 +166,7 @@ auto standard_pslq_dictionary() {
     m.emplace(1/glaisher_, "1/A");
     m.emplace(log(glaisher_), "ln(A)");
     m.emplace(exp(glaisher_), "exp(A)");
+
     Real khinchin_ = khinchin<Real>();
     m.emplace(khinchin_, "K₀");
     m.emplace(log(khinchin_), "ln(K₀)");
@@ -202,6 +203,43 @@ auto standard_pslq_dictionary() {
     m.emplace(root_three<Real>()*pi_, "π√3");
     m.emplace(catalan_*pi_, "πG");
 
+    // Lemniscate constant:
+    auto lemniscate = pi_*gauss<Real>();
+    m.emplace(lemniscate, "L");
+    m.emplace(log(lemniscate), "ln(L)");
+    m.emplace(exp(lemniscate), "exp(L)");
+    m.emplace(lemniscate*lemniscate, "L²");
+    m.emplace(1/lemniscate, "1/L");
+
+    // Plastic constant:
+    auto P = plastic<Real>();
+    m.emplace(P, "P");
+    m.emplace(log(P), "ln(P)");
+    m.emplace(exp(P), "exp(P)");
+    m.emplace(P*P, "P²");
+    m.emplace(1/P, "1/P");
+
+    // Dottie number: x = cos(x).
+    auto dot_ = dottie<Real>();
+    m.emplace(dot_, "d");
+    m.emplace(-log(dot_), "-ln(d)");
+    m.emplace(exp(dot_), "exp(d)");
+    m.emplace(dot_*dot_, "d²");
+    m.emplace(1/dot_, "1/d");
+
+    auto rfib = reciprocal_fibonacci<Real>();
+    m.emplace(rfib, "ψ");
+    m.emplace(log(rfib), "ln(ψ)");
+    m.emplace(rfib*rfib, "ψ²");
+    m.emplace(exp(rfib), "exp(ψ)");
+    m.emplace(1/rfib, "1/ψ");
+
+    auto ll = laplace_limit<Real>();
+    m.emplace(ll, "λ");
+    m.emplace(ll*ll, "λ²");
+    m.emplace(1/ll, "1/λ");
+    m.emplace(-log(ll), "-ln(λ)");
+    m.emplace(exp(ll), "exp(λ)");
     return m;
 }
 

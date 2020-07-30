@@ -23,5 +23,7 @@ int main() {
   analyze(sin_one<Real>(), "sin(1)");
   analyze(cos_one<Real>(), "cos(1)");
   analyze(e_pow_pi<Real>(), "e^pi");
-  
+  analyze(dottie<Real>(), "d");
+  analyze(laplace_limit<Real>(), "λ");
+  analyze(reciprocal_fibonacci<Real>(), "ψ");
 }
