@@ -44,9 +44,9 @@ inline int eval_jacobi(const Backend& a, const Backend& n)
       eval_modulus(x, y);
 
       Backend yd2 = y;
-      eval_right_shift(yd2, 1)
+      eval_right_shift(yd2, 1);
 
-          if (eval_gt(x, yd2))
+      if (eval_gt(x, yd2))
       {
          eval_subtract(x, y, x);
          if (eval_integer_modulus(y, 4) == 3)
