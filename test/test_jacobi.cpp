@@ -58,7 +58,7 @@ int main()
    test<mpz_int>();
 #endif
 #if defined(TEST_TOMMATH)
-   test<tommath_int>();
+   test<tom_int>();
 #endif
 
    return boost::report_errors();
