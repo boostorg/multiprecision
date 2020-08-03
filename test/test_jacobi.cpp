@@ -29,7 +29,7 @@
 #if defined(TEST_TOMMATH)
 #include <boost/multiprecision/tommath.hpp>
 #endif
-#ifdef TEST_CPP_INT
+#if defined(TEST_CPP_INT)
 #include <boost/multiprecision/cpp_int.hpp>
 #endif
 
@@ -51,10 +51,10 @@ int main()
 {
    using namespace boost::multiprecision;
 
-#ifdef TEST_CPP_INT
+#if defined(TEST_CPP_INT)
    test<cpp_int>();
 #endif
-#ifdef TEST_MPZ
+#if defined(TEST_MPZ)
    test<mpz_int>();
 #endif
 #if defined(TEST_TOMMATH)
