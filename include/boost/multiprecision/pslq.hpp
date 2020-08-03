@@ -43,8 +43,9 @@
 #include <optional>
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions/lambert_w.hpp>
-#include <boost/math/tools/polynomial.hpp>
 #include <boost/math/special_functions/rsqrt.hpp>
+#include <boost/math/special_functions/expint.hpp> // for Ei(1), Ei(-1).
+#include <boost/math/tools/polynomial.hpp>
 #include <boost/core/demangle.hpp>
 #if defined __has_include
 #  if __has_include (<Eigen/Dense>)
@@ -127,7 +128,7 @@ auto standard_pslq_dictionary() {
     m.emplace(zeta_three_*zeta_three_, "ζ(3)²");
     m.emplace(zeta_three_*zeta_three_*zeta_three_, "ζ(3)³");
     m.emplace(pow(zeta_three_, 4), "ζ(3)⁴");
-    
+
     auto pi_ = pi<Real>();
     m.emplace(pi_, "π");
     m.emplace(1/pi_, "1/π");
@@ -175,7 +176,7 @@ auto standard_pslq_dictionary() {
     m.emplace(khinchin_*khinchin_, "K₀²");
     m.emplace(log(static_cast<Real>(1) + sqrt(static_cast<Real>(2))), "ln(1+√2)");
     // To recover multiplicative relations we need the logarithms of small primes.
-    Real ln2 = log(static_cast<Real>(2)); 
+    Real ln2 = log(static_cast<Real>(2));
     m.emplace(ln2, "ln(2)");
     m.emplace(-log(ln2), "-ln(ln(2))");
     m.emplace(log(static_cast<Real>(3)), "ln(3)");
@@ -240,6 +241,21 @@ auto standard_pslq_dictionary() {
     m.emplace(1/ll, "1/λ");
     m.emplace(-log(ll), "-ln(λ)");
     m.emplace(exp(ll), "exp(λ)");
+
+    auto ei1 = boost::math::expint(Real(1));
+    m.emplace(ei1, "Ei(1)");
+    m.emplace(ei1*ei1, "Ei(1)²");
+    m.emplace(1/ei1, "1/Ei(1)");
+    m.emplace(log(ei1), "ln(Ei(1))");
+    m.emplace(exp(ei1), "exp(Ei(1))");
+
+    auto eim1 = boost::math::expint(-Real(1));
+    m.emplace(-eim1, "-Ei(-1)");
+    m.emplace(eim1*eim1, "Ei(-1)²");
+    m.emplace(-1/eim1, "-1/Ei(-1)");
+    m.emplace(-log(-eim1), "-ln(-Ei(-1))");
+    m.emplace(exp(eim1), "exp(Ei(-1))");
+
     return m;
 }
 
@@ -366,7 +382,7 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
     for (int64_t i = n - 2; i >= 0; --i) {
         s_sq[i] = s_sq[i+1] + x[i]*x[i];
     }
-    
+
     using std::pow;
     if (max_acceptable_norm_bound*max_acceptable_norm_bound*s_sq[0] > 1/std::numeric_limits<Real>::epsilon()) {
         std::cerr << "The maximum acceptable norm bound " << max_acceptable_norm_bound << " is too large; spurious relations will be recovered.\n";
