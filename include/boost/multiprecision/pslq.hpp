@@ -258,11 +258,6 @@ auto standard_pslq_dictionary() {
     m.emplace(exp(eim1), "exp(Ei(-1))");
 
     // These show up in a lot of identities in Finch:
-    auto gamma_14 = boost::math::tgamma(Real(1)/Real(4));
-    m.emplace(gamma_14, "Γ(1/4)");
-    m.emplace(log(gamma_14), "ln(Γ(1/4))");
-    m.emplace(1/gamma_14, "1/Γ(1/4)");
-
     auto gamma_13 = boost::math::tgamma(Real(1)/Real(3));
     m.emplace(gamma_13, "Γ(1/3)");
     m.emplace(log(gamma_13), "ln(Γ(1/3))");
