@@ -37,13 +37,13 @@ void analyze(Real x, std::string symbol)
 
     std::cout << symbol << " ≈ " << x << "\n";
     auto scf = simple_continued_fraction(x);
-    std::cout << " ≈ " << scf  << "\n";
+    std::cout << symbol << " ≈ " << scf  << "\n";
     auto ccf = centered_continued_fraction(x);
-    std::cout << " ≈ " << ccf  << "\n";
+    std::cout << symbol << " ≈ " << ccf  << "\n";
     auto lur = luroth_expansion(x);
-    std::cout << " ≈ " << lur  << "\n";
+    std::cout << symbol << " ≈ " << lur  << "\n";
     auto eng = engel_expansion<Real, checked_int1024_t>(x);
-    std::cout << " ≈ " << eng  << "\n";
+    std::cout << symbol << " ≈ " << eng  << "\n";
     std::cout << std::setprecision(11);
     std::cout << "Empirical Khinchin geometric mean of simple cfrac        : " << scf.khinchin_geometric_mean() << "\n";
     std::cout << "Expected Khinchin geometric mean if the value is 'random': 2.6854520010.\n";
@@ -61,8 +61,8 @@ void analyze(Real x, std::string symbol)
     auto lur_exp = luroth_expansion(expx);
     std::cout << "exp(" << symbol << ")";
     std::cout << " ≈ " << scf_exp  << "\n";
-    std::cout << " ≈ " << ccf_exp  << "\n";
-    std::cout << " ≈ " << lur_exp  << "\n";
+    std::cout << "exp(" << symbol << ") ≈ " << ccf_exp  << "\n";
+    std::cout << "exp(" << symbol << ") ≈ " << lur_exp  << "\n";
     std::cout << std::setprecision(11);
     std::cout << "Empirical Khinchin geometric mean of simple cfrac        : " << scf_exp.khinchin_geometric_mean() << "\n";
     std::cout << "Expected Khinchin geometric mean if the value is 'random': 2.6854520010.\n";
@@ -79,8 +79,8 @@ void analyze(Real x, std::string symbol)
     auto lur_log = luroth_expansion(lnx);
     std::cout << "ln(" << symbol << ")";
     std::cout << " ≈ " << scf_log  << "\n";
-    std::cout << " ≈ " << ccf_log  << "\n";
-    std::cout << " ≈ " << lur_log  << "\n";
+    std::cout << "ln(" << symbol << ") ≈ " << ccf_log  << "\n";
+    std::cout <<  "ln(" << symbol << ") ≈ " << lur_log  << "\n";
     std::cout << std::setprecision(11);
     std::cout << "Empirical Khinchin geometric mean of simple cfrac        : " << scf_log.khinchin_geometric_mean() << "\n";
     std::cout << "Expected Khinchin geometric mean if the value is 'random': 2.6854520010.\n";
