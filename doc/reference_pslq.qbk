@@ -109,6 +109,26 @@ We can silence the progress bar via by passing a `std::ostream` with the badbit 
 Communication of the result is done via strings both decimal strings and unicode characters.
 We have attempted to maintain standard notation for the constants provided in the standard PSLQ dictionary, but if you can't determine the notation, all the constants can be looked up in the Online Encyclopedia of Integer Sequences.
 
+As an example, let's analyze the extreme value skewness:
+The C++ code is
 
+    s = identify(extreme_value_skewness<Real>(), "extreme_value_skewness", Real(1e10));
+    if (!s.empty())
+    {
+        std::cout << s << "\n";
+    }
+    else
+    {
+        std::cout << "No relations found.\n";
+    }
+
+and the output is
+
+    As
+        -2⋅0.130631 + 2⋅0.184034 + 5⋅0.693147 + 3⋅1.09861 - 6⋅1.14473 = 1.90276e-1000,
+    it is likely that
+        -2⋅ln(extreme_value_skewness) + 2⋅ln(ζ(3)) + 5⋅ln(2) + 3⋅ln(3) - 6⋅ln(π) = 0.
+
+We can collect the logarithms to find the correct relation.
 
 [endsect]
