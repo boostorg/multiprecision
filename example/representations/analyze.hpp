@@ -91,7 +91,7 @@ void analyze(Real x, std::string symbol)
     std::cout << "Empirical digit geometric mean of Luroth expansion     : " << lur_log.digit_geometric_mean() << "\n";
     std::cout << "Expected digit geometric mean if the value is 'random' : 2.200161058\n";
 
-    std::cout << "Is it algebraic?\n";
+    std::cout << "Is " << symbol << " algebraic?\n";
     std::string s = is_algebraic(x, symbol, Real(1e10));
     if (!s.empty())
     {
@@ -102,7 +102,7 @@ void analyze(Real x, std::string symbol)
         std::cout << "It is probably not algebraic.\n";
     }
 
-    std::cout << "Searching for closed forms.\n";
+    std::cout << "Searching for closed forms of " << symbol << "\n";
     s = identify(x, symbol, Real(1e10));
     if (!s.empty())
     {
