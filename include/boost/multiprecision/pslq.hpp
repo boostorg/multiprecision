@@ -45,6 +45,7 @@
 #include <boost/math/special_functions/lambert_w.hpp>
 #include <boost/math/special_functions/rsqrt.hpp>
 #include <boost/math/special_functions/expint.hpp> // for Ei(1), Ei(-1).
+#include <boost/math/special_functions/gamma.hpp> // For Γ(1/3), Γ(1/4)
 #include <boost/math/tools/polynomial.hpp>
 #include <boost/core/demangle.hpp>
 #if defined __has_include
@@ -255,6 +256,17 @@ auto standard_pslq_dictionary() {
     m.emplace(-1/eim1, "-1/Ei(-1)");
     m.emplace(-log(-eim1), "-ln(-Ei(-1))");
     m.emplace(exp(eim1), "exp(Ei(-1))");
+
+    // These show up in a lot of identities in Finch:
+    auto gamma_14 = boost::math::tgamma(Real(1)/Real(4));
+    m.emplace(gamma_14, "Γ(1/4)");
+    m.emplace(log(gamma_14), "ln(Γ(1/4))");
+    m.emplace(1/gamma_14, "1/Γ(1/4)");
+
+    auto gamma_13 = boost::math::tgamma(Real(1)/Real(3));
+    m.emplace(gamma_13, "Γ(1/3)");
+    m.emplace(log(gamma_13), "ln(Γ(1/3))");
+    m.emplace(1/gamma_13, "1/Γ(1/3)");
 
     return m;
 }
