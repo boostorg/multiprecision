@@ -31,7 +31,7 @@ T soldner()
 
 int main() {
   using boost::multiprecision::mpfr_float;
-  mpfr_float::default_precision(400);
+  mpfr_float::default_precision(1000);
   using Real = mpfr_float;
   Real s = soldner<Real>();
   analyze(s, "μ");

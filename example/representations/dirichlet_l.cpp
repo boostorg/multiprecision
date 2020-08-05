@@ -5,7 +5,7 @@
 int main()
 {
     using boost::multiprecision::mpfr_float;
-    mpfr_float::default_precision(700);
+    mpfr_float::default_precision(900);
     using Real = mpfr_float;
 
     // See: Mathematical Constants II, Section 1.13 by Steven Finch.
@@ -113,7 +113,7 @@ int main()
 521698841993288727173249743"
     };
 
-    analyze(L5_12, "L₅(1/2");
+    analyze(L5_12, "L₅(1/2)");
 
   // L_8(1/2) in Finch.
   // Mathematica: N[DirichletL[8, 2, 1/2], 1005]
