@@ -104,4 +104,9 @@ test-suite examples :
       
       [ run big_seventh.cpp no_eh_eg_support ]
 
+      [ run exercise_threading_log_agm.cpp : : : <define>BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_TYPE=101 release [ requires cxx11_hdr_atomic cxx11_hdr_thread ] : exercise_threading_log_agm_cpp_dec_float ]
+      [ run exercise_threading_log_agm.cpp gmp : : : <define>BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_TYPE=102 release [ requires cxx11_hdr_atomic cxx11_hdr_thread ] [ check-target-builds ../config//has_gmp : : <build>no ] : exercise_threading_log_agm_gmp ]
+      [ run exercise_threading_log_agm.cpp mpfr gmp : : : <define>BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_TYPE=104 release [ requires cxx11_hdr_atomic cxx11_hdr_thread ] [ check-target-builds ../config//has_mpfr : : <build>no ] : exercise_threading_log_agm_mpfr ]
+      [ run exercise_threading_log_agm.cpp : : : <define>BOOST_MULTIPRECISION_EXERCISE_THREADING_BACKEND_TYPE=103 release [ requires cxx11_hdr_atomic cxx11_hdr_thread ] : exercise_threading_log_agm_cpp_bin_float ]
+
 ;
