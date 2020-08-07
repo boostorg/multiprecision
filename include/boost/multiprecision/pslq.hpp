@@ -353,6 +353,11 @@ private:
 // See: https://www.davidhbailey.com/dhbpapers/cpslq.pdf, section 3.
 template<typename Real>
 std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_acceptable_norm_bound, Real gamma, std::ostream& os = std::cout) {
+    using std::sqrt;
+    using std::log;
+    using std::ceil;
+    using std::pow;
+    using std::abs;
     std::vector<std::pair<int64_t, Real>> relation;
     /*if (!std::is_sorted(x.begin(), x.end())) {
         std::cerr << "Elements must be sorted in increasing order.\n";
@@ -360,7 +365,6 @@ std::vector<std::pair<int64_t, Real>> pslq(std::vector<Real> & x, Real max_accep
     }*/
 
     std::sort(x.begin(), x.end());
-    using std::sqrt;
     if (gamma <= 2/sqrt(3)) {
         std::cerr << "γ > 2/√3 is required\n";
         return relation;
