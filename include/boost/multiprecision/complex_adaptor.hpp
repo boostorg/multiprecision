@@ -550,14 +550,15 @@ inline void eval_sin(complex_adaptor<Backend>& result, const complex_adaptor<Bac
    using default_ops::eval_sin;
    using default_ops::eval_sinh;
 
-   Backend t1, t2;
+   Backend t1, t2, t3;
    eval_sin(t1, arg.real_data());
    eval_cosh(t2, arg.imag_data());
-   eval_multiply(result.real_data(), t1, t2);
+   eval_multiply(t3, t1, t2);
 
    eval_cos(t1, arg.real_data());
    eval_sinh(t2, arg.imag_data());
    eval_multiply(result.imag_data(), t1, t2);
+   result.real_data() = t3;
 }
 
 template <class Backend>
@@ -568,24 +569,85 @@ inline void eval_cos(complex_adaptor<Backend>& result, const complex_adaptor<Bac
    using default_ops::eval_sin;
    using default_ops::eval_sinh;
 
-   Backend t1, t2;
+   Backend t1, t2, t3;
    eval_cos(t1, arg.real_data());
    eval_cosh(t2, arg.imag_data());
-   eval_multiply(result.real_data(), t1, t2);
+   eval_multiply(t3, t1, t2);
 
    eval_sin(t1, arg.real_data());
    eval_sinh(t2, arg.imag_data());
    eval_multiply(result.imag_data(), t1, t2);
    result.imag_data().negate();
+   result.real_data() = t3;
+}
+
+template <class T>
+void tanh_imp(const T& r, const T& i, T& r_result, T& i_result)
+{
+   using default_ops::eval_tan;
+   using default_ops::eval_sinh;
+   using default_ops::eval_add;
+   using default_ops::eval_fpclassify;
+   using default_ops::eval_get_sign;
+
+   typedef typename boost::mpl::front<typename T::unsigned_types>::type ui_type;
+   ui_type one(1);
+   //
+   // Set:
+   // t = tan(i);
+   // s = sinh(r);
+   // b = s * (1 + t^2);
+   // d = 1 + b * s;
+   //
+   T t, s, b, d;
+   eval_tan(t, i);
+   eval_sinh(s, r);
+   eval_multiply(d, t, t);
+   eval_add(d, one);
+   eval_multiply(b, d, s);
+   eval_multiply(d, b, s);
+   eval_add(d, one);
+
+   if (eval_fpclassify(d) == FP_INFINITE)
+   {
+      r_result = one;
+      if (eval_get_sign(s) < 0)
+         r_result.negate();
+      //
+      // Imaginary part is a signed zero:
+      //
+      ui_type zero(0);
+      i_result = zero;
+      if (eval_get_sign(t) < 0)
+         i_result.negate();
+   }
+   //
+   // Real part is sqrt(1 + s^2) * b / d;
+   // Imaginary part is t / d;
+   //
+   eval_divide(i_result, t, d);
+   //
+   // variable t is now spare, as is r_result.
+   //
+   eval_multiply(t, s, s);
+   eval_add(t, one);
+   eval_sqrt(r_result, t);
+   eval_multiply(t, r_result, b);
+   eval_divide(r_result, t, d);
 }
 
 template <class Backend>
+inline void eval_tanh(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& arg)
+{
+   tanh_imp(arg.real_data(), arg.imag_data(), result.real_data(), result.imag_data());
+}
+template <class Backend>
 inline void eval_tan(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& arg)
 {
-   complex_adaptor<Backend> c;
-   eval_cos(c, arg);
-   eval_sin(result, arg);
-   eval_divide(result, c);
+   Backend t(arg.imag_data());
+   t.negate();
+   tanh_imp(t, arg.real_data(), result.imag_data(), result.real_data());
+   result.imag_data().negate();
 }
 
 template <class Backend>
@@ -659,14 +721,15 @@ inline void eval_sinh(complex_adaptor<Backend>& result, const complex_adaptor<Ba
    using default_ops::eval_sin;
    using default_ops::eval_sinh;
 
-   Backend t1, t2;
+   Backend t1, t2, t3;
    eval_cos(t1, arg.imag_data());
    eval_sinh(t2, arg.real_data());
-   eval_multiply(result.real_data(), t1, t2);
+   eval_multiply(t3, t1, t2);
 
    eval_cosh(t1, arg.real_data());
    eval_sin(t2, arg.imag_data());
    eval_multiply(result.imag_data(), t1, t2);
+   result.real_data() = t3;
 }
 
 template <class Backend>
@@ -677,24 +740,15 @@ inline void eval_cosh(complex_adaptor<Backend>& result, const complex_adaptor<Ba
    using default_ops::eval_sin;
    using default_ops::eval_sinh;
 
-   Backend t1, t2;
+   Backend t1, t2, t3;
    eval_cos(t1, arg.imag_data());
    eval_cosh(t2, arg.real_data());
-   eval_multiply(result.real_data(), t1, t2);
+   eval_multiply(t3, t1, t2);
 
    eval_sin(t1, arg.imag_data());
    eval_sinh(t2, arg.real_data());
    eval_multiply(result.imag_data(), t1, t2);
-}
-
-template <class Backend>
-inline void eval_tanh(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& arg)
-{
-   using default_ops::eval_divide;
-   complex_adaptor<Backend> s, c;
-   eval_sinh(s, arg);
-   eval_cosh(c, arg);
-   eval_divide(result, s, c);
+   result.real_data() = t3;
 }
 
 template <class Backend>
