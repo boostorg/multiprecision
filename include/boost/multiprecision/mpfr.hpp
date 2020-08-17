@@ -1366,16 +1366,34 @@ inline void eval_ldexp(mpfr_float_backend<Digits10, AllocateType>& result, const
 template <unsigned Digits10, mpfr_allocation_type AllocateType>
 inline void eval_frexp(mpfr_float_backend<Digits10, AllocateType>& result, const mpfr_float_backend<Digits10, AllocateType>& val, int* e)
 {
-   long v;
-   mpfr_get_d_2exp(&v, val.data(), GMP_RNDN);
+   if (mpfr_zero_p(val.data()))
+   {
+      *e = 0;
+      result = val;
+      return;
+   }
+   mp_exp_t v = mpfr_get_exp(val.data());
    *e = v;
-   eval_ldexp(result, val, -v);
+   if (v)
+      eval_ldexp(result, val, -v);
+   else
+      result = val;
 }
 template <unsigned Digits10, mpfr_allocation_type AllocateType>
 inline void eval_frexp(mpfr_float_backend<Digits10, AllocateType>& result, const mpfr_float_backend<Digits10, AllocateType>& val, long* e)
 {
-   mpfr_get_d_2exp(e, val.data(), GMP_RNDN);
-   return eval_ldexp(result, val, -*e);
+   if (mpfr_zero_p(val.data()))
+   {
+      *e = 0;
+      result = val;
+      return;
+   }
+   mp_exp_t v = mpfr_get_exp(val.data());
+   *e = v;
+   if(v)
+      eval_ldexp(result, val, -v);
+   else
+      result = val;
 }
 
 template <unsigned Digits10, mpfr_allocation_type AllocateType>
