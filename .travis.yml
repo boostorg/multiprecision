@@ -50,6 +50,7 @@ branches:
     - cmake-develop
     - cmake-master
     - 2-modular-adaptor
+    - 6-shanks-tonelli
 
 env:
   matrix:
