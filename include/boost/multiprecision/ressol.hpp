@@ -12,7 +12,6 @@
 #define BOOST_MULTIPRECISION_RESSOL_HPP
 
 #include <boost/multiprecision/jacobi.hpp>
-#include <boost/multiprecision/pow_mod.hpp>
 
 #include <boost/multiprecision/modular/modular_adaptor.hpp>
 
@@ -32,10 +31,17 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
    using default_ops::eval_lt;
    using default_ops::eval_right_shift;
    using default_ops::eval_subtract;
+   using default_ops::eval_add;
+   using default_ops::eval_divide;
+
+   Backend zero, posone, negone;
+   eval_subtract(zero, a, a);
+   eval_add(posone, zero, 1);
+   eval_subtract(negone, zero, posone);
 
    if (eval_is_zero(a))
    {
-      return Backend(0);
+      return zero;
    }
    else if (eval_get_sign(a) < 0)
    {
@@ -63,69 +69,94 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
 
    if (eval_jacobi(a, p) != 1)
    { // not a quadratic residue
-      return Backend(-1);
+      return negone;
    }
+
+   modular_adaptor<Backend> res, a_mod(a, p);
+
+   Backend shift, p_posone;
+
+   eval_add(p_posone, p, 1);
+
+   shift = p_posone;
 
    if (eval_integer_modulus(p, 4) == 3)
    {
-      return power_mod(a, ((p + 1) >> 2), p);
+      eval_divide(shift, shift, 4);
+      eval_pow(res, a_mod, shift);
+      return res.base_data();
    }
+   
+   Backend p_negone;
+   eval_subtract(p_negone, p, posone);
+   size_t s = eval_lsb(p_negone);
 
-   size_t s = eval_lsb(p - 1);
+   Backend q = p, two;
+   eval_add(two, posone, posone);
 
-   Backend q = p;
+   modular_adaptor<Backend> p_mod(p, p_posone), two_s_mod(two, p), two_mod(two, p); 
 
-   eval_right_shift(p, s);
-   eval_subtract(q, 1);
-   eval_right_shift(q, 1);
+   eval_right_shift(p_mod, s);
+   
+   eval_subtract(q, posone);
 
-   modular_reducer mod_p(p);
+   modular_adaptor<Backend>  q_mod(q, p_posone);
+   eval_right_shift(q_mod, posone);
 
-   Backend r = eval_power_mod(a, q, p);
-   Backend n = mod_p.multiply(a, mod_p.square(r));
-   r         = mod_p.multiply(r, a);
+   modular_adaptor <Backend> r = a_mod, n = a_mod, r_sq;
+   eval_pow(r, a_mod, q_mod.base_data());
+   eval_pow(r_sq, r, two);
+   eval_multiply(n, r_sq);
+   eval_multiply(r, a_mod);
 
-   if (eval_eq(n, 1))
+   if (eval_eq(n.base_data(), posone))
    {
-      return r;
+      return r.base_data();
    }
 
    // find random non quadratic residue z
-   Backend z = 2;
-   while (eval_jacobi(z, p) == 1)
+   modular_adaptor<Backend>  z_mod(two, p);
+   while (eval_jacobi(z_mod.base_data(), p) == 1)
    { // while z quadratic residue
-      ++z;
+      eval_add(z_mod, z_mod, posone);
    }
 
-   Backend c = eval_power_mod(z, (q << 1) + 1, p);
+   res = z_mod;
+   eval_left_shift(res, posone);
 
-   while (eval_gt(n, 1))
+   eval_add(res, res, posone);
+   eval_pow(r, z_mod, res.base_data());
+   Backend c = r.base_data();
+
+   while (eval_gt(n.base_data(), posone))
    {
-      q = n;
+      q_mod = n;
 
       size_t i = 0;
-      while (q != 1)
-      {
-         q = mod_p.square(q);
+      while (!eval_eq(q_mod.base_data(), posone))
+      {  
+         eval_pow(q_mod, q_mod, two_mod);
          ++i;
 
          if (i >= s)
          {
-            return -Backend(1);
+            return negone;
          }
       }
 
       Backend p2;
       eval_bit_set(p2, s - i - 1);
 
-      c = power_mod(c, p2, p);
-      r = mod_p.multiply(r, c);
-      c = mod_p.square(c);
-      n = mod_p.multiply(n, c);
+
+      modular_adaptor <Backend> c_mod(c, p), p2_mod(p2, p);
+      eval_pow(c_mod, c_mod, p2);
+      eval_multiply(r, c_mod);
+      eval_pow(c_mod, c_mod, two_mod);
+      eval_multiply_mod(n, c_mod);
       s = i;
    }
 
-   return r;
+   return r.base_data();
 }
 
 /**
