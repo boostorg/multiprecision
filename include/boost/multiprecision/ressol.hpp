@@ -94,14 +94,21 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
    Backend q = p, two;
    eval_add(two, posone, posone);
 
-   modular_adaptor<Backend> p_mod(p, p_posone), two_s_mod(two, p), two_mod(two, p); 
+   modular_adaptor<Backend> p_mod(p, p_posone), two_s_mod(posone, p), two_mod(two, p); 
 
-   eval_right_shift(p_mod, s);
-   
+   //eval_right_shift(p_mod, s);
+   size_t i = 0;
+   while (i < s) {
+      eval_multiply(two_s_mod, two_mod);
+      ++i;
+   }
+   eval_divide(p_mod, two_s_mod);
+
    eval_subtract(q, posone);
 
    modular_adaptor<Backend>  q_mod(q, p_posone);
-   eval_right_shift(q_mod, posone);
+   //eval_right_shift(q_mod, posone);
+   eval_divide(q_mod, two_mod);
 
    modular_adaptor <Backend> r = a_mod, n = a_mod, r_sq;
    eval_pow(r, a_mod, q_mod.base_data());
@@ -122,8 +129,8 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
    }
 
    res = z_mod;
-   eval_left_shift(res, posone);
-
+   //eval_left_shift(res, posone);
+   eval_multiply(res, two_mod);
    eval_add(res, res, posone);
    eval_pow(r, z_mod, res.base_data());
    Backend c = r.base_data();
@@ -152,7 +159,7 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
       eval_pow(c_mod, c_mod, p2);
       eval_multiply(r, c_mod);
       eval_pow(c_mod, c_mod, two_mod);
-      eval_multiply_mod(n, c_mod);
+      eval_multiply(n, c_mod);
       s = i;
    }
 
