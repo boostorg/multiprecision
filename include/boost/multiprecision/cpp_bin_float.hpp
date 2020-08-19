@@ -1662,6 +1662,7 @@ inline void eval_sqrt(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE
    }
    typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type ae = arg.exponent();
    res.exponent()                                                                               = ae / 2;
+   res.sign() = false;
    if ((ae & 1) && (ae < 0))
       --res.exponent();
    copy_and_round(res, s);
