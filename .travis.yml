@@ -49,7 +49,7 @@ branches:
     - develop
     - cmake-develop
     - cmake-master
-    - 2-modular-adaptor
+    - 30-jacobi-symbol
 
 env:
   matrix:
