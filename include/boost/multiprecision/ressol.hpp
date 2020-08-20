@@ -15,6 +15,8 @@
 
 #include <boost/multiprecision/modular/modular_adaptor.hpp>
 
+using namespace std;
+
 namespace boost {
 namespace multiprecision {
 
@@ -34,10 +36,14 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
    using default_ops::eval_add;
    using default_ops::eval_divide;
 
-   Backend zero, posone, negone;
-   eval_subtract(zero, a, a);
-   eval_add(posone, zero, 1);
-   eval_subtract(negone, zero, posone);
+   Backend zero = typename mpl::front<typename Backend::unsigned_types>::type(0u);
+   Backend posone = typename mpl::front<typename Backend::unsigned_types>::type(1u);
+   Backend two = typename mpl::front<typename Backend::unsigned_types>::type(2u);
+   Backend negone;
+
+   eval_subtract(negone, posone);
+
+   modular_adaptor<Backend> a_mod(a, p);
 
    if (eval_is_zero(a))
    {
@@ -62,7 +68,7 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
    {
       BOOST_THROW_EXCEPTION(std::invalid_argument("ressol: prime must be > 1 a"));
    }
-   else if (eval_integer_modulus(p, 2))
+   else if (eval_integer_modulus(p, 2) == 0)
    {
       BOOST_THROW_EXCEPTION(std::invalid_argument("ressol: invalid prime"));
    }
@@ -72,72 +78,59 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
       return negone;
    }
 
-   modular_adaptor<Backend> res, a_mod(a, p);
-
-   Backend shift, p_posone;
-
-   eval_add(p_posone, p, 1);
-
-   shift = p_posone;
-
    if (eval_integer_modulus(p, 4) == 3)
-   {
-      eval_divide(shift, shift, 4);
-      eval_pow(res, a_mod, shift);
+   {     
+      Backend exp = p;
+
+      eval_add(exp, posone);
+      eval_right_shift(exp, 2);
+
+      modular_adaptor<Backend> exp_mod(exp, p), res;
+
+      eval_pow(res, a_mod, exp_mod);
+
       return res.base_data();
    }
    
-   Backend p_negone;
-   eval_subtract(p_negone, p, posone);
+   Backend p_negone = p, q = p;
+   eval_subtract(p_negone, posone);
    size_t s = eval_lsb(p_negone);
 
-   Backend q = p, two;
-   eval_add(two, posone, posone);
-
-   modular_adaptor<Backend> p_mod(p, p_posone), two_s_mod(posone, p), two_mod(two, p); 
-
-   //eval_right_shift(p_mod, s);
-   size_t i = 0;
-   while (i < s) {
-      eval_multiply(two_s_mod, two_mod);
-      ++i;
-   }
-   eval_divide(p_mod, two_s_mod);
-
+   eval_right_shift(q, s);
    eval_subtract(q, posone);
+   eval_right_shift(q, posone);
 
-   modular_adaptor<Backend>  q_mod(q, p_posone);
-   //eval_right_shift(q_mod, posone);
-   eval_divide(q_mod, two_mod);
+   modular_adaptor <Backend> r_mod, n_mod = a_mod, r_sq_mod, q_mod(q, p), two_mod(two, p);
 
-   modular_adaptor <Backend> r = a_mod, n = a_mod, r_sq;
-   eval_pow(r, a_mod, q_mod.base_data());
-   eval_pow(r_sq, r, two);
-   eval_multiply(n, r_sq);
-   eval_multiply(r, a_mod);
+   eval_pow(r_mod, a_mod, q_mod);
+   eval_pow(r_sq_mod, r_mod, two_mod);
+   eval_multiply(n_mod, r_sq_mod);
+   eval_multiply(r_mod, a_mod);
 
-   if (eval_eq(n.base_data(), posone))
+   if (eval_eq(n_mod.base_data(), posone))
    {
-      return r.base_data();
+      return r_mod.base_data();
    }
 
    // find random non quadratic residue z
-   modular_adaptor<Backend>  z_mod(two, p);
-   while (eval_jacobi(z_mod.base_data(), p) == 1)
+   Backend z = two;
+   while (eval_jacobi(z, p) == 1)
    { // while z quadratic residue
-      eval_add(z_mod, z_mod, posone);
+      eval_add(z, posone);
    }
 
-   res = z_mod;
-   //eval_left_shift(res, posone);
-   eval_multiply(res, two_mod);
-   eval_add(res, res, posone);
-   eval_pow(r, z_mod, res.base_data());
-   Backend c = r.base_data();
+   eval_left_shift(q, posone);
+   eval_add(q, posone);
 
-   while (eval_gt(n.base_data(), posone))
+   modular_adaptor <Backend> z_mod(z, p), c_mod, newq_mod(q, p); 
+
+   q_mod = newq_mod;
+
+   eval_pow(c_mod, z_mod, q_mod);
+
+   while (eval_gt(n_mod.base_data(), posone))
    {
-      q_mod = n;
+      q_mod = n_mod;
 
       size_t i = 0;
       while (!eval_eq(q_mod.base_data(), posone))
@@ -154,16 +147,16 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
       Backend p2;
       eval_bit_set(p2, s - i - 1);
 
+      modular_adaptor <Backend> p2_mod(p2, p);
 
-      modular_adaptor <Backend> c_mod(c, p), p2_mod(p2, p);
-      eval_pow(c_mod, c_mod, p2);
-      eval_multiply(r, c_mod);
+      eval_pow(c_mod, c_mod, p2_mod);
+      eval_multiply(r_mod, c_mod);
       eval_pow(c_mod, c_mod, two_mod);
-      eval_multiply(n, c_mod);
+      eval_multiply(n_mod, c_mod);
       s = i;
    }
 
-   return r.base_data();
+   return r_mod.base_data();
 }
 
 /**
