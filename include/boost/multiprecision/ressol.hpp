@@ -1,7 +1,8 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation AG
-// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
-// Copyright (c) 2018-2019 Alexey Moskvin
+// Copyright (c) 2018-2020 Nil Foundation AG
+// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nilfoundation.org>
+// Copyright (c) 2018-2020 Alexey Moskvin
+// Copyright (c) 2018-2020 Pavel Kharitonov <ipavrus@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -21,6 +22,7 @@ namespace multiprecision {
 template <typename Backend>
 inline Backend eval_ressol(const Backend& a, const Backend& p)
 {
+
    using default_ops::eval_bit_set;
    using default_ops::eval_eq;
    using default_ops::eval_get_sign;
@@ -30,6 +32,7 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
    using default_ops::eval_lsb;
    using default_ops::eval_lt;
    using default_ops::eval_right_shift;
+   using default_ops::eval_left_shift;
    using default_ops::eval_subtract;
    using default_ops::eval_add;
 
@@ -39,8 +42,6 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
    Backend negone;
 
    eval_subtract(negone, posone);
-
-   modular_adaptor<Backend> a_mod(a, p);
 
    if (eval_is_zero(a))
    {
@@ -75,6 +76,8 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
       return negone;
    }
 
+   modular_adaptor<Backend> a_mod(a, p);
+   
    if (eval_integer_modulus(p, 4) == 3)
    {     
       Backend exp = p;
@@ -82,25 +85,25 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
       eval_add(exp, posone);
       eval_right_shift(exp, 2);
 
-      modular_adaptor<Backend> exp_mod(exp, p), res;
+      modular_adaptor<Backend> res_mod;
 
-      eval_pow(res, a_mod, exp_mod);
+      eval_pow(res_mod, a_mod, exp);
 
-      return res.base_data();
+      return res_mod.base_data();
    }
    
    Backend p_negone = p, q = p;
-   eval_subtract(p_negone, posone);
+   eval_add(p_negone, negone);
    size_t s = eval_lsb(p_negone);
 
    eval_right_shift(q, s);
    eval_subtract(q, posone);
-   eval_right_shift(q, posone);
+   eval_right_shift(q, 1);
 
-   modular_adaptor <Backend> r_mod, n_mod = a_mod, r_sq_mod, q_mod(q, p), two_mod(two, p);
+   modular_adaptor <Backend> r_mod, n_mod = a_mod, r_sq_mod;
 
-   eval_pow(r_mod, a_mod, q_mod);
-   eval_pow(r_sq_mod, r_mod, two_mod);
+   eval_pow(r_mod, a_mod, q);
+   eval_pow(r_sq_mod, r_mod, two);
    eval_multiply(n_mod, r_sq_mod);
    eval_multiply(r_mod, a_mod);
 
@@ -116,14 +119,12 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
       eval_add(z, posone);
    }
 
-   eval_left_shift(q, posone);
+   eval_left_shift(q, 1);
    eval_add(q, posone);
 
-   modular_adaptor <Backend> z_mod(z, p), c_mod, newq_mod(q, p); 
+   modular_adaptor <Backend> z_mod(z, p), c_mod, q_mod; 
 
-   q_mod = newq_mod;
-
-   eval_pow(c_mod, z_mod, q_mod);
+   eval_pow(c_mod, z_mod, q);
 
    while (eval_gt(n_mod.base_data(), posone))
    {
@@ -132,7 +133,7 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
       size_t i = 0;
       while (!eval_eq(q_mod.base_data(), posone))
       {  
-         eval_pow(q_mod, q_mod, two_mod);
+         eval_pow(q_mod, q_mod, two);
          ++i;
 
          if (i >= s)
@@ -142,14 +143,13 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
       }
 
       Backend p2;
+
       eval_bit_set(p2, s - i - 1);
-
-      modular_adaptor <Backend> p2_mod(p2, p);
-
-      eval_pow(c_mod, c_mod, p2_mod);
+      eval_pow(c_mod, c_mod, p2);
       eval_multiply(r_mod, c_mod);
-      eval_pow(c_mod, c_mod, two_mod);
+      eval_pow(c_mod, c_mod, two);
       eval_multiply(n_mod, c_mod);
+
       s = i;
    }
 
