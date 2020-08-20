@@ -445,7 +445,7 @@ inline void eval_left_shift(modular_adaptor<Backend>& t, UI i)
    using default_ops::eval_left_shift;
    Backend tmp;
    t.mod_data().adjust_regular(tmp, t.base_data());
-   eval_left_shift(tmp);
+   eval_left_shift(tmp, i);
    t.base_data() = tmp;
    t.mod_data().adjust_modular(t.base_data());
 }
@@ -455,7 +455,7 @@ inline void eval_right_shift(modular_adaptor<Backend>& t, UI i)
    using default_ops::eval_right_shift;
    Backend tmp;
    t.mod_data().adjust_regular(tmp, t.base_data());
-   eval_right_shift(tmp);
+   eval_right_shift(tmp, i);
    t.base_data() = tmp;
    t.mod_data().adjust_modular(t.base_data());
 }
