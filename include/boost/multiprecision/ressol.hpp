@@ -15,8 +15,6 @@
 
 #include <boost/multiprecision/modular/modular_adaptor.hpp>
 
-using namespace std;
-
 namespace boost {
 namespace multiprecision {
 
@@ -34,7 +32,6 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
    using default_ops::eval_right_shift;
    using default_ops::eval_subtract;
    using default_ops::eval_add;
-   using default_ops::eval_divide;
 
    Backend zero = typename mpl::front<typename Backend::unsigned_types>::type(0u);
    Backend posone = typename mpl::front<typename Backend::unsigned_types>::type(1u);
