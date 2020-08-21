@@ -83,7 +83,7 @@ class modular_params : public backends::montgomery_params<Backend>, public backe
       }
    }
 
-   const number_type &get_mod() const
+   number_type get_mod() const
    {
       return backends::montgomery_params<Backend>::mod() | backends::barrett_params<Backend>::mod();
    }
