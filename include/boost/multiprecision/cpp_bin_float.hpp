@@ -380,7 +380,7 @@ class cpp_bin_float
       if (eval_get_sign(f) < 0)
       {
          f.negate();
-         *this = f;
+         assign_float(f);
          this->negate();
          return *this;
       }
