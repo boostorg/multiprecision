@@ -276,7 +276,7 @@ std::size_t almost_montgomery_inverse(number<Backend, ExpressionTemplates>&     
 template <typename Backend, expression_template_option ExpressionTemplates>
 number<Backend, ExpressionTemplates> normalized_montgomery_inverse(const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& p)
 {
-   BigInt r;
+   number<Backend, ExpressionTemplates> r;
    size_t k = almost_montgomery_inverse(r, a, p);
 
    for (size_t i = 0; i != k; ++i)
@@ -301,12 +301,12 @@ number<Backend, ExpressionTemplates> inverse_mod_pow2(const number<Backend, Expr
    if (a1.is_even())
       return 0;
 
-   BigInt a = a1;
+   number<Backend, ExpressionTemplates> a = a1;
    a.mask_bits(k);
 
-   BigInt b = 1;
-   BigInt X = 0;
-   BigInt newb;
+   number<Backend, ExpressionTemplates> b = 1;
+   number<Backend, ExpressionTemplates> X = 0;
+   number<Backend, ExpressionTemplates> newb;
 
    const size_t a_words = a.sig_words();
 
@@ -374,21 +374,21 @@ number<Backend, ExpressionTemplates> inverse_mod(const number<Backend, Expressio
    * using CRT, which is possible because 2^k and o are relatively prime.
    */
 
-   const BigInt o      = mod >> mod_lz;
-   const BigInt n_redc = ct_modulo(n, o);
-   const BigInt inv_o  = inverse_mod_odd_modulus(n_redc, o);
-   const BigInt inv_2k = inverse_mod_pow2(n, mod_lz);
+   const number<Backend, ExpressionTemplates> o      = mod >> mod_lz;
+   const number<Backend, ExpressionTemplates> n_redc = ct_modulo(n, o);
+   const number<Backend, ExpressionTemplates> inv_o  = inverse_mod_odd_modulus(n_redc, o);
+   const number<Backend, ExpressionTemplates> inv_2k = inverse_mod_pow2(n, mod_lz);
 
    // No modular inverse in this case:
    if (inv_o == 0 || inv_2k == 0)
       return 0;
 
-   const BigInt m2k = BigInt::power_of_2(mod_lz);
+   const number<Backend, ExpressionTemplates> m2k = BigInt::power_of_2(mod_lz);
    // Compute the CRT parameter
-   const BigInt c = inverse_mod_pow2(o, mod_lz);
+   const number<Backend, ExpressionTemplates> c = inverse_mod_pow2(o, mod_lz);
 
    // Compute h = c*(inv_2k-inv_o) mod 2^k
-   BigInt     h     = c * (inv_2k - inv_o);
+   number<Backend, ExpressionTemplates>     h     = c * (inv_2k - inv_o);
    const bool h_neg = h.is_negative();
    h.set_sign(BigInt::Positive);
    h.mask_bits(mod_lz);
