@@ -59,13 +59,13 @@ void test()
 int main()
 {
 #ifdef TEST_CPP_INT
-   test<cpp_int>();
+   test<boost::muliprecision::cpp_int>();
 #endif
 #ifdef TEST_MPZ
-   test<mpz_int>();
+   test<boost::muliprecision::mpz_int>();
 #endif
 #if defined(TEST_TOMMATH)
-   test<tom_int>();
+   test<boost::muliprecision::tom_int>();
 #endif
 
    return boost::report_errors();
