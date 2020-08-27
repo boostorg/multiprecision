@@ -49,10 +49,12 @@ if(BOOST_CMAKE)
                            ${CMAKE_WORKSPACE_NAME}::regexp)
 else()
     find_package(Boost REQUIRED COMPONENTS chrono filesystem unit_test_framework serialization regex)
+    list(APPEND ${CURRENT_PROJECT_NAME}_LIBRARIES ${Boost_LIBRARIES})
     find_package(Boost COMPONENTS timer exception)
+    list(APPEND ${CURRENT_PROJECT_NAME}_LIBRARIES ${Boost_LIBRARIES})
 
     cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
-                           ${Boost_LIBRARIES})
+                           ${${CURRENT_PROJECT_NAME}_LIBRARIES})
 
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../include"
                         "${CMAKE_CURRENT_BINARY_DIR}/include"
