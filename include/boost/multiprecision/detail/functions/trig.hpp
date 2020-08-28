@@ -71,9 +71,31 @@ void hyp0F1(T& result, const T& b, const T& x)
 }
 
 template <class T>
+void reduce_n_half_pi(T& arg, const T& n, bool go_down)
+{
+   typedef typename boost::multiprecision::detail::transcendental_reduction_type<T>::type reduction_type;
+
+   reduction_type big_arg(arg);
+   reduction_type reduction = get_constant_pi<reduction_type>();
+   eval_ldexp(reduction, reduction, -1); // divide by 2
+   eval_multiply(reduction, n);
+   BOOST_MATH_INSTRUMENT_CODE(big_arg.str(10, std::ios_base::scientific));
+   BOOST_MATH_INSTRUMENT_CODE(reduction.str(10, std::ios_base::scientific));
+
+   if (go_down)
+      eval_subtract(big_arg, reduction, big_arg);
+   else
+      eval_subtract(big_arg, reduction);
+   arg = big_arg;
+   BOOST_MATH_INSTRUMENT_CODE(big_arg.str(10, std::ios_base::scientific));
+   BOOST_MATH_INSTRUMENT_CODE(arg.str(10, std::ios_base::scientific));
+}
+
+template <class T>
 void eval_sin(T& result, const T& x)
 {
    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The sin function is only valid for floating point types.");
+   BOOST_MATH_INSTRUMENT_CODE(x.str(0, std::ios_base::scientific));
    if (&result == &x)
    {
       T temp;
@@ -119,49 +141,68 @@ void eval_sin(T& result, const T& x)
    }
 
    T n_pi, t;
-   // Remove even multiples of pi.
-   if (xx.compare(get_constant_pi<T>()) > 0)
+   T half_pi = get_constant_pi<T>();
+   eval_ldexp(half_pi, half_pi, -1); // divide by 2
+   // Remove multiples of pi/2.
+   if (xx.compare(half_pi) > 0)
    {
-      eval_divide(n_pi, xx, get_constant_pi<T>());
+      eval_divide(n_pi, xx, half_pi);
       eval_trunc(n_pi, n_pi);
-      t = ui_type(2);
+      t = ui_type(4);
       eval_fmod(t, n_pi, t);
-      const bool b_n_pi_is_even = eval_get_sign(t) == 0;
-      eval_multiply(n_pi, get_constant_pi<T>());
-      if (n_pi.compare(get_constant_one_over_epsilon<T>()) > 0)
+      bool b_go_down = false;
+      if (t.compare(ui_type(1)) == 0)
       {
-         result = ui_type(0);
-         return;
+         b_go_down = true;
       }
-      else
-         eval_subtract(xx, n_pi);
-
-      BOOST_MATH_INSTRUMENT_CODE(xx.str(0, std::ios_base::scientific));
-      BOOST_MATH_INSTRUMENT_CODE(n_pi.str(0, std::ios_base::scientific));
-
-      // Adjust signs if the multiple of pi is not even.
-      if (!b_n_pi_is_even)
+      else if (t.compare(ui_type(2)) == 0)
       {
          b_negate_sin = !b_negate_sin;
       }
-   }
+      else if (t.compare(ui_type(3)) == 0)
+      {
+         b_negate_sin = !b_negate_sin;
+         b_go_down    = true;
+      }
 
-   // Reduce the argument to 0 <= xx <= pi/2.
-   eval_ldexp(t, get_constant_pi<T>(), -1);
-   if (xx.compare(t) > 0)
-   {
-      eval_subtract(xx, get_constant_pi<T>(), xx);
+      if (b_go_down)
+         eval_increment(n_pi);
+      //
+      // If n_pi is > 1/epsilon, then it is no longer an exact integer value
+      // but an approximation.  As a result we can no longer reliably reduce
+      // xx to 0 <= xx < pi/2, nor can we tell the sign of the result as we need
+      // n_pi % 4 for that, but that will always be zero in this situation.
+      // We could use a higher precision type for n_pi, along with division at
+      // higher precision, but that's rather expensive.  So for now we do not support
+      // this, and will see if anyone complains and has a legitimate use case.
+      //
+      if (n_pi.compare(get_constant_one_over_epsilon<T>()) > 0)
+      {
+         BOOST_THROW_EXCEPTION(std::runtime_error("Argument reduction failed in call to sin"));
+         result = ui_type(0);
+         return;
+      }
+
+      reduce_n_half_pi(xx, n_pi, b_go_down);
+
       BOOST_MATH_INSTRUMENT_CODE(xx.str(0, std::ios_base::scientific));
+      BOOST_MATH_INSTRUMENT_CODE(n_pi.str(0, std::ios_base::scientific));
+      BOOST_ASSERT(xx.compare(half_pi) < 0);
+      BOOST_ASSERT(xx.compare(ui_type(0)) >= 0);
    }
 
+   t = half_pi;
    eval_subtract(t, xx);
+
    const bool b_zero    = eval_get_sign(xx) == 0;
    const bool b_pi_half = eval_get_sign(t) == 0;
+
+   BOOST_MATH_INSTRUMENT_CODE(xx.str(0, std::ios_base::scientific));
+   BOOST_MATH_INSTRUMENT_CODE(t.str(0, std::ios_base::scientific));
 
    // Check if the reduced argument is very close to 0 or pi/2.
    const bool b_near_zero    = xx.compare(fp_type(1e-1)) < 0;
    const bool b_near_pi_half = t.compare(fp_type(1e-1)) < 0;
-   ;
 
    if (b_zero)
    {
@@ -225,6 +266,7 @@ void eval_sin(T& result, const T& x)
 
    if (b_negate_sin)
       result.negate();
+   BOOST_MATH_INSTRUMENT_CODE(result.str(0, std::ios_base::scientific));
 }
 
 template <class T>
@@ -273,67 +315,78 @@ void eval_cos(T& result, const T& x)
    {
       xx.negate();
    }
+   BOOST_MATH_INSTRUMENT_CODE(xx.str(0, std::ios_base::scientific));
 
    T n_pi, t;
+   T half_pi = get_constant_pi<T>();
+   eval_ldexp(half_pi, half_pi, -1); // divide by 2
    // Remove even multiples of pi.
-   if (xx.compare(get_constant_pi<T>()) > 0)
+   if (xx.compare(half_pi) > 0)
    {
-      eval_divide(t, xx, get_constant_pi<T>());
+      eval_divide(t, xx, half_pi);
       eval_trunc(n_pi, t);
       BOOST_MATH_INSTRUMENT_CODE(n_pi.str(0, std::ios_base::scientific));
-      eval_multiply(t, n_pi, get_constant_pi<T>());
-      BOOST_MATH_INSTRUMENT_CODE(t.str(0, std::ios_base::scientific));
+      t = ui_type(4);
+      eval_fmod(t, n_pi, t);
+
+      bool b_go_down = false;
+      if (t.compare(ui_type(0)) == 0)
+      {
+         b_go_down = true;
+      }
+      else if (t.compare(ui_type(1)) == 0)
+      {
+         b_negate_cos = true;
+      }
+      else if (t.compare(ui_type(2)) == 0)
+      {
+         b_go_down    = true;
+         b_negate_cos = true;
+      }
+      else
+      {
+         BOOST_ASSERT(t.compare(ui_type(3)) == 0);
+      }
+
+      if (b_go_down)
+         eval_increment(n_pi);
       //
-      // If t is so large that all digits cancel the result of this subtraction
-      // is completely meaningless, just assume the result is zero for now...
-      //
-      // TODO We should of course do much better, see:
-      // "ARGUMENT REDUCTION FOR HUGE ARGUMENTS" K C Ng 1992
+      // If n_pi is > 1/epsilon, then it is no longer an exact integer value
+      // but an approximation.  As a result we can no longer reliably reduce
+      // xx to 0 <= xx < pi/2, nor can we tell the sign of the result as we need
+      // n_pi % 4 for that, but that will always be zero in this situation.
+      // We could use a higher precision type for n_pi, along with division at
+      // higher precision, but that's rather expensive.  So for now we do not support
+      // this, and will see if anyone complains and has a legitimate use case.
       //
       if (n_pi.compare(get_constant_one_over_epsilon<T>()) > 0)
       {
-         result = ui_type(1);
+         BOOST_THROW_EXCEPTION(std::runtime_error("Argument reduction failed in call to sin"));
+         result = ui_type(0);
          return;
       }
-      else
-         eval_subtract(xx, t);
-      BOOST_MATH_INSTRUMENT_CODE(xx.str(0, std::ios_base::scientific));
 
-      // Adjust signs if the multiple of pi is not even.
-      t = ui_type(2);
-      eval_fmod(t, n_pi, t);
-      const bool b_n_pi_is_even = eval_get_sign(t) == 0;
-
-      if (!b_n_pi_is_even)
-      {
-         b_negate_cos = !b_negate_cos;
-      }
+      reduce_n_half_pi(xx, n_pi, b_go_down);
    }
-
-   // Reduce the argument to 0 <= xx <= pi/2.
-   eval_ldexp(t, get_constant_pi<T>(), -1);
-   int com = xx.compare(t);
-   if (com > 0)
+   else
    {
-      eval_subtract(xx, get_constant_pi<T>(), xx);
-      b_negate_cos = !b_negate_cos;
-      BOOST_MATH_INSTRUMENT_CODE(xx.str(0, std::ios_base::scientific));
+      n_pi = ui_type(1);
+      reduce_n_half_pi(xx, n_pi, true);
    }
 
-   const bool b_zero    = eval_get_sign(xx) == 0;
-   const bool b_pi_half = com == 0;
+   const bool b_zero = eval_get_sign(xx) == 0;
 
    // Check if the reduced argument is very close to 0.
    const bool b_near_zero = xx.compare(fp_type(1e-1)) < 0;
 
    if (b_zero)
    {
-      result = si_type(1);
-   }
+      result = si_type(0);
+   } /*
    else if (b_pi_half)
    {
-      result = si_type(0);
-   }
+      result = si_type(1);
+   } 
    else if (b_near_zero)
    {
       eval_multiply(t, xx, xx);
@@ -341,14 +394,14 @@ void eval_cos(T& result, const T& x)
       n_pi = fp_type(0.5f);
       hyp0F1(result, n_pi, t);
       BOOST_MATH_INSTRUMENT_CODE(result.str(0, std::ios_base::scientific));
-   }
+   }*/
    else
    {
-      eval_subtract(t, xx);
-      eval_sin(result, t);
+      eval_sin(result, xx);
    }
    if (b_negate_cos)
       result.negate();
+   BOOST_MATH_INSTRUMENT_CODE(result.str(0, std::ios_base::scientific));
 }
 
 template <class T>
