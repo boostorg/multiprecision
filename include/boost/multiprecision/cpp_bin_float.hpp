@@ -1779,6 +1779,15 @@ namespace detail {
 template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinExponent, Exponent MaxExponent>
 struct transcendental_reduction_type<boost::multiprecision::backends::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinExponent, MaxExponent> >
 {
+   //
+   // The type used for trigonometric reduction needs 3 times the precision of the base type.
+   // This is double the precision of the original type, plus the largest exponent supported.
+   // As a practical measure the largest argument supported is 1/eps, as supporting larger
+   // arguments requires the division of argument by PI/2 to also be done at higher precision,
+   // otherwise the result (an integer) can not be represented exactly.
+   // 
+   // See ARGUMENT REDUCTION FOR HUGE ARGUMENTS. K C Ng.
+   //
    typedef boost::multiprecision::backends::cpp_bin_float<
        boost::multiprecision::backends::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinExponent, MaxExponent>::bit_count * 3, 
        boost::multiprecision::backends::digit_base_2, 
