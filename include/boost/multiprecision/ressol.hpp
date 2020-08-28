@@ -13,8 +13,10 @@
 #define BOOST_MULTIPRECISION_RESSOL_HPP
 
 #include <boost/multiprecision/jacobi.hpp>
+#include <boost/multiprecision/detail/default_ops.hpp>
 
 #include <boost/multiprecision/modular/modular_adaptor.hpp>
+#include <boost/multiprecision/modular/modular_params.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -36,9 +38,11 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
    using default_ops::eval_subtract;
    using default_ops::eval_add;
 
-   Backend zero = typename mpl::front<typename Backend::unsigned_types>::type(0u);
-   Backend posone = typename mpl::front<typename Backend::unsigned_types>::type(1u);
-   Backend two = typename mpl::front<typename Backend::unsigned_types>::type(2u);
+   typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
+
+   Backend zero = ui_type(0u);
+   Backend posone = ui_type(1u);
+   Backend two = ui_type(2u);
    Backend negone;
 
    eval_subtract(negone, posone);
@@ -76,20 +80,26 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
       return negone;
    }
 
-   modular_adaptor<Backend> a_mod(a, p);
+
+   modular_adaptor<Backend> a_mod;
+
+   assign_components(a_mod, a, p);
    
    if (eval_integer_modulus(p, 4) == 3)
    {     
-      Backend exp = p;
+      Backend exp = p, res;
 
       eval_add(exp, posone);
+
       eval_right_shift(exp, 2);
 
-      modular_adaptor<Backend> res_mod;
+      modular_adaptor<Backend> res_mod(zero, p);
 
       eval_pow(res_mod, a_mod, exp);
 
-      return res_mod.base_data();
+      res_mod.mod_data().adjust_regular(res, res_mod.base_data());
+
+      return res;
    }
    
    Backend p_negone = p, q = p;
@@ -122,7 +132,9 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
    eval_left_shift(q, 1);
    eval_add(q, posone);
 
-   modular_adaptor <Backend> z_mod(z, p), c_mod, q_mod; 
+   modular_adaptor <Backend> z_mod, c_mod, q_mod; 
+
+   assign_components(z_mod, z, p);
 
    eval_pow(c_mod, z_mod, q);
 
