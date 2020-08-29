@@ -43,7 +43,7 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
    Backend zero = ui_type(0u);
    Backend posone = ui_type(1u);
    Backend two = ui_type(2u);
-   Backend negone;
+   Backend negone, res;
 
    eval_subtract(negone, posone);
 
@@ -80,30 +80,26 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
       return negone;
    }
 
-
-   modular_adaptor<Backend> a_mod;
+   modular_adaptor<Backend> a_mod, res_mod;
 
    assign_components(a_mod, a, p);
    
    if (eval_integer_modulus(p, 4) == 3)
    {     
-      Backend exp = p, res;
+      Backend exp = p;
 
       eval_add(exp, posone);
-
       eval_right_shift(exp, 2);
-
-      modular_adaptor<Backend> res_mod(zero, p);
-
       eval_pow(res_mod, a_mod, exp);
-
       res_mod.mod_data().adjust_regular(res, res_mod.base_data());
 
       return res;
    }
    
    Backend p_negone = p, q = p;
+
    eval_add(p_negone, negone);
+
    size_t s = eval_lsb(p_negone);
 
    eval_right_shift(q, s);
@@ -117,9 +113,13 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
    eval_multiply(n_mod, r_sq_mod);
    eval_multiply(r_mod, a_mod);
 
-   if (eval_eq(n_mod.base_data(), posone))
+   Backend n, r;
+   n_mod.mod_data().adjust_regular(n, n_mod.base_data());
+
+   if (eval_eq(n, posone))
    {
-      return r_mod.base_data();
+      r_mod.mod_data().adjust_regular(r, r_mod.base_data());
+      return r;
    }
 
    // find random non quadratic residue z
@@ -132,40 +132,49 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
    eval_left_shift(q, 1);
    eval_add(q, posone);
 
-   modular_adaptor <Backend> z_mod, c_mod, q_mod; 
+   modular_adaptor <Backend> z_mod, c_mod, q_mod;
 
    assign_components(z_mod, z, p);
-
    eval_pow(c_mod, z_mod, q);
+   n_mod.mod_data().adjust_regular(n, n_mod.base_data());
 
-   while (eval_gt(n_mod.base_data(), posone))
+   while (eval_gt(n, 1))
    {
-      q_mod = n_mod;
-
+      Backend q;
       size_t i = 0;
-      while (!eval_eq(q_mod.base_data(), posone))
+
+      q_mod = n_mod;
+      q_mod.mod_data().adjust_regular(q, q_mod.base_data());
+
+      while (!eval_eq(q, 1))
       {  
-         eval_pow(q_mod, q_mod, two);
+         eval_pow(res_mod, q_mod, two);
+         q_mod = res_mod;
          ++i;
 
          if (i >= s)
          {
             return negone;
          }
+
+         q_mod.mod_data().adjust_regular(q, q_mod.base_data());
       }
 
-      Backend p2;
+      Backend power_of_2;
 
-      eval_bit_set(p2, s - i - 1);
-      eval_pow(c_mod, c_mod, p2);
+      eval_bit_set(power_of_2, s - i - 1);
+      eval_pow(c_mod, c_mod, power_of_2);
       eval_multiply(r_mod, c_mod);
       eval_pow(c_mod, c_mod, two);
       eval_multiply(n_mod, c_mod);
 
+      n_mod.mod_data().adjust_regular(n, n_mod.base_data());
       s = i;
    }
 
-   return r_mod.base_data();
+   r_mod.mod_data().adjust_regular(res, r_mod.base_data());
+
+   return res;
 }
 
 /**
