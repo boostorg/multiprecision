@@ -17,7 +17,6 @@
 #include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
 #include <boost/multiprecision/modular/base_params.hpp>
 #include <boost/multiprecision/modular/barrett_params.hpp>
-#include <boost/multiprecisio/gmp.hpp>
 
 namespace boost {
 namespace multiprecision {
@@ -97,7 +96,7 @@ void eval_monty_inverse(Backend& res, const Backend& a)
 template <typename Backend>
 void inverse_mod_odd_modulus(Backend& res, const Backend& n, const Backend& mod)
 {
-  eval_inverse_mod_odd_modulus(res, n, mod);
+   eval_inverse_mod_odd_modulus(res, n, mod);
 }
 
 template <typename Backend, expression_template_option ExpressionTemplates>
@@ -121,6 +120,7 @@ number<Backend, ExpressionTemplates> inverse_mod_pow2(const number<Backend, Expr
    return eval_inverse_mod_pow2(a1, k);
 }
 
+template <typename Backend, expression_template_option ExpressionTemplates>
 number<Backend, ExpressionTemplates> inverse_mod(const number<Backend, ExpressionTemplates>& n, const number<Backend, ExpressionTemplates>& mod)
 {
    return eval_inverse_mod(n, mod);
@@ -133,7 +133,8 @@ IntegerType monty_inverse(const IntegerType& a)
    if (IntgerType == number)
    {
       eval_monty_inverse(res, a);
-   } else
+   }
+   else
    {
       res = eval_monty_inverse(a);
    }
@@ -141,7 +142,8 @@ IntegerType monty_inverse(const IntegerType& a)
    return res;
 }
 }
+}
 
-} // namespace boost::multiprecision
+} // namespace boost::multiprecision::backends
 
 #endif
