@@ -314,7 +314,7 @@ Backend eval_inverse_mod_pow2(Backend& a1, size_t k)
       return 0;
 
    Backend a = a1;
-   eval_mask_bits(a, k);
+   eval_bit_set(a, k);
 
    Backend b = 1, X = 0, newb;
 
@@ -339,7 +339,7 @@ Backend eval_inverse_mod_pow2(Backend& a1, size_t k)
       b.ct_cond_assign(b0, newb);
       eval_right_shift(b, 1);
    }
-   eval_mask_bits(X, k);
+   eval_bit_set(X, k);
    X.const_time_unpoison();
    return X;
 }
@@ -356,12 +356,19 @@ template <typename Backend>
 void eval_inverse_mod(Backend& res, const Backend& n, const Backend& mod)
 {
    if (eval_is_zero(mod))
-      throw BigInt::DivideByZero();
+   {
+      BOOST_THROW_EXCEPTION(
+          std::invalid_argument("eval_inverse_mod: mod must be non zero"));
+   }
    if ((eval_get_sign(mod) < 0) || (eval_get_sign(n) < 0))
-      throw Invalid_Argument("inverse_mod: arguments must be non-negative");
+   {
+      BOOST_THROW_EXCEPTION(
+          std::invalid_argument("eval_inverse_mod: arguments must be non-negative"));
+   }
    if (eval_is_zero(n) || (eval_integer_modulus(n, 2) == 0 && eval_integer_modulus(mod, 2) == 0))
+   {
       return 0;
-
+   }
    if (eval_integer_modulus(n, 2) == 1)
    {
       /*
@@ -404,21 +411,30 @@ void eval_inverse_mod(Backend& res, const Backend& n, const Backend& mod)
    if (eval_is_zero(o) || eval_is_zero(inv_2k))
       return 0;
 
-   Backend m2k = BigInt::power_of_2(mod_lz);
+   Backend m2k = mod_lz;
+   eval_multiply(m2k, m2k);
    // Compute the CRT parameter
    Backend c = inverse_mod_pow2(o, mod_lz);
 
    // Compute h = c*(inv_2k-inv_o) mod 2^k
-   Backend     h     = c * (inv_2k - inv_o);
+   Backend h = inv2_k;
+
+   eval_subtract(h, inv_o);
+   eval_multiply(h, c);
+
    const bool h_neg = (eval_get_sign(h) < 0);
-   h.set_sign(BigInt::Positive);
-   eval_mask_bits(h, mod_lz);
+
+   eval_abs(h); // h.set_sign(BigInt::Positive);
+   eval_bit_set(h, mod_lz);
+
    const bool h_nonzero = !eval_is_zero(h);
+
    h.ct_cond_assign(h_nonzero && h_neg, m2k - h);
 
    // Return result inv_o + h * o
    eval_multiply(h, o);
    eval_add(h, inv_o);
+
    return h;
 }
 
