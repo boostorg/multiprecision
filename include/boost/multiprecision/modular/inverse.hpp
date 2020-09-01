@@ -277,9 +277,9 @@ template <typename Backend>
 Backend eval_normalized_montgomery_inverse(const Backend& a, const Backend& p)
 {
    Backend r;
-   size_t k = eval_almost_montgomery_inverse(r, a, p);
+   std::size_t k = eval_almost_montgomery_inverse(r, a, p);
 
-   for (size_t i = 0; i != k; ++i)
+   for (std::size_t i = 0; i != k; ++i)
    {
       if (eval_integer_modulus(p, 2) == 1)
       {
@@ -318,7 +318,7 @@ Backend eval_inverse_mod_pow2(Backend& a1, size_t k)
 
    Backend b = 1, X = 0, newb;
 
-   const size_t a_words = a.sig_words();
+   const std::size_t a_words = a.sig_words();
 
    X.grow_to(round_up(k, sizeof(ui_type) * CHAR_BIT) / sizeof(ui_type) * CHAR_BIT);
    b.grow_to(a_words);
@@ -328,9 +328,9 @@ Backend eval_inverse_mod_pow2(Backend& a1, size_t k)
    granularity because of the length of a, so no point in doing more
    than this.
    */
-   const size_t iter = round_up(k, sizeof(ui_type) * CHAR_BIT);
+   const std::size_t iter = round_up(k, sizeof(ui_type) * CHAR_BIT);
 
-   for (size_t i = 0; i != iter; ++i)
+   for (std::size_t i = 0; i != iter; ++i)
    {
       const bool b0 = b.get_bit(0);
       X.conditionally_set_bit(i, b0);
@@ -374,9 +374,9 @@ void eval_inverse_mod(Backend& res, const Backend& n, const Backend& mod)
          return eval_inverse_mod_odd_modulus(ct_modulo(n, mod), mod);
    }
 
-   const size_t mod_lz = eval_lsb(mod);
+   const std::size_t mod_lz = eval_lsb(mod);
    BOOST_ASSERT(mod_lz > 0);
-   const size_t mod_bits = mod.bits();
+   const std::size_t mod_bits = mod.bits();
    BOOST_ASSERT(mod_bits > mod_lz);
 
    if (mod_lz == mod_bits - 1)
@@ -422,14 +422,11 @@ void eval_inverse_mod(Backend& res, const Backend& n, const Backend& mod)
    return h;
 }
 
-number<Backend, ExpressionTemplates> inverse_mod(
-    const number<Backend, ExpressionTemplates>& n,
-    const number<Backend, ExpressionTemplates>& mod)
 template <typename Backend, expression_template_option ExpressionTemplates>
 number<Backend, ExpressionTemplates> inverse_mod(const number<Backend, ExpressionTemplates>& n,
                                                  const number<Backend, ExpressionTemplates>& mod)
 {
-   return number<Backend, ExpressionTemplates>(eval_inverse_mod(n, mod));
+   return number<Backend, ExpressionTemplates>(eval_inverse_mod(n.backend(), mod.backend()));
 }
 
 template <typename IntegerType>
