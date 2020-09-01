@@ -1,7 +1,11 @@
-///////////////////////////////////////////////////////////////
-//  Copyright 2020 Mikhail Komarov. Distributed under the Boost
-//  Software License, Version 1.0. (See accompanying file
-//  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
+// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2018-2020 Pavel Kharitonov <ipavrus@nil.foundation>
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
 
 #ifdef _MSC_VER
 #define _SCL_SECURE_NO_WARNINGS
@@ -59,13 +63,13 @@ void test()
 int main()
 {
 #ifdef TEST_CPP_INT
-   test<cpp_int>();
+   test<boost::multiprecision::cpp_int>();
 #endif
 #ifdef TEST_MPZ
-   test<mpz_int>();
+   test<boost::multiprecision::mpz_int>();
 #endif
 #if defined(TEST_TOMMATH)
-   test<tom_int>();
+   test<boost::multiprecision::tom_int>();
 #endif
 
    return boost::report_errors();
