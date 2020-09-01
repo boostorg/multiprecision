@@ -332,7 +332,7 @@ Backend eval_inverse_mod_pow2(Backend& a1, size_t k)
 
    for (std::size_t i = 0; i != iter; ++i)
    {
-      const bool b0 = b.get_bit(0);
+      const bool b0 = eval_bit_test(b, 0);
       X.conditionally_set_bit(i, b0);
       newb = b;
       eval_subtract(newb, a);
@@ -453,17 +453,14 @@ IntegerType monty_inverse(const IntegerType& a)
    {
       res = eval_monty_inverse(a);
    } else
-      eval_monty_inverse(res, a);
-}
-else
-{
-eval_monty_inverse(res.backend(), a.backend());
-}
+   {
+      eval_monty_inverse(res.backend(), a.backend());
+   }
 
 return res;
 }
 }
-}
+
 
 } // namespace boost::multiprecision::backends
 
