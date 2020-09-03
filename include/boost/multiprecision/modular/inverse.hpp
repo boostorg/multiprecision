@@ -94,6 +94,165 @@ void eval_monty_inverse(Backend& res, const Backend& a)
 }
 
 template <typename Backend>
+inline void bigint_shr1(typename mpl::front<typename Backend::unsigned_types>::type x[], size_t x_size,
+                        size_t word_shift, size_t bit_shift)
+{
+   typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
+
+   const size_t top = x_size >= word_shift ? (x_size - word_shift) : 0;
+
+   if(top > 0)
+      copy_mem(x, x + word_shift, top);
+   clear_mem(x + top, std::min(word_shift, x_size));
+
+   const auto carry_mask = CT::Mask<ui_type>::expand(bit_shift);
+   const size_t carry_shift = carry_mask.if_set_return(BOTAN_MP_WORD_BITS - bit_shift);
+
+   ui_type carry = 0;
+
+   for(size_t i = 0; i != top; ++i)
+   {
+      const ui_type w = x[top - i - 1];
+      x[top-i-1] = (w >> bit_shift) | carry;
+      carry = carry_mask.if_set_return(w << carry_shift);
+   }
+}
+
+template <typename Backend>
+inline typename mpl::front<typename Backend::unsigned_types>::type bigint_add2_nc(
+                           typename mpl::front<typename Backend::unsigned_types>::type x[], size_t x_size,
+                           const typename mpl::front<typename Backend::unsigned_types>::type y[], size_t y_size)
+{
+   typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
+
+   ui_type carry = 0;
+
+   BOOST_ASSERT_MSG(x_size >= y_size, "Expected sizes");
+
+   const size_t blocks = y_size - (y_size % 8);
+
+   for(size_t i = 0; i != blocks; i += 8)
+      carry = word8_add2(x + i, y + i, carry);
+
+   for(size_t i = blocks; i != y_size; ++i)
+      x[i] = word_add(x[i], y[i], &carry);
+
+   for(size_t i = y_size; i != x_size; ++i)
+      x[i] = word_add(x[i], 0, &carry);
+
+   return carry;
+}
+
+template <typename Backend>
+inline typename mpl::front<typename Backend::unsigned_types>::type bigint_cnd_sub(
+                           typename mpl::front<typename Backend::unsigned_types>::type cnd,
+                           typename mpl::front<typename Backend::unsigned_types>::type x[], size_t x_size,
+                           const typename mpl::front<typename Backend::unsigned_types>::type y[], size_t y_size)
+{
+   BOOST_ASSERT_MSG(x_size >= y_size, "Expected sizes");
+
+   typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
+
+   const auto mask = CT::Mask<ui_type>::expand(cnd);
+
+   ui_type carry = 0;
+
+   const size_t blocks = y_size - (y_size % 8);
+   ui_type z[8] = { 0 };
+
+   for(size_t i = 0; i != blocks; i += 8)
+   {
+      carry = word8_sub3(z, x + i, y + i, carry);
+      mask.select_n(x + i, z, x + i, 8);
+   }
+
+   for(size_t i = blocks; i != y_size; ++i)
+   {
+      z[0] = word_sub(x[i], y[i], &carry);
+      x[i] = mask.select(z[0], x[i]);
+   }
+
+   for(size_t i = y_size; i != x_size; ++i)
+   {
+      z[0] = word_sub(x[i], 0, &carry);
+      x[i] = mask.select(z[0], x[i]);
+   }
+
+   return mask.if_set_return(carry);
+}
+
+template <typename Backend>
+inline typename mpl::front<typename Backend::unsigned_types>::type bigint_cnd_add(
+                            typename mpl::front<typename Backend::unsigned_types>::type cnd,
+                            typename mpl::front<typename Backend::unsigned_types>::type x[],
+                            typename mpl::front<typename Backend::unsigned_types>::type x_size,
+                            const typename mpl::front<typename Backend::unsigned_types>::type y[], size_t y_size)
+{
+   BOTAN_ASSERT(x_size >= y_size, "Expected sizes");
+
+   typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
+
+   const auto mask = CT::Mask<ui_type>::expand(cnd);
+
+   ui_type carry = 0;
+
+   const size_t blocks = y_size - (y_size % 8);
+   ui_type z[8] = { 0 };
+
+   for(size_t i = 0; i != blocks; i += 8)
+   {
+      carry = word8_add3(z, x + i, y + i, carry);
+      mask.select_n(x + i, z, x + i, 8);
+   }
+
+   for(size_t i = blocks; i != y_size; ++i)
+   {
+      z[0] = word_add(x[i], y[i], &carry);
+      x[i] = mask.select(z[0], x[i]);
+   }
+
+   for(size_t i = y_size; i != x_size; ++i)
+   {
+      z[0] = word_add(x[i], 0, &carry);
+      x[i] = mask.select(z[0], x[i]);
+   }
+
+   return mask.if_set_return(carry);
+}
+
+template <typename Backend>
+inline void bigint_cnd_abs(typename mpl::front<typename Backend::unsigned_types>::type cnd,
+                           typename mpl::front<typename Backend::unsigned_types>::type x[], size_t size)
+{
+   typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
+   const auto mask = CT::Mask<ui_type>::expand(cnd);
+
+   ui_type carry = mask.if_set_return(1);
+   for(size_t i = 0; i != size; ++i)
+   {
+      const ui_type z = word_add(~x[i], 0, &carry);
+      x[i] = mask.select(z, x[i]);
+   }
+}
+
+template <typename Backend>
+inline void bigint_cnd_swap(typename mpl::front<typename Backend::unsigned_types>::type cnd,
+                            typename mpl::front<typename Backend::unsigned_types>::type x[],
+                            typename mpl::front<typename Backend::unsigned_types>::type y[], size_t size)
+{
+   typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
+   const auto mask = CT::Mask<ui_type>::expand(cnd);
+
+   for(size_t i = 0; i != size; ++i)
+   {
+      const ui_type a = x[i];
+      const ui_type b = y[i];
+      x[i] = mask.select(b, a);
+      y[i] = mask.select(a, b);
+   }
+}
+
+template <typename Backend>
 void eval_inverse_mod_odd_modulus(Backend& res, const Backend& n, const Backend& mod)
 {
    typedef typename mpl::front<typename Backend::signed_types>::type   si_type;
@@ -132,7 +291,7 @@ void eval_inverse_mod_odd_modulus(Backend& res, const Backend& n, const Backend&
    ui_type* a_w   = &tmp_mem[3 * mod_words];
    ui_type* mp1o2 = &tmp_mem[4 * mod_words];
 
-//   ct::poison(tmp_mem.data(), tmp_mem.size());
+   //   ct::poison(tmp_mem.data(), tmp_mem.size());
 
    copy_mem(a_w, n.data(), std::min(n.size(), mod_words));
    copy_mem(b_w, mod.data(), std::min(mod.size(), mod_words));
@@ -147,7 +306,7 @@ void eval_inverse_mod_odd_modulus(Backend& res, const Backend& n, const Backend&
    BOOST_ASSERT(carry == 0);
 
    // Only n.bits() + mod.bits() iterations are required, but avoid leaking the size of n
-   const size_t execs = 2 * mod.bits();
+   const size_t execs = 2 * eval_msb(mod);
 
    for (size_t i = 0; i != execs; ++i)
    {
@@ -179,13 +338,13 @@ void eval_inverse_mod_odd_modulus(Backend& res, const Backend& n, const Backend&
       bigint_cnd_add(odd_u, u_w, mp1o2, mod_words);
    }
 
-   auto a_is_0 = CT::Mask<word>::set();
+   auto a_is_0 = CT::Mask<ui_type>::set();
    for (size_t i = 0; i != mod_words; ++i)
-      a_is_0 &= CT::Mask<word>::is_zero(a_w[i]);
+      a_is_0 &= CT::Mask<ui_type>::is_zero(a_w[i]);
 
-   auto b_is_1 = CT::Mask<word>::is_equal(b_w[0], 1);
+   auto b_is_1 = CT::Mask<ui_type>::is_equal(b_w[0], 1);
    for (size_t i = 1; i != mod_words; ++i)
-      b_is_1 &= CT::Mask<word>::is_zero(b_w[i]);
+      b_is_1 &= CT::Mask<ui_type>::is_zero(b_w[i]);
 
    BOOST_ASSERT_MSG(a_is_0.is_set(), "A is zero");
 
@@ -208,7 +367,7 @@ void eval_inverse_mod_odd_modulus(Backend& res, const Backend& n, const Backend&
 }
 
 template <typename Backend, expression_template_option ExpressionTemplates>
-void inverse_mod_odd_modulus(number<Backend, ExpressionTemplates>& res,
+void inverse_mod_odd_modulus(number<Backend, ExpressionTemplates>&       res,
                              const number<Backend, ExpressionTemplates>& n,
                              const number<Backend, ExpressionTemplates>& mod)
 {
@@ -216,7 +375,7 @@ void inverse_mod_odd_modulus(number<Backend, ExpressionTemplates>& res,
 }
 
 template <typename Backend>
-std::size_t eval_almost_montgomery_inverse(Backend&  result, const Backend& a,
+std::size_t eval_almost_montgomery_inverse(Backend& result, const Backend& a,
                                            const Backend& p)
 {
    size_t k = 0;
@@ -250,7 +409,7 @@ std::size_t eval_almost_montgomery_inverse(Backend&  result, const Backend& a,
          eval_left_shift(r, 1);
       }
 
-      eval_add(k, 1);
+      k++;
    }
 
    if (!eval_gt(p, r))
@@ -266,7 +425,7 @@ std::size_t eval_almost_montgomery_inverse(Backend&  result, const Backend& a,
 }
 
 template <typename Backend, expression_template_option ExpressionTemplates>
-std::size_t almost_montgomery_inverse(number<Backend, ExpressionTemplates>&  result,
+std::size_t almost_montgomery_inverse(number<Backend, ExpressionTemplates>&       result,
                                       const number<Backend, ExpressionTemplates>& a,
                                       const number<Backend, ExpressionTemplates>& p)
 {
@@ -276,7 +435,7 @@ std::size_t almost_montgomery_inverse(number<Backend, ExpressionTemplates>&  res
 template <typename Backend>
 Backend eval_normalized_montgomery_inverse(const Backend& a, const Backend& p)
 {
-   Backend r;
+   Backend     r;
    std::size_t k = eval_almost_montgomery_inverse(r, a, p);
 
    for (std::size_t i = 0; i != k; ++i)
@@ -291,7 +450,6 @@ Backend eval_normalized_montgomery_inverse(const Backend& a, const Backend& p)
    return r;
 }
 
-
 template <typename Backend, expression_template_option ExpressionTemplates>
 number<Backend, ExpressionTemplates> normalized_montgomery_inverse(
     const number<Backend, ExpressionTemplates>& a,
@@ -301,7 +459,7 @@ number<Backend, ExpressionTemplates> normalized_montgomery_inverse(
        evaL_normalized_montgomery_inverse(a.backned(), p.backend()));
 }
 
-template <Backend>
+template <typename Backend>
 Backend eval_inverse_mod_pow2(Backend& a1, size_t k)
 {
    typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
@@ -310,7 +468,7 @@ Backend eval_inverse_mod_pow2(Backend& a1, size_t k)
    * https://eprint.iacr.org/2017/411.pdf sections 5 and 7.
    */
 
-   if (eval_integer_modulus(p, 2) == 0)
+   if (eval_integer_modulus(a1, 2) == 0)
       return 0;
 
    Backend a = a1;
@@ -353,7 +511,7 @@ number<Backend, ExpressionTemplates> inverse_mod_pow2(
 }
 
 template <typename Backend>
-void eval_inverse_mod(Backend& res, const Backend& n, const Backend& mod)
+Backend eval_inverse_mod(Backend& res, const Backend& n, const Backend& mod)
 {
    if (eval_is_zero(mod))
    {
@@ -383,7 +541,7 @@ void eval_inverse_mod(Backend& res, const Backend& n, const Backend& mod)
 
    const std::size_t mod_lz = eval_lsb(mod);
    BOOST_ASSERT(mod_lz > 0);
-   const std::size_t mod_bits = mod.bits();
+   const std::size_t mod_bits = eval_msb(mod);
    BOOST_ASSERT(mod_bits > mod_lz);
 
    if (mod_lz == mod_bits - 1)
@@ -417,7 +575,7 @@ void eval_inverse_mod(Backend& res, const Backend& n, const Backend& mod)
    Backend c = inverse_mod_pow2(o, mod_lz);
 
    // Compute h = c*(inv_2k-inv_o) mod 2^k
-   Backend h = inv2_k;
+   Backend h = inv_2k;
 
    eval_subtract(h, inv_o);
    eval_multiply(h, c);
@@ -429,7 +587,8 @@ void eval_inverse_mod(Backend& res, const Backend& n, const Backend& mod)
 
    const bool h_nonzero = !eval_is_zero(h);
 
-   h.ct_cond_assign(h_nonzero && h_neg, m2k - h);
+   eval_subtracr(m2k, h);
+   h.ct_cond_assign(h_nonzero && h_neg, m2k);
 
    // Return result inv_o + h * o
    eval_multiply(h, o);
@@ -449,19 +608,20 @@ template <typename IntegerType>
 IntegerType monty_inverse(const IntegerType& a)
 {
    IntegerType res;
-   if (is_trivial_cpp_int(IntegerType))
+   if (std::enable_if< is_trivial_cpp_int<IntegerType>::value>::type)
    {
       res = eval_monty_inverse(a);
-   } else
+   }
+   else
    {
       eval_monty_inverse(res.backend(), a.backend());
    }
 
-return res;
+   return res;
 }
 }
 
-
-} // namespace boost::multiprecision::backends
+}
+}// namespace boost::multiprecision::backends
 
 #endif
