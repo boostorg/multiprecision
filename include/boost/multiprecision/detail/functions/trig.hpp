@@ -70,12 +70,65 @@ void hyp0F1(T& result, const T& b, const T& x)
       BOOST_THROW_EXCEPTION(std::runtime_error("H0F1 Failed to Converge"));
 }
 
+template <class T, unsigned N, bool b = boost::multiprecision::detail::is_variable_precision<boost::multiprecision::number<T> >::value>
+struct scoped_N_precision
+{
+   template <class U>
+   scoped_N_precision(U const&) {}
+   template <class U>
+   void reduce(U&) {}
+};
+
+template <class T, unsigned N>
+struct scoped_N_precision<T, N, true>
+{
+   unsigned old_precision, old_arg_precision;
+   scoped_N_precision(T& arg)
+   {
+      old_precision = T::default_precision();
+      old_arg_precision = arg.precision();
+      T::default_precision(old_arg_precision * N);
+      arg.precision(old_arg_precision * N);
+   }
+   ~scoped_N_precision()
+   {
+      T::default_precision(old_precision);
+   }
+   void reduce(T& arg) 
+   {
+      arg.precision(old_arg_precision);
+   }
+};
+
 template <class T>
 void reduce_n_half_pi(T& arg, const T& n, bool go_down)
 {
+   //
+   // We need to perform argument reduction at 3 times the precision of arg
+   // in order to ensure a correct result up to arg = 1/epsilon.  Beyond that
+   // the value of n will have been incorrectly calculated anyway since it will
+   // have a value greater than 1/epsilon and no longer be an exact integer value.
+   //
+   // More information in ARGUMENT REDUCTION FOR HUGE ARGUMENTS. K C Ng.
+   //
+   // There are two mutually exclusive ways to achieve this, both of which are 
+   // supported here:
+   // 1) To define a fixed precision type with 3 times the precision for the calculation.
+   // 2) To dynamically increase the precision of the variables.
+   //
    typedef typename boost::multiprecision::detail::transcendental_reduction_type<T>::type reduction_type;
-
+   //
+   // Make a copy of the arg at higher precision:
+   //
    reduction_type big_arg(arg);
+   //
+   // Dynamically increase precision when supported, this increases the default
+   // and ups the precision of big_arg to match:
+   //
+   scoped_N_precision<T, 3> scoped_precision(big_arg);
+   //
+   // High precision PI:
+   //
    reduction_type reduction = get_constant_pi<reduction_type>();
    eval_ldexp(reduction, reduction, -1); // divide by 2
    eval_multiply(reduction, n);
@@ -86,7 +139,12 @@ void reduce_n_half_pi(T& arg, const T& n, bool go_down)
       eval_subtract(big_arg, reduction, big_arg);
    else
       eval_subtract(big_arg, reduction);
-   arg = big_arg;
+   arg = T(big_arg);
+   //
+   // If arg is a variable precision type, then we have just copied the
+   // precision of big_arg s well it's value.  Reduce the precision now:
+   //
+   scoped_precision.reduce(arg);
    BOOST_MATH_INSTRUMENT_CODE(big_arg.str(10, std::ios_base::scientific));
    BOOST_MATH_INSTRUMENT_CODE(arg.str(10, std::ios_base::scientific));
 }
@@ -178,16 +236,32 @@ void eval_sin(T& result, const T& x)
       //
       if (n_pi.compare(get_constant_one_over_epsilon<T>()) > 0)
       {
-         BOOST_THROW_EXCEPTION(std::runtime_error("Argument reduction failed in call to sin"));
          result = ui_type(0);
          return;
       }
 
       reduce_n_half_pi(xx, n_pi, b_go_down);
+      //
+      // Post reduction we may be a few ulp below zero or above pi/2
+      // given that n_pi was calculated at working precision and not
+      // at the higher precision used for reduction.  Correct that now:
+      //
+      if (eval_get_sign(xx) < 0)
+      {
+         xx.negate();
+         b_negate_sin = !b_negate_sin;
+      }
+      if (xx.compare(half_pi) > 0)
+      {
+         eval_ldexp(half_pi, half_pi, 1);
+         eval_subtract(xx, half_pi, xx);
+         eval_ldexp(half_pi, half_pi, -1);
+         b_go_down = !b_go_down;
+      }
 
       BOOST_MATH_INSTRUMENT_CODE(xx.str(0, std::ios_base::scientific));
       BOOST_MATH_INSTRUMENT_CODE(n_pi.str(0, std::ios_base::scientific));
-      BOOST_ASSERT(xx.compare(half_pi) < 0);
+      BOOST_ASSERT(xx.compare(half_pi) <= 0);
       BOOST_ASSERT(xx.compare(ui_type(0)) >= 0);
    }
 
@@ -361,12 +435,29 @@ void eval_cos(T& result, const T& x)
       //
       if (n_pi.compare(get_constant_one_over_epsilon<T>()) > 0)
       {
-         BOOST_THROW_EXCEPTION(std::runtime_error("Argument reduction failed in call to sin"));
          result = ui_type(0);
          return;
       }
 
       reduce_n_half_pi(xx, n_pi, b_go_down);
+      //
+      // Post reduction we may be a few ulp below zero or above pi/2
+      // given that n_pi was calculated at working precision and not
+      // at the higher precision used for reduction.  Correct that now:
+      //
+      if (eval_get_sign(xx) < 0)
+      {
+         xx.negate();
+         b_negate_cos = !b_negate_cos;
+      }
+      if (xx.compare(half_pi) > 0)
+      {
+         eval_ldexp(half_pi, half_pi, 1);
+         eval_subtract(xx, half_pi, xx);
+         eval_ldexp(half_pi, half_pi, -1);
+      }
+      BOOST_ASSERT(xx.compare(half_pi) <= 0);
+      BOOST_ASSERT(xx.compare(ui_type(0)) >= 0);
    }
    else
    {
@@ -382,19 +473,7 @@ void eval_cos(T& result, const T& x)
    if (b_zero)
    {
       result = si_type(0);
-   } /*
-   else if (b_pi_half)
-   {
-      result = si_type(1);
-   } 
-   else if (b_near_zero)
-   {
-      eval_multiply(t, xx, xx);
-      eval_divide(t, si_type(-4));
-      n_pi = fp_type(0.5f);
-      hyp0F1(result, n_pi, t);
-      BOOST_MATH_INSTRUMENT_CODE(result.str(0, std::ios_base::scientific));
-   }*/
+   }
    else
    {
       eval_sin(result, xx);
