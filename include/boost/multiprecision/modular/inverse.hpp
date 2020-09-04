@@ -101,27 +101,27 @@ inline void bigint_shr1(typename mpl::front<typename Backend::unsigned_types>::t
 
    const size_t top = x_size >= word_shift ? (x_size - word_shift) : 0;
 
-   if(top > 0)
+   if (top > 0)
       copy_mem(x, x + word_shift, top);
    clear_mem(x + top, std::min(word_shift, x_size));
 
-   const auto carry_mask = CT::Mask<ui_type>::expand(bit_shift);
+   const auto   carry_mask  = CT::Mask<ui_type>::expand(bit_shift);
    const size_t carry_shift = carry_mask.if_set_return(BOTAN_MP_WORD_BITS - bit_shift);
 
    ui_type carry = 0;
 
-   for(size_t i = 0; i != top; ++i)
+   for (size_t i = 0; i != top; ++i)
    {
       const ui_type w = x[top - i - 1];
-      x[top-i-1] = (w >> bit_shift) | carry;
-      carry = carry_mask.if_set_return(w << carry_shift);
+      x[top - i - 1]  = (w >> bit_shift) | carry;
+      carry           = carry_mask.if_set_return(w << carry_shift);
    }
 }
 
 template <typename Backend>
 inline typename mpl::front<typename Backend::unsigned_types>::type bigint_add2_nc(
-                           typename mpl::front<typename Backend::unsigned_types>::type x[], size_t x_size,
-                           const typename mpl::front<typename Backend::unsigned_types>::type y[], size_t y_size)
+    typename mpl::front<typename Backend::unsigned_types>::type x[], size_t x_size,
+    const typename mpl::front<typename Backend::unsigned_types>::type y[], size_t y_size)
 {
    typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
 
@@ -131,13 +131,13 @@ inline typename mpl::front<typename Backend::unsigned_types>::type bigint_add2_n
 
    const size_t blocks = y_size - (y_size % 8);
 
-   for(size_t i = 0; i != blocks; i += 8)
+   for (size_t i = 0; i != blocks; i += 8)
       carry = word8_add2(x + i, y + i, carry);
 
-   for(size_t i = blocks; i != y_size; ++i)
+   for (size_t i = blocks; i != y_size; ++i)
       x[i] = word_add(x[i], y[i], &carry);
 
-   for(size_t i = y_size; i != x_size; ++i)
+   for (size_t i = y_size; i != x_size; ++i)
       x[i] = word_add(x[i], 0, &carry);
 
    return carry;
@@ -145,9 +145,9 @@ inline typename mpl::front<typename Backend::unsigned_types>::type bigint_add2_n
 
 template <typename Backend>
 inline typename mpl::front<typename Backend::unsigned_types>::type bigint_cnd_sub(
-                           typename mpl::front<typename Backend::unsigned_types>::type cnd,
-                           typename mpl::front<typename Backend::unsigned_types>::type x[], size_t x_size,
-                           const typename mpl::front<typename Backend::unsigned_types>::type y[], size_t y_size)
+    typename mpl::front<typename Backend::unsigned_types>::type cnd,
+    typename mpl::front<typename Backend::unsigned_types>::type x[], size_t x_size,
+    const typename mpl::front<typename Backend::unsigned_types>::type y[], size_t y_size)
 {
    BOOST_ASSERT_MSG(x_size >= y_size, "Expected sizes");
 
@@ -158,21 +158,21 @@ inline typename mpl::front<typename Backend::unsigned_types>::type bigint_cnd_su
    ui_type carry = 0;
 
    const size_t blocks = y_size - (y_size % 8);
-   ui_type z[8] = { 0 };
+   ui_type      z[8]   = {0};
 
-   for(size_t i = 0; i != blocks; i += 8)
+   for (size_t i = 0; i != blocks; i += 8)
    {
       carry = word8_sub3(z, x + i, y + i, carry);
       mask.select_n(x + i, z, x + i, 8);
    }
 
-   for(size_t i = blocks; i != y_size; ++i)
+   for (size_t i = blocks; i != y_size; ++i)
    {
       z[0] = word_sub(x[i], y[i], &carry);
       x[i] = mask.select(z[0], x[i]);
    }
 
-   for(size_t i = y_size; i != x_size; ++i)
+   for (size_t i = y_size; i != x_size; ++i)
    {
       z[0] = word_sub(x[i], 0, &carry);
       x[i] = mask.select(z[0], x[i]);
@@ -183,10 +183,10 @@ inline typename mpl::front<typename Backend::unsigned_types>::type bigint_cnd_su
 
 template <typename Backend>
 inline typename mpl::front<typename Backend::unsigned_types>::type bigint_cnd_add(
-                            typename mpl::front<typename Backend::unsigned_types>::type cnd,
-                            typename mpl::front<typename Backend::unsigned_types>::type x[],
-                            typename mpl::front<typename Backend::unsigned_types>::type x_size,
-                            const typename mpl::front<typename Backend::unsigned_types>::type y[], size_t y_size)
+    typename mpl::front<typename Backend::unsigned_types>::type       cnd,
+    typename mpl::front<typename Backend::unsigned_types>::type       x[],
+    typename mpl::front<typename Backend::unsigned_types>::type       x_size,
+    const typename mpl::front<typename Backend::unsigned_types>::type y[], size_t y_size)
 {
    BOTAN_ASSERT(x_size >= y_size, "Expected sizes");
 
@@ -197,21 +197,21 @@ inline typename mpl::front<typename Backend::unsigned_types>::type bigint_cnd_ad
    ui_type carry = 0;
 
    const size_t blocks = y_size - (y_size % 8);
-   ui_type z[8] = { 0 };
+   ui_type      z[8]   = {0};
 
-   for(size_t i = 0; i != blocks; i += 8)
+   for (size_t i = 0; i != blocks; i += 8)
    {
       carry = word8_add3(z, x + i, y + i, carry);
       mask.select_n(x + i, z, x + i, 8);
    }
 
-   for(size_t i = blocks; i != y_size; ++i)
+   for (size_t i = blocks; i != y_size; ++i)
    {
       z[0] = word_add(x[i], y[i], &carry);
       x[i] = mask.select(z[0], x[i]);
    }
 
-   for(size_t i = y_size; i != x_size; ++i)
+   for (size_t i = y_size; i != x_size; ++i)
    {
       z[0] = word_add(x[i], 0, &carry);
       x[i] = mask.select(z[0], x[i]);
@@ -225,13 +225,13 @@ inline void bigint_cnd_abs(typename mpl::front<typename Backend::unsigned_types>
                            typename mpl::front<typename Backend::unsigned_types>::type x[], size_t size)
 {
    typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
-   const auto mask = CT::Mask<ui_type>::expand(cnd);
+   const auto                                                          mask = CT::Mask<ui_type>::expand(cnd);
 
    ui_type carry = mask.if_set_return(1);
-   for(size_t i = 0; i != size; ++i)
+   for (size_t i = 0; i != size; ++i)
    {
       const ui_type z = word_add(~x[i], 0, &carry);
-      x[i] = mask.select(z, x[i]);
+      x[i]            = mask.select(z, x[i]);
    }
 }
 
@@ -241,14 +241,14 @@ inline void bigint_cnd_swap(typename mpl::front<typename Backend::unsigned_types
                             typename mpl::front<typename Backend::unsigned_types>::type y[], size_t size)
 {
    typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
-   const auto mask = CT::Mask<ui_type>::expand(cnd);
+   const auto                                                          mask = CT::Mask<ui_type>::expand(cnd);
 
-   for(size_t i = 0; i != size; ++i)
+   for (size_t i = 0; i != size; ++i)
    {
       const ui_type a = x[i];
       const ui_type b = y[i];
-      x[i] = mask.select(b, a);
-      y[i] = mask.select(a, b);
+      x[i]            = mask.select(b, a);
+      y[i]            = mask.select(a, b);
    }
 }
 
@@ -604,24 +604,22 @@ number<Backend, ExpressionTemplates> inverse_mod(const number<Backend, Expressio
    return number<Backend, ExpressionTemplates>(eval_inverse_mod(n.backend(), mod.backend()));
 }
 
-template <typename IntegerType>
+template <typename IntegerType, typename = typename enable_if<typename is_trivial_cpp_int<IntegerType>::value>::type>
+IntegerType monty_inverse(const IntegerType& a)
+{
+   return eval_monty_inverse(a);
+}
+
+template <typename IntegerType, typename = typename enable_if<!typename is_trivial_cpp_int<IntegerType>::value>::type>
 IntegerType monty_inverse(const IntegerType& a)
 {
    IntegerType res;
-   if (std::enable_if< is_trivial_cpp_int<IntegerType>::value>::type)
-   {
-      res = eval_monty_inverse(a);
-   }
-   else
-   {
-      eval_monty_inverse(res.backend(), a.backend());
-   }
-
+   eval_monty_inverse(res.backend(), a.backend());
    return res;
 }
 }
 
 }
-}// namespace boost::multiprecision::backends
+} // namespace boost::multiprecision::backends
 
 #endif
