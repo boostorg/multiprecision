@@ -13,7 +13,7 @@
 using boost::math::tools::ulps_plot;
 
 int main() {
-   using PreciseReal = boost::multiprecision::mpfr_float_100;
+   using PreciseReal = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<300> >;
    using CoarseReal = boost::multiprecision::cpp_bin_float_50;
 
    typedef boost::math::policies::policy<
@@ -43,8 +43,8 @@ int main() {
    plot/*.clip(clip)*/.width(width);
    plot.background_color("white").font_color("black");
    // Sometimes it's useful to set a title, but in many cases it's more useful to just use a caption.
-   //std::string title = "Airy Ai ULP plot at " + boost::core::demangle(typeid(CoarseReal).name()) + " precision";
-   //plot.title(title);
+   std::string title = "asin ULP plot with cpp_bin_float_50";
+   plot.title(title);
    plot.vertical_lines(6);
    plot.add_fn(ai_coarse);
    // You can write the plot to a stream:

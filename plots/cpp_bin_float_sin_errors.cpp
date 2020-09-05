@@ -44,8 +44,8 @@ int main() {
    plot./*clip(clip).*/width(width);
    plot.background_color("white").font_color("black");
    // Sometimes it's useful to set a title, but in many cases it's more useful to just use a caption.
-   //std::string title = "Airy Ai ULP plot at " + boost::core::demangle(typeid(CoarseReal).name()) + " precision";
-   //plot.title(title);
+   std::string title = "sin ULP plot with cpp_bin_float_50";
+   plot.title(title);
    plot.vertical_lines(6);
    plot.add_fn(ai_coarse);
    // You can write the plot to a stream:

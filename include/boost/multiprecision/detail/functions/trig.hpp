@@ -621,7 +621,7 @@ void eval_asin(T& result, const T& x)
       return;
    }
 
-   if (xx.compare(fp_type(1e-4)) < 0)
+   if (xx.compare(fp_type(1e-3)) < 0)
    {
       // http://functions.wolfram.com/ElementaryFunctions/ArcSin/26/01/01/
       eval_multiply(xx, xx);
@@ -632,8 +632,11 @@ void eval_asin(T& result, const T& x)
       eval_multiply(result, x);
       return;
    }
-   else if (xx.compare(fp_type(1 - 1e-4f)) > 0)
+   else if (xx.compare(fp_type(1 - 5e-2f)) > 0)
    {
+      // http://functions.wolfram.com/ElementaryFunctions/ArcSin/26/01/01/
+      // This branch is simlilar in complexity to Newton iterations down to
+      // the above limit.  It is *much* more accurate.
       T dx1;
       T t1, t2;
       eval_subtract(dx1, ui_type(1), xx);
@@ -713,8 +716,9 @@ inline void eval_acos(T& result, const T& x)
       return;
    }
 
-   eval_abs(result, x);
-   int c = result.compare(ui_type(1));
+   T xx;
+   eval_abs(xx, x);
+   int c = xx.compare(ui_type(1));
 
    if (c > 0)
    {
@@ -736,11 +740,82 @@ inline void eval_acos(T& result, const T& x)
       return;
    }
 
-   eval_asin(result, x);
-   T t;
-   eval_ldexp(t, get_constant_pi<T>(), -1);
-   eval_subtract(result, t);
-   result.negate();
+   typedef typename mpl::front<typename T::float_types>::type fp_type;
+
+   if (xx.compare(fp_type(1e-3)) < 0)
+   {
+      // https://functions.wolfram.com/ElementaryFunctions/ArcCos/26/01/01/
+      eval_multiply(xx, xx);
+      T t1, t2;
+      t1 = fp_type(0.5f);
+      t2 = fp_type(1.5f);
+      hyp2F1(result, t1, t1, t2, xx);
+      eval_multiply(result, x);
+      eval_ldexp(t1, get_constant_pi<T>(), -1);
+      result.negate();
+      eval_add(result, t1);
+      return;
+   }
+   if (eval_get_sign(x) < 0)
+   {
+      eval_acos(result, xx);
+      result.negate();
+      eval_add(result, get_constant_pi<T>());
+      return;
+   }
+   else if (xx.compare(fp_type(0.85)) > 0)
+   {
+      // https://functions.wolfram.com/ElementaryFunctions/ArcCos/26/01/01/
+      // This branch is simlilar in complexity to Newton iterations down to
+      // the above limit.  It is *much* more accurate.
+      T dx1;
+      T t1, t2;
+      eval_subtract(dx1, ui_type(1), xx);
+      t1 = fp_type(0.5f);
+      t2 = fp_type(1.5f);
+      eval_ldexp(dx1, dx1, -1);
+      hyp2F1(result, t1, t1, t2, dx1);
+      eval_ldexp(dx1, dx1, 2);
+      eval_sqrt(t1, dx1);
+      eval_multiply(result, t1);
+      return;
+   }
+
+#ifndef BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
+   typedef typename boost::multiprecision::detail::canonical<long double, T>::type guess_type;
+#else
+   typedef fp_type guess_type;
+#endif
+   // Get initial estimate using standard math function asin.
+   guess_type dd;
+   eval_convert_to(&dd, xx);
+
+   result = (guess_type)(std::acos(dd));
+
+   // Newton-Raphson iteration, we should double our precision with each iteration,
+   // in practice this seems to not quite work in all cases... so terminate when we
+   // have at least 2/3 of the digits correct on the assumption that the correction
+   // we've just added will finish the job...
+
+   boost::intmax_t current_precision = eval_ilogb(result);
+   boost::intmax_t target_precision = std::numeric_limits<number<T> >::is_specialized ?
+      current_precision - 1 - (std::numeric_limits<number<T> >::digits * 2) / 3
+      : current_precision - 1 - (boost::multiprecision::detail::digits2<number<T> >::value() * 2) / 3;
+
+   // Newton-Raphson iteration
+   while (current_precision > target_precision)
+   {
+      T sine, cosine;
+      eval_sin(sine, result);
+      eval_cos(cosine, result);
+      eval_subtract(cosine, xx);
+      cosine.negate();
+      eval_divide(cosine, sine);
+      eval_subtract(result, cosine);
+      current_precision = eval_ilogb(cosine);
+      if (current_precision <= (std::numeric_limits<typename T::exponent_type>::min)() + 1)
+         break;
+   }
 }
 
 template <class T>

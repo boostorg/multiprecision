@@ -38,13 +38,13 @@ int main() {
    // and the low precision function at the nearest representable x̂ to x?
    // Or should we compute both the high precision and low precision function at a low precision representable x̂?
    bool perturb_abscissas = false;
-   auto plot = ulps_plot<decltype(ai_precise), PreciseReal, CoarseReal>(ai_precise, CoarseReal(-400), CoarseReal(400), samples, perturb_abscissas);
+   auto plot = ulps_plot<decltype(ai_precise), PreciseReal, CoarseReal>(ai_precise, CoarseReal(-200), CoarseReal(200), samples, perturb_abscissas);
    // Note the argument chaining:
    plot/*.clip(clip)*/.width(width);
    plot.background_color("white").font_color("black");
    // Sometimes it's useful to set a title, but in many cases it's more useful to just use a caption.
-   //std::string title = "Airy Ai ULP plot at " + boost::core::demangle(typeid(CoarseReal).name()) + " precision";
-   //plot.title(title);
+   std::string title = "atan ULP plot with cpp_bin_float_50";
+   plot.title(title);
    plot.vertical_lines(6);
    plot.add_fn(ai_coarse);
    // You can write the plot to a stream:
