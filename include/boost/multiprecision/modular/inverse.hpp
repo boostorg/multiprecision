@@ -12,6 +12,7 @@
 #include <boost/container/vector.hpp>
 
 #include <boost/type_traits/is_integral.hpp>
+#include <boost/multiprecision/detail/default_ops.hpp>
 
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
@@ -22,6 +23,43 @@ namespace boost {
 namespace multiprecision {
 namespace backends {
 
+template <typename Backend>
+Backend eval_extended_euclidean_algorithm (Backend& a, Backend& b, Backend& x, Backend& y) {
+   if (eval_is_zero(a)) {
+      typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
+      x = ui_type(0u);
+      y = ui_type(1u);
+      return b;
+   }
+   Backend x1, y1, tmp = b;
+   eval_modulus(tmp, a);
+   Backend d = eval_extended_euclidean_algorithm(tmp, a, x1, y1);
+   tmp = b;
+   eval_divide(tmp, a);
+   eval_multiply(tmp, x1);
+   x = y1;
+   eval_subtract(x, tmp);
+   y = x1;
+   return d;
+}
+
+template <typename Backend>
+Backend eval_inverse_extended_euclidean_algorithm (const Backend& a, const Backend& m) {
+   Backend aa = a, mm = m, x, y, g;
+   typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
+   g = eval_extended_euclidean_algorithm(aa, mm, x, y);
+   if (!eval_eq(g, ui_type(1u))) {
+      //BOOST_THROW_EXCEPTION(std::invalid_argument("eval_inverse_with_gcd: no inverse element"));
+      return ui_type(0u);
+   } else {
+      eval_modulus(x, m);
+      eval_add(x, m);
+      eval_modulus(x, m);
+      return x;
+   }
+}
+
+/*
 template <typename Backend>
 typename mpl::front<typename Backend::signed_types>::type eval_monty_inverse(typename mpl::front<typename Backend::signed_types>::type a)
 {
@@ -36,7 +74,7 @@ typename mpl::front<typename Backend::signed_types>::type eval_monty_inverse(typ
     * From "A New Algorithm for Inversion mod p^k" by Çetin Kaya Koç
     * https://eprint.iacr.org/2017/411.pdf sections 5 and 7.
     */
-
+/*
    si_type b = 1;
    si_type r = 0;
 
@@ -56,43 +94,80 @@ typename mpl::front<typename Backend::signed_types>::type eval_monty_inverse(typ
    return r;
 }
 
+*/
+
+
 template <typename Backend>
-void eval_monty_inverse(Backend& res, const Backend& a)
+void eval_monty_inverse(Backend& res, const Backend& a, const Backend& p, const Backend& k)
 {
+
+   using default_ops::eval_modulus;
+   using default_ops::eval_subtract;
+   using default_ops::eval_abs;
+   using default_ops::eval_gt;
+
    typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
-   if (eval_modulus(a, 2) == 0)
-   {
-      throw std::invalid_argument("monty_inverse only valid for odd integers");
-   }
+   Backend zero = ui_type(0u);
+   Backend one  = ui_type(1u);
+   Backend two  = ui_type(2u);
 
    /*
     * From "A New Algorithm for Inversion mod p^k" by Çetin Kaya Koç
     * https://eprint.iacr.org/2017/411.pdf sections 5 and 7.
     */
+   Backend c, tmp = a;
 
-   Backend b         = ui_type(1u), bi, bt;
-   res               = ui_type(0u);
-   std::size_t abits = eval_msb(a);
+   eval_modulus(tmp, p);
 
-   for (std::size_t i = 0; i != abits; ++i)
+   //a^(-1) mod p:
+   c = p;
+   eval_modulus(tmp, p);
+   eval_subtract(c, tmp);
+
+
+
+   Backend bi         = one, bt, i = zero, k_negone = k, xi, nextp = one;
+   eval_subtract(k_negone, one);
+   res               = zero;
+
+   ui_type kn = cpp_int(k_negone);
+
+   while(!eval_eq(i, k))
    {
-      eval_modulus(bi, b, 2);
-      eval_right_shift(res, 1);
-      eval_right_shift(bt, bi, abits - 1);
-      eval_add(res, res, bt);
-      eval_multiply(bt, a, bi);
-      eval_subtract(b, bt);
-      eval_right_shift(b, 1);
+      //xi:
+      xi = bi;
+      eval_multiply(xi, c);
+      eval_modulus(xi, p);
+
+      if (eval_get_sign(xi) < 0) {
+         tmp = xi;
+         eval_abs(tmp, tmp);
+         eval_modulus(tmp, p);
+         xi = p;
+         eval_subtract(xi, tmp);
+      }
+      std::cout<<"\n x"<<cpp_int(i)<< " == "<< cpp_int(xi);
+
+      //bi:
+      tmp = a;
+      eval_multiply(tmp, xi);
+      eval_subtract(bi, tmp);
+      eval_divide(bi, p);
+      std::cout<<"\n new_b"<<cpp_int(i)<< " == "<< cpp_int(bi) << "\n";
+
+      //res:
+      tmp = xi;
+      eval_multiply(tmp, nextp);
+      eval_multiply(nextp, p);
+      eval_add(res, tmp);
+      eval_add(i, one);
+      std::cout<<"\n res"<<cpp_int(i)<< " == "<< cpp_int(res) << "\n";
    }
 
-   b = ui_type(0u);
-
-   // Now invert in addition space
-   eval_complement(b, b);
-   eval_subtract(b, res);
-   eval_add(res, 1);
 }
 
+
+/*
 template <typename Backend>
 inline void bigint_shr1(typename mpl::front<typename Backend::unsigned_types>::type x[], size_t x_size,
                         size_t word_shift, size_t bit_shift)
@@ -252,6 +327,7 @@ inline void bigint_cnd_swap(typename mpl::front<typename Backend::unsigned_types
    }
 }
 
+
 template <typename Backend>
 void eval_inverse_mod_odd_modulus(Backend& res, const Backend& n, const Backend& mod)
 {
@@ -279,7 +355,7 @@ void eval_inverse_mod_odd_modulus(Backend& res, const Backend& n, const Backend&
    Thanks to Niels for creating the algorithm, explaining some things
    about it, and the reference to the paper.
    */
-
+/*
    const size_t mod_words = mod.size();
    BOOST_ASSERT_MSG(mod_words > 0, "Not empty");
 
@@ -357,6 +433,7 @@ void eval_inverse_mod_odd_modulus(Backend& res, const Backend& n, const Backend&
    * So just clear out the other values and then give that buffer to a
    * BigInt.
    */
+/*
    clear_mem(&tmp_mem[mod_words], 4 * mod_words);
 
    CT::unpoison(tmp_mem.data(), tmp_mem.size());
@@ -366,6 +443,7 @@ void eval_inverse_mod_odd_modulus(Backend& res, const Backend& n, const Backend&
    return r;
 }
 
+/*
 template <typename Backend, expression_template_option ExpressionTemplates>
 void inverse_mod_odd_modulus(number<Backend, ExpressionTemplates>&       res,
                              const number<Backend, ExpressionTemplates>& n,
@@ -373,7 +451,9 @@ void inverse_mod_odd_modulus(number<Backend, ExpressionTemplates>&       res,
 {
    eval_inverse_mod_odd_modulus(res.backend(), n.backend(), mod.backend());
 }
+ */
 
+/*
 template <typename Backend>
 std::size_t eval_almost_montgomery_inverse(Backend& result, const Backend& a,
                                            const Backend& p)
@@ -423,7 +503,9 @@ std::size_t eval_almost_montgomery_inverse(Backend& result, const Backend& a,
 
    return k;
 }
+*/
 
+/*
 template <typename Backend, expression_template_option ExpressionTemplates>
 std::size_t almost_montgomery_inverse(number<Backend, ExpressionTemplates>&       result,
                                       const number<Backend, ExpressionTemplates>& a,
@@ -431,7 +513,9 @@ std::size_t almost_montgomery_inverse(number<Backend, ExpressionTemplates>&     
 {
    return eval_almost_montgomery_inverse(result.backend(), a.backend(), p.backend());
 }
+*/
 
+/*
 template <typename Backend>
 Backend eval_normalized_montgomery_inverse(const Backend& a, const Backend& p)
 {
@@ -449,7 +533,9 @@ Backend eval_normalized_montgomery_inverse(const Backend& a, const Backend& p)
 
    return r;
 }
+*/
 
+/*
 template <typename Backend, expression_template_option ExpressionTemplates>
 number<Backend, ExpressionTemplates> normalized_montgomery_inverse(
     const number<Backend, ExpressionTemplates>& a,
@@ -458,7 +544,9 @@ number<Backend, ExpressionTemplates> normalized_montgomery_inverse(
    return number<Backend, ExpressionTemplates>(
        evaL_normalized_montgomery_inverse(a.backned(), p.backend()));
 }
+ */
 
+/*
 template <typename Backend>
 Backend eval_inverse_mod_pow2(Backend& a1, size_t k)
 {
@@ -467,7 +555,7 @@ Backend eval_inverse_mod_pow2(Backend& a1, size_t k)
    * From "A New Algorithm for Inversion mod p^k" by Çetin Kaya Koç
    * https://eprint.iacr.org/2017/411.pdf sections 5 and 7.
    */
-
+/*
    if (eval_integer_modulus(a1, 2) == 0)
       return 0;
 
@@ -486,6 +574,8 @@ Backend eval_inverse_mod_pow2(Backend& a1, size_t k)
    granularity because of the length of a, so no point in doing more
    than this.
    */
+/*
+
    const std::size_t iter = round_up(k, sizeof(ui_type) * CHAR_BIT);
 
    for (std::size_t i = 0; i != iter; ++i)
@@ -501,7 +591,9 @@ Backend eval_inverse_mod_pow2(Backend& a1, size_t k)
    X.const_time_unpoison();
    return X;
 }
+*/
 
+/*
 template <typename Backend, expression_template_option ExpressionTemplates>
 number<Backend, ExpressionTemplates> inverse_mod_pow2(
     const number<Backend, ExpressionTemplates>& a1, size_t k)
@@ -509,7 +601,9 @@ number<Backend, ExpressionTemplates> inverse_mod_pow2(
    return number<Backend, ExpressionTemplates>(
        eval_inverse_mod_pow2(a1.backend(), k.backend()));
 }
+*/
 
+/*
 template <typename Backend>
 Backend eval_inverse_mod(Backend& res, const Backend& n, const Backend& mod)
 {
@@ -533,6 +627,7 @@ Backend eval_inverse_mod(Backend& res, const Backend& n, const Backend& mod)
       Fastpath for common case. This leaks information if n > mod
       but we don't guarantee const time behavior in that case.
       */
+/*
       if (eval_gt(mod, n))
          return eval_inverse_mod_odd_modulus(n, mod);
       else
@@ -556,7 +651,7 @@ Backend eval_inverse_mod(Backend& res, const Backend& n, const Backend& mod)
    * Compute the inversions modulo 2^k and modulo o, then combine them
    * using CRT, which is possible because 2^k and o are relatively prime.
    */
-
+/*
    Backend o = mod;
 
    eval_right_shift(mod, mod_lz);
@@ -596,20 +691,43 @@ Backend eval_inverse_mod(Backend& res, const Backend& n, const Backend& mod)
 
    return h;
 }
+*/
 
+/*
 template <typename Backend, expression_template_option ExpressionTemplates>
 number<Backend, ExpressionTemplates> inverse_mod(const number<Backend, ExpressionTemplates>& n,
                                                  const number<Backend, ExpressionTemplates>& mod)
 {
    return number<Backend, ExpressionTemplates>(eval_inverse_mod(n.backend(), mod.backend()));
 }
+*/
 
+/*
 template <typename IntegerType, typename = typename enable_if<typename is_trivial_cpp_int<IntegerType>::value>::type>
 IntegerType monty_inverse(const IntegerType& a)
 {
    return eval_monty_inverse(a);
 }
+ */
 
+template <typename Backend, expression_template_option ExpressionTemplates>
+number<Backend, ExpressionTemplates> inverse_extended_euclidean_algorithm(const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& p)
+{
+   number<Backend, ExpressionTemplates> res;
+   return eval_inverse_extended_euclidean_algorithm(a.backend(), p.backend());
+}
+
+
+template <typename Backend, expression_template_option ExpressionTemplates>
+number<Backend, ExpressionTemplates> monty_inverse(const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& p, const number<Backend, ExpressionTemplates>& k)
+{
+   number<Backend, ExpressionTemplates> res;
+   eval_monty_inverse(res.backend(), a.backend(), p.backend(), k.backend());
+   return res;
+}
+
+
+/*
 template <typename IntegerType, typename = typename enable_if<!typename is_trivial_cpp_int<IntegerType>::value>::type>
 IntegerType monty_inverse(const IntegerType& a)
 {
@@ -617,6 +735,7 @@ IntegerType monty_inverse(const IntegerType& a)
    eval_monty_inverse(res.backend(), a.backend());
    return res;
 }
+ */
 }
 
 }

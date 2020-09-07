@@ -1593,5 +1593,9 @@ if(TOMMATH_COMPILED)
     target_compile_definitions(multiprecision_test_test_ressol_tommath PUBLIC -DTEST_TOMMATH)
 endif()
 
+cm_test(NAME multiprecision_test_test_inverse_cpp_int SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_inverse.cpp)
+target_compile_definitions(multiprecision_test_test_inverse_cpp_int PUBLIC -DTEST_CPP_INT)
+target_link_libraries(multiprecision_test_test_inverse_cpp_int no_eh_support)
+
 include_directories(${CMAKE_WORKSPACE_SOURCES_DIR})
 
