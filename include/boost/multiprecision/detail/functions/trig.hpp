@@ -435,7 +435,7 @@ void eval_cos(T& result, const T& x)
       //
       if (n_pi.compare(get_constant_one_over_epsilon<T>()) > 0)
       {
-         result = ui_type(0);
+         result = ui_type(1);
          return;
       }
 
