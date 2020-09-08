@@ -27,8 +27,25 @@ template <typename T>
 void test()
 {
    using namespace boost::multiprecision::backends;
+   //test for monty_inverse
+   BOOST_CHECK_EQUAL(monty_inverse(T(12), T(5), T(5)),T(1823));
+   BOOST_CHECK_EQUAL(monty_inverse(T(10), T(37), T(1)),T(26));
+   BOOST_CHECK_EQUAL(monty_inverse(T(3), T(2), T(3)),T(3));
+   BOOST_CHECK_EQUAL(monty_inverse(T(3), T(4), T(2)), T(11));
+   BOOST_CHECK_EQUAL(monty_inverse(T(4), T(7), T(2)), T(37));
+   BOOST_CHECK_EQUAL(monty_inverse(T(32), T(247), T(1)), T(193));
+   BOOST_CHECK_EQUAL(monty_inverse(T(3), T(7), T(7)), T(549029));
+   BOOST_CHECK_EQUAL(monty_inverse(T(5317589), T(23), T(8)), T(32104978469));
 
-   //inverse with extended euclidean algorithm
+   //test for inverse with extended euclidean algorithm
+   BOOST_CHECK_EQUAL(monty_inverse(T(12), T(5), T(5)),T(1823));
+   BOOST_CHECK_EQUAL(monty_inverse(T(10), T(37), T(1)),T(26));
+   BOOST_CHECK_EQUAL(monty_inverse(T(3), T(2), T(3)),T(3));
+   BOOST_CHECK_EQUAL(monty_inverse(T(3), T(4), T(2)), T(11));
+   BOOST_CHECK_EQUAL(monty_inverse(T(4), T(7), T(2)), T(37));
+   BOOST_CHECK_EQUAL(monty_inverse(T(32), T(247), T(1)), T(193));
+   BOOST_CHECK_EQUAL(monty_inverse(T(3), T(7), T(7)), T(549029));
+   BOOST_CHECK_EQUAL(monty_inverse(T(5317589), T(23), T(8)), T(32104978469));
 
    BOOST_CHECK_EQUAL(inverse_extended_euclidean_algorithm(T(10), T(37)),T(26));
    BOOST_CHECK_EQUAL(inverse_extended_euclidean_algorithm(T(5), T("0x7fffffffffffffffffffffffffffffff")), T("0x33333333333333333333333333333333"));

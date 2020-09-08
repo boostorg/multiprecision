@@ -115,16 +115,10 @@ void eval_monty_inverse(Backend& res, const Backend& a, const Backend& p, const 
     * From "A New Algorithm for Inversion mod p^k" by Çetin Kaya Koç
     * https://eprint.iacr.org/2017/411.pdf sections 5 and 7.
     */
-   Backend c, tmp = a;
-
-   eval_modulus(tmp, p);
+   Backend c, tmp;
 
    //a^(-1) mod p:
-   c = p;
-   eval_modulus(tmp, p);
-   eval_subtract(c, tmp);
-
-
+   c = eval_inverse_extended_euclidean_algorithm(a, p);
 
    Backend bi         = one, bt, i = zero, k_negone = k, xi, nextp = one;
    eval_subtract(k_negone, one);
@@ -146,14 +140,12 @@ void eval_monty_inverse(Backend& res, const Backend& a, const Backend& p, const 
          xi = p;
          eval_subtract(xi, tmp);
       }
-      std::cout<<"\n x"<<cpp_int(i)<< " == "<< cpp_int(xi);
 
       //bi:
       tmp = a;
       eval_multiply(tmp, xi);
       eval_subtract(bi, tmp);
       eval_divide(bi, p);
-      std::cout<<"\n new_b"<<cpp_int(i)<< " == "<< cpp_int(bi) << "\n";
 
       //res:
       tmp = xi;
@@ -161,9 +153,7 @@ void eval_monty_inverse(Backend& res, const Backend& a, const Backend& p, const 
       eval_multiply(nextp, p);
       eval_add(res, tmp);
       eval_add(i, one);
-      std::cout<<"\n res"<<cpp_int(i)<< " == "<< cpp_int(res) << "\n";
    }
-
 }
 
 
