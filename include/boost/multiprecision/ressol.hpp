@@ -179,7 +179,7 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
  * Compute the square root of x modulo a prime using the
  * Shanks-Tonnelli algorithm
  *
- * @param x the input
+ * @param a the input
  * @param p the prime
  * @return y such that (y*y)%p == x, or -1 if no such integer
  */
@@ -190,6 +190,21 @@ ressol(const number<Backend, ExpressionTemplates>& a,
 {
    return number<Backend, ExpressionTemplates>(
        eval_ressol(a.backend(), p.backend()));
+}
+
+/**
+ * Compute the square root of x modulo a prime using the
+ * Shanks-Tonnelli algorithm
+ *
+ * @param a the prime
+ * @return y such that (y*y)%p == x, or -1 if no such integer
+ */
+template <typename Backend, expression_template_option ExpressionTemplates>
+inline number<Backend, ExpressionTemplates>
+ressol(const number<modular_adaptor<Backend>, ExpressionTemplates>& a)
+{
+   return number<Backend, ExpressionTemplates>(
+       eval_ressol(a.backend().base_data(), a.backend().mod_data()));
 }
 
 }

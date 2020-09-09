@@ -16,6 +16,7 @@
 
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
+#include <boost/multiprecision/modular/modular_adaptor.hpp>
 #include <boost/multiprecision/modular/base_params.hpp>
 #include <boost/multiprecision/modular/barrett_params.hpp>
 
@@ -707,6 +708,12 @@ number<Backend, ExpressionTemplates> inverse_extended_euclidean_algorithm(const 
    return eval_inverse_extended_euclidean_algorithm(a.backend(), p.backend());
 }
 
+template <typename Backend, expression_template_option ExpressionTemplates>
+number<Backend, ExpressionTemplates> inverse_extended_euclidean_algorithm(const number<modular_adaptor<Backend>, ExpressionTemplates>& a)
+{
+   number<Backend, ExpressionTemplates> res;
+   return eval_inverse_extended_euclidean_algorithm(a.backend().base_data(), a.backend().mod_data());
+}
 
 template <typename Backend, expression_template_option ExpressionTemplates>
 number<Backend, ExpressionTemplates> monty_inverse(const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& p, const number<Backend, ExpressionTemplates>& k)
