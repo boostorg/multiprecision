@@ -199,12 +199,16 @@ ressol(const number<Backend, ExpressionTemplates>& a,
  * @param a the prime
  * @return y such that (y*y)%p == x, or -1 if no such integer
  */
+
 template <typename Backend, expression_template_option ExpressionTemplates>
-inline number<Backend, ExpressionTemplates>
-ressol(const number<modular_adaptor<Backend>, ExpressionTemplates>& a)
+inline number<modular_adaptor<Backend>, ExpressionTemplates>
+ressol(const number<modular_adaptor<Backend>, ExpressionTemplates>& modular)
 {
-   return number<Backend, ExpressionTemplates>(
-       eval_ressol(a.backend().base_data(), a.backend().mod_data()));
+   number<Backend, ExpressionTemplates> mod =  modular.backend().mod_data().get_mod();
+   number<Backend, ExpressionTemplates> res = eval_ressol(modular.backend().base_data(), mod.backend());
+   number<modular_adaptor<Backend>, ExpressionTemplates> res_mod;
+   assign_components(res_mod.backend(), res.backend(), mod.backend());
+   return res_mod;
 }
 
 }
