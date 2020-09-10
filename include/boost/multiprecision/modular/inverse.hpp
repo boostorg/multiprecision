@@ -22,7 +22,6 @@
 
 namespace boost {
 namespace multiprecision {
-namespace backends {
 
 template <typename Backend>
 Backend eval_extended_euclidean_algorithm (Backend& a, Backend& b, Backend& x, Backend& y) {
@@ -684,36 +683,24 @@ Backend eval_inverse_mod(Backend& res, const Backend& n, const Backend& mod)
 }
 */
 
-/*
+
 template <typename Backend, expression_template_option ExpressionTemplates>
 number<Backend, ExpressionTemplates> inverse_mod(const number<Backend, ExpressionTemplates>& n,
                                                  const number<Backend, ExpressionTemplates>& mod)
 {
    return number<Backend, ExpressionTemplates>(eval_inverse_mod(n.backend(), mod.backend()));
 }
-*/
-
-/*
-template <typename IntegerType, typename = typename enable_if<typename is_trivial_cpp_int<IntegerType>::value>::type>
-IntegerType monty_inverse(const IntegerType& a)
-{
-   return eval_monty_inverse(a);
-}
- */
 
 template <typename Backend, expression_template_option ExpressionTemplates>
-number<Backend, ExpressionTemplates> inverse_extended_euclidean_algorithm(const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& p)
+number<modular_adaptor<Backend>, ExpressionTemplates> inverse_extended_euclidean_algorithm(const number<modular_adaptor<Backend>, ExpressionTemplates>& modular)
 {
-   number<Backend, ExpressionTemplates> res;
-   return eval_inverse_extended_euclidean_algorithm(a.backend(), p.backend());
+   number<Backend, ExpressionTemplates> mod =  modular.backend().mod_data().get_mod();
+   number<Backend, ExpressionTemplates> res = eval_inverse_extended_euclidean_algorithm(modular.backend().base_data(), mod.backend());
+   number<modular_adaptor<Backend>, ExpressionTemplates> res_mod;
+   assign_components(res_mod.backend(), res.backend(), mod.backend());
+   return res_mod;
 }
 
-template <typename Backend, expression_template_option ExpressionTemplates>
-number<Backend, ExpressionTemplates> inverse_extended_euclidean_algorithm(const number<modular_adaptor<Backend>, ExpressionTemplates>& a)
-{
-   number<Backend, ExpressionTemplates> res;
-   return eval_inverse_extended_euclidean_algorithm(a.backend().base_data(), a.backend().mod_data());
-}
 
 template <typename Backend, expression_template_option ExpressionTemplates>
 number<Backend, ExpressionTemplates> monty_inverse(const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& p, const number<Backend, ExpressionTemplates>& k)
@@ -723,6 +710,13 @@ number<Backend, ExpressionTemplates> monty_inverse(const number<Backend, Express
    return res;
 }
 
+/*
+template <typename IntegerType, typename = typename enable_if<typename is_trivial_cpp_int<IntegerType>::value>::type>
+IntegerType monty_inverse(const IntegerType& a)
+{
+   return eval_monty_inverse(a);
+}
+ */
 
 /*
 template <typename IntegerType, typename = typename enable_if<!typename is_trivial_cpp_int<IntegerType>::value>::type>
@@ -733,7 +727,6 @@ IntegerType monty_inverse(const IntegerType& a)
    return res;
 }
  */
-}
 
 }
 } // namespace boost::multiprecision::backends
