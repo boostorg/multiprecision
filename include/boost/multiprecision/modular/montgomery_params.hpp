@@ -16,6 +16,7 @@
 
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
+#include <boost/multiprecision/modular/inverse.hpp>
 #include <boost/multiprecision/modular/base_params.hpp>
 #include <boost/multiprecision/modular/barrett_params.hpp>
 
@@ -29,6 +30,8 @@ template <typename Backend>
 class montgomery_params : public base_params<Backend>
 {
    typedef number<Backend> number_type;
+
+   typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
 
  protected:
    template <typename Number>
@@ -44,32 +47,6 @@ class montgomery_params : public base_params<Backend>
       find_const_variables(p);
    }
 
-   limb_type monty_inverse(limb_type a)
-   {
-      if (a % 2 == 0)
-      {
-         throw std::invalid_argument("Monty_inverse only valid for odd integers");
-      }
-
-      limb_type b = 1;
-      limb_type r = 0;
-
-      for (size_t i = 0; i != sizeof(limb_type) * CHAR_BIT; ++i)
-      {
-         const limb_type bi = b % 2;
-         r >>= 1;
-         r += bi << (sizeof(limb_type) * CHAR_BIT - 1);
-
-         b -= a * bi;
-         b >>= 1;
-      }
-
-      // Now invert in addition space
-      r = (~static_cast<limb_type>(0) - r) + 1;
-
-      return r;
-   }
-
    template <typename T>
    void find_const_variables(const T& pp)
    {
@@ -81,7 +58,7 @@ class montgomery_params : public base_params<Backend>
 
       m_p_words = this->m_mod.backend().size();
 
-      m_p_dash = monty_inverse(this->m_mod.backend().limbs()[0]);
+      m_p_dash = monty_inverse<Backend>(this->m_mod.backend().limbs()[0]);
 
       number_type r;
 
