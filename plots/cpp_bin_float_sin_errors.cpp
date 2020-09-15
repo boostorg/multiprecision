@@ -1,4 +1,4 @@
-﻿
+
 //  (C) Copyright Nick Thompson 2020.
 //  (C) Copyright John Maddock 2020.
 //  Use, modification and distribution are subject to the
