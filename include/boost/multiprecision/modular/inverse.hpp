@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef BOOST_MULTIPRECISION_MODULAR_INVERSE_HPP
-#define BOOST_MULTIPRECISION_MODULAR_INVERSE_HPP
+#ifndef BOOST_MULTIPRECISION_MODULAR_BACKENDS_INVERSE_HPP
+#define BOOST_MULTIPRECISION_MODULAR_BACKENDS_INVERSE_HPP
 
 #include <boost/container/vector.hpp>
 
@@ -16,16 +16,16 @@
 
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
-#include <boost/multiprecision/modular/modular_adaptor.hpp>
-#include <boost/multiprecision/modular/base_params.hpp>
-#include <boost/multiprecision/modular/barrett_params.hpp>
 
 namespace boost {
 namespace multiprecision {
+namespace backends {
 
 template <typename Backend>
-Backend eval_extended_euclidean_algorithm (Backend& a, Backend& b, Backend& x, Backend& y) {
-   if (eval_is_zero(a)) {
+Backend eval_extended_euclidean_algorithm(Backend& a, Backend& b, Backend& x, Backend& y)
+{
+   if (eval_is_zero(a))
+   {
       typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
       x = ui_type(0u);
       y = ui_type(1u);
@@ -34,7 +34,7 @@ Backend eval_extended_euclidean_algorithm (Backend& a, Backend& b, Backend& x, B
    Backend x1, y1, tmp = b;
    eval_modulus(tmp, a);
    Backend d = eval_extended_euclidean_algorithm(tmp, a, x1, y1);
-   tmp = b;
+   tmp       = b;
    eval_divide(tmp, a);
    eval_multiply(tmp, x1);
    x = y1;
@@ -44,14 +44,18 @@ Backend eval_extended_euclidean_algorithm (Backend& a, Backend& b, Backend& x, B
 }
 
 template <typename Backend>
-Backend eval_inverse_extended_euclidean_algorithm (const Backend& a, const Backend& m) {
-   Backend aa = a, mm = m, x, y, g;
+Backend eval_inverse_extended_euclidean_algorithm(const Backend& a, const Backend& m)
+{
+   Backend                                                             aa = a, mm = m, x, y, g;
    typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
    g = eval_extended_euclidean_algorithm(aa, mm, x, y);
-   if (!eval_eq(g, ui_type(1u))) {
+   if (!eval_eq(g, ui_type(1u)))
+   {
       //BOOST_THROW_EXCEPTION(std::invalid_argument("eval_inverse_with_gcd: no inverse element"));
       return ui_type(0u);
-   } else {
+   }
+   else
+   {
       eval_modulus(x, m);
       eval_add(x, m);
       eval_modulus(x, m);
@@ -59,7 +63,6 @@ Backend eval_inverse_extended_euclidean_algorithm (const Backend& a, const Backe
    }
 }
 
-/*
 template <typename Backend>
 typename mpl::front<typename Backend::signed_types>::type eval_monty_inverse(typename mpl::front<typename Backend::signed_types>::type a)
 {
@@ -74,7 +77,7 @@ typename mpl::front<typename Backend::signed_types>::type eval_monty_inverse(typ
     * From "A New Algorithm for Inversion mod p^k" by Çetin Kaya Koç
     * https://eprint.iacr.org/2017/411.pdf sections 5 and 7.
     */
-/*
+
    si_type b = 1;
    si_type r = 0;
 
@@ -94,9 +97,6 @@ typename mpl::front<typename Backend::signed_types>::type eval_monty_inverse(typ
    return r;
 }
 
-*/
-
-
 template <typename Backend>
 void eval_monty_inverse(Backend& res, const Backend& a, const Backend& p, const Backend& k)
 {
@@ -107,9 +107,9 @@ void eval_monty_inverse(Backend& res, const Backend& a, const Backend& p, const 
    using default_ops::eval_gt;
 
    typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
-   Backend zero = ui_type(0u);
-   Backend one  = ui_type(1u);
-   Backend two  = ui_type(2u);
+   Backend                                                             zero = ui_type(0u);
+   Backend                                                             one  = ui_type(1u);
+   Backend                                                             two  = ui_type(2u);
 
    /*
     * From "A New Algorithm for Inversion mod p^k" by Çetin Kaya Koç
@@ -120,20 +120,21 @@ void eval_monty_inverse(Backend& res, const Backend& a, const Backend& p, const 
    //a^(-1) mod p:
    c = eval_inverse_extended_euclidean_algorithm(a, p);
 
-   Backend bi         = one, bt, i = zero, k_negone = k, xi, nextp = one;
+   Backend bi = one, bt, i = zero, k_negone = k, xi, nextp = one;
    eval_subtract(k_negone, one);
-   res               = zero;
+   res = zero;
 
    ui_type kn = cpp_int(k_negone);
 
-   while(!eval_eq(i, k))
+   while (!eval_eq(i, k))
    {
       //xi:
       xi = bi;
       eval_multiply(xi, c);
       eval_modulus(xi, p);
 
-      if (eval_get_sign(xi) < 0) {
+      if (eval_get_sign(xi) < 0)
+      {
          tmp = xi;
          eval_abs(tmp, tmp);
          eval_modulus(tmp, p);
@@ -155,7 +156,6 @@ void eval_monty_inverse(Backend& res, const Backend& a, const Backend& p, const 
       eval_add(i, one);
    }
 }
-
 
 /*
 template <typename Backend>
@@ -682,53 +682,9 @@ Backend eval_inverse_mod(Backend& res, const Backend& n, const Backend& mod)
    return h;
 }
 */
-
-
-template <typename Backend, expression_template_option ExpressionTemplates>
-number<Backend, ExpressionTemplates> inverse_mod(const number<Backend, ExpressionTemplates>& n,
-                                                 const number<Backend, ExpressionTemplates>& mod)
-{
-   return number<Backend, ExpressionTemplates>(eval_inverse_mod(n.backend(), mod.backend()));
 }
-
-template <typename Backend, expression_template_option ExpressionTemplates>
-number<modular_adaptor<Backend>, ExpressionTemplates> inverse_extended_euclidean_algorithm(const number<modular_adaptor<Backend>, ExpressionTemplates>& modular)
-{
-   number<Backend, ExpressionTemplates> mod =  modular.backend().mod_data().get_mod();
-   number<Backend, ExpressionTemplates> res = eval_inverse_extended_euclidean_algorithm(modular.backend().base_data(), mod.backend());
-   number<modular_adaptor<Backend>, ExpressionTemplates> res_mod;
-   assign_components(res_mod.backend(), res.backend(), mod.backend());
-   return res_mod;
-}
-
-
-template <typename Backend, expression_template_option ExpressionTemplates>
-number<Backend, ExpressionTemplates> monty_inverse(const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& p, const number<Backend, ExpressionTemplates>& k)
-{
-   number<Backend, ExpressionTemplates> res;
-   eval_monty_inverse(res.backend(), a.backend(), p.backend(), k.backend());
-   return res;
-}
-
-/*
-template <typename IntegerType, typename = typename enable_if<typename is_trivial_cpp_int<IntegerType>::value>::type>
-IntegerType monty_inverse(const IntegerType& a)
-{
-   return eval_monty_inverse(a);
-}
- */
-
-/*
-template <typename IntegerType, typename = typename enable_if<!typename is_trivial_cpp_int<IntegerType>::value>::type>
-IntegerType monty_inverse(const IntegerType& a)
-{
-   IntegerType res;
-   eval_monty_inverse(res.backend(), a.backend());
-   return res;
-}
- */
-
 }
 } // namespace boost::multiprecision::backends
 
 #endif
+
