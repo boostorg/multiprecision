@@ -1,0 +1,18 @@
+[/
+]
+
+[section:modular_adaptor modular_adaptor]
+``
+    namespace boost {
+    namespace multiprecision {
+    namespace backends {
+
+    template <typename Backend>
+    class modular_adaptor;
+    }}
+``
+The class template `modular_adaptor` is a backend for number which converts any existing integer backend into a modular-number backend.
+The class `modular_adaptor` is defined by an integer backend and [link boost_multiprecision.tut.modular.modular_adaptor.modular_params `modular_params`].
+
+[include tutorial_modular_params.qbk]
+[endsect] [/section:modular_adaptor modular_adaptor]

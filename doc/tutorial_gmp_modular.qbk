@@ -1,0 +1,30 @@
+[/
+  
+]
+
+[section:gmp_modular gmp_modular]
+
+`#include <boost/multiprecision/gmp.hpp>`
+`#include <boost/multiprecision/modular/modular_adaptor.hpp>`
+`#include <boost/multiprecision/modular/modular_params_gmp.hpp>`
+
+    namespace boost {
+    namespace multiprecision {
+    typedef modular_params<gmp_int>           mpz_int_mod_params;
+    typedef number<modular_adaptor<gmp_int> > mpz_int_mod;
+    }
+    } // namespace boost::multiprecision
+
+The `mpz_int_mod_params` and `mpz_int_mod`  acts as a thin wrapper around the [gmp] `mpz_t`
+to provide an modular type that is a drop-in replacement for the native C++ integer types, but with unlimited precision.
+
+Things you should know when using this type:
+
+* No changes are made to the GMP library's global settings - so you can safely mix this type with
+existing code that uses [gmp].
+* Default constructed `gmp_int`s have the value zero (this is GMP's default behavior).
+* Conversion from a string results in a std::runtime_error being thrown if the string can not be interpreted as a valid rational number.
+* No changes are made to the GMP library's global settings, so this type can coexist with existing GMP code.
+* The code can equally be used with MPIR as the underlying library - indeed that is the preferred option on Win32. 
+
+[endsect] [/section:gmp_modular gmp_modular]

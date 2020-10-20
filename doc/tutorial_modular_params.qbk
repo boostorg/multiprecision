@@ -1,0 +1,14 @@
+[/
+]
+
+[section:modular_params Modular_params]
+
+``
+    namespace boost {
+    namespace multiprecision {
+
+    template <typename Backend>
+    class modular_params;
+``
+
+[endsect] [/section:modular_params modular_params]

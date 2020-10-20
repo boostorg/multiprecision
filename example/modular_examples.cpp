@@ -7,6 +7,7 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
+//[cpp_modular_eg
 #include <iostream>
 #include <boost/multiprecision/cpp_modular.hpp>
 
@@ -44,3 +45,5 @@ int main()
    modular_number_examples<boost::multiprecision::cpp_mod, boost::multiprecision::cpp_mod_params>();
    return 0;
 }
+
+//]
