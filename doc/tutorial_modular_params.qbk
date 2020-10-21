@@ -1,7 +1,7 @@
 [/
 ]
 
-[section:modular_params Modular_params]
+[section:modular_params Modular params]
 
 ``
     namespace boost {
@@ -9,6 +9,32 @@
 
     template <typename Backend>
     class modular_params;
+    }}
 ``
+
+The class `modular_params` is inherited from the 
+[link boost_multiprecision.tut.modular.modular_adaptor.modular_params.montgomery_params `public backends::montgomery_params<Backend>`] 
+and [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.barrett_params `public backends::barrett_params<Backend>`]classes.
+[include tutorial_montgomery_params.qbk]
+[include tutorial_barrett_params.qbk]
+[include tutorial_base_params.qbk]
+
+[h2 API modular_params]
+[h3 Constructors]
+* `modular_params()`
+* `modular_params(const Number& p)`
+[h3 Operators]
+* `modular_params& operator=(const modular_params<Backend>& v)`
+* `modular_params& operator=(const Number& v)`
+* `operator number<BackendT, ExpressionTemplates>()`
+* `friend std::ostream& operator<<(std::ostream& o, modular_params<Backend> const& a)`
+[h3 Getters]
+* `number_type get_mod() const`
+[h3 Class member functions] 
+* `void reduce(Backend& result) const`
+This void perform the Montgomery's modular reduction for odd numbers and Barrett's modular reductions for even.
+* `void adjust_modular(Backend& result)` 
+* `void adjust_regular(Backend& result, const Backend& input) const`
+* `int compare(const modular_params<Backend>& o) const`
 
 [endsect] [/section:modular_params modular_params]
