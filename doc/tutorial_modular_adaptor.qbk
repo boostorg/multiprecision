@@ -1,4 +1,10 @@
 [/
+  Copyright 2020 Ilia Shirobokov.
+  Copyright 2020 Alisa Cherniaeva.
+
+  Distributed under the Boost Software License, Version 1.0.
+  (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt).
 ]
 
 [section:modular_adaptor modular_adaptor]
@@ -11,8 +17,196 @@
     class modular_adaptor;
     }}
 ``
-The class template `modular_adaptor` is a backend for number which converts any existing integer backend into a modular-number backend.
-The class `modular_adaptor` is defined by an integer backend and [link boost_multiprecision.tut.modular.modular_adaptor.modular_params `modular_params`].
+The class template `modular_adaptor` is a backend for number which converts any existing integer backend into a number backend for [@https://en.wikipedia.org/wiki/Modular_arithmetic modular arithmetic].
+
+The class `modular_adaptor` contains two parts.
+
+* The first part is a /number/ which is defined by the given integer backend. In math, it is known as /residue class/ or /congruence class/. 
+* The second part is /modulus/ which is an instance of [link boost_multiprecision.tut.modular.modular_adaptor.modular_params `modular_params`].
+
+[section:modular_adaptor_api modular_adaptor API]
+
+[section:constructors_and_operators Constructors and Operators]
+
+[table `modular_adaptor` constructors
+    [ [ Signature ] [ Comments ] ]
+    [ [ `modular_adaptor()` ] [ ] ]
+    [ [ `modular_adaptor(const modular_adaptor& o)` ] [ ] ]
+    [ [ `modular_adaptor(modular_adaptor&& o)` ] [ ] ]
+    [ [ `modular_adaptor(const Backend& val, const modular_params<Backend>& mod)` ] [ ] ]
+    [ [ `modular_adaptor(const Backend& val, const Backend& mod)` ] [ ] ]
+    [ [ `modular_adaptor(Backend& val, Backend& mod)` ] [ ] ]
+    [ [ `modular_adaptor(const Backend& val)` ] [ ] ]
+    [ [ `modular_adaptor(const modular_params<Backend>& mod)` ] [ ] ]
+]
+
+[table `modular_adaptor` operators
+    [ [ Signature ] [ Comments ] ]
+    [ [ `modular_adaptor& operator=(const modular_adaptor& o)` ] [ ] ]
+    [ [ `modular_adaptor& operator=(modular_adaptor&& o)` ] [ ] ]
+    [ [ `modular_adaptor& operator=(const char* s)` ] [ ] ]
+]
+[endsect] [/section:constructors_and_operators]
+
+[section:getters Getters]
+`inline Backend& base_data()`
+
+`inline Backend const& base_data() const`
+
+__returns residue class
+
+`inline modular_params<Backend>& mod_data()`
+
+`inline const modular_params<Backend>& mod_data() const`
+
+__returns [link boost_multiprecision.tut.modular.modular_adaptor.modular_params `modular_params`] that contains modulus and additional data.
+
+[endsect] [/ section:getters ]
+
+[section:member_functions Class Member Functions]
+
+[section:compare `compare(const modular_adaptor& o) const`]
+`int compare(const modular_adaptor& o) const`
+
+Compares bases (see [link boost_multiprecision.tut.modular.modular_adaptor.modular_adaptor_api.getters `base_data()`]) of two `modular_adaptor`.
+
+Modulus values of the both `modular_adaptor` have to be equal. 
+
+In other case, the functione throws the exception:
+``
+BOOST_THROW_EXCEPTION(std::runtime_error("Could not compare modular number with different mod."))
+``
+[endsect]
+
+[section:compare_t `compare(const T& val) const`]
+`template <class T> int compare(const T& val) const`
+
+TO DO (adjust_data)
+[endsect]
+
+[section:negate `negate()`]
+`inline void negate()`
+
+Multiply the number by -1. 
+
+According to the modular arithmetic rules, the result equals /modulus - number/ (always > 0).
+[endsect]
+
+[section:str `str(std::streamsize dig, std::ios_base::fmtflags f)`]
+`inline std::string str(std::streamsize dig, std::ios_base::fmtflags f) const`
+
+TO DO (adjust_data)
+[endsect]
+
+[section:swap `swap(modular_adaptor& o)`]
+`inline void swap(modular_adaptor& o)`
+
+Swap both number and modulus values between two instances of `modular_adaptor`.
+[endsect]
+
+[endsect] [/section:member_functions]
+
+[section:other Other]
+[section:eval_redc `eval_redc(Backend& result, const modular_params<Backend>& mod)`]
+`template <class Backend> inline void eval_redc(Backend& result, const modular_params<Backend>& mod)`
+
+Computes `result` by modulo set in `modular_params`.
+
+Currently, `modular_params` doesn't allow choosing reduction algorithm. 
+
+By default, `modular_params` uses [@https://en.wikipedia.org/wiki/Barrett_reduction Barrett reduction] for even numbers and [@https://en.wikipedia.org/wiki/Montgomery_modular_multiplication Montgomery reduction] otherwise. 
+[endsect]
+
+[endsect] [/section:other]
+
+[section:backend_requirements Backend Required Functions]
+
+[section:eval_add `eval_add(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)`]
+`template <class Backend> inline void eval_add(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)`
+
+Adds `o` base value to `result` base value (see [link boost_multiprecision.tut.modular.modular_adaptor.modular_adaptor_api.getters `base_data()`]). 
+
+Modulus values of the both `modular_adaptor` have to be equal. 
+The result is reduced by the modulus value.
+[endsect]
+
+[section:eval_convert_to `eval_convert_to(Result* result, const modular_adaptor<Backend>& val)`]
+`template <class Result, class Backend> inline void eval_convert_to(Result* result, const modular_adaptor<Backend>& val)`
+
+Converts a residue class handed by `modular_adapter` (see [link boost_multiprecision.tut.modular.modular_adaptor.modular_adaptor_api.getters `base_data()`]) to the type of `result`.
+
+Notice that modulus data (see [link boost_multiprecision.tut.modular.modular_adaptor.modular_adaptor_api.getters `mod_data()`]) doesn't affect this conversion. 
+[endsect]
+
+[section:eval_subtract `eval_subtract(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)`]
+`template <class Backend> inline void eval_subtract(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)`
+
+
+[endsect]
+
+[section:eval_multiply `template <class Backend> inline void eval_multiply(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)`]
+[endsect]
+
+[section:eval_divide `template <class Backend> inline void eval_divide(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)`]
+[endsect]
+
+[section:eval_modulus `template <class Backend> inline void eval_modulus(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)`]
+[endsect]
+
+[section:eval_is_zero `template <class Backend> inline bool eval_is_zero(const modular_adaptor<Backend>& val)`]
+[endsect]
+
+[section:eval_get_sign `template <class Backend> inline int eval_get_sign(const modular_adaptor<Backend>&)`]
+[endsect]
+
+[section:assign_components `template <class Backend, class T, class V> inline void assign_components(modular_adaptor<Backend>& result, const T& a, const V& b)`]
+[endsect]
+
+[section:eval_sqrt `template <class Backend> inline void eval_sqrt(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& val)`]
+[endsect]
+
+[section:eval_abs `template <class Backend> inline void eval_abs(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& val)`]
+[endsect]
+
+[section:window_bits `size_t window_bits(size_t exp_bits))`]
+[endsect]
+
+[section:find_modular_pow `template <class Backend> inline void find_modular_pow(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& b, Backend& exp)`]
+[endsect]
+
+[section:eval_pow `template <class Backend> inline void eval_pow(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& b, const modular_adaptor<Backend>& e)`]
+[endsect]
+
+[section:eval_pow_backend_e `template <class Backend> inline void eval_pow(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& b, const Backend& e)`]
+[endsect]
+
+[section:eval_left_shift `template <class Backend, class UI> inline void eval_left_shift(modular_adaptor<Backend>& t, UI i)`]
+[endsect]
+
+[section:eval_right_shift `template <class Backend, class UI> inline void eval_right_shift(modular_adaptor<Backend>& t, UI i)`]
+[endsect]
+
+[section:eval_left_shift_with_v `template <class Backend, class UI> inline void eval_left_shift(modular_adaptor<Backend>& t, const modular_adaptor<Backend>& v, UI i)`]
+[endsect]
+
+[section:eval_right_shift_with_v `template <class Backend, class UI> inline void eval_right_shift(modular_adaptor<Backend>& t, const modular_adaptor<Backend>& v, UI i)`]
+[endsect]
+
+[section:eval_bitwise_and `template <class Backend> inline void eval_bitwise_and(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)`]
+[endsect]
+
+[section:eval_bitwise_or `template <class Backend> inline void eval_bitwise_or(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)`]
+[endsect]
+
+[section:eval_bitwise_xor `template <class Backend> inline void eval_bitwise_xor(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)`]
+[endsect]
+
+[section:eval_right_shift_with_v `template <class Backend, class UI> inline void eval_right_shift(modular_adaptor<Backend>& t, const modular_adaptor<Backend>& v, UI i)`]
+[endsect]
+
+[endsect] [/section:backend_requirements]
+
+[endsect] [/section:modular_adaptor_api]
 
 [include tutorial_modular_params.qbk]
 [endsect] [/section:modular_adaptor modular_adaptor]

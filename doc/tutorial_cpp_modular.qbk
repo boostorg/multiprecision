@@ -1,4 +1,10 @@
 [/
+  Copyright 2020 Ilia Shirobokov.
+  Copyright 2020 Alisa Cherniaeva.
+
+  Distributed under the Boost Software License, Version 1.0.
+  (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt).
 ]
 
 [section:cpp_modular cpp_modular]
@@ -71,7 +77,7 @@
 
 
 The `cpp_mod` and `cpp_mod_params` are used via the typedef boost::multiprecision::cpp_modular.
-It provides a modular number type that is a drop-in replacement for the native C++ number types, but with unlimited precision. 
+It provides a number type for [@https://en.wikipedia.org/wiki/Modular_arithmetic [modular arithmetic]] with unlimited precision. 
 As well as the usual conversions from arithmetic and string types, instances of cpp_modular are copy constructible and assignable from type cpp_int. 
 
 Things you should know when using this type:
