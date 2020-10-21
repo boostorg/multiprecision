@@ -1,0 +1,24 @@
+[/
+]
+
+[section:base_params Base_params]
+``
+    namespace boost {
+    namespace multiprecision {
+    namespace backends {
+
+    template <typename Backend>
+    class base_params;
+    }}
+``
+The class `base_params` initialize the module for modular calculations.
+
+[h2 API base_params]
+[h3 Constructors]
+* `base_params()`
+* `base_params(const Number& p)`
+
+[h3 Getter]
+`const number_type& mod() const` - return the modules value.
+
+[endsect] [/section:base_params base_params]
