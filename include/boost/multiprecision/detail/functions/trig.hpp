@@ -357,7 +357,6 @@ void eval_cos(T& result, const T& x)
 
    typedef typename boost::multiprecision::detail::canonical<boost::int32_t, T>::type  si_type;
    typedef typename boost::multiprecision::detail::canonical<boost::uint32_t, T>::type ui_type;
-   typedef typename mpl::front<typename T::float_types>::type                          fp_type;
 
    switch (eval_fpclassify(x))
    {
@@ -466,9 +465,6 @@ void eval_cos(T& result, const T& x)
    }
 
    const bool b_zero = eval_get_sign(xx) == 0;
-
-   // Check if the reduced argument is very close to 0.
-   const bool b_near_zero = xx.compare(fp_type(1e-1)) < 0;
 
    if (b_zero)
    {

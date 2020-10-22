@@ -50,7 +50,7 @@
 template <class T>
 void test()
 {
-   using mpfr_float_1000 = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<1000> >;
+   typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<1000> > mpfr_float_1000;
 
    for (int n = -20; n <= 20; ++n)
    {
@@ -102,12 +102,10 @@ int main()
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<64> > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<63> > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<62> > >();
-   /* These fail since our exponent range is greater than that of mpfr which we use for comparison:
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<61, long long> > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<60, long long> > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<59, long long, std::allocator<char> > > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<58, long long, std::allocator<char> > > >();
-   */
    // Check low multiprecision digit counts.
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<9> > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<18> > >();

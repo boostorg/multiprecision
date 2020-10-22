@@ -50,13 +50,15 @@
 template <class T>
 void test()
 {
-   using mpfr_float_1000 = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<1000> >;
+   typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<1000> > mpfr_float_1000;
 
-   for (int n = -20; n <= 20; ++n)
+   for (int n = 0; n <= 20; ++n)
    {
       std::cout << "Testing n = " << n << std::endl;
       T boundary = boost::math::constants::half_pi<T>() * n;
       T val      = boundary;
+      if((n == 0) && ((std::numeric_limits<T>::min_exponent <= std::numeric_limits<mpfr_float_1000>::min_exponent) || (!std::numeric_limits<T>::is_specialized)))
+         continue;
       for (unsigned i = 0; i < 200; ++i)
       {
          mpfr_float_1000 comparison(val);
@@ -64,10 +66,6 @@ void test()
          T found = sin(val);
          T expected = T(comparison);
          BOOST_CHECK_LE(boost::math::epsilon_difference(found, expected), 20);
-         //std::cout << std::setprecision(10) << val << std::endl;
-         //std::cout << std::setprecision(50) << found << std::endl;
-         //std::cout << std::setprecision(50) << comparison << std::endl;
-         //std::cout << std::setprecision(50) << expected << std::endl;
          val = boost::math::float_next(val);
       }
       val = boundary;
@@ -102,12 +100,10 @@ int main()
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<64> > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<63> > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<62> > >();
-   /* These fail since our exponent range is greater than that of mpfr which we use for comparison:
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<61, long long> > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<60, long long> > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<59, long long, std::allocator<char> > > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<58, long long, std::allocator<char> > > >();
-   */
    // Check low multiprecision digit counts.
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<9> > >();
    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<18> > >();

@@ -1,7 +1,8 @@
-@import url('../../../../doc/src/boostbook.css');
 /* Contains the basic settings for BoostBook and used by Quickbook to docbook conversion. */ 
 
-/* Note:this import link assumes called from doc/html, not from any backup copy in /doc. */
+/* Note:this import link assumes called from libs/multiprecision/doc/html, not from any backup copy in libs/multiprecision/doc. */
+/* boost-no-inspect */
+@import url('../../../../doc/src/boostbook.css');
 
 /*=============================================================================
 Copyright (c) 2004 Joel de Guzman    http://spirit.sourceforge.net/
