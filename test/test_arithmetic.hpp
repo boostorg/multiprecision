@@ -948,7 +948,7 @@ void test_integer_ops(const boost::mpl::int_<boost::multiprecision::number_kind_
    test_integer_round_trip<Real, unsigned int>();
    test_integer_round_trip<Real, long>();
    test_integer_round_trip<Real, unsigned long>();
-#ifndef BOOST_NO_CXX11_LONG_LONG
+#ifndef BOOST_NO_LONG_LONG
    test_integer_round_trip<Real, long long>();
    test_integer_round_trip<Real, unsigned long long>();
 #endif

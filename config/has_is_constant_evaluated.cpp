@@ -38,10 +38,6 @@ BOOST_PRAGMA_MESSAGE ("BOOST_MP_HAS_IS_CONSTANT_EVALUATED is NOT defined, so no 
 BOOST_PRAGMA_MESSAGE ("BOOST_NO_CXX14_CONSTEXPR is defined.")
 #endif
 
-#ifdef BOOST_NO_CXX17_CONSTEXPR
-BOOST_PRAGMA_MESSAGE ("BOOST_NO_CXX17_CONSTEXPR is defined.")
-#endif
-
 #ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
 #  error 1  "std::is_constant_evaluated is NOT available to determine if a calculation can use constexpr."
 #endif
