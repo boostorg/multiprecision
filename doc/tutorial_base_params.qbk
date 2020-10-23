@@ -1,7 +1,22 @@
 [/
+ Copyright 2020 Ilia Shirobokov.
+  Copyright 2020 Alisa Cherniaeva.
+
+  Distributed under the Boost Software License, Version 1.0.
+  (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt).
 ]
 
-[section:base_params Base_params]
+[section:base_params Base params]
+
+[pre
+[*Table of Contents]
+ [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.base_params.api base_params API]
+     [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.base_params.const_oper Constructors and Operators]
+     [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.base_params.getter Getters]
+]
+
+
 ``
     namespace boost {
     namespace multiprecision {
@@ -11,14 +26,23 @@
     class base_params;
     }}
 ``
-The class `base_params` initialize the module for modular calculations.
+The class `base_params` initializes the module for modular calculations.
 
-[h2 API base_params]
-[h3 Constructors]
-* `base_params()`
-* `base_params(const Number& p)`
+[h2:api base_params API]
 
-[h3 Getter]
-`const number_type& mod() const` - return the modules value.
+[h4:const_oper Constructors and Operators]
 
-[endsect] [/section:base_params base_params]
+[table `base_params` constructors
+    [ [ Signature ] [ Comments ] ]
+    [ [ `base_params()` ] [ ] ]
+    [ [ `base_params(const Number& p)` ] [ ] ]
+]
+
+
+[h4:getter Getters]
+`const number_type& mod() const`
+
+return the modules value.
+
+
+[endsect] [/section:base_params]
