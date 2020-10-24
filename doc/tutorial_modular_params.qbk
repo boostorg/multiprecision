@@ -33,6 +33,8 @@
 The class `modular_params` is inherited from the 
 [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.montgomery_params `public backends::montgomery_params<Backend>`] 
 and [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.barrett_params `public backends::barrett_params<Backend>`]classes.
+[note It can be also be used with `tommath_int` backend and `gmp_int` backend.]
+
 [include tutorial_montgomery_params.qbk]
 [include tutorial_barrett_params.qbk]
 [include tutorial_base_params.qbk]

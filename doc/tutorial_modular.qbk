@@ -11,11 +11,11 @@
 The following backends provide modular number arithmetic:
 
 [table
-[[Backend Type][Header][Radix][Dependencies][Pros][Cons]]
-[[`cpp_modular`][boost/multiprecision/cpp_modular.hpp][2][None][An all C++ Boost-licensed implementation.][Slower than [mpc].]]
-[[`gmp_modular`][boost/multiprecision/gmp_modular.hpp][2][[mpc]][Very fast and efficient back-end.][Dependency on LGLP-licensed [MPC] library.]]
-[[`tommath_modular`][boost/multiprecision/tommath_modular.hpp][2][`__float128` and libquadmath][Very fast and efficient number type.][128-bit precision only, and resticted to GCC.]]
-[[`modular_adaptor`][boost/multiprecision/modular/modular_adaptor.hpp][-][none][Can convert any backend type into a complex number backend.][Not a number in its own right, and hard to use as a result.]]
+[[Backend Type][Header][Dependencies][Pros]]
+[[`cpp_modular`][boost/multiprecision/cpp_modular.hpp][None][ An all C++ Boost-licensed implementation.]]
+[[`gmp_modular`][boost/multiprecision/gmp_modular.hpp][[gmp]][ Very fast and efficient back-end.]]
+[[`tommath_modular`][boost/multiprecision/tommath_modular.hpp][[tommath]][ Public domain back-end with no licence restrictions.]]
+[[`modular_adaptor`][boost/multiprecision/modular/modular_adaptor.hpp][None][ All C++ adaptor that allows an integer back-end type to be used as a modular type.]]
 ]
 
 [include tutorial_cpp_modular.qbk]
