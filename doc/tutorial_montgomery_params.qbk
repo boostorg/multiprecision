@@ -49,9 +49,15 @@ Inside of the fuction only multiplications, subtractions, additions and shifts a
 [h4:getter Getters]
 * `inline const number_type& r2() const `
 
+return squared Montgomery radix.
+
 * `inline limb_type p_dash() const `
 
+return precomputed constant for the Montgomery reduction
+
 * `inline size_t p_words() const`
+
+return significant words of the represented integer value 
 
 [h4:members Class member functions] 
 

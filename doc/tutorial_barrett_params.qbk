@@ -47,6 +47,8 @@ Inside of the fuction only multiplications, subtractions, additions and shifts a
 [h4:getter Getters]
 `inline const number_type& mu() const`
 
+return precomputed constant for the Barrett reduction
+
 [h4:members Class member functions] 
 
 [#reduce] [role blue `inline void eval_barret_reduce(Backend& result) const`]

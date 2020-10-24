@@ -168,29 +168,65 @@ Notice that modulus data (see [link boost_multiprecision.tut.modular.modular_ada
 [#eval_subtract] 
 [role blue `template <class Backend> inline void eval_subtract(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)`]
 
+Subtract `o` base value from `result` base value (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `base_data()`]). 
+
+Modulus values of the both `modular_adaptor` have to be equal. 
+The result is reduced by the modulus value.
+
 [#eval_multiply] [role blue `template <class Backend> inline void eval_multiply(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)`]
 
+Multiply `o` base value to `result` base value (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `base_data()`]). 
+
+Modulus values of the both `modular_adaptor` have to be equal. 
+The result is reduced by the modulus value.
+
 [#eval_divide] [role blue `template <class Backend> inline void eval_divide(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)`]
+
+Divide `result` base value by `o` base value (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `base_data()`]). 
+
+Modulus values of the both `modular_adaptor` have to be equal. 
+The result is reduced by the modulus value.
 
 
 [#eval_modulus] [role blue `template <class Backend> inline void eval_modulus(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)`]
 
+Compute `result` base value by  modulo `o` base value (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `base_data()`]).
+
+Uses for cases then the special reduction algorithms (Montgomery or Barrett) can not be applied.
+
+Modulus values of the both `modular_adaptor` have to be equal. 
+The result is reduced by the modulus value.
+
 
 [#eval_is_zero] [role blue `template <class Backend> inline bool eval_is_zero(const modular_adaptor<Backend>& val)`]
 
+Compare `val` base value with 0.
+
 [#eval_get_sign] [role blue `template <class Backend> inline int eval_get_sign(const modular_adaptor<Backend>&)`]
 
+Return (int)1.
 
 [#assign_components] [role blue `template <class Backend, class T, class V> inline void assign_components(modular_adaptor<Backend>& result, const T& a, const V& b)`]
 
+Assign to `result` base value the value `a` and `result` mod value the value `b` in the Montgomery form (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `base_data()` and `mod_data()`] ).
+
 [#eval_sqrt] [role blue `template <class Backend> inline void eval_sqrt(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& val)`]
 
+Assign to `result` base value the square root of `o` base value (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `base_data()`]). 
+
+This value is not reduced on modulo.
 
 [#eval_abs] [role blue `template <class Backend> inline void eval_abs(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& val)`]
 
+Execute the operator `result = val`.
+
 [#window_bits] [role blue `size_t window_bits(size_t exp_bits))`]
 
+
+
 [#find_modular_pow] [role blue `template <class Backend> inline void find_modular_pow(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& b, Backend& exp)`]
+
+
 
 [#eval_pow] [role blue `template <class Backend> inline void eval_pow(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& b, const modular_adaptor<Backend>& e)`]
 

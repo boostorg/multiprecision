@@ -57,6 +57,8 @@ and [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.barret
 [h4:getter Getters]
 * `number_type get_mod() const`
 
+return the modules value.
+
 [h4:members Class member functions] 
 [#reduce] [role blue `void reduce(Backend& result) const`]
 This void performs the Montgomery's modular reduction for odd numbers and Barrett's modular reductions for even.
