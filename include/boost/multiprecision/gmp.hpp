@@ -2602,6 +2602,22 @@ struct digits2<number<debug_adaptor<gmp_float<0> >, et_off> >
    }
 };
 
+template <unsigned Digits10>
+struct transcendental_reduction_type<boost::multiprecision::backends::gmp_float<Digits10> >
+{
+   //
+   // The type used for trigonometric reduction needs 3 times the precision of the base type.
+   // This is double the precision of the original type, plus the largest exponent supported.
+   // As a practical measure the largest argument supported is 1/eps, as supporting larger
+   // arguments requires the division of argument by PI/2 to also be done at higher precision,
+   // otherwise the result (an integer) can not be represented exactly.
+   // 
+   // See ARGUMENT REDUCTION FOR HUGE ARGUMENTS. K C Ng.
+   //
+   typedef boost::multiprecision::backends::gmp_float<Digits10 * 3> type;
+};
+
+
 } // namespace detail
 
 template <>
