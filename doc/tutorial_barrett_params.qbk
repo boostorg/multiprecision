@@ -29,7 +29,7 @@ This class performs the modular reductions using the Barrett reduction [@https:/
 
 The class `barrett_params` is inherited from the [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.base_params `base_params`] class.
 
-Precomputed values required for the algorithm are calculated automaticly.
+The pre-computed values required for the algorithm are calculated automatically.
 
 [h2:api API barrett_params]
 [h4:const_oper Constructors and Operators]
@@ -47,12 +47,12 @@ Precomputed values required for the algorithm are calculated automaticly.
 [h4:getter Getters]
 `inline const number_type& mu() const`
 
-Returns the precomputed constant for the Barrett reduction.
+Returns the pre-computed constant for the Barrett reduction.
 
 [h4:members Class member functions] 
 
 [#reduce] [role blue `inline void eval_barret_reduce(Backend& result) const`]
 
-Performs the Barrett's modular reduction. 
+Performs Barrett's modular reduction. 
 
 [endsect][/section:barrett_params barrett_params]

@@ -41,7 +41,7 @@ and [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.barret
 [h4:reduction_method Reduction Method Choice]
 `modular_params` describes which of the reduction methods (Montgomery or Barrett) to use based on the modulus value. 
 
-The Montgomery's modular reduction is used for odd numbers and Barrett's modular reductions - for even.
+Montgomery's modular reduction is used for odd numbers and Barrett's modular reductions - for even.
 
 [include tutorial_montgomery_params.qbk]
 [include tutorial_barrett_params.qbk]
@@ -77,17 +77,17 @@ Transforms `result` into Montgomery's form if it is needed (see [link reduction_
 
 [#adjust_regular] [role blue `void adjust_regular(Backend& result, const Backend& input) const`]
 
-Transforms `input` from Montgomery's form into a standart number and stores it in `result`.
+Transforms `input` from Montgomery's form into a standard number and stores it in `result`.
 
 See also [link reduction_method Reduction Method Choice]). 
 
 [#compare] [role blue `int compare(const modular_params<Backend>& o) const`]
 
-Compares two modules values.
+Compares two modulus values.
 
 [#reduce] [role blue `void reduce(Backend& result) const`]
 
-Performs a modular reduction accordint to ether Montgomery or Barrett algorithms.
+Performs a modular reduction according to either Montgomery or Barrett algorithms.
 
 See also [link reduction_method Reduction Method Choice]). 
 

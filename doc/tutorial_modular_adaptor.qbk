@@ -57,7 +57,7 @@
         class modular_adaptor;
     }}
 ``
-The class template `modular_adaptor` is a backend for number which converts any existing integer backend into a number backend for [@https://en.wikipedia.org/wiki/Modular_arithmetic modular arithmetic].
+The class template `modular_adaptor` converts any existing integer backend into a number backend for [@https://en.wikipedia.org/wiki/Modular_arithmetic modular arithmetic].
 
 The class `modular_adaptor` contains two parts.
 
@@ -96,7 +96,7 @@ The class `modular_adaptor` contains two parts.
 
 `inline Backend const& base_data() const`
 
-Returns number value of the `modular_adaptor` (residue class of the number by modulo).
+Returns the value of the `modular_adaptor` (residue class of the number by modulo).
 
 [#mod_data]
 [role blue `mod_data`]
@@ -115,7 +115,7 @@ Returns [link boost_multiprecision.tut.modular.modular_adaptor.modular_params `m
 
 Compares bases (see [link base_data `base_data()`]) of two `modular_adaptor`.
 
-Modulus values of the both `modular_adaptor` have to be equal. 
+Modulus values of both `modular_adaptor` have to be equal. 
 
 In other case, the function throws the `std::runtime_error` exception.
 
@@ -124,7 +124,7 @@ In other case, the function throws the `std::runtime_error` exception.
 
 Compares base (see [link base_data `base_data()`]) of `modular_adaptor` to `val`.
 
-Modulus values of the  `modular_adaptor` have to be less then `val`. 
+Modulus values of the  `modular_adaptor` have to be less than `val`. 
 
 In other case, the function throws the `std::runtime_error` exception.
 
@@ -146,7 +146,7 @@ If `dig` is zero, then returns as many digits as are required to reconstruct the
 [#swap] 
 [role blue `inline void swap(modular_adaptor& o)`]
 
-Swap both number and modulus values between two instances of `modular_adaptor`.
+Swap both base value and modulus values between two instances of `modular_adaptor`.
 
 
 [h4:other Class Related Functions]
@@ -155,7 +155,7 @@ Swap both number and modulus values between two instances of `modular_adaptor`.
 
 Computes `result` by modulo set in `modular_params`.
 
-Currently, `modular_params` doesn't allow choosing reduction algorithm. 
+Currently, `modular_params` doesn't allow choosing a reduction algorithm. 
 
 By default, `modular_params` uses [@https://en.wikipedia.org/wiki/Barrett_reduction Barrett reduction] for even numbers and [@https://en.wikipedia.org/wiki/Montgomery_modular_multiplication Montgomery reduction] otherwise. 
 
@@ -165,9 +165,6 @@ By default, `modular_params` uses [@https://en.wikipedia.org/wiki/Barrett_reduct
 Calculates modular exponentiation, i.e. `b.base_data() ^ exp mod m` where `m` is a modulus of `b` (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `mod_data()`]).
 
 The implementation is based on ???.
-
-Notice that the default way to calculate modular exponentiation is functions [eval_pow `eval_pow`].
-We recommend use it. 
 
 [#window_bits] [role blue `size_t window_bits(size_t exp_bits))`]
 
@@ -191,24 +188,25 @@ Set `result` base data to the absolute value of the `val` base data (see [link b
 
 Adds `o` base value to `result` base value (see [link base_data `base_data()`]). 
 
-Modulus values of the both `modular_adaptor` have to be equal. 
+Modulus values of both `modular_adaptor` have to be equal. 
+
 The result is reduced by modulo.
 
 [#eval_bitwise_and] [role blue `template <class Backend> inline void eval_bitwise_and(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)`]
 
-Converts both `result` and `b` to a regular numbers, evaluates "bitwise and" operation over them in accordance with `Backend` rules and converts the result back to `modular_adaptor`.  
+Converts both `result` and `b` to a regular numbers, evaluates "bitwise and" operation over them following `Backend` rules, and converts the result back to `modular_adaptor`.  
 
 Stores the result in `result` with its original modulus value.
 
 [#eval_bitwise_or] [role blue `template <class Backend> inline void eval_bitwise_or(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)`]
 
-Converts both `result` and `b` to a regular numbers, evaluates "bitwise or" operation over them in accordance with `Backend` rules and converts the result back to `modular_adaptor`.  
+Converts both `result` and `b` to a regular numbers, evaluates "bitwise or" operation over them following `Backend` rules, and converts the result back to `modular_adaptor`.  
 
 Stores the result in `result` with its original modulus value.
 
 [#eval_bitwise_xor] [role blue `template <class Backend> inline void eval_bitwise_xor(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)`]
 
-Converts both `result` and `b` to a regular numbers, evaluates "bitwise xor" operation over them in accordance with `Backend` rules and converts the result back to `modular_adaptor`.  
+Converts both `result` and `b` to a regular numbers, evaluates "bitwise xor" operation over them following `Backend` rules, and converts the result back to `modular_adaptor`.  
 
 Stores the result in `result` with its original modulus value.
 
@@ -221,7 +219,7 @@ Notice that modulus data (see [link mod_data `mod_data()`]) doesn't affect this 
 
 [#eval_divide] [role blue `template <class Backend> inline void eval_divide(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)`]
 
-Dividew `result` base value by `o` base value (see [link base_data `base_data()`]). 
+Divides `result` base value by `o` base value (see [link base_data `base_data()`]). 
 
 Modulus values of the both `modular_adaptor` have to be equal. 
 The result is reduced by modulo.
@@ -231,6 +229,7 @@ The result is reduced by modulo.
 Returns `true` if `a` and `b` are equal in value.
 
 Notice that `a` and `b` must have the same modulus value. 
+
 In other case, the function throws the `std::runtime_error` exception.
 
 [#eval_get_sign] [role blue `template <class Backend> inline int eval_get_sign(const modular_adaptor<Backend>&)`]
@@ -244,13 +243,13 @@ Returns true if the base value (see [link base_data `base_data()`]) of `val` is 
 
 [#eval_left_shift] [role blue `template <class Backend, class UI> inline void eval_left_shift(modular_adaptor<Backend>& t, UI i)`]
 
-Converts `t` to a regular number, evaluates left shift over it in accordance with `Backend` rules and converts the result back to `modular_adaptor` with the same modulus. 
+Converts `t` to a regular number, evaluates left shift over it following `Backend` rules, and converts the result back to `modular_adaptor` with the same modulus. 
 
 Stores the result in `t`.
 
 [#eval_left_shift_with_v] [role blue `template <class Backend, class UI> inline void eval_left_shift(modular_adaptor<Backend>& t, const modular_adaptor<Backend>& v, UI i)`]
 
-Converts `v` to a regular number, evaluates right shift over it in accordance with `Backend` rules and converts the result back to `modular_adaptor` with the same modulus.  
+Converts `v` to a regular number, evaluates right shift over it following `Backend` rules, and converts the result back to `modular_adaptor` with the same modulus.  
 
 Stores the result in `t`.
 
@@ -270,6 +269,7 @@ Notice that the same functionality is provided by [link eval_redc `eval_redc`] w
 Multiply `o` base value to `result` base value (see [link base_data `base_data()`]). 
 
 Modulus values of the both `modular_adaptor` have to be equal. 
+
 The result is reduced by the modulus value.
 
 [#eval_pow] [role blue `template <class Backend> inline void eval_pow(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& b, const modular_adaptor<Backend>& e)`]
@@ -286,13 +286,13 @@ The implementation is based on ???.
 
 [#eval_right_shift] [role blue `template <class Backend, class UI> inline void eval_right_shift(modular_adaptor<Backend>& t, UI i)`]
 
-Converts `t` to a regular number, evaluates right shift over it in accordance with `Backend` rules and converts the result back to `modular_adaptor` with the same modulus.  
+Converts `t` to a regular number, evaluates right shift over it following `Backend` rules, and converts the result back to `modular_adaptor` with the same modulus.  
 
 Stores the result in `t`.
 
 [#eval_right_shift_with_v] [role blue `template <class Backend, class UI> inline void eval_right_shift(modular_adaptor<Backend>& t, const modular_adaptor<Backend>& v, UI i)`]
 
-Converts `v` to a regular number, evaluates right shift over it in accordance with `Backend` rules and converts the result back to `modular_adaptor` with the same modulus.  
+Converts `v` to a regular number, evaluates right shift over it following `Backend` rules, and converts the result back to `modular_adaptor` with the same modulus.  
 
 Stores the result in `t`.
 
@@ -307,7 +307,7 @@ This value is not reduced on modulo.
 
 Subtract `o` base value from `result` base value (see [link base_data `base_data()`]). 
 
-Modulus values of the both `modular_adaptor` have to be equal. 
+Modulus values of both `modular_adaptor` have to be equal. 
 The result is reduced by the modulus value.
 
 
