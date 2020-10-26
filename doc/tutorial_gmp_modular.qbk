@@ -22,7 +22,8 @@ Things you should know when using this type:
 
 * Default constructed `gmp_int` have the value zero (this is GMP's default behavior).
 * Division by zero results in a `std::overflow_error` being thrown.
-* Conversion from a string results in a std::runtime_error being thrown if the string can not be interpreted as a valid rational number.
+* Conversion from a string results in a `std::runtime_error` being thrown if the string can not be interpreted as a valid rational number.
+* Arithmetic operations result in a `std::runtime_error` being thrown if the modulus values a different for two modular mumbers. 
 * No changes are made to the GMP library's global settings, so this type can coexist with existing GMP code.
 
 [endsect] [/section:gmp_modular gmp_modular]

@@ -77,14 +77,15 @@
 
 
 The `cpp_mod` and `cpp_mod_params` are used via the typedef boost::multiprecision::cpp_modular.
-It provides a number type for [@https://en.wikipedia.org/wiki/Modular_arithmetic [modular arithmetic]] with unlimited precision. 
+It provides a number type for [@https://en.wikipedia.org/wiki/Modular_arithmetic modular arithmetic] with unlimited precision. 
 As well as the usual conversions from arithmetic and string types, instances of cpp_modular are copy constructible and assignable from type cpp_int. 
 
 Things you should know when using this type:
 
 * Default constructed `cpp_modular` have a value of zero.
-* Division by zero results in a std::overflow_error being thrown.
-* Conversion from a string results in a std::runtime_error being thrown if the string can not be interpreted as a valid modular number. 
+* Division by zero results in a `std::overflow_error` being thrown.
+* Conversion from a string results in a `std::runtime_error` being thrown if the string can not be interpreted as a valid modular number. 
+* Arithmetic operations result in a `std::runtime_error` being thrown if the modulus values a different for two modular mumbers. 
 
 
 [h5 example:]

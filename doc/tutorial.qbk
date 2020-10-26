@@ -21,6 +21,7 @@ In order to use this library you need to make two choices:
 [include tutorial_interval_mpfi.qbk]
 [include tutorial_complex.qbk]
 [include tutorial_rational.qbk]
+[include tutorial_modular.qbk]
 [include tutorial_misc_backends.qbk]
 [include tutorial_conversions.qbk]
 [include tutorial_random.qbk]
@@ -36,7 +37,6 @@ In order to use this library you need to make two choices:
 [include tutorial_hash.qbk]
 [include tutorial_eigen.qbk]
 [include tutorial_new_backend.qbk]
-[include tutorial_modular.qbk]
 
 [endsect] [/section:tut Tutorial]
 

@@ -20,8 +20,10 @@
         [link negate `negate()`]
         [link str `str(std::streamsize dig, std::ios_base::fmtflags f)`]
         [link swap `swap(modular_adaptor& o)`]
-     [link boost_multiprecision.tut.modular.modular_adaptor.other Other]
+     [link boost_multiprecision.tut.modular.modular_adaptor.other Class Related Functions]
         [link eval_redc `eval_redc(Backend& result, const modular_params<Backend>& mod)`]
+        [link find_modular_pow `find_modular_pow(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& b, Backend& exp)`]
+        [link window_bits `window_bits(size_t exp_bits))`]
      [link boost_multiprecision.tut.modular.modular_adaptor.backend_requirements Backend Required Functions]
         [link assign_components `assign_components(modular_adaptor<Backend>& result, const T& a, const V& b)`]
         [link eval_abs `eval_abs(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& val)`]
@@ -44,8 +46,6 @@
         [link eval_right_shift_with_v `eval_right_shift(modular_adaptor<Backend>& t, const modular_adaptor<Backend>& v, UI i)`]
         [link eval_sqrt `eval_sqrt(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& val)`]
         [link eval_subtract `eval_subtract(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)`]
-        [link find_modular_pow `find_modular_pow(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& b, Backend& exp)`]
-        [link window_bits `window_bits(size_t exp_bits))`]
 ]
 
 ``
@@ -53,8 +53,8 @@
     namespace multiprecision {
     namespace backends {
 
-    template <typename Backend>
-    class modular_adaptor;
+        template <typename Backend>
+        class modular_adaptor;
     }}
 ``
 The class template `modular_adaptor` is a backend for number which converts any existing integer backend into a number backend for [@https://en.wikipedia.org/wiki/Modular_arithmetic modular arithmetic].
@@ -76,8 +76,8 @@ The class `modular_adaptor` contains two parts.
     [ [ `modular_adaptor(const Backend& val, const modular_params<Backend>& mod)` ] [ ] ]
     [ [ `modular_adaptor(const Backend& val, const Backend& mod)` ] [ ] ]
     [ [ `modular_adaptor(Backend& val, Backend& mod)` ] [ ] ]
-    [ [ `modular_adaptor(const Backend& val)` ] [ ] ]
-    [ [ `modular_adaptor(const modular_params<Backend>& mod)` ] [ ] ]
+    [ [ `modular_adaptor(const Backend& val)` ] [ Creates `modular_adaptor` instance with modulus equals to zero ] ]
+    [ [ `modular_adaptor(const modular_params<Backend>& mod)` ] [ Creates `modular_adaptor` instance with value (residue class) equals to zero ] ]
 ]
 
 [table `modular_adaptor` operators
@@ -88,17 +88,24 @@ The class `modular_adaptor` contains two parts.
 ]
 
 [h4:getter Getters]
+
+[#base_data]
+[role blue `base_data`]
+
 `inline Backend& base_data()`
 
 `inline Backend const& base_data() const`
 
-returns residue class
+Returns number value of the `modular_adaptor` (residue class of the number by modulo).
+
+[#mod_data]
+[role blue `mod_data`]
 
 `inline modular_params<Backend>& mod_data()`
 
 `inline const modular_params<Backend>& mod_data() const`
 
-returns [link boost_multiprecision.tut.modular.modular_adaptor.modular_params `modular_params`] that contains modulus and additional data.
+Returns [link boost_multiprecision.tut.modular.modular_adaptor.modular_params `modular_params`] that contains modulus and additional data.
 
 
 [h4:members Class Member Functions]
@@ -106,26 +113,20 @@ returns [link boost_multiprecision.tut.modular.modular_adaptor.modular_params `m
 [#compare] 
 [role blue `int compare(const modular_adaptor& o) const`]
 
-Compares bases (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `base_data()`]) of two `modular_adaptor`.
+Compares bases (see [link base_data `base_data()`]) of two `modular_adaptor`.
 
 Modulus values of the both `modular_adaptor` have to be equal. 
 
-In other case, the function throws the exception:
-``
-BOOST_THROW_EXCEPTION(std::runtime_error("Could not compare modular number with different mod."))
-``
+In other case, the function throws the `std::runtime_error` exception.
 
 [#compare_t] 
 [role blue `template <class T> int compare(const T& val) const`]
 
-Compares base (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `base_data()`]) of `modular_adaptor` to `val`.
+Compares base (see [link base_data `base_data()`]) of `modular_adaptor` to `val`.
 
 Modulus values of the  `modular_adaptor` have to be less then `val`. 
 
-In other case, the function throws the exception:
-``
-BOOST_THROW_EXCEPTION(std::runtime_error("Could not compare modular number with mod bigger than compared number."))
-``
+In other case, the function throws the `std::runtime_error` exception.
 
 [#negate] 
 [role blue `inline void negate()`]
@@ -137,8 +138,10 @@ According to the modular arithmetic rules, the result equals /modulus - number/ 
 [#str] 
 [role blue `inline std::string str(std::streamsize dig, std::ios_base::fmtflags f) const`]
 
-Returns the string representation of base (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `base_data()`]) of `modular_adaptor` with `dig` digits
-and formatted according to the flags set in `f`.  If `dig` is zero, then returns as many digits as are required to reconstruct the original value. 
+Returns the string representation of base (see [link base_data `base_data()`]) with `dig` digits
+and formatted according to the flags set in `f`. 
+
+If `dig` is zero, then returns as many digits as are required to reconstruct the original value. 
 
 [#swap] 
 [role blue `inline void swap(modular_adaptor& o)`]
@@ -146,7 +149,7 @@ and formatted according to the flags set in `f`.  If `dig` is zero, then returns
 Swap both number and modulus values between two instances of `modular_adaptor`.
 
 
-[h4:other Other]
+[h4:other Class Related Functions]
 [#eval_redc] 
 [role blue `template <class Backend> inline void eval_redc(Backend& result, const modular_params<Backend>& mod)`]
 
@@ -157,23 +160,39 @@ Currently, `modular_params` doesn't allow choosing reduction algorithm.
 By default, `modular_params` uses [@https://en.wikipedia.org/wiki/Barrett_reduction Barrett reduction] for even numbers and [@https://en.wikipedia.org/wiki/Montgomery_modular_multiplication Montgomery reduction] otherwise. 
 
 
+[#find_modular_pow] [role blue `template <class Backend> inline void find_modular_pow(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& b, Backend& exp)`]
+
+Calculates modular exponentiation, i.e. `b.base_data() ^ exp mod m` where `m` is a modulus of `b` (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `mod_data()`]).
+
+The implementation is based on ???.
+
+Notice that the default way to calculate modular exponentiation is functions [eval_pow `eval_pow`].
+We recommend use it. 
+
+[#window_bits] [role blue `size_t window_bits(size_t exp_bits))`]
+
+Returns the window size for exponentiation operation (see [link eval_pow `eval_pow`] or [link find_modular_pow `find_modular_pow`]).
+Notice that you do not need to invoke `window_bits` manually. 
+
 [h4:backend_requirements Backend Required Functions]
 
 [#assign_components] [role blue `template <class Backend, class T, class V> inline void assign_components(modular_adaptor<Backend>& result, const T& a, const V& b)`]
 
-Assign to `result` base value the value `a` and `result` mod value the value `b` in the Montgomery form (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `base_data()` and `mod_data()`] ).
+Assign to `result` base value the value `a` and `result` mod value the value `b` (see [link boost_multiprecision.tut.modular.modular_adaptor.getter Getters section] ).
+
+The base value is represented in the form required for the reduction algorithm used (see [link eval_redc `eval_redc`]).
 
 [#eval_abs] [role blue `template <class Backend> inline void eval_abs(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& val)`]
 
-Execute the operator `result = val`.
+Set `result` base data to the absolute value of the `val` base data (see [link base_data `base_data()`]). 
 
 [#eval_add] 
 [role blue `template <class Backend> inline void eval_add(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)`]
 
-Adds `o` base value to `result` base value (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `base_data()`]). 
+Adds `o` base value to `result` base value (see [link base_data `base_data()`]). 
 
 Modulus values of the both `modular_adaptor` have to be equal. 
-The result is reduced by the modulus value.
+The result is reduced by modulo.
 
 [#eval_bitwise_and] [role blue `template <class Backend> inline void eval_bitwise_and(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)`]
 
@@ -196,36 +215,32 @@ Stores the result in `result` with its original modulus value.
 [#eval_convert_to] 
 [role blue `template <class Result, class Backend> inline typename disable_if_c<boost::is_complex<Result>::value>::type eval_convert_to(Result* result, const modular_adaptor<Backend>& val)`]
 
-Converts a residue class handed by `modular_adapter` (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `base_data()`]) to the type of `result`.
+Converts a residue class handed by `modular_adaptor` (see [link base_data `base_data()`]) to the type of `result`.
 
-Notice that modulus data (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `mod_data()`]) doesn't affect this conversion. 
+Notice that modulus data (see [link mod_data `mod_data()`]) doesn't affect this conversion. 
 
 [#eval_divide] [role blue `template <class Backend> inline void eval_divide(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)`]
 
-Divide `result` base value by `o` base value (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `base_data()`]). 
+Dividew `result` base value by `o` base value (see [link base_data `base_data()`]). 
 
 Modulus values of the both `modular_adaptor` have to be equal. 
-The result is reduced by the modulus value.
+The result is reduced by modulo.
 
 [#eval_eq] [role blue `template <class Backend, class T> inline typename enable_if<is_arithmetic<T>, bool> ::type eval_eq(const modular_adaptor<Backend>& a, const T& b)`]
 
-Return `true` if `a` and `b` are equal in value.
+Returns `true` if `a` and `b` are equal in value.
 
 Notice that `a` and `b` must have the same modulus value. 
-In other case, the function throws the exception:
-``
-BOOST_THROW_EXCEPTION(std::runtime_error("Could not compare modular number with mod bigger than compared number."))
-``
+In other case, the function throws the `std::runtime_error` exception.
 
 [#eval_get_sign] [role blue `template <class Backend> inline int eval_get_sign(const modular_adaptor<Backend>&)`]
 
-Returns a value < zero if base value (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `base_data()`]) is negative,
-a value > zero if base value is positive, and zero if base value is zero.  
-Return `(int)1`.
+Returns a value < zero if the base value (see [link base_data `base_data()`]) is negative,
+a value > zero if the base value is positive, and zero if the base value is zero. 
 
 [#eval_is_zero] [role blue `template <class Backend> inline bool eval_is_zero(const modular_adaptor<Backend>& val)`]
 
-Returns true if the base value (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `base_data()`]) of `val` is zero, otherwise false.
+Returns true if the base value (see [link base_data `base_data()`]) of `val` is zero, otherwise false.
 
 [#eval_left_shift] [role blue `template <class Backend, class UI> inline void eval_left_shift(modular_adaptor<Backend>& t, UI i)`]
 
@@ -241,29 +256,31 @@ Stores the result in `t`.
 
 [#eval_modulus] [role blue `template <class Backend> inline void eval_modulus(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)`]
 
-Compute `result` base value by  modulo `o` base value (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `base_data()`]).
+Compute `result` base value by  modulo `o` base value (see [link base_data `base_data()`]).
 
-Uses for cases then the special reduction algorithms (Montgomery or Barrett) can not be applied.
+Uses `Backend` reduction algorithm. 
 
 Modulus values of the both `modular_adaptor` have to be equal. 
 The result is reduced by the modulus value.
 
+Notice that the same functionality is provided by [link eval_redc `eval_redc`] which is prefered method while working with `modular_adaptor`.
+
 [#eval_multiply] [role blue `template <class Backend> inline void eval_multiply(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)`]
 
-Multiply `o` base value to `result` base value (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `base_data()`]). 
+Multiply `o` base value to `result` base value (see [link base_data `base_data()`]). 
 
 Modulus values of the both `modular_adaptor` have to be equal. 
 The result is reduced by the modulus value.
 
 [#eval_pow] [role blue `template <class Backend> inline void eval_pow(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& b, const modular_adaptor<Backend>& e)`]
 
-Calculates modular exponentiation, i.e. `b.base_data() ^ e.base_data() mod m` where `m` is a modulus of `b` (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `mod_data()`]).
+Calculates modular exponentiation, i.e. `b.base_data() ^ e.base_data() mod m` where `m` is a modulus of `b` (see [link mod_data `mod_data()`]).
 
 The implementation is based on ???.
 
 [#eval_pow_backend_e] [role blue `template <class Backend> inline void eval_pow(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& b, const Backend& e)`]
 
-Calculates modular exponentiation, i.e. `b.base_data() ^ e mod m` where `m` is a modulus of `b` (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `mod_data()`]).
+Calculates modular exponentiation, i.e. `b.base_data() ^ e mod m` where `m` is a modulus of `b` (see [link mod_data `mod_data()`]).
 
 The implementation is based on ???.
 
@@ -281,31 +298,17 @@ Stores the result in `t`.
 
 [#eval_sqrt] [role blue `template <class Backend> inline void eval_sqrt(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& val)`]
 
-Assign to `result` base value the square root of `o` base value (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `base_data()`]). 
+Assign to `result` base value the square root of `o` base value (see [link base_data `base_data()`]). 
 
 This value is not reduced on modulo.
 
 [#eval_subtract] 
 [role blue `template <class Backend> inline void eval_subtract(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)`]
 
-Subtract `o` base value from `result` base value (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `base_data()`]). 
+Subtract `o` base value from `result` base value (see [link base_data `base_data()`]). 
 
 Modulus values of the both `modular_adaptor` have to be equal. 
 The result is reduced by the modulus value.
-
-[#find_modular_pow] [role blue `template <class Backend> inline void find_modular_pow(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& b, Backend& exp)`]
-
-Calculates modular exponentiation, i.e. `b.base_data() ^ exp mod m` where `m` is a modulus of `b` (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `mod_data()`]).
-
-The implementation is based on ???.
-
-Notice that the default way to calculate modular exponentiation is functions [eval_pow `eval_pow`].
-We recommend use it. 
-
-[#window_bits] [role blue `size_t window_bits(size_t exp_bits))`]
-
-Returns the window size for exponentiation operation (see [link eval_pow `eval_pow`] or [link find_modular_pow `find_modular_pow`]).
-Notice that you do not need to invoke `window_bits` manually. 
 
 
 [include tutorial_modular_params.qbk]
