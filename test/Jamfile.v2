@@ -423,6 +423,15 @@ test-suite functions_and_limits :
               <define>TEST_CPP_INT
               : test_move_cpp_int ]
 
+      [ run test_sin_near_half_pi.cpp mpfr gmp : : : <define>TEST_CPP_BIN_FLOAT release [ check-target-builds ../config//has_float128 : <source>quadmath : ] [ check-target-builds ../config//has_mpfr : : <build>no ] : test_sin_near_half_pi_cpp_bin_float ]
+      [ run test_sin_near_half_pi.cpp mpfr gmp : : : <define>TEST_CPP_DEC_FLOAT release [ check-target-builds ../config//has_mpfr : : <build>no ] : test_sin_near_half_pi_cpp_dec_float ]
+      [ run test_sin_near_half_pi.cpp mpfr gmp : : : <define>TEST_MPF_50 release [ check-target-builds ../config//has_mpfr : : <build>no ] : test_sin_near_half_pi_mpf_50 ]
+      [ run test_sin_near_half_pi.cpp mpfr gmp quadmath : : : <define>TEST_FLOAT128 release [ check-target-builds ../config//has_mpfr : : <build>no ] [ check-target-builds ../config//has_float128 : : <build>no ] : test_sin_near_half_pi_float128 ]
+      [ run test_cos_near_half_pi.cpp mpfr gmp : : : <define>TEST_CPP_BIN_FLOAT release [ check-target-builds ../config//has_float128 : <source>quadmath : ] [ check-target-builds ../config//has_mpfr : : <build>no ] : test_cos_near_half_pi_cpp_bin_float ]
+      [ run test_cos_near_half_pi.cpp mpfr gmp : : : <define>TEST_CPP_DEC_FLOAT release [ check-target-builds ../config//has_mpfr : : <build>no ] : test_cos_near_half_pi_cpp_dec_float ]
+      [ run test_cos_near_half_pi.cpp mpfr gmp : : : <define>TEST_MPF_50 release [ check-target-builds ../config//has_mpfr : : <build>no ] : test_cos_near_half_pi_mpf_50 ]
+      [ run test_cos_near_half_pi.cpp mpfr gmp quadmath : : : <define>TEST_FLOAT128 release [ check-target-builds ../config//has_mpfr : : <build>no ] [ check-target-builds ../config//has_float128 : : <build>no ] : test_cos_near_half_pi_float128 ]
+
       [ get_function_tests ]
 ;
 
