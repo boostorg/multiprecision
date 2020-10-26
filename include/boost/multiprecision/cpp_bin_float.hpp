@@ -1774,9 +1774,27 @@ inline std::size_t hash_value(const cpp_bin_float<D1, B1, A1, E1, M1, M2>& val)
 
 } // namespace backends
 
-#ifdef BOOST_NO_SFINAE_EXPR
-
 namespace detail {
+
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinExponent, Exponent MaxExponent>
+struct transcendental_reduction_type<boost::multiprecision::backends::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinExponent, MaxExponent> >
+{
+   //
+   // The type used for trigonometric reduction needs 3 times the precision of the base type.
+   // This is double the precision of the original type, plus the largest exponent supported.
+   // As a practical measure the largest argument supported is 1/eps, as supporting larger
+   // arguments requires the division of argument by PI/2 to also be done at higher precision,
+   // otherwise the result (an integer) can not be represented exactly.
+   // 
+   // See ARGUMENT REDUCTION FOR HUGE ARGUMENTS. K C Ng.
+   //
+   typedef boost::multiprecision::backends::cpp_bin_float<
+       boost::multiprecision::backends::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinExponent, MaxExponent>::bit_count * 3, 
+       boost::multiprecision::backends::digit_base_2, 
+       Allocator, Exponent, MinExponent, MaxExponent> type;
+};
+
+#ifdef BOOST_NO_SFINAE_EXPR
 
 template <unsigned D1, backends::digit_base_type B1, class A1, class E1, E1 M1, E1 M2, unsigned D2, backends::digit_base_type B2, class A2, class E2, E2 M3, E2 M4>
 struct is_explicitly_convertible<backends::cpp_bin_float<D1, B1, A1, E1, M1, M2>, backends::cpp_bin_float<D2, B2, A2, E2, M3, M4> > : public mpl::true_
@@ -1785,8 +1803,9 @@ template <class FloatT, unsigned D2, backends::digit_base_type B2, class A2, cla
 struct is_explicitly_convertible<FloatT, backends::cpp_bin_float<D2, B2, A2, E2, M3, M4> > : public boost::is_floating_point<FloatT>
 {};
 
-} // namespace detail
 #endif
+
+} // namespace detail
 
 template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Exponent, Exponent MinE, Exponent MaxE, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
 inline boost::multiprecision::number<boost::multiprecision::backends::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates>
