@@ -2929,7 +2929,19 @@ inline void eval_ldexp(cpp_dec_float<Digits10, ExponentType, Allocator>& result,
    else if ((the_exp < static_cast<boost::long_long_type>(std::numeric_limits<boost::long_long_type>::digits)) && (the_exp > static_cast<boost::long_long_type>(0)))
       result.mul_unsigned_long_long(1ULL << the_exp);
    else if (the_exp != static_cast<boost::long_long_type>(0))
-      result *= cpp_dec_float<Digits10, ExponentType, Allocator>::pow2(e);
+   {
+      if ((the_exp < cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float_min_exp / 2) && (x.order() > 0))
+      {
+         boost::long_long_type half_exp = e / 2;
+         cpp_dec_float<Digits10, ExponentType, Allocator> t = cpp_dec_float<Digits10, ExponentType, Allocator>::pow2(half_exp);
+         result *= t;
+         if (2 * half_exp != e)
+            t *= 2;
+         result *= t;
+      }
+      else
+         result *= cpp_dec_float<Digits10, ExponentType, Allocator>::pow2(e);
+   }
 }
 
 template <unsigned Digits10, class ExponentType, class Allocator>
@@ -3035,17 +3047,33 @@ using boost::multiprecision::backends::cpp_dec_float;
 typedef number<cpp_dec_float<50> >  cpp_dec_float_50;
 typedef number<cpp_dec_float<100> > cpp_dec_float_100;
 
-#ifdef BOOST_NO_SFINAE_EXPR
-
 namespace detail {
+
+template <unsigned Digits10, class ExponentType, class Allocator>
+struct transcendental_reduction_type<boost::multiprecision::backends::cpp_dec_float<Digits10, ExponentType, Allocator> >
+{
+   //
+   // The type used for trigonometric reduction needs 3 times the precision of the base type.
+   // This is double the precision of the original type, plus the largest exponent supported.
+   // As a practical measure the largest argument supported is 1/eps, as supporting larger
+   // arguments requires the division of argument by PI/2 to also be done at higher precision,
+   // otherwise the result (an integer) can not be represented exactly.
+   // 
+   // See ARGUMENT REDUCTION FOR HUGE ARGUMENTS. K C Ng.
+   //
+   typedef boost::multiprecision::backends::cpp_dec_float<Digits10 * 3, ExponentType, Allocator> type;
+};
+
+#ifdef BOOST_NO_SFINAE_EXPR
 
 template <unsigned D1, class E1, class A1, unsigned D2, class E2, class A2>
 struct is_explicitly_convertible<cpp_dec_float<D1, E1, A1>, cpp_dec_float<D2, E2, A2> > : public mpl::true_
 {};
 
+#endif
+
 } // namespace detail
 
-#endif
 
 }} // namespace boost::multiprecision
 

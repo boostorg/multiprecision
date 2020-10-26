@@ -13,6 +13,7 @@
 #include <boost/type_traits/is_constructible.hpp>
 #include <boost/type_traits/decay.hpp>
 #include <boost/math/tools/complex.hpp>
+#include <boost/multiprecision/traits/transcendental_reduction_type.hpp>
 #ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable : 4307)
