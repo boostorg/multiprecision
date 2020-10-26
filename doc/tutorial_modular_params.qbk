@@ -1,7 +1,25 @@
 [/
+ Copyright 2020 Ilia Shirobokov.
+  Copyright 2020 Alisa Cherniaeva.
+
+  Distributed under the Boost Software License, Version 1.0.
+  (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt).
 ]
 
 [section:modular_params Modular params]
+
+[pre
+[*Table of Contents]
+ [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.api modular_params API]
+     [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.const_oper Constructors and Operators]
+     [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.getter Getters]
+     [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.members Class member functions]
+        [link reduce `reduce(Backend& result)`]
+        [link adjust_modular `adjust_modular(Backend& result)`]
+        [link adjust_regular `adjust_regular(Backend& result, const Backend& input)`]
+        [link compare `compare(const modular_params<Backend>& o)`]
+]
 
 ``
     namespace boost {
@@ -15,26 +33,45 @@
 The class `modular_params` is inherited from the 
 [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.montgomery_params `public backends::montgomery_params<Backend>`] 
 and [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.barrett_params `public backends::barrett_params<Backend>`]classes.
+[note It can be also be used with `tommath_int` backend and `gmp_int` backend.]
+
 [include tutorial_montgomery_params.qbk]
 [include tutorial_barrett_params.qbk]
 [include tutorial_base_params.qbk]
 
-[h2 API modular_params]
-[h3 Constructors]
-* `modular_params()`
-* `modular_params(const Number& p)`
-[h3 Operators]
-* `modular_params& operator=(const modular_params<Backend>& v)`
-* `modular_params& operator=(const Number& v)`
-* `operator number<BackendT, ExpressionTemplates>()`
-* `friend std::ostream& operator<<(std::ostream& o, modular_params<Backend> const& a)`
-[h3 Getters]
+[h2:api API modular_params]
+
+[h4:const_oper Constructors and Operators]
+[table `modular_params` constructors
+    [ [ Signature ] [ Comments ] ]
+    [ [ `modular_params()` ] [ ] ]
+    [ [ `modular_params(const Number& p)` ] [ ] ]
+]
+
+[table `montgomery_params` operators
+    [ [ Signature ] [ Comments ] ]
+    [ [ `modular_params& operator=(const modular_params<Backend>& v)` ] [ ] ]
+    [ [ `modular_params& operator=(const Number& v)` ] [ ] ]
+    [ [ `operator number<BackendT, ExpressionTemplates>()` ] [ ] ]
+    [ [ `friend std::ostream& operator<<(std::ostream& o, modular_params<Backend> const& a)` ] [ ] ]
+]
+
+[h4:getter Getters]
 * `number_type get_mod() const`
-[h3 Class member functions] 
-* `void reduce(Backend& result) const`
-This void perform the Montgomery's modular reduction for odd numbers and Barrett's modular reductions for even.
-* `void adjust_modular(Backend& result)` 
-* `void adjust_regular(Backend& result, const Backend& input) const`
-* `int compare(const modular_params<Backend>& o) const`
+
+return the modules value.
+
+[h4:members Class member functions] 
+[#reduce] [role blue `void reduce(Backend& result) const`]
+This void performs the Montgomery's modular reduction for odd numbers and Barrett's modular reductions for even.
+
+[#adjust_modular] [role blue `void adjust_modular(Backend& result)`]
+This void transforms the numbers into a special form.
+
+[#adjust_regular] [role blue `void adjust_regular(Backend& result, const Backend& input) const`]
+This void transforms the numbers in the special form into a standart numbers.
+
+[#compare] [role blue `int compare(const modular_params<Backend>& o) const`]
+This void compares two modules values.
 
 [endsect] [/section:modular_params modular_params]

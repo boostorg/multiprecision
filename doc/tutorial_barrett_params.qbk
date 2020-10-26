@@ -1,6 +1,22 @@
 [/
+ Copyright 2020 Ilia Shirobokov.
+  Copyright 2020 Alisa Cherniaeva.
+
+  Distributed under the Boost Software License, Version 1.0.
+  (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt).
 ]
 [section:barrett_params Barrett params]
+
+[pre
+[*Table of Contents]
+ [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.barrett_params.api barrett_params API]
+     [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.barrett_params.const_oper Constructors and Operators]
+     [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.barrett_params.getter Getters]
+     [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.barrett_params.members Class member functions]
+        [link reduce `eval_barrett_reduce(Backend& result)`]
+]
+
 ``
     namespace boost {
     namespace multiprecision {
@@ -10,21 +26,32 @@
     }}
 ``
 The class `barrett_params` is inherited from the [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.base_params `base_params`] class.
-This class perform the modular reductions using the Barrett reduction algorithm.
-The constructor of class set the base_params and precomputed values.
-The function `inline void eval_barret_reduce` compute the number that need to be reduced on modulo.
+This class performs the modular reductions using the Barrett reduction algorithm.
+The constructor of class sets the base_params and precomputed values.
+The function `inline void eval_barrett_reduce` computes the number that need to be reduced on modulo.
 Inside of the fuction only multiplications, subtractions, additions and shifts are used.
 
-[h2 API barrett_params]
-[h3 Constructors]
-* `barrett_params()`
-* `barrett_params(const Number& p)`
-[h3 Operators]
-* `barrett_params& operator=(const V& v)`
-[h3 Getters]
+[h2:api API barrett_params]
+[h4:const_oper Constructors and Operators]
+[table `barrett_params` constructors
+    [ [ Signature ] [ Comments ] ]
+    [ [ `barrett_params()` ] [ ] ]
+    [ [ `barrett_params(const Number& p)` ] [ ] ]
+]
+
+[table `barrett_params` operators
+    [ [ Signature ] [ Comments ] ]
+    [ [ `barrett_params& operator=(const V& v)` ] [ ] ]
+]
+
+[h4:getter Getters]
 `inline const number_type& mu() const`
-[h3 Class member functions] 
-* `inline void eval_barret_reduce(Backend& result) const`
-This void perform the Barrett's modular reduction. 
+
+return precomputed constant for the Barrett reduction
+
+[h4:members Class member functions] 
+
+[#reduce] [role blue `inline void eval_barret_reduce(Backend& result) const`]
+This void performs the Barrett's modular reduction. 
 
 [endsect][/section:barrett_params barrett_params]

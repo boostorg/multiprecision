@@ -20,11 +20,9 @@ to provide an modular type that is a drop-in replacement for the native C++ inte
 
 Things you should know when using this type:
 
-* No changes are made to the GMP library's global settings - so you can safely mix this type with
-existing code that uses [gmp].
-* Default constructed `gmp_int`s have the value zero (this is GMP's default behavior).
+* Default constructed `gmp_int` have the value zero (this is GMP's default behavior).
+* Division by zero results in a `std::overflow_error` being thrown.
 * Conversion from a string results in a std::runtime_error being thrown if the string can not be interpreted as a valid rational number.
 * No changes are made to the GMP library's global settings, so this type can coexist with existing GMP code.
-* The code can equally be used with MPIR as the underlying library - indeed that is the preferred option on Win32. 
 
 [endsect] [/section:gmp_modular gmp_modular]
