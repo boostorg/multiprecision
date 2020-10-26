@@ -164,7 +164,7 @@ By default, `modular_params` uses [@https://en.wikipedia.org/wiki/Barrett_reduct
 
 Calculates modular exponentiation, i.e. `b.base_data() ^ exp mod m` where `m` is a modulus of `b` (see [link boost_multiprecision.tut.modular.modular_adaptor.getter `mod_data()`]).
 
-The implementation is based on ???.
+The implementation is based on fixed window algorithm with Montgomery representation (e.g. see page 4 of the [@https://eprint.iacr.org/2011/239.pdf paper]).
 
 [#window_bits] [role blue `size_t window_bits(size_t exp_bits))`]
 
@@ -276,13 +276,13 @@ The result is reduced by the modulus value.
 
 Calculates modular exponentiation, i.e. `b.base_data() ^ e.base_data() mod m` where `m` is a modulus of `b` (see [link mod_data `mod_data()`]).
 
-The implementation is based on ???.
+The implementation is based on fixed window algorithm with Montgomery representation (e.g. see page 4 of the [@https://eprint.iacr.org/2011/239.pdf paper]).
 
 [#eval_pow_backend_e] [role blue `template <class Backend> inline void eval_pow(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& b, const Backend& e)`]
 
 Calculates modular exponentiation, i.e. `b.base_data() ^ e mod m` where `m` is a modulus of `b` (see [link mod_data `mod_data()`]).
 
-The implementation is based on ???.
+The implementation is based on fixed window algorithm with Montgomery representation (e.g. see page 4 of the [@https://eprint.iacr.org/2011/239.pdf paper]).
 
 [#eval_right_shift] [role blue `template <class Backend, class UI> inline void eval_right_shift(modular_adaptor<Backend>& t, UI i)`]
 
