@@ -36,6 +36,7 @@ In order to use this library you need to make two choices:
 [include tutorial_hash.qbk]
 [include tutorial_eigen.qbk]
 [include tutorial_new_backend.qbk]
+[include tutorial_jacobi_symbol.qbk]
 
 [endsect] [/section:tut Tutorial]
 

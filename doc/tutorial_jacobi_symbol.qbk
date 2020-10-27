@@ -1,0 +1,41 @@
+[/
+  Copyright 2020 Ilia Shirobokov.
+  Copyright 2020 Alisa Cherniaeva.
+
+  Distributed under the Boost Software License, Version 1.0.
+  (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt).
+]
+
+[section:jacobi Jacobi Symbol]
+
+``
+namespace boost {
+namespace multiprecision {
+    template <typename Backend, expression_template_option ExpressionTemplates>
+    inline typename enable_if_c<number_category<Backend>::value == number_kind_integer, int>::type jacobi(
+        const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& n)
+}
+}
+``
+
+[pre
+[*Table of Contents]
+ [link boost_multiprecision.tut.jacobi.api Jacobi Symbol API]
+     [link jacobi `jacobi(const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& n)`]
+]
+
+[h2:api Jacobi Symbol API]
+
+[#jacobi] [role blue `template <typename Backend, expression_template_option ExpressionTemplates> inline typename enable_if_c<number_category<Backend>::value == number_kind_integer, int>::type jacobi(const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& n)`]
+
+Computes [@http://mathworld.wolfram.com/JacobiSymbol.html Jacobi symbol]. 
+
+Requirements to arguments: 
+
+* `a` is an integer, > 0
+* `n` is an odd integer, > 1
+
+If `n` is prime, this is equivalent to the Legendre symbol. 
+
+[endsect] [/ section:jacobi]
