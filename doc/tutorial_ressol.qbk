@@ -1,0 +1,29 @@
+[/
+  Copyright 2020 Ilia Shirobokov.
+  Copyright 2020 Alisa Cherniaeva.
+
+  Distributed under the Boost Software License, Version 1.0.
+  (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt).
+]
+
+[section:ressol Tonelli–Shanks algorithm]
+
+[pre
+[*Table of Contents]
+ [link boost_multiprecision.tut.ressol.api Tonelli–Shanks algorithm API]
+     [link ressol `ressol(const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& p)`]
+     [link ressol_modular `ressol(const number<modular_adaptor<Backend>, ExpressionTemplates>& modular)`]
+]
+
+[h2:api Tonelli–Shanks algorithm API]
+
+[#ressol] [role blue `template <typename Backend, expression_template_option ExpressionTemplates> inline number<Backend, ExpressionTemplates> ressol(const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& p)`]
+
+Compute the square root of `a` modulo `p` prime using the [@https://en.wikipedia.org/wiki/Tonelli-Shanks_algorithm Tonelli–Shanks algorithm].
+
+[#ressol_modular] [role blue `template <typename Backend, expression_template_option ExpressionTemplates> inline number<modular_adaptor<Backend>, ExpressionTemplates> ressol(const number<modular_adaptor<Backend>, ExpressionTemplates>& modular)`]
+
+Compute the square root of `modular` base data [] modulo `modular` mod data [] prime using the [@https://en.wikipedia.org/wiki/Tonelli-Shanks_algorithm Tonelli–Shanks algorithm].
+
+[endsect] [/section:ressol]
