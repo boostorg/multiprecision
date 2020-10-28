@@ -407,6 +407,27 @@ inline void eval_sqrt(float128_backend& result, const float128_backend& arg)
 {
    result.value() = sqrtq(arg.value());
 }
+inline void eval_rsqrt(float128_backend& result, const float128_backend& arg)
+{
+   using std::sqrt;
+   if (arg.value() < std::numeric_limits<long double>::denorm_min() || arg.value() > (std::numeric_limits<long double>::max)()) {
+      result.value() = 1/sqrtq(arg.value());
+      return;
+   }
+   float128_backend xk = 1/sqrt(static_cast<long double>(arg.value()));
+
+   // Newton iteration for f(x) = arg.value() - 1/x^2.
+   BOOST_IF_CONSTEXPR (sizeof(long double) == sizeof(double)) {
+       // If the long double is the same as a double, then we need two Newton iterations:
+       xk.value() = xk.value() + xk.value()*(1-arg.value()*xk.value()*xk.value())/2;
+       result.value() = xk.value() + xk.value()*(1-arg.value()*xk.value()*xk.value())/2;
+       return;
+   }
+
+   // 80 bit long double only needs a single iteration to produce ~2ULPs.
+   result.value() = xk.value() + xk.value()*(1-arg.value()*xk.value()*xk.value())/2;
+   return;
+}
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
 inline BOOST_MP_CXX14_CONSTEXPR 
 #else
@@ -680,6 +701,13 @@ template <boost::multiprecision::expression_template_option ExpressionTemplates>
 inline boost::multiprecision::number<float128_backend, ExpressionTemplates> log1p BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
 {
    return log1pq(arg.backend().value());
+}
+template <boost::multiprecision::expression_template_option ExpressionTemplates>
+inline boost::multiprecision::number<float128_backend, ExpressionTemplates> rsqrt BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<float128_backend, ExpressionTemplates>& arg)
+{
+   boost::multiprecision::number<float128_backend, ExpressionTemplates> res;
+   eval_rsqrt(res.backend(), arg.backend());
+   return res;
 }
 
 #ifndef BOOST_MP_USE_QUAD

@@ -12,6 +12,7 @@
 #include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/multiprecision/detail/atomic.hpp>
+#include <boost/multiprecision/traits/max_digits10.hpp>
 #include <boost/multiprecision/mpfr.hpp>
 #include <boost/multiprecision/logged_adaptor.hpp>
 #include <boost/math/constants/constants.hpp>
@@ -147,7 +148,7 @@ struct mpfi_float_imp
       boost::ulong_long_type mask  = ((((1uLL << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1u);
       unsigned               shift = 0;
       mpfi_t                 t;
-      mpfi_init2(t, (std::max)(static_cast<unsigned long>(std::numeric_limits<boost::ulong_long_type>::digits), static_cast<unsigned long>(multiprecision::detail::digits10_2_2(digits10))));
+      mpfi_init2(t, (std::max)(static_cast<mpfr_prec_t>(std::numeric_limits<boost::ulong_long_type>::digits), static_cast<mpfr_prec_t>(multiprecision::detail::digits10_2_2(digits10))));
       mpfi_set_ui(m_data, 0);
       while (i)
       {
@@ -1317,6 +1318,11 @@ namespace math {
 
 namespace tools {
 
+inline void set_output_precision(const boost::multiprecision::mpfi_float& val, std::ostream& os)
+{
+   os << std::setprecision(val.precision());
+}
+
 template <>
 inline int digits<boost::multiprecision::mpfi_float>()
 #ifdef BOOST_MATH_NOEXCEPT
@@ -1619,7 +1625,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfi_f
    BOOST_STATIC_CONSTEXPR int digits   = static_cast<int>((Digits10 * 1000L) / 301L + ((Digits10 * 1000L) % 301 ? 2 : 1));
    BOOST_STATIC_CONSTEXPR int digits10 = Digits10;
    // Is this really correct???
-   BOOST_STATIC_CONSTEXPR int  max_digits10 = Digits10 + 3;
+   BOOST_STATIC_CONSTEXPR int  max_digits10 = boost::multiprecision::detail::calc_max_digits10<digits>::value;
    BOOST_STATIC_CONSTEXPR bool is_signed    = true;
    BOOST_STATIC_CONSTEXPR bool is_integer   = false;
    BOOST_STATIC_CONSTEXPR bool is_exact     = false;

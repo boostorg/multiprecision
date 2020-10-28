@@ -10,6 +10,7 @@
 #include <boost/multiprecision/integer.hpp>
 #include <boost/math/special_functions/trunc.hpp>
 #include <boost/multiprecision/detail/float_string_cvt.hpp>
+#include <boost/multiprecision/traits/max_digits10.hpp>
 
 //
 // Some includes we need from Boost.Math, since we rely on that library to provide these functions:
@@ -379,7 +380,7 @@ class cpp_bin_float
       if (eval_get_sign(f) < 0)
       {
          f.negate();
-         *this = f;
+         assign_float(f);
          this->negate();
          return *this;
       }
@@ -779,7 +780,8 @@ inline void do_eval_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponen
       }
       else if (a.exponent() == (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + b.exponent() + 1)
       {
-         if (eval_lsb(b.bits()) != cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1)
+         if ((eval_lsb(a.bits()) == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1)
+            && (eval_lsb(b.bits()) != cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1))
          {
             eval_left_shift(dt, 1);
             eval_decrement(dt);
@@ -803,7 +805,8 @@ inline void do_eval_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponen
       }
       else if (b.exponent() == (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + a.exponent() + 1)
       {
-         if (eval_lsb(a.bits()) != cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1)
+         if ((eval_lsb(a.bits()) != cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1)
+            && eval_lsb(b.bits()))
          {
             eval_left_shift(dt, 1);
             eval_decrement(dt);
@@ -1659,6 +1662,7 @@ inline void eval_sqrt(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE
    }
    typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type ae = arg.exponent();
    res.exponent()                                                                               = ae / 2;
+   res.sign() = false;
    if ((ae & 1) && (ae < 0))
       --res.exponent();
    copy_and_round(res, s);
@@ -1770,9 +1774,27 @@ inline std::size_t hash_value(const cpp_bin_float<D1, B1, A1, E1, M1, M2>& val)
 
 } // namespace backends
 
-#ifdef BOOST_NO_SFINAE_EXPR
-
 namespace detail {
+
+template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinExponent, Exponent MaxExponent>
+struct transcendental_reduction_type<boost::multiprecision::backends::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinExponent, MaxExponent> >
+{
+   //
+   // The type used for trigonometric reduction needs 3 times the precision of the base type.
+   // This is double the precision of the original type, plus the largest exponent supported.
+   // As a practical measure the largest argument supported is 1/eps, as supporting larger
+   // arguments requires the division of argument by PI/2 to also be done at higher precision,
+   // otherwise the result (an integer) can not be represented exactly.
+   // 
+   // See ARGUMENT REDUCTION FOR HUGE ARGUMENTS. K C Ng.
+   //
+   typedef boost::multiprecision::backends::cpp_bin_float<
+       boost::multiprecision::backends::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinExponent, MaxExponent>::bit_count * 3, 
+       boost::multiprecision::backends::digit_base_2, 
+       Allocator, Exponent, MinExponent, MaxExponent> type;
+};
+
+#ifdef BOOST_NO_SFINAE_EXPR
 
 template <unsigned D1, backends::digit_base_type B1, class A1, class E1, E1 M1, E1 M2, unsigned D2, backends::digit_base_type B2, class A2, class E2, E2 M3, E2 M4>
 struct is_explicitly_convertible<backends::cpp_bin_float<D1, B1, A1, E1, M1, M2>, backends::cpp_bin_float<D2, B2, A2, E2, M3, M4> > : public mpl::true_
@@ -1781,8 +1803,9 @@ template <class FloatT, unsigned D2, backends::digit_base_type B2, class A2, cla
 struct is_explicitly_convertible<FloatT, backends::cpp_bin_float<D2, B2, A2, E2, M3, M4> > : public boost::is_floating_point<FloatT>
 {};
 
-} // namespace detail
 #endif
+
+} // namespace detail
 
 template <unsigned Digits, boost::multiprecision::backends::digit_base_type DigitBase, class Exponent, Exponent MinE, Exponent MaxE, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
 inline boost::multiprecision::number<boost::multiprecision::backends::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, ExpressionTemplates>
@@ -1892,9 +1915,9 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::cpp_bi
       return -(max)();
    }
    BOOST_STATIC_CONSTEXPR int digits   = boost::multiprecision::cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count;
-   BOOST_STATIC_CONSTEXPR int digits10 = (digits - 1) * 301 / 1000;
+   BOOST_STATIC_CONSTEXPR int digits10 = boost::multiprecision::detail::calc_digits10<digits>::value;
    // Is this really correct???
-   BOOST_STATIC_CONSTEXPR int  max_digits10 = (digits * 301 / 1000) + 3;
+   BOOST_STATIC_CONSTEXPR int  max_digits10 = boost::multiprecision::detail::calc_max_digits10<digits>::value;
    BOOST_STATIC_CONSTEXPR bool is_signed    = true;
    BOOST_STATIC_CONSTEXPR bool is_integer   = false;
    BOOST_STATIC_CONSTEXPR bool is_exact     = false;

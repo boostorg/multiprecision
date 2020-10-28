@@ -16,7 +16,6 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
-#include <boost/timer.hpp>
 #include "test.hpp"
 
 #if !defined(TEST1) && !defined(TEST2) && !defined(TEST3)

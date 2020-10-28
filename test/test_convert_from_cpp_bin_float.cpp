@@ -39,6 +39,19 @@ using namespace boost::multiprecision;
 template <class T>
 T generate_random()
 {
+   //
+   // Our aim is to fill up the mantissa of T with random bits,
+   // the main loop simply multiplies by the largest random value
+   // we produce and then adds the next random value.  It stops
+   // when the next random value is too small to change the result,
+   // and so "val" and "prev_val" end up with the same value.
+   //
+   // We start with an arbitrary value in "prev_val" - anything you
+   // like as long as it's a value that our generator can not produce.
+   //
+   // At the end we ditch the current exponent, and replace with our own
+   // randomly generated one.
+   //
    typedef int                   e_type;
    static boost::random::mt19937 gen;
    T                             val      = gen();

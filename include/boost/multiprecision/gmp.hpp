@@ -1219,6 +1219,39 @@ struct gmp_int
       return *this;
    }
 #endif
+#ifdef BOOST_HAS_INT128
+   gmp_int& operator=(unsigned __int128 i)
+   {
+      if (m_data[0]._mp_d == 0)
+         mpz_init(this->m_data);
+      unsigned __int128 mask  = ((((1uLL << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1uLL);
+      unsigned               shift = 0;
+      mpz_t                  t;
+      mpz_set_ui(m_data, 0);
+      mpz_init_set_ui(t, 0);
+      while (i)
+      {
+         mpz_set_ui(t, static_cast<unsigned long>(i & mask));
+         if (shift)
+            mpz_mul_2exp(t, t, shift);
+         mpz_add(m_data, m_data, t);
+         shift += std::numeric_limits<unsigned long>::digits;
+         i >>= std::numeric_limits<unsigned long>::digits;
+      }
+      mpz_clear(t);
+      return *this;
+   }
+   gmp_int& operator=(__int128 i)
+   {
+      if (m_data[0]._mp_d == 0)
+         mpz_init(this->m_data);
+      bool neg = i < 0;
+      *this    = boost::multiprecision::detail::unsigned_abs(i);
+      if (neg)
+         mpz_neg(m_data, m_data);
+      return *this;
+   }
+#endif
    gmp_int& operator=(unsigned long i)
    {
       if (m_data[0]._mp_d == 0)
@@ -1721,7 +1754,120 @@ inline void eval_convert_to(double* result, const gmp_int& val)
 {
    *result = mpz_get_d(val.data());
 }
+#ifdef BOOST_HAS_LONG_LONG
+inline void eval_convert_to(boost::ulong_long_type* result, const gmp_int& val)
+{
+   if (mpz_sgn(val.data()) < 0)
+   {
+      BOOST_THROW_EXCEPTION(std::range_error("Conversion from negative integer to an unsigned type results in undefined behaviour"));
+   }
+   *result = 0;
+   gmp_int t(val);
+   unsigned parts = sizeof(boost::ulong_long_type) / sizeof(unsigned long);
 
+   for (unsigned i = 0; i < parts; ++i)
+   {
+      boost::ulong_long_type part = mpz_get_ui(t.data());
+      if (i)
+         *result |= part << (i * sizeof(unsigned long) * CHAR_BIT);
+      else
+         *result = part;
+      mpz_tdiv_q_2exp(t.data(), t.data(), sizeof(unsigned long) * CHAR_BIT);
+   }
+}
+inline void eval_convert_to(boost::long_long_type* result, const gmp_int& val)
+{
+   int s = mpz_sgn(val.data());
+   *result = 0;
+   gmp_int t(val);
+   unsigned parts = sizeof(boost::ulong_long_type) / sizeof(unsigned long);
+   boost::ulong_long_type unsigned_result = 0;
+
+   for (unsigned i = 0; i < parts; ++i)
+   {
+      boost::ulong_long_type part = mpz_get_ui(t.data());
+      if (i)
+         unsigned_result |= part << (i * sizeof(unsigned long) * CHAR_BIT);
+      else
+         unsigned_result = part;
+      mpz_tdiv_q_2exp(t.data(), t.data(), sizeof(unsigned long) * CHAR_BIT);
+   }
+   //
+   // Overflow check:
+   //
+   bool overflow = false;
+   if (mpz_sgn(t.data()))
+   {
+      overflow = true;
+   }
+   if ((s > 0) && (unsigned_result > static_cast<boost::ulong_long_type>((std::numeric_limits<boost::long_long_type>::max)())))
+      overflow = true;
+   if((s < 0) && (unsigned_result > 1u - static_cast<boost::ulong_long_type>((std::numeric_limits<boost::long_long_type>::min)() + 1)))
+      overflow = true;
+   if(overflow)
+      *result = s < 0 ? (std::numeric_limits<boost::long_long_type>::min)() : (std::numeric_limits<boost::long_long_type>::max)();
+   else
+      *result = s < 0 ? -boost::long_long_type(unsigned_result - 1) - 1 : unsigned_result;
+}
+#endif
+#ifdef BOOST_HAS_INT128
+inline void eval_convert_to(unsigned __int128* result, const gmp_int& val)
+{
+   if (mpz_sgn(val.data()) < 0)
+   {
+      BOOST_THROW_EXCEPTION(std::range_error("Conversion from negative integer to an unsigned type results in undefined behaviour"));
+   }
+   *result = 0;
+   gmp_int t(val);
+   unsigned parts = sizeof(unsigned __int128) / sizeof(unsigned long);
+
+   for (unsigned i = 0; i < parts; ++i)
+   {
+      unsigned __int128 part = mpz_get_ui(t.data());
+      if (i)
+         *result |= part << (i * sizeof(unsigned long) * CHAR_BIT);
+      else
+         *result = part;
+      mpz_tdiv_q_2exp(t.data(), t.data(), sizeof(unsigned long) * CHAR_BIT);
+   }
+}
+inline void eval_convert_to(__int128* result, const gmp_int& val)
+{
+   int s = mpz_sgn(val.data());
+   *result = 0;
+   gmp_int t(val);
+   unsigned parts = sizeof(unsigned __int128) / sizeof(unsigned long);
+   unsigned __int128 unsigned_result = 0;
+
+   for (unsigned i = 0; i < parts; ++i)
+   {
+      unsigned __int128 part = mpz_get_ui(t.data());
+      if (i)
+         unsigned_result |= part << (i * sizeof(unsigned long) * CHAR_BIT);
+      else
+         unsigned_result = part;
+      mpz_tdiv_q_2exp(t.data(), t.data(), sizeof(unsigned long) * CHAR_BIT);
+   }
+   //
+   // Overflow check:
+   //
+   static const __int128 int128_max = static_cast<__int128>((static_cast<unsigned __int128>(1u) << 127) - 1);
+   static const __int128 int128_min = (static_cast<unsigned __int128>(1u) << 127);
+   bool overflow = false;
+   if (mpz_sgn(t.data()))
+   {
+      overflow = true;
+   }
+   if ((s > 0) && (unsigned_result > static_cast<unsigned __int128>(int128_max)))
+      overflow = true;
+   if ((s < 0) && (unsigned_result > 1u - static_cast<unsigned __int128>(int128_min + 1)))
+      overflow = true;
+   if (overflow)
+      *result = s < 0 ? int128_min : int128_max;
+   else
+      *result = s < 0 ? -__int128(unsigned_result - 1) - 1 : unsigned_result;
+}
+#endif
 inline void eval_abs(gmp_int& result, const gmp_int& val)
 {
    mpz_abs(result.data(), val.data());
@@ -2456,6 +2602,22 @@ struct digits2<number<debug_adaptor<gmp_float<0> >, et_off> >
    }
 };
 
+template <unsigned Digits10>
+struct transcendental_reduction_type<boost::multiprecision::backends::gmp_float<Digits10> >
+{
+   //
+   // The type used for trigonometric reduction needs 3 times the precision of the base type.
+   // This is double the precision of the original type, plus the largest exponent supported.
+   // As a practical measure the largest argument supported is 1/eps, as supporting larger
+   // arguments requires the division of argument by PI/2 to also be done at higher precision,
+   // otherwise the result (an integer) can not be represented exactly.
+   // 
+   // See ARGUMENT REDUCTION FOR HUGE ARGUMENTS. K C Ng.
+   //
+   typedef boost::multiprecision::backends::gmp_float<Digits10 * 3> type;
+};
+
+
 } // namespace detail
 
 template <>
@@ -2485,6 +2647,11 @@ typedef number<gmp_rational>     mpq_rational;
 } // namespace multiprecision
 
 namespace math { namespace tools {
+
+inline void set_output_precision(const boost::multiprecision::mpf_float& val, std::ostream& os)
+{
+   os << std::setprecision(val.precision());
+}
 
 template <>
 inline int digits<boost::multiprecision::mpf_float>()
@@ -2517,7 +2684,7 @@ inline boost::multiprecision::mpf_float
 min_value<boost::multiprecision::mpf_float>()
 {
    boost::multiprecision::mpf_float result(0.5);
-   mpf_div_2exp(result.backend().data(), result.backend().data(), (std::numeric_limits<mp_exp_t>::min)() / 64 + 1);
+   mpf_div_2exp(result.backend().data(), result.backend().data(), (std::numeric_limits<mp_exp_t>::max)() / 64 + 1);
    return result;
 }
 

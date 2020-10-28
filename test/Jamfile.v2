@@ -254,7 +254,7 @@ test-suite functions_and_limits :
               : # command line
               : # input files
               : # requirements
-              <define>TEST_MPF_50
+              <define>TEST_MPF_50 <define>PRINT_MAX_DIGITS10
                [ check-target-builds ../config//has_gmp : : <build>no ]
               : test_numeric_limits_mpf50 ]
 
@@ -262,7 +262,7 @@ test-suite functions_and_limits :
               : # command line
               : # input files
               : # requirements
-              <define>TEST_MPF
+              <define>TEST_MPF <define>PRINT_MAX_DIGITS10
                [ check-target-builds ../config//has_gmp : : <build>no ]
               : test_numeric_limits_mpf ]
 
@@ -286,7 +286,7 @@ test-suite functions_and_limits :
               : # command line
               : # input files
               : # requirements
-              <define>TEST_MPFR
+              <define>TEST_MPFR <define>PRINT_MAX_DIGITS10
                [ check-target-builds ../config//has_mpfr : : <build>no ]
               : test_numeric_limits_mpfr ]
 
@@ -294,7 +294,7 @@ test-suite functions_and_limits :
               : # command line
               : # input files
               : # requirements
-              <define>TEST_MPFR_50
+              <define>TEST_MPFR_50 <define>PRINT_MAX_DIGITS10
                [ check-target-builds ../config//has_mpfr : : <build>no ]
               : test_numeric_limits_mpfr_50 ]
 
@@ -309,7 +309,7 @@ test-suite functions_and_limits :
               : # command line
               : # input files
               : # requirements
-              <define>TEST_CPP_BIN_FLOAT
+              <define>TEST_CPP_BIN_FLOAT <define>PRINT_MAX_DIGITS10
               : test_numeric_limits_cpp_bin_float ]
 
       [ run test_numeric_limits.cpp $(TOMMATH) no_eh_support
@@ -397,6 +397,15 @@ test-suite functions_and_limits :
               : # requirements
               <define>TEST_CPP_INT
               : test_move_cpp_int ]
+
+      [ run test_sin_near_half_pi.cpp mpfr gmp : : : <define>TEST_CPP_BIN_FLOAT release [ check-target-builds ../config//has_float128 : <source>quadmath : ] [ check-target-builds ../config//has_mpfr : : <build>no ] : test_sin_near_half_pi_cpp_bin_float ]
+      [ run test_sin_near_half_pi.cpp mpfr gmp : : : <define>TEST_CPP_DEC_FLOAT release [ check-target-builds ../config//has_mpfr : : <build>no ] : test_sin_near_half_pi_cpp_dec_float ]
+      [ run test_sin_near_half_pi.cpp mpfr gmp : : : <define>TEST_MPF_50 release [ check-target-builds ../config//has_mpfr : : <build>no ] : test_sin_near_half_pi_mpf_50 ]
+      [ run test_sin_near_half_pi.cpp mpfr gmp quadmath : : : <define>TEST_FLOAT128 release [ check-target-builds ../config//has_mpfr : : <build>no ] [ check-target-builds ../config//has_float128 : : <build>no ] : test_sin_near_half_pi_float128 ]
+      [ run test_cos_near_half_pi.cpp mpfr gmp : : : <define>TEST_CPP_BIN_FLOAT release [ check-target-builds ../config//has_float128 : <source>quadmath : ] [ check-target-builds ../config//has_mpfr : : <build>no ] : test_cos_near_half_pi_cpp_bin_float ]
+      [ run test_cos_near_half_pi.cpp mpfr gmp : : : <define>TEST_CPP_DEC_FLOAT release [ check-target-builds ../config//has_mpfr : : <build>no ] : test_cos_near_half_pi_cpp_dec_float ]
+      [ run test_cos_near_half_pi.cpp mpfr gmp : : : <define>TEST_MPF_50 release [ check-target-builds ../config//has_mpfr : : <build>no ] : test_cos_near_half_pi_mpf_50 ]
+      [ run test_cos_near_half_pi.cpp mpfr gmp quadmath : : : <define>TEST_FLOAT128 release [ check-target-builds ../config//has_mpfr : : <build>no ] [ check-target-builds ../config//has_float128 : : <build>no ] : test_cos_near_half_pi_float128 ]
 
       [ get_function_tests ]
 ;
@@ -800,7 +809,7 @@ test-suite cpp_int_tests :
       [ run test_cpp_int_serial.cpp ../../serialization/build//boost_serialization : : : release <define>TEST4 <toolset>gcc-mingw:<link>static : test_cpp_int_serial_4 ]
       [ run test_cpp_int_deserial.cpp ../../serialization/build//boost_serialization ../../filesystem/build//boost_filesystem : $(here)/serial_txts : : release <toolset>gcc-mingw:<link>static  ]
       [ run test_cpp_rat_serial.cpp ../../serialization/build//boost_serialization : : : release <toolset>gcc-mingw:<link>static  ]
-
+      [ run test_gcd.cpp : : : [ requires cxx11_hdr_random ] ]
 ;
 
 test-suite misc :
@@ -1013,6 +1022,8 @@ test-suite misc :
       [ compile git_issue_30.cpp ]
       [ run git_issue_167.cpp ]
       [ run git_issue_175.cpp ]
+      [ run git_issue_248.cpp ]
+      [ run git_issue_265.cpp : : : [ check-target-builds ../config//has_mpfr : <source>gmp <source>mpfr : <build>no ] ]
       [ compile git_issue_98.cpp : 
          [ check-target-builds ../config//has_float128 : <define>TEST_FLOAT128 <source>quadmath : ]
          [ check-target-builds ../config//has_gmp : <define>TEST_GMP <source>gmp : ]
@@ -1052,7 +1063,7 @@ test-suite misc :
 run test_cpp_bin_float_round.cpp mpfr gmp ;
 explicit test_cpp_bin_float_round ;
 
-rule get_specfun_tests
+rule get_specfun_tests_mpfr
 {
    local result ;
    for local source in [ glob math/*.cpp ]
@@ -1065,6 +1076,7 @@ rule get_specfun_tests
            : # input files
            : # requirements
             [ check-target-builds ../config//has_mpfr : : <build>no ]
+            [ check-target-builds ../config//has_float128 : <source>quadmath ]
             <define>TEST_MPFR_50
             <optimization>speed
             <define>BOOST_ALL_NO_LIB
@@ -1073,82 +1085,6 @@ rule get_specfun_tests
             <include>../../math/include_private
             release
            : $(source:B)_mpfr ] ;
-      result += [ run $(source) gmp 
-            /boost/test//boost_unit_test_framework/<link>static 
-            /boost/regex//boost_regex/<link>static
-            math/instances//test_instances_mpf/<link>static
-           : # command line
-           : # input files
-           : # requirements
-            [ check-target-builds ../config//has_gmp : : <build>no ]
-            <optimization>speed
-            <define>TEST_MPF_50
-            <define>BOOST_ALL_NO_LIB
-            <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
-            <toolset>msvc:<cxxflags>-bigobj
-            <include>../../math/include_private
-            release
-           : $(source:B)_mpf ] ;
-      result += [ run $(source) /boost/test//boost_unit_test_framework/<link>static 
-               /boost/regex//boost_regex/<link>static
-               math/instances//test_instances_cpp_dec_float/<link>static
-           : # command line
-           : # input files
-           : # requirements
-            <define>TEST_CPP_DEC_FLOAT
-            <define>BOOST_ALL_NO_LIB
-            <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
-            <optimization>speed
-            <toolset>msvc:<cxxflags>-bigobj
-            <include>../../math/include_private
-            release
-           : $(source:B)_cpp_dec_float ] ;
-      result += [ run $(source) /boost/test//boost_unit_test_framework/<link>static 
-               /boost/regex//boost_regex/<link>static
-               math/instances//test_instances_cpp_bin_float/<link>static
-           : # command line
-           : # input files
-           : # requirements
-            <define>TEST_CPP_BIN_FLOAT
-            <define>BOOST_ALL_NO_LIB
-            <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
-            <optimization>speed
-            <toolset>msvc:<cxxflags>-bigobj
-            <include>../../math/include_private
-            release
-           : $(source:B)_cpp_bin_float ] ;
-      result += [ run $(source) quadmath 
-            /boost/test//boost_unit_test_framework/<link>static 
-            /boost/regex//boost_regex/<link>static
-            math/instances//test_instances_float128/<link>static
-           : # command line
-           : # input files
-           : # requirements
-            [ check-target-builds ../config//has_float128 : : <build>no ]
-            <optimization>speed
-            <define>TEST_FLOAT128
-            <define>BOOST_ALL_NO_LIB
-            <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
-            <toolset>msvc:<cxxflags>-bigobj
-            <include>../../math/include_private
-            release
-           : $(source:B)_float128 ] ;
-      result += [ run $(source)
-            /boost/test//boost_unit_test_framework/<link>static 
-            /boost/regex//boost_regex/<link>static
-            math/instances//test_instances_intel_quad/<link>static
-           : # command line
-           : # input files
-           : # requirements
-            [ check-target-builds ../config//has_intel_quad : <cxxflags>-Qoption,cpp,--extended_float_type : <build>no ] [ check-target-builds ../config//has_float128 : <source>quadmath ]
-            <optimization>speed
-            <define>TEST_FLOAT128
-            <define>BOOST_ALL_NO_LIB
-            <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
-            <toolset>msvc:<cxxflags>-bigobj
-            <include>../../math/include_private
-            release
-           : $(source:B)_intel_quad ] ;
    }
    #
    # High precision tests are rather different, as they test only one
@@ -1167,13 +1103,152 @@ rule get_specfun_tests
             <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
             <toolset>msvc:<cxxflags>-bigobj
             [ check-target-builds ../config//has_mpfr : <define>TEST_MPFR <source>gmp <source>mpfr :  ]
+            [ check-target-builds ../config//has_float128 : <source>quadmath ]
             <include>../../math/include_private
             release ] ;
    }
    return $(result) ;
 }
 
-test-suite specfun : [ get_specfun_tests ] ;
+rule get_specfun_tests_gmp
+{
+   local result ;
+   for local source in [ glob math/*.cpp ]
+   {
+      result += [ run $(source) gmp 
+            /boost/test//boost_unit_test_framework/<link>static 
+            /boost/regex//boost_regex/<link>static
+            math/instances//test_instances_mpf/<link>static
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_gmp : : <build>no ]
+            [ check-target-builds ../config//has_float128 : <source>quadmath ]
+            <optimization>speed
+            <define>TEST_MPF_50
+            <define>BOOST_ALL_NO_LIB
+            <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
+            <toolset>msvc:<cxxflags>-bigobj
+            <include>../../math/include_private
+            release
+           : $(source:B)_mpf ] ;
+   }
+   return $(result) ;
+}
+
+rule get_specfun_tests_cpp_dec_float
+{
+   local result ;
+   for local source in [ glob math/*.cpp ]
+   {
+      result += [ run $(source) /boost/test//boost_unit_test_framework/<link>static 
+               /boost/regex//boost_regex/<link>static
+               math/instances//test_instances_cpp_dec_float/<link>static
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_float128 : <source>quadmath ]
+            <define>TEST_CPP_DEC_FLOAT
+            <define>BOOST_ALL_NO_LIB
+            <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
+            <optimization>speed
+            <toolset>msvc:<cxxflags>-bigobj
+            <include>../../math/include_private
+            release
+           : $(source:B)_cpp_dec_float ] ;
+   }
+   return $(result) ;
+}
+
+rule get_specfun_tests_cpp_bin_float
+{
+   local result ;
+   for local source in [ glob math/*.cpp ]
+   {
+      result += [ run $(source) /boost/test//boost_unit_test_framework/<link>static 
+               /boost/regex//boost_regex/<link>static
+               math/instances//test_instances_cpp_bin_float/<link>static
+           : # command line
+           : # input files
+           : # requirements
+            <define>TEST_CPP_BIN_FLOAT
+            <define>BOOST_ALL_NO_LIB
+            <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
+            <optimization>speed
+            <toolset>msvc:<cxxflags>-bigobj
+            <include>../../math/include_private
+            release
+            [ check-target-builds ../config//has_float128 : <source>quadmath ]
+           : $(source:B)_cpp_bin_float ] ;
+   }
+   return $(result) ;
+}
+
+rule get_specfun_tests_float128
+{
+   local result ;
+   for local source in [ glob math/*.cpp ]
+   {
+      result += [ run $(source) quadmath 
+            /boost/test//boost_unit_test_framework/<link>static 
+            /boost/regex//boost_regex/<link>static
+            math/instances//test_instances_float128/<link>static
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_float128 : : <build>no ]
+            <optimization>speed
+            <define>TEST_FLOAT128
+            <define>BOOST_ALL_NO_LIB
+            <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
+            <toolset>msvc:<cxxflags>-bigobj
+            <include>../../math/include_private
+            release
+           : $(source:B)_float128 ] ;
+   }
+   return $(result) ;
+}
+
+rule get_specfun_tests_intel_quad
+{
+   local result ;
+   for local source in [ glob math/*.cpp ]
+   {
+      result += [ run $(source)
+            /boost/test//boost_unit_test_framework/<link>static 
+            /boost/regex//boost_regex/<link>static
+            math/instances//test_instances_intel_quad/<link>static
+           : # command line
+           : # input files
+           : # requirements
+            [ check-target-builds ../config//has_intel_quad : <cxxflags>-Qoption,cpp,--extended_float_type : <build>no ] 
+            [ check-target-builds ../config//has_float128 : <source>quadmath ]
+            <optimization>speed
+            <define>TEST_FLOAT128
+            <define>BOOST_ALL_NO_LIB
+            <define>BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
+            <toolset>msvc:<cxxflags>-bigobj
+            <include>../../math/include_private
+            release
+           : $(source:B)_intel_quad ] ;
+   }
+   return $(result) ;
+}
+
+test-suite specfun_mpfr : [ get_specfun_tests_mpfr ] ;
+explicit specfun_mpfr ;
+test-suite specfun_gmp : [ get_specfun_tests_gmp ] ;
+explicit specfun_gmp ;
+test-suite specfun_cpp_dec_float : [ get_specfun_tests_cpp_dec_float ] ;
+explicit specfun_cpp_dec_float ;
+test-suite specfun_cpp_bin_float : [ get_specfun_tests_cpp_bin_float ] ;
+explicit specfun_cpp_bin_float ;
+test-suite specfun_float128 : [ get_specfun_tests_float128 ] ;
+explicit specfun_float128 ;
+test-suite specfun_intel_quad : [ get_specfun_tests_intel_quad ] ;
+explicit specfun_intel_quad ;
+
+test-suite specfun : specfun_mpfr specfun_gmp specfun_cpp_dec_float specfun_cpp_bin_float specfun_float128 specfun_intel_quad ;
 explicit specfun ;
 
 rule get_compile_fail_tests

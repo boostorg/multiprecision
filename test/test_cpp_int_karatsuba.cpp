@@ -21,7 +21,7 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
-#include <boost/timer.hpp>
+#include "timer.hpp"
 #include "test.hpp"
 
 #ifdef _MSC_VER
@@ -81,7 +81,7 @@ typename boost::enable_if_c<boost::multiprecision::backends::is_fixed_precision<
 
    static unsigned last_error_count = 0;
 
-   boost::timer tim;
+   timer tim;
 
    do
    {
@@ -190,7 +190,7 @@ typename boost::disable_if_c<boost::multiprecision::backends::is_fixed_precision
 
    static unsigned last_error_count = 0;
 
-   boost::timer tim;
+   timer tim;
 
    mpz_int mask;
    if (std::numeric_limits<N>::is_bounded)

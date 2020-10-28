@@ -24,7 +24,7 @@
 
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp> // Boost.Test
-#include <boost/test/floating_point_comparison.hpp>
+#include <boost/test/tools/floating_point_comparison.hpp>
 
 #include <iostream>
 #include <iomanip>
@@ -37,7 +37,7 @@
 // static long double const log10Two = 0.30102999566398119521373889472449L; // log10(2.)
 // It is more portable useful to use a Boost macro
 // See https://www.boost.org/doc/libs/release/libs/config/doc/html/boost_config/boost_macro_reference.html
-BOOST_STATIC_CONSTEXPR long double log10Two = 0.30102999566398119521373889472449L; 
+BOOST_STATIC_CONSTEXPR long double log10Two = 0.30102999566398119521373889472449L;
 // which expands to static constexpr on standard C++11 and up, but static const on earlier versions.
 
   /*`By default, output would only show the standard 6 decimal digits,
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(test_numeric_limits_snips)
      std::cout.precision(std::numeric_limits<T>::digits10);
      std::cout.setf(std::ios_base::showpoint); // Append any trailing zeros,
      // or more memorably
-     std::cout << std::showpoint << std::endl; // 
+     std::cout << std::showpoint << std::endl; //
   #endif
 #endif
 
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE(test_numeric_limits_snips)
 
   typedef number<cpp_dec_float<50> > cpp_dec_float_50; // 50 decimal digits.
 
-  using boost::multiprecision::cpp_dec_float_50;
+  // or using boost::multiprecision::cpp_dec_float_50;
 
   cpp_dec_float_50 pi = boost::math::constants::pi<cpp_dec_float_50>();
   std::cout.precision(std::numeric_limits<cpp_dec_float_50>::max_digits10);
@@ -281,7 +281,7 @@ BOOST_AUTO_TEST_CASE(test_numeric_limits_snips)
   }
 
   {
-    bool b = 
+    bool b =
 //[digits10_5
     -(std::numeric_limits<double>::max)() == std::numeric_limits<double>::lowest();
 //] [/digits10_5]

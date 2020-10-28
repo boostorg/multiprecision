@@ -14,6 +14,7 @@
 #include <boost/multiprecision/detail/big_lanczos.hpp>
 #include <boost/multiprecision/detail/digits.hpp>
 #include <boost/multiprecision/detail/atomic.hpp>
+#include <boost/multiprecision/traits/max_digits10.hpp>
 #include <mpfr.h>
 #include <cmath>
 #include <algorithm>
@@ -164,7 +165,7 @@ struct mpfr_float_imp<digits10, allocate_dynamic>
       boost::ulong_long_type mask  = ((((1uLL << (std::numeric_limits<unsigned long>::digits - 1)) - 1) << 1) | 1uLL);
       unsigned               shift = 0;
       mpfr_t                 t;
-      mpfr_init2(t, (std::max)(static_cast<unsigned long>(std::numeric_limits<boost::ulong_long_type>::digits), mpfr_get_prec(m_data)));
+      mpfr_init2(t, (std::max)(static_cast<mpfr_prec_t>(std::numeric_limits<boost::ulong_long_type>::digits), static_cast<mpfr_prec_t>(mpfr_get_prec(m_data))));
       mpfr_set_ui(m_data, 0, GMP_RNDN);
       while (i)
       {
@@ -1365,16 +1366,34 @@ inline void eval_ldexp(mpfr_float_backend<Digits10, AllocateType>& result, const
 template <unsigned Digits10, mpfr_allocation_type AllocateType>
 inline void eval_frexp(mpfr_float_backend<Digits10, AllocateType>& result, const mpfr_float_backend<Digits10, AllocateType>& val, int* e)
 {
-   long v;
-   mpfr_get_d_2exp(&v, val.data(), GMP_RNDN);
+   if (mpfr_zero_p(val.data()))
+   {
+      *e = 0;
+      result = val;
+      return;
+   }
+   mp_exp_t v = mpfr_get_exp(val.data());
    *e = v;
-   eval_ldexp(result, val, -v);
+   if (v)
+      eval_ldexp(result, val, -v);
+   else
+      result = val;
 }
 template <unsigned Digits10, mpfr_allocation_type AllocateType>
 inline void eval_frexp(mpfr_float_backend<Digits10, AllocateType>& result, const mpfr_float_backend<Digits10, AllocateType>& val, long* e)
 {
-   mpfr_get_d_2exp(e, val.data(), GMP_RNDN);
-   return eval_ldexp(result, val, -*e);
+   if (mpfr_zero_p(val.data()))
+   {
+      *e = 0;
+      result = val;
+      return;
+   }
+   mp_exp_t v = mpfr_get_exp(val.data());
+   *e = v;
+   if(v)
+      eval_ldexp(result, val, -v);
+   else
+      result = val;
 }
 
 template <unsigned Digits10, mpfr_allocation_type AllocateType>
@@ -1644,6 +1663,11 @@ using boost::multiprecision::copysign;
 using boost::multiprecision::signbit;
 
 namespace tools {
+
+inline void set_output_precision(const boost::multiprecision::mpfr_float& val, std::ostream& os)
+{
+   os << std::setprecision(val.precision());
+}
 
 template <>
 inline int digits<boost::multiprecision::mpfr_float>()
@@ -2304,7 +2328,7 @@ inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<D
    boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result;
    mpfr_log1p(result.backend().data(), arg.backend().data(), GMP_RNDN);
    if (mpfr_inf_p(result.backend().data()))
-      return policies::raise_overflow_error<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >("log1p<%1%>(%1%)", 0, pol);
+      return (arg == -1 ? -1 : 1) * policies::raise_overflow_error<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >("log1p<%1%>(%1%)", 0, pol);
    if (mpfr_nan_p(result.backend().data()))
       return policies::raise_evaluation_error("log1p<%1%>(%1%)", "Unknown error, result is a NaN", result, pol);
    return result;
@@ -2313,6 +2337,25 @@ template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type Allocat
 inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> log1p BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>& arg)
 {
    return log1p(arg, policies::policy<>());
+}
+
+template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates, class Policy>
+inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> rsqrt BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>& arg, const Policy& pol)
+{
+   boost::multiprecision::detail::scoped_default_precision<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> > precision_guard(arg);
+
+   boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> result;
+   mpfr_rec_sqrt(result.backend().data(), arg.backend().data(), GMP_RNDN);
+   if (mpfr_inf_p(result.backend().data()))
+      return policies::raise_overflow_error<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> >("rsqrt<%1%>(%1%)", 0, pol);
+   if (mpfr_nan_p(result.backend().data()))
+      return policies::raise_evaluation_error("rsqrt<%1%>(%1%)", "Negative argument, result is a NaN", result, pol);
+   return result;
+}
+template <unsigned Digits10, boost::multiprecision::mpfr_allocation_type AllocateType, boost::multiprecision::expression_template_option ExpressionTemplates>
+inline boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates> rsqrt BOOST_PREVENT_MACRO_SUBSTITUTION(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>, ExpressionTemplates>& arg)
+{
+   return rsqrt(arg, policies::policy<>());
 }
 
 } // namespace math
@@ -2362,7 +2405,7 @@ class numeric_limits<boost::multiprecision::number<boost::multiprecision::mpfr_f
    BOOST_STATIC_CONSTEXPR int digits   = static_cast<int>((Digits10 * 1000L) / 301L + ((Digits10 * 1000L) % 301 ? 2 : 1));
    BOOST_STATIC_CONSTEXPR int digits10 = Digits10;
    // Is this really correct???
-   BOOST_STATIC_CONSTEXPR int  max_digits10 = Digits10 + 3;
+   BOOST_STATIC_CONSTEXPR int  max_digits10 = boost::multiprecision::detail::calc_max_digits10<digits>::value;
    BOOST_STATIC_CONSTEXPR bool is_signed    = true;
    BOOST_STATIC_CONSTEXPR bool is_integer   = false;
    BOOST_STATIC_CONSTEXPR bool is_exact     = false;

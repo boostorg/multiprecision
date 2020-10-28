@@ -255,6 +255,7 @@ const T& get_constant_ln2()
    if ((digits != boost::multiprecision::detail::digits2<number<T> >::value()))
    {
 #endif
+      boost::multiprecision::detail::maybe_promote_precision(&result);
       calc_log2(result, boost::multiprecision::detail::digits2<number<T, et_on> >::value());
       digits = boost::multiprecision::detail::digits2<number<T> >::value();
    }
@@ -278,6 +279,7 @@ const T& get_constant_e()
    if ((digits != boost::multiprecision::detail::digits2<number<T> >::value()))
    {
 #endif
+      boost::multiprecision::detail::maybe_promote_precision(&result);
       calc_e(result, boost::multiprecision::detail::digits2<number<T, et_on> >::value());
       digits = boost::multiprecision::detail::digits2<number<T> >::value();
    }
@@ -301,6 +303,7 @@ const T& get_constant_pi()
    if ((digits != boost::multiprecision::detail::digits2<number<T> >::value()))
    {
 #endif
+      boost::multiprecision::detail::maybe_promote_precision(&result);
       calc_pi(result, boost::multiprecision::detail::digits2<number<T, et_on> >::value());
       digits = boost::multiprecision::detail::digits2<number<T> >::value();
    }
@@ -325,8 +328,13 @@ const T& get_constant_one_over_epsilon()
    {
 #endif
       typedef typename mpl::front<typename T::unsigned_types>::type ui_type;
+      boost::multiprecision::detail::maybe_promote_precision(&result);
       result = static_cast<ui_type>(1u);
-      eval_divide(result, std::numeric_limits<number<T> >::epsilon().backend());
+      if(std::numeric_limits<number<T> >::is_specialized)
+         eval_divide(result, std::numeric_limits<number<T> >::epsilon().backend());
+      else
+         eval_ldexp(result, result, boost::multiprecision::detail::digits2<number<T> >::value() - 1);
+      digits = boost::multiprecision::detail::digits2<number<T> >::value();
    }
 
    return result;
