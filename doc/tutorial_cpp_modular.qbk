@@ -92,4 +92,8 @@ Things you should know when using this type:
 
 [cpp_modular_eg]
 
+Which produces the output:
+
+[modular_out]
+
 [endsect] [/section:modular Modular Number Types]
