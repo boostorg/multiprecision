@@ -25,6 +25,8 @@ namespace multiprecision {
      [link jacobi `jacobi(const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& n)`]
 ]
 
+[note It can be also be used with `tommath_int` backend and `gmp_int` backend.]
+
 [h2:api Jacobi Symbol API]
 
 [#jacobi] [role blue `template <typename Backend, expression_template_option ExpressionTemplates> inline typename enable_if_c<number_category<Backend>::value == number_kind_integer, int>::type jacobi(const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& n)`]
