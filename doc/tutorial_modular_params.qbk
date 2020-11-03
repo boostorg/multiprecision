@@ -1,0 +1,94 @@
+[/
+  Copyright 2020 Ilia Shirobokov.
+  Copyright 2020 Alisa Cherniaeva.
+
+  Distributed under the Boost Software License, Version 1.0.
+  (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt).
+]
+
+[section:modular_params Modular params]
+
+[pre
+[*Table of Contents]
+ [link reduction_method Reduction Method Choice]
+ [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.api modular_params API]
+     [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.const_oper Constructors and Operators]
+     [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.getter Getters]
+     [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.members Class member functions]
+        [link adjust_modular `adjust_modular(Backend& result)`]
+        [link adjust_regular `adjust_regular(Backend& result, const Backend& input)`]
+        [link compare `compare(const modular_params<Backend>& o)`]
+        [link reduce `reduce(Backend& result)`]
+]
+
+``
+    namespace boost {
+    namespace multiprecision {
+
+        template <typename Backend>
+        class modular_params;
+    }}
+``
+The class `modular_params` handles modular reduction functionality (for [@https://en.wikipedia.org/wiki/Modular_arithmetic modular arithmetic]).
+
+The class `modular_params` is inherited from the 
+[link boost_multiprecision.tut.modular.modular_adaptor.modular_params.montgomery_params `backends::montgomery_params`] 
+and [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.barrett_params `backends::barrett_params`] classes.
+
+[note It can be also be used with `tommath_int` backend and `gmp_int` backend.]
+
+[h4:reduction_method Reduction Method Choice]
+`modular_params` describes which of the reduction methods (Montgomery or Barrett) to use based on the modulus value. 
+
+Montgomery's modular reduction is used for odd numbers and Barrett's modular reductions - for even.
+
+[include tutorial_montgomery_params.qbk]
+[include tutorial_barrett_params.qbk]
+[include tutorial_base_params.qbk]
+
+[h2:api API modular_params]
+
+[h4:const_oper Constructors and Operators]
+[table `modular_params` constructors
+    [ [ Signature ] [ Comments ] ]
+    [ [ `modular_params()` ] [ ] ]
+    [ [ `modular_params(const Number& p)` ] [ ] ]
+]
+
+[table `montgomery_params` operators
+    [ [ Signature ] [ Comments ] ]
+    [ [ `modular_params& operator=(const modular_params<Backend>& v)` ] [ ] ]
+    [ [ `modular_params& operator=(const Number& v)` ] [ ] ]
+    [ [ `operator number<BackendT, ExpressionTemplates>()` ] [ ] ]
+    [ [ `friend std::ostream& operator<<(std::ostream& o, modular_params<Backend> const& a)` ] [ ] ]
+]
+
+[h4:getter Getters]
+
+[role blue `number_type get_mod() const`]
+
+Returns the modulus value. 
+
+[h4:members Class member functions] 
+[#adjust_modular] [role blue `void adjust_modular(Backend& result)`]
+
+Transforms `result` into Montgomery's form if it is needed (see [link reduction_method Reduction Method Choice]). 
+
+[#adjust_regular] [role blue `void adjust_regular(Backend& result, const Backend& input) const`]
+
+Transforms `input` from Montgomery's form into a standard number and stores it in `result`.
+
+See also [link reduction_method Reduction Method Choice]). 
+
+[#compare] [role blue `int compare(const modular_params<Backend>& o) const`]
+
+Compares two modulus values.
+
+[#reduce] [role blue `void reduce(Backend& result) const`]
+
+Performs a modular reduction according to either Montgomery or Barrett algorithms.
+
+See also [link reduction_method Reduction Method Choice]). 
+
+[endsect] [/section:modular_params modular_params]

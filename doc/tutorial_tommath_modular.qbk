@@ -1,0 +1,29 @@
+[/
+]
+
+[section:tommath_modular tommath_modular]
+
+`#include <boost/multiprecision/tommath.hpp>`
+`#include <boost/multiprecision/modular/modular_adaptor.hpp>`
+`#include <boost/multiprecision/modular/modular_params_tommath.hpp>`
+
+    namespace boost {
+    namespace multiprecision {
+    typedef modular_params<tommath_int>           tom_int_mod_params;
+    typedef number<modular_adaptor<tommath_int> > tom_int_mod;
+    }
+    } // namespace boost::multiprecision
+
+The `tom_int_mod_params` and `tom_int_mod`  acts as a thin wrapper around the `boost::modular<tom_int>`.
+to provide a modular type that is a drop-in replacement for the native C++ integer types, but with unlimited precision.
+
+Things you should know when using this type:
+
+* Default constructed `tom_modular` has the value zero (this the inherited Boost.Modular behavior).
+* Division by zero results in a `std::overflow_error` being thrown.
+* Conversion from a string results in a `std::runtime_error` being thrown if the string can not be
+interpreted as a valid rational number.
+* Arithmetic operations result in a `std::runtime_error` being thrown if the modulus values a different for two modular numbers. 
+* No changes are made to [tommath]'s global state, so this type can safely coexist with other [tommath] code.
+
+[endsect] [/section:tommath_modular tommath_modular]

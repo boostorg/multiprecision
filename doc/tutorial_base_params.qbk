@@ -1,0 +1,49 @@
+[/
+  Copyright 2020 Ilia Shirobokov.
+  Copyright 2020 Alisa Cherniaeva.
+
+  Distributed under the Boost Software License, Version 1.0.
+  (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt).
+]
+
+[section:base_params Base params]
+
+[pre
+[*Table of Contents]
+ [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.base_params.api base_params API]
+     [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.base_params.const_oper Constructors and Operators]
+     [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.base_params.getter Getters]
+]
+
+
+``
+    namespace boost {
+    namespace multiprecision {
+    namespace backends {
+
+        template <typename Backend>
+        class base_params;
+    }}
+``
+
+The class `base_params` represents a base class for modular reduction algorithms.
+
+[h2:api base_params API]
+
+[h4:const_oper Constructors and Operators]
+
+[table `base_params` constructors
+    [ [ Signature ] [ Comments ] ]
+    [ [ `base_params()` ] [ ] ]
+    [ [ `base_params(const Number& p)` ] [ ] ]
+]
+
+
+[h4:getter Getters]
+`const number_type& mod() const`
+
+Returns the modulus value.
+
+
+[endsect] [/section:base_params]

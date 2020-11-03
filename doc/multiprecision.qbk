@@ -49,6 +49,7 @@
 [import ../example/constexpr_float_arithmetic_examples.cpp]
 [import ../test/constexpr_test_cpp_int_5.cpp]
 [import ../test/constexpr_test_cpp_int_7.cpp]
+[import ../example/modular_examples.cpp]
 
 [/External links as templates (see also some defs below)]
 [template mpfr[] [@http://www.mpfr.org MPFR]]

@@ -1,7 +1,10 @@
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright 2011 John Maddock. Distributed under the Boost
-//  Software License, Version 1.0. (See accompanying file
-//  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Copyright 2011 John Maddock.
+//  Copyright (c) 2019 Mikhail Komarov <nemo@nil.foundation>
+//  Copyright (c) 2019 Alexey Moskvin
+//  Distributed under the Boost Software License, Version 1.0.
+//  (See accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef BOOST_MP_ET_OPS_HPP
 #define BOOST_MP_ET_OPS_HPP
@@ -45,7 +48,7 @@ inline BOOST_MP_CXX14_CONSTEXPR detail::expression<detail::negate, detail::expre
    return detail::expression<detail::negate, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> >(v);
 }
 template <class B>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer,
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular,
                             detail::expression<detail::complement_immediates, number<B, et_on> > >::type
 operator~(const number<B, et_on>& v) { return detail::expression<detail::complement_immediates, number<B, et_on> >(v); }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
@@ -992,7 +995,7 @@ operator/(number<B2, ET>&& a, const detail::expression<detail::negate, number<B,
 // Modulus:
 //
 template <class B>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer,
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular,
                             detail::expression<detail::modulus_immediates, number<B, et_on>, number<B, et_on> > >::type
 operator%(const number<B, et_on>& a, const number<B, et_on>& b)
 {
@@ -1022,7 +1025,7 @@ operator%(number<B, et_on>&& a, number<B, et_on>&& b)
 }
 #endif
 template <class B, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer),
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular),
                             detail::expression<detail::modulus_immediates, number<B, et_on>, V> >::type
 operator%(const number<B, et_on>& a, const V& b)
 {
@@ -1038,7 +1041,7 @@ operator%(number<B, et_on>&& a, const V& b)
 }
 #endif
 template <class V, class B>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer),
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular),
                             detail::expression<detail::modulus_immediates, V, number<B, et_on> > >::type
 operator%(const V& a, const number<B, et_on>& b)
 {
@@ -1054,7 +1057,7 @@ operator%(const V& a, number<B, et_on>&& b)
 }
 #endif
 template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer,
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular,
                             detail::expression<detail::modulus, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> > >::type
 operator%(const number<B, et_on>& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
@@ -1070,7 +1073,7 @@ operator%(number<B, et_on>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, 
 }
 #endif
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer,
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular,
                             detail::expression<detail::modulus, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> > >::type
 operator%(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const number<B, et_on>& b)
 {
@@ -1110,7 +1113,7 @@ operator%(const V& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 // Left shift:
 //
 template <class B, class I>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<I>::value && (number_category<B>::value == number_kind_integer), detail::expression<detail::shift_left, number<B, et_on>, I> >::type
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<I>::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular), detail::expression<detail::shift_left, number<B, et_on>, I> >::type
 operator<<(const number<B, et_on>& a, const I& b)
 {
    return detail::expression<detail::shift_left, number<B, et_on>, I>(a, b);
@@ -1134,7 +1137,7 @@ operator<<(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const I& b)
 // Right shift:
 //
 template <class B, class I>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<I>::value && (number_category<B>::value == number_kind_integer),
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<I>::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular),
                             detail::expression<detail::shift_right, number<B, et_on>, I> >::type
 operator>>(const number<B, et_on>& a, const I& b)
 {
@@ -1160,7 +1163,7 @@ operator>>(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const I& b)
 // Bitwise AND:
 //
 template <class B>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer,
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular || number_category<B>::value == number_kind_modular,
                             detail::expression<detail::bitwise_and_immediates, number<B, et_on>, number<B, et_on> > >::type
 operator&(const number<B, et_on>& a, const number<B, et_on>& b)
 {
@@ -1190,7 +1193,7 @@ operator&(number<B, et_on>&& a, number<B, et_on>&& b)
 }
 #endif
 template <class B, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer),
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular),
                             detail::expression<detail::bitwise_and_immediates, number<B, et_on>, V> >::type
 operator&(const number<B, et_on>& a, const V& b)
 {
@@ -1206,7 +1209,7 @@ operator&(number<B, et_on>&& a, const V& b)
 }
 #endif
 template <class V, class B>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer),
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular),
                             detail::expression<detail::bitwise_and_immediates, V, number<B, et_on> > >::type
 operator&(const V& a, const number<B, et_on>& b)
 {
@@ -1222,7 +1225,7 @@ operator&(const V& a, number<B, et_on>&& b)
 }
 #endif
 template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer,
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular,
                             detail::expression<detail::bitwise_and, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> > >::type
 operator&(const number<B, et_on>& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
@@ -1238,7 +1241,7 @@ operator&(number<B, et_on>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, 
 }
 #endif
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer,
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular,
                             detail::expression<detail::bitwise_and, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> > >::type
 operator&(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const number<B, et_on>& b)
 {
@@ -1278,7 +1281,7 @@ operator&(const V& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 // Bitwise OR:
 //
 template <class B>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer,
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular,
                             detail::expression<detail::bitwise_or_immediates, number<B, et_on>, number<B, et_on> > >::type
 operator|(const number<B, et_on>& a, const number<B, et_on>& b)
 {
@@ -1308,7 +1311,7 @@ operator|(number<B, et_on>&& a, number<B, et_on>&& b)
 }
 #endif
 template <class B, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer),
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular),
                             detail::expression<detail::bitwise_or_immediates, number<B, et_on>, V> >::type
 operator|(const number<B, et_on>& a, const V& b)
 {
@@ -1324,7 +1327,7 @@ operator|(number<B, et_on>&& a, const V& b)
 }
 #endif
 template <class V, class B>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer),
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular),
                             detail::expression<detail::bitwise_or_immediates, V, number<B, et_on> > >::type
 operator|(const V& a, const number<B, et_on>& b)
 {
@@ -1340,7 +1343,7 @@ operator|(const V& a, number<B, et_on>&& b)
 }
 #endif
 template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer,
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular,
                             detail::expression<detail::bitwise_or, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> > >::type
 operator|(const number<B, et_on>& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
@@ -1356,7 +1359,7 @@ operator|(number<B, et_on>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, 
 }
 #endif
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer,
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular,
                             detail::expression<detail::bitwise_or, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> > >::type
 operator|(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const number<B, et_on>& b)
 {
@@ -1396,7 +1399,7 @@ operator|(const V& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 // Bitwise XOR:
 //
 template <class B>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer,
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular,
                             detail::expression<detail::bitwise_xor_immediates, number<B, et_on>, number<B, et_on> > >::type
 operator^(const number<B, et_on>& a, const number<B, et_on>& b)
 {
@@ -1426,7 +1429,7 @@ operator^(number<B, et_on>&& a, number<B, et_on>&& b)
 }
 #endif
 template <class B, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer),
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular),
                             detail::expression<detail::bitwise_xor_immediates, number<B, et_on>, V> >::type
 operator^(const number<B, et_on>& a, const V& b)
 {
@@ -1442,7 +1445,7 @@ operator^(number<B, et_on>&& a, const V& b)
 }
 #endif
 template <class V, class B>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer),
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular),
                             detail::expression<detail::bitwise_xor_immediates, V, number<B, et_on> > >::type
 operator^(const V& a, const number<B, et_on>& b)
 {
@@ -1458,7 +1461,7 @@ operator^(const V& a, number<B, et_on>&& b)
 }
 #endif
 template <class B, class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer,
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular,
                             detail::expression<detail::bitwise_xor, number<B, et_on>, detail::expression<tag, Arg1, Arg2, Arg3, Arg4> > >::type
 operator^(const number<B, et_on>& a, const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& b)
 {
@@ -1474,7 +1477,7 @@ operator^(number<B, et_on>&& a, const detail::expression<tag, Arg1, Arg2, Arg3, 
 }
 #endif
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4, class B>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer,
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<number_category<B>::value == number_kind_integer || number_category<B>::value == number_kind_modular,
                             detail::expression<detail::bitwise_xor, detail::expression<tag, Arg1, Arg2, Arg3, Arg4>, number<B, et_on> > >::type
 operator^(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& a, const number<B, et_on>& b)
 {

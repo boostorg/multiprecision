@@ -1,0 +1,67 @@
+[/
+  Copyright 2020 Ilia Shirobokov.
+  Copyright 2020 Alisa Cherniaeva.
+
+  Distributed under the Boost Software License, Version 1.0.
+  (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt).
+]
+[section:montgomery_params Montgomery params]
+
+[pre
+[*Table of Contents]
+ [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.montgomery_params.api montgomery_params API]
+     [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.montgomery_params.const_oper Constructors and Operators]
+     [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.montgomery_params.getter Getters]
+     [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.montgomery_params.members Class member functions]
+        [link reduce `eval_montgomery_reduce(Backend& result)`]
+]
+
+
+``
+    namespace boost {
+    namespace multiprecision {
+    namespace backends {
+        template <typename Backend>
+        class montgomery_params;
+    }}}
+``
+This class `montgomery_params` performs the modular reductions using the Montgomery reduction algorithm.
+
+`montgomery_params` is inherited from the [link boost_multiprecision.tut.modular.modular_adaptor.modular_params.base_params `base_params`] class.
+
+The pre-computed values required for the algorithm are calculated automatically.
+
+[h2:api montgomery_params API]
+[h4:const_oper Constructors and Operators]
+[table `montgomery_params` constructors
+    [ [ Signature ] [ Comments ] ]
+    [ [ `montgomery_params()` ] [ ] ]
+    [ [ `montgomery_params(const Number& p)` ] [ ] ]
+]
+
+[table `montgomery_params` operators
+    [ [ Signature ] [ Comments ] ]
+    [ [ `montgomery_params& operator=(const V& v)` ] [ ] ]
+]
+
+[h4:getter Getters]
+[role blue `inline const number_type& r2() const `]
+
+Returns squared Montgomery radix.
+
+[role blue `inline limb_type p_dash() const `]
+
+Returns the pre-computed constant for Montgomery's reduction.
+
+[role blue `inline size_t p_words() const`]
+
+Returns word-size of the represented integer value.
+
+[h4:members Class member functions] 
+
+[#reduce] [role blue `inline void eval_montgomery_reduce(Backend& result) const`]
+
+Performs Montgomery's modular reduction. 
+
+[endsect][/section:montgomery_params montgomery_params]

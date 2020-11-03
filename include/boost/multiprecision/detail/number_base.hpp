@@ -299,6 +299,7 @@ struct canonical_imp<number<B, et_off>, Backend, mpl::int_<3> >
    typedef B type;
 };
 #endif
+
 template <class Val, class Backend>
 struct canonical_imp<Val, Backend, mpl::int_<0> >
 {
@@ -1682,7 +1683,8 @@ enum number_category_type
    number_kind_floating_point = 1,
    number_kind_rational       = 2,
    number_kind_fixed_point    = 3,
-   number_kind_complex        = 4
+   number_kind_complex        = 4,
+   number_kind_modular        = 5
 };
 
 template <class Num, bool, bool>
