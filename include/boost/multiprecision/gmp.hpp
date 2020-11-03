@@ -1881,6 +1881,12 @@ inline void eval_lcm(gmp_int& result, const gmp_int& a, const gmp_int& b)
 {
    mpz_lcm(result.data(), a.data(), b.data());
 }
+
+inline int eval_jacobi(const gmp_int& a, const gmp_int& n)
+{
+   return mpz_jacobi(a.data(), n.data());
+}
+
 template <class I>
 inline typename enable_if_c<(is_unsigned<I>::value && (sizeof(I) <= sizeof(unsigned long)))>::type eval_gcd(gmp_int& result, const gmp_int& a, const I b)
 {

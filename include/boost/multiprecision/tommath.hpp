@@ -81,9 +81,9 @@ struct tommath_int
    {
       if (m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
-      boost::ulong_long_type mask = ((1uLL << 32) - 1);
-      unsigned shift = 0;
-      ::mp_int t;
+      boost::ulong_long_type mask  = ((1uLL << 32) - 1);
+      unsigned               shift = 0;
+      ::mp_int               t;
       detail::check_tommath_result(mp_init(&t));
       mp_zero(&m_data);
       while (i)
@@ -104,14 +104,14 @@ struct tommath_int
    {
       if (m_data.dp == 0)
          detail::check_tommath_result(mp_init(&m_data));
-      if(sizeof(boost::ulong_long_type) * CHAR_BIT == 64)
+      if (sizeof(boost::ulong_long_type) * CHAR_BIT == 64)
       {
          mp_set_u64(&m_data, i);
          return *this;
       }
-      boost::ulong_long_type mask = ((1uLL << 64) - 1);
-      unsigned shift = 0;
-      ::mp_int t;
+      boost::ulong_long_type mask  = ((1uLL << 64) - 1);
+      unsigned               shift = 0;
+      ::mp_int               t;
       detail::check_tommath_result(mp_init(&t));
       mp_zero(&m_data);
       while (i)
@@ -692,6 +692,12 @@ inline void eval_abs(tommath_int& result, const tommath_int& val)
 inline void eval_gcd(tommath_int& result, const tommath_int& a, const tommath_int& b)
 {
    detail::check_tommath_result(mp_gcd(const_cast< ::mp_int*>(&a.data()), const_cast< ::mp_int*>(&b.data()), const_cast< ::mp_int*>(&result.data())));
+}
+inline int eval_jacobi(tommath_int& a, tommath_int& n)
+{
+   int result = 0;
+   mp_jacobi(const_cast< ::mp_int*>(&a.data()), const_cast< ::mp_int*>(&n.data()), &result);
+   return result;
 }
 inline void eval_lcm(tommath_int& result, const tommath_int& a, const tommath_int& b)
 {

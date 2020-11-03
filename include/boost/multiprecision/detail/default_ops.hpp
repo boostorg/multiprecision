@@ -47,6 +47,8 @@ template <class To, class From>
 void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_rational>& /*to_type*/, const mpl::int_<number_kind_rational>& /*from_type*/);
 template <class To, class From>
 void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_rational>& /*to_type*/, const mpl::int_<number_kind_integer>& /*from_type*/);
+template <class To, class From>
+void generic_interconvert(To& to, const From& from, const mpl::int_<number_kind_integer>& /*to_type*/, const mpl::int_<number_kind_modular>& /*from_type*/);
 
 } // namespace detail
 
@@ -3612,6 +3614,11 @@ UNARY_OP_FUNCTOR(atanh, number_kind_complex)
 BINARY_OP_FUNCTOR(gcd, number_kind_integer)
 BINARY_OP_FUNCTOR(lcm, number_kind_integer)
 HETERO_BINARY_OP_FUNCTOR(pow, unsigned, number_kind_integer)
+
+//
+// Modular functions:
+//
+BINARY_OP_FUNCTOR(pow, number_kind_modular)
 
 #undef BINARY_OP_FUNCTOR
 #undef UNARY_OP_FUNCTOR
