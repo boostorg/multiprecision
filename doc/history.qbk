@@ -12,6 +12,15 @@
 
 [section:hist History]
 
+[h4 Multiprecision-3.2.5 (Boost-1.75)]
+
+* Much improved gcd and modulus operations for __cpp_int.
+* Improved addition/subtraction routines for __cpp_int via Intel's intrinsics.
+* __gmp_int: add better conversion routines for `long long` and `__int128`.
+* __mpfr_float_backend: Fix `log1p` corner case.
+* Improve accuracy of complex tan/tanh.
+* Improve accuracy of trig functions for __cpp_bin_float.
+
 [h4 Multiprecision-3.2.4 (Boost-1.73)]
 
 * IMPORTANT: Mark C++03 support as deprecated and due for removal in 2021.
