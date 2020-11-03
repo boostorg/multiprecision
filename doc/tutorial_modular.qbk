@@ -13,9 +13,9 @@ The following backends provide modular number arithmetic:
 [table
 [[Backend Type][Header][Dependencies][Pros]]
 [[`cpp_modular`][boost/multiprecision/cpp_modular.hpp][None][ An all C++ Boost-licensed implementation.]]
-[[`gmp_modular`][boost/multiprecision/gmp_modular.hpp][[gmp]][ Very fast and efficient back-end.]]
-[[`tommath_modular`][boost/multiprecision/tommath_modular.hpp][[tommath]][ Public domain back-end with no licence restrictions.]]
-[[`modular_adaptor`][boost/multiprecision/modular/modular_adaptor.hpp][None][ All C++ adaptor that allows an integer back-end type to be used as a modular type.]]
+[[`gmp_modular`][boost/multiprecision/gmp_modular.hpp][[gmp]][ Very fast and efficient backend.]]
+[[`tommath_modular`][boost/multiprecision/tommath_modular.hpp][[tommath]][ Public domain backend with no licence restrictions.]]
+[[`modular_adaptor`][boost/multiprecision/modular/modular_adaptor.hpp][None][ All C++ adaptor that allows an integer backend type to be used as a modular type.]]
 ]
 
 [include tutorial_cpp_modular.qbk]

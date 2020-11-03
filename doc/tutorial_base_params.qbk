@@ -1,5 +1,5 @@
 [/
- Copyright 2020 Ilia Shirobokov.
+  Copyright 2020 Ilia Shirobokov.
   Copyright 2020 Alisa Cherniaeva.
 
   Distributed under the Boost Software License, Version 1.0.
@@ -22,11 +22,12 @@
     namespace multiprecision {
     namespace backends {
 
-    template <typename Backend>
-    class base_params;
+        template <typename Backend>
+        class base_params;
     }}
 ``
-The class `base_params` initializes the module for modular calculations.
+
+The class `base_params` represents a base class for modular reduction algorithms.
 
 [h2:api base_params API]
 
@@ -42,7 +43,7 @@ The class `base_params` initializes the module for modular calculations.
 [h4:getter Getters]
 `const number_type& mod() const`
 
-return the modules value.
+Returns the modulus value.
 
 
 [endsect] [/section:base_params]

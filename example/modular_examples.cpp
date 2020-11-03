@@ -47,3 +47,28 @@ int main()
 }
 
 //]
+
+/*
+
+//[modular_out
+Pre-calculation parameters for module: 
+Value mod: 7
+Initialization a equal b: 1
+Value a: 4
+Value b: 4
+Value c: 2
+Some base function: 
+Add a and b: 1
+Sub a and b: 0
+Sub c and a ((-y mod x) equal ((x-y) mod x): 5
+Multiply a and b: 2
+Divide a and b: 1
+Module a % b: 0
+Some bitwise function: 
+a and b: 4
+a xor b: 0
+a or b: 4
+Pow function: 
+Pow a^b: 4
+//]
+*/
