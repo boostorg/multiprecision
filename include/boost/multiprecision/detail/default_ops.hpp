@@ -6,6 +6,7 @@
 #ifndef BOOST_MATH_BIG_NUM_DEF_OPS
 #define BOOST_MATH_BIG_NUM_DEF_OPS
 
+#include <boost/core/no_exceptions_support.hpp> // BOOST_TRY
 #include <boost/math/policies/error_handling.hpp>
 #include <boost/multiprecision/detail/number_base.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -970,11 +971,10 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
    //
    if (std::numeric_limits<R>::is_integer && !std::numeric_limits<R>::is_signed && (eval_get_sign(backend) < 0))
       BOOST_THROW_EXCEPTION(std::range_error("Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
-   try
-   {
+   BOOST_TRY {
       result->value = boost::lexical_cast<R>(backend.str(0, std::ios_base::fmtflags(0)));
    }
-   catch (const bad_lexical_cast&)
+   BOOST_CATCH (const bad_lexical_cast&)
    {
       if (eval_get_sign(backend) < 0)
       {
@@ -983,6 +983,7 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
       else
          *result = (std::numeric_limits<R>::max)();
    }
+   BOOST_CATCH_END
 }
 
 template <class R, class B>
@@ -994,14 +995,13 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
    //
    if (std::numeric_limits<R>::is_integer && !std::numeric_limits<R>::is_signed && (eval_get_sign(backend) < 0))
       BOOST_THROW_EXCEPTION(std::range_error("Attempt to convert negative value to an unsigned integer results in undefined behaviour"));
-   try
-   {
+   BOOST_TRY {
       B t(backend);
       R mask = ~static_cast<R>(0u);
       eval_bitwise_and(t, mask);
       result->value = boost::lexical_cast<R>(t.str(0, std::ios_base::fmtflags(0)));
    }
-   catch (const bad_lexical_cast&)
+   BOOST_CATCH (const bad_lexical_cast&)
    {
       if (eval_get_sign(backend) < 0)
       {
@@ -1010,6 +1010,7 @@ inline void last_chance_eval_convert_to(terminal<R>* result, const B& backend, c
       else
          *result = (std::numeric_limits<R>::max)();
    }
+   BOOST_CATCH_END
 }
 
 template <class R, class B>
