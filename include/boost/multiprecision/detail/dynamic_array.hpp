@@ -8,6 +8,8 @@
 #ifndef BOOST_MP_DETAIL_DYNAMIC_ARRAY_HPP
 #define BOOST_MP_DETAIL_DYNAMIC_ARRAY_HPP
 
+#include <algorithm>
+#include <initializer_list>
 #include <vector>
 #include <boost/multiprecision/detail/rebind.hpp>
 
@@ -15,8 +17,19 @@ namespace boost { namespace multiprecision { namespace backends { namespace deta
 template <class value_type, const boost::uint32_t elem_number, class my_allocator>
 struct dynamic_array : public std::vector<value_type, typename rebind<value_type, my_allocator>::type>
 {
-   dynamic_array() : std::vector<value_type, typename rebind<value_type, my_allocator>::type>(static_cast<typename std::vector<value_type, typename rebind<value_type, my_allocator>::type>::size_type>(elem_number), static_cast<value_type>(0))
+private:
+   using base_class_type = std::vector<value_type, typename rebind<value_type, my_allocator>::type>;
+
+public:
+   dynamic_array() : base_class_type(static_cast<typename base_class_type::size_type>(elem_number), static_cast<value_type>(0))
    {
+   }
+
+   dynamic_array( std::initializer_list<value_type> lst ) : base_class_type(static_cast<typename base_class_type::size_type>(elem_number), static_cast<value_type>(0))
+   {
+     std::copy(lst.begin(),
+               lst.end(),
+               base_class_type::begin());
    }
 
    value_type*       data() { return &(*(this->begin())); }

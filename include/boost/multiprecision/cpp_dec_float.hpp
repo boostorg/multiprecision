@@ -16,9 +16,11 @@
 #ifndef BOOST_MP_CPP_DEC_FLOAT_BACKEND_HPP
 #define BOOST_MP_CPP_DEC_FLOAT_BACKEND_HPP
 
+#include <initializer_list>
+#include <limits>
+
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
-#include <limits>
 #ifndef BOOST_NO_CXX11_HDR_ARRAY
 #include <array>
 #else
@@ -69,6 +71,11 @@ template <unsigned Digits10, class ExponentType, class Allocator>
 class cpp_dec_float
 {
  private:
+   static BOOST_CONSTEXPR_OR_CONST boost::uint32_t pow10_maker(boost::uint32_t n)
+   {
+     return ((n == UINT32_C(0)) ? UINT32_C(1) : pow10_maker(n - UINT32_C(1)) * UINT32_C(10));
+   }
+
    static const boost::int32_t cpp_dec_float_digits10_setting = Digits10;
 
    // We need at least 16-bits in the exponent type to do anything sensible:
@@ -145,6 +152,17 @@ class cpp_dec_float
                                    fpclass(c),
                                    prec_elem(cpp_dec_float_elem_number) {}
 
+
+   BOOST_CONSTEXPR cpp_dec_float(typename array_type::value_type data0,
+                                 const ExponentType exponent,
+                                 const bool n,
+                                 const fpclass_type c)
+    : data( { data0 } ),
+      exp(exponent),
+      neg(n),
+      fpclass(c),
+      prec_elem(cpp_dec_float_elem_number) { }
+
    //
    // Static data initializer:
    //
@@ -152,10 +170,7 @@ class cpp_dec_float
    {
       initializer()
       {
-         cpp_dec_float<Digits10, ExponentType, Allocator>::nan();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::inf();
          (cpp_dec_float<Digits10, ExponentType, Allocator>::min)();
-         (cpp_dec_float<Digits10, ExponentType, Allocator>::max)();
          cpp_dec_float<Digits10, ExponentType, Allocator>::zero();
          cpp_dec_float<Digits10, ExponentType, Allocator>::one();
          cpp_dec_float<Digits10, ExponentType, Allocator>::two();
@@ -167,7 +182,6 @@ class cpp_dec_float
          cpp_dec_float<Digits10, ExponentType, Allocator>::long_long_max();
          cpp_dec_float<Digits10, ExponentType, Allocator>::long_long_min();
          cpp_dec_float<Digits10, ExponentType, Allocator>::ulong_long_max();
-         cpp_dec_float<Digits10, ExponentType, Allocator>::eps();
          cpp_dec_float<Digits10, ExponentType, Allocator>::pow2(0);
       }
       void do_nothing() {}
@@ -284,25 +298,25 @@ class cpp_dec_float
    }
 
    // Specific special values.
-   static const cpp_dec_float& nan()
+   static BOOST_CONSTEXPR_OR_CONST cpp_dec_float nan()
    {
-      static const cpp_dec_float val(cpp_dec_float_NaN);
-      init.do_nothing();
-      return val;
+      return cpp_dec_float(cpp_dec_float_NaN);
    }
 
-   static const cpp_dec_float& inf()
+   static BOOST_CONSTEXPR_OR_CONST cpp_dec_float inf()
    {
-      static const cpp_dec_float val(cpp_dec_float_inf);
-      init.do_nothing();
-      return val;
+      return cpp_dec_float(cpp_dec_float_inf);
    }
 
-   static const cpp_dec_float&(max)()
+   static BOOST_CONSTEXPR_OR_CONST cpp_dec_float(max)()
    {
-      init.do_nothing();
-      static cpp_dec_float val_max = std::string("1.0e" + boost::multiprecision::detail::itos(cpp_dec_float_max_exp10)).c_str();
-      return val_max;
+      return cpp_dec_float
+             (
+                pow10_maker((boost::uint32_t) (cpp_dec_float_max_exp10 % cpp_dec_float_elem_digits10)),
+                (ExponentType) (cpp_dec_float_max_exp10 - (ExponentType) (cpp_dec_float_max_exp10 % cpp_dec_float_elem_digits10)),
+                false,
+                cpp_dec_float_finite
+             );
    }
 
    static const cpp_dec_float&(min)()
@@ -397,11 +411,15 @@ class cpp_dec_float
       return val;
    }
 
-   static const cpp_dec_float& eps()
+   static BOOST_CONSTEXPR_OR_CONST cpp_dec_float eps()
    {
-      init.do_nothing();
-      static cpp_dec_float val(1.0, 1 - static_cast<int>(cpp_dec_float_digits10));
-      return val;
+      return cpp_dec_float
+             (
+                pow10_maker((boost::uint32_t) ((boost::int32_t) (INT32_C(1) + (boost::int32_t) (((cpp_dec_float_digits10 / cpp_dec_float_elem_digits10) + ((cpp_dec_float_digits10 % cpp_dec_float_elem_digits10) != 0 ? 1 : 0)) * cpp_dec_float_elem_digits10)) - cpp_dec_float_digits10)),
+                -(ExponentType) (((cpp_dec_float_digits10 / cpp_dec_float_elem_digits10) + ((cpp_dec_float_digits10 % cpp_dec_float_elem_digits10) != 0 ? 1 : 0)) * cpp_dec_float_elem_digits10),
+                false,
+                cpp_dec_float_finite
+             );
    }
 
    // Basic operations.
@@ -2216,7 +2234,9 @@ cpp_dec_float<Digits10, ExponentType, Allocator>::cpp_dec_float(const double man
    // Create *this cpp_dec_float<Digits10, ExponentType, Allocator> from a given mantissa and exponent.
    // Note: This constructor does not maintain the full precision of double.
 
-   const bool mantissa_is_iszero = (::fabs(mantissa) < ((std::numeric_limits<double>::min)() * (1.0 + std::numeric_limits<double>::epsilon())));
+   using std::fabs;
+
+   const bool mantissa_is_iszero = (fabs(mantissa) < ((std::numeric_limits<double>::min)() * (1.0 + std::numeric_limits<double>::epsilon())));
 
    if (mantissa_is_iszero)
    {
