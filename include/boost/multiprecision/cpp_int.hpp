@@ -452,7 +452,7 @@ private:
       {
          m_sign = o.m_sign;
          this->resize(o.size(), o.size());
-         std::memcpy(this->limbs(), o.limbs(), o.size() * sizeof((o.limbs())));
+         std::memcpy(this->limbs(), o.limbs(), o.size() * sizeof(*(o.limbs())));
          return *this;
       }
       if (!m_internal && !m_alias)

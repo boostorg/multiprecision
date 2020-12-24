@@ -956,6 +956,7 @@ test-suite misc :
       [ run test_cpp_int_import_export.cpp no_eh_support ]
       [ run test_native_integer.cpp no_eh_support ]
 
+      [ run test_mixed_move_cpp_int.cpp no_eh_support ]
       [ run test_mixed_cpp_int.cpp no_eh_support ]
       [ run test_mixed_float.cpp no_eh_support
               : # command line
