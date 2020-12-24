@@ -179,6 +179,9 @@ template <unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class 
 struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, false>
     : private boost::empty_value<typename detail::rebind<limb_type, Allocator>::type>
 {
+   template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, bool trivial2>
+   friend struct cpp_int_base;
+
    typedef typename detail::rebind<limb_type, Allocator>::type allocator_type;
 #ifdef BOOST_NO_CXX11_ALLOCATOR
    typedef typename allocator_type::pointer       limb_pointer;
@@ -194,9 +197,9 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
    //
    BOOST_STATIC_ASSERT(!is_void<Allocator>::value);
 
- private:
    typedef boost::empty_value<allocator_type> base_type;
 
+private:
    struct limb_data
    {
       unsigned        capacity;
@@ -408,7 +411,7 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
    }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
    cpp_int_base(cpp_int_base&& o)
-       : base_type(static_cast<base_type&&>(o)), m_limbs(o.m_limbs), m_sign(o.m_sign), m_internal(o.m_internal), m_alias(o.m_alias)
+      : base_type(static_cast<base_type&&>(o)), m_limbs(o.m_limbs), m_sign(o.m_sign), m_internal(o.m_internal), m_alias(o.m_alias)
    {
       if (m_internal)
       {
@@ -416,8 +419,8 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
       }
       else
       {
-         m_data.ld    = o.m_data.ld;
-         o.m_limbs    = 0;
+         m_data.ld = o.m_data.ld;
+         o.m_limbs = 0;
          o.m_internal = true;
       }
    }
@@ -426,20 +429,43 @@ struct cpp_int_base<MinBits, MaxBits, signed_magnitude, Checked, Allocator, fals
       if (!m_internal && !m_alias)
          allocator().deallocate(m_data.ld.data, m_data.ld.capacity);
       *static_cast<base_type*>(this) = static_cast<base_type&&>(o);
-      m_limbs                        = o.m_limbs;
-      m_sign                         = o.m_sign;
-      m_internal                     = o.m_internal;
-      m_alias                        = o.m_alias;
+      m_limbs = o.m_limbs;
+      m_sign = o.m_sign;
+      m_internal = o.m_internal;
+      m_alias = o.m_alias;
       if (m_internal)
       {
          std::memcpy(limbs(), o.limbs(), o.size() * sizeof(limbs()[0]));
       }
       else
       {
-         m_data.ld    = o.m_data.ld;
-         o.m_limbs    = 0;
+         m_data.ld = o.m_data.ld;
+         o.m_limbs = 0;
          o.m_internal = true;
       }
+      return *this;
+   }
+   template <unsigned MinBits2, unsigned MaxBits2, cpp_int_check_type Checked2>
+   cpp_int_base& operator=(cpp_int_base<MinBits2, MaxBits2, signed_magnitude, Checked2, Allocator>&& o) BOOST_NOEXCEPT
+   {
+      if(o.m_internal)
+      {
+         m_sign = o.m_sign;
+         this->resize(o.size(), o.size());
+         std::memcpy(this->limbs(), o.limbs(), o.size() * sizeof((o.limbs())));
+         return *this;
+      }
+      if (!m_internal && !m_alias)
+         allocator().deallocate(m_data.ld.data, m_data.ld.capacity);
+      *static_cast<base_type*>(this) = static_cast<typename cpp_int_base<MinBits2, MaxBits2, signed_magnitude, Checked2, Allocator>::base_type&&>(o);
+      m_limbs                        = o.m_limbs;
+      m_sign                         = o.m_sign;
+      m_internal                     = o.m_internal;
+      m_alias                        = o.m_alias;
+      m_data.ld.capacity             = o.m_data.ld.capacity;
+      m_data.ld.data                 = o.limbs();
+      o.m_limbs                      = 0;
+      o.m_internal                   = true;
       return *this;
    }
 #endif
@@ -1360,6 +1386,11 @@ struct cpp_int_backend
    BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(cpp_int_backend&& o) BOOST_NOEXCEPT
        : base_type(static_cast<base_type&&>(o))
    {}
+   template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2>
+   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2>&& o, typename std::enable_if<is_implicit_cpp_int_conversion<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2>, self_type>::value>::type* = 0) BOOST_NOEXCEPT
+   {
+      *this = static_cast<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2>&&>(o);
+   }
 #endif
    //
    // Direct construction from arithmetic type:
@@ -1478,6 +1509,12 @@ struct cpp_int_backend
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR cpp_int_backend& operator=(cpp_int_backend&& o) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<base_type&>() = std::declval<base_type>()))
    {
       *static_cast<base_type*>(this) = static_cast<base_type&&>(o);
+      return *this;
+   }
+   template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2>
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<((MaxBits2 <= MaxBits) || (MaxBits == 0)) && !boost::is_void<Allocator>::value, cpp_int_backend&>::type operator=(cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2>&& o) BOOST_NOEXCEPT
+   {
+      *static_cast<base_type*>(this) = static_cast<typename cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2>::base_type&&>(o);
       return *this;
    }
 #endif

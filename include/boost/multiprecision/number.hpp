@@ -252,6 +252,15 @@ class number
       m_backend = canonical_value(v);
       return *this;
    }
+   /*
+   template <class V>
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<is_convertible<V, self_type>::value && !boost::multiprecision::is_number_expression<V>::value && !boost::multiprecision::is_number<V>::value, number<Backend, ExpressionTemplates>&>::type
+   operator=(V&& v)
+       BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend&>() = canonical_value(std::declval<V>())))
+   {
+      m_backend = canonical_value(BOOST_MP_MOVE(v));
+      return *this;
+   }*/
    template <class V>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number<Backend, ExpressionTemplates>& assign(const V& v)
        BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend&>() = std::declval<const typename detail::canonical<V, Backend>::type&>()))
@@ -321,6 +330,19 @@ class number
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number& operator=(number&& r) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend&>() = std::declval<Backend>()))
    {
       m_backend = static_cast<Backend&&>(r.m_backend);
+      return *this;
+   }
+   template <class Other, expression_template_option ET>
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number(number<Other, ET>&& val,
+                               typename boost::enable_if_c<(boost::is_convertible<Other, Backend>::value && !detail::is_restricted_conversion<Other, Backend>::value)>::type* = 0)
+       BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<Other const&>())))
+       : m_backend(static_cast<number<Other, ET>&&>(val).backend()) {}
+   template <class Other, expression_template_option ET>
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<(boost::is_convertible<Other, Backend>::value && !detail::is_restricted_conversion<Other, Backend>::value), number&>::type 
+         operator=(number<Other, ET>&& val)
+            BOOST_MP_NOEXCEPT_IF(noexcept(Backend(std::declval<Other const&>())))
+   {
+      m_backend = std::move(val).backend();
       return *this;
    }
 #endif
@@ -988,7 +1010,18 @@ class number
       do_assign(e, tag());
    }
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-   BOOST_MP_CXX14_CONSTEXPR void do_assign(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e, const mpl::false_&)
+   BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<std::is_assignable<number, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value>::type 
+      do_assign(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e, const mpl::false_&)
+   {
+      // The result of the expression isn't the same type as this -
+      // create a temporary result and assign it to *this:
+      typedef typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type temp_type;
+      temp_type                                                                     t(e);
+      *this = BOOST_MP_MOVE(t);
+   }
+   template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
+   BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<!std::is_assignable<number, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value>::type 
+      do_assign(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e, const mpl::false_&)
    {
       // The result of the expression isn't the same type as this -
       // create a temporary result and assign it to *this:
@@ -1989,6 +2022,8 @@ class number
    static BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const Backend& canonical_value(const self_type& v) BOOST_NOEXCEPT { return v.m_backend; }
    template <class B2, expression_template_option ET>
    static BOOST_MP_FORCEINLINE BOOST_CONSTEXPR const B2& canonical_value(const number<B2, ET>& v) BOOST_NOEXCEPT { return v.backend(); }
+   template <class B2, expression_template_option ET>
+   static BOOST_MP_FORCEINLINE BOOST_CONSTEXPR B2&& canonical_value(number<B2, ET>&& v) BOOST_NOEXCEPT { return static_cast<number<B2, ET>&&>(v).backend(); }
    template <class V>
    static BOOST_MP_FORCEINLINE BOOST_CONSTEXPR typename boost::disable_if<is_same<typename detail::canonical<V, Backend>::type, V>, typename detail::canonical<V, Backend>::type>::type
    canonical_value(const V& v) BOOST_NOEXCEPT { return static_cast<typename detail::canonical<V, Backend>::type>(v); }
