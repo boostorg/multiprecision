@@ -1387,7 +1387,7 @@ struct cpp_int_backend
        : base_type(static_cast<base_type&&>(o))
    {}
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2>
-   BOOST_MP_FORCEINLINE BOOST_CONSTEXPR cpp_int_backend(cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2>&& o, typename std::enable_if<is_implicit_cpp_int_conversion<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2>, self_type>::value>::type* = 0) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_CXX14_CONSTEXPR cpp_int_backend(cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2>&& o, typename std::enable_if<is_implicit_cpp_int_conversion<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2>, self_type>::value>::type* = 0) BOOST_NOEXCEPT
    {
       *this = static_cast<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2>&&>(o);
    }
@@ -1512,7 +1512,7 @@ struct cpp_int_backend
       return *this;
    }
    template <unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2>
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<((MaxBits2 <= MaxBits) || (MaxBits == 0)) && !boost::is_void<Allocator>::value, cpp_int_backend&>::type operator=(cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2>&& o) BOOST_NOEXCEPT
+   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<((MaxBits2 <= MaxBits) || (MaxBits == 0)) && !boost::is_void<Allocator>::value, cpp_int_backend&>::type operator=(cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator>&& o) BOOST_NOEXCEPT
    {
       *static_cast<base_type*>(this) = static_cast<typename cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2>::base_type&&>(o);
       return *this;
