@@ -263,7 +263,7 @@ eval_increment(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocato
    else if (result.sign() && result.limbs()[0])
    {
       --result.limbs()[0];
-      if (!result.limbs()[0])
+      if (!result.limbs()[0] && (result.size() == 1))
          result.sign(false);
    }
    else
