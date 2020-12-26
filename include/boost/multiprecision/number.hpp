@@ -252,15 +252,6 @@ class number
       m_backend = canonical_value(v);
       return *this;
    }
-   /*
-   template <class V>
-   BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<is_convertible<V, self_type>::value && !boost::multiprecision::is_number_expression<V>::value && !boost::multiprecision::is_number<V>::value, number<Backend, ExpressionTemplates>&>::type
-   operator=(V&& v)
-       BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend&>() = canonical_value(std::declval<V>())))
-   {
-      m_backend = canonical_value(BOOST_MP_MOVE(v));
-      return *this;
-   }*/
    template <class V>
    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR number<Backend, ExpressionTemplates>& assign(const V& v)
        BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<Backend&>() = std::declval<const typename detail::canonical<V, Backend>::type&>()))
