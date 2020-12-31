@@ -5,7 +5,7 @@ Boost Multiprecision Library
 
 |                  |  Master  |   Develop   |
 |------------------|----------|-------------|
-| Drone            |  [![Build Status](https://drone.cpp.al/api/badges/boostorg/multiprecision/status.svg?ref=refs/heads/master)](https://drone.cpp.al/boostorg/multiprecision) | [![Build Status](https://drone.cpp.al/apmultiprecision/badges/boostorg/multiprecision/status.svg)](https:/multiprecisiondrone.cpp.al/boostorg/multiprecision) |
+| Drone            |  [![Build Status](https://drone.cpp.al/api/badges/boostorg/multiprecision/status.svg?ref=refs/heads/master)](https://drone.cpp.al/boostorg/multiprecision) | [![Build Status](https://drone.cpp.al/api/badges/boostorg/multiprecision/status.svg)](https:/multiprecisiondrone.cpp.al/boostorg/multiprecision) |
 | Travis           | [![Build Status](https://travis-ci.org/boostorg/multiprecision.svg?branch=master)](https://travis-ci.org/boostorg/multiprecision)  |  [![Build Status](https://travis-ci.org/boostorg/multiprecision.png)](https://travis-ci.org/boostorg/multiprecision) |
 | Appveyor         | [![Build status](https://ci.appveyor.com/api/projects/status/w38yv47cr60k18sh/branch/master?svg=true)](https://ci.appveyor.com/project/jzmaddock/multiprecision/branch/master) | [![Build status](https://ci.appveyor.com/api/projects/status/w38yv47cr60k18sh/branch/develop?svg=true)](https://ci.appveyor.com/project/jzmaddock/multiprecision/branch/develop) |
 
