@@ -2248,6 +2248,10 @@ struct double_precision_type<backends::cpp_int_backend<MinBits, MaxBits, SignTyp
 
 } // namespace default_ops
 
+template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked, class Allocator, expression_template_option ET, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, expression_template_option ET2>
+struct is_compatible_mixed_arithmetic_type<number<backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ET>, number<backends::cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>, ET2 > >
+   : public mpl::bool_<std::numeric_limits<number<backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>, ET> >::digits == std::numeric_limits<number<backends::cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>, ET2 > >::digits>{};
+
 template <unsigned MinBits, unsigned MaxBits, cpp_integer_type SignType, cpp_int_check_type Checked>
 struct expression_template_default<backends::cpp_int_backend<MinBits, MaxBits, SignType, Checked, void> >
 {

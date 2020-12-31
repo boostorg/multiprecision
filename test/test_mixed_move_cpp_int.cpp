@@ -29,7 +29,7 @@ void operator delete(void * p)noexcept
 {
    return std::free(p);
 }
-void operator delete[](void* p)
+void operator delete[](void* p)noexcept
 {
    return std::free(p);
 }
@@ -69,6 +69,125 @@ void test()
    }
 }
 
+template <class From, class To>
+void test_operations()
+{
+   From a = From(1) << 150;
+   From b = From(1) << 149;
+   {
+      alloc_count = 0;
+      To c        = a * b;
+      BOOST_CHECK_EQUAL(alloc_count, 0);
+      BOOST_CHECK_EQUAL(c, a * b);
+   }
+   {
+      alloc_count = 0;
+      To c;
+      multiply(c, a, b);
+      BOOST_CHECK_EQUAL(alloc_count, 0);
+      BOOST_CHECK_EQUAL(c, a * b);
+   }
+   {
+      alloc_count = 0;
+      To c        = a + b;
+      BOOST_CHECK_EQUAL(alloc_count, 0);
+      BOOST_CHECK_EQUAL(c, a + b);
+   }
+   {
+      alloc_count = 0;
+      To c;
+      add(c, a, b);
+      BOOST_CHECK_EQUAL(alloc_count, 0);
+      BOOST_CHECK_EQUAL(c, a + b);
+   }
+   {
+      alloc_count = 0;
+      To c        = -a;
+      BOOST_CHECK_EQUAL(alloc_count, 0);
+      BOOST_CHECK_EQUAL(c, -a);
+   }
+   {
+      alloc_count = 0;
+      To c        = a - b;
+      BOOST_CHECK_EQUAL(alloc_count, 0);
+      BOOST_CHECK_EQUAL(c, a - b);
+   }
+   {
+      alloc_count = 0;
+      To c;
+      subtract(c, a, b);
+      BOOST_CHECK_EQUAL(alloc_count, 0);
+      BOOST_CHECK_EQUAL(c, a - b);
+   }
+   {
+      alloc_count = 0;
+      To c        = a / b;
+      BOOST_CHECK_EQUAL(alloc_count, 0);
+      BOOST_CHECK_EQUAL(c, a / b);
+   }
+   {
+      alloc_count = 0;
+      To c        = a % b;
+      BOOST_CHECK_EQUAL(alloc_count, 0);
+      BOOST_CHECK_EQUAL(c, a % b);
+   }
+   {
+      alloc_count = 0;
+      To c        = a << 1;
+      BOOST_CHECK_EQUAL(alloc_count, 0);
+      BOOST_CHECK_EQUAL(c, a << 1);
+   }
+   {
+      alloc_count = 0;
+      To c        = a >> 1;
+      BOOST_CHECK_EQUAL(alloc_count, 0);
+      BOOST_CHECK_EQUAL(c, a >> 1);
+   }
+   {
+      alloc_count = 0;
+      To c        = a | b;
+      BOOST_CHECK_EQUAL(alloc_count, 0);
+      BOOST_CHECK_EQUAL(c, a | b);
+   }
+   {
+      alloc_count = 0;
+      To c        = a & b;
+      BOOST_CHECK_EQUAL(alloc_count, 0);
+      BOOST_CHECK_EQUAL(c, a & b);
+   }
+   {
+      alloc_count = 0;
+      To c        = a ^ b;
+      BOOST_CHECK_EQUAL(alloc_count, 0);
+      BOOST_CHECK_EQUAL(c, a ^ b);
+   }
+   {
+      alloc_count = 0;
+      To c        = gcd(a, b);
+      BOOST_CHECK_EQUAL(c, gcd(a, b));
+   }
+   {
+      alloc_count = 0;
+      To c        = lcm(a, b);
+      BOOST_CHECK_EQUAL(c, lcm(a, b));
+   }
+   {
+      alloc_count = 0;
+      To c        = pow(a, 2);
+      BOOST_CHECK_EQUAL(c, pow(a, 2));
+   }
+   {
+      alloc_count = 0;
+      To c        = powm(a, b, 2);
+      BOOST_CHECK_EQUAL(c, powm(a, b, 2));
+   }
+   {
+      alloc_count = 0;
+      To c        = sqrt(a);
+      BOOST_CHECK_EQUAL(c, sqrt(a));
+   }
+}
+
 int main()
 {
    using namespace boost::multiprecision;
@@ -80,6 +199,9 @@ int main()
    // allocation may be needed even on a move.
    //
    test<number<cpp_int_backend<sizeof(limb_type) * CHAR_BIT * 2> >, cpp_int>();
+
+   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_backend<512> > To;
+   test_operations<cpp_int, To>();
 
    return boost::report_errors();
 }

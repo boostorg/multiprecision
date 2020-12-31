@@ -1752,6 +1752,9 @@ template <class Backend, expression_template_option ExpressionTemplates>
 struct is_interval_number<number<Backend, ExpressionTemplates> > : public is_interval_number<Backend>
 {};
 
+template <class T, class U>
+struct is_compatible_mixed_arithmetic_type : public boost::is_same<T, U> {};
+
 } // namespace multiprecision
 } // namespace boost
 
