@@ -195,11 +195,11 @@ eval_lsb(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocato
    using default_ops::eval_get_sign;
    if (eval_get_sign(a) == 0)
    {
-      BOOST_THROW_EXCEPTION(std::range_error("No bits were set in the operand."));
+      BOOST_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
    }
    if (a.sign())
    {
-      BOOST_THROW_EXCEPTION(std::range_error("Testing individual bits in negative values is not supported - results are undefined."));
+      BOOST_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
    }
 
    //
@@ -236,11 +236,11 @@ eval_msb(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocato
    using default_ops::eval_get_sign;
    if (eval_get_sign(a) == 0)
    {
-      BOOST_THROW_EXCEPTION(std::range_error("No bits were set in the operand."));
+      BOOST_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
    }
    if (a.sign())
    {
-      BOOST_THROW_EXCEPTION(std::range_error("Testing individual bits in negative values is not supported - results are undefined."));
+      BOOST_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
    }
    return eval_msb_imp(a);
 }
@@ -1158,11 +1158,11 @@ eval_lsb(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocato
    using default_ops::eval_get_sign;
    if (eval_get_sign(a) == 0)
    {
-      BOOST_THROW_EXCEPTION(std::range_error("No bits were set in the operand."));
+      BOOST_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
    }
    if (a.sign())
    {
-      BOOST_THROW_EXCEPTION(std::range_error("Testing individual bits in negative values is not supported - results are undefined."));
+      BOOST_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
    }
    //
    // Find the index of the least significant bit within that limb:
@@ -1187,11 +1187,11 @@ eval_msb(const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocato
    using default_ops::eval_get_sign;
    if (eval_get_sign(a) == 0)
    {
-      BOOST_THROW_EXCEPTION(std::range_error("No bits were set in the operand."));
+      BOOST_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
    }
    if (a.sign())
    {
-      BOOST_THROW_EXCEPTION(std::range_error("Testing individual bits in negative values is not supported - results are undefined."));
+      BOOST_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
    }
    return eval_msb_imp(a);
 }

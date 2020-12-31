@@ -115,11 +115,11 @@ BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value, unsig
    {
       if (val == 0)
       {
-         BOOST_THROW_EXCEPTION(std::range_error("No bits were set in the operand."));
+         BOOST_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
       }
       else
       {
-         BOOST_THROW_EXCEPTION(std::range_error("Testing individual bits in negative values is not supported - results are undefined."));
+         BOOST_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
       }
    }
    return detail::find_lsb(val);
@@ -132,11 +132,11 @@ BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_integral<Integer>::value, unsig
    {
       if (val == 0)
       {
-         BOOST_THROW_EXCEPTION(std::range_error("No bits were set in the operand."));
+         BOOST_THROW_EXCEPTION(std::domain_error("No bits were set in the operand."));
       }
       else
       {
-         BOOST_THROW_EXCEPTION(std::range_error("Testing individual bits in negative values is not supported - results are undefined."));
+         BOOST_THROW_EXCEPTION(std::domain_error("Testing individual bits in negative values is not supported - results are undefined."));
       }
    }
    return detail::find_msb(val);

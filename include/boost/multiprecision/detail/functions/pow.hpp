@@ -1,6 +1,6 @@
 
 // Copyright Christopher Kormanyos 2002 - 2013.
-// Copyright 2011 - 2013 John Maddock. Distributed under the Boost
+// Copyright 2011 - 2013 John Maddock.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          http://www.boost.org/LICENSE_1_0.txt)
@@ -16,6 +16,8 @@
 #pragma warning(push)
 #pragma warning(disable : 6326) // comparison of two constants
 #endif
+
+#include <boost/core/no_exceptions_support.hpp> // BOOST_TRY
 
 namespace detail {
 
@@ -503,10 +505,9 @@ inline void eval_pow(T& result, const T& x, const T& a)
       case FP_NAN:
          result = a;
          break;
-      case FP_NORMAL:
-      {
+      case FP_NORMAL: {
          // Need to check for a an odd integer as a special case:
-         try
+         BOOST_TRY
          {
             typename boost::multiprecision::detail::canonical<boost::intmax_t, T>::type i;
             eval_convert_to(&i, a);
@@ -536,10 +537,11 @@ inline void eval_pow(T& result, const T& x, const T& a)
                return;
             }
          }
-         catch (const std::exception&)
+         BOOST_CATCH(const std::exception&)
          {
             // fallthrough..
          }
+         BOOST_CATCH_END
          BOOST_FALLTHROUGH;
       }
       default:
@@ -584,31 +586,26 @@ inline void eval_pow(T& result, const T& x, const T& a)
        std::numeric_limits<typename boost::multiprecision::detail::canonical<boost::intmax_t, T>::type>::is_specialized ? (std::numeric_limits<typename boost::multiprecision::detail::canonical<boost::intmax_t, T>::type>::min)() : -min_an;
 
    T fa;
-#ifndef BOOST_NO_EXCEPTIONS
-   try
+   BOOST_TRY
    {
-#endif
       eval_convert_to(&an, a);
       if (a.compare(an) == 0)
       {
          detail::pow_imp(result, x, an, mpl::true_());
          return;
       }
-#ifndef BOOST_NO_EXCEPTIONS
    }
-   catch (const std::exception&)
+   BOOST_CATCH(const std::exception&)
    {
       // conversion failed, just fall through, value is not an integer.
       an = (std::numeric_limits<boost::intmax_t>::max)();
    }
-#endif
+   BOOST_CATCH_END
    if ((eval_get_sign(x) < 0))
    {
       typename boost::multiprecision::detail::canonical<boost::uintmax_t, T>::type aun;
-#ifndef BOOST_NO_EXCEPTIONS
-      try
+      BOOST_TRY
       {
-#endif
          eval_convert_to(&aun, a);
          if (a.compare(aun) == 0)
          {
@@ -619,13 +616,13 @@ inline void eval_pow(T& result, const T& x, const T& a)
                result.negate();
             return;
          }
-#ifndef BOOST_NO_EXCEPTIONS
       }
-      catch (const std::exception&)
+      BOOST_CATCH(const std::exception&)
       {
          // conversion failed, just fall through, value is not an integer.
       }
-#endif
+      BOOST_CATCH_END
+
       eval_floor(result, a);
       // -1^INF is a special case in C99:
       if ((x.compare(si_type(-1)) == 0) && (eval_fpclassify(a) == FP_INFINITE))
@@ -758,7 +755,7 @@ void eval_exp2(T& result, const T& arg)
    // Check for pure-integer arguments which can be either signed or unsigned.
    typename boost::multiprecision::detail::canonical<typename T::exponent_type, T>::type i;
    T                                                                                     temp;
-   try
+   BOOST_TRY
    {
       eval_trunc(temp, arg);
       eval_convert_to(&i, temp);
@@ -769,12 +766,13 @@ void eval_exp2(T& result, const T& arg)
          return;
       }
    }
-   catch (const boost::math::rounding_error&)
+   BOOST_CATCH(const boost::math::rounding_error&)
    { /* Fallthrough */
    }
-   catch (const std::runtime_error&)
+   BOOST_CATCH(const std::runtime_error&)
    { /* Fallthrough */
    }
+   BOOST_CATCH_END
 
    temp = static_cast<typename mpl::front<typename T::unsigned_types>::type>(2u);
    eval_pow(result, temp, arg);
