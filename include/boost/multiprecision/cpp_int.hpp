@@ -2316,13 +2316,13 @@ struct is_explicitly_convertible<cpp_int_backend<MinBits, MaxBits, SignType, Che
 //
 // Last of all we include the implementations of all the eval_* non member functions:
 //
+#include <boost/multiprecision/cpp_int/limits.hpp>
 #include <boost/multiprecision/cpp_int/comparison.hpp>
 #include <boost/multiprecision/cpp_int/add.hpp>
 #include <boost/multiprecision/cpp_int/multiply.hpp>
 #include <boost/multiprecision/cpp_int/divide.hpp>
 #include <boost/multiprecision/cpp_int/bitwise.hpp>
 #include <boost/multiprecision/cpp_int/misc.hpp>
-#include <boost/multiprecision/cpp_int/limits.hpp>
 #ifdef BOOST_MP_USER_DEFINED_LITERALS
 #include <boost/multiprecision/cpp_int/literals.hpp>
 #endif
