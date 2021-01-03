@@ -88,14 +88,14 @@ operator+(number<B, et_on>&& a, number<B, et_on>&& b)
 }
 #endif
 template <class B, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && !is_compatible_mixed_arithmetic_type<V, number<B, et_on> >::value, detail::expression<detail::add_immediates, number<B, et_on>, V> >::type
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && !is_equivalent_number_type<V, number<B, et_on> >::value, detail::expression<detail::add_immediates, number<B, et_on>, V> >::type
 operator+(const number<B, et_on>& a, const V& b)
 {
    return detail::expression<detail::add_immediates, number<B, et_on>, V>(a, b);
 }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
 template <class B, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && !is_compatible_mixed_arithmetic_type<V, number<B, et_on> >::value, number<B, et_on> >::type
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && !is_equivalent_number_type<V, number<B, et_on> >::value, number<B, et_on> >::type
 operator+(number<B, et_on>&& a, const V& b)
 {
    return detail::expression<detail::add_immediates, number<B, et_on>, V>(a, b);
@@ -380,14 +380,14 @@ operator-(number<B, et_on>&& a, number<B, et_on>&& b)
 }
 #endif
 template <class B, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && !is_compatible_mixed_arithmetic_type<V, number<B, et_on> >::value, detail::expression<detail::subtract_immediates, number<B, et_on>, V> >::type
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && !is_equivalent_number_type<V, number<B, et_on> >::value, detail::expression<detail::subtract_immediates, number<B, et_on>, V> >::type
 operator-(const number<B, et_on>& a, const V& b)
 {
    return detail::expression<detail::subtract_immediates, number<B, et_on>, V>(a, b);
 }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
 template <class B, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && !is_compatible_mixed_arithmetic_type<V, number<B, et_on> >::value, number<B, et_on> >::type
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && !is_equivalent_number_type<V, number<B, et_on> >::value, number<B, et_on> >::type
 operator-(number<B, et_on>&& a, const V& b)
 {
    return detail::expression<detail::subtract_immediates, number<B, et_on>, V>(a, b);
@@ -586,14 +586,14 @@ operator*(number<B, et_on>&& a, number<B, et_on>&& b)
 }
 #endif
 template <class B, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && !is_compatible_mixed_arithmetic_type<V, number<B, et_on> >::value, detail::expression<detail::multiply_immediates, number<B, et_on>, V> >::type
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && !is_equivalent_number_type<V, number<B, et_on> >::value, detail::expression<detail::multiply_immediates, number<B, et_on>, V> >::type
 operator*(const number<B, et_on>& a, const V& b)
 {
    return detail::expression<detail::multiply_immediates, number<B, et_on>, V>(a, b);
 }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
 template <class B, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && !is_compatible_mixed_arithmetic_type<V, number<B, et_on> >::value, number<B, et_on> >::type
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && !is_equivalent_number_type<V, number<B, et_on> >::value, number<B, et_on> >::type
 operator*(number<B, et_on>&& a, const V& b)
 {
    return detail::expression<detail::multiply_immediates, number<B, et_on>, V>(a, b);
@@ -802,14 +802,14 @@ operator/(number<B, et_on>&& a, number<B, et_on>&& b)
 }
 #endif
 template <class B, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && !is_compatible_mixed_arithmetic_type<V, number<B, et_on> >::value, detail::expression<detail::divide_immediates, number<B, et_on>, V> >::type
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && !is_equivalent_number_type<V, number<B, et_on> >::value, detail::expression<detail::divide_immediates, number<B, et_on>, V> >::type
 operator/(const number<B, et_on>& a, const V& b)
 {
    return detail::expression<detail::divide_immediates, number<B, et_on>, V>(a, b);
 }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
 template <class B, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && !is_compatible_mixed_arithmetic_type<V, number<B, et_on> >::value, number<B, et_on> >::type
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && !is_equivalent_number_type<V, number<B, et_on> >::value, number<B, et_on> >::type
 operator/(number<B, et_on>&& a, const V& b)
 {
    return detail::expression<detail::divide_immediates, number<B, et_on>, V>(a, b);
@@ -1022,7 +1022,7 @@ operator%(number<B, et_on>&& a, number<B, et_on>&& b)
 }
 #endif
 template <class B, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer) && !is_compatible_mixed_arithmetic_type<V, number<B, et_on> >::value,
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer) && !is_equivalent_number_type<V, number<B, et_on> >::value,
                             detail::expression<detail::modulus_immediates, number<B, et_on>, V> >::type
 operator%(const number<B, et_on>& a, const V& b)
 {
@@ -1030,7 +1030,7 @@ operator%(const number<B, et_on>& a, const V& b)
 }
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
 template <class B, class V>
-inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer) && !is_compatible_mixed_arithmetic_type<V, number<B, et_on> >::value,
+inline BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<is_compatible_arithmetic_type<V, number<B, et_on> >::value && (number_category<B>::value == number_kind_integer) && !is_equivalent_number_type<V, number<B, et_on> >::value,
    number<B, et_on> >::type
 operator%(number<B, et_on>&& a, const V& b)
 {

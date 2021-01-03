@@ -192,7 +192,7 @@ class number
    template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
    BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<is_convertible<typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type, self_type>::value, number&>::type operator=(const detail::expression<tag, Arg1, Arg2, Arg3, Arg4>& e)
    {
-      typedef mpl::bool_<is_compatible_mixed_arithmetic_type<number, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value> tag_type;
+      typedef mpl::bool_<l<number, typename detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type>::value> tag_type;
       detail::scoped_default_precision<number<Backend, ExpressionTemplates> >                                       precision_guard(e);
       //
       // If the current precision of *this differs from that of expression e, then we

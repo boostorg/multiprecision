@@ -1753,7 +1753,7 @@ struct is_interval_number<number<Backend, ExpressionTemplates> > : public is_int
 {};
 
 template <class T, class U>
-struct is_compatible_mixed_arithmetic_type : public boost::is_same<T, U> {};
+struct is_equivalent_number_type : public boost::is_same<T, U> {};
 
 } // namespace multiprecision
 } // namespace boost
