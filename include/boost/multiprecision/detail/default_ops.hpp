@@ -1072,20 +1072,20 @@ inline BOOST_MP_CXX14_CONSTEXPR void eval_convert_to(std::complex<long double>* 
 //
 // Functions:
 //
-template <class T>
-inline BOOST_MP_CXX14_CONSTEXPR void eval_abs(T& result, const T& arg)
+template <class T, class U>
+inline BOOST_MP_CXX14_CONSTEXPR void eval_abs(T& result, const U& arg)
 {
-   typedef typename T::signed_types             type_list;
+   typedef typename U::signed_types             type_list;
    typedef typename mpl::front<type_list>::type front;
    result = arg;
    if (arg.compare(front(0)) < 0)
       result.negate();
 }
-template <class T>
-inline BOOST_MP_CXX14_CONSTEXPR void eval_fabs(T& result, const T& arg)
+template <class T, class U>
+inline BOOST_MP_CXX14_CONSTEXPR void eval_fabs(T& result, const U& arg)
 {
    BOOST_STATIC_ASSERT_MSG(number_category<T>::value == number_kind_floating_point, "The fabs function is only valid for floating point types.");
-   typedef typename T::signed_types             type_list;
+   typedef typename U::signed_types             type_list;
    typedef typename mpl::front<type_list>::type front;
    result = arg;
    if (arg.compare(front(0)) < 0)

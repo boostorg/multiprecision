@@ -1755,7 +1755,17 @@ struct is_interval_number<number<Backend, ExpressionTemplates> > : public is_int
 template <class T, class U>
 struct is_equivalent_number_type : public boost::is_same<T, U> {};
 
-} // namespace multiprecision
+template <class Backend, expression_template_option ExpressionTemplates, class T2>
+struct is_equivalent_number_type<number<Backend, ExpressionTemplates>, T2> : public is_equivalent_number_type<Backend, T2>
+{};
+template <class T1, class Backend, expression_template_option ExpressionTemplates>
+struct is_equivalent_number_type<T1, number<Backend, ExpressionTemplates> > : public is_equivalent_number_type<Backend, T1>
+{};
+template <class Backend, expression_template_option ExpressionTemplates, class Backend2, expression_template_option ExpressionTemplates2>
+struct is_equivalent_number_type<number<Backend, ExpressionTemplates>, number<Backend2, ExpressionTemplates2> > : public is_equivalent_number_type<Backend, Backend2>
+{};
+
+}
 } // namespace boost
 
 namespace boost { namespace math {

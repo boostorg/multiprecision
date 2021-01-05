@@ -132,6 +132,19 @@ class cpp_bin_float
    {
       *this = o;
    }
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   template <unsigned D, digit_base_type B, class A, class E, E MinE, E MaxE>
+   cpp_bin_float(cpp_bin_float<D, B, A, E, MinE, MaxE>&& o, typename boost::enable_if_c<(bit_count >= cpp_bin_float<D, B, A, E, MinE, MaxE>::bit_count)>::type const* = 0)BOOST_MP_NOEXCEPT_IF(noexcept(rep_type(std::declval<rep_type&&>())))
+   {
+      *this = std::move(o);
+   }
+   template <unsigned D, digit_base_type B, class A, class E, E MinE, E MaxE>
+   explicit cpp_bin_float(cpp_bin_float<D, B, A, E, MinE, MaxE>&& o, typename boost::disable_if_c<(bit_count >= cpp_bin_float<D, B, A, E, MinE, MaxE>::bit_count)>::type const* = 0)BOOST_MP_NOEXCEPT_IF(noexcept(rep_type(std::declval<rep_type&&>())))
+       : m_exponent(o.exponent()), m_sign(o.sign())
+   {
+      *this = std::move(o);
+   }
+#endif
    template <class Float>
    cpp_bin_float(const Float& f,
                  typename boost::enable_if_c<detail::is_cpp_bin_float_implicitly_constructible_from_type<Float, bit_count>::value>::type const* = 0)
@@ -173,6 +186,62 @@ class cpp_bin_float
       return *this;
    }
 
+   template <class A, class E, E MinE, E MaxE>
+   cpp_bin_float& operator=(const cpp_bin_float<Digits, DigitBase, A, E, MinE, MaxE>& o) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<rep_type&>() = std::declval<const rep_type&>()))
+   {
+      m_data     = o.bits();
+      m_sign     = o.sign();
+      if (o.exponent() == cpp_bin_float<Digits, DigitBase, A, E, MinE, MaxE>::exponent_zero)
+         m_exponent = exponent_zero;
+      else if (o.exponent() == cpp_bin_float<Digits, DigitBase, A, E, MinE, MaxE>::exponent_nan)
+         m_exponent = exponent_nan;
+      else if (o.exponent() == cpp_bin_float<Digits, DigitBase, A, E, MinE, MaxE>::exponent_infinity)
+         m_exponent = exponent_infinity;
+      else if (o.exponent() > cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::max_exponent)
+      {
+         // Overflow:
+         exponent() = cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity;
+         bits() = static_cast<limb_type>(0u);
+      }
+      else if (o.exponent() < cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::min_exponent)
+      {
+         // Underflow:
+         exponent() = cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero;
+         bits() = static_cast<limb_type>(0u);
+      }
+      else
+         m_exponent = o.exponent();
+      return *this;
+   }
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   template <class A, class E, E MinE, E MaxE>
+   cpp_bin_float& operator=(cpp_bin_float<Digits, DigitBase, A, E, MinE, MaxE>&& o) BOOST_MP_NOEXCEPT_IF(noexcept(std::declval<rep_type&>() = std::declval<rep_type&&>()))
+   {
+      m_data     = std::move(o.bits());
+      m_sign     = o.sign();
+      if (o.exponent() == cpp_bin_float<Digits, DigitBase, A, E, MinE, MaxE>::exponent_zero)
+         m_exponent = exponent_zero;
+      else if (o.exponent() == cpp_bin_float<Digits, DigitBase, A, E, MinE, MaxE>::exponent_nan)
+         m_exponent = exponent_nan;
+      else if (o.exponent() == cpp_bin_float<Digits, DigitBase, A, E, MinE, MaxE>::exponent_infinity)
+         m_exponent = exponent_infinity;
+      else if (o.exponent() > cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::max_exponent)
+      {
+         // Overflow:
+         exponent() = cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity;
+         bits() = static_cast<limb_type>(0u);
+      }
+      else if (o.exponent() < cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::min_exponent)
+      {
+         // Underflow:
+         exponent() = cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero;
+         bits() = static_cast<limb_type>(0u);
+      }
+      else
+         m_exponent = o.exponent();
+      return *this;
+   }
+#endif
    template <unsigned D, digit_base_type B, class A, class E, E MinE, E MaxE>
    cpp_bin_float& operator=(const cpp_bin_float<D, B, A, E, MinE, MaxE>& f)
    {
@@ -640,8 +709,9 @@ inline void copy_and_round(cpp_bin_float<Digits, DigitBase, Allocator, Exponent,
    }
 }
 
-template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
-inline void do_eval_add(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& a, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& b)
+template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, class BinFloat2, class BinFloat3>
+inline void do_eval_add(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, 
+   const BinFloat2& a, const BinFloat3& b)
 {
    if (a.exponent() < b.exponent())
    {
@@ -662,14 +732,14 @@ inline void do_eval_add(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Mi
    // Special cases first:
    switch (a.exponent())
    {
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero:
+   case BinFloat2::exponent_zero:
    {
       bool s     = a.sign();
       res        = b;
       res.sign() = s;
       return;
    }
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
+   case BinFloat2::exponent_infinity:
       if (b.exponent() == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan)
          res = b;
       else
@@ -681,15 +751,15 @@ inline void do_eval_add(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Mi
    }
    switch (b.exponent())
    {
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero:
+   case BinFloat3::exponent_zero:
       res = a;
       return;
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
+   case BinFloat3::exponent_infinity:
       res = b;
       if (res.sign())
          res.negate();
       return; // result is infinite.
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
+   case BinFloat3::exponent_nan:
       res = b;
       return; // result is a NaN.
    }
@@ -717,52 +787,52 @@ inline void do_eval_add(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Mi
       res.negate();
 }
 
-template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
-inline void do_eval_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& a, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& b)
+template <class BinFloat1, class BinFloat2, class BinFloat3>
+inline void do_eval_subtract(BinFloat1& res, const BinFloat2& a, const BinFloat3& b)
 {
    using default_ops::eval_bit_test;
    using default_ops::eval_decrement;
    using default_ops::eval_subtract;
 
-   typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::double_rep_type dt;
+   typename BinFloat1::double_rep_type dt;
 
    // Special cases first:
    switch (a.exponent())
    {
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero:
-      if (b.exponent() == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan)
-         res = std::numeric_limits<number<cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> > >::quiet_NaN().backend();
+   case BinFloat2::exponent_zero:
+      if (b.exponent() == BinFloat3::exponent_nan)
+         res = std::numeric_limits<number<BinFloat1> >::quiet_NaN().backend();
       else
       {
          bool s = a.sign();
          res    = b;
-         if (res.exponent() == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero)
+         if (res.exponent() == BinFloat1::exponent_zero)
             res.sign() = false;
          else if (res.sign() == s)
             res.negate();
       }
       return;
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
-      if ((b.exponent() == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan) || (b.exponent() == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity))
-         res = std::numeric_limits<number<cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> > >::quiet_NaN().backend();
+   case BinFloat2::exponent_infinity:
+      if ((b.exponent() == BinFloat3::exponent_nan) || (b.exponent() == BinFloat3::exponent_infinity))
+         res = std::numeric_limits<number<BinFloat1> >::quiet_NaN().backend();
       else
          res = a;
       return;
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
+   case BinFloat2::exponent_nan:
       res = a;
       return; // result is still a NaN.
    }
    switch (b.exponent())
    {
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero:
+   case BinFloat3::exponent_zero:
       res = a;
       return;
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
-      res.exponent() = cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity;
+   case BinFloat3::exponent_infinity:
+      res.exponent() = BinFloat1::exponent_infinity;
       res.sign()     = !a.sign();
       res.bits()     = static_cast<limb_type>(0u);
       return; // result is a NaN.
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
+   case BinFloat3::exponent_nan:
       res = b;
       return; // result is still a NaN.
    }
@@ -771,17 +841,17 @@ inline void do_eval_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponen
    if ((a.exponent() > b.exponent()) || ((a.exponent() == b.exponent()) && a.bits().compare(b.bits()) >= 0))
    {
       dt = a.bits();
-      if (a.exponent() <= (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + b.exponent())
+      if (a.exponent() <= (int)BinFloat1::bit_count + b.exponent())
       {
-         typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type e_diff = a.exponent() - b.exponent();
+         typename BinFloat1::exponent_type e_diff = a.exponent() - b.exponent();
          eval_left_shift(dt, e_diff);
          res.exponent() = a.exponent() - e_diff;
          eval_subtract(dt, b.bits());
       }
-      else if (a.exponent() == (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + b.exponent() + 1)
+      else if (a.exponent() == (int)BinFloat1::bit_count + b.exponent() + 1)
       {
-         if ((eval_lsb(a.bits()) == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1)
-            && (eval_lsb(b.bits()) != cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1))
+         if ((eval_lsb(a.bits()) == BinFloat1::bit_count - 1)
+            && (eval_lsb(b.bits()) != BinFloat1::bit_count - 1))
          {
             eval_left_shift(dt, 1);
             eval_decrement(dt);
@@ -796,16 +866,16 @@ inline void do_eval_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponen
    else
    {
       dt = b.bits();
-      if (b.exponent() <= (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + a.exponent())
+      if (b.exponent() <= (int)BinFloat1::bit_count + a.exponent())
       {
-         typename cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_type e_diff = a.exponent() - b.exponent();
+         typename BinFloat1::exponent_type e_diff = a.exponent() - b.exponent();
          eval_left_shift(dt, -e_diff);
          res.exponent() = b.exponent() + e_diff;
          eval_subtract(dt, a.bits());
       }
-      else if (b.exponent() == (int)cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count + a.exponent() + 1)
+      else if (b.exponent() == (int)BinFloat1::bit_count + a.exponent() + 1)
       {
-         if ((eval_lsb(a.bits()) != cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::bit_count - 1)
+         if ((eval_lsb(a.bits()) != BinFloat1::bit_count - 1)
             && eval_lsb(b.bits()))
          {
             eval_left_shift(dt, 1);
@@ -821,15 +891,19 @@ inline void do_eval_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponen
    }
 
    copy_and_round(res, dt);
-   if (res.exponent() == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero)
+   if (res.exponent() == BinFloat1::exponent_zero)
       res.sign() = false;
    else if (res.sign() != s)
       res.negate();
    res.check_invariants();
 }
 
-template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
-inline void eval_add(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& a, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& b)
+template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, 
+   class Allocator2, class Exponent2, Exponent MinE2, Exponent MaxE2,
+   class Allocator3, class Exponent3, Exponent MinE3, Exponent MaxE3>
+inline void eval_add(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, 
+   const cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>& a, 
+   const cpp_bin_float<Digits, DigitBase, Allocator3, Exponent3, MinE3, MaxE3>& b)
 {
    if (a.sign() == b.sign())
       do_eval_add(res, a, b);
@@ -837,14 +911,20 @@ inline void eval_add(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE,
       do_eval_subtract(res, a, b);
 }
 
-template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
-inline void eval_add(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& a)
+template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
+   class Allocator2, class Exponent2, Exponent MinE2, Exponent MaxE2>
+inline void eval_add(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, 
+   const cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>& a)
 {
    return eval_add(res, res, a);
 }
 
-template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
-inline void eval_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& a, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& b)
+template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
+   class Allocator2, class Exponent2, Exponent MinE2, Exponent MaxE2,
+   class Allocator3, class Exponent3, Exponent MinE3, Exponent MaxE3>
+inline void eval_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, 
+   const cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>& a, 
+   const cpp_bin_float<Digits, DigitBase, Allocator3, Exponent3, MinE3, MaxE3>& b)
 {
    if (a.sign() != b.sign())
       do_eval_add(res, a, b);
@@ -852,14 +932,20 @@ inline void eval_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, 
       do_eval_subtract(res, a, b);
 }
 
-template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
-inline void eval_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& a)
+template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
+   class Allocator2, class Exponent2, Exponent MinE2, Exponent MaxE2>
+inline void eval_subtract(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, 
+   const cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>& a)
 {
    return eval_subtract(res, res, a);
 }
 
-template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
-inline void eval_multiply(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& a, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& b)
+template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, 
+   class Allocator2, class Exponent2, Exponent MinE2, Exponent MaxE2, 
+   class Allocator3, class Exponent3, Exponent MinE3, Exponent MaxE3>
+inline void eval_multiply(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, 
+   const cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>& a, 
+   const cpp_bin_float<Digits, DigitBase, Allocator3, Exponent3, MinE3, MaxE3>& b)
 {
    using default_ops::eval_bit_test;
    using default_ops::eval_multiply;
@@ -867,11 +953,11 @@ inline void eval_multiply(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, 
    // Special cases first:
    switch (a.exponent())
    {
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero:
+   case cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>::exponent_zero:
    {
-      if (b.exponent() == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan)
+      if (b.exponent() == cpp_bin_float<Digits, DigitBase, Allocator3, Exponent3, MinE3, MaxE3>::exponent_nan)
          res = b;
-      else if (b.exponent() == cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity)
+      else if (b.exponent() == cpp_bin_float<Digits, DigitBase, Allocator3, Exponent3, MinE3, MaxE3>::exponent_infinity)
          res = std::numeric_limits<number<cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> > >::quiet_NaN().backend();
       else
       {
@@ -881,13 +967,13 @@ inline void eval_multiply(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, 
       }
       return;
    }
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
+   case cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>::exponent_infinity:
       switch (b.exponent())
       {
-      case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero:
+      case cpp_bin_float<Digits, DigitBase, Allocator3, Exponent3, MinE3, MaxE3>::exponent_zero:
          res = std::numeric_limits<number<cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> > >::quiet_NaN().backend();
          break;
-      case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
+      case cpp_bin_float<Digits, DigitBase, Allocator3, Exponent3, MinE3, MaxE3>::exponent_nan:
          res = b;
          break;
       default:
@@ -897,11 +983,11 @@ inline void eval_multiply(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, 
          break;
       }
       return;
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
+   case cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>::exponent_nan:
       res = a;
       return;
    }
-   if (b.exponent() > cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::max_exponent)
+   if (b.exponent() > cpp_bin_float<Digits, DigitBase, Allocator3, Exponent3, MinE3, MaxE3>::max_exponent)
    {
       bool s     = a.sign() != b.sign();
       res        = b;
@@ -940,14 +1026,18 @@ inline void eval_multiply(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, 
    res.sign() = a.sign() != b.sign();
 }
 
-template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
-inline void eval_multiply(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& a)
+template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
+   class Allocator2, class Exponent2, Exponent MinE2, Exponent MaxE2>
+inline void eval_multiply(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, 
+   const cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>& a)
 {
    eval_multiply(res, res, a);
 }
 
-template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, class U>
-inline typename enable_if_c<is_unsigned<U>::value>::type eval_multiply(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& a, const U& b)
+template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
+   class Allocator2, class Exponent2, Exponent MinE2, Exponent MaxE2, class U>
+inline typename enable_if_c<is_unsigned<U>::value>::type eval_multiply(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, 
+   const cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>& a, const U& b)
 {
    using default_ops::eval_bit_test;
    using default_ops::eval_multiply;
@@ -955,20 +1045,20 @@ inline typename enable_if_c<is_unsigned<U>::value>::type eval_multiply(cpp_bin_f
    // Special cases first:
    switch (a.exponent())
    {
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero:
+   case cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>::exponent_zero:
    {
       bool s     = a.sign();
       res        = a;
       res.sign() = s;
       return;
    }
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
+   case cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>::exponent_infinity:
       if (b == 0)
          res = std::numeric_limits<number<cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> > >::quiet_NaN().backend();
       else
          res = a;
       return;
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
+   case cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>::exponent_nan:
       res = a;
       return;
    }
@@ -988,8 +1078,10 @@ inline typename enable_if_c<is_unsigned<U>::value>::type eval_multiply(cpp_bin_f
    eval_multiply(res, res, b);
 }
 
-template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, class S>
-inline typename enable_if_c<is_signed<S>::value>::type eval_multiply(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& a, const S& b)
+template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
+   class Allocator2, class Exponent2, Exponent MinE2, Exponent MaxE2, class S>
+inline typename enable_if_c<is_signed<S>::value>::type eval_multiply(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, 
+   const cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>& a, const S& b)
 {
    typedef typename make_unsigned<S>::type ui_type;
    eval_multiply(res, a, static_cast<ui_type>(boost::multiprecision::detail::unsigned_abs(b)));
@@ -1003,8 +1095,12 @@ inline typename enable_if_c<is_signed<S>::value>::type eval_multiply(cpp_bin_flo
    eval_multiply(res, res, b);
 }
 
-template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
-inline void eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& u, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& v)
+template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
+   class Allocator2, class Exponent2, Exponent MinE2, Exponent MaxE2,
+   class Allocator3, class Exponent3, Exponent MinE3, Exponent MaxE3>
+inline void eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, 
+   const cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>& u, 
+   const cpp_bin_float<Digits, DigitBase, Allocator3, Exponent3, MinE3, MaxE3>& v)
 {
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -1021,12 +1117,12 @@ inline void eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Mi
    //
    switch (u.exponent())
    {
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero:
+   case cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>::exponent_zero:
    {
       switch (v.exponent())
       {
-      case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero:
-      case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
+      case cpp_bin_float<Digits, DigitBase, Allocator3, Exponent3, MinE3, MaxE3>::exponent_zero:
+      case cpp_bin_float<Digits, DigitBase, Allocator3, Exponent3, MinE3, MaxE3>::exponent_nan:
          res = std::numeric_limits<number<cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> > >::quiet_NaN().backend();
          return;
       }
@@ -1035,12 +1131,12 @@ inline void eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Mi
       res.sign() = s;
       return;
    }
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
+   case cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>::exponent_infinity:
    {
       switch (v.exponent())
       {
-      case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
-      case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
+      case cpp_bin_float<Digits, DigitBase, Allocator3, Exponent3, MinE3, MaxE3>::exponent_infinity:
+      case cpp_bin_float<Digits, DigitBase, Allocator3, Exponent3, MinE3, MaxE3>::exponent_nan:
          res = std::numeric_limits<number<cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> > >::quiet_NaN().backend();
          return;
       }
@@ -1049,25 +1145,25 @@ inline void eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Mi
       res.sign() = s;
       return;
    }
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
+   case cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>::exponent_nan:
       res = std::numeric_limits<number<cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> > >::quiet_NaN().backend();
       return;
    }
    switch (v.exponent())
    {
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero:
+   case cpp_bin_float<Digits, DigitBase, Allocator3, Exponent3, MinE3, MaxE3>::exponent_zero:
    {
       bool s     = u.sign() != v.sign();
       res        = std::numeric_limits<number<cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> > >::infinity().backend();
       res.sign() = s;
       return;
    }
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
+   case cpp_bin_float<Digits, DigitBase, Allocator3, Exponent3, MinE3, MaxE3>::exponent_infinity:
       res.exponent() = cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero;
       res.bits()     = limb_type(0);
       res.sign()     = u.sign() != v.sign();
       return;
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
+   case cpp_bin_float<Digits, DigitBase, Allocator3, Exponent3, MinE3, MaxE3>::exponent_nan:
       res = std::numeric_limits<number<cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> > >::quiet_NaN().backend();
       return;
    }
@@ -1166,14 +1262,18 @@ inline void eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, Mi
 #endif
 }
 
-template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
-inline void eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& arg)
+template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
+   class Allocator2, class Exponent2, Exponent MinE2, Exponent MaxE2>
+inline void eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, 
+   const cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>& arg)
 {
    eval_divide(res, res, arg);
 }
 
-template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, class U>
-inline typename enable_if_c<is_unsigned<U>::value>::type eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& u, const U& v)
+template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
+   class Allocator2, class Exponent2, Exponent MinE2, Exponent MaxE2, class U>
+inline typename enable_if_c<is_unsigned<U>::value>::type eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, 
+   const cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>& u, const U& v)
 {
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -1190,7 +1290,7 @@ inline typename enable_if_c<is_unsigned<U>::value>::type eval_divide(cpp_bin_flo
    //
    switch (u.exponent())
    {
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_zero:
+   case cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>::exponent_zero:
    {
       if (v == 0)
       {
@@ -1202,10 +1302,10 @@ inline typename enable_if_c<is_unsigned<U>::value>::type eval_divide(cpp_bin_flo
       res.sign() = s;
       return;
    }
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_infinity:
+   case cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>::exponent_infinity:
       res = u;
       return;
-   case cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>::exponent_nan:
+   case cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>::exponent_nan:
       res = std::numeric_limits<number<cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE> > >::quiet_NaN().backend();
       return;
    }
@@ -1290,8 +1390,10 @@ inline typename enable_if_c<is_unsigned<U>::value>::type eval_divide(cpp_bin_flo
    eval_divide(res, res, v);
 }
 
-template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, class S>
-inline typename enable_if_c<is_signed<S>::value>::type eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& u, const S& v)
+template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
+   class Allocator2, class Exponent2, Exponent MinE2, Exponent MaxE2, class S>
+inline typename enable_if_c<is_signed<S>::value>::type eval_divide(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, 
+   const cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2>& u, const S& v)
 {
    typedef typename make_unsigned<S>::type ui_type;
    eval_divide(res, u, static_cast<ui_type>(boost::multiprecision::detail::unsigned_abs(v)));
@@ -1588,6 +1690,13 @@ inline typename enable_if_c<is_signed<I>::value>::type eval_ldexp(cpp_bin_float<
 * Sign manipulation
 */
 
+template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
+   unsigned Digits2, digit_base_type DigitBase2, class Allocator2, class Exponent2, Exponent MinE2, Exponent MaxE2>
+inline void eval_abs(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, const cpp_bin_float<Digits2, DigitBase2, Allocator2, Exponent2, MinE2, MaxE2>& arg)
+{
+   res        = arg;
+   res.sign() = false;
+}
 template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
 inline void eval_abs(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& arg)
 {
@@ -1595,6 +1704,13 @@ inline void eval_abs(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE,
    res.sign() = false;
 }
 
+template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE,
+   unsigned Digits2, digit_base_type DigitBase2, class Allocator2, class Exponent2, Exponent MinE2, Exponent MaxE2>
+inline void eval_fabs(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, const cpp_bin_float<Digits2, DigitBase2, Allocator2, Exponent2, MinE2, MaxE2>& arg)
+{
+   res        = arg;
+   res.sign() = false;
+}
 template <unsigned Digits, digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE>
 inline void eval_fabs(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& res, const cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>& arg)
 {
@@ -1831,6 +1947,10 @@ struct expression_template_default<cpp_bin_float<Digits, DigitBase, Allocator, E
 {
    static const expression_template_option value = is_void<Allocator>::value ? et_off : et_on;
 };
+
+template <unsigned Digits, backends::digit_base_type DigitBase, class Allocator, class Exponent, Exponent MinE, Exponent MaxE, class Allocator2, class Exponent2, Exponent MinE2, Exponent MaxE2>
+struct is_equivalent_number_type<cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>, cpp_bin_float<Digits, DigitBase, Allocator2, Exponent2, MinE2, MaxE2> >
+   : public mpl::true_ {};
 
 typedef number<backends::cpp_bin_float<50> >  cpp_bin_float_50;
 typedef number<backends::cpp_bin_float<100> > cpp_bin_float_100;
