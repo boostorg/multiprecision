@@ -1453,9 +1453,15 @@ struct cpp_int_backend
       this->resize(other.size(), other.size());
 
       unsigned count = (std::min)(other.size(), this->size());
-      for (unsigned i = 0; i < count; ++i)
-         this->limbs()[i] = other.limbs()[i];
-      //std::memcpy(this->limbs(), other.limbs(), (std::min)(other.size(), this->size()) * sizeof(this->limbs()[0]));
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+      if (BOOST_MP_IS_CONST_EVALUATED(m_limbs))
+      {
+         for (unsigned i = 0; i < count; ++i)
+            this->limbs()[i] = other.limbs()[i];
+      }
+      else
+#endif
+         std::memcpy(this->limbs(), other.limbs(), (std::min)(other.size(), this->size()) * sizeof(this->limbs()[0]));
 
       this->sign(other.sign());
       this->normalize();
