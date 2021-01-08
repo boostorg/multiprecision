@@ -1454,7 +1454,7 @@ struct cpp_int_backend
 
       unsigned count = (std::min)(other.size(), this->size());
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
-      if (BOOST_MP_IS_CONST_EVALUATED(m_limbs))
+      if (BOOST_MP_IS_CONST_EVALUATED(other.size()))
       {
          for (unsigned i = 0; i < count; ++i)
             this->limbs()[i] = other.limbs()[i];
