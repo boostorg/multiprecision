@@ -1452,17 +1452,22 @@ struct cpp_int_backend
       // regular non-trivial to non-trivial assign:
       this->resize(other.size(), other.size());
 
+#if !defined(BOOST_MP_HAS_IS_CONSTANT_EVALUATED) && !defined(BOOST_MP_HAS_BUILTIN_IS_CONSTANT_EVALUATED) && !defined(BOOST_NO_CXX14_CONSTEXPR)
       unsigned count = (std::min)(other.size(), this->size());
+      for (unsigned i = 0; i < count; ++i)
+         this->limbs()[i] = other.limbs()[i];
+#else
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
       if (BOOST_MP_IS_CONST_EVALUATED(other.size()))
       {
+         unsigned count = (std::min)(other.size(), this->size());
          for (unsigned i = 0; i < count; ++i)
             this->limbs()[i] = other.limbs()[i];
       }
       else
 #endif
          std::memcpy(this->limbs(), other.limbs(), (std::min)(other.size(), this->size()) * sizeof(this->limbs()[0]));
-
+#endif
       this->sign(other.sign());
       this->normalize();
    }
